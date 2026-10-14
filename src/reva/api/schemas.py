@@ -673,6 +673,7 @@ class ProvenanceNode(ApiModel):
         "scenario",
         "context",
         "model_version",
+        "claim",
     ]
     label: str
     attributes: dict[str, Any] = Field(default_factory=dict)

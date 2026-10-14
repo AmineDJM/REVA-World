@@ -148,6 +148,27 @@
         }
       ]
     },
+    "pop_fra_1950_1951_chain": {
+      "years": [
+        1950,
+        1951
+      ],
+      "purpose": "revision chain constraint checks",
+      "vintages": [
+        {
+          "label": "v1",
+          "file": "pop_fra_1950_1951_chain.v1.json",
+          "retrieved_at": "2026-01-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-01-01"
+        },
+        {
+          "label": "v2",
+          "file": "pop_fra_1950_1951_chain.v2.json",
+          "retrieved_at": "2026-01-06T10:00:00+00:00",
+          "dataset_lastupdated": "2026-01-05"
+        }
+      ]
+    },
     "pop_fra_1960_1961_job": {
       "years": [
         1960,

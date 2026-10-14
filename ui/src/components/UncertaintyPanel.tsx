@@ -1,7 +1,8 @@
 import type { Uncertainty, UncertaintySummary } from '../api/types';
 import { formatDecimalString } from '../lib/format';
 
-type AnyUncertainty = Partial<Uncertainty> & Partial<UncertaintySummary> & { status?: string | null };
+type AnyUncertainty = Omit<Partial<Uncertainty>, 'status'> &
+  Omit<Partial<UncertaintySummary>, 'status'> & { status?: Uncertainty['status'] | UncertaintySummary['status'] | null };
 
 export interface UncertaintyLabel {
   /** Short heading, e.g. "Sensitivity range (not a confidence interval)". */

@@ -184,7 +184,6 @@ UPDATE ops.job j SET
   lease_until = clock_timestamp() + make_interval(secs => :lease),
   fencing_token = nextval('ops.fencing_seq'),
   attempts = j.attempts + 1,
-  last_error = j.last_error,
   updated_at = clock_timestamp()
 FROM cand WHERE j.id = cand.id
 RETURNING j.id, j.job_type, j.payload, j.fencing_token, j.attempts, j.max_attempts, j.lease_until,

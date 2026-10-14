@@ -104,6 +104,16 @@ NOT_CLAIMED = (
 )
 
 
+def dstr(d: Decimal) -> str:
+    """Plain decimal string at full model precision.
+
+    ``kernel.values.decimal_str`` normalises in the *thread* context (28 digits by
+    default), which would silently round 50-digit results; format inside the model context.
+    """
+    with localcontext(_CTX):
+        return decimal_str(d)
+
+
 def _dec(x: Any, what: str) -> Decimal:
     """Exact Decimal conversion; floats go through their shortest repr (1.25 -> '1.25')."""
     if isinstance(x, bool):
@@ -171,7 +181,7 @@ class ExposureResult:
 
     def as_json(self) -> dict[str, str]:
         return {
-            k: (decimal_str(v) if isinstance(v, Decimal) else str(v))
+            k: (dstr(v) if isinstance(v, Decimal) else str(v))
             for k, v in self.__dict__.items()
         }
 
@@ -222,7 +232,7 @@ def exposure_l1(M: Any, X: Any, G: Any, import_multiplier: Any, export_multiplie
 
 def l2_variant_name(import_elasticity: Any, export_elasticity: Any) -> str:
     e_m, e_x = _dec(import_elasticity, "import_elasticity"), _dec(export_elasticity, "export_elasticity")
-    return f"L2:eM={decimal_str(e_m)};eX={decimal_str(e_x)}"
+    return f"L2:eM={dstr(e_m)};eX={dstr(e_x)}"
 
 
 def exposure_l2(M: Any, X: Any, G: Any, import_multiplier: Any, export_multiplier: Any,

@@ -157,5 +157,8 @@ def decimal_str(d: Decimal) -> str:
     """Plain (non-exponent) decimal string with no trailing noise."""
     if not d.is_finite():
         raise ValueError("non-finite decimal")
-    s = format(d.normalize(), "f")
+    import decimal
+
+    ctx = decimal.Context(prec=max(28, len(d.as_tuple().digits)))
+    s = format(d.normalize(ctx), "f")
     return "0" if s in ("-0", "") else s

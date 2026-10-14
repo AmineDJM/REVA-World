@@ -88,7 +88,7 @@ CREATE TABLE sim.run (
 -- Run outcome is an append-only record (status history lives in ops.job).
 CREATE TABLE sim.run_outcome (
   run_id uuid PRIMARY KEY REFERENCES sim.run,
-  status text NOT NULL CHECK (status IN ('succeeded','failed','unsupported','missing_input')),
+  status text NOT NULL CHECK (status IN ('succeeded','failed','unsupported','missing_input','cache_miss')),
   output_manifest_sha256 text REFERENCES meta.artifact,
   output_digest text,
   applicability jsonb NOT NULL,

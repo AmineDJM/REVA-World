@@ -26,7 +26,6 @@ from reva.kernel.errors import (
     ValidationProblem,
 )
 from reva.kernel.ids import external_id, logical_hash
-from reva.kernel.values import decimal_str
 from reva.models.economic import crude_exposure as ce
 from reva.simulation.coupling import CouplingGraph, PortSpec
 from reva.simulation.spec import ScenarioSpec
@@ -48,8 +47,8 @@ class TypedChange:
     def as_json(self) -> dict[str, Any]:
         return {
             "kind": self.kind,
-            "import_multiplier": decimal_str(self.import_multiplier),
-            "export_multiplier": decimal_str(self.export_multiplier),
+            "import_multiplier": ce.dstr(self.import_multiplier),
+            "export_multiplier": ce.dstr(self.export_multiplier),
             "unit": self.unit,
             "duration": self.duration,
             "held_fixed": list(self.held_fixed),
@@ -87,7 +86,7 @@ class CountryPlan:
 
     def input_refs(self) -> dict[str, Any]:
         return {n: {"estimate_id": i.estimate_id, "concept": ce.INPUT_CONCEPTS[n],
-                    "value": (decimal_str(i.value) if isinstance(i.value, Decimal) else None),
+                    "value": (ce.dstr(i.value) if isinstance(i.value, Decimal) else None),
                     "reference_year": i.reference_year, "valuation": i.valuation}
                 for n, i in self.inputs.by_name().items()}
 

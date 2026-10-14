@@ -78,6 +78,10 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
 
     key = str(payload.get("idempotency_key") or default_idempotency_key(
         scenario["spec_digest"], fidelity, scenario["baseline_release_id"]))
+    if fidelity == "L0" and not payload.get("idempotency_key"):
+        # A lookup outcome depends on what has been computed so far: a miss must not
+        # be replayed forever, so L0 keys name the hit (or the job, for a miss).
+        key += f":hit:{plan.cache_hit_of}" if plan.cache_hit_of else f":miss:job:{ctx.job_id}"
     execution_profile = {
         "engine": ENGINE_VERSION,
         "fidelity": fidelity,

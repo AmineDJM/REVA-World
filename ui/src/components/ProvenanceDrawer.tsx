@@ -68,9 +68,14 @@ function pickAttr(attrs: Record<string, unknown>, keys: string[]): unknown {
   return undefined;
 }
 
-function NodeDetails({ node }: { node: ProvenanceNode }) {
+/** "artifact:abc…" -> "abc…" (API node ids are kind-prefixed). */
+export function nodeIdent(n: { id: string; kind: string }): string {
+  return n.id.startsWith(`${n.kind}:`) ? n.id.slice(n.kind.length + 1) : n.id;
+}
+
+function NodeDetails({ node, selectors }: { node: ProvenanceNode; selectors: { relation: string; selector: unknown }[] }) {
   const attrs = isRecord(node.attributes) ? node.attributes : {};
-  const sha = pickAttr(attrs, SHA_KEYS) ?? (node.kind === 'artifact' ? node.id : undefined);
+  const sha = pickAttr(attrs, SHA_KEYS) ?? (node.kind === 'artifact' ? nodeIdent(node) : undefined);
   const selector = pickAttr(attrs, SELECTOR_KEYS);
   const rest = Object.entries(attrs).filter(([k]) => !SHA_KEYS.includes(k) && !SELECTOR_KEYS.includes(k));
   return (
@@ -87,6 +92,12 @@ function NodeDetails({ node }: { node: ProvenanceNode }) {
           <dd className="mono break">{typeof selector === 'string' ? selector : JSON.stringify(selector)}</dd>
         </div>
       )}
+      {selectors.map((sel, i) => (
+        <div className="kv-row" key={`sel-${i}`}>
+          <dt>Selector ({humanize(sel.relation)})</dt>
+          <dd className="mono break">{typeof sel.selector === 'string' ? sel.selector : JSON.stringify(sel.selector)}</dd>
+        </div>
+      ))}
       {rest.map(([k, v]) => (
         <div className="kv-row" key={k}>
           <dt>{humanize(k)}</dt>
@@ -137,6 +148,15 @@ function ProvenanceDrawer({
 
   const graph: ProvenanceGraph | undefined = state.data?.data;
   const ordered = useMemo(() => orderNodes(graph), [graph]);
+  const selectorsByTarget = useMemo(() => {
+    const m = new Map<string, { relation: string; selector: unknown }[]>();
+    for (const e of graph?.edges ?? []) {
+      const sel = e.attributes?.selector;
+      if (sel === undefined || sel === null) continue;
+      m.set(e.target, [...(m.get(e.target) ?? []), { relation: e.relation, selector: sel }]);
+    }
+    return m;
+  }, [graph]);
   const nodeLabel = useMemo(() => new Map(graph?.nodes.map((n) => [n.id, `${humanize(n.kind)}: ${n.label}`]) ?? []), [graph]);
 
   return (
@@ -185,9 +205,9 @@ function ProvenanceDrawer({
                       {n.id.length > 24 ? `${n.id.slice(0, 24)}…` : n.id}
                     </span>
                   </p>
-                  <NodeDetails node={n} />
+                  <NodeDetails node={n} selectors={selectorsByTarget.get(n.id) ?? []} />
                   {n.id !== graph.root && (PROVENANCE_KINDS as readonly string[]).includes(n.kind) && (
-                    <button type="button" className="link-button" onClick={() => onFollow({ kind: n.kind, id: n.id, label: n.label })}>
+                    <button type="button" className="link-button" onClick={() => onFollow({ kind: n.kind, id: nodeIdent(n), label: n.label })}>
                       Trace from this {humanize(n.kind)}
                     </button>
                   )}

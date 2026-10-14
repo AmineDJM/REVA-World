@@ -87,7 +87,7 @@ class RedactionFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
         try:
             msg = record.getMessage()
-        except Exception:  # noqa: BLE001 - malformed format args must not crash logging
+        except Exception:
             msg = str(record.msg)
         record.msg = redact_text(msg, self._secrets)[:MAX_MESSAGE_CHARS]
         record.args = None

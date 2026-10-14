@@ -30,7 +30,7 @@ models:
       - {name: import_value_change_usd, unit: unit.usd}
       - {name: export_value_change_usd, unit: unit.usd}
       - {name: net_external_cost_change_usd, unit: unit.usd}
-      - {name: exposure_percent_baseline_gdp, unit: percent_of_baseline_gdp}
+      - {name: exposure_percent_baseline_gdp, unit: unit.percent_of_baseline_gdp}
     applicability:
       horizon: {periods: 1, unit: annual_accounting_period}
       reference_years: [2020, 2024]

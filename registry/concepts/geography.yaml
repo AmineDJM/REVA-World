@@ -25,3 +25,11 @@ concepts:
     labels: {en: Kilogram}
     definition: Mass in kilograms.
     owner: reva-maintainers
+  - concept_id: unit.percent_of_baseline_gdp
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Percent of baseline nominal GDP"}
+    definition: >-
+      100 x amount / same-year baseline nominal GDP in the same currency basis. A ratio of an
+      accounting change to GDP; not a GDP change.
+    owner: reva-maintainers

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from decimal import Decimal
+from decimal import Decimal, localcontext
 
 import pytest
 from hypothesis import given, settings
@@ -15,9 +15,9 @@ from reva.models.economic.crude_exposure import (
     CountryInputs,
     MonetaryInput,
     evaluate_country,
+    explain,
     exposure_l1,
     exposure_l2,
-    explain,
     validate_country_inputs,
 )
 
@@ -60,15 +60,15 @@ def test_zero_elasticity_l2_equals_l1_exactly(p_m, p_x):
 def test_l2_matches_definition_and_is_correctly_rounded():
     M, X, G = D(100), D(40), D(1000)
     r = exposure_l2(M, X, G, 1.25, 1.25, -0.5, 0.5)
-    from decimal import localcontext
-
     with localcontext() as c:
         c.prec = 60
         m_prime = M * (D("0.5") * D("1.25").ln()).exp()
         x_prime = X * (D("1.5") * D("1.25").ln()).exp()
     assert abs(r.scenario_import_value_usd - m_prime) < D("1e-45")
     assert abs(r.scenario_export_value_usd - x_prime) < D("1e-45")
-    assert r.import_value_change_usd == r.scenario_import_value_usd - M
+    with localcontext() as c:
+        c.prec = 80
+        assert abs(r.import_value_change_usd - (r.scenario_import_value_usd - M)) < D("1e-45")
     # integral exponents are exact: eps = 1 -> p^2
     r2 = exposure_l2(M, X, G, 1.25, 1.25, 1, 1)
     assert r2.import_value_change_usd == D("56.25")
@@ -209,12 +209,15 @@ def test_linearity_in_m_and_x_at_fixed_p(m1, m2, x1, x2, p_m, p_x, a):
     r1 = exposure_l1(D(m1), D(x1), G, p_m, p_x)
     r2 = exposure_l1(D(m2), D(x2), G, p_m, p_x)
     r12 = exposure_l1(D(m1 + m2), D(x1 + x2), G, p_m, p_x)
-    for k in ("import_value_change_usd", "export_value_change_usd", "net_external_cost_change_usd"):
-        assert getattr(r12, k) == getattr(r1, k) + getattr(r2, k)  # exact at 50 digits
-    tol = D("1e-35") * (1 + abs(r12.exposure_percent_baseline_gdp))
-    assert abs(r12.exposure_percent_baseline_gdp
-               - (r1.exposure_percent_baseline_gdp + r2.exposure_percent_baseline_gdp)) <= tol
-    # homogeneity: scaling M and X by a scales every value change
-    if a >= 0:
-        ra = exposure_l1(D(a * m1), D(a * x1), G, p_m, p_x)
-        assert ra.net_external_cost_change_usd == a * r1.net_external_cost_change_usd
+    with localcontext() as c:
+        c.prec = 100  # the test's own arithmetic must not round
+        for k in ("import_value_change_usd", "export_value_change_usd", "net_external_cost_change_usd"):
+            assert getattr(r12, k) == getattr(r1, k) + getattr(r2, k)  # exact
+        # exposure involves one division rounded at 50 significant digits
+        tol = D("1e-48") * (abs(r1.exposure_percent_baseline_gdp) + abs(r2.exposure_percent_baseline_gdp))
+        assert abs(r12.exposure_percent_baseline_gdp
+                   - (r1.exposure_percent_baseline_gdp + r2.exposure_percent_baseline_gdp)) <= tol
+        # homogeneity: scaling M and X by a scales every value change exactly
+        if a >= 0:
+            ra = exposure_l1(D(a * m1), D(a * x1), G, p_m, p_x)
+            assert ra.net_external_cost_change_usd == a * r1.net_external_cost_change_usd

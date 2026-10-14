@@ -29,7 +29,6 @@ from sqlalchemy import Connection, text
 from reva.kernel.errors import CapabilityGap, RevaError
 from reva.kernel.ids import logical_hash
 from reva.kernel.uncertainty import UncertaintyKind, UncertaintySpec, UncertaintyStatus
-from reva.kernel.values import decimal_str
 from reva.models.economic import crude_exposure as ce
 from reva.simulation import rng
 from reva.simulation.compile import CompiledScenario, compile_scenario
@@ -139,7 +138,7 @@ def _value(output_key: str, d: Decimal) -> dict[str, Any]:
                  "notes": "change in border value over one annual accounting period"}
     else:
         basis = {"scale_factor": "1", "notes": "percent of same-year baseline nominal GDP (current USD)"}
-    return {"kind": "decimal", "value": decimal_str(d), "unit_ref": unit, "basis": basis}
+    return {"kind": "decimal", "value": ce.dstr(d), "unit_ref": unit, "basis": basis}
 
 
 def _unknown_uncertainty() -> dict[str, Any]:
@@ -156,8 +155,8 @@ def _range_uncertainty(lo: Decimal, hi: Decimal, grid: list[dict[str, Any]]) -> 
         description=("Elasticity sensitivity range: min/max of this output across the labelled scenario-"
                      "assumption grid. Not a confidence, credible or prediction interval; no coverage level."),
         method_version=SENSITIVITY_METHOD,
-        lower=decimal_str(lo),
-        upper=decimal_str(hi),
+        lower=ce.dstr(lo),
+        upper=ce.dstr(hi),
         conditioning=tuple(f"import_elasticity={g['import_elasticity']};export_elasticity={g['export_elasticity']}"
                            f";basis={g['basis']}" for g in grid),
     )

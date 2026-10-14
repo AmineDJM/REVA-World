@@ -1,0 +1,35 @@
+# Secrets and local state never enter the build context.
+.env
+.env.*
+!.env.example
+var/
+*.pem
+*.key
+
+# VCS, tooling, caches
+.git/
+.github/
+.venv/
+**/__pycache__/
+**/*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+*.egg-info/
+build/
+dist/
+
+# Built in the ui stage from the lockfile; never copied from the host.
+ui/node_modules/
+ui/dist/
+ui/test-results/
+ui/playwright-report/
+src/reva/api/static/
+
+# Not needed at runtime (tests/fixtures are test_fixture origin and never published in production).
+tests/
+docs/
+schema/
+compose.yaml
+Makefile
