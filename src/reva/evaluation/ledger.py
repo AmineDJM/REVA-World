@@ -121,7 +121,7 @@ def load_frozen_manifest(store: ArtifactStore, sha: str) -> dict[str, Any]:
     data = store.get("evaluation", sha)
     if hashlib.sha256(data).hexdigest() != sha:
         raise IntegrityFailure("frozen forecast manifest does not match its hash", sha256=sha)
-    manifest = decode_canonical(json.loads(data))
+    manifest: dict[str, Any] = decode_canonical(json.loads(data))
     if manifest_sha256(manifest) != sha:
         raise IntegrityFailure("frozen forecast manifest is not canonical", sha256=sha)
     return manifest
@@ -166,7 +166,7 @@ def freeze_issue(
         if not report.applicable:
             refused.append({"series_id": sid, "reasons": list(report.reasons)})
             continue
-        fitted = model.fit(list(obs))  # type: ignore[arg-type]
+        fitted = model.fit(list(obs))
         if isinstance(fitted, IneligibleReport):
             refused.append({"series_id": sid, "reasons": [f"ineligible: {fitted.reason}"]})
             continue
@@ -190,7 +190,7 @@ def freeze_issue(
     if not issued:
         raise CapabilityGap("no series is within the model's applicability envelope; nothing issued",
                             refused=refused[:20])
-    return finite_json({
+    issue: dict[str, Any] = finite_json({
         "schema": ISSUE_SCHEMA,
         "label": LEDGER_LABEL,
         "replay_mode": REPLAY_MODE,
@@ -204,6 +204,7 @@ def freeze_issue(
         "statement": "These forecasts were issued at issued_at from the pinned release and are scored only "
         "against outcomes recorded later.",
     })
+    return issue
 
 
 def score_issue(
@@ -260,7 +261,7 @@ def score_issue(
         )
     scaled = [r["mase_scaled_error"] for r in scores if r["mase_scaled_error"] is not None]
     cov = [r["covered"] for r in scores if r["covered"] is not None]
-    return finite_json({
+    scored: dict[str, Any] = finite_json({
         "schema": SCORE_SCHEMA,
         "label": LEDGER_LABEL,
         "replay_mode": REPLAY_MODE,
@@ -281,6 +282,7 @@ def score_issue(
             "n_intervals": len(cov),
         },
     })
+    return scored
 
 
 # --------------------------------------------------------------------------- DB wrappers

@@ -11,12 +11,22 @@ from sqlalchemy import Connection, text
 
 
 def release_as_of(conn: Connection, as_of: datetime | None, origin: str | None = None) -> dict[str, Any] | None:
-    """The release REVA actually had published at `as_of` (operational_as_known)."""
+    """The release REVA actually had published at `as_of` (operational_as_known).
+
+    Definition of the *current release* as of time T (``as_of=None`` means the
+    database's ``clock_timestamp()``): among published releases (optionally of one
+    origin) with ``published_at <= T`` **and** ``knowledge_cutoff <= T``, the one
+    with the highest publication sequence. A release whose knowledge cutoff lies
+    after T is never returned, whatever its sequence (R-20).
+    """
     row = conn.execute(
         text(
-            """SELECT r.*, p.sequence, p.published_at FROM belief.release r
+            """WITH t AS (SELECT COALESCE(CAST(:t AS timestamptz), clock_timestamp()) AS at)
+               SELECT r.*, p.sequence, p.published_at FROM belief.release r
                JOIN ops.publication p ON p.release_id = r.id
-               WHERE (CAST(:t AS timestamptz) IS NULL OR p.published_at <= :t)
+               CROSS JOIN t
+               WHERE p.published_at <= t.at
+                 AND r.knowledge_cutoff <= t.at
                  AND (CAST(:o AS text) IS NULL OR r.origin = :o)
                ORDER BY p.sequence DESC LIMIT 1"""
         ),

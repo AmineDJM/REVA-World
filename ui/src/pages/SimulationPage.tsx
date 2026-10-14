@@ -302,7 +302,7 @@ function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationSt
           <p className="field-hint">Exports carry the SIMULATION label, scenario id, baseline release, cutoff, model version and assumptions.</p>
         </div>
       )}
-      <EnvelopeDetails meta={env} open />
+      <EnvelopeDetails meta={env} />
     </section>
   );
 }
@@ -435,7 +435,20 @@ export default function SimulationPage() {
         {SIMULATION_BANNER_TEXT}
       </div>
       <h1>Simulation: crude border-price exposure</h1>
-      <ContextBanner meta={simEnv ?? beliefs.data} simulation scope="Scenario definition and runs" />
+      <ContextBanner
+        meta={
+          simEnv ?? {
+            context_mode: 'simulation',
+            modality: 'assumption_conditioned_scenario',
+            origin: release?.origin ?? 'none',
+            baseline_release: release,
+            knowledge_cutoff: release?.knowledge_cutoff ?? null,
+            warnings: beliefs.data?.warnings ?? [],
+          }
+        }
+        simulation
+        scope={simId ? 'Scenario run' : 'Scenario definition (no run yet)'}
+      />
 
       <section className="panel" aria-labelledby="baseline-h">
         <h2 id="baseline-h">Baseline release</h2>

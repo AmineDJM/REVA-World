@@ -100,6 +100,44 @@ concepts:
       price_basis: nominal_current
       valuation: primaryValue (provider-declared)
       permitted_transformations: [identity]
+  - concept_id: trade.hs2709.import_net_weight.world_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) imports, net weight, World partner"}
+    definition: >-
+      Provider netWgt in kilograms of HS 2709 imports (flowCode M) from all partners (partnerCode 0).
+      Frequently null or unusable for aggregates (kept Missing). Never derived from value; barrels are
+      never inferred (mass↔volume requires density and convention). A different quantity from the
+      export net weight: the two are never selected against each other or combined.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.kg
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected]
+  - concept_id: trade.hs2709.export_net_weight.world_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) exports, net weight, World partner"}
+    definition: >-
+      Provider netWgt in kilograms of HS 2709 exports (flowCode X) to all partners (partnerCode 0).
+      Frequently null or unusable for aggregates (kept Missing). Never derived from value; barrels are
+      never inferred (mass↔volume requires density and convention). A different quantity from the
+      import net weight: the two are never selected against each other or combined.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.kg
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected]
   - concept_id: trade.hs2709.net_weight.world_total
     version: "1.0.0"
     kind: quantity

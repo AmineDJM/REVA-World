@@ -16,10 +16,11 @@ from uuid import UUID
 
 import pyarrow as pa
 import pyarrow.parquet as pq
-from sqlalchemy import Engine, text
+from sqlalchemy import Connection, Engine, text
 
 from reva.adapters.postgres import repositories as repo
 from reva.belief.selection import METHOD_KEY, METHOD_VERSION, eligible_latest, select
+from reva.evidence.locks import take_evidence_snapshot_lock
 from reva.kernel.context import Origin, assert_publishable
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import logical_hash
@@ -70,44 +71,68 @@ def publish_release(
     engine: Engine,
     store: ArtifactStore,
     *,
-    cutoff: datetime,
+    cutoff: datetime | None = None,
     origin: Origin,
     environment: str,
     actor: str = "worker:belief",
     concepts: list[str] | None = None,
     fence: Any = None,
+    lock_timeout: str = "120s",
 ) -> ReleaseResult:
+    """Publish a source_select_v1 release.
+
+    Snapshot consistency (R-03): the transaction first takes the evidence lock
+    exclusively (every evidence writer holds it shared), so no ingest, retraction
+    or eligibility decision is in flight. ``cutoff=None`` means "now": the cutoff is
+    then read from the database clock *after* the lock is granted, and selection
+    runs in the same transaction. An explicit cutoff must not be in the future
+    (rows recorded later could still fall at/before it); past cutoffs are honoured.
+    """
     assert_publishable(origin, environment)
     reg = load_registry()
     preferences = reg.policies["selection"]["preferences"]
     origins = [origin.value]
-    with engine.connect() as conn:
-        rows = eligible_latest(conn, cutoff, origins, concepts)
-    selections = select(rows, preferences)
-    if not selections:
-        raise ValidationProblem("no eligible observations at this cutoff; nothing to publish")
-
-    table_rows = []
-    for s in selections:
-        table_rows.append(
-            {
-                "subject_id": str(s.subject_id),
-                "concept_id": s.concept_id,
-                "support_id": str(s.support_id),
-                "value_kind": s.value.get("kind"),
-                "value": s.value.get("value") if s.value.get("kind") == "decimal" else None,
-                "unit_ref": s.value.get("unit_ref"),
-                "uncertainty_status": s.uncertainty.get("status"),
-                "observation_id": str(s.observation_id),
-                "source_key": s.source_key,
-            }
-        )
-    parquet_bytes, table_meta = _estimate_table(table_rows)
-    pq_obj = store.put_bytes(parquet_bytes, "belief", "application/vnd.apache.parquet")  # objects first
 
     with engine.begin() as conn:
+        conn.execute(text("SELECT set_config('lock_timeout', :t, true)"), {"t": lock_timeout})
+        take_evidence_snapshot_lock(conn)  # waits for in-flight evidence writers to commit
+        repo.take_publication_lock(conn)  # serialises publication sequence allocation
+        db_now = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+        if cutoff is None:
+            cutoff = db_now
+        elif cutoff > db_now:
+            raise ValidationProblem(
+                "knowledge cutoff is in the future; pass cutoff=None to publish as of now",
+                cutoff=cutoff.isoformat(), now=db_now.isoformat(),
+            )
         if fence is not None:
             fence(conn)  # stale lease holders cannot publish
+        rows = eligible_latest(conn, cutoff, origins, concepts, include_retracted=True)  # fresh snapshot
+        selections = select(rows, preferences)
+        if not selections:
+            raise ValidationProblem("no eligible observations at this cutoff; nothing to publish")
+        excluded_retracted = sorted(str(r["id"]) for r in rows if r.get("selection_status") == "retracted")
+
+        table_rows = []
+        for s in selections:
+            table_rows.append(
+                {
+                    "subject_id": str(s.subject_id),
+                    "concept_id": s.concept_id,
+                    "support_id": str(s.support_id),
+                    "value_kind": s.value.get("kind"),
+                    "value": s.value.get("value") if s.value.get("kind") == "decimal" else None,
+                    "unit_ref": s.value.get("unit_ref"),
+                    "uncertainty_status": s.uncertainty.get("status"),
+                    "observation_id": str(s.observation_id),
+                    "source_key": s.source_key,
+                }
+            )
+        parquet_bytes, table_meta = _estimate_table(table_rows)
+        # Objects before the metadata that references them; an object orphaned by a
+        # rollback is harmless (GC).
+        pq_obj = store.put_bytes(parquet_bytes, "belief", "application/vnd.apache.parquet")
+
         act = repo.simple_activity(
             "belief.publication", "belief", actor,
             {"method": f"{METHOD_KEY}@{METHOD_VERSION}", "cutoff": cutoff.isoformat(), "origin": origin.value,
@@ -140,6 +165,7 @@ def publish_release(
             "ontology_manifest_sha256": onto_sha,
             "model_manifest_sha256": model_sha,
             "input_observation_ids": input_obs,
+            "excluded_retracted_lineage_heads": excluded_retracted,
             "temporal_coverage": [str(temporal[0]), str(temporal[1])],
             "source_logical_keys_count": len(input_obs),
         }
@@ -178,25 +204,67 @@ def publish_release(
                 text("INSERT INTO belief.input(estimate_id, observation_id) VALUES (:e, :o)"),
                 {"e": eid, "o": s.observation_id},
             )
-        repo.take_publication_lock(conn)
         seq = conn.execute(
             text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a) RETURNING sequence"),
             {"r": rid, "a": act.id},
         ).scalar_one()
         repo.emit_outbox(conn, "belief.release_published",
                          {"release_id": str(rid), "sequence": seq, "cutoff": cutoff.isoformat()})
-        # Clear only markers caused by this origin's changes; a mixed marker is narrowed
-        # to the other origin so its pending publication is not lost.
-        other = "test_fixture" if origin.value == "live" else "live"
-        conn.execute(
-            text("DELETE FROM ops.dirty_node WHERE node_key LIKE 'belief:%' AND since_sequence <= "
-                 "(SELECT COALESCE(max(id),0) FROM ops.outbox) AND (reason = :mine OR reason NOT LIKE 'upstream_changed%'"
-                 " OR reason = 'upstream_changed')"),
-            {"mine": f"upstream_changed:{origin.value}"},
-        )
-        conn.execute(
-            text("UPDATE ops.dirty_node SET reason = :other WHERE node_key LIKE 'belief:%' "
-                 "AND reason = 'upstream_changed:mixed'"),
-            {"other": f"upstream_changed:{other}"},
-        )
+        _clear_dirty_nodes(conn, origin.value, concepts)
     return ReleaseResult(UUID(str(rid)), ctx, int(seq), len(selections), manifest_sha, cutoff)
+
+
+def _clear_dirty_nodes(conn: Connection, origin: str, concepts: list[str] | None) -> None:
+    """Clear belief dirty markers this release actually covers (R-06).
+
+    Only nodes of the published concepts (all belief nodes for a full
+    publication), and only markers caused by this origin's changes (or by
+    origin-less invalidations); a mixed marker is narrowed to the other origin so
+    its pending publication is not lost. Under the evidence lock no ingest is in
+    flight, so every marker present was caused by evidence visible to selection.
+    """
+    nodes = None if concepts is None else sorted({f"belief:{c}" for c in concepts})
+    other = "test_fixture" if origin == "live" else "live"
+    scope = "node_key LIKE 'belief:%' AND (CAST(:n AS text[]) IS NULL OR node_key = ANY(CAST(:n AS text[])))"
+    conn.execute(
+        text(f"DELETE FROM ops.dirty_node WHERE {scope} AND (reason = :mine "
+             "OR reason NOT LIKE 'upstream_changed%' OR reason = 'upstream_changed')"),
+        {"n": nodes, "mine": f"upstream_changed:{origin}"},
+    )
+    conn.execute(
+        text(f"UPDATE ops.dirty_node SET reason = :other WHERE {scope} AND reason = 'upstream_changed:mixed'"),
+        {"n": nodes, "other": f"upstream_changed:{other}"},
+    )
+
+
+def add_prior_estimate_input(conn: Connection, estimate_id: UUID, prior_estimate_id: UUID) -> None:
+    """Record a prior belief estimate as an input of another estimate (R-27).
+
+    The prior must come from a *published* release whose knowledge cutoff is not
+    later than the consuming release's, and a live release may only cite live
+    priors (a fixture or test estimate can never inform the live world).
+    """
+    rows = conn.execute(
+        text(
+            """SELECT e.id, r.origin, r.knowledge_cutoff, p.sequence
+               FROM belief.estimate e JOIN belief.release r ON r.id = e.release_id
+               LEFT JOIN ops.publication p ON p.release_id = r.id
+               WHERE e.id = ANY(:ids)"""
+        ),
+        {"ids": [estimate_id, prior_estimate_id]},
+    ).mappings().all()
+    by_id = {UUID(str(r["id"])): r for r in rows}
+    if estimate_id not in by_id or prior_estimate_id not in by_id:
+        raise ValidationProblem("unknown estimate")
+    cur, prior = by_id[estimate_id], by_id[prior_estimate_id]
+    if prior["sequence"] is None:
+        raise ValidationProblem("prior estimate belongs to an unpublished release")
+    if prior["knowledge_cutoff"] > cur["knowledge_cutoff"]:
+        raise ValidationProblem("prior estimate comes from a later knowledge cutoff")
+    if cur["origin"] == "live" and prior["origin"] != "live":
+        raise ValidationProblem("a live release cannot cite a non-live prior estimate",
+                                prior_origin=prior["origin"])
+    conn.execute(
+        text("INSERT INTO belief.input(estimate_id, prior_estimate_id) VALUES (:e, :p)"),
+        {"e": estimate_id, "p": prior_estimate_id},
+    )

@@ -6,6 +6,12 @@ and is below maxRecords (no truncation), and keys are unique. Anything ambiguous
 blocks publication. A missing flow is Missing, never zero. CIF, FOB and
 primaryValue are preserved separately; quantities/weights are never derived from
 values, and zero/null unusable weights stay Missing.
+
+1.1.0 (parser comtrade-parse-2): import and export net weights map to the
+flow-specific concepts ``trade.hs2709.{import,export}_net_weight.world_total``
+(1.0.0 emitted both flows under one concept, collapsing two quantities); the
+valuation label is inferred per flow (exports are FOB; a CIF label on an export
+is impossible); value bases record the exchange-rate transform.
 """
 
 from __future__ import annotations
@@ -53,6 +59,14 @@ FLOW_CONCEPT = {
     ("M", "bilateral"): "trade.hs2709.import_value.bilateral",
     ("X", "bilateral"): "trade.hs2709.export_value.bilateral",
 }
+WEIGHT_CONCEPT = {
+    "M": "trade.hs2709.import_net_weight.world_total",
+    "X": "trade.hs2709.export_net_weight.world_total",
+}
+CONNECTOR_VERSION = "1.1.0"
+PARSER_VERSION = "comtrade-parse-2"
+VALUATION_UNDETERMINED = "primaryValue (basis not determinable from response)"
+EXCHANGE_RATE_TRANSFORM = "provider_reported_usd (UN Comtrade methodology)"
 FIXED_DIMS = {"typeCode": "C", "freqCode": "A", "cmdCode": "2709", "customsCode": "C00", "motCode": 0,
               "partner2Code": 0}
 
@@ -71,14 +85,15 @@ class ComtradeConnector:
     def describe(self) -> ConnectorSpec:
         return ConnectorSpec(
             name="un.comtrade.public_exact",
-            version="1.0.0",
+            version=CONNECTOR_VERSION,
             template="comtrade_public_exact",
             source_key="un.comtrade.public_preview",
             provider="United Nations Statistics Division",
             licence="UN Comtrade terms of use",
             allowed_hosts=("comtradeapi.un.org",),
             dataset_ids=("C/A/HS/2709",),
-            field_mappings={f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
+            field_mappings={**{f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
+                            **{f"{k}:netWgt:total": v for k, v in WEIGHT_CONCEPT.items()}},
             units={"primaryValue": "unit.usd", "netWgt": "unit.kg"},
             geography=self.reporters,
             time_semantics="annual calendar-year flow totals",
@@ -87,7 +102,7 @@ class ComtradeConnector:
             revision_strategy="append revision on changed latest state; rolling recent-year rechecks",
             max_response_bytes=5_000_000,
             max_pages=1,
-            parser_version="comtrade-parse-1",
+            parser_version=PARSER_VERSION,
             code_digest=module_digest(ComtradeConnector),
         )
 
@@ -170,7 +185,7 @@ class ComtradeConnector:
             expected = ()
         yield ObservationBatch(
             connector="un.comtrade.public_exact",
-            connector_version="1.0.0",
+            connector_version=CONNECTOR_VERSION,
             item_key=raw.item.key,
             observations=tuple(obs),
             expected_keys=expected,
@@ -203,13 +218,36 @@ class ComtradeConnector:
         }
 
     @staticmethod
-    def _valuation(flow: str, r: dict[str, Any]) -> str:
+    def _valuation(flow: str, r: dict[str, Any]) -> tuple[str, str | None]:
+        """Flow-aware valuation label and an optional quality warning code.
+
+        Imports may be reported CIF or FOB: the label is CIF/FOB only when
+        primaryValue matches exactly one of them. Exports are valued FOB, so an
+        export whose primaryValue matches fobvalue is FOB; an export matching only
+        cifvalue would carry an impossible CIF label and is reported as
+        undetermined with a warning.
+        """
         pv, cif, fob = r.get("primaryValue"), r.get("cifvalue"), r.get("fobvalue")
-        if pv is not None and cif is not None and Decimal(pv) == Decimal(cif):
-            return "CIF"
-        if pv is not None and fob is not None and Decimal(pv) == Decimal(fob):
-            return "FOB"
-        return "primaryValue (basis not determinable from response)"
+        eq_cif = pv is not None and cif is not None and Decimal(pv) == Decimal(cif)
+        eq_fob = pv is not None and fob is not None and Decimal(pv) == Decimal(fob)
+        if flow == "M":
+            if eq_cif and not eq_fob:
+                return "CIF", None
+            if eq_fob and not eq_cif:
+                return "FOB", None
+            return VALUATION_UNDETERMINED, ("valuation_ambiguous" if eq_cif and eq_fob else None)
+        if eq_fob:
+            return "FOB", None
+        if eq_cif:
+            return VALUATION_UNDETERMINED, "export_cif_label_impossible"
+        return VALUATION_UNDETERMINED, None
+
+    def _value_basis(self, flow: str, r: dict[str, Any], flags: dict[str, Any]) -> dict[str, Any]:
+        valuation, warning = self._valuation(flow, r)
+        if warning:
+            flags["valuation_warning"] = warning
+        return {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": valuation,
+                "exchange_rate_transform": EXCHANGE_RATE_TRANSFORM}
 
     def _support(self, iso: str, year: int, partner: str) -> Support:
         return Support(
@@ -238,16 +276,15 @@ class ComtradeConnector:
                 value = {"kind": "missing", "reason": "unavailable"}
                 flags = self._flags(r)
             else:
+                flags = self._flags(r)
                 value = {
                     "kind": "decimal",
                     "value": dec_str(r["primaryValue"]),
                     "unit_ref": "unit.usd",
-                    "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1",
-                              "valuation": self._valuation(flow, r)},
+                    "basis": self._value_basis(flow, r, flags),
                 }
-                flags = self._flags(r)
         else:
-            concept = "trade.hs2709.net_weight.world_total"
+            concept = WEIGHT_CONCEPT[flow]
             lk = f"comtrade:HS2709:{flow}:{REPORTERS[iso]}:0:{year}:netWgt"
             if r is None:
                 value, flags = {"kind": "missing", "reason": "unavailable"}, {"provider_returned_no_rows": True}
@@ -281,14 +318,13 @@ class ComtradeConnector:
         year = int(str(r.get("period")))
         partner = str(plain(r.get("partnerCode")))
         v = r.get("primaryValue")
+        flags = {**self._flags(r), "flowCode": flow, "partnerCode": partner}
         value: dict[str, Any] = (
             {"kind": "missing", "reason": "unavailable"}
             if v is None
             else {"kind": "decimal", "value": dec_str(v), "unit_ref": "unit.usd",
-                  "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1",
-                            "valuation": self._valuation(flow, r)}}
+                  "basis": self._value_basis(flow, r, flags)}
         )
-        flags = {**self._flags(r), "flowCode": flow, "partnerCode": partner}
         reporter_dir, partner_dir = ("in", "out") if flow == "M" else ("out", "in")
         return ParsedObservation(
             subject_provider="comtrade_reporter",
@@ -352,6 +388,12 @@ class ComtradeConnector:
         if missing:
             findings.append(Finding(code="missing_flow", severity="warning",
                                     message=f"{len(missing)} requested flows returned no value (kept Missing)"))
+        undetermined = [o for o in batch.observations if o.source_flags.get("valuation_warning")]
+        if undetermined:
+            codes = sorted({str(o.source_flags["valuation_warning"]) for o in undetermined})
+            findings.append(Finding(code="valuation_basis_undetermined", severity="warning",
+                                    message=f"{len(undetermined)} values carry an undeterminable valuation basis "
+                                            f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'"))
         derived = [o for o in batch.observations if o.source_flags.get("provider_derived_aggregate")]
         if derived:
             findings.append(Finding(code="provider_derived", severity="info",

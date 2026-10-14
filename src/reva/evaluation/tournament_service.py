@@ -78,7 +78,7 @@ DEFAULT_SEED = 20261014
 MAX_HORIZON = 5
 
 NAIVE_KEY = LastValue.key
-CANDIDATES: dict[str, type] = {
+CANDIDATES: dict[str, Any] = {
     LastValue.key: LastValue,
     LogDrift.key: LogDrift,
     LocalLevelLog.key: LocalLevelLog,
@@ -297,7 +297,9 @@ def holdout_spec(series: Mapping[str, Sequence[tuple[int, Any]]], n_years: int, 
     return HoldoutSpec(years, years[0] - 1, int(max_accesses), cells, key)
 
 
-def development_panel(series: Mapping[str, Sequence[tuple[int, Any]]], spec: HoldoutSpec) -> dict[str, list]:
+def development_panel(
+    series: Mapping[str, Sequence[tuple[int, Any]]], spec: HoldoutSpec
+) -> dict[str, list[tuple[int, object]]]:
     """Series truncated at the last development year (the holdout is invisible)."""
     return {sid: CutoffScopedSeries(obs, cutoff=spec.last_dev_year).observations() for sid, obs in series.items()}
 
@@ -400,8 +402,9 @@ def evaluate(
     dev = {sid: obs for sid, obs in development_panel(series, spec).items() if obs}
     if not dev:
         raise MissingInput("no development years remain after reserving the locked holdout")
-    result = run_tournament(
-        dev, list(models.values()), incumbent_key, horizons, replay_mode=REPLAY_MODE, seed=seed, policy=policy
+    result = run_tournament(  # Decimal values are converted explicitly by the tournament (to_float)
+        dev, list(models.values()), incumbent_key, horizons,  # type: ignore[arg-type]
+        replay_mode=REPLAY_MODE, seed=seed, policy=policy,
     )
     pol = result.policy
     max_deg = float(pol["max_subgroup_degradation"])
@@ -527,7 +530,7 @@ def build_manifest(
     inc_ref = model_ref(outcome.models[t.incumbent])
     sub = {f"{g}={v}": {k: _metrics_dict(m) for k, m in per.items()} for (g, v), per in t.subgroup_metrics.items()}
     dev_targets = sorted({(r.series_id, r.target_year, r.target) for r in t.records})
-    return finite_json({
+    manifest: dict[str, Any] = finite_json({
         "schema": SCHEMA,
         "kind": "forecast_tournament",
         "label": LABEL,
@@ -613,6 +616,7 @@ def build_manifest(
             "tournament_runtime_seconds": round(outcome.runtime_seconds, 3),
         },
     })
+    return manifest
 
 
 # --------------------------------------------------------------------------- DB helpers
@@ -822,8 +826,8 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
         eval_ids: dict[str, str] = {}
         sub_by_model: dict[str, dict[str, Any]] = defaultdict(dict)
         for (g, v), per in t.subgroup_metrics.items():
-            for k, m in per.items():
-                sub_by_model[k][f"{g}={v}"] = _metrics_dict(m)
+            for k, mm in per.items():
+                sub_by_model[k][f"{g}={v}"] = _metrics_dict(mm)
         inel_by_model = Counter((i.report.model_key, i.report.reason) for i in t.ineligible)
         for k, m in sorted(outcome.models.items()):
             ref = model_ref(m)
