@@ -460,7 +460,7 @@ def _production_settings(**over) -> Settings:
         "reva_env": "production", "reva_object_backend": "s3", "reva_s3_bucket": "b",
         "reva_s3_access_key_id": "AKIAEXAMPLE", "reva_s3_secret_access_key": "x" * 40,
         "reva_session_secret": "s" * 40, "reva_public_base_url": "https://reva.example",
-        "reva_worker_db_password": "pw-worker-example",
+        "reva_worker_db_password": "pw-worker-example", "reva_db_sslmode": "require",
     }
     data.update(over)
     return Settings(_env_file=None, **data)  # type: ignore[call-arg]

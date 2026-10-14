@@ -130,14 +130,16 @@ class Stack:
             c.execute(text(f'CREATE DATABASE "{self.db_name}"'))
         self.db_created = True
         url = base.migration_url().set(database=self.db_name).render_as_string(hide_password=False)
-        return Settings.model_validate({
-            **base.model_dump(),
-            "reva_migration_database_url": SecretStr(url),
-            "reva_db_name": self.db_name,
-            "reva_env": "test",
-            "reva_object_backend": "filesystem",
-            "reva_object_root": self.object_root,
-        })
+        return Settings.model_validate(
+            {
+                **base.model_dump(),
+                "reva_migration_database_url": SecretStr(url),
+                "reva_db_name": self.db_name,
+                "reva_env": "test",
+                "reva_object_backend": "filesystem",
+                "reva_object_root": self.object_root,
+            }
+        )
 
     def prepare_data(self, settings: Any) -> dict[str, Any]:
         from reva.adapters.connectors.registry import builtin_connectors
@@ -153,7 +155,7 @@ class Stack:
             try:
                 bootstrap(settings)
                 break
-            except Exception:  # noqa: BLE001
+            except Exception:
                 if attempt == 2:
                     raise
                 time.sleep(1 + attempt)
@@ -166,22 +168,45 @@ class Stack:
             for name in FIXTURE_CONNECTORS:
                 c = connectors[name]
                 spec = c.describe()
-                rep = with_connection_retry(f"ingest {name}", lambda c=c, spec=spec: asyncio.run(run_connector(
-                    c, FixtureHttp(spec.name), store, worker, persist_cursor=False,
-                    post_publish=post_publish_for(spec.template))))
-                ingest[name] = {"inserted": rep.inserted, "unchanged": rep.unchanged, "errors": rep.errors,
-                                "outcomes": [o.status for o in rep.outcomes]}
+                rep = with_connection_retry(
+                    f"ingest {name}",
+                    lambda c=c, spec=spec: asyncio.run(
+                        run_connector(
+                            c,
+                            FixtureHttp(spec.name),
+                            store,
+                            worker,
+                            persist_cursor=False,
+                            post_publish=post_publish_for(spec.template),
+                        )
+                    ),
+                )
+                ingest[name] = {
+                    "inserted": rep.inserted,
+                    "unchanged": rep.unchanged,
+                    "errors": rep.errors,
+                    "outcomes": [o.status for o in rep.outcomes],
+                }
                 if rep.errors:
                     log.warning("fixture ingest %s reported errors: %s", name, rep.errors)
                 log.info("ingested %s: %d inserted, %d unchanged", name, rep.inserted, rep.unchanged)
-            release = with_connection_retry("publish release", lambda: publish_release(
-                worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test"))
+            release = with_connection_retry(
+                "publish release",
+                lambda: publish_release(
+                    worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test"
+                ),
+            )
         finally:
             worker.dispose()
-        rel = {"id": str(release.release_id), "context_id": str(release.context_id),
-               "sequence": release.sequence, "estimates": release.estimates,
-               "manifest_sha256": release.manifest_sha256,
-               "knowledge_cutoff": release.knowledge_cutoff.isoformat(), "origin": "test_fixture"}
+        rel = {
+            "id": str(release.release_id),
+            "context_id": str(release.context_id),
+            "sequence": release.sequence,
+            "estimates": release.estimates,
+            "manifest_sha256": release.manifest_sha256,
+            "knowledge_cutoff": release.knowledge_cutoff.isoformat(),
+            "origin": "test_fixture",
+        }
         log.info("published test_fixture release: %s", rel)
         return {"ingest": ingest, "release": rel}
 
@@ -192,8 +217,7 @@ class Stack:
             if not (path / "index.html").is_file():
                 raise SystemExit(f"--static-dir {path} has no index.html")
             return path
-        cmd = ["npm", "--prefix", str(ROOT / "ui"), "run", "build", "--", "--outDir", str(self.ui_dir),
-               "--emptyOutDir"]
+        cmd = ["npm", "--prefix", str(ROOT / "ui"), "run", "build", "--", "--outDir", str(self.ui_dir), "--emptyOutDir"]
         log.info("building UI: %s", " ".join(cmd))
         proc = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True, check=False)
         if proc.returncode != 0:
@@ -207,8 +231,9 @@ class Stack:
         from reva.adapters.postgres.engine import make_engine
         from reva.operations.worker import Worker, wait_for_schema
 
-        ws = settings.model_copy(update={"reva_migration_database_url": None, "reva_db_pool_size": 4,
-                                         "reva_db_max_overflow": 0})
+        ws = settings.model_copy(
+            update={"reva_migration_database_url": None, "reva_db_pool_size": 4, "reva_db_max_overflow": 0}
+        )
         engine = make_engine("worker", ws)
         sim_engine = make_engine("sim", ws)
         self.engines += [engine, sim_engine]
@@ -216,8 +241,18 @@ class Stack:
         store = FilesystemArtifactStore(self.object_root, ws.reva_s3_prefix)
         # Scheduler off (it would enqueue live acquisitions); invalidation off (it would publish
         # further releases mid-suite). Queue claiming, leases, heartbeats and handlers are real.
-        self.worker = Worker(ws, engine, store, sim_engine, scheduler=False, invalidation=False,
-                             poll_interval=0.2, lease_seconds=60, heartbeat_seconds=5, drain_seconds=5)
+        self.worker = Worker(
+            ws,
+            engine,
+            store,
+            sim_engine,
+            scheduler=False,
+            invalidation=False,
+            poll_interval=0.2,
+            lease_seconds=60,
+            heartbeat_seconds=5,
+            drain_seconds=5,
+        )
         self.worker_thread = threading.Thread(target=self.worker.run, name="reva-e2e-worker", daemon=True)
         self.worker_thread.start()
 
@@ -229,19 +264,19 @@ class Stack:
         from reva.api.auth import hash_password
 
         base_url = f"http://127.0.0.1:{port}"
-        api_settings = settings.model_copy(update={
-            "reva_migration_database_url": None,
-            "reva_admin_password_hash": SecretStr(hash_password(password)),
-            "reva_session_secret": SecretStr(secrets.token_urlsafe(48)),
-            "reva_allowed_hosts": "127.0.0.1,localhost",
-            "reva_public_base_url": base_url,
-            "reva_cors_origins": "",
-            "reva_db_pool_size": 3,
-        })
-        app = create_app(api_settings, static_dir=static_dir,
-                         login_rate_limit_per_minute=self.args.login_rate_limit)
-        config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning", access_log=False,
-                                lifespan="on")
+        api_settings = settings.model_copy(
+            update={
+                "reva_migration_database_url": None,
+                "reva_admin_password_hash": SecretStr(hash_password(password)),
+                "reva_session_secret": SecretStr(secrets.token_urlsafe(48)),
+                "reva_allowed_hosts": "127.0.0.1,localhost",
+                "reva_public_base_url": base_url,
+                "reva_cors_origins": "",
+                "reva_db_pool_size": 3,
+            }
+        )
+        app = create_app(api_settings, static_dir=static_dir, login_rate_limit_per_minute=self.args.login_rate_limit)
+        config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning", access_log=False, lifespan="on")
         self.server = uvicorn.Server(config)
         return base_url
 
@@ -261,9 +296,11 @@ class Stack:
     def write_storage_state(self, base_url: str, password: str) -> None:
         """One real login; the cookies become the Playwright storageState shared by all specs."""
         req = urllib.request.Request(  # noqa: S310
-            f"{base_url}/v1/session", method="POST",
+            f"{base_url}/v1/session",
+            method="POST",
             data=json.dumps({"username": ADMIN_USERNAME, "password": password}).encode(),
-            headers={"Content-Type": "application/json"})
+            headers={"Content-Type": "application/json"},
+        )
         with urllib.request.urlopen(req, timeout=30) as r:  # noqa: S310
             set_cookies = r.headers.get_all("Set-Cookie") or []
         cookies = []
@@ -273,12 +310,18 @@ class Stack:
             for name, morsel in jar.items():
                 same_site = (morsel["samesite"] or "Lax").capitalize()
                 max_age = morsel["max-age"]
-                cookies.append({
-                    "name": name, "value": morsel.value, "domain": "127.0.0.1", "path": morsel["path"] or "/",
-                    "expires": time.time() + int(max_age) if max_age else -1,
-                    "httpOnly": bool(morsel["httponly"]), "secure": bool(morsel["secure"]),
-                    "sameSite": same_site if same_site in ("Strict", "Lax", "None") else "Lax",
-                })
+                cookies.append(
+                    {
+                        "name": name,
+                        "value": morsel.value,
+                        "domain": "127.0.0.1",
+                        "path": morsel["path"] or "/",
+                        "expires": time.time() + int(max_age) if max_age else -1,
+                        "httpOnly": bool(morsel["httponly"]),
+                        "secure": bool(morsel["secure"]),
+                        "sameSite": same_site if same_site in ("Strict", "Lax", "None") else "Lax",
+                    }
+                )
         names = {c["name"] for c in cookies}
         if "reva_session" not in names:
             raise RuntimeError(f"login did not set a session cookie (got {sorted(names)})")
@@ -298,8 +341,8 @@ class Stack:
         for e in self.engines:
             try:
                 e.dispose()
-            except Exception:  # noqa: BLE001
-                pass
+            except Exception as exc:  # noqa: BLE001
+                log.debug("engine dispose failed: %s", exc)
         if self.admin_engine is not None:
             if self.db_created and not self.args.keep_db:
                 from sqlalchemy import text
@@ -308,7 +351,7 @@ class Stack:
                     with self.admin_engine.connect() as c:
                         c.execute(text(f'DROP DATABASE IF EXISTS "{self.db_name}" WITH (FORCE)'))
                     log.info("dropped database %s", self.db_name)
-                except Exception as e:  # noqa: BLE001
+                except Exception as e:
                     log.error("could not drop database %s: %s", self.db_name, e)
             self.admin_engine.dispose()
         for p in (self.stack_file, self.storage_state):
@@ -326,14 +369,19 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--stack-file", default=os.environ.get("REVA_E2E_STACK_FILE", str(DEFAULT_STACK_FILE)))
     ap.add_argument("--port", type=int, default=0, help="API port (default: a free port)")
     ap.add_argument("--static-dir", help="use an existing UI build instead of building")
-    ap.add_argument("--login-rate-limit", type=int, default=10,
-                    help="login attempts per client per minute (always enforced; default 10)")
+    ap.add_argument(
+        "--login-rate-limit",
+        type=int,
+        default=10,
+        help="login attempts per client per minute (always enforced; default 10)",
+    )
     ap.add_argument("--keep-db", action="store_true", help="keep the database and temp files for debugging")
     ap.add_argument("--run", action="store_true", help="run the Playwright suite against the stack, then exit")
     ap.add_argument("playwright_args", nargs="*", help="extra Playwright arguments (after --)")
     args = ap.parse_args(argv)
-    logging.basicConfig(level=os.environ.get("REVA_E2E_LOG_LEVEL", "INFO"),
-                        format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+    logging.basicConfig(
+        level=os.environ.get("REVA_E2E_LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(name)s: %(message)s"
+    )
     for noisy in ("reva.api.access", "httpx"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
@@ -386,9 +434,14 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"base_url": base_url, "stack_file": str(stack.stack_file)}), flush=True)
 
         if args.run:
-            env = {**os.environ, "REVA_E2E_BASE_URL": base_url, "REVA_E2E_USERNAME": ADMIN_USERNAME,
-                   "REVA_E2E_PASSWORD": password, "REVA_E2E_STACK_FILE": str(stack.stack_file),
-                   "REVA_E2E_STORAGE_STATE": str(stack.storage_state)}
+            env = {
+                **os.environ,
+                "REVA_E2E_BASE_URL": base_url,
+                "REVA_E2E_USERNAME": ADMIN_USERNAME,
+                "REVA_E2E_PASSWORD": password,
+                "REVA_E2E_STACK_FILE": str(stack.stack_file),
+                "REVA_E2E_STORAGE_STATE": str(stack.storage_state),
+            }
             env.setdefault("PLAYWRIGHT_BROWSERS_PATH", "/opt/pw-browsers")
             env.pop("REVA_MIGRATION_DATABASE_URL", None)
             cmd = ["npm", "--prefix", str(ROOT / "ui"), "run", "e2e", "--", *args.playwright_args]
