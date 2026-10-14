@@ -203,16 +203,51 @@ def test_r03_future_cutoff_rejected_and_none_means_db_now(db: Any) -> None:
 
 
 # --------------------------------------------------------------------------- R-04
+TEST_SOURCE = "fx2.test_source"
+
+
+def _isolated_spec(db: Any) -> Any:
+    """A test-only source + connector version (eligible for POP, never in a preference policy), so
+    live-origin test rows never appear under a real source of the shared session database."""
+    spec = WB.model_copy(update={"name": "fx2.test.connector", "source_key": TEST_SOURCE})
+    with db.worker.begin() as c:
+        act = repo.simple_activity("registry.seed", "review", "maintainer:fx2-test", {})
+        repo.record_activity(c, act)
+        if repo.source_by_key(c, TEST_SOURCE) is None:
+            sid = c.execute(text(
+                """INSERT INTO evidence.source(source_key, title, provider_url, lineage_family, rights, metadata,
+                     provenance_activity_id)
+                   VALUES (:k, 'FX2 test source', 'https://example.invalid/', 'fx2_test',
+                           '{"licence":"test"}', '{}', :a) RETURNING id"""), {"k": TEST_SOURCE, "a": act.id}
+            ).scalar_one()
+            c.execute(text(
+                """INSERT INTO evidence.source_metadata_version(source_id, version, metadata, rights,
+                     provenance_activity_id) VALUES (:s, 1, '{}', '{"licence":"test"}', :a)"""),
+                {"s": sid, "a": act.id})
+        cv = register_connector_version(c, db.store, spec, act.id)
+        concept = repo.concept_version_id(c, POP, "1.0.0")
+        if not c.execute(text("SELECT 1 FROM evidence.eligibility WHERE connector_version_id=:cv"),
+                         {"cv": cv}).scalar_one_or_none():
+            c.execute(text(
+                """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+                     decision, policy_version, review_activity_id)
+                   VALUES (:cv, :c, CAST(:ap AS jsonb), 'eligible', 'fx2-test', :a)"""),
+                {"cv": cv, "c": concept, "a": act.id,
+                 "ap": json.dumps({"subject_ids": [str(entity_id("FRA"))]})})
+    return spec
+
+
 def test_r04_live_ingest_identical_to_fixture_creates_live_lineage(db: Any) -> None:
     tag = f"r04-{uuid.uuid4().hex[:8]}"
-    fx = _ingest(db, tag, {"a": "42"}, origin="test_fixture")
-    live = _ingest(db, tag, {"a": "42"}, origin="live")
+    spec = _isolated_spec(db)
+    fx = _ingest(db, tag, {"a": "42"}, origin="test_fixture", spec=spec)
+    live = _ingest(db, tag, {"a": "42"}, origin="live", spec=spec)
     assert fx.inserted == 1 and live.inserted == 1 and live.unchanged == 0
     rows = _obs(db, f"fx2:{tag}:a")
     assert [(r["origin"], r["revision_no"], r["supersedes_id"]) for r in rows] == [
         ("live", 1, None), ("test_fixture", 1, None)]
     # Re-fetching the same live state is unchanged within the live lineage only.
-    again = _ingest(db, tag, {"a": "42"}, origin="live", body_salt="refetch")
+    again = _ingest(db, tag, {"a": "42"}, origin="live", body_salt="refetch", spec=spec)
     assert again.inserted == 0 and again.unchanged == 1
     with db.worker.connect() as c:
         live_rows = eligible_latest(c, _now(db.worker), ["live"], [POP])
@@ -554,3 +589,44 @@ def test_r28_parser_version_change_reprocesses_same_bytes(db: Any) -> None:
     assert not reparsed.duplicate_acquisition and reparsed.acquisition_id != first.acquisition_id
     assert reparsed.unchanged == 1  # same semantics: no new revision, but the bytes were reprocessed
 
+
+
+# --------------------------------------------------------------------------- population from Eurostat
+async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
+    from reva.autonomy.jobs import handle_discovery, promoted_connectors
+    from reva.operations.context import JobContext
+    from reva.population.service import build_population, load_cells
+
+    jid = uuid.uuid4()
+    with db.owner.begin() as conn:
+        conn.execute(text("""INSERT INTO ops.job(id, job_type, payload, idempotency_key, status, worker_id,
+                                 lease_until, fencing_token, attempts)
+                             VALUES (:i, 'discovery', '{}'::jsonb, :k, 'running', 'fx2-worker',
+                                     clock_timestamp() + interval '10 minutes', 7, 1)"""),
+                     {"i": jid, "k": f"fx2-discovery-{jid}"})
+    ctx = JobContext(job_id=jid, job_type="discovery", worker_id="fx2-worker", fencing_token=7, attempt=1,
+                     settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+    out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)
+    assert out["status"] in ("promoted", "no_gap"), out
+    name = "eurostat.demo_pjan.fr"
+    connector = promoted_connectors(db.worker, db.store)[name]
+    rep = await run_connector(connector, FixtureHttp(name), db.store, db.worker, persist_cursor=False)
+    assert not rep.errors, rep.errors[:3]
+    rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test",
+                          concepts=["demography.population.jan1_age_sex"])
+    assert rel.estimates >= 309
+
+    cells = load_cells(db.worker, geo_entity="FRA", year=2023, cutoff=_now(db.worker), origin="test_fixture")
+    codes = {(c.sex_code, c.age_code) for c in cells}
+    assert {("T", "TOTAL"), ("F", "Y_LT1"), ("M", "Y99"), ("F", "Y_OPEN"), ("F", "UNK")} <= codes
+    assert {c.sex_code for c in cells} == {"T", "M", "F"}
+    assert all(c.flags == ("p",) for c in cells)  # Eurostat 'p' (provisional) flows from source_flags.status
+
+    res = build_population(db.worker, db.store, n_records=100_000, origin="test_fixture")
+    assert res["records"] == 100_000
+    with db.worker.connect() as c:
+        row = c.execute(text("SELECT recipe_sha256, record_count, privacy_class FROM model.population_dataset "
+                             "WHERE id = :i"), {"i": res["population_dataset_id"]}).mappings().one()
+    assert row["record_count"] == 100_000 and row["privacy_class"] == "synthetic_public_aggregate_derived"
+    recipe = json.loads(db.store.get("models", row["recipe_sha256"]))
+    assert sum(int(leaf["count"]) for leaf in recipe["leaf_cells"]) == 68_277_210

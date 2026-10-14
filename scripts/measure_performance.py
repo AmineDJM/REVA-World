@@ -1203,8 +1203,8 @@ def main(argv: list[str] | None = None) -> int:
         args.report.parent.mkdir(parents=True, exist_ok=True)
         args.report.write_text(render_report(results))
         print(f"[perf] wrote {args.report}")
-    for c in results["checks"].values():
-        print(f"[perf] {c['status']:>12}  {c['target']}: {_fmt(c['value'])} (limit {_fmt(c['limit'])})")
+    for k, c in results["checks"].items():
+        print(f"[perf] {c['status']:>12}  {k}: {c['target']}: {_fmt(c['value'])} (limit {_fmt(c['limit'])})")
     return 1 if any(c["status"] == "FAIL" for c in results["checks"].values()) else 0
 
 

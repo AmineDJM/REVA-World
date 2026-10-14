@@ -319,6 +319,8 @@ DEFAULT_SCHEDULES = (
     ("ingest:un.comtrade.public_exact", "ingest", {"connector": "un.comtrade.public_exact"}, 30 * 86400),
     ("ingest:naturalearth.admin0_110m", "ingest", {"connector": "naturalearth.admin0_110m"}, 7 * 86400),
     ("ingest:crossref.works.doi", "ingest", {"connector": "crossref.works.doi"}, 7 * 86400),
+    # Promoted by the autonomy gate (agent G); the ingest handler is a no-op until promotion.
+    ("ingest:eurostat.demo_pjan.fr", "ingest", {"connector": "eurostat.demo_pjan.fr"}, 7 * 86400),
     ("health:connectors", "health", {}, 86400),
     ("gaps:mvp", "gaps", {}, 86400),
     ("gc:orphans", "gc", {}, 86400),

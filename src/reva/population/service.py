@@ -44,6 +44,10 @@ def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, 
                 {"ids": list({r["support_id"] for r in rows})},
             ).mappings()
         }
+    # All cells (leaf, subtotal and total, incl. TOTAL/Y_LT1..Y99/Y_OPEN/UNK and sex
+    # T/M/F) are passed through: build_recipe selects the disjoint leaf partition
+    # itself and audits it against the totals. cell_type from the connector is not
+    # trusted for the partition.
     cells = []
     for r in rows:
         if r["subject_id"] != subject:
@@ -55,8 +59,11 @@ def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, 
         res = sup["resolution"] or {}
         v = r["value"]
         count = int(v["value"]) if v.get("kind") == "decimal" else None
-        st = (r.get("source_flags") or {}).get("status") or ()
-        flags = tuple(sorted(st)) if isinstance(st, (list, tuple)) else tuple(str(st))
+        # Eurostat OBS_FLAG codes: the template stores them as one string of flag
+        # characters (e.g. "p", "ep", ""); accept a list too. One code per flag.
+        st = (r.get("source_flags") or {}).get("status") or ""
+        raw_codes = st if isinstance(st, (list, tuple)) else list(str(st))
+        flags = tuple(sorted({str(c).strip() for c in raw_codes if str(c).strip()}))
         cells.append(SourceCell(age_code=str(res.get("age")), sex_code=str(res.get("sex")), count=count,
                                 flags=flags, source_key=r["logical_key"]))
     if not cells:

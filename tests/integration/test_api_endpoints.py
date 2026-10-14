@@ -484,3 +484,209 @@ def test_metrics_after_traffic(env: Env) -> None:
 
 def test_as_of_must_be_timezone_aware(env: Env) -> None:
     problem(env.client.get("/v1/beliefs", params={"as_of": (datetime.now() - timedelta(days=1)).isoformat()}), 422)
+
+
+# ---------------------------------------------------------------------------
+# Follow-ups from the UI integration (agent E2)
+# ---------------------------------------------------------------------------
+
+
+def _run_claimed(env: Env, job_id: str, handler: Any) -> dict[str, Any]:
+    """Claim a queued job by hand (lease + fencing token) and run its handler in-process."""
+    from reva.operations.context import JobContext
+
+    with env.owner.begin() as c:
+        row = c.execute(text(
+            """UPDATE ops.job SET status = 'running', worker_id = 'test-worker-E2',
+                 lease_until = clock_timestamp() + interval '15 minutes',
+                 fencing_token = nextval('ops.fencing_seq'), attempts = attempts + 1
+               WHERE id = :j RETURNING job_type, payload, fencing_token"""), {"j": job_id}).mappings().one()
+    sim = make_engine("sim", env.settings)
+    try:
+        ctx = JobContext(job_id=uuid.UUID(job_id), job_type=row["job_type"], worker_id="test-worker-E2",
+                         fencing_token=int(row["fencing_token"]), attempt=1, settings=env.settings,
+                         worker_engine=env.worker, sim_engine=sim, store=env.store)
+        result = handler(dict(row["payload"]), ctx)
+        if not ctx.completed_in_handler:
+            with env.worker.begin() as c:
+                ctx.assert_lease(c)
+                ctx.complete_in(c, "succeeded", result)
+    finally:
+        sim.dispose()
+    return result  # type: ignore[no-any-return]
+
+
+def test_provenance_of_run_and_scenario(env: Env) -> None:
+    from reva.simulation.jobs import handle_simulation
+
+    sid = env.client.post("/v1/scenarios", json=_scenario(env, title="provenance run")).json()["scenario_id"]
+    acc = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L1"},
+                          headers={"Idempotency-Key": f"prov-run-{uuid.uuid4()}"})
+    assert acc.status_code == 202, acc.text
+    _run_claimed(env, acc.json()["job_id"], handle_simulation)
+    st = env.client.get(f"/v1/simulations/{acc.json()['job_id']}").json()
+    links = {lk["kind"]: lk for lk in st["provenance_links"]}
+    assert {"scenario", "run"} <= set(links)
+    run_id = st["data"]["run"]["id"]
+
+    # Every emitted link resolves (no dangling run/scenario links).
+    for lk in st["provenance_links"][:5]:
+        assert env.client.get(lk["href"]).status_code == 200, lk
+
+    r = env.client.get(f"/v1/provenance/run/{run_id}")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    g = body["data"]
+    assert g["root"] == f"run:{run_id}" and not g["truncated"]
+    assert body["context_mode"] == "simulation" and body["origin"] == "test_fixture"
+    nodes = {n["id"]: n for n in g["nodes"]}
+    kinds = {n["kind"] for n in g["nodes"]}
+    assert {"run", "scenario", "release", "artifact", "context", "model_version"} <= kinds
+    roles = {e["attributes"].get("role") for e in g["edges"] if e["source"] == g["root"]}
+    assert {"model_manifest", "ontology_manifest", "result_manifest"} <= roles
+    assert any(e["relation"] == "of_scenario" and e["target"] == f"scenario:{sid}" for e in g["edges"])
+    assert any(e["relation"] == "baseline_release" and e["source"] == f"scenario:{sid}"
+               and e["target"] == f"release:{env.r1.release_id}" for e in g["edges"])
+    assert all(e["source"] in nodes and e["target"] in nodes for e in g["edges"])
+
+    sc = env.client.get(f"/v1/provenance/scenario/{sid}").json()
+    sg = sc["data"]
+    spec_edge = next(e for e in sg["edges"] if e["relation"] == "defined_by")
+    spec_node = next(n for n in sg["nodes"] if n["id"] == spec_edge["target"])
+    assert spec_node["attributes"]["stored_inline"] is True
+    assert any(n["kind"] == "release" for n in sg["nodes"]) and sc["context_mode"] == "simulation"
+
+    small = env.client.get(f"/v1/provenance/run/{run_id}", params={"max_nodes": 10}).json()
+    assert small["data"]["truncated"] and len(small["data"]["nodes"]) <= 10
+    problem(env.client.get(f"/v1/provenance/run/{uuid.uuid4()}"), 404)
+    problem(env.client.get(f"/v1/provenance/scenario/{uuid.uuid4()}"), 404)
+    problem(env.client.get("/v1/provenance/run/not-a-uuid"), 422)
+
+
+def test_connector_and_source_origin_is_derived(env: Env) -> None:
+    from reva.api.routes.catalog import _acq_origin
+
+    r = env.client.get("/v1/connectors").json()
+    wb = next(c for c in r["data"] if c["name"] == WB)
+    assert wb["origin"] == "test_fixture" and wb["latest_acquisition_origin"] == "test_fixture"
+    assert wb["acquisitions_by_origin"] == {"live": 0, "test_fixture": wb["acquisitions"]}
+    assert r["origin"] == "test_fixture" and any(w["code"] == "fixture_data" for w in r["warnings"])
+    for c in r["data"]:
+        if c["acquisitions"] == 0:
+            assert c["origin"] == "none" and c["latest_acquisition_origin"] is None
+    src = env.client.get("/v1/sources").json()
+    wdi = next(s for s in src["data"] if s["source_key"] == "worldbank.wdi")
+    assert wdi["origin"] == "test_fixture" and wdi["acquisitions_by_origin"]["test_fixture"] >= 2
+    assert src["origin"] == "test_fixture"
+    assert [_acq_origin(a, b) for a, b in ((0, 0), (3, 0), (0, 2), (1, 1))] == \
+        ["none", "live", "test_fixture", "mixed"]
+
+
+def test_evaluation_job_and_scorecard_labels(env: Env) -> None:
+    from reva.operations.jobs import HANDLERS, resolve_handler
+
+    assert HANDLERS["evaluation"] == "reva.evaluation.tournament_service:handle_evaluation"
+    handler = resolve_handler("evaluation")
+    body = {"concepts": [POP], "horizons": [1], "seed": 7}
+    problem(env.client.post("/v1/evaluations", json=body), 400, "idempotency_key_required")
+    problem(env.client.post("/v1/evaluations", json={"concepts": [CRUDE_M]},
+                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "capability_gap")
+    problem(env.client.post("/v1/evaluations", json={"horizons": [9]},
+                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
+    problem(env.client.post("/v1/evaluations", json={"seed": -1},
+                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
+    problem(env.client.post("/v1/evaluations", json={"extra": 1},
+                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
+    key = {"Idempotency-Key": f"eval-{uuid.uuid4()}"}
+    acc = env.client.post("/v1/evaluations", json=body, headers=key)
+    assert acc.status_code == 202, acc.text
+    jid = acc.json()["job_id"]
+    assert acc.json()["job_type"] == "evaluation" and acc.headers["location"] == f"/v1/jobs/{jid}"
+    assert env.client.post("/v1/evaluations", json=body, headers=key).json()["job_id"] == jid
+    problem(env.client.post("/v1/evaluations", json={**body, "seed": 8}, headers=key), 409, "idempotency_conflict")
+    job = env.client.get(f"/v1/jobs/{jid}").json()
+    assert job["payload"] == {"concepts": [POP], "horizons": [1], "seed": 7} and job["status"] == "queued"
+    # A default request (no fields) is accepted with an empty payload: service defaults apply.
+    empty = env.client.post("/v1/evaluations", json={}, headers={"Idempotency-Key": f"eval-{uuid.uuid4()}"})
+    assert empty.status_code == 202 and env.client.get(f"/v1/jobs/{empty.json()['job_id']}").json()["payload"] == {}
+    env.client.post(f"/v1/jobs/{empty.json()['job_id']}/cancel")
+
+    result = _run_claimed(env, jid, handler)
+    assert result["replay_mode"] == "revised_data_retrospective"
+    assert env.client.get(f"/v1/jobs/{jid}").json()["status"] == "succeeded"
+
+    ev = env.client.get("/v1/models/forecast.log_drift/evaluations")
+    assert ev.status_code == 200, ev.text
+    out = ev.json()
+    rows = out["data"]
+    mine = [r for r in rows if r["included_as"] == "requested_model"]
+    naive = [r for r in rows if r["included_as"] == "naive_baseline_comparator"]
+    assert mine and all(r["model_key"] == "forecast.log_drift" and not r["is_naive_baseline"] for r in mine)
+    assert naive and all(r["model_key"] == "forecast.last_value" and r["is_naive_baseline"] for r in naive)
+    dev_manifests = {r["evaluation_manifest_sha256"] for r in mine if r["task_scope"]["period"] == "development"}
+    assert dev_manifests <= {r["evaluation_manifest_sha256"] for r in naive
+                             if r["task_scope"]["period"] == "development"}
+    label = "revised-data retrospective — not a real-time backtest"
+    assert all(r["replay_mode"] == "revised_data_retrospective" and r["replay_mode_label"] == label for r in rows)
+    assert any(w["code"] == "revised_data_retrospective" and label in w["message"] for w in out["warnings"])
+    assert out["origin"] == "test_fixture" and out["context_mode"] == "evaluation"
+    assert out["historical_validation"]["status"] == "reported"
+    assert out["historical_validation"]["detail"]["labels"] == [label]
+    # The naive model's own listing has no comparator rows (its rows are the baseline).
+    own = env.client.get("/v1/models/forecast.last_value/evaluations").json()["data"]
+    assert own and all(r["included_as"] == "requested_model" and r["is_naive_baseline"] for r in own)
+    # Scope: a read-only token cannot start evaluations.
+    from reva.api.auth import new_api_token
+
+    tok, sha = new_api_token()
+    with env.owner.begin() as c:
+        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'e2-read')"),
+                  {"h": sha, "s": ["read"]})
+    r = env.client.post("/v1/evaluations", json={}, headers={"Authorization": f"Bearer {tok}",
+                                                             "Idempotency-Key": f"eval-{uuid.uuid4()}"})
+    assert r.status_code == 403
+
+
+def test_discovery_candidates_from_jobs_and_proposals(env: Env) -> None:
+    empty = env.client.get("/v1/discovery/candidates")
+    assert empty.status_code == 200, empty.text
+    assert any(w["code"] == "unreviewed_candidates" for w in empty.json()["warnings"])
+    with env.owner.begin() as c:
+        sha = c.execute(text("SELECT manifest_sha256 FROM belief.release LIMIT 1")).scalar_one()
+        pid = c.execute(text(
+            "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, summary, author) "
+            "VALUES ('connector_promotion', :s, 1, CAST(:sm AS jsonb), 'agent:discovery') RETURNING id"),
+            {"s": sha, "sm": json.dumps({"scope": {"dataset": "demo_pjan", "concept": "x@1"}})}).scalar_one()
+        result = {
+            "status": "gate_hold", "requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture",
+            "search": {"ranked": [{"code": "demo_pjan", "score": 3.5, "jaccard": 0.6},
+                                  {"code": "demo_pjanaggr3", "score": 2.0, "jaccard": 0.4},
+                                  {"code": "not-inspected", "score": 1.0, "jaccard": 0.1}],
+                       "inspections": [{"code": "demo_pjan", "ok": True, "error": None},
+                                       {"code": "demo_pjanaggr3", "ok": False, "error": "timeout"}]},
+            "connector": {"name": "eurostat.demo_pjan", "version": "1.0.0"},
+            "gate": {"proposal_id": str(pid), "outcome": "hold"},
+        }
+        jid = c.execute(text(
+            "INSERT INTO ops.job(job_type, payload, idempotency_key, status, result_ref, finished_at) "
+            "VALUES ('discovery', CAST(:p AS jsonb), :k, 'succeeded', CAST(:r AS jsonb), clock_timestamp()) "
+            "RETURNING id"),
+            {"p": json.dumps({"mode": "fixture"}), "k": f"disc-cand-{uuid.uuid4()}", "r": json.dumps(result)}
+        ).scalar_one()
+    r = env.client.get("/v1/discovery/candidates")
+    assert r.status_code == 200, r.text
+    body = r.json()
+    found = [c for c in body["data"] if c["job_id"] == str(jid)]
+    assert [c["dataset_code"] for c in found] == ["demo_pjan", "demo_pjanaggr3", "not-inspected"]
+    assert [c["rank"] for c in found] == [1, 2, 3]
+    top = found[0]
+    assert top["selected"] and top["proposal_id"] == str(pid) and top["gate_outcome"] == "hold"
+    assert top["inspected"] is True and found[1]["inspected"] is False and found[1]["inspection_error"] == "timeout"
+    assert found[2]["inspected"] is None and not found[1]["selected"] and not found[2]["selected"]
+    assert all(c["origin"] == "test_fixture" and c["requirement_id"] == "R-POP-JAN-AGESEX" for c in found)
+    prop = next(c for c in body["data"] if c["candidate_kind"] == "connector_proposal" and c["proposal_id"] == str(pid))
+    assert prop["dataset_code"] == "demo_pjan" and prop["origin"] == "test_fixture" and prop["reviews"] == []
+    assert body["origin"] == "test_fixture" and any(w["code"] == "fixture_data" for w in body["warnings"])
+    lim = env.client.get("/v1/discovery/candidates", params={"limit": 1}).json()
+    assert len(lim["data"]) == 1 and any(w["code"] == "truncated" for w in lim["warnings"])
+    assert env.client.get("/v1/discovery/candidates", params={"limit": 0}).status_code == 422
