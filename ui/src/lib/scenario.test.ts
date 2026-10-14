@@ -90,4 +90,34 @@ describe('scenario spec', () => {
     expect(json.context.baseline_release_id).toBe(REAL);
     expect(json.results[1].value).toEqual({ kind: 'missing', reason: 'unavailable' });
   });
+
+  it('exports an L2 sensitivity-range row as bounds, never as a point value', () => {
+    const results: SimResult[] = [
+      {
+        id: 'r3',
+        output_key: 'import_value_change_usd',
+        subject: { id: 'e1', label: 'France' },
+        variant: 'L2:sensitivity_range',
+        value: {
+          kind: 'sensitivity_range',
+          lower: '397.5',
+          upper: '562.5',
+          unit_ref: 'unit.usd',
+          basis: {},
+          evaluated_points: 3,
+          includes_fixed_quantity_point: true,
+          statement: 'assumption sensitivity, not a confidence interval',
+        },
+        uncertainty: { status: 'quantified', kind: 'sensitivity_range', lower: '397.5', upper: '562.5' },
+        applicability: {},
+      },
+    ];
+    const ctx = {
+      simulation_id: 'sim-2', scenario_id: 'scn-2', scenario_title: 'T', baseline_release_id: 'b',
+      baseline_release_sequence: 1, knowledge_cutoff: '2026-10-14T20:00:00Z', model_versions: [], fidelity: 'L2',
+      assumptions: [], origin: 'live',
+    };
+    const row = resultsToCsv(ctx, results).split('\n').find((l) => l.startsWith('France'))!;
+    expect(row).toBe('France,import_value_change_usd,L2:sensitivity_range,,unit.usd,,' + row.split(',')[6] + ',397.5,562.5');
+  });
 });

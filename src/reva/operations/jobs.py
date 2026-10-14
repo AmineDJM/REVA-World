@@ -146,7 +146,7 @@ def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: in
     payload = {"origin": origin, "through_outbox_id": int(through_outbox_id)}
     res = enqueue_resolving_conflict(conn, "publish_beliefs", payload, idempotency_key("publish_beliefs", payload),
                                      priority=PUBLISH_PRIORITY, created_by=created_by)
-    if res.conflict is not None:
+    if res.conflict is not None and res.created:  # surface once, when the disambiguated job is created
         from reva.operations.audit import record
         from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
 

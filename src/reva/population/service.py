@@ -17,9 +17,9 @@ from sqlalchemy import Engine, text
 
 from reva.adapters.postgres import repositories as repo
 from reva.belief.selection import eligible_latest
-from reva.compression.refine import refine
+from reva.compression.refine import UnsupportedRefinement, refine
 from reva.compression.stratified import coarsen
-from reva.kernel.errors import MissingInput, ValidationProblem
+from reva.kernel.errors import IncompatibleSemantics, MissingInput, ValidationProblem
 from reva.operations.context import JobContext
 from reva.population.diagnostics import diagnose
 from reva.population.materialise import materialise, table_logical_hash, to_parquet_bytes
@@ -97,22 +97,43 @@ def build_population(
     table = materialise(recipe, n_records)
     diag = diagnose(table, recipe)
     pq_obj = store.put_bytes(to_parquet_bytes(table), "models", "application/vnd.apache.parquet")
-    coarse = coarsen(table, FIVE_YEAR_BANDS, task_scope="age_band_reporting")
-    coarse_obj = store.put_bytes(to_parquet_bytes(coarse.table), "models", "application/vnd.apache.parquet")
-    refined = refine(coarse.table, recipe, "age", task_scope="age_band_reporting")
-    refined_obj = store.put_bytes(to_parquet_bytes(refined.table), "models", "application/vnd.apache.parquet")
+    # Compression is optional: when it does not apply (unknown Y_OPEN bound, a band
+    # that would split a leaf, ...) it is recorded as not_applicable with the reason;
+    # the population itself is still published. Recipe errors (e.g.
+    # InconsistentSourceTotals) are not caught: the job fails with the typed error.
+    compression: dict[str, Any] = {}
+    steps: list[tuple[str, Any, Any]] = []  # (operation, result, stored object)
+    try:
+        coarse = coarsen(table, FIVE_YEAR_BANDS, task_scope="age_band_reporting")
+    except ValidationProblem as e:
+        compression["coarsen"] = {"status": "not_applicable", "reason": e.message}
+        compression["refine"] = {"status": "not_applicable", "reason": "requires a coarsened table"}
+    else:
+        coarse_obj = store.put_bytes(to_parquet_bytes(coarse.table), "models", "application/vnd.apache.parquet")
+        steps.append(("coarsen", coarse, coarse_obj))
+        compression["coarsen"] = {"status": "applied", "output_sha256": coarse_obj.sha256}
+        try:
+            refined = refine(coarse.table, recipe, "age", task_scope="age_band_reporting")
+        except (ValidationProblem, UnsupportedRefinement, IncompatibleSemantics) as e:
+            compression["refine"] = {"status": "not_applicable", "reason": e.message}
+        else:
+            refined_obj = store.put_bytes(to_parquet_bytes(refined.table), "models",
+                                          "application/vnd.apache.parquet")
+            steps.append(("refine", refined, refined_obj))
+            compression["refine"] = {"status": "applied", "output_sha256": refined_obj.sha256}
+    diag = {**diag, "compression": compression}
     with worker.begin() as conn:
         act = repo.simple_activity("population.materialise", "model", actor,
                                    {"geo": geo_entity, "year": year, "n_records": n_records, "seed": seed})
         recipe_sha = repo.store_json_artifact(conn, store, recipe.to_dict(), "models",
                                               schema_version="population-recipe/1",
                                               privacy_class="synthetic_public_aggregate_derived")
-        for obj, logical in ((pq_obj, table_logical_hash(table)), (coarse_obj, table_logical_hash(coarse.table)),
-                             (refined_obj, table_logical_hash(refined.table))):
+        for obj, logical in [(pq_obj, table_logical_hash(table))] + [
+                (o, table_logical_hash(res.table)) for _op, res, o in steps]:
             repo.register_artifact(conn, obj, schema_version="population-records/1",
                                    rights={"licence": "derived from Eurostat (CC BY 4.0)"},
                                    privacy_class="synthetic_public_aggregate_derived", logical_sha256=logical)
-        repo.record_activity(conn, act, outputs=[recipe_sha, pq_obj.sha256, coarse_obj.sha256, refined_obj.sha256])
+        repo.record_activity(conn, act, outputs=[recipe_sha, pq_obj.sha256, *(o.sha256 for _op, _r, o in steps)])
         ctx_id = repo.create_context(conn, mode="population", origin=origin, manifest_sha256=recipe_sha,
                                      knowledge_cutoff=cutoff)
         pid = conn.execute(
@@ -126,7 +147,7 @@ def build_population(
              "d": json.dumps(diag, default=str), "sp": json.dumps({"seed": seed, "allocator": "largest_remainder"}),
              "a": act.id},
         ).scalar_one()
-        for op, res, obj in (("coarsen", coarse, coarse_obj), ("refine", refined, refined_obj)):
+        for op, res, obj in steps:
             conn.execute(
                 text(
                     """INSERT INTO model.compression_certificate(population_dataset_id, operation, task_scope,
@@ -138,7 +159,8 @@ def build_population(
             )
     return {"population_dataset_id": str(pid), "context_id": str(ctx_id), "records": table.num_rows,
             "recipe_sha256": recipe_sha, "materialisation_sha256": pq_obj.sha256,
-            "ess": diag.get("effective_sample_size"), "leaf_cells": len(recipe.leaf_cells)}
+            "ess": diag.get("effective_sample_size"), "leaf_cells": len(recipe.leaf_cells),
+            "totals_status": recipe.totals_status, "compression": compression}
 
 
 def handle_population(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:

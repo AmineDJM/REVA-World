@@ -191,8 +191,10 @@ export function exportContext(simId: string, status: SimulationStatus, modelVers
   };
 }
 
-function resultValue(r: SimResult): { value: string; unit: string; missing: string } {
+function resultValue(r: SimResult): { value: string; unit: string; missing: string; lower?: string; upper?: string } {
   const v = r.value;
+  // L2 sensitivity range: no point value; the bounds go to lower/upper (assumption sweep, not a CI).
+  if (v.kind === 'sensitivity_range') return { value: '', unit: String(v.unit_ref), missing: '', lower: String(v.lower), upper: String(v.upper) };
   if (v.kind === 'decimal') return { value: String(v.value), unit: String(v.unit_ref), missing: '' };
   if (v.kind === 'float') return { value: String(v.value), unit: String(v.unit_ref), missing: '' };
   if (v.kind === 'missing') return { value: '', unit: '', missing: missingReasonLabel(String(v.reason)) };
@@ -232,8 +234,8 @@ export function resultsToCsv(ctx: ExportContext, results: SimResult[]): string {
         v.unit,
         v.missing,
         u.title,
-        r.uncertainty?.lower ?? '',
-        r.uncertainty?.upper ?? '',
+        v.lower ?? r.uncertainty?.lower ?? '',
+        v.upper ?? r.uncertainty?.upper ?? '',
       ]
         .map((c) => csvCell(String(c)))
         .join(','),

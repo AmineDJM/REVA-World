@@ -10,16 +10,17 @@
 | Object inventory | weekly | `scripts/backup_restore.py inventory` / `backup.sh` |
 
 Measured locally (PostgreSQL 17.5 / PostGIS 3.5 in Docker, MVP fixture data:
-55 tables, 4,166 rows, 62 objects, 0.57 MB custom-format dump), from
-`tests/integration/test_backup_restore.py` on 2026-10-14:
+55–57 tables, 4,166–4,222 rows, 62 objects, 0.57–0.61 MB custom-format dump), from
+`tests/integration/test_backup_restore.py`, six runs on 2026-10-14 on a shared
+development machine with other test suites running concurrently:
 
 | Step | Wall time |
 |---|---|
-| `backup.sh` end to end (snapshot, logical manifest, `pg_dump`, inventory with sha256 of every object, age encryption) | 1.21–1.31 s |
-| of which `pg_dump` | 0.37–0.38 s |
-| `restore.sh` end to end (checksum, decrypt, `pg_restore`, grants, bootstrap, manifest re-computation, object check) | 1.73–1.78 s |
-| of which `pg_restore` | 0.84–0.86 s |
-| of which bootstrap | 0.04–0.05 s |
+| `backup.sh` end to end (snapshot, logical manifest, `pg_dump`, inventory with sha256 of every object, age encryption) | 1.18–2.60 s |
+| of which `pg_dump` | 0.37–0.86 s |
+| `restore.sh` end to end (checksum, decrypt, `pg_restore`, grants, bootstrap, manifest re-computation, object check) | 1.73–3.42 s |
+| of which `pg_restore` | 0.84–1.46 s |
+| of which bootstrap | 0.04–0.09 s |
 
 These are small-data numbers; they do not extrapolate to production volumes.
 Re-measure in each restore drill and record the result here.

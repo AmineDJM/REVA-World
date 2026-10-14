@@ -131,7 +131,7 @@ def tick(engine: Engine, *, limit: int = 50, actor: str = "scheduler") -> list[S
                             conn, r["job_type"], payload, key, SCHEDULE_PRIORITY,
                             created_by=f"{actor}:{r['schedule_key']}"[:200])
                         conflict = res.conflict
-                        if conflict is not None:
+                        if conflict is not None and res.created:
                             _record_conflict(conn, actor, r["schedule_key"], slot, conflict)
                         job_id, created = res.job_id, res.created
                     else:

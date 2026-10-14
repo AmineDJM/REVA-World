@@ -41,7 +41,7 @@ def _require_database(demo: Any) -> None:
     try:
         with eng.connect() as c:
             c.execute(text("SELECT 1"))
-    except Exception:  # noqa: BLE001
+    except Exception:
         pytest.skip("PostgreSQL not reachable")
     finally:
         eng.dispose()
@@ -58,9 +58,16 @@ def demo_result(tmp_path_factory: pytest.TempPathFactory) -> dict[str, Any]:
 
 
 def _failures(doc: dict[str, Any]) -> list[dict[str, Any]]:
-    return [{"step": s["id"], "title": s["title"], "error": s["error"],
-             "failed_checks": [c for c in s["checks"] if c["status"] != "pass"]}
-            for s in doc["steps"] if s["status"] == "fail"]
+    return [
+        {
+            "step": s["id"],
+            "title": s["title"],
+            "error": s["error"],
+            "failed_checks": [c for c in s["checks"] if c["status"] != "pass"],
+        }
+        for s in doc["steps"]
+        if s["status"] == "fail"
+    ]
 
 
 def test_environment_was_set_up(demo_result: dict[str, Any]) -> None:
@@ -82,8 +89,11 @@ def test_all_non_blocked_steps_pass(demo_result: dict[str, Any]) -> None:
 
 def test_offline_core_steps_are_never_blocked(demo_result: dict[str, Any]) -> None:
     # In fixture mode nothing external can block ingestion, beliefs, graph, simulation or provenance.
-    blocked = {s["id"]: s["blocked_reason"] for s in demo_result["steps"]
-               if s["id"] in {"1", "2", "3", "4", "5", "6", "7", "N"} and s["status"] == "blocked"}
+    blocked = {
+        s["id"]: s["blocked_reason"]
+        for s in demo_result["steps"]
+        if s["id"] in {"1", "2", "3", "4", "5", "6", "7", "N"} and s["status"] == "blocked"
+    }
     assert not blocked, blocked
 
 
