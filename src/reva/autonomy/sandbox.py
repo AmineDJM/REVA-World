@@ -244,7 +244,7 @@ class TrustedTemplateSandbox:
                 proc = subprocess.run(
                     [sys.executable, "-I", "-m", "reva.autonomy.sandbox_child"],
                     input=json.dumps(request).encode(), capture_output=True, env=scrubbed_environment(),
-                    cwd=cwd, timeout=max(1, int(policy.budget.max_wall_seconds)), preexec_fn=limits,  # noqa: PLW1509
+                    cwd=cwd, timeout=max(1, int(policy.budget.max_wall_seconds)), preexec_fn=limits,
                     check=False,
                 )
             except subprocess.TimeoutExpired:
@@ -265,7 +265,7 @@ class TrustedTemplateSandbox:
 
 def _secretish(key: str) -> bool:
     k = key.upper()
-    return ("DATABASE" in k or k.endswith("_URL") and "DB" in k or any(
+    return ("DATABASE" in k or (k.endswith("_URL") and "DB" in k) or any(
         s in k for s in ("PASSWORD", "SECRET", "TOKEN", "API_KEY", "ACCESS_KEY", "PRIVATE"))
         or (k.startswith("REVA_") and k.endswith("_KEY")))
 

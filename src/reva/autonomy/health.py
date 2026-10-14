@@ -27,7 +27,7 @@ from uuid import UUID
 from sqlalchemy import Connection, text
 
 from reva.autonomy.common import ArtifactIO
-from reva.ports.autonomy import ArtifactRef, HealthReport, JSON
+from reva.ports.autonomy import JSON, ArtifactRef, HealthReport
 
 WINDOW = 20
 SUCCESS = ("success", "published", "unchanged")

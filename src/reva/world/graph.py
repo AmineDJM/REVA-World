@@ -32,7 +32,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 import numpy as np
-from scipy import sparse
+from scipy import sparse  # type: ignore[import-untyped]
 
 from reva.kernel.errors import CapabilityGap, ValidationProblem
 

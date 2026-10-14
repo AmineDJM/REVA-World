@@ -211,7 +211,7 @@ def structure_fingerprint(doc: Mapping[str, Any]) -> str:
     shape = {
         "dimension_order": list(doc.get("id") or []),
         "categories": {
-            d: sorted((dims.get(d, {}).get("category", {}).get("index") or {}))
+            d: sorted(dims.get(d, {}).get("category", {}).get("index") or {})
             for d in (doc.get("id") or [])
             if d != "time"
         },

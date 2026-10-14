@@ -153,7 +153,7 @@ def run_sync(coro: Coroutine[Any, Any, T]) -> T:
     def target() -> None:
         try:
             box["value"] = asyncio.run(coro)
-        except BaseException as e:  # noqa: BLE001 - re-raised in the caller thread
+        except BaseException as e:
             box["error"] = e
 
     t = threading.Thread(target=target, name="reva-autonomy-async")

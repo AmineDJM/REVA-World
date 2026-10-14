@@ -93,7 +93,7 @@ def main() -> int:
     try:
         out.update(asyncio.run(_run(req)))
         out["ok"] = True
-    except Exception as e:  # noqa: BLE001 - reported to the parent as a failed run
+    except Exception as e:
         out["ok"] = False
         out["error"] = f"{type(e).__name__}: {str(e)[:500]}"
     try:
@@ -101,7 +101,7 @@ def main() -> int:
 
         out["rlimits"] = {"cpu": resource.getrlimit(resource.RLIMIT_CPU),
                           "as": resource.getrlimit(resource.RLIMIT_AS)}
-    except Exception:  # noqa: BLE001
+    except Exception:
         out["rlimits"] = None
     sys.stdout.write(json.dumps(out, default=str))
     return 0

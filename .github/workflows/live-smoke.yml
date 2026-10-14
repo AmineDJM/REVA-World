@@ -1,0 +1,60 @@
+# Real-provider smoke tests (network). Independent of PRs so ordinary CI never
+# depends on provider availability. Results are evidence about providers, not
+# a merge gate.
+name: live-smoke
+
+on:
+  schedule:
+    - cron: "17 5 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: live-smoke
+  cancel-in-progress: false
+
+jobs:
+  live:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        # postgis/postgis:17-3.5
+        image: postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
+        env:
+          POSTGRES_DB: reva
+          POSTGRES_USER: reva_owner
+          POSTGRES_PASSWORD: local_reva_owner_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U reva_owner -d reva"
+          --health-interval 5s --health-timeout 3s --health-retries 30
+    env:
+      REVA_HTTP_CONTACT_EMAIL: ${{ vars.REVA_HTTP_CONTACT_EMAIL }}
+      REVA_COMTRADE_API_KEY: ${{ secrets.REVA_COMTRADE_API_KEY }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: "0.11.32"
+          enable-cache: true
+      - run: uv sync --frozen --all-extras
+      - run: cp .env.example .env
+      - name: Live provider tests
+        run: uv run pytest -m live -q -o addopts="" --junitxml=var/junit-live.xml
+      - name: Render schema drift (download the current official schema)
+        run: uv run python scripts/validate_blueprint.py --live
+      - if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: junit-live
+          path: var/junit-live.xml
+          if-no-files-found: warn

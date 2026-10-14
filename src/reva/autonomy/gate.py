@@ -126,7 +126,7 @@ class PolicyPromotionGate:
         problems: list[str] = []
         try:
             change = self.io.get_json(proposal.patch_or_manifest)
-        except Exception as e:  # noqa: BLE001 - any unreadable manifest is out of scope
+        except Exception as e:
             return False, [f"unreadable manifest: {type(e).__name__}"], {}
         if not isinstance(change, dict) or change.get("schema") != CONNECTOR_CHANGE_SCHEMA:
             return False, ["T1 auto-promotion only covers declarative connector manifests"], {}
