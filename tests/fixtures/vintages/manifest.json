@@ -1,0 +1,146 @@
+{
+  "schema": "reva-vintage-fixtures/1",
+  "connector": "worldbank.wdi.indicators",
+  "indicator": "SP.POP.TOTL",
+  "countries": [
+    "FRA"
+  ],
+  "provenance": "SYNTHETIC vintages in the exact World Bank API v2 response shape. Values are illustrative test numbers, not real WDI vintages; they exist to exercise revision lineage and temporal replay. Years are outside the captured live fixture (2000-2024) so lineages never collide with it.",
+  "series": {
+    "pop_fra_1990_1991_two_vintages": {
+      "years": [
+        1990,
+        1991
+      ],
+      "purpose": "two recorded vintages; 1991 revised in v2",
+      "vintages": [
+        {
+          "label": "v1",
+          "file": "pop_fra_1990_1991_two_vintages.v1.json",
+          "retrieved_at": "2026-07-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-07-01"
+        },
+        {
+          "label": "v2",
+          "file": "pop_fra_1990_1991_two_vintages.v2.json",
+          "retrieved_at": "2026-09-16T10:00:00+00:00",
+          "dataset_lastupdated": "2026-09-15"
+        }
+      ]
+    },
+    "pop_fra_1985_1986_aba": {
+      "years": [
+        1985,
+        1986
+      ],
+      "purpose": "A -> (identical re-poll) -> B -> A for 1986",
+      "vintages": [
+        {
+          "label": "a",
+          "file": "pop_fra_1985_1986_aba.a.json",
+          "retrieved_at": "2026-05-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-05-01"
+        },
+        {
+          "label": "a_repoll",
+          "file": "pop_fra_1985_1986_aba.a_repoll.json",
+          "retrieved_at": "2026-06-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-06-01"
+        },
+        {
+          "label": "b",
+          "file": "pop_fra_1985_1986_aba.b.json",
+          "retrieved_at": "2026-07-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-07-01"
+        },
+        {
+          "label": "a_again",
+          "file": "pop_fra_1985_1986_aba.a_again.json",
+          "retrieved_at": "2026-08-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-08-01"
+        }
+      ]
+    },
+    "pop_fra_1980_1981_parser_replay": {
+      "years": [
+        1980,
+        1981
+      ],
+      "purpose": "original vintage replayed later with a new parser/connector version",
+      "vintages": [
+        {
+          "label": "v1",
+          "file": "pop_fra_1980_1981_parser_replay.v1.json",
+          "retrieved_at": "2026-04-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-04-01"
+        }
+      ]
+    },
+    "pop_fra_1975_1976_leakage": {
+      "years": [
+        1975,
+        1976
+      ],
+      "purpose": "revised historical value recorded after a replay cutoff",
+      "vintages": [
+        {
+          "label": "v1",
+          "file": "pop_fra_1975_1976_leakage.v1.json",
+          "retrieved_at": "2026-03-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-03-01"
+        },
+        {
+          "label": "v2",
+          "file": "pop_fra_1975_1976_leakage.v2.json",
+          "retrieved_at": "2026-08-21T10:00:00+00:00",
+          "dataset_lastupdated": "2026-08-20"
+        }
+      ]
+    },
+    "pop_fra_1970_1971_archive": {
+      "years": [
+        1970,
+        1971
+      ],
+      "purpose": "archived vintage with availability proof vs current vintage without proof",
+      "vintages": [
+        {
+          "label": "current",
+          "file": "pop_fra_1970_1971_archive.current.json",
+          "retrieved_at": "2026-10-09T10:00:00+00:00",
+          "dataset_lastupdated": "2026-10-08"
+        },
+        {
+          "label": "archived_2015",
+          "file": "pop_fra_1970_1971_archive.archived_2015.json",
+          "retrieved_at": "2026-10-10T10:00:00+00:00",
+          "dataset_lastupdated": "2015-06-30",
+          "availability": {
+            "source_available_at": "2015-07-01T00:00:00+00:00",
+            "availability_basis": {
+              "kind": "archived_release_snapshot",
+              "captured_at": "2015-07-01T00:00:00+00:00",
+              "evidence": "SYNTHETIC TEST FIXTURE standing in for an independently archived provider vintage; not a real archive record",
+              "archive_ref": "fixture:vintages/pop_fra_1970_1971_archive.archived_2015.json"
+            }
+          }
+        }
+      ]
+    },
+    "pop_fra_1960_1961_job": {
+      "years": [
+        1960,
+        1961
+      ],
+      "purpose": "replay job end-to-end",
+      "vintages": [
+        {
+          "label": "v1",
+          "file": "pop_fra_1960_1961_job.v1.json",
+          "retrieved_at": "2026-02-02T10:00:00+00:00",
+          "dataset_lastupdated": "2026-02-01"
+        }
+      ]
+    }
+  }
+}
