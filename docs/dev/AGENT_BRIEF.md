@@ -59,7 +59,13 @@ unsupported capability returns a typed blocked/unavailable result.
 | Replay/leakage + temporal/revision acceptance | agent H1 | src/reva/evaluation/{replay,cutoff,leakage}.py, tests/replay/**, tests/integration/test_revisions*.py, tests/fixtures/vintages/** |
 | Security/storage/kernel/contract tests | agent H2 | tests/security/test_{roles,ssrf,http,secrets,sql}*.py, tests/unit/test_{kernel,storage,values,ids,settings}*.py, tests/integration/test_storage*.py, tests/contracts/**, tests/fixtures/adversarial/** |
 | Deployment/ops/docs | agent I | Dockerfile, .dockerignore, Makefile, scripts/*.py and *.sh (except dev_reset_db.sh), .github/**, docs/** (except docs/dev and docs/implementation_status.md), tests/security/test_start_env*.py, tests/integration/test_backup_restore*.py |
-| Integration, CLI, world graph/queries, ledger | lead | src/reva/cli/**, src/reva/world/**, src/reva/belief/**, src/reva/evidence/**, conftest, pyproject, migrations, docs/implementation_status.md |
+| World graph library | agent J | src/reva/world/{graph.py,entities.py,identities.py,events.py,queries.py}, tests/unit/test_world_graph*.py, tests/integration/test_world_graph*.py |
+| Ontology services, units, components, exports | agent K | src/reva/ontology/{components.py,mappings.py,units.py,validation.py,exports.py}, registry/components/*.schema.json, tests/unit/test_ontology*.py, tests/contracts/test_registry_components*.py |
+| Model evaluation service + forecast ledger + model registry | agent L | src/reva/models/{registry.py,applicability.py,ports.py}, src/reva/evaluation/{tournament_service.py,ledger.py}, tests/integration/test_evaluation_service*.py, tests/unit/test_model_registry*.py |
+| Extension interfaces P8–P12 + capability descriptors | agent M | src/reva/models/physical/**, src/reva/extensions/**, src/reva/capabilities.py, tests/unit/test_capabilities*.py, tests/unit/test_extensions*.py |
+| Code review of core (read-only, report) | agent R | docs/dev/review_core.md only |
+| Spec compliance audit (read-only, report) | agent S | docs/dev/spec_audit.md only |
+| Integration, CLI, world/space.py, ledger | lead | src/reva/cli/**, src/reva/world/space.py, src/reva/population/service.py, src/reva/belief/**, src/reva/evidence/**, conftest, pyproject, migrations, docs/implementation_status.md |
 
 ## Cross-agent interface names (fixed)
 - API app: `reva.api.app:app` (FastAPI) and factory `reva.api.app:create_app(settings=None)`.
