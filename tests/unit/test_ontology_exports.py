@@ -71,7 +71,7 @@ def test_prov_export_rejects_dangling_refs_cycles_and_naive_times() -> None:
     cyc_use = [*usages, {"activity_id": acts[0]["id"], "artifact_sha256": NORM, "ordinal": 0, "selector": {}}]
     with pytest.raises(ValidationProblem, match="cycle"):
         prov_jsonld(acts, arts, cyc_use, gens)
-    naive = [{**acts[0], "started_at": datetime(2026, 1, 1)}, acts[1]]  # noqa: DTZ001
+    naive = [{**acts[0], "started_at": datetime(2026, 1, 1)}, acts[1]]
     with pytest.raises(ValidationProblem, match="timezone"):
         prov_jsonld(naive, arts, usages, gens)
 

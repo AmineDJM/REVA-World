@@ -142,10 +142,15 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
     summary["search"] = discoverer.last_search
     if not candidates:
         return {**summary, "status": "no_candidate", "note": "search failure is a valid, recorded result"}
-    cand = candidates[0]
-    # 3. mapping
+    # 3. mapping: prefer a candidate covered by an approved exact mapping; otherwise the best
+    # inspected candidate becomes a reviewable (T2) proposal. Ranking text never grants semantics.
     mapper = RegistryOntologyMapper(io_, registry=reg, policy=policy)
-    mappings = mapper.assess(cand, context)
+    inspected = [c for c in candidates if io_.get_json(c.metadata).get("inspection")]
+    if not inspected:
+        return {**summary, "status": "no_inspected_candidate", "note": "search failure is a valid result"}
+    assessed = [(c, mapper.assess(c, context)) for c in inspected]
+    cand, mappings = next(((c, m) for c, m in assessed if m[0].relation == "exact" and not m[0].review_required),
+                          assessed[0])
     primary = mappings[0]
     summary["mappings"] = [{"target": m.target_concept_version, "relation": m.relation,
                             "review_required": m.review_required} for m in mappings]

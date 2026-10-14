@@ -143,8 +143,8 @@ function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationSt
   const inputs = useMemo(() => baselineInputs(st.results), [st.results]);
   const isL2 = st.run?.fidelity === 'L2';
   const variantNames = useMemo(() => [...new Set(st.results.filter((r) => r.variant !== 'L1').map((r) => r.variant))].sort(), [st.results]);
-  const modelVersions = env.model_versions.map((m) => `${m.model_key}@${m.version}`);
-  const ctx = exportContext(simId, st, modelVersions, env.assumptions);
+  const modelVersions = (env.model_versions ?? []).map((m) => `${m.model_key}@${m.version}`);
+  const ctx = exportContext(simId, st, modelVersions, env.assumptions ?? []);
   const outcome = st.outcome;
   const notClaimed = outcome && isRecord(outcome.applicability) && typeof outcome.applicability.not_claimed === 'string' ? outcome.applicability.not_claimed : null;
 

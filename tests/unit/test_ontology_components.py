@@ -93,7 +93,8 @@ def _border(valuation: str | None) -> dict:
 
 def test_trade_crude_requires_valuation_and_kg_only() -> None:
     inst = {"reference_year": 2023, "classification": {"system": "HS", "revision": "H6", "product_code": "2709"},
-            "imports_border_value": _border("CIF"), "exports_border_value": {"kind": "missing", "reason": "unavailable"},
+            "imports_border_value": _border("CIF"),
+            "exports_border_value": {"kind": "missing", "reason": "unavailable"},
             "imports_net_weight": {"kind": "decimal", "value": "5", "unit_ref": "unit.kg"}}
     assert validate_component_instance(TRADE, inst).ok
     rep = validate_component_instance(TRADE, {**inst, "imports_border_value": _border(None)})

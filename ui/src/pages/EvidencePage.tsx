@@ -116,7 +116,7 @@ function CardDetail({ id }: { id: string }) {
               ))}
             </ul>
           )}
-          {d.effects.length > 0 && (
+          {(d.effects ?? []).length > 0 && (
             <>
               <h4>Extracted effects</h4>
               <JsonView value={d.effects} />

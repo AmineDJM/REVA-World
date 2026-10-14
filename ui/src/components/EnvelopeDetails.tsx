@@ -1,7 +1,7 @@
 import type { Assessment, EnvelopeMeta } from '../api/types';
 import { formatDateTime, humanize, unitLabel } from '../lib/format';
 import { JsonView } from './JsonView';
-import { ProvenanceButton } from './ProvenanceDrawer';
+import { PROVENANCE_KINDS, ProvenanceButton } from './ProvenanceDrawer';
 import { UncertaintyPanel } from './UncertaintyPanel';
 
 export function AssessmentView({ a }: { a: Assessment | null | undefined }) {
@@ -137,7 +137,13 @@ export function EnvelopeDetails({ meta, open = false, title = 'About this result
               ? 'no links'
               : links.slice(0, maxLinks).map((l) => (
                   <span key={`${l.kind}:${l.id}`} className="prov-link">
-                    <ProvenanceButton kind={l.kind} id={l.id} label={`${humanize(l.kind)} ${l.id.slice(0, 8)}`} />{' '}
+                    {(PROVENANCE_KINDS as readonly string[]).includes(l.kind) ? (
+                      <ProvenanceButton kind={l.kind} id={l.id} label={`${humanize(l.kind)} ${l.id.slice(0, 8)}`} />
+                    ) : (
+                      <span className="mono" title={l.id}>
+                        {humanize(l.kind)} {l.id.slice(0, 8)}
+                      </span>
+                    )}{' '}
                   </span>
                 ))}
             {links.length > maxLinks && <span className="muted"> +{links.length - maxLinks} more</span>}

@@ -108,6 +108,8 @@ class TrustedTemplateSandbox:
         self.external_runner = external_runner
         self.guard = guard
 
+    network_probe: str | None = None  # self-test hook: the child tries one outbound connection
+
     async def run(self, proposal: PlatformChangeProposal, policy: SandboxPolicy) -> ValidationReport:
         started = time.monotonic()
         findings: list[Finding] = []
@@ -159,7 +161,8 @@ class TrustedTemplateSandbox:
             findings.append(_f("no_read_only_inputs", "blocker", "no captured fixture bank for the planned requests"))
             return finish("blocked", EVALUATOR_TEMPLATE)
         request = {"manifest": manifest, "fixtures": inputs, "network_hosts": list(policy.network_hosts),
-                   "max_items": policy.budget.max_requests, "max_bytes": policy.budget.max_bytes}
+                   "max_items": policy.budget.max_requests, "max_bytes": policy.budget.max_bytes,
+                   "network_probe": self.network_probe}
         out, usage = self._spawn(request, policy)
         evidence["child"] = out
         if out.get("timeout"):

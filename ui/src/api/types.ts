@@ -87,7 +87,7 @@ export type TypedValue = DecimalValue | FloatValue | MissingValueT | OtherValue;
 /** Full uncertainty record (reva.kernel.uncertainty.UncertaintySpec). */
 export interface Uncertainty {
   status: UncertaintyStatus;
-  kind: UncertaintyKind | string;
+  kind?: UncertaintyKind | string;
   description?: string | null;
   level?: number | null;
   lower?: string | null;
@@ -116,9 +116,9 @@ export interface Assessment {
 
 export interface BaselineReleaseRef {
   id: string;
-  sequence: number | null;
+  sequence?: number | null;
   knowledge_cutoff: string;
-  published_at: string | null;
+  published_at?: string | null;
   origin: RecordOrigin;
   method?: string | null;
 }
@@ -161,23 +161,23 @@ export interface EnvelopeMeta {
   origin: OriginLabel;
   modality: Modality;
   estimand?: Record<string, unknown> | null;
-  units: string[];
+  units?: string[];
   support?: Record<string, unknown> | null;
   baseline_release?: BaselineReleaseRef | null;
   knowledge_cutoff?: string | null;
   valid_time?: Record<string, unknown> | null;
-  model_versions: ModelVersionRef[];
-  assumptions: string[];
-  uncertainty: UncertaintySummary;
+  model_versions?: ModelVersionRef[];
+  assumptions?: string[];
+  uncertainty?: UncertaintySummary;
   data_freshness?: Freshness | null;
-  evidence_profile: Assessment;
-  applicability: Assessment;
-  numerical_error: Assessment;
-  compression_error: Assessment;
-  model_disagreement: Assessment;
-  historical_validation: Assessment;
-  provenance_links: ProvenanceLink[];
-  warnings: ApiWarning[];
+  evidence_profile?: Assessment;
+  applicability?: Assessment;
+  numerical_error?: Assessment;
+  compression_error?: Assessment;
+  model_disagreement?: Assessment;
+  historical_validation?: Assessment;
+  provenance_links?: ProvenanceLink[];
+  warnings?: ApiWarning[];
   cost?: CostReport | null;
   next_cursor?: string | null;
 }
@@ -230,7 +230,7 @@ export interface Job {
   available_at: string;
   finished_at?: string | null;
   cancellable: boolean;
-  links: Record<string, string>;
+  links?: Record<string, string>;
 }
 
 export interface JobCancelResult {
@@ -415,9 +415,9 @@ export interface RevisionEntry {
 }
 
 export interface TimeseriesPoint {
-  period_label: string | null;
-  valid_start: string | null;
-  valid_end: string | null;
+  period_label?: string | null;
+  valid_start?: string | null;
+  valid_end?: string | null;
   temporal_kind: string;
   aggregation: string;
   support_id: string;
@@ -471,8 +471,8 @@ export interface ReleaseConceptCount {
 
 export interface BeliefRelease {
   id: string;
-  sequence: number | null;
-  published_at: string | null;
+  sequence?: number | null;
+  published_at?: string | null;
   knowledge_cutoff: string;
   origin: RecordOrigin;
   method: string;
@@ -522,7 +522,7 @@ export interface EvidenceDetail {
   claim_key?: string | null;
   claim_version?: number | null;
   study?: Record<string, unknown> | null;
-  effects: Record<string, unknown>[];
+  effects?: Record<string, unknown>[];
   disagreement?: SourceDisagreement | null;
   recorded_at?: string | null;
 }
@@ -543,20 +543,21 @@ export type ProvenanceNodeKind =
   | 'run'
   | 'scenario'
   | 'context'
-  | 'model_version';
+  | 'model_version'
+  | 'claim';
 
 export interface ProvenanceNode {
   id: string;
   kind: ProvenanceNodeKind;
   label: string;
-  attributes: Record<string, unknown>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface ProvenanceEdge {
   source: string;
   target: string;
   relation: string;
-  attributes: Record<string, unknown>;
+  attributes?: Record<string, unknown>;
 }
 
 export interface ProvenanceGraph {
@@ -578,18 +579,19 @@ export interface GeoFeatureProperties {
   match_status: MatchStatus;
   name?: string | null;
   dataset_sha256: string;
-  display_only: true;
+  display_only?: true;
 }
 
 export interface GeoFeature {
-  type: 'Feature';
+  type?: 'Feature';
   id: string;
-  geometry: { type: string; coordinates: unknown; [k: string]: unknown };
+  /** GeoJSON geometry (type, coordinates) in EPSG:4326, longitude-latitude order. */
+  geometry: Record<string, unknown>;
   properties: GeoFeatureProperties;
 }
 
 export interface FeatureCollection {
-  type: 'FeatureCollection';
+  type?: 'FeatureCollection';
   features: GeoFeature[];
   display_note: string;
   truncated: boolean;
@@ -624,7 +626,7 @@ export interface ModelEvaluation {
   metrics: Record<string, unknown>;
   evaluation_manifest_sha256: string;
   recorded_at: string;
-  promotions: Record<string, unknown>[];
+  promotions?: Record<string, unknown>[];
 }
 
 // ---------------------------------------------------------------- scenarios / simulations
@@ -635,7 +637,7 @@ export interface ScenarioCreated {
   spec_digest: string;
   spec_sha256: string;
   baseline_release_id: string;
-  knowledge_cutoff: string | null;
+  knowledge_cutoff?: string | null;
   created_by: string;
   recorded_at: string;
 }
@@ -646,7 +648,7 @@ export interface Scenario {
   origin: RecordOrigin;
   title: string;
   baseline_release: BaselineReleaseRef;
-  knowledge_cutoff: string | null;
+  knowledge_cutoff?: string | null;
   spec: Record<string, unknown>;
   spec_digest: string;
   spec_sha256: string;
@@ -692,10 +694,10 @@ export interface SimResult {
 }
 
 export interface SimulationStatus {
-  job: Job | null;
-  scenario: Scenario | null;
-  run: SimRun | null;
-  outcome: SimOutcome | null;
+  job?: Job | null;
+  scenario?: Scenario | null;
+  run?: SimRun | null;
+  outcome?: SimOutcome | null;
   results: SimResult[];
 }
 
@@ -705,14 +707,14 @@ export interface ReplayRequest {
   concepts?: string[];
   subjects?: string[];
   model_keys?: string[];
-  horizon_years?: number;
+  horizon_years: number;
 }
 
 export interface DiscoveryRequest {
-  catalogue?: 'eurostat' | 'worldbank' | 'comtrade';
+  catalogue: 'eurostat' | 'worldbank' | 'comtrade';
   query: string;
   concept_id?: string | null;
-  max_candidates?: number;
+  max_candidates: number;
 }
 
 // ---------------------------------------------------------------- sources / connectors / ontology
@@ -834,7 +836,7 @@ export interface CoverageTotals {
 export interface Coverage {
   catalogue_version: string;
   statement: string;
-  release_id: string | null;
+  release_id?: string | null;
   requirements: RequirementCoverage[];
   totals: CoverageTotals;
 }
@@ -845,7 +847,7 @@ export interface Gap {
   requirement_id: string;
   concept: string;
   entity_key: string;
-  entity_id: string | null;
+  entity_id?: string | null;
   period: number;
   gap_kind: GapKind;
   reason: string;

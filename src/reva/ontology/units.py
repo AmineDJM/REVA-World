@@ -50,7 +50,7 @@ class UnknownUnit(ValidationProblem):
 
 class QuantityKind(StrEnum):
     currency_amount = "currency_amount"
-    count = "count"
+    count_quantity = "count"  # member name avoids shadowing str.count
     mass = "mass"
     volume = "volume"
     dimensionless = "dimensionless"
@@ -76,7 +76,7 @@ class UnitDefinition:
 UNIT_DEFINITIONS: tuple[UnitDefinition, ...] = (
     UnitDefinition("unit.usd", "reva_USD", QuantityKind.currency_amount, "US dollar amount", currency="USD"),
     UnitDefinition("unit.eur", "reva_EUR", QuantityKind.currency_amount, "Euro amount", currency="EUR"),
-    UnitDefinition("unit.persons", "reva_person", QuantityKind.count, "Persons"),
+    UnitDefinition("unit.persons", "reva_person", QuantityKind.count_quantity, "Persons"),
     UnitDefinition("unit.kg", "kilogram", QuantityKind.mass, "Kilogram"),
     UnitDefinition("unit.tonne", "metric_ton", QuantityKind.mass, "Metric tonne"),
     UnitDefinition("unit.barrel", "oil_barrel", QuantityKind.volume, "Oil barrel (42 US gallons)"),
@@ -110,9 +110,9 @@ _BY_REF: dict[str, UnitDefinition] = {d.ref: d for d in UNIT_DEFINITIONS}
 
 
 @lru_cache(maxsize=1)
-def unit_registry() -> pint.UnitRegistry:  # type: ignore[type-arg]
+def unit_registry() -> pint.UnitRegistry:
     """The Pint registry with REVA's extra base dimensions (Decimal magnitudes)."""
-    ureg: pint.UnitRegistry = pint.UnitRegistry(non_int_type=Decimal)  # type: ignore[type-arg]
+    ureg: pint.UnitRegistry = pint.UnitRegistry(non_int_type=Decimal)
     ureg.define("reva_person = [reva_population]")
     for d in UNIT_DEFINITIONS:
         if d.kind is QuantityKind.currency_amount:

@@ -146,7 +146,7 @@ function ReplayForm() {
     setError(null);
     try {
       const split = (s: string) => s.split(',').map((x) => x.trim()).filter(Boolean);
-      const r = await startReplay({ mode, cutoff: iso, concepts: split(concepts), subjects: split(subjects) }, newIdempotencyKey());
+      const r = await startReplay({ mode, cutoff: iso, concepts: split(concepts), subjects: split(subjects), horizon_years: 1 }, newIdempotencyKey());
       setJobId(r.job_id);
     } catch (err) {
       setError(err);

@@ -90,6 +90,13 @@ def main() -> int:
         "cwd_writable": os.access(os.getcwd(), os.W_OK),
         "modules_from_proposal": [],
     }
+    probe = req.get("network_probe")
+    if probe:  # self-test: prove that outbound connections are refused
+        try:
+            socket.create_connection((str(probe), 443), timeout=2)
+            out["network_probe"] = "connected"
+        except Exception as e:
+            out["network_probe"] = f"refused: {type(e).__name__}"
     try:
         out.update(asyncio.run(_run(req)))
         out["ok"] = True

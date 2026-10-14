@@ -221,12 +221,20 @@ def _run_bounded(conn: Connection, timeout_ms: int, sql: str, params: dict[str, 
 
     Returns ``None`` when the time limit cancelled the statement; the savepoint
     is rolled back so the caller's transaction stays usable, and the previous
-    ``statement_timeout`` is restored in every case.
+    ``statement_timeout`` is restored in every case. A stricter limit already
+    set on the session is kept.
     """
     nested = conn.begin_nested()
     try:
-        prev = conn.execute(text("SELECT current_setting('statement_timeout')")).scalar_one()
-        conn.exec_driver_sql(f"SET LOCAL statement_timeout = {int(timeout_ms)}")
+        prev, prev_ms = conn.execute(
+            text(
+                "SELECT current_setting('statement_timeout'), setting::bigint FROM pg_settings "
+                "WHERE name = 'statement_timeout'"
+            )
+        ).one()
+        # Never loosen a stricter limit the session already has (e.g. the API engine's).
+        effective = int(timeout_ms) if not prev_ms else min(int(timeout_ms), int(prev_ms))
+        conn.exec_driver_sql(f"SET LOCAL statement_timeout = {effective}")
         rows = [dict(r) for r in conn.execute(text(sql), params).mappings()]
         conn.execute(text("SELECT set_config('statement_timeout', :v, true)"), {"v": prev})
     except DBAPIError as exc:
@@ -459,8 +467,14 @@ def _neighbours(focal: UUID, edges: Iterable[Hyperedge]) -> list[Neighbour]:
                 continue
             n = acc.setdefault(
                 p.entity_id,
-                {"label": p.entity_label, "kind": p.entity_kind, "roles": set(), "focal": set(), "layers": set(),
-                 "edges": {}},
+                {
+                    "label": p.entity_label,
+                    "kind": p.entity_kind,
+                    "roles": set(),
+                    "focal": set(),
+                    "layers": set(),
+                    "edges": {},
+                },
             )
             n["roles"].add(p.role)
             n["focal"].update(focal_roles)
@@ -503,8 +517,9 @@ def neighbourhood(
     """
     check_bounds(1, max_edges, timeout_ms)
     notes = list(_check_release(conn, context))
-    params = _params(context, layers=layers, predicate=predicate, valid_during=valid_during, focal=entity_id,
-                     roles=roles)
+    params = _params(
+        context, layers=layers, predicate=predicate, valid_during=valid_during, focal=entity_id, roles=roles
+    )
     params["lim"] = max_edges + 1
     rows = _run_bounded(
         conn,
@@ -519,8 +534,9 @@ def neighbourhood(
     edges = load_hyperedges(conn, [UUID(str(r["id"])) for r in rows[:max_edges]])
     if not edges:
         notes.append("no visible hyperedges for this entity in this context")
-    return Neighbourhood(entity_id, context, tuple(edges), tuple(_neighbours(entity_id, edges)), truncated, max_edges,
-                         tuple(notes))
+    return Neighbourhood(
+        entity_id, context, tuple(edges), tuple(_neighbours(entity_id, edges)), truncated, max_edges, tuple(notes)
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -667,7 +683,15 @@ def path_search(
         notes.append("no path within the depth bound in this context" if target_id else "no reachable entity")
     edges = load_hyperedges(conn, list(seen_edges))
     return PathResult(
-        source_id, target_id, context, tuple(paths), reached, tuple(edges), bool(reasons), tuple(reasons), bounds,
+        source_id,
+        target_id,
+        context,
+        tuple(paths),
+        reached,
+        tuple(edges),
+        bool(reasons),
+        tuple(reasons),
+        bounds,
         tuple(notes),
     )
 
@@ -809,38 +833,71 @@ def aggregate_flow_items(items: Sequence[FlowItem], *, skip_missing: bool = Fals
         uniq.setdefault((it.record_kind, it.id), it)
     items = list(uniq.values())
     if not items:
-        return FlowAggregate(None, {}, (), "unsupported", {"status": "not_applicable"},
-                             ("no flow items were supplied; nothing to aggregate",))
-    kind = _uniform(items, "record_kind", lambda i: i.record_kind, "mixed_record_kind",
-                    "source claims (observations) and accepted estimates cannot be aggregated together")
+        return FlowAggregate(
+            None,
+            {},
+            (),
+            "unsupported",
+            {"status": "not_applicable"},
+            ("no flow items were supplied; nothing to aggregate",),
+        )
+    kind = _uniform(
+        items,
+        "record_kind",
+        lambda i: i.record_kind,
+        "mixed_record_kind",
+        "source claims (observations) and accepted estimates cannot be aggregated together",
+    )
     breakdown = _uniform(
-        items, "breakdown", lambda i: i.breakdown, "mixed_breakdown",
+        items,
+        "breakdown",
+        lambda i: i.breakdown,
+        "mixed_breakdown",
         "partner-world totals and bilateral breakdowns cannot be added together (the world total already "
         "includes the bilateral flows)",
     )
-    concept = _uniform(items, "concept", lambda i: f"{i.concept_id}@{i.concept_version}", "mixed_concept",
-                       "flows of different concepts cannot be added")
+    concept = _uniform(
+        items,
+        "concept",
+        lambda i: f"{i.concept_id}@{i.concept_version}",
+        "mixed_concept",
+        "flows of different concepts cannot be added",
+    )
     scale = items[0].scale_type
     if scale not in ADDITIVE_SCALE_TYPES:
         raise IncompatibleSemantics(f"quantity scale type {scale!r} is not additive", reason="non_additive_quantity")
-    classification = _uniform(items, "classification", lambda i: i.classification, "mixed_classification",
-                              "mixing classification revisions is refused unless they are identical")
+    classification = _uniform(
+        items,
+        "classification",
+        lambda i: i.classification,
+        "mixed_classification",
+        "mixing classification revisions is refused unless they are identical",
+    )
     flow = _uniform(items, "flow", lambda i: i.flow, "mixed_flow_direction", "imports and exports cannot be added")
     present = [i for i in items if not i.is_missing]
     unit = _uniform(present, "unit_ref", lambda i: i.unit_ref, "mixed_unit", "different units cannot be added")
     currency = _uniform(
-        present, "currency_basis", lambda i: (i.basis.get("currency"), i.basis.get("price_basis")),
-        "mixed_currency_basis", "different currency or price bases cannot be added",
+        present,
+        "currency_basis",
+        lambda i: (i.basis.get("currency"), i.basis.get("price_basis")),
+        "mixed_currency_basis",
+        "different currency or price bases cannot be added",
     )
-    valuation = _uniform(present, "valuation", lambda i: i.basis.get("valuation"), "mixed_valuation",
-                         "mixing valuation bases (e.g. CIF and FOB) is refused unless they are identical")
+    valuation = _uniform(
+        present,
+        "valuation",
+        lambda i: i.basis.get("valuation"),
+        "mixed_valuation",
+        "mixing valuation bases (e.g. CIF and FOB) is refused unless they are identical",
+    )
     seen: dict[tuple[UUID, str, UUID], UUID] = {}
     for i in items:
         k = (i.subject_id, concept, i.support_id)
         if k in seen:
             raise IncompatibleSemantics(
                 "two records describe the same subject, concept and support; adding them would double count",
-                reason="duplicate_record", ids=[str(seen[k]), str(i.id)],
+                reason="duplicate_record",
+                ids=[str(seen[k]), str(i.id)],
             )
         seen[k] = i.id
 
@@ -860,11 +917,24 @@ def aggregate_flow_items(items: Sequence[FlowItem], *, skip_missing: bool = Fals
         elif not [m for m in members if not m.is_missing]:
             total = {"kind": "missing", "reason": "unavailable", "note": "every input value is Missing"}
         else:
-            total = {"kind": "decimal", "value": format(total_dec, "f"), "unit_ref": unit,
-                     "basis": dict(present[0].basis) if present else {}}
-        out.append(FlowGroup(start, end, label, total, len(members), len(missing),
-                             bool(missing) and skip_missing and total["kind"] == "decimal",
-                             tuple(m.id for m in members)))
+            total = {
+                "kind": "decimal",
+                "value": format(total_dec, "f"),
+                "unit_ref": unit,
+                "basis": dict(present[0].basis) if present else {},
+            }
+        out.append(
+            FlowGroup(
+                start,
+                end,
+                label,
+                total,
+                len(members),
+                len(missing),
+                bool(missing) and skip_missing and total["kind"] == "decimal",
+                tuple(m.id for m in members),
+            )
+        )
     warnings: list[str] = []
     if any(i.partner_kind == "entity.world_aggregate" for i in items):
         warnings.append("some partners are provider aggregate areas; check they do not overlap other partners")
@@ -872,20 +942,33 @@ def aggregate_flow_items(items: Sequence[FlowItem], *, skip_missing: bool = Fals
         warnings.append("some inputs are provider-derived aggregates (isReported=false), not direct customs records")
     statuses = sorted({i.uncertainty_status or "unknown" for i in items})
     uncertainty = (
-        {"status": "unquantified", "input_statuses": statuses,
-         "note": "inputs carry no quantified uncertainty; none is invented for the sum"}
+        {
+            "status": "unquantified",
+            "input_statuses": statuses,
+            "note": "inputs carry no quantified uncertainty; none is invented for the sum",
+        }
         if any(s in ("unknown", "unquantified") for s in statuses)
-        else {"status": "not_propagated", "input_statuses": statuses,
-              "note": "input uncertainty exists but is not propagated by this sum"}
+        else {
+            "status": "not_propagated",
+            "input_statuses": statuses,
+            "note": "input uncertainty exists but is not propagated by this sum",
+        }
     )
     return FlowAggregate(
         record_kind=kind,
-        semantics={"concept": concept, "breakdown": breakdown, "scale_type": scale, "unit_ref": unit,
-                   "currency_basis": None if currency is None else {"currency": currency[0],
-                                                                    "price_basis": currency[1]},
-                   "valuation": valuation, "classification": classification, "flow": flow},
+        semantics={
+            "concept": concept,
+            "breakdown": breakdown,
+            "scale_type": scale,
+            "unit_ref": unit,
+            "currency_basis": None if currency is None else {"currency": currency[0], "price_basis": currency[1]},
+            "valuation": valuation,
+            "classification": classification,
+            "flow": flow,
+        },
         groups=tuple(out),
-        modality="derived_aggregate_of_reported_observations" if kind == "observation"
+        modality="derived_aggregate_of_reported_observations"
+        if kind == "observation"
         else "derived_aggregate_of_selected_estimates",
         uncertainty=uncertainty,
         warnings=tuple(warnings),
@@ -1011,8 +1094,15 @@ def aggregate_flows(
     agg = aggregate_flow_items(items, skip_missing=skip_missing)
     if not excluded:
         return agg
-    return FlowAggregate(agg.record_kind, agg.semantics, agg.groups, agg.modality, agg.uncertainty,
-                         (*agg.warnings, f"{len(excluded)} requested record(s) were excluded"), tuple(excluded))
+    return FlowAggregate(
+        agg.record_kind,
+        agg.semantics,
+        agg.groups,
+        agg.modality,
+        agg.uncertainty,
+        (*agg.warnings, f"{len(excluded)} requested record(s) were excluded"),
+        tuple(excluded),
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -1120,7 +1210,8 @@ def compare_claims(
                 "uncertainty": d["uncertainty"],
                 "source_flags": d["source_flags"],
                 "recorded_at": d["recorded_at"].isoformat(),
-                "source_published_at": None if d["source_published_at"] is None
+                "source_published_at": None
+                if d["source_published_at"] is None
                 else d["source_published_at"].isoformat(),
                 "origin": d["origin"],
                 "concept_version": d["concept_version"],
@@ -1130,15 +1221,20 @@ def compare_claims(
             }
         )
     if not claims:
-        notes.append("no source claim recorded for this subject/concept/support" +
-                     ("" if as_of is None else " at/before as_of"))
+        notes.append(
+            "no source claim recorded for this subject/concept/support" + ("" if as_of is None else " at/before as_of")
+        )
     release: dict[str, Any] | None
     if release_id is not None:
-        row = conn.execute(
-            text("""SELECT r.id, r.knowledge_cutoff, r.origin, r.method, p.sequence, p.published_at
+        row = (
+            conn.execute(
+                text("""SELECT r.id, r.knowledge_cutoff, r.origin, r.method, p.sequence, p.published_at
                     FROM belief.release r LEFT JOIN ops.publication p ON p.release_id = r.id WHERE r.id = :i"""),
-            {"i": release_id},
-        ).mappings().one_or_none()
+                {"i": release_id},
+            )
+            .mappings()
+            .one_or_none()
+        )
         release = None if row is None else dict(row)
         if release is not None and release["published_at"] is None:
             notes.append("the requested release is not published; its estimates are not accepted beliefs")
@@ -1185,18 +1281,31 @@ def compare_claims(
                 entry.update({"comparable": False, "reason": "unit_mismatch"})
             else:
                 diff = cv - ev
-                entry.update({
-                    "comparable": True,
-                    "difference": format(diff, "f"),
-                    "relative_difference": None if ev == 0 else format(diff / abs(ev), ".6E"),
-                    "unit_ref": c["value"].get("unit_ref"),
-                    "identical": diff == 0,
-                })
+                entry.update(
+                    {
+                        "comparable": True,
+                        "difference": format(diff, "f"),
+                        "relative_difference": None if ev == 0 else format(diff / abs(ev), ".6E"),
+                        "unit_ref": c["value"].get("unit_ref"),
+                        "identical": diff == 0,
+                    }
+                )
             comparisons.append(entry)
     rel_out = None
     if release is not None:
-        rel_out = {k: (v.isoformat() if isinstance(v, datetime) else str(v) if isinstance(v, UUID) else v)
-                   for k, v in release.items()
-                   if k in ("id", "knowledge_cutoff", "origin", "method", "sequence", "published_at")}
-    return ClaimComparison(subject_id, concept_id, support_id, as_of, rel_out, tuple(claims), tuple(estimates),
-                           tuple(comparisons), tuple(notes))
+        rel_out = {
+            k: (v.isoformat() if isinstance(v, datetime) else str(v) if isinstance(v, UUID) else v)
+            for k, v in release.items()
+            if k in ("id", "knowledge_cutoff", "origin", "method", "sequence", "published_at")
+        }
+    return ClaimComparison(
+        subject_id,
+        concept_id,
+        support_id,
+        as_of,
+        rel_out,
+        tuple(claims),
+        tuple(estimates),
+        tuple(comparisons),
+        tuple(notes),
+    )

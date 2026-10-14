@@ -30,7 +30,7 @@ via `scripts/validate_contracts.py`). This page is an orientation only.
 |---|---|---|
 | GET | `/health/live` | process liveness |
 | GET | `/health/ready` | DB/schema readiness (Render health check path) |
-| GET | `/metrics` | Prometheus metrics (not public: authenticated/internal) |
+| GET | `/metrics` | Prometheus metrics; requires an authenticated session/token with `read` scope |
 | POST, GET, DELETE | `/v1/session` | login / current session / logout |
 | GET | `/v1/entities`, `/v1/entities/{entity_ref}` | identity register, aliases, components |
 | GET | `/v1/relations`, `/v1/events` | bounded n-ary graph and occurrences |

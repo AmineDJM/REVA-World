@@ -1053,3 +1053,36 @@ def test_restricted_privacy_classes_rejected(w: World, cls: str) -> None:
         {"s": uuid.uuid4().hex * 2, "p": cls},
         match="check constraint",
     )
+
+
+# =========================================================================== readers see only published releases
+def test_release_readers_ignore_unpublished_releases(w: World) -> None:
+    from reva.belief.snapshots import release_as_of
+
+    with w.db.api.connect() as c:
+        rel = release_as_of(c, datetime.now(UTC))
+        assert rel is not None and rel["id"] == w.release_id  # the newer unpublished draft is invisible
+        assert release_as_of(c, datetime.now(UTC), "test_fixture")["id"] == w.release_id
+        assert release_as_of(c, datetime.now(UTC), "live") is None
+    queries = pytest.importorskip("reva.world.queries")
+    with w.db.api.connect() as c:
+        ctx = queries.release_context_as_of(c, datetime.now(UTC))
+        assert ctx is not None and str(w.release_id) in json.dumps(ctx.as_dict(), default=str)
+        assert str(w.unpublished_release_id) not in json.dumps(ctx.as_dict(), default=str)
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason=(
+        "BUG: belief.snapshots.release_by_id LEFT JOINs ops.publication and returns unpublished releases; "
+        "API routes (/evidence?release_id=..., scenario baseline display) use it without checking "
+        "publication, so an unpublished release manifest can be served. INNER JOIN ops.publication "
+        "(or add published_only=True and use it in API routes)"
+    ),
+)
+def test_release_by_id_does_not_serve_unpublished_releases(w: World) -> None:
+    from reva.belief.snapshots import release_by_id
+
+    with w.db.api.connect() as c:
+        assert release_by_id(c, w.release_id) is not None
+        assert release_by_id(c, w.unpublished_release_id) is None

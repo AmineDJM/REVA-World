@@ -28,7 +28,7 @@ from reva.adapters.connectors.base import json_decimal, plain
 from reva.adapters.connectors.eurostat_template import DATA_BASE, structure_fingerprint
 from reva.autonomy.common import ArtifactIO, AutonomyBlocked, now_utc, stable_id
 from reva.autonomy.policy import AutonomyGuard
-from reva.kernel.errors import CapabilityGap, SourceResponseError
+from reva.kernel.errors import CapabilityGap, RevaError, SourceResponseError
 from reva.kernel.ids import sha256_bytes
 from reva.ontology.registry import Registry, load_registry
 from reva.ports.autonomy import KnowledgeGap, ResourceBudget, SourceCandidate
@@ -85,11 +85,13 @@ def parse_toc(body: bytes) -> list[dict[str, Any]]:
     return out
 
 
-def score(query: set[str], title: str) -> float:
+def score(query: set[str], title: str) -> tuple[float, float]:
+    """(recall of concept tokens in the title, Jaccard similarity) — transparent and deterministic."""
     t = tokens(title)
     if not query or not t:
-        return 0.0
-    return len(query & t) / len(query | t)
+        return 0.0, 0.0
+    inter = len(query & t)
+    return inter / len(query), inter / len(query | t)
 
 
 class EurostatCatalogueDiscoverer:
@@ -97,7 +99,8 @@ class EurostatCatalogueDiscoverer:
 
     def __init__(self, io_: ArtifactIO, http: Any, *, registry: Registry | None = None,
                  guard: AutonomyGuard | None = None, max_toc_bytes: int = 4_000_000, top_k: int = 5,
-                 max_inspections: int = 1, min_score: float = 0.5, max_sample_bytes: int = 2_000_000) -> None:
+                 max_inspections: int = 1, max_inspection_attempts: int = 3, min_score: float = 0.6,
+                 max_sample_bytes: int = 2_000_000) -> None:
         self.io = io_
         self.http = http
         self.registry = registry or load_registry()
@@ -105,6 +108,7 @@ class EurostatCatalogueDiscoverer:
         self.max_toc_bytes = max_toc_bytes
         self.top_k = top_k
         self.max_inspections = max_inspections
+        self.max_inspection_attempts = max_inspection_attempts
         self.min_score = min_score
         self.max_sample_bytes = max_sample_bytes
         self.last_search: dict[str, Any] = {}
@@ -155,23 +159,39 @@ class EurostatCatalogueDiscoverer:
         used_bytes += len(res.body)
         toc_ref = self.io.put_bytes(res.body, "raw", "text/plain")
         entries = parse_toc(res.body)
-        ranked = sorted(
-            ({**e, "score": round(score(query, e["title"]), 6)} for e in entries if e["type"] == "dataset"),
-            key=lambda e: (-e["score"], e["code"]),
-        )
-        ranked = [e for e in ranked if e["score"] >= self.min_score][: self.top_k]
+        scored = []
+        for e in entries:
+            if e["type"] != "dataset":
+                continue
+            recall, jacc = score(query, e["title"])
+            scored.append({**e, "score": round(recall, 6), "jaccard": round(jacc, 6)})
+        scored.sort(key=lambda e: (-e["score"], -e["jaccard"], e["code"]))
+        ranked = [e for e in scored if e["score"] >= self.min_score][: self.top_k]
         self.last_search = {"query_tokens": sorted(query), "datasets_in_catalogue": len(entries),
-                            "ranked": [{"code": e["code"], "score": e["score"]} for e in ranked]}
+                            "ranked": [{"code": e["code"], "score": e["score"], "jaccard": e["jaccard"]}
+                                       for e in ranked], "inspections": []}
         source = next(s for s in self.registry.sources if s["source_key"] == "eurostat.dissemination")
         rights = "verified" if (source.get("rights") or {}).get("licence") else "unknown"
         out: list[SourceCandidate] = []
-        for i, entry in enumerate(ranked):
-            inspection = None
-            if i < self.max_inspections and geo and years and requests < budget.max_requests:
-                inspection, nbytes = await self._inspect(entry["code"], geo, years,
-                                                         min(self.max_sample_bytes, budget.max_bytes - used_bytes))
+        inspected = attempts = 0
+        for entry in ranked:
+            inspection: dict[str, Any] | None = None
+            inspection_error = None
+            if (inspected < self.max_inspections and attempts < self.max_inspection_attempts and geo and years
+                    and requests < budget.max_requests and budget.max_bytes - used_bytes > 0):
+                attempts += 1
                 requests += 1
-                used_bytes += nbytes
+                try:
+                    inspection, nbytes = await self._inspect(
+                        entry["code"], geo, years, min(self.max_sample_bytes, budget.max_bytes - used_bytes))
+                    used_bytes += nbytes
+                    inspected += 1
+                except RevaError as e:  # one failed inspection never aborts discovery
+                    inspection_error = f"{e.code}: {e.message[:300]}"
+                except ValueError as e:
+                    inspection_error = f"malformed metadata: {str(e)[:300]}"
+                self.last_search["inspections"].append({"code": entry["code"], "ok": inspection is not None,
+                                                        "error": inspection_error})
             meta = {
                 "schema": "reva-source-candidate/1",
                 "provider": "eurostat",
@@ -181,11 +201,12 @@ class EurostatCatalogueDiscoverer:
                               "retrieved_at": res.retrieved_at.isoformat(),
                               "max_bytes_override": limit},
                 "entry": entry,
-                "match": {"method": "jaccard_title_tokens@1", "query_tokens": sorted(query),
-                          "score": entry["score"]},
+                "match": {"method": "title_token_recall_then_jaccard@1", "query_tokens": sorted(query),
+                          "score": entry["score"], "jaccard": entry["jaccard"]},
                 "geography": {"iso3": list(gap.geography), "eurostat_geo": geo},
                 "years": years,
                 "inspection": inspection,
+                "inspection_error": inspection_error,
                 "lifecycle": "inspected" if inspection else "discovered",
             }
             ref = self.io.put_json(meta, "normalised")
@@ -217,6 +238,9 @@ class EurostatCatalogueDiscoverer:
             raise AutonomyBlocked("discovery byte budget exhausted before inspection")
         res = await self.http.get(url, max_bytes=max_bytes)
         doc = json_decimal(res.body)
+        if not isinstance(doc, dict) or str(doc.get("version")) != "2.0":
+            raise SourceResponseError("inspection did not return a JSON-stat 2.0 object", retryable=False,
+                                      kind="schema_drift")
         raw_ref = self.io.put_bytes(res.body, "raw", "application/json")
         ids = [str(d) for d in doc.get("id", [])]
         dims = doc.get("dimension") or {}

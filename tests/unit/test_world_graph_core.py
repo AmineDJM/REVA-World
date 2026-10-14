@@ -24,26 +24,59 @@ def _edge(*participants: tuple[str, UUID], layer: str = "trade.crude_petroleum")
         for i, (role, eid) in enumerate(participants)
     )
     return g.Hyperedge(
-        id=uuid4(), predicate="predicate.trade_flow", predicate_version="1.0.0", layer=layer, support={},
+        id=uuid4(),
+        predicate="predicate.trade_flow",
+        predicate_version="1.0.0",
+        layer=layer,
+        support={},
         provenance=g.EdgeProvenance("evidence", None, uuid4(), "test_fixture", "src", 1, None, uuid4()),
-        component={}, existence_uncertainty={"status": "unquantified"}, flow_magnitude={"status": "not_recorded"},
-        tie_strength=dict(g.NOT_ASSESSED_STRENGTH), scientific_confidence=dict(g.NOT_ASSESSED_CONFIDENCE),
-        recorded_at=datetime.now(UTC), participants=parts,
+        component={},
+        existence_uncertainty={"status": "unquantified"},
+        flow_magnitude={"status": "not_recorded"},
+        tie_strength=dict(g.NOT_ASSESSED_STRENGTH),
+        scientific_confidence=dict(g.NOT_ASSESSED_CONFIDENCE),
+        recorded_at=datetime.now(UTC),
+        participants=parts,
     )
 
 
-def _flow(value: str | None, *, breakdown: str = "bilateral", classification: str | None = "H6",
-          valuation: str = "CIF", year: int = 2023, concept: str = "trade.hs2709.import_value.bilateral",
-          subject: UUID | None = None, support: UUID | None = None, kind: str = "observation",
-          flow: str = "M") -> FlowItem:
-    v = ({"kind": "missing", "reason": "unavailable"} if value is None else
-         {"kind": "decimal", "value": value, "unit_ref": "unit.usd",
-          "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": valuation}})
+def _flow(
+    value: str | None,
+    *,
+    breakdown: str = "bilateral",
+    classification: str | None = "H6",
+    valuation: str = "CIF",
+    year: int = 2023,
+    concept: str = "trade.hs2709.import_value.bilateral",
+    subject: UUID | None = None,
+    support: UUID | None = None,
+    kind: str = "observation",
+    flow: str = "M",
+) -> FlowItem:
+    v = (
+        {"kind": "missing", "reason": "unavailable"}
+        if value is None
+        else {
+            "kind": "decimal",
+            "value": value,
+            "unit_ref": "unit.usd",
+            "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": valuation},
+        }
+    )
     return FlowItem(
-        id=uuid4(), record_kind=kind, subject_id=subject or uuid4(), concept_id=concept, concept_version="1.0.0",  # type: ignore[arg-type]
-        scale_type="flow", breakdown=breakdown, support_id=support or uuid4(),
+        id=uuid4(),
+        record_kind=kind,
+        subject_id=subject or uuid4(),
+        concept_id=concept,
+        concept_version="1.0.0",  # type: ignore[arg-type]
+        scale_type="flow",
+        breakdown=breakdown,
+        support_id=support or uuid4(),
         temporal_extent={"start": f"{year}-01-01", "end": f"{year + 1}-01-01", "label": str(year)},
-        value=v, classification=classification, flow=flow, uncertainty_status="unknown",
+        value=v,
+        classification=classification,
+        flow=flow,
+        uncertainty_status="unknown",
     )
 
 
@@ -56,9 +89,12 @@ def test_compatible_bilateral_flows_sum_exactly() -> None:
     agg = aggregate_flow_items([_flow("1.10"), _flow("2.205"), _flow("3")])
     assert len(agg.groups) == 1
     grp = agg.groups[0]
-    assert grp.total == {"kind": "decimal", "value": "6.305", "unit_ref": "unit.usd",
-                         "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1",
-                                   "valuation": "CIF"}}
+    assert grp.total == {
+        "kind": "decimal",
+        "value": "6.305",
+        "unit_ref": "unit.usd",
+        "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"},
+    }
     assert grp.n_items == 3 and not grp.is_lower_bound
     assert agg.semantics["breakdown"] == "bilateral" and agg.semantics["classification"] == "H6"
     assert agg.uncertainty["status"] == "unquantified"
@@ -240,8 +276,9 @@ def test_time_bounds_and_relations() -> None:
 
 def test_sequence_relations_never_claim_causation() -> None:
     def occ(te: dict) -> Occurrence:
-        return Occurrence(uuid4(), "e", "t", "1", "real", uuid4(), te, TimeBounds.from_extent(te), {}, {},
-                          datetime.now(UTC), uuid4())
+        return Occurrence(
+            uuid4(), "e", "t", "1", "real", uuid4(), te, TimeBounds.from_extent(te), {}, {}, datetime.now(UTC), uuid4()
+        )
 
     rels = sequence_relations([occ(_te("2021-01-01", instant=True)), occ(_te("2020-01-01", instant=True))])
     assert len(rels) == 1 and rels[0].relation == "before"

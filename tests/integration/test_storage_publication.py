@@ -27,7 +27,7 @@ from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.objects.filesystem import FilesystemArtifactStore
 from reva.belief.selection import eligible_latest
 from reva.evidence import ingest
-from reva.evidence.ingest import acquisition_idempotency_key, publish_acquisition
+from reva.evidence.ingest import publish_acquisition
 from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import sha256_bytes
@@ -196,11 +196,15 @@ def test_crash_after_upload_before_commit_is_invisible_then_retry_publishes_once
     assert s2.inserted == 0
     assert visible(pdb.owner, sha) == v1
     with pdb.owner.connect() as c:
-        keys = c.execute(
-            text("SELECT count(*) FROM evidence.acquisition WHERE idempotency_key = :k"),
-            {"k": acquisition_idempotency_key(spec, raw, sha)},
+        n = c.execute(
+            text(
+                "SELECT count(*) FROM evidence.acquisition WHERE connector_version_id = "
+                "(SELECT id FROM evidence.connector_version WHERE name = :n AND version = :v) "
+                "AND request_fingerprint = :fp AND raw_sha256 = :s"
+            ),
+            {"n": spec.name, "v": spec.version, "fp": raw.request_fingerprint, "s": sha},
         ).scalar_one()
-    assert keys == 1
+    assert n == 1  # exactly one visible acquisition for this request + bytes
 
 
 def test_failure_inside_transaction_rolls_back_everything(pdb: Any, monkeypatch: pytest.MonkeyPatch) -> None:

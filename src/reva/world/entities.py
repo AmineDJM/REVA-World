@@ -291,10 +291,17 @@ def list_entities(
 def get_entity(conn: Connection, entity_id: UUID, *, as_of: datetime | None = None) -> Entity | None:
     """One entity with its aliases, or ``None`` if absent (or not yet recorded at ``as_of``)."""
     require_aware(as_of, "as_of")
-    row = conn.execute(
-        text(_ENTITY_COLUMNS + " WHERE e.id = :i AND (CAST(:as_of AS timestamptz) IS NULL OR e.recorded_at <= :as_of)"),
-        {"i": entity_id, "as_of": as_of},
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text(
+                _ENTITY_COLUMNS
+                + " WHERE e.id = :i AND (CAST(:as_of AS timestamptz) IS NULL OR e.recorded_at <= :as_of)"
+            ),
+            {"i": entity_id, "as_of": as_of},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if row is None:
         return None
     return _entity(row, load_aliases(conn, [entity_id], as_of=as_of).get(entity_id, []))

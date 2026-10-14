@@ -132,8 +132,12 @@ class OccurrencePage:
     notes: tuple[str, ...] = ()
 
     def as_dict(self) -> dict[str, Any]:
-        return {"items": [o.as_dict() for o in self.items], "next_cursor": self.next_cursor, "limit": self.limit,
-                "notes": list(self.notes)}
+        return {
+            "items": [o.as_dict() for o in self.items],
+            "next_cursor": self.next_cursor,
+            "limit": self.limit,
+            "notes": list(self.notes),
+        }
 
 
 @dataclass(frozen=True)
@@ -145,8 +149,14 @@ class SequenceRelation:
     causal_claim: bool = False
 
     def as_dict(self) -> dict[str, Any]:
-        return {"a": str(self.a), "b": str(self.b), "relation": self.relation, "basis": self.basis,
-                "causal_claim": False, "note": SEQUENCE_NOTE}
+        return {
+            "a": str(self.a),
+            "b": str(self.b),
+            "relation": self.relation,
+            "basis": self.basis,
+            "causal_claim": False,
+            "note": SEQUENCE_NOTE,
+        }
 
 
 @dataclass(frozen=True)
@@ -204,9 +214,12 @@ def temporal_relation(a: TimeBounds, b: TimeBounds) -> Relation:
     if _certainly_before(b, a):
         return "after"
     if (
-        a.latest_start is not None and b.latest_start is not None
-        and a.earliest_end is not None and b.earliest_end is not None
-        and a.latest_start < b.earliest_end and b.latest_start < a.earliest_end
+        a.latest_start is not None
+        and b.latest_start is not None
+        and a.earliest_end is not None
+        and b.earliest_end is not None
+        and a.latest_start < b.earliest_end
+        and b.latest_start < a.earliest_end
     ):
         return "overlaps"
     return "indeterminate"
@@ -219,7 +232,7 @@ def sequence_relations(occurrences: Sequence[Occurrence]) -> list[SequenceRelati
     ordered = sort_occurrences(occurrences)
     out = []
     for i, a in enumerate(ordered):
-        for b in ordered[i + 1:]:
+        for b in ordered[i + 1 :]:
             out.append(SequenceRelation(a.entity_id, b.entity_id, temporal_relation(a.time, b.time)))
     return out
 
@@ -228,8 +241,12 @@ def sort_occurrences(occurrences: Sequence[Occurrence]) -> list[Occurrence]:
     """Order by earliest start (unknown times last), then latest start, then id. A display order only."""
     return sorted(
         occurrences,
-        key=lambda o: (o.time.earliest_start is None, o.time.earliest_start or date.min,
-                       o.time.latest_start or date.min, str(o.entity_id)),
+        key=lambda o: (
+            o.time.earliest_start is None,
+            o.time.earliest_start or date.min,
+            o.time.latest_start or date.min,
+            str(o.entity_id),
+        ),
     )
 
 
@@ -237,13 +254,17 @@ def sort_occurrences(occurrences: Sequence[Occurrence]) -> list[Occurrence]:
 # Queries
 # ---------------------------------------------------------------------------
 
-_ES = "COALESCE(CAST(sp.temporal_extent->'start_uncertainty'->>'earliest' AS date), " \
-      "CAST(sp.temporal_extent->>'start' AS date))"
-_LE = ("CASE WHEN sp.temporal_extent->>'kind' = 'instant' THEN "
-       "COALESCE(CAST(sp.temporal_extent->'start_uncertainty'->>'latest' AS date), "
-       "CAST(sp.temporal_extent->>'start' AS date)) ELSE "
-       "COALESCE(CAST(sp.temporal_extent->'end_uncertainty'->>'latest' AS date), "
-       "CAST(sp.temporal_extent->>'end' AS date)) END")
+_ES = (
+    "COALESCE(CAST(sp.temporal_extent->'start_uncertainty'->>'earliest' AS date), "
+    "CAST(sp.temporal_extent->>'start' AS date))"
+)
+_LE = (
+    "CASE WHEN sp.temporal_extent->>'kind' = 'instant' THEN "
+    "COALESCE(CAST(sp.temporal_extent->'start_uncertainty'->>'latest' AS date), "
+    "CAST(sp.temporal_extent->>'start' AS date)) ELSE "
+    "COALESCE(CAST(sp.temporal_extent->'end_uncertainty'->>'latest' AS date), "
+    "CAST(sp.temporal_extent->>'end' AS date)) END"
+)
 
 _OCC_SQL = f"""
 SELECT oc.entity_id, e.label, e.referent_mode, e.recorded_at, c.concept_id AS event_type,
@@ -348,17 +369,20 @@ def list_occurrences(
     return OccurrencePage(items, encode_cursor([items[-1].entity_id]) if more and items else None, limit, notes)
 
 
-def occurrence_participants(conn: Connection, occurrence_id: UUID, *, as_of: datetime | None = None,
-                            max_edges: int = 500) -> tuple[list[Hyperedge], bool]:
+def occurrence_participants(
+    conn: Connection, occurrence_id: UUID, *, as_of: datetime | None = None, max_edges: int = 500
+) -> tuple[list[Hyperedge], bool]:
     """Participant assertions (hyperedges) in which an occurrence takes part; ``(edges, truncated)``."""
     require_aware(as_of, "as_of")
-    ids = list(conn.execute(
-        text("""SELECT DISTINCT p.relation_id FROM world.relation_participant p
+    ids = list(
+        conn.execute(
+            text("""SELECT DISTINCT p.relation_id FROM world.relation_participant p
                 JOIN world.relation r ON r.id = p.relation_id
                 WHERE p.entity_id = :e AND (CAST(:as_of AS timestamptz) IS NULL OR r.recorded_at <= :as_of)
                 ORDER BY p.relation_id LIMIT :lim"""),
-        {"e": occurrence_id, "as_of": as_of, "lim": max_edges + 1},
-    ).scalars())
+            {"e": occurrence_id, "as_of": as_of, "lim": max_edges + 1},
+        ).scalars()
+    )
     return load_hyperedges(conn, [UUID(str(i)) for i in ids[:max_edges]]), len(ids) > max_edges
 
 
@@ -374,10 +398,12 @@ def causal_hypotheses(
     require_aware(as_of, "as_of")
     if not occurrence_ids:
         return [], False
-    ids = list(conn.execute(
-        text(_CAUSAL_SQL),
-        {"ids": list(occurrence_ids), "cls": CAUSAL_ASSERTION_CLASS, "as_of": as_of, "lim": max_edges + 1},
-    ).scalars())
+    ids = list(
+        conn.execute(
+            text(_CAUSAL_SQL),
+            {"ids": list(occurrence_ids), "cls": CAUSAL_ASSERTION_CLASS, "as_of": as_of, "lim": max_edges + 1},
+        ).scalars()
+    )
     edges = load_hyperedges(conn, [UUID(str(i)) for i in ids[:max_edges]])
     return [CausalHypothesis(e) for e in edges], len(ids) > max_edges
 
@@ -398,8 +424,9 @@ def history_view(
         raise ValidationProblem("history_view needs participant_id or occurrence_ids")
     if not 1 <= limit <= MAX_SEQUENCE_ITEMS:
         raise ValidationProblem(f"limit must be within 1..{MAX_SEQUENCE_ITEMS}")
-    page = list_occurrences(conn, participant_id=participant_id, occurrence_ids=occurrence_ids, as_of=as_of,
-                            limit=limit)
+    page = list_occurrences(
+        conn, participant_id=participant_id, occurrence_ids=occurrence_ids, as_of=as_of, limit=limit
+    )
     occ = sort_occurrences(page.items)
     truncated = page.next_cursor is not None
     rels = sequence_relations(occ)
@@ -407,9 +434,14 @@ def history_view(
     disputed: list[dict[str, Any]] = [r.as_dict() for r in rels if r.relation in ("indeterminate", "unknown")]
     for o in occ:
         if o.time_disputed:
-            disputed.append({"occurrence": str(o.entity_id), "relation": "time_disputed",
-                             "date_claims": o.component.get("date_claims"),
-                             "note": "sources disagree on the date of this occurrence"})
+            disputed.append(
+                {
+                    "occurrence": str(o.entity_id),
+                    "relation": "time_disputed",
+                    "date_claims": o.component.get("date_claims"),
+                    "note": "sources disagree on the date of this occurrence",
+                }
+            )
     hyps, hyp_trunc = causal_hypotheses(conn, [o.entity_id for o in occ], as_of=as_of)
     notes = [SEQUENCE_NOTE]
     if not occ:
