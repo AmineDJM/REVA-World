@@ -592,6 +592,32 @@ def test_r28_parser_version_change_reprocesses_same_bytes(db: Any) -> None:
 
 
 # --------------------------------------------------------------------------- population from Eurostat
+def _ensure_reapproved(db: Any, name: str) -> None:
+    """If the promotion was retired (rollback drill elsewhere in the session), append a named-human
+    re-approval with the original applicability (append-only; latest decision wins)."""
+    from reva.evidence.locks import take_evidence_write_lock
+
+    with db.worker.begin() as c:
+        take_evidence_write_lock(c)
+        cv = c.execute(text("SELECT id FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at DESC "
+                            "LIMIT 1"), {"n": name}).scalar_one()
+        concept = repo.concept_version_id(c, "demography.population.jan1_age_sex", "1.0.0")
+        latest = c.execute(text(
+            """SELECT decision, applicability, policy_version FROM evidence.eligibility
+               WHERE connector_version_id=:cv AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
+            {"cv": cv, "c": concept}).mappings().one()
+        if latest["decision"] == "eligible":
+            return
+        act = repo.simple_activity("evidence.eligibility_review", "review", "human:fx2-test", {"connector": name})
+        repo.record_activity(c, act)
+        c.execute(text(
+            """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
+                 policy_version, review_activity_id)
+               VALUES (:cv, :c, CAST(:ap AS jsonb), 'eligible', :p, :a)"""),
+            {"cv": cv, "c": concept, "ap": json.dumps(dict(latest["applicability"])),
+             "p": latest["policy_version"], "a": act.id})
+
+
 async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
     from reva.autonomy.jobs import handle_discovery, promoted_connectors
     from reva.operations.context import JobContext
@@ -609,6 +635,7 @@ async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)
     assert out["status"] in ("promoted", "no_gap"), out
     name = "eurostat.demo_pjan.fr"
+    _ensure_reapproved(db, name)  # an earlier module may have rolled the promotion back (shared session DB)
     connector = promoted_connectors(db.worker, db.store)[name]
     rep = await run_connector(connector, FixtureHttp(name), db.store, db.worker, persist_cursor=False)
     assert not rep.errors, rep.errors[:3]
