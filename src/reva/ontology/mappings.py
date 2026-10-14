@@ -434,4 +434,3 @@ class CrosswalkResult(_Frozen):
         return not self.residual_by_source and not self.missing_source_codes
 
 
-WeightedCrosswalk.model_rebuild()

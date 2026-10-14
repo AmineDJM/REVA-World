@@ -177,7 +177,7 @@ def test_comtrade_null_primary_value_stays_missing(ct: ComtradeConnector, fra_m_
 
 
 def test_comtrade_bilateral_excludes_world_total(ct: ComtradeConnector) -> None:
-    body, _ = fixture_body(CT, ["period=2023", "reporterCode=251", "flowCode=M", "partner2Code=0&customs"])
+    body, _ = fixture_body(CT, ["period=2023", "reporterCode=251", "flowCode=M", "flowCode=M&partner2Code"])
     p = copy.deepcopy(body)
     world = {**p["data"][0], "partnerCode": 0}
     p["data"].append(world)
@@ -287,7 +287,7 @@ def test_wb_schema_drift_is_a_failure(wb: WorldBankConnector, payload: Any) -> N
 
 
 def test_wb_semantic_drift_in_indicator_metadata_blocks(wb: WorldBankConnector) -> None:
-    body, _ = fixture_body(WB, ["/indicator/SP.POP.TOTL?format=json"])
+    body, _ = fixture_body(WB, ["v2/indicator/SP.POP.TOTL?format=json"])
     _, reports = parse_validate(wb, wb_item(wb, "indicator:SP.POP.TOTL"), body)
     assert not reports[0].blocking
     drifted = copy.deepcopy(body)
@@ -325,7 +325,7 @@ def _obs_count(d: Any, concept: str) -> int:
 @pytest.mark.db
 def test_runner_semantic_drift_blocks_dependent_series(rdb: Any) -> None:
     wb = WorldBankConnector()
-    body, url = fixture_body(WB, ["/indicator/SP.POP.TOTL?format=json"])
+    body, url = fixture_body(WB, ["v2/indicator/SP.POP.TOTL?format=json"])
     body[1][0]["sourceNote"] = "Total population counts residents on 1 January of each year."
     http = FixtureHttp(WB, overrides={request_fingerprint("GET", url): json.dumps(body).encode()})
     rep = asyncio.run(run_connector(wb, http, rdb.store, rdb.worker, persist_cursor=True))
