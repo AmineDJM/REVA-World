@@ -149,10 +149,163 @@ class PgTools:
             raise BackupError(f"{tool} failed ({proc.returncode}): {redact(proc.stderr.decode(errors='replace'))}")
         return proc.stdout.decode(errors="replace") if stdout is None and proc.stdout else ""
 
+    def spawn(self, tool: str, args: list[str], url: Any, *, stdin: Any = None, stdout: Any = None) -> _Proc:
+        env = {**os.environ, **pg_env(url)}
+        return _Proc(tool, self.argv(tool, args, sorted(pg_env(url))), env, stdin=stdin, stdout=stdout)
+
     def major_version(self, tool: str, url: Any) -> int:
         out = self.run(tool, ["--version"], url)
         # "pg_dump (PostgreSQL) 17.5 (Debian ...)"
         return int(out.split(")")[1].strip().split(".")[0])
+
+
+# --- streaming (no plaintext dump ever touches disk when encrypting) -----------------
+
+CHUNK = 1 << 20
+
+
+class _Proc:
+    """A child process whose stderr goes to an anonymous temp file (no pipe deadlock)."""
+
+    def __init__(self, name: str, argv: list[str], env: Mapping[str, str], *, stdin: Any = None, stdout: Any = None):
+        self.name = name
+        self.err = tempfile.TemporaryFile()
+        self.p = subprocess.Popen(argv, env=dict(env), stdin=stdin, stdout=stdout, stderr=self.err)
+
+    def finish(self) -> tuple[int, str]:
+        rc = self.p.wait()
+        self.err.seek(0)
+        msg = self.err.read().decode(errors="replace")
+        self.err.close()
+        return rc, redact(msg.strip())[-2000:]
+
+    def kill(self) -> None:
+        if self.p.poll() is None:
+            self.p.kill()
+
+
+def _copy(src: Any, dst: Any) -> tuple[str, int]:
+    """Copy src to dst (None: discard) in bounded chunks; sha256/bytes of what passed."""
+    h = hashlib.sha256()
+    n = 0
+    while chunk := src.read(CHUNK):
+        h.update(chunk)
+        n += len(chunk)
+        if dst is not None:
+            dst.write(chunk)
+    return h.hexdigest(), n
+
+
+def _age() -> str:
+    exe = shutil.which("age")
+    if not exe:
+        raise BackupError("age is required for encryption/decryption but was not found on PATH")
+    return exe
+
+
+def _require_ok(*procs: tuple[_Proc, tuple[int, str]]) -> None:
+    bad = [f"{p.name} exited {rc}: {msg}" for p, (rc, msg) in procs if rc != 0]
+    if bad:
+        raise BackupError("; ".join(bad))
+
+
+def stream_dump(tools: PgTools, args: list[str], url: Any, out: Path, age_args: list[str] | None) -> tuple[str, int]:
+    """pg_dump -> (age ->) out. Returns sha256/bytes of the *plaintext* stream.
+
+    With encryption the plaintext exists only in pipe buffers: pg_dump's stdout is
+    copied chunk by chunk into age's stdin and age writes the ciphertext file.
+    """
+    dump = tools.spawn("pg_dump", args, url, stdout=subprocess.PIPE)
+    try:
+        if age_args is None:
+            with _private_umask(), out.open("wb") as f:
+                digest = _copy(dump.p.stdout, f)
+            _require_ok((dump, dump.finish()))
+            return digest
+        with _private_umask():
+            enc = _Proc("age", [_age(), "--encrypt", *age_args, "-o", str(out)], os.environ, stdin=subprocess.PIPE)
+        try:
+            digest = _copy(dump.p.stdout, enc.p.stdin)
+        except BrokenPipeError:
+            digest = ("", 0)
+        finally:
+            enc.p.stdin.close()  # type: ignore[union-attr]
+        _require_ok((dump, dump.finish()), (enc, enc.finish()))
+        return digest
+    except BaseException:
+        dump.kill()
+        out.unlink(missing_ok=True)
+        raise
+
+
+def _plaintext_source(archive: Path, identity: str | None) -> tuple[Any, _Proc | None]:
+    if identity is None:
+        return archive.open("rb"), None
+    dec = _Proc("age", [_age(), "--decrypt", "-i", identity, str(archive)], os.environ, stdout=subprocess.PIPE)
+    return dec.p.stdout, dec
+
+
+def verify_plaintext(archive: Path, identity: str | None) -> tuple[str, int]:
+    """Pass 1: authenticate/decrypt to nowhere and hash the plaintext."""
+    src, dec = _plaintext_source(archive, identity)
+    try:
+        digest = _copy(src, None)
+    finally:
+        src.close()
+    if dec is not None:
+        _require_ok((dec, dec.finish()))
+    return digest
+
+
+def stream_restore(tools: PgTools, args: list[str], url: Any, archive: Path, identity: str | None) -> tuple[str, int]:
+    """Pass 2: (age -d ->) pg_restore via stdin; sha256/bytes of the plaintext fed to it."""
+    src, dec = _plaintext_source(archive, identity)
+    restore_proc = tools.spawn("pg_restore", args, url, stdin=subprocess.PIPE)
+    try:
+        try:
+            digest = _copy(src, restore_proc.p.stdin)
+        except BrokenPipeError:
+            digest = ("", 0)
+        finally:
+            src.close()
+        if dec is not None:
+            rc, msg = dec.finish()
+            if rc != 0:
+                raise BackupError(f"age decryption failed during restore: {msg}")
+        restore_proc.p.stdin.close()  # type: ignore[union-attr]
+        _require_ok((restore_proc, restore_proc.finish()))
+        return digest
+    except BaseException:
+        restore_proc.kill()
+        if dec is not None:
+            dec.kill()
+        raise
+
+
+def write_checksums(directory: Path, names: list[str]) -> Path:
+    """SHA256SUMS (``sha256sum -c`` format) over every file of the backup set."""
+    path = directory / "SHA256SUMS"
+    with _private_umask():
+        path.write_text("".join(f"{_sha256_file(directory / n)}  {n}\n" for n in sorted(names)))
+    return path
+
+
+def verify_checksums(directory: Path) -> list[str]:
+    path = directory / "SHA256SUMS"
+    if not path.is_file():
+        raise BackupError("SHA256SUMS missing: refusing an unverifiable backup")
+    names = []
+    for line in path.read_text().splitlines():
+        digest, _, name = line.partition("  ")
+        if not name or "/" in name or name.startswith("."):
+            raise BackupError(f"malformed SHA256SUMS line: {line[:80]!r}")
+        target = directory / name
+        if not target.is_file() or _sha256_file(target) != digest:
+            raise BackupError(f"checksum verification failed for {name}: refusing to restore")
+        names.append(name)
+    if "backup.json" not in names:
+        raise BackupError("SHA256SUMS does not cover backup.json")
+    return names
 
 
 # --- logical manifest --------------------------------------------------------------
@@ -377,12 +530,20 @@ def backup(
         t0 = time.perf_counter()
         manifest = logical_manifest(conn, in_transaction=True)
         timings["logical_manifest_seconds"] = round(time.perf_counter() - t0, 3)
-        dump_path = target / "reva.dump"
+        age_args: list[str] | None = None
+        if encrypt:
+            age_args = [x for r in recipients for x in ("-r", r)]
+            if recipients_file:
+                age_args += ["-R", recipients_file]
+        dump_file = target / ("reva.dump.age" if encrypt else "reva.dump")
         t0 = time.perf_counter()
-        with _private_umask(), dump_path.open("wb") as f:
-            tools.run(
-                "pg_dump", ["--format=custom", "--compress=6", f"--snapshot={snapshot}", "--no-password"], url, stdout=f
-            )
+        plain_sha, plain_bytes = stream_dump(
+            tools,
+            ["--format=custom", "--compress=6", f"--snapshot={snapshot}", "--no-password"],
+            url,
+            dump_file,
+            age_args,
+        )
         timings["pg_dump_seconds"] = round(time.perf_counter() - t0, 3)
         conn.execute("COMMIT")
         inventory: list[dict[str, Any]] = []
@@ -395,20 +556,6 @@ def backup(
             timings["object_inventory_seconds"] = round(time.perf_counter() - t0, 3)
     finally:
         conn.close()
-    dump_bytes = dump_path.stat().st_size
-    dump_file = dump_path
-    if encrypt:
-        t0 = time.perf_counter()
-        enc = target / "reva.dump.age"
-        args = [shutil.which("age") or "age", "--encrypt", "-o", str(enc)]
-        for r in recipients:
-            args += ["-r", r]
-        if recipients_file:
-            args += ["-R", recipients_file]
-        subprocess.run([*args, str(dump_path)], check=True)
-        dump_path.unlink()
-        dump_file = enc
-        timings["encrypt_seconds"] = round(time.perf_counter() - t0, 3)
     inv_path = target / "objects.jsonl"
     with _private_umask():
         inv_path.write_text("".join(json.dumps(i, sort_keys=True) + "\n" for i in inventory))
@@ -424,8 +571,10 @@ def backup(
             "format": "custom",
             "sha256": _sha256_file(dump_file),
             "bytes": dump_file.stat().st_size,
-            "plaintext_bytes": dump_bytes,
+            "plaintext_bytes": plain_bytes,
+            "plaintext_sha256": plain_sha,
             "encrypted": encrypt,
+            "encryption": "age (X25519 recipients; ChaCha20-Poly1305 authenticated chunks)" if encrypt else None,
         },
         "logical_manifest": manifest,
         "objects": {
@@ -440,6 +589,7 @@ def backup(
     }
     with _private_umask():
         (target / "backup.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
+    write_checksums(target, [dump_file.name, inv_path.name, "backup.json"])
     if objects and (locations.get("missing") or locations.get("mismatched") or locations.get("corrupt_objects")):
         raise BackupError(f"object store inconsistent with database (see {target / 'backup.json'})")
     record["path"] = str(target)
@@ -476,55 +626,57 @@ def _target_is_empty(conn: psycopg.Connection[Any]) -> bool:
 def restore(
     backup_dir: Path, *, url_env: str, tools: PgTools, identity: str | None, run_bootstrap: bool, verify_objects: bool
 ) -> dict[str, Any]:
+    verify_checksums(backup_dir)  # refuses unverifiable or tampered sets before anything else
     record = json.loads((backup_dir / "backup.json").read_text())
     dump_file = backup_dir / record["dump"]["file"]
-    if _sha256_file(dump_file) != record["dump"]["sha256"]:
+    if dump_file.name not in {"reva.dump", "reva.dump.age"} or _sha256_file(dump_file) != record["dump"]["sha256"]:
         raise BackupError("dump checksum mismatch: refusing to restore")
+    encrypted = bool(record["dump"]["encrypted"])
+    if encrypted and not identity:
+        raise BackupError("encrypted dump: pass --identity (age identity file)")
     url = url_from_env(url_env)
     timings: dict[str, float] = {}
-    with tempfile.TemporaryDirectory(prefix="reva-restore-") as tmp:
-        plain = dump_file
-        if record["dump"]["encrypted"]:
-            if not identity:
-                raise BackupError("encrypted dump: pass --identity (age identity file)")
-            plain = Path(tmp) / "reva.dump"
-            t0 = time.perf_counter()
-            with _private_umask():
-                subprocess.run(
-                    [shutil.which("age") or "age", "--decrypt", "-i", identity, "-o", str(plain), str(dump_file)],
-                    check=True,
-                )
-            timings["decrypt_seconds"] = round(time.perf_counter() - t0, 3)
-        conn = connect(url, autocommit=True)
-        try:
-            server_major = int(conn.execute("SHOW server_version_num").fetchone()[0]) // 10000  # type: ignore[index]
-            if not _target_is_empty(conn):
-                raise BackupError("target database is not empty; restore only into a new, empty database")
-            conn.execute(ROLE_SQL)
-            restore_major = tools.major_version("pg_restore", url)
-            if restore_major < record["pg_dump_major"]:
-                raise BackupError("pg_restore is older than the pg_dump that produced the archive")
-            t0 = time.perf_counter()
-            with plain.open("rb") as f:
-                tools.run(
-                    "pg_restore",
-                    [
-                        "--no-owner",
-                        "--no-comments",
-                        "--exit-on-error",
-                        "--single-transaction",
-                        "--no-password",
-                        f"--dbname={url.database}",
-                    ],
-                    url,
-                    stdin=f,
-                )
-            timings["pg_restore_seconds"] = round(time.perf_counter() - t0, 3)
-            dbname = sql.Identifier(url.database)
-            conn.execute(sql.SQL("REVOKE ALL ON DATABASE {} FROM PUBLIC").format(dbname))
-            conn.execute(sql.SQL("GRANT CONNECT ON DATABASE {} TO reva_api, reva_worker, reva_sim").format(dbname))
-        finally:
-            conn.close()
+    # Pass 1: authenticate (age) and hash the plaintext without writing it anywhere.
+    t0 = time.perf_counter()
+    plain = verify_plaintext(dump_file, identity if encrypted else None)
+    timings["verify_seconds"] = round(time.perf_counter() - t0, 3)
+    if plain[0] != record["dump"].get("plaintext_sha256"):
+        raise BackupError("decrypted dump does not match its recorded sha256: refusing to restore")
+    conn = connect(url, autocommit=True)
+    try:
+        server_major = int(conn.execute("SHOW server_version_num").fetchone()[0]) // 10000  # type: ignore[index]
+        row = conn.execute("SELECT rolsuper FROM pg_roles WHERE rolname = current_user").fetchone()
+        superuser = bool(row and row[0])
+        if not _target_is_empty(conn):
+            raise BackupError("target database is not empty; restore only into a new, empty database")
+        conn.execute(ROLE_SQL)
+        restore_major = tools.major_version("pg_restore", url)
+        if restore_major < record["pg_dump_major"]:
+            raise BackupError("pg_restore is older than the pg_dump that produced the archive")
+        # Pass 2: stream straight into pg_restore (one transaction; no plaintext file).
+        t0 = time.perf_counter()
+        fed = stream_restore(
+            tools,
+            [
+                "--no-owner",
+                "--no-comments",
+                "--exit-on-error",
+                "--single-transaction",
+                "--no-password",
+                f"--dbname={url.database}",
+            ],
+            url,
+            dump_file,
+            identity if encrypted else None,
+        )
+        timings["pg_restore_seconds"] = round(time.perf_counter() - t0, 3)
+        if fed[0] != plain[0]:
+            raise BackupError("archive changed between verification and restore; drop the target and retry")
+        dbname = sql.Identifier(url.database)
+        conn.execute(sql.SQL("REVOKE ALL ON DATABASE {} FROM PUBLIC").format(dbname))
+        conn.execute(sql.SQL("GRANT CONNECT ON DATABASE {} TO reva_api, reva_worker, reva_sim").format(dbname))
+    finally:
+        conn.close()
     bootstrap_report = None
     if run_bootstrap:
         from reva.cli.bootstrap import bootstrap
@@ -552,6 +704,7 @@ def restore(
         "backup": str(backup_dir),
         "target_database": url.database,
         "server_major": server_major,
+        "restored_as_superuser": superuser,
         "logical_manifest_sha256": restored["manifest_sha256"],
         "matches_backup": not differences,
         "differences": differences,
