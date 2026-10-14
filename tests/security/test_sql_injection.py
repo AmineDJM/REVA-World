@@ -156,7 +156,7 @@ def test_hostile_strings_written_through_narrow_paths_round_trip_verbatim(sdb: A
             text("SELECT payload, idempotency_key, created_by FROM ops.job WHERE id = :j"), {"j": jid}
         ).one()
         audit = c.execute(text("SELECT actor, action, target FROM ops.audit WHERE actor = :a"), {"a": HOSTILE[9]}).one()
-    assert row[0] == payload and row[1] == key and row[2] == HOSTILE[5]
+    assert row[0] == payload and row[1].endswith(key) and row[2] == HOSTILE[5]
     assert audit[0] == HOSTILE[9] and audit[1] == HOSTILE[0] and audit[2] == {"target": HOSTILE[2]}
     after = snapshot(sdb)
     assert after["ops.job"] == before["ops.job"] + 1 and after["ops.audit"] == before["ops.audit"] + 1

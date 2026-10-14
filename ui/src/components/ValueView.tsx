@@ -1,4 +1,4 @@
-import type { DecimalValue, FloatValue, MeasurementBasis, TypedValue } from '../api/types';
+import type { DecimalValue, FloatValue, MeasurementBasis, SensitivityRangeValue, TypedValue } from '../api/types';
 import { basisLabel, compactMagnitude, formatDecimalString, unitLabel } from '../lib/format';
 import { MissingValue } from './MissingValue';
 
@@ -37,6 +37,18 @@ export function ValueView({ value, showBasis = false, compact = false }: ValueVi
         <span className="value" title={`${v.value} ${v.unit_ref}`}>
           <span className="num">{v.value.toLocaleString('en-US', { maximumSignificantDigits: 15 })}</span>
           {unit && <span className="unit"> {unit}</span>}
+        </span>
+      );
+    }
+    case 'sensitivity_range': {
+      // A range over assumed elasticities: rendered as a range, never as a point estimate.
+      const v = value as SensitivityRangeValue;
+      const unit = unitLabel(v.unit_ref);
+      return (
+        <span className="value sensitivity-range" title={v.statement}>
+          <span className="num">{formatDecimalString(v.lower)}</span> to <span className="num">{formatDecimalString(v.upper)}</span>
+          {unit && <span className="unit"> {unit}</span>}
+          <span className="basis"> · sensitivity range (not a confidence interval)</span>
         </span>
       );
     }

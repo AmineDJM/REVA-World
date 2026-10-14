@@ -37,10 +37,31 @@ def db_bootstrap() -> None:
 
 @db_app.command("upgrade")
 def db_upgrade() -> None:
-    """Apply Alembic migrations (idempotent; same lock as bootstrap)."""
-    from reva.cli.bootstrap import bootstrap
+    """Apply Alembic migrations only (migration owner, under the migration advisory lock).
 
-    _out(bootstrap())
+    Unlike `db bootstrap`, this does not (re)provision runtime role passwords.
+    """
+    from alembic import command
+    from sqlalchemy import text
+
+    from reva.adapters.postgres.engine import make_engine
+    from reva.cli.bootstrap import MIGRATION_LOCK_KEY, alembic_config
+
+    eng = make_engine("migration")
+    with eng.connect() as conn:
+        conn.execute(text("SELECT pg_advisory_lock(:k)"), {"k": MIGRATION_LOCK_KEY})
+        conn.commit()
+        try:
+            cfg = alembic_config()
+            cfg.attributes["connection"] = conn
+            command.upgrade(cfg, "head")
+            conn.commit()
+            version = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
+        finally:
+            conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": MIGRATION_LOCK_KEY})
+            conn.commit()
+    eng.dispose()
+    _out({"schema_version": version})
 
 
 @app.command("seed")
@@ -63,7 +84,13 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
     from reva.settings import get_settings
 
     settings = get_settings()
-    conns = builtin_connectors(settings.reva_http_contact_email)
+    conns = dict(builtin_connectors(settings.reva_http_contact_email))
+    try:  # declarative connectors promoted by the autonomy gate (e.g. Eurostat demo_pjan)
+        from reva.autonomy.jobs import promoted_connectors
+
+        conns.update(promoted_connectors(get_engine("worker"), get_store()))
+    except Exception as e:
+        typer.echo(f"promoted connectors unavailable: {type(e).__name__}", err=True)
     reports = []
 
     async def go() -> None:
@@ -103,16 +130,28 @@ def ingest(
     """Run connectors. Live runs carry origin=live; fixture runs origin=test_fixture."""
     from reva.adapters.connectors.registry import builtin_connectors
 
-    names = connector or list(builtin_connectors())
+    names = connector or list(builtin_connectors())  # promoted connectors: pass --connector explicitly
     _out({"profile": profile, "reports": _run_ingest(names, live, capture)})
 
 
 @fixtures_app.command("load")
 def fixtures_load(profile: str = typer.Option("mvp")) -> None:
-    """Replay captured fixtures through the real ingest path (origin=test_fixture)."""
+    """Replay captured fixtures through the real ingest path (origin=test_fixture).
+
+    Includes declarative connectors already promoted by the autonomy gate.
+    """
     from reva.adapters.connectors.registry import builtin_connectors
 
-    _out({"profile": profile, "reports": _run_ingest(list(builtin_connectors()), live=False, capture=False)})
+    names = list(builtin_connectors())
+    try:
+        from reva.adapters.objects.factory import get_store
+        from reva.adapters.postgres.engine import get_engine
+        from reva.autonomy.jobs import promoted_connectors
+
+        names += [n for n in promoted_connectors(get_engine("worker"), get_store()) if n not in names]
+    except Exception as e:
+        typer.echo(f"promoted connectors unavailable: {type(e).__name__}", err=True)
+    _out({"profile": profile, "reports": _run_ingest(names, live=False, capture=False)})
 
 
 @beliefs_app.command("publish")

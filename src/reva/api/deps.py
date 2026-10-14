@@ -45,7 +45,33 @@ def encode_cursor(values: Iterable[Any]) -> str:
     return base64.urlsafe_b64encode(raw.encode()).decode().rstrip("=")
 
 
-def decode_cursor(cursor: str | None, arity: int) -> list[Any] | None:
+def _check_cursor_value(kind: str, v: Any) -> Any:
+    if kind == "t":
+        if not isinstance(v, str):
+            raise ValueError
+        ts = datetime.fromisoformat(v)
+        if ts.tzinfo is None:
+            raise ValueError
+        return v
+    if kind == "u":
+        return str(UUID(str(v))) if isinstance(v, str) else _fail()
+    if kind == "s":
+        return v if isinstance(v, str) else _fail()
+    if kind == "i":
+        return v if isinstance(v, int) and not isinstance(v, bool) else _fail()
+    raise AssertionError(kind)
+
+
+def _fail() -> Any:
+    raise ValueError
+
+
+def decode_cursor(cursor: str | None, kinds: str) -> list[Any] | None:
+    """Decode an opaque keyset cursor whose elements have the given kinds.
+
+    ``kinds`` has one letter per element: ``t`` aware ISO timestamp, ``u`` UUID, ``s`` text, ``i`` integer.
+    Anything else (wrong arity or element type) is a 400 ``invalid_cursor``, never a database error.
+    """
     if cursor is None:
         return None
     try:
@@ -53,9 +79,12 @@ def decode_cursor(cursor: str | None, arity: int) -> list[Any] | None:
         vals = json.loads(base64.urlsafe_b64decode(cursor + pad).decode())
     except (ValueError, binascii.Error, UnicodeDecodeError):
         raise ApiProblem(400, "invalid_cursor", "cursor is not valid for this endpoint") from None
-    if not isinstance(vals, list) or len(vals) != arity:
+    if not isinstance(vals, list) or len(vals) != len(kinds):
         raise ApiProblem(400, "invalid_cursor", "cursor is not valid for this endpoint")
-    return vals
+    try:
+        return [_check_cursor_value(k, v) for k, v in zip(kinds, vals, strict=True)]
+    except (ValueError, TypeError):
+        raise ApiProblem(400, "invalid_cursor", "cursor is not valid for this endpoint") from None
 
 
 def page(rows: list[Any], limit: int, key: Any) -> tuple[list[Any], str | None]:
@@ -94,6 +123,12 @@ class Timer:
         return s.CostReport(wall_time_ms=round((time.perf_counter() - self.t0) * 1000, 3), rows=rows,
                             detail=detail or None)
 
+
+SCENARIO_BANNER = s.ApiWarning(
+    code="scenario_context",
+    message="Assumption-conditioned scenario output in a simulation context: not a forecast, not an observation "
+    "and never accepted as real-world evidence.",
+)
 
 FIXTURE_WARNING = s.ApiWarning(
     code="fixture_data",

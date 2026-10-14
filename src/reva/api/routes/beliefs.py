@@ -106,7 +106,7 @@ def beliefs_response(
     subjects: list[UUID] | None, concepts: list[str] | None, year: int | None, cursor: str | None, limit: int,
 ) -> s.BeliefListResponse:
     rel = resolve_release(conn, release_id, as_of, origin)
-    cur = decode_cursor(cursor, 4)
+    cur = decode_cursor(cursor, "sssu")
     rows = [dict(r) for r in conn.execute(text(ESTIMATE_SQL), {
         "r": rel["id"], "subjects": subjects or None, "concepts": concepts or None, "y": year,
         "c0": cur[0] if cur else None, "c1": cur[1] if cur else None, "c2": cur[2] if cur else None,
@@ -209,7 +209,7 @@ def list_releases(
     """Published releases, newest publication sequence first."""
     t = Timer()
     require_aware(as_of, "as_of")
-    cur = decode_cursor(cursor, 1)
+    cur = decode_cursor(cursor, "i")
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(RELEASE_LIST), {
             "as_of": as_of, "origin": origin, "c0": cur[0] if cur else None, "lim": limit + 1}).mappings()]

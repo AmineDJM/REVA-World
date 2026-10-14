@@ -307,6 +307,7 @@
                 "float": "#/components/schemas/FloatValue",
                 "geometry": "#/components/schemas/OtherValue",
                 "missing": "#/components/schemas/MissingValue",
+                "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                 "text": "#/components/schemas/OtherValue"
               },
               "propertyName": "kind"
@@ -320,6 +321,9 @@
               },
               {
                 "$ref": "#/components/schemas/MissingValue"
+              },
+              {
+                "$ref": "#/components/schemas/SensitivityRangeValue"
               },
               {
                 "$ref": "#/components/schemas/OtherValue"
@@ -6745,6 +6749,7 @@
                 "float": "#/components/schemas/FloatValue",
                 "geometry": "#/components/schemas/OtherValue",
                 "missing": "#/components/schemas/MissingValue",
+                "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                 "text": "#/components/schemas/OtherValue"
               },
               "propertyName": "kind"
@@ -6758,6 +6763,9 @@
               },
               {
                 "$ref": "#/components/schemas/MissingValue"
+              },
+              {
+                "$ref": "#/components/schemas/SensitivityRangeValue"
               },
               {
                 "$ref": "#/components/schemas/OtherValue"
@@ -8274,6 +8282,7 @@
                     "float": "#/components/schemas/FloatValue",
                     "geometry": "#/components/schemas/OtherValue",
                     "missing": "#/components/schemas/MissingValue",
+                    "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                     "text": "#/components/schemas/OtherValue"
                   },
                   "propertyName": "kind"
@@ -8287,6 +8296,9 @@
                   },
                   {
                     "$ref": "#/components/schemas/MissingValue"
+                  },
+                  {
+                    "$ref": "#/components/schemas/SensitivityRangeValue"
                   },
                   {
                     "$ref": "#/components/schemas/OtherValue"
@@ -8959,6 +8971,12 @@
             "title": "Recorded At",
             "type": "string"
           },
+          "retracted": {
+            "default": false,
+            "description": "Retracted at/before as_of (never used as the point value)",
+            "title": "Retracted",
+            "type": "boolean"
+          },
           "retrieved_at": {
             "format": "date-time",
             "title": "Retrieved At",
@@ -9002,6 +9020,7 @@
                 "float": "#/components/schemas/FloatValue",
                 "geometry": "#/components/schemas/OtherValue",
                 "missing": "#/components/schemas/MissingValue",
+                "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                 "text": "#/components/schemas/OtherValue"
               },
               "propertyName": "kind"
@@ -9017,6 +9036,9 @@
                 "$ref": "#/components/schemas/MissingValue"
               },
               {
+                "$ref": "#/components/schemas/SensitivityRangeValue"
+              },
+              {
                 "$ref": "#/components/schemas/OtherValue"
               }
             ],
@@ -9030,7 +9052,8 @@
           "source_revision_id",
           "retrieved_at",
           "recorded_at",
-          "source_published_at"
+          "source_published_at",
+          "retracted"
         ],
         "title": "RevisionEntry",
         "type": "object"
@@ -9649,6 +9672,76 @@
         "title": "ScenarioResponse",
         "type": "object"
       },
+      "SensitivityRangeValue": {
+        "additionalProperties": true,
+        "description": "An assumption-sensitivity range over a scenario grid (L2): never a point, never a confidence interval.",
+        "properties": {
+          "basis": {
+            "additionalProperties": true,
+            "title": "Basis",
+            "type": "object"
+          },
+          "evaluated_points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evaluated Points"
+          },
+          "includes_fixed_quantity_point": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Includes Fixed Quantity Point"
+          },
+          "kind": {
+            "const": "sensitivity_range",
+            "default": "sensitivity_range",
+            "title": "Kind",
+            "type": "string"
+          },
+          "lower": {
+            "description": "Exact decimal string",
+            "title": "Lower",
+            "type": "string"
+          },
+          "statement": {
+            "description": "Assumption sensitivity, not a confidence interval",
+            "title": "Statement",
+            "type": "string"
+          },
+          "unit_ref": {
+            "title": "Unit Ref",
+            "type": "string"
+          },
+          "upper": {
+            "description": "Exact decimal string",
+            "title": "Upper",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "lower",
+          "upper",
+          "unit_ref",
+          "basis",
+          "evaluated_points",
+          "includes_fixed_quantity_point",
+          "statement"
+        ],
+        "title": "SensitivityRangeValue",
+        "type": "object"
+      },
       "SessionInfo": {
         "additionalProperties": false,
         "properties": {
@@ -9845,6 +9938,7 @@
                 "float": "#/components/schemas/FloatValue",
                 "geometry": "#/components/schemas/OtherValue",
                 "missing": "#/components/schemas/MissingValue",
+                "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                 "text": "#/components/schemas/OtherValue"
               },
               "propertyName": "kind"
@@ -9858,6 +9952,9 @@
               },
               {
                 "$ref": "#/components/schemas/MissingValue"
+              },
+              {
+                "$ref": "#/components/schemas/SensitivityRangeValue"
               },
               {
                 "$ref": "#/components/schemas/OtherValue"
@@ -10879,6 +10976,12 @@
             "title": "Recorded At",
             "type": "string"
           },
+          "retracted_revisions_skipped": {
+            "default": 0,
+            "description": "Later revisions retracted at/before as_of that were skipped: the point is the latest non-retracted revision (the same rule as belief selection)",
+            "title": "Retracted Revisions Skipped",
+            "type": "integer"
+          },
           "retrieved_at": {
             "format": "date-time",
             "title": "Retrieved At",
@@ -10964,6 +11067,7 @@
                 "float": "#/components/schemas/FloatValue",
                 "geometry": "#/components/schemas/OtherValue",
                 "missing": "#/components/schemas/MissingValue",
+                "sensitivity_range": "#/components/schemas/SensitivityRangeValue",
                 "text": "#/components/schemas/OtherValue"
               },
               "propertyName": "kind"
@@ -10977,6 +11081,9 @@
               },
               {
                 "$ref": "#/components/schemas/MissingValue"
+              },
+              {
+                "$ref": "#/components/schemas/SensitivityRangeValue"
               },
               {
                 "$ref": "#/components/schemas/OtherValue"
@@ -11002,6 +11109,7 @@
           "retrieved_at",
           "source_published_at",
           "origin",
+          "retracted_revisions_skipped",
           "revisions"
         ],
         "title": "TimeseriesPoint",
@@ -12939,7 +13047,7 @@
     },
     "/v1/jobs/{job_id}/cancel": {
       "post": {
-        "description": "Cooperative cancellation; the partial audit trail is preserved.",
+        "description": "Cooperative cancellation; the partial audit trail is preserved.\n\nAuthorised per job type (``CANCEL_SCOPE``): ``simulate`` cancels simulation/replay/evaluation/population\njobs, ``ingest`` cancels ingestion/publication/discovery/maintenance jobs.",
         "operationId": "cancel_job_v1_jobs__job_id__cancel_post",
         "parameters": [
           {

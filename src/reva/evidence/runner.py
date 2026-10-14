@@ -272,7 +272,8 @@ def make_live_client(spec: Any, settings: Any) -> SafeHttpClient:
     from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
 
     policies = {
-        "comtradeapi.un.org": HostPolicy(min_interval_seconds=1.5, max_concurrency=1),
+        # Live check 2026-10-14: 429 "Try again in 2|3 seconds" at 1.5 s spacing.
+        "comtradeapi.un.org": HostPolicy(min_interval_seconds=3.0, max_concurrency=1),
         "api.worldbank.org": HostPolicy(min_interval_seconds=0.5, max_concurrency=1),
         "api.crossref.org": HostPolicy(min_interval_seconds=1.0, max_concurrency=1),
         "ec.europa.eu": HostPolicy(min_interval_seconds=1.0, max_concurrency=1),

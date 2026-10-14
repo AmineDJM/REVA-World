@@ -4,7 +4,8 @@ Scientific scope and limits
 ---------------------------
 * Refinement may only add detail the source recipe actually supports. For a
   Eurostat ``demo_pjan`` recipe that means splitting age bands back into the
-  recipe's single-year leaf cells (``dimension="age"``); recorded sex is already
+  recipe's leaf cells (``dimension="age"``: single years, or the recipe's
+  age-band leaves where the source has nothing finer); recorded sex is already
   resolved in coarse tables.
 * The split of a coarse cell's exact weight ``W`` across its leaves uses the
   recipe's own leaf counts ``c_i``: ``w_i = W · c_i / Σc``. Total weight per
@@ -90,9 +91,18 @@ def _members(
             if top or (hi is None and lo is not None and open_lo is not None and lo <= open_lo):
                 out.append(leaf)
             continue
-        assert leaf.age_years is not None and lo is not None
-        if leaf.age_years >= lo and (hi is None or leaf.age_years <= hi):
+        assert lo is not None
+        leaf_lo = leaf.age_years if leaf.age_years is not None else leaf.age_lo
+        leaf_hi = leaf.age_years if leaf.age_years is not None else leaf.age_hi
+        if leaf_lo is None:
+            raise ValidationProblem("recipe leaf without an age range", cell_id=leaf.cell_id)
+        if leaf_lo >= lo and (hi is None or (leaf_hi is not None and leaf_hi <= hi)):
             out.append(leaf)
+        elif leaf_lo <= (hi if hi is not None else leaf_lo) and (leaf_hi is None or leaf_hi >= lo):
+            raise ValidationProblem(
+                f"coarse cell [{lo}, {hi}] only partly covers the leaf {leaf.cell_id}",
+                cell_id=leaf.cell_id,
+            )
     return out
 
 

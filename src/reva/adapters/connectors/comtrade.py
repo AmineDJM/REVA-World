@@ -71,6 +71,15 @@ FIXED_DIMS = {"typeCode": "C", "freqCode": "A", "cmdCode": "2709", "customsCode"
               "partner2Code": 0}
 
 
+def _nonzero(v: Any) -> bool:
+    if v is None or v == "":
+        return False
+    try:
+        return Decimal(str(v)) != 0
+    except ArithmeticError:
+        return False
+
+
 class ComtradeConnector:
     def __init__(
         self,
@@ -214,7 +223,11 @@ class ComtradeConnector:
             "qtyUnitCode": plain(r.get("qtyUnitCode")),
             "qty": plain(r.get("qty")),
             "isQtyEstimated": r.get("isQtyEstimated"),
-            "provider_derived_aggregate": bool(r.get("isAggregate")) and not bool(r.get("isReported")),
+            # 1.1.0: the former derived flag provider_derived_aggregate (isAggregate and not
+            # isReported) was true for every live HS2709 world-total row, i.e. uninformative.
+            # The raw isReported/isAggregate flags are kept above; the derived flag now marks
+            # only rows the provider itself flags as estimated (legacyEstimationFlag != 0).
+            "provider_estimation_flagged": _nonzero(r.get("legacyEstimationFlag")),
         }
 
     @staticmethod
@@ -228,8 +241,10 @@ class ComtradeConnector:
         undetermined with a warning.
         """
         pv, cif, fob = r.get("primaryValue"), r.get("cifvalue"), r.get("fobvalue")
-        eq_cif = pv is not None and cif is not None and Decimal(pv) == Decimal(cif)
-        eq_fob = pv is not None and fob is not None and Decimal(pv) == Decimal(fob)
+        # A 0 cifvalue/fobvalue (seen for CHN/USA 2020-21) is kept as a flag only: it never
+        # "matches" primaryValue, not even when primaryValue is itself 0.
+        eq_cif = _nonzero(pv) and _nonzero(cif) and Decimal(pv) == Decimal(cif)
+        eq_fob = _nonzero(pv) and _nonzero(fob) and Decimal(pv) == Decimal(fob)
         if flow == "M":
             if eq_cif and not eq_fob:
                 return "CIF", None
@@ -394,11 +409,11 @@ class ComtradeConnector:
             findings.append(Finding(code="valuation_basis_undetermined", severity="warning",
                                     message=f"{len(undetermined)} values carry an undeterminable valuation basis "
                                             f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'"))
-        derived = [o for o in batch.observations if o.source_flags.get("provider_derived_aggregate")]
-        if derived:
-            findings.append(Finding(code="provider_derived", severity="info",
-                                    message=f"{len(derived)} values are provider-derived aggregates "
-                                            "(isReported=false)"))
+        estimated = [o for o in batch.observations if o.source_flags.get("provider_estimation_flagged")]
+        if estimated:
+            findings.append(Finding(code="provider_estimation_flagged", severity="info",
+                                    message=f"{len(estimated)} values carry a provider estimation flag "
+                                            "(legacyEstimationFlag != 0)"))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:

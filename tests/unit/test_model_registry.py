@@ -15,7 +15,6 @@ from reva.evaluation.tournament_service import (
     finite_json,
     holdout_spec,
     paired_common_metrics,
-    paired_holdout,
     panel_from_rows,
 )
 from reva.kernel.errors import ImmutableRecordViolation, ValidationProblem
@@ -313,20 +312,18 @@ def test_paired_metrics_use_common_cases_where_unpaired_ranking_flips():
 
 
 def test_challenger_choice_requires_a_distinguishable_paired_winner():
-    pol = {"bootstrap": {"block_length": 3, "replicates": 500, "level": 0.95}}
+    pol = {"paired_test": {"alpha": 0.025, "min_origins_per_horizon": 8}}
     clear = [_rec("a", y, 1.0 + 0.01 * (y % 3)) for y in range(2000, 2040)] + \
             [_rec("b", y, 2.0 + 0.01 * (y % 5)) for y in range(2000, 2040)]
-    assert choose_among_challengers(clear, ["a", "b"], pol, seed=1)["winner"] == "a"
+    assert choose_among_challengers(clear, ["a", "b"], pol)["winner"] == "a"
     noisy = [_rec("a", y, 1.0 + (0.5 if y % 2 else -0.5)) for y in range(2000, 2040)] + \
             [_rec("b", y, 1.0 + (-0.5 if y % 2 else 0.5)) for y in range(2000, 2040)]
-    sel = choose_among_challengers(noisy, ["a", "b"], pol, seed=1)
+    sel = choose_among_challengers(noisy, ["a", "b"], pol)
     assert sel["winner"] is None and sel["n_common"] == 40
 
 
-def test_holdout_confirmation_is_paired_and_rejects_any_regression():
-    ch = [{"series_id": "S", "origin": 2022, "horizon": 1, "mase_scaled_error": 1.05},
-          {"series_id": "T", "origin": 2022, "horizon": 1, "mase_scaled_error": None}]
-    inc = [{"series_id": "S", "origin": 2022, "horizon": 1, "mase_scaled_error": 1.0},
-           {"series_id": "T", "origin": 2022, "horizon": 1, "mase_scaled_error": 9.0}]
-    hp = paired_holdout(ch, inc)
-    assert hp["n_common"] == 1 and hp["mean_difference"] > 0  # 5% worse is a regression, not "within 10%"
+def test_holdout_confirmation_never_accepts_a_worse_challenger():
+    from reva.models.tournament import holdout_non_inferiority
+
+    ni = holdout_non_inferiority([("S", 1.05, 1.0), ("T", None, 9.0)])  # 5% worse on the only common cell
+    assert not ni.passed and ni.n_pairs == 1

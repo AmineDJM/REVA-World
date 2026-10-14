@@ -14,12 +14,21 @@ Start-up contract (binding spec §12 ``start_worker``):
 * thread budget from ``reva.settings.threads_budget()`` (explicit budget and
   cgroup quota, never ``os.cpu_count()``), exported to OMP/OpenBLAS/MKL/Polars;
 * concurrency ``REVA_WORKER_CONCURRENCY`` (default 1: one active job);
-* a heartbeat thread extends leases every ``REVA_JOB_HEARTBEAT_SECONDS``;
-* SIGTERM/SIGINT: stop claiming, signal cooperative cancellation/checkpoint to
-  running handlers (``ctx.is_cancelled()`` turns true), drain within
-  ``REVA_WORKER_DRAIN_SECONDS`` (default 100 s, below Render's 120 s grace).
-  Interrupted jobs are released back to the queue without consuming an
-  attempt; jobs that do not stop in time are recovered by lease expiry.
+* a heartbeat thread extends leases every ``REVA_JOB_HEARTBEAT_SECONDS`` over a
+  dedicated small connection pool whose sessions use a short ``lock_timeout``
+  and ``statement_timeout`` (``HEARTBEAT_LOCK_TIMEOUT_MS``/
+  ``HEARTBEAT_STATEMENT_TIMEOUT_MS``) and never take advisory locks, so a
+  heartbeat never queues behind a long publication; a lock timeout counts as
+  "busy, retry next beat" (R2-14);
+* SIGTERM/SIGINT: stop claiming, signal running handlers
+  (``ctx.shutdown_requested()`` and the generic ``ctx.is_cancelled()`` turn
+  true), drain within ``REVA_WORKER_DRAIN_SECONDS`` (default 100 s, below
+  Render's 120 s grace). A shutdown is never a cancellation (R2-01): whatever
+  the handler raises/returns to stop (``JobCancelled``, ``{"status":
+  "cancelled"}``, ``{"status": "interrupted"}``) the job is released back to the
+  queue without consuming an attempt, unless the database says a user asked to
+  cancel it (status ``cancel_requested``), in which case it ends ``cancelled``.
+  Jobs that do not stop in time are recovered by lease expiry.
 """
 
 from __future__ import annotations
@@ -37,7 +46,7 @@ from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
 
-from sqlalchemy import Connection, Engine, text
+from sqlalchemy import Connection, Engine, create_engine, text
 from sqlalchemy.exc import DBAPIError, OperationalError
 
 from reva.adapters.postgres import queue
@@ -58,6 +67,8 @@ THREAD_ENV_VARS = (
 MIN_SCHEMA_REVISION = 7  # 0007_security
 DEFAULT_DRAIN_SECONDS = 100.0
 HEARTBEAT_MIN_INTERVAL = 1.0  # rate limit for handler-initiated status checks
+HEARTBEAT_LOCK_TIMEOUT_MS = 2000
+HEARTBEAT_STATEMENT_TIMEOUT_MS = 2000
 
 
 class SchemaNotReady(RevaError):
@@ -152,6 +163,38 @@ def wait_for_schema(
     raise ConfigurationError(f"schema/runtime roles not ready after {attempts} attempts: {last}")
 
 
+# --------------------------------------------------------------------------- heartbeat pool
+def heartbeat_engine_for(worker_engine: Engine, concurrency: int = 1) -> Engine:
+    """A dedicated small pool for heartbeats (R2-14), same credentials as the worker.
+
+    Its sessions carry short lock/statement timeouts so a heartbeat can never queue
+    for long behind a transaction holding the job row, and it is never used for
+    advisory locks or publication work. Falls back to ``worker_engine`` when the
+    URL cannot be reused (e.g. a test double).
+    """
+    try:
+        url = worker_engine.url
+        if url.get_backend_name() != "postgresql":
+            return worker_engine
+        return create_engine(
+            url,
+            pool_size=1,
+            max_overflow=max(1, concurrency),
+            pool_timeout=5,
+            pool_pre_ping=True,
+            pool_recycle=1800,
+            connect_args={
+                "options": f"-c lock_timeout={HEARTBEAT_LOCK_TIMEOUT_MS} "
+                           f"-c statement_timeout={HEARTBEAT_STATEMENT_TIMEOUT_MS}",
+                "application_name": "reva-worker-heartbeat",
+                "connect_timeout": 5,
+            },
+        )
+    except Exception as e:  # pragma: no cover - defensive
+        log.warning("dedicated heartbeat pool unavailable (%s); using the worker pool", type(e).__name__)
+        return worker_engine
+
+
 # --------------------------------------------------------------------------- worker
 @dataclass
 class _Active:
@@ -192,6 +235,7 @@ class Worker:
         invalidation_tick_seconds: float = 5.0,
         job_types: list[str] | None = None,
         backoff_base_seconds: float = queue.DEFAULT_BACKOFF_BASE_SECONDS,
+        heartbeat_engine: Engine | None = None,
     ) -> None:
         self.settings = settings
         self.engine = worker_engine
@@ -199,6 +243,8 @@ class Worker:
         self.store = store
         self.worker_id = worker_id or f"{socket.gethostname()[:40]}:{os.getpid()}:{uuid.uuid4().hex[:8]}"
         self.concurrency = concurrency or settings.reva_worker_concurrency
+        self._own_hb_engine = heartbeat_engine is None
+        self.heartbeat_engine = heartbeat_engine or heartbeat_engine_for(worker_engine, self.concurrency)
         self.lease_seconds = lease_seconds or settings.reva_job_lease_seconds
         self.heartbeat_seconds = heartbeat_seconds or settings.reva_job_heartbeat_seconds
         if self.heartbeat_seconds >= self.lease_seconds:
@@ -278,30 +324,62 @@ class Worker:
 
     def _beat(self, st: _Active, progress: dict[str, Any] | None) -> str:
         try:
-            status = queue.heartbeat(self.engine, st.job, progress, self.lease_seconds)
+            status = queue.heartbeat(self.heartbeat_engine, st.job, progress, self.lease_seconds,
+                                     lock_timeout_ms=HEARTBEAT_LOCK_TIMEOUT_MS,
+                                     statement_timeout_ms=HEARTBEAT_STATEMENT_TIMEOUT_MS)
         except StaleLease:
             st.lost = True
             log.warning("lease lost for job %s", st.job.id, extra={"job_id": str(st.job.id)})
             raise
         except Exception as e:
-            log.warning("heartbeat failed for job %s: %s", st.job.id, type(e).__name__)
+            if queue.is_lock_busy(e):
+                log.info("heartbeat for job %s busy (row locked); retrying next beat", st.job.id)
+            else:
+                log.warning("heartbeat failed for job %s: %s", st.job.id, type(e).__name__)
             return st.status
         st.status = status
         st.last_hb = time.monotonic()
         return status
 
-    def _ctx_heartbeat(self, job_id: UUID, progress: dict[str, Any] | None = None) -> str:
+    def _active_state(self, job_id: UUID) -> _Active:
         with self._lock:
             st = self._active.get(job_id)
         if st is None:
             raise StaleLease(f"job {job_id} is not active in this worker")
         if st.lost:
             raise StaleLease(f"lease lost for job {job_id}")
+        return st
+
+    def _ctx_heartbeat(self, job_id: UUID, progress: dict[str, Any] | None = None) -> str:
+        """Handler heartbeat. Returns ``cancel_requested`` as the generic stop signal for a
+        user cancel *or* a worker shutdown (backwards compatible); handlers distinguish the
+        two with ``ctx.shutdown_requested()`` / ``ctx.cancel_requested()``."""
+        st = self._active_state(job_id)
+        status = st.status
+        if progress is not None or time.monotonic() - st.last_hb >= HEARTBEAT_MIN_INTERVAL:
+            status = self._beat(st, progress)  # keeps the lease and the true DB status current
         if self._shutdown.is_set():
-            return "cancel_requested"  # cooperative stop/checkpoint signal during shutdown
-        if progress is None and time.monotonic() - st.last_hb < HEARTBEAT_MIN_INTERVAL:
-            return st.status
-        return self._beat(st, progress)
+            return "cancel_requested"
+        return status
+
+    def _ctx_user_cancel(self, job_id: UUID) -> bool:
+        """True only if the job row's DB status is ``cancel_requested`` (never for a shutdown)."""
+        st = self._active_state(job_id)
+        if time.monotonic() - st.last_hb >= 0.2:
+            self._beat(st, None)
+        return st.status == "cancel_requested"
+
+    def shutdown_requested(self) -> bool:
+        return self._shutdown.is_set()
+
+    def _release_on_shutdown(self, job: ClaimedJob, checkpoint: dict[str, Any] | None,
+                             done: Callable[..., JobOutcome], ack: float) -> JobOutcome:
+        """Shutdown is not a cancellation: hand the job back without consuming an attempt.
+
+        ``queue.release`` re-reads the status under the row lock, so a real user cancel
+        (``cancel_requested``) still ends as ``cancelled``."""
+        status = queue.release(self.engine, job, checkpoint, "worker_shutdown")
+        return done("released" if status == "queued" else status, None, ack)
 
     # ------------------------------------------------------------------ execution
     def claim_one(self) -> ClaimedJob | None:
@@ -372,6 +450,8 @@ class Worker:
             store=self.store,
             heartbeat=lambda p=None: self._ctx_heartbeat(job.id, p),
             checkpoint=job.checkpoint,
+            shutdown_signal=self._shutdown.is_set,
+            cancel_probe=lambda: self._ctx_user_cancel(job.id),
         )
         ack = time.monotonic() - job.claimed_monotonic
         self.ack_latencies.append(ack)
@@ -383,9 +463,8 @@ class Worker:
             result = handler(dict(job.payload), ctx)
         except JobCancelled as e:
             try:
-                if self._shutdown.is_set() and st.status != "cancel_requested":
-                    status = queue.release(self.engine, job, ctx.checkpoint, "worker_shutdown")
-                    return done("released" if status == "queued" else status, None, ack)
+                if self._shutdown.is_set():
+                    return self._release_on_shutdown(job, ctx.checkpoint, done, ack)
                 queue.finish_cancelled(self.engine, job, {"message": e.message[:500]})
             except StaleLease:
                 return done("lost_lease", None, ack)
@@ -400,11 +479,12 @@ class Worker:
                 return done("completed_in_handler", None, ack)
             res = dict(result or {})
             if res.get("status") == "cancelled":
+                if self._shutdown.is_set():  # R2-01: a shutdown never ends a job as cancelled
+                    return self._release_on_shutdown(job, res.get("checkpoint") or ctx.checkpoint, done, ack)
                 queue.finish_cancelled(self.engine, job, {"message": "handler honoured cancellation"})
                 return done("cancelled", None, ack)
             if res.get("status") == "interrupted":
-                status = queue.release(self.engine, job, res.get("checkpoint"), "worker_shutdown")
-                return done("released" if status == "queued" else status, None, ack)
+                return self._release_on_shutdown(job, res.get("checkpoint"), done, ack)
             queue.complete(self.engine, job, res)
             return done("succeeded", None, ack)
         except StaleLease:
@@ -478,7 +558,15 @@ class Worker:
             self.request_stop(self.stop_reason or "loop exit")
             drained = self.drain()
             self._hb_stop.set()
+            if self._hb_thread is not None:
+                self._hb_thread.join(timeout=self.heartbeat_seconds + 5)
+            self.close()
         return drained
+
+    def close(self) -> None:
+        """Dispose of the dedicated heartbeat pool (if this worker created it)."""
+        if self._own_hb_engine and self.heartbeat_engine is not self.engine:
+            self.heartbeat_engine.dispose()
 
     def drain(self, deadline_seconds: float | None = None) -> bool:
         deadline = time.monotonic() + (self.drain_seconds if deadline_seconds is None else deadline_seconds)

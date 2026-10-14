@@ -69,7 +69,7 @@ def test_coarsen_then_refine_round_trip(recipe):
     assert cert.measured_error == "0" and cert.tail_errors == {"top_coded": "0", "unknown_age": "0"}
     d = diagnose(out, recipe)
     assert d["calibration_error"]["joint_age_sex"]["max_abs_error"] == "0"
-    assert d["structural_zero_violations"]["ok"]
+    assert d["support_violations"]["ok"]
 
 
 def test_refine_after_reweighting_conserves_coarse_totals_but_reports_error(recipe):

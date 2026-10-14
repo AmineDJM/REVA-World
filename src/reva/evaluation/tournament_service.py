@@ -34,7 +34,6 @@ import dataclasses
 import json
 import math
 import time
-import zlib
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
@@ -43,7 +42,6 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 from uuid import UUID
 
-import numpy as np
 from sqlalchemy import Connection, text
 
 from reva.evaluation.splits import CutoffScopedSeries
@@ -60,7 +58,9 @@ from reva.models.tournament import (
     ModelMetrics,
     PredictionRecord,
     TournamentResult,
-    moving_block_bootstrap_means,
+    dm_hln_test,
+    holdout_non_inferiority,
+    holm_rejections,
     run_tournament,
 )
 
@@ -404,52 +404,69 @@ def paired_common_metrics(records: Sequence[PredictionRecord], model_keys: Seque
             "metrics": metrics}
 
 
+def _headline_paired(result: TournamentResult, keys: Sequence[str]) -> dict[str, Any]:
+    """Paired common-case metrics: the tournament's own when provided, else computed here."""
+    pm = getattr(result, "paired_metrics", None)
+    if pm:
+        return {"models": list(getattr(result, "paired_models", ()) or keys),
+                "n_common_cases": int(getattr(result, "n_paired_cases", 0)),
+                "definition": "cases (series, origin, horizon) where every compared model has a defined "
+                "scaled error (reva.models.tournament paired_metrics)",
+                "metrics": {k: _jsonable(m) for k, m in pm.items()}}
+    return paired_common_metrics(result.records, keys)
+
+
 def choose_among_challengers(
-    records: Sequence[PredictionRecord], keys: Sequence[str], policy: Mapping[str, Any], seed: int
+    records: Sequence[PredictionRecord], keys: Sequence[str], policy: Mapping[str, Any]
 ) -> dict[str, Any]:
-    """Paired selection among challengers that all passed the gates.
+    """Paired selection among challengers that all passed every gate.
 
     On the common cases of ``keys`` the challenger with the lowest paired MASE
-    wins only if the moving-block bootstrap interval of its loss difference with
-    *each* other challenger lies entirely below zero; otherwise ``winner`` is
-    ``None`` (keep the incumbent and route to review).
+    is selected only if, against *each* other challenger, the origin-aggregated
+    Diebold-Mariano/HLN test (one-sided, Holm across horizons at
+    ``paired_test.alpha``; the same machinery as the promotion rule) rejects
+    equal loss for at least one horizon and no horizon is significantly worse.
+    Otherwise ``winner`` is ``None``: keep the incumbent and route to review.
     """
     pm = paired_common_metrics(records, keys)
     n = pm["n_common_cases"]
     out: dict[str, Any] = {"n_common": n, "paired_mase": {k: pm["metrics"][k]["mase"] for k in keys},
-                           "comparisons": {}, "winner": None}
+                           "comparisons": {}, "winner": None, "test": "dm_hln_holm (origin-aggregated)"}
     if n == 0:
         return out
+    pt = {"alpha": 0.025, "min_origins_per_horizon": 8, **dict(policy.get("paired_test") or {})}
+    alpha, min_o = float(pt["alpha"]), int(pt["min_origins_per_horizon"])
     best = min(keys, key=lambda k: (pm["metrics"][k]["mase"], k))
     by_case: dict[tuple[str, int, int], dict[str, float]] = defaultdict(dict)
     for r in records:
         if r.model in keys and r.mase_scaled_error is not None:
             by_case[_case_key(r)][r.model] = r.mase_scaled_error
     common = sorted(c for c, d in by_case.items() if all(k in d for k in keys))
-    b = policy["bootstrap"]
-    alpha = 1.0 - float(b["level"])
     all_sig = True
     for other in sorted(set(keys) - {best}):
-        diffs = np.array([by_case[c][best] - by_case[c][other] for c in common], dtype=float)
-        rng = np.random.default_rng(np.random.SeedSequence(seed, spawn_key=(zlib.crc32(f"{best}|{other}".encode()),)))
-        means = moving_block_bootstrap_means(diffs, int(b["block_length"]), int(b["replicates"]), rng)
-        lo, hi = (float(x) for x in np.quantile(means, [alpha / 2.0, 1.0 - alpha / 2.0]))
-        out["comparisons"][f"{best} - {other}"] = {"mean_difference": float(diffs.mean()), "interval": [lo, hi]}
-        all_sig = all_sig and hi < 0.0
+        per_h: dict[int, dict[int, list[float]]] = defaultdict(lambda: defaultdict(list))
+        for sid, origin, h in common:
+            per_h[h][origin].append(by_case[(sid, origin, h)][best] - by_case[(sid, origin, h)][other])
+        p_less: dict[int, float] = {}
+        worse = False
+        tests: dict[str, Any] = {}
+        for h, by_o in sorted(per_h.items()):
+            xs = [math.fsum(v) / len(v) for _, v in sorted(by_o.items())]
+            if len(xs) < max(min_o, 2):
+                tests[str(h)] = {"tested": False, "n_origins": len(xs)}
+                continue
+            dm = dm_hln_test(xs, h)
+            p_less[h] = dm.p_less
+            worse = worse or dm.p_greater <= alpha
+            tests[str(h)] = {"tested": True, "n_origins": len(xs), "mean": dm.mean, "p_less": dm.p_less,
+                             "p_greater": dm.p_greater}
+        rejected = holm_rejections(p_less, alpha) if p_less else {}
+        sig = bool(rejected) and not worse
+        out["comparisons"][f"{best} vs {other}"] = {"horizons": tests, "holm_rejected": sorted(rejected),
+                                                    "significant": sig}
+        all_sig = all_sig and sig
     out["winner"] = best if all_sig else None
     return out
-
-
-def paired_holdout(challenger: Sequence[Mapping[str, Any]], incumbent: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """Paired holdout comparison on common cells with defined scaled errors."""
-    ch = {_case_key(r): r["mase_scaled_error"] for r in challenger if r["mase_scaled_error"] is not None}
-    inc = {_case_key(r): r["mase_scaled_error"] for r in incumbent if r["mase_scaled_error"] is not None}
-    common = sorted(set(ch) & set(inc))
-    if not common:
-        return {"n_common": 0, "challenger_mase": None, "incumbent_mase": None, "mean_difference": None}
-    c = math.fsum(ch[k] for k in common) / len(common)
-    i = math.fsum(inc[k] for k in common) / len(common)
-    return {"n_common": len(common), "challenger_mase": c, "incumbent_mase": i, "mean_difference": c - i}
 
 
 # --------------------------------------------------------------------------- pure evaluation
@@ -537,6 +554,11 @@ def evaluate(
             "development_decision": d.decision,
         }
         reasons = [LABEL, *d.reasons]
+        if d.decision == "needs_review":
+            # model.promotion has no review state: the incumbent stays until a named reviewer decides.
+            reasons.append("needs_review: routed to named review; incumbent kept until then")
+            decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons, "needs_review": True}
+            continue
         if d.decision != "promote":
             decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
             continue
@@ -546,27 +568,25 @@ def evaluate(
             decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
             continue
         ch_ref = model_ref(models[k])
-        hp = paired_holdout(holdout_scores[ch_ref]["predictions"], holdout_scores[inc_ref]["predictions"])
-        base["holdout_paired"] = hp
-        if hp["n_common"] == 0:
-            reasons.append("locked_holdout_undefined: no common holdout cell with a defined scaled error")
+        ch_cells = {_case_key(r): r for r in holdout_scores[ch_ref]["predictions"]}
+        in_cells = {_case_key(r): r for r in holdout_scores[inc_ref]["predictions"]}
+        pairs = [(c[0], ch_cells[c]["mase_scaled_error"], in_cells[c]["mase_scaled_error"])
+                 for c in sorted(set(ch_cells) & set(in_cells))]
+        ni_pol = dict(pol.get("holdout_non_inferiority") or {})
+        ni = holdout_non_inferiority(
+            pairs, margin=float(ni_pol.get("margin", 0.0)), alpha=float(ni_pol.get("alpha", 0.025)),
+            require_statistical=bool(ni_pol.get("require_statistical", False)),
+        )
+        base["holdout_non_inferiority"] = _jsonable(ni)
+        reasons.extend(ni.reasons)
+        if not ni.passed:
             decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
             continue
-        if hp["mean_difference"] > 0.0:
-            reasons.append(
-                f"locked_holdout_regression: on {hp['n_common']} common holdout cells the challenger's paired "
-                f"MASE {hp['challenger_mase']:.4g} is worse than the incumbent's {hp['incumbent_mase']:.4g}")
-            decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
-            continue
-        reasons.append(
-            f"locked_holdout_confirmed: on {hp['n_common']} common holdout cells the challenger's paired MASE "
-            f"{hp['challenger_mase']:.4g} is not worse than the incumbent's {hp['incumbent_mase']:.4g} "
-            "(confirmatory non-regression check on a small sample, not a significance test)")
         decisions[k] = {**base, "decision": "promote", "reasons": reasons}
         confirmed.append(k)
     selection: dict[str, Any] | None = None
     if len(confirmed) > 1:
-        selection = choose_among_challengers(result.records, confirmed, pol, seed)
+        selection = choose_among_challengers(result.records, confirmed, pol)
         winner = selection["winner"]
         for k in confirmed:
             if winner is None:
@@ -581,6 +601,9 @@ def evaluate(
                     f"{selection['n_common']} common development cases (block-bootstrap interval excludes zero)")
     if any(d["decision"] == "promote" for d in decisions.values()):
         status = "promoted"
+    elif any(d.get("needs_review") or any(r.startswith("requires_review") for r in d["reasons"])
+             for d in decisions.values()):
+        status = "needs_review"
     elif decisions and all(
         any(r.startswith("insufficient_evaluation") for r in d["reasons"]) for d in decisions.values()
     ):
@@ -591,7 +614,7 @@ def evaluate(
         tournament=result, holdout=spec, holdout_status=status_h, holdout_scores=holdout_scores,
         holdout_blocked=blocked, access_before=access_before, access_after=access_after, decisions=decisions,
         status=status, runtime_seconds=time.perf_counter() - t0, models=models,
-        paired=paired_common_metrics(result.records, sorted(models)), challenger_selection=selection,
+        paired=_headline_paired(result, sorted(models)), challenger_selection=selection,
     )
 
 
@@ -616,7 +639,7 @@ def finite_json(obj: Any) -> Any:
 def _jsonable(obj: Any) -> Any:
     """Dataclasses (e.g. tournament paired metrics, when provided) to plain data."""
     if dataclasses.is_dataclass(obj) and not isinstance(obj, type):
-        return dataclasses.asdict(obj)
+        return _jsonable(dataclasses.asdict(obj))
     if isinstance(obj, Mapping):
         return {str(k): _jsonable(v) for k, v in obj.items()}
     if isinstance(obj, (list, tuple)):
@@ -687,7 +710,6 @@ def build_manifest(
             "scores_unpaired": {k: _metrics_dict(m) for k, m in t.metrics.items()},
             "scores_unpaired_note": "each model over its own eligible cases; not comparable across models "
             "(use paired_scores)",
-            "tournament_paired_metrics": _jsonable(getattr(t, "paired_metrics", None)),
             "challenger_selection": outcome.challenger_selection,
             "subgroup_scores": sub,
             "ineligible": [

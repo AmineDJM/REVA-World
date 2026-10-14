@@ -18,7 +18,7 @@ def test_diagnostics_of_fresh_materialisation(recipe):
     for margin in ("age_margin", "sex_margin", "joint_age_sex"):
         assert d["calibration_error"][margin]["max_abs_error"] == "0"
         assert d["calibration_error"][margin]["max_rel_error"] == "0"
-    assert d["structural_zero_violations"]["ok"] is True
+    assert d["support_violations"]["ok"] is True
     assert d["total_weight"] == str(recipe.total_count)
     assert 1 <= d["effective_sample_size"] <= 1000
     assert 0 < d["max_weight_share"] < 1
@@ -40,11 +40,11 @@ def test_records_moved_into_zero_cell_are_flagged(recipe):
     t = materialise(recipe, 100)
     cells = t.column("cell_id").to_pylist()
     i = cells.index("M|Y4")
-    cells[i] = "M|Y3"  # structural zero cell
+    cells[i] = "M|Y3"  # observed-zero cell
     tampered = t.set_column(t.schema.get_field_index("cell_id"), "cell_id", pa.array(cells))
     d = diagnose(tampered, recipe)
-    assert d["structural_zero_violations"]["records_in_observed_zero_cells"] == 1
-    assert d["structural_zero_violations"]["ok"] is False
+    assert d["support_violations"]["records_in_observed_zero_cells"] == 1
+    assert d["support_violations"]["ok"] is False
     joint = d["calibration_error"]["joint_age_sex"]
     assert joint["max_abs_error"] != "0"
     assert "M|Y3" in joint["categories_with_undefined_relative_error"]

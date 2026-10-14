@@ -32,9 +32,9 @@ test('DZA crude imports are shown as missing with a reason, never as 0', async (
 
   for (const e of missing) {
     const period = String(e.support.period_label ?? e.support.temporal?.label);
-    const row = crude.getByRole('row').filter({ has: page.getByRole('cell', { name: period, exact: true }) });
+    const row = crude.getByRole('row').filter({ has: page.getByRole('rowheader', { name: period, exact: true }) });
     await expect(row, `row for ${period}`).toHaveCount(1);
-    const value = row.getByRole('cell').nth(1);
+    const value = row.getByRole('cell').first();
     const mv = value.locator('.missing-value');
     await expect(mv, `${period} renders as a missing value`).toBeVisible();
     await expect(mv).toHaveText(/^missing \(.+\)$/);
@@ -68,7 +68,7 @@ test('provenance drawer from a belief value reaches the raw artifact SHA-256 and
   const pop = panel(page, 'Population');
   await expect(pop.locator('.state-loading')).toHaveCount(0, { timeout: 30_000 });
   const period = String(est.support.period_label ?? est.support.temporal?.label);
-  const row = pop.getByRole('row').filter({ has: page.getByRole('cell', { name: period, exact: true }) });
+  const row = pop.getByRole('row').filter({ has: page.getByRole('rowheader', { name: period, exact: true }) });
   await row.getByRole('button', { name: 'Trace' }).click();
 
   const drawer = page.getByRole('dialog', { name: 'Provenance' });

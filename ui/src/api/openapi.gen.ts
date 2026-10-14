@@ -378,6 +378,9 @@ export interface paths {
         /**
          * Cancel Job
          * @description Cooperative cancellation; the partial audit trail is preserved.
+         *
+         *     Authorised per job type (``CANCEL_SCOPE``): ``simulate`` cancels simulation/replay/evaluation/population
+         *     jobs, ``ingest`` cancels ingestion/publication/discovery/maintenance jobs.
          */
         post: operations["cancel_job_v1_jobs__job_id__cancel_post"];
         delete?: never;
@@ -867,7 +870,7 @@ export interface components {
             support: components["schemas"]["SupportSummary"];
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */
-            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
+            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"];
         };
         /** BeliefListResponse */
         BeliefListResponse: {
@@ -2986,7 +2989,7 @@ export interface components {
             support: components["schemas"]["SupportSummary"];
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */
-            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
+            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"];
         };
         /** ObservationListResponse */
         ObservationListResponse: {
@@ -3473,7 +3476,7 @@ export interface components {
              * Value
              * @description Reported value of the evidence record, when any
              */
-            value: (components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"]) | null;
+            value: (components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"]) | null;
         };
         /** RelationGraph */
         RelationGraph: {
@@ -3740,6 +3743,12 @@ export interface components {
              */
             recorded_at: string;
             /**
+             * Retracted
+             * @description Retracted at/before as_of (never used as the point value)
+             * @default false
+             */
+            retracted: boolean;
+            /**
              * Retrieved At
              * Format: date-time
              */
@@ -3751,7 +3760,7 @@ export interface components {
             /** Source Revision Id */
             source_revision_id: string | null;
             /** Value */
-            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
+            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"];
         };
         /** Scenario */
         Scenario: {
@@ -3957,6 +3966,44 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
+        /**
+         * SensitivityRangeValue
+         * @description An assumption-sensitivity range over a scenario grid (L2): never a point, never a confidence interval.
+         */
+        SensitivityRangeValue: {
+            /** Basis */
+            basis: {
+                [key: string]: unknown;
+            };
+            /** Evaluated Points */
+            evaluated_points: number | null;
+            /** Includes Fixed Quantity Point */
+            includes_fixed_quantity_point: boolean | null;
+            /**
+             * @description discriminator enum property added by openapi-typescript
+             * @enum {string}
+             */
+            kind: "sensitivity_range";
+            /**
+             * Lower
+             * @description Exact decimal string
+             */
+            lower: string;
+            /**
+             * Statement
+             * @description Assumption sensitivity, not a confidence interval
+             */
+            statement: string;
+            /** Unit Ref */
+            unit_ref: string;
+            /**
+             * Upper
+             * @description Exact decimal string
+             */
+            upper: string;
+        } & {
+            [key: string]: unknown;
+        };
         /** SessionInfo */
         SessionInfo: {
             /**
@@ -4028,7 +4075,7 @@ export interface components {
             subject: components["schemas"]["EntityRef"] | null;
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */
-            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
+            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"];
             /** Variant */
             variant: string;
         };
@@ -4369,6 +4416,12 @@ export interface components {
              */
             recorded_at: string;
             /**
+             * Retracted Revisions Skipped
+             * @description Later revisions retracted at/before as_of that were skipped: the point is the latest non-retracted revision (the same rule as belief selection)
+             * @default 0
+             */
+            retracted_revisions_skipped: number;
+            /**
              * Retrieved At
              * Format: date-time
              */
@@ -4397,7 +4450,7 @@ export interface components {
             /** Valid Start */
             valid_start: string | null;
             /** Value */
-            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
+            value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["SensitivityRangeValue"] | components["schemas"]["OtherValue"];
         };
         /** TimeseriesQuery */
         TimeseriesQuery: {

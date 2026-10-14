@@ -317,7 +317,8 @@ def test_l2_sensitivity_range(db, baseline):
             # the L1 fixed-quantity row and every grid variant keep the unquantified status (R3-03)
             assert u["status"] == "unquantified" and u["kind"] == "unknown", r
             assert r["value"]["kind"] == "decimal"
-    by = {(r["label"], r["output_key"], r["variant"]): r["value"]["value"] for r in rows}
+    by = {(r["label"], r["output_key"], r["variant"]): r["value"]["value"] for r in rows
+          if r["value"]["kind"] == "decimal"}
     for label in ("France", "China", "United States"):
         for k in OUTPUTS:
             assert by[(label, k, "L2:eM=0;eX=0")] == by[(label, k, "L1")]  # zero elasticity == L1 exactly

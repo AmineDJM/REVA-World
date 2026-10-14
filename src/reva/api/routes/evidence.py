@@ -137,7 +137,7 @@ def list_observations(
     """Source records with vintage/support filters and revision lineage."""
     t = Timer()
     require_aware(as_of, "as_of")
-    cur = decode_cursor(cursor, 3)
+    cur = decode_cursor(cursor, "siu")
     with read_conn(request) as conn:
         subj = resolve_entity(conn, subject_id) if subject_id else None
         rows = [dict(r) for r in conn.execute(text(OBS_SQL), obs_params(
@@ -325,7 +325,7 @@ def list_evidence(
 ) -> s.EvidenceListResponse:
     """Scientific cards, study metadata and source disagreements in the pinned release."""
     t = Timer()
-    cur = decode_cursor(cursor, 2)
+    cur = decode_cursor(cursor, "su")
     with read_conn(request) as conn:
         rel = release_as_of(conn, None) if release_id is None else release_by_id(conn, release_id)
         if release_id is not None and rel is None:

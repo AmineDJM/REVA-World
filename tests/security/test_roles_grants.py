@@ -552,12 +552,14 @@ def test_submit_job_idempotency_key_binds_the_request(w: World) -> None:
         again = c.execute(text(sql), {"p": '{"cutoff": "2024-01-01"}', "k": key}).scalar_one()
     assert first == again  # safe retry
     fails(w.db.api, sql, {"p": '{"cutoff": "2025-01-01"}', "k": key}, match="idempotency key reused")
-    fails(
-        w.db.api,
-        "SELECT ops.submit_job('simulation', CAST(:p AS jsonb), :k, 0, 'api')",
-        {"p": '{"cutoff": "2024-01-01"}', "k": key},
-        match="idempotency key reused",
-    )
+    # Keys are scoped by creator and job type: the same client key for another type is a new job,
+    # never a silent alias of the replay job.
+    with tx(w.db.api) as c:
+        other = c.execute(
+            text("SELECT ops.submit_job('simulation', CAST(:p AS jsonb), :k, 0, 'api:test')"),
+            {"p": '{"cutoff": "2024-01-01"}', "k": key},
+        ).scalar_one()
+    assert other != first
     fails(w.db.api, sql, {"p": "{}", "k": "short"}, match="invalid idempotency key")
     fails(
         w.db.api,

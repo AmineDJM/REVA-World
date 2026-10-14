@@ -76,14 +76,18 @@ function jobProgress(job: Job | null): { label: string; fraction: number | null 
   return { label: `${humanize(job.status)}${stage ? ` — ${stage}` : ''}`, fraction };
 }
 
-/** Group results by country and output; L1 first, then L2 grid variants. */
+/** Variant of the separate L2 row whose value is the sensitivity range over the grid (kind sensitivity_range). */
+export const SENSITIVITY_VARIANT = 'L2:sensitivity_range';
+
+/** Group results by country and output; L1 first, the L2 sensitivity-range row, then L2 grid variants. */
 function groupResults(results: SimResult[]) {
-  const by = new Map<string, { country: string; output: string; l1?: SimResult; variants: SimResult[] }>();
+  const by = new Map<string, { country: string; output: string; l1?: SimResult; range?: SimResult; variants: SimResult[] }>();
   for (const r of results) {
     const country = r.subject?.label ?? String(r.applicability?.country ?? '—');
     const key = `${country}|${r.output_key}`;
     const g = by.get(key) ?? { country, output: r.output_key, variants: [] };
     if (r.variant === 'L1') g.l1 = r;
+    else if (r.variant === SENSITIVITY_VARIANT) g.range = r;
     else g.variants.push(r);
     by.set(key, g);
   }
@@ -142,7 +146,10 @@ function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationSt
   const groups = useMemo(() => groupResults(st.results), [st.results]);
   const inputs = useMemo(() => baselineInputs(st.results), [st.results]);
   const isL2 = st.run?.fidelity === 'L2';
-  const variantNames = useMemo(() => [...new Set(st.results.filter((r) => r.variant !== 'L1').map((r) => r.variant))].sort(), [st.results]);
+  const variantNames = useMemo(
+    () => [...new Set(st.results.filter((r) => r.variant !== 'L1' && r.variant !== SENSITIVITY_VARIANT).map((r) => r.variant))].sort(),
+    [st.results],
+  );
   const modelVersions = (env.model_versions ?? []).map((m) => `${m.model_key}@${m.version}`);
   const ctx = exportContext(simId, st, modelVersions, env.assumptions ?? []);
   const outcome = st.outcome;
@@ -224,7 +231,9 @@ function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationSt
                   </td>
                   {isL2 && (
                     <td>
-                      {g.l1?.uncertainty?.kind === 'sensitivity_range' && g.l1.uncertainty.lower && g.l1.uncertainty.upper ? (
+                      {g.range && g.range.value.kind === 'sensitivity_range' ? (
+                        <ValueView value={g.range.value} />
+                      ) : g.l1?.uncertainty?.kind === 'sensitivity_range' && g.l1.uncertainty.lower && g.l1.uncertainty.upper ? (
                         <span className="sensitivity-range">
                           {formatDecimalString(g.l1.uncertainty.lower)} to {formatDecimalString(g.l1.uncertainty.upper)}{' '}
                           {unitLabel(g.l1.value.kind === 'decimal' ? g.l1.value.unit_ref : undefined)}

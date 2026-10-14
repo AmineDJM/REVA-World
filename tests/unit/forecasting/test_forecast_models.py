@@ -8,6 +8,8 @@ from decimal import Decimal
 import numpy as np
 import pytest
 
+from scipy.stats import t as student_t
+
 from reva.kernel.uncertainty import UncertaintyKind, UncertaintyStatus
 from reva.models.forecasting import (
     ForecastModel,
@@ -57,7 +59,7 @@ def test_last_value_single_point_and_decimal_input():
     assert isinstance(LastValue().fit([]), IneligibleReport)
 
 
-def test_log_drift_recovers_exact_geometric_growth():
+def test_log_drift_recovers_exact_geometric_growth_but_does_not_quantify_zero_variance():
     train = geometric(12)
     fitted = LogDrift().fit(train)
     assert not isinstance(fitted, IneligibleReport)
@@ -65,29 +67,63 @@ def test_log_drift_recovers_exact_geometric_growth():
     for f in fitted.predict([1, 2, 3], level=0.8):
         expected = 100.0 * 1.05 ** (11 + f.horizon)
         assert abs(f.point - expected) / expected < 1e-9
-        lo, hi = f.interval
-        assert lo <= f.point <= hi
-        assert f.interval_kind == "prediction_interval" and f.level == 0.8
-        assert f.uncertainty.status == UncertaintyStatus.quantified
-        assert f.uncertainty.kind == UncertaintyKind.prediction_interval
-        assert f.uncertainty.method_version == "forecast.log_drift@1.0.0"
+        # R3-04: constant growth gives zero residual variance; a zero-width interval
+        # must not pass as a quantified 80% prediction interval.
+        assert f.interval is None and f.interval_kind is None and f.level is None
+        assert f.predictive is None
+        assert f.uncertainty.status == UncertaintyStatus.unquantified
+        assert f.uncertainty.kind == UncertaintyKind.unknown
+        assert "zero sample variance" in f.uncertainty.description
 
 
-def test_log_drift_interval_formula_and_widening():
+def test_log_drift_interval_is_student_t_with_t_minus_one_df():
     train = noisy_positive(15)
     fitted = LogDrift().fit(train)
     assert not isinstance(fitted, IneligibleReport)
     z = np.log([v for _, v in train])
     d = np.diff(z)
     sd, T = d.std(ddof=1), d.size
-    q = 1.2815515655446004  # Phi^-1(0.9) for an 80% central interval
+    q = float(student_t.ppf(0.9, T - 1))  # 80% central interval, df = T - 1 = 13
+    assert q > 1.2815515655446004  # wider than the plug-in normal quantile
     f1, f3 = fitted.predict([1, 3], level=0.8)
     for f, h in ((f1, 1), (f3, 3)):
         half = q * sd * math.sqrt(h * (1 + h / T))
         centre = z[-1] + h * d.mean()
         assert f.interval[0] == pytest.approx(math.exp(centre - half), rel=1e-9)
         assert f.interval[1] == pytest.approx(math.exp(centre + half), rel=1e-9)
+        assert f.interval_kind == "prediction_interval" and f.level == 0.8
+        assert f.uncertainty.status == UncertaintyStatus.quantified
+        assert f.uncertainty.method_version == "forecast.log_drift@1.0.0"
+        p = f.predictive
+        assert p is not None and p.family == "student_t" and p.df == T - 1
+        assert p.loc == pytest.approx(centre) and p.scale == pytest.approx(half / q)
     assert (f3.interval[1] - f3.interval[0]) > (f1.interval[1] - f1.interval[0])
+
+
+def test_log_drift_interval_unquantified_below_two_degrees_of_freedom():
+    # n=3 -> T=2 differences -> df=1 (< 2): point forecast only.
+    (f,) = LogDrift().fit(noisy_positive(3)).predict([1])
+    assert math.isfinite(f.point)
+    assert f.interval is None and f.predictive is None
+    assert f.uncertainty.status == UncertaintyStatus.unquantified
+    assert "df=1 < 2" in f.uncertainty.description
+    # n=4 -> df=2: quantified.
+    (g,) = LogDrift().fit(noisy_positive(4)).predict([1])
+    assert g.interval is not None and g.uncertainty.status == UncertaintyStatus.quantified
+
+
+def test_log_drift_t_interval_is_calibrated_in_short_windows():
+    """Simulation from the model's own DGP: nominal 0.80 coverage at n=4 and n=6."""
+    rng = np.random.default_rng(20261014)
+    for n in (4, 6):
+        hits = []
+        for _ in range(3000):
+            z = np.log(100.0) + np.cumsum(rng.normal(0.02, 0.05, n + 1))
+            train = [(2000 + t, float(math.exp(v))) for t, v in enumerate(z[:n])]
+            (f,) = LogDrift().fit(train).predict([1], level=0.8)
+            hits.append(f.interval[0] <= math.exp(z[n]) <= f.interval[1])
+        # Monte-Carlo SE ~0.0073; the old normal plug-in gave ~0.67 (n=4) and ~0.72 (n=6).
+        assert abs(np.mean(hits) - 0.80) < 0.025, (n, np.mean(hits))
 
 
 @pytest.mark.parametrize("bad", [0.0, -1.0, Decimal("0")])
@@ -124,6 +160,13 @@ def test_local_level_finite_forecasts_with_prediction_interval():
         assert f.interval_kind == "prediction_interval"
         assert f.uncertainty.kind == UncertaintyKind.prediction_interval
         assert f.uncertainty.level == 0.8
+        # R3-05: plug-in MLE interval is labelled as not calibrated.
+        assert "nominal coverage not calibrated" in f.uncertainty.description
+        assert any("not calibrated" in c for c in f.uncertainty.conditioning)
+        p = f.predictive
+        assert p is not None and p.family == "normal" and p.df is None
+        z_lo = p.loc + float(student_t.ppf(0.1, 1e9)) * p.scale
+        assert math.exp(z_lo) == pytest.approx(lo, rel=1e-6)
     widths = [f.interval[1] - f.interval[0] for f in fcs]
     assert widths == sorted(widths)
 

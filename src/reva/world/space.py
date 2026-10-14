@@ -9,7 +9,7 @@ from typing import Any
 
 from sqlalchemy import Connection, text
 
-from reva.adapters.connectors.naturalearth import NaturalEarthConnector, classify_feature
+from reva.adapters.connectors.naturalearth import DISPUTED_TYPES, NaturalEarthConnector
 from reva.adapters.postgres import repositories as repo
 from reva.evidence.ingest import PublishSummary
 from reva.ports.connectors import ObservationBatch, RawAcquisition
@@ -20,6 +20,15 @@ DISPLAY_NOTES = {
     "France and Monaco; WDI FRA follows World Bank coverage notes. Supports differ.",
     "USA": "Comtrade reporter 842 includes Puerto Rico and US Virgin Islands; display polygon differs.",
 }
+
+
+def display_match_status(props: dict[str, Any], *, matched: bool) -> str:
+    """Display classification only (never a sovereignty statement): 'disputed' iff the
+    Natural Earth TYPE is Disputed or Indeterminate; otherwise reviewed_match/unmatched.
+    NOTE_BRK alone does not mark a feature disputed (recorded as a display note)."""
+    if str(props.get("TYPE")) in DISPUTED_TYPES:
+        return "disputed"
+    return "reviewed_match" if matched else "unmatched"
 
 
 def publish_display_geometries(
@@ -40,13 +49,15 @@ def publish_display_geometries(
         props = dict(f["properties"])
         key = str(props.get("ADM0_A3") or f"feature-{i}")
         entity = repo.resolve_alias(conn, "naturalearth_adm0_a3", key)
-        status = "reviewed_match" if entity else classify_feature(props)
-        if entity and str(props.get("TYPE")) in ("Disputed", "Indeterminate"):
-            status = "disputed"
+        status = display_match_status(props, matched=entity is not None)
         counts[status] = counts.get(status, 0) + 1
         props["display_only"] = True
         if key in DISPLAY_NOTES:
             props["display_note"] = DISPLAY_NOTES[key]
+        if props.get("NOTE_BRK"):
+            # Kept as a display note only: a breakaway/dispute note does not make the
+            # feature itself 'disputed' (it is present e.g. on ISR and ATA).
+            props["display_note_brk"] = str(props["NOTE_BRK"])
         conn.execute(
             text(
                 """INSERT INTO world.display_geometry(dataset_sha256, feature_key, entity_id, match_status,

@@ -19,7 +19,7 @@ from sqlalchemy import Connection, text
 
 from reva.api import schemas as s
 from reva.api.auth import require_scope
-from reva.api.deps import Timer, origin_warnings, read_conn
+from reva.api.deps import SCENARIO_BANNER, Timer, origin_warnings, read_conn
 from reva.api.errors import ApiProblem, NotFound
 
 router = APIRouter(prefix="/v1", tags=["provenance"], dependencies=[Depends(require_scope("read"))])
@@ -45,6 +45,7 @@ class Builder:
         self.queue: deque[tuple[str, str, int]] = deque()
         self.truncated = False
         self.origins: set[str] = set()
+        self.scenario_context: Any = None  # context of the first scenario reached (simulation lineage)
 
     @staticmethod
     def key(kind: str, ident: Any) -> str:
@@ -249,6 +250,8 @@ class Builder:
                          WHERE sc.id = :i""", i=ident)
         if sc is None:
             return None
+        if self.scenario_context is None:
+            self.scenario_context = sc["context_id"]
         k = self.add("scenario", ident, sc["spec"].get("title", "scenario"), spec_digest=sc["spec_digest"],
                      spec_sha256=sc["spec_sha256"], created_by=sc["created_by"], recorded_at=sc["recorded_at"],
                      model_key=sc["spec"].get("model_key"), model_version=sc["spec"].get("model_version"),
@@ -324,11 +327,16 @@ def get_provenance(
     warnings = origin_warnings(org)
     if b.truncated:
         warnings.append(s.ApiWarning(code="truncated", message=f"Lineage bounded at max_nodes={max_nodes}"))
-    mode = ("simulation" if kind in ("sim_result", "run", "scenario")
-            else "belief" if kind in ("estimate", "release") else "evidence")
+    simulation = kind in ("sim_result", "run", "scenario")
+    mode = "simulation" if simulation else "belief" if kind in ("estimate", "release") else "evidence"
+    if simulation:
+        # Scenario lineage carries scenario values: same banner and modality as every simulation response.
+        warnings.append(SCENARIO_BANNER)
     return s.ProvenanceResponse(
         data=s.ProvenanceGraph(root=root, nodes=list(b.nodes.values()), edges=b.edges, truncated=b.truncated,
                                max_nodes=max_nodes),
-        context_mode=mode, origin=org, modality="metadata", warnings=warnings,  # type: ignore[arg-type]
+        context_id=b.scenario_context if simulation else None,
+        context_mode=mode, origin=org,  # type: ignore[arg-type]
+        modality="assumption_conditioned_scenario" if simulation else "metadata", warnings=warnings,
         cost=t.cost(len(b.nodes)),
     )

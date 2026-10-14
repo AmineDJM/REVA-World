@@ -15,12 +15,13 @@ from uuid import UUID
 
 from fastapi import APIRouter, Body, Depends, Query, Request, Response
 from sqlalchemy import Connection, text
-from sqlalchemy.exc import DBAPIError
+from sqlalchemy.exc import DBAPIError, IntegrityError
 
 from reva.api import schemas as s
 from reva.api.auth import Principal, require_scope
 from reva.api.deps import (
     DEFAULT_PAGE,
+    SCENARIO_BANNER,
     Timer,
     decode_cursor,
     get_engine,
@@ -46,11 +47,6 @@ from reva.simulation.spec import RESERVED_FIDELITY, SUPPORTED_FIDELITY, validate
 router = APIRouter(prefix="/v1", tags=["simulation"], dependencies=[Depends(require_scope("read"))])
 query_router = APIRouter(prefix="/v1", tags=["query"], dependencies=[Depends(require_scope("read"))])
 
-SCENARIO_BANNER = s.ApiWarning(
-    code="scenario_context",
-    message="Assumption-conditioned scenario output in a simulation context: not a forecast, not an observation "
-    "and never accepted as real-world evidence.",
-)
 
 
 @lru_cache(maxsize=1)
@@ -140,11 +136,21 @@ def create_scenario(
             raise ValidationProblem("scenario knowledge_cutoff is in the future")
         existed = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_digest = :d"),
                                {"d": parsed.digest()}).scalar_one_or_none()
-        sid = conn.execute(
-            text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :canonical_bytes, :digest, :actor)"),
-            {"spec": json.dumps(parsed.as_json()), "canonical_bytes": parsed.canonical_bytes(),
-             "digest": parsed.digest(), "actor": principal.actor},
-        ).scalar_one()
+        try:
+            with conn.begin_nested():
+                sid = conn.execute(
+                    text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :canonical_bytes, :digest, :actor)"),
+                    {"spec": json.dumps(parsed.as_json()), "canonical_bytes": parsed.canonical_bytes(),
+                     "digest": parsed.digest(), "actor": principal.actor},
+                ).scalar_one()
+        except IntegrityError as e:
+            # A concurrent identical request committed first (UNIQUE spec_digest): return that scenario.
+            if getattr(getattr(e, "orig", None), "sqlstate", None) != "23505":
+                raise
+            existed = sid = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_digest = :d"),
+                                         {"d": parsed.digest()}).scalar_one_or_none()
+            if sid is None:
+                raise
         row = fetch_scenario(conn, sid)
     assert row is not None
     if existed is not None:
@@ -169,7 +175,7 @@ def list_scenarios(
     request: Request, cursor: str | None = None, limit: int = Query(DEFAULT_PAGE, ge=1, le=1000),
 ) -> s.ScenarioListResponse:
     t = Timer()
-    cur = decode_cursor(cursor, 2)
+    cur = decode_cursor(cursor, "tu")
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(
             SCENARIO_SQL + """ WHERE (CAST(:c0 AS timestamptz) IS NULL
@@ -491,6 +497,8 @@ def run_query(request: Request, spec: s.QuerySpec = Body(..., discriminator="kin
             return timeseries_response(conn, t, subject=spec.subject_id, concept=spec.concept, as_of=spec.as_of,
                                        revisions=spec.revisions)
         if isinstance(spec, s.BeliefsQuery):
+            if spec.as_of is not None and spec.as_of.tzinfo is None:
+                raise ValidationProblem("as_of must include a timezone offset")
             return beliefs_response(conn, t, release_id=spec.release_id, as_of=spec.as_of, origin=None,
                                     subjects=list(spec.subject_ids) or None, concepts=list(spec.concepts) or None,
                                     year=None, cursor=None, limit=spec.limit)

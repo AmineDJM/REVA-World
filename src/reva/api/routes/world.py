@@ -80,7 +80,7 @@ def list_entities(
     limit: int = Depends(page_limit),
 ) -> s.EntityListResponse:
     t = Timer()
-    cur = decode_cursor(cursor, 2)
+    cur = decode_cursor(cursor, "su")
     pattern = None
     if q:
         pattern = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
@@ -312,7 +312,7 @@ def list_events(
 ) -> s.EventListResponse:
     """Occurrences (real-world events). An empty list means none are recorded."""
     t = Timer()
-    cur = decode_cursor(cursor, 1)
+    cur = decode_cursor(cursor, "u")
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(
             """SELECT oc.entity_id, e.label, c.concept_id AS event_type, oc.component, sp.id AS support_id,

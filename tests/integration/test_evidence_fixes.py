@@ -353,6 +353,10 @@ def test_r3_08_decimal_values_compare_numerically() -> None:
         ("X", "100", "100", "100", "FOB", None),
         ("X", "100", None, "100", "FOB", None),
         ("X", "100", "100", "90", VALUATION_UNDETERMINED, "export_cif_label_impossible"),
+        # 0.0 cif/fob are flags only and never "match" (live CHN/USA 2020-21 rows)
+        ("M", "0", "0", None, VALUATION_UNDETERMINED, None),
+        ("M", "100", "100", "0", "CIF", None),
+        ("X", "0", None, "0", VALUATION_UNDETERMINED, None),
     ],
 )
 def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: str | None, label: str,
@@ -372,6 +376,31 @@ def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: s
     codes = {f.code for f in report.findings}
     assert ("valuation_basis_undetermined" in codes) == (warning is not None)
     assert all(f.severity != "blocker" for f in report.findings if f.code == "valuation_basis_undetermined")
+
+
+def test_comtrade_estimation_flag_replaces_uninformative_derived_flag() -> None:
+    ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
+    body = copy.deepcopy(_ct_body(156, "M", 2023))
+    body["data"][0].update({"isReported": False, "isAggregate": True, "legacyEstimationFlag": 0})
+    batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
+    v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
+    assert v.source_flags["isReported"] is False and v.source_flags["isAggregate"] is True  # raw flags kept
+    assert v.source_flags["provider_estimation_flagged"] is False
+    assert "provider_derived_aggregate" not in v.source_flags
+    body["data"][0]["legacyEstimationFlag"] = 6
+    batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
+    v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
+    assert v.source_flags["provider_estimation_flagged"] is True and str(v.source_flags["legacyEstimationFlag"]) == "6"
+    assert "provider_estimation_flagged" in {f.code for f in report.findings}
+
+
+def test_display_geometry_disputed_only_by_type() -> None:
+    from reva.world.space import display_match_status
+
+    assert display_match_status({"TYPE": "Sovereign country", "NOTE_BRK": "x"}, matched=False) == "unmatched"
+    assert display_match_status({"TYPE": "Indeterminate"}, matched=False) == "disputed"
+    assert display_match_status({"TYPE": "Disputed"}, matched=True) == "disputed"
+    assert display_match_status({"TYPE": "Country", "NOTE_BRK": "y"}, matched=True) == "reviewed_match"
 
 
 # --------------------------------------------------------------------------- R-10

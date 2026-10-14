@@ -100,6 +100,10 @@ def install_error_handlers(app: FastAPI) -> None:
         sqlstate = getattr(getattr(exc, "orig", None), "sqlstate", None)
         if sqlstate == "P0001":
             return problem_response(request, _problem(422, "rejected_by_database", _db_message(exc)))
+        if isinstance(sqlstate, str) and sqlstate.startswith("22"):
+            # data exception (bad cast, out of range...): a client parameter problem, not a server fault
+            return problem_response(request, _problem(400, "invalid_parameter",
+                                                      "a request parameter has an invalid value"))
         if sqlstate == "57014":
             return problem_response(request, _problem(503, "statement_timeout", "query exceeded the time budget"))
         log.exception("database error")

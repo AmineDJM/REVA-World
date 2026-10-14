@@ -18,10 +18,11 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import threading
 import time
-from collections import deque
+from collections import OrderedDict, deque
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -43,6 +44,7 @@ SESSION_TTL = timedelta(hours=8)
 ALL_SCOPES = frozenset({"read", "simulate", "ingest", "review"})
 ADMIN_USERNAME = "admin"
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
+HUMAN_TOKEN_LABEL = re.compile(r"human:[a-z0-9][a-z0-9._-]{0,63}")
 LOGIN_ATTEMPTS_PER_MINUTE = 5  # default when not configured
 LOGIN_RATE_LIMIT_ENV = "REVA_LOGIN_RATE_LIMIT_PER_MINUTE"
 LOGIN_RATE_LIMIT_MAX = 1000
@@ -93,14 +95,27 @@ class Principal:
     token_id: str | None = None
     token_label: str | None = None
 
+    principal_kind: str | None = None  # ops.api_token.principal_kind when the column exists
+
     @property
     def human_reviewer(self) -> str | None:
-        """Reviewer identity for ops.review_proposal (must be human:<name>)."""
+        """Reviewer identity for ops.review_proposal (must be human:<name>), or None.
+
+        Only (a) the interactive admin session, or (b) an API token that is explicitly a human reviewer
+        token: it carries the ``review`` scope, its label is ``human:<name>`` (lowercase name, not the
+        reserved session identity ``human:admin``), and, once ``ops.api_token.principal_kind`` exists, its
+        principal kind is ``human``. Service tokens never review, whatever their label.
+        """
         if self.method == "session":
             return f"human:{self.username}"
-        if self.token_label and self.token_label.startswith("human:"):
-            return self.token_label
-        return None
+        label = self.token_label or ""
+        if "review" not in self.scopes or not HUMAN_TOKEN_LABEL.fullmatch(label):
+            return None
+        if label == f"human:{ADMIN_USERNAME}":
+            return None  # reserved: indistinguishable from the interactive admin session
+        if self.principal_kind is not None and self.principal_kind != "human":
+            return None
+        return label
 
 
 def login_rate_limit_per_minute(settings: Settings, override: int | None = None) -> int:
@@ -133,28 +148,60 @@ def login_rate_limit_per_minute(settings: Settings, override: int | None = None)
 
 
 class LoginRateLimiter:
-    """In-memory sliding window per client (single API process in V1)."""
+    """In-memory sliding window per client plus a global window (single API process in V1).
 
-    def __init__(self, limit: int = LOGIN_ATTEMPTS_PER_MINUTE, window_seconds: float = 60.0) -> None:
+    Memory is bounded: at most ``max_keys`` client buckets are kept in LRU order and idle buckets (no
+    attempt within the window) are evicted from the front, so every attempt costs amortised O(1). The
+    global bucket (``global_limit`` attempts per window across all clients) bounds Argon2 work under
+    distributed guessing; it is checked before any password verification.
+    """
+
+    GLOBAL_KEY = "__global__"
+
+    def __init__(self, limit: int = LOGIN_ATTEMPTS_PER_MINUTE, window_seconds: float = 60.0,
+                 max_keys: int = 10_000, global_limit: int | None = None) -> None:
         self.limit = limit
         self.window = window_seconds
-        self._hits: dict[str, deque[float]] = {}
+        self.max_keys = max_keys
+        self.global_limit = global_limit if global_limit is not None else max(60, 12 * limit)
+        self._hits: OrderedDict[str, deque[float]] = OrderedDict()
+        self._global: deque[float] = deque()
         self._lock = threading.Lock()
 
+    def _prune(self, q: deque[float], now: float) -> None:
+        while q and now - q[0] > self.window:
+            q.popleft()
+
+    def _evict(self, now: float) -> None:
+        # Front = least recently used. Drop idle buckets, then enforce the size bound.
+        while self._hits:
+            q = next(iter(self._hits.values()))
+            if (q and now - q[-1] > self.window) or not q or len(self._hits) > self.max_keys:
+                self._hits.popitem(last=False)
+                continue
+            break
+
+    def __len__(self) -> int:
+        return len(self._hits)
+
     def check_and_record(self, key: str) -> float | None:
-        """Record an attempt; return seconds to wait if the limit is exceeded."""
+        """Record an attempt; return seconds to wait if a limit is exceeded."""
         now = time.monotonic()
         with self._lock:
-            q = self._hits.setdefault(key, deque())
-            while q and now - q[0] > self.window:
-                q.popleft()
+            self._prune(self._global, now)
+            if len(self._global) >= self.global_limit:
+                return max(1.0, self.window - (now - self._global[0]))
+            q = self._hits.get(key)
+            if q is None:
+                q = self._hits[key] = deque()
+            else:
+                self._hits.move_to_end(key)
+            self._prune(q, now)
             if len(q) >= self.limit:
                 return max(1.0, self.window - (now - q[0]))
             q.append(now)
-            if len(self._hits) > 10_000:  # bound memory
-                for k in list(self._hits)[:5_000]:
-                    if not self._hits[k]:
-                        del self._hits[k]
+            self._global.append(now)
+            self._evict(now)
             return None
 
 
@@ -226,13 +273,27 @@ class AuthService:
                    {"client": ck, "session": hashlib.sha256(sid.encode()).hexdigest()[:16]})
         return principal, cookie
 
+    @staticmethod
+    def _sid_key(sid: str) -> str:
+        return hashlib.sha256(sid.encode()).hexdigest()
+
     def logout(self, principal: Principal) -> None:
+        """End the session for good: the revocation is persisted (ops.session_revocation), so a copied
+        cookie stays invalid across API restarts until it would have expired anyway."""
         if principal.session_id:
             with self._lock:
                 now = time.time()
                 self._revoked = {k: v for k, v in self._revoked.items() if v > now}
                 self._revoked[principal.session_id] = now + SESSION_TTL.total_seconds()
-            self.audit(principal.actor, "session.logout", {"username": principal.username}, {})
+            expires = principal.expires_at or (datetime.now(UTC) + SESSION_TTL)
+            with self.engine_getter().begin() as conn:
+                conn.execute(
+                    text("INSERT INTO ops.session_revocation(session_id, expires_at) VALUES (:s, :e) "
+                         "ON CONFLICT (session_id) DO NOTHING"),
+                    {"s": self._sid_key(principal.session_id), "e": expires},
+                )
+            self.audit(principal.actor, "session.logout", {"username": principal.username},
+                       {"session": self._sid_key(principal.session_id)[:16]})
 
     # --- authentication -------------------------------------------------
     def _from_session(self, cookie: str) -> Principal:
@@ -245,9 +306,16 @@ class AuthService:
         if not isinstance(data, dict) or data.get("u") != ADMIN_USERNAME:
             raise Unauthenticated("session is invalid")
         sid = str(data.get("sid", ""))
+        if len(sid) < 16:
+            raise Unauthenticated("session is invalid")
         with self._lock:
             if sid in self._revoked:
                 raise Unauthenticated("session has ended")
+        with self.engine_getter().connect() as conn:
+            revoked = conn.execute(text("SELECT 1 FROM ops.session_revocation WHERE session_id = :s"),
+                                   {"s": self._sid_key(sid)}).scalar_one_or_none()
+        if revoked is not None:
+            raise Unauthenticated("session has ended")
         return Principal(ADMIN_USERNAME, f"human:{ADMIN_USERNAME}", "session", ALL_SCOPES,
                          str(data.get("csrf", "")), sid, signed_at + SESSION_TTL)
 
@@ -256,14 +324,15 @@ class AuthService:
             raise Unauthenticated("invalid token")
         with self.engine_getter().connect() as conn:
             row = conn.execute(
-                text("SELECT id, scopes, label, revoked_at FROM ops.api_token WHERE token_sha256 = :h"),
+                text("SELECT * FROM ops.api_token WHERE token_sha256 = :h"),
                 {"h": token_sha256(token)},
             ).mappings().one_or_none()
         if row is None or row["revoked_at"] is not None:
             raise Unauthenticated("token is invalid or revoked")
         scopes = frozenset(s for s in (row["scopes"] or []) if s in ALL_SCOPES)
         label = str(row["label"])
-        return Principal(label, f"token:{label}", "token", scopes, token_id=str(row["id"]), token_label=label)
+        return Principal(label, f"token:{label}", "token", scopes, token_id=str(row["id"]), token_label=label,
+                         principal_kind=row.get("principal_kind"))
 
     def authenticate(self, request: Request) -> Principal:
         cached = getattr(request.state, "principal", None)

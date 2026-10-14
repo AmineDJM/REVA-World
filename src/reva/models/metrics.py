@@ -32,9 +32,7 @@ import math
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
 
-from scipy.special import beta as beta_fn
-from scipy.stats import norm
-from scipy.stats import t as student_t
+from scipy.special import stdtr
 
 from reva.kernel.uncertainty import UncertaintyKind
 
@@ -180,6 +178,18 @@ def mean_interval_width(
     return math.fsum(widths) / len(widths)
 
 
+def _beta(a: float, b: float) -> float:
+    return math.exp(math.lgamma(a) + math.lgamma(b) - math.lgamma(a + b))
+
+
+def _norm_cdf(z: float) -> float:
+    return 0.5 * math.erfc(-z / math.sqrt(2.0))
+
+
+def _norm_pdf(z: float) -> float:
+    return math.exp(-0.5 * z * z) / math.sqrt(2.0 * math.pi)
+
+
 def interval_score(interval: tuple[float, float], actual: float, level: float) -> float:
     """Interval score of a central ``level`` prediction interval (lower is better).
 
@@ -221,9 +231,10 @@ def crps_student_t(actual: float, loc: float, scale: float, df: float) -> float:
     if v <= 1.0:
         raise ValueError("CRPS of a Student-t requires df > 1")
     z = (_finite(actual, "actual") - _finite(loc, "loc")) / s
-    cdf = float(student_t.cdf(z, v))
-    pdf = float(student_t.pdf(z, v))
-    const = 2.0 * math.sqrt(v) * float(beta_fn(0.5, v - 0.5)) / ((v - 1.0) * float(beta_fn(0.5, v / 2.0)) ** 2)
+    cdf = float(stdtr(v, z))
+    log_norm = math.lgamma((v + 1.0) / 2.0) - math.lgamma(v / 2.0) - 0.5 * math.log(v * math.pi)
+    pdf = math.exp(log_norm - (v + 1.0) / 2.0 * math.log1p(z * z / v))
+    const = 2.0 * math.sqrt(v) * _beta(0.5, v - 0.5) / ((v - 1.0) * _beta(0.5, v / 2.0) ** 2)
     return s * (z * (2.0 * cdf - 1.0) + 2.0 * pdf * (v + z * z) / (v - 1.0) - const)
 
 
@@ -236,9 +247,7 @@ def crps_gaussian(actual: float, mu: float, sigma: float) -> float:
     if s <= 0:
         raise ValueError("sigma must be > 0")
     z = (_finite(actual, "actual") - _finite(mu, "mu")) / s
-    return s * (
-        z * (2.0 * float(norm.cdf(z)) - 1.0) + 2.0 * float(norm.pdf(z)) - 1.0 / math.sqrt(math.pi)
-    )
+    return s * (z * (2.0 * _norm_cdf(z) - 1.0) + 2.0 * _norm_pdf(z) - 1.0 / math.sqrt(math.pi))
 
 
 def log_score_gaussian(actual: float, mu: float, sigma: float) -> float:

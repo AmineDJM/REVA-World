@@ -82,7 +82,18 @@ export interface OtherValue {
   kind: 'category' | 'text' | 'entity' | 'array' | 'distribution' | 'geometry';
   [k: string]: unknown;
 }
-export type TypedValue = DecimalValue | FloatValue | MissingValueT | OtherValue;
+/** L2 assumption-sensitivity range over the elasticity grid: never a point and never a confidence interval. */
+export interface SensitivityRangeValue {
+  kind: 'sensitivity_range';
+  lower: string;
+  upper: string;
+  unit_ref: string;
+  basis?: MeasurementBasis;
+  evaluated_points?: number | null;
+  includes_fixed_quantity_point?: boolean | null;
+  statement: string;
+}
+export type TypedValue = DecimalValue | FloatValue | MissingValueT | SensitivityRangeValue | OtherValue;
 
 /** Full uncertainty record (reva.kernel.uncertainty.UncertaintySpec). */
 export interface Uncertainty {
@@ -420,6 +431,8 @@ export interface RevisionEntry {
   retrieved_at: string;
   recorded_at: string;
   source_published_at?: string | null;
+  /** Retracted at/before as_of: never used as the point value. */
+  retracted?: boolean;
 }
 
 export interface TimeseriesPoint {
@@ -439,6 +452,8 @@ export interface TimeseriesPoint {
   retrieved_at: string;
   source_published_at?: string | null;
   origin: RecordOrigin;
+  /** Later revisions retracted at/before as_of that were skipped (latest non-retracted revision shown). */
+  retracted_revisions_skipped?: number;
   revisions?: RevisionEntry[] | null;
 }
 

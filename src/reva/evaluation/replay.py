@@ -219,7 +219,7 @@ def available_then_reconstruction(
     concepts: Sequence[str] | None = None,
 ) -> dict[str, Any]:
     """Re-run source_select_v1 over observations with proven availability <= cutoff."""
-    from reva.belief.selection import METHOD_KEY, METHOD_VERSION, select
+    from reva.belief.selection import METHOD_KEY, METHOD_VERSION, select_report
     from reva.ontology.registry import load_registry
 
     now = _check_cutoff(conn, cutoff)
@@ -231,7 +231,8 @@ def available_then_reconstruction(
     no_policy = sum(1 for r in scope.rows if not prefs.get(r["concept_id"]))
     if no_policy:
         scope.exclusions["no_published_selection_policy"] += no_policy
-    selections = select(scope.rows, prefs)
+    report = select_report(scope.rows, prefs)
+    selections = report.selections
     by_id = {str(r["id"]): r for r in scope.rows}
     inputs = []
     for s in selections:
@@ -265,6 +266,7 @@ def available_then_reconstruction(
         for s in selections
     ]
     m["exclusions"] = scope.exclusion_report()
+    m["withheld"] = [w.as_json() for w in report.withheld]  # incomparable lineages: no value (R3-08)
     m["post_cutoff_flags"] = scope.flag_report()
     m["excluded_without_proof"] = scope.exclusions.get("no_availability_proof", 0)
     m["candidate_revisions_with_proof"] = scope.candidate_revisions

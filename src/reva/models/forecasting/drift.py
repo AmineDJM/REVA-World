@@ -42,7 +42,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 import numpy as np
-from scipy.stats import t as student_t
+from scipy.special import stdtrit
 
 from reva.kernel.uncertainty import UncertaintySpec
 from reva.models.forecasting.base import (
@@ -105,7 +105,7 @@ class FittedLogDrift:
         lvl = check_level(level)
         hs = check_horizons(horizons)
         reason = self.unquantified_reason
-        q = None if reason else float(student_t.ppf(0.5 + lvl / 2.0, self.df))
+        q = None if reason else float(stdtrit(self.df, 0.5 + lvl / 2.0))
         out: list[Forecast] = []
         for h in hs:
             centre = self.log_last + h * self.drift_mean

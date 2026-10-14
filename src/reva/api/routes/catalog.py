@@ -232,7 +232,7 @@ def list_evaluations(
     manifest is included (``included_as = naive_baseline_comparator``) so scores are never shown without it.
     """
     t = Timer()
-    cur = decode_cursor(cursor, 2)
+    cur = decode_cursor(cursor, "tu")
     try:
         mid: UUID | None = UUID(model_ref)
         key = None
@@ -502,7 +502,7 @@ def list_proposals(
 ) -> s.ProposalListResponse:
     """Autonomy proposals with gate results and human reviews."""
     t = Timer()
-    cur = decode_cursor(cursor, 2)
+    cur = decode_cursor(cursor, "tu")
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(
             """SELECT p.id, p.proposal_type, p.manifest_sha256, p.permission_tier, p.summary, p.author, p.recorded_at,

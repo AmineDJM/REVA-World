@@ -602,19 +602,38 @@ def _select_partition(
     }
     open_observed = "Y_OPEN" in observed_codes
 
-    # 1. finest disjoint cover of the observed age range (Y_OPEN, when observed, is the top)
-    obs_cands: dict[str, Interval] = {}
+    # 1. finest disjoint cover of the observed age range. When Y_OPEN is observed it is
+    #    the open top group, provisionally placed one above the highest *minimal*
+    #    observed finite cell (a cell containing no other observed cell): source age
+    #    cells are disjoint, so Y_OPEN cannot start lower. Open bands (Y_GEn) then
+    #    overlap Y_OPEN and are only subtotals.
+    finite_obs: dict[str, Interval] = {}
+    open_bands: dict[str, Interval] = {}
     for a in observed_codes:
         iv = parse_age_code(a).interval
-        if iv is not None and (iv[1] is not None or not open_observed):
-            obs_cands[a] = iv
-    chosen = finest_disjoint_cover(obs_cands)
-    if chosen is None:
+        if iv is None:
+            continue
+        (finite_obs if iv[1] is not None else open_bands)[a] = iv
+    minimal_his = [
+        iv[1]
+        for a, iv in finite_obs.items()
+        if iv[1] is not None
+        and not any(b != a and ivb != iv and _contains(iv, ivb) for b, ivb in finite_obs.items())
+    ]
+    provisional_open = max(minimal_his) + 1 if minimal_his else None
+    obs_cands: dict[str, Interval] = dict(finite_obs)
+    if not open_observed:
+        obs_cands.update(open_bands)
+    elif provisional_open is not None:
+        obs_cands["Y_OPEN"] = (provisional_open, None)
+    cover = finest_disjoint_cover(obs_cands)
+    if cover is None:
         raise ValidationProblem(
             "observed age codes overlap without any disjoint cover; the leaf partition is "
             "ambiguous and would double-count or drop population",
             age_codes=sorted(obs_cands, key=_age_sort_key),
         )
+    chosen = tuple(a for a in cover if a != "Y_OPEN")
     chosen_ivs = [obs_cands[a] for a in chosen]
     top_is_band = any(iv[1] is None for iv in chosen_ivs)
     open_is_leaf = "Y_OPEN" in present and not top_is_band
@@ -628,15 +647,25 @@ def _select_partition(
     def uncovered(iv: Interval) -> bool:
         return all(not _overlaps(iv, c) for c in chosen_ivs)
 
+    declared_top = declared_open_lo if open_is_leaf else None
     miss_cands: dict[str, Interval] = {}
-    finite_hi = [iv[1] for a in present if (iv := parse_age_code(a).interval) and iv[1] is not None]
     for a in present - observed_codes:
         iv = parse_age_code(a).interval
         if iv is None or (iv[1] is None and open_is_leaf) or not uncovered(iv):
             continue
+        if declared_top is not None and iv[0] >= declared_top:
+            continue  # inside Y_OPEN per the declared bound: a sub-cell, not a missing leaf
+        if declared_top is not None and (iv[1] is None or iv[1] >= declared_top):
+            raise ValidationProblem(
+                f"age code {a} straddles the declared Y_OPEN lower bound {declared_top}",
+                open_age_lower_bound=declared_top,
+            )
         miss_cands[a] = iv
+    # ages in gaps between named cells (e.g. Y8 absent for both sexes) are absent leaves
+    finite_hi = [iv[1] for iv in (*chosen_ivs, *miss_cands.values()) if iv[1] is not None]
     if finite_hi:
-        for age in range(0, max(finite_hi) + 1):
+        top_age = max(finite_hi) if declared_top is None else min(max(finite_hi), declared_top - 1)
+        for age in range(0, top_age + 1):
             iv = (age, age)
             if uncovered(iv) and all(not _overlaps(iv, m) for m in miss_cands.values()):
                 miss_cands[single_age_code(age)] = iv
@@ -659,8 +688,6 @@ def _select_partition(
         # no Y_OPEN, or Y_OPEN lies inside an open band leaf (e.g. Y_GE85): no bound needed
         open_lo, basis = None, "not_applicable: no Y_OPEN leaf in the partition"
     elif declared_open_lo is not None:
-        if isinstance(declared_open_lo, bool) or not isinstance(declared_open_lo, int):
-            raise ValidationProblem("open_age_lower_bound must be an int")
         if all_finite_leaf_hi and declared_open_lo <= max(all_finite_leaf_hi):
             raise ValidationProblem(
                 f"declared Y_OPEN lower bound {declared_open_lo} overlaps finite age cells "
@@ -780,6 +807,14 @@ def build_recipe(
         reference_date = date.fromisoformat(reference_date)
     if not geography:
         raise ValidationProblem("geography is required")
+    if open_age_lower_bound is not None and (
+        isinstance(open_age_lower_bound, bool)
+        or not isinstance(open_age_lower_bound, int)
+        or open_age_lower_bound < 1
+    ):
+        raise ValidationProblem(
+            "open_age_lower_bound must be a positive int", open_age_lower_bound=open_age_lower_bound
+        )
     if inconsistency_explanation is not None and not inconsistency_explanation.strip():
         raise ValidationProblem("inconsistency_explanation must be a non-empty explanation")
 

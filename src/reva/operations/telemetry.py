@@ -348,6 +348,14 @@ INGEST_REQUESTS = REGISTRY.counter("reva_ingestion_requests_total", "Connector i
 INGEST_BYTES = REGISTRY.counter("reva_ingestion_bytes_total", "Raw bytes acquired", ("connector",))
 SIM_DURATION = REGISTRY.histogram("reva_simulation_duration_seconds", "Simulation job wall time", ("status",))
 SIM_RSS = REGISTRY.gauge("reva_simulation_max_rss_bytes", "Peak worker RSS observed after a simulation job")
+IDEMPOTENCY_CONFLICTS = REGISTRY.counter(
+    "reva_idempotency_conflicts_total",
+    "Internal enqueues whose idempotency key was held by a foreign job (created under a disambiguated key)",
+    ("job_type",))
+OUTBOX_EVENT_FAILURES = REGISTRY.counter("reva_outbox_event_failures_total",
+                                         "Outbox events whose processing failed (isolated, retried with backoff)")
+OUTBOX_FAILING_EVENTS = REGISTRY.gauge("reva_outbox_failing_events",
+                                       "Unprocessed outbox events with at least one recorded failure")
 
 
 def max_rss_bytes() -> int:

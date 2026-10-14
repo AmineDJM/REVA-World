@@ -2,10 +2,13 @@
 
 Scientific scope and limits
 ---------------------------
-* Coarsening only merges existing single-year age categories into bands; it
-  keeps recorded sex unchanged. ``UNK`` (unknown age) is never merged into a
-  band, and the top-coded ``Y_OPEN`` group may only join an open-ended band
-  that starts at or below its lower bound (it is never split or assigned an age).
+* Coarsening only merges existing age leaves (single years, or age-band leaves
+  such as ``Y_GE85`` when the source has nothing finer) into bands; it keeps
+  recorded sex unchanged. ``UNK`` (unknown age) is never merged into a band, an
+  age-band leaf must lie wholly inside one target band, and the top-coded
+  ``Y_OPEN`` group may only join an open-ended band that starts at or below its
+  lower bound (it is never split or assigned an age). An unknown ``Y_OPEN``
+  lower bound refuses the operation rather than guessing.
 * Each coarse cell becomes one representative record whose exact weight
   (``weight_num``/``weight_den``) is the exact Fraction sum of its fine records'
   weights, so totals per coarse cell, per sex and overall are conserved exactly.
@@ -33,7 +36,7 @@ from reva.compression.certificates import (
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import logical_hash
 from reva.population.materialise import INT64_MAX, exact_weight_sums, table_metadata
-from reva.population.recipe import fraction_decimal_str, fraction_str
+from reva.population.recipe import fraction_decimal_str, fraction_str, parse_age_code
 
 UNK_LABEL = "UNK"
 SEX_ORDER = ("F", "M")
@@ -160,9 +163,24 @@ def coarsen(
                 )
             label, order = open_band.label, 10**6
             band_has_top.add(label)
+        elif age_years is None:
+            # an age-band leaf (e.g. Y_GE85, Y85-89): it must fit wholly inside one band
+            leaf_iv = parse_age_code(_age_code).interval
+            if leaf_iv is None:
+                raise ValidationProblem(
+                    "record without age_years that is neither UNK, Y_OPEN nor an age band",
+                    cell_id=cid,
+                )
+            lo, hi = leaf_iv
+            hit = [b for b in bands if b.lo <= lo and (b.hi is None or (hi is not None and hi <= b.hi))]
+            if not hit:
+                raise ValidationProblem(
+                    f"age-band leaf {_age_code!r} is not wholly inside any target band; "
+                    "it cannot be split without inventing within-band detail",
+                    cell_id=cid,
+                )
+            label, order = hit[0].label, lo
         else:
-            if age_years is None:
-                raise ValidationProblem("record without age_years that is neither UNK nor Y_OPEN")
             hit = [b for b in bands if b.contains(age_years)]
             if not hit:
                 raise ValidationProblem(f"age {age_years} not covered by any band", cell_id=cid)

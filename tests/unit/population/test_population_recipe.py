@@ -1,9 +1,18 @@
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 
 from reva.kernel.errors import CapabilityGap, ValidationProblem
-from reva.population import SourceCell, UnsupportedAttribute, parse_age_code
+from reva.population import (
+    InconsistentSourceTotals,
+    SourceCell,
+    UnsupportedAttribute,
+    exact_total_weight,
+    materialise,
+    parse_age_code,
+)
 from reva.population.recipe import FORBIDDEN_ATTRIBUTES
 
 from .conftest import F_COUNTS, M_COUNTS, make_cells, recipe_from
@@ -30,8 +39,18 @@ def test_only_disjoint_leaves_are_counted(recipe):
     assert recipe.is_internally_consistent
 
 
-def test_inconsistent_total_is_reported_not_corrected():
-    r = recipe_from(make_cells(total_offsets={"F|TOTAL": 3}))
+def test_inconsistent_total_blocks_recipe_without_explanation():
+    with pytest.raises(InconsistentSourceTotals) as ei:
+        recipe_from(make_cells(total_offsets={"F|TOTAL": 3}))
+    assert isinstance(ei.value, ValidationProblem)
+    (failing,) = ei.value.details["failing_checks"]
+    assert (failing["sex_code"], failing["age_code"]) == ("F", "TOTAL")
+    assert failing["leaf_sum"] == sum(F_COUNTS) and failing["reported"] == sum(F_COUNTS) + 3
+
+
+def test_inconsistent_total_is_reported_not_corrected_when_explained():
+    why = "publisher note: F|TOTAL includes 3 persons of unknown sex (documented)"
+    r = recipe_from(make_cells(total_offsets={"F|TOTAL": 3}), inconsistency_explanation=why)
     check = next(c for c in r.consistency if c.sex_code == "F" and c.age_code == "TOTAL")
     assert check.status == "inconsistent"
     assert check.reported == sum(F_COUNTS) + 3
@@ -41,9 +60,35 @@ def test_inconsistent_total_is_reported_not_corrected():
     # source leaves are not altered to match the reported total
     assert r.total_count == sum(F_COUNTS) + sum(M_COUNTS)
     assert not r.is_internally_consistent
+    assert r.totals_status == "inconsistent_accepted" and not r.is_blocked
+    assert r.accepted_inconsistency == why and r.to_dict()["accepted_inconsistency"] == why
     # the grand total (T|TOTAL) is unaffected
     grand = next(c for c in r.consistency if c.sex_code == "T" and c.age_code == "TOTAL")
     assert grand.status == "consistent"
+    assert exact_total_weight(materialise(r, 200)) == r.total_count
+
+
+def test_materialise_refuses_blocked_recipe():
+    why = "documented"
+    r = recipe_from(make_cells(total_offsets={"M|TOTAL": -1}), inconsistency_explanation=why)
+    blocked = dataclasses.replace(r, accepted_inconsistency=None)
+    assert blocked.is_blocked and blocked.totals_status == "blocked"
+    with pytest.raises(InconsistentSourceTotals):
+        materialise(blocked, 200)
+
+
+def test_blank_explanation_rejected(cells):
+    with pytest.raises(ValidationProblem):
+        recipe_from(cells, inconsistency_explanation="  ")
+
+
+def test_clean_fixture_passes_totals_gate(recipe):
+    assert recipe.totals_status == "consistent" and not recipe.is_blocked
+    assert {(c.sex_code, c.status) for c in recipe.total_checks} == {
+        ("F", "consistent"),
+        ("M", "consistent"),
+        ("T", "consistent"),
+    }
 
 
 def test_open_band_subtotal_includes_top_coded_group(recipe):
@@ -68,10 +113,14 @@ def test_unknown_and_top_coded_retained_explicitly(recipe):
     assert recipe.leaf("F|Y_LT1").age_years == 0
 
 
-def test_observed_zero_is_structural_zero_not_missing(recipe):
-    assert recipe.structural_zeros == ("M|Y3",)
+def test_observed_zero_is_not_structural_zero_and_not_missing(recipe):
+    assert recipe.observed_zero_cells == ("M|Y3",)
+    # structural zeros are impossible cells by definition: none exist for age x recorded sex
+    assert recipe.structural_zeros == ()
     assert recipe.leaf("M|Y3").count == 0
     assert recipe.missing_cells == ()
+    d = recipe.to_dict()
+    assert d["observed_zero_cells"] == ["M|Y3"] and d["structural_zeros"] == []
 
 
 def test_missing_count_raises_by_default():

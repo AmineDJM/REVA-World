@@ -58,7 +58,7 @@ import time
 import traceback
 import uuid
 from collections.abc import Callable, Iterator
-from contextlib import contextmanager
+from contextlib import contextmanager, suppress
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from decimal import Decimal, localcontext
@@ -136,7 +136,7 @@ class Step:
         """Run ``fn``; record a failed check (not a crash of the step) when it raises."""
         try:
             return fn()
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             self.check(name, False, {"error": f"{type(e).__name__}: {str(e)[:600]}"})
             return None
 
@@ -188,7 +188,7 @@ class Recorder:
         except Blocked as b:
             st.status = "blocked"
             st.blocked_reason = str(b)
-        except Exception as e:  # noqa: BLE001
+        except Exception as e:
             st.status = "fail"
             st.error = f"{type(e).__name__}: {str(e)[:1500]}"
             st.evidence["traceback_tail"] = traceback.format_exc().splitlines()[-12:]
@@ -260,7 +260,7 @@ def create_environment(mode: str, object_root: Path | None) -> Env:
         try:
             bootstrap(settings)
             break
-        except Exception:  # noqa: BLE001
+        except Exception:
             if attempt == 2:
                 raise
             time.sleep(1.0)
@@ -297,7 +297,7 @@ def open_api_client(env: Env) -> None:
         client.headers["X-CSRF-Token"] = client.cookies.get("reva_csrf") or ""
         env.client = client
         env.state["api_app"] = app
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         env.client_error = f"{type(e).__name__}: {str(e)[:500]}"
 
 
@@ -317,14 +317,12 @@ def api_get(env: Env, st: Step, path: str, **params: Any) -> dict[str, Any] | No
 
 def close_environment(env: Env, keep: bool) -> dict[str, Any]:
     info: dict[str, Any] = {"name": env.db_name, "kept": keep, "object_root": str(env.object_root) if keep else None}
-    try:
+    with suppress(Exception):
         if env.client is not None:
             env.client.__exit__(None, None, None)
         app = env.state.get("api_app")
         if app is not None and getattr(app.state, "engine", None) is not None:
             app.state.engine.dispose()
-    except Exception:  # noqa: BLE001
-        pass
     for e in (env.owner, env.api, env.worker, env.sim):
         e.dispose()
     if not keep:
@@ -447,7 +445,7 @@ def step1_fetch(env: Env, rec: Recorder) -> None:
                     verified += 1
                 else:
                     bad.append(a["raw_sha256"])
-            except Exception as e:  # noqa: BLE001
+            except Exception as e:
                 bad.append(f"{a['raw_sha256']}: {type(e).__name__}")
         st.check("every archived raw response is retrievable and matches its SHA-256", not bad and verified > 0,
                  {"verified": verified, "problems": bad[:5]})
@@ -718,32 +716,52 @@ def step6_l2(env: Env, rec: Recorder) -> None:
         st.check("L2 job succeeded", job["status"] == "succeeded", job["last_error"])
         run_id = (job["result_ref"] or {}).get("run_id")
         rows = results_for(env, run_id) if run_id else []
-        st.check("results = 3 countries x 4 outputs x (L1 + 6 grid variants)", len(rows) == 3 * 4 * 7, len(rows))
         l1_ref = {(r["label"], r["output_key"]): r["value"]["value"] for r in env.state["l1"]["rows"]}
         summary: dict[str, Any] = {}
-        for r in rows:
-            if r["variant"] != "L1":
-                continue
-            u = r["uncertainty"]
-            variants = [Decimal(x["value"]["value"]) for x in rows if x["label"] == r["label"]
-                        and x["output_key"] == r["output_key"] and x["variant"].startswith("L2:")]
-            ok = (u.get("kind") == "sensitivity_range" and u.get("level") is None and variants
-                  and Decimal(u["lower"]) == min(variants) and Decimal(u["upper"]) == max(variants))
-            st.check(f"{r['label']} {r['output_key']}: range labelled sensitivity_range (no probability level)",
-                     bool(ok), {"uncertainty": u})
-            st.check(f"{r['label']} {r['output_key']}: deterministic L1 value unchanged",
-                     r["value"]["value"] == l1_ref.get((r["label"], r["output_key"])))
-            if r["output_key"] == "exposure_percent_baseline_gdp":
-                summary[r["label"]] = {"exposure_percent_L1": r["value"]["value"], "sensitivity_range":
-                                       [u.get("lower"), u.get("upper")], "kind": u.get("kind")}
-        zero = [r for r in rows if r["variant"] == "L2:eM=0;eX=0"]
-        st.check("zero-elasticity variant equals L1 exactly", bool(zero) and all(
-            r["value"]["value"] == l1_ref.get((r["label"], r["output_key"])) for r in zero))
+        for iso in TRADE_COUNTRIES:
+            label = LABELS[iso]
+            for k in OUTPUTS:
+                mine = [r for r in rows if r["label"] == label and r["output_key"] == k]
+                l1 = [r for r in mine if r["variant"] == "L1"]
+                points = [r for r in mine if r["variant"].startswith("L2:") and r["value"].get("kind") == "decimal"]
+                ranges = [r for r in mine if (r["uncertainty"] or {}).get("kind") == "sensitivity_range"]
+                st.check(f"{iso} {k}: deterministic L1 value present and identical to the L1 run",
+                         len(l1) == 1 and l1[0]["value"].get("value") == l1_ref.get((label, k)),
+                         {"l2_run": l1[0]["value"].get("value") if l1 else None, "l1_run": l1_ref.get((label, k))})
+                st.check(f"{iso} {k}: one value per labelled elasticity grid point", len(points) >= len(grid),
+                         {"grid_points": len(grid), "variant_rows": [r["variant"] for r in points]})
+                if len(ranges) != 1:
+                    st.check(f"{iso} {k}: exactly one range labelled sensitivity_range", False,
+                             [r["variant"] for r in ranges])
+                    continue
+                u = ranges[0]["uncertainty"]
+                vals = [Decimal(r["value"]["value"]) for r in points] + (
+                    [Decimal(l1[0]["value"]["value"])] if l1 else [])
+                st.check(f"{iso} {k}: range is labelled sensitivity_range with no probability/coverage level",
+                         u.get("level") is None and u.get("kind") == "sensitivity_range",
+                         {"variant": ranges[0]["variant"], "kind": u.get("kind"), "level": u.get("level")})
+                st.check(f"{iso} {k}: range bounds are the min/max over the grid and the fixed-quantity point",
+                         bool(vals) and Decimal(u["lower"]) == min(vals) and Decimal(u["upper"]) == max(vals),
+                         {"lower": u.get("lower"), "upper": u.get("upper"), "min": str(min(vals)) if vals else None,
+                          "max": str(max(vals)) if vals else None})
+                zero = [r for r in points if r["variant"] == "L2:eM=0;eX=0"]
+                if zero:
+                    st.check(f"{iso} {k}: zero-elasticity variant equals L1 exactly",
+                             zero[0]["value"]["value"] == l1_ref.get((label, k)))
+                if k == "exposure_percent_baseline_gdp":
+                    summary[iso] = {"exposure_percent_L1": l1_ref.get((label, k)), "sensitivity_range":
+                                    [u.get("lower"), u.get("upper")], "kind": u.get("kind"),
+                                    "range_row_variant": ranges[0]["variant"]}
         st.evidence.update(run_id=run_id, exposure=summary, grid=grid)
         api = api_get(env, st, f"/v1/simulations/{job_id}")
         if api is not None:
-            st.check("api uncertainty summary shows a sensitivity range", "sensitivity_range"
-                     in json.dumps(api.get("uncertainty")), api.get("uncertainty"))
+            shown = [r for r in api["data"]["results"] if (r.get("uncertainty") or {}).get("kind")
+                     == "sensitivity_range"]
+            st.check("api shows the labelled sensitivity-range rows (no level) next to the L1 values",
+                     len(shown) == 3 * len(OUTPUTS) and all(r["uncertainty"].get("level") is None for r in shown)
+                     and api.get("context_mode") == "simulation",
+                     {"range_rows": len(shown), "summary": api.get("uncertainty"),
+                      "variants": sorted({r["variant"] for r in shown})})
 
 
 # --------------------------------------------------------------------------- step 7
@@ -849,6 +867,20 @@ def step8_replay(env: Env, rec: Recorder) -> None:
         r2 = publish_release(env.worker, env.store, cutoff=env.now(), origin=Origin.test_fixture,
                              environment=env.settings.reva_env, concepts=[POP])
         t_after = env.now()
+        with env.worker.connect() as c:
+            scope = [dict(r) for r in c.execute(text(
+                """SELECT cv.version, e.decision, e.applicability FROM evidence.eligibility e
+                   JOIN evidence.connector_version cv ON cv.id = e.connector_version_id
+                   JOIN ontology.concept_version c ON c.id = e.concept_version_id
+                   WHERE cv.name = 'worldbank.wdi.indicators' AND c.concept_id = :c"""), {"c": POP}).mappings()]
+            in_release = c.execute(text(
+                """SELECT count(*) FROM belief.input i JOIN belief.estimate e ON e.id = i.estimate_id
+                   JOIN evidence.observation o ON o.id = i.observation_id
+                   WHERE e.release_id = :r AND o.logical_key = :k"""), {"r": r1.release_id, "k": key}).scalar_one()
+        years = [list((x["applicability"] or {}).get("years") or []) for x in scope]
+        st.check("recorded vintage years (1990-1991) are admitted into the belief release",
+                 in_release > 0, {"eligibility_years": years, "vintage_years": [1990, 1991],
+                                  "vintage_observation_in_release_1": in_release})
         st.check("vintage 2 revises exactly one value (1991)", (s1.inserted, s2.inserted, s2.unchanged) == (2, 1, 1),
                  {"v1": {"inserted": s1.inserted}, "v2": {"inserted": s2.inserted, "unchanged": s2.unchanged}})
         with env.api.connect() as c:
@@ -1049,7 +1081,7 @@ def step11_tournament(env: Env, rec: Recorder) -> None:
         if out.get("manifest_sha256"):
             man = json.loads(env.store.get("evaluation", out["manifest_sha256"]))
             st.check("stored evaluation manifest carries the label",
-                     LABEL in json.dumps(man), {"manifest_sha256": out["manifest_sha256"]})
+                     LABEL in json.dumps(man, ensure_ascii=False), {"manifest_sha256": out["manifest_sha256"]})
 
 
 # --------------------------------------------------------------------------- step 12
@@ -1165,13 +1197,16 @@ def step_negative(env: Env, rec: Recorder) -> None:
 
 # --------------------------------------------------------------------------- main
 def git_head() -> dict[str, Any]:
+    git = shutil.which("git")
+    if git is None:
+        return {"head": None, "dirty_worktree": None}
     try:
-        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True,
+        head = subprocess.run([git, "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True,
                               timeout=10).stdout.strip()
-        dirty = bool(subprocess.run(["git", "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True,
+        dirty = bool(subprocess.run([git, "status", "--porcelain"], cwd=ROOT, capture_output=True, text=True,
                                     timeout=20).stdout.strip())
         return {"head": head, "dirty_worktree": dirty}
-    except Exception:  # noqa: BLE001
+    except Exception:
         return {"head": None, "dirty_worktree": None}
 
 
@@ -1195,7 +1230,7 @@ def run_demo(mode: str = "fixtures", *, out_path: Path | None = None, keep: bool
         for fn in (step1_fetch, step2_flags, step3_publish, step4_hyperedges, step5_l1, step6_l2, step7_provenance,
                    step8_replay, step9_eurostat, step10_population, step11_tournament, step12_gaps, step_negative):
             fn(env, rec)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         doc["setup_error"] = f"{type(e).__name__}: {str(e)[:1500]}"
         doc["setup_traceback_tail"] = traceback.format_exc().splitlines()[-15:]
     finally:

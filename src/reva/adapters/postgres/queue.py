@@ -17,17 +17,34 @@ Protocol
   row and verify owner, current fencing token and unexpired lease with the
   database clock. A stale holder therefore cannot commit (``StaleLease``).
 
-Priority and starvation protection
-----------------------------------
-Candidates are ordered by an *effective* priority::
+Priority and starvation protection (R2-08)
+------------------------------------------
+Two rules, applied in this order:
 
-    priority + LEAST(aging_cap, floor(seconds_since_created_at / aging_seconds))
+1. **Hard wait bound.** Any available job created more than ``max_wait_seconds``
+   ago (default 1800 s = 30 min) is *overdue*. Overdue jobs are claimed before
+   every non-overdue job, among themselves strictly FIFO (``created_at``, id),
+   whatever their priority.
+2. **Uncapped linear aging** for the rest: the effective priority is::
 
-i.e. a job gains one priority point per ``aging_seconds`` (default 60 s) it has
-existed, capped at ``aging_cap`` (default 200, the full width of the -100..100
-priority range). A low-priority job therefore always overtakes a stream of
-fresh high-priority jobs after at most ``aging_cap * aging_seconds`` (200 min
-by default); ties break by ``created_at`` then id (FIFO).
+       priority + floor(seconds_since_created_at / aging_seconds)
+
+   (one point per ``aging_seconds``, default 60 s, with *no* cap); ties break by
+   ``created_at`` then id (FIFO).
+
+Why this bounds waiting: with uncapped aging every job's score grows at the
+same rate, so for two jobs the order depends only on ``priority`` and creation
+time, never on how long a competing backlog has itself waited. And because
+every job reaches the overdue class after ``max_wait_seconds`` and that class
+is FIFO, a job is never overtaken by a job created after it once it is overdue:
+its wait is bounded by ``max_wait_seconds`` plus the time to drain the overdue
+jobs created before it (finite, independent of the arrival rate of new
+high-priority work). The older "capped" aging did not have this property: a
+backlog of high-priority jobs ages as well, so an old low-priority job could
+starve indefinitely.
+
+``created_at`` (not ``available_at``) is the reference, so time spent in retry
+backoff counts as waiting.
 
 Retry policy
 ------------
@@ -60,7 +77,9 @@ from reva.kernel.ids import logical_hash
 
 STALE_LEASE_SQLSTATE = "RV001"
 DEFAULT_AGING_SECONDS = 60
-DEFAULT_AGING_CAP = 200
+DEFAULT_MAX_WAIT_SECONDS = 1800
+RESERVED_KEY_PREFIXES = ("api:",)  # namespace of ops.submit_job (API-submitted jobs)
+LOCK_BUSY_SQLSTATES = frozenset({"55P03", "57014"})  # lock_not_available, query_canceled (timeout)
 DEFAULT_BACKOFF_BASE_SECONDS = 5.0
 DEFAULT_BACKOFF_CAP_SECONDS = 3600.0
 MAX_ERROR_MESSAGE = 2000
@@ -95,6 +114,12 @@ def to_json(obj: Any) -> str | None:
     return None if obj is None else json.dumps(obj, sort_keys=True, default=str, allow_nan=False)
 
 
+def is_lock_busy(exc: BaseException) -> bool:
+    """A lock/statement timeout: the row is busy, not lost (retry later)."""
+    orig = getattr(exc, "orig", None)
+    return getattr(orig, "sqlstate", None) in LOCK_BUSY_SQLSTATES
+
+
 def _stale(exc: BaseException) -> bool:
     orig = getattr(exc, "orig", None)
     return getattr(orig, "sqlstate", None) == STALE_LEASE_SQLSTATE
@@ -103,6 +128,19 @@ def _stale(exc: BaseException) -> bool:
 def _raise_stale(job_id: UUID, token: int, exc: BaseException) -> None:
     raise StaleLease(f"lease lost for job {job_id} (fencing token {token})", job_id=str(job_id),
                      fencing_token=token) from exc
+
+
+class KeyConflict(ValidationProblem):
+    """An idempotency key is already held by a different job (type or payload differ)."""
+
+    code = "idempotency_key_conflict"
+
+
+@dataclass(frozen=True)
+class EnqueueResult:
+    job_id: UUID
+    created: bool
+    conflict: dict[str, Any] | None = None
 
 
 def enqueue(
@@ -115,9 +153,21 @@ def enqueue(
     *,
     created_by: str = "system",
 ) -> UUID:
-    """Insert a job in the caller's transaction; returns the existing id on replay."""
+    """Insert a job in the caller's transaction; returns the existing id on replay.
+
+    Internal producers may not use the API namespace (``api:``): API-submitted
+    keys are namespaced by ``ops.submit_job`` and must never alias internal ones.
+    Re-using a key for a different job type/payload raises :class:`KeyConflict`.
+    """
+    return _enqueue(conn, job_type, payload, idempotency_key, priority, max_attempts, created_by).job_id
+
+
+def _enqueue(conn: Connection, job_type: str, payload: Mapping[str, Any], idempotency_key: str, priority: int,
+             max_attempts: int | None, created_by: str) -> EnqueueResult:
     if not 8 <= len(idempotency_key) <= 200:
         raise ValidationProblem("idempotency key must be 8..200 characters")
+    if idempotency_key.startswith(RESERVED_KEY_PREFIXES):
+        raise ValidationProblem("idempotency key uses the reserved API namespace", idempotency_key=idempotency_key)
     if not -100 <= priority <= 100:
         raise ValidationProblem("priority must be within -100..100")
     if max_attempts is not None and max_attempts < 1:
@@ -132,7 +182,7 @@ def enqueue(
         {"t": job_type, "p": p, "k": idempotency_key, "pr": priority, "ma": max_attempts, "cb": created_by},
     ).scalar_one_or_none()
     if jid is not None:
-        return UUID(str(jid))
+        return EnqueueResult(UUID(str(jid)), True)
     row = conn.execute(
         text(
             "SELECT id, job_type = :t AND payload = CAST(:p AS jsonb) AS same FROM ops.job "
@@ -141,8 +191,58 @@ def enqueue(
         {"t": job_type, "p": p, "k": idempotency_key},
     ).one()
     if not row.same:
-        raise ValidationProblem("idempotency key reused with a different request", idempotency_key=idempotency_key)
-    return UUID(str(row.id))
+        raise KeyConflict("idempotency key reused with a different request", idempotency_key=idempotency_key)
+    return EnqueueResult(UUID(str(row.id)), False)
+
+
+def conflicting_job(conn: Connection, idempotency_key: str) -> dict[str, Any] | None:
+    row = conn.execute(
+        text("SELECT id, job_type, created_by, status FROM ops.job WHERE idempotency_key = :k"),
+        {"k": idempotency_key},
+    ).mappings().one_or_none()
+    return dict(row) if row else None
+
+
+MAX_DISAMBIGUATION = 8
+
+
+def enqueue_resolving_conflict(
+    conn: Connection,
+    job_type: str,
+    payload: Mapping[str, Any],
+    idempotency_key: str,
+    priority: int = 0,
+    max_attempts: int | None = None,
+    *,
+    created_by: str = "system",
+) -> EnqueueResult:
+    """Like :func:`enqueue`, but a key held by a *foreign* job never suppresses this one.
+
+    Normally returns the job under ``idempotency_key`` (``conflict is None``).
+    When the key is held by a job of another type/payload (a collision or a
+    pre-claimed key) the job is created under a deterministic disambiguated key
+    ``{key}#alt{n}`` (repeated attempts converge on the same job) and
+    ``conflict`` describes the foreign holder so the caller can log/audit it.
+    """
+    try:
+        with conn.begin_nested():
+            return _enqueue(conn, job_type, payload, idempotency_key, priority, max_attempts, created_by)
+    except KeyConflict:
+        pass
+    foreign = conflicting_job(conn, idempotency_key) or {}
+    for n in range(1, MAX_DISAMBIGUATION + 1):
+        alt = f"{idempotency_key[:190]}#alt{n}"
+        try:
+            with conn.begin_nested():
+                res = _enqueue(conn, job_type, payload, alt, priority, max_attempts, created_by)
+        except KeyConflict:
+            continue
+        conflict = {"idempotency_key": idempotency_key, "disambiguated_key": alt,
+                    "foreign_job_id": str(foreign.get("id")), "foreign_job_type": foreign.get("job_type"),
+                    "foreign_created_by": foreign.get("created_by"), "job_type": job_type}
+        return EnqueueResult(res.job_id, res.created, conflict)
+    raise KeyConflict("idempotency key and all disambiguated keys are held by different requests",
+                      idempotency_key=idempotency_key)
 
 
 REQUEUE_EXPIRED_SQL = """
@@ -174,7 +274,10 @@ WITH cand AS (
   SELECT id FROM ops.job
    WHERE status = 'queued' AND available_at <= clock_timestamp()
      AND (CAST(:types AS text[]) IS NULL OR job_type = ANY(CAST(:types AS text[])))
-   ORDER BY (priority + LEAST(:cap, floor(EXTRACT(EPOCH FROM clock_timestamp() - created_at) / :aging))) DESC,
+   ORDER BY (created_at <= clock_timestamp() - make_interval(secs => :max_wait)) DESC,
+            CASE WHEN created_at <= clock_timestamp() - make_interval(secs => :max_wait)
+                 THEN created_at END ASC,
+            (priority + floor(EXTRACT(EPOCH FROM clock_timestamp() - created_at) / :aging)) DESC,
             created_at, id
    LIMIT 1
    FOR UPDATE SKIP LOCKED)
@@ -203,19 +306,25 @@ def claim(
     *,
     job_types: Sequence[str] | None = None,
     aging_seconds: int = DEFAULT_AGING_SECONDS,
-    aging_cap: int = DEFAULT_AGING_CAP,
+    max_wait_seconds: int = DEFAULT_MAX_WAIT_SECONDS,
 ) -> ClaimedJob | None:
-    """Claim one job in a short transaction that commits (releasing row locks) before returning."""
+    """Claim one job in a short transaction that commits (releasing row locks) before returning.
+
+    Ordering: overdue jobs (older than ``max_wait_seconds``) first in FIFO, then
+    uncapped aged priority (see module docstring).
+    """
     if lease_seconds < 1:
         raise ValidationProblem("lease_seconds must be >= 1")
     if aging_seconds < 1:
         raise ValidationProblem("aging_seconds must be >= 1")
+    if max_wait_seconds < 1:
+        raise ValidationProblem("max_wait_seconds must be >= 1")
     with engine.begin() as conn:
         expired = requeue_expired(conn)
         row = conn.execute(
             text(CLAIM_SQL),
             {"w": worker_id, "lease": lease_seconds, "types": list(job_types) if job_types else None,
-             "aging": aging_seconds, "cap": aging_cap},
+             "aging": aging_seconds, "max_wait": max_wait_seconds},
         ).one_or_none()
     if expired:
         from reva.operations.telemetry import LEASE_EXPIRIES
@@ -253,10 +362,22 @@ def assert_lease(conn: Connection, job: ClaimedJob) -> None:
 
 
 def heartbeat(engine: Engine, job: ClaimedJob, progress: Mapping[str, Any] | None = None,
-              lease_seconds: int | None = None) -> str:
-    """Extend the lease; returns the current status (``running`` or ``cancel_requested``)."""
+              lease_seconds: int | None = None, *, lock_timeout_ms: int | None = None,
+              statement_timeout_ms: int | None = None) -> str:
+    """Extend the lease; returns the current status (``running`` or ``cancel_requested``).
+
+    With ``lock_timeout_ms``/``statement_timeout_ms`` the transaction gives up
+    quickly when the job row is locked by another transaction; the resulting
+    DBAPIError satisfies :func:`is_lock_busy` (busy, retry), never ``StaleLease``.
+    No advisory lock is ever taken here.
+    """
     try:
         with engine.begin() as conn:
+            if lock_timeout_ms is not None:
+                conn.execute(text("SELECT set_config('lock_timeout', :v, true)"), {"v": f"{int(lock_timeout_ms)}ms"})
+            if statement_timeout_ms is not None:
+                conn.execute(text("SELECT set_config('statement_timeout', :v, true)"),
+                             {"v": f"{int(statement_timeout_ms)}ms"})
             return str(conn.execute(
                 text("SELECT ops.heartbeat(:j, :w, :t, :s, CAST(:p AS jsonb))"),
                 {"j": job.id, "w": job.worker_id, "t": job.fencing_token,

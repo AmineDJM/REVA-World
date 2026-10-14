@@ -689,3 +689,70 @@ def test_provisioned_verifier_lets_the_runtime_role_log_in(w: dict[str, Any]) ->
             assert c.execute(text("SELECT current_user")).scalar_one() == "reva_worker"
     finally:
         fresh.dispose()
+
+
+def test_role_connection_limit_is_configurable(monkeypatch: pytest.MonkeyPatch) -> None:
+    from types import SimpleNamespace
+
+    from reva.cli.bootstrap import role_connection_limit
+    from reva.kernel.errors import ConfigurationError
+
+    monkeypatch.delenv("REVA_ROLE_CONNECTION_LIMIT", raising=False)
+    assert role_connection_limit(SimpleNamespace(reva_env="production")) == 20
+    assert role_connection_limit(SimpleNamespace(reva_env="test")) == -1
+    monkeypatch.setenv("REVA_ROLE_CONNECTION_LIMIT", "50")
+    assert role_connection_limit(SimpleNamespace(reva_env="production")) == 50
+    for bad_env, bad in (("production", "-1"), ("production", "0"), ("test", "0"), ("test", "-2"), ("test", "x")):
+        monkeypatch.setenv("REVA_ROLE_CONNECTION_LIMIT", bad)
+        with pytest.raises(ConfigurationError):
+            role_connection_limit(SimpleNamespace(reva_env=bad_env))
+
+
+# =========================================================================== lead follow-ups (R2-02, R2-09, G)
+def test_gate_result_accepts_needs_review(w: dict[str, Any]) -> None:
+    with tx(w["db"].worker) as c:
+        pid = proposal(c, w)
+        c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'needs_review', :s, "
+                       "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
+        with pytest.raises(DBAPIError, match="invalid gate decision"), c.begin_nested():
+            c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'approve', :s, "
+                           "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
+
+
+def test_client_idempotency_keys_are_namespaced(w: dict[str, Any]) -> None:
+    db = w["db"]
+    key = f"fx1-ns-{uuid.uuid4().hex}"
+    with tx(db.worker) as c:  # an internal job whose key a client might guess
+        internal = c.execute(text("INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
+                                  "VALUES ('health', '{}', :k, 'scheduler') RETURNING id"), {"k": key}).scalar_one()
+        c.commit()
+    try:
+        sql = "SELECT ops.submit_job('health', '{}'::jsonb, :k, 0, :a)"
+        with db.api.begin() as c:
+            mine = c.execute(text(sql), {"k": key, "a": "human:alice"}).scalar_one()
+            stored = c.execute(text("SELECT idempotency_key FROM ops.job WHERE id = :j"), {"j": mine}).scalar_one()
+        assert mine != internal and stored == f"api:human:alice:health:{key}"
+        with db.api.begin() as c:  # safe retry; another principal gets its own job
+            assert c.execute(text(sql), {"k": key, "a": "human:alice"}).scalar_one() == mine
+            assert c.execute(text(sql), {"k": key, "a": "human:bob"}).scalar_one() not in (mine, internal)
+        with tx(db.api) as c, pytest.raises(DBAPIError, match="idempotency key reused"):
+            c.execute(text("SELECT ops.submit_job('health', '{\"x\": 1}'::jsonb, :k, 0, 'human:alice')"), {"k": key})
+    finally:
+        with db.owner.begin() as c:
+            c.execute(text("DELETE FROM ops.job WHERE idempotency_key LIKE :k"), {"k": f"%{key}"})
+
+
+def test_session_revocation_grants(w: dict[str, Any]) -> None:
+    db = w["db"]
+    sid = f"fx1-session-{uuid.uuid4().hex}"
+    with tx(db.api) as c:
+        c.execute(text("INSERT INTO ops.session_revocation(session_id, expires_at) "
+                       "VALUES (:s, clock_timestamp() + interval '1 hour')"), {"s": sid})
+        assert c.execute(text("SELECT count(*) FROM ops.session_revocation WHERE session_id = :s"),
+                         {"s": sid}).scalar_one() == 1
+    for engine in (db.worker, db.sim):
+        with tx(engine) as c, pytest.raises(DBAPIError, match="permission denied"):
+            c.execute(text("INSERT INTO ops.session_revocation(session_id, expires_at) "
+                           "VALUES (:s, clock_timestamp())"), {"s": sid})
+    with tx(db.worker) as c:  # the worker may prune expired rows
+        c.execute(text("DELETE FROM ops.session_revocation WHERE expires_at < clock_timestamp()"))

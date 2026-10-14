@@ -1,7 +1,7 @@
 """Population recipes and weighted-representative materialisation (age × recorded sex).
 
-Only the age × recorded-sex joint distribution of Eurostat ``demo_pjan`` is
-supported. Records are weighted representatives of source cells, never real
+Only the age × recorded-sex joint distribution of Eurostat ``demo_pjan``-like
+tables is supported (single years and/or disjoint age bands; see ``recipe``). Records are weighted representatives of source cells, never real
 individuals, and carry no other attributes.
 """
 
@@ -13,6 +13,7 @@ from reva.population.materialise import (
     CellAllocation,
     ResolutionError,
     allocate,
+    band_for_leaf,
     canonical_summary,
     exact_total_weight,
     exact_weight_sums,
@@ -29,6 +30,7 @@ from reva.population.recipe import (
     SUPPORTED_ATTRIBUTES,
     ConsistencyCheck,
     ExcludedCell,
+    InconsistentSourceTotals,
     LeafCell,
     MissingCell,
     PopulationRecipe,
@@ -36,6 +38,7 @@ from reva.population.recipe import (
     UnsupportedAttribute,
     build_recipe,
     check_attributes,
+    finest_disjoint_cover,
     parse_age_code,
 )
 
@@ -48,6 +51,7 @@ __all__ = [
     "CellAllocation",
     "ConsistencyCheck",
     "ExcludedCell",
+    "InconsistentSourceTotals",
     "LeafCell",
     "MissingCell",
     "PopulationRecipe",
@@ -55,12 +59,14 @@ __all__ = [
     "SourceCell",
     "UnsupportedAttribute",
     "allocate",
+    "band_for_leaf",
     "build_recipe",
     "canonical_summary",
     "check_attributes",
     "diagnose",
     "exact_total_weight",
     "exact_weight_sums",
+    "finest_disjoint_cover",
     "materialise",
     "parse_age_code",
     "rake",
