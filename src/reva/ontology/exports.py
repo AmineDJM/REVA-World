@@ -375,6 +375,8 @@ def time_extent_to_owl_time(te: TimeExtent, iri: str | None = None) -> dict[str,
 
 _WKT_HEAD = re.compile(r"^\s*(POINT|MULTIPOINT|LINESTRING|MULTILINESTRING|POLYGON|MULTIPOLYGON|GEOMETRYCOLLECTION|"
                        r"TRIANGLE|TIN|POLYHEDRALSURFACE)(\s+(Z|M|ZM))?\s*(EMPTY\s*$|\()", re.IGNORECASE)
+_WKT_WORDS = re.compile(r"\b(POINT|MULTIPOINT|LINESTRING|MULTILINESTRING|POLYGON|MULTIPOLYGON|GEOMETRYCOLLECTION|"
+                        r"TRIANGLE|TIN|POLYHEDRALSURFACE|ZM|Z|M|EMPTY)\b", re.IGNORECASE)
 _NUM = re.compile(r"-?\d+(?:\.\d+)?(?:[eE][-+]?\d+)?")
 
 
@@ -391,8 +393,8 @@ def _check_wkt(wkt: str) -> None:
     if re.search(r"\b(nan|inf|infinity)\b", wkt, re.IGNORECASE):
         raise ValidationProblem("non-finite coordinates in WKT")
     body = wkt[wkt.find("("):] if "(" in wkt else ""
-    leftovers = _NUM.sub("", body)
-    if re.search(r"[^\s(),A-Za-z]", leftovers):
+    leftovers = _WKT_WORDS.sub("", _NUM.sub("", body))
+    if re.search(r"[^\s(),]", leftovers):
         raise ValidationProblem("invalid coordinate tokens in WKT")
     if not all(math.isfinite(float(n)) for n in _NUM.findall(body)):
         raise ValidationProblem("non-finite coordinates in WKT")

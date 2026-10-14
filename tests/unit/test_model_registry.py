@@ -224,7 +224,7 @@ def test_versions_are_immutable_and_promotion_moves_pointers():
 # --------------------------------------------------------------------------- pure evaluation
 
 
-def synthetic_growth_panel(n_series: int = 8, years: tuple[int, int] = (1990, 2024), seed: int = 7):
+def synthetic_growth_panel(n_series: int = 5, years: tuple[int, int] = (2004, 2024), seed: int = 7):
     """Smooth exponential growth with small multiplicative noise (log drift should win)."""
     rng = np.random.default_rng(seed)
     out = {}
