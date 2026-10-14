@@ -65,6 +65,7 @@ WEIGHT_CONCEPT = {
 }
 CONNECTOR_VERSION = "1.1.0"
 PARSER_VERSION = "comtrade-parse-2"
+JUMP_RATIO = Decimal(100)
 VALUATION_UNDETERMINED = "primaryValue (basis not determinable from response)"
 EXCHANGE_RATE_TRANSFORM = "provider_reported_usd (UN Comtrade methodology)"
 FIXED_DIMS = {"typeCode": "C", "freqCode": "A", "cmdCode": "2709", "customsCode": "C00", "motCode": 0,
@@ -90,6 +91,10 @@ class ComtradeConnector:
         self.reporters = tuple(reporters)
         self.total_years = tuple(total_years)
         self.bilateral_years = tuple(bilateral_years)
+        # Values validated in this run, per (reporter, flow, field) series, for the
+        # adjacent-year plausibility review signal (spec §20.2: outliers are review
+        # signals, never deletions).
+        self._series: dict[tuple[str, str, str], dict[int, Decimal]] = {}
 
     def describe(self) -> ConnectorSpec:
         return ConnectorSpec(
@@ -414,7 +419,35 @@ class ComtradeConnector:
             findings.append(Finding(code="provider_estimation_flagged", severity="info",
                                     message=f"{len(estimated)} values carry a provider estimation flag "
                                             "(legacyEstimationFlag != 0)"))
+        findings.extend(self._jump_signals(batch))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
+
+    def _jump_signals(self, batch: ObservationBatch) -> list[Finding]:
+        """Warn (never block, never delete) when a world-total value differs by more than
+        JUMP_RATIO from the adjacent year of the same series seen in this run (e.g. a
+        reporter's crude imports falling from billions to a few thousand dollars)."""
+        out: list[Finding] = []
+        for o in batch.observations:
+            parts = o.logical_key.split(":")  # comtrade:HS2709:{flow}:{reporter}:{partner}:{year}:{field}
+            if len(parts) != 7 or parts[4] != "0" or o.value.get("kind") != "decimal":
+                continue
+            v = Decimal(str(o.value["value"]))
+            if v <= 0:
+                continue
+            series = self._series.setdefault((parts[3], parts[2], parts[6]), {})
+            year = int(parts[5])
+            series[year] = v
+            for adj in (year - 1, year + 1):
+                w = series.get(adj)
+                if w is None or w <= 0:
+                    continue
+                ratio = max(v, w) / min(v, w)
+                if ratio > JUMP_RATIO:
+                    out.append(Finding(
+                        code="implausible_jump", severity="warning",
+                        message=f"{o.logical_key}: {v} vs {w} in {adj} (x{ratio:.0f} > x{JUMP_RATIO}); "
+                                "review signal only, value kept as reported"))
+        return out
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
         required = {i.key for i in plan.items if i.required}

@@ -256,14 +256,6 @@ def test_raw_acquisition_metadata_excludes_secret_query_values() -> None:
     assert secret not in json.dumps(raw.response_metadata, default=str)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: RecordingHttp writes the full request URL (including secret query params such as "
-        "subscription-key) into tests/fixtures/source/<connector>/manifest.json; strip secret params "
-        "before recording"
-    ),
-)
 async def test_recorded_fixture_manifest_excludes_secret_query_values(tmp_path: Path) -> None:
     from reva.evidence.runner import RecordingHttp
 

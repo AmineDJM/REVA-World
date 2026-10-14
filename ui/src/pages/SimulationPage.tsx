@@ -141,7 +141,7 @@ function BaselineCell({ input }: { input: BaselineInput | undefined }) {
   );
 }
 
-function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationStatus> }) {
+export function ResultsView({ simId, env }: { simId: string; env: Envelope<SimulationStatus> }) {
   const st = env.data;
   const groups = useMemo(() => groupResults(st.results), [st.results]);
   const inputs = useMemo(() => baselineInputs(st.results), [st.results]);

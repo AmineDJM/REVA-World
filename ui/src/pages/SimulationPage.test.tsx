@@ -1,8 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import SimulationPage from './SimulationPage';
+import SimulationPage, { ResultsView } from './SimulationPage';
 import { ProvenanceProvider } from '../components/ProvenanceDrawer';
 import { envelope, mockFetch } from '../test/fetchMock';
 import { FIXTURE_BASELINE_UUID } from '../lib/scenario';
@@ -111,5 +111,35 @@ describe('SimulationPage', () => {
     await userEvent.click(submit);
     expect(await screen.findByText(/required inputs are missing/)).toBeInTheDocument();
     expect(screen.getByText(/HTTP 422, missing_input/)).toBeInTheDocument();
+  });
+
+  it('renders the L2 sensitivity-range row in the range column, not as a grid variant', () => {
+    const fr = { id: 'e1', label: 'France' };
+    const usd = { unit_ref: 'unit.usd', basis: {} };
+    const results = [
+      { id: 'a', output_key: 'import_value_change_usd', subject: fr, variant: 'L1', value: { kind: 'decimal', value: '250', ...usd }, uncertainty: { status: 'unquantified', kind: 'unknown' }, applicability: {} },
+      { id: 'b', output_key: 'import_value_change_usd', subject: fr, variant: 'L2:eM=-0.5;eX=-0.5', value: { kind: 'decimal', value: '400', ...usd }, uncertainty: { status: 'unquantified', kind: 'unknown' }, applicability: {} },
+      {
+        id: 'c', output_key: 'import_value_change_usd', subject: fr, variant: 'L2:sensitivity_range',
+        value: { kind: 'sensitivity_range', lower: '250', upper: '562.5', evaluated_points: 3, includes_fixed_quantity_point: true, statement: 'assumption sensitivity, not a confidence interval', ...usd },
+        uncertainty: { status: 'quantified', kind: 'sensitivity_range', lower: '250', upper: '562.5' }, applicability: {},
+      },
+    ];
+    const env = envelope(
+      { job: null, scenario: null, run: { id: 'run', fidelity: 'L2', model_manifest_sha256: 'm', ontology_manifest_sha256: 'o', seed_plan: {}, execution_profile: {}, recorded_at: '' }, outcome: null, results },
+      { context_mode: 'simulation', modality: 'assumption_conditioned_scenario' },
+    );
+    render(
+      <MemoryRouter>
+        <ProvenanceProvider>
+          <ResultsView simId="sim" env={env as never} />
+        </ProvenanceProvider>
+      </MemoryRouter>,
+    );
+    const table = screen.getByTestId('comparison-table');
+    const range = within(table).getByTitle('assumption sensitivity, not a confidence interval');
+    expect(range.textContent).toMatch(/250.*to.*562\.5/);
+    expect(range.textContent).toContain('not a confidence interval');
+    expect(screen.getByText(/L2 grid variants \(1 assumed elasticity pairs\)/)).toBeInTheDocument();
   });
 });

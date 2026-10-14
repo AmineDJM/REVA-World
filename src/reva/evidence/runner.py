@@ -17,7 +17,13 @@ from typing import Any
 
 from sqlalchemy import Engine, text
 
-from reva.adapters.http.safe_client import HttpResult, SafeHttpClient, request_fingerprint
+from reva.adapters.http.safe_client import (
+    SECRET_QUERY_PARAMS,
+    HttpResult,
+    SafeHttpClient,
+    redact_url,
+    request_fingerprint,
+)
 from reva.evidence.ingest import publish_acquisition
 from reva.kernel.errors import RevaError, SourceResponseError
 from reva.kernel.ids import sha256_bytes
@@ -26,6 +32,12 @@ from reva.ports.storage import ArtifactStore
 
 log = logging.getLogger("reva.runner")
 FIXTURE_ROOT = Path(__file__).resolve().parents[3] / "tests" / "fixtures" / "source"
+
+
+def _fixture_fingerprint(url: str) -> str:
+    """Fixture key: secret query parameters are excluded, so captures never depend on a key.
+    (Identical to the plain fingerprint for URLs without secret parameters.)"""
+    return request_fingerprint("GET", url, secret_params=tuple(SECRET_QUERY_PARAMS))
 
 
 class FixtureHttp:
@@ -43,7 +55,7 @@ class FixtureHttp:
         self.overrides = overrides or {}
 
     async def get(self, url: str, **kw: Any) -> HttpResult:
-        fp = request_fingerprint("GET", url)
+        fp = _fixture_fingerprint(url)
         if fp in self.overrides:
             body = self.overrides[fp]
             status, headers = 200, {"content-type": "application/json"}
@@ -78,12 +90,13 @@ class RecordingHttp:
         sha = sha256_bytes(r.body)
         ext = ".zip" if r.media_type in ("application/zip", "application/octet-stream") else ".json"
         self.dir.mkdir(parents=True, exist_ok=True)
-        fname = f"{request_fingerprint('GET', url)[:16]}{ext}"
+        fp = _fixture_fingerprint(url)
+        fname = f"{fp[:16]}{ext}"
         (self.dir / fname).write_bytes(r.body)
         self.captured.append(
             {
-                "request_fingerprint": request_fingerprint("GET", url),
-                "url": url,
+                "request_fingerprint": fp,
+                "url": redact_url(url),  # secret query values (subscription-key, token, ...) never persisted
                 "file": fname,
                 "sha256": sha,
                 "status": r.status,
@@ -237,6 +250,16 @@ async def run_connector(
                 batches, reports = [], [
                     QualityReport(outcome="quarantine", findings=({"code": e.details.get("kind", "parse_error"),
                                                                    "severity": "blocker", "message": e.message},))
+                ]
+            except (KeyError, IndexError, TypeError, ValueError, AttributeError, ArithmeticError) as e:
+                # Row-level schema drift (a missing/renamed field, an unexpected type) in
+                # an otherwise well-formed response: quarantine this item, keep the run going.
+                log.warning("connector %s item %s: row-level schema drift: %s", spec.name, item.key,
+                            type(e).__name__)
+                batches, reports = [], [
+                    QualityReport(outcome="quarantine", findings=(
+                        {"code": "row_schema_drift", "severity": "blocker",
+                         "message": f"parser failed on a row ({type(e).__name__}: {str(e)[:200]})"},))
                 ]
             for b in batches:
                 queue.extend(b.follow_up)

@@ -35,13 +35,19 @@ def release_as_of(conn: Connection, as_of: datetime | None, origin: str | None =
     return dict(row) if row else None
 
 
-def release_by_id(conn: Connection, release_id: UUID) -> dict[str, Any] | None:
+def release_by_id(
+    conn: Connection, release_id: UUID, *, include_unpublished: bool = False
+) -> dict[str, Any] | None:
+    """A release by id. Read paths only ever see *published* releases (a release row
+    without an ops.publication row is not visible); ``include_unpublished`` is for
+    internal diagnostics only and must not back a read API."""
     row = conn.execute(
         text(
             """SELECT r.*, p.sequence, p.published_at FROM belief.release r
-               LEFT JOIN ops.publication p ON p.release_id = r.id WHERE r.id = :i"""
+               LEFT JOIN ops.publication p ON p.release_id = r.id
+               WHERE r.id = :i AND (CAST(:all AS boolean) OR p.release_id IS NOT NULL)"""
         ),
-        {"i": release_id},
+        {"i": release_id, "all": include_unpublished},
     ).mappings().one_or_none()
     return dict(row) if row else None
 

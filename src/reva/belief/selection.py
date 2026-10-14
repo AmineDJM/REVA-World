@@ -64,7 +64,7 @@ WITH visible AS (
     AND o.origin = ANY(:origins)
 ),
 annotated AS (
-  SELECT v.*, s.source_key, c.concept_id,
+  SELECT v.*, s.source_key, s.lineage_family, c.concept_id,
          EXISTS (SELECT 1 FROM evidence.observation_retraction r
                  WHERE r.observation_id = v.id AND r.recorded_at <= :cutoff) AS retracted,
          evidence.is_eligible(v.connector_version_id, v.concept_version_id, v.subject_id, :cutoff,
@@ -87,14 +87,15 @@ chosen AS (
   ORDER BY a.source_id, a.origin, a.logical_key, a.revision_no DESC
 ),
 result AS (
-  SELECT id, subject_id, concept_version_id, concept_id, support_id, source_key, origin, value, uncertainty,
-         logical_key, source_flags, revision_no,
+  SELECT id, subject_id, concept_version_id, concept_id, support_id, source_key, lineage_family, origin, value,
+         uncertainty, logical_key, source_flags, revision_no,
          CASE WHEN revision_no = head_revision_no THEN 'current' ELSE 'superseded_revision_selected' END
            AS selection_status
   FROM chosen
   UNION ALL
-  SELECT a.id, a.subject_id, a.concept_version_id, a.concept_id, a.support_id, a.source_key, a.origin, a.value,
-         a.uncertainty, a.logical_key, a.source_flags, a.revision_no, 'retracted' AS selection_status
+  SELECT a.id, a.subject_id, a.concept_version_id, a.concept_id, a.support_id, a.source_key, a.lineage_family,
+         a.origin, a.value, a.uncertainty, a.logical_key, a.source_flags, a.revision_no,
+         'retracted' AS selection_status
   FROM annotated a JOIN heads h ON h.head_id = a.id
   WHERE h.head_retracted AND CAST(:include_retracted AS boolean)
 )
@@ -172,6 +173,14 @@ def _same_value(a: dict[str, Any], b: dict[str, Any]) -> bool:
     return a == b
 
 
+def _independence(alt: dict[str, Any], chosen: dict[str, Any]) -> dict[str, Any]:
+    """Invariant 13: an alternative from the same source lineage family as the selected
+    value is never independent corroboration (it shares upstream data/processing)."""
+    fam_alt, fam_chosen = alt.get("lineage_family"), chosen.get("lineage_family")
+    same = fam_alt is None or fam_chosen is None or fam_alt == fam_chosen
+    return {"lineage_family": fam_alt, "independence": "same_family" if same else "independent_family"}
+
+
 def select(rows: list[dict[str, Any]], preferences: dict[str, list[str]]) -> list[Selection]:
     return select_report(rows, preferences).selections
 
@@ -210,7 +219,8 @@ def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]])
         if chosen.get("selection_status") == "superseded_revision_selected":
             sel.discrepancy_flags.append("superseded_revision_selected")
         for alt in ranked[1:]:
-            entry = {"observation_id": str(alt["id"]), "source_key": alt["source_key"], "value": alt["value"]}
+            entry = {"observation_id": str(alt["id"]), "source_key": alt["source_key"], "value": alt["value"],
+                     **_independence(alt, chosen)}
             if alt.get("selection_status") == "superseded_revision_selected":
                 entry["selection_status"] = "superseded_revision_selected"
             sel.alternatives.append(entry)
@@ -237,7 +247,8 @@ def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]])
         for r in retracted:
             # The retracted lineage is excluded; its value is not carried forward.
             sel.alternatives.append({"observation_id": str(r["id"]), "source_key": r["source_key"],
-                                     "logical_key": r["logical_key"], "selection_status": "retracted"})
+                                     "logical_key": r["logical_key"], "selection_status": "retracted",
+                                     **_independence(r, chosen)})
             sel.discrepancy_flags.append(f"retracted_lineage_excluded:{r['source_key']}")
         sel.discrepancy_flags = list(dict.fromkeys(sel.discrepancy_flags))
         out.append(sel)

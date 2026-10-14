@@ -207,3 +207,80 @@ def test_ingest_events_enqueue_one_publication_and_releases_are_not_redirtied(id
     _event(idb, {"acquisition_id": str(acq), "keys": [["wdi.population", "FRA"]]})
     r3 = invalidation.process_outbox(idb.worker, environment="production")
     assert r3.publish_jobs == [] and "belief:wdi.population" in _dirty(idb)
+
+
+# --------------------------------------------------------------------------- R2-02 per-event isolation
+def test_failing_event_is_isolated_retried_with_backoff_and_surfaced(idb: FreshDB, monkeypatch) -> None:
+    _reset(idb)
+    bad = _event(idb, {"keys": [["concept.bad", "FRA"]]})
+    good = _event(idb, {"keys": [["concept.good", "FRA"]]})
+    real = invalidation._process_observation_event
+
+    def flaky(conn, ev, *a, **k):
+        if int(ev.id) == bad:
+            conn.execute(text("SELECT 1/0"))  # a real DB error inside the event's savepoint
+        return real(conn, ev, *a, **k)
+
+    monkeypatch.setattr(invalidation, "_process_observation_event", flaky)
+    rep = invalidation.process_outbox(idb.worker)
+    assert rep.failed_events == [bad] and "belief:concept.good" in rep.dirty
+    with idb.owner.connect() as c:
+        processed = dict(c.execute(text("SELECT id, processed_at IS NOT NULL FROM ops.outbox WHERE id = ANY(:i)"),
+                                   {"i": [bad, good]}).all())
+        audit = c.execute(text("SELECT details FROM ops.audit WHERE action = 'outbox.event_failed' "
+                               "AND (target->>'outbox_id')::bigint = :i"), {"i": bad}).scalars().all()
+    assert processed == {bad: False, good: True}
+    assert len(audit) == 1 and audit[0]["failures"] == 1 and audit[0]["exception"] == "DataError"
+    assert "belief:concept.bad" not in _dirty(idb)
+    from reva.operations.telemetry import OUTBOX_FAILING_EVENTS
+
+    assert "reva_outbox_failing_events 1" in "\n".join(OUTBOX_FAILING_EVENTS.render())
+    # In backoff: the event is not even selected, newer events still flow.
+    newer = _event(idb, {"keys": [["concept.newer", "FRA"]]})
+    rep = invalidation.process_outbox(idb.worker)
+    assert rep.events == 1 and rep.failed_events == [] and "belief:concept.newer" in rep.dirty
+    # After the backoff (shortened here) it is retried; once healthy it is processed.
+    monkeypatch.setattr(invalidation, "OUTBOX_BACKOFF_BASE", 0.001)
+    monkeypatch.setattr(invalidation, "_process_observation_event", real)
+    rep = invalidation.process_outbox(idb.worker)
+    assert rep.events == 1 and rep.failed_events == [] and "belief:concept.bad" in rep.dirty
+    with idb.owner.connect() as c:
+        assert c.execute(text("SELECT processed_at IS NOT NULL FROM ops.outbox WHERE id = :i"), {"i": bad}).scalar()
+    assert newer > good
+
+
+def test_publish_enqueue_failure_never_aborts_the_batch(idb: FreshDB, monkeypatch) -> None:
+    import reva.operations.jobs as jobs_mod
+
+    _reset(idb)
+    with idb.owner.begin() as c:
+        acq = c.execute(text("SELECT id FROM evidence.acquisition WHERE origin = 'test_fixture' LIMIT 1")).scalar()
+        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                       "WHERE status IN ('queued','running','cancel_requested')"))
+    if acq is None:
+        pytest.skip("needs the fixture acquisition created by the ingest test above")
+    ev = _event(idb, {"acquisition_id": str(acq), "keys": [["concept.pubfail", "FRA"]]})
+    real = jobs_mod.enqueue_publish_beliefs
+
+    def broken(conn, *a, **k):
+        conn.execute(text("SELECT 1/0"))
+        return real(conn, *a, **k)
+
+    monkeypatch.setattr(jobs_mod, "enqueue_publish_beliefs", broken)
+    rep = invalidation.process_outbox(idb.worker, environment="test")
+    assert rep.publish_jobs == [] and rep.publish_requests_deferred == ["test_fixture"]
+    assert "belief:concept.pubfail" in _dirty(idb)
+    with idb.owner.connect() as c:
+        assert c.execute(text("SELECT processed_at IS NOT NULL FROM ops.outbox WHERE id = :i"), {"i": ev}).scalar()
+        req = c.execute(text("SELECT payload FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
+                             "AND processed_at IS NULL")).scalars().all()
+    assert len(req) == 1 and req[0]["origin"] == "test_fixture"
+    # The deferred request goes through the normal per-event retry path once enqueue works again.
+    monkeypatch.setattr(jobs_mod, "enqueue_publish_beliefs", real)
+    rep = invalidation.process_outbox(idb.worker, environment="test")
+    assert len(rep.publish_jobs) == 1
+    with idb.owner.connect() as c:
+        assert c.execute(text("SELECT job_type FROM ops.job WHERE id = :j"),
+                         {"j": rep.publish_jobs[0]}).scalar() == "publish_beliefs"
+        assert c.execute(text("SELECT count(*) FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
+                              "AND processed_at IS NULL")).scalar() == 0

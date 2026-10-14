@@ -11,6 +11,7 @@ from reva.evaluation.voi import (
     evpi,
     evsi_exact,
     evsi_nested_mc,
+    evsi_nested_mc_expectation,
     prior_decision_value,
     uncertainty_reduction_proxy,
 )
@@ -55,6 +56,35 @@ def test_nested_mc_agrees_with_exact(problem):
     assert abs(est.value - exact) <= 3 * est.std_error
     again = evsi_nested_mc(problem, n_outer=20000, n_inner=2000, seed=12345)
     assert again == est
+
+
+# Review R3-13 problem (verified with exact rational arithmetic: net EVSI = 7.2).
+R313 = DecisionProblem(prior=0.3, utility=((0.0, 0.0), (-20.0, 100.0)), sensitivity=0.9,
+                       specificity=0.8, cost=1.0)
+
+
+def test_nested_mc_inner_bias_sign_is_not_determined():
+    """The nested estimator's inner-loop bias can be upward or downward (R3-13)."""
+    exact = evsi_exact(R313)
+    assert exact == pytest.approx(7.2, abs=1e-12)
+    # Exact expectation of the estimator (finite sum over the inner Binomial count).
+    e1, e2, e64 = (evsi_nested_mc_expectation(R313, n) for n in (1, 2, 64))
+    assert e1 == pytest.approx(13.0, abs=1e-9)  # upward at n_inner = 1
+    assert e2 == pytest.approx(5.4629, abs=1e-3)  # downward at n_inner = 2
+    assert e64 < exact - 0.25  # still downward at n_inner = 64
+    assert abs(evsi_nested_mc_expectation(R313, 5000) - exact) < 0.02  # vanishes as n_inner grows
+    # The Monte Carlo estimator agrees with its exact expectation, not with the EVSI:
+    # at n_inner=2 the bias is ~20 outer standard errors and std_error does not include it.
+    mc = evsi_nested_mc(R313, n_outer=200_000, n_inner=2, seed=2)
+    assert abs(mc.value - e2) <= 4 * mc.std_error
+    assert exact - mc.value > 10 * mc.std_error
+
+
+def test_nested_mc_expectation_matches_exact_in_the_limit_for_both_problems():
+    for problem in (PROBLEM, DecisionProblem(0.15, U, 0.95, 0.9, 0.5)):
+        assert evsi_nested_mc_expectation(problem, 4000) == pytest.approx(evsi_exact(problem), abs=0.05)
+    with pytest.raises(ValueError):
+        evsi_nested_mc_expectation(PROBLEM, 0)
 
 
 def test_estimate_value_without_decision_spec_is_unitless_proxy():

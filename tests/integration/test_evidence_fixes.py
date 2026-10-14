@@ -53,6 +53,7 @@ from reva.ports.connectors import (
     Cursor,
     FetchBudget,
     FetchItem,
+    FetchOutcome,
     FetchPlan,
     ObservationBatch,
     ParsedObservation,
@@ -105,7 +106,8 @@ def _support(tag: str, year: int = 2021) -> Support:
 def _synthetic(tag: str, values: dict[str, str], *, origin: str = "test_fixture", year: int = 2021,
                body_salt: str = "") -> tuple[RawAcquisition, list[ObservationBatch], list[QualityReport]]:
     """A synthetic WDI-shaped acquisition: one observation per logical-key suffix in ``values``."""
-    body = json.dumps({"fx2": tag, "values": values, "salt": body_salt}, sort_keys=True).encode()
+    rows = [{"suffix": k, "value": v} for k, v in sorted(values.items())]
+    body = json.dumps({"fx2": tag, "rows": rows, "salt": body_salt}, sort_keys=True).encode()
     item = FetchItem(key=f"fx2:{tag}", url=f"https://api.worldbank.org/v2/fx2-test/{tag}", max_bytes=10_000)
     raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
                          response_metadata={"status": 200}, request_fingerprint=f"fx2:{tag}", origin=origin)
@@ -554,7 +556,8 @@ def test_r27_retracted_latest_revision_is_not_replaced_by_superseded_value(db: A
     assert f"retracted_lineage_excluded:{WB.source_key}" in est["discrepancy_flags"]
     alt = [a for a in est["alternatives"] if a.get("selection_status") == "retracted"]
     assert alt == [{"observation_id": str(rev2["id"]), "source_key": WB.source_key,
-                    "logical_key": f"fx2:{tag}:a", "selection_status": "retracted"}]
+                    "logical_key": f"fx2:{tag}:a", "selection_status": "retracted",
+                    "lineage_family": "worldbank_wdi", "independence": "same_family"}]
     with db.worker.connect() as c:
         manifest_sha = c.execute(text("SELECT manifest_sha256 FROM belief.release WHERE id=:r"),
                                  {"r": rel.release_id}).scalar_one()
@@ -701,3 +704,83 @@ async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
     assert row["record_count"] == 100_000 and row["privacy_class"] == "synthetic_public_aggregate_derived"
     recipe = json.loads(db.store.get("models", row["recipe_sha256"]))
     assert sum(int(leaf["count"]) for leaf in recipe["leaf_cells"]) == 68_277_210
+
+
+# --------------------------------------------------------------------------- spec audit items
+def test_invariant13_alternatives_record_lineage_family_independence() -> None:
+    rows = [{**_BASE, "id": 10, "logical_key": "a", "lineage_family": "worldbank_wdi",
+             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
+            {**_BASE, "id": 11, "logical_key": "b", "lineage_family": "worldbank_wdi",
+             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
+            {**_BASE, "id": 12, "logical_key": "c", "source_key": "t", "lineage_family": "eurostat",
+             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}}]
+    (sel,) = select(rows, {"c": ["s", "t"]})
+    by_id = {a["observation_id"]: a for a in sel.alternatives}
+    assert by_id["11"]["independence"] == "same_family" and by_id["11"]["lineage_family"] == "worldbank_wdi"
+    assert by_id["12"]["independence"] == "independent_family"
+
+
+def test_selector_that_does_not_resolve_quarantines_the_item(db: Any) -> None:
+    tag = f"sel-{uuid.uuid4().hex[:8]}"
+    raw, batches, reports = _synthetic(tag, {"a": "1"})
+    bad = batches[0].model_copy(update={"observations": tuple(
+        o.model_copy(update={"raw_selector": {"match": {"suffix": "nope"}}}) for o in batches[0].observations)})
+    s = publish_acquisition(db.worker, db.store, WB, raw, [bad], reports)
+    assert s.namespace == "quarantine" and s.inserted == 0
+    with db.worker.connect() as c:
+        meta = c.execute(text("SELECT response_metadata FROM evidence.acquisition WHERE id=:i"),
+                         {"i": s.acquisition_id}).scalar_one()
+    assert "selector_unresolved" in {f["code"] for q in meta["quality"] for f in q["findings"]}
+    # A duplicated element is ambiguous, also quarantined; the well-formed payload publishes.
+    dup_raw = raw.model_copy(update={"body": json.dumps({"rows": [{"suffix": "a"}, {"suffix": "a"}]}).encode(),
+                                     "request_fingerprint": f"fx2:{tag}:dup"})
+    assert publish_acquisition(db.worker, db.store, WB, dup_raw, batches, reports).namespace == "quarantine"
+    ok = publish_acquisition(db.worker, db.store, WB, raw.model_copy(update={"request_fingerprint": f"fx2:{tag}:ok"}),
+                             batches, reports)
+    assert ok.namespace == "raw" and ok.inserted == 1
+
+
+def test_comtrade_implausible_jump_is_a_review_signal_not_a_block() -> None:
+    ct = ComtradeConnector(reporters=("CHN",), total_years=(2022, 2023), bilateral_years=())
+    for year, value in ((2022, "5000000000"), (2023, "5564")):
+        body = copy.deepcopy(_ct_body(156, "M", 2023))
+        body["data"][0].update({"period": year, "refYear": year, "primaryValue": value, "cifvalue": value})
+        item = next(i for i in ct.plan(None, FetchBudget()).items if i.key == f"total:CHN:M:{year}")
+        raw = RawAcquisition(item=item, body=json.dumps(body, default=str).encode(), media_type="application/json",
+                             retrieved_at=datetime.now(UTC), response_metadata={"status": 200},
+                             request_fingerprint="t", origin="test_fixture")
+        report = ct.validate(next(iter(ct.parse(raw))))
+    jumps = [f for f in report.findings if f.code == "implausible_jump"]
+    assert jumps and all(f.severity == "warning" for f in jumps) and report.outcome == "pass"
+
+
+async def test_crossref_sends_conditional_headers_and_treats_304_as_unchanged() -> None:
+    from reva.adapters.connectors.crossref import CrossrefConnector
+    from reva.adapters.http.safe_client import HttpResult
+
+    calls: list[dict[str, Any]] = []
+    body = json.dumps({"status": "ok", "message-type": "work",
+                       "message": {"DOI": "10.1257/aer.99.3.1053", "title": ["T"]}}).encode()
+
+    class Http:
+        origin = "test_fixture"
+
+        async def get(self, url: str, **kw: Any) -> HttpResult:
+            calls.append(kw)
+            if (kw.get("headers") or {}).get("If-None-Match") == '"v1"':
+                return HttpResult(url, url, 304, {}, b"", datetime.now(UTC), 0.0, (), 1)
+            return HttpResult(url, url, 200, {"content-type": "application/json", "etag": '"v1"'}, body,
+                              datetime.now(UTC), 0.0, (), 1)
+
+    c1 = CrossrefConnector()
+    plan = c1.plan(None, FetchBudget())
+    raw = await c1.fetch(plan.items[0], Http())
+    assert raw.response_metadata["status"] == 200 and not calls[0].get("headers")
+    cursor = c1.next_cursor(plan, [FetchOutcome(item_key=plan.items[0].key, status="published")])
+    assert cursor.state["validators"]["10.1257/aer.99.3.1053"]["etag"] == '"v1"'
+    c2 = CrossrefConnector()
+    plan2 = c2.plan(cursor, FetchBudget())
+    raw2 = await c2.fetch(plan2.items[0], Http())
+    assert calls[1]["headers"]["If-None-Match"] == '"v1"' and raw2.response_metadata["status"] == 304
+    batch = next(iter(c2.parse(raw2)))
+    assert batch.metadata == {"not_modified": True} and c2.validate(batch).outcome == "pass"

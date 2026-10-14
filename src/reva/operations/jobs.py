@@ -40,6 +40,7 @@ from reva.kernel.errors import (
     UnsafeRequest,
     ValidationProblem,
 )
+from reva.operations.budgets import BudgetExhausted
 from reva.operations.context import JobCancelled, JobContext
 
 __all__ = ["HANDLERS", "JobCancelled", "JobContext", "resolve_handler"]
@@ -91,7 +92,7 @@ class PublicationBusy(RevaError):
 NON_RETRYABLE: tuple[type[RevaError], ...] = (
     ValidationProblem, CapabilityGap, MissingInput, IncompatibleSemantics, LeakageBlocked,
     ImmutableRecordViolation, PolicyDenied, ConfigurationError, UnsafeRequest, IntegrityFailure,
-    HandlerUnavailable,
+    HandlerUnavailable, BudgetExhausted,
 )
 
 
@@ -207,6 +208,22 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     if ctx.is_cancelled():
         raise JobCancelled("cancelled before acquisition started")
 
+    # Invariant 30: live runs are charged against registry/policies/budgets.yaml before any
+    # request; a run that would exceed a daily budget is not started (budget_exhausted).
+    reservation = None
+    fetch_budget = None
+    if mode == "live":
+        from reva.evidence.runner import load_cursor
+        from reva.operations.budgets import reserve_ingest
+        from reva.ports.connectors import FetchBudget
+
+        default = FetchBudget()
+        planned = len(connector.plan(load_cursor(ctx.worker_engine, spec.name), default).items)
+        reservation = reserve_ingest(ctx.worker_engine, job_id=ctx.job_id, attempt=ctx.attempt,
+                                     source_key=spec.source_key, planned_requests=planned)
+        fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
+                                   max_bytes=min(default.max_bytes, reservation.max_bytes))
+
     http: Any
     if mode == "fixture":
         http = FixtureHttp(spec.name)
@@ -214,15 +231,18 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         client = make_live_client(spec, ctx.settings)
         http = RecordingHttp(client, spec.name, spec.licence) if capture else client
 
+    from reva.operations.tracing import span, traced_connector
+
     async def _run() -> Any:
         try:
-            return await run_connector(connector, http, ctx.store, ctx.worker_engine,
-                                       persist_cursor=(mode == "live"), post_publish=post_publish_for(spec.template),
-                                       fence=ctx.assert_lease)
+            return await run_connector(traced_connector(connector), http, ctx.store, ctx.worker_engine,
+                                       budget=fetch_budget, persist_cursor=(mode == "live"),
+                                       post_publish=post_publish_for(spec.template), fence=ctx.assert_lease)
         finally:
             await http.aclose()
 
-    report = asyncio.run(_run())
+    with span("ingest.run", connector=spec.name, mode=mode, job_id=str(ctx.job_id)):
+        report = asyncio.run(_run())
     if capture:
         http.write_manifest()
 
@@ -233,6 +253,7 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     shas = sorted({o.raw_sha256 for o in report.outcomes if o.raw_sha256})
     origin = "test_fixture" if mode == "fixture" else "live"
     publish_job = None
+    nbytes = 0
     with ctx.worker_engine.begin() as conn:
         if shas:
             nbytes = conn.execute(text("SELECT COALESCE(sum(byte_size), 0) FROM meta.artifact WHERE sha256 = ANY(:s)"),
@@ -247,6 +268,16 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
             except Exception as e:  # data is already published; the outbox path enqueues it as a backstop
                 log.error("publish_beliefs enqueue after ingest failed (%s); outbox processing will retry",
                           type(e).__name__)
+    budget_info = None
+    if reservation is not None:
+        from reva.operations.budgets import settle
+
+        fetched = sum(1 for o in report.outcomes
+                      if o.detail != "budget" and not str(o.detail or "").startswith("blocked by"))
+        settle(ctx.worker_engine, reservation, requests=fetched, nbytes=int(nbytes))
+        budget_info = {"policy": reservation.policy_version, "source_key": reservation.source_key,
+                       "reserved_requests": reservation.planned_requests, "consumed_requests": fetched,
+                       "consumed_bytes": int(nbytes)}
     result = {
         "connector": spec.name,
         "connector_version": spec.version,
@@ -260,6 +291,7 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         "cursor_advanced": report.cursor_advanced,
         "raw_sha256": shas[:50],
         "publish_job_id": str(publish_job) if publish_job else None,
+        "budget": budget_info,
         "status": "partial" if report.errors else "complete",
     }
     if report.outcomes and all(o.status == "failed" for o in report.outcomes):

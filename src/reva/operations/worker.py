@@ -53,6 +53,7 @@ from reva.adapters.postgres import queue
 from reva.adapters.postgres.queue import ClaimedJob
 from reva.kernel.errors import ConfigurationError, RevaError, StaleLease
 from reva.operations import telemetry as tm
+from reva.operations import tracing
 from reva.operations.context import JobContext
 from reva.operations.jobs import SIM_ENGINE_JOB_TYPES, HandlerUnavailable, JobCancelled, classify_exception
 from reva.ports.storage import ArtifactStore
@@ -460,7 +461,9 @@ class Worker:
             if self._shutdown.is_set():
                 status = queue.release(self.engine, job, None, "worker_shutdown_before_start")
                 return done("released" if status == "queued" else status, None, ack)
-            result = handler(dict(job.payload), ctx)
+            with tracing.span("job.execute", job_type=job.job_type, job_id=str(job.id), attempt=job.attempts,
+                              worker_id=self.worker_id):
+                result = handler(dict(job.payload), ctx)
         except JobCancelled as e:
             try:
                 if self._shutdown.is_set():

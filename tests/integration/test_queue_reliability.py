@@ -645,3 +645,60 @@ def test_claim_job_claims_only_that_job(qdb: FreshDB) -> None:
     assert job is not None and job.id == mine and job.fencing_token > 0
     assert queue.claim_job(qdb.worker, mine, "cli-demo", 30) is None  # no longer queued
     assert _status(qdb, other)["status"] == "queued"
+
+
+# --------------------------------------------------------------------------- invariant 30 ingestion budgets
+def test_budget_reservation_refuses_runs_that_would_exceed_daily_limits(qdb: FreshDB) -> None:
+    from reva.operations.budgets import BudgetExhausted, IngestBudget, reserve_ingest, settle, usage_today
+
+    src = f"test.source.{uuid.uuid4().hex[:6]}"
+    b = IngestBudget("t", "", total_requests=10**6, total_bytes=10**12, per_source_requests={src: 100})
+    r1 = reserve_ingest(qdb.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=48, budget=b)
+    assert r1.max_requests == 100  # run cap: what was left for this source when it started
+    with pytest.raises(BudgetExhausted) as ei:  # 48 + 60 > 100: not started
+        reserve_ingest(qdb.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=60, budget=b)
+    assert ei.value.code == "budget_exhausted" and ei.value.details["used_source_requests"] == 48
+    settle(qdb.worker, r1, requests=40, nbytes=1234)  # consumed replaces the reservation
+    with qdb.worker.connect() as c:
+        u = usage_today(c, src)
+    assert u["source_requests"] == 40
+    r2 = reserve_ingest(qdb.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=60, budget=b)
+    assert r2.max_requests == 60
+    tight = IngestBudget("t", "", total_requests=10**6, total_bytes=u["total_bytes"], per_source_requests={})
+    with pytest.raises(BudgetExhausted):  # daily byte budget already used up
+        reserve_ingest(qdb.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=1, budget=tight)
+
+
+def test_live_ingest_over_budget_fails_with_budget_exhausted_without_requests(qdb: FreshDB, monkeypatch) -> None:
+    from reva.evidence import runner
+
+    def no_network(*a, **k):
+        raise AssertionError("a live client must not be created when the budget is exhausted")
+
+    monkeypatch.setattr(runner, "make_live_client", no_network)
+    with qdb.owner.begin() as c:  # today's WDI request budget (200) already consumed
+        c.execute(text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
+                       "VALUES ('source:worldbank.wdi:requests', :o, 'requests', 200, 200)"),
+                  {"o": f"test-prefill-{uuid.uuid4().hex}"})
+    jid = _enqueue(qdb, "ingest", {"connector": "worldbank.wdi.indicators", "mode": "live", "probe": "budget"})
+    w = _worker(qdb)
+    job = w.claim_one()
+    assert job is not None and job.id == jid
+    out = w.execute(job)
+    row = _status(qdb, jid)
+    assert out.status == "failed" and row["status"] == "failed"
+    assert row["last_error"]["code"] == "budget_exhausted" and row["last_error"]["retryable"] is False
+    assert row["result_ref"] is None
+
+
+def test_tracing_is_a_no_op_without_endpoint(monkeypatch) -> None:
+    from reva.operations import tracing
+
+    monkeypatch.delenv("OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+    monkeypatch.setattr(tracing, "_resolved", False)
+    monkeypatch.setattr(tracing, "_tracer", None)
+    with tracing.span("job.execute", job_type="health") as sp:
+        assert sp is None
+    assert tracing.enabled() is False
+    sentinel = object()
+    assert tracing.traced_connector(sentinel) is sentinel

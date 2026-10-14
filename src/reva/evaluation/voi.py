@@ -122,7 +122,7 @@ def evpi(problem: DecisionProblem) -> float:
 @dataclass(frozen=True)
 class MonteCarloEstimate:
     value: float
-    std_error: float  # outer-loop sampling error only; inner-loop bias is O(1/n_inner)
+    std_error: float  # outer-loop sampling error only; excludes the inner-loop bias (see below)
     n_outer: int
     n_inner: int
     seed: int
@@ -139,7 +139,23 @@ def evsi_nested_mc(
     ``E[U(a)|x_i] ~= sum_j L(x_i|theta_j) U(a,theta_j) / sum_j L(x_i|theta_j)``,
     then take ``max_a``. The prior decision value is computed exactly (it has a
     closed form), so the only Monte Carlo error is in the preposterior term.
-    The max over noisy inner estimates biases the estimate upward by O(1/n_inner).
+
+    Inner-loop bias: the estimator is biased at finite ``n_inner`` and the
+    **sign of the bias is not determined** in general. Two effects compete:
+    the max over noisy inner estimates pushes upward (Jensen), while the
+    self-normalised posterior weight ``k L1 / (k L1 + (n - k) L0)`` is a
+    non-linear (concave or convex) function of the inner count ``k``, which
+    can push either way; with few inner draws the estimated posterior is also
+    pulled towards the prior, which pushes the preposterior value down
+    towards the prior value. For example (review R3-13) with prior 0.3,
+    utilities ((0, 0), (-20, 100)), sensitivity 0.9, specificity 0.8 and
+    cost 1, the exact net EVSI is 7.2 while the estimator's exact expectation
+    is 13.0 at ``n_inner=1`` (upward), 5.46 at ``n_inner=2`` and 6.90 at
+    ``n_inner=64`` (downward).
+    The bias vanishes as ``n_inner -> inf`` and is not included in
+    ``std_error``. :func:`evsi_nested_mc_expectation` computes the estimator's
+    exact expectation, so the bias of a given design can be checked; prefer
+    :func:`evsi_exact` whenever the outcome space is finite.
     """
     if n_outer < 2 or n_inner < 1:
         raise ValueError("n_outer must be >= 2 and n_inner >= 1")
@@ -165,6 +181,42 @@ def evsi_nested_mc(
     est = float(vals.mean()) - prior_decision_value(problem) - problem.cost
     se = float(vals.std(ddof=1) / math.sqrt(n_outer))
     return MonteCarloEstimate(est, se, n_outer, n_inner, seed)
+
+
+def evsi_nested_mc_expectation(problem: DecisionProblem, n_inner: int) -> float:
+    """Exact expectation of :func:`evsi_nested_mc` for a given ``n_inner``.
+
+    The outer loop averages over ``x``; for each ``x`` the inner estimate
+    depends only on the number ``k ~ Binomial(n_inner, prior)`` of inner draws
+    with ``theta = 1``, so the expectation is a finite sum. ``expectation -
+    evsi_exact(problem)`` is the inner-loop bias of the nested estimator.
+    """
+    if n_inner < 1:
+        raise ValueError("n_inner must be >= 1")
+    from scipy.stats import binom
+
+    u = _u(problem)
+    like = _outcome_probs(problem)
+    p = problem.prior
+    prior = np.array([1.0 - p, p])
+    prior_eu = u @ prior
+    k = np.arange(n_inner + 1)
+    pk = binom.pmf(k, n_inner, p)
+    total = 0.0
+    for x in (0, 1):
+        px = float((like[x] * prior).sum())
+        if px == 0.0:
+            continue
+        l0, l1 = like[x, 0], like[x, 1]
+        w1, w0 = k * l1, (n_inner - k) * l0
+        den = w1 + w0
+        val = np.empty(k.size)
+        safe = den > 0
+        eu = (w0[safe, None] * u[:, 0][None, :] + w1[safe, None] * u[:, 1][None, :]) / den[safe, None]
+        val[safe] = eu.max(axis=1)
+        val[~safe] = prior_eu.max()
+        total += px * float((pk * val).sum())
+    return total - prior_decision_value(problem) - problem.cost
 
 
 def _dec(x: float) -> str:

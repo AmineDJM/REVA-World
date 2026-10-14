@@ -381,14 +381,6 @@ def test_runner_quarantines_truncated_page_and_html(rdb: Any) -> None:
 
 
 @pytest.mark.db
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: row-level schema drift (e.g. WB rows without 'date') raises KeyError/ValueError from "
-        "connector.parse; run_connector only catches SourceResponseError/RevaError, so the whole run "
-        "crashes instead of quarantining the item and continuing"
-    ),
-)
 def test_runner_quarantines_row_level_schema_drift(rdb: Any) -> None:
     wb = WorldBankConnector()
     pop, pop_url = fixture_body(WB, ["indicator/SP.POP.TOTL?", "page=1"])

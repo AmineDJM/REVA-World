@@ -18,9 +18,12 @@ acquisitions of the same series never share a revision chain.
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
-from collections.abc import Callable, Sequence
+from collections import Counter
+from collections.abc import Callable, Iterator, Sequence
 from dataclasses import dataclass, field
+from decimal import Decimal
 from typing import Any
 from uuid import UUID
 
@@ -33,6 +36,7 @@ from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import canonical_bytes
 from reva.ports.connectors import (
     ConnectorSpec,
+    Finding,
     ObservationBatch,
     ParsedObservation,
     QualityReport,
@@ -79,6 +83,72 @@ def acquisition_idempotency_key(spec: ConnectorSpec, raw: RawAcquisition, raw_sh
     # version bump must reprocess previously captured bytes (R-28).
     basis = f"{spec.name}|{spec.version}|{spec.parser_version}|{raw.request_fingerprint}|{raw_sha}|{raw.origin}"
     return hashlib.sha256(basis.encode()).hexdigest()
+
+
+def _walk_dicts(node: Any) -> Iterator[dict[str, Any]]:
+    stack = [node]
+    while stack:
+        n = stack.pop()
+        if isinstance(n, dict):
+            yield n
+            stack.extend(n.values())
+        elif isinstance(n, list):
+            stack.extend(n)
+
+
+def _jsonstat_position(doc: Any, coords: dict[str, Any]) -> int | None:
+    """Row-major JSON-stat position of ``coords`` or None when a coordinate does not resolve."""
+    try:
+        ids, sizes, dims = doc["id"], doc["size"], doc["dimension"]
+        pos = 0
+        for d, n in zip(ids, sizes, strict=True):
+            index = dims[d]["category"]["index"]
+            code = coords[d]
+            i = index.index(code) if isinstance(index, list) else index[code]
+            pos = pos * int(n) + int(i)
+        return pos
+    except (KeyError, TypeError, ValueError, IndexError):
+        return None
+
+
+def selector_report(raw: RawAcquisition, batches: Sequence[ObservationBatch]) -> QualityReport | None:
+    """Check 8 (selector references resolve): every observation's raw selector must
+    resolve to exactly one element of the raw payload; a Missing value may resolve to
+    none (the provider returned no row) but never to several. Returns a blocking
+    report (the item is quarantined) or None when every selector resolves."""
+    obs = [o for b in batches for o in b.observations]
+    checked = [o for o in obs if isinstance(o.raw_selector.get("match"), dict) or "jsonstat_position" in o.raw_selector]
+    if not checked:
+        return None
+    try:
+        payload = json.loads(raw.body, parse_float=Decimal)
+    except (ValueError, UnicodeDecodeError):
+        return QualityReport(outcome="quarantine", findings=(Finding(
+            code="selector_unresolved", severity="blocker",
+            message="observations carry JSON selectors but the raw payload is not JSON"),))
+    counters: dict[tuple[str, ...], Counter[tuple[str, ...]]] = {}
+    bad: list[str] = []
+    for o in checked:
+        missing = o.value.get("kind") == "missing"
+        if "jsonstat_position" in o.raw_selector:
+            ok = _jsonstat_position(payload, dict(o.raw_selector.get("coordinates") or {})) == int(
+                o.raw_selector["jsonstat_position"])
+        else:
+            match = o.raw_selector["match"]
+            keys = tuple(sorted(match))
+            if keys not in counters:
+                counters[keys] = Counter(
+                    tuple(str(d[k]) for k in keys) for d in _walk_dicts(payload) if all(k in d for k in keys))
+            n = counters[keys][tuple(str(match[k]) for k in keys)]
+            ok = n == 1 or (missing and n == 0)
+        if not ok:
+            bad.append(o.logical_key)
+    if not bad:
+        return None
+    return QualityReport(outcome="quarantine", findings=(Finding(
+        code="selector_unresolved", severity="blocker",
+        message=f"{len(bad)} observation selectors do not resolve to exactly one payload element "
+                f"(e.g. {', '.join(bad[:5])})"),))
 
 
 def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: bool) -> StoredObject:
@@ -179,8 +249,6 @@ def _insert_observation(
 
 
 def canonical_json(obj: Any) -> str:
-    import json
-
     return json.dumps(obj, sort_keys=True, default=str, allow_nan=False, separators=(",", ":"))
 
 
@@ -246,6 +314,9 @@ def publish_acquisition(
     acquisition. If it raises, the acquisition rolls back too, so a retry
     re-publishes both (R-14).
     """
+    sel = selector_report(raw, batches)
+    if sel is not None:
+        reports = [*reports, sel]
     quarantined = any(r.blocking for r in reports)
     obj = write_raw_object(store, raw, quarantined)  # 1-2: bytes first, verified
     if fault_after_object_write:  # used by fault-injection tests

@@ -144,7 +144,9 @@ test('L2 shows the sensitivity range labelled "not a confidence interval"', asyn
   expect((sim.data.results as any[]).some((r) => r.uncertainty?.kind === 'sensitivity_range')).toBe(true);
   // No served L2 result claims a probability-bearing interval.
   for (const r of sim.data.results as any[]) {
-    expect(['sensitivity_range', 'none', 'not_quantified', 'exact', undefined]).toContain(r.uncertainty?.kind);
+    const kind = r.uncertainty?.kind;
+    expect(['confidence_interval', 'credible_interval', 'prediction_interval', 'probability', 'distribution']).not.toContain(kind);
+    if (kind === 'sensitivity_range') expect(r.uncertainty.level ?? null, 'a sensitivity range has no coverage level').toBeNull();
   }
 
   const table = page.getByTestId('comparison-table');
@@ -162,7 +164,8 @@ test('L2 shows the sensitivity range labelled "not a confidence interval"', asyn
   expect(json.context.scenario_id).toBe(sim.data.scenario.id);
   expect(json.context.assumptions.join(' ')).toMatch(/no probability interpretation/);
   const ranged = (json.results as any[]).find((r) => r.uncertainty?.kind === 'sensitivity_range');
-  expect(ranged.uncertainty.label).not.toMatch(/confidence/i);
+  expect(ranged.uncertainty.label).toMatch(/sensitivity range/i);
+  expect(String(ranged.uncertainty.label).replace(/not a confidence interval/i, '')).not.toMatch(/confidence|credible|95/i);
 });
 
 test('a run including DZA is rejected with missing_input naming DZA (never imputed, no results)', async ({ page }) => {

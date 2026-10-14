@@ -1075,15 +1075,6 @@ def test_release_readers_ignore_unpublished_releases(w: World) -> None:
         assert str(w.unpublished_release_id) not in json.dumps(ctx.as_dict(), default=str)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: belief.snapshots.release_by_id LEFT JOINs ops.publication and returns unpublished releases; "
-        "API routes (/evidence?release_id=..., scenario baseline display) use it without checking "
-        "publication, so an unpublished release manifest can be served. INNER JOIN ops.publication "
-        "(or add published_only=True and use it in API routes)"
-    ),
-)
 def test_release_by_id_does_not_serve_unpublished_releases(w: World) -> None:
     from reva.belief.snapshots import release_by_id
 
