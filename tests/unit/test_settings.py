@@ -115,14 +115,6 @@ def test_load_settings_error_never_contains_secret_values(clean_env: pytest.Monk
         assert secret not in str(ei2.value) and secret not in repr(ei2.value.problem())
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: Settings() raises a pydantic ValidationError whose text includes input_value with raw "
-        "secrets (e.g. the session secret) when constructed directly instead of via load_settings(); "
-        "set hide_input_in_errors=True in Settings.model_config"
-    ),
-)
 def test_direct_settings_validation_error_hides_inputs(clean_env: pytest.MonkeyPatch) -> None:
     over = {k: v for k, v in GOOD_PROD.items() if k != "reva_session_secret"}
     with pytest.raises(ValidationError) as ei:

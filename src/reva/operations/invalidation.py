@@ -26,6 +26,21 @@ knowledge cutoff is at/after the event are not re-dirtied (prevents duplicate
 releases when the outbox is processed after publication). When belief nodes
 are dirty after a batch, a publish_beliefs job is enqueued idempotently per
 origin.
+
+Failure isolation (R2-02): every event is processed in its own savepoint. An
+event whose processing raises is rolled back alone, left unprocessed and
+retried on later ticks with exponential backoff
+(``min(OUTBOX_BACKOFF_CAP, OUTBOX_BACKOFF_BASE * 2**(failures-1))`` seconds);
+each failure is surfaced as an ``outbox.event_failed`` audit row (which is also
+the durable failure counter the backoff is computed from), an error log line and
+the ``reva_outbox_event_failures_total`` / ``reva_outbox_failing_events``
+metrics. Events in backoff are excluded from the batch query, so they never
+starve newer events. The publish_beliefs enqueue is isolated the same way: a key
+held by a foreign job is resolved with a disambiguated key (audited as
+``outbox.publish_key_conflict``); any other enqueue failure is converted into a
+durable ``beliefs.publish_requested`` outbox event that goes through the same
+retry/backoff path, so one bad enqueue never aborts the batch or loses the
+publication.
 """
 
 from __future__ import annotations
@@ -43,6 +58,10 @@ from sqlalchemy import Connection, Engine, text
 log = logging.getLogger("reva.invalidation")
 
 OBS_EVENT = "evidence.observations_changed"
+PUBLISH_REQUEST_EVENT = "beliefs.publish_requested"
+OUTBOX_BACKOFF_BASE = 5.0
+OUTBOX_BACKOFF_CAP = 3600.0
+FAILURE_MEMORY_DAYS = 30
 SKIP = "materiality_skip"
 EXHAUSTED = "error_budget_exhausted"
 
@@ -56,6 +75,9 @@ class InvalidationReport:
     forced: list[str] = field(default_factory=list)
     coupled_components: list[list[str]] = field(default_factory=list)
     publish_jobs: list[str] = field(default_factory=list)
+    failed_events: list[int] = field(default_factory=list)
+    publish_conflicts: list[dict[str, Any]] = field(default_factory=list)
+    publish_requests_deferred: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -257,69 +279,159 @@ def _apply(conn: Connection, seq: int, dirty: dict[str, str], skipped: dict[str,
         report.dirty.append(k)
 
 
+BATCH_SQL = """
+WITH fails AS (
+  SELECT (a.target->>'outbox_id')::bigint AS id, count(*) AS n, max(a.recorded_at) AS last
+    FROM ops.audit a
+   WHERE a.action = 'outbox.event_failed'
+     AND a.recorded_at > clock_timestamp() - make_interval(days => :mem)
+   GROUP BY 1)
+SELECT o.id, o.event_type, o.payload, o.created_at, COALESCE(f.n, 0) AS failures
+  FROM ops.outbox o LEFT JOIN fails f ON f.id = o.id
+ WHERE o.processed_at IS NULL
+   AND (f.id IS NULL
+        OR f.last + make_interval(secs => LEAST(:cap, :base * power(2, f.n - 1))) <= clock_timestamp())
+ ORDER BY o.id
+ LIMIT :n
+ FOR UPDATE OF o SKIP LOCKED
+"""
+
+
+def outbox_backoff_seconds(failures: int) -> float:
+    return float(min(OUTBOX_BACKOFF_CAP, OUTBOX_BACKOFF_BASE * (2 ** max(0, failures - 1))))
+
+
+def _audit(conn: Connection, actor: str, action: str, target: dict[str, Any], details: dict[str, Any]) -> None:
+    from reva.operations.audit import record
+
+    try:
+        with conn.begin_nested():
+            record(conn, actor, action, target, details)
+    except Exception as e:  # auditing must not abort the batch
+        log.warning("could not record %s audit row: %s", action, type(e).__name__)
+
+
+def _record_event_failure(conn: Connection, actor: str, ev: Any, exc: BaseException) -> None:
+    from reva.operations.telemetry import OUTBOX_EVENT_FAILURES, redact_text, secret_values
+
+    failures = int(ev.failures) + 1
+    msg = redact_text(getattr(exc, "message", None) or str(exc) or type(exc).__name__, secret_values())[:500]
+    log.error("outbox event %s (%s) failed (failure %d, next retry in %.0fs): %s: %s", ev.id, ev.event_type,
+              failures, outbox_backoff_seconds(failures), type(exc).__name__, msg)
+    OUTBOX_EVENT_FAILURES.inc()
+    _audit(conn, actor, "outbox.event_failed", {"outbox_id": int(ev.id)},
+           {"event_type": ev.event_type, "failures": failures, "exception": type(exc).__name__,
+            "message": msg, "retry_in_seconds": outbox_backoff_seconds(failures)})
+
+
+def _enqueue_publish(conn: Connection, origin: str, through: int, actor: str, report: InvalidationReport) -> None:
+    from reva.operations.jobs import enqueue_publish_beliefs
+
+    res = enqueue_publish_beliefs(conn, origin, through, created_by=actor, audit_actor=actor)
+    report.publish_jobs.append(str(res))
+
+
+def _process_observation_event(conn: Connection, ev: Any, release_cutoffs: dict[str, datetime],
+                               report: InvalidationReport, origins_seen: dict[str, int]) -> None:
+    report.observation_events += 1
+    payload = dict(ev.payload)
+    origin = None
+    if payload.get("acquisition_id"):
+        origin = conn.execute(text("SELECT origin FROM evidence.acquisition WHERE id = :a"),
+                              {"a": payload["acquisition_id"]}).scalar_one_or_none()
+    seeds = _event_seeds(payload)
+    if not seeds:
+        return
+    bounds = {k: d for k, v in (payload.get("change_bounds") or {}).items() if (d := _dec(v)) is not None}
+    edges = _reachable_edges(conn, seeds)
+    dirty, skipped, comps = _propagate(seeds, edges, bounds)
+    # Fine-grained observation seeds are only tracked when something depends on them.
+    consumers = {e.upstream for e in edges}
+    dirty = {k: r for k, r in dirty.items() if not (k.startswith("observation:") and k not in consumers)}
+    covered = release_cutoffs.get(origin) if origin else None
+    if covered is not None and covered >= ev.created_at:
+        dirty = {k: r for k, r in dirty.items() if not k.startswith("belief:")}
+        skipped = {k: v for k, v in skipped.items() if not k.startswith("belief:")}
+    _apply(conn, int(ev.id), dirty, skipped, report)
+    report.coupled_components.extend(comps)
+    if origin:
+        origins_seen[origin] = max(origins_seen.get(origin, 0), int(ev.id))
+
+
 def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "local",
                    actor: str = "worker:invalidation") -> InvalidationReport:
-    """Process one batch of unprocessed outbox events in a single transaction."""
-    from reva.operations.jobs import dirty_belief_nodes, enqueue_publish_beliefs, latest_observation_event
+    """Process one batch of unprocessed outbox events (one transaction, one savepoint per event)."""
+    from reva.operations.jobs import dirty_belief_nodes, latest_observation_event
+    from reva.operations.telemetry import OUTBOX_FAILING_EVENTS
 
     report = InvalidationReport()
     with engine.begin() as conn:
         events = conn.execute(
-            text("SELECT id, event_type, payload, created_at FROM ops.outbox WHERE processed_at IS NULL "
-                 "ORDER BY id LIMIT :n FOR UPDATE SKIP LOCKED"),
-            {"n": batch},
+            text(BATCH_SQL),
+            {"n": batch, "mem": FAILURE_MEMORY_DAYS, "cap": OUTBOX_BACKOFF_CAP, "base": OUTBOX_BACKOFF_BASE},
         ).all()
-        if not events:
-            return report
-        report.events = len(events)
-        release_cutoffs: dict[str, datetime] = {
-            o: c for o, c in conn.execute(
-                text("SELECT r.origin, max(r.knowledge_cutoff) FROM belief.release r "
-                     "JOIN ops.publication p ON p.release_id = r.id GROUP BY r.origin")
-            ).all()
-        }
-        origins_seen: dict[str, int] = {}
-        for ev in events:
-            if ev.event_type != OBS_EVENT:
-                continue
-            report.observation_events += 1
-            payload = dict(ev.payload)
-            origin = None
-            if payload.get("acquisition_id"):
-                origin = conn.execute(text("SELECT origin FROM evidence.acquisition WHERE id = :a"),
-                                      {"a": payload["acquisition_id"]}).scalar_one_or_none()
-            seeds = _event_seeds(payload)
-            if not seeds:
-                continue
-            bounds = {k: d for k, v in (payload.get("change_bounds") or {}).items()
-                      if (d := _dec(v)) is not None}
-            edges = _reachable_edges(conn, seeds)
-            dirty, skipped, comps = _propagate(seeds, edges, bounds)
-            # Fine-grained observation seeds are only tracked when something depends on them.
-            consumers = {e.upstream for e in edges}
-            dirty = {k: r for k, r in dirty.items() if not (k.startswith("observation:") and k not in consumers)}
-            covered = release_cutoffs.get(origin) if origin else None
-            if covered is not None and covered >= ev.created_at:
-                dirty = {k: r for k, r in dirty.items() if not k.startswith("belief:")}
-                skipped = {k: v for k, v in skipped.items() if not k.startswith("belief:")}
-            _apply(conn, int(ev.id), dirty, skipped, report)
-            report.coupled_components.extend(comps)
-            if origin:
-                origins_seen[origin] = max(origins_seen.get(origin, 0), int(ev.id))
-        conn.execute(text("UPDATE ops.outbox SET processed_at = clock_timestamp() WHERE id = ANY(:ids)"),
-                     {"ids": [int(e.id) for e in events]})
-        if origins_seen and dirty_belief_nodes(conn) > 0:
-            # Same key derivation as the ingest handler (origin + newest observation
-            # event) so both paths usually coincide; any residual duplicate is a
-            # no-op because publication clears the dirty belief nodes.
-            through = latest_observation_event(conn)
-            for origin in sorted(origins_seen):
-                if environment == "production" and origin != "live":
+        if events:
+            report.events = len(events)
+            release_cutoffs: dict[str, datetime] = {
+                o: c for o, c in conn.execute(
+                    text("SELECT r.origin, max(r.knowledge_cutoff) FROM belief.release r "
+                         "JOIN ops.publication p ON p.release_id = r.id GROUP BY r.origin")
+                ).all()
+            }
+            origins_seen: dict[str, int] = {}
+            done: list[int] = []
+            for ev in events:
+                try:
+                    with conn.begin_nested():
+                        if ev.event_type == OBS_EVENT:
+                            _process_observation_event(conn, ev, release_cutoffs, report, origins_seen)
+                        elif ev.event_type == PUBLISH_REQUEST_EVENT:
+                            p = dict(ev.payload)
+                            origin = str(p.get("origin"))
+                            if not (environment == "production" and origin != "live") and dirty_belief_nodes(conn):
+                                _enqueue_publish(conn, origin, int(p.get("through_outbox_id") or 0), actor, report)
+                except Exception as e:  # isolate: this event alone is rolled back and retried later
+                    _record_event_failure(conn, actor, ev, e)
+                    report.failed_events.append(int(ev.id))
                     continue
-                jid = enqueue_publish_beliefs(conn, origin, through, created_by=actor)
-                report.publish_jobs.append(str(jid))
+                done.append(int(ev.id))
+            if done:
+                conn.execute(text("UPDATE ops.outbox SET processed_at = clock_timestamp() WHERE id = ANY(:ids)"),
+                             {"ids": done})
+            if origins_seen and dirty_belief_nodes(conn) > 0:
+                # Same key derivation as the ingest handler (origin + newest observation
+                # event) so both paths usually coincide; any residual duplicate is a
+                # no-op because publication clears the dirty belief nodes.
+                through = latest_observation_event(conn)
+                for origin in sorted(origins_seen):
+                    if environment == "production" and origin != "live":
+                        continue
+                    try:
+                        with conn.begin_nested():
+                            _enqueue_publish(conn, origin, through, actor, report)
+                    except Exception as e:
+                        # never abort the batch: hand the request to the durable retry path
+                        log.error("publish_beliefs enqueue for origin %s failed (%s); deferred via outbox",
+                                  origin, type(e).__name__)
+                        conn.execute(
+                            text("INSERT INTO ops.outbox(event_type, payload) VALUES (:t, CAST(:p AS jsonb))"),
+                            {"t": PUBLISH_REQUEST_EVENT,
+                             "p": json.dumps({"origin": origin, "through_outbox_id": through})},
+                        )
+                        _audit(conn, actor, "outbox.publish_enqueue_deferred", {"origin": origin},
+                               {"through_outbox_id": through, "exception": type(e).__name__})
+                        report.publish_requests_deferred.append(origin)
+        failing = conn.execute(
+            text("SELECT count(DISTINCT (a.target->>'outbox_id')::bigint) FROM ops.audit a "
+                 "JOIN ops.outbox o ON o.id = (a.target->>'outbox_id')::bigint "
+                 "WHERE a.action = 'outbox.event_failed' AND o.processed_at IS NULL "
+                 "AND a.recorded_at > clock_timestamp() - make_interval(days => :mem)"),
+            {"mem": FAILURE_MEMORY_DAYS},
+        ).scalar_one()
+        OUTBOX_FAILING_EVENTS.set(float(failing))
     report.dirty = sorted(set(report.dirty))
     if report.events:
-        log.info("outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs", report.events,
-                 len(report.dirty), len(report.skipped), len(report.forced), len(report.publish_jobs))
+        log.info("outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs, %d failed", report.events,
+                 len(report.dirty), len(report.skipped), len(report.forced), len(report.publish_jobs),
+                 len(report.failed_events))
     return report

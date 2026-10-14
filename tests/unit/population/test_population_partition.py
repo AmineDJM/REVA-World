@@ -121,8 +121,8 @@ def test_band_only_source_materialises_exactly():
     t = materialise(r, 500)
     assert _by_cell(t) == {c.cell_id: Fraction(c.count) for c in r.leaf_cells}
     tens = [("Y_LT10", 0, 9)] + [(f"Y{lo}-{lo + 9}", lo, lo + 9) for lo in range(10, 80, 10)] + [("Y_GE80", 80, None)]
-    with pytest.raises(ValidationProblem):  # Y_GE85 fits Y_GE80, but Y80-84 + Y_GE85 do; Y_LT5 fits Y_LT10 ...
-        coarsen(t, [("Y_LT3", 0, 2), ("Y_GE3", 3, None)])  # ... while Y_LT5 would be split here
+    with pytest.raises(ValidationProblem):  # the Y_LT5 leaf would be split
+        coarsen(t, [("Y_LT3", 0, 2), ("Y_GE3", 3, None)])
     c = coarsen(t, tens)
     assert c.certificate.conserved
     back = refine(c.table, r, "age")
