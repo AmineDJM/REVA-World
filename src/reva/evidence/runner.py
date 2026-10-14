@@ -285,6 +285,7 @@ def make_live_client(spec: Any, settings: Any) -> SafeHttpClient:
         max_bytes=min(settings.reva_http_max_bytes, spec.max_response_bytes),
         contact_email=settings.reva_http_contact_email,
         rate_limiter=RateLimiter(policies),
+        proxy_mode=settings.reva_http_proxy_mode,
     )
 
 

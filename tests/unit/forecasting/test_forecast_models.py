@@ -7,7 +7,6 @@ from decimal import Decimal
 
 import numpy as np
 import pytest
-
 from scipy.stats import norm
 from scipy.stats import t as student_t
 

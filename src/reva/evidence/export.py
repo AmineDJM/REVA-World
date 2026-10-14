@@ -105,7 +105,7 @@ def export_observation(conn: Connection, observation_id: UUID | str) -> dict[str
     row = conn.execute(_SELECT, {"id": oid}).mappings().one_or_none()
     if row is None:
         raise ObservationNotFound(f"observation {oid} does not exist", observation_id=str(oid))
-    return observation_record(row)
+    return observation_record(dict(row))
 
 
 def observation_record(row: Mapping[str, Any]) -> dict[str, Any]:

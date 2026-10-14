@@ -528,3 +528,120 @@ def test_health_job_appends_cadence_relative_vector(qdb: FreshDB) -> None:
     assert m["schema_drift"]["drift"] is False
     assert m["completeness"]["validated_acquisition_ratio"] == 1.0
     assert status == m["status"] == "healthy"
+
+
+# --------------------------------------------------------------------------- R2-08 bounded waiting
+def _backdate(d: FreshDB, jid: uuid.UUID, minutes: float) -> None:
+    with d.owner.begin() as c:
+        c.execute(text("UPDATE ops.job SET created_at = clock_timestamp() - make_interval(mins => :m) "
+                       "WHERE id = :j"), {"j": jid, "m": minutes})
+
+
+def test_old_low_priority_job_beats_aged_high_priority_backlog(qdb: FreshDB) -> None:
+    # The review's counter-example to capped aging: p=-100 waited 600 min, p=100 waited 5 min.
+    low = _enqueue(qdb, "health", {"probe": "starve-low"}, priority=-100)
+    high = _enqueue(qdb, "health", {"probe": "starve-high"}, priority=100)
+    _backdate(qdb, low, 600)
+    _backdate(qdb, high, 5)
+    got = queue.claim(qdb.worker, "w", 30)
+    assert got is not None and got.id == low
+
+
+def test_overdue_jobs_are_claimed_fifo_before_any_priority(qdb: FreshDB) -> None:
+    old_low = _enqueue(qdb, "health", {"probe": "fifo-old-low"}, priority=-100)
+    newer_high = _enqueue(qdb, "health", {"probe": "fifo-newer-high"}, priority=100)
+    fresh_top = _enqueue(qdb, "health", {"probe": "fifo-fresh-top"}, priority=100)
+    _backdate(qdb, old_low, 40)  # overdue (> 30 min)
+    _backdate(qdb, newer_high, 35)  # overdue, created later
+    order = [queue.claim(qdb.worker, "w", 30) for _ in range(3)]
+    assert [j.id for j in order if j] == [old_low, newer_high, fresh_top]
+
+
+def test_uncapped_aging_below_the_deadline(qdb: FreshDB) -> None:
+    # Neither job is overdue: p=-100 aged 150 min scores 50 and loses to p=60 fresh (60) ...
+    low = _enqueue(qdb, "health", {"probe": "age-low"}, priority=-100)
+    mid = _enqueue(qdb, "health", {"probe": "age-mid"}, priority=60)
+    _backdate(qdb, low, 150)
+    got = queue.claim(qdb.worker, "w", 30, max_wait_seconds=86_400)
+    assert got is not None and got.id == mid
+    # ... but beats p=40 fresh (no cap at the priority span: 50 > 40).
+    p40 = _enqueue(qdb, "health", {"probe": "age-40"}, priority=40)
+    got = queue.claim(qdb.worker, "w", 30, max_wait_seconds=86_400)
+    assert got is not None and got.id == low
+    assert queue.claim(qdb.worker, "w", 30).id == p40
+
+
+# --------------------------------------------------------------------------- R2-14 heartbeat vs long locks
+def test_heartbeat_gives_up_quickly_when_row_is_locked(qdb: FreshDB) -> None:
+    from reva.operations.worker import HEARTBEAT_LOCK_TIMEOUT_MS, _Active
+
+    jid = _enqueue(qdb, "health", {"probe": "hb-busy"})
+    job = queue.claim(qdb.worker, "w-hb", 30)
+    assert job is not None and job.id == jid
+    w = _worker(qdb)
+    assert w.heartbeat_engine is not w.engine  # dedicated heartbeat pool
+    with qdb.worker.connect() as holder:  # a long publication holding the job row lock
+        holder.execute(text("SELECT ops.assert_lease(:j, :w, :t)"),
+                       {"j": job.id, "w": job.worker_id, "t": job.fencing_token})
+        t0 = time.monotonic()
+        with pytest.raises(DBAPIError) as ei:
+            queue.heartbeat(w.heartbeat_engine, job, None, 30, lock_timeout_ms=200, statement_timeout_ms=2000)
+        assert queue.is_lock_busy(ei.value) and time.monotonic() - t0 < 2
+        st = _Active(job)
+        t0 = time.monotonic()
+        assert w._beat(st, None) == "running"  # busy -> last known status, lease not lost
+        assert not st.lost and time.monotonic() - t0 < HEARTBEAT_LOCK_TIMEOUT_MS / 1000 + 2
+        holder.rollback()
+    assert queue.heartbeat(w.heartbeat_engine, job, None, 30) == "running"
+    w.close()
+
+
+def test_non_locking_lease_check_does_not_block_heartbeat(qdb: FreshDB) -> None:
+    jid = _enqueue(qdb, "health", {"probe": "hb-check-lease"})
+    job = queue.claim(qdb.worker, "w-hb2", 30)
+    assert job is not None and job.id == jid
+    ctx = _ctx(qdb, job)
+    with qdb.worker.connect() as pub:  # what handle_publish_beliefs now passes as the fence
+        ctx.check_lease(pub)
+        t0 = time.monotonic()
+        assert queue.heartbeat(qdb.worker, job, None, 30, lock_timeout_ms=500) == "running"
+        assert time.monotonic() - t0 < 0.5
+        pub.rollback()
+    _expire_lease(qdb, jid)
+    with qdb.worker.connect() as pub, pytest.raises(StaleLease):
+        ctx.check_lease(pub)
+
+
+# --------------------------------------------------------------------------- R2-02 internal key conflicts
+def test_internal_enqueue_refuses_api_namespace(qdb: FreshDB) -> None:
+    with qdb.worker.begin() as c, pytest.raises(ValidationProblem):
+        queue.enqueue(c, "health", {"probe": "ns"}, "api:someone:health:k-12345678")
+
+
+def test_publish_beliefs_key_held_by_foreign_job_is_disambiguated_and_audited(qdb: FreshDB) -> None:
+    payload = {"origin": "test_fixture", "through_outbox_id": 987654}
+    key = queue.idempotency_key("publish_beliefs", payload)
+    with qdb.owner.begin() as c:  # a foreign job pre-claims the internal key
+        foreign = c.execute(text("INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
+                                 "VALUES ('replay', '{}', :k, 'api:attacker') RETURNING id"), {"k": key}).scalar()
+    with qdb.worker.begin() as c:
+        jid = jobs.enqueue_publish_beliefs(c, "test_fixture", 987654, created_by="worker:test",
+                                           audit_actor="worker:test")
+    with qdb.worker.begin() as c:  # converges on the same job
+        assert jobs.enqueue_publish_beliefs(c, "test_fixture", 987654, created_by="worker:test") == jid
+    row = _status(qdb, jid)
+    assert jid != foreign and row["job_type"] == "publish_beliefs" and row["payload"] == payload
+    assert row["idempotency_key"] == f"{key}#alt1"
+    with qdb.owner.connect() as c:
+        audit = c.execute(text("SELECT details FROM ops.audit WHERE action = 'jobs.publish_key_conflict' "
+                               "AND target->>'job_id' = :j"), {"j": str(jid)}).scalars().all()
+    assert len(audit) == 1 and audit[0]["foreign_job_id"] == str(foreign)
+
+
+def test_claim_job_claims_only_that_job(qdb: FreshDB) -> None:
+    other = _enqueue(qdb, "health", {"probe": "claim-job-other"}, priority=100)
+    mine = _enqueue(qdb, "health", {"probe": "claim-job-mine"}, priority=-100)
+    job = queue.claim_job(qdb.worker, mine, "cli-demo", 30)
+    assert job is not None and job.id == mine and job.fencing_token > 0
+    assert queue.claim_job(qdb.worker, mine, "cli-demo", 30) is None  # no longer queued
+    assert _status(qdb, other)["status"] == "queued"

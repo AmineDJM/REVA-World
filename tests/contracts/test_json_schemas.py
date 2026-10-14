@@ -3,18 +3,14 @@
 from __future__ import annotations
 
 import asyncio
-import importlib.util
 import json
-import sys
 import typing
-from collections.abc import Iterator
 from pathlib import Path
 from typing import Any
 
 import jsonschema
 import pytest
 from jsonschema import Draft202012Validator, FormatChecker
-from sqlalchemy import text
 
 from reva.adapters.connectors.registry import builtin_connectors
 from reva.kernel.uncertainty import UncertaintyKind, UncertaintyStatus
@@ -107,116 +103,43 @@ def test_kernel_uncertainty_statuses_match_observation_contract() -> None:
     assert set(unc["properties"]["status"]["enum"]) == {s.value for s in UncertaintyStatus}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "CONTRACT MISMATCH: kernel UncertaintyKind has 'probability' but observation.schema.json "
-        "uncertainty.kind enum does not; align the enums (or document the restriction)"
-    ),
-)
-def test_kernel_uncertainty_kinds_match_observation_contract() -> None:
-    unc = load("observation.schema.json")["properties"]["uncertainty"]
-    assert set(unc["properties"]["kind"]["enum"]) == {k.value for k in UncertaintyKind}
+def test_observation_contract_restricts_kernel_kinds_only_by_probability() -> None:
+    """D-8 resolved: observation records (source reports) never carry the kernel kind
+    'probability' (a model-output type); the schema documents the restriction and the
+    exporter refuses it (tests/contracts/test_observation_export_properties.py)."""
+    kind = load("observation.schema.json")["properties"]["uncertainty"]["properties"]["kind"]
+    assert set(kind["enum"]) == {k.value for k in UncertaintyKind} - {"probability"}
+    assert "probability" in kind["description"]
 
 
-def _helper() -> Any:
-    name = "reva_h2_isolated_db"
-    if name not in sys.modules:
-        path = REPO / "tests" / "fixtures" / "adversarial" / "isolated_db.py"
-        spec = importlib.util.spec_from_file_location(name, path)
-        assert spec and spec.loader
-        mod = importlib.util.module_from_spec(spec)
-        sys.modules[name] = mod
-        spec.loader.exec_module(mod)
-    return sys.modules[name]
+# Exported observation records (real ingestion of captured fixtures → reva.evidence.export →
+# full Draft 2020-12 + format validation) are covered in tests/contracts/test_observation_export.py.
 
 
-@pytest.fixture(scope="module")
-def exported(tmp_path_factory: pytest.TempPathFactory) -> Iterator[list[dict[str, Any]]]:
-    """Observation records exported from the DB after a real fixture ingestion."""
-    from reva.evidence.runner import FixtureHttp, run_connector
-
-    with _helper().isolated_db(tmp_path_factory) as d:
-        for name in ("worldbank.wdi.indicators", "un.comtrade.public_exact"):
-            c = builtin_connectors()[name]
-            asyncio.run(run_connector(c, FixtureHttp(name), d.store, d.worker, persist_cursor=False))
-        with d.api.connect() as c:
-            rows = (
-                c.execute(
-                    text(
-                        """SELECT o.*, a.retrieved_at, a.raw_sha256 FROM evidence.observation o
-                   JOIN evidence.acquisition a ON a.id = o.acquisition_id ORDER BY o.logical_key"""
-                    )
-                )
-                .mappings()
-                .all()
-            )
-        yield [export(dict(r)) for r in rows]
+# =========================================================================== appendix pins
+ANNOTATIONS = frozenset({"$comment", "description", "title", "examples"})
+APPENDIX_DIGESTS = {  # sha256 of canonical JSON, annotation keywords removed (binding appendices)
+    "scenario.schema.json": "dd598b55635b50ee48264c5ab7f395ea66afdb57a6e73e0074d9fc91fe43ed2d",
+    "observation.schema.json": "4619edd9425dd3a78c3f454ed01fd0fe050e450b7bd0560763ea6c5de77c4c74",
+    "connector.schema.json": "0e83f9df3b3cb69563b76b0f49c25b7f89ec7b879be571f22e7a2316ed22254b",
+}
 
 
-def _iso(v: Any) -> Any:
-    return v.isoformat() if v is not None else None
+def _strip_annotations(o: Any, parent: str | None = None) -> Any:
+    if isinstance(o, dict):
+        return {k: _strip_annotations(v, k) for k, v in o.items() if not (k in ANNOTATIONS and parent != "properties")}
+    if isinstance(o, list):
+        return [_strip_annotations(v) for v in o]
+    return o
 
 
-def export(r: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "schema_version": "1.0.0",
-        "source_id": str(r["source_id"]),
-        "connector_version_id": str(r["connector_version_id"]),
-        "acquisition_id": str(r["acquisition_id"]),
-        "subject_id": str(r["subject_id"]),
-        "concept_version_id": str(r["concept_version_id"]),
-        "support_id": str(r["support_id"]),
-        "logical_key": r["logical_key"],
-        "source_revision_id": r["source_revision_id"],
-        "value": r["value"],
-        "uncertainty": r["uncertainty"],
-        "observed_at": _iso(r["observed_at"]),
-        "source_published_at": _iso(r["source_published_at"]),
-        "source_available_at": _iso(r["source_available_at"]),
-        "availability_basis": r["availability_basis"],
-        "retrieved_at": _iso(r["retrieved_at"]),
-        "source_flags": r["source_flags"],
-        "raw_selector": r["raw_selector"],
-        "provenance_activity_id": str(r["provenance_activity_id"]),
-        "raw_sha256": r["raw_sha256"],
-    }
+@pytest.mark.parametrize("name", sorted(APPENDIX_DIGESTS))
+def test_schema_validation_semantics_equal_the_binding_appendix(name: str) -> None:
+    """Annotations may be added; any change to validation keywords needs a version bump + ADR."""
+    import hashlib
 
-
-@pytest.mark.db
-def test_exported_observation_values_and_identity_fields_conform(exported: list[dict[str, Any]]) -> None:
-    assert len(exported) > 200
-    kinds = {o["value"]["kind"] for o in exported}
-    assert kinds == {"decimal", "missing"}  # both shapes are exercised (Comtrade DZA is Missing)
-    schema = load("observation.schema.json")
-    sub = {**schema, "required": [k for k in schema["required"] if k != "uncertainty"]}
-    sub["properties"] = {k: v for k, v in schema["properties"].items() if k != "uncertainty"}
-    v = Draft202012Validator(sub, format_checker=FormatChecker())
-    bad = {}
-    for o in exported:
-        errs = [e.message for e in v.iter_errors({k: x for k, x in o.items() if k != "uncertainty"})]
-        if errs:
-            bad[o["logical_key"]] = errs[:3]
-    assert bad == {}
-
-
-@pytest.mark.db
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "CONTRACT MISMATCH: stored observation uncertainty is UncertaintySpec.model_dump_json() and "
-        "includes level/lower/upper/conditioning, which observation.schema.json forbids "
-        "(uncertainty.additionalProperties=false); either add these optional fields to the schema or "
-        "export with exclude of unset/None fields"
-    ),
-)
-def test_exported_observation_records_validate_against_contract(exported: list[dict[str, Any]]) -> None:
-    bad = {
-        o["logical_key"]: errors("observation.schema.json", o)[:3]
-        for o in exported
-        if errors("observation.schema.json", o)
-    }
-    assert bad == {}
+    canon = json.dumps(_strip_annotations(load(name)), sort_keys=True, separators=(",", ":"), ensure_ascii=False)
+    assert hashlib.sha256(canon.encode()).hexdigest() == APPENDIX_DIGESTS[name]
 
 
 # =========================================================================== connector manifests
@@ -280,6 +203,46 @@ def test_connector_contract_rejects_unsafe_manifests(mutate: Any) -> None:
     m = manifest_from_spec(spec, ["demography.population.wdi_midyear_total"])
     mutate(m)
     assert errors("connector.schema.json", m) != []
+
+
+def test_generated_eurostat_manifest_validates_with_formats(tmp_path: Path) -> None:
+    """The autonomy generator's real output (captured Eurostat catalogue, offline) satisfies the contract."""
+    import uuid
+    from datetime import UTC, datetime
+
+    from reva.adapters.objects.filesystem import FilesystemArtifactStore
+    from reva.autonomy.common import ArtifactIO, default_budget, make_context
+    from reva.autonomy.discovery import EurostatCatalogueDiscoverer
+    from reva.autonomy.fixtures import BankHttp, bank_from_dir
+    from reva.autonomy.generator import DeclarativeConnectorGenerator
+    from reva.autonomy.mapping import RegistryOntologyMapper
+    from reva.ports.autonomy import KnowledgeGap
+
+    io = ArtifactIO(FilesystemArtifactStore(tmp_path / "objects"))
+    ctx = make_context(io, "evidence", datetime.now(UTC), {"schema": "test"})
+    gap = KnowledgeGap(
+        gap_id=uuid.uuid4(),
+        requirement_id="R-POP-JAN-AGESEX",
+        concept_version="demography.population.jan1_age_sex@1.0.0",
+        geography=("FRA",),
+        temporal_support={"years": [2023]},
+        reason="unsupported: no eligible connector",
+        priority=1.0,
+        priority_method="test",
+        context=ctx,
+    )
+
+    async def pipeline() -> dict[str, Any]:
+        bank = bank_from_dir(io, "eurostat.demo_pjan.fr")
+        cands = await EurostatCatalogueDiscoverer(io, BankHttp(io, bank)).discover(gap, default_budget())
+        mapping = RegistryOntologyMapper(io).assess(cands[0], gap.context)[0]
+        cp = DeclarativeConnectorGenerator(io).generate(cands[0], mapping, ("eurostat_jsonstat",))
+        manifest: dict[str, Any] = io.get_json(cp.manifest)
+        return manifest
+
+    manifest = asyncio.run(pipeline())
+    assert errors("connector.schema.json", manifest) == []
+    assert manifest["generation_mode"] == "declarative_only"
 
 
 # =========================================================================== registry

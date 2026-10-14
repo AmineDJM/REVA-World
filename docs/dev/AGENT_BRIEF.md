@@ -17,7 +17,7 @@ unsupported capability returns a typed blocked/unavailable result.
 - Live network to providers works; tests must be offline (use captured fixtures in
   `tests/fixtures/source/<connector>/manifest.json` via `reva.evidence.runner.FixtureHttp`). Live tests
   must be marked `@pytest.mark.live` (deselected by default).
-- Do **not** `git commit`/`git push`. Do not edit files owned by someone else (table below). If you need a
+- Do **not** `git commit`/`git push`, and NEVER run `git stash`, `git reset`, `git checkout -- <path>`, `git restore` or `git clean` — other agents' uncommitted work lives in the same working tree (a stash at 23:48 temporarily wiped 38 files). Do not edit files owned by someone else (table below). If you need a
   change in a shared file (pyproject.toml dependencies, migrations, kernel, `adapters/postgres/repositories.py`,
   `cli/main.py`, conftest), do not edit it: put the exact requested change in your final report. You may
   add new modules inside your own directories. No new Alembic migrations: report needed schema changes.

@@ -63,8 +63,12 @@ def row(**over: Any) -> dict[str, Any]:
 
 
 def decimal_value(s: str) -> dict[str, Any]:
-    return {"kind": "decimal", "value": s, "unit_ref": "unit.usd",
-            "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1"}}
+    return {
+        "kind": "decimal",
+        "value": s,
+        "unit_ref": "unit.usd",
+        "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1"},
+    }
 
 
 # --------------------------------------------------------------------------- round trip
@@ -120,8 +124,12 @@ def test_exported_record_shape_and_formats() -> None:
     assert rec["source_flags"] == r["source_flags"]
     assert rec["value"]["basis"] == {"scale_factor": "1"}  # as stored; no defaults filled in
     assert rec["uncertainty"] == {
-        "status": "unquantified", "kind": "unknown", "description": "WDI publishes no uncertainty",
-        "artifact_sha256": None, "dependence_group": None, "method_version": None,
+        "status": "unquantified",
+        "kind": "unknown",
+        "description": "WDI publishes no uncertainty",
+        "artifact_sha256": None,
+        "dependence_group": None,
+        "method_version": None,
     }
     for f in ("source_id", "acquisition_id", "provenance_activity_id"):
         assert UUID(rec[f]) == r[f]
@@ -135,8 +143,13 @@ def test_missing_value_is_exported_as_typed_missing() -> None:
 
 # --------------------------------------------------------------------------- uncertainty
 def test_probability_kind_is_refused_explicitly() -> None:
-    spec = UncertaintySpec(status="quantified", kind=UncertaintyKind.probability, description="p",
-                           method_version="m@1", artifact_sha256=SHA)
+    spec = UncertaintySpec(
+        status="quantified",
+        kind=UncertaintyKind.probability,
+        description="p",
+        method_version="m@1",
+        artifact_sha256=SHA,
+    )
     with pytest.raises(ObservationNotExportable, match="probability"):
         export_uncertainty(json.loads(spec.model_dump_json()))
 
@@ -151,8 +164,14 @@ def test_contract_documents_the_probability_restriction() -> None:
 
 
 def test_quantified_distribution_with_artifact_is_exported() -> None:
-    spec = UncertaintySpec(status="quantified", kind="distribution", description="posterior draws",
-                           method_version="m@1", artifact_sha256=SHA, dependence_group="wdi-family")
+    spec = UncertaintySpec(
+        status="quantified",
+        kind="distribution",
+        description="posterior draws",
+        method_version="m@1",
+        artifact_sha256=SHA,
+        dependence_group="wdi-family",
+    )
     rec = observation_record(row(uncertainty=json.loads(spec.model_dump_json())))
     assert rec["uncertainty"]["artifact_sha256"] == SHA
     assert rec["uncertainty"]["dependence_group"] == "wdi-family"
@@ -169,10 +188,25 @@ def test_exact_by_definition_is_exported() -> None:
     "spec",
     [
         # inline interval fields the v1 contract cannot carry
-        UncertaintySpec(status="quantified", kind="confidence_interval", description="95% CI",
-                        method_version="m@1", artifact_sha256=SHA, level=0.95, lower="1", upper="2"),
-        UncertaintySpec(status="quantified", kind="bounds", description="b", method_version="m@1",
-                        artifact_sha256=SHA, lower="1", upper="2"),
+        UncertaintySpec(
+            status="quantified",
+            kind="confidence_interval",
+            description="95% CI",
+            method_version="m@1",
+            artifact_sha256=SHA,
+            level=0.95,
+            lower="1",
+            upper="2",
+        ),
+        UncertaintySpec(
+            status="quantified",
+            kind="bounds",
+            description="b",
+            method_version="m@1",
+            artifact_sha256=SHA,
+            lower="1",
+            upper="2",
+        ),
         UncertaintySpec.sensitivity("1", "2", "m@1", "assumption spread", conditioning=("elasticity",)),
         # quantified without the artifact the contract requires
         UncertaintySpec(status="quantified", kind="distribution", description="d", method_version="m@1"),

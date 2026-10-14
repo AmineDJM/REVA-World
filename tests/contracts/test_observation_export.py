@@ -111,8 +111,15 @@ def test_every_exported_observation_validates_against_contract(exported: list[tu
 
 def test_export_is_faithful_to_the_stored_row(exported: list[tuple[dict, dict]]) -> None:
     for row, rec in exported:
-        for f in ("source_id", "connector_version_id", "acquisition_id", "subject_id", "concept_version_id",
-                  "support_id", "provenance_activity_id"):
+        for f in (
+            "source_id",
+            "connector_version_id",
+            "acquisition_id",
+            "subject_id",
+            "concept_version_id",
+            "support_id",
+            "provenance_activity_id",
+        ):
             assert rec[f] == str(row[f])
         assert rec["logical_key"] == row["logical_key"]
         assert rec["source_revision_id"] == row["source_revision_id"]
@@ -120,8 +127,12 @@ def test_export_is_faithful_to_the_stored_row(exported: list[tuple[dict, dict]])
         assert rec["raw_selector"] == row["raw_selector"]
         assert rec["source_flags"] == row["source_flags"]
         assert rec["availability_basis"] == row["availability_basis"]
-        for f, src in (("observed_at", "observed_at"), ("source_published_at", "source_published_at"),
-                       ("source_available_at", "source_available_at"), ("retrieved_at", "acq_retrieved_at")):
+        for f, src in (
+            ("observed_at", "observed_at"),
+            ("source_published_at", "source_published_at"),
+            ("source_available_at", "source_available_at"),
+            ("retrieved_at", "acq_retrieved_at"),
+        ):
             if row[src] is None:
                 assert rec[f] is None
             else:
@@ -132,8 +143,12 @@ def test_export_is_faithful_to_the_stored_row(exported: list[tuple[dict, dict]])
         stored = row["value"]
         if stored["kind"] == "decimal":
             # The decimal string is copied byte-for-byte, with unit and basis as stored.
-            assert rec["value"] == {"kind": "decimal", "value": stored["value"], "unit_ref": stored["unit_ref"],
-                                    "basis": stored["basis"]}
+            assert rec["value"] == {
+                "kind": "decimal",
+                "value": stored["value"],
+                "unit_ref": stored["unit_ref"],
+                "basis": stored["basis"],
+            }
         else:
             assert rec["value"] == {"kind": "missing", "reason": stored["reason"]}
         # Connectors publish no uncertainty: unquantified/unknown, nothing invented.
@@ -156,8 +171,11 @@ def test_comtrade_dza_missing_is_exported_as_typed_missing(exported: list[tuple[
     from reva.cli.seed import entity_id
 
     dza = str(entity_id("DZA"))
-    no_rows = [rec for row, rec in exported
-               if row["source_key"] == "un.comtrade.public_preview" and row["source_flags"].get("provider_returned_no_rows")]
+    no_rows = [
+        rec
+        for row, rec in exported
+        if row["source_key"] == "un.comtrade.public_preview" and row["source_flags"].get("provider_returned_no_rows")
+    ]
     assert any(rec["subject_id"] == dza for rec in no_rows), "captured DZA zero-row years must be exported"
     for rec in no_rows:  # an absent provider row is typed Missing, never a number or zero
         assert rec["value"] == {"kind": "missing", "reason": "unavailable"}
