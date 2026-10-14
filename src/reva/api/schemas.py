@@ -518,6 +518,7 @@ class RevisionEntry(ApiModel):
     retrieved_at: datetime
     recorded_at: datetime
     source_published_at: datetime | None = None
+    retracted: bool = Field(False, description="Retracted at/before as_of (never used as the point value)")
 
 
 class TimeseriesPoint(ApiModel):
@@ -537,6 +538,9 @@ class TimeseriesPoint(ApiModel):
     retrieved_at: datetime
     source_published_at: datetime | None = None
     origin: Literal["live", "test_fixture"]
+    retracted_revisions_skipped: int = Field(
+        0, description="Later revisions retracted at/before as_of that were skipped: the point is the latest "
+        "non-retracted revision (the same rule as belief selection)")
     revisions: list[RevisionEntry] | None = Field(
         None, description="Full lineage visible at as_of (revisions=all only)"
     )

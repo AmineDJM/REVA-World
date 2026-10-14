@@ -95,40 +95,125 @@ def _sqlstate(exc: BaseException) -> str:
     return str(getattr(orig, "sqlstate", None) or getattr(exc, "sqlstate", None) or type(exc).__name__)
 
 
+ROLE_PROVISION_LOCK_KEY = 7262002
+#: SQLSTATEs worth retrying when several bootstraps (e.g. parallel test databases on one
+#: cluster) alter the cluster-global runtime roles at once: "tuple concurrently updated"
+#: surfaces as XX000; serialization/deadlock/lock-timeout as 40001/40P01/55P03.
+_RETRYABLE = {"XX000", "40001", "40P01", "55P03"}
+PROVISION_ATTEMPTS = 8
+
+
+def role_connection_limit(settings: Settings) -> int:
+    """CONNECTION LIMIT for each runtime role (cluster-wide, per role).
+
+    ``REVA_ROLE_CONNECTION_LIMIT`` (or a ``reva_role_connection_limit`` setting):
+    default 20 in production, where it must be a positive integer; default -1
+    (unlimited) in local/test, where parallel test databases share the roles.
+    """
+    raw = getattr(settings, "reva_role_connection_limit", None)
+    if raw is None:
+        raw = os.environ.get("REVA_ROLE_CONNECTION_LIMIT")
+    production = getattr(settings, "reva_env", "local") == "production"
+    if raw is None or str(raw).strip() == "":
+        return 20 if production else -1
+    try:
+        value = int(str(raw).strip())
+    except ValueError:
+        raise ConfigurationError("REVA_ROLE_CONNECTION_LIMIT must be an integer") from None
+    if production and value < 1:
+        raise ConfigurationError("REVA_ROLE_CONNECTION_LIMIT must be a positive integer in production")
+    if value == 0 or value < -1 or value > 10000:
+        raise ConfigurationError("REVA_ROLE_CONNECTION_LIMIT must be -1 (unlimited) or 1..10000")
+    return value
+
+
+def _verifier_matches(stored: str | None, password: str) -> bool:
+    """True when a stored SCRAM verifier was derived from ``password``."""
+    if not stored or not stored.startswith("SCRAM-SHA-256$"):
+        return False
+    try:
+        head, _keys = stored[len("SCRAM-SHA-256$"):].split("$", 1)
+        iterations, salt = head.split(":", 1)
+        expected = scram_sha256_verifier(password, iterations=int(iterations), salt=base64.b64decode(salt))
+    except (ValueError, ConfigurationError):
+        return False
+    return hmac.compare_digest(expected.encode(), stored.encode())
+
+
+def _role_already_provisioned(conn: Connection, login: str, password: str, limit: int) -> bool:
+    """Skip a needless catalog update (fewer concurrent ALTER ROLE races). Needs pg_authid
+    (superuser); otherwise the role is always (re)provisioned."""
+    row = conn.execute(
+        text(
+            "SELECT rolpassword, rolcanlogin, rolinherit, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, "
+            "rolreplication, rolconnlimit FROM pg_authid WHERE rolname = :r"
+        ),
+        {"r": login},
+    ).mappings().one_or_none()
+    if row is None:
+        return False
+    flags_ok = row["rolcanlogin"] and not any(
+        row[k] for k in ("rolinherit", "rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls", "rolreplication")
+    )
+    return bool(flags_ok and row["rolconnlimit"] == limit and _verifier_matches(row["rolpassword"], password))
+
+
 def provision_roles(conn: Connection, settings: Settings) -> list[str]:
     """Set LOGIN + password for each runtime role, sending only a SCRAM verifier.
 
     The statement is composed server-side (``format(%I, %L)``) from bind
     parameters; on any failure the original exception (whose text would contain
     the statement) is suppressed and only the role and SQLSTATE are reported.
+    Roles are cluster-global: concurrent bootstraps of different databases can
+    race on the same catalog rows, so retryable failures are retried with
+    backoff, and a role that already has exactly this configuration is left
+    untouched. (An advisory lock only serialises bootstraps of the same database.)
     """
+    import random
+    import time
+
     done = []
     superuser = bool(
         conn.execute(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")).scalar_one_or_none()
     )
+    limit = role_connection_limit(settings)
     for role, login in ROLE_LOGIN.items():
         pw = settings.role_password(role)  # type: ignore[arg-type]
         if pw is None:
             raise ConfigurationError(f"generated password for {login} is missing")
-        verifier = scram_sha256_verifier(pw.get_secret_value())
         failure: str | None = None
-        try:
-            with conn.begin_nested():
-                if superuser:  # keep even the verifier out of statement logs where we can
-                    conn.execute(text("SET LOCAL log_statement = 'none'"))
-                stmt = conn.execute(
-                    text(
-                        "SELECT format('ALTER ROLE %I LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE "
-                        "NOBYPASSRLS CONNECTION LIMIT 10 PASSWORD %L', CAST(:r AS text), CAST(:v AS text))"
-                    ),
-                    {"r": login, "v": verifier},
-                ).scalar_one()
-                # Not text(): the verifier contains ':' which text() would parse as bind markers.
-                conn.exec_driver_sql(stmt)
-        except Exception as e:  # noqa: BLE001 - re-raised below without the statement text
-            failure = _sqlstate(e)
-        finally:
+        for attempt in range(PROVISION_ATTEMPTS):
+            failure = None
             verifier = ""
+            try:
+                with conn.begin_nested():
+                    conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": ROLE_PROVISION_LOCK_KEY})
+                    if superuser and _role_already_provisioned(conn, login, pw.get_secret_value(), limit):
+                        break
+                    verifier = scram_sha256_verifier(pw.get_secret_value())
+                    if superuser:  # keep even the verifier out of statement logs where we can
+                        conn.execute(text("SET LOCAL log_statement = 'none'"))
+                    stmt = conn.execute(
+                        text(
+                            "SELECT format('ALTER ROLE %I LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE "
+                            "NOBYPASSRLS NOREPLICATION CONNECTION LIMIT %s PASSWORD %L', "
+                            "CAST(:r AS text), CAST(:l AS integer), CAST(:v AS text))"
+                        ),
+                        {"r": login, "l": limit, "v": verifier},
+                    ).scalar_one()
+                    # Not text(): the verifier contains ':' which text() would parse as bind markers.
+                    conn.exec_driver_sql(stmt)
+                    stmt = ""
+                break
+            except ConfigurationError:
+                raise
+            except Exception as e:  # noqa: BLE001 - re-raised below without the statement text
+                failure = _sqlstate(e)
+            finally:
+                verifier = ""
+            if failure not in _RETRYABLE:
+                break
+            time.sleep(min(2.0, 0.05 * (2**attempt)) * (0.5 + random.random()))  # noqa: S311 - jitter only
         if failure is not None:
             raise ConfigurationError(f"provisioning runtime role {login} failed (SQLSTATE {failure})") from None
         done.append(login)

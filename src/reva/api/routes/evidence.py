@@ -194,9 +194,21 @@ def timeseries_response(
     for r in rows:
         lineages.setdefault((r["source_key"], r["logical_key"]), []).append(r)
     points: list[s.TimeseriesPoint] = []
+    heads: list[dict[str, Any]] = []
+    skipped_total = 0
+    only_retracted: list[str] = []
     for lin in lineages.values():
         lin.sort(key=lambda r: r["revision_no"])
-        head = lin[-1]  # latest revision among those visible at as_of
+        # Latest revision visible at as_of that was not retracted at as_of (belief-selection semantics):
+        # a retraction is never shown silently as the current value.
+        usable = [r for r in lin if not r["retracted"]]
+        if not usable:
+            only_retracted.append(lin[-1]["logical_key"])
+            continue
+        head = usable[-1]
+        skipped = sum(1 for r in lin if r["retracted"] and r["revision_no"] > head["revision_no"])
+        skipped_total += skipped
+        heads.append(head)
         temporal = head["temporal_extent"] or {}
         points.append(s.TimeseriesPoint(
             period_label=temporal.get("label") or temporal.get("start"), valid_start=temporal.get("start"),
@@ -205,16 +217,23 @@ def timeseries_response(
             logical_key=head["logical_key"], observation_id=head["id"], revision_no=head["revision_no"],
             value=head["value"], uncertainty=head["uncertainty"], recorded_at=head["recorded_at"],
             retrieved_at=head["retrieved_at"], source_published_at=head["source_published_at"],
-            origin=head["origin"],
+            origin=head["origin"], retracted_revisions_skipped=skipped,
             revisions=[s.RevisionEntry(observation_id=r["id"], revision_no=r["revision_no"], value=r["value"],
                                        source_revision_id=r["source_revision_id"], retrieved_at=r["retrieved_at"],
-                                       recorded_at=r["recorded_at"], source_published_at=r["source_published_at"])
+                                       recorded_at=r["recorded_at"], source_published_at=r["source_published_at"],
+                                       retracted=bool(r["retracted"]))
                        for r in lin] if revisions == "all" else None,
         ))
     points.sort(key=lambda p: (p.valid_start or "", p.source_key, p.logical_key))
-    heads = [r for lin in lineages.values() for r in lin[-1:]]
     org = origin_of(r["origin"] for r in heads)
     warnings = origin_warnings(org)
+    if skipped_total or only_retracted:
+        warnings.append(s.ApiWarning(
+            code="retracted_records",
+            message=f"{skipped_total} retracted revision(s) were skipped in favour of the latest non-retracted "
+                    f"revision; {len(only_retracted)} record(s) with only retracted revisions are omitted"
+                    + (f" ({', '.join(sorted(only_retracted)[:10])})" if only_retracted else "")
+                    + ". See /v1/observations?revisions=all for the full lineage."))
     n_missing = sum(1 for p in points if p.value.kind == "missing")
     if n_missing:
         warnings.append(s.ApiWarning(code="missing_values",

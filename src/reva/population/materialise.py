@@ -16,7 +16,11 @@ Scientific scope and limits
   weight sum per cell equals the source count. The float ``weight`` column is a
   convenience rounding of that fraction.
 * Observed-zero cells receive no records; missing cells are not in the recipe.
-* Within-cell structure (e.g. exact ages inside ``Y_OPEN``) is not represented.
+* Within-cell structure (exact ages inside ``Y_OPEN`` or inside an age-band leaf
+  such as ``Y_GE85``) is not represented: such records have ``age_years`` null
+  and keep the source age code.
+* A recipe whose totals gate is blocked (leaves do not reproduce the reported
+  ``TOTAL``) is refused with ``InconsistentSourceTotals``.
 """
 
 from __future__ import annotations
@@ -33,7 +37,7 @@ import pyarrow.parquet as pq
 
 from reva.kernel.errors import CapabilityGap, ValidationProblem
 from reva.kernel.ids import canonical_bytes, logical_hash
-from reva.population.recipe import LeafCell, PopulationRecipe, fraction_str
+from reva.population.recipe import InconsistentSourceTotals, LeafCell, PopulationRecipe, fraction_str
 
 MAX_RECORDS = 100_000
 ALLOCATION_METHOD = "reva-largest-remainder-min1-v1"
@@ -108,8 +112,10 @@ def standard_age_bands(
 ) -> list[tuple[str, int, int | None]]:
     """Eurostat-style bands of ``width`` years with an open-ended last band.
 
-    The open band starts at or below the source's ``Y_OPEN`` lower bound so the
-    top-coded group is never split.
+    The open band starts at or below ``open_age_lower_bound`` (the source's
+    ``Y_OPEN`` lower bound, or the lower bound of an open band leaf) so the
+    top group is never split. ``max_single_age`` is the highest finite age
+    covered when there is no open top group.
     """
     top = open_age_lower_bound if open_age_lower_bound is not None else max_single_age + 1
     last = max((top // width) * width, 0)
@@ -122,33 +128,67 @@ def standard_age_bands(
     return bands
 
 
-def _band_cell_count(recipe: PopulationRecipe, bands: Sequence[tuple[str, int, int | None]]) -> int:
+def band_for_leaf(
+    leaf: LeafCell, bands: Sequence[tuple[str, int, int | None]], open_age_lower_bound: int | None
+) -> str | None:
+    """Label of the band that wholly contains ``leaf``'s age range, or ``None``.
+
+    ``UNK`` maps to ``"UNK"``. ``Y_OPEN`` maps to an open-ended band starting at or
+    below its lower bound; with an unknown bound it maps nowhere (refused).
+    """
+    if leaf.is_unknown_age:
+        return "UNK"
+    if leaf.is_top_coded:
+        lo_leaf: int | None = open_age_lower_bound
+        hi_leaf: int | None = None
+    else:
+        lo_leaf, hi_leaf = leaf.age_lo, leaf.age_hi
+        if lo_leaf is None and leaf.age_years is not None:
+            lo_leaf = hi_leaf = leaf.age_years
+    if lo_leaf is None:
+        return None
+    for label, lo, hi in bands:
+        if lo <= lo_leaf and (hi is None or (hi_leaf is not None and hi_leaf <= hi)):
+            return label
+    return None
+
+
+def _band_cell_count(recipe: PopulationRecipe, bands: Sequence[tuple[str, int, int | None]]) -> int | None:
+    """Nonzero coarse cells under ``bands``; ``None`` if some leaf would be split."""
     nonzero: set[tuple[str, str]] = set()
     for c in recipe.nonzero_cells:
-        if c.is_unknown_age:
-            nonzero.add((c.sex_code, "UNK"))
-            continue
-        for label, lo, hi in bands:
-            if c.is_top_coded:
-                if hi is None:
-                    nonzero.add((c.sex_code, label))
-                continue
-            assert c.age_years is not None
-            if c.age_years >= lo and (hi is None or c.age_years <= hi):
-                nonzero.add((c.sex_code, label))
-                break
+        label = band_for_leaf(c, bands, recipe.open_age_lower_bound)
+        if label is None:
+            return None
+        nonzero.add((c.sex_code, label))
     return len(nonzero)
 
 
+def _open_top(recipe: PopulationRecipe) -> tuple[int | None, bool]:
+    """(lower bound of the open-ended top leaf, whether that bound is known)."""
+    has_open = False
+    for c in recipe.leaf_cells:
+        if c.is_top_coded:
+            return recipe.open_age_lower_bound, recipe.open_age_lower_bound is not None
+        if c.age_hi is None and c.age_lo is not None:
+            has_open = True
+            return c.age_lo, True
+    return None, not has_open
+
+
 def suggest_coarsening(recipe: PopulationRecipe, n_records: int) -> list[dict[str, Any]]:
-    """Coarser age schemes (sex kept) with the minimum record count each needs."""
-    singles = [c.age_years for c in recipe.leaf_cells if c.age_years is not None]
-    max_single = max(singles) if singles else 0
+    """Coarser age schemes (sex kept) with the minimum record count each needs.
+
+    A scheme that would split a leaf (an age band leaf, or ``Y_OPEN`` whose
+    lower bound is unknown) is reported as not applicable rather than guessed.
+    """
+    finite = [c.age_hi if c.age_hi is not None else c.age_years for c in recipe.leaf_cells]
+    finite_his = [h for h in finite if h is not None]
+    max_finite = max(finite_his) if finite_his else 0
+    open_lo, open_known = _open_top(recipe)
     schemes: list[tuple[str, list[tuple[str, int, int | None]]]] = [
-        (f"{w}_year_age_bands", standard_age_bands(w, recipe.open_age_lower_bound, max_single))
-        for w in (5, 10, 20)
+        (f"{w}_year_age_bands", standard_age_bands(w, open_lo, max_finite)) for w in (5, 10, 20)
     ]
-    open_lo = recipe.open_age_lower_bound
     if open_lo is None or open_lo >= 65:
         broad: list[tuple[str, int, int | None]] = [
             ("Y_LT15", 0, 14),
@@ -158,16 +198,21 @@ def suggest_coarsening(recipe: PopulationRecipe, n_records: int) -> list[dict[st
         schemes.append(("broad_age_groups", broad))
     out = []
     for name, bands in schemes:
-        m = _band_cell_count(recipe, bands)
-        out.append(
-            {
-                "scheme": name,
-                "age_bands": [[label, lo, hi] for label, lo, hi in bands],
-                "minimum_feasible_records": m,
-                "feasible_for_requested": m <= n_records,
-                "how": "materialise at >= the recipe minimum, then compression.coarsen(...)",
-            }
-        )
+        m = _band_cell_count(recipe, bands) if open_known else None
+        entry: dict[str, Any] = {
+            "scheme": name,
+            "age_bands": [[label, lo, hi] for label, lo, hi in bands],
+            "minimum_feasible_records": m,
+            "feasible_for_requested": m is not None and m <= n_records,
+            "how": "materialise at >= the recipe minimum, then compression.coarsen(...)",
+        }
+        if m is None:
+            entry["not_applicable_reason"] = (
+                "Y_OPEN lower bound is unknown; an open band cannot be placed without guessing"
+                if not open_known
+                else "the scheme would split an age-band leaf of the recipe"
+            )
+        out.append(entry)
     return out
 
 
@@ -187,6 +232,13 @@ def allocate(recipe: PopulationRecipe, n_records: int) -> Allocation:
             f"n_records={n_records} exceeds the supported maximum of {MAX_RECORDS}",
             requested=n_records,
             maximum_records=MAX_RECORDS,
+        )
+    if recipe.is_blocked:
+        failing = [c.to_dict() for c in recipe.total_checks if c.status == "inconsistent"]
+        raise InconsistentSourceTotals(
+            "recipe is blocked: its leaf cells do not reproduce the reported TOTAL and no "
+            "documented explanation was recorded; refusing to materialise",
+            failing_checks=failing,
         )
     nonzero: list[LeafCell] = list(recipe.nonzero_cells)
     m = len(nonzero)

@@ -26,7 +26,10 @@ BEGIN
   FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
       EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
-    ELSE
+    ELSIF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r AND (rolinherit OR rolsuper OR rolcreatedb
+                  OR rolcreaterole OR rolbypassrls OR rolreplication)) THEN
+      -- Roles are cluster-global; only touch the catalog row when needed so parallel
+      -- bootstraps of other databases do not race on it ("tuple concurrently updated").
       EXECUTE format('ALTER ROLE %I NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
     END IF;
   END LOOP;
