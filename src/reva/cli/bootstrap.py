@@ -1,12 +1,29 @@
 """Pre-deploy bootstrap: lock, verify capabilities, migrate, provision runtime roles.
 
 Only this module uses the migration-owner credential. It never prints secrets.
+
+Role passwords (review finding R-17): the plaintext password never reaches the
+server or an exception message. ``provision_roles`` computes a SCRAM-SHA-256
+verifier client-side (RFC 5802/7677, the format PostgreSQL stores in
+``pg_authid``) and sends only that, and any failure is re-raised as a
+``ConfigurationError`` that names the role and the SQLSTATE but carries neither
+the statement nor its parameters. Server-side exposure: with
+``log_statement = ddl|all`` (or ``log_min_error_statement`` on a failing
+statement, or pg_stat_statements) PostgreSQL logs the ``ALTER ROLE`` text, i.e.
+the verifier. A verifier is not the password, but it allows an offline guessing
+attack, so treat server logs as sensitive; when the migration role is a
+superuser, bootstrap additionally turns ``log_statement`` off for that
+transaction.
 """
 
 from __future__ import annotations
 
+import base64
+import hashlib
+import hmac
 import json
 import logging
+import os
 from pathlib import Path
 from typing import Any
 
@@ -49,20 +66,70 @@ def verify_capabilities(conn: Connection, *, allow_older_server: bool = False) -
     return {"server_version_num": ver, "postgis_default_version": postgis}
 
 
+SCRAM_ITERATIONS = 4096  # PostgreSQL's default scram_iterations
+
+
+def scram_sha256_verifier(password: str, *, iterations: int = SCRAM_ITERATIONS, salt: bytes | None = None) -> str:
+    """Return the SCRAM-SHA-256 verifier PostgreSQL stores for ``password``.
+
+    ``SCRAM-SHA-256$<iterations>:<salt>$<StoredKey>:<ServerKey>`` (all base64).
+    PostgreSQL applies SASLprep to the password; for printable ASCII that is the
+    identity, so only such passwords are accepted (generated passwords are).
+    """
+    if not password or not all(0x20 < ord(ch) < 0x7F for ch in password):
+        raise ConfigurationError("runtime role passwords must be non-empty printable ASCII without spaces")
+    salt = salt if salt is not None else os.urandom(16)
+    salted = hashlib.pbkdf2_hmac("sha256", password.encode("ascii"), salt, iterations)
+    client_key = hmac.new(salted, b"Client Key", "sha256").digest()
+    server_key = hmac.new(salted, b"Server Key", "sha256").digest()
+    stored_key = hashlib.sha256(client_key).digest()
+
+    def b64(b: bytes) -> str:
+        return base64.b64encode(b).decode("ascii")
+
+    return f"SCRAM-SHA-256${iterations}:{b64(salt)}${b64(stored_key)}:{b64(server_key)}"
+
+
+def _sqlstate(exc: BaseException) -> str:
+    orig = getattr(exc, "orig", None)
+    return str(getattr(orig, "sqlstate", None) or getattr(exc, "sqlstate", None) or type(exc).__name__)
+
+
 def provision_roles(conn: Connection, settings: Settings) -> list[str]:
+    """Set LOGIN + password for each runtime role, sending only a SCRAM verifier.
+
+    The statement is composed server-side (``format(%I, %L)``) from bind
+    parameters; on any failure the original exception (whose text would contain
+    the statement) is suppressed and only the role and SQLSTATE are reported.
+    """
     done = []
+    superuser = bool(
+        conn.execute(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")).scalar_one_or_none()
+    )
     for role, login in ROLE_LOGIN.items():
         pw = settings.role_password(role)  # type: ignore[arg-type]
         if pw is None:
             raise ConfigurationError(f"generated password for {login} is missing")
-        stmt = conn.execute(
-            text(
-                "SELECT format('ALTER ROLE %I LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE "
-                "NOBYPASSRLS CONNECTION LIMIT 10 PASSWORD %L', CAST(:r AS text), CAST(:p AS text))"
-            ),
-            {"r": login, "p": pw.get_secret_value()},
-        ).scalar_one()
-        conn.execute(text(stmt))
+        verifier = scram_sha256_verifier(pw.get_secret_value())
+        failure: str | None = None
+        try:
+            with conn.begin_nested():
+                if superuser:  # keep even the verifier out of statement logs where we can
+                    conn.execute(text("SET LOCAL log_statement = 'none'"))
+                stmt = conn.execute(
+                    text(
+                        "SELECT format('ALTER ROLE %I LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE "
+                        "NOBYPASSRLS CONNECTION LIMIT 10 PASSWORD %L', CAST(:r AS text), CAST(:v AS text))"
+                    ),
+                    {"r": login, "v": verifier},
+                ).scalar_one()
+                conn.execute(text(stmt))
+        except Exception as e:  # noqa: BLE001 - re-raised below without the statement text
+            failure = _sqlstate(e)
+        finally:
+            verifier = ""
+        if failure is not None:
+            raise ConfigurationError(f"provisioning runtime role {login} failed (SQLSTATE {failure})") from None
         done.append(login)
     return done
 

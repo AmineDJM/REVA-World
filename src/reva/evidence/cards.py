@@ -88,7 +88,8 @@ class EvidenceCard(BaseModel):
             raise ValueError("LLM extraction cannot carry a human review in the same record")
         for name in ("coefficient", "standard_error"):
             v = getattr(self, name)
-            if v not in (None, NOT_EXTRACTED) and not any(s.artifact in ("full_text", "table") for s in self.source_spans):
+            spans_ok = any(s.artifact in ("full_text", "table") for s in self.source_spans)
+            if v not in (None, NOT_EXTRACTED) and not spans_ok:
                 raise ValueError(f"{name} requires a full-text/table source span; metadata cannot support it")
         if self.evidence_kind == "hypothesis" and self.coefficient not in (None, NOT_EXTRACTED):
             raise ValueError("a hypothesis cannot carry a causal coefficient")

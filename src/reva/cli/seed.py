@@ -14,6 +14,7 @@ from sqlalchemy import Connection, Engine, text
 
 from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.postgres import repositories as repo
+from reva.evidence.locks import take_evidence_write_lock
 from reva.kernel.errors import ImmutableRecordViolation
 from reva.kernel.ids import external_id
 from reva.ontology.registry import Registry, concept_hash, load_registry
@@ -339,6 +340,7 @@ def _seed_schedules(conn: Connection) -> None:
 def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = None) -> dict[str, Any]:
     reg = load_registry()
     with engine.begin() as conn:
+        take_evidence_write_lock(conn)  # writes eligibility decisions: evidence lock protocol (R-03)
         act = repo.simple_activity("registry.seed", "review", SEED_ACTOR, {"registry": "mvp"})
         repo.record_activity(conn, act)
         concepts = _seed_concepts(conn, reg, act.id)

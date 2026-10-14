@@ -36,8 +36,21 @@ def _gap(io, **over) -> ports.KnowledgeGap:
 
 def test_protocol_conformance():
     """Every normative protocol has a concrete class with the protocol's methods."""
-    from reva.autonomy import (challenger, discovery, evidence, gaps, gate, generator, health, mapping, models,
-                               quality, sandbox, validator, voi)
+    from reva.autonomy import (
+        challenger,
+        discovery,
+        evidence,
+        gaps,
+        gate,
+        generator,
+        health,
+        mapping,
+        models,
+        quality,
+        sandbox,
+        validator,
+        voi,
+    )
 
     impl = {
         ports.SourceDiscoverer: discovery.EurostatCatalogueDiscoverer,

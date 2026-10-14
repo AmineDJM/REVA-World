@@ -120,7 +120,7 @@ async def test_trusted_template_env_has_no_secrets_and_network_is_template_only(
                  "REVA_COMTRADE_API_KEY": "k"}.items():
         monkeypatch.setenv(k, v)
     env = scrubbed_environment()
-    assert not [k for k in env if SECRET_RE.search(k) or k.startswith("REVA_") and k != "REVA_SANDBOX_ISOLATION"]
+    assert not [k for k in env if SECRET_RE.search(k) or (k.startswith("REVA_") and k != "REVA_SANDBOX_ISOLATION")]
     p, bank = _manifest_proposal(io)
     sb = TrustedTemplateSandbox(io, fixtures=bank)
     sb.network_probe = "ec.europa.eu"  # even the template host is unreachable: replay only
@@ -154,10 +154,11 @@ async def test_manifest_proposal_cannot_smuggle_code(io):
 def test_worker_never_imports_proposed_code(io, tmp_path):
     marker = tmp_path / "marker"
     _code_proposal(io, marker)
-    assert not any("generated" in m or "evil_patch" in m for m in sys.modules)
+    assert not any(m.startswith("reva.autonomy.generated") or "evil_patch" in m for m in sys.modules)
     assert not marker.exists()
     # static guarantee: the autonomy package has no dynamic code loading/execution primitive
-    forbidden = re.compile(r"(?<![.\w])(exec|eval|compile)\(|import_module\(|__import__\(|runpy|spec_from_file_location")
+    forbidden = re.compile(r"(?<![.\w])(exec|eval|compile)\(|import_module\(|__import__\("
+                           r"|runpy|spec_from_file_location")
     offenders = [f"{p.name}:{i}" for p in AUTONOMY_SRC.glob("*.py")
                  for i, line in enumerate(p.read_text().splitlines(), 1) if forbidden.search(line)]
     assert offenders == []

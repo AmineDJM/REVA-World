@@ -1,8 +1,36 @@
-"""Configuration with production validation and secret redaction."""
+"""Configuration with production validation and secret redaction.
+
+Production validation has two layers:
+
+* ``Settings`` itself (model validator) checks role-independent rules whenever
+  ``REVA_ENV=production``: S3 object storage, https public URL, TLS to
+  PostgreSQL (``REVA_DB_SSLMODE`` in require/verify-ca/verify-full), no
+  wildcard CORS, well-formed optional secrets (an admin hash, when present,
+  must be Argon2id), the LLM budget, and the session secret (unless the
+  process role is a non-API role).
+* Per-process requirements come from ``Settings.required_for(role)`` /
+  ``validate_for(role)``; they are enforced automatically when
+  ``REVA_PROCESS_ROLE`` is set, and entrypoints call them explicitly:
+
+  ========== ==============================================================
+  role        required in production (besides the role-independent rules)
+  ========== ==============================================================
+  api         REVA_API_DB_PASSWORD, REVA_SESSION_SECRET (>=32 chars),
+              REVA_ADMIN_PASSWORD_HASH ($argon2id$...), non-local
+              REVA_ALLOWED_HOSTS, no REVA_MIGRATION_DATABASE_URL
+  worker      REVA_WORKER_DB_PASSWORD, REVA_SIM_DB_PASSWORD,
+              no REVA_MIGRATION_DATABASE_URL
+  sim         REVA_SIM_DB_PASSWORD, no REVA_MIGRATION_DATABASE_URL
+  bootstrap   REVA_MIGRATION_DATABASE_URL and all three runtime role passwords
+  ========== ==============================================================
+
+  Outside production only the runtime role password(s) are required.
+"""
 
 from __future__ import annotations
 
 import os
+import re
 from functools import lru_cache
 from pathlib import Path
 from typing import Literal
@@ -30,14 +58,42 @@ SECRET_ENV_KEYS = frozenset(
     }
 )
 
+#: Common secret-bearing names outside the Settings model (redacted, never logged).
+COMMON_SECRET_ENV_KEYS = frozenset(
+    {
+        "PGPASSWORD",
+        "PGPASSFILE",
+        "AWS_SECRET_ACCESS_KEY",
+        "AWS_SESSION_TOKEN",
+        "AWS_ACCESS_KEY_ID",
+        "GITHUB_TOKEN",
+        "GH_TOKEN",
+        "ANTHROPIC_API_KEY",
+        "OPENAI_API_KEY",
+    }
+)
+#: Name patterns treated as secret by redaction (*PASSWORD*, *SECRET*, *TOKEN*, *KEY*, ...).
+SECRET_NAME_PATTERN = re.compile(
+    r"(PASSWORD|PASSWD|PASSPHRASE|SECRET|TOKEN|KEY|CREDENTIAL|PRIVATE|COOKIE|_DSN$|^DSN$|DATABASE_URL)",
+    re.IGNORECASE,
+)
+_URL_USERINFO = re.compile(r"(?P<scheme>[a-zA-Z][a-zA-Z0-9+.\-]*://)(?P<user>[^:/@\s]*):(?P<pw>[^@\s/]*)@")
+ARGON2ID_HASH = re.compile(r"^\$argon2id\$v=\d+\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}$")
+SSL_MODES_PRODUCTION = ("require", "verify-ca", "verify-full")
+
 Role = Literal["api", "worker", "sim"]
+ProcessRole = Literal["api", "worker", "sim", "bootstrap"]
 ROLE_LOGIN = {"api": "reva_api", "worker": "reva_worker", "sim": "reva_sim"}
 
 
 class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", env_file_encoding="utf-8", extra="ignore")
+    model_config = SettingsConfigDict(
+        env_file=".env", env_file_encoding="utf-8", extra="ignore", hide_input_in_errors=True
+    )
 
     reva_env: Literal["local", "test", "production"] = "local"
+    #: Which process this configuration is for; enables per-role production checks.
+    reva_process_role: ProcessRole | None = None
     reva_log_level: str = "INFO"
 
     reva_migration_database_url: SecretStr | None = None
@@ -77,6 +133,9 @@ class Settings(BaseSettings):
     reva_http_timeout_seconds: float = 30
     reva_http_max_bytes: int = 52_428_800
     reva_http_contact_email: str | None = None
+    #: Outbound HTTP egress: "direct" (DNS-pinned, default in production) or "env"
+    #: (HTTPS_PROXY from the environment; the proxy then enforces SSRF policy).
+    reva_http_proxy_mode: Literal["direct", "env"] | None = None
     reva_cache_max_bytes: int = 536_870_912
     reva_comtrade_api_key: SecretStr | None = None
 
@@ -103,14 +162,67 @@ class Settings(BaseSettings):
         for name in ("reva_s3_bucket", "reva_s3_access_key_id", "reva_s3_secret_access_key"):
             if not getattr(self, name):
                 missing.append(name.upper())
-        if not self.reva_session_secret or len(self.reva_session_secret.get_secret_value()) < 32:
+        # The session secret is an API secret; non-API processes (whose environment
+        # never receives it) declare themselves through REVA_PROCESS_ROLE.
+        if self.reva_process_role in (None, "api") and (
+            not self.reva_session_secret or len(self.reva_session_secret.get_secret_value()) < 32
+        ):
             missing.append("REVA_SESSION_SECRET (>=32 chars)")
         if self.reva_public_base_url.startswith("http://"):
             missing.append("REVA_PUBLIC_BASE_URL must be https in production")
         if self.reva_llm_enabled and self.reva_llm_monthly_budget_usd <= 0:
             missing.append("REVA_LLM_MONTHLY_BUDGET_USD > 0 when LLM is enabled")
+        if self.reva_db_sslmode not in SSL_MODES_PRODUCTION:
+            missing.append("REVA_DB_SSLMODE must be one of " + "/".join(SSL_MODES_PRODUCTION) + " in production")
+        if "*" in self.cors_origins:
+            missing.append("REVA_CORS_ORIGINS must not contain '*' in production")
+        if self.reva_admin_password_hash is not None and not _is_argon2id(self.reva_admin_password_hash):
+            missing.append("REVA_ADMIN_PASSWORD_HASH must be an Argon2id hash ($argon2id$...)")
+        if self.reva_process_role is not None:
+            missing.extend(m for m in self.required_for(self.reva_process_role) if m not in missing)
         if missing:
             raise ValueError("invalid production configuration: " + "; ".join(missing))
+        return self
+
+    # --- per-process requirements ------------------------------------------
+    def required_for(self, role: ProcessRole) -> list[str]:
+        """Missing/invalid settings for starting ``role`` (empty list when ready).
+
+        Names only, never values. Outside production only the database
+        credentials the role logs in with are required.
+        """
+        problems: list[str] = []
+        needed: dict[ProcessRole, tuple[Role, ...]] = {
+            "api": ("api",),
+            "worker": ("worker", "sim"),
+            "sim": ("sim",),
+            "bootstrap": ("api", "worker", "sim"),
+        }
+        if role not in needed:
+            raise ValueError(f"unknown process role {role!r}")
+        for r in needed[role]:
+            if self.role_password(r) is None or not self.role_password(r).get_secret_value():  # type: ignore[union-attr]
+                problems.append(f"REVA_{r.upper()}_DB_PASSWORD")
+        if role == "bootstrap" and self.reva_migration_database_url is None:
+            problems.append("REVA_MIGRATION_DATABASE_URL")
+        if self.reva_env != "production":
+            return problems
+        if role in ("api", "worker", "sim") and self.reva_migration_database_url is not None:
+            problems.append("REVA_MIGRATION_DATABASE_URL must not be present in a runtime process")
+        if role == "api":
+            if not self.reva_session_secret or len(self.reva_session_secret.get_secret_value()) < 32:
+                problems.append("REVA_SESSION_SECRET (>=32 chars)")
+            if self.reva_admin_password_hash is None or not _is_argon2id(self.reva_admin_password_hash):
+                problems.append("REVA_ADMIN_PASSWORD_HASH (Argon2id; generate with `reva auth hash-password`)")
+            if not self.allowed_hosts or set(self.allowed_hosts) <= {"localhost", "127.0.0.1", "::1"}:
+                problems.append("REVA_ALLOWED_HOSTS (public hostname(s), not only localhost)")
+        return problems
+
+    def validate_for(self, role: ProcessRole) -> Settings:
+        """Raise ``ConfigurationError`` naming every missing setting for ``role``."""
+        problems = self.required_for(role)
+        if problems:
+            raise ConfigurationError(f"configuration incomplete for {role}: " + "; ".join(problems))
         return self
 
     # --- derived ---------------------------------------------------------
@@ -154,6 +266,8 @@ class Settings(BaseSettings):
 
 def load_settings() -> Settings:
     try:
+        if os.environ.get("REVA_ENV") == "production":
+            return Settings(_env_file=None)  # type: ignore[call-arg]  # never read ./.env in production
         return Settings()
     except ValidationError as e:
         # Redact: report only field names/messages, never input values.
@@ -166,8 +280,23 @@ def get_settings() -> Settings:
     return load_settings()
 
 
+def _is_argon2id(value: SecretStr) -> bool:
+    return bool(ARGON2ID_HASH.match(value.get_secret_value()))
+
+
+def is_secret_env_key(name: str) -> bool:
+    """Secret-bearing environment variable name (explicit lists plus name patterns)."""
+    return name in SECRET_ENV_KEYS or name in COMMON_SECRET_ENV_KEYS or bool(SECRET_NAME_PATTERN.search(name))
+
+
+def redact_value(value: str) -> str:
+    """Mask passwords embedded in URLs (``scheme://user:pw@host`` -> ``scheme://user:***@host``)."""
+    return _URL_USERINFO.sub(lambda m: f"{m['scheme']}{m['user']}:***@", value)
+
+
 def redact_env(env: dict[str, str]) -> dict[str, str]:
-    return {k: ("***" if k in SECRET_ENV_KEYS else v) for k, v in env.items()}
+    """Copy of ``env`` with secret values masked; never mutates the input."""
+    return {k: ("***" if is_secret_env_key(k) else redact_value(v)) for k, v in env.items()}
 
 
 def threads_budget() -> int:

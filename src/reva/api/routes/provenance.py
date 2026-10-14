@@ -2,7 +2,10 @@
 
 estimate -> observation -> normalisation activity -> acquisition -> raw artifact
 (sha256 + verified storage location + raw selector); sim_result -> run ->
-scenario -> baseline release.
+scenario -> baseline release. A run also pins its model and ontology manifests
+and its result (output) manifest; a scenario pins its inline canonical spec
+artifact, its simulation context, its model version and its baseline release.
+Every graph is bounded by ``max_nodes`` (``truncated`` is never silent).
 """
 
 from __future__ import annotations
@@ -240,30 +243,48 @@ class Builder:
         return k
 
     def _scenario(self, ident: str, depth: int) -> str | None:
-        sc = self.one("SELECT * FROM sim.scenario WHERE id = :i", i=ident)
+        sc = self.one("""SELECT sc.*, mv.id AS model_version_id FROM sim.scenario sc
+                         LEFT JOIN model.version mv ON mv.model_key = sc.spec->>'model_key'
+                                                   AND mv.version = sc.spec->>'model_version'
+                         WHERE sc.id = :i""", i=ident)
         if sc is None:
             return None
         k = self.add("scenario", ident, sc["spec"].get("title", "scenario"), spec_digest=sc["spec_digest"],
-                     spec_sha256=sc["spec_sha256"], created_by=sc["created_by"], recorded_at=sc["recorded_at"])
-        self.edge(k, self._artifact(sc["spec_sha256"], depth + 1), "defined_by")
+                     spec_sha256=sc["spec_sha256"], created_by=sc["created_by"], recorded_at=sc["recorded_at"],
+                     model_key=sc["spec"].get("model_key"), model_version=sc["spec"].get("model_version"),
+                     fidelity=sc["spec"].get("fidelity"), knowledge_cutoff=sc["spec"].get("knowledge_cutoff"))
+        # The canonical spec bytes are stored inline (meta.artifact_inline) by sim.create_scenario.
+        self.edge(k, self._artifact(sc["spec_sha256"], depth + 1), "defined_by", role="scenario_spec")
         self.edge(k, self._context(str(sc["context_id"]), depth + 1), "in_context")
         self.edge(k, self._release(str(sc["baseline_release_id"]), depth + 1), "baseline_release")
+        if sc["model_version_id"]:
+            self.edge(k, self._model_version(str(sc["model_version_id"]), depth + 1), "uses_model")
+        if sc["parent_scenario_id"]:
+            self.edge(k, self.key("scenario", sc["parent_scenario_id"]), "derived_from")
+            self.enqueue("scenario", sc["parent_scenario_id"], depth + 1)
         return k
 
     def _run(self, ident: str, depth: int) -> str | None:
-        r = self.one("""SELECT r.*, o.status, o.output_manifest_sha256, o.provenance_activity_id
+        r = self.one("""SELECT r.*, o.status, o.output_manifest_sha256, o.output_digest, o.provenance_activity_id,
+                               o.cache_hit_of
                         FROM sim.run r LEFT JOIN sim.run_outcome o ON o.run_id = r.id WHERE r.id = :i""", i=ident)
         if r is None:
             return None
         k = self.add("run", ident, f"run {r['fidelity']} ({r['status'] or 'pending'})", fidelity=r["fidelity"],
                      status=r["status"], job_id=r["job_id"], model_manifest_sha256=r["model_manifest_sha256"],
-                     seed_plan=r["seed_plan"])
+                     ontology_manifest_sha256=r["ontology_manifest_sha256"], seed_plan=r["seed_plan"],
+                     execution_profile=r["execution_profile"], output_digest=r["output_digest"],
+                     recorded_at=r["recorded_at"])
         self.edge(k, self._scenario(str(r["scenario_id"]), depth + 1), "of_scenario")
         self.edge(k, self._artifact(r["model_manifest_sha256"], depth + 1), "pins", role="model_manifest")
+        self.edge(k, self._artifact(r["ontology_manifest_sha256"], depth + 1), "pins", role="ontology_manifest")
         if r["output_manifest_sha256"]:
-            self.edge(k, self._artifact(r["output_manifest_sha256"], depth + 1), "produced", role="output_manifest")
+            self.edge(k, self._artifact(r["output_manifest_sha256"], depth + 1), "produced", role="result_manifest")
         if r["provenance_activity_id"]:
             self.edge(k, self._activity(str(r["provenance_activity_id"]), depth + 1), "executed_by")
+        if r["cache_hit_of"]:
+            self.edge(k, self.key("run", r["cache_hit_of"]), "cache_hit_of")
+            self.enqueue("run", r["cache_hit_of"], depth + 1)
         return k
 
     def _sim_result(self, ident: str, depth: int) -> str | None:
@@ -303,7 +324,7 @@ def get_provenance(
     warnings = origin_warnings(org)
     if b.truncated:
         warnings.append(s.ApiWarning(code="truncated", message=f"Lineage bounded at max_nodes={max_nodes}"))
-    mode = "simulation" if kind == "sim_result" else ("belief" if kind in ("estimate", "release") else "evidence")
+    mode = "simulation" if kind in ("sim_result", "run", "scenario") else ("belief" if kind in ("estimate", "release") else "evidence")
     return s.ProvenanceResponse(
         data=s.ProvenanceGraph(root=root, nodes=list(b.nodes.values()), edges=b.edges, truncated=b.truncated,
                                max_nodes=max_nodes),

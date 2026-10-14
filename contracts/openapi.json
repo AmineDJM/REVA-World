@@ -36,7 +36,8 @@
           "provider",
           "external_key",
           "confidence_kind",
-          "mapping_version"
+          "mapping_version",
+          "valid_range"
         ],
         "title": "Alias",
         "type": "object"
@@ -98,7 +99,9 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "reason",
+          "detail"
         ],
         "title": "Assessment",
         "type": "object"
@@ -162,8 +165,11 @@
         },
         "required": [
           "id",
+          "sequence",
           "knowledge_cutoff",
-          "origin"
+          "published_at",
+          "origin",
+          "method"
         ],
         "title": "BaselineReleaseRef",
         "type": "object"
@@ -315,6 +321,10 @@
           "uncertainty",
           "alternatives",
           "discrepancy_flags",
+          "source_key",
+          "observation_id",
+          "observation_revision_no",
+          "retrieved_at",
           "method"
         ],
         "title": "BeliefEstimate",
@@ -531,9 +541,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "BeliefListResponse",
         "type": "object"
@@ -857,9 +888,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "BeliefReleaseListResponse",
         "type": "object"
@@ -1071,9 +1123,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "BeliefReleaseResponse",
         "type": "object"
@@ -1193,6 +1266,8 @@
           "version",
           "kind",
           "definition",
+          "unit_ref",
+          "aggregation",
           "semantic_profile"
         ],
         "title": "ConceptInfo",
@@ -1504,9 +1579,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ConnectorListResponse",
         "type": "object"
@@ -1604,11 +1700,15 @@
           "name",
           "version",
           "source_key",
+          "licence",
           "declared_capabilities",
           "spec_sha256",
           "code_digest",
           "recorded_at",
-          "acquisitions"
+          "latest_health",
+          "cursor",
+          "acquisitions",
+          "last_retrieved_at"
         ],
         "title": "ConnectorOut",
         "type": "object"
@@ -1639,7 +1739,9 @@
           }
         },
         "required": [
-          "wall_time_ms"
+          "wall_time_ms",
+          "rows",
+          "detail"
         ],
         "title": "CostReport",
         "type": "object"
@@ -1895,9 +1997,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "CoverageResponse",
         "type": "object"
@@ -1967,8 +2090,10 @@
           }
         },
         "required": [
+          "kind",
           "value",
-          "unit_ref"
+          "unit_ref",
+          "basis"
         ],
         "title": "DecimalValue",
         "type": "object"
@@ -2083,7 +2208,11 @@
         },
         "required": [
           "component",
-          "count"
+          "concept_id",
+          "layer",
+          "count",
+          "first_period",
+          "last_period"
         ],
         "title": "EntityComponent",
         "type": "object"
@@ -2360,9 +2489,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "EntityDetailResponse",
         "type": "object"
@@ -2578,9 +2728,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "EntityListResponse",
         "type": "object"
@@ -2611,7 +2782,8 @@
         },
         "required": [
           "id",
-          "label"
+          "label",
+          "kind"
         ],
         "title": "EntityRef",
         "type": "object"
@@ -2908,9 +3080,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "EventListResponse",
         "type": "object"
@@ -3038,7 +3231,16 @@
         "required": [
           "id",
           "kind",
-          "title"
+          "title",
+          "status",
+          "evidence_kind",
+          "card",
+          "claim_key",
+          "claim_version",
+          "study",
+          "effects",
+          "disagreement",
+          "recorded_at"
         ],
         "title": "EvidenceDetail",
         "type": "object"
@@ -3250,9 +3452,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "EvidenceDetailResponse",
         "type": "object"
@@ -3327,7 +3550,11 @@
         "required": [
           "id",
           "kind",
-          "title"
+          "title",
+          "status",
+          "evidence_kind",
+          "summary",
+          "recorded_at"
         ],
         "title": "EvidenceItem",
         "type": "object"
@@ -3543,9 +3770,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "EvidenceListResponse",
         "type": "object"
@@ -3576,6 +3824,7 @@
           }
         },
         "required": [
+          "type",
           "features",
           "display_note",
           "truncated"
@@ -3607,8 +3856,10 @@
           }
         },
         "required": [
+          "kind",
           "value",
-          "unit_ref"
+          "unit_ref",
+          "basis"
         ],
         "title": "FloatValue",
         "type": "object"
@@ -3652,6 +3903,11 @@
             "title": "Note"
           }
         },
+        "required": [
+          "latest_retrieved_at",
+          "latest_recorded_at",
+          "note"
+        ],
         "title": "Freshness",
         "type": "object"
       },
@@ -3726,6 +3982,7 @@
           "period",
           "gap_kind",
           "reason",
+          "source_flags",
           "action"
         ],
         "title": "Gap",
@@ -3942,9 +4199,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "GapListResponse",
         "type": "object"
@@ -4018,6 +4296,7 @@
           }
         },
         "required": [
+          "type",
           "id",
           "geometry",
           "properties"
@@ -4089,8 +4368,12 @@
         },
         "required": [
           "feature_key",
+          "entity_id",
+          "entity_label",
           "match_status",
-          "dataset_sha256"
+          "name",
+          "dataset_sha256",
+          "display_only"
         ],
         "title": "GeoFeatureProperties",
         "type": "object"
@@ -4158,7 +4441,8 @@
         },
         "required": [
           "name",
-          "ok"
+          "ok",
+          "detail"
         ],
         "title": "HealthCheck",
         "type": "object"
@@ -4332,11 +4616,15 @@
           "max_attempts",
           "progress",
           "has_checkpoint",
+          "result_ref",
+          "last_error",
           "created_by",
           "created_at",
           "updated_at",
           "available_at",
-          "cancellable"
+          "finished_at",
+          "cancellable",
+          "links"
         ],
         "title": "Job",
         "type": "object"
@@ -4602,9 +4890,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "JobListResponse",
         "type": "object"
@@ -4816,9 +5125,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "LocationResponse",
         "type": "object"
@@ -4942,7 +5272,9 @@
           }
         },
         "required": [
-          "reason"
+          "kind",
+          "reason",
+          "detail"
         ],
         "title": "MissingValue",
         "type": "object"
@@ -5005,7 +5337,8 @@
           "task_scope",
           "metrics",
           "evaluation_manifest_sha256",
-          "recorded_at"
+          "recorded_at",
+          "promotions"
         ],
         "title": "ModelEvaluation",
         "type": "object"
@@ -5221,9 +5554,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ModelEvaluationListResponse",
         "type": "object"
@@ -5439,9 +5793,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ModelListResponse",
         "type": "object"
@@ -5518,6 +5893,7 @@
           "assumptions",
           "input_ports",
           "output_ports",
+          "training_cutoff",
           "spec_sha256",
           "recorded_at",
           "evaluation_count"
@@ -5561,8 +5937,10 @@
           }
         },
         "required": [
+          "id",
           "model_key",
-          "version"
+          "version",
+          "approval_status"
         ],
         "title": "ModelVersionRef",
         "type": "object"
@@ -5779,6 +6157,9 @@
           "origin",
           "logical_key",
           "revision_no",
+          "supersedes_id",
+          "superseded_by_id",
+          "source_revision_id",
           "subject",
           "concept_id",
           "concept_version",
@@ -5786,10 +6167,15 @@
           "uncertainty",
           "source_flags",
           "support",
+          "observed_at",
+          "source_published_at",
+          "source_available_at",
+          "availability_basis",
           "retrieved_at",
           "recorded_at",
           "raw_selector",
-          "parser_version"
+          "parser_version",
+          "retracted"
         ],
         "title": "Observation",
         "type": "object"
@@ -6005,9 +6391,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ObservationListResponse",
         "type": "object"
@@ -6244,9 +6651,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "OntologyResponse",
         "type": "object"
@@ -6383,7 +6811,10 @@
           "title",
           "status",
           "detail",
-          "code"
+          "code",
+          "instance",
+          "request_id",
+          "details"
         ],
         "title": "Problem",
         "type": "object"
@@ -6662,9 +7093,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ProposalListResponse",
         "type": "object"
@@ -6729,7 +7181,8 @@
         "required": [
           "source",
           "target",
-          "relation"
+          "relation",
+          "attributes"
         ],
         "title": "ProvenanceEdge",
         "type": "object"
@@ -6849,7 +7302,8 @@
         "required": [
           "id",
           "kind",
-          "label"
+          "label",
+          "attributes"
         ],
         "title": "ProvenanceNode",
         "type": "object"
@@ -7061,9 +7515,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ProvenanceResponse",
         "type": "object"
@@ -7218,6 +7693,12 @@
           "support",
           "component",
           "existence_uncertainty",
+          "strength",
+          "value",
+          "concept_id",
+          "evidence_observation_id",
+          "release_id",
+          "origin",
           "recorded_at",
           "participants"
         ],
@@ -7478,9 +7959,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "RelationListResponse",
         "type": "object"
@@ -7897,8 +8399,10 @@
           "observation_id",
           "revision_no",
           "value",
+          "source_revision_id",
           "retrieved_at",
-          "recorded_at"
+          "recorded_at",
+          "source_published_at"
         ],
         "title": "RevisionEntry",
         "type": "object"
@@ -8254,9 +8758,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ScenarioListResponse",
         "type": "object"
@@ -8468,9 +8993,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "ScenarioResponse",
         "type": "object"
@@ -8531,7 +9077,9 @@
           "username",
           "principal",
           "auth_method",
-          "scopes"
+          "scopes",
+          "expires_at",
+          "csrf_token"
         ],
         "title": "SessionInfo",
         "type": "object"
@@ -8606,9 +9154,12 @@
         },
         "required": [
           "status",
+          "output_manifest_sha256",
+          "output_digest",
           "applicability",
           "problems",
           "cost",
+          "cache_hit_of",
           "recorded_at"
         ],
         "title": "SimOutcome",
@@ -8694,10 +9245,12 @@
         "required": [
           "id",
           "output_key",
+          "subject",
           "variant",
           "value",
           "uncertainty",
-          "applicability"
+          "applicability",
+          "artifact_sha256"
         ],
         "title": "SimResult",
         "type": "object"
@@ -9039,9 +9592,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "SimulationStatusResponse",
         "type": "object"
@@ -9319,9 +9893,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "SourceListResponse",
         "type": "object"
@@ -9403,8 +9998,10 @@
           "lineage_family",
           "rights",
           "metadata",
+          "metadata_version",
           "connectors",
-          "observations"
+          "observations",
+          "last_retrieved_at"
         ],
         "title": "SourceOut",
         "type": "object"
@@ -9454,7 +10051,8 @@
           "temporal",
           "spatial",
           "population",
-          "aggregation"
+          "aggregation",
+          "period_label"
         ],
         "title": "SupportSummary",
         "type": "object"
@@ -9525,6 +10123,10 @@
         },
         "required": [
           "mode",
+          "context_id",
+          "release_id",
+          "origin",
+          "knowledge_cutoff",
           "description"
         ],
         "title": "SupportedContext",
@@ -9571,6 +10173,7 @@
           "subject",
           "concept",
           "revisions_mode",
+          "as_of",
           "points"
         ],
         "title": "Timeseries",
@@ -9737,7 +10340,9 @@
           "uncertainty",
           "recorded_at",
           "retrieved_at",
-          "origin"
+          "source_published_at",
+          "origin",
+          "revisions"
         ],
         "title": "TimeseriesPoint",
         "type": "object"
@@ -9997,9 +10602,30 @@
         },
         "required": [
           "data",
+          "context_id",
           "context_mode",
           "origin",
-          "modality"
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
         ],
         "title": "TimeseriesResponse",
         "type": "object"
@@ -10098,7 +10724,15 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "kind",
+          "description",
+          "level",
+          "lower",
+          "upper",
+          "dependence_group",
+          "method_version",
+          "conditioning"
         ],
         "title": "Uncertainty",
         "type": "object"
@@ -10164,7 +10798,11 @@
           }
         },
         "required": [
-          "status"
+          "status",
+          "kind",
+          "level",
+          "dependence",
+          "note"
         ],
         "title": "UncertaintySummary",
         "type": "object"

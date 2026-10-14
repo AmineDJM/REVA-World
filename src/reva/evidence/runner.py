@@ -146,7 +146,8 @@ def save_cursor(engine: Engine, name: str, cursor: Cursor) -> None:
         conn.execute(
             text(
                 """INSERT INTO ops.connector_cursor(connector_name, cursor) VALUES (:n, CAST(:c AS jsonb))
-                   ON CONFLICT (connector_name) DO UPDATE SET cursor = EXCLUDED.cursor, updated_at = clock_timestamp()"""
+                   ON CONFLICT (connector_name)
+                   DO UPDATE SET cursor = EXCLUDED.cursor, updated_at = clock_timestamp()"""
             ),
             {"n": name, "c": json.dumps(cursor.state)},
         )

@@ -32,14 +32,17 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class ApiModel(BaseModel):
-    model_config = ConfigDict(extra="forbid", populate_by_name=True)
+    # Response schemas are exported in serialization mode: a field with a
+    # default is always present in a response, so it is *required* there
+    # (the generated TypeScript types then never mark it optional).
+    model_config = ConfigDict(extra="forbid", populate_by_name=True, json_schema_serialization_defaults_required=True)
 
 
 class OpenModel(BaseModel):
     """Response sub-objects that carry registered but open-ended JSON (e.g. a
     connector's declared capabilities) keep unknown keys."""
 
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(extra="allow", json_schema_serialization_defaults_required=True)
 
 
 # ---------------------------------------------------------------------------
@@ -213,7 +216,13 @@ class Envelope(ApiModel):
 
 
 class Problem(OpenModel):
-    """RFC 9457 problem details (application/problem+json)."""
+    """RFC 9457 problem details (application/problem+json).
+
+    Built directly from ``RevaError.problem()`` (not serialized through this
+    model), so optional members are genuinely optional on the wire.
+    """
+
+    model_config = ConfigDict(extra="allow", json_schema_serialization_defaults_required=False)
 
     type: str
     title: str
@@ -653,7 +662,8 @@ class EvidenceDetailResponse(Envelope):
 # ---------------------------------------------------------------------------
 
 
-ProvenanceKind = Literal["estimate", "observation", "acquisition", "artifact", "sim_result", "release"]
+ProvenanceKind = Literal["estimate", "observation", "acquisition", "artifact", "sim_result", "release", "run",
+                         "scenario"]
 
 
 class ProvenanceNode(ApiModel):
@@ -755,13 +765,33 @@ class ModelVersionOut(ApiModel):
 class ModelEvaluation(ApiModel):
     id: UUID
     model_version_id: UUID
+    model_key: str
+    model_version: str
     context_id: UUID
+    origin: Literal["live", "test_fixture"]
     replay_mode: str
+    replay_mode_label: str = Field(
+        description="Human label of the replay mode, e.g. 'revised-data retrospective — not a real-time backtest'"
+    )
     task_scope: dict[str, Any]
     metrics: dict[str, Any]
     evaluation_manifest_sha256: str
     recorded_at: datetime
     promotions: list[dict[str, Any]] = Field(default_factory=list)
+    is_naive_baseline: bool = Field(description="Row of the naive last-value baseline every challenger must beat")
+    included_as: Literal["requested_model", "naive_baseline_comparator"] = Field(
+        description="naive_baseline_comparator rows belong to the naive baseline model and are included because "
+        "they were scored in the same evaluation manifest and period as a requested row"
+    )
+
+
+class EvaluationRequest(ApiModel):
+    """Start a model evaluation (rolling-origin tournament, revised-data retrospective) as a job."""
+
+    concepts: list[str] | None = Field(None, min_length=1, max_length=10,
+                                       description="Concept ids (default: every supported positive annual series)")
+    horizons: list[int] | None = Field(None, min_length=1, max_length=5, description="Forecast horizons in years")
+    seed: int | None = Field(None, ge=0, le=2**31 - 1, description="Deterministic seed (default: service seed)")
 
 
 class ModelListResponse(Envelope):
@@ -878,6 +908,39 @@ class DiscoveryRequest(ApiModel):
     max_candidates: int = Field(10, ge=1, le=50)
 
 
+class DiscoveryCandidate(ApiModel):
+    """A source candidate surfaced by a completed discovery job, or a connector proposal.
+
+    Search ranking is lexical evidence only: it never grants semantic equivalence.
+    Nothing here is promoted; promotion needs passing gates and a human review.
+    """
+
+    candidate_kind: Literal["search_result", "connector_proposal"]
+    job_id: UUID | None = None
+    proposal_id: UUID | None = None
+    origin: Literal["live", "test_fixture"] | None = Field(
+        None, description="test_fixture when the discovery ran against captured catalogue responses")
+    provider: str | None = None
+    dataset_code: str | None = None
+    requirement_id: str | None = None
+    rank: int | None = Field(None, description="1-based lexical rank in the job's catalogue search")
+    score: float | None = None
+    jaccard: float | None = None
+    inspected: bool | None = Field(None, description="Whether the dataset's metadata was inspected (null: not tried)")
+    inspection_error: str | None = None
+    selected: bool = Field(description="The job turned this candidate into a connector proposal")
+    discovery_status: str | None = Field(None, description="Outcome of the discovery job (e.g. gate_reject)")
+    proposal_type: str | None = None
+    permission_tier: int | None = None
+    gate_outcome: str | None = None
+    reviews: list[str] = Field(default_factory=list, description="Human review decisions recorded so far")
+    recorded_at: datetime
+
+
+class DiscoveryCandidateListResponse(Envelope):
+    data: list[DiscoveryCandidate]
+
+
 # ---------------------------------------------------------------------------
 # Sources, connectors, ontology
 # ---------------------------------------------------------------------------
@@ -887,6 +950,11 @@ class ConnectorHealth(ApiModel):
     status: Literal["healthy", "degraded", "quarantined", "unknown"]
     metrics: dict[str, Any]
     recorded_at: datetime
+
+
+class AcquisitionOriginCounts(ApiModel):
+    live: int
+    test_fixture: int
 
 
 class ConnectorOut(ApiModel):
@@ -903,6 +971,11 @@ class ConnectorOut(ApiModel):
     cursor: dict[str, Any] | None = None
     acquisitions: int
     last_retrieved_at: datetime | None = None
+    origin: OriginLabel = Field(description="Origins of this connector's acquisitions: live, test_fixture, mixed "
+                                "(both) or none (never acquired)")
+    latest_acquisition_origin: Literal["live", "test_fixture"] | None = Field(
+        description="Origin of the most recent acquisition (null when none)")
+    acquisitions_by_origin: AcquisitionOriginCounts
 
 
 class SourceOut(ApiModel):
@@ -917,6 +990,9 @@ class SourceOut(ApiModel):
     connectors: list[str]
     observations: int
     last_retrieved_at: datetime | None = None
+    origin: OriginLabel = Field(description="Origins of this source's acquisitions: live, test_fixture, mixed or none")
+    latest_acquisition_origin: Literal["live", "test_fixture"] | None = None
+    acquisitions_by_origin: AcquisitionOriginCounts
 
 
 class SourceListResponse(Envelope):

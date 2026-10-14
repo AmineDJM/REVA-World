@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import json
 import uuid
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
@@ -68,7 +68,7 @@ async def _pipeline(io, overrides=None):
 
 
 async def test_discovers_demo_pjan_from_captured_catalogue(io):
-    bank, disc, cands, _, _ = await _pipeline(io)
+    _bank, disc, cands, _, _ = await _pipeline(io)
     assert cands[0].dataset_id == "demo_pjan"
     assert disc.last_search["datasets_in_catalogue"] > 5000  # the real catalogue, not a toy list
     assert [c["code"] for c in disc.last_search["ranked"]][:2] == ["demo_pjan", "demo_pjangroup"]
@@ -141,7 +141,7 @@ def _drop_status(doc):
                                            (_drop_status, "status_missing")])
 async def test_validator_fails_mutated_sample(io, mutation, code):
     # the manifest is generated from the genuine sample; validation replays a mutated one
-    _, _, cands, mappings, cp = await _pipeline(io)
+    _, _, _cands, _mappings, cp = await _pipeline(io)
     bad_bank = bank_from_dir(io, CONNECTOR, overrides=_mutated(mutation))
     rep = await JsonStatConnectorValidator(io).validate(cp, bad_bank, default_budget())
     assert rep.outcome == "fail"
@@ -156,7 +156,7 @@ async def test_validator_blocks_without_sample(io):
 
 
 async def test_wdi_midyear_equivalence_is_incompatible(io):
-    _, _, cands, mappings, _ = await _pipeline(io)
+    _, _, _cands, mappings, _ = await _pipeline(io)
     by_target = {m.target_concept_version: m for m in mappings}
     exact = by_target["demography.population.jan1_age_sex@1.0.0"]
     wdi = by_target["demography.population.wdi_midyear_total@1.0.0"]
@@ -267,8 +267,7 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, tmp_path
 
     wb = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(wb, FixtureHttp(wb.describe().name), db.store, db.worker, persist_cursor=False)
-    rel = publish_release(db.worker, db.store, cutoff=datetime.now(UTC) + timedelta(seconds=1),
-                          origin=Origin.test_fixture, environment="test",
+    rel = publish_release(db.worker, db.store, cutoff=None, origin=Origin.test_fixture, environment="test",
                           concepts=["demography.population.jan1_age_sex", "demography.population.wdi_midyear_total"])
     with db.owner.connect() as conn:
         est = conn.execute(text(
@@ -295,7 +294,7 @@ async def test_rollback_retires_eligibility(db, tmp_path):
 
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
     assert out["status"] in ("promoted", "no_gap"), out
-    with pytest.raises(Exception):  # noqa: B017 - the proposer may not roll back
+    with pytest.raises(Exception):
         rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
                            "agent:autonomy-discovery", "test")
     rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",

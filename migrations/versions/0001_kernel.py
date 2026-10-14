@@ -69,18 +69,20 @@ END $$;
 -- True iff a row whose xmin is x was inserted by the current transaction
 -- (including its subtransactions). Uncommitted rows of other transactions are
 -- invisible, so a visible row whose inserting xid is still "in progress" and
--- not older than our own top-level xid is ours. Callers pass the xmin of a row
--- they could see. Fails closed (false) for frozen/special xids and for the
--- practically unreachable case of a subtransaction crossing an epoch boundary.
+-- not older than our own top-level xid (subtransaction xids are newer) is ours.
+-- Callers pass the xmin of a row they could see. The 32-bit xmin is widened
+-- with the current epoch; an unfrozen xmin is less than 2^31 xids old, so a
+-- value more than 2^31 ahead belongs to the previous epoch (not ours). Fails
+-- closed (false) for frozen/special xids and for the practically unreachable
+-- case of a subtransaction crossing an epoch boundary.
 CREATE FUNCTION meta.inserted_in_current_xact(x xid) RETURNS boolean
   LANGUAGE plpgsql VOLATILE AS $$
-DECLARE cur bigint; cand bigint; lim bigint;
+DECLARE cur bigint; cand bigint;
 BEGIN
   IF x IS NULL OR x::text::bigint < 3 THEN RETURN false; END IF;
   cur := pg_catalog.pg_current_xact_id()::text::bigint;
   cand := (cur & ~4294967295::bigint) | x::text::bigint;
-  lim := pg_catalog.pg_snapshot_xmax(pg_catalog.pg_current_snapshot())::text::bigint;
-  IF cand < cur OR cand >= lim THEN RETURN false; END IF;
+  IF cand < cur OR cand > cur + 2147483647 THEN RETURN false; END IF;
   RETURN COALESCE(pg_catalog.pg_xact_status(cand::text::xid8) = 'in progress', false);
 END $$;
 

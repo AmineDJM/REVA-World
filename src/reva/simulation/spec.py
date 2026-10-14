@@ -8,6 +8,8 @@ release; a real published baseline must be resolved before execution.
 from __future__ import annotations
 
 import json
+import re
+from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
@@ -24,6 +26,47 @@ SUPPORTED_FIDELITY = ("L0", "L1", "L2")
 RESERVED_FIDELITY = ("L3", "L4")
 IMPORT_ELASTICITY_ENVELOPE = (-2.0, 1.0)
 EXPORT_ELASTICITY_ENVELOPE = (-1.0, 2.0)
+
+
+#: RFC 3339 ``date-time`` (section 5.6): full-date "T" full-time with an explicit offset.
+_RFC3339 = re.compile(
+    r"^(\d{4})-(\d{2})-(\d{2})[Tt](\d{2}):(\d{2}):(\d{2})(\.\d{1,9})?([Zz]|[+-]\d{2}:\d{2})$",
+    re.ASCII,
+)
+#: Tolerated clock skew for a knowledge cutoff "now".
+CUTOFF_FUTURE_SKEW = timedelta(seconds=60)
+
+
+def parse_knowledge_cutoff(value: object, *, now: datetime | None = None) -> datetime:
+    """Strict RFC 3339 parse of a knowledge cutoff (independent of jsonschema format plugins).
+
+    Rejects anything that is not an RFC 3339 date-time with an explicit offset
+    (``infinity``, ``yesterday``, ``2026-99-99``, naive or date-only values), and
+    cutoffs more than 60 s in the future. Returns an aware UTC datetime.
+    """
+    if not isinstance(value, str):
+        raise ValidationProblem("knowledge_cutoff must be an RFC 3339 date-time string")
+    m = _RFC3339.match(value)
+    if m is None:
+        raise ValidationProblem("knowledge_cutoff is not an RFC 3339 date-time with an explicit offset",
+                                errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}])
+    text = value[:-1] + "+00:00" if value[-1] in "Zz" else value
+    frac = m.group(7)
+    if frac and len(frac) > 7:  # fromisoformat accepts at most microseconds; truncate extra digits
+        text = text.replace(frac, frac[:7], 1)
+    try:
+        parsed = datetime.fromisoformat(text.replace("t", "T", 1))
+    except ValueError as e:
+        raise ValidationProblem("knowledge_cutoff is not a valid calendar date-time",
+                                errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}]) from e
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValidationProblem("knowledge_cutoff must carry an explicit UTC offset")
+    utc = parsed.astimezone(UTC)
+    current = now or datetime.now(UTC)
+    if utc > current + CUTOFF_FUTURE_SKEW:
+        raise ValidationProblem("knowledge_cutoff lies in the future",
+                                errors=[{"path": "/knowledge_cutoff", "message": "future cutoff"}])
+    return utc
 
 
 @lru_cache(maxsize=1)
@@ -88,8 +131,15 @@ class ScenarioSpec(BaseModel):
         return logical_hash(self.as_json())
 
 
-def validate_scenario_spec(data: dict[str, Any], *, allow_fixture_baseline: bool = False) -> ScenarioSpec:
-    """JSON Schema validation, then scope checks (still required after schema)."""
+def validate_scenario_spec(
+    data: dict[str, Any], *, allow_fixture_baseline: bool = False, now: datetime | None = None
+) -> ScenarioSpec:
+    """JSON Schema validation, then scope checks (still required after schema).
+
+    ``knowledge_cutoff`` is parsed explicitly (``parse_knowledge_cutoff``): the
+    schema's ``format: date-time`` is only enforced by jsonschema when the
+    optional ``rfc3339-validator`` plugin is installed.
+    """
     from reva.capabilities import require
 
     if isinstance(data, dict) and data.get("fidelity") in RESERVED_FIDELITY:
@@ -113,6 +163,7 @@ def validate_scenario_spec(data: dict[str, Any], *, allow_fixture_baseline: bool
             errors=[{"path": "/" + "/".join(map(str, e.path)), "message": e.message} for e in errors[:20]],
         )
     spec = ScenarioSpec.model_validate(data)
+    parse_knowledge_cutoff(spec.knowledge_cutoff, now=now)
     if spec.baseline_release_id == FIXTURE_BASELINE and not allow_fixture_baseline:
         raise ValidationProblem(
             "baseline_release_id is the illustrative fixture UUID; resolve a real published baseline release"

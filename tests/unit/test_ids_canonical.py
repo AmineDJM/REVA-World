@@ -110,10 +110,11 @@ def test_temporal_types_are_tagged_and_distinct() -> None:
     d = date(2023, 1, 1)
     t = datetime(2023, 1, 1, tzinfo=UTC)
     assert logical_hash(d) != logical_hash(t) != logical_hash("2023-01-01")
-    # Same instant in a different offset is a different serialisation: callers must normalise to UTC.
+    # The same instant in another UTC offset has one canonical serialisation.
     t2 = t.astimezone(timezone(timedelta(hours=2)))
     assert t == t2
-    assert canonical_bytes(t) != canonical_bytes(t2)
+    assert canonical_bytes(t) == canonical_bytes(t2)
+    assert canonical_bytes(t) != canonical_bytes(t + timedelta(microseconds=1))
 
 
 def test_sets_are_order_independent_and_enums_use_values() -> None:
@@ -205,15 +206,9 @@ def test_registry_entity_ids_are_label_independent() -> None:
     assert len({entity_id(e["key"]) for e in reg.entities}) == len(reg.entities)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: external_id joins components with \\x1f without escaping/length-prefixing, so "
-        "('a\\x1fb','c') and ('a','b\\x1fc') collide; identities must be injective"
-    ),
-)
 def test_external_id_is_injective_over_components() -> None:
     assert external_id("a\x1fb", "c") != external_id("a", "b\x1fc")
+    assert external_id("a\\", "\x1fb") != external_id("a\\\x1f", "b")
 
 
 @settings(max_examples=200)

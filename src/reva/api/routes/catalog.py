@@ -17,6 +17,7 @@ from reva.api.deps import (
     Timer,
     decode_cursor,
     get_engine,
+    origin_of,
     origin_warnings,
     page,
     page_limit,
@@ -36,9 +37,41 @@ router = APIRouter(prefix="/v1", tags=["catalog"], dependencies=[Depends(require
 # ---------------------------------------------------------------------------
 
 
+def _acq_origin(n_live: int, n_fixture: int) -> str:
+    """Honest origin of a connector/source from its acquisitions (never assumed live)."""
+    if n_live and n_fixture:
+        return "mixed"
+    if n_live:
+        return "live"
+    if n_fixture:
+        return "test_fixture"
+    return "none"
+
+
+def _origin_fields(r: dict[str, Any]) -> dict[str, Any]:
+    n_live, n_fix = int(r.pop("n_live") or 0), int(r.pop("n_fixture") or 0)
+    return {"origin": _acq_origin(n_live, n_fix), "latest_acquisition_origin": r.pop("latest_origin"),
+            "acquisitions_by_origin": s.AcquisitionOriginCounts(live=n_live, test_fixture=n_fix)}
+
+
+def _listing_origin(items: list[Any]) -> str:
+    return origin_of(x for o in items if o.origin != "none"
+                     for x in (("live", "test_fixture") if o.origin == "mixed" else (o.origin,)))
+
+
+ACQ_ORIGIN_SQL = """
+LEFT JOIN LATERAL (SELECT count(*) FILTER (WHERE a.origin = 'live') AS n_live,
+                          count(*) FILTER (WHERE a.origin = 'test_fixture') AS n_fixture,
+                          count(*) AS n_acq, max(a.retrieved_at) AS last_retrieved_at
+                   FROM evidence.acquisition a WHERE a.{col} = {ref}) ag ON true
+LEFT JOIN LATERAL (SELECT a.origin AS latest_origin FROM evidence.acquisition a WHERE a.{col} = {ref}
+                   ORDER BY a.retrieved_at DESC, a.recorded_at DESC LIMIT 1) la ON true
+"""
+
+
 @router.get("/sources", response_model=s.SourceListResponse)
 def list_sources(request: Request) -> s.SourceListResponse:
-    """Registered sources with latest metadata version, rights and activity."""
+    """Registered sources with latest metadata version, rights, activity and acquisition origin."""
     t = Timer()
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(
@@ -48,19 +81,24 @@ def list_sources(request: Request) -> s.SourceListResponse:
                       ARRAY(SELECT cv.name || '@' || cv.version FROM evidence.connector_version cv
                             WHERE cv.source_id = src.id ORDER BY cv.name, cv.version) AS connectors,
                       (SELECT count(*) FROM evidence.observation o WHERE o.source_id = src.id) AS observations,
-                      (SELECT max(a.retrieved_at) FROM evidence.acquisition a WHERE a.source_id = src.id)
-                        AS last_retrieved_at
+                      ag.last_retrieved_at, ag.n_live, ag.n_fixture, la.latest_origin
                FROM evidence.source src
                LEFT JOIN LATERAL (SELECT version, metadata, rights FROM evidence.source_metadata_version v
                                   WHERE v.source_id = src.id ORDER BY version DESC LIMIT 1) m ON true
+               """ + ACQ_ORIGIN_SQL.format(col="source_id", ref="src.id") + """
                ORDER BY src.source_key""")).mappings()]
-    return s.SourceListResponse(data=[s.SourceOut(**r) for r in rows], context_mode="registry", origin="none",
-                                modality="metadata", cost=t.cost(len(rows)))
+    data = []
+    for r in rows:
+        extra = _origin_fields(r)  # pops the aggregate columns first
+        data.append(s.SourceOut(**r, **extra))
+    org = _listing_origin(data)
+    return s.SourceListResponse(data=data, context_mode="registry", origin=org,  # type: ignore[arg-type]
+                                modality="metadata", warnings=origin_warnings(org), cost=t.cost(len(data)))
 
 
 @router.get("/connectors", response_model=s.ConnectorListResponse)
 def list_connectors(request: Request) -> s.ConnectorListResponse:
-    """Connector versions with licence, declared capabilities, cursor and latest health."""
+    """Connector versions with licence, declared capabilities, cursor, latest health and acquisition origin."""
     t = Timer()
     with read_conn(request) as conn:
         rows = [dict(r) for r in conn.execute(text(
@@ -68,11 +106,8 @@ def list_connectors(request: Request) -> s.ConnectorListResponse:
                       cv.code_digest, cv.recorded_at,
                       COALESCE(m.rights, src.rights)->>'licence' AS licence,
                       h.status AS h_status, h.metrics AS h_metrics, h.recorded_at AS h_at,
-                      cur.cursor,
-                      (SELECT count(*) FROM evidence.acquisition a WHERE a.connector_version_id = cv.id)
-                        AS acquisitions,
-                      (SELECT max(a.retrieved_at) FROM evidence.acquisition a WHERE a.connector_version_id = cv.id)
-                        AS last_retrieved_at
+                      cur.cursor, ag.n_acq AS acquisitions, ag.last_retrieved_at, ag.n_live, ag.n_fixture,
+                      la.latest_origin
                FROM evidence.connector_version cv
                JOIN evidence.source src ON src.id = cv.source_id
                LEFT JOIN LATERAL (SELECT rights FROM evidence.source_metadata_version v
@@ -80,7 +115,10 @@ def list_connectors(request: Request) -> s.ConnectorListResponse:
                LEFT JOIN LATERAL (SELECT status, metrics, recorded_at FROM ops.connector_health ch
                                   WHERE ch.connector_version_id = cv.id ORDER BY recorded_at DESC LIMIT 1) h ON true
                LEFT JOIN ops.connector_cursor cur ON cur.connector_name = cv.name
+               """ + ACQ_ORIGIN_SQL.format(col="connector_version_id", ref="cv.id") + """
                ORDER BY cv.name, cv.version""")).mappings()]
+    for r in rows:
+        r["origin_fields"] = _origin_fields(r)
     data = [
         s.ConnectorOut(
             id=r["id"], name=r["name"], version=r["version"], source_key=r["source_key"], licence=r["licence"],
@@ -89,11 +127,13 @@ def list_connectors(request: Request) -> s.ConnectorListResponse:
             latest_health=s.ConnectorHealth(status=r["h_status"], metrics=r["h_metrics"], recorded_at=r["h_at"])
             if r["h_status"] else None,
             cursor=r["cursor"], acquisitions=r["acquisitions"], last_retrieved_at=r["last_retrieved_at"],
+            **r["origin_fields"],
         )
         for r in rows
     ]
-    return s.ConnectorListResponse(data=data, context_mode="registry", origin="none", modality="metadata",
-                                   cost=t.cost(len(data)))
+    org = _listing_origin(data)
+    return s.ConnectorListResponse(data=data, context_mode="registry", origin=org,  # type: ignore[arg-type]
+                                   modality="metadata", warnings=origin_warnings(org), cost=t.cost(len(data)))
 
 
 # ---------------------------------------------------------------------------
@@ -151,6 +191,33 @@ def list_models(
                                modality="metadata", cost=t.cost(len(rows)))
 
 
+# Naive last-value baseline every challenger must beat (registry/models/methods.yaml).
+NAIVE_BASELINE_MODEL_KEY = "forecast.last_value"
+RETROSPECTIVE_LABEL = "revised-data retrospective — not a real-time backtest"
+REPLAY_MODE_LABELS = {
+    "revised_data_retrospective": RETROSPECTIVE_LABEL,
+    "operational_as_known": "operational as-known — what REVA actually had published at the cutoff",
+    "available_then_reconstruction": "available-then reconstruction — archived vintages; not what REVA believed then",
+    "analytic_verification": "analytic verification — checked against analytic solutions; not an empirical backtest",
+}
+
+EVALUATION_SQL = """
+SELECT ev.id, ev.model_version_id, mv.model_key, mv.version AS model_version, ev.context_id, c.origin,
+       ev.replay_mode, ev.task_scope, ev.metrics, ev.evaluation_manifest_sha256, ev.recorded_at,
+       COALESCE((SELECT jsonb_agg(jsonb_build_object('decision', p.decision, 'policy_version',
+                  p.policy_version, 'reviewer', p.reviewer, 'reasons', p.reasons,
+                  'recorded_at', p.recorded_at) ORDER BY p.recorded_at)
+                 FROM model.promotion p WHERE p.evaluation_id = ev.id), '[]'::jsonb) AS promotions,
+       (mv.model_key = :naive OR COALESCE(ev.metrics->>'is_naive_baseline', '') = 'true') AS is_naive_baseline
+FROM model.evaluation ev JOIN model.version mv ON mv.id = ev.model_version_id
+JOIN meta.context c ON c.id = ev.context_id
+"""
+
+
+def _period(r: dict[str, Any]) -> str:
+    return str((r["task_scope"] or {}).get("period") or (r["metrics"] or {}).get("period") or "")
+
+
 @router.get("/models/{model_ref}/evaluations", response_model=s.ModelEvaluationListResponse,
             responses={404: {"model": s.Problem}})
 def list_evaluations(
@@ -159,7 +226,11 @@ def list_evaluations(
     cursor: str | None = None,
     limit: int = Depends(page_limit),
 ) -> s.ModelEvaluationListResponse:
-    """Evaluations (scores, replay mode, task scope) for a model version UUID or every version of a model key."""
+    """Evaluations (scores, replay mode + label, task scope) for a model version UUID or every version of a key.
+
+    For every evaluation manifest and period on the page, the naive last-value baseline's row from the same
+    manifest is included (``included_as = naive_baseline_comparator``) so scores are never shown without it.
+    """
     t = Timer()
     cur = decode_cursor(cursor, 2)
     try:
@@ -174,33 +245,60 @@ def list_evaluations(
         if not found:
             raise NotFound("model not found", model=model_ref[:200])
         rows = [dict(r) for r in conn.execute(text(
-            """SELECT ev.id, ev.model_version_id, ev.context_id, ev.replay_mode, ev.task_scope, ev.metrics,
-                      ev.evaluation_manifest_sha256, ev.recorded_at,
-                      COALESCE((SELECT jsonb_agg(jsonb_build_object('decision', p.decision, 'policy_version',
-                                 p.policy_version, 'reviewer', p.reviewer, 'reasons', p.reasons,
-                                 'recorded_at', p.recorded_at) ORDER BY p.recorded_at)
-                                FROM model.promotion p WHERE p.evaluation_id = ev.id), '[]'::jsonb) AS promotions,
-                      c.origin
-               FROM model.evaluation ev JOIN model.version mv ON mv.id = ev.model_version_id
-               JOIN meta.context c ON c.id = ev.context_id
+            EVALUATION_SQL + """
                WHERE ((CAST(:i AS uuid) IS NOT NULL AND mv.id = :i) OR (CAST(:k AS text) IS NOT NULL
                       AND mv.model_key = :k))
                  AND (CAST(:c0 AS timestamptz) IS NULL
                       OR (ev.recorded_at, ev.id) < (CAST(:c0 AS timestamptz), CAST(:c1 AS uuid)))
                ORDER BY ev.recorded_at DESC, ev.id DESC LIMIT :lim"""),
             {"i": mid, "k": key, "c0": cur[0] if cur else None, "c1": cur[1] if cur else None,
-             "lim": limit + 1}).mappings()]
-    rows, nxt = page(rows, limit, lambda r: (r["recorded_at"].isoformat(), r["id"]))
-    origins = {r.pop("origin") for r in rows}
-    org = "none" if not origins else (origins.pop() if len(origins) == 1 else "mixed")
+             "lim": limit + 1, "naive": NAIVE_BASELINE_MODEL_KEY}).mappings()]
+        rows, nxt = page(rows, limit, lambda r: (r["recorded_at"].isoformat(), r["id"]))
+        for r in rows:
+            r["included_as"] = "requested_model"
+        manifests = sorted({r["evaluation_manifest_sha256"] for r in rows})
+        comparators: list[dict[str, Any]] = []
+        if manifests:
+            wanted = {(r["evaluation_manifest_sha256"], _period(r)) for r in rows}
+            have = {r["id"] for r in rows}
+            for r in conn.execute(text(
+                EVALUATION_SQL + """
+                   WHERE ev.evaluation_manifest_sha256 = ANY(:m)
+                     AND (mv.model_key = :naive OR COALESCE(ev.metrics->>'is_naive_baseline', '') = 'true')
+                   ORDER BY ev.recorded_at DESC, ev.id DESC LIMIT 1000"""),
+                    {"m": manifests, "naive": NAIVE_BASELINE_MODEL_KEY}).mappings():
+                r = dict(r)
+                if r["id"] in have or (r["evaluation_manifest_sha256"], _period(r)) not in wanted:
+                    continue
+                r["included_as"] = "naive_baseline_comparator"
+                comparators.append(r)
+    all_rows = rows + comparators
+    org = origin_of(r["origin"] for r in all_rows)
     warnings = origin_warnings(org)
     if not rows:
         warnings.append(s.ApiWarning(code="no_evaluations", message="No evaluation has been recorded for this model"))
+    if any(r["replay_mode"] == "revised_data_retrospective" for r in all_rows):
+        warnings.append(s.ApiWarning(
+            code="revised_data_retrospective",
+            message=f"{RETROSPECTIVE_LABEL}: scores use today's revised historical values split by year; no "
+                    "forecast was issued at these origins."))
+    groups = {(r["evaluation_manifest_sha256"], _period(r)) for r in rows}
+    naive_groups = {(r["evaluation_manifest_sha256"], _period(r)) for r in all_rows if r["is_naive_baseline"]}
+    if groups - naive_groups:
+        warnings.append(s.ApiWarning(
+            code="naive_baseline_missing",
+            message=f"{len(groups - naive_groups)} evaluation set(s) have no naive baseline row; their scores cannot "
+                    "be compared to the naive forecast"))
+    data = [s.ModelEvaluation(**r, replay_mode_label=REPLAY_MODE_LABELS.get(r["replay_mode"], r["replay_mode"]))
+            for r in all_rows]
+    modes = sorted({r["replay_mode"] for r in all_rows})
     return s.ModelEvaluationListResponse(
-        data=[s.ModelEvaluation(**r) for r in rows], context_mode="evaluation", origin=org,  # type: ignore[arg-type]
-        modality="evaluation", warnings=warnings, cost=t.cost(len(rows)), next_cursor=nxt,
-        historical_validation=s.Assessment(status="reported" if rows else "not_assessed",
-                                           reason=None if rows else "no evaluation recorded"))
+        data=data, context_mode="evaluation", origin=org,  # type: ignore[arg-type]
+        modality="evaluation", warnings=warnings, cost=t.cost(len(data)), next_cursor=nxt,
+        historical_validation=s.Assessment(
+            status="reported", detail={"replay_modes": modes,
+                                       "labels": [REPLAY_MODE_LABELS.get(m, m) for m in modes]})
+        if rows else s.Assessment(status="not_assessed", reason="no evaluation recorded"))
 
 
 # ---------------------------------------------------------------------------

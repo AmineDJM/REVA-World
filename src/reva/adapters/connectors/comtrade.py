@@ -397,7 +397,8 @@ class ComtradeConnector:
         derived = [o for o in batch.observations if o.source_flags.get("provider_derived_aggregate")]
         if derived:
             findings.append(Finding(code="provider_derived", severity="info",
-                                    message=f"{len(derived)} values are provider-derived aggregates (isReported=false)"))
+                                    message=f"{len(derived)} values are provider-derived aggregates "
+                                            "(isReported=false)"))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:

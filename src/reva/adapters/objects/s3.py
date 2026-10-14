@@ -1,9 +1,22 @@
 """S3-compatible ArtifactStore.
 
-SHA-256 is computed locally while spooling and verified with the provider's
-ChecksumSHA256 where supported and stored as object metadata; ETags are never
+SHA-256 is computed locally while spooling and sent as ChecksumSHA256 (the
+provider validates the upload) and stored as object metadata; ETags are never
 treated as SHA-256. Writes are conditional (If-None-Match: *) so an object is
 never overwritten.
+
+Verification never trusts REVA-written metadata alone (review R-16):
+
+* an object that already existed (HEAD hit, or the conditional PUT lost a race)
+  is re-hashed by streaming its content (bounded memory, aborted as soon as it
+  exceeds the expected size) and its ``reva-sha256`` metadata must also match;
+* a freshly uploaded object is checked against the provider-computed
+  full-object ``ChecksumSHA256`` (HEAD with ChecksumMode=ENABLED); when the
+  provider returns none or a composite (multipart) checksum, it is stream-hashed.
+
+S3-compatible stores that ignore ``If-None-Match`` could overwrite an existing
+object between HEAD and PUT; the post-write content verification still detects
+a mismatch (IntegrityFailure) but cannot undo the overwrite.
 """
 
 from __future__ import annotations
@@ -15,7 +28,7 @@ import os
 from collections.abc import Iterator
 from typing import Any, BinaryIO
 
-from reva.adapters.objects.common import check_namespace, object_key, spool_and_hash, verify
+from reva.adapters.objects.common import CHUNK, check_namespace, object_key, spool_and_hash, verify
 from reva.kernel.errors import IntegrityFailure
 from reva.ports.storage import ObjectHead, StoredObject
 
@@ -61,6 +74,7 @@ class S3ArtifactStore:
         key = object_key(self.prefix, namespace, sha)
         try:
             existing = self._head_key(key)
+            uploaded = False
             if existing is None:
                 checksum = base64.b64encode(binascii.unhexlify(sha)).decode()
                 with open(tmp, "rb") as body:
@@ -75,6 +89,7 @@ class S3ArtifactStore:
                             Metadata={"reva-sha256": sha},
                             IfNoneMatch="*",
                         )
+                        uploaded = True
                     except self.client.exceptions.ClientError as e:  # pragma: no cover - provider
                         code = e.response.get("Error", {}).get("Code")
                         if code not in ("PreconditionFailed", "ConditionalRequestConflict"):
@@ -82,10 +97,50 @@ class S3ArtifactStore:
                 existing = self._head_key(key)
             if existing is None:
                 raise IntegrityFailure("object missing after upload", key=key)
+            # Metadata must be consistent (head() reports it) ...
             verify(sha, size, existing.sha256, existing.byte_size)
+            # ... but the bytes themselves are what is verified.
+            if not (uploaded and self._server_checksum_matches(key, sha, size)):
+                got_sha, got_size = self._stream_hash(key, size)
+                verify(sha, size, got_sha, got_size)
         finally:
             os.unlink(tmp)
         return StoredObject(sha, size, namespace, self.uri(key), media_type)
+
+    def _server_checksum_matches(self, key: str, sha: str, size: int) -> bool:
+        """True only when the provider reports a full-object SHA-256 equal to ``sha``."""
+        try:
+            r = self.client.head_object(Bucket=self.bucket, Key=key, ChecksumMode="ENABLED")
+        except Exception:  # noqa: BLE001 - unsupported parameter/provider: fall back to streaming
+            return False
+        server = r.get("ChecksumSHA256")
+        if not server or "-" in server or r.get("ChecksumType", "FULL_OBJECT") != "FULL_OBJECT":
+            return False
+        try:
+            server_hex = base64.b64decode(server, validate=True).hex()
+        except (binascii.Error, ValueError):
+            return False
+        return server_hex == sha and int(r.get("ContentLength", -1)) == size
+
+    def _stream_hash(self, key: str, expected_size: int) -> tuple[str, int]:
+        """SHA-256 and size of the stored bytes; one chunk in memory; stops past ``expected_size``."""
+        import hashlib
+
+        r = self.client.get_object(Bucket=self.bucket, Key=key)
+        body = r["Body"]
+        h = hashlib.sha256()
+        n = 0
+        try:
+            while chunk := body.read(CHUNK):
+                n += len(chunk)
+                if n > expected_size:
+                    break  # larger than expected: a mismatch; do not read further
+                h.update(chunk)
+        finally:
+            close = getattr(body, "close", None)
+            if close is not None:
+                close()
+        return h.hexdigest(), n
 
     def put_bytes(self, data: bytes, namespace: str, media_type: str) -> StoredObject:
         return self.put(io.BytesIO(data), namespace, media_type, max_bytes=max(len(data), 1))
@@ -131,6 +186,19 @@ class S3ArtifactStore:
         for page in paginator.paginate(Bucket=self.bucket, Prefix=f"{self.prefix}{namespace}/"):
             for obj in page.get("Contents", []):
                 yield self.uri(obj["Key"]), obj["LastModified"].timestamp()
+
+    def uri_mtime(self, storage_uri: str) -> float | None:
+        """Current LastModified (seconds) for a storage URI, or None if absent."""
+        prefix = f"s3://{self.bucket}/{self.prefix}"
+        if not storage_uri.startswith(prefix):
+            raise ValueError("storage URI outside the configured prefix")
+        try:
+            r = self.client.head_object(Bucket=self.bucket, Key=storage_uri.removeprefix(f"s3://{self.bucket}/"))
+        except self.client.exceptions.ClientError as e:
+            if e.response.get("Error", {}).get("Code") in ("404", "NoSuchKey", "NotFound"):
+                return None
+            raise
+        return float(r["LastModified"].timestamp())
 
     def delete_orphan(self, storage_uri: str) -> None:
         prefix = f"s3://{self.bucket}/{self.prefix}"

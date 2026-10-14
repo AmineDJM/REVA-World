@@ -10,6 +10,20 @@ publication transaction that never committed. It is deleted only when
   (``ops.gc_candidate.confirmed_scans >= 2``), AND
 * a reference re-check immediately before deletion still finds no location.
 
+The final re-check and the delete run in one transaction that holds the
+per-object advisory lock ``hashtextextended('obj|' || sha256, 0)``
+(``reva.adapters.objects.common.object_lock_key``), taken with
+``pg_try_advisory_xact_lock``: a busy object is skipped, never waited on. Under
+the lock GC re-checks references *and* re-stats the object's timestamp (stores
+refresh it when ``put`` reuses existing bytes), so a concurrent publication that
+reuses the bytes by content address either
+
+* committed its location before GC got the lock (the re-check sees it), or
+* refreshed the object's age through ``put`` (the re-stat sees a young object), or
+* takes the same lock in its registering transaction and confirms the object
+  still exists before inserting the location (``confirm_object_locked``), so
+  a delete that won the race is detected and the bytes are re-put.
+
 Referenced (published) objects are never deleted; candidates that became
 referenced are dropped from ops.gc_candidate.
 """
@@ -24,6 +38,7 @@ from typing import Any
 
 from sqlalchemy import Engine, text
 
+from reva.adapters.objects.common import try_lock_object_xact
 from reva.operations import audit
 from reva.operations.context import JobContext
 from reva.ports.storage import ArtifactStore
@@ -45,11 +60,13 @@ class GcReport:
     retained_young: int = 0
     retained_unconfirmed: int = 0
     dropped_candidates: int = 0
+    skipped_locked: int = 0
 
     def as_dict(self) -> dict[str, Any]:
         return {"scanned": self.scanned, "referenced": self.referenced, "candidates": self.candidates,
                 "deleted": len(self.deleted), "retained_young": self.retained_young,
-                "retained_unconfirmed": self.retained_unconfirmed, "dropped_candidates": self.dropped_candidates}
+                "retained_unconfirmed": self.retained_unconfirmed, "dropped_candidates": self.dropped_candidates,
+                "skipped_locked": self.skipped_locked}
 
 
 def _sha_from_uri(uri: str) -> str | None:
@@ -69,6 +86,12 @@ def _referenced(conn: Any, ns: str, uris: list[str]) -> set[str]:
         {"ns": ns, "s": sorted(set(shas.values()))},
     ).scalars()) if shas else set()
     return {u for u in uris if u in by_uri or shas.get(u) in by_sha}
+
+
+def _current_mtime(store: ArtifactStore, uri: str, listed: float) -> float | None:
+    """Re-stat the object (stores exposing ``uri_mtime``); falls back to the listed time."""
+    fn = getattr(store, "uri_mtime", None)
+    return listed if fn is None else fn(uri)
 
 
 def gc_scan(
@@ -124,9 +147,24 @@ def gc_scan(
             continue
         if not delete:
             continue
+        sha = _sha_from_uri(uri)
+        if sha is None:  # not content addressed: never deleted by GC
+            continue
         with engine.begin() as conn:
-            if _referenced(conn, ns, [uri]):  # re-check right before deletion
+            # Exclusion against concurrent reuse of the same content address.
+            if not try_lock_object_xact(conn, sha):
+                report.skipped_locked += 1
+                continue
+            if _referenced(conn, ns, [uri]):  # re-check right before deletion, under the lock
                 conn.execute(text("DELETE FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": uri})
+                continue
+            current = _current_mtime(store, uri, mtime)
+            if current is None:  # already gone
+                conn.execute(text("DELETE FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": uri})
+                continue
+            age = db_now - datetime.fromtimestamp(current, UTC)
+            if age < min_age:  # reused (age refreshed by put) since the scan
+                report.retained_young += 1
                 continue
             store.delete_orphan(uri)
             conn.execute(text("DELETE FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": uri})

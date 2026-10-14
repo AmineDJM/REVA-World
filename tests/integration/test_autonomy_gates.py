@@ -86,7 +86,7 @@ async def test_t1_within_signed_scope_promotes(db, io):
 
 
 async def test_t1_without_independent_reports_is_not_promoted(db, io):
-    p, v, s = await _t1(io, db)
+    p, v, _s = await _t1(io, db)
     d = _gate(db, io).decide(p, [v], promotion_policy().ref())  # no sandbox report
     assert d.outcome == "reject"
     assert any("sandbox" in r for r in d.reasons)

@@ -455,8 +455,17 @@ def test_sim_object_locations_limited_to_scenario_namespaces(w: World) -> None:
     )
     for ns in ("raw", "normalised", "belief", "quarantine"):
         fails(w.db.sim, sql, {"ns": ns, "s": w.manifest_sha}, match="row-level security")
-    ok(w.db.sim, sql, {"ns": "scenarios", "s": w.manifest_sha})
-    fails(w.db.worker, sql, {"ns": "scenarios", "s": w.manifest_sha}, match="row-level security")
+    # Nor may it re-home an existing belief/raw artifact into its own namespace.
+    fails(w.db.sim, sql, {"ns": "scenarios", "s": w.manifest_sha}, match="row-level security")
+    fails(w.db.sim, sql, {"ns": "scenarios", "s": w.raw_sha}, match="row-level security")
+    # Positive control: an artifact the simulation role creates itself, in this transaction.
+    with tx(w.db.sim) as c:
+        sha = _artifact(c)
+        c.execute(text(sql), {"ns": "scenarios", "s": sha})
+    with tx(w.db.worker) as c:
+        sha = _artifact(c)
+        with pytest.raises(DBAPIError, match="row-level security"):
+            c.execute(text(sql), {"ns": "scenarios", "s": sha})
 
 
 def test_worker_cannot_create_simulation_context(w: World) -> None:
