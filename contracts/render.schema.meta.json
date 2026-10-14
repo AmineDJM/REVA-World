@@ -1,0 +1,7 @@
+{
+  "source_url": "https://render.com/schema/render.yaml.json",
+  "retrieved_at": "2026-10-14T22:58:21Z",
+  "sha256": "8a3fb8da6b4f55fe686fbefa790e011d3dd7895f013f355953c572a21ab6494a",
+  "json_schema_dialect": "https://json-schema.org/draft/2020-12/schema",
+  "note": "Cached copy of Render's official Blueprint JSON Schema. Refresh with `uv run python scripts/validate_blueprint.py --refresh` and review the diff; render.yaml is changed only when the provider schema requires it."
+}
