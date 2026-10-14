@@ -17,6 +17,7 @@ Conventions
 
 from __future__ import annotations
 
+import itertools
 import math
 from collections.abc import Sequence
 from dataclasses import dataclass, field
@@ -81,9 +82,12 @@ class IneligibleReport:
 
 @runtime_checkable
 class Fitted(Protocol):
-    model_key: str
-    model_version: str
-    origin_year: int
+    @property
+    def model_key(self) -> str: ...
+    @property
+    def model_version(self) -> str: ...
+    @property
+    def origin_year(self) -> int: ...
 
     def predict(self, horizons: Sequence[int], level: float = 0.8) -> list[Forecast]: ...
 
@@ -109,7 +113,7 @@ class PreparedSeries:
 
     @property
     def consecutive(self) -> bool:
-        return all(b - a == 1 for a, b in zip(self.years, self.years[1:], strict=False))
+        return all(b - a == 1 for a, b in itertools.pairwise(self.years))
 
 
 def to_float(value: object) -> float:
@@ -163,7 +167,12 @@ def check_level(level: float) -> float:
 
 
 def prediction_interval_spec(
-    *, method_version: str, level: float, lower: float, upper: float, description: str,
+    *,
+    method_version: str,
+    level: float,
+    lower: float,
+    upper: float,
+    description: str,
     conditioning: tuple[str, ...] = (),
 ) -> UncertaintySpec:
     return UncertaintySpec(

@@ -15,6 +15,7 @@
 
 from __future__ import annotations
 
+import itertools
 import math
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass
@@ -62,7 +63,7 @@ def mase_scale(train_values: Sequence[float]) -> MaseScale:
     n = len(vals)
     if n < 2:
         return MaseScale(None, UNDEFINED_SCALE, n)
-    scale = math.fsum(abs(b - a) for a, b in zip(vals, vals[1:], strict=False)) / (n - 1)
+    scale = math.fsum(abs(b - a) for a, b in itertools.pairwise(vals)) / (n - 1)
     if scale == 0.0:
         return MaseScale(None, UNDEFINED_SCALE, n)
     return MaseScale(scale, None, n)
@@ -81,9 +82,9 @@ class MaseResult:
     flag: str | None
 
 
-def mase(points: Sequence[float], actuals: Sequence[float], train_values: Sequence[float]) -> (
-    MaseResult
-):
+def mase(
+    points: Sequence[float], actuals: Sequence[float], train_values: Sequence[float]
+) -> MaseResult:
     """MASE of forecasts made from one training window (shared scale)."""
     if len(points) != len(actuals) or len(points) == 0:
         raise ValueError("points and actuals must be equal-length and non-empty")
@@ -137,9 +138,9 @@ def aggregate_coverage(items: Iterable[tuple[str | UncertaintyKind, bool]]) -> f
     return sum(flags) / len(flags)
 
 
-def mean_interval_width(items: Iterable[tuple[str | UncertaintyKind, tuple[float, float]]]) -> (
-    float
-):
+def mean_interval_width(
+    items: Iterable[tuple[str | UncertaintyKind, tuple[float, float]]],
+) -> float:
     """Mean width (sharpness) of prediction intervals; rejects other kinds."""
     widths: list[float] = []
     for kind, interval in items:
@@ -159,8 +160,9 @@ def crps_gaussian(actual: float, mu: float, sigma: float) -> float:
     if s <= 0:
         raise ValueError("sigma must be > 0")
     z = (_finite(actual, "actual") - _finite(mu, "mu")) / s
-    return s * (z * (2.0 * float(norm.cdf(z)) - 1.0) + 2.0 * float(norm.pdf(z))
-                - 1.0 / math.sqrt(math.pi))
+    return s * (
+        z * (2.0 * float(norm.cdf(z)) - 1.0) + 2.0 * float(norm.pdf(z)) - 1.0 / math.sqrt(math.pi)
+    )
 
 
 def log_score_gaussian(actual: float, mu: float, sigma: float) -> float:

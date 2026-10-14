@@ -141,6 +141,4 @@ class LocalLevelLog:
                 failures.append(f"{method}: non-finite parameters")
                 continue
             return FittedLocalLevel(self.key, self.version, s.years[-1], res, method)
-        return IneligibleReport(
-            self.key, self.version, "fit_failed: " + "; ".join(failures), s.n
-        )
+        return IneligibleReport(self.key, self.version, "fit_failed: " + "; ".join(failures), s.n)

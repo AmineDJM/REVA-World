@@ -109,6 +109,8 @@ def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = Fa
             command.upgrade(cfg, "head")
             conn.commit()
             report["roles"] = provision_roles(conn, s)
+            # Readiness checks read the schema version; nothing else in public is granted.
+            conn.execute(text("GRANT SELECT ON public.alembic_version TO reva_api, reva_worker, reva_sim"))
             verify_ownership(conn)
             conn.commit()
             report["schema_version"] = conn.execute(
