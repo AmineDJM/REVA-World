@@ -142,6 +142,11 @@ def reva_checks(doc: dict[str, Any]) -> list[str]:
     for k, v in expected.items():
         if common.get(k) != v:
             problems.append(f"reva-common {k} must be {v!r}")
+    if common.get("REVA_DB_SSLMODE") not in {"require", "verify-ca", "verify-full"}:
+        problems.append("reva-common REVA_DB_SSLMODE must be require/verify-ca/verify-full (TLS to PostgreSQL)")
+    for env_keys, role in ((akeys, "api"), (wkeys, "worker")):
+        if env_keys.get("REVA_PROCESS_ROLE", {}).get("value") != role:
+            problems.append(f"reva-{role} must set REVA_PROCESS_ROLE={role}")
     for db in doc.get("databases", []):
         if str(db.get("postgresMajorVersion")) != "17":
             problems.append("database must be PostgreSQL 17")

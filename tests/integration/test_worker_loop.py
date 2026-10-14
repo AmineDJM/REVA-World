@@ -207,3 +207,195 @@ def test_drain_deadline_leaves_uncooperative_job_to_lease_expiry(wdb: FreshDB, m
     while queue.job_row(wdb.owner, jid)["status"] == "running" and time.monotonic() < deadline:
         time.sleep(0.1)
     assert queue.job_row(wdb.owner, jid)["status"] == "succeeded"  # the fenced holder still finished
+
+
+# --------------------------------------------------------------------------- R2-01 shutdown is not a cancel
+def _clear_queue(d: FreshDB) -> None:
+    with d.owner.begin() as c:
+        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(text("UPDATE ops.schedule SET enabled = false"))
+
+
+def _sim_like(style: str, started: threading.Event):
+    """Handlers in the styles found in the code base, all stopping on ctx.is_cancelled()."""
+
+    def handler(payload, ctx):
+        started.set()
+        deadline = time.monotonic() + 20
+        while not ctx.is_cancelled():
+            if time.monotonic() > deadline:
+                return {"status": "finished"}
+            time.sleep(0.02)
+        if style == "complete_in":  # old simulation style: finalises the cancellation itself
+            with ctx.worker_engine.begin() as conn:
+                ctx.complete_in(conn, "cancelled", {"published": False})
+            return {"status": "cancelled"}
+        if style == "return":  # evaluation style
+            return {"status": "cancelled"}
+        raise jobs.JobCancelled("stopping at a safe point")
+
+    return handler
+
+
+@pytest.mark.parametrize("style", ["complete_in", "return", "raise"])
+def test_sigterm_releases_job_whatever_the_handler_does(wdb: FreshDB, monkeypatch, style: str) -> None:
+    _clear_queue(wdb)
+    started = threading.Event()
+    monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like(style, started))
+    jid = _enqueue(wdb, "health", {"probe": f"r2-01-{style}"})
+    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
+               scheduler=False, invalidation=False)
+    job = w.claim_one()
+    assert job is not None and job.id == jid
+    out: dict = {}
+    t = threading.Thread(target=lambda: out.setdefault("o", w.execute(job)))
+    t.start()
+    assert started.wait(10)
+    w.request_stop("SIGTERM")
+    t.join(20)
+    row = queue.job_row(wdb.owner, jid)
+    assert out["o"].status == "released", style
+    assert row["status"] == "queued" and row["attempts"] == 0 and row["worker_id"] is None
+    assert row["last_error"]["code"] == "released" and row["finished_at"] is None
+    w.close()
+
+
+@pytest.mark.parametrize("style", ["complete_in", "return", "raise"])
+def test_user_cancel_still_cancels(wdb: FreshDB, monkeypatch, style: str) -> None:
+    _clear_queue(wdb)
+    started = threading.Event()
+    monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like(style, started))
+    jid = _enqueue(wdb, "health", {"probe": f"r2-01-user-{style}"})
+    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
+               scheduler=False, invalidation=False)
+    job = w.claim_one()
+    out: dict = {}
+    t = threading.Thread(target=lambda: out.setdefault("o", w.execute(job)))
+    t.start()
+    assert started.wait(10)
+    with wdb.owner.begin() as c:
+        assert c.execute(text("SELECT ops.request_cancel(:j, 'human:tester')"), {"j": jid}).scalar() == \
+            "cancel_requested"
+    t.join(20)
+    row = queue.job_row(wdb.owner, jid)
+    assert row["status"] == "cancelled" and row["finished_at"] is not None
+    assert out["o"].status in ("cancelled", "completed_in_handler")
+    w.close()
+
+
+def test_user_cancel_during_shutdown_ends_cancelled(wdb: FreshDB, monkeypatch) -> None:
+    _clear_queue(wdb)
+    started = threading.Event()
+    monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like("return", started))
+    jid = _enqueue(wdb, "health", {"probe": "r2-01-both"})
+    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
+               scheduler=False, invalidation=False)
+    job = w.claim_one()
+    assert started.wait(0) is False
+    with wdb.owner.begin() as c:
+        c.execute(text("SELECT ops.request_cancel(:j, 'human:tester')"), {"j": jid})
+    w.request_stop("SIGTERM")
+    # handler never even starts (shutdown before start) -> release maps the user cancel to cancelled
+    assert w.execute(job).status == "cancelled"
+    assert queue.job_row(wdb.owner, jid)["status"] == "cancelled"
+    w.close()
+
+
+def test_context_signals_distinguish_shutdown_from_user_cancel(wdb: FreshDB, monkeypatch) -> None:
+    _clear_queue(wdb)
+    seen: dict = {}
+    started = threading.Event()
+    go = threading.Event()
+
+    def handler(payload, ctx):
+        seen["before"] = (ctx.shutdown_requested(), ctx.cancel_requested(), ctx.is_cancelled())
+        started.set()
+        go.wait(10)
+        seen["after"] = (ctx.shutdown_requested(), ctx.cancel_requested(), ctx.is_cancelled())
+        raise jobs.JobCancelled("stop")
+
+    monkeypatch.setattr(jobs, "resolve_handler", lambda jt: handler)
+    jid = _enqueue(wdb, "health", {"probe": "r2-01-signals"})
+    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
+               scheduler=False, invalidation=False)
+    job = w.claim_one()
+    t = threading.Thread(target=lambda: w.execute(job))
+    t.start()
+    assert started.wait(10)
+    w.request_stop("SIGTERM")
+    go.set()
+    t.join(20)
+    assert seen["before"] == (False, False, False)
+    assert seen["after"] == (True, False, True)  # stop, but not a user cancel
+    assert queue.job_row(wdb.owner, jid)["status"] == "queued"
+    w.close()
+
+
+@pytest.fixture(scope="module")
+def sim_baseline(wdb: FreshDB) -> dict:
+    import asyncio
+
+    from reva.adapters.connectors.registry import builtin_connectors
+    from reva.belief.publication import publish_release
+    from reva.evidence.runner import FixtureHttp, run_connector
+    from reva.kernel.context import Origin
+    from reva.kernel.time import utc_now
+
+    async def ingest() -> None:
+        for name in ("worldbank.wdi.indicators", "un.comtrade.public_exact"):
+            c = builtin_connectors()[name]
+            await run_connector(c, FixtureHttp(c.describe().name), wdb.store, wdb.worker, persist_cursor=False)
+
+    asyncio.run(ingest())
+    rel = publish_release(wdb.worker, wdb.store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
+    return {"release_id": rel.release_id, "cutoff": rel.knowledge_cutoff}
+
+
+def test_sigterm_during_real_simulation_requeues_job(wdb: FreshDB, sim_baseline: dict, monkeypatch) -> None:
+    import json as _json
+
+    import reva.simulation.jobs as sj
+    from reva.simulation.spec import CONTRACTS, validate_scenario_spec
+
+    _clear_queue(wdb)
+    spec = _json.loads((CONTRACTS / "scenario.example.json").read_text())
+    spec.update(baseline_release_id=str(sim_baseline["release_id"]),
+                knowledge_cutoff=sim_baseline["cutoff"].isoformat(), title=f"R2-01 {uuid.uuid4().hex[:6]}")
+    s = validate_scenario_spec(spec)
+    api = make_engine("api", wdb.settings)
+    try:
+        with api.begin() as c:
+            sid = c.execute(text("SELECT sim.create_scenario(CAST(:s AS jsonb), :b, :d, 'human:test')"),
+                            {"s": _json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()}).scalar_one()
+    finally:
+        api.dispose()
+    jid = _enqueue(wdb, "simulation", {"scenario_id": str(sid), "fidelity": "L1"})
+    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, scheduler=False, invalidation=False,
+               lease_seconds=60, heartbeat_seconds=5)
+    real = sj.plan_run
+
+    def plan_then_sigterm(*a, **k):
+        p = real(*a, **k)
+        w.request_stop("SIGTERM")  # what the signal handler does mid-run (e.g. a deploy)
+        return p
+
+    monkeypatch.setattr(sj, "plan_run", plan_then_sigterm)
+    job = w.claim_one()
+    assert job is not None and job.id == jid
+    out = w.execute(job)
+    row = queue.job_row(wdb.owner, jid)
+    assert out.status == "released"
+    assert row["status"] == "queued" and row["attempts"] == 0 and row["finished_at"] is None
+    with wdb.owner.connect() as c:
+        assert c.execute(text("SELECT count(*) FROM sim.run WHERE job_id = :j"), {"j": jid}).scalar() == 0
+    # A fresh worker later runs it to completion.
+    monkeypatch.setattr(sj, "plan_run", real)
+    w2 = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, scheduler=False, invalidation=False,
+                lease_seconds=60, heartbeat_seconds=5)
+    job2 = w2.claim_one()
+    assert job2 is not None and job2.id == jid and job2.attempts == 1
+    w2.execute(job2)
+    assert queue.job_row(wdb.owner, jid)["status"] == "succeeded"
+    w.close()
+    w2.close()

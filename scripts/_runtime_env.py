@@ -300,6 +300,10 @@ def build_child_env(
         if key not in child and is_secret_name(key):
             child[key] = ""
 
+    # The child declares which process it is (Settings applies per-role production
+    # rules, e.g. no session secret is expected in the worker).
+    child["REVA_PROCESS_ROLE"] = component
+
     if extra_pythonpath:
         existing = child.get("PYTHONPATH")
         child["PYTHONPATH"] = extra_pythonpath + (os.pathsep + existing if existing else "")
@@ -309,6 +313,27 @@ def build_child_env(
 
 
 # --- settings validation (isolated from the parent's os.environ) ---------------
+
+
+def check_process_role(environ: Mapping[str, str], component: str) -> None:
+    """Refuse a conflicting REVA_PROCESS_ROLE (e.g. the worker command on the API service)."""
+    declared = (environ.get("REVA_PROCESS_ROLE") or "").strip()
+    if declared and declared != component:
+        raise ConfigError(f"REVA_PROCESS_ROLE={declared} but this entrypoint starts the {component} process")
+
+
+def validate_for(environ: Mapping[str, str], role: str) -> Any:
+    """Isolated Settings for ``environ`` plus ``Settings.validate_for(role)`` (names only)."""
+    from reva.kernel.errors import ConfigurationError
+
+    settings = isolated_settings({**environ, "REVA_PROCESS_ROLE": role})
+    checker = getattr(settings, "validate_for", None)
+    if checker is not None:
+        try:
+            checker(role)
+        except ConfigurationError as e:
+            raise ConfigError(str(getattr(e, "message", e))) from None
+    return settings
 
 
 def isolated_settings(environ: Mapping[str, str]) -> Any:

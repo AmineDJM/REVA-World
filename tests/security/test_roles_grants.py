@@ -826,13 +826,6 @@ def test_create_scenario_function_checks_publication(w: World) -> None:
     )
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: sim.create_scenario trusts the caller-supplied p_spec_digest: a different spec submitted "
-        "with an existing digest silently returns the other scenario's id instead of raising"
-    ),
-)
 def test_create_scenario_does_not_alias_different_specs(w: World) -> None:
     sql = "SELECT sim.create_scenario(CAST(:spec AS jsonb), :bytes, :digest, 'api:test')"
     a = _scenario_spec(w.release_id, "scenario A")

@@ -87,6 +87,7 @@ def _http(mode: str, io_: ArtifactIO, requirement: str, settings: Any) -> tuple[
     client = SafeHttpClient(allowed_hosts=TEMPLATE_HOSTS, timeout_seconds=settings.reva_http_timeout_seconds,
                             max_bytes=min(settings.reva_http_max_bytes, 4_000_000),
                             contact_email=settings.reva_http_contact_email,
+                            proxy_mode=getattr(settings, "reva_http_proxy_mode", None),
                             rate_limiter=RateLimiter({"ec.europa.eu": HostPolicy(min_interval_seconds=1.0,
                                                                                   max_concurrency=1)}))
     return CapturingHttp(client, "Eurostat (CC BY 4.0)"), None

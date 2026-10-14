@@ -60,9 +60,7 @@ def test_coarsen_then_refine_round_trip(recipe):
     assert exact_total_weight(out) == exact_total_weight(fine) == recipe.total_count
     assert _by(out, "sex_code") == {"F": sum(F_COUNTS), "M": sum(M_COUNTS)}
     # refining with the same recipe restores each leaf count exactly
-    assert _by(out, "cell_id") == {
-        c.cell_id: Fraction(c.count) for c in recipe.leaf_cells if c.count > 0
-    }
+    assert _by(out, "cell_id") == {c.cell_id: Fraction(c.count) for c in recipe.leaf_cells if c.count > 0}
     assert "M|Y3" not in _by(out, "cell_id")
     cert = res.certificate
     assert cert.operation == "refine" and cert.conserved

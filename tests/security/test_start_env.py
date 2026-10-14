@@ -51,6 +51,7 @@ CONFIG = {
     "REVA_LOG_LEVEL": "INFO",
     "REVA_DB_HOST": "db.internal",
     "REVA_DB_PORT": "5432",
+    "REVA_DB_SSLMODE": "require",
     "REVA_DB_NAME": "reva",
     "REVA_OBJECT_BACKEND": "s3",
     "REVA_S3_BUCKET": "reva-bucket",
@@ -111,6 +112,7 @@ def test_api_child_env_keeps_only_api_credentials() -> None:
     s3_like = {k for k in child if "S3" in k and ("KEY" in k or "SECRET" in k)}
     assert s3_like == {"REVA_S3_ACCESS_KEY_ID", "REVA_S3_SECRET_ACCESS_KEY"}
     assert child["REVA_DB_HOST"] == "db.internal" and child["PORT"] == "10000"
+    assert child["REVA_PROCESS_ROLE"] == "api" and child["REVA_DB_SSLMODE"] == "require"
     assert child["OMP_NUM_THREADS"] == "1" and child["POLARS_MAX_THREADS"] == "1"
 
 
@@ -171,6 +173,25 @@ def test_dotenv_secrets_are_neutralised_for_child() -> None:
     assert child["REVA_MIGRATION_DATABASE_URL"] == ""
     assert child["REVA_WORKER_DB_PASSWORD"] == ""
     assert child["REVA_DB_HOST"] == "db.internal"
+
+
+def test_process_role_is_declared_and_conflicts_refused() -> None:
+    wchild, _ = runtime_env.build_child_env({**PROD, "REVA_PROCESS_ROLE": "api"}, "worker", cgroup_root=NO_CGROUP)
+    assert wchild["REVA_PROCESS_ROLE"] == "worker"
+    with pytest.raises(runtime_env.ConfigError, match="REVA_PROCESS_ROLE"):
+        start_api.validate({**PROD, "REVA_PROCESS_ROLE": "worker"})
+    with pytest.raises(runtime_env.ConfigError, match="REVA_PROCESS_ROLE"):
+        start_worker.validate({**PROD, "REVA_ENV": "local", "REVA_PROCESS_ROLE": "api"})
+    # Production worker validation does not demand API-only secrets.
+    worker_env = {
+        k: v
+        for k, v in PROD.items()
+        if k not in {"REVA_SESSION_SECRET", "REVA_ADMIN_PASSWORD_HASH", "REVA_API_DB_PASSWORD"}
+    }
+    settings = start_worker.validate({**worker_env, "REVA_PROCESS_ROLE": "worker"})
+    assert settings.reva_process_role == "worker"
+    with pytest.raises(runtime_env.ConfigError, match="REVA_DB_SSLMODE"):
+        start_api.validate({**PROD, "REVA_DB_SSLMODE": "disable"})
 
 
 def test_command_lines() -> None:
@@ -457,6 +478,8 @@ def test_bootstrap_runtime_reports_schema_without_secrets(db, tmp_path: Path) ->
         "REVA_API_DB_PASSWORD": s.reva_api_db_password.get_secret_value(),
         "REVA_WORKER_DB_PASSWORD": s.reva_worker_db_password.get_secret_value(),
         "REVA_SIM_DB_PASSWORD": s.reva_sim_db_password.get_secret_value(),
+        # As on Render: the pre-deploy runs in the API service's environment.
+        "REVA_PROCESS_ROLE": "api",
     }
     proc = _run("bootstrap_runtime.py", env, tmp_path)
     assert proc.returncode == 0, proc.stderr

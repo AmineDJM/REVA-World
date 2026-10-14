@@ -87,11 +87,14 @@ CREATE TABLE sim.scenario (
   parent_scenario_id uuid REFERENCES sim.scenario,
   baseline_release_id uuid NOT NULL REFERENCES belief.release,
   spec jsonb NOT NULL,
-  spec_digest text NOT NULL UNIQUE,
-  spec_sha256 text NOT NULL REFERENCES meta.artifact,
+  -- Identity is the server-verified SHA-256 of the canonical spec bytes;
+  -- spec_digest (the client's logical hash) is advisory metadata only.
+  spec_digest text NOT NULL,
+  spec_sha256 text NOT NULL UNIQUE REFERENCES meta.artifact,
   created_by text NOT NULL,
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+CREATE INDEX scenario_spec_digest ON sim.scenario(spec_digest);
 CREATE FUNCTION sim.check_scenario() RETURNS trigger LANGUAGE plpgsql AS $$
 BEGIN
   PERFORM meta.require_context_mode(NEW.context_id, 'simulation');

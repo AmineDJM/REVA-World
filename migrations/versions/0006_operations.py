@@ -383,16 +383,22 @@ CREATE FUNCTION sim.create_scenario(p_spec jsonb, p_canonical bytea, p_spec_dige
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
 DECLARE sha text; ctx uuid; sid uuid; rel record;
 BEGIN
-  SELECT id INTO sid FROM sim.scenario WHERE spec_digest = p_spec_digest;
-  IF sid IS NOT NULL THEN RETURN sid; END IF;
-  IF convert_from(p_canonical, 'UTF8')::jsonb <> p_spec THEN
+  -- Identity comes from the verified canonical bytes, never from the caller's
+  -- p_spec_digest (advisory metadata): a different spec can never resolve to an
+  -- existing scenario by reusing its digest.
+  IF p_canonical IS NULL OR p_spec IS NULL OR convert_from(p_canonical, 'UTF8')::jsonb <> p_spec THEN
     RAISE EXCEPTION 'canonical bytes do not encode the scenario spec';
   END IF;
+  IF p_spec_digest IS NULL OR length(p_spec_digest) > 200 THEN
+    RAISE EXCEPTION 'invalid spec digest';
+  END IF;
+  sha := encode(sha256(p_canonical), 'hex');
+  SELECT id INTO sid FROM sim.scenario WHERE spec_sha256 = sha;
+  IF sid IS NOT NULL THEN RETURN sid; END IF;
   SELECT r.id, r.origin INTO rel FROM belief.release r
     JOIN ops.publication p ON p.release_id = r.id
    WHERE r.id = (p_spec->>'baseline_release_id')::uuid;
   IF rel.id IS NULL THEN RAISE EXCEPTION 'baseline release is not published'; END IF;
-  sha := encode(sha256(p_canonical), 'hex');
   INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights)
   VALUES (sha, 'application/json', octet_length(p_canonical), 'scenario-spec/' || (p_spec->>'schema_version'),
           'public_aggregate', '{"licence":"internal-derived"}')

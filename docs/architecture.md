@@ -72,9 +72,9 @@ Contracts live in `pyproject.toml` (`[tool.importlinter]`) and run through
 
 ## Deployment shape
 
-`render.yaml` is the specification's Blueprint, unchanged (validated against
-Render's official JSON Schema, cached in `contracts/render.schema.json`, plus
-REVA-specific rules in `scripts/validate_blueprint.py`). See
+`render.yaml` is the specification's Blueprint with a minimal, documented compatibility update (`REVA_DB_SSLMODE`, `REVA_PROCESS_ROLE`; see deployment.md), validated against
+Render's official JSON Schema (cached in `contracts/render.schema.json`) plus
+REVA-specific rules in `scripts/validate_blueprint.py`. See
 [deployment.md](deployment.md) and [operations.md](operations.md).
 
 ## Repository map
@@ -104,3 +104,4 @@ polish) decided each case.
 | 7 | `belief.snapshots.estimates()` orders by concept/label/period with no unique tie-breaker, so equal-key rows (bilateral partner flows) come back in physical order. | Restore comparison sorts by estimate id; change request filed to append `e.id` to the `ORDER BY` for deterministic pagination. | test above |
 | 8 | Host `pg_dump` 16 cannot dump the PostgreSQL 17 server. | Backup/restore accept `REVA_PG_CONTAINER` (run tools in the DB container) or `REVA_PG_BINDIR`; CI runs them inside the service container. | `scripts/backup_restore.py` |
 | 9 | `render.yaml` gives the API `REVA_S3_*` without saying which credential. | Documented: the API service's `REVA_S3_ACCESS_KEY_ID/SECRET` must be a read-only credential; the worker's are its own prefix-scoped write credential (never `fromService`). The validator enforces the latter. | deployment.md |
+| 10 | Settings (production) requires `REVA_DB_SSLMODE` ∈ {require, verify-ca, verify-full} and per-process checks keyed by `REVA_PROCESS_ROLE`; the appendix Blueprint sets neither, so both services would fail startup. | Minimal Blueprint update: `REVA_DB_SSLMODE=require` in `reva-common`, `REVA_PROCESS_ROLE=api`/`worker` per service; start scripts set and verify the role in the child; the pre-deploy runs as `bootstrap`. | deployment.md "Minimal reviewed compatibility update" |

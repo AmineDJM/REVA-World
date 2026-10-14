@@ -27,12 +27,13 @@ from _runtime_env import (
     SRC,
     ConfigError,
     build_child_env,
+    check_process_role,
     emit,
     ensure_importable,
     exec_target,
-    isolated_settings,
     merged_environ,
     redact,
+    validate_for,
 )
 
 APP = "reva.api.app:app"
@@ -77,18 +78,22 @@ def build_command(environ: Mapping[str, str]) -> list[str]:
     ]
 
 
-def validate(environ: Mapping[str, str]) -> dict[str, object]:
-    """Validate API configuration from ``environ``. Returns a non-secret summary."""
-    settings = isolated_settings(environ)
+def validate(environ: Mapping[str, str], dotenv_keys: set[str] | frozenset[str] = frozenset()) -> dict[str, object]:
+    """Validate the configuration the API child will actually receive.
+
+    Validation runs on the scrubbed child environment with REVA_PROCESS_ROLE=api,
+    so Settings' production rules apply exactly as inside Uvicorn (in particular
+    the migration-owner URL, present on the Render API service for pre-deploy,
+    must be absent). Returns a non-secret summary.
+    """
+    check_process_role(environ, "api")
+    child, _ = build_child_env(environ, "api", dotenv_keys=dotenv_keys)
+    settings = validate_for(child, "api")
     problems: list[str] = []
-    if settings.reva_api_db_password is None:
-        problems.append("REVA_API_DB_PASSWORD")
     if settings.reva_env == "production":
         h = settings.reva_admin_password_hash
         if h is None or not h.get_secret_value().startswith("$argon2id$"):
             problems.append("REVA_ADMIN_PASSWORD_HASH (Argon2id; generate with `reva auth hash-password`)")
-        if not settings.allowed_hosts:
-            problems.append("REVA_ALLOWED_HOSTS")
         if not settings.reva_s3_region and not settings.reva_s3_endpoint_url:
             problems.append("REVA_S3_REGION or REVA_S3_ENDPOINT_URL")
     if problems:
@@ -96,6 +101,7 @@ def validate(environ: Mapping[str, str]) -> dict[str, object]:
     url = settings.runtime_url("api")  # URL.create; raises if the password is missing
     return {
         "env": settings.reva_env,
+        "process_role": "api",
         "db": url.render_as_string(hide_password=True),
         "object_backend": settings.reva_object_backend,
     }
@@ -106,7 +112,7 @@ def prepare(
     dotenv_keys: set[str] | frozenset[str] = frozenset(),
     extra_pythonpath: str | None = None,
 ) -> tuple[list[str], dict[str, str], dict[str, object]]:
-    summary = validate(environ)
+    summary = validate(environ, dotenv_keys)
     child, removed = build_child_env(environ, "api", dotenv_keys=dotenv_keys, extra_pythonpath=extra_pythonpath)
     command = exec_target(environ, build_command(environ))
     summary.update({"removed_env": removed, "threads": child["OMP_NUM_THREADS"], "argv": build_command(environ)})

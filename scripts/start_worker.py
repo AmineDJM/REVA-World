@@ -34,12 +34,13 @@ from _runtime_env import (
     SRC,
     ConfigError,
     build_child_env,
+    check_process_role,
     emit,
     ensure_importable,
     exec_target,
-    isolated_settings,
     merged_environ,
     redact,
+    validate_for,
 )
 
 OWNER_KEYS = ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL")
@@ -64,8 +65,16 @@ def check_owner_credentials(environ: Mapping[str, str]) -> list[str]:
     return present
 
 
-def validate(environ: Mapping[str, str]) -> Any:
-    settings = isolated_settings(environ)
+def validate(environ: Mapping[str, str], dotenv_keys: set[str] | frozenset[str] = frozenset()) -> Any:
+    """Validate the configuration the worker child will actually receive.
+
+    Runs on the scrubbed child environment with REVA_PROCESS_ROLE=worker, so the
+    API-only secrets (session secret, admin hash) are not expected and the owner
+    URL must be absent.
+    """
+    check_process_role(environ, "worker")
+    child, _ = build_child_env(environ, "worker", dotenv_keys=dotenv_keys)
+    settings = validate_for(child, "worker")
     problems = [
         name
         for name, value in (
@@ -169,11 +178,12 @@ def prepare(
     extra_pythonpath: str | None = None,
 ) -> tuple[list[str], dict[str, str], dict[str, Any], Any]:
     stripped = check_owner_credentials(environ)
-    settings = validate(environ)
+    settings = validate(environ, dotenv_keys)
     child, removed = build_child_env(environ, "worker", dotenv_keys=dotenv_keys, extra_pythonpath=extra_pythonpath)
     command = exec_target(environ, build_command(environ))
     summary: dict[str, Any] = {
         "env": settings.reva_env,
+        "process_role": "worker",
         "removed_env": removed,
         "stripped_owner_keys": stripped,
         "threads": child["OMP_NUM_THREADS"],

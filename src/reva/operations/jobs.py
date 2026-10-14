@@ -9,7 +9,10 @@ Cooperative cancellation/shutdown: handlers call ``ctx.is_cancelled()`` at safe
 points and either raise :class:`JobCancelled` or return
 ``{"status": "cancelled"}``; during worker shutdown they may instead return
 ``{"status": "interrupted", "checkpoint": {...}}`` to be re-queued from the
-checkpoint without consuming an attempt.
+checkpoint without consuming an attempt. A worker shutdown is never a
+cancellation: the worker releases the job unless the database status says a
+user cancelled it (``ctx.shutdown_requested()`` vs ``ctx.cancel_requested()``,
+see ``operations.context``).
 """
 
 from __future__ import annotations
@@ -37,7 +40,9 @@ from reva.kernel.errors import (
     UnsafeRequest,
     ValidationProblem,
 )
-from reva.operations.context import JobContext
+from reva.operations.context import JobCancelled, JobContext
+
+__all__ = ["HANDLERS", "JobCancelled", "JobContext", "resolve_handler"]
 
 log = logging.getLogger("reva.jobs")
 
@@ -67,11 +72,6 @@ class HandlerUnavailable(RevaError):
 
     code = "handler_unavailable"
     http_status = 501
-
-
-class JobCancelled(RevaError):
-    code = "cancelled"
-    http_status = 409
 
 
 class IngestFailed(RevaError):
@@ -133,13 +133,34 @@ def latest_observation_event(conn: Connection) -> int:
     ).scalar_one())
 
 
-def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: int, *, created_by: str) -> Any:
-    """Idempotent publish_beliefs job for (origin, through_outbox_id)."""
-    from reva.adapters.postgres.queue import enqueue, idempotency_key
+def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: int, *, created_by: str,
+                            audit_actor: str | None = None) -> Any:
+    """Idempotent publish_beliefs job for (origin, through_outbox_id).
+
+    A key held by a foreign job (R2-02) never blocks publication: the job is
+    created under a disambiguated key and the conflict is logged, counted and
+    audited (``jobs.publish_key_conflict``).
+    """
+    from reva.adapters.postgres.queue import enqueue_resolving_conflict, idempotency_key
 
     payload = {"origin": origin, "through_outbox_id": int(through_outbox_id)}
-    return enqueue(conn, "publish_beliefs", payload, idempotency_key("publish_beliefs", payload),
-                   priority=PUBLISH_PRIORITY, created_by=created_by)
+    res = enqueue_resolving_conflict(conn, "publish_beliefs", payload, idempotency_key("publish_beliefs", payload),
+                                     priority=PUBLISH_PRIORITY, created_by=created_by)
+    if res.conflict is not None:
+        from reva.operations.audit import record
+        from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
+
+        log.error("publish_beliefs key %s is held by foreign job %s (%s); created job %s under %s",
+                  res.conflict["idempotency_key"], res.conflict["foreign_job_id"], res.conflict["foreign_job_type"],
+                  res.job_id, res.conflict["disambiguated_key"])
+        IDEMPOTENCY_CONFLICTS.inc(job_type="publish_beliefs")
+        try:
+            with conn.begin_nested():
+                record(conn, audit_actor or "system", "jobs.publish_key_conflict",
+                       {"job_id": str(res.job_id)}, res.conflict)
+        except Exception as e:
+            log.warning("could not audit publish key conflict: %s", type(e).__name__)
+    return res.job_id
 
 
 def dirty_belief_nodes(conn: Connection) -> int:
@@ -218,8 +239,14 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
                                   {"s": shas}).scalar_one()
             INGEST_BYTES.inc(float(nbytes), connector=spec.name)
         if report.inserted > 0 and not (production and origin != "live"):
-            publish_job = enqueue_publish_beliefs(conn, origin, latest_observation_event(conn),
-                                                  created_by=f"job:{ctx.job_id}")
+            try:
+                with conn.begin_nested():
+                    publish_job = enqueue_publish_beliefs(conn, origin, latest_observation_event(conn),
+                                                          created_by=f"job:{ctx.job_id}",
+                                                          audit_actor=f"worker:{ctx.worker_id}"[:200])
+            except Exception as e:  # data is already published; the outbox path enqueues it as a backstop
+                log.error("publish_beliefs enqueue after ingest failed (%s); outbox processing will retry",
+                          type(e).__name__)
     result = {
         "connector": spec.name,
         "connector_version": spec.version,
@@ -274,8 +301,13 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
                 return {"status": "up_to_date", "origin": origin.value, "dirty_nodes": 0}
             if ctx.is_cancelled():  # also re-verifies the lease right before publishing
                 raise JobCancelled("cancelled before publication")
+            # R2-14: a non-locking lease check. ``ctx.assert_lease`` would hold the job row
+            # lock for the whole (possibly long) publication transaction and block the
+            # heartbeat that keeps the lease alive. Publication is idempotent (it clears
+            # the dirty nodes it covers) and serialised by advisory locks, and the
+            # worker's completion afterwards is fenced.
             rr = publish_release(eng, ctx.store, cutoff=cutoff, origin=origin, environment=env,
-                                 actor="worker:publish_beliefs", fence=ctx.assert_lease)
+                                 actor="worker:publish_beliefs", fence=ctx.check_lease)
         finally:
             lock_conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": PUBLISH_JOB_LOCK})
             lock_conn.commit()

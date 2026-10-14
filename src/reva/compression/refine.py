@@ -138,9 +138,7 @@ def refine(
             },
         )
     if dimension == "sex":
-        raise ValidationProblem(
-            "coarse tables already resolve recorded sex; nothing to refine along 'sex'"
-        )
+        raise ValidationProblem("coarse tables already resolve recorded sex; nothing to refine along 'sex'")
     missing_cols = [c for c in REQUIRED_COARSE_COLUMNS if c not in coarse_table.column_names]
     if missing_cols:
         raise ValidationProblem("not a coarse population table", missing_columns=missing_cols)
@@ -207,28 +205,21 @@ def refine(
         cols["weight_den"].append(w.denominator)
 
     frozen_mapping = {k: tuple(v) for k, v in sorted(mapping.items())}
-    mapping_digest = logical_hash(
-        {"operation": "refine", "dimension": dimension, "mapping": frozen_mapping}
-    )
+    mapping_digest = logical_hash({"operation": "refine", "dimension": dimension, "mapping": frozen_mapping})
     new_md = {
         **{k: v for k, v in md.items() if k not in ("reva.age_bands",)},
         "reva.compression": "refine",
         "reva.refined_dimension": dimension,
         "reva.mapping_digest": mapping_digest,
         "reva.recipe_digest": digest,
-        "reva.open_age_lower_bound": (
-            "" if recipe.open_age_lower_bound is None else str(recipe.open_age_lower_bound)
-        ),
+        "reva.open_age_lower_bound": ("" if recipe.open_age_lower_bound is None else str(recipe.open_age_lower_bound)),
         "reva.semantics": SEMANTICS_NOTE,
     }
     out = pa.Table.from_pydict(cols, schema=POPULATION_SCHEMA.with_metadata(new_md))
 
     # --- certificate (recomputed from the output table)
     out_cells = {k[0]: v for k, v in exact_weight_sums(out, ["cell_id"]).items()}
-    leaf_err = {
-        leaf.cell_id: abs(out_cells.get(leaf.cell_id, Fraction(0)) - leaf.count)
-        for leaf in recipe.leaf_cells
-    }
+    leaf_err = {leaf.cell_id: abs(out_cells.get(leaf.cell_id, Fraction(0)) - leaf.count) for leaf in recipe.leaf_cells}
     measured = max(leaf_err.values(), default=Fraction(0))
     per_cell_diff = max(
         (abs(coarse_out.get(c, Fraction(0)) - w) for c, w in coarse_in.items()),
@@ -254,9 +245,7 @@ def refine(
         tail_errors=group_max_errors(leaf_err, tails),
         conservation=(
             *conservation_checks(coarse_table, out),
-            ConservationCheck(
-                "per_coarse_cell_weight", per_cell_diff == 0, fraction_str(per_cell_diff)
-            ),
+            ConservationCheck("per_coarse_cell_weight", per_cell_diff == 0, fraction_str(per_cell_diff)),
         ),
         runtime_seconds=time.perf_counter() - t0,
         expiry_conditions=(
@@ -271,6 +260,4 @@ def refine(
             "any attribute beyond age and recorded sex",
         ),
     )
-    return CompressionResult(
-        table=out, mapping=frozen_mapping, mapping_digest=mapping_digest, certificate=cert
-    )
+    return CompressionResult(table=out, mapping=frozen_mapping, mapping_digest=mapping_digest, certificate=cert)

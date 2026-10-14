@@ -242,11 +242,11 @@ class CutoffRepository:
         params = self._obs_params(concepts)
         rows = [dict(r) for r in self._conn.execute(text(_OBS_SELECT), params).mappings()]
         scope = ObservationScope(self._mode, self._cutoff, [])
-        for r in self._conn.execute(text(_OBS_COUNTS), params).mappings():
-            if r["exclusion"] is None:
-                scope.candidate_revisions = int(r["n"])
+        for cnt in self._conn.execute(text(_OBS_COUNTS), params).mappings():
+            if cnt["exclusion"] is None:
+                scope.candidate_revisions = int(cnt["n"])
             else:
-                scope.exclusions[r["exclusion"]] = int(r["n"])
+                scope.exclusions[cnt["exclusion"]] = int(cnt["n"])
         for r in rows:
             self._guard.check(self.observation_input(r))  # defence in depth
             r["ineligible_after_cutoff"] = bool(r.pop("ineligible_now"))

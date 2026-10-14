@@ -82,7 +82,8 @@ def _plain(obj: Any) -> Any:
 
 
 def _db_now(conn: Connection) -> datetime:
-    return conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+    now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+    return now
 
 
 def _check_cutoff(conn: Connection, cutoff: datetime) -> datetime:
@@ -499,28 +500,28 @@ def revised_data_retrospective(
         return sum(xs) / len(xs) if xs else None
 
     scores: dict[str, dict[str, Any]] = defaultdict(dict)
-    for (concept, model), v in sorted(per_model.items()):
+    for (concept, model), acc_v in sorted(per_model.items()):
         scores[concept][model] = {
             "label": RETROSPECTIVE_LABEL,
-            "n": len(v["ae_latest"]),
-            "mae_latest_revised": _mean(v["ae_latest"]),
+            "n": len(acc_v["ae_latest"]),
+            "mae_latest_revised": _mean(acc_v["ae_latest"]),
             "mae_pooling": "pooled across series of different scale (e.g. countries); see scores_by_series and "
                            "mase_latest_revised",
-            "mase_latest_revised": _mean(v["sae_latest"]),
-            "n_mase": len(v["sae_latest"]),
-            "mape_latest_revised": _mean(v["ape_latest"]),
-            "mae_first_release": _mean(v["ae_first"]),
-            "n_first_release": len(v["ae_first"]),
+            "mase_latest_revised": _mean(acc_v["sae_latest"]),
+            "n_mase": len(acc_v["sae_latest"]),
+            "mape_latest_revised": _mean(acc_v["ape_latest"]),
+            "mae_first_release": _mean(acc_v["ae_first"]),
+            "n_first_release": len(acc_v["ae_first"]),
         }
     by_series: dict[str, dict[str, dict[str, Any]]] = defaultdict(lambda: defaultdict(dict))
-    for (concept, slabel, model), v in sorted(per_series.items()):
+    for (concept, slabel, model), acc_v in sorted(per_series.items()):
         by_series[concept][slabel][model] = {
             "label": RETROSPECTIVE_LABEL,
-            "n": len(v["ae_latest"]),
-            "mae_latest_revised": _mean(v["ae_latest"]),
-            "mase_latest_revised": _mean(v["sae_latest"]),
-            "mae_first_release": _mean(v["ae_first"]),
-            "n_first_release": len(v["ae_first"]),
+            "n": len(acc_v["ae_latest"]),
+            "mae_latest_revised": _mean(acc_v["ae_latest"]),
+            "mase_latest_revised": _mean(acc_v["sae_latest"]),
+            "mae_first_release": _mean(acc_v["ae_first"]),
+            "n_first_release": len(acc_v["ae_first"]),
         }
     m["scores"] = dict(scores)
     m["scores_by_series"] = {c: {k: dict(v) for k, v in d.items()} for c, d in by_series.items()}

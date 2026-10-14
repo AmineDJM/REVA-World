@@ -359,13 +359,12 @@ def test_cancellation_before_publication(db, baseline):
 
 def test_worker_shutdown_is_not_a_user_cancel(db, baseline):
     """R2-01: a shutdown signal raises JobCancelled (the worker requeues); the job is not ended."""
-    from reva.operations.jobs import JobCancelled
+    from reva.operations.context import JobCancelled
 
     sid = create_scenario(db, make_spec(baseline, title="Test: shutdown"))
     payload = {"scenario_id": str(sid)}
     ctx = claim_job(db, payload)
-    ctx.heartbeat = lambda _p=None: "cancel_requested"  # what the worker reports while shutting down
-    ctx.shutdown_requested = lambda: True  # type: ignore[attr-defined]
+    ctx.shutdown_signal = lambda: True  # the worker is shutting down; the DB status is still 'running'
     with pytest.raises(JobCancelled):
         handle_simulation(payload, ctx)
     assert job_row(db, ctx.job_id)["status"] == "running"  # left for the worker to release, not cancelled

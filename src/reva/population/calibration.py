@@ -111,9 +111,7 @@ def rake(
             raise ValidationProblem(f"category column {d!r} has wrong length")
         for k, v in tg.items():
             if not math.isfinite(v) or v < 0:
-                problems.append(
-                    {"kind": "invalid_target", "dimension": d, "category": k, "target": repr(v)}
-                )
+                problems.append({"kind": "invalid_target", "dimension": d, "category": k, "target": repr(v)})
         order = sorted(tg)
         pos = {k: i for i, k in enumerate(order)}
         unknown = sorted({lab for lab in labels if lab not in pos})
@@ -130,9 +128,7 @@ def rake(
         support = np.bincount(code, weights=(w0 > 0).astype(np.float64), minlength=len(order))
         for k in order:
             if tg[k] > 0 and support[pos[k]] == 0:
-                problems.append(
-                    {"kind": "positive_target_without_support", "dimension": d, "category": k}
-                )
+                problems.append({"kind": "positive_target_without_support", "dimension": d, "category": k})
         codes[d] = code
         tvec[d] = np.array([tg[k] for k in order], dtype=np.float64)
 
@@ -174,10 +170,7 @@ def rake(
                 factor = np.where(current > 0, tvec[d] / current, 1.0)
             w = w * factor[codes[d]]
         max_dev = max(
-            float(
-                np.max(np.abs(np.bincount(codes[d], weights=w, minlength=tvec[d].size) - tvec[d]))
-            )
-            for d in dims
+            float(np.max(np.abs(np.bincount(codes[d], weights=w, minlength=tvec[d].size) - tvec[d]))) for d in dims
         )
         if max_dev <= relative_tolerance * scale:
             break

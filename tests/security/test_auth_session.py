@@ -256,3 +256,77 @@ def test_login_rate_limit_default_is_five(db: Any, monkeypatch: pytest.MonkeyPat
 
     monkeypatch.delenv(LOGIN_RATE_LIMIT_ENV, raising=False)
     assert login_rate_limit_per_minute(settings_for(db)) == 5
+
+
+def test_r2_09_logout_survives_restart(db: Any) -> None:
+    """A logged-out cookie stays invalid in a fresh app process (persisted ops.session_revocation)."""
+    s = settings_for(db)
+    app1 = create_app(s)
+    with TestClient(app1) as c:
+        assert _login(c).status_code == 200
+        stolen = c.cookies.get("reva_session")
+        assert c.delete("/v1/session", headers={"X-CSRF-Token": c.cookies.get("reva_csrf")}).status_code == 204
+    app1.state.engine.dispose()
+    app2 = create_app(s)  # same session secret: the signature is still valid
+    with TestClient(app2) as c2:
+        c2.cookies.set("reva_session", stolen)
+        assert c2.get("/v1/session").status_code == 401
+        assert _login(c2).status_code == 200  # a new session is unaffected
+        assert c2.get("/v1/session").status_code == 200
+    app2.state.engine.dispose()
+    with db.owner.connect() as conn:
+        n = conn.execute(text("SELECT count(*) FROM ops.session_revocation WHERE expires_at > now()")).scalar_one()
+    assert n >= 1
+
+
+def test_r2_10_rate_limiter_memory_is_bounded() -> None:
+    import time
+
+    from reva.api.auth import LoginRateLimiter
+
+    lim = LoginRateLimiter(limit=5, max_keys=100, global_limit=10**9)
+    t0 = time.perf_counter()
+    for i in range(30_000):
+        assert lim.check_and_record(f"client-{i}") is None
+    assert len(lim) <= 100
+    assert time.perf_counter() - t0 < 5.0
+    # The most recent client keeps its bucket and is still limited.
+    for _ in range(4):
+        lim.check_and_record("client-29999")
+    assert lim.check_and_record("client-29999") is not None
+
+
+def test_r2_10_global_login_budget() -> None:
+    from reva.api.auth import LoginRateLimiter
+
+    lim = LoginRateLimiter(limit=5, global_limit=10)
+    assert all(lim.check_and_record(f"addr-{i}") is None for i in range(10))
+    assert lim.check_and_record("addr-new") is not None  # distributed guessing hits the global bucket
+
+
+def test_r2_12_human_reviewer_identity_rules() -> None:
+    from reva.api.auth import Principal
+
+    def tok(label: str, scopes: set[str], kind: str | None = None) -> Principal:
+        return Principal(label, f"token:{label}", "token", frozenset(scopes), token_label=label, principal_kind=kind)
+
+    assert Principal("admin", "human:admin", "session", frozenset({"review"})).human_reviewer == "human:admin"
+    assert tok("human:alice", {"read", "review"}).human_reviewer == "human:alice"
+    assert tok("human:alice", {"read"}).human_reviewer is None  # no review scope
+    assert tok("human:admin", {"review"}).human_reviewer is None  # reserved for the interactive session
+    assert tok("service-bot", {"review"}).human_reviewer is None
+    assert tok("human:Bad Name", {"review"}).human_reviewer is None
+    assert tok("human:alice", {"review"}, kind="service").human_reviewer is None
+    assert tok("human:alice", {"review"}, kind="human").human_reviewer == "human:alice"
+
+
+def test_r2_12_review_endpoint_gate(db: Any, client: TestClient) -> None:
+    pid = uuid.uuid4()
+    reserved = _token(db, ["read", "review"], label="human:admin")
+    r = client.post(f"/v1/proposals/{pid}/review", json={"decision": "approve"},
+                    headers={"Authorization": f"Bearer {reserved}"})
+    assert r.status_code == 403
+    alice = _token(db, ["read", "review"], label="human:alice")
+    r = client.post(f"/v1/proposals/{pid}/review", json={"decision": "approve"},
+                    headers={"Authorization": f"Bearer {alice}"})
+    assert r.status_code == 404  # passed the identity gate; the proposal does not exist

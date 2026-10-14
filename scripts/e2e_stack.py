@@ -122,7 +122,7 @@ class Stack:
 
         from reva.settings import Settings
 
-        base = Settings(_env_file=ROOT / ".env")  # type: ignore[call-arg]
+        base = Settings(_env_file=ROOT / ".env")
         if base.reva_migration_database_url is None:
             raise SystemExit("REVA_MIGRATION_DATABASE_URL is not configured (.env); cannot create the e2e database")
         self.admin_engine = create_engine(base.migration_url().set(database="postgres"), isolation_level="AUTOCOMMIT")
@@ -185,7 +185,10 @@ class Stack:
                     "inserted": rep.inserted,
                     "unchanged": rep.unchanged,
                     "errors": rep.errors,
-                    "outcomes": [o.status for o in rep.outcomes],
+                    "outcomes": {
+                        st: sum(1 for o in rep.outcomes if o.status == st)
+                        for st in sorted({o.status for o in rep.outcomes})
+                    },
                 }
                 if rep.errors:
                     log.warning("fixture ingest %s reported errors: %s", name, rep.errors)
@@ -341,7 +344,7 @@ class Stack:
         for e in self.engines:
             try:
                 e.dispose()
-            except Exception as exc:  # noqa: BLE001
+            except Exception as exc:
                 log.debug("engine dispose failed: %s", exc)
         if self.admin_engine is not None:
             if self.db_created and not self.args.keep_db:

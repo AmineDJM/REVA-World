@@ -23,6 +23,7 @@ The JSON contract is unchanged: ``sensitivity_range`` remains valid only under
 
 from __future__ import annotations
 
+from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, model_validator
@@ -65,8 +66,7 @@ PROBABILISTIC_KINDS = frozenset(
 )
 
 
-def _dec(v: str | None, name: str) -> object:
-    from decimal import Decimal, InvalidOperation
+def _dec(v: str | None, name: str) -> Decimal | None:
 
     if v is None:
         return None

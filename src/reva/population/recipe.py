@@ -76,8 +76,7 @@ FORBIDDEN_ATTRIBUTES: frozenset[str] = frozenset(
     }
 )
 RECORDED_SEX_DEFINITION = (
-    "Recorded sex as published by the source (Eurostat demo_pjan: M, F); "
-    "not gender identity and not re-coded."
+    "Recorded sex as published by the source (Eurostat demo_pjan: M, F); not gender identity and not re-coded."
 )
 LEAF_SEXES: tuple[str, ...] = ("F", "M")
 TOTAL_SEX = "T"
@@ -226,11 +225,7 @@ def check_attributes(attributes: Iterable[str]) -> tuple[str, ...]:
         raise UnsupportedAttribute(
             "only age and recorded sex are supported by Eurostat demo_pjan; requested "
             f"attributes {sorted(extra)} are unsupported"
-            + (
-                f" and {forbidden} are sensitive attributes that are never synthesised"
-                if forbidden
-                else ""
-            ),
+            + (f" and {forbidden} are sensitive attributes that are never synthesised" if forbidden else ""),
             requested=sorted(extra),
             forbidden=forbidden,
             supported=list(SUPPORTED_ATTRIBUTES),
@@ -258,9 +253,7 @@ class SourceCell:
             if isinstance(self.count, bool) or not isinstance(self.count, int):
                 raise ValidationProblem("count must be an int or None", source_key=self.source_key)
             if self.count < 0:
-                raise ValidationProblem(
-                    "negative population count", source_key=self.source_key, count=self.count
-                )
+                raise ValidationProblem("negative population count", source_key=self.source_key, count=self.count)
         object.__setattr__(self, "flags", tuple(self.flags))
 
 
@@ -386,9 +379,7 @@ class ConsistencyCheck:
         }
 
 
-TotalsStatus = Literal[
-    "consistent", "inconsistent_accepted", "blocked", "not_computable", "not_reported"
-]
+TotalsStatus = Literal["consistent", "inconsistent_accepted", "blocked", "not_computable", "not_reported"]
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -591,9 +582,7 @@ class _Partition:
         return tuple(sorted({*self.observed, *self.missing}, key=_age_sort_key))
 
 
-def _select_partition(
-    by_key: Mapping[tuple[str, str], SourceCell], declared_open_lo: int | None
-) -> _Partition:
+def _select_partition(by_key: Mapping[tuple[str, str], SourceCell], declared_open_lo: int | None) -> _Partition:
     present = {a for (_s, a) in by_key}
     observed_codes = {
         a
@@ -617,8 +606,7 @@ def _select_partition(
     minimal_his = [
         iv[1]
         for a, iv in finite_obs.items()
-        if iv[1] is not None
-        and not any(b != a and ivb != iv and _contains(iv, ivb) for b, ivb in finite_obs.items())
+        if iv[1] is not None and not any(b != a and ivb != iv and _contains(iv, ivb) for b, ivb in finite_obs.items())
     ]
     provisional_open = max(minimal_his) + 1 if minimal_his else None
     obs_cands: dict[str, Interval] = dict(finite_obs)
@@ -680,9 +668,7 @@ def _select_partition(
     observed_finite = [iv[1] for iv in chosen_ivs if iv[1] is not None]
     open_min = max(observed_finite) + 1 if observed_finite else None
     all_finite_leaf_hi = [
-        iv[1]
-        for a in (*chosen, *missing_leaves)
-        if (iv := parse_age_code(a).interval) and iv[1] is not None
+        iv[1] for a in (*chosen, *missing_leaves) if (iv := parse_age_code(a).interval) and iv[1] is not None
     ]
     if not open_is_leaf:
         # no Y_OPEN, or Y_OPEN lies inside an open band leaf (e.g. Y_GE85): no bound needed
@@ -699,11 +685,7 @@ def _select_partition(
         open_lo, basis = None, "unknown: no finite age cell has an observed count"
     else:
         above = sorted(
-            (
-                a
-                for a in missing_leaves
-                if (iv := parse_age_code(a).interval) is not None and iv[0] >= open_min
-            ),
+            (a for a in missing_leaves if (iv := parse_age_code(a).interval) is not None and iv[0] >= open_min),
             key=_age_sort_key,
         )
         if above:
@@ -715,10 +697,7 @@ def _select_partition(
             )
         else:
             open_lo = open_min
-            basis = (
-                "inferred: one above the highest age cell with an observed count "
-                "(source age cells are disjoint)"
-            )
+            basis = "inferred: one above the highest age cell with an observed count (source age cells are disjoint)"
     return _Partition(
         observed=tuple(sorted(observed_leaves, key=_age_sort_key)),
         missing=tuple(sorted(missing_leaves, key=_age_sort_key)),
@@ -748,9 +727,7 @@ def _excluded_reason(sex: str, age: AgeCode, leaf_codes: Sequence[str]) -> str:
     return "finer_than_leaf_partition"
 
 
-def _aggregate_members(
-    age: AgeCode, part: _Partition
-) -> tuple[list[str] | None, str]:
+def _aggregate_members(age: AgeCode, part: _Partition) -> tuple[list[str] | None, str]:
     """Leaf age codes contained in an aggregate age code, or ``None`` if not computable."""
     codes = part.codes
     if age.kind == "total":
@@ -808,9 +785,7 @@ def build_recipe(
     if not geography:
         raise ValidationProblem("geography is required")
     if open_age_lower_bound is not None and (
-        isinstance(open_age_lower_bound, bool)
-        or not isinstance(open_age_lower_bound, int)
-        or open_age_lower_bound < 1
+        isinstance(open_age_lower_bound, bool) or not isinstance(open_age_lower_bound, int) or open_age_lower_bound < 1
     ):
         raise ValidationProblem(
             "open_age_lower_bound must be a positive int", open_age_lower_bound=open_age_lower_bound
@@ -828,9 +803,7 @@ def build_recipe(
         parse_age_code(cell.age_code)
         key = (cell.sex_code, cell.age_code)
         if key in by_key:
-            raise ValidationProblem(
-                "duplicate source cell", sex_code=cell.sex_code, age_code=cell.age_code
-            )
+            raise ValidationProblem("duplicate source cell", sex_code=cell.sex_code, age_code=cell.age_code)
         by_key[key] = cell
     if not by_key:
         raise ValidationProblem("no source cells supplied")

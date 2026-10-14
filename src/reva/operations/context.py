@@ -14,7 +14,7 @@ Two different things can ask a handler to stop, and they must not be confused:
 
 * ``ctx.shutdown_requested()`` — the *worker* is shutting down (SIGTERM on a
   deploy). This is not a cancellation: the job must be handed back to the queue
-  (raise :class:`reva.operations.jobs.JobCancelled`, return
+  (raise :class:`JobCancelled`, return
   ``{"status": "cancelled"}`` or ``{"status": "interrupted", "checkpoint": ...}``)
   and the worker releases it without consuming an attempt.
 * ``ctx.cancel_requested()`` — a *user* asked to cancel (DB status
@@ -36,8 +36,21 @@ from uuid import UUID
 
 from sqlalchemy import Connection, Engine, text
 
+from reva.kernel.errors import RevaError, StaleLease
 from reva.ports.storage import ArtifactStore
 from reva.settings import Settings
+
+
+class JobCancelled(RevaError):
+    """Raised by a handler to stop at a safe point (user cancel or worker shutdown).
+
+    Defined here (not in ``operations.jobs``) so handlers can import it without
+    pulling in ingestion/publication modules; ``operations.jobs`` re-exports it.
+    The worker decides the outcome: released during a shutdown, otherwise cancelled.
+    """
+
+    code = "cancelled"
+    http_status = 409
 
 
 def _never() -> bool:
@@ -100,8 +113,6 @@ class JobContext:
             {"j": self.job_id, "w": self.worker_id, "t": self.fencing_token},
         ).scalar_one_or_none()
         if ok is None:
-            from reva.kernel.errors import StaleLease
-
             raise StaleLease(f"lease lost for job {self.job_id} (fencing token {self.fencing_token})",
                              job_id=str(self.job_id), fencing_token=self.fencing_token)
 
@@ -110,8 +121,6 @@ class JobContext:
         import json
 
         if status == "cancelled" and self.shutdown_requested() and not self.cancel_requested():
-            from reva.operations.jobs import JobCancelled
-
             # R2-01: a shutdown is not a cancellation; abort the handler's transaction so
             # the worker releases the job for a retry instead of ending it.
             raise JobCancelled(f"worker shutting down; job {self.job_id} released, not cancelled",

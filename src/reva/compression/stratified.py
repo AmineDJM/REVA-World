@@ -82,9 +82,7 @@ class CompressionResult:
 
 def validate_bands(age_bands: Sequence[tuple[str, int, int | None]]) -> tuple[AgeBand, ...]:
     """Bands must be uniquely labelled, non-overlapping, and only the last may be open."""
-    bands = sorted(
-        (AgeBand(str(lab), int(lo), hi) for lab, lo, hi in age_bands), key=lambda b: b.lo
-    )
+    bands = sorted((AgeBand(str(lab), int(lo), hi) for lab, lo, hi in age_bands), key=lambda b: b.lo)
     if not bands:
         raise ValidationProblem("at least one age band is required")
     labels = [b.label for b in bands]
@@ -95,7 +93,8 @@ def validate_bands(age_bands: Sequence[tuple[str, int, int | None]]) -> tuple[Ag
             raise ValidationProblem(f"invalid band {b.label!r}")
         if b.hi is None and i != len(bands) - 1:
             raise ValidationProblem("only the last (highest) band may be open-ended")
-        if i and (bands[i - 1].hi is None or bands[i - 1].hi >= b.lo):
+        prev_hi = bands[i - 1].hi if i else None
+        if i and (prev_hi is None or prev_hi >= b.lo):
             raise ValidationProblem(f"bands overlap at {b.label!r}")
     return tuple(bands)
 
@@ -127,9 +126,7 @@ def coarsen(
 
     keys = ["cell_id", "sex_code", "age_code", "age_years", "is_top_coded", "is_unknown_age"]
     fine = exact_weight_sums(table, keys)
-    rec_counts_tbl = table.group_by(["cell_id"], use_threads=False).aggregate(
-        [("record_id", "count")]
-    )
+    rec_counts_tbl = table.group_by(["cell_id"], use_threads=False).aggregate([("record_id", "count")])
     rec_counts = dict(
         zip(
             rec_counts_tbl.column("cell_id").to_pylist(),
@@ -148,13 +145,9 @@ def coarsen(
         elif top:
             open_band = bands[-1]
             if open_band.hi is not None:
-                raise ValidationProblem(
-                    "top-coded (Y_OPEN) records require an open-ended last band", cell_id=cid
-                )
+                raise ValidationProblem("top-coded (Y_OPEN) records require an open-ended last band", cell_id=cid)
             if open_age_lower_bound is None:
-                raise ValidationProblem(
-                    "Y_OPEN lower bound unknown; pass open_age_lower_bound", cell_id=cid
-                )
+                raise ValidationProblem("Y_OPEN lower bound unknown; pass open_age_lower_bound", cell_id=cid)
             if open_band.lo > open_age_lower_bound:
                 raise ValidationProblem(
                     f"open band {open_band.label!r} starts above the Y_OPEN lower bound "
@@ -228,10 +221,7 @@ def coarsen(
     # --- certificate: recompute from the output table, independently of coarse_w
     out_cells = {k[0]: v for k, v in exact_weight_sums(out, ["cell_id"]).items()}
     in_cells = {k[0]: v for k, v in exact_weight_sums(table, ["cell_id"]).items()}
-    cell_err = {
-        c: abs(out_cells[c] - sum((in_cells[f] for f in fs), Fraction(0)))
-        for c, fs in mapping.items()
-    }
+    cell_err = {c: abs(out_cells[c] - sum((in_cells[f] for f in fs), Fraction(0))) for c, fs in mapping.items()}
     measured = max(cell_err.values(), default=Fraction(0))
     sex_of = {c: c.split("|", 1)[0] for c in mapping}
     groups: dict[str, list[str]] = {}
@@ -239,9 +229,7 @@ def coarsen(
         groups.setdefault(s, []).append(c)
     tails = {"unknown_age": [c for c in mapping if c.endswith(f"|{UNK_LABEL}")]}
     if bands[-1].hi is None:
-        tails[f"open_band_{bands[-1].label}_incl_top_coded"] = [
-            c for c in mapping if c.endswith(f"|{bands[-1].label}")
-        ]
+        tails[f"open_band_{bands[-1].label}_incl_top_coded"] = [c for c in mapping if c.endswith(f"|{bands[-1].label}")]
     cert = CompressionCertificate(
         task_scope=task_scope,
         operation="coarsen",
@@ -271,6 +259,4 @@ def coarsen(
             "age of UNK records",
         ),
     )
-    return CompressionResult(
-        table=out, mapping=mapping, mapping_digest=mapping_digest, certificate=cert
-    )
+    return CompressionResult(table=out, mapping=mapping, mapping_digest=mapping_digest, certificate=cert)

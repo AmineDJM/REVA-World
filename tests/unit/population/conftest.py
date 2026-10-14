@@ -39,9 +39,7 @@ def make_cells(
     def add(age: str, sex: str, count: int | None) -> None:
         if (sex, age) in dropped:
             return
-        cells.append(
-            SourceCell(age, sex, count, flags.get((sex, age), ()), f"demo_pjan.XX.2024.{sex}.{age}")
-        )
+        cells.append(SourceCell(age, sex, count, flags.get((sex, age), ()), f"demo_pjan.XX.2024.{sex}.{age}"))
 
     def ssum(values: Iterable[int | None]) -> int | None:
         vals = list(values)

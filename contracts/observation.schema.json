@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "REVA normalised scalar observation v1",
+  "$comment": "Validation semantics are exactly the binding appendix (schema_version 1.0.0). Annotation-only additions (this $comment and the description of uncertainty.kind) were made on 2026-10-14 to record decision D-8; they change no instance's validity, so schema_version is unchanged. Producer: reva.evidence.export.export_observation.",
   "type": "object",
   "additionalProperties": false,
   "properties": {
@@ -106,6 +107,7 @@
           ]
         },
         "kind": {
+          "description": "Uncertainty kind of the reported value. Deliberately excludes the kernel kind 'probability' (D-8): an observation record is a source report of a scalar quantity, and the probability of an event is a model-output type (forecast/belief modality), not an uncertainty kind of a source report; a source-published distribution over the reported value is 'distribution'. Exporters must refuse 'probability' explicitly rather than relabel it. Kernel-only fields (level, lower, upper, conditioning) have no place in v1: quantified uncertainty is carried by the referenced artifact (artifact_sha256), and records whose inline fields would be lost are refused, not truncated.",
           "enum": [
             "unknown",
             "definition",

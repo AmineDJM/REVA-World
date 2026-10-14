@@ -69,9 +69,7 @@ class CompressionCertificate:
         return logical_hash(d)
 
 
-def group_max_errors(
-    errors: Mapping[str, Fraction], groups: Mapping[str, Sequence[str]]
-) -> dict[str, str]:
+def group_max_errors(errors: Mapping[str, Fraction], groups: Mapping[str, Sequence[str]]) -> dict[str, str]:
     """Loss metric restricted to each subgroup: max per-cell error, as decimal strings."""
     return {
         g: fraction_decimal_str(max((errors[c] for c in cells if c in errors), default=Fraction(0)))

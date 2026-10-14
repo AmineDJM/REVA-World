@@ -165,7 +165,8 @@ def test_insufficient_evidence_keeps_incumbent(db, wdi_release):
     m = manifest_of(db, res["manifest_sha256"])
     for d in m["final_decisions"].values():
         assert any(r.startswith("insufficient_evaluation") for r in d["reasons"])
-    assert m["holdout_usage_count"] == {k: 0 for k in m["holdout_usage_count"]}
+    # Nothing is spent in this run (earlier runs may already have used overlapping holdout cells).
+    assert m["holdout_usage_count"] == m["locked_holdout"]["access_count_before"]
     with db.owner.connect() as conn:
         n_hold = conn.execute(
             text("SELECT count(*) FROM model.evaluation WHERE context_id = :c "

@@ -43,9 +43,7 @@ MAX_RECORDS = 100_000
 ALLOCATION_METHOD = "reva-largest-remainder-min1-v1"
 TABLE_HASH_VERSION = "reva-population-rows-1"
 INT64_MAX = np.iinfo(np.int64).max
-SEMANTICS_NOTE = (
-    "Weighted representative records of age x recorded-sex cells; not linked to real individuals."
-)
+SEMANTICS_NOTE = "Weighted representative records of age x recorded-sex cells; not linked to real individuals."
 
 POPULATION_SCHEMA = pa.schema(
     [
@@ -98,9 +96,7 @@ class Allocation:
             "recipe_digest": self.recipe_digest,
             "n_records": self.n_records,
             "seed": self.seed,
-            "cells": [
-                {"cell_id": c.cell_id, "count": c.count, "records": c.records} for c in self.cells
-            ],
+            "cells": [{"cell_id": c.cell_id, "count": c.count, "records": c.records} for c in self.cells],
         }
 
 
@@ -266,13 +262,10 @@ def allocate(recipe: PopulationRecipe, n_records: int) -> Allocation:
     for i in order[:leftover]:
         base[i] += 1
     cells = tuple(
-        CellAllocation(cell_id=c.cell_id, count=c.count, records=k)
-        for c, k in zip(nonzero, base, strict=True)
+        CellAllocation(cell_id=c.cell_id, count=c.count, records=k) for c, k in zip(nonzero, base, strict=True)
     )
     assert sum(base) == n_records
-    return Allocation(
-        recipe_digest=recipe.digest(), n_records=n_records, seed=recipe.seed, cells=cells
-    )
+    return Allocation(recipe_digest=recipe.digest(), n_records=n_records, seed=recipe.seed, cells=cells)
 
 
 # --------------------------------------------------------------------------- table
@@ -315,9 +308,7 @@ def materialise(recipe: PopulationRecipe, n_records: int) -> pa.Table:
         "reva.allocation_method": alloc.method,
         "reva.seed": str(recipe.seed),
         "reva.n_records": str(n_records),
-        "reva.open_age_lower_bound": (
-            "" if recipe.open_age_lower_bound is None else str(recipe.open_age_lower_bound)
-        ),
+        "reva.open_age_lower_bound": ("" if recipe.open_age_lower_bound is None else str(recipe.open_age_lower_bound)),
         "reva.geography": recipe.geography,
         "reva.reference_date": recipe.reference_date.isoformat(),
         "reva.semantics": SEMANTICS_NOTE,
@@ -369,10 +360,7 @@ def canonical_summary(table: pa.Table) -> dict[str, Any]:
         "version": TABLE_HASH_VERSION,
         "n_records": table.num_rows,
         "recipe_digest": table_metadata(table).get("reva.recipe_digest"),
-        "cells": {
-            cid: {"records": counts[cid], "weight_sum": fraction_str(sums[(cid,)])}
-            for cid in sorted(counts)
-        },
+        "cells": {cid: {"records": counts[cid], "weight_sum": fraction_str(sums[(cid,)])} for cid in sorted(counts)},
         "total_weight": fraction_str(sum(sums.values(), Fraction(0))),
     }
 

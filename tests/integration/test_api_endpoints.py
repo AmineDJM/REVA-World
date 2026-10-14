@@ -729,3 +729,195 @@ def test_relations_exclude_retracted_observations(env: Env) -> None:
     pinned = env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id), "max_edges": 5})
     assert pinned.status_code == 200 and pinned.json()["context_mode"] == "belief"
     assert pinned.json()["baseline_release"]["id"] == str(env.r1.release_id)
+
+
+# ---------------------------------------------------------------------------
+# Review findings docs/dev/review_api_sim_ops.md (R2-xx)
+# ---------------------------------------------------------------------------
+
+
+def _l2_spec(env: Env, title: str) -> dict[str, Any]:
+    return _scenario(env, title=title, countries=["FRA"], fidelity="L2", assumptions={
+        "quantity_response": "elasticity_sensitivity", "no_general_equilibrium": True,
+        "elasticity_grid": [{"import_elasticity": -0.5, "export_elasticity": -0.5, "basis": "scenario_assumption"},
+                            {"import_elasticity": -1.0, "export_elasticity": -1.0, "basis": "scenario_assumption"}]})
+
+
+def test_r2_20_l2_sensitivity_range_and_r2_03_replayed_run(env: Env) -> None:
+    from reva.simulation.jobs import handle_simulation
+
+    created = env.client.post("/v1/scenarios", json=_l2_spec(env, "L2 range"))
+    assert created.status_code == 201, created.text
+    sid = created.json()["scenario_id"]
+    first = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L2"},
+                            headers={"Idempotency-Key": f"l2-a-{uuid.uuid4()}"}).json()["job_id"]
+    _run_claimed(env, first, handle_simulation)
+    st = env.client.get(f"/v1/simulations/{first}")
+    assert st.status_code == 200, st.text  # R2-20: was a 500 (TypedValue rejected sensitivity_range)
+    body = st.json()
+    assert body["data"]["outcome"]["status"] == "succeeded", body["data"]["outcome"]
+    ranges = [r for r in body["data"]["results"] if r["value"]["kind"] == "sensitivity_range"]
+    assert ranges and all(r["variant"] == "L2:sensitivity_range" for r in ranges)
+    rv = ranges[0]["value"]
+    assert {"lower", "upper", "unit_ref", "statement"} <= set(rv) and "value" not in rv
+    assert "not a confidence interval" in rv["statement"]
+    run_id = body["data"]["run"]["id"]
+
+    # R2-03: a second job for the same scenario/fidelity reuses the run; its status shows that run.
+    second = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L2"},
+                             headers={"Idempotency-Key": f"l2-b-{uuid.uuid4()}"}).json()["job_id"]
+    res = _run_claimed(env, second, handle_simulation)
+    assert res.get("run_id") == run_id
+    again = env.client.get(f"/v1/simulations/{second}").json()
+    assert again["data"]["job"]["id"] == second and again["data"]["run"]["id"] == run_id
+    assert len(again["data"]["results"]) == len(body["data"]["results"])
+    codes = {w["code"] for w in again["warnings"]}
+    assert "idempotent_replay" in codes and "not_finished" not in codes
+
+    # R2-19: simulation lineage carries the simulation envelope and banner.
+    rid = ranges[0]["id"]
+    prov = env.client.get(f"/v1/provenance/sim_result/{rid}").json()
+    assert prov["modality"] == "assumption_conditioned_scenario" and prov["context_mode"] == "simulation"
+    assert any(w["code"] == "scenario_context" for w in prov["warnings"])
+    assert prov["context_id"] == body["data"]["scenario"]["context_id"]
+    for kind, ident in (("run", run_id), ("scenario", sid)):
+        p = env.client.get(f"/v1/provenance/{kind}/{ident}").json()
+        assert p["modality"] == "assumption_conditioned_scenario" and p["context_id"] == prov["context_id"]
+    est = env.client.get("/v1/provenance/release/" + str(env.r1.release_id)).json()
+    assert est["modality"] == "metadata" and not any(w["code"] == "scenario_context" for w in est["warnings"])
+
+
+def _token_for(env: Env, scopes: list[str], label: str) -> dict[str, str]:
+    from reva.api.auth import new_api_token
+
+    tok, sha = new_api_token()
+    with env.owner.begin() as c:
+        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
+                  {"h": sha, "s": scopes, "l": label})
+    return {"Authorization": f"Bearer {tok}"}
+
+
+def _insert_job(env: Env, job_type: str, **cols: Any) -> str:
+    extra = {"last_error": None, **cols}
+    with env.owner.begin() as c:
+        return str(c.execute(text(
+            "INSERT INTO ops.job(job_type, payload, idempotency_key, last_error) "
+            "VALUES (:t, '{}'::jsonb, :k, CAST(:e AS jsonb)) RETURNING id"),
+            {"t": job_type, "k": f"test-{job_type}-{uuid.uuid4()}",
+             "e": json.dumps(extra["last_error"]) if extra["last_error"] is not None else None}).scalar_one())
+
+
+def test_r2_07_cancel_is_scoped_by_job_type(env: Env) -> None:
+    sim_tok = _token_for(env, ["read", "simulate"], "svc-sim")
+    ing_tok = _token_for(env, ["read", "ingest"], "svc-ingest")
+    ingest_job = _insert_job(env, "ingest")
+    publish_job = _insert_job(env, "publish_beliefs")
+    sim_job = _insert_job(env, "simulation")
+    r = env.client.post(f"/v1/jobs/{ingest_job}/cancel", headers=sim_tok)
+    assert r.status_code == 403 and r.json()["details"]["required_scope"] == "ingest"
+    assert env.client.post(f"/v1/jobs/{publish_job}/cancel", headers=sim_tok).status_code == 403
+    r = env.client.post(f"/v1/jobs/{sim_job}/cancel", headers=ing_tok)
+    assert r.status_code == 403 and r.json()["details"]["required_scope"] == "simulate"
+    assert env.client.post(f"/v1/jobs/{sim_job}/cancel", headers=sim_tok).json()["status"] == "cancelled"
+    assert env.client.post(f"/v1/jobs/{ingest_job}/cancel", headers=ing_tok).json()["status"] == "cancelled"
+    assert env.client.get(f"/v1/jobs/{publish_job}").json()["status"] == "queued"
+    problem(env.client.post(f"/v1/jobs/{uuid.uuid4()}/cancel", headers=sim_tok), 404)
+
+
+def test_r2_11_malformed_cursor_is_400(env: Env) -> None:
+    from reva.api.deps import encode_cursor
+
+    for path, cur in (("/v1/jobs", ["not-a-date", "x"]), ("/v1/jobs", ["2026-01-01T00:00:00+00:00", "x"]),
+                      ("/v1/jobs", ["2026-01-01T00:00:00", str(uuid.uuid4())]),
+                      ("/v1/beliefs", ["a", "b", "c", "not-a-uuid"]), ("/v1/belief-releases", ["seven"]),
+                      ("/v1/observations", ["k", "1", str(uuid.uuid4())]), ("/v1/scenarios", [1, 2]),
+                      ("/v1/entities", ["x", 5]), ("/v1/proposals", ["2026", str(uuid.uuid4())])):
+        problem(env.client.get(path, params={"cursor": encode_cursor(cur)}), 400, "invalid_cursor")
+    problem(env.client.get("/v1/jobs", params={"cursor": "%%%"}), 400, "invalid_cursor")
+    first = env.client.get("/v1/jobs", params={"limit": 1}).json()
+    assert env.client.get("/v1/jobs", params={"limit": 1, "cursor": first["next_cursor"]}).status_code == 200
+
+
+def test_r2_13_job_errors_never_expose_sql(env: Env) -> None:
+    leaked = ("(psycopg.errors.UndefinedColumn) column \"secretcol\" does not exist\nLINE 1: SELECT secretcol\n"
+              "[SQL: SELECT secretcol FROM ops.job WHERE id = %(id)s]\n[parameters: {'id': 'payload-value'}]\n"
+              "(Background on this error at: https://sqlalche.me/e/21/f405)")
+    jid = _insert_job(env, "health", last_error={"code": "internal_error", "message": leaked, "retryable": False,
+                                                 "attempt": 1, "exception": "ProgrammingError"})
+    read_tok = _token_for(env, ["read"], "reader")
+    for r in (env.client.get(f"/v1/jobs/{jid}", headers=read_tok).json(),
+              next(j for j in env.client.get("/v1/jobs", params={"job_type": "health"}).json()["data"]
+                   if j["id"] == jid)):
+        err = r["last_error"]
+        assert err["code"] == "internal_error" and err["exception"] == "ProgrammingError"
+        text_ = json.dumps(err)
+        assert "[SQL" not in text_ and "parameters" not in text_ and "payload-value" not in text_
+        assert "SELECT" not in text_ and "secretcol" in err["message"]
+
+
+def test_r2_15_concurrent_identical_scenario_returns_existing(env: Env) -> None:
+    import threading
+
+    from reva.simulation.spec import validate_scenario_spec
+
+    spec = _scenario(env, title=f"race {uuid.uuid4()}")
+    parsed = validate_scenario_spec(spec)
+    out: dict[str, Any] = {}
+    with env.owner.connect() as c:
+        tx = c.begin()
+        winner = c.execute(text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:other')"),
+                           {"spec": json.dumps(parsed.as_json()), "b": parsed.canonical_bytes(),
+                            "d": parsed.digest()}).scalar_one()
+
+        def post() -> None:
+            out["r"] = env.client.post("/v1/scenarios", json=spec)
+
+        th = threading.Thread(target=post)
+        th.start()
+        th.join(1.5)  # the API's insert now waits on the uncommitted competing row
+        tx.commit()
+    th.join(30)
+    r = out["r"]
+    assert r.status_code == 200, r.text
+    assert r.json()["scenario_id"] == str(winner)
+
+
+def test_r2_18_query_requires_aware_as_of(env: Env) -> None:
+    naive = (datetime.now() - timedelta(days=1)).isoformat()
+    problem(env.client.post("/v1/query", json={"kind": "beliefs", "as_of": naive}), 422)
+    problem(env.client.post("/v1/query", json={"kind": "relations", "entity_id": str(uuid.uuid4()),
+                                               "as_of": naive}), 422)
+    problem(env.client.post("/v1/query", json={"kind": "timeseries", "subject_id": str(uuid.uuid4()),
+                                               "concept": POP, "as_of": naive}), 422)
+
+
+def test_r2_04_timeseries_skips_and_flags_retracted(env: Env) -> None:
+    base = {"subject_id": "DZA", "concept": POP}
+    before = env.client.get("/v1/timeseries", params=base).json()
+    p23 = next(p for p in before["data"]["points"] if p["period_label"].startswith("2023"))
+    assert p23["revision_no"] == 2 and p23["retracted_revisions_skipped"] == 0
+    p22 = next(p for p in before["data"]["points"] if p["period_label"].startswith("2022"))
+    t0 = datetime.now(UTC)
+    with env.owner.begin() as c:
+        for oid in (p23["observation_id"], p22["observation_id"]):
+            act = c.execute(text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"),
+                            {"o": oid}).scalar_one()
+            c.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                           "VALUES (:o, 'test retraction', :a)"), {"o": oid, "a": act})
+    after = env.client.get("/v1/timeseries", params=base).json()
+    pts = after["data"]["points"]
+    q23 = next(p for p in pts if p["period_label"].startswith("2023"))
+    # The retracted revision 2 is skipped: revision 1 (still valid) is the point, flagged.
+    assert q23["revision_no"] == 1 and q23["value"]["value"] == env.old_pop
+    assert q23["retracted_revisions_skipped"] == 1
+    # 2022 had a single, now retracted, revision: it is omitted rather than shown as current.
+    assert not any(p["period_label"].startswith("2022") for p in pts) and len(pts) == len(before["data"]["points"]) - 1
+    w = next(w for w in after["warnings"] if w["code"] == "retracted_records")
+    assert "1 retracted revision" in w["message"] and "wb:SP.POP.TOTL:DZA:2022" in w["message"]
+    full = env.client.get("/v1/timeseries", params={**base, "revisions": "all"}).json()
+    r23 = next(p for p in full["data"]["points"] if p["period_label"].startswith("2023"))
+    assert [(r["revision_no"], r["retracted"]) for r in r23["revisions"]] == [(1, False), (2, True)]
+    # As known before the retractions nothing is skipped.
+    then = env.client.get("/v1/timeseries", params={**base, "as_of": iso(t0)}).json()
+    assert next(p for p in then["data"]["points"] if p["period_label"].startswith("2023"))["revision_no"] == 2
+    assert not any(w["code"] == "retracted_records" for w in then["warnings"])

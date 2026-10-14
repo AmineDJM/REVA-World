@@ -337,6 +337,7 @@ def test_non_retryable_failure_is_immediate(qdb: FreshDB) -> None:
 
 def test_missing_handler_is_a_typed_failure_never_success(qdb: FreshDB, monkeypatch) -> None:
     monkeypatch.setitem(jobs.HANDLERS, "population", "reva.population.no_such_module:handle_population")
+    monkeypatch.setitem(jobs.HANDLERS, "evaluation", "reva.operations.jobs:no_such_function")
     for jt in ("population", "evaluation"):
         jid = _enqueue(qdb, jt, {"probe": "unavailable"})
         w = _worker(qdb)

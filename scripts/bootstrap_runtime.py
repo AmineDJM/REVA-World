@@ -16,6 +16,7 @@ redacted JSON error on stderr and exits non-zero, which aborts the Render deploy
 
 from __future__ import annotations
 
+import os
 import sys
 import time
 from pathlib import Path
@@ -36,7 +37,14 @@ def main() -> int:
         emit({"event": "reva.bootstrap", "status": "error", "error": redact(f"{type(e).__name__}: {e}")})
         return 1
     try:
+        # The pre-deploy runs in the API service's environment (which may declare
+        # REVA_PROCESS_ROLE=api); this process is the bootstrap role, the only one
+        # allowed to hold the migration-owner URL.
+        os.environ["REVA_PROCESS_ROLE"] = "bootstrap"
         settings = load_settings()
+        validate = getattr(settings, "validate_for", None)
+        if validate is not None:
+            validate("bootstrap")
         report = bootstrap(settings)
     except (ConfigurationError, ConfigError) as e:
         emit({"event": "reva.bootstrap", "status": "error", "kind": "configuration", "error": redact(str(e))})

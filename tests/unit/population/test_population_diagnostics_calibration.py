@@ -84,9 +84,7 @@ def test_ipf_infeasible_positive_target_without_records():
     cats = {"a": ["x", "x"]}
     res = rake([1, 1], cats, {"a": {"x": 3, "y": 2}})
     assert not res.feasible
-    assert {"kind": "positive_target_without_support", "dimension": "a", "category": "y"} in (
-        res.problems
-    )
+    assert {"kind": "positive_target_without_support", "dimension": "a", "category": "y"} in (res.problems)
 
 
 def test_ipf_infeasible_records_without_target():

@@ -572,6 +572,7 @@ def step4_hyperedges(env: Env, rec: Recorder) -> None:
             nb = queries.neighbourhood(c, entity("FRA"), context=ctx_rel, layers=[TRADE_LAYER], valid_during=y23,
                                        max_edges=200)
             context_used = "release"
+            release_pinned_edges = len(nb.edges)
             if not nb.edges:
                 nb = queries.neighbourhood(c, entity("FRA"), context=queries.GraphContext.evidence(
                     env.now(), env.origin), layers=[TRADE_LAYER], valid_during=y23, max_edges=200)
@@ -587,6 +588,11 @@ def step4_hyperedges(env: Env, rec: Recorder) -> None:
                  bool(nb.edges) and all(e.support for e in nb.edges), nb.edges[0].support if nb.edges else None)
         st.check("partners are listed as distinct neighbours", len(nb.neighbours) > 1, len(nb.neighbours))
         sample = nb.edges[0].as_dict() if nb.edges else None
+        st.evidence["release_pinned_edges"] = release_pinned_edges
+        if not release_pinned_edges:
+            st.evidence["note"] = ("publish_release did not pin any world.relation rows to the release "
+                                   "(world.relation.release_id); the release-pinned graph context is empty, so the "
+                                   "edges shown come from the evidence context as known now (same origin)")
         st.evidence.update(context=context_used, edges=len(nb.edges), neighbours=len(nb.neighbours),
                            truncated=nb.truncated, sample_edge=sample,
                            partners=[n.label for n in nb.neighbours][:10])

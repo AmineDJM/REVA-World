@@ -157,9 +157,7 @@ def diagnose(table: pa.Table, recipe: PopulationRecipe) -> dict[str, Any]:
         "unsupported_associations": [dict(a) for a in UNSUPPORTED_ASSOCIATIONS],
         "source_consistency": {
             "inconsistent_checks": sum(1 for c in recipe.consistency if c.status == "inconsistent"),
-            "not_computable_checks": sum(
-                1 for c in recipe.consistency if c.status == "not_computable"
-            ),
+            "not_computable_checks": sum(1 for c in recipe.consistency if c.status == "not_computable"),
             "missing_leaf_cells": len(recipe.missing_cells),
             "totals_status": recipe.totals_status,
             "accepted_inconsistency": recipe.accepted_inconsistency,

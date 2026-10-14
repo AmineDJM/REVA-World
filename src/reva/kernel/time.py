@@ -67,6 +67,14 @@ class TimeExtent(BaseModel):
                 raise ValueError("interval requires a start or an uncertain start")
             if self.start is not None and self.end is not None and self.end <= self.start:
                 raise ValueError("interval end must be after start (half-open)")
+        if self.start is not None and self.start_uncertainty is not None and not (
+            self.start_uncertainty.earliest <= self.start <= self.start_uncertainty.latest
+        ):
+            raise ValueError("start lies outside its own uncertain bound")
+        if self.end is not None and self.end_uncertainty is not None and not (
+            self.end_uncertainty.earliest <= self.end <= self.end_uncertainty.latest
+        ):
+            raise ValueError("end lies outside its own uncertain bound")
         return self
 
     @classmethod

@@ -1,52 +1,46 @@
-import { expect, test, type Page } from '@playwright/test';
+/**
+ * Quick smoke checks (shared stored session; see helpers.ts for how the stack is found).
+ * The detailed acceptance checks live in auth/screens/country/simulation specs.
+ */
+import { expect, test } from '@playwright/test';
+import { BASE_URL, HAVE_SESSION, SKIP_REASON, STORAGE_STATE, settle } from './helpers';
 
-const BASE = process.env.REVA_E2E_BASE_URL;
-const USER = process.env.REVA_E2E_USERNAME ?? 'admin';
-const PASS = process.env.REVA_E2E_PASSWORD ?? '';
+test.skip(!HAVE_SESSION, SKIP_REASON);
+test.use({ baseURL: BASE_URL, storageState: STORAGE_STATE });
 
-test.skip(!BASE, 'REVA_E2E_BASE_URL is not set');
-
-async function login(page: Page) {
-  await page.goto('/world');
-  await page.getByLabel('Username').fill(USER);
-  await page.getByLabel('Password').fill(PASS);
-  await page.getByRole('button', { name: 'Sign in' }).click();
-  await expect(page.getByRole('navigation', { name: 'Screens' })).toBeVisible();
-}
-
-test('session cookie is HttpOnly and nothing is kept in web storage', async ({ page, context }) => {
-  await login(page);
-  const cookies = await context.cookies();
-  const session = cookies.find((c) => c.name === 'reva_session');
-  expect(session?.httpOnly).toBe(true);
-  const stored = await page.evaluate(() => [localStorage.length, sessionStorage.length]);
-  expect(stored).toEqual([0, 0]);
-});
-
-test('every screen shows context and knowledge cutoff', async ({ page }) => {
-  await login(page);
-  for (const path of ['/world', '/country/FRA', '/country/DZA', '/evidence', '/graph', '/simulation', '/models', '/acquisition']) {
-    await page.goto(path);
-    await expect(page.getByRole('region', { name: 'Result context' }).first()).toBeVisible();
-    await expect(page.getByText('Knowledge cutoff').first()).toBeVisible();
-  }
-});
-
-test('simulation screen carries a persistent SIMULATION banner and never uses the fixture baseline', async ({ page }) => {
-  await login(page);
-  const requests: string[] = [];
-  page.on('request', (r) => {
-    if (r.method() === 'POST' && r.url().endsWith('/v1/scenarios')) requests.push(r.postData() ?? '');
-  });
-  await page.goto('/simulation');
-  await expect(page.getByTestId('simulation-screen-banner')).toContainText('SIMULATION');
-  await page.mouse.wheel(0, 2000);
-  await expect(page.getByTestId('simulation-screen-banner')).toBeInViewport();
-  for (const body of requests) expect(body).not.toContain('00000000-0000-4000-8000-000000000001');
+test('health endpoints answer and security headers are set on the UI shell', async ({ page }) => {
+  expect((await page.request.get('/health/live')).status()).toBe(200);
+  expect((await page.request.get('/health/ready')).status()).toBe(200);
+  const r = await page.goto('/world');
+  const h = r!.headers();
+  expect(h['content-security-policy']).toContain("default-src 'self'");
+  expect(h['x-frame-options']).toBe('DENY');
+  expect(h['x-content-type-options']).toBe('nosniff');
 });
 
 test('map notes that display boundaries are not authoritative', async ({ page }) => {
-  await login(page);
   await page.goto('/world');
+  await settle(page);
   await expect(page.getByText(/display-only/).first()).toBeVisible();
+});
+
+test('no external network requests are made by the UI (self-hosted map, no tile service)', async ({ page }) => {
+  const external: string[] = [];
+  page.on('request', (r) => {
+    const u = new URL(r.url());
+    if (!['127.0.0.1', 'localhost'].includes(u.hostname) && !['data:', 'blob:'].includes(u.protocol)) external.push(r.url());
+  });
+  for (const path of ['/world', '/country/FRA', '/graph']) {
+    await page.goto(path);
+    await settle(page);
+  }
+  expect(external).toEqual([]);
+});
+
+test('unknown screen and API 404 render clearly', async ({ page }) => {
+  await page.goto('/no-such-screen');
+  await expect(page.getByText('Unknown screen')).toBeVisible();
+  const r = await page.request.get('/v1/no-such-endpoint');
+  expect(r.status()).toBe(404);
+  expect(r.headers()['content-type']).toContain('application/problem+json');
 });

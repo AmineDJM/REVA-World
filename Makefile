@@ -87,8 +87,8 @@ lint: imports ## Ruff lint + format check, import boundaries
 format: ## Apply Ruff formatting
 	$(PY) ruff format .
 
-typecheck: ## mypy strict on the kernel
-	$(PY) mypy
+typecheck: ## mypy strict on the kernel and ports
+	$(PY) mypy -p reva.kernel -p reva.ports
 
 imports: ## import-linter dependency contracts
 	$(PY) python scripts/verify_imports.py

@@ -26,9 +26,7 @@ from reva.population import (
 )
 
 FIVE_YEAR_TO_85 = [(f"Y{lo}-{lo + 4}", lo, lo + 4) for lo in range(0, 85, 5)] + [("Y_GE85", 85, None)]
-FR_FIXTURE = (
-    Path(__file__).resolve().parents[2] / "fixtures/source/eurostat.demo_pjan.fr/9a08edda6adba71f.json"
-)
+FR_FIXTURE = Path(__file__).resolve().parents[2] / "fixtures/source/eurostat.demo_pjan.fr/9a08edda6adba71f.json"
 
 
 def _cells(per_sex: dict[str, list[tuple[str, int | None]]], *, totals: bool = True) -> list[SourceCell]:
@@ -47,7 +45,12 @@ def _same(rows: list[tuple[str, int | None]]) -> dict[str, list[tuple[str, int |
 
 def _recipe(cells: list[SourceCell], **kw: object):
     return build_recipe(
-        cells, geography="XX", reference_date=date(2023, 1, 1), source_ref={}, seed=1, **kw  # type: ignore[arg-type]
+        cells,
+        geography="XX",
+        reference_date=date(2023, 1, 1),
+        source_ref={},
+        seed=1,
+        **kw,  # type: ignore[arg-type]
     )
 
 
@@ -108,8 +111,11 @@ def test_band_only_source_materialises_exactly():
     for s, rows in per_sex.items():
         d = dict(rows)
         cells.append(SourceCell("Y15-64", s, sum(d[f"Y{lo}-{lo + 4}"] for lo in range(15, 65, 5)), (), f"{s}|Y15-64"))
-        cells.append(SourceCell("Y_GE65", s, sum(d[f"Y{lo}-{lo + 4}"] for lo in range(65, 85, 5)) + d["Y_GE85"], (),
-                                f"{s}|Y_GE65"))
+        cells.append(
+            SourceCell(
+                "Y_GE65", s, sum(d[f"Y{lo}-{lo + 4}"] for lo in range(65, 85, 5)) + d["Y_GE85"], (), f"{s}|Y_GE65"
+            )
+        )
     r = _recipe(cells)
     assert r.leaf_age_codes == tuple(a for a, _ in bands)
     assert r.total_count == sum(c for _, c in f) + sum(c for _, c in m)
@@ -154,9 +160,10 @@ def test_singles_beyond_band_start_are_replaced_by_the_band_when_band_covers_mor
 
 def test_mixed_singles_bands_and_open_band():
     rows = [*_singles(0, 84), ("Y85-89", 20), ("Y90-94", 15), ("Y95-99", 5), ("Y_GE100", 1), ("Y_GE85", 41)]
-    r = _recipe(_cells({"F": rows, "M": rows}, totals=False) + [
-        SourceCell("TOTAL", s, 850 + 41, (), f"{s}|TOTAL") for s in ("F", "M")
-    ])
+    r = _recipe(
+        _cells({"F": rows, "M": rows}, totals=False)
+        + [SourceCell("TOTAL", s, 850 + 41, (), f"{s}|TOTAL") for s in ("F", "M")]
+    )
     assert r.leaf_age_codes[-4:] == ("Y85-89", "Y90-94", "Y95-99", "Y_GE100")
     assert r.totals_status == "consistent"
     ge85 = next(c for c in r.consistency if c.age_code == "Y_GE85" and c.sex_code == "F")

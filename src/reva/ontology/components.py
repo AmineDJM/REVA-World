@@ -40,11 +40,12 @@ _FILE = re.compile(r"^(?P<name>[a-z][a-z0-9_]*)\.v(?P<major>\d+)\.schema\.json$"
 # Published component versions and their manifest digests. A published entry is
 # immutable: changing the schema file of a listed version fails verification;
 # publish a new version instead (see classify_change for the required bump).
+# Logical hashes under canonical hash version reva-cjson-2 (re-pinned when the hash version changed).
 PUBLISHED_COMPONENT_DIGESTS: Mapping[str, str] = {
-    "demographics@1.0.0": "efbd8fabbc4678371ad9cabfbc8a9da31c3e0cfa90b3c983215942fa00578ad5",
-    "display_geometry@1.0.0": "6aeb397849e6f49425e155119dac5a031934fe86dc446d25bb7a80aefc3a270c",
-    "economy@1.0.0": "4c2cf98e608e252cea32c201bbb54a6607e43e0a9447031d95b0207f4cf90dbe",
-    "trade_crude@1.0.0": "232abc1bc5665c47929b68b1ba526002c64a7ed5a5cd2d15d8dd0cf583119e60",
+    "demographics@1.0.0": "825984b83315a58138d0ea861fe5e32ae0a21b65da7460f51025e5ef6f16d075",
+    "display_geometry@1.0.0": "e5e67661bf2dd912bfeb701aa001c93a84b7ed70d2a8ccb278813e3b5148873b",
+    "economy@1.0.0": "be5896ab0a9a810c4bd62e1921071dfe3e3ecb6c3202106cc6157938ae2bbebe",
+    "trade_crude@1.0.0": "028c9431dd51ad617088d2123f27b69ffa5e960ad226a5e4d073d1073f41d081",
 }
 
 # Entity kinds referenced by component manifests that are not yet registered

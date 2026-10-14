@@ -102,13 +102,6 @@ def test_garbage_decimal_strings_rejected(v: str) -> None:
         dec(v)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: ScalarDecimal accepts non-canonical decimal strings ('1_000', ' 1.5 ', '1E+5', '+1', '1.') "
-        "that violate contracts/observation.schema.json value pattern ^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
-    ),
-)
 @pytest.mark.parametrize("v", ["1_000", " 1.5 ", "1E+5", "+1", "1."])
 def test_decimal_strings_are_canonical_plain_notation(v: str) -> None:
     with pytest.raises(ValidationError):

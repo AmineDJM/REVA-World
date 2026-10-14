@@ -1,8 +1,9 @@
 """Population recipes and weighted-representative materialisation (age × recorded sex).
 
-Only the age × recorded-sex joint distribution of Eurostat ``demo_pjan``-like
-tables is supported (single years and/or disjoint age bands; see ``recipe``). Records are weighted representatives of source cells, never real
-individuals, and carry no other attributes.
+Only the age × recorded-sex joint distribution of Eurostat ``demo_pjan``-like tables
+is supported (single years and/or disjoint age bands; see ``recipe``). Records are
+weighted representatives of source cells, never real individuals, and carry no
+other attributes.
 """
 
 from reva.population.calibration import CalibrationResult, rake

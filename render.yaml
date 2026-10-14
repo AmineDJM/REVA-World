@@ -12,6 +12,9 @@ envVarGroups:
         value: production
       - key: REVA_LOG_LEVEL
         value: INFO
+      # Compatibility update (2026-10-14): Settings requires TLS to PostgreSQL in production.
+      - key: REVA_DB_SSLMODE
+        value: require
       - key: REVA_OBJECT_BACKEND
         value: s3
       - key: REVA_S3_PREFIX
@@ -86,6 +89,10 @@ services:
     maxShutdownDelaySeconds: 60
     envVars:
       - fromGroup: reva-common
+      # Compatibility update (2026-10-14): per-process production checks; the
+      # pre-deploy overrides it to "bootstrap" for its own process.
+      - key: REVA_PROCESS_ROLE
+        value: api
       - key: REVA_MIGRATION_DATABASE_URL
         fromDatabase:
           name: reva-db
@@ -149,6 +156,8 @@ services:
     maxShutdownDelaySeconds: 120
     envVars:
       - fromGroup: reva-common
+      - key: REVA_PROCESS_ROLE
+        value: worker
       - key: REVA_DB_HOST
         fromDatabase:
           name: reva-db

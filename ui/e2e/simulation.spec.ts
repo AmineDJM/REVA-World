@@ -9,7 +9,6 @@ import { BASE_URL, FIXTURE_BASELINE_UUID, HAVE_SESSION, RELEASE, SKIP_REASON, ST
 
 test.skip(!HAVE_SESSION, SKIP_REASON);
 test.use({ baseURL: BASE_URL, storageState: STORAGE_STATE });
-test.describe.configure({ mode: 'serial' });
 
 const RUN_TIMEOUT = 180_000;
 
@@ -35,7 +34,14 @@ async function runAndWait(page: Page): Promise<string> {
   await expect(page).toHaveURL(/[?&]sim=[0-9a-f-]{36}/, { timeout: 30_000 });
   const simId = new URL(page.url()).searchParams.get('sim')!;
   const results = page.locator('section.panel').filter({ has: page.getByRole('heading', { name: 'Results', level: 2 }) });
-  await expect(results, 'simulation finished and results loaded').toBeVisible({ timeout: RUN_TIMEOUT });
+  const runStatus = page.locator('section.panel').filter({ has: page.getByRole('heading', { name: 'Run status', level: 2 }) });
+  const failure = runStatus.getByRole('alert');
+  // Fail fast on a degraded state (job error / status endpoint error) instead of timing out.
+  await expect(results.or(failure).first()).toBeVisible({ timeout: RUN_TIMEOUT });
+  if (await failure.count()) {
+    throw new Error(`simulation ${simId} did not load results: ${(await failure.first().innerText()).replace(/\s+/g, ' ')}`);
+  }
+  await expect(results, 'simulation finished and results loaded').toBeVisible();
   for (const body of posted) expect(body).not.toContain(FIXTURE_BASELINE_UUID);
   return simId;
 }

@@ -41,8 +41,8 @@ jobs:
         run: uv run ruff check .
       - name: Ruff format
         run: uv run ruff format --check .
-      - name: mypy (strict, kernel)
-        run: uv run mypy
+      - name: mypy (strict, kernel + ports)
+        run: uv run mypy -p reva.kernel -p reva.ports
       - name: Import boundaries (import-linter)
         run: uv run python scripts/verify_imports.py
       - name: Registry, JSON Schemas, scenario example, OpenAPI
@@ -86,6 +86,17 @@ jobs:
         run: cp .env.example .env
       - name: Tools for the backup/restore test
         run: sudo apt-get update -q && sudo apt-get install -y -q age
+      - name: Upgrade from the previous migration (0006 -> head) on a fresh database
+        env:
+          REVA_MIGRATION_DATABASE_URL: postgresql://reva_owner:local_reva_owner_only@127.0.0.1:5432/reva_upgrade
+          REVA_DB_NAME: reva_upgrade
+        run: |
+          docker exec "$REVA_PG_CONTAINER" psql -U reva_owner -d postgres -v ON_ERROR_STOP=1 -c "CREATE DATABASE reva_upgrade"
+          uv run alembic upgrade 0006_operations
+          test "$(uv run alembic current 2>/dev/null | awk 'NF{print $1}' | tail -1)" = 0006_operations
+          # Head is applied by the real pre-deploy entrypoint, as on Render (API service env).
+          REVA_PROCESS_ROLE=api uv run python scripts/bootstrap_runtime.py
+          docker exec "$REVA_PG_CONTAINER" psql -U reva_owner -d postgres -c "DROP DATABASE reva_upgrade WITH (FORCE)"
       - name: pytest (offline; live tests deselected by default)
         run: uv run pytest -q --junitxml=var/junit.xml -o junit_family=xunit2
       - name: Upload JUnit report
@@ -113,6 +124,83 @@ jobs:
       - run: npm --prefix ui run typecheck
       - run: npm --prefix ui test -- --run
       - run: npm --prefix ui run build
+      - name: npm audit (runtime dependencies, high and above)
+        run: npm --prefix ui audit --omit=dev --audit-level=high
+      - name: UI licence scan (production dependencies; strong copyleft fails)
+        working-directory: ui
+        run: >-
+          npx --yes license-checker@25.0.1 --production --summary --excludePrivatePackages
+          --failOn "GPL-2.0;GPL-2.0-only;GPL-2.0-or-later;GPL-3.0;GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0;AGPL-3.0-only;AGPL-3.0-or-later"
+
+  e2e:
+    name: UI end-to-end (Playwright, Chromium) against a disposable stack
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    needs: [static]
+    services:
+      postgres:
+        # postgis/postgis:17-3.5
+        image: postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
+        env:
+          POSTGRES_DB: reva
+          POSTGRES_USER: reva_owner
+          POSTGRES_PASSWORD: local_reva_owner_only
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U reva_owner -d reva"
+          --health-interval 5s --health-timeout 3s --health-retries 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: ui/package-lock.json
+      - run: uv sync --frozen --all-extras
+      - run: npm --prefix ui ci
+      - name: Chromium for the locked @playwright/test version
+        working-directory: ui
+        run: npx playwright install --with-deps chromium
+      - run: cp .env.example .env
+      - name: Playwright suite (scripts/e2e_stack.py builds the UI, seeds fixtures, serves API + worker, tears down)
+        run: uv run python scripts/e2e_stack.py --run
+
+  audit:
+    name: Python dependency vulnerabilities and licences
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+      - name: Export the locked runtime requirements (with hashes)
+        run: |
+          mkdir -p var
+          uv export --frozen --no-dev --no-emit-project --format requirements-txt -o var/requirements.txt
+      - name: pip-audit (runtime lock)
+        run: uvx pip-audit@2.10.1 --strict --disable-pip -r var/requirements.txt
+      - name: Python licence scan (runtime dependencies; strong copyleft fails)
+        run: >-
+          uv run --no-dev --with pip-licenses==5.5.5 pip-licenses --summary
+          --ignore-packages reva-world
+          --fail-on "GNU General Public License v2 (GPLv2);GNU General Public License v3 (GPLv3);GNU Affero General Public License v3;GPL-2.0-only;GPL-2.0-or-later;GPL-3.0-only;GPL-3.0-or-later;AGPL-3.0-only;AGPL-3.0-or-later"
 
   image:
     name: Docker image build + non-root smoke

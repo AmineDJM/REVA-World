@@ -123,13 +123,8 @@ def test_seed_only_changes_tied_allocations():
         sums = {k[0]: v for k, v in exact_weight_sums(t, ["cell_id"]).items()}
         assert set(sums.values()) == {Fraction(100)}
     # without ties the seed does not matter
-    base = make_cells(
-        f_counts=[1000 + 37 * i for i in range(12)], m_counts=[2003 + 41 * i for i in range(12)]
-    )
-    assert (
-        allocate(recipe_from(base, seed=0), 1000).cells
-        == allocate(recipe_from(base, seed=99), 1000).cells
-    )
+    base = make_cells(f_counts=[1000 + 37 * i for i in range(12)], m_counts=[2003 + 41 * i for i in range(12)])
+    assert allocate(recipe_from(base, seed=0), 1000).cells == allocate(recipe_from(base, seed=99), 1000).cells
 
 
 def test_too_few_records_raises_resolution_error_with_suggestion(recipe):

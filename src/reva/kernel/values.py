@@ -8,6 +8,7 @@ so JSON round-trips preserve precision.
 from __future__ import annotations
 
 import math
+import re
 from decimal import Decimal, InvalidOperation
 from enum import StrEnum
 from typing import Annotated, Any, Literal
@@ -16,6 +17,9 @@ from uuid import UUID
 from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator
 
 from reva.kernel.errors import MissingInput
+
+
+_DECIMAL_RE = re.compile(r"-?(0|[1-9][0-9]*)(\.[0-9]+)?")
 
 
 class MissingReason(StrEnum):
@@ -54,6 +58,10 @@ class ScalarDecimal(_Base):
     @field_validator("value")
     @classmethod
     def _decimal(cls, v: str) -> str:
+        # Plain decimal notation only (observation contract pattern): no exponent,
+        # underscores, whitespace, leading '+', or trailing '.'.
+        if not _DECIMAL_RE.fullmatch(v):
+            raise ValueError(f"not a plain decimal string: {v!r}")
         try:
             d = Decimal(v)
         except InvalidOperation as e:

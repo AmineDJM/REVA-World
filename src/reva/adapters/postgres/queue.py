@@ -294,6 +294,21 @@ RETURNING j.id, j.job_type, j.payload, j.fencing_token, j.attempts, j.max_attemp
 """
 
 
+CLAIM_ONE_SQL = """
+UPDATE ops.job j SET
+  status = 'running',
+  worker_id = :w,
+  lease_until = clock_timestamp() + make_interval(secs => :lease),
+  fencing_token = nextval('ops.fencing_seq'),
+  attempts = j.attempts + 1,
+  updated_at = clock_timestamp()
+WHERE j.id = (SELECT id FROM ops.job WHERE id = :j AND status = 'queued' AND available_at <= clock_timestamp()
+              FOR UPDATE SKIP LOCKED)
+RETURNING j.id, j.job_type, j.payload, j.fencing_token, j.attempts, j.max_attempts, j.lease_until,
+          j.checkpoint, j.created_at, clock_timestamp() AS claimed_at
+"""
+
+
 def requeue_expired(conn: Connection) -> list[tuple[UUID, str]]:
     rows = conn.execute(text(REQUEUE_EXPIRED_SQL)).all()
     return [(UUID(str(r.id)), r.status) for r in rows]
@@ -332,6 +347,23 @@ def claim(
         LEASE_EXPIRIES.inc(len(expired))
     if row is None:
         return None
+    return _claimed(row, worker_id, lease_seconds, len(expired))
+
+
+def claim_job(engine: Engine, job_id: UUID, worker_id: str, lease_seconds: int) -> ClaimedJob | None:
+    """Claim one *specific* queued job (same lease/fencing protocol as :func:`claim`).
+
+    Returns ``None`` when the job is not (or no longer) queued and available,
+    e.g. because a running worker already claimed it.
+    """
+    if lease_seconds < 1:
+        raise ValidationProblem("lease_seconds must be >= 1")
+    with engine.begin() as conn:
+        row = conn.execute(text(CLAIM_ONE_SQL), {"j": job_id, "w": worker_id, "lease": lease_seconds}).one_or_none()
+    return None if row is None else _claimed(row, worker_id, lease_seconds, 0)
+
+
+def _claimed(row: Any, worker_id: str, lease_seconds: int, expired: int) -> ClaimedJob:
     return ClaimedJob(
         id=UUID(str(row.id)),
         job_type=row.job_type,
@@ -346,7 +378,7 @@ def claim(
         checkpoint=dict(row.checkpoint) if row.checkpoint is not None else None,
         lease_seconds=lease_seconds,
         claimed_monotonic=time.monotonic(),
-        expired_requeued=len(expired),
+        expired_requeued=expired,
     )
 
 

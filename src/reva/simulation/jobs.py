@@ -29,7 +29,7 @@ from sqlalchemy.exc import DBAPIError
 
 from reva.kernel.errors import ConfigurationError, StaleLease, ValidationProblem
 from reva.kernel.ids import logical_hash
-from reva.operations.context import JobContext
+from reva.operations.context import JobCancelled, JobContext
 from reva.simulation import results as res
 from reva.simulation.engine import ENGINE_VERSION, RunPlan, model_manifest, plan_run
 
@@ -50,11 +50,6 @@ def load_scenario(conn: Connection, scenario_id: UUID) -> dict[str, Any]:
 def default_idempotency_key(spec_digest: str, fidelity: str, baseline_release_id: Any,
                             model_manifest_digest: str) -> str:
     return f"sim:{spec_digest}:{fidelity}:{baseline_release_id}:{model_manifest_digest}"
-
-
-def _shutdown_requested(ctx: JobContext) -> bool:
-    fn = getattr(ctx, "shutdown_requested", None)
-    return bool(fn()) if callable(fn) else False
 
 
 def _is_stale(e: DBAPIError) -> bool:
@@ -114,9 +109,7 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
 
     # ---- cancellation is honoured before anything becomes visible ----
     if ctx.is_cancelled():
-        if _shutdown_requested(ctx):
-            from reva.operations.jobs import JobCancelled
-
+        if ctx.shutdown_requested() and not ctx.cancel_requested():
             # Worker shutdown, not a user cancel: nothing is published and the worker
             # releases/requeues the job (it handles JobCancelled); never "cancelled".
             raise JobCancelled(f"worker shutting down; simulation job {ctx.job_id} released unpublished",

@@ -8,7 +8,8 @@ an admin password hash, which are external inputs.
 
 ## What the Blueprint creates
 
-`render.yaml` (the specification's Blueprint, unchanged; validated against Render's
+`render.yaml` (the specification's Blueprint plus one minimal reviewed compatibility
+update, below; validated against Render's
 official schema — `make blueprint`, or `render blueprints validate render.yaml`
 with the Render CLI):
 
@@ -24,6 +25,23 @@ Generated on `reva-api` (`generateValue: true`): `REVA_API_DB_PASSWORD`,
 references the worker/sim passwords from the API service. `REVA_MIGRATION_DATABASE_URL`
 is the database `connectionString` and exists only on `reva-api`; `start_api.py`
 removes it (and the worker/sim passwords) before Uvicorn starts.
+
+## Minimal reviewed compatibility update to render.yaml (2026-10-14)
+
+The supplied Blueprint is kept except for three added variables (9 lines; the
+provider schema did not change — both versions validate against Render's schema):
+
+| Added | Where | Reason |
+|---|---|---|
+| `REVA_DB_SSLMODE=require` | `reva-common` | `reva.settings` refuses production configuration unless PostgreSQL connections use TLS (`require`, `verify-ca` or `verify-full`). Without it neither service starts. Render's internal connections must accept TLS; confirm on the first deploy (startup fails closed with a redacted error otherwise). |
+| `REVA_PROCESS_ROLE=api` | `reva-api` | enables the per-process production checks (`Settings.required_for("api")`): API password, session secret ≥ 32 chars, Argon2id admin hash, public allowed hosts, and **no owner URL in the runtime process**. `start_api.py` validates the scrubbed child environment, from which the owner URL is removed; `bootstrap_runtime.py` overrides the role to `bootstrap` for the pre-deploy, the only process allowed to hold the owner URL. |
+| `REVA_PROCESS_ROLE=worker` | `reva-worker` | without it, production validation expects the API-only session secret, which the worker (correctly) does not have. |
+
+The start scripts set `REVA_PROCESS_ROLE` in the child environment themselves and
+refuse a conflicting value (e.g. the worker command started with the API's role),
+so the Blueprint values are a declaration that the scripts verify, not the only
+source. `scripts/validate_blueprint.py` now requires all three entries; the
+unmodified appendix Blueprint fails those checks with explicit messages.
 
 ## Exact provisioning inputs (external to the Blueprint)
 

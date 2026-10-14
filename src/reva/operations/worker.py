@@ -490,6 +490,19 @@ class Worker:
         except StaleLease:
             return done("lost_lease", None, ack)
 
+    def run_job(self, job: ClaimedJob) -> JobOutcome:
+        """Execute one already-claimed job in the foreground with background heartbeats
+        (used by ``reva demo`` when no worker is running). Honours user cancellation and
+        ``request_stop`` exactly like the main loop."""
+        self._start_heartbeats()
+        try:
+            return self.execute(job)
+        finally:
+            self._hb_stop.set()
+            if self._hb_thread is not None:
+                self._hb_thread.join(timeout=self.heartbeat_seconds + 5)
+            self.close()
+
     def _spawn(self, job: ClaimedJob) -> None:
         st = _Active(job)
 

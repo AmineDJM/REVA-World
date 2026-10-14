@@ -38,7 +38,14 @@ def register_artifact(
     privacy_class: str = "public_aggregate",
     logical_sha256: str | None = None,
 ) -> str:
-    """Record a verified object. Must run in the publication transaction."""
+    """Record a verified object. Must run in the publication transaction.
+
+    Takes the per-object advisory lock shared with orphan GC so a concurrent GC
+    can never delete bytes that this transaction is about to reference.
+    """
+    from reva.adapters.objects.common import lock_object_xact
+
+    lock_object_xact(conn, obj.sha256)
     conn.execute(
         text(
             """INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class,

@@ -29,7 +29,7 @@ pytestmark = pytest.mark.db
 
 SCHEMA = json.loads((Path(__file__).resolve().parents[2] / "contracts" / "observation.schema.json").read_text())
 CONNECTORS = ("worldbank.wdi.indicators", "un.comtrade.public_exact")
-SOURCES = ("worldbank.wdi", "un.comtrade")
+SOURCES = ("worldbank.wdi", "un.comtrade.public_preview")
 
 
 def strict_format_checker() -> FormatChecker:
@@ -91,7 +91,10 @@ def exported(db: Any, ingested: list[dict[str, Any]]) -> list[tuple[dict[str, An
 
 
 def test_both_sources_and_both_value_shapes_are_exercised(exported: list[tuple[dict, dict]]) -> None:
-    assert len(exported) > 200
+    from collections import Counter
+
+    counts = Counter((row["source_key"], rec["value"]["kind"]) for row, rec in exported)
+    assert len(exported) > 200, counts
     assert {row["source_key"] for row, _ in exported} == set(SOURCES)
     kinds = {rec["value"]["kind"] for _, rec in exported}
     assert kinds == {"decimal", "missing"}  # Comtrade DZA rows are typed Missing
@@ -154,7 +157,7 @@ def test_comtrade_dza_missing_is_exported_as_typed_missing(exported: list[tuple[
 
     dza = str(entity_id("DZA"))
     no_rows = [rec for row, rec in exported
-               if row["source_key"] == "un.comtrade" and row["source_flags"].get("provider_returned_no_rows")]
+               if row["source_key"] == "un.comtrade.public_preview" and row["source_flags"].get("provider_returned_no_rows")]
     assert any(rec["subject_id"] == dza for rec in no_rows), "captured DZA zero-row years must be exported"
     for rec in no_rows:  # an absent provider row is typed Missing, never a number or zero
         assert rec["value"] == {"kind": "missing", "reason": "unavailable"}
