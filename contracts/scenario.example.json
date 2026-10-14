@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.0.0",
+  "title": "Illustrative fixture: 25% crude border-price stress",
+  "baseline_release_id": "00000000-0000-4000-8000-000000000001",
+  "knowledge_cutoff": "2026-10-14T21:00:00Z",
+  "model_key": "economic.crude_exposure",
+  "model_version": "1.0.0",
+  "countries": [
+    "FRA",
+    "CHN",
+    "USA"
+  ],
+  "reference_year": 2023,
+  "horizon": {
+    "periods": 1,
+    "unit": "annual_accounting_period"
+  },
+  "intervention": {
+    "kind": "set_exogenous_border_price_multiplier",
+    "import_multiplier": 1.25,
+    "export_multiplier": 1.25,
+    "unit": "ratio"
+  },
+  "assumptions": {
+    "quantity_response": "fixed",
+    "elasticity_grid": [],
+    "no_general_equilibrium": true
+  },
+  "fidelity": "L1",
+  "missing_input_policy": "fail",
+  "outputs": [
+    "import_value_change_usd",
+    "export_value_change_usd",
+    "net_external_cost_change_usd",
+    "exposure_percent_baseline_gdp"
+  ],
+  "seed": 1729
+}
+

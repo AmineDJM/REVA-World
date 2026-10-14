@@ -1,0 +1,322 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "REVA normalised scalar observation v1",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "source_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "connector_version_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "acquisition_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "subject_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "concept_version_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "support_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "logical_key": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_revision_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "value": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "decimal"
+            },
+            "value": {
+              "type": "string",
+              "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"
+            },
+            "unit_ref": {
+              "type": "string"
+            },
+            "basis": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "kind",
+            "value",
+            "unit_ref",
+            "basis"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "kind": {
+              "const": "missing"
+            },
+            "reason": {
+              "enum": [
+                "not_collected",
+                "unavailable",
+                "not_applicable",
+                "suppressed",
+                "source_error",
+                "unmatched_semantics",
+                "outside_support"
+              ]
+            }
+          },
+          "required": [
+            "kind",
+            "reason"
+          ]
+        }
+      ]
+    },
+    "uncertainty": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "enum": [
+            "unquantified",
+            "exact_by_definition",
+            "quantified"
+          ]
+        },
+        "kind": {
+          "enum": [
+            "unknown",
+            "definition",
+            "distribution",
+            "bounds",
+            "confidence_interval",
+            "credible_interval",
+            "prediction_interval",
+            "sensitivity_range"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "artifact_sha256": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^[a-f0-9]{64}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "dependence_group": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "method_version": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "kind",
+        "description",
+        "artifact_sha256",
+        "dependence_group",
+        "method_version"
+      ],
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "unquantified"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "unknown"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "exact_by_definition"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "const": "definition"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "status": {
+                "const": "quantified"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "distribution",
+                  "bounds",
+                  "confidence_interval",
+                  "credible_interval",
+                  "prediction_interval",
+                  "sensitivity_range"
+                ]
+              },
+              "method_version": {
+                "type": "string",
+                "minLength": 1
+              },
+              "artifact_sha256": {
+                "type": "string",
+                "pattern": "^[a-f0-9]{64}$"
+              }
+            }
+          }
+        }
+      ]
+    },
+    "observed_at": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_published_at": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "source_available_at": {
+      "anyOf": [
+        {
+          "type": "string",
+          "format": "date-time"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "availability_basis": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "retrieved_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "source_flags": {
+      "type": "object"
+    },
+    "raw_selector": {
+      "type": "object"
+    },
+    "provenance_activity_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "raw_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    }
+  },
+  "required": [
+    "schema_version",
+    "source_id",
+    "connector_version_id",
+    "acquisition_id",
+    "subject_id",
+    "concept_version_id",
+    "support_id",
+    "logical_key",
+    "source_revision_id",
+    "value",
+    "uncertainty",
+    "observed_at",
+    "source_published_at",
+    "source_available_at",
+    "availability_basis",
+    "retrieved_at",
+    "source_flags",
+    "raw_selector",
+    "provenance_activity_id",
+    "raw_sha256"
+  ],
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "source_available_at": {
+            "type": "string"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "availability_basis": {
+            "type": "object",
+            "minProperties": 1
+          }
+        }
+      }
+    }
+  ]
+}
+

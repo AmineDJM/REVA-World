@@ -5,8 +5,9 @@ Model (statsmodels ``UnobservedComponents(endog=log(y), level="local level")``):
     z_t = mu_t + eps_t,          eps_t ~ N(0, sigma_eps^2)
     mu_{t+1} = mu_t + eta_t,     eta_t ~ N(0, sigma_eta^2)
 
-fitted by maximum likelihood with deterministic settings (L-BFGS, fixed
-``maxiter``, default deterministic start parameters, ``disp=False``) on the
+fitted by maximum likelihood with deterministic settings (fixed optimiser chain
+L-BFGS then Powell, fixed ``maxiter``, default deterministic start parameters,
+``disp=False``) on the
 training window only. Forecasts come from the Kalman-filter predictive
 distribution of the *next observation* (``get_forecast(h)``), so the interval is
 a state-space prediction interval for the future released statistic (not a
@@ -42,8 +43,10 @@ from reva.models.forecasting.base import (
 KEY = "forecast.local_level_log"
 VERSION = "1.0.0"
 METHOD_VERSION = f"{KEY}@{VERSION}"
-MAXITER = 200
-FIT_METHOD = "lbfgs"
+MAXITER = 500
+# Deterministic optimiser chain: L-BFGS first; if it stops abnormally (common when a
+# variance sits on the zero boundary) Powell is tried. Order is fixed and recorded.
+FIT_METHODS = ("lbfgs", "powell")
 ASSUMPTIONS = (
     "Gaussian local level (random walk plus noise) on natural-log values",
     "MLE plug-in parameters; parameter uncertainty not propagated",
@@ -59,6 +62,7 @@ class FittedLocalLevel:
     model_version: str
     origin_year: int
     results: Any  # statsmodels UnobservedComponentsResultsWrapper (fitted on train only)
+    fit_method: str
 
     def predict(self, horizons: Sequence[int], level: float = 0.8) -> list[Forecast]:
         lvl = check_level(level)
@@ -119,22 +123,24 @@ class LocalLevelLog:
         from statsmodels.tsa.statespace.structural import UnobservedComponents
 
         z = np.log(np.asarray(s.values, dtype=float))
-        try:
-            with warnings.catch_warnings():
-                warnings.simplefilter("ignore")
-                model = UnobservedComponents(endog=z, level="local level")
-                res = model.fit(disp=False, maxiter=MAXITER, method=FIT_METHOD)
-        except Exception as exc:  # statsmodels/numpy linear-algebra failures
-            return IneligibleReport(
-                self.key, self.version, f"fit_failed: {type(exc).__name__}: {exc}", s.n
-            )
-        retvals = getattr(res, "mle_retvals", None) or {}
-        if not retvals.get("converged", False):
-            return IneligibleReport(
-                self.key, self.version, "fit_failed: optimizer did not converge", s.n
-            )
-        if not np.all(np.isfinite(np.asarray(res.params, dtype=float))):
-            return IneligibleReport(
-                self.key, self.version, "fit_failed: non-finite parameters", s.n
-            )
-        return FittedLocalLevel(self.key, self.version, s.years[-1], res)
+        failures: list[str] = []
+        for method in FIT_METHODS:
+            try:
+                with warnings.catch_warnings():
+                    warnings.simplefilter("ignore")
+                    model = UnobservedComponents(endog=z, level="local level")
+                    res = model.fit(disp=False, maxiter=MAXITER, method=method)
+            except Exception as exc:  # statsmodels/numpy linear-algebra failures
+                failures.append(f"{method}: {type(exc).__name__}: {exc}")
+                continue
+            retvals = getattr(res, "mle_retvals", None) or {}
+            if not retvals.get("converged", False):
+                failures.append(f"{method}: optimizer did not converge")
+                continue
+            if not np.all(np.isfinite(np.asarray(res.params, dtype=float))):
+                failures.append(f"{method}: non-finite parameters")
+                continue
+            return FittedLocalLevel(self.key, self.version, s.years[-1], res, method)
+        return IneligibleReport(
+            self.key, self.version, "fit_failed: " + "; ".join(failures), s.n
+        )
