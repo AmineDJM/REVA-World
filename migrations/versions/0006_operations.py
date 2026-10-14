@@ -158,6 +158,13 @@ CREATE TABLE ops.connector_health (
   status text NOT NULL CHECK (status IN ('healthy','degraded','quarantined','unknown')),
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+-- Liveness for the "worker missing > 5 min" alert.
+CREATE TABLE ops.worker_presence (
+  worker_id text PRIMARY KEY,
+  started_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+  last_seen timestamptz NOT NULL DEFAULT clock_timestamp(),
+  details jsonb NOT NULL DEFAULT '{}'::jsonb
+);
 CREATE TABLE ops.api_token (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   token_sha256 text NOT NULL UNIQUE,

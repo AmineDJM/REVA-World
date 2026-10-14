@@ -10,7 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import logging
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 from uuid import UUID
@@ -219,6 +219,7 @@ def publish_acquisition(
     *,
     actor: str = "worker:ingest",
     fault_after_object_write: bool = False,
+    fence: Callable[[Connection], None] | None = None,
 ) -> PublishSummary:
     quarantined = any(r.blocking for r in reports)
     obj = write_raw_object(store, raw, quarantined)  # 1-2: bytes first, verified
@@ -226,6 +227,8 @@ def publish_acquisition(
         raise RuntimeError("injected fault after object upload, before commit")
     summary = PublishSummary(None, obj.sha256, obj.namespace)
     with engine.begin() as conn:  # 4: one transaction
+        if fence is not None:
+            fence(conn)  # verify job owner/fencing token/lease in the publication transaction
         reg = connector_registration(conn, spec)
         # Serialise acquisitions of the same request; compare with the latest one so a
         # crash-retry of identical bytes is a duplicate, while a legitimate return to
@@ -349,10 +352,12 @@ def publish_acquisition(
                 conn.execute(
                     text(
                         """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
-                           VALUES (:k, :s, '{"kind":"none","value":"0"}'::jsonb, 'upstream_changed')
-                           ON CONFLICT (node_key) DO UPDATE SET updated_at = clock_timestamp()"""
+                           VALUES (:k, :s, '{"kind":"none","value":"0"}'::jsonb, :r)
+                           ON CONFLICT (node_key) DO UPDATE SET updated_at = clock_timestamp(),
+                             reason = CASE WHEN ops.dirty_node.reason = EXCLUDED.reason THEN EXCLUDED.reason
+                                           ELSE 'upstream_changed:mixed' END"""
                     ),
-                    {"k": f"belief:{concept_id}", "s": seq},
+                    {"k": f"belief:{concept_id}", "s": seq, "r": f"upstream_changed:{raw.origin}"},
                 )
     log.info(
         "published acquisition %s: %d inserted, %d unchanged",

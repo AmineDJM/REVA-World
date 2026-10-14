@@ -75,6 +75,7 @@ def publish_release(
     environment: str,
     actor: str = "worker:belief",
     concepts: list[str] | None = None,
+    fence: Any = None,
 ) -> ReleaseResult:
     assert_publishable(origin, environment)
     reg = load_registry()
@@ -105,6 +106,8 @@ def publish_release(
     pq_obj = store.put_bytes(parquet_bytes, "belief", "application/vnd.apache.parquet")  # objects first
 
     with engine.begin() as conn:
+        if fence is not None:
+            fence(conn)  # stale lease holders cannot publish
         act = repo.simple_activity(
             "belief.publication", "belief", actor,
             {"method": f"{METHOD_KEY}@{METHOD_VERSION}", "cutoff": cutoff.isoformat(), "origin": origin.value,
@@ -182,6 +185,18 @@ def publish_release(
         ).scalar_one()
         repo.emit_outbox(conn, "belief.release_published",
                          {"release_id": str(rid), "sequence": seq, "cutoff": cutoff.isoformat()})
-        conn.execute(text("DELETE FROM ops.dirty_node WHERE node_key LIKE 'belief:%' AND since_sequence <= "
-                          "(SELECT COALESCE(max(id),0) FROM ops.outbox)"))
+        # Clear only markers caused by this origin's changes; a mixed marker is narrowed
+        # to the other origin so its pending publication is not lost.
+        other = "test_fixture" if origin.value == "live" else "live"
+        conn.execute(
+            text("DELETE FROM ops.dirty_node WHERE node_key LIKE 'belief:%' AND since_sequence <= "
+                 "(SELECT COALESCE(max(id),0) FROM ops.outbox) AND (reason = :mine OR reason NOT LIKE 'upstream_changed%'"
+                 " OR reason = 'upstream_changed')"),
+            {"mine": f"upstream_changed:{origin.value}"},
+        )
+        conn.execute(
+            text("UPDATE ops.dirty_node SET reason = :other WHERE node_key LIKE 'belief:%' "
+                 "AND reason = 'upstream_changed:mixed'"),
+            {"other": f"upstream_changed:{other}"},
+        )
     return ReleaseResult(UUID(str(rid)), ctx, int(seq), len(selections), manifest_sha, cutoff)

@@ -167,7 +167,23 @@ class PolicyPromotionGate:
         concept_key = f"{target['concept_id']}@{target['version']}"
         if any(not s.startswith(concept_key + ":") for s in manifest["eligibility_scope"]):
             problems.append("eligibility scope names concepts outside the approved mapping")
-        kinds = {r.evaluator_version.split(":", 1)[0] for r in reports if r.outcome == "pass"}
+        manifest_sha = (change.get("manifest_ref") or {}).get("sha256")
+        kinds = set()
+        for r in reports:
+            if r.outcome != "pass":
+                continue
+            kind = r.evaluator_version.split(":", 1)[0]
+            try:
+                ev = self.io.get_json(r.evidence_manifest)
+            except Exception:  # noqa: BLE001 - unverifiable evidence does not count
+                problems.append(f"{kind} report evidence is unreadable")
+                continue
+            covers = (ev.get("manifest") == manifest_sha if kind == "connector-validator"
+                      else ev.get("proposal_id") == str(proposal.proposal_id) if kind == "sandbox" else False)
+            if covers:
+                kinds.add(kind)
+            elif kind in ("connector-validator", "sandbox"):
+                problems.append(f"{kind} report does not cover this proposal/manifest")
         for needed in ("connector-validator", "sandbox"):
             if needed not in kinds:
                 problems.append(f"missing passing independent {needed} report")

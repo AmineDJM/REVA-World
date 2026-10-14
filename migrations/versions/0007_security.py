@@ -61,7 +61,7 @@ def _grants() -> str:
     s.append(
         "GRANT SELECT ON ops.job, ops.schedule, ops.publication, ops.connector_health, ops.proposal, "
         "ops.proposal_review, ops.gate_result, ops.api_token, ops.budget_ledger, ops.dirty_node, "
-        "ops.connector_cursor TO reva_api;"
+        "ops.connector_cursor, ops.worker_presence TO reva_api;"
     )
     s.append("GRANT INSERT ON ops.audit TO reva_api;")
     s.append(
@@ -77,7 +77,7 @@ def _grants() -> str:
         s.append(f"GRANT INSERT ON ALL TABLES IN SCHEMA {sch} TO reva_worker;")
     s.append(
         "GRANT UPDATE ON ops.job, ops.schedule, ops.dirty_node, ops.outbox, ops.connector_cursor, "
-        "ops.gc_candidate, ops.budget_ledger TO reva_worker;"
+        "ops.gc_candidate, ops.budget_ledger, ops.worker_presence TO reva_worker;"
     )
     s.append("GRANT DELETE ON ops.dirty_node, ops.gc_candidate TO reva_worker;")
     s.append("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ops TO reva_worker;")

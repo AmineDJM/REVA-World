@@ -253,8 +253,21 @@ class Worker:
             self._hb_thread = threading.Thread(target=self._heartbeat_loop, name="reva-heartbeat", daemon=True)
             self._hb_thread.start()
 
+    def _presence(self) -> None:
+        try:
+            with self.engine.begin() as conn:
+                conn.execute(
+                    text("INSERT INTO ops.worker_presence(worker_id) VALUES (:w) ON CONFLICT (worker_id) "
+                         "DO UPDATE SET last_seen = clock_timestamp()"),
+                    {"w": self.worker_id},
+                )
+        except Exception as e:  # presence is advisory; never kill the worker over it
+            log.warning("worker presence update failed: %s", type(e).__name__)
+
     def _heartbeat_loop(self) -> None:
+        self._presence()
         while not self._hb_stop.wait(self.heartbeat_seconds):
+            self._presence()
             with self._lock:
                 states = [s for s in self._active.values() if not s.lost]
             for st in states:

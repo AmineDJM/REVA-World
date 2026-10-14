@@ -391,6 +391,10 @@ def check_support_against_profile(profile: SemanticProfile, support: Support) ->
                            severity="incompatible",
                            message=f"support universe {support.population.universe} contradicts concept "
                                    f"{profile.population_universe}"))
+    if support.spatial.scheme != profile.spatial_support:
+        out.append(Finding(aspect="support.spatial", code="support_profile_spatial_mismatch", severity="incompatible",
+                           message=f"support spatial scheme {support.spatial.scheme} contradicts concept "
+                                   f"{profile.spatial_support}"))
     spec = parse_temporal_support(profile.temporal_support)
     t = support.temporal
     if spec.kind == "point":

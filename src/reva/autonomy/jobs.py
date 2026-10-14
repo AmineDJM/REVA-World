@@ -255,6 +255,7 @@ def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore
         act = repo.simple_activity("autonomy.mapping_assessment", "review", gate.evaluator,
                                    {"mapping": mm.get("mapping_key"), "relation": mapping.relation,
                                     "gate_result": str(decision.decision_id)})
+        io_.register(conn, mapping.mapping_manifest, "mapping-proposal/1")
         repo.record_activity(conn, act, outputs=[mapping.mapping_manifest.sha256])
         if reg_mapping:
             record_mapping_and_eligibility(conn, reg_mapping, act.id, policy_version=policy.version)

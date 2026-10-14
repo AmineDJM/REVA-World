@@ -152,7 +152,7 @@ def save_cursor(engine: Engine, name: str, cursor: Cursor) -> None:
         )
 
 
-def record_health(engine: Engine, spec_name: str, spec_version: str, report: RunReport) -> None:
+def record_health(engine: Engine, spec_name: str, spec_version: str, report: RunReport, origin: str = "live") -> None:
     ok = sum(1 for o in report.outcomes if o.status in ("published", "unchanged"))
     total = max(1, len(report.outcomes))
     quarantined = sum(1 for o in report.outcomes if o.status == "quarantined")
@@ -173,6 +173,7 @@ def record_health(engine: Engine, spec_name: str, spec_version: str, report: Run
                 "cv": cv,
                 "m": json.dumps(
                     {
+                        "origin": origin,
                         "request_success_ratio": ok / total,
                         "items": total,
                         "quarantined": quarantined,
@@ -195,6 +196,7 @@ async def run_connector(
     budget: FetchBudget | None = None,
     persist_cursor: bool = True,
     post_publish: Any = None,
+    fence: Any = None,
 ) -> RunReport:
     spec = connector.describe()
     budget = budget or FetchBudget()
@@ -231,7 +233,7 @@ async def run_connector(
             if raw.response_metadata.get("status") == 304:
                 report.outcomes.append(FetchOutcome(item_key=item.key, status="unchanged", detail="304"))
                 continue
-            summary = publish_acquisition(engine, store, spec, raw, batches, reports)
+            summary = publish_acquisition(engine, store, spec, raw, batches, reports, fence=fence)
             if post_publish is not None and summary.namespace == "raw" and not summary.duplicate_acquisition:
                 post_publish(engine, store, raw, batches, summary)
             report.inserted += summary.inserted
@@ -249,7 +251,7 @@ async def run_connector(
     if persist_cursor and new_cursor.state.get("complete"):
         save_cursor(engine, spec.name, new_cursor)
         report.cursor_advanced = True
-    record_health(engine, spec.name, spec.version, report)
+    record_health(engine, spec.name, spec.version, report, origin=getattr(http, "origin", "live"))
     return report
 
 

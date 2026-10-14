@@ -183,7 +183,8 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     async def _run() -> Any:
         try:
             return await run_connector(connector, http, ctx.store, ctx.worker_engine,
-                                       persist_cursor=(mode == "live"), post_publish=post_publish_for(spec.template))
+                                       persist_cursor=(mode == "live"), post_publish=post_publish_for(spec.template),
+                                       fence=ctx.assert_lease)
         finally:
             await http.aclose()
 
@@ -261,7 +262,7 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
             if ctx.is_cancelled():  # also re-verifies the lease right before publishing
                 raise JobCancelled("cancelled before publication")
             rr = publish_release(eng, ctx.store, cutoff=cutoff, origin=origin, environment=env,
-                                 actor="worker:publish_beliefs")
+                                 actor="worker:publish_beliefs", fence=ctx.assert_lease)
         finally:
             lock_conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": PUBLISH_JOB_LOCK})
             lock_conn.commit()

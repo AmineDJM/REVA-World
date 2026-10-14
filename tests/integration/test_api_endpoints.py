@@ -206,7 +206,7 @@ def test_beliefs_are_release_pinned_and_as_of(env: Env) -> None:
         assert r.status_code == 200, r.text
         return r.json()["data"][0]["value"]["value"], r.json()
 
-    v1, b1 = pop({"release_id": str(env.r1.release_id)})
+    v1, _b1 = pop({"release_id": str(env.r1.release_id)})
     assert v1 == env.old_pop  # pinned: the later revision never changes release 1
     v2, b2 = pop({})
     assert v2 == env.new_pop and b2["baseline_release"]["id"] == str(env.r2.release_id)

@@ -99,7 +99,7 @@ def manifest_sha256(manifest: Mapping[str, Any]) -> str:
     return hashlib.sha256(canonical_bytes(manifest)).hexdigest()
 
 
-def _decode(obj: Any) -> Any:
+def decode_canonical(obj: Any) -> Any:
     """Inverse of the canonical encoding for floats/decimals/datetimes."""
     if isinstance(obj, dict):
         if len(obj) == 1:
@@ -110,9 +110,9 @@ def _decode(obj: Any) -> Any:
                 return Decimal(v)
             if k == "$datetime":
                 return datetime.fromisoformat(v)
-        return {k: _decode(v) for k, v in obj.items()}
+        return {k: decode_canonical(v) for k, v in obj.items()}
     if isinstance(obj, list):
-        return [_decode(v) for v in obj]
+        return [decode_canonical(v) for v in obj]
     return obj
 
 
@@ -121,7 +121,7 @@ def load_frozen_manifest(store: ArtifactStore, sha: str) -> dict[str, Any]:
     data = store.get("evaluation", sha)
     if hashlib.sha256(data).hexdigest() != sha:
         raise IntegrityFailure("frozen forecast manifest does not match its hash", sha256=sha)
-    manifest = _decode(json.loads(data))
+    manifest = decode_canonical(json.loads(data))
     if manifest_sha256(manifest) != sha:
         raise IntegrityFailure("frozen forecast manifest is not canonical", sha256=sha)
     return manifest
@@ -471,6 +471,7 @@ __all__ = [
     "IssueResult",
     "Outcome",
     "ScoreResult",
+    "decode_canonical",
     "freeze_issue",
     "issue_forecasts",
     "load_frozen_manifest",
