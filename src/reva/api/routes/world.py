@@ -1,8 +1,13 @@
-"""Entities, relations (bounded hyperedges), events and display locations."""
+"""Entities, relations (bounded hyperedges), events and display locations.
+
+Relations are read through ``reva.world.queries`` (read-only, bounded, supersession- and
+retraction-aware); the HTTP schema (``RelationGraph``: truncated flag, ordered role-bound
+participants) is unchanged.
+"""
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
@@ -18,13 +23,18 @@ from reva.api.deps import (
     origin_warnings,
     page,
     page_limit,
+    period_label,
     read_conn,
     release_ref,
     require_aware,
     support_summary,
 )
 from reva.api.errors import NotFound
-from reva.belief.snapshots import release_as_of
+from reva.belief.snapshots import release_as_of, release_by_id
+from reva.kernel.errors import ValidationProblem
+from reva.world import queries as wq
+from reva.world.graph import Hyperedge
+from reva.world.queries import GraphContext
 
 router = APIRouter(prefix="/v1", tags=["world"], dependencies=[Depends(require_scope("read"))])
 
@@ -172,109 +182,76 @@ def get_entity(entity_ref: str, request: Request) -> s.EntityDetailResponse:
 # Relations
 # ---------------------------------------------------------------------------
 
-REL_FILTER = """
-SELECT r.id FROM world.relation r
-JOIN world.support sp ON sp.id = r.support_id
-LEFT JOIN evidence.observation o ON o.id = r.evidence_observation_id
-LEFT JOIN evidence.acquisition a ON a.id = o.acquisition_id
-LEFT JOIN belief.release rel ON rel.id = r.release_id
-WHERE (CAST(:layer AS text) IS NULL OR r.layer = :layer)
-  AND (CAST(:as_of AS timestamptz) IS NULL OR r.recorded_at <= :as_of)
-  AND (CAST(:year AS integer) IS NULL OR EXTRACT(YEAR FROM lower(sp.valid_range)) = :year)
-  AND (CAST(:origin AS text) IS NULL OR COALESCE(a.origin, rel.origin) = :origin)
-  AND (CAST(:frontier AS uuid[]) IS NULL OR EXISTS (
-        SELECT 1 FROM world.relation_participant p WHERE p.relation_id = r.id AND p.entity_id = ANY(:frontier)))
-  AND NOT (r.id = ANY(CAST(:seen AS uuid[])))
-  -- only the latest revision of the underlying evidence visible at as_of
-  AND (r.evidence_observation_id IS NULL OR NOT EXISTS (
-        SELECT 1 FROM evidence.observation o2 WHERE o2.supersedes_id = r.evidence_observation_id
-          AND (CAST(:as_of AS timestamptz) IS NULL OR o2.recorded_at <= :as_of)))
-ORDER BY r.id
-LIMIT :lim
-"""
+def _year_interval(period: int | None) -> tuple[datetime, datetime] | None:
+    if period is None:
+        return None
+    return datetime(period, 1, 1, tzinfo=UTC), datetime(period + 1, 1, 1, tzinfo=UTC)
 
-REL_DETAIL = """
-SELECT r.id, pc.concept_id AS predicate, r.layer, r.component, r.existence_uncertainty, r.strength,
-       r.evidence_observation_id, r.release_id, r.recorded_at, sp.id AS support_id, sp.temporal_extent,
-       sp.spatial_spec, sp.population_spec, sp.aggregation, o.value, oc.concept_id AS obs_concept,
-       COALESCE(a.origin, rel.origin) AS origin
-FROM world.relation r
-JOIN ontology.concept_version pc ON pc.id = r.predicate_id
-JOIN world.support sp ON sp.id = r.support_id
-LEFT JOIN evidence.observation o ON o.id = r.evidence_observation_id
-LEFT JOIN ontology.concept_version oc ON oc.id = o.concept_version_id
-LEFT JOIN evidence.acquisition a ON a.id = o.acquisition_id
-LEFT JOIN belief.release rel ON rel.id = r.release_id
-WHERE r.id = ANY(:ids)
-ORDER BY sp.temporal_extent->>'start', r.layer, r.id
-"""
 
-PARTICIPANTS = """
-SELECT p.relation_id, p.ordinal, rc.concept_id AS role, p.entity_id, e.label AS entity_label,
-       ec.concept_id AS entity_kind, p.direction
-FROM world.relation_participant p
-JOIN ontology.concept_version rc ON rc.id = p.role_concept_id
-JOIN world.entity e ON e.id = p.entity_id
-JOIN ontology.concept_version ec ON ec.id = e.kind_concept_id
-WHERE p.relation_id = ANY(:ids)
-ORDER BY p.relation_id, p.ordinal
-"""
+def _relation(e: Hyperedge) -> s.Relation:
+    fm = e.flow_magnitude or {}
+    is_evidence = e.provenance.kind == "evidence"
+    value = fm.get("value") if is_evidence and isinstance(fm.get("value"), dict) and fm.get("value") else None
+    sup = e.support
+    temporal = sup.get("temporal_extent") or {}
+    return s.Relation(
+        id=e.id, predicate=e.predicate, layer=e.layer,
+        support=s.SupportSummary(id=sup["id"], temporal=temporal, spatial=sup.get("spatial_spec") or {},
+                                 population=sup.get("population_spec") or {}, aggregation=sup.get("aggregation"),
+                                 period_label=period_label(temporal)),
+        component=e.component, existence_uncertainty=e.existence_uncertainty, strength=e.tie_strength,
+        value=value, concept_id=fm.get("concept_id") if is_evidence else None,
+        evidence_observation_id=e.provenance.observation_id, release_id=e.provenance.release_id,
+        origin=e.provenance.origin, recorded_at=e.recorded_at,  # type: ignore[arg-type]
+        participants=[s.Participant(ordinal=p.ordinal, role=p.role, entity_id=p.entity_id,
+                                    entity_label=p.entity_label, entity_kind=p.entity_kind, direction=p.direction)
+                      for p in e.participants],
+    )
 
 
 def relation_graph(
     conn: Connection, *, entity_id: UUID | None, layer: str | None, period: int | None, as_of: datetime | None,
-    origin: str | None, depth: int, max_edges: int,
-) -> tuple[s.RelationGraph, list[str]]:
-    seen: list[UUID] = []
-    truncated = False
-    frontier: list[UUID] | None = [entity_id] if entity_id else None
-    rounds = depth if entity_id else 1
-    for _ in range(rounds):
-        remaining = max_edges - len(seen)
-        if remaining <= 0:
-            break
-        ids = list(conn.execute(text(REL_FILTER), {
-            "layer": layer, "as_of": as_of, "year": period, "origin": origin, "frontier": frontier,
-            "seen": seen, "lim": remaining + 1}).scalars())
-        if len(ids) > remaining:
-            truncated = True
-            ids = ids[:remaining]
-        seen.extend(ids)
-        if truncated or not ids or frontier is None:
-            break
-        nxt = set(conn.execute(text(
-            "SELECT DISTINCT entity_id FROM world.relation_participant WHERE relation_id = ANY(:ids)"),
-            {"ids": ids}).scalars())
-        frontier = sorted(nxt - set(frontier), key=str)
-        if not frontier:
-            break
-    details = [dict(r) for r in conn.execute(text(REL_DETAIL), {"ids": seen}).mappings()] if seen else []
-    parts: dict[Any, list[s.Participant]] = {}
+    origin: str | None, depth: int, max_edges: int, release_id: UUID | None = None,
+) -> tuple[s.RelationGraph, list[str], list[str]]:
+    """Visible hyperedges via ``reva.world.queries`` (supersession- and retraction-aware, bounded).
+
+    Context: a pinned published release (``release_id``) or evidence as known at ``as_of`` (optionally
+    one origin). ``depth=1`` is the entity's neighbourhood; ``depth=2`` a bounded path search from it;
+    without an entity a bounded subgraph. Returns (graph, origins, library notes).
+    """
+    if release_id is not None:
+        if as_of is not None or origin is not None:
+            raise ValidationProblem("release_id pins the context; as_of/origin do not apply to it")
+        ctx = GraphContext.release(release_id)
+    else:
+        ctx = GraphContext.evidence(as_of, origin)
+    layers = [layer] if layer else None
+    during = _year_interval(period)
+    notes: list[str] = []
+    if entity_id is None:
+        es = wq.extract_subgraph(conn, context=ctx, layers=layers, valid_during=during, max_edges=max_edges)
+        edges, truncated, notes = list(es.edges), es.truncated, list(es.notes)
+    elif depth == 1:
+        nb = wq.neighbourhood(conn, entity_id, context=ctx, layers=layers, valid_during=during, max_edges=max_edges)
+        edges, truncated, notes = list(nb.edges), nb.truncated, list(nb.notes)
+    else:
+        pr = wq.path_search(conn, entity_id, None, context=ctx, layers=layers, valid_during=during,
+                            max_depth=depth, max_edges=max_edges)
+        edges, truncated = list(pr.edges), pr.truncated
+        notes = list(pr.notes) + [f"bound reached: {r}" for r in pr.truncation_reasons]
+    rels = [_relation(e) for e in edges]
     nodes: dict[Any, s.GraphNode] = {}
-    if seen:
-        for p in conn.execute(text(PARTICIPANTS), {"ids": seen}).mappings():
-            parts.setdefault(p["relation_id"], []).append(s.Participant(
-                ordinal=p["ordinal"], role=p["role"], entity_id=p["entity_id"], entity_label=p["entity_label"],
-                entity_kind=p["entity_kind"], direction=p["direction"]))
-            nodes[p["entity_id"]] = s.GraphNode(id=p["entity_id"], label=p["entity_label"], kind=p["entity_kind"])
-    rels = [
-        s.Relation(
-            id=d["id"], predicate=d["predicate"], layer=d["layer"], support=support_summary(d),
-            component=d["component"], existence_uncertainty=d["existence_uncertainty"], strength=d["strength"],
-            value=d["value"], concept_id=d["obs_concept"], evidence_observation_id=d["evidence_observation_id"],
-            release_id=d["release_id"], origin=d["origin"], recorded_at=d["recorded_at"],
-            participants=parts.get(d["id"], []),
-        )
-        for d in details
-    ]
+    for r in rels:
+        for p in r.participants:
+            nodes[p.entity_id] = s.GraphNode(id=p.entity_id, label=p.entity_label, kind=p.entity_kind)
     graph = s.RelationGraph(relations=rels, nodes=sorted(nodes.values(), key=lambda n: (n.label, str(n.id))),
                             truncated=truncated, max_edges=max_edges, depth=depth,
-                            matched_lower_bound=len(seen) + (1 if truncated else 0))
-    return graph, [d["origin"] for d in details]
+                            matched_lower_bound=len(rels) + (1 if truncated else 0))
+    return graph, [r.origin for r in rels if r.origin], notes
 
 
 def relations_response(conn: Connection, t: Timer, **kw: Any) -> s.RelationListResponse:
-    graph, origins = relation_graph(conn, **kw)
+    graph, origins, notes = relation_graph(conn, **kw)
     origin = origin_of(origins)
     warnings = origin_warnings(origin)
     if graph.truncated:
@@ -282,10 +259,17 @@ def relations_response(conn: Connection, t: Timer, **kw: Any) -> s.RelationListR
             code="truncated",
             message=f"Result bounded at max_edges={graph.max_edges}, depth={graph.depth}; more relations match. "
                     "Narrow the query (layer, period, entity) to see them."))
+    warnings += [s.ApiWarning(code="graph_note", message=n[:500]) for n in notes]
+    rel = None
+    if kw.get("release_id") is not None:
+        rel = release_by_id(conn, kw["release_id"])
     return s.RelationListResponse(
-        data=graph, context_mode="evidence", origin=origin, modality="reported_observation",  # type: ignore[arg-type]
-        knowledge_cutoff=kw.get("as_of"),
-        assumptions=["Relations are reported flows; existence is as reported by the source"],
+        data=graph, context_id=rel["context_id"] if rel else None,
+        context_mode="belief" if rel else "evidence", origin=origin,  # type: ignore[arg-type]
+        modality="selected_estimate" if rel else "reported_observation",
+        baseline_release=release_ref(rel), knowledge_cutoff=rel["knowledge_cutoff"] if rel else kw.get("as_of"),
+        assumptions=["Relations are reported flows; existence is as reported by the source",
+                     "Superseded and retracted observations are excluded as known at the as_of time"],
         warnings=warnings, cost=t.cost(len(graph.relations), truncated=graph.truncated),
     )
 
@@ -296,8 +280,11 @@ def list_relations(
     entity_id: str | None = Query(None, max_length=64, description="Entity UUID or ISO3 key"),
     layer: str | None = Query(None, max_length=200),
     period: int | None = Query(None, ge=1900, le=2100, description="Calendar year of the valid support"),
-    as_of: datetime | None = Query(None, description="Only relations recorded at/before this instant"),
+    as_of: datetime | None = Query(None, description="Evidence as known at this instant (recorded, not "
+                                   "superseded, not retracted at/before it)"),
     origin: str | None = Query(None, pattern="^(live|test_fixture)$"),
+    release_id: UUID | None = Query(None, description="Relations pinned to this published belief release instead "
+                                    "of evidence (excludes as_of/origin)"),
     depth: int = Query(1, ge=1, le=MAX_DEPTH),
     max_edges: int = Query(MAX_EDGES, ge=1, le=MAX_EDGES),
 ) -> s.RelationListResponse:
@@ -307,7 +294,7 @@ def list_relations(
     with read_conn(request) as conn:
         eid = resolve_entity(conn, entity_id) if entity_id else None
         return relations_response(conn, t, entity_id=eid, layer=layer, period=period, as_of=as_of, origin=origin,
-                                  depth=depth, max_edges=max_edges)
+                                  depth=depth, max_edges=max_edges, release_id=release_id)
 
 
 # ---------------------------------------------------------------------------

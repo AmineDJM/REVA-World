@@ -690,3 +690,42 @@ def test_discovery_candidates_from_jobs_and_proposals(env: Env) -> None:
     lim = env.client.get("/v1/discovery/candidates", params={"limit": 1}).json()
     assert len(lim["data"]) == 1 and any(w["code"] == "truncated" for w in lim["warnings"])
     assert env.client.get("/v1/discovery/candidates", params={"limit": 0}).status_code == 422
+
+
+def test_relations_exclude_retracted_observations(env: Env) -> None:
+    """Runs last in this module: it retracts one observation behind a FRA 2023 trade relation."""
+    params = {"entity_id": "FRA", "period": 2023}
+    before = env.client.get("/v1/relations", params=params).json()
+    rels = [r for r in before["data"]["relations"] if r["evidence_observation_id"]]
+    assert rels and before["data"]["truncated"] is False
+    target = rels[0]
+    t_before = datetime.now(UTC)
+    with env.owner.begin() as c:
+        act = c.execute(text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"),
+                        {"o": target["evidence_observation_id"]}).scalar_one()
+        c.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                       "VALUES (:o, 'test: provider withdrew the record', :a)"),
+                  {"o": target["evidence_observation_id"], "a": act})
+    after = env.client.get("/v1/relations", params=params).json()
+    ids_after = {r["id"] for r in after["data"]["relations"]}
+    assert target["id"] not in ids_after and len(ids_after) == len(before["data"]["relations"]) - 1
+    # As known before the retraction, the relation is still visible (bitemporal as_of).
+    then = env.client.get("/v1/relations", params={**params, "as_of": iso(t_before)}).json()
+    assert target["id"] in {r["id"] for r in then["data"]["relations"]}
+    # Same through the typed QuerySpec and at depth 2.
+    with env.owner.connect() as c:
+        fra = c.execute(text("SELECT entity_id FROM world.alias WHERE provider='iso3166_alpha3' "
+                             "AND external_key='FRA'")).scalar_one()
+    q = env.client.post("/v1/query", json={"kind": "relations", "entity_id": str(fra), "period": 2023})
+    assert q.status_code == 200 and target["id"] not in {r["id"] for r in q.json()["data"]["relations"]}
+    d2 = env.client.get("/v1/relations", params={**params, "depth": 2, "max_edges": 500}).json()
+    assert target["id"] not in {r["id"] for r in d2["data"]["relations"]}
+    # Roles stay ordered and role-bound; the release context rejects evidence-only filters.
+    assert [p["ordinal"] for p in after["data"]["relations"][0]["participants"]] == [0, 1, 2] or \
+        after["data"]["relations"][0]["participants"] == sorted(after["data"]["relations"][0]["participants"],
+                                                                key=lambda p: p["ordinal"])
+    problem(env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id),
+                                                    "as_of": iso(t_before)}), 422, "validation_error")
+    pinned = env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id), "max_edges": 5})
+    assert pinned.status_code == 200 and pinned.json()["context_mode"] == "belief"
+    assert pinned.json()["baseline_release"]["id"] == str(env.r1.release_id)

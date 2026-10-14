@@ -479,6 +479,9 @@ def run_query(request: Request, spec: s.QuerySpec = Body(..., discriminator="kin
                                     subjects=list(spec.subject_ids) or None, concepts=list(spec.concepts) or None,
                                     year=None, cursor=None, limit=spec.limit)
         if isinstance(spec, s.RelationsQuery):
+            if spec.as_of is not None and spec.as_of.tzinfo is None:
+                raise ValidationProblem("as_of must include a timezone offset")
             return relations_response(conn, t, entity_id=spec.entity_id, layer=spec.layer, period=spec.period,
-                                      as_of=spec.as_of, origin=None, depth=spec.depth, max_edges=spec.max_edges)
+                                      as_of=spec.as_of, origin=None, depth=spec.depth, max_edges=spec.max_edges,
+                                      release_id=spec.release_id)
     raise CapabilityGap("unsupported query kind")

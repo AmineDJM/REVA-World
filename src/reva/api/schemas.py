@@ -1179,6 +1179,7 @@ class RelationsQuery(ApiModel):
     layer: str | None = Field(None, max_length=200)
     period: int | None = Field(None, ge=1900, le=2100)
     as_of: datetime | None = None
+    release_id: UUID | None = Field(None, description="Pin to a published belief release (excludes as_of)")
     depth: int = Field(1, ge=1, le=2)
     max_edges: int = Field(500, ge=1, le=500)
 
