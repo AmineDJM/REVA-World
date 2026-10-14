@@ -8,12 +8,14 @@ import type {
   BeliefRelease,
   ConnectorOut,
   Coverage,
+  DiscoveryCandidate,
   DiscoveryRequest,
   EntityDetail,
   EntitySummary,
   Envelope,
   EventRecord,
   EvidenceDetail,
+  EvaluationRequest,
   EvidenceItem,
   FeatureCollection,
   Gap,
@@ -91,6 +93,11 @@ export const getModels = (q?: Query, s?: AbortSignal) => get<Envelope<ModelVersi
 export const getModelEvaluations = (id: string, q?: Query, s?: AbortSignal) =>
   get<Envelope<ModelEvaluation[]>>(`/models/${enc(id)}/evaluations`, q, s);
 
+/** Start a model evaluation (revised-data retrospective tournament) as a job (202). */
+export async function startEvaluation(body: EvaluationRequest = {}, idempotencyKey: string | true = true) {
+  return (await request<JobAccepted>('POST', `${V1}/evaluations`, { body, idempotencyKey })).body;
+}
+
 // ------------------------------------------------------------------ simulation (work-starting POSTs carry Idempotency-Key)
 
 export async function createScenario(spec: ScenarioSpec, idempotencyKey: string | true = true) {
@@ -119,6 +126,9 @@ export const getGaps = (q?: Query, s?: AbortSignal) => get<Envelope<Gap[]>>('/ga
 export async function startDiscovery(body: DiscoveryRequest, idempotencyKey: string | true = true) {
   return (await request<JobAccepted>('POST', `${V1}/discovery`, { body, idempotencyKey })).body;
 }
+
+export const getDiscoveryCandidates = (q?: Query, s?: AbortSignal) =>
+  get<Envelope<DiscoveryCandidate[]>>('/discovery/candidates', q, s);
 
 export const getProposals = (q?: Query, s?: AbortSignal) => get<Envelope<Proposal[]>>('/proposals', q, s);
 

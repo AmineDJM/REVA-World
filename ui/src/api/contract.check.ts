@@ -3,10 +3,11 @@
  * contracts/openapi.json (npm run gen:types) must be assignable to the
  * hand-written type the UI consumes. `npm run typecheck` fails on drift.
  */
-import type { components } from './openapi.gen';
+import type { components, operations } from './openapi.gen';
 import type * as T from './types';
 
 type S = components['schemas'];
+type OP<K extends keyof operations> = operations[K];
 type Assert<X extends true> = X;
 type Fits<Generated, Hand> = [Generated] extends [Hand] ? true : false;
 
@@ -29,6 +30,9 @@ export type ContractChecks = [
   Assert<Fits<S['FeatureCollection'], T.FeatureCollection>>,
   Assert<Fits<S['ModelVersionOut'], T.ModelVersionOut>>,
   Assert<Fits<S['ModelEvaluation'], T.ModelEvaluation>>,
+  Assert<Fits<S['DiscoveryCandidate'], T.DiscoveryCandidate>>,
+  Assert<Fits<S['AcquisitionOriginCounts'], T.AcquisitionOriginCounts>>,
+  Assert<Fits<S['ProvenanceLink'], T.ProvenanceLink>>,
   Assert<Fits<S['ScenarioCreated'], T.ScenarioCreated>>,
   Assert<Fits<S['SimulationStatus'], T.SimulationStatus>>,
   Assert<Fits<S['ConnectorOut'], T.ConnectorOut>>,
@@ -41,10 +45,17 @@ export type ContractChecks = [
   Assert<Fits<S['BeliefListResponse'], T.Envelope<T.BeliefEstimate[]>>>,
   Assert<Fits<S['SimulationStatusResponse'], T.Envelope<T.SimulationStatus>>>,
   Assert<Fits<S['CoverageResponse'], T.Envelope<T.Coverage>>>,
+  Assert<Fits<S['ModelEvaluationListResponse'], T.Envelope<T.ModelEvaluation[]>>>,
+  Assert<Fits<S['ConnectorListResponse'], T.Envelope<T.ConnectorOut[]>>>,
+  Assert<Fits<S['DiscoveryCandidateListResponse'], T.Envelope<T.DiscoveryCandidate[]>>>,
+  Assert<Fits<S['ProvenanceResponse'], T.Envelope<T.ProvenanceGraph>>>,
+  // The provenance path parameter accepts every kind the API emits in provenance_links.
+  Assert<Fits<T.ProvenanceKind, NonNullable<OP<'get_provenance_v1_provenance__kind___ident__get'>['parameters']['path']>['kind']>>,
   // Request bodies the UI sends must be accepted by the API.
   Assert<Fits<T.SimulationRequest, S['SimulationRequest']>>,
   Assert<Fits<T.ReplayRequest, S['ReplayRequest']>>,
   Assert<Fits<T.DiscoveryRequest, S['DiscoveryRequest']>>,
+  Assert<Fits<T.EvaluationRequest, S['EvaluationRequest']>>,
   Assert<Fits<T.ReviewRequest, S['ReviewRequest']>>,
   Assert<Fits<T.LoginRequest, S['LoginRequest']>>,
 ];

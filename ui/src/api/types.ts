@@ -130,10 +130,18 @@ export interface ModelVersionRef {
   approval_status?: string | null;
 }
 
-export type ProvenanceKind = 'estimate' | 'observation' | 'acquisition' | 'artifact' | 'sim_result' | 'release';
+export type ProvenanceKind =
+  | 'estimate'
+  | 'observation'
+  | 'acquisition'
+  | 'artifact'
+  | 'sim_result'
+  | 'release'
+  | 'run'
+  | 'scenario';
 
 export interface ProvenanceLink {
-  kind: ProvenanceKind | 'run' | 'scenario';
+  kind: ProvenanceKind;
   id: string;
   href: string;
 }
@@ -620,13 +628,28 @@ export type ReplayMode = 'operational_as_known' | 'available_then_reconstruction
 export interface ModelEvaluation {
   id: string;
   model_version_id: string;
+  model_key: string;
+  model_version: string;
   context_id: string;
-  replay_mode: ReplayMode | string;
+  origin: RecordOrigin;
+  replay_mode: ReplayMode | 'analytic_verification' | string;
+  /** Server label, e.g. 'revised-data retrospective — not a real-time backtest'. */
+  replay_mode_label: string;
   task_scope: Record<string, unknown>;
   metrics: Record<string, unknown>;
   evaluation_manifest_sha256: string;
   recorded_at: string;
   promotions?: Record<string, unknown>[];
+  is_naive_baseline: boolean;
+  /** naive_baseline_comparator: the naive baseline's row from the same manifest/period, added for comparison. */
+  included_as: 'requested_model' | 'naive_baseline_comparator';
+}
+
+/** POST /v1/evaluations (202 job of type 'evaluation'; Idempotency-Key required). */
+export interface EvaluationRequest {
+  concepts?: string[] | null;
+  horizons?: number[] | null;
+  seed?: number | null;
 }
 
 // ---------------------------------------------------------------- scenarios / simulations
@@ -717,6 +740,29 @@ export interface DiscoveryRequest {
   max_candidates: number;
 }
 
+/** GET /v1/discovery/candidates: unreviewed search results and connector proposals (read-only). */
+export interface DiscoveryCandidate {
+  candidate_kind: 'search_result' | 'connector_proposal';
+  job_id?: string | null;
+  proposal_id?: string | null;
+  origin?: RecordOrigin | null;
+  provider?: string | null;
+  dataset_code?: string | null;
+  requirement_id?: string | null;
+  rank?: number | null;
+  score?: number | null;
+  jaccard?: number | null;
+  inspected?: boolean | null;
+  inspection_error?: string | null;
+  selected: boolean;
+  discovery_status?: string | null;
+  proposal_type?: string | null;
+  permission_tier?: number | null;
+  gate_outcome?: string | null;
+  reviews: string[];
+  recorded_at: string;
+}
+
 // ---------------------------------------------------------------- sources / connectors / ontology
 
 export interface ConnectorHealth {
@@ -725,7 +771,20 @@ export interface ConnectorHealth {
   recorded_at: string;
 }
 
-export interface ConnectorOut {
+export interface AcquisitionOriginCounts {
+  live: number;
+  test_fixture: number;
+}
+
+/** Origin fields derived from acquisitions (never assumed live). */
+export interface AcquisitionOrigin {
+  /** live, test_fixture, mixed (both) or none (never acquired). Show a TEST FIXTURE label unless 'live'/'none'. */
+  origin: OriginLabel;
+  latest_acquisition_origin?: RecordOrigin | null;
+  acquisitions_by_origin: AcquisitionOriginCounts;
+}
+
+export interface ConnectorOut extends AcquisitionOrigin {
   id: string;
   name: string;
   version: string;
@@ -741,7 +800,7 @@ export interface ConnectorOut {
   last_retrieved_at?: string | null;
 }
 
-export interface SourceOut {
+export interface SourceOut extends AcquisitionOrigin {
   id: string;
   source_key: string;
   title: string;
