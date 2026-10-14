@@ -1,0 +1,27 @@
+concepts:
+  - concept_id: geography.display_boundary
+    version: "1.0.0"
+    kind: component
+    labels: {en: "Display boundary (Natural Earth 1:110m)"}
+    definition: >-
+      Low-resolution display geometry for visual exploration only. Not an authoritative
+      statistical or legal boundary; it does not resolve disputed sovereignty.
+    owner: reva-maintainers
+  - concept_id: unit.usd
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "US dollar (amount)"}
+    definition: Amount in US dollars. Price basis and reference year are carried by the value basis.
+    owner: reva-maintainers
+  - concept_id: unit.persons
+    version: "1.0.0"
+    kind: unit
+    labels: {en: Persons}
+    definition: Count of persons.
+    owner: reva-maintainers
+  - concept_id: unit.kg
+    version: "1.0.0"
+    kind: unit
+    labels: {en: Kilogram}
+    definition: Mass in kilograms.
+    owner: reva-maintainers

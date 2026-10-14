@@ -1,0 +1,578 @@
+[
+  {
+    "request_fingerprint": "5bf510d6de9460cd10f5f5b374c6a4e239aeba73c1b495db404a5865e0af32b0",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=12&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "5bf510d6de9460cd.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:41.909103+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "51ec413c780f3e7a70c73f702fe38e093e7b42c682d1b6282c125721be25109e",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=12&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "51ec413c780f3e7a.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:03.650673+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "5025b61478923517e014e4aa63443be526cec3c9f1ed2c58e9d9d9f8e655691e",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=156&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "5025b61478923517.json",
+    "sha256": "645b7f05e3093fff47a139ce5f04a885975776741d96082b99824643a75f85db",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:15.073599+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "b93b868983f02cb8a8c5e10894dc59457a5a5386e03b18690185bd5015c76d86",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=156&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "b93b868983f02cb8.json",
+    "sha256": "7d79a9da95f81ef7d50892a170d8e457c87b4ff4d18dec15ddfa65121d158fb9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:36.503123+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "7efe724e41e8fe85fd0141b47f91520b6b698ae0f2fee852e724b22b289b7041",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "7efe724e41e8fe85.json",
+    "sha256": "e72ad4a227e6992e4e471d18b708a116ddd1341142aeafb3371aa1de7e5cf500",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:39.365491+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "7bef0609ea19b38ab034d6ce0c20e7c3cdae9e2bfcdf2b909150e441c2144c3e",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=251&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "7bef0609ea19b38a.json",
+    "sha256": "27a860a18f1e2fe4801be37382cece5cc6cd14c5e5646cfcd6b5088f9173843e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:57.237423+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "6bc7802c164a39abe1c070c95fc63042f621172e30fee6b59d9f9e36dfc49161",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=842&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "6bc7802c164a39ab.json",
+    "sha256": "5efffd8780d3371d06651728c83df62e0dd159d8f3ec91e34cd845a49fddf279",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:58.279079+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "db2f1adde821c9046fdf9e144def17b3af465ffae4462a27a126df26fb1442a5",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2020&reporterCode=842&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "db2f1adde821c904.json",
+    "sha256": "7769686c0c27a9504f04bba065e15539b2cabd7e03e72404fe1a3e5c1a5ff392",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:20.459357+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "f49faa514d5de8fb1f043fea6820752b38f7ccf0473c3474dbd2ec5825af8977",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=12&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "f49faa514d5de8fb.json",
+    "sha256": "74fb9e013d2918f975bfabd9d7de6ec6c766547ddfcbaed48bfea66fe1eb2e96",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:45.562581+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "db8c249f4537917e293f6ae24edc69d7a9b0d95e5a347ebc1309a752fb58f57f",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=12&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "db8c249f4537917e.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:07.271415+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "2edbc45b93fcd9aef7088146ea5d143462fb1caab25d4b471731541092eebc44",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=156&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "2edbc45b93fcd9ae.json",
+    "sha256": "cbd9e3edf9ef0eff51c782ba21db8942056ff3d3989aa0eb0cf034191e1db937",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:18.668310+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "9cc57a77438fd36840ba40b1f099cc94a891c675bb46d8fa2fd58c4387753ab4",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=156&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "9cc57a77438fd368.json",
+    "sha256": "f90f8c004be0afc91c13d600a6f3bdb822293cf398c393e547f822a180aaa28f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:40.125133+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "7ad80b8fa33f539c2d4f89db79307090908585a8bd24320575b5a7e9ac78cd92",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "7ad80b8fa33f539c.json",
+    "sha256": "70afdd6c9b3941638f02ccd52fc62d4be9e16195178110afa3f162adeccdac6b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:43.370590+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "b07ad4d32e46b97ad7aec1818cb2c458fe6e3ed4bf94812206006f3a5e3721bf",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=251&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "b07ad4d32e46b97a.json",
+    "sha256": "fb9e6fdda445825b4f6202ca1e3b91a5e0a84bd0c0dd00877d412fecce7bd7c0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:00.887907+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "8e505cbcc9a7984156c24595bc2dfa36d4b5b18f650950ace1b952bb9fa1b5be",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=842&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "8e505cbcc9a79841.json",
+    "sha256": "dafd62ebdac5f2c8b950d812d0f3e186d26b6fc8cb83e96a33f591b602d64a51",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:02.013755+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "799c3206d77e047aa035bf7cbe06408ac746c7778d9fc425551e0d82c8251474",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2021&reporterCode=842&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "799c3206d77e047a.json",
+    "sha256": "a69f8a33ee99ddfae6eb54ba9cf3985fd3e549072d9a8e4b2bb3288ff3a4b749",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:23.785639+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "2fecce30a5d727bb1418ad3b6fd9c76acb70c86f588b665c54365922c69cc396",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=12&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "2fecce30a5d727bb.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:49.159742+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "9c02afd3c996713f1bc58be9fe01aa8122e59f005e3e13a802a437fe4e8ad151",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=12&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "9c02afd3c996713f.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:10.903124+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "688fd8399eb546bd1689a04248574c1ea7c62f8f2a76a43695c5ed39fa562446",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=156&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "688fd8399eb546bd.json",
+    "sha256": "ad02db2ff08fddffe39f8eb4e6fcba77e8c0740d868dccc4c4bd9ae6a7e5ad4e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:22.041131+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "3353c6cdc5d040a31da64efeef2c65f19d09478f0fcd4c648e5dedb656365018",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=156&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "3353c6cdc5d040a3.json",
+    "sha256": "cb88061fedd01cd144153ffdaedcfe30b1ce10e480e220956860b7ac38ce3571",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:44.346477+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "f0c50e1f8b5a6059c6d356cea348be7869239c2ecbef536ba0806c6febec5bb0",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "f0c50e1f8b5a6059.json",
+    "sha256": "614edc48ee155ed6e0d643d8eb7d0eb1ddc02828568682d6c36cbbf75c764c49",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:44.797493+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "069e9b6dba0ceb13a819dca188ce4df6cbbdb5c1348fe2209389039716978f73",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=251&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "069e9b6dba0ceb13.json",
+    "sha256": "f7340c29855746b7cc2b7496ebe1c2d9f5b15a192fc12eb1370a1659ce84f0cf",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:04.512951+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "84c6cff539ee2f9176d0ed658709391d095a9fbf754797e944736a916b067b2d",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=842&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "84c6cff539ee2f91.json",
+    "sha256": "2cbb4004b86ff175f9bd9a04d270742cf4e5f0aad3e157622f10055f4c99fe19",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:05.735064+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "665b518b1fb98852137c54ee66e2ab73f1b4958a89d6a8aeab940f51b76c8670",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022&reporterCode=842&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "665b518b1fb98852.json",
+    "sha256": "724d5ecee94f14bc1df27ece9d4b66778606d7692a56da699e950b7f73e30bf2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:28.062241+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "99276d90d150362b0c52d2336ae674f981f61b4a2d05cbb3e32f61e4ca51365f",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=12&cmdCode=2709&flowCode=M&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "99276d90d150362b.json",
+    "sha256": "d5b6bec2ca12c01d3de898153073fea5196e40f417bf4617352282e5478ee1bd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:00.042474+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "8aea2d4bdb30436941ea51b156b369bb4fa4f454addf906a6ac67a5c32c6abdd",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=12&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "8aea2d4bdb304369.json",
+    "sha256": "d5b6bec2ca12c01d3de898153073fea5196e40f417bf4617352282e5478ee1bd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:52.787334+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "15cf6ec193e529cd526419d0e1d8c8177345605c73c82747ea75752f0e98cef1",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=12&cmdCode=2709&flowCode=X&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "15cf6ec193e529cd.json",
+    "sha256": "d5b6bec2ca12c01d3de898153073fea5196e40f417bf4617352282e5478ee1bd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:21.809102+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "2d17bb9dadc7fb0657d17c1e272396991a868696c7ad549f534894d64cde5f22",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=12&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "2d17bb9dadc7fb06.json",
+    "sha256": "521c3442c33af89e73ffef06a0e06631bf52944cd98740a2e527c04641939e08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:14.550889+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "09d5960105195e92d3d643a7c94811099be9ba0f06a3c792120869407ab5733e",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=156&cmdCode=2709&flowCode=M&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "09d5960105195e92.json",
+    "sha256": "be132a5c5df6d00b02a862987c0ec8682819aa0ecf99a93ddec49200f165b2e7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:32.937476+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "849e3a0e90a177cc15e64c96da25e5f3d7d15122dd874fec8133b2335b4ea114",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=156&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "849e3a0e90a177cc.json",
+    "sha256": "449365be43bdf8229a9c6457e3b9d39ffdda41681a1acd1ae66096efae0c198b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:25.640212+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "4d8233cbf8d20cacf916e2204f95ad82fb142db7033b491d214a688391d5f850",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=156&cmdCode=2709&flowCode=X&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "4d8233cbf8d20cac.json",
+    "sha256": "e6f4311bc7b6b8a3e511a026c67763869c99559b52504db1b16cf207fa4b4274",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:54.699799+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "38fd9e1c706037dc2de97186adc46a3f61a48a7801bff4e1a37c6082000d57b0",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=156&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "38fd9e1c706037dc.json",
+    "sha256": "79ea2917dbd7dea94be89d5f39e3e54f7924f6b3b1f99459b4c679fe0ce37913",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:47.390235+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "5ee0f1698a8808136608bb4c172ec48c6bb5d3c9e48bda9f5b7602ccfb5a227f",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "5ee0f1698a880813.json",
+    "sha256": "45e179273bea41ef2556887b14423294a1961e3ab9204b69990b4a1e24b98ea4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:53.748333+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "b4a4ba0308215cff64de1f1794d00b6fd2e11601ab14c1c3d7b92777e925730f",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "b4a4ba0308215cff.json",
+    "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:46.402542+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "abbfae64c90ea53b6cd34c851437533495d14bfd21e2f78a773200510484bf78",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=X&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "abbfae64c90ea53b.json",
+    "sha256": "6ee424dae5f7ef92cca75ffae5cef8b3220450bcaa4702cc0eaf86b43300f63f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:13.271482+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "2bf640ebfe2cdda91c8fd67b43913956523e4e2b8b102ee4454fd51b6bc801eb",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "2bf640ebfe2cdda9.json",
+    "sha256": "c438cae284f3aea3b7c8f58f940f5c398450404d456b0344e343b9ee2a2462eb",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:08.171088+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "48a2b9dbcaf2c1bbbcb5455c99a1a9e13d925d13022d8d93fa8597fac6cc64b6",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=842&cmdCode=2709&flowCode=M&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "48a2b9dbcaf2c1bb.json",
+    "sha256": "98b874d07dddbc4bdaced9c31f357cc4b4a1c00a23ea58456ce92fa55b36bd7c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:16.584434+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "c13cdbcf86e9ffd7b00aeb698d2e5bfb6a46126e885df0630a3aa2f9f17d0e2c",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=842&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "c13cdbcf86e9ffd7.json",
+    "sha256": "eff4c12ce3f6e0463bf75c2d8aeea63d3c85810940ce700cfa3135160ac21731",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:09.270842+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "c12ec644372914e3678226e99819cbb66ca1d44dd805a3f0dd10c2537ecbd1cc",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=842&cmdCode=2709&flowCode=X&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "c12ec644372914e3.json",
+    "sha256": "e3e3fe212e0a38dbda8f5aa4a897355647b897081d94f8e8a2fbba171161f842",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:38.457577+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "d95abdd2384097a49457cbff37ae6defa7a10c81faebda7ab684eddb4ea621c3",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=842&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "d95abdd2384097a4.json",
+    "sha256": "55fc72fb4d7ac49303ffad3a630a5a70d3492d1c7969a4917e8b820b692ece57",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:31.053873+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "97cee59d2969eca03e7bd009f948a347b76bb0ee9d31b8b9d66259173558d335",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=12&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "97cee59d2969eca0.json",
+    "sha256": "71b83ee56ff37fa0dba048d4c7356cf7387f880b455c8499cc067c6a689fedfa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:56.442635+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "fad349a2b8a6968d0f6e8ee3445ab8c3c8206ac4cf56033c17ebe04c550fcce0",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=12&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "fad349a2b8a6968d.json",
+    "sha256": "0edb3104b29473c1929936bd72ed95e4530fafe18522f10385b5ed1aa58563b8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:40:18.248912+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "464817723e9d8818fae81d2b1a882e283e449f96c33395963430778ee87199a9",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=156&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "464817723e9d8818.json",
+    "sha256": "485485794fdfbdc1d8b6c2a913515d24c3dc8a80530dc92a3eb4a44e2ed82512",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:29.254665+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "85a6c84157326239a2f38666e6db9dcc55885283d8e2848d53ac9dd13eeae70f",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=156&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "85a6c84157326239.json",
+    "sha256": "d650c533da0a52979cd1af84ed23733e06902bdb4c09371ea6887432ff88595f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:51.018495+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "c5800b2ef02669fe1b29efacfc82c4719a7fa8035eb57b15519e522856b793a9",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "c5800b2ef02669fe.json",
+    "sha256": "9b3e04177cb73aa60673f6599220a5b2f683967e44d0e71914b5fa343e37a1c1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:37:50.229714+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "7aa24bf830aee37939c5a277bef1653abf7d613d711807652b4ecd6dca01511d",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=251&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "7aa24bf830aee379.json",
+    "sha256": "22562f8a58aa8b14edc01d35a78c2472b731b8fb0ff5a96cf1d7a7775bc8780e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:38:11.786308+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "879993473f02683978bb5fc1166fb7758c30748fcd96fbce34a14382bbb5e4a7",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=842&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "879993473f026839.json",
+    "sha256": "3b5ecc1e231a41346aa0fa23b8cd76428b62c7852986449e22c40ab080cc5304",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:12.845785+00:00",
+    "licence": "UN Comtrade terms of use"
+  },
+  {
+    "request_fingerprint": "aa384ff315a9631a50f6f3c045b76989140fca2e8eb5072088eebbd8efaad859",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2024&reporterCode=842&cmdCode=2709&flowCode=X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "file": "aa384ff315a9631a.json",
+    "sha256": "644da3a4bfcfc053c4750eecb6b683ba3e597bfecbda9c1550c23332389363c6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-14T22:39:34.880477+00:00",
+    "licence": "UN Comtrade terms of use"
+  }
+]

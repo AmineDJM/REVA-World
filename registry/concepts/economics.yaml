@@ -1,0 +1,119 @@
+concepts:
+  - concept_id: economics.gdp.nominal_current_usd
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "GDP (current US$, WDI)"}
+    definition: >-
+      World Bank WDI NY.GDP.MKTP.CD. Indicator metadata (checked 2026-10-14): total income earned
+      through production of goods and services in an economic territory during an accounting
+      period; expressed in current prices (no adjustment for price changes) and in United States
+      dollars. Conversion from domestic currency follows the provider's methodology. Annual total.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: resident_producers_of_economy
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.usd
+      currency_basis: USD
+      price_basis: nominal_current
+      permitted_transformations: [identity]
+      missingness: [unavailable]
+  - concept_id: trade.hs2709.import_value.world_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) imports from World, border value"}
+    definition: >-
+      UN Comtrade annual goods imports of HS heading 2709 by the reporter from partner World
+      (partnerCode 0, partner2Code 0, customsCode C00, motCode 0), provider primaryValue in current
+      US dollars. Imports are typically CIF-valued; CIF and FOB fields are preserved separately.
+      Provider-derived aggregates (isReported=false / isAggregate=true) are flagged and are not
+      direct customs observations. A missing flow is missing, not zero.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.usd
+      currency_basis: USD
+      price_basis: nominal_current
+      valuation: primaryValue (provider-declared; imports usually CIF)
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected, suppressed]
+  - concept_id: trade.hs2709.export_value.world_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) exports to World, border value"}
+    definition: >-
+      UN Comtrade annual goods exports of HS heading 2709 by the reporter to partner World, provider
+      primaryValue in current US dollars (exports typically FOB). Same dimension checks and
+      missingness rules as imports.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.usd
+      currency_basis: USD
+      price_basis: nominal_current
+      valuation: primaryValue (provider-declared; exports usually FOB)
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected, suppressed]
+  - concept_id: trade.hs2709.import_value.bilateral
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) imports by partner, border value"}
+    definition: >-
+      Partner-specific breakdown of HS 2709 imports. A distinct support from the World total: the
+      two must never be added together.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_partner_pair
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.usd
+      currency_basis: USD
+      price_basis: nominal_current
+      valuation: primaryValue (provider-declared)
+      permitted_transformations: [identity]
+  - concept_id: trade.hs2709.export_value.bilateral
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) exports by partner, border value"}
+    definition: Partner-specific breakdown of HS 2709 exports; distinct support from the World total.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_partner_pair
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.usd
+      currency_basis: USD
+      price_basis: nominal_current
+      valuation: primaryValue (provider-declared)
+      permitted_transformations: [identity]
+  - concept_id: trade.hs2709.net_weight.world_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Crude petroleum (HS 2709) net weight, World partner"}
+    definition: >-
+      Provider netWgt in kilograms. Frequently null or unusable for aggregates. Never derived from
+      value; barrels are never inferred (mass↔volume requires density and convention).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.kg
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected]

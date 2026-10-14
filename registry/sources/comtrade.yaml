@@ -1,0 +1,13 @@
+source_key: un.comtrade.public_preview
+title: UN Comtrade public preview API (annual goods, HS)
+provider_url: https://comtradeapi.un.org/public/v1/preview/
+lineage_family: un_comtrade
+rights:
+  licence: UN Comtrade terms of use (public preview, non-commercial research use with attribution)
+  licence_url: https://comtrade.un.org/data/doc/terms
+  attribution: "United Nations Comtrade database"
+metadata:
+  api_docs: https://comtradeplus.un.org/ApiDocs
+  authentication: none (public preview; bounded exact keys only)
+  reporter_catalogue: https://comtradeapi.un.org/files/v1/app/reference/Reporters.json
+  cadence: monthly with rolling recent-year revision checks

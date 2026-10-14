@@ -1,0 +1,53 @@
+# Persistent REVA identities are distinct from provider codes. Each alias is a
+# reviewed, provider-scoped mapping. Note: UN M49 France (250) is NOT the
+# Comtrade reporter code for France (251, "France, Monaco").
+entities:
+  - key: FRA
+    kind: entity.country
+    label: France
+    aliases:
+      - {provider: iso3166_alpha3, key: FRA}
+      - {provider: worldbank, key: FRA}
+      - {provider: comtrade_reporter, key: "251", note: "Comtrade reporterNote: France, Monaco"}
+      - {provider: un_m49, key: "250"}
+      - {provider: naturalearth_adm0_a3, key: FRA, note: "NE ISO_A3 is -99 for France; ADM0_A3 reviewed"}
+      - {provider: eurostat_geo, key: FR}
+  - key: DZA
+    kind: entity.country
+    label: Algeria
+    aliases:
+      - {provider: iso3166_alpha3, key: DZA}
+      - {provider: worldbank, key: DZA}
+      - {provider: comtrade_reporter, key: "12"}
+      - {provider: un_m49, key: "12"}
+      - {provider: naturalearth_adm0_a3, key: DZA}
+  - key: CHN
+    kind: entity.country
+    label: China
+    aliases:
+      - {provider: iso3166_alpha3, key: CHN}
+      - {provider: worldbank, key: CHN}
+      - {provider: comtrade_reporter, key: "156"}
+      - {provider: un_m49, key: "156"}
+      - {provider: naturalearth_adm0_a3, key: CHN}
+  - key: USA
+    kind: entity.country
+    label: United States
+    aliases:
+      - {provider: iso3166_alpha3, key: USA}
+      - {provider: worldbank, key: USA}
+      - {provider: comtrade_reporter, key: "842", note: "Comtrade reporterNote: USA, Puerto Rico and US Virgin Islands"}
+      - {provider: un_m49, key: "840"}
+      - {provider: naturalearth_adm0_a3, key: USA}
+  - key: WORLD
+    kind: entity.world_aggregate
+    label: World (provider partner aggregate)
+    referent_mode: abstract
+    aliases:
+      - {provider: comtrade_partner, key: "0"}
+  - key: HS2709
+    kind: entity.product
+    label: "HS 2709: Petroleum oils and oils obtained from bituminous minerals, crude"
+    referent_mode: abstract
+    aliases:
+      - {provider: hs_heading, key: "2709"}

@@ -1,0 +1,20 @@
+# Local development only. API and worker run through uv on the host.
+# Image pinned to the digest tested on 2026-10-14.
+services:
+  db:
+    image: postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
+    environment:
+      POSTGRES_DB: reva
+      POSTGRES_USER: reva_owner
+      POSTGRES_PASSWORD: local_reva_owner_only
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - reva_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reva_owner -d reva"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+volumes:
+  reva_pgdata:

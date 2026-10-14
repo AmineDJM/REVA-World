@@ -1,0 +1,198 @@
+# REVA World proposed application Blueprint.
+# Checked against Render's live schema on 2026-10-14.
+# Requires the application, scripts and Dockerfile specified in the build prompt.
+# Provision a private S3-compatible bucket and scoped credentials separately.
+previews:
+  generation: "off"
+
+envVarGroups:
+  - name: reva-common
+    envVars:
+      - key: REVA_ENV
+        value: production
+      - key: REVA_LOG_LEVEL
+        value: INFO
+      - key: REVA_OBJECT_BACKEND
+        value: s3
+      - key: REVA_S3_PREFIX
+        value: reva/
+      - key: REVA_DB_POOL_SIZE
+        value: "2"
+      - key: REVA_DB_MAX_OVERFLOW
+        value: "0"
+      - key: REVA_DB_STATEMENT_TIMEOUT_MS
+        value: "10000"
+      - key: REVA_WORKER_CONCURRENCY
+        value: "1"
+      - key: REVA_JOB_LEASE_SECONDS
+        value: "120"
+      - key: REVA_JOB_HEARTBEAT_SECONDS
+        value: "30"
+      - key: REVA_JOB_MAX_ATTEMPTS
+        value: "5"
+      - key: REVA_SCHEDULER_TICK_SECONDS
+        value: "30"
+      - key: REVA_CPU_BUDGET_THREADS
+        value: "1"
+      - key: REVA_DUCKDB_MEMORY_LIMIT
+        value: 256MB
+      - key: REVA_HTTP_TIMEOUT_SECONDS
+        value: "30"
+      - key: REVA_HTTP_MAX_BYTES
+        value: "52428800"
+      - key: REVA_CACHE_MAX_BYTES
+        value: "536870912"
+      - key: REVA_LLM_ENABLED
+        value: "false"
+      - key: REVA_LLM_MONTHLY_BUDGET_USD
+        value: "0"
+      - key: REVA_AUTONOMY_MODE
+        value: template_only
+      - key: REVA_AUTONOMY_KILL_SWITCH
+        value: "false"
+      - key: OMP_NUM_THREADS
+        value: "1"
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"
+      - key: MKL_NUM_THREADS
+        value: "1"
+      - key: POLARS_MAX_THREADS
+        value: "1"
+
+databases:
+  - name: reva-db
+    databaseName: reva
+    user: reva_owner
+    plan: 0.1c-256mb
+    region: frankfurt
+    postgresMajorVersion: "17"
+    diskSizeGB: 5
+    storageAutoscalingEnabled: false
+    ipAllowList: []
+
+services:
+  - type: web
+    name: reva-api
+    runtime: docker
+    plan: 0.5c-512mb
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/start_api.py
+    preDeployCommand: python scripts/bootstrap_runtime.py
+    healthCheckPath: /health/ready
+    autoDeployTrigger: checksPass
+    numInstances: 1
+    maxShutdownDelaySeconds: 60
+    envVars:
+      - fromGroup: reva-common
+      - key: REVA_MIGRATION_DATABASE_URL
+        fromDatabase:
+          name: reva-db
+          property: connectionString
+      - key: REVA_DB_HOST
+        fromDatabase:
+          name: reva-db
+          property: host
+      - key: REVA_DB_PORT
+        fromDatabase:
+          name: reva-db
+          property: port
+      - key: REVA_DB_NAME
+        fromDatabase:
+          name: reva-db
+          property: database
+      - key: REVA_API_DB_PASSWORD
+        generateValue: true
+      - key: REVA_WORKER_DB_PASSWORD
+        generateValue: true
+      - key: REVA_SIM_DB_PASSWORD
+        generateValue: true
+      - key: REVA_SESSION_SECRET
+        generateValue: true
+      - key: REVA_ADMIN_PASSWORD_HASH
+        sync: false
+      - key: REVA_PUBLIC_BASE_URL
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: RENDER_EXTERNAL_URL
+      - key: REVA_ALLOWED_HOSTS
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
+      - key: REVA_S3_ENDPOINT_URL
+        sync: false
+      - key: REVA_S3_REGION
+        sync: false
+      - key: REVA_S3_BUCKET
+        sync: false
+      # API credentials must be read-only for approved prefixes.
+      - key: REVA_S3_ACCESS_KEY_ID
+        sync: false
+      - key: REVA_S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: REVA_HTTP_CONTACT_EMAIL
+        sync: false
+
+  - type: worker
+    name: reva-worker
+    runtime: docker
+    plan: 1c-2g
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/start_worker.py
+    autoDeployTrigger: checksPass
+    numInstances: 1
+    maxShutdownDelaySeconds: 120
+    envVars:
+      - fromGroup: reva-common
+      - key: REVA_DB_HOST
+        fromDatabase:
+          name: reva-db
+          property: host
+      - key: REVA_DB_PORT
+        fromDatabase:
+          name: reva-db
+          property: port
+      - key: REVA_DB_NAME
+        fromDatabase:
+          name: reva-db
+          property: database
+      - key: REVA_WORKER_DB_PASSWORD
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_WORKER_DB_PASSWORD
+      - key: REVA_SIM_DB_PASSWORD
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_SIM_DB_PASSWORD
+      - key: REVA_S3_ENDPOINT_URL
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_ENDPOINT_URL
+      - key: REVA_S3_REGION
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_REGION
+      - key: REVA_S3_BUCKET
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_BUCKET
+      # Distinct worker credentials: required prefixes only, no bucket-admin rights.
+      - key: REVA_S3_ACCESS_KEY_ID
+        sync: false
+      - key: REVA_S3_SECRET_ACCESS_KEY
+        sync: false
+      - key: REVA_HTTP_CONTACT_EMAIL
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_HTTP_CONTACT_EMAIL

@@ -1,0 +1,14 @@
+# The Eurostat January population is NOT the WDI midyear population. The
+# relation is recorded explicitly as incompatible for identity purposes.
+connector: {name: eurostat.demo_pjan.fr, version: "1.0.0"}
+mappings:
+  - mapping_key: eurostat.demo_pjan.to_wdi_midyear
+    source_ref: {provider: eurostat, dataset: demo_pjan, dimensions: {sex: T, age: TOTAL}}
+    target: {concept_id: demography.population.wdi_midyear_total, version: "1.0.0"}
+    mapping_kind: incompatible
+    version: "1.0.0"
+    applicability:
+      reason: >-
+        1 January point support vs midyear estimate; usually-resident (Eurostat) vs de facto
+        (WDI) universe. Not interchangeable; no transform approved.
+    eligibility: none

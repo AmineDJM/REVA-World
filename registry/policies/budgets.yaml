@@ -1,0 +1,15 @@
+policy_version: "budgets-1.0.0"
+daily:
+  http_requests_total: 2000
+  http_bytes_total: 524288000
+per_source_daily_requests:
+  worldbank.wdi: 200
+  un.comtrade.public_preview: 100
+  crossref.works: 50
+  eurostat.dissemination: 100
+  naturalearth.admin0_110m: 10
+llm:
+  monthly_usd: 0
+autonomy:
+  max_open_proposals: 20
+  recursive_agents: false

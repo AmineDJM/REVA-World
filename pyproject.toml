@@ -1,0 +1,113 @@
+[project]
+name = "reva-world"
+version = "0.1.0"
+description = "REVA World: a versioned federation of evidence, estimates and models (private MVP)."
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+license = { text = "Proprietary" }
+dependencies = [
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  "pydantic>=2.8",
+  "pydantic-settings>=2.4",
+  "sqlalchemy>=2.0.30",
+  "psycopg[binary]>=3.2",
+  "alembic>=1.13",
+  "httpx>=0.27",
+  "boto3>=1.34",
+  "numpy>=2.0",
+  "scipy>=1.13",
+  "statsmodels>=0.14",
+  "polars>=1.0",
+  "pyarrow>=16",
+  "duckdb>=1.0",
+  "pint>=0.24",
+  "argon2-cffi>=23.1",
+  "itsdangerous>=2.2",
+  "jsonschema>=4.22",
+  "pyyaml>=6.0",
+  "pyshp>=2.3",
+  "typer>=0.12",
+]
+
+[project.optional-dependencies]
+research = []
+
+[dependency-groups]
+dev = [
+  "pytest>=8.2",
+  "pytest-asyncio>=0.23",
+  "hypothesis>=6.100",
+  "ruff>=0.5",
+  "mypy>=1.10",
+  "import-linter>=2.0",
+  "moto[s3]>=5.0",
+  "types-PyYAML",
+  "types-jsonschema",
+]
+
+[project.scripts]
+reva = "reva.cli.main:app"
+
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/reva"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "S", "RUF"]
+ignore = ["S101", "S311", "S603", "S608", "RUF001", "RUF002", "RUF003", "B008", "S105", "S106"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["S", "B"]
+"migrations/**" = ["E501"]
+
+[tool.mypy]
+python_version = "3.12"
+packages = ["reva.kernel"]
+strict = true
+mypy_path = "src"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = [
+  "db: requires PostgreSQL/PostGIS (REVA_MIGRATION_DATABASE_URL)",
+  "live: performs real network requests to public providers",
+  "perf: performance measurement",
+]
+addopts = "-m 'not live'"
+
+[tool.importlinter]
+root_package = "reva"
+
+[[tool.importlinter.contracts]]
+name = "kernel imports nothing from the rest of reva"
+type = "forbidden"
+source_modules = ["reva.kernel"]
+forbidden_modules = ["reva.adapters", "reva.api", "reva.evidence", "reva.belief", "reva.world", "reva.models", "reva.simulation", "reva.operations", "reva.autonomy", "reva.population", "reva.evaluation", "sqlalchemy", "httpx", "fastapi"]
+
+[[tool.importlinter.contracts]]
+name = "numerical models have no HTTP, DB or adapters"
+type = "forbidden"
+source_modules = ["reva.models"]
+forbidden_modules = ["reva.adapters", "reva.api", "reva.operations", "httpx", "sqlalchemy", "psycopg", "boto3"]
+
+[[tool.importlinter.contracts]]
+name = "simulation does not write evidence or beliefs"
+type = "forbidden"
+source_modules = ["reva.simulation"]
+forbidden_modules = ["reva.evidence.ingest", "reva.belief.publication", "reva.adapters.connectors", "httpx"]
+
+[[tool.importlinter.contracts]]
+name = "autonomy never imports connectors' runtime writers or api"
+type = "forbidden"
+source_modules = ["reva.autonomy"]
+forbidden_modules = ["reva.api"]

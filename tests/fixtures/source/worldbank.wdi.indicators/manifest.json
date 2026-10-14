@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "c777fbeb439103a6a7776c4b5f82ed0a99d217633dbfa2fd3c6e3d3025aa6964",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/NY.GDP.MKTP.CD?format=json&date=2000:2024&per_page=1000&page=1",
+    "file": "c777fbeb439103a6.json",
+    "sha256": "57676d1b218a15d1789442a2c2cf7a13dc1009f558ada1fa48f3098f128d628f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "last-modified": "Wed, 14 Oct 2026 22:35:54 GMT"
+    },
+    "retrieved_at": "2026-10-14T22:36:22.092540+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "5ea35fdcb633a3322a951e7f973ed2d2cd46b87cfb8b557e9d45034054adcd2c",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json&date=2000:2024&per_page=1000&page=1",
+    "file": "5ea35fdcb633a332.json",
+    "sha256": "b8c35c012e255e3f72d6bf0a080cbbf290abd831cdba1837c819859d07b3f2a9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "last-modified": "Wed, 14 Oct 2026 22:35:13 GMT"
+    },
+    "retrieved_at": "2026-10-14T22:36:21.109363+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "003ed10696e39290e52c3a67a2844e4d53ef928fc871cd2759c1c3ff83322ba5",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA?format=json&per_page=100",
+    "file": "003ed10696e39290.json",
+    "sha256": "ceaf9aeb32e47c3eba5b8483124958e68f62d991a4b35ab5623415aad6d9bc1c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "last-modified": "Wed, 14 Oct 2026 22:35:46 GMT"
+    },
+    "retrieved_at": "2026-10-14T22:36:20.499435+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "c0a638218401ad94c3c73ac6bfd69d6302a99848723fb254cd1c1248b253a422",
+    "url": "https://api.worldbank.org/v2/indicator/NY.GDP.MKTP.CD?format=json",
+    "file": "c0a638218401ad94.json",
+    "sha256": "51cec1e144a5bad8d92238630c0a305e20116e86d34ad95c7c315ed166255b28",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "last-modified": "Wed, 14 Oct 2026 04:19:51 GMT"
+    },
+    "retrieved_at": "2026-10-14T22:36:21.597168+00:00",
+    "licence": "CC-BY-4.0"
+  },
+  {
+    "request_fingerprint": "41d53651bf70cb92b30a6923a71f089054e5095427814564a792b7423a68acd2",
+    "url": "https://api.worldbank.org/v2/indicator/SP.POP.TOTL?format=json",
+    "file": "41d53651bf70cb92.json",
+    "sha256": "2f8491efc00bf2c0995112ff8e87aba69e5e9d22d0880b22f7e3a4ec757ba05c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8",
+      "last-modified": "Tue, 13 Oct 2026 13:23:51 GMT"
+    },
+    "retrieved_at": "2026-10-14T22:36:20.592153+00:00",
+    "licence": "CC-BY-4.0"
+  }
+]

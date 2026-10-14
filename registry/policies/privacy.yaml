@@ -1,0 +1,8 @@
+policy_version: "privacy-1.0.0"
+allowed_privacy_classes: [public_aggregate, synthetic_public_aggregate_derived]
+forbidden_in_v1: [restricted_microdata, sensitive_restricted]
+synthetic_population:
+  allowed_attributes: [age, sex]
+  forbidden_attributes: [income, religion, sexual_orientation, political_opinion, health, ethnicity, household]
+  max_records: 100000
+  link_to_real_individuals: false

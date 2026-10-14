@@ -1,0 +1,11 @@
+# Published source/method preference policy for source_select_v1.
+policy_version: "selection-1.0.0"
+preferences:
+  demography.population.wdi_midyear_total: [worldbank.wdi]
+  economics.gdp.nominal_current_usd: [worldbank.wdi]
+  trade.hs2709.import_value.world_total: [un.comtrade.public_preview]
+  trade.hs2709.export_value.world_total: [un.comtrade.public_preview]
+  trade.hs2709.import_value.bilateral: [un.comtrade.public_preview]
+  trade.hs2709.export_value.bilateral: [un.comtrade.public_preview]
+  trade.hs2709.net_weight.world_total: [un.comtrade.public_preview]
+  demography.population.jan1_age_sex: [eurostat.dissemination]

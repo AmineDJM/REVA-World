@@ -1,0 +1,87 @@
+models:
+  - model_key: belief.source_select
+    version: "1.0.0"
+    kind: belief_method
+    approval_status: approved
+    description: >-
+      source_select_v1. Filters eligible, semantically compatible observations at the cutoff,
+      selects the latest pre-cutoff revision in each lineage, applies the published source
+      preference policy for the exact estimand and publishes selected_report with the original
+      uncertainty status. Never averages incomparable definitions.
+    input_ports: [{name: observations, kind: evidence.observation}]
+    output_ports: [{name: estimates, modality: selected_report}]
+    applicability: {concepts: "*", modality: selected_report}
+    assumptions: [source report is not certain reality, original uncertainty retained]
+  - model_key: economic.crude_exposure
+    version: "1.0.0"
+    kind: scenario
+    approval_status: approved
+    description: >-
+      One-period crude-oil border-value exposure accounting. L1 fixed quantities:
+      dM = M(pM-1), dX = X(pX-1), dnet = dM - dX, exposure = 100 dnet / G.
+      L2 labelled elasticity sensitivity: M' = M pM^(1+eM), X' = X pX^(1+eX).
+      Assumption-conditioned accounting only: not GDP loss, welfare, inflation, fiscal revenue
+      or balance-of-payments forecast.
+    input_ports:
+      - {name: M, concept: trade.hs2709.import_value.world_total, unit: unit.usd, basis: nominal_current, aggregation: period_flow_total}
+      - {name: X, concept: trade.hs2709.export_value.world_total, unit: unit.usd, basis: nominal_current, aggregation: period_flow_total}
+      - {name: G, concept: economics.gdp.nominal_current_usd, unit: unit.usd, basis: nominal_current, aggregation: period_flow_total}
+    output_ports:
+      - {name: import_value_change_usd, unit: unit.usd}
+      - {name: export_value_change_usd, unit: unit.usd}
+      - {name: net_external_cost_change_usd, unit: unit.usd}
+      - {name: exposure_percent_baseline_gdp, unit: percent_of_baseline_gdp}
+    applicability:
+      horizon: {periods: 1, unit: annual_accounting_period}
+      reference_years: [2020, 2024]
+      multiplier_envelope: {min_exclusive: 0, max: 3}
+      import_elasticity_envelope: [-2, 1]
+      export_elasticity_envelope: [-1, 2]
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [gdp_loss, unemployment, consumer_inflation, household_welfare, dynamic_multi_year_effects]
+    assumptions:
+      - same-year source-reported border values in current USD
+      - imports CIF / exports FOB as declared by provider; bases kept explicit
+      - no general equilibrium; no quantity response at L1
+      - elasticities at L2 are scenario assumptions with no probability interpretation
+  - model_key: forecast.last_value
+    version: "1.0.0"
+    kind: forecast
+    approval_status: approved
+    description: Naive baseline; forecasts the last observed training value. Permanent benchmark.
+    input_ports: [{name: series, kind: annual_positive_or_any}]
+    output_ports: [{name: point_forecast}]
+    applicability: {min_train: 1}
+    assumptions: [random-walk point forecast]
+  - model_key: forecast.log_drift
+    version: "1.0.0"
+    kind: forecast
+    approval_status: approved
+    description: Random walk with drift on log values fitted within the fold; strictly positive series only.
+    input_ports: [{name: series, kind: annual_strictly_positive}]
+    output_ports: [{name: point_forecast}, {name: prediction_interval}]
+    applicability: {min_train: 3, requires_positive: true}
+    assumptions: [log transform explicit; zeros not clipped]
+  - model_key: forecast.local_level_log
+    version: "1.0.0"
+    kind: forecast
+    approval_status: candidate
+    description: >-
+      Gaussian local-level state-space model on log values (statsmodels UnobservedComponents),
+      fitted only within each training window; estimand is the future released statistic.
+    input_ports: [{name: series, kind: annual_strictly_positive}]
+    output_ports: [{name: point_forecast}, {name: prediction_interval}]
+    applicability: {min_train: 6, requires_positive: true}
+    assumptions: [Gaussian local level on logs; measurement model for latent reality not identified]
+  - model_key: population.age_sex_recipe
+    version: "1.0.0"
+    kind: population
+    approval_status: approved
+    description: >-
+      Population recipe from disjoint age x recorded-sex leaf cells with exact (rational) weight
+      allocation; materialises at most 100,000 weighted records in Parquet.
+    input_ports: [{name: cells, concept: demography.population.jan1_age_sex}]
+    output_ports: [{name: weighted_records}]
+    applicability: {attributes: [age, sex], max_records: 100000}
+    assumptions: [no attributes beyond age and recorded sex; no household structure]

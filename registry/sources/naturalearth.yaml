@@ -1,0 +1,11 @@
+source_key: naturalearth.admin0_110m
+title: Natural Earth 1:110m Admin 0 – Countries
+provider_url: https://www.naturalearthdata.com/
+lineage_family: natural_earth
+rights:
+  licence: Public domain
+  licence_url: https://www.naturalearthdata.com/about/terms-of-use/
+  attribution: "Made with Natural Earth"
+metadata:
+  role: display geography only; not authoritative boundaries
+  cadence: weekly metadata check; download only on changed release

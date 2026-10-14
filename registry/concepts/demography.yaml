@@ -1,0 +1,41 @@
+concepts:
+  - concept_id: demography.population.wdi_midyear_total
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Total population (WDI, midyear estimate)"}
+    definition: >-
+      World Bank WDI SP.POP.TOTL. Per the indicator metadata: total population based on the de
+      facto definition, counting all residents regardless of legal status or citizenship; values
+      are midyear estimates. Definition text is captured from the provider's indicator metadata at
+      acquisition and pinned by source metadata version.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: de_facto_residents_wdi
+      temporal_support: "point:07-01 (midyear estimate)"
+      spatial_support: provider_reporter_territory
+      aggregation: point_in_time_stock
+      scale_type: stock
+      unit_ref: unit.persons
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_collected]
+      measurement_method: provider_estimate_from_census_and_projections
+  - concept_id: demography.population.jan1_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Population on 1 January by age and recorded sex (Eurostat demo_pjan)"}
+    definition: >-
+      Eurostat demo_pjan: number of persons usually resident on 1 January of the reference year,
+      by single year of age and sex as recorded by the national statistical institute. Unknown
+      ages and open-ended top age groups are retained as distinct categories. Recorded sex is not
+      gender identity.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      temporal_support: "point:01-01"
+      spatial_support: eurostat_geo_code
+      aggregation: point_in_time_stock
+      scale_type: stock
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, suppressed, not_collected]
+      measurement_method: national_population_statistics

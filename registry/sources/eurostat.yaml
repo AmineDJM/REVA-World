@@ -1,0 +1,12 @@
+source_key: eurostat.dissemination
+title: Eurostat dissemination API (JSON-stat 2.0) and catalogue
+provider_url: https://ec.europa.eu/eurostat/api/dissemination/
+lineage_family: eurostat
+rights:
+  licence: Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)
+  licence_url: https://ec.europa.eu/eurostat/about-us/policies/copyright
+  attribution: "Source: Eurostat"
+metadata:
+  api_docs: https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-detailed-guidelines/api-statistics
+  catalogue: https://ec.europa.eu/eurostat/api/dissemination/catalogue/toc/txt?lang=en
+  cadence: weekly metadata/update check

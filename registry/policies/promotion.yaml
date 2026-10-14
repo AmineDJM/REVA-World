@@ -1,0 +1,24 @@
+# Versioned promotion policy. The autonomy agent cannot edit this file's
+# effective content: gates verify its pinned digest (see policies/digests.yaml).
+policy_version: "promotion-1.0.0"
+tiers:
+  T0: {description: "read, discover, generate proposals", auto: true}
+  T1: {description: "new series via approved template, approved semantics/rights, known hosts", auto_within_scope: true}
+  T2: {description: "new parser code, model, ontology mapping, executable legal rule", requires: [isolated_evaluation, named_review]}
+  T3: {description: "kernel, security, licences, sensitive data, causal claims, destructive migrations, paid resources", requires: [maintainer_approval]}
+approved_templates:
+  eurostat_jsonstat:
+    template_digest_ref: src/reva/adapters/connectors/eurostat_template.py
+    allowed_hosts: [ec.europa.eu]
+approved_exact_mappings:
+  - template: eurostat_jsonstat
+    dataset: demo_pjan
+    target: {concept_id: demography.population.jan1_age_sex, version: "1.0.0"}
+    scope: {geo: [FR]}
+    rights: verified
+model_promotion:
+  min_origin_series_pairs: 30
+  bootstrap: {method: moving_block, block_length: 3, replicates: 1000, level: 0.95}
+  primary_loss: mase
+  max_subgroup_degradation: 0.10
+  keep_naive_baseline: true

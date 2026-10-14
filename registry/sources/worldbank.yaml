@@ -1,0 +1,12 @@
+source_key: worldbank.wdi
+title: World Bank World Development Indicators (API v2)
+provider_url: https://api.worldbank.org/v2/
+lineage_family: worldbank_wdi
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://datacatalog.worldbank.org/public-licenses#cc-by
+  attribution: "The World Bank: World Development Indicators"
+metadata:
+  api_docs: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392
+  authentication: none
+  cadence: monthly metadata/update check

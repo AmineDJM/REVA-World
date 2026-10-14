@@ -1,0 +1,12 @@
+source_key: crossref.works
+title: Crossref REST API (works metadata)
+provider_url: https://api.crossref.org/
+lineage_family: crossref
+rights:
+  licence: Crossref metadata is provided without restriction (CC0) for bibliographic metadata
+  licence_url: https://www.crossref.org/documentation/retrieve-metadata/rest-api/
+  attribution: Crossref
+metadata:
+  role: DOI metadata and update/retraction signals; metadata is not full text
+  etiquette: polite pool with mailto; honour X-Rate-Limit and concurrency headers
+  cadence: weekly for the curated set

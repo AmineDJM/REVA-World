@@ -1,0 +1,44 @@
+# Versioned requirement catalogue. Coverage is reported only relative to this
+# finite catalogue, never as a percentage of reality.
+catalogue_version: "mvp-1.0.0"
+requirements:
+  - id: R-POP-WDI
+    task: country_profile
+    concept: demography.population.wdi_midyear_total
+    geography: [FRA, DZA, CHN, USA]
+    period: [2000, 2024]
+    acceptable_freshness_days: 400
+    evidence: source_report
+    weight: 1
+  - id: R-GDP-WDI
+    task: crude_exposure
+    concept: economics.gdp.nominal_current_usd
+    geography: [FRA, DZA, CHN, USA]
+    period: [2020, 2024]
+    acceptable_freshness_days: 400
+    evidence: source_report
+    weight: 2
+  - id: R-CRUDE-M
+    task: crude_exposure
+    concept: trade.hs2709.import_value.world_total
+    geography: [FRA, DZA, CHN, USA]
+    period: [2020, 2024]
+    acceptable_freshness_days: 400
+    evidence: source_report
+    weight: 2
+  - id: R-CRUDE-X
+    task: crude_exposure
+    concept: trade.hs2709.export_value.world_total
+    geography: [FRA, DZA, CHN, USA]
+    period: [2020, 2024]
+    acceptable_freshness_days: 400
+    evidence: source_report
+    weight: 2
+  - id: R-POP-JAN-AGESEX
+    task: population_recipe
+    concept: demography.population.jan1_age_sex
+    geography: [FRA]
+    period: [2023, 2023]
+    acceptable_freshness_days: 800
+    evidence: source_report
+    weight: 1

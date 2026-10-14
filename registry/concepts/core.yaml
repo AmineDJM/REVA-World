@@ -1,0 +1,72 @@
+# Core entity types, roles and predicates. Published versions are immutable:
+# changing meaning requires a new version.
+concepts:
+  - concept_id: entity.country
+    version: "1.0.0"
+    kind: entity_type
+    labels: {en: "Country / economy", fr: "Pays / économie"}
+    definition: >-
+      A territorial economy or state referent as used by statistical providers. Identity is
+      persistent and distinct from any provider code; codes are aliases with provider scope.
+      Existence of a referent does not settle sovereignty or boundary disputes.
+    owner: reva-maintainers
+  - concept_id: entity.world_aggregate
+    version: "1.0.0"
+    kind: entity_type
+    labels: {en: World partner aggregate}
+    definition: >-
+      The provider-defined aggregate of all partners (e.g. UN Comtrade partnerCode 0 'World').
+      It is an abstract aggregate, not a country.
+    owner: reva-maintainers
+  - concept_id: entity.product
+    version: "1.0.0"
+    kind: entity_type
+    labels: {en: Traded product class}
+    definition: >-
+      A product class in a named classification and revision (e.g. HS heading 2709).
+      The classification revision is part of every observation's flags.
+    owner: reva-maintainers
+  - concept_id: entity.scholarly_work
+    version: "1.0.0"
+    kind: entity_type
+    labels: {en: Scholarly work}
+    definition: A published study identified by DOI. Metadata is not full text.
+    owner: reva-maintainers
+  - concept_id: role.reporter
+    version: "1.0.0"
+    kind: role
+    labels: {en: Reporter}
+    definition: The economy whose customs/statistics authority reports the flow.
+    owner: reva-maintainers
+  - concept_id: role.partner
+    version: "1.0.0"
+    kind: role
+    labels: {en: Partner}
+    definition: The counterpart economy or aggregate of a reported flow.
+    owner: reva-maintainers
+  - concept_id: role.product
+    version: "1.0.0"
+    kind: role
+    labels: {en: Product}
+    definition: The product class traded in the flow.
+    owner: reva-maintainers
+  - concept_id: predicate.trade_flow
+    version: "1.0.0"
+    kind: predicate
+    labels: {en: Reported merchandise trade flow}
+    definition: >-
+      An n-ary reported trade flow (reporter, partner, product, interval). The flow direction is
+      from the reporter's perspective and recorded in the component. A reported flow is a
+      descriptive statement, not a causal relation.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: not_applicable
+      temporal_support: annual_total
+      spatial_support: provider_reporter_territory
+      aggregation: period_flow_total
+      scale_type: flow
+      signature:
+        roles:
+          role.reporter: {entity_kinds: [entity.country], min: 1, max: 1}
+          role.partner: {entity_kinds: [entity.country, entity.world_aggregate], min: 1, max: 1}
+          role.product: {entity_kinds: [entity.product], min: 1, max: 1}
