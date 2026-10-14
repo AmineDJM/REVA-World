@@ -111,7 +111,7 @@ class S3ArtifactStore:
         """True only when the provider reports a full-object SHA-256 equal to ``sha``."""
         try:
             r = self.client.head_object(Bucket=self.bucket, Key=key, ChecksumMode="ENABLED")
-        except Exception:  # noqa: BLE001 - unsupported parameter/provider: fall back to streaming
+        except Exception:
             return False
         server = r.get("ChecksumSHA256")
         if not server or "-" in server or r.get("ChecksumType", "FULL_OBJECT") != "FULL_OBJECT":

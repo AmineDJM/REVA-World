@@ -245,6 +245,8 @@ def available_then_reconstruction(
             "retrieved_at": _plain(r["retrieved_at"]),
             "source_published_at": _plain(r["source_published_at"]),
             "availability_proof": _availability_proof(r, operational=False),
+            "eligibility_evaluated_at": _plain(r["eligibility_evaluated_at"]),
+            "post_cutoff_flags": [f for f in ("retracted_after_cutoff", "ineligible_after_cutoff") if r.get(f)],
         })
     m["inputs"] = inputs
     m["outputs"] = [
@@ -263,6 +265,7 @@ def available_then_reconstruction(
         for s in selections
     ]
     m["exclusions"] = scope.exclusion_report()
+    m["post_cutoff_flags"] = scope.flag_report()
     m["excluded_without_proof"] = scope.exclusions.get("no_availability_proof", 0)
     m["candidate_revisions_with_proof"] = scope.candidate_revisions
     method_recorded = conn.execute(
@@ -270,12 +273,24 @@ def available_then_reconstruction(
         {"k": METHOD_KEY, "v": METHOD_VERSION},
     ).scalar_one_or_none()
     avail = [r["source_available_at"] for r in (by_id[i["observation_id"]] for i in inputs)]
+    elig_times = [r["eligibility_evaluated_at"] for r in scope.rows if r.get("eligibility_evaluated_at")]
     m["algorithm_design"] = {
         "method": f"{METHOD_KEY}@{METHOD_VERSION}",
         "method_registered_at": _plain(method_recorded),
+        "algorithm_design_date": _plain(method_recorded),
         "selection_policy": policy["policy_version"],
-        "eligibility_and_ontology_as_of": now.isoformat(),
-        "design_date_note": "the algorithm used is today's design; its date is not the availability date",
+        "selection_method_and_ontology_as_of": now.isoformat(),
+        "design_date_note": ("the selection method and ontology are today's design; the design date is not the "
+                             "availability date and not the cutoff"),
+    }
+    m["data_quality_decisions"] = {
+        "retractions_as_of": cutoff.isoformat(),
+        "eligibility_as_of": cutoff.isoformat(),
+        "eligibility_rule": ("decision in force at the cutoff; where REVA had none yet for a (connector version, "
+                             "concept), its first recorded decision (algorithm design) is used and dated"),
+        "latest_eligibility_evaluated_at": _plain(max(elig_times)) if elig_times else None,
+        "post_cutoff_knowledge": ("later retractions and eligibility changes are flagged on inputs "
+                                  "(post_cutoff_flags), never used to exclude: excluding them would be hindsight"),
     }
     m["availability"] = {
         "earliest_source_available_at": _plain(min(avail)) if avail else None,
@@ -316,6 +331,20 @@ def _default_models() -> list[Any]:
     return [LastValue(), LogDrift()]  # the naive baseline is always present
 
 
+DEFAULT_PUBLICATION_LAG_YEARS = 1
+PUBLICATION_LAG_NOTE = (
+    "Annual WDI/Comtrade values for reference year t are published months after t ends, so a value for t is "
+    "assumed available only at 31 Dec of year t + publication_lag_years. A fold's information date is 31 Dec of "
+    "origin_year; its training window ends at origin_year - publication_lag_years and the target is "
+    "origin_year + horizon, i.e. horizon + lag steps after the last training observation. With lag 0, h=1 is "
+    "partly a nowcast."
+)
+
+
+def _series_label(key: tuple[Any, ...]) -> str:
+    return f"{key[0]}|{key[2]}|{key[3]}"
+
+
 def revised_data_retrospective(
     conn: Connection,
     cutoff: datetime | None = None,
@@ -325,6 +354,7 @@ def revised_data_retrospective(
     min_train: int = 5,
     horizons: Sequence[int] = (1,),
     models: Sequence[Any] | None = None,
+    publication_lag_years: int = DEFAULT_PUBLICATION_LAG_YEARS,
 ) -> dict[str, Any]:
     """Rolling-origin forecast evaluation on current revised data.
 
@@ -332,9 +362,23 @@ def revised_data_retrospective(
     defaults to now) so the evaluation is reproducible. Every fold is labelled
     ``revised_data_retrospective``; inputs that a strict guard at the fold
     origin would block are counted, not hidden.
+
+    ``publication_lag_years`` (default 1, documented in ``design``) is the
+    assumed delay between the end of a reference year and the availability of
+    its value: see :data:`PUBLICATION_LAG_NOTE`. Scores are reported per
+    concept (pooled MAE, which mixes series of different scale and is labelled
+    so), per series (MAE in the series' unit) and as a scale-free MASE
+    (in-sample one-step naive scale of each fold's training window).
     """
+    from reva.models.metrics import mase_scale, scaled_absolute_error
+
     if min_train < 1 or not horizons or any(h < 1 for h in horizons):
         raise ValidationProblem("min_train must be >= 1 and horizons positive")
+    if isinstance(publication_lag_years, bool) or not isinstance(publication_lag_years, int) \
+            or not 0 <= publication_lag_years <= 10:
+        raise ValidationProblem("publication_lag_years must be an integer in [0, 10]",
+                                publication_lag_years=str(publication_lag_years))
+    lag = publication_lag_years
     now = _db_now(conn)
     snapshot = cutoff or now
     _check_cutoff(conn, snapshot)
@@ -362,6 +406,8 @@ def revised_data_retrospective(
     folds: list[dict[str, Any]] = []
     # Scores are pooled per concept only: errors in different units are never averaged together.
     per_model: dict[tuple[str, str], dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+    per_series: dict[tuple[str, str, str], dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+    undefined_scale: Counter[str] = Counter()
     ineligible: Counter[str] = Counter()
     flagged_inputs = 0
     series_used = 0
@@ -378,14 +424,18 @@ def revised_data_retrospective(
             excl["series_shorter_than_min_train_plus_one"] += 1
             continue
         series_used += 1
+        slabel = _series_label(key)
         for i in range(min_train - 1, len(years) - 1):
-            origin_year = years[i]
-            train = [(y, pts[y]["_v"]) for y in years[: i + 1]]
-            # What a strict guard would say at the fold origin: revised values
-            # recorded long after the origin are admitted only under this label.
+            last_train = years[i]
+            origin_year = last_train + lag  # information date: 31 Dec of origin_year
+            train_years = years[: i + 1]
+            train = [(y, pts[y]["_v"]) for y in train_years]
+            scale = mase_scale([v for _, v in train], train_years)
+            # What a strict guard would say at the fold's information date: revised values
+            # recorded long after it are admitted only under this label.
             origin_guard = LeakageGuard(datetime(origin_year, 12, 31, 23, 59, 59, tzinfo=UTC),
                                         GuardMode.revised_data_retrospective)
-            for y in years[: i + 1]:
+            for y in train_years:
                 origin_guard.check(CutoffRepository.observation_input(pts[y]))
             n_flag = len(origin_guard.flagged())
             flagged_inputs += n_flag
@@ -393,6 +443,7 @@ def revised_data_retrospective(
                 target = origin_year + h
                 if target not in pts:
                     continue
+                steps = target - last_train
                 actual = pts[target]["_v"]
                 first = _decimal(pts[target].get("first_release_value"))
                 preds = []
@@ -401,25 +452,41 @@ def revised_data_retrospective(
                     if not hasattr(fitted, "predict"):
                         ineligible[f"{mdl.key}:{getattr(fitted, 'reason', 'ineligible')}"] += 1
                         continue
-                    point = float(fitted.predict([h])[0].point)
+                    point = float(fitted.predict([steps])[0].point)
                     ae = abs(point - actual)
-                    rec = {"model": f"{mdl.key}@{mdl.version}", "point": point, "abs_error_latest_revised": ae}
+                    rec: dict[str, Any] = {"model": f"{mdl.key}@{mdl.version}", "point": point,
+                                           "abs_error_latest_revised": ae}
                     acc = per_model[(key[1], rec["model"])]
+                    sacc = per_series[(key[1], slabel, rec["model"])]
                     acc["ae_latest"].append(ae)
+                    sacc["ae_latest"].append(ae)
+                    sae = scaled_absolute_error(point, actual, scale)
+                    rec["scaled_abs_error_latest_revised"] = sae
+                    if sae is None:
+                        undefined_scale[scale.reason or "undefined"] += 1
+                    else:
+                        acc["sae_latest"].append(sae)
+                        sacc["sae_latest"].append(sae)
                     if actual > 0:
                         acc["ape_latest"].append(ae / actual)
                     if first is not None:
                         rec["abs_error_first_release"] = abs(point - first)
                         acc["ae_first"].append(rec["abs_error_first_release"])
+                        sacc["ae_first"].append(rec["abs_error_first_release"])
                     preds.append(rec)
                 folds.append({
                     "label": RETROSPECTIVE_LABEL,
                     "series": {"subject_id": key[0], "concept_id": key[1], "source_key": key[2],
                                "aggregation": key[3]},
                     "origin_year": origin_year,
+                    "information_date": f"{origin_year}-12-31",
+                    "publication_lag_years": lag,
+                    "last_train_year": last_train,
                     "target_year": target,
                     "horizon": h,
-                    "train_years": [years[0], origin_year],
+                    "steps_after_last_observation": steps,
+                    "train_years": [years[0], last_train],
+                    "mase_scale": scale.value,
                     "actual_latest_revised": actual,
                     "actual_first_release": first,
                     "inputs_recorded_after_origin": n_flag,
@@ -435,12 +502,33 @@ def revised_data_retrospective(
             "label": RETROSPECTIVE_LABEL,
             "n": len(v["ae_latest"]),
             "mae_latest_revised": _mean(v["ae_latest"]),
+            "mae_pooling": "pooled across series of different scale (e.g. countries); see scores_by_series and "
+                           "mase_latest_revised",
+            "mase_latest_revised": _mean(v["sae_latest"]),
+            "n_mase": len(v["sae_latest"]),
             "mape_latest_revised": _mean(v["ape_latest"]),
             "mae_first_release": _mean(v["ae_first"]),
             "n_first_release": len(v["ae_first"]),
         }
+    by_series: dict[str, dict[str, dict[str, Any]]] = defaultdict(lambda: defaultdict(dict))
+    for (concept, slabel, model), v in sorted(per_series.items()):
+        by_series[concept][slabel][model] = {
+            "label": RETROSPECTIVE_LABEL,
+            "n": len(v["ae_latest"]),
+            "mae_latest_revised": _mean(v["ae_latest"]),
+            "mase_latest_revised": _mean(v["sae_latest"]),
+            "mae_first_release": _mean(v["ae_first"]),
+            "n_first_release": len(v["ae_first"]),
+        }
     m["scores"] = dict(scores)
-    m["scores_note"] = "pooled per concept (one unit per concept); never across concepts"
+    m["scores_by_series"] = {c: {k: dict(v) for k, v in d.items()} for c, d in by_series.items()}
+    m["scores_note"] = (
+        "pooled per concept (one unit per concept), never across concepts. Pooled MAE mixes series of very "
+        "different scale; compare models with the scale-free mase_latest_revised (in-sample one-step naive "
+        "scale of each fold's training window) or per series in scores_by_series (series key: "
+        "subject_id|source_key|aggregation)"
+    )
+    m["mase_undefined_scale"] = [{"reason": k, "count": v} for k, v in sorted(undefined_scale.items())]
     m["outputs"] = folds
     m["inputs"] = [{
         "observation_id": str(r["id"]), "logical_key": r["logical_key"], "revision_no": r["revision_no"],
@@ -452,6 +540,8 @@ def revised_data_retrospective(
         "split": "expanding-window rolling origins on annual reference years",
         "min_train": min_train,
         "horizons": hs,
+        "publication_lag_years": lag,
+        "publication_lag_note": PUBLICATION_LAG_NOTE,
         "models": [f"{x.key}@{x.version}" for x in models],
         "data_vintage_policy": "latest revision of each lineage recorded at/before the snapshot cutoff",
         "truth_vintage_policy": "latest revised value (primary); first release scored separately where recorded",
@@ -497,6 +587,7 @@ def run_replay(conn: Connection, mode: str, cutoff: datetime, *, origin: str = "
         return revised_data_retrospective(
             conn, cutoff, origins=[origin], concepts=concepts,
             min_train=int(options.get("min_train", 5)), horizons=tuple(options.get("horizons", (1,))),
+            publication_lag_years=options.get("publication_lag_years", DEFAULT_PUBLICATION_LAG_YEARS),
         )
     raise CapabilityGap(f"unknown replay mode {mode!r}", supported=list(REPLAY_MODES))
 

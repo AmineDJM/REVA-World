@@ -7,7 +7,9 @@ concepts:
       World Bank WDI SP.POP.TOTL. Per the indicator metadata: total population based on the de
       facto definition, counting all residents regardless of legal status or citizenship; values
       are midyear estimates. Definition text is captured from the provider's indicator metadata at
-      acquisition and pinned by source metadata version.
+      acquisition and pinned by source metadata version. Upstream dependence: WDI compiles this
+      series from national statistical offices, Eurostat and the UN World Population Prospects, so
+      for EU countries it is not independent evidence of Eurostat values (and vice versa).
     owner: reva-maintainers
     semantic_profile:
       population_universe: de_facto_residents_wdi
@@ -27,7 +29,10 @@ concepts:
       Eurostat demo_pjan: number of persons usually resident on 1 January of the reference year,
       by single year of age and sex as recorded by the national statistical institute. Unknown
       ages and open-ended top age groups are retained as distinct categories. Recorded sex is not
-      gender identity.
+      gender identity. Age is age in completed years at 1 January. Per the demo_pjan metadata, where
+      the usually-resident population is unavailable a country may report its legal or registered
+      resident population instead. Values for recent reference years are frequently provisional
+      (Eurostat status flag 'p') and may be revised; the flags are kept with every value.
     owner: reva-maintainers
     semantic_profile:
       population_universe: usually_resident_population_eurostat

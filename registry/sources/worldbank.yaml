@@ -10,3 +10,8 @@ metadata:
   api_docs: https://datahelpdesk.worldbank.org/knowledgebase/articles/889392
   authentication: none
   cadence: monthly metadata/update check
+  # Invariant 13 (lineage independence): SP.POP.TOTL metadata lists UN WPP, national statistical
+  # offices and Eurostat as source organisations. WDI population is therefore NOT independent of
+  # Eurostat demo_pjan (or UN WPP) values; never count them as corroborating evidence.
+  upstream_lineages:
+    SP.POP.TOTL: [un_wpp, national_statistical_offices, eurostat]

@@ -112,7 +112,8 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
         assert e["evaluation_manifest_sha256"] == res["manifest_sha256"]
     naive = next(e for e in dev if e["model_key"] == "forecast.last_value")
     assert naive["metrics"]["is_naive_baseline"] is True and naive["metrics"]["n_predictions"] > 0
-    assert naive["metrics"]["mase"] is not None
+    assert naive["metrics"]["paired"]["mase"] is not None and naive["metrics"]["paired"]["n_common_cases"] > 0
+    assert naive["metrics"]["unpaired"]["is_baseline"] is True
     assert "series_id=DZA:" + POP in naive["metrics"]["subgroups"]
 
     assert len(promos) == 2
@@ -126,7 +127,9 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
     m = manifest_of(db, res["manifest_sha256"])
     for ref, d in m["final_decisions"].items():
         print(f"  {ref}: {d['decision']} n_pairs={d['n_pairs']} reasons={d['reasons'][1:]}")
-    print("  dev MASE:", {k: v["mase"] for k, v in m["development"]["scores"].items()})
+    print("  paired dev MASE:", {k: v["mase"] for k, v in m["development"]["paired_scores"]["metrics"].items()},
+          "n_common", m["development"]["paired_scores"]["n_common_cases"])
+    print("  unpaired dev MASE:", {k: v["mase"] for k, v in m["development"]["scores_unpaired"].items()})
     assert m["label"] == LABEL and m["replay_mode"] == REPLAY_MODE
     assert {"DZA:" + POP, "DZA:" + GDP, "FRA:" + POP, "CHN:" + GDP, "USA:" + GDP} <= set(m["inputs"]["series"])
     assert m["inputs"]["source"]["release_id"] == str(wdi_release.release_id)
@@ -141,7 +144,10 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
     # The challenger selection never saw the holdout years.
     preds = m["development"]["predictions"]
     assert preds and max(p["target_year"] for p in preds) <= 2022
-    assert m["development"]["targets"] and m["development"]["scores"]["forecast.last_value"]["is_baseline"]
+    assert m["development"]["targets"] and m["development"]["scores_unpaired"]["forecast.last_value"]["is_baseline"]
+    paired = m["development"]["paired_scores"]
+    assert set(paired["metrics"]) == {"forecast.last_value", "forecast.log_drift", "forecast.local_level_log"}
+    assert 0 < paired["n_common_cases"] <= min(v["n_scaled"] for v in m["development"]["scores_unpaired"].values())
     assert m["development"]["ineligible"]  # local level needs >= 6 points: early origins are ineligible
     assert m["execution"]["tournament_runtime_seconds"] > 0
     if hold["status"] == "scored":

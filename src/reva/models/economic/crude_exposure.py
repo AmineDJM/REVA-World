@@ -381,7 +381,11 @@ def evaluate_country(ci: CountryInputs, *, reference_year: int, import_multiplie
 
 
 def sensitivity_range(results: list[ExposureResult], output_key: str) -> tuple[Decimal, Decimal]:
-    """Min/max of an output across an L2 grid: a sensitivity range, never a confidence interval."""
+    """Min/max of an output across the given L2 variants: a sensitivity range, never a confidence interval.
+
+    The range covers exactly the variants passed. Callers that publish it next to the L1
+    value must include the ε=(0,0) variant (bit-identical to L1) so the range contains L1.
+    """
     if not results:
         raise ValidationProblem("empty elasticity grid")
     vals = [getattr(r, output_key) for r in results]
@@ -440,8 +444,9 @@ def explain(inputs: CountryInputs | None = None, *, fidelity: str = "L1") -> dic
         ],
         "uncertainty": (
             "Unquantified: the sources publish no uncertainty for M, X or G and no justified error model is "
-            "introduced. L2 min/max across the elasticity grid is a sensitivity range, not a confidence "
-            "interval and has no coverage level."
+            "introduced. In an L2 run the min/max over the elasticity grid together with the fixed-quantity "
+            "point ε=(0,0) is published as a separate sensitivity-range row (assumption sensitivity, not a "
+            "confidence interval, no coverage level); the L1 value keeps its unquantified status."
         ),
         "numerical": f"Decimal arithmetic at {PRECISION} significant digits",
         "source_flags": flags,

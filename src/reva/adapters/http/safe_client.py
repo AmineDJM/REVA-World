@@ -169,7 +169,9 @@ class PinnedNetworkBackend(httpcore.AsyncNetworkBackend):
     so certificate verification is unchanged.
     """
 
-    def __init__(self, addresses_for: Callable[[str], Sequence[str]], inner: httpcore.AsyncNetworkBackend | None = None):
+    def __init__(
+        self, addresses_for: Callable[[str], Sequence[str]], inner: httpcore.AsyncNetworkBackend | None = None
+    ) -> None:
         self._addresses_for = addresses_for
         self._inner = inner or httpcore.AnyIOBackend()  # asyncio or trio via anyio
 
@@ -207,7 +209,7 @@ def _pinned_transport(backend: httpcore.AsyncNetworkBackend, ssl_context: Any) -
     transport = httpx.AsyncHTTPTransport(verify=ssl_context, trust_env=False)
     if not hasattr(transport, "_pool"):  # pragma: no cover - fail closed on an httpx internals change
         raise ConfigurationError("httpx transport internals changed; DNS pinning unavailable")
-    transport._pool = httpcore.AsyncConnectionPool(  # noqa: SLF001 - documented single integration point
+    transport._pool = httpcore.AsyncConnectionPool(
         ssl_context=ssl_context,
         max_connections=100,
         max_keepalive_connections=20,
@@ -266,7 +268,7 @@ def _no_proxy_bypass(environ: Mapping[str, str] | None = None) -> Callable[[str]
     def bypass(host: str) -> bool:
         if not no_proxy:
             return False
-        return bool(urllib.request.proxy_bypass_environment(host, {"no": no_proxy}))
+        return bool(urllib.request.proxy_bypass_environment(host, {"no": no_proxy}))  # type: ignore[attr-defined]
 
     return bypass
 
@@ -477,7 +479,7 @@ class SafeHttpClient:
             attempt += 1
             try:
                 result = await self._get_once(url, headers or {}, limit, attempt)
-            except (httpx.TransportError, asyncio.TimeoutError) as e:
+            except (TimeoutError, httpx.TransportError) as e:
                 if attempt >= self.max_attempts:
                     raise SourceResponseError(f"transport failure: {type(e).__name__}", retryable=True) from e
                 await self._sleep(backoff_seconds(attempt))

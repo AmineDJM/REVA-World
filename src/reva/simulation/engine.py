@@ -5,8 +5,13 @@ L0  exact-spec cache lookup: the same full specification (excluding only the
     succeeded L1/L2 outcome; otherwise the run is a ``cache_miss`` — never a
     computed answer.
 L1  deterministic fixed-quantity crude border-value exposure.
-L2  labelled elasticity sensitivity over the declared grid; the per-country
-    min/max across the grid is a ``sensitivity_range`` (no coverage level).
+L2  labelled elasticity sensitivity over the declared grid. Each grid point is its
+    own result variant. The per-country/output min/max over grid ∪ {ε=(0,0)} is
+    published as a SEPARATE row (variant ``L2:sensitivity_range``) whose value is
+    the range object (kind ``sensitivity_range``) and whose uncertainty is a
+    ``sensitivity_range`` without a coverage level: assumption sensitivity, not a
+    confidence interval. The fixed-quantity ``L1`` row keeps its own unquantified
+    uncertainty (R3-03 / kernel rule R3-19); the range always contains it.
 L3/L4 reserved: CapabilityGap.
 
 The engine only reads (pinned release, prior runs). Persistence lives in
@@ -35,7 +40,11 @@ from reva.simulation.compile import CompiledScenario, compile_scenario
 from reva.simulation.spec import RESERVED_FIDELITY, ScenarioSpec
 
 ENGINE_VERSION = "reva.simulation.engine@1.0.0"
-SENSITIVITY_METHOD = "reva.simulation.l2_elasticity_grid_minmax@1.0.0"
+SENSITIVITY_METHOD = "reva.simulation.l2_elasticity_grid_minmax@1.1.0"
+SENSITIVITY_VARIANT = "L2:sensitivity_range"
+SENSITIVITY_STATEMENT = "assumption sensitivity, not a confidence interval"
+FIXED_POINT_CONDITION = ("fixed_quantity_point:import_elasticity=0;export_elasticity=0 (the L1 value) is always "
+                         "included in the range, whether or not it is listed in the grid")
 _IMPL_FILES = (
     Path(ce.__file__),
     Path(__file__),
@@ -148,19 +157,41 @@ def _unknown_uncertainty() -> dict[str, Any]:
     ).model_dump(mode="json")
 
 
+def _grid_conditioning(grid: list[dict[str, Any]]) -> tuple[str, ...]:
+    return (*(f"import_elasticity={g['import_elasticity']};export_elasticity={g['export_elasticity']}"
+              f";basis={g['basis']}" for g in grid), FIXED_POINT_CONDITION)
+
+
 def _range_uncertainty(lo: Decimal, hi: Decimal, grid: list[dict[str, Any]]) -> dict[str, Any]:
+    """Uncertainty of the separate range row: assumption sensitivity only (kernel rule R3-19)."""
     spec = UncertaintySpec(
         status=UncertaintyStatus.quantified,
         kind=UncertaintyKind.sensitivity_range,
-        description=("Elasticity sensitivity range: min/max of this output across the labelled scenario-"
-                     "assumption grid. Not a confidence, credible or prediction interval; no coverage level."),
+        description=(f"Elasticity sensitivity range ({SENSITIVITY_STATEMENT}): min/max of this output over the "
+                     "labelled scenario-assumption grid together with the fixed-quantity point ε=(0,0). Not a "
+                     "confidence, credible or prediction interval; no coverage level. It says nothing about the "
+                     "measurement uncertainty of the inputs, which is unquantified."),
         method_version=SENSITIVITY_METHOD,
         lower=ce.dstr(lo),
         upper=ce.dstr(hi),
-        conditioning=tuple(f"import_elasticity={g['import_elasticity']};export_elasticity={g['export_elasticity']}"
-                           f";basis={g['basis']}" for g in grid),
+        conditioning=_grid_conditioning(grid),
     )
     return spec.model_dump(mode="json")
+
+
+def _range_value(output_key: str, lo: Decimal, hi: Decimal, points: int) -> dict[str, Any]:
+    """The range object itself (value kind ``sensitivity_range``)."""
+    base = _value(output_key, lo)
+    return {
+        "kind": "sensitivity_range",
+        "lower": ce.dstr(lo),
+        "upper": ce.dstr(hi),
+        "unit_ref": base["unit_ref"],
+        "basis": base["basis"],
+        "evaluated_points": points,
+        "includes_fixed_quantity_point": True,
+        "statement": SENSITIVITY_STATEMENT,
+    }
 
 
 def _applicability(spec: ScenarioSpec, country: Any, variant: str, assumptions: dict[str, Any]) -> dict[str, Any]:
@@ -202,13 +233,23 @@ def compute(compiled: CompiledScenario, fidelity: str) -> list[ResultRow]:
                            Decimal(repr(p["import_elasticity"])), Decimal(repr(p["export_elasticity"])))
             for p in grid
         ]
+        # ε=(0,0) reproduces L1 bit-for-bit; it is always part of the range so the range contains L1.
+        fixed_point = ce.exposure_l2(m, x, g, ch.import_multiplier, ch.export_multiplier, Decimal(0), Decimal(0))
+        evaluated = {r.variant for r in variants} | {fixed_point.variant}
         for k in wanted:
-            lo, hi = ce.sensitivity_range(variants, k)
-            # The fixed-quantity case (the L1 special case) carries the grid's sensitivity range.
+            lo, hi = ce.sensitivity_range([fixed_point, *variants], k)
+            # The fixed-quantity row keeps its own (unquantified) uncertainty: R3-03.
             rows.append(ResultRow(k, c.iso3, c.subject_id, "L1", _value(k, getattr(l1, k)),
+                                  _unknown_uncertainty(),
+                                  _applicability(spec, c, "L1", {"quantity_response": "fixed"})))
+            rows.append(ResultRow(k, c.iso3, c.subject_id, SENSITIVITY_VARIANT,
+                                  _range_value(k, lo, hi, len(evaluated)),
                                   _range_uncertainty(lo, hi, grid),
-                                  _applicability(spec, c, "L1", {"quantity_response": "fixed",
-                                                                 "uncertainty": "sensitivity_range over grid"})))
+                                  _applicability(spec, c, SENSITIVITY_VARIANT, {
+                                      "quantity_response": "elasticity_sensitivity",
+                                      "range_over": "elasticity grid ∪ {(0,0)} (fixed-quantity L1 point)",
+                                      "elasticity_grid": grid,
+                                      "statement": SENSITIVITY_STATEMENT})))
             for p, r in zip(grid, variants, strict=True):
                 if r.variant in {row.variant for row in rows if row.output_key == k and row.iso3 == c.iso3}:
                     continue  # duplicate grid points are evaluated once

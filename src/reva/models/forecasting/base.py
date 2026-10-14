@@ -13,6 +13,9 @@ Conventions
 * Data problems that make a model inapplicable (too short, non-positive values
   for log models, gaps, non-finite values, failed fits) are reported as an
   :class:`IneligibleReport`, never silently repaired (no clipping, no imputation).
+* A forecast that carries a quantified prediction interval may also carry its
+  full :class:`PredictiveDistribution` (used for proper scores such as the
+  CRPS). A forecast without one has no proper score ("not_applicable").
 """
 
 from __future__ import annotations
@@ -33,6 +36,35 @@ IntervalKind = Literal["prediction_interval"]
 
 
 @dataclass(frozen=True)
+class PredictiveDistribution:
+    """Location-scale predictive distribution of ``log(y)`` (``space="log"``).
+
+    ``family="normal"``: ``log y ~ N(loc, scale^2)``; ``family="student_t"``:
+    ``(log y - loc)/scale ~ t_df``. Exponentiating gives the predictive
+    distribution of ``y`` (log-normal / log-t), so proper scores computed on
+    ``log y`` are proper for ``y`` too (the transform is a bijection).
+    """
+
+    family: Literal["normal", "student_t"]
+    loc: float
+    scale: float
+    df: float | None = None
+    space: Literal["log"] = "log"
+
+    def __post_init__(self) -> None:
+        if not (math.isfinite(self.loc) and math.isfinite(self.scale)) or self.scale <= 0.0:
+            raise ValueError("predictive loc must be finite and scale finite and > 0")
+        if self.family == "student_t":
+            if self.df is None or not math.isfinite(self.df) or self.df <= 0:
+                raise ValueError("a Student-t predictive needs a finite df > 0")
+        elif self.family == "normal":
+            if self.df is not None:
+                raise ValueError("a normal predictive has no df")
+        else:
+            raise ValueError(f"unknown predictive family {self.family!r}")
+
+
+@dataclass(frozen=True)
 class Forecast:
     model_key: str
     model_version: str
@@ -45,8 +77,11 @@ class Forecast:
     level: float | None
     uncertainty: UncertaintySpec
     assumptions: tuple[str, ...] = ()
+    predictive: PredictiveDistribution | None = None
 
     def __post_init__(self) -> None:
+        if self.predictive is not None and self.interval is None:
+            raise ValueError("a predictive distribution requires a quantified prediction interval")
         if self.horizon < 1:
             raise ValueError("horizon must be >= 1")
         if self.target_year != self.origin_year + self.horizon:

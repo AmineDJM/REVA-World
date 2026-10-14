@@ -10,9 +10,12 @@ import pytest
 
 from reva.evaluation.tournament_service import (
     LABEL,
+    choose_among_challengers,
     evaluate,
     finite_json,
     holdout_spec,
+    paired_common_metrics,
+    paired_holdout,
     panel_from_rows,
 )
 from reva.kernel.errors import ImmutableRecordViolation, ValidationProblem
@@ -43,6 +46,7 @@ from reva.models.registry import (
     parse_ref,
     rollback_target,
 )
+from reva.models.tournament import PredictionRecord
 from reva.ontology.registry import load_registry
 
 POLICY = {"model_promotion": load_registry().policies["promotion"]["model_promotion"]}
@@ -289,3 +293,40 @@ def test_panel_rows_drop_missing_and_exclude_non_positive_series():
     spec = holdout_spec(series, 2, 1)
     assert spec.years == (2001, 2002) and spec.cells == ("AAA:c:2002",)
     assert finite_json({"x": [math.inf, 1.0]}) == {"x": ["Infinity", 1.0]}
+
+
+def _rec(model: str, origin: int, err: float, sid: str = "S") -> PredictionRecord:
+    return PredictionRecord(series_id=sid, origin=origin, horizon=1, target_year=origin + 1, model=model,
+                            model_version="1.0.0", point=1.0, interval=None, interval_kind=None, level=None,
+                            target=1.0, abs_error=err, mase_scaled_error=err, scale_flag=None, covered=None)
+
+
+def test_paired_metrics_use_common_cases_where_unpaired_ranking_flips():
+    # "a" is scored on a hard early origin that "b" never faces (ineligible there).
+    recs = [_rec("a", 2001, 10.0), _rec("a", 2010, 1.0), _rec("a", 2011, 1.0),
+            _rec("b", 2010, 2.0), _rec("b", 2011, 2.0)]
+    unpaired_a = (10.0 + 1.0 + 1.0) / 3
+    assert unpaired_a > 2.0  # unpaired: "b" looks better
+    pm = paired_common_metrics(recs, ["a", "b"])
+    assert pm["n_common_cases"] == 2
+    assert pm["metrics"]["a"]["mase"] == 1.0 and pm["metrics"]["b"]["mase"] == 2.0  # paired: "a" is better
+
+
+def test_challenger_choice_requires_a_distinguishable_paired_winner():
+    pol = {"bootstrap": {"block_length": 3, "replicates": 500, "level": 0.95}}
+    clear = [_rec("a", y, 1.0 + 0.01 * (y % 3)) for y in range(2000, 2040)] + \
+            [_rec("b", y, 2.0 + 0.01 * (y % 5)) for y in range(2000, 2040)]
+    assert choose_among_challengers(clear, ["a", "b"], pol, seed=1)["winner"] == "a"
+    noisy = [_rec("a", y, 1.0 + (0.5 if y % 2 else -0.5)) for y in range(2000, 2040)] + \
+            [_rec("b", y, 1.0 + (-0.5 if y % 2 else 0.5)) for y in range(2000, 2040)]
+    sel = choose_among_challengers(noisy, ["a", "b"], pol, seed=1)
+    assert sel["winner"] is None and sel["n_common"] == 40
+
+
+def test_holdout_confirmation_is_paired_and_rejects_any_regression():
+    ch = [{"series_id": "S", "origin": 2022, "horizon": 1, "mase_scaled_error": 1.05},
+          {"series_id": "T", "origin": 2022, "horizon": 1, "mase_scaled_error": None}]
+    inc = [{"series_id": "S", "origin": 2022, "horizon": 1, "mase_scaled_error": 1.0},
+           {"series_id": "T", "origin": 2022, "horizon": 1, "mase_scaled_error": 9.0}]
+    hp = paired_holdout(ch, inc)
+    assert hp["n_common"] == 1 and hp["mean_difference"] > 0  # 5% worse is a regression, not "within 10%"

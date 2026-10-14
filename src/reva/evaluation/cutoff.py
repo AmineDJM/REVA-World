@@ -14,9 +14,18 @@ Modes
 ``available_then`` (reconstruction)
     Observations with independently evidenced availability at/before the
     cutoff (``source_available_at`` **and** ``availability_basis``), whenever
-    REVA recorded them. Records without proof are excluded and counted. The
-    eligibility/ontology in force is the *current* algorithm design, which is
-    reported separately from availability.
+    REVA recorded them. Records without proof are excluded and counted.
+    Data-quality knowledge is applied *as of the cutoff* (R3-10): a retraction
+    excludes a record only if it was recorded at/before the cutoff, and the
+    eligibility decision in force at the cutoff governs. When REVA had made no
+    eligibility decision for a (connector version, concept) by the cutoff, the
+    *first* decision REVA ever recorded for it (the algorithm-design decision)
+    is used and its date is reported (``eligibility_evaluated_at``). Later
+    retractions and later eligibility changes (quarantine/retirement) are
+    never used to exclude records; they are reported as row flags
+    (``retracted_after_cutoff``, ``ineligible_after_cutoff``) and counted in
+    :meth:`ObservationScope.flag_report`. Selection method and ontology are the
+    current algorithm design, reported separately from availability.
 ``revised_data_retrospective`` (explicit downgrade)
     The data snapshot is identical to ``as_known`` at the cutoff (latest
     revised values recorded by then); the mode exists so that consumers that
@@ -71,6 +80,7 @@ class ObservationScope:
     rows: list[dict[str, Any]]
     exclusions: Counter[str] = field(default_factory=Counter)
     candidate_revisions: int = 0
+    flags: Counter[str] = field(default_factory=Counter)
 
     def exclusion_report(self) -> list[dict[str, Any]]:
         reasons = {
@@ -84,26 +94,55 @@ class ObservationScope:
             for k, v in sorted(self.exclusions.items())
         ]
 
+    def flag_report(self) -> list[dict[str, Any]]:
+        """Post-cutoff quality knowledge about *included* rows: flagged, never used to exclude."""
+        reasons = {
+            "retracted_after_cutoff": "retracted after the cutoff; it was available then, so it stays in",
+            "ineligible_after_cutoff": "eligible under the decision in force at the cutoff, ineligible today",
+            "eligibility_from_first_decision_after_cutoff": (
+                "REVA had no eligibility decision at the cutoff; the first recorded (design) decision was used"),
+        }
+        return [
+            {"flag": k, "count": v, "explanation": reasons.get(k, k)}
+            for k, v in sorted(self.flags.items())
+        ]
+
 
 _OBS_CTE = """
-WITH cand AS (
+WITH base AS (
+  SELECT o.*,
+         -- eligibility clock: the cutoff; in available_then, if REVA had no decision for this
+         -- (connector version, concept) by the cutoff, the first decision it ever recorded.
+         CASE WHEN :mode = 'available_then'
+              THEN GREATEST(CAST(:cutoff AS timestamptz),
+                            (SELECT min(e.recorded_at) FROM evidence.eligibility e
+                             WHERE e.connector_version_id = o.connector_version_id
+                               AND e.concept_version_id = o.concept_version_id))
+              ELSE CAST(:cutoff AS timestamptz) END AS eligibility_evaluated_at
+  FROM evidence.observation o
+), cand AS (
   SELECT o.id, o.source_id, o.logical_key, o.revision_no, o.subject_id, o.concept_version_id, o.support_id,
          o.value, o.uncertainty, o.source_flags, o.recorded_at, o.observed_at, o.source_published_at,
          o.source_available_at, o.availability_basis, o.source_revision_id, o.connector_version_id,
          o.acquisition_id, o.parser_version, s.source_key, c.concept_id, a.origin, a.retrieved_at,
-         sp.temporal_extent, sp.spatial_spec, sp.aggregation,
+         sp.temporal_extent, sp.spatial_spec, sp.aggregation, o.eligibility_evaluated_at,
+         EXISTS (SELECT 1 FROM evidence.observation_retraction r
+                 WHERE r.observation_id = o.id AND r.recorded_at > CAST(:cutoff AS timestamptz))
+           AS retracted_after_cutoff,
+         NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id,
+                                  CAST(:now AS timestamptz)) AS ineligible_now,
          CASE
            WHEN NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id,
-                                         CAST(:elig_at AS timestamptz)) THEN 'ineligible'
+                                         o.eligibility_evaluated_at) THEN 'ineligible'
            WHEN EXISTS (SELECT 1 FROM evidence.observation_retraction r
-                        WHERE r.observation_id = o.id AND r.recorded_at <= CAST(:retract_at AS timestamptz))
+                        WHERE r.observation_id = o.id AND r.recorded_at <= CAST(:cutoff AS timestamptz))
              THEN 'retracted'
            WHEN :mode = 'available_then' AND (o.source_available_at IS NULL OR o.availability_basis IS NULL)
              THEN 'no_availability_proof'
            WHEN :mode = 'available_then' AND o.source_available_at > :cutoff THEN 'available_after_cutoff'
            ELSE NULL
          END AS exclusion
-  FROM evidence.observation o
+  FROM base o
   JOIN evidence.source s ON s.id = o.source_id
   JOIN evidence.acquisition a ON a.id = o.acquisition_id
   JOIN ontology.concept_version c ON c.id = o.concept_version_id
@@ -187,17 +226,15 @@ class CutoffRepository:
 
     # ----------------------------------------------------------------- evidence
     def _obs_params(self, concepts: Sequence[str] | None) -> dict[str, Any]:
-        reconstruct = self._mode is CutoffMode.available_then
-        # available_then uses the current algorithm design (eligibility/retractions
-        # as of reconstruction time); the operational clock uses the cutoff.
-        at = self._now if reconstruct else self._cutoff
+        # Retractions and eligibility decisions are always evaluated as of the cutoff
+        # (available_then: see the module docstring for the design-decision floor);
+        # ``now`` is used only to flag post-cutoff changes, never to exclude.
         return {
             "cutoff": self._cutoff,
+            "now": self._now,
             "mode": self._mode.value,
             "origins": self._origins,
             "concepts": list(concepts) if concepts else None,
-            "elig_at": at,
-            "retract_at": at,
         }
 
     def observations(self, concepts: Sequence[str] | None = None) -> ObservationScope:
@@ -212,6 +249,13 @@ class CutoffRepository:
                 scope.exclusions[r["exclusion"]] = int(r["n"])
         for r in rows:
             self._guard.check(self.observation_input(r))  # defence in depth
+            r["ineligible_after_cutoff"] = bool(r.pop("ineligible_now"))
+            if r["retracted_after_cutoff"]:
+                scope.flags["retracted_after_cutoff"] += 1
+            if r["ineligible_after_cutoff"]:
+                scope.flags["ineligible_after_cutoff"] += 1
+            if r["eligibility_evaluated_at"] is not None and r["eligibility_evaluated_at"] > self._cutoff:
+                scope.flags["eligibility_from_first_decision_after_cutoff"] += 1
             scope.rows.append(r)
         return scope
 

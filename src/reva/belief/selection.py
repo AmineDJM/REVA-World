@@ -9,7 +9,9 @@
    ``superseded_revision_selected``.
 3. Apply the published source preference policy for the exact estimand.
 4. Publish selected_report with the original uncertainty status.
-5. Retain alternatives and discrepancy flags; never average incomparable definitions.
+5. Retain alternatives and discrepancy flags; never average incomparable definitions,
+   and never pick one of them: candidates that differ on a distinguishing dimension
+   (flow, partner) withhold the estimand, recorded in the release manifest.
 """
 
 from __future__ import annotations
@@ -17,6 +19,7 @@ from __future__ import annotations
 from collections import defaultdict
 from dataclasses import dataclass, field
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any
 from uuid import UUID
 
@@ -125,16 +128,61 @@ def eligible_latest(
     return [dict(r) for r in rows]
 
 
-# Dimensions that make two lineages of one source different quantities, not
-# disagreeing reports of the same quantity (defensive check, R-05).
+# Dimensions that make two candidate lineages of one estimand different
+# quantities, not disagreeing reports of the same quantity (R-05, R3-08): when
+# candidates differ on one of them, no value is published for the estimand.
 DISTINGUISHING_FLAGS = ("flowCode", "partnerCode")
 
 
+@dataclass
+class Withheld:
+    """An estimand for which no value is published (R3-08): its candidate lineages
+    differ on a distinguishing dimension, so they are different quantities and
+    picking any one would be arbitrary."""
+
+    subject_id: UUID
+    concept_version_id: UUID
+    concept_id: str
+    support_id: UUID
+    reason: str
+    discrepancy_flags: list[str]
+    alternatives: list[dict[str, Any]]
+
+    def as_json(self) -> dict[str, Any]:
+        return {"subject_id": str(self.subject_id), "concept_id": self.concept_id,
+                "support_id": str(self.support_id), "reason": self.reason,
+                "discrepancy_flags": self.discrepancy_flags, "alternatives": self.alternatives}
+
+
+@dataclass
+class SelectionResult:
+    selections: list[Selection]
+    withheld: list[Withheld]
+
+
+def _same_value(a: dict[str, Any], b: dict[str, Any]) -> bool:
+    """Value equality; decimals compare numerically ("100" == "100.0")."""
+    if a.get("kind") == b.get("kind") == "decimal":
+        try:
+            rest_a = {k: v for k, v in a.items() if k != "value"}
+            rest_b = {k: v for k, v in b.items() if k != "value"}
+            return bool(Decimal(str(a.get("value"))) == Decimal(str(b.get("value"))) and rest_a == rest_b)
+        except InvalidOperation:
+            return a == b
+    return a == b
+
+
 def select(rows: list[dict[str, Any]], preferences: dict[str, list[str]]) -> list[Selection]:
+    return select_report(rows, preferences).selections
+
+
+def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]]) -> SelectionResult:
+    """source_select_v1 over ``eligible_latest`` rows: selections plus withheld estimands."""
     groups: dict[tuple[Any, Any, Any], list[dict[str, Any]]] = defaultdict(list)
     for r in rows:
         groups[(r["subject_id"], r["concept_version_id"], r["support_id"])].append(r)
     out: list[Selection] = []
+    withheld: list[Withheld] = []
     for (subject, concept, support), group in sorted(groups.items(), key=lambda kv: tuple(map(str, kv[0]))):
         concept_id = group[0]["concept_id"]
         prefs = preferences.get(concept_id)
@@ -166,15 +214,26 @@ def select(rows: list[dict[str, Any]], preferences: dict[str, list[str]]) -> lis
             if alt.get("selection_status") == "superseded_revision_selected":
                 entry["selection_status"] = "superseded_revision_selected"
             sel.alternatives.append(entry)
-            if alt["value"] != chosen["value"]:
+            if not _same_value(alt["value"], chosen["value"]):
                 sel.discrepancy_flags.append(f"source_disagreement:{alt['source_key']}")
         same_source = [c for c in ranked if c["source_key"] == chosen["source_key"]]
         if len(same_source) > 1:
             sel.discrepancy_flags.append("multiple_lineages_same_source")
-            for dim in DISTINGUISHING_FLAGS:
-                vals = {str((c.get("source_flags") or {}).get(dim)) for c in same_source}
-                if len(vals) > 1:
-                    sel.discrepancy_flags.append(f"incompatible_lineages:{dim}")
+        incompatible = [
+            f"incompatible_lineages:{dim}" for dim in DISTINGUISHING_FLAGS
+            if len({str((c.get("source_flags") or {}).get(dim)) for c in ranked}) > 1
+        ]
+        if incompatible:
+            # Different quantities under one estimand (R-05/R3-08): never pick one arbitrarily.
+            withheld.append(Withheld(
+                subject_id=subject, concept_version_id=concept, concept_id=concept_id, support_id=support,
+                reason="incompatible_lineages", discrepancy_flags=incompatible,
+                alternatives=[{"observation_id": str(c["id"]), "source_key": c["source_key"],
+                               "logical_key": c["logical_key"], "value": c["value"],
+                               **{d: (c.get("source_flags") or {}).get(d) for d in DISTINGUISHING_FLAGS}}
+                              for c in ranked],
+            ))
+            continue
         for r in retracted:
             # The retracted lineage is excluded; its value is not carried forward.
             sel.alternatives.append({"observation_id": str(r["id"]), "source_key": r["source_key"],
@@ -182,4 +241,4 @@ def select(rows: list[dict[str, Any]], preferences: dict[str, list[str]]) -> lis
             sel.discrepancy_flags.append(f"retracted_lineage_excluded:{r['source_key']}")
         sel.discrepancy_flags = list(dict.fromkeys(sel.discrepancy_flags))
         out.append(sel)
-    return out
+    return SelectionResult(out, withheld)

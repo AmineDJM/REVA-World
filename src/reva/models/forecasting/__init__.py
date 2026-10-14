@@ -6,6 +6,7 @@ from reva.models.forecasting.base import (
     ForecastModel,
     IneligibleReport,
     Observation,
+    PredictiveDistribution,
 )
 from reva.models.forecasting.drift import LogDrift
 from reva.models.forecasting.last_value import LastValue
@@ -20,4 +21,5 @@ __all__ = [
     "LocalLevelLog",
     "LogDrift",
     "Observation",
+    "PredictiveDistribution",
 ]

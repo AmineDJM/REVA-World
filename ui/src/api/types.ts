@@ -978,6 +978,8 @@ export type QuerySpec =
       layer?: string | null;
       period?: number | null;
       as_of?: string | null;
+      /** Pin to a published belief release instead of evidence (excludes as_of). */
+      release_id?: string | null;
       depth?: number;
       max_edges?: number;
     };

@@ -1133,7 +1133,7 @@ export interface components {
              * Limit
              * @default 100
              */
-            limit: number;
+            limit?: number;
             /** Release Id */
             release_id?: string | null;
             /** Subject Ids */
@@ -1604,14 +1604,14 @@ export interface components {
              * @default eurostat
              * @enum {string}
              */
-            catalogue: "eurostat" | "worldbank" | "comtrade";
+            catalogue?: "eurostat" | "worldbank" | "comtrade";
             /** Concept Id */
             concept_id?: string | null;
             /**
              * Max Candidates
              * @default 10
              */
-            max_candidates: number;
+            max_candidates?: number;
             /** Query */
             query: string;
         };
@@ -3571,7 +3571,7 @@ export interface components {
              * Depth
              * @default 1
              */
-            depth: number;
+            depth?: number;
             /**
              * Entity Id
              * Format: uuid
@@ -3588,9 +3588,14 @@ export interface components {
              * Max Edges
              * @default 500
              */
-            max_edges: number;
+            max_edges?: number;
             /** Period */
             period?: number | null;
+            /**
+             * Release Id
+             * @description Pin to a published belief release (excludes as_of)
+             */
+            release_id?: string | null;
         };
         /** ReleaseArtifact */
         ReleaseArtifact: {
@@ -3622,7 +3627,7 @@ export interface components {
              * Horizon Years
              * @default 1
              */
-            horizon_years: number;
+            horizon_years?: number;
             /**
              * Mode
              * @enum {string}
@@ -3715,7 +3720,7 @@ export interface components {
              * Comment
              * @default
              */
-            comment: string;
+            comment?: string;
             /**
              * Decision
              * @enum {string}
@@ -4410,7 +4415,7 @@ export interface components {
              * @default latest
              * @enum {string}
              */
-            revisions: "latest" | "all";
+            revisions?: "latest" | "all";
             /**
              * Subject Id
              * Format: uuid
@@ -5662,9 +5667,11 @@ export interface operations {
                 layer?: string | null;
                 /** @description Calendar year of the valid support */
                 period?: number | null;
-                /** @description Only relations recorded at/before this instant */
+                /** @description Evidence as known at this instant (recorded, not superseded, not retracted at/before it) */
                 as_of?: string | null;
                 origin?: string | null;
+                /** @description Relations pinned to this published belief release instead of evidence (excludes as_of/origin) */
+                release_id?: string | null;
                 depth?: number;
                 max_edges?: number;
             };

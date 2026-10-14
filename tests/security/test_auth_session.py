@@ -209,3 +209,50 @@ def test_cors_only_for_configured_origins(db: Any) -> None:
         bad = c.options("/v1/entities", headers={"Origin": "https://evil.example", **pre})
         assert "access-control-allow-origin" not in bad.headers
     app.state.engine.dispose()
+
+
+def _bad_logins(c: TestClient, n: int) -> list[int]:
+    return [c.post("/v1/session", json={"username": "admin", "password": f"bad-{i}"}).status_code for i in range(n)]
+
+
+def test_login_rate_limit_override_is_enforced(db: Any) -> None:
+    app = create_app(settings_for(db), login_rate_limit_per_minute=2)
+    with TestClient(app) as c:
+        assert _bad_logins(c, 3) == [401, 401, 429]
+        r = c.post("/v1/session", json={"username": "admin", "password": PASSWORD})
+        assert r.status_code == 429 and int(r.headers["retry-after"]) >= 1
+    app.state.engine.dispose()
+
+
+def test_login_rate_limit_from_environment(db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    from reva.api.auth import LOGIN_RATE_LIMIT_ENV
+
+    monkeypatch.setenv(LOGIN_RATE_LIMIT_ENV, "3")
+    extra = {"reva_login_rate_limit_per_minute": 3} if "reva_login_rate_limit_per_minute" in Settings.model_fields \
+        else {}
+    app = create_app(settings_for(db, **extra))
+    assert app.state.auth.limiter.limit == 3
+    with TestClient(app) as c:
+        assert _bad_logins(c, 4) == [401, 401, 401, 429]
+    app.state.engine.dispose()
+
+
+@pytest.mark.parametrize("raw", ["0", "-1", "abc", "1.5", "100000"])
+def test_login_rate_limit_invalid_config_fails_closed(db: Any, monkeypatch: pytest.MonkeyPatch, raw: str) -> None:
+    from reva.api.auth import LOGIN_RATE_LIMIT_ENV, login_rate_limit_per_minute
+    from reva.kernel.errors import ConfigurationError
+
+    if "reva_login_rate_limit_per_minute" in Settings.model_fields:
+        pytest.skip("Settings declares the field; its own validation applies")
+    monkeypatch.setenv(LOGIN_RATE_LIMIT_ENV, raw)
+    with pytest.raises(ConfigurationError):
+        create_app(settings_for(db))
+    with pytest.raises(ConfigurationError):
+        login_rate_limit_per_minute(settings_for(db), 0)
+
+
+def test_login_rate_limit_default_is_five(db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    from reva.api.auth import LOGIN_RATE_LIMIT_ENV, login_rate_limit_per_minute
+
+    monkeypatch.delenv(LOGIN_RATE_LIMIT_ENV, raising=False)
+    assert login_rate_limit_per_minute(settings_for(db)) == 5

@@ -294,20 +294,29 @@ def test_l2_sensitivity_range(db, baseline):
     ref, _ = run(db, sid)
     assert ref["status"] == "succeeded", ref
     rows = results(db, ref["run_id"])
-    assert len(rows) == 4 * 3 * (1 + 3)
+    # per country/output: L1 + 3 grid variants + 1 separate sensitivity-range row
+    assert len(rows) == 4 * 3 * (1 + 3 + 1)
     for r in rows:
         u = r["uncertainty"]
-        if r["variant"] == "L1":
-            assert u["kind"] == "sensitivity_range" and u["level"] is None
+        if r["variant"] == "L2:sensitivity_range":
+            v = r["value"]
+            assert v["kind"] == "sensitivity_range"
+            assert v["statement"] == "assumption sensitivity, not a confidence interval"
+            assert u["status"] == "quantified" and u["kind"] == "sensitivity_range" and u["level"] is None
             assert u["kind"] != "confidence_interval"
+            assert (u["lower"], u["upper"]) == (v["lower"], v["upper"])
             assert Decimal(u["lower"]) <= Decimal(u["upper"])
-            variants = [Decimal(x["value"]["value"]) for x in rows
-                        if x["label"] == r["label"] and x["output_key"] == r["output_key"]
-                        and x["variant"].startswith("L2:")]
-            assert Decimal(u["lower"]) == min(variants) and Decimal(u["upper"]) == max(variants)
-            assert len(u["conditioning"]) == 3
+            same = [x for x in rows if x["label"] == r["label"] and x["output_key"] == r["output_key"]]
+            points = [Decimal(x["value"]["value"]) for x in same
+                      if x["variant"].startswith("L2:eM=") or x["variant"] == "L1"]
+            assert Decimal(u["lower"]) == min(points) and Decimal(u["upper"]) == max(points)
+            l1 = next(Decimal(x["value"]["value"]) for x in same if x["variant"] == "L1")
+            assert Decimal(u["lower"]) <= l1 <= Decimal(u["upper"])
+            assert len(u["conditioning"]) == 3 + 1  # grid points + the always-included (0,0) point
         else:
-            assert u["status"] == "unquantified"
+            # the L1 fixed-quantity row and every grid variant keep the unquantified status (R3-03)
+            assert u["status"] == "unquantified" and u["kind"] == "unknown", r
+            assert r["value"]["kind"] == "decimal"
     by = {(r["label"], r["output_key"], r["variant"]): r["value"]["value"] for r in rows}
     for label in ("France", "China", "United States"):
         for k in OUTPUTS:

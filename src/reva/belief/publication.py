@@ -19,7 +19,7 @@ import pyarrow.parquet as pq
 from sqlalchemy import Connection, Engine, text
 
 from reva.adapters.postgres import repositories as repo
-from reva.belief.selection import METHOD_KEY, METHOD_VERSION, eligible_latest, select
+from reva.belief.selection import METHOD_KEY, METHOD_VERSION, eligible_latest, select_report
 from reva.evidence.locks import take_evidence_snapshot_lock
 from reva.kernel.context import Origin, assert_publishable
 from reva.kernel.errors import ValidationProblem
@@ -108,7 +108,8 @@ def publish_release(
         if fence is not None:
             fence(conn)  # stale lease holders cannot publish
         rows = eligible_latest(conn, cutoff, origins, concepts, include_retracted=True)  # fresh snapshot
-        selections = select(rows, preferences)
+        result = select_report(rows, preferences)
+        selections = result.selections
         if not selections:
             raise ValidationProblem("no eligible observations at this cutoff; nothing to publish")
         excluded_retracted = sorted(str(r["id"]) for r in rows if r.get("selection_status") == "retracted")
@@ -166,6 +167,7 @@ def publish_release(
             "model_manifest_sha256": model_sha,
             "input_observation_ids": input_obs,
             "excluded_retracted_lineage_heads": excluded_retracted,
+            "withheld_estimands": [w.as_json() for w in result.withheld],
             "temporal_coverage": [str(temporal[0]), str(temporal[1])],
             "source_logical_keys_count": len(input_obs),
         }

@@ -8665,6 +8665,19 @@
               }
             ],
             "title": "Period"
+          },
+          "release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pin to a published belief release (excludes as_of)",
+            "title": "Release Id"
           }
         },
         "required": [
@@ -13949,7 +13962,7 @@
             }
           },
           {
-            "description": "Only relations recorded at/before this instant",
+            "description": "Evidence as known at this instant (recorded, not superseded, not retracted at/before it)",
             "in": "query",
             "name": "as_of",
             "required": false,
@@ -13963,7 +13976,7 @@
                   "type": "null"
                 }
               ],
-              "description": "Only relations recorded at/before this instant",
+              "description": "Evidence as known at this instant (recorded, not superseded, not retracted at/before it)",
               "title": "As Of"
             }
           },
@@ -13982,6 +13995,25 @@
                 }
               ],
               "title": "Origin"
+            }
+          },
+          {
+            "description": "Relations pinned to this published belief release instead of evidence (excludes as_of/origin)",
+            "in": "query",
+            "name": "release_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Relations pinned to this published belief release instead of evidence (excludes as_of/origin)",
+              "title": "Release Id"
             }
           },
           {

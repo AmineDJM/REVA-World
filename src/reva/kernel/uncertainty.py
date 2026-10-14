@@ -2,6 +2,23 @@
 
 Interval kinds are distinct types: a sensitivity range is not a confidence
 interval and a prediction interval is not a credible interval.
+
+Sensitivity ranges (rule R3-19). ``status`` always describes the object that
+carries the spec. A ``kind=sensitivity_range`` spec is ``quantified`` only in
+the sense that the spread of an output across *stated scenario assumptions*
+was computed exactly; it is assumption sensitivity, never measurement,
+sampling or forecast uncertainty, and it has no coverage level. Consequently:
+
+* a sensitivity range must state both bounds and must not carry a level;
+* it never replaces or upgrades the uncertainty status of the point value it
+  was derived from: a point computed under fixed assumptions keeps its own
+  spec (typically ``unquantified`` when its inputs publish no uncertainty) and
+  the range is published as a separate value/row
+  (``quantifies_measurement`` is False for it);
+* producers should list the assumptions in ``conditioning``.
+
+The JSON contract is unchanged: ``sensitivity_range`` remains valid only under
+``status=quantified`` (contracts/observation.schema.json).
 """
 
 from __future__ import annotations
@@ -89,8 +106,11 @@ class UncertaintySpec(BaseModel):
                 raise ValueError("quantified uncertainty needs a concrete kind")
             if not self.method_version:
                 raise ValueError("quantified uncertainty requires method_version")
-        if self.kind == UncertaintyKind.sensitivity_range and self.level is not None:
-            raise ValueError("a sensitivity range has no probabilistic coverage level")
+        if self.kind == UncertaintyKind.sensitivity_range:
+            if self.level is not None:
+                raise ValueError("a sensitivity range has no probabilistic coverage level")
+            if self.lower is None or self.upper is None:
+                raise ValueError("a sensitivity range must state both lower and upper bounds")
         if self.kind == UncertaintyKind.bounds and self.level is not None:
             raise ValueError("bounds have no probabilistic coverage level")
         if self.level is not None and not (0.0 < self.level < 1.0):
@@ -113,6 +133,17 @@ class UncertaintySpec(BaseModel):
     def is_probabilistic(self) -> bool:
         return self.kind in PROBABILISTIC_KINDS
 
+    @property
+    def is_assumption_sensitivity(self) -> bool:
+        """True when this spec describes spread across scenario assumptions (R3-19)."""
+        return self.kind == UncertaintyKind.sensitivity_range
+
+    @property
+    def quantifies_measurement(self) -> bool:
+        """True only when the uncertainty of the value itself (measurement, sampling,
+        estimation or forecast error) is quantified. A sensitivity range is not."""
+        return self.status == UncertaintyStatus.quantified and not self.is_assumption_sensitivity
+
     @classmethod
     def unknown(cls, description: str = "Source reports no uncertainty") -> UncertaintySpec:
         return cls(
@@ -131,8 +162,14 @@ class UncertaintySpec(BaseModel):
 
     @classmethod
     def sensitivity(
-        cls, lower: str, upper: str, method_version: str, description: str
+        cls,
+        lower: str,
+        upper: str,
+        method_version: str,
+        description: str,
+        conditioning: tuple[str, ...] = (),
     ) -> UncertaintySpec:
+        """Assumption-sensitivity range for a *separate* range value; see the module rule."""
         return cls(
             status=UncertaintyStatus.quantified,
             kind=UncertaintyKind.sensitivity_range,
@@ -140,4 +177,5 @@ class UncertaintySpec(BaseModel):
             method_version=method_version,
             lower=lower,
             upper=upper,
+            conditioning=tuple(conditioning),
         )

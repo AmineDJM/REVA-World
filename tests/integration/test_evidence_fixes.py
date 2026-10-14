@@ -37,7 +37,7 @@ from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.connectors.worldbank import WorldBankConnector
 from reva.adapters.postgres import repositories as repo
 from reva.belief.publication import add_prior_estimate_input, publish_release
-from reva.belief.selection import eligible_latest, select
+from reva.belief.selection import eligible_latest, select, select_report
 from reva.belief.snapshots import release_as_of
 from reva.cli.seed import entity_id, register_connector_version
 from reva.evidence.ingest import acquisition_idempotency_key, publish_acquisition
@@ -318,13 +318,28 @@ async def test_r05_import_and_export_weights_are_separate_estimates(db: Any) -> 
     assert not any(f.startswith("source_disagreement") for r in rows for f in r["discrepancy_flags"])
 
 
-def test_r05_select_flags_incompatible_lineages_of_one_source() -> None:
-    base = {"subject_id": 1, "concept_version_id": 2, "support_id": 3, "concept_id": "c", "source_key": "s",
-            "uncertainty": {"status": "unquantified"}, "selection_status": "current", "origin": "test_fixture"}
-    rows = [{**base, "id": 10, "logical_key": "a", "value": {"v": 1}, "source_flags": {"flowCode": "M"}},
-            {**base, "id": 11, "logical_key": "b", "value": {"v": 2}, "source_flags": {"flowCode": "X"}}]
+_BASE = {"subject_id": 1, "concept_version_id": 2, "support_id": 3, "concept_id": "c", "source_key": "s",
+         "uncertainty": {"status": "unquantified"}, "selection_status": "current", "origin": "test_fixture"}
+
+
+def test_r05_r3_08_incompatible_lineages_withhold_the_estimand() -> None:
+    rows = [{**_BASE, "id": 10, "logical_key": "a", "value": {"kind": "decimal", "value": "100"},
+             "source_flags": {"flowCode": "M"}},
+            {**_BASE, "id": 11, "logical_key": "b", "value": {"kind": "decimal", "value": "40"},
+             "source_flags": {"flowCode": "X"}}]
+    assert select(rows, {"c": ["s"]}) == []  # no arbitrary pick among different quantities
+    res = select_report(rows, {"c": ["s"]})
+    (w,) = res.withheld
+    assert w.reason == "incompatible_lineages" and w.discrepancy_flags == ["incompatible_lineages:flowCode"]
+    assert {a["flowCode"] for a in w.alternatives} == {"M", "X"}
+
+
+def test_r3_08_decimal_values_compare_numerically() -> None:
+    rows = [{**_BASE, "id": 10, "logical_key": "a", "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
+            {**_BASE, "id": 11, "logical_key": "b", "value": {"kind": "decimal", "value": "100.0"},
+             "source_flags": {}}]
     (sel,) = select(rows, {"c": ["s"]})
-    assert "incompatible_lineages:flowCode" in sel.discrepancy_flags
+    assert not any(f.startswith("source_disagreement") for f in sel.discrepancy_flags)
 
 
 # --------------------------------------------------------------------------- R-23

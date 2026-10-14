@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import json
 from datetime import UTC, date, datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from sqlalchemy import Engine, text
@@ -18,7 +19,7 @@ from reva.adapters.postgres import repositories as repo
 from reva.belief.selection import eligible_latest
 from reva.compression.refine import refine
 from reva.compression.stratified import coarsen
-from reva.kernel.errors import MissingInput
+from reva.kernel.errors import MissingInput, ValidationProblem
 from reva.operations.context import JobContext
 from reva.population.diagnostics import diagnose
 from reva.population.materialise import materialise, table_logical_hash, to_parquet_bytes
@@ -29,6 +30,17 @@ CONCEPT = "demography.population.jan1_age_sex"
 FIVE_YEAR_BANDS: list[tuple[str, int, int | None]] = [
     (f"Y{lo}-{lo + 4}", lo, lo + 4) for lo in range(0, 85, 5)
 ] + [("Y_GE85", 85, None)]
+
+
+def _integral_count(value: Any, source_key: str) -> int:
+    """A person count published as a decimal string ("123" or "123.0"); a fractional count is rejected."""
+    try:
+        d = Decimal(str(value))
+    except InvalidOperation:
+        raise ValidationProblem("population count is not a number", source_key=source_key) from None
+    if not d.is_finite() or d != d.to_integral_value():
+        raise ValidationProblem("population count is not an integer", source_key=source_key, value=str(value))
+    return int(d)
 
 
 def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, origin: str) -> list[SourceCell]:
@@ -58,7 +70,7 @@ def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, 
             continue
         res = sup["resolution"] or {}
         v = r["value"]
-        count = int(v["value"]) if v.get("kind") == "decimal" else None
+        count = _integral_count(v["value"], r["logical_key"]) if v.get("kind") == "decimal" else None
         # Eurostat OBS_FLAG codes: the template stores them as one string of flag
         # characters (e.g. "p", "ep", ""); accept a list too. One code per flag.
         st = (r.get("source_flags") or {}).get("status") or ""
@@ -79,7 +91,8 @@ def build_population(
     cutoff = cutoff or datetime.now(UTC)
     cells = load_cells(worker, geo_entity=geo_entity, year=year, cutoff=cutoff, origin=origin)
     recipe = build_recipe(cells, geography=geo_entity, reference_date=date(year, 1, 1),
-                          source_ref={"concept": CONCEPT, "dataset": "eurostat demo_pjan", "cutoff": cutoff.isoformat()},
+                          source_ref={"concept": CONCEPT, "dataset": "eurostat demo_pjan",
+                                      "cutoff": cutoff.isoformat()},
                           seed=seed)
     table = materialise(recipe, n_records)
     diag = diagnose(table, recipe)
@@ -91,7 +104,8 @@ def build_population(
     with worker.begin() as conn:
         act = repo.simple_activity("population.materialise", "model", actor,
                                    {"geo": geo_entity, "year": year, "n_records": n_records, "seed": seed})
-        recipe_sha = repo.store_json_artifact(conn, store, recipe.to_dict(), "models", schema_version="population-recipe/1",
+        recipe_sha = repo.store_json_artifact(conn, store, recipe.to_dict(), "models",
+                                              schema_version="population-recipe/1",
                                               privacy_class="synthetic_public_aggregate_derived")
         for obj, logical in ((pq_obj, table_logical_hash(table)), (coarse_obj, table_logical_hash(coarse.table)),
                              (refined_obj, table_logical_hash(refined.table))):
@@ -124,7 +138,7 @@ def build_population(
             )
     return {"population_dataset_id": str(pid), "context_id": str(ctx_id), "records": table.num_rows,
             "recipe_sha256": recipe_sha, "materialisation_sha256": pq_obj.sha256,
-            "ess": diag.get("ess"), "leaf_cells": len(recipe.leaf_cells)}
+            "ess": diag.get("effective_sample_size"), "leaf_cells": len(recipe.leaf_cells)}
 
 
 def handle_population(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:

@@ -84,8 +84,9 @@ markers = [
   "db: requires PostgreSQL/PostGIS (REVA_MIGRATION_DATABASE_URL)",
   "live: performs real network requests to public providers",
   "perf: performance measurement",
+  "e2e: end-to-end workflow tests",
 ]
-addopts = "-m 'not live'"
+addopts = "-m 'not live and not perf'"
 
 [tool.importlinter]
 root_package = "reva"

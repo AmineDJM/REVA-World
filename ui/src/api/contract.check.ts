@@ -56,6 +56,9 @@ export type ContractChecks = [
   Assert<Fits<T.ReplayRequest, S['ReplayRequest']>>,
   Assert<Fits<T.DiscoveryRequest, S['DiscoveryRequest']>>,
   Assert<Fits<T.EvaluationRequest, S['EvaluationRequest']>>,
+  Assert<Fits<Extract<T.QuerySpec, { kind: 'relations' }>, S['RelationsQuery']>>,
+  Assert<Fits<Extract<T.QuerySpec, { kind: 'beliefs' }>, S['BeliefsQuery']>>,
+  Assert<Fits<Extract<T.QuerySpec, { kind: 'timeseries' }>, S['TimeseriesQuery']>>,
   Assert<Fits<T.ReviewRequest, S['ReviewRequest']>>,
   Assert<Fits<T.LoginRequest, S['LoginRequest']>>,
 ];
