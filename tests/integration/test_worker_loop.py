@@ -12,6 +12,7 @@ import time
 import uuid
 from collections.abc import Iterator
 from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
 
 import pytest
@@ -399,3 +400,37 @@ def test_sigterm_during_real_simulation_requeues_job(wdb: FreshDB, sim_baseline:
     assert queue.job_row(wdb.owner, jid)["status"] == "succeeded"
     w.close()
     w2.close()
+
+
+# --------------------------------------------------------------------------- R2-16 demo CLI
+def test_demo_runs_through_the_worker_path_with_db_clock_cutoff(wdb: FreshDB, sim_baseline: dict,
+                                                                 monkeypatch) -> None:
+    from reva.cli import demo
+
+    _clear_queue(wdb)
+    api = make_engine("api", wdb.settings)
+    engines = {"api": api, "worker": wdb.worker, "sim": wdb.sim}
+    monkeypatch.setattr(demo, "get_engine", lambda kind: engines[kind])
+    monkeypatch.setattr(demo, "get_store", lambda: wdb.store)
+    monkeypatch.setattr(demo, "get_settings", lambda: wdb.settings)
+    try:
+        with pytest.raises(Exception, match="origin"):
+            demo.run_demo(scenario="crude-border-price-25", countries=["FRA"], fidelity="L1", origin="bogus")
+        # A worker is "running": the job is left queued for it and polled with a timeout.
+        queued = demo.run_demo(scenario="crude-border-price-25", countries=["FRA", "USA"], fidelity="L1",
+                               origin="test_fixture", execute_locally=False, wait_seconds=0.5)
+        assert queued["execution"] == "worker" and queued["job"]["status"] == "queued"
+        assert queued["results"] == [] and queued["warnings"]
+        # No worker: the demo executes the job itself through the fenced worker path.
+        out = demo.run_demo(scenario="crude-border-price-25", countries=["FRA", "USA"], fidelity="L1",
+                            origin="test_fixture", execute_locally=True)
+        assert out["execution"] == "local:succeeded" and out["job"]["status"] == "succeeded"
+        assert out["run_id"] and out["results"]
+        assert out["baseline_release"]["origin"] == "test_fixture"
+        cutoff = datetime.fromisoformat(out["knowledge_cutoff"].replace("Z", "+00:00"))
+        assert cutoff >= out["baseline_release"]["knowledge_cutoff"]
+        with wdb.owner.connect() as c:
+            assert c.execute(text("SELECT count(DISTINCT r.run_id) FROM sim.result r WHERE r.run_id = :r"),
+                             {"r": out["run_id"]}).scalar() == 1
+    finally:
+        api.dispose()
