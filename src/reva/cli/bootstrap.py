@@ -123,7 +123,8 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
                     ),
                     {"r": login, "v": verifier},
                 ).scalar_one()
-                conn.execute(text(stmt))
+                # Not text(): the verifier contains ':' which text() would parse as bind markers.
+                conn.exec_driver_sql(stmt)
         except Exception as e:  # noqa: BLE001 - re-raised below without the statement text
             failure = _sqlstate(e)
         finally:

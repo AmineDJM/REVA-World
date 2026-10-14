@@ -127,7 +127,7 @@ export interface paths {
         };
         /**
          * List Connectors
-         * @description Connector versions with licence, declared capabilities, cursor and latest health.
+         * @description Connector versions with licence, declared capabilities, cursor, latest health and acquisition origin.
          */
         get: operations["list_connectors_v1_connectors_get"];
         put?: never;
@@ -178,6 +178,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/discovery/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Discovery Candidates
+         * @description Candidates from the latest completed discovery jobs (their recorded search) and connector proposals.
+         */
+        get: operations["list_discovery_candidates_v1_discovery_candidates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/entities": {
         parameters: {
             query?: never;
@@ -206,6 +226,29 @@ export interface paths {
         get: operations["get_entity_v1_entities__entity_ref__get"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/v1/evaluations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Evaluation
+         * @description Enqueue a model evaluation (rolling-origin tournament over the latest published release).
+         *
+         *     Results are a revised-data retrospective, not a real-time backtest; the naive last-value baseline is
+         *     always scored. Unsupported concepts/horizons are rejected here rather than failing later.
+         */
+        post: operations["create_evaluation_v1_evaluations_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -392,7 +435,10 @@ export interface paths {
         };
         /**
          * List Evaluations
-         * @description Evaluations (scores, replay mode, task scope) for a model version UUID or every version of a model key.
+         * @description Evaluations (scores, replay mode + label, task scope) for a model version UUID or every version of a key.
+         *
+         *     For every evaluation manifest and period on the page, the naive last-value baseline's row from the same
+         *     manifest is included (``included_as = naive_baseline_comparator``) so scores are never shown without it.
          */
         get: operations["list_evaluations_v1_models__model_ref__evaluations_get"];
         put?: never;
@@ -674,7 +720,7 @@ export interface paths {
         };
         /**
          * List Sources
-         * @description Registered sources with latest metadata version, rights and activity.
+         * @description Registered sources with latest metadata version, rights, activity and acquisition origin.
          */
         get: operations["list_sources_v1_sources_get"];
         put?: never;
@@ -706,6 +752,13 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AcquisitionOriginCounts */
+        AcquisitionOriginCounts: {
+            /** Live */
+            live: number;
+            /** Test Fixture */
+            test_fixture: number;
+        };
         /** Alias */
         Alias: {
             /** Confidence Kind */
@@ -717,7 +770,7 @@ export interface components {
             /** Provider */
             provider: string;
             /** Valid Range */
-            valid_range?: string | null;
+            valid_range: string | null;
         };
         /** ApiWarning */
         ApiWarning: {
@@ -736,11 +789,11 @@ export interface components {
          */
         Assessment: {
             /** Detail */
-            detail?: {
+            detail: {
                 [key: string]: unknown;
             } | null;
             /** Reason */
-            reason?: string | null;
+            reason: string | null;
             /**
              * Status
              * @enum {string}
@@ -760,19 +813,19 @@ export interface components {
              */
             knowledge_cutoff: string;
             /** Method */
-            method?: string | null;
+            method: string | null;
             /**
              * Origin
              * @enum {string}
              */
             origin: "live" | "test_fixture";
             /** Published At */
-            published_at?: string | null;
+            published_at: string | null;
             /**
              * Sequence
              * @description Publication sequence (commit order)
              */
-            sequence?: number | null;
+            sequence: number | null;
         };
         /** BeliefEstimate */
         BeliefEstimate: {
@@ -798,18 +851,18 @@ export interface components {
              */
             modality: "selected_report" | "estimated_state" | "forecast";
             /** Observation Id */
-            observation_id?: string | null;
+            observation_id: string | null;
             /** Observation Revision No */
-            observation_revision_no?: number | null;
+            observation_revision_no: number | null;
             /**
              * Release Id
              * Format: uuid
              */
             release_id: string;
             /** Retrieved At */
-            retrieved_at?: string | null;
+            retrieved_at: string | null;
             /** Source Key */
-            source_key?: string | null;
+            source_key: string | null;
             subject: components["schemas"]["EntityRef"];
             support: components["schemas"]["SupportSummary"];
             uncertainty: components["schemas"]["Uncertainty"];
@@ -818,47 +871,47 @@ export interface components {
         };
         /** BeliefListResponse */
         BeliefListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["BeliefEstimate"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -866,23 +919,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** BeliefRelease */
         BeliefRelease: {
@@ -932,47 +985,47 @@ export interface components {
         };
         /** BeliefReleaseListResponse */
         BeliefReleaseListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["BeliefRelease"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -980,66 +1033,66 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** BeliefReleaseResponse */
         BeliefReleaseResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["BeliefRelease"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1047,23 +1100,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** BeliefsQuery */
         BeliefsQuery: {
@@ -1089,7 +1142,7 @@ export interface components {
         /** ConceptInfo */
         ConceptInfo: {
             /** Aggregation */
-            aggregation?: string | null;
+            aggregation: string | null;
             /** Concept Id */
             concept_id: string;
             /** Definition */
@@ -1101,7 +1154,7 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Unit Ref */
-            unit_ref?: string | null;
+            unit_ref: string | null;
             /** Version */
             version: string;
         };
@@ -1157,47 +1210,47 @@ export interface components {
         };
         /** ConnectorListResponse */
         ConnectorListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ConnectorOut"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1205,32 +1258,33 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ConnectorOut */
         ConnectorOut: {
             /** Acquisitions */
             acquisitions: number;
+            acquisitions_by_origin: components["schemas"]["AcquisitionOriginCounts"];
             /** Code Digest */
             code_digest: string;
             /** Cursor */
-            cursor?: {
+            cursor: {
                 [key: string]: unknown;
             } | null;
             /** Declared Capabilities */
@@ -1243,12 +1297,23 @@ export interface components {
              */
             id: string;
             /** Last Retrieved At */
-            last_retrieved_at?: string | null;
-            latest_health?: components["schemas"]["ConnectorHealth"] | null;
+            last_retrieved_at: string | null;
+            /**
+             * Latest Acquisition Origin
+             * @description Origin of the most recent acquisition (null when none)
+             */
+            latest_acquisition_origin: ("live" | "test_fixture") | null;
+            latest_health: components["schemas"]["ConnectorHealth"] | null;
             /** Licence */
-            licence?: string | null;
+            licence: string | null;
             /** Name */
             name: string;
+            /**
+             * Origin
+             * @description Origins of this connector's acquisitions: live, test_fixture, mixed (both) or none (never acquired)
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
             /**
              * Recorded At
              * Format: date-time
@@ -1264,7 +1329,7 @@ export interface components {
         /** CostReport */
         CostReport: {
             /** Detail */
-            detail?: {
+            detail: {
                 [key: string]: unknown;
             } | null;
             /**
@@ -1289,46 +1354,46 @@ export interface components {
         };
         /** CoverageResponse */
         CoverageResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Coverage"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1336,23 +1401,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** CoverageTotals */
         CoverageTotals: {
@@ -1375,7 +1440,7 @@ export interface components {
              * Basis
              * @description Explicit measurement basis
              */
-            basis?: {
+            basis: {
                 [key: string]: unknown;
             };
             /**
@@ -1392,6 +1457,145 @@ export interface components {
             value: string;
         } & {
             [key: string]: unknown;
+        };
+        /**
+         * DiscoveryCandidate
+         * @description A source candidate surfaced by a completed discovery job, or a connector proposal.
+         *
+         *     Search ranking is lexical evidence only: it never grants semantic equivalence.
+         *     Nothing here is promoted; promotion needs passing gates and a human review.
+         */
+        DiscoveryCandidate: {
+            /**
+             * Candidate Kind
+             * @enum {string}
+             */
+            candidate_kind: "search_result" | "connector_proposal";
+            /** Dataset Code */
+            dataset_code: string | null;
+            /**
+             * Discovery Status
+             * @description Outcome of the discovery job (e.g. gate_reject)
+             */
+            discovery_status: string | null;
+            /** Gate Outcome */
+            gate_outcome: string | null;
+            /**
+             * Inspected
+             * @description Whether the dataset's metadata was inspected (null: not tried)
+             */
+            inspected: boolean | null;
+            /** Inspection Error */
+            inspection_error: string | null;
+            /** Jaccard */
+            jaccard: number | null;
+            /** Job Id */
+            job_id: string | null;
+            /**
+             * Origin
+             * @description test_fixture when the discovery ran against captured catalogue responses
+             */
+            origin: ("live" | "test_fixture") | null;
+            /** Permission Tier */
+            permission_tier: number | null;
+            /** Proposal Id */
+            proposal_id: string | null;
+            /** Proposal Type */
+            proposal_type: string | null;
+            /** Provider */
+            provider: string | null;
+            /**
+             * Rank
+             * @description 1-based lexical rank in the job's catalogue search
+             */
+            rank: number | null;
+            /**
+             * Recorded At
+             * Format: date-time
+             */
+            recorded_at: string;
+            /** Requirement Id */
+            requirement_id: string | null;
+            /**
+             * Reviews
+             * @description Human review decisions recorded so far
+             */
+            reviews: string[];
+            /** Score */
+            score: number | null;
+            /**
+             * Selected
+             * @description The job turned this candidate into a connector proposal
+             */
+            selected: boolean;
+        };
+        /** DiscoveryCandidateListResponse */
+        DiscoveryCandidateListResponse: {
+            applicability: components["schemas"]["Assessment"];
+            /** Assumptions */
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
+            /**
+             * Context Id
+             * @description Context the data belongs to (null for registry metadata)
+             */
+            context_id: string | null;
+            /**
+             * Context Mode
+             * @enum {string}
+             */
+            context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
+            cost: components["schemas"]["CostReport"] | null;
+            /** Data */
+            data: components["schemas"]["DiscoveryCandidate"][];
+            data_freshness: components["schemas"]["Freshness"] | null;
+            /** Estimand */
+            estimand: {
+                [key: string]: unknown;
+            } | null;
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
+            /** Knowledge Cutoff */
+            knowledge_cutoff: string | null;
+            /**
+             * Modality
+             * @enum {string}
+             */
+            modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
+            model_disagreement: components["schemas"]["Assessment"];
+            /** Model Versions */
+            model_versions: components["schemas"]["ModelVersionRef"][];
+            /**
+             * Next Cursor
+             * @description Opaque keyset cursor; null when no further page
+             */
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
+            /**
+             * Origin
+             * @description live, test_fixture (labelled fixture data), mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
+            /** Provenance Links */
+            provenance_links: components["schemas"]["ProvenanceLink"][];
+            /** Support */
+            support: {
+                [key: string]: unknown;
+            } | null;
+            uncertainty: components["schemas"]["UncertaintySummary"];
+            /** Units */
+            units: string[];
+            /**
+             * Valid Time
+             * @description Valid-time window of the returned data
+             */
+            valid_time: {
+                [key: string]: unknown;
+            } | null;
+            /** Warnings */
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** DiscoveryRequest */
         DiscoveryRequest: {
@@ -1423,15 +1627,15 @@ export interface components {
              */
             component: "observations" | "estimates" | "display_geometry" | "relations";
             /** Concept Id */
-            concept_id?: string | null;
+            concept_id: string | null;
             /** Count */
             count: number;
             /** First Period */
-            first_period?: string | null;
+            first_period: string | null;
             /** Last Period */
-            last_period?: string | null;
+            last_period: string | null;
             /** Layer */
-            layer?: string | null;
+            layer: string | null;
         };
         /** EntityDetail */
         EntityDetail: {
@@ -1462,46 +1666,46 @@ export interface components {
         };
         /** EntityDetailResponse */
         EntityDetailResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EntityDetail"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1509,67 +1713,67 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** EntityListResponse */
         EntityListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EntitySummary"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1577,23 +1781,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** EntityRef */
         EntityRef: {
@@ -1603,7 +1807,7 @@ export interface components {
              */
             id: string;
             /** Kind */
-            kind?: string | null;
+            kind: string | null;
             /** Label */
             label: string;
         };
@@ -1628,6 +1832,27 @@ export interface components {
              */
             referent_mode: "real" | "abstract" | "synthetic" | "hypothetical";
         };
+        /**
+         * EvaluationRequest
+         * @description Start a model evaluation (rolling-origin tournament, revised-data retrospective) as a job.
+         */
+        EvaluationRequest: {
+            /**
+             * Concepts
+             * @description Concept ids (default: every supported positive annual series)
+             */
+            concepts?: string[] | null;
+            /**
+             * Horizons
+             * @description Forecast horizons in years
+             */
+            horizons?: number[] | null;
+            /**
+             * Seed
+             * @description Deterministic seed (default: service seed)
+             */
+            seed?: number | null;
+        };
         /** Event */
         Event: {
             /** Component */
@@ -1647,47 +1872,47 @@ export interface components {
         };
         /** EventListResponse */
         EventListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Event"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1695,41 +1920,41 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** EvidenceDetail */
         EvidenceDetail: {
             /** Card */
-            card?: {
+            card: {
                 [key: string]: unknown;
             } | null;
             /** Claim Key */
-            claim_key?: string | null;
+            claim_key: string | null;
             /** Claim Version */
-            claim_version?: number | null;
-            disagreement?: components["schemas"]["SourceDisagreement"] | null;
+            claim_version: number | null;
+            disagreement: components["schemas"]["SourceDisagreement"] | null;
             /** Effects */
-            effects?: {
+            effects: {
                 [key: string]: unknown;
             }[];
             /** Evidence Kind */
-            evidence_kind?: string | null;
+            evidence_kind: string | null;
             /**
              * Id
              * Format: uuid
@@ -1741,11 +1966,11 @@ export interface components {
              */
             kind: "scientific_card" | "study" | "source_disagreement";
             /** Recorded At */
-            recorded_at?: string | null;
+            recorded_at: string | null;
             /** Status */
-            status?: string | null;
+            status: string | null;
             /** Study */
-            study?: {
+            study: {
                 [key: string]: unknown;
             } | null;
             /** Title */
@@ -1753,46 +1978,46 @@ export interface components {
         };
         /** EvidenceDetailResponse */
         EvidenceDetailResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["EvidenceDetail"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1800,28 +2025,28 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** EvidenceItem */
         EvidenceItem: {
             /** Evidence Kind */
-            evidence_kind?: string | null;
+            evidence_kind: string | null;
             /**
              * Id
              * Format: uuid
@@ -1833,57 +2058,57 @@ export interface components {
              */
             kind: "scientific_card" | "study" | "source_disagreement";
             /** Recorded At */
-            recorded_at?: string | null;
+            recorded_at: string | null;
             /** Status */
-            status?: string | null;
+            status: string | null;
             /** Summary */
-            summary?: string | null;
+            summary: string | null;
             /** Title */
             title: string;
         };
         /** EvidenceListResponse */
         EvidenceListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["EvidenceItem"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -1891,23 +2116,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** FeatureCollection */
         FeatureCollection: {
@@ -1927,7 +2152,7 @@ export interface components {
         /** FloatValue */
         FloatValue: {
             /** Basis */
-            basis?: {
+            basis: {
                 [key: string]: unknown;
             };
             /**
@@ -1945,11 +2170,11 @@ export interface components {
         /** Freshness */
         Freshness: {
             /** Latest Recorded At */
-            latest_recorded_at?: string | null;
+            latest_recorded_at: string | null;
             /** Latest Retrieved At */
-            latest_retrieved_at?: string | null;
+            latest_retrieved_at: string | null;
             /** Note */
-            note?: string | null;
+            note: string | null;
         };
         /** Gap */
         Gap: {
@@ -1973,53 +2198,53 @@ export interface components {
             /** Requirement Id */
             requirement_id: string;
             /** Source Flags */
-            source_flags?: {
+            source_flags: {
                 [key: string]: unknown;
             } | null;
         };
         /** GapListResponse */
         GapListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Gap"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2027,23 +2252,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** GateResultOut */
         GateResultOut: {
@@ -2095,9 +2320,9 @@ export interface components {
              */
             display_only: true;
             /** Entity Id */
-            entity_id?: string | null;
+            entity_id: string | null;
             /** Entity Label */
-            entity_label?: string | null;
+            entity_label: string | null;
             /** Feature Key */
             feature_key: string;
             /**
@@ -2106,7 +2331,7 @@ export interface components {
              */
             match_status: "reviewed_match" | "unmatched" | "disputed" | "overseas_part";
             /** Name */
-            name?: string | null;
+            name: string | null;
         };
         /** GraphNode */
         GraphNode: {
@@ -2128,7 +2353,7 @@ export interface components {
         /** HealthCheck */
         HealthCheck: {
             /** Detail */
-            detail?: string | null;
+            detail: string | null;
             /** Name */
             name: string;
             /** Ok */
@@ -2171,7 +2396,7 @@ export interface components {
             /** Created By */
             created_by: string;
             /** Finished At */
-            finished_at?: string | null;
+            finished_at: string | null;
             /** Has Checkpoint */
             has_checkpoint: boolean;
             /**
@@ -2182,11 +2407,11 @@ export interface components {
             /** Job Type */
             job_type: string;
             /** Last Error */
-            last_error?: {
+            last_error: {
                 [key: string]: unknown;
             } | null;
             /** Links */
-            links?: {
+            links: {
                 [key: string]: string;
             };
             /** Max Attempts */
@@ -2202,7 +2427,7 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Result Ref */
-            result_ref?: {
+            result_ref: {
                 [key: string]: unknown;
             } | null;
             /**
@@ -2242,47 +2467,47 @@ export interface components {
         };
         /** JobListResponse */
         JobListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Job"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2290,66 +2515,66 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** LocationResponse */
         LocationResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["FeatureCollection"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2357,23 +2582,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** LoginRequest */
         LoginRequest: {
@@ -2422,7 +2647,7 @@ export interface components {
         /** MissingValue */
         MissingValue: {
             /** Detail */
-            detail?: string | null;
+            detail: string | null;
             /**
              * @description discriminator enum property added by openapi-typescript
              * @enum {string}
@@ -2450,17 +2675,37 @@ export interface components {
              * Format: uuid
              */
             id: string;
+            /**
+             * Included As
+             * @description naive_baseline_comparator rows belong to the naive baseline model and are included because they were scored in the same evaluation manifest and period as a requested row
+             * @enum {string}
+             */
+            included_as: "requested_model" | "naive_baseline_comparator";
+            /**
+             * Is Naive Baseline
+             * @description Row of the naive last-value baseline every challenger must beat
+             */
+            is_naive_baseline: boolean;
             /** Metrics */
             metrics: {
                 [key: string]: unknown;
             };
+            /** Model Key */
+            model_key: string;
+            /** Model Version */
+            model_version: string;
             /**
              * Model Version Id
              * Format: uuid
              */
             model_version_id: string;
+            /**
+             * Origin
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture";
             /** Promotions */
-            promotions?: {
+            promotions: {
                 [key: string]: unknown;
             }[];
             /**
@@ -2470,6 +2715,11 @@ export interface components {
             recorded_at: string;
             /** Replay Mode */
             replay_mode: string;
+            /**
+             * Replay Mode Label
+             * @description Human label of the replay mode, e.g. 'revised-data retrospective — not a real-time backtest'
+             */
+            replay_mode_label: string;
             /** Task Scope */
             task_scope: {
                 [key: string]: unknown;
@@ -2477,47 +2727,47 @@ export interface components {
         };
         /** ModelEvaluationListResponse */
         ModelEvaluationListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ModelEvaluation"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2525,67 +2775,67 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ModelListResponse */
         ModelListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["ModelVersionOut"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2593,23 +2843,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ModelVersionOut */
         ModelVersionOut: {
@@ -2642,16 +2892,16 @@ export interface components {
             /** Spec Sha256 */
             spec_sha256: string;
             /** Training Cutoff */
-            training_cutoff?: string | null;
+            training_cutoff: string | null;
             /** Version */
             version: string;
         };
         /** ModelVersionRef */
         ModelVersionRef: {
             /** Approval Status */
-            approval_status?: string | null;
+            approval_status: string | null;
             /** Id */
-            id?: string | null;
+            id: string | null;
             /** Model Key */
             model_key: string;
             /** Version */
@@ -2665,7 +2915,7 @@ export interface components {
              */
             acquisition_id: string;
             /** Availability Basis */
-            availability_basis?: {
+            availability_basis: {
                 [key: string]: unknown;
             } | null;
             /** Concept Id */
@@ -2684,7 +2934,7 @@ export interface components {
             /** Logical Key */
             logical_key: string;
             /** Observed At */
-            observed_at?: string | null;
+            observed_at: string | null;
             /**
              * Origin
              * @enum {string}
@@ -2714,7 +2964,7 @@ export interface components {
             /** Revision No */
             revision_no: number;
             /** Source Available At */
-            source_available_at?: string | null;
+            source_available_at: string | null;
             /** Source Flags */
             source_flags: {
                 [key: string]: unknown;
@@ -2722,17 +2972,17 @@ export interface components {
             /** Source Key */
             source_key: string;
             /** Source Published At */
-            source_published_at?: string | null;
+            source_published_at: string | null;
             /** Source Revision Id */
-            source_revision_id?: string | null;
+            source_revision_id: string | null;
             subject: components["schemas"]["EntityRef"];
             /**
              * Superseded By Id
              * @description Later revision visible at the as_of time
              */
-            superseded_by_id?: string | null;
+            superseded_by_id: string | null;
             /** Supersedes Id */
-            supersedes_id?: string | null;
+            supersedes_id: string | null;
             support: components["schemas"]["SupportSummary"];
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */
@@ -2740,47 +2990,47 @@ export interface components {
         };
         /** ObservationListResponse */
         ObservationListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Observation"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2788,23 +3038,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** Ontology */
         Ontology: {
@@ -2815,46 +3065,46 @@ export interface components {
         };
         /** OntologyResponse */
         OntologyResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Ontology"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -2862,23 +3112,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /**
          * OtherValue
@@ -2917,6 +3167,9 @@ export interface components {
         /**
          * Problem
          * @description RFC 9457 problem details (application/problem+json).
+         *
+         *     Built directly from ``RevaError.problem()`` (not serialized through this
+         *     model), so optional members are genuinely optional on the wire.
          */
         Problem: {
             /** Code */
@@ -2971,47 +3224,47 @@ export interface components {
         };
         /** ProposalListResponse */
         ProposalListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Proposal"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3019,23 +3272,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ProposalReviewOut */
         ProposalReviewOut: {
@@ -3059,7 +3312,7 @@ export interface components {
         /** ProvenanceEdge */
         ProvenanceEdge: {
             /** Attributes */
-            attributes?: {
+            attributes: {
                 [key: string]: unknown;
             };
             /** Relation */
@@ -3097,7 +3350,7 @@ export interface components {
         /** ProvenanceNode */
         ProvenanceNode: {
             /** Attributes */
-            attributes?: {
+            attributes: {
                 [key: string]: unknown;
             };
             /** Id */
@@ -3112,46 +3365,46 @@ export interface components {
         };
         /** ProvenanceResponse */
         ProvenanceResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["ProvenanceGraph"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3159,23 +3412,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** Relation */
         Relation: {
@@ -3184,9 +3437,9 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Concept Id */
-            concept_id?: string | null;
+            concept_id: string | null;
             /** Evidence Observation Id */
-            evidence_observation_id?: string | null;
+            evidence_observation_id: string | null;
             /** Existence Uncertainty */
             existence_uncertainty: {
                 [key: string]: unknown;
@@ -3199,7 +3452,7 @@ export interface components {
             /** Layer */
             layer: string;
             /** Origin */
-            origin?: ("live" | "test_fixture") | null;
+            origin: ("live" | "test_fixture") | null;
             /** Participants */
             participants: components["schemas"]["Participant"][];
             /** Predicate */
@@ -3210,9 +3463,9 @@ export interface components {
              */
             recorded_at: string;
             /** Release Id */
-            release_id?: string | null;
+            release_id: string | null;
             /** Strength */
-            strength?: {
+            strength: {
                 [key: string]: unknown;
             } | null;
             support: components["schemas"]["SupportSummary"];
@@ -3220,7 +3473,7 @@ export interface components {
              * Value
              * @description Reported value of the evidence record, when any
              */
-            value?: (components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"]) | null;
+            value: (components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"]) | null;
         };
         /** RelationGraph */
         RelationGraph: {
@@ -3245,46 +3498,46 @@ export interface components {
         };
         /** RelationListResponse */
         RelationListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["RelationGraph"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3292,23 +3545,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** RelationsQuery */
         RelationsQuery: {
@@ -3489,9 +3742,9 @@ export interface components {
             /** Revision No */
             revision_no: number;
             /** Source Published At */
-            source_published_at?: string | null;
+            source_published_at: string | null;
             /** Source Revision Id */
-            source_revision_id?: string | null;
+            source_revision_id: string | null;
             /** Value */
             value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
         };
@@ -3566,47 +3819,47 @@ export interface components {
         };
         /** ScenarioListResponse */
         ScenarioListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["Scenario"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3614,66 +3867,66 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** ScenarioResponse */
         ScenarioResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Scenario"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3681,23 +3934,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** SessionInfo */
         SessionInfo: {
@@ -3710,9 +3963,9 @@ export interface components {
              * Csrf Token
              * @description Echo in X-CSRF-Token on unsafe cookie-authenticated requests (also in cookie reva_csrf)
              */
-            csrf_token?: string | null;
+            csrf_token: string | null;
             /** Expires At */
-            expires_at?: string | null;
+            expires_at: string | null;
             /**
              * Principal
              * @description Audit actor, e.g. human:admin
@@ -3730,15 +3983,15 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Cache Hit Of */
-            cache_hit_of?: string | null;
+            cache_hit_of: string | null;
             /** Cost */
             cost: {
                 [key: string]: unknown;
             };
             /** Output Digest */
-            output_digest?: string | null;
+            output_digest: string | null;
             /** Output Manifest Sha256 */
-            output_manifest_sha256?: string | null;
+            output_manifest_sha256: string | null;
             /** Problems */
             problems: unknown[];
             /**
@@ -3759,7 +4012,7 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Artifact Sha256 */
-            artifact_sha256?: string | null;
+            artifact_sha256: string | null;
             /**
              * Id
              * Format: uuid
@@ -3767,7 +4020,7 @@ export interface components {
             id: string;
             /** Output Key */
             output_key: string;
-            subject?: components["schemas"]["EntityRef"] | null;
+            subject: components["schemas"]["EntityRef"] | null;
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */
             value: components["schemas"]["DecimalValue"] | components["schemas"]["FloatValue"] | components["schemas"]["MissingValue"] | components["schemas"]["OtherValue"];
@@ -3825,46 +4078,46 @@ export interface components {
         };
         /** SimulationStatusResponse */
         SimulationStatusResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["SimulationStatus"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3872,23 +4125,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** SourceDisagreement */
         SourceDisagreement: {
@@ -3921,47 +4174,47 @@ export interface components {
         };
         /** SourceListResponse */
         SourceListResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             /** Data */
             data: components["schemas"]["SourceOut"][];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -3969,26 +4222,27 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /** SourceOut */
         SourceOut: {
+            acquisitions_by_origin: components["schemas"]["AcquisitionOriginCounts"];
             /** Connectors */
             connectors: string[];
             /**
@@ -3997,7 +4251,9 @@ export interface components {
              */
             id: string;
             /** Last Retrieved At */
-            last_retrieved_at?: string | null;
+            last_retrieved_at: string | null;
+            /** Latest Acquisition Origin */
+            latest_acquisition_origin: ("live" | "test_fixture") | null;
             /** Lineage Family */
             lineage_family: string;
             /** Metadata */
@@ -4005,9 +4261,15 @@ export interface components {
                 [key: string]: unknown;
             };
             /** Metadata Version */
-            metadata_version?: number | null;
+            metadata_version: number | null;
             /** Observations */
             observations: number;
+            /**
+             * Origin
+             * @description Origins of this source's acquisitions: live, test_fixture, mixed or none
+             * @enum {string}
+             */
+            origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provider Url */
             provider_url: string;
             /** Rights */
@@ -4029,7 +4291,7 @@ export interface components {
              */
             id: string;
             /** Period Label */
-            period_label?: string | null;
+            period_label: string | null;
             /** Population */
             population: {
                 [key: string]: unknown;
@@ -4049,25 +4311,25 @@ export interface components {
         /** SupportedContext */
         SupportedContext: {
             /** Context Id */
-            context_id?: string | null;
+            context_id: string | null;
             /** Description */
             description: string;
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Mode
              * @enum {string}
              */
             mode: "evidence" | "belief" | "simulation";
             /** Origin */
-            origin?: string | null;
+            origin: string | null;
             /** Release Id */
-            release_id?: string | null;
+            release_id: string | null;
         };
         /** Timeseries */
         Timeseries: {
             /** As Of */
-            as_of?: string | null;
+            as_of: string | null;
             concept: components["schemas"]["ConceptInfo"];
             /** Points */
             points: components["schemas"]["TimeseriesPoint"][];
@@ -4112,11 +4374,11 @@ export interface components {
              * Revisions
              * @description Full lineage visible at as_of (revisions=all only)
              */
-            revisions?: components["schemas"]["RevisionEntry"][] | null;
+            revisions: components["schemas"]["RevisionEntry"][] | null;
             /** Source Key */
             source_key: string;
             /** Source Published At */
-            source_published_at?: string | null;
+            source_published_at: string | null;
             /**
              * Support Id
              * Format: uuid
@@ -4157,46 +4419,46 @@ export interface components {
         };
         /** TimeseriesResponse */
         TimeseriesResponse: {
-            applicability?: components["schemas"]["Assessment"];
+            applicability: components["schemas"]["Assessment"];
             /** Assumptions */
-            assumptions?: string[];
-            baseline_release?: components["schemas"]["BaselineReleaseRef"] | null;
-            compression_error?: components["schemas"]["Assessment"];
+            assumptions: string[];
+            baseline_release: components["schemas"]["BaselineReleaseRef"] | null;
+            compression_error: components["schemas"]["Assessment"];
             /**
              * Context Id
              * @description Context the data belongs to (null for registry metadata)
              */
-            context_id?: string | null;
+            context_id: string | null;
             /**
              * Context Mode
              * @enum {string}
              */
             context_mode: "evidence" | "belief" | "simulation" | "evaluation" | "population" | "registry" | "operations";
-            cost?: components["schemas"]["CostReport"] | null;
+            cost: components["schemas"]["CostReport"] | null;
             data: components["schemas"]["Timeseries"];
-            data_freshness?: components["schemas"]["Freshness"] | null;
+            data_freshness: components["schemas"]["Freshness"] | null;
             /** Estimand */
-            estimand?: {
+            estimand: {
                 [key: string]: unknown;
             } | null;
-            evidence_profile?: components["schemas"]["Assessment"];
-            historical_validation?: components["schemas"]["Assessment"];
+            evidence_profile: components["schemas"]["Assessment"];
+            historical_validation: components["schemas"]["Assessment"];
             /** Knowledge Cutoff */
-            knowledge_cutoff?: string | null;
+            knowledge_cutoff: string | null;
             /**
              * Modality
              * @enum {string}
              */
             modality: "reported_observation" | "selected_estimate" | "forecast" | "identified_causal_estimate" | "assumption_conditioned_scenario" | "unsupported" | "metadata" | "evaluation";
-            model_disagreement?: components["schemas"]["Assessment"];
+            model_disagreement: components["schemas"]["Assessment"];
             /** Model Versions */
-            model_versions?: components["schemas"]["ModelVersionRef"][];
+            model_versions: components["schemas"]["ModelVersionRef"][];
             /**
              * Next Cursor
              * @description Opaque keyset cursor; null when no further page
              */
-            next_cursor?: string | null;
-            numerical_error?: components["schemas"]["Assessment"];
+            next_cursor: string | null;
+            numerical_error: components["schemas"]["Assessment"];
             /**
              * Origin
              * @description live, test_fixture (labelled fixture data), mixed or none
@@ -4204,23 +4466,23 @@ export interface components {
              */
             origin: "live" | "test_fixture" | "mixed" | "none";
             /** Provenance Links */
-            provenance_links?: components["schemas"]["ProvenanceLink"][];
+            provenance_links: components["schemas"]["ProvenanceLink"][];
             /** Support */
-            support?: {
+            support: {
                 [key: string]: unknown;
             } | null;
-            uncertainty?: components["schemas"]["UncertaintySummary"];
+            uncertainty: components["schemas"]["UncertaintySummary"];
             /** Units */
-            units?: string[];
+            units: string[];
             /**
              * Valid Time
              * @description Valid-time window of the returned data
              */
-            valid_time?: {
+            valid_time: {
                 [key: string]: unknown;
             } | null;
             /** Warnings */
-            warnings?: components["schemas"]["ApiWarning"][];
+            warnings: components["schemas"]["ApiWarning"][];
         };
         /**
          * Uncertainty
@@ -4228,11 +4490,11 @@ export interface components {
          */
         Uncertainty: {
             /** Conditioning */
-            conditioning?: string[];
+            conditioning: string[];
             /** Dependence Group */
-            dependence_group?: string | null;
+            dependence_group: string | null;
             /** Description */
-            description?: string | null;
+            description: string | null;
             /**
              * Kind
              * @default unknown
@@ -4242,18 +4504,18 @@ export interface components {
              * Level
              * @description Nominal coverage; only for probabilistic interval kinds
              */
-            level?: number | null;
+            level: number | null;
             /** Lower */
-            lower?: string | null;
+            lower: string | null;
             /** Method Version */
-            method_version?: string | null;
+            method_version: string | null;
             /**
              * Status
              * @enum {string}
              */
             status: "unquantified" | "exact_by_definition" | "quantified";
             /** Upper */
-            upper?: string | null;
+            upper: string | null;
         } & {
             [key: string]: unknown;
         };
@@ -4263,13 +4525,13 @@ export interface components {
          */
         UncertaintySummary: {
             /** Dependence */
-            dependence?: string | null;
+            dependence: string | null;
             /** Kind */
-            kind?: string | null;
+            kind: string | null;
             /** Level */
-            level?: number | null;
+            level: number | null;
             /** Note */
-            note?: string | null;
+            note: string | null;
             /**
              * Status
              * @enum {string}
@@ -4600,6 +4862,38 @@ export interface operations {
             };
         };
     };
+    list_discovery_candidates_v1_discovery_candidates_get: {
+        parameters: {
+            query?: {
+                /** @description Maximum candidates returned */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DiscoveryCandidateListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     list_entities_v1_entities_get: {
         parameters: {
             query?: {
@@ -4676,6 +4970,60 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_evaluation_v1_evaluations_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Required on POSTs that start work: 8-200 printable ASCII characters */
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EvaluationRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobAccepted"];
+                };
+            };
+            /** @description Bad Request */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Conflict */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            /** @description Unprocessable Entity */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -5237,7 +5585,7 @@ export interface operations {
             };
             header?: never;
             path: {
-                kind: "estimate" | "observation" | "acquisition" | "artifact" | "sim_result" | "release";
+                kind: "estimate" | "observation" | "acquisition" | "artifact" | "sim_result" | "release" | "run" | "scenario";
                 ident: string;
             };
             cookie?: never;

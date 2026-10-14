@@ -197,7 +197,7 @@ def load_benchmark_fixture(path: Path = BENCHMARK_FIXTURE) -> dict[str, Any]:
         raise ValueError(f"{path} is not a labelled synthetic test fixture; refusing to benchmark with it")
     if sorted(data["countries"]) != ["CHN", "DZA", "FRA", "USA"]:
         raise ValueError("benchmark fixture must hold exactly FRA, DZA, CHN and USA")
-    return data
+    return dict(data)
 
 
 def benchmark_spec(fx: dict[str, Any], fidelity: str) -> dict[str, Any]:
@@ -586,7 +586,7 @@ def api_server(settings: Any, *, pin: bool = True, cpu_fraction: float | None = 
            "--workers", "1", "--no-access-log", "--log-level", "warning", "--no-server-header"]
     taskset = shutil.which("taskset")
     use_pin = bool(pin and taskset and _cpu0())
-    if use_pin:
+    if use_pin and taskset:
         cmd = [taskset, "-c", str(sorted(_cpu0() or {0})[0]), *cmd]
     with open(log_path, "wb") as logf:
         proc = subprocess.Popen(cmd, cwd=workdir, env=api_child_env(settings), stdout=logf,
@@ -789,7 +789,7 @@ def bench_queue(env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, 
     def resolve(job_type: str) -> Callable[..., dict[str, Any]]:
         return noop if job_type == "health" else real_resolve(job_type)
 
-    jobs.resolve_handler = resolve  # type: ignore[assignment]
+    jobs.resolve_handler = resolve
     w = Worker(env.settings, env.worker, env.store, env.sim, lease_seconds=60, heartbeat_seconds=5,
                poll_interval=poll_interval, scheduler=False, job_types=["health"])
     enq_to_start: list[float] = []
@@ -819,7 +819,7 @@ def bench_queue(env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, 
             w.request_stop("perf benchmark done")
             th.join(30)
     finally:
-        jobs.resolve_handler = real_resolve  # type: ignore[assignment]
+        jobs.resolve_handler = real_resolve
         w.request_stop("perf benchmark cleanup")
     statuses: dict[str, int] = {}
     for o in w.outcomes:
@@ -905,7 +905,7 @@ def bench_population(records: int = 100_000, *, pin: bool = True) -> dict[str, A
     cmd = [sys.executable, str(Path(__file__).resolve()), "_population-child", "--records", str(records)]
     taskset = shutil.which("taskset")
     use_pin = bool(pin and taskset and _cpu0())
-    if use_pin:
+    if use_pin and taskset:
         cmd = [taskset, "-c", str(sorted(_cpu0() or {0})[0]), *cmd]
     env = {**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
            "POLARS_MAX_THREADS": "1", "REVA_CPU_BUDGET_THREADS": "1"}
@@ -1100,9 +1100,10 @@ def render_report(results: dict[str, Any]) -> str:
     L.append("- **Not the reference hardware.** Render plans are API 0.5 CPU/512 MB, worker 1 CPU/2 GB and "
              "PostgreSQL 0.1 CPU/256 MB. Here `taskset -c 0` gives the API and the measured processes one *full* "
              "core; the API is additionally measured under an emulated 0.5 CPU quota (SIGSTOP/SIGCONT, not a "
-             "cgroup, so throttling granularity differs from Render's), memory is not capped (no cgroup limit was applied; the 2 GiB "
-             "budget is checked only against measured peak RSS), and PostgreSQL runs in a local Docker container "
-             "with unconstrained CPU on the same host and no network latency. Expect slower API/DB numbers on Render.")
+             "cgroup, so throttling granularity differs from Render's), memory is not capped (no cgroup limit "
+             "was applied; the 2 GiB budget is checked only against measured peak RSS), and PostgreSQL runs in "
+             "a local Docker container with unconstrained CPU on the same host and no network latency. Expect "
+             "slower API/DB numbers on Render.")
     L.append("- **Single run.** Percentiles come from one measurement session on a shared machine where other "
              "processes (parallel agents, test suites) were running; see the load averages above.")
     L.append("- **Small data.** The database holds only captured test fixtures (four countries, few concepts), "

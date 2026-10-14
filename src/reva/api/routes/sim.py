@@ -1,4 +1,4 @@
-"""Scenarios, simulations, replay, discovery and the typed QuerySpec endpoint.
+"""Scenarios, simulations, replay, evaluations, discovery and the typed QuerySpec endpoint.
 
 Long work returns 202 + job_id + status URL. Every POST that starts work
 requires Idempotency-Key. Unsupported requests return typed 422 problems; the
@@ -414,6 +414,45 @@ def create_discovery(
         job = fetch_job(conn, jid)
     assert job is not None
     return _accepted(response, jid, "discovery", job["status"], f"/v1/jobs/{jid}")
+
+
+@router.post("/evaluations", response_model=s.JobAccepted, status_code=202,
+             responses={400: {"model": s.Problem}, 409: {"model": s.Problem}, 422: {"model": s.Problem}})
+def create_evaluation(
+    body: s.EvaluationRequest,
+    request: Request,
+    response: Response,
+    key: str = Depends(idempotency_key),
+    principal: Principal = Depends(require_scope("simulate")),
+) -> s.JobAccepted:
+    """Enqueue a model evaluation (rolling-origin tournament over the latest published release).
+
+    Results are a revised-data retrospective, not a real-time backtest; the naive last-value baseline is
+    always scored. Unsupported concepts/horizons are rejected here rather than failing later.
+    """
+    try:
+        from reva.evaluation import tournament_service as ts
+    except ImportError:
+        raise CapabilityGap("the model evaluation service is not installed in this build",
+                            capability="evaluation") from None
+    payload: dict[str, Any] = {}
+    if body.concepts is not None:
+        bad = sorted(set(body.concepts) - set(ts.SUPPORTED_CONCEPTS))
+        if bad:
+            raise CapabilityGap("concepts are not supported by the evaluation service (positive annual series only)",
+                                unsupported=bad, supported=list(ts.SUPPORTED_CONCEPTS))
+        payload["concepts"] = sorted(set(body.concepts))
+    if body.horizons is not None:
+        if any(not 1 <= h <= ts.MAX_HORIZON for h in body.horizons):
+            raise ValidationProblem(f"horizons must be integers in [1, {ts.MAX_HORIZON}]")
+        payload["horizons"] = sorted(set(body.horizons))
+    if body.seed is not None:
+        payload["seed"] = body.seed
+    with get_engine(request).begin() as conn:
+        jid = submit_job(conn, "evaluation", payload, key, principal.actor)
+        job = fetch_job(conn, jid)
+    assert job is not None
+    return _accepted(response, jid, "evaluation", job["status"], f"/v1/jobs/{jid}")
 
 
 # ---------------------------------------------------------------------------

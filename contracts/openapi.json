@@ -1,6 +1,25 @@
 {
   "components": {
     "schemas": {
+      "AcquisitionOriginCounts": {
+        "additionalProperties": false,
+        "properties": {
+          "live": {
+            "title": "Live",
+            "type": "integer"
+          },
+          "test_fixture": {
+            "title": "Test Fixture",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "live",
+          "test_fixture"
+        ],
+        "title": "AcquisitionOriginCounts",
+        "type": "object"
+      },
       "Alias": {
         "additionalProperties": false,
         "properties": {
@@ -1614,6 +1633,9 @@
             "title": "Acquisitions",
             "type": "integer"
           },
+          "acquisitions_by_origin": {
+            "$ref": "#/components/schemas/AcquisitionOriginCounts"
+          },
           "code_digest": {
             "title": "Code Digest",
             "type": "string"
@@ -1652,6 +1674,22 @@
             ],
             "title": "Last Retrieved At"
           },
+          "latest_acquisition_origin": {
+            "anyOf": [
+              {
+                "enum": [
+                  "live",
+                  "test_fixture"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Origin of the most recent acquisition (null when none)",
+            "title": "Latest Acquisition Origin"
+          },
           "latest_health": {
             "anyOf": [
               {
@@ -1675,6 +1713,17 @@
           },
           "name": {
             "title": "Name",
+            "type": "string"
+          },
+          "origin": {
+            "description": "Origins of this connector's acquisitions: live, test_fixture, mixed (both) or none (never acquired)",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
             "type": "string"
           },
           "recorded_at": {
@@ -1708,7 +1757,10 @@
           "latest_health",
           "cursor",
           "acquisitions",
-          "last_retrieved_at"
+          "last_retrieved_at",
+          "origin",
+          "latest_acquisition_origin",
+          "acquisitions_by_origin"
         ],
         "title": "ConnectorOut",
         "type": "object"
@@ -2096,6 +2148,475 @@
           "basis"
         ],
         "title": "DecimalValue",
+        "type": "object"
+      },
+      "DiscoveryCandidate": {
+        "additionalProperties": false,
+        "description": "A source candidate surfaced by a completed discovery job, or a connector proposal.\n\nSearch ranking is lexical evidence only: it never grants semantic equivalence.\nNothing here is promoted; promotion needs passing gates and a human review.",
+        "properties": {
+          "candidate_kind": {
+            "enum": [
+              "search_result",
+              "connector_proposal"
+            ],
+            "title": "Candidate Kind",
+            "type": "string"
+          },
+          "dataset_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Code"
+          },
+          "discovery_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Outcome of the discovery job (e.g. gate_reject)",
+            "title": "Discovery Status"
+          },
+          "gate_outcome": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gate Outcome"
+          },
+          "inspected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Whether the dataset's metadata was inspected (null: not tried)",
+            "title": "Inspected"
+          },
+          "inspection_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Inspection Error"
+          },
+          "jaccard": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Jaccard"
+          },
+          "job_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Job Id"
+          },
+          "origin": {
+            "anyOf": [
+              {
+                "enum": [
+                  "live",
+                  "test_fixture"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "test_fixture when the discovery ran against captured catalogue responses",
+            "title": "Origin"
+          },
+          "permission_tier": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Permission Tier"
+          },
+          "proposal_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposal Id"
+          },
+          "proposal_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Proposal Type"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "1-based lexical rank in the job's catalogue search",
+            "title": "Rank"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "requirement_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requirement Id"
+          },
+          "reviews": {
+            "description": "Human review decisions recorded so far",
+            "items": {
+              "type": "string"
+            },
+            "title": "Reviews",
+            "type": "array"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "selected": {
+            "description": "The job turned this candidate into a connector proposal",
+            "title": "Selected",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "candidate_kind",
+          "job_id",
+          "proposal_id",
+          "origin",
+          "provider",
+          "dataset_code",
+          "requirement_id",
+          "rank",
+          "score",
+          "jaccard",
+          "inspected",
+          "inspection_error",
+          "selected",
+          "discovery_status",
+          "proposal_type",
+          "permission_tier",
+          "gate_outcome",
+          "reviews",
+          "recorded_at"
+        ],
+        "title": "DiscoveryCandidate",
+        "type": "object"
+      },
+      "DiscoveryCandidateListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/DiscoveryCandidate"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Knowledge Cutoff"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "DiscoveryCandidateListResponse",
         "type": "object"
       },
       "DiscoveryRequest": {
@@ -2832,6 +3353,62 @@
           "alias_count"
         ],
         "title": "EntitySummary",
+        "type": "object"
+      },
+      "EvaluationRequest": {
+        "additionalProperties": false,
+        "description": "Start a model evaluation (rolling-origin tournament, revised-data retrospective) as a job.",
+        "properties": {
+          "concepts": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 10,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Concept ids (default: every supported positive annual series)",
+            "title": "Concepts"
+          },
+          "horizons": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "integer"
+                },
+                "maxItems": 5,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Forecast horizons in years",
+            "title": "Horizons"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "maximum": 2147483647.0,
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Deterministic seed (default: service seed)",
+            "title": "Seed"
+          }
+        },
+        "title": "EvaluationRequest",
         "type": "object"
       },
       "Event": {
@@ -5296,14 +5873,44 @@
             "title": "Id",
             "type": "string"
           },
+          "included_as": {
+            "description": "naive_baseline_comparator rows belong to the naive baseline model and are included because they were scored in the same evaluation manifest and period as a requested row",
+            "enum": [
+              "requested_model",
+              "naive_baseline_comparator"
+            ],
+            "title": "Included As",
+            "type": "string"
+          },
+          "is_naive_baseline": {
+            "description": "Row of the naive last-value baseline every challenger must beat",
+            "title": "Is Naive Baseline",
+            "type": "boolean"
+          },
           "metrics": {
             "additionalProperties": true,
             "title": "Metrics",
             "type": "object"
           },
+          "model_key": {
+            "title": "Model Key",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
           "model_version_id": {
             "format": "uuid",
             "title": "Model Version Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "test_fixture"
+            ],
+            "title": "Origin",
             "type": "string"
           },
           "promotions": {
@@ -5323,6 +5930,11 @@
             "title": "Replay Mode",
             "type": "string"
           },
+          "replay_mode_label": {
+            "description": "Human label of the replay mode, e.g. 'revised-data retrospective — not a real-time backtest'",
+            "title": "Replay Mode Label",
+            "type": "string"
+          },
           "task_scope": {
             "additionalProperties": true,
             "title": "Task Scope",
@@ -5332,13 +5944,19 @@
         "required": [
           "id",
           "model_version_id",
+          "model_key",
+          "model_version",
           "context_id",
+          "origin",
           "replay_mode",
+          "replay_mode_label",
           "task_scope",
           "metrics",
           "evaluation_manifest_sha256",
           "recorded_at",
-          "promotions"
+          "promotions",
+          "is_naive_baseline",
+          "included_as"
         ],
         "title": "ModelEvaluation",
         "type": "object"
@@ -6749,7 +7367,7 @@
       },
       "Problem": {
         "additionalProperties": true,
-        "description": "RFC 9457 problem details (application/problem+json).",
+        "description": "RFC 9457 problem details (application/problem+json).\n\nBuilt directly from ``RevaError.problem()`` (not serialized through this\nmodel), so optional members are genuinely optional on the wire.",
         "properties": {
           "code": {
             "title": "Code",
@@ -6811,10 +7429,7 @@
           "title",
           "status",
           "detail",
-          "code",
-          "instance",
-          "request_id",
-          "details"
+          "code"
         ],
         "title": "Problem",
         "type": "object"
@@ -9924,6 +10539,9 @@
       "SourceOut": {
         "additionalProperties": false,
         "properties": {
+          "acquisitions_by_origin": {
+            "$ref": "#/components/schemas/AcquisitionOriginCounts"
+          },
           "connectors": {
             "items": {
               "type": "string"
@@ -9948,6 +10566,21 @@
             ],
             "title": "Last Retrieved At"
           },
+          "latest_acquisition_origin": {
+            "anyOf": [
+              {
+                "enum": [
+                  "live",
+                  "test_fixture"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Acquisition Origin"
+          },
           "lineage_family": {
             "title": "Lineage Family",
             "type": "string"
@@ -9971,6 +10604,17 @@
           "observations": {
             "title": "Observations",
             "type": "integer"
+          },
+          "origin": {
+            "description": "Origins of this source's acquisitions: live, test_fixture, mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
           },
           "provider_url": {
             "title": "Provider Url",
@@ -10001,7 +10645,10 @@
           "metadata_version",
           "connectors",
           "observations",
-          "last_retrieved_at"
+          "last_retrieved_at",
+          "origin",
+          "latest_acquisition_origin",
+          "acquisitions_by_origin"
         ],
         "title": "SourceOut",
         "type": "object"
@@ -11267,7 +11914,7 @@
     },
     "/v1/connectors": {
       "get": {
-        "description": "Connector versions with licence, declared capabilities, cursor and latest health.",
+        "description": "Connector versions with licence, declared capabilities, cursor, latest health and acquisition origin.",
         "operationId": "list_connectors_v1_connectors_get",
         "responses": {
           "200": {
@@ -11436,6 +12083,54 @@
         "summary": "Create Discovery",
         "tags": [
           "simulation"
+        ]
+      }
+    },
+    "/v1/discovery/candidates": {
+      "get": {
+        "description": "Candidates from the latest completed discovery jobs (their recorded search) and connector proposals.",
+        "operationId": "list_discovery_candidates_v1_discovery_candidates_get",
+        "parameters": [
+          {
+            "description": "Maximum candidates returned",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "description": "Maximum candidates returned",
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DiscoveryCandidateListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Discovery Candidates",
+        "tags": [
+          "catalog"
         ]
       }
     },
@@ -11641,6 +12336,88 @@
         "summary": "Get Entity",
         "tags": [
           "world"
+        ]
+      }
+    },
+    "/v1/evaluations": {
+      "post": {
+        "description": "Enqueue a model evaluation (rolling-origin tournament over the latest published release).\n\nResults are a revised-data retrospective, not a real-time backtest; the naive last-value baseline is\nalways scored. Unsupported concepts/horizons are rejected here rather than failing later.",
+        "operationId": "create_evaluation_v1_evaluations_post",
+        "parameters": [
+          {
+            "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EvaluationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Evaluation",
+        "tags": [
+          "simulation"
         ]
       }
     },
@@ -12380,7 +13157,7 @@
     },
     "/v1/models/{model_ref}/evaluations": {
       "get": {
-        "description": "Evaluations (scores, replay mode, task scope) for a model version UUID or every version of a model key.",
+        "description": "Evaluations (scores, replay mode + label, task scope) for a model version UUID or every version of a key.\n\nFor every evaluation manifest and period on the page, the naive last-value baseline's row from the same\nmanifest is included (``included_as = naive_baseline_comparator``) so scores are never shown without it.",
         "operationId": "list_evaluations_v1_models__model_ref__evaluations_get",
         "parameters": [
           {
@@ -12969,7 +13746,9 @@
                 "acquisition",
                 "artifact",
                 "sim_result",
-                "release"
+                "release",
+                "run",
+                "scenario"
               ],
               "title": "Kind",
               "type": "string"
@@ -13758,7 +14537,7 @@
     },
     "/v1/sources": {
       "get": {
-        "description": "Registered sources with latest metadata version, rights and activity.",
+        "description": "Registered sources with latest metadata version, rights, activity and acquisition origin.",
         "operationId": "list_sources_v1_sources_get",
         "responses": {
           "200": {

@@ -50,7 +50,7 @@ HANDLERS: dict[str, str] = {
     "gaps": "reva.autonomy.jobs:handle_gaps",
     "health": "reva.operations.jobs:handle_health",
     "gc": "reva.operations.gc:handle_gc",
-    "evaluation": "reva.operations.jobs:handle_evaluation",
+    "evaluation": "reva.evaluation.tournament_service:handle_evaluation",
     "population": "reva.population.service:handle_population",
 }
 

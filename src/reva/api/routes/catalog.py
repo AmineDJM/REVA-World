@@ -545,3 +545,118 @@ def review_proposal(
         rid = conn.execute(text("SELECT ops.review_proposal(:p, :d, :r, :c)"),
                            {"p": proposal_id, "d": body.decision, "r": reviewer, "c": body.comment}).scalar_one()
     return s.ReviewRecorded(review_id=rid, proposal_id=proposal_id, decision=body.decision, reviewer=reviewer)
+
+
+# ---------------------------------------------------------------------------
+# Discovery candidates (read-only)
+# ---------------------------------------------------------------------------
+
+DISCOVERY_JOB_SCAN = 50
+CANDIDATE_NOTE = s.ApiWarning(
+    code="unreviewed_candidates",
+    message="Discovery candidates are lexical search results and proposals awaiting gates/human review; ranking "
+            "never grants semantic equivalence and nothing listed here is promoted.",
+)
+
+
+def _num(v: Any) -> float | None:
+    return float(v) if isinstance(v, (int, float)) and not isinstance(v, bool) else None
+
+
+def _gate(res: dict[str, Any]) -> dict[str, Any]:
+    return res.get("gate") if isinstance(res.get("gate"), dict) else {}  # type: ignore[return-value]
+
+
+def _job_candidates(job: dict[str, Any], proposal_dataset: dict[str, str]) -> list[s.DiscoveryCandidate]:
+    res = job["result_ref"] if isinstance(job["result_ref"], dict) else {}
+    payload = job["payload"] if isinstance(job["payload"], dict) else {}
+    mode = res.get("mode") or payload.get("mode")
+    origin = "test_fixture" if mode == "fixture" else ("live" if mode == "live" else None)
+    search = res.get("search") if isinstance(res.get("search"), dict) else {}
+    inspections = {i.get("code"): i for i in search.get("inspections") or [] if isinstance(i, dict)}
+    gate = _gate(res)
+    proposal_id = gate.get("proposal_id")
+    # Exact link: the job's gated proposal records the dataset it was generated from.
+    chosen = proposal_dataset.get(str(proposal_id)) if proposal_id else None
+    out = []
+    for n, e in enumerate(search.get("ranked") or [], start=1):
+        if not isinstance(e, dict) or not isinstance(e.get("code"), str):
+            continue
+        code = e["code"][:200]
+        insp = inspections.get(e["code"])
+        selected = chosen is not None and chosen == e["code"]
+        out.append(s.DiscoveryCandidate(
+            candidate_kind="search_result", job_id=job["id"],
+            proposal_id=UUID(str(proposal_id)) if selected and proposal_id else None, origin=origin,  # type: ignore[arg-type]
+            provider=str(res.get("catalogue") or payload.get("catalogue") or "eurostat")[:100], dataset_code=code,
+            requirement_id=res.get("requirement_id"), rank=n, score=_num(e.get("score")),
+            jaccard=_num(e.get("jaccard")),
+            inspected=None if insp is None else bool(insp.get("ok")),
+            inspection_error=None if insp is None or insp.get("error") is None else str(insp.get("error"))[:500],
+            selected=selected, discovery_status=str(res.get("status")) if res.get("status") else None,
+            gate_outcome=gate.get("outcome") if selected else None,
+            recorded_at=job["finished_at"] or job["updated_at"]))
+    return out
+
+
+@router.get("/discovery/candidates", response_model=s.DiscoveryCandidateListResponse)
+def list_discovery_candidates(
+    request: Request,
+    limit: int = Query(200, ge=1, le=1000, description="Maximum candidates returned"),
+) -> s.DiscoveryCandidateListResponse:
+    """Candidates from the latest completed discovery jobs (their recorded search) and connector proposals."""
+    t = Timer()
+    with read_conn(request) as conn:
+        jobs = [dict(r) for r in conn.execute(text(
+            """SELECT id, payload, result_ref, finished_at, updated_at FROM ops.job
+               WHERE job_type = 'discovery' AND status = 'succeeded' AND result_ref IS NOT NULL
+               ORDER BY finished_at DESC NULLS LAST, id DESC LIMIT :n"""), {"n": DISCOVERY_JOB_SCAN}).mappings()]
+        proposals = [dict(r) for r in conn.execute(text(
+            """SELECT p.id, p.proposal_type, p.permission_tier, p.summary, p.recorded_at,
+                      ARRAY(SELECT r.decision FROM ops.proposal_review r WHERE r.proposal_id = p.id
+                            ORDER BY r.recorded_at) AS reviews,
+                      (SELECT g.decision FROM ops.gate_result g WHERE g.proposal_id = p.id
+                       ORDER BY g.recorded_at DESC LIMIT 1) AS gate_outcome
+               FROM ops.proposal p WHERE p.proposal_type LIKE 'connector%'
+               ORDER BY p.recorded_at DESC, p.id DESC LIMIT :n"""), {"n": limit + 1}).mappings()]
+        gate_ids = []
+        for j in jobs:
+            pid = _gate(j["result_ref"] if isinstance(j["result_ref"], dict) else {}).get("proposal_id")
+            try:
+                gate_ids.append(UUID(str(pid)))
+            except ValueError:
+                continue
+        proposal_dataset = {str(r[0]): r[1] for r in conn.execute(text(
+            "SELECT id, summary->'scope'->>'dataset' FROM ops.proposal WHERE id = ANY(:i)"), {"i": gate_ids})
+            if r[1]}
+    items: list[s.DiscoveryCandidate] = []
+    proposal_origin: dict[str, str | None] = {}
+    for job in jobs:
+        found = _job_candidates(job, proposal_dataset)
+        items.extend(found)
+        for c in found:
+            if c.proposal_id is not None:
+                proposal_origin[str(c.proposal_id)] = c.origin
+    for p in proposals:
+        scope = (p["summary"] or {}).get("scope") if isinstance(p["summary"], dict) else None
+        scope = scope if isinstance(scope, dict) else {}
+        items.append(s.DiscoveryCandidate(
+            candidate_kind="connector_proposal", proposal_id=p["id"],
+            origin=proposal_origin.get(str(p["id"])),  # type: ignore[arg-type]
+            dataset_code=str(scope["dataset"])[:200] if scope.get("dataset") else None,
+            requirement_id=None, selected=True, proposal_type=p["proposal_type"],
+            permission_tier=p["permission_tier"], gate_outcome=p["gate_outcome"], reviews=list(p["reviews"] or []),
+            recorded_at=p["recorded_at"]))
+    items.sort(key=lambda c: c.recorded_at, reverse=True)
+    truncated = len(items) > limit
+    items = items[:limit]
+    org = origin_of(c.origin for c in items)
+    warnings = [*origin_warnings(org), CANDIDATE_NOTE]
+    if truncated:
+        warnings.append(s.ApiWarning(code="truncated", message=f"More candidates exist than limit={limit}"))
+    if len(jobs) == DISCOVERY_JOB_SCAN:
+        warnings.append(s.ApiWarning(code="job_scan_bounded",
+                                     message=f"Only the latest {DISCOVERY_JOB_SCAN} completed discovery jobs are read"))
+    return s.DiscoveryCandidateListResponse(
+        data=items, context_mode="operations", origin=org, modality="metadata",  # type: ignore[arg-type]
+        warnings=warnings, cost=t.cost(len(items)))

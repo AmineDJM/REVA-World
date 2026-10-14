@@ -324,7 +324,8 @@ def get_provenance(
     warnings = origin_warnings(org)
     if b.truncated:
         warnings.append(s.ApiWarning(code="truncated", message=f"Lineage bounded at max_nodes={max_nodes}"))
-    mode = "simulation" if kind in ("sim_result", "run", "scenario") else ("belief" if kind in ("estimate", "release") else "evidence")
+    mode = ("simulation" if kind in ("sim_result", "run", "scenario")
+            else "belief" if kind in ("estimate", "release") else "evidence")
     return s.ProvenanceResponse(
         data=s.ProvenanceGraph(root=root, nodes=list(b.nodes.values()), edges=b.edges, truncated=b.truncated,
                                max_nodes=max_nodes),

@@ -17,6 +17,7 @@ from __future__ import annotations
 import hashlib
 import hmac
 import json
+import os
 import secrets
 import threading
 import time
@@ -32,6 +33,7 @@ from itsdangerous import BadSignature, URLSafeTimedSerializer
 from sqlalchemy import text
 
 from reva.api.errors import ApiProblem, Forbidden, Unauthenticated
+from reva.kernel.errors import ConfigurationError
 from reva.settings import Settings
 
 SESSION_COOKIE = "reva_session"
@@ -41,7 +43,9 @@ SESSION_TTL = timedelta(hours=8)
 ALL_SCOPES = frozenset({"read", "simulate", "ingest", "review"})
 ADMIN_USERNAME = "admin"
 SAFE_METHODS = frozenset({"GET", "HEAD", "OPTIONS"})
-LOGIN_ATTEMPTS_PER_MINUTE = 5
+LOGIN_ATTEMPTS_PER_MINUTE = 5  # default when not configured
+LOGIN_RATE_LIMIT_ENV = "REVA_LOGIN_RATE_LIMIT_PER_MINUTE"
+LOGIN_RATE_LIMIT_MAX = 1000
 
 _hasher = PasswordHasher()  # argon2-cffi default: Argon2id
 # A valid Argon2id hash used to equalise timing when the username is wrong.
@@ -99,6 +103,35 @@ class Principal:
         return None
 
 
+def login_rate_limit_per_minute(settings: Settings, override: int | None = None) -> int:
+    """Login attempts allowed per client per 60 s window (always enforced; never disabled).
+
+    Resolution order: explicit ``override`` (``create_app(login_rate_limit_per_minute=...)``), a
+    ``reva_login_rate_limit_per_minute`` Settings field once Settings declares it, then the environment
+    variable ``REVA_LOGIN_RATE_LIMIT_PER_MINUTE``, then the default 5. Values outside 1..1000 or
+    non-integers are a configuration error (fail closed at startup).
+    """
+    value: Any = override
+    if value is None:
+        value = getattr(settings, "reva_login_rate_limit_per_minute", None)
+    source = "override/settings"
+    if value is None:
+        raw = os.environ.get(LOGIN_RATE_LIMIT_ENV)
+        if raw is None or not raw.strip():
+            return LOGIN_ATTEMPTS_PER_MINUTE
+        value, source = raw.strip(), LOGIN_RATE_LIMIT_ENV
+    try:
+        if isinstance(value, bool):
+            raise ValueError
+        n = int(value)
+    except (TypeError, ValueError):
+        raise ConfigurationError(f"{LOGIN_RATE_LIMIT_ENV} must be an integer", source=source) from None
+    if not 1 <= n <= LOGIN_RATE_LIMIT_MAX:
+        raise ConfigurationError(f"{LOGIN_RATE_LIMIT_ENV} must be between 1 and {LOGIN_RATE_LIMIT_MAX}",
+                                 source=source)
+    return n
+
+
 class LoginRateLimiter:
     """In-memory sliding window per client (single API process in V1)."""
 
@@ -129,11 +162,13 @@ class LoginRateLimiter:
 class AuthService:
     settings: Settings
     engine_getter: Any
-    limiter: LoginRateLimiter = field(default_factory=LoginRateLimiter)
+    login_limit_override: int | None = None
+    limiter: LoginRateLimiter = field(init=False)
     _revoked: dict[str, float] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock)
 
     def __post_init__(self) -> None:
+        self.limiter = LoginRateLimiter(login_rate_limit_per_minute(self.settings, self.login_limit_override))
         secret = self.settings.reva_session_secret
         if secret is not None and secret.get_secret_value():
             key = secret.get_secret_value()

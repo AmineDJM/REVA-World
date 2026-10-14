@@ -61,8 +61,17 @@ def _lazy_engine(settings: Settings) -> Callable[[], Engine]:
     return get
 
 
-def create_app(settings: Settings | None = None, *, static_dir: Path | None = None) -> FastAPI:
-    """Build the app. ``static_dir`` overrides the built UI location (default: reva/api/static)."""
+def create_app(
+    settings: Settings | None = None,
+    *,
+    static_dir: Path | None = None,
+    login_rate_limit_per_minute: int | None = None,
+) -> FastAPI:
+    """Build the app. ``static_dir`` overrides the built UI location (default: reva/api/static).
+
+    ``login_rate_limit_per_minute`` overrides the login rate limit (otherwise Settings/env
+    ``REVA_LOGIN_RATE_LIMIT_PER_MINUTE``, default 5); the limit is always enforced.
+    """
     settings = settings or get_settings()
     production = settings.reva_env == "production"
     ui_dir = static_dir or STATIC_DIR
@@ -85,10 +94,12 @@ def create_app(settings: Settings | None = None, *, static_dir: Path | None = No
         docs_url=None if production else "/docs",
         redoc_url=None,
         openapi_url="/openapi.json",
+        # Response schemas in serialization mode: fields with defaults are required in responses.
+        separate_input_output_schemas=True,
     )
     app.state.settings = settings
     app.state.engine = engine
-    app.state.auth = AuthService(settings, app.state.engine)
+    app.state.auth = AuthService(settings, app.state.engine, login_rate_limit_per_minute)
     app.state.metrics = system.RequestMetrics()
 
     install_error_handlers(app)
