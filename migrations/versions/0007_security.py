@@ -25,8 +25,13 @@ DECLARE r text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
-      EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
-    ELSIF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r AND (rolinherit OR rolsuper OR rolcreatedb
+      BEGIN
+        EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
+      EXCEPTION WHEN duplicate_object OR unique_violation THEN
+        NULL;  -- created concurrently by another bootstrap; attributes are verified below
+      END;
+    END IF;
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r AND (rolinherit OR rolsuper OR rolcreatedb
                   OR rolcreaterole OR rolbypassrls OR rolreplication)) THEN
       -- Roles are cluster-global; only touch the catalog row when needed so parallel
       -- bootstraps of other databases do not race on it ("tuple concurrently updated").

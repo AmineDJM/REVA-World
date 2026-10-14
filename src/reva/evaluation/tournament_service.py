@@ -528,11 +528,12 @@ def evaluate(
     decisions: dict[str, dict[str, Any]] = {}
     confirmed: list[str] = []
     for k, d in sorted(result.decisions.items()):
+        ci = getattr(d, "bootstrap_interval", None)
         base = {
-            "challenger": model_ref(models[k]), "incumbent": inc_ref, "n_pairs": d.n_pairs,
-            "mean_loss_difference": d.mean_loss_difference,
-            "bootstrap_interval": list(d.bootstrap_interval) if d.bootstrap_interval else None,
-            "subgroup_degradation": dict(d.subgroup_degradation),
+            "challenger": model_ref(models[k]), "incumbent": inc_ref, "n_pairs": getattr(d, "n_pairs", None),
+            "mean_loss_difference": getattr(d, "mean_loss_difference", None),
+            "bootstrap_interval": list(ci) if ci else None,
+            "subgroup_degradation": dict(getattr(d, "subgroup_degradation", None) or {}),
             "development_decision": d.decision,
         }
         reasons = [LABEL, *d.reasons]
@@ -695,10 +696,7 @@ def build_manifest(
                 for i in t.ineligible
             ],
             "tournament_decisions": {
-                k: {"decision": d.decision, "reasons": list(d.reasons), "n_pairs": d.n_pairs,
-                    "mean_loss_difference": d.mean_loss_difference,
-                    "bootstrap_interval": list(d.bootstrap_interval) if d.bootstrap_interval else None}
-                for k, d in t.decisions.items()
+                k: _jsonable(d) for k, d in t.decisions.items()
             },
         },
         "locked_holdout": {

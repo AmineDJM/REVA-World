@@ -165,15 +165,14 @@ def _band_cell_count(recipe: PopulationRecipe, bands: Sequence[tuple[str, int, i
 
 
 def _open_top(recipe: PopulationRecipe) -> tuple[int | None, bool]:
-    """(lower bound of the open-ended top leaf, whether that bound is known)."""
-    has_open = False
+    """(lower bound of the open-ended top leaf or ``None``, whether that bound is known)."""
     for c in recipe.leaf_cells:
         if c.is_top_coded:
             return recipe.open_age_lower_bound, recipe.open_age_lower_bound is not None
-        if c.age_hi is None and c.age_lo is not None:
-            has_open = True
+    for c in recipe.leaf_cells:
+        if c.is_age_band and c.age_hi is None:
             return c.age_lo, True
-    return None, not has_open
+    return None, True
 
 
 def suggest_coarsening(recipe: PopulationRecipe, n_records: int) -> list[dict[str, Any]]:
@@ -182,8 +181,7 @@ def suggest_coarsening(recipe: PopulationRecipe, n_records: int) -> list[dict[st
     A scheme that would split a leaf (an age band leaf, or ``Y_OPEN`` whose
     lower bound is unknown) is reported as not applicable rather than guessed.
     """
-    finite = [c.age_hi if c.age_hi is not None else c.age_years for c in recipe.leaf_cells]
-    finite_his = [h for h in finite if h is not None]
+    finite_his = [c.age_hi for c in recipe.leaf_cells if c.age_hi is not None]
     max_finite = max(finite_his) if finite_his else 0
     open_lo, open_known = _open_top(recipe)
     schemes: list[tuple[str, list[tuple[str, int, int | None]]]] = [
