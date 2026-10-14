@@ -33,7 +33,8 @@ PRIORITY_METHOD = "requirement_weight_x_affected_period_fraction@1"
 
 LATEST_SQL = """
 WITH latest AS (
-  SELECT o.*, row_number() OVER (PARTITION BY o.source_id, o.logical_key ORDER BY o.revision_no DESC) AS rn
+  SELECT o.*, row_number() OVER (PARTITION BY o.source_id, a.origin, o.logical_key
+                                   ORDER BY o.revision_no DESC) AS rn
   FROM evidence.observation o
   JOIN evidence.acquisition a ON a.id = o.acquisition_id
   WHERE o.recorded_at <= :cutoff AND a.origin = ANY(:origins)

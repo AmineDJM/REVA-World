@@ -33,3 +33,49 @@ concepts:
       100 x amount / same-year baseline nominal GDP in the same currency basis. A ratio of an
       accounting change to GDP; not a GDP change.
     owner: reva-maintainers
+  - concept_id: unit.eur
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Euro (amount)"}
+    definition: Amount in euros. Price basis and reference year are carried by the value basis.
+    owner: reva-maintainers
+  - concept_id: unit.tonne
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Metric tonne"}
+    definition: Mass in metric tonnes (1000 kg).
+    owner: reva-maintainers
+  - concept_id: unit.barrel
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Oil barrel"}
+    definition: >-
+      Volume in oil barrels (42 US gallons). Never inferred from mass without a declared density and
+      temperature convention.
+    owner: reva-maintainers
+  - concept_id: unit.m3
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Cubic metre"}
+    definition: Volume in cubic metres.
+    owner: reva-maintainers
+  - concept_id: unit.ratio
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Ratio"}
+    definition: Bare dimensionless ratio with no declared denominator.
+    owner: reva-maintainers
+  - concept_id: unit.percent
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Percent"}
+    definition: Bare percent (100 x ratio) with no declared denominator.
+    owner: reva-maintainers
+  - concept_id: unit.ratio_to_baseline_gdp
+    version: "1.0.0"
+    kind: unit
+    labels: {en: "Ratio to baseline nominal GDP"}
+    definition: >-
+      amount / same-year baseline nominal GDP in the same currency basis. A ratio of an accounting
+      change to GDP; not a GDP change.
+    owner: reva-maintainers

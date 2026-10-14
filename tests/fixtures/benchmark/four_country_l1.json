@@ -1,0 +1,46 @@
+{
+  "origin": "test_fixture",
+  "label": "SYNTHETIC BENCHMARK — not observed data",
+  "fixture_id": "benchmark.crude_exposure.four_country_l1.v1",
+  "purpose": "Numerical performance benchmark of the pure economic.crude_exposure L1/L2 path (architecture §20.3: 'The four-country numerical benchmark uses a complete labelled test fixture; the initial live scenario uses the three verified countries.'). Only consumed by tests/performance/test_perf_simulation.py and scripts/measure_performance.py.",
+  "not_evidence": true,
+  "usage_restrictions": [
+    "Never ingest, publish, cite or display these values as evidence, beliefs or source reports.",
+    "Values are rounded synthetic magnitudes chosen to be plausible in order of magnitude only; they are not copied from, and must not be compared with, any provider dataset.",
+    "In particular the DZA crude flows are synthetic: the live Comtrade query for DZA 2023 returned no rows and is stored as typed Missing."
+  ],
+  "model": {"key": "economic.crude_exposure", "version": "1.0.0"},
+  "reference_year": 2023,
+  "units": {
+    "M": "current USD, crude (HS 2709) import border value from World, one calendar year (synthetic)",
+    "X": "current USD, crude (HS 2709) export border value to World, one calendar year (synthetic)",
+    "G": "current USD, nominal GDP, one calendar year (synthetic)"
+  },
+  "value_dict_template": {
+    "kind": "decimal",
+    "unit_ref": "unit.usd",
+    "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1",
+              "notes": "SYNTHETIC BENCHMARK — not observed data"}
+  },
+  "aggregation": "period_flow_total",
+  "intervention": {
+    "kind": "set_exogenous_border_price_multiplier",
+    "import_multiplier": 1.25,
+    "export_multiplier": 1.25,
+    "unit": "ratio"
+  },
+  "l2_elasticity_grid": [
+    {"import_elasticity": 0.0, "export_elasticity": 0.0, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.1, "export_elasticity": 0.05, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.25, "export_elasticity": 0.1, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.5, "export_elasticity": 0.2, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.75, "export_elasticity": 0.35, "basis": "scenario_assumption"},
+    {"import_elasticity": -1.0, "export_elasticity": 0.5, "basis": "scenario_assumption"}
+  ],
+  "countries": {
+    "FRA": {"M": "35000000000", "X": "150000000", "G": "3030000000000"},
+    "DZA": {"M": "90000000", "X": "26000000000", "G": "240000000000"},
+    "CHN": {"M": "337000000000", "X": "1000000000", "G": "17800000000000"},
+    "USA": {"M": "170000000000", "X": "120000000000", "G": "27400000000000"}
+  }
+}

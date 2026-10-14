@@ -26,6 +26,13 @@ concepts:
       A product class in a named classification and revision (e.g. HS heading 2709).
       The classification revision is part of every observation's flags.
     owner: reva-maintainers
+  - concept_id: entity.synthetic_person
+    version: "1.0.0"
+    kind: entity_type
+    labels: {en: Synthetic person record}
+    definition: >-
+      Weighted synthetic representative record; not a real individual; never linked to a real person.
+    owner: reva-maintainers
   - concept_id: entity.scholarly_work
     version: "1.0.0"
     kind: entity_type

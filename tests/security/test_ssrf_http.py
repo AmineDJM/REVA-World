@@ -427,13 +427,6 @@ def test_non_finite_json_constants_rejected(body: bytes) -> None:
         require_json(result(body))
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: require_json accepts numeric overflow (1e400 -> float('inf')); NaN/Infinity are forbidden "
-        "but an overflowing literal smuggles Infinity in. Use parse_float=Decimal or a finite check"
-    ),
-)
 @pytest.mark.parametrize("body", [b'{"v": 1e400}', b"[-1e999]"])
 def test_overflowing_json_numbers_rejected(body: bytes) -> None:
     with pytest.raises(SourceResponseError):
@@ -507,14 +500,6 @@ def _lying_size_zip() -> bytes:
     return bytes(data)
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: read_zip_members lets zipfile.BadZipFile/zlib errors from corrupt, truncated or size-lying "
-        "archives escape as non-RevaError exceptions; run_connector only catches RevaError, so one hostile "
-        "archive aborts the whole connector run instead of quarantining the item"
-    ),
-)
 @pytest.mark.parametrize("kind", ["lying_size", "truncated", "not_a_zip"])
 def test_corrupt_archives_fail_as_typed_errors(kind: str) -> None:
     from reva.kernel.errors import RevaError
@@ -531,13 +516,6 @@ def test_zip_members_filtered_by_suffix_and_flattened() -> None:
     assert out == {"ne_110m.shp": b"S", "ne_110m.dbf": b"D"}
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: read_zip_members keys members by basename, so 'a/x.shp' and 'b/x.shp' silently overwrite "
-        "each other (silent ambiguity/truncation); duplicate basenames must raise"
-    ),
-)
 def test_zip_duplicate_basenames_are_ambiguous() -> None:
     data = _zip({"a/x.shp": b"first", "b/x.shp": b"second"})
     with pytest.raises(UnsafeRequest):

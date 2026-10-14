@@ -101,6 +101,10 @@ CREATE TABLE evidence.observation (
   source_id uuid NOT NULL REFERENCES evidence.source,
   connector_version_id uuid NOT NULL REFERENCES evidence.connector_version,
   acquisition_id uuid NOT NULL,
+  -- Lineages are per origin (R-04): fixture and live records of the same
+  -- logical key never share a revision chain. Must equal the acquisition's
+  -- origin (enforced by evidence.check_revision; filled from it when omitted).
+  origin text NOT NULL CHECK (origin IN ('live','test_fixture')),
   logical_key text NOT NULL,
   revision_no integer NOT NULL CHECK (revision_no > 0),
   source_revision_id text,
@@ -121,9 +125,9 @@ CREATE TABLE evidence.observation (
   semantic_hash text NOT NULL,
   record_hash text NOT NULL,
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp(),
-  UNIQUE (source_id, logical_key, revision_no),
+  UNIQUE (source_id, origin, logical_key, revision_no),
   UNIQUE (acquisition_id, logical_key, connector_version_id),
-  UNIQUE (id, source_id, logical_key),
+  UNIQUE (id, source_id, origin, logical_key),
   UNIQUE (supersedes_id),
   CHECK (supersedes_id IS NULL OR supersedes_id <> id),
   CHECK ((revision_no = 1) = (supersedes_id IS NULL)),
@@ -135,20 +139,27 @@ CREATE TABLE evidence.observation (
   -- (2) observation's source/connector/acquisition agree
   FOREIGN KEY (acquisition_id, source_id, connector_version_id)
     REFERENCES evidence.acquisition (id, source_id, connector_version_id),
-  -- (3) supersedes points to the same source/logical key
-  FOREIGN KEY (supersedes_id, source_id, logical_key)
-    REFERENCES evidence.observation (id, source_id, logical_key)
+  -- (3) supersedes points to the same source/origin/logical key
+  FOREIGN KEY (supersedes_id, source_id, origin, logical_key)
+    REFERENCES evidence.observation (id, source_id, origin, logical_key)
 );
 CREATE INDEX observation_revision_lookup
-  ON evidence.observation(source_id, logical_key, recorded_at DESC, revision_no DESC);
+  ON evidence.observation(source_id, origin, logical_key, revision_no DESC);
 CREATE INDEX observation_series
   ON evidence.observation(subject_id, concept_version_id, support_id);
 
 -- (3) supersedes has exactly the preceding revision number: lineage is a
 -- strictly decreasing chain, therefore acyclic.
 CREATE FUNCTION evidence.check_revision() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE prev integer;
+DECLARE prev integer; acq evidence.acquisition;
 BEGIN
+  SELECT * INTO acq FROM evidence.acquisition WHERE id = NEW.acquisition_id;
+  -- The lineage origin is the acquisition's origin; never caller-chosen.
+  IF NEW.origin IS NULL THEN
+    NEW.origin := acq.origin;
+  ELSIF NEW.origin IS DISTINCT FROM acq.origin THEN
+    RAISE EXCEPTION 'observation origin % does not match its acquisition origin %', NEW.origin, acq.origin;
+  END IF;
   IF NEW.supersedes_id IS NOT NULL THEN
     SELECT revision_no INTO prev FROM evidence.observation WHERE id = NEW.supersedes_id;
     IF prev IS NULL OR prev <> NEW.revision_no - 1 THEN
@@ -156,8 +167,7 @@ BEGIN
     END IF;
   END IF;
   -- The raw selector must point at the acquisition's verified raw bytes.
-  IF NEW.raw_selector->>'artifact_sha256' IS DISTINCT FROM
-     (SELECT raw_sha256 FROM evidence.acquisition WHERE id = NEW.acquisition_id) THEN
+  IF NEW.raw_selector->>'artifact_sha256' IS DISTINCT FROM acq.raw_sha256 THEN
     RAISE EXCEPTION 'raw_selector.artifact_sha256 must match the acquisition raw artifact';
   END IF;
   RETURN NEW;
@@ -187,14 +197,34 @@ CREATE TABLE evidence.eligibility (
 );
 CREATE INDEX eligibility_lookup ON evidence.eligibility(connector_version_id, concept_version_id, recorded_at DESC);
 
-CREATE FUNCTION evidence.is_eligible(cv uuid, concept uuid, subject uuid, at timestamptz)
+-- (6) A decision applies only inside its applicability scope (R-07):
+--   * subject_ids (when present) must contain the subject;
+--   * years (when present and ref_year is given): [y] = that year, [lo, hi] =
+--     inclusive range, any longer list = membership.
+-- The latest decision among those whose scope covers the record wins, so a
+-- decision scoped to other subjects/years never affects this record.
+-- ref_year NULL means "year unknown to the caller": the years scope is then
+-- not applied (pre-filters such as belief.selection); the authoritative
+-- belief.check_input trigger always passes the support's year.
+CREATE FUNCTION evidence.is_eligible(cv uuid, concept uuid, subject uuid, at timestamptz,
+                                     ref_year integer DEFAULT NULL)
   RETURNS boolean LANGUAGE sql STABLE AS $$
   SELECT COALESCE((
     SELECT e.decision = 'eligible'
-       AND (NOT e.applicability ? 'subject_ids'
-            OR e.applicability->'subject_ids' ? subject::text)
     FROM evidence.eligibility e
     WHERE e.connector_version_id = cv AND e.concept_version_id = concept AND e.recorded_at <= at
+      AND (NOT e.applicability ? 'subject_ids'
+           OR (jsonb_typeof(e.applicability->'subject_ids') = 'array'
+               AND e.applicability->'subject_ids' ? subject::text))
+      AND (ref_year IS NULL OR NOT e.applicability ? 'years'
+           OR CASE WHEN jsonb_typeof(e.applicability->'years') IS DISTINCT FROM 'array' THEN false
+                   WHEN jsonb_array_length(e.applicability->'years') = 1
+                     THEN ref_year = (e.applicability->'years'->>0)::int
+                   WHEN jsonb_array_length(e.applicability->'years') = 2
+                     THEN ref_year BETWEEN (e.applicability->'years'->>0)::int
+                                       AND (e.applicability->'years'->>1)::int
+                   ELSE e.applicability->'years' @> to_jsonb(ref_year)
+              END)
     ORDER BY e.recorded_at DESC, e.id DESC LIMIT 1), false)
 $$;
 """

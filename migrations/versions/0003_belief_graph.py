@@ -114,7 +114,7 @@ CREATE TABLE belief.input (
 CREATE INDEX input_estimate ON belief.input(estimate_id);
 
 CREATE FUNCTION belief.check_input() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE r belief.release; o evidence.observation; acq_origin text; prior_cutoff timestamptz;
+DECLARE r belief.release; o evidence.observation; prior_cutoff timestamptz; ref_year integer;
 BEGIN
   SELECT rel.* INTO r FROM belief.estimate e JOIN belief.release rel ON rel.id = e.release_id
    WHERE e.id = NEW.estimate_id;
@@ -125,7 +125,13 @@ BEGIN
       RAISE EXCEPTION 'observation % recorded after release cutoff', o.id;
     END IF;
     -- (6) eligible only for concepts/scopes approved for that connector version
-    IF NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, r.knowledge_cutoff) THEN
+    -- Support year (UTC) of the observation; 0 (no such year) when the support has no
+    -- bounded time range, so years-scoped decisions fail closed.
+    SELECT CASE WHEN sp.valid_range IS NULL OR lower_inf(sp.valid_range) OR NOT isfinite(lower(sp.valid_range))
+                THEN 0 ELSE extract(year FROM lower(sp.valid_range) AT TIME ZONE 'UTC')::int END
+      INTO ref_year FROM world.support sp WHERE sp.id = o.support_id;
+    IF NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, r.knowledge_cutoff,
+                                COALESCE(ref_year, 0)) THEN
       RAISE EXCEPTION 'observation % is not eligible for concept % under connector %',
         o.id, o.concept_version_id, o.connector_version_id;
     END IF;
@@ -133,8 +139,7 @@ BEGIN
                WHERE t.observation_id = o.id AND t.recorded_at <= r.knowledge_cutoff) THEN
       RAISE EXCEPTION 'observation % was retracted before the cutoff', o.id;
     END IF;
-    SELECT origin INTO acq_origin FROM evidence.acquisition WHERE id = o.acquisition_id;
-    IF r.origin = 'live' AND acq_origin <> 'live' THEN
+    IF r.origin = 'live' AND o.origin <> 'live' THEN
       RAISE EXCEPTION 'fixture-origin observation cannot enter a live release';
     END IF;
   ELSE
@@ -160,13 +165,28 @@ CREATE TABLE ops.publication (
 
 -- (11) published release manifests reference only committed, checksum-verified artifacts
 CREATE FUNCTION ops.check_publication() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE r belief.release; bad text;
+DECLARE r belief.release; bad text; cmm text; session_held boolean;
 BEGIN
   -- The identity value is allocated before this trigger runs, so the caller
-  -- must take the publication lock before INSERT for sequence = commit order.
-  IF NOT EXISTS (SELECT 1 FROM pg_locks WHERE locktype = 'advisory' AND pid = pg_backend_pid()
-                 AND objid = 7262011 AND classid = 0 AND granted) THEN
+  -- must take the publication lock before INSERT for sequence = commit order,
+  -- and it must stay held until commit: only pg_advisory_xact_lock(7262011)
+  -- (single bigint key: classid 0, objid 7262011, objsubid 1) qualifies.
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_locks WHERE locktype = 'advisory' AND pid = pg_catalog.pg_backend_pid()
+                 AND classid = 0 AND objid = 7262011 AND objsubid = 1 AND mode = 'ExclusiveLock' AND granted) THEN
     RAISE EXCEPTION 'publication advisory lock (7262011) not held by this transaction';
+  END IF;
+  -- (R-19) pg_locks shows session-level and transaction-level advisory holds
+  -- identically (verified on PostgreSQL 17: same row, same virtualtransaction).
+  -- pg_advisory_unlock releases only a session-level hold and returns true iff
+  -- one existed, so it detects a session lock (which could be released before
+  -- commit). The probe emits a WARNING when no session hold exists (the normal
+  -- case); it is hidden from the client here (the server log may record it).
+  cmm := current_setting('client_min_messages');
+  PERFORM set_config('client_min_messages', 'error', true);
+  session_held := pg_catalog.pg_advisory_unlock(7262011);
+  PERFORM set_config('client_min_messages', cmm, true);
+  IF session_held THEN
+    RAISE EXCEPTION 'publication advisory lock must be transaction-scoped (pg_advisory_xact_lock), not session-level';
   END IF;
   SELECT * INTO r FROM belief.release WHERE id = NEW.release_id;
   FOR bad IN
@@ -189,6 +209,27 @@ BEGIN
 END $$;
 CREATE TRIGGER publication_verified BEFORE INSERT ON ops.publication
   FOR EACH ROW EXECUTE FUNCTION ops.check_publication();
+
+-- (R-02) A published release is sealed: nothing can be appended to it.
+CREATE FUNCTION belief.reject_if_published() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE rel uuid;
+BEGIN
+  IF TG_TABLE_NAME = 'input' THEN
+    SELECT e.release_id INTO rel FROM belief.estimate e WHERE e.id = NEW.estimate_id;
+  ELSE
+    rel := NEW.release_id;
+  END IF;
+  IF EXISTS (SELECT 1 FROM ops.publication p WHERE p.release_id = rel) THEN
+    RAISE EXCEPTION 'release % is published and sealed; publish a new release instead', rel;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER release_sealed BEFORE INSERT ON belief.estimate
+  FOR EACH ROW EXECUTE FUNCTION belief.reject_if_published();
+CREATE TRIGGER release_sealed BEFORE INSERT ON belief.input
+  FOR EACH ROW EXECUTE FUNCTION belief.reject_if_published();
+CREATE TRIGGER release_sealed BEFORE INSERT ON belief.release_artifact
+  FOR EACH ROW EXECUTE FUNCTION belief.reject_if_published();
 
 CREATE TABLE world.relation (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -217,11 +258,18 @@ CREATE INDEX participant_lookup ON world.relation_participant(entity_id, role_co
 
 -- (10) participant role/entity type satisfy the predicate signature
 CREATE FUNCTION world.check_participant() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE sig jsonb; role_key text; kind_key text; pred_kind text;
+DECLARE sig jsonb; role_key text; kind_key text; pred_kind text; rel_xmin xid;
 BEGIN
-  SELECT cv.semantic_profile->'signature', cv.kind INTO sig, pred_kind
+  SELECT cv.semantic_profile->'signature', cv.kind, r.xmin INTO sig, pred_kind, rel_xmin
     FROM world.relation r JOIN ontology.concept_version cv ON cv.id = r.predicate_id
    WHERE r.id = NEW.relation_id;
+  -- (R-09) A relation is sealed with its creating transaction: participants can
+  -- only be inserted together with the relation (cardinality is checked at that
+  -- commit), never appended later.
+  IF NOT meta.inserted_in_current_xact(rel_xmin) THEN
+    RAISE EXCEPTION 'relation % is sealed; participants must be inserted in the transaction that created it',
+      NEW.relation_id;
+  END IF;
   IF pred_kind <> 'predicate' OR sig IS NULL THEN
     RAISE EXCEPTION 'relation predicate has no registered signature';
   END IF;
@@ -231,7 +279,7 @@ BEGIN
   END IF;
   SELECT cv.concept_id INTO kind_key FROM world.entity e JOIN ontology.concept_version cv ON cv.id = e.kind_concept_id
    WHERE e.id = NEW.entity_id;
-  IF NOT (sig->'roles'->role_key->'entity_kinds') ? kind_key THEN
+  IF NOT COALESCE((sig->'roles'->role_key->'entity_kinds') ? kind_key, false) THEN
     RAISE EXCEPTION 'entity kind % cannot fill role %', kind_key, role_key;
   END IF;
   RETURN NEW;
@@ -239,23 +287,39 @@ END $$;
 CREATE TRIGGER participant_signature BEFORE INSERT ON world.relation_participant
   FOR EACH ROW EXECUTE FUNCTION world.check_participant();
 
--- Cardinality is checked at commit, after all participants were inserted.
-CREATE FUNCTION world.check_relation_cardinality() RETURNS trigger LANGUAGE plpgsql AS $$
+-- Cardinality is checked at commit, after all participants were inserted;
+-- both for the relation and (defence in depth) for every participant insert.
+CREATE FUNCTION world.assert_relation_cardinality(rel uuid) RETURNS void LANGUAGE plpgsql AS $$
 DECLARE sig jsonb; role_key text; spec jsonb; n integer;
 BEGIN
-  SELECT cv.semantic_profile->'signature' INTO sig FROM ontology.concept_version cv WHERE cv.id = NEW.predicate_id;
+  SELECT cv.semantic_profile->'signature' INTO sig
+    FROM world.relation r JOIN ontology.concept_version cv ON cv.id = r.predicate_id WHERE r.id = rel;
+  IF sig IS NULL THEN
+    RAISE EXCEPTION 'relation % predicate has no registered signature', rel;
+  END IF;
   FOR role_key, spec IN SELECT key, value FROM jsonb_each(sig->'roles') LOOP
     SELECT count(*) INTO n FROM world.relation_participant p
       JOIN ontology.concept_version rc ON rc.id = p.role_concept_id
-     WHERE p.relation_id = NEW.id AND rc.concept_id = role_key;
+     WHERE p.relation_id = rel AND rc.concept_id = role_key;
     IF n < COALESCE((spec->>'min')::int, 0) OR n > COALESCE((spec->>'max')::int, 2147483647) THEN
-      RAISE EXCEPTION 'relation % role % has % participants, outside [%..%]', NEW.id, role_key, n, spec->>'min', spec->>'max';
+      RAISE EXCEPTION 'relation % role % has % participants, outside [%..%]', rel, role_key, n, spec->>'min', spec->>'max';
     END IF;
   END LOOP;
+END $$;
+CREATE FUNCTION world.check_relation_cardinality() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM world.assert_relation_cardinality(NEW.id);
   RETURN NULL;
 END $$;
 CREATE CONSTRAINT TRIGGER relation_cardinality AFTER INSERT ON world.relation
   DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION world.check_relation_cardinality();
+CREATE FUNCTION world.check_participant_cardinality() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  PERFORM world.assert_relation_cardinality(NEW.relation_id);
+  RETURN NULL;
+END $$;
+CREATE CONSTRAINT TRIGGER participant_cardinality AFTER INSERT ON world.relation_participant
+  DEFERRABLE INITIALLY DEFERRED FOR EACH ROW EXECUTE FUNCTION world.check_participant_cardinality();
 
 CREATE TABLE world.occurrence (
   entity_id uuid PRIMARY KEY REFERENCES world.entity,

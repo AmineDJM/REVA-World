@@ -49,7 +49,7 @@ PUBLISHED_COMPONENT_DIGESTS: Mapping[str, str] = {
 
 # Entity kinds referenced by component manifests that are not yet registered
 # concepts in registry/concepts (requested from the registry owner).
-REQUESTED_REGISTRY_CONCEPTS: frozenset[str] = frozenset({"entity.synthetic_person"})
+REQUESTED_REGISTRY_CONCEPTS: frozenset[str] = frozenset()
 
 
 def parse_semver(v: str) -> tuple[int, int, int]:

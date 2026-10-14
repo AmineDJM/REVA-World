@@ -222,15 +222,6 @@ async def test_http_errors_do_not_echo_secret_query_values() -> None:
     assert secret not in rendered
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: the 'httpx' logger emits INFO lines with the full request URL (including query secrets such "
-        "as subscription-key) and nothing raises its level; with REVA_LOG_LEVEL=INFO secrets reach logs. "
-        "Set logging.getLogger('httpx').setLevel(logging.WARNING) (and httpcore) in SafeHttpClient/logging "
-        "setup, or send keys in a header"
-    ),
-)
 async def test_http_client_logs_do_not_contain_secret_query_values(caplog: pytest.LogCaptureFixture) -> None:
     secret = "sub-key-77aa66bb55cc"
     caplog.set_level(logging.INFO)  # the production default REVA_LOG_LEVEL
@@ -258,15 +249,6 @@ def test_raw_acquisition_fingerprint_excludes_subscription_key() -> None:
     assert secret not in raw.request_fingerprint
 
 
-@pytest.mark.xfail(
-    strict=True,
-    reason=(
-        "BUG: HttpResult.response_metadata() copies final_url and redirect URLs verbatim, so a "
-        "key-enabled connector would persist subscription-key values into evidence.acquisition."
-        "response_metadata; redact secret query params (same list as request_fingerprint) in to_raw/"
-        "response_metadata"
-    ),
-)
 def test_raw_acquisition_metadata_excludes_secret_query_values() -> None:
     secret = "sub-key-9z8y7x6w5v4u"
     item, res = _result_with_secret(secret)

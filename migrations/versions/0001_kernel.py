@@ -52,6 +52,38 @@ BEGIN
 END;
 $$;
 
+-- recorded_at is server-generated (§6.1). Generic BEFORE INSERT trigger body,
+-- attached to every table with a recorded_at column in 0007: runtime roles can
+-- never choose (backdate) the value. Only the table owner (the migration role:
+-- registry maintenance, tests constructing historical fixtures) may supply one.
+CREATE FUNCTION meta.force_recorded_at() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c
+                 WHERE c.oid = TG_RELID AND c.relowner = (SELECT r.oid FROM pg_catalog.pg_roles r
+                                                          WHERE r.rolname = current_user)) THEN
+    NEW.recorded_at := clock_timestamp();
+  END IF;
+  RETURN NEW;
+END $$;
+
+-- True iff a row whose xmin is x was inserted by the current transaction
+-- (including its subtransactions). Uncommitted rows of other transactions are
+-- invisible, so a visible row whose inserting xid is still "in progress" and
+-- not older than our own top-level xid is ours. Callers pass the xmin of a row
+-- they could see. Fails closed (false) for frozen/special xids and for the
+-- practically unreachable case of a subtransaction crossing an epoch boundary.
+CREATE FUNCTION meta.inserted_in_current_xact(x xid) RETURNS boolean
+  LANGUAGE plpgsql VOLATILE AS $$
+DECLARE cur bigint; cand bigint; lim bigint;
+BEGIN
+  IF x IS NULL OR x::text::bigint < 3 THEN RETURN false; END IF;
+  cur := pg_catalog.pg_current_xact_id()::text::bigint;
+  cand := (cur & ~4294967295::bigint) | x::text::bigint;
+  lim := pg_catalog.pg_snapshot_xmax(pg_catalog.pg_current_snapshot())::text::bigint;
+  IF cand < cur OR cand >= lim THEN RETURN false; END IF;
+  RETURN COALESCE(pg_catalog.pg_xact_status(cand::text::xid8) = 'in progress', false);
+END $$;
+
 CREATE TABLE meta.artifact (
   sha256 text PRIMARY KEY CHECK (sha256 ~ '^[0-9a-f]{64}$'),
   media_type text NOT NULL,

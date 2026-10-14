@@ -1,6 +1,12 @@
 # Persistent REVA identities are distinct from provider codes. Each alias is a
 # reviewed, provider-scoped mapping. Note: UN M49 France (250) is NOT the
 # Comtrade reporter code for France (251, "France, Monaco").
+# Comtrade partner codes: only the reviewed comtrade_partner aliases below map to
+# these entities (the partner catalogue uses the same code and territorial
+# definition as the reviewed reporter code). Every other partner code, even with
+# the same ISO alpha-3 (e.g. 250 "Metropolitan France", 840/841 USA variants),
+# gets its own provider-declared entity: different territorial definitions are
+# never aliased to one entity by ISO3 alone.
 entities:
   - key: FRA
     kind: entity.country
@@ -9,6 +15,7 @@ entities:
       - {provider: iso3166_alpha3, key: FRA}
       - {provider: worldbank, key: FRA}
       - {provider: comtrade_reporter, key: "251", note: "Comtrade reporterNote: France, Monaco"}
+      - {provider: comtrade_partner, key: "251", mapping_version: "1.1.0", note: "Comtrade partnerNote: France, Monaco (same code and territory as reporter 251)"}
       - {provider: un_m49, key: "250"}
       - {provider: naturalearth_adm0_a3, key: FRA, note: "NE ISO_A3 is -99 for France; ADM0_A3 reviewed"}
       - {provider: eurostat_geo, key: FR}
@@ -19,6 +26,7 @@ entities:
       - {provider: iso3166_alpha3, key: DZA}
       - {provider: worldbank, key: DZA}
       - {provider: comtrade_reporter, key: "12"}
+      - {provider: comtrade_partner, key: "12", mapping_version: "1.1.0", note: "Comtrade partner 12 Algeria (same code and territory as reporter 12)"}
       - {provider: un_m49, key: "12"}
       - {provider: naturalearth_adm0_a3, key: DZA}
   - key: CHN
@@ -28,6 +36,7 @@ entities:
       - {provider: iso3166_alpha3, key: CHN}
       - {provider: worldbank, key: CHN}
       - {provider: comtrade_reporter, key: "156"}
+      - {provider: comtrade_partner, key: "156", mapping_version: "1.1.0", note: "Comtrade partner 156 China (same code and territory as reporter 156; excludes HKG 344, MAC 446)"}
       - {provider: un_m49, key: "156"}
       - {provider: naturalearth_adm0_a3, key: CHN}
   - key: USA
@@ -37,6 +46,7 @@ entities:
       - {provider: iso3166_alpha3, key: USA}
       - {provider: worldbank, key: USA}
       - {provider: comtrade_reporter, key: "842", note: "Comtrade reporterNote: USA, Puerto Rico and US Virgin Islands"}
+      - {provider: comtrade_partner, key: "842", mapping_version: "1.1.0", note: "Comtrade partnerNote: USA, Puerto Rico and US Virgin Islands (same as reporter 842)"}
       - {provider: un_m49, key: "840"}
       - {provider: naturalearth_adm0_a3, key: USA}
   - key: WORLD

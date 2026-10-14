@@ -11,7 +11,7 @@ import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
 import { ValueView } from '../components/ValueView';
-import { formatDateTime, humanize, isRecord } from '../lib/format';
+import { formatDateTime, humanize, isRecord, localUtcToIso } from '../lib/format';
 import { useApi } from '../lib/useApi';
 import { PROFILE_PANELS } from '../lib/concepts';
 
@@ -148,6 +148,7 @@ function CardDetail({ id }: { id: string }) {
 const evidenceColumns: ColumnDef<EvidenceItem, unknown>[] = [
   { header: 'Title', accessorKey: 'title' },
   { header: 'Kind', accessorFn: (e) => humanize(e.kind) },
+  { header: 'Summary', accessorFn: (e) => e.summary ?? '—' },
   { header: 'Status', accessorFn: (e) => e.status ?? '—' },
   { header: 'Recorded', accessorFn: (e) => formatDateTime(e.recorded_at) },
 ];
@@ -256,12 +257,17 @@ export default function EvidencePage() {
   const [concept, setConcept] = useState<string>(PROFILE_PANELS[2]!.concept);
   const [year, setYear] = useState<string>('2023');
   const [obsId, setObsId] = useState<string | null>(null);
+  const [asOf, setAsOf] = useState('');
+  const asOfIso = localUtcToIso(asOf);
 
   const y = /^\d{4}$/.test(year) ? Number(year) : undefined;
   const obs = useApi(
     (s) =>
-      getObservations({ subject_id: country, concept, period_start: y, period_end: y, revisions: 'all', limit: 1000 }, s),
-    [country, concept, y],
+      getObservations(
+        { subject_id: country, concept, period_start: y, period_end: y, revisions: 'all', as_of: asOfIso, limit: 1000 },
+        s,
+      ),
+    [country, concept, y, asOfIso],
   );
 
   const bySource = useMemo(() => {
@@ -311,6 +317,13 @@ export default function EvidencePage() {
             <input type="text" inputMode="numeric" value={year} onChange={(e) => setYear(e.target.value)} aria-describedby="year-hint" />
             <span id="year-hint" className="field-hint">
               Leave empty for all years.
+            </span>
+          </label>
+          <label>
+            Recorded as of (UTC)
+            <input type="datetime-local" value={asOf} onChange={(e) => setAsOf(e.target.value)} aria-describedby="asof-hint" />
+            <span id="asof-hint" className="field-hint">
+              Only records committed by this instant; later revisions are excluded.
             </span>
           </label>
         </form>

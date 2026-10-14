@@ -1,5 +1,13 @@
 """Model evaluation/promotion, scenarios, runs and results with typed context boundaries.
 
+Migration policy (review finding R-15): no database had been deployed when the
+security review fixes were made, so the canonical migration set stays exactly
+0001..0007 (the names the specification mandates) and these files were fixed in
+place, including the ``cache_miss`` run-outcome status below. From the first
+deployment on, an applied migration is never edited again: every later schema
+change is a new revision (0008+). A database created from an earlier draft of
+these files (e.g. a developer database) must be recreated, not upgraded.
+
 Revision ID: 0004_models_sim
 Revises: 0003_belief_graph
 """
@@ -45,6 +53,32 @@ CREATE TABLE model.promotion (
   reasons jsonb NOT NULL DEFAULT '[]'::jsonb,
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+-- (R-01, invariant 15) A promotion decision cites an evaluation of the same
+-- model version; anything other than reject/keep_incumbent needs a replay-based
+-- evaluation (analytic verification alone never promotes), a non-empty policy
+-- version and a gate evaluator or named human reviewer. Applies to direct
+-- inserts and to model.record_promotion.
+CREATE FUNCTION model.check_promotion() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE ev model.evaluation;
+BEGIN
+  SELECT * INTO ev FROM model.evaluation WHERE id = NEW.evaluation_id;
+  IF ev.id IS NULL OR ev.model_version_id IS DISTINCT FROM NEW.model_version_id THEN
+    RAISE EXCEPTION 'promotion of model version % must cite an evaluation of that model version',
+      NEW.model_version_id;
+  END IF;
+  IF NEW.decision NOT IN ('reject','keep_incumbent') AND ev.replay_mode = 'analytic_verification' THEN
+    RAISE EXCEPTION 'decision % requires a replay-based evaluation (not analytic_verification)', NEW.decision;
+  END IF;
+  IF NEW.reviewer !~ '^(gate-evaluator|human):[^[:space:]]+$' THEN
+    RAISE EXCEPTION 'promotion reviewer must be gate-evaluator:<name> or human:<name>';
+  END IF;
+  IF btrim(NEW.policy_version) = '' THEN
+    RAISE EXCEPTION 'promotion requires a policy version';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER promotion_checked BEFORE INSERT ON model.promotion
+  FOR EACH ROW EXECUTE FUNCTION model.check_promotion();
 
 -- (7) scenarios live in simulation contexts and pin a *published* baseline release.
 CREATE TABLE sim.scenario (
