@@ -294,12 +294,23 @@ def get_simulation(sim_id: UUID, request: Request) -> s.SimulationStatusResponse
     t = Timer()
     with read_conn(request) as conn:
         job = fetch_job(conn, sim_id)
-        run = conn.execute(text("SELECT * FROM sim.run WHERE job_id = :i OR id = :i ORDER BY recorded_at DESC LIMIT 1"),
-                           {"i": sim_id}).mappings().one_or_none()
-        if job is None and run is None:
-            raise NotFound("simulation not found", id=str(sim_id))
         if job is not None and job["job_type"] != "simulation":
             raise NotFound("job is not a simulation", id=str(sim_id))
+        run = None
+        ref_run = (job["result_ref"] or {}).get("run_id") if job is not None else None
+        if ref_run:
+            # The job's own result names its run; for an idempotent replay that is an earlier job's run.
+            try:
+                run = conn.execute(text("SELECT * FROM sim.run WHERE id = :r"),
+                                   {"r": UUID(str(ref_run))}).mappings().one_or_none()
+            except ValueError:
+                run = None
+        if run is None:
+            run = conn.execute(text(
+                "SELECT * FROM sim.run WHERE job_id = :i OR id = :i ORDER BY recorded_at DESC LIMIT 1"),
+                {"i": sim_id}).mappings().one_or_none()
+        if job is None and run is None:
+            raise NotFound("simulation not found", id=str(sim_id))
         if job is None and run is not None and run["job_id"]:
             job = fetch_job(conn, run["job_id"])
         scenario_id = run["scenario_id"] if run is not None else UUID(str(job["payload"]["scenario_id"]))  # type: ignore[index]
@@ -342,6 +353,11 @@ def get_simulation(sim_id: UUID, request: Request) -> s.SimulationStatusResponse
     env: dict[str, Any] = _scenario_envelope(sc) if sc else {
         "context_mode": "simulation", "origin": "none", "modality": "assumption_conditioned_scenario"}
     warnings: list[s.ApiWarning] = list(env.pop("warnings", []))
+    if job is not None and run is not None and run["job_id"] is not None and run["job_id"] != job["id"]:
+        warnings.append(s.ApiWarning(
+            code="idempotent_replay",
+            message=f"This job reused run {run['id']} computed by job {run['job_id']} for the same scenario, "
+                    "fidelity and baseline; no new computation was performed."))
     if outcome is not None and outcome["status"] != "succeeded":
         env["modality"] = "unsupported"
         warnings.append(s.ApiWarning(code=f"run_{outcome['status']}",

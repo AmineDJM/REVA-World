@@ -26,7 +26,7 @@ import pyarrow as pa
 from reva.population.materialise import exact_weight_sums
 from reva.population.recipe import PopulationRecipe, fraction_decimal_str, fraction_str
 
-DIAGNOSTICS_VERSION = "reva-population-diagnostics-1"
+DIAGNOSTICS_VERSION = "reva-population-diagnostics-2"
 
 UNSUPPORTED_ASSOCIATIONS: tuple[dict[str, str], ...] = tuple(
     {
@@ -43,7 +43,7 @@ UNSUPPORTED_ASSOCIATIONS: tuple[dict[str, str], ...] = tuple(
         "age x sex x sexual_orientation",
         "age x sex x political_opinion",
         "age x sex x gender_identity",
-        "within-cell age detail (exact age inside Y_OPEN, age of UNK records)",
+        "within-cell age detail (exact age inside Y_OPEN or an age-band leaf, age of UNK records)",
         "sub-national geography",
         "any attribute other than age and recorded sex",
     )
@@ -112,10 +112,12 @@ def diagnose(table: pa.Table, recipe: PopulationRecipe) -> dict[str, Any]:
         age_t[c.age_code] = age_t.get(c.age_code, Fraction(0)) + c.count
 
     cell_col = table.column("cell_id").to_pylist()
-    zeros = set(recipe.structural_zeros)
+    observed_zeros = set(recipe.observed_zero_cells)
+    structural = set(recipe.structural_zeros)
     known = {c.cell_id for c in recipe.leaf_cells}
     missing = {m.cell_id for m in recipe.missing_cells}
-    in_zero = sum(1 for c in cell_col if c in zeros)
+    in_zero = sum(1 for c in cell_col if c in observed_zeros)
+    in_structural = sum(1 for c in cell_col if c in structural)
     in_missing = sum(1 for c in cell_col if c in missing)
     outside = sum(1 for c in cell_col if c not in known and c not in missing)
     total_exact = sum(joint_est.values(), Fraction(0))
@@ -140,11 +142,16 @@ def diagnose(table: pa.Table, recipe: PopulationRecipe) -> dict[str, Any]:
             "joint_age_sex": _margin_errors(joint_t, joint_est),
             "basis": "exact weight_num/weight_den sums vs recipe leaf counts",
         },
-        "structural_zero_violations": {
+        "support_violations": {
             "records_in_observed_zero_cells": in_zero,
+            "records_in_structural_zero_cells": in_structural,
             "records_in_missing_cells": in_missing,
             "records_outside_recipe_cells": outside,
-            "ok": in_zero == 0 and in_missing == 0 and outside == 0,
+            "ok": in_zero == 0 and in_structural == 0 and in_missing == 0 and outside == 0,
+            "note": (
+                "observed zeros are source cells reported as 0; structural zeros are cells "
+                "impossible by definition (none for age x recorded sex)"
+            ),
         },
         "supported_associations": ["age x recorded sex (joint, from source cells)"],
         "unsupported_associations": [dict(a) for a in UNSUPPORTED_ASSOCIATIONS],
@@ -154,5 +161,9 @@ def diagnose(table: pa.Table, recipe: PopulationRecipe) -> dict[str, Any]:
                 1 for c in recipe.consistency if c.status == "not_computable"
             ),
             "missing_leaf_cells": len(recipe.missing_cells),
+            "totals_status": recipe.totals_status,
+            "accepted_inconsistency": recipe.accepted_inconsistency,
         },
+        "open_age_lower_bound": recipe.open_age_lower_bound,
+        "open_age_lower_bound_basis": recipe.open_age_lower_bound_basis,
     }
