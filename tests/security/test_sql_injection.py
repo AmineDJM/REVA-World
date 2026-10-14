@@ -35,8 +35,16 @@ HOSTILE = [
     "FRA\x00",
     "Robert'); DELETE FROM world.alias WHERE ('1'='1",
 ]
-TABLES = ["evidence.observation", "evidence.source", "world.entity", "world.alias", "meta.artifact",
-          "ontology.concept_version", "ops.audit", "ops.job"]
+TABLES = [
+    "evidence.observation",
+    "evidence.source",
+    "world.entity",
+    "world.alias",
+    "meta.artifact",
+    "ontology.concept_version",
+    "ops.audit",
+    "ops.job",
+]
 
 
 def _helper() -> Any:
@@ -63,8 +71,9 @@ def snapshot(d: Any) -> dict[str, int]:
         for t in TABLES:
             assert c.execute(text("SELECT to_regclass(:t)"), {"t": t}).scalar_one() is not None, f"{t} dropped"
             out[t] = int(c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one())
-        out["sensitive"] = int(c.execute(text(
-            "SELECT count(*) FROM meta.artifact WHERE privacy_class <> 'public_aggregate'")).scalar_one())
+        out["sensitive"] = int(
+            c.execute(text("SELECT count(*) FROM meta.artifact WHERE privacy_class <> 'public_aggregate'")).scalar_one()
+        )
         return out
 
 
@@ -88,7 +97,7 @@ def test_repository_lookups_treat_input_as_data(sdb: Any, s: str) -> None:
                 repo.concept_version_id(c, "demography.population.wdi_midyear_total", s)
         else:
             # PostgreSQL text cannot hold NUL: rejected by the driver, never interpolated.
-            with pytest.raises(Exception):  # noqa: B017
+            with pytest.raises(Exception):
                 repo.resolve_alias(c, "worldbank", s)
     assert snapshot(sdb) == before
 
@@ -137,25 +146,30 @@ def test_hostile_strings_written_through_narrow_paths_round_trip_verbatim(sdb: A
     payload = {"note": HOSTILE[0], "nested": [HOSTILE[3], {"k": HOSTILE[4]}]}
     key = "h2-" + HOSTILE[1].replace(" ", "_")
     with sdb.api.begin() as c:
-        jid = c.execute(text("SELECT ops.submit_job('replay', CAST(:p AS jsonb), :k, 0, :by)"),
-                        {"p": json.dumps(payload), "k": key, "by": HOSTILE[5]}).scalar_one()
+        jid = c.execute(
+            text("SELECT ops.submit_job('replay', CAST(:p AS jsonb), :k, 0, :by)"),
+            {"p": json.dumps(payload), "k": key, "by": HOSTILE[5]},
+        ).scalar_one()
         repo.audit(c, HOSTILE[9], HOSTILE[0], {"target": HOSTILE[2]}, {"d": HOSTILE[4]})
     with sdb.owner.connect() as c:
-        row = c.execute(text("SELECT payload, idempotency_key, created_by FROM ops.job WHERE id = :j"),
-                        {"j": jid}).one()
-        audit = c.execute(text("SELECT actor, action, target FROM ops.audit WHERE actor = :a"),
-                          {"a": HOSTILE[9]}).one()
+        row = c.execute(
+            text("SELECT payload, idempotency_key, created_by FROM ops.job WHERE id = :j"), {"j": jid}
+        ).one()
+        audit = c.execute(text("SELECT actor, action, target FROM ops.audit WHERE actor = :a"), {"a": HOSTILE[9]}).one()
     assert row[0] == payload and row[1] == key and row[2] == HOSTILE[5]
     assert audit[0] == HOSTILE[9] and audit[1] == HOSTILE[0] and audit[2] == {"target": HOSTILE[2]}
     after = snapshot(sdb)
     assert after["ops.job"] == before["ops.job"] + 1 and after["ops.audit"] == before["ops.audit"] + 1
-    assert {k: v for k, v in after.items() if k not in ("ops.job", "ops.audit")} == \
-        {k: v for k, v in before.items() if k not in ("ops.job", "ops.audit")}
+    assert {k: v for k, v in after.items() if k not in ("ops.job", "ops.audit")} == {
+        k: v for k, v in before.items() if k not in ("ops.job", "ops.audit")
+    }
 
 
 def test_hostile_job_type_is_rejected_not_executed(sdb: Any) -> None:
     before = snapshot(sdb)
-    with pytest.raises(Exception, match="cannot be submitted"), sdb.api.begin() as c:  # noqa: B017
-        c.execute(text("SELECT ops.submit_job(:t, '{}'::jsonb, 'h2-hostile-type-1', 0, 'api')"),
-                  {"t": "replay'; DROP TABLE ops.job; --"})
+    with pytest.raises(Exception, match="cannot be submitted"), sdb.api.begin() as c:
+        c.execute(
+            text("SELECT ops.submit_job(:t, '{}'::jsonb, 'h2-hostile-type-1', 0, 'api')"),
+            {"t": "replay'; DROP TABLE ops.job; --"},
+        )
     assert snapshot(sdb) == before

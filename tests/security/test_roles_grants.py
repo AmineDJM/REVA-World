@@ -98,24 +98,34 @@ class World:
 def w(tmp_path_factory: pytest.TempPathFactory) -> Iterator[World]:
     with _helper().isolated_db(tmp_path_factory) as d:
         wb = builtin_connectors()["worldbank.wdi.indicators"]
-        rep = asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), d.store, d.worker,
-                                        persist_cursor=False))
+        rep = asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), d.store, d.worker, persist_cursor=False))
         assert rep.inserted == 200, rep.as_dict()
-        rel = publish_release(d.worker, d.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
-                              environment="test")
+        rel = publish_release(
+            d.worker, d.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test"
+        )
         with d.owner.connect() as c:
             r = c.execute(text("SELECT * FROM belief.release WHERE id = :r"), {"r": rel.release_id}).mappings().one()
-            obs = dict(c.execute(text(
-                """SELECT o.*, c.concept_id FROM evidence.observation o
+            obs = dict(
+                c.execute(
+                    text(
+                        """SELECT o.*, c.concept_id FROM evidence.observation o
                    JOIN ontology.concept_version c ON c.id = o.concept_version_id
-                   WHERE o.logical_key = 'wb:SP.POP.TOTL:FRA:2020'""")).mappings().one())
-            raw_sha = c.execute(text("SELECT raw_sha256 FROM evidence.acquisition WHERE id = :a"),
-                                {"a": obs["acquisition_id"]}).scalar_one()
+                   WHERE o.logical_key = 'wb:SP.POP.TOTL:FRA:2020'"""
+                    )
+                )
+                .mappings()
+                .one()
+            )
+            raw_sha = c.execute(
+                text("SELECT raw_sha256 FROM evidence.acquisition WHERE id = :a"), {"a": obs["acquisition_id"]}
+            ).scalar_one()
             wb_src = c.execute(text("SELECT id FROM evidence.source WHERE source_key='worldbank.wdi'")).scalar_one()
-            smv = c.execute(text("SELECT id FROM evidence.source_metadata_version WHERE source_id=:s"),
-                            {"s": wb_src}).scalar_one()
-            ct_cv = c.execute(text("SELECT id FROM evidence.connector_version WHERE name='un.comtrade.public_exact'"
-                                   )).scalar_one()
+            smv = c.execute(
+                text("SELECT id FROM evidence.source_metadata_version WHERE source_id=:s"), {"s": wb_src}
+            ).scalar_one()
+            ct_cv = c.execute(
+                text("SELECT id FROM evidence.connector_version WHERE name='un.comtrade.public_exact'")
+            ).scalar_one()
             mv = c.execute(text("SELECT id FROM model.version WHERE model_key='belief.source_select'")).scalar_one()
             tf = repo.concept_version_id(c, "predicate.trade_flow")
         with d.api.begin() as c:  # the API may append audit records (and nothing else)
@@ -124,18 +134,43 @@ def w(tmp_path_factory: pytest.TempPathFactory) -> Iterator[World]:
         with d.worker.begin() as c:
             act = repo.simple_activity("belief.publication", "belief", "test:h2", {"draft": True})
             repo.record_activity(c, act)
-            ctx = repo.create_context(c, mode="belief", origin="test_fixture", manifest_sha256=r["manifest_sha256"],
-                                      knowledge_cutoff=datetime.now(UTC))
-            unpub = c.execute(text(
-                """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
+            ctx = repo.create_context(
+                c,
+                mode="belief",
+                origin="test_fixture",
+                manifest_sha256=r["manifest_sha256"],
+                knowledge_cutoff=datetime.now(UTC),
+            )
+            unpub = c.execute(
+                text(
+                    """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
                      model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
                    SELECT :c, 'test_fixture', :m, :om, :mm, knowledge_cutoff, 'draft', :a
-                   FROM meta.context WHERE id = :c RETURNING id"""),
-                {"c": ctx, "m": r["manifest_sha256"], "om": r["ontology_manifest_sha256"],
-                 "mm": r["model_manifest_sha256"], "a": act.id}).scalar_one()
-        yield World(d, rel.release_id, UUID(str(unpub)), r["manifest_sha256"], r["ontology_manifest_sha256"],
-                    r["model_manifest_sha256"], UUID(str(mv)), obs, raw_sha, UUID(str(wb_src)), UUID(str(smv)),
-                    UUID(str(ct_cv)), tf)
+                   FROM meta.context WHERE id = :c RETURNING id"""
+                ),
+                {
+                    "c": ctx,
+                    "m": r["manifest_sha256"],
+                    "om": r["ontology_manifest_sha256"],
+                    "mm": r["model_manifest_sha256"],
+                    "a": act.id,
+                },
+            ).scalar_one()
+        yield World(
+            d,
+            rel.release_id,
+            UUID(str(unpub)),
+            r["manifest_sha256"],
+            r["ontology_manifest_sha256"],
+            r["model_manifest_sha256"],
+            UUID(str(mv)),
+            obs,
+            raw_sha,
+            UUID(str(wb_src)),
+            UUID(str(smv)),
+            UUID(str(ct_cv)),
+            tf,
+        )
 
 
 def activity(c: Connection, origin: str = "belief") -> UUID:
@@ -146,54 +181,86 @@ def activity(c: Connection, origin: str = "belief") -> UUID:
 
 def draft_estimate(c: Connection, w: World, *, origin: str, cutoff: datetime, with_input: bool = False) -> UUID:
     act = activity(c)
-    ctx = repo.create_context(c, mode="belief", origin=origin, manifest_sha256=w.manifest_sha,
-                              knowledge_cutoff=cutoff)
-    rid = c.execute(text(
-        """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
+    ctx = repo.create_context(c, mode="belief", origin=origin, manifest_sha256=w.manifest_sha, knowledge_cutoff=cutoff)
+    rid = c.execute(
+        text(
+            """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
              model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
-           VALUES (:c, :o, :m, :om, :mm, :cut, 'test', :a) RETURNING id"""),
-        {"c": ctx, "o": origin, "m": w.manifest_sha, "om": w.onto_sha, "mm": w.model_sha, "cut": cutoff,
-         "a": act}).scalar_one()
-    eid = c.execute(text(
-        """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id, method_version_id,
+           VALUES (:c, :o, :m, :om, :mm, :cut, 'test', :a) RETURNING id"""
+        ),
+        {"c": ctx, "o": origin, "m": w.manifest_sha, "om": w.onto_sha, "mm": w.model_sha, "cut": cutoff, "a": act},
+    ).scalar_one()
+    eid = c.execute(
+        text(
+            """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id, method_version_id,
              modality, value, uncertainty, provenance_activity_id)
            VALUES (:r, :s, :c, :sp, :m, 'selected_report', CAST(:v AS jsonb), CAST(:u AS jsonb), :a)
-           RETURNING id"""),
-        {"r": rid, "s": w.obs["subject_id"], "c": w.obs["concept_version_id"], "sp": w.obs["support_id"],
-         "m": w.method_version_id, "v": json.dumps(w.obs["value"]), "u": json.dumps(w.obs["uncertainty"]),
-         "a": act}).scalar_one()
+           RETURNING id"""
+        ),
+        {
+            "r": rid,
+            "s": w.obs["subject_id"],
+            "c": w.obs["concept_version_id"],
+            "sp": w.obs["support_id"],
+            "m": w.method_version_id,
+            "v": json.dumps(w.obs["value"]),
+            "u": json.dumps(w.obs["uncertainty"]),
+            "a": act,
+        },
+    ).scalar_one()
     if with_input:
         add_input(c, eid, w.obs["id"])
     return UUID(str(eid))
 
 
 def add_input(c: Connection, estimate_id: UUID, observation_id: Any) -> None:
-    c.execute(text("INSERT INTO belief.input(estimate_id, observation_id) VALUES (:e, :o)"),
-              {"e": estimate_id, "o": observation_id})
+    c.execute(
+        text("INSERT INTO belief.input(estimate_id, observation_id) VALUES (:e, :o)"),
+        {"e": estimate_id, "o": observation_id},
+    )
 
 
 def release_of(c: Connection, estimate_id: UUID) -> UUID:
-    return UUID(str(c.execute(text("SELECT release_id FROM belief.estimate WHERE id=:e"),
-                              {"e": estimate_id}).scalar_one()))
+    return UUID(
+        str(c.execute(text("SELECT release_id FROM belief.estimate WHERE id=:e"), {"e": estimate_id}).scalar_one())
+    )
 
 
 # =========================================================================== role attributes
 def test_runtime_roles_are_unprivileged_noinherit_logins(w: World) -> None:
     with w.db.owner.connect() as c:
-        rows = c.execute(text(
-            "SELECT rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolreplication, rolbypassrls, "
-            "rolcanlogin FROM pg_roles WHERE rolname = ANY(:r)"), {"r": list(LOGIN.values())}).mappings().all()
+        rows = (
+            c.execute(
+                text(
+                    "SELECT rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolreplication, rolbypassrls, "
+                    "rolcanlogin FROM pg_roles WHERE rolname = ANY(:r)"
+                ),
+                {"r": list(LOGIN.values())},
+            )
+            .mappings()
+            .all()
+        )
     assert {r["rolname"] for r in rows} == set(LOGIN.values())
     for r in rows:
         assert r["rolcanlogin"], r
-        assert not any((r["rolsuper"], r["rolinherit"], r["rolcreaterole"], r["rolcreatedb"],
-                        r["rolreplication"], r["rolbypassrls"])), r
+        assert not any(
+            (
+                r["rolsuper"],
+                r["rolinherit"],
+                r["rolcreaterole"],
+                r["rolcreatedb"],
+                r["rolreplication"],
+                r["rolbypassrls"],
+            )
+        ), r
 
 
 def test_runtime_roles_own_nothing_and_hold_no_powerful_memberships(w: World) -> None:
     with w.db.owner.connect() as c:
-        owned = c.execute(text(
-            """SELECT 'class:' || c.oid::regclass::text FROM pg_class c JOIN pg_roles r ON r.oid = c.relowner
+        owned = (
+            c.execute(
+                text(
+                    """SELECT 'class:' || c.oid::regclass::text FROM pg_class c JOIN pg_roles r ON r.oid = c.relowner
                  WHERE r.rolname = ANY(:r)
                UNION ALL SELECT 'proc:' || p.oid::regprocedure::text FROM pg_proc p
                  JOIN pg_roles r ON r.oid = p.proowner WHERE r.rolname = ANY(:r)
@@ -202,16 +269,37 @@ def test_runtime_roles_own_nothing_and_hold_no_powerful_memberships(w: World) ->
                UNION ALL SELECT 'type:' || t.typname FROM pg_type t
                  JOIN pg_roles r ON r.oid = t.typowner WHERE r.rolname = ANY(:r)
                UNION ALL SELECT 'database:' || d.datname FROM pg_database d
-                 JOIN pg_roles r ON r.oid = d.datdba WHERE r.rolname = ANY(:r)"""),
-            {"r": list(LOGIN.values())}).scalars().all()
-        member_of = c.execute(text(
-            """SELECT m.rolname || ' in ' || g.rolname FROM pg_auth_members am
+                 JOIN pg_roles r ON r.oid = d.datdba WHERE r.rolname = ANY(:r)"""
+                ),
+                {"r": list(LOGIN.values())},
+            )
+            .scalars()
+            .all()
+        )
+        member_of = (
+            c.execute(
+                text(
+                    """SELECT m.rolname || ' in ' || g.rolname FROM pg_auth_members am
                JOIN pg_roles m ON m.oid = am.member JOIN pg_roles g ON g.oid = am.roleid
-               WHERE m.rolname = ANY(:r)"""), {"r": list(LOGIN.values())}).scalars().all()
+               WHERE m.rolname = ANY(:r)"""
+                ),
+                {"r": list(LOGIN.values())},
+            )
+            .scalars()
+            .all()
+        )
         owner = c.execute(text("SELECT current_user")).scalar_one()
     assert owned == []
-    forbidden = {"reva_restricted_deletion", "pg_read_all_data", "pg_write_all_data", "pg_execute_server_program",
-                 "pg_read_server_files", "pg_write_server_files", owner, *LOGIN.values()}
+    forbidden = {
+        "reva_restricted_deletion",
+        "pg_read_all_data",
+        "pg_write_all_data",
+        "pg_execute_server_program",
+        "pg_read_server_files",
+        "pg_write_server_files",
+        owner,
+        *LOGIN.values(),
+    }
     assert [m for m in member_of if m.split(" in ")[1] in forbidden] == []
 
 
@@ -317,17 +405,31 @@ def test_where_clause_is_not_the_boundary(w: World) -> None:
 # =========================================================================== simulation isolation
 @pytest.mark.parametrize(
     "table",
-    ["evidence.observation", "evidence.source", "evidence.acquisition", "evidence.eligibility", "belief.estimate",
-     "belief.release", "belief.input", "ops.publication", "world.relation", "world.entity", "world.alias",
-     "ontology.concept_version", "evidence.claim"],
+    [
+        "evidence.observation",
+        "evidence.source",
+        "evidence.acquisition",
+        "evidence.eligibility",
+        "belief.estimate",
+        "belief.release",
+        "belief.input",
+        "ops.publication",
+        "world.relation",
+        "world.entity",
+        "world.alias",
+        "ontology.concept_version",
+        "evidence.claim",
+    ],
 )
 def test_sim_cannot_insert_evidence_or_beliefs(w: World, table: str) -> None:
     fails(w.db.sim, f"INSERT INTO {table} DEFAULT VALUES")
 
 
 def test_sim_cannot_create_belief_context_but_can_create_simulation_context(w: World) -> None:
-    sql = ("INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
-           "VALUES (:m, 'test_fixture', :sha, clock_timestamp()) RETURNING id")
+    sql = (
+        "INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
+        "VALUES (:m, 'test_fixture', :sha, clock_timestamp()) RETURNING id"
+    )
     for mode in ("belief", "evidence", "population", "quarantine"):
         fails(w.db.sim, sql, {"m": mode, "sha": w.manifest_sha}, match="row-level security")
     assert ok(w.db.sim, sql, {"m": "simulation", "sha": w.manifest_sha})  # positive control
@@ -335,8 +437,10 @@ def test_sim_cannot_create_belief_context_but_can_create_simulation_context(w: W
 
 
 def test_sim_cannot_record_source_or_belief_activities(w: World) -> None:
-    sql = ("INSERT INTO meta.activity(kind, origin, code_digest, parameters, environment_digest, actor, "
-           "started_at, ended_at) VALUES ('x', :o, 'c', '{}', 'e', 'test', now(), now()) RETURNING id")
+    sql = (
+        "INSERT INTO meta.activity(kind, origin, code_digest, parameters, environment_digest, actor, "
+        "started_at, ended_at) VALUES ('x', :o, 'c', '{}', 'e', 'test', now(), now()) RETURNING id"
+    )
     for origin in ("source", "normalisation", "belief", "review"):
         fails(w.db.sim, sql, {"o": origin}, match="row-level security")
     assert ok(w.db.sim, sql, {"o": "simulation"})
@@ -344,9 +448,11 @@ def test_sim_cannot_record_source_or_belief_activities(w: World) -> None:
 
 
 def test_sim_object_locations_limited_to_scenario_namespaces(w: World) -> None:
-    sql = ("INSERT INTO meta.artifact_location(artifact_sha256, storage_uri, namespace, verified_byte_size, "
-           "checksum_verified_at) SELECT sha256, 'file:///x/' || :ns, :ns, byte_size, now() "
-           "FROM meta.artifact WHERE sha256 = :s")
+    sql = (
+        "INSERT INTO meta.artifact_location(artifact_sha256, storage_uri, namespace, verified_byte_size, "
+        "checksum_verified_at) SELECT sha256, 'file:///x/' || :ns, :ns, byte_size, now() "
+        "FROM meta.artifact WHERE sha256 = :s"
+    )
     for ns in ("raw", "normalised", "belief", "quarantine"):
         fails(w.db.sim, sql, {"ns": ns, "s": w.manifest_sha}, match="row-level security")
     ok(w.db.sim, sql, {"ns": "scenarios", "s": w.manifest_sha})
@@ -354,8 +460,10 @@ def test_sim_object_locations_limited_to_scenario_namespaces(w: World) -> None:
 
 
 def test_worker_cannot_create_simulation_context(w: World) -> None:
-    sql = ("INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
-           "VALUES (:m, 'test_fixture', :sha, clock_timestamp())")
+    sql = (
+        "INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
+        "VALUES (:m, 'test_fixture', :sha, clock_timestamp())"
+    )
     fails(w.db.worker, sql, {"m": "simulation", "sha": w.manifest_sha}, match="row-level security")
     ok(w.db.worker, sql, {"m": "belief", "sha": w.manifest_sha})
 
@@ -368,9 +476,24 @@ def test_worker_cannot_write_simulation_outputs(w: World) -> None:
 # =========================================================================== API narrow functions
 @pytest.mark.parametrize(
     "table",
-    ["evidence.observation", "evidence.acquisition", "belief.estimate", "belief.release", "belief.input",
-     "sim.scenario", "sim.run", "sim.result", "meta.artifact", "meta.context", "meta.activity", "ops.job",
-     "ops.publication", "model.version", "model.evaluation", "world.relation"],
+    [
+        "evidence.observation",
+        "evidence.acquisition",
+        "belief.estimate",
+        "belief.release",
+        "belief.input",
+        "sim.scenario",
+        "sim.run",
+        "sim.result",
+        "meta.artifact",
+        "meta.context",
+        "meta.activity",
+        "ops.job",
+        "ops.publication",
+        "model.version",
+        "model.evaluation",
+        "world.relation",
+    ],
 )
 def test_api_cannot_insert_directly(w: World, table: str) -> None:
     fails(w.db.api, f"INSERT INTO {table} DEFAULT VALUES")
@@ -389,16 +512,26 @@ def test_api_cannot_call_worker_queue_functions(w: World, call: str) -> None:
 
 
 def test_sim_cannot_submit_or_review(w: World) -> None:
-    fails(w.db.sim, "SELECT ops.submit_job('simulation', '{}'::jsonb, 'h2-sim-submit-1', 0, 'sim')",
-          match="permission denied for function")
-    fails(w.db.sim, "SELECT ops.review_proposal(gen_random_uuid(), 'approve', 'human:x', '')",
-          match="permission denied for function")
+    fails(
+        w.db.sim,
+        "SELECT ops.submit_job('simulation', '{}'::jsonb, 'h2-sim-submit-1', 0, 'sim')",
+        match="permission denied for function",
+    )
+    fails(
+        w.db.sim,
+        "SELECT ops.review_proposal(gen_random_uuid(), 'approve', 'human:x', '')",
+        match="permission denied for function",
+    )
 
 
 @pytest.mark.parametrize("job_type", ["shell", "publish_beliefs", "migrate", "'; DROP TABLE ops.job; --", ""])
 def test_submit_job_rejects_unknown_types(w: World, job_type: str) -> None:
-    fails(w.db.api, "SELECT ops.submit_job(:t, '{}'::jsonb, :k, 0, 'api')",
-          {"t": job_type, "k": f"h2-{uuid.uuid4().hex}"}, match="cannot be submitted")
+    fails(
+        w.db.api,
+        "SELECT ops.submit_job(:t, '{}'::jsonb, :k, 0, 'api')",
+        {"t": job_type, "k": f"h2-{uuid.uuid4().hex}"},
+        match="cannot be submitted",
+    )
 
 
 def test_submit_job_idempotency_key_binds_the_request(w: World) -> None:
@@ -410,20 +543,35 @@ def test_submit_job_idempotency_key_binds_the_request(w: World) -> None:
         again = c.execute(text(sql), {"p": '{"cutoff": "2024-01-01"}', "k": key}).scalar_one()
     assert first == again  # safe retry
     fails(w.db.api, sql, {"p": '{"cutoff": "2025-01-01"}', "k": key}, match="idempotency key reused")
-    fails(w.db.api, "SELECT ops.submit_job('simulation', CAST(:p AS jsonb), :k, 0, 'api')",
-          {"p": '{"cutoff": "2024-01-01"}', "k": key}, match="idempotency key reused")
+    fails(
+        w.db.api,
+        "SELECT ops.submit_job('simulation', CAST(:p AS jsonb), :k, 0, 'api')",
+        {"p": '{"cutoff": "2024-01-01"}', "k": key},
+        match="idempotency key reused",
+    )
     fails(w.db.api, sql, {"p": "{}", "k": "short"}, match="invalid idempotency key")
-    fails(w.db.api, "SELECT ops.submit_job('replay', '{}'::jsonb, :k, 50, 'api')",
-          {"k": f"h2-{uuid.uuid4().hex}"}, match="priority")
+    fails(
+        w.db.api,
+        "SELECT ops.submit_job('replay', '{}'::jsonb, :k, 50, 'api')",
+        {"k": f"h2-{uuid.uuid4().hex}"},
+        match="priority",
+    )
 
 
 def test_security_definer_functions_pin_search_path(w: World) -> None:
     with w.db.owner.connect() as c:
-        rows = c.execute(text(
-            """SELECT p.oid::regprocedure::text AS f, p.proconfig FROM pg_proc p
+        rows = (
+            c.execute(
+                text(
+                    """SELECT p.oid::regprocedure::text AS f, p.proconfig FROM pg_proc p
                JOIN pg_namespace n ON n.oid = p.pronamespace
                WHERE p.prosecdef AND n.nspname IN ('meta','ontology','world','evidence','belief','model','sim',
-                                                    'ops','public')""")).mappings().all()
+                                                    'ops','public')"""
+                )
+            )
+            .mappings()
+            .all()
+        )
     assert rows, "expected narrow SECURITY DEFINER functions"
     for r in rows:
         cfg = r["proconfig"] or []
@@ -454,10 +602,13 @@ def test_belief_input_rejects_observation_recorded_after_cutoff(w: World) -> Non
 def test_belief_input_rejects_non_eligible_observation(w: World) -> None:
     with tx(w.db.worker) as c:
         act = activity(c, "review")
-        c.execute(text(
-            """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
-                 policy_version, review_activity_id) VALUES (:cv, :c, '{}', 'retired', 'h2-test', :a)"""),
-            {"cv": w.obs["connector_version_id"], "c": w.obs["concept_version_id"], "a": act})
+        c.execute(
+            text(
+                """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
+                 policy_version, review_activity_id) VALUES (:cv, :c, '{}', 'retired', 'h2-test', :a)"""
+            ),
+            {"cv": w.obs["connector_version_id"], "c": w.obs["concept_version_id"], "a": act},
+        )
         cutoff = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=cutoff)
         with pytest.raises(DBAPIError, match="is not eligible"):
@@ -467,8 +618,13 @@ def test_belief_input_rejects_non_eligible_observation(w: World) -> None:
 def test_belief_input_rejects_retracted_observation(w: World) -> None:
     with tx(w.db.worker) as c:
         act = activity(c, "review")
-        c.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
-                       "VALUES (:o, 'h2 test', :a)"), {"o": w.obs["id"], "a": act})
+        c.execute(
+            text(
+                "INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                "VALUES (:o, 'h2 test', :a)"
+            ),
+            {"o": w.obs["id"], "a": act},
+        )
         cutoff = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=cutoff)
         with pytest.raises(DBAPIError, match="retracted"):
@@ -477,14 +633,19 @@ def test_belief_input_rejects_retracted_observation(w: World) -> None:
 
 def test_belief_input_cannot_reference_simulation_or_evaluation_outputs(w: World) -> None:
     with w.db.owner.connect() as c:
-        targets = set(c.execute(text(
-            "SELECT confrelid::regclass::text FROM pg_constraint WHERE conrelid = 'belief.input'::regclass "
-            "AND contype = 'f'")).scalars())
+        targets = set(
+            c.execute(
+                text(
+                    "SELECT confrelid::regclass::text FROM pg_constraint WHERE conrelid = 'belief.input'::regclass "
+                    "AND contype = 'f'"
+                )
+            ).scalars()
+        )
     assert targets == {"belief.estimate", "evidence.observation", "evidence.claim"}
     with tx(w.db.worker) as c:
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=datetime.now(UTC))
         # Rejected by the admissibility trigger (or the FK): a sim.result id is not an observation.
-        with pytest.raises(DBAPIError, match="foreign key|is not eligible"):
+        with pytest.raises(DBAPIError, match=r"foreign key|is not eligible"):
             add_input(c, eid, uuid.uuid4())
 
 
@@ -493,56 +654,80 @@ def test_publication_requires_advisory_lock(w: World) -> None:
     with tx(w.db.worker) as c:
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=datetime.now(UTC), with_input=True)
         with pytest.raises(DBAPIError, match="advisory lock"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": release_of(c, eid), "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": release_of(c, eid), "a": activity(c)},
+            )
     with tx(w.db.worker) as c:  # positive control: same release, lock held -> published
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=datetime.now(UTC), with_input=True)
         repo.take_publication_lock(c)
-        c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                  {"r": release_of(c, eid), "a": activity(c)})
+        c.execute(
+            text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+            {"r": release_of(c, eid), "a": activity(c)},
+        )
 
 
 def test_publication_rejects_estimates_without_provenance(w: World) -> None:
     with tx(w.db.worker) as c:
         repo.take_publication_lock(c)
         with pytest.raises(DBAPIError, match="has no estimates"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": w.unpublished_release_id, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": w.unpublished_release_id, "a": activity(c)},
+            )
     with tx(w.db.worker) as c:
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=datetime.now(UTC), with_input=False)
         repo.take_publication_lock(c)
         with pytest.raises(DBAPIError, match="without inputs"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": release_of(c, eid), "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": release_of(c, eid), "a": activity(c)},
+            )
 
 
 def test_publication_rejects_unverified_artifacts(w: World) -> None:
     with tx(w.db.worker) as c:
         eid = draft_estimate(c, w, origin="test_fixture", cutoff=datetime.now(UTC), with_input=True)
         fake = uuid.uuid4().hex * 2  # registered metadata, but never written/verified in a store
-        c.execute(text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, "
-                       "rights) VALUES (:s, 'application/x-parquet', 10, 't', 'public_aggregate', '{}')"),
-                  {"s": fake})
+        c.execute(
+            text(
+                "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, "
+                "rights) VALUES (:s, 'application/x-parquet', 10, 't', 'public_aggregate', '{}')"
+            ),
+            {"s": fake},
+        )
         rid = release_of(c, eid)
-        c.execute(text("INSERT INTO belief.release_artifact(release_id, artifact_sha256, role) "
-                       "VALUES (:r, :s, 'estimates')"), {"r": rid, "s": fake})
+        c.execute(
+            text("INSERT INTO belief.release_artifact(release_id, artifact_sha256, role) VALUES (:r, :s, 'estimates')"),
+            {"r": rid, "s": fake},
+        )
         repo.take_publication_lock(c)
         with pytest.raises(DBAPIError, match="unverified artifact"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": rid, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": rid, "a": activity(c)},
+            )
 
 
 def test_release_requires_belief_mode_context(w: World) -> None:
     with tx(w.db.worker) as c:
         act = activity(c)
-        ctx = repo.create_context(c, mode="evaluation", origin="test_fixture", manifest_sha256=w.manifest_sha,
-                                  knowledge_cutoff=datetime.now(UTC))
+        ctx = repo.create_context(
+            c,
+            mode="evaluation",
+            origin="test_fixture",
+            manifest_sha256=w.manifest_sha,
+            knowledge_cutoff=datetime.now(UTC),
+        )
         with pytest.raises(DBAPIError, match="belief-mode context"):
-            c.execute(text(
-                """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
+            c.execute(
+                text(
+                    """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
                      model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
-                   SELECT id, origin, :m, :m, :m, knowledge_cutoff, 'x', :a FROM meta.context WHERE id = :c"""),
-                {"c": ctx, "m": w.manifest_sha, "a": act})
+                   SELECT id, origin, :m, :m, :m, knowledge_cutoff, 'x', :a FROM meta.context WHERE id = :c"""
+                ),
+                {"c": ctx, "m": w.manifest_sha, "a": act},
+            )
 
 
 # =========================================================================== scenarios
@@ -556,15 +741,24 @@ def _scenario_spec(baseline: UUID, title: str = "h2 roles test") -> Any:
 
 
 def test_scenario_rejects_unpublished_baseline_direct_insert(w: World) -> None:
-    sql_ctx = ("INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
-               "VALUES ('simulation', 'test_fixture', :sha, clock_timestamp()) RETURNING id")
-    sql_scn = ("INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest, spec_sha256, "
-               "created_by) VALUES (:c, :b, CAST(:spec AS jsonb), :d, :sha, 'sim')")
+    sql_ctx = (
+        "INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
+        "VALUES ('simulation', 'test_fixture', :sha, clock_timestamp()) RETURNING id"
+    )
+    sql_scn = (
+        "INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest, spec_sha256, "
+        "created_by) VALUES (:c, :b, CAST(:spec AS jsonb), :d, :sha, 'sim')"
+    )
     for baseline, expect_ok in ((w.unpublished_release_id, False), (w.release_id, True)):
         with tx(w.db.sim) as c:
             ctx = c.execute(text(sql_ctx), {"sha": w.manifest_sha}).scalar_one()
-            params = {"c": ctx, "b": baseline, "spec": json.dumps({"baseline_release_id": str(baseline)}),
-                      "d": uuid.uuid4().hex, "sha": w.manifest_sha}
+            params = {
+                "c": ctx,
+                "b": baseline,
+                "spec": json.dumps({"baseline_release_id": str(baseline)}),
+                "d": uuid.uuid4().hex,
+                "sha": w.manifest_sha,
+            }
             if expect_ok:
                 c.execute(text(sql_scn), params)
             else:
@@ -574,29 +768,51 @@ def test_scenario_rejects_unpublished_baseline_direct_insert(w: World) -> None:
 
 def test_scenario_spec_baseline_must_match_pinned_baseline(w: World) -> None:
     with tx(w.db.sim) as c:
-        ctx = c.execute(text("INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
-                             "VALUES ('simulation', 'test_fixture', :sha, now()) RETURNING id"),
-                        {"sha": w.manifest_sha}).scalar_one()
+        ctx = c.execute(
+            text(
+                "INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "
+                "VALUES ('simulation', 'test_fixture', :sha, now()) RETURNING id"
+            ),
+            {"sha": w.manifest_sha},
+        ).scalar_one()
         with pytest.raises(DBAPIError, match="does not match pinned baseline"):
-            c.execute(text("INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest, "
-                           "spec_sha256, created_by) VALUES (:c, :b, CAST(:s AS jsonb), :d, :sha, 'sim')"),
-                      {"c": ctx, "b": w.release_id, "s": json.dumps({"baseline_release_id": str(uuid.uuid4())}),
-                       "d": uuid.uuid4().hex, "sha": w.manifest_sha})
+            c.execute(
+                text(
+                    "INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest, "
+                    "spec_sha256, created_by) VALUES (:c, :b, CAST(:s AS jsonb), :d, :sha, 'sim')"
+                ),
+                {
+                    "c": ctx,
+                    "b": w.release_id,
+                    "s": json.dumps({"baseline_release_id": str(uuid.uuid4())}),
+                    "d": uuid.uuid4().hex,
+                    "sha": w.manifest_sha,
+                },
+            )
 
 
 def test_create_scenario_function_checks_publication(w: World) -> None:
     sql = "SELECT sim.create_scenario(CAST(:spec AS jsonb), :bytes, :digest, 'api:test')"
     bad = _scenario_spec(w.unpublished_release_id)
-    fails(w.db.api, sql, {"spec": json.dumps(bad.as_json()), "bytes": bad.canonical_bytes(),
-                          "digest": bad.digest()}, match="baseline release is not published")
+    fails(
+        w.db.api,
+        sql,
+        {"spec": json.dumps(bad.as_json()), "bytes": bad.canonical_bytes(), "digest": bad.digest()},
+        match="baseline release is not published",
+    )
     good = _scenario_spec(w.release_id)
     with tx(w.db.api) as c:
-        sid = c.execute(text(sql), {"spec": json.dumps(good.as_json()), "bytes": good.canonical_bytes(),
-                                    "digest": good.digest()}).scalar_one()
+        sid = c.execute(
+            text(sql), {"spec": json.dumps(good.as_json()), "bytes": good.canonical_bytes(), "digest": good.digest()}
+        ).scalar_one()
         assert sid is not None
     # Canonical bytes must encode the spec (no smuggled payload).
-    fails(w.db.api, sql, {"spec": json.dumps(good.as_json()), "bytes": b'{"x":1}', "digest": good.digest()},
-          match="canonical bytes do not encode")
+    fails(
+        w.db.api,
+        sql,
+        {"spec": json.dumps(good.as_json()), "bytes": b'{"x":1}', "digest": good.digest()},
+        match="canonical bytes do not encode",
+    )
 
 
 @pytest.mark.xfail(
@@ -611,12 +827,14 @@ def test_create_scenario_does_not_alias_different_specs(w: World) -> None:
     a = _scenario_spec(w.release_id, "scenario A")
     b = _scenario_spec(w.release_id, "scenario B")
     with tx(w.db.api) as c:
-        sid_a = c.execute(text(sql), {"spec": json.dumps(a.as_json()), "bytes": a.canonical_bytes(),
-                                      "digest": a.digest()}).scalar_one()
+        sid_a = c.execute(
+            text(sql), {"spec": json.dumps(a.as_json()), "bytes": a.canonical_bytes(), "digest": a.digest()}
+        ).scalar_one()
         # Spec B with A's digest must not resolve to scenario A.
         try:
-            sid_b = c.execute(text(sql), {"spec": json.dumps(b.as_json()), "bytes": b.canonical_bytes(),
-                                          "digest": a.digest()}).scalar_one()
+            sid_b = c.execute(
+                text(sql), {"spec": json.dumps(b.as_json()), "bytes": b.canonical_bytes(), "digest": a.digest()}
+            ).scalar_one()
         except DBAPIError:
             return
         assert sid_b != sid_a
@@ -624,18 +842,28 @@ def test_create_scenario_does_not_alias_different_specs(w: World) -> None:
 
 # =========================================================================== relations / graph
 def _relation(c: Connection, w: World) -> UUID:
-    return UUID(str(c.execute(text(
-        """INSERT INTO world.relation(predicate_id, layer, support_id, evidence_observation_id,
+    return UUID(
+        str(
+            c.execute(
+                text(
+                    """INSERT INTO world.relation(predicate_id, layer, support_id, evidence_observation_id,
              existence_uncertainty, component, provenance_activity_id)
-           VALUES (:p, 'trade.crude_petroleum', :s, :o, '{"status":"unquantified"}', '{}', :a) RETURNING id"""),
-        {"p": w.trade_flow, "s": w.obs["support_id"], "o": w.obs["id"], "a": activity(c, "normalisation")}
-    ).scalar_one()))
+           VALUES (:p, 'trade.crude_petroleum', :s, :o, '{"status":"unquantified"}', '{}', :a) RETURNING id"""
+                ),
+                {"p": w.trade_flow, "s": w.obs["support_id"], "o": w.obs["id"], "a": activity(c, "normalisation")},
+            ).scalar_one()
+        )
+    )
 
 
 def _participant(c: Connection, rid: UUID, ordinal: int, role: str, entity: str) -> None:
-    c.execute(text("INSERT INTO world.relation_participant(relation_id, ordinal, role_concept_id, entity_id, "
-                   "direction) VALUES (:r, :o, :role, :e, 'undirected')"),
-              {"r": rid, "o": ordinal, "role": repo.concept_version_id(c, role), "e": entity_id(entity)})
+    c.execute(
+        text(
+            "INSERT INTO world.relation_participant(relation_id, ordinal, role_concept_id, entity_id, "
+            "direction) VALUES (:r, :o, :role, :e, 'undirected')"
+        ),
+        {"r": rid, "o": ordinal, "role": repo.concept_version_id(c, role), "e": entity_id(entity)},
+    )
 
 
 def test_relation_signature_positive_control(w: World) -> None:
@@ -678,26 +906,38 @@ def test_relation_cardinality_checked_at_commit(w: World, parts: list[tuple[str,
         for i, (role, ent) in enumerate(parts):
             _participant(c, rid, i, role, ent)
     with w.db.owner.connect() as c:  # nothing was committed
-        assert c.execute(text("SELECT count(*) FROM world.relation WHERE evidence_observation_id = :o"),
-                         {"o": w.obs["id"]}).scalar_one() == 0
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM world.relation WHERE evidence_observation_id = :o"), {"o": w.obs["id"]}
+            ).scalar_one()
+            == 0
+        )
 
 
 # =========================================================================== provenance
 def _artifact(c: Connection) -> str:
     sha = uuid.uuid4().hex * 2
-    c.execute(text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights) "
-                   "VALUES (:s, 'application/json', 1, 't', 'public_aggregate', '{}')"), {"s": sha})
+    c.execute(
+        text(
+            "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights) "
+            "VALUES (:s, 'application/json', 1, 't', 'public_aggregate', '{}')"
+        ),
+        {"s": sha},
+    )
     return sha
 
 
 def _io(c: Connection, kind: str, act: UUID, sha: str) -> None:
     if kind == "in":
         n = c.execute(text("SELECT count(*) FROM meta.activity_input WHERE activity_id=:a"), {"a": act}).scalar_one()
-        c.execute(text("INSERT INTO meta.activity_input(activity_id, ordinal, artifact_sha256) VALUES (:a, :o, :s)"),
-                  {"a": act, "o": n, "s": sha})
+        c.execute(
+            text("INSERT INTO meta.activity_input(activity_id, ordinal, artifact_sha256) VALUES (:a, :o, :s)"),
+            {"a": act, "o": n, "s": sha},
+        )
     else:
-        c.execute(text("INSERT INTO meta.activity_output(activity_id, artifact_sha256) VALUES (:a, :s)"),
-                  {"a": act, "s": sha})
+        c.execute(
+            text("INSERT INTO meta.activity_output(activity_id, artifact_sha256) VALUES (:a, :s)"), {"a": act, "s": sha}
+        )
 
 
 def test_provenance_cycles_rejected(w: World) -> None:
@@ -729,56 +969,87 @@ def test_provenance_cycles_rejected(w: World) -> None:
 
 # =========================================================================== cross-table consistency
 def test_acquisition_connector_must_belong_to_source(w: World) -> None:
-    sql = ("INSERT INTO evidence.acquisition(source_id, connector_version_id, source_metadata_version_id, origin, "
-           "request_fingerprint, raw_sha256, retrieved_at, response_metadata, provenance_activity_id, "
-           "idempotency_key) VALUES (:s, :cv, :smv, 'test_fixture', 'fp', :sha, now(), '{}', :a, :k)")
+    sql = (
+        "INSERT INTO evidence.acquisition(source_id, connector_version_id, source_metadata_version_id, origin, "
+        "request_fingerprint, raw_sha256, retrieved_at, response_metadata, provenance_activity_id, "
+        "idempotency_key) VALUES (:s, :cv, :smv, 'test_fixture', 'fp', :sha, now(), '{}', :a, :k)"
+    )
     with tx(w.db.worker) as c:
         with pytest.raises(DBAPIError, match="foreign key"):
-            c.execute(text(sql), {"s": w.wb_source, "cv": w.comtrade_cv, "smv": w.wb_smv, "sha": w.raw_sha,
-                                  "a": activity(c, "source"), "k": uuid.uuid4().hex})
+            c.execute(
+                text(sql),
+                {
+                    "s": w.wb_source,
+                    "cv": w.comtrade_cv,
+                    "smv": w.wb_smv,
+                    "sha": w.raw_sha,
+                    "a": activity(c, "source"),
+                    "k": uuid.uuid4().hex,
+                },
+            )
 
 
 def test_acquisition_requires_verified_raw_bytes(w: World) -> None:
-    sql = ("INSERT INTO evidence.acquisition(source_id, connector_version_id, source_metadata_version_id, origin, "
-           "request_fingerprint, raw_sha256, retrieved_at, response_metadata, provenance_activity_id, "
-           "idempotency_key) VALUES (:s, :cv, :smv, 'test_fixture', 'fp', :sha, now(), '{}', :a, :k)")
+    sql = (
+        "INSERT INTO evidence.acquisition(source_id, connector_version_id, source_metadata_version_id, origin, "
+        "request_fingerprint, raw_sha256, retrieved_at, response_metadata, provenance_activity_id, "
+        "idempotency_key) VALUES (:s, :cv, :smv, 'test_fixture', 'fp', :sha, now(), '{}', :a, :k)"
+    )
     with tx(w.db.worker) as c:
         sha = _artifact(c)  # metadata only, no verified location
         with pytest.raises(DBAPIError, match="no verified storage location"):
-            c.execute(text(sql), {"s": w.wb_source, "cv": w.obs["connector_version_id"], "smv": w.wb_smv,
-                                  "sha": sha, "a": activity(c, "source"), "k": uuid.uuid4().hex})
+            c.execute(
+                text(sql),
+                {
+                    "s": w.wb_source,
+                    "cv": w.obs["connector_version_id"],
+                    "smv": w.wb_smv,
+                    "sha": sha,
+                    "a": activity(c, "source"),
+                    "k": uuid.uuid4().hex,
+                },
+            )
 
 
 def test_observation_must_agree_with_its_acquisition(w: World) -> None:
     with tx(w.db.worker) as c:
         with pytest.raises(DBAPIError, match="foreign key"):
-            c.execute(text(
-                """INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
+            c.execute(
+                text(
+                    """INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
                      revision_no, subject_id, concept_version_id, support_id, value, uncertainty, source_flags,
                      raw_selector, parser_version, provenance_activity_id, semantic_hash, record_hash)
                    SELECT source_id, :cv, acquisition_id, 'h2:test', 1, subject_id, concept_version_id, support_id,
                      value, uncertainty, source_flags, raw_selector, parser_version, provenance_activity_id,
-                     'x', 'y' FROM evidence.observation WHERE id = :o"""),
-                {"cv": w.comtrade_cv, "o": w.obs["id"]})
+                     'x', 'y' FROM evidence.observation WHERE id = :o"""
+                ),
+                {"cv": w.comtrade_cv, "o": w.obs["id"]},
+            )
 
 
 def test_missing_value_cannot_carry_a_number(w: World) -> None:
     with tx(w.db.worker) as c:
         with pytest.raises(DBAPIError, match="check constraint"):
-            c.execute(text(
-                """INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
+            c.execute(
+                text(
+                    """INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
                      revision_no, subject_id, concept_version_id, support_id, value, uncertainty, source_flags,
                      raw_selector, parser_version, provenance_activity_id, semantic_hash, record_hash)
                    SELECT source_id, connector_version_id, acquisition_id, 'h2:missing', 1, subject_id,
                      concept_version_id, support_id, '{"kind":"missing","reason":"unavailable","value":"0"}',
                      uncertainty, source_flags, raw_selector, parser_version, provenance_activity_id, 'x', 'y'
-                   FROM evidence.observation WHERE id = :o"""),
-                {"o": w.obs["id"]})
+                   FROM evidence.observation WHERE id = :o"""
+                ),
+                {"o": w.obs["id"]},
+            )
 
 
 @pytest.mark.parametrize("cls", ["restricted_microdata", "sensitive_restricted", "clinical", ""])
 def test_restricted_privacy_classes_rejected(w: World, cls: str) -> None:
-    fails(w.db.worker,
-          "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights) "
-          "VALUES (:s, 'text/csv', 1, 't', :p, '{}')",
-          {"s": uuid.uuid4().hex * 2, "p": cls}, match="check constraint")
+    fails(
+        w.db.worker,
+        "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights) "
+        "VALUES (:s, 'text/csv', 1, 't', :p, '{}')",
+        {"s": uuid.uuid4().hex * 2, "p": cls},
+        match="check constraint",
+    )

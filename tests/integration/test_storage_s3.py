@@ -88,7 +88,7 @@ def test_sha_comes_from_verified_metadata_never_from_etag(store: S3ArtifactStore
     key = object_key("reva/", "raw", sha(data))
     s3.put_object(Bucket=BUCKET, Key=key, Body=data)  # no reva-sha256 metadata
     etag = s3.head_object(Bucket=BUCKET, Key=key)["ETag"].strip('"')
-    assert etag == hashlib.md5(data).hexdigest()  # noqa: S324 - showing what an ETag is
+    assert etag == hashlib.md5(data).hexdigest()
     head = store.head("raw", sha(data))
     assert head is not None
     assert head.sha256 != etag and head.sha256 == ""  # ETag is never promoted to a SHA-256
@@ -143,8 +143,12 @@ def test_max_bytes_exceeded_uploads_nothing(store: S3ArtifactStore, s3: Any, tmp
 
 def test_mid_stream_failure_uploads_nothing(store: S3ArtifactStore, s3: Any, tmp_path) -> None:  # type: ignore[no-untyped-def]
     with pytest.raises(ConnectionResetError):
-        store.put(Stream(4 * 1024 * 1024, fail_after=2 * 1024 * 1024), "raw", "application/octet-stream",
-                  max_bytes=8 * 1024 * 1024)
+        store.put(
+            Stream(4 * 1024 * 1024, fail_after=2 * 1024 * 1024),
+            "raw",
+            "application/octet-stream",
+            max_bytes=8 * 1024 * 1024,
+        )
     assert keys(s3) == []
     assert list(tmp_path.iterdir()) == []
 

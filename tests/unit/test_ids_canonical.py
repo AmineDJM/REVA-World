@@ -29,14 +29,10 @@ from reva.ontology.registry import load_registry
 keys = st.text(min_size=0, max_size=8)
 finite_floats = st.floats(allow_nan=False, allow_infinity=False)
 decimals = st.decimals(allow_nan=False, allow_infinity=False, places=None)
-scalars = st.one_of(
-    st.none(), st.booleans(), st.integers(), finite_floats, decimals, st.text(max_size=12), st.uuids()
-)
+scalars = st.one_of(st.none(), st.booleans(), st.integers(), finite_floats, decimals, st.text(max_size=12), st.uuids())
 json_like = st.recursive(
     scalars,
-    lambda children: st.one_of(
-        st.lists(children, max_size=4), st.dictionaries(keys, children, max_size=4)
-    ),
+    lambda children: st.one_of(st.lists(children, max_size=4), st.dictionaries(keys, children, max_size=4)),
     max_leaves=20,
 )
 
@@ -91,8 +87,7 @@ def test_bool_int_and_string_are_not_conflated() -> None:
     assert len(hashes) == 7
 
 
-@pytest.mark.parametrize("bad", [math.nan, math.inf, -math.inf, Decimal("NaN"), Decimal("-Infinity"),
-                                 Decimal("sNaN")])
+@pytest.mark.parametrize("bad", [math.nan, math.inf, -math.inf, Decimal("NaN"), Decimal("-Infinity"), Decimal("sNaN")])
 def test_non_finite_forbidden_in_canonical_json(bad: object) -> None:
     with pytest.raises(ValueError):
         canonical_bytes({"nested": [1, {"x": bad}]})
@@ -222,9 +217,11 @@ def test_external_id_is_injective_over_components() -> None:
 
 
 @settings(max_examples=200)
-@given(p=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
-       k=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
-       e=st.text(min_size=1, max_size=4, alphabet=st.characters(blacklist_characters="\x1f")))
+@given(
+    p=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
+    k=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
+    e=st.text(min_size=1, max_size=4, alphabet=st.characters(blacklist_characters="\x1f")),
+)
 def test_external_id_distinct_for_distinct_keys(p: str, k: str, e: str) -> None:
     assert external_id(p, k, e) != external_id(p, k + "x", e)
     assert external_id(p, k, e) != external_id(p + "x", k, e)

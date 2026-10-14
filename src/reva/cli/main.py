@@ -131,10 +131,69 @@ def beliefs_publish(origin: str = typer.Option("live", help="live or test_fixtur
 
 @auth_app.command("hash-password")
 def hash_password(password: str = typer.Option(..., prompt=True, hide_input=True, confirmation_prompt=True)) -> None:
-    """Print an Argon2id hash for REVA_ADMIN_PASSWORD_HASH."""
-    from argon2 import PasswordHasher
+    """Print an Argon2id hash for REVA_ADMIN_PASSWORD_HASH (minimum 12 characters)."""
+    from reva.api.auth import hash_password as _hash
 
-    typer.echo(PasswordHasher().hash(password))
+    if len(password) < 12:
+        typer.echo("password must be at least 12 characters", err=True)
+        raise typer.Exit(2)
+    typer.echo(_hash(password))
+
+
+@auth_app.command("create-token")
+def create_token(
+    label: str = typer.Option(..., help="e.g. human:alice or service:ci"),
+    scopes: str = typer.Option("read", help="comma list of read,simulate,ingest,review"),
+) -> None:
+    """Create a hashed, scoped API token (admin operation; uses the migration owner). Printed once."""
+    from sqlalchemy import text
+
+    from reva.adapters.postgres.engine import make_engine
+    from reva.api.auth import new_api_token
+
+    allowed = {"read", "simulate", "ingest", "review"}
+    sc = [x.strip() for x in scopes.split(",") if x.strip()]
+    if not sc or set(sc) - allowed:
+        typer.echo(f"scopes must be a subset of {sorted(allowed)}", err=True)
+        raise typer.Exit(2)
+    token, sha = new_api_token()
+    eng = make_engine("migration")
+    with eng.begin() as c:
+        tid = c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:s, :sc, :l) RETURNING id"),
+            {"s": sha, "sc": sc, "l": label},
+        ).scalar_one()
+        c.execute(
+            text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
+                 "jsonb_build_object('token_id', CAST(:i AS text)), jsonb_build_object('label', CAST(:l AS text)))"),
+            {"i": str(tid), "l": label},
+        )
+    eng.dispose()
+    _out({"token_id": str(tid), "label": label, "scopes": sc, "token": token,
+          "note": "store this token securely; only its SHA-256 is kept"})
+
+
+@auth_app.command("revoke-token")
+def revoke_token(token_id: str) -> None:
+    """Revoke an API token (admin operation)."""
+    from sqlalchemy import text
+
+    from reva.adapters.postgres.engine import make_engine
+
+    eng = make_engine("migration")
+    with eng.begin() as c:
+        n = c.execute(
+            text("UPDATE ops.api_token SET revoked_at = clock_timestamp() WHERE id = CAST(:i AS uuid) "
+                 "AND revoked_at IS NULL"),
+            {"i": token_id},
+        ).rowcount
+        c.execute(
+            text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.revoke', "
+                 "jsonb_build_object('token_id', CAST(:i AS text)), '{}'::jsonb)"),
+            {"i": token_id},
+        )
+    eng.dispose()
+    _out({"token_id": token_id, "revoked": bool(n)})
 
 
 @app.command("api")

@@ -58,7 +58,7 @@ def isolated_db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[IsolatedDB
     try:
         with admin.connect() as c:
             c.execute(text("SELECT 1"))
-    except Exception:  # noqa: BLE001
+    except Exception:
         admin.dispose()
         pytest.skip("PostgreSQL not reachable")
     name = f"reva_h2_{uuid.uuid4().hex[:10]}"
@@ -66,9 +66,7 @@ def isolated_db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[IsolatedDB
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp("h2objects")
     url = base.migration_url().set(database=name).render_as_string(hide_password=False)
-    settings = _settings(
-        reva_migration_database_url=url, reva_db_name=name, reva_env="test", reva_object_root=root
-    )
+    settings = _settings(reva_migration_database_url=url, reva_db_name=name, reva_env="test", reva_object_root=root)
     from reva.cli.bootstrap import bootstrap
     from reva.cli.seed import seed
 
@@ -78,7 +76,7 @@ def isolated_db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[IsolatedDB
             try:
                 bootstrap(settings)
                 break
-            except Exception:  # noqa: BLE001
+            except Exception:
                 if attempt == 2:
                     raise
         store = FilesystemArtifactStore(root, settings.reva_s3_prefix)

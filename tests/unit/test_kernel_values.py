@@ -152,8 +152,7 @@ def test_values_are_frozen_and_discriminated() -> None:
     sd = dec("1")
     with pytest.raises(ValidationError):
         sd.value = "2"  # type: ignore[misc]
-    assert isinstance(parse_value({"kind": "category", "code": "C00", "vocabulary_version": "cm-1"}),
-                      object)
+    assert isinstance(parse_value({"kind": "category", "code": "C00", "vocabulary_version": "cm-1"}), object)
     with pytest.raises(ValidationError):
         parse_value({"kind": "decimal", "value": "1"})  # no unit/basis
     with pytest.raises(ValidationError):
@@ -220,8 +219,9 @@ def test_sensitivity_range_and_bounds_have_no_coverage_level() -> None:
     assert s.level is None and not s.is_probabilistic
     for kind in ("sensitivity_range", "bounds"):
         with pytest.raises(ValidationError):
-            UncertaintySpec(status="quantified", kind=kind, description="d", method_version="m",
-                            lower="0", upper="1", level=0.9)
+            UncertaintySpec(
+                status="quantified", kind=kind, description="d", method_version="m", lower="0", upper="1", level=0.9
+            )
 
 
 @pytest.mark.parametrize("kind", ["confidence_interval", "credible_interval", "prediction_interval"])
@@ -290,8 +290,7 @@ def test_open_ended_and_uncertain_bounds() -> None:
     open_ = TimeExtent(kind="interval", precision="year", start=date(1973, 10, 1))
     assert open_.end is None
     ub = UncertainBound(earliest=date(1973, 10, 1), latest=date(1973, 10, 31))
-    fuzzy = TimeExtent(kind="interval", precision="month", start=None, start_uncertainty=ub,
-                       end=date(1974, 4, 1))
+    fuzzy = TimeExtent(kind="interval", precision="month", start=None, start_uncertainty=ub, end=date(1974, 4, 1))
     assert fuzzy.start is None and fuzzy.reference_year() is None
     with pytest.raises(ValidationError):
         TimeExtent(kind="interval", precision="year", start=None)

@@ -310,8 +310,11 @@ async def test_ordinary_gzip_body_is_decoded() -> None:
     rec = Recorder()
 
     def handler(_: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, headers={"content-encoding": "gzip", "content-type": "application/json"},
-                              content=gzip.compress(payload))
+        return httpx.Response(
+            200,
+            headers={"content-encoding": "gzip", "content-type": "application/json"},
+            content=gzip.compress(payload),
+        )
 
     async with make_client(handler, rec) as c:
         r = await c.get(f"https://{HOST}/ok")
@@ -391,8 +394,9 @@ async def test_client_errors_not_retried(status: int) -> None:
 
 # =========================================================================== body parsing
 def result(body: bytes, ctype: str = "application/json", status: int = 200) -> HttpResult:
-    return HttpResult(f"https://{HOST}/x", f"https://{HOST}/x", status, {"content-type": ctype}, body,
-                      datetime.now(UTC), 0.0, (), 1)
+    return HttpResult(
+        f"https://{HOST}/x", f"https://{HOST}/x", status, {"content-type": ctype}, body, datetime.now(UTC), 0.0, (), 1
+    )
 
 
 @pytest.mark.parametrize(
@@ -417,7 +421,7 @@ def test_malformed_json_is_a_failure(body: bytes) -> None:
     assert ei.value.details.get("kind") == "malformed_json" and not ei.value.retryable
 
 
-@pytest.mark.parametrize("body", [b'{"v": NaN}', b'{"v": Infinity}', b'[-Infinity]', b'{"a":[1,{"b":NaN}]}'])
+@pytest.mark.parametrize("body", [b'{"v": NaN}', b'{"v": Infinity}', b"[-Infinity]", b'{"a":[1,{"b":NaN}]}'])
 def test_non_finite_json_constants_rejected(body: bytes) -> None:
     with pytest.raises(SourceResponseError):
         require_json(result(body))
@@ -443,11 +447,13 @@ def test_valid_json_parsed() -> None:
 # =========================================================================== fingerprints
 def test_request_fingerprint_strips_secret_params_and_is_canonical() -> None:
     secret = "SECRET-KEY-123"
-    a = request_fingerprint("GET", f"https://{HOST}/v1?b=2&subscription-key={secret}&a=1",
-                            secret_params=("subscription-key",))
+    a = request_fingerprint(
+        "GET", f"https://{HOST}/v1?b=2&subscription-key={secret}&a=1", secret_params=("subscription-key",)
+    )
     b = request_fingerprint("get", f"https://{HOST.upper()}/v1?a=1&b=2#frag")
-    c = request_fingerprint("GET", f"https://{HOST}/v1?a=1&b=2&subscription-key=OTHER",
-                            secret_params=("subscription-key",))
+    c = request_fingerprint(
+        "GET", f"https://{HOST}/v1?a=1&b=2&subscription-key=OTHER", secret_params=("subscription-key",)
+    )
     assert a == b == c  # same request regardless of secret value, order, case or fragment
     assert secret not in a
     assert request_fingerprint("GET", f"https://{HOST}/v1?a=1&b=3") != b  # real params matter

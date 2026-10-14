@@ -96,8 +96,9 @@ def test_scenario_schema_rejects_invalid_variants(mutate: Any) -> None:
 # =========================================================================== observation
 def test_kernel_missing_reasons_match_observation_contract() -> None:
     schema = load("observation.schema.json")
-    missing = next(v for v in schema["properties"]["value"]["oneOf"] if v["properties"]["kind"].get("const") ==
-                   "missing")
+    missing = next(
+        v for v in schema["properties"]["value"]["oneOf"] if v["properties"]["kind"].get("const") == "missing"
+    )
     assert set(missing["properties"]["reason"]["enum"]) == {r.value for r in MissingReason}
 
 
@@ -140,9 +141,16 @@ def exported(tmp_path_factory: pytest.TempPathFactory) -> Iterator[list[dict[str
             c = builtin_connectors()[name]
             asyncio.run(run_connector(c, FixtureHttp(name), d.store, d.worker, persist_cursor=False))
         with d.api.connect() as c:
-            rows = c.execute(text(
-                """SELECT o.*, a.retrieved_at, a.raw_sha256 FROM evidence.observation o
-                   JOIN evidence.acquisition a ON a.id = o.acquisition_id ORDER BY o.logical_key""")).mappings().all()
+            rows = (
+                c.execute(
+                    text(
+                        """SELECT o.*, a.retrieved_at, a.raw_sha256 FROM evidence.observation o
+                   JOIN evidence.acquisition a ON a.id = o.acquisition_id ORDER BY o.logical_key"""
+                    )
+                )
+                .mappings()
+                .all()
+            )
         yield [export(dict(r)) for r in rows]
 
 
@@ -203,8 +211,11 @@ def test_exported_observation_values_and_identity_fields_conform(exported: list[
     ),
 )
 def test_exported_observation_records_validate_against_contract(exported: list[dict[str, Any]]) -> None:
-    bad = {o["logical_key"]: errors("observation.schema.json", o)[:3] for o in exported
-           if errors("observation.schema.json", o)}
+    bad = {
+        o["logical_key"]: errors("observation.schema.json", o)[:3]
+        for o in exported
+        if errors("observation.schema.json", o)
+    }
     assert bad == {}
 
 
@@ -294,9 +305,17 @@ def test_connector_concepts_are_registered() -> None:
     from reva.adapters.connectors.worldbank import INDICATORS
 
     ids = {c.concept_id for c in load_registry().concepts}
-    used = set(FLOW_CONCEPT.values()) | {v["concept"] for v in INDICATORS.values()} | {
-        "trade.hs2709.net_weight.world_total", "predicate.trade_flow", "role.reporter", "role.partner",
-        "role.product"}
+    used = (
+        set(FLOW_CONCEPT.values())
+        | {v["concept"] for v in INDICATORS.values()}
+        | {
+            "trade.hs2709.net_weight.world_total",
+            "predicate.trade_flow",
+            "role.reporter",
+            "role.partner",
+            "role.product",
+        }
+    )
     assert used <= ids, used - ids
 
 
@@ -325,8 +344,9 @@ def test_quantity_concepts_carry_semantic_profiles_with_distinct_population_sema
             assert c.semantic_profile.temporal_support and c.semantic_profile.aggregation
     pops = [c for c in reg.concepts if c.concept_id.startswith("demography.population")]
     if len(pops) > 1:  # January vs mid-year population are not the same concept
-        assert len({(p.semantic_profile.temporal_support, p.semantic_profile.aggregation) for p in pops
-                    if p.semantic_profile}) == len(pops)
+        assert len(
+            {(p.semantic_profile.temporal_support, p.semantic_profile.aggregation) for p in pops if p.semantic_profile}
+        ) == len(pops)
 
 
 def test_selection_policy_references_registered_concepts() -> None:

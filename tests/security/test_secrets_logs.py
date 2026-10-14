@@ -125,10 +125,18 @@ def test_documented_examples_are_marked_local_only() -> None:
 
 
 # --------------------------------------------------------------------------- fixtures / manifests
-SECRET_QUERY = re.compile(r"(?i)[?&](subscription-key|api[_-]?key|apikey|token|access_token|key|secret|password"
-                          r"|signature|sig)=")
-SECRET_HEADERS = {"authorization", "proxy-authorization", "cookie", "set-cookie", "x-api-key",
-                  "ocp-apim-subscription-key"}
+SECRET_QUERY = re.compile(
+    r"(?i)[?&](subscription-key|api[_-]?key|apikey|token|access_token|key|secret|password"
+    r"|signature|sig)="
+)
+SECRET_HEADERS = {
+    "authorization",
+    "proxy-authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key",
+    "ocp-apim-subscription-key",
+}
 
 
 def test_captured_fixture_manifests_contain_no_secrets() -> None:
@@ -155,8 +163,9 @@ def test_builtin_connector_specs_contain_no_secrets() -> None:
     for name, conn in builtin_connectors(contact_email="ops@example.org").items():
         spec = conn.describe()
         # Authentication is a reference to an environment secret, never a value.
-        assert spec.authentication_secret_ref is None or re.fullmatch(r"[A-Z][A-Z0-9_]*",
-                                                                      spec.authentication_secret_ref)
+        assert spec.authentication_secret_ref is None or re.fullmatch(
+            r"[A-Z][A-Z0-9_]*", spec.authentication_secret_ref
+        )
         blob = spec.model_dump_json()
         for rx in HARD_PATTERNS.values():
             assert not rx.search(blob), name
@@ -233,8 +242,7 @@ async def _noop() -> None:
 def _result_with_secret(secret: str) -> tuple[FetchItem, HttpResult]:
     url = f"https://comtradeapi.un.org/data/v1/get/C/A/HS?reporterCode=251&subscription-key={secret}"
     item = FetchItem(key="k", url=url, max_bytes=1000)
-    res = HttpResult(url, url, 200, {"content-type": "application/json"}, b"{}", datetime.now(UTC), 0.1,
-                     (url,), 1)
+    res = HttpResult(url, url, 200, {"content-type": "application/json"}, b"{}", datetime.now(UTC), 0.1, (url,), 1)
     return item, res
 
 

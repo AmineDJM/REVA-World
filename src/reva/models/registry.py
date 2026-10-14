@@ -149,14 +149,17 @@ def _port_signature(ports: Sequence[Mapping[str, Any]]) -> tuple[tuple[str, str,
 def versions_compatible(a: ModelDescriptor, b: ModelDescriptor) -> tuple[bool, tuple[str, ...]]:
     """Can ``b`` stand in for ``a`` as the incumbent of the same task?
 
-    Same kind and the same output-port signature (names, concepts, units); a
-    retired version is never compatible as a replacement.
+    Same kind, and ``b`` provides every output port of ``a`` with the same
+    signature (name, concept, unit), so no consumer loses an output (e.g. a
+    model with prediction intervals cannot be replaced by the point-only naive
+    baseline through rollback). A retired version is never compatible.
     """
     reasons: list[str] = []
     if a.kind != b.kind:
         reasons.append(f"kind {a.kind!r} != {b.kind!r}")
-    if _port_signature(a.output_ports) != _port_signature(b.output_ports):
-        reasons.append("output port signatures differ")
+    missing = set(_port_signature(a.output_ports)) - set(_port_signature(b.output_ports))
+    if missing:
+        reasons.append(f"{b.ref} lacks output ports {sorted(m[0] for m in missing)} provided by {a.ref}")
     if b.approval_status == "retired":
         reasons.append(f"{b.ref} is retired")
     return (not reasons, tuple(reasons))

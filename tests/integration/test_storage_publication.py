@@ -254,8 +254,12 @@ def test_unresolvable_subject_aborts_whole_acquisition(pdb: Any) -> None:
 
 def test_quarantined_acquisition_is_recorded_but_publishes_no_observations(pdb: Any) -> None:
     conn, raw, batches, _ = captured("series:SP.POP.TOTL:p1", pad=6)
-    blocked = [QualityReport(outcome="blocked", findings=(
-        {"code": "pagination_truncated", "severity": "blocker", "message": "injected"},))]
+    blocked = [
+        QualityReport(
+            outcome="blocked",
+            findings=({"code": "pagination_truncated", "severity": "blocker", "message": "injected"},),
+        )
+    ]
     s = publish_acquisition(pdb.worker, pdb.store, conn.describe(), raw, batches, blocked)
     assert s.namespace == "quarantine" and s.inserted == 0
     assert pdb.store.head("quarantine", s.raw_sha256) is not None
@@ -263,9 +267,13 @@ def test_quarantined_acquisition_is_recorded_but_publishes_no_observations(pdb: 
     v = visible(pdb.owner, s.raw_sha256)
     assert v["acquisition"] == 1 and v["observation"] == 0
     with pdb.owner.connect() as c:
-        ev = c.execute(
-            text("SELECT event_type FROM ops.outbox WHERE payload->>'acquisition_id' = :a"),
-            {"a": str(s.acquisition_id)},
-        ).scalars().all()
+        ev = (
+            c.execute(
+                text("SELECT event_type FROM ops.outbox WHERE payload->>'acquisition_id' = :a"),
+                {"a": str(s.acquisition_id)},
+            )
+            .scalars()
+            .all()
+        )
     assert ev == ["evidence.acquisition_quarantined"]
     assert reader_sees(pdb.api, s.raw_sha256) == 0

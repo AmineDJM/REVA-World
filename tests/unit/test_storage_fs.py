@@ -147,8 +147,12 @@ def test_max_bytes_exceeded_leaves_no_object(store: FilesystemArtifactStore) -> 
 
 def test_mid_stream_failure_leaves_no_object(store: FilesystemArtifactStore) -> None:
     with pytest.raises(ConnectionResetError):
-        store.put(ZeroStream(8 * 1024 * 1024, fail_after=3 * 1024 * 1024), "raw", "application/octet-stream",
-                  max_bytes=16 * 1024 * 1024)
+        store.put(
+            ZeroStream(8 * 1024 * 1024, fail_after=3 * 1024 * 1024),
+            "raw",
+            "application/octet-stream",
+            max_bytes=16 * 1024 * 1024,
+        )
     assert final_files(store) == []
     assert staged_files(store) == []
 

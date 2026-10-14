@@ -1,0 +1,115 @@
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import SimulationPage from './SimulationPage';
+import { ProvenanceProvider } from '../components/ProvenanceDrawer';
+import { envelope, mockFetch } from '../test/fetchMock';
+import { FIXTURE_BASELINE_UUID } from '../lib/scenario';
+
+const REAL = '7a1c2b3d-4e5f-4a6b-8c7d-9e0f1a2b3c4d';
+
+function release(id: string, origin: 'live' | 'test_fixture' = 'live') {
+  return { id, sequence: 4, knowledge_cutoff: '2026-10-14T20:00:00Z', published_at: '2026-10-14T20:05:00Z', origin, method: 'source_select_v1@1.0.0' };
+}
+
+function renderPage() {
+  return render(
+    <MemoryRouter initialEntries={['/simulation']}>
+      <ProvenanceProvider>
+        <SimulationPage />
+      </ProvenanceProvider>
+    </MemoryRouter>,
+  );
+}
+
+afterEach(() => vi.unstubAllGlobals());
+
+describe('SimulationPage', () => {
+  it('shows the persistent SIMULATION banner', async () => {
+    mockFetch({
+      'GET /v1/beliefs': { body: envelope([], { baseline_release: release(REAL) }) },
+      'GET /v1/belief-releases': { body: envelope([]) },
+    });
+    renderPage();
+    expect(screen.getByTestId('simulation-screen-banner')).toHaveTextContent(/^SIMULATION/);
+    expect(screen.getByTestId('simulation-banner')).toBeInTheDocument();
+  });
+
+  it('rejects the fixture baseline UUID and never submits a scenario', async () => {
+    const { calls } = mockFetch({
+      'GET /v1/beliefs': { body: envelope([], { baseline_release: release(FIXTURE_BASELINE_UUID, 'test_fixture') }) },
+      'GET /v1/belief-releases': { body: envelope([]) },
+    });
+    renderPage();
+    const err = await screen.findByTestId('baseline-error');
+    expect(err).toHaveTextContent(/fixture baseline UUID is not a real release/i);
+    const submit = screen.getByRole('button', { name: /create scenario and run/i });
+    expect(submit).toBeDisabled();
+    await userEvent.click(submit);
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
+  });
+
+  it('blocks submission when no release is published', async () => {
+    mockFetch({
+      'GET /v1/beliefs': { status: 404, body: { title: 'no release', status: 404, detail: 'no belief release has been published', code: 'no_release' } },
+      'GET /v1/belief-releases': { body: envelope([]) },
+    });
+    renderPage();
+    expect(await screen.findByTestId('baseline-error')).toHaveTextContent(/No published baseline release/);
+    expect(screen.getByRole('button', { name: /create scenario and run/i })).toBeDisabled();
+  });
+
+  it('submits a scenario pinned to the real release with idempotency keys and polls the job', async () => {
+    const SCN = '0b9e4a52-6f0a-4c1d-9a39-1b2c3d4e5f60';
+    const JOB = '5d4c3b2a-1f0e-4d9c-8b7a-6f5e4d3c2b1a';
+    const { calls } = mockFetch({
+      'GET /v1/beliefs': { body: envelope([], { baseline_release: release(REAL) }) },
+      'GET /v1/belief-releases': { body: envelope([release(REAL)]) },
+      'POST /v1/scenarios': { status: 201, body: { scenario_id: SCN, context_id: 'c', spec_digest: 'd', spec_sha256: 's', baseline_release_id: REAL, knowledge_cutoff: '2026-10-14T20:00:00Z', created_by: 'human:admin', recorded_at: '2026-10-14T21:00:00Z' } },
+      'POST /v1/simulations': { status: 202, body: { job_id: JOB, job_type: 'simulation', status: 'queued', status_url: `/v1/simulations/${JOB}` } },
+      'GET /v1/jobs/': {
+        body: { id: JOB, job_type: 'simulation', status: 'running', payload: {}, priority: 0, attempts: 1, max_attempts: 3, progress: {}, has_checkpoint: false, created_by: 'human:admin', created_at: '', updated_at: '', available_at: '', cancellable: true, links: {} },
+      },
+    });
+    renderPage();
+    const submit = await screen.findByRole('button', { name: /create scenario and run/i });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await userEvent.click(submit);
+
+    await waitFor(() => expect(calls.some((c) => c.method === 'POST' && c.url === '/v1/simulations')).toBe(true));
+    const scenarioCall = calls.find((c) => c.method === 'POST' && c.url === '/v1/scenarios')!;
+    const spec = scenarioCall.body as Record<string, unknown>;
+    expect(spec.baseline_release_id).toBe(REAL);
+    expect(spec.baseline_release_id).not.toBe(FIXTURE_BASELINE_UUID);
+    expect(spec.knowledge_cutoff).toBe('2026-10-14T20:00:00Z');
+    expect(scenarioCall.headers.get('Idempotency-Key')).toBeTruthy();
+    const simCall = calls.find((c) => c.method === 'POST' && c.url === '/v1/simulations')!;
+    expect(simCall.body).toEqual({ scenario_id: SCN, fidelity: 'L1' });
+    expect(simCall.headers.get('Idempotency-Key')).toBeTruthy();
+    expect(simCall.headers.get('Idempotency-Key')).not.toBe(scenarioCall.headers.get('Idempotency-Key'));
+
+    expect(await screen.findByRole('button', { name: /cancel run/i })).toBeInTheDocument();
+    expect(screen.getByText(/running/i)).toBeInTheDocument();
+  });
+
+  it('shows a missing_input rejection (e.g. Algeria) as problem details', async () => {
+    mockFetch({
+      'GET /v1/beliefs': { body: envelope([], { baseline_release: release(REAL) }) },
+      'GET /v1/belief-releases': { body: envelope([]) },
+      'POST /v1/scenarios': { status: 201, body: { scenario_id: 's1' } },
+      'POST /v1/simulations': {
+        status: 422,
+        body: { type: 'x', title: 'missing input', status: 422, detail: 'required inputs are missing from the pinned baseline release', code: 'missing_input', details: { missing: [{ country: 'DZA', input: 'M' }] } },
+      },
+    });
+    renderPage();
+    await userEvent.click(await screen.findByRole('checkbox', { name: 'DZA' }));
+    expect(screen.getByRole('note')).toHaveTextContent(/never dropped silently or treated as zero/);
+    const submit = screen.getByRole('button', { name: /create scenario and run/i });
+    await waitFor(() => expect(submit).toBeEnabled());
+    await userEvent.click(submit);
+    expect(await screen.findByText(/required inputs are missing/)).toBeInTheDocument();
+    expect(screen.getByText(/HTTP 422, missing_input/)).toBeInTheDocument();
+  });
+});

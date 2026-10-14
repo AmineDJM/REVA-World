@@ -23,7 +23,7 @@ from typing import Any
 from sqlalchemy import Connection, Engine, text
 
 from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, template_digest, validate_manifest
-from reva.autonomy.common import ArtifactIO, AutonomyBlocked, report_json
+from reva.autonomy.common import ArtifactIO, AutonomyBlocked, ref_from, report_json
 from reva.autonomy.policy import (
     PINNED_POLICY_DIGESTS,
     POLICY_DIR,
@@ -136,6 +136,11 @@ class PolicyPromotionGate:
             manifest = validate_manifest(manifest)
         except RevaError as e:
             return False, [f"manifest invalid: {e.message}"], {}
+        try:
+            if self.io.get_json(ref_from(change["manifest_ref"])) != manifest:
+                problems.append("embedded manifest differs from the referenced manifest artifact")
+        except Exception:
+            problems.append("manifest reference is unreadable")
         template = manifest["template"]
         tpl = (policy.content.get("approved_templates") or {}).get(template)
         if tpl is None:
@@ -175,7 +180,7 @@ class PolicyPromotionGate:
             kind = r.evaluator_version.split(":", 1)[0]
             try:
                 ev = self.io.get_json(r.evidence_manifest)
-            except Exception:  # noqa: BLE001 - unverifiable evidence does not count
+            except Exception:
                 problems.append(f"{kind} report evidence is unreadable")
                 continue
             covers = (ev.get("manifest") == manifest_sha if kind == "connector-validator"

@@ -59,9 +59,7 @@ def test_valid_production_configuration_is_accepted(clean_env: pytest.MonkeyPatc
         ({"reva_llm_enabled": True, "reva_llm_monthly_budget_usd": 0}, "BUDGET"),
     ],
 )
-def test_production_rejects_unsafe_configuration(
-    clean_env: pytest.MonkeyPatch, override: dict, needle: str
-) -> None:
+def test_production_rejects_unsafe_configuration(clean_env: pytest.MonkeyPatch, override: dict, needle: str) -> None:
     with pytest.raises(ValidationError) as ei:
         make(**{**GOOD_PROD, **override})
     assert needle in str(ei.value)
@@ -167,22 +165,23 @@ def test_every_secretstr_field_is_listed_as_secret(name: str) -> None:
 def test_all_secretstr_fields_are_redacted_keys() -> None:
     from pydantic import SecretStr
 
-    secret_fields = {
-        n.upper() for n, f in Settings.model_fields.items() if "SecretStr" in str(f.annotation)
-    }
+    secret_fields = {n.upper() for n, f in Settings.model_fields.items() if "SecretStr" in str(f.annotation)}
     assert secret_fields <= settings_mod.SECRET_ENV_KEYS
     assert SecretStr  # imported for annotation check readability
 
 
 # --------------------------------------------------------------------------- DSN
-@pytest.mark.parametrize(
-    "pw", ["p@ss:/w?rd#%", "a b/c?d=e&f", "%40%2F", "ünïcødé'\"\\", "x@y@z:::///???###%%%"]
-)
+@pytest.mark.parametrize("pw", ["p@ss:/w?rd#%", "a b/c?d=e&f", "%40%2F", "ünïcødé'\"\\", "x@y@z:::///???###%%%"])
 @pytest.mark.parametrize("role", ["api", "worker", "sim"])
 def test_runtime_url_survives_url_special_characters(clean_env, pw: str, role: str) -> None:  # type: ignore[no-untyped-def]
     s = make(
-        reva_api_db_password=pw, reva_worker_db_password=pw, reva_sim_db_password=pw,
-        reva_db_host="db.internal", reva_db_port=6543, reva_db_name="reva", reva_db_sslmode="require",
+        reva_api_db_password=pw,
+        reva_worker_db_password=pw,
+        reva_sim_db_password=pw,
+        reva_db_host="db.internal",
+        reva_db_port=6543,
+        reva_db_name="reva",
+        reva_db_sslmode="require",
     )
     url = s.runtime_url(role)
     assert url.password == pw

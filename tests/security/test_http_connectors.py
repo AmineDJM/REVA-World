@@ -43,9 +43,15 @@ def fixture_body(connector: str, url_contains: list[str]) -> Any:
 
 def raw_for(item: FetchItem, payload: Any) -> RawAcquisition:
     body = payload if isinstance(payload, bytes) else json.dumps(payload).encode()
-    return RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
-                          response_metadata={}, request_fingerprint=request_fingerprint("GET", item.url),
-                          origin="test_fixture")
+    return RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/json",
+        retrieved_at=datetime.now(UTC),
+        response_metadata={},
+        request_fingerprint=request_fingerprint("GET", item.url),
+        origin="test_fixture",
+    )
 
 
 def parse_validate(conn: Any, item: FetchItem, payload: Any) -> tuple[list[ObservationBatch], list[QualityReport]]:
@@ -118,8 +124,7 @@ def test_comtrade_max_records_truncation_blocks(ct: ComtradeConnector, fra_m_202
         ("period", "2022"),
     ],
 )
-def test_comtrade_dimension_mismatch_blocks(ct: ComtradeConnector, fra_m_2023: dict, field: str,
-                                            value: Any) -> None:
+def test_comtrade_dimension_mismatch_blocks(ct: ComtradeConnector, fra_m_2023: dict, field: str, value: Any) -> None:
     p = copy.deepcopy(fra_m_2023)
     p["data"][0][field] = value
     _, reports = parse_validate(ct, ct_item(ct, "total:FRA:M:2023"), p)
@@ -268,8 +273,9 @@ def test_wb_null_values_stay_missing(wb: WorldBankConnector, pop_series: list) -
     header, rows = copy.deepcopy(pop_series)
     rows[0]["value"] = None
     batches, reports = parse_validate(wb, wb_item(wb, "series:SP.POP.TOTL:p1"), [header, rows])
-    o = next(o for o in batches[0].observations if o.logical_key.endswith(f"{rows[0]['countryiso3code']}:"
-                                                                          f"{rows[0]['date']}"))
+    o = next(
+        o for o in batches[0].observations if o.logical_key.endswith(f"{rows[0]['countryiso3code']}:{rows[0]['date']}")
+    )
     assert o.value == {"kind": "missing", "reason": "unavailable"}
     assert not reports[0].blocking
 
@@ -317,9 +323,15 @@ def rdb(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Any]:
 
 def _obs_count(d: Any, concept: str) -> int:
     with d.owner.connect() as c:
-        return int(c.execute(text(
-            "SELECT count(*) FROM evidence.observation o JOIN ontology.concept_version cv "
-            "ON cv.id = o.concept_version_id WHERE cv.concept_id = :c"), {"c": concept}).scalar_one())
+        return int(
+            c.execute(
+                text(
+                    "SELECT count(*) FROM evidence.observation o JOIN ontology.concept_version cv "
+                    "ON cv.id = o.concept_version_id WHERE cv.concept_id = :c"
+                ),
+                {"c": concept},
+            ).scalar_one()
+        )
 
 
 @pytest.mark.db
@@ -351,10 +363,13 @@ def test_runner_quarantines_truncated_page_and_html(rdb: Any) -> None:
     pop, pop_url = fixture_body(WB, ["indicator/SP.POP.TOTL?", "page=1"])
     _, gdp_url = fixture_body(WB, ["indicator/NY.GDP.MKTP.CD?", "page=1"])
     truncated = [pop[0], pop[1][:70]]
-    http = FixtureHttp(WB, overrides={
-        request_fingerprint("GET", pop_url): json.dumps(truncated).encode(),
-        request_fingerprint("GET", gdp_url): (ADV / "html_error_200.html").read_bytes(),
-    })
+    http = FixtureHttp(
+        WB,
+        overrides={
+            request_fingerprint("GET", pop_url): json.dumps(truncated).encode(),
+            request_fingerprint("GET", gdp_url): (ADV / "html_error_200.html").read_bytes(),
+        },
+    )
     before = _obs_count(rdb, "demography.population.wdi_midyear_total")
     rep = asyncio.run(run_connector(wb, http, rdb.store, rdb.worker, persist_cursor=False))
     status = {o.item_key: o.status for o in rep.outcomes}
