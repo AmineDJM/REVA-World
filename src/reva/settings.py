@@ -33,7 +33,7 @@ import os
 import re
 from functools import lru_cache
 from pathlib import Path
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import Field, SecretStr, ValidationError, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -92,6 +92,15 @@ class Settings(BaseSettings):
     )
 
     reva_env: Literal["local", "test", "production"] = "local"
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        # pydantic includes each error's ``input`` (for model-level checks: the whole
+        # input mapping, raw secrets included) in ValidationError.errors(); re-raise
+        # with every input replaced, so no construction path can echo a secret.
+        try:
+            super().__init__(*args, **kwargs)
+        except ValidationError as e:
+            raise _redacted_validation_error(e) from None
+
     #: Which process this configuration is for; enables per-role production checks.
     reva_process_role: ProcessRole | None = None
     reva_log_level: str = "INFO"
@@ -278,6 +287,16 @@ def load_settings() -> Settings:
 @lru_cache(maxsize=1)
 def get_settings() -> Settings:
     return load_settings()
+
+
+def _redacted_validation_error(e: ValidationError) -> ValidationError:
+    line_errors: list[Any] = []
+    for err in e.errors(include_url=False):
+        item: dict[str, Any] = {"type": err["type"], "loc": err["loc"], "input": "<redacted>"}
+        if "ctx" in err:
+            item["ctx"] = err["ctx"]
+        line_errors.append(item)
+    return ValidationError.from_exception_data(e.title, line_errors, hide_input=True)
 
 
 def _is_argon2id(value: SecretStr) -> bool:

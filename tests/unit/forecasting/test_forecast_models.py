@@ -8,6 +8,7 @@ from decimal import Decimal
 import numpy as np
 import pytest
 
+from scipy.stats import norm
 from scipy.stats import t as student_t
 
 from reva.kernel.uncertainty import UncertaintyKind, UncertaintyStatus
@@ -165,7 +166,7 @@ def test_local_level_finite_forecasts_with_prediction_interval():
         assert any("not calibrated" in c for c in f.uncertainty.conditioning)
         p = f.predictive
         assert p is not None and p.family == "normal" and p.df is None
-        z_lo = p.loc + float(student_t.ppf(0.1, 1e9)) * p.scale
+        z_lo = p.loc + float(norm.ppf(0.1)) * p.scale
         assert math.exp(z_lo) == pytest.approx(lo, rel=1e-6)
     widths = [f.interval[1] - f.interval[0] for f in fcs]
     assert widths == sorted(widths)
