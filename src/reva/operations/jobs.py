@@ -150,8 +150,21 @@ def dirty_belief_nodes(conn: Connection) -> int:
 
 
 # --------------------------------------------------------------------------- ingest
-def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
+def _all_connectors(ctx: JobContext) -> dict[str, Any]:
+    """Reviewed built-in connectors plus declarative connectors promoted by the gate."""
     from reva.adapters.connectors.registry import builtin_connectors
+
+    connectors: dict[str, Any] = dict(builtin_connectors(ctx.settings.reva_http_contact_email))
+    try:
+        from reva.autonomy.jobs import promoted_connectors
+
+        connectors.update(promoted_connectors(ctx.worker_engine, ctx.store))
+    except Exception as e:
+        log.warning("promoted connectors unavailable: %s", type(e).__name__)
+    return connectors
+
+
+def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     from reva.evidence.runner import FixtureHttp, RecordingHttp, make_live_client, post_publish_for, run_connector
     from reva.operations.telemetry import INGEST_BYTES, INGEST_REQUESTS
 
@@ -160,7 +173,7 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     capture = bool(payload.get("capture", False))
     if mode not in ("live", "fixture"):
         raise ValidationProblem("ingest mode must be 'live' or 'fixture'", mode=str(mode)[:32])
-    connectors = builtin_connectors(ctx.settings.reva_http_contact_email)
+    connectors = _all_connectors(ctx)
     connector = connectors.get(str(name))
     if connector is None:
         raise ValidationProblem("unknown connector", connector=str(name)[:128], known=sorted(connectors))
@@ -281,10 +294,9 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
 
 # --------------------------------------------------------------------------- health
 def handle_health(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
-    from reva.adapters.connectors.registry import builtin_connectors
     from reva.operations.health import append_health, connector_health_vector
 
-    connectors = builtin_connectors(ctx.settings.reva_http_contact_email)
+    connectors = _all_connectors(ctx)
     names = [payload["connector"]] if payload.get("connector") else sorted(connectors)
     origin = payload.get("origin") or ("live" if ctx.settings.reva_env == "production" else None)
     out: dict[str, Any] = {}

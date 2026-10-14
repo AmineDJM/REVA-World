@@ -174,7 +174,15 @@ def fresh_database(object_root: Path, keep: bool = False, prefix: str = "reva_li
         store = FilesystemArtifactStore(object_root, settings.reva_s3_prefix)
         d = LiveDB(settings, name, make_engine("migration", settings), make_engine("worker", settings), store,
                    admin)
-        seed(d.worker, store)
+        for attempt in range(12):  # the runtime roles have a cluster-wide connection limit shared by agents
+            try:
+                seed(d.worker, store)
+                break
+            except Exception as e:
+                if "too many connections" not in str(e) or attempt == 11:
+                    raise
+                log.warning("connection limit reached; retrying seed in 10 s")
+                time.sleep(10)
         yield d
     finally:
         if d is not None:
@@ -206,6 +214,9 @@ async def check_comtrade_reference(contact_email: str | None = None) -> dict[str
                 "expected_code": code,
                 "repository_code": REPORTERS.get(iso),
                 "provider_codes_for_iso3": [x.get("reporterCode") for x in hits],
+                "provider_entries_for_iso3": [
+                    {k: x.get(k) for k in ("reporterCode", "reporterDesc", "entryEffectiveDate", "entryExpiredDate")}
+                    for x in hits],
                 "provider_entry": {k: entry.get(k) for k in ("reporterCode", "reporterDesc", "reporterNote",
                                                               "reporterCodeIsoAlpha3", "entryEffectiveDate",
                                                               "entryExpiredDate", "isGroup")} if entry else None,
@@ -504,6 +515,52 @@ def crossref_details(run: dict[str, Any], db: LiveDB) -> dict[str, Any]:
     return out
 
 
+# --------------------------------------------------------------------------- fixture drift
+VOLATILE_JSON_KEYS = ("elapsedTime",)  # Comtrade reports server time per response
+
+
+def _semantic(body: bytes) -> Any:
+    try:
+        doc = json.loads(body)
+    except ValueError:
+        return sha256(body)
+    if isinstance(doc, dict):
+        doc = {k: v for k, v in doc.items() if k not in VOLATILE_JSON_KEYS}
+    return doc
+
+
+def fixture_drift(bodies_by_connector: dict[str, dict[str, bytes]]) -> dict[str, Any]:
+    """Compare live responses with the captured CI fixtures (read-only).
+
+    Byte identity and semantic identity (JSON minus volatile keys) are reported
+    separately: a byte change with equal semantics is not a provider revision."""
+    root = REPO / "tests" / "fixtures" / "source"
+    out: dict[str, Any] = {}
+    for name, bodies in bodies_by_connector.items():
+        mpath = root / name / "manifest.json"
+        if not mpath.exists():
+            out[name] = {"fixtures": False}
+            continue
+        entries = {e["url"]: e for e in json.loads(mpath.read_text())}
+        res: dict[str, Any] = {"compared": 0, "byte_identical": 0, "semantically_identical": 0,
+                               "changed": [], "not_in_fixtures": []}
+        for url, body in bodies.items():
+            e = entries.get(url)
+            if e is None:
+                res["not_in_fixtures"].append(url)
+                continue
+            fbody = (root / name / e["file"]).read_bytes()
+            res["compared"] += 1
+            res["byte_identical"] += int(fbody == body)
+            if _semantic(fbody) == _semantic(body):
+                res["semantically_identical"] += 1
+            else:
+                res["changed"].append({"url": url, "fixture_sha256": e["sha256"], "live_sha256": sha256(body),
+                                       "fixture_retrieved_at": e.get("retrieved_at")})
+        out[name] = res
+    return out
+
+
 # --------------------------------------------------------------------------- Eurostat
 async def eurostat_check(settings: Any, work: Path) -> dict[str, Any]:
     """Bounded live check of demo_pjan FR 2023 through the approved template."""
@@ -596,6 +653,7 @@ async def _eurostat_template(c: Any, work: Path) -> dict[str, Any]:
             "fr_total_2023_flags": {k: total.source_flags.get(k) for k in ("status", "cell_type")} if total else None,
             "quality": q.model_dump(mode="json"),
             "requests": http.trace,
+            "_bodies": dict(http.bodies),
         }
     finally:
         await http.aclose()
@@ -661,6 +719,7 @@ async def run_all(db: LiveDB, names: list[str] | None, eurostat: bool, work: Pat
         except Exception as e:
             details[name] = {"error": f"{type(e).__name__}: {e}"}
     result["source_details"] = details
+    result["fixture_drift"] = fixture_drift({n: r["_bodies"] for n, r in runs.items()})
     for run in runs.values():
         run.pop("_bodies", None)
         rep = run["report"]
@@ -683,6 +742,9 @@ async def run_all(db: LiveDB, names: list[str] | None, eurostat: bool, work: Pat
                    ORDER BY cv.name""")).mappings()],
         }
     result["eurostat"] = await eurostat_check(db.settings, work) if eurostat else {"mode": "skipped"}
+    if "_bodies" in result["eurostat"]:
+        result["fixture_drift"]["eurostat.demo_pjan.fr"] = fixture_drift(
+            {"eurostat.demo_pjan.fr": result["eurostat"].pop("_bodies")})["eurostat.demo_pjan.fr"]
     result["finished_at"] = now()
     result["gates"] = gates(result)
     return result
@@ -748,6 +810,33 @@ def render_markdown(r: dict[str, Any]) -> str:
                     else:
                         row.append("absent")
                 L.append(f"| {iso} | " + " | ".join(row) + " |")
+        L.append("")
+    ct = r.get("source_details", {}).get("un.comtrade.public_exact", {})
+    if ct.get("totals"):
+        L.append("## Comtrade HS2709 world totals (partner 0)\n")
+        L.append("| reporter | flow | year | rows | primaryValue | cif | fob | netWgt | cls | isReported | isAggregate "
+                 "| legacyEst |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+        for iso, flows in ct["totals"].items():
+            for flow, years in flows.items():
+                for y, v in years.items():
+                    L.append(f"| {iso} | {flow} | {y} | {v['rows']} | {v.get('primaryValue')} | {v.get('cifvalue')} | "
+                             f"{v.get('fobvalue')} | {v.get('netWgt')} | {v.get('classificationCode')} | "
+                             f"{v.get('isReported')} | {v.get('isAggregate')} | {v.get('legacyEstimationFlag')} |")
+        L.append("\n## Comtrade bilateral 2023 (partner rows excl. World)\n")
+        L.append("| reporter | flow:year | rows | partner rows | world row in response | null values | cls |\n"
+                 "|---|---|---|---|---|---|---|")
+        for iso, d in ct["bilateral"].items():
+            for k, v in d.items():
+                L.append(f"| {iso} | {k} | {v['rows']} | {v['partner_rows_excluding_world']} | "
+                         f"{v['world_row_in_response']} | {v['null_primary_values']} | "
+                         f"{','.join(v['classification_codes'])} |")
+        L.append("")
+    if r.get("fixture_drift"):
+        L.append("## Drift against captured CI fixtures\n")
+        L.append("| connector | compared | byte identical | semantically identical | changed |\n|---|---|---|---|---|")
+        for name, d in r["fixture_drift"].items():
+            L.append(f"| {name} | {d.get('compared')} | {d.get('byte_identical')} | "
+                     f"{d.get('semantically_identical')} | {len(d.get('changed') or [])} |")
         L.append("")
     L.append("## Requests\n")
     L.append("| connector | requests | bytes | outcomes |\n|---|---|---|---|")

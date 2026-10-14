@@ -94,7 +94,7 @@ async def test_comtrade_reporter_codes_match_provider_catalogue() -> None:
 
 async def test_comtrade_exact_world_total_shape(settings: Any) -> None:
     c = ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=())
-    [(raw, batch, q)] = await _fetch_parse(c, settings, {"total:FRA:M:2023"})
+    [(_raw, batch, q)] = await _fetch_parse(c, settings, {"total:FRA:M:2023"})
     md = batch.metadata
     assert md["count"] is not None and int(md["count"]) == md["returned_rows"] < MAX_RECORDS
     assert q.outcome == "pass", [(f.code, f.message) for f in q.findings]
@@ -155,7 +155,7 @@ async def test_naturalearth_asset_structure(settings: Any) -> None:
 # ----------------------------------------------------------------------------- Crossref
 async def test_crossref_doi_metadata(settings: Any) -> None:
     c = CrossrefConnector()
-    [(raw, batch, q)] = await _fetch_parse(c, settings)
+    [(_raw, batch, q)] = await _fetch_parse(c, settings)
     study = batch.metadata["study"]
     assert study["doi"] == CURATED_DOIS[0]
     assert "oil" in (study["title"] or "").lower()
