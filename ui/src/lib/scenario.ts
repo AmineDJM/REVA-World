@@ -201,14 +201,25 @@ function resultValue(r: SimResult): { value: string; unit: string; missing: stri
   return { value: '', unit: '', missing: `unsupported value kind ${v.kind}` };
 }
 
-function csvCell(s: string): string {
-  const safe = /^[=+\-@\t\r]/.test(s) && !/^-?\d/.test(s) ? `'${s}` : s; // spreadsheet formula guard
+const PLAIN_NUMBER = /^-?\d+(\.\d+)?([eE][+-]?\d+)?$/;
+
+/** One CSV cell: spreadsheet formula guard (a leading = + - @ tab or CR is neutralised unless the whole
+ * cell is a plain number, so "-2+3+cmd|..." is guarded) and RFC 4180 quoting of quotes/commas/newlines. */
+export function csvCell(s: string): string {
+  const safe = /^[=+\-@\t\r]/.test(s) && !PLAIN_NUMBER.test(s) ? `'${s}` : s;
   return /[",\n\r]/.test(safe) ? `"${safe.replace(/"/g, '""')}"` : safe;
+}
+
+/** A value for a "# key: value" header line: never contains a line break (no row injection). */
+function headerValue(v: unknown): string {
+  return String(v).replace(/[\r\n]+/g, ' ');
 }
 
 /** CSV with the simulation banner and full scenario context as leading comment lines. */
 export function resultsToCsv(ctx: ExportContext, results: SimResult[]): string {
-  const lines = [
+  // Header lines are single quoted CSV cells without line breaks: a title like "x,=CMD()" or "x\n=CMD()"
+  // can neither open a new cell nor a new row.
+  const header = [
     `# ${SIMULATION_BANNER_TEXT}`,
     `# simulation_id: ${ctx.simulation_id}`,
     `# scenario_id: ${ctx.scenario_id ?? 'unknown'}`,
@@ -219,7 +230,10 @@ export function resultsToCsv(ctx: ExportContext, results: SimResult[]): string {
     `# model_versions: ${ctx.model_versions.join('; ') || 'unknown'}`,
     `# fidelity: ${ctx.fidelity ?? 'unknown'}`,
     `# origin: ${ctx.origin ?? 'unknown'}`,
-    ...ctx.assumptions.map((a) => `# assumption: ${a.replace(/[\r\n]+/g, ' ')}`),
+    ...ctx.assumptions.map((a) => `# assumption: ${a}`),
+  ];
+  const lines = [
+    ...header.map((h) => csvCell(headerValue(h))),
     ['country', 'output_key', 'variant', 'value', 'unit_ref', 'missing_reason', 'uncertainty', 'lower', 'upper'].join(','),
   ];
   for (const r of results) {

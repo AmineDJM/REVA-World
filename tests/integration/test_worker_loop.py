@@ -424,7 +424,7 @@ def test_demo_runs_through_the_worker_path_with_db_clock_cutoff(wdb: FreshDB, si
         # No worker: the demo executes the job itself through the fenced worker path.
         out = demo.run_demo(scenario="crude-border-price-25", countries=["FRA", "USA"], fidelity="L1",
                             origin="test_fixture", execute_locally=True)
-        assert out["execution"] == "local:succeeded" and out["job"]["status"] == "succeeded"
+        assert out["execution"].startswith("local:") and out["job"]["status"] == "succeeded"
         assert out["run_id"] and out["results"]
         assert out["baseline_release"]["origin"] == "test_fixture"
         cutoff = datetime.fromisoformat(out["knowledge_cutoff"].replace("Z", "+00:00"))

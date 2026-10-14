@@ -58,14 +58,18 @@ export function formatDecimalString(value: string, maxFractionDigits = 6): strin
     const n = Number(trimmed);
     return Number.isFinite(n) ? n.toLocaleString('en-US', { maximumSignificantDigits: 15 }) : trimmed;
   }
-  const sign = m[1] === '-' ? '−' : '';
-  const intPart = (m[2] || '0').replace(/^0+(?=\d)/, '');
+  let intPart = (m[2] || '0').replace(/^0+(?=\d)/, '');
   let frac = m[3] ?? '';
   if (frac.length > maxFractionDigits) {
-    frac = roundFraction(intPart, frac, maxFractionDigits).frac;
+    // Keep the carry: 0.9999999 -> "1", 1999.99999995 -> "2,000".
+    const r = roundFraction(intPart, frac, maxFractionDigits);
+    intPart = r.int.replace(/^0+(?=\d)/, '');
+    frac = r.frac;
   }
   const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
   frac = frac.replace(/0+$/, '');
+  const isZero = /^0*$/.test(intPart) && !frac;
+  const sign = m[1] === '-' && !isZero ? '−' : '';
   return `${sign}${grouped}${frac ? `.${frac}` : ''}`;
 }
 

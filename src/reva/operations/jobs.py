@@ -173,17 +173,35 @@ def dirty_belief_nodes(conn: Connection) -> int:
 
 # --------------------------------------------------------------------------- ingest
 def _all_connectors(ctx: JobContext) -> dict[str, Any]:
-    """Reviewed built-in connectors plus declarative connectors promoted by the gate."""
+    """Reviewed built-in connectors plus declarative connectors promoted by the gate.
+
+    A promoted connector can never shadow a built-in (R4-01/R4-03): built-ins are
+    applied last, and a promoted name that collides with a built-in is dropped,
+    logged and audited (``connectors.promoted_name_collision``). Used by both the
+    ingest and the health handlers.
+    """
     from reva.adapters.connectors.registry import builtin_connectors
 
-    connectors: dict[str, Any] = dict(builtin_connectors(ctx.settings.reva_http_contact_email))
+    builtins: dict[str, Any] = dict(builtin_connectors(ctx.settings.reva_http_contact_email))
+    promoted: dict[str, Any] = {}
     try:
         from reva.autonomy.jobs import promoted_connectors
 
-        connectors.update(promoted_connectors(ctx.worker_engine, ctx.store))
+        promoted = dict(promoted_connectors(ctx.worker_engine, ctx.store))
     except Exception as e:
         log.warning("promoted connectors unavailable: %s", type(e).__name__)
-    return connectors
+    collisions = sorted(set(promoted) & set(builtins))
+    if collisions:
+        log.error("promoted connector(s) %s collide with built-in names; the built-ins are used", collisions)
+        try:
+            from reva.operations.audit import record
+
+            with ctx.worker_engine.begin() as conn:
+                record(conn, f"worker:{ctx.worker_id}"[:200], "connectors.promoted_name_collision",
+                       {"job_id": str(ctx.job_id)}, {"names": collisions[:50]})
+        except Exception as e:  # the anomaly record is best effort; the override is refused regardless
+            log.warning("could not audit connector name collision: %s", type(e).__name__)
+    return {**promoted, **builtins}
 
 
 def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:

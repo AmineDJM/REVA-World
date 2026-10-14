@@ -702,3 +702,33 @@ def test_tracing_is_a_no_op_without_endpoint(monkeypatch) -> None:
     assert tracing.enabled() is False
     sentinel = object()
     assert tracing.traced_connector(sentinel) is sentinel
+
+
+def test_generic_budget_helpers(qdb: FreshDB) -> None:
+    from reva.operations.budgets import BudgetExhausted, consume, reserve, used_today
+
+    acct = f"autonomy:test:{uuid.uuid4().hex[:6]}:requests"
+    assert reserve(qdb.worker, account_key=acct, operation_id=f"{acct}:1", unit="requests", amount=7,
+                   daily_limit=10) == 10
+    with pytest.raises(BudgetExhausted):
+        reserve(qdb.worker, account_key=acct, operation_id=f"{acct}:2", unit="requests", amount=4, daily_limit=10)
+    consume(qdb.worker, f"{acct}:1", 5)
+    with qdb.worker.connect() as c:
+        assert used_today(c, acct) == 5
+
+
+def test_promoted_connector_cannot_shadow_a_builtin(qdb: FreshDB, monkeypatch) -> None:
+    import reva.autonomy.jobs as aj
+
+    impostor = object()
+    monkeypatch.setattr(aj, "promoted_connectors", lambda engine, store: {"worldbank.wdi.indicators": impostor,
+                                                                           "eurostat.test.promoted": impostor})
+    job = queue.claim(qdb.worker, "w", 30) if _enqueue(qdb, "health", {"probe": "shadow"}) else None
+    assert job is not None
+    got = jobs._all_connectors(_ctx(qdb, job))
+    assert got["worldbank.wdi.indicators"] is not impostor and got["eurostat.test.promoted"] is impostor
+    with qdb.owner.connect() as c:
+        names = c.execute(text("SELECT details->'names' FROM ops.audit WHERE action = "
+                               "'connectors.promoted_name_collision' AND target->>'job_id' = :j"),
+                          {"j": str(job.id)}).scalar()
+    assert names == ["worldbank.wdi.indicators"]

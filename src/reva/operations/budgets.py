@@ -141,7 +141,53 @@ def reserve_ingest(engine: Engine, *, job_id: UUID | str, attempt: int, source_k
 
 def settle(engine: Engine, reservation: Reservation, *, requests: int, nbytes: int) -> None:
     """Record what the run consumed (replaces the reservation in the daily sums)."""
+    consume(engine, reservation.requests_operation_id, requests)
+    consume(engine, reservation.bytes_operation_id, nbytes)
+
+
+# --------------------------------------------------------------------------- generic ledger helpers
+# Reusable for any daily budget (e.g. autonomy discovery requests):
+#   remaining = reserve(engine, account_key="autonomy:discovery:requests", operation_id=f"discovery:{job}:{n}",
+#                       unit="requests", amount=planned, daily_limit=limit)
+#   ... do the work, at most ``remaining`` units ...
+#   consume(engine, operation_id, actually_used)
+def used_today(conn: Connection, account_key: str) -> int:
+    """Units charged to ``account_key`` today (UTC, DB clock); unsettled rows count their reservation."""
+    return int(conn.execute(
+        text(f"SELECT COALESCE(sum(COALESCE(consumed, reserved)), 0) FROM ops.budget_ledger "
+             f"WHERE account_key = :a AND recorded_at >= {DAY_START_SQL}"),
+        {"a": account_key},
+    ).scalar_one())
+
+
+def reserve(engine: Engine, *, account_key: str, operation_id: str, unit: str, amount: int,
+            daily_limit: int) -> int:
+    """Atomically reserve ``amount`` units against ``daily_limit`` for ``account_key``.
+
+    Serialised per account by an advisory transaction lock. Raises
+    :class:`BudgetExhausted` (nothing recorded) when ``used + amount`` would exceed
+    the limit; otherwise records the reservation (idempotent per ``operation_id``)
+    and returns the units that were left before it (the caller's hard cap).
+    """
+    if amount < 0 or daily_limit < 0:
+        raise ValueError("amount and daily_limit must be >= 0")
     with engine.begin() as conn:
-        upd = text("UPDATE ops.budget_ledger SET consumed = :c WHERE operation_id = :o")
-        conn.execute(upd, {"c": max(0, int(requests)), "o": reservation.requests_operation_id})
-        conn.execute(upd, {"c": max(0, int(nbytes)), "o": reservation.bytes_operation_id})
+        conn.execute(text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"), {"k": f"reva:budget:{account_key}"})
+        used = used_today(conn, account_key)
+        if used + amount > daily_limit:
+            raise BudgetExhausted(f"daily budget for {account_key} would be exceeded ({used} used + {amount} "
+                                  f"requested > {daily_limit})", account_key=account_key, used=used,
+                                  requested=amount, daily_limit=daily_limit, unit=unit)
+        conn.execute(
+            text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved) VALUES (:a, :o, :u, :r) "
+                 "ON CONFLICT (operation_id) DO NOTHING"),
+            {"a": account_key, "o": operation_id, "u": unit, "r": amount},
+        )
+    return daily_limit - used
+
+
+def consume(engine: Engine, operation_id: str, amount: int) -> None:
+    """Record the units an operation actually consumed (replaces its reservation)."""
+    with engine.begin() as conn:
+        conn.execute(text("UPDATE ops.budget_ledger SET consumed = :c WHERE operation_id = :o"),
+                     {"c": max(0, int(amount)), "o": operation_id})
