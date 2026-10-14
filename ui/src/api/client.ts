@@ -142,7 +142,8 @@ export async function runQuery(spec: QuerySpec) {
   return (await request<Envelope<unknown>>('POST', `${V1}/query`, { body: spec })).body;
 }
 
-export const getJob = (id: string, s?: AbortSignal) => get<Envelope<Job>>(`/jobs/${enc(id)}`, undefined, s);
+export const getJob = (id: string, s?: AbortSignal) => get<Job>(`/jobs/${enc(id)}`, undefined, s);
+export const getJobs = (q?: Query, s?: AbortSignal) => get<Envelope<Job[]>>('/jobs', q, s);
 
 export async function cancelJob(id: string) {
   return (await request<JobCancelResult>('POST', `${V1}/jobs/${enc(id)}/cancel`, {})).body;

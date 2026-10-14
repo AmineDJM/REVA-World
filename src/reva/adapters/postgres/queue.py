@@ -91,7 +91,7 @@ def idempotency_key(job_type: str, payload: Mapping[str, Any]) -> str:
     return f"{job_type}:{logical_hash({'job_type': job_type, 'payload': dict(payload)})}"
 
 
-def _j(obj: Any) -> str | None:
+def to_json(obj: Any) -> str | None:
     return None if obj is None else json.dumps(obj, sort_keys=True, default=str, allow_nan=False)
 
 
@@ -122,7 +122,7 @@ def enqueue(
         raise ValidationProblem("priority must be within -100..100")
     if max_attempts is not None and max_attempts < 1:
         raise ValidationProblem("max_attempts must be >= 1")
-    p = _j(dict(payload))
+    p = to_json(dict(payload))
     jid = conn.execute(
         text(
             """INSERT INTO ops.job(job_type, payload, idempotency_key, priority, max_attempts, created_by)
@@ -261,7 +261,7 @@ def heartbeat(engine: Engine, job: ClaimedJob, progress: Mapping[str, Any] | Non
             return str(conn.execute(
                 text("SELECT ops.heartbeat(:j, :w, :t, :s, CAST(:p AS jsonb))"),
                 {"j": job.id, "w": job.worker_id, "t": job.fencing_token,
-                 "s": lease_seconds or job.lease_seconds, "p": _j(dict(progress)) if progress else None},
+                 "s": lease_seconds or job.lease_seconds, "p": to_json(dict(progress)) if progress else None},
             ).scalar_one())
     except DBAPIError as e:
         if _stale(e):
@@ -275,7 +275,7 @@ def _complete(conn: Connection, job: ClaimedJob, status: str, result: Any, error
             conn.execute(
                 text("SELECT ops.complete_job(:j, :w, :t, :s, CAST(:r AS jsonb), CAST(:e AS jsonb))"),
                 {"j": job.id, "w": job.worker_id, "t": job.fencing_token, "s": status,
-                 "r": _j(result), "e": _j(error)},
+                 "r": to_json(result), "e": to_json(error)},
             )
     except DBAPIError as e:
         if _stale(e):
@@ -338,7 +338,7 @@ def fail(
                     "UPDATE ops.job SET status = 'dead', last_error = CAST(:e AS jsonb), lease_until = NULL, "
                     "finished_at = clock_timestamp(), updated_at = clock_timestamp() WHERE id = :j"
                 ),
-                {"j": job.id, "e": _j({**err, "dead_letter": True})},
+                {"j": job.id, "e": to_json({**err, "dead_letter": True})},
             )
             return "dead"
         delay = backoff_seconds(int(row.attempts), backoff_base_seconds, backoff_cap_seconds)
@@ -348,7 +348,7 @@ def fail(
                 "available_at = clock_timestamp() + make_interval(secs => :d), last_error = CAST(:e AS jsonb), "
                 "updated_at = clock_timestamp() WHERE id = :j"
             ),
-            {"j": job.id, "d": delay, "e": _j({**err, "backoff_seconds": delay})},
+            {"j": job.id, "d": delay, "e": to_json({**err, "backoff_seconds": delay})},
         )
         return "queued"
 
@@ -369,8 +369,8 @@ def release(engine: Engine, job: ClaimedJob, checkpoint: Mapping[str, Any] | Non
                 "available_at = clock_timestamp(), last_error = CAST(:e AS jsonb), updated_at = clock_timestamp() "
                 "WHERE id = :j"
             ),
-            {"j": job.id, "c": _j(dict(checkpoint)) if checkpoint else None,
-             "e": _j({"code": "released", "reason": reason, "retryable": True})},
+            {"j": job.id, "c": to_json(dict(checkpoint)) if checkpoint else None,
+             "e": to_json({"code": "released", "reason": reason, "retryable": True})},
         )
         return "queued"
 
@@ -380,7 +380,7 @@ def save_checkpoint(engine: Engine, job: ClaimedJob, checkpoint: Mapping[str, An
         assert_lease(conn, job)
         conn.execute(
             text("UPDATE ops.job SET checkpoint = CAST(:c AS jsonb), updated_at = clock_timestamp() WHERE id = :j"),
-            {"j": job.id, "c": _j(dict(checkpoint))},
+            {"j": job.id, "c": to_json(dict(checkpoint))},
         )
 
 

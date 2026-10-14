@@ -311,11 +311,11 @@ def handle_evaluation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
 
 def save_checkpoint(ctx: JobContext, checkpoint: dict[str, Any], engine: Engine | None = None) -> None:
     """Durable, fenced checkpoint for long handlers."""
-    from reva.adapters.postgres.queue import _j  # noqa: PLC2701
+    from reva.adapters.postgres.queue import to_json
 
     eng = engine or ctx.worker_engine
     with eng.begin() as conn:
         ctx.assert_lease(conn)
         conn.execute(text("UPDATE ops.job SET checkpoint = CAST(:c AS jsonb), updated_at = clock_timestamp() "
-                          "WHERE id = :j"), {"c": _j(checkpoint), "j": ctx.job_id})
+                          "WHERE id = :j"), {"c": to_json(checkpoint), "j": ctx.job_id})
     ctx.checkpoint = checkpoint

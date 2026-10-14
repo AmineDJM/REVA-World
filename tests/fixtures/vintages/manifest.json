@@ -127,6 +127,27 @@
         }
       ]
     },
+    "pop_fra_1955_1956_exact_return": {
+      "years": [
+        1955,
+        1956
+      ],
+      "purpose": "provider returns byte-identical A after B",
+      "vintages": [
+        {
+          "label": "a",
+          "file": "pop_fra_1955_1956_exact_return.a.json",
+          "retrieved_at": "2026-01-11T10:00:00+00:00",
+          "dataset_lastupdated": "2026-01-10"
+        },
+        {
+          "label": "b",
+          "file": "pop_fra_1955_1956_exact_return.b.json",
+          "retrieved_at": "2026-01-21T10:00:00+00:00",
+          "dataset_lastupdated": "2026-01-20"
+        }
+      ]
+    },
     "pop_fra_1960_1961_job": {
       "years": [
         1960,
