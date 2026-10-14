@@ -227,3 +227,10 @@ export function str(x: unknown, fallback = ''): string {
   if (typeof x === 'number' || typeof x === 'boolean') return String(x);
   return JSON.stringify(x);
 }
+
+/** datetime-local value (interpreted as UTC) -> ISO-8601 with Z. */
+export function localUtcToIso(v: string): string | undefined {
+  if (!v) return undefined;
+  const d = new Date(/T\d{2}:\d{2}$/.test(v) ? `${v}:00Z` : `${v}Z`);
+  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
+}

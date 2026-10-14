@@ -61,11 +61,14 @@ class ExternalRunPolicy:
 
     def __post_init__(self) -> None:
         if self.isolation in _REJECTED_ISOLATION or self.isolation not in (
-            "firecracker_microvm", "gvisor_vm", "disposable_cloud_vm"
+            "firecracker_microvm",
+            "gvisor_vm",
+            "disposable_cloud_vm",
         ):
             raise ValidationProblem(
                 f"isolation {self.isolation!r} is not acceptable for generated code; a disposable VM/microVM "
-                "is required")
+                "is required"
+            )
         if self.secrets_mounted is not False:
             raise ValidationProblem("external runs must not receive secrets")
         if self.inputs_read_only is not True:
@@ -110,8 +113,11 @@ class ExternalRunRequest:
             if not is_sha256(digest):
                 raise ValidationProblem("patch and command manifest must be content-addressed")
         lowered = {k.upper() for k in self.environment}
-        suspicious = sorted(k for k in lowered if any(s in k for s in ("TOKEN", "SECRET", "PASSWORD", "KEY",
-                                                                       "DATABASE_URL", "CREDENTIAL")))
+        suspicious = sorted(
+            k
+            for k in lowered
+            if any(s in k for s in ("TOKEN", "SECRET", "PASSWORD", "KEY", "DATABASE_URL", "CREDENTIAL"))
+        )
         if suspicious:
             raise ValidationProblem(f"environment variables look like secrets and are refused: {suspicious}")
 

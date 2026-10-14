@@ -130,25 +130,37 @@ _ROADMAP = "architecture §25 phase table"
 _BASE: tuple[Capability, ...] = (
     # ------------------------------------------------------------------ P4/P5: V1 executable envelope
     Capability(
-        "fidelity.L0", "Exact full-specification cache lookup", "implemented", "P4",
+        "fidelity.L0",
+        "Exact full-specification cache lookup",
+        "implemented",
+        "P4",
         "reva.simulation.engine",
         ("identical spec digest + pinned manifests return the cached result; otherwise an explicit cache miss",),
         notes="No surrogate: a near-identical specification is a cache miss.",
     ),
     Capability(
-        "fidelity.L1", "Deterministic fixed-quantity crude-value exposure", "implemented", "P4",
+        "fidelity.L1",
+        "Deterministic fixed-quantity crude-value exposure",
+        "implemented",
+        "P4",
         "reva.models.economic.crude_exposure",
         ("hand-computed cases match", "p=1 gives zero", "missing input blocks"),
         notes="Assumption-conditioned accounting model; not GDP loss, inflation, unemployment or welfare.",
     ),
     Capability(
-        "fidelity.L2", "Labelled elasticity sensitivity of crude-value exposure", "implemented", "P4",
+        "fidelity.L2",
+        "Labelled elasticity sensitivity of crude-value exposure",
+        "implemented",
+        "P4",
         "reva.models.economic.crude_exposure",
         ("elasticity 0 equals L1", "registered elasticity envelope enforced"),
         notes="Sensitivity grid over registered elasticities; not an uncertainty distribution.",
     ),
     Capability(
-        "fidelity.L3", "Paired Monte Carlo uncertainty propagation", "reserved", "P4",
+        "fidelity.L3",
+        "Paired Monte Carlo uncertainty propagation",
+        "reserved",
+        "P4",
         "reva.simulation.engine",
         (
             "every parameter distribution has justified provenance (registered evidence)",
@@ -162,7 +174,10 @@ _BASE: tuple[Capability, ...] = (
         available_instead=("fidelity.L2",),
     ),
     Capability(
-        "fidelity.L4", "Competing models, global sensitivity and deep research", "reserved", "P11",
+        "fidelity.L4",
+        "Competing models, global sensitivity and deep research",
+        "reserved",
+        "P11",
         "reva.simulation.engine",
         (
             "more than one approved model for the estimand with locked-holdout tournament evidence",
@@ -173,12 +188,18 @@ _BASE: tuple[Capability, ...] = (
         available_instead=("fidelity.L1", "fidelity.L2"),
     ),
     Capability(
-        "coupling.acyclic", "Acyclic one-way model coupling with port compatibility and SCC detection",
-        "implemented", "P4", "reva.simulation.coupling",
+        "coupling.acyclic",
+        "Acyclic one-way model coupling with port compatibility and SCC detection",
+        "implemented",
+        "P4",
+        "reva.simulation.coupling",
         ("port stock/flow/rate compatibility enforced", "strongly connected components detected and rejected"),
     ),
     Capability(
-        "coupling.feedback", "Feedback-block coupling solver", "reserved", "P9",
+        "coupling.feedback",
+        "Feedback-block coupling solver",
+        "reserved",
+        "P9",
         "reva.simulation.feedback",
         (
             "explicit convergence contract (step size, criterion, damping, iteration cap, conservative exchange, "
@@ -191,27 +212,38 @@ _BASE: tuple[Capability, ...] = (
         available_instead=("coupling.acyclic",),
     ),
     Capability(
-        "horizon.multi_period", "Dynamic multi-period simulation", "reserved", "P9",
+        "horizon.multi_period",
+        "Dynamic multi-period simulation",
+        "reserved",
+        "P9",
         "reva.simulation.engine",
         ("stock/flow ledger and dynamic model with validated transition dynamics",),
         reason="the V1 model is a one-annual-period accounting identity; dynamics are not modelled",
     ),
     Capability(
-        "outputs.macroeconomic", "GDP loss, unemployment, consumer inflation or household welfare outputs",
-        "reserved", "P9", "reva.models.economic",
+        "outputs.macroeconomic",
+        "GDP loss, unemployment, consumer inflation or household welfare outputs",
+        "reserved",
+        "P9",
+        "reva.models.economic",
         ("structural macro/IO model with identification review", "independent causal policy model review"),
         reason="exposure arithmetic is not a macroeconomic or welfare model",
     ),
     Capability(
-        "forecasting.baselines", "last_value_v1, log_drift_v1 and local_level_log_v1 forecasts", "implemented",
-        "P5", "reva.models.forecasting",
+        "forecasting.baselines",
+        "last_value_v1, log_drift_v1 and local_level_log_v1 forecasts",
+        "implemented",
+        "P5",
+        "reva.models.forecasting",
         ("fit inside fold", "insufficient observations produce an ineligible report", "naive baseline shown"),
     ),
     # ------------------------------------------------------------------ verification-only helpers
     Capability(
         "verification.analytic_field_aggregation",
         "Conservative spherical area-weighted aggregation of an analytic field (verification only)",
-        "implemented", "P8", "reva.models.physical.verification",
+        "implemented",
+        "P8",
+        "reva.models.physical.verification",
         (
             "constant field returns its exact value",
             "separable analytic field matches closed-form spherical integral to 1e-9 relative",
@@ -226,16 +258,22 @@ _BASE: tuple[Capability, ...] = (
         ),
     ),
     Capability(
-        "verification.double_entry_balance", "Double-entry and stock-flow consistency verifier (verification only)",
-        "implemented", "P9", "reva.extensions.io_sfc",
+        "verification.double_entry_balance",
+        "Double-entry and stock-flow consistency verifier (verification only)",
+        "implemented",
+        "P9",
+        "reva.extensions.io_sfc",
         ("every transaction balances per unit", "instrument claims net to zero", "opening + flows = closing"),
         interface="reva.extensions.io_sfc",
         verification_only=True,
         notes="Pure checker of supplied ledgers; there is no SFC or IO model in this build.",
     ),
     Capability(
-        "verification.external_model_lifecycle", "BMI-style external-model lifecycle conformance checker",
-        "implemented", "P8", "reva.models.physical.adapter",
+        "verification.external_model_lifecycle",
+        "BMI-style external-model lifecycle conformance checker",
+        "implemented",
+        "P8",
+        "reva.models.physical.adapter",
         ("initialize/update/get_value/finalize lifecycle exercised", "declared units and monotone model time"),
         interface="reva.models.physical.adapter",
         verification_only=True,
@@ -243,7 +281,10 @@ _BASE: tuple[Capability, ...] = (
     ),
     # ------------------------------------------------------------------ P8 physical fields
     Capability(
-        "physical.field_adapter", "CF/COG/Zarr physical-field adapter and STAC asset catalogue", "reserved", "P8",
+        "physical.field_adapter",
+        "CF/COG/Zarr physical-field adapter and STAC asset catalogue",
+        "reserved",
+        "P8",
         "reva.models.physical.fields",
         (
             "CF metadata (standard name, units, calendar, CRS, axes, cell methods) validated on ingest",
@@ -254,7 +295,10 @@ _BASE: tuple[Capability, ...] = (
         interface="reva.models.physical.fields",
     ),
     Capability(
-        "physical.field_to_region", "Conservative field-to-region aggregation of real datasets", "reserved", "P8",
+        "physical.field_to_region",
+        "Conservative field-to-region aggregation of real datasets",
+        "reserved",
+        "P8",
         "reva.world.regridding",
         (
             "known analytic field integrates correctly (see verification.analytic_field_aggregation)",
@@ -266,13 +310,19 @@ _BASE: tuple[Capability, ...] = (
         available_instead=("verification.analytic_field_aggregation",),
     ),
     Capability(
-        "physical.hazard_exposure", "Bounded historical heat/drought exposure dataset", "reserved", "P8",
+        "physical.hazard_exposure",
+        "Bounded historical heat/drought exposure dataset",
+        "reserved",
+        "P8",
         "reva.adapters.physical",
         ("withheld temporal/spatial validation", "no weather forecast claimed from climate averages"),
         reason="no hazard dataset has been acquired, validated or licensed",
     ),
     Capability(
-        "physical.external_model", "Coupled external physical model via BMI/FMI port", "reserved", "P8",
+        "physical.external_model",
+        "Coupled external physical model via BMI/FMI port",
+        "reserved",
+        "P8",
         "reva.models.physical.adapter",
         ("external-model port conformance", "calendar/timestep/support translation as versioned components"),
         reason="no external model is integrated; only the conformance protocol and checker exist",
@@ -281,8 +331,11 @@ _BASE: tuple[Capability, ...] = (
     ),
     # ------------------------------------------------------------------ P9 economics
     Capability(
-        "economic.input_output", "Multi-region sector input-output model with capacity constraints", "reserved",
-        "P9", "reva.models.economic.io",
+        "economic.input_output",
+        "Multi-region sector input-output model with capacity constraints",
+        "reserved",
+        "P9",
+        "reva.models.economic.io",
         (
             "accounting balances",
             "nonnegative feasible production",
@@ -293,7 +346,10 @@ _BASE: tuple[Capability, ...] = (
         interface="reva.extensions.io_sfc",
     ),
     Capability(
-        "economic.sfc_ledger", "Stock-flow-consistent financial ledger model", "reserved", "P9",
+        "economic.sfc_ledger",
+        "Stock-flow-consistent financial ledger model",
+        "reserved",
+        "P9",
         "reva.models.economic.ledger",
         ("double-entry balance on every period", "stock-flow reconciliation", "revaluation separated from flows"),
         reason="no sector balance-sheet data or SFC behavioural model exists; only a ledger verifier",
@@ -301,14 +357,20 @@ _BASE: tuple[Capability, ...] = (
         available_instead=("verification.double_entry_balance",),
     ),
     Capability(
-        "causal.policy_model", "Independently reviewed causal policy model", "reserved", "P9",
+        "causal.policy_model",
+        "Independently reviewed causal policy model",
+        "reserved",
+        "P9",
         "reva.models.economic",
         ("SCM/identification profile", "independent identification review"),
         reason="no causal identification profile has been reviewed; interventions remain typed assumptions",
     ),
     # ------------------------------------------------------------------ P10 population
     Capability(
-        "population.households", "Household-aware synthetic population", "reserved", "P10",
+        "population.households",
+        "Household-aware synthetic population",
+        "reserved",
+        "P10",
         "reva.population.households",
         (
             "licensed/approved joint household data",
@@ -320,47 +382,64 @@ _BASE: tuple[Capability, ...] = (
         interface="reva.extensions.population",
     ),
     Capability(
-        "population.privacy_accounting", "Differential-privacy accounting for population releases", "reserved",
-        "P10", "reva.population.privacy",
+        "population.privacy_accounting",
+        "Differential-privacy accounting for population releases",
+        "reserved",
+        "P10",
+        "reva.population.privacy",
         ("explicit epsilon/delta and neighbouring relation", "privacy attack assessment"),
         reason="no sensitive microdata is processed and no DP mechanism is implemented",
         interface="reva.extensions.population",
     ),
     Capability(
-        "compression.network", "Network-aware population compression and rare-event benchmarks", "reserved",
-        "P10", "reva.compression.network",
+        "compression.network",
+        "Network-aware population compression and rare-event benchmarks",
+        "reserved",
+        "P10",
+        "reva.compression.network",
         ("intervention/subgroup/tail compression certificates pass",),
         reason="household/contact networks are not represented",
     ),
     # ------------------------------------------------------------------ P11 autonomy
     Capability(
-        "autonomy.external_sandbox_runner", "Disposable VM/microVM runner for generated code", "blocked", "P11",
+        "autonomy.external_sandbox_runner",
+        "Disposable VM/microVM runner for generated code",
+        "blocked",
+        "P11",
         "reva.autonomy.external_runner",
         (
             "deliberate privilege/egress/resource attacks blocked",
             "no secrets, read-only inputs, egress blocked by default, bounded CPU/RAM/disk/time",
             "independent gate evidence",
         ),
-        reason=f"no secure external runner is configured ({SANDBOX_ENDPOINT_ENV} unset); proposals remain "
-        "unexecuted",
+        reason=f"no secure external runner is configured ({SANDBOX_ENDPOINT_ENV} unset); proposals remain unexecuted",
         interface="reva.extensions.runner",
         requires_config=(SANDBOX_ENDPOINT_ENV,),
     ),
     Capability(
-        "autonomy.parser_repair", "Autonomous parser-repair branches", "reserved", "P11",
+        "autonomy.parser_repair",
+        "Autonomous parser-repair branches",
+        "reserved",
+        "P11",
         "reva.autonomy.code_changes",
         ("isolated branch + external runner evidence", "named review for T2"),
         reason="generated parser code cannot run without autonomy.external_sandbox_runner",
     ),
     Capability(
-        "models.shadow_promotion", "Shadow models, locked-holdout tournament and signed promotion", "reserved",
-        "P11", "reva.operations.releases",
+        "models.shadow_promotion",
+        "Shadow models, locked-holdout tournament and signed promotion",
+        "reserved",
+        "P11",
+        "reva.operations.releases",
         ("no holdout access by proposer", "rollback exercised", "prospective improvement or rollback"),
         reason="signed promotion and locked holdouts are not implemented",
     ),
     # ------------------------------------------------------------------ P12 decisions
     Capability(
-        "decision.search", "Robust multi-objective policy search", "reserved", "P12",
+        "decision.search",
+        "Robust multi-objective policy search",
+        "reserved",
+        "P12",
         "reva.decision.optimise",
         (
             "utility and constraints explicit in a DecisionSpec",
@@ -371,21 +450,30 @@ _BASE: tuple[Capability, ...] = (
         interface="reva.extensions.decision",
     ),
     Capability(
-        "decision.multi_actor", "Multi-actor reaction models", "reserved", "P12",
+        "decision.multi_actor",
+        "Multi-actor reaction models",
+        "reserved",
+        "P12",
         "reva.decision.reactions",
         ("bounded two-actor test solved", "multiple equilibria retained", "no unsupported equilibrium claim"),
         reason="no reaction model or equilibrium solver has been validated",
         interface="reva.extensions.decision",
     ),
     Capability(
-        "domains.ecological_social", "Ecological, health, governance and language domain plugins", "reserved",
-        "P12", "reva.models.ecological",
+        "domains.ecological_social",
+        "Ecological, health, governance and language domain plugins",
+        "reserved",
+        "P12",
+        "reva.models.ecological",
         ("concepts, sources, model/measurement contract, tests and a benefiting task per domain",),
         reason="no planetary domain beyond the crude-exposure vertical slice has entered production",
     ),
     # ------------------------------------------------------------------ later
     Capability(
-        "query.ask_reva", "Conversational 'Ask REVA' bounded query compiler", "reserved", "unscheduled",
+        "query.ask_reva",
+        "Conversational 'Ask REVA' bounded query compiler",
+        "reserved",
+        "unscheduled",
         "reva.api",
         (
             "prose compiled only into a validated QuerySpec",
@@ -437,15 +525,21 @@ def not_available(capability_id: str, settings: Any | None = None) -> Capability
     cap = get(capability_id, settings)
     if cap is None:
         return CapabilityNotAvailable(
-            capability_id=capability_id, status="unknown", phase=None,
-            reason="capability is not declared in the catalogue", required_evidence=(),
+            capability_id=capability_id,
+            status="unknown",
+            phase=None,
+            reason="capability is not declared in the catalogue",
+            required_evidence=(),
         )
     if cap.available:
         return None
     assert cap.reason is not None and cap.status != "implemented"
     return CapabilityNotAvailable(
-        capability_id=cap.capability_id, status=cap.status, phase=cap.phase,
-        reason=cap.reason, required_evidence=cap.required_evidence,
+        capability_id=cap.capability_id,
+        status=cap.status,
+        phase=cap.phase,
+        reason=cap.reason,
+        required_evidence=cap.required_evidence,
     )
 
 

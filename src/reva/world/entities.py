@@ -203,7 +203,9 @@ def alias_from_row(r: Any) -> Alias:
     )
 
 
-def load_aliases(conn: Connection, entity_ids: Sequence[UUID], *, as_of: datetime | None = None) -> dict[UUID, list[Alias]]:
+def load_aliases(
+    conn: Connection, entity_ids: Sequence[UUID], *, as_of: datetime | None = None
+) -> dict[UUID, list[Alias]]:
     """Aliases recorded at/before ``as_of`` for the given entities, grouped by entity."""
     require_aware(as_of, "as_of")
     out: dict[UUID, list[Alias]] = {eid: [] for eid in entity_ids}

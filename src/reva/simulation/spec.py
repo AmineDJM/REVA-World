@@ -90,21 +90,17 @@ class ScenarioSpec(BaseModel):
 
 def validate_scenario_spec(data: dict[str, Any], *, allow_fixture_baseline: bool = False) -> ScenarioSpec:
     """JSON Schema validation, then scope checks (still required after schema)."""
+    from reva.capabilities import require
+
     if isinstance(data, dict) and data.get("fidelity") in RESERVED_FIDELITY:
-        raise CapabilityGap(
-            f"fidelity {data['fidelity']} is reserved and not available in V1",
-            capability=f"fidelity.{data['fidelity']}",
-            reason="L3 requires justified parameter distributions; L4 requires research execution",
-        )
+        require(f"fidelity.{data['fidelity']}")  # raises a structured CapabilityGap
     if isinstance(data, dict) and isinstance(data.get("horizon"), dict) and data["horizon"].get("periods") != 1:
-        raise CapabilityGap(
-            "only a one annual accounting period horizon is supported; dynamic multi-year effects are unsupported",
-            capability="horizon.multi_period",
-        )
+        require("horizon.multi_period", requested_periods=data["horizon"].get("periods"))
     unsupported = {"gdp_loss", "unemployment", "consumer_inflation", "household_welfare"} & set(
         data.get("outputs", []) if isinstance(data, dict) else []
     )
     if unsupported:
+        require("outputs.macroeconomic", requested=sorted(unsupported))
         raise CapabilityGap(
             f"outputs {sorted(unsupported)} are not produced by an accounting exposure model",
             capability="outputs.macroeconomic",

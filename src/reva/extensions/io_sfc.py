@@ -82,8 +82,12 @@ class LedgerTransaction:
 @dataclass(frozen=True)
 class LedgerFinding:
     code: Literal[
-        "unbalanced_transaction", "revaluation_with_counterparty", "revaluation_physical_unit",
-        "boundary_without_rest_of_world", "stock_flow_mismatch", "instrument_not_zero_sum",
+        "unbalanced_transaction",
+        "revaluation_with_counterparty",
+        "revaluation_physical_unit",
+        "boundary_without_rest_of_world",
+        "stock_flow_mismatch",
+        "instrument_not_zero_sum",
         "duplicate_transaction_id",
     ]
     message: str
@@ -114,36 +118,51 @@ def verify_double_entry(
     for tx in transactions:
         n += 1
         if tx.transaction_id in seen:
-            findings.append(LedgerFinding("duplicate_transaction_id", "transaction id appears twice",
-                                          tx.transaction_id))
+            findings.append(
+                LedgerFinding("duplicate_transaction_id", "transaction id appears twice", tx.transaction_id)
+            )
         seen.add(tx.transaction_id)
         per_unit: dict[str, Decimal] = defaultdict(Decimal)
         for p in tx.postings:
             per_unit[p.unit] += p.amount
         for unit, residual in sorted(per_unit.items()):
             if abs(residual) > tolerance:
-                findings.append(LedgerFinding(
-                    "unbalanced_transaction",
-                    f"postings in {unit} sum to {residual}, not zero",
-                    tx.transaction_id, (unit,), residual,
-                ))
+                findings.append(
+                    LedgerFinding(
+                        "unbalanced_transaction",
+                        f"postings in {unit} sum to {residual}, not zero",
+                        tx.transaction_id,
+                        (unit,),
+                        residual,
+                    )
+                )
         sectors = {p.sector for p in tx.postings}
         if tx.kind == "revaluation":
             if len(sectors) != 1:
-                findings.append(LedgerFinding(
-                    "revaluation_with_counterparty",
-                    f"revaluation touches sectors {sorted(sectors)}; it must stay within one holder",
-                    tx.transaction_id))
+                findings.append(
+                    LedgerFinding(
+                        "revaluation_with_counterparty",
+                        f"revaluation touches sectors {sorted(sectors)}; it must stay within one holder",
+                        tx.transaction_id,
+                    )
+                )
             physical = sorted({p.unit for p in tx.postings} - monetary_units)
             if physical:
-                findings.append(LedgerFinding(
-                    "revaluation_physical_unit",
-                    f"revaluation posts physical units {physical}; valuation changes carry no physical flow",
-                    tx.transaction_id))
+                findings.append(
+                    LedgerFinding(
+                        "revaluation_physical_unit",
+                        f"revaluation posts physical units {physical}; valuation changes carry no physical flow",
+                        tx.transaction_id,
+                    )
+                )
         if tx.kind == "boundary_exchange" and BOUNDARY_SECTOR not in sectors:
-            findings.append(LedgerFinding(
-                "boundary_without_rest_of_world",
-                f"boundary exchange must post the counterparty to {BOUNDARY_SECTOR!r}", tx.transaction_id))
+            findings.append(
+                LedgerFinding(
+                    "boundary_without_rest_of_world",
+                    f"boundary exchange must post the counterparty to {BOUNDARY_SECTOR!r}",
+                    tx.transaction_id,
+                )
+            )
     return LedgerCheckReport(balanced=not findings, findings=tuple(findings), transactions_checked=n)
 
 
@@ -172,20 +191,29 @@ def verify_stock_flow(
     for key in sorted(set(expected) | set(actual)):
         diff = actual.get(key, Decimal(0)) - expected.get(key, Decimal(0))
         if abs(diff) > tolerance:
-            findings.append(LedgerFinding(
-                "stock_flow_mismatch", f"closing differs from opening + flows by {diff}", key=key, residual=diff))
+            findings.append(
+                LedgerFinding(
+                    "stock_flow_mismatch", f"closing differs from opening + flows by {diff}", key=key, residual=diff
+                )
+            )
     claims: dict[tuple[str, str], Decimal] = defaultdict(Decimal)
     for (_sector, account, unit), v in actual.items():
         if account in financial_accounts:
             claims[(account, unit)] += v
     for (account, unit), total in sorted(claims.items()):
         if abs(total) > tolerance:
-            findings.append(LedgerFinding(
-                "instrument_not_zero_sum",
-                f"financial instrument {account} ({unit}) nets to {total} across sectors; assets must equal "
-                "liabilities", key=(account, unit), residual=total))
-    return LedgerCheckReport(balanced=not findings, findings=tuple(findings),
-                             transactions_checked=base.transactions_checked)
+            findings.append(
+                LedgerFinding(
+                    "instrument_not_zero_sum",
+                    f"financial instrument {account} ({unit}) nets to {total} across sectors; assets must equal "
+                    "liabilities",
+                    key=(account, unit),
+                    residual=total,
+                )
+            )
+    return LedgerCheckReport(
+        balanced=not findings, findings=tuple(findings), transactions_checked=base.transactions_checked
+    )
 
 
 # --------------------------------------------------------------------------- protocols (reserved)

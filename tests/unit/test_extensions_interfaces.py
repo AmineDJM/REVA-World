@@ -21,13 +21,20 @@ def P(sector, account, unit, amount):
 
 def purchase(tx_id="t1", amount="100"):
     """Household buys goods from firms, paying with deposits."""
-    return io_sfc.LedgerTransaction(tx_id, "transaction", (
-        P("households", "deposits", "USD", f"-{amount}"), P("firms", "deposits", "USD", amount),
-        P("households", "goods", "USD", amount), P("firms", "goods", "USD", f"-{amount}"),
-    ))
+    return io_sfc.LedgerTransaction(
+        tx_id,
+        "transaction",
+        (
+            P("households", "deposits", "USD", f"-{amount}"),
+            P("firms", "deposits", "USD", amount),
+            P("households", "goods", "USD", amount),
+            P("firms", "goods", "USD", f"-{amount}"),
+        ),
+    )
 
 
 # ----------------------------------------------------------------------------- P9 ledger verifier
+
 
 def test_balanced_ledger_passes():
     rep = io_sfc.verify_double_entry([purchase()])
@@ -35,8 +42,9 @@ def test_balanced_ledger_passes():
 
 
 def test_imbalance_detected_with_residual():
-    tx = io_sfc.LedgerTransaction("bad", "transaction", (
-        P("households", "deposits", "USD", "-100"), P("firms", "deposits", "USD", "99.99")))
+    tx = io_sfc.LedgerTransaction(
+        "bad", "transaction", (P("households", "deposits", "USD", "-100"), P("firms", "deposits", "USD", "99.99"))
+    )
     rep = io_sfc.verify_double_entry([tx])
     assert not rep.balanced
     f = rep.findings[0]
@@ -44,33 +52,46 @@ def test_imbalance_detected_with_residual():
 
 
 def test_money_never_balances_against_energy():
-    tx = io_sfc.LedgerTransaction("mix", "transaction", (
-        P("firms", "deposits", "USD", "-100"), P("firms", "fuel", "MJ", "100")))
+    tx = io_sfc.LedgerTransaction(
+        "mix", "transaction", (P("firms", "deposits", "USD", "-100"), P("firms", "fuel", "MJ", "100"))
+    )
     rep = io_sfc.verify_double_entry([tx])
     assert {f.key for f in rep.findings} == {("USD",), ("MJ",)}
 
 
 def test_revaluation_rules_and_boundary_exchange():
-    reval_ok = io_sfc.LedgerTransaction("rv", "revaluation", (
-        P("banks", "foreign_bonds", "USD", "5"), P("banks", "net_worth", "USD", "-5")))
-    reval_cp = io_sfc.LedgerTransaction("rv2", "revaluation", (
-        P("banks", "foreign_bonds", "USD", "5"), P("government", "net_worth", "USD", "-5")))
-    reval_phys = io_sfc.LedgerTransaction("rv3", "revaluation", (
-        P("firms", "oil", "bbl", "5"), P("firms", "oil_adj", "bbl", "-5")))
-    boundary = io_sfc.LedgerTransaction("imp", "boundary_exchange", (
-        P("firms", "deposits", "USD", "-10"), P("households", "deposits", "USD", "10")))
+    reval_ok = io_sfc.LedgerTransaction(
+        "rv", "revaluation", (P("banks", "foreign_bonds", "USD", "5"), P("banks", "net_worth", "USD", "-5"))
+    )
+    reval_cp = io_sfc.LedgerTransaction(
+        "rv2", "revaluation", (P("banks", "foreign_bonds", "USD", "5"), P("government", "net_worth", "USD", "-5"))
+    )
+    reval_phys = io_sfc.LedgerTransaction(
+        "rv3", "revaluation", (P("firms", "oil", "bbl", "5"), P("firms", "oil_adj", "bbl", "-5"))
+    )
+    boundary = io_sfc.LedgerTransaction(
+        "imp", "boundary_exchange", (P("firms", "deposits", "USD", "-10"), P("households", "deposits", "USD", "10"))
+    )
     rep = io_sfc.verify_double_entry([reval_ok, reval_cp, reval_phys, boundary])
     codes = sorted(f.code for f in rep.findings)
     assert codes == ["boundary_without_rest_of_world", "revaluation_physical_unit", "revaluation_with_counterparty"]
 
 
 def test_stock_flow_consistency_and_zero_sum_claims():
-    opening = {("households", "deposits", "USD"): D(500), ("banks", "deposits", "USD"): D(-1000),
-               ("firms", "deposits", "USD"): D(500), ("households", "goods", "USD"): D(0),
-               ("firms", "goods", "USD"): D(300)}
-    closing = {("households", "deposits", "USD"): D(400), ("banks", "deposits", "USD"): D(-1000),
-               ("firms", "deposits", "USD"): D(600), ("households", "goods", "USD"): D(100),
-               ("firms", "goods", "USD"): D(200)}
+    opening = {
+        ("households", "deposits", "USD"): D(500),
+        ("banks", "deposits", "USD"): D(-1000),
+        ("firms", "deposits", "USD"): D(500),
+        ("households", "goods", "USD"): D(0),
+        ("firms", "goods", "USD"): D(300),
+    }
+    closing = {
+        ("households", "deposits", "USD"): D(400),
+        ("banks", "deposits", "USD"): D(-1000),
+        ("firms", "deposits", "USD"): D(600),
+        ("households", "goods", "USD"): D(100),
+        ("firms", "goods", "USD"): D(200),
+    }
     ok = io_sfc.verify_stock_flow(opening, [purchase()], closing, financial_accounts=frozenset({"deposits"}))
     assert ok.balanced, ok.findings
     wrong = dict(closing)
@@ -98,9 +119,17 @@ def test_io_and_sfc_models_refuse():
 
 # ----------------------------------------------------------------------------- P9 feedback solver
 
+
 def contract(**kw):
-    base = dict(step_size=1.0, criterion="residual_inf_norm", tolerance=1e-8, damping=0.5, max_iterations=200,
-                conservative_exchange=True, error_bounds={"price": 1e-6, "quantity": 1e-6})
+    base = dict(
+        step_size=1.0,
+        criterion="residual_inf_norm",
+        tolerance=1e-8,
+        damping=0.5,
+        max_iterations=200,
+        conservative_exchange=True,
+        error_bounds={"price": 1e-6, "quantity": 1e-6},
+    )
     base.update(kw)
     return feedback.ConvergenceContract(**base)
 
@@ -121,8 +150,17 @@ def test_feedback_solve_refuses_even_with_valid_contract():
     assert d["refusal"] == "not_implemented_in_v1" and d["status"] == "reserved" and d["phase"] == "P9"
 
 
-@pytest.mark.parametrize("bad", [dict(damping=0.0), dict(damping=1.5), dict(conservative_exchange=False),
-                                 dict(error_bounds={}), dict(max_iterations=0), dict(tolerance=float("nan"))])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        dict(damping=0.0),
+        dict(damping=1.5),
+        dict(conservative_exchange=False),
+        dict(error_bounds={}),
+        dict(max_iterations=0),
+        dict(tolerance=float("nan")),
+    ],
+)
 def test_invalid_contracts_rejected(bad):
     with pytest.raises(ValidationProblem):
         contract(**bad)
@@ -146,15 +184,27 @@ def test_outcome_never_presents_last_iterate_as_equilibrium():
 
 # ----------------------------------------------------------------------------- P10 population / privacy
 
+
 def test_dp_budget_requires_explicit_terms():
     b = population.DPBudget(1.0, 1e-6, "add_remove_household", "household", "zero_concentrated_dp", "release X")
     with pytest.raises(CapabilityGap) as ei:
         population.open_privacy_accountant(b)
     assert ei.value.details["capability"] == "population.privacy_accounting"
-    for kw in (dict(epsilon=0.0), dict(epsilon=float("inf")), dict(delta=1.0), dict(unit_of_privacy="person"),
-               dict(justification=" ")):
-        args = dict(epsilon=1.0, delta=1e-6, neighbouring="add_remove_household", unit_of_privacy="household",
-                    composition="basic_sequential", justification="j")
+    for kw in (
+        dict(epsilon=0.0),
+        dict(epsilon=float("inf")),
+        dict(delta=1.0),
+        dict(unit_of_privacy="person"),
+        dict(justification=" "),
+    ):
+        args = dict(
+            epsilon=1.0,
+            delta=1e-6,
+            neighbouring="add_remove_household",
+            unit_of_privacy="household",
+            composition="basic_sequential",
+            justification="j",
+        )
         args.update(kw)
         with pytest.raises(ValidationProblem):
             population.DPBudget(**args)
@@ -165,8 +215,9 @@ def test_household_synthesis_refuses_and_validates_sources():
     with pytest.raises(ValidationProblem):
         population.HouseholdSynthesisSpec("FRA residents", "2021", ("wpp",), (src,), ("one head",), "bounds")
     with pytest.raises(ValidationProblem):
-        population.HouseholdSynthesisSpec("FRA residents", "2021", ("wpp",), (), ("one head",), "bounds",
-                                          sensitive_attributes_allowed=("religion",))
+        population.HouseholdSynthesisSpec(
+            "FRA residents", "2021", ("wpp",), (), ("one head",), "bounds", sensitive_attributes_allowed=("religion",)
+        )
     spec = population.HouseholdSynthesisSpec("FRA residents", "2021", ("wpp",), (), ("one head",), "bounds")
     with pytest.raises(CapabilityGap) as ei:
         population.synthesize_households(spec, seed=1)
@@ -184,9 +235,17 @@ def test_runner_policy_defaults_are_safe():
     assert p.network_blocked and p.secrets_mounted is False and p.inputs_read_only and p.disposable
 
 
-@pytest.mark.parametrize("kw", [dict(isolation="python_subprocess"), dict(isolation="docker_default"),
-                                dict(secrets_mounted=True), dict(inputs_read_only=False),
-                                dict(allowlisted_dependencies=("numpy",)), dict(egress_allowlist=("*",))])
+@pytest.mark.parametrize(
+    "kw",
+    [
+        dict(isolation="python_subprocess"),
+        dict(isolation="docker_default"),
+        dict(secrets_mounted=True),
+        dict(inputs_read_only=False),
+        dict(allowlisted_dependencies=("numpy",)),
+        dict(egress_allowlist=("*",)),
+    ],
+)
 def test_runner_policy_rejects_unsafe(kw):
     args = dict(policy_version="1", isolation="gvisor_vm", budget=BUDGET, allowlisted_dependencies=(DEP,))
     args.update(kw)
@@ -205,8 +264,9 @@ def test_run_request_refuses_secrets_and_unaddressed_inputs():
         runner.ExternalRunRequest(uuid.uuid4(), "c", h, h, (), {"REVA_SANDBOX_TOKEN": "x"})
     with pytest.raises(ValidationProblem):
         runner.RunInput("fixture", "not-a-hash", "application/json")
-    runner.ExternalRunRequest(uuid.uuid4(), "c", h, h, (runner.RunInput("f", h, "application/json"),),
-                              {"LANG": "C.UTF-8"})
+    runner.ExternalRunRequest(
+        uuid.uuid4(), "c", h, h, (runner.RunInput("f", h, "application/json"),), {"LANG": "C.UTF-8"}
+    )
 
 
 def test_resolve_runner_blocked_or_reserved(monkeypatch):
@@ -224,21 +284,35 @@ def test_resolve_runner_blocked_or_reserved(monkeypatch):
 
 # ----------------------------------------------------------------------------- P12 decisions
 
+
 def make_spec(**kw):
     args = dict(
         actor="FRA_government",
-        actions=(decision.Action("fuel_tax", "fuel excise change", "continuous", -0.1, 0.1, unit="EUR/l",
-                                 controllable_by="FRA_government"),),
-        objectives=(decision.Objective("exposure", "economic.crude_exposure_pct_gdp", "minimise", "percent"),
-                    decision.Objective("revenue", "fiscal.revenue", "maximise", "EUR",
-                                       affected_groups=("bottom_quintile",))),
-        distributional_constraints=(decision.DistributionalConstraint("dc1", "bottom_quintile", "cost_share",
-                                                                      "<=", 0.02, "1"),),
+        actions=(
+            decision.Action(
+                "fuel_tax",
+                "fuel excise change",
+                "continuous",
+                -0.1,
+                0.1,
+                unit="EUR/l",
+                controllable_by="FRA_government",
+            ),
+        ),
+        objectives=(
+            decision.Objective("exposure", "economic.crude_exposure_pct_gdp", "minimise", "percent"),
+            decision.Objective("revenue", "fiscal.revenue", "maximise", "EUR", affected_groups=("bottom_quintile",)),
+        ),
+        distributional_constraints=(
+            decision.DistributionalConstraint("dc1", "bottom_quintile", "cost_share", "<=", 0.02, "1"),
+        ),
         hard_constraints=(decision.HardConstraint("eu_min", "legal", "EU minimum excise", "Directive 2003/96/EC"),),
         risk_measure=decision.RiskMeasure("cvar", alpha=0.1),
-        horizon_periods=1, period_unit="year",
+        horizon_periods=1,
+        period_unit="year",
         discounting=decision.Discounting("none", rationale="single period"),
-        model_set=("economic.crude_exposure@1.0.0",), scenario_set=("s1", "s2"),
+        model_set=("economic.crude_exposure@1.0.0",),
+        scenario_set=("s1", "s2"),
     )
     args.update(kw)
     return decision.DecisionSpec(**args)

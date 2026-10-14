@@ -57,10 +57,17 @@ def test_v1_fidelity_envelope():
 
 def test_required_reserved_entries_present():
     expected = {
-        "physical.field_adapter": "P8", "physical.field_to_region": "P8", "physical.external_model": "P8",
-        "economic.input_output": "P9", "economic.sfc_ledger": "P9", "coupling.feedback": "P9",
-        "population.households": "P10", "population.privacy_accounting": "P10",
-        "autonomy.external_sandbox_runner": "P11", "decision.search": "P12", "decision.multi_actor": "P12",
+        "physical.field_adapter": "P8",
+        "physical.field_to_region": "P8",
+        "physical.external_model": "P8",
+        "economic.input_output": "P9",
+        "economic.sfc_ledger": "P9",
+        "coupling.feedback": "P9",
+        "population.households": "P10",
+        "population.privacy_accounting": "P10",
+        "autonomy.external_sandbox_runner": "P11",
+        "decision.search": "P12",
+        "decision.multi_actor": "P12",
         "query.ask_reva": "unscheduled",
     }
     for cid, phase in expected.items():

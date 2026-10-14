@@ -20,7 +20,10 @@ from reva.capabilities import require
 from reva.kernel.errors import ValidationProblem
 
 NeighbouringRelation = Literal[
-    "add_remove_individual", "substitute_individual", "add_remove_household", "substitute_household",
+    "add_remove_individual",
+    "substitute_individual",
+    "add_remove_household",
+    "substitute_household",
 ]
 Composition = Literal["basic_sequential", "advanced", "renyi_dp", "zero_concentrated_dp"]
 

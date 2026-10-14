@@ -97,8 +97,11 @@ class FeedbackOutcome:
     residual_history: tuple[float, ...] = field(default=())
 
     def __post_init__(self) -> None:
-        converged = (math.isfinite(self.final_residual) and self.final_residual <= self.tolerance
-                     and self.iterations <= self.max_iterations)
+        converged = (
+            math.isfinite(self.final_residual)
+            and self.final_residual <= self.tolerance
+            and self.iterations <= self.max_iterations
+        )
         if self.status == "converged" and not converged:
             raise ValidationProblem("status 'converged' requires final residual <= tolerance within the cap")
         if self.equilibrium_claim and self.status != "converged":
@@ -116,14 +119,22 @@ def solve(config: FeedbackSolverConfig, inputs: Mapping[str, Any] | None = None)
         raise CapabilityGap(
             "feedback coupling requires an explicit convergence contract (step size, criterion, damping, "
             "iteration cap, conservative exchange, error bounds)",
-            capability="coupling.feedback", refusal="no_convergence_contract", block_id=config.block_id,
+            capability="coupling.feedback",
+            refusal="no_convergence_contract",
+            block_id=config.block_id,
             components=list(config.components),
-            status=gap.status if gap else "implemented", phase=gap.phase if gap else None,
+            status=gap.status if gap else "implemented",
+            phase=gap.phase if gap else None,
         )
     if gap is not None:
         err = gap.to_error()
-        err.details.update(refusal="not_implemented_in_v1", block_id=config.block_id,
-                           components=list(config.components), method=config.method)
+        err.details.update(
+            refusal="not_implemented_in_v1",
+            block_id=config.block_id,
+            components=list(config.components),
+            method=config.method,
+        )
         raise err
     raise CapabilityGap(  # pragma: no cover - catalogue says reserved; never execute without a solver
-        "no feedback solver is registered", capability="coupling.feedback", refusal="no_solver")
+        "no feedback solver is registered", capability="coupling.feedback", refusal="no_solver"
+    )

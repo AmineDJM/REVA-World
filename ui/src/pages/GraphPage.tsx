@@ -9,7 +9,7 @@ import { GraphView, roleLabel } from '../components/GraphView';
 import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { ValueView } from '../components/ValueView';
-import { formatDateTime, humanize } from '../lib/format';
+import { formatDateTime, humanize, localUtcToIso } from '../lib/format';
 import { useApi } from '../lib/useApi';
 
 interface Filters {
@@ -24,12 +24,6 @@ interface Filters {
 
 const DEFAULTS: Filters = { entity: 'FRA', layer: '', period: '2023', asOf: '', origin: '', depth: 1, maxEdges: 100 };
 
-/** datetime-local value (interpreted as UTC) -> ISO-8601 with Z. */
-export function localUtcToIso(v: string): string | undefined {
-  if (!v) return undefined;
-  const d = new Date(/T\d{2}:\d{2}$/.test(v) ? `${v}:00Z` : `${v}Z`);
-  return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
-}
 
 const relColumns: ColumnDef<Relation, unknown>[] = [
   { header: 'Layer', accessorFn: (r) => humanize(r.layer) },

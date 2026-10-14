@@ -6,7 +6,8 @@ Node keys (ops.dependency / ops.dirty_node):
   anything downstream (``scenario:…``, ``model:…``, ``card:…``) registered in ops.dependency.
 
 ``evidence.observations_changed`` events seed both forms for each changed
-(concept, subject). Propagation follows ops.dependency edges (DAG descendants).
+(concept, subject); an ``observation:`` seed is only recorded as dirty when
+some registered dependency consumes it. Propagation follows ops.dependency edges (DAG descendants).
 Every strongly connected component with more than one node (a feedback
 coupling) is invalidated as a whole once any member is reached
 (reason ``coupled_component``) — cycles are never partially refreshed.
@@ -292,7 +293,11 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
                 continue
             bounds = {k: d for k, v in (payload.get("change_bounds") or {}).items()
                       if (d := _dec(v)) is not None}
-            dirty, skipped, comps = _propagate(seeds, _reachable_edges(conn, seeds), bounds)
+            edges = _reachable_edges(conn, seeds)
+            dirty, skipped, comps = _propagate(seeds, edges, bounds)
+            # Fine-grained observation seeds are only tracked when something depends on them.
+            consumers = {e.upstream for e in edges}
+            dirty = {k: r for k, r in dirty.items() if not (k.startswith("observation:") and k not in consumers)}
             covered = release_cutoffs.get(origin) if origin else None
             if covered is not None and covered >= ev.created_at:
                 dirty = {k: r for k, r in dirty.items() if not k.startswith("belief:")}

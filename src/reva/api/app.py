@@ -14,7 +14,8 @@ import logging
 import secrets
 import threading
 import time
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncIterator, Awaitable, Callable
+from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
@@ -60,10 +61,20 @@ def _lazy_engine(settings: Settings) -> Callable[[], Engine]:
     return get
 
 
-def create_app(settings: Settings | None = None) -> FastAPI:
+def create_app(settings: Settings | None = None, *, static_dir: Path | None = None) -> FastAPI:
+    """Build the app. ``static_dir`` overrides the built UI location (default: reva/api/static)."""
     settings = settings or get_settings()
     production = settings.reva_env == "production"
+    ui_dir = static_dir or STATIC_DIR
+    engine = _lazy_engine(settings)
+
+    @asynccontextmanager
+    async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        yield
+        engine.dispose()  # type: ignore[attr-defined]
+
     app = FastAPI(
+        lifespan=lifespan,
         title="REVA World API",
         version=API_VERSION,
         description=(
@@ -76,7 +87,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         openapi_url="/openapi.json",
     )
     app.state.settings = settings
-    app.state.engine = _lazy_engine(settings)
+    app.state.engine = engine
     app.state.auth = AuthService(settings, app.state.engine)
     app.state.metrics = system.RequestMetrics()
 
@@ -128,7 +139,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
 
     @app.get("/", include_in_schema=False)
     def root() -> Response:
-        index = STATIC_DIR / "index.html"
+        index = ui_dir / "index.html"
         if index.is_file():
             return FileResponse(index, headers={"Cache-Control": "no-cache"})
         return JSONResponse({"service": "reva-world-api", "api": "/v1", "health": "/health/ready",
@@ -138,10 +149,10 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def spa(path: str) -> Response:
         if path.startswith(("v1/", "health/")) or path in ("v1", "health", "metrics"):
             raise NotFound("no such endpoint")
-        index = STATIC_DIR / "index.html"
+        index = ui_dir / "index.html"
         if not index.is_file():
             raise NotFound("no such endpoint")
-        root_dir = STATIC_DIR.resolve()
+        root_dir = ui_dir.resolve()
         candidate = (root_dir / path).resolve()
         if candidate.is_relative_to(root_dir) and candidate.is_file() and not any(
             part.startswith(".") for part in candidate.relative_to(root_dir).parts
@@ -149,10 +160,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             cache = "public, max-age=31536000, immutable" if "/assets/" in f"/{path}" else "no-cache"
             return FileResponse(candidate, headers={"Cache-Control": cache})
         return FileResponse(index, headers={"Cache-Control": "no-cache"})
-
-    @app.on_event("shutdown")
-    def _dispose() -> None:
-        app.state.engine.dispose()
 
     return app
 

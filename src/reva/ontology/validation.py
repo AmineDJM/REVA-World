@@ -356,7 +356,8 @@ def basis_findings(a: MeasurementBasis | None, b: MeasurementBasis | None, *, cu
 
 def _support_findings(a: Support, b: Support, purpose: Purpose) -> list[Finding]:
     out: list[Finding | None] = [
-        _neq("support.aggregation", "support_aggregation_mismatch", a.aggregation, b.aggregation, "support aggregation"),
+        _neq("support.aggregation", "support_aggregation_mismatch", a.aggregation, b.aggregation,
+             "support aggregation"),
         _neq("support.population", "support_population_mismatch", a.population.universe, b.population.universe,
              "support population universe"),
         _neq("support.spatial", "spatial_scheme_mismatch", a.spatial.scheme, b.spatial.scheme, "spatial scheme"),
@@ -383,7 +384,8 @@ def check_support_against_profile(profile: SemanticProfile, support: Support) ->
     if support.aggregation != profile.aggregation:
         out.append(Finding(aspect="support.aggregation", code="support_profile_aggregation_mismatch",
                            severity="incompatible",
-                           message=f"support aggregation {support.aggregation} contradicts concept {profile.aggregation}"))
+                           message=f"support aggregation {support.aggregation} contradicts concept "
+                                   f"{profile.aggregation}"))
     if profile.population_universe != "not_applicable" and support.population.universe != profile.population_universe:
         out.append(Finding(aspect="support.population", code="support_profile_universe_mismatch",
                            severity="incompatible",

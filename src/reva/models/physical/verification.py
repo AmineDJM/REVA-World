@@ -63,7 +63,8 @@ class RegularLatLonGrid:
             raise CapabilityGap(
                 f"verification aggregation supports geographic CRS {SUPPORTED_CRS} only; "
                 f"reprojection of {self.crs!r} is a reserved P8 capability",
-                capability="physical.field_to_region", crs=self.crs,
+                capability="physical.field_to_region",
+                crs=self.crs,
             )
         lat = np.asarray(self.lat_edges, dtype=np.float64)
         lon = np.asarray(self.lon_edges, dtype=np.float64)
@@ -81,8 +82,9 @@ class RegularLatLonGrid:
             raise ValidationProblem("sphere radius must be positive and finite")
 
     @classmethod
-    def global_regular(cls, n_lat: int, n_lon: int, *, lon0: float = -180.0,
-                       radius_m: float = MEAN_EARTH_RADIUS_M) -> RegularLatLonGrid:
+    def global_regular(
+        cls, n_lat: int, n_lon: int, *, lon0: float = -180.0, radius_m: float = MEAN_EARTH_RADIUS_M
+    ) -> RegularLatLonGrid:
         if n_lat < 1 or n_lon < 1:
             raise ValidationProblem("grid sizes must be positive")
         lat = np.linspace(-90.0, 90.0, n_lat + 1)
@@ -139,8 +141,10 @@ class LatLonRegion:
         return w + self.lon_width_deg > 180.0 + _TOL_DEG
 
     def area_m2(self, radius_m: float = MEAN_EARTH_RADIUS_M) -> float:
-        return radius_m**2 * math.radians(self.lon_width_deg) * (
-            math.sin(math.radians(self.north)) - math.sin(math.radians(self.south))
+        return (
+            radius_m**2
+            * math.radians(self.lon_width_deg)
+            * (math.sin(math.radians(self.north)) - math.sin(math.radians(self.south)))
         )
 
 
@@ -250,8 +254,13 @@ def aggregate_to_regions(
             )
         )
     return AggregationReport(
-        method=METHOD, verification_only=True, label=label, radius_m=grid.radius_m,
-        grid_shape=grid.shape, grid_integral=grid_integral, regions=tuple(out),
+        method=METHOD,
+        verification_only=True,
+        label=label,
+        radius_m=grid.radius_m,
+        grid_shape=grid.shape,
+        grid_integral=grid_integral,
+        regions=tuple(out),
     )
 
 

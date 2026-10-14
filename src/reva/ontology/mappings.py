@@ -266,7 +266,8 @@ def assess_identity(source: Concept, target: Concept) -> RelationAssessment:
 def check_mapping_against_concepts(mapping: ConceptMapping, source: Concept, target: Concept) -> CompatibilityReport:
     """A declared ``exact`` mapping between two concepts must not contradict their semantics."""
     if mapping.target.key() != f"{target.concept_id}@{target.version}":
-        raise ValidationProblem(f"mapping {mapping.mapping_key} targets {mapping.target.key()}, not {target.concept_id}")
+        raise ValidationProblem(
+            f"mapping {mapping.mapping_key} targets {mapping.target.key()}, not {target.concept_id}")
     report = compare_concepts(source, target)
     if mapping.relation is RelationType.exact and report.verdict is not Verdict.compatible:
         raise IncompatibleSemantics(

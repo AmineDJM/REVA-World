@@ -678,3 +678,28 @@ progress {
     grid-template-columns: 1fr;
   }
 }
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+.fixture-inline {
+  color: var(--fixture);
+  font-size: 0.8rem;
+}
+.revision-timeline li[aria-current='true'] {
+  font-weight: 600;
+}
+.headline {
+  font-size: 1.05rem;
+}
+.sensitivity-range {
+  border-bottom: 2px dashed #9a3412;
+}

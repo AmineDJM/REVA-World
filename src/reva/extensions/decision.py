@@ -46,8 +46,11 @@ class Action:
 
     def __post_init__(self) -> None:
         if self.domain in ("continuous", "integer"):
-            if self.lower is None or self.upper is None or not (math.isfinite(self.lower)
-                                                                 and math.isfinite(self.upper)):
+            if (
+                self.lower is None
+                or self.upper is None
+                or not (math.isfinite(self.lower) and math.isfinite(self.upper))
+            ):
                 raise ValidationProblem(f"action {self.action_id!r} needs finite bounds")
             if self.lower > self.upper:
                 raise ValidationProblem(f"action {self.action_id!r} has lower > upper")
@@ -116,9 +119,9 @@ class Discounting:
     rationale: str = ""
 
     def __post_init__(self) -> None:
-        if self.kind == "constant_exponential" and not (self.annual_rate is not None
-                                                        and math.isfinite(self.annual_rate)
-                                                        and -0.5 < self.annual_rate < 1):
+        if self.kind == "constant_exponential" and not (
+            self.annual_rate is not None and math.isfinite(self.annual_rate) and -0.5 < self.annual_rate < 1
+        ):
             raise ValidationProblem("exponential discounting needs a finite annual rate")
         if not self.rationale.strip():
             raise ValidationProblem("discounting is a normative choice; a rationale is required")
@@ -190,10 +193,12 @@ class ParetoFrontier:
     model_ambiguity: Mapping[str, Any]
     method: str
     method_version: str
-    caveats: tuple[str, ...] = field(default=(
-        "all suggested actions are conditional on the declared model set and scenarios",
-        "no point is 'the best policy'; trade-offs and normative weights remain choices",
-    ))
+    caveats: tuple[str, ...] = field(
+        default=(
+            "all suggested actions are conditional on the declared model set and scenarios",
+            "no point is 'the best policy'; trade-offs and normative weights remain choices",
+        )
+    )
 
     def __post_init__(self) -> None:
         if not self.caveats:
@@ -224,7 +229,12 @@ class ActorSpec:
 class MultiActorSpec:
     actors: tuple[ActorSpec, ...]
     equilibrium_concept: Literal[
-        "nash", "bayesian_nash", "stackelberg", "correlated", "level_k", "non_equilibrium_trajectory",
+        "nash",
+        "bayesian_nash",
+        "stackelberg",
+        "correlated",
+        "level_k",
+        "non_equilibrium_trajectory",
     ]
     reaction_models: tuple[str, ...]
     """Several plausible reaction models must be supported; one is accepted but flagged."""
@@ -247,13 +257,20 @@ class MultiActorSpec:
 
 def optimise(spec: DecisionSpec) -> ParetoFrontier:
     """Reserved: raises ``CapabilityGap`` (decision.search) with the spec digest."""
-    require("decision.search", spec_digest=spec.digest(), actor=spec.actor, objectives=len(spec.objectives),
-            models=len(spec.model_set), risk_measure=spec.risk_measure.kind)
+    require(
+        "decision.search",
+        spec_digest=spec.digest(),
+        actor=spec.actor,
+        objectives=len(spec.objectives),
+        models=len(spec.model_set),
+        risk_measure=spec.risk_measure.kind,
+    )
     raise AssertionError("unreachable")  # pragma: no cover
 
 
 def solve_reactions(spec: MultiActorSpec) -> Any:
     """Reserved: raises ``CapabilityGap`` (decision.multi_actor)."""
-    require("decision.multi_actor", actors=[a.actor_id for a in spec.actors],
-            equilibrium_concept=spec.equilibrium_concept)
+    require(
+        "decision.multi_actor", actors=[a.actor_id for a in spec.actors], equilibrium_concept=spec.equilibrium_concept
+    )
     raise AssertionError("unreachable")  # pragma: no cover

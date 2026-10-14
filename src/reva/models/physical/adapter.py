@@ -70,9 +70,13 @@ class FieldToRegionAggregator(Protocol):
     method: str
     method_version: str
 
-    def aggregate(self, asset: FieldAsset, regions: Sequence[RegionGeometryRef], *,
-                  statistic: Literal["area_weighted_mean", "area_integral", "population_weighted_mean"],
-                  ) -> AggregationResult: ...
+    def aggregate(
+        self,
+        asset: FieldAsset,
+        regions: Sequence[RegionGeometryRef],
+        *,
+        statistic: Literal["area_weighted_mean", "area_integral", "population_weighted_mean"],
+    ) -> AggregationResult: ...
 
 
 def aggregate_field_to_regions(asset: FieldAsset, regions: Sequence[RegionGeometryRef]) -> AggregationResult:
@@ -133,10 +137,23 @@ class ConformanceReport:
 
 
 _REQUIRED_METHODS: tuple[str, ...] = (
-    "initialize", "update", "update_until", "finalize",
-    "get_component_name", "get_input_var_names", "get_output_var_names", "get_var_units", "get_var_support",
-    "get_start_time", "get_end_time", "get_current_time", "get_time_step", "get_time_units", "get_calendar",
-    "get_value", "set_value",
+    "initialize",
+    "update",
+    "update_until",
+    "finalize",
+    "get_component_name",
+    "get_input_var_names",
+    "get_output_var_names",
+    "get_var_units",
+    "get_var_support",
+    "get_start_time",
+    "get_end_time",
+    "get_current_time",
+    "get_time_step",
+    "get_time_units",
+    "get_calendar",
+    "get_value",
+    "set_value",
 )
 
 
@@ -151,8 +168,12 @@ def check_lifecycle_conformance(model: object, config: Mapping[str, Any], *, max
     findings: list[ConformanceFinding] = []
     missing = [m for m in _REQUIRED_METHODS if not callable(getattr(model, m, None))]
     if missing:
-        return ConformanceReport(None, "fail", (ConformanceFinding(
-            "missing_methods", "blocker", f"missing port methods: {sorted(missing)}"),), 0)
+        return ConformanceReport(
+            None,
+            "fail",
+            (ConformanceFinding("missing_methods", "blocker", f"missing port methods: {sorted(missing)}"),),
+            0,
+        )
 
     m: Any = model
     steps = 0
@@ -185,15 +206,23 @@ def check_lifecycle_conformance(model: object, config: Mapping[str, Any], *, max
             findings.append(ConformanceFinding("no_outputs", "blocker", "model declares no output variables"))
         prev = float(m.get_current_time())
         if abs(prev - t0) > 1e-12 * max(1.0, abs(t0)):
-            findings.append(ConformanceFinding("start_time_mismatch", "warning",
-                                               f"current time {prev} differs from start time {t0} after initialize"))
+            findings.append(
+                ConformanceFinding(
+                    "start_time_mismatch",
+                    "warning",
+                    f"current time {prev} differs from start time {t0} after initialize",
+                )
+            )
         while steps < max_steps and prev < t_end:
             m.update()
             steps += 1
             now = float(m.get_current_time())
             if not now > prev:
-                findings.append(ConformanceFinding("time_not_increasing", "blocker",
-                                                   f"time did not increase on update ({prev} -> {now})"))
+                findings.append(
+                    ConformanceFinding(
+                        "time_not_increasing", "blocker", f"time did not increase on update ({prev} -> {now})"
+                    )
+                )
                 break
             if now > t_end + 1e-9 * max(1.0, abs(t_end)):
                 findings.append(ConformanceFinding("time_past_end", "blocker", f"time {now} passed end {t_end}"))
@@ -204,8 +233,11 @@ def check_lifecycle_conformance(model: object, config: Mapping[str, Any], *, max
             if arr.dtype.kind not in "iuf":
                 findings.append(ConformanceFinding("non_numeric_output", "blocker", f"{var!r} is not numeric"))
             elif not np.all(np.isfinite(arr)):
-                findings.append(ConformanceFinding("non_finite_output", "blocker",
-                                                   f"{var!r} contains non-finite values; missingness must be typed"))
+                findings.append(
+                    ConformanceFinding(
+                        "non_finite_output", "blocker", f"{var!r} contains non-finite values; missingness must be typed"
+                    )
+                )
     except Exception as exc:  # the port is untrusted: any failure is a finding, not a crash
         findings.append(ConformanceFinding("lifecycle_exception", "blocker", f"{type(exc).__name__}: {exc}"))
     finally:

@@ -527,17 +527,7 @@ def neighbourhood(
 # Bounded path search
 # ---------------------------------------------------------------------------
 
-_PATH_SQL = (
-    "WITH RECURSIVE "
-    + _VISIBLE_EVIDENCE.replace("visible AS", "visible_ev AS", 1)
-    + ", "
-    + _VISIBLE_RELEASE.replace("visible AS", "visible_rel AS", 1)
-    + """,
-visible AS (
-  SELECT id FROM visible_ev WHERE CAST(:mode AS text) = 'evidence'
-  UNION ALL
-  SELECT id FROM visible_rel WHERE CAST(:mode AS text) = 'release'
-),
+_PATH_TAIL = """,
 inc AS (
   SELECT DISTINCT p.relation_id, p.entity_id
   FROM world.relation_participant p
@@ -561,7 +551,10 @@ SELECT entity_id, depth, path_entities, path_edges FROM walk
 WHERE depth > 0 AND (CAST(:target AS uuid) IS NULL OR entity_id = CAST(:target AS uuid))
 LIMIT :row_cap
 """
-)
+
+
+def _path_sql(ctx: GraphContext) -> str:
+    return "WITH RECURSIVE " + _visible_cte(ctx) + _PATH_TAIL
 
 
 @dataclass(frozen=True)
@@ -641,7 +634,6 @@ def path_search(
     params = _params(context, layers=layers, predicate=predicate, valid_during=valid_during)
     params.update(
         {
-            "mode": context.mode,
             "source": source_id,
             "target": target_id,
             "excluded_roles": list(excluded_roles),
@@ -650,7 +642,7 @@ def path_search(
         }
     )
     bounds = {"max_depth": max_depth, "max_edges": max_edges, "timeout_ms": timeout_ms}
-    rows = _run_bounded(conn, timeout_ms, _PATH_SQL, params)
+    rows = _run_bounded(conn, timeout_ms, _path_sql(context), params)
     if rows is None:
         notes.append("the time limit cancelled the search before any result was produced")
         return PathResult(source_id, target_id, context, (), {}, (), True, ("time_limit",), bounds, tuple(notes))

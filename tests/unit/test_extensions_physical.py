@@ -73,8 +73,7 @@ def test_separable_lat_lon_field_and_global_total():
     exact = separable_region_integral(region, lat_primitive=lin_lat_primitive, lon_primitive=cos_lon_primitive)
     assert rel(rep.by_id("box").integral, exact) < 1e-9
     globe = LatLonRegion("globe", -90.0, 90.0, -180.0, 180.0)
-    exact_global = separable_region_integral(globe, lat_primitive=lin_lat_primitive,
-                                             lon_primitive=cos_lon_primitive)
+    exact_global = separable_region_integral(globe, lat_primitive=lin_lat_primitive, lon_primitive=cos_lon_primitive)
     assert rel(rep.grid_integral, exact_global) < 1e-9
 
 
@@ -85,7 +84,8 @@ def test_partition_conserves_total_with_unaligned_edges_and_antimeridian():
     lon_cuts = [(-120.3, 17.9), (17.9, 120.3), (120.3, -120.3)]  # last sector crosses the antimeridian
     regions = [
         LatLonRegion(f"r{i}{j}", lat_cuts[i], lat_cuts[i + 1], w, e)
-        for i in range(4) for j, (w, e) in enumerate(lon_cuts)
+        for i in range(4)
+        for j, (w, e) in enumerate(lon_cuts)
     ]
     rep = aggregate_to_regions(g, v, regions)
     assert all(r.complete for r in rep.regions)
@@ -107,12 +107,16 @@ def test_antimeridian_region_on_both_longitude_conventions(lon0):
     r = aggregate_to_regions(g, v, [region]).by_id("pacific")
     exact = separable_region_integral(region, lon_primitive=cos_lon_primitive)
     # h integrates to 2·Δλ + sin(190°) − sin(170°) = 2·Δλ − 2 sin(10°) over the unwrapped interval
-    expected = R**2 * (math.sin(math.radians(30)) - math.sin(math.radians(-20))) * (
-        2 * math.radians(20) - 2 * math.sin(math.radians(10)))
+    expected = (
+        R**2
+        * (math.sin(math.radians(30)) - math.sin(math.radians(-20)))
+        * (2 * math.radians(20) - 2 * math.sin(math.radians(10)))
+    )
     assert rel(exact, expected) < 1e-12
     assert rel(r.integral, exact) < 1e-9
-    split = aggregate_to_regions(g, v, [LatLonRegion("e", -20.0, 30.0, 170.0, 180.0),
-                                        LatLonRegion("w", -20.0, 30.0, -180.0, -170.0)])
+    split = aggregate_to_regions(
+        g, v, [LatLonRegion("e", -20.0, 30.0, 170.0, 180.0), LatLonRegion("w", -20.0, 30.0, -180.0, -170.0)]
+    )
     assert rel(split.by_id("e").integral + split.by_id("w").integral, r.integral) < 1e-12
 
 
@@ -153,13 +157,36 @@ def test_invalid_inputs_rejected():
 
 def test_field_metadata_contracts_and_reserved_reader():
     crs = fields.CRSSpec("OGC:CRS84", ("lon", "lat"))
-    axes = (fields.AxisSpec("lat", "latitude", "degrees_north", 180),
-            fields.AxisSpec("lon", "longitude", "degrees_east", 360))
+    axes = (
+        fields.AxisSpec("lat", "latitude", "degrees_north", 180),
+        fields.AxisSpec("lon", "longitude", "degrees_east", 360),
+    )
     with pytest.raises(ValueError):  # a reanalysis must declare that it includes later information
-        fields.FieldMetadata("tas", "air_temperature", None, "K", crs, "proleptic_gregorian", axes,
-                             "cell_mean", "time: mean", "reanalysis")
-    meta = fields.FieldMetadata("tas", "air_temperature", None, "K", crs, "proleptic_gregorian", axes,
-                                "cell_mean", "time: mean", "reanalysis", includes_later_information=True)
+        fields.FieldMetadata(
+            "tas",
+            "air_temperature",
+            None,
+            "K",
+            crs,
+            "proleptic_gregorian",
+            axes,
+            "cell_mean",
+            "time: mean",
+            "reanalysis",
+        )
+    meta = fields.FieldMetadata(
+        "tas",
+        "air_temperature",
+        None,
+        "K",
+        crs,
+        "proleptic_gregorian",
+        axes,
+        "cell_mean",
+        "time: mean",
+        "reanalysis",
+        includes_later_information=True,
+    )
     assert meta.axis("latitude").units == "degrees_north"
     asset = fields.FieldAsset("a1", "zarr", "application/vnd+zarr", "0" * 64, meta, None, "test")
     with pytest.raises(CapabilityGap) as ei:
@@ -187,19 +214,44 @@ class DecayModel:
     def finalize(self):
         self.finalized = True
 
-    def get_component_name(self): return "decay"
-    def get_input_var_names(self): return ("decay_rate",)
-    def get_output_var_names(self): return ("amount",)
-    def get_var_units(self, name): return {"decay_rate": "d-1", "amount": "kg"}[name]
-    def get_var_support(self, name): return "point_in_time_stock" if name == "amount" else "period_rate"
-    def get_start_time(self): return 0.0
-    def get_end_time(self): return self.t_end
-    def get_current_time(self): return self.t
-    def get_time_step(self): return self.dt
-    def get_time_units(self): return "days since 2000-01-01"
-    def get_calendar(self): return "proleptic_gregorian"
-    def get_value(self, name): return np.array([self.x])
-    def set_value(self, name, value): self.k = float(value[0])
+    def get_component_name(self):
+        return "decay"
+
+    def get_input_var_names(self):
+        return ("decay_rate",)
+
+    def get_output_var_names(self):
+        return ("amount",)
+
+    def get_var_units(self, name):
+        return {"decay_rate": "d-1", "amount": "kg"}[name]
+
+    def get_var_support(self, name):
+        return "point_in_time_stock" if name == "amount" else "period_rate"
+
+    def get_start_time(self):
+        return 0.0
+
+    def get_end_time(self):
+        return self.t_end
+
+    def get_current_time(self):
+        return self.t
+
+    def get_time_step(self):
+        return self.dt
+
+    def get_time_units(self):
+        return "days since 2000-01-01"
+
+    def get_calendar(self):
+        return "proleptic_gregorian"
+
+    def get_value(self, name):
+        return np.array([self.x])
+
+    def set_value(self, name, value):
+        self.k = float(value[0])
 
 
 def test_lifecycle_conformance_passes_for_conforming_model():

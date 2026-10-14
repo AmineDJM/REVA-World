@@ -20,8 +20,16 @@ from reva.capabilities import CapabilityNotAvailable, not_available, require
 
 # CF-1.x calendar attribute values (CF conventions §4.4.1). "standard" == "gregorian" (mixed Julian/Gregorian).
 CFCalendar = Literal[
-    "standard", "gregorian", "proleptic_gregorian", "julian", "noleap", "365_day", "all_leap", "366_day",
-    "360_day", "none",
+    "standard",
+    "gregorian",
+    "proleptic_gregorian",
+    "julian",
+    "noleap",
+    "365_day",
+    "all_leap",
+    "366_day",
+    "360_day",
+    "none",
 ]
 AxisKind = Literal["latitude", "longitude", "time", "vertical", "projection_x", "projection_y", "ensemble", "other"]
 CellSupport = Literal["point", "cell_mean", "cell_total", "cell_max", "cell_min"]
@@ -138,8 +146,9 @@ class FieldWindow:
 class FieldCatalogue(Protocol):
     """STAC-like discovery of field assets."""
 
-    def search(self, *, standard_name: str, bbox: tuple[float, float, float, float] | None,
-               time_range: tuple[str, str] | None) -> Sequence[FieldAsset]: ...
+    def search(
+        self, *, standard_name: str, bbox: tuple[float, float, float, float] | None, time_range: tuple[str, str] | None
+    ) -> Sequence[FieldAsset]: ...
 
     def describe(self, asset_id: str) -> FieldAsset: ...
 

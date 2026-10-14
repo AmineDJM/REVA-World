@@ -112,3 +112,9 @@ name = "autonomy never imports connectors' runtime writers or api"
 type = "forbidden"
 source_modules = ["reva.autonomy"]
 forbidden_modules = ["reva.api"]
+
+[[tool.importlinter.contracts]]
+name = "extensions and capability catalogue have no HTTP, DB, API or adapters"
+type = "forbidden"
+source_modules = ["reva.extensions", "reva.capabilities"]
+forbidden_modules = ["reva.adapters", "reva.api", "reva.operations", "httpx", "sqlalchemy", "psycopg", "boto3"]

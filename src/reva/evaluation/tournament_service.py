@@ -110,7 +110,7 @@ class Panel:
         return logical_hash({sid: [[y, v] for y, v in obs] for sid, obs in sorted(self.series.items())})
 
 
-def _year_of(temporal: Mapping[str, Any]) -> int | None:
+def annual_year_of(temporal: Mapping[str, Any]) -> int | None:
     """Calendar year of an annual support, or None if the support is not annual."""
     start = temporal.get("start")
     if not start:
@@ -147,7 +147,7 @@ def panel_from_rows(
         if concept not in want_c or iso3 not in want_k:
             continue
         sid = series_id(concept, iso3)
-        year = _year_of(r.get("temporal_extent") or {})
+        year = annual_year_of(r.get("temporal_extent") or {})
         if year is None:
             dropped.append({"series_id": sid, "reason": "non_annual_support"})
             continue

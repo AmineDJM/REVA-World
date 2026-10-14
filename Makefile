@@ -93,8 +93,8 @@ typecheck: ## mypy strict on the kernel
 imports: ## import-linter dependency contracts
 	$(PY) python scripts/verify_imports.py
 
-registry: ## Validate registry/contracts (seed-time validation without a database)
-	$(PY) python -c "from reva.ontology.registry import load_registry; r = load_registry(); print('registry ok')"
+registry: ## Validate registry, JSON Schemas, scenario example and OpenAPI (offline)
+	$(PY) python scripts/validate_contracts.py
 
 blueprint: ## Validate render.yaml against the cached Render schema + REVA rules
 	$(PY) python scripts/validate_blueprint.py
