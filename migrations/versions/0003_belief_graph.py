@@ -210,6 +210,19 @@ END $$;
 CREATE TRIGGER publication_verified BEFORE INSERT ON ops.publication
   FOR EACH ROW EXECUTE FUNCTION ops.check_publication();
 
+-- (R-08) published_at is server time; only the table owner may supply it.
+CREATE FUNCTION ops.force_published_at() RETURNS trigger LANGUAGE plpgsql AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c
+                 WHERE c.oid = TG_RELID AND c.relowner = (SELECT r.oid FROM pg_catalog.pg_roles r
+                                                          WHERE r.rolname = current_user)) THEN
+    NEW.published_at := clock_timestamp();
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER a00_server_published_at BEFORE INSERT ON ops.publication
+  FOR EACH ROW EXECUTE FUNCTION ops.force_published_at();
+
 -- (R-02) A published release is sealed: nothing can be appended to it.
 CREATE FUNCTION belief.reject_if_published() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE rel uuid;

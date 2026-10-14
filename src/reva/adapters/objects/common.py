@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import os
 import tempfile
-from typing import BinaryIO
+from typing import Any, BinaryIO
 
 from reva.kernel.errors import IntegrityFailure, UnsafeRequest
 from reva.ports.storage import NAMESPACES
@@ -68,3 +68,57 @@ def verify(expected_sha: str, expected_size: int, actual_sha: str, actual_size: 
             expected_size=expected_size,
             actual_size=actual_size,
         )
+
+
+# --------------------------------------------------------------------------- GC / reuse exclusion
+#: Per-object transaction-level advisory lock shared by GC and publishers.
+#: Key text is ``'obj|' || <sha256 hex>``; the lock id is ``hashtextextended(key, 0)``.
+OBJECT_LOCK_SQL = "SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"
+OBJECT_TRY_LOCK_SQL = "SELECT pg_try_advisory_xact_lock(hashtextextended(:k, 0))"
+
+
+def object_lock_key(sha256: str) -> str:
+    """Advisory-lock key text for a content address (namespace independent).
+
+    Protocol (closes the GC-vs-reuse race, review R-11):
+
+    * GC takes this lock (transaction level) before its final reference
+      re-check, age re-check and delete, all in the same transaction.
+    * A publisher that registers a ``meta.artifact_location`` for an object --
+      in particular one whose bytes already existed (``put`` found and
+      re-verified them) -- takes the same lock in the registering transaction
+      and then confirms the object is still present (``confirm_object_locked``)
+      before inserting the location. The lock is held until commit, so GC
+      cannot delete between the confirmation and the commit, and a delete that
+      happened earlier is detected by the confirmation.
+    """
+    if len(sha256) != 64 or any(c not in "0123456789abcdef" for c in sha256):
+        raise ValueError("invalid sha256")
+    return f"obj|{sha256}"
+
+
+def lock_object_xact(conn: Any, sha256: str) -> None:
+    """Block until the per-object advisory lock is held (released at transaction end)."""
+    from sqlalchemy import text
+
+    conn.execute(text(OBJECT_LOCK_SQL), {"k": object_lock_key(sha256)})
+
+
+def try_lock_object_xact(conn: Any, sha256: str) -> bool:
+    from sqlalchemy import text
+
+    return bool(conn.execute(text(OBJECT_TRY_LOCK_SQL), {"k": object_lock_key(sha256)}).scalar_one())
+
+
+def confirm_object_locked(conn: Any, store: Any, namespace: str, sha256: str, byte_size: int | None = None) -> None:
+    """Publisher side: take the object lock, then require the bytes to still exist.
+
+    Call inside the transaction that inserts the artifact location, after
+    ``store.put`` returned. Raises ``IntegrityFailure`` (retryable by re-putting)
+    if GC removed the object in the meantime.
+    """
+    lock_object_xact(conn, sha256)
+    head = store.head(namespace, sha256)
+    if head is None or (byte_size is not None and head.byte_size != byte_size):
+        raise IntegrityFailure("object vanished before registration; re-put and retry",
+                               namespace=namespace, sha256=sha256, retryable=True)

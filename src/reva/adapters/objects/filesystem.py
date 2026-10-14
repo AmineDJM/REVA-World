@@ -42,18 +42,27 @@ class FilesystemArtifactStore:
         try:
             final = self._path(namespace, sha)
             final.parent.mkdir(parents=True, exist_ok=True)
-            if final.exists():
-                existing_sha, existing_size = hash_file(str(final))
-                verify(sha, size, existing_sha, existing_size)  # never overwrite
-            else:
+            created = False
+            if not final.exists():
                 # link() fails if the target exists: an atomic conditional create.
                 try:
                     os.link(tmp, final)
+                    created = True
                 except FileExistsError:
                     pass
+            if created:
                 os.chmod(final, 0o444)
+            else:
+                # Reuse of an existing object: refresh its age so orphan GC (which
+                # re-stats under the per-object lock) treats it as young again. Best
+                # effort: the advisory-lock protocol (common.object_lock_key) is the guard.
+                try:
+                    os.utime(final)
+                except PermissionError:
+                    pass
+            # Verify the actual bytes at the address (never metadata), also for reuse.
             got_sha, got_size = hash_file(str(final))
-            verify(sha, size, got_sha, got_size)
+            verify(sha, size, got_sha, got_size)  # never overwrite; mismatch is an IntegrityFailure
         finally:
             os.unlink(tmp)
         return StoredObject(sha, size, namespace, self.uri(namespace, sha), media_type)
@@ -98,6 +107,16 @@ class FilesystemArtifactStore:
         for p in base.rglob("*"):
             if p.is_file():
                 yield f"file://{p}", p.stat().st_mtime
+
+    def uri_mtime(self, storage_uri: str) -> float | None:
+        """Current object timestamp (seconds) for a storage URI, or None if absent."""
+        path = Path(storage_uri.removeprefix("file://")).resolve()
+        if self.root not in path.parents:
+            raise ValueError("storage URI outside the object root")
+        try:
+            return path.stat().st_mtime
+        except FileNotFoundError:
+            return None
 
     def delete_orphan(self, storage_uri: str) -> None:
         path = Path(storage_uri.removeprefix("file://")).resolve()

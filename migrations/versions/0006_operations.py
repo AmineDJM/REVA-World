@@ -140,11 +140,23 @@ CREATE TABLE ops.gate_result (
   -- Gate results come from the separately controlled evaluator, never the proposer.
   CHECK (evaluator LIKE 'gate-evaluator:%')
 );
+-- (R-01) Applies to direct inserts and to ops.record_gate_result: a named
+-- gate evaluator that is not the proposal author, and a non-empty policy version.
 CREATE FUNCTION ops.check_gate_evaluator() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE author text;
 BEGIN
-  IF EXISTS (SELECT 1 FROM ops.proposal p WHERE p.id = NEW.proposal_id
-             AND 'gate-evaluator:' || p.author = NEW.evaluator) THEN
+  SELECT p.author INTO author FROM ops.proposal p WHERE p.id = NEW.proposal_id;
+  IF author IS NULL THEN
+    RAISE EXCEPTION 'proposal % not found', NEW.proposal_id;
+  END IF;
+  IF NEW.evaluator = author OR NEW.evaluator = 'gate-evaluator:' || author THEN
     RAISE EXCEPTION 'the proposer cannot evaluate its own proposal';
+  END IF;
+  IF NEW.evaluator !~ '^gate-evaluator:[^[:space:]]+$' THEN
+    RAISE EXCEPTION 'gate results must be recorded by a named gate-evaluator:<name>';
+  END IF;
+  IF NEW.policy_version IS NULL OR btrim(NEW.policy_version) = '' THEN
+    RAISE EXCEPTION 'gate result requires a policy version';
   END IF;
   RETURN NEW;
 END $$;
@@ -190,6 +202,10 @@ BEGIN
   END IF;
   IF p_priority < -10 OR p_priority > 10 THEN
     RAISE EXCEPTION 'priority out of API range';
+  END IF;
+  -- (R-26) bounded payloads: a job payload is a small parameter document.
+  IF p_payload IS NULL OR octet_length(p_payload::text) > 65536 THEN
+    RAISE EXCEPTION 'job payload missing or larger than 64 KiB';
   END IF;
   INSERT INTO ops.job(job_type, payload, idempotency_key, priority, created_by)
   VALUES (p_type, p_payload, p_idempotency_key, p_priority, p_created_by)
@@ -242,6 +258,10 @@ CREATE FUNCTION ops.heartbeat(p_job uuid, p_worker text, p_token bigint, p_lease
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
 DECLARE st text;
 BEGIN
+  -- (R-26) a negative lease would expire at once, a huge one never.
+  IF p_lease_seconds IS NULL OR p_lease_seconds < 10 OR p_lease_seconds > 3600 THEN
+    RAISE EXCEPTION 'lease seconds must be within [10, 3600] (got %)', p_lease_seconds;
+  END IF;
   PERFORM ops.assert_lease(p_job, p_worker, p_token);
   UPDATE ops.job SET lease_until = clock_timestamp() + make_interval(secs => p_lease_seconds),
          progress = COALESCE(p_progress, progress), updated_at = clock_timestamp()
@@ -276,6 +296,68 @@ BEGIN
   VALUES (p_reviewer, 'proposal.review', jsonb_build_object('proposal_id', p_proposal),
           jsonb_build_object('decision', p_decision, 'tier', tier));
   RETURN rid;
+END $$;
+
+-- (R-01) Governance writes through checked functions. The worker keeps a
+-- direct INSERT grant on ops.gate_result and model.promotion for now (the BEFORE
+-- INSERT triggers enforce the same rules); callers should migrate to these.
+CREATE FUNCTION ops.record_gate_result(p_proposal uuid, p_gate_name text, p_policy_version text,
+                                       p_decision text, p_evidence_sha256 text, p_evaluator text)
+RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE gid uuid;
+BEGIN
+  IF p_gate_name IS NULL OR p_gate_name !~ '^[A-Za-z0-9_.-]{1,100}$' THEN
+    RAISE EXCEPTION 'invalid gate name';
+  END IF;
+  IF p_decision IS NULL OR p_decision NOT IN ('pass','fail','blocked') THEN
+    RAISE EXCEPTION 'invalid gate decision %', p_decision;
+  END IF;
+  IF p_evaluator IS DISTINCT FROM 'gate-evaluator:' || p_gate_name THEN
+    RAISE EXCEPTION 'evaluator must be gate-evaluator:<gate name>';
+  END IF;
+  IF p_policy_version IS NULL OR btrim(p_policy_version) = '' OR length(p_policy_version) > 200 THEN
+    RAISE EXCEPTION 'invalid policy version';
+  END IF;
+  IF p_evidence_sha256 IS NULL OR NOT meta.artifact_is_verified(p_evidence_sha256) THEN
+    RAISE EXCEPTION 'gate evidence % is not a verified artifact', p_evidence_sha256;
+  END IF;
+  INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision, evidence_sha256, evaluator)
+  VALUES (p_proposal, p_gate_name, p_policy_version, p_decision, p_evidence_sha256, p_evaluator)
+  RETURNING id INTO gid;
+  INSERT INTO ops.audit(actor, action, target, details)
+  VALUES (p_evaluator, 'gate.result', jsonb_build_object('proposal_id', p_proposal, 'gate_result_id', gid),
+          jsonb_build_object('decision', p_decision, 'policy_version', p_policy_version));
+  RETURN gid;
+END $$;
+
+CREATE FUNCTION model.record_promotion(p_model_version uuid, p_task_scope jsonb, p_decision text,
+                                       p_evaluation uuid, p_policy_version text, p_reviewer text,
+                                       p_reasons jsonb)
+RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE pid uuid;
+BEGIN
+  IF p_decision IS NULL OR p_decision NOT IN ('promote','reject','rollback','retire','keep_incumbent') THEN
+    RAISE EXCEPTION 'invalid promotion decision %', p_decision;
+  END IF;
+  IF p_task_scope IS NULL OR jsonb_typeof(p_task_scope) <> 'object' OR octet_length(p_task_scope::text) > 65536 THEN
+    RAISE EXCEPTION 'task scope must be a JSON object of at most 64 KiB';
+  END IF;
+  IF p_reasons IS NOT NULL AND (jsonb_typeof(p_reasons) <> 'array' OR octet_length(p_reasons::text) > 65536) THEN
+    RAISE EXCEPTION 'reasons must be a JSON array of at most 64 KiB';
+  END IF;
+  IF p_policy_version IS NULL OR length(p_policy_version) > 200 THEN
+    RAISE EXCEPTION 'invalid policy version';
+  END IF;
+  -- model.check_promotion (BEFORE INSERT) validates evaluation, replay mode,
+  -- reviewer and policy version.
+  INSERT INTO model.promotion(model_version_id, task_scope, decision, evaluation_id, policy_version, reviewer, reasons)
+  VALUES (p_model_version, p_task_scope, p_decision, p_evaluation, p_policy_version, p_reviewer,
+          COALESCE(p_reasons, '[]'::jsonb))
+  RETURNING id INTO pid;
+  INSERT INTO ops.audit(actor, action, target, details)
+  VALUES (p_reviewer, 'model.promotion', jsonb_build_object('model_version_id', p_model_version, 'promotion_id', pid),
+          jsonb_build_object('decision', p_decision, 'evaluation_id', p_evaluation, 'policy_version', p_policy_version));
+  RETURN pid;
 END $$;
 
 -- Immutable scenario definitions created by the API without object-store write
