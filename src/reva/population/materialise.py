@@ -364,6 +364,5 @@ def to_parquet_bytes(table: pa.Table) -> bytes:
         version="2.6",
         data_page_version="1.0",
         row_group_size=1 << 20,
-        use_threads=False,
     )
     return bytes(sink.getvalue().to_pybytes())

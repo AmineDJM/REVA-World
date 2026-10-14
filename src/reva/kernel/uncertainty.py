@@ -29,6 +29,14 @@ class UncertaintyKind(StrEnum):
     probability = "probability"
 
 
+INTERVAL_KINDS = frozenset(
+    {
+        UncertaintyKind.confidence_interval,
+        UncertaintyKind.credible_interval,
+        UncertaintyKind.prediction_interval,
+    }
+)
+
 PROBABILISTIC_KINDS = frozenset(
     {
         UncertaintyKind.distribution,
@@ -38,6 +46,20 @@ PROBABILISTIC_KINDS = frozenset(
         UncertaintyKind.probability,
     }
 )
+
+
+def _dec(v: str | None, name: str) -> object:
+    from decimal import Decimal, InvalidOperation
+
+    if v is None:
+        return None
+    try:
+        d = Decimal(v)
+    except InvalidOperation as e:
+        raise ValueError(f"{name} must be a decimal string") from e
+    if not d.is_finite():
+        raise ValueError(f"{name} must be finite")
+    return d
 
 
 class UncertaintySpec(BaseModel):
@@ -73,6 +95,12 @@ class UncertaintySpec(BaseModel):
             raise ValueError("bounds have no probabilistic coverage level")
         if self.level is not None and not (0.0 < self.level < 1.0):
             raise ValueError("level must be in (0, 1)")
+        if self.level is not None and self.kind not in INTERVAL_KINDS:
+            raise ValueError(f"a nominal level is only meaningful for interval kinds, not {self.kind}")
+        lo = _dec(self.lower, "lower")
+        hi = _dec(self.upper, "upper")
+        if lo is not None and hi is not None and lo > hi:
+            raise ValueError("lower bound exceeds upper bound")
         if self.kind in (
             UncertaintyKind.confidence_interval,
             UncertaintyKind.credible_interval,

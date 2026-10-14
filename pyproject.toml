@@ -87,6 +87,7 @@ addopts = "-m 'not live'"
 
 [tool.importlinter]
 root_package = "reva"
+include_external_packages = true
 
 [[tool.importlinter.contracts]]
 name = "kernel imports nothing from the rest of reva"
