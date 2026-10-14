@@ -21,6 +21,7 @@ No LLM is used in replay.
 
 from __future__ import annotations
 
+import itertools
 import json
 import math
 from collections import Counter, defaultdict
@@ -310,28 +311,9 @@ def _year(temporal: dict[str, Any]) -> int | None:
 
 
 def _default_models() -> list[Any]:
-    try:
-        from reva.models.forecasting import LastValue, LogDrift
-    except ImportError:  # pragma: no cover - forecasting package is part of the build
-        return [_InlineLastValue()]
-    return [LastValue(), LogDrift()]
+    from reva.models.forecasting import LastValue, LogDrift
 
-
-class _InlineLastValue:
-    """Fallback naive baseline used only if the forecasting package is unavailable."""
-
-    key = "forecast.last_value"
-    version = "inline-1"
-    min_train = 1
-
-    def fit(self, train: Sequence[tuple[int, float]]) -> Any:
-        last_year, last = train[-1]
-
-        class _F:
-            def predict(self, horizons: Sequence[int], level: float = 0.8) -> list[Any]:
-                return [type("P", (), {"point": last, "target_year": last_year + h})() for h in horizons]
-
-        return _F()
+    return [LastValue(), LogDrift()]  # the naive baseline is always present
 
 
 def revised_data_retrospective(
@@ -389,7 +371,7 @@ def revised_data_retrospective(
             continue
         pts = groups[key]
         years = sorted(pts)
-        if any(b - a != 1 for a, b in zip(years, years[1:], strict=False)):
+        if any(b - a != 1 for a, b in itertools.pairwise(years)):
             excl["non_consecutive_series"] += 1
             continue
         if len(years) < min_train + 1:

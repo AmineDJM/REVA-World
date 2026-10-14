@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:reva:component:economy:1.0.0",
+  "title": "REVA economy component v1",
+  "description": "Annual macroeconomic aggregates of an economy. gdp_current_usd is WDI NY.GDP.MKTP.CD: GDP in current prices converted to US dollars by the provider. A currency amount always carries its full basis; a missing value is typed Missing, never zero.",
+  "x-reva-component": {
+    "name": "economy",
+    "version": "1.0.0",
+    "applicable_entity_kinds": ["entity.country"],
+    "concepts": ["economics.gdp.nominal_current_usd@1.0.0"],
+    "support_requirements": {
+      "temporal_support": "annual_total",
+      "aggregation": "period_flow_total",
+      "population_universe": "resident_producers_of_economy",
+      "spatial_support": "provider_reporter_territory"
+    },
+    "privacy_class": "public_aggregate",
+    "validation_rules": ["currency_values_require_basis", "units_must_be_registered"]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reference_year", "gdp_current_usd"],
+  "properties": {
+    "reference_year": {"type": "integer", "minimum": 1800, "maximum": 2200},
+    "gdp_current_usd": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value", "unit_ref", "basis"],
+          "properties": {
+            "kind": {"const": "decimal"},
+            "value": {"type": "string", "pattern": "^-?(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+            "unit_ref": {"const": "unit.usd"},
+            "basis": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["currency", "price_basis", "exchange_rate_transform"],
+              "properties": {
+                "currency": {"const": "USD"},
+                "price_basis": {"const": "nominal"},
+                "price_reference_year": {"type": ["integer", "null"], "description": "null: current prices of the reference year."},
+                "exchange_rate_transform": {"type": "string", "minLength": 1},
+                "valuation": {"type": ["string", "null"]},
+                "scale_factor": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?$"},
+                "notes": {"type": ["string", "null"]}
+              }
+            }
+          }
+        },
+        {"$ref": "#/$defs/missing"}
+      ]
+    }
+  },
+  "$defs": {
+    "missing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reason"],
+      "properties": {
+        "kind": {"const": "missing"},
+        "reason": {"enum": ["not_collected", "unavailable", "not_applicable", "suppressed", "source_error", "unmatched_semantics", "outside_support"]}
+      }
+    }
+  }
+}

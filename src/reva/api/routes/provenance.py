@@ -47,7 +47,7 @@ class Builder:
     def key(kind: str, ident: Any) -> str:
         return f"{kind}:{ident}"
 
-    def add(self, kind: str, ident: Any, label: str, **attrs: Any) -> str | None:
+    def add(self, kind: str, ident: Any, label: str, /, **attrs: Any) -> str | None:
         k = self.key(kind, ident)
         if k in self.nodes:
             return k

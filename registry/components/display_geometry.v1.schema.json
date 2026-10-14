@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:reva:component:display_geometry:1.0.0",
+  "title": "REVA display geometry component v1",
+  "description": "Low-resolution display geometry (Natural Earth 1:110m) for visual exploration only. It is not an authoritative statistical or legal boundary and does not resolve disputed sovereignty. Coordinates are longitude/latitude (OGC CRS84).",
+  "x-reva-component": {
+    "name": "display_geometry",
+    "version": "1.0.0",
+    "applicable_entity_kinds": ["entity.country"],
+    "concepts": ["geography.display_boundary@1.0.0"],
+    "support_requirements": {
+      "spatial_support": "naturalearth_display",
+      "authoritative": false
+    },
+    "privacy_class": "public_aggregate",
+    "validation_rules": ["display_geometry_not_authoritative"]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["dataset_sha256", "feature_key", "match_status", "crs", "geometry_wkt", "scale", "authoritative"],
+  "properties": {
+    "dataset_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "feature_key": {"type": "string", "minLength": 1},
+    "match_status": {"enum": ["reviewed_match", "unmatched", "disputed", "overseas_part"]},
+    "crs": {"const": "OGC:CRS84"},
+    "geometry_wkt": {"type": "string", "pattern": "^(POINT|MULTIPOINT|LINESTRING|MULTILINESTRING|POLYGON|MULTIPOLYGON|GEOMETRYCOLLECTION)\\s*(EMPTY|\\()"},
+    "scale": {"const": "1:110m"},
+    "authoritative": {"const": false},
+    "disclaimer": {"type": "string"}
+  }
+}

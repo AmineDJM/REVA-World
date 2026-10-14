@@ -227,7 +227,31 @@ def publish_acquisition(
     summary = PublishSummary(None, obj.sha256, obj.namespace)
     with engine.begin() as conn:  # 4: one transaction
         reg = connector_registration(conn, spec)
-        idem = acquisition_idempotency_key(spec, raw, obj.sha256)
+        # Serialise acquisitions of the same request; compare with the latest one so a
+        # crash-retry of identical bytes is a duplicate, while a legitimate return to
+        # previously seen bytes after an intervening change is a new acquisition.
+        conn.execute(
+            text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"),
+            {"k": f"acq|{reg.connector_version_id}|{raw.request_fingerprint}|{raw.origin}"},
+        )
+        latest = conn.execute(
+            text(
+                "SELECT id, raw_sha256 FROM evidence.acquisition WHERE connector_version_id = :cv "
+                "AND request_fingerprint = :fp AND origin = :o ORDER BY recorded_at DESC, id DESC LIMIT 1"
+            ),
+            {"cv": reg.connector_version_id, "fp": raw.request_fingerprint, "o": raw.origin},
+        ).one_or_none()
+        if latest is not None and latest[1] == obj.sha256 and not raw.replay_of_acquisition_id:
+            summary.acquisition_id = UUID(str(latest[0]))
+            summary.duplicate_acquisition = True
+            return summary
+        base = acquisition_idempotency_key(spec, raw, obj.sha256)
+        suffix = (
+            f"|replay:{raw.replay_of_acquisition_id}"
+            if raw.replay_of_acquisition_id
+            else f"|after:{latest[0] if latest else ''}"
+        )
+        idem = hashlib.sha256((base + suffix).encode()).hexdigest()
         existing = conn.execute(
             text("SELECT id FROM evidence.acquisition WHERE idempotency_key = :k"), {"k": idem}
         ).scalar_one_or_none()

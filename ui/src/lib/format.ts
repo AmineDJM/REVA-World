@@ -107,6 +107,7 @@ const UNIT_LABEL: Record<string, string> = {
   'unit.usd': 'US$',
   'unit.persons': 'persons',
   'unit.percent': '%',
+  'unit.percent_of_baseline_gdp': '% of baseline GDP',
   'unit.ratio': 'ratio',
   'unit.kg': 'kg',
   'unit.count': 'count',

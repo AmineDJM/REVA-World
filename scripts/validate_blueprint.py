@@ -40,13 +40,16 @@ CACHE = ROOT / "contracts" / "render.schema.json"
 META = ROOT / "contracts" / "render.schema.meta.json"
 
 API_FORBIDDEN_ON_WORKER = {
-    "REVA_MIGRATION_DATABASE_URL", "DATABASE_URL", "REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET",
+    "REVA_MIGRATION_DATABASE_URL",
+    "DATABASE_URL",
+    "REVA_API_DB_PASSWORD",
+    "REVA_SESSION_SECRET",
     "REVA_ADMIN_PASSWORD_HASH",
 }
 
 
 def download_schema() -> bytes:
-    req = urllib.request.Request(SCHEMA_URL, headers={"User-Agent": "reva-blueprint-validator"})  # noqa: S310
+    req = urllib.request.Request(SCHEMA_URL, headers={"User-Agent": "reva-blueprint-validator"})
     with urllib.request.urlopen(req, timeout=30) as resp:  # noqa: S310 - fixed https URL
         data: bytes = resp.read(5_000_000)
     json.loads(data)
@@ -59,9 +62,13 @@ def load_schema(mode: str) -> tuple[dict[str, Any], str]:
         if mode == "refresh":
             CACHE.write_bytes(raw)
             meta = json.loads(META.read_text()) if META.exists() else {}
-            meta.update({"source_url": SCHEMA_URL,
-                         "retrieved_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
-                         "sha256": hashlib.sha256(raw).hexdigest()})
+            meta.update(
+                {
+                    "source_url": SCHEMA_URL,
+                    "retrieved_at": datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                    "sha256": hashlib.sha256(raw).hexdigest(),
+                }
+            )
             META.write_text(json.dumps(meta, indent=2) + "\n")
         return json.loads(raw), f"{SCHEMA_URL} (downloaded)"
     raw = CACHE.read_bytes()
@@ -120,10 +127,18 @@ def reva_checks(doc: dict[str, Any]) -> list[str]:
     for key in ("REVA_S3_ACCESS_KEY_ID", "REVA_S3_SECRET_ACCESS_KEY"):
         if "fromService" in wkeys.get(key, {}):
             problems.append(f"reva-worker {key} must be its own credential, not the API's")
-    common = {e["key"]: e.get("value") for g in doc.get("envVarGroups", []) if g.get("name") == "reva-common"
-              for e in g.get("envVars", [])}
-    expected = {"REVA_ENV": "production", "REVA_OBJECT_BACKEND": "s3", "REVA_AUTONOMY_MODE": "template_only",
-                "REVA_LLM_ENABLED": "false"}
+    common = {
+        e["key"]: e.get("value")
+        for g in doc.get("envVarGroups", [])
+        if g.get("name") == "reva-common"
+        for e in g.get("envVars", [])
+    }
+    expected = {
+        "REVA_ENV": "production",
+        "REVA_OBJECT_BACKEND": "s3",
+        "REVA_AUTONOMY_MODE": "template_only",
+        "REVA_LLM_ENABLED": "false",
+    }
     for k, v in expected.items():
         if common.get(k) != v:
             problems.append(f"reva-common {k} must be {v!r}")
@@ -146,8 +161,10 @@ def main(argv: list[str] | None = None) -> int:
     schema, origin = load_schema(mode)
     doc = yaml.safe_load(Path(args.path).read_text())
     validator = Draft202012Validator(schema)
-    errors = [f"schema: /{'/'.join(map(str, e.absolute_path))}: {e.message[:300]}"
-              for e in sorted(validator.iter_errors(doc), key=lambda e: list(map(str, e.absolute_path)))]
+    errors = [
+        f"schema: /{'/'.join(map(str, e.absolute_path))}: {e.message[:300]}"
+        for e in sorted(validator.iter_errors(doc), key=lambda e: list(map(str, e.absolute_path)))
+    ]
     errors += [f"reva: {p}" for p in reva_checks(doc)]
     result = {"blueprint": str(args.path), "schema": origin, "valid": not errors, "problems": errors}
     print(json.dumps(result, indent=2))

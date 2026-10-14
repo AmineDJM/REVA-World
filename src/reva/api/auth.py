@@ -29,7 +29,7 @@ from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError, VerifyMismatchError
 from fastapi import Request
 from itsdangerous import BadSignature, URLSafeTimedSerializer
-from sqlalchemy import Engine, text
+from sqlalchemy import text
 
 from reva.api.errors import ApiProblem, Forbidden, Unauthenticated
 from reva.settings import Settings

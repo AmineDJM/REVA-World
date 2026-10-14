@@ -78,7 +78,7 @@ const gapColumns: ColumnDef<Gap, unknown>[] = [
 
 export default function WorldPage() {
   const coverage = useApi((s) => getCoverage(undefined, s), []);
-  const gaps = useApi((s) => getGaps({ limit: 1000 }, s), []);
+  const gaps = useApi((s) => getGaps(undefined, s), []);
   const sources = useApi((s) => getSources(undefined, s), []);
   const locations = useApi((s) => getLocations(undefined, s), []);
   const events = useApi((s) => getEvents({ limit: 20 }, s), []);

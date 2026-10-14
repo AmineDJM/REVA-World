@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:reva:component:trade_crude:1.0.0",
+  "title": "REVA crude petroleum trade component v1",
+  "description": "Annual reported goods trade of HS heading 2709 (crude petroleum) between a reporter and partner World, at border values in current US dollars. Imports and exports are separate measures with their own valuation (CIF and FOB are distinct and are never added). Net weight is in kilograms; barrels are never inferred (mass and volume require density and convention). A missing flow is Missing, not zero.",
+  "x-reva-component": {
+    "name": "trade_crude",
+    "version": "1.0.0",
+    "applicable_entity_kinds": ["entity.country"],
+    "concepts": [
+      "trade.hs2709.import_value.world_total@1.0.0",
+      "trade.hs2709.export_value.world_total@1.0.0",
+      "trade.hs2709.net_weight.world_total@1.0.0"
+    ],
+    "support_requirements": {
+      "temporal_support": "annual_total",
+      "aggregation": "period_flow_total",
+      "spatial_support": "provider_reporter_territory",
+      "partner": "world_aggregate"
+    },
+    "privacy_class": "public_aggregate",
+    "validation_rules": ["currency_values_require_basis", "border_values_require_valuation", "units_must_be_registered"]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["reference_year", "classification", "imports_border_value", "exports_border_value"],
+  "properties": {
+    "reference_year": {"type": "integer", "minimum": 1962, "maximum": 2200},
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["system", "revision", "product_code"],
+      "properties": {
+        "system": {"const": "HS"},
+        "revision": {"enum": ["H0", "H1", "H2", "H3", "H4", "H5", "H6"]},
+        "product_code": {"const": "2709"}
+      }
+    },
+    "imports_border_value": {"oneOf": [{"$ref": "#/$defs/border_value"}, {"$ref": "#/$defs/missing"}]},
+    "exports_border_value": {"oneOf": [{"$ref": "#/$defs/border_value"}, {"$ref": "#/$defs/missing"}]},
+    "imports_net_weight": {"oneOf": [{"$ref": "#/$defs/mass_kg"}, {"$ref": "#/$defs/missing"}]},
+    "exports_net_weight": {"oneOf": [{"$ref": "#/$defs/mass_kg"}, {"$ref": "#/$defs/missing"}]},
+    "provider_derived_aggregate": {"type": "boolean", "description": "True when the provider derived the value (isAggregate and not isReported); not a direct customs observation."}
+  },
+  "$defs": {
+    "border_value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "unit_ref", "basis"],
+      "properties": {
+        "kind": {"const": "decimal"},
+        "value": {"type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+        "unit_ref": {"const": "unit.usd"},
+        "basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["currency", "price_basis", "valuation"],
+          "properties": {
+            "currency": {"const": "USD"},
+            "price_basis": {"const": "nominal"},
+            "price_reference_year": {"type": ["integer", "null"]},
+            "exchange_rate_transform": {"type": ["string", "null"]},
+            "valuation": {"enum": ["CIF", "FOB", "undetermined_primary_value"]},
+            "scale_factor": {"type": "string", "pattern": "^[0-9]+(\\.[0-9]+)?$"},
+            "notes": {"type": ["string", "null"]}
+          }
+        }
+      }
+    },
+    "mass_kg": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "unit_ref"],
+      "properties": {
+        "kind": {"const": "decimal"},
+        "value": {"type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+        "unit_ref": {"const": "unit.kg"},
+        "basis": {"type": "object"}
+      }
+    },
+    "missing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "reason"],
+      "properties": {
+        "kind": {"const": "missing"},
+        "reason": {"enum": ["not_collected", "unavailable", "not_applicable", "suppressed", "source_error", "unmatched_semantics", "outside_support"]}
+      }
+    }
+  }
+}

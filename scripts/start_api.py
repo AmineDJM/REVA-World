@@ -22,7 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _runtime_env import (  # noqa: E402
+from _runtime_env import (
     EX_CONFIG,
     SRC,
     ConfigError,
@@ -58,13 +58,21 @@ def build_command(environ: Mapping[str, str]) -> list[str]:
     if not ips:
         raise ConfigError("REVA_FORWARDED_ALLOW_IPS must not be empty")
     return [
-        sys.executable, "-m", "uvicorn", APP,
-        "--host", "0.0.0.0",  # noqa: S104 - container ingress; Render routes to $PORT
-        "--port", str(_port(environ)),
-        "--workers", "1",
+        sys.executable,
+        "-m",
+        "uvicorn",
+        APP,
+        "--host",
+        "0.0.0.0",  # noqa: S104 - container ingress; Render routes to $PORT
+        "--port",
+        str(_port(environ)),
+        "--workers",
+        "1",
         "--proxy-headers",
-        "--forwarded-allow-ips", ips,
-        "--timeout-graceful-shutdown", str(GRACEFUL_SHUTDOWN_SECONDS),
+        "--forwarded-allow-ips",
+        ips,
+        "--timeout-graceful-shutdown",
+        str(GRACEFUL_SHUTDOWN_SECONDS),
         "--no-server-header",
     ]
 
@@ -93,8 +101,11 @@ def validate(environ: Mapping[str, str]) -> dict[str, object]:
     }
 
 
-def prepare(environ: Mapping[str, str], dotenv_keys: set[str] | frozenset[str] = frozenset(),
-            extra_pythonpath: str | None = None) -> tuple[list[str], dict[str, str], dict[str, object]]:
+def prepare(
+    environ: Mapping[str, str],
+    dotenv_keys: set[str] | frozenset[str] = frozenset(),
+    extra_pythonpath: str | None = None,
+) -> tuple[list[str], dict[str, str], dict[str, object]]:
     summary = validate(environ)
     child, removed = build_child_env(environ, "api", dotenv_keys=dotenv_keys, extra_pythonpath=extra_pythonpath)
     command = exec_target(environ, build_command(environ))
@@ -110,9 +121,10 @@ def main() -> int:
     except ConfigError as e:
         emit({"event": "reva.start", "component": "api", "status": "error", "error": redact(str(e))})
         return EX_CONFIG
-    except Exception as e:  # noqa: BLE001
-        emit({"event": "reva.start", "component": "api", "status": "error",
-              "error": redact(f"{type(e).__name__}: {e}")})
+    except Exception as e:
+        emit(
+            {"event": "reva.start", "component": "api", "status": "error", "error": redact(f"{type(e).__name__}: {e}")}
+        )
         return EX_CONFIG
     emit({"event": "reva.start", "component": "api", "status": "exec", **summary})
     os.execvpe(command[0], command, child)  # noqa: S606 - replaces this process; no shell

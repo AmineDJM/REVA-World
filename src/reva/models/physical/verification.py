@@ -235,7 +235,7 @@ def aggregate_to_regions(
         valid = float(valid_w.sum())
         weighted = float(np.sum(filled * valid_w))
         coverage = covered / region_area if region_area > 0 else 0.0
-        complete = abs(coverage - 1.0) <= 1e-12 and valid == covered
+        complete = abs(coverage - 1.0) <= 1e-9 and valid == covered
         out.append(
             RegionAggregate(
                 region_id=region.region_id,

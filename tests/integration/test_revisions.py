@@ -139,10 +139,6 @@ async def test_aba_creates_three_revisions_identical_polls_create_none(db):
     assert n_acq == 4
 
 
-@pytest.mark.xfail(strict=True, reason=(
-    "ingest idempotency key (connector, version, request, raw sha, origin) ignores the lineage state: a "
-    "byte-identical return to an earlier response after an intervening revision is treated as a duplicate "
-    "acquisition, so A->B->A(exact bytes) leaves B as the latest belief. Requested change in report."))
 async def test_aba_with_byte_identical_return_creates_third_revision(db):
     name = "pop_fra_1955_1956_exact_return"
     await vl.ingest_vintage(db.worker, db.store, name, "a")
@@ -160,7 +156,7 @@ async def test_replayed_raw_with_new_parser_is_distinguished_from_original_vinta
     replay_conn = vl.ReplayParserWorldBank(countries=("FRA",), years=(y0, y1))
     vl.register_connector_variant(db.worker, db.store, replay_conn)
     archived = db.store.get("raw", orig.raw_sha256)  # the original vintage bytes, as archived
-    rep, raw1 = await vl.ingest_vintage(db.worker, db.store, name, "v1", connector=replay_conn,
+    rep, _raw1 = await vl.ingest_vintage(db.worker, db.store, name, "v1", connector=replay_conn,
                                         replay_of=str(orig.acquisition_id), retrieved_at=raw0.retrieved_at,
                                         body=archived)
     assert not rep.duplicate_acquisition and rep.acquisition_id != orig.acquisition_id
@@ -203,7 +199,8 @@ async def test_missing_source_publication_time_is_never_the_reference_date(db):
                GROUP BY s.source_key"""
         )).mappings().all()
         dataset_dates = c.execute(text(
-            """SELECT count(*) FROM evidence.acquisition a, jsonb_array_elements(a.response_metadata->'batch_metadata') b
+            """SELECT count(*) FROM evidence.acquisition a,
+                      jsonb_array_elements(a.response_metadata->'batch_metadata') b
                WHERE b ? 'dataset_last_updated' AND b->>'dataset_last_updated' IS NOT NULL"""
         )).scalar_one()
     stats = {r["source_key"]: r for r in rows}

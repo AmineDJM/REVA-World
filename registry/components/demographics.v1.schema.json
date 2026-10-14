@@ -1,0 +1,61 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:reva:component:demographics:1.0.0",
+  "title": "REVA demographics component v1",
+  "description": "Age and recorded sex of a weighted synthetic representative record of one age x recorded-sex population cell. Recorded sex is the sex recorded by the source statistical authority (Eurostat demo_pjan codes); it is not gender identity and is never re-coded. Unknown ages and open-ended top age groups are explicit categories; no age is imputed for them.",
+  "x-reva-component": {
+    "name": "demographics",
+    "version": "1.0.0",
+    "applicable_entity_kinds": ["entity.synthetic_person"],
+    "concepts": ["demography.population.jan1_age_sex@1.0.0"],
+    "support_requirements": {
+      "temporal_support": "point:01-01",
+      "aggregation": "point_in_time_stock",
+      "population_universe": "usually_resident_population_eurostat",
+      "context_modes": ["population"]
+    },
+    "privacy_class": "synthetic_public_aggregate_derived",
+    "validation_rules": ["no_gender_identity_fields", "age_category_consistent", "units_must_be_registered"]
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["age", "recorded_sex"],
+  "properties": {
+    "age": {
+      "description": "Age category as published by the source cell.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "source_code"],
+      "properties": {
+        "kind": {"enum": ["single_year", "band", "open_ended", "unknown"]},
+        "source_code": {"type": "string", "minLength": 1, "description": "Source age code, e.g. Y_LT1, Y42, Y_OPEN, UNK."},
+        "years": {"type": "integer", "minimum": 0, "maximum": 130, "description": "Completed years of age; single_year only."},
+        "lower_bound_years": {"type": "integer", "minimum": 0, "description": "Inclusive lower bound; band and open_ended only."},
+        "upper_bound_years": {"type": "integer", "minimum": 0, "description": "Inclusive upper bound; band only."}
+      }
+    },
+    "recorded_sex": {
+      "description": "Sex as recorded by the source. Not gender identity.",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "vocabulary_version"],
+      "properties": {
+        "code": {"enum": ["F", "M", "UNK"], "description": "F and M as published; UNK = not recorded/unknown, never imputed."},
+        "vocabulary_version": {"const": "eurostat.sex.recorded.v1"}
+      }
+    },
+    "weight": {
+      "description": "Number of persons represented by this record (survey-style weight).",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "value", "unit_ref", "basis"],
+      "properties": {
+        "kind": {"const": "decimal"},
+        "value": {"type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?$"},
+        "unit_ref": {"const": "unit.persons"},
+        "basis": {"type": "object"}
+      }
+    },
+    "reference_date": {"type": "string", "format": "date", "description": "1 January reference date of the source cell."}
+  }
+}

@@ -142,7 +142,7 @@ SELECT exclusion, count(*) AS n FROM cand GROUP BY exclusion
 class CutoffRepository:
     """Time-scoped, read-only access for replay and evaluation."""
 
-    __slots__ = ("_conn", "_cutoff", "_guard", "_mode", "_origins", "_now")
+    __slots__ = ("_conn", "_cutoff", "_guard", "_mode", "_now", "_origins")
 
     def __init__(
         self,

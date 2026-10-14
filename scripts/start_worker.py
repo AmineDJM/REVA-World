@@ -28,7 +28,7 @@ from typing import Any
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _runtime_env import (  # noqa: E402
+from _runtime_env import (
     EX_CONFIG,
     EX_TEMPFAIL,
     SRC,
@@ -58,7 +58,8 @@ def check_owner_credentials(environ: Mapping[str, str]) -> list[str]:
     if present and environ.get("REVA_ENV") == "production":
         raise ConfigError(
             "worker refuses to start: migration-owner credential variable(s) present: "
-            + ", ".join(present) + " (remove them from the reva-worker service)"
+            + ", ".join(present)
+            + " (remove them from the reva-worker service)"
         )
     return present
 
@@ -66,10 +67,12 @@ def check_owner_credentials(environ: Mapping[str, str]) -> list[str]:
 def validate(environ: Mapping[str, str]) -> Any:
     settings = isolated_settings(environ)
     problems = [
-        name for name, value in (
+        name
+        for name, value in (
             ("REVA_WORKER_DB_PASSWORD", settings.reva_worker_db_password),
             ("REVA_SIM_DB_PASSWORD", settings.reva_sim_db_password),
-        ) if value is None
+        )
+        if value is None
     ]
     if settings.reva_env == "production" and not settings.reva_http_contact_email:
         problems.append("REVA_HTTP_CONTACT_EMAIL (provider user-agent contact)")
@@ -149,27 +152,33 @@ def wait_for_schema(
             state = probe(settings)
             state["attempts"] = attempts
             return state
-        except Exception as e:  # noqa: BLE001 - every failure is retried until the deadline
+        except Exception as e:
             orig = getattr(e, "orig", None)
             last = redact(str(orig) if orig is not None else f"{type(e).__name__}: {e}")
         remaining = deadline - (clock() - start)
         if remaining <= 0:
             raise TimeoutError(f"schema/roles not ready after {attempts} attempts in {deadline:.0f}s: {last}")
-        emit({"event": "reva.start", "component": "worker", "status": "waiting", "attempt": attempts,
-              "reason": last})
+        emit({"event": "reva.start", "component": "worker", "status": "waiting", "attempt": attempts, "reason": last})
         sleep(min(delay, remaining))
         delay = min(delay * 2, 30.0)
 
 
-def prepare(environ: Mapping[str, str], dotenv_keys: set[str] | frozenset[str] = frozenset(),
-            extra_pythonpath: str | None = None) -> tuple[list[str], dict[str, str], dict[str, Any], Any]:
+def prepare(
+    environ: Mapping[str, str],
+    dotenv_keys: set[str] | frozenset[str] = frozenset(),
+    extra_pythonpath: str | None = None,
+) -> tuple[list[str], dict[str, str], dict[str, Any], Any]:
     stripped = check_owner_credentials(environ)
     settings = validate(environ)
-    child, removed = build_child_env(environ, "worker", dotenv_keys=dotenv_keys,
-                                     extra_pythonpath=extra_pythonpath)
+    child, removed = build_child_env(environ, "worker", dotenv_keys=dotenv_keys, extra_pythonpath=extra_pythonpath)
     command = exec_target(environ, build_command(environ))
-    summary: dict[str, Any] = {"env": settings.reva_env, "removed_env": removed, "stripped_owner_keys": stripped,
-                               "threads": child["OMP_NUM_THREADS"], "argv": build_command(environ)}
+    summary: dict[str, Any] = {
+        "env": settings.reva_env,
+        "removed_env": removed,
+        "stripped_owner_keys": stripped,
+        "threads": child["OMP_NUM_THREADS"],
+        "argv": build_command(environ),
+    }
     return command, child, summary, settings
 
 
@@ -182,9 +191,15 @@ def main() -> int:
     except ConfigError as e:
         emit({"event": "reva.start", "component": "worker", "status": "error", "error": redact(str(e))})
         return EX_CONFIG
-    except Exception as e:  # noqa: BLE001
-        emit({"event": "reva.start", "component": "worker", "status": "error",
-              "error": redact(f"{type(e).__name__}: {e}")})
+    except Exception as e:
+        emit(
+            {
+                "event": "reva.start",
+                "component": "worker",
+                "status": "error",
+                "error": redact(f"{type(e).__name__}: {e}"),
+            }
+        )
         return EX_CONFIG
     skip_wait = environ.get("REVA_ENV") == "test" and environ.get("REVA_SKIP_SCHEMA_WAIT") == "1"
     if not skip_wait:

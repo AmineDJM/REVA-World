@@ -275,7 +275,7 @@ COVERAGE_STATEMENT = (
 def _release_or_none(conn: Connection, release_id: UUID | None, as_of: datetime | None) -> dict[str, Any] | None:
     try:
         return resolve_release(conn, release_id, as_of)
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         if getattr(e, "code", None) == "no_release":
             return None
         raise

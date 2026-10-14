@@ -79,13 +79,29 @@ def _secret_values(keys: set[str]) -> list[str]:
 
 def test_api_child_env_keeps_only_api_credentials() -> None:
     child, removed = runtime_env.build_child_env(PROD, "api", cgroup_root=NO_CGROUP)
-    for key in ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL", "REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD",
-                "REVA_COMTRADE_API_KEY", "REVA_LLM_API_KEY", "REVA_SANDBOX_TOKEN", "AWS_SECRET_ACCESS_KEY",
-                "GITHUB_TOKEN", "REVA_WORKER_S3_SECRET_ACCESS_KEY", "UNRELATED_SETTING", "HTTPS_PROXY"):
+    for key in (
+        "REVA_MIGRATION_DATABASE_URL",
+        "DATABASE_URL",
+        "REVA_WORKER_DB_PASSWORD",
+        "REVA_SIM_DB_PASSWORD",
+        "REVA_COMTRADE_API_KEY",
+        "REVA_LLM_API_KEY",
+        "REVA_SANDBOX_TOKEN",
+        "AWS_SECRET_ACCESS_KEY",
+        "GITHUB_TOKEN",
+        "REVA_WORKER_S3_SECRET_ACCESS_KEY",
+        "UNRELATED_SETTING",
+        "HTTPS_PROXY",
+    ):
         assert key not in child, key
         assert key in removed
-    for key in ("REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET", "REVA_ADMIN_PASSWORD_HASH",
-                "REVA_S3_ACCESS_KEY_ID", "REVA_S3_SECRET_ACCESS_KEY"):
+    for key in (
+        "REVA_API_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+        "REVA_ADMIN_PASSWORD_HASH",
+        "REVA_S3_ACCESS_KEY_ID",
+        "REVA_S3_SECRET_ACCESS_KEY",
+    ):
         assert child[key] == PROD[key]
     blob = json.dumps(child)
     for value in _secret_values(set(SECRETS) - runtime_env.COMPONENT_SECRETS["api"]):
@@ -101,13 +117,26 @@ def test_api_child_env_keeps_only_api_credentials() -> None:
 def test_worker_child_env_has_no_api_or_owner_secrets() -> None:
     env = {**PROD, "REVA_ENV": "local"}
     child, removed = runtime_env.build_child_env(env, "worker", cgroup_root=NO_CGROUP)
-    for key in ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL", "REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET",
-                "REVA_ADMIN_PASSWORD_HASH", "AWS_SECRET_ACCESS_KEY", "GITHUB_TOKEN",
-                "REVA_WORKER_S3_SECRET_ACCESS_KEY", "REVA_LLM_API_KEY"):
+    for key in (
+        "REVA_MIGRATION_DATABASE_URL",
+        "DATABASE_URL",
+        "REVA_API_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+        "REVA_ADMIN_PASSWORD_HASH",
+        "AWS_SECRET_ACCESS_KEY",
+        "GITHUB_TOKEN",
+        "REVA_WORKER_S3_SECRET_ACCESS_KEY",
+        "REVA_LLM_API_KEY",
+    ):
         assert key not in child, key
     assert "REVA_MIGRATION_DATABASE_URL" in removed
-    for key in ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_S3_ACCESS_KEY_ID",
-                "REVA_S3_SECRET_ACCESS_KEY", "REVA_COMTRADE_API_KEY"):
+    for key in (
+        "REVA_WORKER_DB_PASSWORD",
+        "REVA_SIM_DB_PASSWORD",
+        "REVA_S3_ACCESS_KEY_ID",
+        "REVA_S3_SECRET_ACCESS_KEY",
+        "REVA_COMTRADE_API_KEY",
+    ):
         assert child[key] == env[key]
     assert child["HTTPS_PROXY"] == env["HTTPS_PROXY"]  # the worker performs egress
     llm_child, _ = runtime_env.build_child_env({**env, "REVA_LLM_ENABLED": "true"}, "worker", cgroup_root=NO_CGROUP)
@@ -134,7 +163,9 @@ def test_thread_budget_is_explicit_and_capped_by_cgroup(tmp_path: Path, monkeypa
 def test_dotenv_secrets_are_neutralised_for_child() -> None:
     env = {**CONFIG, "REVA_ENV": "local", **SECRETS}
     child, _ = runtime_env.build_child_env(
-        env, "api", dotenv_keys={"REVA_MIGRATION_DATABASE_URL", "REVA_WORKER_DB_PASSWORD", "REVA_DB_HOST"},
+        env,
+        "api",
+        dotenv_keys={"REVA_MIGRATION_DATABASE_URL", "REVA_WORKER_DB_PASSWORD", "REVA_DB_HOST"},
         cgroup_root=NO_CGROUP,
     )
     assert child["REVA_MIGRATION_DATABASE_URL"] == ""
@@ -149,9 +180,12 @@ def test_command_lines() -> None:
     assert "--host 0.0.0.0 --port 10000 --workers 1 --proxy-headers" in joined
     ips = api[api.index("--forwarded-allow-ips") + 1]
     assert "*" not in ips and "10.0.0.0/8" in ips
-    assert start_api.build_command({**PROD, "REVA_FORWARDED_ALLOW_IPS": "10.1.0.0/16"})[
-        api.index("--forwarded-allow-ips") + 1
-    ] == "10.1.0.0/16"
+    assert (
+        start_api.build_command({**PROD, "REVA_FORWARDED_ALLOW_IPS": "10.1.0.0/16"})[
+            api.index("--forwarded-allow-ips") + 1
+        ]
+        == "10.1.0.0/16"
+    )
     with pytest.raises(runtime_env.ConfigError):
         start_api.build_command({**PROD, "PORT": "http"})
     assert start_worker.build_command(PROD) == [sys.executable, "-m", "reva.operations.worker"]
@@ -174,15 +208,20 @@ def test_worker_refuses_owner_url_in_production_and_strips_otherwise() -> None:
         start_worker.check_owner_credentials(PROD)
     assert OWNER_URL not in str(ei.value) and "REVA_MIGRATION_DATABASE_URL" in str(ei.value)
     assert start_worker.check_owner_credentials({**PROD, "REVA_ENV": "local"}) == [
-        "REVA_MIGRATION_DATABASE_URL", "DATABASE_URL"]
+        "REVA_MIGRATION_DATABASE_URL",
+        "DATABASE_URL",
+    ]
     with pytest.raises(runtime_env.ConfigError):
-        start_worker.validate({**PROD, "REVA_ENV": "production", "REVA_HTTP_CONTACT_EMAIL": ""}
-                              | {"REVA_MIGRATION_DATABASE_URL": ""})
+        start_worker.validate(
+            {**PROD, "REVA_ENV": "production", "REVA_HTTP_CONTACT_EMAIL": ""} | {"REVA_MIGRATION_DATABASE_URL": ""}
+        )
 
 
 def test_redact_removes_url_passwords_and_bound_parameters() -> None:
-    msg = (f"(psycopg.OperationalError) failed {OWNER_URL} [SQL: ALTER ROLE] "
-           f"[parameters: {{'p': '{SECRETS['REVA_API_DB_PASSWORD']}'}}]")
+    msg = (
+        f"(psycopg.OperationalError) failed {OWNER_URL} [SQL: ALTER ROLE] "
+        f"[parameters: {{'p': '{SECRETS['REVA_API_DB_PASSWORD']}'}}]"
+    )
     out = runtime_env.redact(msg, SECRETS)
     assert SECRETS["REVA_API_DB_PASSWORD"] not in out and "own3r" not in out
     assert "reva_owner:***@" in out
@@ -229,8 +268,15 @@ def _stub(tmp_path: Path) -> tuple[Path, Path]:
 
 
 def _run(script: str, env: dict[str, str], cwd: Path) -> subprocess.CompletedProcess[str]:
-    return subprocess.run([sys.executable, str(SCRIPTS / script)], env=env, cwd=cwd, capture_output=True,
-                          text=True, timeout=120, check=False)
+    return subprocess.run(
+        [sys.executable, str(SCRIPTS / script)],
+        env=env,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
 
 
 def _assert_no_values(text: str, keys: set[str]) -> None:
@@ -241,19 +287,45 @@ def _assert_no_values(text: str, keys: set[str]) -> None:
 
 def test_start_api_subprocess_child_environment(tmp_path: Path) -> None:
     stub, out = _stub(tmp_path)
-    env = {**CONFIG, **SECRETS, "REVA_ENV": "test", "REVA_EXEC_OVERRIDE": str(stub),
-           "REVA_OBJECT_BACKEND": "filesystem"}
+    env = {
+        **CONFIG,
+        **SECRETS,
+        "REVA_ENV": "test",
+        "REVA_EXEC_OVERRIDE": str(stub),
+        "REVA_OBJECT_BACKEND": "filesystem",
+    }
     proc = _run("start_api.py", env, tmp_path)
     assert proc.returncode == 0, proc.stderr
     _assert_no_values(proc.stdout + proc.stderr, set(SECRETS))
     child = json.loads(out.read_text())
     cenv, argv = child["env"], child["argv"]
-    assert argv[1:] == ["-m", "uvicorn", "reva.api.app:app", "--host", "0.0.0.0", "--port", "10000", "--workers",
-                        "1", "--proxy-headers", "--forwarded-allow-ips",
-                        start_api.DEFAULT_FORWARDED_ALLOW_IPS, "--timeout-graceful-shutdown", "50",
-                        "--no-server-header"]
-    for key in ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL", "REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD",
-                "REVA_EXEC_OVERRIDE", "AWS_SECRET_ACCESS_KEY", "GITHUB_TOKEN", "REVA_COMTRADE_API_KEY"):
+    assert argv[1:] == [
+        "-m",
+        "uvicorn",
+        "reva.api.app:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "10000",
+        "--workers",
+        "1",
+        "--proxy-headers",
+        "--forwarded-allow-ips",
+        start_api.DEFAULT_FORWARDED_ALLOW_IPS,
+        "--timeout-graceful-shutdown",
+        "50",
+        "--no-server-header",
+    ]
+    for key in (
+        "REVA_MIGRATION_DATABASE_URL",
+        "DATABASE_URL",
+        "REVA_WORKER_DB_PASSWORD",
+        "REVA_SIM_DB_PASSWORD",
+        "REVA_EXEC_OVERRIDE",
+        "AWS_SECRET_ACCESS_KEY",
+        "GITHUB_TOKEN",
+        "REVA_COMTRADE_API_KEY",
+    ):
         assert not cenv.get(key), key
     _assert_no_values(json.dumps(cenv), set(SECRETS) - runtime_env.COMPONENT_SECRETS["api"])
     assert cenv["REVA_API_DB_PASSWORD"] == SECRETS["REVA_API_DB_PASSWORD"]
@@ -296,16 +368,31 @@ def test_start_worker_refuses_owner_url_in_production(tmp_path: Path) -> None:
 
 def test_start_worker_subprocess_child_environment(tmp_path: Path) -> None:
     stub, out = _stub(tmp_path)
-    env = {**CONFIG, **SECRETS, "REVA_ENV": "test", "REVA_EXEC_OVERRIDE": str(stub), "REVA_SKIP_SCHEMA_WAIT": "1",
-           "REVA_OBJECT_BACKEND": "filesystem", "REVA_CPU_BUDGET_THREADS": "1"}
+    env = {
+        **CONFIG,
+        **SECRETS,
+        "REVA_ENV": "test",
+        "REVA_EXEC_OVERRIDE": str(stub),
+        "REVA_SKIP_SCHEMA_WAIT": "1",
+        "REVA_OBJECT_BACKEND": "filesystem",
+        "REVA_CPU_BUDGET_THREADS": "1",
+    }
     proc = _run("start_worker.py", env, tmp_path)
     assert proc.returncode == 0, proc.stderr
     _assert_no_values(proc.stdout + proc.stderr, set(SECRETS))
     child = json.loads(out.read_text())
     assert child["argv"][1:] == ["-m", "reva.operations.worker"]
     cenv = child["env"]
-    for key in ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL", "REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET",
-                "REVA_ADMIN_PASSWORD_HASH", "REVA_EXEC_OVERRIDE", "REVA_SKIP_SCHEMA_WAIT", "GITHUB_TOKEN"):
+    for key in (
+        "REVA_MIGRATION_DATABASE_URL",
+        "DATABASE_URL",
+        "REVA_API_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+        "REVA_ADMIN_PASSWORD_HASH",
+        "REVA_EXEC_OVERRIDE",
+        "REVA_SKIP_SCHEMA_WAIT",
+        "GITHUB_TOKEN",
+    ):
         assert not cenv.get(key), key
     assert cenv["REVA_WORKER_DB_PASSWORD"] == SECRETS["REVA_WORKER_DB_PASSWORD"]
     assert cenv["REVA_SIM_DB_PASSWORD"] == SECRETS["REVA_SIM_DB_PASSWORD"]
@@ -315,10 +402,15 @@ def test_start_worker_subprocess_child_environment(tmp_path: Path) -> None:
 
 
 def test_bootstrap_failure_is_redacted(tmp_path: Path) -> None:
-    env = {"PATH": CONFIG["PATH"], "HOME": "/tmp", "REVA_ENV": "test",
-           "REVA_MIGRATION_DATABASE_URL": "postgresql://reva_owner:boot-secret-pw@127.0.0.1:1/reva",
-           "REVA_API_DB_PASSWORD": "a-boot-pw", "REVA_WORKER_DB_PASSWORD": "w-boot-pw",
-           "REVA_SIM_DB_PASSWORD": "s-boot-pw"}
+    env = {
+        "PATH": CONFIG["PATH"],
+        "HOME": "/tmp",
+        "REVA_ENV": "test",
+        "REVA_MIGRATION_DATABASE_URL": "postgresql://reva_owner:boot-secret-pw@127.0.0.1:1/reva",
+        "REVA_API_DB_PASSWORD": "a-boot-pw",
+        "REVA_WORKER_DB_PASSWORD": "w-boot-pw",
+        "REVA_SIM_DB_PASSWORD": "s-boot-pw",
+    }
     proc = _run("bootstrap_runtime.py", env, tmp_path)
     assert proc.returncode != 0
     assert proc.stdout == ""
@@ -335,9 +427,13 @@ def test_bootstrap_failure_is_redacted(tmp_path: Path) -> None:
 def test_bootstrap_runtime_reports_schema_without_secrets(db, tmp_path: Path) -> None:
     s = db.settings
     env = {
-        "PATH": CONFIG["PATH"], "HOME": "/tmp", "REVA_ENV": "test",
+        "PATH": CONFIG["PATH"],
+        "HOME": "/tmp",
+        "REVA_ENV": "test",
         "REVA_MIGRATION_DATABASE_URL": s.reva_migration_database_url.get_secret_value(),
-        "REVA_DB_HOST": s.reva_db_host, "REVA_DB_PORT": str(s.reva_db_port), "REVA_DB_NAME": db.name,
+        "REVA_DB_HOST": s.reva_db_host,
+        "REVA_DB_PORT": str(s.reva_db_port),
+        "REVA_DB_NAME": db.name,
         "REVA_API_DB_PASSWORD": s.reva_api_db_password.get_secret_value(),
         "REVA_WORKER_DB_PASSWORD": s.reva_worker_db_password.get_secret_value(),
         "REVA_SIM_DB_PASSWORD": s.reva_sim_db_password.get_secret_value(),
@@ -346,8 +442,9 @@ def test_bootstrap_runtime_reports_schema_without_secrets(db, tmp_path: Path) ->
     assert proc.returncode == 0, proc.stderr
     report = json.loads(proc.stdout)
     assert report["status"] == "ok" and report["roles"] == ["reva_api", "reva_worker", "reva_sim"]
-    from reva.cli.bootstrap import alembic_config
     from alembic.script import ScriptDirectory
+
+    from reva.cli.bootstrap import alembic_config
 
     assert report["schema_version"] == ScriptDirectory.from_config(alembic_config()).get_current_head()
     owner_pw = s.migration_url().password

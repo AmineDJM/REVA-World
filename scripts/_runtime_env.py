@@ -33,7 +33,7 @@ EX_TEMPFAIL = 75
 def ensure_importable() -> bool:
     """Make ``reva`` importable. Returns True when ``src`` had to be added."""
     try:
-        import reva  # noqa: F401
+        import reva
     except ModuleNotFoundError:
         sys.path.insert(0, str(SRC))
         import reva  # noqa: F401
@@ -76,18 +76,45 @@ COMPONENT_SECRETS: dict[Component, frozenset[str]] = {
 
 SYSTEM_KEYS = frozenset(
     {
-        "PATH", "HOME", "USER", "LOGNAME", "HOSTNAME", "LANG", "LANGUAGE", "TZ", "TMPDIR", "TERM",
-        "PYTHONPATH", "PYTHONDONTWRITEBYTECODE", "PYTHONUNBUFFERED", "PYTHONIOENCODING", "PYTHONUTF8",
-        "PYTHONFAULTHANDLER", "VIRTUAL_ENV", "SSL_CERT_FILE", "SSL_CERT_DIR", "REQUESTS_CA_BUNDLE",
-        "CURL_CA_BUNDLE", "PORT",
+        "PATH",
+        "HOME",
+        "USER",
+        "LOGNAME",
+        "HOSTNAME",
+        "LANG",
+        "LANGUAGE",
+        "TZ",
+        "TMPDIR",
+        "TERM",
+        "PYTHONPATH",
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONUNBUFFERED",
+        "PYTHONIOENCODING",
+        "PYTHONUTF8",
+        "PYTHONFAULTHANDLER",
+        "VIRTUAL_ENV",
+        "SSL_CERT_FILE",
+        "SSL_CERT_DIR",
+        "REQUESTS_CA_BUNDLE",
+        "CURL_CA_BUNDLE",
+        "PORT",
     }
 )
 # Render's documented default (non-secret) service variables.
 RENDER_KEYS = frozenset(
     {
-        "RENDER", "RENDER_SERVICE_ID", "RENDER_SERVICE_NAME", "RENDER_SERVICE_TYPE", "RENDER_INSTANCE_ID",
-        "RENDER_GIT_COMMIT", "RENDER_GIT_BRANCH", "RENDER_GIT_REPO_SLUG", "RENDER_EXTERNAL_URL",
-        "RENDER_EXTERNAL_HOSTNAME", "RENDER_DISCOVERY_SERVICE", "IS_PULL_REQUEST",
+        "RENDER",
+        "RENDER_SERVICE_ID",
+        "RENDER_SERVICE_NAME",
+        "RENDER_SERVICE_TYPE",
+        "RENDER_INSTANCE_ID",
+        "RENDER_GIT_COMMIT",
+        "RENDER_GIT_BRANCH",
+        "RENDER_GIT_REPO_SLUG",
+        "RENDER_EXTERNAL_URL",
+        "RENDER_EXTERNAL_HOSTNAME",
+        "RENDER_DISCOVERY_SERVICE",
+        "IS_PULL_REQUEST",
     }
 )
 # Only the worker performs outbound HTTP (through SafeHttpClient).
@@ -95,13 +122,20 @@ PROXY_KEYS = frozenset({"HTTP_PROXY", "HTTPS_PROXY", "NO_PROXY", "http_proxy", "
 #: Non-secret REVA_* variables used by the entrypoints themselves or the build.
 EXTRA_REVA_CONFIG = frozenset(
     {
-        "REVA_FORWARDED_ALLOW_IPS", "REVA_GIT_COMMIT", "REVA_IMAGE_DIGEST",
+        "REVA_FORWARDED_ALLOW_IPS",
+        "REVA_GIT_COMMIT",
+        "REVA_IMAGE_DIGEST",
         "REVA_WORKER_STARTUP_DEADLINE_SECONDS",
     }
 )
 THREAD_VARS = (
-    "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "POLARS_MAX_THREADS",
-    "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "RAYON_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "POLARS_MAX_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+    "RAYON_NUM_THREADS",
 )
 #: Variables honoured only when REVA_ENV=test (never in local/production).
 TEST_ONLY = frozenset({"REVA_EXEC_OVERRIDE", "REVA_SKIP_SCHEMA_WAIT"})
@@ -186,7 +220,9 @@ def read_dotenv(path: Path) -> dict[str, str]:
     return {k: v for k, v in dotenv_values(path).items() if v is not None}
 
 
-def merged_environ(environ: Mapping[str, str] | None = None, cwd: Path | None = None) -> tuple[dict[str, str], set[str]]:
+def merged_environ(
+    environ: Mapping[str, str] | None = None, cwd: Path | None = None
+) -> tuple[dict[str, str], set[str]]:
     """Process environment plus a local .env (process env wins).
 
     Returns (merged, dotenv_keys). In production a .env file is refused: the

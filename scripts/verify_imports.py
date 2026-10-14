@@ -24,8 +24,7 @@ def main() -> int:
         return 2
     env = dict(os.environ)
     env["PYTHONPATH"] = str(ROOT / "src") + (os.pathsep + env["PYTHONPATH"] if env.get("PYTHONPATH") else "")
-    return subprocess.run([exe, "--config", str(ROOT / "pyproject.toml")], cwd=ROOT, env=env,
-                          check=False).returncode
+    return subprocess.run([exe, "--config", str(ROOT / "pyproject.toml")], cwd=ROOT, env=env, check=False).returncode
 
 
 if __name__ == "__main__":

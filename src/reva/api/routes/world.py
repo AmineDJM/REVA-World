@@ -388,7 +388,7 @@ def list_locations(
             match_status=r["match_status"], name=str(name) if name is not None else None,
             dataset_sha256=r["dataset_sha256"])))
     origin = origin_of(origins)
-    warnings = origin_warnings(origin) + [s.ApiWarning(code="display_only", message=DISPLAY_NOTE)]
+    warnings = [*origin_warnings(origin), s.ApiWarning(code="display_only", message=DISPLAY_NOTE)]
     if truncated:
         warnings.append(s.ApiWarning(code="truncated", message=f"Bounded at {MAX_FEATURES} features"))
     if not feats:

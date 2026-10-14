@@ -69,7 +69,7 @@ def ready(request: Request) -> Any:
             ))
     except ApiProblem:
         raise
-    except Exception as e:  # noqa: BLE001 - readiness reports, never raises
+    except Exception as e:
         checks.append(s.HealthCheck(name="database", ok=False, detail=type(e).__name__))
     ok = bool(checks) and all(c.ok for c in checks)
     body = s.HealthReady(status="ready" if ok else "not_ready", checks=checks)
@@ -159,7 +159,8 @@ def list_jobs(
         rows = [dict(r) for r in conn.execute(
             text(JOB_SQL + """ WHERE (CAST(:jt AS text) IS NULL OR job_type = :jt)
                  AND (CAST(:st AS text) IS NULL OR status = :st)
-                 AND (CAST(:c0 AS timestamptz) IS NULL OR (created_at, id) < (CAST(:c0 AS timestamptz), CAST(:c1 AS uuid)))
+                 AND (CAST(:c0 AS timestamptz) IS NULL
+                      OR (created_at, id) < (CAST(:c0 AS timestamptz), CAST(:c1 AS uuid)))
                  ORDER BY created_at DESC, id DESC LIMIT :lim"""),
             {"jt": job_type, "st": status, "c0": cur[0] if cur else None, "c1": cur[1] if cur else None,
              "lim": limit + 1},

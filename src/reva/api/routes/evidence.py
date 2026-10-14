@@ -181,7 +181,9 @@ def timeseries_response(
     ent = conn.execute(text(
         """SELECT e.id, e.label, c.concept_id AS kind FROM world.entity e
            JOIN ontology.concept_version c ON c.id = e.kind_concept_id WHERE e.id = :i"""),
-        {"i": subject}).mappings().one()
+        {"i": subject}).mappings().one_or_none()
+    if ent is None:
+        raise NotFound("entity not found", entity=str(subject))
     rows = [dict(r) for r in conn.execute(text(OBS_SQL), obs_params(
         as_of=as_of, subject=subject, concept=concept, source=source, all_revisions=True,
         lim=MAX_SERIES_ROWS + 1)).mappings()]

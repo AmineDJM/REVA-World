@@ -22,7 +22,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from _runtime_env import EX_CONFIG, ConfigError, emit, ensure_importable, redact  # noqa: E402
+from _runtime_env import EX_CONFIG, ConfigError, emit, ensure_importable, redact
 
 
 def main() -> int:
@@ -32,7 +32,7 @@ def main() -> int:
         from reva.cli.bootstrap import bootstrap
         from reva.kernel.errors import ConfigurationError
         from reva.settings import load_settings
-    except Exception as e:  # noqa: BLE001 - report import problems without traceback noise
+    except Exception as e:
         emit({"event": "reva.bootstrap", "status": "error", "error": redact(f"{type(e).__name__}: {e}")})
         return 1
     try:
@@ -41,7 +41,7 @@ def main() -> int:
     except (ConfigurationError, ConfigError) as e:
         emit({"event": "reva.bootstrap", "status": "error", "kind": "configuration", "error": redact(str(e))})
         return EX_CONFIG
-    except Exception as e:  # noqa: BLE001
+    except Exception as e:
         # SQLAlchemy wraps driver errors; the wrapped message may echo bound
         # parameters (role passwords). Report only the driver-level message.
         orig = getattr(e, "orig", None)

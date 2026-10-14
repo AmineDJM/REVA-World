@@ -657,7 +657,7 @@ progress {
   border-bottom: 1px solid var(--border);
   margin-bottom: 10px;
 }
-.tabs button[aria-selected='true'] {
+.tabs button[aria-pressed='true'] {
   background: var(--accent);
   color: #fff;
 }
