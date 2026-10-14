@@ -41,10 +41,10 @@ _FILE = re.compile(r"^(?P<name>[a-z][a-z0-9_]*)\.v(?P<major>\d+)\.schema\.json$"
 # immutable: changing the schema file of a listed version fails verification;
 # publish a new version instead (see classify_change for the required bump).
 PUBLISHED_COMPONENT_DIGESTS: Mapping[str, str] = {
-    "demographics@1.0.0": "PENDING",
-    "display_geometry@1.0.0": "PENDING",
-    "economy@1.0.0": "PENDING",
-    "trade_crude@1.0.0": "PENDING",
+    "demographics@1.0.0": "efbd8fabbc4678371ad9cabfbc8a9da31c3e0cfa90b3c983215942fa00578ad5",
+    "display_geometry@1.0.0": "6aeb397849e6f49425e155119dac5a031934fe86dc446d25bb7a80aefc3a270c",
+    "economy@1.0.0": "4c2cf98e608e252cea32c201bbb54a6607e43e0a9447031d95b0207f4cf90dbe",
+    "trade_crude@1.0.0": "232abc1bc5665c47929b68b1ba526002c64a7ed5a5cd2d15d8dd0cf583119e60",
 }
 
 # Entity kinds referenced by component manifests that are not yet registered

@@ -37,7 +37,7 @@ CATALOGUE_VERSION = "1.0.0"
 CATALOGUE_SCHEMA = "reva.capability_catalogue/1"
 
 Status = Literal["implemented", "reserved", "blocked"]
-PHASES: tuple[str, ...] = tuple(f"P{i}" for i in range(13)) + ("unscheduled",)
+PHASES: tuple[str, ...] = (*(f"P{i}" for i in range(13)), "unscheduled")
 
 SANDBOX_ENDPOINT_ENV = "REVA_SANDBOX_ENDPOINT"
 
