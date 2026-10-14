@@ -1,0 +1,16 @@
+[
+  {
+    "request_fingerprint": "d6ec1d9d6b430a3f7b8f9aed38c867d174a6732b10d5c3848c2179b44bb341eb",
+    "url": "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip",
+    "file": "d6ec1d9d6b430a3f.zip",
+    "sha256": "0f243aeac8ac6cf26f0417285b0bd33ac47f1b5bdb719fd3e0df37d03ea37110",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip",
+      "last-modified": "Fri, 13 May 2022 05:22:22 GMT",
+      "etag": "\"374f5381a2ff702d3d79d345a9e5f65c\""
+    },
+    "retrieved_at": "2026-10-14T22:43:33.525905+00:00",
+    "licence": "Public domain"
+  }
+]

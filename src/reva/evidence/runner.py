@@ -274,3 +274,15 @@ def make_live_client(spec: Any, settings: Any) -> SafeHttpClient:
 
 def outcomes_ok(outcomes: Sequence[FetchOutcome]) -> bool:
     return all(o.status in ("published", "unchanged") for o in outcomes)
+
+
+def post_publish_for(template: str) -> Any:
+    if template == "naturalearth_asset":
+        from reva.world.space import publish_display_geometries
+
+        return publish_display_geometries
+    if template == "crossref_doi":
+        from reva.evidence.cards import publish_study
+
+        return publish_study
+    return None

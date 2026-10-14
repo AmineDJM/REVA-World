@@ -1,0 +1,63 @@
+# Curated, human-reviewed qualitative card. It explains WHY the origin of an oil
+# price shock matters for REVA's crude-exposure stress test. It deliberately
+# contains NO effect coefficients: V1 has DOI metadata only (no lawful full text
+# was retrieved), so quantitative fields are explicit 'not_extracted'.
+status: reviewed
+card:
+  claim_id: kilian2009.oil_shock_origin_matters
+  claim_version: 1
+  question: >-
+    Do oil price increases have one universal macroeconomic effect, or does the effect depend on
+    the underlying shock (supply vs demand)?
+  estimand: {missing: not_extracted}
+  treatment: "Oil price shocks distinguished by origin (crude oil supply vs demand shocks)"
+  comparator: {missing: not_extracted}
+  outcome: {missing: not_extracted}
+  population: {missing: not_extracted}
+  geography: {missing: not_extracted}
+  period: {missing: not_extracted}
+  horizon: {missing: not_extracted}
+  units: {missing: not_extracted}
+  effect_scale: {missing: not_extracted}
+  study_ids: ["doi:10.1257/aer.99.3.1053"]
+  dataset_families: {missing: not_extracted}
+  sample_size: {missing: not_extracted}
+  design: {missing: not_extracted}
+  coefficient: {missing: not_extracted}
+  standard_error: {missing: not_extracted}
+  covariance_ref: {missing: not_extracted}
+  identification_assumptions: {missing: not_extracted}
+  confounders: {missing: not_extracted}
+  selection: {missing: not_extracted}
+  interference: {missing: not_extracted}
+  measurement_validity: {missing: not_extracted}
+  risk_of_bias: {missing: not_extracted}
+  robustness: {missing: not_extracted}
+  replication_status: {missing: not_extracted}
+  publication_status: "published (journal article per Crossref metadata)"
+  retraction_status: "none signalled by Crossref update relations at retrieval"
+  external_validity: {missing: not_extracted}
+  mechanism: "Supply and demand shocks are distinguished as different origins of oil price changes."
+  competing_explanations: {missing: not_extracted}
+  source_spans:
+    - artifact: crossref_metadata
+      locator: "/message/title/0"
+      quote: "Not All Oil Price Shocks Are Alike: Disentangling Demand and Supply Shocks in the Crude Oil Market"
+  extraction_method: manual_curation_from_metadata
+  extraction_version: "1"
+  human_review: {reviewer: "maintainer:curation", scope: "qualitative relevance only; no quantitative extraction"}
+  licence: "Card text: internal; bibliographic metadata via Crossref (CC0)"
+  evidence_kind: observational
+  ratings:
+    identification: not_assessed
+    precision: not_assessed
+    bias: not_assessed
+    transportability: not_assessed
+    replication: not_assessed
+    measurement: not_assessed
+    documentation: metadata_only
+  relevance_to_reva: >-
+    The title states that oil price shocks are not alike and separates demand from supply shocks.
+    REVA therefore does not attach one universal macroeconomic multiplier to a border-price
+    increase: the crude exposure model is an assumption-conditioned accounting stress test, and a
+    headline price shock is not automatically the modelled intervention.

@@ -1,0 +1,14 @@
+[
+  {
+    "request_fingerprint": "04aa4ca3e1c4c10753b674edfc052ee6723a696fd741419448cbb98c2d3ec5ba",
+    "url": "https://api.crossref.org/works/10.1257/aer.99.3.1053",
+    "file": "04aa4ca3e1c4c107.json",
+    "sha256": "80facae388a309a3c1663f6ae6634445093effb3b9b8ae7b5b4a7c2f2d5cb514",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-14T22:43:35.424999+00:00",
+    "licence": "CC0 metadata"
+  }
+]
