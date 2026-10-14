@@ -182,6 +182,7 @@ CREATE TABLE evidence.observation_retraction (
   activity_id uuid NOT NULL REFERENCES meta.activity,
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+CREATE INDEX retraction_observation ON evidence.observation_retraction(observation_id);
 
 -- (6) concept/scope-specific eligibility per connector version; append-only
 -- decisions, latest decision wins.

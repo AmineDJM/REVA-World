@@ -259,6 +259,8 @@ CREATE TABLE world.relation (
   CHECK (num_nonnulls(release_id, evidence_observation_id) = 1)
 );
 CREATE INDEX relation_release ON world.relation(release_id, layer);
+CREATE INDEX relation_observation ON world.relation(evidence_observation_id);
+CREATE INDEX relation_layer ON world.relation(layer, support_id);
 CREATE TABLE world.relation_participant (
   relation_id uuid NOT NULL REFERENCES world.relation,
   ordinal integer NOT NULL CHECK (ordinal >= 0),

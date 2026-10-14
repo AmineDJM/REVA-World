@@ -356,6 +356,42 @@ def test_cancellation_before_publication(db, baseline):
     assert count(db, "SELECT count(*) FROM sim.run WHERE job_id=:j", j=ctx.job_id) == 0
 
 
+def test_worker_shutdown_is_not_a_user_cancel(db, baseline):
+    """R2-01: a shutdown signal raises JobCancelled (the worker requeues); the job is not ended."""
+    from reva.operations.jobs import JobCancelled
+
+    sid = create_scenario(db, make_spec(baseline, title="Test: shutdown"))
+    payload = {"scenario_id": str(sid)}
+    ctx = claim_job(db, payload)
+    ctx.heartbeat = lambda _p=None: "cancel_requested"  # what the worker reports while shutting down
+    ctx.shutdown_requested = lambda: True  # type: ignore[attr-defined]
+    with pytest.raises(JobCancelled):
+        handle_simulation(payload, ctx)
+    assert job_row(db, ctx.job_id)["status"] == "running"  # left for the worker to release, not cancelled
+    assert count(db, "SELECT count(*) FROM sim.run WHERE job_id=:j", j=ctx.job_id) == 0
+
+
+def test_run_reuse_key_includes_model_manifest(db, baseline, monkeypatch):
+    """R2-06: identical spec + baseline but different model/engine code never reuses the old run."""
+    from reva.simulation import jobs as sim_jobs
+
+    sid = create_scenario(db, make_spec(baseline, seed=4242, title="Test: manifest reuse"))
+    first, _ = run(db, sid)
+    again, _ = run(db, sid)
+    assert again["run_id"] == first["run_id"] and again.get("idempotent_replay") is True
+    real = sim_jobs.model_manifest
+
+    def changed(conn):
+        m = real(conn)
+        m["models"][0] = {**m["models"][0], "implementation_digest": "sha256:" + "0" * 64}
+        return m
+
+    monkeypatch.setattr(sim_jobs, "model_manifest", changed)
+    other, _ = run(db, sid)
+    assert other["status"] == "succeeded" and other["run_id"] != first["run_id"]
+    assert not other.get("idempotent_replay")
+
+
 @pytest.mark.parametrize("table", ["evidence.observation", "belief.estimate", "belief.release"])
 def test_sim_role_cannot_write_evidence_or_beliefs(db, baseline, table):
     before = count(db, f"SELECT count(*) FROM {table}")

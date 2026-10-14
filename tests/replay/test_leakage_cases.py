@@ -267,6 +267,61 @@ async def test_available_then_excludes_records_without_availability_proof(db):
         assert op["status"] == "no_release_at_cutoff" and op["outputs"] == []
 
 
+async def test_available_then_applies_retractions_and_eligibility_as_of_the_cutoff(db):
+    """R3-10: later retractions/quarantines are flagged, never used to exclude (no hindsight)."""
+    name = "pop_fra_1970_1971_archive"
+    await vl.ingest_vintage(db.worker, db.store, name, "current")
+    await vl.ingest_vintage(db.worker, db.store, name, "archived_2015")
+    cutoff = datetime(2016, 1, 1, tzinfo=UTC)
+    with db.owner.connect() as conn:
+        base = available_then_reconstruction(conn, cutoff, origins=["test_fixture"], concepts=[POP])
+        target = next(i for i in base["inputs"] if i["logical_key"] == "wb:SP.POP.TOTL:FRA:1970")
+        assert target["post_cutoff_flags"] == []
+        assert base["data_quality_decisions"]["retractions_as_of"] == cutoff.isoformat()
+        assert base["data_quality_decisions"]["eligibility_as_of"] == cutoff.isoformat()
+        design = base["algorithm_design"]
+        assert design["algorithm_design_date"] == design["method_registered_at"] > cutoff.isoformat()
+        # REVA's eligibility decisions postdate 2016: the first (design) decision is used and dated
+        assert target["eligibility_evaluated_at"] > cutoff.isoformat()
+        flags = {f["flag"]: f["count"] for f in base["post_cutoff_flags"]}
+        assert flags.get("eligibility_from_first_decision_after_cutoff", 0) >= 1
+        conn.rollback()
+
+        # Within a rolled-back transaction: retract the record and quarantine its scope *now*.
+        with conn.begin():
+            obs = conn.execute(text("SELECT connector_version_id, concept_version_id, subject_id "
+                                    "FROM evidence.observation WHERE id = :o"),
+                               {"o": target["observation_id"]}).mappings().one()
+            act = _activity(conn, "test.r3_10")
+            conn.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                              "VALUES (:o, 'test: withdrawn after the cutoff', :a)"),
+                         {"o": target["observation_id"], "a": act})
+            conn.execute(text(
+                """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+                     decision, policy_version, review_activity_id)
+                   VALUES (:cv, :c, CAST(:ap AS jsonb), 'quarantine', 'r3-10-test', :a)"""),
+                {"cv": obs["connector_version_id"], "c": obs["concept_version_id"], "a": act,
+                 "ap": json.dumps({"subject_ids": [str(obs["subject_id"])]})})
+            m = available_then_reconstruction(conn, cutoff, origins=["test_fixture"], concepts=[POP])
+            again = {i["logical_key"]: i for i in m["inputs"]}
+            kept = again["wb:SP.POP.TOTL:FRA:1970"]
+            assert kept["observation_id"] == target["observation_id"]  # still in: it was available then
+            assert set(kept["post_cutoff_flags"]) == {"retracted_after_cutoff", "ineligible_after_cutoff"}
+            flags = {f["flag"]: f["count"] for f in m["post_cutoff_flags"]}
+            assert flags["retracted_after_cutoff"] >= 1 and flags["ineligible_after_cutoff"] >= 1
+            assert {o["observation_id"] for o in m["outputs"]} >= {target["observation_id"]}
+            # a cutoff after both decisions applies them
+            later = _now_conn(conn)
+            m2 = available_then_reconstruction(conn, later, origins=["test_fixture"], concepts=[POP])
+            assert target["observation_id"] not in {i["observation_id"] for i in m2["inputs"]}
+            assert {e["reason"]: e["count"] for e in m2["exclusions"]}.get("ineligible", 0) >= 1
+            conn.rollback()
+
+
+def _now_conn(conn) -> datetime:
+    return conn.execute(text("SELECT clock_timestamp()")).scalar_one()
+
+
 async def test_revised_data_retrospective_is_labelled_everywhere(db):
     c = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
@@ -286,8 +341,14 @@ async def test_revised_data_retrospective_is_labelled_everywhere(db):
     assert all(f["inputs_recorded_after_origin"] > 0 for f in m["outputs"])
     assert m["design"]["inputs_recorded_after_fold_origin"] > 0
     # WDI 2000-2024 annual series for 4 countries x 2 concepts, origins from 2004
+    # publication lag (R3-14): default 1 year, so at the 31 Dec 2010 information date the last
+    # available reference year is 2009 and h=1 targets 2011 (two steps after the last observation)
+    assert m["design"]["publication_lag_years"] == 1 and "publication" in m["design"]["publication_lag_note"]
     fold = next(f for f in m["outputs"] if f["origin_year"] == 2010 and f["horizon"] == 1
                 and f["series"]["concept_id"] == POP)
-    assert fold["target_year"] == 2011 and fold["train_years"] == [2000, 2010]
+    assert fold["target_year"] == 2011 and fold["train_years"] == [2000, 2009]
+    assert fold["last_train_year"] == 2009 and fold["steps_after_last_observation"] == 2
+    assert fold["information_date"] == "2010-12-31" and fold["publication_lag_years"] == 1
+    assert all(f["target_year"] - f["last_train_year"] == f["horizon"] + 1 for f in m["outputs"])
     lv = next(p for p in fold["predictions"] if p["model"] == "forecast.last_value@1.0.0")
     assert lv["abs_error_latest_revised"] == pytest.approx(abs(lv["point"] - fold["actual_latest_revised"]))

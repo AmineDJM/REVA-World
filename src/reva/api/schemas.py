@@ -70,13 +70,27 @@ class MissingValue(OpenModel):
     detail: str | None = None
 
 
+class SensitivityRangeValue(OpenModel):
+    """An assumption-sensitivity range over a scenario grid (L2): never a point, never a confidence interval."""
+
+    kind: Literal["sensitivity_range"] = "sensitivity_range"
+    lower: str = Field(description="Exact decimal string")
+    upper: str = Field(description="Exact decimal string")
+    unit_ref: str
+    basis: dict[str, Any] = Field(default_factory=dict)
+    evaluated_points: int | None = None
+    includes_fixed_quantity_point: bool | None = None
+    statement: str = Field(description="Assumption sensitivity, not a confidence interval")
+
+
 class OtherValue(OpenModel):
     """Category, text, entity reference, array, distribution or geometry values."""
 
     kind: Literal["category", "text", "entity", "array", "distribution", "geometry"]
 
 
-TypedValue = Annotated[DecimalValue | FloatValue | MissingValue | OtherValue, Field(discriminator="kind")]
+TypedValue = Annotated[DecimalValue | FloatValue | MissingValue | SensitivityRangeValue | OtherValue,
+                       Field(discriminator="kind")]
 
 
 class Uncertainty(OpenModel):

@@ -67,6 +67,8 @@ def _grants() -> str:
         "ops.connector_cursor, ops.worker_presence TO reva_api;"
     )
     s.append("GRANT INSERT ON ops.audit TO reva_api;")
+    # (R2-09) session revocations are recorded by the API and pruned by the worker.
+    s.append("GRANT SELECT, INSERT ON ops.session_revocation TO reva_api;")
     s.append(
         "GRANT EXECUTE ON FUNCTION ops.submit_job(text,jsonb,text,integer,text), "
         "ops.request_cancel(uuid,text), ops.review_proposal(uuid,text,text,text), "
@@ -84,12 +86,12 @@ def _grants() -> str:
     # and promotions keep a direct grant for now, guarded by BEFORE INSERT
     # triggers; ops.record_gate_result / model.record_promotion are the
     # checked path callers should migrate to.
-    s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review FROM reva_worker;")
+    s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation FROM reva_worker;")
     s.append(
         "GRANT UPDATE ON ops.job, ops.schedule, ops.dirty_node, ops.outbox, ops.connector_cursor, "
         "ops.gc_candidate, ops.budget_ledger, ops.worker_presence TO reva_worker;"
     )
-    s.append("GRANT DELETE ON ops.dirty_node, ops.gc_candidate TO reva_worker;")
+    s.append("GRANT DELETE ON ops.dirty_node, ops.gc_candidate, ops.session_revocation TO reva_worker;")
     s.append("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ops TO reva_worker;")
     s.append(
         "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint), "

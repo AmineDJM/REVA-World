@@ -23,6 +23,7 @@ GOOD_PROD = {
     "reva_s3_secret_access_key": S3_SECRET,
     "reva_session_secret": "x" * 48,
     "reva_public_base_url": "https://reva.example.org",
+    "reva_db_sslmode": "verify-full",
 }
 
 
@@ -56,6 +57,8 @@ def test_valid_production_configuration_is_accepted(clean_env: pytest.MonkeyPatc
         ({"reva_session_secret": None}, "REVA_SESSION_SECRET"),
         ({"reva_session_secret": "short"}, "REVA_SESSION_SECRET"),
         ({"reva_public_base_url": "http://reva.example.org"}, "https"),
+        ({"reva_db_sslmode": None}, "SSLMODE"),
+        ({"reva_db_sslmode": "disable"}, "SSLMODE"),
         ({"reva_llm_enabled": True, "reva_llm_monthly_budget_usd": 0}, "BUDGET"),
     ],
 )

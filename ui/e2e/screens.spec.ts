@@ -26,12 +26,12 @@ for (const path of SCREENS) {
     }
     // The cutoff is a stated timestamp, not "not stated" (the stack has a published release).
     const cutoff = banner.locator('dt', { hasText: 'Knowledge cutoff' }).locator('xpath=following-sibling::dd[1]');
-    await expect(cutoff).not.toHaveText(/not stated|not loaded/);
-    if (RELEASE) await expect(cutoff).toContainText(RELEASE.knowledge_cutoff.slice(0, 10));
+    await expect.soft(cutoff, 'knowledge cutoff must be stated on every screen').not.toHaveText(/not stated|not loaded/);
+    if (RELEASE) await expect.soft(cutoff).toContainText(RELEASE.knowledge_cutoff.slice(0, 10));
 
-    // All data in this stack is captured fixtures: the screen must say so.
-    await expect(page.getByTestId('fixture-label').first()).toBeVisible();
-    await expect(page.getByTestId('fixture-label').first()).toContainText('TEST FIXTURE');
+    // The stack runs in fixture mode (only captured fixtures, one test_fixture release): every
+    // screen must say so (spec §11 "Fixture mode is visibly labelled").
+    await expect.soft(page.getByTestId('fixture-label').first(), 'TEST FIXTURE label').toContainText('TEST FIXTURE');
 
     expect(failures, failures.join('\n')).toEqual([]);
   });
@@ -40,7 +40,6 @@ for (const path of SCREENS) {
 test('keyboard navigation reaches the skip link, every screen link and the main simulation controls', async ({ page }) => {
   await page.goto('/simulation');
   await settle(page);
-  await page.locator('body').click({ position: { x: 1, y: 1 } });
   await page.keyboard.press('Tab');
   const first = await page.evaluate(() => document.activeElement?.textContent?.trim());
   expect(first).toBe('Skip to content');
@@ -71,8 +70,10 @@ test('keyboard navigation reaches the skip link, every screen link and the main 
   await expect(page).toHaveURL(/\/models$/);
 
   // Skip link moves focus to main content.
-  await page.locator('body').click({ position: { x: 1, y: 1 } });
+  await page.reload();
+  await settle(page);
   await page.keyboard.press('Tab');
+  expect(await page.evaluate(() => document.activeElement?.textContent?.trim())).toBe('Skip to content');
   await page.keyboard.press('Enter');
   expect(await page.evaluate(() => document.activeElement?.id)).toBe('main');
 });

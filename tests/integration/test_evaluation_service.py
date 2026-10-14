@@ -111,7 +111,7 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
         assert e["metrics"]["label"] == LABEL
         assert e["evaluation_manifest_sha256"] == res["manifest_sha256"]
     naive = next(e for e in dev if e["model_key"] == "forecast.last_value")
-    assert naive["metrics"]["is_naive_baseline"] is True and naive["metrics"]["n_predictions"] > 0
+    assert naive["metrics"]["is_naive_baseline"] is True and naive["metrics"]["unpaired"]["n_predictions"] > 0
     assert naive["metrics"]["paired"]["mase"] is not None and naive["metrics"]["paired"]["n_common_cases"] > 0
     assert naive["metrics"]["unpaired"]["is_baseline"] is True
     assert "series_id=DZA:" + POP in naive["metrics"]["subgroups"]

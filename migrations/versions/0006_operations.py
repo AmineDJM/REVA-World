@@ -133,7 +133,7 @@ CREATE TABLE ops.gate_result (
   proposal_id uuid NOT NULL REFERENCES ops.proposal,
   gate_name text NOT NULL,
   policy_version text NOT NULL,
-  decision text NOT NULL CHECK (decision IN ('pass','fail','blocked')),
+  decision text NOT NULL CHECK (decision IN ('pass','fail','blocked','needs_review')),
   evidence_sha256 text NOT NULL REFERENCES meta.artifact,
   evaluator text NOT NULL,
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp(),
@@ -185,21 +185,38 @@ CREATE TABLE ops.api_token (
   created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
   revoked_at timestamptz
 );
+-- (R2-09) Server-side revocation of API sessions (logout / admin revoke).
+-- Mutable operational table: rows may be pruned after expires_at.
+CREATE TABLE ops.session_revocation (
+  session_id text PRIMARY KEY CHECK (length(session_id) BETWEEN 8 AND 200),
+  revoked_at timestamptz NOT NULL DEFAULT clock_timestamp(),
+  expires_at timestamptz NOT NULL
+);
+CREATE INDEX session_revocation_expiry ON ops.session_revocation(expires_at);
 
 -- ---------------------------------------------------------------------------
 -- Narrow SECURITY DEFINER functions. search_path is fixed; arguments validated.
 -- ---------------------------------------------------------------------------
+-- Client idempotency keys are namespaced (R2-02): the stored key is
+-- 'api:' || created_by || ':' || type || ':' || key, so a client key can never
+-- collide with (and thereby return or block) an internal job whose key the
+-- worker/scheduler chose (those enqueue directly with their own prefixes), nor
+-- with another principal's or another job type's key.
 CREATE FUNCTION ops.submit_job(p_type text, p_payload jsonb, p_idempotency_key text,
                                p_priority integer, p_created_by text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
-DECLARE jid uuid;
+DECLARE jid uuid; k text;
 BEGIN
+  IF p_created_by IS NULL OR length(p_created_by) < 1 OR length(p_created_by) > 200 THEN
+    RAISE EXCEPTION 'invalid job creator';
+  END IF;
   IF p_type NOT IN ('simulation','replay','discovery','ingest','evaluation','population','health') THEN
     RAISE EXCEPTION 'job type % cannot be submitted through the API', p_type;
   END IF;
-  IF length(p_idempotency_key) < 8 OR length(p_idempotency_key) > 200 THEN
+  IF p_idempotency_key IS NULL OR length(p_idempotency_key) < 8 OR length(p_idempotency_key) > 200 THEN
     RAISE EXCEPTION 'invalid idempotency key';
   END IF;
+  k := 'api:' || p_created_by || ':' || p_type || ':' || p_idempotency_key;
   IF p_priority < -10 OR p_priority > 10 THEN
     RAISE EXCEPTION 'priority out of API range';
   END IF;
@@ -208,11 +225,11 @@ BEGIN
     RAISE EXCEPTION 'job payload missing or larger than 64 KiB';
   END IF;
   INSERT INTO ops.job(job_type, payload, idempotency_key, priority, created_by)
-  VALUES (p_type, p_payload, p_idempotency_key, p_priority, p_created_by)
+  VALUES (p_type, p_payload, k, p_priority, p_created_by)
   ON CONFLICT (idempotency_key) DO NOTHING
   RETURNING id INTO jid;
   IF jid IS NULL THEN
-    SELECT id INTO jid FROM ops.job WHERE idempotency_key = p_idempotency_key
+    SELECT id INTO jid FROM ops.job WHERE idempotency_key = k
       AND job_type = p_type AND payload = p_payload;
     IF jid IS NULL THEN
       RAISE EXCEPTION 'idempotency key reused with a different request';
@@ -309,7 +326,7 @@ BEGIN
   IF p_gate_name IS NULL OR p_gate_name !~ '^[A-Za-z0-9_.-]{1,100}$' THEN
     RAISE EXCEPTION 'invalid gate name';
   END IF;
-  IF p_decision IS NULL OR p_decision NOT IN ('pass','fail','blocked') THEN
+  IF p_decision IS NULL OR p_decision NOT IN ('pass','fail','blocked','needs_review') THEN
     RAISE EXCEPTION 'invalid gate decision %', p_decision;
   END IF;
   IF p_evaluator IS DISTINCT FROM 'gate-evaluator:' || p_gate_name THEN

@@ -8,6 +8,15 @@ Request problems (missing inputs, unsupported fidelity/horizon, cache miss) are
 recorded as immutable run outcomes and the job completes with that outcome as a
 failed job — never as a fake success. Results, outcome and job completion commit
 in one transaction guarded by the fencing token.
+
+Run reuse (R2-06): the idempotency key always includes the logical digest of the
+model manifest (which carries the model + engine implementation digest), so a
+change to model or engine code never silently reuses a run computed by older code.
+
+Cancellation (R2-01): a user cancel (job status ``cancel_requested``) completes the
+job as ``cancelled`` before anything is published. A worker shutdown is *not* a
+cancel: the handler raises ``JobCancelled`` so the worker releases the job for a
+retry instead of ending it.
 """
 
 from __future__ import annotations
@@ -38,8 +47,14 @@ def load_scenario(conn: Connection, scenario_id: UUID) -> dict[str, Any]:
     return dict(row)
 
 
-def default_idempotency_key(spec_digest: str, fidelity: str, baseline_release_id: Any) -> str:
-    return f"sim:{spec_digest}:{fidelity}:{baseline_release_id}"
+def default_idempotency_key(spec_digest: str, fidelity: str, baseline_release_id: Any,
+                            model_manifest_digest: str) -> str:
+    return f"sim:{spec_digest}:{fidelity}:{baseline_release_id}:{model_manifest_digest}"
+
+
+def _shutdown_requested(ctx: JobContext) -> bool:
+    fn = getattr(ctx, "shutdown_requested", None)
+    return bool(fn()) if callable(fn) else False
 
 
 def _is_stale(e: DBAPIError) -> bool:
@@ -76,8 +91,11 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
         plan: RunPlan = plan_run(conn, scenario, fidelity, manifest)
         conn.rollback()
 
-    key = str(payload.get("idempotency_key") or default_idempotency_key(
-        scenario["spec_digest"], fidelity, scenario["baseline_release_id"]))
+    mm_digest = logical_hash(manifest)
+    if payload.get("idempotency_key"):
+        key = f"{payload['idempotency_key']}:mm:{mm_digest}"
+    else:
+        key = default_idempotency_key(scenario["spec_digest"], fidelity, scenario["baseline_release_id"], mm_digest)
     if fidelity == "L0" and not payload.get("idempotency_key"):
         # A lookup outcome depends on what has been computed so far: a miss must not
         # be replayed forever, so L0 keys name the hit (or the job, for a miss).
@@ -86,7 +104,7 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
         "engine": ENGINE_VERSION,
         "fidelity": fidelity,
         "cache_key": plan.cache_key,
-        "model_manifest_logical_sha256": logical_hash(manifest),
+        "model_manifest_logical_sha256": mm_digest,
         "scheduling": "deterministic: countries sorted by ISO3; acyclic one-way coupling",
         "decimal_precision": manifest["models"][0]["decimal_precision"],
         "job_id": str(ctx.job_id),
@@ -96,6 +114,13 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
 
     # ---- cancellation is honoured before anything becomes visible ----
     if ctx.is_cancelled():
+        if _shutdown_requested(ctx):
+            from reva.operations.jobs import JobCancelled
+
+            # Worker shutdown, not a user cancel: nothing is published and the worker
+            # releases/requeues the job (it handles JobCancelled); never "cancelled".
+            raise JobCancelled(f"worker shutting down; simulation job {ctx.job_id} released unpublished",
+                               scenario_id=str(scenario_id), published=False)
         try:
             with engine.begin() as conn:
                 ctx.complete_in(conn, "cancelled", {"scenario_id": str(scenario_id), "published": False})

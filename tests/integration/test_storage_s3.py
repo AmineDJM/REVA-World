@@ -195,6 +195,7 @@ def test_factory_builds_s3_store_for_production_settings(s3: Any) -> None:
         reva_s3_secret_access_key="testing",
         reva_session_secret="s" * 40,
         reva_public_base_url="https://reva.example.org",
+        reva_db_sslmode="verify-full",
     )
     st = build_store(s)
     assert isinstance(st, S3ArtifactStore)

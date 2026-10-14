@@ -43,7 +43,7 @@ unsupported capability returns a typed blocked/unavailable result.
 - `src/reva/ports/autonomy.py` — normative autonomy protocols/DTOs.
 - `registry/` — concepts, entities (`reva.cli.seed.entity_id(key)` gives deterministic entity UUIDs, e.g.
   `entity_id("FRA")`), sources, mappings, models, policies, requirement catalogue.
-- Live facts: Comtrade 2023 HS2709 world totals exist for FRA/CHN/USA; DZA returned zero rows 2020-2024
+- Live facts: Comtrade 2023 HS2709 world totals exist for FRA/CHN/USA; DZA returned zero rows 2020–2023 (2024 has one H4 row per flow, isReported=false, legacyEstimationFlag=6)
   (stored as typed Missing). WDI population/GDP 2000-2024 for all four.
 
 ## Ownership
