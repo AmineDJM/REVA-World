@@ -378,7 +378,8 @@ def revised_data_retrospective(
     models = list(models) if models is not None else _default_models()
     hs = sorted(set(int(h) for h in horizons))
     folds: list[dict[str, Any]] = []
-    per_model: dict[str, dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
+    # Scores are pooled per concept only: errors in different units are never averaged together.
+    per_model: dict[tuple[str, str], dict[str, list[float]]] = defaultdict(lambda: defaultdict(list))
     ineligible: Counter[str] = Counter()
     flagged_inputs = 0
     series_used = 0
@@ -421,12 +422,13 @@ def revised_data_retrospective(
                     point = float(fitted.predict([h])[0].point)
                     ae = abs(point - actual)
                     rec = {"model": f"{mdl.key}@{mdl.version}", "point": point, "abs_error_latest_revised": ae}
-                    per_model[rec["model"]]["ae_latest"].append(ae)
+                    acc = per_model[(key[1], rec["model"])]
+                    acc["ae_latest"].append(ae)
                     if actual > 0:
-                        per_model[rec["model"]]["ape_latest"].append(ae / actual)
+                        acc["ape_latest"].append(ae / actual)
                     if first is not None:
                         rec["abs_error_first_release"] = abs(point - first)
-                        per_model[rec["model"]]["ae_first"].append(rec["abs_error_first_release"])
+                        acc["ae_first"].append(rec["abs_error_first_release"])
                     preds.append(rec)
                 folds.append({
                     "label": RETROSPECTIVE_LABEL,
@@ -445,8 +447,9 @@ def revised_data_retrospective(
     def _mean(xs: list[float]) -> float | None:
         return sum(xs) / len(xs) if xs else None
 
-    m["scores"] = {
-        model: {
+    scores: dict[str, dict[str, Any]] = defaultdict(dict)
+    for (concept, model), v in sorted(per_model.items()):
+        scores[concept][model] = {
             "label": RETROSPECTIVE_LABEL,
             "n": len(v["ae_latest"]),
             "mae_latest_revised": _mean(v["ae_latest"]),
@@ -454,8 +457,8 @@ def revised_data_retrospective(
             "mae_first_release": _mean(v["ae_first"]),
             "n_first_release": len(v["ae_first"]),
         }
-        for model, v in sorted(per_model.items())
-    }
+    m["scores"] = dict(scores)
+    m["scores_note"] = "pooled per concept (one unit per concept); never across concepts"
     m["outputs"] = folds
     m["inputs"] = [{
         "observation_id": str(r["id"]), "logical_key": r["logical_key"], "revision_no": r["revision_no"],

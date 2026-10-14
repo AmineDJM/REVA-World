@@ -6,12 +6,11 @@ import type { Gap, RequirementCoverage, SourceOut } from '../api/types';
 import { ContextBanner } from '../components/ContextBanner';
 import { DataTable } from '../components/DataTable';
 import { EnvelopeDetails } from '../components/EnvelopeDetails';
-import { MapView, type AvailabilityClass } from '../components/MapView';
+import { MapView } from '../components/MapView';
+import { catalogueKeys, computeAvailability } from '../lib/availability';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { formatDate, formatDateTime, humanize } from '../lib/format';
 import { useApi } from '../lib/useApi';
-
-const MISSING_GAP_KINDS = new Set(['typed_missing', 'absent', 'no_release']);
 
 function daysSince(iso: string | null | undefined): number | null {
   if (!iso) return null;
@@ -85,18 +84,14 @@ export default function WorldPage() {
   const events = useApi((s) => getEvents({ limit: 20 }, s), []);
   const evidence = useApi((s) => getEvidence({ limit: 50 }, s), []);
 
-  const catalogueKeys = useMemo(() => {
-    const keys = new Set<string>();
-    coverage.data?.data.requirements.forEach((r) => r.geography.forEach((g) => keys.add(g)));
-    return [...keys].sort().slice(0, 20);
-  }, [coverage.data]);
+  const keys = useMemo(() => catalogueKeys(coverage.data?.data), [coverage.data]);
 
   // Resolve catalogue geography keys (ISO3) to REVA entity ids for the map.
   const entityIds = useApi(
     async (s) => {
       const out: Record<string, string> = {};
       await Promise.all(
-        catalogueKeys.map(async (k) => {
+        keys.map(async (k) => {
           try {
             out[k] = (await getEntity(k, s)).data.id;
           } catch {
@@ -106,33 +101,14 @@ export default function WorldPage() {
       );
       return out;
     },
-    [catalogueKeys.join(',')],
-    catalogueKeys.length > 0,
+    [keys.join(',')],
+    keys.length > 0,
   );
 
-  const availability = useMemo(() => {
-    const out: Record<string, AvailabilityClass> = {};
-    const reqs = coverage.data?.data.requirements ?? [];
-    const ids = entityIds.data ?? {};
-    const missingByKey = new Map<string, number>();
-    for (const g of gaps.data?.data ?? []) {
-      if (MISSING_GAP_KINDS.has(g.gap_kind)) missingByKey.set(g.entity_key, (missingByKey.get(g.entity_key) ?? 0) + 1);
-    }
-    for (const key of catalogueKeys) {
-      const id = ids[key];
-      if (!id) continue;
-      let required = 0;
-      for (const r of reqs) {
-        if (!r.geography.includes(key)) continue;
-        const [a, b] = r.period;
-        required += a !== undefined && b !== undefined ? b - a + 1 : r.period.length;
-      }
-      const missing = Math.min(required, missingByKey.get(key) ?? 0);
-      const available = required - missing;
-      out[id] = required === 0 ? 'not_in_catalogue' : available === required ? 'complete' : available > 0 ? 'partial' : 'none_available';
-    }
-    return out;
-  }, [coverage.data, gaps.data, entityIds.data, catalogueKeys]);
+  const availability = useMemo(
+    () => computeAvailability(coverage.data?.data, gaps.data?.data, entityIds.data),
+    [coverage.data, gaps.data, entityIds.data],
+  );
 
   const recentEvidence = useMemo(
     () =>

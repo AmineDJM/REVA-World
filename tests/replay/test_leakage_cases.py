@@ -278,8 +278,10 @@ async def test_revised_data_retrospective_is_labelled_everywhere(db):
     assert RETROSPECTIVE_DISCLAIMER in m["honesty_statement"] and m["disclaimer"] == RETROSPECTIVE_DISCLAIMER
     assert m["real_time_backtest"] is False and m["status"] == "ok"
     assert m["outputs"] and all(f["label"] == "revised_data_retrospective" for f in m["outputs"])
-    assert m["scores"] and all(s["label"] == "revised_data_retrospective" for s in m["scores"].values())
-    assert "forecast.last_value@1.0.0" in m["scores"]  # naive baseline always present
+    assert set(m["scores"]) == {POP, GDP}  # never pooled across units
+    for per_concept in m["scores"].values():
+        assert all(s["label"] == "revised_data_retrospective" for s in per_concept.values())
+        assert "forecast.last_value@1.0.0" in per_concept  # naive baseline always present
     # every fold used values recorded long after its origin, and says so
     assert all(f["inputs_recorded_after_origin"] > 0 for f in m["outputs"])
     assert m["design"]["inputs_recorded_after_fold_origin"] > 0
