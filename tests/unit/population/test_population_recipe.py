@@ -86,9 +86,7 @@ def test_missing_count_excluded_and_reported_when_allowed():
     f = list(F_COUNTS)
     f[4] = None
     r = recipe_from(make_cells(f_counts=f), allow_missing=True)
-    assert [(m.cell_id, m.reason) for m in r.missing_cells] == [
-        ("F|Y4", "count_missing_in_source")
-    ]
+    assert [(m.cell_id, m.reason) for m in r.missing_cells] == [("F|Y4", "count_missing_in_source")]
     assert "F|Y4" not in {c.cell_id for c in r.leaf_cells}
     assert r.total_count == sum(v for v in f if v is not None) + sum(M_COUNTS)
     # checks that need the missing leaf cannot be computed (missing is not zero)
@@ -105,10 +103,21 @@ def test_leaf_absent_from_source_is_missing():
     assert [(m.cell_id, m.reason) for m in r.missing_cells] == [("M|Y8", "absent_from_source")]
 
 
-@pytest.mark.parametrize("attr", sorted(FORBIDDEN_ATTRIBUTES & {
-    "income", "religion", "sexual_orientation", "political_opinion", "health", "ethnicity",
-    "household",
-}))
+@pytest.mark.parametrize(
+    "attr",
+    sorted(
+        FORBIDDEN_ATTRIBUTES
+        & {
+            "income",
+            "religion",
+            "sexual_orientation",
+            "political_opinion",
+            "health",
+            "ethnicity",
+            "household",
+        }
+    ),
+)
 def test_forbidden_attributes_rejected(cells, attr):
     with pytest.raises(UnsupportedAttribute) as ei:
         recipe_from(cells, attributes=("age", "sex", attr))

@@ -56,9 +56,7 @@ def _finite(x: float) -> float:
     return float(x)
 
 
-def _margin_errors(
-    targets: dict[str, Fraction], estimates: dict[str, Fraction]
-) -> dict[str, Any]:
+def _margin_errors(targets: dict[str, Fraction], estimates: dict[str, Fraction]) -> dict[str, Any]:
     max_abs = Fraction(0)
     max_rel: Fraction | None = Fraction(0)
     worst: str | None = None

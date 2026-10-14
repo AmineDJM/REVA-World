@@ -40,8 +40,7 @@ ALLOCATION_METHOD = "reva-largest-remainder-min1-v1"
 TABLE_HASH_VERSION = "reva-population-rows-1"
 INT64_MAX = np.iinfo(np.int64).max
 SEMANTICS_NOTE = (
-    "Weighted representative records of age x recorded-sex cells; "
-    "not linked to real individuals."
+    "Weighted representative records of age x recorded-sex cells; not linked to real individuals."
 )
 
 POPULATION_SCHEMA = pa.schema(
@@ -213,9 +212,7 @@ def allocate(recipe: PopulationRecipe, n_records: int) -> Allocation:
         base.append(1 + q)
         rems.append(r)
     leftover = n_records - sum(base)
-    order = sorted(
-        range(m), key=lambda i: (-rems[i], _tie_key(recipe.seed, nonzero[i].cell_id), i)
-    )
+    order = sorted(range(m), key=lambda i: (-rems[i], _tie_key(recipe.seed, nonzero[i].cell_id), i))
     for i in order[:leftover]:
         base[i] += 1
     cells = tuple(
@@ -310,9 +307,7 @@ def exact_total_weight(table: pa.Table) -> Fraction:
 def canonical_summary(table: pa.Table) -> dict[str, Any]:
     """Order-independent summary: per-cell record counts and exact weight totals."""
     sums = exact_weight_sums(table, ["cell_id"])
-    counts_tbl = table.group_by(["cell_id"], use_threads=False).aggregate(
-        [("record_id", "count")]
-    )
+    counts_tbl = table.group_by(["cell_id"], use_threads=False).aggregate([("record_id", "count")])
     counts = dict(
         zip(
             counts_tbl.column("cell_id").to_pylist(),

@@ -155,7 +155,11 @@ def refine(
         cid = r["cell_id"]
         coarse_in[cid] = coarse_in.get(cid, Fraction(0)) + w
         members = _members(
-            recipe, r["sex_code"], r["age_lo"], r["age_hi"], r["includes_top_coded"],
+            recipe,
+            r["sex_code"],
+            r["age_lo"],
+            r["age_hi"],
+            r["includes_top_coded"],
             r["is_unknown_age"],
         )
         denom = sum(m.count for m in members)
@@ -193,8 +197,9 @@ def refine(
         cols["weight_den"].append(w.denominator)
 
     frozen_mapping = {k: tuple(v) for k, v in sorted(mapping.items())}
-    mapping_digest = logical_hash({"operation": "refine", "dimension": dimension,
-                                   "mapping": frozen_mapping})
+    mapping_digest = logical_hash(
+        {"operation": "refine", "dimension": dimension, "mapping": frozen_mapping}
+    )
     new_md = {
         **{k: v for k, v in md.items() if k not in ("reva.age_bands",)},
         "reva.compression": "refine",

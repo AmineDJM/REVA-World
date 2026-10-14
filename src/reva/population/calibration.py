@@ -175,9 +175,7 @@ def rake(
             w = w * factor[codes[d]]
         max_dev = max(
             float(
-                np.max(
-                    np.abs(np.bincount(codes[d], weights=w, minlength=tvec[d].size) - tvec[d])
-                )
+                np.max(np.abs(np.bincount(codes[d], weights=w, minlength=tvec[d].size) - tvec[d]))
             )
             for d in dims
         )

@@ -68,7 +68,11 @@ def test_age_and_tail_columns(recipe):
     rows = {
         cid: (age, years, top, unk)
         for cid, age, years, top, unk in zip(
-            t["cell_id"], t["age_code"], t["age_years"], t["is_top_coded"], t["is_unknown_age"],
+            t["cell_id"],
+            t["age_code"],
+            t["age_years"],
+            t["is_top_coded"],
+            t["is_unknown_age"],
             strict=True,
         )
     }
@@ -122,9 +126,10 @@ def test_seed_only_changes_tied_allocations():
     base = make_cells(
         f_counts=[1000 + 37 * i for i in range(12)], m_counts=[2003 + 41 * i for i in range(12)]
     )
-    assert allocate(recipe_from(base, seed=0), 1000).cells == allocate(
-        recipe_from(base, seed=99), 1000
-    ).cells
+    assert (
+        allocate(recipe_from(base, seed=0), 1000).cells
+        == allocate(recipe_from(base, seed=99), 1000).cells
+    )
 
 
 def test_too_few_records_raises_resolution_error_with_suggestion(recipe):

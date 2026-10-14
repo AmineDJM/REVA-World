@@ -195,9 +195,7 @@ class SourceCell:
     def __post_init__(self) -> None:
         if self.count is not None:
             if isinstance(self.count, bool) or not isinstance(self.count, int):
-                raise ValidationProblem(
-                    "count must be an int or None", source_key=self.source_key
-                )
+                raise ValidationProblem("count must be an int or None", source_key=self.source_key)
             if self.count < 0:
                 raise ValidationProblem(
                     "negative population count", source_key=self.source_key, count=self.count
@@ -335,7 +333,7 @@ class PopulationRecipe:
     supported_attributes: tuple[str, ...] = SUPPORTED_ATTRIBUTES
     sex_definition: str = RECORDED_SEX_DEFINITION
     method_version: str = RECIPE_METHOD_VERSION
-    _index: dict[str, LeafCell] = field(default_factory=dict, repr=False, compare=False)
+    _index: dict[str, LeafCell] = field(default_factory=dict, init=False, repr=False, compare=False)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "source_ref", dict(self.source_ref))
@@ -545,9 +543,7 @@ def build_recipe(
 
     excluded: list[ExcludedCell] = []
     checks: list[ConsistencyCheck] = []
-    for (sex, age_code), src in sorted(
-        by_key.items(), key=lambda kv: (kv[0][0], kv[0][1])
-    ):
+    for (sex, age_code), src in sorted(by_key.items(), key=lambda kv: (kv[0][0], kv[0][1])):
         a = parse_age_code(age_code)
         if sex != TOTAL_SEX and a.is_leaf:
             continue
@@ -589,15 +585,21 @@ def _check(
 
     def nc(n: str, leaf_sum: int | None = None) -> ConsistencyCheck:
         return ConsistencyCheck(
-            src.source_key, src.sex_code, age.code, src.count, leaf_sum, None, None, None,
-            "not_computable", n,
+            src.source_key,
+            src.sex_code,
+            age.code,
+            src.count,
+            leaf_sum,
+            None,
+            None,
+            None,
+            "not_computable",
+            n,
         )
 
     if members is None:
         return nc(note)
-    missing = [
-        cell_id_for(s, m) for s in sexes for m in members if leaf_counts.get((s, m)) is None
-    ]
+    missing = [cell_id_for(s, m) for s in sexes for m in members if leaf_counts.get((s, m)) is None]
     if missing:
         return nc(f"leaf cells missing: {', '.join(missing)}")
     leaf_sum = sum(leaf_counts[(s, m)] or 0 for s in sexes for m in members)

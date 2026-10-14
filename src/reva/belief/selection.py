@@ -52,7 +52,7 @@ WITH eligible AS (
                     WHERE r.observation_id = o.id AND r.recorded_at <= :cutoff)
     AND (CAST(:concepts AS text[]) IS NULL OR c.concept_id = ANY(CAST(:concepts AS text[])))
 )
-SELECT id, subject_id, concept_version_id, concept_id, support_id, source_key, value, uncertainty, logical_key,
+SELECT id, subject_id, concept_version_id, concept_id, support_id, source_key, value, uncertainty, logical_key, source_flags,
        revision_no
 FROM eligible WHERE rn = 1
 """
