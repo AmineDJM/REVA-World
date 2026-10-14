@@ -233,7 +233,8 @@ def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore
     """Record 'dataset ≡ target' as a proposal that the gate rejects, plus the incompatible mapping record."""
     mm = io_.get_json(mapping.mapping_manifest)
     change = io_.put_json({"schema": "reva-mapping-change/1", "claimed_relation": "exact",
-                           "assessed_relation": mapping.relation, "mapping_manifest": ref_json(mapping.mapping_manifest),
+                           "assessed_relation": mapping.relation,
+                           "mapping_manifest": ref_json(mapping.mapping_manifest),
                            "dataset": dataset, "target": mapping.target_concept_version}, "models")
     p = PlatformChangeProposal(
         proposal_id=stable_id("equivalence", change.sha256), author=AUTHOR, permission_tier=2,

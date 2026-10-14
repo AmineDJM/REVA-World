@@ -109,7 +109,8 @@ class PolicyPromotionGate:
             reasons.append("T0: read/discover/propose within budget is automatic")
             return self._record(proposal, "promote", reasons, reports, policy, trace)
         if tier >= 2:
-            reasons.append(f"T{tier}: requires {'maintainer approval' if tier == 3 else 'isolated evaluation and named review'}")
+            need = "maintainer approval" if tier == 3 else "isolated evaluation and named review"
+            reasons.append(f"T{tier}: requires {need}")
             return self._record(proposal, "needs_review", reasons, reports, policy, trace)
         ok, scope_reasons, scope = self._t1_scope(proposal, reports, policy)
         trace["t1_scope"] = scope
@@ -150,7 +151,8 @@ class PolicyPromotionGate:
         target = {"concept_id": sem["concept_id"], "version": sem["concept_version"]}
         if mapping.get("relation") != "exact" or mapping.get("review_required"):
             problems.append(f"mapping relation {mapping.get('relation')!r} is not an approved exact mapping")
-        geo = set(manifest["request_parameters"]["filters"].get(manifest["request_parameters"]["subject"]["dimension"], []))
+        rp = manifest["request_parameters"]
+        geo = set(rp["filters"].get(rp["subject"]["dimension"], []))
         entry = next((m for m in policy.content.get("approved_exact_mappings") or []
                       if m.get("template") == template and m.get("dataset") == manifest["dataset"]
                       and m.get("target", {}).get("concept_id") == target["concept_id"]

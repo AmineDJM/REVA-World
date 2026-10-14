@@ -13,7 +13,7 @@ import threading
 import uuid
 from collections.abc import Coroutine, Mapping
 from datetime import UTC, datetime
-from typing import Any, TypeVar
+from typing import Any
 
 from sqlalchemy import Connection
 
@@ -23,7 +23,6 @@ from reva.kernel.ids import sha256_bytes
 from reva.ports.autonomy import ArtifactRef, Finding, ResourceBudget, ScopedContext, ValidationReport
 from reva.ports.storage import ArtifactStore
 
-T = TypeVar("T")
 AUTONOMY_NAMESPACE = uuid.UUID("0b8d3a52-6c1e-5f0e-9a43-2f6c1d7e8a10")
 
 
@@ -142,7 +141,7 @@ def make_context(io: ArtifactIO, mode: str, cutoff: datetime, ontology_manifest:
                          knowledge_cutoff=cutoff, ontology_manifest=ref)
 
 
-def run_sync(coro: Coroutine[Any, Any, T]) -> T:
+def run_sync[T](coro: Coroutine[Any, Any, T]) -> T:
     """Run a coroutine from sync code, also when called inside a running event loop."""
     try:
         asyncio.get_running_loop()

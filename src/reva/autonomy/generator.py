@@ -118,7 +118,7 @@ class DeclarativeConnectorGenerator:
                 "total_categories": {d: [c for c in cats[d] if c in EUROSTAT_TOTAL_CODES] for d in resolution},
                 "special_categories": {d: {c: EUROSTAT_SPECIAL_CODES[c] for c in cats[d]
                                            if c in EUROSTAT_SPECIAL_CODES} for d in resolution},
-                "logical_key_template": "eurostat:{dataset}:" + ":".join("{%s}" % d for d in key_dims),
+                "logical_key_template": "eurostat:{dataset}:" + ":".join(f"{{{d}}}" for d in key_dims),
                 "licence": str((source.get("rights") or {}).get("licence", "")),
                 "inspection_fingerprint": inspection.get("structure_fingerprint"),
                 "dataset_label": str(inspection.get("label", ""))[:200],

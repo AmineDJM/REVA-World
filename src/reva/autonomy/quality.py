@@ -63,7 +63,8 @@ def evaluate_batch(batch: dict[str, Any], contract: dict[str, Any]) -> tuple[lis
     years: set[int] = set()
     for o in obs:
         s = o["support"]
-        if s["aggregation"] != contract["aggregation"] or s["population"]["universe"] != contract["population_universe"]:
+        universe = s["population"]["universe"]
+        if s["aggregation"] != contract["aggregation"] or universe != contract["population_universe"]:
             bad_support += 1
         t = s["temporal"]
         start = str(t.get("start") or "")

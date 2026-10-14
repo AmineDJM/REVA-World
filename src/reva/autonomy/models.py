@@ -189,7 +189,8 @@ class TournamentModelEvaluator:
             "evaluator": self.VERSION, "mode": specification.mode,
         }
         prov = self.io.put_json({"schema": "reva-evaluation-provenance/1", "evaluator": self.VERSION,
-                                 "model": model.model_key, "version": model.version, "spec": specification.manifest.sha256,
+                                 "model": model.model_key, "version": model.version,
+                                 "spec": specification.manifest.sha256,
                                  "context_id": str(specification.context.context_id),
                                  "cutoff": specification.context.knowledge_cutoff.isoformat()}, "evaluation")
         return EvaluationReport(uuid.uuid4(), model, metrics, predictions, targets, prov, tuple(findings))
