@@ -184,7 +184,11 @@ def run_demo(*, scenario: str, countries: list[str], fidelity: str, origin: str 
                 text(
                     """SELECT e.label AS country, r.output_key, r.variant, r.value->>'value' AS value,
                               r.value->>'unit_ref' AS unit, r.uncertainty->>'kind' AS uncertainty_kind,
-                              r.uncertainty->>'lower' AS lower, r.uncertainty->>'upper' AS upper
+                              CASE WHEN r.value->>'kind' = 'sensitivity_range' THEN r.value->>'lower'
+                                   ELSE r.uncertainty->>'lower' END AS lower,
+                              CASE WHEN r.value->>'kind' = 'sensitivity_range' THEN r.value->>'upper'
+                                   ELSE r.uncertainty->>'upper' END AS upper,
+                              r.value->>'kind' AS value_kind
                        FROM sim.result r
                        LEFT JOIN world.entity e ON e.id = r.subject_id
                        WHERE r.run_id = :r ORDER BY e.label, r.output_key, r.variant"""

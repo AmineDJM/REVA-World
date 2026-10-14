@@ -458,8 +458,8 @@ class Worker:
         tm.QUEUE_ACK.observe(ack, job_type=job.job_type)
         try:
             if self._shutdown.is_set():
-                queue.release(self.engine, job, None, "worker_shutdown_before_start")
-                return done("released", None, ack)
+                status = queue.release(self.engine, job, None, "worker_shutdown_before_start")
+                return done("released" if status == "queued" else status, None, ack)
             result = handler(dict(job.payload), ctx)
         except JobCancelled as e:
             try:
