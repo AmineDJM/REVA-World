@@ -981,7 +981,9 @@ SELECT o.id, o.subject_id, o.value, o.uncertainty, o.source_flags, o.recorded_at
        sp.resolution, pt.entity_id AS partner_entity_id, pt.kind AS partner_kind,
        (CAST(:as_of AS timestamptz) IS NULL OR o.recorded_at <= :as_of) AS recorded_by_as_of,
        EXISTS (SELECT 1 FROM evidence.observation_retraction t WHERE t.observation_id = o.id
-               AND (CAST(:as_of AS timestamptz) IS NULL OR t.recorded_at <= :as_of)) AS retracted
+               AND (CAST(:as_of AS timestamptz) IS NULL OR t.recorded_at <= :as_of)) AS retracted,
+       EXISTS (SELECT 1 FROM evidence.observation o2 WHERE o2.supersedes_id = o.id
+               AND (CAST(:as_of AS timestamptz) IS NULL OR o2.recorded_at <= :as_of)) AS superseded
 FROM evidence.observation o
 JOIN ontology.concept_version c ON c.id = o.concept_version_id
 JOIN world.support sp ON sp.id = o.support_id
@@ -1044,7 +1046,8 @@ def load_flow_items(
     as_of: datetime | None = None,
 ) -> tuple[list[FlowItem], list[dict[str, Any]]]:
     """Load flow items. Returns ``(items, excluded)``; records not visible at
-    ``as_of`` (not yet recorded/published, or retracted) are excluded with a reason."""
+    ``as_of`` (not yet recorded/published, retracted, or superseded by a later
+    revision) are excluded with a reason."""
     require_aware(as_of, "as_of")
     if len(observation_ids) + len(estimate_ids) > MAX_SUBGRAPH_EDGES:
         raise ValidationProblem(f"at most {MAX_SUBGRAPH_EDGES} records per aggregation")
@@ -1059,6 +1062,8 @@ def load_flow_items(
                 excluded.append({"id": str(d["id"]), "reason": "recorded_after_as_of"})
             elif d["retracted"]:
                 excluded.append({"id": str(d["id"]), "reason": "retracted_by_as_of"})
+            elif d["superseded"]:
+                excluded.append({"id": str(d["id"]), "reason": "superseded_by_as_of"})
             else:
                 items.append(_item(d, "observation"))
     if estimate_ids:

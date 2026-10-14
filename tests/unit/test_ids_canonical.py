@@ -218,9 +218,15 @@ def test_external_id_is_injective_over_components() -> None:
 
 @settings(max_examples=200)
 @given(
-    p=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
-    k=st.text(min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f")),
-    e=st.text(min_size=1, max_size=4, alphabet=st.characters(blacklist_characters="\x1f")),
+    p=st.text(
+        min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f", blacklist_categories=("Cs",))
+    ),
+    k=st.text(
+        min_size=1, max_size=10, alphabet=st.characters(blacklist_characters="\x1f", blacklist_categories=("Cs",))
+    ),
+    e=st.text(
+        min_size=1, max_size=4, alphabet=st.characters(blacklist_characters="\x1f", blacklist_categories=("Cs",))
+    ),
 )
 def test_external_id_distinct_for_distinct_keys(p: str, k: str, e: str) -> None:
     assert external_id(p, k, e) != external_id(p, k + "x", e)

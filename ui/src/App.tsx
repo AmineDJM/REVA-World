@@ -4,6 +4,7 @@ import { getSession, logout } from './api/client';
 import { onUnauthorized } from './api/http';
 import { ApiError } from './api/problem';
 import type { SessionInfo } from './api/types';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProvenanceProvider } from './components/ProvenanceDrawer';
 import { ErrorState, Loading } from './components/StateViews';
 import { LoginPage } from './pages/LoginPage';
@@ -106,6 +107,7 @@ export function App() {
         </div>
       </header>
       <main id="main" tabIndex={-1}>
+        <ErrorBoundary resetKey={location.pathname}>
         <Suspense fallback={<Loading what="screen" />}>
           <Routes>
             <Route path="/" element={<Navigate to="/world" replace />} />
@@ -121,6 +123,7 @@ export function App() {
             <Route path="*" element={<p>Unknown screen. Choose a screen from the navigation.</p>} />
           </Routes>
         </Suspense>
+        </ErrorBoundary>
       </main>
     </ProvenanceProvider>
   );

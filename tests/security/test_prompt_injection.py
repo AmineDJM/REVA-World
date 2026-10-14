@@ -39,10 +39,12 @@ def _captured(url: str) -> bytes:
     return (d / e["file"]).read_bytes()
 
 
-def _poisoned() -> dict[str, bytes]:
+def _poisoned(title_injection: bool = False) -> dict[str, bytes]:
     toc = _captured(EUROSTAT_TOC_URL).decode()
-    toc = toc.replace('"                Population on 1 January by age and sex"\t"demo_pjan"',
-                      f'"                Population on 1 January by age and sex {INJECTION}"\t"demo_pjan"')
+    if title_injection:
+        needle = '"                Population on 1 January by age and sex"\t"demo_pjan"'
+        assert needle in toc
+        toc = toc.replace(needle, f'"                Population on 1 January by age and sex {INJECTION}"\t"demo_pjan"')
     toc += (f'"Population on 1 January by age and recorded sex {INJECTION}"\t"evil_pop"\t"dataset"\t'
             '"01.01.2026"\t"01.01.2026"\t"2000"\t"2025"\t10\n')
     sample = json.loads(_captured(SAMPLE_URL))
@@ -98,6 +100,24 @@ async def test_injected_catalogue_and_metadata_change_nothing(db):
     await client.aclose()
     with pytest.raises(UnsafeRequest):
         await BankHttp(io, bank, allowed_hosts=tuple(manifest["allowed_hosts"])).get("https://evil.example.com/x")
+
+
+@pytest.mark.db
+async def test_injection_in_a_dataset_title_only_affects_ranking(db):
+    io = ArtifactIO(db.store)
+    before = _policy_digests()
+    bank = bank_from_dir(io, CONNECTOR, overrides=_poisoned(title_injection=True))
+    ctx = make_context(io, "evidence", datetime.now(UTC), {"t": 1})
+    gap = KnowledgeGap(uuid.uuid4(), "R-POP-JAN-AGESEX", "demography.population.jan1_age_sex@1.0.0", ("FRA",),
+                       {"years": [2023]}, "unsupported", 1.0, "t", ctx)
+    cands = await EurostatCatalogueDiscoverer(io, BankHttp(io, bank)).discover(gap, default_budget())
+    assert cands and {c.allowed_hosts for c in cands} == {("ec.europa.eu",)}
+    for c in cands:
+        meta = io.get_json(c.metadata)
+        m = RegistryOntologyMapper(io).propose_mapping(c, ctx)
+        if c.dataset_id != "demo_pjan" or not meta.get("inspection"):
+            assert m.relation != "exact"
+    assert _policy_digests() == before
 
 
 def test_injected_paper_text_yields_only_a_candidate(tmp_path):

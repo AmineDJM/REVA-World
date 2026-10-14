@@ -347,6 +347,26 @@ def test_start_api_neutralises_local_dotenv(tmp_path: Path) -> None:
     # so the owner URL and the worker password are blanked, the API password kept.
     assert cenv["REVA_MIGRATION_DATABASE_URL"] == "" and cenv["REVA_WORKER_DB_PASSWORD"] == ""
     assert cenv["REVA_API_DB_PASSWORD"] == "dotenv-api-pw"
+    # What the child's own Settings() sees, from the same cwd (with the .env file).
+    probe = subprocess.run(
+        [
+            sys.executable,
+            "-c",
+            "import json; from reva.settings import Settings; s = Settings(); "
+            "v = lambda x: x.get_secret_value() if x else None; "
+            "print(json.dumps([v(s.reva_migration_database_url), v(s.reva_worker_db_password), "
+            "v(s.reva_api_db_password)]))",
+        ],
+        env=cenv,
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=60,
+        check=False,
+    )
+    assert probe.returncode == 0, probe.stderr
+    seen = json.loads(probe.stdout)
+    assert not seen[0] and not seen[1] and seen[2] == "dotenv-api-pw"
 
 
 def test_start_api_fails_closed_without_printing_secrets(tmp_path: Path) -> None:

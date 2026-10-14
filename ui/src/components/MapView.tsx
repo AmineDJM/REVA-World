@@ -18,7 +18,7 @@ export const AVAILABILITY_LEGEND: { cls: AvailabilityClass; label: string; color
   { cls: 'partial', label: 'Some catalogue-required cells available', color: '#7fa7cc' },
   { cls: 'none_available', label: 'In catalogue, no cells available', color: '#e3d9c6' },
   { cls: 'not_in_catalogue', label: 'Matched entity outside the V1 catalogue', color: '#d4d4d4' },
-  { cls: 'no_entity', label: 'Display feature without a reviewed entity match', color: '#efefef' },
+  { cls: 'no_entity', label: 'Display feature without a reviewed entity match (light outline)', color: '#efefef' },
 ];
 
 const COLOR = Object.fromEntries(AVAILABILITY_LEGEND.map((l) => [l.cls, l.color])) as Record<AvailabilityClass, string>;
@@ -94,22 +94,25 @@ export function MapView({ collection, availability, focusEntityId, label, height
           source: 'features',
           paint: {
             'fill-color': ['match', ['get', 'availability'], ...AVAILABILITY_LEGEND.flatMap((l) => [l.cls, l.color]), COLOR.no_entity] as never,
-            'fill-opacity': ['case', ['in', ['get', 'match_status'], ['literal', ['disputed', 'unmatched']]], 0.45, 0.9],
+            'fill-opacity': ['case', ['==', ['get', 'match_status'], 'disputed'], 0.45, 0.9],
           },
         });
         map.addLayer({
           id: 'outline',
           type: 'line',
           source: 'features',
-          filter: ['!', ['in', ['get', 'match_status'], ['literal', ['disputed', 'unmatched']]]],
-          paint: { 'line-color': '#6b7280', 'line-width': 0.5 },
+          filter: ['!=', ['get', 'match_status'], 'disputed'],
+          paint: {
+            'line-color': ['case', ['==', ['get', 'match_status'], 'unmatched'], '#b8bec6', '#6b7280'],
+            'line-width': ['case', ['==', ['get', 'match_status'], 'unmatched'], 0.4, 0.7],
+          },
         });
-        // Disputed / unmatched features: dashed dark outline, never a solid border.
+        // Disputed features: dashed dark outline, never a solid border.
         map.addLayer({
           id: 'disputed',
           type: 'line',
           source: 'features',
-          filter: ['in', ['get', 'match_status'], ['literal', ['disputed', 'unmatched']]],
+          filter: ['==', ['get', 'match_status'], 'disputed'],
           paint: { 'line-color': '#7c2d12', 'line-width': 1.2, 'line-dasharray': [2, 2] },
         });
         map.addLayer({
@@ -163,8 +166,7 @@ export function MapView({ collection, availability, focusEntityId, label, height
             </li>
           ))}
           <li>
-            <span className="swatch swatch-dashed" aria-hidden="true" /> Disputed or unmatched display feature (dashed
-            outline)
+            <span className="swatch swatch-dashed" aria-hidden="true" /> Disputed display feature (dashed outline)
           </li>
         </ul>
         <p className="map-note">

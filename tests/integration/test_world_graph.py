@@ -387,7 +387,10 @@ def test_release_pinned_context(db, world) -> None:
 
 def _obs_id(conn: Connection, logical_key: str) -> UUID:
     return conn.execute(
-        text("SELECT id FROM evidence.observation WHERE logical_key = :k ORDER BY revision_no DESC LIMIT 1"),
+        text(
+            """SELECT o.id FROM evidence.observation o JOIN evidence.acquisition a ON a.id = o.acquisition_id
+               WHERE o.logical_key = :k AND a.origin = 'test_fixture' ORDER BY o.revision_no DESC LIMIT 1"""
+        ),
         {"k": logical_key},
     ).scalar_one()
 

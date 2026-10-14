@@ -57,7 +57,6 @@ export function GraphView({ graph, selectedRelationId, onSelectRelation, label, 
       cy = cytoscape({
         container: el.current,
         elements,
-        wheelSensitivity: 0.3,
         motionBlur: false,
         textureOnViewport: prefersReducedMotion(),
         style: [

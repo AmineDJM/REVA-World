@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import uPlot from 'uplot';
+import type uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
 
 export interface SeriesPoint {
@@ -56,7 +56,15 @@ export function TimeSeriesChart({ points, label, yLabel, bandKind = null, height
       data.push(points.map((p) => p.lower ?? null), points.map((p) => p.upper ?? null));
     }
     const width = Math.max(280, node.clientWidth || 560);
-    const plot = new uPlot(
+    let plot: uPlot | null = null;
+    let ro: ResizeObserver | null = null;
+    let cancelled = false;
+    // Loaded lazily: a chart failure (e.g. an unsupported browser locale) must never break the page;
+    // the data table next to the chart carries the same values.
+    import('uplot')
+      .then(({ default: UPlot }) => {
+        if (cancelled) return;
+        plot = new UPlot(
       {
         width,
         height,
@@ -73,11 +81,16 @@ export function TimeSeriesChart({ points, label, yLabel, bandKind = null, height
       data,
       node,
     );
-    const ro = new ResizeObserver(() => plot.setSize({ width: Math.max(280, node.clientWidth), height }));
-    ro.observe(node);
+        ro = new ResizeObserver(() => plot?.setSize({ width: Math.max(280, node.clientWidth), height }));
+        ro.observe(node);
+      })
+      .catch(() => {
+        if (!cancelled) node.textContent = 'Chart unavailable in this browser; see the table.';
+      });
     return () => {
-      ro.disconnect();
-      plot.destroy();
+      cancelled = true;
+      ro?.disconnect();
+      plot?.destroy();
     };
   }, [points, bandKind, height, yLabel]);
 

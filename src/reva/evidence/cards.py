@@ -13,10 +13,11 @@ from typing import Any, Literal
 
 import yaml
 from pydantic import BaseModel, ConfigDict, Field, model_validator
-from sqlalchemy import Connection, Engine, text
+from sqlalchemy import Connection, text
 
 from reva.adapters.postgres import repositories as repo
 from reva.evidence.ingest import PublishSummary
+from reva.evidence.locks import take_evidence_write_lock
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import logical_hash
 from reva.ports.connectors import ObservationBatch, RawAcquisition
@@ -102,34 +103,36 @@ def validate_card(data: dict[str, Any]) -> EvidenceCard:
 
 
 def publish_study(
-    engine: Engine, store: ArtifactStore, raw: RawAcquisition, batches: list[ObservationBatch], summary: PublishSummary
+    conn: Connection, store: ArtifactStore, raw: RawAcquisition, batches: list[ObservationBatch],
+    summary: PublishSummary,
 ) -> str | None:
+    """Post-publish step for Crossref: runs inside the acquisition publication
+    transaction (``conn``), so study metadata commits atomically with it."""
     study = batches[0].metadata["study"] if batches else None
     if not study:
         return None
-    with engine.begin() as conn:
-        latest = conn.execute(
-            text("SELECT metadata FROM evidence.study WHERE lower(doi)=:d ORDER BY recorded_at DESC LIMIT 1"),
-            {"d": study["doi"]},
-        ).scalar_one_or_none()
-        stable = {k: v for k, v in study.items() if k not in ("crossref_indexed", "is_referenced_by_count")}
-        if latest is not None and logical_hash(
-            {k: v for k, v in latest.items() if k not in ("crossref_indexed", "is_referenced_by_count")}
-        ) == logical_hash(stable):
-            return None
-        act = repo.simple_activity("study.metadata", "normalisation", "worker:crossref", {"doi": study["doi"]})
-        repo.record_activity(conn, act, inputs=[(summary.raw_sha256, {"json_pointer": "/message"})])
-        sid = conn.execute(
-            text(
-                """INSERT INTO evidence.study(doi, metadata, source_artifact_sha256, acquisition_id,
-                     provenance_activity_id) VALUES (:d, CAST(:m AS jsonb), :s, :acq, :a) RETURNING id"""
-            ),
-            {"d": study["doi"], "m": json.dumps(study), "s": summary.raw_sha256,
-             "acq": summary.acquisition_id, "a": act.id},
-        ).scalar_one()
-        repo.emit_outbox(conn, "evidence.study_metadata", {"doi": study["doi"], "study_id": str(sid),
-                                                            "update_signal": bool(study.get("updated_by"))})
-        return str(sid)
+    latest = conn.execute(
+        text("SELECT metadata FROM evidence.study WHERE lower(doi)=:d ORDER BY recorded_at DESC LIMIT 1"),
+        {"d": study["doi"]},
+    ).scalar_one_or_none()
+    stable = {k: v for k, v in study.items() if k not in ("crossref_indexed", "is_referenced_by_count")}
+    if latest is not None and logical_hash(
+        {k: v for k, v in latest.items() if k not in ("crossref_indexed", "is_referenced_by_count")}
+    ) == logical_hash(stable):
+        return None
+    act = repo.simple_activity("study.metadata", "normalisation", "worker:crossref", {"doi": study["doi"]})
+    repo.record_activity(conn, act, inputs=[(summary.raw_sha256, {"json_pointer": "/message"})])
+    sid = conn.execute(
+        text(
+            """INSERT INTO evidence.study(doi, metadata, source_artifact_sha256, acquisition_id,
+                 provenance_activity_id) VALUES (:d, CAST(:m AS jsonb), :s, :acq, :a) RETURNING id"""
+        ),
+        {"d": study["doi"], "m": json.dumps(study), "s": summary.raw_sha256,
+         "acq": summary.acquisition_id, "a": act.id},
+    ).scalar_one()
+    repo.emit_outbox(conn, "evidence.study_metadata", {"doi": study["doi"], "study_id": str(sid),
+                                                        "update_signal": bool(study.get("updated_by"))})
+    return str(sid)
 
 
 def import_card(
@@ -139,6 +142,7 @@ def import_card(
         raise ValidationProblem("only a named human/maintainer can record a reviewed card")
     if card.extraction_method.startswith("llm") and status != "candidate":
         raise ValidationProblem("LLM-extracted cards are candidate-only")
+    take_evidence_write_lock(conn)  # R-03 lock protocol: claims inform releases
     existing = conn.execute(
         text("SELECT id, card FROM evidence.claim WHERE claim_key=:k AND version=:v"),
         {"k": card.claim_id, "v": card.claim_version},

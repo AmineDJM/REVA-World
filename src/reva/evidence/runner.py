@@ -187,6 +187,16 @@ def record_health(engine: Engine, spec_name: str, spec_version: str, report: Run
         )
 
 
+def _bind_post_publish(post_publish: Any, store: ArtifactStore, raw: Any, batches: list[Any]) -> Any:
+    if post_publish is None:
+        return None
+
+    def step(conn: Any, summary: Any) -> None:
+        post_publish(conn, store, raw, batches, summary)
+
+    return step
+
+
 async def run_connector(
     connector: Any,
     http: Any,
@@ -233,9 +243,11 @@ async def run_connector(
             if raw.response_metadata.get("status") == 304:
                 report.outcomes.append(FetchOutcome(item_key=item.key, status="unchanged", detail="304"))
                 continue
-            summary = publish_acquisition(engine, store, spec, raw, batches, reports, fence=fence)
-            if post_publish is not None and summary.namespace == "raw" and not summary.duplicate_acquisition:
-                post_publish(engine, store, raw, batches, summary)
+            step = _bind_post_publish(post_publish, store, raw, batches)
+            # Post-publish steps run inside the acquisition transaction (R-14): a crash
+            # rolls the acquisition back, so the retry is not a duplicate and re-runs them.
+            summary = publish_acquisition(engine, store, spec, raw, batches, reports, fence=fence,
+                                          post_publish=step)
             report.inserted += summary.inserted
             report.unchanged += summary.unchanged
             report.relations += summary.relations
@@ -279,6 +291,12 @@ def outcomes_ok(outcomes: Sequence[FetchOutcome]) -> bool:
 
 
 def post_publish_for(template: str) -> Any:
+    """Post-publish step for a connector template.
+
+    Contract: ``fn(conn, store, raw, batches, summary)``; it runs inside the
+    acquisition publication transaction (only for newly published raw bytes) and
+    must not commit.
+    """
     if template == "naturalearth_asset":
         from reva.world.space import publish_display_geometries
 

@@ -44,6 +44,11 @@ LOCAL_ONLY_VALUE = re.compile(r"^(?:local_[a-z_]*only|replace_with_[a-z_]+)$")
 PLACEHOLDERS = {"pw", "pass", "password", "PASSWORD", "secret", "***", "xxx", "changeme"}
 
 
+def _placeholder(value: str) -> bool:
+    """Templating, redaction or documentation ellipses rather than a value."""
+    return value.startswith(("$", "{", "<", "*")) or value in PLACEHOLDERS or set(value) <= set(".…")
+
+
 def tracked_text_files() -> list[Path]:
     try:
         out = subprocess.run(["git", "ls-files", "-z"], cwd=REPO, capture_output=True, check=True).stdout
@@ -94,14 +99,14 @@ def test_non_test_files_have_no_credentials_except_documented_local_examples() -
         content = p.read_text(errors="replace")
         for m in URL_CREDENTIALS.finditer(content):
             user, pw = m.group(1), m.group(2)
-            if pw.startswith(("$", "{", "<", "*")) or pw in PLACEHOLDERS:
+            if _placeholder(pw):
                 continue  # placeholders / templating / redaction
             if LOCAL_ONLY_VALUE.match(pw):
                 continue  # documented local-only example (self-describing value)
             hits.append(f"{rel}: credentials in URL for user {user!r}")
         for m in SECRET_ASSIGNMENT.finditer(content):
             value = m.group(2)
-            if value.startswith(("$", "{", "<", "*")) or value.lower() in ("", "none", "null", "true", "false"):
+            if _placeholder(value) or value.lower() in ("", "none", "null", "true", "false"):
                 continue
             if rel.endswith((".py", ".ts", ".tsx")):
                 continue  # code refers to names; values come from the environment

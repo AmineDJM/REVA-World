@@ -308,3 +308,23 @@ async def test_rollback_retires_eligibility(db, tmp_path):
         ok = conn.execute(text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"),
                           {"cv": cv, "c": c, "s": entity_id("FRA")}).scalar_one()
     assert ok is False
+
+
+@pytest.mark.live
+async def test_live_catalogue_and_sample_still_conform(io):
+    """Bounded live check (2 discovery requests + 1 sample): run with ``-m live``."""
+    from reva.adapters.http.safe_client import SafeHttpClient
+    from reva.autonomy.fixtures import CapturingHttp
+
+    client = SafeHttpClient(allowed_hosts=["ec.europa.eu"], max_bytes=4_000_000)
+    http = CapturingHttp(client, "Eurostat (CC BY 4.0)")
+    gap = _gap(io)
+    cands = await EurostatCatalogueDiscoverer(io, http).discover(gap, default_budget())
+    assert cands[0].dataset_id == "demo_pjan"
+    mapping = RegistryOntologyMapper(io).assess(cands[0], gap.context)[0]
+    cp = DeclarativeConnectorGenerator(io).generate(cands[0], mapping, ("eurostat_jsonstat",))
+    empty = io.put_json({"schema": "reva-fixture-bank/1", "connector": CONNECTOR, "entries": []}, "raw")
+    rep = await JsonStatConnectorValidator(io, live_client_factory=lambda hosts: client).validate(
+        cp, empty, default_budget())
+    assert rep.outcome == "pass", [(f.code, f.message) for f in rep.findings]
+    assert io.get_json(rep.evidence_manifest)["fixture_bank"]

@@ -4,6 +4,15 @@ Publication protocol: bytes are written to the object store (content-addressed,
 verified) *before* the transaction; metadata, observations, relations, outbox
 and invalidation rows then commit atomically. A crash before commit leaves an
 unreferenced object (an orphan for GC), never partially visible data.
+
+Lock protocol (see ``reva.evidence.locks``): the publication transaction takes
+the shared evidence lock first, so a belief release never selects while an
+acquisition is in flight. Post-publish steps (display geometries, study
+metadata) run inside the same transaction, so a crash rolls back the whole
+acquisition and a retry re-publishes it.
+
+Lineages are keyed by (source, origin, logical key): fixture and live
+acquisitions of the same series never share a revision chain.
 """
 
 from __future__ import annotations
@@ -18,6 +27,7 @@ from uuid import UUID
 from sqlalchemy import Connection, Engine, text
 
 from reva.adapters.postgres import repositories as repo
+from reva.evidence.locks import take_evidence_write_lock
 from reva.evidence.revisions import LineageHead, decide_revision, semantic_hash
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import canonical_bytes
@@ -65,7 +75,9 @@ def connector_registration(conn: Connection, spec: ConnectorSpec) -> ConnectorRe
 
 
 def acquisition_idempotency_key(spec: ConnectorSpec, raw: RawAcquisition, raw_sha: str) -> str:
-    basis = f"{spec.name}|{spec.version}|{raw.request_fingerprint}|{raw_sha}|{raw.origin}"
+    # parser_version is part of the key: a parser fix shipped without a connector
+    # version bump must reprocess previously captured bytes (R-28).
+    basis = f"{spec.name}|{spec.version}|{spec.parser_version}|{raw.request_fingerprint}|{raw_sha}|{raw.origin}"
     return hashlib.sha256(basis.encode()).hexdigest()
 
 
@@ -74,18 +86,20 @@ def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: boo
     return store.put_bytes(raw.body, ns, raw.media_type or "application/octet-stream")
 
 
-def _lineage_head(conn: Connection, source_id: UUID, logical_key: str) -> LineageHead | None:
+def _lineage_head(conn: Connection, source_id: UUID, origin: str, logical_key: str) -> LineageHead | None:
     # Serialise writers of the same lineage for the duration of the transaction.
+    # A lineage is (source, origin, logical key): a live ingest never dedups
+    # against, or supersedes, a fixture-origin head (R-04).
     conn.execute(
         text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"),
-        {"k": f"{source_id}|{logical_key}"},
+        {"k": f"{source_id}|{origin}|{logical_key}"},
     )
     row = conn.execute(
         text(
             "SELECT id, revision_no, semantic_hash FROM evidence.observation "
-            "WHERE source_id = :s AND logical_key = :k ORDER BY revision_no DESC LIMIT 1"
+            "WHERE source_id = :s AND origin = :o AND logical_key = :k ORDER BY revision_no DESC LIMIT 1"
         ),
-        {"s": source_id, "k": logical_key},
+        {"s": source_id, "o": origin, "k": logical_key},
     ).one_or_none()
     return LineageHead(row[0], row[1], row[2]) if row else None
 
@@ -94,6 +108,7 @@ def _insert_observation(
     conn: Connection,
     reg: ConnectorRegistration,
     acquisition_id: UUID,
+    origin: str,
     raw_sha: str,
     obs: ParsedObservation,
     parser_version: str,
@@ -109,12 +124,13 @@ def _insert_observation(
     concept = repo.concept_version_id(conn, obs.concept_id, obs.concept_version)
     support_id = repo.ensure_support(conn, obs.support, activity_id)
     shash = semantic_hash(obs)
-    decision = decide_revision(_lineage_head(conn, reg.source_id, obs.logical_key), shash)
+    decision = decide_revision(_lineage_head(conn, reg.source_id, origin, obs.logical_key), shash)
     if decision.action == "unchanged":
         return "unchanged", None
     selector = {**obs.raw_selector, "artifact_sha256": raw_sha}
     record = {
         "logical_key": obs.logical_key,
+        "origin": origin,
         "revision_no": decision.revision_no,
         "value": obs.value,
         "semantic_hash": shash,
@@ -123,12 +139,12 @@ def _insert_observation(
     oid = conn.execute(
         text(
             """INSERT INTO evidence.observation(
-                 source_id, connector_version_id, acquisition_id, logical_key, revision_no,
+                 source_id, connector_version_id, acquisition_id, origin, logical_key, revision_no,
                  source_revision_id, supersedes_id, subject_id, concept_version_id, support_id, value,
                  uncertainty, source_flags, observed_at, source_published_at, source_available_at,
                  availability_basis, raw_selector, parser_version, provenance_activity_id, semantic_hash,
                  record_hash)
-               VALUES (:src, :cv, :acq, :lk, :rev, :srid, :sup, :subj, :concept, :support,
+               VALUES (:src, :cv, :acq, :origin, :lk, :rev, :srid, :sup, :subj, :concept, :support,
                  CAST(:value AS jsonb), CAST(:unc AS jsonb), CAST(:flags AS jsonb), :obs_at, :pub_at,
                  :avail_at, CAST(:avail_basis AS jsonb), CAST(:sel AS jsonb), :pv, :act, :shash, :rhash)
                RETURNING id"""
@@ -137,6 +153,7 @@ def _insert_observation(
             "src": reg.source_id,
             "cv": reg.connector_version_id,
             "acq": acquisition_id,
+            "origin": origin,
             "lk": obs.logical_key,
             "rev": decision.revision_no,
             "srid": obs.source_revision_id,
@@ -220,13 +237,22 @@ def publish_acquisition(
     actor: str = "worker:ingest",
     fault_after_object_write: bool = False,
     fence: Callable[[Connection], None] | None = None,
+    post_publish: Callable[[Connection, PublishSummary], None] | None = None,
 ) -> PublishSummary:
+    """Publish one acquisition atomically.
+
+    ``post_publish(conn, summary)`` runs inside the publication transaction just
+    before commit, only for a newly published (non-duplicate, non-quarantined)
+    acquisition. If it raises, the acquisition rolls back too, so a retry
+    re-publishes both (R-14).
+    """
     quarantined = any(r.blocking for r in reports)
     obj = write_raw_object(store, raw, quarantined)  # 1-2: bytes first, verified
     if fault_after_object_write:  # used by fault-injection tests
         raise RuntimeError("injected fault after object upload, before commit")
     summary = PublishSummary(None, obj.sha256, obj.namespace)
     with engine.begin() as conn:  # 4: one transaction
+        take_evidence_write_lock(conn)  # R-03: publication never selects while this is in flight
         if fence is not None:
             fence(conn)  # verify job owner/fencing token/lease in the publication transaction
         reg = connector_registration(conn, spec)
@@ -239,12 +265,14 @@ def publish_acquisition(
         )
         latest = conn.execute(
             text(
-                "SELECT id, raw_sha256 FROM evidence.acquisition WHERE connector_version_id = :cv "
+                "SELECT id, raw_sha256, response_metadata->>'parser_version' FROM evidence.acquisition "
+                "WHERE connector_version_id = :cv "
                 "AND request_fingerprint = :fp AND origin = :o ORDER BY recorded_at DESC, id DESC LIMIT 1"
             ),
             {"cv": reg.connector_version_id, "fp": raw.request_fingerprint, "o": raw.origin},
         ).one_or_none()
-        if latest is not None and latest[1] == obj.sha256 and not raw.replay_of_acquisition_id:
+        if (latest is not None and latest[1] == obj.sha256 and latest[2] == spec.parser_version
+                and not raw.replay_of_acquisition_id):
             summary.acquisition_id = UUID(str(latest[0]))
             summary.duplicate_acquisition = True
             return summary
@@ -285,6 +313,7 @@ def publish_acquisition(
         response_metadata = {
             **raw.response_metadata,
             "item_key": raw.item.key,
+            "parser_version": spec.parser_version,
             "quality": [r.model_dump(mode="json") for r in reports],
             "batch_metadata": [b.metadata for b in batches],
             "schema_fingerprints": sorted({b.schema_fingerprint for b in batches}),
@@ -330,7 +359,7 @@ def publish_acquisition(
         for batch in batches:
             for obs in batch.observations:
                 status, oid = _insert_observation(
-                    conn, reg, acq_id, obj.sha256, obs, spec.parser_version, norm_act.id
+                    conn, reg, acq_id, raw.origin, obj.sha256, obs, spec.parser_version, norm_act.id
                 )
                 if status == "unchanged":
                     summary.unchanged += 1
@@ -359,6 +388,8 @@ def publish_acquisition(
                     ),
                     {"k": f"belief:{concept_id}", "s": seq, "r": f"upstream_changed:{raw.origin}"},
                 )
+        if post_publish is not None:
+            post_publish(conn, summary)  # same transaction: a failure rolls back the acquisition
     log.info(
         "published acquisition %s: %d inserted, %d unchanged",
         summary.acquisition_id,
