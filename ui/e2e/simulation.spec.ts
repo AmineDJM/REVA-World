@@ -157,6 +157,15 @@ test('L2 shows the sensitivity range labelled "not a confidence interval"', asyn
   await expect(table.locator('caption')).toContainText('sensitivity range (not a confidence interval)');
   await expect(table.getByRole('columnheader', { name: 'Sensitivity range (not a confidence interval)' })).toBeVisible();
   await expect(table.locator('.sensitivity-range').first()).toBeVisible();
+  // The range is not presented as an interval around L1: where L1 sits is derived from the served values.
+  const fraNet = (sim.data.results as any[]).filter((r) => /France/.test(r.subject?.label ?? '') && r.output_key === 'net_external_cost_change_usd');
+  const l1 = fraNet.find((r) => r.variant === 'L1');
+  const rng = fraNet.find((r) => r.variant === 'L2:sensitivity_range');
+  expect(l1 && rng, 'France net cost L1 and L2 range rows').toBeTruthy();
+  const expected = Number(l1.value.value) === Number(rng.value.upper) ? 'upper end' : Number(l1.value.value) === Number(rng.value.lower) ? 'lower end' : 'inside';
+  const fraRow = table.getByRole('row').filter({ has: page.getByRole('rowheader', { name: 'France' }) }).filter({ hasText: 'Net external cost change' });
+  await expect(fraRow.getByTestId('l1-position')).toContainText(expected);
+  expect(await table.innerText()).not.toMatch(/±/);
   // Nothing on the page presents the band as a confidence/credible interval or a 95% band.
   const text = await page.locator('main').innerText();
   expect(text.replace(/not a confidence interval/gi, '')).not.toMatch(/confidence interval|credible interval|\b95\s?%/i);

@@ -454,9 +454,9 @@ def test_runtime_roles_cannot_backdate_recorded_at(w: dict[str, Any]) -> None:
         assert c.execute(text("SELECT min(recorded_at) FROM ops.audit WHERE actor = 'worker:x'")).scalar_one() >= start
     with tx(db.sim) as c, pytest.raises(DBAPIError, match="recorded_at is server-generated"):
         c.execute(
-            text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights, "
-                 "recorded_at) VALUES (:s, 'application/json', 1, 't', 'public_aggregate', '{}', :old)"),
-            {"s": uuid.uuid4().hex * 2, "old": old})
+            text("INSERT INTO meta.activity(kind, origin, code_digest, parameters, environment_digest, actor, "
+                 "started_at, ended_at, recorded_at) VALUES ('t', 'simulation', 'c', '{}', 'e', 'sim:test', "
+                 ":old, :old, :old)"), {"old": old})
     with tx(db.owner) as c:  # the owner (migrations, historical test fixtures) may supply the value
         oid = copy_obs(c, w, "fx1:owner-backdated", extra_cols=", recorded_at",
                        extra_vals=", CAST(:old AS timestamptz)", old=old)

@@ -184,6 +184,9 @@ describe('SimulationPage', () => {
     const range = within(table).getByTitle('assumption sensitivity, not a confidence interval');
     expect(range.textContent).toMatch(/250.*to.*562\.5/);
     expect(range.textContent).toContain('not a confidence interval');
+    // L1 (250) is the lower end of this one-sided range: stated from the data, never drawn as ± around L1.
+    expect(within(table).getByTestId('l1-position')).toHaveTextContent('L1 = lower end under this grid');
+    expect(table.textContent).not.toMatch(/±/);
     expect(screen.getByText(/L2 grid variants \(1 assumed elasticity pairs\)/)).toBeInTheDocument();
   });
 });
