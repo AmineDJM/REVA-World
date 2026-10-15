@@ -89,3 +89,10 @@ unsupported capability returns a typed blocked/unavailable result.
 | BKP | scripts/backup*.{sh,py}, scripts/restore.sh, tests/integration/test_backup_restore*.py, docs/operations.md backup section |
 | SEC | src/reva/api/**, tests/security/test_api_adv_*.py |
 | CI | .github/workflows/**, Makefile, pyproject.toml tool sections |
+| CVAL | src/reva/adapters/connectors/{worldbank,comtrade}.py + their tests |
+| HOOK | src/reva/operations/jobs.py, belief/publication.py, world/queries.py, autonomy/repair.py |
+| GOV | 0007_security.py (except sim grants), 0006 ops/model governance functions, cli/bootstrap.py, cli/seed.py |
+| SIMFIX | 0004 sim.*, 0006 sim.create_scenario, 0007 sim/artifact grants, simulation/**, register_artifact |
+| PUBFIX | 0001/0002/0003/0005, belief/** except publication.py, PUBLICATION_LOCK probe, eligibility scopes |
+| MIGR | adapters/postgres/schema_contract.py, migrations/schema_contract.json, `reva db verify-schema` |
+| LEDGER | docs/implementation_status.md |
