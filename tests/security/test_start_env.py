@@ -478,20 +478,23 @@ def test_bootstrap_runtime_reports_schema_without_secrets(db, tmp_path: Path) ->
         "REVA_API_DB_PASSWORD": s.reva_api_db_password.get_secret_value(),
         "REVA_WORKER_DB_PASSWORD": s.reva_worker_db_password.get_secret_value(),
         "REVA_SIM_DB_PASSWORD": s.reva_sim_db_password.get_secret_value(),
+        # As on Render the pre-deploy also provisions the independent gate login (reva_gate).
+        "REVA_GATE_DB_PASSWORD": s.reva_gate_db_password.get_secret_value(),
         # As on Render: the pre-deploy runs in the API service's environment.
         "REVA_PROCESS_ROLE": "api",
     }
     proc = _run("bootstrap_runtime.py", env, tmp_path)
     assert proc.returncode == 0, proc.stderr
     report = json.loads(proc.stdout)
-    assert report["status"] == "ok" and report["roles"] == ["reva_api", "reva_worker", "reva_sim"]
+    assert report["status"] == "ok" and report["roles"] == ["reva_api", "reva_worker", "reva_sim", "reva_gate"]
     from alembic.script import ScriptDirectory
 
     from reva.cli.bootstrap import alembic_config
 
     assert report["schema_version"] == ScriptDirectory.from_config(alembic_config()).get_current_head()
     owner_pw = s.migration_url().password
-    for secret in (owner_pw, env["REVA_API_DB_PASSWORD"], env["REVA_WORKER_DB_PASSWORD"]):
+    for secret in (owner_pw, env["REVA_API_DB_PASSWORD"], env["REVA_WORKER_DB_PASSWORD"],
+                   env["REVA_GATE_DB_PASSWORD"]):
         assert secret and secret not in proc.stdout + proc.stderr
 
 
