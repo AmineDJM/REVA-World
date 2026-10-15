@@ -753,3 +753,42 @@ def dataset_manifest(table_code: str, iso3: str, table: Any, *, raw_sha256: str,
         "years": sorted({int(y) for y in table.column("year").to_pylist()}),
         "semantics": t.describe(),
     }
+
+
+def dataset_key(table_code: str) -> str:
+    return f"{CONNECTOR_NAME}.{table_code}"
+
+
+def dataset_coverage(table: Any) -> dict[str, Any]:
+    rows = table.to_pylist()
+    years = sorted({r["year"] for r in rows})
+    present = [r for r in rows if r["value"] is not None]
+    return {"years": [years[0], years[-1]] if years else [],
+            "years_with_values": sorted({r["year"] for r in present}),
+            "status_flags": sorted({r["status"] for r in rows if r["status"]}),
+            "missing_cells": len(rows) - len(present),
+            "derivation_version": DATASET_DERIVATION_VERSION}
+
+
+def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch],
+                          summary: Any) -> None:
+    """Register the per-country dataset inputs derived from this acquisition's raw bytes.
+
+    Contract of ``post_publish`` hooks: runs inside the acquisition publication transaction, only
+    for newly published (not quarantined) raw bytes, and must not commit. The derivation is a pure
+    function of the archived bytes, so a dataset can always be re-derived from its acquisition."""
+    from reva.simulation.datasets import register_dataset
+
+    code = str(raw.item.params["table"])
+    t = TABLES_BY_CODE[code]
+    geos = list((batches[0].metadata.get("categories") or {}).get("geo") or DEFAULT_GEOS) if batches else DEFAULT_GEOS
+    for iso3, table in derive_dataset_tables(raw.body, code, geos).items():
+        register_dataset(conn, store, dataset_key=dataset_key(code), concept_id=t.concept_id, subject_key=iso3,
+                         table=table, source_acquisition_ids=[summary.acquisition_id], parser_version=PARSER_VERSION,
+                         origin=raw.origin, coverage=dataset_coverage(table), actor=f"connector:{CONNECTOR_NAME}",
+                         rights={"licence": LICENCE, "attribution": "Source: Eurostat", "source_key": SOURCE_KEY})
+
+
+# Optional hook read by runners that dispatch post-publish steps per connector (same convention as
+# reva.adapters.connectors.eurostat_demography).
+EurostatLabourPensionsConnector.post_publish = staticmethod(post_publish_datasets)  # type: ignore[attr-defined]

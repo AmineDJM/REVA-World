@@ -684,7 +684,7 @@ def _ensure_reapproved(db: Any, name: str) -> None:
                         "human:fx2-test", "re-enable after a rollback drill in another test module")
 
 
-async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
+async def test_population_from_promoted_eurostat_connector(db: Any, gate_service: Any) -> None:
     from reva.autonomy.jobs import handle_discovery, promoted_connectors
     from reva.operations.context import JobContext
     from reva.population.service import build_population, load_cells

@@ -1,0 +1,42 @@
+/** Shared V2 API fixtures for unit tests (shapes from the real routes; never used by e2e). */
+
+/** Shape of src/reva/api/routes/nl.py ScenarioDraftResponse. */
+export const READY_RESPONSE = {
+  status: 'draft_ready',
+  confirmation_required: true,
+  executed: false,
+  draft_spec: {
+    schema_version: '2.0.0',
+    title: 'France and USA: crude oil import price +20% in 2023',
+    model_key: 'economic.crude_exposure',
+    countries: ['FRA', 'USA'],
+    reference_year: 2023,
+    intervention: { kind: 'set_exogenous_border_price_multiplier', import_multiplier: 1.2, export_multiplier: 1, unit: 'ratio' },
+    fidelity: 'L1',
+    baseline_release_id: 'rel-1',
+    knowledge_cutoff: '2026-10-15T00:00:00Z',
+  },
+  draft_spec_sha256: 'abc',
+  candidate_spec: null,
+  validation: { valid: true, errors: [] },
+  restatement: 'Crude import border price ×1.2 for France and the United States in 2023 (L1, fixed quantities).',
+  language: 'en',
+  llm_restatement: 'This scenario examines France and the USA if crude oil import prices increase by 20% in 2023.',
+  unsupported: [{ text: 'GDP loss', capability_key: 'outputs.macroeconomic', kind: 'capability_gap', reason: 'not computed by any listed model', source: 'llm' }],
+  rejected_ids: [],
+  missing_fields: [],
+  assumptions_added: [{ text: 'export multiplier 1 (unchanged)', source: 'llm' }],
+  numbers_to_confirm: [{ path: 'intervention.import_multiplier', value: 1.2, provenance: 'converted_from_stated', quote: '20% rise' }],
+  provider: 'openai',
+  model: 'gpt-4.1-2025-04-14',
+  model_requested: 'gpt-4.1',
+  prompt_version: 'nl-draft-1.0.0',
+  prompt_sha256: 'f9662e32a386927e',
+  catalog_digest: 'fb2b',
+  usage: { input_tokens: 3000, output_tokens: 250, total_tokens: 3250 },
+  latency_ms: 3076.2,
+  fallback_from: [],
+  warnings: [],
+  next_step: 'Review the draft',
+};
+

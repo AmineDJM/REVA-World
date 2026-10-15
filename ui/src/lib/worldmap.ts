@@ -25,6 +25,8 @@ export interface CountryRunStatus {
   apiStatus: string | null;
   /** Typed reasons, one line each (input, year, state). */
   reasons: string[];
+  /** Entity id when the API states it (skipped_countries[].subject_id). */
+  subjectId?: string | null;
 }
 
 /** One readable line for a problem item from the API ({input, concept, year, state|reason}). */
@@ -33,7 +35,7 @@ export function problemText(p: unknown): string {
   if (!isRecord(p)) return String(p);
   const what = [p.input, p.concept].filter((x) => typeof x === 'string' && x).join(' · ');
   const year = p.year ?? p.reference_year;
-  const state = p.state ?? p.reason ?? p.code ?? p.message ?? p.detail;
+  const state = p.state ?? (p.code === 'missing_input' && typeof p.reason === 'string' ? `missing:${p.reason}` : undefined) ?? p.reason ?? p.code ?? p.message ?? p.detail;
   const parts = [what || null, year !== undefined && year !== null ? String(year) : null].filter(Boolean).join(' ');
   const st = typeof state === 'string' ? state.replace(/^missing:/, 'missing: ') : state !== undefined ? JSON.stringify(state) : '';
   return [parts, st].filter(Boolean).join(' — ') || JSON.stringify(p);
@@ -81,15 +83,18 @@ export function runCountryStatuses(st: SimulationStatus | null | undefined): Rec
   for (const s of skipped) {
     const iso = typeof s === 'string' ? s : isRecord(s) && typeof s.country === 'string' ? s.country : null;
     if (!iso) continue;
-    const reasons = isRecord(s)
-      ? Array.isArray(s.problems)
-        ? s.problems.map(problemText)
-        : Array.isArray(s.missing)
-          ? s.missing.map(problemText)
-          : [problemText(s.reason ?? s)]
-      : [];
+    const list = isRecord(s) ? (Array.isArray(s.problems) ? s.problems : Array.isArray(s.reasons) ? s.reasons : Array.isArray(s.missing) ? s.missing : null) : null;
+    const reasons = isRecord(s) ? (list ? list.map(problemText) : [problemText(s.reason ?? s)]) : [];
     const prev = out[iso];
-    out[iso] = { iso3: iso, apiStatus: prev?.apiStatus ?? 'skipped', state: withResult.has(iso) ? 'computed' : 'skipped', reasons: prev?.reasons.length ? prev.reasons : reasons };
+    const subjectId = isRecord(s) && typeof s.subject_id === 'string' ? s.subject_id : null;
+    out[iso] = {
+      iso3: iso,
+      apiStatus: prev?.apiStatus ?? 'skipped',
+      // Skipped under skip_missing_countries: the run went on without it.
+      state: withResult.has(iso) ? 'computed' : 'skipped',
+      reasons: prev?.reasons.length ? prev.reasons : reasons,
+      subjectId,
+    };
   }
   const specCountries = Array.isArray(st.scenario?.spec?.countries) ? (st.scenario!.spec.countries as unknown[]) : [];
   for (const c of specCountries) {

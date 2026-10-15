@@ -104,9 +104,17 @@ Errors (RFC 9457): 400 `idempotency_key_required`, 403 scope, 409
     plugin is registered (`reva.simulation.plugins.load_all()`); countries = the
     branch enum, else the registered country entities (`countries.yaml` + the
     verified crosswalk) matching the branch pattern, plus `ALL` when the plugin
-    declares `supports_all_countries`. During this session the catalogue picked up
-    `demography.cohort_component` and `economic.io_price` automatically (both
-    flagged `experimental_model` from `review_status: maintainer_review_pending`).
+    declares `supports_all_countries` (the prompt tells the model to write
+    `["ALL"]` for "all countries / tous les pays"; a draft with `ALL` and
+    `missing_input_policy=fail` carries a warning that one missing country refuses
+    the whole run). Model-specific objects given as `oneOf` alternatives (e.g. the
+    retirement module's intervention kinds) expose their constant discriminator as
+    a choice parameter; the server picks the alternative from it and asks for the
+    variant when it is unknown. During this session the catalogue picked up
+    `demography.cohort_component`, `economic.io_price` and `social.retirement_age`
+    automatically (flagged `experimental_model` from `review_status:
+    maintainer_review_pending`); the unit test asserts catalogue models ==
+    registered plugins.
 13. **Budget** `llm.scenario_drafts`: 200 requests/day, 2 000 000 tokens/day,
     1500 output tokens. Reservation per request = UTF-8 bytes sent (system +
     user + schema) + 64 + max output tokens (a byte-level BPE token covers ≥ 1
@@ -147,11 +155,12 @@ Errors (RFC 9457): 400 `idempotency_key_required`, 403 scope, 409
 | openai_en_multiyear | 200 | gpt-4.1-2025-04-14 | 2099 | 4822 / 288 / 5110 |
 | openai_en_io_energy_shock | 200 | gpt-4.1-2025-04-14 | 3286 | 7608 / 221 / 7829 |
 | openai_fr_population | 200 | gpt-4.1-2025-04-14 | 1994 | 7593 / 187 / 7780 |
+| openai_fr_all_countries | 200 | gpt-4.1-2025-04-14 | 2971 | 9965 / 248 / 10213 |
 | gemini_en_basic (`gemini-3.8-flash`) | 402 | — (prepayment credits depleted) | 326 | — |
 
-Latency 1.4–3.3 s. The input grew from ~4.8 k to ~7.6 k tokens when the POP and
-IO plugins registered (their country lists and parameters entered the
-catalogue). `pytest -m live tests/integration/test_nl_live.py` (one call):
+Latency 1.4–3.3 s. The input grew from ~4.8 k to ~7.6 k and then ~10 k tokens as
+the POP, IO and retirement plugins registered (their country lists and parameters
+entered the catalogue); the budget reservation bound grows with it. `pytest -m live tests/integration/test_nl_live.py` (one call):
 `gpt-4.1-2025-04-14`, 2351 ms, 7477 / 208 / 7685 tokens, status `needs_input`.
 
 Observed model behaviour worth knowing: with `[2020, 2024]` rendered as a list
@@ -165,12 +174,12 @@ from both the model and the guard; no spec field can carry a data value.
 
 All live calls of this session were made by the maintainer capture helper and
 the live test, outside the persistent ledger (per-run caps, like the operator
-live-check scripts): 32 OpenAI requests and 5 Gemini requests (404/402),
-about 160 k tokens in total.
+live-check scripts): 33 OpenAI requests and 5 Gemini requests (404/402),
+about 170 k tokens in total.
 
 ## Tests
 
-* `tests/unit/test_nl_drafts.py` — 38 tests, offline (recorded + labelled synthetic
+* `tests/unit/test_nl_drafts.py` — 40 tests, offline (recorded + labelled synthetic
   adversarial outputs, in-memory ledger): fixtures are real and redacted; FR/EN;
   same validator and canonical sha as `/v1/scenarios`; GDP/unemployment, retirement,
   multi-year, data override, role override, out-of-list region; synthetic outputs
@@ -178,7 +187,8 @@ about 160 k tokens in total.
   (refused), forged capability keys, refusal; fallback only on retryable errors;
   402 typed; over budget → no provider call and no fallback; token bound ≥ usage;
   payloads tool-free/temperature 0/strict; host allowlist; prompt isolation;
-  no execution path; dynamic plugin registration; IO and population drafts.
+  no execution path; dynamic plugin registration (catalogue == registered plugins);
+  IO, population and "tous les pays" drafts.
 * `tests/integration/test_nl_drafts_api.py` — 9 tests on a fresh database through
   `reva_api`: ledger functions SECURITY DEFINER and not PUBLIC; draft returns a
   valid spec and creates no scenario/job/run; confirmed draft → `POST /v1/scenarios`
@@ -187,7 +197,12 @@ about 160 k tokens in total.
   disabled LLM and missing ledger functions fail closed (503); injection text as data.
 * `tests/integration/test_nl_live.py` — `live` (deselected by default), one call.
 
-Results at hand-off are in the final report of this agent.
+Results at hand-off (2026-10-15): `tests/unit` 693 passed; `tests/security -k "nl or
+injection or api"` 161 passed (an earlier run had 2 failures in other agents'
+in-progress tests that passed on re-run and in isolation); `tests/integration -k "nl
+or draft"` 19 passed, 2 skipped (MinIO not configured); `-m live` NL test 1 passed;
+ruff clean on NLC files (remaining ruff errors are in other agents' files); mypy
+clean on `src/reva/nl` and the route; `scripts/export_contracts.py --check` up to date.
 
 ## Requests to other owners
 

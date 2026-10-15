@@ -136,7 +136,7 @@ def test_enqueue_requires_exactly_one_trigger(db) -> None:
 
 
 # --------------------------------------------------------------------------- 1-3. quarantine -> pause -> release
-async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(db) -> None:
+async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(db, gate_service) -> None:
     wb = WorldBankConnector()
     # A baseline release that publishes POP (and GDP) from the captured bank.
     rep0 = await run_connector(wb, FixtureHttp(WB), db.store, db.worker, persist_cursor=False)

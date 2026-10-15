@@ -17,6 +17,14 @@ export const KIND_LABEL: Record<PaletteKind, string> = {
   release: 'Release',
 };
 
+export const KIND_PLURAL: Record<PaletteKind, string> = {
+  screen: 'screens',
+  country: 'countries',
+  concept: 'concepts',
+  run: 'runs',
+  release: 'releases',
+};
+
 export interface PaletteItem {
   id: string;
   kind: PaletteKind;

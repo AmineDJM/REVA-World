@@ -238,7 +238,7 @@ def test_r6_03_model_registration_never_approved_by_a_gate_pass(db, io):
     from reva.ports.autonomy import GateDecision
 
     with (getattr(db, "gate", None) or db.worker).begin() as conn:
-        io.register(conn, ev, "r6/1")
+        io.register(conn, ev, "gate-decision/1")
         gid = conn.execute(text("SELECT ops.record_gate_result(:p,'x',:v,'pass',:e,'gate-evaluator:x')"),
                            {"p": p.proposal_id, "e": ev.sha256, "v": promotion_policy().version}).scalar_one()
     with pytest.raises(PolicyDenied, match="named human review"):

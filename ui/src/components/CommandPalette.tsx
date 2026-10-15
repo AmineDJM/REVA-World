@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router';
 import { getBeliefReleases, getEntities, getEntity, getJobs, getOntology, getScenarios } from '../api/client';
 import { COUNTRY_CODES } from '../api/types';
 import { formatDateTime, shortId } from '../lib/format';
-import { KIND_LABEL, rankItems, type PaletteItem, type PaletteKind } from '../lib/palette';
+import { KIND_LABEL, KIND_PLURAL, rankItems, type PaletteItem, type PaletteKind } from '../lib/palette';
 
 export interface PaletteScreen {
   to: string;
@@ -234,7 +234,7 @@ export function CommandPalette({ screens }: { screens: PaletteScreen[] }) {
             )}
             {errorKinds.length > 0 && (
               <p className="field-error" role="status">
-                Not searchable right now: {errorKinds.map(([k, m]) => `${KIND_LABEL[k] ?? k}s (${m})`).join('; ')}.
+                Not searchable right now: {errorKinds.map(([k, m]) => `${KIND_PLURAL[k] ?? k} (${m})`).join('; ')}.
               </p>
             )}
             <ul id={listId} role="listbox" aria-label="Results" className="palette-list">

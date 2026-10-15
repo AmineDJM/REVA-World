@@ -46,18 +46,24 @@ def other_connector_version(c: Connection, w: dict[str, Any]) -> UUID:
 
 def promotion_proposal(c: Connection, w: dict[str, Any], scope: dict[str, Any],
                        ptype: str = "connector_promotion") -> UUID:
-    return UUID(str(c.execute(
-        text("INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, author, summary) "
-             "VALUES (:t, :s, 1, 'agent:discovery', CAST(:sum AS jsonb)) RETURNING id"),
-        {"t": ptype, "s": w["verified"], "sum": json.dumps({"scope": scope})},
-    ).scalar_one()))
+    """A committed worker proposal (GATE: the independent gate login must be able to see it)."""
+    _ = c
+    with w["db"].worker.begin() as wc:
+        return UUID(str(wc.execute(
+            text("INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, author, summary) "
+                 "VALUES (:t, :s, 1, 'agent:discovery', CAST(:sum AS jsonb)) RETURNING id"),
+            {"t": ptype, "s": w["verified"], "sum": json.dumps({"scope": scope})},
+        ).scalar_one()))
 
 
 def gate(c: Connection, w: dict[str, Any], pid: UUID, decision: str = "pass", policy: str = "promotion-1") -> UUID:
-    return UUID(str(c.execute(
-        text("SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion')"),
-        {"p": pid, "v": policy, "d": decision, "s": w["verified"]},
-    ).scalar_one()))
+    """A gate result recorded (committed) by the independent gate login reva_gate (GATE)."""
+    _ = c
+    with w["db"].gate.begin() as gc:
+        return UUID(str(gc.execute(
+            text("SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion')"),
+            {"p": pid, "v": policy, "d": decision, "s": w["verified"]},
+        ).scalar_one()))
 
 
 # =========================================================================== R5-01

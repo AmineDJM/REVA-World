@@ -86,7 +86,16 @@ export default function MapPage() {
   const statuses = useMemo(() => runCountryStatuses(st), [st]);
   const rows = useMemo(() => exposureRows(st?.results ?? []), [st]);
   const uncomputed = useMemo(() => Object.values(statuses).filter((s) => s.state !== 'computed'), [statuses]);
-  const resolved = useApi((s) => resolveIsos(uncomputed.map((u) => u.iso3), s), [uncomputed.map((u) => u.iso3).join(',')], uncomputed.length > 0);
+  // Entity ids of countries without a result: stated by the API (skipped_countries[].subject_id) or resolved by ISO3.
+  const toResolve = uncomputed.filter((u) => !u.subjectId).map((u) => u.iso3);
+  const looked = useApi((s) => resolveIsos(toResolve, s), [toResolve.join(',')], toResolve.length > 0);
+  const resolved = useMemo(() => {
+    const out: Record<string, { id: string; label: string }> = { ...(looked.data ?? {}) };
+    const labels = new Map<string | undefined, string | undefined>((st?.results ?? []).map((r) => [r.subject?.id, r.subject?.label]));
+    for (const f of locations.data?.data.features ?? []) if (f.properties.entity_id && f.properties.entity_label) labels.set(f.properties.entity_id, f.properties.entity_label);
+    for (const u of uncomputed) if (u.subjectId) out[u.iso3] = { id: u.subjectId, label: labels.get(u.subjectId) ?? looked.data?.[u.iso3]?.label ?? u.iso3 };
+    return { data: out };
+  }, [looked.data, uncomputed, st, locations.data]);
 
   const focusId = focusParam ?? rows[0]?.entityId ?? null;
   const focusRow = rows.find((r) => r.entityId === focusId) ?? null;

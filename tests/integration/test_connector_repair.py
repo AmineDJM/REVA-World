@@ -68,7 +68,7 @@ def advisor(db) -> R.ConnectorRepairAdvisor:
 
 @pytest.fixture()
 def gate(db, io) -> PolicyPromotionGate:
-    return PolicyPromotionGate(db.worker, io)
+    return PolicyPromotionGate(db.gate, io)
 
 
 @pytest.fixture(scope="module", autouse=True)

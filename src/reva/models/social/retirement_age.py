@@ -297,9 +297,23 @@ def employment_rates(rows: Sequence[Mapping[str, Any]], year: int, name: str = "
     return rates, flags, missing
 
 
+def latest_beneficiaries(ben_rows: Sequence[Mapping[str, Any]], max_year: int) -> dict[str, Any]:
+    """Latest year <= max_year with old-age beneficiaries (both sexes) present."""
+    ben = {r["year"]: r for r in ben_rows if r.get("dim1") == "T" and r.get("value") is not None
+           and r["year"] <= max_year}
+    if not ben:
+        return {}
+    y = max(ben)
+    return {"year": y, "beneficiaries": D(ben[y]["value"]) * D(ben[y]["scale_factor"]),
+            "flag": ben[y].get("status", "")}
+
+
 def latest_pension_basis(ben_rows: Sequence[Mapping[str, Any]], exp_rows: Sequence[Mapping[str, Any]],
                          max_year: int) -> dict[str, Any]:
-    """Latest year <= max_year with old-age beneficiaries (T) and OLD, AOLD and PART expenditure all present."""
+    """Latest year <= max_year with old-age beneficiaries (T) and OLD, AOLD and PART expenditure all present.
+
+    A component missing in the source is never treated as zero: such a year is skipped, and when no
+    year qualifies the expenditure output is not computed."""
     ben = {r["year"]: r for r in ben_rows if r.get("dim1") == "T" and r.get("value") is not None}
     exp: dict[int, dict[str, Mapping[str, Any]]] = {}
     for r in exp_rows:
@@ -337,7 +351,28 @@ def population_inputs(iso3: str, base_year: int, end_year: int, tables: Mapping[
     proj = cohort.project(data, jump_off=jump, end_year=end_year + 1, assumptions=ass)
     values = cohort.output_values(proj)
     dep = {y: values[("old_age_dependency_ratio_65plus_per_15_64", y)] for y in sorted(proj.population)}
-    return dict(proj.population), dep, proj.summary()
+    summary = proj.summary()
+    summary["observed_population_65_plus_jan1"] = {str(y): dstr(v) for y, v in observed_65_plus(data).items()}
+    return dict(proj.population), dep, summary
+
+
+def observed_65_plus(data: Any) -> dict[int, Decimal]:
+    """Observed 1 January population aged 65+ (both sexes) per year: sum of leaf age cells starting at 65 or
+    above; a year with any such leaf missing is left out (never zero-filled)."""
+    out: dict[int, Decimal] = {}
+    for y in sorted({yy for (yy, _s) in data.population}):
+        total, ok = Decimal(0), True
+        for s in SEXES:
+            cells = data.population.get((y, s)) or {}
+            leaves = [c for c in cells.values() if c.cell_type == "leaf" and c.start is not None and c.start >= 65
+                      and c.kind not in ("total", "unknown")]
+            if not leaves or any(c.value is None for c in leaves):
+                ok = False
+                break
+            total += sum((c.value for c in leaves), Decimal(0))
+        if ok:
+            out[y] = total
+    return out
 
 
 # --------------------------------------------------------------------------- compiled plan
@@ -351,6 +386,7 @@ class CountryPlan:
     data: CountryData | None
     status: str = "ready"
     problems: list[dict[str, Any]] = field(default_factory=list)
+    notes: list[dict[str, Any]] = field(default_factory=list)
     shares: dict[str, dict[tuple[int, int], Fraction]] = field(default_factory=dict)  # path -> (year, age) -> I
 
 
@@ -418,31 +454,42 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
         if key in act and e > act[key]:
             plan.problems.append({"code": "inconsistent_input", "country": iso3, "detail":
                                   f"employment rate {e} exceeds activity rate {act[key]} for {key} in {b}"})
-    basis = latest_pension_basis(_rows(tables["pension_beneficiaries"]), _rows(tables["pension_expenditure"]), b)
-    if not basis:
+    bens = latest_beneficiaries(_rows(tables["pension_beneficiaries"]), b)
+    if not bens:
         plan.problems.append({"code": "missing_input", "country": iso3, "input": "pension_beneficiaries",
                               "concept": CONCEPTS["pension_beneficiaries"], "reference_year": b,
-                              "reason": "no year <= reference_year with old-age beneficiaries and OLD/AOLD/PART "
-                                        "expenditure all present"})
+                              "reason": "no year <= reference_year with old-age pension beneficiaries"})
+    basis = latest_pension_basis(_rows(tables["pension_beneficiaries"]), _rows(tables["pension_expenditure"]), b)
+    if not basis:
+        plan.notes.append({"code": "output_not_computable", "output": "pension_expenditure_change_approx_eur",
+                           "reason": "no year <= reference_year with old-age beneficiaries and OLD, AOLD and PART "
+                                     "expenditure all present in ESSPROS (a missing component is never zero)"})
     try:
         pop, dep, summary = population_inputs(iso3, b, years[-1], tables, assumptions)
     except MissingInput as e:
         for m in e.details.get("missing", []) or [{"detail": e.message}]:
             plan.problems.append({"code": "missing_input", "country": iso3, "input": "population_projection",
-                                  "concept": CONCEPTS["population"], **m})
+                                  "concept": "demography inputs of demography.cohort_component", **m})
         pop, dep, summary = {}, {}, {}
     if plan.problems:
         plan.status = "missing_input" if any(p["code"] == "missing_input" for p in plan.problems) else "incompatible"
         return plan
     plan.data = CountryData(
         iso3=iso3, base_year=b, employment_rate=rates, employment_flags=flags, activity_rate=act,
-        beneficiaries=basis["beneficiaries"], beneficiaries_year=basis["year"],
-        avg_pension_eur=basis["avg_pension_eur"], avg_pension_year=basis["year"],
+        beneficiaries=bens["beneficiaries"], beneficiaries_year=bens["year"],
+        avg_pension_eur=basis.get("avg_pension_eur"), avg_pension_year=basis.get("year"),
         avg_pension_basis={"year": basis["year"], "expenditure_eur": dstr(basis["expenditure_eur"]),
                            "beneficiaries": dstr(basis["beneficiaries"]), "flags": basis["flags"],
                            "definition": "ESSPROS spr_exp_pens (OLD + AOLD + PART, MIO_EUR) / spr_pns_ben (OLD_TOT, "
-                                         "T, persons); nominal euro of that year"},
+                                         "T, persons); nominal euro of that year"} if basis else {
+            "status": "not_computable", "reason": plan.notes[-1]["reason"]},
         population=pop, dependency=dep, population_summary=summary)
+    obs65 = summary.get("observed_population_65_plus_jan1") or {}
+    by = bens["year"]
+    if str(by) not in obs65 or str(by + 1) not in obs65:
+        plan.notes.append({"code": "output_not_computable", "output": "pension_recipients",
+                           "reason": f"no observed 65+ population on 1 January {by} and {by + 1} to scale the "
+                                     "ESSPROS beneficiaries"})
     plan.shares = eligibility_shares(iv, b, years)
     return plan
 
@@ -472,13 +519,15 @@ def compute_point(plan: CountryPlan, point: lit.GridPoint, years: Sequence[int])
     b = d.base_year
     out: dict[str, dict[int, Decimal]] = {k: {} for k in OUTPUTS}
     problems: list[dict[str, Any]] = []
+    obs65 = {int(k): D(v) for k, v in (d.population_summary.get("observed_population_65_plus_jan1") or {}).items()}
     p65_base = None
-    if d.beneficiaries_year in d.population:
-        p65_base = sum((v for s in SEXES for v in d.population[d.beneficiaries_year][s][65:]), Decimal(0))
+    by = d.beneficiaries_year
+    if by is not None and by in obs65 and by + 1 in obs65:
+        p65_base = CTX.divide(obs65[by] + obs65[by + 1], Decimal(2))  # mid-year, as N(t) below
     for t in years:
         emp_s = emp_r = d_rec_scn_obs = Decimal(0)
         d_emp = d_rec = Decimal(0)
-        grp_num: dict[tuple[str, str], Decimal] = {}
+        grp_num: dict[tuple[str, ...], Decimal] = {}
         grp_den: dict[tuple[str, str], Decimal] = {}
         for s in SEXES:
             for a in AGES:
@@ -491,33 +540,40 @@ def compute_point(plan: CountryPlan, point: lit.GridPoint, years: Sequence[int])
                 i_s, i_r = fr(sh["scenario"][(t, a)]), fr(sh["reference"][(t, a)])
                 e_s = base + k * (i_s - i_obs)
                 e_r = base + k * (i_r - i_obs)
-                for label, e in (("scenario", e_s), ("reference", e_r)):
-                    if not Decimal(0) <= e <= Decimal(1):
-                        problems.append({"code": "employment_rate_out_of_bounds", "country": d.iso3, "year": t,
-                                         "age": a, "sex": s, "path": label, "rate": dstr(e),
-                                         "grid_point": point.point_id})
                 emp_s += n * e_s
                 emp_r += n * e_r
                 d_emp += k * n * (i_s - i_r)
                 d_rec -= rho * n * (i_s - i_r)
                 d_rec_scn_obs -= rho * n * (i_s - i_obs)
                 grp_num[(s, g)] = grp_num.get((s, g), Decimal(0)) + n * e_s
+                grp_num[(s, g, "r")] = grp_num.get((s, g, "r"), Decimal(0)) + n * e_r
                 grp_den[(s, g)] = grp_den.get((s, g), Decimal(0)) + n
         out["employed_persons_55_69"][t] = emp_s
         out["employed_persons_55_69_reference"][t] = emp_r
         out["employment_change_55_69"][t] = d_emp
         out["pension_recipients_change"][t] = d_rec
-        out["pension_expenditure_change_approx_eur"][t] = CTX.multiply(d.avg_pension_eur or Decimal(0), d_rec)
+        if d.avg_pension_eur is not None:
+            out["pension_expenditure_change_approx_eur"][t] = CTX.multiply(d.avg_pension_eur, d_rec)
         if p65_base is not None and d.beneficiaries is not None:
             p65_t = sum((n_mid(d.population, t, s, a) for s in SEXES for a in range(65, len(d.population[t][s]))),
                         Decimal(0))
             out["pension_recipients"][t] = CTX.multiply(d.beneficiaries, CTX.divide(p65_t, p65_base)) + d_rec_scn_obs
         out["old_age_dependency_ratio"][t] = d.dependency[t]
-        for (s, g), num in grp_num.items():
-            out[f"employment_rate.{s}.{g}"][t] = CTX.multiply(Decimal(100), CTX.divide(num, grp_den[(s, g)]))
+        # Bounds are checked on the published group rates. (A single age inside a group can show a
+        # rate outside [0, 1]: the base rate is a group average while the eligibility change is
+        # concentrated on some ages; only group aggregates are published.)
+        for key, num in grp_num.items():
+            rate = CTX.divide(num, grp_den[(key[0], key[1])])
+            if not Decimal(0) <= rate <= Decimal(1):
+                problems.append({"code": "employment_rate_out_of_bounds", "country": d.iso3, "year": t,
+                                 "sex": key[0], "age_group": key[1], "path": "reference" if len(key) == 3 else
+                                 "scenario", "rate": dstr(rate), "grid_point": point.point_id})
+            if len(key) == 2:
+                out[f"employment_rate.{key[0]}.{key[1]}"][t] = CTX.multiply(Decimal(100), rate)
     if p65_base is None:
         problems.append({"code": "pension_level_not_computable", "country": d.iso3,
-                         "detail": f"no population on 1 January {d.beneficiaries_year} in the projection inputs"})
+                         "detail": f"no observed 65+ population on 1 January {d.beneficiaries_year} and "
+                                   f"{(d.beneficiaries_year or 0) + 1}"})
     return out, problems
 
 
@@ -782,7 +838,7 @@ class RetirementAgeModel:
     def run_applicability(self, compiled: Compiled, fidelity: str) -> dict[str, Any]:
         countries = {}
         for c in compiled.countries:
-            entry: dict[str, Any] = {"status": c.status, "problems": c.problems}
+            entry: dict[str, Any] = {"status": c.status, "problems": c.problems, "notes": c.notes}
             if c.intervention is not None:
                 entry["intervention"] = c.intervention.as_json()
             if c.central is not None:

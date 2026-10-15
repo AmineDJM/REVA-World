@@ -161,7 +161,9 @@ describe('SimulationPage', () => {
     // legacyEstimationFlag 6 codes quantity/net weight: the X value is not called an estimate.
     expect(screen.getByText(/not directly reported \(isReported=false\)/)).toBeInTheDocument();
     const flagTexts = [...document.querySelectorAll('.source-flag')].map((e) => e.textContent ?? '');
-    expect(flagTexts.filter((t) => /estimat/.test(t))).toHaveLength(1);
+    // provider_value_estimated null is "undeterminable" (APIX), never "estimated" nor "not estimated".
+    expect(flagTexts.some((t) => /estimation status undeterminable from provider flags/.test(t))).toBe(true);
+    expect(flagTexts.filter((t) => /estimat/.test(t.replace(/estimation status undeterminable from provider flags/g, '')))).toHaveLength(1);
   });
 
   it('renders the L2 sensitivity-range row in the range column, not as a grid variant', () => {

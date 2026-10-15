@@ -199,7 +199,7 @@ def _job_ctx(db, tmp_path):
                       settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
 
 
-async def test_end_to_end_promotion_ingestion_and_belief_separation(db, tmp_path):
+async def test_end_to_end_promotion_ingestion_and_belief_separation(db, gate_service, tmp_path):
     from reva.autonomy.jobs import handle_discovery, promoted_connectors
     from reva.belief.publication import publish_release
     from reva.kernel.context import Origin
@@ -296,7 +296,7 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, tmp_path
     assert all(not e["alternatives"] for e in jan + mid)
 
 
-async def test_rollback_retires_eligibility(db, tmp_path):
+async def test_rollback_retires_eligibility(db, gate_service, tmp_path):
     from reva.autonomy.jobs import handle_discovery, rollback_promotion
     from reva.cli.seed import entity_id
 
@@ -408,7 +408,7 @@ def _count(db, sql):
         return conn.execute(text(sql)).scalar_one()
 
 
-async def test_r4_04_rediscovery_after_rollback_holds(db, tmp_path):
+async def test_r4_04_rediscovery_after_rollback_holds(db, gate_service, tmp_path):
     """After a rollback, discovery reports rolled_back_hold: no proposal, gate pass, event or eligibility."""
     from reva.autonomy.jobs import handle_discovery, promoted_connectors, reapprove_promotion, rollback_promotion
 
@@ -474,7 +474,7 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
         ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion",
                                               scope=connector_promotion_scope(io_, manifest, mp), risk={})
         s = await TrustedTemplateSandbox(io_, fixtures=bank).run(p, trusted_template_policy(default_budget()))
-        return PolicyPromotionGate(db.worker, io_).decide(p, [v, s], promotion_policy().ref())
+        return PolicyPromotionGate(db.gate, io_).decide(p, [v, s], promotion_policy().ref())
 
     mp = MappingProposal(uuid.uuid4(), cp.candidate.metadata, CONCEPT, "exact", mappings[0].mapping_manifest, False)
     # same (name, version) with different content is refused, never silently mapped to the old row:
@@ -500,7 +500,7 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     assert again["status"] == "rolled_back_hold" and _count(db, events) == n
 
 
-async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, tmp_path, monkeypatch):
+async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, gate_service, tmp_path, monkeypatch):
     import reva.adapters.connectors.eurostat_template as et
     from reva.autonomy.gaps import build_coverage_snapshot, classify
     from reva.autonomy.jobs import (
@@ -532,7 +532,7 @@ async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, tmp_p
     assert len(_version_rows(db)) == versions
 
 
-async def test_r6_05_rollback_hold_is_keyed_on_content(db, tmp_path, monkeypatch):
+async def test_r6_05_rollback_hold_is_keyed_on_content(db, gate_service, tmp_path, monkeypatch):
     """(R6-05) Rolled-back content stays held: neither a proposer-chosen version nor a later template
     re-pin re-enables it (review scratch test_b_rollback_hold_bypasses). Restores state at the end."""
     from reva.adapters.connectors import eurostat_template as et

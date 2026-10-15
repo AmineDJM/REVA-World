@@ -542,15 +542,24 @@ _BASE: tuple[Capability, ...] = (
     ),
     Capability(
         "economic.io_price",
-        "Multi-region input-output cost-push price model",
-        "reserved",
+        "Multi-region input-output cost-push price model (first-round cost-push; not an inflation forecast)",
+        "implemented",
         "V2",
         "reva.models.economic.io_price",
         ("FIGARO/ICIO tables as pinned dataset inputs with accounting identities verified",
          "Leontief price solution checked against a hand-computed small system",
          "labelled first-round cost-push, full pass-through"),
-        reason="V2 step 3b: the IO price plugin and its data are not in this build yet",
         interface="reva.simulation.plugins",
+        tests=("tests/unit/test_io_tables.py::test_identity_violation_refuses_publication",
+               "tests/unit/test_io_price.py::test_industry_prices_match_the_hand_computed_solution",
+               "tests/unit/test_io_price.py::test_l2_pass_through_grid_and_one_sided_sensitivity_range",
+               "tests/integration/test_io_price_pipeline.py::test_l1_scenario_end_to_end_matches_hand_computation",
+               "tests/integration/test_io_price_pipeline.py::test_identity_failure_refuses_registration"),
+        docs=("docs/dev/v2_io.md",),
+        notes=("Experimental model (maintainer review pending). Eurostat FIGARO industry-by-industry table; "
+               "exogenous output-price change of NACE B, C19 or D35 (B is mining and quarrying, broader than "
+               "crude oil); fixed coefficients, no substitution or demand response, one period. Not an "
+               "inflation forecast, CPI or macro outcome (outputs.macroeconomic stays reserved)."),
     ),
     Capability(
         "social.retirement_age",

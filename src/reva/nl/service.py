@@ -48,6 +48,8 @@ from reva.nl.catalog import (
     DraftCatalog,
     _const,
     current_catalog,
+    discriminator,
+    object_variants,
     registered_plugins,
     select_variant,
 )
@@ -541,6 +543,9 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
                 item = {"path": path, "value": spec_value(spec, path), "provenance": "schema_constant"}
             confirm.append(item)
 
+    if spec.get("countries") == ["ALL"] and spec.get("missing_input_policy") == "fail":
+        warnings.append("all_countries_with_fail_policy: with missing_input_policy fail, any country with a missing "
+                        "input refuses the whole run; set skip_missing_countries explicitly to run the complete ones")
     candidate = copy.deepcopy(spec)
     errors: list[dict[str, Any]] = []
     valid = False

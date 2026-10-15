@@ -439,6 +439,26 @@ def test_number_provenance() -> None:
     assert number_provenance(2.0, nums) == "not_in_text"
 
 
+def test_catalog_equals_the_registered_plugins() -> None:
+    from reva.simulation import plugins
+
+    plugins.load_all()
+    assert set(current_catalog().models) == set(plugins.REGISTRY)
+
+
+def test_all_countries_is_draftable_when_the_plugin_supports_it() -> None:
+    cat = current_catalog()
+    m = cat.models["economic.crude_exposure"]
+    if "ALL" not in m.countries:
+        pytest.skip("the crude plugin does not declare supports_all_countries in this build")
+    view = next(v for v in cat.prompt_view()["models"] if v["model_key"] == m.model_key)
+    assert "tous les pays" in view["all_countries"] and "ALL" not in view["countries"]
+    r = draft(TEXTS["openai_fr_all_countries"])  # recorded: "Pour tous les pays, ..."
+    assert r.status == "draft_ready", r.validation
+    assert r.draft_spec["countries"] == ["ALL"] and r.draft_spec["missing_input_policy"] == "fail"
+    assert any(w.startswith("all_countries_with_fail_policy") for w in r.warnings)
+
+
 def test_catalog_reads_registered_plugins_dynamically() -> None:
     """A newly registered plugin with a schema branch becomes draftable; its planned-model gap disappears."""
     from reva.simulation.spec import scenario_schema

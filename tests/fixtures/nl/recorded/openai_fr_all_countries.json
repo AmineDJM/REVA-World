@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_fr_all_countries",
+ "recorded_at": "2026-10-15T01:22:51+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 2971.3,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "cd193e36dba3ba12323fde77bc1115513ff4880bcc72b16087db78f0570bbfc8",
+ "catalog_digest": "faefe49e669c44990c496400c363611684a7e89bf0667543a9d3c1e5f4cbdb8a",
+ "text": "Pour tous les pays, quel est l'effet d'une hausse de 20 % du prix du pétrole brut importé en 2023, exportations inchangées ?",
+ "text_sha256": "d7b97440d4bb738750943b6f1e0422dfbab89dbbf3f9212905ea38d5a9d82a80",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792027369,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Pour tous les pays, calculer l'effet d'une hausse de 20 % du prix du pétrole brut importé en 2023, en supposant que le prix des exportations reste inchangé.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Effet d'une hausse de 20 % du prix du pétrole brut importé en 2023 pour tous les pays\",\"countries\":[\"ALL\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.2,\"text\":null,\"quote\":\"hausse de 20 %\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.0,\"text\":null,\"quote\":\"exportations inchangées\"}],\"unsupported\":[],\"assumptions_added\":[\"Le prix du pétrole brut exporté est maintenu à 1.0 (inchangé) car l'utilisateur n'a pas indiqué de variation.\",\"La politique de gestion des données manquantes n'a pas été précisée et n'est pas fixée dans ce brouillon.\",\"La réponse inclut tous les pays couverts par le modèle, conformément à la demande « tous les pays ».\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 9965,
+   "completion_tokens": 248,
+   "total_tokens": 10213,
+   "prompt_tokens_details": {
+    "cached_tokens": 0,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

@@ -321,7 +321,7 @@ def test_model_registry_requires_approval_and_is_immutable(db, io):
     man = _model_manifest(io, key)
     desc = ports.ModelDescriptor(uuid.uuid4(), key, "9.0.0", man, {"concepts": "*"})
     p = _model_proposal(db, io, man.sha256)
-    review = PolicyPromotionGate(db.worker, io).decide(p, [], promotion_policy().ref())
+    review = PolicyPromotionGate(db.gate, io).decide(p, [], promotion_policy().ref())
     assert review.outcome == "needs_review"  # new_model is T2
     with pytest.raises(PolicyDenied):
         reg.register(desc, review)
@@ -353,7 +353,7 @@ def test_model_registry_requires_approval_and_is_immutable(db, io):
                                       False, ports.ValueEstimate("unsupported", None, None, {}, man, "t"),
                                       promotion_policy().version)
     ProposalStore(db.worker, io).persist(t0, proposal_type="t", scope={}, risk={})
-    t0_pass = PolicyPromotionGate(db.worker, io).decide(t0, [], promotion_policy().ref())
+    t0_pass = PolicyPromotionGate(db.gate, io).decide(t0, [], promotion_policy().ref())
     assert t0_pass.outcome == "promote"
     key2 = f"forecast.test_{uuid.uuid4().hex[:8]}"
     with pytest.raises(PolicyDenied):
@@ -436,7 +436,7 @@ def test_challenger_proposals_are_bounded_t2_and_need_review(db, io):
     again = BoundedModelChallenger(io).propose(tested, inc, _ctx(io), default_budget())
     assert [io.get_json(p.patch_or_manifest)["challenger"] for p in again] == ["forecast.local_level_log"]
     ProposalStore(db.worker, io).persist(props[0], proposal_type="model_challenge", scope=task, risk={})
-    d = PolicyPromotionGate(db.worker, io).decide(props[0], [], promotion_policy().ref())
+    d = PolicyPromotionGate(db.gate, io).decide(props[0], [], promotion_policy().ref())
     assert d.outcome == "needs_review"
 
 

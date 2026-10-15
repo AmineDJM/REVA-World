@@ -21,6 +21,7 @@ import pytest
 from sqlalchemy import Engine, create_engine, text
 
 from reva.adapters.connectors import eurostat_demography as ed
+from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.objects.filesystem import FilesystemArtifactStore
 from reva.adapters.postgres.engine import make_engine
 from reva.belief.publication import publish_release
@@ -71,6 +72,10 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         conn_ = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
         report = asyncio.run(run_connector(conn_, FixtureHttp(ed.NAME), store, engines["worker"],
                                            persist_cursor=False, post_publish=ed.post_publish_datasets))
+        # a release needs at least one selected estimate: the World Bank fixture provides them
+        wb = builtin_connectors()["worldbank.wdi.indicators"]
+        asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), store, engines["worker"],
+                                  persist_cursor=False))
         rel = publish_release(engines["worker"], store, cutoff=utc_now(), origin=Origin.test_fixture,
                               environment="test")
         try:
@@ -229,3 +234,25 @@ def test_missing_europop_for_liechtenstein_is_missing_input(env: Env) -> None:
     ref = run(env, create(env, doc), "L1")
     assert ref["status"] == "missing_input"
     assert {p.get("input") for p in ref["problems"]} == {"europop_migration"}
+
+
+def test_backtest_evaluation_is_stored_from_pinned_datasets(env: Env) -> None:
+    from reva.evaluation.population_backtest import REPLAY_MODE, run_population_evaluation
+
+    out = run_population_evaluation(env.worker, env.store, env.release_id, ["LUX", "LIE"])
+    rows = q(env.owner, """SELECT e.replay_mode, e.task_scope, e.metrics, c.mode
+                           FROM model.evaluation e JOIN meta.context c ON c.id = e.context_id
+                           JOIN model.version v ON v.id = e.model_version_id
+                           WHERE v.model_key = 'demography.cohort_component'""")
+    assert len(rows) == 2 and {r["mode"] for r in rows} == {"evaluation"}
+    assert {r["replay_mode"] for r in rows} == {REPLAY_MODE}
+    lux = out["manifest"]["countries"]["LUX"]
+    prim = lux["backtests"]["primary_leak_free"]
+    assert prim["jump_off"] == 2013 and prim["base_period"] == [2008, 2012] and prim["target_year"] == 2023
+    assert Decimal(prim["variants"]["mig=average_residual;fert=constant_base_period_rates"]["total_ape"]) >= 0
+    cmp_ = lux["europop2023_comparison"]["mig=europop2023_bsl;fert=europop2023_bsl"]
+    assert "2050" in cmp_["years"] and "difference_percent" in cmp_["years"]["2050"]["all_ages"]
+    lie = out["manifest"]["countries"]["LIE"]["europop2023_comparison"]
+    assert lie["mig=europop2023_bsl;fert=europop2023_bsl"]["status"] == "unavailable"  # never zero-filled
+    stored = json.loads(env.store.get("evaluation", out["evaluation_manifest_sha256"]))
+    assert stored["replay_mode"] == REPLAY_MODE and "not validation" in stored["statement"]

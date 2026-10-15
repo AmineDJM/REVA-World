@@ -1,0 +1,1284 @@
+{
+ "protocol": "reva-pen-backtest-fra-2010@1.0.0",
+ "country": "FRA",
+ "age_group": "Y60-64",
+ "base_year": 2010,
+ "test_years": [
+  2012,
+  2013,
+  2014,
+  2015,
+  2016,
+  2017,
+  2018,
+  2019
+ ],
+ "scenario_path": "law_2010_as_amended_2011",
+ "reference_path": "pre_2010_counterfactual",
+ "rule_table_digest": "f20ad6adb98e166c77aeb6c9f04af62e71beaee94d1c27f156ce76a3802e9fc6",
+ "assumption_registry_digest": "b33ec2e058da0f78938bdadc53394dfef7582a26dca66d12f94a1093715cb24b",
+ "central_point": "staubli_zweimuller_2013_aut",
+ "benchmark": "benchmark_persistence",
+ "grid_points": [
+  {
+   "point_id": "staubli_zweimuller_2013_aut",
+   "label": "Staubli, S",
+   "kind": "literature",
+   "country": "AUT",
+   "doi": "10.1016/j.jpubeco.2013.09.003",
+   "citation": "Staubli, S. and Zweimüller, J. (2013). Does raising the early retirement age increase employment of older workers? Journal of Public Economics 108, 17–32.",
+   "share_employed": {
+    "M": "0.392",
+    "F": "0.447"
+   },
+   "pension_drop": {
+    "M": "0.2485",
+    "F": "0.2463"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.1100961",
+    "M": "0.0974120"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "primary"
+   ],
+   "sex_transfer": null,
+   "provenance": {
+    "policy_change": "Early retirement age (ERA) raised from 60 to 62 for men and from 55 to 58.25 for women (2000 and 2004 reforms)",
+    "population": "Men aged 57–64 and women aged 52–59 (specification 2); effect = being below the cohort-specific new ERA",
+    "period": "1997–2010 (treatment period); placebo 1987–2000",
+    "design": "Difference-in-differences across birth cohorts (OLS, linear probability), administrative social-security data",
+    "text_sources": [
+     "pmc3851570_xml"
+    ],
+    "derived": [
+     "employment_share_of_pension_drop_men",
+     "employment_share_of_pension_drop_women"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  },
+  {
+   "point_id": "cribb_emmerson_tetlow_2016_gbr",
+   "label": "Cribb, J",
+   "kind": "literature",
+   "country": "GBR",
+   "doi": "10.1016/j.labeco.2016.09.005",
+   "citation": "Cribb, J., Emmerson, C. and Tetlow, G. (2016). Signals matter? Large retirement responses to limited financial incentives. Labour Economics 42, 203–212.",
+   "share_employed": {
+    "F": "0.548",
+    "M": "0.548"
+   },
+   "pension_drop": {
+    "F": "0.115",
+    "M": "0.115"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.063020",
+    "M": "0.063020"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "secondary_compilation"
+   ],
+   "sex_transfer": "estimate for sex F only; applied to both sexes",
+   "provenance": {
+    "policy_change": "Female state pension age 60 → 62 (compilation labels it 'ERA 60 → 62')",
+    "population": "UK women at the old threshold age",
+    "period": "2010 onwards (female SPA increase)",
+    "design": "Difference-in-differences (per the compilation table)",
+    "text_sources": [
+     "iza_dp14150_pdf"
+    ],
+    "derived": [
+     "employment_share_of_retirement_drop_women"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  },
+  {
+   "point_id": "geyer_welteke_2017_deu_wp",
+   "label": "Geyer, J",
+   "kind": "literature",
+   "country": "DEU",
+   "doi": "10.2139/ssrn.2949117",
+   "citation": "Geyer, J. and Welteke, C. (2017). Closing Routes to Retirement: How Do People Respond? IZA Discussion Paper No. 10681.",
+   "share_employed": {
+    "F": "0.578",
+    "M": "0.578"
+   },
+   "pension_drop": {
+    "F": "0.249",
+    "M": "0.249"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.143922",
+    "M": "0.143922"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "primary"
+   ],
+   "sex_transfer": "estimate for sex F only; applied to both sexes",
+   "provenance": {
+    "policy_change": "Abolition of the early-retirement 'pension for women' for women born after 1951, effectively raising their ERA by three years (60 → 63)",
+    "population": "Women aged 60–61 who met the eligibility criteria of the abolished pension for women (N = 3,771)",
+    "period": "Cohorts born around the 1951/1952 cutoff, observed at ages 60–61",
+    "design": "Regression discontinuity in month of birth, administrative pension-insurance data (VSKT 2014)",
+    "text_sources": [
+     "iza_dp10681_pdf"
+    ],
+    "derived": [
+     "employment_share_of_pension_drop_women"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  },
+  {
+   "point_id": "geyer_welteke_2021_deu",
+   "label": "Geyer, J",
+   "kind": "literature",
+   "country": "DEU",
+   "doi": "10.3368/jhr.56.1.0717-8947r2",
+   "citation": "Geyer, J. and Welteke, C. (2021). Closing Routes to Retirement for Women: How Do They Respond? Journal of Human Resources 56(1), 311–341.",
+   "share_employed": {
+    "F": "0.489",
+    "M": "0.489"
+   },
+   "pension_drop": {
+    "F": "0.276",
+    "M": "0.276"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.134964",
+    "M": "0.134964"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "secondary_compilation"
+   ],
+   "sex_transfer": "estimate for sex F only; applied to both sexes",
+   "provenance": {
+    "policy_change": "Women's ERA 60 → 63 (abolition of the pension for women)",
+    "population": "German women affected by the abolition",
+    "period": "Cohorts born around 1951/1952",
+    "design": "Regression discontinuity (per the compilation table)",
+    "text_sources": [
+     "iza_dp14150_pdf"
+    ],
+    "derived": [
+     "employment_share_of_pension_drop_women"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  },
+  {
+   "point_id": "atav_jongen_rabate_2021_nld_wp",
+   "label": "Atav, T",
+   "kind": "literature",
+   "country": "NLD",
+   "doi": "10.2139/ssrn.3798903",
+   "citation": "Atav, T., Jongen, E. and Rabaté, S. (2021). Increasing the Effective Retirement Age: Key Factors and Interaction Effects. IZA Discussion Paper No. 14150. Working-paper version of Rabaté, Jongen and Atav (2024), American Economic Journal: Economic Policy 16(1), 259–291.",
+   "share_employed": {
+    "F": "0.321",
+    "M": "0.321"
+   },
+   "pension_drop": {
+    "F": "0.58945",
+    "M": "0.58945"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.18921345",
+    "M": "0.18921345"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "primary"
+   ],
+   "sex_transfer": "single estimate (sexes pooled or one population) applied to both sexes",
+   "provenance": {
+    "policy_change": "Statutory retirement age (AOW) raised from 65 to 66 years and 4 months between 2013 and 2019; main estimate at cutoff 4 (SRA 65y6m → 65y9m)",
+    "population": "Individuals born just before vs. after July 1951, outcome at age 65 years and 6 months",
+    "period": "2007–2019 (SRA increases from 2013)",
+    "design": "Regression discontinuity in date of birth, administrative data on the universe of the Dutch population",
+    "text_sources": [
+     "iza_dp14150_pdf"
+    ],
+    "derived": [
+     "employment_share_of_retirement_drop"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  },
+  {
+   "point_id": "ardito_2021_ita",
+   "label": "Ardito, C",
+   "kind": "literature",
+   "country": "ITA",
+   "doi": "10.2478/izajole-2021-0003",
+   "citation": "Ardito, C. (2021). The unequal impact of raising the retirement age: Employment response and program substitution. IZA Journal of Labor Economics 10(1), article 20210003.",
+   "share_employed": {
+    "M": "0.198",
+    "F": "0.198"
+   },
+   "pension_drop": {
+    "M": "0.44",
+    "F": "0.44"
+   },
+   "study_employment_effect_full_cell": {
+    "F": "0.08712",
+    "M": "0.08712"
+   },
+   "pension_drop_used_by_model": "own-country data (not this study's value)",
+   "evidence": [
+    "primary"
+   ],
+   "sex_transfer": "estimate for sex M only; applied to both sexes",
+   "provenance": {
+    "policy_change": "1992 reform raising the normal retirement age from 60 to 65 for private-sector male employees",
+    "population": "Male private-sector employees aged 60–64",
+    "period": "Control cohorts born 1931–1933, treated cohorts born 1934–1936, observed at ages 60–64",
+    "design": "Difference-in-differences (standard and de Chaisemartin–D'Haultfoeuille staggered estimator), administrative registers, wild-cluster bootstrap",
+    "text_sources": [
+     "sciendo_izajole_2021_0003_pdf"
+    ],
+    "derived": [
+     "employment_share_of_pension_drop_men"
+    ]
+   },
+   "status": "stated scenario assumption with citation (not a reviewed evidence claim)"
+  }
+ ],
+ "excluded_points": [
+  {
+   "point_id": "rabate_rochut_2020_fra",
+   "reason": "estimation sample overlaps the FRA reform/period being back-tested (2010-2019): leakage"
+  }
+ ],
+ "ineligible_share_60_64": {
+  "2012": "0.1083",
+  "2013": "0.1583",
+  "2014": "0.2319",
+  "2015": "0.2889",
+  "2016": "0.3375",
+  "2017": "0.4",
+  "2018": "0.4",
+  "2019": "0.4"
+ },
+ "base_data": {
+  "F": {
+   "employment_rate_2010": "16.6",
+   "activity_rate_2010": "17.4"
+  },
+  "M": {
+   "employment_rate_2010": "19.1",
+   "activity_rate_2010": "20"
+  }
+ },
+ "results": {
+  "staubli_zweimuller_2013_aut": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "20.6",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "0.9"
+     },
+     {
+      "year": 2013,
+      "predicted": "22.45",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "0.55"
+     },
+     {
+      "year": 2014,
+      "predicted": "25.16",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "0.16"
+     },
+     {
+      "year": 2015,
+      "predicted": "27.27",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "-0.23"
+     },
+     {
+      "year": 2016,
+      "predicted": "29.06",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "0.56"
+     },
+     {
+      "year": 2017,
+      "predicted": "31.37",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "1.37"
+     },
+     {
+      "year": 2018,
+      "predicted": "31.37",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "0.07"
+     },
+     {
+      "year": 2019,
+      "predicted": "31.37",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "-0.53"
+     }
+    ],
+    "mean_error_pp": "0.36",
+    "mean_absolute_error_pp": "0.55"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "22.5",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "-1"
+     },
+     {
+      "year": 2013,
+      "predicted": "24.07",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "-0.93"
+     },
+     {
+      "year": 2014,
+      "predicted": "26.37",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "0.77"
+     },
+     {
+      "year": 2015,
+      "predicted": "28.16",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "0.26"
+     },
+     {
+      "year": 2016,
+      "predicted": "29.68",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "1.68"
+     },
+     {
+      "year": 2017,
+      "predicted": "31.64",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "2.44"
+     },
+     {
+      "year": 2018,
+      "predicted": "31.64",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "0.54"
+     },
+     {
+      "year": 2019,
+      "predicted": "31.64",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "-1.96"
+     }
+    ],
+    "mean_error_pp": "0.23",
+    "mean_absolute_error_pp": "1.2"
+   }
+  },
+  "cribb_emmerson_tetlow_2016_gbr": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "21.5",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "1.8"
+     },
+     {
+      "year": 2013,
+      "predicted": "23.77",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "1.87"
+     },
+     {
+      "year": 2014,
+      "predicted": "27.1",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "2.1"
+     },
+     {
+      "year": 2015,
+      "predicted": "29.68",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "2.18"
+     },
+     {
+      "year": 2016,
+      "predicted": "31.88",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "3.38"
+     },
+     {
+      "year": 2017,
+      "predicted": "34.71",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "4.71"
+     },
+     {
+      "year": 2018,
+      "predicted": "34.71",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "3.41"
+     },
+     {
+      "year": 2019,
+      "predicted": "34.71",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "2.81"
+     }
+    ],
+    "mean_error_pp": "2.78",
+    "mean_absolute_error_pp": "2.78"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "23.85",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "0.35"
+     },
+     {
+      "year": 2013,
+      "predicted": "26.04",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "1.04"
+     },
+     {
+      "year": 2014,
+      "predicted": "29.27",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "3.67"
+     },
+     {
+      "year": 2015,
+      "predicted": "31.76",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "3.86"
+     },
+     {
+      "year": 2016,
+      "predicted": "33.9",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "5.9"
+     },
+     {
+      "year": 2017,
+      "predicted": "36.64",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "7.44"
+     },
+     {
+      "year": 2018,
+      "predicted": "36.64",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "5.54"
+     },
+     {
+      "year": 2019,
+      "predicted": "36.64",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "3.04"
+     }
+    ],
+    "mean_error_pp": "3.85",
+    "mean_absolute_error_pp": "3.85"
+   }
+  },
+  "geyer_welteke_2017_deu_wp": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "21.77",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "2.07"
+     },
+     {
+      "year": 2013,
+      "predicted": "24.16",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "2.26"
+     },
+     {
+      "year": 2014,
+      "predicted": "27.67",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "2.67"
+     },
+     {
+      "year": 2015,
+      "predicted": "30.39",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "2.89"
+     },
+     {
+      "year": 2016,
+      "predicted": "32.71",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "4.21"
+     },
+     {
+      "year": 2017,
+      "predicted": "35.7",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "5.7"
+     },
+     {
+      "year": 2018,
+      "predicted": "35.7",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "4.4"
+     },
+     {
+      "year": 2019,
+      "predicted": "35.7",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "3.8"
+     }
+    ],
+    "mean_error_pp": "3.5",
+    "mean_absolute_error_pp": "3.5"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "24.11",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "0.61"
+     },
+     {
+      "year": 2013,
+      "predicted": "26.42",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "1.42"
+     },
+     {
+      "year": 2014,
+      "predicted": "29.83",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "4.23"
+     },
+     {
+      "year": 2015,
+      "predicted": "32.46",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "4.56"
+     },
+     {
+      "year": 2016,
+      "predicted": "34.71",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "6.71"
+     },
+     {
+      "year": 2017,
+      "predicted": "37.6",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "8.4"
+     },
+     {
+      "year": 2018,
+      "predicted": "37.6",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "6.5"
+     },
+     {
+      "year": 2019,
+      "predicted": "37.6",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "4"
+     }
+    ],
+    "mean_error_pp": "4.55",
+    "mean_absolute_error_pp": "4.55"
+   }
+  },
+  "geyer_welteke_2021_deu": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "20.98",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "1.28"
+     },
+     {
+      "year": 2013,
+      "predicted": "23",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "1.1"
+     },
+     {
+      "year": 2014,
+      "predicted": "25.97",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "0.97"
+     },
+     {
+      "year": 2015,
+      "predicted": "28.27",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "0.77"
+     },
+     {
+      "year": 2016,
+      "predicted": "30.23",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "1.73"
+     },
+     {
+      "year": 2017,
+      "predicted": "32.76",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "2.76"
+     },
+     {
+      "year": 2018,
+      "predicted": "32.76",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "1.46"
+     },
+     {
+      "year": 2019,
+      "predicted": "32.76",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "0.86"
+     }
+    ],
+    "mean_error_pp": "1.36",
+    "mean_absolute_error_pp": "1.36"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "23.34",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "-0.16"
+     },
+     {
+      "year": 2013,
+      "predicted": "25.29",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "0.29"
+     },
+     {
+      "year": 2014,
+      "predicted": "28.17",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "2.57"
+     },
+     {
+      "year": 2015,
+      "predicted": "30.4",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "2.5"
+     },
+     {
+      "year": 2016,
+      "predicted": "32.3",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "4.3"
+     },
+     {
+      "year": 2017,
+      "predicted": "34.75",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "5.55"
+     },
+     {
+      "year": 2018,
+      "predicted": "34.75",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "3.65"
+     },
+     {
+      "year": 2019,
+      "predicted": "34.75",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "1.15"
+     }
+    ],
+    "mean_error_pp": "2.48",
+    "mean_absolute_error_pp": "2.52"
+   }
+  },
+  "atav_jongen_rabate_2021_nld_wp": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "19.47",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "-0.23"
+     },
+     {
+      "year": 2013,
+      "predicted": "20.8",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "-1.1"
+     },
+     {
+      "year": 2014,
+      "predicted": "22.75",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "-2.25"
+     },
+     {
+      "year": 2015,
+      "predicted": "24.26",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "-3.24"
+     },
+     {
+      "year": 2016,
+      "predicted": "25.55",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "-2.95"
+     },
+     {
+      "year": 2017,
+      "predicted": "27.21",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "-2.79"
+     },
+     {
+      "year": 2018,
+      "predicted": "27.21",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "-4.09"
+     },
+     {
+      "year": 2019,
+      "predicted": "27.21",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "-4.69"
+     }
+    ],
+    "mean_error_pp": "-2.67",
+    "mean_absolute_error_pp": "2.67"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "21.88",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "-1.62"
+     },
+     {
+      "year": 2013,
+      "predicted": "23.17",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "-1.83"
+     },
+     {
+      "year": 2014,
+      "predicted": "25.06",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "-0.54"
+     },
+     {
+      "year": 2015,
+      "predicted": "26.52",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "-1.38"
+     },
+     {
+      "year": 2016,
+      "predicted": "27.77",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "-0.23"
+     },
+     {
+      "year": 2017,
+      "predicted": "29.37",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "0.17"
+     },
+     {
+      "year": 2018,
+      "predicted": "29.37",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "-1.73"
+     },
+     {
+      "year": 2019,
+      "predicted": "29.37",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "-4.23"
+     }
+    ],
+    "mean_error_pp": "-1.42",
+    "mean_absolute_error_pp": "1.47"
+   }
+  },
+  "ardito_2021_ita": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "18.37",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "-1.33"
+     },
+     {
+      "year": 2013,
+      "predicted": "19.19",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "-2.71"
+     },
+     {
+      "year": 2014,
+      "predicted": "20.39",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "-4.61"
+     },
+     {
+      "year": 2015,
+      "predicted": "21.32",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "-6.18"
+     },
+     {
+      "year": 2016,
+      "predicted": "22.12",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "-6.38"
+     },
+     {
+      "year": 2017,
+      "predicted": "23.14",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "-6.86"
+     },
+     {
+      "year": 2018,
+      "predicted": "23.14",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "-8.16"
+     },
+     {
+      "year": 2019,
+      "predicted": "23.14",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "-8.76"
+     }
+    ],
+    "mean_error_pp": "-5.62",
+    "mean_absolute_error_pp": "5.62"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "20.82",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "-2.68"
+     },
+     {
+      "year": 2013,
+      "predicted": "21.61",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "-3.39"
+     },
+     {
+      "year": 2014,
+      "predicted": "22.77",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "-2.83"
+     },
+     {
+      "year": 2015,
+      "predicted": "23.68",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "-4.22"
+     },
+     {
+      "year": 2016,
+      "predicted": "24.45",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "-3.55"
+     },
+     {
+      "year": 2017,
+      "predicted": "25.44",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "-3.76"
+     },
+     {
+      "year": 2018,
+      "predicted": "25.44",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "-5.66"
+     },
+     {
+      "year": 2019,
+      "predicted": "25.44",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "-8.16"
+     }
+    ],
+    "mean_error_pp": "-4.28",
+    "mean_absolute_error_pp": "4.28"
+   }
+  },
+  "benchmark_persistence": {
+   "F": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "16.6",
+      "observed": "19.7",
+      "observed_flag": "",
+      "error_pp": "-3.1"
+     },
+     {
+      "year": 2013,
+      "predicted": "16.6",
+      "observed": "21.9",
+      "observed_flag": "",
+      "error_pp": "-5.3"
+     },
+     {
+      "year": 2014,
+      "predicted": "16.6",
+      "observed": "25",
+      "observed_flag": "b",
+      "error_pp": "-8.4"
+     },
+     {
+      "year": 2015,
+      "predicted": "16.6",
+      "observed": "27.5",
+      "observed_flag": "",
+      "error_pp": "-10.9"
+     },
+     {
+      "year": 2016,
+      "predicted": "16.6",
+      "observed": "28.5",
+      "observed_flag": "",
+      "error_pp": "-11.9"
+     },
+     {
+      "year": 2017,
+      "predicted": "16.6",
+      "observed": "30",
+      "observed_flag": "",
+      "error_pp": "-13.4"
+     },
+     {
+      "year": 2018,
+      "predicted": "16.6",
+      "observed": "31.3",
+      "observed_flag": "",
+      "error_pp": "-14.7"
+     },
+     {
+      "year": 2019,
+      "predicted": "16.6",
+      "observed": "31.9",
+      "observed_flag": "",
+      "error_pp": "-15.3"
+     }
+    ],
+    "mean_error_pp": "-10.38",
+    "mean_absolute_error_pp": "10.38"
+   },
+   "M": {
+    "per_year": [
+     {
+      "year": 2012,
+      "predicted": "19.1",
+      "observed": "23.5",
+      "observed_flag": "",
+      "error_pp": "-4.4"
+     },
+     {
+      "year": 2013,
+      "predicted": "19.1",
+      "observed": "25",
+      "observed_flag": "",
+      "error_pp": "-5.9"
+     },
+     {
+      "year": 2014,
+      "predicted": "19.1",
+      "observed": "25.6",
+      "observed_flag": "b",
+      "error_pp": "-6.5"
+     },
+     {
+      "year": 2015,
+      "predicted": "19.1",
+      "observed": "27.9",
+      "observed_flag": "",
+      "error_pp": "-8.8"
+     },
+     {
+      "year": 2016,
+      "predicted": "19.1",
+      "observed": "28",
+      "observed_flag": "",
+      "error_pp": "-8.9"
+     },
+     {
+      "year": 2017,
+      "predicted": "19.1",
+      "observed": "29.2",
+      "observed_flag": "",
+      "error_pp": "-10.1"
+     },
+     {
+      "year": 2018,
+      "predicted": "19.1",
+      "observed": "31.1",
+      "observed_flag": "",
+      "error_pp": "-12"
+     },
+     {
+      "year": 2019,
+      "predicted": "19.1",
+      "observed": "33.6",
+      "observed_flag": "",
+      "error_pp": "-14.5"
+     }
+    ],
+    "mean_error_pp": "-8.89",
+    "mean_absolute_error_pp": "8.89"
+   }
+  }
+ },
+ "placebo_55_59": {
+  "F": [
+   {
+    "year": 2012,
+    "predicted": "57.2",
+    "observed": "63.5",
+    "observed_flag": "",
+    "error_pp": "-6.3"
+   },
+   {
+    "year": 2013,
+    "predicted": "57.2",
+    "observed": "63.9",
+    "observed_flag": "",
+    "error_pp": "-6.7"
+   },
+   {
+    "year": 2014,
+    "predicted": "57.2",
+    "observed": "64.9",
+    "observed_flag": "b",
+    "error_pp": "-7.7"
+   },
+   {
+    "year": 2015,
+    "predicted": "57.2",
+    "observed": "65.7",
+    "observed_flag": "",
+    "error_pp": "-8.5"
+   },
+   {
+    "year": 2016,
+    "predicted": "57.2",
+    "observed": "67.2",
+    "observed_flag": "",
+    "error_pp": "-10"
+   },
+   {
+    "year": 2017,
+    "predicted": "57.2",
+    "observed": "69.1",
+    "observed_flag": "",
+    "error_pp": "-11.9"
+   },
+   {
+    "year": 2018,
+    "predicted": "57.2",
+    "observed": "68.8",
+    "observed_flag": "",
+    "error_pp": "-11.6"
+   },
+   {
+    "year": 2019,
+    "predicted": "57.2",
+    "observed": "69.2",
+    "observed_flag": "",
+    "error_pp": "-12"
+   }
+  ],
+  "M": [
+   {
+    "year": 2012,
+    "predicted": "64.4",
+    "observed": "71.3",
+    "observed_flag": "",
+    "error_pp": "-6.9"
+   },
+   {
+    "year": 2013,
+    "predicted": "64.4",
+    "observed": "71.4",
+    "observed_flag": "",
+    "error_pp": "-7"
+   },
+   {
+    "year": 2014,
+    "predicted": "64.4",
+    "observed": "71.1",
+    "observed_flag": "b",
+    "error_pp": "-6.7"
+   },
+   {
+    "year": 2015,
+    "predicted": "64.4",
+    "observed": "72.4",
+    "observed_flag": "",
+    "error_pp": "-8"
+   },
+   {
+    "year": 2016,
+    "predicted": "64.4",
+    "observed": "73.8",
+    "observed_flag": "",
+    "error_pp": "-9.4"
+   },
+   {
+    "year": 2017,
+    "predicted": "64.4",
+    "observed": "74.8",
+    "observed_flag": "",
+    "error_pp": "-10.4"
+   },
+   {
+    "year": 2018,
+    "predicted": "64.4",
+    "observed": "75.7",
+    "observed_flag": "",
+    "error_pp": "-11.3"
+   },
+   {
+    "year": 2019,
+    "predicted": "64.4",
+    "observed": "75.7",
+    "observed_flag": "",
+    "error_pp": "-11.3"
+   }
+  ]
+ },
+ "weights": "uniform over single ages 60-64 (no post-2010 population used)",
+ "label": "out-of-sample back-test of a conditional projection; no parameter was fitted on 2011-2019",
+ "digest": "111ae6bfc8c6794666f2412aab665a94f111d1334287b51012c829940dc2e83f"
+}

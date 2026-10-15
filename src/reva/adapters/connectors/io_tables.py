@@ -547,7 +547,9 @@ class FigaroConnector:
         data = [o for o in outcomes if o.item_key.startswith("data:")]
         ok = bool(data) and len(data) == len(origin_groups(self.per_request, self.dims)) and all(
             o.status in ("published", "unchanged") for o in outcomes)
-        return Cursor(state={"complete": ok, "dataset": self.dataset, "year": self.year,
+        years = sorted({int(o.item_key.split(":")[2]) for o in data})
+        return Cursor(state={"complete": ok, "dataset": self.dataset,
+                             "year": years[0] if len(years) == 1 else self.year,
                              "raw_sha256": {o.item_key: o.raw_sha256 for o in data}})
 
 

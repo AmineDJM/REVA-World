@@ -166,6 +166,77 @@ BEGIN
 END $$;
 """
 
+# LLM budget ledger functions for the API role (copy of reva.nl.budget.LEDGER_FUNCTIONS_SQL; migrations
+# stay self-contained — tests/unit check the two copies are identical).
+SQL_LLM_LEDGER = r"""
+CREATE FUNCTION ops.reserve_llm_budget(p_operation_id text, p_requests integer, p_tokens bigint,
+                                       p_daily_requests integer, p_daily_tokens bigint)
+RETURNS jsonb LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE used_r numeric; used_t numeric; day_start timestamptz;
+BEGIN
+  IF meta.session_principal() NOT IN ('reva_api','reva_worker','owner') THEN
+    RAISE EXCEPTION 'LLM budget reservation is an API/worker action' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  IF p_operation_id IS NULL OR p_operation_id !~ '^nl_draft:[0-9a-f]{32,64}:[0-9]{1,2}$' THEN
+    RAISE EXCEPTION 'invalid LLM budget operation id';
+  END IF;
+  IF p_requests IS NULL OR p_requests < 1 OR p_requests > 10 OR p_tokens IS NULL OR p_tokens < 1
+     OR p_tokens > 2000000 OR p_daily_requests IS NULL OR p_daily_requests < 0
+     OR p_daily_tokens IS NULL OR p_daily_tokens < 0 THEN
+    RAISE EXCEPTION 'LLM budget amounts out of range';
+  END IF;
+  PERFORM pg_advisory_xact_lock(hashtextextended('reva:budget:llm', 0));
+  IF EXISTS (SELECT 1 FROM ops.budget_ledger
+              WHERE operation_id IN (p_operation_id || ':' || 'requests', p_operation_id || ':' || 'tokens')) THEN
+    RETURN jsonb_build_object('granted', false, 'reason', 'operation_exists');
+  END IF;
+  day_start := date_trunc('day', clock_timestamp() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC';
+  SELECT COALESCE(sum(COALESCE(consumed, reserved)) FILTER (WHERE account_key = 'llm:scenario_drafts:requests'), 0),
+         COALESCE(sum(COALESCE(consumed, reserved)) FILTER (WHERE account_key = 'llm:scenario_drafts:tokens'), 0)
+    INTO used_r, used_t
+    FROM ops.budget_ledger
+   WHERE account_key IN ('llm:scenario_drafts:requests', 'llm:scenario_drafts:tokens')
+     AND recorded_at >= day_start;
+  IF used_r + p_requests > p_daily_requests THEN
+    RETURN jsonb_build_object('granted', false, 'reason', 'request_limit', 'used_requests', used_r,
+                              'used_tokens', used_t);
+  END IF;
+  IF used_t + p_tokens > p_daily_tokens THEN
+    RETURN jsonb_build_object('granted', false, 'reason', 'token_limit', 'used_requests', used_r,
+                              'used_tokens', used_t);
+  END IF;
+  INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved) VALUES
+    ('llm:scenario_drafts:requests', p_operation_id || ':' || 'requests', 'requests', p_requests),
+    ('llm:scenario_drafts:tokens', p_operation_id || ':' || 'tokens', 'tokens', p_tokens);
+  RETURN jsonb_build_object('granted', true, 'used_requests', used_r, 'used_tokens', used_t);
+END $$;
+
+CREATE FUNCTION ops.settle_llm_budget(p_operation_id text, p_requests integer, p_tokens bigint)
+RETURNS integer LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE n integer;
+BEGIN
+  IF meta.session_principal() NOT IN ('reva_api','reva_worker','owner') THEN
+    RAISE EXCEPTION 'LLM budget settlement is an API/worker action' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  IF p_requests IS NULL OR p_requests < 0 OR p_requests > 10 OR p_tokens IS NULL OR p_tokens < 0
+     OR p_tokens > 2000000 THEN
+    RAISE EXCEPTION 'LLM budget amounts out of range';
+  END IF;
+  UPDATE ops.budget_ledger
+     SET consumed = CASE unit WHEN 'requests' THEN p_requests ELSE p_tokens END
+   WHERE operation_id IN (p_operation_id || ':' || 'requests', p_operation_id || ':' || 'tokens')
+     AND account_key IN ('llm:scenario_drafts:requests', 'llm:scenario_drafts:tokens')
+     AND consumed IS NULL;
+  GET DIAGNOSTICS n = ROW_COUNT;
+  RETURN n;
+END $$;
+
+REVOKE ALL ON FUNCTION ops.reserve_llm_budget(text, integer, bigint, integer, bigint) FROM PUBLIC;
+REVOKE ALL ON FUNCTION ops.settle_llm_budget(text, integer, bigint) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION ops.reserve_llm_budget(text, integer, bigint, integer, bigint),
+                          ops.settle_llm_budget(text, integer, bigint) TO reva_api, reva_worker;
+"""
+
 
 def upgrade() -> None:
     op.execute(SQL_RESULT_PERIOD)
@@ -174,6 +245,7 @@ def upgrade() -> None:
     op.execute(server_recorded_at("evidence"))
     op.execute(SQL_GRANTS)
     op.execute(SQL_RESTRICTED_DELETION)
+    op.execute(SQL_LLM_LEDGER)
 
 
 def downgrade() -> None:

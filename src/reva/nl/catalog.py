@@ -121,7 +121,10 @@ class DraftableModel:
         return {
             "model_key": self.model_key,
             "description": self.description,
-            "countries": list(self.countries),
+            "countries": [c for c in self.countries if c != "ALL"],
+            **({"all_countries": 'write countries ["ALL"] when the user asks for every country / all countries / '
+                                 'tous les pays (the platform resolves it to every country with data)'}
+               if "ALL" in self.countries else {}),
             "reference_years": (f"any year from {self.reference_years[0]} to {self.reference_years[1]} inclusive"
                                 if self.reference_years else None),
             "fidelities": {f: _fidelity_title(f) for f in self.fidelities},
@@ -267,7 +270,7 @@ def discriminator(variants: list[dict[str, Any]]) -> str | None:
     for name in sorted(common):
         values = [_const((v.get("properties") or {}).get(name)) for v in variants]
         if all(ok for ok, _ in values) and len({json.dumps(val) for _, val in values}) == len(values):
-            return name
+            return str(name)
     return None
 
 
@@ -514,6 +517,6 @@ def current_catalog() -> DraftCatalog:
     from reva.simulation.spec import scenario_schema
 
     state, registry = registered_plugins()
-    stamp = tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in
-                  (REGISTRY_ROOT / "entities" / "countries.yaml", REGISTRY_ROOT / "entities" / "country_crosswalk.json"))
+    files = (REGISTRY_ROOT / "entities" / "countries.yaml", REGISTRY_ROOT / "entities" / "country_crosswalk.json")
+    stamp = tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in files)
     return _cached(logical_hash(scenario_schema()), tuple(sorted(registry)), state, stamp)

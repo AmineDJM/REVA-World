@@ -67,6 +67,23 @@ def _rate(rows: Sequence[Mapping[str, Any]], year: int, sex: str) -> tuple[Decim
     raise ValidationProblem(f"no row for {sex} {GROUP[0]} {year}")
 
 
+def placebo(emp_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Ages 55-59 are below the minimum age under both paths, so the model predicts no reform effect
+    there: the observed 2010 -> t change of that group shows how much of the 60-64 change could be a
+    trend the model does not represent (diagnostic only, never used to adjust predictions)."""
+    out: dict[str, Any] = {}
+    for s in SEXES:
+        base = next(Decimal(r["value"]) for r in emp_rows if r["year"] == BASE_YEAR and r["dim1"] == s
+                    and r["dim2"] == "Y55-59")
+        per = []
+        for t in TEST_YEARS:
+            r = next(r for r in emp_rows if r["year"] == t and r["dim1"] == s and r["dim2"] == "Y55-59")
+            per.append({"year": t, "predicted": dstr(base), "observed": r["value"], "observed_flag": r["status"],
+                        "error_pp": dstr(base - Decimal(r["value"]))})
+        out[s] = per
+    return out
+
+
 def predict(train_emp: Sequence[Mapping[str, Any]], train_act: Sequence[Mapping[str, Any]], table: rl.RuleTable,
             points: Sequence[lit.GridPoint]) -> dict[str, dict[str, dict[int, Decimal]]]:
     """point_id -> sex -> year -> predicted employment rate (percent). Uses only ``year <= BASE_YEAR`` rows."""
@@ -141,6 +158,7 @@ def run(emp_rows: Sequence[Mapping[str, Any]], act_rows: Sequence[Mapping[str, A
                                    for t in TEST_YEARS},
         "base_data": base,
         "results": results,
+        "placebo_55_59": placebo(emp_rows),
         "weights": "uniform over single ages 60-64 (no post-2010 population used)",
         "label": "out-of-sample back-test of a conditional projection; no parameter was fitted on 2011-2019",
     }

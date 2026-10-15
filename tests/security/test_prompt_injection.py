@@ -93,7 +93,7 @@ async def test_injected_catalogue_and_metadata_change_nothing(db):
     assert p.permission_tier == 1
     ProposalStore(db.worker, io).persist(p, proposal_type="connector_promotion", scope={}, risk={})
     s = await TrustedTemplateSandbox(io, fixtures=bank).run(p, trusted_template_policy(default_budget()))
-    d = PolicyPromotionGate(db.worker, io).decide(p, [v, s], promotion_policy().ref())
+    d = PolicyPromotionGate(db.gate, io).decide(p, [v, s], promotion_policy().ref())
     receipt = io.get_json(d.signed_receipt)
     assert receipt["tier"]["effective_tier"] == 1  # not lowered to 0 by text
     assert receipt["policy"]["sha256"] == pins["promotion.yaml"]

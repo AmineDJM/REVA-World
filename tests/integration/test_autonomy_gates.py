@@ -80,7 +80,7 @@ async def _t1(io, db, mutate_manifest=None):
 
 
 def _gate(db, io, **kw) -> PolicyPromotionGate:
-    return PolicyPromotionGate(db.worker, io, **kw)
+    return PolicyPromotionGate(db.gate, io, **kw)
 
 
 def _persist(db, io, p):
@@ -173,9 +173,17 @@ def test_proposer_cannot_write_its_own_gate_result(db, io):
             conn.execute(text("""INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision,
                                     evidence_sha256, evaluator) VALUES (:p, 'promotion', 'x', 'pass', :e, :ev)"""),
                          {"p": p.proposal_id, "e": ev.sha256, "ev": evaluator})
-        assert ("cannot evaluate its own proposal" in str(exc.value)) or ("check" in str(exc.value).lower())
+        # GATE: the worker (proposer's process) holds no INSERT on ops.gate_result at all
+        assert "permission denied" in str(exc.value)
+    # even the independent gate login cannot record a result for a proposal authored under its own name
+    p2 = _proposal(io, author="sneaky")
+    _persist(db, io, p2)
+    with pytest.raises(sqlalchemy.exc.DBAPIError, match="cannot evaluate its own proposal"), \
+            db.gate.begin() as conn:
+        conn.execute(text("SELECT ops.record_gate_result(:p, 'sneaky', 'x', 'pass', :e, 'gate-evaluator:sneaky')"),
+                     {"p": p2.proposal_id, "e": ev.sha256})
     with pytest.raises(PolicyDenied):
-        PolicyPromotionGate(db.worker, io, name="sneaky").decide(
+        PolicyPromotionGate(db.gate, io, name="sneaky").decide(
             _proposal(io, author="sneaky"), [], promotion_policy().ref())
 
 
@@ -194,11 +202,11 @@ async def test_policy_change_makes_gate_refuse(db, io, tmp_path):
     copy = tmp_path / "promotion.yaml"
     shutil.copy(POLICY_DIR / "promotion.yaml", copy)
     pinned = promotion_policy().sha256
-    ok = PolicyPromotionGate(db.worker, io, policy_path=copy, pinned_sha256=pinned)
+    ok = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=pinned)
     assert ok.decide(p, [v, s], promotion_policy().ref()).outcome == "promote"
     copy.write_text(copy.read_text().replace("allowed_hosts: [ec.europa.eu]",
                                              "allowed_hosts: [ec.europa.eu, evil.example.com]"))
-    d = PolicyPromotionGate(db.worker, io, policy_path=copy, pinned_sha256=pinned).decide(
+    d = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=pinned).decide(
         p, [v, s], promotion_policy().ref())
     assert d.outcome == "blocked" and any("changed" in r for r in d.reasons)
     # a forged 'signed policy' reference is refused as well
@@ -249,7 +257,7 @@ async def test_kill_switch_blocks_everything(db, io, over):
         ProposalStore(db.worker, io, guard).persist(p, proposal_type="t", scope={}, risk={})
     rep = await TrustedTemplateSandbox(io, fixtures=bank, guard=guard).run(p, trusted_template_policy(default_budget()))
     assert rep.outcome == "blocked"
-    assert PolicyPromotionGate(db.worker, io, guard=guard).decide(p, [], promotion_policy().ref()).outcome == "blocked"
+    assert PolicyPromotionGate(db.gate, io, guard=guard).decide(p, [], promotion_policy().ref()).outcome == "blocked"
     with db.owner.connect() as conn:
         after = conn.execute(text("SELECT (SELECT count(*) FROM ops.proposal), (SELECT count(*) FROM ops.gate_result)"
                                   )).one()
@@ -385,7 +393,7 @@ async def test_r4_11_template_digest_is_pinned_in_policy(db, io, tmp_path):
 
     copy.write_text(_re.sub(r'template_sha256: "[^"]*"', 'template_sha256: "sha256:' + "0" * 64 + '"', text0))
     sha = hashlib.sha256(copy.read_bytes()).hexdigest()
-    d = PolicyPromotionGate(db.worker, io, policy_path=copy, pinned_sha256=sha).decide(
+    d = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=sha).decide(
         p, [v, s], ArtifactRef(sha, "policy", "application/yaml"))
     assert d.outcome == "reject" and any("pinned in the signed policy" in r for r in d.reasons)
 

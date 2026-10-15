@@ -413,7 +413,7 @@ class BaseRates:
     male_share_at_birth: Decimal
     residual_migration: dict[int, dict[str, list[Decimal]]]  # year t (flow t -> t+1) -> sex -> age 0..omega
     notes: tuple[str, ...]
-    input_status_flags: dict[str, dict[int, list[str]]]
+    input_status_flags: dict[str, dict[str, list[str]]]
 
     @property
     def tfr(self) -> Decimal:
@@ -453,12 +453,13 @@ def determine_omega(data: CountryDemography, pop_years: Iterable[int], death_yea
     return omega
 
 
-def _status_flags(table: Table, years: Iterable[int]) -> dict[int, list[str]]:
-    out: dict[int, list[str]] = {}
+def _status_flags(table: Table, years: Iterable[int]) -> dict[str, list[str]]:
+    """Eurostat status flags present per year (keys are year strings, JSON-safe)."""
+    out: dict[str, list[str]] = {}
     for y in years:
         seen = sorted({c.status for (yy, _s), cells in table.items() if yy == y for c in cells.values() if c.status})
         if seen:
-            out[y] = seen
+            out[str(y)] = seen
     return out
 
 
@@ -919,6 +920,37 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
         }
     result["naive_no_change_total_ape"] = dstr(_CTX.quantize(_ape(naive, obs_total) or ZERO, Decimal("0.001")))
     return result
+
+
+def europop_comparison(proj: Projection, data: CountryDemography,
+                       years: Sequence[int] = (2030, 2040, 2050)) -> dict[str, Any]:
+    """Plausibility comparison with the EUROPOP2023 baseline projection (proj_23np), NOT a
+    validation: both are conditional projections (EUROPOP2023 also assumes mortality
+    improvement, which this model does not). Differences in percent of EUROPOP2023."""
+    out: dict[str, Any] = {"country": proj.iso3, "assumptions": proj.assumptions.as_json(), "years": {}}
+    for y in years:
+        if y not in proj.population:
+            continue
+        ev = {s: to_vector(data.europop_population.get((y, s)), proj.omega) for s in SEXES}
+        if any(v is None for v in ev.values()):
+            out["years"][str(y)] = {"status": "unavailable", "reason": "no EUROPOP2023 projection for this year"}
+            continue
+        row: dict[str, Any] = {}
+        for gk, (lo, hi) in COMPARISON_GROUPS.items():
+            hi_ = proj.omega + 1 if hi is None else hi
+            mine = proj.total(y, None, lo, None if hi is None else hi)
+            theirs = xsum(ev[s][x] for s in SEXES for x in range(lo, hi_))  # type: ignore[index]
+            row[gk] = {"reva": dstr(_CTX.quantize(mine, Decimal(1))), "europop2023_bsl": dstr(theirs),
+                       "difference_percent": dstr(_CTX.quantize(div(mul(Decimal(100), _CTX.subtract(mine, theirs)),
+                                                                    theirs), Decimal("0.01")))}
+        ratio_mine = div(mul(Decimal(100), proj.total(y, None, 65)), proj.total(y, None, 15, 65))
+        e65 = xsum(ev[s][x] for s in SEXES for x in range(65, proj.omega + 1))  # type: ignore[index]
+        e1564 = xsum(ev[s][x] for s in SEXES for x in range(15, 65))  # type: ignore[index]
+        row["old_age_dependency_ratio_65plus_per_15_64"] = {
+            "reva": dstr(_CTX.quantize(ratio_mine, Decimal("0.01"))),
+            "europop2023_bsl": dstr(_CTX.quantize(div(mul(Decimal(100), e65), e1564), Decimal("0.01")))}
+        out["years"][str(y)] = row
+    return out
 
 
 def implementation_digest() -> str:

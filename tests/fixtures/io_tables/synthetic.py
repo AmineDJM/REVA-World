@@ -20,7 +20,6 @@ FR basket (θ = 1) = (50·2/97 + 30·0.6/97 + 20·0.1) / 100 = 3.12/0.97 % = 3.2
 from __future__ import annotations
 
 import gzip
-import io
 from decimal import Decimal
 
 COUNTRIES = ("FR", "DE", "WRL_REST")
