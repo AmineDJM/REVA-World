@@ -38,6 +38,7 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+from pydantic import SecretStr
 from sqlalchemy import Engine, create_engine, text
 from sqlalchemy.exc import DBAPIError
 
@@ -117,8 +118,7 @@ def source(db, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Source]:
     root = tmp_path_factory.mktemp("bk_objects_src")
     url = db.settings.migration_url().set(database=name).render_as_string(hide_password=False)
     settings = db.settings.model_copy(
-        update={"reva_migration_database_url": db.settings.reva_migration_database_url.__class__(url),
-                "reva_db_name": name, "reva_object_root": root}
+        update={"reva_migration_database_url": SecretStr(url), "reva_db_name": name, "reva_object_root": root}
     )
     engines: list[Engine] = []
     try:
@@ -145,9 +145,16 @@ def source(db, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Source]:
         admin.dispose()
 
 
-def _run(script: str, args: list[str], env: dict[str, str], cwd: Path, *, ok: bool = True) -> subprocess.CompletedProcess:
+def _run(
+    script: str, args: list[str], env: dict[str, str], cwd: Path, *, ok: bool = True
+) -> subprocess.CompletedProcess:
     proc = subprocess.run(
-        ["bash", str(SCRIPTS / script), *args], env=env, cwd=cwd, capture_output=True, text=True, timeout=600,
+        ["bash", str(SCRIPTS / script), *args],
+        env=env,
+        cwd=cwd,
+        capture_output=True,
+        text=True,
+        timeout=600,
         check=False,
     )
     if ok:
@@ -225,8 +232,10 @@ def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source,
         plain[f"{name} (plaintext)"] = data
     tools = br.PgTools(tools_env.get("REVA_PG_CONTAINER"), tools_env.get("REVA_PG_BINDIR"))
     plain["dump as SQL"] = subprocess.run(
-        tools.argv("pg_restore", ["--file=-"], []), input=plain[f"reva.dump{suffix} (plaintext)"],
-        capture_output=True, check=True,
+        tools.argv("pg_restore", ["--file=-"], []),
+        input=plain[f"reva.dump{suffix} (plaintext)"],
+        capture_output=True,
+        check=True,
     ).stdout
     assert b"CREATE TABLE evidence.observation" in plain["dump as SQL"]
     assert b"CREATE ROLE" not in plain["dump as SQL"]  # roles are cluster-global, not in the dump
@@ -278,8 +287,10 @@ def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source,
 
         # Runtime roles (cluster-global; passwords re-applied by bootstrap) work and stay confined.
         settings_r = s.model_copy(update={"reva_db_name": target, "reva_migration_database_url": None})
-        api_r, worker_r, owner_r = make_engine("api", settings_r), make_engine("worker", settings_r), create_engine(
-            target_url
+        api_r, worker_r, owner_r = (
+            make_engine("api", settings_r),
+            make_engine("worker", settings_r),
+            create_engine(target_url),
         )
         engines += [api_r, worker_r, owner_r]
         with api_r.connect() as c:
@@ -293,8 +304,13 @@ def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source,
         verify_env = {k: v for k, v in restore_env.items() if k != "REVA_RESTORE_DATABASE_URL"}
         verify_env["REVA_DB_NAME"] = target
         v = subprocess.run(
-            [sys.executable, "-m", "reva.cli.main", "verify"], env=verify_env, cwd=tmp_path, capture_output=True,
-            text=True, timeout=300, check=False,
+            [sys.executable, "-m", "reva.cli.main", "verify"],
+            env=verify_env,
+            cwd=tmp_path,
+            capture_output=True,
+            text=True,
+            timeout=300,
+            check=False,
         )
         assert v.returncode == 0, v.stderr[-2000:]
         verdict = json.loads(v.stdout)
@@ -306,16 +322,22 @@ def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source,
         victim.write_bytes(victim.read_bytes() + b"x")
         conn = br.connect(target_url, autocommit=True)
         try:
-            bad = br.check_locations(conn, br.object_inventory(s.model_copy(update={"reva_object_root": fresh_root})),
-                                     s.model_copy(update={"reva_object_root": fresh_root}))
+            bad = br.check_locations(
+                conn,
+                br.object_inventory(s.model_copy(update={"reva_object_root": fresh_root})),
+                s.model_copy(update={"reva_object_root": fresh_root}),
+            )
         finally:
             conn.close()
         assert bad["corrupt_objects"] and not br._locations_ok(bad)
 
         # A non-empty target is refused unless explicitly forced with the database name.
         before = restored["manifest_sha256"]
-        for extra, msg in (([], "not empty"), (["--force"], "--confirm-database"),
-                           (["--force", "--confirm-database", "other"], "--confirm-database")):
+        for extra, msg in (
+            ([], "not empty"),
+            (["--force"], "--confirm-database"),
+            (["--force", "--confirm-database", "other"], "--confirm-database"),
+        ):
             p = _run("restore.sh", [str(bdir), *extra], restore_env, tmp_path, ok=False)
             assert p.returncode != 0 and msg in p.stderr
         conn = br.connect(target_url, autocommit=True)
@@ -326,14 +348,26 @@ def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source,
         os.environ["REVA_TEST_BKRT_URL"] = target_url.render_as_string(hide_password=False)
         try:
             with pytest.raises(br.BackupError, match="refused in production"):
-                br.restore(bdir, url_env="REVA_TEST_BKRT_URL", tools=tools, identity=str(identity) if encrypt else None,
-                           run_bootstrap=False, verify_objects=False, force=True, confirm_database=target,
-                           environment="production")
+                br.restore(
+                    bdir,
+                    url_env="REVA_TEST_BKRT_URL",
+                    tools=tools,
+                    identity=str(identity) if encrypt else None,
+                    run_bootstrap=False,
+                    verify_objects=False,
+                    force=True,
+                    confirm_database=target,
+                    environment="production",
+                )
         finally:
             del os.environ["REVA_TEST_BKRT_URL"]
         forced = json.loads(
-            _run("restore.sh", [str(bdir), "--force", "--confirm-database", target, "--skip-bootstrap"], restore_env,
-                 tmp_path).stdout
+            _run(
+                "restore.sh",
+                [str(bdir), "--force", "--confirm-database", target, "--skip-bootstrap"],
+                restore_env,
+                tmp_path,
+            ).stdout
         )
         assert forced["matches_backup"] and "evidence" in forced["forced_overwrite"]["dropped_schemas"]
     finally:

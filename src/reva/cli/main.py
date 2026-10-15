@@ -63,6 +63,38 @@ def db_upgrade() -> None:
     _out({"schema_version": version})
 
 
+@db_app.command("verify-schema")
+def db_verify_schema(
+    role: str = typer.Option("auto", help="connect as migration|api|worker|sim (auto: migration if configured)"),
+    limit: int = typer.Option(20, help="max objects listed per category"),
+) -> None:
+    """Compare the live catalog with migrations/schema_contract.json (read-only). Exit 1 on drift."""
+    from sqlalchemy import text
+
+    from reva.adapters.postgres.engine import make_engine
+    from reva.adapters.postgres.schema_contract import verify_schema
+    from reva.settings import load_settings
+
+    s = load_settings()
+    kind = role if role != "auto" else ("migration" if s.reva_migration_database_url is not None else "worker")
+    if kind not in ("migration", "api", "worker", "sim"):
+        typer.echo("--role must be auto, migration, api, worker or sim", err=True)
+        raise typer.Exit(2)
+    eng = make_engine(kind, s)  # type: ignore[arg-type]
+    try:
+        with eng.connect() as conn:
+            conn.execute(text("SET TRANSACTION READ ONLY"))
+            d = verify_schema(conn)
+            conn.rollback()
+    finally:
+        eng.dispose()
+    _out({"database": s.reva_db_name if kind != "migration" else s.migration_url().database, "role": kind,
+          **d.as_dict(limit=limit)})
+    typer.echo(d.summary(limit=limit), err=True)
+    if not d.ok:
+        raise typer.Exit(1)
+
+
 @app.command("seed")
 def seed_cmd(profile: str = typer.Option("mvp", help="registry profile")) -> None:
     """Seed concepts, entities, sources, connectors, mappings, models (worker role)."""

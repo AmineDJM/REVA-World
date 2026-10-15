@@ -396,8 +396,18 @@ BEGIN
     RAISE EXCEPTION 'invalid spec digest';
   END IF;
   sha := encode(sha256(p_canonical), 'hex');
+  -- (R5-15) Serialise creators of the same identity: a concurrent call waits
+  -- here until the first commits, then (READ COMMITTED: a fresh snapshot per
+  -- statement) finds and returns its row instead of hitting the unique index.
+  PERFORM pg_advisory_xact_lock(hashtextextended('scenario|' || sha, 0));
   SELECT id INTO sid FROM sim.scenario WHERE spec_sha256 = sha;
-  IF sid IS NOT NULL THEN RETURN sid; END IF;
+  IF sid IS NOT NULL THEN
+    -- (R5-02) Reuse only a row whose stored spec is the caller's spec.
+    IF NOT EXISTS (SELECT 1 FROM sim.scenario WHERE id = sid AND spec = p_spec) THEN
+      RAISE EXCEPTION 'scenario % exists for spec_sha256 % with a different spec', sid, sha;
+    END IF;
+    RETURN sid;
+  END IF;
   SELECT r.id, r.origin INTO rel FROM belief.release r
     JOIN ops.publication p ON p.release_id = r.id
    WHERE r.id = (p_spec->>'baseline_release_id')::uuid;

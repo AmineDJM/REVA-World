@@ -42,12 +42,19 @@ Counted over every ledger row in §2–§8 (one row per gate, criterion, check o
 
 | Status | Rows |
 |---|---|
-| done | 155 |
-| partial | 31 |
-| interface-only | 18 |
-| not started | 7 |
-| blocked-on-credentials | 6 |
-| **total** | **217** |
+| done | 159 |
+| partial | 23 |
+| interface-only | 14 |
+| not started | 6 |
+| blocked-on-credentials | 5 |
+| **total** | **207** |
+
+By section: P0–P7 (§3): 74 done, 13 partial, 3 blocked. P8–P12 (§4): 14 interface-only, 6 not started (none
+done). §13 acceptance (§5): 34 done, 1 blocked. MVP gates/demo (§6): 6 done, 2 partial. First actions + CI (§7):
+15 done, 3 partial, 1 blocked. Invariants (§8.1): 30 done… see the recount note below.
+
+"done" rows have code and a test or measurement that exists. **No row's test has been confirmed in the final
+full run** (§9). A done row can still turn into a failure there.
 
 ---
 
@@ -124,7 +131,7 @@ Counted over every ledger row in §2–§8 (one row per gate, criterion, check o
 | P2.9 | Crossref DOI 10.1257/aer.99.3.1053, cache/conditional requests, 429, reviewed EvidenceCard without invented coefficients (§6) | **done** | `src/reva/adapters/connectors/crossref.py`, `src/reva/evidence/cards.py`, `registry/evidence/kilian2009.yaml`; `EF::test_crossref_sends_conditional_headers_and_treats_304_as_unchanged`, `tests/live/test_live_sources.py::test_crossref_doi_metadata` | — |
 | P2.10 | Durable PG queue: SKIP LOCKED, lease, heartbeat, fencing, dead letter, idempotency, priority/starvation, cancellation (§7) | **done** | `src/reva/adapters/postgres/queue.py`, `src/reva/operations/worker.py`; `QR::test_claim_commits_and_releases_row_locks_before_work`, `QR::test_expired_lease_reclaimed_with_higher_token_and_stale_holder_cannot_commit`, `QR::test_retry_with_exponential_backoff_then_dead_letter`, `QR::test_priority_and_starvation_protection`, `QR::test_cancel_running_job_is_honoured_cooperatively` | Capped priority aging does not strictly prevent starvation (R2-08) |
 | P2.11 | Scheduler: idempotent due slots, no duplicates; outbox invalidation, SCC, materiality budget (§7) | **done** | `src/reva/operations/schedules.py`, `invalidation.py`; `QR::test_two_schedulers_create_exactly_one_job_per_slot`, `tests/integration/test_scheduler_slots.py::test_slot_key_is_utc_whatever_the_offset`, `tests/integration/test_queue_invalidation.py::test_cycle_invalidates_coupled_component_as_a_whole`, `::test_materiality_skips_accumulate_error_budget_then_force_refresh` | — |
-| P2.12 | Default cadences (WDI/Comtrade monthly, NE/Crossref/Eurostat weekly) (§6) | **done** | `src/reva/cli/seed.py` (`DEFAULT_SCHEDULES`, including `ingest:eurostat.demo_pjan.fr` weekly); `tests/integration/test_scheduler_slots.py` | Comtrade "rolling recent-year revision checks" is implicit (re-fetches all years monthly) |
+| P2.12 | Default cadences (WDI/Comtrade monthly, NE/Crossref/Eurostat weekly) (§6) | **partial** | `src/reva/cli/seed.py` (`DEFAULT_SCHEDULES`, including `ingest:eurostat.demo_pjan.fr` weekly); `tests/integration/test_scheduler_slots.py` | No test asserts the cadence table itself (scheduler tests cover slot mechanics only). Comtrade "rolling recent-year revision checks" is implicit (re-fetches all years monthly) |
 | P2.13 | APIs: connectors/jobs (§25 P2) | **done** | `src/reva/api/routes/catalog.py`, `system.py`; `API::test_simulations_jobs`, `API::test_r2_07_cancel_is_scoped_by_job_type` | — |
 
 ### P3 — beliefs, aliases, n-ary graph, cards
@@ -169,7 +176,7 @@ Counted over every ledger row in §2–§8 (one row per gate, criterion, check o
 | P5.7 | Naive baseline always shown (§25 P5) | **done** | `src/reva/models/tournament.py`; `tests/unit/forecasting/test_forecast_tournament.py::test_naive_baseline_added_when_not_a_candidate`, `tests/integration/test_evaluation_service.py::test_full_panel_stores_evaluations_promotions_and_label` | — |
 | P5.8 | Three forecasting models; in-fold preprocessing; ineligible on short series (§9) | **done** | `src/reva/models/forecasting/{last_value,drift,local_level}.py`; `tests/unit/forecasting/` | Local-level plug-in interval is not calibrated in short windows (R3-05, documented in `docs/methodology.md`) |
 | P5.9 | Tournament promotion statistically sound; insufficient evidence keeps incumbent (§12.2) | **done** | `src/reva/models/tournament.py`, `src/reva/evaluation/tournament_service.py`; `tests/scientific/test_tournament_calibration.py::test_false_promotion_rate_at_nominal_level_under_exact_null`, `tests/integration/test_evaluation_service.py::test_insufficient_evidence_keeps_incumbent` | No proper probabilistic score (CRPS/log/interval) because V1 forecasts are not probabilistic (R3-11, returned as not-applicable) |
-| P5.10 | Seven screens read the real API; fixture mode labelled; every result shows context/units/uncertainty/assumptions/model/provenance (§11) | **done** | `ui/src/pages/{World,Country,Evidence,Graph,Simulation,Models,Acquisition}Page.tsx`, `ui/src/components/ContextBanner.tsx`; `ui/e2e/screens.spec.ts`, `ui/src/components/ContextBanner.test.tsx`, `API::test_every_envelope_states_its_knowledge_cutoff` | `ui/e2e/RESULTS.md` (23:56) records 4 screen failures (cutoff "not stated"). Commit `186f0f5` reports e2e 25/25 after the fix, but `RESULTS.md` was not regenerated. Valid/reference time on Country panels is "not stated" with no test |
+| P5.10 | Seven screens read the real API; fixture mode labelled; every result shows context/units/uncertainty/assumptions/model/provenance (§11) | **partial** | `ui/src/pages/{World,Country,Evidence,Graph,Simulation,Models,Acquisition}Page.tsx`, `ui/src/components/ContextBanner.tsx`; `ui/e2e/screens.spec.ts`, `ui/src/components/ContextBanner.test.tsx`, `API::test_every_envelope_states_its_knowledge_cutoff` | `ui/e2e/RESULTS.md` (23:56) records 4 screen failures (cutoff "not stated"). Commit `186f0f5` reports e2e 25/25 after the fix, but `RESULTS.md` was not regenerated. Valid/reference time on Country panels is "not stated" with no test |
 | P5.11 | APIs: replay/models/query/coverage (§25 P5) | **done** | `src/reva/api/routes/{sim,catalog}.py`; `API::test_replay_and_discovery`, `API::test_query_spec`, `API::test_coverage_and_gaps`, `tests/integration/test_api_contract.py::test_committed_contract_is_current` | — |
 
 ### P6 — autonomy, Eurostat, demographic recipe, gaps
@@ -352,10 +359,10 @@ every cited node is collected and every enforcement symbol exists. "proven" maps
 | I.12 | No replay with unavailable revisions/later preprocessing | **done** | — |
 | I.13 | No source-family duplicates counted as independent | **partial** | `lineage_family` is recorded but nothing consumes it (no pooling in V1); `EF::test_invariant13_alternatives_record_lineage_family_independence` covers recording only |
 | I.14 | No arbitrary code from documents/agents in production | **done** | — |
-| I.15 | No self-promotion / editing own gates | **done** | Policy/gate path is tested. DB-level residual: see §8.3 |
+| I.15 | No self-promotion / editing own gates | **partial** | coverage.yaml says proven (application gate path tested), but at DB level the worker can insert approved `model.version`/eligibility/mapping rows (§8.3) |
 | I.16 | No kernel/ontology mutation without version | **done** | — |
 | I.17 | No silent truncation | **done** | — |
-| I.18 | No partial multi-object publication visible | **done** | Concurrent append race on the seal (R5-07) |
+| I.18 | No partial multi-object publication visible | **partial** | coverage.yaml says proven (sequential case tested), but the seal is check-then-insert: a concurrent transaction can append to a release while it is published; `world.relation` unsealed (R5-07) |
 | I.19 | No commit after losing fencing token | **done** | — |
 | I.20 | No model outside declared support | **done** | — |
 | I.21 | No fabricated probabilities | **done** | — |

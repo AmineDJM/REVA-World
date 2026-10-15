@@ -17,7 +17,8 @@ What is fingerprinted (one entry per object, order-independent, no OIDs):
   (type, nullability, default, identity/generated, collation, column ACL);
 * constraints, indexes, non-internal triggers (``pg_get_triggerdef``), event
   triggers, enum/domain/range types;
-* functions/procedures keyed by ``schema.name(identity args)`` with result,
+* functions/procedures keyed by ``schema.name(input arg types)`` with arguments (names,
+  defaults), result,
   language, SECURITY DEFINER, volatility, strictness, ``proconfig``, ACL and a
   SHA-256 of the body (``prosrc`` plus any SQL-standard body);
 * RLS policies; default privileges;
@@ -224,7 +225,7 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
             "owner": _role(r["owner"], None), "acl": _acl(r["acl"], r["owner"])}
 
     for r in rows(f"""
-        SELECT n.nspname, p.proname, pg_catalog.pg_get_function_identity_arguments(p.oid) AS ident,
+        SELECT n.nspname, p.proname, pg_catalog.oidvectortypes(p.proargtypes) AS ident,
                pg_catalog.pg_get_function_arguments(p.oid) AS args,
                pg_catalog.pg_get_function_result(p.oid) AS result, p.prokind, l.lanname, p.prosecdef,
                p.provolatile, p.proisstrict, p.proleakproof, p.proparallel, p.proretset, p.proconfig,

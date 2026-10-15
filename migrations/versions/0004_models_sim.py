@@ -104,10 +104,59 @@ BEGIN
   IF NEW.spec->>'baseline_release_id' IS DISTINCT FROM NEW.baseline_release_id::text THEN
     RAISE EXCEPTION 'scenario spec baseline does not match pinned baseline';
   END IF;
+  -- (R5-02) The stored spec must be exactly what its identity hashes. The
+  -- canonical bytes live inline (CHECK sha256(content) = artifact_sha256), so
+  -- this binds spec_sha256 -> verified bytes -> parsed jsonb = NEW.spec, and
+  -- the artifact's recorded size to the bytes. Canonical JSON is not
+  -- recomputed in SQL (float formatting); the server hashes the bytes instead.
+  IF NOT EXISTS (
+       SELECT 1 FROM meta.artifact_inline i JOIN meta.artifact a ON a.sha256 = i.artifact_sha256
+        WHERE i.artifact_sha256 = NEW.spec_sha256
+          AND a.byte_size = octet_length(i.content)
+          AND convert_from(i.content, 'UTF8')::jsonb = NEW.spec) THEN
+    RAISE EXCEPTION 'scenario spec does not match its verified canonical bytes (spec_sha256 %)', NEW.spec_sha256;
+  END IF;
   RETURN NEW;
 END $$;
 CREATE TRIGGER scenario_context BEFORE INSERT ON sim.scenario
   FOR EACH ROW EXECUTE FUNCTION sim.check_scenario();
+
+-- (R5-05) The simulation role registers artifact metadata only through this
+-- function, never by INSERT: sha256 and byte size are computed here from the
+-- bytes, the schema label is derived from the document's own "schema" field
+-- (simulation result and model manifests only), and media type, privacy class
+-- and rights are fixed. Nothing is caller-chosen, so a registration made with
+-- simulation credentials can never carry a wrong size or a foreign label for
+-- bytes that another writer (worker, API) registers later: the worker is not
+-- blocked, and the metadata it finds is what it would have written itself.
+CREATE FUNCTION sim.register_artifact(p_content bytea) RETURNS text
+LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE doc jsonb; label text; sha text; size bigint; stored bigint;
+BEGIN
+  IF p_content IS NULL OR octet_length(p_content) > 33554432 THEN
+    RAISE EXCEPTION 'simulation artifact content is missing or larger than 32 MiB';
+  END IF;
+  BEGIN
+    doc := convert_from(p_content, 'UTF8')::jsonb;
+  EXCEPTION WHEN OTHERS THEN
+    RAISE EXCEPTION 'simulation artifact is not a UTF-8 JSON document';
+  END;
+  IF jsonb_typeof(doc) <> 'object'
+     OR COALESCE(doc->>'schema', '') !~ '^reva-(simulation-result|model-manifest)/[0-9]+$' THEN
+    RAISE EXCEPTION 'the simulation role may register only simulation result and model manifests';
+  END IF;
+  label := substr(doc->>'schema', 6);
+  sha := encode(sha256(p_content), 'hex');
+  size := octet_length(p_content);
+  INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights)
+  VALUES (sha, 'application/json', size, label, 'public_aggregate', '{"licence":"internal-derived"}')
+  ON CONFLICT (sha256) DO NOTHING;
+  SELECT byte_size INTO stored FROM meta.artifact WHERE sha256 = sha;
+  IF stored IS DISTINCT FROM size THEN
+    RAISE EXCEPTION 'artifact % size mismatch (% vs %)', sha, stored, size;
+  END IF;
+  RETURN sha;
+END $$;
 
 CREATE TABLE sim.run (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),

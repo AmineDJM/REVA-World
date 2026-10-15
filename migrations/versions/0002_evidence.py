@@ -198,35 +198,141 @@ CREATE TABLE evidence.eligibility (
 );
 CREATE INDEX eligibility_lookup ON evidence.eligibility(connector_version_id, concept_version_id, recorded_at DESC);
 
--- (6) A decision applies only inside its applicability scope (R-07):
---   * subject_ids (when present) must contain the subject;
---   * years (when present and ref_year is given): [y] = that year, [lo, hi] =
---     inclusive range, any longer list = membership.
+-- (6) Applicability scope (R-07, R5-11). The schema is explicit and validated
+-- at insert (evidence.check_eligibility_applicability); allowed keys:
+--   scope keys (enforced by evidence.is_eligible):
+--     subject_ids      array of entity UUID strings: the subject must be listed;
+--     years            {"from": int, "to": int} (inclusive range) or
+--                      {"in": [int, ...]} (explicit set): the record's reference
+--                      year (world.support_ref_year) must be covered; an unknown
+--                      year is never covered;
+--     classifications  array of classification codes (e.g. HS revisions H4..H6):
+--                      the record's classification (source_flags->>'classificationCode')
+--                      must be listed; an unknown classification is never covered.
+--   informational keys (recorded, never matched): subjects, geo, mapping_key,
+--     gate_result_id, rollback_sha256, superseded_by, reapproved_by,
+--     restored_by_rollback_of, reason.
+-- Any other key, list-form years or non-integer years are rejected at insert.
+CREATE FUNCTION evidence.check_eligibility_applicability() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE ap jsonb := NEW.applicability; k text; y jsonb; v jsonb;
+BEGIN
+  IF ap IS NULL OR jsonb_typeof(ap) <> 'object' THEN
+    RAISE EXCEPTION 'eligibility applicability must be a JSON object' USING ERRCODE = '22023';
+  END IF;
+  FOR k IN SELECT jsonb_object_keys(ap) LOOP
+    IF k <> ALL (ARRAY['subject_ids','years','classifications','subjects','geo','mapping_key','gate_result_id',
+                       'rollback_sha256','superseded_by','reapproved_by','restored_by_rollback_of','reason']) THEN
+      RAISE EXCEPTION 'eligibility applicability key % is not part of the scope schema', k USING ERRCODE = '22023';
+    END IF;
+  END LOOP;
+  IF ap ? 'subject_ids' THEN
+    IF jsonb_typeof(ap->'subject_ids') <> 'array' THEN
+      RAISE EXCEPTION 'applicability.subject_ids must be an array of entity UUIDs' USING ERRCODE = '22023';
+    END IF;
+    FOR v IN SELECT jsonb_array_elements(ap->'subject_ids') LOOP
+      IF jsonb_typeof(v) <> 'string'
+         OR (v #>> '{}') !~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$' THEN
+        RAISE EXCEPTION 'applicability.subject_ids must hold lower-case entity UUID strings (got %)', v
+          USING ERRCODE = '22023';
+      END IF;
+    END LOOP;
+  END IF;
+  IF ap ? 'years' THEN
+    y := ap->'years';
+    IF jsonb_typeof(y) <> 'object' THEN
+      RAISE EXCEPTION 'applicability.years must be {"from": y0, "to": y1} or {"in": [y, ...]} (got %)', y
+        USING ERRCODE = '22023';
+    END IF;
+    IF (SELECT array_agg(x ORDER BY x) FROM jsonb_object_keys(y) x) = ARRAY['from','to'] THEN
+      FOREACH v IN ARRAY ARRAY[y->'from', y->'to'] LOOP
+        IF jsonb_typeof(v) <> 'number' OR (v #>> '{}')::numeric <> trunc((v #>> '{}')::numeric)
+           OR (v #>> '{}')::numeric NOT BETWEEN 1 AND 9999 THEN
+          RAISE EXCEPTION 'applicability.years bounds must be integer years (got %)', v USING ERRCODE = '22023';
+        END IF;
+      END LOOP;
+      IF (y->>'from')::int > (y->>'to')::int THEN
+        RAISE EXCEPTION 'applicability.years.from must not exceed years.to (got %)', y USING ERRCODE = '22023';
+      END IF;
+    ELSIF (SELECT array_agg(x) FROM jsonb_object_keys(y) x) = ARRAY['in'] THEN
+      IF jsonb_typeof(y->'in') <> 'array' OR jsonb_array_length(y->'in') = 0 THEN
+        RAISE EXCEPTION 'applicability.years.in must be a non-empty array of integer years' USING ERRCODE = '22023';
+      END IF;
+      FOR v IN SELECT jsonb_array_elements(y->'in') LOOP
+        IF jsonb_typeof(v) <> 'number' OR (v #>> '{}')::numeric <> trunc((v #>> '{}')::numeric)
+           OR (v #>> '{}')::numeric NOT BETWEEN 1 AND 9999 THEN
+          RAISE EXCEPTION 'applicability.years.in must hold integer years (got %)', v USING ERRCODE = '22023';
+        END IF;
+      END LOOP;
+    ELSE
+      RAISE EXCEPTION 'applicability.years must be {"from": y0, "to": y1} or {"in": [y, ...]} (got %)', y
+        USING ERRCODE = '22023';
+    END IF;
+  END IF;
+  IF ap ? 'classifications' THEN
+    IF jsonb_typeof(ap->'classifications') <> 'array' OR jsonb_array_length(ap->'classifications') = 0 THEN
+      RAISE EXCEPTION 'applicability.classifications must be a non-empty array of codes' USING ERRCODE = '22023';
+    END IF;
+    FOR v IN SELECT jsonb_array_elements(ap->'classifications') LOOP
+      IF jsonb_typeof(v) <> 'string' OR (v #>> '{}') = '' THEN
+        RAISE EXCEPTION 'applicability.classifications must hold non-empty strings (got %)', v
+          USING ERRCODE = '22023';
+      END IF;
+    END LOOP;
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER applicability_valid BEFORE INSERT ON evidence.eligibility
+  FOR EACH ROW EXECUTE FUNCTION evidence.check_eligibility_applicability();
+
 -- The latest decision among those whose scope covers the record wins, so a
--- decision scoped to other subjects/years never affects this record.
--- ref_year NULL means "year unknown to the caller": the years scope is then
--- not applied (pre-filters such as belief.selection); the authoritative
--- belief.check_input trigger always passes the support's year.
+-- decision scoped to other subjects/years/classifications never affects this
+-- record. ref_year / classification NULL mean "unknown": a decision scoped on
+-- that dimension then does not cover the record (fails closed, R5-03/R5-11);
+-- only decisions without that scope key apply. Unknown keys (impossible after
+-- the insert check) make a decision non-matching.
 CREATE FUNCTION evidence.is_eligible(cv uuid, concept uuid, subject uuid, at timestamptz,
-                                     ref_year integer DEFAULT NULL)
+                                     ref_year integer DEFAULT NULL, classification text DEFAULT NULL)
   RETURNS boolean LANGUAGE sql STABLE AS $$
   SELECT COALESCE((
     SELECT e.decision = 'eligible'
     FROM evidence.eligibility e
     WHERE e.connector_version_id = cv AND e.concept_version_id = concept AND e.recorded_at <= at
+      AND jsonb_typeof(e.applicability) = 'object'
+      AND NOT EXISTS (SELECT 1 FROM jsonb_object_keys(e.applicability) k
+                      WHERE k <> ALL (ARRAY['subject_ids','years','classifications','subjects','geo','mapping_key',
+                                            'gate_result_id','rollback_sha256','superseded_by','reapproved_by',
+                                            'restored_by_rollback_of','reason']))
       AND (NOT e.applicability ? 'subject_ids'
            OR (jsonb_typeof(e.applicability->'subject_ids') = 'array'
                AND e.applicability->'subject_ids' ? subject::text))
-      AND (ref_year IS NULL OR NOT e.applicability ? 'years'
-           OR CASE WHEN jsonb_typeof(e.applicability->'years') IS DISTINCT FROM 'array' THEN false
-                   WHEN jsonb_array_length(e.applicability->'years') = 1
-                     THEN ref_year = (e.applicability->'years'->>0)::int
-                   WHEN jsonb_array_length(e.applicability->'years') = 2
-                     THEN ref_year BETWEEN (e.applicability->'years'->>0)::int
-                                       AND (e.applicability->'years'->>1)::int
-                   ELSE e.applicability->'years' @> to_jsonb(ref_year)
+      AND (NOT e.applicability ? 'years'
+           OR CASE WHEN ref_year IS NULL OR jsonb_typeof(e.applicability->'years') IS DISTINCT FROM 'object'
+                     THEN false
+                   WHEN jsonb_typeof(e.applicability->'years'->'from') = 'number'
+                        AND jsonb_typeof(e.applicability->'years'->'to') = 'number'
+                     THEN ref_year BETWEEN (e.applicability->'years'->>'from')::numeric
+                                       AND (e.applicability->'years'->>'to')::numeric
+                   WHEN jsonb_typeof(e.applicability->'years'->'in') = 'array'
+                     THEN e.applicability->'years'->'in' @> jsonb_build_array(ref_year)
+                   ELSE false
               END)
+      AND (NOT e.applicability ? 'classifications'
+           OR (classification IS NOT NULL
+               AND jsonb_typeof(e.applicability->'classifications') = 'array'
+               AND e.applicability->'classifications' @> jsonb_build_array(classification)))
     ORDER BY e.recorded_at DESC, e.id DESC LIMIT 1), false)
+$$;
+
+-- The single eligibility authority for one observation (R5-03): used by the
+-- belief.input trigger and by belief selection, so a row selection admits is a
+-- row the trigger accepts. Reference year = world.support_ref_year(support);
+-- classification = source_flags->>'classificationCode' (NULL when absent).
+CREATE FUNCTION evidence.observation_is_eligible(obs uuid, at timestamptz) RETURNS boolean
+  LANGUAGE sql STABLE AS $$
+  SELECT COALESCE((
+    SELECT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, at,
+                                world.support_ref_year(o.support_id), o.source_flags->>'classificationCode')
+    FROM evidence.observation o WHERE o.id = obs), false)
 $$;
 """
 
