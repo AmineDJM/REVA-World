@@ -550,6 +550,15 @@ class RevisionEntry(ApiModel):
     retracted: bool = Field(False, description="Retracted at/before as_of (never used as the point value)")
 
 
+SOURCE_FLAGS_DOC = (
+    "Provider/connector flags as stored on the selected observation (e.g. Comtrade isReported, "
+    "legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means "
+    "undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: "
+    "at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about "
+    "4 KiB; never a raw payload. The full record is at /v1/observations.")
+SOURCE_FLAGS_TRUNCATED_DOC = "True when source_flags was cut to its size bound (see /v1/observations)"
+
+
 class TimeseriesPoint(ApiModel):
     period_label: str | None
     valid_start: str | None
@@ -567,6 +576,9 @@ class TimeseriesPoint(ApiModel):
     retrieved_at: datetime
     source_published_at: datetime | None = None
     origin: Literal["live", "test_fixture"]
+    source_flags: dict[str, Any] | None = Field(
+        None, description=SOURCE_FLAGS_DOC)
+    source_flags_truncated: bool = Field(False, description=SOURCE_FLAGS_TRUNCATED_DOC)
     retracted_revisions_skipped: int = Field(
         0, description="Later revisions retracted at/before as_of that were skipped: the point is the latest "
         "non-retracted revision (the same rule as belief selection)")
@@ -608,6 +620,9 @@ class BeliefEstimate(ApiModel):
     observation_id: UUID | None = None
     observation_revision_no: int | None = None
     retrieved_at: datetime | None = None
+    source_flags: dict[str, Any] | None = Field(
+        None, description=SOURCE_FLAGS_DOC + " Null when the estimate has no selected observation.")
+    source_flags_truncated: bool = Field(False, description=SOURCE_FLAGS_TRUNCATED_DOC)
     method: ModelVersionRef
 
 

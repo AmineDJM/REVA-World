@@ -96,3 +96,6 @@ unsupported capability returns a typed blocked/unavailable result.
 | PUBFIX | 0001/0002/0003/0005, belief/** except publication.py, PUBLICATION_LOCK probe, eligibility scopes |
 | MIGR | adapters/postgres/schema_contract.py, migrations/schema_contract.json, `reva db verify-schema` |
 | LEDGER | docs/implementation_status.md |
+
+## V2 roadmap (owner-approved 2026-10-15) — see docs/roadmap/v2_design.md for ownership
+Agents: ENG (platform/plugins/0008), ALLC (all countries), NLC (NL drafts), POP (cohort projection), IO (input-output prices), PEN (retirement age + households), AFX (R6 autonomy fixes), APIX (API fields), UI2 (UI round 2).

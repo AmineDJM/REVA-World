@@ -10,6 +10,7 @@ import { MissingValue } from '../components/MissingValue';
 import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
+import { UncertaintyLegend, glyphKindsOf } from '../components/UncertaintyGlyph';
 import { ValueView } from '../components/ValueView';
 import { formatDateTime, humanize, isRecord, localUtcToIso } from '../lib/format';
 import { useApi } from '../lib/useApi';
@@ -159,6 +160,7 @@ const obsColumns: ColumnDef<Observation, unknown>[] = [
   { header: 'Period', accessorFn: (o) => o.support.period_label ?? '—' },
   { header: 'Revision', accessorKey: 'revision_no' },
   { header: 'Value', id: 'value', cell: (c) => <ValueView value={c.row.original.value} showBasis /> },
+  { header: 'Uncertainty', id: 'unc', cell: (c) => <UncertaintyPanel uncertainty={c.row.original.uncertainty} compact /> },
   { header: 'Retrieved', accessorFn: (o) => formatDateTime(o.retrieved_at) },
   {
     header: 'State',
@@ -333,6 +335,7 @@ export default function EvidencePage() {
         {obs.data && obs.data.data.length > 0 && (
           <>
             <h3>Source comparison</h3>
+            <UncertaintyLegend present={glyphKindsOf(obs.data.data)} />
             <DataTable
               caption="Latest revision per source, by period"
               columns={[

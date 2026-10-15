@@ -203,7 +203,12 @@ def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]])
         prefs = preferences.get(concept_id)
         if not prefs:
             continue  # no published preference policy for this estimand: not selected
-        retracted = [c for c in group if c.get("selection_status") == "retracted" and c["source_key"] in prefs]
+        # (R7-B1) deterministic order independent of input row order: stored estimates and release
+        # manifests are byte-identical for any caller's row order.
+        retracted = sorted(
+            (c for c in group if c.get("selection_status") == "retracted" and c["source_key"] in prefs),
+            key=lambda c: (prefs.index(c["source_key"]), c["logical_key"], str(c.get("origin", ""))),
+        )
         cands = [c for c in group if c.get("selection_status") != "retracted"]
         ranked = sorted(
             (c for c in cands if c["source_key"] in prefs),

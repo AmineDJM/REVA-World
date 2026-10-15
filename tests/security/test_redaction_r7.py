@@ -676,7 +676,8 @@ def test_sandbox_child_stderr_is_scrubbed_before_it_becomes_evidence(monkeypatch
                         lambda: ("/bin/sh", "-c", f"echo 'leak {key} Authorization: Bearer {key}' >&2; exit 3", "--"))
     budget = type("B", (), {"max_cpu_seconds": 5, "max_memory_bytes": 1 << 30, "max_wall_seconds": 20,
                             "max_requests": 1, "max_bytes": 1000})()
-    policy = SandboxPolicy.model_construct(budget=budget)
+    policy = SandboxPolicy(policy_version="r7", isolation="trusted_template", network_hosts=(), writable_paths=(),
+                           secret_access=False, budget=budget)
     out, _ = sandbox.TrustedTemplateSandbox._spawn({"manifest": {}}, policy)
     assert out["ok"] is False and "leak" in out["error"]
     assert_absent(json.dumps(out), key)

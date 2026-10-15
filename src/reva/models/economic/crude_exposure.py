@@ -18,10 +18,14 @@ The implementation evaluates ΔM as ``M × (p^(1+ε) − 1)`` and special-cases 
 exponent 1 so that ε = 0 executes exactly the L1 expression: the zero-elasticity
 L2 case is bit-for-bit identical to L1, not merely close.
 
-All arithmetic uses ``decimal`` in a 50-digit context. Integral exponents use exact
-Decimal integer powers; non-integral exponents use exp((1 + ε)·ln p), which the
-standard library rounds correctly in that context. Inputs are never silently
-zero: a missing value raises :class:`MissingInput`.
+All arithmetic uses ``decimal`` in a 50-digit context. Integral exponents use
+Decimal integer powers; non-integral exponents use exp((1 + ε)·ln p). Each step
+(ln, the product, exp) is rounded in that context, but the composition is not
+correctly rounded: the power can differ from the correctly rounded p^(1+ε) in
+the last (50th) significant digit, e.g. 0.0001^(−0.5) evaluates to
+100.000…0001 rather than 100. That error is far below any reported precision;
+results are deterministic for given inputs. Inputs are never silently zero: a
+missing value raises :class:`MissingInput`.
 
 M and X are same-year source-reported border values in current USD (imports
 commonly CIF, exports FOB; both bases stay explicit). G is nominal GDP in current
@@ -115,7 +119,15 @@ def dstr(d: Decimal) -> str:
 
 
 def _dec(x: Any, what: str) -> Decimal:
-    """Exact Decimal conversion; floats go through their shortest repr (1.25 -> '1.25')."""
+    """Exact Decimal conversion; floats go through their shortest repr (1.25 -> '1.25').
+
+    ``None`` or a kernel ``Missing`` is a missing input (``missing_input``), never a
+    validation error and never zero (R7-S1).
+    """
+    if x is None or isinstance(x, Missing):
+        reason = x.reason.value if isinstance(x, Missing) else MissingReason.unavailable.value
+        raise MissingInput(f"{what} is missing ({reason})", input=what, reason=reason,
+                           missing=[{"input": what, "reason": reason}])
     if isinstance(x, bool):
         raise ValidationProblem(f"{what} must be numeric, not boolean")
     if isinstance(x, Decimal):

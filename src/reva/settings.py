@@ -133,6 +133,8 @@ class Settings(BaseSettings):
     reva_s3_access_key_id: SecretStr | None = None
     reva_s3_secret_access_key: SecretStr | None = None
     reva_s3_prefix: str = "reva/"
+    #: botocore S3 addressing: "auto" (path-style for custom endpoints), "path" or "virtual".
+    reva_s3_addressing_style: Literal["auto", "path", "virtual"] = "auto"
 
     reva_session_secret: SecretStr | None = None
     reva_admin_password_hash: SecretStr | None = None

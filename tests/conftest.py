@@ -2,8 +2,8 @@
 
 DB tests run against a fresh, uniquely named database per test session (so
 parallel developers/agents never collide), created with the local migration
-owner, bootstrapped (migrations + runtime role passwords) and seeded through the
-worker role. Requires REVA_MIGRATION_DATABASE_URL (see .env.example); DB tests
+owner, bootstrapped (migrations + runtime role passwords) and seeded by the
+migration owner (bootstrap). Requires REVA_MIGRATION_DATABASE_URL (see .env.example); DB tests
 are skipped when the server is unreachable.
 """
 
@@ -96,7 +96,9 @@ def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[DB]:
         sim=make_engine("sim", settings),
         store=store,
     )
-    seed(d.worker, store)
+    # bootstrap() seeds the reviewed registry as the migration owner (R5-01: runtime roles may not
+    # write approved registry state); re-running it as the owner is an idempotent no-op.
+    seed(d.owner, store)
     yield d
     for e in (d.owner, d.api, d.worker, d.sim):
         e.dispose()

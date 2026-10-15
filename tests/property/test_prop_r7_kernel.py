@@ -56,7 +56,7 @@ TAGS = ("$float", "$decimal", "$datetime", "$date")
 # --------------------------------------------------------------------------- strategies
 _offsets = st.integers(min_value=-(24 * 60 - 1), max_value=24 * 60 - 1).map(
     lambda m: timezone(timedelta(minutes=m)))
-# Instants away from datetime.min/max so every offset is representable (see the xfail below).
+# Instants away from datetime.min/max so every offset is representable (edge case tested below).
 _utc_instants = st.datetimes(min_value=datetime(2, 1, 1), max_value=datetime(9998, 12, 31)).map(
     lambda d: d.replace(tzinfo=UTC))
 _aware = st.builds(lambda d, tz: d.astimezone(tz), _utc_instants, _offsets)
@@ -210,14 +210,17 @@ def test_naive_datetimes_are_rejected_anywhere(naive: datetime, ctx: Any) -> Non
             canonical_bytes(obj)
 
 
-@pytest.mark.xfail(strict=True, reason="R7-K1: aware datetimes at the calendar edge raise OverflowError, "
-                   "not the ValueError every other unsupported canonical input raises")
 def test_edge_of_calendar_aware_datetime_is_encoded_or_rejected_with_valueerror() -> None:
-    edge = datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=5)))  # 0000-12-31T19:00Z: not representable
-    try:
-        canonical_bytes(edge)
-    except ValueError:
-        pass
+    # R7-K1: 0000-12-31T19:00Z and 10000-01-01T04:00Z are not representable in UTC.
+    for edge in (datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=5))),
+                 datetime(9999, 12, 31, 23, tzinfo=timezone(timedelta(hours=-5)))):
+        with pytest.raises(ValueError, match="representable UTC range"):
+            canonical_bytes(edge)
+    # Representable instants keep their reva-cjson-2 encoding (the fix changes no successful output).
+    assert canonical_bytes(datetime(1, 1, 1, 5, tzinfo=timezone(timedelta(hours=5)))) == \
+        b'{"$datetime":"0001-01-01T00:00:00+00:00"}'
+    assert canonical_bytes(datetime(2020, 1, 1, 1, tzinfo=timezone(timedelta(hours=1)))) == \
+        b'{"$datetime":"2020-01-01T00:00:00+00:00"}'
 
 
 def test_lone_surrogate_string_is_rejected_with_valueerror() -> None:
@@ -393,8 +396,6 @@ def test_sensitivity_range_never_carries_a_level(a: str, b: str, level: float) -
         UncertaintySpec(**{**spec.model_dump(), "level": level})
 
 
-@pytest.mark.xfail(strict=True, reason="R7-K3: UncertaintySpec.lower/upper accept non-plain decimal strings "
-                   "(whitespace, '_', exponent, '+'), unlike ScalarDecimal and the observation contract")
 @settings(max_examples=50, deadline=None)
 @given(st.sampled_from([" 1", "1_0", "1e5", "+1", "01"]))
 def test_uncertainty_bounds_must_be_plain_decimals(bad: str) -> None:
@@ -454,8 +455,6 @@ def test_bound_lies_within_its_uncertain_bound(x: date, e: date, l_: date, end_s
     assert ok == (e <= x <= l_)
 
 
-@pytest.mark.xfail(strict=True, reason="R7-K4: TimeExtent does not order an uncertain start against end "
-                   "(or an uncertain end against start): impossible intervals validate")
 @settings(max_examples=50, deadline=None)
 @given(_dates, st.integers(1, 3650), st.integers(0, 3650), st.booleans())
 @example(date(2020, 1, 1), 365, 0, False)
@@ -470,6 +469,29 @@ def test_interval_whose_end_precedes_every_admissible_start_is_rejected(s: date,
               "end": s - timedelta(days=gap)}
     with pytest.raises(ValidationError):
         TimeExtent(kind="interval", precision=Precision.day, **kw)
+
+
+def test_instant_never_has_an_end_bound() -> None:
+    with pytest.raises(ValidationError):
+        TimeExtent(kind="instant", precision=Precision.day, start=date(2020, 1, 1),
+                   end_uncertainty=UncertainBound(earliest=date(2020, 1, 2), latest=date(2020, 2, 1)))
+
+
+@FAST
+@given(_dates, st.integers(0, 400), st.integers(0, 400), st.integers(-400, 400))
+def test_uncertain_interval_accepted_iff_some_admissible_pair_is_non_empty(s: date, sw: int, ew: int,
+                                                                          off: int) -> None:
+    assume(date(1, 1, 1) + timedelta(days=sw + ew + 800) < s < date(9998, 1, 1))
+    su = UncertainBound(earliest=s, latest=s + timedelta(days=sw))
+    e0 = s + timedelta(days=off)
+    eu = UncertainBound(earliest=e0, latest=e0 + timedelta(days=ew))
+    try:
+        TimeExtent(kind="interval", precision=Precision.day, start=None, start_uncertainty=su,
+                   end_uncertainty=eu)
+        ok = True
+    except ValidationError:
+        ok = False
+    assert ok == (eu.latest > su.earliest)
 
 
 # --------------------------------------------------------------------------- external_id

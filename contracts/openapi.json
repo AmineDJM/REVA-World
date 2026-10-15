@@ -276,6 +276,25 @@
             ],
             "title": "Retrieved At"
           },
+          "source_flags": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Provider/connector flags as stored on the selected observation (e.g. Comtrade isReported, legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about 4 KiB; never a raw payload. The full record is at /v1/observations. Null when the estimate has no selected observation.",
+            "title": "Source Flags"
+          },
+          "source_flags_truncated": {
+            "default": false,
+            "description": "True when source_flags was cut to its size bound (see /v1/observations)",
+            "title": "Source Flags Truncated",
+            "type": "boolean"
+          },
           "source_key": {
             "anyOf": [
               {
@@ -348,6 +367,8 @@
           "observation_id",
           "observation_revision_no",
           "retrieved_at",
+          "source_flags",
+          "source_flags_truncated",
           "method"
         ],
         "title": "BeliefEstimate",
@@ -11562,6 +11583,25 @@
             "description": "Full lineage visible at as_of (revisions=all only)",
             "title": "Revisions"
           },
+          "source_flags": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Provider/connector flags as stored on the selected observation (e.g. Comtrade isReported, legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about 4 KiB; never a raw payload. The full record is at /v1/observations.",
+            "title": "Source Flags"
+          },
+          "source_flags_truncated": {
+            "default": false,
+            "description": "True when source_flags was cut to its size bound (see /v1/observations)",
+            "title": "Source Flags Truncated",
+            "type": "boolean"
+          },
           "source_key": {
             "title": "Source Key",
             "type": "string"
@@ -11665,6 +11705,8 @@
           "retrieved_at",
           "source_published_at",
           "origin",
+          "source_flags",
+          "source_flags_truncated",
           "retracted_revisions_skipped",
           "revisions"
         ],

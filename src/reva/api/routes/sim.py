@@ -174,11 +174,25 @@ def create_scenario(
         knowledge_cutoff=row["knowledge_cutoff"], created_by=row["created_by"], recorded_at=row["recorded_at"])
 
 
+def scenario_valid_time(spec: dict[str, Any]) -> dict[str, Any] | None:
+    """The scenario reference year as a half-open UTC interval [Jan 1 Y, Jan 1 Y+1).
+
+    Scenario outputs are annual accounting quantities for one reference year; ``None`` when the stored spec
+    carries no usable year (never a guessed period).
+    """
+    year = spec.get("reference_year")
+    if isinstance(year, bool) or not isinstance(year, int) or not 1 <= year < 9999:
+        return None
+    return {"start": f"{year:04d}-01-01T00:00:00Z", "end": f"{year + 1:04d}-01-01T00:00:00Z", "bounds": "[)",
+            "basis": "scenario_reference_year", "reference_year": year}
+
+
 def _scenario_envelope(sc: s.Scenario) -> dict[str, Any]:
     return {
         "context_id": sc.context_id, "context_mode": "simulation", "origin": sc.origin,
         "modality": "assumption_conditioned_scenario", "baseline_release": sc.baseline_release,
-        "knowledge_cutoff": sc.knowledge_cutoff, "warnings": [*origin_warnings(sc.origin), SCENARIO_BANNER],
+        "knowledge_cutoff": sc.knowledge_cutoff, "valid_time": scenario_valid_time(sc.spec),
+        "warnings": [*origin_warnings(sc.origin), SCENARIO_BANNER],
     }
 
 

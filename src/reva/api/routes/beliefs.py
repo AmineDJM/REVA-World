@@ -14,6 +14,7 @@ from reva.api import schemas as s
 from reva.api.auth import require_scope
 from reva.api.deps import (
     Timer,
+    bounded_source_flags,
     decode_cursor,
     freshness,
     link,
@@ -63,6 +64,7 @@ SELECT e.id, e.release_id, e.subject_id, ent.label AS subject_label, ek.concept_
        e.discrepancy_flags, sp.id AS support_id, sp.temporal_extent, sp.spatial_spec, sp.population_spec,
        sp.aggregation, mv.id AS method_id, mv.model_key, mv.version AS method_version,
        mv.approval_status, inp.observation_id, inp.revision_no, inp.source_key, inp.retrieved_at,
+       inp.source_flags,
        COALESCE(sp.temporal_extent->>'start', '') AS sort_start
 FROM belief.estimate e
 JOIN world.entity ent ON ent.id = e.subject_id
@@ -71,7 +73,7 @@ JOIN ontology.concept_version c ON c.id = e.concept_version_id
 JOIN world.support sp ON sp.id = e.support_id
 JOIN model.version mv ON mv.id = e.method_version_id
 LEFT JOIN LATERAL (
-  SELECT i.observation_id, o.revision_no, src.source_key, a.retrieved_at
+  SELECT i.observation_id, o.revision_no, src.source_key, a.retrieved_at, o.source_flags
   FROM belief.input i
   JOIN evidence.observation o ON o.id = i.observation_id
   JOIN evidence.source src ON src.id = o.source_id
@@ -90,6 +92,7 @@ LIMIT :lim
 
 
 def estimate_model(r: dict[str, Any]) -> s.BeliefEstimate:
+    flags, flags_cut = bounded_source_flags(r.get("source_flags"))
     return s.BeliefEstimate(
         id=r["id"], release_id=r["release_id"],
         subject=s.EntityRef(id=r["subject_id"], label=r["subject_label"], kind=r["subject_kind"]),
@@ -97,6 +100,7 @@ def estimate_model(r: dict[str, Any]) -> s.BeliefEstimate:
         modality=r["modality"], value=r["value"], uncertainty=r["uncertainty"], alternatives=r["alternatives"],
         discrepancy_flags=r["discrepancy_flags"], source_key=r["source_key"], observation_id=r["observation_id"],
         observation_revision_no=r["revision_no"], retrieved_at=r["retrieved_at"],
+        source_flags=flags, source_flags_truncated=flags_cut,
         method=s.ModelVersionRef(id=r["method_id"], model_key=r["model_key"], version=r["method_version"],
                                  approval_status=r["approval_status"]),
     )

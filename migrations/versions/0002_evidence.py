@@ -209,6 +209,10 @@ CREATE INDEX eligibility_lookup ON evidence.eligibility(connector_version_id, co
 --     classifications  array of classification codes (e.g. HS revisions H4..H6):
 --                      the record's classification (source_flags->>'classificationCode')
 --                      must be listed; an unknown classification is never covered.
+--     admit_unclassified_missing  boolean, only with classifications: true also
+--                      covers a typed-Missing record that reports no classification
+--                      (evidence.observation_is_eligible passes the reserved
+--                      classification 'unclassified_missing' for it).
 --   informational keys (recorded, never matched): subjects, geo, mapping_key,
 --     gate_result_id, rollback_sha256, superseded_by, reapproved_by,
 --     restored_by_rollback_of, reason.
@@ -220,7 +224,8 @@ BEGIN
     RAISE EXCEPTION 'eligibility applicability must be a JSON object' USING ERRCODE = '22023';
   END IF;
   FOR k IN SELECT jsonb_object_keys(ap) LOOP
-    IF k <> ALL (ARRAY['subject_ids','years','classifications','subjects','geo','mapping_key','gate_result_id',
+    IF k <> ALL (ARRAY['subject_ids','years','classifications','admit_unclassified_missing','subjects','geo','mapping_key',
+                       'gate_result_id',
                        'rollback_sha256','superseded_by','reapproved_by','restored_by_rollback_of','reason']) THEN
       RAISE EXCEPTION 'eligibility applicability key % is not part of the scope schema', k USING ERRCODE = '22023';
     END IF;
@@ -268,6 +273,11 @@ BEGIN
         USING ERRCODE = '22023';
     END IF;
   END IF;
+  IF ap ? 'admit_unclassified_missing' AND (jsonb_typeof(ap->'admit_unclassified_missing') <> 'boolean'
+                                             OR NOT ap ? 'classifications') THEN
+    RAISE EXCEPTION 'applicability.admit_unclassified_missing must be a boolean next to classifications'
+      USING ERRCODE = '22023';
+  END IF;
   IF ap ? 'classifications' THEN
     IF jsonb_typeof(ap->'classifications') <> 'array' OR jsonb_array_length(ap->'classifications') = 0 THEN
       RAISE EXCEPTION 'applicability.classifications must be a non-empty array of codes' USING ERRCODE = '22023';
@@ -299,8 +309,8 @@ CREATE FUNCTION evidence.is_eligible(cv uuid, concept uuid, subject uuid, at tim
     WHERE e.connector_version_id = cv AND e.concept_version_id = concept AND e.recorded_at <= at
       AND jsonb_typeof(e.applicability) = 'object'
       AND NOT EXISTS (SELECT 1 FROM jsonb_object_keys(e.applicability) k
-                      WHERE k <> ALL (ARRAY['subject_ids','years','classifications','subjects','geo','mapping_key',
-                                            'gate_result_id','rollback_sha256','superseded_by','reapproved_by',
+                      WHERE k <> ALL (ARRAY['subject_ids','years','classifications','admit_unclassified_missing',
+                                            'subjects','geo','mapping_key','gate_result_id','rollback_sha256','superseded_by','reapproved_by',
                                             'restored_by_rollback_of','reason']))
       AND (NOT e.applicability ? 'subject_ids'
            OR (jsonb_typeof(e.applicability->'subject_ids') = 'array'
@@ -317,7 +327,9 @@ CREATE FUNCTION evidence.is_eligible(cv uuid, concept uuid, subject uuid, at tim
                    ELSE false
               END)
       AND (NOT e.applicability ? 'classifications'
-           OR (classification IS NOT NULL
+           OR (classification = 'unclassified_missing'
+               AND e.applicability->'admit_unclassified_missing' = 'true'::jsonb)
+           OR (classification IS NOT NULL AND classification <> 'unclassified_missing'
                AND jsonb_typeof(e.applicability->'classifications') = 'array'
                AND e.applicability->'classifications' @> jsonb_build_array(classification)))
     ORDER BY e.recorded_at DESC, e.id DESC LIMIT 1), false)
@@ -326,12 +338,19 @@ $$;
 -- The single eligibility authority for one observation (R5-03): used by the
 -- belief.input trigger and by belief selection, so a row selection admits is a
 -- row the trigger accepts. Reference year = world.support_ref_year(support);
--- classification = source_flags->>'classificationCode' (NULL when absent).
+-- classification = source_flags->>'classificationCode'. A typed-Missing record
+-- that reports no classification (e.g. the provider returned no rows: there is
+-- no value whose classification could be incomparable) has the reserved code
+-- 'unclassified_missing', which a decision covers only if it sets
+-- admit_unclassified_missing; any other record without a classification has NULL (never
+-- covered by a classification-scoped decision).
 CREATE FUNCTION evidence.observation_is_eligible(obs uuid, at timestamptz) RETURNS boolean
   LANGUAGE sql STABLE AS $$
   SELECT COALESCE((
     SELECT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, at,
-                                world.support_ref_year(o.support_id), o.source_flags->>'classificationCode')
+                                world.support_ref_year(o.support_id),
+                                COALESCE(o.source_flags->>'classificationCode',
+                                         CASE WHEN o.value->>'kind' = 'missing' THEN 'unclassified_missing' END))
     FROM evidence.observation o WHERE o.id = obs), false)
 $$;
 """

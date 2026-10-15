@@ -205,17 +205,41 @@ def test_classifications_are_enforced(w: dict[str, Any]) -> None:
         add_input(c, add_estimate(c, w, rid), h6)
 
 
-def _obs_with_flags(c: Connection, w: dict[str, Any], flags: dict[str, Any]) -> UUID:
+@pytest.mark.db
+def test_unclassified_missing_is_admitted_only_explicitly(w: dict[str, Any]) -> None:
+    """A typed-Missing record without a classification (provider returned no rows) is covered by a
+    classification-scoped decision only with admit_unclassified_missing; a value without one never is."""
+    subj = str(w["obs"]["subject_id"])
+    missing = {"kind": "missing", "reason": "unavailable"}
+    for admit in (False, True):
+        with tx(w["db"].owner) as c:
+            _decision(c, w, {}, "quarantine")
+            ap: dict[str, Any] = {"subject_ids": [subj], "classifications": ["H6"]}
+            if admit:
+                ap["admit_unclassified_missing"] = True
+            _decision(c, w, ap)
+            gone = _obs_with_flags(c, w, {"provider_returned_no_rows": True}, value=missing)
+            unclassified_value = _obs_with_flags(c, w, {})
+            assert _selected(c, gone) is admit
+            assert not _selected(c, unclassified_value)
+    with tx(w["db"].worker) as c, pytest.raises(DBAPIError, match="admit_unclassified_missing"):
+        _decision(c, w, {"admit_unclassified_missing": True}, "quarantine")  # meaningless without classifications
+
+
+def _obs_with_flags(c: Connection, w: dict[str, Any], flags: dict[str, Any],
+                    value: dict[str, Any] | None = None) -> UUID:
     return UUID(str(
         c.execute(
             text("""INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
                       revision_no, subject_id, concept_version_id, support_id, value, uncertainty, source_flags,
                       raw_selector, parser_version, provenance_activity_id, semantic_hash, record_hash)
                     SELECT source_id, connector_version_id, acquisition_id, :lk, 1, subject_id, concept_version_id,
-                      support_id, value, uncertainty, source_flags || CAST(:f AS jsonb), raw_selector, parser_version,
+                      support_id, COALESCE(CAST(:v AS jsonb), value), uncertainty,
+                      (source_flags - 'classificationCode') || CAST(:f AS jsonb), raw_selector, parser_version,
                       provenance_activity_id, 'x', 'y'
                     FROM evidence.observation WHERE id = :o RETURNING id"""),
-            {"o": w["obs"]["id"], "lk": f"r5:flags:{uuid.uuid4().hex}", "f": json.dumps(flags)},
+            {"o": w["obs"]["id"], "lk": f"r5:flags:{uuid.uuid4().hex}", "f": json.dumps(flags),
+             "v": json.dumps(value) if value is not None else None},
         ).scalar_one()))
 
 
@@ -231,6 +255,7 @@ def test_seeded_decisions_use_the_explicit_schema(w: dict[str, Any]) -> None:
                ORDER BY e.recorded_at DESC LIMIT 1""")).scalar_one()
     assert years == ["object"]
     assert comtrade["years"] == {"from": 2020, "to": 2024} and comtrade["classifications"] == ["H4", "H5", "H6"]
+    assert comtrade["admit_unclassified_missing"] is True
 
 
 # --------------------------------------------------------------------------- registry loader (no database)

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { getBeliefs, getCoverage, getEntity, getGaps, getLocations, getObservations, getOntology, getTimeseries } from '../api/client';
@@ -12,7 +12,7 @@ import {
   type TypedValue,
   type Uncertainty,
 } from '../api/types';
-import { ContextBanner } from '../components/ContextBanner';
+import { ContextBanner, combineOrigins } from '../components/ContextBanner';
 import { DataTable } from '../components/DataTable';
 import { DefinitionPopover } from '../components/DefinitionPopover';
 import { EnvelopeDetails } from '../components/EnvelopeDetails';
@@ -21,6 +21,7 @@ import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { TimeSeriesChart, type SeriesPoint } from '../components/TimeSeriesChart';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
+import { UncertaintyLegend, glyphKindsOf } from '../components/UncertaintyGlyph';
 import { ValueView } from '../components/ValueView';
 import { computeAvailability, yearOf } from '../lib/availability';
 import { formatDateTime, humanize, sourceFlagNotes, unitLabel } from '../lib/format';
@@ -117,7 +118,16 @@ function evidenceRows(points: TimeseriesPoint[]): Row[] {
   }));
 }
 
-function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; concept: string; title: string; definition?: ConceptOut }) {
+interface ConceptPanelProps {
+  iso3: string;
+  concept: string;
+  title: string;
+  definition?: ConceptOut;
+  /** Reports the origins (live / test_fixture) of the records this panel shows. */
+  onOrigins?: (concept: string, origins: string[]) => void;
+}
+
+function ConceptPanel({ iso3, concept, title, definition, onOrigins }: ConceptPanelProps) {
   const [mode, setMode] = useState<'belief' | 'evidence'>('belief');
   const beliefs = useApi((s) => getBeliefs({ subject_id: iso3, concept, limit: 1000 }, s), [iso3, concept], mode === 'belief');
   const series = useApi((s) => getTimeseries({ subject_id: iso3, concept }, s), [iso3, concept], mode === 'evidence');
@@ -131,6 +141,19 @@ function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; conc
     return base.map((r) => (r.observationId && flagsById.get(r.observationId)?.length ? { ...r, flags: flagsById.get(r.observationId)! } : r));
   }, [mode, beliefs.data, series.data, observations.data]);
   const sorted = useMemo(() => [...rows].sort((a, b) => (a.year ?? 0) - (b.year ?? 0)), [rows]);
+  // Origins of the records actually shown: the panel envelope and the observations behind the rows.
+  const shownOrigins = useMemo(() => {
+    const o: string[] = [];
+    if (state.data?.origin && state.data.origin !== 'none') o.push(state.data.origin);
+    const shownObs = new Set(rows.map((r) => r.observationId).filter(Boolean));
+    for (const ob of observations.data?.data ?? []) if (shownObs.has(ob.id) && ob.origin) o.push(ob.origin);
+    return [...new Set(o)].sort();
+  }, [state.data, rows, observations.data]);
+  const originKey = shownOrigins.join(',');
+  useEffect(() => {
+    onOrigins?.(concept, originKey ? originKey.split(',') : []);
+  }, [onOrigins, concept, originKey]);
+  const glyphs = useMemo(() => glyphKindsOf(rows), [rows]);
   const chartPoints: SeriesPoint[] = useMemo(
     () => sorted.filter((r) => r.year !== null).map((r) => ({ x: r.year!, y: numeric(r.value) })),
     [sorted],
@@ -181,6 +204,7 @@ function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; conc
             <p className="muted">Missing (shown as gaps, not zero): {missingPeriods.join(', ')}</p>
           )}
           <TimeSeriesChart points={chartPoints} label={`${title} by year for ${iso3}; table follows`} yLabel={unitLabel(unit) || 'value'} />
+          <UncertaintyLegend present={glyphs} />
           <DataTable caption={`${title} — ${iso3} (${mode === 'belief' ? 'selected estimates' : 'latest source revisions'})`} columns={rowColumns} rows={sorted} rowKey={(r) => r.key} />
           <EnvelopeDetails meta={state.data} />
         </>
@@ -205,6 +229,21 @@ export default function CountryPage() {
     for (const c of ontology.data?.data.concepts ?? []) m.set(c.concept_id, c);
     return m;
   }, [ontology.data]);
+
+  // The entity envelope reports origin "none" (it holds no records itself); the banner shows the
+  // origin of the records the panels below actually display instead.
+  const [panelOrigins, setPanelOrigins] = useState<Record<string, string[]>>({});
+  const onOrigins = useCallback(
+    (concept: string, origins: string[]) => {
+      const k = `${iso3}|${concept}`;
+      setPanelOrigins((prev) => (prev[k]?.join(',') === origins.join(',') ? prev : { ...prev, [k]: origins }));
+    },
+    [iso3],
+  );
+  const dataOrigin = useMemo(
+    () => combineOrigins(Object.entries(panelOrigins).flatMap(([k, o]) => (k.startsWith(`${iso3}|`) ? o : []))),
+    [panelOrigins, iso3],
+  );
 
   const availability = useMemo(
     () => (entity.data ? computeAvailability(coverage.data?.data, gaps.data?.data, { [iso3]: entity.data.data.id }) : {}),
@@ -241,7 +280,7 @@ export default function CountryPage() {
         ))}
       </nav>
       <h1>{ent ? `${ent.label} (${iso3})` : `Country ${iso3}`}</h1>
-      <ContextBanner meta={entity.data} scope="Country profile" />
+      <ContextBanner meta={entity.data} scope="Country profile" dataOrigin={dataOrigin} />
       {entity.status === 'loading' && <Loading what="entity" />}
       {entity.status === 'error' && <ErrorState error={entity.error} what="The entity" onRetry={entity.reload} />}
 
@@ -330,7 +369,14 @@ export default function CountryPage() {
       )}
 
       {PROFILE_PANELS.map((p) => (
-        <ConceptPanel key={`${iso3}-${p.concept}`} iso3={iso3} concept={p.concept} title={p.title} definition={concepts.get(p.concept)} />
+        <ConceptPanel
+          key={`${iso3}-${p.concept}`}
+          iso3={iso3}
+          concept={p.concept}
+          title={p.title}
+          definition={concepts.get(p.concept)}
+          onOrigins={onOrigins}
+        />
       ))}
     </>
   );

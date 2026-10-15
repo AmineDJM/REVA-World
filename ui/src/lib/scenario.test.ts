@@ -141,4 +141,38 @@ describe('scenario spec', () => {
     const title = lines.find((l) => l.includes('scenario_title'))!;
     expect(title.startsWith('"# scenario_title: Stress =HYPERLINK(""http://evil""),=1+1 -2+cmd"')).toBe(true);
   });
+
+  it('exports the exact served decimal strings, never the display rounding', () => {
+    const results: SimResult[] = [
+      {
+        id: 'r1',
+        output_key: 'net_external_cost_change_usd',
+        subject: { id: 'e1', label: 'France' },
+        variant: 'L1',
+        value: { kind: 'decimal', value: '57082396439.600717', unit_ref: 'unit.usd', basis: {} },
+        uncertainty: { status: 'unquantified', kind: 'unknown' },
+        applicability: {},
+      },
+      {
+        id: 'r2',
+        output_key: 'exposure_percent_baseline_gdp',
+        subject: { id: 'e1', label: 'France' },
+        variant: 'L1',
+        value: { kind: 'decimal', value: '1.987654321987', unit_ref: 'unit.percent_of_baseline_gdp', basis: {} },
+        uncertainty: { status: 'unquantified', kind: 'unknown' },
+        applicability: {},
+      },
+    ];
+    const ctx = {
+      simulation_id: 's', scenario_id: 'c', scenario_title: 'T', baseline_release_id: REAL, baseline_release_sequence: 1,
+      knowledge_cutoff: '2026-10-14T20:00:00Z', model_versions: ['m@1'], fidelity: 'L1', assumptions: [], origin: 'test_fixture',
+    };
+    const csv = resultsToCsv(ctx, results);
+    expect(csv).toContain('France,net_external_cost_change_usd,L1,57082396439.600717,unit.usd,');
+    expect(csv).toContain('France,exposure_percent_baseline_gdp,L1,1.987654321987,unit.percent_of_baseline_gdp,');
+    expect(csv).not.toMatch(/57,082|439\.60[^0]|1\.9877/);
+    const json = JSON.parse(resultsToJson(ctx, results));
+    expect(json.results[0].value.value).toBe('57082396439.600717');
+    expect(json.results[1].value.value).toBe('1.987654321987');
+  });
 });

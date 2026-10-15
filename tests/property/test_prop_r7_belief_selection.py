@@ -107,9 +107,6 @@ def _two_retracted_lineages() -> tuple[list[dict[str, Any]], dict[str, list[str]
     return rows, {"c": ["src.a", "src.b"]}
 
 
-@pytest.mark.xfail(strict=True, reason="R7-B1: retracted-lineage alternatives and their "
-                   "'retracted_lineage_excluded:*' flags are emitted in input-row order, so the stored "
-                   "estimate (and release manifest bytes) depend on SQL row order")
 @PURE
 @given(candidate_rows(), st.randoms(use_true_random=False))
 @example(_two_retracted_lineages(), random.Random(0))

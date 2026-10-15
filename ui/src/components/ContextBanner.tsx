@@ -1,4 +1,4 @@
-import type { EnvelopeMeta } from '../api/types';
+import type { EnvelopeMeta, OriginLabel } from '../api/types';
 import { contextModeLabel, formatDateTime, modalityLabel, shortId, validTimeLabel } from '../lib/format';
 
 export type BannerMeta = Partial<EnvelopeMeta> | null | undefined;
@@ -11,7 +11,42 @@ export interface ContextBannerProps {
   referenceTime?: string;
   /** Label for what this context describes, e.g. "Country profile". */
   scope?: string;
+  /**
+   * Origin of the records actually shown on the page (observations / estimates). Used when the
+   * envelope itself reports `origin: none` (e.g. the entity endpoint, which holds no records of
+   * its own), so the banner never says "no records" next to fixture data.
+   */
+  dataOrigin?: OriginLabel | null;
 }
+
+/** Combine record origins: all live, all test_fixture, both (mixed) or none. */
+export function combineOrigins(origins: Iterable<string | null | undefined>): OriginLabel {
+  let live = false;
+  let fixture = false;
+  for (const o of origins) {
+    if (o === 'live') live = true;
+    else if (o === 'test_fixture') fixture = true;
+    else if (o === 'mixed') live = fixture = true;
+  }
+  if (live && fixture) return 'mixed';
+  if (fixture) return 'test_fixture';
+  if (live) return 'live';
+  return 'none';
+}
+
+/** The origin to display and whether it was derived from the page's data rather than the envelope. */
+export function displayOrigin(meta: BannerMeta, dataOrigin?: OriginLabel | null): { origin: OriginLabel | null; derived: boolean } {
+  const own = meta?.origin ?? null;
+  if ((own === null || own === 'none') && dataOrigin && dataOrigin !== 'none') return { origin: dataOrigin, derived: true };
+  return { origin: own, derived: false };
+}
+
+const ORIGIN_TEXT: Record<OriginLabel, string> = {
+  live: 'live',
+  test_fixture: 'test fixture',
+  mixed: 'mixed (live and test fixture)',
+  none: 'no records',
+};
 
 export function isSimulationContext(meta: BannerMeta, forced = false): boolean {
   return forced || meta?.context_mode === 'simulation' || meta?.modality === 'assumption_conditioned_scenario';
@@ -38,9 +73,10 @@ const CUTOFF_BASIS_LABEL: Record<string, string> = {
  * cutoff. Simulation contexts get a persistent red banner; fixture-origin data
  * gets a visible TEST FIXTURE DATA label.
  */
-export function ContextBanner({ meta, simulation = false, referenceTime, scope }: ContextBannerProps) {
+export function ContextBanner({ meta, simulation = false, referenceTime, scope, dataOrigin }: ContextBannerProps) {
   const sim = isSimulationContext(meta, simulation);
-  const fixture = isFixtureOrigin(meta);
+  const origin = displayOrigin(meta, dataOrigin);
+  const fixture = isFixtureOrigin(meta) || origin.origin === 'test_fixture' || origin.origin === 'mixed';
   const release = meta?.baseline_release;
   const cutoff = meta?.knowledge_cutoff ?? release?.knowledge_cutoff ?? null;
   const vt = referenceTime ?? (meta?.valid_time ? validTimeLabel(meta.valid_time) : 'not stated');
@@ -56,7 +92,7 @@ export function ContextBanner({ meta, simulation = false, referenceTime, scope }
       {fixture && (
         <p className="fixture-flag" data-testid="fixture-label">
           <strong>TEST FIXTURE DATA</strong>
-          {meta?.origin === 'mixed' ? ' — some records come from captured test fixtures' : ' — captured fixture records, not a live acquisition'}
+          {origin.origin === 'mixed' ? ' — some records come from captured test fixtures' : ' — captured fixture records, not a live acquisition'}
         </p>
       )}
       <dl className="context-fields">
@@ -107,10 +143,16 @@ export function ContextBanner({ meta, simulation = false, referenceTime, scope }
             </dd>
           </div>
         )}
-        {meta?.origin && (
+        {origin.origin && (
           <div>
             <dt>Origin</dt>
-            <dd>{meta.origin === 'none' ? 'no records' : meta.origin.replace('_', ' ')}</dd>
+            <dd data-testid="banner-origin" data-origin={origin.origin} data-origin-derived={origin.derived ? 'true' : 'false'}>
+              {ORIGIN_TEXT[origin.origin] ?? String(origin.origin).replace(/_/g, ' ')}
+              {origin.derived && <span className="muted"> (of the records shown on this page)</span>}
+              {!origin.derived && origin.origin === 'none' && fixture && release?.origin === 'test_fixture' && (
+                <span className="muted"> (none shown here; baseline release is a test fixture)</span>
+              )}
+            </dd>
           </div>
         )}
       </dl>

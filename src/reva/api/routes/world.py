@@ -147,6 +147,14 @@ def get_entity(entity_ref: str, request: Request) -> s.EntityDetailResponse:
                     {"i": eid, "r": latest["id"]}).mappings():
                 comps.append(s.EntityComponent(component="estimates", concept_id=r["concept_id"], count=r["n"],
                                                first_period=r["first"], last_period=r["last"]))
+        # Origin of the data this entity actually has: acquisitions behind its observations, plus the
+        # release its listed estimates come from. Registry metadata alone has no origin ("none").
+        origins = set(conn.execute(text(
+            """SELECT DISTINCT a.origin FROM evidence.observation o
+               JOIN evidence.acquisition a ON a.id = o.acquisition_id WHERE o.subject_id = :i"""),
+            {"i": eid}).scalars())
+        if latest and any(c.component == "estimates" for c in comps):
+            origins.add(latest["origin"])
         n_geo = conn.execute(text("SELECT count(*) FROM world.display_geometry WHERE entity_id = :i"),
                              {"i": eid}).scalar_one()
         if n_geo:
@@ -175,8 +183,10 @@ def get_entity(entity_ref: str, request: Request) -> s.EntityDetailResponse:
                     mode="simulation", context_id=r["context_id"], origin=r["origin"],
                     knowledge_cutoff=r["knowledge_cutoff"], description=f"Scenario {r['id']}: {r['title']}"))
     detail = s.EntityDetail(**dict(ent), aliases=aliases, components=comps, supported_contexts=contexts)
-    return s.EntityDetailResponse(data=detail, context_mode="registry", origin="none", modality="metadata",
-                                  baseline_release=release_ref(latest), cost=t.cost(len(comps)))
+    org = origin_of(origins)
+    return s.EntityDetailResponse(data=detail, context_mode="registry", origin=org,  # type: ignore[arg-type]
+                                  modality="metadata", baseline_release=release_ref(latest),
+                                  warnings=origin_warnings(org), cost=t.cost(len(comps)))
 
 
 # ---------------------------------------------------------------------------

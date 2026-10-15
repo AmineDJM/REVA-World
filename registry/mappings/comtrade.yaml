@@ -6,20 +6,28 @@
 # legacyEstimationFlag coding (quantity/weight, never the value); values,
 # concepts and logical keys unchanged, so the mappings below are unchanged.
 connector: {name: un.comtrade.public_exact, version: "1.2.0"}
+# Eligibility scope (R5-11): years are {from, to} (inclusive) or {in: [...]};
+# classifications list the reviewed HS editions. admit_unclassified_missing
+# admits a typed-Missing record that reports no classification (the provider
+# returned no rows), so DZA's absent flows stay visible as Missing; a value
+# reported under an unreviewed edition (e.g. H3) or a value without a
+# classification is ineligible.
 mappings:
   - mapping_key: comtrade.2709.M.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: 0, field: primaryValue}
     target: {concept_id: trade.hs2709.import_value.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6],
+                    admit_unclassified_missing: true}
     eligibility: eligible
   - mapping_key: comtrade.2709.X.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: 0, field: primaryValue}
     target: {concept_id: trade.hs2709.export_value.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6],
+                    admit_unclassified_missing: true}
     eligibility: eligible
   - mapping_key: comtrade.2709.M.bilateral
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: "*", field: primaryValue}

@@ -13,6 +13,7 @@ from reva.api import schemas as s
 from reva.api.auth import require_scope
 from reva.api.deps import (
     Timer,
+    bounded_source_flags,
     decode_cursor,
     freshness,
     link,
@@ -212,6 +213,7 @@ def timeseries_response(
         skipped_total += skipped
         heads.append(head)
         temporal = head["temporal_extent"] or {}
+        flags, flags_cut = bounded_source_flags(head["source_flags"])
         points.append(s.TimeseriesPoint(
             period_label=temporal.get("label") or temporal.get("start"), valid_start=temporal.get("start"),
             valid_end=temporal.get("end"), temporal_kind=temporal.get("kind", "unknown"),
@@ -219,7 +221,8 @@ def timeseries_response(
             logical_key=head["logical_key"], observation_id=head["id"], revision_no=head["revision_no"],
             value=head["value"], uncertainty=head["uncertainty"], recorded_at=head["recorded_at"],
             retrieved_at=head["retrieved_at"], source_published_at=head["source_published_at"],
-            origin=head["origin"], retracted_revisions_skipped=skipped,
+            origin=head["origin"], source_flags=flags, source_flags_truncated=flags_cut,
+            retracted_revisions_skipped=skipped,
             revisions=[s.RevisionEntry(observation_id=r["id"], revision_no=r["revision_no"], value=r["value"],
                                        source_revision_id=r["source_revision_id"], retrieved_at=r["retrieved_at"],
                                        recorded_at=r["recorded_at"], source_published_at=r["source_published_at"],

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareDecimalStrings, formatDecimalString, isQuantityConcept, pointInRange, sourceFlagNotes } from './format';
+import { compareDecimalStrings, displayDecimal, formatDecimalString, isQuantityConcept, valueToText, pointInRange, sourceFlagNotes } from './format';
 
 describe('formatDecimalString', () => {
   it('keeps the rounding carry into the integer part', () => {
@@ -95,5 +95,36 @@ describe('compareDecimalStrings / pointInRange', () => {
     expect(pointInRange('5', '1', '9')).toBe('inside');
     expect(pointInRange('3', '3', '3')).toBe('degenerate');
     expect(pointInRange('10', '1', '9')).toBe('outside');
+  });
+});
+
+describe('displayDecimal (display precision; exact string untouched)', () => {
+  it('shows US$ to the cent and flags the rounding', () => {
+    const d = displayDecimal('57082396439.600717', 'unit.usd');
+    expect(d).toEqual({ text: '57,082,396,439.60', exact: '57082396439.600717', rounded: true });
+    expect(displayDecimal('-12.345', 'unit.usd').text).toBe('−12.35');
+    expect(displayDecimal('0.004', 'unit.usd')).toEqual({ text: '0.00', exact: '0.004', rounded: true });
+    expect(displayDecimal('1999.999', 'unit.usd').text).toBe('2,000.00');
+  });
+
+  it('keeps integers and short fractions exact (nothing to expand)', () => {
+    expect(displayDecimal('5564', 'unit.usd')).toEqual({ text: '5,564', exact: '5564', rounded: false });
+    expect(displayDecimal('1.5', 'unit.usd')).toEqual({ text: '1.50', exact: '1.5', rounded: false });
+    expect(displayDecimal('1.2300000', 'unit.usd').rounded).toBe(false);
+  });
+
+  it('shows percent of GDP to 4 decimals', () => {
+    expect(displayDecimal('0.123456789', 'unit.percent_of_baseline_gdp')).toEqual({ text: '0.1235', exact: '0.123456789', rounded: true });
+    expect(displayDecimal('-1.20004', 'unit.percent_of_baseline_gdp').text).toBe('−1.2');
+    expect(displayDecimal('2.5', 'unit.percent').rounded).toBe(false);
+  });
+
+  it('keeps up to 6 decimals for other units', () => {
+    expect(displayDecimal('0.1234567', 'unit.ratio').text).toBe('0.123457');
+    expect(displayDecimal('68000000', 'unit.persons').text).toBe('68,000,000');
+  });
+
+  it('uses the same display precision in plain-text renderings', () => {
+    expect(valueToText({ kind: 'decimal', value: '57082396439.600717', unit_ref: 'unit.usd', basis: {} })).toBe('57,082,396,439.60 US$');
   });
 });

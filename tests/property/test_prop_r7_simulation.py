@@ -185,8 +185,6 @@ def test_missing_value_dict_becomes_missing_input(reason: MissingReason) -> None
         ce.validate_country_inputs(ci, reference_year=YEAR)
 
 
-@pytest.mark.xfail(strict=True, reason="R7-S1: exposure_l1/exposure_l2 called with a kernel Missing (or None) "
-                   "raise validation_error ('must be numeric (got Missing)') instead of missing_input")
 @FEW
 @given(st.sampled_from(list(MissingReason)), st.sampled_from(["M", "X", "G"]))
 @example(MissingReason.not_collected, "M")
@@ -355,13 +353,21 @@ def test_result_values_are_decimal_strings_without_floats(sc: Any) -> None:
 
 
 # --------------------------------------------------------------------------- rng
-@pytest.mark.xfail(strict=True, reason="R7-S2: rng stream names join (model_id, entity_id) with an unescaped "
-                   "U+001F, so distinct names can share one random stream")
 @FEW
 @given(st.text(max_size=4), st.text(max_size=4), st.text(max_size=4), st.integers(0, 2**32))
 @example("a", "b", "c", 0)
 def test_rng_stream_names_are_injective(a: str, b: str, c: str, seed: int) -> None:
     assert rng.stream_key(seed, f"{a}\x1f{b}", c, 0) != rng.stream_key(seed, a, f"{b}\x1f{c}", 0)
+
+
+@pytest.mark.parametrize(("args", "key"), [
+    ((7, "economic.crude_exposure", "FRA", 0), "6c829630437ee667e71268b31101765287f6c6b438aa56337beae86b8273f3c0"),
+    ((0, "", " ", 3), "5f9f8dd00d5fe4861ccaffe6a3716e4ac9487627ca9a9243b623613f8e129989"),
+    ((123, "économie", "日本", 1), "6cad2dd89121af279fe88c92b427571b7d72c0e77d954ce3cbbbec51ca9863b4"),
+])
+def test_rng_ordinary_names_keep_their_pre_escaping_stream_keys(args: tuple[Any, ...], key: str) -> None:
+    # Pinned before the R7-S2 escaping fix: names without '\\' or U+001F are unaffected by it.
+    assert rng.stream_key(*args) == key
 
 
 @FEW

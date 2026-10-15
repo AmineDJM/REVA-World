@@ -993,3 +993,113 @@ def test_every_envelope_states_its_knowledge_cutoff(env: Env) -> None:
     if sc["data"]:
         s1 = env.client.get(f"/v1/scenarios/{sc['data'][0]['id']}").json()
         assert s1["knowledge_cutoff"] and s1["knowledge_cutoff_basis"] == "scenario_cutoff"
+
+
+# ---------------------------------------------------------------------------
+# R7 (ui_check.md backend requests): provider flags inline, scenario valid time, derived entity origin
+# ---------------------------------------------------------------------------
+
+CRUDE_M_WEIGHT = "trade.hs2709.import_net_weight.world_total"
+
+
+def _stored_flags(env: Env, observation_id: str) -> dict[str, Any]:
+    with env.owner.connect() as c:
+        return c.execute(text("SELECT source_flags FROM evidence.observation WHERE id = :i"),
+                         {"i": observation_id}).scalar_one()  # type: ignore[no-any-return]
+
+
+def test_r7_beliefs_carry_selected_observation_source_flags(env: Env) -> None:
+    r = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "subject_id": "CHN",
+                                              "concept": CRUDE_M, "period": 2023})
+    assert r.status_code == 200, r.text
+    est = r.json()["data"][0]
+    flags = est["source_flags"]
+    assert est["observation_id"] and est["source_flags_truncated"] is False
+    # Exactly the flags stored on the selected observation (no extra /v1/observations call needed) ...
+    assert flags == _stored_flags(env, est["observation_id"])
+    # ... including the Comtrade 1.2.0 interpretation (value estimation undeterminable = null) and raw flags.
+    assert "provider_value_estimated" in flags and flags["provider_value_estimated"] is None
+    assert {"isReported", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated"} <= set(flags)
+    # Same as the observation endpoint shows for that record.
+    obs = env.client.get("/v1/observations", params={"subject_id": "CHN", "concept": CRUDE_M,
+                                                     "period_start": 2023, "period_end": 2023}).json()["data"]
+    assert next(o for o in obs if o["id"] == est["observation_id"])["source_flags"] == flags
+    pop = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP, "period": 2023}).json()
+    assert {"indicator", "obs_status"} <= set(pop["data"][0]["source_flags"])
+    # The QuerySpec path shares the serializer.
+    q = env.client.post("/v1/query", json={"kind": "beliefs", "release_id": str(env.r1.release_id),
+                                            "subject_ids": [est["subject"]["id"]], "concepts": [CRUDE_M]})
+    assert q.status_code == 200, q.text
+    assert all("source_flags" in d for d in q.json()["data"])
+
+
+def test_r7_timeseries_points_carry_source_flags(env: Env) -> None:
+    r = env.client.get("/v1/timeseries", params={"subject_id": "CHN", "concept": CRUDE_M_WEIGHT})
+    assert r.status_code == 200, r.text
+    pts = r.json()["data"]["points"]
+    assert pts
+    for p in pts:
+        assert p["source_flags"] == _stored_flags(env, p["observation_id"])
+        assert "provider_quantity_estimated" in p["source_flags"] and p["source_flags_truncated"] is False
+    # A revised lineage reports the flags of the point's own (latest non-retracted) revision.
+    dza = env.client.get("/v1/timeseries", params={"subject_id": "DZA", "concept": POP}).json()["data"]["points"]
+    p23 = next(p for p in dza if p["period_label"].startswith("2023"))
+    assert p23["revision_no"] == 2 and p23["source_flags"] == _stored_flags(env, p23["observation_id"])
+
+
+def test_r7_source_flags_are_bounded() -> None:
+    from reva.api.deps import MAX_FLAG_BYTES, MAX_FLAG_KEYS, MAX_FLAG_STR_CHARS, bounded_source_flags
+
+    assert bounded_source_flags(None) == (None, False)
+    assert bounded_source_flags(["not", "a", "dict"]) == (None, False)
+    small = {"isReported": False, "legacyEstimationFlag": 6, "provider_value_estimated": None,
+             "categories": {"geo": "FR", "unit": "THS_T"}}
+    assert bounded_source_flags(small) == (small, False)
+    big: dict[str, Any] = {f"k{i:03d}": "x" * 50 for i in range(200)}
+    big.update(provider_quantity_estimated=True, provider_value_estimated=None, long="y" * 5000,
+               deep={"a": {"b": {"c": 1}}, "ok": 1}, lst=list(range(100)))
+    out, cut = bounded_source_flags(big)
+    assert cut and out is not None
+    assert len(out) <= MAX_FLAG_KEYS and len(json.dumps(out)) <= MAX_FLAG_BYTES
+    # Estimation flags survive the bound.
+    assert out["provider_quantity_estimated"] is True and out["provider_value_estimated"] is None
+    deep, _ = bounded_source_flags({"deep": {"a": {"b": 1}, "ok": 1}, "long": "y" * 5000, "lst": list(range(100))})
+    assert deep == {"deep": {"ok": 1}, "long": "y" * MAX_FLAG_STR_CHARS, "lst": list(range(20))}
+
+
+def test_r7_simulation_and_scenario_valid_time_is_reference_year(env: Env) -> None:
+    from reva.api.routes.sim import scenario_valid_time
+
+    year = json.loads(EXAMPLE.read_text())["reference_year"]
+    want = {"start": f"{year}-01-01T00:00:00Z", "end": f"{year + 1}-01-01T00:00:00Z", "bounds": "[)",
+            "basis": "scenario_reference_year", "reference_year": year}
+    sid = env.client.post("/v1/scenarios", json=_scenario(env, title="r7 valid time")).json()["scenario_id"]
+    assert env.client.get(f"/v1/scenarios/{sid}").json()["valid_time"] == want
+    acc = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L0"},
+                          headers={"Idempotency-Key": f"r7-vt-{uuid.uuid4()}"})
+    assert acc.status_code == 202, acc.text
+    st = env.client.get(f"/v1/simulations/{acc.json()['job_id']}").json()
+    assert st["valid_time"] == want
+    assert scenario_valid_time({}) is None and scenario_valid_time({"reference_year": "2023"}) is None
+    assert scenario_valid_time({"reference_year": True}) is None
+
+
+def test_r7_entity_origin_is_derived_from_its_data(env: Env) -> None:
+    d = env.client.get("/v1/entities/FRA").json()
+    # Fixture-only instance: the entity's observations and estimates are all test_fixture.
+    assert d["origin"] == "test_fixture"
+    assert any(w["code"] == "fixture_data" for w in d["warnings"])
+    with env.owner.connect() as c:
+        bare = c.execute(text(
+            """SELECT e.id FROM world.entity e WHERE NOT EXISTS (
+                 SELECT 1 FROM evidence.observation o WHERE o.subject_id = e.id)
+               AND NOT EXISTS (SELECT 1 FROM belief.estimate b WHERE b.subject_id = e.id) LIMIT 1""")
+        ).scalar_one_or_none()
+    if bare is not None:
+        b = env.client.get(f"/v1/entities/{bare}").json()
+        assert b["origin"] == "none" and not any(w["code"] == "fixture_data" for w in b["warnings"])
+    # Never claims live: no live acquisition exists in this database.
+    with env.owner.connect() as c:
+        assert not c.execute(text("SELECT count(*) FROM evidence.acquisition WHERE origin = 'live'")).scalar_one()
+    for iso3 in ("DZA", "CHN", "USA"):
+        assert env.client.get(f"/v1/entities/{iso3}").json()["origin"] == "test_fixture"

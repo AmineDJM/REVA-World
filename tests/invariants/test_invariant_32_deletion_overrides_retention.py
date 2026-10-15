@@ -2,7 +2,7 @@
 
 V1 cannot store restricted data at all (``artifact_v1_public_only``). The
 append-only machinery that protects scientific records (``meta.reject_mutation``)
-has an explicit, reviewed deletion path: a member of ``reva_restricted_deletion``
+has an explicit, reviewed deletion path: ``SET ROLE reva_restricted_deletion``
 holding a reviewed deletion ticket can delete an immutable row, so retention
 can never make a required deletion impossible. Runtime roles can never use that
 path (``tests/security/test_roles_grants.py::test_deletion_ticket_does_not_help_runtime_roles``).
@@ -50,7 +50,7 @@ def test_restricted_privacy_classes_cannot_be_stored_in_v1(db) -> None:
 def test_reviewed_deletion_ticket_can_delete_an_immutable_record(db) -> None:
     with db.owner.connect() as conn:
         member = conn.execute(
-            text("SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'MEMBER')")
+            text("SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'SET')")
         ).scalar_one()
     if not member:
         pytest.skip("migration owner is not a member of reva_restricted_deletion in this cluster")
@@ -63,7 +63,14 @@ def test_reviewed_deletion_ticket_can_delete_an_immutable_record(db) -> None:
                 conn.execute(text("DELETE FROM meta.artifact WHERE sha256 = :s"), {"s": sha})
             sp.rollback()
             conn.execute(text("SELECT set_config('reva.reviewed_deletion_ticket', 'INV32-REVIEWED', true)"))
+            # (R5-10) a ticket alone is not enough: the reviewed path is an explicit SET ROLE
+            sp = conn.begin_nested()
+            with pytest.raises(DBAPIError, match="Immutable scientific record"):
+                conn.execute(text("DELETE FROM meta.artifact WHERE sha256 = :s"), {"s": sha})
+            sp.rollback()
+            conn.execute(text("SET LOCAL ROLE reva_restricted_deletion"))
             deleted = conn.execute(text("DELETE FROM meta.artifact WHERE sha256 = :s"), {"s": sha}).rowcount
+            conn.execute(text("RESET ROLE"))
             assert deleted == 1
             # the ticket permits DELETE only; an in-place UPDATE is still refused
             sha2 = _insert_artifact(conn)

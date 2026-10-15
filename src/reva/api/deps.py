@@ -227,6 +227,85 @@ def valid_window(temporals: Iterable[dict[str, Any] | None]) -> dict[str, Any] |
     return {"start": min(starts), "end": max(ends)}
 
 
+MAX_FLAG_KEYS = 40
+MAX_FLAG_NESTED_ITEMS = 20
+MAX_FLAG_KEY_CHARS = 64
+MAX_FLAG_STR_CHARS = 200
+MAX_FLAG_BYTES = 4096
+# Interpreted provider-estimation flags first, so they survive any key-count or byte bound.
+PRIORITY_FLAG_KEYS = ("provider_value_estimated", "provider_quantity_estimated", "provider_estimation_flagged",
+                      "legacy_estimation_code_unrecognised", "valuation_warning", "isReported",
+                      "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated", "obs_status")
+
+
+def _flag_scalar(v: Any) -> tuple[Any, bool]:
+    """A JSON scalar kept as stored (strings capped); anything else is dropped (marked truncated)."""
+    if v is None or isinstance(v, bool | int | float):
+        return v, False
+    if isinstance(v, str):
+        return (v, False) if len(v) <= MAX_FLAG_STR_CHARS else (v[:MAX_FLAG_STR_CHARS], True)
+    return None, True
+
+
+def bounded_source_flags(flags: Any) -> tuple[dict[str, Any] | None, bool]:
+    """Provider ``source_flags`` as stored on an observation, bounded for embedding in list responses.
+
+    Returns ``(flags, truncated)``. Flags are the small provider/connector markers kept beside a value
+    (e.g. Comtrade ``isReported``/``legacyEstimationFlag`` and the 1.2.0 ``provider_value_estimated`` /
+    ``provider_quantity_estimated``); raw payloads are never stored there. The bound still applies so one
+    pathological record cannot inflate a page: at most ``MAX_FLAG_KEYS`` keys (estimation flags first), scalar
+    values, one level of nested scalars (``MAX_FLAG_NESTED_ITEMS`` items), strings capped at
+    ``MAX_FLAG_STR_CHARS`` and about ``MAX_FLAG_BYTES`` of JSON. Anything cut sets ``truncated``; the full
+    record stays available from ``/v1/observations``.
+    """
+    if not isinstance(flags, dict):
+        return None, False
+    keys = [k for k in PRIORITY_FLAG_KEYS if k in flags] + [k for k in flags if k not in PRIORITY_FLAG_KEYS]
+    out: dict[str, Any] = {}
+    truncated = False
+    size = 2
+    for k in keys:
+        if len(out) >= MAX_FLAG_KEYS:
+            truncated = True
+            break
+        v = flags[k]
+        key = str(k)
+        if len(key) > MAX_FLAG_KEY_CHARS:
+            key, truncated = key[:MAX_FLAG_KEY_CHARS], True
+        if isinstance(v, dict):
+            val: Any = {}
+            for i, (nk, nv) in enumerate(v.items()):
+                if i >= MAX_FLAG_NESTED_ITEMS:
+                    truncated = True
+                    break
+                sv, cut = _flag_scalar(nv)
+                truncated |= cut
+                if not (cut and sv is None):
+                    val[str(nk)[:MAX_FLAG_KEY_CHARS]] = sv
+        elif isinstance(v, list):
+            val = []
+            for i, nv in enumerate(v):
+                if i >= MAX_FLAG_NESTED_ITEMS:
+                    truncated = True
+                    break
+                sv, cut = _flag_scalar(nv)
+                truncated |= cut
+                if not (cut and sv is None):
+                    val.append(sv)
+        else:
+            val, cut = _flag_scalar(v)
+            truncated |= cut
+            if cut and val is None:
+                continue
+        item = len(json.dumps({key: val}, default=str))
+        if size + item > MAX_FLAG_BYTES:
+            truncated = True
+            continue
+        out[key] = val
+        size += item
+    return out, truncated
+
+
 def link(kind: str, ident: Any) -> s.ProvenanceLink:
     return s.ProvenanceLink(kind=kind, id=str(ident), href=f"/v1/provenance/{kind}/{ident}")  # type: ignore[arg-type]
 
