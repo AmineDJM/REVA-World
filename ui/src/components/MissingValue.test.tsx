@@ -44,9 +44,10 @@ describe('ValueView', () => {
     expect(container.textContent).not.toContain('missing');
   });
 
-  it('formats decimal strings without float loss', () => {
-    render(<ValueView value={{ kind: 'decimal', value: '68210345678.123456', unit_ref: 'unit.usd', basis: { valuation: 'CIF' } }} showBasis />);
-    expect(screen.getByText('68,210,345,678.123456')).toBeInTheDocument();
+  it('formats decimal strings without float loss (US$ shown to the cent, exact string kept)', () => {
+    const { container } = render(<ValueView value={{ kind: 'decimal', value: '68210345678.123456', unit_ref: 'unit.usd', basis: { valuation: 'CIF' } }} showBasis />);
+    expect(screen.getByText('68,210,345,678.12')).toBeInTheDocument();
+    expect(container.querySelector('[data-exact]')?.getAttribute('data-exact')).toBe('68210345678.123456');
     expect(screen.getByText(/CIF/)).toBeInTheDocument();
   });
 });

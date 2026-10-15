@@ -4,7 +4,8 @@ The normative contract is the generated OpenAPI document
 [`contracts/openapi.json`](../contracts/openapi.json) (regenerate with
 `uv run python scripts/export_contracts.py`; CI checks it parses as OpenAPI 3.x
 via `scripts/validate_contracts.py`). The running service also serves it at
-`/openapi.json`; the interactive `/docs` page exists only outside production.
+`/openapi.json` (in production it requires the `read` scope); the interactive
+`/docs` page exists only outside production.
 This page is an orientation only.
 
 ## Conventions
@@ -21,7 +22,11 @@ This page is an orientation only.
   CSRF cookie; cookie-authenticated unsafe methods need the matching
   `X-CSRF-Token` header. Logout is recorded server-side, so a copied cookie stays
   invalid. Scoped, revocable Bearer API tokens (only their SHA-256 is stored) are
-  the alternative. Nothing is stored in browser localStorage.
+  the alternative. Nothing is stored in browser localStorage. Logging in again
+  revokes the session cookie presented with the request, and changing
+  `REVA_ADMIN_PASSWORD_HASH` ends every existing session.
+* Request bodies are limited to 1 MiB (413 `payload_too_large`), checked before
+  authentication and rate limiting. `REVA_CORS_ORIGINS=*` is refused at startup.
 * Scopes: `read` (every `/v1` read and `/metrics`), `simulate` (scenarios,
   simulations, replay, evaluations), `ingest` (discovery), `review` (proposal
   reviews; additionally the principal must be the session or a `human:<name>`
