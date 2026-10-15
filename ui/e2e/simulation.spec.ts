@@ -96,7 +96,23 @@ test('L1 FRA/CHN/USA run completes with results, persistent SIMULATION banner an
   // Stress test, not a forecast and not GDP loss: on the banner and in the result's own limits statement.
   await expect(page.getByTestId('simulation-screen-banner')).toContainText(/stress test.*not observations or forecasts.*GDP loss/);
   await expect(page.getByTestId('result-limits')).toContainText(/not a GDP loss/);
-  await expect(banner).toContainText('2023 (scenario reference year');
+  // The API now serves the reference-year interval as valid_time; the UI label is only a fallback.
+  await expect(banner).toContainText(/\[2023-01-01[^,]*, 2024-01-01[^)]*\)|2023 \(scenario reference year/);
+
+  // Display precision: US$ to the cent with a compact magnitude; the exact served string on expand.
+  const fraRow = table.getByRole('row').filter({ has: page.getByRole('rowheader', { name: 'France' }) }).filter({ hasText: 'Import value change' });
+  const l1Cell = fraRow.getByRole('cell').nth(1);
+  const exact: string = fraImport.value.value;
+  const [intPart, frac = ''] = exact.replace(/^-/, '').split('.');
+  const shown = (await l1Cell.locator('.num').first().innerText()).trim();
+  expect(shown.replace(/[,−-]/g, '').startsWith(intPart!)).toBe(true);
+  expect(shown.split('.')[1]?.length ?? 0, 'at most cents').toBeLessThanOrEqual(2);
+  await expect(l1Cell).toContainText(/(billion|million|trillion) US\$/);
+  if (frac.replace(/0+$/, '').length > 2) {
+    await l1Cell.getByRole('button', { name: 'Show exact value' }).click();
+    await expect(l1Cell.getByTestId('exact-value')).toHaveText(`= ${exact}`);
+  }
+  await expect(page.getByTestId('uncertainty-legend').first()).toContainText('Ribbon = assumption sensitivity range');
 
   // The screen banner stays visible while scrolling through results.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));

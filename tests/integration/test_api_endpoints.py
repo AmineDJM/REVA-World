@@ -1041,10 +1041,14 @@ def test_r7_timeseries_points_carry_source_flags(env: Env) -> None:
     for p in pts:
         assert p["source_flags"] == _stored_flags(env, p["observation_id"])
         assert "provider_quantity_estimated" in p["source_flags"] and p["source_flags_truncated"] is False
-    # A revised lineage reports the flags of the point's own (latest non-retracted) revision.
-    dza = env.client.get("/v1/timeseries", params={"subject_id": "DZA", "concept": POP}).json()["data"]["points"]
+    # A revised lineage reports the flags of the point's own selected revision (test_r2_04 may have retracted
+    # revision 2 earlier in the module, so the revision number is not fixed here).
+    dza = env.client.get("/v1/timeseries", params={"subject_id": "DZA", "concept": POP,
+                                                   "revisions": "all"}).json()["data"]["points"]
     p23 = next(p for p in dza if p["period_label"].startswith("2023"))
-    assert p23["revision_no"] == 2 and p23["source_flags"] == _stored_flags(env, p23["observation_id"])
+    assert len(p23["revisions"]) == 2
+    assert p23["source_flags"] == _stored_flags(env, p23["observation_id"])
+    assert p23["source_flags"]["indicator"] == "SP.POP.TOTL"
 
 
 def test_r7_source_flags_are_bounded() -> None:

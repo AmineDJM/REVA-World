@@ -20,7 +20,7 @@ removed.
 
 Nothing under `src/` was edited. The patches below are proposals for the code owners.
 
-### R7-K1 (kernel, low): aware datetimes at the calendar edge raise `OverflowError`
+### R7-K1 (kernel, low): aware datetimes at the calendar edge raise `OverflowError` — FIXED (kernel/ids.py)
 `canonical_bytes(datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=5))))` raises
 `OverflowError: date value out of range` from `astimezone(UTC)`. The same happens for `9999-12-31T23:00-05:00`.
 Every other unsupported input raises `ValueError`/`TypeError`, so callers that map `ValueError` to a 422 answer

@@ -50,14 +50,58 @@ test('DZA crude imports are shown as missing with a reason, never as 0', async (
   const summary = crude.getByText(/Missing \(shown as gaps, not zero\)/);
   for (const e of missing) await expect(summary).toContainText(String(e.support.period_label));
 
-  // A reported DZA value that the provider flags as estimated / not directly reported says so.
+  // Provider flags (Comtrade 1.2.0): a value is called a provider estimate only when
+  // provider_value_estimated === true. legacyEstimationFlag codes quantity/net weight, never the
+  // USD value, so the 2024 row (legacyEstimationFlag 6, isReported=false) must not be called an estimate.
   const obs = await apiGet(page.request, `/v1/observations?subject_id=DZA&concept=${CRUDE_M}&limit=1000`);
-  const flagged = (obs.data as any[]).filter((o) => o.value.kind !== 'missing' && o.source_flags?.provider_estimation_flagged === true);
-  for (const o of flagged) {
+  const reported = (obs.data as any[]).filter((o) => o.value.kind !== 'missing' && !o.superseded_by_id);
+  expect(reported.length, 'DZA has at least one reported crude-import value').toBeGreaterThan(0);
+  for (const o of reported) {
     const period = String(o.support.period_label ?? o.support.temporal?.label);
     const row = crude.getByRole('row').filter({ has: page.getByRole('rowheader', { name: period, exact: true }) });
-    await expect(row.getByTestId('source-flag'), `${period} carries the provider estimation flag`).toContainText('provider estimate');
+    if (!(await row.count())) continue;
+    const f = o.source_flags ?? {};
+    if (f.provider_value_estimated === true) {
+      await expect(row.getByTestId('source-flag'), `${period} carries the provider value-estimate flag`).toContainText('provider estimate');
+    } else {
+      await expect(row, `${period}: legacyEstimationFlag ${f.legacyEstimationFlag} is not a value estimate`).not.toContainText('provider estimate');
+      if (f.isReported === false) await expect(row.getByTestId('source-flag')).toContainText('not directly reported (isReported=false)');
+    }
   }
+});
+
+test('country banner derives the data origin from the records shown (never "no records" next to TEST FIXTURE)', async ({ page }) => {
+  const entity = await apiGet(page.request, '/v1/entities/FRA');
+  await page.goto('/country/FRA');
+  await settle(page);
+  const banner = page.getByRole('region', { name: 'Result context' }).first();
+  await expect(banner.getByTestId('fixture-label')).toContainText('TEST FIXTURE');
+  const origin = banner.getByTestId('banner-origin');
+  await expect(origin).toHaveAttribute('data-origin', 'test_fixture');
+  await expect(origin).not.toContainText('no records');
+  // Derived only because the entity endpoint itself reports none (backend gap, see docs/dev/ui_check.md).
+  await expect(origin).toHaveAttribute('data-origin-derived', entity.origin === 'none' ? 'true' : 'false');
+  // Every value listing carries the uncertainty glyph legend.
+  const legends = page.getByTestId('uncertainty-legend');
+  expect(await legends.count()).toBeGreaterThan(0);
+  await expect(legends.first()).toContainText('Dotted line = uncertainty not quantified');
+  await expect(legends.first()).toContainText('Hatched box = missing value');
+});
+
+test('charts render when the browser reports an invalid locale tag (en-US@posix)', async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Navigator.prototype, 'language', { configurable: true, get: () => 'en-US@posix' });
+    Object.defineProperty(Navigator.prototype, 'languages', { configurable: true, get: () => ['en-US@posix'] });
+  });
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(String(e)));
+  await page.goto('/country/FRA');
+  await settle(page);
+  const pop = panel(page, 'Population');
+  await expect(pop.locator('.chart canvas').first()).toBeVisible({ timeout: 15_000 });
+  await expect(page.getByText('Chart unavailable in this browser')).toHaveCount(0);
+  expect(await page.evaluate(() => navigator.language)).toBe('en-US');
+  expect(errors.filter((e) => /RangeError|locale/i.test(e))).toEqual([]);
 });
 
 test('provenance drawer from a belief value reaches the raw artifact SHA-256 and selector', async ({ page }) => {

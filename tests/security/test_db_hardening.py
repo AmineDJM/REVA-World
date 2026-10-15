@@ -760,7 +760,7 @@ def test_publication_lock_is_held_until_commit(w: dict[str, Any]) -> None:
             c.commit()
 
 
-def test_publication_requires_the_lock_before_insert(w: dict[str, Any]) -> None:
+def test_publication_requires_a_transaction_scoped_lock(w: dict[str, Any]) -> None:
     with tx(w["db"].worker) as c:  # no lock at all
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])

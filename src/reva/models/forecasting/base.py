@@ -28,6 +28,7 @@ from decimal import Decimal
 from typing import Literal, Protocol, runtime_checkable
 
 from reva.kernel.uncertainty import UncertaintyKind, UncertaintySpec, UncertaintyStatus
+from reva.kernel.values import _DECIMAL_RE
 
 Observation = tuple[int, float]
 """``(year, value)``. ``value`` may also be a ``Decimal`` or ``int`` on input."""
@@ -201,6 +202,12 @@ def check_level(level: float) -> float:
     return float(level)
 
 
+def _plain(x: float) -> str:
+    """Bound string in the strict kernel decimal grammar (no exponent form)."""
+    s = repr(x)
+    return s if _DECIMAL_RE.fullmatch(s) else format(Decimal(s), "f")
+
+
 def prediction_interval_spec(
     *,
     method_version: str,
@@ -216,7 +223,7 @@ def prediction_interval_spec(
         description=description,
         method_version=method_version,
         level=level,
-        lower=repr(lower),
-        upper=repr(upper),
+        lower=_plain(lower),
+        upper=_plain(upper),
         conditioning=conditioning,
     )

@@ -115,7 +115,9 @@ def _synthetic(tag: str, values: dict[str, str], *, origin: str = "test_fixture"
         ParsedObservation(
             subject_provider="worldbank", subject_key="FRA", concept_id=POP, concept_version="1.0.0",
             support=_support(tag, year), logical_key=f"fx2:{tag}:{suffix}",
-            value={"kind": "decimal", "value": v, "unit_ref": "unit.persons"},
+            # A complete kernel ScalarDecimal (basis is required): these rows share the session DB with
+            # tests that export/validate every stored WDI observation (tests/contracts/test_observation_export.py).
+            value={"kind": "decimal", "value": v, "unit_ref": "unit.persons", "basis": {"scale_factor": "1"}},
             uncertainty=UncertaintySpec.unknown("synthetic test value"),
             source_flags={"fx2": tag}, raw_selector={"match": {"suffix": suffix}},
         )
@@ -279,14 +281,14 @@ def _ct_parse(ct: ComtradeConnector, key: str, body: dict[str, Any]) -> tuple[li
 def test_r05_connector_emits_flow_specific_weight_concepts() -> None:
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
     spec = ct.describe()
-    assert spec.name == "un.comtrade.public_exact" and spec.version == "1.1.0"
-    assert spec.parser_version == "comtrade-parse-2"
+    assert spec.name == "un.comtrade.public_exact" and spec.version == "1.2.0"
+    assert spec.parser_version == "comtrade-parse-3"
     concepts = {}
     for flow in ("M", "X"):
         batches, _ = _ct_parse(ct, f"total:CHN:{flow}:2023", _ct_body(156, flow, 2023))
         w = next(o for o in batches[0].observations if o.logical_key.endswith("netWgt"))
         concepts[flow] = w.concept_id
-        assert batches[0].connector_version == "1.1.0"
+        assert batches[0].connector_version == "1.2.0"
     assert concepts == WEIGHT_CONCEPT
     ids = {c.concept_id for c in load_registry().concepts}
     assert set(WEIGHT_CONCEPT.values()) <= ids and "trade.hs2709.net_weight.world_total" in ids  # old stays
@@ -297,8 +299,8 @@ def test_r05_connector_emits_flow_specific_weight_concepts() -> None:
 
 async def test_r05_import_and_export_weights_are_separate_estimates(db: Any) -> None:
     with db.worker.connect() as c:
-        cv = repo.connector_version_row(c, "un.comtrade.public_exact", "1.1.0")
-        assert cv is not None, "seed must register Comtrade 1.1.0"
+        cv = repo.connector_version_row(c, "un.comtrade.public_exact", "1.2.0")
+        assert cv is not None, "seed must register Comtrade 1.2.0"
         n_elig = c.execute(text(
             """SELECT count(*) FROM evidence.eligibility e
                JOIN ontology.concept_version k ON k.id = e.concept_version_id
@@ -366,10 +368,11 @@ def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: s
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
     body = copy.deepcopy(_ct_body(156, flow, 2023))
     row = body["data"][0]
-    row["primaryValue"] = Decimal(pv)
-    row["cifvalue"] = None if cif is None else Decimal(cif)
-    row["fobvalue"] = None if fob is None else Decimal(fob)
-    body = json.loads(json.dumps(body, default=str))
+    # Comtrade reports numbers; a string value is (correctly) a structural-drift blocker since 1.2.0.
+    row["primaryValue"] = int(Decimal(pv))
+    row["cifvalue"] = None if cif is None else int(Decimal(cif))
+    row["fobvalue"] = None if fob is None else int(Decimal(fob))
+    body = json.loads(json.dumps(body))
     batches, report = _ct_parse(ct, f"total:CHN:{flow}:2023", body)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
     assert v.value["basis"]["valuation"] == label
@@ -386,14 +389,19 @@ def test_comtrade_estimation_flag_replaces_uninformative_derived_flag() -> None:
     body["data"][0].update({"isReported": False, "isAggregate": True, "legacyEstimationFlag": 0})
     batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
+    w = next(o for o in batches[0].observations if o.logical_key.endswith("netWgt"))
     assert v.source_flags["isReported"] is False and v.source_flags["isAggregate"] is True  # raw flags kept
-    assert v.source_flags["provider_estimation_flagged"] is False
-    assert "provider_derived_aggregate" not in v.source_flags
+    # 1.2.0: legacyEstimationFlag codes quantity/weight (UNSD 0/2/4/6), never the USD value.
+    assert v.source_flags["provider_value_estimated"] is None
+    assert w.source_flags["provider_quantity_estimated"] is False
+    assert "provider_estimation_flagged" not in v.source_flags and "provider_derived_aggregate" not in v.source_flags
     body["data"][0]["legacyEstimationFlag"] = 6
     batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
-    assert v.source_flags["provider_estimation_flagged"] is True and str(v.source_flags["legacyEstimationFlag"]) == "6"
-    assert "provider_estimation_flagged" in {f.code for f in report.findings}
+    w = next(o for o in batches[0].observations if o.logical_key.endswith("netWgt"))
+    assert v.source_flags["provider_value_estimated"] is None and str(v.source_flags["legacyEstimationFlag"]) == "6"
+    assert w.source_flags["provider_quantity_estimated"] is True
+    assert "provider_quantity_estimated" in {f.code for f in report.findings}
 
 
 def test_display_geometry_disputed_only_by_type() -> None:
@@ -742,7 +750,7 @@ def test_selector_that_does_not_resolve_quarantines_the_item(db: Any) -> None:
 
 def test_comtrade_implausible_jump_is_a_review_signal_not_a_block() -> None:
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2022, 2023), bilateral_years=())
-    for year, value in ((2022, "5000000000"), (2023, "5564")):
+    for year, value in ((2022, 5000000000), (2023, 5564)):  # numbers: string values are structural drift
         body = copy.deepcopy(_ct_body(156, "M", 2023))
         body["data"][0].update({"period": year, "refYear": year, "primaryValue": value, "cifvalue": value})
         item = next(i for i in ct.plan(None, FetchBudget()).items if i.key == f"total:CHN:M:{year}")

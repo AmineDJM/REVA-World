@@ -216,7 +216,8 @@ def test_comtrade_hostile_strings_are_inert_data(ct: ComtradeConnector, fra_m_20
     batches, reports = parse_validate(ct, ct_item(ct, "total:FRA:M:2023"), p)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
     assert v.source_flags["classificationCode"] == hostile  # kept verbatim as a string flag
-    assert not reports[0].blocking
+    # The hostile edition is outside the reviewed HS set: blocked for that reason only (never executed).
+    assert {f.code for f in reports[0].findings if f.severity == "blocker"} == {"classification_unreviewed"}
 
 
 # =========================================================================== World Bank

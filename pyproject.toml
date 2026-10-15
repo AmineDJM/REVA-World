@@ -89,6 +89,7 @@ markers = [
   "perf: performance measurement",
   "e2e: end-to-end demonstration workflow (fresh database)",
   "chaos: real-process fault injection (SIGKILL/SIGTERM/DB loss) against a throwaway database",
+  "s3: needs a real S3-compatible endpoint (REVA_TEST_S3_ENDPOINT); skipped with the reason otherwise",
 ]
 addopts = "-m 'not live and not perf'"
 
