@@ -335,7 +335,12 @@ def test_real_db_errors_are_scrubbed_in_job_errors_and_logs(db: Any, json_log: i
             conn.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, '{read}', 'r7')"),
                          {"h": sha})
     raw = str(e1.value) + str(e2.value)
-    assert sha in raw and "[parameters:" in raw and "Key (token_sha256)" in raw  # sensitivity
+    # sensitivity: PostgreSQL echoes the key value in DETAIL whatever the engine does with parameters
+    assert sha in str(e2.value) and "Key (token_sha256)" in raw
+    for exc in (e1.value, e2.value):
+        # bound parameters are either never rendered (hide_parameters=True) or rendered with the hash,
+        # in which case the redaction below must mask them; they must never survive redaction
+        assert "[SQL parameters hidden" in str(exc) or ("[parameters:" in str(exc) and sha in str(exc))
     for exc in (e1.value, e2.value):
         doc = queue.error_document("transient_error", str(exc), retryable=True, attempt=1,
                                    exception=type(exc).__name__)

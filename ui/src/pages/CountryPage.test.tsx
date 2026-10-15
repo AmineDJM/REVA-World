@@ -93,10 +93,11 @@ describe('CountryPage source flags and staleness (APIX)', () => {
     expect(within(row2023).getByTestId('flags-truncated')).toBeInTheDocument();
     expect(within(row2023).queryByTestId('stale-notes')).toBeNull();
 
+    const notesOf = () => within(within(panel).getByRole('row', { name: /^2024/ })).getByTestId('stale-notes');
+    expect(notesOf()).toHaveTextContent('stale: source schema quarantine');
+    await waitFor(() => expect(notesOf()).toHaveTextContent('served from release #6'));
     const row2024 = within(panel).getByRole('row', { name: /^2024/ });
-    const notes = within(row2024).getByTestId('stale-notes');
-    expect(notes).toHaveTextContent('stale: source schema quarantine');
-    await waitFor(() => expect(notes).toHaveTextContent('served from release #6'));
+    const notes = notesOf();
     expect(within(notes).getByRole('link', { name: 'repair proposal' })).toHaveAttribute('href', expect.stringContaining(PROPOSAL));
     expect(within(row2024).getByTestId('source-flag')).toHaveTextContent('provider estimate');
 

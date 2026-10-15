@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareDecimalStrings, displayDecimal, formatDecimalString, isQuantityConcept, valueToText, pointInRange, sourceFlagNotes } from './format';
+import { compareDecimalStrings, displayDecimal, formatDecimalString, isQuantityConcept, valueToText, pointInRange, sourceFlagNotes, validTimeLabel } from './format';
 
 describe('formatDecimalString', () => {
   it('keeps the rounding carry into the integer part', () => {
@@ -131,5 +131,22 @@ describe('displayDecimal (display precision; exact string untouched)', () => {
 
   it('uses the same display precision in plain-text renderings', () => {
     expect(valueToText({ kind: 'decimal', value: '57082396439.600717', unit_ref: 'unit.usd', basis: {} })).toBe('57,082,396,439.60 US$');
+  });
+});
+
+describe('validTimeLabel (APIX envelope window)', () => {
+  it('formats the scenario reference-year window with its half-open bounds', () => {
+    expect(
+      validTimeLabel({ start: '2023-01-01T00:00:00Z', end: '2024-01-01T00:00:00Z', bounds: '[)', basis: 'scenario_reference_year', reference_year: 2023 }),
+    ).toBe('2023 (scenario reference year) · [2023-01-01, 2024-01-01)');
+  });
+  it('keeps a non-midnight instant in full and honours closed bounds', () => {
+    expect(validTimeLabel({ start: '2023-01-01T12:30:00Z', end: '2023-12-31', bounds: '[]' })).toBe('[2023-01-01 12:30Z, 2023-12-31]');
+  });
+  it('falls back to labels, open ends and "not stated"', () => {
+    expect(validTimeLabel({ label: '2023' })).toBe('2023');
+    expect(validTimeLabel({ start: '2020-01-01' })).toBe('from 2020-01-01');
+    expect(validTimeLabel(null)).toBe('not stated');
+    expect(validTimeLabel({})).toBe('not stated');
   });
 });

@@ -156,8 +156,8 @@ def test_captured_fixture_manifests_contain_no_secrets() -> None:
 
 
 def test_captured_fixture_bodies_contain_no_credentials() -> None:
-    for p in sorted((FIXTURES / "source").glob("*/*")):
-        if p.suffix == ".zip":
+    for p in sorted((FIXTURES / "source").rglob("*")):
+        if not p.is_file() or p.suffix == ".zip":
             continue
         content = p.read_text(errors="replace")
         for name, rx in HARD_PATTERNS.items():

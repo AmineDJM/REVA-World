@@ -1,0 +1,182 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://reva.world/registry/assumptions/schema.json",
+  "title": "REVA literature-assumption registry file",
+  "description": "Literature parameters that V2 models may use as stated scenario assumptions with citations (docs/roadmap/v2_design.md, 'Literature parameters'). They are NOT reviewed evidence claims. Every numeric value must be quoted verbatim (normalised) from a text whose bytes were hashed at access time, with a locator. Entries whose number could not be seen in an accessible text carry no values and verification_status metadata_only.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_key", "title", "description", "curation", "quote_normalisation", "entries"],
+  "properties": {
+    "schema_version": {"const": "1.0.0"},
+    "registry_key": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "title": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "curation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["curated_by", "curated_at", "review_status", "statement"],
+      "properties": {
+        "curated_by": {"type": "string", "minLength": 1},
+        "curated_at": {"$ref": "#/$defs/utc_timestamp"},
+        "review_status": {"enum": ["maintainer_review_pending"]},
+        "statement": {"type": "string", "minLength": 1}
+      }
+    },
+    "quote_normalisation": {"type": "string", "minLength": 1},
+    "entries": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/entry"}
+    }
+  },
+  "$defs": {
+    "utc_timestamp": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"
+    },
+    "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "doi": {"type": "string", "pattern": "^10\\.[0-9]{4,9}/\\S+$"},
+    "identifier": {"type": "string", "pattern": "^[a-z][a-z0-9_]*$"},
+    "metadata_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "url", "accessed_at", "sha256", "bytes"],
+      "description": "The bibliographic record (normally the Crossref works record) fetched to verify title/authors/venue/DOI.",
+      "properties": {
+        "source": {"enum": ["crossref"]},
+        "url": {"type": "string", "format": "uri"},
+        "accessed_at": {"$ref": "#/$defs/utc_timestamp"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "abstract_in_record": {"type": "boolean"}
+      }
+    },
+    "text_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "kind", "title", "url", "accessed_at", "sha256", "bytes", "media_type", "archived", "licence_note"],
+      "description": "An accessible text from which numbers were read. Only the digest is archived when licensing is unclear.",
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "kind": {
+          "enum": [
+            "published_version",
+            "author_accepted_manuscript",
+            "working_paper_version",
+            "secondary_compilation",
+            "institutional_publication"
+          ]
+        },
+        "title": {"type": "string", "minLength": 1},
+        "doi": {"oneOf": [{"$ref": "#/$defs/doi"}, {"type": "null"}]},
+        "url": {"type": "string", "format": "uri"},
+        "accessed_at": {"$ref": "#/$defs/utc_timestamp"},
+        "sha256": {"$ref": "#/$defs/sha256"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "media_type": {"type": "string", "minLength": 1},
+        "archived": {"type": "boolean"},
+        "licence_note": {"type": "string", "minLength": 1},
+        "differs_from_cited_version": {"type": "string"}
+      }
+    },
+    "value": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "value", "unit", "as_printed", "definition", "population", "verification", "evidence", "text_source", "locator", "quote"],
+      "properties": {
+        "name": {"$ref": "#/$defs/identifier"},
+        "value": {"type": "number"},
+        "unit": {"type": "string", "minLength": 1},
+        "as_printed": {"type": "string", "minLength": 1, "description": "The number exactly as printed; must occur in quote."},
+        "standard_error": {"oneOf": [{"type": "number", "minimum": 0}, {"type": "null"}]},
+        "standard_error_as_printed": {"type": "string"},
+        "confidence_interval": {
+          "oneOf": [
+            {"type": "null"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["level", "lower", "upper"],
+              "properties": {
+                "level": {"type": "number", "exclusiveMinimum": 0, "exclusiveMaximum": 1},
+                "lower": {"type": "number"},
+                "upper": {"type": "number"}
+              }
+            }
+          ]
+        },
+        "definition": {"type": "string", "minLength": 1},
+        "population": {"type": "string", "minLength": 1},
+        "verification": {"const": "verified_from_text"},
+        "evidence": {
+          "enum": ["primary", "secondary_compilation"],
+          "description": "primary: read in a version of the cited work itself; secondary_compilation: read in another paper that reports the cited work's number with its own locator."
+        },
+        "text_source": {"$ref": "#/$defs/identifier"},
+        "locator": {"type": "string", "minLength": 3},
+        "quote": {"type": "string", "minLength": 3},
+        "notes": {"type": "string"}
+      }
+    },
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "op", "numerator", "denominator", "sign", "value", "unit", "rounding", "meaning"],
+      "description": "A quantity computed by REVA from verified values of the same entry. It is not a number printed by the authors unless 'printed_as' is given.",
+      "properties": {
+        "name": {"$ref": "#/$defs/identifier"},
+        "op": {"const": "ratio"},
+        "numerator": {"$ref": "#/$defs/identifier"},
+        "denominator": {"$ref": "#/$defs/identifier"},
+        "sign": {"enum": [1, -1]},
+        "value": {"type": "number"},
+        "unit": {"type": "string", "minLength": 1},
+        "rounding": {"type": "integer", "minimum": 0, "maximum": 6},
+        "meaning": {"type": "string", "minLength": 1},
+        "printed_as": {"type": "string"}
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id", "citation", "doi", "url", "accessed_at", "verification_status", "metadata_check",
+        "country", "period", "design", "policy_change", "population", "text_sources", "values", "notes"
+      ],
+      "properties": {
+        "id": {"$ref": "#/$defs/identifier"},
+        "citation": {"type": "string", "minLength": 1},
+        "doi": {"oneOf": [{"$ref": "#/$defs/doi"}, {"type": "null"}]},
+        "url": {"type": "string", "format": "uri"},
+        "accessed_at": {"$ref": "#/$defs/utc_timestamp"},
+        "verification_status": {"enum": ["verified_from_text", "metadata_only"]},
+        "metadata_check": {"oneOf": [{"$ref": "#/$defs/metadata_check"}, {"type": "null"}]},
+        "country": {"type": "string", "pattern": "^([A-Z]{3}|EA|EA12)$"},
+        "period": {"type": "string", "minLength": 1},
+        "design": {"type": "string", "minLength": 1},
+        "method_family": {"enum": ["quasi_experimental", "input_output", "input_output_hybrid", "macro_models"]},
+        "policy_change": {"type": "string", "minLength": 1},
+        "population": {"type": "string", "minLength": 1},
+        "text_sources": {"type": "array", "items": {"$ref": "#/$defs/text_source"}},
+        "values": {"type": "array", "items": {"$ref": "#/$defs/value"}},
+        "derived": {"type": "array", "items": {"$ref": "#/$defs/derived"}},
+        "related_entries": {"type": "array", "items": {"$ref": "#/$defs/identifier"}},
+        "not_verified": {"type": "string", "description": "What could not be verified and why."},
+        "notes": {"type": "string", "minLength": 1}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"verification_status": {"const": "metadata_only"}}},
+          "then": {
+            "properties": {"values": {"maxItems": 0}, "derived": {"maxItems": 0}},
+            "required": ["not_verified"]
+          }
+        },
+        {
+          "if": {"properties": {"verification_status": {"const": "verified_from_text"}}},
+          "then": {"properties": {"values": {"minItems": 1}, "text_sources": {"minItems": 1}}}
+        }
+      ]
+    }
+  }
+}

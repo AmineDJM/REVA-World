@@ -113,14 +113,38 @@ class CompiledScenario:
     change: TypedChange
     countries: list[CountryPlan]
     schedule: list[str]
+    # V2 step 1 (ALLC): set by the platform when the spec asked for countries ["ALL"].
+    country_selection: dict[str, Any] | None = None
+
+    # --- V2 step 1 (ALLC): missing_input_policy = skip_missing_countries -------------------
+    # "fail" (default, V1): any country with a missing or incompatible input refuses the
+    # whole run. "skip_missing_countries": the countries with complete inputs run; every
+    # other country is listed in ``skipped`` with its typed problems (nothing is filled).
+    # When no country has complete inputs the run is refused exactly as under "fail".
+    def skipping(self) -> bool:
+        return (getattr(self.spec, "missing_input_policy", "fail") == "skip_missing_countries"
+                and any(c.status == "ready" for c in self.countries))
+
+    @property
+    def skipped(self) -> list[dict[str, Any]]:
+        if not self.skipping():
+            return []
+        return [{"country": c.iso3, "subject_id": str(c.subject_id), "subject_resolution": c.subject_resolution,
+                 "status": c.status, "reasons": list(c.problems)}
+                for c in sorted(self.countries, key=lambda c: c.iso3) if c.status != "ready"]
 
     @property
     def missing(self) -> list[dict[str, Any]]:
+        if self.skipping():
+            return []
         return [p for c in self.countries for p in c.problems if p.get("code") == "missing_input"]
 
     @property
     def incompatible(self) -> list[dict[str, Any]]:
+        if self.skipping():
+            return []
         return [p for c in self.countries for p in c.problems if p.get("code") != "missing_input"]
+    # --- end V2 step 1 (ALLC) ---------------------------------------------------------------
 
     def baseline_inputs(self) -> dict[str, Any]:
         return {c.iso3: {"subject_id": str(c.subject_id), "subject_resolution": c.subject_resolution,
@@ -314,7 +338,8 @@ class CrudeExposureModel:
     model_key = ce.MODEL_KEY
     model_version = ce.MODEL_VERSION
     fidelities = frozenset({"L1", "L2"})
-    missing_input_policies = frozenset({"fail"})
+    missing_input_policies = frozenset({"fail", "skip_missing_countries"})  # V2 step 1 (ALLC)
+    supports_all_countries = True  # countries ["ALL"] is resolved by the platform (V2 step 1, ALLC)
 
     @staticmethod
     def _spec(spec: dict[str, Any] | ScenarioSpec) -> ScenarioSpec:
@@ -377,7 +402,7 @@ class CrudeExposureModel:
         return ce.explain(None, fidelity=fidelity)
 
     def run_applicability(self, compiled: CompiledScenario, fidelity: str) -> dict[str, Any]:
-        return {
+        out = {
             "explanation": ce.explain(None, fidelity=fidelity),
             "intervention": compiled.change.as_json(),
             "countries": {c.iso3: {"status": c.status, "problems": c.problems} for c in compiled.countries},
@@ -385,6 +410,14 @@ class CrudeExposureModel:
             "baseline_inputs": compiled.baseline_inputs(),
             "baseline_digest": compiled.baseline_digest(),
         }
+        # V2 step 1 (ALLC): only present for the new options, so V1 runs keep their exact shape.
+        if compiled.country_selection is not None:
+            out["country_selection"] = compiled.country_selection
+        if getattr(compiled.spec, "missing_input_policy", "fail") == "skip_missing_countries":
+            out["missing_input_policy"] = "skip_missing_countries"
+            out["skipped_countries"] = compiled.skipped
+            out["computed_countries"] = sorted(c.iso3 for c in compiled.countries if c.status == "ready")
+        return out
 
     def cost(self, spec: dict[str, Any]) -> dict[str, Any]:
         return {"grid_points": len(spec.get("assumptions", {}).get("elasticity_grid", []))}
