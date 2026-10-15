@@ -1,7 +1,7 @@
 # Long-run history layer (agent A-HISTECON). Provider-declared concepts (not human-reviewed): each concept lists
 # only series with the same definition and unit; series of other units/bases are separate concepts (e.g. GDP per
 # capita in 2011$ (Maddison), 2021 PPP $ (Gapminder) and 1990 Geary-Khamis $ (Clio-Infra) are three concepts).
-# Atlas tables: maddison.mpd2023, clio.infra, gapminder.fasttrack, cow.nmc7, cow.system2024, cow.wars4.
+# Atlas tables: hyde.hyde321, maddison.mpd2023, clio.infra, gapminder.fasttrack, cow.nmc7, cow.system2024, cow.wars4.
 # Historical values carry the provider's own notes in flags (Maddison source spans, Clio polity/territory,
 # Gapminder segment and composite-reconstruction note, COW currency break). See docs/dev/v3_a_histecon.md.
 domain: history
@@ -65,7 +65,9 @@ concepts:
     subdomain: population
     source_order:
       - gapminder.fasttrack.pop
+      - hyde.hyde321.popc
     provider_declared: true
+    notes: "HYDE 3.2.1 popc (modelled, inhabitants) answers where Gapminder has no value (e.g. 100-1790 CE)."
   - id: history.state_population_cow
     labels: {fr: "Population de l'État (COW, milliers)", en: "State population (COW NMC, thousands)"}
     definition: >-
@@ -251,4 +253,49 @@ concepts:
     subdomain: politics
     source_order:
       - cow.system2024.system_member
+    provider_declared: true
+  - id: history.urban_population_persons
+    labels: {fr: "Population urbaine (personnes, HYDE)", en: "Urban population (persons, HYDE)"}
+    definition: "HYDE 3.2.1 urban population (urbc) per country, modelled estimate (baseline scenario)."
+    unit: "inhabitants"
+    domain: history
+    subdomain: population
+    source_order:
+      - hyde.hyde321.urbc
+    provider_declared: true
+  - id: history.cropland_area_km2
+    labels: {fr: "Surface cultivée (km²)", en: "Cropland area (km²)"}
+    definition: "HYDE 3.2.1 total cropland area per country (km²); after 1960 identical to FAO 'arable land and permanent crops'."
+    unit: "km2"
+    domain: history
+    subdomain: land_use
+    source_order:
+      - hyde.hyde321.cropland
+    provider_declared: true
+  - id: history.grazing_area_km2
+    labels: {fr: "Surface pâturée (km²)", en: "Grazing land area (km²)"}
+    definition: "HYDE 3.2.1 total land used for grazing per country (km²); after 1960 identical to FAO 'permanent pasture'."
+    unit: "km2"
+    domain: history
+    subdomain: land_use
+    source_order:
+      - hyde.hyde321.grazing
+    provider_declared: true
+  - id: history.irrigated_area_km2
+    labels: {fr: "Surface irriguée (km²)", en: "Irrigated area (km²)"}
+    definition: "HYDE 3.2.1 total actual irrigated area per country (km²)."
+    unit: "km2"
+    domain: history
+    subdomain: land_use
+    source_order:
+      - hyde.hyde321.tot_irri
+    provider_declared: true
+  - id: history.built_up_area_km2
+    labels: {fr: "Surface bâtie (km²)", en: "Built-up area (km²)"}
+    definition: "HYDE 3.2.1 total built-up area (towns, cities) per country (km²)."
+    unit: "km2"
+    domain: history
+    subdomain: land_use
+    source_order:
+      - hyde.hyde321.uopp
     provider_declared: true

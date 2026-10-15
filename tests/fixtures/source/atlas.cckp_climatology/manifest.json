@@ -1,0 +1,38 @@
+[
+  {
+    "request_fingerprint": "281f65bf8b07f5c64a5e39b8974252c8ab570b1e26bf92971906743877b81a8b",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cru-x0.5_climatology_tas,pr,tasmax,tasmin_climatology_monthly_1991-2020_mean_historical_cru_ts4.09_mean/all_countries?_format=json",
+    "file": "281f65bf8b07f5c6.json",
+    "sha256": "7e960e407ee2d4f8af649e31a4f14a628169dd22fb2ec8a2a030faf965ce4672",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:45:40.193847+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "731ebe229632e15b8b5b772997c66e5e6dca7f3b2b78994ef51fc17513a96eb2",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/cru-x0.5_climatology_tas,pr_climatology_annual_1991-2020_mean_historical_cru_ts4.09_mean/all_countries?_format=json",
+    "file": "731ebe229632e15b.json",
+    "sha256": "a1256fd6494793b31a1ef7e61b8914117cde9b93dd04337d19da48021edaa1c2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:45:39.557984+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "d76c0f6a479c4d33063cba1779d15ab0161a85b4d8a3a7366e910500e95be375",
+    "url": "https://cckpapi.worldbank.org/cckp/v1/era5-x0.25_climatology_tas,pr_climatology_annual_1991-2020_mean_historical_era5_x0.25_mean/all_countries?_format=json",
+    "file": "d76c0f6a479c4d33.json",
+    "sha256": "d1b23224aca51ab6a27c250a91be1f29cf684629464354e6aa4ae2e4e9e6af86",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:45:41.058263+00:00",
+    "licence": "CC BY 4.0"
+  }
+]

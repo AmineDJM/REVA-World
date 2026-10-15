@@ -49,7 +49,8 @@ from reva.adapters.connectors.base import to_raw
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
-CONNECTOR_NAME = "atlas.regimes"
+LIED_CONNECTOR = "atlas.lied"
+BMR_CONNECTOR = "atlas.bmr"
 CONNECTOR_VERSION = "1.0.0"
 PARSER_VERSION = "atlas_regimes/1"
 DATAVERSE = "dataverse.harvard.edu"
@@ -92,20 +93,26 @@ def _record_url(doi: str) -> str:
     return f"https://{DATAVERSE}/api/datasets/:persistentId/?persistentId={doi}"
 
 
-def fetch_items() -> tuple[FetchItem, ...]:
-    return (
-        FetchItem(key="lied.record", url=_record_url(LIED_DOI), max_bytes=2_000_000),
-        FetchItem(
-            key="lied.file", url=f"https://{DATAVERSE}/api/access/datafile/{LIED_FILE_ID}", max_bytes=10_000_000,
-            expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                  "application/octet-stream"),
-        ),
-        FetchItem(key="bmr.record", url=_record_url(BMR_DOI), max_bytes=2_000_000),
-        FetchItem(
-            key="bmr.file", url=f"https://{DATAVERSE}/api/access/datafile/{BMR_FILE_ID}?format=original",
-            max_bytes=5_000_000, expected_media_types=("text/csv", "application/octet-stream"),
-        ),
-    )
+def fetch_items(which: str) -> tuple[FetchItem, ...]:
+    """Fetch plan of ``which`` = "lied" | "bmr": the Dataverse record (licence, MD5) and the data file."""
+    if which == "lied":
+        return (
+            FetchItem(key="lied.record", url=_record_url(LIED_DOI), max_bytes=2_000_000),
+            FetchItem(
+                key="lied.file", url=f"https://{DATAVERSE}/api/access/datafile/{LIED_FILE_ID}", max_bytes=10_000_000,
+                expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                      "application/octet-stream"),
+            ),
+        )
+    if which == "bmr":
+        return (
+            FetchItem(key="bmr.record", url=_record_url(BMR_DOI), max_bytes=2_000_000),
+            FetchItem(
+                key="bmr.file", url=f"https://{DATAVERSE}/api/access/datafile/{BMR_FILE_ID}?format=original",
+                max_bytes=5_000_000, expected_media_types=("text/csv", "application/octet-stream"),
+            ),
+        )
+    raise ValueError(which)
 
 
 async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
@@ -113,47 +120,47 @@ async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
     return to_raw(item, result, getattr(http, "origin", "live"))
 
 
-async def fetch_all(http: Any) -> dict[str, RawAcquisition]:
-    """Every item of :func:`fetch_items`, sequentially (one host at a time; nothing on failure)."""
-    return {it.key: await fetch(it, http) for it in fetch_items()}
+async def fetch_all(http: Any, which: str) -> dict[str, RawAcquisition]:
+    """Every item of :func:`fetch_items` (``which``), sequentially."""
+    return {it.key: await fetch(it, http) for it in fetch_items(which)}
 
 
-def connector_spec() -> Any:
-    from reva.adapters.connectors import atlas_sci_common as common
+def _code_digest() -> str:
+    import hashlib as _h
+    import inspect
 
-    return common.atlas_spec(
-        name=CONNECTOR_NAME,
+    return "sha256:" + _h.sha256(inspect.getsource(inspect.getmodule(_code_digest)).encode()).hexdigest()  # type: ignore[arg-type]
+
+
+def _spec(which: str) -> Any:
+    from reva.atlas.sources import AtlasSourceSpec
+
+    lied = which == "lied"
+    return AtlasSourceSpec(
+        name=LIED_CONNECTOR if lied else BMR_CONNECTOR,
         version=CONNECTOR_VERSION,
-        source_key="lied.dataverse",
-        provider="Harvard Dataverse (LIED: Skaaning et al.; BMR: Boix, Miller, Rosato)",
+        source_key="lied.dataverse" if lied else "bmr.dataverse",
+        atlas_source=which,
+        provider=("Skaaning, Gerring & Bartusevicius (Harvard Dataverse)" if lied
+                  else "Boix, Miller & Rosato (Harvard Dataverse)"),
         licence="CC0-1.0",
         allowed_hosts=(DATAVERSE, S3_HOST),
-        dataset_ids=("lied.lied", "bmr.bmr"),
-        field_mappings={"lied": "countryn x year", "bmr": "ccode x year"},
-        units={"lexical_index": "ordinal 0-6", "democracy": "0/1"},
-        geography=("LIED units (244)", "BMR units (223)"),
-        time_semantics="country-year; LIED = status on 31 December",
-        lineage_family="regimes",
+        datasets=(which,),
+        dataset_ids=(LIED_DOI if lied else BMR_DOI,),
         cadence_seconds=30 * 86400,
-        release_aware=True,
-        revision_strategy="new atlas table version when the file checksum changes",
+        planned_requests=len(fetch_items(which)),
         max_response_bytes=10_000_000,
-        max_pages=1,
+        min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
-        code_digest=common.code_digest(__import__(__name__, fromlist=["_"])),
+        code_digest=_code_digest(),
+        field_mappings={"geo_scheme": which, "provider_geo": "countryn|vdem=<id>" if lied else "ccode (COW)"},
+        notes="CC0 1.0. Licence and file MD5 checked against the Dataverse dataset record on every run.",
     )
 
 
-def bmr_connector_spec() -> Any:
-    """BMR is archived under its own source key (``bmr.dataverse``)."""
-    spec = connector_spec()
-    return spec.model_copy(update={"name": CONNECTOR_NAME + ".bmr", "source_key": "bmr.dataverse",
-                                   "dataset_ids": ("bmr.bmr",)})
-
-
-def lied_connector_spec() -> Any:
-    spec = connector_spec()
-    return spec.model_copy(update={"name": CONNECTOR_NAME + ".lied", "dataset_ids": ("lied.lied",)})
+def atlas_source() -> list[Any]:
+    """Two atlas sources (``atlas.lied``, ``atlas.bmr``); :func:`atlas_ingest` dispatches on the spec name."""
+    return [_spec("lied"), _spec("bmr")]
 
 
 # ----------------------------------------------------------------------------- dataverse record
@@ -415,37 +422,35 @@ def unit_qids(dataset: str) -> dict[str, str]:
 
 
 # ----------------------------------------------------------------------------- ingest
-def ingest(engine: Any, store: Any, raws: Mapping[str, RawAcquisition], *, origin: str,
-           actor: str = "worker:atlas_regimes", min_rows: tuple[int, int] = (LIED_MIN_ROWS, BMR_MIN_ROWS)) -> dict[str, Any]:
-    """Archive the four raw files and register ``lied.lied`` and ``bmr.bmr``."""
-    from reva.adapters.connectors import atlas_sci_common as common
-    from reva.atlas.tables import register_atlas_table
-
-    lied_meta = check_record(raws["lied.record"].body, file_id=LIED_FILE_ID, filename=LIED_FILENAME,
-                             payload=raws["lied.file"].body)
-    bmr_meta = check_record(raws["bmr.record"].body, file_id=BMR_FILE_ID, filename=BMR_FILENAME,
-                            payload=raws["bmr.file"].body)
-    lspec, bspec = lied_connector_spec(), bmr_connector_spec()
-    shas = {k: common.archive_raw(engine, store, lspec if k.startswith("lied") else bspec, r, actor=actor)
-            for k, r in raws.items()}
-    out: dict[str, Any] = {}
-    lf = lied_frame(parse_lied(raws["lied.file"].body, min_rows=min_rows[0]), raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
-    out["lied"] = register_atlas_table(
-        engine, store, source="lied", dataset="lied", frame=lf, raw_sha256s=[shas["lied.file"]],
-        parser_version=PARSER_VERSION, origin=origin, geo_scheme="lied",
-        coverage_note=(f"LIED v{LIED_VERSION} ({LIED_FILENAME}), 1789-2025, status on 31 December; units keyed by "
-                       "LIED name; historical polities and colonies without a crosswalk entity kept unmapped. CC0."),
-        rights={**RIGHTS_LIED, "record": lied_meta, "record_raw_sha256": shas["lied.record"]}, actor=actor,
-    )
-    bf = bmr_frame(parse_bmr(raws["bmr.file"].body, min_rows=min_rows[1]), raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
-    out["bmr"] = register_atlas_table(
-        engine, store, source="bmr", dataset="bmr", frame=bf, raw_sha256s=[shas["bmr.file"]],
-        parser_version=PARSER_VERSION, origin=origin, geo_scheme="bmr",
-        coverage_note=(f"BMR v{BMR_VERSION} ({BMR_FILENAME}), 1800-2020, sovereign states keyed by COW code; "
-                       "West Germany, USSR, Yugoslavia, Czechoslovakia and historical states kept unmapped. CC0."),
-        rights={**RIGHTS_BMR, "record": bmr_meta, "record_raw_sha256": shas["bmr.record"]}, actor=actor,
-    )
-    return out
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """LIED or BMR (by ``run.spec.name``): record + file through ``run``, checks, archive, register."""
+    which = "lied" if run.spec.name == LIED_CONNECTOR else "bmr"
+    raws = {
+        it.key: await run.get(it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes)
+        for it in fetch_items(which)
+    }
+    file_id, filename = (LIED_FILE_ID, LIED_FILENAME) if which == "lied" else (BMR_FILE_ID, BMR_FILENAME)
+    meta = check_record(raws[f"{which}.record"].body, file_id=file_id, filename=filename,
+                        payload=raws[f"{which}.file"].body)
+    shas = {k: run.archive(r) for k, r in raws.items()}
+    # Fixture runs replay documented subsets; the partial-file guard applies to live bytes.
+    live = run.origin == "live"
+    if which == "lied":
+        rows = parse_lied(raws["lied.file"].body, min_rows=LIED_MIN_ROWS if live else 1)
+        frame = lied_frame(rows, raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
+        note = (f"LIED v{LIED_VERSION} ({LIED_FILENAME}), 1789-2025, status on 31 December; units keyed "
+                "'<countryn>|vdem=<id>'; historical polities and colonies without a crosswalk entity kept unmapped. CC0.")
+        rights = RIGHTS_LIED
+    else:
+        rows = parse_bmr(raws["bmr.file"].body, min_rows=BMR_MIN_ROWS if live else 1)
+        frame = bmr_frame(rows, raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
+        note = (f"BMR v{BMR_VERSION} ({BMR_FILENAME}), 1800-2020, sovereign states keyed by COW code; West Germany, "
+                "USSR, Yugoslavia, Czechoslovakia and historical states kept unmapped. CC0.")
+        rights = RIGHTS_BMR
+    reg = run.register(dataset=which, frame=frame, raw_sha256s=[shas[f"{which}.file"]], geo_scheme=which,
+                       coverage_note=note, rights={**rights, "record": meta, "record_raw_sha256": shas[f"{which}.record"]})
+    return {"record": meta, "rows_parsed": len(rows),
+            "table": {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")}}
 
 
 __all__ = [
@@ -453,10 +458,11 @@ __all__ = [
     "LIED_INDICATORS",
     "bmr_frame",
     "check_record",
+    "atlas_ingest",
+    "atlas_source",
     "fetch",
     "fetch_all",
     "fetch_items",
-    "ingest",
     "lied_frame",
     "parse_bmr",
     "parse_lied",

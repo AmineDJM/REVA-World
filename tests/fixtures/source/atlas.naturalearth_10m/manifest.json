@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "278c02bddf903608f20a219b9b396e2fc815dd9687877824d7f1f87b22e62dc3",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_boundary_lines_disputed_areas.zip",
+    "file": "278c02bddf903608.zip",
+    "sha256": "d9eedd54bcc222d25a41438dc1c547a4034e787f228ad04273038995bca27301",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip",
+      "last-modified": "Fri, 13 May 2022 05:21:15 GMT",
+      "etag": "\"b057b3f6f7ffa2f50e6df481e56f2f79\""
+    },
+    "retrieved_at": "2026-10-15T22:45:12.745766+00:00",
+    "licence": "Public domain"
+  },
+  {
+    "request_fingerprint": "d0e6ad709a556b4c2b92ec05eb2a4c604fe383be86da5904b578d1d9c4f6e3bd",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_disputed_areas.zip",
+    "file": "d0e6ad709a556b4c.zip",
+    "sha256": "a250c1cf8ab68898399928a1fa1d5c242eb4de6335cb51a7f7a7f12a9f3c8438",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip",
+      "last-modified": "Fri, 13 May 2022 05:20:49 GMT",
+      "etag": "\"075917236d8076d989ab8af0c7e61c9c\""
+    },
+    "retrieved_at": "2026-10-15T22:45:13.775732+00:00",
+    "licence": "Public domain"
+  }
+]

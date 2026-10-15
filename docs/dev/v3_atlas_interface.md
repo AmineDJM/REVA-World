@@ -146,7 +146,7 @@ atlas connectors are **not** `builtin_connectors()`. Instead (`src/reva/atlas/so
 # src/reva/adapters/connectors/atlas_imf.py  (discovered by module name: atlas_*.py, nothing to register)
 from reva.atlas.sources import AtlasSourceSpec
 
-def atlas_source() -> AtlasSourceSpec:          # or ATLAS_SOURCE = ... / ATLAS_SOURCES = [...]
+def atlas_source() -> AtlasSourceSpec:          # or a list of specs (only this function name counts)
     return AtlasSourceSpec(
         name="atlas.imf", version="1.0.0",       # connector name (atlas.*) + version (bump on change)
         source_key="imf.sdmx",                   # registry/sources/*.yaml key (also the budget key)

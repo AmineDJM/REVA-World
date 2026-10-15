@@ -141,29 +141,31 @@ async def fetch_all(http: Any) -> dict[str, RawAcquisition]:
     return {it.key: await fetch(it, http) for it in fetch_items()}
 
 
-def connector_spec() -> Any:
-    from reva.adapters.connectors import atlas_sci_common as common
+def atlas_source() -> Any:
+    """The atlas source spec (discovered by :mod:`reva.atlas.sources`)."""
+    import hashlib
+    import inspect
 
-    return common.atlas_spec(
+    from reva.atlas.sources import AtlasSourceSpec
+
+    return AtlasSourceSpec(
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        atlas_source=SOURCE,
         provider="Inter-Parliamentary Union (IPU)",
-        licence=RIGHTS["licence"],
+        licence="CC-BY-NC-SA-4.0 (non-commercial)",
         allowed_hosts=(HOST,),
-        dataset_ids=("ipu.parline", "ipu.elections"),
-        field_mappings={"geo": "parliament code (ISO 3166 alpha-2)", "chamber": "LC01 lower / UC01 upper"},
-        units={"current_women_percent": "%", "turnout": "%"},
-        geography=("IPU parliaments (193)",),
-        time_semantics="provider validity intervals (date_from..date_to); election date ranges; year-end readings",
-        lineage_family="ipu_parline",
+        datasets=("parline", "elections"),
+        dataset_ids=tuple(f"ipu:v1/{n}" for n in ENDPOINTS),
         cadence_seconds=30 * 86400,
-        release_aware=False,
-        revision_strategy="new atlas table version when response bytes change",
+        planned_requests=len(ENDPOINTS),
         max_response_bytes=MAX_BYTES,
-        max_pages=1,
+        min_interval_seconds=2.0,
         parser_version=PARSER_VERSION,
-        code_digest=common.code_digest(__import__(__name__, fromlist=["_"])),
+        code_digest="sha256:" + hashlib.sha256(inspect.getsource(inspect.getmodule(atlas_source)).encode()).hexdigest(),  # type: ignore[arg-type]
+        field_mappings={"geo_scheme": "iso2", "chamber": "LC01 lower / UC01 upper"},
+        notes="NON-COMMERCIAL licence (CC BY-NC-SA 4.0): exclude source ipu from commercial use.",
     )
 
 
@@ -470,34 +472,30 @@ def elections_frame(elections: Sequence[Mapping[str, Any]], *, raw_sha256: str, 
 
 
 # ----------------------------------------------------------------------------- ingest
-def ingest(engine: Any, store: Any, raws: Mapping[str, RawAcquisition], *, origin: str,
-           actor: str = "worker:atlas_ipu") -> dict[str, Any]:
-    from reva.adapters.connectors import atlas_sci_common as common
-    from reva.atlas.tables import register_atlas_table
-
-    data = {k.split(".", 1)[1]: parse_response(r.body, k) for k, r in raws.items()}
-    missing = sorted(set(ENDPOINTS) - set(data))
-    if missing:
-        raise _err(f"missing responses {missing}", kind="incomplete")
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch the four endpoints through ``run``, archive them, register ``ipu.parline`` and ``ipu.elections``."""
+    raws = {it.key: await run.get(it.url, key=it.key, max_bytes=it.max_bytes) for it in fetch_items()}
+    data = {k.split(".", 1)[1]: parse_response(r.body, k) for k, r in raws.items()}  # licence + completeness first
     retrieved = min(date_accessed(r.body) for r in raws.values())
-    spec = connector_spec()
-    shas = {k.split(".", 1)[1]: common.archive_raw(engine, store, spec, r, actor=actor) for k, r in raws.items()}
-    pf, pskip = parline_frame(data["chambers"], data["parliaments"], data["countries"], raw=shas, retrieved=retrieved)
-    ef, eskip = elections_frame(data["elections"], raw_sha256=shas["elections"], retrieved=retrieved)
-    out: dict[str, Any] = {"retrieved": retrieved.isoformat()}
-    for ds, frame, rawlist, skip in (
-        ("parline", pf, [shas["chambers"], shas["parliaments"], shas["countries"]], pskip),
-        ("elections", ef, [shas["elections"]], eskip),
-    ):
-        out[ds] = register_atlas_table(
-            engine, store, source=SOURCE, dataset=ds, frame=frame, raw_sha256s=rawlist,
-            parser_version=PARSER_VERSION, origin=origin, geo_scheme="iso2",
+    shas = {k.split(".", 1)[1]: run.archive(r) for k, r in raws.items()}
+    out: dict[str, Any] = {"retrieved": retrieved.isoformat(), "tables": {}}
+    jobs = []
+    if run.wants("parline"):
+        pf, pskip = parline_frame(data["chambers"], data["parliaments"], data["countries"], raw=shas, retrieved=retrieved)
+        jobs.append(("parline", pf, [shas["chambers"], shas["parliaments"], shas["countries"]], pskip))
+    if run.wants("elections"):
+        ef, eskip = elections_frame(data["elections"], raw_sha256=shas["elections"], retrieved=retrieved)
+        jobs.append(("elections", ef, [shas["elections"]], eskip))
+    for ds, frame, rawlist, skip in jobs:
+        reg = run.register(
+            dataset=ds, frame=frame, raw_sha256s=rawlist, geo_scheme="iso2", rights=RIGHTS,
             coverage_note=(f"IPU Parline API retrieved {retrieved.isoformat()}; provider validity intervals kept, "
                            f"year-end readings selected (|at=year_end); not loaded: {json.dumps(skip, sort_keys=True)}. "
                            "Licence CC BY-NC-SA 4.0 (NON-COMMERCIAL)."),
-            rights=RIGHTS, actor=actor,
         )
-        out[ds]["not_loaded"] = skip
+        out["tables"][ds] = {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created",
+                                                 "unmapped_provider_geo")}
+        out["tables"][ds]["not_loaded"] = skip
     return out
 
 
@@ -510,12 +508,12 @@ def unmapped_codes(records: Iterable[Mapping[str, Any]]) -> list[str]:
 __all__ = [
     "ENDPOINTS",
     "RIGHTS",
-    "connector_spec",
+    "atlas_ingest",
+    "atlas_source",
     "elections_frame",
     "fetch",
     "fetch_all",
     "fetch_items",
-    "ingest",
     "parline_frame",
     "parse_response",
 ]

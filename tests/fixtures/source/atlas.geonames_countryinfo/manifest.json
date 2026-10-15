@@ -1,0 +1,16 @@
+[
+  {
+    "request_fingerprint": "3d496cb84c2b42d69eb1b3a6484fb122e106015e1a57c7f594b20e83bf96ac36",
+    "url": "https://download.geonames.org/export/dump/countryInfo.txt",
+    "file": "3d496cb84c2b42d6.json",
+    "sha256": "c55f638cfaafb4fe45a9aa15120a0f1f78e8a34a8e1847d7b9320cf740fbc9ab",
+    "status": 200,
+    "headers": {
+      "last-modified": "Thu, 15 Oct 2026 02:14:46 GMT",
+      "etag": "\"7bca-65dd79c91e453\"",
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:45:38.563223+00:00",
+    "licence": "CC BY 4.0"
+  }
+]

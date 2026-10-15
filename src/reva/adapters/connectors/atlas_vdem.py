@@ -49,6 +49,7 @@ Semantics
 from __future__ import annotations
 
 import hashlib
+import inspect
 import json
 import re
 from collections.abc import Iterable, Mapping, Sequence
@@ -122,30 +123,36 @@ async def fetch_all(http: Any) -> dict[str, RawAcquisition]:
     return {it.key: await fetch(it, http) for it in fetch_items()}
 
 
-def connector_spec() -> Any:
-    from reva.adapters.connectors import atlas_sci_common as common
+def atlas_source() -> Any:
+    """The atlas source spec (discovered by :mod:`reva.atlas.sources`; budget key = source key)."""
+    from reva.atlas.sources import AtlasSourceSpec
 
-    return common.atlas_spec(
+    return AtlasSourceSpec(
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        atlas_source=SOURCE,
         provider="V-Dem Institute (University of Gothenburg)",
-        licence=RIGHTS["licence"],
+        licence="CC-BY-SA-4.0",
         allowed_hosts=(HOST,),
-        dataset_ids=tuple(f"vdem.{d}" for d in DATASETS),
-        field_mappings={"rdata_object": "vdem", "unit": "country_text_id", "period": "year"},
-        units={"index": "0-1", "latent": "measurement-model latent scale"},
-        geography=("vdem country units (202, incl. historical states)",),
-        time_semantics="country-year, V-Dem cy_aggregation per variable",
-        lineage_family="vdem",
+        datasets=DATASETS,
+        dataset_ids=("vdemdata:data/vdem.RData", "vdemdata:data/codebook.RData"),
         cadence_seconds=30 * 86400,
-        release_aware=True,
-        revision_strategy="new atlas table version when the RData bytes change (annual release)",
+        planned_requests=len(fetch_items()),
         max_response_bytes=MAX_RDATA_BYTES,
-        max_pages=1,
+        min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
-        code_digest=common.code_digest(atlas_rdata, __import__(__name__, fromlist=["_"])),
+        code_digest=_code_digest(),
+        field_mappings={"rdata_object": "vdem", "unit": "country_text_id", "period": "year", "geo_scheme": GEO_SCHEME},
+        notes="CC BY-SA 4.0 (share alike). Third-party e_* variables are not loaded.",
     )
+
+
+def _code_digest() -> str:
+    h = hashlib.sha256()
+    for mod in (atlas_rdata, __import__(__name__, fromlist=["_"])):
+        h.update(inspect.getsource(mod).encode())
+    return "sha256:" + h.hexdigest()
 
 
 # ----------------------------------------------------------------------------- variable selection
@@ -591,39 +598,33 @@ def coverage_note(dataset: str, release: str, data: RFrame) -> str:
     )
 
 
-def ingest(
-    engine: Any,
-    store: Any,
-    raws: Mapping[str, RawAcquisition],
-    *,
-    origin: str,
-    datasets: Sequence[str] = DATASETS,
-    actor: str = "worker:atlas_vdem",
-) -> dict[str, Any]:
-    """Archive the three raw files and register the V-Dem atlas tables. Returns a summary per dataset."""
-    from reva.adapters.connectors import atlas_sci_common as common
-    from reva.atlas.tables import register_atlas_table
-
-    spec = connector_spec()
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch the three raw files through ``run``, archive them and register the V-Dem atlas tables."""
+    raws = {
+        it.key: await run.get(it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes)
+        for it in fetch_items()
+    }
     desc = parse_description(raws["vdemdata.description"].body)
     release = dataset_version(desc)
     if int(release.split(".")[0]) < EXPECTED_MAJOR_VERSION:
         raise _err(f"vdemdata version {release} is older than v{EXPECTED_MAJOR_VERSION}", kind="stale_release")
-    parse_codebook(raws["vdemdata.codebook"].body)  # validates the codebook bytes that are archived
-    shas = {k: common.archive_raw(engine, store, spec, r, actor=actor) for k, r in raws.items()}
+    parse_codebook(raws["vdemdata.codebook"].body)  # the archived codebook must be readable
+    shas = {k: run.archive(r) for k, r in raws.items()}
     data = read_vdem(raws["vdemdata.vdem"].body)
     qids = vdem_qids()
-    out: dict[str, Any] = {"release": release, "missing_variables": missing_variables(data.all_columns)}
-    for ds in datasets:
+    out: dict[str, Any] = {"release": release, "missing_variables": missing_variables(data.all_columns), "tables": {}}
+    for ds in DATASETS:
+        if not run.wants(ds):
+            continue
         frame = build_frame(data, ds, raw_sha256=shas["vdemdata.vdem"], release=release, qids=qids)
-        out[ds] = register_atlas_table(
-            engine, store, source=SOURCE, dataset=ds, frame=frame,
-            raw_sha256s=[shas["vdemdata.vdem"]], parser_version=PARSER_VERSION, origin=origin,
+        reg = run.register(
+            dataset=ds, frame=frame, raw_sha256s=[shas["vdemdata.vdem"]],
             coverage_note=coverage_note(ds, release, data), geo_scheme=GEO_SCHEME,
             rights={**RIGHTS, "codebook_raw_sha256": shas["vdemdata.codebook"],
                     "description_raw_sha256": shas["vdemdata.description"], "release": release},
-            actor=actor,
         )
+        out["tables"][ds] = {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created",
+                                                 "unmapped_provider_geo")}
         del frame
     return out
 
@@ -636,12 +637,12 @@ __all__ = [
     "INDICATORS",
     "RIGHTS",
     "SOURCE",
+    "atlas_ingest",
+    "atlas_source",
     "build_frame",
-    "connector_spec",
     "fetch",
     "fetch_all",
     "fetch_items",
-    "ingest",
     "missing_variables",
     "parse_codebook",
     "parse_description",

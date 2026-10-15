@@ -110,7 +110,7 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
     except Exception:
         pytest.skip("PostgreSQL not reachable")
     mod = types.ModuleType(MOD)
-    mod.ATLAS_SOURCES = [SPEC, GREEDY]  # type: ignore[attr-defined]
+    mod.atlas_source = lambda: [SPEC, GREEDY]  # type: ignore[attr-defined]
     mod.atlas_ingest = fake_atlas_ingest  # type: ignore[attr-defined]
     sys.modules[MOD] = mod
     atlas_sources.clear_cache()

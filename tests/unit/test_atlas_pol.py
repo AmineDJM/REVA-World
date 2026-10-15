@@ -21,7 +21,7 @@ from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError
 
 sys.path.insert(0, str(Path(__file__).parent))
-import atlas_pol_rdata_writer as w  # noqa: E402
+import atlas_pol_rdata_writer as w
 
 SHA = "0" * 64
 

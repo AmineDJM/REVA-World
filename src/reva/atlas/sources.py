@@ -4,8 +4,8 @@ Atlas connectors are **not** ``ConnectorSpec`` templates and not ``builtin_conne
 (``ports/connectors.py`` is inside the digest-pinned autonomy template closure). An atlas
 connector module ``reva.adapters.connectors.atlas_<name>`` declares instead:
 
-* ``atlas_source()`` → an :class:`AtlasSourceSpec` (or a list of them; or a module constant
-  ``ATLAS_SOURCE`` / ``ATLAS_SOURCES``);
+* ``atlas_source()`` → an :class:`AtlasSourceSpec` or a list of them (only this function name
+  is the protocol; module constants are ignored);
 * ``async def atlas_ingest(run: reva.atlas.ingest.AtlasRun) -> dict`` — fetch through
   ``run.http`` (budget-metered live client or fixture client, never one it builds itself),
   archive raw bytes with ``run.archive(...)`` and register atlas tables with
@@ -126,19 +126,19 @@ def _module_names() -> list[str]:
 
 
 def _specs_of(mod: Any) -> list[AtlasSourceSpec]:
-    if hasattr(mod, "atlas_source"):
-        got = mod.atlas_source()
-    elif hasattr(mod, "ATLAS_SOURCES"):
-        got = mod.ATLAS_SOURCES
-    elif hasattr(mod, "ATLAS_SOURCE"):
-        got = mod.ATLAS_SOURCE
-    else:
+    """The module's ``atlas_source()`` result (a spec or a list of specs); other modules: none.
+
+    Only the function name is part of the protocol: several atlas modules use a module constant
+    ``ATLAS_SOURCE`` for their short table key, which is not a spec."""
+    fn = getattr(mod, "atlas_source", None)
+    if not callable(fn):
         return []
+    got = fn()
     items = list(got) if isinstance(got, (list, tuple)) else [got]
     out = []
     for it in items:
         if not isinstance(it, AtlasSourceSpec):
-            raise TypeError(f"{mod.__name__}: atlas source must be an AtlasSourceSpec, got {type(it).__name__}")
+            raise TypeError(f"{mod.__name__}: atlas_source() must return AtlasSourceSpec(s), got {type(it).__name__}")
         out.append(it)
     if out and not callable(getattr(mod, "atlas_ingest", None)):
         raise TypeError(f"{mod.__name__}: declares atlas sources but no atlas_ingest(run) function")

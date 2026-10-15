@@ -198,17 +198,19 @@ def main(raw_dir: str) -> None:
          "licence": "CC-BY-SA-4.0", "orig": _sha(vd),
          "note": f"subset of vdem.RData v16: units {VDEM_UNITS} x years {VDEM_YEARS}, every column the connector reads; values bit-identical"},
     ])
-    items = {i.key: i.url for i in atlas_regimes.fetch_items()}
+    items = {i.key: i.url for w in ("lied", "bmr") for i in atlas_regimes.fetch_items(w)}
     lied = (r / "dv" / "LIED_6.9.xlsx").read_bytes()
     bmr = (r / "dv" / "democracy-v4.0.csv").read_bytes()
     lsub, bsub = derive_lied(lied), derive_bmr(bmr)
-    write("atlas.regimes", [
+    write("atlas.lied", [
         {"url": items["lied.record"], "body": derive_record((r / "dv" / "lied_record.json").read_bytes(),
                                                             atlas_regimes.LIED_FILE_ID, lsub),
          "ext": ".json", "ctype": "application/json", "licence": "CC0-1.0", "note": "real record; file MD5 replaced by the subset's"},
         {"url": items["lied.file"], "body": lsub, "ext": ".xlsx",
          "ctype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "licence": "CC0-1.0",
          "orig": _sha(lied), "note": f"subset of LIED_6.9.xlsx: header + rows of {LIED_KEYS}; exact cell text"},
+    ])
+    write("atlas.bmr", [
         {"url": items["bmr.record"], "body": derive_record((r / "dv" / "bmr_record.json").read_bytes(),
                                                            atlas_regimes.BMR_FILE_ID, bsub),
          "ext": ".json", "ctype": "application/json", "licence": "CC0-1.0", "note": "real record; file MD5 replaced by the subset's"},

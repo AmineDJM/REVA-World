@@ -245,6 +245,10 @@ def _seed_sources(conn: Connection, store: ArtifactStore, reg: Registry, act: UU
             repo.append_source_metadata_if_changed(conn, row["id"], s["metadata"], s["rights"], act)
     for spec_conn in builtin_connectors(contact).values():
         register_connector_version(conn, store, spec_conn.describe(), act)
+    # V3 atlas sources (AtlasSourceSpec, discovered from reva.adapters.connectors.atlas_*)
+    from reva.atlas.sources import register_atlas_connector_versions
+
+    register_atlas_connector_versions(conn, store, act)
 
 
 def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any, act: UUID) -> UUID:
