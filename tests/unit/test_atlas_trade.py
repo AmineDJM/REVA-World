@@ -88,7 +88,7 @@ def _cell(frame: pl.DataFrame, geo: str, indicator: str, year: int) -> dict[str,
 
 # --------------------------------------------------------------------------- common helpers
 def test_7z_round_trip_and_refusals() -> None:
-    content = b"".join(b"%d,row,%d\n" % (i, i * 7) for i in range(300_000))  # > 2**21 bytes: multi-byte numbers
+    content = b"a,b\n" + b"1,2\n" * 600_000  # > 2**21 bytes: 7z numbers of several bytes
     data = tc.write_7z_single("x.csv", content)
     assert tc.read_7z_single(data) == ("x.csv", content)
     with pytest.raises(SourceResponseError):

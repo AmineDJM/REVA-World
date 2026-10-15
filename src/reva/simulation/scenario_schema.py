@@ -245,13 +245,65 @@ def branch_schema(model: Any) -> dict[str, Any]:
     return branch
 
 
+def _other_versions(models: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Registered non-default versions per model key (V3 SIMWORLD: ``get(key, version)``)."""
+    from reva.simulation.plugins import VERSIONS
+
+    out: dict[str, dict[str, Any]] = {}
+    for k, default in models.items():
+        others = {
+            v: m for v, m in VERSIONS.get(k, {}).items() if m is not default and v != default.model_version
+        }
+        if others:
+            out[k] = dict(sorted(others.items()))
+    return out
+
+
+def _dispatch(k: str, others: dict[str, Any]) -> list[dict[str, Any]]:
+    """allOf entries routing a spec to its model (and version) branch."""
+    if not others:
+        return [
+            {
+                "if": {"properties": {"model_key": {"const": k}}, "required": ["model_key"]},
+                "then": {"$ref": f"#/$defs/{k}"},
+            }
+        ]
+    out: list[dict[str, Any]] = [
+        {
+            "if": {
+                "properties": {"model_key": {"const": k}, "model_version": {"not": {"enum": sorted(others)}}},
+                "required": ["model_key"],
+            },
+            "then": {"$ref": f"#/$defs/{k}"},
+        }
+    ]
+    for v in others:
+        out.append(
+            {
+                "if": {
+                    "properties": {"model_key": {"const": k}, "model_version": {"const": v}},
+                    "required": ["model_key", "model_version"],
+                },
+                "then": {"$ref": f"#/$defs/{k}@{v}"},
+            }
+        )
+    return out
+
+
 def build_schema(models: dict[str, Any] | None = None) -> dict[str, Any]:
-    """The v2.0.0 union over the registered plugins (sorted by model_key)."""
+    """The v2.0.0 union over the registered plugins (sorted by model_key). A model key with
+    several registered versions gets one branch per version (``$defs["<key>@<version>"]``
+    for the non-default ones); single-version keys are exported exactly as before."""
     if models is None:
         from reva.simulation.plugins import load_all
 
         models = load_all()
     keys = sorted(models)
+    extra = _other_versions(models)
+    defs: dict[str, Any] = {k: branch_schema(models[k]) for k in keys}
+    for k in keys:
+        for v, m in extra.get(k, {}).items():
+            defs[f"{k}@{v}"] = branch_schema(m)
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "REVA ScenarioSpec v2.0.0 — discriminated union on model_key",
@@ -267,14 +319,8 @@ def build_schema(models: dict[str, Any] | None = None) -> dict[str, Any]:
         # Closed at the top level too: only the common field names exist; each branch
         # then constrains them (and is itself closed).
         "properties": {k: ({"enum": keys} if k == "model_key" else {}) for k in PROPERTY_ORDER},
-        "allOf": [
-            {
-                "if": {"properties": {"model_key": {"const": k}}, "required": ["model_key"]},
-                "then": {"$ref": f"#/$defs/{k}"},
-            }
-            for k in keys
-        ],
-        "$defs": {k: branch_schema(models[k]) for k in keys},
+        "allOf": [entry for k in keys for entry in _dispatch(k, extra.get(k, {}))],
+        "$defs": defs,
     }
 
 

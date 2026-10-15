@@ -83,7 +83,7 @@ CRUDE_MODEL_KEY = "economic.crude_exposure"
 
 
 @lru_cache(maxsize=8)
-def _union_schema(_keys: tuple[str, ...]) -> dict[str, Any]:
+def _union_schema(_keys: tuple[Any, ...]) -> dict[str, Any]:
     from reva.simulation.plugins import REGISTRY
     from reva.simulation.scenario_schema import build_schema
 
@@ -93,10 +93,10 @@ def _union_schema(_keys: tuple[str, ...]) -> dict[str, Any]:
 def scenario_schema() -> dict[str, Any]:
     """The v2.0.0 union over the registered plugins (``contracts/scenario.schema.json``
     is its exported copy; the contract test keeps them equal)."""
-    from reva.simulation.plugins import REGISTRY, load_all
+    from reva.simulation.plugins import REGISTRY, VERSIONS, load_all
 
     load_all()
-    return _union_schema(tuple(sorted(REGISTRY)))
+    return _union_schema(tuple(sorted((k, *sorted(VERSIONS.get(k, {}))) for k in REGISTRY)))
 
 
 @lru_cache(maxsize=1)
@@ -276,7 +276,11 @@ def validate_scenario_spec(
         from reva.simulation import plugins
 
         _check_macro_outputs(data)
-        return _validate_generic(data, plugins.get(model_key), allow_fixture_baseline=allow_fixture_baseline, now=now)
+        model = plugins.get(model_key)
+        version = data.get("model_version")
+        if isinstance(version, str) and version != model.model_version and version in plugins.versions_of(model_key):
+            model = plugins.get(model_key, version)  # another registered version (V3 SIMWORLD)
+        return _validate_generic(data, model, allow_fixture_baseline=allow_fixture_baseline, now=now)
     if isinstance(data, dict) and isinstance(data.get("horizon"), dict) and data["horizon"].get("periods") != 1:
         require("horizon.multi_period", requested_periods=data["horizon"].get("periods"))
     _check_macro_outputs(data)
