@@ -183,14 +183,36 @@ def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: boo
     return store.put_bytes(raw.body, ns, raw.media_type or "application/octet-stream")
 
 
+# Lineage write locks are striped: one transaction-scoped advisory lock per *bucket* of lineages
+# (two-int key space, class LINEAGE_LOCK_CLASS), taken for the whole acquisition up front in
+# ascending order. A lock per logical key put one entry per observation in PostgreSQL's
+# cluster-wide lock table (max_locks_per_transaction x max_connections), so one large acquisition
+# (thousands of age/sex cells) could exhaust it ("out of shared memory") for every database on the
+# server. Ascending acquisition keeps concurrent ingests deadlock-free; a bucket collision only
+# serialises two writers of unrelated lineages.
+LINEAGE_LOCK_CLASS = 7262050
+LINEAGE_LOCK_BUCKETS = 256
+
+
+def lineage_bucket(source_id: UUID, origin: str, logical_key: str) -> int:
+    """Stable lock bucket of a lineage (source, origin, logical key)."""
+    digest = hashlib.sha256(f"{source_id}|{origin}|{logical_key}".encode()).digest()
+    return int.from_bytes(digest[:4], "big") % LINEAGE_LOCK_BUCKETS
+
+
+def lock_lineages(conn: Connection, source_id: UUID, origin: str, logical_keys: Iterator[str] | Sequence[str]) -> int:
+    """Serialise writers of these lineages for the rest of the transaction (ascending buckets)."""
+    buckets = sorted({lineage_bucket(source_id, origin, k) for k in logical_keys})
+    for b in buckets:
+        conn.execute(text("SELECT pg_advisory_xact_lock(:c, :b)"), {"c": LINEAGE_LOCK_CLASS, "b": b})
+    return len(buckets)
+
+
 def _lineage_head(conn: Connection, source_id: UUID, origin: str, logical_key: str) -> LineageHead | None:
-    # Serialise writers of the same lineage for the duration of the transaction.
-    # A lineage is (source, origin, logical key): a live ingest never dedups
-    # against, or supersedes, a fixture-origin head (R-04).
-    conn.execute(
-        text("SELECT pg_advisory_xact_lock(hashtextextended(:k, 0))"),
-        {"k": f"{source_id}|{origin}|{logical_key}"},
-    )
+    # A lineage is (source, origin, logical key): a live ingest never dedups against, or
+    # supersedes, a fixture-origin head (R-04). The caller holds the lineage's lock
+    # (``lock_lineages``) for the duration of the transaction; re-taking it is re-entrant.
+    lock_lineages(conn, source_id, origin, [logical_key])
     row = conn.execute(
         text(
             "SELECT id, revision_no, semantic_hash FROM evidence.observation "
@@ -457,6 +479,8 @@ def publish_acquisition(
             {"connector": spec.name, "parser_version": spec.parser_version, "acquisition_id": str(acq_id)},
         )
         repo.record_activity(conn, norm_act, inputs=[(obj.sha256, {"item": raw.item.key})])
+        lock_lineages(conn, reg.source_id, raw.origin,
+                      [o.logical_key for b in batches for o in b.observations])  # bounded, ascending
         for batch in batches:
             for obs in batch.observations:
                 status, oid = _insert_observation(

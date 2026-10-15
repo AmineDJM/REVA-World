@@ -116,6 +116,16 @@ describe('RunPage: retirement age (generic multi-period)', () => {
   });
 });
 
+describe('RunPage: truncated results', () => {
+  it('says when the API returned only part of the rows', () => {
+    const e = env('economic.io_price', [r('household_basket_price_change_percent', '0.2', { unit: 'unit.percent' })]);
+    e.warnings = [{ code: 'results_truncated', message: 'Only the first 5000 of 17000 result rows are returned.' }];
+    renderBody(e);
+    expect(screen.getByTestId('results-truncated')).toHaveTextContent('Only the first 5000 of 17000');
+    expect(screen.getByTestId('results-truncated')).toHaveTextContent('not zero');
+  });
+});
+
 describe('RunPage: IO price propagation', () => {
   it('labels first-round cost-push, shows the heatmap, basket and decomposition', () => {
     const io = (k: string, v: string, country: string, app: Record<string, unknown> = {}) => r(k, v, { country, app, unit: 'unit.percent' });

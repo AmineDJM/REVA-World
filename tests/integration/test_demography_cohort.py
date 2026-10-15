@@ -148,7 +148,10 @@ def test_ingest_publishes_observations_and_registers_dataset_inputs(env: Env) ->
     observed = {ed.DATASETS[d].concept_id for d in ed.OBSERVED}
     europop = {ed.DATASETS[d].concept_id for d in ed.EUROPOP}
     assert got == {(c, s) for c in observed for s in ("LIE", "LUX")} | {(c, "LUX") for c in europop}
-    assert all(r["parser_version"] == ed.PARSER_VERSION and len(r["source_acquisition_ids"]) == 1 for r in rows)
+    windows = len(ed.EurostatDemographyConnector(since_year=2008).windows())
+    for r in rows:  # an observed table is assembled from all its time-window acquisitions
+        assert r["parser_version"] == ed.PARSER_VERSION
+        assert len(r["source_acquisition_ids"]) == (windows if r["concept_id"] in observed else 1)
     # every dataset names an acquisition whose archived raw bytes it was derived from
     acq = q(env.owner, """SELECT d.concept_id, a.raw_sha256 FROM evidence.dataset d
                           JOIN evidence.acquisition a ON a.id = d.source_acquisition_ids[1]""")

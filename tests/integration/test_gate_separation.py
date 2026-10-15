@@ -149,9 +149,19 @@ async def test_worker_proposes_gate_process_decides_worker_promotes(db: Any) -> 
         assert tuple(elig) == ("eligible", "reva_worker")
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == m["version"]
 
-    # 4. roll back: the superseded version is restored only because its approval was independent
+    # 4. roll back. When the superseded version is the immediately preceding one it is restored through
+    # evidence.restore_eligibility, which accepts it only because its approval was independent. (On a shared
+    # session database an intermediate rolled-back version may sit in between; then restore the state the
+    # other tests expect through the named-human path.)
+    from reva.autonomy.jobs import reapprove_promotion
+
     rollback_promotion(db.owner, CONNECTOR, m["version"], CONCEPT, "human:maintainer", "gate e2e drill")
     after = promoted_connectors(db.worker, db.store).get(CONNECTOR)
+    assert after is None or after.manifest["version"] != m["version"]
+    if before is not None and (after is None or after.manifest["version"] != before.manifest["version"]):
+        reapprove_promotion(db.owner, CONNECTOR, before.manifest["version"], CONCEPT, "human:maintainer",
+                            "restore after gate e2e drill")
+        after = promoted_connectors(db.worker, db.store).get(CONNECTOR)
     assert (after.manifest["version"] if after else None) == (before.manifest["version"] if before else None)
 
 

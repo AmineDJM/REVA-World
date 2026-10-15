@@ -42,11 +42,12 @@ const COHORT = () =>
 const IO = () =>
   common('economic.io_price', {
     title: 'e2e IO price shock',
+    fidelity: 'L2',
     countries: ['FRA', 'DEU'],
-    reference_year: 2021,
+    reference_year: 2024,
     horizon: { periods: 1, unit: 'annual_accounting_period' },
-    intervention: { kind: 'set_exogenous_industry_price_change', shocks: [{ origin: 'NOR', industry: 'B', price_change_percent: 30 }] },
-    assumptions: {},
+    intervention: { kind: 'set_exogenous_industry_price_change', shocks: [{ origin: 'FRA', industry: 'B', price_change_percent: 30 }] },
+    assumptions: { pass_through_grid: [0.5, 0.75] },
     outputs: ['industry_price_change_percent', 'household_basket_price_change_percent', 'household_basket_contributions'],
   });
 
@@ -65,7 +66,7 @@ const RETIREMENT = () =>
 async function tryRun(page: Page, context: BrowserContext, spec: Record<string, unknown>): Promise<{ id?: string; reason?: string }> {
   const sc = await apiPost(page.request, context, '/v1/scenarios', spec);
   if (sc.status !== 201 && sc.status !== 200) return { reason: `POST /v1/scenarios ${sc.status} ${sc.body?.code ?? ''}: ${String(sc.body?.detail ?? '').slice(0, 200)}` };
-  const sim = await apiPost(page.request, context, '/v1/simulations', { scenario_id: sc.body.scenario_id, fidelity: 'L1' });
+  const sim = await apiPost(page.request, context, '/v1/simulations', { scenario_id: sc.body.scenario_id, fidelity: spec.fidelity ?? 'L1' });
   if (sim.status !== 202) return { reason: `POST /v1/simulations ${sim.status} ${sim.body?.code ?? ''}: ${String(sim.body?.detail ?? '').slice(0, 200)}` };
   const id = sim.body.job_id as string;
   for (let i = 0; i < 240; i++) {
@@ -127,9 +128,29 @@ test('IO price propagation: heatmap, basket and decomposition, labelled first-ro
   test.skip(!r.id, `IO price model cannot run on this stack: ${r.reason}`);
   await page.goto(`/runs/${r.id}`);
   await settle(page);
-  await expect(page.getByTestId('io-label')).toContainText('First-round cost-push, full pass-through; not an inflation forecast');
-  await expect(page.getByTestId('io-heatmap')).toBeVisible();
-  await expect(page.getByTestId('basket-table')).toBeVisible();
+  const st = (await apiGet(page.request, `/v1/simulations/${r.id}`)).data;
+  await expect(page.getByTestId('io-label')).toContainText('not an inflation forecast');
+  await expect(page.getByTestId('experimental-label')).toBeVisible();
+  // Heatmap: one row per country, one cell per industry, values as served (exact strings on the cells).
+  const cells = (st.results as any[]).filter((x) => x.variant === 'L1' && x.output_key.startsWith('industry_price_change_percent:'));
+  const hm = page.getByTestId('io-heatmap');
+  await expect(hm.locator('tbody tr')).toHaveCount(new Set(cells.map((x) => x.applicability.country)).size);
+  for (const c of cells) {
+    if (c.value.kind === 'decimal') await expect(hm.locator(`td[data-exact="${c.value.value}"]`).first()).toBeAttached();
+  }
+  await expect(hm.locator('td.hm-shocked')).toHaveCount(cells.filter((x) => x.applicability.exogenous).length);
+  // Basket and decomposition per country; the L2 range is labelled a sensitivity range.
+  const basket = page.getByTestId('basket-table');
+  for (const b of (st.results as any[]).filter((x) => x.variant === 'L1' && x.output_key === 'household_basket_price_change_percent')) {
+    await expect(basket.getByRole('row', { name: new RegExp(b.applicability.country) })).toBeVisible();
+  }
+  await expect(basket.locator('caption')).toContainText('assumption sensitivity range (not a confidence interval)');
+  await expect(basket.locator('thead')).toContainText('Domestic products');
+  await expect(basket.locator('thead')).toContainText('Imported products');
+  // Hovering a cell reads its exact value.
+  const first = cells.find((x) => x.value.kind === 'decimal');
+  await hm.locator(`td[data-exact="${first.value.value}"]`).first().hover();
+  await expect(page.getByTestId('heatmap-readout')).toContainText(first.applicability.industry);
 });
 
 test('⌘K palette: deterministic search over countries and runs, keyboard only', async ({ page }) => {

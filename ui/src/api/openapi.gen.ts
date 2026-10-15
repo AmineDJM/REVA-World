@@ -4478,6 +4478,10 @@ export interface components {
             id: string;
             /** Output Key */
             output_key: string;
+            /** Period End */
+            period_end: string | null;
+            /** Period Start */
+            period_start: string | null;
             subject: components["schemas"]["EntityRef"] | null;
             uncertainty: components["schemas"]["Uncertainty"];
             /** Value */

@@ -745,6 +745,9 @@ export interface SimResult {
   uncertainty: Uncertainty;
   applicability: Record<string, unknown>;
   artifact_sha256?: string | null;
+  /** V2 multi-period rows: half-open [period_start, period_end) UTC dates; null for single-period rows. */
+  period_start?: string | null;
+  period_end?: string | null;
 }
 
 export interface SimulationStatus {

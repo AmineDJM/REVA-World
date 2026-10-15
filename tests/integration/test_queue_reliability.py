@@ -498,7 +498,8 @@ def test_thread_budget_ignores_cpu_count(monkeypatch) -> None:
 def test_schema_wait_is_bounded_and_role_checked(qdb: FreshDB) -> None:
     with qdb.worker.connect() as c:
         info = verify_runtime(c)
-    assert info["schema_revision"].startswith("0007") and info["role"] == "reva_worker"
+    # at or above 0007_security (the worker's minimum); later migrations (0008_v2, ...) are accepted
+    assert int(info["schema_revision"][:4]) >= 7 and info["role"] == "reva_worker"
     with qdb.owner.connect() as c, pytest.raises(ConfigurationError):
         verify_runtime(c)  # the migration owner is never an acceptable worker identity
     bogus = make_engine("worker", qdb.settings.model_copy(update={"reva_db_name": "reva_no_such_db_x"}))

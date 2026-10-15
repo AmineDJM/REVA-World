@@ -119,14 +119,11 @@ def test_live_labour_pensions_ingest_and_worker_run(tmp_path: Path) -> None:
                                     "k": f"live-pen-{sid}"}).scalar_one()
             w = Worker(settings, engines["worker"], store, engines["sim"], lease_seconds=600, heartbeat_seconds=5,
                        poll_interval=0.05)
-            try:
-                job = w.claim_one()
-                assert job is not None and str(job.id) == str(jid)
-                outcome = w.run_job(job)
-            finally:
-                w.close()
+            job = w.claim_one()
+            assert job is not None and str(job.id) == str(jid)
+            outcome = w.run_job(job)  # foreground execution with background heartbeats; closes the worker
             with engines["migration"].connect() as c:
-                jrow = dict(c.execute(text("SELECT status, result_ref, error FROM ops.job WHERE id=:j"),
+                jrow = dict(c.execute(text("SELECT status, result_ref, last_error FROM ops.job WHERE id=:j"),
                                       {"j": jid}).mappings().one())
                 rows = [dict(r) for r in c.execute(text(
                     """SELECT output_key, variant, value, period_start FROM sim.result

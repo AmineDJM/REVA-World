@@ -172,6 +172,25 @@ def test_non_kernel_values_quarantine_the_acquisition(db: Any) -> None:
     assert "987654321" not in finding["message"]  # the value itself is not echoed
 
 
+def test_large_acquisition_holds_a_bounded_number_of_lineage_locks(db: Any) -> None:
+    """One lineage lock per observation exhausted PostgreSQL's cluster-wide lock table on large
+    acquisitions ("out of shared memory" for every database); locks are striped into buckets."""
+    from reva.evidence.ingest import LINEAGE_LOCK_BUCKETS, LINEAGE_LOCK_CLASS
+
+    tag = f"locks-{uuid.uuid4().hex[:8]}"
+    seen: dict[str, int] = {}
+
+    def probe(conn: Any, _summary: Any) -> None:
+        seen["lineage"], seen["all"] = conn.execute(text(
+            """SELECT count(*) FILTER (WHERE locktype = 'advisory' AND classid = :c AND objsubid = 2), count(*)
+               FROM pg_locks WHERE pid = pg_backend_pid()"""), {"c": LINEAGE_LOCK_CLASS}).one()
+
+    n = 2 * LINEAGE_LOCK_BUCKETS + 100
+    summary = _ingest(db, tag, {f"k{i:04d}": str(i + 1) for i in range(n)}, post_publish=probe)
+    assert summary.inserted == n
+    assert 0 < seen["lineage"] <= LINEAGE_LOCK_BUCKETS and seen["all"] < n
+
+
 # --------------------------------------------------------------------------- R-03
 def test_r03_release_waits_for_inflight_ingest(db: Any) -> None:
     tag = f"r03-{uuid.uuid4().hex[:8]}"

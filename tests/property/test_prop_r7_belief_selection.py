@@ -219,7 +219,8 @@ def _ingest_revision(db: Any, tag: str, value: str, salt: str) -> None:
     )
     obs = (ParsedObservation(
         subject_provider="worldbank", subject_key="FRA", concept_id=POP, concept_version="1.0.0", support=support,
-        logical_key=f"r7:{tag}:a", value={"kind": "decimal", "value": value, "unit_ref": "unit.persons"},
+        logical_key=f"r7:{tag}:a", value={"kind": "decimal", "value": value, "unit_ref": "unit.persons",
+               "basis": {"scale_factor": "1"}},  # a complete kernel value: ingest validates it
         uncertainty=UncertaintySpec.unknown("synthetic r7 value"), source_flags={"r7": tag},
         raw_selector={"match": {"value": value}},
     ),)
