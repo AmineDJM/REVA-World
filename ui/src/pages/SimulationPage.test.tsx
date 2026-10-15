@@ -204,7 +204,7 @@ describe('MissingInputs (V2 engine problem shape)', () => {
   it('reads {code, input, reason, reference_year} rows as typed gaps, never zero', async () => {
     const { MissingInputs } = await import('./SimulationPage');
     const { ApiError } = await import('../api/problem');
-    const err = new ApiError('validation', 422, {
+    const err = new ApiError('unprocessable', 422, {
       title: 'missing input',
       status: 422,
       code: 'missing_input',

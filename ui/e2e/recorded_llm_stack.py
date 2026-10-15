@@ -2,9 +2,11 @@
 """The e2e stack (scripts/e2e_stack.py) with the *recorded* LLM drafter wired in.
 
 Same throwaway database, fixtures, API and worker as ``scripts/e2e_stack.py``; the only
-difference is that ``POST /v1/scenario-drafts`` replays the recorded provider responses in
+differences are that ``POST /v1/scenario-drafts`` replays the recorded provider responses in
 ``tests/fixtures/nl/recorded`` (``reva.nl.recorded.RecordedDrafter``), exactly as the API
-integration tests do. No live LLM is ever called (CI and tests never call an LLM). Without
+integration tests do, and that the V2 recorded source fixtures (all-country WDI/Comtrade, Eurostat
+demography, FIGARO, labour/pensions) are ingested offline too (``--no-v2-fixtures`` to skip). No live
+LLM and no live provider is ever called (CI and tests never call an LLM). Without
 this wrapper the stack runs with LLM drafting disabled and the composer e2e tests check the
 typed ``llm_unavailable`` refusal instead.
 
@@ -77,8 +79,32 @@ def _with_llm_ledger(stack_module):  # type: ignore[no-untyped-def]
     stack_module.Stack.prepare_data = prepare_data
 
 
+#: V2 recorded provider fixtures (tests/fixtures/source/<name>) also ingested offline, when the connector
+#: is registered: all-country WDI/Comtrade (ALLC), Eurostat demography (POP), FIGARO IO tables (IO) and
+#: labour/pensions (PEN). Their datasets are then pinned by the stack's test_fixture release.
+V2_FIXTURE_CONNECTORS = (
+    "worldbank.wdi.all_economies",
+    "un.comtrade.public_batch",
+    "eurostat.demography",
+    "eurostat.figaro.iciot_ii",
+    "eurostat.labour_pensions",
+)
+
+
+def _with_v2_fixtures(stack_module):  # type: ignore[no-untyped-def]
+    from reva.adapters.connectors.registry import builtin_connectors
+
+    known = builtin_connectors()
+    extra = tuple(n for n in V2_FIXTURE_CONNECTORS if n in known and n not in stack_module.FIXTURE_CONNECTORS)
+    stack_module.FIXTURE_CONNECTORS = tuple(stack_module.FIXTURE_CONNECTORS) + extra
+
+
 if __name__ == "__main__":
     mod = _load_stack_module()
     _with_llm_ledger(mod)
+    if "--no-v2-fixtures" in sys.argv:
+        sys.argv.remove("--no-v2-fixtures")
+    else:
+        _with_v2_fixtures(mod)
     sys.argv[0] = str(ROOT / "scripts" / "e2e_stack.py")
     sys.exit(mod.main())

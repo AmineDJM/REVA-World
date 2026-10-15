@@ -383,6 +383,18 @@ function IoView({ st }: { st: SimulationStatus }) {
 
 // ------------------------------------------------------------------ page
 
+/** The API caps result rows per response: say so wherever results are shown (never imply completeness). */
+export function TruncationNotice({ env }: { env: { warnings?: { code: string; message: string }[] } | null | undefined }) {
+  const w = env?.warnings?.find((x) => x.code === 'results_truncated');
+  if (!w) return null;
+  return (
+    <p className="bound-flag" role="status" data-testid="results-truncated">
+      <strong>Incomplete listing:</strong> {w.message} Charts, tables and the heatmap below show only the rows returned; missing rows are not
+      zero and not absent from the run.
+    </p>
+  );
+}
+
 export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatus> }) {
   const st = env.data;
   const model = modelKeyOf(st);
@@ -398,6 +410,7 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
   if (model === MODEL_KEYS.crude) {
     return (
       <>
+        <TruncationNotice env={env} />
         <p>
           <Link to={`/map?sim=${encodeURIComponent(id)}`}>Show this run on the world map</Link>
         </p>
@@ -411,6 +424,7 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
       {(model === MODEL_KEYS.cohort || model === MODEL_KEYS.retirement || (multi && model !== MODEL_KEYS.io)) && <ProjectionLabel />}
       {model === MODEL_KEYS.io && <IoLabel l2={st.run?.fidelity === 'L2'} />}
       {experimental && <ExperimentalLabel reviewStatus={reviewStatus} />}
+      <TruncationNotice env={env} />
 
       <section className="panel" aria-labelledby="runsum-h">
         <h2 id="runsum-h">Run</h2>

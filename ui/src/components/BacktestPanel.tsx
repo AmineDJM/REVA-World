@@ -15,7 +15,8 @@ export function BacktestPanel({ backtests, source, unitRef }: { backtests: Backt
       </p>
       {backtests.length === 0 && (
         <p className="muted" role="status" data-testid="backtest-absent">
-          No back-test is attached to this run{source ? `; see ${source}` : ''}. Its absence is not evidence of accuracy.
+          Back-test: not attached to this run's results{source ? `; see ${source}` : ' (see the model documentation)'}. Its absence is not evidence of
+          accuracy.
         </p>
       )}
       {backtests.map((b, i) => (

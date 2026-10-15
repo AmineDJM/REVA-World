@@ -36,15 +36,20 @@ def fixture_tables() -> dict[str, dict[str, Any]]:
     c = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
     http = FixtureHttp(ed.NAME)
 
-    async def go() -> dict[str, dict[str, Any]]:
-        return {i.key: ed.dataset_tables(await c.fetch(i, http)) for i in c.all_items()}
+    async def go() -> dict[str, list[Any]]:
+        out: dict[str, list[Any]] = {}
+        for i in c.all_items():
+            group = f"{i.params['dataset']}:{','.join(i.params['geos'])}"
+            out.setdefault(group, []).append(await c.fetch(i, http))
+        return out
 
-    return asyncio.run(go())
+    raws = asyncio.run(go())
+    return {group: ed.merged_tables(group.split(":")[0], parts) for group, parts in raws.items()}
 
 
 def table(name: str, iso3: str) -> Any:
     ds = DS[name]
-    key = f"{ds}:all" if ds.startswith("proj") else f"{ds}:{ed.ISO3_TO_GEO[iso3]}"
+    key = f"{ds}:LI,LU" if ds.startswith("proj") else f"{ds}:{ed.ISO3_TO_GEO[iso3]}"
     return fixture_tables()[key].get(iso3)
 
 

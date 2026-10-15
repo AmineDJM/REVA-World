@@ -53,19 +53,19 @@ def test_name_does_not_collide_with_autonomy_templates_and_is_builtin() -> None:
 def test_plan_covers_every_country_and_dataset_and_resumes_from_cursor() -> None:
     c = ed.EurostatDemographyConnector()
     items = c.all_items()
-    assert len(items) == 31 * 3 + 3
+    assert len(items) == 31 * 3 * 3 + 3  # 3 time windows per observed table
     assert all(i.url.startswith(ed.DATA_BASE) for i in items)
-    assert "geo=EL" in next(i.url for i in items if i.key == "demo_pjan:EL")  # Eurostat code for Greece
+    assert "geo=EL" in next(i.url for i in items if i.key == "demo_pjan:EL:2000")  # Eurostat code for Greece
     plan = c.plan(None, FetchBudget(max_requests=40))
     assert len(plan.items) == 40 and plan.budget_exhausted
     done = [FetchOutcome(item_key=i.key, status="published") for i in plan.items]
     cur = c.next_cursor(plan, done)
     assert not cur.state["complete"] and len(cur.state["done"]) == 40
-    plan2 = c.plan(cur, FetchBudget(max_requests=100))
+    plan2 = c.plan(cur, FetchBudget(max_requests=1000))
     assert {i.key for i in plan2.items} == {i.key for i in items} - set(cur.state["done"])
     cur2 = c.next_cursor(plan2, [FetchOutcome(item_key=i.key, status="published") for i in plan2.items])
     assert cur2.state["complete"] and cur2.state["done"] == []
-    assert len(c.plan(Cursor(state=cur2.state), FetchBudget()).items) == len(items)  # a new cycle
+    assert len(c.plan(Cursor(state=cur2.state), FetchBudget(max_requests=1000)).items) == len(items)  # new cycle
 
 
 def test_every_fixture_item_parses_and_passes_validation(fixture_raws: dict[str, RawAcquisition]) -> None:
@@ -83,7 +83,7 @@ def test_every_fixture_item_parses_and_passes_validation(fixture_raws: dict[str,
 
 def test_status_flags_open_and_unknown_ages_are_preserved(fixture_raws: dict[str, RawAcquisition]) -> None:
     c = connector()
-    [batch] = list(c.parse(fixture_raws["demo_pjan:LU"]))
+    [batch] = list(c.parse(fixture_raws["demo_pjan:LU:2017"]))
     by_age = {}
     for o in batch.observations:
         by_age.setdefault(o.source_flags["categories"]["age"], []).append(o)
@@ -99,9 +99,23 @@ def test_status_flags_open_and_unknown_ages_are_preserved(fixture_raws: dict[str
     assert starts and all(85 <= s <= 100 for s in starts)
 
 
+def test_windows_merge_into_one_table_without_overlap(fixture_raws: dict[str, RawAcquisition]) -> None:
+    c = connector()
+    assert c.windows() == [(2008, 2016), (2017, None)]
+    parts = [r for k, r in fixture_raws.items() if k.startswith("demo_pjan:LU:")]
+    merged = ed.merged_tables("demo_pjan", parts)["LUX"].to_pylist()
+    years = sorted({r["year"] for r in merged})
+    assert years[0] == 2008 and years[-1] >= 2025 and years == list(range(years[0], years[-1] + 1))
+    with pytest.raises(Exception, match="overlapping"):
+        ed.merged_tables("demo_pjan", parts + parts[:1])
+    for raw in parts:  # each acquisition stays small (lock-table friendly)
+        [b] = list(c.parse(raw))
+        assert len(b.observations) <= 103 * 3 * 10
+
+
 def test_dataset_tables_are_pure_functions_of_the_raw_bytes(fixture_raws: dict[str, RawAcquisition]) -> None:
-    t1 = ed.dataset_tables(fixture_raws["demo_magec:LI"])
-    t2 = ed.dataset_tables(fixture_raws["demo_magec:LI"])
+    t1 = ed.dataset_tables(fixture_raws["demo_magec:LI:2008"])
+    t2 = ed.dataset_tables(fixture_raws["demo_magec:LI:2008"])
     assert list(t1) == ["LIE"] and t1["LIE"].equals(t2["LIE"])
     tab = t1["LIE"]
     assert tab.schema.names == [n for n, _ in ed.DATASET_COLUMNS]
@@ -119,7 +133,7 @@ def test_dataset_tables_are_pure_functions_of_the_raw_bytes(fixture_raws: dict[s
 
 
 def test_fertility_age_classes_classified(fixture_raws: dict[str, RawAcquisition]) -> None:
-    rows = ed.dataset_tables(fixture_raws["demo_fasec:LU"])["LUX"].to_pylist()
+    rows = ed.dataset_tables(fixture_raws["demo_fasec:LU:2008"])["LUX"].to_pylist()
     kinds = {r["age"]: (r["age_kind"], r["cell_type"]) for r in rows}
     assert kinds["Y10-14"] == ("group", "leaf")  # no single ages 10..14 published: a leaf class
     assert kinds["Y15-19"] == ("group", "subtotal")  # overlaps the single ages 15..19
@@ -135,7 +149,7 @@ def _override(raw: RawAcquisition, mutate: Any) -> RawAcquisition:
 
 def test_unknown_flag_negative_count_and_drift_block(fixture_raws: dict[str, RawAcquisition]) -> None:
     c = connector()
-    raw = fixture_raws["demo_pjan:LI"]
+    raw = fixture_raws["demo_pjan:LI:2008"]
 
     def unknown_flag(d: dict[str, Any]) -> None:
         d["status"] = {"5": "q"}
@@ -170,7 +184,7 @@ def test_confidentiality_status_is_missing_suppressed_never_zero(fixture_raws: d
         d["extension"]["status"] = {"label": {**((d["extension"].get("status") or {}).get("label") or {}),
                                               "|N": "|not for publication"}}
 
-    [b] = list(c.parse(_override(fixture_raws["demo_fasec:LU"], conf)))
+    [b] = list(c.parse(_override(fixture_raws["demo_fasec:LU:2008"], conf)))
     assert c.validate(b).outcome == "pass"
     o = next(o for o in b.observations if o.raw_selector["jsonstat_position"] == 0)
     assert o.value == {"kind": "missing", "reason": "suppressed"}
@@ -190,4 +204,5 @@ def test_registry_entries_exist() -> None:
     maps = [m for m in reg.mappings if m["connector"]["name"] == "eurostat.demography"]
     assert {m["target"]["concept_id"] for m in maps} == {ed.DATASETS[k].concept_id for k in ed.OBSERVED}
     assert all(m["mapping_kind"] == "exact" for m in maps)
-    assert budgets_policy().content["per_source_daily_requests"]["eurostat.demography"] >= 96
+    assert budgets_policy().content["per_source_daily_requests"]["eurostat.demography"] >= len(
+        ed.EurostatDemographyConnector().all_items())

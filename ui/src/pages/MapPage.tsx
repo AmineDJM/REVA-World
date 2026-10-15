@@ -228,6 +228,12 @@ export default function MapPage() {
           </label>
         )}
         {sim.status === 'error' && <ErrorState error={sim.error} what="The simulation" onRetry={sim.reload} />}
+        {sim.data?.warnings?.some((w) => w.code === 'results_truncated') && (
+          <p className="bound-flag" role="status" data-testid="results-truncated">
+            The API returned only part of this run's result rows; countries without a returned row are drawn as "no result reported", not as
+            zero.
+          </p>
+        )}
         {st && (
           <p className="muted">
             Scenario <span className="mono">{shortId(st.scenario?.id)}</span> · baseline release #{st.scenario?.baseline_release?.sequence ?? '—'} · cutoff{' '}

@@ -8,8 +8,9 @@ per_source_daily_requests:
   crossref.works: 50
   eurostat.dissemination: 100
   # 1.2.0 (V2 step 3a, agent POP): built-in connector eurostat.demography; one full run is
-  # 31 countries x 3 tables + 3 EUROPOP2023 tables = 96 requests (resumable via its cursor).
-  eurostat.demography: 120
+  # 31 countries x 3 tables x 3 time windows + 3 EUROPOP2023 tables = 282 small requests
+  # (resumable via its cursor).
+  eurostat.demography: 300
   naturalearth.admin0_110m: 10
 llm:
   # Autonomy LLM evidence extraction stays disabled (zero budget).

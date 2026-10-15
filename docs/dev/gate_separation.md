@@ -1,0 +1,175 @@
+# Independent promotion gate (process separation)
+
+Agent GATE, 2026-10-15. This closes the residual risk recorded in `docs/limitations.md`
+("Governance limits"), R5-01 part 3 and R6-03. The V1 autonomy gate used to run inside the worker
+process with the worker's database login. Because `ops.record_gate_result` was executable by
+`reva_worker`, the worker could record a passing gate result for its own proposal.
+
+## What changed
+
+### Database (`migrations/versions/0007_security.py`, governance section)
+
+**New login `reva_gate`**
+- Created by the migration like the other runtime roles: `NOLOGIN NOINHERIT`, with forbidden attributes checked.
+- Bootstrap then sets `LOGIN`, a SCRAM verifier and the configurable `CONNECTION LIMIT` (`REVA_ROLE_CONNECTION_LIMIT`).
+- `verify_runtime_role_attributes`, `verify_ownership` and `verify_runtime_memberships` cover it, because `RUNTIME_ROLES` is derived from `ROLE_LOGIN`.
+
+**Only `reva_gate` records gate results**
+- `EXECUTE ON ops.record_gate_result` is granted to `reva_gate` only.
+- `reva_worker` lost that grant, and lost `INSERT` on `ops.gate_result`.
+- `ops.gate_result` is now a governed table. `meta.enforce_governance` refuses every inserter except the `reva_gate` login, including the migration owner.
+- `meta.session_principal()` knows `reva_gate`.
+
+**Approvals require `recorded_by = 'reva_gate'`**
+- `ops.consume_approval` (used by `evidence.approve_eligibility`, `ontology.approve_mapping` and `model.approve_version`) accepts a gate result only if `recorded_by = 'reva_gate'`. An API-recorded human review is still accepted as before.
+- `evidence.restore_eligibility` re-enables a version only if its last eligible row is independently approved. That means one of:
+  - it was written by the owner (reviewed seed or admin CLI);
+  - an `ops.approval_use` row exists for exactly that target, whose approval is a `reva_gate` pass or an API-recorded review.
+
+**New table `ops.gate_request`**
+- Columns: `proposal_id`, `gate_name`, `reports` (an array of at most 16 entries and 256 KiB), `policy_sha256`, `recorded_by`, `recorded_at`.
+- It is append-only (immutable trigger) and `recorded_by` is forced.
+- The worker may `INSERT` and `SELECT`. The gate and the API may only `SELECT`.
+
+**Least privilege for `reva_gate`**
+- `USAGE` on `meta`, `evidence` and `ops`.
+- `SELECT` on `ops.proposal`, `ops.gate_request`, `ops.gate_result`, `evidence.connector_version`, `evidence.source` and `evidence.eligibility`. These are what `PolicyPromotionGate` and the T1 binding read.
+- `SELECT, INSERT` on `meta.artifact` and `meta.artifact_location`, so the gate can register its decision evidence. Two restrictions apply:
+  - The trigger `a02_gate_artifact` (`WHEN session_user = 'reva_gate'`) accepts only `gate-decision/1` JSON.
+  - RLS allows locations only in the `evaluation` namespace.
+- No other table, schema or function. The gate cannot read observations, beliefs, jobs, tokens, reviews or audit rows. It cannot submit jobs, approve, or record promotions.
+
+**Indexes**
+- `ops.gate_request(recorded_at, id)`.
+- `ops.gate_result(proposal_id, recorded_at)`.
+
+### Process (`src/reva/gate/`, new package)
+
+**Worker side: `reva.gate.client.GateClient`**
+- It is a drop-in for `PolicyPromotionGate.decide` in the worker.
+- It inserts an `ops.gate_request` row with the persisted proposal id and the report objects, then polls for the newest `ops.gate_result` with `recorded_by = 'reva_gate'` recorded after the request.
+- The outcome is read from the gate's digest-verified evidence, which must agree with the database row. Otherwise the decision is treated as `blocked`.
+- The wait is bounded by `REVA_GATE_WAIT_SECONDS` (default 120). On timeout the client returns an unrecorded `blocked` decision whose reason starts with `gate_pending`. Discovery then reports `status: gate_pending` and promotes nothing.
+
+**Gate process: `reva.gate.service.GateService`**
+- Entrypoints: `reva gate [--once]`, `python -m reva.gate.service` and `scripts/start_gate.py`.
+- It logs in as `reva_gate`; `check_gate_login` refuses any other login.
+- It polls `ops.gate_request` for requests that have no later `reva_gate` decision. It polls rather than using the job queue, so it needs no `ops.job` write privileges, and the worker cannot claim gate work by mistake.
+- It takes a per-request session advisory lock and re-checks that the request is still pending.
+- It runs the unchanged reviewed `PolicyPromotionGate` with its own engine. That class loads the `ops.proposal` row and its digest-verified document, derives the tier, verifies the reports against their stored evidence and, for T1, recomputes the validator and sandbox. The pinned policy is loaded by the gate itself, never taken from the request.
+- The gate then records the decision through `ops.record_gate_result`.
+
+**Failure handling (fail closed)**
+- Kill switch or autonomy disabled: nothing is recorded and the request stays pending.
+- Typed refusal (`RevaError`, for example a malformed request, a tampered or unreadable artifact, or an unknown proposal): a `blocked` decision is recorded.
+- Unexpected error: retried on the next poll. After 5 failures a `blocked` decision is recorded.
+- If even the `blocked` decision cannot be recorded, the request is skipped for the rest of the process lifetime.
+
+**Promotion**
+- The worker promotes only through `promote_connector`, using the decision returned by the client. That function checks the gate row and its evidence. The approval functions then require that the cited gate result was recorded by `reva_gate`.
+
+**Call sites switched to `GateClient`**
+
+Each is a minimal edit marked `GATE`:
+- `src/reva/autonomy/jobs.py`: discovery, and the equivalence rejection that reuses the same client;
+- `src/reva/autonomy/repair.py`: `handle_connector_repair`;
+- the docstring of `src/reva/autonomy/gate.py`: the "honest limit" paragraph is replaced.
+
+`PolicyPromotionGate` itself is unchanged. With the worker's engine its `_record` now fails with `permission denied`.
+
+### Settings, start scripts and Blueprint
+
+**Settings**
+- `Role` and `ProcessRole` include `gate`.
+- `ROLE_LOGIN["gate"] = "reva_gate"`.
+- New settings: `REVA_GATE_DB_PASSWORD` (secret), `REVA_GATE_WAIT_SECONDS` and `REVA_GATE_POLL_SECONDS`.
+- `runtime_url("gate")`.
+- `required_for("gate")`: the gate password, and no owner URL in production.
+- `required_for("bootstrap")` needs the gate password in production only. Outside production the gate login may be left unprovisioned. Nothing can then be auto-promoted, which is fail closed and keeps older local or test bootstraps working.
+- The engine kind `gate` is added.
+
+**`scripts/start_gate.py`**
+It mirrors `start_worker.py`:
+- it refuses owner credentials in production and a conflicting `REVA_PROCESS_ROLE`;
+- it validates the configuration the child will receive;
+- its allowlisted child environment holds only `REVA_GATE_DB_PASSWORD` and the gate's own S3 credential. There are no worker, sim or API passwords, no session secret, no provider keys and no proxy (the gate makes no outbound requests);
+- it waits, bounded by `REVA_GATE_STARTUP_DEADLINE_SECONDS`, until the `reva_gate` login can see `ops.gate_request` and may execute `ops.record_gate_result`.
+
+**`scripts/_runtime_env.py`**
+It gains the `gate` component. The worker allowlist never includes the gate password.
+
+**`render.yaml`**
+- `REVA_GATE_DB_PASSWORD` is generated on `reva-api` because the pre-deploy bootstrap provisions it. The API child does not receive it.
+- New background worker service `reva-gate`:
+  - plan `0.5c-512mb`, one instance;
+  - `python scripts/start_gate.py`, `REVA_PROCESS_ROLE=gate`;
+  - the password from `reva-api`;
+  - its own `sync: false` S3 key pair, prefix-scoped: read the autonomy prefixes, write `evaluation/`, `models/` and `normalised/`.
+- The pre-deploy is unchanged.
+- `scripts/validate_blueprint.py` checks the gate service and that the worker never receives the gate password. It passes.
+
+**`.env.example` / `.env`**
+`REVA_GATE_DB_PASSWORD=local_gate_only` (a local-only value).
+
+## Tests
+
+**`tests/security/test_gate_separation.py`** (new, 14 tests). It covers:
+- worker, API and simulation logins cannot record gate results, either through the function or directly;
+- the gate login can, and its rows carry `recorded_by = 'reva_gate'`; the identity checks still fire;
+- the owner is refused;
+- forged gate rows (trigger bypass with `recorded_by` `reva_worker` or the owner) are refused by `approve_eligibility`, `approve_mapping` and `approve_version`, while a positive control passes;
+- `restore_eligibility` refuses an unapproved eligible row, with an owner-written positive control;
+- the gate's least-privilege matrix;
+- evidence-only artifact registration;
+- `gate_request` is worker-written and append-only;
+- role hygiene: `NOINHERIT`, a login, and a membership is detected;
+- settings: the gate password is required only in production;
+- `start_gate.py` scrubbing and fail-closed checks;
+- Blueprint checks.
+
+**`tests/integration/test_gate_separation.py`** (new, end to end):
+1. The worker files a request. With no gate running it gets `gate_pending`, nothing is recorded, and promotion is refused.
+2. `python -m reva.gate.service --once` runs as a real subprocess with only the gate login and the test database. It recomputes the reports and records `pass` as `reva_gate`.
+3. The worker promotes through `approve_eligibility`. The `ops.approval_use` row cites the `reva_gate` result.
+4. Rollback restores the superseded version through the hardened `restore_eligibility`.
+
+A second test covers the service failing closed: the kill switch records nothing, and a malformed request is recorded as `blocked`.
+
+**Adapted helpers (not production checks)**
+- `tests/conftest.py`: `DB.gate` (the `reva_gate` engine), plus a `gate_service` fixture that runs `GateService` in a background thread with its own engine.
+- Tests that called `PolicyPromotionGate(db.worker, …)` now use `db.gate`.
+- Discovery and repair tests that run the worker step request `gate_service`.
+- `test_db_hardening.py` and `test_governance_r5.py` record gate results with the gate login on committed proposals.
+- The worker-INSERT matrix now expects `ops.gate_request` and no `ops.gate_result`.
+- Expected role lists include `reva_gate`.
+- `scripts/demo_workflow.py` step 9 runs a `GateService` next to the in-process worker.
+
+## Residual risk (honest)
+
+- **Inputs are worker-stored.** The gate decides on what the worker stored: the proposal document, the report evidence, and the captured fixture bank it re-runs the validator and sandbox on. A compromised worker chooses *what* is evaluated, though not the verdict. T1 binding (registry semantics, pinned template digest, approved mapping, content-derived version) limits what can pass.
+- **Same image.** Both processes run the same image, so a code-level compromise affects both.
+- **Local development** (`reva gate`, `make`/uv on the host): the gate runs on the same host or container, usually as the same OS user, from the same `.env` that holds every runtime password. The separation there is a credential convention, not an isolation boundary.
+- **Render:** `reva-gate` is a separate service with its own environment. The API service also holds the gate password because its pre-deploy bootstrap provisions it, exactly as it holds the worker and sim passwords; `start_api.py` scrubs it from the API child.
+- **Still worker-writable:**
+  - `model.record_promotion` (tournament promotions);
+  - `model.evaluation`;
+  - `meta.artifact` metadata;
+  - objects in the store. The gate verifies digests, so content under a digest cannot change, but the worker can write new objects.
+- **`gate_pending`.** If the gate service is down, discovery reports `gate_pending` and does not promote. The request stays queued, and the gate decides it later, but nothing re-runs the promotion automatically: the next discovery run requests again. A follow-up job (`gate_followup`) would remove the need to re-run discovery. It is not implemented.
+
+## Follow-ups for other owners
+
+- `migrations/schema_contract.json` already contains the GATE objects (it was regenerated at 01:20, after the
+  0007 edit). `scripts/update_schema_contract.py --check` reports only ENG's `0008_v2` functions
+  `ops.reserve_llm_budget` and `ops.settle_llm_budget` as stale. GATE did not regenerate it, because ENG edited
+  `0008_v2.py` at 01:29 and may still be working on it. ENG or MIGR should run
+  `uv run python scripts/update_schema_contract.py` when 0008 is final.
+- `docs/deployment.md` and `docs/operations.md` (DKR/DOC2) should document:
+  - the `reva-gate` service and its S3 key pair (prefix-scoped as above);
+  - running `reva gate` locally next to `reva worker`;
+  - the `gate_pending` status.
+- `Makefile` (CI): add a `gate:` target (`$(PY) reva gate`).
+- `reva verify` (`src/reva/cli/main.py`) could also probe the `gate` login when `REVA_GATE_DB_PASSWORD` is set.
+- AFX:
+  - `PolicyPromotionGate._record` could assert `session_user = 'reva_gate'` before recording, for a clearer error than `permission denied`;
+  - `_verify_gate_row` in `jobs.py` could also require `recorded_by = 'reva_gate'` as defence in depth. The database already enforces it at approval time.
