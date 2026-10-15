@@ -332,3 +332,32 @@ def test_sample_answers_for_the_docs(env: Env, llm: MemLedger) -> None:
             f"REPHRASE: {b['rephrase'].get('status')}\nWARNINGS: {b['warnings']}\n"
             f"EVIDENCE: {len(b['evidence'])} items; e.g. {b['sentences'][0]['citation_refs'][:2]}"
         )
+
+
+def test_llm_question_is_charged_to_the_shared_v2_ledger(env: Env) -> None:
+    """The real ledger (``ops.reserve_llm_budget`` / ``settle_llm_budget`` from migration 0008, called as
+    ``reva_api``): one request row and one token row in the llm.scenario_drafts accounts, settled."""
+    from reva.nl.budget import DbLlmLedger
+
+    budget = LlmBudget("test", "", 50, 500_000, 1500)
+    env.app.state.nlqa_planner_factory = lambda settings: [PlanReplay(F.RECORDED_DIR)]
+    env.app.state.nlqa_budget = budget
+    env.app.state.nlqa_ledger = DbLlmLedger(env.api, budget)
+    try:
+        with env.owner.connect() as c:
+            before = c.execute(text("SELECT count(*) FROM ops.budget_ledger")).scalar_one()
+        b = ask(env, FIXTURES["fr_density_rank"]["text"]).json()
+        assert b["planner"] == "llm", b["warnings"]
+        with env.owner.connect() as c:
+            rows = (
+                c.execute(
+                    text("SELECT account_key, operation_id, reserved, consumed FROM ops.budget_ledger ORDER BY id")
+                )
+                .mappings()
+                .all()[before:]
+            )
+        assert {r["account_key"] for r in rows} == {"llm:scenario_drafts:requests", "llm:scenario_drafts:tokens"}
+        assert all(r["operation_id"].startswith("nl_draft:") and r["consumed"] is not None for r in rows)
+    finally:
+        for k in ("nlqa_planner_factory", "nlqa_ledger", "nlqa_budget"):
+            delattr(env.app.state, k)

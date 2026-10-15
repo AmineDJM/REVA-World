@@ -168,7 +168,7 @@ async def capture(
             requests += r.requests
             part = {
                 "entities": r.entities,
-                "sha_by_id": r.sha_by_id,
+                "sha_by_id": getattr(r, "raw_sha_by_id", None) or getattr(r, "sha_by_id", {}),
                 "redirects": r.redirects,
                 "missing": list(r.missing),
                 "shas": list(r.raw_sha256s),

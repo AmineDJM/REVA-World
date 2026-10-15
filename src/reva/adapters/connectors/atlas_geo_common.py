@@ -1,13 +1,10 @@
 """Shared helpers for the A-GEO atlas connectors (Natural Earth 1:10m, GeoNames, CCKP climate, INFORM).
 
-* Connector specs: ``ConnectorSpec.template`` is a closed ``Literal`` without an atlas value yet, so
-  :func:`atlas_spec` validates every field with a valid placeholder template and then sets the template to
-  ``"atlas_bulk"`` (the convention used by the other V3 atlas agents).
-* Raw bytes are archived as evidence acquisitions (zero observation batches) with
-  :func:`archive_raw` *before* any atlas table or KG statement is registered from them.
-* :func:`register_connector` registers a connector version in a throwaway/test database with the seed's
-  own function: the built-in connector list (``reva.adapters.connectors.registry``) is lead-owned and does
-  not list the A-GEO connectors yet.
+* Each A-GEO module declares ``atlas_source() -> AtlasSourceSpec`` and ``async atlas_ingest(run)`` (single
+  atlas ingest entry point, ``reva.atlas.ingest``); fetching goes through ``run.get`` (:func:`run_get`), raw
+  bytes are archived with ``run.archive`` *before* any atlas table or KG statement is built from them.
+* :func:`make_run` wraps an explicit client (tests) in an ``AtlasRun``; :func:`register_connector`
+  registers a connector version in a test/throwaway database (``reva.atlas.sources.ensure_registered``).
 * Values are emitted as strict decimal strings; computed values are rounded explicitly (:func:`dec`).
 """
 
@@ -16,25 +13,10 @@ from __future__ import annotations
 import hashlib
 from datetime import date, datetime, timedelta
 from decimal import ROUND_HALF_EVEN, Decimal
-from typing import Any, get_args
+from typing import Any
 
 from reva.adapters.connectors.base import dec_str, to_raw
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
-
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"
-
-
-def template_supported() -> bool:
-    return ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
-
-
-def atlas_spec(**fields: Any) -> ConnectorSpec:
-    """A connector spec with ``template = "atlas_bulk"`` (every other field validated)."""
-    if template_supported():
-        return ConnectorSpec(template=ATLAS_TEMPLATE, **fields)  # type: ignore[arg-type]
-    checked = ConnectorSpec(template=_VALID_PLACEHOLDER, **fields)  # type: ignore[arg-type]
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 
 async def fetch_raw(item: FetchItem, http: Any) -> RawAcquisition:
@@ -59,28 +41,35 @@ def snapshot_period(retrieved_at: datetime) -> tuple[date, date]:
     return d, d + timedelta(days=1)
 
 
-def archive_raw(engine: Any, store: Any, spec: ConnectorSpec, raw: RawAcquisition, *, actor: str) -> str:
-    """Archive the raw bytes as an acquisition of ``spec`` (no observations); return its sha256."""
-    from reva.evidence.ingest import publish_acquisition
+def make_run(spec: Any, engine: Any, store: Any, http: Any) -> Any:
+    """An ``AtlasRun`` around an explicit client (tests / ``FixtureHttp``); live runs go through
+    ``reva.atlas.ingest.run_atlas_ingest`` (budget-metered client)."""
+    from reva.atlas.ingest import AtlasRun
 
-    summary = publish_acquisition(engine, store, spec, raw, [], [], actor=actor)
-    if summary.namespace == "quarantine":  # pragma: no cover - no blocking report is passed
-        raise RuntimeError("raw acquisition was quarantined")
-    if summary.raw_sha256 != sha256_hex(raw.body):  # pragma: no cover - store integrity
-        raise RuntimeError("archived raw sha256 differs from the body hash")
-    return str(summary.raw_sha256)
+    return AtlasRun(
+        spec=spec,
+        http=http,
+        engine=engine,
+        store=store,
+        settings=None,
+        origin=getattr(http, "origin", "live"),
+        actor="worker:atlas_a_geo",
+    )
 
 
-def register_connector(owner_engine: Any, store: Any, spec: ConnectorSpec, actor: str = "system:a_geo") -> Any:
-    """Register ``spec`` as a connector version (tests / throwaway databases; migration-owner engine).
-    Its ``registry/sources/*.yaml`` entry must already be seeded."""
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
+async def run_get(run: Any, item: FetchItem) -> RawAcquisition:
+    """Fetch one planned item through the run's client (never a client of our own)."""
+    raw: RawAcquisition = await run.get(
+        item.url, key=item.key, media_types=item.expected_media_types, max_bytes=item.max_bytes
+    )
+    return raw
 
-    with owner_engine.begin() as conn:
-        act = repo.simple_activity("registry.seed", "review", actor, {"connector": spec.name})
-        repo.record_activity(conn, act)
-        return register_connector_version(conn, store, spec, act.id)
+
+def register_connector(owner_engine: Any, store: Any, spec: Any) -> None:
+    """Register an atlas connector version in a test/throwaway database (owner engine)."""
+    from reva.atlas.sources import ensure_registered
+
+    ensure_registered(owner_engine, store, spec)
 
 
 def load_country_qids(path: Any = None) -> dict[str, str]:

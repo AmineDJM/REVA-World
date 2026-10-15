@@ -1,4 +1,8 @@
-"""A-ILO labour atlas: fixture bytes -> archived acquisitions -> registered atlas tables (throwaway DB)."""
+"""A-ILO labour atlas through the ATLASCORE entry point (fixture mode, throwaway DB).
+
+Fixture bytes -> archived acquisitions of the atlas connector versions -> registered atlas tables;
+a live run without a budget for the source is refused before any request.
+"""
 
 from __future__ import annotations
 
@@ -10,23 +14,28 @@ import pytest
 
 from reva.adapters.connectors import atlas_ilo as ilo
 from reva.adapters.connectors import atlas_wages_gapfill as gap
-from reva.adapters.connectors.atlas_labour_common import register_connector, run_atlas_ingest
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered, get_source
 from reva.atlas.tables import read_atlas_table
-from reva.evidence.runner import FixtureHttp
-from reva.operations.budgets import BudgetExhausted, IngestBudget
+from reva.operations import budgets as B
 
 pytestmark = pytest.mark.db
 
-AREAS = ("FRA", "DZA", "KOS", "AUT", "TWN", "X01")
+
+def _register(db: Any, name: str) -> None:
+    ensure_registered(db.owner, db.store, get_source(name).spec)
+
+
+def _table(out: dict[str, Any], key: str) -> dict[str, Any]:
+    return next(t for t in out["summary"]["tables"] if t["table"] == key)
 
 
 async def test_ilostat_fixture_ingest_registers_every_table(db: Any) -> None:
-    conn = ilo.IlostatConnector(ref_areas=AREAS)
-    register_connector(db.owner, db.store, conn.describe())
-    report = await run_atlas_ingest(db.worker, db.store, conn, FixtureHttp(conn.describe().name))
-    assert report.ok, report.errors
-    assert {t["table"] for t in report.tables} == {f"ilostat.{i.dataset}" for i in ilo.INDICATORS}
-    mw = next(t for t in report.tables if t["table"] == "ilostat.ear_inee_cur_nb_a")
+    _register(db, ilo.CONNECTOR_NAME)
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, ilo.CONNECTOR_NAME, mode="fixture")
+    assert out["status"] == "completed" and out["summary"]["ok"], out["summary"]["errors"]
+    assert {t["table"] for t in out["summary"]["tables"]} == {f"ilostat.{i.dataset}" for i in ilo.INDICATORS}
+    mw = _table(out, "ilostat.ear_inee_cur_nb_a")
     assert mw["created"] is True and mw["unmapped_provider_geo"] == ["TWN"]
     frame = read_atlas_table(db.store, mw["artifact_sha256"])
     fra = frame.filter(
@@ -35,7 +44,6 @@ async def test_ilostat_fixture_ingest_registers_every_table(db: Any) -> None:
         & (pl.col("period_start").dt.year() == 2026)
     )
     assert fra["value"].to_list() == ["1867"] and fra["unit"].to_list() == ["EUR per month"]
-    # every cited raw artifact is an archived test_fixture acquisition
     with db.owner.connect() as c:
         n = c.exec_driver_sql(
             "SELECT count(*) FROM evidence.acquisition WHERE origin = 'test_fixture' AND raw_sha256 = %(s)s",
@@ -43,34 +51,40 @@ async def test_ilostat_fixture_ingest_registers_every_table(db: Any) -> None:
         ).scalar_one()
     assert n >= 1
     # idempotent: same bytes, same tables, nothing new
-    again = await run_atlas_ingest(db.worker, db.store, conn, FixtureHttp(conn.describe().name))
-    assert again.ok and all(t["created"] is False for t in again.tables)
+    again = await run_atlas_ingest(db.settings, db.worker, db.store, ilo.CONNECTOR_NAME, mode="fixture")
+    assert again["summary"]["ok"] and all(t["created"] is False for t in again["summary"]["tables"])
+    # --dataset: only that table (plus the shared dictionaries) is fetched and registered
+    one = await run_atlas_ingest(
+        db.settings, db.worker, db.store, ilo.CONNECTOR_NAME, mode="fixture", dataset="ilr_tumt_noc_rt_a"
+    )
+    assert [t["table"] for t in one["summary"]["tables"]] == ["ilostat.ilr_tumt_noc_rt_a"]
+    assert not any(f["item"].startswith("data:UNE") for f in one["summary"]["fetched"])
 
 
 async def test_gapfill_fixture_ingest(db: Any) -> None:
-    es = gap.EurostatMinimumWageConnector(geos=("FR", "AT", "EL", "UK", "DE"))
-    oe = gap.OecdEarningsConnector(areas=("FRA", "USA", "OECD"))
-    for c in (es, oe):
-        register_connector(db.owner, db.store, c.describe())
-    r1 = await run_atlas_ingest(db.worker, db.store, es, FixtureHttp(es.describe().name))
-    r2 = await run_atlas_ingest(db.worker, db.store, oe, FixtureHttp(oe.describe().name))
-    assert r1.ok and r2.ok, (r1.errors, r2.errors)
-    t = r1.tables[0]
-    frame = read_atlas_table(db.store, t["artifact_sha256"])
+    for name in (gap.EUROSTAT_NAME, gap.OECD_NAME):
+        _register(db, name)
+    r1 = await run_atlas_ingest(db.settings, db.worker, db.store, gap.EUROSTAT_NAME, mode="fixture")
+    r2 = await run_atlas_ingest(db.settings, db.worker, db.store, gap.OECD_NAME, mode="fixture")
+    assert r1["summary"]["ok"] and r2["summary"]["ok"], (r1["summary"]["errors"], r2["summary"]["errors"])
+    frame = read_atlas_table(db.store, _table(r1, "eurostat.earn_mw_cur")["artifact_sha256"])
     aut = frame.filter(pl.col("iso3") == "AUT")
-    assert aut["value"].null_count() == aut.height
+    assert aut.height > 0 and aut["value"].null_count() == aut.height
     assert json.loads(aut["flags"][0])["missing"] == "not_applicable"
-    assert {x["table"] for x in r2.tables} == {"oecd.earnings_mw_curp", "oecd.earnings_av_an_wage"}
+    assert {t["table"] for t in r2["summary"]["tables"]} == {"oecd.earnings_mw_curp", "oecd.earnings_av_an_wage"}
 
 
-async def test_live_run_without_budget_is_refused_before_any_request(db: Any) -> None:
-    class Boom:
-        origin = "live"
+async def test_live_run_without_budget_is_refused_before_any_request(db: Any, monkeypatch: Any) -> None:
+    pinned = B.load_budget()
+    no_ilo = {k: v for k, v in pinned.per_source_requests.items() if k != "ilostat.rplumber"}
+    budget = B.IngestBudget(
+        pinned.policy_version, pinned.policy_sha256, pinned.total_requests, pinned.total_bytes, no_ilo
+    )
+    monkeypatch.setattr(B, "load_budget", lambda policy=None: budget)
 
-        async def get(self, url: str, **kw: Any) -> Any:  # pragma: no cover - must never be called
-            raise AssertionError("request made without budget")
+    def factory(spec: Any, settings: Any) -> Any:  # pragma: no cover - must never be called
+        raise AssertionError("client built without budget")
 
-    conn = ilo.IlostatConnector(ref_areas=("FRA",))
-    budget = IngestBudget("test", "0" * 64, 100, 10_000_000, {"worldbank.wdi": 10})  # no ilostat.rplumber entry
-    with pytest.raises(BudgetExhausted):
-        await run_atlas_ingest(db.worker, db.store, conn, Boom(), budget=budget)
+    _register(db, ilo.CONNECTOR_NAME)
+    with pytest.raises(B.BudgetExhausted):
+        await run_atlas_ingest(db.settings, db.worker, db.store, ilo.CONNECTOR_NAME, http_factory=factory)

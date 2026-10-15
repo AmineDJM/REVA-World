@@ -30,11 +30,11 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from reva.adapters.connectors.atlas_geo_common import atlas_spec, fetch_raw
+from reva.adapters.connectors.atlas_geo_common import fetch_raw
 from reva.adapters.connectors.base import dec_str, json_decimal, module_digest, schema_fingerprint
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import (
-    ConnectorSpec,
     Cursor,
     FetchBudget,
     FetchItem,
@@ -232,28 +232,35 @@ def atlas_rows(
     return out
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="World Bank Climate Change Knowledge Portal",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(DS_CRU, DS_ERA5),
+        dataset_ids=tuple(ITEMS[k][1].format(v=",".join(ITEMS[k][2])) for k in ITEMS),
+        cadence_seconds=180 * 86400,
+        planned_requests=len(ITEMS),
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(CckpClimatologyConnector),
+        field_mappings={
+            "geo": "ISO3 keys of data.<var> (KSV -> XKX via geo scheme cckp)",
+            "date_key": "climatology label",
+        },
+        notes="climatological normal 1991-2020 (half-open 1991-01-01..2021-01-01); product version in the URL",
+    )
+
+
 class CckpClimatologyConnector:
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="World Bank Climate Change Knowledge Portal",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=(DS_CRU, DS_ERA5),
-            field_mappings={"geo": "ISO3 keys of data.<var>", "date_key": "climatology label"},
-            units={"tas": "°C", "tasmax": "°C", "tasmin": "°C", "pr": "mm/year or mm/month"},
-            geography=("world",),
-            time_semantics="climatological normal 1991-2020 (half-open 1991-01-01..2021-01-01)",
-            lineage_family="worldbank_cckp",
-            cadence_seconds=180 * 86400,
-            revision_strategy="product version in the URL (cru_ts4.09); identical bytes are a no-op",
-            max_response_bytes=MAX_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(CckpClimatologyConnector),
-        )
+    def describe(self) -> AtlasSourceSpec:
+        return atlas_source()
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="one all_countries response")
@@ -303,39 +310,37 @@ def build(raws: Mapping[str, RawAcquisition], raw_sha256s: Mapping[str, str]) ->
     return atlas_rows(parsed, raw_sha256s)
 
 
-async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Single atlas ingest entry point: three whole-world requests, archived, two atlas tables."""
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw
-    from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
+    from reva.adapters.connectors.atlas_geo_common import run_get
+    from reva.atlas.tables import ATLAS_SCHEMA
 
-    conn = CckpClimatologyConnector()
-    spec = conn.describe()
-    raws = {it.key: await conn.fetch(it, http) for it in fetch_items()}
-    shas = {k: archive_raw(engine, store, spec, r, actor="worker:atlas_a_geo") for k, r in raws.items()}
+    raws = {it.key: await run_get(run, it) for it in fetch_items()}
+    shas = {k: run.archive(r) for k, r in raws.items()}
     rows = build(raws, shas)
-    origin = raws["cru_annual"].origin
-    nulls = {
-        ITEMS[k][0]: sorted({g for kk in ITEMS if ITEMS[kk][0] == ITEMS[k][0] for g in null_series(raws[kk].body)})
-        for k in ITEMS
-    }
+    nulls = {ds: sorted({g for k in ITEMS if ITEMS[k][0] == ds for g in null_series(raws[k].body)}) for ds in rows}
     tables = {}
     for ds, rs in rows.items():
+        if not run.wants(ds):
+            continue
         frame = pl.DataFrame(rs, schema=ATLAS_SCHEMA)
-        tables[ds] = register_atlas_table(
-            engine,
-            store,
-            source=ATLAS_SOURCE,
+        tables[ds] = run.register(
             dataset=ds,
             frame=frame,
             raw_sha256s=sorted(set(frame["raw_sha256"].to_list())),
-            parser_version=PARSER_VERSION,
-            origin=origin,
             geo_scheme=GEO_SCHEME,
             rights=RIGHTS,
-            actor="worker:atlas_a_geo",
             coverage_note=f"{PRODUCTS[ds]}: 1991-2020 climatology national aggregates; KSV->XKX alias; "
             "TWN kept unmapped; no CCKP aggregate for ATA/ESH/FLK/SGS/CHI; null series omitted: "
             + (",".join(nulls[ds]) or "none"),
         )
     return {"connector": CONNECTOR_NAME, "raw_sha256s": shas, "tables": tables}
+
+
+async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
+    """Same flow with an explicit client (tests)."""
+    from reva.adapters.connectors.atlas_geo_common import make_run
+
+    return await atlas_ingest(make_run(atlas_source(), engine, store, http))

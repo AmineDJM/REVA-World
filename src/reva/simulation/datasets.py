@@ -249,6 +249,7 @@ SELECT DISTINCT ON (concept_id, subject_key)
        row_count, table_schema, source_acquisition_ids, recorded_at
 FROM evidence.dataset
 WHERE origin = :o AND recorded_at <= :cut
+  AND concept_id <> 'atlas.table'  -- V3 atlas tables are pinned by atlas snapshots, not belief releases
 ORDER BY concept_id, subject_key, recorded_at DESC, id DESC
 """
 

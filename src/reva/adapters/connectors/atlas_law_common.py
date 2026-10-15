@@ -1,16 +1,14 @@
 """Shared plumbing of the laws & legal-systems atlas connectors (V3, agent A-LAW).
 
 Used by :mod:`atlas_wbl`, :mod:`atlas_constitute`, :mod:`atlas_ccp`, :mod:`atlas_factbook` and
-:mod:`atlas_ssa_ssptw`. Nothing here makes a network request on its own.
+:mod:`atlas_ssa_ssptw`. Each of those modules declares ``atlas_source()`` and ``async
+atlas_ingest(run)`` (ATLASCORE platform, ``reva.atlas.sources`` / ``reva.atlas.ingest``): every
+request goes through ``run.get`` (budget-metered live client or fixture replay), raw bytes are
+archived with ``run.archive`` and tables registered with ``run.register``. Nothing here builds an
+HTTP client.
 
-* :func:`law_spec` — a :class:`~reva.ports.connectors.ConnectorSpec` for an atlas bulk connector.
-  ``ConnectorSpec.template`` is a closed ``Literal`` without an atlas value; every other field is
-  validated normally and the template is then set to ``"atlas_bulk"`` (same approach as agent
-  A-SCI; requested lead change: add ``"atlas_bulk"`` to the Literal).
-* :func:`fetch_raw` — one GET through the caller's client (``SafeHttpClient`` live, ``FixtureHttp``
-  in tests) into a :class:`RawAcquisition`. Provider refusals become a typed :class:`Blocked`.
-* :func:`archive_raw` — archive raw bytes as an ``evidence.acquisition`` (zero observation batches)
-  so ``register_atlas_table`` can cite them.
+* :func:`fetch` — ``run.get`` with provider refusals turned into a typed :class:`Blocked`
+  (never an empty "success"); a budget refusal is not caught (the platform types it).
 * :func:`row` / :func:`atlas_frame` — rows in the ATLASCORE long schema.
 
 Provenance conventions of every A-LAW atlas cell:
@@ -29,14 +27,10 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
-from typing import Any, cast, get_args
+from typing import Any, cast
 
-from reva.adapters.connectors.base import to_raw
 from reva.kernel.errors import SourceResponseError, UnsafeRequest
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
 
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"  # only to validate the other fields; replaced before use
 AGENT = "A-LAW"
 VERBATIM = "verbatim"
 
@@ -44,18 +38,6 @@ VERBATIM = "verbatim"
 def transcribed(doc: str) -> str:
     """The flags.transcription marker of an agent-applied rule (never presented as verified)."""
     return f"transcribed by agent {AGENT} from {doc}, maintainer review pending"
-
-
-def template_supported() -> bool:
-    return ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
-
-
-def law_spec(**fields: Any) -> ConnectorSpec:
-    """A connector spec with ``template = "atlas_bulk"`` (every other field validated)."""
-    if template_supported():
-        return ConnectorSpec(template=cast(Any, ATLAS_TEMPLATE), **fields)
-    checked = ConnectorSpec(template=cast(Any, _VALID_PLACEHOLDER), **fields)
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
 
 
 def code_digest(*modules: Any) -> str:
@@ -75,11 +57,12 @@ def canon(obj: Mapping[str, Any]) -> str:
 
 @dataclass(frozen=True)
 class Blocked:
-    """A source the connector could not read: typed, never a silent empty success."""
+    """A source item the connector could not read: typed, never a silent empty success."""
 
     source_key: str
     item: str
-    reason: str  # http_403 | http_status | response_cap | unsafe_request | transport | fixture_missing | policy
+    # http_403 | http_status | response_cap | unsafe_request | transport | fixture_missing | parser_not_implemented
+    reason: str
     detail: str
     http_status: int | None = None
 
@@ -117,58 +100,52 @@ class IngestReport:
         }
 
 
-async def fetch_raw(http: Any, item: FetchItem, source_key: str) -> RawAcquisition | Blocked:
-    """GET one item; a provider refusal or transport failure is a typed :class:`Blocked`."""
+async def fetch(
+    run: Any,
+    url: str,
+    *,
+    key: str,
+    source_key: str,
+    media_types: tuple[str, ...] = ("application/json",),
+    max_bytes: int | None = None,
+) -> Any:
+    """``run.get`` one item -> ``RawAcquisition``, or a typed :class:`Blocked` for a provider refusal,
+    an oversized response, a transport failure or a missing fixture."""
     try:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
+        raw = await run.get(url, key=key, media_types=media_types, max_bytes=max_bytes)
     except SourceResponseError as e:
         status = e.details.get("status")
-        kind = e.details.get("kind")
         if status == 403:
             reason = "http_403"
         elif status is not None:
             reason = "http_status"
-        elif kind == "fixture_missing":
+        elif e.details.get("kind") == "fixture_missing":
             reason = "fixture_missing"
         else:
             reason = "transport"
-        return Blocked(source_key, item.key, reason, str(e)[:500], status)
+        return Blocked(source_key, key, reason, str(e)[:500], status)
     except UnsafeRequest as e:
         reason = "response_cap" if "exceeds limit" in str(e) else "unsafe_request"
-        return Blocked(source_key, item.key, reason, str(e)[:500], None)
-    if result.status != 200:  # recorded fixtures replay the provider status without raising
-        reason = "http_403" if result.status == 403 else "http_status"
-        return Blocked(source_key, item.key, reason, f"HTTP {result.status}", result.status)
-    return to_raw(item, result, getattr(http, "origin", "live"))
+        return Blocked(source_key, key, reason, str(e)[:500], None)
+    status = (raw.response_metadata or {}).get("status", 200)
+    if status != 200:  # recorded fixtures replay the provider status without raising
+        return Blocked(source_key, key, "http_403" if status == 403 else "http_status", f"HTTP {status}", status)
+    return raw
 
 
-def archive_raw(engine: Any, store: Any, spec: ConnectorSpec, raw: RawAcquisition, *, actor: str) -> str:
-    """Archive the raw bytes as an acquisition of ``spec`` (no observations); return its sha256.
-
-    Idempotent: identical bytes for the same request are a duplicate acquisition (same sha256).
-    """
-    from reva.evidence.ingest import publish_acquisition
-
-    summary = publish_acquisition(engine, store, spec, raw, [], [], actor=actor)
-    if summary.namespace == "quarantine":  # pragma: no cover - no quality report is ever blocking here
-        raise RuntimeError("raw acquisition was quarantined")
-    return summary.raw_sha256
-
-
-def register_connector(engine: Any, store: Any, spec: ConnectorSpec) -> Any:
-    """Register ``spec`` as a connector version (tests / throwaway databases).
-
-    The seed registers the built-in connectors (``reva.adapters.connectors.registry``, lead-owned);
-    until the A-LAW connectors are listed there, tests and the throwaway live ingest register them
-    with the seed's own function. The ``registry/sources/<source>.yaml`` entry must be seeded.
-    """
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
-
-    with engine.begin() as conn:
-        act = repo.simple_activity("registry.seed", "review", "system:a_law", {"connector": spec.name})
-        repo.record_activity(conn, act)
-        return register_connector_version(conn, store, spec, act.id)
+def table_summary(out: Mapping[str, Any]) -> dict[str, Any]:
+    """The part of a ``run.register`` result worth reporting."""
+    cov = out.get("coverage") or {}
+    return {
+        "dataset_key": out["dataset_key"],
+        "artifact_sha256": out["artifact_sha256"],
+        "row_count": out["row_count"],
+        "created": out["created"],
+        "countries": cov.get("countries"),
+        "period_min": cov.get("period_min"),
+        "period_max": cov.get("period_max"),
+        "unmapped_provider_geo": out.get("unmapped_provider_geo", []),
+    }
 
 
 # ----------------------------------------------------------------------------- rows
@@ -227,19 +204,15 @@ def clip_text(text: str, limit: int = 3000) -> tuple[str, bool]:
 
 __all__ = [
     "AGENT",
-    "ATLAS_TEMPLATE",
     "VERBATIM",
     "Blocked",
     "IngestReport",
-    "archive_raw",
     "atlas_frame",
     "canon",
     "clip_text",
     "code_digest",
-    "fetch_raw",
-    "law_spec",
-    "register_connector",
+    "fetch",
     "row",
-    "template_supported",
+    "table_summary",
     "transcribed",
 ]

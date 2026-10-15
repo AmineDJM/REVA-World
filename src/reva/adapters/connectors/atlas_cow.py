@@ -60,7 +60,6 @@ from typing import Any
 from reva.adapters.connectors.atlas_history_common import (
     DAY,
     AtlasBuild,
-    atlas_spec,
     canon,
     code_digest,
     decimal_text,
@@ -68,11 +67,13 @@ from reva.adapters.connectors.atlas_history_common import (
     frame,
     historical_qid,
     historical_qids,
+    ingest_with_run,
     sha256_hex,
+    source_spec,
     year_period,
 )
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 NAME = "atlas.cow"
 VERSION = "1.0.0"
@@ -201,7 +202,9 @@ class Spell:
     row: int
 
 
-def parse_spells(rows: Sequence[Mapping[str, str]], what: str, *, names: Mapping[int, str] | None = None) -> list[Spell]:
+def parse_spells(
+    rows: Sequence[Mapping[str, str]], what: str, *, names: Mapping[int, str] | None = None
+) -> list[Spell]:
     cols = ["stateabb", "ccode", "styear", "stmonth", "stday", "endyear", "endmonth", "endday"]
     _need(rows, cols, what)
     out = []
@@ -254,7 +257,9 @@ class Participation:
 
 
 def parse_inter(rows: Sequence[Mapping[str, str]]) -> list[Participation]:
-    _need(rows, ["WarNum", "WarName", "ccode", "StateName", "Side", "StartYear1", "EndYear1", "BatDeath"], "inter-state")
+    _need(
+        rows, ["WarNum", "WarName", "ccode", "StateName", "Side", "StartYear1", "EndYear1", "BatDeath"], "inter-state"
+    )
     out = []
     for i, r in enumerate(rows, start=2):
         spells = []
@@ -264,11 +269,22 @@ def parse_inter(rows: Sequence[Mapping[str, str]]) -> list[Participation]:
             if s[0] is not None:
                 spells.append((s, e))
         bd = r["BatDeath"]
-        out.append(Participation(
-            "inter", int(r["WarNum"]), r["WarName"], int(r["ccode"]), r["StateName"], r["Side"], spells,
-            decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
-            r.get("Initiator"), r.get("Outcome"), i, {"where_fought": r.get("WhereFought")},
-        ))
+        out.append(
+            Participation(
+                "inter",
+                int(r["WarNum"]),
+                r["WarName"],
+                int(r["ccode"]),
+                r["StateName"],
+                r["Side"],
+                spells,
+                decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
+                r.get("Initiator"),
+                r.get("Outcome"),
+                i,
+                {"where_fought": r.get("WhereFought")},
+            )
+        )
     return out
 
 
@@ -287,12 +303,22 @@ def parse_extra(rows: Sequence[Mapping[str, str]]) -> list[Participation]:
             if c is None or c < 0:
                 continue  # non-state side
             bd = r["BatDeath"]
-            out.append(Participation(
-                "extra", int(r["WarNum"]), r["WarName"], c, r[side_col], side, spells,
-                decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
-                r.get("Initiator"), r.get("Outcome"), i,
-                {"where_fought": r.get("WhereFought"), "batdeath_scope": "state participant(s) battle deaths"},
-            ))
+            out.append(
+                Participation(
+                    "extra",
+                    int(r["WarNum"]),
+                    r["WarName"],
+                    c,
+                    r[side_col],
+                    side,
+                    spells,
+                    decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
+                    r.get("Initiator"),
+                    r.get("Outcome"),
+                    i,
+                    {"where_fought": r.get("WhereFought"), "batdeath_scope": "state participant(s) battle deaths"},
+                )
+            )
     return out
 
 
@@ -323,23 +349,50 @@ def load_crosswalk(body: bytes | None) -> Any | None:
 
 
 # --------------------------------------------------------------------------- atlas rows
-def _row(dataset: str, indicator: str, ccode: int, abb: str, period: tuple[date, date], value: str, unit: str,
-         raw_sha: str, selector: Mapping[str, Any], flags: dict[str, Any], resolver: CodeResolver,
-         when: date) -> dict[str, Any]:
+def _row(
+    dataset: str,
+    indicator: str,
+    ccode: int,
+    abb: str,
+    period: tuple[date, date],
+    value: str,
+    unit: str,
+    raw_sha: str,
+    selector: Mapping[str, Any],
+    flags: dict[str, Any],
+    resolver: CodeResolver,
+    when: date,
+) -> dict[str, Any]:
     iso3, reason, q = resolver.resolve(ccode, when)
     flags = {**flags, "cow_stateabb": abb, "iso3_resolution": reason, "terms": "cite COW; no charging for access"}
     if q is not None:
-        flags["entity_mapping"] = {"qid": q["qid"], "label": q.get("wikidata_label_en"),
-                                   "review": q.get("review_status", "agent_mapped")}
+        flags["entity_mapping"] = {
+            "qid": q["qid"],
+            "label": q.get("wikidata_label_en"),
+            "review": q.get("review_status", "agent_mapped"),
+        }
     return {
-        "source": ATLAS_SOURCE, "dataset": dataset, "indicator": indicator, "concept_id": None,
-        "iso3": iso3, "provider_geo": str(ccode), "entity_qid": q["qid"] if q else None,
-        "period_start": period[0], "period_end": period[1], "value": value, "value_text": None, "unit": unit,
-        "flags": canon(flags), "raw_sha256": raw_sha, "selector": canon(selector),
+        "source": ATLAS_SOURCE,
+        "dataset": dataset,
+        "indicator": indicator,
+        "concept_id": None,
+        "iso3": iso3,
+        "provider_geo": str(ccode),
+        "entity_qid": q["qid"] if q else None,
+        "period_start": period[0],
+        "period_end": period[1],
+        "value": value,
+        "value_text": None,
+        "unit": unit,
+        "flags": canon(flags),
+        "raw_sha256": raw_sha,
+        "selector": canon(selector),
     }
 
 
-def nmc_rows(rows: Sequence[Mapping[str, str]], raw_sha: str, resolver: CodeResolver) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+def nmc_rows(
+    rows: Sequence[Mapping[str, str]], raw_sha: str, resolver: CodeResolver
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     cols = ["stateabb", "ccode", "year", "milex", "milper", "irst", "pec", "tpop", "upop", "cinc", "version"]
     _need(rows, cols, NMC_INNER)
     out = []
@@ -365,9 +418,22 @@ def nmc_rows(rows: Sequence[Mapping[str, str]], raw_sha: str, resolver: CodeReso
             flags = {"nmc_version": r["version"], "release": "NMC v7.0 (2026-02-20 documentation)"}
             if ind == "milex":
                 flags["currency_break"] = "GBP until 1913, USD from 1914 (NMC documentation)"
-            out.append(_row("nmc7", ind, c, r["stateabb"], year_period(y), v, unit, raw_sha,
-                            {"file": f"NMCv7.zip!NMCv7/NMC-v7-abridged.zip!{NMC_INNER}", "line": i, "column": ind},
-                            flags, resolver, date(y, 7, 1)))
+            out.append(
+                _row(
+                    "nmc7",
+                    ind,
+                    c,
+                    r["stateabb"],
+                    year_period(y),
+                    v,
+                    unit,
+                    raw_sha,
+                    {"file": f"NMCv7.zip!NMCv7/NMC-v7-abridged.zip!{NMC_INNER}", "line": i, "column": ind},
+                    flags,
+                    resolver,
+                    date(y, 7, 1),
+                )
+            )
     return out, {"state_years": len(seen), "missing_code_minus9": dict(missing)}
 
 
@@ -380,10 +446,22 @@ def system_rows(rows: Sequence[Mapping[str, str]], raw_sha: str, resolver: CodeR
         if (c, y) in seen:
             continue  # the provider lists a state once per year; a repeat adds nothing (counted below)
         seen.add((c, y))
-        out.append(_row("system2024", "system_member", c, r["stateabb"], year_period(y), "1",
-                        "1 = member of the interstate system in that year", raw_sha,
-                        {"file": "System2024.zip!System2024/system2024.csv", "line": i},
-                        {"ssm_version": r.get("version")}, resolver, date(y, 7, 1)))
+        out.append(
+            _row(
+                "system2024",
+                "system_member",
+                c,
+                r["stateabb"],
+                year_period(y),
+                "1",
+                "1 = member of the interstate system in that year",
+                raw_sha,
+                {"file": "System2024.zip!System2024/system2024.csv", "line": i},
+                {"ssm_version": r.get("version")},
+                resolver,
+                date(y, 7, 1),
+            )
+        )
     return out
 
 
@@ -400,17 +478,33 @@ def war_rows(parts: Sequence[Participation], shas: Mapping[str, str], resolver: 
             raise _err(f"duplicate war participation {key}")
         seen.add(key)
         flags = {
-            "war_name": p.war_name, "war_type": WAR_KINDS[p.kind], "side": p.side, "outcome_code": p.outcome,
-            "initiator_code": p.initiator, "state_name": p.state_name,
+            "war_name": p.war_name,
+            "war_type": WAR_KINDS[p.kind],
+            "side": p.side,
+            "outcome_code": p.outcome,
+            "initiator_code": p.initiator,
+            "state_name": p.state_name,
             "participation_spells": [{"start": s[0], "end": e[0], "end_status": e[2]} for s, e in p.spells],
             "period_note": "battle deaths over the whole participation (calendar years spanned)",
             **{k: v for k, v in p.extra.items() if v not in (None, "")},
         }
         ind = f"batdeath|type={p.kind}|war={p.war}|side={p.side}"
-        out.append(_row("wars4", ind, p.ccode, p.state_name[:32], (date(lo, 1, 1), date(hi + 1, 1, 1)), p.batdeath,
-                        "battle deaths (persons)", shas[p.kind],
-                        {"file": FILES[p.kind], "line": p.row, "column": "BatDeath"}, flags, resolver,
-                        date(lo, 7, 1)))
+        out.append(
+            _row(
+                "wars4",
+                ind,
+                p.ccode,
+                p.state_name[:32],
+                (date(lo, 1, 1), date(hi + 1, 1, 1)),
+                p.batdeath,
+                "battle deaths (persons)",
+                shas[p.kind],
+                {"file": FILES[p.kind], "line": p.row, "column": "BatDeath"},
+                flags,
+                resolver,
+                date(lo, 7, 1),
+            )
+        )
     return out
 
 
@@ -435,24 +529,34 @@ def kg_records(
         names.setdefault(p.ccode, p.state_name)
     for c, nm in sorted(names.items()):
         eid = f"cow:{c}"
-        ents[eid] = KgEntity(qid=eid, kind="state_code", labels={"en": f"{nm} (COW {c})"},
-                             descriptions={"en": "state as coded by a Correlates-of-War state number"})
+        ents[eid] = KgEntity(
+            qid=eid,
+            kind="state_code",
+            labels={"en": f"{nm} (COW {c})"},
+            descriptions={"en": "state as coded by a Correlates-of-War state number"},
+        )
     ents["cow:system:interstate"] = KgEntity(
-        qid="cow:system:interstate", kind="international_system",
+        qid="cow:system:interstate",
+        kind="international_system",
         labels={"en": "interstate system (Correlates of War)", "fr": "système interétatique (Correlates of War)"},
-        descriptions={"en": "COW State System Membership v2024 (1816-2024)"})
+        descriptions={"en": "COW State System Membership v2024 (1816-2024)"},
+    )
     ents["cow:system:major_powers"] = KgEntity(
-        qid="cow:system:major_powers", kind="international_system",
+        qid="cow:system:major_powers",
+        kind="international_system",
         labels={"en": "major powers (Correlates of War)", "fr": "grandes puissances (Correlates of War)"},
-        descriptions={"en": "COW Major Powers v2024"})
+        descriptions={"en": "COW Major Powers v2024"},
+    )
 
     def t(d: date | str, prec: int = 11) -> Any:
         return KgTime(iso=d.isoformat() if isinstance(d, date) else d, precision=prec)
 
     for what, group, obj in (("ssm", spells, "cow:system:interstate"), ("major", majors, "cow:system:major_powers")):
         for s in group:
-            q: dict[str, Any] = {"cow_stateabb": s.abb, "dataset": "COW State System Membership v2024"
-                                 if what == "ssm" else "COW Major Powers v2024"}
+            q: dict[str, Any] = {
+                "cow_stateabb": s.abb,
+                "dataset": "COW State System Membership v2024" if what == "ssm" else "COW Major Powers v2024",
+            }
             end = None
             if s.end >= DATA_END:
                 q["observed_until"] = DATA_END.isoformat()
@@ -461,50 +565,100 @@ def kg_records(
                 end = t(s.end)
             if s.start <= DATA_START:
                 q["start_note"] = "COW data begin on 1816-01-01; the state may have existed earlier"
-            sts.append(KgStatement(
-                subject_qid=f"cow:{s.ccode}", property_pid="P463", object_qid=obj, start=t(s.start), end=end,
-                qualifiers=q, statement_id=f"{what}:{s.ccode}:{s.start.isoformat()}",
-                raw_sha256=shas["states" if what == "ssm" else "majors"],
-                references=[{"stated_in": "Correlates of War Project", "file": FILES["states" if what == "ssm" else "majors"],
-                             "line": s.row}]))
+            sts.append(
+                KgStatement(
+                    subject_qid=f"cow:{s.ccode}",
+                    property_pid="P463",
+                    object_qid=obj,
+                    start=t(s.start),
+                    end=end,
+                    qualifiers=q,
+                    statement_id=f"{what}:{s.ccode}:{s.start.isoformat()}",
+                    raw_sha256=shas["states" if what == "ssm" else "majors"],
+                    references=[
+                        {
+                            "stated_in": "Correlates of War Project",
+                            "file": FILES["states" if what == "ssm" else "majors"],
+                            "line": s.row,
+                        }
+                    ],
+                )
+            )
     wars: dict[int, tuple[str, str]] = {}
     for p in parts:
         wars.setdefault(p.war, (p.war_name, p.kind))
         for k, (s, e) in enumerate(p.spells, start=1):
-            q = {"side": p.side, "outcome_code": p.outcome, "initiator_code": p.initiator,
-                 "war_type": WAR_KINDS[p.kind], "state_name_in_source": p.state_name}
+            q = {
+                "side": p.side,
+                "outcome_code": p.outcome,
+                "initiator_code": p.initiator,
+                "war_type": WAR_KINDS[p.kind],
+                "state_name_in_source": p.state_name,
+            }
             if p.batdeath is not None:
                 q["battle_deaths_participant"] = p.batdeath
             if e[2] == "ongoing":
                 q["end_status"] = "ongoing at the end of the data"
-            sts.append(KgStatement(
-                subject_qid=f"cow:{p.ccode}", property_pid="P1344", object_qid=f"cow:war:{p.war}",
-                start=t(s[0], s[1]) if s[0] else None, end=t(e[0], e[1]) if e[0] else None, qualifiers=q,
-                statement_id=f"war:{p.kind}:{p.war}:{p.ccode}:{p.side}:{k}", raw_sha256=shas[p.kind],
-                references=[{"stated_in": "COW War Data v4.0", "file": FILES[p.kind], "line": p.row}]))
+            sts.append(
+                KgStatement(
+                    subject_qid=f"cow:{p.ccode}",
+                    property_pid="P1344",
+                    object_qid=f"cow:war:{p.war}",
+                    start=t(s[0], s[1]) if s[0] else None,
+                    end=t(e[0], e[1]) if e[0] else None,
+                    qualifiers=q,
+                    statement_id=f"war:{p.kind}:{p.war}:{p.ccode}:{p.side}:{k}",
+                    raw_sha256=shas[p.kind],
+                    references=[{"stated_in": "COW War Data v4.0", "file": FILES[p.kind], "line": p.row}],
+                )
+            )
     for w, (nm, kind) in sorted(wars.items()):
         eid = f"cow:war:{w}"
-        ents[eid] = KgEntity(qid=eid, kind="war", labels={"en": nm},
-                             descriptions={"en": f"{WAR_KINDS[kind]} #{w} (COW War Data v4.0)"})
-        sts.append(KgStatement(subject_qid=eid, property_pid="P31", object_qid=Q_WAR,
-                               qualifiers={"cow_war_type": WAR_KINDS[kind]}, statement_id=f"wartype:{w}",
-                               raw_sha256=shas[kind]))
+        ents[eid] = KgEntity(
+            qid=eid, kind="war", labels={"en": nm}, descriptions={"en": f"{WAR_KINDS[kind]} #{w} (COW War Data v4.0)"}
+        )
+        sts.append(
+            KgStatement(
+                subject_qid=eid,
+                property_pid="P31",
+                object_qid=Q_WAR,
+                qualifiers={"cow_war_type": WAR_KINDS[kind]},
+                statement_id=f"wartype:{w}",
+                raw_sha256=shas[kind],
+            )
+        )
     for e in historical_qids("cow"):
         lo, hi = e.get("valid_from_year"), e.get("valid_to_year")
-        sts.append(KgStatement(
-            subject_qid=f"cow:{e['code']}", property_pid="cow:code_denotes", object_qid=e["qid"],
-            start=t(f"{lo:04d}-01-01", 9) if lo else None, end=t(f"{hi:04d}-01-01", 9) if hi else None,
-            qualifiers={"mapping": e.get("review_status", "agent_mapped"), "evidence": e.get("evidence", "")[:500],
-                        "file": "registry/entities/historical_states_qids.json"},
-            statement_id=f"denotes:{e['code']}:{lo}:{hi}:{e['qid']}", raw_sha256=shas["states"]))
+        sts.append(
+            KgStatement(
+                subject_qid=f"cow:{e['code']}",
+                property_pid="cow:code_denotes",
+                object_qid=e["qid"],
+                start=t(f"{lo:04d}-01-01", 9) if lo else None,
+                end=t(f"{hi:04d}-01-01", 9) if hi else None,
+                qualifiers={
+                    "mapping": e.get("review_status", "agent_mapped"),
+                    "evidence": e.get("evidence", "")[:500],
+                    "file": "registry/entities/historical_states_qids.json",
+                },
+                statement_id=f"denotes:{e['code']}:{lo}:{hi}:{e['qid']}",
+                raw_sha256=shas["states"],
+            )
+        )
     return {"entities": list(ents.values()), "statements": sts}
 
 
 KG_CUSTOM_PROPERTIES = [
-    {"pid": "cow:code_denotes", "value_kind": "item", "reva_predicate": "code_denotes",
-     "label_en": "COW state code denotes", "label_fr": "le code d'État COW désigne",
-     "inverse_name": "denoted_by_cow_code", "inverse_label_en": "denoted by COW state code",
-     "inverse_label_fr": "désigné par le code d'État COW"},
+    {
+        "pid": "cow:code_denotes",
+        "value_kind": "item",
+        "reva_predicate": "code_denotes",
+        "label_en": "COW state code denotes",
+        "label_fr": "le code d'État COW désigne",
+        "inverse_name": "denoted_by_cow_code",
+        "inverse_label_en": "denoted by COW state code",
+        "inverse_label_fr": "désigné par le code d'État COW",
+    },
 ]
 KG_WIKIDATA_PIDS = ("P31", "P463", "P1344")
 
@@ -523,14 +677,23 @@ def ensure_kg_properties(engine: Any) -> dict[str, Any]:
     return register_properties(engine, props).__dict__
 
 
-def load_kg(engine: Any, store: Any, kg: Mapping[str, Any], *, raw_sha256s: Sequence[str], retrieved_at: Any,
-            origin: str) -> dict[str, Any]:
+def load_kg(
+    engine: Any, store: Any, kg: Mapping[str, Any], *, raw_sha256s: Sequence[str], retrieved_at: Any, origin: str
+) -> dict[str, Any]:
     from reva.kg.model import load_batch
 
     ensure_kg_properties(engine)
-    rep = load_batch(engine, store, entities=kg["entities"], statements=kg["statements"], source_key=SOURCE_KEY,
-                     raw_sha256s=sorted(set(raw_sha256s)), retrieved_at=retrieved_at, origin=origin,
-                     parameters={"connector": NAME, "parser": PARSER_VERSION})
+    rep = load_batch(
+        engine,
+        store,
+        entities=kg["entities"],
+        statements=kg["statements"],
+        source_key=SOURCE_KEY,
+        raw_sha256s=sorted(set(raw_sha256s)),
+        retrieved_at=retrieved_at,
+        origin=origin,
+        parameters={"connector": NAME, "parser": PARSER_VERSION},
+    )
     return rep.as_dict()
 
 
@@ -542,38 +705,30 @@ class CowConnector:
         self.with_crosswalk = with_crosswalk
         self.kg: dict[str, Any] | None = None
 
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=NAME,
-            version=VERSION,
-            source_key=SOURCE_KEY,
-            provider="Correlates of War Project",
-            licence="COW terms of use: cite; no charging for access (not an open licence)",
-            allowed_hosts=(HOST, "cran.r-project.org"),
-            dataset_ids=("ssm_v2024", "majors_v2024", "nmc_v7.0", "war_v4.0"),
-            field_mappings={"nmc": NMC_INNER, "system": MEMBERS["system"], "wars": "BatDeath"},
-            units={"milex": f"{MILEX_UNIT_GBP} / {MILEX_UNIT_USD}", **NMC_UNITS},
-            geography=("COW state numbers (ccode), resolved by date through KGGEOPOL's StateCodeCrosswalk",),
-            time_semantics="state-year (calendar year); membership spells and war participation with day dates",
-            lineage_family="correlates_of_war",
-            cadence_seconds=90 * DAY,
-            revision_strategy="file bytes changed -> new atlas table version; new KG statement revision",
-            max_response_bytes=MAX_BYTES,
-            max_pages=len(FILES) + 1,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(),
-        )
+    def describe(self) -> Any:
+        return atlas_source()
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
-        items = [FetchItem(key=k, url=f"{BASE}/{f}", max_bytes=MAX_BYTES,
-                           expected_media_types=("application/zip", "text/csv", "application/octet-stream"))
-                 for k, f in FILES.items()]
+        items = [
+            FetchItem(
+                key=k,
+                url=f"{BASE}/{f}",
+                max_bytes=MAX_BYTES,
+                expected_media_types=("application/zip", "text/csv", "application/octet-stream"),
+            )
+            for k, f in FILES.items()
+        ]
         if self.with_crosswalk:
             from reva.adapters.connectors.atlas_geopol_common import COUNTRYCODE_URL
 
-            items.append(FetchItem(key="countrycode", url=COUNTRYCODE_URL, max_bytes=5_000_000,
-                                   expected_media_types=("application/x-gzip", "application/gzip",
-                                                         "application/octet-stream")))
+            items.append(
+                FetchItem(
+                    key="countrycode",
+                    url=COUNTRYCODE_URL,
+                    max_bytes=5_000_000,
+                    expected_media_types=("application/x-gzip", "application/gzip", "application/octet-stream"),
+                )
+            )
         return tuple(items)
 
     def follow_up(self, raw: RawAcquisition) -> tuple[FetchItem, ...]:
@@ -592,13 +747,15 @@ class CowConnector:
         states = read_csv(zip_member(by["states"].body, MEMBERS["states"]), "statelist2024.csv")
         spells = parse_spells(states, "statelist2024.csv")
         names = {s.ccode: s.name for s in spells}
-        majors = parse_spells(read_csv(zip_member(by["majors"].body, MEMBERS["majors"]), "majors2024.csv"),
-                              "majors2024.csv", names=names)
+        majors = parse_spells(
+            read_csv(zip_member(by["majors"].body, MEMBERS["majors"]), "majors2024.csv"), "majors2024.csv", names=names
+        )
         system = read_csv(zip_member(by["system"].body, MEMBERS["system"]), "system2024.csv")
         inner = zip_member(by["nmc"].body, MEMBERS["nmc"])
         nmc = read_csv(zip_member(inner, NMC_INNER), NMC_INNER)
-        parts = parse_inter(read_csv(by["inter"].body, FILES["inter"])) + \
-            parse_extra(read_csv(by["extra"].body, FILES["extra"]))
+        parts = parse_inter(read_csv(by["inter"].body, FILES["inter"])) + parse_extra(
+            read_csv(by["extra"].body, FILES["extra"])
+        )
 
         nmc_r, nmc_rep = nmc_rows(nmc, shas["nmc"], resolver)
         sys_r = system_rows(system, shas["system"], resolver)
@@ -607,23 +764,52 @@ class CowConnector:
         xw = [shas["countrycode"]] if self.with_crosswalk else []
         unresolved = sorted({int(r["provider_geo"]) for r in nmc_r if r["iso3"] is None})
         report = {
-            "spells": len(spells), "major_spells": len(majors), "states": len(names),
-            "nmc": nmc_rep, "system_rows": len(sys_r), "war_participations": len(parts),
-            "war_rows": len(war_r), "kg_entities": len(self.kg["entities"]),
-            "kg_statements": len(self.kg["statements"]), "code_resolution": dict(resolver.reasons),
+            "spells": len(spells),
+            "major_spells": len(majors),
+            "states": len(names),
+            "nmc": nmc_rep,
+            "system_rows": len(sys_r),
+            "war_participations": len(parts),
+            "war_rows": len(war_r),
+            "kg_entities": len(self.kg["entities"]),
+            "kg_statements": len(self.kg["statements"]),
+            "code_resolution": dict(resolver.reasons),
             "nmc_codes_without_iso3": unresolved,
         }
         cite = RIGHTS["attribution"]
         return [
-            AtlasBuild(ATLAS_SOURCE, "nmc7", frame(nmc_r), [shas["nmc"], *xw], PARSER_VERSION,
-                       "COW National Material Capabilities v7.0 (1816-2022), abridged file; -9 omitted; milex GBP "
-                       "until 1913 and USD from 1914. " + cite, rights=dict(RIGHTS), report=report),
-            AtlasBuild(ATLAS_SOURCE, "system2024", frame(sys_r), [shas["system"], *xw], PARSER_VERSION,
-                       "COW State System Membership v2024, state-year list (system2024.csv). " + cite,
-                       rights=dict(RIGHTS), report={"rows": len(sys_r)}),
-            AtlasBuild(ATLAS_SOURCE, "wars4", frame(war_r), [shas["inter"], shas["extra"], *xw], PARSER_VERSION,
-                       "COW War Data v4.0: battle deaths per state participation in inter-state and extra-state "
-                       "wars (-9 unknown omitted). " + cite, rights=dict(RIGHTS), report={"rows": len(war_r)}),
+            AtlasBuild(
+                ATLAS_SOURCE,
+                "nmc7",
+                frame(nmc_r),
+                [shas["nmc"], *xw],
+                PARSER_VERSION,
+                "COW National Material Capabilities v7.0 (1816-2022), abridged file; -9 omitted; milex GBP "
+                "until 1913 and USD from 1914. " + cite,
+                rights=dict(RIGHTS),
+                report=report,
+            ),
+            AtlasBuild(
+                ATLAS_SOURCE,
+                "system2024",
+                frame(sys_r),
+                [shas["system"], *xw],
+                PARSER_VERSION,
+                "COW State System Membership v2024, state-year list (system2024.csv). " + cite,
+                rights=dict(RIGHTS),
+                report={"rows": len(sys_r)},
+            ),
+            AtlasBuild(
+                ATLAS_SOURCE,
+                "wars4",
+                frame(war_r),
+                [shas["inter"], shas["extra"], *xw],
+                PARSER_VERSION,
+                "COW War Data v4.0: battle deaths per state participation in inter-state and extra-state "
+                "wars (-9 unknown omitted). " + cite,
+                rights=dict(RIGHTS),
+                report={"rows": len(war_r)},
+            ),
         ]
 
 
@@ -633,3 +819,46 @@ def coverage_by_century(rows: Sequence[Mapping[str, Any]]) -> dict[str, int]:
         y = r["period_start"].year
         out[f"{(y - 1) // 100 + 1:02d}"] += 1
     return dict(sorted(out.items()))
+
+
+def atlas_source() -> Any:
+    """The atlas platform declaration (``reva.atlas.sources``)."""
+    return source_spec(
+        name=NAME,
+        version=VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        datasets=("nmc7", "system2024", "wars4"),
+        provider="Correlates of War Project",
+        licence="COW terms of use: cite; no charging for access (not an open licence)",
+        allowed_hosts=(HOST, "cran.r-project.org"),
+        dataset_ids=("ssm_v2024", "majors_v2024", "nmc_v7.0", "war_v4.0"),
+        field_mappings={"nmc": NMC_INNER, "system": MEMBERS["system"], "wars": "BatDeath"},
+        units={"milex": f"{MILEX_UNIT_GBP} / {MILEX_UNIT_USD}", **NMC_UNITS},
+        geography=("COW state numbers (ccode), resolved by date through KGGEOPOL's StateCodeCrosswalk",),
+        time_semantics="state-year (calendar year); membership spells and war participation with day dates",
+        lineage_family="correlates_of_war",
+        cadence_seconds=90 * DAY,
+        revision_strategy="file bytes changed -> new atlas table version; new KG statement revision",
+        planned_requests=len(FILES) + 1,
+        max_response_bytes=MAX_BYTES,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(),
+    )
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas tables, then the KG statements (state-system membership with dates, wars) from the same raws."""
+    conn = CowConnector()
+    out = await ingest_with_run(run, conn)
+    raws = out["_raws"]
+    if conn.kg is not None and (run.dataset is None or run.dataset == "system2024"):
+        out["kg"] = load_kg(
+            run.engine,
+            run.store,
+            conn.kg,
+            raw_sha256s=[sha256_hex(r.body) for r in raws],
+            retrieved_at=max(r.retrieved_at for r in raws),
+            origin=run.origin,
+        )
+    return {k: v for k, v in out.items() if not k.startswith("_")}

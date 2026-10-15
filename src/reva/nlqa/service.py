@@ -263,8 +263,8 @@ async def _rephrase(
     request = rephrase_request(result.plan.language, result.composed, budget)
     try:
         response, _ = await call_providers(request, drafters, ledger, _sub_key(inp.operation_key, "rephrase"))
-    except LlmProviderError as e:
-        rep["status"] = "provider_error"
+    except (LlmProviderError, BudgetExhausted, LlmUnavailable) as e:
+        rep["status"] = "provider_error" if isinstance(e, LlmProviderError) else e.code
         rep["reason"] = e.details.get("reason")
         result.warnings.append("rephrase_failed: template text returned")
         return

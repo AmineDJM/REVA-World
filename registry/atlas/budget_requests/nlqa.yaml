@@ -1,7 +1,11 @@
 # Budget request of agent NLQA (natural-language questions, POST /v1/ask). ATLASCORE merges requests into
-# registry/policies/budgets.yaml. Until merged, LLM questions are OFF by default (REVA_NLQA_LLM unset) and,
-# when an operator turns them on, they share the existing llm.scenario_drafts daily caps and ledger accounts
-# (llm:scenario_drafts:{requests,tokens}; operation ids nl_draft:<sha256>:<attempt>).
+# registry/policies/budgets.yaml.
+# STATUS (2026-10-15): llm.nlqa is DEFERRED by ATLASCORE (it needs a migration for a separate LLM ledger).
+# Decision in force: LLM questions reuse the existing V2 budget line llm.scenario_drafts and its ledger
+# (accounts llm:scenario_drafts:{requests,tokens}, operation ids nl_draft:<sha256>:<attempt>, reserved
+# before sending and settled with the provider-reported usage via reva.nl.service.call_providers). They
+# are OFF by default (REVA_LLM_ENABLED and REVA_NLQA_LLM=1 both required). The entries below remain the
+# request for when a dedicated line becomes possible.
 agent: NLQA
 requests:
   - source_key: llm.nlqa
@@ -25,4 +29,5 @@ requests:
     reason: >-
       Optional fallback identification of an entity absent from the REVA KG (MediaWiki action=wbsearchentities,
       one GET per unresolved lookup, <= 10 results, labelled "live Wikidata search, not in REVA's graph").
-      Off by default (REVA_NLQA_WIKIDATA_SEARCH=1); also capped in-process at 120/hour.
+      Not wired: NLQA builds no HTTP client; it needs WDHARVEST's budget-metered Wikidata client to offer a
+      wbsearchentities GET (injected as build_backends(search_get=...)); also capped in-process at 120/hour.

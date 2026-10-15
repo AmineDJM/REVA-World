@@ -30,11 +30,11 @@ from datetime import date
 from decimal import Decimal
 from typing import Any
 
-from reva.adapters.connectors.atlas_geo_common import atlas_spec, fetch_raw
+from reva.adapters.connectors.atlas_geo_common import fetch_raw
 from reva.adapters.connectors.base import dec_str, json_decimal, module_digest, schema_fingerprint
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import (
-    ConnectorSpec,
     Cursor,
     FetchBudget,
     FetchItem,
@@ -190,28 +190,32 @@ def atlas_rows(
     return rows
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="European Commission JRC - INFORM",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=(EDITION_NAME,),
+        cadence_seconds=90 * 86400,
+        planned_requests=2,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(InformHazardsConnector),
+        field_mappings={"geo": "Iso3", "indicator": "IndicatorId", "value": "IndicatorScore"},
+        notes="annual edition; modelled exposure indices (0-10), not observations",
+    )
+
+
 class InformHazardsConnector:
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="European Commission JRC - INFORM",
-            licence="EC reuse policy (CC BY 4.0) - to confirm",
-            allowed_hosts=(HOST,),
-            dataset_ids=(ATLAS_DATASET,),
-            field_mappings={"geo": "Iso3", "indicator": "IndicatorId", "value": "IndicatorScore"},
-            units={"*": "index (0-10)"},
-            geography=("world",),
-            time_semantics="annual edition (INFORM Risk <year>)",
-            lineage_family="inform",
-            cadence_seconds=90 * 86400,
-            revision_strategy="edition workflow id + FlagDataSaved is the revision",
-            max_response_bytes=MAX_BYTES,
-            max_pages=2,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(InformHazardsConnector),
-        )
+    def describe(self) -> AtlasSourceSpec:
+        return atlas_source()
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         return FetchPlan(
@@ -262,36 +266,30 @@ class InformHazardsConnector:
         return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
 
 
-async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Single atlas ingest entry point: workflow list, then the edition's natural-hazard scores."""
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw
-    from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
+    from reva.adapters.connectors.atlas_geo_common import run_get
+    from reva.atlas.tables import ATLAS_SCHEMA
 
     conn = InformHazardsConnector()
-    spec = conn.describe()
-    wraw = await conn.fetch(workflows_item(), http)
-    wsha = archive_raw(engine, store, spec, wraw, actor="worker:atlas_a_geo")
+    wraw = await run_get(run, workflows_item())
+    wsha = run.archive(wraw)
     wf = parse_workflows(wraw.body)
-    sraw = await conn.fetch(scores_item(wf["id"]), http)
-    ssha = archive_raw(engine, store, spec, sraw, actor="worker:atlas_a_geo")
+    sraw = await run_get(run, scores_item(wf["id"]))
+    ssha = run.archive(sraw)
     for b in conn.parse(sraw):
         q = conn.validate(b)
         if q.blocking:
             raise _err("; ".join(f.message for f in q.findings), kind="incomplete")
     frame = pl.DataFrame(atlas_rows(parse_scores(sraw.body), wf, ssha), schema=ATLAS_SCHEMA)
-    table = register_atlas_table(
-        engine,
-        store,
-        source=ATLAS_SOURCE,
+    table = run.register(
         dataset=ATLAS_DATASET,
         frame=frame,
         raw_sha256s=[ssha],
-        parser_version=PARSER_VERSION,
-        origin=sraw.origin,
         geo_scheme="iso3",
         rights=RIGHTS,
-        actor="worker:atlas_a_geo",
         coverage_note=f"{wf['name']} (workflow {wf['id']}, data saved {wf['data_saved']}): natural hazard & "
         "exposure scores 0-10 (composite + 7 components); modelled indices, not observations",
     )
@@ -301,3 +299,10 @@ async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
         "raw_sha256s": {"workflows": wsha, "scores": ssha},
         "table": table,
     }
+
+
+async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
+    """Same flow with an explicit client (tests)."""
+    from reva.adapters.connectors.atlas_geo_common import make_run
+
+    return await atlas_ingest(make_run(atlas_source(), engine, store, http))

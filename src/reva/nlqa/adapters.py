@@ -8,7 +8,8 @@
 * :class:`LinksAdapter` — the LINKS layer's :class:`reva.links.model.Link` records, through a
   ``links_for(node, kinds, limit)`` callable when LINKS exposes one.
 * :class:`WikidataSearchAdapter` — optional live ``wbsearchentities`` fallback for entity
-  identification (labelled as such), **off by default** (``REVA_NLQA_WIKIDATA_SEARCH=1``) and
+  identification (labelled as such), through an injected budget-metered GET only; **not wired** until
+  WDHARVEST's metered client offers it, and
   bounded per process; it identifies, it never supplies statements.
 
 Every adapter converts backend failures into :class:`~reva.nlqa.ports.CapabilityUnavailable`.
@@ -19,11 +20,10 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-import os
 import re
 import threading
 import time
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Awaitable, Callable, Iterable, Mapping, Sequence
 from contextlib import contextmanager
 from typing import Any
 
@@ -48,7 +48,6 @@ from reva.nlqa.ports import (
 )
 
 log = logging.getLogger("reva.nlqa.adapters")
-WIKIDATA_SEARCH_ENV = "REVA_NLQA_WIKIDATA_SEARCH"
 
 
 # --------------------------------------------------------------------------- KG
@@ -623,14 +622,20 @@ class LinksAdapter:
 
 # --------------------------------------------------------------------------- Wikidata search (optional)
 class WikidataSearchAdapter:
-    """``wbsearchentities`` (MediaWiki API) for identification only; bounded per process."""
+    """``wbsearchentities`` (MediaWiki API) for identification only; bounded per process.
+
+    It never builds an HTTP client: ``get`` is an injected, **budget-metered** GET (WDHARVEST's metered
+    Wikidata client — ``reva.operations.budgets.MeteredHttp`` around the SafeHttpClient, with the
+    machine-wide Wikidata lock) returning a :class:`~reva.adapters.http.safe_client.HttpResult`. Until such
+    a client and a ``wikidata.wbsearchentities`` budget line exist it is not wired (see
+    ``registry/atlas/budget_requests/nlqa.yaml``)."""
 
     name = "wikidata.wbsearchentities (live search)"
     HOST = "www.wikidata.org"
 
-    def __init__(self, *, max_per_hour: int = 120, proxy_mode: str | None = None) -> None:
+    def __init__(self, get: Callable[[str], Awaitable[Any]], *, max_per_hour: int = 120) -> None:
+        self.get = get
         self.max_per_hour = max_per_hour
-        self.proxy_mode = proxy_mode
         self._lock = threading.Lock()
         self._calls: list[float] = []
 
@@ -648,8 +653,6 @@ class WikidataSearchAdapter:
             raise CapabilityUnavailable("Wikidata search cap reached for this hour", backend="search")
         from urllib.parse import urlencode
 
-        from reva.adapters.http.safe_client import SafeHttpClient
-
         url = f"https://{self.HOST}/w/api.php?" + urlencode(
             {
                 "action": "wbsearchentities",
@@ -663,18 +666,7 @@ class WikidataSearchAdapter:
         )
 
         async def go() -> Any:
-            client = SafeHttpClient(
-                allowed_hosts=[self.HOST],
-                timeout_seconds=10,
-                max_bytes=262_144,
-                max_attempts=1,
-                max_redirects=0,
-                proxy_mode=self.proxy_mode,
-            )  # type: ignore[arg-type]
-            try:
-                return await client.get(url)
-            finally:
-                await client.aclose()
+            return await self.get(url)
 
         try:
             res = asyncio.run(go())
@@ -704,7 +696,13 @@ class WikidataSearchAdapter:
 
 
 # --------------------------------------------------------------------------- wiring
-def build_backends(engine: Engine | None, settings: Any = None, *, atlas_store: Any = None) -> Backends:
+def build_backends(
+    engine: Engine | None,
+    settings: Any = None,
+    *,
+    atlas_store: Any = None,
+    search_get: Callable[[str], Awaitable[Any]] | None = None,
+) -> Backends:
     """Real backends for the API process; each one absent → ``None`` with a note (never a fake)."""
     b = Backends()
     if engine is not None:
@@ -728,8 +726,8 @@ def build_backends(engine: Engine | None, settings: Any = None, *, atlas_store: 
             b.notes.append(f"capability_unavailable: atlas ({e.message})")
     if b.links is None:
         b.notes.append("capability_unavailable: interconnection layer (LINKS) not wired")
-    if os.environ.get(WIKIDATA_SEARCH_ENV, "").lower() in ("1", "true", "yes"):
-        b.search = WikidataSearchAdapter(proxy_mode=getattr(settings, "reva_http_proxy_mode", None))
+    if search_get is not None:  # a budget-metered Wikidata GET (WDHARVEST) — not wired by default
+        b.search = WikidataSearchAdapter(search_get)
     return b
 
 

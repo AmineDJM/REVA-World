@@ -51,7 +51,6 @@ from __future__ import annotations
 
 import asyncio
 import csv
-import gzip
 import hashlib
 import inspect
 import io
@@ -64,21 +63,17 @@ from collections.abc import Callable, Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal, InvalidOperation
-from typing import Any, get_args
+from typing import Any
 from urllib.parse import quote
-from uuid import uuid4
 from xml.etree import ElementTree as ET
 
 import polars as pl
 
-from reva.adapters.connectors.base import to_raw
-from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.kernel.errors import SourceResponseError
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_VERSION = "1.0.0"
 PARSER_VERSION = "atlas-un-1"
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"  # validates the other spec fields until "atlas_bulk" exists
 GEO_SCHEME = "un_m49x"  # registry/atlas/geo_aliases/a_un.yaml: crosswalk M49 + evidence-backed aliases
 STRICT_DECIMAL = re.compile(r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$")
 _PLAIN_NUMBER = re.compile(r"^[+-]?(\d{1,3}(,\d{3})+|\d+)?(\.\d*)?([eE][-+]?\d{1,3})?$")
@@ -147,19 +142,6 @@ def geo_iso3(provider_geo: str | None, scheme: str = GEO_SCHEME) -> str | None:
 
 def code_digest() -> str:
     return "sha256:" + hashlib.sha256(inspect.getsource(inspect.getmodule(code_digest)).encode()).hexdigest()  # type: ignore[arg-type]
-
-
-def atlas_spec(**fields: Any) -> ConnectorSpec:
-    """A connector spec with ``template = "atlas_bulk"`` (the other fields validated by pydantic).
-
-    ``reva.ports.connectors.ConnectorSpec.template`` does not list ``atlas_bulk`` yet (lead-owned;
-    requested in ``docs/dev/v3_a_un.md``); like the other atlas connectors the spec is validated
-    with a placeholder template and then carries ``atlas_bulk``.
-    """
-    if ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation):
-        return ConnectorSpec(template=ATLAS_TEMPLATE, **fields)
-    checked = ConnectorSpec(template=_VALID_PLACEHOLDER, **fields)  # type: ignore[arg-type]
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
 
 
 def gunzip_bounded(body: bytes, limit: int) -> bytes:
@@ -357,15 +339,36 @@ WPP_DI_COLUMNS: dict[str, tuple[str, str, str]] = {
     "Q0060Female": ("deaths under age 60 per 1,000 female live births", _LIFE, "Female mortality before age 60"),
     "Q1550": ("deaths under age 50 per 1,000 alive at age 15", _LIFE, "Mortality between age 15 and 50, both sexes"),
     "Q1550Male": ("deaths under age 50 per 1,000 males alive at age 15", _LIFE, "Male mortality between age 15 and 50"),
-    "Q1550Female": ("deaths under age 50 per 1,000 females alive at age 15", _LIFE, "Female mortality between age 15 and 50"),
+    "Q1550Female": (
+        "deaths under age 50 per 1,000 females alive at age 15",
+        _LIFE,
+        "Female mortality between age 15 and 50",
+    ),
     "Q1560": ("deaths under age 60 per 1,000 alive at age 15", _LIFE, "Mortality between age 15 and 60, both sexes"),
     "Q1560Male": ("deaths under age 60 per 1,000 males alive at age 15", _LIFE, "Male mortality between age 15 and 60"),
-    "Q1560Female": ("deaths under age 60 per 1,000 females alive at age 15", _LIFE, "Female mortality between age 15 and 60"),
+    "Q1560Female": (
+        "deaths under age 60 per 1,000 females alive at age 15",
+        _LIFE,
+        "Female mortality between age 15 and 60",
+    ),
     "NetMigrations": ("thousands", _FLOW, "Net number of migrants"),
     "CNMR": ("per 1,000 population", _FLOW, "Net migration rate"),
 }
-WPP_ID_COLUMNS = ("SortOrder", "LocID", "Notes", "ISO3_code", "ISO2_code", "SDMX_code", "LocTypeID",
-                  "LocTypeName", "ParentID", "Location", "VarID", "Variant", "Time")
+WPP_ID_COLUMNS = (
+    "SortOrder",
+    "LocID",
+    "Notes",
+    "ISO3_code",
+    "ISO2_code",
+    "SDMX_code",
+    "LocTypeID",
+    "LocTypeName",
+    "ParentID",
+    "Location",
+    "VarID",
+    "Variant",
+    "Time",
+)
 #: Variants taken from TotalPopulationBySex (Medium is in the demographic-indicator table).
 WPP_VARIANT_VALUE_COLUMNS = ("PopTotal",)
 WPP_AGE5_VALUE_COLUMNS = {"PopTotal": "both sexes", "PopMale": "males", "PopFemale": "females"}
@@ -424,9 +427,26 @@ WPP_CONCEPTS: dict[str, str] = {
 }
 #: Medium-variant projection concepts (``<concept>_proj_medium``).
 WPP_PROJECTION_CONCEPTS = frozenset(
-    {"TPopulation1July", "TPopulationMale1July", "TPopulationFemale1July", "PopDensity", "MedianAgePop",
-     "PopGrowthRate", "Births", "Deaths", "TFR", "LEx", "LExMale", "LExFemale", "IMR", "Q5", "NetMigrations",
-     "CNMR", "CBR", "CDR"}
+    {
+        "TPopulation1July",
+        "TPopulationMale1July",
+        "TPopulationFemale1July",
+        "PopDensity",
+        "MedianAgePop",
+        "PopGrowthRate",
+        "Births",
+        "Deaths",
+        "TFR",
+        "LEx",
+        "LExMale",
+        "LExFemale",
+        "IMR",
+        "Q5",
+        "NetMigrations",
+        "CNMR",
+        "CBR",
+        "CDR",
+    }
 )
 #: Total-population projection variants with a catalog concept (``un.wpp.population_proj_<slug>``).
 WPP_VARIANT_CONCEPTS: dict[str, str] = {
@@ -529,8 +549,14 @@ def _wpp_frame(
     flags = (
         pl.when(pl.col("provider_text").is_not_null())
         .then(
-            pl.concat_str([pl.col("flags").str.slice(0, pl.col("flags").str.len_chars() - 1),
-                           pl.lit(',"provider_text":"'), pl.col("provider_text"), pl.lit('"}')])
+            pl.concat_str(
+                [
+                    pl.col("flags").str.slice(0, pl.col("flags").str.len_chars() - 1),
+                    pl.lit(',"provider_text":"'),
+                    pl.col("provider_text"),
+                    pl.lit('"}'),
+                ]
+            )
         )
         .otherwise(pl.col("flags"))
     )
@@ -592,14 +618,17 @@ def build_wpp_demo(body: bytes, raw_sha256: str) -> TablePlan:
     long = long.with_columns((pl.col("Time").cast(pl.Int32) >= WPP_FIRST_PROJECTION_YEAR).alias("proj"))
 
     def make(r: dict[str, Any]) -> str:
-        unit, tref, label = WPP_DI_COLUMNS[r["column"]]
+        _unit, tref, label = WPP_DI_COLUMNS[r["column"]]
         return canon({**_wpp_base_flags(r, r["proj"], "Medium"), "time_reference": tref, "label": label})
 
     long = _flags_join(long, ["column", "proj", "LocTypeName", "Location"], make)
     concept_map = {(c, p): wpp_concept_id(c, p) for c in cols for p in (False, True)}
     concept_frame = pl.DataFrame(
-        {"column": [k[0] for k in concept_map], "proj": [k[1] for k in concept_map],
-         "concept_hint": [v for v in concept_map.values()]},
+        {
+            "column": [k[0] for k in concept_map],
+            "proj": [k[1] for k in concept_map],
+            "concept_hint": [v for v in concept_map.values()],
+        },
         schema={"column": pl.String, "proj": pl.Boolean, "concept_hint": pl.String},
     )
     long = long.join(concept_frame, on=["column", "proj"], how="left")
@@ -663,7 +692,8 @@ def build_wpp_variants(body: bytes, raw_sha256: str) -> TablePlan:
 
     long = _flags_join(long, ["Variant", "VarID", "LocTypeName", "Location"], make)
     concept = pl.col("Variant").replace_strict(
-        {v: f"un.wpp.population_proj_{s}" for v, s in WPP_VARIANT_CONCEPTS.items()}, default=None,
+        {v: f"un.wpp.population_proj_{s}" for v, s in WPP_VARIANT_CONCEPTS.items()},
+        default=None,
         return_dtype=pl.String,
     )
     out = _wpp_frame(
@@ -675,8 +705,13 @@ def build_wpp_variants(body: bytes, raw_sha256: str) -> TablePlan:
         unit=pl.lit("thousands"),
         concept=concept,
     )
-    report = {"file": f.file, "encoding": enc, "rows": out.height, "variants": variants,
-              "medium_rows_skipped_duplicate_of_demo": medium_rows}
+    report = {
+        "file": f.file,
+        "encoding": enc,
+        "rows": out.height,
+        "variants": variants,
+        "medium_rows_skipped_duplicate_of_demo": medium_rows,
+    }
     note = (
         "UN WPP 2024 total population (thousands, 1 July) for every projection variant 2024-2100 except "
         "Medium (in un_wpp.wpp2024_demo as TPopulation1July|proj=medium); indicator 'PopTotal|variant=<name>'; "
@@ -718,27 +753,55 @@ def build_wpp_age5(body: bytes, raw_sha256: str) -> Iterator[TablePlan]:
 
         long = _flags_join(long, ["column", "proj", "AgeGrp", "AgeGrpSpan", "LocTypeName", "Location"], make)
         indicator = pl.concat_str(
-            [pl.col("column"), pl.lit("|age="), pl.col("AgeGrp"), pl.lit(wpp_projection_suffix("Medium") if proj else "")]
+            [
+                pl.col("column"),
+                pl.lit("|age="),
+                pl.col("AgeGrp"),
+                pl.lit(wpp_projection_suffix("Medium") if proj else ""),
+            ]
         )
         concept = (
             pl.when(pl.col("column") == "PopTotal")
-            .then(pl.concat_str([pl.lit("un.wpp.population_age_"),
-                                 pl.col("AgeGrp").str.replace_all(r"[-+]", "_").str.strip_chars("_")]))
+            .then(
+                pl.concat_str(
+                    [
+                        pl.lit("un.wpp.population_age_"),
+                        pl.col("AgeGrp").str.replace_all(r"[-+]", "_").str.strip_chars("_"),
+                    ]
+                )
+            )
             .otherwise(pl.lit(None, dtype=pl.String))
             if not proj
             else pl.lit(None, dtype=pl.String)
         )
         dataset = f"{f.dataset}_proj" if proj else f.dataset
-        out = _wpp_frame(long, dataset=dataset, file=f.file, raw_sha256=raw_sha256, indicator=indicator,
-                         unit=pl.lit("thousands"), concept=concept)
+        out = _wpp_frame(
+            long,
+            dataset=dataset,
+            file=f.file,
+            raw_sha256=raw_sha256,
+            indicator=indicator,
+            unit=pl.lit("thousands"),
+            concept=concept,
+        )
         del long
-        report = {"file": f.file, "encoding": enc, "rows": out.height, "age_groups": groups.to_list(),
-                  "projection": proj}
-        what = ("medium-variant projections 2024-2100, indicator '<PopTotal|PopMale|PopFemale>|age=<group>|proj=medium' "
-                "(flags.projection=true)" if proj else
-                "estimates 1950-2023, indicator '<PopTotal|PopMale|PopFemale>|age=<group>'")
-        note = (f"UN WPP 2024 population by 5-year age group and sex (thousands, 1 July), {what}. Aggregates kept "
-                "with iso3=null. Single-age files not ingested (size; see docs/dev/v3_a_un.md).")
+        report = {
+            "file": f.file,
+            "encoding": enc,
+            "rows": out.height,
+            "age_groups": groups.to_list(),
+            "projection": proj,
+        }
+        what = (
+            "medium-variant projections 2024-2100, indicator '<PopTotal|PopMale|PopFemale>|age=<group>|proj=medium' "
+            "(flags.projection=true)"
+            if proj
+            else "estimates 1950-2023, indicator '<PopTotal|PopMale|PopFemale>|age=<group>'"
+        )
+        note = (
+            f"UN WPP 2024 population by 5-year age group and sex (thousands, 1 July), {what}. Aggregates kept "
+            "with iso3=null. Single-age files not ingested (size; see docs/dev/v3_a_un.md)."
+        )
         yield TablePlan(WPP_SOURCE, dataset, out, [raw_sha256], note, report=report)
         del out
 
@@ -777,14 +840,17 @@ class Xlsx:
 
     def _xml(self, name: str) -> ET.Element:
         data = self._read(name)
-        return ET.fromstring(data)
+        try:
+            return ET.fromstring(data)  # noqa: S314 - DTD/entity declarations refused in _read; expat fetches nothing
+        except ET.ParseError as e:
+            raise _err(f"xlsx part {name} is not well-formed XML") from e
 
     def _read(self, name: str) -> bytes:
         try:
             data = self.zip.read(name)
         except KeyError as e:
             raise _err(f"xlsx part {name} missing") from e
-        if b"<!DOCTYPE" in data[:4096] or b"<!ENTITY" in data[:4096]:
+        if b"<!DOCTYPE" in data or b"<!ENTITY" in data:  # whole part: no DTD may hide behind a long prolog
             raise _err(f"xlsx part {name} declares a DTD/entities (refused)", kind="unsafe_xml")
         return data
 
@@ -810,7 +876,13 @@ class Xlsx:
         if sheet not in self.sheets:
             raise _err(f"sheet {sheet!r} not found (sheets: {sorted(self.sheets)})")
         data = self._read(self.sheets[sheet])
-        for _ev, el in ET.iterparse(io.BytesIO(data)):
+        try:
+            yield from self._rows(data)
+        except ET.ParseError as e:
+            raise _err(f"sheet {sheet!r} is not well-formed XML") from e
+
+    def _rows(self, data: bytes) -> Iterator[tuple[int, dict[str, str]]]:
+        for _ev, el in ET.iterparse(io.BytesIO(data)):  # noqa: S314 - DTD/entities refused in _read
             if el.tag != f"{_XL_NS}row":
                 continue
             cells: dict[str, str] = {}
@@ -870,10 +942,11 @@ def ims_year_columns(header: Mapping[str, str], group_cells: Sequence[tuple[int,
     cols = sorted((col_index(c), c, int(t)) for c, t in header.items() if re.fullmatch(r"(19|20)[0-9]{2}", t.strip()))
     groups = sorted(group_cells)
     if len(cols) < 3 or len(cols) % 3 or [g[1] for g in groups] != ["T", "M", "F"]:
-        raise _err("IMS Table 1 year columns / sex headings not in the expected layout",
-                   year_columns=len(cols), groups=groups)
+        raise _err(
+            "IMS Table 1 year columns / sex headings not in the expected layout", year_columns=len(cols), groups=groups
+        )
     n = len(cols) // 3
-    blocks = [cols[k * n:(k + 1) * n] for k in range(3)]
+    blocks = [cols[k * n : (k + 1) * n] for k in range(3)]
     years = [b[2] for b in blocks[0]]
     out: dict[str, tuple[int, str]] = {}
     for block, (gcol, sex) in zip(blocks, groups, strict=True):
@@ -881,7 +954,7 @@ def ims_year_columns(header: Mapping[str, str], group_cells: Sequence[tuple[int,
             raise _err("IMS Table 1 year blocks differ or are not contiguous")
         if not (block[0][0] - 1 <= gcol <= block[-1][0]):
             raise _err(f"IMS Table 1 heading for sex {sex} lies outside its year block")
-        for ci, col, year in block:
+        for _ci, col, year in block:
             out[col] = (year, sex)
     return out
 
@@ -998,7 +1071,8 @@ def build_ims(body: bytes, raw_sha256: str) -> TablePlan:
         "notes": len(notes),
         **dict(stats),
         "unmapped_origins": sorted(
-            ({"code": c, "label": lab} for c, lab in origins.items() if geo_iso3(c) is None), key=lambda d: int(d["code"])
+            ({"code": c, "label": lab} for c, lab in origins.items() if geo_iso3(c) is None),
+            key=lambda d: int(d["code"]),
         ),
     }
     note = (
@@ -1099,8 +1173,12 @@ def sdg_data_url(series: SdgSeries, page: int = 1) -> str:
 
 
 def sdg_data_item(series: SdgSeries, page: int = 1) -> FetchItem:
-    return FetchItem(key=f"sdg:{series.code}:p{page}", url=sdg_data_url(series, page), max_bytes=SDG_PAGE_MAX_BYTES,
-                     params={"series": series.code, "page": page})
+    return FetchItem(
+        key=f"sdg:{series.code}:p{page}",
+        url=sdg_data_url(series, page),
+        max_bytes=SDG_PAGE_MAX_BYTES,
+        params={"series": series.code, "page": page},
+    )
 
 
 def _json_body(body: bytes, what: str) -> Any:
@@ -1161,7 +1239,9 @@ def _sdg_concept_hints(buf: RowBuffer, row_dims: Sequence[tuple[int, Mapping[str
         for k, v in dims.items():
             values[k].add(v)
     for i, dims, n in row_dims:
-        if n == 1 and all(v in SDG_TOTAL_CODES or len(values[k]) == 1 for k, v in dims.items() if k != "Reporting Type"):
+        if n == 1 and all(
+            v in SDG_TOTAL_CODES or len(values[k]) == 1 for k, v in dims.items() if k != "Reporting Type"
+        ):
             buf.cols["concept_id"][i] = concept
 
 
@@ -1188,8 +1268,9 @@ def build_sdg(pages: Mapping[str, RawAcquisition], series_list: RawAcquisition |
             report["not_in_series_list"].append(s.code)
         meta = sdg_page_meta(got[min(got)].body, s.code) if 1 in got else None
         if meta is None or sorted(got) != list(range(1, meta["totalPages"] + 1)):
-            report["incomplete_series"].append({"series": s.code, "pages": sorted(got),
-                                                "expected": meta["totalPages"] if meta else None})
+            report["incomplete_series"].append(
+                {"series": s.code, "pages": sorted(got), "expected": meta["totalPages"] if meta else None}
+            )
             continue
         rows_seen = 0
         start = len(buf)
@@ -1225,12 +1306,18 @@ def build_sdg(pages: Mapping[str, RawAcquisition], series_list: RawAcquisition |
                     "nature": attrs.get("Nature"),
                     "release": (listing.get(s.code) or {}).get("release"),
                 }
-                for k_src, k_dst in (("UnitMultiplier", "unit_multiplier"), ("Observation Status", "observation_status"),
-                                     ("Source Type", "source_type")):
+                for k_src, k_dst in (
+                    ("UnitMultiplier", "unit_multiplier"),
+                    ("Observation Status", "observation_status"),
+                    ("Source Type", "source_type"),
+                ):
                     if attrs.get(k_src) not in (None, ""):
                         flags[k_dst] = attrs[k_src]
-                for k_src, k_dst in (("lowerBound", "lower_bound"), ("upperBound", "upper_bound"),
-                                     ("basePeriod", "base_period")):
+                for k_src, k_dst in (
+                    ("lowerBound", "lower_bound"),
+                    ("upperBound", "upper_bound"),
+                    ("basePeriod", "base_period"),
+                ):
                     nv = _num_attr(r.get(k_src))
                     if nv is not None:
                         flags[k_dst] = nv
@@ -1284,8 +1371,11 @@ def build_sdg(pages: Mapping[str, RawAcquisition], series_list: RawAcquisition |
             report["incomplete_series"].append({"series": s.code, "rows": rows_seen, "expected": meta["totalElements"]})
             continue
         _sdg_concept_hints(buf, row_dims, s.concept)
-        report["series"][s.code] = {"records": rows_seen, "cells": len(buf) - start,
-                                    "release": (listing.get(s.code) or {}).get("release")}
+        report["series"][s.code] = {
+            "records": rows_seen,
+            "cells": len(buf) - start,
+            "release": (listing.get(s.code) or {}).get("release"),
+        }
     report.update(dict(stats))
     if len(buf) == 0:
         raise _err("no complete SDG series")
@@ -1296,8 +1386,9 @@ def build_sdg(pages: Mapping[str, RawAcquisition], series_list: RawAcquisition |
         "with iso3=null. Bounds, nature, footnotes and custodian source in flags."
         + (f" Left out (incomplete fetch): {', '.join(left_out)}." if left_out else "")
     )
-    return TablePlan(SDG_SOURCE, SDG_DATASET, buf.frame(), sorted({r for r in buf.cols["raw_sha256"]}), note,
-                     report=report)
+    return TablePlan(
+        SDG_SOURCE, SDG_DATASET, buf.frame(), sorted({r for r in buf.cols["raw_sha256"]}), note, report=report
+    )
 
 
 # ============================================================================= UNHCR
@@ -1364,7 +1455,8 @@ def unhcr_follow_ups(item: FetchItem, raw: RawAcquisition, *, max_year: int) -> 
             raise _err("UNHCR years list holds no usable year")
         lo, hi = years[0], years[-1]
         return [unhcr_item("bilateral", y, y) for y in years] + [
-            unhcr_item("by_asylum", lo, hi), unhcr_item("by_origin", lo, hi)
+            unhcr_item("by_asylum", lo, hi),
+            unhcr_item("by_origin", lo, hi),
         ]
     p = item.params
     if p.get("page") != 1:
@@ -1422,7 +1514,9 @@ def build_unhcr(raws: Mapping[str, RawAcquisition], *, max_year: int) -> list[Ta
                             stats["null_cells_omitted"] += 1
                             continue
                         if isinstance(v, str):
-                            stats[f"string_{'dash' if v.strip() == '-' else 'zero' if v.strip() == '0' else 'other'}_omitted"] += 1
+                            stats[
+                                f"string_{'dash' if v.strip() == '-' else 'zero' if v.strip() == '0' else 'other'}_omitted"
+                            ] += 1
                             continue
                         if not isinstance(v, int):
                             raise _err(f"{raw.item.key} record {i}: {fname} is {type(v).__name__}")
@@ -1439,10 +1533,15 @@ def build_unhcr(raws: Mapping[str, RawAcquisition], *, max_year: int) -> list[Ta
                         indicator = fname
                         if other is not None:
                             indicator = f"{fname}|origin={other}"
-                            flags.update({"counterpart_role": "origin", "counterpart_provider_geo": other,
-                                          "counterpart_iso3": geo_iso3(other, "iso3"),
-                                          "counterpart_label": (r.get("coo_name") or "").strip(),
-                                          "counterpart_unhcr_code": r.get("coo")})
+                            flags.update(
+                                {
+                                    "counterpart_role": "origin",
+                                    "counterpart_provider_geo": other,
+                                    "counterpart_iso3": geo_iso3(other, "iso3"),
+                                    "counterpart_label": (r.get("coo_name") or "").strip(),
+                                    "counterpart_unhcr_code": r.get("coo"),
+                                }
+                            )
                         buf.add(
                             indicator=indicator,
                             provider_geo=geo,
@@ -1456,20 +1555,40 @@ def build_unhcr(raws: Mapping[str, RawAcquisition], *, max_year: int) -> list[Ta
                         )
         if incomplete:
             # Never register a partial table: the missing years would read as "no refugees".
-            plans.append(TablePlan(UNHCR_SOURCE, dataset, pl.DataFrame(), sorted(shas), "",
-                                   report={"refused": "incomplete", "missing_spans": incomplete}))
+            plans.append(
+                TablePlan(
+                    UNHCR_SOURCE,
+                    dataset,
+                    pl.DataFrame(),
+                    sorted(shas),
+                    "",
+                    report={"refused": "incomplete", "missing_spans": incomplete},
+                )
+            )
             continue
         if len(buf) == 0:
             continue
-        side = {"bilateral": "country of asylum (counterpart origin in the indicator)",
-                "by_asylum": "country of asylum", "by_origin": "country of origin"}[view]
+        side = {
+            "bilateral": "country of asylum (counterpart origin in the indicator)",
+            "by_asylum": "country of asylum",
+            "by_origin": "country of origin",
+        }[view]
         note = (
             f"UNHCR population statistics ({view}): persons at end of year by {side}; provider_geo = UNHCR ISO3 "
             "field (STA/XXA stateless, UKN/UNK unknown and TIB kept unmapped). Cells the API renders as the "
             "string '0' or '-' (no figure) are omitted, never stored as zero."
         )
-        plans.append(TablePlan(UNHCR_SOURCE, dataset, buf.frame(), sorted(shas), note, geo_scheme="iso3",
-                               report={"cells": len(buf), **dict(stats)}))
+        plans.append(
+            TablePlan(
+                UNHCR_SOURCE,
+                dataset,
+                buf.frame(),
+                sorted(shas),
+                note,
+                geo_scheme="iso3",
+                report={"cells": len(buf), **dict(stats)},
+            )
+        )
     return plans
 
 
@@ -1519,7 +1638,7 @@ def build_syb(body: bytes, raw_sha256: str) -> TablePlan:
         code, label, year, series, raw_v, foot, src = (c.strip() for c in r[:7])
         if series not in SYB_SERIES:
             unknown_series[series] += 1
-            unit = series[series.rfind("(") + 1:-1] if series.endswith(")") else "as labelled"
+            unit = series[series.rfind("(") + 1 : -1] if series.endswith(")") else "as labelled"
             concept = None
         else:
             unit, concept = SYB_SERIES[series]
@@ -1556,8 +1675,13 @@ def build_syb(body: bytes, raw_sha256: str) -> TablePlan:
         )
     if len(buf) == 0:
         raise _err("SYB table has no data rows")
-    report = {"file": SYB_FILE, "encoding": enc, "cells": len(buf), "unknown_series": dict(unknown_series),
-              **dict(stats)}
+    report = {
+        "file": SYB_FILE,
+        "encoding": enc,
+        "cells": len(buf),
+        "unknown_series": dict(unknown_series),
+        **dict(stats),
+    }
     note = (
         "UNSD Statistical Yearbook 68 (Nov 2025) table T02: surface area (thousand km2, 2023, from the "
         "Demographic Yearbook 2023; whole thousands, so small territories read 0 or 1) and WPP-derived "
@@ -1566,54 +1690,71 @@ def build_syb(body: bytes, raw_sha256: str) -> TablePlan:
     return TablePlan(SYB_SOURCE, SYB_DATASET, buf.frame(), [raw_sha256], note, report=report)
 
 
-# ============================================================================= connectors
+# ============================================================================= sources
 @dataclass(frozen=True)
 class UnConnector:
-    """One provider source: its fetch plan, follow-ups and table builders."""
+    """One provider source: its atlas source spec, fetch plan, follow-ups and table builders."""
 
     name: str
     source_key: str
+    atlas_source_key: str
     provider: str
     licence: str
     hosts: tuple[str, ...]
     datasets: tuple[str, ...]
-    lineage_family: str
+    dataset_ids: tuple[str, ...]
     cadence_days: int
-    timeout_seconds: float = 120.0
+    planned_requests: int
+    max_response_bytes: int = 52_428_800
     min_interval_seconds: float = 1.0
 
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
+    def spec(self) -> Any:
+        from reva.atlas.sources import AtlasSourceSpec
+
+        return AtlasSourceSpec(
             name=self.name,
             version=CONNECTOR_VERSION,
             source_key=self.source_key,
+            atlas_source=self.atlas_source_key,
             provider=self.provider,
             licence=self.licence,
             allowed_hosts=self.hosts,
-            dataset_ids=self.datasets,
-            field_mappings={"atlas_tables": list(self.datasets), "geo_scheme": GEO_SCHEME},
-            units={},
-            geography=("every provider geography; crosswalk-mapped where possible, others kept unmapped",),
-            time_semantics="calendar year [Jan 1, Jan 1); stock reference date in flags.time_reference",
-            lineage_family=self.lineage_family,
+            datasets=self.datasets,
+            dataset_ids=self.dataset_ids,
             cadence_seconds=self.cadence_days * 86400,
-            release_aware=True,
-            revision_strategy="new atlas table version per changed raw artifact (content-addressed)",
-            max_response_bytes=52_428_800,
-            max_pages=1000,
+            planned_requests=self.planned_requests,
+            max_response_bytes=self.max_response_bytes,
+            min_interval_seconds=self.min_interval_seconds,
             parser_version=PARSER_VERSION,
             code_digest=code_digest(),
+            field_mappings={"geo_scheme": GEO_SCHEME, "module": "reva.adapters.connectors.atlas_un"},
         )
 
     # -- plan
-    def plan(self) -> list[FetchItem]:
+    def plan(self, wants: Callable[[str], bool] = lambda _d: True) -> list[FetchItem]:
         if self.name == WPP_CONNECTOR.name:
-            return [FetchItem(key=f.key, url=f.url, max_bytes=f.max_bytes,
-                              expected_media_types=("application/x-gzip", "application/gzip", "application/octet-stream"))
-                    for f in WPP_FILES]
+            out = []
+            for f in WPP_FILES:
+                ds = (f.dataset, f"{f.dataset}_proj") if f is WPP_AGE5 else (f.dataset,)
+                if any(wants(d) for d in ds):
+                    out.append(
+                        FetchItem(
+                            key=f.key,
+                            url=f.url,
+                            max_bytes=f.max_bytes,
+                            expected_media_types=("application/x-gzip", "application/gzip", "application/octet-stream"),
+                        )
+                    )
+            return out
         if self.name == IMS_CONNECTOR.name:
-            return [FetchItem(key="ims:table1", url=IMS_URL, max_bytes=30_000_000,
-                              expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",))]
+            return [
+                FetchItem(
+                    key="ims:table1",
+                    url=IMS_URL,
+                    max_bytes=30_000_000,
+                    expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",),
+                )
+            ]
         if self.name == SDG_CONNECTOR.name:
             return [sdg_series_list_item(), *(sdg_data_item(s) for s in SDG_SERIES)]
         if self.name == UNHCR_CONNECTOR.name:
@@ -1655,189 +1796,187 @@ class UnConnector:
 
 
 WPP_CONNECTOR = UnConnector(
-    name="atlas.un_wpp", source_key="un.wpp", provider="UN DESA Population Division",
-    licence="CC BY 3.0 IGO", hosts=(WPP_HOST,), datasets=(*(f.dataset for f in WPP_FILES), f"{WPP_AGE5.dataset}_proj"),
-    lineage_family="un_wpp", cadence_days=180, timeout_seconds=300.0,
+    name="atlas.un_wpp",
+    source_key="un.wpp",
+    atlas_source_key=WPP_SOURCE,
+    provider="UN DESA Population Division",
+    licence="CC BY 3.0 IGO",
+    hosts=(WPP_HOST,),
+    datasets=(*(f.dataset for f in WPP_FILES), f"{WPP_AGE5.dataset}_proj"),
+    dataset_ids=tuple(f.file for f in WPP_FILES),
+    cadence_days=180,
+    planned_requests=3,
+    max_response_bytes=max(f.max_bytes for f in WPP_FILES),
 )
 IMS_CONNECTOR = UnConnector(
-    name="atlas.un_ims", source_key="un.desa_ims", provider="UN DESA Population Division",
-    licence="CC BY 3.0 IGO", hosts=(IMS_HOST,), datasets=(IMS_DATASET,), lineage_family="un_desa_ims",
+    name="atlas.un_ims",
+    source_key="un.desa_ims",
+    atlas_source_key=IMS_SOURCE,
+    provider="UN DESA Population Division",
+    licence="CC BY 3.0 IGO",
+    hosts=(IMS_HOST,),
+    datasets=(IMS_DATASET,),
+    dataset_ids=(IMS_FILE,),
     cadence_days=365,
+    planned_requests=1,
+    max_response_bytes=30_000_000,
 )
 SDG_CONNECTOR = UnConnector(
-    name="atlas.un_sdg", source_key="un.sdg", provider="UN Statistics Division (SDG Global Database)",
-    licence="UNdata terms of use (free use with attribution)", hosts=(SDG_HOST,), datasets=(SDG_DATASET,),
-    lineage_family="un_sdg", cadence_days=90, timeout_seconds=300.0, min_interval_seconds=2.0,
+    name="atlas.un_sdg",
+    source_key="un.sdg",
+    atlas_source_key=SDG_SOURCE,
+    provider="UN Statistics Division (SDG Global Database)",
+    licence="UNdata terms of use (free use with attribution)",
+    hosts=(SDG_HOST,),
+    datasets=(SDG_DATASET,),
+    dataset_ids=tuple(s.code for s in SDG_SERIES),
+    cadence_days=90,
+    planned_requests=1 + len(SDG_SERIES),
+    max_response_bytes=SDG_PAGE_MAX_BYTES,
+    min_interval_seconds=2.0,
 )
 UNHCR_CONNECTOR = UnConnector(
-    name="atlas.unhcr", source_key="unhcr.population", provider="UNHCR", licence="CC BY 4.0",
-    hosts=(UNHCR_HOST,), datasets=tuple(v[0] for v in UNHCR_VIEWS.values()), lineage_family="unhcr",
+    name="atlas.unhcr",
+    source_key="unhcr.population",
+    atlas_source_key=UNHCR_SOURCE,
+    provider="UNHCR",
+    licence="CC BY 4.0",
+    hosts=(UNHCR_HOST,),
+    datasets=tuple(v[0] for v in UNHCR_VIEWS.values()),
+    dataset_ids=("population/v1",),
     cadence_days=90,
+    planned_requests=80,
+    max_response_bytes=20_000_000,
 )
 SYB_CONNECTOR = UnConnector(
-    name="atlas.unsd_syb", source_key="unsd.syb", provider="UN Statistics Division",
-    licence="UNdata terms of use (free use with attribution)", hosts=(SYB_HOST,), datasets=(SYB_DATASET,),
-    lineage_family="unsd_syb", cadence_days=365,
+    name="atlas.unsd_syb",
+    source_key="unsd.syb",
+    atlas_source_key=SYB_SOURCE,
+    provider="UN Statistics Division",
+    licence="UNdata terms of use (free use with attribution)",
+    hosts=(SYB_HOST,),
+    datasets=(SYB_DATASET,),
+    dataset_ids=(SYB_FILE,),
+    cadence_days=365,
+    planned_requests=1,
+    max_response_bytes=20_000_000,
 )
 CONNECTORS: dict[str, UnConnector] = {
     c.name: c for c in (WPP_CONNECTOR, IMS_CONNECTOR, SDG_CONNECTOR, UNHCR_CONNECTOR, SYB_CONNECTOR)
 }
 
 
-# ============================================================================= run
-async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
-    result = await http.get(item.url, max_bytes=item.max_bytes)
-    _reject_html(result.body)
-    return to_raw(item, result, getattr(http, "origin", "live"))
+def atlas_source() -> list[Any]:
+    """The five UN atlas sources (ATLASCORE protocol, ``reva.atlas.sources``)."""
+    return [c.spec() for c in CONNECTORS.values()]
 
 
-def ensure_registered(owner_engine: Any, store: Any, connector: UnConnector) -> None:
-    """Register the connector version (owner role, idempotent). Its source must be seeded
-    (``registry/sources/*.yaml`` -> ``reva.cli.seed``)."""
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
-
-    spec = connector.describe()
-    with owner_engine.begin() as conn:
-        if repo.connector_version_row(conn, spec.name, spec.version) is None:
-            act = repo.simple_activity("registry.connector", "review", "agent:a-un", {"connector": spec.name})
-            repo.record_activity(conn, act)
-        else:
-            act = None
-        register_connector_version(conn, store, spec, act.id if act else uuid4())
+def latest_complete_year() -> int:
+    """Latest complete calendar year: UNHCR end-year stocks of the running year do not exist yet."""
+    return date.today().year - 1
 
 
-def archive(engine: Any, store: Any, connector: UnConnector, raw: RawAcquisition) -> RawAcquisition:
-    from reva.evidence.ingest import publish_acquisition
-
-    s = publish_acquisition(engine, store, connector.describe(), raw, [], [], actor="worker:atlas-un")
-    if s.namespace != "raw":
-        raise ValidationProblem(f"{raw.item.key}: raw bytes were quarantined", namespace=s.namespace)
-    return raw.model_copy(update={"raw_sha256": s.raw_sha256})
-
-
-def live_client(connector: UnConnector, settings: Any) -> Any:
-    from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
-    from reva.adapters.http.safe_client import SafeHttpClient
-
-    cap = max(i.max_bytes for i in connector.plan())
-    cap = max(cap, SDG_PAGE_MAX_BYTES if connector is SDG_CONNECTOR else 0, 20_000_000)
-    policies = {h: HostPolicy(min_interval_seconds=connector.min_interval_seconds, max_concurrency=1)
-                for h in connector.hosts}
-    return SafeHttpClient(
-        allowed_hosts=connector.hosts,
-        timeout_seconds=max(connector.timeout_seconds, float(settings.reva_http_timeout_seconds)),
-        max_bytes=cap,
-        contact_email=settings.reva_http_contact_email,
-        rate_limiter=RateLimiter(policies),
-        proxy_mode=settings.reva_http_proxy_mode,
-    )
-
-
+# ============================================================================= ingest
 def _trim_summary(summary: Mapping[str, Any]) -> dict[str, Any]:
     cov = summary.get("coverage") or {}
     unmapped = summary.get("unmapped_provider_geo") or []
     return {
         **{k: summary.get(k) for k in ("dataset_key", "artifact_sha256", "manifest_sha256", "row_count", "created")},
-        **{k: cov.get(k) for k in ("countries", "indicators", "period_min", "period_max", "numeric_cells",
-                                   "text_cells")},
+        **{
+            k: cov.get(k)
+            for k in ("countries", "indicators", "period_min", "period_max", "numeric_cells", "text_cells")
+        },
         "unmapped_provider_geo_count": len(unmapped),
         "unmapped_rows": sum(u["rows"] for u in unmapped),
+        "unmapped_provider_geo": unmapped,
     }
 
 
-async def run(
-    connector: UnConnector,
-    worker_engine: Any,
-    store: Any,
-    http: Any,
-    *,
-    register: bool = True,
-    budget: Any = None,
-    max_year: int | None = None,
-    on_progress: Callable[[str], None] | None = None,
-) -> dict[str, Any]:
-    """Fetch -> archive -> parse -> register every atlas table of ``connector``.
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch (``run.get``: budget-metered live client or fixture client) -> archive (``run.archive``)
+    -> parse -> register (``run.register``) every wanted atlas table of ``run.spec``.
 
-    Live clients (``origin == "live"``) are charged to the connector's ``source_key`` through the
-    budget ledger (``reserve_ingest`` + ``metered``); a source without a budget in the pinned
-    policy is refused before any request (``BudgetExhausted``, fail closed). Fixture clients are
-    never charged. Failed items are reported with a typed reason; a table whose inputs are
+    Failed items are reported with a typed reason and the run continues; a table whose inputs are
     incomplete is not registered (except SDG, where each series is complete or left out and named
-    in the table's coverage note).
+    in the table's coverage note). A budget refusal propagates (the platform reports
+    ``budget_exhausted`` and keeps what was archived/registered).
     """
-    from reva.atlas.tables import register_atlas_table
-    from reva.operations import budgets as B
+    from reva.operations.budgets import BudgetExhausted
 
-    say = on_progress or (lambda _m: None)
-    origin = getattr(http, "origin", "live")
-    # Latest complete calendar year: UNHCR end-year stocks of the running year do not exist yet.
-    year_cap = max_year if max_year is not None else date.today().year - 1
-    report: dict[str, Any] = {"connector": connector.name, "origin": origin, "acquisitions": {}, "tables": {},
-                              "errors": [], "table_reports": {}}
-    queue = list(connector.plan())
-    client = http
-    reservation = None
-    if origin == "live":
-        reservation = B.reserve_ingest(
-            worker_engine, job_id=f"atlas-{connector.name}-{uuid4()}", attempt=1,
-            source_key=B.budget_source_key(connector.describe()), planned_requests=len(queue), budget=budget,
-        )
-        client = B.metered(http, worker_engine, reservation, budget=budget)
+    connector = CONNECTORS[run.spec.name]
+    max_year = latest_complete_year()
+    report: dict[str, Any] = {
+        "connector": connector.name,
+        "origin": run.origin,
+        "acquisitions": {},
+        "tables": {},
+        "errors": [],
+        "table_reports": {},
+    }
+    queue = list(connector.plan(run.wants))
     raws: dict[str, RawAcquisition] = {}
+    while queue:
+        item = queue.pop(0)
+        try:
+            raw = await run.get(
+                item.url,
+                key=item.key,
+                media_types=item.expected_media_types,
+                max_bytes=item.max_bytes,
+                params=item.params,
+            )
+            _reject_html(raw.body)
+        except BudgetExhausted:
+            raise
+        except Exception as e:  # typed source errors (timeouts, HTTP status, fixture miss) are reported
+            report["errors"].append(
+                {
+                    "item": item.key,
+                    "stage": "fetch",
+                    "error": type(e).__name__,
+                    "kind": getattr(e, "details", {}).get("kind"),
+                    "detail": str(getattr(e, "message", e))[:300],
+                }
+            )
+            continue
+        sha = await asyncio.to_thread(run.archive, raw)
+        raw = raw.model_copy(update={"raw_sha256": sha})
+        raws[item.key] = raw
+        report["acquisitions"][item.key] = {
+            "raw_sha256": sha,
+            "bytes": len(raw.body),
+            "retrieved_at": raw.retrieved_at.isoformat(),
+        }
+        try:
+            queue.extend(connector.follow_ups(item, raw, max_year=max_year))
+        except SourceResponseError as e:
+            report["errors"].append(
+                {"item": item.key, "stage": "follow_up", "error": e.details.get("kind"), "detail": e.message[:300]}
+            )
     try:
-        while queue:
-            item = queue.pop(0)
-            say(f"fetch {item.key}")
-            try:
-                raw = await fetch(item, client)
-            except Exception as e:  # typed source/budget errors are reported, the run continues
-                report["errors"].append({"item": item.key, "stage": "fetch", "error": type(e).__name__,
-                                         "detail": str(getattr(e, "message", e))[:300]})
-                if type(e).__name__ == "BudgetExhausted":
-                    break
+        for plan in connector.build_tables(raws, max_year=max_year):
+            if not run.wants(plan.dataset):
                 continue
-            raw = await asyncio.to_thread(archive, worker_engine, store, connector, raw)
-            raws[item.key] = raw
-            report["acquisitions"][item.key] = {"raw_sha256": raw.raw_sha256, "bytes": len(raw.body),
-                                                "retrieved_at": raw.retrieved_at.isoformat()}
-            try:
-                queue.extend(connector.follow_ups(item, raw, max_year=year_cap))
-            except SourceResponseError as e:
-                report["errors"].append({"item": item.key, "stage": "follow_up", "error": e.details.get("kind"),
-                                         "detail": e.message[:300]})
-    finally:
-        if reservation is not None:
-            report["budget"] = B.settle_metered(worker_engine, client)
-    try:
-        for plan in connector.build_tables(raws, max_year=year_cap):
             report["table_reports"][plan.dataset] = plan.report
             if plan.frame.height == 0:
-                report["errors"].append({"table": plan.dataset, "stage": "build", "error": "refused",
-                                         "detail": json.dumps(plan.report)[:300]})
+                report["errors"].append(
+                    {
+                        "table": plan.dataset,
+                        "stage": "build",
+                        "error": "refused",
+                        "detail": json.dumps(plan.report)[:300],
+                    }
+                )
                 continue
-            if not register:
-                report["tables"][plan.dataset] = {"rows": plan.frame.height, "registered": False}
-                continue
-            say(f"register {plan.source}.{plan.dataset} ({plan.frame.height} rows)")
             summary = await asyncio.to_thread(
-                register_atlas_table,
-                worker_engine,
-                store,
-                source=plan.source,
+                run.register,
                 dataset=plan.dataset,
                 frame=plan.frame,
                 raw_sha256s=plan.raw_sha256s,
-                parser_version=PARSER_VERSION,
-                origin=origin,
                 coverage_note=plan.coverage_note[:MAX_TEXT],
                 geo_scheme=plan.geo_scheme,
-                rights={"licence": connector.licence, "source_key": connector.source_key,
-                        "provider": connector.provider},
-                actor="worker:atlas-un",
             )
             report["tables"][plan.dataset] = _trim_summary(summary)
-            report["tables"][plan.dataset]["unmapped_provider_geo"] = summary["unmapped_provider_geo"]
             del plan
     except SourceResponseError as e:
         report["errors"].append({"stage": "build", "error": e.details.get("kind"), "detail": e.message[:500]})
@@ -1856,6 +1995,8 @@ __all__ = [
     "TablePlan",
     "UnConnector",
     "Xlsx",
+    "atlas_ingest",
+    "atlas_source",
     "build_ims",
     "build_sdg",
     "build_syb",
@@ -1863,8 +2004,5 @@ __all__ = [
     "build_wpp_age5",
     "build_wpp_demo",
     "build_wpp_variants",
-    "ensure_registered",
-    "live_client",
-    "run",
     "strict_decimal",
 ]

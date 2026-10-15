@@ -1,0 +1,30 @@
+# V3 (agent A-WB): World Bank bulk databases for the atlas layer. Connector: atlas.worldbank
+# (src/reva/adapters/connectors/atlas_worldbank.py). One DataBank bulk CSV ZIP per database (WDI, WGI,
+# Gender, HNP, EdStats, Jobs, Doing Business archive, IDS) + French indicator metadata (API v2) + PIP
+# survey-year estimates (pinned release). Raw ZIPs archived content-addressed before parsing.
+source_key: worldbank.atlas
+title: World Bank bulk databases (DataBank bulk CSV, Indicators API v2 metadata, Poverty and Inequality Platform)
+provider_url: https://databank.worldbank.org/data/download/
+lineage_family: worldbank
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://datacatalog.worldbank.org/public-licenses#cc-by
+  attribution: "The World Bank (World Development Indicators, Worldwide Governance Indicators, Gender Statistics, Health Nutrition and Population Statistics, Education Statistics, Jobs, Doing Business, International Debt Statistics, Poverty and Inequality Platform)"
+  per_series_licence: >-
+    Each series carries its licence in the provider's Series metadata ("License Type"). Observed 2026-10-15:
+    WDI 1,489 CC BY-4.0, 6 "SIPRI terms and conditions", 3 "CC BY 3.0 IGO"; Jobs 1 "IEA terms and
+    conditions"; Gender 153 "CC BY 3.0 IGO", 88 blank; HNP 41 blank; Doing Business and EdStats blank.
+    Non-CC-BY series are tagged licence:check in registry/atlas/catalog/worldbank.yaml.
+metadata:
+  allowed_hosts: [databank.worldbank.org, databankfiles.worldbank.org, api.worldbank.org]
+  bulk_docs: https://datatopics.worldbank.org/world-development-indicators/
+  pip_docs: https://pip.worldbank.org/api
+  authentication: none
+  cadence: monthly (WDI/Gender/WGI update several times a year; Doing Business and EdStats bulk are frozen archives)
+  editorial_status: >-
+    Provider-published statistics; many series are compiled from other organisations (UN WPP, ILO
+    modelled estimates, IMF, WHO, UNESCO UIS, SIPRI, IEA): the upstream organisation is in each
+    concept's notes. Not independent evidence of those organisations' own releases.
+  upstream_lineages:
+    SP.POP.TOTL: [un_wpp, national_statistical_offices, eurostat]
+    SL.UEM.TOTL.ZS: [ilo_modelled_estimates]

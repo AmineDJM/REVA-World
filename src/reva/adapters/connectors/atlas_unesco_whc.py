@@ -45,9 +45,9 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from typing import Any
 
-from reva.adapters.connectors.base import schema_fingerprint, to_raw
+from reva.adapters.connectors.base import schema_fingerprint
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem
 
 SOURCE_KEY = "unesco.whc"
 DATASET = "whc001"
@@ -121,11 +121,6 @@ def fetch_items() -> tuple[FetchItem, ...]:
         FetchItem(key="whc001.metadata", url=METADATA_URL, max_bytes=MAX_METADATA_BYTES),
         FetchItem(key="whc001.export", url=EXPORT_URL, max_bytes=MAX_EXPORT_BYTES),
     )
-
-
-async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
-    result = await http.get(item.url, max_bytes=item.max_bytes)
-    return to_raw(item, result, getattr(http, "origin", "live"))
 
 
 # ----------------------------------------------------------------------------- parsing
@@ -392,126 +387,73 @@ def atlas_frame(rows: Sequence[Mapping[str, Any]]) -> Any:
     return pl.DataFrame(list(rows), schema=ATLAS_SCHEMA)
 
 
-# ----------------------------------------------------------------------------- connector + ingest
-
-#: ``ConnectorSpec.template`` value shared by the V3 atlas connectors. The ``Literal`` in
-#: ``reva.ports.connectors.ConnectorSpec`` has no atlas value yet (change requested from the lead:
-#: add ``"atlas_bulk"``); until then every other field is validated with a placeholder template and
-#: the template is set to ``atlas_bulk`` afterwards (same approach as the A-SCI connectors).
-TEMPLATE = "atlas_bulk"
-_PLACEHOLDER_TEMPLATE = "naturalearth_asset"
+# ----------------------------------------------------------------------------- atlas source protocol
 
 
-def template_supported() -> bool:
-    from typing import get_args
+def atlas_source() -> Any:
+    """The atlas source declaration (``reva.atlas.sources`` discovers it by module name)."""
+    from reva.adapters.connectors.base import module_digest
+    from reva.atlas.sources import AtlasSourceSpec
 
-    from reva.ports.connectors import ConnectorSpec
-
-    return TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
-
-
-class UnescoWhcConnector:
-    """Archive-only connector: the raw List bytes are published as evidence acquisitions (zero
-    observation batches); the counts become an atlas table (:func:`ingest`)."""
-
-    def describe(self) -> Any:
-        from reva.adapters.connectors.base import module_digest
-        from reva.ports.connectors import ConnectorSpec
-
-        fields: dict[str, Any] = dict(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="UNESCO World Heritage Centre (data.unesco.org)",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=(DATASET,),
-            field_mappings={"geo": "iso_codes (ISO 3166-1 alpha-2)", "id": "id_no", "year": "date_inscribed"},
-            units={"*": "count"},
-            geography=("world",),
-            time_semantics="current List at the dataset revision; inscription year per property",
-            lineage_family="unesco_whc",
-            cadence_seconds=7 * 86400,
-            revision_strategy="dataset record 'modified' is the source revision; identical bytes are a no-op",
-            max_response_bytes=MAX_EXPORT_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(UnescoWhcConnector),
-        )
-        if template_supported():
-            return ConnectorSpec(template=TEMPLATE, **fields)  # type: ignore[arg-type]
-        checked = ConnectorSpec(template=_PLACEHOLDER_TEMPLATE, **fields)  # type: ignore[arg-type]  # validates the rest
-        return checked.model_copy(update={"template": TEMPLATE})
-
-    def plan(self, cursor: Any, budget: Any) -> Any:
-        from reva.ports.connectors import FetchPlan
-
-        return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="none (single JSON export)")
-
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        return await fetch(item, http)
-
-    def parse(self, raw: RawAcquisition) -> Any:
-        from reva.ports.connectors import ObservationBatch
-
-        if raw.item.key == "whc001.metadata":
-            meta = parse_metadata(raw.body)
-            yield ObservationBatch(connector=CONNECTOR_NAME, connector_version=CONNECTOR_VERSION,
-                                   item_key=raw.item.key, observations=(), metadata={"dataset": meta})
-            return
-        props, info = parse_export(raw.body)
-        yield ObservationBatch(connector=CONNECTOR_NAME, connector_version=CONNECTOR_VERSION, item_key=raw.item.key,
-                               observations=(), metadata={"record_count": info["record_count"],
-                                                          "problems": validate_properties(props)},
-                               schema_fingerprint=info["schema_fingerprint"])
-
-    def validate(self, batch: Any) -> Any:
-        from reva.ports.connectors import Finding, QualityReport
-
-        problems = batch.metadata.get("problems") or []
-        return QualityReport(
-            outcome="blocked" if problems else "pass",
-            findings=tuple(Finding(code="incomplete", severity="blocker", message=m) for m in problems),
-            received_count=int(batch.metadata.get("record_count") or 0),
-        )
-
-    def next_cursor(self, plan: Any, outcomes: Sequence[Any]) -> Any:
-        from reva.ports.connectors import Cursor
-
-        return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="UNESCO World Heritage Centre (data.unesco.org)",
+        licence=f"{RIGHTS['licence']} ({RIGHTS['licence_url']}); attribution: {RIGHTS['attribution']}",
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=(DATASET,),
+        cadence_seconds=7 * 86400,
+        planned_requests=2,
+        max_response_bytes=MAX_EXPORT_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(atlas_source),
+        field_mappings={"geo": "iso_codes (ISO 3166-1 alpha-2)", "id": "id_no", "year": "date_inscribed"},
+        notes="Current World Heritage List; counts per State Party; removed properties absent.",
+    )
 
 
-async def ingest(engine: Any, store: Any, http: Any) -> dict[str, Any]:
-    """Fetch (2 requests), archive both raw responses, register the atlas table ``unesco_whc.whc001``.
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch the dataset record and the export (2 requests), archive both, register ``unesco_whc.whc001``.
 
-    ``http`` is a budget-metered SafeHttpClient for live runs or ``FixtureHttp`` (origin test_fixture).
-    Blocks (raises) on schema drift, licence change or a truncated export; nothing is registered then.
+    Blocks (raises, nothing registered) on schema drift, a licence change or a truncated export.
     """
-    from reva.atlas.tables import register_atlas_table
-    from reva.evidence.ingest import publish_acquisition
-
-    conn = UnescoWhcConnector()
-    spec = conn.describe()
-    raws = {it.key: await conn.fetch(it, http) for it in fetch_items()}
-    meta = parse_metadata(raws["whc001.metadata"].body)
-    props, _ = parse_export(raws["whc001.export"].body)
+    if not run.wants(ATLAS_DATASET):
+        return {"skipped": True}
+    meta_item, export_item = fetch_items()
+    raw_meta = await run.get(meta_item.url, key=meta_item.key, max_bytes=meta_item.max_bytes)
+    meta = parse_metadata(raw_meta.body)  # licence check before the larger download
+    raw_export = await run.get(export_item.url, key=export_item.key, max_bytes=export_item.max_bytes)
+    props, info = parse_export(raw_export.body)
     problems = validate_properties(props, meta)
     if problems:
         raise WhcParseError("; ".join(problems), retryable=False, kind="incomplete")
-    shas = []
-    for raw in raws.values():
-        summary = publish_acquisition(engine, store, spec, raw, [], [], actor="worker:atlas")
-        if summary.namespace == "quarantine":  # pragma: no cover - no quality report is passed
-            raise WhcParseError("raw acquisition was quarantined", retryable=False)
-        shas.append(summary.raw_sha256)
-    export_sha = shas[list(raws).index("whc001.export")]
+    meta_sha = run.archive(raw_meta)
+    export_sha = run.archive(raw_export)
     rows = atlas_rows(props, raw_sha256=export_sha, source_revision=str(meta["modified"]),
-                      retrieved_at=raws["whc001.export"].retrieved_at)
-    origin = raws["whc001.export"].origin
-    return register_atlas_table(
-        engine, store, source=ATLAS_SOURCE, dataset=ATLAS_DATASET, frame=atlas_frame(rows), raw_sha256s=shas,
-        parser_version=PARSER_VERSION, origin=origin, geo_scheme="iso2", rights=RIGHTS,
+                      retrieved_at=raw_export.retrieved_at)
+    out = run.register(
+        dataset=ATLAS_DATASET,
+        frame=atlas_frame(rows),
+        raw_sha256s=[meta_sha, export_sha],
+        geo_scheme="iso2",
+        rights=dict(RIGHTS),
         coverage_note=(f"UNESCO World Heritage List (whc001, revision {meta['modified']}): {len(props)} properties; "
-                       "counts per State Party; removed properties absent; 1 property without State Party code "
-                       "kept unmapped"),
+                       "counts per State Party; properties removed from the List are absent; a property without "
+                       "a State Party code is kept as an unmapped geography"),
     )
+    return {
+        "source_revision": meta["modified"],
+        "properties": len(props),
+        "unmapped": unmapped(props),
+        "schema_fingerprint": info["schema_fingerprint"],
+        "dataset_key": out["dataset_key"],
+        "artifact_sha256": out["artifact_sha256"],
+        "created": out["created"],
+        "row_count": out["row_count"],
+        "unmapped_provider_geo": out["unmapped_provider_geo"],
+    }

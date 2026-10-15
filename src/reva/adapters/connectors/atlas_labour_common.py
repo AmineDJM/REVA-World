@@ -1,21 +1,20 @@
 """Shared plumbing of the labour atlas connectors (V3, agent A-ILO).
 
 Used by :mod:`atlas_ilo` (ILOSTAT) and :mod:`atlas_wages_gapfill` (Eurostat ``earn_mw_cur``,
-OECD earnings). Nothing here interprets a provider value; it only
+OECD earnings). Those modules declare ``atlas_source()`` / ``atlas_ingest(run)`` for the ATLASCORE
+platform (:mod:`reva.atlas.sources`, :mod:`reva.atlas.ingest`); every request goes through
+``run.get`` (budget-metered live client or fixture client, never one built here), raw bytes are
+archived with ``run.archive`` and tables registered with ``run.register``. This module only
 
-* builds a :class:`~reva.ports.connectors.ConnectorSpec` for an atlas bulk connector
-  (:func:`atlas_spec`; ``ConnectorSpec.template`` is a closed ``Literal`` without an atlas value yet,
-  so every other field is validated normally and the template is set to ``"atlas_bulk"`` afterwards —
-  requested change for the lead: add ``"atlas_bulk"`` to that ``Literal``);
-* fetches a connector's plan through any ``get(url, max_bytes=)`` client (live
-  ``SafeHttpClient`` behind the egress budget, or ``FixtureHttp``), refusing empty bodies and
-  unexpected media types (ILOSTAT answers ``200`` with an empty body to some clients);
-* archives each raw download as an ``evidence.acquisition`` (zero observation batches) and
-  registers the connector's atlas tables with :func:`reva.atlas.tables.register_atlas_table`;
-* small exact helpers: bounded gunzip, strict decimal text, canonical JSON.
+* runs a connector's fetch plan through an :class:`~reva.atlas.ingest.AtlasRun`
+  (:func:`ingest_with_run`), refusing empty bodies and unexpected media types (ILOSTAT answers
+  ``200`` with an empty body to some clients), reporting optional items that failed, and never
+  swallowing a budget refusal;
+* small exact helpers: bounded gunzip, strict decimal text, canonical JSON, CSV reading.
 
-Every failure is typed (``SourceResponseError`` / ``ValidationProblem`` / ``BudgetExhausted``);
-a table that does not validate is not registered and the run reports it — nothing is stubbed.
+Nothing here interprets a provider value. Every failure is typed (``SourceResponseError`` /
+``ValidationProblem`` / ``BudgetExhausted``); a table that does not validate is not registered
+and the summary reports it -- nothing is stubbed.
 """
 
 from __future__ import annotations
@@ -25,35 +24,18 @@ import inspect
 import json
 import re
 import zlib
-from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass, field
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from typing import Any, Protocol, get_args
-from uuid import uuid4
+from typing import Any, Protocol
 
 import polars as pl
 
-from reva.adapters.connectors.base import to_raw
 from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
-
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"  # only to validate the other fields; replaced before use
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 #: strict decimal accepted by reva.atlas.tables (kept in sync with tables.DECIMAL_RE)
 _STRICT_DECIMAL = re.compile(r"^-?(0|[1-9][0-9]*)(\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$")
-
-
-def template_supported() -> bool:
-    return ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
-
-
-def atlas_spec(**fields: Any) -> ConnectorSpec:
-    """A connector spec with ``template = "atlas_bulk"`` (every other field validated)."""
-    if template_supported():
-        return ConnectorSpec(template=ATLAS_TEMPLATE, **fields)  # type: ignore[arg-type]
-    checked = ConnectorSpec(template=_VALID_PLACEHOLDER, **fields)  # type: ignore[arg-type]
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
 
 
 def code_digest(*modules: Any) -> str:
@@ -144,39 +126,14 @@ class AtlasTablePlan:
     rights: Mapping[str, Any]
 
 
-class AtlasConnector(Protocol):
-    parser_version: str
-
-    def describe(self) -> ConnectorSpec: ...
+class LabourConnector(Protocol):
+    """A connector object: a fetch plan and a pure parser from archived raw bytes to table plans."""
 
     def plan(self) -> Sequence[FetchItem]: ...
 
+    def datasets_of(self, item: FetchItem) -> set[str] | None: ...
+
     def build_tables(self, raws: Mapping[str, RawAcquisition]) -> list[AtlasTablePlan]: ...
-
-
-@dataclass
-class AtlasRunReport:
-    connector: str
-    origin: str
-    fetched: list[dict[str, Any]] = field(default_factory=list)
-    tables: list[dict[str, Any]] = field(default_factory=list)
-    errors: list[dict[str, Any]] = field(default_factory=list)
-    budget: dict[str, Any] | None = None
-
-    @property
-    def ok(self) -> bool:
-        return not self.errors
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "connector": self.connector,
-            "origin": self.origin,
-            "fetched": self.fetched,
-            "tables": self.tables,
-            "errors": self.errors,
-            "budget": self.budget,
-            "ok": self.ok,
-        }
 
 
 def check_body(item: FetchItem, raw: RawAcquisition) -> None:
@@ -192,126 +149,61 @@ def check_body(item: FetchItem, raw: RawAcquisition) -> None:
         )
 
 
-async def fetch_plan(http: Any, items: Sequence[FetchItem], report: AtlasRunReport) -> dict[str, RawAcquisition]:
-    """Fetch every item; a failed *required* item is an error, optional ones are only reported."""
-    raws: dict[str, RawAcquisition] = {}
-    origin = getattr(http, "origin", "live")
-    for it in items:
-        try:
-            res = await http.get(it.url, max_bytes=it.max_bytes)
-            raw = to_raw(it, res, origin)
-            check_body(it, raw)
-        except Exception as e:  # typed errors are reported per item; the table needing it is skipped
-            entry = {"item": it.key, "error": type(e).__name__, "message": str(e)[:300], "required": it.required}
-            (report.errors if it.required else report.fetched).append(entry)
-            continue
-        raws[it.key] = raw
-        report.fetched.append({"item": it.key, "bytes": len(raw.body), "sha256": hashlib.sha256(raw.body).hexdigest()})
-    return raws
-
-
-def archive_raw(engine: Any, store: Any, spec: ConnectorSpec, raw: RawAcquisition, *, actor: str) -> str:
-    """Archive the raw bytes as an acquisition of ``spec`` (no observations); return the sha256."""
-    from reva.evidence.ingest import publish_acquisition
-
-    summary = publish_acquisition(engine, store, spec, raw, [], [], actor=actor)
-    if summary.namespace == "quarantine":  # pragma: no cover - no quality report can block here
-        raise ValidationProblem("raw acquisition was quarantined", item=raw.item.key)
-    return summary.raw_sha256
-
-
-def register_connector(engine: Any, store: Any, spec: ConnectorSpec, actor: str = "system:a_ilo") -> Any:
-    """Register ``spec`` as a connector version (tests / throwaway databases).
-
-    The seed registers built-in connectors (``reva.adapters.connectors.registry``, lead-owned);
-    until these connectors are listed there, tests and the throwaway live ingest register them with
-    the seed's own function. The ``registry/sources/<source>.yaml`` entry must be seeded.
-    """
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
-
-    with engine.begin() as conn:
-        act = repo.simple_activity("registry.seed", "review", actor, {"connector": spec.name})
-        repo.record_activity(conn, act)
-        return register_connector_version(conn, store, spec, act.id)
-
-
 def _plain_details(e: Exception) -> Any:
     d = getattr(e, "details", None)
-    if not d:
-        return None
-    return (
-        json.loads(json.dumps(d, default=str))[:20] if isinstance(d, list) else json.loads(json.dumps(d, default=str))
-    )
+    return json.loads(json.dumps(d, default=str)) if d else None
 
 
-async def run_atlas_ingest(
-    engine: Any,
-    store: Any,
-    connector: AtlasConnector,
-    http: Any,
-    *,
-    budget: Any = None,
-    actor: str = "worker:atlas_labour",
-    register: Callable[..., dict[str, Any]] | None = None,
-) -> AtlasRunReport:
-    """Fetch -> archive raw -> parse -> register every atlas table of ``connector``.
+async def ingest_with_run(run: Any, connector: LabourConnector) -> dict[str, Any]:
+    """Fetch (``run.get``) -> archive (``run.archive``) -> parse -> register (``run.register``).
 
-    Live clients (``origin == "live"``) are charged to the connector's ``source_key`` through the
-    persistent egress ledger (``reserve_ingest`` / ``metered`` / ``settle_metered``); a source without
-    a budget is refused before any request (``BudgetExhausted``, fail closed). Fixture clients are
-    never charged.
+    ``run`` is a :class:`reva.atlas.ingest.AtlasRun`. Items whose datasets the run does not want
+    (``--dataset``) are not requested. A failed *required* item stops table building; a failed
+    optional item (one indicator file) is reported and its table is simply absent. A budget refusal
+    (``BudgetExhausted``) always propagates (the platform ends the run as ``budget_exhausted``).
     """
-    from reva.atlas.tables import register_atlas_table
-    from reva.operations import budgets as B
+    from reva.operations.budgets import BudgetExhausted
 
-    spec = connector.describe()
-    origin = getattr(http, "origin", "live")
-    report = AtlasRunReport(spec.name, origin)
-    items = list(connector.plan())
-    client = http
-    if origin == "live":
-        reservation = B.reserve_ingest(
-            engine,
-            job_id=f"atlas-{spec.name}-{uuid4()}",
-            attempt=1,
-            source_key=B.budget_source_key(spec),
-            planned_requests=len(items),
-            budget=budget,
-        )
-        client = B.metered(http, engine, reservation, budget=budget)
-    try:
-        raws = await fetch_plan(client, items, report)
-    finally:
-        if origin == "live":
-            report.budget = B.settle_metered(engine, client)
-    for key, raw in list(raws.items()):
-        sha = archive_raw(engine, store, spec, raw, actor=actor)
-        raws[key] = raw.model_copy(update={"raw_sha256": sha})
+    fetched: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+    raws: dict[str, RawAcquisition] = {}
+    for it in connector.plan():
+        wanted = connector.datasets_of(it)
+        if wanted is not None and not any(run.wants(d) for d in wanted):
+            continue
+        try:
+            raw = await run.get(it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes)
+            check_body(it, raw)
+        except BudgetExhausted:
+            raise
+        except Exception as e:  # typed provider errors are reported per item
+            errors.append({"item": it.key, "error": type(e).__name__, "message": str(e)[:300], "required": it.required})
+            continue
+        sha = run.archive(raw)
+        raws[it.key] = raw.model_copy(update={"raw_sha256": sha})
+        fetched.append({"item": it.key, "bytes": len(raw.body), "sha256": sha})
+    tables: list[dict[str, Any]] = []
+    if any(e["required"] for e in errors):
+        return {"fetched": fetched, "errors": errors, "tables": tables, "ok": False}
     try:
         plans = connector.build_tables(raws)
     except Exception as e:
-        report.errors.append({"stage": "parse", "error": type(e).__name__, "message": str(e)[:500]})
-        return report
-    reg = register or register_atlas_table
+        errors.append({"stage": "parse", "error": type(e).__name__, "message": str(e)[:500]})
+        return {"fetched": fetched, "errors": errors, "tables": tables, "ok": False}
     for p in plans:
+        if not run.wants(p.dataset):
+            continue
         try:
-            out = reg(
-                engine,
-                store,
-                source=p.source,
+            out = run.register(
                 dataset=p.dataset,
                 frame=p.frame,
                 raw_sha256s=list(p.raw_sha256s),
-                parser_version=connector.parser_version,
-                origin=origin,
                 coverage_note=p.coverage_note,
                 geo_scheme=p.geo_scheme,
                 rights=dict(p.rights),
-                actor=actor,
             )
         except Exception as e:
-            report.errors.append(
+            errors.append(
                 {
                     "stage": "register",
                     "table": f"{p.source}.{p.dataset}",
@@ -322,7 +214,7 @@ async def run_atlas_ingest(
             )
             continue
         cov = out.get("coverage") or {}
-        report.tables.append(
+        tables.append(
             {
                 "table": f"{p.source}.{p.dataset}",
                 "dataset_key": out.get("dataset_key"),
@@ -334,24 +226,17 @@ async def run_atlas_ingest(
                 "artifact_sha256": out.get("artifact_sha256"),
             }
         )
-    return report
+    return {"fetched": fetched, "errors": errors, "tables": tables, "ok": not errors}
 
 
 __all__ = [
-    "ATLAS_TEMPLATE",
-    "AtlasConnector",
-    "AtlasRunReport",
     "AtlasTablePlan",
-    "archive_raw",
-    "atlas_spec",
+    "LabourConnector",
     "canon",
     "check_body",
     "code_digest",
-    "fetch_plan",
     "gunzip_bounded",
+    "ingest_with_run",
     "read_csv_text",
-    "register_connector",
-    "run_atlas_ingest",
     "strict_decimal",
-    "template_supported",
 ]

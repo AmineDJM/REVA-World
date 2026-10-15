@@ -57,20 +57,11 @@ from decimal import Decimal
 from typing import Any
 from urllib.parse import quote
 
-from reva.adapters.connectors.atlas_healthedu_common import AtlasConnectorSpec, canon, fit_flags
-from reva.adapters.connectors.base import dec_str, json_decimal, module_digest, schema_fingerprint, to_raw
+from reva.adapters.connectors.atlas_healthedu_common import canon, fetch_archive_register, fit_flags
+from reva.adapters.connectors.base import dec_str, json_decimal, module_digest
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import (
-    Cursor,
-    FetchBudget,
-    FetchItem,
-    FetchOutcome,
-    FetchPlan,
-    Finding,
-    ObservationBatch,
-    QualityReport,
-    RawAcquisition,
-)
+from reva.ports.connectors import FetchItem
 
 CONNECTOR_NAME = "atlas.who_gho"
 CONNECTOR_VERSION = "1.0.0"
@@ -78,7 +69,7 @@ PARSER_VERSION = "atlas-who-gho-parse-1"
 SOURCE_KEY = "who.gho"
 HOST = "ghoapi.azureedge.net"
 BASE = f"https://{HOST}/api"
-MAX_ITEM_BYTES = 52_428_800  # ConnectorSpec cap; the largest response (NCDMORTPERCENT) is ~38 MB
+MAX_ITEM_BYTES = 104_857_600  # the largest response (NCDMORTPERCENT, all rows) was ~38 MB on 2026-10-15
 
 RIGHTS: dict[str, str] = {
     "licence": "CC BY 4.0 (WHO additional terms)",
@@ -301,40 +292,7 @@ class WhoGhoConnector:
         self.indicators = codes
         self.countries = tuple(sorted(countries)) if countries else None
 
-    # ------------------------------------------------------------------ connector protocol
-    def describe(self) -> AtlasConnectorSpec:
-        return AtlasConnectorSpec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            template="atlas_who_gho_odata",
-            source_key=SOURCE_KEY,
-            provider="World Health Organization",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=self.indicators,
-            field_mappings={
-                "value": "NumericValue",
-                "display": "Value",
-                "interval": ["Low", "High"],
-                "dimensions": [f for _, f in DIM_FIELDS],
-                "select": list(SELECT),
-            },
-            units={i: INDICATORS_BY_CODE[i].unit for i in self.indicators},
-            geography=self.countries or ("ALL_COUNTRIES",),
-            time_semantics="calendar year (TimeDimType YEAR); half-open [Y-01-01, Y+1-01-01)",
-            lineage_family="who_gho",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="atlas table re-registered per run; changed content = new table version",
-            max_response_bytes=MAX_ITEM_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(WhoGhoConnector),
-        )
-
-    def expected_item_keys(self) -> list[str]:
-        return [i.key for i in self.items()]
-
+    # ------------------------------------------------------------------ run protocol (atlas_healthedu_common)
     def items(self) -> tuple[FetchItem, ...]:
         out = [
             FetchItem(
@@ -352,63 +310,18 @@ class WhoGhoConnector:
             )
         return tuple(out)
 
-    def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
-        items = self.items()
-        return FetchPlan(
-            connector=CONNECTOR_NAME,
-            items=items[: budget.max_requests],
-            pagination="none: the GHO OData API returns every row of an indicator in one response",
-            availability_expectation="WHO updates indicators independently; per-row Date = last update",
-            budget_exhausted=len(items) > budget.max_requests,
-        )
+    def follow_ups(self, item: FetchItem, body: bytes) -> tuple[FetchItem, ...]:
+        return ()
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
-        return to_raw(item, result, getattr(http, "origin", "live"))
-
-    def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
-        kind = raw.item.params.get("kind")
-        if kind == "indicator_list":
-            names = parse_indicator_list(raw.body)
-            meta: dict[str, Any] = {"kind": kind, "indicators_listed": len(names)}
-            fp = schema_fingerprint({"IndicatorCode": "x", "IndicatorName": "x"})
-        else:
-            code = str(raw.item.params["indicator"])
-            rows = parse_data(raw.body, code)
-            meta = {
-                "kind": kind,
-                "indicator": code,
-                "rows": len(rows),
-                "countries": len({r["SpatialDim"] for r in rows}),
-            }
-            fp = schema_fingerprint(list(SELECT))
-        yield ObservationBatch(
-            connector=CONNECTOR_NAME,
-            connector_version=CONNECTOR_VERSION,
-            item_key=raw.item.key,
-            observations=(),
-            metadata=meta,
-            schema_fingerprint=fp,
-        )
-
-    def validate(self, batch: ObservationBatch) -> QualityReport:
-        m = batch.metadata
-        if m.get("kind") == "data" and not m.get("rows"):
-            return QualityReport(
-                outcome="quarantine",
-                findings=(
-                    Finding(
-                        code="empty_indicator",
-                        severity="blocker",
-                        message=f"{m.get('indicator')}: the API returned no country rows",
-                    ),
-                ),
-            )
-        return QualityReport(outcome="pass", received_count=int(m.get("rows") or m.get("indicators_listed") or 0))
-
-    def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
-        done = all(o.status in ("published", "unchanged") for o in outcomes) and not plan.budget_exhausted
-        return Cursor(state={"complete": done})
+    def check(self, item: FetchItem, body: bytes) -> dict[str, Any]:
+        """Structural check of one archived response (drift -> ``WhoParseError``)."""
+        if item.params.get("kind") == "indicator_list":
+            return {"indicators_listed": len(parse_indicator_list(body))}
+        code = str(item.params["indicator"])
+        rows = parse_data(body, code)
+        if not rows:
+            raise _err(f"{code}: the API returned no country rows")
+        return {"rows": len(rows)}
 
     # ------------------------------------------------------------------ atlas table
     def atlas_frame(self, bodies: Mapping[str, bytes], raws: Mapping[str, str]) -> tuple[Any, str, dict[str, Any]]:
@@ -423,19 +336,20 @@ class WhoGhoConnector:
                 problems.append(f"{code}: archived by WHO ({n})")
         if problems:
             raise ValidationProblem("WHO indicator list drift: registration refused", problems=problems)
-        rows: list[dict[str, Any]] = []
+        import polars as pl
+
+        parts = []
         for code in self.indicators:
             key = f"gho.data:{code}"
-            rows.extend(
-                atlas_rows(
-                    parse_data(bodies[key], code),
-                    INDICATORS_BY_CODE[code],
-                    raw_sha256=raws[key],
-                    item_key=key,
-                    indicator_name=names[code],
-                )
+            rows = atlas_rows(
+                parse_data(bodies[key], code),
+                INDICATORS_BY_CODE[code],
+                raw_sha256=raws[key],
+                item_key=key,
+                indicator_name=names[code],
             )
-        frame = _frame(rows)
+            parts.append(_frame(rows))
+        frame = pl.concat(parts, how="vertical")
         note = (
             f"WHO GHO OData, {len(self.indicators)} indicators, country rows only "
             f"(SpatialDimType COUNTRY){'; subset ' + ','.join(self.countries) if self.countries else ''}. "
@@ -562,6 +476,52 @@ def _frame(rows: Sequence[Mapping[str, Any]]) -> Any:
     return pl.DataFrame(list(rows), schema=ATLAS_SCHEMA)
 
 
+#: Fixture mode (``--fixture`` / tests) replays the captured subset in tests/fixtures/source/atlas.who_gho.
+FIXTURE_INDICATORS = ("WHOSIS_000001", "MDG_0000000032", "MDG_0000000007", "M_Est_tob_curr_std",
+                      "GHED_CHEGDP_SHA2011", "RS_198")  # fmt: skip
+FIXTURE_COUNTRIES = ("DZA", "FRA", "HKG", "IND", "NGA")
+
+
+def atlas_source() -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=WhoGhoConnector.ATLAS_SOURCE,
+        provider="World Health Organization",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(WhoGhoConnector.ATLAS_DATASET,),
+        dataset_ids=tuple(i.code for i in INDICATORS),
+        cadence_seconds=30 * 86400,
+        planned_requests=1 + len(INDICATORS),
+        max_response_bytes=MAX_ITEM_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(WhoGhoConnector),
+        field_mappings={
+            "value": "NumericValue",
+            "display": "Value",
+            "interval": ["Low", "High"],
+            "dimensions": [f for _, f in DIM_FIELDS],
+            "select": list(SELECT),
+            "units": {i.code: i.unit for i in INDICATORS},
+        },
+        notes="One request per curated GHO indicator, country rows only; a partial run registers nothing.",
+    )
+
+
+def connector_for(run: Any) -> WhoGhoConnector:
+    if run.origin == "test_fixture":
+        return WhoGhoConnector(FIXTURE_INDICATORS, FIXTURE_COUNTRIES)
+    return WhoGhoConnector()
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """ATLASCORE entry point (``uv run python -m reva.atlas.ingest atlas.who_gho``)."""
+    return await fetch_archive_register(run, connector_for(run), dataset=WhoGhoConnector.ATLAS_DATASET)
+
+
 #: Folded indicator -> catalog concept (registry/atlas/catalog/health.yaml; a test keeps them in sync).
 CONCEPT_HINTS: dict[str, str] = {}
 
@@ -587,6 +547,8 @@ _load_hints()
 
 __all__ = [
     "CONNECTOR_NAME",
+    "atlas_ingest",
+    "atlas_source",
     "INDICATORS",
     "RIGHTS",
     "SOURCE_KEY",

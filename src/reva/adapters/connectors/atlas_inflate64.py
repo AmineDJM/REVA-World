@@ -22,11 +22,42 @@ MAXLCODES = 286
 MAXDCODES = 32
 FIXLCODES = 288
 
-_LBASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163,
-          195, 227]
+_LBASE = [3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227]
 _LEXT = [0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5]
-_DBASE = [1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073,
-          4097, 6145, 8193, 12289, 16385, 24577, 32769, 49153]
+_DBASE = [
+    1,
+    2,
+    3,
+    4,
+    5,
+    7,
+    9,
+    13,
+    17,
+    25,
+    33,
+    49,
+    65,
+    97,
+    129,
+    193,
+    257,
+    385,
+    513,
+    769,
+    1025,
+    1537,
+    2049,
+    3073,
+    4097,
+    6145,
+    8193,
+    12289,
+    16385,
+    24577,
+    32769,
+    49153,
+]
 _DEXT = [0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, 14, 14]
 
 
@@ -59,7 +90,7 @@ class _Huffman:
 
 
 class _State:
-    __slots__ = ("data", "pos", "bitbuf", "bitcnt", "out", "max_out", "deflate64")
+    __slots__ = ("bitbuf", "bitcnt", "data", "deflate64", "max_out", "out", "pos")
 
     def __init__(self, data: bytes, max_out: int, deflate64: bool) -> None:
         self.data = data
@@ -109,7 +140,7 @@ def _stored(s: _State) -> None:
         raise InflateError("stored block length check failed")
     if s.pos + ln > len(s.data):
         raise InflateError("truncated stored block")
-    s.out += s.data[s.pos:s.pos + ln]
+    s.out += s.data[s.pos : s.pos + ln]
     s.pos += ln
 
 
@@ -140,7 +171,7 @@ def _codes(s: _State, lencode: _Huffman, distcode: _Huffman) -> None:
                 raise InflateError("distance too far back")
             start = len(out) - dist
             if dist >= length:
-                out += out[start:start + length]
+                out += out[start : start + length]
             else:
                 for i in range(length):
                     out.append(out[start + i])

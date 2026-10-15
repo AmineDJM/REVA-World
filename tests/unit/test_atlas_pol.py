@@ -26,8 +26,8 @@ import atlas_pol_rdata_writer as w
 SHA = "0" * 64
 
 
-def _raws(module, connector: str) -> dict:
-    return asyncio.run(module.fetch_all(FixtureHttp(connector)))
+def _raws(module, connector: str, *args) -> dict:
+    return asyncio.run(module.fetch_all(FixtureHttp(connector), *args))
 
 
 # ----------------------------------------------------------------------------- RData reader
@@ -169,7 +169,7 @@ def test_vdem_unknown_category_code_is_refused(vdem_raws):
 # ----------------------------------------------------------------------------- LIED / BMR
 @pytest.fixture(scope="module")
 def regime_raws():
-    return _raws(reg, reg.CONNECTOR_NAME)
+    return {**_raws(reg, reg.LIED_CONNECTOR, "lied"), **_raws(reg, reg.BMR_CONNECTOR, "bmr")}
 
 
 def test_dataverse_record_checks(regime_raws):
@@ -209,9 +209,24 @@ def test_lied_frame_geo_and_labels(regime_raws):
     assert de["period_start"].is_duplicated().sum() == 0
 
 
-def test_lied_parse_refuses_partial_file(regime_raws):
+def test_partial_files_are_refused(regime_raws):
     with pytest.raises(SourceResponseError, match="partial"):
         reg.parse_lied(regime_raws["lied.file"].body)  # the fixture is a subset (< 20,000 rows)
+    with pytest.raises(SourceResponseError, match="partial"):
+        reg.parse_bmr(regime_raws["bmr.file"].body)
+
+
+def test_atlas_sources_are_declared():
+    from reva.atlas.sources import discover
+
+    found, errors = discover(["reva.adapters.connectors.atlas_vdem", "reva.adapters.connectors.atlas_regimes",
+                              "reva.adapters.connectors.atlas_ipu"])
+    assert errors == []
+    assert set(found) == {"atlas.vdem", "atlas.lied", "atlas.bmr", "atlas.ipu"}
+    assert found["atlas.vdem"].spec.datasets == vdem.DATASETS
+    assert found["atlas.ipu"].spec.licence.startswith("CC-BY-NC-SA")
+    for e in found.values():
+        assert (Path(__file__).parents[2] / "tests" / "fixtures" / "source" / e.spec.name / "manifest.json").exists()
 
 
 def test_bmr_frame(regime_raws):

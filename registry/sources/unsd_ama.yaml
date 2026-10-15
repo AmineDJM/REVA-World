@@ -1,0 +1,28 @@
+# V3 (agent A-FACTBOOK): UN Statistics Division, National Accounts - Analysis of Main Aggregates (AMA).
+# Bulk XLSX downloads (all countries and areas, 1970-latest) from the AMA API used by the UNSD web app.
+# Atlas connector: src/reva/adapters/connectors/atlas_unsd_ama.py (atlas.unsd_ama, tables atlas.unsd.ama_*).
+source_key: unsd.ama
+title: "UN Statistics Division - National Accounts, Analysis of Main Aggregates (AMA)"
+provider_url: https://unstats.un.org/unsd/snaama/
+lineage_family: unsd_national_accounts
+rights:
+  licence: "UNdata terms of use (free use with attribution)"
+  licence_url: https://data.un.org/Host.aspx?Content=UNdataUse
+  attribution: "United Nations Statistics Division, National Accounts - Analysis of Main Aggregates (AMA), https://unstats.un.org/unsd/snaama/"
+  provider_statement: >-
+    "All data and metadata provided on UNdata's website are available free of charge and may be copied
+    freely, duplicated and further distributed provided that UNdata is cited as the reference." (read
+    2026-10-15; AMA is the National Accounts Main Aggregates Database also served on UNdata as SNAAMA)
+  review: pending maintainer review (the AMA site itself, unstats.un.org/unsd/snaama, answered HTTP 503 on 2026-10-15; the API and files answered 200)
+metadata:
+  allowed_hosts: [unstats.un.org]
+  endpoints:
+    file_list: https://unstats.un.org/unsd/amaapi/api/file
+    file: https://unstats.un.org/unsd/amaapi/api/file/<fileId>
+  authentication: none
+  cadence: annual (December update; data through year t-1)
+  coverage: "220 countries and areas (incl. Anguilla, Bermuda, Cayman Islands, Cook Islands, Curacao, DPR Korea, Greenland, Kosovo, Monaco, Montserrat, Sint Maarten, Turks and Caicos, Zanzibar) plus former states (USSR, Yugoslavia, Czechoslovakia, Netherlands Antilles, Sudan, Ethiopia, the two Yemens)"
+  editorial_status: >-
+    Official national accounts reported to UNSD through the National Accounts Questionnaire,
+    supplemented by UNSD estimates for missing years/countries (AMA is complete by construction:
+    gaps are filled by UNSD estimation). Values are what UNSD publishes, not national releases.

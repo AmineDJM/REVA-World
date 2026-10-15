@@ -1,0 +1,22 @@
+# Budget request from agent A-FACTBOOK (gap-filling sources with near-universal country coverage).
+# ATLASCORE merges into registry/policies/budgets.yaml (src/reva/atlas/budget_merge.py).
+# Connectors: src/reva/adapters/connectors/atlas_factbook_profiles.py (atlas.factbook_profiles) and
+# src/reva/adapters/connectors/atlas_unsd_ama.py (atlas.unsd_ama). Live runs: docs/dev/v3_a_factbook.md.
+agent: A-FACTBOOK
+requests:
+  - source_key: factbook.json
+    # Shared with A-LAW (atlas.factbook, 262 files, 300/day). atlas.factbook_profiles fetches the same
+    # 262 files at the pinned commit (dataset profiles_2026_01) plus 260 files at the last mirror
+    # commit that still carried "Disputes - international" (dataset disputes_2024_04, commit b1e7065,
+    # 2024-04-18): 522 requests for one full run, ~31 MB. With A-LAW's run the same day: ~800.
+    daily_requests: 900
+    expected_bytes_per_day: 60000000
+    reason: "one ~60 kB JSON per Factbook entity at two pinned mirror commits (522 requests, ~31 MB) plus A-LAW's 262; source discontinued, one run total"
+  - source_key: unsd.ama
+    # 1 file-list JSON + 9 bulk XLSX (all countries, 1970-2024), ~14 MB per full run.
+    daily_requests: 20
+    expected_bytes_per_day: 40000000
+    reason: "UNSD National Accounts AMA bulk downloads: 10 requests (~14 MB) per run, one retry; annual update (December)"
+daily_totals_increase:
+  http_requests_total: "+620"
+  http_bytes_total: "+100_000_000"

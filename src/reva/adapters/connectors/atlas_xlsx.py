@@ -68,11 +68,10 @@ def col_letters(idx: int) -> str:
 
 
 def _parse(data: bytes, part: str) -> ET.Element:
-    head = data[:4096]
-    if b"<!DOCTYPE" in head or b"<!ENTITY" in head:
+    if b"<!DOCTYPE" in data or b"<!ENTITY" in data:
         raise XlsxError(f"workbook part {part} declares a DTD/entity (refused)")
     try:
-        return ET.fromstring(data)
+        return ET.fromstring(data)  # noqa: S314 - DTD/entity declarations refused above; expat fetches nothing
     except ET.ParseError as exc:
         raise XlsxError(f"workbook part {part} is not well-formed XML: {exc}") from exc
 
@@ -127,11 +126,11 @@ class Workbook:
             raise XlsxError(f"sheet {sheet!r} not in workbook (has {sorted(self.sheets)})")
         part = self.sheets[sheet]
         data = self._read(part)
-        if b"<!DOCTYPE" in data[:4096] or b"<!ENTITY" in data[:4096]:
+        if b"<!DOCTYPE" in data or b"<!ENTITY" in data:
             raise XlsxError(f"sheet part {part} declares a DTD/entity (refused)")
         m = f"{{{NS['m']}}}"
         n_rows = 0
-        for _ev, el in ET.iterparse(io.BytesIO(data), events=("end",)):
+        for _ev, el in ET.iterparse(io.BytesIO(data), events=("end",)):  # noqa: S314 - no DTD (checked above)
             if el.tag != m + "row":
                 continue
             n_rows += 1

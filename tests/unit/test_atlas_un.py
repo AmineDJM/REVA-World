@@ -35,8 +35,9 @@ def _fetch(connector: str, items):
 
 
 def _validated(plan: U.TablePlan) -> pl.DataFrame:
-    frame, _ = validate_atlas_frame(plan.frame, source=plan.source, dataset=plan.dataset,
-                                    raw_sha256s=plan.raw_sha256s, geo_scheme=plan.geo_scheme)
+    frame, _ = validate_atlas_frame(
+        plan.frame, source=plan.source, dataset=plan.dataset, raw_sha256s=plan.raw_sha256s, geo_scheme=plan.geo_scheme
+    )
     return frame
 
 
@@ -176,8 +177,10 @@ def test_wpp_age5_split_in_estimate_and_projection_tables(wpp_raws):
 
 
 def test_wpp_schema_drift_is_typed():
-    body = gzip.compress(b"SortOrder,LocID,Notes,ISO3_code,ISO2_code,SDMX_code,LocTypeID,LocTypeName,ParentID,"
-                         b"Location,VarID,Variant,Time,TFR\n,250,,FRA,FR,250,4,Country/Area,1,France,2,Medium,2020,1.8\n")
+    body = gzip.compress(
+        b"SortOrder,LocID,Notes,ISO3_code,ISO2_code,SDMX_code,LocTypeID,LocTypeName,ParentID,"
+        b"Location,VarID,Variant,Time,TFR\n,250,,FRA,FR,250,4,Country/Area,1,France,2,Medium,2020,1.8\n"
+    )
     with pytest.raises(SourceResponseError) as e:
         U.build_wpp_demo(body, "0" * 64)
     assert e.value.details["kind"] == "schema_drift"
@@ -202,8 +205,14 @@ def test_ims_bilateral_cells(ims):
     assert fl["time_reference"] == "as of 1 July" and row["unit"] == "persons"
     assert "data_type" in fl
     # sexes: both = males + females for this cell as published (no derivation, just a sanity check)
-    by_sex = {s: f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == f"migrant_stock|origin=12|sex={s}")
-                          & (pl.col("period_start") == date(2024, 1, 1)))["value"][0] for s in "TMF"}
+    by_sex = {
+        s: f.filter(
+            (pl.col("iso3") == "FRA")
+            & (pl.col("indicator") == f"migrant_stock|origin=12|sex={s}")
+            & (pl.col("period_start") == date(2024, 1, 1))
+        )["value"][0]
+        for s in "TMF"
+    }
     assert int(by_sex["T"]) == int(by_sex["M"]) + int(by_sex["F"])
 
 
@@ -242,8 +251,14 @@ def test_xlsx_refuses_dtd_and_non_zip():
 def test_ims_year_block_layout_is_checked():
     header = {"A": "Index", "H": "1990", "I": "2024", "J": "1990", "K": "2024", "L": "1990", "M": "2024"}
     cols = U.ims_year_columns(header, [(8, "T"), (10, "M"), (12, "F")])
-    assert cols == {"H": (1990, "T"), "I": (2024, "T"), "J": (1990, "M"), "K": (2024, "M"),
-                    "L": (1990, "F"), "M": (2024, "F")}
+    assert cols == {
+        "H": (1990, "T"),
+        "I": (2024, "T"),
+        "J": (1990, "M"),
+        "K": (2024, "M"),
+        "L": (1990, "F"),
+        "M": (2024, "F"),
+    }
     with pytest.raises(SourceResponseError):
         U.ims_year_columns(header, [(8, "T"), (12, "F"), (10, "M")][:2])
 
@@ -284,15 +299,35 @@ def test_sdg_incomplete_series_is_left_out_and_named(sdg_raws):
 
 def test_sdg_text_and_duplicate_cells_are_kept_labelled():
     def rec(v, src):
-        return {"series": "SH_H2O_SAFE", "geoAreaCode": "250", "geoAreaName": "France", "timePeriodStart": 2020.0,
-                "value": v, "valueType": "Float", "source": src, "attributes": {"Units": "PERCENT", "Nature": "C"},
-                "dimensions": {"Location": "ALLAREA", "Reporting Type": "G"}}
-    doc = {"size": 10000, "totalElements": 3, "totalPages": 1, "pageNumber": 1,
-           "data": [rec(">99", "JMP"), rec("98.5", "JMP"), rec("", "JMP")]}
+        return {
+            "series": "SH_H2O_SAFE",
+            "geoAreaCode": "250",
+            "geoAreaName": "France",
+            "timePeriodStart": 2020.0,
+            "value": v,
+            "valueType": "Float",
+            "source": src,
+            "attributes": {"Units": "PERCENT", "Nature": "C"},
+            "dimensions": {"Location": "ALLAREA", "Reporting Type": "G"},
+        }
+
+    doc = {
+        "size": 10000,
+        "totalElements": 3,
+        "totalPages": 1,
+        "pageNumber": 1,
+        "data": [rec(">99", "JMP"), rec("98.5", "JMP"), rec("", "JMP")],
+    }
     item = U.sdg_data_item(U.SDG_BY_CODE["SH_H2O_SAFE"], 1)
-    raw = U.RawAcquisition(item=item, body=json.dumps(doc).encode(), media_type="application/json",
-                           retrieved_at="2026-10-15T00:00:00Z", response_metadata={}, request_fingerprint="x",
-                           origin="test_fixture")
+    raw = U.RawAcquisition(
+        item=item,
+        body=json.dumps(doc).encode(),
+        media_type="application/json",
+        retrieved_at="2026-10-15T00:00:00Z",
+        response_metadata={},
+        request_fingerprint="x",
+        origin="test_fixture",
+    )
     plan = U.build_sdg({item.key: raw}, None)
     f = _validated(plan).sort("indicator")
     assert f["value_text"].to_list() == [">99", None]
@@ -306,8 +341,12 @@ def test_sdg_text_and_duplicate_cells_are_kept_labelled():
 def unhcr_raws():
     raws = _fetch(U.UNHCR_CONNECTOR.name, [U.unhcr_years_item()])
     follow = U.unhcr_follow_ups(U.unhcr_years_item(), raws["unhcr:years"], max_year=2025)
-    assert [i.key for i in follow] == ["unhcr:bilateral:2024:p1", "unhcr:bilateral:2025:p1",
-                                       "unhcr:by_asylum:2024-2025:p1", "unhcr:by_origin:2024-2025:p1"]
+    assert [i.key for i in follow] == [
+        "unhcr:bilateral:2024:p1",
+        "unhcr:bilateral:2025:p1",
+        "unhcr:by_asylum:2024-2025:p1",
+        "unhcr:by_origin:2024-2025:p1",
+    ]
     raws.update(_fetch(U.UNHCR_CONNECTOR.name, follow))
     return raws
 
@@ -318,8 +357,11 @@ def test_unhcr_string_zero_is_never_a_zero(unhcr_raws):
     bil = _validated(plans["pop_bilateral"])
     assert not (bil["value"] == "0").any()
     assert plans["pop_bilateral"].report["string_zero_omitted"] > 0
-    syr_deu = bil.filter((pl.col("iso3") == "DEU") & (pl.col("indicator") == "refugees|origin=SYR")
-                         & (pl.col("period_start") == date(2024, 1, 1)))
+    syr_deu = bil.filter(
+        (pl.col("iso3") == "DEU")
+        & (pl.col("indicator") == "refugees|origin=SYR")
+        & (pl.col("period_start") == date(2024, 1, 1))
+    )
     assert syr_deu["value"].to_list() == ["725102"]
     fl = _flags(syr_deu.to_dicts()[0])
     assert fl["counterpart_iso3"] == "SYR" and fl["time_reference"].startswith("end of year")
@@ -336,7 +378,8 @@ def test_unhcr_incomplete_span_is_refused(unhcr_raws):
     doc = json.loads(raws["unhcr:bilateral:2024:p1"].body)
     doc["maxPages"] = 2  # page 2 never fetched
     raws["unhcr:bilateral:2024:p1"] = raws["unhcr:bilateral:2024:p1"].model_copy(
-        update={"body": json.dumps(doc).encode()})
+        update={"body": json.dumps(doc).encode()}
+    )
     plans = {p.dataset: p for p in U.build_unhcr(raws, max_year=2025)}
     assert plans["pop_bilateral"].frame.height == 0
     assert plans["pop_bilateral"].report["refused"] == "incomplete"
@@ -372,9 +415,16 @@ def test_catalog_un_loads_and_names_produced_series():
     cat = load_catalog(strict=True)
     un = [c for c in cat.concepts.values() if c.domain == "un"]
     assert len(un) >= 80
-    datasets = {("un_wpp", "wpp2024_demo"), ("un_wpp", "wpp2024_variants"), ("un_wpp", "wpp2024_age5"),
-                ("un_desa", "ims2024"), ("un_sdg", "sdg_headline"), ("unhcr", "pop_by_asylum"),
-                ("unhcr", "pop_by_origin"), ("unsd", "syb68_t02")}
+    datasets = {
+        ("un_wpp", "wpp2024_demo"),
+        ("un_wpp", "wpp2024_variants"),
+        ("un_wpp", "wpp2024_age5"),
+        ("un_desa", "ims2024"),
+        ("un_sdg", "sdg_headline"),
+        ("unhcr", "pop_by_asylum"),
+        ("unhcr", "pop_by_origin"),
+        ("unsd", "syb68_t02"),
+    }
     for c in un:
         for s in c.source_order:
             if s.source.startswith("un") and s.source in {d[0] for d in datasets}:

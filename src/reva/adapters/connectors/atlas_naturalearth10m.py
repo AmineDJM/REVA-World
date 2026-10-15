@@ -60,7 +60,7 @@ from typing import Any
 import numpy as np
 import shapefile  # type: ignore[import-untyped]  # pyshp
 
-from reva.adapters.connectors.atlas_geo_common import atlas_spec, dec, fetch_raw, snapshot_period
+from reva.adapters.connectors.atlas_geo_common import dec, fetch_raw, snapshot_period
 from reva.adapters.connectors.atlas_geodesy import (
     AREA_METHOD,
     LENGTH_METHOD,
@@ -69,9 +69,9 @@ from reva.adapters.connectors.atlas_geodesy import (
     vincenty_inverse_m,
 )
 from reva.adapters.connectors.base import module_digest, schema_fingerprint
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import (
-    ConnectorSpec,
     Cursor,
     FetchBudget,
     FetchItem,
@@ -1037,29 +1037,8 @@ class NaturalEarth10mConnector:
     """Archive-only connector: six layer ZIPs become evidence acquisitions; :func:`build` derives the atlas
     tables and the adjacency statements from all of them together."""
 
-    def describe(self) -> ConnectorSpec:
-        # atlas_bulk, not naturalearth_asset: the generic runner's naturalearth_asset post-publish hook
-        # would turn these layers into 1:110m-style display geometries.
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="Natural Earth",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=tuple(v[0] for v in LAYERS.values()),
-            field_mappings={"map_unit": "GU_A3", "entity": "ISO_A3 > ADM0_A3 > ISO_A3_EH > KOS->XKX"},
-            units={"area": "km2", "length": "km"},
-            geography=("world",),
-            time_semantics="release-versioned geometry; atlas rows dated by retrieval snapshot",
-            lineage_family="natural_earth",
-            cadence_seconds=30 * 86400,
-            revision_strategy="VERSION.txt is the source revision; identical bytes are a no-op",
-            max_response_bytes=MAX_LAYER_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(NaturalEarth10mConnector),
-        )
+    def describe(self) -> AtlasSourceSpec:
+        return atlas_source()
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="one ZIP per layer")
@@ -1103,6 +1082,34 @@ class NaturalEarth10mConnector:
         return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
 
 
+def atlas_source() -> AtlasSourceSpec:
+    """The atlas source spec (single atlas ingest entry point: ``python -m reva.atlas.ingest atlas.naturalearth_10m``).
+
+    Template ``atlas_bulk`` (not ``naturalearth_asset``: the generic runner's post-publish hook for that template
+    would turn these layers into 1:110m-style display geometries)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Natural Earth",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(DS_COUNTRY, DS_BORDERS, DS_DISPUTED),
+        dataset_ids=tuple(v[0] for v in LAYERS.values()),
+        cadence_seconds=30 * 86400,
+        planned_requests=len(LAYERS),
+        max_response_bytes=MAX_LAYER_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(NaturalEarth10mConnector),
+        field_mappings={"map_unit": "GU_A3", "entity": "ISO_A3 > ADM0_A3 > ISO_A3_EH > KOS->XKX"},
+        notes="computed geography from public-domain 1:10m geometry; NE default (de facto) view; offline fixture "
+        "mode is not available (the four large layers are not committed as fixtures)",
+    )
+
+
 def fetch_items() -> tuple[FetchItem, ...]:
     return tuple(
         FetchItem(
@@ -1144,61 +1151,68 @@ def build(
     return NeBuild(comp, rows, layers["map_units"].version, dict(raw_sha256s))
 
 
-async def ingest(
-    engine: Any, store: Any, http: Any, *, qids: Mapping[str, str] | None = None, load_kg: bool = True
-) -> dict[str, Any]:
-    """Fetch the six layers, archive them, register the three atlas tables and load the adjacency
-    statements through KGCORE's ``load_batch`` (worker engine). Parsing/computation happen before any
-    registration, so a failure registers nothing (archived raw bytes stay archived)."""
+NOTES = {
+    DS_COUNTRY: "Natural Earth 1:10m Admin-0 map units (v{v}): computed WGS84 area, 1:10m coastline, land "
+    "borders, landlocked, exclaves; de facto view; unmapped NE features kept (iso3 null)",
+    DS_BORDERS: "Natural Earth 1:10m (v{v}): shared Admin-0 edge length per country pair (both directions), "
+    "typed by NE boundary lines; disputed flagged",
+    DS_DISPUTED: "Natural Earth 1:10m (v{v}) disputed/breakaway/claim areas: computed area, NE note verbatim",
+}
+
+
+async def _ingest(
+    run: Any, *, qids: Mapping[str, str] | None, load_kg: bool
+) -> tuple[dict[str, Any], NeBuild, datetime]:
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw
-    from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
+    from reva.adapters.connectors.atlas_geo_common import run_get
+    from reva.atlas.tables import ATLAS_SCHEMA
 
-    conn = NaturalEarth10mConnector()
-    spec = conn.describe()
-    raws = {it.key: await conn.fetch(it, http) for it in fetch_items()}
-    origin = next(iter(raws.values())).origin
-    shas = {k: archive_raw(engine, store, spec, r, actor="worker:atlas_a_geo") for k, r in raws.items()}
-    nb = build(raws, shas)
+    raws = {it.key: await run_get(run, it) for it in fetch_items()}
+    shas = {k: run.archive(r) for k, r in raws.items()}  # raw bytes first
+    nb = build(raws, shas)  # parse + compute before any registration: a failure registers nothing
     tables = {}
-    notes = {
-        DS_COUNTRY: "Natural Earth 1:10m Admin-0 map units (v{v}): computed WGS84 area, 1:10m coastline, land "
-        "borders, landlocked, exclaves; de facto view; unmapped NE features kept (iso3 null)",
-        DS_BORDERS: "Natural Earth 1:10m (v{v}): shared Admin-0 edge length per country pair (both directions), "
-        "typed by NE boundary lines; disputed flagged",
-        DS_DISPUTED: "Natural Earth 1:10m (v{v}) disputed/breakaway/claim areas: computed area, NE note verbatim",
-    }
     for ds, rows in nb.rows.items():
+        if not run.wants(ds):
+            continue
         frame = pl.DataFrame(rows, schema=ATLAS_SCHEMA)
         used = sorted(set(frame["raw_sha256"].to_list()))
-        tables[ds] = register_atlas_table(
-            engine,
-            store,
-            source=ATLAS_SOURCE,
-            dataset=ds,
-            frame=frame,
-            raw_sha256s=used,
-            parser_version=PARSER_VERSION,
-            origin=origin,
-            coverage_note=notes[ds].format(v=nb.ne_version),
-            rights=RIGHTS,
-            actor="worker:atlas_a_geo",
+        tables[ds] = run.register(
+            dataset=ds, frame=frame, raw_sha256s=used, coverage_note=NOTES[ds].format(v=nb.ne_version), rights=RIGHTS
         )
+    t = raws["map_units"].retrieved_at
     kg: dict[str, Any] = {"loaded": False}
-    if load_kg:
-        kg = load_adjacency_kg(engine, store, nb, retrieved_at=raws["map_units"].retrieved_at, origin=origin, qids=qids)
-    return {
+    if load_kg and run.wants(DS_BORDERS):
+        kg = load_adjacency_kg(run.engine, run.store, nb, retrieved_at=t, origin=run.origin, qids=qids)
+    summary = {
         "connector": CONNECTOR_NAME,
         "ne_version": nb.ne_version,
         "raw_sha256s": shas,
         "tables": tables,
         "diagnostics": nb.computation.diagnostics,
         "kg": kg,
-        "build": nb,  # in-memory result (not JSON): lets a caller load the KG later with load_adjacency_kg
-        "retrieved_at": raws["map_units"].retrieved_at,
-        "origin": origin,
     }
+    return summary, nb, t
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Single atlas ingest entry point (``reva.atlas.ingest``): fetch the six layers through ``run``, archive
+    them, register the three atlas tables and load the adjacency statements (``shares border with``) through
+    KGCORE's ``load_batch`` when ``registry/entities/country_qids.json`` provides the QIDs."""
+    summary, _, _ = await _ingest(run, qids=None, load_kg=True)
+    return summary
+
+
+async def ingest(
+    engine: Any, store: Any, http: Any, *, qids: Mapping[str, str] | None = None, load_kg: bool = True
+) -> dict[str, Any]:
+    """Same flow with an explicit client (tests: ``FixtureHttp`` with overrides). Also returns the in-memory
+    build (``build``) so a caller can load the KG later with :func:`load_adjacency_kg`."""
+    from reva.adapters.connectors.atlas_geo_common import make_run
+
+    run = make_run(atlas_source(), engine, store, http)
+    summary, nb, t = await _ingest(run, qids=qids, load_kg=load_kg)
+    return {**summary, "build": nb, "retrieved_at": t, "origin": run.origin}
 
 
 def load_adjacency_kg(

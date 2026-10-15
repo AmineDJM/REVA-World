@@ -53,18 +53,16 @@ import io
 import json
 import re
 import zipfile
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
 import polars as pl
 
-from reva.adapters.connectors.base import to_raw
-from reva.adapters.http.safe_client import HttpResult
-from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.kernel.errors import SourceResponseError
+from reva.ports.connectors import FetchItem
 
-CONNECTOR_NAME = "worldbank.atlas_bulk"
+CONNECTOR_NAME = "atlas.worldbank"
 CONNECTOR_VERSION = "1.0.0"
 PARSER_VERSION = "atlas_wb/1"
 SOURCE_KEY = "worldbank.atlas"
@@ -162,38 +160,42 @@ def _code_digest() -> str:
     return "sha256:" + hashlib.sha256(inspect.getsource(inspect.getmodule(_code_digest)).encode()).hexdigest()  # type: ignore[arg-type]
 
 
-def spec() -> ConnectorSpec:
-    """Connector descriptor. ``max_response_bytes`` is the default cap of the small metadata
-    requests; each bulk ZIP item declares its own bound (``FetchItem.max_bytes``)."""
-    return ConnectorSpec(
+def all_datasets() -> tuple[str, ...]:
+    out: list[str] = []
+    for d in DATABASES:
+        out.extend(d.datasets())
+        if d.split:
+            out.append(WDI_OTHER)
+    return (*out, "pip")
+
+
+def atlas_source() -> Any:
+    """The atlas source of this module (``reva.atlas.sources`` protocol)."""
+    from reva.atlas.sources import AtlasSourceSpec
+
+    return AtlasSourceSpec(
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
-        # No dedicated atlas template exists in reva.ports.connectors (requested in docs/dev/v3_a_wb.md);
-        # worldbank_v2 is the provider family. This connector is not a builtin ingest connector.
-        template="worldbank_v2",
         source_key=SOURCE_KEY,
+        atlas_source=SOURCE,
         provider="World Bank",
         licence=LICENCE,
         allowed_hosts=ALLOWED_HOSTS,
-        dataset_ids=tuple(d.key for d in DATABASES) + ("pip", "indicator_metadata_fr"),
+        datasets=all_datasets(),
+        dataset_ids=(*(f"{d.zip_name} (API source {d.api_source_id})" for d in DATABASES), f"PIP {PIP_VERSION}"),
+        cadence_seconds=30 * 86400,
+        planned_requests=len(fetch_items()),
+        max_response_bytes=max(d.max_bytes for d in DATABASES),
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=_code_digest(),
         field_mappings={
-            "atlas_source": SOURCE,
-            "datasets": {d.key: list(d.datasets()) for d in DATABASES} | {"pip": ["pip"]},
+            "databases": {d.key: list(d.datasets()) for d in DATABASES},
             "bulk_item_max_bytes": {d.key: d.max_bytes for d in DATABASES},
             "pip_version": PIP_VERSION,
             "pip_poverty_lines": list(PIP_POVERTY_LINES),
         },
-        units={},
-        geography=("all crosswalk economies; aggregates excluded and listed",),
-        time_semantics="calendar year [Jan 1, Jan 1) per provider column; PIP reporting_year",
-        lineage_family="worldbank",
-        cadence_seconds=30 * 86400,
-        release_aware=True,
-        revision_strategy="new atlas table version per changed bulk file (content-addressed)",
-        max_response_bytes=52_428_800,
-        max_pages=1,
-        parser_version=PARSER_VERSION,
-        code_digest=_code_digest(),
+        notes="DataBank bulk CSV ZIPs + PIP API + French indicator metadata; aggregates excluded and listed.",
     )
 
 
@@ -218,10 +220,7 @@ def fr_item(db: BulkDatabase) -> FetchItem:
 def pip_item(line: str) -> FetchItem:
     return FetchItem(
         key=f"pip:{line}",
-        url=(
-            f"{API}pip/v1/pip?country=all&year=all&povline={line}&fill_gaps=false"
-            f"&version={PIP_VERSION}&format=csv"
-        ),
+        url=(f"{API}pip/v1/pip?country=all&year=all&povline={line}&fill_gaps=false&version={PIP_VERSION}&format=csv"),
         expected_media_types=("text/csv",),
         max_bytes=52_428_800,
     )
@@ -244,15 +243,12 @@ def fetch_items(
     return tuple(items)
 
 
-async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
-    result: HttpResult = await http.get(item.url, max_bytes=item.max_bytes)
-    origin = getattr(http, "origin", "live")
-    head = result.body[:256].lstrip().lower()
+def check_body(item: FetchItem, body: bytes) -> None:
+    head = body[:256].lstrip().lower()
     if head.startswith((b"<!doctype", b"<html")):
         raise SourceResponseError("HTML page received instead of data", retryable=True, kind="html_body")
-    if item.key.startswith("bulk:") and not result.body.startswith(b"PK"):
+    if item.key.startswith("bulk:") and not body.startswith(b"PK"):
         raise SourceResponseError("bulk download is not a ZIP archive", retryable=False, kind="not_zip")
-    return to_raw(item, result, origin)
 
 
 # --------------------------------------------------------------------------- CSV helpers
@@ -542,9 +538,7 @@ class ParsedDatabase:
 
 def _json_flags(parts: Sequence[pl.Expr]) -> pl.Expr:
     """``{"k":v,...}`` from expressions yielding ``"k":v`` fragments or null (keys pre-sorted)."""
-    return pl.concat_str(
-        [pl.lit("{"), pl.concat_list(parts).list.drop_nulls().list.join(","), pl.lit("}")]
-    )
+    return pl.concat_str([pl.lit("{"), pl.concat_list(parts).list.drop_nulls().list.join(","), pl.lit("}")])
 
 
 def parse_bulk(db: BulkDatabase, body: bytes, raw_sha256: str) -> ParsedDatabase:
@@ -701,9 +695,10 @@ def parse_bulk(db: BulkDatabase, body: bytes, raw_sha256: str) -> ParsedDatabase
         f = parts.pop(ds)
         note = dict(base_note)
         if db.split:
-            note["split"] = {"by": "World Bank topic (first segment)", "topics": sorted(
-                t for t, d in db.split.items() if d == ds
-            ) or ["(topics not listed in the split)"]}
+            note["split"] = {
+                "by": "World Bank topic (first segment)",
+                "topics": sorted(t for t, d in db.split.items() if d == ds) or ["(topics not listed in the split)"],
+            }
         tables.append(ParsedTable(ds, f, _note_json(note)))
     report = {
         "database": db.key,
@@ -819,7 +814,9 @@ def parse_pip(bodies: Mapping[str, tuple[bytes, str]]) -> ParsedDatabase:
                         if c in df.columns
                     ]
                     + [pl.lit(f'"pip_version":"{PIP_VERSION}"')]
-                ).list.drop_nulls().list.join(","),
+                )
+                .list.drop_nulls()
+                .list.join(","),
                 pl.lit("}"),
             ]
         )
@@ -827,7 +824,9 @@ def parse_pip(bodies: Mapping[str, tuple[bytes, str]]) -> ParsedDatabase:
         dist = [c for c in PIP_DIST_MEASURES if c in df.columns]
         base = df.with_columns(dims.alias("dims"), flag_expr.alias("flags"))
 
-        def melt(cols: list[str], with_line: bool, f: pl.DataFrame = base, ln: str = line, s: str = sha) -> pl.DataFrame:
+        def melt(
+            cols: list[str], with_line: bool, f: pl.DataFrame = base, ln: str = line, s: str = sha
+        ) -> pl.DataFrame:
             u = f.select(["row", "country_code", "reporting_year", "dims", "flags", *cols]).unpivot(
                 index=["row", "country_code", "reporting_year", "dims", "flags"],
                 on=cols,
@@ -939,106 +938,52 @@ def parse_fr_labels(body: bytes) -> dict[str, dict[str, str]]:
 
 
 # --------------------------------------------------------------------------- ingest
-@dataclass
-class IngestResult:
-    origin: str
-    acquisitions: dict[str, dict[str, Any]] = field(default_factory=dict)  # item key -> {sha, bytes, ...}
-    tables: dict[str, dict[str, Any]] = field(default_factory=dict)  # dataset -> register summary (trimmed)
-    reports: dict[str, dict[str, Any]] = field(default_factory=dict)
-    fr_labels: dict[str, dict[str, dict[str, str]]] = field(default_factory=dict)
-    series: dict[str, dict[str, SeriesMeta]] = field(default_factory=dict)
-    units: dict[str, dict[str, tuple[str, str]]] = field(default_factory=dict)
-    datasets: dict[str, dict[str, str]] = field(default_factory=dict)
-    blocked: list[dict[str, Any]] = field(default_factory=list)
-
-    def as_dict(self) -> dict[str, Any]:
-        return {
-            "connector": CONNECTOR_NAME,
-            "origin": self.origin,
-            "acquisitions": self.acquisitions,
-            "tables": self.tables,
-            "reports": self.reports,
-            "blocked": self.blocked,
-        }
+def _wanted(run: Any, db: BulkDatabase) -> list[str]:
+    ds = list(db.datasets()) + ([WDI_OTHER] if db.split else [])
+    return [d for d in ds if run.wants(d)]
 
 
-def ensure_connector_registered(owner_engine: Any, store: Any) -> None:
-    """Register this connector version (owner role; registry writes). Idempotent.
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch (through ``run.get``), archive, parse and register the World Bank atlas tables.
 
-    The connector is not (yet) in ``builtin_connectors`` (lead-owned), so ``seed`` does not
-    register it; the atlas run registers it itself in the target database."""
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
+    Databases are processed one at a time and released before the next download (peak memory
+    ~ one ZIP + its long frame, ~5 GB for WDI). A failed item is reported under ``blocked`` with
+    a typed reason and never registered; budget refusals propagate (typed run outcome)."""
+    from reva.operations.budgets import BudgetExhausted
 
-    with owner_engine.begin() as conn:
-        act = repo.simple_activity("registry.connector", "review", "agent:a-wb", {"connector": CONNECTOR_NAME})
-        if repo.connector_version_row(conn, CONNECTOR_NAME, CONNECTOR_VERSION) is None:
-            repo.record_activity(conn, act)
-            register_connector_version(conn, store, spec(), act.id)
+    out: dict[str, Any] = {"acquisitions": {}, "tables": {}, "reports": {}, "blocked": []}
 
-
-def _archive(engine: Any, store: Any, raw: RawAcquisition) -> tuple[str, str]:
-    from reva.evidence.ingest import publish_acquisition
-
-    s = publish_acquisition(engine, store, spec(), raw, [], [], actor="worker:atlas-wb")
-    if s.namespace != "raw":
-        raise ValidationProblem(f"{raw.item.key}: raw bytes were quarantined", namespace=s.namespace)
-    return s.raw_sha256, str(s.acquisition_id)
-
-
-async def ingest(
-    worker_engine: Any,
-    store: Any,
-    http: Any,
-    *,
-    databases: Iterable[str] | None = None,
-    include_pip: bool = True,
-    include_fr: bool = True,
-    register: bool = True,
-    on_progress: Callable[[str], None] | None = None,
-) -> IngestResult:
-    """Fetch, archive, parse and register the World Bank atlas tables.
-
-    ``http`` is a ``SafeHttpClient`` (wrapped in the budget meter for live runs) or a
-    ``FixtureHttp`` (``origin = test_fixture``). Databases are processed one at a time and their
-    frames released before the next download (peak memory ~ one ZIP + its long frame).
-    A failed item is reported in ``blocked`` (typed reason) and never registered."""
-    from reva.atlas.tables import register_atlas_table
-
-    origin = getattr(http, "origin", "live")
-    res = IngestResult(origin=origin)
-    keys = list(databases) if databases is not None else [d.key for d in DATABASES]
-    say = on_progress or (lambda _m: None)
-
-    async def get(item: FetchItem) -> RawAcquisition | None:
+    async def get(item: FetchItem) -> Any:
         try:
-            raw = await fetch(item, http)
-        except Exception as e:  # typed source errors and budget refusals are reported, not raised
-            res.blocked.append({"item": item.key, "url": item.url, "error": type(e).__name__, "detail": str(e)[:300]})
+            raw = await run.get(item.url, key=item.key, media_types=item.expected_media_types, max_bytes=item.max_bytes)
+            check_body(item, raw.body)
+        except BudgetExhausted:
+            raise
+        except Exception as e:  # typed source errors are reported, never registered
+            out["blocked"].append({"item": item.key, "error": type(e).__name__, "detail": str(e)[:300]})
             return None
         return raw
 
-    def register_tables(p: ParsedDatabase, raw_shas: list[str]) -> None:
+    def archive(item: FetchItem, raw: Any) -> str:
+        sha = run.archive(raw)
+        out["acquisitions"][item.key] = {
+            "raw_sha256": sha,
+            "bytes": len(raw.body),
+            "retrieved_at": raw.retrieved_at.isoformat(),
+            "last_modified": raw.response_metadata.get("last-modified"),
+        }
+        return sha
+
+    def register(p: ParsedDatabase, raw_shas: list[str]) -> None:
         for t in p.tables:
-            if not register:
-                res.tables[t.dataset] = {"rows": t.frame.height, "registered": False}
+            if not run.wants(t.dataset):
                 continue
-            summary = register_atlas_table(
-                worker_engine,
-                store,
-                source=SOURCE,
-                dataset=t.dataset,
-                frame=t.frame,
-                raw_sha256s=raw_shas,
-                parser_version=PARSER_VERSION,
-                origin=origin,
-                coverage_note=t.coverage_note,
-                rights={"licence": LICENCE, "source_key": SOURCE_KEY, "provider": "World Bank"},
-                actor="worker:atlas-wb",
+            summary = run.register(
+                dataset=t.dataset, frame=t.frame, raw_sha256s=raw_shas, coverage_note=t.coverage_note
             )
             cov = summary["coverage"]
-            res.tables[t.dataset] = {
-                k: summary[k] for k in ("dataset_key", "artifact_sha256", "manifest_sha256", "row_count", "created")
+            out["tables"][t.dataset] = {
+                k: summary[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created")
             } | {
                 "countries": cov["countries"],
                 "indicators": cov["indicators"],
@@ -1047,82 +992,54 @@ async def ingest(
                 "unmapped_provider_geo": summary["unmapped_provider_geo"],
             }
 
-    for k in keys:
-        db = DATABASES_BY_KEY[k]
-        say(f"download {db.zip_name}")
-        raw = await get(bulk_item(db))
+    for db in DATABASES:
+        if not _wanted(run, db):
+            continue
+        item = bulk_item(db)
+        raw = await get(item)
         if raw is None:
             continue
-        sha, acq = await asyncio.to_thread(_archive, worker_engine, store, raw)
-        res.acquisitions[f"bulk:{k}"] = {"raw_sha256": sha, "acquisition_id": acq, "bytes": len(raw.body),
-                                         "retrieved_at": raw.retrieved_at.isoformat(),
-                                         "last_modified": raw.response_metadata.get("last-modified")}  # fmt: skip
-        say(f"parse {db.zip_name}")
+        sha = await asyncio.to_thread(archive, item, raw)
         try:
             parsed = await asyncio.to_thread(parse_bulk, db, raw.body, sha)
         except SourceResponseError as e:
-            res.blocked.append({"item": f"bulk:{k}", "error": "parse_failed", "detail": str(e)[:300]})
+            out["blocked"].append({"item": item.key, "error": "parse_failed", "detail": str(e)[:300]})
             continue
-        del raw
-        res.reports[k] = parsed.report
-        res.series[k] = parsed.series
-        res.units[k] = parsed.units
-        res.datasets[k] = parsed.datasets
-        say(f"register {k}")
-        await asyncio.to_thread(register_tables, parsed, [sha])
+        finally:
+            del raw
+        out["reports"][db.key] = parsed.report
+        await asyncio.to_thread(register, parsed, [sha])
         del parsed
-        if include_fr:
-            fr_raw = await get(fr_item(db))
-            if fr_raw is not None:
-                fsha, facq = await asyncio.to_thread(_archive, worker_engine, store, fr_raw)
-                res.acquisitions[f"fr:{k}"] = {"raw_sha256": fsha, "acquisition_id": facq, "bytes": len(fr_raw.body)}
-                try:
-                    res.fr_labels[k] = parse_fr_labels(fr_raw.body)
-                except (SourceResponseError, ValueError) as e:
-                    res.blocked.append({"item": f"fr:{k}", "error": "parse_failed", "detail": str(e)[:300]})
-    if include_pip:
+        # French labels (catalog input only): archived, checked parseable, not an atlas table.
+        fitem = fr_item(db)
+        fraw = await get(fitem)
+        if fraw is not None:
+            await asyncio.to_thread(archive, fitem, fraw)
+            try:
+                out["reports"][db.key]["fr_labels"] = len(parse_fr_labels(fraw.body))
+            except (SourceResponseError, ValueError) as e:
+                out["blocked"].append({"item": fitem.key, "error": "parse_failed", "detail": str(e)[:300]})
+    if run.wants("pip"):
         bodies: dict[str, tuple[bytes, str]] = {}
         for line in PIP_POVERTY_LINES:
-            raw = await get(pip_item(line))
+            item = pip_item(line)
+            raw = await get(item)
             if raw is None:
                 continue
-            sha, acq = await asyncio.to_thread(_archive, worker_engine, store, raw)
-            res.acquisitions[f"pip:{line}"] = {"raw_sha256": sha, "acquisition_id": acq, "bytes": len(raw.body)}
-            bodies[line] = (raw.body, sha)
+            bodies[line] = (raw.body, await asyncio.to_thread(archive, item, raw))
         if len(bodies) == len(PIP_POVERTY_LINES):
             try:
                 parsed = await asyncio.to_thread(parse_pip, bodies)
             except SourceResponseError as e:
-                res.blocked.append({"item": "pip", "error": "parse_failed", "detail": str(e)[:300]})
+                out["blocked"].append({"item": "pip", "error": "parse_failed", "detail": str(e)[:300]})
             else:
-                res.reports["pip"] = parsed.report
-                res.units["pip"] = parsed.units
-                res.datasets["pip"] = parsed.datasets
-                await asyncio.to_thread(register_tables, parsed, sorted(s for _, s in bodies.values()))
+                out["reports"]["pip"] = parsed.report
+                await asyncio.to_thread(register, parsed, sorted(s for _, s in bodies.values()))
         elif bodies:
-            res.blocked.append({"item": "pip", "error": "incomplete", "detail": "not every poverty line was fetched"})
-    return res
-
-
-def live_client(settings: Any, *, max_bytes: int | None = None) -> Any:
-    """A SafeHttpClient for the World Bank hosts whose byte cap covers the largest bulk item."""
-    from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
-    from reva.adapters.http.safe_client import SafeHttpClient
-
-    cap = max_bytes or max(d.max_bytes for d in DATABASES)
-    policies = {h: HostPolicy(min_interval_seconds=1.0, max_concurrency=1) for h in ALLOWED_HOSTS}
-    return SafeHttpClient(
-        allowed_hosts=ALLOWED_HOSTS,
-        timeout_seconds=max(60.0, float(settings.reva_http_timeout_seconds)),
-        max_bytes=cap,
-        contact_email=settings.reva_http_contact_email,
-        rate_limiter=RateLimiter(policies),
-        proxy_mode=settings.reva_http_proxy_mode,
-    )
-
-
-def planned_requests(databases: Iterable[str] | None = None, *, include_pip: bool = True, include_fr: bool = True) -> int:
-    return len(fetch_items(databases, include_pip=include_pip, include_fr=include_fr))
+            out["blocked"].append(
+                {"item": "pip", "error": "incomplete", "detail": "not every poverty line was fetched"}
+            )
+    return out
 
 
 __all__ = [
@@ -1132,15 +1049,11 @@ __all__ = [
     "SOURCE",
     "SOURCE_KEY",
     "BulkDatabase",
-    "IngestResult",
-    "ensure_connector_registered",
+    "atlas_ingest",
+    "atlas_source",
     "fetch_items",
-    "ingest",
-    "live_client",
     "map_geographies",
     "parse_bulk",
     "parse_fr_labels",
     "parse_pip",
-    "spec",
 ]
-

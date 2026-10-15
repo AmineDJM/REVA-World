@@ -10,12 +10,14 @@ data is said as missing, a path is a connection and not a cause.
 Controls: scope ``read`` (it reads sourced data and writes nothing but the LLM ledger and one
 audit row); body ≤ 8 KiB, question ≤ 2048 UTF-8 bytes; a per-actor rate limit
 (``REVA_NLQA_RATE_PER_MINUTE``, default 10/min → 429 ``rate_limited``); every LLM request is
-charged to the persistent daily LLM budget first (429 ``budget_exhausted``, nothing sent).
+charged to the persistent daily LLM budget *before* it is sent (``reva.nl.service.call_providers``:
+ledger reserve → provider → settle).
 
-LLM use is **opt-in**: it needs ``REVA_LLM_ENABLED`` *and* ``REVA_NLQA_LLM=1``. Until a dedicated
-``llm.nlqa`` budget line is merged (request: ``registry/atlas/budget_requests/nlqa.yaml``), the
-questions share the existing ``llm.scenario_drafts`` daily caps and ledger accounts. Without the
-LLM the keyword planner answers (``planner: keyword_fallback``) — never an invented answer.
+LLM use is **opt-in**: it needs ``REVA_LLM_ENABLED`` *and* ``REVA_NLQA_LLM=1``. A dedicated
+``llm.nlqa`` line is deferred (it needs a migration for a separate LLM ledger), so questions reuse the
+V2 line ``llm.scenario_drafts`` and its ledger accounts. When the planner LLM is not enabled, or is
+refused (budget exhausted, provider error, ledger unavailable), the deterministic keyword planner
+answers instead (``planner: keyword_fallback`` + a warning naming the reason) — never an invented answer.
 The audit row holds the question's sha256 and length, never its text.
 """
 
@@ -200,9 +202,7 @@ def _parse(raw: bytes) -> AskRequest:
     responses={
         413: {"description": "Body larger than 8 KiB or question larger than 2048 bytes"},
         422: {"description": "Invalid request"},
-        429: {"description": "Rate limited, or the daily LLM budget is exhausted (nothing was sent)"},
-        502: {"description": "LLM provider failed"},
-        503: {"description": "LLM budget ledger unavailable"},
+        429: {"description": "Rate limited (per actor)"},
     },
     openapi_extra={
         "requestBody": {"required": True, "content": {"application/json": {"schema": AskRequest.model_json_schema()}}}

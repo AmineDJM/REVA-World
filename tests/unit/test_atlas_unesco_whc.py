@@ -21,7 +21,7 @@ def raws() -> dict[str, bytes]:
     http = FixtureHttp(whc.CONNECTOR_NAME)
 
     async def go() -> dict[str, bytes]:
-        return {it.key: (await whc.fetch(it, http)).body for it in whc.fetch_items()}
+        return {it.key: (await http.get(it.url, max_bytes=it.max_bytes)).body for it in whc.fetch_items()}
 
     return asyncio.run(go())
 
@@ -151,3 +151,14 @@ def test_missing_criteria_are_flagged_not_inferred(parsed):
     valongo = next(p for p in props if p.id_no == "1548")  # Valongo Wharf: no criteria in the export
     assert valongo.criteria == () and valongo.raw_flags.get("criteria_not_reported") is True
     assert sum(1 for p in props if p.raw_flags.get("criteria_not_reported")) == 17
+
+
+def test_atlas_source_is_discovered():
+    from reva.atlas.sources import discover
+
+    sources, errors = discover(["reva.adapters.connectors.atlas_unesco_whc"])
+    assert not errors
+    spec = sources[whc.CONNECTOR_NAME].spec
+    assert spec.source_key == "unesco.whc" and spec.atlas_source == "unesco_whc" and spec.datasets == ("whc001",)
+    assert spec.allowed_hosts == ("data.unesco.org",) and spec.planned_requests == 2
+    assert "CC BY-SA 4.0" in spec.licence

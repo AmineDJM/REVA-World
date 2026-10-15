@@ -54,19 +54,20 @@ from typing import Any
 from reva.adapters.connectors.atlas_history_common import (
     DAY,
     AtlasBuild,
-    atlas_spec,
     canon,
     code_digest,
     decimal_text,
     fetch_plain,
     frame,
     historical_qid,
+    ingest_with_run,
     sha256_hex,
+    source_spec,
     year_period,
 )
 from reva.adapters.connectors.atlas_xlsx import Workbook, XlsxError
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 NAME = "atlas.maddison.mpd2023"
 VERSION = "1.0.0"
@@ -166,7 +167,7 @@ def parse_spans(rows: Sequence[Sequence[Any]], header: str = "ISO code") -> dict
     started = False
     cur: dict[str, Any] | None = None
     for r in rows:
-        cells = [(c.strip() if isinstance(c, str) else c) for c in (list(r) + [None, None, None])[:3]]
+        cells = [(c.strip() if isinstance(c, str) else c) for c in [*list(r), None, None, None][:3]]
         a, b, c = cells
         if not started:
             started = a == header
@@ -244,8 +245,16 @@ def parse_workbook(body: bytes) -> dict[str, Any]:
             if v is None:
                 bad.append({"row": rnum, "column": ind, "text": cell.text[:40], "kind": cell.kind})
                 continue
-            cells.append({"code": code, "year": int(year_s), "indicator": ind, "value": v, "row": rnum,
-                          "col": "E" if col == 4 else "F"})
+            cells.append(
+                {
+                    "code": code,
+                    "year": int(year_s),
+                    "indicator": ind,
+                    "value": v,
+                    "row": rnum,
+                    "col": "E" if col == 4 else "F",
+                }
+            )
     if not header_ok:
         raise _err("'Full data' sheet is empty")
     regional = _parse_regional(wb.table("Regional data"))
@@ -267,8 +276,9 @@ def _parse_regional(t: list[list[Any]]) -> list[dict[str, Any]]:
     top, names = t[0], t[1]
     gdp_cols: dict[int, str] = {}
     pop_cols: dict[int, str] = {}
-    pop_start = next((i for i, x in enumerate(top) if isinstance(x, str) and x.strip().startswith("Regional Population")),
-                     None)
+    pop_start = next(
+        (i for i, x in enumerate(top) if isinstance(x, str) and x.strip().startswith("Regional Population")), None
+    )
     world_gdp = next((i for i, x in enumerate(top) if isinstance(x, str) and x.strip() == "World GDP pc"), None)
     if pop_start is None or world_gdp is None:
         raise _err("'Regional data' layout changed (no 'World GDP pc' / 'Regional Population' header)")
@@ -290,8 +300,17 @@ def _parse_regional(t: list[list[Any]]) -> list[dict[str, Any]]:
                 v = decimal_text(r[i]) if i < len(r) and r[i] is not None else None
                 if v is None:
                     continue
-                out.append({"geo": geo, "year": int(str(y).strip()), "indicator": ind, "value": v, "row": ridx,
-                            "col": i, "label": names[i]})
+                out.append(
+                    {
+                        "geo": geo,
+                        "year": int(str(y).strip()),
+                        "indicator": ind,
+                        "value": v,
+                        "row": ridx,
+                        "col": i,
+                        "label": names[i],
+                    }
+                )
     return out
 
 
@@ -316,8 +335,9 @@ def _sources_flags(code: str, year: int, parsed: Mapping[str, Any]) -> dict[str,
     return flags
 
 
-def atlas_rows(parsed: Mapping[str, Any], *, raw_sha256: str, record: Mapping[str, Any],
-               retrieved_at: datetime) -> list[dict[str, Any]]:
+def atlas_rows(
+    parsed: Mapping[str, Any], *, raw_sha256: str, record: Mapping[str, Any], retrieved_at: datetime
+) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     base = {
         "mpd_cell_flag": "none_published",
@@ -334,30 +354,59 @@ def atlas_rows(parsed: Mapping[str, Any], *, raw_sha256: str, record: Mapping[st
             flags.update(_sources_flags(code, year, parsed))
         q = historical_qid("maddison", code)
         if q is not None:
-            flags["entity_mapping"] = {"qid": q["qid"], "review": q.get("review_status", "agent_mapped"),
-                                       "file": "registry/entities/historical_states_qids.json"}
+            flags["entity_mapping"] = {
+                "qid": q["qid"],
+                "review": q.get("review_status", "agent_mapped"),
+                "file": "registry/entities/historical_states_qids.json",
+            }
         meta = parsed["countries"].get(code, {})
         flags["provider_name"] = meta.get("name")
         start, end = year_period(year)
-        rows.append({
-            "source": ATLAS_SOURCE, "dataset": ATLAS_DATASET, "indicator": ind,
-            "concept_id": "history.gdp_per_capita_ppp_2011" if ind == "gdppc" else "history.population_thousands",
-            "iso3": None, "provider_geo": code, "entity_qid": q["qid"] if q else None,
-            "period_start": start, "period_end": end, "value": c["value"], "value_text": None,
-            "unit": UNITS[ind], "flags": canon(flags), "raw_sha256": raw_sha256,
-            "selector": canon(file=DATA_FILENAME, sheet="Full data", row=c["row"], column=c["col"]),
-        })
+        rows.append(
+            {
+                "source": ATLAS_SOURCE,
+                "dataset": ATLAS_DATASET,
+                "indicator": ind,
+                "concept_id": "history.gdp_per_capita_ppp_2011" if ind == "gdppc" else "history.population_thousands",
+                "iso3": None,
+                "provider_geo": code,
+                "entity_qid": q["qid"] if q else None,
+                "period_start": start,
+                "period_end": end,
+                "value": c["value"],
+                "value_text": None,
+                "unit": UNITS[ind],
+                "flags": canon(flags),
+                "raw_sha256": raw_sha256,
+                "selector": canon(file=DATA_FILENAME, sheet="Full data", row=c["row"], column=c["col"]),
+            }
+        )
     for c in parsed["regional"]:
         start, end = year_period(c["year"])
-        flags = {**base, "aggregate": "provider_region" if c["geo"] != "world" else "world",
-                 "provider_label": c["label"]}
-        rows.append({
-            "source": ATLAS_SOURCE, "dataset": ATLAS_DATASET, "indicator": c["indicator"], "concept_id": None,
-            "iso3": None, "provider_geo": c["geo"][:64], "entity_qid": None,
-            "period_start": start, "period_end": end, "value": c["value"], "value_text": None,
-            "unit": UNITS[c["indicator"]], "flags": canon(flags), "raw_sha256": raw_sha256,
-            "selector": canon(file=DATA_FILENAME, sheet="Regional data", row=c["row"], column=c["col"] + 1),
-        })
+        flags = {
+            **base,
+            "aggregate": "provider_region" if c["geo"] != "world" else "world",
+            "provider_label": c["label"],
+        }
+        rows.append(
+            {
+                "source": ATLAS_SOURCE,
+                "dataset": ATLAS_DATASET,
+                "indicator": c["indicator"],
+                "concept_id": None,
+                "iso3": None,
+                "provider_geo": c["geo"][:64],
+                "entity_qid": None,
+                "period_start": start,
+                "period_end": end,
+                "value": c["value"],
+                "value_text": None,
+                "unit": UNITS[c["indicator"]],
+                "flags": canon(flags),
+                "raw_sha256": raw_sha256,
+                "selector": canon(file=DATA_FILENAME, sheet="Regional data", row=c["row"], column=c["col"] + 1),
+            }
+        )
     return rows
 
 
@@ -367,27 +416,8 @@ class MaddisonConnector:
     def __init__(self, *, min_rows: int = MIN_ROWS) -> None:
         self.min_rows = min_rows  # lowered only by tests on trimmed fixtures
 
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=NAME,
-            version=VERSION,
-            source_key=SOURCE_KEY,
-            provider="Groningen Growth and Development Centre (Maddison Project)",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST, "objectstore.surf.nl"),
-            dataset_ids=(DOI,),
-            field_mappings={"gdppc": "Full data!E", "pop": "Full data!F", "regional": "Regional data"},
-            units=dict(UNITS),
-            geography=("ISO 3166-1 alpha-3 (provider) + historical CSK/SUN/YUG + TWN + regions",),
-            time_semantics="calendar year (provider year column); half-open [Y-01-01, Y+1-01-01)",
-            lineage_family="maddison_project",
-            cadence_seconds=30 * DAY,
-            revision_strategy="new DataverseNL version or file checksum -> new atlas table version",
-            max_response_bytes=MAX_FILE_BYTES,
-            max_pages=2,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(),
-        )
+    def describe(self) -> Any:
+        return atlas_source()
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
         return (FetchItem(key="mpd.record", url=RECORD_URL, max_bytes=MAX_RECORD_BYTES),)
@@ -396,10 +426,18 @@ class MaddisonConnector:
         if raw.item.key != "mpd.record":
             return ()
         rec = parse_record(raw.body)
-        return (FetchItem(key="mpd.xlsx", url=FILE_URL.format(id=rec["file_id"]), max_bytes=MAX_FILE_BYTES,
-                          expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                                "application/octet-stream"),
-                          params={"sha1": rec["checksum"], "file_id": rec["file_id"]}),)
+        return (
+            FetchItem(
+                key="mpd.xlsx",
+                url=FILE_URL.format(id=rec["file_id"]),
+                max_bytes=MAX_FILE_BYTES,
+                expected_media_types=(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/octet-stream",
+                ),
+                params={"sha1": rec["checksum"], "file_id": rec["file_id"]},
+            ),
+        )
 
     async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
         return await fetch_plain(item, http)
@@ -439,5 +477,47 @@ class MaddisonConnector:
             "published; flags carry the provider's source spans. CSK/SUN/YUG/TWN kept unmapped with QIDs."
         )
         raws_used = [sha, sha256_hex(rec_raw.body)]  # the record carries the licence + checksum evidence
-        return [AtlasBuild(ATLAS_SOURCE, ATLAS_DATASET, frame(rows), raws_used, PARSER_VERSION, note,
-                           geo_scheme="iso3", rights={**RIGHTS, "doi": DOI}, report=report)]
+        return [
+            AtlasBuild(
+                ATLAS_SOURCE,
+                ATLAS_DATASET,
+                frame(rows),
+                raws_used,
+                PARSER_VERSION,
+                note,
+                geo_scheme="iso3",
+                rights={**RIGHTS, "doi": DOI},
+                report=report,
+            )
+        ]
+
+
+def atlas_source() -> Any:
+    """The atlas platform declaration (``reva.atlas.sources``)."""
+    return source_spec(
+        name=NAME,
+        version=VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        datasets=(ATLAS_DATASET,),
+        provider="Groningen Growth and Development Centre (Maddison Project)",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST, "objectstore.surf.nl"),
+        dataset_ids=(DOI,),
+        field_mappings={"gdppc": "Full data!E", "pop": "Full data!F", "regional": "Regional data"},
+        units=dict(UNITS),
+        geography=("ISO 3166-1 alpha-3 (provider) + historical CSK/SUN/YUG + TWN + regions",),
+        time_semantics="calendar year (provider year column); half-open [Y-01-01, Y+1-01-01)",
+        lineage_family="maddison_project",
+        cadence_seconds=30 * DAY,
+        revision_strategy="new DataverseNL version or file checksum -> new atlas table version",
+        planned_requests=2,
+        max_response_bytes=MAX_FILE_BYTES,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(),
+    )
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    out = await ingest_with_run(run, MaddisonConnector(min_rows=1 if run.origin == "test_fixture" else MIN_ROWS))
+    return {k: v for k, v in out.items() if not k.startswith("_")}

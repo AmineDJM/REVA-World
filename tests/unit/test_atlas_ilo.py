@@ -17,14 +17,8 @@ import pytest
 
 from reva.adapters.connectors import atlas_ilo as ilo
 from reva.adapters.connectors import atlas_wages_gapfill as gap
-from reva.adapters.connectors.atlas_labour_common import (
-    AtlasRunReport,
-    atlas_spec,
-    check_body,
-    fetch_plan,
-    gunzip_bounded,
-    strict_decimal,
-)
+from reva.adapters.connectors.atlas_labour_common import check_body, gunzip_bounded, strict_decimal
+from reva.adapters.connectors.base import to_raw
 from reva.atlas.catalog import load_catalog
 from reva.atlas.tables import country_iso3, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp
@@ -36,12 +30,19 @@ GEOS = ("FR", "AT", "EL", "UK", "DE")
 OECD_AREAS = ("FRA", "USA", "OECD")
 
 
-def _tables(conn: Any) -> dict[str, pl.DataFrame]:
-    rep = AtlasRunReport(conn.describe().name, "test_fixture")
-    raws = asyncio.run(fetch_plan(FixtureHttp(conn.describe().name), conn.plan(), rep))
-    assert rep.errors == [], rep.errors
+def _tables(conn: Any, name: str) -> dict[str, pl.DataFrame]:
+    http = FixtureHttp(name)
+
+    async def fetch() -> dict[str, RawAcquisition]:
+        out = {}
+        for it in conn.plan():
+            raw = to_raw(it, await http.get(it.url), "test_fixture")
+            check_body(it, raw)
+            out[it.key] = raw
+        return out
+
     out = {}
-    for p in conn.build_tables(raws):
+    for p in conn.build_tables(asyncio.run(fetch())):
         frame, _ = validate_atlas_frame(
             p.frame, source=p.source, dataset=p.dataset, raw_sha256s=p.raw_sha256s, geo_scheme=p.geo_scheme
         )
@@ -51,14 +52,14 @@ def _tables(conn: Any) -> dict[str, pl.DataFrame]:
 
 @pytest.fixture(scope="module")
 def ilo_tables() -> dict[str, pl.DataFrame]:
-    return _tables(ilo.IlostatConnector(ref_areas=AREAS))
+    return _tables(ilo.IlostatConnector(ref_areas=AREAS), ilo.CONNECTOR_NAME)
 
 
 @pytest.fixture(scope="module")
 def gap_tables() -> dict[str, pl.DataFrame]:
     return {
-        **_tables(gap.EurostatMinimumWageConnector(geos=GEOS)),
-        **_tables(gap.OecdEarningsConnector(areas=OECD_AREAS)),
+        **_tables(gap.EurostatMinimumWageConnector(geos=GEOS), gap.EUROSTAT_NAME),
+        **_tables(gap.OecdEarningsConnector(areas=OECD_AREAS), gap.OECD_NAME),
     }
 
 
@@ -197,15 +198,29 @@ def test_build_tables_needs_dictionaries() -> None:
         ilo.IlostatConnector(ref_areas=AREAS).build_tables({})
 
 
-def test_spec_and_plan() -> None:
-    c = ilo.IlostatConnector()
-    spec = c.describe()
-    assert str(spec.template) == "atlas_bulk" and spec.source_key == "ilostat.rplumber"
-    assert spec.allowed_hosts == ("rplumber.ilo.org",)
-    urls = [i.url for i in c.plan()]
+def test_atlas_source_declarations() -> None:
+    from reva.atlas.sources import discover
+
+    found, errors = discover(
+        [
+            "reva.adapters.connectors.atlas_ilo",
+            "reva.adapters.connectors.atlas_wages_gapfill",
+            "reva.adapters.connectors.atlas_labour_common",
+        ]
+    )
+    assert errors == []
+    assert set(found) == {"atlas.ilostat", "atlas.eurostat.earn_mw_cur", "atlas.oecd.earnings"}
+    spec = found["atlas.ilostat"].spec
+    assert spec.source_key == "ilostat.rplumber" and spec.allowed_hosts == ("rplumber.ilo.org",)
+    assert set(spec.datasets) == {i.dataset for i in ilo.INDICATORS}
+    assert spec.planned_requests == len(ilo.IlostatConnector().plan())
+    assert found["atlas.oecd.earnings"].spec.source_key == "oecd.sdmx"
+    assert found["atlas.eurostat.earn_mw_cur"].spec.source_key == "eurostat.dissemination"
+    urls = [i.url for i in ilo.IlostatConnector().plan()]
     assert all(u.startswith("https://rplumber.ilo.org/") for u in urls)
     assert "https://rplumber.ilo.org/data/indicator/?id=EAR_INEE_CUR_NB_A&format=.csv.gz" in urls
-    assert atlas_spec(**{k: v for k, v in spec.model_dump().items() if k != "template"}).template == spec.template
+    assert ilo.FIXTURE_REF_AREAS == AREAS
+    assert gap.FIXTURE_EUROSTAT_GEOS == GEOS and gap.FIXTURE_OECD_AREAS == OECD_AREAS
 
 
 # --------------------------------------------------------------------------- helpers

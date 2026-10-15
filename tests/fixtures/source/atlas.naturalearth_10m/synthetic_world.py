@@ -200,13 +200,18 @@ def layers() -> dict[str, bytes]:
 
 
 def _merge_countries(units):  # type: ignore[no-untyped-def]
-    """Countries layer: one feature per ADM0_A3 (map units of one ADM0 merged; rings concatenated)."""
+    """Countries layer: one feature per ADM0_A3 (map units of one ADM0 merged; rings concatenated). The FJI
+    filler islands stay separate features so the layer passes the minimum-feature check."""
     merged: dict[str, tuple[dict[str, str], list]] = {}
+    filler = []
     for rec, rings in units:
         adm = rec["ADM0_A3"]
+        if adm == "FJI":
+            filler.append((rec, rings))
+            continue
         if adm not in merged:
             r = dict(rec)
             r["GU_A3"] = adm
             merged[adm] = (r, [])
         merged[adm][1].extend(rings)
-    return list(merged.values())
+    return list(merged.values()) + filler

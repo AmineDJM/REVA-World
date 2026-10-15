@@ -29,11 +29,11 @@ from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
-from reva.adapters.connectors.atlas_geo_common import atlas_spec, fetch_raw, snapshot_period
+from reva.adapters.connectors.atlas_geo_common import fetch_raw, snapshot_period
 from reva.adapters.connectors.base import dec_str, module_digest, schema_fingerprint
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import (
-    ConnectorSpec,
     Cursor,
     FetchBudget,
     FetchItem,
@@ -294,27 +294,8 @@ def neighbour_statements(
 
 
 class GeoNamesCountryInfoConnector:
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="GeoNames",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=("countryInfo.txt",),
-            field_mappings={"geo": "ISO3", "numeric": sorted(NUMERIC), "text": sorted(TEXT)},
-            units={"area_km2": "km2", "population": "persons"},
-            geography=("world",),
-            time_semantics="undated provider snapshot; atlas rows dated by retrieval day",
-            lineage_family="geonames",
-            cadence_seconds=30 * 86400,
-            revision_strategy="raw sha256 is the revision (the file carries no version)",
-            max_response_bytes=MAX_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(GeoNamesCountryInfoConnector),
-        )
+    def describe(self) -> AtlasSourceSpec:
+        return atlas_source()
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="single file")
@@ -345,6 +326,29 @@ class GeoNamesCountryInfoConnector:
         return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="GeoNames",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=("countryInfo.txt",),
+        cadence_seconds=30 * 86400,
+        planned_requests=1,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(GeoNamesCountryInfoConnector),
+        field_mappings={"geo": "ISO3", "numeric": sorted(NUMERIC), "text": sorted(TEXT)},
+        notes="undated provider snapshot; atlas rows dated by retrieval day",
+    )
+
+
 def fetch_items() -> tuple[FetchItem, ...]:
     return (
         FetchItem(
@@ -356,53 +360,54 @@ def fetch_items() -> tuple[FetchItem, ...]:
     )
 
 
-async def ingest(
-    engine: Any, store: Any, http: Any, *, qids: Mapping[str, str] | None = None, load_kg: bool = True
-) -> dict[str, Any]:
+async def _ingest(
+    run: Any, *, qids: Mapping[str, str] | None, load_kg: bool
+) -> tuple[dict[str, Any], list[CountryInfo], RawAcquisition]:
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw
-    from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
+    from reva.adapters.connectors.atlas_geo_common import run_get
+    from reva.atlas.tables import ATLAS_SCHEMA
 
-    conn = GeoNamesCountryInfoConnector()
-    spec = conn.describe()
-    item = fetch_items()[0]
-    raw = await conn.fetch(item, http)
-    sha = archive_raw(engine, store, spec, raw, actor="worker:atlas_a_geo")
+    raw = await run_get(run, fetch_items()[0])
+    sha = run.archive(raw)
     rows = parse_country_info(raw.body)
     problems = validate_rows(rows)
     if problems:
         raise _err("; ".join(problems[:10]))
     frame = pl.DataFrame(atlas_rows(rows, raw_sha256=sha, retrieved_at=raw.retrieved_at), schema=ATLAS_SCHEMA)
-    table = register_atlas_table(
-        engine,
-        store,
-        source=ATLAS_SOURCE,
+    table = run.register(
         dataset=ATLAS_DATASET,
         frame=frame,
         raw_sha256s=[sha],
-        parser_version=PARSER_VERSION,
-        origin=raw.origin,
         geo_scheme="iso3",
         rights=RIGHTS,
         coverage_note=f"GeoNames countryInfo.txt: {len(rows)} countries/territories as declared by GeoNames "
         "(undated; retrieval snapshot); historical codes SCG/ANT and Taiwan kept unmapped",
-        actor="worker:atlas_a_geo",
     )
     kg: dict[str, Any] = {"loaded": False}
     if load_kg:
         kg = load_neighbours_kg(
-            engine, store, rows, raw_sha256=sha, retrieved_at=raw.retrieved_at, origin=raw.origin, qids=qids
+            run.engine, run.store, rows, raw_sha256=sha, retrieved_at=raw.retrieved_at, origin=run.origin, qids=qids
         )
-    return {
-        "connector": CONNECTOR_NAME,
-        "raw_sha256": sha,
-        "table": table,
-        "kg": kg,
-        "rows": rows,
-        "retrieved_at": raw.retrieved_at,
-        "origin": raw.origin,
-    }
+    return {"connector": CONNECTOR_NAME, "raw_sha256": sha, "table": table, "kg": kg}, rows, raw
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Single atlas ingest entry point: one request, archive, register ``geonames.countryinfo``, load the
+    neighbour statements (P47) when ``registry/entities/country_qids.json`` provides QIDs."""
+    summary, _, _ = await _ingest(run, qids=None, load_kg=True)
+    return summary
+
+
+async def ingest(
+    engine: Any, store: Any, http: Any, *, qids: Mapping[str, str] | None = None, load_kg: bool = True
+) -> dict[str, Any]:
+    """Same flow with an explicit client (tests); also returns the parsed rows for a later KG load."""
+    from reva.adapters.connectors.atlas_geo_common import make_run
+
+    run = make_run(atlas_source(), engine, store, http)
+    summary, rows, raw = await _ingest(run, qids=qids, load_kg=load_kg)
+    return {**summary, "rows": rows, "retrieved_at": raw.retrieved_at, "origin": run.origin}
 
 
 def load_neighbours_kg(

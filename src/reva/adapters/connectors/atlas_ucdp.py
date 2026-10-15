@@ -45,19 +45,22 @@ from datetime import date
 from typing import Any
 
 from reva.adapters.connectors.atlas_geopol_common import (
+    COUNTRYCODE_VERSION,
     KgEntity,
     KgStatement,
     StateCodeCrosswalk,
     StateEntityResolver,
     atlas_frame,
-    canon,
+    code_correspondence,
+    fetch_countrycode,
     int_or_none,
     iso_date_or_none,
-    make_spec,
+    kg_available,
+    load_kg,
+    load_qid_for_iso3,
     merge_years,
     read_csv_member,
 )
-from reva.adapters.connectors.base import to_raw
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
@@ -123,11 +126,6 @@ def fetch_items() -> tuple[FetchItem, ...]:
                   expected_media_types=("application/zip", "application/octet-stream", "application/x-zip-compressed"))
         for k, (path, _m, _n) in FILES.items()
     )
-
-
-async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
-    result = await http.get(item.url, max_bytes=item.max_bytes)
-    return to_raw(item, result, getattr(http, "origin", "live"))
 
 
 def parse_file(key: str, body: bytes) -> list[dict[str, str]]:
@@ -377,62 +375,29 @@ def kg_records(acd: Sequence[Mapping[str, str]], brd: Sequence[Mapping[str, str]
     return ents, stmts
 
 
-# ----------------------------------------------------------------------------- connector + ingest
+# ----------------------------------------------------------------------------- atlas source + ingest
 
 
-class UcdpConnector:
-    """Archive-only connector: four CSV zips per run (UCDP 26.1); see the module docstring."""
+def atlas_source() -> Any:
+    from reva.atlas.sources import AtlasSourceSpec
 
-    def describe(self) -> Any:
-        from reva.adapters.connectors.base import module_digest
-
-        return make_spec(
-            name=CONNECTOR_NAME, version=CONNECTOR_VERSION, source_key=SOURCE_KEY,
-            provider="Uppsala Conflict Data Program (Uppsala University)", licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,), dataset_ids=tuple(f"{k}-{UCDP_VERSION}" for k in FILES),
-            field_mappings={"geo": "Gleditsch-Ward codes (gwno_*, country_id)", "time": "year"},
-            units={"*_deaths_*": "deaths", "*_count": "count"}, geography=("world",),
-            time_semantics="calendar year (conflict-year / country-year); dataset version 26.1",
-            lineage_family="ucdp", cadence_seconds=30 * 86400,
-            revision_strategy="pinned dataset version (26.1); a new UCDP release is a new connector version",
-            max_response_bytes=MAX_BYTES, max_pages=1, parser_version=PARSER_VERSION,
-            code_digest=module_digest(UcdpConnector),
-        )
-
-    def plan(self, cursor: Any, budget: Any) -> Any:
-        from reva.ports.connectors import FetchPlan
-
-        return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="none (one zip per dataset)")
-
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        return await fetch(item, http)
-
-    def parse(self, raw: RawAcquisition) -> Any:
-        from reva.ports.connectors import ObservationBatch
-
-        rows = parse_file(raw.item.key, raw.body)
-        yield ObservationBatch(connector=CONNECTOR_NAME, connector_version=CONNECTOR_VERSION, item_key=raw.item.key,
-                               observations=(), metadata={"row_count": len(rows)})
-
-    def validate(self, batch: Any) -> Any:
-        from reva.ports.connectors import QualityReport
-
-        return QualityReport(outcome="pass", received_count=int(batch.metadata.get("row_count") or 0))
-
-    def next_cursor(self, plan: Any, outcomes: Sequence[Any]) -> Any:
-        from reva.ports.connectors import Cursor
-
-        return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME, version=CONNECTOR_VERSION, source_key=SOURCE_KEY, atlas_source=ATLAS_SOURCE,
+        provider="Uppsala Conflict Data Program (Uppsala University)", licence=RIGHTS["licence"],
+        allowed_hosts=(HOST, "cran.r-project.org"), datasets=("orgvio_cy", "acd_cy"),
+        dataset_ids=tuple(f"ucdp-{k}-{UCDP_VERSION}" for k in FILES) + (f"countrycode-{COUNTRYCODE_VERSION}",),
+        cadence_seconds=30 * 86400, planned_requests=8, max_response_bytes=MAX_BYTES, min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        field_mappings={"geo": "Gleditsch-Ward codes (UCDP variant: 345 kept for Serbia after 2006)",
+                        "time": "calendar year", "kg": "ucdp:conflict:<id>, ucdp:actor:<id>"},
+        notes="UCDP API needs a token since 2025; the official CSV downloads are used. Also fetches the "
+              "countrycode R package (CRAN) for GW/COW -> ISO3.",
+    )
 
 
-async def acquire(http: Any) -> dict[str, RawAcquisition]:
-    conn = UcdpConnector()
-    return {it.key: await conn.fetch(it, http) for it in fetch_items()}
-
-
-def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk,
-          qid_for_iso3: Mapping[str, str]) -> dict[str, Any]:
-    """Parse archived raw bytes into the two atlas frames and the KG records (no I/O)."""
+def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk, qid_for_iso3: Mapping[str, str],
+          countrycode_sha256: str | None = None) -> dict[str, Any]:
+    """Parse raw bytes into the two atlas frames and the KG records (no I/O)."""
     import hashlib
 
     shas = {k: hashlib.sha256(r.body).hexdigest() for k, r in raws.items()}
@@ -442,6 +407,8 @@ def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk,
     resolver = StateEntityResolver(crosswalk, qid_for_iso3)
     ents, stmts = kg_records(parsed["acd"], parsed["brd_conf"], parsed["actor"], shas=shas, resolver=resolver)
     ents = ents + resolver.code_entities()
+    if countrycode_sha256:
+        stmts = stmts + code_correspondence(resolver, raw_sha256=countrycode_sha256)
     return {"shas": shas, "orgvio_cy": cy, "acd_cy": acd_cy, "entities": ents, "statements": stmts,
             "row_counts": {k: len(v) for k, v in parsed.items()},
             "unresolved_state_codes": {k: sorted(v) for k, v in resolver.unresolved.items()}}
@@ -456,41 +423,36 @@ def unmapped_geo(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     return sorted(seen.values(), key=lambda e: e["provider_geo"])
 
 
-async def ingest(engine: Any, store: Any, http: Any, *, crosswalk: StateCodeCrosswalk,
-                 qid_for_iso3: Mapping[str, str], kg_loader: Any = None) -> dict[str, Any]:
-    """Fetch the four zips, archive them, register ``ucdp.orgvio_cy`` and ``ucdp.acd_cy``; load KG records
-    through ``kg_loader(entities, statements, raw_sha256s, origin, retrieved_at)`` when given."""
-    from reva.atlas.tables import register_atlas_table
-    from reva.evidence.ingest import publish_acquisition
-
-    spec = UcdpConnector().describe()
-    raws = await acquire(http)
-    out = build(raws, crosswalk=crosswalk, qid_for_iso3=qid_for_iso3)  # parse first: nothing archived on drift
-    for raw in raws.values():
-        summary = publish_acquisition(engine, store, spec, raw, [], [], actor="worker:atlas")
-        if summary.namespace == "quarantine":  # pragma: no cover
-            raise UcdpParseError("raw acquisition was quarantined", retryable=False)
-    origin = next(iter(raws.values())).origin
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch the four UCDP zips + countrycode through the run, archive them, register ``ucdp.orgvio_cy`` and
+    ``ucdp.acd_cy``, and load the KG records when the ``kg`` schema exists."""
+    crosswalk, cc_sha = await fetch_countrycode(run)
+    raws = {}
+    for it in fetch_items():
+        raws[it.key] = await run.get(it.url, key=f"{it.key}:{UCDP_VERSION}", media_types=it.expected_media_types,
+                                     max_bytes=it.max_bytes)
+    out = build(raws, crosswalk=crosswalk, qid_for_iso3=load_qid_for_iso3(), countrycode_sha256=cc_sha)
+    for raw in raws.values():  # parsed first: nothing archived on schema drift
+        run.archive(raw)
     shas = out["shas"]
-    res: dict[str, Any] = {"row_counts": out["row_counts"]}
-    res["orgvio_cy"] = register_atlas_table(
-        engine, store, source=ATLAS_SOURCE, dataset="orgvio_cy", frame=atlas_frame(out["orgvio_cy"]),
-        raw_sha256s=[shas["orgvio_cy"]], parser_version=PARSER_VERSION, origin=origin, rights=RIGHTS,
-        coverage_note=f"UCDP Country-Year Dataset on Organized Violence within Country Borders {UCDP_VERSION}, "
-                      "1989-2025, all GW states; indicators = UCDP columns verbatim; zeros are UCDP-coded",
-    )
-    res["acd_cy"] = register_atlas_table(
-        engine, store, source=ATLAS_SOURCE, dataset="acd_cy", frame=atlas_frame(out["acd_cy"]),
-        raw_sha256s=[shas["acd"]], parser_version=PARSER_VERSION, origin=origin, rights=RIGHTS,
-        coverage_note=f"Computed from UCDP/PRIO ACD {UCDP_VERSION} (1946-2025): distinct active conflicts per "
-                      "country-year by role; only country-years with >= 1 conflict are listed",
-    )
-    if kg_loader is not None:
-        res["kg"] = kg_loader(out["entities"], out["statements"], sorted(set(shas.values())), origin,
-                              max(r.retrieved_at for r in raws.values()))
+    res: dict[str, Any] = {"row_counts": out["row_counts"], "atlas": {}}
+    if run.wants("orgvio_cy"):
+        r = run.register(
+            dataset="orgvio_cy", frame=atlas_frame(out["orgvio_cy"]), raw_sha256s=[shas["orgvio_cy"]], rights=RIGHTS,
+            coverage_note=f"UCDP Country-Year Dataset on Organized Violence within Country Borders {UCDP_VERSION}, "
+                          "1989-2025, all GW states; indicators = UCDP columns verbatim; zeros are UCDP-coded")
+        res["atlas"]["orgvio_cy"] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
+    if run.wants("acd_cy"):
+        r = run.register(
+            dataset="acd_cy", frame=atlas_frame(out["acd_cy"]), raw_sha256s=[shas["acd"]], rights=RIGHTS,
+            coverage_note=f"COMPUTED from UCDP/PRIO ACD {UCDP_VERSION} (1946-2025): distinct active conflicts per "
+                          "country-year by role; only country-years with >= 1 conflict are listed")
+        res["atlas"]["acd_cy"] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
     res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
-    res["unresolved_state_codes"] = out["unresolved_state_codes"]
+    if run.dataset is None and kg_available(run.engine):
+        res["kg"] = load_kg(run.engine, run.store, out["entities"], out["statements"], source_key=KG_SOURCE_KEY,
+                            source_revision=f"ucdp-{UCDP_VERSION}", raw_sha256s=sorted(set(shas.values()) | {cc_sha}),
+                            retrieved_at=max(r.retrieved_at for r in raws.values()), origin=run.origin)
+    res["unresolved_state_codes"] = {k: v[:3] + (["..."] if len(v) > 3 else []) for k, v in
+                                     out["unresolved_state_codes"].items()}
     return res
-
-
-__all__ = ["UcdpConnector", "build", "ingest", "kg_records", "orgvio_atlas_rows", "acd_country_year_rows", "canon"]

@@ -1,0 +1,18 @@
+# Budget request from agent A-WB (World Bank atlas layer). ATLASCORE merges into registry/policies/budgets.yaml.
+# Connector: src/reva/adapters/connectors/atlas_worldbank.py (atlas.worldbank). Coverage: docs/dev/v3_a_wb.md.
+agent: A-WB
+requests:
+  - source_key: worldbank.atlas
+    # One full run = 19 requests: 8 bulk ZIPs (WDI 283 MB, Gender 171 MB, HNP 121 MB, EdStats 39 MB, Jobs 34 MB,
+    # IDS 11 MB, WGI 3.3 MB, Doing Business 1.3 MB), 8 French indicator-metadata JSONs (~10 MB), 3 PIP CSVs (~4 MB).
+    # ~680 MB per full run; single-dataset runs (--dataset wgi) are a few MB. Cadence monthly.
+    daily_requests: 40
+    expected_bytes_per_day: 700000000
+    reason: "bulk CSV ZIPs of 8 World Bank databases + PIP + French metadata; one full run ~680 MB (19 requests), one retry"
+daily_totals_increase:
+  http_requests_total: "+40"
+  # The current daily byte total cannot hold one full run (WDI alone is 283 MB).
+  http_bytes_total: "+750_000_000"
+storage:
+  archived_raw_bytes: 690000000   # one copy of each raw artifact per release
+  parquet_bytes: 160000000        # 11 atlas tables (zstd)

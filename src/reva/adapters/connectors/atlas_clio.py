@@ -50,19 +50,20 @@ from urllib.parse import quote
 from reva.adapters.connectors.atlas_history_common import (
     DAY,
     AtlasBuild,
-    atlas_spec,
     canon,
     code_digest,
     decimal_text,
     fetch_plain,
     frame,
     historical_qid,
+    ingest_with_run,
     sha256_hex,
+    source_spec,
     year_period,
 )
 from reva.adapters.connectors.atlas_xlsx import Workbook, XlsxError
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 NAME = "atlas.clio_infra"
 VERSION = "1.0.0"
@@ -149,12 +150,16 @@ def parse_record(body: bytes) -> dict[str, Any]:
     files = []
     for f in lv.get("files") or []:
         df = f.get("dataFile") or {}
-        files.append({
-            "id": df.get("id"), "filename": df.get("filename"), "size": df.get("filesize"),
-            "restricted": bool(f.get("restricted") or df.get("restricted")),
-            "checksum_type": (df.get("checksum") or {}).get("type"),
-            "checksum": (df.get("checksum") or {}).get("value"),
-        })
+        files.append(
+            {
+                "id": df.get("id"),
+                "filename": df.get("filename"),
+                "size": df.get("filesize"),
+                "restricted": bool(f.get("restricted") or df.get("restricted")),
+                "checksum_type": (df.get("checksum") or {}).get("type"),
+                "checksum": (df.get("checksum") or {}).get("value"),
+            }
+        )
     return {
         "doi": lv.get("datasetPersistentId") or doc["data"].get("persistentUrl"),
         "title": title,
@@ -222,7 +227,7 @@ def parse_data_file(body: bytes) -> dict[str, Any]:
     cells: list[dict[str, Any]] = []
     polities: dict[str, dict[str, Any]] = {}
     nonnum: list[dict[str, Any]] = []
-    body_rows = rows[hdr_idx + 1:]
+    body_rows = rows[hdr_idx + 1 :]
 
     def g(c: Mapping[int, Any], i: int) -> str | None:
         v = c.get(i)
@@ -238,8 +243,16 @@ def parse_data_file(body: bytes) -> dict[str, Any]:
         else:
             geo = f"name:{name}" if name else f"row:{rnum}"
         geo = geo[:64]
-        pol = {"code": code, "num": num, "ccode": str(int(float(ccode))) if ccode and _year(ccode) is not None else ccode,
-               "name": name, "start": _year(start), "end": _year(end), "start_text": start, "end_text": end}
+        pol = {
+            "code": code,
+            "num": num,
+            "ccode": str(int(float(ccode))) if ccode and _year(ccode) is not None else ccode,
+            "name": name,
+            "start": _year(start),
+            "end": _year(end),
+            "start_text": start,
+            "end_text": end,
+        }
         for k, cell in c.items():
             if k < 6 or cell.kind == "empty" or cell.text.strip() == "":
                 continue
@@ -251,17 +264,31 @@ def parse_data_file(body: bytes) -> dict[str, Any]:
                 raise _err(f"polity {geo} appears on two different rows")
             polities[geo] = pol
             cells.append({"geo": geo, "year": years[k], "value": v, "row": rnum, "col": k})
-    return {"layout": "clio_polity_wide", "sheet": sheet, "title": title, "unit": unit, "cells": cells,
-            "polities": polities, "non_numeric": nonnum, "header_row": hrow}
+    return {
+        "layout": "clio_polity_wide",
+        "sheet": sheet,
+        "title": title,
+        "unit": unit,
+        "cells": cells,
+        "polities": polities,
+        "non_numeric": nonnum,
+        "header_row": hrow,
+    }
 
 
-def atlas_rows(indicator: str, parsed: Mapping[str, Any], record: Mapping[str, Any], *, raw_sha256: str,
-               filename: str) -> list[dict[str, Any]]:
+def atlas_rows(
+    indicator: str, parsed: Mapping[str, Any], record: Mapping[str, Any], *, raw_sha256: str, filename: str
+) -> list[dict[str, Any]]:
     from reva.atlas.tables import country_iso3
 
     lic = ALLOWED_LICENCES[record["licence"]]
-    base = {"dataset_doi": record["doi"], "dataset_title": record["title"], "dataverse_version": record["version"],
-            "licence": lic[0], "provider_indicator_title": parsed["title"]}
+    base = {
+        "dataset_doi": record["doi"],
+        "dataset_title": record["title"],
+        "dataverse_version": record["version"],
+        "licence": lic[0],
+        "provider_indicator_title": parsed["title"],
+    }
     if indicator in PERIOD_NOTES:
         base["provider_period_note"] = PERIOD_NOTES[indicator]
     unit = (parsed["unit"] or parsed["title"] or "as published")[:100]
@@ -270,8 +297,12 @@ def atlas_rows(indicator: str, parsed: Mapping[str, Any], record: Mapping[str, A
         pol = parsed["polities"][c["geo"]]
         iso3 = country_iso3(pol["ccode"], "m49") if pol["ccode"] else None
         flags = dict(base)
-        flags["polity"] = {"name": pol["name"], "start": pol["start_text"], "end": pol["end_text"],
-                           "ccode": pol["ccode"]}
+        flags["polity"] = {
+            "name": pol["name"],
+            "start": pol["start_text"],
+            "end": pol["end_text"],
+            "ccode": pol["ccode"],
+        }
         if c["geo"].startswith("geacron/"):
             flags["territory"] = "historical_borders_geacron_polity"
         elif pol["ccode"]:
@@ -284,16 +315,31 @@ def atlas_rows(indicator: str, parsed: Mapping[str, Any], record: Mapping[str, A
             flags["ccode_not_in_crosswalk"] = pol["ccode"]
         q = None if iso3 else historical_qid("clio", c["geo"])
         if q is not None:
-            flags["entity_mapping"] = {"qid": q["qid"], "review": q.get("review_status", "agent_mapped"),
-                                       "file": "registry/entities/historical_states_qids.json"}
+            flags["entity_mapping"] = {
+                "qid": q["qid"],
+                "review": q.get("review_status", "agent_mapped"),
+                "file": "registry/entities/historical_states_qids.json",
+            }
         start, end = year_period(c["year"])
-        out.append({
-            "source": ATLAS_SOURCE, "dataset": ATLAS_DATASET, "indicator": indicator, "concept_id": None,
-            "iso3": iso3, "provider_geo": c["geo"][:64], "entity_qid": q["qid"] if q else None,
-            "period_start": start, "period_end": end, "value": c["value"], "value_text": None, "unit": unit,
-            "flags": canon(flags), "raw_sha256": raw_sha256,
-            "selector": canon(file=filename, sheet=parsed["sheet"], row=c["row"], column=c["col"] + 1),
-        })
+        out.append(
+            {
+                "source": ATLAS_SOURCE,
+                "dataset": ATLAS_DATASET,
+                "indicator": indicator,
+                "concept_id": None,
+                "iso3": iso3,
+                "provider_geo": c["geo"][:64],
+                "entity_qid": q["qid"] if q else None,
+                "period_start": start,
+                "period_end": end,
+                "value": c["value"],
+                "value_text": None,
+                "unit": unit,
+                "flags": canon(flags),
+                "raw_sha256": raw_sha256,
+                "selector": canon(file=filename, sheet=parsed["sheet"], row=c["row"], column=c["col"] + 1),
+            }
+        )
     return out
 
 
@@ -307,27 +353,8 @@ class ClioConnector:
     def __init__(self, *, min_datasets: int = MIN_DATASETS) -> None:
         self.min_datasets = min_datasets  # lowered only by tests on trimmed fixtures
 
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=NAME,
-            version=VERSION,
-            source_key=SOURCE_KEY,
-            provider="Clio-Infra (IISH / Utrecht University), DataverseNL collection clioinfra",
-            licence="CC0 1.0 / CC BY-SA 4.0 (per dataset record)",
-            allowed_hosts=(HOST, "objectstore.surf.nl"),
-            dataset_ids=(f"dataverse:{SUBTREE}",),
-            field_mappings={"indicator": "data file name", "geo": "Webmapper code", "iso3": "ccode (ISO numeric)"},
-            units={"*": "unit row of each data file, verbatim"},
-            geography=("CShapes / GEACRON polities (Webmapper codes); ISO 3166 numeric ccode when given",),
-            time_semantics="calendar year columns as published (some indicators are decade/birth-cohort values)",
-            lineage_family="clio_infra",
-            cadence_seconds=90 * DAY,
-            revision_strategy="new DataverseNL dataset version or file checksum -> new atlas table version",
-            max_response_bytes=MAX_FILE_BYTES,
-            max_pages=400,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(),
-        )
+    def describe(self) -> Any:
+        return atlas_source()
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
         return (FetchItem(key="clio.search.0", url=SEARCH_URL.format(start=0), max_bytes=MAX_SEARCH_BYTES),)
@@ -336,22 +363,38 @@ class ClioConnector:
         key = raw.item.key
         if key.startswith("clio.search."):
             s = parse_search(raw.body)
-            items = [FetchItem(key=f"clio.record.{d['doi']}", url=RECORD_URL.format(doi=quote(d["doi"], safe=":/")),
-                               max_bytes=MAX_RECORD_BYTES) for d in s["datasets"]]
+            items = [
+                FetchItem(
+                    key=f"clio.record.{d['doi']}",
+                    url=RECORD_URL.format(doi=quote(d["doi"], safe=":/")),
+                    max_bytes=MAX_RECORD_BYTES,
+                )
+                for d in s["datasets"]
+            ]
             nxt = s["start"] + len(s["datasets"])
             if s["datasets"] and nxt < s["total"]:
-                items.append(FetchItem(key=f"clio.search.{nxt}", url=SEARCH_URL.format(start=nxt),
-                                       max_bytes=MAX_SEARCH_BYTES))
+                items.append(
+                    FetchItem(key=f"clio.search.{nxt}", url=SEARCH_URL.format(start=nxt), max_bytes=MAX_SEARCH_BYTES)
+                )
             return tuple(items)
         if key.startswith("clio.record."):
             rec = parse_record(raw.body)
             take, _ = data_files(rec)
             return tuple(
-                FetchItem(key=f"clio.file.{f['id']}", url=FILE_URL.format(id=f["id"]), max_bytes=MAX_FILE_BYTES,
-                          expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                                "application/octet-stream"),
-                          params={"doi": key.removeprefix("clio.record."), "filename": f["filename"],
-                                  "sha1": f["checksum"] if f["checksum_type"] == "SHA-1" else None})
+                FetchItem(
+                    key=f"clio.file.{f['id']}",
+                    url=FILE_URL.format(id=f["id"]),
+                    max_bytes=MAX_FILE_BYTES,
+                    expected_media_types=(
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                        "application/octet-stream",
+                    ),
+                    params={
+                        "doi": key.removeprefix("clio.record."),
+                        "filename": f["filename"],
+                        "sha1": f["checksum"] if f["checksum_type"] == "SHA-1" else None,
+                    },
+                )
                 for f in take
             )
         return ()
@@ -397,8 +440,9 @@ class ClioConnector:
                 raise _err(f"{fname}: SHA-1 differs from the dataset record")
             parsed = parse_data_file(fr.body)
             if parsed["layout"] != "clio_polity_wide":
-                report["skipped"].append({"doi": doi, "title": rec["title"], "file": fname,
-                                          "reason": "layout_not_a_clio_data_sheet"})
+                report["skipped"].append(
+                    {"doi": doi, "title": rec["title"], "file": fname, "reason": "layout_not_a_clio_data_sheet"}
+                )
                 continue
             indicator = _stem(fname)
             if stems[indicator] > 1:  # two datasets ship a file of the same name: qualify with the DOI suffix
@@ -410,17 +454,69 @@ class ClioConnector:
             used.append(sha)
             rows.extend(atlas_rows(indicator, parsed, rec, raw_sha256=sha, filename=fname))
             yrs = [c["year"] for c in parsed["cells"]]
-            report["datasets"].append({
-                "doi": doi, "title": rec["title"], "licence": rec["licence"], "indicator": indicator,
-                "unit": parsed["unit"], "cells": len(parsed["cells"]), "polities": len(parsed["polities"]),
-                "years": [min(yrs), max(yrs)] if yrs else None, "non_numeric": parsed["non_numeric"][:5],
-            })
+            report["datasets"].append(
+                {
+                    "doi": doi,
+                    "title": rec["title"],
+                    "licence": rec["licence"],
+                    "indicator": indicator,
+                    "unit": parsed["unit"],
+                    "cells": len(parsed["cells"]),
+                    "polities": len(parsed["polities"]),
+                    "years": [min(yrs), max(yrs)] if yrs else None,
+                    "non_numeric": parsed["non_numeric"][:5],
+                }
+            )
         missing_records = sorted({d["doi"] for d in listed} - set(records))
         if missing_records:
             raise _err(f"dataset records not fetched: {missing_records[:5]}")
-        note = (f"Clio-Infra on DataverseNL (collection {SUBTREE}): {len(report['datasets'])} indicator files from "
-                f"{total} datasets; polity rows (CShapes/GEACRON) kept, ISO numeric ccode mapped through the "
-                "crosswalk; licence per row (CC0 1.0 or CC BY-SA 4.0).")
+        note = (
+            f"Clio-Infra on DataverseNL (collection {SUBTREE}): {len(report['datasets'])} indicator files from "
+            f"{total} datasets; polity rows (CShapes/GEACRON) kept, ISO numeric ccode mapped through the "
+            "crosswalk; licence per row (CC0 1.0 or CC BY-SA 4.0)."
+        )
         lic_set = sorted({ALLOWED_LICENCES[r["licence"]][0] for r in recs.values() if r["licence"] in ALLOWED_LICENCES})
-        return [AtlasBuild(ATLAS_SOURCE, ATLAS_DATASET, frame(rows), sorted(set(used)), PARSER_VERSION, note,
-                           geo_scheme=None, rights={**RIGHTS, "licences_present": lic_set}, report=report)]
+        return [
+            AtlasBuild(
+                ATLAS_SOURCE,
+                ATLAS_DATASET,
+                frame(rows),
+                sorted(set(used)),
+                PARSER_VERSION,
+                note,
+                geo_scheme=None,
+                rights={**RIGHTS, "licences_present": lic_set},
+                report=report,
+            )
+        ]
+
+
+def atlas_source() -> Any:
+    """The atlas platform declaration (``reva.atlas.sources``)."""
+    return source_spec(
+        name=NAME,
+        version=VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        datasets=(ATLAS_DATASET,),
+        provider="Clio-Infra (IISH / Utrecht University), DataverseNL collection clioinfra",
+        licence="CC0 1.0 / CC BY-SA 4.0 (per dataset record)",
+        allowed_hosts=(HOST, "objectstore.surf.nl"),
+        dataset_ids=(f"dataverse:{SUBTREE}",),
+        field_mappings={"indicator": "data file name", "geo": "Webmapper code", "iso3": "ccode (ISO numeric)"},
+        units={"*": "unit row of each data file, verbatim"},
+        geography=("CShapes / GEACRON polities (Webmapper codes); ISO 3166 numeric ccode when given",),
+        time_semantics="calendar year columns as published (some indicators are decade/birth-cohort values)",
+        lineage_family="clio_infra",
+        cadence_seconds=90 * DAY,
+        revision_strategy="new DataverseNL dataset version or file checksum -> new atlas table version",
+        planned_requests=185,
+        max_response_bytes=MAX_FILE_BYTES,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(),
+    )
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    out = await ingest_with_run(run, ClioConnector(min_datasets=1 if run.origin == "test_fixture" else MIN_DATASETS))
+    return {k: v for k, v in out.items() if not k.startswith("_")}

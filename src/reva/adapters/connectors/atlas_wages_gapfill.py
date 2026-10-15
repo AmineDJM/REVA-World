@@ -45,9 +45,10 @@ import polars as pl
 
 from reva.adapters.connectors import atlas_labour_common as common
 from reva.adapters.connectors.atlas_labour_common import AtlasTablePlan, canon, strict_decimal
+from reva.atlas.sources import AtlasSourceSpec
 from reva.atlas.tables import ATLAS_SCHEMA
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 
 def _module() -> Any:
@@ -188,32 +189,8 @@ class EurostatMinimumWageConnector:
     def __init__(self, geos: Sequence[str] | None = None) -> None:
         self.geos = tuple(geos) if geos else None
 
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
-            name="atlas.eurostat.earn_mw_cur",
-            version="1.0.0",
-            source_key=EUROSTAT_SOURCE_KEY,
-            provider="Eurostat",
-            licence=EUROSTAT_RIGHTS["licence"],
-            allowed_hosts=(EUROSTAT_HOST,),
-            dataset_ids=("earn_mw_cur",),
-            field_mappings={
-                "atlas_source": "eurostat",
-                "tables": {"earn_mw_cur": "eurostat.earn_mw_cur"},
-                "geo_scheme": "eurostat",
-            },
-            units=EUROSTAT_CURRENCY_UNITS,
-            geography=self.geos or ("all earn_mw_cur geographies",),
-            time_semantics="semi-annual: S1 -> [Y-01-01, Y-07-01), S2 -> [Y-07-01, Y+1-01-01)",
-            lineage_family="eurostat",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="whole-dataset re-download; changed content = new atlas table version",
-            max_response_bytes=5_000_000,
-            max_pages=1,
-            parser_version=self.parser_version,
-            code_digest=common.code_digest(common, _module()),
-        )
+    def datasets_of(self, item: FetchItem) -> set[str] | None:
+        return None
 
     def plan(self) -> list[FetchItem]:
         return [
@@ -387,37 +364,15 @@ class OecdEarningsConnector:
         self.areas = tuple(areas) if areas else None
         self.flows = tuple(flows)
 
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
-            name="atlas.oecd.earnings",
-            version="1.0.0",
-            source_key=OECD_SOURCE_KEY,
-            provider="OECD (Directorate for Employment, Labour and Social Affairs)",
-            licence=OECD_RIGHTS["licence"],
-            allowed_hosts=(OECD_HOST,),
-            dataset_ids=self.flows,
-            field_mappings={
-                "atlas_source": "oecd",
-                "tables": {f: f"oecd.{OECD_FLOWS[f]}" for f in self.flows},
-                "geo_scheme": "iso3",
-            },
-            units={"MW_CURP": "national currency units per pay period", "AV_AN_WAGE": "per year (unit per row)"},
-            geography=self.areas or ("all OECD reference areas",),
-            time_semantics="annual -> [Y-01-01, Y+1-01-01)",
-            lineage_family="oecd",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="whole-dataflow re-download; changed content = new atlas table version",
-            max_response_bytes=10_000_000,
-            max_pages=1,
-            parser_version=self.parser_version,
-            code_digest=common.code_digest(common, _module()),
-        )
+    def datasets_of(self, item: FetchItem) -> set[str] | None:
+        ds = item.params.get("dataset")
+        return {ds} if ds else None
 
     def plan(self) -> list[FetchItem]:
         return [
             FetchItem(
                 key=f"data:{f}",
+                params={"dataset": OECD_FLOWS[f]},
                 url=oecd_url(f, self.areas),
                 max_bytes=10_000_000,
                 required=False,
@@ -440,12 +395,82 @@ class OecdEarningsConnector:
         return plans
 
 
+# --------------------------------------------------------------------------- ATLASCORE declarations
+EUROSTAT_NAME = "atlas.eurostat.earn_mw_cur"
+OECD_NAME = "atlas.oecd.earnings"
+#: Restricted requests of the recorded offline fixtures (captured live 2026-10-15); used in fixture mode.
+FIXTURE_EUROSTAT_GEOS: tuple[str, ...] = ("FR", "AT", "EL", "UK", "DE")
+FIXTURE_OECD_AREAS: tuple[str, ...] = ("FRA", "USA", "OECD")
+
+
+def atlas_source() -> list[AtlasSourceSpec]:
+    """Two atlas sources: Eurostat earn_mw_cur and OECD earnings (MW_CURP, AV_AN_WAGE)."""
+    digest = common.code_digest(common, _module())
+    return [
+        AtlasSourceSpec(
+            name=EUROSTAT_NAME,
+            version="1.0.0",
+            source_key=EUROSTAT_SOURCE_KEY,
+            atlas_source="eurostat",
+            provider="Eurostat",
+            licence=f"{EUROSTAT_RIGHTS['licence']} ({EUROSTAT_RIGHTS['licence_url']})",
+            allowed_hosts=(EUROSTAT_HOST,),
+            datasets=("earn_mw_cur",),
+            dataset_ids=("earn_mw_cur",),
+            cadence_seconds=30 * 86400,
+            planned_requests=2,
+            max_response_bytes=5_000_000,
+            min_interval_seconds=1.0,
+            parser_version=EurostatMinimumWageConnector.parser_version,
+            code_digest=digest,
+            field_mappings={"geo_scheme": "eurostat", "units": EUROSTAT_CURRENCY_UNITS},
+            notes="Monthly national minimum wages, semi-annual; flag m = no national minimum wage.",
+        ),
+        AtlasSourceSpec(
+            name=OECD_NAME,
+            version="1.0.0",
+            source_key=OECD_SOURCE_KEY,
+            atlas_source="oecd",
+            provider="OECD (Directorate for Employment, Labour and Social Affairs)",
+            licence=f"{OECD_RIGHTS['licence']} ({OECD_RIGHTS['licence_url']})",
+            allowed_hosts=(OECD_HOST,),
+            datasets=tuple(OECD_FLOWS.values()),
+            dataset_ids=tuple(f"OECD.ELS.SAE:{f}" for f in OECD_FLOWS),
+            cadence_seconds=30 * 86400,
+            planned_requests=len(OECD_FLOWS),
+            max_response_bytes=10_000_000,
+            min_interval_seconds=1.0,
+            parser_version=OecdEarningsConnector.parser_version,
+            code_digest=digest,
+            field_mappings={"geo_scheme": "iso3", "tables": {f: f"oecd.{d}" for f, d in OECD_FLOWS.items()}},
+            notes="Statutory minimum wages (NCU, per pay period) and average annual wages per FTE employee.",
+        ),
+    ]
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """ATLASCORE entry point; dispatches on ``run.spec.name``."""
+    fixture = run.origin == "test_fixture"
+    conn: Any
+    if run.spec.name == EUROSTAT_NAME:
+        conn = EurostatMinimumWageConnector(geos=FIXTURE_EUROSTAT_GEOS if fixture else None)
+    elif run.spec.name == OECD_NAME:
+        conn = OecdEarningsConnector(areas=FIXTURE_OECD_AREAS if fixture else None)
+    else:  # pragma: no cover - the platform only calls declared names
+        raise ValueError(f"unknown atlas source {run.spec.name}")
+    return await common.ingest_with_run(run, conn)
+
+
 __all__ = [
+    "EUROSTAT_NAME",
     "EUROSTAT_RIGHTS",
     "OECD_FLOWS",
+    "OECD_NAME",
     "OECD_RIGHTS",
     "EurostatMinimumWageConnector",
     "OecdEarningsConnector",
+    "atlas_ingest",
+    "atlas_source",
     "parse_eurostat_mw",
     "parse_oecd_earnings",
     "parse_sdmx_codelist",

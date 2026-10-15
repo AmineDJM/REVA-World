@@ -63,8 +63,9 @@ import polars as pl
 
 from reva.adapters.connectors import atlas_labour_common as common
 from reva.adapters.connectors.atlas_labour_common import AtlasTablePlan, canon, gunzip_bounded, read_csv_text
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 SOURCE = "ilostat"
 SOURCE_KEY = "ilostat.rplumber"
@@ -260,34 +261,10 @@ class IlostatConnector:
         self.ref_areas = tuple(ref_areas) if ref_areas else None
 
     # ------------------------------------------------------------------ descriptor
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="International Labour Organization (ILOSTAT)",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=tuple(i.id for i in self.indicators),
-            field_mappings={
-                "atlas_source": SOURCE,
-                "tables": {i.id: f"{SOURCE}.{i.dataset}" for i in self.indicators},
-                "estimate_type": {i.id: i.estimate for i in self.indicators},
-                "geo_scheme": GEO_SCHEME,
-                "dictionaries": list(DICTIONARIES),
-            },
-            units={i.id: i.unit for i in self.indicators},
-            geography=self.ref_areas or ("all ILOSTAT reference areas",),
-            time_semantics="annual; ILOSTAT 'time' = reference year -> [Y-01-01, Y+1-01-01)",
-            lineage_family="ilostat",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="whole-file re-download; changed content = new atlas table version",
-            max_response_bytes=max(i.max_bytes for i in self.indicators),
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=common.code_digest(common, _module()),
-        )
+    def datasets_of(self, item: FetchItem) -> set[str] | None:
+        """Atlas datasets that need ``item`` (``None``: every dataset, e.g. dictionaries / TOC)."""
+        ind = item.params.get("indicator")
+        return {ind.lower()} if ind else None
 
     def plan(self) -> list[FetchItem]:
         items = [
@@ -360,6 +337,46 @@ class IlostatConnector:
                 )
             )
         return plans
+
+
+#: Areas of the recorded offline fixtures (tests/fixtures/source/atlas.ilostat): in fixture mode the
+#: connector requests exactly these restricted URLs, which is what was captured live on 2026-10-15.
+FIXTURE_REF_AREAS: tuple[str, ...] = ("FRA", "DZA", "KOS", "AUT", "TWN", "X01")
+
+
+def atlas_source() -> AtlasSourceSpec:
+    """ATLASCORE atlas source declaration (``uv run python -m reva.atlas.ingest atlas.ilostat``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=SOURCE,
+        provider="International Labour Organization (ILOSTAT)",
+        licence=f"{RIGHTS['licence']} ({RIGHTS['terms_url']}); attribution: {RIGHTS['attribution']}",
+        allowed_hosts=(HOST,),
+        datasets=tuple(i.dataset for i in INDICATORS),
+        dataset_ids=tuple(i.id for i in INDICATORS),
+        cadence_seconds=30 * 86400,
+        planned_requests=1 + len(DICTIONARIES) + len(INDICATORS),
+        max_response_bytes=max(i.max_bytes for i in INDICATORS),
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=common.code_digest(common, _module()),
+        field_mappings={
+            "tables": {i.id: f"{SOURCE}.{i.dataset}" for i in INDICATORS},
+            "estimate_type": {i.id: i.estimate for i in INDICATORS},
+            "units": {i.id: i.unit for i in INDICATORS},
+            "geo_scheme": GEO_SCHEME,
+            "dictionaries": list(DICTIONARIES),
+        },
+        notes="One gzip CSV per ILOSTAT indicator (all areas, all years) + code dictionaries + TOC.",
+    )
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """ATLASCORE entry point: every ILOSTAT table (or ``run.dataset`` only)."""
+    areas = FIXTURE_REF_AREAS if run.origin == "test_fixture" else None
+    return await common.ingest_with_run(run, IlostatConnector(ref_areas=areas))
 
 
 def _module() -> Any:
@@ -587,12 +604,15 @@ def parse_indicator(
 __all__ = [
     "CONNECTOR_NAME",
     "DICTIONARIES",
+    "FIXTURE_REF_AREAS",
     "INDICATORS",
     "RIGHTS",
     "SOURCE",
     "SOURCE_KEY",
     "IloIndicator",
     "IlostatConnector",
+    "atlas_ingest",
+    "atlas_source",
     "parse_dictionary",
     "parse_indicator",
 ]

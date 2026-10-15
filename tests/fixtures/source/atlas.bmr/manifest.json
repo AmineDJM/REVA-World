@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "24bde9d7c5231ee0f091220c317134f662a1951c01a1153bec418b4283d56c49",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/FENWWR",
+    "file": "24bde9d7c5231ee0.json",
+    "sha256": "6e95b3a27e7d46148098aae26b29fe0f9189989e1d7a743e2ab7907f399a78cd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": null,
+    "note": "real record; file MD5 replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "c2349a256d9e84cd91438a21c1332333283b6be95f627ff771bde687234fdaba",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/5707006?format=original",
+    "file": "c2349a256d9e84cd.csv",
+    "sha256": "1544f0a47d7704149b4e602fa90e558b22ed17d1b318871f503071a1df6046d3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "18e2ea831875e0d163d44f933e4ccf3f6beca199f94adf4784405e0993a0d6b6",
+    "note": "subset of democracy-v4.0.csv: header + rows of ccodes ('2', '220', '255', '260', '364', '365', '490', '713'); lines unchanged"
+  }
+]

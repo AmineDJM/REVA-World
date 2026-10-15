@@ -1,0 +1,31 @@
+# Budget request from agent A-POL (politics atlas). ATLASCORE merges into registry/policies/budgets.yaml.
+# Every source is a bulk download (whole dataset per request). A full refresh of all four is 11 requests / ~95 MB.
+agent: A-POL
+requests:
+  - source_key: vdem.vdemdata
+    # raw.githubusercontent.com/vdeminstitute/vdemdata/master: DESCRIPTION (1 KB), data/codebook.RData (150 KB),
+    # data/vdem.RData (34 MB, V-Dem v16 Full+Others). CC BY-SA 4.0.
+    daily_requests: 9
+    expected_bytes_per_day: 105000000
+    reason: "V-Dem v16: 3 requests per run (package description, codebook, dataset); 3 runs/day headroom for retries"
+  - source_key: ipu.parline
+    # api.data.ipu.org/v1/{chambers,parliaments,countries,elections}, one page each (26 + 5 + 5 + 11 MB). CC BY-NC-SA 4.0.
+    daily_requests: 12
+    expected_bytes_per_day: 145000000
+    reason: "IPU Parline: 4 requests per run; 3 runs/day headroom"
+  - source_key: lied.dataverse
+    # dataverse.harvard.edu dataset record + LIED_6.9.xlsx (2.4 MB; 303 redirect to dvn-cloud-iqss.s3.amazonaws.com). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 8000000
+    reason: "LIED v6.9: 2 requests per run"
+  - source_key: bmr.dataverse
+    # dataverse.harvard.edu dataset record + democracy-v4.0.csv (0.8 MB; redirect to S3). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 3000000
+    reason: "BMR v4.0: 2 requests per run"
+daily_totals_increase:
+  http_requests_total: "+33"
+  http_bytes_total: "+261_000_000"
+notes: >-
+  Not requested (licence): Polity5 (CSP forbids redistribution), International IDEA voter turnout (no commercial
+  benefit; IDEA claims rights in derived work), CCP characteristics (agent A-LAW). See docs/dev/v3_a_pol.md.

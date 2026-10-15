@@ -30,14 +30,21 @@ async def _builds(connector: Any, name: str) -> tuple[list[Any], list[RawAcquisi
 
 
 def _valid(b: Any) -> tuple[pl.DataFrame, list[dict[str, Any]]]:
-    return validate_atlas_frame(b.frame, source=b.source, dataset=b.dataset, raw_sha256s=b.raw_sha256s,
-                                geo_scheme=b.geo_scheme)
+    return validate_atlas_frame(
+        b.frame, source=b.source, dataset=b.dataset, raw_sha256s=b.raw_sha256s, geo_scheme=b.geo_scheme
+    )
 
 
 def _raw(key: str, body: bytes, url: str = "https://example.invalid/x", **params: Any) -> RawAcquisition:
-    return RawAcquisition(item=FetchItem(key=key, url=url, max_bytes=10**8, params=params), body=body,
-                          media_type="application/octet-stream", retrieved_at=datetime(2026, 10, 15, tzinfo=UTC),
-                          response_metadata={}, request_fingerprint="x", origin="test_fixture")
+    return RawAcquisition(
+        item=FetchItem(key=key, url=url, max_bytes=10**8, params=params),
+        body=body,
+        media_type="application/octet-stream",
+        retrieved_at=datetime(2026, 10, 15, tzinfo=UTC),
+        response_metadata={},
+        request_fingerprint="x",
+        origin="test_fixture",
+    )
 
 
 # --------------------------------------------------------------------------- shared helpers
@@ -63,7 +70,9 @@ def test_xlsx_reader_refuses_dtd_and_garbage() -> None:
 
 
 def test_historical_qids_file_is_well_formed() -> None:
-    entries = historical_qids("maddison") + historical_qids("cow") + historical_qids("clio") + historical_qids("gapminder")
+    entries = (
+        historical_qids("maddison") + historical_qids("cow") + historical_qids("clio") + historical_qids("gapminder")
+    )
     assert entries, "registry/entities/historical_states_qids.json must list the mapped historical states"
     for e in entries:
         assert e["qid"].startswith("Q") and e["review_status"] == "agent_mapped_pending_maintainer_review"
@@ -84,7 +93,9 @@ async def test_maddison_fixture_parses_with_provider_notes() -> None:
     flags = json.loads(y1["flags"])
     assert flags["mpd_cell_flag"] == "none_published" and flags["mpd_sparse_period"] is True
     assert flags["mpd_sources"][0]["source"].startswith("Scheidel")  # the provider's own source for year 1
-    g22 = json.loads(fra.filter((pl.col("period_start") == date(2022, 1, 1)) & (pl.col("indicator") == "gdppc"))["flags"][0])
+    g22 = json.loads(
+        fra.filter((pl.col("period_start") == date(2022, 1, 1)) & (pl.col("indicator") == "gdppc"))["flags"][0]
+    )
     assert "Total Economy Database" in g22["mpd_general_note"]
     # historical / non-crosswalk codes kept, never dropped, with agent-mapped QIDs
     geos = {u["provider_geo"] for u in unmapped}
@@ -134,7 +145,11 @@ async def test_clio_fixture_parses_polities_and_licences() -> None:
     assert gea.height > 0 and gea["iso3"].null_count() == gea.height
     assert all(u["rows"] > 0 for u in unmapped)
     assert set(f["indicator"].unique().to_list()) == {
-        "Height-historical", "Labourers_wage-historical", "Infant_mortality-historical", "Total_Population-historical"}
+        "Height-historical",
+        "Labourers_wage-historical",
+        "Infant_mortality-historical",
+        "Total_Population-historical",
+    }
 
 
 async def test_clio_unknown_licence_is_never_published() -> None:
@@ -155,16 +170,23 @@ async def test_clio_unknown_licence_is_never_published() -> None:
 async def test_gapminder_excludes_projections_and_flags_segments() -> None:
     (b,), _ = await _builds(atlas_gapminder.GapminderConnector(), atlas_gapminder.NAME)
     f, unmapped = _valid(b)
-    last = {r["indicator"]: r["period_start"].year for r in
-            f.group_by("indicator").agg(pl.col("period_start").max()).to_dicts()}
+    last = {
+        r["indicator"]: r["period_start"].year
+        for r in f.group_by("indicator").agg(pl.col("period_start").max()).to_dicts()
+    }
     assert last == {"pop": 2023, "lex": 2019, "gdp_pcap": 2024}
     rep = b.report["series"]
     assert all(s["excluded_projection_cells"] > 0 for s in rep.values())
     assert rep["lex"]["version_mismatch"] is True
     lex = json.loads(f.filter(pl.col("indicator") == "lex")["flags"][0])
     assert lex["documentation_version_mismatch"]["documented"] == "v14"
-    fra1800 = json.loads(f.filter((pl.col("provider_geo") == "fra") & (pl.col("indicator") == "pop")
-                                  & (pl.col("period_start") == date(1800, 1, 1)))["flags"][0])
+    fra1800 = json.loads(
+        f.filter(
+            (pl.col("provider_geo") == "fra")
+            & (pl.col("indicator") == "pop")
+            & (pl.col("period_start") == date(1800, 1, 1))
+        )["flags"][0]
+    )
     assert fra1800["composite_reconstruction"] is True and "Clio Infra" in fra1800["segment"]
     assert unmapped == [{"provider_geo": "twn", "rows": unmapped[0]["rows"]}]
     twn = f.filter(pl.col("provider_geo") == "twn")
@@ -208,10 +230,18 @@ async def test_cow_kg_membership_statements() -> None:
     usa = [s for s in sts if s.subject_qid == "cow:2" and s.object_qid == "cow:system:interstate"]
     assert len(usa) == 1 and usa[0].start.iso == "1816-01-01" and usa[0].end is None
     assert usa[0].qualifiers["observed_until"] == "2024-12-31"
-    fra = sorted((s for s in sts if s.subject_qid == "cow:220" and s.property_pid == "P463"
-                  and s.object_qid == "cow:system:interstate"), key=lambda s: s.start.iso)
+    fra = sorted(
+        (
+            s
+            for s in sts
+            if s.subject_qid == "cow:220" and s.property_pid == "P463" and s.object_qid == "cow:system:interstate"
+        ),
+        key=lambda s: s.start.iso,
+    )
     assert [(s.start.iso, s.end.iso if s.end else None) for s in fra] == [
-        ("1816-01-01", "1942-11-11"), ("1944-08-25", None)]
+        ("1816-01-01", "1942-11-11"),
+        ("1944-08-25", None),
+    ]
     majors = [s for s in sts if s.object_qid == "cow:system:major_powers"]
     assert majors and all(s.property_pid == "P463" for s in majors)
     wars = [s for s in sts if s.property_pid == "P1344"]
@@ -278,6 +308,9 @@ async def test_hyde_tail_parse_and_bce_exclusion() -> None:
 def test_hyde_readme_licence_clause_required() -> None:
     from reva.adapters.connectors import atlas_hyde
 
-    assert atlas_hyde.check_readme(b"The Creative Commons License (CC BY 3.0) applies to all of the HYDE data.") == "CC BY 3.0"
+    assert (
+        atlas_hyde.check_readme(b"The Creative Commons License (CC BY 3.0) applies to all of the HYDE data.")
+        == "CC BY 3.0"
+    )
     with pytest.raises(SourceResponseError):
         atlas_hyde.check_readme(b"All rights reserved.")
