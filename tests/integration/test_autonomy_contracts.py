@@ -448,8 +448,8 @@ async def test_health_from_recorded_runs(db, io):
     c = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
     with db.worker.connect() as conn:
-        cv = conn.execute(text("SELECT id FROM evidence.connector_version WHERE name='worldbank.wdi.indicators'"
-                               )).scalar_one()
+        cv = conn.execute(text("SELECT id FROM evidence.connector_version WHERE name = :n AND version = :v"),
+                          {"n": c.describe().name, "v": c.describe().version}).scalar_one()
         hist = run_history_from_db(conn, cv)
     assert hist["runs"]
     h = RunHistoryHealthMonitor(io).assess(cv, io.put_json(hist, "evaluation"),

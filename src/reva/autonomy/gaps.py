@@ -44,7 +44,7 @@ WITH latest AS (
 )
 SELECT c.concept_id, l.subject_id, ws.temporal_extent->>'start' AS start, l.value->>'kind' AS kind,
        l.value->>'reason' AS reason, l.recorded_at, s.source_key,
-       evidence.is_eligible(l.connector_version_id, l.concept_version_id, l.subject_id, :cutoff) AS eligible
+       evidence.observation_is_eligible(l.id, :cutoff) AS eligible
 FROM latest l
 JOIN ontology.concept_version c ON c.id = l.concept_version_id
 JOIN world.support ws ON ws.id = l.support_id
