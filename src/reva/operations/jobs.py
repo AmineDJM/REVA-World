@@ -58,6 +58,7 @@ HANDLERS: dict[str, str] = {
     "gc": "reva.operations.gc:handle_gc",
     "evaluation": "reva.evaluation.tournament_service:handle_evaluation",
     "population": "reva.population.service:handle_population",
+    "connector_repair": "reva.autonomy.repair:handle_connector_repair",
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation
@@ -66,6 +67,9 @@ SIM_ENGINE_JOB_TYPES = frozenset({"simulation", "replay", "evaluation", "populat
 
 PUBLISH_JOB_LOCK = 7262021
 PUBLISH_PRIORITY = 5
+REPAIR_PRIORITY = 0
+# Marker namespace of reva.autonomy.repair.PAUSE_PREFIX ("publication_pause:" + "belief:<concept>").
+PAUSE_NODE_PREFIX = "publication_pause:"
 
 
 class HandlerUnavailable(RevaError):
@@ -165,10 +169,57 @@ def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: in
 
 
 def dirty_belief_nodes(conn: Connection) -> int:
+    """Dirty belief nodes that a publication can actually refresh.
+
+    Nodes of concepts whose publication is paused (``publication_pause:belief:<concept>``,
+    see :mod:`reva.autonomy.repair`) are excluded: a release withholds them, so they stay
+    dirty until the pause is lifted (``connector.publication_resumed`` re-enqueues the
+    publication) instead of triggering identical releases.
+    """
     return int(conn.execute(
-        text("SELECT count(*) FROM ops.dirty_node WHERE node_key LIKE 'belief:%' "
-             "AND reason NOT LIKE 'materiality_skip%'")
+        text("SELECT count(*) FROM ops.dirty_node d WHERE d.node_key LIKE 'belief:%' "
+             "AND d.reason NOT LIKE 'materiality_skip%' "
+             "AND NOT EXISTS (SELECT 1 FROM ops.dirty_node p WHERE p.node_key = :pp || d.node_key)"),
+        {"pp": PAUSE_NODE_PREFIX},
     ).scalar_one())
+
+
+def repair_idempotency_key(connector: str, acquisition_id: str) -> str:
+    """Stable key per (connector, quarantined acquisition): one repair job per case."""
+    from reva.adapters.postgres.queue import idempotency_key
+
+    return idempotency_key("connector_repair", {"connector": connector, "acquisition_id": str(acquisition_id)})
+
+
+def enqueue_connector_repair(conn: Connection, connector: str, origin: str, acquisition_id: str, *,
+                             created_by: str, audit_actor: str | None = None) -> Any:
+    """Idempotent ``connector_repair`` job for one quarantined acquisition.
+
+    The payload names only the connector and origin the handler reads (plus the
+    triggering acquisition for traceability); the handler re-derives the case
+    from the database, so nothing in the payload selects hosts, fixtures or tiers.
+    """
+    from reva.adapters.postgres.queue import enqueue_resolving_conflict
+
+    payload = {"connector": connector, "origin": origin, "acquisition_id": str(acquisition_id)}
+    res = enqueue_resolving_conflict(conn, "connector_repair", payload,
+                                     repair_idempotency_key(connector, str(acquisition_id)),
+                                     priority=REPAIR_PRIORITY, created_by=created_by)
+    if res.conflict is not None and res.created:
+        from reva.operations.audit import record
+        from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
+
+        log.error("connector_repair key %s is held by foreign job %s; created job %s under %s",
+                  res.conflict["idempotency_key"], res.conflict["foreign_job_id"], res.job_id,
+                  res.conflict["disambiguated_key"])
+        IDEMPOTENCY_CONFLICTS.inc(job_type="connector_repair")
+        try:
+            with conn.begin_nested():
+                record(conn, audit_actor or "system", "jobs.repair_key_conflict", {"job_id": str(res.job_id)},
+                       res.conflict)
+        except Exception as e:
+            log.warning("could not audit repair key conflict: %s", type(e).__name__)
+    return res
 
 
 # --------------------------------------------------------------------------- ingest

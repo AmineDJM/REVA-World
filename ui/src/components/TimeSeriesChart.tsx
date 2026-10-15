@@ -72,7 +72,8 @@ export function TimeSeriesChart({ points, label, yLabel, bandKind = null, height
         bands: hasBand && bandKind === 'prediction' ? [{ series: [3, 2], fill: 'rgba(31,78,121,0.15)' }] : undefined,
         scales: { x: { time: false } },
         axes: [
-          { values: (_u, vals) => vals.map((v) => String(Math.round(v))) },
+          // Years are integers: tick only at whole-year increments so labels never repeat.
+          { incrs: [1, 2, 5, 10, 20, 50, 100], values: (_u, vals) => vals.map((v) => String(Math.round(v))) },
           { label: yLabel, size: 80, values: (_u, vals) => vals.map((v) => compact(v)) },
         ],
         legend: { show: false },

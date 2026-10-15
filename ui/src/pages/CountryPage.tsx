@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-import { getBeliefs, getCoverage, getEntity, getGaps, getLocations, getOntology, getTimeseries } from '../api/client';
+import { getBeliefs, getCoverage, getEntity, getGaps, getLocations, getObservations, getOntology, getTimeseries } from '../api/client';
 import { ApiError } from '../api/problem';
 import {
   COUNTRY_CODES,
@@ -23,7 +23,7 @@ import { TimeSeriesChart, type SeriesPoint } from '../components/TimeSeriesChart
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
 import { ValueView } from '../components/ValueView';
 import { computeAvailability, yearOf } from '../lib/availability';
-import { formatDateTime, humanize, unitLabel } from '../lib/format';
+import { formatDateTime, humanize, sourceFlagNotes, unitLabel } from '../lib/format';
 import { useApi } from '../lib/useApi';
 import { PROFILE_PANELS } from '../lib/concepts';
 
@@ -48,6 +48,10 @@ interface Row {
   detail: string;
   provKind: 'estimate' | 'observation';
   provId: string;
+  /** Observation the value comes from (joins provider source flags). */
+  observationId: string | null;
+  /** Provider source-flag notes (e.g. provider estimate, not directly reported). */
+  flags: string[];
 }
 
 const rowColumns: ColumnDef<Row, unknown>[] = [
@@ -55,7 +59,21 @@ const rowColumns: ColumnDef<Row, unknown>[] = [
   { header: 'Value', id: 'value', cell: (c) => <ValueView value={c.row.original.value} showBasis /> },
   { header: 'Uncertainty', id: 'unc', cell: (c) => <UncertaintyPanel uncertainty={c.row.original.uncertainty} compact /> },
   { header: 'Source', accessorKey: 'source' },
-  { header: 'Notes', accessorKey: 'detail' },
+  {
+    header: 'Notes',
+    id: 'notes',
+    cell: (c) => (
+      <>
+        {c.row.original.detail}
+        {c.row.original.flags.length > 0 && (
+          <span className="source-flag" data-testid="source-flag">
+            {' '}
+            · {c.row.original.flags.join('; ')}
+          </span>
+        )}
+      </>
+    ),
+  },
   {
     header: 'Provenance',
     id: 'prov',
@@ -77,6 +95,8 @@ function beliefRows(data: BeliefEstimate[]): Row[] {
       detail: [humanize(e.modality), ...flags.map(humanize)].join('; '),
       provKind: 'estimate',
       provId: e.id,
+      observationId: e.observation_id ?? null,
+      flags: [],
     };
   });
 }
@@ -92,6 +112,8 @@ function evidenceRows(points: TimeseriesPoint[]): Row[] {
     detail: `${humanize(p.temporal_kind)}; ${humanize(p.aggregation)}; retrieved ${formatDateTime(p.retrieved_at)}`,
     provKind: 'observation',
     provId: p.observation_id,
+    observationId: p.observation_id,
+    flags: [],
   }));
 }
 
@@ -99,11 +121,15 @@ function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; conc
   const [mode, setMode] = useState<'belief' | 'evidence'>('belief');
   const beliefs = useApi((s) => getBeliefs({ subject_id: iso3, concept, limit: 1000 }, s), [iso3, concept], mode === 'belief');
   const series = useApi((s) => getTimeseries({ subject_id: iso3, concept }, s), [iso3, concept], mode === 'evidence');
+  // Provider source flags (estimation / not-reported markers) live on the observations.
+  const observations = useApi((s) => getObservations({ subject_id: iso3, concept, limit: 1000 }, s), [iso3, concept]);
   const state = mode === 'belief' ? beliefs : series;
   const rows = useMemo(() => {
-    if (mode === 'belief') return beliefs.data ? beliefRows(beliefs.data.data) : [];
-    return series.data ? evidenceRows(series.data.data.points) : [];
-  }, [mode, beliefs.data, series.data]);
+    const base = mode === 'belief' ? (beliefs.data ? beliefRows(beliefs.data.data) : []) : series.data ? evidenceRows(series.data.data.points) : [];
+    const flagsById = new Map<string, string[]>();
+    for (const o of observations.data?.data ?? []) flagsById.set(o.id, sourceFlagNotes(o.source_flags));
+    return base.map((r) => (r.observationId && flagsById.get(r.observationId)?.length ? { ...r, flags: flagsById.get(r.observationId)! } : r));
+  }, [mode, beliefs.data, series.data, observations.data]);
   const sorted = useMemo(() => [...rows].sort((a, b) => (a.year ?? 0) - (b.year ?? 0)), [rows]);
   const chartPoints: SeriesPoint[] = useMemo(
     () => sorted.filter((r) => r.year !== null).map((r) => ({ x: r.year!, y: numeric(r.value) })),
@@ -148,6 +174,7 @@ function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; conc
           {latest && (
             <p className="headline">
               Latest ({latest.period}): <ValueView value={latest.value} compact showBasis />
+              {latest.flags.length > 0 && <span className="source-flag"> · {latest.flags.join('; ')}</span>}
             </p>
           )}
           {missingPeriods.length > 0 && (

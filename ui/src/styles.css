@@ -240,6 +240,9 @@ button:disabled {
 }
 
 /* ------------------------------------------------------------- values */
+.source-flag {
+  color: #7a4100;
+}
 .missing-value {
   color: var(--missing);
   font-style: italic;
@@ -612,6 +615,10 @@ label {
 .field-hint {
   font-size: 0.82rem;
   color: var(--muted);
+}
+label > .field-hint,
+label > .field-error {
+  display: block;
 }
 .field-error {
   color: #b42318;

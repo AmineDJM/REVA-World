@@ -362,6 +362,7 @@ def logical_manifest(conn: psycopg.Connection[Any], *, in_transaction: bool = Fa
                 )
                 for r in cur.fetchall()
             ]
+            catalog = catalog_manifest(cur)
     finally:
         if not in_transaction:
             conn.execute("COMMIT")
@@ -372,9 +373,73 @@ def logical_manifest(conn: psycopg.Connection[Any], *, in_transaction: bool = Fa
         "artifact_count": len(artifact_shas),
         "artifact_sha256_list_digest": hashlib.sha256("\n".join(artifact_shas).encode()).hexdigest(),
         "releases": releases,
+        "catalog": catalog,
     }
     body["manifest_sha256"] = hashlib.sha256(json.dumps(body, sort_keys=True).encode()).hexdigest()
     return body
+
+
+# Security-relevant catalog state that a data-only comparison would miss: a restore
+# that silently lost an append-only trigger, an RLS policy or a grant must fail.
+# ACL entries are exploded and normalised (grantor and the owner's own implicit
+# entry dropped) because restore uses --no-owner: the restoring role becomes owner.
+CATALOG_QUERIES: dict[str, str] = {
+    "triggers": """
+        SELECT n.nspname || '.' || c.relname, t.tgname, t.tgenabled::text, pg_get_triggerdef(t.oid)
+        FROM pg_trigger t JOIN pg_class c ON c.oid = t.tgrelid JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE NOT t.tgisinternal AND n.nspname = ANY(%(s)s) ORDER BY 1, 2""",
+    "rls_tables": """
+        SELECT n.nspname || '.' || c.relname, c.relrowsecurity, c.relforcerowsecurity
+        FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        WHERE n.nspname = ANY(%(s)s) AND (c.relrowsecurity OR c.relforcerowsecurity) ORDER BY 1""",
+    "policies": """
+        SELECT schemaname || '.' || tablename, policyname, permissive, roles::text, cmd,
+               coalesce(qual, ''), coalesce(with_check, '')
+        FROM pg_policies WHERE schemaname = ANY(%(s)s) ORDER BY 1, 2""",
+    "functions": """
+        SELECT p.oid::regprocedure::text, p.prosecdef, coalesce(array_to_string(p.proconfig, ','), ''),
+               p.provolatile::text, md5(coalesce(p.prosrc, ''))
+        FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+        WHERE n.nspname = ANY(%(s)s) ORDER BY 1""",
+    "grants": """
+        WITH acl AS (
+          SELECT 'schema' AS kind, n.nspname AS obj, n.nspowner AS owner,
+                 (aclexplode(coalesce(n.nspacl, acldefault('n', n.nspowner)))).*
+          FROM pg_namespace n WHERE n.nspname = ANY(%(s)s)
+          UNION ALL
+          SELECT CASE c.relkind WHEN 'S' THEN 'sequence' ELSE 'relation' END, n.nspname || '.' || c.relname,
+                 c.relowner,
+                 (aclexplode(coalesce(c.relacl, acldefault(CASE c.relkind WHEN 'S' THEN 's' ELSE 'r' END::"char",
+                                                          c.relowner)))).*
+          FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = ANY(%(s)s) AND c.relkind IN ('r', 'p', 'v', 'm', 'S', 'f')
+          UNION ALL
+          SELECT 'column', n.nspname || '.' || c.relname || '.' || a.attname, c.relowner, (aclexplode(a.attacl)).*
+          FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace
+          WHERE n.nspname = ANY(%(s)s) AND a.attacl IS NOT NULL AND NOT a.attisdropped
+          UNION ALL
+          SELECT 'function', p.oid::regprocedure::text, p.proowner,
+                 (aclexplode(coalesce(p.proacl, acldefault('f', p.proowner)))).*
+          FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace WHERE n.nspname = ANY(%(s)s)
+          UNION ALL
+          SELECT 'database', '<current>', d.datdba, (aclexplode(coalesce(d.datacl, acldefault('d', d.datdba)))).*
+          FROM pg_database d WHERE d.datname = current_database()
+        )
+        SELECT acl.kind, acl.obj, CASE WHEN acl.grantee = 0 THEN 'PUBLIC' ELSE r.rolname END,
+               acl.privilege_type, acl.is_grantable
+        FROM acl LEFT JOIN pg_roles r ON r.oid = acl.grantee
+        WHERE acl.grantee <> acl.owner ORDER BY 1, 2, 3, 4""",
+    "extensions": "SELECT extname, extversion FROM pg_extension ORDER BY 1",
+}
+
+
+def catalog_manifest(cur: psycopg.Cursor[Any]) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for name, q in CATALOG_QUERIES.items():
+        cur.execute(q, {"s": list(SCHEMAS)})
+        out[name] = [list(r) for r in cur.fetchall()]
+    out["counts"] = {k: len(v) for k, v in out.items()}
+    return out
 
 
 def diff_manifests(a: Mapping[str, Any], b: Mapping[str, Any]) -> list[str]:
@@ -385,6 +450,16 @@ def diff_manifests(a: Mapping[str, Any], b: Mapping[str, Any]) -> list[str]:
     for key in ("schema_version", "artifact_count", "artifact_sha256_list_digest", "releases"):
         if a.get(key) != b.get(key):
             out.append(f"{key} differs")
+    ca, cb = a.get("catalog"), b.get("catalog")
+    if ca is not None and cb is not None:  # backups taken before the catalog section have none
+        for key in sorted(set(ca) | set(cb)):
+            if key == "counts":
+                continue
+            sa = {json.dumps(x) for x in ca.get(key, [])}
+            sb = {json.dumps(x) for x in cb.get(key, [])}
+            if sa != sb:
+                lost, extra = sorted(sa - sb)[:5], sorted(sb - sa)[:5]
+                out.append(f"catalog {key}: missing after restore {lost}; unexpected {extra}")
     return out
 
 
@@ -450,31 +525,180 @@ def object_inventory(settings: Any, *, verify_content: bool = True) -> list[dict
 
 
 def _location_key(uri: str, settings: Any) -> str:
+    """Store key (``<prefix><namespace>/sha256/aa/bb/<sha>``) of a recorded location.
+
+    ``meta.artifact_location.storage_uri`` is immutable history: a filesystem
+    location keeps the absolute root it was written under, and an S3 location
+    its bucket. The application reads objects by (namespace, sha256) from the
+    *configured* store, so a restore into a fresh object root or bucket is
+    checked by key, not by the historical root.
+    """
     parts = urlsplit(uri)
     if parts.scheme == "file":
-        return str(Path(parts.path).resolve().relative_to(Path(settings.reva_object_root).resolve()))
+        path = Path(parts.path)
+        try:
+            return str(path.resolve().relative_to(Path(settings.reva_object_root).resolve()))
+        except ValueError:
+            segs = path.parts
+            if len(segs) < 5 or segs[-4] != "sha256":
+                raise
+            return settings.reva_s3_prefix + "/".join(segs[-5:])
     return parts.path.lstrip("/")
 
 
+def _parse_key(key: str, prefix: str) -> tuple[str, str]:
+    """(namespace, sha256) of a store key; raises BackupError on anything else."""
+    from reva.adapters.objects.common import object_key
+
+    rest = key[len(prefix) :] if key.startswith(prefix) else None
+    segs = rest.split("/") if rest is not None else []
+    if len(segs) != 5:
+        raise BackupError(f"unexpected object key {key[:120]!r}")
+    namespace, sha = segs[0], segs[4]
+    try:
+        if object_key(prefix, namespace, sha) != key:
+            raise ValueError
+    except (ValueError, Exception) as e:  # check_namespace raises a typed RevaError
+        raise BackupError(f"unexpected object key {key[:120]!r}") from e
+    return namespace, sha
+
+
 def check_locations(conn: psycopg.Connection[Any], inventory: list[dict[str, Any]], settings: Any) -> dict[str, Any]:
+    """Every recorded location exists, its bytes hash to its address and size; every
+    non-inline artifact is backed by at least one present object of the recorded size."""
     keys = {i["key"]: i for i in inventory}
     with conn.cursor() as cur:
-        cur.execute("SELECT artifact_sha256, storage_uri, verified_byte_size FROM meta.artifact_location")
+        cur.execute(
+            "SELECT l.artifact_sha256, l.storage_uri, l.verified_byte_size, a.byte_size FROM meta.artifact_location l"
+            " JOIN meta.artifact a ON a.sha256 = l.artifact_sha256"
+        )
         rows = cur.fetchall()
-    missing, mismatched = [], []
-    for sha, uri, size in rows:
+        cur.execute(
+            "SELECT a.sha256 FROM meta.artifact a WHERE NOT EXISTS"
+            " (SELECT 1 FROM meta.artifact_inline i WHERE i.artifact_sha256 = a.sha256)"
+        )
+        need_object = {r[0] for r in cur.fetchall()}
+    missing, mismatched, relocated = [], [], 0
+    backed: set[str] = set()
+    for sha, uri, size, artifact_size in rows:
         try:
             key = _location_key(uri, settings)
         except ValueError:
             missing.append(uri)
             continue
+        if urlsplit(uri).scheme == "file" and not uri.startswith(f"file://{Path(settings.reva_object_root).resolve()}/"):
+            relocated += 1
         item = keys.get(key)
         if item is None:
             missing.append(uri)
-        elif item["address"] != sha or item["bytes"] != size or item["content_ok"] is False:
+        elif (
+            item["address"] != sha
+            or item["bytes"] != size
+            or item["bytes"] != artifact_size
+            or item["content_ok"] is False
+        ):
             mismatched.append(uri)
+        else:
+            backed.add(sha)
     bad_content = [i["key"] for i in inventory if i["content_ok"] is False]
-    return {"locations": len(rows), "missing": missing, "mismatched": mismatched, "corrupt_objects": bad_content}
+    return {
+        "locations": len(rows),
+        "relocated_locations": relocated,
+        "artifacts": len(need_object),
+        "artifacts_verified": len(backed & need_object),
+        "unbacked_artifacts": sorted(need_object - backed)[:50],
+        "missing": missing,
+        "mismatched": mismatched,
+        "corrupt_objects": bad_content,
+    }
+
+
+def _locations_ok(res: Mapping[str, Any]) -> bool:
+    return not (res.get("missing") or res.get("mismatched") or res.get("corrupt_objects") or res.get("unbacked_artifacts"))
+
+
+# --- sealed release manifests ------------------------------------------------------------
+
+
+def verify_releases(conn: psycopg.Connection[Any], store: Any) -> dict[str, Any]:
+    """Re-verify every belief release against its sealed manifest in the object store.
+
+    Per release: the manifest object exists and hashes to ``manifest_sha256``; its
+    bytes are the canonical JSON whose logical hash is recorded in meta.artifact;
+    origin, method, cutoff and the ontology/model manifest digests equal the release
+    row; the estimates Parquet is the release's registered estimates artifact, has
+    the row count and logical digest the manifest pins and as many rows as
+    belief.estimate; the pinned input observation ids equal belief.input.
+    """
+    import io
+
+    import pyarrow.parquet as pq
+
+    from reva.kernel.ids import CANONICAL_HASH_VERSION, logical_hash
+
+    def lhash(raw: bytes) -> str:
+        return hashlib.sha256(CANONICAL_HASH_VERSION.encode("ascii") + b"\x00" + raw).hexdigest()
+
+    results = []
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT r.id::text, r.manifest_sha256, r.ontology_manifest_sha256, r.model_manifest_sha256, r.origin,"
+            " r.method, r.knowledge_cutoff, a.logical_sha256 FROM belief.release r"
+            " LEFT JOIN meta.artifact a ON a.sha256 = r.manifest_sha256 ORDER BY r.id"
+        )
+        releases = cur.fetchall()
+        for rid, msha, osha, modsha, origin, method, cutoff, recorded_lsha in releases:
+            problems: list[str] = []
+            try:
+                raw = store.get("belief", msha)  # verifies bytes against the address
+                doc = json.loads(raw)
+            except Exception as e:
+                results.append({"release_id": rid, "ok": False, "problems": [f"manifest unreadable: {type(e).__name__}"]})
+                continue
+            if lhash(raw) != recorded_lsha:
+                problems.append("manifest logical sha256 differs from meta.artifact")
+            # canonical_bytes() would re-escape the "$datetime" tags; compare the encoding.
+            if json.dumps(doc, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode() != raw:
+                problems.append("manifest bytes are not canonical JSON")
+            if doc.get("schema") != "reva-belief-release/1":
+                problems.append("unexpected manifest schema")
+            if doc.get("origin") != origin or doc.get("method") != method:
+                problems.append("origin/method differ from release row")
+            if doc.get("ontology_manifest_sha256") != osha or doc.get("model_manifest_sha256") != modsha:
+                problems.append("ontology/model manifest digests differ from release row")
+            if (doc.get("knowledge_cutoff") or {}).get("$datetime") != cutoff.astimezone(UTC).isoformat():
+                problems.append("knowledge cutoff differs from release row")
+            for sha in (osha, modsha):
+                try:
+                    store.get("belief", sha)
+                except Exception as e:
+                    problems.append(f"pinned manifest {sha[:12]} unreadable: {type(e).__name__}")
+            est = doc.get("estimates_artifact") or {}
+            cur.execute(
+                "SELECT artifact_sha256 FROM belief.release_artifact WHERE release_id = %s AND role = 'estimates'",
+                (rid,),
+            )
+            if [r[0] for r in cur.fetchall()] != [est.get("sha256")]:
+                problems.append("estimates artifact differs from belief.release_artifact")
+            cur.execute("SELECT count(*) FROM belief.estimate WHERE release_id = %s", (rid,))
+            n_est = cur.fetchone()[0]  # type: ignore[index]
+            try:
+                rows = pq.read_table(io.BytesIO(store.get("belief", est["sha256"]))).to_pylist()
+                if len(rows) != est.get("row_count") or len(rows) != n_est:
+                    problems.append(f"estimate rows {len(rows)} != manifest {est.get('row_count')} / db {n_est}")
+                if logical_hash(rows) != est.get("logical_sha256"):
+                    problems.append("estimates logical sha256 differs from manifest")
+            except Exception as e:
+                problems.append(f"estimates artifact unreadable: {type(e).__name__}")
+            cur.execute(
+                "SELECT DISTINCT i.observation_id::text FROM belief.input i JOIN belief.estimate e"
+                " ON e.id = i.estimate_id WHERE e.release_id = %s",
+                (rid,),
+            )
+            if sorted(r[0] for r in cur.fetchall()) != sorted(doc.get("input_observation_ids", [])):
+                problems.append("pinned input observations differ from belief.input")
+            results.append({"release_id": rid, "ok": not problems, "estimates": n_est, "problems": problems})
+    return {"releases": len(results), "verified": sum(r["ok"] for r in results), "details": results}
 
 
 # --- backup --------------------------------------------------------------------------

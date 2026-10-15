@@ -28,6 +28,9 @@ describe('ContextBanner', () => {
     render(<ContextBanner meta={{ ...base, context_mode: 'simulation', modality: 'assumption_conditioned_scenario' }} />);
     const banner = screen.getByTestId('simulation-banner');
     expect(banner).toHaveTextContent('SIMULATION');
+    expect(banner).toHaveTextContent(/stress test/);
+    expect(banner).toHaveTextContent(/not observations or forecasts/);
+    expect(banner).toHaveTextContent(/not an estimate of GDP loss/);
     expect(banner.closest('.context-banner')).toHaveClass('context-simulation');
   });
 

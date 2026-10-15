@@ -238,3 +238,25 @@ export function localUtcToIso(v: string): string | undefined {
   const d = new Date(/T\d{2}:\d{2}$/.test(v) ? `${v}:00Z` : `${v}Z`);
   return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
 }
+
+/**
+ * Short, human-readable notes for provider source flags that change how a value must be read
+ * (e.g. UN Comtrade `isReported=false` / `legacyEstimationFlag`, WDI `obs_status`). A flag that
+ * is absent is not reported as anything; an explicit `note` from the API is used verbatim.
+ */
+export function sourceFlagNotes(flags: Record<string, unknown> | null | undefined): string[] {
+  if (!flags || typeof flags !== 'object') return [];
+  const out: string[] = [];
+  if (typeof flags.note === 'string' && flags.note.trim()) out.push(flags.note.trim());
+  if (flags.provider_returned_no_rows === true) out.push('provider returned no rows for this key');
+  const estimated = flags.provider_estimation_flagged === true;
+  if (estimated && !out.some((n) => /estimat/i.test(n))) {
+    const lef = flags.legacyEstimationFlag;
+    out.push(`provider estimate${lef !== undefined && lef !== null && lef !== '' ? ` (legacyEstimationFlag ${String(lef)})` : ''}`);
+  }
+  if (flags.isReported === false && !estimated && !out.some((n) => /reported/i.test(n))) {
+    out.push('not directly reported (isReported=false)');
+  }
+  if (typeof flags.obs_status === 'string' && flags.obs_status.trim()) out.push(`provider status: ${flags.obs_status.trim()}`);
+  return out;
+}

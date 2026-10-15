@@ -49,6 +49,15 @@ test('DZA crude imports are shown as missing with a reason, never as 0', async (
   // The missing periods are named in the panel summary.
   const summary = crude.getByText(/Missing \(shown as gaps, not zero\)/);
   for (const e of missing) await expect(summary).toContainText(String(e.support.period_label));
+
+  // A reported DZA value that the provider flags as estimated / not directly reported says so.
+  const obs = await apiGet(page.request, `/v1/observations?subject_id=DZA&concept=${CRUDE_M}&limit=1000`);
+  const flagged = (obs.data as any[]).filter((o) => o.value.kind !== 'missing' && o.source_flags?.provider_estimation_flagged === true);
+  for (const o of flagged) {
+    const period = String(o.support.period_label ?? o.support.temporal?.label);
+    const row = crude.getByRole('row').filter({ has: page.getByRole('rowheader', { name: period, exact: true }) });
+    await expect(row.getByTestId('source-flag'), `${period} carries the provider estimation flag`).toContainText('provider estimate');
+  }
 });
 
 test('provenance drawer from a belief value reaches the raw artifact SHA-256 and selector', async ({ page }) => {

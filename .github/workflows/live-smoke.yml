@@ -1,12 +1,36 @@
-# Real-provider smoke tests (network). Independent of PRs so ordinary CI never
-# depends on provider availability. Results are evidence about providers, not
-# a merge gate.
+# Real-provider checks (network). Scheduled/manual only, never on push or pull
+# request, so ordinary CI never depends on provider availability. Results are
+# evidence about providers, not a merge gate (render.yaml's checksPass ignores
+# workflows that did not run for the commit).
+#
+# Credentials: none are required. World Bank WDI, Natural Earth and Crossref are
+# keyless; UN Comtrade uses the keyless public preview endpoint. Optional:
+#   * repository variable REVA_HTTP_CONTACT_EMAIL  -> Crossref polite-pool mailto
+#   * repository secret   REVA_COMTRADE_API_KEY    -> exposed only to the live steps
+#     (currently not consumed by any connector; reserved for the keyed endpoint).
+# Actions are pinned by full commit SHA (see ci.yml).
 name: live-smoke
 
 on:
   schedule:
     - cron: "17 5 * * *"
   workflow_dispatch:
+    inputs:
+      connectors:
+        description: "Space-separated connector names to restrict to (empty = all built-ins)"
+        required: false
+        default: ""
+        type: string
+      skip_eurostat:
+        description: "Skip the Eurostat demo_pjan template check"
+        required: false
+        default: false
+        type: boolean
+      pytest_live:
+        description: "Also run the pytest -m live suite"
+        required: false
+        default: true
+        type: boolean
 
 permissions:
   contents: read  # read-only token; no write scopes for scheduled runs
@@ -15,13 +39,19 @@ concurrency:
   group: live-smoke
   cancel-in-progress: false
 
+env:
+  UV_VERSION: "0.11.32"
+  PYTHON_VERSION: "3.12"
+  UV_FROZEN: "1"
+
 jobs:
   live:
+    name: live source checks (fresh database, origin=live)
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 45
     services:
       postgres:
-        # postgis/postgis:17-3.5
+        # postgis/postgis:17-3.5 (same digest as compose.yaml)
         image: postgis/postgis:17-3.5@sha256:01a6a70e41e6c4467c8f55f6063555ed72db2d6662cd0d571040d42eadaeb6f6
         env:
           POSTGRES_DB: reva
@@ -32,31 +62,65 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U reva_owner -d reva"
           --health-interval 5s --health-timeout 3s --health-retries 30
-    # No job-level env: the optional provider key is exposed only to the one step
-    # that performs live requests (not to checkout/setup/sync/schema steps).
+    # No job-level secrets: the optional provider key is exposed only to the steps
+    # that perform live requests (not to checkout/setup/sync).
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: "3.12"
+          python-version: ${{ env.PYTHON_VERSION }}
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
-          version: "0.11.32"
+          version: ${{ env.UV_VERSION }}
           enable-cache: true
       - run: uv sync --frozen --all-extras
       - run: cp .env.example .env
-      - name: Live provider tests
+      - name: Live source checks (scripts/live_source_checks.py)
+        id: checks
         env:
           REVA_HTTP_CONTACT_EMAIL: ${{ vars.REVA_HTTP_CONTACT_EMAIL }}
           REVA_COMTRADE_API_KEY: ${{ secrets.REVA_COMTRADE_API_KEY }}
-        run: uv run pytest -m live -q -o addopts="" --junitxml=var/junit-live.xml
+          CONNECTORS: ${{ inputs.connectors }}
+          SKIP_EUROSTAT: ${{ inputs.skip_eurostat }}
+        run: |
+          args=()
+          for c in $CONNECTORS; do args+=(--connector "$c"); done
+          if [ "$SKIP_EUROSTAT" = "true" ]; then args+=(--skip-eurostat); fi
+          uv run python scripts/live_source_checks.py "${args[@]}"
+      - name: Gate summary (fails the run when a provider is blocked or degraded)
+        if: always() && steps.checks.outcome != 'skipped'
+        run: |
+          test -f var/live/live_checks.json || { echo "::error::live_checks.json was not written"; exit 1; }
+          cat var/live/live_checks.md >> "$GITHUB_STEP_SUMMARY"
+          uv run python - <<'PY'
+          import json, sys
+          gates = json.load(open("var/live/live_checks.json"))["gates"]
+          bad = {k: v for k, v in gates.items() if v is not True and v != "pass"}
+          for k, v in gates.items():
+              print(f"{k}: {v}")
+          if bad:
+              print(f"::error::live gates not passing: {bad}")
+              sys.exit(1)
+          PY
+      - name: Live provider tests (pytest -m live)
+        if: always() && (github.event_name == 'schedule' || inputs.pytest_live)
+        env:
+          REVA_HTTP_CONTACT_EMAIL: ${{ vars.REVA_HTTP_CONTACT_EMAIL }}
+          REVA_COMTRADE_API_KEY: ${{ secrets.REVA_COMTRADE_API_KEY }}
+        run: uv run pytest -m live -q -o addopts="" -p no:cacheprovider --junitxml=var/junit-live.xml
       - name: Render schema drift (download the current official schema)
+        if: always()
         run: uv run python scripts/validate_blueprint.py --live
-      - if: always()
+      - name: Upload live evidence
+        if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
-          name: junit-live
-          path: var/junit-live.xml
+          name: live-checks
+          path: |
+            var/live/live_checks.json
+            var/live/live_checks.md
+            var/junit-live.xml
           if-no-files-found: warn
+          retention-days: 30

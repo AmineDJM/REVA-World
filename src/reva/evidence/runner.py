@@ -281,7 +281,11 @@ async def run_connector(
             report.outcomes.append(FetchOutcome(item_key=item.key, status=status, raw_sha256=summary.raw_sha256))
         except RevaError as e:
             log.warning("connector %s item %s failed: %s", spec.name, item.key, e.message)
-            report.errors.append({"item": item.key, "code": e.code, "error": e.message})
+            err: dict[str, Any] = {"item": item.key, "code": e.code, "error": e.message}
+            http_status = e.details.get("status")
+            if isinstance(http_status, int) and not isinstance(http_status, bool) and 100 <= http_status <= 599:
+                err["status"] = http_status  # structured HTTP status (repair/health read it, not the message)
+            report.errors.append(err)
             report.outcomes.append(FetchOutcome(item_key=item.key, status="failed", detail=e.message[:500]))
     new_cursor = connector.next_cursor(plan, report.outcomes)
     report.cursor = new_cursor.state

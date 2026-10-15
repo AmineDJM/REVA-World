@@ -1,14 +1,29 @@
-# Tag-triggered release image (archival + provenance). Render builds the same
-# Dockerfile from the repository itself; this image is the immutable, attested
-# copy kept for reproducibility and restore drills (architecture §28).
+# Release image (archival + provenance). Render builds the same Dockerfile from
+# the repository itself; this image is the immutable, attested copy kept for
+# reproducibility and restore drills (architecture §28).
+#
+# Deployment: this workflow NEVER deploys to Render and holds no Render
+# credentials. Render deploys from its own Git integration once the owner has
+# created the Blueprint in their Render account (render.yaml:
+# `autoDeployTrigger: checksPass`, i.e. after ci.yml passes on main) or when the
+# owner triggers a manual deploy in the Render dashboard. See docs/deployment.md.
+#
+# * tag push v*.*.*   -> build, push to GHCR with SBOM + max provenance, smoke the pushed digest
+# * workflow_dispatch -> build + smoke only (nothing is pushed)
+# Actions are pinned by full commit SHA (see ci.yml).
 name: release
 
 on:
   push:
     tags: ["v*.*.*"]
+  workflow_dispatch:
 
 permissions:
   contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
   image:
@@ -16,7 +31,10 @@ jobs:
     timeout-minutes: 45
     permissions:
       contents: read
-      packages: write
+      packages: write  # GHCR push on tag runs only (login/push steps are skipped otherwise)
+    env:
+      PUSH: ${{ github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') }}
+      LOCAL_TAG: reva-world:release-check
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -27,10 +45,12 @@ jobs:
       - uses: astral-sh/setup-uv@1c37ad07a6a961277cf70c0d37d6f313000f5884 # v10.3.0
         with:
           version: "0.11.32"
-      - name: Blueprint must still validate
+          enable-cache: true
+      - name: Blueprint must still validate (cached schema)
         run: uv run --frozen python scripts/validate_blueprint.py
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
-      - uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+      - if: env.PUSH == 'true'
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
@@ -46,16 +66,28 @@ jobs:
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          push: ${{ env.PUSH == 'true' }}
+          # Manual runs load the image into the local daemon for the smoke test
+          # (the docker exporter cannot carry attestations, so they are off there).
+          load: ${{ env.PUSH != 'true' }}
+          tags: ${{ env.PUSH == 'true' && steps.meta.outputs.tags || env.LOCAL_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: REVA_GIT_COMMIT=${{ github.sha }}
-          provenance: mode=max
-          sbom: true
-      - name: Non-root smoke of the pushed digest
+          provenance: ${{ env.PUSH == 'true' && 'mode=max' || 'false' }}
+          sbom: ${{ env.PUSH == 'true' }}
+      - name: Non-root smoke
+        env:
+          REPOSITORY: ${{ github.repository }}
+          DIGEST: ${{ steps.build.outputs.digest }}
         run: |
-          repo="$(echo "ghcr.io/${{ github.repository }}" | tr '[:upper:]' '[:lower:]')"
-          docker run --rm -e REVA_ENV=test "${repo}@${{ steps.build.outputs.digest }}" \
+          if [ "$PUSH" = "true" ]; then
+            ref="$(echo "ghcr.io/${REPOSITORY}" | tr '[:upper:]' '[:lower:]')@${DIGEST}"
+          else
+            ref="$LOCAL_TAG"
+          fi
+          docker run --rm --network none -e REVA_ENV=test "$ref" \
             sh -c 'test "$(id -u)" != 0 && python -c "import reva.api.app, reva.operations.worker" && echo smoke-ok'
       - name: Record digest
-        run: echo "image digest ${{ steps.build.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: echo "image digest ${DIGEST} (pushed: ${PUSH})" >> "$GITHUB_STEP_SUMMARY"

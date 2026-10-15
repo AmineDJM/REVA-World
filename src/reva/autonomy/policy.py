@@ -30,6 +30,13 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 
 # Maintainer-pinned SHA-256 of policy file bytes. Changing a policy requires a
 # reviewed change to these pins (T3); the agent has no write path to either.
+# History of deliberate re-pins:
+# * promotion.yaml -> promotion-1.1.0 (2026-10-15, R4 fixes): pins the reviewed
+#   eurostat_jsonstat template code digest (approved_templates.*.template_sha256,
+#   checked by the gate), names the template's registered source (source_key), and
+#   adds explicit model_promotion test settings. Any later edit of
+#   src/reva/adapters/connectors/eurostat_template.py changes the template digest
+#   and disables T1 auto-promotion until a maintainer re-pins both digests.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "442e406aedfa9802c20cf46ff5847b4a7bae6c81cc8fb751e0c8169618f4fad9",
     "budgets.yaml": "048ec5bef503f29e771828d8394601572e59c133d10905a8a283cedf4bdbd08a",

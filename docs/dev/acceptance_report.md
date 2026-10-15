@@ -1,6 +1,6 @@
 # REVA World — acceptance report
 
-Generated 2026-10-15T00:19:30.982533+00:00 by `scripts/acceptance_report.py` (machine-readable: `var/acceptance/acceptance_report.json`, schema `reva-acceptance-report/1`). Git `f7e2119b1399` on `claude/kind-darwin-kyy8re` with 30 uncommitted paths. This file is generated; do not edit by hand.
+Generated 2026-10-15T00:24:23.549648+00:00 by `scripts/acceptance_report.py` (machine-readable: `var/acceptance/acceptance_report.json`, schema `reva-acceptance-report/1`). Git `ab91cae58603` on `claude/kind-darwin-kyy8re` with 19 uncommitted paths. This file is generated; do not edit by hand.
 
 Status vocabulary: **passed** (all counted evidence passed), **failed**, **blocked** (could not run here: credentials, deployment, network, browser, or excluded from this run), **missing** (no automated evidence exists). A criterion is never reported passed without evidence.
 
@@ -10,11 +10,11 @@ Status vocabulary: **passed** (all counted evidence passed), **failed**, **block
 
 | Ledger | passed | failed | blocked | missing |
 |---|---|---|---|---|
-| P0–P7 gate criteria | 42 | 5 | 2 | 2 |
+| P0–P7 gate criteria | 43 | 4 | 2 | 2 |
 | §13 mandatory acceptance tests | 37 | 0 | 1 | 1 |
-| §17.4 MVP gates | 5 | 1 | 0 | 0 |
+| §17.4 MVP gates | 6 | 0 | 0 | 0 |
 
-Phases: P0 **FAILED**, P1 passed, P2 passed, P3 **FAILED**, P4 passed, P5 _missing_, P6 passed, P7 **FAILED**
+Phases: P0 **FAILED**, P1 passed, P2 passed, P3 **FAILED**, P4 passed, P5 _missing_, P6 passed, P7 _blocked_
 
 pytest cases: 1454 passed, 4 failed, 5 skipped (groups: unit, contracts, property, scientific, replay, security, integration, e2e, perf; excluded markers: live). UI vitest: 47 passed, 0 failed.
 
@@ -28,7 +28,7 @@ Failing tests:
 ## Demonstration workflow (§17.3)
 
 - **fixtures** (`var/acceptance/demo_fixtures.json`): overall `pass`, {'pass': 13, 'fail': 0, 'blocked': 0}
-- **live** (`var/acceptance/demo_live.json`): overall `fail`, {'pass': 12, 'fail': 1, 'blocked': 0}
+- **live** (`var/acceptance/demo_live.json`): overall `pass`, {'pass': 13, 'fail': 0, 'blocked': 0}
 
 | Step | Status | Title | Reason |
 |---|---|---|---|
@@ -55,7 +55,7 @@ Failing tests:
 | Clean local install (lockfile consistent) | passed | cmd uv_lock_check |  |
 | /health/live works | passed | pytest 1/1 |  |
 | Unit tests pass | **FAILED** | group unit (461 cases) | group:group: failed |
-| Lint passes (ruff + import-linter boundaries) | **FAILED** | cmd ruff; cmd import_linter | command:ruff: failed |
+| Lint passes (ruff + import-linter boundaries) | **FAILED** | cmd ruff; cmd import_linter | command:ruff: failed (['75 +         except Exception:', '76 \|             if attempt == 2:', '   \|', '', 'Found 7 errors.', '[*] 4 fixable with `--fix` (1 unsafe fix available with `--fix --unsafe-fixes`).']) |
 | Package imports without network/secrets | passed | cmd import_without_secrets; pytest 1/1 |  |
 | Published build status is honest | _missing_ | doc; manual | doc:docs/implementation_status.md: missing; manual:manual: missing (honesty of the published status is a human review item; no automated check) |
 
@@ -88,7 +88,7 @@ Failing tests:
 |---|---|---|---|
 | Every displayed value traces to raw source | passed | pytest 1/1; demo[fixtures] step 7 |  |
 | Graph preserves participant roles | passed | pytest 2/2; demo[fixtures] step 4 |  |
-| World view is release-pinned | **FAILED** | pytest 2/2; demo evidence release_pinned_edges=0 | demo_evidence:4: failed |
+| World view is release-pinned | **FAILED** | pytest 2/2; demo evidence release_pinned_edges=0 | demo_evidence:4: failed (publish_release did not pin any world.relation rows to the release (world.relation.release_id); the release-pinned graph context is empty, so the edges shown come from the evidence context as known now (same origin)) |
 | WDI/Eurostat incompatible support cannot reconcile | **FAILED** | pytest 2/3; demo[fixtures] step 9 | tests/integration/test_eurostat_discovery.py::test_end_to_end_promotion_ingestion_and_belief_separation: failed (AssertionError: {'status': 'blocked', 'reason': 'proposal backlog is full (20 open >= 20); no new proposals'} assert 'blocked' == 'promoted'      - promoted   + blocked) |
 | No scenario input allowed into beliefs | passed | pytest 1/1; demo[fixtures] step 5 |  |
 
@@ -127,7 +127,7 @@ Failing tests:
 | Generated code cannot run in worker | passed | pytest 2/2 |  |
 | Hostile document cannot alter policy | passed | pytest 2/2 |  |
 
-### P7 — image, Render config, monitoring, backup, release: **FAILED**
+### P7 — image, Render config, monitoring, backup, release: _blocked_
 
 | Gate criterion | Status | Evidence | Reasons |
 |---|---|---|---|
@@ -137,7 +137,7 @@ Failing tests:
 | Restore from backups | passed | pytest 1/1 |  |
 | No filesystem persistence assumptions | passed | pytest 2/2 |  |
 | p95/RSS measurements recorded | passed | perf ordinary_api_p95_ms=171.914; perf cached_metadata_p95_ms=37.336; perf l1_four_country_ms=12.113; perf queue_ack_p95_ms=241.265; perf population_100k_peak_rss_mib=181.1; doc |  |
-| Complete live demo | **FAILED** | demo[live] step * | demo:*: failed |
+| Complete live demo | passed | demo[live] step * |  |
 
 ## Mandatory acceptance tests (implementation prompt §13)
 
@@ -192,7 +192,7 @@ Failing tests:
 | All four country profiles exist even if one scenario input is unavailable | passed | pytest 2/2; demo[fixtures] step N |  |
 | No scenario number can be retrieved through a canonical observation endpoint | passed | pytest 1/1; demo[fixtures] step 5 |  |
 | No synthetic record is linked to a real individual | passed | pytest 2/2; demo[fixtures] step 10 |  |
-| MVP operational only after complete live demonstration and restore test pass | **FAILED** | demo[live] step *; pytest 1/1 | demo:*: failed |
+| MVP operational only after complete live demonstration and restore test pass | passed | demo[live] step *; pytest 1/1 |  |
 
 ## Commands
 

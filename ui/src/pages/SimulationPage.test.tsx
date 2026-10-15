@@ -100,7 +100,10 @@ describe('SimulationPage', () => {
       'POST /v1/scenarios': { status: 201, body: { scenario_id: 's1' } },
       'POST /v1/simulations': {
         status: 422,
-        body: { type: 'x', title: 'missing input', status: 422, detail: 'required inputs are missing from the pinned baseline release', code: 'missing_input', details: { missing: [{ country: 'DZA', input: 'M' }] } },
+        body: {
+          type: 'x', title: 'missing input', status: 422, detail: 'required inputs are missing from the pinned baseline release', code: 'missing_input',
+          details: { missing: [{ country: 'DZA', input: 'M', concept: 'trade.hs2709.import_value.world_total', year: 2023, state: 'missing:unavailable' }] },
+        },
       },
     });
     renderPage();
@@ -111,6 +114,47 @@ describe('SimulationPage', () => {
     await userEvent.click(submit);
     expect(await screen.findByText(/required inputs are missing/)).toBeInTheDocument();
     expect(screen.getByText(/HTTP 422, missing_input/)).toBeInTheDocument();
+    // Listed as a data gap per input, never as zero.
+    const gaps = screen.getByTestId('missing-inputs');
+    expect(within(gaps).getByRole('table')).toHaveAccessibleName(/missing for DZA — a data gap, not zero/);
+    expect(within(gaps).getByRole('rowheader', { name: 'DZA' })).toBeInTheDocument();
+    expect(within(gaps).getByText('missing (unavailable)')).toBeInTheDocument();
+    expect(within(gaps).queryByText(/^0$/)).toBeNull();
+  });
+
+  it('states the scenario limits, uncertainty and provider flags on baseline inputs', () => {
+    const fr = { id: 'e1', label: 'France' };
+    const notClaimed = 'It is not a GDP loss, welfare change or forecast.';
+    const results = [
+      {
+        id: 'a', output_key: 'import_value_change_usd', subject: fr, variant: 'L1',
+        value: { kind: 'decimal', value: '250', unit_ref: 'unit.usd', basis: {} }, uncertainty: { status: 'unquantified', kind: 'unknown' },
+        applicability: {
+          inputs: { M: { value: '1000', valuation: 'CIF' }, X: { value: '10', valuation: 'FOB' }, G: { value: '5000' } },
+          source_flags: { M: { note: 'provider estimation flagged (legacyEstimationFlag != 0): not a direct customs observation', provider_estimation_flagged: true } },
+        },
+      },
+    ];
+    const outcome = {
+      status: 'succeeded', applicability: { explanation: { not_claimed: notClaimed, uncertainty: 'Unquantified: no error model.', sign_convention: 'Positive means higher net payment.' } },
+      problems: [], cost: {}, recorded_at: '',
+    };
+    const env = envelope(
+      { job: null, scenario: null, run: { id: 'run', fidelity: 'L1', model_manifest_sha256: 'm', ontology_manifest_sha256: 'o', seed_plan: {}, execution_profile: {}, recorded_at: '' }, outcome, results },
+      { context_mode: 'simulation', modality: 'assumption_conditioned_scenario' },
+    );
+    render(
+      <MemoryRouter>
+        <ProvenanceProvider>
+          <ResultsView simId="sim" env={env as never} />
+        </ProvenanceProvider>
+      </MemoryRouter>,
+    );
+    const limits = screen.getByTestId('result-limits');
+    expect(limits).toHaveTextContent(notClaimed);
+    expect(limits).toHaveTextContent('Unquantified: no error model.');
+    expect(limits).toHaveTextContent('Positive means higher net payment.');
+    expect(screen.getByText(/not a direct customs observation/)).toBeInTheDocument();
   });
 
   it('renders the L2 sensitivity-range row in the range column, not as a grid variant', () => {

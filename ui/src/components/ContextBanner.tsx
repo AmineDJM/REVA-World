@@ -23,7 +23,7 @@ export function isFixtureOrigin(meta: BannerMeta): boolean {
 
 /** The simulation banner text, reused in exports. */
 export const SIMULATION_BANNER_TEXT =
-  'SIMULATION — assumption-conditioned scenario. Values are hypothetical; they are not observations or forecasts.';
+  'SIMULATION — assumption-conditioned stress test. Values are hypothetical consequences of the stated assumptions; they are not observations or forecasts and not an estimate of GDP loss.';
 
 const CUTOFF_BASIS_LABEL: Record<string, string> = {
   release_cutoff: 'release cutoff',
@@ -49,8 +49,8 @@ export function ContextBanner({ meta, simulation = false, referenceTime, scope }
     <div className={`context-banner${sim ? ' context-simulation' : ''}`} role="region" aria-label="Result context">
       {sim && (
         <p className="simulation-flag" data-testid="simulation-banner">
-          <strong>SIMULATION</strong> — assumption-conditioned scenario. Values are hypothetical; they are not
-          observations or forecasts.
+          <strong>SIMULATION</strong>
+          {SIMULATION_BANNER_TEXT.replace(/^SIMULATION/, '')}
         </p>
       )}
       {fixture && (

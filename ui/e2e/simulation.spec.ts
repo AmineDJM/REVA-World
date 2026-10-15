@@ -93,6 +93,10 @@ test('L1 FRA/CHN/USA run completes with results, persistent SIMULATION banner an
   await expect(banner).toContainText(releaseId.slice(0, 8));
   await expect(banner).toContainText('Knowledge cutoff');
   await expect(banner.getByTestId('fixture-label')).toContainText('TEST FIXTURE');
+  // Stress test, not a forecast and not GDP loss: on the banner and in the result's own limits statement.
+  await expect(page.getByTestId('simulation-screen-banner')).toContainText(/stress test.*not observations or forecasts.*GDP loss/);
+  await expect(page.getByTestId('result-limits')).toContainText(/not a GDP loss/);
+  await expect(banner).toContainText('2023 (scenario reference year');
 
   // The screen banner stays visible while scrolling through results.
   await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
@@ -184,6 +188,12 @@ test('a run including DZA is rejected with missing_input naming DZA (never imput
   await expect(problem).toContainText('HTTP 422');
   await expect(problem).toContainText('"country": "DZA"');
   await expect(problem).not.toContainText('"country": "FRA"');
+  // The rejection is also listed as a data gap per missing input, never as zero.
+  const gaps = page.getByTestId('missing-inputs');
+  await expect(gaps.locator('caption')).toContainText('missing for DZA — a data gap, not zero');
+  await expect(gaps.getByRole('rowheader', { name: 'DZA' }).first()).toBeVisible();
+  await expect(gaps.getByRole('rowheader', { name: /FRA|CHN|USA/ })).toHaveCount(0);
+  await expect(gaps.locator('.missing-value').first()).toHaveText(/^missing \(.+\)$/);
   // The run was refused before any job existed: no sim id, no results, no fabricated output.
   expect(responses.find((r) => r.url === '/v1/simulations')?.status).toBe(422);
   expect(new URL(page.url()).searchParams.get('sim')).toBeNull();

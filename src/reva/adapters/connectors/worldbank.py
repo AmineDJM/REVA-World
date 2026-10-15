@@ -4,12 +4,27 @@ Fetches country metadata, indicator metadata (definition/source notes) and the
 SP.POP.TOTL / NY.GDP.MKTP.CD series for FRA, DZA, CHN, USA, 2000-2024, fully
 consuming pagination. Nulls stay typed Missing; dataset-level 'lastupdated' is
 kept as metadata and never used as a source publication time.
+
+Validation of series pages blocks (the acquisition is quarantined, nothing is
+coerced) when a row's provider markers differ from what the reviewed mapping
+expects: the row's ``indicator.id`` must be the requested indicator, ``unit``
+and ``decimal`` must be present and equal the reviewed values in
+``INDICATORS`` (a unit change such as "" -> "thousands" means the values are on
+a different scale), and ``value`` must be a JSON number or null (a string-typed
+number is a type drift, not a value). ``decimal`` is the provider's display
+precision; a change is not necessarily a value change, but it is reviewed
+before anything is published. A silent rescale that keeps every marker
+unchanged cannot be told apart from a genuine revision in one payload: it is
+detected by the repair advisor's comparison with the accepted vintage of the
+same request (``reva.autonomy.repair.value_comparison``), not here.
 """
 
 from __future__ import annotations
 
+from collections import Counter
 from collections.abc import Iterator, Sequence
 from datetime import date
+from decimal import Decimal
 from typing import Any
 
 from reva.adapters.connectors.base import (
@@ -45,11 +60,16 @@ INDICATORS: dict[str, dict[str, Any]] = {
     "SP.POP.TOTL": {
         "concept": "demography.population.wdi_midyear_total",
         "unit": "unit.persons",
+        # Reviewed provider markers of every series row (captured live 2026-10-08).
+        "provider_unit": "",
+        "provider_decimal": "0",
         "definition_must_contain": ["midyear"],
     },
     "NY.GDP.MKTP.CD": {
         "concept": "economics.gdp.nominal_current_usd",
         "unit": "unit.usd",
+        "provider_unit": "",
+        "provider_decimal": "0",
         "definition_must_contain": ["current prices", "United States dollars"],
     },
 }
@@ -194,6 +214,8 @@ class WorldBankConnector:
                 for p in range(2, pages + 1)
             )
         meta["dataset_last_updated"] = header.get("lastupdated")  # dataset-level; NOT a publication time
+        meta["requested_indicator"] = indicator
+        meta["row_markers"] = _row_markers(rows)
         obs = tuple(self._observation(indicator, r) for r in rows)
         expected = ()
         if pages == 1:
@@ -286,8 +308,10 @@ class WorldBankConnector:
             page = int(str(header.get("page", "1")))
             expected_rows = max(0, min(per_page, total - (page - 1) * per_page))
             if len(batch.observations) != expected_rows:
-                findings.append(Finding(code="pagination_truncated", severity="blocker",
-                                        message=f"page has {len(batch.observations)} rows, header implies {expected_rows}"))
+                findings.append(Finding(
+                    code="pagination_truncated", severity="blocker",
+                    message=f"page has {len(batch.observations)} rows, header implies {expected_rows}"))
+            findings.extend(_marker_findings(batch.metadata))
             keys = [o.logical_key for o in batch.observations]
             if len(keys) != len(set(keys)):
                 findings.append(Finding(code="duplicate_keys", severity="blocker", message="duplicate series keys"))
@@ -309,6 +333,68 @@ class WorldBankConnector:
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
         ok = all(o.status in ("published", "unchanged") for o in outcomes) and not plan.budget_exhausted
         return Cursor(state={"complete": ok, "years": list(self.years)})
+
+
+def _value_type(r: dict[str, Any], key: str) -> str:
+    if key not in r:
+        return "absent"
+    v = r[key]
+    if v is None:
+        return "null"
+    if isinstance(v, bool):
+        return "boolean"
+    if isinstance(v, Decimal | int | float):
+        return "number"
+    return "string" if isinstance(v, str) else type(v).__name__
+
+
+def _row_markers(rows: Sequence[Any]) -> list[dict[str, Any]]:
+    """Distinct provider markers of the series rows, as observed (absent kept distinct from null/"")."""
+    seen: Counter[tuple[Any, ...]] = Counter()
+    for r in rows:
+        if not isinstance(r, dict):
+            seen[(None, False, None, False, None, "not_an_object")] += 1
+            continue
+        ind = r.get("indicator")
+        seen[(
+            plain(ind.get("id")) if isinstance(ind, dict) else None,
+            "unit" in r, plain(r.get("unit")),
+            "decimal" in r, plain(r.get("decimal")),
+            _value_type(r, "value"),
+        )] += 1
+    keys = ("indicator", "unit_present", "unit", "decimal_present", "decimal", "value_type")
+    return [{**dict(zip(keys, k, strict=True)), "rows": n} for k, n in sorted(seen.items(), key=lambda kv: str(kv[0]))]
+
+
+def _marker_findings(meta: dict[str, Any]) -> list[Finding]:
+    """Blockers for rows whose indicator, unit, decimal or value type differ from the reviewed mapping."""
+    indicator = meta.get("requested_indicator")
+    spec = INDICATORS.get(str(indicator))
+    markers = meta.get("row_markers")
+    if spec is None or markers is None:
+        return [Finding(code="mapping_unverifiable", severity="blocker",
+                        message=f"series page for {indicator!r} carries no reviewed row markers")]
+    out: list[Finding] = []
+    for m in markers:
+        n = m["rows"]
+        if m["indicator"] != indicator:
+            out.append(Finding(code="indicator_mismatch", severity="blocker",
+                               message=f"{n} rows carry indicator {m['indicator']!r}, requested {indicator}"))
+        if not m["unit_present"] or m["unit"] != spec["provider_unit"]:
+            got = repr(m["unit"]) if m["unit_present"] else "no unit field"
+            out.append(Finding(code="unit_drift", severity="blocker",
+                               message=f"{n} rows carry unit {got}; reviewed mapping expects "
+                                       f"{spec['provider_unit']!r} (values may be on another scale)"))
+        if not m["decimal_present"] or str(m["decimal"]) != spec["provider_decimal"]:
+            got = repr(m["decimal"]) if m["decimal_present"] else "no decimal field"
+            out.append(Finding(code="decimal_drift", severity="blocker",
+                               message=f"{n} rows carry decimal {got}; reviewed mapping expects "
+                                       f"{spec['provider_decimal']}"))
+        if m["value_type"] not in ("number", "null"):
+            out.append(Finding(code="value_type_drift", severity="blocker",
+                               message=f"{n} rows carry a {m['value_type']} value; reviewed mapping expects a "
+                                       "JSON number or null (never coerced)"))
+    return out
 
 
 def require_json_like(raw: RawAcquisition) -> None:

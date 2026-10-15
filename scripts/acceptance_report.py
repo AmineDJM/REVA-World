@@ -1436,9 +1436,8 @@ def evaluate_criterion(ev: Evaluator, name: str, evidence: list[dict[str, Any]])
                 ]
             else:
                 label = c.get("name") or c.get("node") or c.get("step") or c.get("key") or c.get("path") or c["kind"]
-                reasons.append(
-                    f"{c['kind']}:{label}: {c['status']}" + (f" ({c.get('reason')})" if c.get("reason") else "")
-                )
+                why = c.get("reason") or c.get("note") or c.get("output_tail")
+                reasons.append(f"{c['kind']}:{label}: {c['status']}" + (f" ({why})" if why else ""))
     if st == "blocked" and all(c["status"] == "not_run" for c in checks):
         reasons.append("all evidence excluded from this run")
     return {"name": name, "status": st, "checks": checks, "reasons": reasons}

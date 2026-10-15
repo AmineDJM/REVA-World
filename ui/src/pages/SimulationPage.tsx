@@ -28,7 +28,7 @@ import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { ErrorState, Loading, ProblemView } from '../components/StateViews';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
 import { ValueView } from '../components/ValueView';
-import { formatDateTime, formatDecimalString, humanize, isRecord, shortId, unitLabel } from '../lib/format';
+import { formatDateTime, formatDecimalString, humanize, isRecord, missingReasonLabel, shortId, sourceFlagNotes, unitLabel } from '../lib/format';
 import {
   ALL_OUTPUTS,
   DEFAULT_FORM,
@@ -104,6 +104,8 @@ interface BaselineInput {
   reference_year?: number | null;
   concept?: string;
   estimate_id?: string | null;
+  /** Provider source-flag notes for this input (e.g. provider estimate, not directly reported). */
+  flags?: string[];
 }
 
 /** Baseline inputs (M, X, G) per country, from result applicability (pinned release values). */
@@ -113,9 +115,29 @@ function baselineInputs(results: SimResult[]): Map<string, Record<string, Baseli
     const country = r.subject?.label ?? String(r.applicability?.country ?? '—');
     if (out.has(country)) continue;
     const inputs = r.applicability?.inputs;
-    if (isRecord(inputs)) out.set(country, inputs as Record<string, BaselineInput>);
+    if (!isRecord(inputs)) continue;
+    const flags = isRecord(r.applicability?.source_flags) ? (r.applicability.source_flags as Record<string, unknown>) : {};
+    const withFlags: Record<string, BaselineInput> = {};
+    for (const [k, v] of Object.entries(inputs as Record<string, BaselineInput>)) {
+      const f = flags[k];
+      withFlags[k] = { ...v, flags: isRecord(f) ? sourceFlagNotes(f) : [] };
+    }
+    out.set(country, withFlags);
   }
   return out;
+}
+
+/** The model's own statement of what the result is not, its uncertainty and sign convention. */
+function explanationOf(outcome: SimulationStatus['outcome'], results: SimResult[]) {
+  const app = outcome && isRecord(outcome.applicability) ? outcome.applicability : {};
+  const ex = isRecord(app.explanation) ? app.explanation : {};
+  const str = (v: unknown) => (typeof v === 'string' && v.trim() ? v : null);
+  const fromResult = results.map((r) => str(r.applicability?.not_claimed)).find((x) => x) ?? null;
+  return {
+    notClaimed: str(app.not_claimed) ?? str(ex.not_claimed) ?? fromResult,
+    uncertainty: str(ex.uncertainty),
+    signConvention: str(ex.sign_convention),
+  };
 }
 
 const INPUT_LABELS: Record<string, string> = {
@@ -137,7 +159,60 @@ function BaselineCell({ input }: { input: BaselineInput | undefined }) {
           <ProvenanceButton kind="estimate" id={input.estimate_id} label="Trace" />
         </>
       )}
+      {input.flags && input.flags.length > 0 && <span className="source-flag field-hint"> {input.flags.join('; ')}</span>}
     </span>
+  );
+}
+
+interface MissingInputRow {
+  country?: string;
+  input?: string;
+  concept?: string;
+  year?: number | string;
+  state?: string;
+}
+
+/** A missing_input rejection listed as data gaps (never zero), above the raw problem details. */
+function MissingInputs({ error }: { error: unknown }) {
+  if (!(error instanceof ApiError) || error.code !== 'missing_input') return null;
+  const details = error.problem.details;
+  const raw = isRecord(details) && Array.isArray(details.missing) ? details.missing : Array.isArray(error.problem.missing) ? error.problem.missing : [];
+  const rows = (raw as unknown[]).filter(isRecord) as MissingInputRow[];
+  if (rows.length === 0) return null;
+  const countries = [...new Set(rows.map((r) => r.country).filter(Boolean))];
+  return (
+    <div className="table-wrap" data-testid="missing-inputs">
+      <table className="data-table">
+        <caption>
+          Run rejected: required inputs missing for {countries.join(', ')} — a data gap, not zero. No country was dropped and no
+          value was imputed.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Country</th>
+            <th scope="col">Input</th>
+            <th scope="col">Concept</th>
+            <th scope="col">Year</th>
+            <th scope="col">State in pinned release</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows.map((r, i) => (
+            <tr key={`${r.country}-${r.input}-${i}`}>
+              <th scope="row">{r.country ?? '—'}</th>
+              <td>{r.input ? (INPUT_LABELS[r.input] ?? r.input) : '—'}</td>
+              <td className="mono">{r.concept ?? '—'}</td>
+              <td>{r.year ?? '—'}</td>
+              <td>
+                <span className="missing-value">
+                  {r.state?.startsWith('missing:') ? `missing (${missingReasonLabel(r.state.slice(8))})` : (r.state ?? 'missing')}
+                </span>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }
 
@@ -153,7 +228,8 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
   const modelVersions = (env.model_versions ?? []).map((m) => `${m.model_key}@${m.version}`);
   const ctx = exportContext(simId, st, modelVersions, env.assumptions ?? []);
   const outcome = st.outcome;
-  const notClaimed = outcome && isRecord(outcome.applicability) && typeof outcome.applicability.not_claimed === 'string' ? outcome.applicability.not_claimed : null;
+  const explanation = useMemo(() => explanationOf(outcome, st.results), [outcome, st.results]);
+  const notClaimed = explanation.notClaimed;
 
   return (
     <section className="panel" aria-labelledby="results-h">
@@ -288,9 +364,19 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
       )}
 
       {(notClaimed || st.results.length > 0) && (
-        <aside className="panel limits-panel" aria-label="Limits of this result">
+        <aside className="panel limits-panel" aria-label="Limits of this result" data-testid="result-limits">
           <h3>Limits</h3>
-          {notClaimed && <p>{notClaimed}</p>}
+          <p>{notClaimed ?? LIMITS_TEXT[1]}</p>
+          {explanation.uncertainty && (
+            <p>
+              <strong>Uncertainty:</strong> {explanation.uncertainty}
+            </p>
+          )}
+          {explanation.signConvention && (
+            <p>
+              <strong>Sign convention:</strong> {explanation.signConvention}
+            </p>
+          )}
         </aside>
       )}
 
@@ -436,6 +522,11 @@ export default function SimulationPage() {
     setForm((f) => ({ ...f, grid: f.grid.map((g, j) => (j === i ? { ...g, [field]: v } : g)) }));
 
   const progress = jobProgress(job);
+  // The scenario's reference year is its valid/reference time (one annual accounting period).
+  const runYear = simEnv?.data.scenario?.spec?.reference_year;
+  const referenceTime = simEnv?.valid_time
+    ? undefined
+    : `${simEnv ? String(runYear ?? 'not stated') : form.referenceYear} (scenario reference year; one annual accounting period)`;
   const showErr = (k: string) => (touched && errors[k] ? <span className="field-error">{errors[k]}</span> : null);
 
   return (
@@ -456,6 +547,7 @@ export default function SimulationPage() {
           }
         }
         simulation
+        referenceTime={referenceTime}
         scope={simId ? 'Scenario run' : 'Scenario definition (no run yet)'}
       />
 
@@ -653,6 +745,7 @@ export default function SimulationPage() {
             {releaseError ? 'Blocked: no valid baseline release.' : !formValid ? 'Fix the highlighted assumptions.' : 'Runs as a queued job.'}
           </span>
         </p>
+        {!!submitError && <MissingInputs error={submitError} />}
         {!!submitError && <ProblemView error={submitError} />}
       </form>
 
