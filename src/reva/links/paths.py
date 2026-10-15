@@ -42,7 +42,7 @@ from __future__ import annotations
 import itertools
 import math
 from collections import Counter, defaultdict, deque
-from collections.abc import Iterable, Mapping, Sequence
+from collections.abc import Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -537,7 +537,9 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
 MAX_WAYPOINTS = 4
 
 
-def find_chain(graph: PathGraph, waypoints: Sequence[str], **query: Any) -> PathResult:
+def find_chain(
+    graph: PathGraph | Callable[[PathQuery], PathGraph], waypoints: Sequence[str], **query: Any
+) -> PathResult:
     """A path forced through ``waypoints`` (``[Columbus, Treaty of Tordesillas, Brazil, Portuguese]``): the
     best path of each consecutive segment, concatenated. Each segment obeys the same filters and
     ``max_hops``; the result has one path (or none, with ``reason = "no_path_segment:<a>-><b>"``). Segments
@@ -551,7 +553,8 @@ def find_chain(graph: PathGraph, waypoints: Sequence[str], **query: Any) -> Path
     hops: list[Hop] = []
     cost = 0.0
     for a, b in itertools.pairwise(waypoints):
-        seg = find_paths(graph, PathQuery(a, b, **query))
+        sq = PathQuery(a, b, **query)
+        seg = find_paths(graph if isinstance(graph, PathGraph) else graph(sq), sq)
         out.truncated |= seg.truncated
         out.explored_nodes += seg.explored_nodes
         out.labels.update(seg.labels)

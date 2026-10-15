@@ -1,9 +1,26 @@
 [
   {
+    "request_fingerprint": "b53df16131eea2fa77b2a6578194d41a7549bc47933f0c7135582a18f739c326",
+    "url": "https://utexas.box.com/shared/static/cpgysqaogi1590ucv5x0wn59urqm00x3.zip",
+    "file": "characteristics_subset.zip",
+    "sha256": "a097ecc94c4c18756044240d25a8fe54f752aaefe0a457e5925e4ef28dc8b0f4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "No explicit data licence; free download with requested citation; CCP web terms prohibit commercial use",
+    "derived_from": {
+      "real_sha256": "761308d6addd1cfca493540911c223067aa00a7ba863ec500490073185f4af6d",
+      "real_bytes": 118231611,
+      "derivation": "subset: COW codes ['2', '220', '255', '260', '340', '365', '670'], years >= 1990, columns ['cowcode', 'country', 'year', 'systid', 'systyear', 'evntid', 'c_inforce', 'coding_available', 'coding_imputed', 'votemin', 'votemin_article', 'votemin_comments', 'cappun', 'cappun_article', 'cappun_comments', 'marriage', 'marriage_article', 'marriage_comments', 'samesexm', 'samesexm_article', 'samesexm_comments', 'civmar', 'civmar_article', 'civmar_comments']; cell texts verbatim (line numbers differ from the real file)"
+    }
+  },
+  {
     "request_fingerprint": "3b92a0251cc587dde369acf334386331a1537a4e90445b50a238ce2145195a44",
     "url": "https://utexas.box.com/shared/static/qzs6irrpbfzspvv6sq94r98yw9rsh5lz.zip",
     "file": "chronology_subset.zip",
-    "sha256": "be8ec1b43d43814067f0c21968f20949991035826e38235fceaf44cec2181fa8",
+    "sha256": "540b87387f2541d8195a3e8d156d48b478e96791a4931872361ee424d8af304f",
     "status": 200,
     "headers": {
       "content-type": "application/zip"

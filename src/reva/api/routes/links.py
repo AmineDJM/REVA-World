@@ -18,7 +18,7 @@ from reva.api.deps import Timer, origin_of, origin_warnings, read_conn
 from reva.api.errors import NotFound
 from reva.kernel.errors import ValidationProblem
 from reva.links import service
-from reva.links.paths import DISCLAIMER, MAX_HOPS_LIMIT, MAX_K, PathQueryError
+from reva.links.paths import DISCLAIMER, MAX_HOPS_LIMIT, MAX_K, MAX_WAYPOINTS, PathQueryError
 
 router = APIRouter(prefix="/v1/links", tags=["links"], dependencies=[Depends(require_scope("read"))])
 
@@ -63,6 +63,9 @@ def get_links_path(
     request: Request,
     from_: str = Query(..., alias="from", pattern=NODE_PATTERN, max_length=161, description="QID or ISO3"),
     to: str = Query(..., pattern=NODE_PATTERN, max_length=161, description="QID or ISO3"),
+    via: list[str] | None = Query(
+        None, max_length=MAX_WAYPOINTS, description="Waypoints (QID or ISO3): one path forced through them, in order"
+    ),
     k: int = Query(3, ge=1, le=MAX_K, description="Number of paths (k shortest simple paths)"),
     max_hops: int = Query(4, ge=1, le=MAX_HOPS_LIMIT),
     as_of: int | None = Query(None, ge=-5000, le=3000, description="Only hops valid in that year"),
@@ -79,6 +82,11 @@ def get_links_path(
     for x in (*(kind or ()), *(exclude_kind or ())):
         if not re.match(KIND_PATTERN, x):
             raise ValidationProblem("invalid kind", kind=x[:64])
+    for x in via or ():
+        if not re.match(NODE_PATTERN, x):
+            raise ValidationProblem("invalid waypoint", via=x[:64])
+    if via and len(via) > MAX_WAYPOINTS:
+        raise ValidationProblem(f"at most {MAX_WAYPOINTS} waypoints")
     window = None
     if from_year is not None or to_year is not None:
         if from_year is None or to_year is None:
@@ -90,6 +98,7 @@ def get_links_path(
                 conn,
                 from_,
                 to,
+                via=via or (),
                 k=k,
                 max_hops=max_hops,
                 as_of=as_of,

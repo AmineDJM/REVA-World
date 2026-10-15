@@ -9,7 +9,7 @@ from typing import Any
 
 from reva.links.derive import DerivedSet, assert_all_evidenced, derive_all
 from reva.links.model import AtlasRowRef
-from reva.links.paths import KgNeighbourhood, PathQuery, PathResult, find_paths, graph_from_db
+from reva.links.paths import KgNeighbourhood, PathQuery, PathResult, find_chain, find_paths, graph_from_db
 from reva.links.taxonomy import load_taxonomy
 
 ISO3_RE = re.compile(r"^[A-Z]{3}$")
@@ -43,10 +43,16 @@ def path_between(
     target: str,
     *,
     origin: str | None = None,
+    via: Iterable[str] = (),
     **query: Any,
 ) -> PathResult:
+    """Paths ``source`` → ``target`` (QIDs or ISO3 codes); with ``via`` waypoints, one path forced through
+    them (each segment read and searched on its own bounded neighbourhood)."""
     nb = KgNeighbourhood(conn, origin=origin)
-    q = PathQuery(resolve_node(nb, source), resolve_node(nb, target), **query)
+    ends = [resolve_node(nb, x) for x in (source, *via, target)]
+    if len(ends) > 2:
+        return find_chain(lambda sq: graph_from_db(conn, sq, origin=origin), ends, **query)
+    q = PathQuery(ends[0], ends[1], **query)
     g = graph_from_db(conn, q, origin=origin)
     return find_paths(g, q)
 

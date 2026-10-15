@@ -3,7 +3,7 @@
     "request_fingerprint": "7a067d95d117811459059eec0f66d504a916af371c70ad6a91b8654129392931",
     "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2024/WBL2024-1-0-Historical-Panel-Data.xlsx",
     "file": "panel.xlsx",
-    "sha256": "4d5de4a3d2dc0db0b0beaff91b751928c4e87cd67aebeb92237bc17ae87e2cfe",
+    "sha256": "48148a15ed216b7866cf3fb23cb537ce70f784627c72c8dd36c4713e8af9f9b4",
     "status": 200,
     "headers": {
       "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -21,7 +21,7 @@
     "request_fingerprint": "b2bfbe9af2af1972a3ac192536b27ed184bd17232170bc0e575b61a7a162aac2",
     "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026-02-26-WBL-2026-1-0-Scores-Values_F.xlsx",
     "file": "wbl1_2026.xlsx",
-    "sha256": "23412918ae80056308dceb03239734a99931012109a656aea9f014f72b59bbe6",
+    "sha256": "1477a0dc9ac4c20d837d66ab1acde0555242467ef0a8905ae517700caa77b481",
     "status": 200,
     "headers": {
       "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -39,7 +39,7 @@
     "request_fingerprint": "f763e0f521206bd0edab0431ab8c5009f6a953263d934c8fd1876319d48b8ed9",
     "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026.02.19_WBL26_FINAL%20Data%20for%20Download.xlsx",
     "file": "wbl2026.xlsx",
-    "sha256": "ba4ae5acdb922fab095b2eb512b4293c57207783696a31340fb9302fb60a96e5",
+    "sha256": "66d6bd463a9249b028df5780d8df5b26dceb6ee73cb1b8d5c702a459f5cb8c42",
     "status": 200,
     "headers": {
       "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

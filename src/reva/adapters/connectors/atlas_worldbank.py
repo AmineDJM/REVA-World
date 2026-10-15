@@ -324,14 +324,14 @@ def read_members(body: bytes) -> Members:
         else:
             role = f"other:{name}"
         if role in roles:
-            raise SourceResponseError(f"two ZIP members look like the {role} file: {roles[role]}, {name}")
+            raise SourceResponseError(f"two ZIP members look like the {role} file: {roles[role]}, {name}", retryable=False)
         roles[role] = name
         texts[name] = text
         encs[name] = enc
         y, mo, d, *_ = info.date_time
         stamps[name] = f"{y:04d}-{mo:02d}-{d:02d}"
     if "data" not in roles:
-        raise SourceResponseError("no data CSV (Country Code, Indicator/Series Code, years) in the ZIP")
+        raise SourceResponseError("no data CSV (Country Code, Indicator/Series Code, years) in the ZIP", retryable=False)
     return Members(
         data=roles["data"],
         series=roles.get("series"),
