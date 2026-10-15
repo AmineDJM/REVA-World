@@ -283,22 +283,49 @@ export function localUtcToIso(v: string): string | undefined {
   return Number.isNaN(d.getTime()) ? undefined : d.toISOString();
 }
 
+/** Concepts that measure a quantity or net weight (where quantity-estimation flags apply). */
+export function isQuantityConcept(concept: string | null | undefined): boolean {
+  return !!concept && /(net_weight|quantity|\bqty\b|\.weight)/i.test(concept);
+}
+
+const LEGACY_FLAG_NOTE = 'legacy flag (meaning: quantity/net weight estimated)';
+
 /**
  * Short, human-readable notes for provider source flags that change how a value must be read
- * (e.g. UN Comtrade `isReported=false` / `legacyEstimationFlag`, WDI `obs_status`). A flag that
- * is absent is not reported as anything; an explicit `note` from the API is used verbatim.
+ * (e.g. UN Comtrade `isReported=false`, WDI `obs_status`). A flag that is absent is not reported
+ * as anything.
+ *
+ * Comtrade estimation (connector 1.2.0): only `provider_value_estimated === true` labels a value
+ * as a provider estimate (`null` means undeterminable and says nothing). `provider_quantity_estimated`
+ * concerns quantity / net weight and is shown only on quantity/weight concepts. The 1.1.0 key
+ * `provider_estimation_flagged` (legacyEstimationFlag != 0) codes estimated quantity/net weight,
+ * never the USD value: on old rows it is shown as a legacy flag with that meaning, never as a
+ * value estimate. An explicit API `note` is used verbatim unless it is an old note that read the
+ * legacy flag as a value estimate.
  */
-export function sourceFlagNotes(flags: Record<string, unknown> | null | undefined): string[] {
+export function sourceFlagNotes(flags: Record<string, unknown> | null | undefined, opts: { concept?: string | null } = {}): string[] {
   if (!flags || typeof flags !== 'object') return [];
   const out: string[] = [];
-  if (typeof flags.note === 'string' && flags.note.trim()) out.push(flags.note.trim());
-  if (flags.provider_returned_no_rows === true) out.push('provider returned no rows for this key');
-  const estimated = flags.provider_estimation_flagged === true;
-  if (estimated && !out.some((n) => /estimat/i.test(n))) {
-    const lef = flags.legacyEstimationFlag;
-    out.push(`provider estimate${lef !== undefined && lef !== null && lef !== '' ? ` (legacyEstimationFlag ${String(lef)})` : ''}`);
+  const concept = opts.concept ?? (typeof flags.concept === 'string' ? flags.concept : null);
+  const valueEstimated = flags.provider_value_estimated === true;
+  const legacy = flags.provider_estimation_flagged === true;
+  const lef = flags.legacyEstimationFlag;
+  const lefText = lef !== undefined && lef !== null && lef !== '' ? `legacyEstimationFlag ${String(lef)}` : '';
+  if (typeof flags.note === 'string' && flags.note.trim()) {
+    const note = flags.note.trim();
+    const legacyValueClaim = /estimat/i.test(note) && !valueEstimated && (legacy || /legacyEstimationFlag/i.test(note));
+    if (!legacyValueClaim) out.push(note);
   }
-  if (flags.isReported === false && !estimated && !out.some((n) => /reported/i.test(n))) {
+  if (flags.provider_returned_no_rows === true) out.push('provider returned no rows for this key');
+  if (valueEstimated && !out.some((n) => /estimat/i.test(n))) out.push('provider estimate (value marked estimated by the provider)');
+  if (isQuantityConcept(concept) && flags.provider_quantity_estimated === true) {
+    out.push(`provider estimate of quantity/net weight${lefText ? ` (${lefText})` : ''}`);
+  }
+  if (legacy && flags.provider_quantity_estimated === undefined && flags.provider_value_estimated === undefined) {
+    out.push(`${LEGACY_FLAG_NOTE}${lefText ? `, ${lefText}` : ''}`);
+  }
+  if (flags.legacy_estimation_code_unrecognised === true) out.push(`unrecognised provider estimation code${lefText ? ` (${lefText})` : ''}`);
+  if (flags.isReported === false && !valueEstimated && !out.some((n) => /reported/i.test(n))) {
     out.push('not directly reported (isReported=false)');
   }
   if (typeof flags.obs_status === 'string' && flags.obs_status.trim()) out.push(`provider status: ${flags.obs_status.trim()}`);

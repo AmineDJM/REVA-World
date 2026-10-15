@@ -23,7 +23,16 @@ resource abuse or a real defence gap), Low (hardening with a narrow precondition
 | A7 | 500 responses had no security headers (no `nosniff`, CSP or `X-Frame-Options`). The generic handler runs in Starlette's outermost `ServerErrorMiddleware`, outside the header middleware. | Low | any unhandled exception | Header logic is factored into `apply_security_headers()`, exposed as `app.state.apply_security_headers` and applied by the `Exception` handler in `errors.py`. The body is still a generic `internal_error` with no exception text. | `test_internal_errors_carry_security_headers_and_no_internals` |
 | A8 | `REVA_CORS_ORIGINS=*` was accepted outside production together with `allow_credentials=True`. Starlette then reflects any `Origin` with `Access-Control-Allow-Credentials: true`. Settings rejected this only in production. | Low | a local or test deployment configured with `*` | `create_app` raises `ConfigurationError` whenever the origins contain `*`. | `test_wildcard_cors_with_credentials_is_refused_everywhere` |
 
-Also changed: `errors.py` maps HTTP 413 to the stable code `payload_too_large`.
+Also changed:
+
+* `errors.py` maps HTTP 413 to the stable code `payload_too_large`.
+* `routes/sim.py`: `sim.create_scenario` now serialises identical creators with an advisory lock (R5-15) and
+  returns the row a concurrent caller committed. `POST /v1/scenarios` reported that row as 201 Created,
+  failing the existing R2-15 test. It now checks `meta.inserted_in_current_xact(xmin)` and answers 200 for a
+  scenario it did not insert.
+* `app.py` lifespan (coordinator request): the schema-contract startup guard
+  (`assert_schema_contract`, run via `asyncio.to_thread`). `SchemaDriftError` refuses startup in production.
+  In warn mode (the `REVA_ENV=test` default) drift, or a database that is not configured, is only logged.
 
 ## Verified with no change needed (regression tests added where cheap)
 

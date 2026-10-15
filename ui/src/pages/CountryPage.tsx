@@ -127,7 +127,7 @@ function ConceptPanel({ iso3, concept, title, definition }: { iso3: string; conc
   const rows = useMemo(() => {
     const base = mode === 'belief' ? (beliefs.data ? beliefRows(beliefs.data.data) : []) : series.data ? evidenceRows(series.data.data.points) : [];
     const flagsById = new Map<string, string[]>();
-    for (const o of observations.data?.data ?? []) flagsById.set(o.id, sourceFlagNotes(o.source_flags));
+    for (const o of observations.data?.data ?? []) flagsById.set(o.id, sourceFlagNotes(o.source_flags, { concept }));
     return base.map((r) => (r.observationId && flagsById.get(r.observationId)?.length ? { ...r, flags: flagsById.get(r.observationId)! } : r));
   }, [mode, beliefs.data, series.data, observations.data]);
   const sorted = useMemo(() => [...rows].sort((a, b) => (a.year ?? 0) - (b.year ?? 0)), [rows]);

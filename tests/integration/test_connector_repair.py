@@ -244,7 +244,8 @@ def test_unit_change_suggests_conditional_mapping_that_leaves_history_intact(db,
     scale = next(x for x in a.changes if x["kind"] == R.SCALE)
     assert scale["rescaled_concepts"] == {f"{POP}@1.0.0": "1E-3"}
     m = a.suggested_mapping
-    assert m is not None and m.scales == (R.ScaleRule("$[1][].value", "1000", "$[1][].unit", "thousands"),)
+    # The conditional rule also restores the reviewed (empty) unit marker on the rows it rescales.
+    assert m is not None and m.scales == (R.ScaleRule("$[1][].value", "1000", "$[1][].unit", "thousands", ""),)
     rp = advisor.propose(wb, a)
     assert rp is not None
     ev = io.get_json(rp.reports[0].evidence_manifest)

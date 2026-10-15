@@ -242,7 +242,8 @@ async def _noop(_: float = 0) -> None:
 def _client(handler: Any, hosts: tuple[str, ...] = ("comtradeapi.un.org",), **kw: Any) -> SafeHttpClient:
     return SafeHttpClient(allowed_hosts=list(hosts), transport=httpx.MockTransport(handler),
                           resolver=lambda h: ["93.184.216.34"],
-                          rate_limiter=RateLimiter(default=HostPolicy(min_interval_seconds=0, max_retry_after_seconds=5)),
+                          rate_limiter=RateLimiter(
+                              default=HostPolicy(min_interval_seconds=0, max_retry_after_seconds=5)),
                           sleep=_noop, **kw)
 
 
@@ -500,6 +501,8 @@ def api(fresh: Fresh) -> Iterator[Any]:
     def boom() -> None:
         raise RuntimeError(f"internal state password={ADMIN_PASSWORD} at /srv/reva/secret.py")
 
+    app.router.routes.insert(0, app.router.routes.pop())  # ahead of the SPA catch-all
+
     with TestClient(app, raise_server_exceptions=False) as client:
         yield app, client
 
@@ -513,7 +516,8 @@ def _mint_token(f: Fresh, label: str) -> tuple[str, str]:
                              "VALUES (:s, :sc, :l, 'service') RETURNING id"),
                         {"s": sha, "sc": ["read", "ingest"], "l": label}).scalar_one()
         c.execute(text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
-                       "jsonb_build_object('token_id', CAST(:i AS text)), jsonb_build_object('label', :l))"),
+                       "jsonb_build_object('token_id', CAST(:i AS text)), "
+                       "jsonb_build_object('label', CAST(:l AS text)))"),
                   {"i": str(tid), "l": label})
     return token, sha
 
@@ -606,15 +610,17 @@ _API_PROCESS = textwrap.dedent("""
     @app.get("/v1/_boom2")
     def boom2():
         raise RuntimeError("Authorization: Bearer " + sys.argv[2])
-    with TestClient(app, raise_server_exceptions=False) as c:
-        assert c.get("/v1/_boom").status_code == 500
-        assert c.get("/v1/_boom2").status_code == 500
+    app.router.routes[:0] = [app.router.routes.pop(), app.router.routes.pop()]  # ahead of the SPA catch-all
+    c = TestClient(app, raise_server_exceptions=False)  # no lifespan: this process never touches a database
+    assert c.get("/v1/_boom").status_code == 500
+    assert c.get("/v1/_boom2").status_code == 500
 """)
 
 
 def _api_process(tmp_path: Path, mode: str, secret: str) -> subprocess.CompletedProcess[str]:
     env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(tmp_path), "REVA_ENV": "local",
-           "REVA_API_DB_PASSWORD": canary("apipw"), "REVA_ALLOWED_HOSTS": "testserver"}
+           "REVA_API_DB_PASSWORD": canary("apipw"), "REVA_ALLOWED_HOSTS": "testserver",
+           "REVA_DB_PORT": "1", "REVA_DB_NAME": "reva_r7_unreachable"}  # never the dev database
     return subprocess.run([sys.executable, "-c", _API_PROCESS, mode, secret], env=env, cwd=tmp_path,
                           capture_output=True, text=True, timeout=120)
 

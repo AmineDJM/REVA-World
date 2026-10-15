@@ -264,9 +264,21 @@ BEGIN
     RAISE EXCEPTION 'reva_registry must be a NOLOGIN role without privileged attributes';
   END IF;
   -- A non-superuser CREATEROLE owner (PG16+) holds only ADMIN on roles it
-  -- created; making reva_registry an object owner needs SET on it.
+  -- created (createrole_self_grant = ''); making reva_registry an object owner
+  -- needs SET on it, which ADMIN lets the owner grant itself. A reva_registry
+  -- created by another role (shared cluster) needs a superuser grant first,
+  -- exactly like the runtime roles.
   IF NOT (SELECT rolsuper FROM pg_roles WHERE rolname = current_user)
      AND NOT pg_has_role(current_user, 'reva_registry', 'SET') THEN
+    IF NOT EXISTS (SELECT 1 FROM pg_auth_members m
+                   WHERE m.roleid = (SELECT oid FROM pg_roles WHERE rolname = 'reva_registry')
+                     AND m.member = (SELECT oid FROM pg_roles WHERE rolname = current_user)
+                     AND m.admin_option) THEN
+      RAISE EXCEPTION 'role reva_registry exists but migration owner % holds neither SET nor ADMIN on it',
+        current_user
+        USING ERRCODE = 'insufficient_privilege',
+              HINT = format('a superuser must run: GRANT reva_registry TO %I WITH ADMIN OPTION', current_user);
+    END IF;
     EXECUTE format('GRANT reva_registry TO %I WITH INHERIT FALSE, SET TRUE', current_user);
   END IF;
 END $$;

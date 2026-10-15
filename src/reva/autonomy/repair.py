@@ -359,10 +359,19 @@ _DECIMAL_TEXT = re.compile(r"-?(0|[1-9]\d*)(\.\d+)?([eE][+-]?\d+)?")
 
 @dataclass(frozen=True)
 class ScaleRule:
+    """Multiply ``path`` by ``factor`` where ``when_path == when_equals``.
+
+    ``normalize_to`` (conditional rules only) rewrites the matched unit marker to the
+    reviewed unit value, so the mapped payload carries the unit the reviewed parser
+    and validator expect (e.g. ``"thousands"`` -> ``""`` after multiplying by 1000)
+    instead of a rescaled value under a stale marker.
+    """
+
     path: str
     factor: str
     when_path: str | None = None
     when_equals: str | None = None
+    normalize_to: str | None = None
 
 
 @dataclass(frozen=True)
@@ -385,7 +394,9 @@ class MappingRevision:
         return {"base_parser_version": self.base_parser_version,
                 "renames": [{"from": a, "to": b} for a, b in self.renames],
                 "scales": [{"path": s.path, "factor": s.factor, "when": (
-                    {"path": s.when_path, "equals": s.when_equals} if s.when_path else None)} for s in self.scales],
+                    {"path": s.when_path, "equals": s.when_equals} if s.when_path else None),
+                    **({"normalize_to": s.normalize_to} if s.normalize_to is not None else {})}
+                    for s in self.scales],
                 "coercions": list(self.coercions), "note": self.note}
 
     @property
@@ -411,6 +422,8 @@ class MappingRevision:
                 v = r.get(key)
                 if isinstance(v, Decimal):
                     r[key] = v * factor
+                if cond_key is not None and s.normalize_to is not None:
+                    r[cond_key] = s.normalize_to
         for p in self.coercions:
             recs, key = _records(obj, p)
             for r in recs:
@@ -1529,12 +1542,14 @@ def suggest_mapping(parser_version: str, cls: str, changes: Sequence[Mapping[str
     if scale is not None:
         # A rescaling is only invertible when one unit marker changed to one new value
         # (the condition) and the item has a single value field; otherwise review decides.
+        # The matched marker is restored to the single accepted unit value (normalize_to);
+        # with several accepted values the target unit is ambiguous and review decides.
         if not (sem and len(sem.value_paths) == 1 and len(units) == 1 and len(units[0]["new_values"]) == 1
-                and scale["factor_new_over_old"]):
+                and len(units[0].get("old_values") or []) == 1 and scale["factor_new_over_old"]):
             return None
         factor = Decimal(1) / Decimal(scale["factor_new_over_old"])
         scales = (ScaleRule(sem.value_paths[0], format(factor.normalize(), "f"), units[0]["path"],
-                            units[0]["new_values"][0]),)
+                            units[0]["new_values"][0], units[0]["old_values"][0]),)
     elif units:
         return None  # unit text changed without measurable rescaling: meaning must be reviewed
     if any(c["kind"] in (MEANING, CLASSIFICATION, REMOVED, STRUCTURE) for c in changes):
