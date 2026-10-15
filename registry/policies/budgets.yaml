@@ -1,7 +1,7 @@
-policy_version: "budgets-1.3.0"
+policy_version: "budgets-1.3.1"
 daily:
-  http_requests_total: 7839
-  http_bytes_total: 2926788000
+  http_requests_total: 9997
+  http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
   un.comtrade.public_preview: 100
@@ -17,18 +17,72 @@ per_source_daily_requests:
   # max of the requests per registered source, capped at 5000/day; reasons in the request files.
   # ccp.data: requested by A-LAW (a_law.yaml)
   ccp.data: 10
+  # clio_infra.dataverse: requested by A-HISTECON (a_histecon.yaml)
+  clio_infra.dataverse: 250
   # constitute.service: requested by A-LAW (a_law.yaml)
   constitute.service: 5
+  # cow.data: requested by A-HISTECON (a_histecon.yaml)
+  cow.data: 20
   # factbook.json: requested by A-LAW (a_law.yaml)
   factbook.json: 300
+  # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
+  gapminder.fasttrack: 20
+  # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
+  geonames.countryinfo: 2
+  # hyde.dans: requested by A-HISTECON (a_histecon.yaml)
+  hyde.dans: 10
+  # ilostat.rplumber: requested by A-ILO (a_ilo.yaml)
+  ilostat.rplumber: 60
+  # imf.sdmx: requested by A-IMF (a_imf.yaml)
+  imf.sdmx: 60
+  # jrc.inform_risk: requested by A-GEO (a_geo.yaml)
+  jrc.inform_risk: 4
+  # maddison.mpd: requested by A-HISTECON (a_histecon.yaml)
+  maddison.mpd: 10
+  # naturalearth.admin0_10m: requested by A-GEO (a_geo.yaml)
+  naturalearth.admin0_10m: 12
+  # nobelprize.api: requested by A-SCI (a_sci.yaml)
+  nobelprize.api: 5
+  # oecd.sdmx: requested by A-ILO (a_ilo.yaml)
+  oecd.sdmx: 6
+  # openalex.api: requested by A-SCI (a_sci.yaml)
+  openalex.api: 400
+  # owid.compilations: requested by A-QOL (a_qol.yaml)
+  owid.compilations: 50
   # ssa.ssptw: requested by A-LAW (a_law.yaml)
   ssa.ssptw: 10
+  # un.desa_ims: requested by A-UN (a_un.yaml)
+  un.desa_ims: 5
+  # un.sdg: requested by A-UN (a_un.yaml)
+  un.sdg: 400
+  # un.wpp: requested by A-UN (a_un.yaml)
+  un.wpp: 10
+  # undp.hdr: requested by A-QOL (a_qol.yaml)
+  undp.hdr: 10
+  # unesco.uis: requested by A-HEALTHEDU (a_healthedu.yaml)
+  unesco.uis: 30
   # unesco.whc: requested by KGCULT (kgcult.yaml)
   unesco.whc: 4
+  # unhcr.population: requested by A-UN (a_un.yaml)
+  unhcr.population: 150
+  # unsd.syb: requested by A-UN (a_un.yaml)
+  unsd.syb: 5
+  # who.gho: requested by A-HEALTHEDU (a_healthedu.yaml)
+  who.gho: 120
+  # whr.figure21: requested by A-QOL (a_qol.yaml)
+  whr.figure21: 5
+  # wid.bulk: requested by A-QOL (a_qol.yaml)
+  wid.bulk: 500
   # wikidata.wbapi: requested by WDHARVEST (wdharvest.yaml)
   wikidata.wbapi: 4000
   # wikidata.wdqs: requested by WDHARVEST (wdharvest.yaml)
   wikidata.wdqs: 1500
+  # wipo.gii: requested by A-SCI (a_sci.yaml)
+  wipo.gii: 3
+  # wipo.ipstats_bulk: requested by A-SCI (a_sci.yaml)
+  wipo.ipstats_bulk: 5
+  # worldbank.cckp: requested by A-GEO (a_geo.yaml)
+  worldbank.cckp: 6
   # worldbank.wbl: requested by A-LAW (a_law.yaml)
   worldbank.wbl: 10
 llm:

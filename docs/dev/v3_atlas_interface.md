@@ -49,9 +49,9 @@ summary = register_atlas_table(
 #     created, unmapped_provider_geo [{provider_geo, rows}], coverage {...}}
 ```
 
-* **Raw bytes first.** Archive each raw download as an `evidence.acquisition` (with your
-  connector's spec through `reva.evidence.ingest.publish_acquisition`, zero observation batches is
-  fine) with the same `origin`; pass the raw sha256s. Unarchived raw → `ValidationProblem`.
+* **Raw bytes first.** Archive each raw download as an `evidence.acquisition` with the same
+  `origin` — inside an atlas run simply `run.archive(raw)` (section 7) — and pass the raw sha256s.
+  Unarchived raw → `ValidationProblem`.
 * Validation refuses (typed `ValidationProblem`, nothing written): wrong/missing/extra columns or
   types, nulls in required columns, `source`/`dataset` mismatch, non-strict decimals, value-less rows
   without `flags.missing`, `period_start >= period_end`, invalid JSON flags/selector, duplicate cells,
@@ -135,3 +135,57 @@ an unlisted source is refused (fail closed) — test with fixtures meanwhile.
 `reva.atlas.query` (DuckDB over the snapshot's pinned Parquet files) and `GET /v1/atlas/*`:
 `/concepts`, `/countries/{iso3}` (dossier), `/series?concept&iso3`, `/map?concept&year`, `/coverage`.
 See `docs/dev/v3_atlascore.md`.
+
+## 7. Atlas sources and the single ingest entry point (lead decision, replaces the template workaround)
+
+`ConnectorSpec.template` stays closed (it is inside the digest-pinned autonomy template closure) and
+atlas connectors are **not** `builtin_connectors()`. Instead (`src/reva/atlas/sources.py`,
+`src/reva/atlas/ingest.py`):
+
+```python
+# src/reva/adapters/connectors/atlas_imf.py  (discovered by module name: atlas_*.py, nothing to register)
+from reva.atlas.sources import AtlasSourceSpec
+
+def atlas_source() -> AtlasSourceSpec:          # or ATLAS_SOURCE = ... / ATLAS_SOURCES = [...]
+    return AtlasSourceSpec(
+        name="atlas.imf", version="1.0.0",       # connector name (atlas.*) + version (bump on change)
+        source_key="imf.sdmx",                   # registry/sources/*.yaml key (also the budget key)
+        atlas_source="imf",                      # atlas table `source` (no dots)
+        provider="International Monetary Fund", licence="...",
+        allowed_hosts=("api.imf.org",), datasets=("weo", "bop"), dataset_ids=("IMF.RES:WEO",),
+        cadence_seconds=30 * 86400,
+        planned_requests=40,                     # reserved before the run; extra requests are topped up or refused
+        max_response_bytes=300_000_000,          # <= 1 GiB per response (bulk files); daily bytes still apply
+        min_interval_seconds=1.0,                # politeness per host
+        parser_version="atlas_imf/1", code_digest="sha256:...",  # optional
+        budget_key="",                           # default = source_key; set to share another source's budget
+    )
+
+async def atlas_ingest(run) -> dict:             # run: reva.atlas.ingest.AtlasRun
+    for ds in ("weo", "bop"):
+        if not run.wants(ds):                    # honours --dataset
+            continue
+        raw = await run.get(url, key=f"{ds}:2025-10", media_types=("application/xml",), headers={...})
+        sha = run.archive(raw)                   # evidence.acquisition of connector atlas.imf@1.0.0
+        frame = parse(raw.body, sha)             # polars frame in ATLAS_SCHEMA
+        run.register(dataset=ds, frame=frame, raw_sha256s=[sha], geo_scheme="iso3", coverage_note="...")
+    return {"datasets": [...]}                   # anything JSON-able
+```
+
+* **Never build an HTTP client in an atlas module.** `run.http` (and `run.get`) is the
+  SafeHttpClient restricted to `allowed_hosts`, wrapped in the budget meter (live), or
+  `FixtureHttp("<name>")` replaying `tests/fixtures/source/<name>/manifest.json` (fixture mode).
+  Invariant 30 (`test_every_live_provider_request_path_is_budgeted`) flags any module that creates
+  a client (`make_live_client(`, `SafeHttpClient(`, `httpx.*Client(`, `urlopen(`) outside a budgeted path.
+* Run it: `uv run python -m reva.atlas.ingest atlas.imf [--dataset weo] [--fixture]`
+  (`--list` shows every discovered source and modules that failed to import); worker job handler
+  `reva.atlas.ingest:handle_atlas_ingest` (payload `{"source", "dataset"?, "mode"}`); requested CLI
+  alias `reva atlas ingest <source>` and job kind `atlas_ingest` (lead-owned files).
+* Live flow: `reserve_ingest(budget_key, planned_requests)` before any request (refused →
+  `BudgetExhausted`, nothing fetched) → metered requests → `settle_metered` with actual usage
+  (also on failure). An in-run budget refusal ends the run with `status: "budget_exhausted"`; what was
+  archived/registered so far stays (each table registration is atomic).
+* Connector versions: atlas specs are registered like built-in connectors (owner role). In tests /
+  throwaway databases call `reva.atlas.sources.ensure_registered(owner_engine, store, spec)`; for the
+  seeded deployment the lead adds `register_atlas_connector_versions(conn, store, act)` to the seed.
+* Tests: see `tests/integration/test_atlas_ingest.py` (fake live client via `http_factory=`).

@@ -56,7 +56,7 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   Each later merge bumps the patch version and re-pins here.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "4a7a956ee5f6a433e5520c5c1d3506a70f5287f7232de5fa915c295e9c8828e8",
+    "budgets.yaml": "c75a9cf10a25e5b2d71c9ddb6a293d9f81df271104136a5c7b87fa327658dd1a",
 }
 
 

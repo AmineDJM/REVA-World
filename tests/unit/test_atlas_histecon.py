@@ -240,3 +240,44 @@ def test_cow_zip_member_is_exact_and_bounded() -> None:
     assert atlas_cow.zip_member(buf.getvalue(), "States2024/statelist2024.csv") == b"a,b\n1,2\n"
     with pytest.raises(SourceResponseError):
         atlas_cow.zip_member(buf.getvalue(), "statelist2024.csv")
+
+
+# --------------------------------------------------------------------------- HYDE
+def test_inflate64_real_member_crc() -> None:
+    import zlib
+    from pathlib import Path
+
+    from reva.adapters.connectors.atlas_inflate64 import InflateError, inflate
+
+    d = Path(__file__).resolve().parents[1] / "fixtures" / "source" / "atlas.hyde.hyde321"
+    meta = json.loads((d / "deflate64_rf_rice_r.json").read_text())
+    out = inflate((d / "deflate64_rf_rice_r.bin").read_bytes(), deflate64=True)
+    assert len(out) == meta["size"] and zlib.crc32(out) == meta["crc32"]
+    with pytest.raises(InflateError):
+        inflate((d / "deflate64_rf_rice_r.bin").read_bytes(), deflate64=True, max_out=1000)
+    with pytest.raises(InflateError):
+        inflate(b"\xff\xff\xff", deflate64=True)
+
+
+async def test_hyde_tail_parse_and_bce_exclusion() -> None:
+    from reva.adapters.connectors import atlas_hyde
+
+    (b,), _ = await _builds(atlas_hyde.HydeConnector(tail_bytes=10_000_000), atlas_hyde.NAME)
+    f, unmapped = _valid(b)
+    assert {u["provider_geo"] for u in unmapped} == {"158", "891", "world"}
+    fra = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "popc"))
+    assert fra["period_start"].min() == date(100, 1, 1)  # BCE steps and year 0 are not representable
+    assert b.report["excluded_bce_or_year0_cells"] > 0 and b.report["bce_steps"][0] == -10000
+    fl = json.loads(fra["flags"][0])
+    assert fl["hyde_modelled"] is True and fl["licence"] == "CC BY 3.0" and "inhabitants" in fl["unit_note"]
+    assert set(f["indicator"].unique().to_list()) == {v[0] for v in atlas_hyde.SUMMARIES.values()}
+    twn = f.filter(pl.col("provider_geo") == "158")
+    assert set(twn["entity_qid"].to_list()) == {"Q865"}
+
+
+def test_hyde_readme_licence_clause_required() -> None:
+    from reva.adapters.connectors import atlas_hyde
+
+    assert atlas_hyde.check_readme(b"The Creative Commons License (CC BY 3.0) applies to all of the HYDE data.") == "CC BY 3.0"
+    with pytest.raises(SourceResponseError):
+        atlas_hyde.check_readme(b"All rights reserved.")

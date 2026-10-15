@@ -1,0 +1,737 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 5396324,
+  "identifier": "dans-25g-gez3",
+  "persistentUrl": "https://doi.org/10.17026/DANS-25G-GEZ3",
+  "protocol": "doi",
+  "authority": "10.17026",
+  "separator": "/",
+  "publisher": "DANS Data Station Archaeology",
+  "publicationDate": "2017-09-29",
+  "storageIdentifier": "surf://10.17026/dans-25g-gez3",
+  "effectiveDatasetFileCountLimit": 10000,
+  "datasetFileUploadsAvailable": 7172,
+  "datasetType": "dataset",
+  "locks": [],
+  "latestVersion": {
+   "id": 384650,
+   "datasetId": 5396324,
+   "datasetPersistentId": "doi:10.17026/DANS-25G-GEZ3",
+   "datasetType": "dataset",
+   "storageIdentifier": "surf://10.17026/dans-25g-gez3",
+   "versionNumber": 2,
+   "internalVersionNumber": 10,
+   "versionMinorNumber": 0,
+   "versionState": "RELEASED",
+   "latestVersionPublishingState": "RELEASED",
+   "deaccessionLink": "",
+   "distributionDate": "2017-09-29",
+   "productionDate": "2017-09-28",
+   "UNF": "UNF:6:awlkxWQCVLO/LImWDWVc8Q==",
+   "lastUpdateTime": "2025-06-02T14:41:52Z",
+   "releaseTime": "2025-06-02T14:41:52Z",
+   "createTime": "2025-06-02T14:34:12Z",
+   "publicationDate": "2017-09-29",
+   "citationDate": "2017-09-29",
+   "effectiveDatasetFileCountLimit": 10000,
+   "datasetFileUploadsAvailable": 7172,
+   "license": {
+    "name": "CC0-1.0",
+    "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+    "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+    "rightsIdentifier": "CC0-1.0",
+    "rightsIdentifierScheme": "SPDX",
+    "schemeUri": "https://spdx.org/licenses/",
+    "languageCode": "en"
+   },
+   "termsOfAccess": "",
+   "fileAccessRequest": true,
+   "metadataBlocks": {
+    "citation": {
+     "displayName": "Citation Metadata",
+     "name": "citation",
+     "fields": [
+      {
+       "typeName": "title",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "Anthropogenic land-use estimates for the Holocene; HYDE 3.2"
+      },
+      {
+       "typeName": "otherId",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "otherIdAgency": {
+          "typeName": "otherIdAgency",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "DANS-KNAW"
+         },
+         "otherIdValue": {
+          "typeName": "otherIdValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "easy-dataset:74467"
+         }
+        },
+        {
+         "otherIdValue": {
+          "typeName": "otherIdValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "016.158.021 (NWO VENI grant no.)"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "author",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "authorName": {
+          "typeName": "authorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "C.G.M. Klein Goldewijk"
+         },
+         "authorAffiliation": {
+          "typeName": "authorAffiliation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Utrecht University"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "datasetContact",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "datasetContactName": {
+          "typeName": "datasetContactName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "C.G.M. Klein Goldewijk"
+         },
+         "datasetContactAffiliation": {
+          "typeName": "datasetContactAffiliation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Utrecht University"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "dsDescription",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "dsDescriptionValue": {
+          "typeName": "dsDescriptionValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "<p>Land use plays an important role in the climate system (Feddema et al., 2005). Many ecosystem processes are directly or indirectly climate driven, and together with human driven land use changes, they determine how the land surface will evolve through time. To assess the effects of land cover changes on the climate system, models are required which are capable of simulating interactions between the involved components of the Earth system (land, atmosphere, ocean, and carbon cycle). Since driving forces for global environmental change differ among regions, a geographically (spatially) explicit modeling approach is called for, so that it can be incorporated in global and regional (climate and/or biophysical) change models in order to enhance our understanding of the underlying processes and thus improving future projections.</p><p>Integrated records of the co-evolving human-environment system over millennia are needed to provide a basis for a deeper understanding of the present and for forecasting the future. This requires the major task of assembling and integrating regional and global historical, archaeological, and paleo-environmental records. Humans cannot predict the future. But, if we can adequately understand the past, we can use that understanding to influence our decisions and to create a better, more sustainable and desirable future.</p><p>Some researchers suggest that mankind has shifted from living in the Holocene (~emergence of agriculture) into the Anthropocene (~humans capable of changing the Earth\u2019 atmosphere) since the start of the Industrial Revolution. But in the light of the sheer size and magnitude of some historical land use changes (e.g. collapse of the Roman Empire in the 4th century, the depopulation of Europe due to the Black Plague in the 14th century and the aftermath of the colonization of the Americas in the 16th century), some believe that this point might have occurred earlier in time (Ruddiman, 2003; Kaplan et al., 2010). Many uncertainties still remain today and gaps in our knowledge of the Antiquity and its aftermath can only be improved by interdisciplinary research.</p><p>HYDE presents (gridded) time series of population and land use for the last 12,000 years. It is an update (v 3.2) of the History Database of the Global Environment (HYDE) from Klein Goldewijk et al. (2011, 2013) with new quantitative estimates of the underlying demographic and agricultural developments for the Holocene.</p>"
+         }
+        },
+        {
+         "dsDescriptionValue": {
+          "typeName": "dsDescriptionValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "<p>The datasets consist of different time steps for each period: 10k BCE - 1 CE: 1000 yr, 1 - 1700 CE: 100 yr, 1700 - 2000 CE: 10 yr, 2000 - 2015 CE: 1 yr.</p><p>The \u2018Lower\u2019 and \u2018Upper\u2019 scenarios are available upon request by sending an email to c.g.m.kleingoldewijk@uu.nl</p>"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "subject",
+       "multiple": true,
+       "typeClass": "controlledVocabulary",
+       "value": [
+        "Agricultural Sciences",
+        "Arts and Humanities",
+        "Earth and Environmental Sciences",
+        "Social Sciences"
+       ]
+      },
+      {
+       "typeName": "keyword",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Historical population"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "land use"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "cropland"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "pasture"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Holocene"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "agriculture"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "notesText",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "The data is offered in three ZIPfiles. Be aware that when extracted the total size of the dataset is 77.8 GB."
+      },
+      {
+       "typeName": "language",
+       "multiple": true,
+       "typeClass": "controlledVocabulary",
+       "value": [
+        "English"
+       ]
+      },
+      {
+       "typeName": "productionDate",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "2017-09-28"
+      },
+      {
+       "typeName": "contributor",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "contributorName": {
+          "typeName": "contributorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "A. Beusen (Utrecht University)"
+         }
+        },
+        {
+         "contributorName": {
+          "typeName": "contributorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "J. Doelman (PBL Netherlands Environmental Assesment Agency)"
+         }
+        },
+        {
+         "contributorName": {
+          "typeName": "contributorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "E. Stehfest (PBL Netherlands Environmental Assesment Agency)"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "distributionDate",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "2017-09-29"
+      },
+      {
+       "typeName": "dateOfDeposit",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "2017-09-28"
+      },
+      {
+       "typeName": "dataSources",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "History Database of the Global Environment (HYDE)"
+       ]
+      }
+     ]
+    },
+    "dansRights": {
+     "displayName": "Rights Metadata",
+     "name": "dansRights",
+     "fields": [
+      {
+       "typeName": "dansRightsHolder",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "Unknown"
+       ]
+      },
+      {
+       "typeName": "dansPersonalDataPresent",
+       "multiple": false,
+       "typeClass": "controlledVocabulary",
+       "value": "Unknown"
+      },
+      {
+       "typeName": "dansMetadataLanguage",
+       "multiple": true,
+       "typeClass": "controlledVocabulary",
+       "value": [
+        "English"
+       ]
+      }
+     ]
+    },
+    "dansRelationMetadata": {
+     "displayName": "Relation Metadata",
+     "name": "dansRelationMetadata",
+     "fields": [
+      {
+       "typeName": "dansAudience",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "https://www.narcis.nl/classification/D37000",
+        "https://www.narcis.nl/classification/D64000",
+        "https://www.narcis.nl/classification/E15000",
+        "https://www.narcis.nl/classification/D34000",
+        "https://www.narcis.nl/classification/D15000",
+        "https://www.narcis.nl/classification/D18000"
+       ],
+       "expandedvalue": [
+        {
+         "@id": "https://www.narcis.nl/classification/D37000",
+         "termName": [
+          {
+           "lang": "nl",
+           "value": "Archeologie"
+          },
+          {
+           "lang": "en",
+           "value": "Archaeology"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        },
+        {
+         "@id": "https://www.narcis.nl/classification/D64000",
+         "termName": [
+          {
+           "lang": "nl",
+           "value": "Demografie"
+          },
+          {
+           "lang": "en",
+           "value": "Demography"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        },
+        {
+         "@id": "https://www.narcis.nl/classification/E15000",
+         "termName": [
+          {
+           "lang": "en",
+           "value": "Environmental studies"
+          },
+          {
+           "lang": "nl",
+           "value": "Milieustudies"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        },
+        {
+         "@id": "https://www.narcis.nl/classification/D34000",
+         "termName": [
+          {
+           "lang": "nl",
+           "value": "Geschiedenis"
+          },
+          {
+           "lang": "en",
+           "value": "History"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        },
+        {
+         "@id": "https://www.narcis.nl/classification/D15000",
+         "termName": [
+          {
+           "lang": "nl",
+           "value": "Aardwetenschappen"
+          },
+          {
+           "lang": "en",
+           "value": "Earth sciences"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        },
+        {
+         "@id": "https://www.narcis.nl/classification/D18000",
+         "termName": [
+          {
+           "lang": "nl",
+           "value": "Landbouw en beheer van het fysieke milieu"
+          },
+          {
+           "lang": "en",
+           "value": "Agriculture and the physical environment"
+          }
+         ],
+         "vocabularyUri": "https://www.narcis.nl/classification/"
+        }
+       ]
+      },
+      {
+       "typeName": "dansRelation",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "references"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Feddema, J.J., Oleson, K.W., Bonan, G.B., Mearns, L.O., Buja, L.E., Meehl, G.A. & Washington, W.M. (2005) Atmospheric science: The importance of land-cover change in simulating future climates. Science, 310, 1674-167"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "references"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Kaplan, J.O., Krumhardt, K.M., Ellis, E.C., Ruddiman, W.F., Lemmen, C. & Klein Goldewijk, K. (2010) Holocene carbon emissions as a result of anthropogenic land cover change. The Holocene, 20"
+         },
+         "dansRelationURI": {
+          "typeName": "dansRelationURI",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "http://dx.doi.org/10.1177/0959683610386983"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "references"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Klein Goldewijk, K., Beusen, A., van Drecht, G. & de Vos, M. (2011) The HYDE 3.1 spatially explicit database of human induced land use change over the past 12,000 years. Global Ecology and Biogeography, 20, 73-86"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "references"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Ruddiman, W.F. (2003) The anthropogenic greenhouse era began thousands of years ago. Climatic Change, 61, 261-293"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "replaces"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Klein Goldewijk, Dr. ir. C.G.M. (Utrecht University) (2016): A historical land use data set for the Holocene; HYDE 3.2 (replaced)."
+         },
+         "dansRelationURI": {
+          "typeName": "dansRelationURI",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "http://dx.doi.org/10.17026/dans-znk-cfy3"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "replaces"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Klein Goldewijk, Dr. ir. C.G.M. (Utrecht University) (2016): A historical land use data set for the Holocene; HYDE 3.2 (version 2, replaced)"
+         },
+         "dansRelationURI": {
+          "typeName": "dansRelationURI",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "https://doi.org/10.17026/dans-2ct-fmud"
+         }
+        },
+        {
+         "dansRelationType": {
+          "typeName": "dansRelationType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "is referenced by"
+         },
+         "dansRelationText": {
+          "typeName": "dansRelationText",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Klein Goldewijk, K., A. Beusen, J. Doelman and S. Stehfest (2017), Anthropogenic land-use estimates for the Holocene; HYDE 3.2, Earth System Science Data"
+         }
+        }
+       ]
+      }
+     ]
+    },
+    "dansTemporalSpatial": {
+     "displayName": "Temporal and Spatial Coverage",
+     "name": "dansTemporalSpatial",
+     "fields": [
+      {
+       "typeName": "dansTemporalCoverage",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "10 000 BCE - 2015 CE",
+        "Holocene"
+       ]
+      },
+      {
+       "typeName": "dansSpatialCoverageText",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "Global"
+       ]
+      }
+     ]
+    },
+    "dansDataVaultMetadata": {
+     "displayName": "Data Vault Metadata",
+     "name": "dansDataVaultMetadata",
+     "fields": [
+      {
+       "typeName": "dansDataversePid",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "doi:10.17026/dans-25g-gez3"
+      },
+      {
+       "typeName": "dansDataversePidVersion",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "2.0"
+      },
+      {
+       "typeName": "dansBagId",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "urn:uuid:40fe0ca2-41be-45e9-97ed-29bca759423a"
+      },
+      {
+       "typeName": "dansNbn",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "urn:nbn:nl:ui:13-clts-tg"
+      }
+     ]
+    }
+   },
+   "files": [
+    {
+     "description": "",
+     "label": "easy-migration.zip",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 384650,
+     "dataFile": {
+      "id": 5398615,
+      "persistentId": "",
+      "filename": "easy-migration.zip",
+      "contentType": "application/zip",
+      "friendlyType": "ZIP Archive",
+      "filesize": 1400247,
+      "description": "",
+      "storageIdentifier": "surf://store:19580921191-7195d8e9a70e",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "e8c4bbea7125168e48cb640e77d6c1d5cf743851"
+      },
+      "tabularData": false,
+      "creationDate": "2025-03-10",
+      "publicationDate": "2017-09-29",
+      "lastUpdateTime": "2025-06-02T14:41:52Z",
+      "fileAccessRequest": true
+     }
+    },
+    {
+     "label": "HYDE3_2_1-anthromes.zip",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 384650,
+     "dataFile": {
+      "id": 5490329,
+      "persistentId": "",
+      "filename": "HYDE3_2_1-anthromes.zip",
+      "contentType": "application/octet-stream",
+      "friendlyType": "Unknown",
+      "filesize": 141764831,
+      "storageIdentifier": "surf://store:1973114bf59-c9ba1f7384e8",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "7c9f049a8b3be404692d672828c6f5e0ce756867"
+      },
+      "tabularData": false,
+      "creationDate": "2025-06-02",
+      "publicationDate": "2025-06-02",
+      "lastUpdateTime": "2025-06-02T14:41:52Z",
+      "fileAccessRequest": true
+     }
+    },
+    {
+     "label": "HYDE3_2_1-baseline.zip",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 384650,
+     "dataFile": {
+      "id": 5490328,
+      "persistentId": "",
+      "filename": "HYDE3_2_1-baseline.zip",
+      "contentType": "application/octet-stream",
+      "friendlyType": "Unknown",
+      "filesize": 19021,
+      "storageIdentifier": "surf://store:19731138dee-aa13cba62cc9",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "fd2499ee9e7fb4daaa654d2190c7e8a66e484196"
+      },
+      "tabularData": false,
+      "creationDate": "2025-06-02",
+      "publicationDate": "2025-06-02",
+      "lastUpdateTime": "2025-06-02T14:41:52Z",
+      "fileAccessRequest": true
+     }
+    },
+    {
+     "label": "HYDE3_2_1-general_supplementary.zip",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 384650,
+     "dataFile": {
+      "id": 5490327,
+      "persistentId": "",
+      "filename": "HYDE3_2_1-general_supplementary.zip",
+      "contentType": "application/zip",
+      "friendlyType": "ZIP Archive",
+      "filesize": 23585889,
+      "storageIdentifier": "surf://store:19731144930-c04f4a597680",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "3cfe98d21e70c9ce478460c7265962f1bb2b6aab"
+      },
+      "tabularData": false,
+      "creationDate": "2025-06-02",
+      "publicationDate": "2025-06-02",
+      "lastUpdateTime": "2025-06-02T14:41:52Z",
+      "fileAccessRequest": true
+     }
+    },
+    {
+     "description": "",
+     "label": "readme_release_HYDE3.2.1.txt",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 384650,
+     "dataFile": {
+      "id": 5396388,
+      "persistentId": "",
+      "filename": "readme_release_HYDE3.2.1.txt",
+      "contentType": "text/plain",
+      "friendlyType": "Plain Text",
+      "filesize": 8826,
+      "description": "",
+      "storageIdentifier": "surf://store:1958075413c-72bbd21f81e9",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "821309ce6035c68033c6e5b3522982cd515bd111"
+      },
+      "tabularData": false,
+      "creationDate": "2025-03-10",
+      "publicationDate": "2017-09-29",
+      "lastUpdateTime": "2025-06-02T14:41:52Z",
+      "fileAccessRequest": true
+     }
+    }
+   ]
+  }
+ }
+}

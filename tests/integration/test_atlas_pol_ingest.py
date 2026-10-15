@@ -31,7 +31,8 @@ async def test_vdem_ingest_registers_three_tables(db):
     assert fr.height == 1 and 0 < float(fr["value"][0]) < 1
     with db.owner.connect() as c:
         rights = c.execute(
-            text("SELECT rights FROM evidence.dataset WHERE dataset_key = 'atlas.vdem.indices' ORDER BY recorded_at DESC LIMIT 1")
+            text("SELECT a.rights FROM evidence.dataset d JOIN meta.artifact a ON a.sha256 = d.artifact_sha256 "
+                 "WHERE d.dataset_key = 'atlas.vdem.indices' ORDER BY d.recorded_at DESC LIMIT 1")
         ).scalar_one()
         n_acq = c.execute(
             text("SELECT count(*) FROM evidence.acquisition WHERE origin = 'test_fixture' AND raw_sha256 = :s"),
@@ -69,7 +70,8 @@ async def test_ipu_ingest(db):
     assert rep["parline"]["unmapped_provider_geo"] == [] and rep["elections"]["unmapped_provider_geo"] == []
     with db.owner.connect() as c:
         rights = c.execute(
-            text("SELECT rights FROM evidence.dataset WHERE dataset_key = 'atlas.ipu.parline' ORDER BY recorded_at DESC LIMIT 1")
+            text("SELECT a.rights FROM evidence.dataset d JOIN meta.artifact a ON a.sha256 = d.artifact_sha256 "
+                 "WHERE d.dataset_key = 'atlas.ipu.parline' ORDER BY d.recorded_at DESC LIMIT 1")
         ).scalar_one()
     rights = rights if isinstance(rights, dict) else json.loads(rights)
     assert rights["licence"] == "CC-BY-NC-SA-4.0" and rights["non_commercial"] is True
