@@ -61,8 +61,14 @@ def test_parse_time_bounds(iso: str, precision: int, calendar: str, expected: tu
 
 @pytest.mark.parametrize(
     ("iso", "precision"),
-    [("+1822-02-30T00:00:00Z", 11), ("+1822-00-00T00:00:00Z", 11), ("+1822-13-01", 10), ("next tuesday", 9),
-     ("1822", 15), ("1822", -1)],
+    [
+        ("+1822-02-30T00:00:00Z", 11),
+        ("+1822-00-00T00:00:00Z", 11),
+        ("+1822-13-01", 10),
+        ("next tuesday", 9),
+        ("1822", 15),
+        ("1822", -1),
+    ],
 )
 def test_parse_time_rejects_invalid(iso: str, precision: int) -> None:
     with pytest.raises(_Reject):
@@ -135,8 +141,12 @@ def test_somevalue_allowed_for_item_property_and_single_raw_default() -> None:
 def test_entity_normalisation_skips_bad_labels_visibly() -> None:
     row, skipped = _normalise_entity(
         0,
-        KgEntity("Q155", "country", {"en": "Brazil", "fr": "Brésil", "not a lang": "x", "de": "y" * 600},
-                 aliases={"en": ["Brasil", "Brazil", ""]}),
+        KgEntity(
+            "Q155",
+            "country",
+            {"en": "Brazil", "fr": "Brésil", "not a lang": "x", "de": "y" * 600},
+            aliases={"en": ["Brasil", "Brazil", ""]},
+        ),
     )
     langs = {(lang, alias) for lang, alias, _ in row.labels}
     assert langs == {("en", False), ("fr", False), ("en", True)}

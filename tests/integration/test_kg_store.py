@@ -71,16 +71,23 @@ def test_load_is_idempotent_and_records_provenance(kg) -> None:  # type: ignore[
     r1 = load_batch(kg.worker, kg.store, entities=ents, statements=sts, retrieved_at=now, **kw)
     assert (r1.entities_inserted, r1.labels_inserted, r1.statements_inserted, r1.rejected_total) == (1, 3, 2, 0)
     r2 = load_batch(kg.worker, kg.store, entities=ents, statements=sts, retrieved_at=now + timedelta(seconds=1), **kw)
-    assert (r2.entities_inserted, r2.entities_unchanged, r2.statements_inserted, r2.statements_unchanged) == (0, 1, 0, 2)
+    assert (r2.entities_inserted, r2.entities_unchanged, r2.statements_inserted, r2.statements_unchanged) == (
+        0,
+        1,
+        0,
+        2,
+    )
     with kg.api.connect() as c:
         n = c.execute(text("SELECT count(*) FROM kg.statement WHERE source_key = :s"), {"s": src}).scalar_one()
         assert n == 2
         load = c.execute(text("SELECT * FROM kg.load WHERE id = :i"), {"i": r1.load_id}).mappings().one()
         assert load["recorded_by"] == "reva_worker" and load["raw_sha256s"] == [raw]
         assert load["recorded_at"] >= now - timedelta(seconds=5)
-        row = c.execute(
-            text("SELECT * FROM kg.statement_current WHERE statement_key = :k"), {"k": f"{src}:S1"}
-        ).mappings().one()
+        row = (
+            c.execute(text("SELECT * FROM kg.statement_current WHERE statement_key = :k"), {"k": f"{src}:S1"})
+            .mappings()
+            .one()
+        )
         assert row["raw_sha256"] == raw and row["recorded_at"] == load["recorded_at"]
         assert str(row["valid_lo"]) == "1900-01-01" and row["valid_hi"] is None
         # the raw artifact was registered as a verified meta.artifact by the loader
@@ -95,7 +102,9 @@ def test_revisions_append_and_current_view_shows_latest(kg) -> None:  # type: ig
     def st(obj: str, rev: str) -> KgStatement:
         return KgStatement("kgs:c", "syn:linked", obj, statement_id="S", source_revision=rev)
 
-    assert load_batch(kg.worker, kg.store, statements=[st("kgs:x", "1")], retrieved_at=t0, **kw).statements_inserted == 1
+    assert (
+        load_batch(kg.worker, kg.store, statements=[st("kgs:x", "1")], retrieved_at=t0, **kw).statements_inserted == 1
+    )
     r = load_batch(kg.worker, kg.store, statements=[st("kgs:y", "2")], retrieved_at=t0 + timedelta(minutes=1), **kw)
     assert (r.statements_inserted, r.statements_new_revision) == (1, 1)
     assert [x["object_qid"] for x in _current(kg.api, src)] == ["kgs:y"]
@@ -125,21 +134,30 @@ def test_deprecated_rank_rejected_and_retracts_earlier_version(kg) -> None:  # t
     assert len(_current(kg.api, src)) == 3
     dep2 = KgStatement("kgs:d", "syn:linked", "kgs:f", statement_id="D", source_revision="2", rank="deprecated")
     r = load_batch(
-        kg.worker, kg.store, statements=[dep2], retract_keys=[statement_key(gone, src)],
-        retrieved_at=t0 + timedelta(minutes=1), **kw,
+        kg.worker,
+        kg.store,
+        statements=[dep2],
+        retract_keys=[statement_key(gone, src)],
+        retrieved_at=t0 + timedelta(minutes=1),
+        **kw,
     )
     assert r.rejected_counts == {"deprecated_rank": 1} and r.statements_inserted == 0
     assert r.retractions_inserted == 2
     assert [x["statement_key"] for x in _current(kg.api, src)] == [f"{src}:K"]
     # a deprecated statement never seen before is only rejected
     r = load_batch(
-        kg.worker, kg.store,
+        kg.worker,
+        kg.store,
         statements=[KgStatement("kgs:d", "syn:linked", "kgs:h", statement_id="N", rank="deprecated")],
-        retrieved_at=t0 + timedelta(minutes=2), **kw,
+        retrieved_at=t0 + timedelta(minutes=2),
+        **kw,
     )
     assert r.rejected_counts == {"deprecated_rank": 1} and r.retractions_inserted == 0
     with kg.api.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM kg.statement WHERE rank NOT IN ('preferred','normal')")).scalar_one() == 0
+        assert (
+            c.execute(text("SELECT count(*) FROM kg.statement WHERE rank NOT IN ('preferred','normal')")).scalar_one()
+            == 0
+        )
 
 
 def test_batch_validation_and_rejections_are_reported(kg) -> None:  # type: ignore[no-untyped-def]
@@ -147,7 +165,10 @@ def test_batch_validation_and_rejections_are_reported(kg) -> None:  # type: igno
     now = datetime.now(UTC)
     kw = dict(source_key=src, raw_sha256s=[raw], origin="test_fixture")
     r = load_batch(
-        kg.worker, kg.store, retrieved_at=now, **kw,
+        kg.worker,
+        kg.store,
+        retrieved_at=now,
+        **kw,
         statements=[
             KgStatement("kgs:a", "syn:unregistered", "kgs:b"),
             KgStatement("kgs:a", "syn:linked", "kgs:b", statement_id="X"),
@@ -158,18 +179,38 @@ def test_batch_validation_and_rejections_are_reported(kg) -> None:  # type: igno
     assert r.statements_inserted == 1
     assert r.rejected_counts == {"unknown_property": 1, "conflict_in_batch": 1}
     with pytest.raises(ValidationProblem):
-        load_batch(kg.worker, kg.store, statements=[], retrieved_at=now, source_key="Bad Key", raw_sha256s=[raw],
-                   origin="test_fixture")
+        load_batch(
+            kg.worker,
+            kg.store,
+            statements=[],
+            retrieved_at=now,
+            source_key="Bad Key",
+            raw_sha256s=[raw],
+            origin="test_fixture",
+        )
     with pytest.raises(ValidationProblem):
-        load_batch(kg.worker, kg.store, statements=[], retrieved_at=now, source_key=src, raw_sha256s=[raw],
-                   origin="synthetic")
+        load_batch(
+            kg.worker, kg.store, statements=[], retrieved_at=now, source_key=src, raw_sha256s=[raw], origin="synthetic"
+        )
     with pytest.raises(ValidationProblem):
-        load_batch(kg.worker, kg.store, retrieved_at=now, **kw,
-                   statements=[KgStatement("kgs:a", "syn:linked", "kgs:b")] * (MAX_STATEMENTS_PER_BATCH + 1))
+        load_batch(
+            kg.worker,
+            kg.store,
+            retrieved_at=now,
+            **kw,
+            statements=[KgStatement("kgs:a", "syn:linked", "kgs:b")] * (MAX_STATEMENTS_PER_BATCH + 1),
+        )
     # a raw artifact that is neither registered nor archived refuses the whole batch
     with pytest.raises(IntegrityFailure):
-        load_batch(kg.worker, kg.store, statements=[], retrieved_at=now, source_key=src, raw_sha256s=["f" * 64],
-                   origin="test_fixture")
+        load_batch(
+            kg.worker,
+            kg.store,
+            statements=[],
+            retrieved_at=now,
+            source_key=src,
+            raw_sha256s=["f" * 64],
+            origin="test_fixture",
+        )
     # retrieval time in the future is refused by the database
     with pytest.raises(DBAPIError):
         load_batch(kg.worker, kg.store, statements=[], retrieved_at=now + timedelta(days=1), **kw)
@@ -179,22 +220,33 @@ def test_origins_are_kept_apart(kg) -> None:  # type: ignore[no-untyped-def]
     src, raw = _source(), _raw(kg, "origin")
     st = KgStatement("kgs:o", "syn:linked", "kgs:p", statement_id="O")
     now = datetime.now(UTC)
-    a = load_batch(kg.worker, kg.store, statements=[st], retrieved_at=now, source_key=src, raw_sha256s=[raw],
-                   origin="test_fixture")
-    b = load_batch(kg.worker, kg.store, statements=[st], retrieved_at=now, source_key=src, raw_sha256s=[raw],
-                   origin="live")
+    a = load_batch(
+        kg.worker, kg.store, statements=[st], retrieved_at=now, source_key=src, raw_sha256s=[raw], origin="test_fixture"
+    )
+    b = load_batch(
+        kg.worker, kg.store, statements=[st], retrieved_at=now, source_key=src, raw_sha256s=[raw], origin="live"
+    )
     assert a.statements_inserted == b.statements_inserted == 1
     with kg.api.connect() as c:
-        got = c.execute(
-            text("SELECT origin FROM kg.statement_current WHERE source_key = :s ORDER BY origin"), {"s": src}
-        ).scalars().all()
+        got = (
+            c.execute(text("SELECT origin FROM kg.statement_current WHERE source_key = :s ORDER BY origin"), {"s": src})
+            .scalars()
+            .all()
+        )
     assert got == ["live", "test_fixture"]
 
 
 def _one_statement_load(kg, src: str) -> tuple[int, str]:  # type: ignore[no-untyped-def]
     raw = _raw(kg, "grant")
-    r = load_batch(kg.worker, kg.store, statements=[KgStatement("kgs:q", "syn:linked", "kgs:r", statement_id="Q")],
-                   retrieved_at=datetime.now(UTC), source_key=src, raw_sha256s=[raw], origin="test_fixture")
+    r = load_batch(
+        kg.worker,
+        kg.store,
+        statements=[KgStatement("kgs:q", "syn:linked", "kgs:r", statement_id="Q")],
+        retrieved_at=datetime.now(UTC),
+        source_key=src,
+        raw_sha256s=[raw],
+        origin="test_fixture",
+    )
     return int(r.load_id), raw  # type: ignore[arg-type]
 
 
@@ -211,7 +263,10 @@ def test_read_only_roles_cannot_write(kg, role: str) -> None:  # type: ignore[no
         pytest.skip(f"{role} login not configured")
     load_id, raw = _one_statement_load(kg, _source())
     with engine.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM kg.statement_current WHERE load_id = :l"), {"l": load_id}).scalar_one() == 1
+        assert (
+            c.execute(text("SELECT count(*) FROM kg.statement_current WHERE load_id = :l"), {"l": load_id}).scalar_one()
+            == 1
+        )
     for sql in (
         INSERT_STATEMENT,
         "INSERT INTO kg.property(pid, value_kind) VALUES ('syn:forged', 'item')",
@@ -232,8 +287,11 @@ def test_history_is_immutable_and_rows_are_sealed_to_their_load(kg) -> None:  # 
         c.execute(text("UPDATE kg.statement SET rank = 'preferred' WHERE load_id = :l"), {"l": load_id})
     assert "permission denied" in str(e.value.orig)
     # even the migration owner cannot rewrite or delete history (append-only trigger)
-    for sql in ("UPDATE kg.statement SET rank = 'preferred' WHERE load_id = :l",
-                "DELETE FROM kg.load WHERE id = :l", "TRUNCATE kg.statement_retraction"):
+    for sql in (
+        "UPDATE kg.statement SET rank = 'preferred' WHERE load_id = :l",
+        "DELETE FROM kg.load WHERE id = :l",
+        "TRUNCATE kg.statement_retraction",
+    ):
         with kg.owner.begin() as c, pytest.raises(DBAPIError) as e:
             c.execute(text(sql), {"l": load_id})
         assert "mmutable" in str(e.value.orig)
@@ -252,8 +310,10 @@ def test_history_is_immutable_and_rows_are_sealed_to_their_load(kg) -> None:  # 
     assert "does not match its load" in str(e.value.orig)
     # a load must cite verified raw artifacts
     with kg.worker.begin() as c, pytest.raises(DBAPIError) as e:
-        c.execute(text("""INSERT INTO kg.load(source_key, origin, raw_sha256s, retrieved_at, loader_version)
-                          VALUES ('kgtestforge', 'test_fixture', ARRAY[repeat('d', 64)], now(), 'test')"""))
+        c.execute(
+            text("""INSERT INTO kg.load(source_key, origin, raw_sha256s, retrieved_at, loader_version)
+                          VALUES ('kgtestforge', 'test_fixture', ARRAY[repeat('d', 64)], now(), 'test')""")
+        )
     assert "no verified storage location" in str(e.value.orig)
     # recorded_at is server time; a runtime role cannot backdate a load
     with kg.worker.begin() as c, pytest.raises(DBAPIError) as e:
@@ -274,16 +334,24 @@ def test_deprecated_rank_refused_by_database_too(kg) -> None:  # type: ignore[no
 
 def test_kg_functions_are_not_executable_by_public(kg) -> None:  # type: ignore[no-untyped-def]
     with kg.owner.connect() as c:
-        rows = c.execute(
-            text("""SELECT p.oid::regprocedure::text FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
+        rows = (
+            c.execute(
+                text("""SELECT p.oid::regprocedure::text FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
                      WHERE n.nspname = 'kg' AND has_function_privilege('public', p.oid, 'EXECUTE')""")
-        ).scalars().all()
+            )
+            .scalars()
+            .all()
+        )
         assert rows == []
-        tables = c.execute(
-            text("""SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
+        tables = (
+            c.execute(
+                text("""SELECT c.relname FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
                      WHERE n.nspname = 'kg' AND c.relkind = 'r' AND NOT EXISTS (
                        SELECT 1 FROM pg_trigger g WHERE g.tgrelid = c.oid AND g.tgname = 'immutable_record')""")
-        ).scalars().all()
+            )
+            .scalars()
+            .all()
+        )
         assert tables == []
 
 

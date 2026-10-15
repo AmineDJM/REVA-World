@@ -1,0 +1,58 @@
+[
+  {
+    "request_fingerprint": "153db235a8b71995e077df6e558bfe93f4e88463eadba1dfc16d2f4f2df7f491",
+    "url": "https://api.data.ipu.org/v1/chambers?page%5Bsize%5D=300",
+    "file": "153db235a8b71995.json",
+    "sha256": "a83469e869e853c31dcbe9b4423fab4687a21fef5c1e45d014d87886af050458",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-NC-SA-4.0",
+    "derived_from_sha256": "ef92c67c780eac167afd44a4ee84b322854dd8544682d042e110136bd7231dff",
+    "note": "subset of the live response: parliaments ('FR', 'NA'); meta.total adjusted"
+  },
+  {
+    "request_fingerprint": "d9cff7716da1f86bad67c30c5e3f7270fc4cb01c5d374ce0367a5390203f7577",
+    "url": "https://api.data.ipu.org/v1/parliaments?page%5Bsize%5D=300",
+    "file": "d9cff7716da1f86b.json",
+    "sha256": "5b392e94a8e8d67036e8e5d9c409b0dbc0ae360c3eead57ff44bc324adbfaf8d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-NC-SA-4.0",
+    "derived_from_sha256": "6bc3c619185da72ca5c4ce9b141d4fd1a0d69bed5f37666eb11008c2700d366e",
+    "note": "subset of the live response: parliaments ('FR', 'NA'); meta.total adjusted"
+  },
+  {
+    "request_fingerprint": "ccaa053f61ecdc21d132eecbdfe30bf06d5ae90eff4e930ca047044b271c0e61",
+    "url": "https://api.data.ipu.org/v1/countries?page%5Bsize%5D=300",
+    "file": "ccaa053f61ecdc21.json",
+    "sha256": "b442660521c6e1e775044ce4b4e802381c53661f4ec6b34ab1e7d5796c347408",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-NC-SA-4.0",
+    "derived_from_sha256": "a5186c64a5b829eebcd16231f98c9c6f6e9dfe8db6632e6330192ef6ae845357",
+    "note": "subset of the live response: parliaments ('FR', 'NA'); meta.total adjusted"
+  },
+  {
+    "request_fingerprint": "461fa2753cd3288e1e051032d71fb6392669b54273acff76760884aa67ad70cf",
+    "url": "https://api.data.ipu.org/v1/elections?page%5Bsize%5D=3500",
+    "file": "461fa2753cd3288e.json",
+    "sha256": "32367eec58c2348861abca5a1e2242a9668d2c72bfd18bb91dd21c3a83516cd8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-NC-SA-4.0",
+    "derived_from_sha256": "17c590a965de51e41fe351c4da77df56a7f7a1dfea60d2810d291e2839f6284e",
+    "note": "subset of the live response: parliaments ('FR', 'NA'); meta.total adjusted"
+  }
+]

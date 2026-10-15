@@ -95,7 +95,7 @@ CREATE SCHEMA IF NOT EXISTS kg;
 
 CREATE TABLE kg.load (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
-  source_key text NOT NULL CHECK {_source_key('source_key')},
+  source_key text NOT NULL CHECK {_source_key("source_key")},
   origin text NOT NULL CHECK (origin IN ('live','test_fixture')),
   raw_sha256s text[] NOT NULL CHECK (cardinality(raw_sha256s) BETWEEN 1 AND 10000),
   retrieved_at timestamptz NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE kg.load (
 );
 
 CREATE TABLE kg.property (
-  pid text PRIMARY KEY CHECK {_pid('pid')},
+  pid text PRIMARY KEY CHECK {_pid("pid")},
   value_kind text NOT NULL CHECK (value_kind IN
     ('item','time','quantity','string','monolingualtext','external_id','globe_coordinate','url','other')),
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp(),
@@ -117,13 +117,13 @@ CREATE TABLE kg.property (
 CREATE TABLE kg.property_version (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   pid text NOT NULL REFERENCES kg.property,
-  reva_predicate text NOT NULL CHECK {_name('reva_predicate')},
-  inverse_name text CHECK (inverse_name IS NULL OR {_name('inverse_name')}),
+  reva_predicate text NOT NULL CHECK {_name("reva_predicate")},
+  inverse_name text CHECK (inverse_name IS NULL OR {_name("inverse_name")}),
   label_en text NOT NULL CHECK (length(label_en) BETWEEN 1 AND 200),
   label_fr text CHECK (label_fr IS NULL OR length(label_fr) BETWEEN 1 AND 200),
   inverse_label_en text CHECK (inverse_label_en IS NULL OR length(inverse_label_en) BETWEEN 1 AND 200),
   inverse_label_fr text CHECK (inverse_label_fr IS NULL OR length(inverse_label_fr) BETWEEN 1 AND 200),
-  definition_sha256 text NOT NULL CHECK {_sha('definition_sha256')},
+  definition_sha256 text NOT NULL CHECK {_sha("definition_sha256")},
   recorded_at timestamptz NOT NULL DEFAULT clock_timestamp(),
   recorded_by text NOT NULL DEFAULT session_user,
   UNIQUE (pid, definition_sha256)
@@ -133,14 +133,14 @@ CREATE INDEX property_version_latest ON kg.property_version(pid, id);
 CREATE TABLE kg.entity (
   id bigint GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   load_id bigint NOT NULL REFERENCES kg.load,
-  qid text NOT NULL CHECK {_qid('qid')},
+  qid text NOT NULL CHECK {_qid("qid")},
   origin text NOT NULL CHECK (origin IN ('live','test_fixture')),
-  kind text NOT NULL CHECK {_name('kind')},
+  kind text NOT NULL CHECK {_name("kind")},
   descriptions jsonb NOT NULL DEFAULT '{{}}'::jsonb CHECK (jsonb_typeof(descriptions) = 'object'),
   aliases jsonb NOT NULL DEFAULT '{{}}'::jsonb CHECK (jsonb_typeof(aliases) = 'object'),
   sitelinks integer CHECK (sitelinks IS NULL OR sitelinks >= 0),
-  content_sha256 text NOT NULL CHECK {_sha('content_sha256')},
-  source_key text NOT NULL CHECK {_source_key('source_key')},
+  content_sha256 text NOT NULL CHECK {_sha("content_sha256")},
+  source_key text NOT NULL CHECK {_source_key("source_key")},
   source_revision text CHECK (source_revision IS NULL OR length(source_revision) BETWEEN 1 AND 100),
   retrieved_at timestamptz NOT NULL,
   CONSTRAINT entity_version_identity UNIQUE NULLS NOT DISTINCT (qid, origin, source_revision, content_sha256)
@@ -164,12 +164,12 @@ CREATE TABLE kg.statement (
   statement_key text NOT NULL CHECK (length(statement_key) BETWEEN 3 AND 300),
   statement_id text CHECK (statement_id IS NULL OR length(statement_id) BETWEEN 1 AND 200),
   origin text NOT NULL CHECK (origin IN ('live','test_fixture')),
-  content_sha256 text NOT NULL CHECK {_sha('content_sha256')},
-  subject_qid text NOT NULL CHECK {_qid('subject_qid')},
+  content_sha256 text NOT NULL CHECK {_sha("content_sha256")},
+  subject_qid text NOT NULL CHECK {_qid("subject_qid")},
   -- load_id and property_pid are checked set-wise by kg.check_statement_rows() (one query per INSERT
   -- statement instead of two foreign-key probes per row; rows are never updated or deleted).
-  property_pid text NOT NULL CHECK {_pid('property_pid')},
-  object_qid text CHECK (object_qid IS NULL OR {_qid('object_qid')}),
+  property_pid text NOT NULL CHECK {_pid("property_pid")},
+  object_qid text CHECK (object_qid IS NULL OR {_qid("object_qid")}),
   value jsonb CHECK (value IS NULL OR (jsonb_typeof(value) = 'object' AND jsonb_typeof(value->'type') = 'string')),
   start_time text CHECK (start_time IS NULL OR length(start_time) BETWEEN 1 AND 64),
   start_precision smallint CHECK (start_precision BETWEEN 0 AND 14),
@@ -185,9 +185,9 @@ CREATE TABLE kg.statement (
   qualifiers jsonb NOT NULL DEFAULT '{{}}'::jsonb CHECK (jsonb_typeof(qualifiers) = 'object'),
   rank text NOT NULL CHECK (rank IN ('preferred','normal')),
   refs jsonb NOT NULL DEFAULT '[]'::jsonb CHECK (jsonb_typeof(refs) = 'array'),
-  source_key text NOT NULL CHECK {_source_key('source_key')},
+  source_key text NOT NULL CHECK {_source_key("source_key")},
   source_revision text CHECK (source_revision IS NULL OR length(source_revision) BETWEEN 1 AND 100),
-  raw_sha256 text CHECK (raw_sha256 IS NULL OR {_sha('raw_sha256')}),
+  raw_sha256 text CHECK (raw_sha256 IS NULL OR {_sha("raw_sha256")}),
   retrieved_at timestamptz NOT NULL,
   CHECK ((object_qid IS NULL) <> (value IS NULL)),
   CHECK ((start_time IS NULL) = (start_precision IS NULL)),

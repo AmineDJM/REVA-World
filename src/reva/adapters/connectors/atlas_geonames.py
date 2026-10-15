@@ -222,7 +222,9 @@ def atlas_rows(rows: Sequence[CountryInfo], *, raw_sha256: str, retrieved_at: da
             v = _num(r.cells[col])
             if v is None:
                 continue
-            extra: dict[str, Any] = {"provider_zero_implausible": True} if (col == "Area(in sq km)" and v == "0") else {}
+            extra: dict[str, Any] = (
+                {"provider_zero_implausible": True} if (col == "Area(in sq km)" and v == "0") else {}
+            )
             add(ind, v, None, unit, col, flags=extra)
         for col, ind in TEXT.items():
             raw = r.cells[col]
@@ -359,7 +361,7 @@ async def ingest(
 ) -> dict[str, Any]:
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw, load_country_qids
+    from reva.adapters.connectors.atlas_geo_common import archive_raw
     from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
 
     conn = GeoNamesCountryInfoConnector()
@@ -389,24 +391,48 @@ async def ingest(
     )
     kg: dict[str, Any] = {"loaded": False}
     if load_kg:
-        q = dict(qids) if qids is not None else load_country_qids()
-        if not q:
-            kg = {"loaded": False, "blocked": "registry/entities/country_qids.json (ISO3 -> QID) not available"}
-        else:
-            from reva.adapters.connectors.atlas_geo_common import ensure_kg_property
-            from reva.kg.model import load_batch
+        kg = load_neighbours_kg(
+            engine, store, rows, raw_sha256=sha, retrieved_at=raw.retrieved_at, origin=raw.origin, qids=qids
+        )
+    return {
+        "connector": CONNECTOR_NAME,
+        "raw_sha256": sha,
+        "table": table,
+        "kg": kg,
+        "rows": rows,
+        "retrieved_at": raw.retrieved_at,
+        "origin": raw.origin,
+    }
 
-            ensure_kg_property(engine, "P47")
-            sts, info = neighbour_statements(rows, q, raw_sha256=sha, retrieved_at=raw.retrieved_at)
-            rep = load_batch(
-                engine,
-                store,
-                statements=sts,
-                source_key=SOURCE_KEY,
-                raw_sha256s=[sha],
-                retrieved_at=raw.retrieved_at,
-                origin=raw.origin,
-                parameters={"connector": CONNECTOR_NAME},
-            )
-            kg = {"loaded": True, **info, "report": rep.as_dict()}
-    return {"connector": CONNECTOR_NAME, "raw_sha256": sha, "table": table, "kg": kg}
+
+def load_neighbours_kg(
+    engine: Any,
+    store: Any,
+    rows: Sequence[CountryInfo],
+    *,
+    raw_sha256: str,
+    retrieved_at: datetime,
+    origin: str,
+    qids: Mapping[str, str] | None = None,
+) -> dict[str, Any]:
+    """Load GeoNames neighbour statements (P47, no length) through KGCORE's ``load_batch``; blocked without
+    an ISO3 -> QID map (``registry/entities/country_qids.json``)."""
+    from reva.adapters.connectors.atlas_geo_common import ensure_kg_property, load_country_qids
+    from reva.kg.model import load_batch
+
+    q = dict(qids) if qids is not None else load_country_qids()
+    if not q:
+        return {"loaded": False, "blocked": "registry/entities/country_qids.json (ISO3 -> QID) not available"}
+    ensure_kg_property(engine, "P47")
+    sts, info = neighbour_statements(rows, q, raw_sha256=raw_sha256, retrieved_at=retrieved_at)
+    rep = load_batch(
+        engine,
+        store,
+        statements=sts,
+        source_key=SOURCE_KEY,
+        raw_sha256s=[raw_sha256],
+        retrieved_at=retrieved_at,
+        origin=origin,
+        parameters={"connector": CONNECTOR_NAME},
+    )
+    return {"loaded": True, **info, "report": rep.as_dict()}

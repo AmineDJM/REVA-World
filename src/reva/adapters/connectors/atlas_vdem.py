@@ -117,6 +117,11 @@ async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
     return to_raw(item, result, getattr(http, "origin", "live"))
 
 
+async def fetch_all(http: Any) -> dict[str, RawAcquisition]:
+    """Every item of :func:`fetch_items`, sequentially (one host at a time; nothing on failure)."""
+    return {it.key: await fetch(it, http) for it in fetch_items()}
+
+
 def connector_spec() -> Any:
     from reva.adapters.connectors import atlas_sci_common as common
 
@@ -634,6 +639,7 @@ __all__ = [
     "build_frame",
     "connector_spec",
     "fetch",
+    "fetch_all",
     "fetch_items",
     "ingest",
     "missing_variables",

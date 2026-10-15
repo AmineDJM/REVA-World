@@ -1,0 +1,14 @@
+[
+  {
+    "request_fingerprint": "b118e6baa7e747bc1e7491150c08108bd08619f87f0996ab37a01cc37292ec6c",
+    "url": "https://www.wikidata.org/w/api.php?action=wbgetentities&ids=Q17167|Q83286&props=claims|labels|descriptions|aliases|sitelinks&languages=fr|en|es|pt|ar|zh|ru|de&format=json",
+    "file": "b118e6baa7e747bc.json",
+    "sha256": "1b054c486648a6f585c64b25871cd759aa2aea8cb9bea3d9126efefc96e20d66",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:42:00.770102+00:00",
+    "licence": "CC0-1.0"
+  }
+]

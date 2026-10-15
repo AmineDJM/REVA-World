@@ -218,7 +218,10 @@ def build_catalog(
         topic = meta.topic if meta else ""
         dom = reva_domain(code, primary, topic)
         stats["by_domain"][dom] = stats["by_domain"].get(dom, 0) + 1
-        definition, truncated = _definition(meta) if meta else (name, False)
+        definition, truncated = _definition(meta) if meta else ("", False)
+        no_definition = not definition
+        if no_definition:
+            definition = f"{name} (the World Bank metadata gives no definition for {code})."
         unit, unit_how = units[primary][code]
         licence = (meta.licence if meta and meta.licence else "") or UNSTATED_LICENCE
         notes = [
@@ -232,6 +235,8 @@ def build_catalog(
             notes.append(f"Periodicity: {meta.periodicity}.")
         if unit_how != "provider_unit_of_measure":
             notes.append(f"Unit taken from: {unit_how.replace('_', ' ')}.")
+        if no_definition:
+            notes.append("Provider metadata has no definition text; the definition repeats the indicator name.")
         if truncated:
             notes.append("Definition truncated; the full text is in the archived Series metadata.")
         if other:

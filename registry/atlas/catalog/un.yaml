@@ -1,0 +1,1536 @@
+# UN atlas concepts (agent A-UN). Provider-declared, not human-reviewed: definitions are the
+# providers' own (UN DESA Population Division WPP 2024 and International Migrant Stock 2024, UNSD SDG
+# Global Database and Statistical Yearbook, UNHCR). Generated from the connector constants in
+# src/reva/adapters/connectors/atlas_un.py (+ SDG headline indicators observed in the 2026-10-15 live run).
+# Projections are separate concepts (suffix _proj_*) and separate series (indicator suffix |proj=medium or
+# PopTotal|variant=<name>): a best-available lookup for an estimate never returns a projection.
+# Only UN series are listed; equivalent World Bank series are named in notes (not independent lineages).
+domain: un
+labels:
+  fr: Nations unies (population, migration, ODD, réfugiés, superficie)
+  en: United Nations (population, migration, SDGs, refugees, area)
+maintainer: agent A-UN (provider-declared, not human-reviewed)
+concepts:
+- id: un.wpp.population
+  labels:
+    fr: Population totale (1er juillet)
+    en: Total population (1 July)
+  definition: Total population, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulation1July
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July. World Bank WDI SP.POP.TOTL reports the same quantity (largely from WPP: not independent); it is not merged here
+    because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_proj_medium
+  labels:
+    fr: Population totale (1er juillet) — projection (variante moyenne)
+    en: Total population (1 July) — projection (medium variant)
+  definition: 'Total population, as of 1 July: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A
+    projection, not an observation.'
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulation1July|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_1jan
+  labels:
+    fr: Population totale (1er janvier)
+    en: Total population (1 January)
+  definition: Total population, as of 1 January (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulation1Jan
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    January.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_male
+  labels:
+    fr: Population masculine
+    en: Male population
+  definition: Male population, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulationMale1July
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_male_proj_medium
+  labels:
+    fr: Population masculine — projection (variante moyenne)
+    en: Male population — projection (medium variant)
+  definition: 'Male population, as of 1 July: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulationMale1July|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_female
+  labels:
+    fr: Population féminine
+    en: Female population
+  definition: Female population, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulationFemale1July
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_female_proj_medium
+  labels:
+    fr: Population féminine — projection (variante moyenne)
+    en: Female population — projection (medium variant)
+  definition: 'Female population, as of 1 July: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A
+    projection, not an observation.'
+  unit: thousands
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.TPopulationFemale1July|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_density
+  labels:
+    fr: Densité de population
+    en: Population density
+  definition: Population density, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: persons per square km
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.PopDensity
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July. World Bank WDI EN.POP.DNST reports the same quantity (largely from WPP: not independent); it is not merged here
+    because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_density_proj_medium
+  labels:
+    fr: Densité de population — projection (variante moyenne)
+    en: Population density — projection (medium variant)
+  definition: 'Population density, as of 1 July: UN World Population Prospects 2024 medium-variant projection, 2024-2100.
+    A projection, not an observation.'
+  unit: persons per square km
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.PopDensity|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.sex_ratio
+  labels:
+    fr: Rapport de masculinité de la population
+    en: Population sex ratio
+  definition: Population sex ratio, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: males per 100 females
+  domain: un
+  subdomain: population
+  source_order:
+  - un_wpp.wpp2024_demo.PopSexRatio
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.median_age
+  labels:
+    fr: Âge médian
+    en: Median age
+  definition: Median age, as of 1 July (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_demo.MedianAgePop
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: as of 1
+    July.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.median_age_proj_medium
+  labels:
+    fr: Âge médian — projection (variante moyenne)
+    en: Median age — projection (medium variant)
+  definition: 'Median age, as of 1 July: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: years
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_demo.MedianAgePop|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.natural_change
+  labels:
+    fr: Accroissement naturel
+    en: Natural change
+  definition: Natural change, births minus deaths (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.NatChange
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.natural_change_rate
+  labels:
+    fr: Taux d'accroissement naturel
+    en: Rate of natural change
+  definition: Rate of natural change (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: per 1,000 population
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.NatChangeRT
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_change
+  labels:
+    fr: Variation de la population
+    en: Population change
+  definition: Population change (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.PopChange
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_growth_rate
+  labels:
+    fr: Taux de croissance démographique
+    en: Population growth rate
+  definition: Population growth rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: percentage
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.PopGrowthRate
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SP.POP.GROW reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_growth_rate_proj_medium
+  labels:
+    fr: Taux de croissance démographique — projection (variante moyenne)
+    en: Population growth rate — projection (medium variant)
+  definition: 'Population growth rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: percentage
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.PopGrowthRate|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.doubling_time
+  labels:
+    fr: Temps de doublement de la population
+    en: Population doubling time
+  definition: Population annual doubling time (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: growth
+  source_order:
+  - un_wpp.wpp2024_demo.DoublingTime
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.births
+  labels:
+    fr: Naissances
+    en: Births
+  definition: Births (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.Births
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.births_proj_medium
+  labels:
+    fr: Naissances — projection (variante moyenne)
+    en: Births — projection (medium variant)
+  definition: 'Births: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection, not an observation.'
+  unit: thousands
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.Births|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.births_15_19
+  labels:
+    fr: Naissances de mères de 15 à 19 ans
+    en: Births to women aged 15-19
+  definition: Births by women aged 15 to 19 (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.Births1519
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.crude_birth_rate
+  labels:
+    fr: Taux brut de natalité
+    en: Crude birth rate
+  definition: Crude birth rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: births per 1,000 population
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.CBR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SP.DYN.CBRT.IN reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.crude_birth_rate_proj_medium
+  labels:
+    fr: Taux brut de natalité — projection (variante moyenne)
+    en: Crude birth rate — projection (medium variant)
+  definition: 'Crude birth rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection, not
+    an observation.'
+  unit: births per 1,000 population
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.CBR|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.total_fertility_rate
+  labels:
+    fr: Indice synthétique de fécondité
+    en: Total fertility rate
+  definition: Total fertility rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: live births per woman
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.TFR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SP.DYN.TFRT.IN reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.total_fertility_rate_proj_medium
+  labels:
+    fr: Indice synthétique de fécondité — projection (variante moyenne)
+    en: Total fertility rate — projection (medium variant)
+  definition: 'Total fertility rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: live births per woman
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.TFR|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.net_reproduction_rate
+  labels:
+    fr: Taux net de reproduction
+    en: Net reproduction rate
+  definition: Net reproduction rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: surviving daughters per woman
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.NRR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.mean_age_childbearing
+  labels:
+    fr: Âge moyen à la maternité
+    en: Mean age at childbearing
+  definition: Mean age at childbearing (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.MAC
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.sex_ratio_at_birth
+  labels:
+    fr: Rapport de masculinité à la naissance
+    en: Sex ratio at birth
+  definition: Sex ratio at birth (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: males per 100 female births
+  domain: un
+  subdomain: fertility
+  source_order:
+  - un_wpp.wpp2024_demo.SRB
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.deaths
+  labels:
+    fr: Décès
+    en: Deaths
+  definition: Total deaths (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Deaths
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.deaths_proj_medium
+  labels:
+    fr: Décès — projection (variante moyenne)
+    en: Deaths — projection (medium variant)
+  definition: 'Total deaths: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection, not an
+    observation.'
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Deaths|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.deaths_male
+  labels:
+    fr: Décès masculins
+    en: Male deaths
+  definition: Male deaths (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.DeathsMale
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.deaths_female
+  labels:
+    fr: Décès féminins
+    en: Female deaths
+  definition: Female deaths (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.DeathsFemale
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.crude_death_rate
+  labels:
+    fr: Taux brut de mortalité
+    en: Crude death rate
+  definition: Crude death rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: deaths per 1,000 population
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.CDR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SP.DYN.CDRT.IN reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.crude_death_rate_proj_medium
+  labels:
+    fr: Taux brut de mortalité — projection (variante moyenne)
+    en: Crude death rate — projection (medium variant)
+  definition: 'Crude death rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection, not
+    an observation.'
+  unit: deaths per 1,000 population
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.CDR|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.life_expectancy
+  labels:
+    fr: Espérance de vie à la naissance
+    en: Life expectancy at birth
+  definition: Life expectancy at birth, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LEx
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year. World Bank WDI SP.DYN.LE00.IN reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_proj_medium
+  labels:
+    fr: Espérance de vie à la naissance — projection (variante moyenne)
+    en: Life expectancy at birth — projection (medium variant)
+  definition: 'Life expectancy at birth, both sexes: UN World Population Prospects 2024 medium-variant projection, 2024-2100.
+    A projection, not an observation.'
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LEx|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.life_expectancy_male
+  labels:
+    fr: Espérance de vie à la naissance, hommes
+    en: Life expectancy at birth, males
+  definition: Male life expectancy at birth (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LExMale
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_male_proj_medium
+  labels:
+    fr: Espérance de vie à la naissance, hommes — projection (variante moyenne)
+    en: Life expectancy at birth, males — projection (medium variant)
+  definition: 'Male life expectancy at birth: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LExMale|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.life_expectancy_female
+  labels:
+    fr: Espérance de vie à la naissance, femmes
+    en: Life expectancy at birth, females
+  definition: Female life expectancy at birth (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LExFemale
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_female_proj_medium
+  labels:
+    fr: Espérance de vie à la naissance, femmes — projection (variante moyenne)
+    en: Life expectancy at birth, females — projection (medium variant)
+  definition: 'Female life expectancy at birth: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A
+    projection, not an observation.'
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LExFemale|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.life_expectancy_15
+  labels:
+    fr: Espérance de vie à 15 ans
+    en: Life expectancy at age 15
+  definition: Life expectancy at age 15, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LE15
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_65
+  labels:
+    fr: Espérance de vie à 65 ans
+    en: Life expectancy at age 65
+  definition: Life expectancy at age 65, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LE65
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_65_male
+  labels:
+    fr: Espérance de vie à 65 ans, hommes
+    en: Life expectancy at age 65, males
+  definition: Male life expectancy at age 65 (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LE65Male
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_65_female
+  labels:
+    fr: Espérance de vie à 65 ans, femmes
+    en: Life expectancy at age 65, females
+  definition: Female life expectancy at age 65 (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LE65Female
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.life_expectancy_80
+  labels:
+    fr: Espérance de vie à 80 ans
+    en: Life expectancy at age 80
+  definition: Life expectancy at age 80, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: years
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.LE80
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.infant_deaths
+  labels:
+    fr: Décès infantiles
+    en: Infant deaths
+  definition: Infant deaths, under age 1 (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.InfantDeaths
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.infant_mortality_rate
+  labels:
+    fr: Taux de mortalité infantile
+    en: Infant mortality rate
+  definition: Infant mortality rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: infant deaths per 1,000 live births
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.IMR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SP.DYN.IMRT.IN reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.infant_mortality_rate_proj_medium
+  labels:
+    fr: Taux de mortalité infantile — projection (variante moyenne)
+    en: Infant mortality rate — projection (medium variant)
+  definition: 'Infant mortality rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: infant deaths per 1,000 live births
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.IMR|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.under5_deaths
+  labels:
+    fr: Décès avant 5 ans
+    en: Deaths under age 5
+  definition: Deaths under age 5 (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Under5Deaths
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.under5_mortality
+  labels:
+    fr: Mortalité des moins de 5 ans
+    en: Under-five mortality
+  definition: Under-five mortality (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: deaths under age 5 per 1,000 live births
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Q5
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year. World Bank WDI SH.DYN.MORT reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.under5_mortality_proj_medium
+  labels:
+    fr: Mortalité des moins de 5 ans — projection (variante moyenne)
+    en: Under-five mortality — projection (medium variant)
+  definition: 'Under-five mortality: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: deaths under age 5 per 1,000 live births
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Q5|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.mortality_before_60
+  labels:
+    fr: Mortalité avant 60 ans
+    en: Mortality before age 60
+  definition: Mortality before age 60, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: deaths under age 60 per 1,000 live births
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Q0060
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.adult_mortality_15_60
+  labels:
+    fr: Mortalité adulte (15-60 ans)
+    en: Adult mortality (15-60)
+  definition: Mortality between age 15 and 60, both sexes (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: deaths under age 60 per 1,000 alive at age 15
+  domain: un
+  subdomain: mortality
+  source_order:
+  - un_wpp.wpp2024_demo.Q1560
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: period life
+    table of the calendar year.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.net_migrants
+  labels:
+    fr: Solde migratoire
+    en: Net number of migrants
+  definition: Net number of migrants (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: thousands
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_wpp.wpp2024_demo.NetMigrations
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December). World Bank WDI SM.POP.NETM reports the same quantity (largely from WPP: not independent);
+    it is not merged here because WDI units/rounding differ (WDI persons vs WPP thousands).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.net_migrants_proj_medium
+  labels:
+    fr: Solde migratoire — projection (variante moyenne)
+    en: Net number of migrants — projection (medium variant)
+  definition: 'Net number of migrants: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: thousands
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_wpp.wpp2024_demo.NetMigrations|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.net_migration_rate
+  labels:
+    fr: Taux de migration nette
+    en: Net migration rate
+  definition: Net migration rate (UN World Population Prospects 2024 estimates, 1950-2023).
+  unit: per 1,000 population
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_wpp.wpp2024_demo.CNMR
+  provider_declared: true
+  notes: 'UN WPP 2024 estimate (model-based reconstruction from censuses, surveys and registers). Time reference: calendar
+    year (1 January - 31 December).'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.net_migration_rate_proj_medium
+  labels:
+    fr: Taux de migration nette — projection (variante moyenne)
+    en: Net migration rate — projection (medium variant)
+  definition: 'Net migration rate: UN World Population Prospects 2024 medium-variant projection, 2024-2100. A projection,
+    not an observation.'
+  unit: per 1,000 population
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_wpp.wpp2024_demo.CNMR|proj=medium
+  provider_declared: true
+  notes: 'Projection (flags.projection = true). Never mixed with estimates: separate concept and series.'
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_high
+  labels:
+    fr: Population totale — projection (variante haute)
+    en: Total population — projection (High)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'High', 2024-2100. A projection, not an observation.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=High
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_low
+  labels:
+    fr: Population totale — projection (variante basse)
+    en: Total population — projection (Low)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Low', 2024-2100. A projection, not an observation.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Low
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_constant_fertility
+  labels:
+    fr: Population totale — projection (fécondité constante)
+    en: Total population — projection (Constant fertility)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Constant fertility', 2024-2100. A projection, not
+    an observation.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Constant fertility
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_zero_migration
+  labels:
+    fr: Population totale — projection (migration nulle)
+    en: Total population — projection (Zero migration)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Zero migration', 2024-2100. A projection, not an
+    observation.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Zero migration
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_lower95
+  labels:
+    fr: Population totale — projection (borne inférieure IP 95 %)
+    en: Total population — projection (Lower 95 PI)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Lower 95 PI', 2024-2100. A projection, not an observation.
+    Bound of the probabilistic projection interval.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Lower 95 PI
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_upper95
+  labels:
+    fr: Population totale — projection (borne supérieure IP 95 %)
+    en: Total population — projection (Upper 95 PI)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Upper 95 PI', 2024-2100. A projection, not an observation.
+    Bound of the probabilistic projection interval.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Upper 95 PI
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_lower80
+  labels:
+    fr: Population totale — projection (borne inférieure IP 80 %)
+    en: Total population — projection (Lower 80 PI)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Lower 80 PI', 2024-2100. A projection, not an observation.
+    Bound of the probabilistic projection interval.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Lower 80 PI
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_upper80
+  labels:
+    fr: Population totale — projection (borne supérieure IP 80 %)
+    en: Total population — projection (Upper 80 PI)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Upper 80 PI', 2024-2100. A projection, not an observation.
+    Bound of the probabilistic projection interval.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Upper 80 PI
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_proj_median_pi
+  labels:
+    fr: Population totale — projection (médiane probabiliste)
+    en: Total population — projection (Median PI)
+  definition: Total population at 1 July, UN WPP 2024 projection variant 'Median PI', 2024-2100. A projection, not an observation.
+    Bound of the probabilistic projection interval.
+  unit: thousands
+  domain: un
+  subdomain: projections
+  source_order:
+  - un_wpp.wpp2024_variants.PopTotal|variant=Median PI
+  provider_declared: true
+  notes: Projection scenario (flags.projection = true).
+  tags:
+  - wpp2024
+  - projection
+- id: un.wpp.population_age_0_4
+  labels:
+    fr: Population âgée de 0-4 ans
+    en: Population aged 0-4
+  definition: Population (both sexes) aged 0-4 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=0-4
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_5_9
+  labels:
+    fr: Population âgée de 5-9 ans
+    en: Population aged 5-9
+  definition: Population (both sexes) aged 5-9 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=5-9
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_10_14
+  labels:
+    fr: Population âgée de 10-14 ans
+    en: Population aged 10-14
+  definition: Population (both sexes) aged 10-14 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=10-14
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_15_19
+  labels:
+    fr: Population âgée de 15-19 ans
+    en: Population aged 15-19
+  definition: Population (both sexes) aged 15-19 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=15-19
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_20_24
+  labels:
+    fr: Population âgée de 20-24 ans
+    en: Population aged 20-24
+  definition: Population (both sexes) aged 20-24 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=20-24
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_25_29
+  labels:
+    fr: Population âgée de 25-29 ans
+    en: Population aged 25-29
+  definition: Population (both sexes) aged 25-29 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=25-29
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_30_34
+  labels:
+    fr: Population âgée de 30-34 ans
+    en: Population aged 30-34
+  definition: Population (both sexes) aged 30-34 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=30-34
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_35_39
+  labels:
+    fr: Population âgée de 35-39 ans
+    en: Population aged 35-39
+  definition: Population (both sexes) aged 35-39 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=35-39
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_40_44
+  labels:
+    fr: Population âgée de 40-44 ans
+    en: Population aged 40-44
+  definition: Population (both sexes) aged 40-44 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=40-44
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_45_49
+  labels:
+    fr: Population âgée de 45-49 ans
+    en: Population aged 45-49
+  definition: Population (both sexes) aged 45-49 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=45-49
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_50_54
+  labels:
+    fr: Population âgée de 50-54 ans
+    en: Population aged 50-54
+  definition: Population (both sexes) aged 50-54 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=50-54
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_55_59
+  labels:
+    fr: Population âgée de 55-59 ans
+    en: Population aged 55-59
+  definition: Population (both sexes) aged 55-59 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=55-59
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_60_64
+  labels:
+    fr: Population âgée de 60-64 ans
+    en: Population aged 60-64
+  definition: Population (both sexes) aged 60-64 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=60-64
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_65_69
+  labels:
+    fr: Population âgée de 65-69 ans
+    en: Population aged 65-69
+  definition: Population (both sexes) aged 65-69 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=65-69
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_70_74
+  labels:
+    fr: Population âgée de 70-74 ans
+    en: Population aged 70-74
+  definition: Population (both sexes) aged 70-74 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=70-74
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_75_79
+  labels:
+    fr: Population âgée de 75-79 ans
+    en: Population aged 75-79
+  definition: Population (both sexes) aged 75-79 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=75-79
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_80_84
+  labels:
+    fr: Population âgée de 80-84 ans
+    en: Population aged 80-84
+  definition: Population (both sexes) aged 80-84 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=80-84
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_85_89
+  labels:
+    fr: Population âgée de 85-89 ans
+    en: Population aged 85-89
+  definition: Population (both sexes) aged 85-89 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=85-89
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_90_94
+  labels:
+    fr: Population âgée de 90-94 ans
+    en: Population aged 90-94
+  definition: Population (both sexes) aged 90-94 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=90-94
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_95_99
+  labels:
+    fr: Population âgée de 95-99 ans
+    en: Population aged 95-99
+  definition: Population (both sexes) aged 95-99 at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=95-99
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.wpp.population_age_100
+  labels:
+    fr: Population âgée de 100 ans et plus
+    en: Population aged 100+
+  definition: Population (both sexes) aged 100+ at 1 July, UN WPP 2024 estimates 1950-2023.
+  unit: thousands
+  domain: un
+  subdomain: age_structure
+  source_order:
+  - un_wpp.wpp2024_age5.PopTotal|age=100+
+  provider_declared: true
+  notes: 'Male/female counts: PopMale|age=… / PopFemale|age=…; projections in un_wpp.wpp2024_age5_proj.'
+  tags:
+  - wpp2024
+  - estimate
+- id: un.ims.migrant_stock
+  labels:
+    fr: Stock de migrants internationaux
+    en: International migrant stock
+  definition: Number of international migrants (foreign-born, or foreign citizens where birthplace data are lacking, plus
+    refugees where noted) living in the country at 1 July (UN DESA International Migrant Stock 2024).
+  unit: persons
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_desa.ims2024.migrant_stock|origin=900|sex=T
+  provider_declared: true
+  notes: 'Years 1990, 1995, ..., 2020, 2024 only. Bilateral stocks by origin: migrant_stock|origin=<M49>|sex=…'
+  tags:
+  - ims2024
+- id: un.ims.migrant_stock_female
+  labels:
+    fr: Stock de migrants internationaux, femmes
+    en: International migrant stock, females
+  definition: Number of international migrants (foreign-born, or foreign citizens where birthplace data are lacking, plus
+    refugees where noted) living in the country at 1 July (UN DESA International Migrant Stock 2024).
+  unit: persons
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_desa.ims2024.migrant_stock|origin=900|sex=F
+  provider_declared: true
+  notes: 'Years 1990, 1995, ..., 2020, 2024 only. Bilateral stocks by origin: migrant_stock|origin=<M49>|sex=…'
+  tags:
+  - ims2024
+- id: un.ims.migrant_stock_male
+  labels:
+    fr: Stock de migrants internationaux, hommes
+    en: International migrant stock, males
+  definition: Number of international migrants (foreign-born, or foreign citizens where birthplace data are lacking, plus
+    refugees where noted) living in the country at 1 July (UN DESA International Migrant Stock 2024).
+  unit: persons
+  domain: un
+  subdomain: migration
+  source_order:
+  - un_desa.ims2024.migrant_stock|origin=900|sex=M
+  provider_declared: true
+  notes: 'Years 1990, 1995, ..., 2020, 2024 only. Bilateral stocks by origin: migrant_stock|origin=<M49>|sex=…'
+  tags:
+  - ims2024
+- id: un.unhcr.refugees_hosted
+  labels:
+    fr: Réfugiés accueillis (HCR)
+    en: Refugees hosted (UNHCR)
+  definition: Refugees under UNHCR's mandate living in the country (country of asylum) at end of year.
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_asylum.refugees
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unhcr.asylum_seekers_hosted
+  labels:
+    fr: Demandeurs d'asile accueillis
+    en: Asylum-seekers hosted
+  definition: Asylum-seekers in the country (country of asylum) at end of year.
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_asylum.asylum_seekers
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unhcr.stateless
+  labels:
+    fr: Personnes apatrides
+    en: Stateless persons
+  definition: Stateless persons reported in the country at end of year (UNHCR).
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_asylum.stateless
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unhcr.refugees_originating
+  labels:
+    fr: Réfugiés originaires du pays
+    en: Refugees originating from the country
+  definition: Refugees under UNHCR's mandate whose country of origin is the country, at end of year.
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_origin.refugees
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unhcr.asylum_seekers_originating
+  labels:
+    fr: Demandeurs d'asile originaires du pays
+    en: Asylum-seekers originating from the country
+  definition: Asylum-seekers from the country, at end of year.
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_origin.asylum_seekers
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unhcr.idps
+  labels:
+    fr: Déplacés internes (HCR)
+    en: Internally displaced persons (UNHCR)
+  definition: Internally displaced persons of concern to UNHCR in the country, at end of year.
+  unit: persons
+  domain: un
+  subdomain: displacement
+  source_order:
+  - unhcr.pop_by_origin.idps
+  provider_declared: true
+  notes: UNHCR end-year stock; the API's string '0' cells (no figure) are omitted, so a missing year is not zero.
+  tags:
+  - unhcr
+- id: un.unsd.surface_area
+  labels:
+    fr: Superficie (UNSD)
+    en: Surface area (UNSD)
+  definition: Total surface area (land and inland waters) as published in the UN Statistical Yearbook 68 from the Demographic
+    Yearbook 2023, in thousand km2.
+  unit: thousand km2
+  domain: un
+  subdomain: area
+  source_order:
+  - unsd.syb68_t02.Surface area (thousand km2)
+  provider_declared: true
+  notes: Rounded to whole thousand km2 by the publisher (small territories read 0 or 1); see docs/dev/v3_a_un.md for the cross-check
+    against World Bank AG.SRF.TOTL.K2.
+  tags:
+  - syb68

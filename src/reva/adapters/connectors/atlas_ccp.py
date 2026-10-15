@@ -58,7 +58,7 @@ CONNECTOR_NAME = "atlas.ccp"
 CONNECTOR_VERSION = "1.0.0"
 PARSER_VERSION = "atlas-ccp-parse-1"
 BOX = "https://utexas.box.com/shared/static"
-HOSTS = ("utexas.box.com", "public.boxcloud.com")
+HOSTS = ("utexas.box.com", "utexas.app.box.com", "public.boxcloud.com")  # Box: 301 -> app -> 302 cloud
 ZIP_MEDIA = ("application/zip", "application/octet-stream", "application/x-zip-compressed")
 MAX_SPEC_BYTES = 50_000_000  # ConnectorSpec bound (le=52_428_800)
 

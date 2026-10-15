@@ -68,7 +68,7 @@ from psycopg import sql  # noqa: E402
 from sqlalchemy.engine import make_url  # noqa: E402
 from sqlalchemy.exc import ArgumentError  # noqa: E402
 
-SCHEMAS = ("meta", "ontology", "world", "evidence", "belief", "model", "sim", "ops")
+SCHEMAS = ("meta", "ontology", "world", "evidence", "belief", "model", "sim", "ops", "kg")
 RUNTIME_ROLES = ("reva_api", "reva_worker", "reva_sim")
 SESSION_GUCS = (
     "SET LOCAL TimeZone = 'UTC'",

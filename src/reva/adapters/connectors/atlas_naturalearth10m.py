@@ -936,7 +936,7 @@ def atlas_rows(
             {
                 "source": ATLAS_SOURCE,
                 "dataset": DS_DISPUTED,
-                "indicator": "disputed_area_km2",
+                "indicator": f"disputed_area_km2|area={pg}",
                 "concept_id": None,
                 "iso3": ent,
                 "provider_geo": pg,
@@ -1152,7 +1152,7 @@ async def ingest(
     registration, so a failure registers nothing (archived raw bytes stay archived)."""
     import polars as pl
 
-    from reva.adapters.connectors.atlas_geo_common import archive_raw, load_country_qids
+    from reva.adapters.connectors.atlas_geo_common import archive_raw
     from reva.atlas.tables import ATLAS_SCHEMA, register_atlas_table
 
     conn = NaturalEarth10mConnector()
@@ -1187,32 +1187,7 @@ async def ingest(
         )
     kg: dict[str, Any] = {"loaded": False}
     if load_kg:
-        q = dict(qids) if qids is not None else load_country_qids()
-        if not q:
-            kg = {"loaded": False, "blocked": "registry/entities/country_qids.json (ISO3 -> QID) not available"}
-        else:
-            from reva.adapters.connectors.atlas_geo_common import ensure_kg_property
-            from reva.kg.model import load_batch
-
-            ensure_kg_property(engine, "P47")
-            sts, info = adjacency_statements(
-                nb.computation,
-                q,
-                raw_sha256=shas["map_units"],
-                source_revision=str(nb.ne_version),
-                retrieved_at=raws["map_units"].retrieved_at,
-            )
-            rep = load_batch(
-                engine,
-                store,
-                statements=sts,
-                source_key=SOURCE_KEY,
-                raw_sha256s=[shas["map_units"]],
-                retrieved_at=raws["map_units"].retrieved_at,
-                origin=origin,
-                parameters={"connector": CONNECTOR_NAME, "ne_version": nb.ne_version},
-            )
-            kg = {"loaded": True, **info, "report": rep.as_dict()}
+        kg = load_adjacency_kg(engine, store, nb, retrieved_at=raws["map_units"].retrieved_at, origin=origin, qids=qids)
     return {
         "connector": CONNECTOR_NAME,
         "ne_version": nb.ne_version,
@@ -1220,4 +1195,38 @@ async def ingest(
         "tables": tables,
         "diagnostics": nb.computation.diagnostics,
         "kg": kg,
+        "build": nb,  # in-memory result (not JSON): lets a caller load the KG later with load_adjacency_kg
+        "retrieved_at": raws["map_units"].retrieved_at,
+        "origin": origin,
     }
+
+
+def load_adjacency_kg(
+    engine: Any, store: Any, nb: NeBuild, *, retrieved_at: datetime, origin: str, qids: Mapping[str, str] | None = None
+) -> dict[str, Any]:
+    """Load the ``shares border with`` (P47) statements of a build through KGCORE's ``load_batch``.
+
+    QIDs come from ``registry/entities/country_qids.json`` (WDHARVEST) unless given; without them the load
+    is reported as blocked (nothing is guessed)."""
+    from reva.adapters.connectors.atlas_geo_common import ensure_kg_property, load_country_qids
+    from reva.kg.model import load_batch
+
+    q = dict(qids) if qids is not None else load_country_qids()
+    if not q:
+        return {"loaded": False, "blocked": "registry/entities/country_qids.json (ISO3 -> QID) not available"}
+    ensure_kg_property(engine, "P47")
+    raw = nb.raw_sha256s["map_units"]
+    sts, info = adjacency_statements(
+        nb.computation, q, raw_sha256=raw, source_revision=str(nb.ne_version), retrieved_at=retrieved_at
+    )
+    rep = load_batch(
+        engine,
+        store,
+        statements=sts,
+        source_key=SOURCE_KEY,
+        raw_sha256s=[raw],
+        retrieved_at=retrieved_at,
+        origin=origin,
+        parameters={"connector": CONNECTOR_NAME, "ne_version": nb.ne_version},
+    )
+    return {"loaded": True, **info, "report": rep.as_dict()}

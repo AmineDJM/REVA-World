@@ -47,8 +47,9 @@ FLOOR_STATEMENTS_PER_S = 5_000
 
 def _entities(n: int) -> Iterator[KgEntity]:
     for i in range(n):
-        yield KgEntity(f"syn:n{i}", "test_thing", {"en": f"Synthetic node {i}", "fr": f"Nœud synthétique {i}"},
-                       sitelinks=i % 300)
+        yield KgEntity(
+            f"syn:n{i}", "test_thing", {"en": f"Synthetic node {i}", "fr": f"Nœud synthétique {i}"}, sitelinks=i % 300
+        )
 
 
 def _statements(n_st: int, n_ent: int, seed: int = 7) -> Iterator[KgStatement]:
@@ -64,13 +65,20 @@ def _statements(n_st: int, n_ent: int, seed: int = 7) -> Iterator[KgStatement]:
             start = KgTime(f"+{y:04d}-00-00T00:00:00Z", 9)
             if rnd.random() < 0.5:
                 end = KgTime(f"+{min(y + rnd.randrange(1, 80), 2025):04d}-00-00T00:00:00Z", 9)
-        yield KgStatement(f"syn:n{s}", PIDS[j % len(PIDS)], f"syn:n{o}", start=start, end=end,
-                          statement_id=f"e{j}", source_revision="1")
+        yield KgStatement(
+            f"syn:n{s}",
+            PIDS[j % len(PIDS)],
+            f"syn:n{o}",
+            start=start,
+            end=end,
+            statement_id=f"e{j}",
+            source_revision="1",
+        )
 
 
 def _pct(xs: list[float], p: float) -> float:
     xs = sorted(xs)
-    return xs[min(len(xs) - 1, int(round(p * (len(xs) - 1))))]
+    return xs[min(len(xs) - 1, round(p * (len(xs) - 1)))]
 
 
 @pytest.fixture(scope="module")
@@ -99,8 +107,15 @@ def test_kg_bulk_load_and_query_latency(kgperf: dict[str, Any]) -> None:
     t0 = time.perf_counter()
     ents = list(_entities(n_ent))
     for i in range(0, n_ent, BATCH):
-        load_batch(worker, store, entities=ents[i : i + BATCH], source_key="synthetic", raw_sha256s=[raw],
-                   retrieved_at=datetime.now(UTC), origin="test_fixture")
+        load_batch(
+            worker,
+            store,
+            entities=ents[i : i + BATCH],
+            source_key="synthetic",
+            raw_sha256s=[raw],
+            retrieved_at=datetime.now(UTC),
+            origin="test_fixture",
+        )
     res["entity_load_s"] = round(time.perf_counter() - t0, 2)
     res["entities_per_s"] = round(n_ent / res["entity_load_s"])
 
@@ -111,8 +126,15 @@ def test_kg_bulk_load_and_query_latency(kgperf: dict[str, Any]) -> None:
     while loaded < N_STATEMENTS:
         chunk = [next(gen) for _ in range(min(BATCH, N_STATEMENTS - loaded))]
         t = time.perf_counter()
-        rep = load_batch(worker, store, statements=chunk, source_key="synthetic", raw_sha256s=[raw],
-                         retrieved_at=datetime.now(UTC), origin="test_fixture")
+        rep = load_batch(
+            worker,
+            store,
+            statements=chunk,
+            source_key="synthetic",
+            raw_sha256s=[raw],
+            retrieved_at=datetime.now(UTC),
+            origin="test_fixture",
+        )
         dt = time.perf_counter() - t
         assert rep.statements_inserted == len(chunk) and rep.rejected_total == 0
         batch_times.append(round(dt, 3))
@@ -124,8 +146,15 @@ def test_kg_bulk_load_and_query_latency(kgperf: dict[str, Any]) -> None:
     # idempotent reload of one batch (all unchanged)
     chunk = [s for _, s in zip(range(BATCH), _statements(N_STATEMENTS, n_ent), strict=False)]
     t = time.perf_counter()
-    rep = load_batch(worker, store, statements=chunk, source_key="synthetic", raw_sha256s=[raw],
-                     retrieved_at=datetime.now(UTC), origin="test_fixture")
+    rep = load_batch(
+        worker,
+        store,
+        statements=chunk,
+        source_key="synthetic",
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
     res["reload_unchanged_batch_s"] = round(time.perf_counter() - t, 2)
     assert rep.statements_inserted == 0 and rep.statements_unchanged == len(chunk)
 
@@ -134,16 +163,25 @@ def test_kg_bulk_load_and_query_latency(kgperf: dict[str, Any]) -> None:
         c.commit()
         res["kg_bytes"] = {
             r[0]: int(r[1])
-            for r in c.execute(text("""SELECT c.relname, pg_total_relation_size(c.oid) FROM pg_class c
+            for r in c.execute(
+                text("""SELECT c.relname, pg_total_relation_size(c.oid) FROM pg_class c
                                         JOIN pg_namespace n ON n.oid = c.relnamespace
-                                       WHERE n.nspname = 'kg' AND c.relkind = 'r' ORDER BY 2 DESC"""))
+                                       WHERE n.nspname = 'kg' AND c.relkind = 'r' ORDER BY 2 DESC""")
+            )
         }
         res["kg_total_mb"] = round(sum(res["kg_bytes"].values()) / 1e6, 1)
 
     rnd = random.Random(11)
     pairs = [(f"syn:n{rnd.randrange(HUBS, n_ent)}", f"syn:n{rnd.randrange(HUBS, n_ent)}") for _ in range(30)]
-    lat: dict[str, list[float]] = {"path4": [], "path4_window": [], "path5": [], "neighbours": [], "timeline": [],
-                                   "search": [], "entity": []}
+    lat: dict[str, list[float]] = {
+        "path4": [],
+        "path4_window": [],
+        "path5": [],
+        "neighbours": [],
+        "timeline": [],
+        "search": [],
+        "entity": [],
+    }
     found = {"path4": 0, "path4_window": 0, "path5": 0}
     lengths: list[int] = []
     truncated = 0
@@ -176,8 +214,11 @@ def test_kg_bulk_load_and_query_latency(kgperf: dict[str, Any]) -> None:
         res["hub_endpoint_path_ms"] = round((time.perf_counter() - t) * 1000, 1)
         res["hub_endpoint_truncated"] = r["search"]["truncated"]
     res["latency_ms"] = {
-        k: {"p50": round(statistics.median(v) * 1000, 1), "p95": round(_pct(v, 0.95) * 1000, 1),
-            "max": round(max(v) * 1000, 1)}
+        k: {
+            "p50": round(statistics.median(v) * 1000, 1),
+            "p95": round(_pct(v, 0.95) * 1000, 1),
+            "max": round(max(v) * 1000, 1),
+        }
         for k, v in lat.items()
     }
     res["paths_found_of_30"] = found

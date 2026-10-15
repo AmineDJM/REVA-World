@@ -71,6 +71,9 @@ MAX_GET_URL = 7500  # WDQS/varnish accept longer GETs, but chunks this large mea
 ENTITY_PREFIX = "http://www.wikidata.org/entity/"
 PROPERTIES_FILE = REPO_ROOT / "registry" / "kg" / "properties.yaml"
 VERSION = "0.3"
+#: Seconds between the end of one Wikidata request and the start of the next, machine-wide. 2 s (not 1 s):
+#: on 2026-10-15 the API answered 429 "You are making too many requests" at ~1 req/s aggregate.
+DEFAULT_MIN_INTERVAL = 2.0
 PROJECT_URL = "https://github.com/AmineDJM/REVA-World"
 TEMPORAL_QUALIFIERS = {"P580": "start", "P582": "end", "P585": "point_in_time"}
 SITELINKS_KEPT = ("enwiki", "frwiki", "eswiki", "ptwiki", "arwiki", "zhwiki", "ruwiki", "dewiki")
@@ -118,7 +121,7 @@ class MachineLock:
     ``last_end`` (wall clock of the end of the last request, any process) and ``cooldown_until``.
     """
 
-    def __init__(self, directory: Path | None = None, *, min_interval: float = 1.0,
+    def __init__(self, directory: Path | None = None, *, min_interval: float = DEFAULT_MIN_INTERVAL,
                  clock: Any = time.time, sleep: Any = asyncio.sleep) -> None:
         self.dir = Path(directory) if directory else default_lock_dir()
         self.dir.mkdir(parents=True, exist_ok=True)

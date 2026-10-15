@@ -29,7 +29,9 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
     register_properties(
         db.worker,
         [
-            KgProperty("syn:linked", "item", "linked_to", "linked to", "lié à", "linked_from", "linked from", "lié depuis"),
+            KgProperty(
+                "syn:linked", "item", "linked_to", "linked to", "lié à", "linked_from", "linked from", "lié depuis"
+            ),
             KgProperty("P828", "item", "has_cause", "has cause", "a pour cause", "cause_of", "cause of"),
         ],
     )
@@ -40,16 +42,30 @@ def api(db) -> Iterator[tuple[TestClient, str]]:  # type: ignore[no-untyped-def]
         KgStatement("syn:apiq", "syn:linked", "syn:apir", statement_id="qr", end=KgTime("1962-07-05", 11)),
         KgStatement("syn:apir", "P828", "syn:apis", statement_id="rs"),
     ]
-    rep = load_batch(db.worker, db.store, entities=ents, statements=sts, source_key=SRC, raw_sha256s=[raw],
-                     retrieved_at=datetime.now(UTC), origin="test_fixture")
+    rep = load_batch(
+        db.worker,
+        db.store,
+        entities=ents,
+        statements=sts,
+        source_key=SRC,
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
     assert rep.rejected_total == 0
     tok, sha = new_api_token()
     with db.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'kg-read')"),
-                  {"h": sha, "s": ["read"]})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'kg-read')"),
+            {"h": sha, "s": ["read"]},
+        )
     settings = Settings.model_validate(
-        {**db.settings.model_dump(), "reva_session_secret": SecretStr("s" * 48),
-         "reva_allowed_hosts": "testserver,localhost", "reva_cors_origins": ""}
+        {
+            **db.settings.model_dump(),
+            "reva_session_secret": SecretStr("s" * 48),
+            "reva_allowed_hosts": "testserver,localhost",
+            "reva_cors_origins": "",
+        }
     )
     app = create_app(settings)
     try:
@@ -131,7 +147,9 @@ def test_path_says_connected_via_and_attributes_causal_claims(api) -> None:  # t
     assert hops[2]["causal_assertion"]["asserted_by"] == SRC and f"asserted by {SRC}" in hops[2]["wording"]
     assert all(h["provenance"]["raw_sha256"] for h in hops)
     # time window: the second hop ended in 1962
-    r = get(api, "/v1/kg/path", **{"from": "syn:apip", "to": "syn:apis", "valid_from": "1970", "include_undated": "false"})
+    r = get(
+        api, "/v1/kg/path", **{"from": "syn:apip", "to": "syn:apis", "valid_from": "1970", "include_undated": "false"}
+    )
     assert r.status_code == 200 and not r.json()["data"]["found"]
 
 

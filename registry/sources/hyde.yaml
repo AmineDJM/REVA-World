@@ -1,0 +1,23 @@
+# V3 (agent A-HISTECON): HYDE 3.2.1 country summaries (population and land use) from DANS.
+# Connector: src/reva/adapters/connectors/atlas_hyde.py -> atlas table hyde.hyde321.
+source_key: hyde.dans
+title: HYDE 3.2.1 History Database of the Global Environment (country summaries, baseline)
+provider_url: https://doi.org/10.17026/dans-25g-gez3
+lineage_family: hyde
+rights:
+  licence: CC BY 3.0
+  licence_url: https://creativecommons.org/licenses/by/3.0/
+  attribution: >-
+    Klein Goldewijk, K., Beusen, A., Doelman, J. and Stehfest, E. (2017), Anthropogenic land use estimates for
+    the Holocene - HYDE 3.2, Earth Syst. Sci. Data 9, 927-953. Data: DANS, doi:10.17026/dans-25g-gez3
+  licence_basis: >-
+    The release readme states "The Creative Commons License (CC BY 3.0) applies to all of the HYDE data";
+    the DANS dataset record states CC0-1.0. The stricter (attribution) licence is applied.
+metadata:
+  allowed_hosts: [archaeology.datastations.nl, objectstore.surf.nl]
+  dataset_record: https://archaeology.datastations.nl/api/datasets/:persistentId/?persistentId=doi:10.17026/dans-25g-gez3
+  access: one HTTP Range request for the last 1.5 MB of HYDE3_2_1-baseline.zip (5.3 GB); members are Deflate64
+  hyde_3_3: HYDE 3.3 is served behind an Anubis bot challenge (public.yoda.uu.nl); not used
+  editorial_status: modelled estimates (historical population and land-use estimates allocated to a 5' grid)
+  authentication: none
+  cadence: semi-annual check

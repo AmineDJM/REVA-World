@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
@@ -325,6 +326,14 @@ def vote_rows(cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha
     return out
 
 
+_CONTROL = re.compile(r"[\x00-\x1f\x7f]+")
+
+
+def _clean_text(t: str) -> str:
+    """Provider text with control characters (line breaks, tabs) folded to single spaces."""
+    return re.sub(r"\s{2,}", " ", _CONTROL.sub(" ", t)).strip() or "?"
+
+
 def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[str, Any]]:
     from reva.atlas.tables import MAX_TEXT, json_obj
 
@@ -339,7 +348,7 @@ def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[
             "source": ATLAS_SOURCE, "dataset": "rollcalls", "indicator": f"rollcall|rcid={rc.rcid}",
             "concept_id": None, "iso3": None, "provider_geo": "UNGA", "entity_qid": None, "period_start": start,
             "period_end": end, "value": None,
-            "value_text": (rc.descr or rc.short or rc.unres or f"roll call {rc.rcid}")[:MAX_TEXT],
+            "value_text": _clean_text(rc.descr or rc.short or rc.unres or f"roll call {rc.rcid}")[:MAX_TEXT],
             "unit": "description", "flags": json_obj(flags), "raw_sha256": raw_sha256,
             "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME, row=rc.first_row, column="descr"),
         })
@@ -424,8 +433,9 @@ def kg_records(cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sh
         rc = rcs[r]
         subj = f"unga:rcid:{r}"
         title = rc.short or rc.unres or f"roll call {r}"
-        ents.append(KgEntity(qid=subj, kind="un_roll_call", labels={"en": f"UNGA roll call {r}: {title}"[:500]},
-                             descriptions={"en": (rc.descr or title)[:500]}))
+        ents.append(KgEntity(qid=subj, kind="un_roll_call",
+                             labels={"en": _clean_text(f"UNGA roll call {r}: {title}")[:500]},
+                             descriptions={"en": _clean_text(rc.descr or title)[:500]}))
         pit = rc.date.isoformat()
         sel = {"file": VOTES_FILE_NAME, "object": FRAME, "row": rc.first_row}
         if rc.unres:

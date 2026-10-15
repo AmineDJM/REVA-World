@@ -113,6 +113,11 @@ async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
     return to_raw(item, result, getattr(http, "origin", "live"))
 
 
+async def fetch_all(http: Any) -> dict[str, RawAcquisition]:
+    """Every item of :func:`fetch_items`, sequentially (one host at a time; nothing on failure)."""
+    return {it.key: await fetch(it, http) for it in fetch_items()}
+
+
 def connector_spec() -> Any:
     from reva.adapters.connectors import atlas_sci_common as common
 
@@ -250,7 +255,11 @@ def _int_text(v: Any, what: str) -> str | None:
     return str(int(f))
 
 
-def parse_lied(body: bytes) -> list[dict[str, Any]]:
+LIED_MIN_ROWS = 20_000  # v6.9 has 33,090 rows
+BMR_MIN_ROWS = 15_000  # v4.0 has 19,775 rows
+
+
+def parse_lied(body: bytes, *, min_rows: int = LIED_MIN_ROWS) -> list[dict[str, Any]]:
     """``LIED_6.9.xlsx`` -> rows (dicts of exact cell text); checks the header."""
     from reva.adapters.connectors.atlas_xlsx import Workbook, XlsxError
 
@@ -274,12 +283,12 @@ def parse_lied(body: bytes) -> list[dict[str, Any]]:
             continue
         d["_row"] = n
         rows.append(d)
-    if len(rows) < 20_000:
+    if len(rows) < min_rows:
         raise _err(f"LIED has only {len(rows)} rows; refusing a partial file")
     return rows
 
 
-def parse_bmr(body: bytes) -> list[dict[str, Any]]:
+def parse_bmr(body: bytes, *, min_rows: int = BMR_MIN_ROWS) -> list[dict[str, Any]]:
     text = body.decode("utf-8-sig")
     reader = csv.DictReader(io.StringIO(text))
     need = {"country", "ccode", "abbreviation", "year", *BMR_INDICATORS}
@@ -291,7 +300,7 @@ def parse_bmr(body: bytes) -> list[dict[str, Any]]:
         r = dict(r)
         r["_row"] = n
         rows.append(r)
-    if len(rows) < 15_000:
+    if len(rows) < min_rows:
         raise _err(f"BMR has only {len(rows)} rows; refusing a partial file")
     return rows
 
@@ -407,7 +416,7 @@ def unit_qids(dataset: str) -> dict[str, str]:
 
 # ----------------------------------------------------------------------------- ingest
 def ingest(engine: Any, store: Any, raws: Mapping[str, RawAcquisition], *, origin: str,
-           actor: str = "worker:atlas_regimes") -> dict[str, Any]:
+           actor: str = "worker:atlas_regimes", min_rows: tuple[int, int] = (LIED_MIN_ROWS, BMR_MIN_ROWS)) -> dict[str, Any]:
     """Archive the four raw files and register ``lied.lied`` and ``bmr.bmr``."""
     from reva.adapters.connectors import atlas_sci_common as common
     from reva.atlas.tables import register_atlas_table
@@ -420,7 +429,7 @@ def ingest(engine: Any, store: Any, raws: Mapping[str, RawAcquisition], *, origi
     shas = {k: common.archive_raw(engine, store, lspec if k.startswith("lied") else bspec, r, actor=actor)
             for k, r in raws.items()}
     out: dict[str, Any] = {}
-    lf = lied_frame(parse_lied(raws["lied.file"].body), raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
+    lf = lied_frame(parse_lied(raws["lied.file"].body, min_rows=min_rows[0]), raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
     out["lied"] = register_atlas_table(
         engine, store, source="lied", dataset="lied", frame=lf, raw_sha256s=[shas["lied.file"]],
         parser_version=PARSER_VERSION, origin=origin, geo_scheme="lied",
@@ -428,7 +437,7 @@ def ingest(engine: Any, store: Any, raws: Mapping[str, RawAcquisition], *, origi
                        "LIED name; historical polities and colonies without a crosswalk entity kept unmapped. CC0."),
         rights={**RIGHTS_LIED, "record": lied_meta, "record_raw_sha256": shas["lied.record"]}, actor=actor,
     )
-    bf = bmr_frame(parse_bmr(raws["bmr.file"].body), raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
+    bf = bmr_frame(parse_bmr(raws["bmr.file"].body, min_rows=min_rows[1]), raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
     out["bmr"] = register_atlas_table(
         engine, store, source="bmr", dataset="bmr", frame=bf, raw_sha256s=[shas["bmr.file"]],
         parser_version=PARSER_VERSION, origin=origin, geo_scheme="bmr",
@@ -445,6 +454,7 @@ __all__ = [
     "bmr_frame",
     "check_record",
     "fetch",
+    "fetch_all",
     "fetch_items",
     "ingest",
     "lied_frame",

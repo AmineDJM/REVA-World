@@ -22,17 +22,17 @@ pytestmark = pytest.mark.db
 SRC = "kgpathtest"
 
 
-def L(qid: str) -> str:  # noqa: N802
-    return qid.split(":")[1].upper()
-
-
 @pytest.fixture(scope="module")
 def g(db):  # type: ignore[no-untyped-def]
     register_properties(
         db.worker,
         [
-            KgProperty("syn:linked", "item", "linked_to", "linked to", "lié à", "linked_from", "linked from", "lié depuis"),
-            KgProperty("syn:member", "item", "member_of", "member of", "membre de", "has_member", "has member", "a pour membre"),
+            KgProperty(
+                "syn:linked", "item", "linked_to", "linked to", "lié à", "linked_from", "linked from", "lié depuis"
+            ),
+            KgProperty(
+                "syn:member", "item", "member_of", "member of", "membre de", "has_member", "has member", "a pour membre"
+            ),
             KgProperty("syn:founded", "time", "founded", "founded", "fondé"),
             KgProperty("P31", "item", "instance_of", "instance of", "nature de l'élément"),
             KgProperty("P828", "item", "has_cause", "has cause", "a pour cause", "cause_of", "cause of"),
@@ -40,8 +40,10 @@ def g(db):  # type: ignore[no-untyped-def]
     )
     raw = db.store.put_bytes(b"kg path test synthetic graph v1", "raw", "application/json").sha256
     names = ["a", "b", "c", "d", "e", "hub", "cls", "war", "spark"] + [f"x{i:02d}" for i in range(1, 31)]
-    ents = [KgEntity(f"pth:{n}", "test_thing", {"en": f"Node {n.upper()}", "fr": f"Nœud {n.upper()}"}, sitelinks=len(n))
-            for n in names]
+    ents = [
+        KgEntity(f"pth:{n}", "test_thing", {"en": f"Node {n.upper()}", "fr": f"Nœud {n.upper()}"}, sitelinks=len(n))
+        for n in names
+    ]
     y = lambda v: KgTime(v, 9)  # noqa: E731
     sts = [
         KgStatement("pth:a", "syn:linked", "pth:b", statement_id="ab"),
@@ -54,11 +56,23 @@ def g(db):  # type: ignore[no-untyped-def]
         KgStatement("pth:a", "P31", "pth:cls", statement_id="acls"),
         KgStatement("pth:d", "P31", "pth:cls", statement_id="dcls"),
         KgStatement("pth:war", "P828", "pth:spark", statement_id="cause", references=[{"P248": "pth:book"}]),
-        KgStatement("pth:a", "syn:founded", value={"type": "time", "time": "+1492-10-12T00:00:00Z", "precision": 11},
-                    statement_id="founded"),
+        KgStatement(
+            "pth:a",
+            "syn:founded",
+            value={"type": "time", "time": "+1492-10-12T00:00:00Z", "precision": 11},
+            statement_id="founded",
+        ),
     ] + [KgStatement(f"pth:x{i:02d}", "syn:member", "pth:hub", statement_id=f"xh{i}") for i in range(1, 31)]
-    rep = load_batch(db.worker, db.store, entities=ents, statements=sts, source_key=SRC, raw_sha256s=[raw],
-                     retrieved_at=datetime.now(UTC), origin="test_fixture")
+    rep = load_batch(
+        db.worker,
+        db.store,
+        entities=ents,
+        statements=sts,
+        source_key=SRC,
+        raw_sha256s=[raw],
+        retrieved_at=datetime.now(UTC),
+        origin="test_fixture",
+    )
     assert rep.rejected_total == 0, rep.rejected
     with db.api.connect() as conn:
         yield conn
@@ -166,7 +180,8 @@ def test_neighbours_direction_kind_filter_and_pagination(g) -> None:  # type: ig
 def test_timeline_is_sorted_and_includes_time_values(g) -> None:  # type: ignore[no-untyped-def]
     tl = kq.timeline(g, "pth:b")
     assert [(e["sort_date"], e["provenance"]["statement_key"]) for e in tl["events"]] == [
-        ("1500-01-01", f"{SRC}:bc"), ("1900-01-01", f"{SRC}:be")
+        ("1500-01-01", f"{SRC}:bc"),
+        ("1900-01-01", f"{SRC}:be"),
     ]
     tl = kq.timeline(g, "pth:a")
     assert [e["dated_by"] for e in tl["events"]] == ["time_value"] and tl["events"][0]["sort_date"] == "1492-10-12"

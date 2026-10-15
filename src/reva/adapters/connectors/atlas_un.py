@@ -1454,12 +1454,12 @@ def build_unhcr(raws: Mapping[str, RawAcquisition], *, max_year: int) -> list[Ta
                             selector={"item": raw.item.key, "record": i, "field": fname},
                             concept_id=UNHCR_CONCEPTS.get((dataset, fname)),
                         )
-        if len(buf) == 0:
-            continue
         if incomplete:
             # Never register a partial table: the missing years would read as "no refugees".
             plans.append(TablePlan(UNHCR_SOURCE, dataset, pl.DataFrame(), sorted(shas), "",
                                    report={"refused": "incomplete", "missing_spans": incomplete}))
+            continue
+        if len(buf) == 0:
             continue
         side = {"bilateral": "country of asylum (counterpart origin in the indicator)",
                 "by_asylum": "country of asylum", "by_origin": "country of origin"}[view]

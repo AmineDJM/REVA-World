@@ -3270,6 +3270,264 @@
         "title": "CostReport",
         "type": "object"
       },
+      "CountryLinksResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "CountryLinksResponse",
+        "type": "object"
+      },
       "Coverage": {
         "additionalProperties": false,
         "properties": {
@@ -9882,6 +10140,264 @@
           "next_cursor"
         ],
         "title": "KgTimelineResponse",
+        "type": "object"
+      },
+      "LinksPathResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "additionalProperties": true,
+            "title": "Data",
+            "type": "object"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "LinksPathResponse",
         "type": "object"
       },
       "LocationResponse": {
@@ -19660,6 +20176,315 @@
         "summary": "Search",
         "tags": [
           "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/links/path": {
+      "get": {
+        "operationId": "get_links_path_v1_links_path_get",
+        "parameters": [
+          {
+            "description": "QID or ISO3",
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "description": "QID or ISO3",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[A-Z]{3}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "description": "QID or ISO3",
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "description": "QID or ISO3",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[A-Z]{3}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Number of paths (k shortest simple paths)",
+            "in": "query",
+            "name": "k",
+            "required": false,
+            "schema": {
+              "default": 3,
+              "description": "Number of paths (k shortest simple paths)",
+              "maximum": 10,
+              "minimum": 1,
+              "title": "K",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_hops",
+            "required": false,
+            "schema": {
+              "default": 4,
+              "maximum": 6,
+              "minimum": 1,
+              "title": "Max Hops",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Only hops valid in that year",
+            "in": "query",
+            "name": "as_of",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only hops valid in that year",
+              "title": "As Of"
+            }
+          },
+          {
+            "in": "query",
+            "name": "from_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "From Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To Year"
+            }
+          },
+          {
+            "description": "Allowed hop kinds: P37, link:co_member...",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Allowed hop kinds: P37, link:co_member...",
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "exclude_kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Exclude Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_undated",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Undated",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_blocked_hubs",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Include Blocked Hubs",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinksPathResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Links Path",
+        "tags": [
+          "links"
+        ]
+      }
+    },
+    "/v1/links/{ref}": {
+      "get": {
+        "operationId": "get_country_links_v1_links__ref__get",
+        "parameters": [
+          {
+            "description": "ISO 3166 alpha-3 or QID",
+            "in": "path",
+            "name": "ref",
+            "required": true,
+            "schema": {
+              "description": "ISO 3166 alpha-3 or QID",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[A-Z]{3}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Ref",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "link_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 30,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Link Type"
+            }
+          },
+          {
+            "description": "Only links valid in that year",
+            "in": "query",
+            "name": "year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 3000,
+                  "minimum": -5000,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Only links valid in that year",
+              "title": "Year"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryLinksResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Country Links",
+        "tags": [
+          "links"
         ]
       }
     },

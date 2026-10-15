@@ -27,10 +27,17 @@ requests:
     daily_requests: 20
     expected_bytes_per_day: 30000000
     reason: "Correlates of War: ~8 bulk files per run"
+  - source_key: hyde.dans
+    # archaeology.datastations.nl (DANS): dataset record, release readme, and ONE HTTP Range request for the
+    # last 1.5 MB of HYDE3_2_1-baseline.zip (5.3 GB, never downloaded whole): the country summary tables
+    # and the zip64 central directory sit in that tail. The file access URL redirects to objectstore.surf.nl.
+    daily_requests: 10
+    expected_bytes_per_day: 5000000
+    reason: "HYDE 3.2.1 country summaries: 3 requests (~1.5 MB) per run"
 daily_totals_increase:
-  http_requests_total: "+300"
-  http_bytes_total: "+112_000_000"
+  http_requests_total: "+310"
+  http_bytes_total: "+117_000_000"
 notes: >-
-  HYDE 3.x is not requested: HYDE 3.3 (public.yoda.uu.nl / geo.public.data.uu.nl) sits behind an
-  Anubis proof-of-work bot challenge (not circumvented), and HYDE 3.2.1 on DANS ships the country
-  summaries only inside a 5.3 GB zip (over the 1.5 GB agent disk budget). See docs/dev/v3_a_histecon.md.
+  HYDE 3.3 (public.yoda.uu.nl / geo.public.data.uu.nl) sits behind an Anubis proof-of-work bot challenge
+  (not circumvented); HYDE 3.2.1 on DANS is used through one Range request. cow.data includes one request
+  to cran.r-project.org (countrycode tarball, KGGEOPOL's COW/GW code panel). See docs/dev/v3_a_histecon.md.

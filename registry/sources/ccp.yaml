@@ -12,7 +12,7 @@ rights:
   commercial_use: not_permitted_without_permission
   redistribution: not_granted
 metadata:
-  allowed_hosts: [utexas.box.com, public.boxcloud.com, comparativeconstitutionsproject.org]
+  allowed_hosts: [utexas.box.com, utexas.app.box.com, public.boxcloud.com, comparativeconstitutionsproject.org]
   authentication: none
   cadence: irregular versioned releases (chronology v6 April 2026; characteristics v5 February 2025)
   time_semantics: country-year; the year an event was promulgated (chronology); content as in force at the end of the year (characteristics)

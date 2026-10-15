@@ -3,7 +3,8 @@
 # src/reva/adapters/connectors/atlas_naturalearth10m.py), GeoNames countryInfo (CC BY 4.0), World Bank CCKP
 # climatologies (CC BY 4.0; CRU TS 4.09 and ERA5), INFORM Risk 2026 natural-hazard scores (EC JRC).
 # Not catalogued: per-neighbour border rows (naturalearth.admin0_10m_borders: one indicator per partner;
-# consumed by LINKS and the KG), exclave rows, monthly climate normals (in the CRU table), elevation
+# consumed by LINKS and the KG), exclave rows, disputed-area rows (naturalearth.admin0_10m_disputed: one
+# indicator per area, disputed_area_km2|area=<BRK_A3>), monthly climate normals (in the CRU table), elevation
 # (no small open per-country DEM summary found; not computed). Coverage: docs/dev/v3_a_geo.md.
 domain: geography
 labels:
@@ -388,18 +389,3 @@ concepts:
   provider_declared: true
   notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
     (EC reuse policy).
-- id: geography.disputed_area_ne10m
-  labels:
-    fr: Superficie des zones disputées (Natural Earth)
-    en: Area of disputed areas (Natural Earth)
-  definition: Area of a Natural Earth 1:10m disputed / breakaway / claim polygon, attached to the Admin-0 feature Natural
-    Earth attaches it to (administering side in the de facto view); provider_geo is the Natural Earth BRK_A3 code and flags.ne_note
-    quotes who administers and who claims.
-  unit: km2
-  domain: geography
-  subdomain: disputes
-  value_kind: numeric
-  source_order:
-  - naturalearth.admin0_10m_disputed.disputed_area_km2
-  provider_declared: true
-  notes: Several rows per country are possible (one per area, provider_geo distinguishes them). Not a judgement on any claim.

@@ -1,0 +1,44 @@
+[
+  {
+    "request_fingerprint": "46c8c35c2f6d7de3736a5027c18df257d2061c9bd6b485391afd7e94854a723a",
+    "url": "https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/DESCRIPTION",
+    "file": "46c8c35c2f6d7de3.txt",
+    "sha256": "1ac0a3b691861b1052b298043f66c62ab3e747cceb844f73a940df0f57304d43",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "GPL-3 (package metadata)",
+    "derived_from_sha256": null,
+    "note": "live bytes, unchanged"
+  },
+  {
+    "request_fingerprint": "d3dd1c236be1faecf107c144fb9a97d464f3437deb3b21b1806a0d2a49fedd8e",
+    "url": "https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/codebook.RData",
+    "file": "d3dd1c236be1faec.RData",
+    "sha256": "2840d879cb9071b1f742f5f18c5373518a586ac90454b58dbf5f4309077f0700",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-SA-4.0",
+    "derived_from_sha256": null,
+    "note": "live bytes, unchanged"
+  },
+  {
+    "request_fingerprint": "fa3edb6508b88cf9e43ba3bdc31f9262c3ae45885f0ed99e78ccec65eb969768",
+    "url": "https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData",
+    "file": "fa3edb6508b88cf9.RData",
+    "sha256": "c65f779b37fd2410078ead4af1e10ceb872fc822a77b444860e011be0e8befa3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:08:36+00:00",
+    "licence": "CC-BY-SA-4.0",
+    "derived_from_sha256": "39b412d39a061c18f20c98e4ad4d6355b05a0441df31be4ee9aec420dc3d95ea",
+    "note": "subset of vdem.RData v16: units ('FRA', 'DEU', 'PSE', 'BVR', 'TWN', 'USA') x years (1789, 1800, 1871, 1900, 1945, 1990, 2024, 2025), every column the connector reads; values bit-identical"
+  }
+]
