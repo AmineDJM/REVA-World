@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { displayDecimal } from '../lib/format';
 import type { Backtest } from '../lib/runviews';
 
@@ -33,7 +34,7 @@ export function BacktestPanel({
       {evaluations && (
         <p className="field-hint" data-testid="model-evaluations">
           Recorded evaluations of this model version in REVA: {evaluations.count}
-          {evaluations.labels.length > 0 && ` (${evaluations.labels.join('; ')})`} — see the <a href="/models">Models</a> screen.
+          {evaluations.labels.length > 0 && ` (${evaluations.labels.join('; ')})`} — see the <Link to="/models">Models</Link> screen.
         </p>
       )}
       {backtests.map((b, i) => (

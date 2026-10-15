@@ -235,19 +235,28 @@ def get_scenario(scenario_id: UUID, request: Request) -> s.ScenarioResponse:
 
 
 def _assumptions(spec: dict[str, Any]) -> list[str]:
-    a = spec.get("assumptions", {})
-    iv = spec.get("intervention", {})
-    out = [
-        f"Intervention: {iv.get('kind')} import x{iv.get('import_multiplier')} export x{iv.get('export_multiplier')}",
-        f"Quantity response: {a.get('quantity_response')}",
-        "No general equilibrium" if a.get("no_general_equilibrium") else "General equilibrium not excluded",
-        f"Horizon: {spec.get('horizon', {}).get('periods')} {spec.get('horizon', {}).get('unit')}",
-        f"Missing input policy: {spec.get('missing_input_policy')}",
-    ]
-    grid = a.get("elasticity_grid") or []
-    if grid:
-        out.append(f"Elasticity grid ({len(grid)} points) is a scenario assumption with no probability "
-                   "interpretation")
+    a = spec.get("assumptions", {}) or {}
+    iv = spec.get("intervention", {}) or {}
+    horizon = spec.get("horizon", {}) or {}
+    if spec.get("model_key", "economic.crude_exposure") == "economic.crude_exposure":
+        out = [
+            f"Intervention: {iv.get('kind')} import x{iv.get('import_multiplier')} "
+            f"export x{iv.get('export_multiplier')}",
+            f"Quantity response: {a.get('quantity_response')}",
+            "No general equilibrium" if a.get("no_general_equilibrium") else "General equilibrium not excluded",
+        ]
+        grid = a.get("elasticity_grid") or []
+        if grid:
+            out.append(f"Elasticity grid ({len(grid)} points) is a scenario assumption with no probability "
+                       "interpretation")
+    else:
+        # other models: state the spec's own intervention and assumptions verbatim (keys and values),
+        # never the crude model's vocabulary
+        out = [f"Intervention: {iv.get('kind')}"]
+        out += [f"Intervention {k}: {v}" for k, v in sorted(iv.items()) if k != "kind"]
+        out += [f"Assumption {k}: {v}" for k, v in sorted(a.items())]
+    out += [f"Horizon: {horizon.get('periods')} {horizon.get('unit')}",
+            f"Missing input policy: {spec.get('missing_input_policy')}"]
     m = model_registry().get(f"{spec.get('model_key')}@{spec.get('model_version')}")
     if m:
         out += [str(x) for x in m.get("assumptions", [])]

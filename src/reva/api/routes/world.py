@@ -201,8 +201,10 @@ def _year_interval(period: int | None) -> tuple[datetime, datetime] | None:
 
 def _relation(e: Hyperedge) -> s.Relation:
     fm = e.flow_magnitude or {}
-    is_evidence = e.provenance.kind == "evidence"
-    value = fm.get("value") if is_evidence and isinstance(fm.get("value"), dict) and fm.get("value") else None
+    # evidence relations carry the reported observation value; release-pinned ones the release's selected
+    # estimate value (status "selected"); "not_recorded" serves no value
+    has_value = fm.get("status") in ("reported", "missing", "selected")
+    value = fm.get("value") if has_value and isinstance(fm.get("value"), dict) and fm.get("value") else None
     sup = e.support
     temporal = sup.get("temporal_extent") or {}
     return s.Relation(
@@ -211,7 +213,7 @@ def _relation(e: Hyperedge) -> s.Relation:
                                  population=sup.get("population_spec") or {}, aggregation=sup.get("aggregation"),
                                  period_label=period_label(temporal)),
         component=e.component, existence_uncertainty=e.existence_uncertainty, strength=e.tie_strength,
-        value=value, concept_id=fm.get("concept_id") if is_evidence else None,
+        value=value, concept_id=fm.get("concept_id") if has_value else None,
         evidence_observation_id=e.provenance.observation_id, release_id=e.provenance.release_id,
         origin=e.provenance.origin, recorded_at=e.recorded_at,  # type: ignore[arg-type]
         participants=[s.Participant(ordinal=p.ordinal, role=p.role, entity_id=p.entity_id,

@@ -405,6 +405,9 @@ def test_registry_seed_runs_as_owner_and_runtime_roles_only_confirm_it(w: dict[s
     import reva.cli.seed as seed_mod
 
     db = w["db"]
+    # The owner seeds (or confirms) exactly the current registry first: on a shared session database the
+    # registry files may have changed since bootstrap. A runtime role may then only confirm it.
+    assert seed_mod.seed(db.owner, db.store)["status"] in ("seeded", "already_seeded")
     assert seed_mod.seed(db.worker, db.store)["status"] == "already_seeded"
     with db.owner.connect() as c:
         assert c.execute(text("SELECT recorded_by FROM meta.activity WHERE kind = 'registry.seed' "

@@ -57,7 +57,7 @@ process with the worker's database login. Because `ops.record_gate_result` was e
 **R6-03: T2+ changes need a named human review**
 `ops.consume_approval` refuses a gate pass for `model_registration` or `mapping_equivalence` proposals, and for any proposal with `permission_tier >= 2`. Such proposals need an approving human review recorded through the API.
 
-**Regression tests** are in `tests/security/test_gate_separation.py`:
+**Regression tests** are in `tests/security/test_gate_separation_security.py`:
 - `test_r6_02_gate_pass_is_bound_to_the_gate_derived_scope_and_manifest`;
 - `test_r6_03_t2_proposals_need_a_human_review_not_a_gate_pass`.
 
@@ -129,11 +129,11 @@ It gains the `gate` component. The worker allowlist never includes the gate pass
 - `scripts/validate_blueprint.py` checks the gate service and that the worker never receives the gate password. It passes.
 
 **`.env.example` / `.env`**
-`REVA_GATE_DB_PASSWORD=local_gate_only` (a local-only value).
+`REVA_GATE_DB_PASSWORD=<local-only value>` (see `.env.example`).
 
 ## Tests
 
-**`tests/security/test_gate_separation.py`** (new, 14 tests). It covers:
+**`tests/security/test_gate_separation_security.py`** (new, 14 tests). It covers:
 - worker, API and simulation logins cannot record gate results, either through the function or directly;
 - the gate login can, and its rows carry `recorded_by = 'reva_gate'`; the identity checks still fire;
 - the owner is refused;
