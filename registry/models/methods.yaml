@@ -157,3 +157,49 @@ models:
       - every other industry passes on share theta of its unit-cost increase (L1 theta = 1)
       - household basket weights are P3_S14 purchases at basic prices (no product taxes, no purchases abroad)
       - a shocked industry is a whole table industry (NACE B is broader than crude petroleum)
+  - model_key: social.retirement_age
+    version: "1.0.0"
+    kind: scenario
+    # V2 experimental model (agent PEN): runs only because its plugin manifest declares
+    # review_status maintainer_review_pending; labelled "experimental model, not yet reviewed".
+    approval_status: candidate
+    review_status: maintainer_review_pending
+    description: >-
+      Pension eligibility-age changes by birth cohort or claim year (rule tables transcribed from
+      archived legal text, registry/rules/retirement_age) -> exact share of person-time below the
+      eligibility age by single age 55-69 and year -> pension-receipt drop from the country's own
+      base-year LFS inactivity (upper-bound proxy) and employment response = cited literature share
+      (registry/assumptions, verified values only) -> employed persons 55-69, pension recipients,
+      approximate expenditure change (average old-age pension x recipients change) and the
+      old-age dependency ratio from the cohort-component projection. Annual to 2040. A conditional
+      projection under stated assumptions, not a forecast.
+    input_ports:
+      - {name: employment_rate, kind: dataset, concept: labour.employment_rate.lfs_age_sex}
+      - {name: activity_rate, kind: dataset, concept: labour.activity_rate.lfs_age_sex}
+      - {name: pension_beneficiaries, kind: dataset, concept: social.pension_beneficiaries.esspros_old_age}
+      - {name: pension_expenditure, kind: dataset, concept: social.pension_expenditure.esspros}
+      - {name: population, kind: dataset, concept: demography.population.jan1_age_sex}
+      - {name: deaths, kind: dataset, concept: demography.deaths.age_sex}
+      - {name: births, kind: dataset, concept: demography.live_births.mother_age_newborn_sex}
+    output_ports:
+      - {name: employed_persons_55_69, unit: unit.persons}
+      - {name: employment_change_55_69, unit: unit.persons}
+      - {name: pension_recipients, unit: unit.persons}
+      - {name: pension_recipients_change, unit: unit.persons}
+      - {name: pension_expenditure_change_approx_eur, unit: unit.eur}
+      - {name: old_age_dependency_ratio, unit: unit.ratio}
+      - {name: employment_rate_by_sex_and_group, unit: unit.percent}
+    applicability:
+      countries_with_rule_tables: [FRA, DEU, ESP, NLD]
+      countries_refused_capability_gap: [ITA, BEL, SWE, POL]
+      horizon: {max_end_year: 2040, unit: calendar_year}
+      ages: [55, 69]
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [gdp_loss, unemployment, wages, household_welfare, benefit_substitution, full_rate_age_effects]
+    assumptions:
+      - base-year LFS employment rates by sex and five-year group held constant
+      - pension-receipt drop of an affected cell = base-year share outside the labour force (upper-bound proxy, own-country data)
+      - employment response share from the literature registry (stated assumption with citation; L2 grid)
+      - exceptions to the general eligibility age (long careers, disability, hardship) not represented
+      - average pension constant in nominal euro of its year; pension recipients level scales with the 65+ population

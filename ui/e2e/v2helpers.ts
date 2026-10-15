@@ -34,7 +34,7 @@ export function crudeSpec(overrides: Record<string, unknown> = {}): Record<strin
 /** Create a scenario and run it; waits until the job is terminal and returns the job id. */
 export async function runScenario(request: APIRequestContext, context: BrowserContext, spec: Record<string, unknown>, timeout = 120_000): Promise<string> {
   const sc = await apiPost(request, context, '/v1/scenarios', spec);
-  expect(sc.status, `POST /v1/scenarios: ${JSON.stringify(sc.body)}`).toBe(201);
+  expect([200, 201], `POST /v1/scenarios: ${JSON.stringify(sc.body)}`).toContain(sc.status); // 200 = identical spec already exists
   const sim = await apiPost(request, context, '/v1/simulations', { scenario_id: sc.body.scenario_id, fidelity: spec.fidelity ?? 'L1' });
   expect(sim.status, `POST /v1/simulations: ${JSON.stringify(sim.body)}`).toBe(202);
   const id = sim.body.job_id as string;

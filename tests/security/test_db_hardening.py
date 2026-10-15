@@ -216,20 +216,33 @@ def test_worker_cannot_mint_api_tokens_or_record_human_reviews(w: dict[str, Any]
     ],
 )
 def test_direct_gate_result_forgeries_rejected(w: dict[str, Any], evaluator: str, policy: str, match: str) -> None:
+    sql = """INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision,
+             evidence_sha256, evaluator) VALUES (:p, 'promotion', :v, 'pass', :s, :e)"""
+    # GATE: the worker has no INSERT on ops.gate_result at all (gate results come from reva_gate)
     with tx(w["db"].worker) as c:
         pid = proposal(c, w)
+        with pytest.raises(DBAPIError, match="permission denied"):
+            c.execute(text(sql), {"p": pid, "v": policy, "s": w["verified"], "e": evaluator})
+    # the identity triggers still fire first for any writer (here the owner; then z_governance refuses it)
+    with tx(w["db"].owner) as c:
+        pid = proposal(c, w)
         with pytest.raises(DBAPIError, match=match):
-            c.execute(text("""INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision,
-                              evidence_sha256, evaluator) VALUES (:p, 'promotion', :v, 'pass', :s, :e)"""),
-                      {"p": pid, "v": policy, "s": w["verified"], "e": evaluator})
+            c.execute(text(sql), {"p": pid, "v": policy, "s": w["verified"], "e": evaluator})
+
+
+def _committed_proposal(w: dict[str, Any], author: str = "agent:discovery") -> UUID:
+    """GATE: the gate login records in its own transaction, so the proposal must be committed."""
+    with w["db"].worker.begin() as c:
+        return proposal(c, w, author=author)
 
 
 def test_gate_result_function_validates_and_audits(w: dict[str, Any]) -> None:
     db = w["db"]
-    with tx(db.worker) as c:
-        pid = proposal(c, w)
+    pid = _committed_proposal(w)
+    with db.gate.begin() as c:  # GATE: only the independent gate login records gate results
         gid = c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, "
                              "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]}).scalar_one()
+    with db.owner.connect() as c:  # the gate login cannot read the audit trail; the owner can
         assert c.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'gate.result' "
                               "AND target->>'gate_result_id' = :g"), {"g": str(gid)}).scalar_one() == 1
     bad = [
@@ -238,19 +251,20 @@ def test_gate_result_function_validates_and_audits(w: dict[str, Any]) -> None:
         ("bad name!", "gate-evaluator:bad name!", w["verified"], "invalid gate name"),
     ]
     for gate, evaluator, sha, match in bad:
-        with tx(db.worker) as c:
-            pid = proposal(c, w)
+        with tx(db.gate) as c:
+            pid = _committed_proposal(w)
             with pytest.raises(DBAPIError, match=match):
                 c.execute(text("SELECT ops.record_gate_result(:p, :g, 'promotion-1', 'pass', :s, :e)"),
                           {"p": pid, "g": gate, "s": sha, "e": evaluator})
-    with tx(db.worker) as c:  # the proposer cannot launder itself through the function either
-        pid = proposal(c, w, author="promotion")
+    with tx(db.gate) as c:  # the proposer cannot launder itself through the function either
+        pid = _committed_proposal(w, author="promotion")
         with pytest.raises(DBAPIError, match="cannot evaluate its own proposal"):
             c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, "
                            "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
-    with tx(db.sim) as c, pytest.raises(DBAPIError, match="permission denied"):
-        c.execute(text("SELECT ops.record_gate_result(gen_random_uuid(), 'g', 'p', 'pass', :s, "
-                       "'gate-evaluator:g')"), {"s": w["verified"]})
+    for engine in (db.sim, db.worker, db.api):  # GATE: no other login may execute it
+        with tx(engine) as c, pytest.raises(DBAPIError, match="permission denied"):
+            c.execute(text("SELECT ops.record_gate_result(gen_random_uuid(), 'g', 'p', 'pass', :s, "
+                           "'gate-evaluator:g')"), {"s": w["verified"]})
 
 
 def test_model_promotion_requires_matching_replay_evaluation_and_named_reviewer(w: dict[str, Any]) -> None:
@@ -292,7 +306,9 @@ def test_worker_insert_grants_are_the_reviewed_set(w: dict[str, Any]) -> None:
             """SELECT table_schema || '.' || table_name FROM information_schema.role_table_grants
                WHERE grantee = 'reva_worker' AND privilege_type = 'INSERT'""")).scalars())
     assert "ops.api_token" not in rows and "ops.proposal_review" not in rows
-    assert {"ops.gate_result", "model.promotion", "ops.audit", "ops.worker_presence"} <= rows
+    # GATE: gate results come from reva_gate; the worker only files gate requests
+    assert "ops.gate_result" not in rows
+    assert {"ops.gate_request", "model.promotion", "ops.audit", "ops.worker_presence"} <= rows
 
 
 # =========================================================================== R-02 sealed releases
@@ -853,7 +869,7 @@ def test_provisioned_verifier_lets_the_runtime_role_log_in(w: dict[str, Any]) ->
 
     db = w["db"]
     with db.owner.connect() as c:
-        assert b.provision_roles(c, db.settings) == ["reva_api", "reva_worker", "reva_sim"]
+        assert b.provision_roles(c, db.settings) == ["reva_api", "reva_worker", "reva_sim", "reva_gate"]
         c.commit()
         stored = c.execute(text("SELECT rolpassword FROM pg_authid WHERE rolname = 'reva_worker'")).scalar_one()
     assert stored.startswith("SCRAM-SHA-256$4096:")
@@ -884,8 +900,8 @@ def test_role_connection_limit_is_configurable(monkeypatch: pytest.MonkeyPatch) 
 
 # =========================================================================== lead follow-ups (R2-02, R2-09, G)
 def test_gate_result_accepts_needs_review(w: dict[str, Any]) -> None:
-    with tx(w["db"].worker) as c:
-        pid = proposal(c, w)
+    with tx(w["db"].gate) as c:
+        pid = _committed_proposal(w)
         c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'needs_review', :s, "
                        "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
         with pytest.raises(DBAPIError, match="invalid gate decision"), c.begin_nested():
@@ -956,7 +972,8 @@ def test_bootstrap_with_non_superuser_createrole_owner(w: dict[str, Any]) -> Non
             c.execute(text(f'CREATE DATABASE "{dbname}" OWNER "{owner}"'))
             # the runtime roles already exist cluster-wide (created by another owner): on a fresh managed
             # cluster the CREATEROLE owner creates them and so holds ADMIN on them; simulate that.
-            c.execute(text(f'GRANT reva_api, reva_worker, reva_sim, reva_registry TO "{owner}" WITH ADMIN OPTION'))
+            c.execute(text(f'GRANT reva_api, reva_worker, reva_sim, reva_gate, reva_registry TO "{owner}" '
+                           'WITH ADMIN OPTION'))
         su = create_engine(db.settings.migration_url().set(database=dbname), isolation_level="AUTOCOMMIT")
         with su.connect() as c:  # PostGIS is provisioned by the platform, not by the owner
             c.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
@@ -968,17 +985,17 @@ def test_bootstrap_with_non_superuser_createrole_owner(w: dict[str, Any]) -> Non
         with create_engine(url).connect() as c:
             assert c.execute(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")).scalar_one() is False
         report = bootstrap(settings)
-        assert report["roles"] == ["reva_api", "reva_worker", "reva_sim"]
+        assert report["roles"] == ["reva_api", "reva_worker", "reva_sim", "reva_gate"]
         with admin.connect() as c:
             attrs = c.execute(text(
                 "SELECT rolname, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, rolreplication, rolinherit, "
-                "rolcanlogin FROM pg_roles WHERE rolname IN ('reva_api','reva_worker','reva_sim')")).all()
-            assert len(attrs) == 3
+                "rolcanlogin FROM pg_roles WHERE rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')")).all()
+            assert len(attrs) == 4
             assert all(not any(r[1:7]) and r[7] for r in attrs), attrs
             members = c.execute(text(
                 "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
                 "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = 'reva_restricted_deletion' "
-                "AND r.rolname IN ('reva_api','reva_worker','reva_sim')")).scalars().all()
+                "AND r.rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')")).scalars().all()
             assert members == []
     finally:
         with admin.connect() as c:

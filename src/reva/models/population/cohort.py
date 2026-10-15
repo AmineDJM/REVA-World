@@ -515,40 +515,54 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
                 if u is not None and u != 0:
                     notes.append(f"{which} {t} {s}: {dstr(u)} persons of unknown age excluded (absorbed by the "
                                  "migration residual)")
-    # fertility
-    num: dict[str, Decimal] = {}
-    den: dict[str, Decimal] = {}
-    groups: dict[str, FertilityGroup] = {}
+    # fertility: rates from the base-period years whose mother's-age table is complete (a year
+    # with a missing leaf class is left out of the rate estimation, never imputed; reported)
+    num: dict[tuple[int, int], Decimal] = {}
+    den: dict[tuple[int, int], Decimal] = {}
+    groups: dict[tuple[int, int], FertilityGroup] = {}
     unk_b = ZERO
     unk_e = ZERO
     b_m = ZERO
     b_f = ZERO
+    fert_years: list[int] = []
+    sex_years: list[int] = []
     for t in years:
         cells = data.births.get((t, "T"))
+        bm = data.births.get((t, "M"), {}).get("TOTAL")
+        bf = data.births.get((t, "F"), {}).get("TOTAL")
+        if bm is not None and bf is not None and bm.value is not None and bf.value is not None:
+            b_m, b_f = xadd(b_m, bm.value), xadd(b_f, bf.value)
+            sex_years.append(t)
         if not cells:
-            raise _gap(data.iso3, f"births {t} by mother's age missing", input="births", year=t)
+            continue
+        gs = fertility_groups(cells)
+        if not gs or any(cells[g.code].value is None for g in gs):
+            continue
         f0 = _vec(data, "population", t, "F", omega)
         f1 = _vec(data, "population", t + 1, "F", omega)
-        for g in fertility_groups(cells):
-            v = cells[g.code].value
-            if v is None:
-                raise _gap(data.iso3, f"births {t} mother's age {g.code} missing", input="births", year=t)
-            groups[g.code] = g
-            num[g.code] = xadd(num.get(g.code, ZERO), v)
-            den[g.code] = xadd(den.get(g.code, ZERO), mul(HALF, xadd(group_sum(f0, g), group_sum(f1, g))))
+        for g in gs:
+            k = (g.start, g.end)
+            groups.setdefault(k, g)
+            num[k] = xadd(num.get(k, ZERO), cells[g.code].value)  # type: ignore[arg-type]
+            den[k] = xadd(den.get(k, ZERO), mul(HALF, xadd(group_sum(f0, g), group_sum(f1, g))))
         u = unknown_age(cells)
         if u:
             unk_b = xadd(unk_b, u)
         unk_e = xadd(unk_e, mul(HALF, xadd(group_sum(f0, UNK_GROUP), group_sum(f1, UNK_GROUP))))
-        bm = data.births.get((t, "M"), {}).get("TOTAL")
-        bf = data.births.get((t, "F"), {}).get("TOTAL")
-        if bm is None or bf is None or bm.value is None or bf.value is None:
-            raise _gap(data.iso3, f"births {t} by newborn sex missing", input="births", year=t)
-        b_m, b_f = xadd(b_m, bm.value), xadd(b_f, bf.value)
-    for code in groups:
-        if den[code] <= 0:
-            raise _gap(data.iso3, f"zero female exposure for mother's age {code}")
-    fert = tuple(sorted(((groups[c], div(num[c], den[c])) for c in groups), key=lambda gr: gr[0].start))
+        fert_years.append(t)
+    if not fert_years:
+        raise _gap(data.iso3, f"no base-period year {years[0]}-{years[-1]} has a complete births-by-mother's-age "
+                   "table", input="births", years=list(years))
+    if not sex_years:
+        raise _gap(data.iso3, "no base-period year has births by newborn sex", input="births", years=list(years))
+    for label, used in (("fertility rates", fert_years), ("sex ratio at birth", sex_years)):
+        if len(used) < len(years):
+            notes.append(f"{label} estimated from {used} (other base-period years have incomplete or "
+                         "unpublished birth tables; left out, never imputed)")
+    for k in groups:
+        if den[k] <= 0:
+            raise _gap(data.iso3, f"zero female exposure for mother's age {groups[k].code}")
+    fert = tuple(sorted(((groups[k], div(num[k], den[k])) for k in groups), key=lambda gr: gr[0].start))
     if unk_b:
         notes.append(f"{dstr(unk_b)} births with unknown mother's age: separate rate per woman aged 15-49 "
                      "(never spread over ages)")
