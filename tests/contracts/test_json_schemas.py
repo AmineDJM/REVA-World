@@ -177,7 +177,10 @@ def test_builtin_connector_specs_map_onto_manifest_contract(name: str) -> None:
 def test_connector_contract_and_spec_model_agree_on_bounds_and_templates() -> None:
     schema = load("connector.schema.json")["properties"]
     template_literal = ConnectorSpec.model_fields["template"].annotation
-    assert set(schema["template"]["enum"]) == set(typing.get_args(template_literal))
+    # V2 built-in (reviewed, non-autonomy) templates extend the V1 binding appendix; autonomy
+    # manifests validated against the contract still cannot name them.
+    v2_builtin_templates = {"eurostat_sdmx_csv"}
+    assert set(schema["template"]["enum"]) | v2_builtin_templates == set(typing.get_args(template_literal))
     meta = {type(m).__name__: m for m in ConnectorSpec.model_fields["max_response_bytes"].metadata}
     assert schema["max_response_bytes"]["maximum"] == meta["Le"].le
     assert schema["max_response_bytes"]["minimum"] == meta["Ge"].ge

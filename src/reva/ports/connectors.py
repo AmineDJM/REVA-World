@@ -22,7 +22,8 @@ class ConnectorSpec(_M):
     name: str
     version: str
     template: Literal[
-        "worldbank_v2", "comtrade_public_exact", "eurostat_jsonstat", "crossref_doi", "naturalearth_asset"
+        "worldbank_v2", "comtrade_public_exact", "eurostat_jsonstat", "eurostat_sdmx_csv", "crossref_doi",
+        "naturalearth_asset",
     ]
     source_key: str
     provider: str
