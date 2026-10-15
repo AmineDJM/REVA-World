@@ -62,7 +62,7 @@ make e2e                        # disposable stack + Playwright
 | Check | Result |
 |---|---|
 | `uv run pytest -m "not live and not perf"` | **2,439 passed, 0 failed**, 30 skipped, 21 deselected (23 min) |
-| `uv run pytest -m live` (real provider requests) | see §4 |
+| `uv run pytest -m live` (real provider requests) | **16/16 pass** after one re-run (see §4) |
 | `ruff check .` / `ruff format --check .` / `lint-imports` / `mypy -p reva.kernel -p reva.ports` | all pass |
 | UI typecheck / vitest / build | pass / 144 tests in 22 files / pass |
 | UI Playwright (`scripts/e2e_stack.py --run --recorded-drafter --v2-fixtures`) | **53 passed**, 1 skipped (applies only when drafting is disabled) |
@@ -91,7 +91,12 @@ connector decided by the separate gate process.
   human reviews that mapping.
 * Population: 31 EU/EFTA countries; retirement: FRA, DEU, NLD (to 2025); ITA, BEL, POL, SWE refused (no
   archivable official rule text); ESP refused by its own data.
-* Live-marked test run: PLACEHOLDER — filled in below once the run in progress completes.
+* Live-marked tests (`uv run pytest -m live`, real requests to World Bank, Comtrade, Natural Earth, Crossref,
+  Eurostat incl. FIGARO, and one gpt-4.1 draft): first run 15 passed, 1 failed — from 03:53 UTC the Comtrade
+  public preview answered HTTP 403 to every request (provider throttling after a day of repeated live runs);
+  REVA stored those cells as absent, never as values. A single probe minutes later returned 200, and a re-run
+  of the failed test (`test_full_live_run_release_and_coverage`) passed (24 min). The public preview has no
+  documented quota; a production deployment should use a Comtrade subscription key (`REVA_COMTRADE_API_KEY`).
 
 ## 5. Deployment readiness and credential blockers
 

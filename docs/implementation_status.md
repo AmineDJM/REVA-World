@@ -446,7 +446,7 @@ All results below are from the final code (`docs/final_report.md` §3 has the sa
 | Check | Command | Result | Evidence |
 |---|---|---|---|
 | pytest offline | `uv run pytest -m "not live and not perf" -q -rfE` | **2,439 passed, 0 failed**, 30 skipped, 21 deselected | session log; CI runs the same selection |
-| pytest live | `uv run pytest -m live -q` | see `docs/final_report.md` §4 | — |
+| pytest live | `uv run pytest -m live -q` | 15 passed, 1 failed (Comtrade HTTP 403 throttling from 03:53 UTC); the failed test re-run alone passed → **16/16** | `docs/final_report.md` §4 |
 | live acceptance workflow | `uv run python scripts/demo_workflow.py --live` | **13/13 pass** | `docs/dev/final_run/demo_live_summary.json` |
 | ruff / format / import-linter / mypy | `ruff check .`; `ruff format --check .`; `lint-imports`; `mypy -p reva.kernel -p reva.ports` | all pass | — |
 | UI typecheck / vitest / build | `npm --prefix ui run typecheck`; `npx vitest run`; `npm run build` | pass / 144 passed (22 files) / pass | — |
