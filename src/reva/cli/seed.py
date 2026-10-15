@@ -16,7 +16,7 @@ from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.postgres import repositories as repo
 from reva.evidence.locks import take_evidence_write_lock
 from reva.kernel.errors import ImmutableRecordViolation
-from reva.kernel.ids import external_id
+from reva.kernel.ids import entity_id as kernel_entity_id
 from reva.ontology.registry import Registry, concept_hash, load_registry
 from reva.ports.storage import ArtifactStore
 
@@ -24,7 +24,8 @@ SEED_ACTOR = "maintainer:registry-seed"
 
 
 def entity_id(key: str) -> UUID:
-    return external_id("reva.entity", key)
+    """Re-exported from the kernel (kept here for existing callers)."""
+    return kernel_entity_id(key)
 
 
 def _seed_concepts(conn: Connection, reg: Registry, act: UUID) -> int:

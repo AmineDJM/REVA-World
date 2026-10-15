@@ -44,7 +44,7 @@ def _integral_count(value: Any, source_key: str) -> int:
 
 
 def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, origin: str) -> list[SourceCell]:
-    from reva.cli.seed import entity_id
+    from reva.kernel.ids import entity_id
 
     subject = entity_id(geo_entity)
     with engine.connect() as conn:

@@ -76,14 +76,6 @@ def test_model_execution_cannot_reach_the_network_through_imports(graph, package
     assert not chains, f"{package} transitively imports network/ingest code:\n" + "\n".join(map(" -> ".join, chains))
 
 
-@pytest.mark.xfail(
-    strict=False,
-    reason=(
-        "owner: lead (src/reva/population/service.py). handle_population imports reva.cli.seed.entity_id, and "
-        "reva.cli.seed imports the connector registry -> SafeHttpClient -> httpx. No fetch happens, but the import "
-        "boundary is open; fix: move entity_id() to a pure module (e.g. reva.kernel.ids) and import it from there."
-    ),
-)
 def test_population_job_cannot_reach_the_network_through_imports(graph) -> None:
     chains = _violations(graph, "reva.population")
     assert not chains, "reva.population transitively imports network code:\n" + "\n".join(map(" -> ".join, chains))

@@ -226,15 +226,12 @@ invariants:
 
   - id: 11
     text: No model execution fetching live inputs.
-    status: partially_proven
+    status: proven
     reason: >-
       models, simulation, evaluation, compression and extensions cannot transitively import any HTTP library,
       connector, HTTP adapter or ingest module (grimp), the import-linter contracts are kept, JobContext carries no
-      HTTP client, and real L1/L2 simulation jobs succeed with every network path disabled.
-    gaps: >-
-      reva.population.service (population job handler) imports reva.cli.seed.entity_id, which pulls the connector
-      registry, SafeHttpClient and httpx into its import closure (no fetch happens). Test is xfail until fixed.
-    owner: "lead (src/reva/population/service.py; move entity_id to a pure module such as reva.kernel.ids)"
+      HTTP client, real L1/L2 simulation jobs succeed with every network path disabled, and the population job
+      imports entity identities from reva.kernel.ids (no connector/HTTP import closure).
     enforcement:
       - {file: pyproject.toml, symbol: "numerical models have no HTTP, DB or adapters", kind: import_contract}
       - {file: pyproject.toml, symbol: "simulation does not write evidence or beliefs", kind: import_contract}
@@ -247,7 +244,6 @@ invariants:
       - tests/invariants/test_invariant_11_no_live_inputs.py::test_handler_contract_carries_no_http_client
       - tests/invariants/test_invariant_11_no_live_inputs.py::test_simulation_succeeds_with_all_network_paths_disabled
       - tests/scientific/test_crude_exposure_coupling_rng.py::test_unbound_or_double_owned_inputs_rejected
-    xfail:
       - tests/invariants/test_invariant_11_no_live_inputs.py::test_population_job_cannot_reach_the_network_through_imports
 
   - id: 12

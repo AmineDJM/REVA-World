@@ -450,9 +450,9 @@ def test_subject_scoped_quarantine_does_not_affect_other_subjects(w: dict[str, A
 
 def test_years_outside_the_decision_scope_are_ineligible(w: dict[str, Any]) -> None:
     with tx(w["db"].worker) as c:
-        # the seeded WDI decision is scoped to years [2000, 2024]
-        assert _eligible(c, w, "FRA", 2000) and _eligible(c, w, "FRA", 2024)
-        assert not _eligible(c, w, "FRA", 1999) and not _eligible(c, w, "FRA", 2025)
+        # the seeded WDI decision is scoped to years [1960, 2024] (WDI series begin in 1960)
+        assert _eligible(c, w, "FRA", 1960) and _eligible(c, w, "FRA", 2024)
+        assert not _eligible(c, w, "FRA", 1959) and not _eligible(c, w, "FRA", 2025)
         # a single-year scope covers exactly that year; a year-scoped quarantine leaves other years alone
         _decision(c, w, "quarantine", {"years": [2010]})
         assert not _eligible(c, w, "FRA", 2010)
@@ -465,12 +465,12 @@ def test_input_trigger_enforces_the_support_year_scope(w: dict[str, Any]) -> Non
         sup = c.execute(text(
             """INSERT INTO world.support(temporal_extent, valid_range, spatial_spec, population_spec, aggregation,
                  resolution, provenance_activity_id, support_digest)
-               SELECT temporal_extent, tstzrange('1990-01-01 00:00:00+00', '1991-01-01 00:00:00+00', '[)'),
+               SELECT temporal_extent, tstzrange('1950-01-01 00:00:00+00', '1951-01-01 00:00:00+00', '[)'),
                  spatial_spec, population_spec, aggregation, resolution, provenance_activity_id, :d
                FROM world.support WHERE id = :s RETURNING id"""),
             {"s": w["obs"]["support_id"], "d": f"fx1-{uuid.uuid4()}"},
         ).scalar_one()
-        old = copy_obs(c, w, "fx1:year-1990", support=sup)
+        old = copy_obs(c, w, "fx1:year-1950", support=sup)  # before the reviewed 1960-2024 scope
         rid = draft_release(c, w)
         with pytest.raises(DBAPIError, match="is not eligible"), c.begin_nested():
             add_input(c, add_estimate(c, w, rid, support=sup), old)

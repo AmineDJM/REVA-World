@@ -216,6 +216,13 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     connectors = _all_connectors(ctx)
     connector = connectors.get(str(name))
     if connector is None:
+        from reva.autonomy.jobs import promoted_connector_availability
+
+        # A template connector name (e.g. a scheduled eurostat.* ingest) that is not (or no longer)
+        # active is a typed, non-failing result — never a crash and never a fake success.
+        unavailable = promoted_connector_availability(ctx.worker_engine, str(name))
+        if unavailable is not None:
+            return unavailable
         raise ValidationProblem("unknown connector", connector=str(name)[:128], known=sorted(connectors))
     spec = connector.describe()
     production = ctx.settings.reva_env == "production"
@@ -346,7 +353,6 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
         try:
             with eng.connect() as conn:
                 dirty = dirty_belief_nodes(conn)
-                cutoff = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
             if dirty == 0 and not force:
                 return {"status": "up_to_date", "origin": origin.value, "dirty_nodes": 0}
             if ctx.is_cancelled():  # also re-verifies the lease right before publishing
@@ -356,7 +362,7 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
             # heartbeat that keeps the lease alive. Publication is idempotent (it clears
             # the dirty nodes it covers) and serialised by advisory locks, and the
             # worker's completion afterwards is fenced.
-            rr = publish_release(eng, ctx.store, cutoff=cutoff, origin=origin, environment=env,
+            rr = publish_release(eng, ctx.store, cutoff=None, origin=origin, environment=env,
                                  actor="worker:publish_beliefs", fence=ctx.check_lease)
         finally:
             lock_conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": PUBLISH_JOB_LOCK})

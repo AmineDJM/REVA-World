@@ -118,3 +118,8 @@ def sha256_bytes(data: bytes) -> str:
 
 def is_sha256(value: str) -> bool:
     return len(value) == 64 and all(c in "0123456789abcdef" for c in value)
+
+
+def entity_id(key: str) -> uuid.UUID:
+    """Deterministic REVA entity identity for a registry key (e.g. 'FRA', 'WORLD', 'HS2709')."""
+    return external_id("reva.entity", key)

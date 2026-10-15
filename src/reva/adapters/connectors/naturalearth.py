@@ -133,6 +133,7 @@ class NaturalEarthConnector:
 
 
 def classify_feature(props: dict[str, Any]) -> str:
-    if str(props.get("TYPE")) in DISPUTED_TYPES or props.get("NOTE_BRK"):
+    # Only Natural Earth TYPE Disputed/Indeterminate marks a dispute; NOTE_BRK is a display note.
+    if str(props.get("TYPE")) in DISPUTED_TYPES:
         return "disputed"
     return "unmatched"

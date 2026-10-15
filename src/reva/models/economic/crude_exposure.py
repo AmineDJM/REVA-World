@@ -399,12 +399,14 @@ def _input_flags(inp: MonetaryInput) -> dict[str, Any]:
         "valuation": inp.valuation,
         "reference_year": inp.reference_year,
     }
-    for k in ("provider_derived_aggregate", "isReported", "isAggregate", "classificationCode", "indicator",
-              "obs_status", "provider_returned_no_rows"):
+    for k in ("provider_estimation_flagged", "legacyEstimationFlag", "provider_derived_aggregate", "isReported",
+              "isAggregate", "classificationCode", "indicator", "obs_status", "provider_returned_no_rows"):
         if k in f:
             out[k] = f[k]
-    if f.get("provider_derived_aggregate"):
-        out["note"] = "provider-derived aggregate (isReported=false): not a direct customs observation"
+    if f.get("provider_estimation_flagged") or f.get("provider_derived_aggregate"):
+        out["note"] = "provider estimation flagged (legacyEstimationFlag != 0): not a direct customs observation"
+    elif f.get("isReported") is False:
+        out["note"] = "provider marks this value as not directly reported (isReported=false)"
     return out
 
 

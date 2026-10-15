@@ -6,7 +6,6 @@ import asyncio
 import json
 import os
 import sys
-from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
@@ -183,7 +182,8 @@ def beliefs_publish(origin: str = typer.Option("live", help="live or test_fixtur
     from reva.kernel.context import Origin
     from reva.settings import get_settings
 
-    r = publish_release(get_engine("worker"), get_store(), cutoff=datetime.now(UTC), origin=Origin(origin),
+    # cutoff=None: the DB clock is read inside the publication lock
+    r = publish_release(get_engine("worker"), get_store(), cutoff=None, origin=Origin(origin),
                         environment=get_settings().reva_env)
     _out(r.__dict__)
 
