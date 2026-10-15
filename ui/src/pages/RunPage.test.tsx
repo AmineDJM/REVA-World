@@ -84,7 +84,7 @@ describe('RunPage: cohort-component projection', () => {
     const st = screen.getByRole('table', { name: /Population, total, all ages/ });
     expect(within(st).getByRole('rowheader', { name: /2025 \[2025-01-01, 2025-01-02\)/ })).toBeInTheDocument();
     expect(within(st).getByRole('row', { name: /^2025/ })).toHaveTextContent('67,900,000 to 68,200,000');
-    expect(within(st).getByRole('row', { name: /^2025/ })).toHaveTextContent('L1 at upper end');
+    expect(within(st).getByRole('row', { name: /^2025/ })).toHaveTextContent('central point at upper end');
     expect(screen.getByTestId('backtest-absent')).toHaveTextContent('docs/dev/v2_pop_backtest.md');
   });
 });

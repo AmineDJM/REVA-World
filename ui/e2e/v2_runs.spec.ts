@@ -153,6 +153,13 @@ test('retirement age: indicators, sensitivity ribbon and back-test panel', async
     await expect(page.locator(`figure[data-output-key="${key}"]`)).toBeVisible();
   }
   await expect(page.locator('figure[data-output-key="pension_expenditure_change_approx_eur"]').getByText('approximate', { exact: true })).toBeVisible();
+  // L2 runs of this model have no L1 rows: the line is the stated central grid point, named on screen.
+  const central = st.outcome.applicability.countries.FRA?.central_grid_point;
+  if (central && !(st.results as any[]).some((x) => x.variant === 'L1')) {
+    const fig = page.locator('figure[data-output-key="employed_persons_55_69"]');
+    await expect(fig.getByTestId('central-variant')).toContainText(central);
+    await expect(fig.locator('path.l1-line').first()).toBeAttached();
+  }
   if ((st.results as any[]).some((x) => x.variant === 'L2:sensitivity_range')) await expect(page.getByTestId('sensitivity-ribbon').first()).toBeVisible();
   // Back-test: shown next to the model, from the run when attached, else pointed to.
   await expect(page.getByTestId('backtest-panel')).toBeVisible();

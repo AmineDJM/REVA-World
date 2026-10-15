@@ -84,11 +84,29 @@ export interface Series {
   range: RangePoint[];
   /** Grid variant names present (L2 only). */
   variants: string[];
+  /** Variant drawn as the line: "L1", or the central grid point of an L2 run without L1 rows. */
+  centralVariant: string;
+}
+
+/**
+ * Central variant per country for L2 runs whose central point is itself a grid variant
+ * (social.retirement_age: outcome.applicability.countries[iso].central_grid_point -> "L2:<id>").
+ */
+export function centralVariants(st: SimulationStatus | null | undefined): Record<string, string> {
+  const out: Record<string, string> = {};
+  const app = isRecord(st?.outcome?.applicability) ? st!.outcome!.applicability : {};
+  if (!isRecord(app.countries)) return out;
+  for (const [iso, v] of Object.entries(app.countries)) {
+    if (isRecord(v) && typeof v.central_grid_point === 'string') out[iso] = `L2:${v.central_grid_point}`;
+  }
+  return out;
 }
 
 /** Every (country, output_key) multi-period series, L1 points plus the sensitivity range per year. */
-export function buildSeries(results: SimResult[], filter?: (outputKey: string) => boolean): Series[] {
+export function buildSeries(results: SimResult[], filter?: (outputKey: string) => boolean, central: Record<string, string> = {}): Series[] {
   const by = new Map<string, Series>();
+  // Countries with L1 rows draw L1; otherwise their stated central grid variant.
+  const hasL1 = new Set(results.filter((r) => r.variant === 'L1').map(countryOf));
   for (const r of results) {
     if (filter && !filter(r.output_key)) continue;
     const p = periodOf(r);
@@ -97,11 +115,12 @@ export function buildSeries(results: SimResult[], filter?: (outputKey: string) =
     const k = `${country}|${r.output_key}`;
     let s = by.get(k);
     if (!s) {
-      s = { country, outputKey: r.output_key, label: null, unitRef: null, l1: [], range: [], variants: [] };
+      s = { country, outputKey: r.output_key, label: null, unitRef: null, l1: [], range: [], variants: [], centralVariant: hasL1.has(country) ? 'L1' : (central[country] ?? 'L1') };
       by.set(k, s);
     }
     if (!s.label && typeof r.applicability?.output_label === 'string') s.label = r.applicability.output_label;
-    if (r.variant === 'L1') {
+    if (r.variant.startsWith('L2:') && r.variant !== RANGE_VARIANT && !s.variants.includes(r.variant)) s.variants.push(r.variant);
+    if (r.variant === s.centralVariant) {
       const v = r.value;
       if (v.kind === 'decimal') {
         s.unitRef = v.unit_ref;
@@ -113,8 +132,6 @@ export function buildSeries(results: SimResult[], filter?: (outputKey: string) =
       const v = r.value as typeof r.value & { one_sidedness?: string };
       s.unitRef = s.unitRef ?? v.unit_ref;
       s.range.push({ year: p.year, lower: v.lower, upper: v.upper, statement: v.statement ?? null, oneSidedness: v.one_sidedness ?? null, result: r });
-    } else if (r.variant.startsWith('L2:') && !s.variants.includes(r.variant)) {
-      s.variants.push(r.variant);
     }
   }
   for (const s of by.values()) {

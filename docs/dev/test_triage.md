@@ -1,5 +1,82 @@
 # Test triage (agent T)
 
+## Round 6 (agent STAB, 2026-10-15 01:00–02:10 UTC)
+
+Command (as CI; `-n` is not available, pytest-xdist is not installed):
+`uv run pytest -m "not live and not perf" -q -p no:cacheprovider -rfE` (includes `tests/chaos`).
+
+| Run | Result |
+|---|---|
+| A 01:21–01:41 (mid-flight GOV `reva_gate` work) | 85 failed, 2122 passed, 30 skipped, 17 errors |
+| B 01:46 | collection error: `tests/integration/test_gate_separation.py` and `tests/security/test_gate_separation.py` share a basename (rootdir import mode) — **GOV**: rename one; the whole suite does not collect until then |
+| C 01:47–02:07 (`--ignore=tests/security/test_gate_separation.py`) | **14 failed, 2299 passed, 30 skipped, 7 errors** (1219 s) |
+| ruff `src tests scripts` | 1 error: `src/reva/autonomy/gate.py:131` E501 (**AFX**); tests and scripts clean |
+| lint-imports / mypy | 5 kept, 0 broken / pass |
+
+### Fixed this round (STAB)
+- **CHAOS-1/2** (`src/reva/operations/worker.py`): local lease deadline — after 90 % of the lease without a
+  successful heartbeat (basis = send time of the last successful extension, initially the claim) the lease
+  is presumed lost, `StaleLease` stops the handler (also checked at rate-limited safe points); failed
+  heartbeats are rate-limited by `last_attempt`. Strict xfail removed; the outage test now waits for the
+  post-reconnect presence beat (it raced a 5-step resumed attempt). `tests/chaos` 11/11, then the queue
+  module 9/9 twice; `test_worker_loop.py` passes (its two simulation failures in my first run were ENG's
+  in-flight `plan_run`, fixed since).
+- `test_redaction_r7::test_real_db_errors_are_scrubbed_in_job_errors_and_logs`: the code is right
+  (`hide_parameters=True` is stricter); the test now requires parameters to be hidden *or* rendered and then
+  masked, sensitivity kept through PostgreSQL's DETAIL echo of the key.
+- `test_secrets_logs::test_captured_fixture_bodies_contain_no_credentials`: recursive scan over files only
+  (ALLC's `probes/` directory).
+- `test_evidence_fixes`: estimation-flag test sets `isQtyEstimated/isNetWgtEstimated=False` for the code-0
+  case; `_ensure_reapproved` re-enables through `reva.autonomy.jobs.reapprove_promotion` on `db.owner`
+  (newest retired version under the current template) and discovery may answer `rolled_back_hold`.
+- `tests/replay/test_leakage_cases.py`: maintainer-attributed alias/mapping rows written through `db.owner`.
+  (`test_revisions.py` was already fixed.)
+- `test_world_graph.py`: the release-pinned and causal relations are written inside a *new* publication
+  transaction (wrapping `pin_release_relations`), before `ops.publication` seals it.
+- `tests/invariants/coverage.yaml`: inv21 cites `simulation/crude_plugin.py` (`_range_uncertainty`,
+  `_unknown_uncertainty` moved there in V2); invariants 184 passed.
+- `test_observation_export.py`: fixture scoped to the acquisitions of its own fixture bodies (raw digests).
+- `test_evaluation_service.py` and `test_backup_restore.py`: module-scoped private database
+  (`tests/fixtures/adversarial/isolated_db.py`), immune to other modules' rows and concurrent writes.
+- Backup/restore (`scripts/backup_restore.py`): database-level grants are re-applied from the grants
+  recorded in the backup's catalog manifest (was a hard-coded api/worker/sim list → `reva_gate CONNECT`
+  missing after restore); missing `reva_*` grantee roles are created NOLOGIN before pg_restore. ACLs are
+  kept (not `--no-acl`): bootstrap does not re-grant object privileges, so dropping ACLs would lose them
+  (and the non-superuser restore, which skips bootstrap, would fail the catalog comparison). No
+  `pg_default_acl` entries exist in current test databases, so the earlier "change default privileges"
+  error does not reproduce; both backup tests pass (4/4) including the non-superuser restore.
+- `publish_acquisition` (`src/reva/evidence/ingest.py`): every value is validated with
+  `reva.kernel.values.parse_value`; any non-kernel value quarantines the item (finding
+  `invalid_kernel_value`, keys and error location only, never the value). Test added. The R7 belief
+  selection property test's synthetic value gained its required `basis`.
+- `ingest.py` lineage locks striped into 256 buckets taken once per acquisition in ascending order (was one
+  advisory lock per observation: large acquisitions exhausted the cluster-wide lock table — run A's
+  `out of shared memory` errors in `test_evaluation_service` / `test_demography_cohort`). Test added.
+- `test_queue_reliability::test_schema_wait…` accepts revisions ≥ 0007 (0008_v2 exists);
+  `test_prop_r7_kernel::test_interval_whose_end_precedes…` guards date arithmetic below year 1 (Hypothesis
+  found `date(10,1,1)` − 3288 days overflowing inside `assume`).
+- Already fixed by others when checked: repair-module teardowns closing proposals through
+  `ops.review_proposal` as `human:test-teardown` (API login); `test_roles_grants` messages; chaos lint.
+
+### Remaining failures (run C) by owner
+| Owner | Tests | Root cause |
+|---|---|---|
+| **GOV** | collection of `test_gate_separation.py` ×2 | duplicate basename (see run B) |
+| **GOV** | `test_governance_r5::test_registry_seed_runs_as_owner…` | test still seeds through `reva_worker`; expects confirm-only behaviour the seed now refuses |
+| **GOV** | `test_secrets_logs::test_non_test_files_have_no_credentials…` | `docs/dev/gate_separation.md` contains a literal `REVA_GATE_DB_PASSWORD` value |
+| **migration owners (NLC/ENG 0008) + MIGR** | `test_schema_contract::test_committed_contract…`, `test_api_endpoints::test_r4_06…` (SchemaDriftError) | contract lacks `ops.reserve_llm_budget`, `ops.settle_llm_budget`: run `scripts/update_schema_contract.py` with the migration |
+| **POP** | `test_start_env::test_bootstrap_runtime_reports…` | session-DB re-bootstrap: `eurostat.demography@1.0.0 is registered with different content; bump the version` (connector spec changed without a version bump); also pass `REVA_GATE_DB_PASSWORD` in that test's env once GOV settles which roles bootstrap reports |
+| **PEN** | `tests/unit/social/test_retirement_age_model.py` 4 failed + 7 errors; `test_labour_pensions_retirement_pipeline.py` ×2 | no captured fixture for `demo_pjan … geo=DE` (fixture manifest missing the DE item); pipeline then `missing_input` |
+| **ALLC** | `test_comtrade_worldbank_all_countries::test_all_country_fixture_ingest_keeps_gaps_typed` | DZA 2023 typed-Missing row `comtrade:HS2709:M:12:0:2023:primaryValue` not emitted by the batch connector (ingest outcomes are published/unchanged, not quarantined) |
+| **NLC** | `test_capabilities_v2::test_implemented_capability_cites_existing_tests[nl.scenario_drafts]` | capability cites `test_nl_drafts.py::test_retirement_age_before_the_model_exists_is_a_capability_gap`, which is not a test function |
+| **AFX** | ruff E501 `src/reva/autonomy/gate.py:131` | wrap |
+
+Transient in run A only (resolved by the owners during the round): `permission denied for function
+record_gate_result` ×~45 and `proposal backlog is full (32 open >= 20)` cascades (GOV moving gate results to
+`reva_gate`), `budgets.yaml` pin mismatch, ENG `scenario.schema.json` stale, NL drafts schema, LI `demo_pjan`
+fixture.
+
+
 Round 5 (final for this session) — full run 2026-10-15 00:41:31–00:53:20 UTC, follow-up reruns to 00:58.
 The run overlapped heavy in-flight work: FX1 governance/eligibility migrations (R5), CVAL Comtrade 1.2.0,
 AF autonomy, HOOK repair hook-up and SEC API. Several clusters below are "intended change, callers/tests not yet

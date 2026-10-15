@@ -19,6 +19,7 @@ import {
   IO_CONTRIB,
   basketRows,
   buildSeries,
+  centralVariants,
   countryOf,
   findBacktests,
   ioMatrix,
@@ -34,11 +35,11 @@ import { useSimulation } from '../lib/useSimulation';
 import { ResultsView } from './SimulationPage';
 
 const L1_POS: Record<string, string> = {
-  upper_end: 'L1 at upper end',
-  lower_end: 'L1 at lower end',
-  inside: 'L1 inside',
+  upper_end: 'central point at upper end',
+  lower_end: 'central point at lower end',
+  inside: 'central point inside',
   degenerate: 'no sensitivity',
-  outside: 'L1 outside (unexpected)',
+  outside: 'central point outside (unexpected)',
 };
 
 function explanationOf(st: SimulationStatus) {
@@ -69,7 +70,7 @@ function SeriesTable({ s }: { s: Series }) {
           <thead>
             <tr>
               <th scope="col">Period</th>
-              <th scope="col">L1 (stated assumptions)</th>
+              <th scope="col">{s.centralVariant === 'L1' ? 'L1 (stated assumptions)' : `Central point (${s.centralVariant.replace(/^L2:/, '')})`}</th>
               {s.range.length > 0 && <th scope="col">Sensitivity range (not a confidence interval)</th>}
               <th scope="col">Trace</th>
             </tr>
@@ -118,6 +119,12 @@ function SeriesBlock({ s }: { s: Series }) {
       <figcaption>
         <strong>{seriesLabel(s)}</strong> <span className="muted">— {s.country}</span>
         {approx && <span className="badge badge-approx">approximate</span>}
+        {s.centralVariant !== 'L1' && (
+          <span className="field-hint" data-testid="central-variant">
+            {' '}
+            · line = central point <span className="mono">{s.centralVariant.replace(/^L2:/, '')}</span>
+          </span>
+        )}
         {s.range.length > 0 && (
           <span className="field-hint">
             {' '}
@@ -261,7 +268,7 @@ function CohortView({ st }: { st: SimulationStatus }) {
 // ------------------------------------------------------------------ generic multi-period (retirement age and others)
 
 function MultiPeriodView({ st }: { st: SimulationStatus }) {
-  const series = useMemo(() => buildSeries(st.results), [st.results]);
+  const series = useMemo(() => buildSeries(st.results, undefined, centralVariants(st)), [st]);
   const countries = useMemo(() => [...new Set(series.map((s) => s.country))], [series]);
   const [country, setCountry] = useState('');
   const c = country || countries[0] || '';
@@ -526,7 +533,13 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
       {(model === MODEL_KEYS.cohort || model === MODEL_KEYS.retirement || backtests.length > 0) && (
         <BacktestPanel
           backtests={backtests}
-          source={model === MODEL_KEYS.cohort ? 'the method back-test in docs/dev/v2_pop_backtest.md' : undefined}
+          source={
+            model === MODEL_KEYS.cohort
+              ? 'the method back-test in docs/dev/v2_pop_backtest.md'
+              : model === MODEL_KEYS.retirement
+                ? 'the 2010-reform back-test in docs/dev/v2_pen_backtest.md (predicted vs observed employment rates 60–64, 2010 → 2019)'
+                : undefined
+          }
           unitRef={model === MODEL_KEYS.cohort ? 'unit.persons' : undefined}
         />
       )}

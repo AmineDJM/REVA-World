@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { SimResult, SimulationStatus } from '../api/types';
-import { basketRows, buildSeries, findBacktests, ioMatrix, isMultiPeriod, multiOutputLabel, parseBacktest, periodOf, pyramidFor, pyramidYears } from './runviews';
+import { basketRows, buildSeries, centralVariants, findBacktests, ioMatrix, isMultiPeriod, multiOutputLabel, parseBacktest, periodOf, pyramidFor, pyramidYears } from './runviews';
 
 let n = 0;
 function row(output: string, value: string, opts: { variant?: string; country?: string; start?: string; end?: string; app?: Record<string, unknown>; unit?: string } = {}): SimResult {
@@ -148,5 +148,24 @@ describe('labels', () => {
     expect(multiOutputLabel('old_age_dependency_ratio_65plus_per_15_64')).toBe('Old-age dependency ratio, persons 65+ per 100 aged 15–64');
     expect(multiOutputLabel('net_migration.female')).toMatch(/statistical adjustment/);
     expect(multiOutputLabel('pension_expenditure_change_eur')).toMatch(/approximate/);
+  });
+});
+
+describe('central variant of L2-only runs', () => {
+  it('draws the stated central grid point when a run has no L1 rows (social.retirement_age L2)', () => {
+    const rows = [
+      row('employed_persons_55_69', '5800000', { start: '2025-01-01', end: '2026-01-01', variant: 'L2:rabate_rochut_2020_fra' }),
+      row('employed_persons_55_69', '5700000', { start: '2025-01-01', end: '2026-01-01', variant: 'L2:reference_no_employment_response' }),
+      range('employed_persons_55_69', '5700000', '5800000', '2025-01-01'),
+    ];
+    const st = { results: rows, outcome: { applicability: { countries: { FRA: { status: 'ready', central_grid_point: 'rabate_rochut_2020_fra' } } } } } as unknown as SimulationStatus;
+    const central = centralVariants(st);
+    expect(central).toEqual({ FRA: 'L2:rabate_rochut_2020_fra' });
+    const [s] = buildSeries(rows, undefined, central);
+    expect(s!.centralVariant).toBe('L2:rabate_rochut_2020_fra');
+    expect(s!.l1.map((p) => p.value)).toEqual(['5800000']);
+    expect(s!.variants).toEqual(['L2:rabate_rochut_2020_fra', 'L2:reference_no_employment_response']);
+    // Without a stated central point nothing is picked: no line rather than a guessed one.
+    expect(buildSeries(rows)[0]!.l1).toEqual([]);
   });
 });
