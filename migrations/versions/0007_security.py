@@ -102,21 +102,25 @@ def _grants() -> str:
     # (R-01) Authentication and human-review rows are never written with worker
     # credentials: tokens are minted by the migration owner (admin CLI), reviews
     # only through ops.review_proposal (granted to reva_api alone). Gate results
-    # and promotions keep a direct grant for now, guarded by BEFORE INSERT
-    # triggers; ops.record_gate_result / model.record_promotion are the
-    # checked path callers should migrate to.
+    # and promotions keep a direct grant, guarded by BEFORE INSERT triggers
+    # (identity format) and by meta.enforce_governance (who may attribute to a
+    # human; R5-01, see SQL_GOVERNANCE). Approved/eligible/reviewed registry
+    # states are written only by the reva_registry approval functions.
     s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation FROM reva_worker;")
     s.append(
         "GRANT UPDATE ON ops.job, ops.schedule, ops.dirty_node, ops.outbox, ops.connector_cursor, "
         "ops.gc_candidate, ops.budget_ledger, ops.worker_presence TO reva_worker;"
     )
+    # (R5-06) session_revocation DELETE is limited to expired rows by RLS (SQL_GOVERNANCE).
     s.append("GRANT DELETE ON ops.dirty_node, ops.gc_candidate, ops.session_revocation TO reva_worker;")
     s.append("GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA ops TO reva_worker;")
+    # (R5-12) The worker does not submit API jobs: ops.submit_job is the API's
+    # path (creator = the authenticated API principal); internal jobs are
+    # enqueued directly with their own key prefixes.
     s.append(
         "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint), "
         "ops.heartbeat(uuid,text,bigint,integer,jsonb), "
         "ops.complete_job(uuid,text,bigint,text,jsonb,jsonb), "
-        "ops.submit_job(text,jsonb,text,integer,text), "
         "ops.record_gate_result(uuid,text,text,text,text,text), "
         "model.record_promotion(uuid,jsonb,text,uuid,text,text,jsonb) TO reva_worker;"
     )
@@ -157,8 +161,10 @@ CREATE POLICY context_worker_insert ON meta.context FOR INSERT TO reva_worker
 
 ALTER TABLE meta.activity ENABLE ROW LEVEL SECURITY;
 CREATE POLICY activity_read ON meta.activity FOR SELECT TO reva_api, reva_worker, reva_sim USING (true);
+-- (R5-16) 'model' activities are the worker's (population.materialise); the
+-- simulation role has only simulation/evaluation provenance.
 CREATE POLICY activity_sim_insert ON meta.activity FOR INSERT TO reva_sim
-  WITH CHECK (origin IN ('simulation','evaluation','model'));
+  WITH CHECK (origin IN ('simulation','evaluation'));
 CREATE POLICY activity_worker_insert ON meta.activity FOR INSERT TO reva_worker
   WITH CHECK (origin <> 'simulation');
 
@@ -186,14 +192,16 @@ CREATE POLICY location_worker_insert ON meta.artifact_location FOR INSERT TO rev
   WITH CHECK (namespace <> 'scenarios');
 
 -- (R-18) Provenance edges: the simulation role may attach inputs/outputs only
--- to simulation/evaluation/model activities (never to source, normalisation,
--- belief or review activities); the worker never to simulation activities.
+-- to simulation/evaluation activities (never to source, normalisation, belief,
+-- model or review activities); the worker never to simulation activities.
+-- (R5-16) The simulation role may not claim to have produced an artifact that
+-- a non-simulation/evaluation activity produced (e.g. raw source bytes).
 ALTER TABLE meta.activity_input ENABLE ROW LEVEL SECURITY;
 CREATE POLICY activity_input_read ON meta.activity_input FOR SELECT TO reva_api, reva_worker, reva_sim
   USING (true);
 CREATE POLICY activity_input_sim_insert ON meta.activity_input FOR INSERT TO reva_sim
   WITH CHECK ((SELECT a.origin FROM meta.activity a WHERE a.id = activity_input.activity_id)
-              IN ('simulation','evaluation','model'));
+              IN ('simulation','evaluation'));
 CREATE POLICY activity_input_worker_insert ON meta.activity_input FOR INSERT TO reva_worker
   WITH CHECK ((SELECT a.origin FROM meta.activity a WHERE a.id = activity_input.activity_id) <> 'simulation');
 
@@ -202,7 +210,10 @@ CREATE POLICY activity_output_read ON meta.activity_output FOR SELECT TO reva_ap
   USING (true);
 CREATE POLICY activity_output_sim_insert ON meta.activity_output FOR INSERT TO reva_sim
   WITH CHECK ((SELECT a.origin FROM meta.activity a WHERE a.id = activity_output.activity_id)
-              IN ('simulation','evaluation','model'));
+              IN ('simulation','evaluation')
+              AND NOT EXISTS (SELECT 1 FROM meta.activity_output o JOIN meta.activity a ON a.id = o.activity_id
+                              WHERE o.artifact_sha256 = activity_output.artifact_sha256
+                                AND a.origin NOT IN ('simulation','evaluation')));
 CREATE POLICY activity_output_worker_insert ON meta.activity_output FOR INSERT TO reva_worker
   WITH CHECK ((SELECT a.origin FROM meta.activity a WHERE a.id = activity_output.activity_id) <> 'simulation');
 """

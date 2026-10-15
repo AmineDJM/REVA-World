@@ -28,7 +28,17 @@ import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { ErrorState, Loading, ProblemView } from '../components/StateViews';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
 import { ValueView } from '../components/ValueView';
-import { formatDateTime, formatDecimalString, humanize, isRecord, missingReasonLabel, shortId, sourceFlagNotes, unitLabel } from '../lib/format';
+import {
+  formatDateTime,
+  formatDecimalString,
+  humanize,
+  isRecord,
+  missingReasonLabel,
+  pointInRange,
+  shortId,
+  sourceFlagNotes,
+  unitLabel,
+} from '../lib/format';
 import {
   ALL_OUTPUTS,
   DEFAULT_FORM,
@@ -164,6 +174,26 @@ function BaselineCell({ input }: { input: BaselineInput | undefined }) {
   );
 }
 
+const L1_POSITION_TEXT: Record<NonNullable<ReturnType<typeof pointInRange>>, string> = {
+  upper_end: 'L1 = upper end under this grid (one-sided range, not centred on L1)',
+  lower_end: 'L1 = lower end under this grid (one-sided range, not centred on L1)',
+  inside: 'L1 lies inside this range',
+  degenerate: 'no sensitivity under this grid (every point equals L1)',
+  outside: 'L1 lies outside this range (unexpected: the range should include the fixed-quantity point)',
+};
+
+/** States where the fixed-quantity (L1) value sits in the L2 range, derived from the data. */
+function L1Position({ l1, lower, upper }: { l1: SimResult | undefined; lower: string; upper: string }) {
+  if (!l1 || l1.value.kind !== 'decimal') return null;
+  const pos = pointInRange(l1.value.value, lower, upper);
+  if (!pos) return null;
+  return (
+    <span className="field-hint l1-position" data-position={pos} data-testid="l1-position">
+      {L1_POSITION_TEXT[pos]}
+    </span>
+  );
+}
+
 interface MissingInputRow {
   country?: string;
   input?: string;
@@ -286,7 +316,8 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
           <table className="data-table" data-testid="comparison-table">
             <caption>
               Scenario outputs relative to baseline (SIMULATION; assumption-conditioned)
-              {isL2 && ' — L2 column shows the sensitivity range (not a confidence interval)'}
+              {isL2 &&
+                ' — L2 column shows the assumption sensitivity range over the elasticity grid (not a confidence interval; not centred on L1 — where L1 sits is stated per row)'}
             </caption>
             <thead>
               <tr>
@@ -308,12 +339,18 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
                   {isL2 && (
                     <td>
                       {g.range && g.range.value.kind === 'sensitivity_range' ? (
-                        <ValueView value={g.range.value} />
+                        <>
+                          <ValueView value={g.range.value} />
+                          <L1Position l1={g.l1} lower={g.range.value.lower} upper={g.range.value.upper} />
+                        </>
                       ) : g.l1?.uncertainty?.kind === 'sensitivity_range' && g.l1.uncertainty.lower && g.l1.uncertainty.upper ? (
-                        <span className="sensitivity-range">
-                          {formatDecimalString(g.l1.uncertainty.lower)} to {formatDecimalString(g.l1.uncertainty.upper)}{' '}
-                          {unitLabel(g.l1.value.kind === 'decimal' ? g.l1.value.unit_ref : undefined)}
-                        </span>
+                        <>
+                          <span className="sensitivity-range">
+                            {formatDecimalString(g.l1.uncertainty.lower)} to {formatDecimalString(g.l1.uncertainty.upper)}{' '}
+                            {unitLabel(g.l1.value.kind === 'decimal' ? g.l1.value.unit_ref : undefined)}
+                          </span>
+                          <L1Position l1={g.l1} lower={g.l1.uncertainty.lower} upper={g.l1.uncertainty.upper} />
+                        </>
                       ) : (
                         <span className="muted">not reported</span>
                       )}

@@ -48,7 +48,7 @@ export function ValueView({ value, showBasis = false, compact = false }: ValueVi
         <span className="value sensitivity-range" title={v.statement}>
           <span className="num">{formatDecimalString(v.lower)}</span> to <span className="num">{formatDecimalString(v.upper)}</span>
           {unit && <span className="unit"> {unit}</span>}
-          <span className="basis"> · sensitivity range (not a confidence interval)</span>
+          <span className="basis"> · assumption sensitivity range (not a confidence interval)</span>
         </span>
       );
     }

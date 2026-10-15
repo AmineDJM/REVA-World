@@ -1,10 +1,26 @@
 # Deployment (Render)
 
 Status: **not deployed.** Everything below is prepared and locally verified
-(image build, non-root smoke, pre-deploy bootstrap in the image against a fresh
-PostgreSQL 17/PostGIS 3.5 database, Blueprint schema validation). A deployment
+(image build, pre-deploy bootstrap, API and worker started from the image in
+production mode against a throwaway TLS PostgreSQL 17/PostGIS 3.5 database,
+Blueprint schema validation; see `docs/dev/docker_check.md`). A deployment
 needs a Render account, an S3-compatible bucket with two scoped credentials and
 an admin password hash, which are external inputs.
+
+## Blockers that need the owner's credentials
+
+Nothing below can be done or verified from the repository:
+
+1. **Render account / API key** — to create the Blueprint (dashboard or
+   `render blueprints` CLI) and observe the first deploy (internal TLS, owner
+   `CREATEROLE`/PostGIS, health check passing).
+2. **S3-compatible bucket and two scoped key pairs** (read-only for `reva-api`,
+   prefix-scoped write for `reva-worker`), plus endpoint and region. Object storage
+   was not exercised by any container check.
+3. **Admin password** — its Argon2id hash (`uv run reva auth hash-password`).
+4. **Contact e-mail** for provider user agents (`REVA_HTTP_CONTACT_EMAIL`).
+5. Optional: `REVA_COMTRADE_API_KEY`; a custom domain (then extend
+   `REVA_ALLOWED_HOSTS`, see below).
 
 ## What the Blueprint creates
 
@@ -47,8 +63,10 @@ unmodified appendix Blueprint fails those checks with explicit messages.
 
 1. **S3-compatible private bucket** (any provider; versioning recommended, public
    access blocked) and its endpoint/region:
-   * `REVA_S3_BUCKET`, `REVA_S3_REGION`, `REVA_S3_ENDPOINT_URL` (omit the endpoint
-     for AWS S3) — set on `reva-api`; the worker references them.
+   * `REVA_S3_BUCKET`, `REVA_S3_REGION`, `REVA_S3_ENDPOINT_URL` — set on
+     `reva-api`; the worker references them. Do not leave the endpoint blank: an
+     empty value fails in boto3; for AWS give the regional endpoint
+     (`https://s3.<region>.amazonaws.com`).
 2. **API credential (read-only)** — set as `REVA_S3_ACCESS_KEY_ID` /
    `REVA_S3_SECRET_ACCESS_KEY` on **reva-api**. Policy: `s3:GetObject` and
    `s3:ListBucket` limited to prefix `reva/` (`raw/ normalised/ belief/ models/
@@ -95,38 +113,90 @@ unmodified appendix Blueprint fails those checks with explicit messages.
    the first live acquisitions (or run `reva ingest --profile mvp --live` from a
    Render shell on the worker service); then submit the demo scenario.
 
-## Known blocker to resolve before the first Render deploy
+## Verified in a container (2026-10-15) — no Render account involved
 
-**Worker startup in production (R4-02, verified 2026-10-15).** With `render.yaml`
-as written the worker does **not** start: `Settings` applies the rule
-"`REVA_PUBLIC_BASE_URL` must be https" to every production process, and the
-worker (correctly) has no public URL, so the default `http://localhost:8000`
-fails validation. The API side passes. Regression test:
-`tests/security/test_start_env.py::test_blueprint_as_written_starts_both_processes_in_production`
-materialises each service's environment from `render.yaml` and runs the real
-start-script preparation; it fails until the rule is limited to the API process
-(`reva_process_role in (None, "api")`, change requested in `reva/settings.py`).
+Measured with the production image against a throwaway PostgreSQL 17.5/PostGIS
+3.5.2 container with TLS on, using the environment `render.yaml` gives each
+service (commands and raw output: `docs/dev/docker_check.md`):
 
+* The pre-deploy (`python scripts/bootstrap_runtime.py`) succeeds as a
+  **non-superuser `CREATEROLE` owner** (the managed-PostgreSQL shape), applies
+  migrations to head `0007_security`, provisions `reva_api`/`reva_worker`/`reva_sim`
+  without SUPERUSER/CREATEDB/CREATEROLE/BYPASSRLS, and is idempotent on re-run
+  (≈ 2–4 s each). The former blockers are fixed in code: the https
+  public-URL rule applies only to the `api` process role (`reva/settings.py`), and
+  bootstrap no longer sets privileged role attributes (it needs only `rolsuper OR
+  rolcreaterole`; `reva/cli/bootstrap.py`, migration `0007`).
+* `start_api.py` with `REVA_ENV=production`, `REVA_PROCESS_ROLE=api` starts
+  Uvicorn on `$PORT` under a 0.5 CPU / 512 MB limit; `/health/ready` returned 200
+  ≈ 6–7 s after container start (database, migrations, runtime role
+  `reva_api` 8/8 schemas). RSS ≈ 86 MiB. The owner URL and worker/sim passwords are
+  absent from the Uvicorn process environment. The built UI is served at `/`
+  (SPA deep links fall back to `index.html`; hashed assets are immutable-cached).
+* `start_worker.py` with `REVA_PROCESS_ROLE=worker` and **no**
+  `REVA_PUBLIC_BASE_URL`, session secret or admin hash starts, verifies the schema
+  head with both runtime logins and registers a row in `ops.worker_presence` within
+  ≈ 3 s. RSS ≈ 70–90 MiB under a 1 CPU / 2 GB limit. SIGTERM drains (`drained=True`,
+  exit 0).
+* All runtime connections were TLS 1.3 (`pg_stat_ssl`) with `REVA_DB_SSLMODE=require`.
+* Fail-closed checks (exit 78 unless noted): http public URL on the API; missing
+  admin hash; owner URL on the worker; worker command with `REVA_PROCESS_ROLE=api`;
+  `REVA_DB_SSLMODE=disable`; a `.env` file in production; worker before bootstrap
+  → bounded retries, then exit 75.
 
-Managed PostgreSQL owners are `CREATEROLE` but not superusers. PostgreSQL 16+
-refuses `ALTER ROLE … NOSUPERUSER/NOCREATEDB/NOBYPASSRLS` from such a role (we
-reproduced this on PostgreSQL 17.5). `reva.cli.bootstrap.provision_roles` and the
-"role exists" branch of migration `0007` currently issue those clauses, so the
-first pre-deploy can fail closed. The requested fix: alter only `LOGIN NOINHERIT
-CONNECTION LIMIT … PASSWORD …` and verify the dangerous attributes are false from
-`pg_roles`. Whether Render's owner has `CREATEROLE` and may `CREATE EXTENSION
-postgis` must also be confirmed on the first deploy; bootstrap checks both and
-reports a redacted error if not.
+## Open questions only a real deploy can settle
+
+* **Internal TLS.** Render's documentation states internal connections
+  "optionally support TLS using self-signed certificates" and that
+  `sslmode=require` is the way to refuse plaintext (verify-ca/verify-full are not
+  supported internally). This is consistent with `REVA_DB_SSLMODE=require`, but it
+  is **unverified on Render**; the services fail closed with a redacted error if it
+  does not hold. The pre-deploy's owner URL is Render's `connectionString` without
+  `sslmode`, so libpq's default (`prefer`) applies to the migration connection only.
+* **Owner capabilities.** Whether Render's database user has `CREATEROLE` and may
+  `CREATE EXTENSION postgis` is not documented explicitly (Render lists PostGIS as
+  supported and says to enable extensions from a psql session). Bootstrap checks
+  both and reports a redacted error if not.
+* **Health-check Host header.** `TrustedHostMiddleware` rejects any Host not in
+  `REVA_ALLOWED_HOSTS` with 400 (verified: Host `10.0.0.5:10000` → 400). Render's
+  documentation says HTTP health checks use the service's `onrender.com` subdomain,
+  or a verified custom domain when one exists. `REVA_ALLOWED_HOSTS` is
+  `RENDER_EXTERNAL_HOSTNAME`, so a **custom domain must be added to
+  `REVA_ALLOWED_HOSTS`** (and `REVA_PUBLIC_BASE_URL`) before it is verified, or
+  health checks fail.
+* **Object storage.** `/health/ready` does not touch S3, so a wrong bucket or key
+  surfaces only on the first object read/write; S3 was not exercised in the
+  container check (no bucket available). Test the access-denied cases below.
+* **Blank S3 endpoint.** An empty `REVA_S3_ENDPOINT_URL` is passed to boto3,
+  which raises `ValueError: Invalid endpoint` (verified in the image). For AWS, set
+  the regional endpoint explicitly (e.g. `https://s3.eu-central-1.amazonaws.com`)
+  rather than leaving the prompt blank.
+* **Registry seed.** Bootstrap currently provisions schema and roles only; the
+  registry (concepts, entities, sources, schedules) is seeded by a separate step.
+  Check `reva/cli/bootstrap.py` for whether seeding has moved into the pre-deploy;
+  otherwise run `reva seed --profile mvp` once from a Render shell before the first
+  ingestion.
 
 ## Image
 
 `Dockerfile`: `ui` stage (Node 22, `npm ci && npm run build`, requires
-`ui/package-lock.json`), `builder` (uv 0.11.32, `uv sync --frozen --no-dev`),
-`runtime` (python:3.12-slim-bookworm, uid 10001, no compilers, read-only
-application files, writable `/app/var` only). Base images are pinned by digest
-(see the Dockerfile comments). Behind a TLS-intercepting proxy, pass the proxy CA
-as a BuildKit secret: `docker build --secret id=build_ca,src=ca.crt .` (it is never
-written to a layer). Render ignores the optional secret.
+`ui/package-lock.json`), `builder` (uv 0.11.32, `uv sync --frozen --no-dev`;
+removes uv's world-writable `/opt/venv/.lock` and third-party `tests/`
+directories), `runtime` (python:3.12-slim-bookworm, uid/gid 10001, no compilers,
+node or uv, root-owned read-only application files, writable `/app/var` only).
+Base images are pinned by digest (see the Dockerfile comments). Behind a
+TLS-intercepting proxy, pass the proxy CA as a BuildKit secret:
+`docker build --secret id=build_ca,src=ca.crt .` (it is never written to a layer).
+Render ignores the optional secret.
+
+Measured 2026-10-15 (4 vCPU build host; details in `docs/dev/docker_check.md`):
+uncompressed image **1.33 GB** (content size 315 MB; before the cleanup 1.50 GB /
+349 MB), 15 layers, of which the virtual environment is ~0.8 GB. Cold build
+(`--no-cache`, base images present) 93–135 s; the dependency layer and image
+export dominate. The image has no Docker `HEALTHCHECK`: Render uses
+`healthCheckPath: /health/ready`, and the same image runs the worker.
+`polars` and `duckdb` (~250 MB installed) are declared dependencies that no module
+in `src/reva` imports.
 
 ## Local equivalent
 
@@ -134,6 +204,7 @@ written to a layer). Render ignores the optional secret.
 make env up sync bootstrap seed fixtures   # PostGIS in Docker, API/worker on the host
 make api        # terminal 1
 make worker     # terminal 2
-make ui         # terminal 3 (Vite dev server)
+make ui-dev     # terminal 3 (Vite dev server; `make ui` = npm ci + typecheck + vitest + build)
 make image smoke
+make ci         # offline CI equivalent (see `make help` for e2e, live-check, format-check)
 ```

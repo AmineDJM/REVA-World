@@ -754,3 +754,7 @@ progress {
   padding: 4px 8px;
   background: #fff8e6;
 }
+
+.l1-position {
+  display: block;
+}
