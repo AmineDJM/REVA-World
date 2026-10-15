@@ -59,6 +59,8 @@ log = logging.getLogger("reva.invalidation")
 
 OBS_EVENT = "evidence.observations_changed"
 PUBLISH_REQUEST_EVENT = "beliefs.publish_requested"
+QUARANTINE_EVENT = "evidence.acquisition_quarantined"
+RESUME_EVENT = "connector.publication_resumed"
 OUTBOX_BACKOFF_BASE = 5.0
 OUTBOX_BACKOFF_CAP = 3600.0
 FAILURE_MEMORY_DAYS = 30
@@ -78,6 +80,7 @@ class InvalidationReport:
     failed_events: list[int] = field(default_factory=list)
     publish_conflicts: list[dict[str, Any]] = field(default_factory=list)
     publish_requests_deferred: list[str] = field(default_factory=list)
+    repair_jobs: list[str] = field(default_factory=list)
 
 
 @dataclass(frozen=True)
@@ -358,6 +361,59 @@ def _process_observation_event(conn: Connection, ev: Any, release_cutoffs: dict[
         origins_seen[origin] = max(origins_seen.get(origin, 0), int(ev.id))
 
 
+def _process_quarantine_event(conn: Connection, ev: Any, environment: str, actor: str,
+                              report: InvalidationReport) -> None:
+    """``evidence.acquisition_quarantined`` -> one idempotent ``connector_repair`` job per
+    (connector, acquisition). Connector and origin come from the acquisition row, not the payload."""
+    from reva.operations.jobs import enqueue_connector_repair
+
+    acq = str(dict(ev.payload).get("acquisition_id") or "")
+    row = conn.execute(
+        text("SELECT a.origin, cv.name FROM evidence.acquisition a "
+             "JOIN evidence.connector_version cv ON cv.id = a.connector_version_id WHERE a.id = CAST(:a AS uuid)"),
+        {"a": acq},
+    ).one_or_none() if acq else None
+    if row is None:
+        log.warning("outbox event %s: quarantined acquisition %r not found; no repair job", ev.id, acq[:64])
+        return
+    origin, connector = str(row[0]), str(row[1])
+    if environment == "production" and origin != "live":
+        return
+    res = enqueue_connector_repair(conn, connector, origin, acquisition_id=acq, created_by=actor, audit_actor=actor)
+    report.repair_jobs.append(str(res.job_id))
+
+
+def _resume_origins(reason: str | None) -> list[str]:
+    if reason is None:
+        return []
+    if reason == "upstream_changed:mixed":
+        return ["live", "test_fixture"]
+    if reason.startswith("upstream_changed:"):
+        o = reason.split(":", 1)[1]
+        return [o] if o in ("live", "test_fixture") else ["live"]
+    return ["live"]
+
+
+def _process_resume_event(conn: Connection, ev: Any, environment: str, actor: str,
+                          report: InvalidationReport) -> None:
+    """``connector.publication_resumed``: the concept's belief node was kept dirty while
+    paused (releases withheld it); now that it is publishable again, enqueue the publication.
+    The key uses the resume event id: no new observation event exists to key on."""
+    from reva.operations.jobs import PAUSE_NODE_PREFIX
+
+    concept = str(dict(ev.payload).get("concept") or "")
+    node = f"belief:{concept}"
+    if not concept or conn.execute(text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"),
+                                   {"k": PAUSE_NODE_PREFIX + node}).scalar_one_or_none():
+        return  # still (or again) paused
+    reason = conn.execute(text("SELECT reason FROM ops.dirty_node WHERE node_key = :k"),
+                          {"k": node}).scalar_one_or_none()
+    for origin in _resume_origins(reason):
+        if environment == "production" and origin != "live":
+            continue
+        _enqueue_publish(conn, origin, int(ev.id), actor, report)
+
+
 def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "local",
                    actor: str = "worker:invalidation") -> InvalidationReport:
     """Process one batch of unprocessed outbox events (one transaction, one savepoint per event)."""
@@ -385,6 +441,10 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
                     with conn.begin_nested():
                         if ev.event_type == OBS_EVENT:
                             _process_observation_event(conn, ev, release_cutoffs, report, origins_seen)
+                        elif ev.event_type == QUARANTINE_EVENT:
+                            _process_quarantine_event(conn, ev, environment, actor, report)
+                        elif ev.event_type == RESUME_EVENT:
+                            _process_resume_event(conn, ev, environment, actor, report)
                         elif ev.event_type == PUBLISH_REQUEST_EVENT:
                             p = dict(ev.payload)
                             origin = str(p.get("origin"))
@@ -431,7 +491,7 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
         OUTBOX_FAILING_EVENTS.set(float(failing))
     report.dirty = sorted(set(report.dirty))
     if report.events:
-        log.info("outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs, %d failed", report.events,
-                 len(report.dirty), len(report.skipped), len(report.forced), len(report.publish_jobs),
-                 len(report.failed_events))
+        log.info("outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs, %d repair jobs, %d failed",
+                 report.events, len(report.dirty), len(report.skipped), len(report.forced), len(report.publish_jobs),
+                 len(report.repair_jobs), len(report.failed_events))
     return report

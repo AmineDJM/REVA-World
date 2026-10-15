@@ -51,6 +51,13 @@ COPY src/ ./src/
 RUN --mount=type=secret,id=build_ca \
     if [ -s /run/secrets/build_ca ]; then export SSL_CERT_FILE=/run/secrets/build_ca; fi; \
     uv sync --frozen --no-dev
+# Runtime hygiene (measured 2026-10-15, docs/dev/docker_check.md): uv leaves a
+# world-writable (0666) /opt/venv/.lock, and third-party wheels ship their own
+# test suites (~66 MB: pandas/tests alone is 37 MB) that nothing imports at runtime.
+RUN rm -f /opt/venv/.lock \
+ && find /opt/venv/lib/python3.12/site-packages -depth -type d -name tests \
+      -path '*/site-packages/*/tests' -exec rm -rf {} + \
+ && test -z "$(find /opt/venv -perm -o+w -not -type l -print -quit)"
 
 # python:3.12-slim-bookworm (CPython 3.12.15) -- same base as builder: the venv's
 # interpreter symlink and any compiled wheels match exactly.

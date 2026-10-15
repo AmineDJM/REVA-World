@@ -100,8 +100,26 @@ test('provenance drawer from a belief value reaches the raw artifact SHA-256 and
   await expect(raw.first()).toContainText('countryiso3code');
   const obsNode = drawer.locator('.prov-observation');
   await expect(obsNode.locator('dt', { hasText: 'Raw selector' })).toBeVisible();
+  // The selected raw field: the observation's selector names the provider row it was read from.
+  await expect(obsNode.locator('dt', { hasText: 'Raw selector' }).locator('xpath=following-sibling::dd[1]')).toContainText('countryiso3code');
   // Storage location of the bytes is reachable too.
   await expect(drawer.locator('.prov-storage_location').first()).toBeVisible();
+
+  // Drill through to the source acquisition: its own lineage is rooted at the acquisition and
+  // reaches the same raw bytes, the connector version and the registered source.
+  const acqNode = drawer.locator('.prov-acquisition');
+  await expect(acqNode.locator('dt', { hasText: 'SHA-256' }).locator('xpath=following-sibling::dd[1]')).toHaveText(rawSha);
+  await acqNode.getByRole('button', { name: 'Trace from this acquisition' }).click();
+  await expect(drawer.locator('.state-loading')).toHaveCount(0, { timeout: 30_000 });
+  await expect(drawer.locator('.prov-node').first()).toHaveClass(/prov-acquisition/);
+  await expect(drawer).toContainText(acq.id.replace(/^acquisition:/, ''));
+  await expect(drawer.locator('.prov-artifact').filter({ hasText: rawSha }).first()).toBeVisible();
+  await expect(drawer.locator('.prov-connector_version')).toHaveCount(1);
+  await expect(drawer.locator('.prov-source')).toContainText('worldbank.wdi');
+  await expect(drawer.locator('.prov-observation')).toHaveCount(0);
+  await drawer.getByRole('button', { name: 'Back' }).click();
+  await expect(drawer.locator('.state-loading')).toHaveCount(0, { timeout: 30_000 });
+  await expect(drawer).toContainText(est.id);
 
   // Following the artifact keeps the SHA-256 (drill-down works), Escape closes and restores focus.
   await raw.first().getByRole('button', { name: /Trace from this artifact/ }).click();
@@ -110,6 +128,7 @@ test('provenance drawer from a belief value reaches the raw artifact SHA-256 and
   await drawer.getByRole('button', { name: 'Back' }).click();
   await page.keyboard.press('Escape');
   await expect(drawer).toHaveCount(0);
+  await expect(row.getByRole('button', { name: 'Trace' })).toBeFocused();
 });
 
 test('country with no published geometry or values renders explicit empty/degraded states', async ({ page }) => {

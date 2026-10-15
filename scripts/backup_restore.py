@@ -394,7 +394,9 @@ def restore_objects_archive(
                     raise BackupError(f"objects archive member {m.name[:120]!r} is not a regular file")
                 namespace, sha = _parse_key(m.name, prefix)
                 f = tar.extractfile(m)
-                obj = store.put(f, namespace, media_types.get(sha, "application/octet-stream"), max_bytes=max(m.size, 1))
+                obj = store.put(
+                    f, namespace, media_types.get(sha, "application/octet-stream"), max_bytes=max(m.size, 1)
+                )
                 if obj.sha256 != sha:
                     raise BackupError(f"archived object {m.name[:120]!r} does not hash to its address")
                 count += 1
@@ -422,7 +424,7 @@ def secret_values(environ: Mapping[str, str] | None = None) -> list[str]:
         if k.endswith("DATABASE_URL"):
             try:
                 pw = make_url(v).password
-            except Exception:
+            except Exception:  # noqa: S112 - not a URL: nothing to extract
                 continue
             if pw:
                 vals.add(str(pw))
@@ -745,7 +747,9 @@ def check_locations(conn: psycopg.Connection[Any], inventory: list[dict[str, Any
         except ValueError:
             missing.append(uri)
             continue
-        if urlsplit(uri).scheme == "file" and not uri.startswith(f"file://{Path(settings.reva_object_root).resolve()}/"):
+        if urlsplit(uri).scheme == "file" and not uri.startswith(
+            f"file://{Path(settings.reva_object_root).resolve()}/"
+        ):
             relocated += 1
         item = keys.get(key)
         if item is None:
@@ -773,7 +777,9 @@ def check_locations(conn: psycopg.Connection[Any], inventory: list[dict[str, Any
 
 
 def _locations_ok(res: Mapping[str, Any]) -> bool:
-    return not (res.get("missing") or res.get("mismatched") or res.get("corrupt_objects") or res.get("unbacked_artifacts"))
+    return not (
+        res.get("missing") or res.get("mismatched") or res.get("corrupt_objects") or res.get("unbacked_artifacts")
+    )
 
 
 # --- sealed release manifests ------------------------------------------------------------
@@ -812,7 +818,9 @@ def verify_releases(conn: psycopg.Connection[Any], store: Any) -> dict[str, Any]
                 raw = store.get("belief", msha)  # verifies bytes against the address
                 doc = json.loads(raw)
             except Exception as e:
-                results.append({"release_id": rid, "ok": False, "problems": [f"manifest unreadable: {type(e).__name__}"]})
+                results.append(
+                    {"release_id": rid, "ok": False, "problems": [f"manifest unreadable: {type(e).__name__}"]}
+                )
                 continue
             if lhash(raw) != recorded_lsha:
                 problems.append("manifest logical sha256 differs from meta.artifact")
@@ -1037,15 +1045,35 @@ END $$;
 
 def _target_is_empty(conn: psycopg.Connection[Any]) -> bool:
     row = conn.execute(
-        "SELECT count(*) FROM pg_tables WHERE schemaname = ANY(%s) "
-        "OR (schemaname = 'public' AND tablename = 'alembic_version')",
+        "SELECT (SELECT count(*) FROM pg_namespace WHERE nspname = ANY(%s))"
+        " + (SELECT count(*) FROM pg_tables WHERE schemaname = 'public' AND tablename = 'alembic_version')",
         (list(SCHEMAS),),
     ).fetchone()
     return bool(row and row[0] == 0)
 
 
+def _drop_reva_objects(conn: psycopg.Connection[Any]) -> list[str]:
+    """--force: drop the REVA schemas and alembic_version of the target (one transaction)."""
+    present = [r[0] for r in conn.execute("SELECT nspname FROM pg_namespace WHERE nspname = ANY(%s)", (list(SCHEMAS),))]
+    with conn.transaction():
+        for schema in present:
+            conn.execute(sql.SQL("DROP SCHEMA {} CASCADE").format(sql.Identifier(schema)))
+        conn.execute("DROP TABLE IF EXISTS public.alembic_version")
+    return sorted(present)
+
+
 def restore(
-    backup_dir: Path, *, url_env: str, tools: PgTools, identity: str | None, run_bootstrap: bool, verify_objects: bool
+    backup_dir: Path,
+    *,
+    url_env: str,
+    tools: PgTools,
+    identity: str | None,
+    run_bootstrap: bool,
+    verify_objects: bool,
+    restore_objects: bool = False,
+    force: bool = False,
+    confirm_database: str | None = None,
+    environment: str | None = None,
 ) -> dict[str, Any]:
     verify_checksums(backup_dir)  # refuses unverifiable or tampered sets before anything else
     record = json.loads((backup_dir / "backup.json").read_text())
@@ -1055,21 +1083,44 @@ def restore(
     encrypted = bool(record["dump"]["encrypted"])
     if encrypted and not identity:
         raise BackupError("encrypted dump: pass --identity (age identity file)")
+    archive_rec = record.get("objects_archive")
+    archive = None
+    if restore_objects:
+        if not archive_rec:
+            raise BackupError("--restore-objects: this backup has no objects archive (taken without --include-objects)")
+        archive = backup_dir / archive_rec["file"]
+        if archive.name not in {"objects.tar", "objects.tar.age"} or _sha256_file(archive) != archive_rec["sha256"]:
+            raise BackupError("objects archive checksum mismatch: refusing to restore")
     url = url_from_env(url_env)
+    env_name = environment if environment is not None else os.environ.get("REVA_ENV", "local")
+    if force and env_name == "production":
+        raise BackupError("--force is refused in production: restore into a new database and switch over")
+    if force and confirm_database != url.database:
+        raise BackupError("--force requires --confirm-database equal to the target database name")
     timings: dict[str, float] = {}
     # Pass 1: authenticate (age) and hash the plaintext without writing it anywhere.
     t0 = time.perf_counter()
     plain = verify_plaintext(dump_file, identity if encrypted else None)
-    timings["verify_seconds"] = round(time.perf_counter() - t0, 3)
     if plain[0] != record["dump"].get("plaintext_sha256"):
         raise BackupError("decrypted dump does not match its recorded sha256: refusing to restore")
+    if archive is not None:
+        a_plain = verify_plaintext(archive, identity if archive_rec["encrypted"] else None)
+        if a_plain[0] != archive_rec["plaintext_sha256"]:
+            raise BackupError("decrypted objects archive does not match its recorded sha256: refusing to restore")
+    timings["verify_seconds"] = round(time.perf_counter() - t0, 3)
+    dropped: list[str] = []
     conn = connect(url, autocommit=True)
     try:
         server_major = int(conn.execute("SHOW server_version_num").fetchone()[0]) // 10000  # type: ignore[index]
         row = conn.execute("SELECT rolsuper FROM pg_roles WHERE rolname = current_user").fetchone()
         superuser = bool(row and row[0])
         if not _target_is_empty(conn):
-            raise BackupError("target database is not empty; restore only into a new, empty database")
+            if not force:
+                raise BackupError(
+                    "target database is not empty; restore only into a new, empty database "
+                    "(or pass --force --confirm-database <name> to drop its REVA schemas first)"
+                )
+            dropped = _drop_reva_objects(conn)
         conn.execute(ROLE_SQL)
         restore_major = tools.major_version("pg_restore", url)
         if restore_major < record["pg_dump_major"]:
@@ -1110,13 +1161,31 @@ def restore(
         timings["bootstrap_seconds"] = round(time.perf_counter() - t0, 3)
     conn = connect(url, autocommit=True)
     try:
+        objects_restored = None
+        store = None
+        if archive is not None or verify_objects:
+            from reva.adapters.objects.factory import build_store
+
+            settings = _settings()
+            store = build_store(settings)
+        if archive is not None:
+            media = dict(conn.execute("SELECT sha256, media_type FROM meta.artifact").fetchall())  # type: ignore[arg-type]
+            t0 = time.perf_counter()
+            objects_restored = restore_objects_archive(
+                archive, identity if archive_rec["encrypted"] else None, store, archive_rec["prefix"], media
+            )
+            timings["objects_restore_seconds"] = round(time.perf_counter() - t0, 3)
+            if objects_restored["plaintext_sha256"] != archive_rec["plaintext_sha256"]:
+                raise BackupError("objects archive changed between verification and restore")
         t0 = time.perf_counter()
         restored = logical_manifest(conn)
         timings["logical_manifest_seconds"] = round(time.perf_counter() - t0, 3)
-        objects = None
+        objects = releases = None
         if verify_objects:
-            settings = _settings()
+            t0 = time.perf_counter()
             objects = check_locations(conn, object_inventory(settings), settings)
+            releases = verify_releases(conn, store)
+            timings["verify_objects_seconds"] = round(time.perf_counter() - t0, 3)
     finally:
         conn.close()
     differences = diff_manifests(record["logical_manifest"], restored)
@@ -1126,17 +1195,29 @@ def restore(
         "target_database": url.database,
         "server_major": server_major,
         "restored_as_superuser": superuser,
+        "forced_overwrite": {"dropped_schemas": dropped} if force else None,
         "logical_manifest_sha256": restored["manifest_sha256"],
+        "catalog_counts": restored["catalog"]["counts"],
         "matches_backup": not differences,
         "differences": differences,
         "bootstrap": bootstrap_report,
+        "objects_restored": objects_restored,
         "objects": objects,
+        "releases": releases,
         "timings": timings,
     }
     if differences:
         raise BackupError("restored logical manifest differs from backup: " + "; ".join(differences[:10]))
-    if objects and (objects["missing"] or objects["mismatched"] or objects["corrupt_objects"]):
-        raise BackupError("object store does not contain every restored artifact location")
+    if objects and not _locations_ok(objects):
+        raise BackupError(
+            "object store does not back every restored artifact: "
+            + json.dumps({k: objects[k] for k in ("missing", "mismatched", "corrupt_objects", "unbacked_artifacts")})[
+                :2000
+            ]
+        )
+    if releases and releases["verified"] != releases["releases"]:
+        bad = [r for r in releases["details"] if not r["ok"]]
+        raise BackupError("sealed release manifests do not verify: " + json.dumps(bad)[:2000])
     return result
 
 
@@ -1158,6 +1239,11 @@ def main(argv: list[str] | None = None) -> int:
     b.add_argument("--url-env", default="REVA_MIGRATION_DATABASE_URL")
     b.add_argument("--no-objects", action="store_true")
     b.add_argument(
+        "--include-objects",
+        action="store_true",
+        help="also copy every object into objects.tar(.age) (needed to rebuild a fresh object store)",
+    )
+    b.add_argument(
         "--recipient", action="append", default=[x for x in [os.environ.get("REVA_BACKUP_AGE_RECIPIENT")] if x]
     )
     b.add_argument("--recipients-file", default=os.environ.get("REVA_BACKUP_AGE_RECIPIENTS_FILE"))
@@ -1166,7 +1252,20 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--url-env", default="REVA_RESTORE_DATABASE_URL")
     r.add_argument("--identity", default=os.environ.get("REVA_BACKUP_AGE_IDENTITY"))
     r.add_argument("--skip-bootstrap", action="store_true")
-    r.add_argument("--verify-objects", action="store_true")
+    r.add_argument(
+        "--verify-objects",
+        action="store_true",
+        help="check every artifact against the configured object store and re-verify sealed releases",
+    )
+    r.add_argument(
+        "--restore-objects",
+        action="store_true",
+        help="put the backup's objects archive into the configured object store first",
+    )
+    r.add_argument(
+        "--force", action="store_true", help="DROP the REVA schemas of a non-empty target first (refused in production)"
+    )
+    r.add_argument("--confirm-database", default=None, help="required with --force: the target database name")
     m = sub.add_parser("manifest")
     m.add_argument("--url-env", default="REVA_MIGRATION_DATABASE_URL")
     sub.add_parser("inventory")
@@ -1182,8 +1281,9 @@ def main(argv: list[str] | None = None) -> int:
                 recipients_file=args.recipients_file,
                 tools=tools,
                 environment=os.environ.get("REVA_ENV", "local"),
+                include_objects=args.include_objects,
             )
-            out = {k: out[k] for k in ("path", "dump", "timings", "objects") if k in out} | {
+            out = {k: out[k] for k in ("path", "dump", "timings", "objects", "objects_archive") if k in out} | {
                 "logical_manifest_sha256": out["logical_manifest"]["manifest_sha256"]
             }
         elif args.cmd == "restore":
@@ -1194,6 +1294,9 @@ def main(argv: list[str] | None = None) -> int:
                 identity=args.identity,
                 run_bootstrap=not args.skip_bootstrap,
                 verify_objects=args.verify_objects,
+                restore_objects=args.restore_objects,
+                force=args.force,
+                confirm_database=args.confirm_database,
             )
         elif args.cmd == "manifest":
             conn = connect(url_from_env(args.url_env), autocommit=True)

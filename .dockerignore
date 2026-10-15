@@ -1,10 +1,14 @@
 # Secrets and local state never enter the build context.
-.env
-.env.*
+# (.dockerignore patterns are anchored at the context root: ** reaches nested files.)
+**/.env
+**/.env.*
 !.env.example
 var/
-*.pem
-*.key
+**/*.pem
+**/*.key
+**/*.p12
+**/id_rsa*
+**/id_ed25519*
 
 # VCS, tooling, caches
 .git/
@@ -16,6 +20,15 @@ var/
 .mypy_cache/
 .ruff_cache/
 .hypothesis/
+.grimp_cache/
+.import_linter_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.log
+.claude/
+**/node_modules/
 *.egg-info/
 build/
 dist/
@@ -33,3 +46,5 @@ docs/
 schema/
 compose.yaml
 Makefile
+# Local-development only (drops the local database; hardcodes the local owner password).
+scripts/dev_reset_db.sh

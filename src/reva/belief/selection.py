@@ -148,11 +148,15 @@ class Withheld:
     reason: str
     discrepancy_flags: list[str]
     alternatives: list[dict[str, Any]]
+    details: dict[str, Any] | None = None  # reason-specific context (e.g. the publication pause)
 
     def as_json(self) -> dict[str, Any]:
-        return {"subject_id": str(self.subject_id), "concept_id": self.concept_id,
-                "support_id": str(self.support_id), "reason": self.reason,
-                "discrepancy_flags": self.discrepancy_flags, "alternatives": self.alternatives}
+        out = {"subject_id": str(self.subject_id), "concept_id": self.concept_id,
+               "support_id": str(self.support_id), "reason": self.reason,
+               "discrepancy_flags": self.discrepancy_flags, "alternatives": self.alternatives}
+        if self.details is not None:
+            out["details"] = self.details
+        return out
 
 
 @dataclass
