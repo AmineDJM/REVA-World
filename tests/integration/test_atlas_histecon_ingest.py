@@ -77,10 +77,14 @@ async def test_cow_atlas_and_kg_load(db: Any) -> None:
                     WHERE subject_qid = 'cow:220' AND property_pid = 'P463'
                       AND object_qid = 'cow:system:interstate' ORDER BY start_time""")
         ).all()
-        ussr = c.execute(
-            text("""SELECT object_qid FROM kg.statement_current
+        ussr = (
+            c.execute(
+                text("""SELECT object_qid FROM kg.statement_current
                     WHERE subject_qid = 'cow:365' AND property_pid = 'cow:code_denotes'""")
-        ).scalars().all()
+            )
+            .scalars()
+            .all()
+        )
     assert [tuple(r) for r in rows] == [("1816-01-01", "1942-11-11"), ("1944-08-25", None)]
     assert "Q15180" in ussr
     again = _summary(await _run(db, atlas_cow))

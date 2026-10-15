@@ -782,19 +782,9 @@ def time_value_from_binding(b: Mapping[str, str] | None) -> dict[str, Any] | Non
 
 
 # --------------------------------------------------------------------------- live HTTP
-def make_live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, proxy_mode: str | None = None,
-                   contact: str | None = None) -> Any:
-    """A SafeHttpClient restricted to the two Wikidata hosts.
+def make_live_http(**kw: Any) -> Any:
+    """Raw live client for offline-fixture capture tools in ``tests`` only. Production (``src``) code goes
+    through the budget-metered :func:`reva.kg.harvest.budgeted_client` (invariant 30)."""
+    from reva.kg.harvest import live_http
 
-    ``max_attempts=1``: retries/back-off are done by :class:`WikidataClient` (which must distinguish WDQS
-    time-outs, 429/503 and maxlag, and share cool-downs machine-wide). The in-process rate limiter is a second
-    guard (1 request/s/host, concurrency 1) behind the machine-wide lock.
-    """
-    from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
-    from reva.adapters.http.safe_client import SafeHttpClient
-
-    policies = {h: HostPolicy(min_interval_seconds=1.0, max_concurrency=1, max_retry_after_seconds=900.0)
-                for h in ALLOWED_HOSTS}
-    return SafeHttpClient(allowed_hosts=ALLOWED_HOSTS, timeout_seconds=timeout_seconds, max_bytes=max_bytes,
-                          max_attempts=1, rate_limiter=RateLimiter(policies), proxy_mode=proxy_mode,  # type: ignore[arg-type]
-                          contact_email=contact)
+    return live_http(**kw)

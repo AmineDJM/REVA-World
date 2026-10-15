@@ -202,7 +202,7 @@ def parse_datapoints(body: bytes, concept: str) -> list[dict[str, Any]]:
 def _segment(spec: Mapping[str, Any], year: int) -> str | None:
     for lo, hi, note in spec["segments"]:
         if lo <= year <= hi:
-            return note
+            return str(note)
     return None
 
 

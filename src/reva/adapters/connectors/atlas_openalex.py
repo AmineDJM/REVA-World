@@ -26,34 +26,25 @@ institution matching (and, for unmatched raw affiliations, its own country infer
 
 Access: since 2025 OpenAlex meters requests; without an API key a request draws on a small free
 daily budget shared by everyone behind the same IP address (exhausted on 2026-10-15: HTTP 429
-"Insufficient budget"). The connector takes an optional key (``api_key``, sent as the ``api_key``
-query parameter, which the safe client and fixtures redact) and a ``mailto`` contact (the
-configured ``REVA_HTTP_CONTACT_EMAIL``). A 429 is never retried in a loop: the run stops and
-reports the remaining items as blocked.
+"Insufficient budget"). The connector takes an optional key (``OPENALEX_API_KEY`` from the environment, sent as the
+``api_key`` query parameter, which the safe client and fixtures redact); the contact address goes in
+the budget-metered client's User-Agent (``mailto:``, from ``REVA_HTTP_CONTACT_EMAIL``), not in the
+URL. A 429 stops the run: the remaining queries are reported ``not_attempted``. Fetching goes only
+through ``run.get`` (``reva.atlas.ingest``: budget-metered live client or fixture replay).
 """
 
 from __future__ import annotations
 
 import json
 import sys
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 from typing import Any
 from urllib.parse import quote, urlencode
 
-from reva.adapters.connectors.atlas_sci_common import atlas_frame, atlas_spec, canon, code_digest
-from reva.adapters.http.safe_client import request_fingerprint
+from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_digest, trim_registration
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import (
-    ConnectorSpec,
-    Cursor,
-    FetchBudget,
-    FetchItem,
-    FetchPlan,
-    ObservationBatch,
-    RawAcquisition,
-)
 
 CONNECTOR_NAME = "atlas.openalex"
 CONNECTOR_VERSION = "1.0.0"
@@ -103,7 +94,6 @@ FIELDS: dict[str, str] = {
     "36": "Health Professions",
 }
 DATASETS = ("works_country_year", "works_country_domain", "works_country_field")
-SECRET_PARAMS = ("api_key", "subscription-key")
 
 RIGHTS: dict[str, str] = {
     "licence": "CC0-1.0",
@@ -164,97 +154,142 @@ def queries(
     return out
 
 
-def query_url(q: Query, *, cursor: str = "*", mailto: str | None = None, api_key: str | None = None) -> str:
+def query_url(q: Query, *, cursor: str = "*", api_key: str | None = None) -> str:
     params: dict[str, str] = {
         "filter": q.filter,
         "group_by": "authorships.countries",
         "per_page": str(PER_PAGE),
         "cursor": cursor,
     }
-    if mailto:
-        params["mailto"] = mailto
     if api_key:
         params["api_key"] = api_key
     return f"https://{HOST}/works?" + urlencode(params, safe=":,|*", quote_via=quote)
 
 
-class OpenAlexAtlasConnector:
-    """Atlas bulk connector (group_by aggregates; archive raw -> atlas tables)."""
+#: Planned requests for one default run (36 + 104 queries, <= 2 cursor pages each).
+PLANNED_REQUESTS = 300
+#: Fixture runs replay a small recorded plan (real captures of these queries).
+FIXTURE_YEARS = (2020, 2020)
 
-    def __init__(
-        self,
-        *,
-        mailto: str | None = None,
-        api_key: str | None = None,
-        years: tuple[int, int] = YEARS,
-        domain_years: tuple[int, int] | None = DOMAIN_YEARS,
-        field_years: Sequence[int] | None = None,
-    ) -> None:
-        self.mailto = mailto
-        self._api_key = api_key
-        self.queries = queries(years=years, domain_years=domain_years, field_years=field_years)
 
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="OpenAlex (OurResearch)",
-            licence="CC0-1.0",
-            allowed_hosts=(HOST,),
-            dataset_ids=DATASETS,
-            field_mappings={
-                "atlas": [f"{ATLAS_SOURCE}.{d}" for d in DATASETS],
-                "group_by": "authorships.countries",
-                "work_types": WORK_TYPES,
-            },
-            units={"works": "works (full counting by country)"},
-            geography=("*",),
-            time_semantics="publication_year of the work; counts as indexed at retrieval time",
-            lineage_family="openalex",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            authentication_secret_ref="env:OPENALEX_API_KEY (optional)",
-            revision_strategy="full re-query per run; new bytes -> new atlas table version",
-            max_response_bytes=MAX_BYTES,
-            max_pages=5,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(sys.modules[__name__]),
+def atlas_source() -> Any:
+    """The atlas source spec (``reva.atlas.sources`` protocol)."""
+    from reva.atlas.sources import AtlasSourceSpec
+
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="OpenAlex (OurResearch)",
+        licence="CC0-1.0",
+        allowed_hosts=(HOST,),
+        datasets=DATASETS,
+        dataset_ids=("works group_by authorships.countries",),
+        cadence_seconds=30 * 86400,
+        planned_requests=PLANNED_REQUESTS,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=0.25,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(sys.modules[__name__]),
+        field_mappings={
+            "group_by": "authorships.countries",
+            "work_types": WORK_TYPES,
+            "years": list(YEARS),
+            "domain_years": list(DOMAIN_YEARS),
+        },
+        notes="optional API key from the environment (OPENALEX_API_KEY, sent as api_key, redacted)",
+    )
+
+
+async def atlas_ingest(
+    run: Any,
+    *,
+    years: tuple[int, int] | None = None,
+    domain_years: tuple[int, int] | None = None,
+    field_years: Sequence[int] | None = None,
+    max_requests: int | None = None,
+) -> dict[str, Any]:
+    """Query every planned group_by; register one table per dataset with the queries that completed.
+
+    A query whose pages did not all succeed contributes no rows (a partial country list would read
+    as absences) and is listed under ``incomplete``; a provider 429/401/403 stops the run (the rest
+    is reported ``not_attempted``)."""
+    import os
+
+    from reva.kernel.errors import RevaError
+
+    fixture = run.origin == "test_fixture"
+    plan = queries(
+        years=years or (FIXTURE_YEARS if fixture else YEARS),
+        domain_years=domain_years or (FIXTURE_YEARS if fixture else DOMAIN_YEARS),
+        field_years=field_years,
+    )
+    plan = [q for q in plan if run.wants(q.dataset)]
+    api_key = None if fixture else (os.environ.get("OPENALEX_API_KEY") or None)
+    limit = max_requests or run.spec.planned_requests
+    rows: dict[str, list[dict[str, Any]]] = {}
+    shas: dict[str, list[str]] = {}
+    incomplete: list[dict[str, Any]] = []
+    requests = 0
+    stopped: str | None = None
+    for q in plan:
+        if stopped:
+            incomplete.append({"query": q.key, "status": "not_attempted", "reason": stopped})
+            continue
+        pages: list[tuple[GroupPage, str, int]] = []
+        cursor, pno = "*", 1
+        try:
+            while True:
+                if requests >= limit:
+                    stopped = "request limit for this run reached"
+                    raise _StopRun
+                requests += 1
+                raw = await run.get(
+                    query_url(q, cursor=cursor, api_key=api_key), key=f"{q.key}:p{pno}", max_bytes=MAX_BYTES
+                )
+                page = parse_group_page(raw.body)
+                pages.append((page, run.archive(raw), pno))
+                if page.next_cursor and len(page.groups) >= PER_PAGE:
+                    if pno >= MAX_PAGES:
+                        raise _err(f"{q.key}: more group pages than {MAX_PAGES}", kind="too_many_pages")
+                    cursor, pno = page.next_cursor, pno + 1
+                    continue
+                break
+        except _StopRun:
+            incomplete.append({"query": q.key, "status": "not_attempted", "reason": stopped})
+            continue
+        except RevaError as e:
+            status = e.details.get("status")
+            incomplete.append({"query": q.key, "status": "failed", "http_status": status, "error": e.message[:300]})
+            if status in (429, 401, 403):
+                stopped = f"provider refused (HTTP {status}); no further requests this run"
+            continue
+        retrieved_at = datetime.now(UTC)
+        rows.setdefault(q.dataset, []).extend(atlas_rows(q, pages, retrieved_at=retrieved_at))
+        shas.setdefault(q.dataset, []).extend(s for _, s, _ in pages)
+    tables = {}
+    for ds, rs in rows.items():
+        reg = run.register(
+            dataset=ds,
+            frame=atlas_frame(rs),
+            raw_sha256s=sorted(set(shas[ds])),
+            geo_scheme=GEO_SCHEME,
+            coverage_note=(
+                "OpenAlex group_by authorships.countries (articles+reviews, full counting) as indexed at "
+                "retrieval; '_all_works' and 'unknown' rows kept unmapped."
+            ),
+            rights=RIGHTS,
         )
+        tables[ds] = trim_registration(reg)
+    return {"requests": requests, "queries": len(plan), "tables": tables, "incomplete": incomplete, "stopped": stopped}
 
-    def item(self, q: Query, cursor: str = "*", page: int = 1) -> FetchItem:
-        return FetchItem(
-            key=f"{q.key}:p{page}",
-            url=query_url(q, cursor=cursor, mailto=self.mailto, api_key=self._api_key),
-            max_bytes=MAX_BYTES,
-            params={"dataset": q.dataset, "year": q.year, "dim": q.dim, "dim_id": q.dim_id, "page": page},
-        )
 
-    def plan(self, cursor: Cursor | None = None, budget: FetchBudget | None = None) -> FetchPlan:
-        items = tuple(self.item(q) for q in self.queries)
-        limit = budget.max_requests if budget else len(items)
-        return FetchPlan(
-            connector=CONNECTOR_NAME,
-            items=items[:limit],
-            pagination="cursor paging of group_by results (per_page 200); a follow-up page is planned from meta.next_cursor",
-            availability_expectation="live index; counts drift daily",
-            budget_exhausted=len(items) > limit,
-        )
+class _StopRun(Exception):
+    pass
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
-        return RawAcquisition(
-            item=item,
-            body=result.body,
-            media_type=result.media_type or "application/json",
-            retrieved_at=result.retrieved_at,
-            response_metadata=result.response_metadata(),
-            request_fingerprint=request_fingerprint("GET", item.url, secret_params=SECRET_PARAMS),
-            origin=getattr(http, "origin", "live"),
-        )
 
-    def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
-        return iter(())  # atlas connector: no evidence observations
+MAX_PAGES = 5
 
 
 # ----------------------------------------------------------------------------- parsing
@@ -402,9 +437,10 @@ __all__ = [
     "FIELDS",
     "GEO_SCHEME",
     "GroupPage",
-    "OpenAlexAtlasConnector",
     "Query",
+    "atlas_ingest",
     "atlas_rows",
+    "atlas_source",
     "frame",
     "parse_group_page",
     "queries",

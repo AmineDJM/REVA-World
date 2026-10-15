@@ -1,24 +1,29 @@
-"""A-SCI atlas connectors end to end on a throwaway database (fixture bytes, no network)."""
+"""A-SCI atlas sources end to end on a throwaway database, through ``reva.atlas.ingest`` (no network)."""
 
 from __future__ import annotations
+
+from typing import Any
 
 import polars as pl
 import pytest
 from sqlalchemy import text
 
-from reva.adapters.connectors import atlas_nobel, atlas_openalex, atlas_wipo
-from reva.adapters.connectors.atlas_sci_common import register_connector
-from reva.adapters.connectors.atlas_sci_ingest import ingest_gii, ingest_nobel, ingest_openalex, ingest_wipo
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered, get_source
 from reva.atlas.tables import read_atlas_table
-from reva.evidence.runner import FixtureHttp
 
 pytestmark = pytest.mark.db
 
 
+def _reg(db: Any, name: str) -> None:
+    ensure_registered(db.owner, db.store, get_source(name).spec)
+
+
 async def test_nobel_atlas_and_kg(db):
-    register_connector(db.owner, db.store, atlas_nobel.NobelAtlasConnector().describe())
-    rep = await ingest_nobel(db.worker, db.store, FixtureHttp(atlas_nobel.CONNECTOR_NAME), min_expected=1)
-    assert rep["origin"] == "test_fixture"
+    _reg(db, "atlas.nobel")
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.nobel", mode="fixture")
+    assert out["status"] == "completed", out
+    rep = out["summary"]
     atlas = rep["atlas"]
     assert atlas["dataset_key"] == "atlas.nobel.laureates" and atlas["created"] is True
     assert [u["provider_geo"] for u in atlas["unmapped_provider_geo"]] == ["Taiwan"]
@@ -36,25 +41,54 @@ async def test_nobel_atlas_and_kg(db):
             )
         ).scalar_one()
     assert n == 2
-    again = await ingest_nobel(db.worker, db.store, FixtureHttp(atlas_nobel.CONNECTOR_NAME), min_expected=1)
-    assert again["atlas"]["created"] is False
-    assert again["kg"]["statements_inserted"] == 0 and again["kg"]["statements_unchanged"] == kg["statements_built"]
+    again = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.nobel", mode="fixture")
+    assert again["summary"]["atlas"]["created"] is False
+    assert again["summary"]["kg"]["statements_inserted"] == 0
 
 
 async def test_nobel_partial_list_writes_nothing(db):
+    """Live mode keeps the 1,000-laureate threshold: an 18-record list is refused, no table registered."""
+    from reva.adapters.http.safe_client import HttpResult
+    from reva.evidence.runner import FixtureHttp
     from reva.kernel.errors import SourceResponseError
 
-    register_connector(db.owner, db.store, atlas_nobel.NobelAtlasConnector().describe())
-    with pytest.raises(SourceResponseError):  # 18-record excerpt < 1,000 expected laureates
-        await ingest_nobel(db.worker, db.store, FixtureHttp(atlas_nobel.CONNECTOR_NAME))
+    _reg(db, "atlas.nobel")
+    inner = FixtureHttp("atlas.nobel")
+
+    class Live:
+        origin = "live"
+
+        async def get(self, url: str, **kw: Any) -> HttpResult:
+            return await inner.get(url, **kw)
+
+        async def aclose(self) -> None:
+            return None
+
+    with pytest.raises(SourceResponseError):
+        await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.nobel", http_factory=lambda s, st: Live())
+    with db.owner.connect() as c:
+        n = c.execute(
+            text(
+                "SELECT count(*) FROM evidence.dataset WHERE dataset_key = 'atlas.nobel.laureates' AND origin = 'live'"
+            )
+        ).scalar_one()
+    assert n == 0
 
 
 async def test_wipo_bulk_and_gii(db):
-    register_connector(db.owner, db.store, atlas_wipo.WipoIpStatsConnector().describe())
-    register_connector(db.owner, db.store, atlas_wipo.WipoGiiConnector().describe())
-    rep = await ingest_wipo(db.worker, db.store, FixtureHttp(atlas_wipo.CONNECTOR_IPSTATS))
+    _reg(db, "atlas.wipo_ipstats")
+    _reg(db, "atlas.wipo_gii")
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.wipo_ipstats", mode="fixture")
+    rep = out["summary"]
     assert rep["errors"] == []
-    assert set(rep["tables"]) == {b.dataset for b in atlas_wipo.BULK_FILES}
+    assert set(rep["tables"]) == {
+        "patent_pub_tech",
+        "patent_grant_tech",
+        "tm_appl_class",
+        "tm_reg_class",
+        "design_appl_class",
+        "design_reg_class",
+    }
     pub = rep["tables"]["patent_pub_tech"]
     assert "**" in {u["provider_geo"] for u in pub["unmapped_provider_geo"]}
     frame = read_atlas_table(db.store, pub["artifact_sha256"])
@@ -64,26 +98,41 @@ async def test_wipo_bulk_and_gii(db):
         & (pl.col("period_start").dt.year() == 2020)
     )
     assert fr["value"].to_list() == ["529"]
-    gii = await ingest_gii(db.worker, db.store, FixtureHttp(atlas_wipo.CONNECTOR_GII))
-    assert gii["economies"] == 139 and gii["atlas"]["unmapped_provider_geo"] == []
+    one = await run_atlas_ingest(
+        db.settings, db.worker, db.store, "atlas.wipo_ipstats", dataset="design_reg_class", mode="fixture"
+    )
+    assert set(one["summary"]["tables"]) == {"design_reg_class"}
+    gii = await run_atlas_ingest(db.settings, db.worker, db.store, "atlas.wipo_gii", mode="fixture")
+    assert gii["summary"]["economies"] == 139 and gii["summary"]["atlas"]["unmapped_provider_geo"] == []
 
 
 async def test_openalex_rate_limit_stops_run(db):
-    """A provider 429 stops the run: nothing is invented for the queries not made."""
+    """A provider 429 stops the run: nothing is invented for the queries not made; usage is settled."""
     from reva.adapters.http.safe_client import HttpResult
     from reva.kernel.errors import SourceResponseError
 
     class Refusing:
-        origin = "test_fixture"
+        origin = "live"
         calls = 0
 
         async def get(self, url: str, **kw: object) -> HttpResult:
             self.calls += 1
             raise SourceResponseError("HTTP 429 from api.openalex.org", retryable=True, status=429)
 
-    conn = atlas_openalex.OpenAlexAtlasConnector(years=(2020, 2021), domain_years=None)
-    register_connector(db.owner, db.store, conn.describe())
+        async def aclose(self) -> None:
+            return None
+
+    _reg(db, "atlas.openalex")
     http = Refusing()
-    rep = await ingest_openalex(db.worker, db.store, http, conn)
+    out = await run_atlas_ingest(
+        db.settings,
+        db.worker,
+        db.store,
+        "atlas.openalex",
+        dataset="works_country_year",
+        http_factory=lambda s, st: http,
+    )
+    rep = out["summary"]
     assert http.calls == 1 and rep["tables"] == {}
-    assert [i["status"] for i in rep["incomplete"]] == ["failed", "not_attempted"]
+    assert rep["incomplete"][0]["status"] == "failed"
+    assert {i["status"] for i in rep["incomplete"][1:]} == {"not_attempted"}

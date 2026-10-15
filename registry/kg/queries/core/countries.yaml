@@ -8,6 +8,6 @@ purpose: seed_entities
 entity_kind: country
 sparql: |
   SELECT ?item WHERE { VALUES ?item { {{values}} } }
-split: {by: values, source: countries, chunk_size: 50}
+split: {by: values, source: countries, chunk_size: 250}
 max_rows: 300
 expand_hops: 1

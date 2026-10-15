@@ -135,10 +135,19 @@ def test_nobel_country_table_targets_are_crosswalk_keys():
     assert set(nobel.COUNTRY_NOW_ISO3.values()) <= known_country_keys()
 
 
-def test_nobel_spec():
-    spec = nobel.NobelAtlasConnector().describe()
+def test_atlas_source_specs():
+    from reva.atlas.sources import discover
+
+    found, errors = discover(
+        [f"reva.adapters.connectors.atlas_{m}" for m in ("nobel", "openalex", "wipo", "sci_common")]
+    )
+    assert errors == []
+    assert set(found) == {"atlas.nobel", "atlas.openalex", "atlas.wipo_ipstats", "atlas.wipo_gii"}
+    spec = found["atlas.nobel"].spec
     assert spec.template == "atlas_bulk" and spec.allowed_hosts == ("api.nobelprize.org",)
-    assert spec.source_key == "nobelprize.api"
+    assert spec.source_key == "nobelprize.api" and spec.datasets == ("laureates",)
+    assert found["atlas.wipo_ipstats"].spec.datasets == tuple(b.dataset for b in wipo.BULK_FILES)
+    assert found["atlas.openalex"].spec.planned_requests >= len(oa.queries())
 
 
 # ----------------------------------------------------------------------------- WIPO bulk
@@ -247,13 +256,12 @@ def _group_doc(groups, count=1000, next_cursor=None):
 
 def test_openalex_query_urls():
     q = oa.Query("works_country_domain", 2020, "domain", "3")
-    url = oa.query_url(q, mailto="ops@example.org", api_key="SECRET")
+    url = oa.query_url(q, api_key="SECRET")
     assert url.startswith("https://api.openalex.org/works?filter=publication_year:2020,type:article|review,")
     assert "primary_topic.domain.id:3" in url and "group_by=authorships.countries" in url and "cursor=*" in url
-    item = oa.OpenAlexAtlasConnector(api_key="SECRET").item(q)
     from reva.adapters.http.safe_client import redact_url
 
-    assert "SECRET" not in redact_url(item.url)
+    assert "SECRET" not in redact_url(url) and "mailto" not in url
     qs = oa.queries()
     assert len([x for x in qs if x.dataset == "works_country_year"]) == 36
     assert len([x for x in qs if x.dataset == "works_country_domain"]) == 26 * 4

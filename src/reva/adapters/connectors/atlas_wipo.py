@@ -58,18 +58,8 @@ from datetime import date, datetime
 from typing import Any
 from xml.etree import ElementTree as ET
 
-from reva.adapters.connectors.atlas_sci_common import atlas_spec, canon, code_digest
-from reva.adapters.connectors.base import to_raw
+from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_digest, trim_registration
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import (
-    ConnectorSpec,
-    Cursor,
-    FetchBudget,
-    FetchItem,
-    FetchPlan,
-    ObservationBatch,
-    RawAcquisition,
-)
 
 CONNECTOR_IPSTATS = "atlas.wipo_ipstats"
 CONNECTOR_GII = "atlas.wipo_gii"
@@ -199,100 +189,110 @@ def _module() -> Any:
 
 
 # ----------------------------------------------------------------------------- connectors
-class _Base:
-    name: str
-    source_key: str
-    dataset_ids: tuple[str, ...]
+def atlas_source() -> list[Any]:
+    """Two atlas sources (``reva.atlas.sources`` protocol): the IP-statistics bulk ZIPs and the GII."""
+    from reva.atlas.sources import AtlasSourceSpec
 
-    def _spec(self, **kw: Any) -> ConnectorSpec:
-        return atlas_spec(
-            name=self.name,
-            version=CONNECTOR_VERSION,
-            source_key=self.source_key,
-            provider="World Intellectual Property Organization (WIPO)",
-            licence="CC-BY-4.0",
-            allowed_hosts=(HOST,),
-            dataset_ids=self.dataset_ids,
-            geography=("*",),
-            lineage_family="wipo",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="full file per run; new bytes -> new atlas table version",
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(_module()),
-            **kw,
-        )
-
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
-        return to_raw(item, result, getattr(http, "origin", "live"))
-
-    def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
-        return iter(())  # atlas connector: no evidence observations
-
-
-class WipoIpStatsConnector(_Base):
-    name = CONNECTOR_IPSTATS
-    source_key = SOURCE_KEY_IPSTATS
-    dataset_ids = tuple(b.dataset for b in BULK_FILES)
-
-    def describe(self) -> ConnectorSpec:
-        return self._spec(
-            field_mappings={"atlas": [f"{ATLAS_SOURCE}.{b.dataset}" for b in BULK_FILES]},
-            units={b.dataset: b.unit for b in BULK_FILES},
-            time_semantics="calendar year of publication/grant/application as reported by the office",
+    common: dict[str, Any] = {
+        "version": CONNECTOR_VERSION,
+        "atlas_source": ATLAS_SOURCE,
+        "provider": "World Intellectual Property Organization (WIPO)",
+        "licence": "CC-BY-4.0 (WIPO Open Access Policy, site-level)",
+        "allowed_hosts": (HOST,),
+        "cadence_seconds": 30 * 86400,
+        "min_interval_seconds": 2.0,
+        "parser_version": PARSER_VERSION,
+        "code_digest": code_digest(_module()),
+    }
+    return [
+        AtlasSourceSpec(
+            name=CONNECTOR_IPSTATS,
+            source_key=SOURCE_KEY_IPSTATS,
+            datasets=tuple(b.dataset for b in BULK_FILES),
+            dataset_ids=tuple(b.member for b in BULK_FILES),
+            planned_requests=len(ZIPS),
             max_response_bytes=MAX_ZIP_BYTES,
-        )
-
-    def plan(self, cursor: Cursor | None = None, budget: FetchBudget | None = None) -> FetchPlan:
-        return FetchPlan(
-            connector=self.name,
-            items=tuple(
-                FetchItem(
-                    key=f"zip:{k}",
-                    url=u,
-                    expected_media_types=("application/zip",),
-                    max_bytes=MAX_ZIP_BYTES,
-                    params={"zip": k},
-                )
-                for k, u in ZIPS.items()
-            ),
-            pagination="none (whole files)",
-            availability_expectation="bulk files dated 2023-12; WIPO refreshes them irregularly",
-        )
-
-
-class WipoGiiConnector(_Base):
-    name = CONNECTOR_GII
-    source_key = SOURCE_KEY_GII
-    dataset_ids = (f"gii_{GII_EDITION}",)
-
-    def describe(self) -> ConnectorSpec:
-        return self._spec(
-            field_mappings={
-                "atlas": f"{ATLAS_SOURCE}.gii_{GII_EDITION}",
-                "levels": ["Index", "SubIndex", "Pillar", "SubPillar"],
-            },
-            units={"score": "score 0-100", "rank": "rank"},
-            time_semantics="GII edition year; component data years vary",
+            field_mappings={"zips": dict(ZIPS)},
+            notes="three bulk ZIPs (files dated 2023-12-06); one atlas table per CSV; nothing summed",
+            **common,
+        ),
+        AtlasSourceSpec(
+            name=CONNECTOR_GII,
+            source_key=SOURCE_KEY_GII,
+            datasets=(f"gii_{GII_EDITION}",),
+            dataset_ids=("wipo-pub-2000-2025-tech1.xlsx",),
+            planned_requests=1,
             max_response_bytes=MAX_XLSX_BYTES,
-        )
+            field_mappings={"levels": list(GII_LEVELS)},
+            notes="GII composite levels only (score, rank); third-party indicator values not ingested",
+            **common,
+        ),
+    ]
 
-    def plan(self, cursor: Cursor | None = None, budget: FetchBudget | None = None) -> FetchPlan:
-        return FetchPlan(
-            connector=self.name,
-            items=(
-                FetchItem(
-                    key=f"gii:{GII_EDITION}",
-                    url=GII_URL,
-                    expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",),
-                    max_bytes=MAX_XLSX_BYTES,
-                ),
-            ),
-            pagination="none (one workbook)",
-            availability_expectation="one edition per year (September)",
-        )
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    if run.spec.name == CONNECTOR_GII:
+        return await _ingest_gii(run)
+    return await _ingest_bulk(run)
+
+
+async def _ingest_bulk(run: Any) -> dict[str, Any]:
+    tables: dict[str, Any] = {}
+    errors: list[dict[str, Any]] = []
+    out: dict[str, Any] = {"tables": tables, "errors": errors}
+    for key, url in ZIPS.items():
+        members = [bf for bf in bulk_members(key) if run.wants(bf.dataset)]
+        if not members:
+            continue
+        try:
+            raw = await run.get(url, key=f"zip:{key}", media_types=("application/zip",), max_bytes=MAX_ZIP_BYTES)
+            if not raw.body.startswith(b"PK"):
+                raise _err(f"{key}: response is not a ZIP ({raw.media_type})", kind="not_zip")
+            sha = run.archive(raw)
+            zf = open_zip(raw.body)
+            if key == "patent":
+                out["tech_field_names"] = tech_field_names(zf)
+            for bf in members:
+                reg = run.register(
+                    dataset=bf.dataset,
+                    frame=bulk_frame(zf, bf, raw_sha256=sha, retrieved_at=raw.retrieved_at),
+                    raw_sha256s=[sha],
+                    geo_scheme=GEO_SCHEME,
+                    coverage_note=(
+                        f"WIPO bulk file {bf.member} (dated 2023-12-06): {bf.unit} by office x origin x "
+                        f"{bf.id_name}; origin '**' and historical codes unmapped; nothing summed."
+                    ),
+                    rights=RIGHTS,
+                )
+                tables[bf.dataset] = trim_registration(reg)
+        except SourceResponseError as e:  # one ZIP failing does not hide the others
+            errors.append({"zip": key, "error": e.message[:500], "kind": e.details.get("kind")})
+    return out
+
+
+async def _ingest_gii(run: Any) -> dict[str, Any]:
+    ds = f"gii_{GII_EDITION}"
+    if not run.wants(ds):
+        return {"skipped": ds}
+    raw = await run.get(
+        GII_URL,
+        key=f"gii:{GII_EDITION}",
+        media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",),
+        max_bytes=MAX_XLSX_BYTES,
+    )
+    if not raw.body.startswith(b"PK"):
+        raise _err(f"GII: response is not an xlsx ({raw.media_type})", kind="not_xlsx")
+    sha = run.archive(raw)
+    rows, info = gii_rows(raw.body, raw_sha256=sha, retrieved_at=raw.retrieved_at)
+    reg = run.register(
+        dataset=ds,
+        frame=atlas_frame(rows),
+        raw_sha256s=[sha],
+        geo_scheme="iso3",
+        coverage_note="GII 2025 composite levels (Index, Sub-Index, Pillar, Sub-Pillar): score and rank only.",
+        rights=GII_RIGHTS,
+    )
+    return {"economies": info["economies"], "atlas": trim_registration(reg)}
 
 
 # ----------------------------------------------------------------------------- zip helpers
@@ -612,8 +612,8 @@ __all__ = [
     "GEO_SCHEME",
     "GII_URL",
     "ZIPS",
-    "WipoGiiConnector",
-    "WipoIpStatsConnector",
+    "atlas_ingest",
+    "atlas_source",
     "bulk_frame",
     "bulk_members",
     "gii_rows",

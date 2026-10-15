@@ -139,10 +139,11 @@ def fetch_items() -> tuple[FetchItem, ...]:
     )
 
 
-def parse_file(key: str, body: bytes) -> list[dict[str, str]]:
+def parse_file(key: str, body: bytes, *, strict: bool = True) -> list[dict[str, str]]:
+    """``strict``: enforce the minimum row count (truncation guard); relaxed only for trimmed test fixtures."""
     _path, member, min_rows = FILES[key]
     rows = read_csv_member(body, member, encoding=ENCODINGS.get(key, "utf-8-sig"))
-    if len(rows) < min_rows:
+    if strict and len(rows) < min_rows:
         raise UcdpParseError(
             f"UCDP {key}: {len(rows)} rows < expected {min_rows} (truncated?)", retryable=False, kind="incomplete"
         )
@@ -210,7 +211,7 @@ def orgvio_atlas_rows(
                     "concept_id": None,
                     "iso3": res.iso3,
                     "provider_geo": f"gw:{gw}",
-                    "entity_qid": None,
+                    "entity_qid": res.qid,
                     "period_start": start,
                     "period_end": end,
                     "value": v,
@@ -282,7 +283,7 @@ def acd_country_year_rows(
                 "concept_id": None,
                 "iso3": res.iso3,
                 "provider_geo": f"gw:{gw}",
-                "entity_qid": None,
+                "entity_qid": res.qid,
                 "period_start": start,
                 "period_end": end,
                 "value": str(len(cids)),
@@ -546,12 +547,13 @@ def build(
     crosswalk: StateCodeCrosswalk,
     qid_for_iso3: Mapping[str, str],
     countrycode_sha256: str | None = None,
+    strict: bool = True,
 ) -> dict[str, Any]:
     """Parse raw bytes into the two atlas frames and the KG records (no I/O)."""
     import hashlib
 
     shas = {k: hashlib.sha256(r.body).hexdigest() for k, r in raws.items()}
-    parsed = {k: parse_file(k, r.body) for k, r in raws.items()}
+    parsed = {k: parse_file(k, r.body, strict=strict) for k, r in raws.items()}
     cy = orgvio_atlas_rows(parsed["orgvio_cy"], raw_sha256=shas["orgvio_cy"], crosswalk=crosswalk)
     acd_cy = acd_country_year_rows(parsed["acd"], raw_sha256=shas["acd"], crosswalk=crosswalk)
     resolver = StateEntityResolver(crosswalk, qid_for_iso3)
@@ -588,7 +590,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         raws[it.key] = await run.get(
             it.url, key=f"{it.key}:{UCDP_VERSION}", media_types=it.expected_media_types, max_bytes=it.max_bytes
         )
-    out = build(raws, crosswalk=crosswalk, qid_for_iso3=load_qid_for_iso3(), countrycode_sha256=cc_sha)
+    out = build(
+        raws,
+        crosswalk=crosswalk,
+        qid_for_iso3=load_qid_for_iso3(),
+        countrycode_sha256=cc_sha,
+        strict=run.origin == "live",
+    )
     for raw in raws.values():  # parsed first: nothing archived on schema drift
         run.archive(raw)
     shas = out["shas"]

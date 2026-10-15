@@ -210,7 +210,7 @@ def test_recordings_match_current_specs_and_raw_bodies() -> None:
     assert recs, "no recorded probes"
     for rec in recs:
         body = (RECORDED / rec["raw_file"]).read_bytes()
-        assert _sha(body) == rec["raw_sha256"], rec["_path"].name
+        assert _sha(body) == rec["body_sha256"], rec["_path"].name
         sent = rec["query"]
         assert _sha(sent.strip().encode()) == rec["query_sha256"]
         if rec["kind"] == "membership":

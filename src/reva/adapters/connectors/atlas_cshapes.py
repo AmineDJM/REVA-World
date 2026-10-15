@@ -72,7 +72,10 @@ ATLAS_SOURCE = "cshapes"
 CSHAPES_VERSION = "2.0"
 PACKAGE_URL = "https://cran.r-project.org/src/contrib/cshapes_2.0.tar.gz"
 PACKAGE_ARCHIVE_URL = "https://cran.r-project.org/src/contrib/Archive/cshapes/cshapes_2.0.tar.gz"
-MEMBERS = {"gw": "cshapes/inst/extdata/cshapes_2_gw.topojson.xz", "cow": "cshapes/inst/extdata/cshapes_2_cow.topojson.xz"}
+MEMBERS = {
+    "gw": "cshapes/inst/extdata/cshapes_2_gw.topojson.xz",
+    "cow": "cshapes/inst/extdata/cshapes_2_cow.topojson.xz",
+}
 CODE_FIELD = {"gw": "gwcode", "cow": "cowcode"}
 MAX_BYTES = 10_000_000
 MAX_TOPOJSON = 60_000_000
@@ -169,7 +172,7 @@ def _num(v: Any) -> float | None:
     return None if v is None or v == "" else float(v)
 
 
-def parse_topojson(system: str, blob_xz: bytes) -> list[Polity]:
+def parse_topojson(system: str, blob_xz: bytes, *, strict: bool = True) -> list[Polity]:
     try:
         data = lzma.LZMADecompressor().decompress(blob_xz, max_length=MAX_TOPOJSON)
         topo = json.loads(data)
@@ -179,7 +182,7 @@ def parse_topojson(system: str, blob_xz: bytes) -> list[Polity]:
         raise CshapesParseError("unexpected TopoJSON structure", retryable=False, kind="schema_drift")
     arcs = _decode_arcs(topo)
     geoms = next(iter(topo["objects"].values()))["geometries"]
-    if len(geoms) < MIN_POLITIES[system]:
+    if strict and len(geoms) < MIN_POLITIES[system]:
         raise CshapesParseError(f"only {len(geoms)} polities (truncated?)", retryable=False, kind="incomplete")
     out = []
     for i, g in enumerate(geoms):
@@ -252,9 +255,7 @@ def adjacency(polities: Sequence[Polity]) -> list[tuple[int, int, date, date, li
 # ----------------------------------------------------------------------------- atlas + polygons
 
 
-def polity_rows(
-    polities: Sequence[Polity], *, raw_sha256: str, crosswalk: StateCodeCrosswalk
-) -> list[dict[str, Any]]:
+def polity_rows(polities: Sequence[Polity], *, raw_sha256: str, crosswalk: StateCodeCrosswalk) -> list[dict[str, Any]]:
     from reva.atlas.tables import json_obj
 
     out = []
@@ -291,7 +292,7 @@ def polity_rows(
                     "concept_id": None,
                     "iso3": res.iso3,
                     "provider_geo": f"{system}:{p.code}",
-                    "entity_qid": None,
+                    "entity_qid": res.qid,
                     "period_start": p.start,
                     "period_end": p.end + timedelta(days=1),
                     "value": None,
@@ -491,9 +492,13 @@ def build(
     crosswalk: StateCodeCrosswalk,
     qid_for_iso3: Mapping[str, str],
     countrycode_sha256: str | None = None,
+    strict: bool = True,
 ) -> dict[str, Any]:
     sha = hashlib.sha256(package_body).hexdigest()
-    pols = {s: parse_topojson(s, extract_tar_member(package_body, m, max_bytes=MAX_BYTES)) for s, m in MEMBERS.items()}
+    pols = {
+        s: parse_topojson(s, extract_tar_member(package_body, m, max_bytes=MAX_BYTES), strict=strict)
+        for s, m in MEMBERS.items()
+    }
     resolver = StateEntityResolver(crosswalk, qid_for_iso3)
     ents, stmts = kg_records(pols["gw"], raw_sha256=sha, resolver=resolver)
     if countrycode_sha256:
@@ -542,8 +547,12 @@ def register_polygons(run: Any, table: Any, raw_sha256: str) -> dict[str, Any]:
             actor=run.actor,
             rights=RIGHTS,
         )
-    return {"dataset_key": rec.dataset_key, "row_count": rec.row_count, "created": rec.created,
-            "artifact_sha256": rec.artifact_sha256}
+    return {
+        "dataset_key": rec.dataset_key,
+        "row_count": rec.row_count,
+        "created": rec.created,
+        "artifact_sha256": rec.artifact_sha256,
+    }
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
@@ -552,26 +561,47 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     crosswalk, cc_sha = await fetch_countrycode(run)
     media = ("application/x-gzip", "application/gzip", "application/octet-stream", "application/x-tar")
     try:
-        raw: RawAcquisition = await run.get(PACKAGE_URL, key=f"cshapes:{CSHAPES_VERSION}", media_types=media,
-                                            max_bytes=MAX_BYTES)
+        raw: RawAcquisition = await run.get(
+            PACKAGE_URL, key=f"cshapes:{CSHAPES_VERSION}", media_types=media, max_bytes=MAX_BYTES
+        )
     except _SRE:
-        raw = await run.get(PACKAGE_ARCHIVE_URL, key=f"cshapes:{CSHAPES_VERSION}", media_types=media,
-                            max_bytes=MAX_BYTES)
-    out = build(raw.body, crosswalk=crosswalk, qid_for_iso3=load_qid_for_iso3(), countrycode_sha256=cc_sha)
+        raw = await run.get(
+            PACKAGE_ARCHIVE_URL, key=f"cshapes:{CSHAPES_VERSION}", media_types=media, max_bytes=MAX_BYTES
+        )
+    out = build(
+        raw.body,
+        crosswalk=crosswalk,
+        qid_for_iso3=load_qid_for_iso3(),
+        countrycode_sha256=cc_sha,
+        strict=run.origin == "live",
+    )
     sha = run.archive(raw)
     res: dict[str, Any] = {"atlas": {}, "polities": {s: len(p) for s, p in out["polities"].items()}}
     for ds, rows in out["atlas"].items():
         if run.wants(ds):
-            r = run.register(dataset=ds, frame=atlas_frame(rows), raw_sha256s=[sha], rights=RIGHTS,
-                             coverage_note=f"CShapes {CSHAPES_VERSION} polity periods 1886-2019 ({ds[-3:].upper()} "
-                             "coding), incl. dependencies; CC BY-NC-SA 4.0")
+            r = run.register(
+                dataset=ds,
+                frame=atlas_frame(rows),
+                raw_sha256s=[sha],
+                rights=RIGHTS,
+                coverage_note=f"CShapes {CSHAPES_VERSION} polity periods 1886-2019 ({ds[-3:].upper()} "
+                "coding), incl. dependencies; CC BY-NC-SA 4.0",
+            )
             res["atlas"][ds] = {k: r[k] for k in ("dataset_key", "row_count", "created")}
             res["atlas"][ds]["unmapped_provider_geo"] = len(r["unmapped_provider_geo"])
     if run.dataset is None:
         res["polygons"] = register_polygons(run, out["polygons"], sha)
     res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
     if run.dataset is None and kg_available(run.engine):
-        res["kg"] = load_kg(run.engine, run.store, out["entities"], out["statements"], source_key=SOURCE_KEY,
-                            source_revision=f"cshapes-{CSHAPES_VERSION}", raw_sha256s=[sha, cc_sha],
-                            retrieved_at=raw.retrieved_at, origin=run.origin)
+        res["kg"] = load_kg(
+            run.engine,
+            run.store,
+            out["entities"],
+            out["statements"],
+            source_key=SOURCE_KEY,
+            source_revision=f"cshapes-{CSHAPES_VERSION}",
+            raw_sha256s=[sha, cc_sha],
+            retrieved_at=raw.retrieved_at,
+            origin=run.origin,
+        )
     return res

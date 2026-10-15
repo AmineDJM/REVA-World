@@ -185,6 +185,7 @@ BUDGETED = {  # file -> markers that must all be present (reserve before, meter/
     "src/reva/autonomy/jobs.py": ("reserve_discovery(", "settle_discovery(", "max_requests=reservation.max_requests"),
     "src/reva/nl/service.py": ("ledger.reserve", "ledger.settle"),
     "src/reva/atlas/ingest.py": ("reserve_ingest(", "metered(", "settle_metered(", "except BudgetExhausted"),
+    "src/reva/kg/harvest.py": ("reserve_ingest(", "metered(", "settle_metered(", "except BudgetExhausted"),
 }
 NOT_PROVIDER_EGRESS = {
     "src/reva/evidence/runner.py": "defines make_live_client (callers are budgeted)",

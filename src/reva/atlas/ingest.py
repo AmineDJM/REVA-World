@@ -62,6 +62,41 @@ class AtlasRun:
             raise ValidationProblem("dataset not declared by the atlas source", dataset=dataset, source=self.spec.name)
         return self.dataset is None or self.dataset == dataset
 
+    @classmethod
+    def offline(cls, spec: AtlasSourceSpec, http: Any) -> AtlasRun:
+        """A run that can only fetch (parser tests): no engine/store, so ``archive``/``register`` fail."""
+        return cls(
+            spec=spec,
+            http=http,
+            engine=None,  # type: ignore[arg-type]
+            store=None,  # type: ignore[arg-type]
+            settings=None,
+            origin=str(getattr(http, "origin", "test_fixture")),
+        )
+
+    def _cap(self, max_bytes: int | None) -> int:
+        return min(max_bytes or self.spec.max_response_bytes, self.spec.max_response_bytes)
+
+    def _raw(
+        self, r: Any, *, url: str, key: str, media_types: tuple[str, ...], cap: int, params: dict[str, Any] | None,
+        fingerprint: str, extra_headers: dict[str, str] | None = None,
+    ) -> Any:
+        from reva.ports.connectors import FetchItem, RawAcquisition
+
+        item = FetchItem(key=key, url=url, expected_media_types=media_types, max_bytes=cap, params=params or {})
+        meta = r.response_metadata()
+        if extra_headers:
+            meta["headers"] = {**meta.get("headers", {}), **extra_headers}
+        return RawAcquisition(
+            item=item,
+            body=r.body,
+            media_type=r.media_type or media_types[0],
+            retrieved_at=r.retrieved_at,
+            response_metadata=meta,
+            request_fingerprint=fingerprint,
+            origin=self.origin,  # type: ignore[arg-type]
+        )
+
     async def get(
         self,
         url: str,
@@ -72,26 +107,73 @@ class AtlasRun:
         max_bytes: int | None = None,
         params: dict[str, Any] | None = None,
     ) -> Any:
-        """GET one item through the run's client and return a ``RawAcquisition`` (not yet archived)."""
-        from reva.adapters.http.safe_client import request_fingerprint
-        from reva.ports.connectors import FetchItem, RawAcquisition
+        """GET one item through the run's client and return a ``RawAcquisition`` (not yet archived).
+
+        ``params`` are kept on the acquisition's item (connector bookkeeping, e.g. which variable a
+        metadata document describes); they are not sent."""
+        from reva.adapters.http.safe_client import SECRET_QUERY_PARAMS, request_fingerprint
 
         if self.is_cancelled():
             raise PolicyDenied("atlas ingest cancelled")
-        cap = min(max_bytes or self.spec.max_response_bytes, self.spec.max_response_bytes)
-        item = FetchItem(key=key, url=url, expected_media_types=media_types, max_bytes=cap, params=params or {})
+        cap = self._cap(max_bytes)
         kw: dict[str, Any] = {"max_bytes": cap}
         if headers:
             kw["headers"] = headers
         r = await self.http.get(url, **kw)
-        return RawAcquisition(
-            item=item,
-            body=r.body,
-            media_type=r.media_type or media_types[0],
-            retrieved_at=r.retrieved_at,
-            response_metadata=r.response_metadata(),
-            request_fingerprint=request_fingerprint("GET", url),
-            origin=self.origin,  # type: ignore[arg-type]
+        fp = request_fingerprint("GET", url, secret_params=tuple(SECRET_QUERY_PARAMS))
+        return self._raw(r, url=url, key=key, media_types=media_types, cap=cap, params=params, fingerprint=fp)
+
+    async def get_range(
+        self,
+        url: str,
+        *,
+        key: str,
+        start: int | None = None,
+        end: int | None = None,
+        suffix: int | None = None,
+        if_range: str | None = None,
+        media_types: tuple[str, ...] = ("application/octet-stream",),
+        params: dict[str, Any] | None = None,
+    ) -> Any:
+        """GET one HTTP byte range (``start``..``end`` inclusive, or the last ``suffix`` bytes).
+
+        Metered like :meth:`get` (one request, the bytes served). Only ``206 Partial Content`` is
+        accepted; ``if_range`` (an ETag) makes a changed resource answer 200 with the whole file,
+        which is refused (status) or capped (size), so ranges of two versions never mix. The
+        acquisition's fingerprint includes the range and its metadata keeps ``content-range``."""
+        import hashlib
+
+        from reva.adapters.http.safe_client import redact_url
+
+        if self.is_cancelled():
+            raise PolicyDenied("atlas ingest cancelled")
+        if suffix is not None:
+            if start is not None or end is not None or suffix <= 0:
+                raise ValidationProblem("byte range: give either suffix > 0 or start <= end")
+            spec, size = f"-{suffix}", suffix
+        else:
+            if start is None or end is None or start < 0 or end < start:
+                raise ValidationProblem("byte range: give either suffix > 0 or start <= end", start=start, end=end)
+            spec, size = f"{start}-{end}", end - start + 1
+        cap = self._cap(size)
+        if cap < size:
+            raise ValidationProblem("byte range larger than the source's max_response_bytes", bytes=size, cap=cap)
+        headers = {"Range": f"bytes={spec}"}
+        if if_range:
+            headers["If-Range"] = if_range
+        r = await self.http.get(url, headers=headers, max_bytes=cap, accept_status=(206,))
+        if r.status != 206:
+            raise ValidationProblem("byte range request was not answered with 206", status=r.status)
+        fp = hashlib.sha256(f"GET {redact_url(url)} Range: bytes={spec}".encode()).hexdigest()
+        return self._raw(
+            r,
+            url=url,
+            key=key,
+            media_types=media_types,
+            cap=cap,
+            params={**(params or {}), "range": spec, **({"if_range": if_range} if if_range else {})},
+            fingerprint=fp,
+            extra_headers={"content-range": r.headers.get("content-range", "")},
         )
 
     def archive(self, raw: Any) -> str:
@@ -139,6 +221,86 @@ class AtlasRun:
         return out
 
 
+class ArchiveRangeFixtureHttp:
+    """Fixture client for sources read by HTTP byte ranges of one archive (e.g. WID).
+
+    ``tests/fixtures/source/<name>/manifest.json`` is then an object
+    ``{"kind": "byte_range_archive", "url", "file", "sha256", "etag", "retrieved_at"}``: the
+    file is served like the provider does (206 + ``Content-Range`` + ``ETag``); a request whose
+    ``If-Range`` differs from the ETag is refused like a changed archive. Never charged."""
+
+    origin = "test_fixture"
+
+    def __init__(self, connector_name: str, root: Any = None, etag: str | None = None) -> None:
+        import hashlib
+        from pathlib import Path
+
+        from reva.evidence.runner import FIXTURE_ROOT
+
+        d = Path(root or FIXTURE_ROOT) / connector_name
+        man = json.loads((d / "manifest.json").read_text())
+        if not isinstance(man, dict) or man.get("kind") != "byte_range_archive":
+            raise ValidationProblem("not a byte-range archive fixture", connector=connector_name)
+        self.url, self.etag = str(man["url"]), str(man["etag"])
+        self.serve_etag = etag or self.etag
+        self.body = (d / man["file"]).read_bytes()
+        if hashlib.sha256(self.body).hexdigest() != man["sha256"]:
+            raise ValidationProblem("fixture bytes do not match the manifest hash", connector=connector_name)
+        self.retrieved_at = datetime.fromisoformat(man.get("retrieved_at", "2026-10-15T00:00:00+00:00"))
+        self.requests: list[dict[str, str]] = []
+
+    async def get(
+        self, url: str, *, headers: dict[str, str] | None = None, max_bytes: int | None = None, **_: Any
+    ) -> Any:
+        from reva.adapters.http.safe_client import HttpResult
+        from reva.kernel.errors import SourceResponseError
+
+        h = dict(headers or {})
+        self.requests.append(h)
+        if url != self.url:
+            raise SourceResponseError("no captured fixture for this URL", retryable=False, kind="fixture_missing")
+        if "If-Range" in h and h["If-Range"] != self.serve_etag:
+            raise SourceResponseError("HTTP 200 (If-Range mismatch: whole file) refused", retryable=False)
+        spec = h.get("Range", "").removeprefix("bytes=")
+        n = len(self.body)
+        if not spec:
+            raise SourceResponseError("byte-range fixture requires a Range header", retryable=False)
+        if spec.startswith("-"):
+            a, b = max(0, n - int(spec[1:])), n - 1
+        else:
+            a, b = (int(x) for x in spec.split("-"))
+            b = min(b, n - 1)
+        chunk = self.body[a : b + 1]
+        if max_bytes is not None and len(chunk) > max_bytes:
+            raise SourceResponseError("fixture range larger than max_bytes", retryable=False)
+        return HttpResult(
+            url,
+            url,
+            206,
+            {"content-range": f"bytes {a}-{b}/{n}", "etag": self.serve_etag, "content-type": "application/zip"},
+            chunk,
+            self.retrieved_at,
+            0.0,
+            (),
+            1,
+        )
+
+    async def aclose(self) -> None:
+        return None
+
+
+def fixture_http(connector_name: str) -> Any:
+    """The fixture client of an atlas source: captured responses, or a byte-range archive."""
+    from reva.evidence.runner import FIXTURE_ROOT, FixtureHttp
+
+    man = FIXTURE_ROOT / connector_name / "manifest.json"
+    if man.exists():
+        doc = json.loads(man.read_text())
+        if isinstance(doc, dict) and doc.get("kind") == "byte_range_archive":
+            return ArchiveRangeFixtureHttp(connector_name)
+    return FixtureHttp(connector_name)
+
+
 def _live_client(spec: AtlasSourceSpec, settings: Any) -> Any:
     from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
     from reva.adapters.http.safe_client import SafeHttpClient
@@ -168,7 +330,6 @@ async def run_atlas_ingest(
     is_cancelled: Callable[[], bool] = lambda: False,
 ) -> dict[str, Any]:
     """Run one atlas source (see module doc). ``http_factory`` replaces the live client (tests)."""
-    from reva.evidence.runner import FixtureHttp
     from reva.operations.budgets import BudgetExhausted, load_budget, metered, reserve_ingest, settle_metered
 
     entry = get_source(source)
@@ -185,7 +346,7 @@ async def run_atlas_ingest(
     started = datetime.now(UTC)
     reservation = None
     if mode == "fixture":
-        http: Any = FixtureHttp(spec.name)
+        http: Any = fixture_http(spec.name)
     else:
         budget = load_budget()
         # Invariant 30: reserve before the first request; a run that does not fit is not started.

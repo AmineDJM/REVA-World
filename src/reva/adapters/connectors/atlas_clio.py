@@ -430,9 +430,10 @@ class ClioConnector:
         for fr in files:
             doi = fr.item.params["doi"]
             fname = fr.item.params["filename"]
-            rec = recs.get(doi)
-            if rec is None:
+            frec = recs.get(doi)
+            if frec is None:
                 raise _err(f"data file {fname} without its dataset record")
+            rec = frec
             if rec["licence"] not in ALLOWED_LICENCES:
                 continue  # rights unknown: never published (listed in skipped)
             sha1 = fr.item.params.get("sha1")

@@ -222,6 +222,9 @@ LIED_LABELS: dict[str, dict[str, str]] = {
                               "democratic_transition", "democratic_breakdown", "turnover_period", "turnover_event",
                               "two_turnover_period")},
 }
+#: Indices whose codes must all be documented (an unknown level means the scale changed): fail closed.
+LIED_STRICT = frozenset({"lexical_index", "lexical_index_plus"})
+UNDOCUMENTED_NOTE = "code not defined in the LIED description (1=present, 0=absent); reported value kept, no label"
 LIED_UNITS: dict[str, str] = {"lexical_index": "ordinal 0-6", "lexical_index_plus": "ordinal 0-7",
                               "transition_type": "category code", "breakdown_type": "category code"}
 
@@ -357,13 +360,17 @@ def lied_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mapp
                 continue
             labels = LIED_LABELS.get(ind)
             label = labels.get(v) if labels else None
+            cell_flags = flags
             if labels and label is None:
-                raise _err(f"LIED {ind}: code {v} has no label (row {r['_row']})")
+                if ind in LIED_STRICT:
+                    raise _err(f"LIED {ind}: code {v} has no label (row {r['_row']})")
+                # Reported as is (e.g. Botswana 1961-1965 legislative_elections = 2 in v6.9): kept, unlabelled, flagged.
+                cell_flags = _canon({**json.loads(flags), "undocumented_code": UNDOCUMENTED_NOTE})
             out.append({
                 "source": "lied", "dataset": "lied", "indicator": ind, "concept_id": None, "iso3": None,
                 "provider_geo": geo, "entity_qid": qids.get(geo), "period_start": date(y, 1, 1),
                 "period_end": date(y + 1, 1, 1), "value": v, "value_text": label,
-                "unit": LIED_UNITS.get(ind, "0/1"), "flags": flags, "raw_sha256": raw_sha256,
+                "unit": LIED_UNITS.get(ind, "0/1"), "flags": cell_flags, "raw_sha256": raw_sha256,
                 "selector": _canon({"file": LIED_FILENAME, "sheet": "Sheet1", "row": r["_row"], "column": ind}),
             })
     return _frame(out)
@@ -438,10 +445,15 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     if which == "lied":
         rows = parse_lied(raws["lied.file"].body, min_rows=LIED_MIN_ROWS if live else 1)
         frame = lied_frame(rows, raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
+        undocumented = frame.filter(frame["flags"].str.contains("undocumented_code"))
+        extra = {"undocumented_code_cells": [
+            {"provider_geo": g, "indicator": i, "year": d.year, "value": v}
+            for g, i, d, v in undocumented.select("provider_geo", "indicator", "period_start", "value").iter_rows()]}
         note = (f"LIED v{LIED_VERSION} ({LIED_FILENAME}), 1789-2025, status on 31 December; units keyed "
                 "'<countryn>|vdem=<id>'; historical polities and colonies without a crosswalk entity kept unmapped. CC0.")
         rights = RIGHTS_LIED
     else:
+        extra = {}
         rows = parse_bmr(raws["bmr.file"].body, min_rows=BMR_MIN_ROWS if live else 1)
         frame = bmr_frame(rows, raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
         note = (f"BMR v{BMR_VERSION} ({BMR_FILENAME}), 1800-2020, sovereign states keyed by COW code; West Germany, "
@@ -449,7 +461,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         rights = RIGHTS_BMR
     reg = run.register(dataset=which, frame=frame, raw_sha256s=[shas[f"{which}.file"]], geo_scheme=which,
                        coverage_note=note, rights={**rights, "record": meta, "record_raw_sha256": shas[f"{which}.record"]})
-    return {"record": meta, "rows_parsed": len(rows),
+    return {"record": meta, "rows_parsed": len(rows), **extra,
             "table": {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")}}
 
 

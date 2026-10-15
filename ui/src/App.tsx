@@ -9,6 +9,7 @@ import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProvenanceProvider } from './components/ProvenanceDrawer';
 import { ErrorState, Loading } from './components/StateViews';
 import { LoginPage } from './pages/LoginPage';
+import { V3_NAV, V3_PALETTE } from './v3/screens';
 
 const WorldPage = lazy(() => import('./pages/WorldPage'));
 const CountryPage = lazy(() => import('./pages/CountryPage'));
@@ -21,6 +22,7 @@ const MapPage = lazy(() => import('./pages/MapPage'));
 const ComposerPage = lazy(() => import('./pages/ComposerPage'));
 const RunsPage = lazy(() => import('./pages/RunsPage'));
 const RunPage = lazy(() => import('./pages/RunPage'));
+const V3App = lazy(() => import('./v3/V3App'));
 
 const NAV = [
   { to: '/world', label: 'World' },
@@ -33,6 +35,7 @@ const NAV = [
   { to: '/runs', label: 'Runs' },
   { to: '/models', label: 'Models' },
   { to: '/acquisition', label: 'Acquisition' },
+  V3_NAV,
 ];
 
 type SessionState = { status: 'checking' } | { status: 'anonymous' } | { status: 'error'; error: unknown } | { status: 'ok'; session: SessionInfo };
@@ -105,7 +108,7 @@ export function App() {
             ))}
           </ul>
         </nav>
-        <CommandPalette screens={NAV} />
+        <CommandPalette screens={[...NAV, ...V3_PALETTE]} />
         <div className="session">
           <span>
             Signed in as <strong>{state.session.username}</strong>
@@ -132,6 +135,7 @@ export function App() {
             <Route path="/compose" element={<ComposerPage />} />
             <Route path="/runs" element={<RunsPage />} />
             <Route path="/runs/:id" element={<RunPage />} />
+            <Route path="/v3/*" element={<V3App />} />
             <Route path="/login" element={<Navigate to="/world" replace />} />
             <Route path="*" element={<p>Unknown screen. Choose a screen from the navigation.</p>} />
           </Routes>

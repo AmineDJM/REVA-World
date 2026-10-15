@@ -23,13 +23,14 @@ from __future__ import annotations
 
 import argparse
 import asyncio
+import contextlib
 import hashlib
 import json
 import logging
 import re
 import sys
 import time
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import AsyncIterator, Callable, Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
@@ -58,6 +59,7 @@ from reva.adapters.connectors.wikidata import (
     time_value_from_binding,
 )
 from reva.kernel.errors import RevaError
+from reva.operations.budgets import BudgetExhausted
 
 log = logging.getLogger("reva.kg.harvest")
 
@@ -922,57 +924,113 @@ def ensure_database(db_name: str) -> Any:
     return settings
 
 
-async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
-                      planned_wdqs: int = 50, planned_wbapi: int = 100) -> dict[str, Any]:
-    """Run specs into the throwaway database, metered by the budget ledger (one reservation per source)."""
+def live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, proxy_mode: str | None = None,
+              contact: str | None = None) -> Any:
+    """The raw SafeHttpClient for the two Wikidata hosts. Every ``src`` caller wraps it in the budget meter
+    (:func:`budgeted_client`); only offline-fixture capture tools in ``tests`` use it directly.
+
+    ``max_attempts=1``: retries/back-off are done by :class:`WikidataClient` (WDQS time-outs, 429/503, maxlag,
+    machine-wide cool-downs). The in-process rate limiter is a second guard behind the machine-wide lock.
+    """
+    from reva.adapters.connectors.wikidata import ALLOWED_HOSTS, DEFAULT_MIN_INTERVAL
+    from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
+    from reva.adapters.http.safe_client import SafeHttpClient
+
+    policies = {h: HostPolicy(min_interval_seconds=DEFAULT_MIN_INTERVAL, max_concurrency=1,
+                              max_retry_after_seconds=900.0) for h in ALLOWED_HOSTS}
+    return SafeHttpClient(allowed_hosts=ALLOWED_HOSTS, timeout_seconds=timeout_seconds, max_bytes=max_bytes,
+                          max_attempts=1, rate_limiter=RateLimiter(policies), proxy_mode=proxy_mode,  # type: ignore[arg-type]
+                          contact_email=contact)
+
+
+@dataclass
+class BudgetedSession:
+    client: WikidataClient
+    engine: Any
+    store: Any
+    run_id: str
+    usage: dict[str, Any] = field(default_factory=dict)
+
+
+@contextlib.asynccontextmanager
+async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wdqs: int = 1,
+                          planned_wbapi: int = 1) -> AsyncIterator[BudgetedSession]:
+    """The only live Wikidata entry point (invariant 30): reserve -> meter every request -> settle.
+
+    The ledger lives in the throwaway harvest database. ``reserve_ingest`` refuses a run that does not fit the
+    per-source/total daily budget (``BudgetExhausted``, nothing requested); ``metered`` tops the reservation up
+    per request or refuses it before the transport is called; ``settle_metered`` records actual usage whatever
+    happened. One reservation per source key (``wikidata.wdqs``, ``wikidata.wbapi``).
+    """
     import uuid
 
-    from reva.adapters.connectors.wikidata import make_live_http
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
     from reva.adapters.postgres.engine import make_engine
-    from reva.operations.budgets import MeteredHttp, reserve_ingest, settle_metered
+    from reva.operations.budgets import load_budget, metered, reserve_ingest, settle_metered
 
     settings = ensure_database(db_name)
     engine = make_engine("worker", settings)
     store = FilesystemArtifactStore(OBJECT_ROOT, settings.reva_s3_prefix)
-    run_id = f"kgharvest-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
+    run_id = f"kg{purpose}-{datetime.now(UTC).strftime('%Y%m%dT%H%M%S')}-{uuid.uuid4().hex[:6]}"
+    inner = live_http()
+    wdqs = wbapi = None
+    session: BudgetedSession | None = None
+    try:
+        budget = load_budget()
+        res_q = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WDQS,
+                               planned_requests=planned_wdqs, budget=budget)
+        res_a = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WBAPI,
+                               planned_requests=planned_wbapi, budget=budget)
+        wdqs = metered(inner, engine, res_q, budget=budget)
+        wbapi = metered(inner, engine, res_a, budget=budget)
+        client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"))
+        session = BudgetedSession(client, engine, store, run_id)
+        yield session
+    finally:
+        settled = [settle_metered(engine, h) for h in (wdqs, wbapi) if h is not None]
+        if session is not None:
+            session.usage["budget"] = settled
+        await inner.aclose()
+        engine.dispose()
+
+
+async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
+                      planned_wdqs: int = 50, planned_wbapi: int = 100) -> dict[str, Any]:
+    """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
     specs = discover_specs(paths or None)
     bad = {k: v for k, v in validate_all(specs, allow).items() if v}
     if bad:
         raise SpecError(f"invalid specs: {json.dumps(bad)[:1500]}")
-    http = make_live_http()
-    res_q = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WDQS, planned_requests=planned_wdqs)
-    res_a = reserve_ingest(engine, job_id=run_id, attempt=1, source_key=SOURCE_WBAPI, planned_requests=planned_wbapi)
-    wdqs = MeteredHttp(http, engine, res_q)
-    wbapi = MeteredHttp(http, engine, res_a)
-    client = WikidataClient(wdqs, wbapi, archive=Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl"))
-    sink = KgDbSink(engine, store)
-    out: dict[str, Any] = {"run_id": run_id, "database": db_name, "started_at": datetime.now(UTC).isoformat(),
+    out: dict[str, Any] = {"database": db_name, "started_at": datetime.now(UTC).isoformat(),
                            "allowlist_sha256": allow.sha256, "specs": []}
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
-    report_path = REPORT_DIR / f"{run_id}.json"
+    async with budgeted_client(purpose="harvest", db_name=db_name, planned_wdqs=planned_wdqs,
+                               planned_wbapi=planned_wbapi) as sess:
+        out["run_id"] = sess.run_id
+        report_path = REPORT_DIR / f"{sess.run_id}.json"
+        sink = KgDbSink(sess.engine, sess.store)
+        client = sess.client
 
-    def save(r: SpecReport) -> None:
-        out["specs"].append(r.as_dict())
-        out["client"] = client.stats.as_dict()
-        out["load_totals"] = dict(sink.totals)
-        report_path.write_text(json.dumps(out, indent=2, default=str))
-        log.info("spec %s: %s rows=%s seeds=%s full=%s labels=%s statements=%s req=%s %.0fs", r.spec_id,
-                 r.status, r.rows, r.seeds, r.entities_full, r.entities_labels, r.statements, r.requests, r.seconds)
+        def save(r: SpecReport) -> None:
+            out["specs"].append(r.as_dict())
+            out["client"] = client.stats.as_dict()
+            out["load_totals"] = dict(sink.totals)
+            report_path.write_text(json.dumps(out, indent=2, default=str))
+            log.info("spec %s: %s rows=%s seeds=%s full=%s labels=%s statements=%s req=%s %.0fs", r.spec_id,
+                     r.status, r.rows, r.seeds, r.entities_full, r.entities_labels, r.statements, r.requests,
+                     r.seconds)
 
-    try:
-        out["properties"] = sink.register_properties(allow)
-        h = Harvester(client, sink, allow=allow)
-        await run_specs(h, specs, force=force, on_report=save)
-    finally:
-        out["budget"] = [settle_metered(engine, wdqs), settle_metered(engine, wbapi)]
-        out["client"] = client.stats.as_dict()
-        out["load_totals"] = dict(sink.totals)
-        out["finished_at"] = datetime.now(UTC).isoformat()
-        report_path.write_text(json.dumps(out, indent=2, default=str))
-        await http.aclose()
-        engine.dispose()
+        try:
+            out["properties"] = sink.register_properties(allow)
+            await run_specs(Harvester(client, sink, allow=allow), specs, force=force, on_report=save)
+        finally:
+            out["client"] = client.stats.as_dict()
+            out["load_totals"] = dict(sink.totals)
+            report_path.write_text(json.dumps(out, indent=2, default=str))
+    out["budget"] = sess.usage.get("budget")
+    out["finished_at"] = datetime.now(UTC).isoformat()
+    report_path.write_text(json.dumps(out, indent=2, default=str))
     out["report_path"] = str(report_path)
     return out
 
@@ -1206,19 +1264,13 @@ def _print(obj: Any) -> None:
     print(json.dumps(obj, indent=2, ensure_ascii=False, default=str))
 
 
-def build_client(*, metered: Any = None, archive_root: Path | None = None) -> tuple[WikidataClient, list[Any]]:
-    """A live client. ``metered``: ``(wdqs_http, wbapi_http)`` already wrapped by the budget meter."""
-    from reva.adapters.connectors.wikidata import make_live_http
-    from reva.adapters.objects.filesystem import FilesystemArtifactStore
-
-    root = archive_root or (REPO_ROOT / "var" / "kg" / "objects")
-    store = FilesystemArtifactStore(root)
-    archive = Archive(store, REPO_ROOT / "var" / "kg" / "archive_index.jsonl")
-    if metered is not None:
-        wdqs, wbapi = metered
-        return WikidataClient(wdqs, wbapi, archive=archive), [wdqs, wbapi]
-    http = make_live_http()
-    return WikidataClient(http, archive=archive), [http]
+def _budget_guard(fn: Callable[[], Any]) -> int:
+    """Run a live command; a daily budget refusal is a typed outcome (exit 3), never a success."""
+    try:
+        return int(asyncio.run(fn()))
+    except BudgetExhausted as e:
+        _print({"status": "budget_exhausted", "message": e.message, **e.details})
+        return 3
 
 
 def main(argv: Sequence[str] | None = None) -> int:
@@ -1265,7 +1317,10 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 1
 
         async def go() -> int:
-            client, closers = build_client()
+            async with budgeted_client(purpose="try", planned_wdqs=1, planned_wbapi=0) as sess:
+                return await _try(sess.client)
+
+        async def _try(client: WikidataClient) -> int:
             try:
                 sink = NullSink()
                 h = Harvester(client, sink, allow=allow)
@@ -1286,14 +1341,16 @@ def main(argv: Sequence[str] | None = None) -> int:
             except WikidataError as e:
                 _print({"spec": spec.id, "error": e.code, "message": e.message})
                 return 1
-            finally:
-                for c in closers:
-                    await c.aclose()
 
-        return asyncio.run(go())
+        return _budget_guard(go)
     if args.cmd == "run":
-        run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
-                                      planned_wdqs=args.planned_wdqs, planned_wbapi=args.planned_wbapi))
+        try:
+            run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
+                                              planned_wdqs=args.planned_wdqs,
+                                              planned_wbapi=args.planned_wbapi))
+        except BudgetExhausted as e:
+            _print({"status": "budget_exhausted", "message": e.message, **e.details})
+            return 3
         keys = ("spec_id", "status", "rows", "seeds", "entities_full", "entities_labels", "statements", "requests",
                 "bytes", "seconds", "failures")
         spec_reports: list[dict[str, Any]] = run_out["specs"]
@@ -1302,26 +1359,19 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if all(r["status"] in ("done", "skipped") for r in spec_reports) else 1
     if args.cmd == "map-countries":
         async def mapc() -> int:
-            client, closers = build_client()
-            try:
-                _print(await map_countries(client, manual_titles=MANUAL_TITLES))
-                return 0
-            finally:
-                for c in closers:
-                    await c.aclose()
+            async with budgeted_client(purpose="mapcountries", planned_wdqs=1, planned_wbapi=10) as sess:
+                _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
+            _print({"budget": sess.usage.get("budget")})
+            return 0
 
-        return asyncio.run(mapc())
+        return _budget_guard(mapc)
     if args.cmd == "merge-property-requests":
         async def merge() -> int:
-            client, closers = build_client()
-            try:
-                _print(await merge_property_requests(client))
-                return 0
-            finally:
-                for c in closers:
-                    await c.aclose()
+            async with budgeted_client(purpose="properties", planned_wdqs=0, planned_wbapi=2) as sess:
+                _print(await merge_property_requests(sess.client))
+            return 0
 
-        return asyncio.run(merge())
+        return _budget_guard(merge)
     return 2
 
 

@@ -49,23 +49,13 @@ from __future__ import annotations
 
 import json
 from collections import defaultdict
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, datetime
 from typing import Any
 
-from reva.adapters.connectors.atlas_sci_common import atlas_frame, atlas_spec, canon, code_digest
-from reva.adapters.connectors.base import to_raw
+from reva.adapters.connectors.atlas_sci_common import atlas_frame, canon, code_digest, trim_registration
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import (
-    ConnectorSpec,
-    Cursor,
-    FetchBudget,
-    FetchItem,
-    FetchPlan,
-    ObservationBatch,
-    RawAcquisition,
-)
 
 CONNECTOR_NAME = "atlas.nobel"
 CONNECTOR_VERSION = "1.0.0"
@@ -234,52 +224,113 @@ def laureates_url(offset: int = 0, limit: int = PAGE_LIMIT) -> str:
     return f"https://{HOST}/2.1/laureates?limit={limit}&offset={offset}"
 
 
-class NobelAtlasConnector:
-    """Atlas bulk connector (archive raw -> atlas table + KG statements; no observations)."""
-
-    def describe(self) -> ConnectorSpec:
-        return atlas_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="Nobel Prize Outreach",
-            licence="CC0-1.0",
-            allowed_hosts=(HOST,),
-            dataset_ids=("laureates",),
-            field_mappings={"atlas": f"{ATLAS_SOURCE}.{ATLAS_DATASET}", "kg": ["P166", "P19"]},
-            units={"born": "laureate-prize records", "affiliated": "laureate-prize records"},
-            geography=tuple(sorted(set(COUNTRY_NOW_ISO3.values()))),
-            time_semantics="award year (calendar year of awardYear); birth country in present-day borders",
-            lineage_family="nobelprize",
-            cadence_seconds=30 * 86400,
-            release_aware=False,
-            revision_strategy="full snapshot per run; new bytes -> new atlas table version",
-            max_response_bytes=MAX_BYTES,
-            max_pages=5,
-            parser_version=PARSER_VERSION,
-            code_digest=code_digest(inspect_module()),
-        )
-
-    def plan(self, cursor: Cursor | None = None, budget: FetchBudget | None = None) -> FetchPlan:
-        return FetchPlan(
-            connector=CONNECTOR_NAME,
-            items=(FetchItem(key="laureates:0", url=laureates_url(0), max_bytes=MAX_BYTES, params={"offset": 0}),),
-            pagination="limit above the total; the parser refuses a page with fewer laureates than meta.count",
-            availability_expectation="updated after each October announcement",
-        )
-
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
-        return to_raw(item, result, getattr(http, "origin", "live"))
-
-    def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
-        return iter(())  # atlas connector: no evidence observations
-
-
-def inspect_module() -> Any:
+def atlas_source() -> Any:
+    """The atlas source spec (``reva.atlas.sources`` protocol)."""
     import sys
 
-    return sys.modules[__name__]
+    from reva.atlas.sources import AtlasSourceSpec
+
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Nobel Prize Outreach",
+        licence="CC0-1.0",
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=("laureates",),
+        cadence_seconds=30 * 86400,
+        planned_requests=1,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(sys.modules[__name__]),
+        field_mappings={"atlas": f"{ATLAS_SOURCE}.{ATLAS_DATASET}", "kg": sorted(KG_PROPERTIES)},
+        notes="one request (limit above the total); KG statements P166/P19 loaded with reva.kg.model.load_batch",
+    )
+
+
+async def atlas_ingest(run: Any, *, load_kg: bool = True) -> dict[str, Any]:
+    """Fetch every laureate, archive, register ``nobel.laureates`` and load the KG statements.
+
+    Fixture runs replay an excerpt of real records (see the fixture manifest), so the
+    completeness threshold is 1 there and :data:`MIN_EXPECTED_LAUREATES` live."""
+    if not run.wants(ATLAS_DATASET):
+        return {"skipped": ATLAS_DATASET}
+    min_expected = 1 if run.origin == "test_fixture" else MIN_EXPECTED_LAUREATES
+    raw = await run.get(laureates_url(0), key="laureates:0", max_bytes=MAX_BYTES)
+    sha = run.archive(raw)
+    records, info = parse_laureates(raw.body, min_expected=min_expected)
+    reg = run.register(
+        dataset=ATLAS_DATASET,
+        frame=frame(records, raw_sha256=sha, retrieved_at=raw.retrieved_at),
+        raw_sha256s=[sha],
+        geo_scheme="iso3",
+        coverage_note=(
+            "Counts of laureate-prize records per present-day birth country and per affiliation country at "
+            "award, computed by REVA from the complete Nobel API laureate list; Taiwan unmapped."
+        ),
+        rights=RIGHTS,
+    )
+    out: dict[str, Any] = {
+        "parse": info,
+        "unmapped_country_names": unmapped_names(records),
+        "atlas": trim_registration(reg),
+    }
+    if load_kg:
+        out["kg"] = load_kg_statements(run.engine, run.store, records, sha, raw.retrieved_at, run.origin)
+    return out
+
+
+def ensure_kg_properties(engine: Any) -> dict[str, int]:
+    """Register P166/P19 (idempotent) with WDHARVEST's definitions (``registry/kg/properties.yaml``)."""
+    from reva.adapters.connectors.wikidata import load_allowlist
+    from reva.kg.harvest import kg_properties
+    from reva.kg.model import register_properties
+
+    allow = load_allowlist()
+    missing = [p for p in KG_PROPERTIES if p not in allow]
+    if missing:
+        raise SourceResponseError(f"properties {missing} are not allow-listed", retryable=False, kind="kg_property")
+    props = [p for p in kg_properties(allow) if p.pid in KG_PROPERTIES]
+    return dict(register_properties(engine, props).__dict__)
+
+
+def load_kg_statements(
+    engine: Any, store: Any, records: Sequence[LaureatePrize], sha: str, retrieved_at: datetime, origin: str
+) -> dict[str, Any]:
+    """Load the Nobel statements; a typed ``blocked``/``failed`` result (nothing written) on error."""
+    from sqlalchemy.exc import DBAPIError
+
+    from reva.kernel.errors import RevaError
+    from reva.kg.model import load_batch
+
+    try:
+        ensure_kg_properties(engine)
+    except (RevaError, DBAPIError) as e:
+        return {"status": "blocked", "reason": f"KG properties not registrable: {str(getattr(e, 'message', e))[:300]}"}
+    kg = to_kg_statements(kg_statements(records, raw_sha256=sha, retrieved_at=retrieved_at))
+    try:
+        rep = load_batch(
+            engine,
+            store,
+            statements=kg,
+            source_key=SOURCE_KEY,
+            raw_sha256s=[sha],
+            retrieved_at=retrieved_at,
+            origin=origin,
+            parameters={"connector": CONNECTOR_NAME, "parser": PARSER_VERSION},
+        )
+    except RevaError as e:
+        return {"status": "failed", "error": e.message, "details": e.details}
+    d = rep.as_dict()
+    d.update(
+        status="loaded",
+        statements_built=len(kg),
+        laureate_prizes_without_qid=sum(1 for r in records if r.laureate_qid is None),
+    )
+    return d
 
 
 # ----------------------------------------------------------------------------- parsing
@@ -651,8 +702,9 @@ __all__ = [
     "CONNECTOR_NAME",
     "COUNTRY_NOW_ISO3",
     "LaureatePrize",
-    "NobelAtlasConnector",
+    "atlas_ingest",
     "atlas_rows",
+    "atlas_source",
     "frame",
     "kg_statements",
     "laureates_url",

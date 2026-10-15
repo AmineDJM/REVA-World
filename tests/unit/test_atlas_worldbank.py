@@ -67,13 +67,15 @@ def test_every_database_slice_validates_against_the_atlas_schema(key: str) -> No
 def test_values_are_the_provider_text_and_empty_cells_are_absent() -> None:
     f = frame(parsed("wdi"))
     [pop] = cell(f, "SP.POP.TOTL", "FRA", 2020)
-    assert pop["value"] == "67601110" and pop["iso3"] == "FRA" and pop["unit"] == "unspecified" or pop["unit"]
+    assert (pop["value"], pop["iso3"], pop["unit"]) == ("67601110", "FRA", "Unit")  # WDI "Unit of measure"
     assert json.loads(pop["selector"]) == {"column": "2020", "file": "WDICSV.csv", "row": 34}
     # ILO modelled unemployment starts in 1991: no 1960-1990 rows (never zero-filled)
     une = f.filter((pl.col("indicator") == "SL.UEM.TOTL.ZS") & (pl.col("provider_geo") == "DZA"))
     assert une["period_start"].min().year == 1991
     assert une["value"].is_not_null().all() and not (une["value"] == "0").any()
     assert f["value"].str.contains(wb.DECIMAL_RE).all()
+    [gdp] = cell(f, "NY.GDP.MKTP.CD", "FRA", 2020)
+    assert gdp["unit"] == "Current US$"
 
 
 def test_aggregates_are_excluded_and_listed() -> None:

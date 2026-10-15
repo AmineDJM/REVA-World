@@ -188,14 +188,14 @@ class Votes:
     cols: dict[str, list[Any]]
 
 
-def parse_votes(body: bytes) -> Votes:
+def parse_votes(body: bytes, *, strict: bool = True) -> Votes:
     from reva.adapters.connectors.atlas_rdata import RDataError, RealColumn, column_text, read_rdata_frame
 
     try:
         frame = read_rdata_frame(body, FRAME, COLUMNS)
     except RDataError as e:
         raise UngaParseError(f"UNVotes RData unreadable: {e}", retryable=False, kind="schema_drift") from e
-    if frame.nrows < MIN_ROWS:
+    if strict and frame.nrows < MIN_ROWS:
         raise UngaParseError(f"only {frame.nrows} rows (truncated?)", retryable=False, kind="incomplete")
     cols: dict[str, list[Any]] = {}
     for name, col in frame.columns.items():
@@ -398,7 +398,7 @@ def vote_rows(
                 "concept_id": None,
                 "iso3": res.iso3,
                 "provider_geo": f"cow:{cell.ccode if cell.ccode is not None else 'NA'}",
-                "entity_qid": None,
+                "entity_qid": res.qid,
                 "period_start": start,
                 "period_end": end,
                 "value": None,
@@ -470,7 +470,7 @@ def share_rows(
 
     # votes are grouped by the state the code denotes *at the vote date* (e.g. COW 365 = USSR until
     # 1991-12-20, then RUS): one group never mixes two states.
-    acc: dict[tuple[int, str | None, str | None, str, int, str], Counter[str]] = defaultdict(Counter)
+    acc: dict[tuple[int, str | None, str | None, str | None, str, int, str], Counter[str]] = defaultdict(Counter)
     cache: dict[tuple[int, date], Any] = {}
     for cell in cells:
         if not cell.usable or cell.ccode is None:
@@ -483,11 +483,11 @@ def share_rows(
         y = rc.date.year
         for issue in (*rc.issues, "all"):
             for grain, p in (("year", y), ("decade", y // 10 * 10)):
-                acc[(cell.ccode, res.iso3, res.label if res.iso3 is None else None, grain, p, issue)][
+                acc[(cell.ccode, res.iso3, res.label if res.iso3 is None else None, res.qid, grain, p, issue)][
                     VOTE[cell.vote]
                 ] += 1  # type: ignore[index]
     out = []
-    for (ccode, iso3, hist, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
+    for (ccode, iso3, hist, qid, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
         if grain == "year":
             start, end = year_period(p)
         else:
@@ -528,7 +528,7 @@ def share_rows(
                     "concept_id": None,
                     "iso3": iso3,
                     "provider_geo": geo,
-                    "entity_qid": None,
+                    "entity_qid": qid,
                     "period_start": start,
                     "period_end": end,
                     "value": val,
@@ -681,10 +681,11 @@ def build(
     qid_for_iso3: Mapping[str, str],
     kg_issues_only: bool = False,
     countrycode_sha256: str | None = None,
+    strict: bool = True,
 ) -> dict[str, Any]:
     meta = check_version(raws["version"].body, raws["votes"].body)
     sha = hashlib.sha256(raws["votes"].body).hexdigest()
-    v = parse_votes(raws["votes"].body)
+    v = parse_votes(raws["votes"].body, strict=strict)
     rcs, ok = rollcalls(v)
     cells, stats = vote_cells(v, ok)
     votes = vote_rows(cells, rcs, raw_sha256=sha, crosswalk=crosswalk)
@@ -715,7 +716,13 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         raws[it.key] = await run.get(
             it.url, key=f"{it.key}:{DATASET_VERSION}", media_types=it.expected_media_types, max_bytes=it.max_bytes
         )
-    out = build(raws, crosswalk=crosswalk, qid_for_iso3=load_qid_for_iso3(), countrycode_sha256=cc_sha)
+    out = build(
+        raws,
+        crosswalk=crosswalk,
+        qid_for_iso3=load_qid_for_iso3(),
+        countrycode_sha256=cc_sha,
+        strict=run.origin == "live",
+    )
     for raw in raws.values():
         run.archive(raw)
     note = (

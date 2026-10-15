@@ -63,7 +63,7 @@ def source_spec(
 def code_digest(*modules: Any) -> str:
     h = hashlib.sha256()
     for m in (inspect.getmodule(code_digest), *modules):
-        h.update(inspect.getsource(m).encode())  # type: ignore[arg-type]
+        h.update(inspect.getsource(m).encode())
     return "sha256:" + h.hexdigest()
 
 
@@ -145,7 +145,7 @@ class AtlasConnector(Protocol):
 async def fetch_plain(item: FetchItem, http: Any, origin: str | None = None) -> RawAcquisition:
     """GET ``item.url`` through the given client and wrap it as a raw acquisition."""
     r = await http.get(item.url, max_bytes=item.max_bytes)
-    return to_raw(item, r, origin or getattr(http, "origin", "live"))
+    return to_raw(item, r, str(origin or getattr(http, "origin", "live")))
 
 
 async def fetch_all(connector: AtlasConnector, http: Any, *, max_requests: int = 400) -> list[RawAcquisition]:
@@ -221,7 +221,8 @@ async def ingest_with_run(run: Any, connector: AtlasConnector, *, max_requests: 
 def _historical_doc() -> dict[str, Any]:
     if not HISTORICAL_QIDS_PATH.exists():
         return {"entries": []}
-    return json.loads(HISTORICAL_QIDS_PATH.read_text())
+    doc: dict[str, Any] = json.loads(HISTORICAL_QIDS_PATH.read_text())
+    return doc
 
 
 def historical_qids(provider: str) -> list[dict[str, Any]]:

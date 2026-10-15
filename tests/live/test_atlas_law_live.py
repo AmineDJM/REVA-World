@@ -1,10 +1,10 @@
-"""Live ingest of the A-LAW atlas connectors into the throwaway test database (deselected by default).
+"""Live ingest of the A-LAW atlas sources into the throwaway test database (deselected by default).
 
-Runs WBL (3 XLSX), Constitute (1 JSON), CCP (chronology ZIP; characteristics refused before any
-request by the 50 MB response bound), the Factbook legal fields (255 JSON files at a pinned commit)
-and the SSA SSPTW access probe through the budget path of the ingest job (``reserve_ingest`` ->
-``metered`` -> ``settle_metered``, pinned ``registry/policies/budgets.yaml``). The ``db`` fixture's
-database and object root are temporary.
+Goes through the ATLASCORE entry point ``reva.atlas.ingest.run_atlas_ingest(mode="live")``: budget
+reservation on each source's key, the platform's metered SafeHttpClient (this test builds no client),
+settlement with actual usage. WBL (3 XLSX), Constitute (1 JSON), CCP (chronology + 118 MB
+characteristics ZIP), the Factbook legal fields (255 JSON at a pinned commit) and the SSA SSPTW probe.
+The ``db`` fixture's database and object root are temporary.
 
 ``REVA_LAW_LIVE_OUT=<path.json>`` writes the per-country coverage used by docs/dev/v3_a_law.md.
 """
@@ -13,36 +13,26 @@ from __future__ import annotations
 
 import json
 import os
-import uuid
 from typing import Any
 
 import polars as pl
 import pytest
 
 from reva.adapters.connectors import atlas_ccp, atlas_constitute, atlas_factbook, atlas_ssa_ssptw, atlas_wbl
-from reva.adapters.connectors.atlas_law_common import register_connector
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered
 from reva.atlas.tables import known_country_keys, read_atlas_table
-from reva.evidence.runner import make_live_client
-from reva.operations.budgets import metered, reserve_ingest, settle_metered
 
 pytestmark = [pytest.mark.live, pytest.mark.db]
 
 
-async def _live(db: Any, module: Any, conn: Any, planned: int, **kw: Any) -> dict[str, Any]:
-    spec = conn.describe()
-    register_connector(db.owner, db.store, spec)
-    reservation = reserve_ingest(
-        db.worker, job_id=uuid.uuid4(), attempt=1, source_key=spec.source_key, planned_requests=planned
-    )
-    http = metered(make_live_client(spec, db.settings), db.worker, reservation)
-    try:
-        rep = await module.run(db.worker, db.store, http, origin="live", **kw)
-    finally:
-        budget = settle_metered(db.worker, http)
-        await http.aclose()
-    out = rep.as_dict()
-    out["budget"] = budget
-    return out
+async def _live(db: Any, module: Any) -> dict[str, Any]:
+    spec = module.atlas_source()
+    ensure_registered(db.owner, db.store, spec)
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="live")
+    rep = dict(out["summary"] or {})
+    rep["platform_status"], rep["budget"] = out["status"], out["budget"]
+    return rep
 
 
 def _latest(frame: pl.DataFrame, indicator: str, *, numeric: bool = True) -> dict[str, tuple[str, str]]:
@@ -55,22 +45,30 @@ def _latest(frame: pl.DataFrame, indicator: str, *, numeric: bool = True) -> dic
 async def test_live_ingest_law(db) -> None:
     out: dict[str, Any] = {"runs": {}}
     runs = out["runs"]
-    runs["wbl"] = await _live(db, atlas_wbl, atlas_wbl.WblConnector(), 3)
-    runs["constitute"] = await _live(db, atlas_constitute, atlas_constitute.ConstituteConnector(), 1)
-    runs["ccp"] = await _live(db, atlas_ccp, atlas_ccp.CcpConnector(), 1)
-    runs["factbook"] = await _live(db, atlas_factbook, atlas_factbook.FactbookConnector(), 255)
-    runs["ssa"] = await _live(db, atlas_ssa_ssptw, atlas_ssa_ssptw.SsaSsptwConnector(), 1)
+    for key, module in (
+        ("wbl", atlas_wbl),
+        ("constitute", atlas_constitute),
+        ("ccp", atlas_ccp),
+        ("factbook", atlas_factbook),
+        ("ssa", atlas_ssa_ssptw),
+    ):
+        runs[key] = await _live(db, module)
 
     assert runs["wbl"]["status"] == "ok", runs["wbl"]
     assert runs["constitute"]["status"] == "ok", runs["constitute"]
-    assert [b["reason"] for b in runs["ccp"]["blocked"]] == ["response_cap"] and runs["ccp"]["tables"]
+    assert runs["ccp"]["status"] == "ok", runs["ccp"]
     assert runs["factbook"]["tables"], runs["factbook"]
     assert runs["ssa"]["status"] == "blocked"  # typed, nothing extracted
 
     tables = {t["dataset_key"]: t for r in runs.values() for t in r["tables"]}
     frames = {k: read_atlas_table(db.store, t["artifact_sha256"]) for k, t in tables.items()}
     wbl26, wbl1, panel = frames["atlas.wbl.wbl2026"], frames["atlas.wbl.wbl1_2026"], frames["atlas.wbl.panel_1971_2024"]
-    con, chron, fb = frames["atlas.constitute.constitutions"], frames["atlas.ccp.chronology_v6"], frames["atlas.factbook.legal_2026_01"]
+    con, chron, fb = (
+        frames["atlas.constitute.constitutions"],
+        frames["atlas.ccp.chronology_v6"],
+        frames["atlas.factbook.legal_2026_01"],
+    )
+    chars = frames["atlas.ccp.characteristics_v5"]
     per: dict[str, dict[str, Any]] = {k: {} for k in sorted(known_country_keys())}
     cols = {
         "constitution_year_enacted": (con, "in_force.year_enacted", True),
@@ -83,6 +81,11 @@ async def test_live_ingest_law(db) -> None:
         "retire_full_men_text": (wbl26, "Pen_Law_PensAgeEq_FullM", False),
         "marriage_18_both": (wbl26, "Saf_Law_ChildMarr_Age", False),
         "voting_age": (fb, "suffrage.minimum_age", True),
+        "const_votemin": (chars, "votemin", True),
+        "const_votemin_text": (chars, "votemin", False),
+        "const_cappun": (chars, "cappun", False),
+        "const_samesexm": (chars, "samesexm", False),
+        "ccp_systyear": (chars, "systyear", True),
         "suffrage_text": (fb, "suffrage", False),
         "legal_families": (fb, "legal_system.families_mentioned", False),
     }

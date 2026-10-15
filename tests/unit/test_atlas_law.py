@@ -25,7 +25,6 @@ from reva.atlas.catalog import load_catalog
 from reva.atlas.tables import country_iso3, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError, UnsafeRequest
-from reva.ports.connectors import FetchItem
 
 FIX = Path(__file__).resolve().parents[1] / "fixtures" / "source"
 
@@ -172,8 +171,9 @@ def test_ccp_chronology():
 
 def test_ccp_characteristics_codebook_transcription():
     body, sha = _fixture("atlas.ccp", "characteristics_subset.zip")
-    meta = json.loads((FIX / "atlas.ccp" / "characteristics_subset.json").read_text())
-    assert meta["sha256"] == sha and meta["real_bytes"] > atlas_ccp.MAX_SPEC_BYTES
+    meta = {e["file"]: e for e in json.loads((FIX / "atlas.ccp" / "manifest.json").read_text())}
+    derived = meta["characteristics_subset.zip"]["derived_from"]
+    assert meta["characteristics_subset.zip"]["sha256"] == sha and derived["real_bytes"] > 100_000_000
     rows = atlas_ccp.parse_characteristics(body, sha)
     frame, _ = _frame(rows, "ccp", "characteristics_v5", [sha], "ccp")
     usa = frame.filter((pl.col("iso3") == "USA") & (pl.col("period_start") == date(2020, 1, 1)))
@@ -207,16 +207,10 @@ def test_ccp_unknown_code_is_drift():
         atlas_ccp.parse_characteristics(out.getvalue(), sha)
 
 
-async def test_ccp_characteristics_blocked_by_response_bound_without_request():
-    class NoNetwork:
-        origin = "test_fixture"
-
-        async def get(self, url, **kw):  # pragma: no cover - must not be called
-            raise AssertionError("characteristics must not be requested")
-
-    rep = await atlas_ccp.run(None, None, NoNetwork(), origin="test_fixture", keys=["characteristics"])
-    assert rep.tables == [] and [b.reason for b in rep.blocked] == ["response_cap"]
-    assert rep.as_dict()["status"] == "blocked"
+def test_ccp_source_declares_the_bulk_response_bound():
+    spec = atlas_ccp.atlas_source()
+    assert spec.max_response_bytes >= 118_231_611  # the real characteristics ZIP (2026-10-15)
+    assert {"utexas.box.com", "utexas.app.box.com", "public.boxcloud.com"} <= set(spec.allowed_hosts)
 
 
 # ----------------------------------------------------------------------------- Factbook
@@ -257,55 +251,90 @@ def test_factbook_age_rule_is_conservative():
 # ----------------------------------------------------------------------------- SSA, fetch outcomes
 
 
+class _Run:
+    """Minimal stand-in for reva.atlas.ingest.AtlasRun (fetch-only paths; archive/register unused)."""
+
+    def __init__(self, http, datasets=("ssptw",)):
+        self.http, self.origin, self.datasets = http, "test_fixture", datasets
+
+    def wants(self, dataset):
+        return dataset in self.datasets
+
+    async def get(self, url, *, key, media_types=("application/json",), headers=None, max_bytes=None, params=None):
+        from reva.adapters.http.safe_client import request_fingerprint
+        from reva.ports.connectors import FetchItem, RawAcquisition
+
+        r = await self.http.get(url, max_bytes=max_bytes)
+        return RawAcquisition(
+            item=FetchItem(key=key, url=url, max_bytes=max_bytes or 1),
+            body=r.body,
+            media_type=r.media_type or media_types[0],
+            retrieved_at=r.retrieved_at,
+            response_metadata=r.response_metadata(),
+            request_fingerprint=request_fingerprint("GET", url),
+            origin="test_fixture",
+        )
+
+    def archive(self, raw):  # pragma: no cover - a blocked probe archives nothing
+        raise AssertionError("nothing must be archived")
+
+
 async def test_ssa_probe_is_typed_blocked():
-    rep = await atlas_ssa_ssptw.run(None, None, FixtureHttp(atlas_ssa_ssptw.CONNECTOR_NAME), origin="test_fixture")
-    assert rep.tables == [] and rep.raw == []
-    (b,) = rep.blocked
-    assert b.reason == "http_403" and b.http_status == 403 and rep.as_dict()["status"] == "blocked"
+    rep = await atlas_ssa_ssptw.atlas_ingest(_Run(FixtureHttp(atlas_ssa_ssptw.CONNECTOR_NAME)))
+    assert rep["tables"] == [] and rep["raw"] == [] and rep["status"] == "blocked"
+    (b,) = rep["blocked"]
+    assert b["reason"] == "http_403" and b["http_status"] == 403
 
 
-async def test_fetch_raw_maps_refusals_to_blocked():
-    item = FetchItem(key="x", url="https://example.org/x", max_bytes=10)
-
+async def test_fetch_maps_refusals_to_blocked():
     class Raises:
-        origin = "test_fixture"
-
         def __init__(self, exc):
             self.exc = exc
 
         async def get(self, url, **kw):
             raise self.exc
 
-    got = await atlas_law_common.fetch_raw(
-        Raises(SourceResponseError("HTTP 403", retryable=False, status=403)), item, "s"
+    url = "https://example.org/x"
+    got = await atlas_law_common.fetch(
+        _Run(Raises(SourceResponseError("HTTP 403", retryable=False, status=403))), url, key="x", source_key="s"
     )
     assert isinstance(got, atlas_law_common.Blocked) and got.reason == "http_403"
-    got = await atlas_law_common.fetch_raw(
-        Raises(UnsafeRequest("declared content-length 9 exceeds limit 5")), item, "s"
+    got = await atlas_law_common.fetch(
+        _Run(Raises(UnsafeRequest("declared content-length 9 exceeds limit 5"))), url, key="x", source_key="s"
     )
     assert got.reason == "response_cap"
+    got = await atlas_law_common.fetch(
+        _Run(Raises(SourceResponseError("no fixture", retryable=False, kind="fixture_missing"))),
+        url,
+        key="x",
+        source_key="s",
+    )
+    assert got.reason == "fixture_missing"
 
     class Ok:
-        origin = "test_fixture"
-
         async def get(self, url, **kw):
             return HttpResult(url, url, 200, {"content-type": "application/json"}, b"[]", datetime.now(UTC), 0.0, (), 1)
 
-    raw = await atlas_law_common.fetch_raw(Ok(), item, "s")
+    raw = await atlas_law_common.fetch(_Run(Ok()), url, key="x", source_key="s")
     assert raw.body == b"[]" and raw.origin == "test_fixture"
 
 
-def test_specs_validate_and_geo_schemes_load():
-    for c in (
-        atlas_wbl.WblConnector(),
-        atlas_constitute.ConstituteConnector(),
-        atlas_ccp.CcpConnector(),
-        atlas_factbook.FactbookConnector(),
-        atlas_ssa_ssptw.SsaSsptwConnector(),
-    ):
-        spec = c.describe()
-        assert spec.template == "atlas_bulk" and spec.code_digest.startswith("sha256:")
-    assert len(atlas_factbook.FactbookConnector().items()) == 255
+def test_sources_discovered_and_geo_schemes_load():
+    from reva.atlas.sources import discover
+
+    mods = [f"reva.adapters.connectors.atlas_{m}" for m in ("wbl", "constitute", "ccp", "factbook", "ssa_ssptw")]
+    sources, errors = discover(mods)
+    assert errors == [] and set(sources) == {
+        "atlas.wbl",
+        "atlas.constitute",
+        "atlas.ccp",
+        "atlas.factbook",
+        "atlas.ssa_ssptw",
+    }
+    for e in sources.values():
+        assert e.spec.template == "atlas_bulk" and e.spec.code_digest.startswith("sha256:")
+        assert e.spec.budget_key == e.spec.source_key
+    assert sources["atlas.factbook"].spec.planned_requests == len(atlas_factbook.items()) == 255
     assert country_iso3("KSV", "wbl") == "XKX" and country_iso3("FRA", "wbl") == "FRA"
     assert country_iso3("Cote_d_Ivoire", "constitute") == "CIV"
     assert country_iso3("Germany_Prussia", "constitute") is None

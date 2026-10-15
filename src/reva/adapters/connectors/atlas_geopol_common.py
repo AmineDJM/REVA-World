@@ -192,17 +192,24 @@ class CodeResolution:
     code: int
     iso3: str | None
     label: str | None
-    reason: str  # policy | panel | panel_nearest_year | unmapped
+    reason: str  # historical_qid | policy | panel | panel_nearest_year | unmapped
+    qid: str | None = None  # Wikidata QID of a historical state (registry/entities/historical_states_qids.json)
 
 
 class StateCodeCrosswalk:
     """GW/COW code + date -> crosswalk entity key (see module docstring)."""
 
     def __init__(
-        self, panel_rows: Iterable[Mapping[str, Any]], *, source_sha256: str, known_keys: frozenset[str] | None = None
+        self,
+        panel_rows: Iterable[Mapping[str, Any]],
+        *,
+        source_sha256: str,
+        known_keys: frozenset[str] | None = None,
+        historical: Sequence[Mapping[str, Any]] | None = None,
     ) -> None:
         self.source_sha256 = source_sha256
         self.known_keys = known_keys
+        self.historical = list(load_historical_qids() if historical is None else historical)
         self._by: dict[tuple[str, int], dict[int, tuple[str | None, str | None]]] = {}
         for r in panel_rows:
             year = r.get("year")
@@ -234,12 +241,28 @@ class StateCodeCrosswalk:
         if code is None:
             return CodeResolution(system, -1, None, None, "unmapped")
         code = int(code)
-        # "ucdp" = GW codes with UCDP's own deviations (its policy entries win, then GW's)
+        # 1. a policy window that names a current entity (documented continuation, e.g. GW 678 -> YEM after
+        #    1990-05-22, COW 345 -> SRB after 2006-06-05) ; 2. verified historical-state QIDs (dated);
+        #    3. a policy window for a historical state without QID; 4. the countrycode panel.
+        # "ucdp" = GW codes with UCDP's own deviations (its policy entries win, then GW's).
         systems = ("ucdp", "gw") if system == "ucdp" else (system,)
+        window = None
         for sys_ in systems:
             for start, end, iso3, label, _note in STATE_CODE_POLICY.get((sys_, code), []):
-                if start <= when <= end:
-                    return CodeResolution(system, code, self._known(iso3), label, "policy")
+                if window is None and start <= when <= end:
+                    window = (iso3, label)
+        if window is not None and window[0] is not None:
+            return CodeResolution(system, code, self._known(window[0]), window[1], "policy")
+        use_hist = system == "cow" or code in GW_SHARES_COW_HISTORICAL
+        for h in self.historical if use_hist else ():
+            if (
+                h["code"] == code
+                and (h["from"] is None or h["from"] <= when.year)
+                and (h["to"] is None or when.year <= h["to"])
+            ):
+                return CodeResolution(system, code, None, h["label"], "historical_qid", h["qid"])
+        if window is not None:
+            return CodeResolution(system, code, None, window[1], "policy")
         system_panel = "gw" if system == "ucdp" else system
         years = self._by.get((system_panel, code))
         if not years:
@@ -258,6 +281,37 @@ class StateCodeCrosswalk:
             if iso3:
                 return CodeResolution(system, code, iso3, name, "panel_nearest_year")
         return CodeResolution(system, code, None, None, "unmapped")
+
+
+#: COW numbers of historical states in registry/entities/historical_states_qids.json that also denote the
+#: same polity under the GW coding (GW and COW agree on these codes for the listed years).
+GW_SHARES_COW_HISTORICAL = frozenset(
+    {255, 260, 265, 300, 315, 325, 345, 365, 511, 640, 678, 680, 710, 713, 730, 816, 817}
+)
+
+
+def load_historical_qids(system: str | None = None) -> list[dict[str, Any]]:
+    """Dated (code -> QID) entries of A-HISTECON's ``historical_states_qids.json`` (provider ``cow``), each
+    checked against Wikidata with evidence (agent-mapped, pending maintainer review). Empty when absent."""
+    from reva.ontology.registry import REGISTRY_ROOT
+
+    path = REGISTRY_ROOT / "entities" / "historical_states_qids.json"
+    if not path.exists():
+        return []
+    out = []
+    for e in json.loads(path.read_text()).get("entries", []):
+        if e.get("provider") != "cow" or not str(e.get("code", "")).isdigit():
+            continue
+        out.append(
+            {
+                "code": int(e["code"]),
+                "from": e.get("valid_from_year"),
+                "to": e.get("valid_to_year"),
+                "qid": e["qid"],
+                "label": e.get("wikidata_label_en") or e.get("provider_label"),
+            }
+        )
+    return out
 
 
 def crosswalk_keys() -> frozenset[str]:
@@ -358,6 +412,8 @@ class StateEntityResolver:
 
     def entity(self, system: str, code: int, when: date, provider_label: str | None = None) -> str:
         r = self.crosswalk.resolve(system, code, when)
+        if r.qid:
+            return r.qid
         if r.iso3 and r.iso3 in self.qid_for_iso3:
             return self.qid_for_iso3[r.iso3]
         eid = f"{'gw' if system == 'ucdp' else system}:{code}"

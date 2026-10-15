@@ -278,7 +278,7 @@ def parse_inter(rows: Sequence[Mapping[str, str]]) -> list[Participation]:
                 r["StateName"],
                 r["Side"],
                 spells,
-                decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
+                decimal_text(bd) if (_int(bd) or -1) >= 0 else None,
                 r.get("Initiator"),
                 r.get("Outcome"),
                 i,
@@ -312,7 +312,7 @@ def parse_extra(rows: Sequence[Mapping[str, str]]) -> list[Participation]:
                     r[side_col],
                     side,
                     spells,
-                    decimal_text(bd) if _int(bd) is not None and _int(bd) >= 0 else None,
+                    decimal_text(bd) if (_int(bd) or -1) >= 0 else None,
                     r.get("Initiator"),
                     r.get("Outcome"),
                     i,
@@ -587,7 +587,7 @@ def kg_records(
     wars: dict[int, tuple[str, str]] = {}
     for p in parts:
         wars.setdefault(p.war, (p.war_name, p.kind))
-        for k, (s, e) in enumerate(p.spells, start=1):
+        for k, (sp_start, sp_end) in enumerate(p.spells, start=1):
             q = {
                 "side": p.side,
                 "outcome_code": p.outcome,
@@ -597,15 +597,15 @@ def kg_records(
             }
             if p.batdeath is not None:
                 q["battle_deaths_participant"] = p.batdeath
-            if e[2] == "ongoing":
+            if sp_end[2] == "ongoing":
                 q["end_status"] = "ongoing at the end of the data"
             sts.append(
                 KgStatement(
                     subject_qid=f"cow:{p.ccode}",
                     property_pid="P1344",
                     object_qid=f"cow:war:{p.war}",
-                    start=t(s[0], s[1]) if s[0] else None,
-                    end=t(e[0], e[1]) if e[0] else None,
+                    start=t(sp_start[0], sp_start[1] or 9) if sp_start[0] else None,
+                    end=t(sp_end[0], sp_end[1] or 9) if sp_end[0] else None,
                     qualifiers=q,
                     statement_id=f"war:{p.kind}:{p.war}:{p.ccode}:{p.side}:{k}",
                     raw_sha256=shas[p.kind],
@@ -627,21 +627,21 @@ def kg_records(
                 raw_sha256=shas[kind],
             )
         )
-    for e in historical_qids("cow"):
-        lo, hi = e.get("valid_from_year"), e.get("valid_to_year")
+    for hq in historical_qids("cow"):
+        lo, hi = hq.get("valid_from_year"), hq.get("valid_to_year")
         sts.append(
             KgStatement(
-                subject_qid=f"cow:{e['code']}",
+                subject_qid=f"cow:{hq['code']}",
                 property_pid="cow:code_denotes",
-                object_qid=e["qid"],
+                object_qid=hq["qid"],
                 start=t(f"{lo:04d}-01-01", 9) if lo else None,
                 end=t(f"{hi:04d}-01-01", 9) if hi else None,
                 qualifiers={
-                    "mapping": e.get("review_status", "agent_mapped"),
-                    "evidence": e.get("evidence", "")[:500],
+                    "mapping": hq.get("review_status", "agent_mapped"),
+                    "evidence": hq.get("evidence", "")[:500],
                     "file": "registry/entities/historical_states_qids.json",
                 },
-                statement_id=f"denotes:{e['code']}:{lo}:{hi}:{e['qid']}",
+                statement_id=f"denotes:{hq['code']}:{lo}:{hi}:{hq['qid']}",
                 raw_sha256=shas["states"],
             )
         )
