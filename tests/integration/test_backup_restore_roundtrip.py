@@ -106,7 +106,13 @@ class Source:
 
 
 @pytest.fixture(scope="module")
-def source(db, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Source]:
+def tools_env(db) -> dict[str, str]:
+    """Checked before any database is created, so a skip costs nothing."""
+    return _pg_tools_env(_server_major(db.owner))
+
+
+@pytest.fixture(scope="module")
+def source(db, tools_env: dict[str, str], tmp_path_factory: pytest.TempPathFactory) -> Iterator[Source]:
     """A dedicated source database + object root (the session db stays untouched)."""
     from reva.cli.bootstrap import bootstrap
     from reva.cli.seed import seed
@@ -174,8 +180,9 @@ def _secrets(settings: Any) -> list[str]:
     return [v for v in vals if v]
 
 
-def test_backup_restore_round_trip_fresh_db_and_object_store(db, source: Source, tmp_path: Path) -> None:
-    tools_env = _pg_tools_env(_server_major(db.owner))
+def test_backup_restore_round_trip_fresh_db_and_object_store(
+    db, tools_env: dict[str, str], source: Source, tmp_path: Path
+) -> None:
     s = source.settings
     base_env = {
         "PATH": os.environ.get("PATH", "/usr/bin:/bin"),

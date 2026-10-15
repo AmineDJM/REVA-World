@@ -212,3 +212,25 @@ collected. Run inventory before and after large GC passes.
 * The Render schema cache is refreshed with
   `uv run python scripts/validate_blueprint.py --refresh` (review the diff;
   `live-smoke.yml` also validates against the live schema daily).
+
+## Schema contract
+
+Until release, migrations are edited in place under the same revision ids, so
+`alembic_version` cannot tell whether a database really has the current schema.
+`migrations/schema_contract.json` holds a fingerprint of every catalog object the
+application relies on (schemas, tables and columns, constraints, indexes,
+triggers, functions with a hash of their bodies, RLS policies, grants, runtime
+role attributes). It is generated from a fresh bootstrap of a throwaway database.
+
+* Check a database (read-only, exit 1 on drift, lists the differing objects):
+  `uv run reva db verify-schema` (`--role worker|api` to check as a runtime role).
+* After any change to `migrations/versions/*.py` or
+  `src/reva/adapters/postgres/ddl.py`, regenerate it and commit it with the
+  migration: `uv run python scripts/update_schema_contract.py`
+  (`--check` exits 1 when the committed contract is stale). This creates and drops
+  a `reva_contract_<random>` database; the database in the URL is not touched.
+  `tests/integration/test_schema_contract.py` fails while the contract is stale.
+* A drifted database (for example a dev database migrated by an earlier draft of
+  the migrations) is not repaired: recreate it from the migrations.
+* Startup guard mode `REVA_SCHEMA_CONTRACT=enforce|warn|off`: the default is
+  `enforce`; `warn` applies under `REVA_ENV=test`; production always enforces.

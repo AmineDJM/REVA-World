@@ -1172,6 +1172,16 @@ def publication_staleness(
     return marks
 
 
+def last_release_with_concept(conn: Connection, release: dict[str, Any], concept_id: str) -> dict[str, Any] | None:
+    """The newest published release of ``release``'s origin, earlier than it, that holds
+    estimates of ``concept_id`` (the last accepted release for a withheld concept)."""
+    if release.get("sequence") is None:
+        return None
+    row = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL),
+                       {"o": release["origin"], "seq": release["sequence"], "c": concept_id}).mappings().one_or_none()
+    return dict(row) if row else None
+
+
 def _annotate(row: dict[str, Any], mark: dict[str, Any] | None, served_from: UUID | Any,
               fallback: bool) -> dict[str, Any]:
     row["stale"] = mark is not None
@@ -1227,8 +1237,7 @@ def release_estimates(
     for concept, mark in sorted(marks.items()):
         if not mark.get("withheld_in_release") or (concept_id is not None and concept != concept_id):
             continue
-        prev = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL),
-                            {"o": rel["origin"], "seq": rel["sequence"], "c": concept}).mappings().one_or_none()
+        prev = last_release_with_concept(conn, rel, concept)
         if prev is None:
             notes.append(f"{concept}: withheld ({mark['reason']}) and no earlier release published it")
             continue
@@ -1389,9 +1398,8 @@ def compare_claims(
     else:
         mark = publication_staleness(conn, release, as_of=as_of).get(concept_id)
         served = [(release["id"], False)]
-        if mark is not None and mark.get("withheld_in_release") and release.get("sequence") is not None:
-            prev = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL), {
-                "o": release["origin"], "seq": release["sequence"], "c": concept_id}).mappings().one_or_none()
+        if mark is not None and mark.get("withheld_in_release"):
+            prev = last_release_with_concept(conn, release, concept_id)
             if prev is not None:
                 served.append((prev["id"], True))
         for rel_id, fallback in served:

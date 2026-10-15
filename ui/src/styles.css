@@ -710,3 +710,47 @@ progress {
 .sensitivity-range {
   border-bottom: 2px dashed #9a3412;
 }
+
+/* ------------------------------------------------------------- promotion gates / tiers */
+.gate-badge,
+.tier-badge {
+  display: inline-block;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+.gate-pass {
+  border-color: #2f6f3e;
+  color: #1f4f2b;
+}
+.gate-fail {
+  border-color: #b42318;
+  color: #8f1c13;
+}
+.gate-blocked {
+  border-color: #6b7280;
+  color: #374151;
+  border-style: dashed;
+}
+.gate-needs_review {
+  border-color: #8a5a00;
+  color: #6b4500;
+  background: #fff8e6;
+  font-weight: 600;
+}
+.gate-unknown {
+  border-style: dotted;
+}
+.gate-glyph {
+  font-weight: 700;
+}
+.tier-badge {
+  white-space: normal;
+}
+.gate-needs-review-note {
+  border-left: 4px solid #8a5a00;
+  padding: 4px 8px;
+  background: #fff8e6;
+}

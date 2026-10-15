@@ -36,7 +36,7 @@ pytestmark = pytest.mark.db
 
 @pytest.fixture(scope="module")
 def fresh() -> Iterator[tuple[Settings, Engine, Fingerprint]]:
-    base = Settings(_env_file=Path(__file__).parents[2] / ".env")  # type: ignore[call-arg]
+    base = Settings(_env_file=Path(__file__).parents[2] / ".env")
     if base.reva_migration_database_url is None:
         pytest.skip("REVA_MIGRATION_DATABASE_URL not configured")
     try:
@@ -75,7 +75,7 @@ def test_fingerprint_is_deterministic_and_role_independent(fresh: tuple[Settings
         assert compute_fingerprint(conn) == fp
     # API/worker startup verifies as a runtime role: the catalog must look the same to it.
     for kind in ("api", "worker"):
-        eng = make_engine(kind, settings)  # type: ignore[arg-type]
+        eng = make_engine(kind, settings)
         try:
             with eng.connect() as conn:
                 assert compute_fingerprint(conn).digest == fp.digest

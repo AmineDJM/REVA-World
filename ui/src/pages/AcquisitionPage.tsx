@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { getConnectors, getProposals, newIdempotencyKey, reviewProposal, startDiscovery } from '../api/client';
 import type { ConnectorOut, DiscoveryRequest, Proposal, ReviewDecision } from '../api/types';
 import { ContextBanner } from '../components/ContextBanner';
+import { GateDecisionBadge, TIER_POLICY_TEXT, TIER_TEXT, TierBadge } from '../components/GateBadges';
 import { EnvelopeDetails } from '../components/EnvelopeDetails';
 import { JobTracker } from '../components/JobTracker';
 import { JsonView } from '../components/JsonView';
@@ -157,12 +158,19 @@ function ProposalCard({ p, onReviewed }: { p: Proposal; onReviewed: () => void }
         <span className="mono" title={p.id}>
           {shortId(p.id)}
         </span>{' '}
-        · tier T{p.permission_tier} · by {p.author} · {formatDateTime(p.recorded_at)} · manifest{' '}
+        · <TierBadge tier={p.permission_tier} /> · by {p.author} · {formatDateTime(p.recorded_at)} · manifest{' '}
         <ProvenanceButton kind="artifact" id={p.manifest_sha256} label={p.manifest_sha256.slice(0, 12)} />
       </p>
       <h4>Semantic diff</h4>
       <SemanticDiff summary={summary} />
+      <p className="field-hint">{TIER_TEXT[p.permission_tier] ?? TIER_POLICY_TEXT}</p>
       <h4>Promotion evidence (gate results)</h4>
+      {p.gate_results.some((g) => g.decision === 'needs_review') && (
+        <p className="gate-needs-review-note" role="note">
+          At least one gate returned <strong>needs human review</strong>: this proposal is not promoted until a named reviewer
+          approves it.
+        </p>
+      )}
       {p.gate_results.length === 0 ? (
         <p className="muted">No gate has evaluated this proposal.</p>
       ) : (
@@ -183,7 +191,9 @@ function ProposalCard({ p, onReviewed }: { p: Proposal; onReviewed: () => void }
               {p.gate_results.map((g) => (
                 <tr key={g.id}>
                   <th scope="row">{humanize(g.gate_name)}</th>
-                  <td>{humanize(g.decision)}</td>
+                  <td>
+                    <GateDecisionBadge decision={g.decision} />
+                  </td>
                   <td className="mono">{g.policy_version}</td>
                   <td>{g.evaluator}</td>
                   <td>
@@ -334,8 +344,7 @@ export default function AcquisitionPage() {
         <h2 id="disc-h">Discovery</h2>
         <p className="muted">
           Bounded search of an official catalogue for a registered requirement. Candidates become proposals that must pass the
-          promotion gates: a tier-1 connector change within the signed policy scope is promoted automatically; tier-2 and tier-3
-          changes need a human review.
+          promotion gates. {TIER_POLICY_TEXT}
         </p>
         <DiscoveryForm />
       </section>

@@ -371,6 +371,12 @@ def connector_version_row(conn: Connection, name: str, version: str) -> dict[str
 
 # --------------------------------------------------------------------------- publication
 def take_publication_lock(conn: Connection) -> None:
+    """Transaction-scoped publication lock (held until commit, so sequence order = commit order).
+
+    ``ops.check_publication`` requires it to be held before the ``ops.publication`` INSERT and
+    re-acquires it at transaction scope itself (re-entrant; R5-08): it never probes with
+    ``pg_advisory_unlock``, which would release a caller's session-level hold.
+    """
     conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": PUBLICATION_LOCK})
 
 

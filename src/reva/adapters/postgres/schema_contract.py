@@ -394,7 +394,7 @@ def build_contract(fp: Fingerprint, alembic_head: str | None) -> dict[str, Any]:
 def load_contract(path: Path | None = None) -> dict[str, Any]:
     path = path or CONTRACT_PATH
     try:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data: dict[str, Any] = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise ConfigurationError(f"schema contract {path} is missing; generate it with `{REGENERATE_HINT}`") from None
     if data.get("format") != CONTRACT_FORMAT or not isinstance(data.get("objects"), dict):
@@ -443,18 +443,27 @@ def assert_schema_contract(target: Engine | Connection, *, mode: str | None = No
                            reva_env: str | None = None, contract_path: Path | None = None) -> SchemaDiff | None:
     """Startup guard: raise ``SchemaDriftError`` (mode enforce) when the live schema differs.
 
-    Returns the diff (``None`` when the mode is ``off``). Read-only.
+    Returns the diff (``None`` when the mode is ``off``, or in ``warn`` mode when the check
+    itself could not run). In ``enforce`` mode an unverifiable schema also refuses. Read-only.
     """
     mode = mode or contract_mode(reva_env=reva_env)
     if mode == "off":
         return None
-    contract = load_contract(contract_path)
-    if isinstance(target, Connection):
-        d = verify_schema(target, contract)
-    else:
-        with target.connect() as conn:
-            d = verify_schema(conn, contract)
-            conn.rollback()
+    try:
+        contract = load_contract(contract_path)
+        if isinstance(target, Connection):
+            d = verify_schema(target, contract)
+        else:
+            with target.connect() as conn:
+                d = verify_schema(conn, contract)
+                conn.rollback()
+    except Exception as e:
+        if mode == "warn":  # e.g. no database in a unit test: never block, but say so
+            log.warning("schema contract not verified: %s", type(e).__name__)
+            return None
+        if isinstance(e, ConfigurationError):
+            raise
+        raise SchemaDriftError(f"schema contract could not be verified ({type(e).__name__}); refusing to start") from e
     if d.ok:
         log.info("schema contract verified (%s)", d.actual_digest[:16])
         return d
