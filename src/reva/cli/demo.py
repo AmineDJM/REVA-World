@@ -43,6 +43,7 @@ from reva.simulation.spec import validate_scenario_spec
 ORIGINS = ("live", "test_fixture")
 TERMINAL = frozenset({"succeeded", "failed", "cancelled", "dead"})
 WORKER_FRESH_SECONDS = 120
+LOCAL_WORKER_ID = "cli-demo"  # the demo's in-process executor
 CONTRACTS = Path(__file__).resolve().parents[3] / "contracts"
 SCENARIOS = {"crude-border-price-25": {"import_multiplier": 1.25, "export_multiplier": 1.25}}
 
@@ -99,10 +100,12 @@ def worker_running(engine: Engine, fresh_seconds: int = WORKER_FRESH_SECONDS) ->
         return bool(
             conn.execute(
                 text(
+                    # the demo's own in-process executor is not a running worker: a previous local demo
+                    # must not make the next one wait for a worker that does not exist
                     "SELECT EXISTS (SELECT 1 FROM ops.worker_presence "
-                    "WHERE last_seen > clock_timestamp() - make_interval(secs => :s))"
+                    "WHERE last_seen > clock_timestamp() - make_interval(secs => :s) AND worker_id <> :local)"
                 ),
-                {"s": fresh_seconds},
+                {"s": fresh_seconds, "local": LOCAL_WORKER_ID},
             ).scalar_one()
         )
 
@@ -135,7 +138,7 @@ def _run_locally(job_id: Any, settings: Any) -> str:
         worker_engine,
         get_store(),
         get_engine("sim"),
-        worker_id="cli-demo",
+        worker_id=LOCAL_WORKER_ID,
         concurrency=1,
         scheduler=False,
         invalidation=False,
