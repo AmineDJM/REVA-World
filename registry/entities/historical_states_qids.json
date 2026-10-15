@@ -1,0 +1,1718 @@
+{
+ "schema": "reva-historical-states-qids/1",
+ "review_status": "agent_mapped_pending_maintainer_review",
+ "built_by": "A-HISTECON (V3), 2026-10-15",
+ "purpose": "Provider codes of historical states (and a few non-crosswalk entities) -> Wikidata QIDs, so atlas rows and KG statements of the long-run history layer link to KG entities. Provider codes are kept verbatim in the atlas; this file never changes an iso3.",
+ "rules": [
+  "only distinct states/polities are mapped; earlier-border versions of a current country (e.g. GEACRON 'France 1820-1879') are not",
+  "each entry was checked against the Wikidata entity (label, description, inception P571, dissolution P576) fetched with wbgetentities through the WDHARVEST locked client; evidence carries the revision id and raw response sha256",
+  "valid_from_year/valid_to_year (inclusive) bound period-specific entries (COW state numbers that span several polities); null = the code's whole span",
+  "Wikidata is community-edited: QIDs are agent-mapped, pending maintainer review"
+ ],
+ "entries": [
+  {
+   "provider": "maddison",
+   "code": "SUN",
+   "provider_label": "Former USSR",
+   "qid": "Q15180",
+   "wikidata_label_en": "Soviet Union",
+   "wikidata_label_fr": "Union soviétique",
+   "wikidata_revision": 2557284772,
+   "wikidata_inception": [
+    "+1922-12-30T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1991-12-26T00:00:00Z"
+   ],
+   "kind": "historical_state_territorial_series",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q15180 'Soviet Union' (former country in Eurasia (1922–1991)); inception +1922-12-30T00:00:00Z; dissolved +1991-12-26T00:00:00Z; enwiki 'Soviet Union'; revision 2557284772. Provider label: 'Former USSR'. MPD 'Sources': 1991 -: based on GDP and population data for their successor states (territorial aggregate after 1991).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "maddison",
+   "code": "CSK",
+   "provider_label": "Czechoslovakia",
+   "qid": "Q33946",
+   "wikidata_label_en": "Czechoslovakia",
+   "wikidata_label_fr": "Tchécoslovaquie",
+   "wikidata_revision": 2555912676,
+   "wikidata_inception": [
+    "+1918-10-28T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-12-31T00:00:00Z"
+   ],
+   "kind": "historical_state_territorial_series",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q33946 'Czechoslovakia' (country in Central Europe (1918–1992)); inception +1918-10-28T00:00:00Z; dissolved +1992-12-31T00:00:00Z; enwiki 'Czechoslovakia'; revision 2555912676. Provider label: 'Czechoslovakia'. MPD 'Sources': 1993 -: based on successor states (territorial aggregate after 1992).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "maddison",
+   "code": "YUG",
+   "provider_label": "Former Yugoslavia",
+   "qid": "Q36704",
+   "wikidata_label_en": "Yugoslavia",
+   "wikidata_label_fr": "Yougoslavie",
+   "wikidata_revision": 2553290415,
+   "wikidata_inception": [
+    "+1918-12-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-04-27T00:00:00Z"
+   ],
+   "kind": "historical_state_territorial_series",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q36704 'Yugoslavia' (1918–1992 country in Southeastern Europe); inception +1918-12-01T00:00:00Z; dissolved +1992-04-27T00:00:00Z; enwiki 'Yugoslavia'; revision 2553290415. Provider label: 'Former Yugoslavia'. MPD 'Sources': 2008 -: based on successor states; series covers the territory of former Yugoslavia.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "maddison",
+   "code": "TWN",
+   "provider_label": "Taiwan, Province of China",
+   "qid": "Q865",
+   "wikidata_label_en": "Taiwan",
+   "wikidata_label_fr": "Taïwan",
+   "wikidata_revision": 2553025887,
+   "wikidata_inception": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [],
+   "kind": "non_crosswalk_current_entity",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan, Province of China'. Current entity absent from the ALLC crosswalk (not a historical state).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "gapminder",
+   "code": "twn",
+   "provider_label": "Taiwan",
+   "qid": "Q865",
+   "wikidata_label_en": "Taiwan",
+   "wikidata_label_fr": "Taïwan",
+   "wikidata_revision": 2553025887,
+   "wikidata_inception": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [],
+   "kind": "non_crosswalk_current_entity",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan'. Current entity absent from the ALLC crosswalk.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "hyde",
+   "code": "158",
+   "provider_label": "158 (Taiwan)",
+   "qid": "Q865",
+   "wikidata_label_en": "Taiwan",
+   "wikidata_label_fr": "Taïwan",
+   "wikidata_revision": 2553025887,
+   "wikidata_inception": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [],
+   "kind": "non_crosswalk_current_entity",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: '158 (Taiwan)'. ISO 3166 numeric 158; not in the crosswalk.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "hyde",
+   "code": "530",
+   "provider_label": "530 (Netherlands Antilles)",
+   "qid": "Q25227",
+   "wikidata_label_en": "Netherlands Antilles",
+   "wikidata_label_fr": "Antilles néerlandaises",
+   "wikidata_revision": 2555397420,
+   "wikidata_inception": [
+    "+1954-12-15T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+2010-10-10T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q25227 'Netherlands Antilles' (former country within the Kingdom of the Netherlands); inception +1954-12-15T00:00:00Z; dissolved +2010-10-10T00:00:00Z; enwiki 'Netherlands Antilles'; revision 2555397420. Provider label: '530 (Netherlands Antilles)'. ISO 3166-3 numeric 530 (deleted 2010).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "hyde",
+   "code": "736",
+   "provider_label": "736 (Sudan, before 2011)",
+   "qid": "Q1049",
+   "wikidata_label_en": "Sudan",
+   "wikidata_label_fr": "Soudan",
+   "wikidata_revision": 2547610677,
+   "wikidata_inception": [
+    "+1956-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [],
+   "kind": "historical_territory_of_current_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q1049 'Sudan' (country in Northeast Africa); inception +1956-01-01T00:00:00Z; dissolved -; enwiki 'Sudan'; revision 2547610677. Provider label: '736 (Sudan, before 2011)'. ISO numeric 736 = Sudan before South Sudan's independence (2011); Q1049 is the same state (crosswalk SDN = 729), territory larger.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "hyde",
+   "code": "891",
+   "provider_label": "891 (Serbia and Montenegro)",
+   "qid": "Q37024",
+   "wikidata_label_en": "Serbia and Montenegro",
+   "wikidata_label_fr": "Serbie-et-Monténégro",
+   "wikidata_revision": 2553095578,
+   "wikidata_inception": [
+    "+2003-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+2006-06-04T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q37024 'Serbia and Montenegro' (former political union in the Balkans (2003–2006)); inception +2003-00-00T00:00:00Z; dissolved +2006-06-04T00:00:00Z; enwiki 'Serbia and Montenegro'; revision 2553095578. Provider label: '891 (Serbia and Montenegro)'. ISO numeric 891 covered the Federal Republic of Yugoslavia (1992-2003, Q838261) and Serbia and Montenegro (2003-2006).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1557",
+   "provider_label": "USSR 1946-1991",
+   "qid": "Q15180",
+   "wikidata_label_en": "Soviet Union",
+   "wikidata_label_fr": "Union soviétique",
+   "wikidata_revision": 2557284772,
+   "wikidata_inception": [
+    "+1922-12-30T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1991-12-26T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q15180 'Soviet Union' (former country in Eurasia (1922–1991)); inception +1922-12-30T00:00:00Z; dissolved +1991-12-26T00:00:00Z; enwiki 'Soviet Union'; revision 2557284772. Provider label: 'USSR 1946-1991'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1601",
+   "provider_label": "Czechoslovakia 1946-1992",
+   "qid": "Q33946",
+   "wikidata_label_en": "Czechoslovakia",
+   "wikidata_label_fr": "Tchécoslovaquie",
+   "wikidata_revision": 2555912676,
+   "wikidata_inception": [
+    "+1918-10-28T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-12-31T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q33946 'Czechoslovakia' (country in Central Europe (1918–1992)); inception +1918-10-28T00:00:00Z; dissolved +1992-12-31T00:00:00Z; enwiki 'Czechoslovakia'; revision 2555912676. Provider label: 'Czechoslovakia 1946-1992'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1602",
+   "provider_label": "Yugoslavia 1946-1992",
+   "qid": "Q83286",
+   "wikidata_label_en": "Socialist Federal Republic of Yugoslavia",
+   "wikidata_label_fr": "république fédérative socialiste de Yougoslavie",
+   "wikidata_revision": 2553094421,
+   "wikidata_inception": [],
+   "wikidata_dissolved": [
+    "+1992-04-26T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q83286 'Socialist Federal Republic of Yugoslavia' (Central and Southeast European socialist state (1945–1992)); inception -; dissolved +1992-04-26T00:00:00Z; enwiki 'Socialist Federal Republic of Yugoslavia'; revision 2553094421. Provider label: 'Yugoslavia 1946-1992'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/1152",
+   "provider_label": "Yugoslavia 1920-1945",
+   "qid": "Q36704",
+   "wikidata_label_en": "Yugoslavia",
+   "wikidata_label_fr": "Yougoslavie",
+   "wikidata_revision": 2553290415,
+   "wikidata_inception": [
+    "+1918-12-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-04-27T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q36704 'Yugoslavia' (1918–1992 country in Southeastern Europe); inception +1918-12-01T00:00:00Z; dissolved +1992-04-27T00:00:00Z; enwiki 'Yugoslavia'; revision 2553290415. Provider label: 'Yugoslavia 1920-1945'. Q36704 (1918-1992) rather than Kingdom of Yugoslavia Q191077 (name from 1929) because the polity span starts in 1920.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1598",
+   "provider_label": "Germany Federal Republic 1955-1990",
+   "qid": "Q713750",
+   "wikidata_label_en": "West Germany",
+   "wikidata_label_fr": "Allemagne de l'Ouest",
+   "wikidata_revision": 2549766859,
+   "wikidata_inception": [
+    "+1949-05-23T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-10-03T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q713750 'West Germany' (Federal Republic of Germany in the period between its formation on 23 May 1949 and German reunification on 3 October 1990); inception +1949-05-23T00:00:00Z; dissolved +1990-10-03T00:00:00Z; enwiki 'West Germany'; revision 2549766859. Provider label: 'Germany Federal Republic 1955-1990'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1599",
+   "provider_label": "Germany Democratic Republic 1954-1990",
+   "qid": "Q16957",
+   "wikidata_label_en": "East Germany",
+   "wikidata_label_fr": "République démocratique allemande",
+   "wikidata_revision": 2551607606,
+   "wikidata_inception": [
+    "+1949-10-07T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-10-03T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q16957 'East Germany' (1949–1990 country in central Europe, unified into modern Germany); inception +1949-10-07T00:00:00Z; dissolved +1990-10-03T00:00:00Z,+1989-00-00T00:00:00Z; enwiki 'East Germany'; revision 2551607606. Provider label: 'Germany Democratic Republic 1954-1990'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1633",
+   "provider_label": "Serbia and Montenegro 1993-2006",
+   "qid": "Q37024",
+   "wikidata_label_en": "Serbia and Montenegro",
+   "wikidata_label_fr": "Serbie-et-Monténégro",
+   "wikidata_revision": 2553095578,
+   "wikidata_inception": [
+    "+2003-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+2006-06-04T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q37024 'Serbia and Montenegro' (former political union in the Balkans (2003–2006)); inception +2003-00-00T00:00:00Z; dissolved +2006-06-04T00:00:00Z; enwiki 'Serbia and Montenegro'; revision 2553095578. Provider label: 'Serbia and Montenegro 1993-2006'. Span also covers the Federal Republic of Yugoslavia (Q838261, 1992-2003).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1604",
+   "provider_label": "Egypt (United Arab Republic) 1958-1961",
+   "qid": "Q170468",
+   "wikidata_label_en": "United Arab Republic",
+   "wikidata_label_fr": "République arabe unie",
+   "wikidata_revision": 2517997676,
+   "wikidata_inception": [
+    "+1958-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1971-00-00T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q170468 'United Arab Republic' (Middle Eastern state between 1958 and 1961 in the present territories of Egypt and Syria); inception +1958-01-01T00:00:00Z; dissolved +1971-00-00T00:00:00Z; enwiki 'United Arab Republic'; revision 2517997676. Provider label: 'Egypt (United Arab Republic) 1958-1961'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1605",
+   "provider_label": "Yemen Arab Republic 1946-1990",
+   "qid": "Q267584",
+   "wikidata_label_en": "Yemen Arab Republic",
+   "wikidata_label_fr": "République arabe du Yémen",
+   "wikidata_revision": 2544384899,
+   "wikidata_inception": [
+    "+1962-09-26T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-05-22T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q267584 'Yemen Arab Republic' (former country); inception +1962-09-26T00:00:00Z; dissolved +1990-05-22T00:00:00Z; enwiki 'Yemen Arab Republic'; revision 2544384899. Provider label: 'Yemen Arab Republic 1946-1990'. Provider span starts 1946 (Mutawakkilite Kingdom before 1962).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "cshapes/1611",
+   "provider_label": "Vietnam 1954-1975 (North)",
+   "qid": "Q172640",
+   "wikidata_label_en": "North Vietnam",
+   "wikidata_label_fr": "république démocratique du Vietnam",
+   "wikidata_revision": 2550570441,
+   "wikidata_inception": [
+    "+1945-09-02T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1976-07-02T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q172640 'North Vietnam' (former country in Southeast Asia that existed from 1945 to 1976); inception +1945-09-02T00:00:00Z; dissolved +1976-07-02T00:00:00Z; enwiki 'North Vietnam'; revision 2550570441. Provider label: 'Vietnam 1954-1975 (North)'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/388",
+   "provider_label": "German Confederation 1820-1839",
+   "qid": "Q151624",
+   "wikidata_label_en": "German Confederation",
+   "wikidata_label_fr": "Confédération germanique",
+   "wikidata_revision": 2551227275,
+   "wikidata_inception": [
+    "+1815-06-10T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1866-08-24T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q151624 'German Confederation' (Confederation of States in Germany from 1815 to 1866); inception +1815-06-10T00:00:00Z; dissolved +1866-08-24T00:00:00Z; enwiki 'German Confederation'; revision 2551227275. Provider label: 'German Confederation 1820-1839'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/855",
+   "provider_label": "Poland-Lithuania 1780-1799",
+   "qid": "Q172107",
+   "wikidata_label_en": "Polish–Lithuanian Commonwealth",
+   "wikidata_label_fr": "république des Deux Nations",
+   "wikidata_revision": 2555436826,
+   "wikidata_inception": [
+    "+1569-06-11T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1795-10-24T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q172107 'Polish–Lithuanian Commonwealth' (historical multinational monarchist state in Eastern Europe (Crown of the Kingdom of Poland and the Grand Duchy of Lithuania)); inception +1569-06-11T00:00:00Z; dissolved +1795-10-24T00:00:00Z; enwiki 'Polish–Lithuanian Commonwealth'; revision 2555436826. Provider label: 'Poland-Lithuania 1780-1799'. Commonwealth partitioned by 1795; polity span ends 1799.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/774",
+   "provider_label": "Ottoman 1780-1799",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1780-1799'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/775",
+   "provider_label": "Ottoman 1800-1819",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1800-1819'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/776",
+   "provider_label": "Ottoman 1820-1839",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1820-1839'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/777",
+   "provider_label": "Ottoman 1840-1859",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1840-1859'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/778",
+   "provider_label": "Ottoman 1860-1879",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1860-1879'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/779",
+   "provider_label": "Ottoman 1880-1899",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1880-1899'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/780",
+   "provider_label": "Ottoman 1900-1919",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Ottoman 1900-1919'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/878",
+   "provider_label": "Prussia 1720-1739",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1720-1739'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/879",
+   "provider_label": "Prussia 1740-1759",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1740-1759'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/880",
+   "provider_label": "Prussia 1760-1779",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1760-1779'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/881",
+   "provider_label": "Prussia 1780-1799",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1780-1799'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/882",
+   "provider_label": "Prussia 1800-1819",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1800-1819'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/883",
+   "provider_label": "Prussia 1820-1859",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1820-1859'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "clio",
+   "code": "geacron/884",
+   "provider_label": "Prussia 1860-1879",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Prussia 1860-1879'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "365",
+   "provider_label": "Russia",
+   "qid": "Q34266",
+   "wikidata_label_en": "Russian Empire",
+   "wikidata_label_fr": "Empire russe",
+   "wikidata_revision": 2556359046,
+   "wikidata_inception": [
+    "+1721-10-22T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1917-09-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1816,
+   "valid_to_year": 1917,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q34266 'Russian Empire' (former empire in Eurasia and North America (1721–1917)); inception +1721-10-22T00:00:00Z; dissolved +1917-09-01T00:00:00Z; enwiki 'Russian Empire'; revision 2556359046. Provider label: 'Russia'. COW 365 spell 1816-01-01..1917-12-05.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "365",
+   "provider_label": "Russia",
+   "qid": "Q15180",
+   "wikidata_label_en": "Soviet Union",
+   "wikidata_label_fr": "Union soviétique",
+   "wikidata_revision": 2557284772,
+   "wikidata_inception": [
+    "+1922-12-30T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1991-12-26T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1922,
+   "valid_to_year": 1991,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q15180 'Soviet Union' (former country in Eurasia (1922–1991)); inception +1922-12-30T00:00:00Z; dissolved +1991-12-26T00:00:00Z; enwiki 'Soviet Union'; revision 2557284772. Provider label: 'Russia'. COW 365 spell from 1922; KGGEOPOL policy: USSR 1922-12-30..1991-12-20.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "640",
+   "provider_label": "Turkey / Ottoman Empire",
+   "qid": "Q12560",
+   "wikidata_label_en": "Ottoman Empire",
+   "wikidata_label_fr": "Empire ottoman",
+   "wikidata_revision": 2548845726,
+   "wikidata_inception": [
+    "+1299-07-29T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1922-11-17T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1816,
+   "valid_to_year": 1922,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q12560 'Ottoman Empire' (empire with the monarchs from the Ottoman dynasty (1299–1922)); inception +1299-07-29T00:00:00Z,+1300-00-00T00:00:00Z; dissolved +1922-11-17T00:00:00Z; enwiki 'Ottoman Empire'; revision 2548845726. Provider label: 'Turkey / Ottoman Empire'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "300",
+   "provider_label": "Austria-Hungary",
+   "qid": "Q131964",
+   "wikidata_label_en": "Austrian Empire",
+   "wikidata_label_fr": "empire d'Autriche",
+   "wikidata_revision": 2556711978,
+   "wikidata_inception": [
+    "+1804-08-11T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1867-06-08T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1816,
+   "valid_to_year": 1866,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q131964 'Austrian Empire' (Central European multinational Empire from 1804 to 1867); inception +1804-08-11T00:00:00Z; dissolved +1867-06-08T00:00:00Z; enwiki 'Austrian Empire'; revision 2556711978. Provider label: 'Austria-Hungary'. COW 300 covers the Austrian Empire before the 1867 Compromise.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "300",
+   "provider_label": "Austria-Hungary",
+   "qid": "Q28513",
+   "wikidata_label_en": "Austria–Hungary",
+   "wikidata_label_fr": "Autriche-Hongrie",
+   "wikidata_revision": 2540319047,
+   "wikidata_inception": [
+    "+1867-03-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-11T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1867,
+   "valid_to_year": 1918,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q28513 'Austria–Hungary' (1867–1918 empire in Central Europe); inception +1867-03-01T00:00:00Z; dissolved +1918-11-11T00:00:00Z,+1918-11-25T00:00:00Z; enwiki 'Austria-Hungary'; revision 2540319047. Provider label: 'Austria-Hungary'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "255",
+   "provider_label": "Germany (Prussia)",
+   "qid": "Q27306",
+   "wikidata_label_en": "Kingdom of Prussia",
+   "wikidata_label_fr": "royaume de Prusse",
+   "wikidata_revision": 2551228211,
+   "wikidata_inception": [
+    "+1701-01-18T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1816,
+   "valid_to_year": 1870,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q27306 'Kingdom of Prussia' (former European state (1701–1918), part of the German Empire after 1871); inception +1701-01-18T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Prussia'; revision 2551228211. Provider label: 'Germany (Prussia)'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "255",
+   "provider_label": "Germany",
+   "qid": "Q43287",
+   "wikidata_label_en": "German Empire",
+   "wikidata_label_fr": "Empire allemand",
+   "wikidata_revision": 2527937211,
+   "wikidata_inception": [
+    "+1871-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1871,
+   "valid_to_year": 1918,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q43287 'German Empire' (German nation-state in Central Europe from 1871 to 1918); inception +1871-01-01T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'German Empire'; revision 2527937211. Provider label: 'Germany'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "255",
+   "provider_label": "Germany",
+   "qid": "Q41304",
+   "wikidata_label_en": "Weimar Republic",
+   "wikidata_label_fr": "république de Weimar",
+   "wikidata_revision": 2556858531,
+   "wikidata_inception": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1933-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1919,
+   "valid_to_year": 1932,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q41304 'Weimar Republic' (Germany in the years 1918/1919–1933); inception +1918-11-09T00:00:00Z; dissolved +1933-01-01T00:00:00Z; enwiki 'Weimar Republic'; revision 2556858531. Provider label: 'Germany'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "255",
+   "provider_label": "Germany",
+   "qid": "Q7318",
+   "wikidata_label_en": "Nazi Germany",
+   "wikidata_label_fr": "Troisième Reich",
+   "wikidata_revision": 2551843539,
+   "wikidata_inception": [
+    "+1933-03-15T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1945-05-23T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1933,
+   "valid_to_year": 1945,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q7318 'Nazi Germany' (Germany from 1933 to 1945 while under control of the Nazi Party); inception +1933-03-15T00:00:00Z; dissolved +1945-05-23T00:00:00Z; enwiki 'Nazi Germany'; revision 2551843539. Provider label: 'Germany'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "260",
+   "provider_label": "German Federal Republic",
+   "qid": "Q713750",
+   "wikidata_label_en": "West Germany",
+   "wikidata_label_fr": "Allemagne de l'Ouest",
+   "wikidata_revision": 2549766859,
+   "wikidata_inception": [
+    "+1949-05-23T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-10-03T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q713750 'West Germany' (Federal Republic of Germany in the period between its formation on 23 May 1949 and German reunification on 3 October 1990); inception +1949-05-23T00:00:00Z; dissolved +1990-10-03T00:00:00Z; enwiki 'West Germany'; revision 2549766859. Provider label: 'German Federal Republic'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "265",
+   "provider_label": "German Democratic Republic",
+   "qid": "Q16957",
+   "wikidata_label_en": "East Germany",
+   "wikidata_label_fr": "République démocratique allemande",
+   "wikidata_revision": 2551607606,
+   "wikidata_inception": [
+    "+1949-10-07T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-10-03T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q16957 'East Germany' (1949–1990 country in central Europe, unified into modern Germany); inception +1949-10-07T00:00:00Z; dissolved +1990-10-03T00:00:00Z,+1989-00-00T00:00:00Z; enwiki 'East Germany'; revision 2551607606. Provider label: 'German Democratic Republic'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "315",
+   "provider_label": "Czechoslovakia",
+   "qid": "Q33946",
+   "wikidata_label_en": "Czechoslovakia",
+   "wikidata_label_fr": "Tchécoslovaquie",
+   "wikidata_revision": 2555912676,
+   "wikidata_inception": [
+    "+1918-10-28T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-12-31T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q33946 'Czechoslovakia' (country in Central Europe (1918–1992)); inception +1918-10-28T00:00:00Z; dissolved +1992-12-31T00:00:00Z; enwiki 'Czechoslovakia'; revision 2555912676. Provider label: 'Czechoslovakia'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "345",
+   "provider_label": "Yugoslavia (Serbia)",
+   "qid": "Q684030",
+   "wikidata_label_en": "Principality of Serbia",
+   "wikidata_label_fr": "principauté de Serbie",
+   "wikidata_revision": 2550381134,
+   "wikidata_inception": [
+    "+1815-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1882-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1878,
+   "valid_to_year": 1881,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q684030 'Principality of Serbia' (1815-1882 principality in Southeastern Europe); inception +1815-01-01T00:00:00Z; dissolved +1882-01-01T00:00:00Z; enwiki 'Principality of Serbia'; revision 2550381134. Provider label: 'Yugoslavia (Serbia)'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "345",
+   "provider_label": "Yugoslavia (Serbia)",
+   "qid": "Q241748",
+   "wikidata_label_en": "Kingdom of Serbia",
+   "wikidata_label_fr": "royaume de Serbie",
+   "wikidata_revision": 2519407751,
+   "wikidata_inception": [
+    "+1882-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-12-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1882,
+   "valid_to_year": 1918,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q241748 'Kingdom of Serbia' (1882–1918 kingdom in Southeastern Europe); inception +1882-01-01T00:00:00Z; dissolved +1918-12-01T00:00:00Z; enwiki 'Kingdom of Serbia'; revision 2519407751. Provider label: 'Yugoslavia (Serbia)'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "345",
+   "provider_label": "Yugoslavia",
+   "qid": "Q36704",
+   "wikidata_label_en": "Yugoslavia",
+   "wikidata_label_fr": "Yougoslavie",
+   "wikidata_revision": 2553290415,
+   "wikidata_inception": [
+    "+1918-12-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1992-04-27T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1919,
+   "valid_to_year": 1991,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q36704 'Yugoslavia' (1918–1992 country in Southeastern Europe); inception +1918-12-01T00:00:00Z; dissolved +1992-04-27T00:00:00Z; enwiki 'Yugoslavia'; revision 2553290415. Provider label: 'Yugoslavia'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "345",
+   "provider_label": "Yugoslavia",
+   "qid": "Q838261",
+   "wikidata_label_en": "Federal Republic of Yugoslavia",
+   "wikidata_label_fr": "république fédérale de Yougoslavie",
+   "wikidata_revision": 2553095109,
+   "wikidata_inception": [
+    "+1992-04-27T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+2003-02-04T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1992,
+   "valid_to_year": 2002,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q838261 'Federal Republic of Yugoslavia' (former Balkan republic (1992–2003)); inception +1992-04-27T00:00:00Z; dissolved +2003-02-04T00:00:00Z; enwiki 'Federal Republic of Yugoslavia'; revision 2553095109. Provider label: 'Yugoslavia'.",
+   "evidence_raw_sha256": "94d9fe9d527584e7ffd5109a8ddc200f8687bd74a0a0e4dd6c0b5de6fe8696df",
+   "evidence_retrieved_at": "2026-10-15T22:47:03.873436+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "345",
+   "provider_label": "Yugoslavia (Serbia and Montenegro)",
+   "qid": "Q37024",
+   "wikidata_label_en": "Serbia and Montenegro",
+   "wikidata_label_fr": "Serbie-et-Monténégro",
+   "wikidata_revision": 2553095578,
+   "wikidata_inception": [
+    "+2003-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+2006-06-04T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 2003,
+   "valid_to_year": 2005,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q37024 'Serbia and Montenegro' (former political union in the Balkans (2003–2006)); inception +2003-00-00T00:00:00Z; dissolved +2006-06-04T00:00:00Z; enwiki 'Serbia and Montenegro'; revision 2553095578. Provider label: 'Yugoslavia (Serbia and Montenegro)'. 2006 left unmapped (Montenegro's independence in June).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "710",
+   "provider_label": "China",
+   "qid": "Q8733",
+   "wikidata_label_en": "Qing dynasty",
+   "wikidata_label_fr": "dynastie Qing",
+   "wikidata_revision": 2550384827,
+   "wikidata_inception": [
+    "+1636-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1860,
+   "valid_to_year": 1911,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q8733 'Qing dynasty' (Manchu-led dynasty of China (1644–1912)); inception +1636-01-01T00:00:00Z,+1644-00-00T00:00:00Z; dissolved +1912-01-01T00:00:00Z; enwiki 'Qing dynasty'; revision 2550384827. Provider label: 'China'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "710",
+   "provider_label": "China",
+   "qid": "Q13426199",
+   "wikidata_label_en": "Republic of China",
+   "wikidata_label_fr": "république de Chine",
+   "wikidata_revision": 2557233335,
+   "wikidata_inception": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1949-12-07T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1912,
+   "valid_to_year": 1949,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q13426199 'Republic of China' (1912–1949 country in Asia); inception +1912-01-01T00:00:00Z; dissolved +1949-12-07T00:00:00Z,+1971-00-00T00:00:00Z; enwiki 'Republic of China (1912–1949)'; revision 2557233335. Provider label: 'China'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "816",
+   "provider_label": "Vietnam (DRV)",
+   "qid": "Q172640",
+   "wikidata_label_en": "North Vietnam",
+   "wikidata_label_fr": "république démocratique du Vietnam",
+   "wikidata_revision": 2550570441,
+   "wikidata_inception": [
+    "+1945-09-02T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1976-07-02T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1954,
+   "valid_to_year": 1975,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q172640 'North Vietnam' (former country in Southeast Asia that existed from 1945 to 1976); inception +1945-09-02T00:00:00Z; dissolved +1976-07-02T00:00:00Z; enwiki 'North Vietnam'; revision 2550570441. Provider label: 'Vietnam (DRV)'. KGGEOPOL policy: unified Vietnam (VNM) from 1976-07-02.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "817",
+   "provider_label": "Republic of Vietnam",
+   "qid": "Q180573",
+   "wikidata_label_en": "South Vietnam",
+   "wikidata_label_fr": "république du Vietnam",
+   "wikidata_revision": 2557248773,
+   "wikidata_inception": [
+    "+1955-10-26T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1975-04-30T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q180573 'South Vietnam' (former state in Southeast Asia); inception +1955-10-26T00:00:00Z; dissolved +1975-04-30T00:00:00Z; enwiki 'South Vietnam'; revision 2557248773. Provider label: 'Republic of Vietnam'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "678",
+   "provider_label": "Yemen Arab Republic",
+   "qid": "Q267584",
+   "wikidata_label_en": "Yemen Arab Republic",
+   "wikidata_label_fr": "République arabe du Yémen",
+   "wikidata_revision": 2544384899,
+   "wikidata_inception": [
+    "+1962-09-26T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-05-22T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q267584 'Yemen Arab Republic' (former country); inception +1962-09-26T00:00:00Z; dissolved +1990-05-22T00:00:00Z; enwiki 'Yemen Arab Republic'; revision 2544384899. Provider label: 'Yemen Arab Republic'. COW spell from 1926 (Mutawakkilite Kingdom before 1962).",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "680",
+   "provider_label": "Yemen People's Republic",
+   "qid": "Q199841",
+   "wikidata_label_en": "South Yemen",
+   "wikidata_label_fr": "République démocratique populaire du Yémen",
+   "wikidata_revision": 2544386426,
+   "wikidata_inception": [
+    "+1967-11-30T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1990-05-22T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q199841 'South Yemen' (1967–1990 state in Western Asia); inception +1967-11-30T00:00:00Z; dissolved +1990-05-22T00:00:00Z; enwiki 'South Yemen'; revision 2544386426. Provider label: 'Yemen People's Republic'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "511",
+   "provider_label": "Zanzibar",
+   "qid": "Q157904",
+   "wikidata_label_en": "Sultanate of Zanzibar",
+   "wikidata_label_fr": "sultanat de Zanzibar",
+   "wikidata_revision": 2551403108,
+   "wikidata_inception": [
+    "+1856-10-19T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1890-00-00T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1963,
+   "valid_to_year": 1963,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q157904 'Sultanate of Zanzibar' (1856–1964 monarchy in the Indian Ocean); inception +1856-10-19T00:00:00Z,+1861-04-06T00:00:00Z; dissolved +1890-00-00T00:00:00Z,+1964-01-12T00:00:00Z; enwiki 'Sultanate of Zanzibar'; revision 2551403108. Provider label: 'Zanzibar'.",
+   "evidence_raw_sha256": "94d9fe9d527584e7ffd5109a8ddc200f8687bd74a0a0e4dd6c0b5de6fe8696df",
+   "evidence_retrieved_at": "2026-10-15T22:47:03.873436+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "511",
+   "provider_label": "Zanzibar",
+   "qid": "Q157535",
+   "wikidata_label_en": "People's Republic of Zanzibar",
+   "wikidata_label_fr": "république populaire de Zanzibar",
+   "wikidata_revision": 2507890473,
+   "wikidata_inception": [
+    "+1964-01-12T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1964-04-26T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1964,
+   "valid_to_year": 1964,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q157535 'People's Republic of Zanzibar' (short-lived republic in the Indian Ocean between January and April 1964); inception +1964-01-12T00:00:00Z; dissolved +1964-04-26T00:00:00Z; enwiki 'People's Republic of Zanzibar'; revision 2507890473. Provider label: 'Zanzibar'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "730",
+   "provider_label": "Korea",
+   "qid": "Q28179",
+   "wikidata_label_en": "Joseon",
+   "wikidata_label_fr": "période Joseon",
+   "wikidata_revision": 2544767571,
+   "wikidata_inception": [
+    "+1392-08-05T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1897-10-12T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1887,
+   "valid_to_year": 1896,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q28179 'Joseon' (Korean dynasty / kingdom (1392–1897)); inception +1392-08-05T00:00:00Z; dissolved +1897-10-12T00:00:00Z; enwiki 'Joseon'; revision 2544767571. Provider label: 'Korea'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "730",
+   "provider_label": "Korea",
+   "qid": "Q28233",
+   "wikidata_label_en": "Korean Empire",
+   "wikidata_label_fr": "Empire de Corée",
+   "wikidata_revision": 2544734979,
+   "wikidata_inception": [
+    "+1897-10-12T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1910-08-29T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1897,
+   "valid_to_year": 1905,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q28233 'Korean Empire' (state of Korea from October 1897 to August 29, 1910); inception +1897-10-12T00:00:00Z; dissolved +1910-08-29T00:00:00Z; enwiki 'Korean Empire'; revision 2544734979. Provider label: 'Korea'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "325",
+   "provider_label": "Italy (Sardinia)",
+   "qid": "Q165154",
+   "wikidata_label_en": "Kingdom of Sardinia",
+   "wikidata_label_fr": "royaume de Sardaigne",
+   "wikidata_revision": 2557241353,
+   "wikidata_inception": [
+    "+1720-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1861-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1816,
+   "valid_to_year": 1860,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q165154 'Kingdom of Sardinia' (state in Southern Europe from 1324 to 1861); inception +1720-00-00T00:00:00Z,+1324-00-00T00:00:00Z; dissolved +1861-01-01T00:00:00Z; enwiki 'Kingdom of Sardinia'; revision 2557241353. Provider label: 'Italy (Sardinia)'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "325",
+   "provider_label": "Italy",
+   "qid": "Q172579",
+   "wikidata_label_en": "Kingdom of Italy",
+   "wikidata_label_fr": "royaume d'Italie",
+   "wikidata_revision": 2555665469,
+   "wikidata_inception": [
+    "+1861-03-17T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1946-06-18T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": 1861,
+   "valid_to_year": 1945,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q172579 'Kingdom of Italy' (kingdom in Southern Europe from 1861 to 1946); inception +1861-03-17T00:00:00Z; dissolved +1946-06-18T00:00:00Z; enwiki 'Kingdom of Italy'; revision 2555665469. Provider label: 'Italy'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "240",
+   "provider_label": "Hanover",
+   "qid": "Q164079",
+   "wikidata_label_en": "Kingdom of Hanover",
+   "wikidata_label_fr": "royaume de Hanovre",
+   "wikidata_revision": 2535276942,
+   "wikidata_inception": [
+    "+1814-10-12T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1866-09-20T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q164079 'Kingdom of Hanover' (German kingdom established in 1814); inception +1814-10-12T00:00:00Z; dissolved +1866-09-20T00:00:00Z; enwiki 'Kingdom of Hanover'; revision 2535276942. Provider label: 'Hanover'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "245",
+   "provider_label": "Bavaria",
+   "qid": "Q154195",
+   "wikidata_label_en": "Kingdom of Bavaria",
+   "wikidata_label_fr": "royaume de Bavière",
+   "wikidata_revision": 2551117636,
+   "wikidata_inception": [
+    "+1806-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q154195 'Kingdom of Bavaria' (kingdom in Central Europe between 1806 and 1918, from January 1871 part of the German Empire); inception +1806-01-01T00:00:00Z; dissolved +1918-11-09T00:00:00Z; enwiki 'Kingdom of Bavaria'; revision 2551117636. Provider label: 'Bavaria'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "267",
+   "provider_label": "Baden",
+   "qid": "Q186320",
+   "wikidata_label_en": "Grand Duchy of Baden",
+   "wikidata_label_fr": "grand-duché de Bade",
+   "wikidata_revision": 2549740123,
+   "wikidata_inception": [
+    "+1806-07-12T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q186320 'Grand Duchy of Baden' (German grand duchy (1806-1918)); inception +1806-07-12T00:00:00Z; dissolved +1918-01-01T00:00:00Z; enwiki 'Grand Duchy of Baden'; revision 2549740123. Provider label: 'Baden'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "269",
+   "provider_label": "Saxony",
+   "qid": "Q153015",
+   "wikidata_label_en": "Kingdom of Saxony",
+   "wikidata_label_fr": "royaume de Saxe",
+   "wikidata_revision": 2541151864,
+   "wikidata_inception": [
+    "+1806-12-20T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-11T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q153015 'Kingdom of Saxony' (former German state (1806-1918)); inception +1806-12-20T00:00:00Z; dissolved +1918-11-11T00:00:00Z; enwiki 'Kingdom of Saxony'; revision 2541151864. Provider label: 'Saxony'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "271",
+   "provider_label": "Wuerttemburg",
+   "qid": "Q159631",
+   "wikidata_label_en": "Kingdom of Württemberg",
+   "wikidata_label_fr": "royaume du Wurtemberg",
+   "wikidata_revision": 2550191790,
+   "wikidata_inception": [
+    "+1806-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-11-06T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q159631 'Kingdom of Württemberg' (kingdom in Central Europe between 1806–1918, from January 1871 part of the German Empire); inception +1806-01-01T00:00:00Z; dissolved +1918-11-06T00:00:00Z; enwiki 'Kingdom of Württemberg'; revision 2550191790. Provider label: 'Wuerttemburg'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "273",
+   "provider_label": "Hesse Electoral",
+   "qid": "Q529605",
+   "wikidata_label_en": "Electorate of Hesse",
+   "wikidata_label_fr": "Électorat de Hesse",
+   "wikidata_revision": 2557026369,
+   "wikidata_inception": [
+    "+1814-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1866-08-00T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q529605 'Electorate of Hesse' (since 1815 sovereign state, member of the German Confederation, annexed by Prussia in 1866, indirect successor of the Kurfüstentum of Hesse, a territory of Holy Roman Empire); inception +1814-00-00T00:00:00Z; dissolved +1866-08-00T00:00:00Z; enwiki 'Electorate of Hesse'; revision 2557026369. Provider label: 'Hesse Electoral'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "275",
+   "provider_label": "Hesse Grand Ducal",
+   "qid": "Q20135",
+   "wikidata_label_en": "Grand Duchy of Hesse",
+   "wikidata_label_fr": "grand-duché de Hesse",
+   "wikidata_revision": 2536530051,
+   "wikidata_inception": [
+    "+1806-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q20135 'Grand Duchy of Hesse' (member state of the German Confederation & the German Empire (1806–1918)); inception +1806-01-01T00:00:00Z; dissolved +1918-01-01T00:00:00Z; enwiki 'Grand Duchy of Hesse'; revision 2536530051. Provider label: 'Hesse Grand Ducal'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "280",
+   "provider_label": "Mecklenburg Schwerin",
+   "qid": "Q158445",
+   "wikidata_label_en": "Grand Duchy of Mecklenburg-Schwerin",
+   "wikidata_label_fr": "grand-duché de Mecklembourg-Schwerin",
+   "wikidata_revision": 2557044779,
+   "wikidata_inception": [
+    "+1815-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1918-00-00T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q158445 'Grand Duchy of Mecklenburg-Schwerin' (grand duchy); inception +1815-01-01T00:00:00Z; dissolved +1918-00-00T00:00:00Z; enwiki 'Grand Duchy of Mecklenburg-Schwerin'; revision 2557044779. Provider label: 'Mecklenburg Schwerin'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "327",
+   "provider_label": "Papal States",
+   "qid": "Q170174",
+   "wikidata_label_en": "Papal States",
+   "wikidata_label_fr": "États pontificaux",
+   "wikidata_revision": 2552639782,
+   "wikidata_inception": [
+    "+0754-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1870-09-20T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q170174 'Papal States' (territories mostly in the Appenine Peninsula under the sovereign direct rule of the pope between 756–1870); inception +0754-00-00T00:00:00Z; dissolved +1870-09-20T00:00:00Z; enwiki 'Papal States'; revision 2552639782. Provider label: 'Papal States'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "329",
+   "provider_label": "Two Sicilies",
+   "qid": "Q180393",
+   "wikidata_label_en": "Kingdom of the Two Sicilies",
+   "wikidata_label_fr": "royaume des Deux-Siciles",
+   "wikidata_revision": 2555673082,
+   "wikidata_inception": [
+    "+1738-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1861-02-21T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q180393 'Kingdom of the Two Sicilies' (state formed from the kingdoms of Sicily and Naples (1815–1861)); inception +1738-01-01T00:00:00Z; dissolved +1861-02-21T00:00:00Z; enwiki 'Kingdom of the Two Sicilies'; revision 2555673082. Provider label: 'Two Sicilies'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "332",
+   "provider_label": "Modena",
+   "qid": "Q252580",
+   "wikidata_label_en": "Duchy of Modena and Reggio",
+   "wikidata_label_fr": "duché de Modène et Reggio",
+   "wikidata_revision": 2550862407,
+   "wikidata_inception": [
+    "+1452-00-00T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1859-01-01T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q252580 'Duchy of Modena and Reggio' (former country); inception +1452-00-00T00:00:00Z; dissolved +1859-01-01T00:00:00Z; enwiki 'Duchy of Modena and Reggio'; revision 2550862407. Provider label: 'Modena'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "335",
+   "provider_label": "Parma",
+   "qid": "Q165040",
+   "wikidata_label_en": "Duchy of Parma and Piacenza",
+   "wikidata_label_fr": "duché de Parme et Plaisance",
+   "wikidata_revision": 2555114511,
+   "wikidata_inception": [
+    "+1545-09-16T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1859-06-09T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q165040 'Duchy of Parma and Piacenza' (former Italian state (1545–1802; 1814–1859)); inception +1545-09-16T00:00:00Z; dissolved +1859-06-09T00:00:00Z; enwiki 'Duchy of Parma and Piacenza'; revision 2555114511. Provider label: 'Parma'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "337",
+   "provider_label": "Tuscany",
+   "qid": "Q154849",
+   "wikidata_label_en": "Grand Duchy of Tuscany",
+   "wikidata_label_fr": "grand-duché de Toscane",
+   "wikidata_revision": 2546624002,
+   "wikidata_inception": [
+    "+1569-08-27T00:00:00Z"
+   ],
+   "wikidata_dissolved": [
+    "+1860-00-00T00:00:00Z"
+   ],
+   "kind": "historical_state",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q154849 'Grand Duchy of Tuscany' (former Italian state (1569–1801; 1815–1859)); inception +1569-08-27T00:00:00Z; dissolved +1860-00-00T00:00:00Z; enwiki 'Grand Duchy of Tuscany'; revision 2546624002. Provider label: 'Tuscany'.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  },
+  {
+   "provider": "cow",
+   "code": "713",
+   "provider_label": "Taiwan",
+   "qid": "Q865",
+   "wikidata_label_en": "Taiwan",
+   "wikidata_label_fr": "Taïwan",
+   "wikidata_revision": 2553025887,
+   "wikidata_inception": [
+    "+1912-01-01T00:00:00Z"
+   ],
+   "wikidata_dissolved": [],
+   "kind": "non_crosswalk_current_entity",
+   "valid_from_year": null,
+   "valid_to_year": null,
+   "review_status": "agent_mapped_pending_maintainer_review",
+   "evidence": "Wikidata Q865 'Taiwan' (country in East Asia); inception +1912-01-01T00:00:00Z; dissolved -; enwiki 'Taiwan'; revision 2553025887. Provider label: 'Taiwan'. Not in the ALLC crosswalk.",
+   "evidence_raw_sha256": "d69b197cd35414ef9a800f14b53328ee750718c4143dfac4efbf9034c26fe658",
+   "evidence_retrieved_at": "2026-10-15T22:46:10.161761+00:00"
+  }
+ ]
+}

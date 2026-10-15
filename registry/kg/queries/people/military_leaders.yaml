@@ -1,0 +1,27 @@
+id: people.military_leaders
+domain: people
+owner: KGPEOPLE
+description: >-
+  Conquerors and military leaders: humans with occupation military leader (Q1402561), military officer
+  (Q189290) or military personnel (Q47064) and at least 30 sitelinks, plus humans with at least 40 sitelinks
+  who have a "conflict" (P607) statement. Thresholds keep the commanders of history (Alexander, Genghis Khan,
+  Hernan Cortes, Napoleon, Giap ...) without the long tail of officers.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?occupation { wd:Q1402561 wd:Q189290 wd:Q47064 }
+      ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links .
+      FILTER(?links >= 30)
+    } UNION {
+      ?item wdt:P607 ?conflict ; wikibase:sitelinks ?links .
+      FILTER(?links >= 40)
+    }
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 15000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

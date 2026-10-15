@@ -40,8 +40,8 @@ from datetime import date
 from typing import Any
 
 from reva.adapters.connectors import atlas_law_common as common
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem
 
 SOURCE_KEY = "factbook.json"
 ATLAS_SOURCE = "factbook"
@@ -129,47 +129,41 @@ def url_for(region: str, gec: str) -> str:
     return f"https://{HOST}/factbook/factbook.json/{COMMIT}/{region}/{gec}.json"
 
 
-class FactbookConnector:
-    def describe(self) -> ConnectorSpec:
-        return common.law_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="CIA World Factbook (factbook/factbook.json mirror)",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=(ATLAS_DATASET,),
-            field_mappings={
-                "commit": COMMIT,
-                "data_commit": DATA_COMMIT,
-                "fields": {k: list(v[0]) for k, v in TEXT_FIELDS.items()},
-            },
-            units={"text": "text", "suffrage.minimum_age": "years (age)"},
-            geography=("ALL_FACTBOOK_ENTITIES",),
-            time_semantics="as published on the last mirror data update (2026-01-22)",
-            lineage_family="cia_world_factbook",
-            cadence_seconds=365 * 86400,
-            revision_strategy="pinned commit; source discontinued",
-            max_response_bytes=MAX_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=common.code_digest(sys.modules[__name__]),
-        )
+def items(gecs: Sequence[str] | None = None) -> list[tuple[str, str]]:
+    """(key "<region>/<gec>", URL at the pinned commit) of every profile (or of ``gecs``)."""
+    return [
+        (f"{region}/{gec}", url_for(region, gec))
+        for region, codes in PATHS.items()
+        for gec in codes.split()
+        if gecs is None or gec in gecs
+    ]
 
-    def items(self, gecs: Sequence[str] | None = None) -> tuple[FetchItem, ...]:
-        out = []
-        for region, codes in PATHS.items():
-            for gec in codes.split():
-                if gecs is None or gec in gecs:
-                    out.append(
-                        FetchItem(
-                            key=f"{region}/{gec}",
-                            url=url_for(region, gec),
-                            max_bytes=MAX_BYTES,
-                            expected_media_types=("text/plain", "application/json"),
-                        )
-                    )
-        return tuple(out)
+
+def atlas_source() -> AtlasSourceSpec:
+    """The ATLASCORE source spec (connector ``atlas.factbook``; budget key ``factbook.json``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="CIA World Factbook (factbook/factbook.json mirror)",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=(f"factbook.json@{COMMIT}",),
+        cadence_seconds=365 * 86400,
+        planned_requests=len(items()),
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=0.5,
+        parser_version=PARSER_VERSION,
+        code_digest=common.code_digest(sys.modules[__name__]),
+        field_mappings={
+            "commit": COMMIT,
+            "data_commit": DATA_COMMIT,
+            "fields": {k: list(v[0]) for k, v in TEXT_FIELDS.items()},
+        },
+    )
 
 
 def clean_text(s: str) -> str:
@@ -292,60 +286,54 @@ def parse_profile(body: bytes, gec: str, region: str, raw_sha256: str) -> list[d
     return rows
 
 
-async def run(
-    engine: Any,
-    store: Any,
-    http: Any,
-    *,
-    origin: str,
-    gecs: Sequence[str] | None = None,
-    actor: str = "worker:atlas_factbook",
-) -> common.IngestReport:
-    from reva.atlas.tables import register_atlas_table
-
-    conn = FactbookConnector()
-    spec = conn.describe()
+async def atlas_ingest(run: Any, gecs: Sequence[str] | None = None) -> dict[str, Any]:
+    """One request per Factbook profile -> atlas table ``factbook.legal_2026_01`` (``gecs`` restricts the
+    profiles, for tests). A profile that cannot be read is a typed ``Blocked`` entry and is listed in the
+    table's coverage note; nothing is invented for it."""
     report = common.IngestReport(CONNECTOR_NAME)
+    if not run.wants(ATLAS_DATASET):
+        return report.as_dict()
     rows: list[dict[str, Any]] = []
     shas: list[str] = []
-    for item in conn.items(gecs):
-        got = await common.fetch_raw(http, item, SOURCE_KEY)
+    for key, url in items(gecs):
+        got = await common.fetch(
+            run,
+            url,
+            key=key,
+            source_key=SOURCE_KEY,
+            media_types=("text/plain", "application/json"),
+            max_bytes=MAX_BYTES,
+        )
         if isinstance(got, common.Blocked):
             report.blocked.append(got)
             continue
-        sha = common.archive_raw(engine, store, spec, got, actor=actor)
+        sha = run.archive(got)
         shas.append(sha)
-        region, gec = item.key.split("/")
+        region, gec = key.split("/")
         rows.extend(parse_profile(got.body, gec, region, sha))
     report.raw.append({"items": len(shas), "commit": COMMIT})
     if rows:
-        s = register_atlas_table(
-            engine,
-            store,
-            source=ATLAS_SOURCE,
+        blocked = [b.item for b in report.blocked]
+        out = run.register(
             dataset=ATLAS_DATASET,
             frame=common.atlas_frame(rows),
             raw_sha256s=shas,
-            parser_version=PARSER_VERSION,
-            origin=origin,
             geo_scheme="fips",
             rights=RIGHTS,
             coverage_note=f"CIA World Factbook legal fields as of 2026-01-22 (mirror {DATA_COMMIT[:7]}); "
-            f"{len(shas)} profiles; blocked: {len(report.blocked)}",
+            f"{len(shas)} profiles; not read: {blocked[:50]}",
         )
-        report.tables.append(
-            {k: s[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")}
-            | {"countries": s["coverage"]["countries"]}
-        )
-    return report
+        report.tables.append(common.table_summary(out))
+    return report.as_dict()
 
 
 __all__ = [
     "ATLAS_DATASET",
     "ATLAS_SOURCE",
     "CONNECTOR_NAME",
-    "FactbookConnector",
+    "atlas_ingest",
+    "atlas_source",
     "families_mentioned",
+    "items",
     "parse_profile",
-    "run",
 ]

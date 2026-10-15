@@ -69,7 +69,7 @@ async def test_cow_atlas_and_kg_load(db: Any) -> None:
     s = _summary(out)
     assert {t["dataset_key"] for t in s["tables"]} == {"atlas.cow.nmc7", "atlas.cow.system2024", "atlas.cow.wars4"}
     kg = s["kg"]
-    assert kg["rejected_total"] == 0, kg["rejected_sample"]
+    assert not kg["rejected_counts"], kg["rejected_sample"]
     assert kg["statements_inserted"] > 1000
     with db.owner.connect() as c:
         rows = c.execute(

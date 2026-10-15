@@ -29,13 +29,20 @@ def _fetch(connector: str, items):
     """Fetch fixture items through the platform's AtlasRun.get (the same path as a live run)."""
     from reva.atlas.ingest import AtlasRun
 
-    run = AtlasRun(spec=U.CONNECTORS[connector].spec(), http=FixtureHttp(connector), engine=None,  # type: ignore[arg-type]
-                   store=None, settings=None, origin="test_fixture")  # type: ignore[arg-type]
+    run = AtlasRun(
+        spec=U.CONNECTORS[connector].spec(),
+        http=FixtureHttp(connector),
+        engine=None,  # type: ignore[arg-type]
+        store=None,
+        settings=None,
+        origin="test_fixture",
+    )  # type: ignore[arg-type]
 
     async def go():
         return {
-            it.key: await run.get(it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes,
-                                  params=it.params)
+            it.key: await run.get(
+                it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes, params=it.params
+            )
             for it in items
         }
 

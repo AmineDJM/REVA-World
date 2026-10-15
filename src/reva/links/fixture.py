@@ -157,6 +157,7 @@ async def capture(
         cached = cache_dir / f"batch_{key}.json" if cache_dir else None
         if cached is not None and cached.exists():
             part = json.loads(cached.read_text(encoding="utf-8"))
+            requests += 1  # fetched by an earlier run of this capture (one request per batch)
         elif entitydata:
             part = await _entitydata(client, chunk)
             requests += len(chunk)

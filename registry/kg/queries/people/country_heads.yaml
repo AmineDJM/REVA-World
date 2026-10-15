@@ -1,0 +1,43 @@
+id: people.country_heads
+domain: people
+owner: KGPEOPLE
+description: >-
+  Head of state (P35) and head of government (P6) statements of current and historical states, empires,
+  colonies and dependencies, with every non-deprecated rank (not only the truthy/current one) and their
+  start/end/point-in-time qualifiers, replaces/replaced-by and series ordinal. This is the "who led country X
+  when" backbone; the people themselves are seeded by people.state_leaders.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT DISTINCT ?state ?prop ?statement ?person ?rank ?start ?end ?pit ?replaces ?replaced_by ?ordinal WHERE {
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+                  wd:Q133156 wd:Q161243 wd:Q164142 }
+    VALUES (?p ?prop) { (p:P35 wd:P35) (p:P6 wd:P6) }
+    ?state wdt:P31 ?cls ; ?p ?statement .
+    ?statement ps:P35|ps:P6 ?person ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+    OPTIONAL { ?statement pq:P1365 ?replaces }
+    OPTIONAL { ?statement pq:P1366 ?replaced_by }
+    OPTIONAL { ?statement pq:P1545 ?ordinal }
+  }
+columns:
+  subject: state
+  property_var: prop
+  object: person
+  statement: statement
+  rank: rank
+  start: start
+  end: end
+  point_in_time: pit
+  qualifiers: {P1365: replaces, P1366: replaced_by, P1545: ordinal}
+max_rows: 40000
+timeout_seconds: 55
+expand_hops: 1
+notes: >-
+  Expected size: a few thousand to ~20k statements (most states list only recent leaders on P35/P6; the long
+  historical lists live on the persons' P39 "position held", seeded by people.state_leaders and
+  people.monarchs). A statement whose person has several start qualifiers gives several rows (same
+  statement id; the harvester de-duplicates by statement id). One request, no split.

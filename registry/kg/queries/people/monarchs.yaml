@@ -1,0 +1,27 @@
+id: people.monarchs
+domain: people
+owner: KGPEOPLE
+description: >-
+  Monarchs of current and historical states and empires: holders (P39, non-deprecated) of a position that is
+  "monarch" (Q116) or a subclass/instance chain of it (king, queen regnant, emperor, sultan, tsar, pharaoh,
+  "King of Portugal", "Emperor of Brazil", ...), plus humans whose occupation (P106) is monarch. No notability
+  threshold: dynastic succession needs every holder.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      ?position (wdt:P31|wdt:P279)/wdt:P279* wd:Q116 .
+      ?item p:P39 ?ps .
+      ?ps ps:P39 ?position ; wikibase:rank ?pr .
+      FILTER(?pr != wikibase:DeprecatedRank)
+    } UNION {
+      ?item wdt:P106 wd:Q116 .
+    }
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 50000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

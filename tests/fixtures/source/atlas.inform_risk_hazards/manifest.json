@@ -1,0 +1,26 @@
+[
+  {
+    "request_fingerprint": "4a23751582977528177e0f1774bfb4afbf8d4fc2c0b8bba293cd8b3102b3d793",
+    "url": "https://drmkc.jrc.ec.europa.eu/inform-index/API/InformAPI/countries/Scores/?WorkflowId=505&IndicatorId=HA.NAT,HA.NAT.EQ,HA.NAT.FL,HA.NAT.CFL,HA.NAT.TC,HA.NAT.DR,HA.NAT.TS,HA.NAT.EPI",
+    "file": "4a23751582977528.json",
+    "sha256": "6f541035bac3d8dbe6438b6c3754d78adeeb53b6353ed116ee5704025fae8734",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:49:45.546836+00:00",
+    "licence": "European Commission reuse policy (Decision 2011/833/EU; CC BY 4.0) - to be confirmed by a maintainer"
+  },
+  {
+    "request_fingerprint": "98f7e4fc9f51e4dacfabec8576f6b26ef0804ae67c6abec191e3eea40c24e9c7",
+    "url": "https://drmkc.jrc.ec.europa.eu/inform-index/API/InformAPI/workflows/GetByWorkflowGroup/INFORM2026",
+    "file": "98f7e4fc9f51e4da.json",
+    "sha256": "db77e7ff06e47e98fbd7ef12748eaae0a17b4846a1edf82b638ffd62c124c996",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:49:43.352196+00:00",
+    "licence": "European Commission reuse policy (Decision 2011/833/EU; CC BY 4.0) - to be confirmed by a maintainer"
+  }
+]

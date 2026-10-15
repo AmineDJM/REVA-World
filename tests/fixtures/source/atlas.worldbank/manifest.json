@@ -1,0 +1,249 @@
+[
+  {
+    "request_fingerprint": "38b297974a9ddc3ae9b43c0f88152494178d63dd9752bb66724e6a036113c3f3",
+    "url": "https://api.worldbank.org/pip/v1/pip?country=all&year=all&povline=3.00&fill_gaps=false&version=20260922_2021_01_02_PROD&format=csv",
+    "file": "38b297974a9ddc3a.csv",
+    "sha256": "fe49c65fb2ab2650459250f25ac2f3874c0f5f3702ea7303ee036db91e884f5d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of PIP 20260922_2021_01_02_PROD povline 3.00 (countries DZA FRA USA TWN CHN)"
+  },
+  {
+    "request_fingerprint": "5d4f6b4104eff0522028d83be176b59e460cbf9a4672afb4da1d6b070c0af827",
+    "url": "https://api.worldbank.org/pip/v1/pip?country=all&year=all&povline=4.20&fill_gaps=false&version=20260922_2021_01_02_PROD&format=csv",
+    "file": "5d4f6b4104eff052.csv",
+    "sha256": "fe94d3de2427f31cae43faeac788c1cdf6f1fcb4038355d46f4d8ab8af4d37ec",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of PIP 20260922_2021_01_02_PROD povline 4.20 (countries DZA FRA USA TWN CHN)"
+  },
+  {
+    "request_fingerprint": "6b1c7bfee73ff63b95e4b23a5f903551bd0581e17bc0adb4d1d8c4224357a899",
+    "url": "https://api.worldbank.org/pip/v1/pip?country=all&year=all&povline=8.30&fill_gaps=false&version=20260922_2021_01_02_PROD&format=csv",
+    "file": "6b1c7bfee73ff63b.csv",
+    "sha256": "a3409de4e7efe8e663592e0ac0696086284f9133e429446409ba0c6f29dc4a66",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of PIP 20260922_2021_01_02_PROD povline 8.30 (countries DZA FRA USA TWN CHN)"
+  },
+  {
+    "request_fingerprint": "0fab1f70595b930ba5e18ec247920cb04b5a92912ae8103905cf47d86434d352",
+    "url": "https://api.worldbank.org/v2/fr/source/1/indicator?format=json&per_page=20000",
+    "file": "0fab1f70595b930b.json",
+    "sha256": "1e61bacae5db0f1c38cdef0f9190c07e095f8d61a2fd5b220e31ac566f4ad42f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 1 (codes ['IC.BUS.EASE.DFRN.XQ.DB1719', 'IC.REG.DURS'])"
+  },
+  {
+    "request_fingerprint": "c187a767898d7a3f85be69fe13eb3125850ccbe647b1757793ab77048d50b5b8",
+    "url": "https://api.worldbank.org/v2/fr/source/12/indicator?format=json&per_page=20000",
+    "file": "c187a767898d7a3f.json",
+    "sha256": "faac23be809a8264fdf0b0aa69681d7ca4392e103e987acdc1e8856569cd4dd1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 12 (codes ['PRJ.ATT.15UP.NED.MF', 'SE.PRM.ENRR'])"
+  },
+  {
+    "request_fingerprint": "da74c8d4e114a1b173e52aa2d1a2e67f369554776ae418d5232cb282b08858c5",
+    "url": "https://api.worldbank.org/v2/fr/source/14/indicator?format=json&per_page=20000",
+    "file": "da74c8d4e114a1b1.json",
+    "sha256": "58729c7d6f516763233a56ba3b48a912a4d7abddb31cec94594ccc150c091502",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 14 (codes ['SL.UEM.TOTL.FE.ZS', 'SP.POP.TOTL.FE.IN'])"
+  },
+  {
+    "request_fingerprint": "dd90c86b6e907a364b1f452da5cae60fb6f3676f201b82977366e1973a0e3895",
+    "url": "https://api.worldbank.org/v2/fr/source/16/indicator?format=json&per_page=20000",
+    "file": "dd90c86b6e907a36.json",
+    "sha256": "104ec68c464a1d048ecfe35650f09b456916252259617bac55b91bebbf585672",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 16 (codes ['SH.XPD.CHEX.GD.ZS', 'SP.POP.TOTL'])"
+  },
+  {
+    "request_fingerprint": "6c5a9c3958d8979687c126bcfdec83222285a76107fb196b8d956cc2252f3f06",
+    "url": "https://api.worldbank.org/v2/fr/source/2/indicator?format=json&per_page=20000",
+    "file": "6c5a9c3958d89796.json",
+    "sha256": "ec73fc0e417677c4550d3ec4c99caca1a258bfabdd4f6f78f29fd2379e0888f1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 2 (codes ['AG.LND.TOTL.K2', 'EN.POP.DNST', 'NE.RSB.GNFS.CD', 'NY.GDP.MKTP.CD', 'SH.DYN.MORT', 'SL.UEM.TOTL.ZS', 'SP.POP.TOTL'])"
+  },
+  {
+    "request_fingerprint": "9db1f64c516212904b107ec788fd5f6199b189cd255840840980b2542246fbcd",
+    "url": "https://api.worldbank.org/v2/fr/source/25/indicator?format=json&per_page=20000",
+    "file": "9db1f64c51621290.json",
+    "sha256": "923e31a8a061b869250e243377dda7ada0d45ecb98ce3d9ee47c7e53b44c09ad",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 25 (codes ['SL.UEM.TOTL.ZS', 'SP.POP.TOTL'])"
+  },
+  {
+    "request_fingerprint": "77edf9fbc5945dde8fe6a36fa86dd9bddb385fe98ada4c1e0a86e5151c441fd2",
+    "url": "https://api.worldbank.org/v2/fr/source/3/indicator?format=json&per_page=20000",
+    "file": "77edf9fbc5945dde.json",
+    "sha256": "22dcf7f403a61d15b0324d54741b2fc5303377e83fc42259e09d8cb570853e69",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 3 (codes ['GOV_WGI_CC.EST', 'GOV_WGI_RL.EST'])"
+  },
+  {
+    "request_fingerprint": "f9580d3929e3429159f7dbb3e2765d5240b471dc72f4e087adf2a8aa451f3c54",
+    "url": "https://api.worldbank.org/v2/fr/source/6/indicator?format=json&per_page=20000",
+    "file": "f9580d3929e34291.json",
+    "sha256": "f3c6488bb13457fa7acafe45c44c85524299023b29694505aa9f112956ab8064",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json;charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of the French indicator list of source 6 (codes ['DT.DOD.DECT.CD', 'DT.TDS.DECT.CD'])"
+  },
+  {
+    "request_fingerprint": "fc4f24d38c4ac0798bb8479d2e414e82c6b64fafcefff75a4136f7aea278efa4",
+    "url": "https://databank.worldbank.org/data/download/DB_CSV.zip",
+    "file": "fc4f24d38c4ac079.zip",
+    "sha256": "246f013a0ba33f39b1994b52a45cebb625d8e793f2299be9c252dc780c8698ee",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of DB_CSV.zip sha256 c49f221b0906843a4e88403a2a1d3d8aed0d30ab8fb8f336c0b28328ff196756 (rows {'DBData.csv': 6, 'DBCountry.csv': 5, 'DBSeries.csv': 1}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "4a50cbde07ff1fa3f56c1675d347e4c33cea8f72bc423052cd035f8a53cbef20",
+    "url": "https://databank.worldbank.org/data/download/EdStats_CSV.zip",
+    "file": "4a50cbde07ff1fa3.zip",
+    "sha256": "5a252e3472341a5dd5551c59413f247c29ebbfa639face2299812cd758215821",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of EdStats_CSV.zip sha256 8ccdd02f411e3f067499253ed577d107e9612f94d6141961ad7dc591f92fd32c (rows {'EdStatsData.csv': 12, 'EdStatsCountry.csv': 6, 'EdStatsSeries.csv': 2, 'EdStatsCountry-Series.csv': 0, 'EdStatsFootNote.csv': 159}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "3be5f770318524c4f3e7bc26fa64a7c422588178ee0f4949e749d8f78588ae2b",
+    "url": "https://databank.worldbank.org/data/download/Gender_Stats_CSV.zip",
+    "file": "3be5f770318524c4.zip",
+    "sha256": "46bd0255fc5a4035c344df88c39ab5d0097f370f4fc0fcb07c444395d342f3ef",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of Gender_Stats_CSV.zip sha256 2990bb8c96ded0b34d09b43e2d79b349f1d3e9c67f09e451198c408103ed9f88 (rows {'Gender_StatsCSV.csv': 12, 'Gender_StatsCountry.csv': 6, 'Gender_StatsSeries.csv': 2, 'Gender_Statscountry-series.csv': 0, 'Gender_Statsfootnote.csv': 66, 'Gender_Statsseries-time.csv': 0}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "d431665b1e7399a512df0ed733649ea558c095a05428d1cc26ec06ee3f12cf63",
+    "url": "https://databank.worldbank.org/data/download/HNP_Stats_CSV.zip",
+    "file": "d431665b1e7399a5.zip",
+    "sha256": "c995975bdf3cd9d48e62e2d10a798a9544be358eed177149aea06c6bf2a869e6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of HNP_Stats_CSV.zip sha256 ba3af48ca40372baa293f4ee3a9b46ae58d87dc64bd695d7503033b9ab9e0ba2 (rows {'HNP_StatsCSV.csv': 12, 'HNP_StatsCountry.csv': 6, 'HNP_StatsSeries.csv': 2, 'HNP_Statscountry-series.csv': 4, 'HNP_Statsfootnote.csv': 6, 'HNP_Statsseries-time.csv': 0}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "71cd4b5cf5b5698bea54e493c741a52ec2b82aeab6415037c9677e9b8b3124ca",
+    "url": "https://databank.worldbank.org/data/download/IDS_CSV.zip",
+    "file": "71cd4b5cf5b5698b.zip",
+    "sha256": "fec1580f22ff87cdc5b658da75faf9f3e5939bf611596ef6c0abdfef1c6f7527",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of IDS_CSV.zip sha256 0b249b4cf30f1ecf20a7fb903d24c5443116b73235e0474c61774601e3db9f06 (rows {'IDS_ALLCountries_Data.csv': 9, 'IDS_FootNoteMetaData.csv': 0, 'IDS_SeriesMetaData.csv': 2, 'IDS_CountryMetaData.csv': 2, 'Country-Series - Metadata.csv': 2}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "4de972fed8a4222c0f8c003ea49729f1e26d8e527ea62427ea8e050045db6bec",
+    "url": "https://databank.worldbank.org/data/download/Jobs_CSV.zip",
+    "file": "4de972fed8a4222c.zip",
+    "sha256": "3a3288ee1bd03131023ca5f9aad93bc7c57d09161fb3fddb31a0df98548faef4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of Jobs_CSV.zip sha256 60d6544d8f2be227ef7e7e73804ea53234a2a8a1bd1eb061f624e56f45c72796 (rows {'JobsCSV.csv': 12, 'JobsCountry.csv': 6, 'JobsSeries.csv': 2, 'Jobscountry-series.csv': 4, 'Jobsfootnote.csv': 107, 'Jobsseries-time.csv': 0}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "cff438936c07e281f2627fa59bac7986d459b23e0248c103558b55960dc447b5",
+    "url": "https://databank.worldbank.org/data/download/WDI_CSV.zip",
+    "file": "cff438936c07e281.zip",
+    "sha256": "e1da56cdb560c72a7ee2f74279e83484f3af6f842386b838aa0772bd8b34c5ca",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of WDI_CSV.zip sha256 1cbb81b7e8e656e05fe9236f201d6d59a82d62a77f96c147c1bc63940a7b0c0c (rows {'WDICSV.csv': 42, 'WDICountry.csv': 6, 'WDISeries.csv': 7, 'WDIcountry-series.csv': 4, 'WDIfootnote.csv': 327, 'WDIseries-time.csv': 0}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  },
+  {
+    "request_fingerprint": "fae79570f57ed2bc431153e1451c2d7efd73ca7e49f006785e0ce4c6bfc4b021",
+    "url": "https://databank.worldbank.org/data/download/WGI_CSV.zip",
+    "file": "fae79570f57ed2bc.zip",
+    "sha256": "e038ca7ade8973657269aed91520dedfd1e0a48830f13429fc3cb12ef1ca5068",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-zip-compressed"
+    },
+    "retrieved_at": "2026-10-15T22:06:00+00:00",
+    "licence": "CC BY 4.0 (World Bank; per-series licence in Series metadata)",
+    "slice_note": "recorded slice of WGI_CSV.zip sha256 137acf55c0899d1c319be282ca173e944aa3a5f5b7693d916518e484987c4434 (rows {'WGICSV.csv': 14, 'WGICountry.csv': 7, 'WGISeries.csv': 2}); geos ['AIA', 'ANT', 'CHN', 'CHN_BEI', 'DZA', 'FRA', 'HIC', 'TWN', 'USA', 'WLD']"
+  }
+]

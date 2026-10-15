@@ -17594,13 +17594,7 @@
             "description": "Invalid request"
           },
           "429": {
-            "description": "Rate limited, or the daily LLM budget is exhausted (nothing was sent)"
-          },
-          "502": {
-            "description": "LLM provider failed"
-          },
-          "503": {
-            "description": "LLM budget ledger unavailable"
+            "description": "Rate limited (per actor)"
           }
         },
         "summary": "Ask",

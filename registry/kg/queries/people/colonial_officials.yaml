@@ -1,0 +1,25 @@
+id: people.colonial_officials
+domain: people
+owner: KGPEOPLE
+description: >-
+  Colonial governors, viceroys, governors-general and residents: holders (P39, non-deprecated) of a position
+  that a colony / dependent territory / protectorate (or a subclass of those) declares as its head-of-state or
+  head-of-government office (P1906/P1313), or of a position whose "applies to jurisdiction" (P1001) is such a
+  territory (e.g. "Governor-General of India", "Viceroy of Peru", "Governor of the Gold Coast").
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?tcls { wd:Q133156 wd:Q161243 wd:Q164142 }
+    ?territory wdt:P31/wdt:P279* ?tcls .
+    { ?territory wdt:P1906|wdt:P1313 ?position . } UNION { ?position wdt:P1001 ?territory . }
+    ?item p:P39 ?ps .
+    ?ps ps:P39 ?position ; wikibase:rank ?pr .
+    FILTER(?pr != wikibase:DeprecatedRank)
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 30000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

@@ -1,0 +1,22 @@
+id: people.revolutionaries_activists
+domain: people
+owner: KGPEOPLE
+description: >-
+  Revolutionary and independence leaders and activists: humans whose occupation (P106) is revolutionary
+  (Q3242115) or activist (Q15253558) with at least 12 sitelinks, e.g. leaders of independence and
+  decolonisation movements (Bolivar, Ho Chi Minh, Lumumba, Nkrumah are also seeded as heads of state).
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?occupation { {{values}} }
+    ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links .
+    FILTER(?links >= 12)
+    ?item wdt:P31 wd:Q5 .
+  }
+split: {by: values, source: list, qids: [Q3242115, Q15253558], chunk_size: 1}
+max_rows: 20000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

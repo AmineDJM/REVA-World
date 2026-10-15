@@ -53,8 +53,8 @@ from typing import Any
 
 from reva.adapters.connectors import atlas_law_common as common
 from reva.adapters.connectors.atlas_xlsx import Workbook, col_letters
-from reva.kernel.errors import SourceResponseError
 from reva.atlas.sources import AtlasSourceSpec
+from reva.kernel.errors import SourceResponseError
 
 SOURCE_KEY = "worldbank.wbl"
 ATLAS_SOURCE = "wbl"
@@ -164,6 +164,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="World Bank Women, Business and the Law",
         licence=RIGHTS["licence"],
@@ -634,8 +635,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     raws: dict[str, tuple[Any, str]] = {}
     for key in wanted:
         item = ITEMS[key]
-        got = await common.fetch(run, item["url"], key=key, source_key=SOURCE_KEY, media_types=XLSX_MEDIA,
-                                 max_bytes=item["max_bytes"])  # fmt: skip
+        got = await common.fetch(
+            run, item["url"], key=key, source_key=SOURCE_KEY, media_types=XLSX_MEDIA, max_bytes=item["max_bytes"]
+        )
         if isinstance(got, common.Blocked):
             report.blocked.append(got)
             continue
@@ -652,8 +654,14 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             rows, _notes = parse_wbl2026(raw.body, sha)
         else:
             rows = parse_wbl1_2026(raw.body, sha, expected_headers=panel_hdrs)
-        out = run.register(dataset=ITEMS[key]["dataset"], frame=common.atlas_frame(rows), raw_sha256s=[sha],
-                           coverage_note=NOTES[key], geo_scheme="wbl", rights=RIGHTS)  # fmt: skip
+        out = run.register(
+            dataset=ITEMS[key]["dataset"],
+            frame=common.atlas_frame(rows),
+            raw_sha256s=[sha],
+            coverage_note=NOTES[key],
+            geo_scheme="wbl",
+            rights=RIGHTS,
+        )
         report.tables.append(common.table_summary(out))
     return report.as_dict()
 
@@ -663,9 +671,9 @@ __all__ = [
     "CONNECTOR_NAME",
     "ITEMS",
     "WBL1_HEADER_ALIASES",
+    "as_of_period",
     "atlas_ingest",
     "atlas_source",
-    "as_of_period",
     "panel_headers",
     "parse_panel",
     "parse_wbl1_2026",

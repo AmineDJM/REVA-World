@@ -62,12 +62,16 @@ def _zip(name: str, write) -> bytes:  # type: ignore[no-untyped-def]
     write(w)
     w.close()
     out = io.BytesIO()
+    members = {
+        f"{name}.shp": shp.getvalue(),
+        f"{name}.shx": shx.getvalue(),
+        f"{name}.dbf": dbf.getvalue(),
+        f"{name}.cpg": b"UTF-8",
+        f"{name}.VERSION.txt": b"9.9.9-synthetic",
+    }
     with zipfile.ZipFile(out, "w") as z:
-        z.writestr(f"{name}.shp", shp.getvalue())
-        z.writestr(f"{name}.shx", shx.getvalue())
-        z.writestr(f"{name}.dbf", dbf.getvalue())
-        z.writestr(f"{name}.cpg", "UTF-8")
-        z.writestr(f"{name}.VERSION.txt", "9.9.9-synthetic")
+        for fn, data in members.items():  # fixed timestamps: identical bytes on every call
+            z.writestr(zipfile.ZipInfo(fn, date_time=(2026, 1, 1, 0, 0, 0)), data)
     return out.getvalue()
 
 

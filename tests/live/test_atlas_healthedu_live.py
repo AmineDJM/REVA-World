@@ -13,7 +13,6 @@ from __future__ import annotations
 
 import json
 import os
-import uuid
 from collections import defaultdict
 from typing import Any
 
@@ -22,30 +21,19 @@ import pytest
 
 from reva.adapters.connectors import atlas_uis as uis
 from reva.adapters.connectors import atlas_who as who
-from reva.adapters.connectors.atlas_healthedu_common import register_connector, run_and_register
 from reva.atlas.catalog import load_catalog
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered
 from reva.atlas.tables import known_country_keys, read_atlas_table
-from reva.evidence.runner import make_live_client
-from reva.operations.budgets import metered, reserve_ingest, settle_metered
 
 pytestmark = [pytest.mark.live, pytest.mark.db]
 
 
-async def _live(db: Any, conn: Any) -> dict[str, Any]:
-    spec = conn.describe()
-    register_connector(db.owner, db.store, conn)
-    planned = len(conn.expected_item_keys())
-    reservation = reserve_ingest(
-        db.worker, job_id=uuid.uuid4(), attempt=1, source_key=spec.source_key, planned_requests=planned
-    )
-    http = metered(make_live_client(spec, db.settings), db.worker, reservation)
-    try:
-        out = await run_and_register(conn, http, db.store, db.worker)
-    finally:
-        budget = settle_metered(db.worker, http)
-        await http.aclose()
-    out["budget"] = budget
-    return out
+async def _live(db: Any, mod: Any) -> dict[str, Any]:
+    """Live run through ATLASCORE's entry point (reserve -> metered -> settle) into the throwaway DB."""
+    spec = mod.atlas_source()
+    ensure_registered(db.owner, db.store, spec)
+    return await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="live")
 
 
 def _coverage(frame: pl.DataFrame, concepts: list[Any], source: str, dataset: str) -> dict[str, Any]:
@@ -78,15 +66,15 @@ def _coverage(frame: pl.DataFrame, concepts: list[Any], source: str, dataset: st
 async def test_live_ingest_who_and_uis(db) -> None:
     results: dict[str, Any] = {}
     cat = load_catalog()
-    concepts = (
-        [c for c in cat.concepts.values()] if isinstance(getattr(cat, "concepts", None), dict) else list(cat.concepts)
-    )
-    for conn, source, dataset in ((uis.UisConnector(), "uis", "api"), (who.WhoGhoConnector(), "who", "gho")):
-        out = await _live(db, conn)
-        assert out["status"] == "registered", json.dumps({k: v for k, v in out.items() if k != "run"}, default=str)[
-            :3000
-        ]
-        atlas = out["atlas"]
+    concepts = list(cat.concepts.values())
+    for mod, conn, source, dataset in (
+        (uis, uis.UisConnector(), "uis", "api"),
+        (who, who.WhoGhoConnector(), "who", "gho"),
+    ):
+        out = await _live(db, mod)
+        assert out["status"] == "completed", json.dumps(out, default=str)[:3000]
+        summary = out["summary"]
+        atlas = summary["atlas"]
         frame = read_atlas_table(db.store, atlas["artifact_sha256"])
         cov = atlas["coverage"]
         assert cov["countries"] >= 180, cov
@@ -108,7 +96,7 @@ async def test_live_ingest_who_and_uis(db) -> None:
             "per_indicator": sorted(per_ind.to_dicts(), key=lambda r: r["code"]),
             "estimate_classes_distinct_flag_objects": dict(classes),
             "concepts": _coverage(frame, concepts, source, dataset),
-            "extra": {k: out.get(k) for k in ("uis_version", "indicator_names", "last_data_update")},
+            "extra": {k: summary.get(k) for k in ("uis_version", "indicator_names", "last_data_update")},
             "raw_bytes": sum(len(db.store.get("raw", s)) for s in cov["raw_sha256s"]),
             "parquet_bytes": len(db.store.get("normalised", atlas["artifact_sha256"])),
         }

@@ -1,6 +1,7 @@
-"""A-HEALTHEDU atlas connectors end to end on captured fixtures (origin test_fixture): raw bytes are
-archived as evidence acquisitions, the atlas tables are registered from the *archived* bytes, a
-re-run is idempotent, and a run with one drifted item registers nothing."""
+"""A-HEALTHEDU atlas sources end to end through ATLASCORE's ingest entry point on captured fixtures
+(origin test_fixture): raw bytes are archived as evidence acquisitions of the atlas connector
+versions, the atlas tables are registered from the *archived* bytes, a re-run is idempotent, and a
+run with one drifted response archives the bytes but registers nothing."""
 
 from __future__ import annotations
 
@@ -11,17 +12,14 @@ from sqlalchemy import text
 
 from reva.adapters.connectors import atlas_uis as uis
 from reva.adapters.connectors import atlas_who as who
-from reva.adapters.connectors.atlas_healthedu_common import register_connector, run_and_register
 from reva.adapters.http.safe_client import request_fingerprint
+from reva.atlas.ingest import AtlasRun, run_atlas_ingest
+from reva.atlas.sources import ensure_registered
 from reva.atlas.tables import read_atlas_table
 from reva.evidence.runner import FixtureHttp
+from reva.kernel.errors import ValidationProblem
 
 pytestmark = pytest.mark.db
-
-WHO_IND = ["WHOSIS_000001", "MDG_0000000032", "MDG_0000000007", "M_Est_tob_curr_std", "GHED_CHEGDP_SHA2011", "RS_198"]
-WHO_CTRY = ["DZA", "FRA", "HKG", "IND", "NGA"]
-UIS_BATCHES = [["LR.AG15T99", "LR.AG15T99.F"], ["XGDP.FSGOV", "EXPGDP.TOT", "CR.MOD.1"]]
-UIS_CTRY = ["DZA", "FRA", "IND", "NGA", "TUR"]
 
 
 def test_sources_are_seeded(db) -> None:
@@ -31,41 +29,50 @@ def test_sources_are_seeded(db) -> None:
 
 
 async def test_fixture_ingest_registers_atlas_tables_idempotently(db) -> None:
-    for conn, source, dataset in (
-        (who.WhoGhoConnector(WHO_IND, WHO_CTRY), "who", "gho"),
-        (uis.UisConnector(UIS_BATCHES, UIS_CTRY), "uis", "api"),
-    ):
-        register_connector(db.owner, db.store, conn)
-        out = await run_and_register(conn, FixtureHttp(conn.describe().name), db.store, db.worker)
-        assert out["status"] == "registered", out
-        atlas = out["atlas"]
-        assert atlas["dataset_key"] == f"atlas.{source}.{dataset}" and atlas["created"] is True
+    for mod, key in ((who, "atlas.who.gho"), (uis, "atlas.uis.api")):
+        spec = mod.atlas_source()
+        ensure_registered(db.owner, db.store, spec)
+        out = await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="fixture")
+        assert out["status"] == "completed" and out["budget"] is None, out
+        atlas = out["summary"]["atlas"]
+        assert atlas["dataset_key"] == key and atlas["created"] is True
         assert atlas["unmapped_provider_geo"] == []
         frame = read_atlas_table(db.store, atlas["artifact_sha256"])
         assert frame.height == atlas["row_count"] > 0
-        # every cell points at an archived raw acquisition of this run
         with db.owner.connect() as c:
             archived = set(
-                c.execute(text("SELECT raw_sha256 FROM evidence.acquisition WHERE origin='test_fixture'")).scalars()
+                c.execute(
+                    text(
+                        """SELECT a.raw_sha256 FROM evidence.acquisition a
+                           JOIN evidence.connector_version v ON v.id = a.connector_version_id
+                           WHERE a.origin = 'test_fixture' AND v.name = :n"""
+                    ),
+                    {"n": spec.name},
+                ).scalars()
             )
         assert set(frame["raw_sha256"].unique().to_list()) <= archived
-        again = await run_and_register(conn, FixtureHttp(conn.describe().name), db.store, db.worker)
-        assert again["status"] == "registered" and again["atlas"]["created"] is False
-        assert again["atlas"]["artifact_sha256"] == atlas["artifact_sha256"]
+        assert out["archived_raw"] == out["summary"]["items"]
+        again = await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="fixture")
+        assert again["summary"]["atlas"]["created"] is False
+        assert again["summary"]["atlas"]["artifact_sha256"] == atlas["artifact_sha256"]
 
 
-async def test_a_drifted_item_blocks_the_whole_table(db) -> None:
-    conn = who.WhoGhoConnector(WHO_IND, WHO_CTRY)  # same spec as above (a name@version is immutable)
-    register_connector(db.owner, db.store, conn)
+async def test_a_drifted_response_blocks_the_whole_table(db) -> None:
+    spec = who.atlas_source()
+    ensure_registered(db.owner, db.store, spec)
+    conn = who.WhoGhoConnector(who.FIXTURE_INDICATORS, who.FIXTURE_COUNTRIES)
     bad_url = who.data_url("RS_198", conn.countries)
     drifted = json.dumps({"value": [{"Renamed": 1}]}).encode()
-    http = FixtureHttp(conn.describe().name, overrides={request_fingerprint("GET", bad_url): drifted})
+    http = FixtureHttp(spec.name, overrides={request_fingerprint("GET", bad_url): drifted})
+    run = AtlasRun(spec=spec, http=http, engine=db.worker, store=db.store, settings=db.settings, origin="test_fixture")
     with db.owner.connect() as c:
         before = c.execute(text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.who.gho'")).scalar_one()
-    out = await run_and_register(conn, http, db.store, db.worker)
-    assert out["status"] == "blocked" and out["atlas"] is None
-    assert [f["item"] for f in out["failed_items"]] == ["gho.data:RS_198"]
-    assert out["failed_items"][0]["status"] == "quarantined"
+    with pytest.raises(ValidationProblem) as ei:
+        await who.atlas_ingest(run)
+    failed = ei.value.details["failed_items"]
+    assert [f["item"] for f in failed] == ["gho.data:RS_198"]
+    assert len(run.archived) == len(conn.items())  # every response archived, drifted one included
+    assert run.registered == []
     with db.owner.connect() as c:
         after = c.execute(text("SELECT count(*) FROM evidence.dataset WHERE dataset_key='atlas.who.gho'")).scalar_one()
     assert after == before

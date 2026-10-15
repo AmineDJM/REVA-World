@@ -1,0 +1,27 @@
+id: people.leader_positions
+domain: people
+owner: KGPEOPLE
+description: >-
+  The offices themselves (not their holders): head-of-state and head-of-government offices (P1906/P1313) of
+  current and historical states, empires, colonies and dependencies, and every monarch position (instance or
+  subclass chain of monarch Q116). Their snapshot keeps applies-to-jurisdiction (P1001), country (P17),
+  part of, inception/dissolution and replaces/replaced-by, which is what links "Emperor of Brazil" or
+  "President of Ghana" to the polity in the graph.
+purpose: seed_entities
+entity_kind: position
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+                    wd:Q133156 wd:Q161243 wd:Q164142 }
+      ?state wdt:P31 ?cls ; p:P1906|p:P1313 ?os .
+      ?os ps:P1906|ps:P1313 ?item .
+    } UNION {
+      ?item (wdt:P31|wdt:P279)/wdt:P279* wd:Q116 .
+    }
+    FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 }
+  }
+max_rows: 25000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P279, P361, P527, P1001, P17, P571, P576, P580, P582, P1365, P1366, P155, P156]

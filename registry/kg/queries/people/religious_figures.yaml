@@ -1,0 +1,27 @@
+id: people.religious_figures
+domain: people
+owner: KGPEOPLE
+description: >-
+  Religious founders and leaders: humans who founded (P112) a religion or denomination (an instance of
+  religion Q9174 or of a subclass), every pope (holder of Q19546), and humans whose occupation (P106) is
+  religious leader (Q15995642) or theologian (Q1234713) with at least 20 sitelinks.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      ?religion wdt:P31/wdt:P279* wd:Q9174 ; wdt:P112 ?item .
+    } UNION {
+      ?item wdt:P39 wd:Q19546 .
+    } UNION {
+      VALUES ?occupation { wd:Q15995642 wd:Q1234713 }
+      ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links .
+      FILTER(?links >= 20)
+    }
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 15000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

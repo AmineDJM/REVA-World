@@ -1,0 +1,26 @@
+id: people.explorers_navigators
+domain: people
+owner: KGPEOPLE
+description: >-
+  Explorers, navigators and conquistadors: humans whose occupation (P106) is explorer (Q11900058), or who took
+  part in an expedition/voyage of exploration (an item that is an instance of expedition Q2401485 or of a
+  subclass) through their own "participant in" (P1344) or the expedition's "participant" (P710), with at least
+  3 sitelinks (keeps documented people, drops crew lists without any article).
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      ?item wdt:P106 wd:Q11900058 .
+    } UNION {
+      ?expedition wdt:P31/wdt:P279* wd:Q2401485 .
+      { ?item wdt:P1344 ?expedition . } UNION { ?expedition wdt:P710 ?item . }
+    }
+    ?item wdt:P31 wd:Q5 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 25000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

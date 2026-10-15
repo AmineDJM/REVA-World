@@ -1,0 +1,28 @@
+id: people.scientists_scholars
+domain: people
+owner: KGPEOPLE
+description: >-
+  Scientists, physicians, engineers, inventors and scholars with at least 25 sitelinks, selected by
+  occupation (P106): scientist, physicist, chemist, mathematician, biologist, astronomer, physician,
+  economist, philosopher, inventor, engineer, historian, computer scientist, botanist, psychologist, geographer,
+  naturalist, sociologist. Nobel laureates are seeded separately without threshold.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?occupation { {{values}} }
+    ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links .
+    FILTER(?links >= 25)
+    ?item wdt:P31 wd:Q5 .
+  }
+split:
+  by: values
+  source: list
+  qids: [Q901, Q169470, Q593644, Q170790, Q864503, Q11063, Q39631, Q188094, Q4964182, Q205375, Q81096, Q201788,
+         Q82594, Q2374149, Q212980, Q901402, Q18805, Q2306091]
+  chunk_size: 2
+max_rows: 40000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

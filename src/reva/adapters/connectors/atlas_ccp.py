@@ -13,10 +13,8 @@ Sources (https://comparativeconstitutionsproject.org/download-data/, Box links, 
   punishment), ``samesexm``, ``marriage``, ``civmar``, each with CCP's article reference
   (``<var>_article``) and comments. Atlas table ``ccp.characteristics_v5``.
 
-  **Blocked live (2026-10-15):** the ZIP is 118 MB, above ``ConnectorSpec.max_response_bytes``
-  (≤ 50 MB, a reviewed bound of the port); the fetch therefore ends as a typed ``Blocked``
-  (``response_cap``) until the lead raises the bound for atlas bulk connectors. The parser is
-  implemented and tested on a subset fixture derived from the real file.
+  The ZIP is 118 MB (213 MB CSV inside, read as one bounded member, nothing extracted to disk);
+  the atlas source declares ``max_response_bytes`` = 130 MB (ATLASCORE bound: 1 GiB for bulk files).
 
 Rights: no explicit data licence; free download with a requested citation; the project's web terms
 prohibit commercial use. Recorded in ``registry/sources/ccp.yaml`` and on every row.
@@ -48,9 +46,9 @@ from collections.abc import Iterator, Sequence
 from typing import Any
 
 from reva.adapters.connectors import atlas_law_common as common
+from reva.atlas.sources import AtlasSourceSpec
 from reva.atlas.tables import year_period
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
 
 SOURCE_KEY = "ccp.data"
 ATLAS_SOURCE = "ccp"
@@ -60,7 +58,7 @@ PARSER_VERSION = "atlas-ccp-parse-1"
 BOX = "https://utexas.box.com/shared/static"
 HOSTS = ("utexas.box.com", "utexas.app.box.com", "public.boxcloud.com")  # Box: 301 -> app -> 302 cloud
 ZIP_MEDIA = ("application/zip", "application/octet-stream", "application/x-zip-compressed")
-MAX_SPEC_BYTES = 50_000_000  # ConnectorSpec bound (le=52_428_800)
+MAX_RESPONSE_BYTES = 130_000_000  # characteristics ZIP: 118,231,611 B on 2026-10-15
 
 ITEMS: dict[str, dict[str, Any]] = {
     "chronology": {
@@ -74,7 +72,7 @@ ITEMS: dict[str, dict[str, Any]] = {
         "url": f"{BOX}/cpgysqaogi1590ucv5x0wn59urqm00x3.zip",
         "member": "ccpcnc_v5/ccpcnc/ccpcnc_v5.csv",
         "dataset": "characteristics_v5",
-        "max_bytes": 130_000_000,  # real size 118,231,611 B (2026-10-15); exceeds the spec bound
+        "max_bytes": 130_000_000,  # real size 118,231,611 B (2026-10-15)
         "max_member_bytes": 300_000_000,
     },
 }
@@ -216,38 +214,30 @@ def _err(msg: str) -> CcpParseError:
     return CcpParseError(msg, retryable=False, kind="schema_drift")
 
 
-class CcpConnector:
-    def describe(self) -> ConnectorSpec:
-        return common.law_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="Comparative Constitutions Project",
-            licence=RIGHTS["licence"],
-            allowed_hosts=HOSTS,
-            dataset_ids=tuple(v["dataset"] for v in ITEMS.values()),
-            field_mappings={
-                "tables": {k: f"{ATLAS_SOURCE}.{v['dataset']}" for k, v in ITEMS.items()},
-                "codebook": {k: {kk: vv for kk, vv in v.items() if kk != "codes"} for k, v in CODEBOOK.items()},
-            },
-            units={k: v["unit"] for k, v in CODEBOOK.items()},
-            geography=("ALL_CCP_STATES",),
-            time_semantics="country-year (event year / content in force at end of year)",
-            lineage_family="ccp",
-            cadence_seconds=180 * 86400,
-            revision_strategy="versioned releases (new atlas table version per release)",
-            max_response_bytes=MAX_SPEC_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=common.code_digest(sys.modules[__name__]),
-        )
-
-    def items(self, keys: Sequence[str] | None = None) -> tuple[FetchItem, ...]:
-        return tuple(
-            FetchItem(key=k, url=v["url"], expected_media_types=ZIP_MEDIA, max_bytes=v["max_bytes"])
-            for k, v in ITEMS.items()
-            if keys is None or k in keys
-        )
+def atlas_source() -> AtlasSourceSpec:
+    """The ATLASCORE source spec (connector ``atlas.ccp``; budget key ``ccp.data``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Comparative Constitutions Project",
+        licence=RIGHTS["licence"],
+        allowed_hosts=HOSTS,
+        datasets=tuple(v["dataset"] for v in ITEMS.values()),
+        dataset_ids=("ccpcce_v6", "ccpcnc_v5"),
+        cadence_seconds=180 * 86400,
+        planned_requests=len(ITEMS),
+        max_response_bytes=MAX_RESPONSE_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=common.code_digest(sys.modules[__name__]),
+        field_mappings={
+            "codebook": {k: {kk: vv for kk, vv in v.items() if kk != "codes"} for k, v in CODEBOOK.items()},
+            "time_semantics": "country-year (event year / content in force at end of year)",
+        },
+    )
 
 
 def read_member(body: bytes, member: str, max_bytes: int) -> bytes:
@@ -455,62 +445,34 @@ CHARACTERISTICS_NOTE = (
 )
 
 
-async def run(
-    engine: Any,
-    store: Any,
-    http: Any,
-    *,
-    origin: str,
-    keys: Sequence[str] | None = None,
-    actor: str = "worker:atlas_ccp",
-) -> common.IngestReport:
-    from reva.atlas.tables import register_atlas_table
-
-    conn = CcpConnector()
-    spec = conn.describe()
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Chronology v6 and Characteristics v5 -> atlas tables ``ccp.chronology_v6`` / ``ccp.characteristics_v5``."""
     report = common.IngestReport(CONNECTOR_NAME)
-    for item in conn.items(keys):
-        if item.max_bytes > spec.max_response_bytes:
-            # Refused before any byte is requested: the archive is larger than the connector's
-            # reviewed response bound (the live client enforces the same bound).
-            report.blocked.append(
-                common.Blocked(
-                    SOURCE_KEY,
-                    item.key,
-                    "response_cap",
-                    f"provider file ~{ITEMS[item.key]['max_bytes'] // 1_000_000} MB > "
-                    f"ConnectorSpec.max_response_bytes {spec.max_response_bytes}; needs a lead-approved bound",
-                )
-            )
+    for key, item in ITEMS.items():
+        if not run.wants(item["dataset"]):
             continue
-        got: RawAcquisition | common.Blocked = await common.fetch_raw(http, item, SOURCE_KEY)
+        got = await common.fetch(
+            run, item["url"], key=key, source_key=SOURCE_KEY, media_types=ZIP_MEDIA, max_bytes=item["max_bytes"]
+        )
         if isinstance(got, common.Blocked):
             report.blocked.append(got)
             continue
-        sha = common.archive_raw(engine, store, spec, got, actor=actor)
-        report.raw.append({"item": item.key, "raw_sha256": sha, "bytes": len(got.body), "url": item.url})
-        if item.key == "chronology":
+        sha = run.archive(got)
+        report.raw.append({"item": key, "raw_sha256": sha, "bytes": len(got.body), "url": item["url"]})
+        if key == "chronology":
             rows, note = parse_chronology(got.body, sha), CHRONOLOGY_NOTE
         else:
             rows, note = parse_characteristics(got.body, sha), CHARACTERISTICS_NOTE
-        s = register_atlas_table(
-            engine,
-            store,
-            source=ATLAS_SOURCE,
-            dataset=ITEMS[item.key]["dataset"],
+        out = run.register(
+            dataset=item["dataset"],
             frame=common.atlas_frame(rows),
             raw_sha256s=[sha],
-            parser_version=PARSER_VERSION,
-            origin=origin,
             geo_scheme="ccp",
             rights=RIGHTS,
             coverage_note=note,
         )
-        report.tables.append(
-            {k: s[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created")}
-            | {"countries": s["coverage"]["countries"], "unmapped_provider_geo_count": len(s["unmapped_provider_geo"])}
-        )
-    return report
+        report.tables.append(common.table_summary(out))
+    return report.as_dict()
 
 
 __all__ = [
@@ -518,9 +480,9 @@ __all__ = [
     "CODEBOOK",
     "CONNECTOR_NAME",
     "PROVIDER_CONTINUITY",
-    "CcpConnector",
+    "atlas_ingest",
+    "atlas_source",
     "parse_characteristics",
     "parse_chronology",
     "read_member",
-    "run",
 ]

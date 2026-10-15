@@ -17,17 +17,18 @@ import yaml
 
 from reva.adapters.connectors import atlas_uis as uis
 from reva.adapters.connectors import atlas_who as who
-from reva.adapters.connectors.atlas_healthedu_common import MAX_FLAGS_CHARS, AtlasConnectorSpec, fit_flags, items_ok
+from reva.adapters.connectors.atlas_healthedu_common import MAX_FLAGS_CHARS, fit_flags
 from reva.atlas.catalog import Series, load_catalog
+from reva.atlas.sources import AtlasSourceSpec, atlas_sources
 from reva.atlas.tables import validate_atlas_frame
 from reva.evidence.runner import FIXTURE_ROOT, FixtureHttp
 from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import FetchBudget, FetchOutcome
+from reva.ports.connectors import FetchItem
 
-WHO_IND = ["WHOSIS_000001", "MDG_0000000032", "MDG_0000000007", "M_Est_tob_curr_std", "GHED_CHEGDP_SHA2011", "RS_198"]
-WHO_CTRY = ["DZA", "FRA", "HKG", "IND", "NGA"]
-UIS_BATCHES = [["LR.AG15T99", "LR.AG15T99.F"], ["XGDP.FSGOV", "EXPGDP.TOT", "CR.MOD.1"]]
-UIS_CTRY = ["DZA", "FRA", "IND", "NGA", "TUR"]
+WHO_IND = list(who.FIXTURE_INDICATORS)
+WHO_CTRY = list(who.FIXTURE_COUNTRIES)
+UIS_BATCHES = [list(b) for b in uis.FIXTURE_BATCHES]
+UIS_CTRY = list(uis.FIXTURE_COUNTRIES)
 CATALOG = Path(__file__).resolve().parents[2] / "registry" / "atlas" / "catalog"
 
 
@@ -40,16 +41,16 @@ def uis_conn() -> uis.UisConnector:
 
 
 async def _fetch_all(conn: Any) -> tuple[dict[str, bytes], dict[str, str]]:
-    http = FixtureHttp(conn.describe().name)
-    queue = list(conn.plan(None, FetchBudget()).items)
+    name = who.CONNECTOR_NAME if isinstance(conn, who.WhoGhoConnector) else uis.CONNECTOR_NAME
+    http = FixtureHttp(name)
+    queue = list(conn.items())
     bodies: dict[str, bytes] = {}
     while queue:
         item = queue.pop(0)
-        raw = await conn.fetch(item, http)
-        for b in conn.parse(raw):
-            assert conn.validate(b).outcome == "pass", (item.key, b.metadata)
-            queue.extend(b.follow_up)
-        bodies[item.key] = raw.body
+        body = (await http.get(item.url, max_bytes=item.max_bytes)).body
+        conn.check(item, body)
+        queue.extend(conn.follow_ups(item, body))
+        bodies[item.key] = body
     import hashlib
 
     return bodies, {k: hashlib.sha256(v).hexdigest() for k, v in bodies.items()}
@@ -194,17 +195,12 @@ async def test_who_archived_or_missing_indicator_blocks_registration() -> None:
         c.atlas_frame(bodies, raws)
 
 
-def test_who_empty_indicator_is_quarantined() -> None:
-    from reva.ports.connectors import ObservationBatch
-
-    b = ObservationBatch(
-        connector="c",
-        connector_version="1",
-        item_key="gho.data:X",
-        observations=(),
-        metadata={"kind": "data", "indicator": "X", "rows": 0},
+def test_who_empty_indicator_is_refused() -> None:
+    item = FetchItem(
+        key="gho.data:RS_198", url="https://x", max_bytes=1, params={"kind": "data", "indicator": "RS_198"}
     )
-    assert who_conn().validate(b).outcome == "quarantine"
+    with pytest.raises(SourceResponseError, match="no country rows"):
+        who_conn().check(item, b'{"value": []}')
 
 
 def test_who_urls_request_country_rows_only() -> None:
@@ -232,10 +228,12 @@ def test_uis_values_qualifiers_and_version(uis_frame: pl.DataFrame) -> None:
 
 def test_uis_follow_ups_are_pinned_to_the_version() -> None:
     c = uis.UisConnector()
-    items = c.follow_ups("20260507-91260335")
+    (version_item,) = c.items()
+    body = b'{"version": "20260507-91260335", "themeDataStatus": []}'
+    items = c.follow_ups(version_item, body)
     assert len(items) == len(uis.BATCHES)
     assert all("version=20260507-91260335" in i.url and "geoUnitType=NATIONAL" in i.url for i in items)
-    assert sorted(c.expected_item_keys()) == sorted(["uis.version"] + [i.key for i in items])
+    assert c.follow_ups(items[0], b"{}") == ()
     assert len({i.code for i in uis.INDICATORS}) == len(uis.INDICATORS)
 
 
@@ -257,20 +255,24 @@ def test_uis_drift_and_caps() -> None:
         uis.parse_data(json.dumps({"records": [rec]}).encode(), ["LR.AG15T99"])
     with pytest.raises(SourceResponseError):
         uis.parse_version(b'{"nothing": 1}')
-    from reva.ports.connectors import ObservationBatch
+    item = FetchItem(key="uis.data:1", url="https://x", max_bytes=1,
+                     params={"kind": "data", "batch": 1, "indicators": ["LR.AG15T99"]})  # fmt: skip
+    rec["footnotes"] = []
 
-    def b(n: int) -> ObservationBatch:
-        return ObservationBatch(
-            connector="c",
-            connector_version="1",
-            item_key="uis.data:1",
-            observations=(),
-            metadata={"kind": "data", "records": n},
-        )
+    def body(n: int) -> bytes:
+        return json.dumps({"records": [dict(rec, year=1000 + i) for i in range(n)]}).encode()
 
-    assert uis_conn().validate(b(0)).outcome == "quarantine"
-    assert uis_conn().validate(b(100_000)).outcome == "quarantine"
-    assert uis_conn().validate(b(10)).outcome == "pass"
+    with pytest.raises(SourceResponseError, match="no records"):
+        uis_conn().check(item, body(0))
+    import reva.adapters.connectors.atlas_uis as mod
+
+    cap, mod.RECORD_CAP = mod.RECORD_CAP, 3  # the cap check, without building 100k records
+    try:
+        with pytest.raises(SourceResponseError, match="cap"):
+            uis_conn().check(item, body(3))
+    finally:
+        mod.RECORD_CAP = cap
+    assert uis_conn().check(item, body(2))["records"] == 2
 
 
 async def test_uis_missing_indicator_metadata_blocks_registration() -> None:
@@ -284,14 +286,17 @@ async def test_uis_missing_indicator_metadata_blocks_registration() -> None:
 
 
 # ------------------------------------------------------------------------------------------- shared
-def test_specs_are_atlas_specs() -> None:
-    for c in (who.WhoGhoConnector(), uis.UisConnector()):
-        spec = c.describe()
-        assert isinstance(spec, AtlasConnectorSpec)
-        assert spec.model_dump(mode="json")["template"].startswith("atlas_")
-        assert spec.max_response_bytes <= 52_428_800
-    assert who.WhoGhoConnector().describe().source_key == "who.gho"
-    assert uis.UisConnector().describe().source_key == "unesco.uis"
+def test_atlas_sources_are_discovered_with_budget_keys() -> None:
+    found = atlas_sources()
+    for mod, key, planned in (
+        (who, "who.gho", 1 + len(who.INDICATORS)),
+        (uis, "unesco.uis", 1 + len(uis.BATCHES)),
+    ):
+        spec = mod.atlas_source()
+        assert isinstance(spec, AtlasSourceSpec) and spec.template == "atlas_bulk"
+        assert spec.source_key == spec.budget_key == key and spec.planned_requests == planned
+        assert found[spec.name].module == mod.__name__
+    assert len({i.code for i in uis.INDICATORS}) == len(uis.INDICATORS)
 
 
 def test_fit_flags_never_exceeds_limit_and_says_when_it_shortened() -> None:
@@ -302,15 +307,6 @@ def test_fit_flags_never_exceeds_limit_and_says_when_it_shortened() -> None:
     s2 = fit_flags(fn, long_keys=("footnotes",))
     assert len(s2) <= MAX_FLAGS_CHARS and json.loads(s2)["notes_truncated"] is True
     assert fit_flags({"a": 1}) == '{"a":1}'
-
-
-def test_items_ok_requires_every_planned_item() -> None:
-    o = [
-        FetchOutcome(item_key="a", status="published", raw_sha256="0" * 64),
-        FetchOutcome(item_key="b", status="quarantined", raw_sha256="1" * 64),
-    ]
-    ok, bad = items_ok(o, ["a", "b", "c"])
-    assert not ok and {x["item"] for x in bad} == {"b", "c"}
 
 
 def test_catalog_series_point_at_curated_indicators_with_matching_units() -> None:

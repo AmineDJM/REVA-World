@@ -1,0 +1,20 @@
+id: people.founders
+domain: people
+owner: KGPEOPLE
+description: >-
+  Founders of states, organisations, parties, companies, religions, cities and movements: humans that are the
+  object of a "founded by" (P112) statement of any item, with at least 15 sitelinks (the threshold bounds the
+  long tail of company/club founders; founders of states and major organisations are far above it).
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?founded wdt:P112 ?item .
+    ?item wdt:P31 wd:Q5 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 15)
+  }
+max_rows: 25000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

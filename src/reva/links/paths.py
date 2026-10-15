@@ -277,7 +277,16 @@ class PathGraph:
         if e.kind == "statement" and e.type_id in self.hubs.excluded_properties:
             if ks is None or e.kind_key not in ks:
                 return False
+        if e.link is not None and not q.include_blocked_hubs and any(v in self.hubs.blocked for v in e.link.via):
+            return False  # a derived link *through* a blocked hub is the hub path in disguise
         return temporal_allows(e.temporal, q)
+
+    def edge_cost(self, e: Edge) -> float:
+        """The kind's cost plus the hub penalty of every ``via`` node of a derived link (a co-membership via
+        the United Nations is damped like the two hops through the UN node it stands for)."""
+        if e.link is None or not e.link.via:
+            return e.cost
+        return e.cost + sum(self.node_penalty(v) for v in e.link.via)
 
     def passable(self, node: str, q: PathQuery) -> bool:
         return node in (q.source, q.target) or q.include_blocked_hubs or node not in self.hubs.blocked
@@ -449,9 +458,9 @@ def _bfs(
     return dist, truncated
 
 
-def _best_edge(edges: Sequence[Edge]) -> Edge:
+def _best_edge(graph: PathGraph, edges: Sequence[Edge]) -> Edge:
     def rank(e: Edge) -> tuple[Any, ...]:
-        return (e.cost, e.temporal.kind == "undated", not e.forward, e.kind != "statement", e.type_id, e.v)
+        return (graph.edge_cost(e), e.temporal.kind == "undated", not e.forward, e.kind != "statement", e.type_id)
 
     return min(edges, key=rank)
 
@@ -460,7 +469,8 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
     res = PathResult(q, labels={})
     for n in (q.source, q.target):
         if n not in graph:
-            res.reason = "unknown_node"
+            # known entity (labelled) without any traversable statement vs an id the graph has never seen
+            res.reason = "no_traversable_statements" if n in graph.labels else "unknown_node"
             res.labels = {n: graph.labels.get(n, {}) for n in (q.source, q.target)}
             return res
     budget = [q.max_expansions]
@@ -487,9 +497,9 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
                 continue
             parallel[(u, e.v)].append(e)
     for (u, v), es in parallel.items():
-        best = _best_edge(es)
+        best = _best_edge(graph, es)
         pen = 0.0 if v == q.target else graph.node_penalty(v)
-        g.add_edge(u, v, weight=best.cost + pen)
+        g.add_edge(u, v, weight=graph.edge_cost(best) + pen)
     seen_candidates = 0
     try:
         for nodes in nx.shortest_simple_paths(g, q.source, q.target, weight="weight"):
@@ -503,7 +513,7 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
             cost = 0.0
             for u, v in itertools.pairwise(nodes):
                 es = parallel[(u, v)]
-                e = _best_edge(es)
+                e = _best_edge(graph, es)
                 cost += g[u][v]["weight"]
                 hops.append(Hop(e, len(es) - 1, {lang: render_hop(e, graph, lang) for lang in LANGS}))
             res.paths.append(Path(list(nodes), hops, cost))
@@ -522,6 +532,38 @@ def find_paths(graph: PathGraph, q: PathQuery) -> PathResult:
                 nodes_used |= {h.edge.stmt.subject, h.edge.stmt.object}
     res.labels = {n: dict(graph.labels.get(n, {})) for n in sorted(nodes_used)}
     return res
+
+
+MAX_WAYPOINTS = 4
+
+
+def find_chain(graph: PathGraph, waypoints: Sequence[str], **query: Any) -> PathResult:
+    """A path forced through ``waypoints`` (``[Columbus, Treaty of Tordesillas, Brazil, Portuguese]``): the
+    best path of each consecutive segment, concatenated. Each segment obeys the same filters and
+    ``max_hops``; the result has one path (or none, with ``reason = "no_path_segment:<a>-><b>"``). Segments
+    are searched independently, so the concatenation may revisit a node (it is a walk, said as such)."""
+    if not 3 <= len(waypoints) <= MAX_WAYPOINTS + 2:
+        raise PathQueryError(f"a chain needs 1..{MAX_WAYPOINTS} intermediate waypoints")
+    query = {**query, "k": 1}
+    first = PathQuery(waypoints[0], waypoints[-1], **query)
+    out = PathResult(first)
+    nodes: list[str] = [waypoints[0]]
+    hops: list[Hop] = []
+    cost = 0.0
+    for a, b in itertools.pairwise(waypoints):
+        seg = find_paths(graph, PathQuery(a, b, **query))
+        out.truncated |= seg.truncated
+        out.explored_nodes += seg.explored_nodes
+        out.labels.update(seg.labels)
+        if not seg.paths:
+            out.reason = f"no_path_segment:{a}->{b} ({seg.reason})"
+            return out
+        p = seg.paths[0]
+        nodes += p.nodes[1:]
+        hops += p.hops
+        cost += p.cost
+    out.paths = [Path(nodes, hops, cost)]
+    return out
 
 
 def build_graph(

@@ -33,8 +33,8 @@ from datetime import datetime, timedelta
 from typing import Any
 
 from reva.adapters.connectors import atlas_law_common as common
-from reva.kernel.errors import SourceResponseError
 from reva.atlas.sources import AtlasSourceSpec
+from reva.kernel.errors import SourceResponseError
 
 SOURCE_KEY = "constitute.service"
 ATLAS_SOURCE = "constitute"
@@ -81,6 +81,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="Constitute Project (Comparative Constitutions Project)",
         licence=RIGHTS["licence"],

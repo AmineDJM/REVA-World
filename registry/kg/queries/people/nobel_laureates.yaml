@@ -1,0 +1,22 @@
+id: people.nobel_laureates
+domain: people
+owner: KGPEOPLE
+description: >-
+  Every human laureate of a Nobel Prize (Physics Q38104, Chemistry Q44585, Physiology or Medicine Q80061,
+  Literature Q37922, Peace Q35637) or of the Sveriges Riksbank Prize in Economic Sciences (Q47170), from a
+  non-deprecated "award received" (P166) statement. No threshold (about 1 000 people).
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?award { wd:Q38104 wd:Q44585 wd:Q80061 wd:Q37922 wd:Q35637 wd:Q47170 }
+    ?item p:P166 ?as .
+    ?as ps:P166 ?award ; wikibase:rank ?ar .
+    FILTER(?ar != wikibase:DeprecatedRank)
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 2000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

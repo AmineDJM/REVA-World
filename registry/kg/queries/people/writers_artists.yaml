@@ -1,0 +1,26 @@
+id: people.writers_artists
+domain: people
+owner: KGPEOPLE
+description: >-
+  Writers, poets, playwrights, painters, sculptors, composers, architects and film directors of global reach:
+  occupation (P106) in that list and at least 40 sitelinks (articles in 40+ Wikipedias and other Wikimedia
+  projects is the bound used for "global influence"; it is a coverage choice, not a value judgement).
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?occupation { {{values}} }
+    ?item wdt:P106 ?occupation ; wikibase:sitelinks ?links .
+    FILTER(?links >= 40)
+    ?item wdt:P31 wd:Q5 .
+  }
+split:
+  by: values
+  source: list
+  qids: [Q36180, Q49757, Q6625963, Q214917, Q1028181, Q1281618, Q36834, Q42973, Q2526255]
+  chunk_size: 1
+max_rows: 40000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]

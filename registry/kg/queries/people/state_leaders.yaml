@@ -1,0 +1,39 @@
+id: people.state_leaders
+domain: people
+owner: KGPEOPLE
+description: >-
+  Every human who was head of state or head of government of a current or historical state, empire, colony
+  or dependency: the object of a non-deprecated P35/P6 statement of such a state, or the holder (P39,
+  non-deprecated) of a position that such a state declares as its head-of-state office (P1906) or
+  head-of-government office (P1313), e.g. "President of the United States", "Prime Minister of India",
+  "President of the French Republic". No notability threshold: every holder is kept.
+purpose: seed_entities
+entity_kind: person
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q7275 wd:Q48349 wd:Q15634554 wd:Q417175 wd:Q1763527
+                  wd:Q133156 wd:Q161243 wd:Q164142 }
+    {
+      ?state wdt:P31 ?cls ; p:P35|p:P6 ?hs .
+      ?hs ps:P35|ps:P6 ?item ; wikibase:rank ?hr .
+      FILTER(?hr != wikibase:DeprecatedRank)
+    } UNION {
+      ?state wdt:P31 ?cls ; p:P1906|p:P1313 ?os .
+      ?os ps:P1906|ps:P1313 ?position .
+      ?item p:P39 ?ps .
+      ?ps ps:P39 ?position ; wikibase:rank ?pr .
+      FILTER(?pr != wikibase:DeprecatedRank)
+    }
+    ?item wdt:P31 wd:Q5 .
+  }
+max_rows: 40000
+timeout_seconds: 55
+expand_hops: 1
+properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,
+             P800, P737, P108, P463, P166, P69, P135, P22, P25, P26, P40, P3373, P53, P97, P551, P937, P1066, P802, P184]
+notes: >-
+  Seeded people get a full wbgetentities snapshot restricted to the person properties listed (citizenship
+  P27 with start/end, birth/death dates and places, positions held P39 with start/end/replaces/replaced-by,
+  participant in P1344, conflicts P607, notable work P800, influenced by P737, employer P108, member of P463,
+  awards P166, education P69, family links). expand_hops 1 gives label snapshots of positions, places,
+  parties, works and events referenced by those claims.
