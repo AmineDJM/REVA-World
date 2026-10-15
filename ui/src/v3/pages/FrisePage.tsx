@@ -200,8 +200,8 @@ function TimelineView({ model }: { model: TimelineModel }) {
         >
           <defs>
             <linearGradient id="v3-fade-r" x1="0" x2="1">
-              <stop offset="0" stopOpacity="1" stopColor="currentColor" />
-              <stop offset="1" stopOpacity="0" stopColor="currentColor" />
+              <stop offset="0" stopOpacity="0" stopColor="#ffffff" />
+              <stop offset="1" stopOpacity="0.95" stopColor="#ffffff" />
             </linearGradient>
             <clipPath id="v3-plot">
               <rect x={left} y={0} width={plotW} height={height} />
@@ -245,7 +245,7 @@ function TimelineView({ model }: { model: TimelineModel }) {
                   return (
                     <g key={it.id} {...common}>
                       <rect x={x0} y={y + 2} width={x1 - x0} height={12} rx={3} fill={l.color} opacity={it.openEnd || it.openStart ? 0.55 : 0.9} />
-                      {it.openEnd && <rect x={x1 - 18} y={y + 2} width={18} height={12} fill="url(#v3-fade-r)" style={{ color: 'var(--v3-bg, #fff)' }} />}
+                      {it.openEnd && <rect x={x1 - 18} y={y + 2} width={18} height={12} fill="url(#v3-fade-r)" />}
                       {x1 - x0 > 60 && (
                         <text x={x0 + 4} y={y + 12} className="v3-tl-text">
                           {(it.other?.label ?? it.title).slice(0, Math.floor((x1 - x0) / 6.5))}

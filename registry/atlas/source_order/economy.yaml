@@ -1,0 +1,100 @@
+# REVA headline concepts: economy (agent ATLASOPS). See population.yaml for the rules.
+# WEO rows after each series' latest actual year are projections (flags.estimate_kind) and never answer.
+theme: economy
+concepts:
+  - id: reva.economy.gdp_usd
+    labels: {fr: "PIB (dollars US courants)", en: "GDP (current US dollars)"}
+    definition: >-
+      Gross domestic product at purchasers' prices, current prices, converted to US dollars at the
+      (official or market) annual average exchange rate.
+    unit: US dollars
+    series:
+      - series: "wb.wdi_econ.NY.GDP.MKTP.CD"
+        justification: >-
+          WDI "GDP (current US$)": GDP at purchaser's prices in current local currency converted with single-year
+          official exchange rates (WDI metadata) — this definition.
+        caveats: >-
+          For a few economies the WDI uses an alternative conversion factor where the official rate is judged not
+          to reflect the rate applied to foreign transactions.
+      - series: "imf.weo.NGDPD"
+        justification: >-
+          IMF WEO "Gross domestic product, current prices, U.S. dollars": national-currency GDP converted at
+          period-average market exchange rates — the same quantity. Values in full US dollars.
+        caveats: "Exchange-rate choices can differ from the WDI for economies with multiple or parallel rates."
+    not_equivalent:
+      - series: "imf.weo.PPPGDP / wb NY.GDP.MKTP.PP.CD"
+        reason: "PPP-converted GDP is a different quantity (international dollars), see reva.economy.gdp_per_capita_ppp."
+      - series: "unsd_ama national accounts"
+        reason: "UNSD AMA series not yet reviewed for this headline concept (A-UN/UNSD files still in progress)."
+    related_catalog_concepts: [imf.gdp_current_usd]
+
+  - id: reva.economy.gdp_per_capita_usd
+    labels: {fr: "PIB par habitant (dollars US courants)", en: "GDP per capita (current US dollars)"}
+    definition: "GDP in current US dollars divided by the mid-year population, as computed by each provider."
+    unit: US dollars per person
+    series:
+      - series: "wb.wdi_econ.NY.GDP.PCAP.CD"
+        justification: >-
+          WDI "GDP per capita (current US$)": GDP divided by midyear population (WDI metadata) — this definition.
+      - series: "imf.weo.NGDPDPC"
+        justification: >-
+          IMF WEO "Gross domestic product per capita, current prices, U.S. dollars": GDP in US dollars divided by
+          the WEO population — the same quantity.
+        caveats: "The IMF divides by its own population series (national definitions), the WDI by its midyear population."
+    related_catalog_concepts: [imf.gdp_per_capita_usd]
+
+  - id: reva.economy.gdp_per_capita_ppp
+    labels: {fr: "PIB par habitant (PPA, dollars internationaux courants)", en: "GDP per capita, PPP (current international dollars)"}
+    definition: >-
+      GDP converted to international dollars with purchasing power parity rates (ICP benchmark), current
+      prices, divided by population.
+    unit: international dollars per person
+    series:
+      - series: "wb.wdi_econ.NY.GDP.PCAP.PP.CD"
+        justification: >-
+          WDI "GDP per capita, PPP (current international $)": GDP converted with PPP rates (ICP 2021 benchmark)
+          divided by midyear population — this definition.
+      - series: "imf.weo.PPPPC"
+        justification: >-
+          IMF WEO "Gross domestic product per capita, current prices, purchasing power parity; international
+          dollars" — the same quantity, PPP rates derived from the ICP benchmark.
+        caveats: >-
+          WEO PPP rows carry no declared latest-actual year: rows before the country's GDP boundary are flagged
+          estimate_kind=unknown_boundary (kept and shown), later rows are projections (never used here).
+    not_equivalent:
+      - series: "undp.hdr25.gnipc / maddison.mpd2023.gdppc / gapminder.fasttrack.gdp_pcap"
+        reason: "GNI (not GDP) per capita in constant 2021 PPP$, or constant-price historical series: different quantities."
+    related_catalog_concepts: [imf.gdp_per_capita_ppp, quality_of_life.gnipc]
+
+  - id: reva.economy.gdp_real_growth
+    labels: {fr: "Croissance du PIB réel", en: "Real GDP growth"}
+    definition: "Annual percentage change of GDP at constant prices (volume)."
+    unit: "% change"
+    series:
+      - series: "wb.wdi_econ.NY.GDP.MKTP.KD.ZG"
+        justification: >-
+          WDI "GDP growth (annual %)": annual percentage growth rate of GDP at market prices based on constant
+          local currency — this definition.
+      - series: "imf.weo.NGDP_RPCH"
+        justification: "IMF WEO \"Gross domestic product, constant prices, percent change\" — the same quantity."
+    related_catalog_concepts: [imf.gdp_real_growth]
+
+  - id: reva.economy.inflation_cpi
+    labels: {fr: "Inflation (prix à la consommation, moyenne annuelle)", en: "Inflation, consumer prices (annual average)"}
+    definition: "Annual percentage change of the average consumer price index of the year over the previous year."
+    unit: "% change"
+    series:
+      - series: "imf.weo.PCPIPCH"
+        justification: >-
+          IMF WEO "Inflation, average consumer prices, percent change": change of the annual average CPI — this
+          definition. Only actual years (projections excluded).
+      - series: "wb.wdi_econ.FP.CPI.TOTL.ZG"
+        justification: >-
+          WDI "Inflation, consumer prices (annual %)": annual percentage change in the cost to the average
+          consumer of a basket of goods and services (Laspeyres CPI, IMF IFS data) — the same quantity.
+    not_equivalent:
+      - series: "imf.weo.PCPIEPCH"
+        reason: "End-of-period (December over December) inflation: a different measure (imf.inflation_cpi_eop)."
+      - series: "wb NY.GDP.DEFL.KD.ZG"
+        reason: "GDP-deflator inflation measures a different price index."
+    related_catalog_concepts: [imf.inflation_cpi_avg]

@@ -25,5 +25,5 @@ sparql: |
   }
 columns: {subject: state, property_var: prop, object: language, statement: statement, rank: rank,
           start: start, end: end, point_in_time: pit}
-max_rows: 30000
+max_rows: 20000
 expand_hops: 1

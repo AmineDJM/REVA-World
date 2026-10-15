@@ -638,6 +638,7 @@
 }
 .v3-tl-row .v3-cite {
   grid-column: 2;
+  justify-self: start;
 }
 .v3-tl-dates {
   font-variant-numeric: tabular-nums;

@@ -1,0 +1,86 @@
+# REVA headline concepts: labour (agent ATLASOPS). See population.yaml for the rules.
+theme: labour
+concepts:
+  - id: reva.labour.unemployment_rate
+    labels: {fr: "Taux de chômage (estimations modélisées OIT, 15 ans et plus)", en: "Unemployment rate (ILO modelled estimates, 15+)"}
+    definition: >-
+      Unemployed persons (without work, available and seeking work; ILO definition) as a percentage of the labour
+      force aged 15+, from the ILO harmonised modelled estimates (every country, imputed where national data are
+      missing).
+    unit: "%"
+    series:
+      - series: "ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15"
+        justification: "ILOSTAT 'Unemployment rate -- ILO modelled estimates', both sexes, ages 15+: the reference series."
+      - series: "wb.wdi_social.SL.UEM.TOTL.ZS"
+        justification: >-
+          WDI "Unemployment, total (% of total labor force) (modeled ILO estimate)" republishes the same ILO
+          modelled series (possibly an earlier ILO vintage).
+        caveats: "The WDI may carry an older ILO modelled vintage; values can differ slightly."
+    caveats: "Modelled estimates include ILO imputations; ILO projection years are excluded."
+    not_equivalent:
+      - series: "ilostat.une_deap_sex_age_rt_a / wb SL.UEM.TOTL.NE.ZS"
+        reason: "National estimates (national definitions and coverage): see reva.labour.unemployment_rate_national."
+      - series: "imf.weo.LUR"
+        reason: "WEO unemployment follows national definitions (for some countries registered unemployment)."
+    related_catalog_concepts: [labour.unemployment_rate.ilo_modelled, imf.unemployment_rate]
+
+  - id: reva.labour.unemployment_rate_national
+    labels: {fr: "Taux de chômage (estimations nationales, 15 ans et plus)", en: "Unemployment rate (national estimates, 15+)"}
+    definition: >-
+      Unemployed persons as a percentage of the labour force aged 15+, as estimated by national sources
+      (labour force surveys preferred) and compiled by the ILO.
+    unit: "%"
+    series:
+      - series: "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15"
+        justification: "ILOSTAT national estimates, both sexes, 15+ (youth/adult breakdown total): the reference series."
+      - series: "ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_YGE15"
+        justification: "Same ILOSTAT national series reported under the aggregate age classification (15+ total)."
+      - series: "wb.wdi_social.SL.UEM.TOTL.NE.ZS"
+        justification: >-
+          WDI "Unemployment, total (% of total labor force) (national estimate)" is sourced from ILOSTAT's
+          national estimates — the same definition.
+    caveats: "Definitions, age bounds and coverage follow each national source (see each cell's flags)."
+    related_catalog_concepts: [labour.unemployment_rate.national]
+
+  - id: reva.labour.minimum_wage_monthly_lcu
+    labels: {fr: "Salaire minimum mensuel (monnaie nationale)", en: "Monthly minimum wage (national currency)"}
+    definition: "Statutory nominal gross monthly minimum wage in national currency (currency named in each cell's unit)."
+    unit: national currency per month (named per cell)
+    series:
+      - series: "ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU"
+        justification: "ILOSTAT statutory nominal gross monthly minimum wage, local currency (A-ILO catalog, rank 1)."
+      - series: "eurostat.earn_mw_cur.earn_mw_cur|currency=NAC"
+        justification: >-
+          Eurostat monthly national minimum wages, national currency: same statutory gross monthly minimum. Its
+          cells are semi-annual (January/July), so they answer only where a calendar-year cell exists.
+      - series: "oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V"
+        justification: "OECD real/nominal minimum wages, monthly, national currency, current prices: same quantity."
+    caveats: >-
+      Countries without a statutory national minimum wage have no value (never zero). The ILO notes give the
+      type (national, sectoral, lowest occupational) per cell.
+    not_equivalent:
+      - series: "oecd ... pay_period=A / pay_period=H"
+        reason: "Annual or hourly minimum wages are different units; never converted with assumed hours."
+    related_catalog_concepts: [labour.minimum_wage.monthly.local_currency]
+
+  - id: reva.labour.average_monthly_earnings_lcu
+    labels: {fr: "Salaire mensuel moyen des salariés (monnaie nationale)", en: "Average monthly earnings of employees (national currency)"}
+    definition: "Mean nominal monthly earnings of employees, all economic activities, national currency (ILO)."
+    unit: national currency per month (named per cell)
+    series:
+      - series: "ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU"
+        justification: "ILOSTAT mean nominal monthly earnings of employees, both sexes, local currency."
+      - series: "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_LCU"
+        justification: "Same ILOSTAT mean earnings, from the by-economic-activity table, total of all sectors."
+      - series: "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_LCU"
+        justification: "Same ILOSTAT mean earnings, by-activity table, aggregate total."
+      - series: "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_LCU"
+        justification: "Same ILOSTAT mean earnings, by-activity table, ISIC Rev.4 total."
+      - series: "ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_LCU"
+        justification: "Same ILOSTAT mean earnings, by-activity table, ISIC Rev.3 total."
+    not_equivalent:
+      - series: "oecd.earnings_av_an_wage (average annual wages)"
+        reason: "Annual wages per full-time-equivalent employee: a different unit and population; never divided by 12."
+      - series: "ilostat.ear_emtm_sex_cur_nb_a (median)"
+        reason: "Median, not mean, earnings."
+    related_catalog_concepts: [labour.mean_monthly_earnings.local_currency]
