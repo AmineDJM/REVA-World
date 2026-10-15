@@ -5,7 +5,18 @@ import type { Backtest } from '../lib/runviews';
  * Back-test results next to the model: predicted vs observed and the served error, including
  * when the error is large. The UI never recomputes, rounds away or hides an error.
  */
-export function BacktestPanel({ backtests, source, unitRef }: { backtests: Backtest[]; source?: string; unitRef?: string }) {
+export function BacktestPanel({
+  backtests,
+  source,
+  unitRef,
+  evaluations,
+}: {
+  backtests: Backtest[];
+  source?: string;
+  unitRef?: string;
+  /** Recorded evaluations of this model version from /v1/models/{id}/evaluations (null = not loaded). */
+  evaluations?: { count: number; labels: string[] } | null;
+}) {
   return (
     <section className="panel backtest-panel" aria-labelledby="backtest-h" data-testid="backtest-panel">
       <h2 id="backtest-h">Back-test (out of sample)</h2>
@@ -17,6 +28,12 @@ export function BacktestPanel({ backtests, source, unitRef }: { backtests: Backt
         <p className="muted" role="status" data-testid="backtest-absent">
           Back-test: not attached to this run's results{source ? `; see ${source}` : ' (see the model documentation)'}. Its absence is not evidence of
           accuracy.
+        </p>
+      )}
+      {evaluations && (
+        <p className="field-hint" data-testid="model-evaluations">
+          Recorded evaluations of this model version in REVA: {evaluations.count}
+          {evaluations.labels.length > 0 && ` (${evaluations.labels.join('; ')})`} — see the <a href="/models">Models</a> screen.
         </p>
       )}
       {backtests.map((b, i) => (

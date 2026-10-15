@@ -32,6 +32,8 @@ import {
   type Series,
 } from '../lib/runviews';
 import { useSimulation } from '../lib/useSimulation';
+import { useApi } from '../lib/useApi';
+import { getModelEvaluations } from '../api/client';
 import { ResultsView } from './SimulationPage';
 
 const L1_POS: Record<string, string> = {
@@ -419,6 +421,11 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
   const backtests = findBacktests(st);
   const experimental = model !== MODEL_KEYS.crude && model !== null;
   const reviewStatus = (env.model_versions ?? [])[0]?.approval_status ?? null;
+  const modelVersionId = (env.model_versions ?? [])[0]?.id ?? null;
+  const evals = useApi((s) => getModelEvaluations(modelVersionId!, undefined, s), [modelVersionId], !!modelVersionId && experimental);
+  const evaluations = evals.data
+    ? { count: evals.data.data.length, labels: [...new Set(evals.data.data.map((e) => e.replay_mode_label).filter(Boolean))] }
+    : null;
   const app = isRecord(st.outcome?.applicability) ? st.outcome!.applicability : {};
   const countryStates = isRecord(app.countries) ? Object.entries(app.countries) : [];
   const skipped = Array.isArray(app.skipped_countries) ? app.skipped_countries : [];
@@ -541,6 +548,7 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
                 : undefined
           }
           unitRef={model === MODEL_KEYS.cohort ? 'unit.persons' : undefined}
+          evaluations={evaluations}
         />
       )}
 
