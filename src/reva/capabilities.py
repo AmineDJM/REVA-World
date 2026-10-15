@@ -432,7 +432,7 @@ _BASE: tuple[Capability, ...] = (
         "P11",
         "reva.operations.releases",
         ("no holdout access by proposer", "rollback exercised", "prospective improvement or rollback"),
-        reason="signed promotion and locked holdouts are not implemented",
+        reason="V1 has a locked-holdout tournament (evaluation.tournament_service) but no shadow deployment, signed promotion or exercised rollback",
     ),
     # ------------------------------------------------------------------ P12 decisions
     Capability(

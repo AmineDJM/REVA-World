@@ -16,13 +16,25 @@ PostgreSQL, external S3-compatible bucket), public-aggregate data only.
 
 | Boundary | Control |
 |---|---|
-| Internet → API | Render TLS edge; trusted hosts; Argon2id login with rate limiting and audit; HttpOnly/Secure/SameSite session + CSRF; scoped hashed API tokens; bounded queries; no SQL/GraphQL/code execution |
+| Internet → API | Render TLS edge; trusted hosts; Argon2id login with per-client and global rate limiting (`REVA_LOGIN_RATE_LIMIT_PER_MINUTE`, default 5/min, in-memory per process) and audit; HttpOnly/Secure/SameSite session + CSRF; scoped hashed API tokens; bounded queries; no SQL/GraphQL/code execution |
 | Render proxy → Uvicorn | `--proxy-headers` trusted only from loopback and private ranges (`REVA_FORWARDED_ALLOW_IPS`) |
-| Process → database | separate NOINHERIT logins; grants per role (0007); append-only triggers; RLS on shared provenance tables; SECURITY DEFINER functions with fixed `search_path` |
+| Process → database | separate NOINHERIT logins; grants per role (0007); append-only triggers; RLS on shared provenance tables (`meta.context`, `meta.activity`, artifact locations, activity inputs/outputs); SECURITY DEFINER functions with fixed `search_path` (see below) |
 | Deploy → runtime | owner URL exists only in the API service env for pre-deploy and is removed from the child environment; worker refuses it in production |
 | Worker → internet | SafeHttpClient: HTTPS allowlist per connector, DNS-resolved address checks, redirect re-checks, size/time/decompression limits |
 | Documents → system | retrieved text is data; tool allowlists and policies live outside content; prompt-injection strings are inert |
-| Autonomy → production | template-only; generated code never executed in the worker; gates evaluated separately; policy digests pinned |
+| Autonomy → production | template-only (declarative manifests run through reviewed template code in a child process that is defence in depth, not a security boundary); generated code never executed; policy digests pinned; the gate re-derives scope and its results go through `ops.record_gate_result`, but it runs in the same worker process with the same credentials |
+
+## Runtime database roles
+
+| Role | Writes | SECURITY DEFINER functions it may execute |
+|---|---|---|
+| `reva_api` | `ops.audit`, `ops.session_revocation` (INSERT) only; reads scientific schemas and selected `ops` tables | `ops.submit_job`, `ops.request_cancel`, `ops.review_proposal`, `sim.create_scenario` |
+| `reva_worker` | INSERT on all tables of `meta`, `ontology`, `world`, `evidence`, `belief`, `model`, `ops` (except `ops.api_token`, `ops.proposal_review`, `ops.session_revocation`); UPDATE/DELETE only on queue/bookkeeping `ops` tables; RLS forbids simulation contexts/activities | `ops.assert_lease`, `ops.heartbeat`, `ops.complete_job`, `ops.submit_job`, `ops.record_gate_result`, `model.record_promotion` |
+| `reva_sim` | INSERT on `sim.*`, `model.evaluation` and provenance rows; RLS limits its contexts to simulation/evaluation and its activities to simulation/evaluation/model | `ops.assert_lease`, `ops.heartbeat`, `ops.complete_job` |
+
+No runtime role has UPDATE/DELETE/TRUNCATE on scientific tables, and append-only
+triggers reject mutation even for the owner. API tokens are minted only by the
+migration owner (admin CLI); human reviews only through `ops.review_proposal`.
 
 ## Threats and mitigations
 
@@ -30,6 +42,7 @@ PostgreSQL, external S3-compatible bucket), public-aggregate data only.
 |---|---|---|
 | Owner credential leak via runtime process (env dump, error page, crash report) | allowlisted child environments; owner URL never forwarded; redacted startup errors; tests on the real child environment | the Render dashboard and the API service's own env still hold it (pre-deploy needs it); protect the Render account with MFA |
 | Runtime role rewrites history | no UPDATE/DELETE/TRUNCATE grants on scientific tables; triggers reject mutation even for the owner | a superuser or the owner disabling triggers; restricted to migrations |
+| **Worker forges governance approvals** (self-approved eligibility, mappings or model versions) | application code writes `evidence.eligibility`, `ontology.mapping` and `model.version` only after seed review or a recorded gate/human decision; gate results and promotions are guarded by insert triggers (`ops.check_gate_evaluator`, `model.check_promotion`); every row is append-only and audited through its `review_activity_id` / provenance activity | **Open, not mitigated in the database.** `reva_worker` can INSERT these governance rows directly with `decision='eligible'`, `approval='approved'` or `approval_status='approved'`, citing a `review` activity it also inserted; no trigger checks who approved them. `reva seed` runs as the worker and the autonomy promotion path writes eligibility/model versions as the worker, so the role needs this today. A compromised or faulty worker could therefore make a connector version eligible (and `source_select_v1` would publish its values), approve a mapping, register an approved model version, or insert a `model.evaluation` that a promotion then cites. Detection is after the fact (immutable rows, provenance, audit). Planned fix: move these writes behind owner-only SECURITY DEFINER functions that require a recorded human review or passing gate result, and run seeding with the owner. |
 | Simulation writes beliefs/evidence | `reva_sim` grants + RLS; `belief.input` FKs exclude sim results | shared worker process boundary is accidental-write isolation, not a sandbox against malicious code |
 | SSRF from connectors | allowlist, literal-IP refusal, post-resolution public-address check, per-redirect check, limited redirects | **DNS-rebinding TOCTOU**: the address check resolves the host before the request, and the HTTP library resolves again when connecting. An attacker controlling an allowlisted domain's DNS could answer a public address to the check and a private one to the connection. Mitigations: hosts are a short allowlist of official statistics domains; redirects are re-checked; no secret-bearing headers are sent to providers except the optional Comtrade key to its fixed host; link-local/metadata ranges are part of the blocked set. Complete fix (planned): connect to the pre-validated IP with SNI/Host set to the name (custom transport) or route egress through a filtering proxy. When an outbound proxy is configured (`HTTPS_PROXY`), the proxy resolves names and must enforce its own private-range policy. |
 | Zip bombs / oversized responses | streamed size limits, decompression ratio limits, safe archive extraction | CPU spent on bounded inputs |
