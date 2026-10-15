@@ -20,7 +20,7 @@ Conventions
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
@@ -944,6 +944,8 @@ class SimResult(ApiModel):
     uncertainty: Uncertainty
     applicability: dict[str, Any]
     artifact_sha256: str | None = None
+    period_start: date | None = None  # half-open [period_start, period_end); null for single-period rows
+    period_end: date | None = None
 
 
 class SimulationStatus(ApiModel):

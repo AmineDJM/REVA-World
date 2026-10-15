@@ -202,7 +202,18 @@ interface MissingInputRow {
   input?: string;
   concept?: string;
   year?: number | string;
+  /** V1 preflight shape: "absent" | "missing:<reason>". */
   state?: string;
+  /** V2 engine shape: {code: "missing_input", reason, reference_year}. */
+  reason?: string;
+  reference_year?: number | string;
+}
+
+/** "missing (reason)" for either problem shape; a row without any reason says so. */
+function missingStateText(r: MissingInputRow): string {
+  if (r.state?.startsWith('missing:')) return `missing (${missingReasonLabel(r.state.slice(8))})`;
+  if (r.state) return r.state === 'absent' ? 'missing (absent from the pinned release)' : r.state;
+  return `missing (${missingReasonLabel(r.reason)})`;
 }
 
 /** A missing_input rejection listed as data gaps (never zero), above the raw problem details. */
@@ -235,11 +246,11 @@ export function MissingInputs({ error }: { error: unknown }) {
               <th scope="row">{r.country ?? '—'}</th>
               <td>{r.input ? (INPUT_LABELS[r.input] ?? r.input) : '—'}</td>
               <td className="mono">{r.concept ?? '—'}</td>
-              <td>{r.year ?? '—'}</td>
+              <td>{r.year ?? r.reference_year ?? '—'}</td>
               <td>
                 <span className="missing-value">
                   <UncertaintyGlyph kind="missing" className="uglyph-inline" />
-                  {r.state?.startsWith('missing:') ? `missing (${missingReasonLabel(r.state.slice(8))})` : (r.state ?? 'missing')}
+                  {missingStateText(r)}
                 </span>
               </td>
             </tr>

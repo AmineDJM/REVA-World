@@ -199,3 +199,28 @@ describe('SimulationPage', () => {
     expect(screen.getByText(/L2 grid variants \(1 assumed elasticity pairs\)/)).toBeInTheDocument();
   });
 });
+
+describe('MissingInputs (V2 engine problem shape)', () => {
+  it('reads {code, input, reason, reference_year} rows as typed gaps, never zero', async () => {
+    const { MissingInputs } = await import('./SimulationPage');
+    const { ApiError } = await import('../api/problem');
+    const err = new ApiError('validation', 422, {
+      title: 'missing input',
+      status: 422,
+      code: 'missing_input',
+      details: {
+        missing: [
+          { code: 'missing_input', country: 'DZA', input: 'M', reason: 'unavailable', concept: 'trade.hs2709.import_value.world_total', reference_year: 2023 },
+          { code: 'missing_input', country: 'WORLD', input: 'io_table', reason: 'not_collected', concept: 'economics.io.figaro_ii_table', reference_year: 2021 },
+        ],
+      },
+    } as never);
+    render(<MissingInputs error={err} />);
+    const gaps = screen.getByTestId('missing-inputs');
+    const rows = within(gaps).getAllByRole('row').slice(1);
+    expect(rows[0]).toHaveTextContent('2023');
+    expect(rows[0]).toHaveTextContent('missing (unavailable)');
+    expect(rows[1]).toHaveTextContent('missing (not collected)');
+    expect(gaps).not.toHaveTextContent(/(^|\s)0(\s|$)/);
+  });
+});

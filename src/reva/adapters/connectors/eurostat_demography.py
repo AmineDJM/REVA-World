@@ -82,6 +82,12 @@ PARSER_VERSION = "eurostat-demography-1"
 DATA_BASE = "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/"
 HOSTS = ("ec.europa.eu",)
 SINCE_YEAR = 2000
+# Observed tables are fetched in 9-year windows (the last one open-ended, "latest"): one
+# acquisition then publishes at most ~2.8k observations, which keeps the per-observation
+# lineage advisory locks of the ingest transaction well inside PostgreSQL's default lock
+# table (max_locks_per_transaction 64 x max_connections). A 26-year cube (~8k cells) does not.
+WINDOW_YEARS = 9
+OPEN_WINDOW_FROM = 2018  # closed windows end before this year; the open window holds 2018+ (grows ~1/yr)
 EUROPOP_YEARS = (2022, 2060)
 EUROPOP_POP_YEARS = (2025, 2030, 2040, 2050, 2060)
 MAX_POSITIONS = 600_000  # bounded parse (a 30-country EUROPOP cube is ~360k positions)
@@ -455,6 +461,24 @@ def dataset_tables(raw: RawAcquisition) -> dict[str, Any]:
     return {iso3: rows_to_table(rows) for iso3, rows in sorted(dataset_rows(cube).items())}
 
 
+def merged_tables(dataset: str, raws: Sequence[RawAcquisition]) -> dict[str, Any]:
+    """``{iso3: arrow_table}`` from every acquisition (time window) of one dataset; a cell
+    present in two windows is schema drift (windows never overlap)."""
+    per_iso3: dict[str, list[dict[str, Any]]] = {}
+    for raw in sorted(raws, key=lambda r: r.item.key):
+        cube = decode_cube(raw.body, raw.media_type, raw.item.url, dataset)
+        for iso3, rws in dataset_rows(cube).items():
+            per_iso3.setdefault(iso3, []).extend(rws)
+    out = {}
+    for iso3, rws in sorted(per_iso3.items()):
+        keys = [(r["projection"], r["year"], r["sex"], r["age"]) for r in rws]
+        if len(keys) != len(set(keys)):
+            raise SourceResponseError(f"overlapping time windows for {dataset} {iso3}", retryable=False,
+                                      kind="schema_drift")
+        out[iso3] = rows_to_table(rws)
+    return out
+
+
 def dataset_concept(dataset: str) -> str:
     d = DATASETS[dataset]
     return f"{d.concept_id}@{d.concept_version}"
@@ -502,7 +526,17 @@ class EurostatDemographyConnector:
         )
 
     # -------------------------------------------------------------- planning
-    def url_for(self, dataset: str, geos: Sequence[str]) -> str:
+    def windows(self) -> list[tuple[int, int | None]]:
+        """Time windows of the observed tables (the last one is open-ended: "latest")."""
+        out: list[tuple[int, int | None]] = []
+        start = self.since_year
+        while start + WINDOW_YEARS <= OPEN_WINDOW_FROM:
+            out.append((start, start + WINDOW_YEARS - 1))
+            start += WINDOW_YEARS
+        out.append((start, None))
+        return out
+
+    def url_for(self, dataset: str, geos: Sequence[str], window: tuple[int, int | None] | None = None) -> str:
         d = DATASETS[dataset]
         params: list[tuple[str, str]] = [("format", "JSON"), ("lang", "EN")]
         params += [("geo", g) for g in geos]
@@ -513,16 +547,21 @@ class EurostatDemographyConnector:
             else:
                 params += [("sinceTimePeriod", str(EUROPOP_YEARS[0])), ("untilTimePeriod", str(EUROPOP_YEARS[1]))]
         else:
-            params.append(("sinceTimePeriod", str(self.since_year)))
+            start, end = window or (self.since_year, None)
+            params.append(("sinceTimePeriod", str(start)))
+            if end is not None:
+                params.append(("untilTimePeriod", str(end)))
         return DATA_BASE + dataset + "?" + urlencode(params)
 
     def all_items(self) -> list[FetchItem]:
         items: list[FetchItem] = []
         for g in self.geos:
             for ds in OBSERVED:
-                items.append(FetchItem(key=f"{ds}:{g}", url=self.url_for(ds, [g]),
-                                       expected_media_types=("application/json",), max_bytes=MAX_RESPONSE_BYTES,
-                                       params={"kind": "jsonstat", "dataset": ds, "geos": [g]}))
+                for w in self.windows():
+                    items.append(FetchItem(key=f"{ds}:{g}:{w[0]}", url=self.url_for(ds, [g], w),
+                                           expected_media_types=("application/json",), max_bytes=MAX_RESPONSE_BYTES,
+                                           params={"kind": "jsonstat", "dataset": ds, "geos": [g],
+                                                   "window": [w[0], w[1]], "since_year": self.since_year}))
         if self.include_europop:
             geos = [g for g in self.geos]
             for ds in EUROPOP:
@@ -592,6 +631,7 @@ class EurostatDemographyConnector:
             "categories": {d: v for d, v in cube.categories.items() if d != "time"},
             "years": sorted(int(t) for t in cube.categories.get("time", [])),
             "requested_geos": list(raw.item.params.get("geos") or []),
+            "window": raw.item.params.get("window"),
             "age_kinds": {a: infos[a]["kind"] for a in age_codes},
             "open_age_starts": open_starts,
             "structure_fingerprint": cube.fingerprint,
@@ -722,9 +762,13 @@ class EurostatDemographyConnector:
         if ddef.kind == "observed" and len(batch.observations) != n:
             f.append(Finding(code="size_mismatch", severity="blocker",
                              message=f"{len(batch.observations)} cells parsed for a cube of {n}"))
-        if ddef.kind == "observed" and md.get("years") and min(md["years"]) > self.since_year + 10:
-            f.append(Finding(code="time_coverage_short", severity="warning",
-                             message=f"series starts in {min(md['years'])}"))
+        window = md.get("window")
+        if ddef.kind == "observed" and window and md.get("years"):
+            lo, hi = window
+            outside = [y for y in md["years"] if y < lo or (hi is not None and y > hi)]
+            if outside:
+                f.append(Finding(code="time_mismatch", severity="blocker",
+                                 message=f"periods {outside} outside the requested window {window}"))
         labels = md.get("status_labels") or {}
         for code in sorted(set(md.get("status_codes_seen") or [])):
             flag_part, conf = split_status(code)
@@ -833,72 +877,99 @@ def dataset_coverage(table: Any) -> dict[str, Any]:
     }
 
 
-def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch],
-                          summary: Any) -> None:
-    """Register the dataset inputs derived from this acquisition's raw bytes (same transaction).
+def _fingerprint(url: str) -> str:
+    from reva.adapters.http.safe_client import request_fingerprint
 
-    Contract of ``reva.evidence.runner.post_publish_for`` hooks: runs inside the acquisition
-    publication transaction, only for newly published (not quarantined) raw bytes, and
-    must not commit. :func:`dataset_tables` is a pure function of the archived bytes, so
-    a dataset can always be re-derived from the acquisition it names."""
+    return request_fingerprint("GET", url, secret_params=("subscription-key",))
+
+
+def _group_items(dataset: str, geos: Sequence[str], since_year: int) -> list[FetchItem]:
+    """Every request whose bytes make up the dataset inputs of (dataset, geos)."""
+    conn_ = EurostatDemographyConnector(countries=list(geos), since_year=since_year,
+                                        include_europop=DATASETS[dataset].kind == "europop")
+    return [i for i in conn_.all_items() if i.params["dataset"] == dataset and list(i.params["geos"]) == list(geos)]
+
+
+def assemble_datasets(conn: Any, store: Any, dataset: str, geos: Sequence[str], *, origin: str,
+                      since_year: int = SINCE_YEAR) -> list[Any]:
+    """Register the dataset inputs of (dataset, geos) from the latest passing acquisition of every
+    request that makes them up (all time windows). Returns the registered records, or ``[]`` while
+    any part is missing or did not pass validation (an incomplete table is never registered)."""
+    from datetime import UTC, datetime
+
+    from sqlalchemy import text
+
+    from reva.kernel.ids import sha256_bytes
     from reva.simulation.datasets import register_dataset
 
+    items = _group_items(dataset, geos, since_year)
+    fps = {_fingerprint(i.url): i for i in items}
+    rows = conn.execute(text(
+        """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.request_fingerprint, a.response_metadata
+           FROM evidence.acquisition a JOIN evidence.connector_version v ON v.id = a.connector_version_id
+           WHERE v.name = :n AND a.origin = :o AND a.request_fingerprint = ANY(:fps)
+           ORDER BY a.request_fingerprint, a.recorded_at DESC, a.id DESC"""),
+        {"n": NAME, "o": origin, "fps": list(fps)}).mappings().all()
+    latest = {r["request_fingerprint"]: r for r in rows}
+    if set(latest) != set(fps):
+        return []  # not every window acquired yet
+    if any(q.get("outcome") != "pass" for r in latest.values()
+           for q in (dict(r["response_metadata"] or {}).get("quality") or [])):
+        return []  # a part is quarantined/blocked: no dataset from it
+    raws = []
+    for fp, item in sorted(fps.items(), key=lambda kv: kv[1].key):
+        body = store.get("raw", latest[fp]["raw_sha256"])
+        if sha256_bytes(body) != latest[fp]["raw_sha256"]:
+            raise SourceResponseError("archived raw bytes do not match their hash", retryable=False,
+                                      kind="integrity")
+        raws.append(RawAcquisition(item=item, body=body, media_type="application/json",
+                                   retrieved_at=datetime.now(UTC), response_metadata={}, request_fingerprint=fp,
+                                   origin=origin))  # type: ignore[arg-type]
+    acq_ids = sorted(str(r["id"]) for r in latest.values())
+    out = []
+    for iso3, table in merged_tables(dataset, raws).items():
+        out.append(register_dataset(
+            conn, store, dataset_key=dataset_key(dataset), concept_id=DATASETS[dataset].concept_id,
+            subject_key=iso3, table=table, source_acquisition_ids=acq_ids, parser_version=PARSER_VERSION,
+            origin=origin, coverage=dataset_coverage(table), actor=f"connector:{NAME}",
+            rights={"licence": "CC-BY-4.0 (Eurostat reuse policy)", "attribution": "Source: Eurostat",
+                    "source_key": SOURCE_KEY}))
+    return out
+
+
+def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch],
+                          summary: Any) -> None:
+    """Register the dataset inputs this acquisition completes (same transaction).
+
+    Contract of ``reva.evidence.runner.post_publish_for`` hooks: runs inside the acquisition
+    publication transaction, only for newly published (not quarantined) raw bytes, and must not
+    commit. A country's observed table spans several time-window acquisitions: the dataset is
+    registered when the last of them is published (and re-registered when any part changes),
+    from the archived bytes of all parts. :func:`dataset_tables` / :func:`decode_cube` are pure
+    functions of those bytes, so a dataset can always be re-derived from the acquisitions it names."""
     dataset = str(raw.item.params["dataset"])
-    for iso3, table in dataset_tables(raw).items():
-        register_dataset(conn, store, dataset_key=dataset_key(dataset), concept_id=DATASETS[dataset].concept_id,
-                         subject_key=iso3, table=table, source_acquisition_ids=[summary.acquisition_id],
-                         parser_version=PARSER_VERSION, origin=raw.origin, coverage=dataset_coverage(table),
-                         actor=f"connector:{NAME}",
-                         rights={"licence": "CC-BY-4.0 (Eurostat reuse policy)", "attribution": "Source: Eurostat",
-                                 "source_key": SOURCE_KEY})
+    geos = list(raw.item.params.get("geos") or [])
+    since = int(raw.item.params.get("since_year") or SINCE_YEAR)  # the window grid's anchor
+    assemble_datasets(conn, store, dataset, geos, origin=raw.origin, since_year=since)
 
 
 # Optional hook read by runners that dispatch post-publish steps per connector.
 EurostatDemographyConnector.post_publish = staticmethod(post_publish_datasets)  # type: ignore[attr-defined]
 
 
-def backfill_datasets(conn: Any, store: Any, *, origin: str = "live") -> list[dict[str, Any]]:
-    """Derive and register dataset inputs from this connector's archived acquisitions.
+def backfill_datasets(conn: Any, store: Any, *, origin: str = "live",
+                      connector: EurostatDemographyConnector | None = None) -> list[Any]:
+    """Assemble and register every complete dataset input from archived acquisitions.
 
     For runners that do not dispatch :func:`post_publish_datasets` (the worker ``ingest``
-    job dispatches post-publish steps by template only): the latest passing acquisition per
-    request is re-read from the object store (namespace ``raw``, hash-checked), re-parsed
-    and registered. Idempotent (``register_dataset`` returns the existing row for the same
-    table bytes). Caller's transaction (worker role)."""
-    from sqlalchemy import text
-
-    from reva.kernel.ids import sha256_bytes
-
-    rows = conn.execute(text(
-        """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.origin, a.retrieved_at,
-                  a.request_fingerprint, a.response_metadata
-           FROM evidence.acquisition a JOIN evidence.connector_version v ON v.id = a.connector_version_id
-           WHERE v.name = :n AND a.origin = :o
-           ORDER BY a.request_fingerprint, a.recorded_at DESC, a.id DESC"""), {"n": NAME, "o": origin}).mappings().all()
-    items = {i.key: i for i in EurostatDemographyConnector().all_items()}
-    out: list[dict[str, Any]] = []
-    for r in rows:
-        md = dict(r["response_metadata"] or {})
-        if any(q.get("outcome") != "pass" for q in md.get("quality") or []):
-            continue  # quarantined/blocked bytes never become dataset inputs
-        key = str(md.get("item_key") or "")
-        dataset = key.split(":", 1)[0]
-        if dataset not in DATASETS:
-            continue
-        body = store.get("raw", r["raw_sha256"])
-        if sha256_bytes(body) != r["raw_sha256"]:
-            raise SourceResponseError("archived raw bytes do not match their hash", retryable=False,
-                                      kind="integrity")
-        item = items.get(key) or FetchItem(key=key, url=DATA_BASE + dataset, max_bytes=MAX_RESPONSE_BYTES,
-                                           params={"kind": "jsonstat", "dataset": dataset})
-        raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=r["retrieved_at"],
-                             response_metadata={}, request_fingerprint=r["request_fingerprint"],
-                             origin=r["origin"])
-
-        class _Summary:
-            acquisition_id = r["id"]
-            raw_sha256 = r["raw_sha256"]
-
-        post_publish_datasets(conn, store, raw, (), _Summary())
-        out.append({"acquisition_id": str(r["id"]), "item_key": key})
+    job dispatches post-publish steps by template only). Idempotent: ``register_dataset``
+    returns the existing row for identical table bytes. Caller's transaction (worker role)."""
+    c = connector or EurostatDemographyConnector()
+    out: list[Any] = []
+    for ds in OBSERVED:
+        for g in c.geos:
+            out += assemble_datasets(conn, store, ds, [g], origin=origin, since_year=c.since_year)
+    if c.include_europop:
+        for ds in EUROPOP:
+            out += assemble_datasets(conn, store, ds, list(c.geos), origin=origin, since_year=c.since_year)
     return out

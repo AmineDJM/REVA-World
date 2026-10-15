@@ -108,23 +108,31 @@ catalogue in `src/reva/capabilities.py` describes them as
 
 ## Governance limits (residual risk)
 
-* **Governance approvals are enforced in the database, but the gate is not independent.** Since
+* **Governance approvals are enforced in the database, and the gate is a separate process.** Since
   migration `0007` every governance row records the writing login (`recorded_by = session_user`);
   human-attributed actors are accepted only from the API login, the migration owner or the approval
   functions; approved states (`eligible`, `approved` mappings and model versions, `reviewed` claims)
   are written only by the owner or by `reva_registry`-owned functions that require a passing gate
-  result or a human review recorded through the API, bound to the proposal's recorded scope and used
-  once (`ops.approval_use`). Seeding runs as the owner during bootstrap. Residual risk: the V1 gate
-  still runs inside the worker, so the worker can record a passing gate result for its own proposal;
-  `model.evaluation` rows and worker artifacts (`meta.artifact`) are still worker-writable. The real
-  fix is a separate gate login and process. See [threat_model.md](threat_model.md).
-* The autonomy gate runs in the same worker process with the same credentials as
-  discovery; independence is enforced by re-derivation and DB checks on gate
-  results, not by process separation.
+  result **recorded by the gate login `reva_gate`** or a human review recorded through the API, bound
+  to the proposal's recorded scope and used once (`ops.approval_use`). The promotion gate runs as its
+  own process (`reva gate` / `scripts/start_gate.py`; the `reva-gate` service on Render) with its own
+  database login, the only one that may record gate results; the worker files `ops.gate_request` rows
+  and waits (`REVA_GATE_WAIT_SECONDS`, default 120 s) for the decision, reporting `gate_pending` and
+  promoting nothing if none arrives. Seeding runs as the owner during bootstrap.
+* Residual risk of the gate separation: the gate evaluates what the worker stored (the proposal
+  document, the report evidence and the captured fixture bank it re-runs the validator and sandbox
+  on), so a compromised worker can still choose the inputs, though not the verdict. Both processes run
+  the same image. In local development the gate runs on the same host/container as the worker,
+  normally from the same `.env` that holds every runtime password, so the separation there is a
+  credential convention, not an isolation boundary; on Render it is a separate service with only the
+  gate's own credentials. Without `REVA_GATE_DB_PASSWORD` (allowed outside production) the gate login
+  is not provisioned and nothing is auto-promoted. `model.record_promotion` (tournament promotions),
+  `model.evaluation` rows and worker artifacts (`meta.artifact`) remain worker-writable. See
+  [threat_model.md](threat_model.md) and [dev/gate_separation.md](dev/gate_separation.md).
 
 ## Operational limits
 
-* One API process (one Uvicorn worker) and one worker; CPU-bound work runs on the
+* One API process (one Uvicorn worker), one worker and one gate process; CPU-bound work runs on the
   queue. No horizontal scaling, no high availability. The login rate limiter is
   in-memory per API process (`REVA_LOGIN_RATE_LIMIT_PER_MINUTE`, default 5).
 * Render filesystem is ephemeral; only the object store and PostgreSQL persist.

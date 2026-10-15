@@ -51,6 +51,9 @@ query_router = APIRouter(prefix="/v1", tags=["query"], dependencies=[Depends(req
 
 
 
+RESULT_LIMIT = 5000  # rows per GET /v1/simulations/{id}; larger runs report results_truncated
+
+
 @lru_cache(maxsize=1)
 def model_registry() -> dict[str, dict[str, Any]]:
     models = load_yaml(REGISTRY_ROOT / "models" / "methods.yaml")["models"]
@@ -360,8 +363,9 @@ def get_simulation(sim_id: UUID, request: Request) -> s.SimulationStatusResponse
                 """SELECT r.*, e.label AS subject_label, c.concept_id AS subject_kind FROM sim.result r
                    LEFT JOIN world.entity e ON e.id = r.subject_id
                    LEFT JOIN ontology.concept_version c ON c.id = e.kind_concept_id
-                   WHERE r.run_id = :r ORDER BY r.output_key, e.label, r.variant LIMIT 5000"""),
-                {"r": run["id"]}).mappings()]
+                   WHERE r.run_id = :r ORDER BY r.output_key, e.label, r.period_start NULLS FIRST, r.variant
+                   LIMIT :lim"""),
+                {"r": run["id"], "lim": RESULT_LIMIT + 1}).mappings()]
         model = None
         if sc is not None:
             model = conn.execute(text(
@@ -383,11 +387,17 @@ def get_simulation(sim_id: UUID, request: Request) -> s.SimulationStatusResponse
             subject=s.EntityRef(id=r["subject_id"], label=r["subject_label"], kind=r["subject_kind"])
             if r["subject_id"] else None,
             variant=r["variant"], value=r["value"], uncertainty=r["uncertainty"], applicability=r["applicability"],
-            artifact_sha256=r["artifact_sha256"]) for r in results],
+            artifact_sha256=r["artifact_sha256"], period_start=r.get("period_start"),
+            period_end=r.get("period_end")) for r in results[:RESULT_LIMIT]],
     )
     env: dict[str, Any] = _scenario_envelope(sc) if sc else {
         "context_mode": "simulation", "origin": "none", "modality": "assumption_conditioned_scenario"}
     warnings: list[s.ApiWarning] = list(env.pop("warnings", []))
+    if len(results) > RESULT_LIMIT:
+        warnings.append(s.ApiWarning(
+            code="results_truncated",
+            message=f"Only the first {RESULT_LIMIT} result rows are returned; the full set is in the run's "
+                    "result manifest (outcome.output_manifest_sha256)."))
     if job is not None and run is not None and run["job_id"] is not None and run["job_id"] != job["id"]:
         warnings.append(s.ApiWarning(
             code="idempotent_replay",

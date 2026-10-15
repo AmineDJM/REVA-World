@@ -10796,6 +10796,30 @@
             "title": "Output Key",
             "type": "string"
           },
+          "period_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
           "subject": {
             "anyOf": [
               {
@@ -10857,7 +10881,9 @@
           "value",
           "uncertainty",
           "applicability",
-          "artifact_sha256"
+          "artifact_sha256",
+          "period_start",
+          "period_end"
         ],
         "title": "SimResult",
         "type": "object"

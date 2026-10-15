@@ -22,7 +22,7 @@ from uuid import UUID
 import pytest
 from sqlalchemy import Connection, create_engine, text
 from sqlalchemy.exc import DBAPIError
-from test_db_hardening import activity, build_world, new_artifact, tx
+from test_db_hardening import activity, build_world, tx
 
 from reva.kernel.errors import ConfigurationError
 
@@ -306,3 +306,79 @@ def test_bootstrap_requires_the_gate_password_only_in_production(monkeypatch: py
     assert "REVA_GATE_DB_PASSWORD" in prod.required_for("bootstrap")
     assert prod.required_for("gate") == ["REVA_GATE_DB_PASSWORD", "REVA_MIGRATION_DATABASE_URL must not be present "
                                          "in a runtime process"]
+
+
+# --------------------------------------------------------------------------- gate entrypoint (start_gate.py)
+def _start_gate() -> Any:
+    import importlib
+    import sys
+    from pathlib import Path
+
+    scripts = Path(__file__).resolve().parents[2] / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    return importlib.import_module("start_gate")
+
+
+GATE_PROD = {
+    "PATH": "/usr/bin:/bin", "HOME": "/home/reva", "REVA_ENV": "production", "REVA_PROCESS_ROLE": "gate",
+    "REVA_DB_HOST": "db.internal", "REVA_DB_PORT": "5432", "REVA_DB_SSLMODE": "require", "REVA_DB_NAME": "reva",
+    "REVA_OBJECT_BACKEND": "s3", "REVA_S3_BUCKET": "b", "REVA_S3_REGION": "eu-central-1", "REVA_S3_PREFIX": "reva/",
+    "REVA_S3_ACCESS_KEY_ID": "AKIA-GATE", "REVA_S3_SECRET_ACCESS_KEY": "gate-s3-secret-value",
+    "REVA_GATE_DB_PASSWORD": "gate-pw-@:/?#-value", "REVA_CPU_BUDGET_THREADS": "1",
+    "HTTPS_PROXY": "http://proxy.internal:3128",
+}
+
+
+def test_start_gate_child_env_holds_only_gate_secrets() -> None:
+    sg = _start_gate()
+    env = {**GATE_PROD, "REVA_WORKER_DB_PASSWORD": "worker-pw-value", "REVA_SIM_DB_PASSWORD": "sim-pw-value",
+           "REVA_API_DB_PASSWORD": "api-pw-value", "REVA_SESSION_SECRET": "s" * 48,
+           "REVA_COMTRADE_API_KEY": "comtrade-key-value"}
+    command, child, summary, settings = sg.prepare(env)
+    assert command[-2:] == ["-m", "reva.gate.service"] and summary["process_role"] == "gate"
+    assert child["REVA_PROCESS_ROLE"] == "gate" and child["REVA_GATE_DB_PASSWORD"] == GATE_PROD["REVA_GATE_DB_PASSWORD"]
+    for k in ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET",
+              "REVA_COMTRADE_API_KEY", "HTTPS_PROXY"):
+        assert k not in child, k
+    assert settings.runtime_url("gate").username == "reva_gate"
+
+
+def test_start_gate_fails_closed() -> None:
+    sg = _start_gate()
+    with pytest.raises(sg.ConfigError, match="migration-owner"):
+        sg.prepare({**GATE_PROD, "REVA_MIGRATION_DATABASE_URL": "postgresql://o:p@h/d"})
+    with pytest.raises(sg.ConfigError, match="REVA_GATE_DB_PASSWORD"):
+        sg.prepare({k: v for k, v in GATE_PROD.items() if k != "REVA_GATE_DB_PASSWORD"})
+    with pytest.raises(sg.ConfigError, match="REVA_PROCESS_ROLE=worker"):
+        sg.prepare({**GATE_PROD, "REVA_PROCESS_ROLE": "worker"})
+    # the worker entrypoint never forwards the gate's password
+    import importlib
+
+    re_ = importlib.import_module("_runtime_env")
+    child, _ = re_.build_child_env({**GATE_PROD, "REVA_PROCESS_ROLE": "worker", "REVA_WORKER_DB_PASSWORD": "w",
+                                    "REVA_SIM_DB_PASSWORD": "s"}, "worker")
+    assert "REVA_GATE_DB_PASSWORD" not in child
+
+
+def test_blueprint_has_an_independent_gate_service() -> None:
+    import importlib
+    import sys
+    from pathlib import Path
+
+    import yaml
+
+    scripts = Path(__file__).resolve().parents[2] / "scripts"
+    if str(scripts) not in sys.path:
+        sys.path.insert(0, str(scripts))
+    vb = importlib.import_module("validate_blueprint")
+    doc = yaml.safe_load((scripts.parent / "render.yaml").read_text())
+    assert vb.reva_checks(doc) == []
+    gate = next(s for s in doc["services"] if s["name"] == "reva-gate")
+    gate["envVars"].append({"key": "REVA_WORKER_DB_PASSWORD", "fromService": {
+        "type": "web", "name": "reva-api", "envVarKey": "REVA_WORKER_DB_PASSWORD"}})
+    worker = next(s for s in doc["services"] if s["name"] == "reva-worker")
+    worker["envVars"].append({"key": "REVA_GATE_DB_PASSWORD", "fromService": {
+        "type": "web", "name": "reva-api", "envVarKey": "REVA_GATE_DB_PASSWORD"}})
+    problems = " | ".join(vb.reva_checks(doc))
+    assert "reva-gate must not receive" in problems and "reva-worker must not receive REVA_GATE_DB_PASSWORD" in problems

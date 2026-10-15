@@ -167,13 +167,19 @@ def manifest_from_spec(spec: ConnectorSpec, eligibility_scope: list[str]) -> dic
     }
 
 
+V2_BUILTIN_TEMPLATES = {"eurostat_sdmx_csv"}  # reviewed built-ins only; never autonomy-generated
+
+
 @pytest.mark.parametrize("name", sorted(builtin_connectors()))
 def test_builtin_connector_specs_map_onto_manifest_contract(name: str) -> None:
     reg = load_registry()
     spec = builtin_connectors()[name].describe()
     scope = sorted({m["target"]["concept_id"] for m in reg.mappings if m["connector"]["name"] == spec.name})
     manifest = manifest_from_spec(spec, scope)
-    assert errors("connector.schema.json", manifest) == []
+    errs = errors("connector.schema.json", manifest)
+    if spec.template in V2_BUILTIN_TEMPLATES:  # reviewed V2 built-ins: only the template enum may differ
+        errs = [e for e in errs if not e.startswith("/template:")]
+    assert errs == []
 
 
 def test_connector_contract_and_spec_model_agree_on_bounds_and_templates() -> None:
@@ -181,8 +187,7 @@ def test_connector_contract_and_spec_model_agree_on_bounds_and_templates() -> No
     template_literal = ConnectorSpec.model_fields["template"].annotation
     # V2 built-in (reviewed, non-autonomy) templates extend the V1 binding appendix; autonomy
     # manifests validated against the contract still cannot name them.
-    v2_builtin_templates = {"eurostat_sdmx_csv"}
-    assert set(schema["template"]["enum"]) | v2_builtin_templates == set(typing.get_args(template_literal))
+    assert set(schema["template"]["enum"]) | V2_BUILTIN_TEMPLATES == set(typing.get_args(template_literal))
     meta = {type(m).__name__: m for m in ConnectorSpec.model_fields["max_response_bytes"].metadata}
     assert schema["max_response_bytes"]["maximum"] == meta["Le"].le
     assert schema["max_response_bytes"]["minimum"] == meta["Ge"].ge

@@ -1279,7 +1279,21 @@ def step9_eurostat(env: Env, rec: Recorder) -> None:
         st.interfaces += ["sql:ops.submit_job(reva_api)", "worker:discovery", "library:autonomy.jobs"]
         mode = "fixture" if env.mode == "fixtures" else "live"
         job_id = submit_job(env, "discovery", {"requirement_id": "R-POP-JAN-AGESEX", "mode": mode})
-        job = run_job(env, job_id, "discovery")
+        # GATE: the promotion gate is a separate process/login (reva_gate); run it alongside the worker
+        # here (in production it is the reva-gate service). Without its password the step reports gate_pending.
+        if env.settings.reva_gate_db_password is not None:
+            from reva.adapters.postgres.engine import make_engine as _make_engine
+            from reva.gate.service import GateService
+
+            st.interfaces += ["process:reva gate (reva_gate login)"]
+            gate_engine = _make_engine("gate", env.settings)
+            try:
+                with GateService(gate_engine, env.store, env.settings, poll_seconds=0.2).background():
+                    job = run_job(env, job_id, "discovery")
+            finally:
+                gate_engine.dispose()
+        else:
+            job = run_job(env, job_id, "discovery")
         out = job["result_ref"] or {}
         st.evidence.update(
             job_id=job_id,
