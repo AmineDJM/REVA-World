@@ -20,8 +20,15 @@ T = datetime(2026, 10, 15, 22, 0, tzinfo=UTC)
 
 
 def _raw(item, body: bytes) -> RawAcquisition:  # type: ignore[no-untyped-def]
-    return RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=T, response_metadata={},
-                          request_fingerprint="fp", origin="test_fixture")
+    return RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/json",
+        retrieved_at=T,
+        response_metadata={},
+        request_fingerprint="fp",
+        origin="test_fixture",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -37,12 +44,19 @@ def cckp_rows(cckp: dict[str, RawAcquisition]) -> dict[str, list[dict]]:
 
 def test_cckp_rows_validate_and_map_kosovo(cckp_rows: dict[str, list[dict]]) -> None:
     for ds, rows in cckp_rows.items():
-        f, unmapped = validate_atlas_frame(pl.DataFrame(rows, schema=ATLAS_SCHEMA), source="cckp", dataset=ds,
-                                           raw_sha256s=sorted({r["raw_sha256"] for r in rows}), geo_scheme="cckp")
+        f, unmapped = validate_atlas_frame(
+            pl.DataFrame(rows, schema=ATLAS_SCHEMA),
+            source="cckp",
+            dataset=ds,
+            raw_sha256s=sorted({r["raw_sha256"] for r in rows}),
+            geo_scheme="cckp",
+        )
         assert [u["provider_geo"] for u in unmapped] == ["TWN"]
         ksv = f.filter(pl.col("provider_geo") == "KSV")
         assert ksv.height > 0 and set(ksv["iso3"].to_list()) == {"XKX"}
-        assert set(f["period_start"].to_list()) == {date(1991, 1, 1)} and set(f["period_end"].to_list()) == {date(2021, 1, 1)}
+        assert set(f["period_start"].to_list()) == {date(1991, 1, 1)} and set(f["period_end"].to_list()) == {
+            date(2021, 1, 1)
+        }
 
 
 def test_cckp_values_units_and_null_series(cckp_rows: dict[str, list[dict]]) -> None:
@@ -70,7 +84,7 @@ def test_cckp_monthly_annual_consistency_check(cckp: dict[str, RawAcquisition]) 
 
 
 def test_cckp_refuses_empty_or_drifted_responses() -> None:
-    with pytest.raises(SourceResponseError, match="incomplete|not an object"):
+    with pytest.raises(SourceResponseError, match=r"incomplete|not an object"):
         cl.parse_response(b'{"metadata":{"status":"success"},"data":[]}', ("tas", "pr"))
     with pytest.raises(SourceResponseError, match="status"):
         cl.parse_response(b'{"metadata":{"status":"error"},"data":{}}', ("tas",))
@@ -90,8 +104,13 @@ def test_inform_main_workflow_and_scores(inform: tuple[dict, bytes]) -> None:
     assert wf["name"] == "INFORM Risk 2026"
     scores = hz.parse_scores(body)
     rows = hz.atlas_rows(scores, wf, "c" * 64)
-    f, unmapped = validate_atlas_frame(pl.DataFrame(rows, schema=ATLAS_SCHEMA), source="inform",
-                                       dataset=hz.ATLAS_DATASET, raw_sha256s=["c" * 64], geo_scheme="iso3")
+    f, unmapped = validate_atlas_frame(
+        pl.DataFrame(rows, schema=ATLAS_SCHEMA),
+        source="inform",
+        dataset=hz.ATLAS_DATASET,
+        raw_sha256s=["c" * 64],
+        geo_scheme="iso3",
+    )
     assert unmapped == []
     assert set(f["indicator"].unique().to_list()) == set(hz.INDICATORS)
     assert f.filter(pl.col("indicator") == "HA.NAT")["iso3"].n_unique() >= hz.MIN_COUNTRIES

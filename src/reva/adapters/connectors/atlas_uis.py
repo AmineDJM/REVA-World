@@ -380,6 +380,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=UisConnector.ATLAS_SOURCE,
         provider="UNESCO Institute for Statistics",
         licence=RIGHTS["licence"],

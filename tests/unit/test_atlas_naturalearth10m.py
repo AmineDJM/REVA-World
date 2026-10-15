@@ -35,8 +35,15 @@ T = datetime(2026, 10, 15, 22, 0, tzinfo=UTC)
 
 def _raw(key: str, body: bytes) -> RawAcquisition:
     item = next(i for i in ne.fetch_items() if i.key == key)
-    return RawAcquisition(item=item, body=body, media_type="application/zip", retrieved_at=T, response_metadata={},
-                          request_fingerprint="fp-" + key, origin="test_fixture")
+    return RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/zip",
+        retrieved_at=T,
+        response_metadata={},
+        request_fingerprint="fp-" + key,
+        origin="test_fixture",
+    )
 
 
 def _real_small_layers() -> dict[str, bytes]:
@@ -101,16 +108,26 @@ def test_areas_match_closed_forms(built: ne.NeBuild) -> None:
 def test_coastline_is_unshared_boundary_and_labelled_with_scale(built: ne.NeBuild) -> None:
     c = built.computation
     # FRA main box: west and south edges are coast; coastal exclave [8,9]x[0,1]: south, east, north edges.
-    want = _len_km((0, 0), (0, 4)) + _len_km((0, 0), (4, 0)) + _len_km((8, 0), (9, 0)) + _len_km((9, 0), (9, 1)) \
+    want = (
+        _len_km((0, 0), (0, 4))
+        + _len_km((0, 0), (4, 0))
+        + _len_km((8, 0), (9, 0))
+        + _len_km((9, 0), (9, 1))
         + _len_km((8, 1), (9, 1))
+    )
     assert c.coast_m["FRA"] / 1e3 == pytest.approx(want, rel=1e-9)
     row = _one(built, ne.DS_COUNTRY, "FRA", "coastline_length_km|scale=ne_1:10m")
     flags = json.loads(row["flags"])
     assert flags["scale_dependent"] is True and flags["scale"] == "1:10,000,000"
     # antimeridian cut edges are not coast: RUS = two boxes minus the two cut meridian edges
-    rus = _len_km((178, 60), (180, 60)) + _len_km((178, 62), (180, 62)) \
-        + _len_km((178, 60), (178, 62)) + _len_km((-180, 60), (-178, 60)) + _len_km((-180, 62), (-178, 62)) \
+    rus = (
+        _len_km((178, 60), (180, 60))
+        + _len_km((178, 62), (180, 62))
+        + _len_km((178, 60), (178, 62))
+        + _len_km((-180, 60), (-178, 60))
+        + _len_km((-180, 62), (-178, 62))
         + _len_km((-178, 60), (-178, 62))
+    )
     assert c.coast_m["RUS"] / 1e3 == pytest.approx(rus, rel=1e-9)
     assert c.diagnostics["artificial_cut_km_excluded"] > 0
 
@@ -138,7 +155,9 @@ def test_borders_typed_by_boundary_lines(built: ne.NeBuild) -> None:
     assert not [k for k in b if "GBR" in k]
     row = _one(built, ne.DS_BORDERS, "CHE", "land_border_km|partner=FRA")
     flags = json.loads(row["flags"])
-    assert flags["disputed"] is True and flags["by_class_km"] == {"disputed": pytest.approx(_len_km((2, 4), (4, 4)), abs=0.01)}
+    assert flags["disputed"] is True and flags["by_class_km"] == {
+        "disputed": pytest.approx(_len_km((2, 4), (4, 4)), abs=0.01)
+    }
     # both directions are emitted
     assert _one(built, ne.DS_BORDERS, "FRA", "land_border_km|partner=CHE")["value"] == row["value"]
 
@@ -173,8 +192,9 @@ def test_exclaves_enclaves_islands_and_antimeridian(built: ne.NeBuild) -> None:
 def test_atlas_frames_validate_against_atlascore_schema(built: ne.NeBuild) -> None:
     for ds, rows in built.rows.items():
         frame = pl.DataFrame(rows, schema=ATLAS_SCHEMA)
-        f, unmapped = validate_atlas_frame(frame, source="naturalearth", dataset=ds,
-                                           raw_sha256s=sorted(set(frame["raw_sha256"].to_list())))
+        f, unmapped = validate_atlas_frame(
+            frame, source="naturalearth", dataset=ds, raw_sha256s=sorted(set(frame["raw_sha256"].to_list()))
+        )
         assert f.height == len(rows)
         assert all(u["rows"] > 0 for u in unmapped)
     geos = {r["provider_geo"] for r in built.rows[ne.DS_COUNTRY] if r["iso3"] == "GBR"}
@@ -234,8 +254,16 @@ def test_topology_violation_is_refused() -> None:
     layer = ne.read_layer(zip_of([[box], [box], [box]]), "x")  # one edge used by three polygons
     empty = ne.read_layer(sw.layers()["boundary_lines_land"], "l")
     with pytest.raises(SourceResponseError, match="topology"):
-        ne.compute({"map_units": layer, "boundary_lines_land": empty, "boundary_lines_disputed": empty,
-                    "countries": layer, "countries_lakes": layer}, {"A0"})
+        ne.compute(
+            {
+                "map_units": layer,
+                "boundary_lines_land": empty,
+                "boundary_lines_disputed": empty,
+                "countries": layer,
+                "countries_lakes": layer,
+            },
+            {"A0"},
+        )
 
 
 def test_connector_blocks_schema_drift_and_truncation(raws: dict[str, RawAcquisition]) -> None:
@@ -244,7 +272,9 @@ def test_connector_blocks_schema_drift_and_truncation(raws: dict[str, RawAcquisi
     assert spec.template == "atlas_bulk" and spec.allowed_hosts == ("naciscdn.org",)
     batch = next(iter(conn.parse(raws["disputed_areas"])))
     assert not conn.validate(batch).blocking
-    small = raws["boundary_lines_land"].model_copy(update={"item": next(i for i in ne.fetch_items() if i.key == "map_units")})
+    small = raws["boundary_lines_land"].model_copy(
+        update={"item": next(i for i in ne.fetch_items() if i.key == "map_units")}
+    )
     with pytest.raises(SourceResponseError):
         ne.build({**raws, "map_units": small}, {k: "0" * 64 for k in raws}, keys=KEYS)
     with pytest.raises(SourceResponseError, match="zip"):

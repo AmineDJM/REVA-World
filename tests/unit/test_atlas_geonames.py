@@ -42,8 +42,13 @@ def test_parse_and_validate(rows: list[gn.CountryInfo]) -> None:
 
 def test_atlas_rows_are_as_declared(rows: list[gn.CountryInfo]) -> None:
     out = gn.atlas_rows(rows, raw_sha256=SHA, retrieved_at=T)
-    frame, unmapped = validate_atlas_frame(pl.DataFrame(out, schema=ATLAS_SCHEMA), source="geonames",
-                                           dataset="countryinfo", raw_sha256s=[SHA], geo_scheme="iso3")
+    frame, unmapped = validate_atlas_frame(
+        pl.DataFrame(out, schema=ATLAS_SCHEMA),
+        source="geonames",
+        dataset="countryinfo",
+        raw_sha256s=[SHA],
+        geo_scheme="iso3",
+    )
     assert frame.height == len(out)
     # historical codes and Taiwan are kept, unmapped (never dropped)
     assert {u["provider_geo"] for u in unmapped} >= {"ANT", "SCG", "TWN"}
@@ -64,8 +69,9 @@ def test_neighbours_and_kg_statements(rows: list[gn.CountryInfo]) -> None:
     pairs, bad = gn.neighbour_pairs(rows)
     assert bad == []
     assert ("FRA", "ESP", next(r.line for r in rows if r.iso3 == "FRA")) in pairs
-    sts, info = gn.neighbour_statements(rows, {"FRA": "Q142", "ESP": "Q29", "AND": "Q228"}, raw_sha256=SHA,
-                                        retrieved_at=T)
+    sts, info = gn.neighbour_statements(
+        rows, {"FRA": "Q142", "ESP": "Q29", "AND": "Q228"}, raw_sha256=SHA, retrieved_at=T
+    )
     got = {(s.subject_qid, s.object_qid) for s in sts}
     assert {("Q142", "Q29"), ("Q29", "Q142"), ("Q228", "Q142")} <= got
     assert all(s.property_pid == "P47" and s.source_key == gn.SOURCE_KEY for s in sts)

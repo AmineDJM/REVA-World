@@ -34,7 +34,7 @@ from typing import Any
 
 from reva.adapters.connectors import atlas_law_common as common
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem
+from reva.atlas.sources import AtlasSourceSpec
 
 SOURCE_KEY = "constitute.service"
 ATLAS_SOURCE = "constitute"
@@ -75,31 +75,26 @@ def _err(msg: str) -> ConstituteParseError:
     return ConstituteParseError(msg, retryable=False, kind="schema_drift")
 
 
-class ConstituteConnector:
-    def describe(self) -> ConnectorSpec:
-        return common.law_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="Constitute Project (Comparative Constitutions Project)",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=(ATLAS_DATASET,),
-            field_mappings={"tables": {"list": f"{ATLAS_SOURCE}.{ATLAS_DATASET}"}},
-            units={"years": "year", "counts": "count"},
-            geography=("ALL_CONSTITUTE_COUNTRIES",),
-            time_semantics="snapshot of the list on the retrieval day",
-            lineage_family="ccp",
-            cadence_seconds=90 * 86400,
-            revision_strategy="snapshot per retrieval; new atlas table version when the list changes",
-            max_response_bytes=MAX_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=common.code_digest(sys.modules[__name__]),
-        )
-
-    def items(self) -> tuple[FetchItem, ...]:
-        return (FetchItem(key="constitutions", url=LIST_URL, max_bytes=MAX_BYTES),)
+def atlas_source() -> AtlasSourceSpec:
+    """The ATLASCORE source spec (connector ``atlas.constitute``; budget key ``constitute.service``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Constitute Project (Comparative Constitutions Project)",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(ATLAS_DATASET,),
+        dataset_ids=("service/constitutions",),
+        cadence_seconds=90 * 86400,
+        planned_requests=1,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=common.code_digest(sys.modules[__name__]),
+        field_mappings={"time_semantics": "snapshot of the list on the retrieval day", "texts_fetched": False},
+    )
 
 
 def _num(v: Any, field: str, idx: int) -> str | None:
@@ -196,40 +191,28 @@ def parse_list(body: bytes, raw_sha256: str, retrieved_at: datetime) -> list[dic
     return rows
 
 
-async def run(
-    engine: Any, store: Any, http: Any, *, origin: str, actor: str = "worker:atlas_constitute"
-) -> common.IngestReport:
-    from reva.atlas.tables import register_atlas_table
-
-    conn = ConstituteConnector()
-    spec = conn.describe()
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """One request: the constitutions list -> atlas table ``constitute.constitutions``."""
     report = common.IngestReport(CONNECTOR_NAME)
-    (item,) = conn.items()
-    got = await common.fetch_raw(http, item, SOURCE_KEY)
+    if not run.wants(ATLAS_DATASET):
+        return report.as_dict()
+    got = await common.fetch(run, LIST_URL, key="constitutions", source_key=SOURCE_KEY, max_bytes=MAX_BYTES)
     if isinstance(got, common.Blocked):
         report.blocked.append(got)
-        return report
-    sha = common.archive_raw(engine, store, spec, got, actor=actor)
-    report.raw.append({"item": item.key, "raw_sha256": sha, "bytes": len(got.body), "url": item.url})
+        return report.as_dict()
+    sha = run.archive(got)
+    report.raw.append({"item": "constitutions", "raw_sha256": sha, "bytes": len(got.body), "url": LIST_URL})
     rows = parse_list(got.body, sha, got.retrieved_at)
-    s = register_atlas_table(
-        engine,
-        store,
-        source=ATLAS_SOURCE,
+    out = run.register(
         dataset=ATLAS_DATASET,
         frame=common.atlas_frame(rows),
         raw_sha256s=[sha],
-        parser_version=PARSER_VERSION,
-        origin=origin,
         geo_scheme="constitute",
         rights=RIGHTS,
         coverage_note="Constitute constitutions list (metadata only, no texts); non-commercial terms",
     )
-    report.tables.append(
-        {k: s[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")}
-        | {"countries": s["coverage"]["countries"]}
-    )
-    return report
+    report.tables.append(common.table_summary(out))
+    return report.as_dict()
 
 
-__all__ = ["ATLAS_DATASET", "ATLAS_SOURCE", "CONNECTOR_NAME", "ConstituteConnector", "parse_list", "run"]
+__all__ = ["ATLAS_DATASET", "ATLAS_SOURCE", "CONNECTOR_NAME", "atlas_ingest", "atlas_source", "parse_list"]

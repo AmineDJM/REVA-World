@@ -20,7 +20,9 @@ WGS84_SURFACE_KM2 = 510_065_621.7  # published total surface of the WGS 84 ellip
 
 
 def _box(x0: float, y0: float, x1: float, y1: float, *, cw: bool = True) -> tuple[list[float], list[float]]:
-    pts = [(x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)] if cw else [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)]
+    pts = (
+        [(x0, y0), (x0, y1), (x1, y1), (x1, y0), (x0, y0)] if cw else [(x0, y0), (x1, y0), (x1, y1), (x0, y1), (x0, y0)]
+    )
     return [p[0] for p in pts], [p[1] for p in pts]
 
 

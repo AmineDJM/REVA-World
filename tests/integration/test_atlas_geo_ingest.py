@@ -34,8 +34,12 @@ QIDS = {"FRA": "Q142", "ESP": "Q29", "CHE": "Q39", "DEU": "Q183", "ITA": "Q38", 
 
 @pytest.fixture(scope="module")
 def registered(db):  # type: ignore[no-untyped-def]
-    for c in (ne.NaturalEarth10mConnector(), gn.GeoNamesCountryInfoConnector(), cl.CckpClimatologyConnector(),
-              hz.InformHazardsConnector()):
+    for c in (
+        ne.NaturalEarth10mConnector(),
+        gn.GeoNamesCountryInfoConnector(),
+        cl.CckpClimatologyConnector(),
+        hz.InformHazardsConnector(),
+    ):
         register_connector(db.owner, db.store, c.describe())
     return db
 
@@ -59,10 +63,14 @@ async def test_natural_earth_ingest_tables_and_kg(registered) -> None:  # type: 
     kg = out["kg"]
     assert kg["loaded"] and kg["report"]["statements_inserted"] == kg["statements"] > 0
     with db.worker.connect() as c:
-        n = c.execute(text("SELECT count(*) FROM kg.statement WHERE source_key = :s AND property_pid = 'P47'"),
-                      {"s": ne.SOURCE_KEY}).scalar_one()
-        q = c.execute(text("""SELECT qualifiers->'border_length_km'->>'amount', qualifiers->>'disputed_boundary'
-                              FROM kg.statement WHERE subject_qid = 'Q39' AND object_qid = 'Q142'""")).one()
+        n = c.execute(
+            text("SELECT count(*) FROM kg.statement WHERE source_key = :s AND property_pid = 'P47'"),
+            {"s": ne.SOURCE_KEY},
+        ).scalar_one()
+        q = c.execute(
+            text("""SELECT qualifiers->'border_length_km'->>'amount', qualifiers->>'disputed_boundary'
+                              FROM kg.statement WHERE subject_qid = 'Q39' AND object_qid = 'Q142'""")
+        ).one()
     assert n == kg["statements"]
     assert float(q[0]) > 200 and q[1] == "true"
 
@@ -90,7 +98,10 @@ async def test_geonames_climate_hazards_ingest(registered) -> None:  # type: ign
     h = await hz.ingest(db.worker, db.store, FixtureHttp(hz.CONNECTOR_NAME))
     assert h["workflow"]["name"] == "INFORM Risk 2026" and h["table"]["row_count"] >= 8 * hz.MIN_COUNTRIES
     with db.worker.connect() as conn:
-        keys = {r[0] for r in conn.execute(text("SELECT dataset_key FROM evidence.dataset WHERE dataset_key LIKE 'atlas.%'"))}
+        keys = {
+            r[0]
+            for r in conn.execute(text("SELECT dataset_key FROM evidence.dataset WHERE dataset_key LIKE 'atlas.%'"))
+        }
     assert {"atlas.geonames.countryinfo", f"atlas.cckp.{cl.DS_CRU}", f"atlas.inform.{hz.ATLAS_DATASET}"} <= keys
 
 
@@ -108,6 +119,7 @@ async def test_live_geonames_through_entry_point(registered) -> None:  # type: i
     """One small live request through the budget-metered entry point (deselected by default)."""
     from reva.atlas.ingest import run_atlas_ingest
 
-    out = await run_atlas_ingest(registered.settings, registered.worker, registered.store, gn.CONNECTOR_NAME,
-                                 mode="live")
+    out = await run_atlas_ingest(
+        registered.settings, registered.worker, registered.store, gn.CONNECTOR_NAME, mode="live"
+    )
     assert out["status"] == "completed" and out["registered"][0]["row_count"] > 3000
