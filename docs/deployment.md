@@ -191,7 +191,7 @@ Render ignores the optional secret.
 
 Measured 2026-10-15 (4 vCPU build host; details in `docs/dev/docker_check.md`):
 uncompressed image **1.33 GB** (content size 315 MB; before the cleanup 1.50 GB /
-349 MB), 15 layers, of which the virtual environment is ~0.8 GB. Cold build
+349 MB), 15 layers, of which the virtual environment layer is 856 MB. Cold build
 (`--no-cache`, base images present) 93–135 s; the dependency layer and image
 export dominate. The image has no Docker `HEALTHCHECK`: Render uses
 `healthCheckPath: /health/ready`, and the same image runs the worker.

@@ -67,6 +67,11 @@ def new_artifact(c: Connection) -> str:
 
 @pytest.fixture(scope="module")
 def w(db: Any) -> dict[str, Any]:
+    return build_world(db)
+
+
+def build_world(db: Any) -> dict[str, Any]:
+    """Ingest the WDI fixture and return the FRA population observation and helpers' references."""
     wb = builtin_connectors()["worldbank.wdi.indicators"]
     asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), db.store, db.worker, persist_cursor=False))
     with db.owner.connect() as c:

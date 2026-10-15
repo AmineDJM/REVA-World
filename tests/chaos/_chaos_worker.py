@@ -46,6 +46,8 @@ def chaos_slow(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     from reva.operations.context import JobCancelled
 
     steps = int(payload.get("steps", 50))
+    if ctx.attempt > 1 and payload.get("retry_steps") is not None:
+        steps = int(payload["retry_steps"])  # keep a re-run after lease expiry short
     step_s = float(payload.get("step_seconds", 0.1))
     mode = payload.get("mode", "cooperative")
     start = int((ctx.checkpoint or {}).get("step", 0))

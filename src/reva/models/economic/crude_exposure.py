@@ -399,13 +399,17 @@ def _input_flags(inp: MonetaryInput) -> dict[str, Any]:
         "valuation": inp.valuation,
         "reference_year": inp.reference_year,
     }
-    for k in ("provider_estimation_flagged", "legacyEstimationFlag", "provider_derived_aggregate", "isReported",
+    # The inputs are trade values and GDP. Comtrade's legacyEstimationFlag (0/2/4/6) codes estimated
+    # quantity/net weight, never the USD value, so neither it nor the 1.1.0 derived key
+    # provider_estimation_flagged (code != 0) labels a value input as estimated; only an explicit
+    # provider_value_estimated=true does (Comtrade 1.2.0 emits null: undeterminable from the response).
+    for k in ("provider_value_estimated", "legacyEstimationFlag", "provider_derived_aggregate", "isReported",
               "isAggregate", "classificationCode", "indicator", "obs_status", "provider_returned_no_rows"):
         if k in f:
             out[k] = f[k]
-    if f.get("provider_estimation_flagged") or f.get("provider_derived_aggregate"):
-        out["note"] = "provider estimation flagged (legacyEstimationFlag != 0): not a direct customs observation"
-    elif f.get("isReported") is False:
+    if f.get("provider_value_estimated") is True:
+        out["note"] = "provider marks this value as estimated"
+    elif f.get("isReported") is False or f.get("provider_derived_aggregate"):
         out["note"] = "provider marks this value as not directly reported (isReported=false)"
     return out
 

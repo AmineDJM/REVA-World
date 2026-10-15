@@ -317,7 +317,7 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
             <caption>
               Scenario outputs relative to baseline (SIMULATION; assumption-conditioned)
               {isL2 &&
-                ' — L2 column shows the assumption sensitivity range over the elasticity grid (not a confidence interval; not centred on L1 — where L1 sits is stated per row)'}
+                ' — L2 column shows the assumption sensitivity range (not a confidence interval) over the elasticity grid; it is not centred on L1, and where L1 sits is stated per row'}
             </caption>
             <thead>
               <tr>

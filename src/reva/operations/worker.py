@@ -626,6 +626,9 @@ def main(argv: list[str] | None = None) -> int:
     store = build_store(settings)
     try:
         wait_for_schema(engine)
+        from reva.adapters.postgres.schema_contract import assert_schema_contract
+
+        assert_schema_contract(engine, reva_env=settings.reva_env)
     except ConfigurationError as e:
         log.error("worker start refused: %s", e.message)
         return 3

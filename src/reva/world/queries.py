@@ -1034,8 +1034,9 @@ def _item(r: dict[str, Any], kind: Literal["observation", "estimate"]) -> FlowIt
         partner_entity_id=None if r.get("partner_entity_id") is None else UUID(str(r["partner_entity_id"])),
         partner_kind=r.get("partner_kind"),
         uncertainty_status=(r.get("uncertainty") or {}).get("status"),
-        # Comtrade 1.1.0 flags provider estimation explicitly; 1.0.0 rows carried the derived flag.
-        provider_derived=bool(flags.get("provider_estimation_flagged", flags.get("provider_derived_aggregate"))),
+        # Only an explicit value-estimation flag (Comtrade 1.2.0 provider_value_estimated) or the 1.0.0
+        # derived-aggregate flag marks a value; 1.1.0 provider_estimation_flagged coded quantity/weight.
+        provider_derived=flags.get("provider_value_estimated") is True or bool(flags.get("provider_derived_aggregate")),
     )
 
 
