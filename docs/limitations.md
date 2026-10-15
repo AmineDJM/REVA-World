@@ -1,7 +1,9 @@
 # Scientific limits and unsupported capabilities
 
 REVA V1 is a private, single-user MVP. It is a disciplined evidence and
-estimate register with one narrow scenario model — not a world model.
+estimate register with one narrow scenario model — not a world model. V2 adds
+experimental models (maintainer review pending) and natural-language drafts;
+their limits are in [V2 models and drafts](#v2-models-and-drafts-experimental).
 
 ## What the outputs are not
 
@@ -102,9 +104,113 @@ catalogue in `src/reva/capabilities.py` describes them as
 * Arbitrary generated code: autonomy is template-only (declarative manifests run
   through reviewed template code); no external sandbox runner is configured, so
   generated code is never executed.
-* LLM use: disabled by default (budget 0); never used in numerical models,
-  transformations, replay or tests.
+* LLM use: only for natural-language scenario **drafts** (V2, below), and only when
+  `REVA_LLM_ENABLED` is set; never used in numerical models, transformations,
+  replay or tests (tests replay recorded responses). The autonomy extraction
+  budget `llm.monthly_usd` stays 0.
 * Value of information in money without a declared decision problem.
+
+## V2 models and drafts (experimental)
+
+Every V2 model is registered as a candidate with `review_status: maintainer_review_pending` and
+labelled "experimental model, not yet reviewed". A scientific review of the V2 models is in
+[dev/review_science_v2.md](dev/review_science_v2.md); the limits below include its findings.
+
+### All-countries scenarios
+
+* `countries: ["ALL"]` (crude border-value model) is resolved at run time to every country with data
+  in the pinned release; with `missing_input_policy: fail` one missing country refuses the whole run,
+  with `skip_missing_countries` the skipped countries are listed with typed reasons (2023: 85 complete,
+  144 skipped). Coverage is what Comtrade and the World Bank publish, not the world.
+* A scenario cannot **exclude** countries: there is no exclusion list. "All countries except China" must
+  be written as an explicit list; a natural-language draft that asks for an exclusion is withheld
+  (`needs_input`), never drafted as `ALL`.
+
+### Natural-language drafts (`POST /v1/scenario-drafts`)
+
+* Enabled only with `REVA_LLM_ENABLED`, a credential-injecting egress proxy and the two ledger
+  functions; budget `llm.scenario_drafts`: 200 requests and 2,000,000 tokens per day, at most 1,500
+  output tokens per request (over budget: 429, nothing sent). Provider: OpenAI `gpt-4.1`; the Gemini
+  fallback has not answered a live call successfully (billing), so its success path is unverified.
+* A draft is a **proposal**, not a result: nothing runs until the user submits the spec. Temperature 0
+  does not make outputs reproducible across provider versions.
+* A draft can be valid and still describe a different scenario from the one asked. The server
+  restatement is generated from the checked spec and server texts only (LLM-written text is kept in
+  `llm_restatement` and in labelled `unsupported` items), and **lexical** French/English cross-checks
+  withhold a draft (`needs_input`) when the text excludes countries, names a region while the draft
+  says `ALL`, leaves an input-output shock origin unstated (a world price is never defaulted to the
+  reported country; a world-wide shock needs 50 origins and cannot be drafted), or states a retirement
+  age level that the draft turned into a shift in months. They warn when the chosen industry is broader
+  or different than the words used (`B` is all of mining and quarrying; `C19` is refined products, not
+  crude oil; `D35` is electricity and gas supply) and when a named region cannot be checked against an
+  explicit country list. These checks are pattern matches: paraphrases they do not know pass to the
+  user's review of the restatement. A draft holds at most 10 items per list (for example 10 shocks).
+
+### Population projection (`demography.cohort_component`)
+
+* EU-27 and EFTA countries from Eurostat only; single ages to an open group; recorded sex only.
+* Mortality is held at base-period rates (no improvement), so old-age populations tend to be
+  understated over long horizons; fertility and migration are labelled assumptions (zero, average residual,
+  EUROPOP2023 baseline), and the L2 grid has no probability level. A conditional projection, not a
+  forecast.
+* "Average residual" migration is a residual of the population balance: it contains statistical
+  adjustments and **census revisions**. Residual years whose 1 January population carries Eurostat's
+  series-break flag `b` are excluded from the average by default and reported in the run warning
+  `migration_residual_contains_break` (they can be kept only by explicit acknowledgement, still
+  warned); an unflagged revision is not detected by this rule (an outlier diagnostic only warns). A
+  window needs at least two usable years unless a single year is allowed explicitly (warned). The
+  review measured why: with the 2019-23 window, Poland's 2021 census break alone made the 2050
+  projection about 4 million lower (25.8 instead of 29.7 million with the 2021-23 window).
+* The back-test (2013 → 2023) uses today's revised vintages (labelled
+  `revised_data_retrospective`, which can make errors look smaller) and takes the open age group's
+  structure from the target year. On total population the reviewer found a constant-growth
+  extrapolation as good or better in most countries; see [dev/v2_pop_backtest.md](dev/v2_pop_backtest.md).
+* Migrants are added at the end of the year (not exposed to mortality in the arrival year, though
+  they enter the next year's birth exposure); the age convention of EUROPOP net migration is assumed,
+  not verified.
+
+### Input-output prices (`economic.io_price`)
+
+* **First-round cost-push, not inflation.** Fixed technical coefficients of one FIGARO year (no
+  substitution), no demand, quantity, wage, exchange-rate or monetary response, one period. Under full
+  pass-through (L1) the result is the largest-magnitude end of the pass-through range; the L2 range
+  is an assumption grid with no probability level. Uncertainty is unquantified.
+* **Basic prices, not a CPI.** The household basket is households' purchases at basic prices: trade
+  and transport margins are in it, **taxes less subsidies on products are not** (France, FIGARO 2024:
+  13.2 % of the basic-price basket), nor are direct purchases abroad; weights are fixed. Each basket row
+  also carries a purchasers'-price reading with product taxes held fixed per unit: for +10 % on B, C19
+  and D35 in every FIGARO economy (θ = 1) France gives 0.93 % at basic prices and 0.82 % with fixed
+  per-unit taxes (euro-area-12 pooled: 0.95 % and 0.84 %). Ad valorem taxes would keep the basic-price
+  figure; the real mix lies between. Neither number is a consumer price index.
+* **Industries, not products.** Only NACE `B`, `C19` and `D35` can be shocked. `B` is all of mining and
+  quarrying (coal, crude petroleum and natural gas, metal ores, quarrying): FIGARO has no crude-oil
+  split, so an "oil price" shock on B also moves metal ores and quarrying, and the crude share of B
+  differs by country. `C19` is refined products; its shock leaves crude unchanged.
+* Coverage: the 49 FIGARO countries are reported; the rest of the world can be a shock origin but is
+  not reported; other countries are refused (`capability_gap`). No external benchmark was reproduced:
+  the published IO studies use other years, tables and shock definitions (the all-energy run is about
+  2.6 times the ECB's 2005-table figure; see [dev/v2_io.md](dev/v2_io.md)).
+
+### Retirement age (`social.retirement_age`)
+
+* Rule tables were transcribed by an agent from archived legal text (every row cited; maintainer
+  review pending) for France, Germany, the Netherlands and Spain. **Refused** (`capability_gap`): Italy,
+  Belgium, Sweden and Poland (no archived, sourced rule table), and Spain is refused by its own data
+  checks (contribution-track heterogeneity); every other country has no rule table.
+* Results are labelled **qualified** for every country: early routes (long careers, disability,
+  inaptitude) are not modelled, so the affected population is overstated where they apply. The
+  pension-receipt proxy (base-year inactivity of the five-year age group) has **unknown direction**:
+  it can overstate or understate at the affected single ages. The employment response is a cited
+  literature share (verified values only), not an estimate for the country.
+* Eligibility is modelled at single ages 55-69 to 2040; a request whose eligibility differs outside
+  those ages is refused, never cut. Expenditure is approximate (average old-age pension × change in
+  recipients, nominal, no indexation); eligibility counts from the month the age is reached while
+  pensions usually start the month after (about one month of timing bias, largely cancelling in
+  scenario differences). The 2010-reform back-test fits partly
+  through offsetting errors; the reviewer could not verify its pre-registration (protocol and results
+  first appear in the same commits).
+* A target age (e.g. "65 years") is a level, not a shift: natural-language drafts never convert one
+  into the other; they ask, or use the model's target-age intervention where it is registered.
 
 ## Governance limits (residual risk)
 

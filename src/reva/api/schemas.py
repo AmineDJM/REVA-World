@@ -854,6 +854,13 @@ class ModelEvaluation(ApiModel):
     )
 
 
+class BacktestRequest(ApiModel):
+    """Start a back-test of a V2 model against a published release (revised-data retrospective) as a job."""
+
+    release_id: UUID | None = Field(None, description="Published release (default: the current one)")
+    countries: list[str] | None = Field(None, min_length=1, max_length=60, description="ISO3 codes (model default)")
+
+
 class EvaluationRequest(ApiModel):
     """Start a model evaluation (rolling-origin tournament, revised-data retrospective) as a job."""
 

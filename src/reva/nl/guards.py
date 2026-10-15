@@ -160,12 +160,12 @@ def _close(a: float, b: float) -> bool:
 
 
 def number_provenance(value: float, numbers: list[tuple[float, bool]]) -> str:
-    """``stated`` (literally in the text), ``converted_from_stated`` (a percentage form of a stated number)
-    or ``not_in_text``."""
+    """``stated`` (literally in the text), ``converted_from_stated`` (a percentage form of a stated number,
+    or years stated as months: 65 -> 780) or ``not_in_text``."""
     for n, _pct in numbers:
         if _close(value, n):
             return "stated"
     for n, _pct in numbers:
-        if any(_close(value, c) for c in (n / 100, 1 + n / 100, 1 - n / 100, -n / 100)):
+        if any(_close(value, c) for c in (n / 100, 1 + n / 100, 1 - n / 100, -n / 100, n * 12)):
             return "converted_from_stated"
     return "not_in_text"

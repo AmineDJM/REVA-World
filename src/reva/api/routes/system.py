@@ -225,6 +225,7 @@ def get_job(job_id: UUID, request: Request) -> s.Job:
 # Unknown job types cannot be cancelled through the API.
 CANCEL_SCOPE: dict[str, str] = {
     "simulation": "simulate", "replay": "simulate", "evaluation": "simulate", "population": "simulate",
+    "backtest": "simulate",
     "ingest": "ingest", "discovery": "ingest", "publish_beliefs": "ingest", "gaps": "ingest",
     "health": "ingest", "gc": "ingest",
 }

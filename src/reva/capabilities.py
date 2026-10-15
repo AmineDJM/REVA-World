@@ -563,7 +563,8 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.models.economic.io_price",
-        ("FIGARO/ICIO tables as pinned dataset inputs with accounting identities verified",
+        ("Eurostat FIGARO inter-country tables as pinned dataset inputs with accounting identities verified "
+         "(OECD ICIO is not implemented)",
          "Leontief price solution checked against a hand-computed small system",
          "labelled first-round cost-push, full pass-through"),
         interface="reva.simulation.plugins",
@@ -571,12 +572,16 @@ _BASE: tuple[Capability, ...] = (
                "tests/unit/test_io_price.py::test_industry_prices_match_the_hand_computed_solution",
                "tests/unit/test_io_price.py::test_l2_pass_through_grid_and_one_sided_sensitivity_range",
                "tests/integration/test_io_price_pipeline.py::test_l1_scenario_end_to_end_matches_hand_computation",
-               "tests/integration/test_io_price_pipeline.py::test_identity_failure_refuses_registration"),
-        docs=("docs/dev/v2_io.md",),
+               "tests/integration/test_io_price_pipeline.py::test_identity_failure_refuses_registration",
+               "tests/unit/test_io_price.py::"
+               "test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixed_unit_taxes"),
+        docs=("docs/dev/v2_io.md", "docs/methodology.md", "docs/limitations.md"),
         notes=("Experimental model (maintainer review pending). Eurostat FIGARO industry-by-industry table; "
                "exogenous output-price change of NACE B, C19 or D35 (B is mining and quarrying, broader than "
-               "crude oil); fixed coefficients, no substitution or demand response, one period. Not an "
-               "inflation forecast, CPI or macro outcome (outputs.macroeconomic stays reserved)."),
+               "crude oil); fixed coefficients, no substitution or demand response, one period. Household "
+               "basket at basic prices (taxes less subsidies on products excluded; each basket row carries a "
+               "labelled purchasers'-price reading with product taxes fixed per unit). Not an inflation "
+               "forecast, CPI or macro outcome (outputs.macroeconomic stays reserved)."),
     ),
     Capability(
         "social.retirement_age",
@@ -648,10 +653,18 @@ _BASE: tuple[Capability, ...] = (
                "tests/unit/test_nl_drafts.py::test_a_draft_never_runs_without_confirmation",
                "tests/integration/test_nl_drafts_api.py::test_draft_returns_a_valid_spec_and_runs_nothing",
                "tests/integration/test_nl_drafts_api.py::test_over_budget_is_429_and_nothing_is_sent",
-               "tests/integration/test_nl_drafts_api.py::test_audit_row_has_hash_and_length_but_never_the_text"),
-        docs=("docs/dev/v2_nlc.md", "docs/methodology.md"),
+               "tests/integration/test_nl_drafts_api.py::test_audit_row_has_hash_and_length_but_never_the_text",
+               "tests/unit/test_nl_crosschecks.py::test_h2_all_countries_except_china_is_never_a_ready_draft",
+               "tests/unit/test_nl_crosschecks.py::test_h3_oil_price_is_not_defaulted_to_french_refineries",
+               "tests/unit/test_nl_crosschecks.py::test_m6_stated_age_level_is_never_converted_into_a_shift",
+               "tests/unit/test_nl_crosschecks.py::test_restatement_never_contains_llm_written_text"),
+        docs=("docs/dev/v2_nlc.md", "docs/methodology.md", "docs/limitations.md"),
         notes="Drafts only: nothing runs until the user submits the reviewed spec to POST /v1/scenarios. Disabled "
-              "unless REVA_LLM_ENABLED; without the two ledger functions the API role fails closed (503).",
+              "unless REVA_LLM_ENABLED; budget llm.scenario_drafts (200 requests, 2,000,000 tokens per day); "
+              "without the two ledger functions the API role fails closed (503). Lexical server cross-checks "
+              "(French/English) withhold a draft that excludes countries, names a region with ALL, leaves an "
+              "IO shock origin unstated or turns a stated retirement age into a shift; they can miss "
+              "paraphrases, so the server restatement must still be reviewed.",
     ),
     Capability(
         "scenario.all_countries",

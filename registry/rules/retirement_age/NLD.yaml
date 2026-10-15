@@ -11,6 +11,9 @@ model_lever:
   age_kind: state_pension_age
   rationale: The AOW pensioengerechtigde leeftijd is the only age at which the state old-age pension starts (no
     early claim).
+  qualification: The AOW age has no early-claim route, but the pension-receipt drop is approximated by LFS
+    inactivity (proxy of unknown direction), while AOW entitlement is residence-based rather than tied to leaving
+    the labour force.
 sources:
 - source_id: nl_aow_7a
   title: Algemene Ouderdomswet art. 7a (wetten.overheid.nl)
@@ -240,3 +243,14 @@ rows:
     source_id: nl_aow_7a
     legal_reference: AOW art. 7a lid 1 onder n
     locator: 'n. in 2025: 67 jaar, respectievelijk 17 jaar;'
+claim_year_semantics:
+  rule: attained_once
+  derivation: verbatim
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1, closing sentence
+    locator: Op pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde leeftijd hebben bereikt
+      zijn de pensioengerechtigde leeftijd en de aanvangsleeftijd in de kalenderjaren daarna niet van toepassing.
+  note: A person who reached the AOW age of a calendar year stays eligible; the higher age of later years is not
+    re-applied (e.g. born August 1950 - 65 years 3 months reached in November 2015 - stays eligible in January 2016
+    when the 2016 age is 65 years 6 months).

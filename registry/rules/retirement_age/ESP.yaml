@@ -13,6 +13,8 @@ model_lever:
   rationale: Ordinary retirement age for persons with fewer contribution years than the DT 7ª threshold. Persons
     above the threshold keep 65; REVA has no data on the share of each track, so applying the short-track age to
     the whole population overstates the affected population; results are labelled qualified.
+  qualification: The short-contribution-track age is applied to the whole population (no data on the share of
+    each contribution track), and early retirement routes are not modelled; the affected population is overstated.
 sources:
 - source_id: es_lgss_boe
   title: Ley General de la Seguridad Social (RDL 8/2015), art. 205 and disposición transitoria 7ª, BOE consolidated
@@ -530,3 +532,10 @@ rows:
     source_id: es_lgss_boe
     legal_reference: LGSS art. 205.1.a and DT 7ª (from 2027)
     locator: sesenta y cinco años cuando se acrediten treinta y ocho años y seis meses de cotización
+claim_year_semantics:
+  rule: attained_once
+  derivation: model_assumption
+  note: The archived excerpt of LGSS art. 205 / DT 7ª has no sentence on persons who reached the age of an earlier
+    year. The model assumes eligibility is attained once (a pension that could be claimed in the year the age of
+    that year was reached is not withdrawn when a later year's age is higher). Stated assumption, not law text;
+    without it, eligibility would revert at some year changes (e.g. 66 years 10 months in 2026 vs 67 in 2027).

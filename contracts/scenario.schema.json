@@ -264,6 +264,15 @@
                 }
               }
             },
+            "migration_breaks": {
+              "enum": [
+                "exclude",
+                "include"
+              ]
+            },
+            "allow_single_year_migration": {
+              "type": "boolean"
+            },
             "sensitivity": {
               "type": "object",
               "additionalProperties": false,
@@ -1048,6 +1057,41 @@
                 "shift_months",
                 "first_birth_year"
               ]
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Target statutory age LEVEL (months of age, e.g. 780 = 65 years) of the rule table's lever age for cohorts born in first_birth_year or later; earlier cohorts keep the reference path. Use this, not a shift, when the request states an age level.",
+              "properties": {
+                "kind": {
+                  "const": "retirement_age_target"
+                },
+                "reference_path": {
+                  "type": "string",
+                  "pattern": "^[a-z0-9_]{1,80}$"
+                },
+                "target_age_months": {
+                  "type": "integer",
+                  "minimum": 660,
+                  "maximum": 840
+                },
+                "first_birth_year": {
+                  "type": "integer",
+                  "minimum": 1900,
+                  "maximum": 2100
+                },
+                "phase_in_months_per_cohort": {
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum": 24
+                }
+              },
+              "required": [
+                "kind",
+                "reference_path",
+                "target_age_months",
+                "first_birth_year"
+              ]
             }
           ]
         },
@@ -1099,6 +1143,15 @@
                   "type": "integer",
                   "minimum": 1,
                   "maximum": 10
+                },
+                "migration_breaks": {
+                  "enum": [
+                    "exclude",
+                    "include"
+                  ]
+                },
+                "allow_single_year_migration": {
+                  "type": "boolean"
                 }
               }
             }

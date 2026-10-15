@@ -21,11 +21,40 @@ What it does, in order:
 6. on exit, SIGINT or SIGTERM: stops the worker, drops the database and removes
    the temporary object store and UI build.
 
+Options for the V2 suites (formerly the ui/e2e/recorded_llm_stack.py monkey-patching wrapper,
+which now just calls this script with ``--recorded-drafter --v2-fixtures``):
+
+``--recorded-drafter``
+    ``POST /v1/scenario-drafts`` replays the recorded provider responses of
+    ``tests/fixtures/nl/recorded`` (``reva.nl.recorded.RecordedDrafter``), exactly as the API
+    integration tests do. No live LLM is ever called. Without it, drafting stays disabled and the
+    composer specs check the typed ``llm_unavailable`` refusal.
+``--v2-fixtures``
+    also ingests, offline and before the release cutoff is taken, the V2 recorded fixtures:
+    all-country World Bank / Comtrade subsets, Eurostat demography (LI, LU since 2008 +
+    EUROPOP2023; FR without EUROPOP from tests/fixtures/social) and labour/pensions with their
+    dataset-input hooks, plus (``--figaro synthetic``, default) the SYNTHETIC 3x2 FIGARO-format
+    table of tests/integration/test_io_price_pipeline.py through the real connector so
+    economic.io_price runs end to end (its results are test_fixture data, not FIGARO figures;
+    ``--figaro recorded`` ingests the real one-group FIGARO capture instead). After publication it
+    enqueues one ``backtest`` job per back-testable model (``--no-backtests`` to skip).
+``--fixture-plan`` / ``--no-fixture-plan``
+    (default: on with ``--v2-fixtures``) the fixtures of worldbank.wdi.all_economies,
+    un.comtrade.public_batch, eurostat.demography and eurostat.figaro.iciot_ii were captured for
+    restricted plans, so their default plans cannot be replayed. Fixture-plan mode
+    (``reva.adapters.connectors.fixture_plans``) runs each with its captured configuration and
+    only the captured requests; dropped items are reported in ``stack.json``. Live behaviour is
+    unchanged. With ``--no-fixture-plan`` those connectors are skipped (reason recorded).
+
+The release cutoff is taken after every ingest has finished, so the release pins all ingested
+datasets.
+
 Usage::
 
     uv run python scripts/e2e_stack.py                 # serve until Ctrl-C
     uv run python scripts/e2e_stack.py --run           # serve, run `npm --prefix ui run e2e`, tear down
     uv run python scripts/e2e_stack.py --run -- --grep provenance   # extra Playwright args
+    uv run python scripts/e2e_stack.py --recorded-drafter --v2-fixtures --run   # V2 suites
 
 The default stack file is ``var/e2e/stack.json`` (gitignored); the specs in
 ui/e2e read it (or ``REVA_E2E_STACK_FILE``) when ``REVA_E2E_BASE_URL`` is unset.
@@ -67,6 +96,10 @@ FIXTURE_CONNECTORS = (
     "naturalearth.admin0_110m",
     "crossref.works.doi",
 )
+#: V2 recorded fixtures replayed with --v2-fixtures (fixture-plan mode where the capture was restricted).
+V2_FIXTURE_PLAN_CONNECTORS = ("worldbank.wdi.all_economies", "un.comtrade.public_batch", "eurostat.demography")
+SOCIAL_FIXTURES = ROOT / "tests" / "fixtures" / "social"
+NL_RECORDED_FIXTURES = ROOT / "tests" / "fixtures" / "nl" / "recorded"
 DEFAULT_STACK_FILE = ROOT / "var" / "e2e" / "stack.json"
 ADMIN_USERNAME = "admin"
 
@@ -193,14 +226,23 @@ class Stack:
                 if rep.errors:
                     log.warning("fixture ingest %s reported errors: %s", name, rep.errors)
                 log.info("ingested %s: %d inserted, %d unchanged", name, rep.inserted, rep.unchanged)
+            v2: dict[str, Any] = {}
+            if self.args.v2_fixtures:
+                v2 = self.ingest_v2(settings, store, worker)
+            # The cutoff is taken only now, after every ingest (base and V2) has committed, so the
+            # release sees and pins everything ingested above.
+            cutoff = datetime.now(UTC)
             release = with_connection_retry(
                 "publish release",
-                lambda: publish_release(
-                    worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test"
-                ),
+                lambda: publish_release(worker, store, cutoff=cutoff, origin=Origin.test_fixture, environment="test"),
             )
+            if self.args.v2_fixtures and self.args.backtests:
+                v2["backtest_jobs"] = self.enqueue_backtests(worker, release.release_id)
         finally:
             worker.dispose()
+        llm: dict[str, Any] = {}
+        if self.args.recorded_drafter:
+            llm = {"llm_drafter": "recorded", "llm_ledger": self.ensure_llm_ledger(settings)}
         rel = {
             "id": str(release.release_id),
             "context_id": str(release.context_id),
@@ -211,7 +253,130 @@ class Stack:
             "origin": "test_fixture",
         }
         log.info("published test_fixture release: %s", rel)
-        return {"ingest": ingest, "release": rel}
+        return {"ingest": ingest, "release": rel, **({"v2": v2} if self.args.v2_fixtures else {}), **llm}
+
+    # ------------------------------------------------------------------ V2 fixtures
+    @staticmethod
+    def _summary(rep: Any, conn: Any = None) -> dict[str, Any]:
+        out: dict[str, Any] = {"inserted": rep.inserted, "unchanged": rep.unchanged, "errors": rep.errors}
+        if conn is not None and getattr(conn, "not_captured", None):
+            out["not_captured"] = len(conn.not_captured)
+        return out
+
+    def ingest_v2(self, settings: Any, store: Any, worker: Any) -> dict[str, Any]:
+        """Offline V2 inputs (see module docstring). Errors are recorded per connector, never hidden."""
+        from reva.adapters.connectors import eurostat_demography as ed
+        from reva.adapters.connectors import fixture_plans as fp
+        from reva.evidence.runner import FixtureHttp, post_publish_for, run_connector
+
+        out: dict[str, Any] = {"fixture_plan": bool(self.args.fixture_plan)}
+
+        def ingest(name: str, conn: Any, http: Any) -> dict[str, Any]:
+            hook = getattr(conn, "post_publish", None) or post_publish_for(conn.describe().template)
+            rep = with_connection_retry(f"ingest {name}", lambda: asyncio.run(
+                run_connector(conn, http, store, worker, persist_cursor=False, post_publish=hook)))
+            if rep.errors:
+                log.warning("V2 fixture ingest %s reported errors: %s", name, rep.errors[:5])
+            log.info("ingested V2 fixture %s: %d inserted", name, rep.inserted)
+            return self._summary(rep, conn)
+
+        restricted = [*V2_FIXTURE_PLAN_CONNECTORS,
+                      *(("eurostat.figaro.iciot_ii",) if self.args.figaro == "recorded" else ())]
+        for name in restricted:
+            if not self.args.fixture_plan:
+                out[name] = {"skipped": "fixtures captured for a restricted plan; run with --fixture-plan"}
+                continue
+            out[name] = ingest(name, fp.fixture_plan_connector(name), FixtureHttp(name))
+        # France demography (no EUROPOP), recorded for the retirement-age pipeline (tests/fixtures/social)
+        fr_conn = ed.EurostatDemographyConnector(countries=("FR",), include_europop=False)
+        fr = fp.fixture_plan_connector(ed.NAME, fr_conn, root=SOCIAL_FIXTURES)
+        out["eurostat.demography:FR"] = ingest(ed.NAME, fr, FixtureHttp(ed.NAME, root=SOCIAL_FIXTURES))
+        # labour/pensions: default plan captured as is; its connector hook registers the dataset inputs
+        out["eurostat.labour_pensions"] = ingest("eurostat.labour_pensions",
+                                                 fp.fixture_plan_connector("eurostat.labour_pensions"),
+                                                 FixtureHttp("eurostat.labour_pensions"))
+        if self.args.figaro == "synthetic":
+            out["io_dataset"] = self.ingest_synthetic_io(settings, store, worker)
+        return out
+
+    def ingest_synthetic_io(self, settings: Any, store: Any, worker: Any) -> dict[str, Any]:
+        """SYNTHETIC 3-economy x 2-industry FIGARO-format table (tests/fixtures/io_tables/synthetic.py)
+        through the real connector (FixtureHttp), identity checks and dataset registration. The recorded
+        FIGARO fixture holds one data group only and cannot form a complete table."""
+        import importlib.util
+
+        from reva.adapters.connectors import io_tables as it
+        from reva.adapters.postgres import repositories as repo
+        from reva.adapters.postgres.engine import make_engine
+        from reva.cli.seed import register_connector_version
+        from reva.evidence.runner import FixtureHttp, _fixture_fingerprint, run_connector
+        from reva.kernel.ids import sha256_bytes
+
+        spec = importlib.util.spec_from_file_location("io_synthetic",
+                                                      ROOT / "tests" / "fixtures" / "io_tables" / "synthetic.py")
+        assert spec and spec.loader
+        syn = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(syn)
+        dims = it.TableDims(countries=syn.COUNTRIES, industries=syn.INDUSTRIES)
+        root = self.tmp / "io-fixtures"
+        d = root / it.NAME
+        d.mkdir(parents=True, exist_ok=True)
+        conn = it.FigaroConnector(dims=dims)
+        bodies = {it.constraint_url("NAIO_10_FCP_II4"): syn.constraint_xml()}
+        for item in conn._data_items(syn.YEAR, "NAIO_10_FCP_II4"):
+            bodies[item.url] = syn.body(tuple(item.params["origins"]), year=syn.YEAR)
+        entries = []
+        for url, body in bodies.items():
+            fpr = _fixture_fingerprint(url)
+            (d / f"{fpr[:16]}.bin").write_bytes(body)
+            entries.append({"request_fingerprint": fpr, "url": url, "file": f"{fpr[:16]}.bin",
+                            "sha256": sha256_bytes(body), "status": 200,
+                            "headers": {"content-type": "application/vnd.sdmx.data+csv"},
+                            "retrieved_at": "2026-10-15T00:00:00+00:00", "licence": it.LICENCE})
+        (d / "manifest.json").write_text(json.dumps(entries))
+        owner = make_engine("migration", settings)
+        try:
+            with owner.begin() as c:
+                act = repo.simple_activity("registry.seed", "review", "maintainer:registry-seed", {"e2e": it.NAME})
+                repo.record_activity(c, act)
+                register_connector_version(c, store, it.FigaroConnector(dims=dims).describe(), act.id)
+        finally:
+            owner.dispose()
+        rep = asyncio.run(run_connector(it.FigaroConnector(syn.YEAR, dims=dims), FixtureHttp(it.NAME, root=root),
+                                        store, worker, persist_cursor=False))
+        if rep.errors:
+            log.warning("synthetic IO ingest reported errors: %s", rep.errors[:5])
+            return {"errors": rep.errors}
+        out = it.publish_io_dataset(worker, store, year=syn.YEAR, origin="test_fixture", dims=dims)
+        return {k: out[k] for k in ("dataset_id", "dataset_key", "artifact_sha256", "row_count") if k in out}
+
+    def enqueue_backtests(self, worker: Any, release_id: Any) -> dict[str, str]:
+        """One ``backtest`` job per back-testable model; the stack's worker runs them."""
+        from reva.evaluation.backtests import BACKTESTS, enqueue_backtest
+
+        jobs = {}
+        for key in sorted(BACKTESTS):
+            jobs[key] = str(enqueue_backtest(worker, key, release_id=release_id, created_by="worker:e2e-stack"))
+        return jobs
+
+    def ensure_llm_ledger(self, settings: Any) -> str:
+        """The LLM budget ledger functions ship with migration 0008; install them only in a database
+        whose migrations predate them (as tests/integration/test_nl_drafts_api.py does)."""
+        from sqlalchemy import text
+
+        from reva.adapters.postgres.engine import make_engine
+        from reva.nl.budget import LEDGER_FUNCTIONS_SQL
+
+        owner = make_engine("migration", settings)
+        try:
+            with owner.begin() as c:
+                present = c.execute(text("SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,"
+                                         "bigint)') IS NOT NULL")).scalar_one()
+                if not present:
+                    c.execute(text(LEDGER_FUNCTIONS_SQL))
+        finally:
+            owner.dispose()
+        return "migration" if present else "installed_for_e2e"
 
     # ------------------------------------------------------------------ UI
     def build_ui(self) -> Path:
@@ -279,6 +444,12 @@ class Stack:
             }
         )
         app = create_app(api_settings, static_dir=static_dir, login_rate_limit_per_minute=self.args.login_rate_limit)
+        if self.args.recorded_drafter:
+            from reva.nl.recorded import RecordedDrafter
+
+            drafter = RecordedDrafter(NL_RECORDED_FIXTURES)
+            app.state.nl_drafter_factory = lambda _settings: [drafter]
+            app.state.nl_drafter_mode = "recorded"
         config = uvicorn.Config(app, host="127.0.0.1", port=port, log_level="warning", access_log=False, lifespan="on")
         self.server = uvicorn.Server(config)
         return base_url
@@ -380,8 +551,21 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--keep-db", action="store_true", help="keep the database and temp files for debugging")
     ap.add_argument("--run", action="store_true", help="run the Playwright suite against the stack, then exit")
+    ap.add_argument("--recorded-drafter", action="store_true",
+                    help="replay recorded LLM responses for POST /v1/scenario-drafts (never a live LLM)")
+    ap.add_argument("--v2-fixtures", action="store_true",
+                    help="also ingest the V2 recorded fixtures (dataset inputs) before the release cutoff")
+    ap.add_argument("--fixture-plan", action=argparse.BooleanOptionalAction, default=None,
+                    help="replay restricted-plan fixtures with their captured plans (default: on with --v2-fixtures)")
+    ap.add_argument("--figaro", choices=("synthetic", "recorded", "none"), default="synthetic",
+                    help="IO table for --v2-fixtures: synthetic 3x2 table (default), the recorded one-group capture, "
+                         "or none")
+    ap.add_argument("--no-backtests", dest="backtests", action="store_false",
+                    help="with --v2-fixtures, do not enqueue back-test jobs after publication")
     ap.add_argument("playwright_args", nargs="*", help="extra Playwright arguments (after --)")
     args = ap.parse_args(argv)
+    if args.fixture_plan is None:
+        args.fixture_plan = args.v2_fixtures
     logging.basicConfig(
         level=os.environ.get("REVA_E2E_LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(name)s: %(message)s"
     )
@@ -426,6 +610,7 @@ def main(argv: list[str] | None = None) -> int:
             "database": stack.db_name,
             "release": data["release"],
             "ingest": data["ingest"],
+            **{k: data[k] for k in ("v2", "llm_drafter", "llm_ledger") if k in data},
             "started_at": datetime.now(UTC).isoformat(),
             "pid": os.getpid(),
             "login_rate_limit_per_minute": args.login_rate_limit,

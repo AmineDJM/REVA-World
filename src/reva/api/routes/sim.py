@@ -548,6 +548,34 @@ def create_evaluation(
     return _accepted(response, jid, "evaluation", job["status"], f"/v1/jobs/{jid}")
 
 
+@router.post("/models/{model_key}/backtests", response_model=s.JobAccepted, status_code=202,
+             responses={400: {"model": s.Problem}, 404: {"model": s.Problem}, 409: {"model": s.Problem},
+                        422: {"model": s.Problem}})
+def create_backtest(
+    model_key: str,
+    body: s.BacktestRequest,
+    request: Request,
+    response: Response,
+    key: str = Depends(idempotency_key),
+    principal: Principal = Depends(require_scope("simulate")),
+) -> s.JobAccepted:
+    """Enqueue a back-test (revised-data retrospective) of a V2 model; results appear under
+    GET /v1/models/{model_key}/backtests. Models without a back-test function are refused (capability_gap)."""
+    from reva.evaluation import backtests as bt
+
+    payload: dict[str, Any] = {"model_key": model_key}
+    if body.release_id is not None:
+        payload["release_id"] = str(body.release_id)
+    if body.countries is not None:
+        payload["countries"] = sorted({c.upper() for c in body.countries})
+    bt.parse_payload(payload)  # typed validation (unknown model -> capability_gap) before queuing
+    with get_engine(request).begin() as conn:
+        jid = submit_job(conn, "backtest", payload, key, principal.actor)
+        job = fetch_job(conn, jid)
+    assert job is not None
+    return _accepted(response, jid, "backtest", job["status"], f"/v1/jobs/{jid}")
+
+
 # ---------------------------------------------------------------------------
 # QuerySpec
 # ---------------------------------------------------------------------------

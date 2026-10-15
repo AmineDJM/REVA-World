@@ -17,6 +17,9 @@ Spec (model branch of ScenarioSpec 2.0.0)::
                      "migration": "zero" | "average_residual" | "europop2023_bsl",
                      "base_period": {"first_year": y0, "last_year": y1},      # y1 < reference_year
                      "migration_window": {"first_year": .., "last_year": ..},  # optional, < reference_year
+                     "migration_breaks": "exclude" | "include",   # average_residual: series-break years (default
+                                                                  #   exclude, typed warning either way)
+                     "allow_single_year_migration": false,        # averaging < 2 residual years refused unless true
                      "sensitivity": {"migration": [...], "fertility": [...]}}  # L2 only
     outputs         subset of OUTPUT_KEYS, plus "population_by_single_age" (opt-in, many rows)
 
@@ -130,13 +133,27 @@ def parse_spec(spec: Any) -> ModelSpec:
     mw = _years(a["migration_window"], "migration_window") if a.get("migration_window") is not None else None
     if mw is not None and mw[1] >= jump_off:
         raise ValidationProblem("assumptions.migration_window must end before reference_year")
+    breaks = a.get("migration_breaks", "exclude")
+    if breaks not in C.MIGRATION_BREAK_OPTIONS:
+        raise ValidationProblem(f"assumptions.migration_breaks must be one of {list(C.MIGRATION_BREAK_OPTIONS)}")
+    single = a.get("allow_single_year_migration", False)
+    if not isinstance(single, bool):
+        raise ValidationProblem("assumptions.allow_single_year_migration must be a boolean")
+    window = mw or base
+    grid_migrations = (a.get("sensitivity") or {}).get("migration") or []
+    uses_avg = "average_residual" in {str(a.get("migration")), *[str(m) for m in grid_migrations]}
+    if uses_avg and window[1] - window[0] + 1 < C.MIN_MIGRATION_YEARS and not single:
+        raise ValidationProblem(f"the residual-migration window {window[0]}-{window[1]} has one year: averaging over "
+                                f"fewer than {C.MIN_MIGRATION_YEARS} years is refused unless "
+                                "assumptions.allow_single_year_migration is true", migration_window=list(window))
     if a.get("mortality", "constant_base_period_rates") not in C.MORTALITY_OPTIONS:
         raise CapabilityGap(f"mortality assumption {a.get('mortality')!r} is not available",
                             capability="demography.mortality_assumption", supported=list(C.MORTALITY_OPTIONS))
 
     def assumption(mig: str, fert: str) -> C.Assumptions:
         try:
-            return C.Assumptions(migration=mig, fertility=fert, base_period=base, migration_window=mw)
+            return C.Assumptions(migration=mig, fertility=fert, base_period=base, migration_window=mw,
+                                 migration_breaks=str(breaks), allow_single_year_migration=single)
         except ValidationProblem as e:
             raise CapabilityGap(e.message, capability="demography.assumption", **e.details) from None
 
@@ -186,6 +203,8 @@ class CountryPlan:
     rates: C.BaseRates | None = None
     provenance: dict[str, Any] = field(default_factory=dict)
     unavailable_variants: list[dict[str, Any]] = field(default_factory=list)
+    migration_window: C.MigrationWindow | None = None
+    warnings: list[dict[str, Any]] = field(default_factory=list)  # typed run warnings (stable codes)
 
 
 @dataclass
@@ -256,7 +275,7 @@ def _range_uncertainty(lo: Decimal, hi: Decimal, variants: list[str]) -> dict[st
 
 
 def _applicability(plan: CountryPlan, variant: str, a: C.Assumptions, ms: ModelSpec) -> dict[str, Any]:
-    return {
+    out = {
         "status": "applicable",
         "modality": "assumption_conditioned_scenario",
         "label": C.LABEL,
@@ -267,6 +286,11 @@ def _applicability(plan: CountryPlan, variant: str, a: C.Assumptions, ms: ModelS
         "jump_off": ms.jump_off,
         "open_age": plan.rates.omega if plan.rates else None,
     }
+    if plan.warnings:
+        out["warnings"] = [{k: v for k, v in w.items() if k != "message"} for w in plan.warnings]
+    if a.migration == "average_residual" and plan.migration_window is not None:
+        out["migration_years_used"] = list(plan.migration_window.years_used)
+    return out
 
 
 class CohortComponentModel:
@@ -326,7 +350,23 @@ class CohortComponentModel:
                                               migration_window=a.migration_window or a.base_period)
                     C._vec(plan.data, "population", ms.jump_off, "F", plan.rates.omega)
                     C._vec(plan.data, "population", ms.jump_off, "M", plan.rates.omega)
+                    plan.warnings = C.base_period_warnings(plan.rates)
+                    window_problem: MissingInput | None = None
+                    if any(v.migration == "average_residual" for v in (ms.central, *ms.grid)):
+                        # series-break years excluded by default; a window left too short is missing_input
+                        try:
+                            plan.migration_window = C.resolve_migration_window(
+                                plan.rates, a.migration_window or a.base_period, breaks=a.migration_breaks,
+                                allow_single_year=a.allow_single_year_migration)
+                            plan.warnings += list(plan.migration_window.warnings)
+                        except MissingInput as e:
+                            if ms.central.migration == "average_residual":
+                                raise
+                            window_problem = e  # only grid variants need it: they are reported unavailable
                     for a in (ms.central, *ms.grid):
+                        if window_problem is not None and a.migration == "average_residual":
+                            plan.unavailable_variants.append({"variant": a.variant, **window_problem.problem()})
+                            continue
                         try:
                             C.check_assumption_inputs(plan.data, a, ms.jump_off, ms.end_year, plan.rates.omega)
                         except CapabilityGap as e:
@@ -443,6 +483,8 @@ class CohortComponentModel:
                     "migration": {"enum": list(C.MIGRATION_OPTIONS)},
                     "base_period": years,
                     "migration_window": years,
+                    "migration_breaks": {"enum": list(C.MIGRATION_BREAK_OPTIONS)},
+                    "allow_single_year_migration": {"type": "boolean"},
                     "sensitivity": {"type": "object", "additionalProperties": False,
                                     "required": ["migration", "fertility"],
                                     "properties": {"migration": {**opts, "items": {"enum": list(C.MIGRATION_OPTIONS)}},
@@ -487,6 +529,8 @@ class CohortComponentModel:
                     "base_period_years_used": r.years_used(),
                     "input_status_flags": r.input_status_flags,
                     "unavailable_variants": c.unavailable_variants,
+                    "migration_window": c.migration_window.as_json() if c.migration_window else None,
+                    "warnings": c.warnings,
                 })
             countries[c.iso3] = info
         return {

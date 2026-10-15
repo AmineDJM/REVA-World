@@ -57,6 +57,15 @@ NL_GAP_KEYS: Mapping[str, tuple[str, str]] = {
     "nl.instruction_in_text": ("policy_refusal", "The text contains instructions addressed to the system; "
                                "they were treated as data and not followed"),
     "nl.out_of_scope": ("capability_gap", "The text is not a scenario request REVA can draft"),
+    # server cross-checks (reva.nl.crosschecks): the draft is withheld and the user is asked
+    "geography.exclusion_not_supported": ("capability_gap", "Excluding countries from a set ('all countries except "
+                                          "X') cannot be expressed in a scenario: list the countries to include"),
+    "geography.region_not_resolved": ("capability_gap", "A named region or country group has no reviewed membership "
+                                      "list for drafting: list its countries explicitly"),
+    "nl.shock_origin_not_stated": ("capability_gap", "The economies where a price change originates are not stated "
+                                   "(never defaulted to the reported country)"),
+    "nl.age_level_not_shift": ("capability_gap", "A stated target age is a level, not a shift in months: it is "
+                               "never converted silently"),
     "nl.unclassified": ("capability_gap", "Unsupported request that matches no more specific key"),
 }
 
@@ -72,6 +81,12 @@ PARAMETER_HINTS: Mapping[tuple[str, str], str] = {
         "export quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
     ("economic.crude_exposure", "assumptions.quantity_response"):
         "fixed (L1) or elasticity_sensitivity (L2); normally implied by the fidelity",
+    ("social.retirement_age", "intervention.shift_months"):
+        "change in months of the eligibility age relative to reference_path (+36 = three years later). Not a "
+        "target age: 'retirement at 65' states a level, which is never converted into a shift",
+    ("social.retirement_age", "intervention.target_age_months"):
+        "target eligibility age as a level, in months of age (65 years = 780; 62 years 9 months = 753), for the "
+        "birth cohorts from first_birth_year",
 }
 
 
@@ -83,11 +98,17 @@ class ParamSpec:
     kind: str  # number | integer | choice | text | boolean
     choices: tuple[Any, ...] = ()
     description: str = ""
+    choice_meanings: tuple[tuple[Any, str], ...] = ()  # reviewed meaning of each choice (from the plugin)
+
+    def meaning_of(self, choice: Any) -> str:
+        return next((m for c, m in self.choice_meanings if c == choice), "")
 
     def prompt_view(self) -> dict[str, Any]:
         out: dict[str, Any] = {"path": self.path, "type": self.kind}
         if self.choices:
             out["choices"] = list(self.choices)
+        if self.choice_meanings:
+            out["choice_meanings"] = {str(c): m for c, m in self.choice_meanings}
         if self.description:
             out["meaning"] = self.description
         return out
@@ -123,7 +144,9 @@ class DraftableModel:
             "description": self.description,
             "countries": [c for c in self.countries if c != "ALL"],
             **({"all_countries": 'write countries ["ALL"] when the user asks for every country / all countries / '
-                                 'tous les pays (the platform resolves it to every country with data)'}
+                                 'tous les pays (the platform resolves it to every country with data). A scenario '
+                                 'cannot exclude countries: for "all countries except X" do not write ALL; report '
+                                 'it with capability_key geography.exclusion_not_supported'}
                if "ALL" in self.countries else {}),
             "reference_years": (f"any year from {self.reference_years[0]} to {self.reference_years[1]} inclusive"
                                 if self.reference_years else None),
@@ -317,10 +340,14 @@ def _leaves(node: Mapping[str, Any], prefix: str) -> Iterator[tuple[str, dict[st
     yield prefix, dict(node)
 
 
-def _param(model_key: str, path: str, node: Mapping[str, Any]) -> ParamSpec:
-    hint = PARAMETER_HINTS.get((model_key, path)) or str(node.get("description") or "")
+def _param(model_key: str, path: str, node: Mapping[str, Any], hints: Mapping[str, Any] | None = None) -> ParamSpec:
+    hints = hints or {}
+    hint = (PARAMETER_HINTS.get((model_key, path)) or str((hints.get("parameters") or {}).get(path) or "")
+            or str(node.get("description") or ""))
     if isinstance(node.get("enum"), list):
-        return ParamSpec(path, "choice", tuple(node["enum"]), hint)
+        meanings = (hints.get("choice_meanings") or {}).get(path) or {}
+        return ParamSpec(path, "choice", tuple(node["enum"]), hint,
+                         tuple((c, str(meanings[c])) for c in node["enum"] if isinstance(c, str) and c in meanings))
     t = node.get("type")
     alternatives = [a.get("type") for a in (node.get("oneOf") or node.get("anyOf") or []) if isinstance(a, dict)]
     if t is None and alternatives:  # e.g. a number or a decimal string: the draft always sends a JSON number
@@ -426,6 +453,18 @@ def registered_plugins() -> tuple[str, dict[str, Any]]:
     return "registered", {str(k): v for k, v in reg.items()}
 
 
+def _plugin_hints(plugin: Any) -> dict[str, Any]:
+    """Reviewed drafting meanings a plugin publishes (``drafting_hints()``: parameters, choice_meanings)."""
+    try:
+        h = plugin.drafting_hints() if hasattr(plugin, "drafting_hints") else {}
+    except Exception:  # descriptive only
+        return {}
+    if not isinstance(h, Mapping):
+        return {}
+    return {k: {str(p): v for p, v in (h.get(k) or {}).items()} for k in ("parameters", "choice_meanings")
+            if isinstance(h.get(k), Mapping)}
+
+
 def _plugin_manifest(plugin: Any) -> dict[str, Any]:
     try:
         m = plugin.manifest() if hasattr(plugin, "manifest") else {}
@@ -471,10 +510,11 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
         if not (_const(periods)[0] and _const(periods)[1] == 1):
             multi_period = True
         params: list[ParamSpec] = []
+        hints = _plugin_hints(registry[key]) if key in registry else {}
         for name, sub in props.items():
             if name in SERVER_FIELDS or name in EXPLICIT_FIELDS:
                 continue
-            params.extend(_param(key, path, node) for path, node in _leaves(sub, name))
+            params.extend(_param(key, path, node, hints) for path, node in _leaves(sub, name))
         units = {str(p["name"]): str(p.get("unit", "")) for p in reg_entry.get("output_ports", [])
                  if isinstance(p, dict) and "name" in p}
         applicability = reg_entry.get("applicability") or {}

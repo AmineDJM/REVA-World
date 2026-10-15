@@ -67,6 +67,7 @@ class DraftGap(BaseModel):
     reason: str
     source: str = Field(description="llm | server_guard | server | validator | provider")
     llm_capability_key_rejected: bool | None = None
+    blocks_draft: bool | None = Field(None, description="true when this item withholds the draft (needs_input)")
 
 
 class DraftNumber(BaseModel):

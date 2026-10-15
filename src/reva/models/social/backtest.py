@@ -1,6 +1,8 @@
-"""Back-test of ``social.retirement_age`` on the French 2010 reform (pre-registered, no tuning).
+"""Back-test of ``social.retirement_age`` on the French 2010 reform (no tuning).
 
-Protocol (fixed before looking at the test years; see docs/dev/v2_pen_backtest.md)
+Protocol (stated by its author as fixed before looking at the test years; NOT verifiably
+pre-registered: protocol, grid, central point and results were first committed together, and
+the central point is also the best-fitting one - see docs/dev/v2_pen_backtest.md)
 ---------------------------------------------------------------------------------
 * Information set: Eurostat LFS employment and activity rates of France for 2010 (the base
   year) - only rows with ``year <= 2010`` are handed to the prediction function - plus the
@@ -16,7 +18,8 @@ Protocol (fixed before looking at the test years; see docs/dev/v2_pen_backtest.m
   ``s_g`` the literature share for grid point ``g``.
 * Grid: every verified literature point **except** estimates whose estimation sample
   overlaps the reform being tested (any French estimate - Rabaté & Rochut estimate the
-  2010 reform itself). Pre-registered central point: Staubli & Zweimüller (2013, AUT).
+  2010 reform itself). Central point: Staubli & Zweimüller (2013, AUT); every grid point's
+  errors are reported.
   Benchmark: persistence (``s = 0``, the 2010 rate carried forward).
 * Errors are reported per year and sex: predicted - observed (percentage points), plus
   mean error and mean absolute error over 2012-2019. Observed values carry their Eurostat

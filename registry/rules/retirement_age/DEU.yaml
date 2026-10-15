@@ -14,6 +14,10 @@ model_lever:
     period can claim an old-age pension. Persons with 35+ insurance years can claim from 63 with deductions (§ 36/§
     236), an age the 2007 reform did not raise for most cohorts; the model's affected population therefore overstates
     the population actually constrained, and the result is labelled qualified.
+  qualification: Upper side for the affected population - the early claim from 63 with 35 insurance years (§ 36 /
+    § 236) and other early routes are not modelled, so persons who can claim before the Regelaltersgrenze are counted
+    as affected; employment and recipient changes are overstated by an unknown amount. Read the central value as
+    'alternative routes not modelled', not as an unqualified central estimate.
 sources:
 - source_id: de_sgb6_35
   title: SGB VI § 35 Regelaltersrente (gesetze-im-internet.de)

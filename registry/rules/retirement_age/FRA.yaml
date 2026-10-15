@@ -17,6 +17,10 @@ model_lever:
   rationale: >-
     The general minimum age at which an old-age pension can be claimed (âge d'ouverture du droit,
     CSS art. L161-17-2). This is the age whose increase Rabaté & Rochut evaluate for the 2010 reform.
+  qualification: Early routes are not modelled and not transcribed - long-career early retirement (retraite
+    anticipée pour carrière longue), disability and incapacity (inaptitude) routes. Persons who would use them are
+    counted as affected by the general minimum age, so the affected population, the employment change and the
+    recipients change are overstated where those routes apply (same issue as Germany's 63-with-35-years route).
 sources:
   - source_id: fr_css_codes_droit_2026_10_14
     title: Code de la sécurité sociale, consolidated edition 2026-10-14 (codes.droit.org, from Légifrance LEGI open data)

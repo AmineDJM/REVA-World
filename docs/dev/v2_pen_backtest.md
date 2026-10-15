@@ -3,7 +3,9 @@
 Model `social.retirement_age@1.0.0` (experimental, maintainer review pending). Protocol
 `reva-pen-backtest-fra-2010@1.0.0`, code `src/reva/models/social/backtest.py`, evaluation
 artifact `docs/dev/v2_pen_backtest.json` (digest
-`111ae6bfc8c6794666f2412aab665a94f111d1334287b51012c829940dc2e83f`; the test
+`8ecf41da51ca6a29f96947ba4ff951caf18c44c75d8c2b691d4d7feb0305a913`, regenerated 2026-10-15 by agent
+SFX1 because the FRA rule-table digest changed when its `model_lever.qualification` was added; every
+result value is unchanged; the test
 `tests/unit/social/test_retirement_backtest.py` recomputes it from the captured Eurostat
 fixtures and fails if this file is stale).
 
@@ -16,14 +18,27 @@ misses by 6-12 pp: employment of 55-59-year-olds rose by 11-12 pp between 2010 a
 reasons the model does not represent (cohort effects, earlier reforms, closure of other
 early-exit routes). The same cohorts reach 60-64 a few years later, so part of the observed
 60-64 rise is that trend, not the 2010 reform. The model gets close anyway because its
-pension-receipt drop is an *upper-bound proxy* (the share of 60-64-year-olds outside the
-labour force in 2010: 82.6 % of women, 80 % of men; the French administrative data of
-Rabaté & Rochut give a retirement share of about 53 % at age 60 before the reform), which
-inflates the reform effect. **Two errors of opposite sign offset each other.** A good fit
+pension-receipt drop proxy (the share of 60-64-year-olds outside the labour force in 2010:
+82.6 % of women, 80 % of men; the French administrative data of Rabaté & Rochut give a
+retirement share of about 53 % at age 60 before the reform) overstates the drop at the affected
+ages 60-61 here, which inflates the reform effect. **Two errors of opposite sign offset each other.** A good fit
 here should not be read as validation; with this test the model cannot be distinguished from
 "reform effect too large + trend omitted".
 
-## Protocol (fixed before the test years were examined)
+**Not pre-registered (verifiable).** The protocol, the grid, the choice of central point and the
+results first appear together in the same uncommitted-then-snapshotted work (WIP snapshot commits);
+no protocol digest was committed before the test years were examined. The central point (Staubli &
+Zweimüller) is also the best-fitting grid point. Read "fixed before the test years were examined"
+below as the author's statement, which git history cannot confirm. A future test should commit a
+protocol digest first. The per-year errors of **every** grid point are reported in one table below,
+so the choice of central point does not hide the spread.
+
+**The pension-receipt proxy is not an upper bound in general.** Here the affected ages are 60-61,
+whose inactivity is below the 60-64 group mean, so the group-mean proxy overstates the effect in this
+back-test. For other reforms (e.g. ages 62-64 under the 2023 reform, base 2024) the same proxy can
+understate; its direction is unknown in general (review finding H4).
+
+## Protocol (stated by the author as fixed before the test years were examined; not verifiable)
 
 * Information set: Eurostat LFS `lfsa_ergan` employment rate and `lfsa_argan` activity rate of
   France, ages 60-64, by sex, **2010 only** (the prediction function refuses any row after 2010);
@@ -43,7 +58,8 @@ here should not be read as validation; with this test the model cannot be distin
 * Grid: every `verified_from_text` entry of `registry/assumptions/retirement_employment_response.yaml`
   (agent LIT) **except estimates whose estimation sample overlaps the reform being tested**:
   Rabaté & Rochut (2020) estimate the 2010 French reform itself and are excluded (leakage;
-  `test_no_grid_estimate_overlaps_the_backtested_reform_or_period`). Pre-registered central point:
+  `test_no_grid_estimate_overlaps_the_backtested_reform_or_period`). Central point (called
+  "pre-registered" by the author; not verifiable, see above, and it is also the best-fitting point):
   Staubli & Zweimüller (2013, Austria; s = 0.447 women, 0.392 men). Benchmark: persistence (2010
   rate carried forward).
 
@@ -64,20 +80,30 @@ here should not be read as validation; with this test the model cannot be distin
 The model predicts a plateau from 2017 (the reform is fully phased in for 60-61) while observed
 rates keep rising (men +2.5 pp 2017 -> 2019): the omitted trend again.
 
-## Results: every grid point, 2012-2019
+## Results: every grid point, per year (error = predicted - observed, percentage points)
 
-| Grid point | s (F / M) | Women: mean error / MAE (pp) | Men: mean error / MAE (pp) |
-|---|---|---|---|
-| staubli_zweimuller_2013_aut (central) | 0.447 / 0.392 | 0.36 / 0.55 | 0.23 / 1.2 |
-| cribb_emmerson_tetlow_2016_gbr | 0.548 / 0.548 | 2.78 / 2.78 | 3.85 / 3.85 |
-| geyer_welteke_2017_deu_wp | 0.578 / 0.578 | 3.5 / 3.5 | 4.55 / 4.55 |
-| geyer_welteke_2021_deu | 0.489 / 0.489 | 1.36 / 1.36 | 2.48 / 2.52 |
-| atav_jongen_rabate_2021_nld_wp | 0.321 / 0.321 | -2.67 / 2.67 | -1.42 / 1.47 |
-| ardito_2021_ita | 0.198 / 0.198 | -5.62 / 5.62 | -4.28 / 4.28 |
-| benchmark_persistence | 0 / 0 | -10.38 / 10.38 | -8.89 / 8.89 |
+| Grid point | s (F / M) | sex | 2012 | 2013 | 2014 | 2015 | 2016 | 2017 | 2018 | 2019 | mean error | MAE |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| staubli_zweimuller_2013_aut (central) | 0.447 / 0.392 | women | 0.9 | 0.55 | 0.16 | -0.23 | 0.56 | 1.37 | 0.07 | -0.53 | 0.36 | 0.55 |
+| staubli_zweimuller_2013_aut (central) | 0.447 / 0.392 | men | -1 | -0.93 | 0.77 | 0.26 | 1.68 | 2.44 | 0.54 | -1.96 | 0.23 | 1.2 |
+| cribb_emmerson_tetlow_2016_gbr | 0.548 / 0.548 | women | 1.8 | 1.87 | 2.1 | 2.18 | 3.38 | 4.71 | 3.41 | 2.81 | 2.78 | 2.78 |
+| cribb_emmerson_tetlow_2016_gbr | 0.548 / 0.548 | men | 0.35 | 1.04 | 3.67 | 3.86 | 5.9 | 7.44 | 5.54 | 3.04 | 3.85 | 3.85 |
+| geyer_welteke_2017_deu_wp | 0.578 / 0.578 | women | 2.07 | 2.26 | 2.67 | 2.89 | 4.21 | 5.7 | 4.4 | 3.8 | 3.5 | 3.5 |
+| geyer_welteke_2017_deu_wp | 0.578 / 0.578 | men | 0.61 | 1.42 | 4.23 | 4.56 | 6.71 | 8.4 | 6.5 | 4 | 4.55 | 4.55 |
+| geyer_welteke_2021_deu | 0.489 / 0.489 | women | 1.28 | 1.1 | 0.97 | 0.77 | 1.73 | 2.76 | 1.46 | 0.86 | 1.36 | 1.36 |
+| geyer_welteke_2021_deu | 0.489 / 0.489 | men | -0.16 | 0.29 | 2.57 | 2.5 | 4.3 | 5.55 | 3.65 | 1.15 | 2.48 | 2.52 |
+| atav_jongen_rabate_2021_nld_wp | 0.321 / 0.321 | women | -0.23 | -1.1 | -2.25 | -3.24 | -2.95 | -2.79 | -4.09 | -4.69 | -2.67 | 2.67 |
+| atav_jongen_rabate_2021_nld_wp | 0.321 / 0.321 | men | -1.62 | -1.83 | -0.54 | -1.38 | -0.23 | 0.17 | -1.73 | -4.23 | -1.42 | 1.47 |
+| ardito_2021_ita | 0.198 / 0.198 | women | -1.33 | -2.71 | -4.61 | -6.18 | -6.38 | -6.86 | -8.16 | -8.76 | -5.62 | 5.62 |
+| ardito_2021_ita | 0.198 / 0.198 | men | -2.68 | -3.39 | -2.83 | -4.22 | -3.55 | -3.76 | -5.66 | -8.16 | -4.28 | 4.28 |
+| benchmark_persistence | 0 / 0 | women | -3.1 | -5.3 | -8.4 | -10.9 | -11.9 | -13.4 | -14.7 | -15.3 | -10.38 | 10.38 |
+| benchmark_persistence | 0 / 0 | men | -4.4 | -5.9 | -6.5 | -8.8 | -8.9 | -10.1 | -12 | -14.5 | -8.89 | 8.89 |
 
-The literature range spans errors from about -5.6 to +4.6 pp on average: the response
-assumption matters more than anything else in the model.
+The literature range spans mean errors from about -5.6 to +4.6 pp: the response assumption matters
+more than anything else in the model. Three grid points over-predict in almost every year and sex
+(the British and both German estimates), two under-predict in almost every year (the Dutch and
+Italian estimates); only the central point stays within about ±2.5 pp, which is exactly why it
+should not be read as validated (see "Read this first").
 
 ## Placebo: ages 55-59 (model predicts no change)
 

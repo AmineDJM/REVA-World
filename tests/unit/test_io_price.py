@@ -246,7 +246,8 @@ def test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixe
     """Basic-price basket excludes product taxes; the labelled purchasers' reading divides by basket + taxes."""
     doc = " ".join((m.__doc__ or "").split())
     assert "taxes on products, margins already embedded" not in doc
-    assert "taxes less subsidies on products (VAT, excise duties) are not" in doc and "not a consumer price index" in doc
+    assert "taxes less subsidies on products (VAT, excise duties) are not" in doc
+    assert "not a consumer price index" in doc
     built = _built_with_household_taxes("25.000")  # FR households: 100 at basic prices + 25 product taxes
     r = results(built, "L2")
     row = r[(m.BASKET_KEY, "FRA", "L1")]

@@ -222,7 +222,7 @@ BEGIN
   IF p_created_by IS NULL OR length(p_created_by) < 1 OR length(p_created_by) > 200 THEN
     RAISE EXCEPTION 'invalid job creator';
   END IF;
-  IF p_type NOT IN ('simulation','replay','discovery','ingest','evaluation','population','health') THEN
+  IF p_type NOT IN ('simulation','replay','discovery','ingest','evaluation','population','health','backtest') THEN
     RAISE EXCEPTION 'job type % cannot be submitted through the API', p_type;
   END IF;
   IF p_idempotency_key IS NULL OR length(p_idempotency_key) < 8 OR length(p_idempotency_key) > 200 THEN

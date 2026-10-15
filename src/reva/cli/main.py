@@ -334,6 +334,21 @@ def gate(
         raise typer.Exit(code)
 
 
+@app.command("backtest")
+def backtest(
+    model: str = typer.Option(..., "--model", help="model key, e.g. demography.cohort_component"),
+    release: str | None = typer.Option(None, "--release", help="published release id (default: current)"),
+    country: list[str] = typer.Option(None, "--country", help="ISO3 code (repeatable; default: model default)"),
+) -> None:
+    """Enqueue a back-test job (revised-data retrospective) for a V2 model; a worker runs it."""
+    from reva.adapters.postgres.engine import get_engine
+    from reva.evaluation.backtests import enqueue_backtest
+
+    jid = enqueue_backtest(get_engine("worker"), model, release_id=release, countries=country or None,
+                           created_by="cli:backtest")
+    _out({"job_id": str(jid), "model_key": model})
+
+
 @app.command("verify")
 def verify(profile: str = typer.Option("local")) -> None:
     """Check configuration, DB schema/roles, registry and object store (no source calls)."""

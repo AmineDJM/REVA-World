@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_fr_all_countries_except_china",
+ "recorded_at": "2026-10-15T02:39:53+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 3695.8,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "5d33edd3b3eab2fb6563ce53c91e6023c8260274f6358667d78b88df541c2ee0",
+ "catalog_digest": "1f9ed1b62f561631e290c1066311ea5168820cf0a1d9f347217c98478cee0187",
+ "text": "Pour tous les pays sauf la Chine, quel est l'effet d'une hausse de 20 % du prix du pétrole brut importé en 2023, exportations inchangées ?",
+ "text_sha256": "db373d2477c80c414f937e8689b048eda4556b0360b6861db89c304500dc184b",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792031991,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Pour tous les pays sauf la Chine, calculer l'effet d'une hausse de 20 % du prix du pétrole brut importé en 2023, avec des exportations inchangées. L'exclusion de la Chine ne peut pas être exprimée dans un scénario : il faut lister explicitement les pays à inclure.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Effet d'une hausse de 20 % du prix du pétrole brut importé en 2023 (exportations inchangées, tous pays sauf Chine)\",\"countries\":[\"ALL\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.2,\"text\":null,\"quote\":\"20 %\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.0,\"text\":null,\"quote\":\"inchangées\"}],\"unsupported\":[{\"text\":\"Exclure la Chine de la liste des pays ('tous les pays sauf la Chine').\",\"capability_key\":\"geography.exclusion_not_supported\",\"reason\":\"L'exclusion de pays d'un ensemble n'est pas prise en charge : il faut lister explicitement les pays à inclure.\"}],\"assumptions_added\":[\"Le multiplicateur d'exportation est fixé à 1.0 (exportations inchangées) car l'utilisateur ne précise pas de changement.\",\"Tous les pays sont inclus (ALL), car l'exclusion de la Chine ne peut pas être exprimée dans un scénario.\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 10808,
+   "completion_tokens": 318,
+   "total_tokens": 11126,
+   "prompt_tokens_details": {
+    "cached_tokens": 0,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

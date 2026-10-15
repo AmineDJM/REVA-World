@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_fr_oil_price_io",
+ "recorded_at": "2026-10-15T02:39:55+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 2408.1,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "5d33edd3b3eab2fb6563ce53c91e6023c8260274f6358667d78b88df541c2ee0",
+ "catalog_digest": "1f9ed1b62f561631e290c1066311ea5168820cf0a1d9f347217c98478cee0187",
+ "text": "Quel est l'effet d'une hausse de 25% du prix du pétrole sur les prix à la consommation en France en 2024 ?",
+ "text_sha256": "5f249a6dc47bde11ac0a273e86b9266be120c412517600cf6df403712932ca83",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792031993,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Effet d'une hausse de 25 % du prix du pétrole sur les prix à la consommation en France en 2024. La demande porte sur l'impact sur les prix à la consommation, mais le modèle disponible calcule uniquement la première transmission des prix industriels et la variation du panier des ménages, pas l'indice des prix à la consommation ni l'inflation.\",\"model_key\":\"economic.io_price\",\"title\":\"Effet d'une hausse de 25 % du prix du pétrole sur les prix industriels et le panier des ménages en France (2024)\",\"countries\":[\"FRA\"],\"reference_year\":2024,\"fidelity\":null,\"outputs\":[\"industry_price_change_percent\",\"household_basket_price_change_percent\",\"household_basket_contributions\"],\"parameters\":[{\"path\":\"intervention.shocks[0].origin\",\"number\":null,\"text\":\"FRA\",\"quote\":\"France\"},{\"path\":\"intervention.shocks[0].industry\",\"number\":null,\"text\":\"C19\",\"quote\":\"pétrole\"},{\"path\":\"intervention.shocks[0].price_change_percent\",\"number\":25,\"text\":null,\"quote\":\"25%\"}],\"unsupported\":[{\"text\":\"prix à la consommation, inflation\",\"capability_key\":\"outputs.macroeconomic\",\"reason\":\"Le modèle ne calcule pas l'indice des prix à la consommation ni l'inflation, seulement la transmission des prix industriels et la variation du panier des ménages.\"}],\"assumptions_added\":[\"Aucune élasticité de transmission n'a été précisée, valeur par défaut utilisée (transmission complète).\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 10799,
+   "completion_tokens": 335,
+   "total_tokens": 11134,
+   "prompt_tokens_details": {
+    "cached_tokens": 10624,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

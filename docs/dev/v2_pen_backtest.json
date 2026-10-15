@@ -15,7 +15,7 @@
  ],
  "scenario_path": "law_2010_as_amended_2011",
  "reference_path": "pre_2010_counterfactual",
- "rule_table_digest": "f20ad6adb98e166c77aeb6c9f04af62e71beaee94d1c27f156ce76a3802e9fc6",
+ "rule_table_digest": "75acd4acedb34ed543bb871f248b946e61ac790b0c658a529c2a6151a5deee92",
  "assumption_registry_digest": "b33ec2e058da0f78938bdadc53394dfef7582a26dca66d12f94a1093715cb24b",
  "central_point": "staubli_zweimuller_2013_aut",
  "benchmark": "benchmark_persistence",
@@ -1280,5 +1280,5 @@
  },
  "weights": "uniform over single ages 60-64 (no post-2010 population used)",
  "label": "out-of-sample back-test of a conditional projection; no parameter was fitted on 2011-2019",
- "digest": "111ae6bfc8c6794666f2412aab665a94f111d1334287b51012c829940dc2e83f"
+ "digest": "8ecf41da51ca6a29f96947ba4ff951caf18c44c75d8c2b691d4d7feb0305a913"
 }

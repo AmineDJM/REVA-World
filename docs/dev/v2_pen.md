@@ -86,12 +86,36 @@ Annual, reference (base) year + 1 .. at most 2040; single ages 55-69 by recorded
 1. **Eligibility.** Exact share of person-time below the eligibility age per single age and year
    (12 x 12 grid of observation month x month of exact age; births uniform within month cohorts;
    eligible from the month the age is reached). Birth-cohort and claim-year rules both supported.
+   **Claim-year ages are attained once** (SFX1, review M2): a person is eligible from the first month
+   whose age reaches that calendar year's age and stays eligible - AOW art. 7a(1) says so verbatim
+   ("Op pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde leeftijd hebben
+   bereikt zijn de pensioengerechtigde leeftijd ... in de kalenderjaren daarna niet van toepassing";
+   cited in `NLD.yaml` `claim_year_semantics`, locator checked against the archived text); for ESP the
+   archived excerpt has no such sentence and the same rule is a stated **model assumption**
+   (`ESP.yaml`). The previous code re-tested every year and revoked eligibility for 22 Dutch birth
+   months (e.g. born August 1950 in January 2016). Effect, NLD `law_in_force` vs 65, base 2015:
+   recipients change 2016 -86,345 -> -82,748, 2019 -235,157 -> -227,883 (-3 %); 2025 unchanged.
+   **Age range:** eligibility is computed at single ages 55-69 only; a request whose scenario,
+   reference or observed eligibility differs at any age outside 55-69 in a modelled year (e.g. DEU
+   +60 months from 1964: ages 70-71) is refused with `capability_gap`
+   (`capability = social.retirement_age.age_range`), never silently cut (review M3).
 2. **Affected population** `A = N * (I_scenario - I_reference)`; `N` = mean of 1 January
    populations of `t` and `t+1` from **agent POP's** `cohort.project` (constant base-period rates,
-   average-residual migration by default; base period = the `base_period_years` before the jump-off).
+   average-residual migration by default; base period = the `base_period_years` before the jump-off;
+   residual years spanning a Eurostat series break are excluded by default and a one-year base
+   period with average-residual migration is refused unless
+   `assumptions.population.allow_single_year_migration: true` - see `v2_pop.md`; the projection's
+   typed warnings are repeated in every row's `caveats`).
 3. **Pension-receipt drop** `rho(g, s) = 1 - activity_rate(g, s)/100` of the base year - the
-   country's own share outside the labour force, a stated **upper-bound proxy** (LIT asked that
-   the drop come from national data, not foreign studies). Pension recipients change `-rho * A`.
+   country's own share outside the labour force of the five-year group, applied at each affected
+   single age (LIT asked that the drop come from national data, not foreign studies). Pension
+   recipients change `-rho * A`. **It is a proxy of unknown direction** (review H4; earlier versions
+   of this page called it an upper bound, which is not established): it overstates at ages still
+   mostly active (60-61 in the 2010 back-test) but can understate at ages already mostly retired
+   under the base-year regime (62-64 for the 2023 reform, base 2024); it counts non-pensioner
+   inactivity and omits unemployed claimants. L2 adds two **bounding variants** of the central
+   point: rho of the 60-64 group and rho of the 65-69 group applied at every age
+   (`L2:<central>;pension_drop=Y60-64` / `=Y65-69`), which enter the sensitivity range.
 4. **Employment response** `s * rho * A`, `s` = literature share of the pension-receipt drop
    employed instead (LIT registry, `verified_from_text` only). Central point: own-country estimate
    when exactly one exists (FRA: Rabaté & Rochut 2020, secondary-compilation numbers, no SE;
@@ -104,31 +128,65 @@ Annual, reference (base) year + 1 .. at most 2040; single ages 55-69 by recorded
    change. If a component is missing in ESSPROS the output is **not computed** (missing is never 0).
 7. **Old-age dependency ratio** (65+ per 100 aged 15-64, 1 January) from the POP projection.
 
-L1 = central point; L2 = every grid point + a labelled no-response reference point, each a variant,
-plus `L2:sensitivity_range` rows (min/max, `sensitivity_range` uncertainty, no level). No GDP,
-unemployment, wage or welfare output exists (`CapabilityGap`). Applicability of non-French runs is
-`qualified` with the rule table's lever caveat.
+L1 = central point; L2 = every grid point + a labelled no-response reference point + the two
+pension-drop bounding variants, each a variant, plus `L2:sensitivity_range` rows (min/max,
+`sensitivity_range` uncertainty, no level). No GDP, unemployment, wage or welfare output exists
+(`CapabilityGap`).
 
-### Results (fixtures captured 2026-10-15; L2; central point and literature range)
+**Labels (review M4).** Every country is `qualified`, France included: each rule table states a
+`model_lever.qualification` (FRA: long-career early retirement, disability and incapacity routes
+are not modelled, so persons using them are counted as affected - the same overstatement as
+Germany's 63-with-35-years route; DEU: the central value is an upper side for the affected
+population, "alternative routes not modelled"; ESP: short-track age applied to everyone; NLD: rho
+proxy). The qualification is repeated in **each value's `basis.notes`** ("… QUALIFIED (DEU): Upper
+side …") and in `applicability.qualification`, so no central value is published unqualified.
+
+**Interventions.** `retirement_age_rule_path` (scenario path of the table), `retirement_age_shift`
+(shift of a path for cohorts from a birth year) and, since SFX1 (review M6),
+**`retirement_age_target`**: `{"kind": "retirement_age_target", "reference_path": …,
+"target_age_months": 780, "first_birth_year": 1969, "phase_in_months_per_cohort": 0}` sets the
+table's lever age (FRA minimum age, DEU Regelaltersgrenze, NLD AOW age, ESP short-track age) to a
+**level** (months of age; 780 = 65 years) for cohorts born in `first_birth_year` or later; earlier
+cohorts keep the reference path; an optional phase-in moves each cohort towards the target by at
+most k months per birth year. It is exported in the plugin `spec_schema` and in
+`contracts/scenario.schema.json` (schema range 660-840 months). A stated age level ("passe à 65
+ans") must map to this kind, not to a shift. Tested: a target of 65 from 1969 on FRA
+`law_in_force_2026` (64 for those cohorts) gives exactly the results of a +12-month shift.
+
+### Results (fixtures captured 2026-10-15; L2; central point and sensitivity range)
+
+Restated 2026-10-15 by agent SFX1 after the review: the ranges now include the two pension-drop
+bounding variants, Germany's population excludes its 2022 census-break residual, and every value is
+labelled `qualified`.
 
 France, `law_in_force_2026` vs `law_2010_as_amended_2011` (effect of the 2023 reform as amended),
-base 2024:
+base 2024, central Rabaté & Rochut; qualified (long-career, disability and incapacity routes not
+modelled):
 
 | Year | Employment change 55-69 | Pension recipients change | Expenditure change (approx., EUR 2024 nominal) | Old-age dependency |
 |---|---|---|---|---|
-| 2025 | +125,000 (0 .. +165,000) | -286,000 | -5.4 bn | 35.5 |
-| 2030 | +292,000 (0 .. +386,000) | -669,000 | -12.7 bn | 37.9 |
-| 2040 | +388,000 (0 .. +513,000) | -888,000 | -16.9 bn | 41.8 |
+| 2025 | +125,000 (0 .. +202,000; was 0 .. +165,000) | -286,000 (-461,000 .. -286,000) | -5.4 bn (-8.8 .. -5.4 bn) | 35.5 |
+| 2030 | +292,000 (0 .. +471,000; was 0 .. +386,000) | -669,000 (-1.08 m .. -669,000) | -12.7 bn (-20.5 .. -12.7 bn) | 37.9 |
+| 2040 | +388,000 (0 .. +626,000; was 0 .. +513,000) | -888,000 (-1.43 m .. -888,000) | -16.9 bn (-27.3 .. -16.9 bn) | 41.8 |
 
-Germany, `law_in_force` vs `pre_2007_counterfactual` (65 -> 67), base 2023 (2024 births by sex and
-2022 births at mother's age 10-14 are missing in `demo_fasec`: one-year base period 2023),
-central Staubli & Zweimüller (transferred from AUT), qualified (the 63-with-35-years route is not
-modelled, so the affected population is overstated): employment +794,000 (0 .. +1.09 m) and
-recipients -1.89 m in 2030; expenditure approx. -36.4 bn EUR (2023 nominal).
+For France every affected age (62-64) is in the 60-64 group, so the central point equals the
+`Y60-64` bounding variant; the `Y65-69` variant (65-69-year-olds are mostly retired) gives a
+1.6 times larger drop. Before this revision the recipient and expenditure ranges were a single
+point (every grid point shares rho), which hid this dependence.
+
+Germany, `law_in_force` vs `pre_2007_counterfactual` (65 -> 67), base 2023, population base period
+2019-2023 (fertility without 2022, whose births by mother's age are incomplete; the 2022 migration
+residual excluded: census break flagged on 1 January 2023), central Staubli & Zweimüller
+(transferred from AUT). **Qualified - upper side for the affected population: the early claim from
+63 with 35 insurance years is not modelled**: employment +790,000 (0 .. +1.08 m; was +794,000) and
+recipients -1.88 m (-1.88 m .. -0.78 m; was -1.89 m) in 2030; expenditure approx. -36.2 bn EUR
+(-36.2 .. -15.0 bn; 2023 nominal; was -36.4 bn). Here the affected ages 65-66 lie in the 65-69 group,
+so the central point equals the `Y65-69` variant and the `Y60-64` variant is 58 % smaller.
 
 Netherlands, AOW `law_in_force` vs `pre_2013_counterfactual`, base 2024, horizon 2025 only (rule
-coverage): employment +103,000 (0 .. +185,000), recipients -320,000; expenditure not computed
-(ESSPROS AOLD/PART missing).
+coverage): employment +103,000 (0 .. +185,000), recipients -320,000 (-320,000 .. -134,000);
+expenditure not computed (ESSPROS AOLD/PART missing). (2025 is not affected by the claim-year fix:
+the AOW age is 67 in both 2024 and 2025.)
 
 Spain: **refused by the data** - applying the short-contribution-track age to the whole population
 drives the reference-path employment rate of women 65-69 below 0 (persons with long careers keep
@@ -136,9 +194,10 @@ drives the reference-path employment rate of women 65-69 below 0 (persons with l
 
 Italy, Belgium, Sweden, Poland: `capability_gap` (no sourced rule table).
 
-The recipient and expenditure numbers inherit the upper-bound proxy for `rho` and should be read as
-upper-bound-leaning; the back-test shows this proxy also over-attributes employment change to a
-reform.
+The recipient and expenditure numbers depend on the rho proxy, whose direction is unknown; the
+bounding variants show how much (factor about 1.6 for France, 2.4 for Germany). The back-test shows
+the proxy over-attributes employment change to the 2010 reform (affected ages 60-61); that finding
+does not carry over to reforms affecting ages already mostly retired.
 
 ## Households (`population.household_margins`, V2; P10 `population.households` stays reserved)
 
@@ -164,9 +223,13 @@ person x household source is used); member ages, sexes, income etc. are unsuppor
 * ISO3 subjects via `iso3166_alpha3` aliases (no new `eurostat_geo` aliases: they feed autonomy T1
   scope) - same as POP.
 * France default central = Rabaté & Rochut for projections (own country, later reform); the back-test
-  excludes it (leakage) and uses Staubli & Zweimüller as pre-registered central.
-* Pension-receipt drop from own-country LFS inactivity (upper-bound proxy) instead of foreign
-  studies' values.
+  excludes it (leakage) and uses Staubli & Zweimüller as central (described as pre-registered, which
+  git history cannot verify - see `v2_pen_backtest.md`).
+* Pension-receipt drop from own-country LFS inactivity (proxy of unknown direction, with two bounding
+  variants in L2 since SFX1) instead of foreign studies' values.
+* (SFX1) Claim-year eligibility attained once: cited for NLD, model assumption for ESP. Ages outside
+  55-69 refused rather than extending the age range (LFS rates exist only for 55-69 in the tables
+  used). Every country labelled `qualified`. A `retirement_age_target` level intervention added.
 * Back-test uses the as-applied 2010 schedule (LFSS 2012 acceleration); uniform weights within 60-64.
 * Phase-2 central for DEU/ESP = Staubli & Zweimüller (the German estimates concern the abolition
   of the women's pension, a different lever).
@@ -181,6 +244,15 @@ person x household source is used); member ages, sexes, income etc. are unsuppor
 
 ## Requests to other owners
 
+* **(SFX1) registry owner of `registry/models/methods.yaml`:** lines ~171 and ~202 still call the
+  pension-receipt drop an "upper-bound proxy"; replace with "proxy of unknown direction (bounding
+  variants rho 60-64 / 65-69 in L2)".
+* **(SFX1) SFX2 / NL drafts:** a stated age level ("passe à 65 ans", "to 65") maps to
+  `{"kind": "retirement_age_target", "reference_path": <path>, "target_age_months": 12 * years +
+  months, "first_birth_year": <first cohort>}`, never to `retirement_age_shift`.
+* **(SFX1) DOC2 / `docs/limitations.md`:** V2 limits now include: residual migration excludes
+  flagged series breaks only (unflagged revisions stay), the rho proxy has unknown direction, every
+  retirement result is `qualified`.
 * **lead / D (runner, jobs, CLI):** dispatch a connector's own post-publish hook:
   `post_publish = getattr(connector, "post_publish", None) or post_publish_for(spec.template)` in
   `operations/jobs.py` (handle_ingest) and `cli/main.py` (ingest). Without it, scheduled/CLI ingests

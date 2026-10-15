@@ -31,8 +31,12 @@ data = C.CountryDemography.from_tables(
 assumptions = C.Assumptions(migration="average_residual",   # "zero" | "average_residual" | "europop2023_bsl"
                             fertility="constant_base_period_rates",  # | "europop2023_bsl"
                             base_period=(2019, 2023),        # calendar years of events, must end < jump_off
-                            migration_window=None)           # default: the base period
+                            migration_window=None,           # default: the base period
+                            migration_breaks="exclude",      # default; "include" keeps series-break years
+                            allow_single_year_migration=False)  # averaging < 2 residual years is refused
 proj = C.project(data, jump_off=2025, end_year=2041, assumptions=assumptions)
+proj.warnings                   # typed run warnings (stable "code"), see "Series breaks" below
+proj.migration_window           # years averaged and years excluded (with residuals and flags)
 proj.population[2030]["F"]      # tuple[Decimal] for ages 0..proj.omega (index omega = open group omega+)
 proj.total(2030, "M", 55, 70)   # persons aged 55..69 on 1 January 2030 (None = both sexes)
 proj.flows[2030]                # births / deaths / net_migration by sex during 2030
@@ -50,9 +54,11 @@ proj.summary()                  # label, assumptions, TFR, e0, data notes, statu
 * Population is on **1 January**; sexes `"F"`, `"M"` (recorded sex); ages in completed years;
   `proj.omega` is between 85 and 100 depending on the data (never split). Values are `Decimal`
   person counts exact to 1e-9 (the model quantum); round only for presentation.
-* Errors are typed: `C.DataGap` (a `MissingInput`) for an incomplete required table, `CapabilityGap`
-  for unsupported data (open age < 85, EUROPOP not available for a year/country),
-  `ValidationProblem` for a base period that does not end before the jump-off.
+* Errors are typed: `C.DataGap` (a `MissingInput`) for an incomplete required table or a migration
+  window left with fewer than 2 years once series-break years are excluded, `CapabilityGap` for
+  unsupported data (open age < 85, EUROPOP not available for a year/country), `ValidationProblem` for
+  a base period that does not end before the jump-off or a stated one-year migration window without
+  `allow_single_year_migration=True`.
 * PEN already uses this API (`src/reva/models/social/retirement_age.py`); it is stable for 1.x.
 
 ## Model (summary; full method in the `cohort.py` docstring)
@@ -69,6 +75,24 @@ proj.summary()                  # label, assumptions, TFR, e0, data notes, statu
 * Net migration (negative allowed): zero; mean of residual estimates
   `M_{x+1}(t) = P_{x+1}(t+1) − S_x P_x(t)` (age 0: `P_0(t+1) − S_b B_s(t)`) over a stated window; or
   EUROPOP2023 BSL by age and sex. Migrants are added at the end of the year.
+* **Series breaks in the residual window (added after the SCIV2 review, finding H1).** A census or
+  register revision changes the 1 January population without any birth, death or move, and the
+  residual method books it as migration; averaged, it becomes permanent migration. Eurostat marks the
+  first 1 January population that is not comparable with the year before with the status flag `b`.
+  The residual of year t spans the break when any demo_pjan cell of **t+1** carries a flag containing
+  `b`. Such years are **excluded from the average by default** and every run carries the typed warning
+  `migration_residual_contains_break` (years, residuals in persons, flags, action); the spec option
+  `migration_breaks: "include"` keeps them (explicit acknowledgement; still warned; variant name
+  `mig=average_residual+breaks_included;…`). Flags are the only exclusion criterion (documented and
+  reproducible); an unflagged revision is not detected by them. A diagnostic warning
+  `migration_residual_outlier` (never an exclusion) lists remaining years whose total residual lies
+  more than 5 × 1.4826 × MAD from the window median (n ≥ 3); in practice it also fires on genuine
+  shocks such as 2022 arrivals from Ukraine (EST, LTU, LVA).
+* **Short windows (finding M8).** The average needs at least 2 years. A stated window of one year is
+  refused (`ValidationProblem`) and a window left with fewer than 2 years after excluding breaks is
+  refused as `missing_input`, unless `allow_single_year_migration: true` (then warning
+  `migration_window_single_year`). A one-year base period (or a component estimated from a single
+  year, e.g. fertility) carries the warning `base_period_single_year`.
 * Numeric type: `decimal.Decimal`, precision 50, `ROUND_HALF_EVEN`; person counts quantized to 1e-9;
   accounting identities computed with `Inexact` trapped, so `P(t+1) = P(t) − D + B + M` holds
   **exactly** (asserted each step; property-tested). Exact rationals were rejected: denominators of
@@ -81,7 +105,8 @@ proj.summary()                  # label, assumptions, TFR, e0, data notes, statu
 
 Spec branch (ScenarioSpec 2.0.0): `reference_year` = jump-off; `horizon {periods ≤ 50, unit
 calendar_year}`; `intervention {"kind": "baseline_projection"}`; `assumptions {mortality, fertility,
-migration, base_period, migration_window?, sensitivity?}`; outputs from
+migration, base_period, migration_window?, migration_breaks? ("exclude" | "include"),
+allow_single_year_migration? (boolean), sensitivity?}`; outputs from
 `population.{total|female|male}.{all_ages|age_0_14|age_15_64|age_65_plus|age_80_plus|age_20_66|age_67_plus}`,
 `old_age_dependency_ratio_65plus_per_15_64`, `old_age_dependency_ratio_67plus_per_20_66` (percent, both
 always clearly named), `{births|deaths|net_migration}.{total|female|male}`, and the opt-in
@@ -97,7 +122,11 @@ always clearly named), `{births|deaths|net_migration}.{total|female|male}`, and 
   listed in the run applicability); EUROPOP data missing for a grid variant only (e.g. Liechtenstein,
   not projected by Eurostat) makes that variant *unavailable* (reported), never zero-filled.
 * Run applicability: per country open age, implied TFR and e0 of the base period, male share at
-  birth, data notes, Eurostat status flags of every input year.
+  birth, data notes, Eurostat status flags of every input year, the migration window (years used,
+  years excluded with reason, residual and flags) and the typed `warnings`; each result row's
+  applicability repeats the warnings (without the message text) and `migration_years_used`.
+  A migration window too short after exclusion makes the country `missing_input` (or, when only grid
+  variants use average-residual migration, those variants unavailable).
 
 ## Connector `eurostat.demography@1.0.0`
 
@@ -182,8 +211,9 @@ deaths (`UNK`) are excluded (absorbed by the migration residual) and reported pe
    1 January 2014 jump-off instead (both in `v2_pop_backtest.md`).
 2. **Residual migration uses base-period survival** (not single-year life tables), so replaying the
    base period with its own residuals reproduces the observed populations exactly (tested). It is
-   labelled "net migration plus statistical adjustment"; census breaks show up in it and are not
-   corrected by hand (visible in the back-test).
+   labelled "net migration plus statistical adjustment". Census breaks show up in it; since the SCIV2
+   review (H1) residual years spanning a Eurostat `b` flag are excluded from the average by default
+   (warned, never corrected by hand, never silently).
 3. **Mortality improvement is not modelled** in 1.0.0 (`proj_23naasmr` was not used: whether its
    values are rates or probabilities was not verified). Hence the EUROPOP2023 comparison is a
    plausibility check only, and REVA's 2050 old-age dependency ratios are lower than EUROPOP's.
@@ -197,6 +227,15 @@ deaths (`UNK`) are excluded (absorbed by the migration residual) and reported pe
 7. **No eurostat_geo aliases** for the 30 new countries (would widen autonomy T1 scope); ISO3
    aliases with a reviewed geo table instead.
 8. **Experimental** registration (candidate + `maintainer_review_pending`), as decided in the roadmap.
+9. **Series-break years excluded by default** (agent SFX1 after the SCIV2 review, H1): the criterion is
+   the Eurostat `b` flag on the 1 January population that closes the residual year, not a statistical
+   outlier rule (reproducible, provider-sourced); the outlier rule is a warning only. A median instead
+   of the mean was not adopted: with 4–5 years it would hide the exclusion instead of stating it.
+10. **At least two residual years** (M8), refused otherwise unless `allow_single_year_migration` is
+    set explicitly; one-year base periods are warned.
+11. **Back-test open age** (L3): taken from the base period and jump-off tables only; when the target
+    year's open group starts lower, the projection is aggregated above it for scoring
+    (`scoring_open_age`; no country needed this in the current vintage, so no number changed).
 
 ## Live run
 
@@ -217,15 +256,29 @@ deaths (`UNK`) are excluded (absorbed by the migration residual) and reported pe
    **identical** to `v2_pop_backtest_evaluation.json` (checked field by field).
 
 Selected outputs (conditional projections under stated assumptions, not forecasts; mortality
-constant at 2019–2023 rates, which include COVID-19 excess mortality):
+constant at 2019–2023 rates, which include COVID-19 excess mortality). **Restated after the SCIV2
+review (H1):** the live run above used 1.0.0 behaviour (series-break years averaged in). The table
+below is recomputed offline from the archived Eurostat bytes of the same fetch (sha256-checked
+against `v2_pop_backtest_evaluation.json`; FRA, ESP and ITA reproduce the live numbers exactly) with
+break years excluded by default. Only POL and DEU change:
 
-| Country | total 2025 (observed jump-off) | total 2050 L1 (avg. residual mig., constant fertility) | 2050 L2 range over the grid | 65+/15-64 2025 | 65+/15-64 2050 L1 | 2050 L2 range |
-|---|---|---|---|---|---|---|
-| DEU | 83577140 | 82017671 | 70561807–82794754 | 35.891 | 39.1731 | 38.9829–48.3689 |
-| ESP | 49128297 | 54919175 | 41913161–55721268 | 31.2174 | 47.4222 | 47.1602–63.4552 |
-| FRA | 68882600 | 71583998 | 65938992–71834774 | 35.523 | 42.4375 | 42.3282–45.3077 |
-| ITA | 58943464 | 50612773 | 47240151–55246876 | 39.0425 | 60.3901 | 55.0062–65.2008 |
-| POL | 36497495 | 25773187 | 25773187–30430194 | 32.7056 | 50.8282 | 44.0641–50.8282 |
+| Country | total 2025 (observed jump-off) | total 2050 L1 (avg. residual mig., constant fertility) | 2050 L2 range over the grid | 65+/15-64 2025 | 65+/15-64 2050 L1 | 2050 L2 range | residual years excluded (break flag) |
+|---|---|---|---|---|---|---|---|
+| DEU | 83577140 | 82581569 (was 82017671) | 70561807–83355169 | 35.891 | 39.5072 (was 39.1731) | 39.3182–48.3689 | 2022 (+172 297; `b` on 1 Jan 2023) |
+| ESP | 49128297 | 54919175 | 41913161–55721268 | 31.2174 | 47.4222 | 47.1602–63.4552 | – |
+| FRA | 68882600 | 71583998 | 65938992–71834774 | 35.523 | 42.4375 | 42.3282–45.3077 | – |
+| ITA | 58943464 | 50612773 | 47240151–55246876 | 39.0425 | 60.3901 | 55.0062–65.2008 | – |
+| POL | 36497495 | **29927296 (was 25773187)** | 29605091–30587785 (was 25773187–30430194) | 32.7056 | 45.0377 (was 50.8282) | 44.0641–45.1885 | 2020 (−762 k persons; `bep` on 1 Jan 2021, census) |
+
+Poland: the 2020 residual (−0.76 million, the 2021 census correction) had been averaged into
+≈ −146 k persons per year for 25 years; without it the 2050 L1 total is 29.93 million (−13.6 % vs
+EUROPOP2023's 34.62 million, was −25.6 %). Germany: the 2022 residual (+0.17 million against
+roughly +1.4 million recorded arrivals) is offset by the census revision flagged on 1 January 2023
+and is excluded; the remaining 2019, 2021 and 2023 residuals (2023: +0.73 million) dominate the
+average. Czechia (not in the live run) shows the other side of the fix: excluding its 2020 census
+residual (−0.18 million) leaves 2022 (+0.35 million, arrivals from Ukraine) with more weight, and its
+2050 average-residual total rises from 11.58 to 13.31 million (+23.9 % vs EUROPOP2023). Averaged
+residuals stay a fragile assumption; L2 reports the grid for that reason.
 
 The L2 range is assumption sensitivity, not a confidence interval (no probability level).
 

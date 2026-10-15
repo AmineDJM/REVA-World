@@ -102,14 +102,16 @@ def test_l2_grid_range_contains_every_point_and_no_response_reference(l2: tuple[
         assert lo == 0  # the no-response reference point
         pv = [Decimal(x.value["value"]) for x in rows if x.output_key == r.output_key and x.period == r.period
               and x.variant.startswith("L2:") and x.variant != ra.SENSITIVITY_VARIANT]
-        assert len(pv) == len(pts) and min(pv) == lo and max(pv) == hi
+        # every grid point plus the two pension-drop bounding variants of the central point (review H4)
+        assert len(pv) == len(pts) + 2 and min(pv) == lo and max(pv) == hi
         assert r.uncertainty["kind"] == "sensitivity_range" and r.uncertainty.get("level") is None
 
 
 def test_pension_drop_comes_from_own_country_data_not_the_study(l2: tuple[Any, list[Any]]) -> None:
     _, rows = l2
     rec = {r.variant: Decimal(r.value["value"]) for r in rows
-           if r.output_key == "pension_recipients_change" and r.period[0].year == 2035 and "range" not in r.variant}
+           if r.output_key == "pension_recipients_change" and r.period[0].year == 2035 and "range" not in r.variant
+           and "pension_drop=" not in r.variant}  # bounding variants (review H4) use other French LFS groups
     assert len(set(rec.values())) == 1  # every grid point shares the French data-based drop
 
 

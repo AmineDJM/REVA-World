@@ -125,6 +125,44 @@
         "title": "Assessment",
         "type": "object"
       },
+      "BacktestRequest": {
+        "additionalProperties": false,
+        "description": "Start a back-test of a V2 model against a published release (revised-data retrospective) as a job.",
+        "properties": {
+          "countries": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 60,
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ISO3 codes (model default)",
+            "title": "Countries"
+          },
+          "release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Published release (default: the current one)",
+            "title": "Release Id"
+          }
+        },
+        "title": "BacktestRequest",
+        "type": "object"
+      },
       "BaselineReleaseRef": {
         "additionalProperties": false,
         "properties": {
@@ -2914,6 +2952,18 @@
       },
       "DraftGap": {
         "properties": {
+          "blocks_draft": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "true when this item withholds the draft (needs_input)",
+            "title": "Blocks Draft"
+          },
           "capability_key": {
             "title": "Capability Key",
             "type": "string"
@@ -6350,6 +6400,413 @@
           "detail"
         ],
         "title": "MissingValue",
+        "type": "object"
+      },
+      "ModelBacktest": {
+        "additionalProperties": false,
+        "description": "A stored back-test of a model (one ``model.evaluation`` row; job type ``backtest``).",
+        "properties": {
+          "backtest_function": {
+            "description": "The model's own back-test function that produced the row",
+            "title": "Backtest Function",
+            "type": "string"
+          },
+          "context_id": {
+            "description": "Evaluation-mode context of the run",
+            "format": "uuid",
+            "title": "Context Id",
+            "type": "string"
+          },
+          "country": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "ISO 3166 alpha-3 of the evaluated country",
+            "title": "Country"
+          },
+          "design": {
+            "additionalProperties": true,
+            "description": "Back-test design (jump-off/base period/target or protocol, years)",
+            "title": "Design",
+            "type": "object"
+          },
+          "evaluation_manifest_sha256": {
+            "description": "sha256 of the evaluation artifact (manifest with the inputs' digests, design and full results)",
+            "title": "Evaluation Manifest Sha256",
+            "type": "string"
+          },
+          "id": {
+            "description": "model.evaluation id",
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Knowledge cutoff of that release",
+            "title": "Knowledge Cutoff"
+          },
+          "labels": {
+            "description": "Labels that must be shown with the metrics (replay mode, model label, statement)",
+            "items": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "array"
+          },
+          "metrics": {
+            "additionalProperties": true,
+            "description": "Error metrics as stored (status, per-variant/per-sex errors)",
+            "title": "Metrics",
+            "type": "object"
+          },
+          "model_key": {
+            "title": "Model Key",
+            "type": "string"
+          },
+          "model_version": {
+            "title": "Model Version",
+            "type": "string"
+          },
+          "model_version_id": {
+            "format": "uuid",
+            "title": "Model Version Id",
+            "type": "string"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "test_fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Belief release whose pinned datasets were the only inputs",
+            "title": "Release Id"
+          },
+          "replay_mode": {
+            "title": "Replay Mode",
+            "type": "string"
+          },
+          "replay_mode_label": {
+            "title": "Replay Mode Label",
+            "type": "string"
+          },
+          "task": {
+            "description": "Back-test task, e.g. population_backtest or retirement_backtest",
+            "title": "Task",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "model_version_id",
+          "model_key",
+          "model_version",
+          "task",
+          "country",
+          "backtest_function",
+          "context_id",
+          "origin",
+          "release_id",
+          "knowledge_cutoff",
+          "replay_mode",
+          "replay_mode_label",
+          "design",
+          "metrics",
+          "labels",
+          "evaluation_manifest_sha256",
+          "recorded_at"
+        ],
+        "title": "ModelBacktest",
+        "type": "object"
+      },
+      "ModelBacktestListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/ModelBacktest"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "ModelBacktestListResponse",
         "type": "object"
       },
       "ModelEvaluation": {
@@ -14265,6 +14722,188 @@
         "summary": "List Models",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/v1/models/{model_key}/backtests": {
+      "get": {
+        "description": "Stored back-tests of a model (all versions of the key), newest first: metrics, design, labels and the\nsha256 of the evaluation artifact. Back-tests are revised-data retrospectives computed by the worker job\n``backtest`` from the datasets pinned by a published release; a model without a back-test function returns\nan empty list with the warning ``backtest_unavailable``.",
+        "operationId": "list_backtests_v1_models__model_key__backtests_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_key",
+            "required": true,
+            "schema": {
+              "title": "Model Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "description": "Page size (max 1000)",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "description": "Page size (max 1000)",
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelBacktestListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Backtests",
+        "tags": [
+          "catalog"
+        ]
+      },
+      "post": {
+        "description": "Enqueue a back-test (revised-data retrospective) of a V2 model; results appear under\nGET /v1/models/{model_key}/backtests. Models without a back-test function are refused (capability_gap).",
+        "operationId": "create_backtest_v1_models__model_key__backtests_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "model_key",
+            "required": true,
+            "schema": {
+              "title": "Model Key",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobAccepted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Create Backtest",
+        "tags": [
+          "simulation"
         ]
       }
     },

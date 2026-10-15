@@ -20,6 +20,20 @@ x month of exact age inside each completed year of age (uniform), i.e. births
 are assumed uniform within each month-cohort and the population uniform across
 months of age inside a completed year. A person is eligible from the month the
 eligibility age is reached. The result is an exact ``Fraction``.
+
+Claim-year rules are attained once. For a claim-year table (the age depends on the
+calendar year in which it is reached: NLD AOW, ESP DT 7ª) a person is eligible from
+the first month in which their age reaches the age of *that* month's calendar year,
+and stays eligible: a later year's higher age is never re-applied to someone who had
+already reached the age of an earlier year (AOW art. 7a(1), archived: "Op
+pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde leeftijd
+hebben bereikt zijn de pensioengerechtigde leeftijd en de aanvangsleeftijd in de
+kalenderjaren daarna niet van toepassing."). Each claim-year table declares this
+semantics (``claim_year_semantics``: cited verbatim for NLD; a stated model assumption
+for ESP, whose archived excerpt has no such sentence: a pension claimed in the year the
+age was reached is not withdrawn). Earlier years are searched back while the person's
+December age is at least the lowest age the path states; a needed year outside the
+table's coverage raises :class:`RuleCoverageGap` (never guessed).
 """
 
 from __future__ import annotations
@@ -52,6 +66,8 @@ DERIVATIONS = ("verbatim", "counterfactual_extension", "secondary_table")
 SOURCE_KINDS = ("official_consolidated_text", "official_information_page", "secondary_consolidated_mirror",
                 "secondary_statutory_fund_table")
 PATH_STATUSES = ("in_force", "enacted_superseded", "enacted_as_amended", "counterfactual")
+CLAIM_YEAR_SEMANTICS = ("attained_once",)
+CLAIM_YEAR_DERIVATIONS = ("verbatim", "model_assumption")
 REVIEW_STATUS = "maintainer_review_pending"
 TRANSCRIPTION_NOTE = "transcribed from law text by an agent; maintainer review pending"
 
@@ -159,6 +175,7 @@ class RuleTable:
     paths: Mapping[str, RulePath]
     rows: tuple[RuleRow, ...]
     raw: Mapping[str, Any]
+    claim_year_semantics: Mapping[str, Any] = field(default_factory=dict)
 
     def digest(self) -> str:
         return logical_hash(json.loads(json.dumps(self.raw, default=str)))
@@ -289,8 +306,27 @@ def parse_rule_table(doc: Mapping[str, Any], *, check_locators: bool = True) -> 
         else:
             raise ValidationProblem(f"{country}: row {rid} basis must be birth_cohort or claim_year")
         rows.append(row)
+    semantics = dict(doc.get("claim_year_semantics") or {})
+    if any(r.basis == "claim_year" for r in rows):
+        if semantics.get("rule") not in CLAIM_YEAR_SEMANTICS:
+            raise ValidationProblem(f"{country}: a table with claim-year rows must declare claim_year_semantics.rule "
+                                    f"in {CLAIM_YEAR_SEMANTICS}")
+        deriv = semantics.get("derivation")
+        if deriv not in CLAIM_YEAR_DERIVATIONS:
+            raise ValidationProblem(f"{country}: claim_year_semantics.derivation must be one of "
+                                    f"{CLAIM_YEAR_DERIVATIONS}")
+        if deriv == "verbatim":
+            cit = semantics.get("citation") or {}
+            if cit.get("source_id") not in sources or not cit.get("locator"):
+                raise ValidationProblem(f"{country}: claim_year_semantics must cite a declared source with a locator")
+            if check_locators and normalise_text(str(cit["locator"])) not in source_text(
+                    sources[cit["source_id"]]["archived_file"]):
+                raise ValidationProblem(f"{country}: claim_year_semantics locator not found verbatim in "
+                                        f"{sources[cit['source_id']]['archived_file']}", locator=cit["locator"])
+        elif not semantics.get("note"):
+            raise ValidationProblem(f"{country}: a model_assumption claim_year_semantics must explain itself in note")
     table = RuleTable(country, str(doc.get("version", "")), doc["review_status"], doc["transcription"], lever,
-                      sources, paths, tuple(rows), dict(doc))
+                      sources, paths, tuple(rows), dict(doc), semantics)
     _check_disjoint(table)
     return table
 
@@ -356,19 +392,38 @@ class TablePath:
     path: str
     age_kind: str
     track: str = "general"
+    _cache: dict[tuple[int, int, int | None], int] = field(default_factory=dict, compare=False, repr=False)
 
     def __post_init__(self) -> None:
         if not self.table.rows_for(self.path, self.age_kind, self.track):
             raise ValidationProblem(f"{self.table.country}: path {self.path!r} has no {self.age_kind} rows for "
                                     f"track {self.track!r}")
 
+    @property
+    def basis(self) -> str:
+        """``birth_cohort`` or ``claim_year`` (one basis per path, age kind and track: checked at load)."""
+        return self.table.rows_for(self.path, self.age_kind, self.track)[0].basis
+
     def age_months(self, birth_y: int, birth_m: int, claim_year: int) -> int:
-        return self.table.age_months_at(self.path, self.age_kind, birth_y, birth_m, claim_year, self.track)
+        key = (birth_y, birth_m, claim_year if self.basis == "claim_year" else None)
+        if key not in self._cache:
+            self._cache[key] = self.table.age_months_at(self.path, self.age_kind, birth_y, birth_m, claim_year,
+                                                        self.track)
+        return self._cache[key]
+
+    def age_bounds_months(self) -> tuple[int, int]:
+        """Lowest and highest age (months) any row of the path states."""
+        ages = [r.age_months for r in self.table.rows_for(self.path, self.age_kind, self.track)]
+        return min(ages), max(ages)
+
+    def claim_floor_months(self, birth_y: int) -> int:
+        """Lowest age a claim year of this path can require of the cohort (stops the backward search)."""
+        return self.age_bounds_months()[0]
 
     def describe(self) -> dict[str, Any]:
         p = self.table.paths[self.path]
         return {"kind": "rule_table_path", "country": self.table.country, "path": self.path, "label": p.label,
-                "status": p.status, "age_kind": self.age_kind, "track": self.track,
+                "status": p.status, "age_kind": self.age_kind, "track": self.track, "basis": self.basis,
                 "rule_table_version": self.table.version, "rule_table_digest": self.table.digest(),
                 "review_status": self.table.review_status}
 
@@ -392,6 +447,10 @@ class ShiftedPath:
         if not 1900 <= self.first_birth_year <= 2100:
             raise ValidationProblem("first_birth_year out of range")
 
+    @property
+    def basis(self) -> str:
+        return self.base.basis
+
     def extra_months(self, birth_y: int) -> int:
         if birth_y < self.first_birth_year:
             return 0
@@ -403,6 +462,13 @@ class ShiftedPath:
     def age_months(self, birth_y: int, birth_m: int, claim_year: int) -> int:
         return self.base.age_months(birth_y, birth_m, claim_year) + self.extra_months(birth_y)
 
+    def age_bounds_months(self) -> tuple[int, int]:
+        lo, hi = self.base.age_bounds_months()
+        return lo + min(0, self.shift_months), hi + max(0, self.shift_months)
+
+    def claim_floor_months(self, birth_y: int) -> int:
+        return self.base.claim_floor_months(birth_y) + self.extra_months(birth_y)
+
     def describe(self) -> dict[str, Any]:
         return {"kind": "shift_of_rule_table_path", "base": self.base.describe(), "shift_months": self.shift_months,
                 "first_birth_year": self.first_birth_year,
@@ -410,10 +476,86 @@ class ShiftedPath:
                 "status": "scenario_assumption (not law)"}
 
 
-AgePath = TablePath | ShiftedPath
+TARGET_AGE_RANGE_MONTHS = (12 * 40, 12 * 80)
+
+
+@dataclass(frozen=True)
+class TargetPath:
+    """A user-specified statutory age *level*: cohorts born in ``first_birth_year`` or later get
+    ``target_age_months`` (e.g. 780 = 65 years), all earlier cohorts keep ``base``. With
+    ``phase_in_months_per_cohort = k > 0`` cohort ``c`` moves from its base age towards the target by at
+    most ``k * (c - first + 1)`` months (never past the target). Lowering or raising are both allowed.
+    A scenario assumption, not law."""
+
+    base: TablePath
+    target_age_months: int
+    first_birth_year: int
+    phase_in_months_per_cohort: int = 0
+
+    def __post_init__(self) -> None:
+        lo, hi = TARGET_AGE_RANGE_MONTHS
+        if isinstance(self.target_age_months, bool) or not lo <= self.target_age_months <= hi:
+            raise ValidationProblem(f"target_age_months must be an integer in [{lo}, {hi}] (months of age)")
+        if not 0 <= self.phase_in_months_per_cohort <= 24:
+            raise ValidationProblem("phase_in_months_per_cohort must be in [0, 24]")
+        if not 1900 <= self.first_birth_year <= 2100:
+            raise ValidationProblem("first_birth_year out of range")
+
+    @property
+    def basis(self) -> str:
+        return self.base.basis
+
+    def _apply(self, birth_y: int, base_months: int) -> int:
+        if birth_y < self.first_birth_year:
+            return base_months
+        gap = self.target_age_months - base_months
+        if self.phase_in_months_per_cohort == 0:
+            return self.target_age_months
+        step = self.phase_in_months_per_cohort * (birth_y - self.first_birth_year + 1)
+        return base_months + max(-step, min(step, gap))
+
+    def age_months(self, birth_y: int, birth_m: int, claim_year: int) -> int:
+        return self._apply(birth_y, self.base.age_months(birth_y, birth_m, claim_year))
+
+    def age_bounds_months(self) -> tuple[int, int]:
+        lo, hi = self.base.age_bounds_months()
+        return min(lo, self.target_age_months), max(hi, self.target_age_months)
+
+    def claim_floor_months(self, birth_y: int) -> int:
+        return self._apply(birth_y, self.base.claim_floor_months(birth_y))  # monotone in the base age
+
+    def describe(self) -> dict[str, Any]:
+        t = self.target_age_months
+        return {"kind": "target_level_on_rule_table_path", "base": self.base.describe(), "target_age_months": t,
+                "target_age": {"years": t // 12, "months": t % 12}, "first_birth_year": self.first_birth_year,
+                "phase_in_months_per_cohort": self.phase_in_months_per_cohort,
+                "status": "scenario_assumption (not law)"}
+
+
+AgePath = TablePath | ShiftedPath | TargetPath
 
 
 # --------------------------------------------------------------------------- eligibility arithmetic
+def is_eligible(path: AgePath, birth_y: int, birth_m: int, year: int, month: int) -> bool:
+    """Eligible in calendar ``year``, month ``month`` (1..12), for a person born in ``birth_y``-``birth_m``.
+
+    Birth-cohort paths: exact age (months) >= the cohort's age. Claim-year paths: attained once - the
+    age of the observation year is reached, or the age of an earlier calendar year was reached in that
+    year (searched back while the December age is >= the path's lowest stated age)."""
+    age = 12 * (year - birth_y) + (month - birth_m)
+    if age >= path.age_months(birth_y, birth_m, year):
+        return True
+    if path.basis != "claim_year":
+        return False
+    floor = path.claim_floor_months(birth_y)
+    y, dec_age = year - 1, age - month  # age in December of the previous year
+    while dec_age >= floor:
+        if dec_age >= path.age_months(birth_y, birth_m, y):
+            return True
+        y, dec_age = y - 1, dec_age - 12
+    return False
+
+
 def ineligible_share_single_age(path: AgePath, year: int, age: int) -> Fraction:
     """Exact share of person-time at completed age ``age`` in calendar ``year`` below the eligibility age."""
     below = 0
@@ -421,7 +563,7 @@ def ineligible_share_single_age(path: AgePath, year: int, age: int) -> Fraction:
         for k in range(12):  # month of exact age inside the completed year
             b = 12 * (year - age) + m - k  # birth month index (months since year 0)
             by, bm = divmod(b, 12)
-            if 12 * age + k < path.age_months(by, bm + 1, year):
+            if not is_eligible(path, by, bm + 1, year, m + 1):
                 below += 1
     return Fraction(below, 144)
 
