@@ -153,7 +153,7 @@ def compile_run(
     Raises on unsupported requests; missing inputs are reported on the compiled object
     (or by ``ResolvedInputs.missing_problems()``), never raised away or zeroed.
     """
-    model = plugins.get(spec_json["model_key"])
+    model = plugins.get(spec_json["model_key"], spec_json.get("model_version"))
     if spec_json.get("model_version") != model.model_version:
         raise CapabilityGap(
             f"model {spec_json['model_key']}@{spec_json.get('model_version')} is not available "
@@ -275,7 +275,7 @@ def preflight_missing(conn: Connection, spec_json: dict[str, Any]) -> list[dict[
 
     from reva.simulation.datasets import dataset_schema_present
 
-    model = plugins.get(spec_json["model_key"])
+    model = plugins.get(spec_json["model_key"], spec_json.get("model_version"))
     release_id = UUID(str(spec_json["baseline_release_id"]))
     if is_all_countries(spec_json.get("countries")):
         sel = resolve_all_countries(conn, model, {"id": release_id}, spec_json)

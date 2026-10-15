@@ -47,10 +47,12 @@ def test_factbook_profiles_tables(registered):
         "atlas.factbook.texts_2026_01",
     }
     assert all(r["created"] for r in out["registered"])
+    ids = [r["dataset_id"] for r in out["registered"]]
     with db.owner.connect() as c:
         ds = c.execute(
             text("""SELECT dataset_key, origin, concept_id, artifact_sha256, cardinality(source_acquisition_ids) AS n
-                    FROM evidence.dataset WHERE dataset_key LIKE 'atlas.factbook.%_2026_01'""")
+                    FROM evidence.dataset WHERE id = ANY(:ids)"""),
+            {"ids": ids},
         ).all()
         acq = c.execute(
             text("""SELECT count(*) FROM evidence.acquisition a JOIN evidence.connector_version v
@@ -58,7 +60,7 @@ def test_factbook_profiles_tables(registered):
             {"n": fb.NAME_PROFILES},
         ).scalar_one()
     assert {d.concept_id for d in ds} == {"atlas.table"} and {d.origin for d in ds} == {"test_fixture"}
-    assert all(d.n == 10 for d in ds) and acq == 10
+    assert len(ds) == 3 and all(d.n == 10 for d in ds) and acq >= 10  # the law test may share this database
     sha = next(d.artifact_sha256 for d in ds if d.dataset_key.endswith("figures_2026_01"))
     f = read_atlas_table(db.store, sha)
     gl = f.filter((pl.col("iso3") == "GRL") & (pl.col("indicator") == "population.total")).to_dicts()

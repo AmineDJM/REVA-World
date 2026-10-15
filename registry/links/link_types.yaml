@@ -435,6 +435,33 @@ derived_links:
     status: awaiting_source
     path_cost: 1.5
 
+  # ---------------------------------------------------------------- polity territory (KGPOLITY, proposed)
+  - id: shared_polity_territory
+    labels: {fr: "territoires couverts par une même entité politique", en: "territories covered by the same polity"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_subject
+      properties: ["geo:covered_territory_of"]
+      sources: [cliopatria]
+      via: polity
+      notes: >-
+        Added by KGPOLITY (docs/dev/v3_kgpolity.md). Two present-day countries are the objects of
+        geo:covered_territory_of statements with the same subject (a Cliopatria polity) over overlapping periods
+        (e.g. Algeria and Tunisia, both partly within the Ottoman Empire's drawn borders). Each statement is a
+        DERIVED spatial overlay (reva.kg.overlay) of a Cliopatria polygon (approximate borders, CC BY 4.0) with
+        Natural Earth 1:10m Admin-0 (de facto view) and cites both raw artifacts and geometry digests; its
+        qualifiers carry the share of the country's area (no weight: computed by REVA, not a source quantity).
+        The statements are loaded (source key cliopatria.github); the derivation is not wired into
+        src/reva/links/derive.py yet (request to LINKS), so no link of this type is produced until then.
+        Polities with more than max_members covered countries should not be expanded pairwise (hub rule).
+    temporal: {kind: interval, description: "intersection of the two overlay statements' runs (first FromYear .. last ToYear, astronomical years)"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : territoires actuels en partie couverts par {via} (superposition calculée, frontières approximatives)", en: "connected via: present-day territories partly covered by {via} (computed overlay, approximate borders)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.5
+
 # Properties the path engine traverses as single hops. labels: subject -> object; inverse_labels: object ->
 # subject. causal: true only for properties whose statements are causal claims of the source.
 statement_edges:

@@ -73,10 +73,12 @@ __all__ = [
     "ScalarInput",
     "SimulationModel",
     "SubjectRef",
+    "VERSIONS",
     "get",
     "load_all",
     "register",
     "source_digest",
+    "versions_of",
 ]
 
 InputKind = Literal["scalar", "dataset"]
@@ -426,6 +428,12 @@ def source_digest(*paths: Path) -> str:
 
 # --------------------------------------------------------------------------- registry
 REGISTRY: dict[str, SimulationModel] = {}
+#: Every registered version per model key (V3 SIMWORLD). ``REGISTRY[key]`` stays the *default*
+#: version: the first one registered (e.g. ``demography.cohort_component@1.0.0``), so every
+#: consumer that looks a model up by key alone behaves exactly as before. Additional versions
+#: (``@1.1.0``) are reachable only by naming the version (``get(key, version)``): a spec that
+#: names ``model_version`` "1.0.0" always runs the 1.0.0 plugin.
+VERSIONS: dict[str, dict[str, SimulationModel]] = {}
 
 #: Modules imported by ``load_all()``; each calls ``register(...)`` at import time.
 #: A module that does not exist yet is skipped (its model is then simply unknown).
@@ -449,8 +457,10 @@ _REQUIRED_ATTRS = (
 
 
 def register(model: SimulationModel, *, replace: bool = False) -> SimulationModel:
-    """Register a plugin under its ``model_key``. Re-registering the same object is a no-op;
-    a different object for a taken key is an error unless ``replace=True`` (tests)."""
+    """Register a plugin under its ``model_key`` and ``model_version``. Re-registering the same
+    object is a no-op; a different object for a taken (key, version) is an error unless
+    ``replace=True`` (tests). The first version registered for a key is its default
+    (``REGISTRY[key]``); later versions are reachable with ``get(key, version)`` only."""
     missing = [a for a in _REQUIRED_ATTRS if not hasattr(model, a)]
     if missing:
         raise TypeError(f"{type(model).__name__} is not a SimulationModel (missing {missing})")
@@ -460,16 +470,31 @@ def register(model: SimulationModel, *, replace: bool = False) -> SimulationMode
     bad = set(model.fidelities) - {"L1", "L2", "L3", "L4"}
     if bad:
         raise ValueError(f"{key}: unknown fidelities {sorted(bad)} (L0 is the platform cache, never a model)")
-    prior = REGISTRY.get(key)
+    version = model.model_version
+    versions = VERSIONS.setdefault(key, {})
+    prior = versions.get(version)
     if prior is not None and prior is not model and not replace:
-        raise ValueError(f"model_key {key!r} is already registered by {type(prior).__name__}")
-    REGISTRY[key] = model
+        raise ValueError(f"model {key}@{version} is already registered by {type(prior).__name__}")
+    default = REGISTRY.get(key)
+    if default is not None and default is not model and default.model_version == version and not replace:
+        raise ValueError(f"model_key {key!r} is already registered by {type(default).__name__}")
+    versions[version] = model
+    if default is None or replace:  # another version of a registered key never displaces the default
+        REGISTRY[key] = model
     return model
 
 
 def unregister(model_key: str) -> None:
-    """Remove a plugin (tests only)."""
+    """Remove a plugin and all its versions (tests only)."""
     REGISTRY.pop(model_key, None)
+    VERSIONS.pop(model_key, None)
+
+
+def versions_of(model_key: str) -> dict[str, SimulationModel]:
+    """Registered versions of ``model_key`` (``{}`` when unknown); loads the known modules first."""
+    if model_key not in VERSIONS:
+        load_all()
+    return dict(VERSIONS.get(model_key, {}))
 
 
 def load_all() -> dict[str, SimulationModel]:
@@ -485,8 +510,9 @@ def load_all() -> dict[str, SimulationModel]:
     return REGISTRY
 
 
-def get(model_key: str) -> SimulationModel:
-    """The plugin for ``model_key`` or a ``CapabilityGap`` (never a fallback model)."""
+def get(model_key: str, model_version: str | None = None) -> SimulationModel:
+    """The plugin for ``model_key`` (its default version, or exactly ``model_version`` when
+    given) or a ``CapabilityGap`` (never a fallback model or a fallback version)."""
     if model_key not in REGISTRY:
         load_all()
     model = REGISTRY.get(model_key)
@@ -496,7 +522,16 @@ def get(model_key: str) -> SimulationModel:
             capability=f"model.{model_key}",
             available=sorted(REGISTRY),
         )
-    return model
+    if model_version is None or model_version == model.model_version:
+        return model
+    other = VERSIONS.get(model_key, {}).get(model_version)
+    if other is None:
+        raise CapabilityGap(
+            f"model {model_key}@{model_version} is not available",
+            capability=f"model.{model_key}",
+            available_versions=sorted(VERSIONS.get(model_key, {})),
+        )
+    return other
 
 
 def optional_hook(model: SimulationModel, name: str) -> Any:

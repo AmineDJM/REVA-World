@@ -38,6 +38,9 @@ consumed 19. Archived raw 641 MB + Parquet 145 MB = **787 MB** (budget 1.5 GB). 
   each table's `coverage_note` (WDI 1,539,985 cells; Gender 561,461; HNP 544,718; IDS 420,428; EdStats 287,957;
   Jobs 81,454). Kept with `iso3 = null` and listed: TWN (WGI, DB, PIP), ANT (WGI, dissolved), 22 Doing Business
   cities (CHN_BEI, USA_NY, …).
+* Crosswalk change after the live run: `country_crosswalk.json` 1.1.0 (251 entities) now has `TWN` (no WB
+  economy code). The parser picks it up through the `iso3` fallback (flag `geo_via: iso3`), so the next
+  ingest maps Taiwan (WGI, Doing Business, PIP) → 225 countries; the live numbers here were made with 1.0.0.
 * Flags: provider `footnote`, `series_year_note`, `period_after_vintage` (year later than the data file's
   own date: EdStats projections 2019–2100, IDS projected debt service to 2032), PIP survey descriptors.
 * Indicators: WB code; IDS folds `|counterpart=WLD`; PIP folds `|povline=…|level=…|welfare=…`.

@@ -11,3 +11,4 @@ sparql: |
 split: {by: values, source: countries, chunk_size: 250}
 max_rows: 300
 expand_hops: 1
+api_search: {source: countries}

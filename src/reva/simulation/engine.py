@@ -70,7 +70,7 @@ def model_manifest(conn: Connection, model_key: str | None = None, model_version
     precision, review status) is merged into the model entry.
     """
     key = model_key or DEFAULT_MODEL_KEY
-    plugin = plugins.get(key)
+    plugin = plugins.get(key, model_version)
     version = model_version or plugin.model_version
     if version != plugin.model_version:
         raise CapabilityGap(
@@ -141,9 +141,9 @@ def output_digest(rows: list[ResultRow]) -> str:
     )
 
 
-def _plugin_or_none(model_key: Any) -> plugins.SimulationModel | None:
+def _plugin_or_none(model_key: Any, model_version: Any = None) -> plugins.SimulationModel | None:
     try:
-        return plugins.get(str(model_key))
+        return plugins.get(str(model_key), None if model_version is None else str(model_version))
     except CapabilityGap:
         return None
 
@@ -187,7 +187,7 @@ def plan_run(
         cache_key=cache_key(spec_json),
     )
     model_key = spec_json.get("model_key", DEFAULT_MODEL_KEY)
-    model = _plugin_or_none(model_key)
+    model = _plugin_or_none(model_key, spec_json.get("model_version"))
     model_id = (
         f"{model.model_key}@{model.model_version}"
         if model is not None
@@ -205,7 +205,7 @@ def plan_run(
             raise CapabilityGap(f"unknown fidelity {fidelity!r}", capability="fidelity")
         spec = validate_scenario_spec({**spec_json, "fidelity": fidelity})
         if model is None:
-            model = plugins.get(str(model_key))  # raises the structured CapabilityGap
+            model = plugins.get(str(model_key), spec_json.get("model_version"))  # structured CapabilityGap
         if fidelity == "L0":
             _lookup(conn, plan, manifest, model)
         else:

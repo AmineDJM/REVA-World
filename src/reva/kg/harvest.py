@@ -626,7 +626,10 @@ def _first_value(b: Mapping[str, Any], var: str | None) -> Mapping[str, str] | N
 class Harvester:
     def __init__(self, client: WikidataClient, sink: Sink, *, allow: AllowList | None = None,
                  state_dir: Path = STATE_DIR, entity_batch: int = 50,
-                 qids_for_source: Callable[[str], list[str]] | None = None) -> None:
+                 qids_for_source: Callable[[str], list[str]] | None = None, via: str = "wdqs",
+                 expand: bool = True) -> None:
+        self.via = via
+        self.expand = expand
         self.client = client
         self.sink = sink
         self.allow = allow or load_allowlist()
@@ -687,7 +690,14 @@ class Harvester:
             state.reset_for(spec.sha256)
             state.data["status"] = "running"
             state.save()
-        chunks = render_chunks(spec, state_dir=self.state_dir, qids_for_source=self.qids_for_source)
+        if self.via == "api" and not trying:
+            if spec.data["purpose"] != "seed_entities" or not spec.get("api_search"):
+                rep.status = "skipped"
+                rep.failures.append({"code": "no_api_search", "error": "spec has no api_search block (WDQS only)"})
+                return
+            chunks = []
+        else:
+            chunks = render_chunks(spec, state_dir=self.state_dir, qids_for_source=self.qids_for_source)
         if trying:
             chunks = chunks[:1]
         rep.chunks_total = len(chunks)
@@ -743,6 +753,21 @@ class Harvester:
                 state.data["subjects"] = list(subjects)
                 state.data["objects"] = list(objects)
                 state.save()
+        if self.via == "api" and not trying and state is not None and not state.data["chunks"].get("api"):
+            found, info = await self.api_seeds(spec)
+            rows_total += len(found)
+            rep.rows += len(found)
+            if rows_total > max_rows:
+                raise RowBoundExceeded(f"{spec.id}: {rows_total} search results > max_rows {max_rows}",
+                                       rows=rows_total, max_rows=max_rows)
+            for q in found:
+                seeds.setdefault(q)
+            if info.get("window_exceeded"):
+                rep.failures.append({"code": "search_window_exceeded", "queries": info["window_exceeded"]})
+            state.data["chunks"]["api"] = info
+            state.data["rows"] = rows_total
+            state.data["seeds"] = list(seeds)
+            state.save()
         rep.seeds = len(seeds)
         if trying:
             rep.status = "tried"
@@ -757,7 +782,7 @@ class Harvester:
             known = self.sink.known_entities(list(subjects))
             await self.fetch_entities(spec, [s for s in subjects if s not in known], state, rep, full=False,
                                       kind=spec.get("entity_kind") or LABEL_KIND)
-        if int(spec.get("expand_hops", 0)) >= 1:
+        if int(spec.get("expand_hops", 0)) >= 1 and self.expand:
             already = set(seeds) | set(subjects)
             todo = [o for o in objects if o not in already]
             known = self.sink.known_entities(todo)
@@ -768,6 +793,40 @@ class Harvester:
         state.data["report"] = rep.as_dict()
         state.save()
         rep.status = "done"
+
+    # -- WDQS-free seeds (CirrusSearch) ---------------------------------------------------------------
+    async def api_seeds(self, spec: Spec) -> tuple[list[str], dict[str, Any]]:
+        a = spec.data["api_search"]
+        if a.get("source") == "countries":
+            qs = self.qids_for_source("countries") if self.qids_for_source else country_qids()
+            return qs, {"method": "countries"}
+        classes = list(dict.fromkeys(a["instance_of"]))
+        frontier = list(classes)
+        shas: list[str] = []
+        info: dict[str, Any] = {"method": "cirrussearch", "instance_of": classes,
+                                "subclass_depth": int(a.get("subclass_depth", 0)), "window_exceeded": []}
+        for _depth in range(int(a.get("subclass_depth", 0))):
+            new: list[str] = []
+            for q in or_groups("haswbstatement:", [f"P279={c}" for c in frontier]):
+                hits, total, sh = await self.client.search_all(q, meta={"spec": spec.id, "step": "subclasses"})
+                shas.extend(sh)
+                if total > len(hits):
+                    info["window_exceeded"].append(q[:200])
+                new.extend(h for h in hits if h not in classes and h not in new)
+            classes.extend(new)
+            frontier = new
+            if not frontier:
+                break
+        seeds: list[str] = []
+        extra = f" {a['extra']}" if a.get("extra") else ""
+        for q in or_groups("haswbstatement:", [f"P31={c}" for c in classes], extra):
+            hits, total, sh = await self.client.search_all(q, meta={"spec": spec.id, "step": "instances"})
+            shas.extend(sh)
+            if total > len(hits):
+                info["window_exceeded"].append(q[:200])
+            seeds.extend(hits)
+        info.update({"classes": len(classes), "raw_sha256": shas})
+        return list(dict.fromkeys(seeds)), info
 
     # -- entities ---------------------------------------------------------------------------------
     async def fetch_entities(self, spec: Spec, qids: Sequence[str], state: HarvestState, rep: SpecReport, *,
@@ -1035,7 +1094,8 @@ async def budgeted_client(*, purpose: str, db_name: str = DEFAULT_DB, planned_wd
 
 
 async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB, force: bool = False,
-                      planned_wdqs: int = 50, planned_wbapi: int = 100) -> dict[str, Any]:
+                      planned_wdqs: int = 50, planned_wbapi: int = 100, via: str = "wdqs",
+                      expand: bool = True) -> dict[str, Any]:
     """Run specs into the throwaway database through :func:`budgeted_client`."""
     allow = load_allowlist()
     specs = discover_specs(paths or None)
@@ -1063,7 +1123,9 @@ async def run_into_db(paths: Sequence[Path] | None, *, db_name: str = DEFAULT_DB
 
         try:
             out["properties"] = sink.register_properties(allow)
-            await run_specs(Harvester(client, sink, allow=allow), specs, force=force, on_report=save)
+            out["via"], out["expand"] = via, expand
+            await run_specs(Harvester(client, sink, allow=allow, via=via, expand=expand), specs, force=force,
+                            on_report=save)
         finally:
             out["client"] = client.stats.as_dict()
             out["load_totals"] = dict(sink.totals)
@@ -1192,60 +1254,93 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
     return stats
 
 
+SEARCH_MAX_CHARS = 290  # CirrusSearch rejects queries longer than 300 characters
+
+
+def or_groups(prefix: str, terms: Sequence[str], suffix: str = "") -> list[str]:
+    """Pack ``prefix + 't1|t2|...' + suffix`` search queries under the CirrusSearch length limit."""
+    out: list[str] = []
+    cur: list[str] = []
+    for t in terms:
+        if cur and len(prefix) + len("|".join([*cur, t])) + len(suffix) > SEARCH_MAX_CHARS:
+            out.append(prefix + "|".join(cur) + suffix)
+            cur = []
+        cur.append(t)
+    if cur:
+        out.append(prefix + "|".join(cur) + suffix)
+    return out
+
+
 async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS,
-                               manual_titles: Mapping[str, str] | None = None) -> dict[str, Any]:
+                               manual_titles: Mapping[str, str] | None = None,
+                               extra_codes: Sequence[str] = ("TWN",)) -> dict[str, Any]:
     """Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).
 
-    Method ``P298_search``: CirrusSearch ``haswbstatement:P298=<alpha-3> -haswbstatement:P576`` (items holding
-    the ISO 3166-1 alpha-3 code that have no dissolution date). One hit -> mapped. Several hits -> their claims
-    are read with wbgetentities: candidates whose P298 statement for that code has an end time (P582) or is
-    deprecated are dropped; if one remains it is mapped, otherwise the code is left unmapped with its
-    candidates. Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title.
-    The search index lags edits by minutes; every mapped item is re-checked for the P298 code when its full
-    snapshot is fetched (core.countries).
+    Method ``P298``: CirrusSearch ``haswbstatement:P298=<a>|P298=<b>|...`` (OR groups under the 300-character
+    query limit) gives every item holding one of the ISO 3166-1 alpha-3 codes; their snapshots are read with
+    wbgetentities (props info|claims|labels) and each code is assigned from the items' own P298 statements:
+    non-deprecated, without end time (P582), on items without dissolution date (P576). Several candidates ->
+    the one classed as a country/sovereign state/territory (P31); still several -> left unmapped (listed).
+    Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title. ``extra_codes`` (TWN)
+    are mapped even when the crosswalk does not list them yet (flagged ``not_in_crosswalk``).
     """
     cw = json.loads(CROSSWALK.read_text())
     ents = {e["key"]: e for e in cw["entities"]}
+    codes = sorted({k for k, e in ents.items() if e.get("iso3")} | set(extra_codes))
+    raws: list[str] = []
+    cands: list[str] = []
+    for q in or_groups("haswbstatement:", [f"P298={c}" for c in codes]):
+        hits, _total, shas = await client.search_all(q, meta={"purpose": "country_qids"})
+        raws.extend(shas)
+        cands.extend(hits)
+    cands = sorted(set(cands), key=lambda q: int(q[1:]))
+    res = await client.get_entities(cands, props=("info", "claims", "labels"), languages=("en", "fr"),
+                                    meta={"purpose": "country_qids"})
+    raws.extend(res.raw_sha256s)
+    by_code: dict[str, list[str]] = {}
+    info: dict[str, dict[str, Any]] = {}
+    for qid, ent in res.entities.items():
+        claims = ent.get("claims") or {}
+        dissolved = any(c.get("rank") != "deprecated" for c in claims.get("P576", []))
+        classes = {((c.get("mainsnak") or {}).get("datavalue") or {}).get("value", {}).get("id")
+                   for c in claims.get("P31", []) if c.get("rank") != "deprecated"}
+        info[qid] = {"classes": sorted(x for x in classes & set(COUNTRY_CLASSES)), "lastrevid": ent.get("lastrevid"),
+                     "label_en": (ent.get("labels") or {}).get("en", {}).get("value"),
+                     "label_fr": (ent.get("labels") or {}).get("fr", {}).get("value"),
+                     "raw_sha256": res.raw_sha_by_id.get(qid)}
+        if dissolved:
+            continue
+        for c in claims.get("P298", []):
+            v = ((c.get("mainsnak") or {}).get("datavalue") or {}).get("value")
+            if isinstance(v, str) and c.get("rank") != "deprecated" and not (c.get("qualifiers") or {}).get("P582"):
+                by_code.setdefault(v, []).append(qid)
     countries: dict[str, Any] = {}
     ambiguous: dict[str, list[str]] = {}
     unmapped: list[str] = []
-    raws: list[str] = []
-    for code in sorted(ents):
-        if not ents[code].get("iso3"):
-            unmapped.append(code)
-            continue
-        hits, sha = await client.search_items(f"haswbstatement:P298={code} -haswbstatement:P576", limit=10,
-                                              meta={"purpose": "country_qids", "code": code})
-        raws.append(sha)
-        if len(hits) == 1:
-            countries[code] = {"qid": hits[0], "method": "P298_search", "crosswalk_label": ents[code]["label"],
-                               "raw_sha256": sha}
-        elif hits:
-            ambiguous[code] = hits
+    for code in codes:
+        opts = sorted(set(by_code.get(code, [])), key=lambda q: int(q[1:]))
+        pick, note = None, None
+        if len(opts) == 1:
+            pick = opts[0]
+        elif len(opts) > 1:
+            classed = [q for q in opts if info[q]["classes"]]
+            if len(classed) == 1:
+                pick, note = classed[0], "several items hold the code; kept the one classed as a country/territory"
+            else:
+                ambiguous[code] = opts
+        if pick:
+            countries[code] = {"qid": pick, "method": "P298", **{k: info[pick][k] for k in
+                               ("label_en", "label_fr", "classes", "lastrevid", "raw_sha256")},
+                               "crosswalk_label": (ents.get(code) or {}).get("label")}
+            if note:
+                countries[code].update(note=note, other_candidates=[q for q in opts if q != pick])
+            if code not in ents:
+                countries[code]["not_in_crosswalk"] = True
         else:
             unmapped.append(code)
-    if ambiguous:
-        allq = sorted({q for v in ambiguous.values() for q in v}, key=lambda q: int(q[1:]))
-        res = await client.get_entities(allq, props=("info", "claims"), languages=("en",),
-                                        meta={"purpose": "country_qids_disambiguation"})
-        raws.extend(res.raw_sha256s)
-        for code, cands in ambiguous.items():
-            keep = []
-            for q in cands:
-                claims = (res.entities.get(q) or {}).get("claims") or {}
-                for c in claims.get("P298", []):
-                    v = ((c.get("mainsnak") or {}).get("datavalue") or {}).get("value")
-                    if v == code and c.get("rank") != "deprecated" and not (c.get("qualifiers") or {}).get("P582"):
-                        keep.append(q)
-                        break
-            if len(keep) == 1:
-                countries[code] = {"qid": keep[0], "method": "P298_search", "crosswalk_label": ents[code]["label"],
-                                   "note": "several items hold the code; the others' P298 statement has an end time "
-                                           "or is deprecated", "other_candidates": [q for q in cands if q != keep[0]]}
-            else:
-                unmapped.append(code)
-                countries.setdefault("_ambiguous", {})[code] = cands
-    amb = countries.pop("_ambiguous", {})
+    for code in sorted(ents):
+        if code not in codes:
+            unmapped.append(code)
     for code, title in (manual_titles or {}).items():
         if code not in unmapped:
             continue
@@ -1253,21 +1348,16 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
         result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
                                             meta={"kind": "wbgetentities_sitelink", "title": title})
         raws.append(sha)
-        found = [q for q, e in (json.loads(result.body).get("entities") or {}).items()
-                 if q.startswith("Q") and "missing" not in e]
+        doc = json.loads(result.body)
+        found = [(q, e) for q, e in (doc.get("entities") or {}).items() if q.startswith("Q") and "missing" not in e]
         if len(found) == 1:
-            countries[code] = {"qid": found[0], "method": "enwiki_sitelink", "enwiki_title": title,
-                               "crosswalk_label": ents[code]["label"], "raw_sha256": sha}
+            q, e = found[0]
+            countries[code] = {"qid": q, "method": "enwiki_sitelink", "enwiki_title": title,
+                               "label_en": (e.get("labels") or {}).get("en", {}).get("value"),
+                               "label_fr": (e.get("labels") or {}).get("fr", {}).get("value"),
+                               "lastrevid": e.get("lastrevid"), "raw_sha256": sha,
+                               "crosswalk_label": (ents.get(code) or {}).get("label")}
             unmapped.remove(code)
-    lab = await client.get_entities([v["qid"] for v in countries.values()], props=("info", "labels"),
-                                    languages=("en", "fr"), meta={"purpose": "country_qids_labels"})
-    raws.extend(lab.raw_sha256s)
-    for v in countries.values():
-        e = lab.entities.get(lab.redirects.get(v["qid"], v["qid"])) or {}
-        v["qid"] = lab.redirects.get(v["qid"], v["qid"])
-        v["label_en"] = (e.get("labels") or {}).get("en", {}).get("value")
-        v["label_fr"] = (e.get("labels") or {}).get("fr", {}).get("value")
-        v["lastrevid"] = e.get("lastrevid")
     dup: dict[str, list[str]] = {}
     for code, v in countries.items():
         dup.setdefault(v["qid"], []).append(code)
@@ -1278,15 +1368,16 @@ async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNT
         "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
         "method": (map_countries_search.__doc__ or "").strip(),
         "sources": {"endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
-                    "retrieved_at": lab.retrieved_at.isoformat(), "raw_sha256": raws},
+                    "retrieved_at": res.retrieved_at.isoformat(), "raw_sha256": raws},
         "crosswalk_sha256": hashlib.sha256(CROSSWALK.read_bytes()).hexdigest(),
-        "stats": {"crosswalk_entities": len(ents), "mapped": len(countries), "unmapped": len(unmapped),
+        "stats": {"crosswalk_entities": len(ents), "mapped": len(countries),
+                  "mapped_crosswalk": sum(1 for c in countries if c in ents), "unmapped": len(unmapped),
                   "by_method": {m: sum(1 for v in countries.values() if v["method"] == m)
                                 for m in sorted({v["method"] for v in countries.values()})},
                   "distinct_qids": len(dup), "shared_qids": {q: c for q, c in dup.items() if len(c) > 1}},
         "countries": dict(sorted(countries.items())),
         "unmapped": sorted(unmapped),
-        "ambiguous": amb,
+        "ambiguous": ambiguous,
     }
     out_path.write_text(json.dumps(doc_out, indent=1, ensure_ascii=False) + "\n")
     stats: dict[str, Any] = doc_out["stats"]
@@ -1433,6 +1524,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     r.add_argument("--force", action="store_true", help="re-run specs already completed with the same sha256")
     r.add_argument("--planned-wdqs", type=int, default=50)
     r.add_argument("--planned-wbapi", type=int, default=100)
+    r.add_argument("--via", choices=("wdqs", "api"), default="wdqs",
+                   help="api: select seeds with the specs' api_search blocks (CirrusSearch) instead of WDQS")
+    r.add_argument("--no-expand", action="store_true", help="skip label snapshots of object entities")
     args = ap.parse_args(argv)
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(name)s %(levelname)s %(message)s")
     allow = load_allowlist()
@@ -1489,7 +1583,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         try:
             run_out = asyncio.run(run_into_db(args.paths or None, db_name=args.db, force=args.force,
                                               planned_wdqs=args.planned_wdqs,
-                                              planned_wbapi=args.planned_wbapi))
+                                              planned_wbapi=args.planned_wbapi, via=args.via,
+                                              expand=not args.no_expand))
         except BudgetExhausted as e:
             _print({"status": "budget_exhausted", "message": e.message, **e.details})
             return 3
@@ -1501,7 +1596,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if all(r["status"] in ("done", "skipped") for r in spec_reports) else 1
     if args.cmd == "map-countries":
         async def mapc() -> int:
-            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=270) as sess:
+            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=30) as sess:
                 if args.via_wdqs:
                     _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
                 else:

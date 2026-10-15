@@ -187,6 +187,7 @@ def atlas_source() -> Any:
         planned_requests=len(fetch_items()),
         max_response_bytes=max(d.max_bytes for d in DATABASES),
         min_interval_seconds=1.0,
+        budget_key=SOURCE_KEY,
         parser_version=PARSER_VERSION,
         code_digest=_code_digest(),
         field_mappings={
@@ -604,7 +605,8 @@ def parse_bulk(db: BulkDatabase, body: bytes, raw_sha256: str) -> ParsedDatabase
     split_of: dict[str, str] = {}
     for c in units:
         if db.split:
-            topic = (series.get(c).topic if series.get(c) else "").split(":")[0].strip()
+            sm = series.get(c)
+            topic = (sm.topic if sm else "").split(":")[0].strip()
             split_of[c] = db.split.get(topic, WDI_OTHER)
         else:
             split_of[c] = db.key
@@ -651,7 +653,7 @@ def parse_bulk(db: BulkDatabase, body: bytes, raw_sha256: str) -> ParsedDatabase
     start = pl.date(pl.col("year"), 1, 1)
     end = pl.date(pl.col("year") + 1, 1, 1)
     unit_map = {c: u for c, (u, _) in units.items()}
-    out = lz.select(
+    out_lz = lz.select(
         pl.lit(SOURCE).alias("source"),
         pl.col("code").replace_strict(split_of, return_dtype=pl.String).alias("dataset"),
         indicator.alias("indicator"),
@@ -669,13 +671,13 @@ def parse_bulk(db: BulkDatabase, body: bytes, raw_sha256: str) -> ParsedDatabase
         pl.concat_str(sel_parts).alias("selector"),
     )
     # concept_id hints must match the catalog id pattern; codes that do not are left without a hint.
-    out = out.with_columns(
+    out_lz = out_lz.with_columns(
         pl.when(pl.col("concept_id").str.contains(r"^[a-z0-9][a-z0-9_.-]{0,199}$"))
         .then(pl.col("concept_id"))
         .otherwise(None)
         .alias("concept_id")
     ).select(list(ATLAS_COLUMNS))
-    out = out.collect(engine="streaming")
+    out = out_lz.collect(engine="streaming")
     del lz, fn, st
 
     excluded = {g: int(n) for g, n in agg_cells}
@@ -976,7 +978,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             "retrieved_at": raw.retrieved_at.isoformat(),
             "last_modified": raw.response_metadata.get("last-modified"),
         }
-        return sha
+        return str(sha)
 
     def register(p: ParsedDatabase, raw_shas: list[str]) -> None:
         for t in p.tables:

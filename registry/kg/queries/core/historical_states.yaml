@@ -12,3 +12,5 @@ sparql: |
 max_rows: 25000
 depends_on: [core.sovereign_states, history.empires, history.colonies]
 expand_hops: 1
+# WDQS-free selection (run --via api): instances of historical country or of its subclasses up to 3 levels.
+api_search: {instance_of: [Q3024240], subclass_depth: 3}

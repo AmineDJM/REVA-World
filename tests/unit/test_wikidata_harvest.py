@@ -458,3 +458,76 @@ def test_harvest_refuses_the_dev_database() -> None:
     for name in ("reva", "postgres", "other"):
         with pytest.raises(hv.SpecError):
             hv.harvest_settings(name)
+
+
+# --------------------------------------------------------------------------- WDQS-free (API) paths
+def test_or_groups_respect_the_cirrussearch_length_limit() -> None:
+    terms = [f"P298={c}" for c in ("FRA", "DEU", "ESP") * 40]
+    groups = hv.or_groups("haswbstatement:", terms, " -haswbstatement:P576")
+    assert all(len(g) <= 300 for g in groups) and len(groups) > 1
+    assert sum(g.count("P298=") for g in groups) == len(terms)
+    assert all(g.endswith(" -haswbstatement:P576") for g in groups)
+
+
+def _search_router(pages: dict[str, list[str]], entities: dict[str, dict[str, Any]]) -> Any:
+    from urllib.parse import parse_qs, urlsplit
+
+    def route(url: str) -> tuple[int, bytes, dict[str, str]]:
+        q = parse_qs(urlsplit(url).query)
+        if q.get("list") == ["search"]:
+            hits = pages.get(q["srsearch"][0], [])
+            off, lim = int(q["sroffset"][0]), int(q["srlimit"][0])
+            page = [{"title": h} for h in hits[off:off + lim]]
+            return 200, json.dumps({"query": {"searchinfo": {"totalhits": len(hits)}, "search": page}}).encode(), {}
+        ids = q["ids"][0].split("|")
+        return 200, json.dumps({"entities": {i: entities[i] for i in ids}}).encode(), {}
+
+    return route
+
+
+async def test_api_seeds_follow_subclasses_and_page(tmp_path: Path) -> None:
+    pages = {
+        "haswbstatement:P279=Q3024240": ["Q100"],
+        "haswbstatement:P279=Q100": [],
+        "haswbstatement:P31=Q3024240|P31=Q100": [f"Q{1000 + i}" for i in range(700)],  # 2 pages
+    }
+    http = ScriptedHttp(router=_search_router(pages, {}))
+    h = hv.Harvester(client_for(http, tmp_path), hv.NullSink(), state_dir=tmp_path / "state", via="api")
+    spec = _spec(tmp_path, {**BASE, "max_rows": 1000,
+                            "api_search": {"instance_of": ["Q3024240"], "subclass_depth": 2}})
+    seeds, info = await h.api_seeds(spec)
+    assert len(seeds) == 700 and info["classes"] == 2 and not info["window_exceeded"]
+    offsets = [u.split("sroffset=")[1].split("&")[0] for u, _ in http.calls if "P31%3D" in u]
+    assert offsets == ["0", "500"]
+
+
+async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    cw = tmp_path / "cw.json"
+    cw.write_text(json.dumps({"entities": [{"key": "FRA", "iso3": "FRA", "label": "France"},
+                                           {"key": "SRB", "iso3": "SRB", "label": "Serbia"}]}))
+    monkeypatch.setattr(hv, "CROSSWALK", cw)
+
+    def p298(code: str, *, ended: bool = False) -> dict[str, Any]:
+        c: dict[str, Any] = {"rank": "normal", "mainsnak": snak("P298", code, "external-id")}
+        if ended:
+            c["qualifiers"] = {"P582": [snak("P582", {"time": "+2006-06-05T00:00:00Z", "precision": 11}, "time")]}
+        return c
+
+    ents = {
+        "Q142": {"id": "Q142", "lastrevid": 1, "labels": {"fr": {"value": "France"}},
+                 "claims": {"P298": [p298("FRA")], "P31": [{"rank": "normal", "mainsnak": snak("P31", "Q3624078")}]}},
+        "Q403": {"id": "Q403", "lastrevid": 2, "claims": {"P298": [p298("SRB")]}},
+        "Q37024": {"id": "Q37024", "lastrevid": 3,  # Serbia and Montenegro: dissolved
+                   "claims": {"P298": [p298("SRB", ended=True)], "P576": [{"rank": "normal", "mainsnak": snak(
+                       "P576", {"time": "+2006-06-05T00:00:00Z", "precision": 11}, "time")}]}},
+        "Q865": {"id": "Q865", "lastrevid": 4, "claims": {"P298": [p298("TWN")]}},
+    }
+    pages = {"haswbstatement:P298=FRA|P298=SRB|P298=TWN": ["Q142", "Q403", "Q37024", "Q865"]}
+    http = ScriptedHttp(router=_search_router(pages, ents))
+    out = tmp_path / "country_qids.json"
+    stats = await hv.map_countries_search(client_for(http, tmp_path), out_path=out)
+    doc = json.loads(out.read_text())
+    assert doc["countries"]["FRA"]["qid"] == "Q142" and doc["countries"]["FRA"]["lastrevid"] == 1
+    assert doc["countries"]["SRB"]["qid"] == "Q403"  # the dissolved holder is excluded
+    assert doc["countries"]["TWN"]["not_in_crosswalk"] is True
+    assert stats["mapped_crosswalk"] == 2 and doc["unmapped"] == []

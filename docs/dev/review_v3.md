@@ -33,7 +33,7 @@ test_atlas_api, test_atlas_ingest, test_links_db, test_nlqa_api` + `tests/review
 | PROV-1 | medium | WDHARVEST | `harvest.py:864-865` | code |
 | LINKS-1 | medium | LINKS | `src/reva/links/paths.py:479`, `:762`; `service.py:78`, `:110` | `test_review_v3_links.py` |
 | SEC-1 | medium | KGCORE / LINKS / NLQA | `kg/query.py:599-621`, `api/routes/kg.py:372`; `links/paths.py:728-762`, `:540`; `nlqa/executor.py:482-493` | code + bounds arithmetic |
-| ATLAS-4 | medium | A-IMF / ATLASCORE | `adapters/connectors/atlas_imf.py:527-541`, `:633`, `:660` | fixture cell IND NGDPD 2024 |
+| ATLAS-4 | medium | A-IMF / ATLASCORE | `adapters/connectors/atlas_imf.py:547-548`, `:626` | fixture cell IND NGDPD 2024 |
 | ATLAS-5 | low | ATLASOPS | `api/routes/atlas.py:30`, `:398-400`; `atlas/snapshot.py` `LATEST_SQL` | code |
 | ATLAS-6 | low (in flight) | ATLASOPS | `query.py:640`, `:713-732` | code |
 | KG-3 | low | KGCORE | `api/routes/kg.py:232-239`; `kg/query.py:344`, `:520` | code |
@@ -172,7 +172,7 @@ wall-clock budget (checked between levels/segments) and a per-actor concurrency 
 and cap `ALL` answers to one year (latest non-projection) with a count.
 
 **ATLAS-4 — fiscal-year cells are stored as calendar years.** `parse_weo` writes `period_start = YYYY-01-01,
-period_end = YYYY+1-01-01` for every WEO label (`atlas_imf.py:527-541`), also for fiscal-year economies; the
+period_end = YYYY+1-01-01` for every WEO label (`atlas_imf.py:547-548`; months read at `:626`), also for fiscal-year economies; the
 real window only survives in `flags.reporting_year` (fixture: IND NGDPD 2024 = 3,759,774,349,000 USD flagged
 `"reporting_year":"April/March"`, i.e. FY2024/25). Best-available, maps and `/v1/ask` (`period_label`) present
 it as calendar 2024, and a lower-ranked calendar-year source for the same concept would be treated as the same

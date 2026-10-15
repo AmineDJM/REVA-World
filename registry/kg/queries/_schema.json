@@ -272,6 +272,38 @@
     },
     "notes": {
       "type": "string"
+    },
+    "api_search": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Optional WDQS-free way to select the seeds of a seed_entities spec, used by `run --via api` (when WDQS is throttled). CirrusSearch on www.wikidata.org: `haswbstatement:P31=<class>` for each class in instance_of (plus subclasses found by following haswbstatement:P279 for subclass_depth levels), or the crosswalk countries. Semantics differ slightly from SPARQL wdt: (search indexes every non-deprecated statement, not only best-rank ones; index lags edits by minutes; at most 10,000 results per query).",
+      "properties": {
+        "source": {
+          "enum": [
+            "countries"
+          ],
+          "description": "Seeds are the crosswalk countries (registry/entities/country_qids.json)."
+        },
+        "instance_of": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^Q[1-9][0-9]*$"
+          },
+          "minItems": 1
+        },
+        "subclass_depth": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 6,
+          "default": 0
+        },
+        "extra": {
+          "type": "string",
+          "maxLength": 300,
+          "description": "Extra CirrusSearch terms ANDed to each instance query, e.g. '-haswbstatement:P576'."
+        }
+      }
     }
   },
   "allOf": [
