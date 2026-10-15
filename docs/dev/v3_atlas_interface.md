@@ -56,8 +56,8 @@ summary = register_atlas_table(
   types, nulls in required columns, `source`/`dataset` mismatch, non-strict decimals, value-less rows
   without `flags.missing`, `period_start >= period_end`, invalid JSON flags/selector, duplicate cells,
   `raw_sha256` not in `raw_sha256s`, `iso3` that is not a crosswalk key or disagrees with `geo_scheme`.
-* Unmapped provider geographies (aggregates, regions, historical areas, Taiwan — not in the ALLC
-  crosswalk) are **kept** with `iso3 = null` and listed in the manifest `coverage.unmapped_provider_geo`.
+* Unmapped provider geographies (aggregates, regions, historical areas; Taiwan only for tables
+  registered before crosswalk 1.1.0, which added `TWN`) are **kept** with `iso3 = null` and listed in the manifest `coverage.unmapped_provider_geo`.
 * Idempotent: identical content → `created: False`. Changed content (new vintage) → a new version
   of `atlas.<source>.<dataset>`; the atlas snapshot uses the latest version recorded at its cutoff.
 * Stored as content-addressed Parquet (zstd) + JSON manifest via

@@ -232,7 +232,9 @@ class XlsxStream:
         if part not in self._names:
             return []
         root = _xml(self._read(part), part)
-        return ["".join(t.text or "" for t in si.iter() if _local(t.tag) == "t") for si in root if _local(si.tag) == "si"]
+        return [
+            "".join(t.text or "" for t in si.iter() if _local(t.tag) == "t") for si in root if _local(si.tag) == "si"
+        ]
 
     def _sheet_targets(self) -> dict[str, str]:
         wb = _xml(self._read("xl/workbook.xml"), "xl/workbook.xml")

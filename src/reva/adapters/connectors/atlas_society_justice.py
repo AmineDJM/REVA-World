@@ -13,8 +13,7 @@ Sources
   derived ``Flag_change``, ``Direction_change`` and ``Break_time`` and the COW codes are kept in flags.
   Units are keyed by CDPD's own (upper-case) names, mapped through scheme ``soc_cdpd``
   (``registry/atlas/geo_aliases/a_society.yaml``); predecessor units (GERMANY EAST/WEST, USSR, YUGOSLAVIA,
-  CZECHOSLOVAKIA, KOREA 1800-1909, VIETNAM NORTH/SOUTH, the two Yemens) stay unmapped; Taiwan is not a
-  crosswalk entity.
+  CZECHOSLOVAKIA, KOREA 1800-1909, VIETNAM NORTH/SOUTH, the two Yemens) stay unmapped.
 * **WHO homicide estimates** -- WHO Global Health Observatory indicators ``VIOLENCE_HOMICIDERATE``
   ("Estimates of rates of homicides per 100 000 population") and ``VIOLENCE_HOMICIDENUM`` ("Estimates of
   number of homicides"), WHO Global Health Estimates, 2000-2021, by sex, with uncertainty intervals.
@@ -245,7 +244,10 @@ def who_frame(bodies: dict[str, bytes], shas: dict[str, str]) -> tuple[Any, dict
             r["flags"] = canon(f)
         counts[ind.code] = len(recs)
         parts.append(pl.DataFrame(recs, schema=ATLAS_SCHEMA))
-    return pl.concat(parts, how="vertical"), {"rows": counts, "indicator_names": {i.code: names[i.code] for i in who_indicators()}}
+    return pl.concat(parts, how="vertical"), {
+        "rows": counts,
+        "indicator_names": {i.code: names[i.code] for i in who_indicators()},
+    }
 
 
 # ----------------------------------------------------------------------------- specs + ingest
@@ -255,6 +257,7 @@ def _spec(which: str) -> AtlasSourceSpec:
             name=CDPD_CONNECTOR,
             version=CDPD_VERSION,
             source_key=CDPD_SOURCE_KEY,
+            budget_key=CDPD_SOURCE_KEY,
             atlas_source="cdpd",
             provider="Comparative Death Penalty Database, Anckar & Denk (Harvard Dataverse)",
             licence="CC0-1.0",
@@ -308,7 +311,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             got.bodies["cdpd.record"], doi=CDPD_DOI, files={CDPD_FILE_ID: (CDPD_FILE, got.bodies["cdpd.data"])},
             licences=("CC0 1.0",),
         )  # fmt: skip
-        frame, rep = parse_cdpd(got.bodies["cdpd.data"], raw_sha256=got.shas["cdpd.data"], min_rows=CDPD_MIN_ROWS if live else 1)
+        frame, rep = parse_cdpd(
+            got.bodies["cdpd.data"], raw_sha256=got.shas["cdpd.data"], min_rows=CDPD_MIN_ROWS if live else 1
+        )
         note = (
             "CDPD v1 (June 2024), death penalty status on 31 December, 1800-2022, 0-4 codebook codes with labels; "
             "units keyed by CDPD name (predecessor states unmapped). CC0."

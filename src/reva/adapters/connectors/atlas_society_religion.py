@@ -285,7 +285,12 @@ def check_osf(node: bytes, files: bytes, payloads: dict[str, bytes]) -> dict[str
             "modified": a.get("date_modified"),
             "download": (f.get("links") or {}).get("download"),
         }
-    out = {"node": OSF_NODE, "title": attrs.get("title"), "node_license": None, "date_modified": attrs.get("date_modified")}
+    out = {
+        "node": OSF_NODE,
+        "title": attrs.get("title"),
+        "node_license": None,
+        "date_modified": attrs.get("date_modified"),
+    }
     for name, payload in payloads.items():
         rec = by_name.get(name)
         if rec is None:
@@ -407,8 +412,8 @@ WRP_RIGHTS: dict[str, Any] = {
     "licence_status": "free_with_citation_no_charging",
     "open_licence": False,
     "licence_url": "https://correlatesofwar.org/faq/",
-    "attribution": "Zeev Maoz and Errol A. Henderson, 2013, \"The World Religion Dataset, 1945-2010: Logic, "
-    "Estimates, and Trends,\" International Interactions 39: 265-291. World Religion Project national data v1.1, "
+    "attribution": 'Zeev Maoz and Errol A. Henderson, 2013, "The World Religion Dataset, 1945-2010: Logic, '
+    'Estimates, and Trends," International Interactions 39: 265-291. World Religion Project national data v1.1, '
     "hosted by the Correlates of War Project.",
     "source_key": WRP_SOURCE_KEY,
 }
@@ -508,7 +513,11 @@ def parse_wrp(
             base["datatype_undocumented"] = True
             rep["undocumented_datatype_rows"] += 1
         if q is not None:
-            base["entity_mapping"] = {"qid": q["qid"], "label": q.get("wikidata_label_en"), "review": q.get("review_status", "agent_mapped")}
+            base["entity_mapping"] = {
+                "qid": q["qid"],
+                "label": q.get("wikidata_label_en"),
+                "review": q.get("review_status", "agent_mapped"),
+            }
         flags = canon(base)
         period = year_period(year)
         for col, unit in [(c, COUNT_UNIT) for c in WRP_COUNTS] + [(c, SHARE_UNIT) for c in WRP_PCTS]:
@@ -543,6 +552,7 @@ def _spec(which: str) -> AtlasSourceSpec:
             name=RCS_CONNECTOR,
             version=RCS_VERSION,
             source_key=RCS_SOURCE_KEY,
+            budget_key=RCS_SOURCE_KEY,
             atlas_source=RCS_ATLAS_SOURCE,
             provider="Religious Characteristics of States project (Davis Brown, Patrick James), via OSF / ARDA",
             licence=RCS_RIGHTS["licence"],
@@ -566,6 +576,7 @@ def _spec(which: str) -> AtlasSourceSpec:
         name=WRP_CONNECTOR,
         version=WRP_VERSION,
         source_key=WRP_SOURCE_KEY,
+        budget_key=WRP_SOURCE_KEY,
         atlas_source=WRP_ATLAS_SOURCE,
         provider="World Religion Project (Maoz & Henderson), hosted by the Correlates of War Project",
         licence=WRP_RIGHTS["licence"],
@@ -606,7 +617,9 @@ async def _ingest_rcs(run: Any) -> dict[str, Any]:
     if "Usage Agreement" not in usage or "acknowledge the Association of Religion Data Archives" not in usage:
         raise err("RCS-Dem usage agreement text changed: review the rights record", kind="licence")
     live = run.origin == "live"
-    frame, rep = parse_rcs(got.bodies.pop("rcs.xlsx"), raw_sha256=got.shas["rcs.xlsx"], min_rows=RCS_MIN_ROWS if live else 1)
+    frame, rep = parse_rcs(
+        got.bodies.pop("rcs.xlsx"), raw_sha256=got.shas["rcs.xlsx"], min_rows=RCS_MIN_ROWS if live else 1
+    )
     note = (
         f"RCS-Dem 2.0 (OSF 7sr4m, {RCS_XLSX_NAME}); {len(RCS_PC)} percentage variables (% of total population, "
         "0-100) + TOTPP, RELPP, RELPC + MAJID/SUPID codes; zeros as published, blanks omitted; iso3 from the RCS "

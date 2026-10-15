@@ -44,12 +44,12 @@ What a cell is
 * CPI: indicators ``cpi_score`` (0-100), ``rank``, ``standard_error``, ``number_of_sources``,
   ``lower_ci``, ``upper_ci`` per (ISO3, year), values as stored in the workbook (some are binary-float
   text such as ``1.8822840000000001``: kept, never rounded). ``provider_geo`` = TI's ISO3 column (scheme
-  ``soc_ti``: ISO3 + KSV -> XKX); Taiwan stays unmapped. TI says CPI scores are comparable over time from
+  ``soc_ti``: ISO3 + KSV -> XKX). TI says CPI scores are comparable over time from
   2012 (the methodology change of CPI 2012).
 * SIGI: indicator = the SDMX ``MEASURE`` code (``SIGI``, ``SIGI_RPI``, ``DF_CM_LAW``...), unit "0-100
   scale" (0 = no discrimination), period = ``TIME_PERIOD`` (2023, the SIGI edition). Empty
   ``OBS_VALUE`` cells are omitted. ``provider_geo`` = ``REF_AREA`` (scheme ``soc_oecd``: ISO3 + XKV ->
-  XKX); OECD aggregates (W, A, E, F, S, OECD, EU, G7, G20) and Taiwan are kept unmapped.
+  XKX); OECD aggregates (W, A, E, F, S, OECD, EU, G7, G20) are kept unmapped.
 * ParlGov: per election date (one-day period) ``vote_share|election=<parliament|ep>|party=<party_id>``
   (% of votes), ``seats|election=...|party=...`` (seats won) and ``seats_total|election=...`` (seats in
   the chamber); party names, ParlGov left-right position (0-10) and election ids in flags. Blank vote
@@ -266,7 +266,9 @@ def sigi_items() -> tuple[FetchItem, ...]:
     )
 
 
-def parse_sigi(bodies: dict[str, bytes], shas: dict[str, str], *, min_rows: dict[str, int] | None = None) -> tuple[Any, dict[str, Any]]:
+def parse_sigi(
+    bodies: dict[str, bytes], shas: dict[str, str], *, min_rows: dict[str, int] | None = None
+) -> tuple[Any, dict[str, Any]]:
     from reva.atlas.tables import country_iso3
 
     mins = SIGI_MIN_ROWS if min_rows is None else min_rows
@@ -375,7 +377,9 @@ def parse_parlgov(body: bytes, *, raw_sha256: str, min_rows: int = PG_MIN_ROWS) 
     seen: set[tuple[str, str, str, str]] = set()
     totals: dict[tuple[str, str, str], tuple[str, int, str]] = {}
     for i, r in enumerate(rows, start=2):
-        geo, etype, edate, pid = (r[k].strip() for k in ("country_name_short", "election_type", "election_date", "party_id"))
+        geo, etype, edate, pid = (
+            r[k].strip() for k in ("country_name_short", "election_type", "election_date", "party_id")
+        )
         if etype not in ("parliament", "ep"):
             raise err(f"{PG_FILE} line {i}: election_type {etype!r} is not parliament/ep")
         try:
@@ -448,6 +452,7 @@ def atlas_source() -> list[AtlasSourceSpec]:
             name=CPI_CONNECTOR,
             version=CPI_VERSION,
             source_key=CPI_SOURCE_KEY,
+            budget_key=CPI_SOURCE_KEY,
             atlas_source="ti",
             provider="Transparency International",
             licence="CC-BY-ND-4.0",
@@ -487,6 +492,7 @@ def atlas_source() -> list[AtlasSourceSpec]:
             name=PG_CONNECTOR,
             version=PG_VERSION,
             source_key=PG_SOURCE_KEY,
+            budget_key=PG_SOURCE_KEY,
             atlas_source="parlgov",
             provider="ParlGov (Döring & Manow), Harvard Dataverse",
             licence="CC0-1.0",
@@ -513,7 +519,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             return {"skipped": True}
         got = await fetch_archive(run, cpi_items())
         check_cpi_page(got.bodies["cpi.page"])
-        frame, rep = parse_cpi(got.bodies["cpi.xlsx"], raw_sha256=got.shas["cpi.xlsx"], min_rows=CPI_MIN_ROWS if live else 1)
+        frame, rep = parse_cpi(
+            got.bodies["cpi.xlsx"], raw_sha256=got.shas["cpi.xlsx"], min_rows=CPI_MIN_ROWS if live else 1
+        )
         note = (
             "Transparency International CPI 2012-2025 (CPI2025_Results.xlsx, sheet 'CPI Historical', cross-checked "
             "with sheet 'CPI2025'); score, rank, standard error, number of sources, lower/upper CI bounds as published. "
@@ -546,7 +554,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         got.bodies["parlgov.record"], doi=PG_DOI, files={PG_FILE_ID: (PG_FILE, got.bodies["parlgov.election"])},
         licences=("CC0 1.0",),
     )  # fmt: skip
-    frame, rep = parse_parlgov(got.bodies["parlgov.election"], raw_sha256=got.shas["parlgov.election"], min_rows=PG_MIN_ROWS if live else 1)
+    frame, rep = parse_parlgov(
+        got.bodies["parlgov.election"], raw_sha256=got.shas["parlgov.election"], min_rows=PG_MIN_ROWS if live else 1
+    )
     note = (
         "ParlGov 2024 stable release, view_election: party vote shares (%) and seats at national parliament and "
         "European Parliament elections, 37 EU/OECD countries since 1900, one-day periods (election date). CC0."

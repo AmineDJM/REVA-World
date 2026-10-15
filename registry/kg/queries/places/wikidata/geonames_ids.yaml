@@ -1,0 +1,30 @@
+id: geography.places_geonames_ids
+domain: geography
+owner: A-CITIES
+description: >-
+  Wikidata's own GeoNames ID statements (P1566) for a list of GeoNames ids: the populated places of GeoNames
+  cities15000 and the first-order divisions of admin1CodesASCII. This is the only link REVA makes between a
+  GeoNames place and a Wikidata item (an id held by exactly one item is mapped; held by several items it is
+  reported as ambiguous and not used). Nothing is ever matched by name.
+purpose: statements
+entity_kind: city
+enabled: false
+notes: >-
+  Executed by reva.adapters.connectors.atlas_cities.harvest_p1566 (CLI: python -m
+  reva.adapters.connectors.atlas_cities wikidata --db <throwaway>) through WDHARVEST's locked, paced,
+  budget-metered WikidataClient (reva.kg.harvest.budgeted_client). The marker __GEONAMES_IDS__ is replaced by
+  up to 300 quoted GeoNames ids per WDQS request; the generic harvester only splits by QIDs, hence
+  enabled: false here. Rows are converted with WDHARVEST's Harvester.rows_to_statements and loaded with its
+  KgDbSink (source wikidata.wdqs). max_rows bounds the whole fan-out (~38k ids); each chunk is also bounded to
+  4 rows per id (row_bound_exceeded, never truncated). Lives in places/wikidata/ with domain geography
+  because the spec schema's domain enum has no 'places' yet (request to WDHARVEST in docs/dev/v3_a_cities.md).
+sparql: |
+  SELECT ?item ?statement ?gn ?rank WHERE {
+    VALUES ?gn { __GEONAMES_IDS__ }
+    ?statement ps:P1566 ?gn .
+    ?item p:P1566 ?statement .
+    ?statement wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: item, property: P1566, object: gn, statement: statement, rank: rank}
+max_rows: 160000

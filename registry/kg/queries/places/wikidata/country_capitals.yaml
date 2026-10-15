@@ -1,0 +1,29 @@
+id: geography.places_country_capitals
+domain: geography
+owner: A-CITIES
+description: >-
+  Capitals (P36) of every Wikidata item holding an ISO 3166-1 alpha-3 code (P298), with the statement rank,
+  start/end qualifiers and the capitals' own GeoNames IDs (P1566). Used to cross-check GeoNames PPLC places
+  against Wikidata: countries with several, changed or disputed capitals are reported with both sides,
+  never resolved.
+purpose: statements
+entity_kind: country
+enabled: false
+notes: >-
+  Executed once per run by reva.adapters.connectors.atlas_cities.fetch_capitals through WDHARVEST's client;
+  the rows are only used for the cross-check (P36 claims of the countries themselves are loaded by
+  core.countries from wbgetentities snapshots, so they are not loaded twice). enabled: false for the
+  generic harvester for that reason.
+sparql: |
+  SELECT ?country ?iso3 ?statement ?capital ?rank ?start ?end ?gn WHERE {
+    ?country wdt:P298 ?iso3 .
+    ?country p:P36 ?statement .
+    ?statement ps:P36 ?capital ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?capital wdt:P1566 ?gn }
+  }
+columns: {subject: country, property: P36, object: capital, statement: statement, rank: rank, start: start,
+          end: end}
+max_rows: 6000

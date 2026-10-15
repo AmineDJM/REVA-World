@@ -16,6 +16,8 @@ names are re-exported here for compatibility).
 
 from __future__ import annotations
 
+import re
+
 from collections.abc import Iterable
 from datetime import datetime
 from typing import Any
@@ -182,6 +184,12 @@ ALL_RULE = (
 )
 
 
+ALL_DATASET_RULE = (
+    "for dataset inputs: every country key (ISO 3166 alpha-3 or World Bank code) for which the pinned release "
+    "pins a dataset of at least one dataset concept the model requires and that resolves to a registered entity"
+)
+
+
 def is_all_countries(countries: Any) -> bool:
     return isinstance(countries, list | tuple) and len(countries) == 1 and countries[0] == ALL_COUNTRIES
 
@@ -207,6 +215,24 @@ def resolve_all_countries(
     probe = model.requirements(spec_json)
     concepts = sorted({r.concept for r in probe if r.kind == "scalar"})
     years = sorted({y for r in probe if r.kind == "scalar" for y in r.years})
+    # V3 SIMWORLD: a model whose inputs are dataset inputs selects the subjects the release
+    # pins a dataset of a required dataset concept for (subject keys are country keys)
+    ds_concepts = sorted({r.concept for r in probe if r.kind == "dataset"})
+    ds_keys: list[str] = []
+    if ds_concepts:
+        from reva.simulation.datasets import dataset_schema_present
+
+        if dataset_schema_present(conn):
+            ds_keys = sorted(
+                str(k)
+                for k in conn.execute(
+                    text(
+                        """SELECT DISTINCT subject_key FROM belief.release_dataset
+                           WHERE release_id = :r AND concept_id = ANY(:c)"""
+                    ),
+                    {"r": release["id"], "c": ds_concepts},
+                ).scalars()
+            )
     rows = (
         conn.execute(
             text(
@@ -236,6 +262,11 @@ def resolve_all_countries(
     for eid, key in keys:
         if resolve_subject(conn, key)[0] == UUID(str(eid)):  # the key must resolve back to this entity
             resolved[key] = UUID(str(eid))
+    for key in ds_keys:
+        if key not in resolved and re.fullmatch(r"[A-Z]{3}", key):
+            sid, how = resolve_subject(conn, key)
+            if how != "deterministic_entity_id":  # the key must resolve to a registered country
+                resolved[key] = sid
     unkeyed = sorted(str(i) for i in set(ids) - set(resolved.values()))
     if not resolved:
         raise ValidationProblem(
@@ -249,6 +280,7 @@ def resolve_all_countries(
         "rule": ALL_RULE,
         "concepts": concepts,
         "years": years,
+        **({"dataset_concepts": ds_concepts, "dataset_rule": ALL_DATASET_RULE} if ds_concepts else {}),
         "resolved": sorted(resolved),
         "resolved_count": len(resolved),
         "unkeyed_subject_ids": unkeyed,

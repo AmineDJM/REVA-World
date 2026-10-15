@@ -279,7 +279,7 @@ def test_04_snapshot_and_api_views(env: Env) -> None:
     assert cov["data"][0]["countries"] == 3 and cov["data"][0]["year_min"] == 2019
     by = {r["iso3"]: r for r in cov["by_country"]}
     assert by["FRA"]["years"] == 3 and by["FRA"]["best_sources_used"] == ["ilo.une.UR|sex=T", "wb.wdi.SL.UEM.TOTL.ZS"]
-    assert by["USA"]["years"] == 0 and cov["countries_total"] == 250
+    assert by["USA"]["years"] == 0 and cov["countries_total"] == 251  # crosswalk 1.1.0 (adds TWN)
 
     c = get(env, "/v1/atlas/concepts", q="chômage").json()
     assert [x["id"] for x in c["data"]] == ["labour.unemployment_rate"]

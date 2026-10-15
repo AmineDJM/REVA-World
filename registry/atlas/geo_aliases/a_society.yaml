@@ -5,7 +5,7 @@ schemes:
   # HIEF country names (HIEF_data.csv, Harvard Dataverse doi:10.7910/DVN/4JQRCL V2, MD5 8bdaacb5a44f691863f5ad78fd0bdf76).
   # Not here on purpose: units whose referent changes over 1945-2013 are mapped by year window in
   # src/reva/adapters/connectors/atlas_society_frac.py (HIEF_WINDOWS): Democratic Republic of Vietnam, German Federal Republic, Yemen Arab Republic, Serbia.
-  # Unmapped (historical states / not a crosswalk entity): Czechoslovakia, German Democratic Republic, Republic of Vietnam, USSR, Yemen PDR, Yugoslavia, Taiwan.
+  # Unmapped (historical states / not a crosswalk entity): Czechoslovakia, German Democratic Republic, Republic of Vietnam, USSR, Yemen PDR, Yugoslavia.
   soc_hief:
     aliases:
       - {code: "Afghanistan", iso3: AFG, source: "HIEF name = crosswalk label"}
@@ -141,6 +141,7 @@ schemes:
       - {code: "Sweden", iso3: SWE, source: "HIEF name = crosswalk label"}
       - {code: "Switzerland", iso3: CHE, source: "HIEF name = crosswalk label"}
       - {code: "Syria", iso3: SYR, source: "HIEF name; crosswalk label Syrian Arab Republic"}
+      - {code: "Taiwan", iso3: TWN, source: "HIEF name = crosswalk label"}
       - {code: "Tajikistan", iso3: TJK, source: "HIEF name = crosswalk label"}
       - {code: "Tanzania", iso3: TZA, source: "HIEF name; crosswalk label United Republic of Tanzania"}
       - {code: "Thailand", iso3: THA, source: "HIEF name = crosswalk label"}
@@ -163,7 +164,7 @@ schemes:
 
   # CDPD country names (CDPD version 1 June 2024.xlsx, Harvard Dataverse doi:10.7910/DVN/LI3WYK, MD5 fd4d028b91ba3e6b10570b5c6e34ae29).
   # CDPD covers 'currently existing independent states since 1800' and splits predecessor states into their own units.
-  # Unmapped (historical states / not a crosswalk entity): CZECHOSLOVAKIA, GERMANY EAST, GERMANY WEST, KOREA, TAIWAN, USSR, VIETNAM NORTH, VIETNAM SOUTH, YEMEN ARAB REPUBLIC, YEMEN PEOPLE REPUBLIC, YUGOSLAVIA.
+  # Unmapped (historical states / not a crosswalk entity): CZECHOSLOVAKIA, GERMANY EAST, GERMANY WEST, KOREA, USSR, VIETNAM NORTH, VIETNAM SOUTH, YEMEN ARAB REPUBLIC, YEMEN PEOPLE REPUBLIC, YUGOSLAVIA.
   soc_cdpd:
     aliases:
       - {code: "AFGHANISTAN", iso3: AFG, source: "CDPD name = crosswalk label (case-insensitive)"}
@@ -339,6 +340,7 @@ schemes:
       - {code: "SWEDEN", iso3: SWE, source: "CDPD name = crosswalk label (case-insensitive)"}
       - {code: "SWITZERLAND", iso3: CHE, source: "CDPD name = crosswalk label (case-insensitive)"}
       - {code: "SYRIA", iso3: SYR, source: "CDPD name; crosswalk label Syrian Arab Republic"}
+      - {code: "TAIWAN", iso3: TWN, source: "CDPD name = crosswalk label (case-insensitive)"}
       - {code: "TAJIKISTAN", iso3: TJK, source: "CDPD name = crosswalk label (case-insensitive)"}
       - {code: "TANZANIA", iso3: TZA, source: "CDPD name; crosswalk label United Republic of Tanzania"}
       - {code: "THAILAND", iso3: THA, source: "CDPD name = crosswalk label (case-insensitive)"}
@@ -365,7 +367,7 @@ schemes:
     source: {kind: provider_data, url: "https://dataverse.harvard.edu/api/access/datafile/10251764", md5: fd4d028b91ba3e6b10570b5c6e34ae29}
 
   # SSCP fractionalisation iso_num (ISO 3166 numeric, sscp_fractionalisation_extension.csv, doi:10.7910/DVN/EVCQXC,
-  # MD5 a905a3d5f9bff1705357b68717916219). Unmapped: 158 Taiwan, 896 "Vietnam, North", 530 and 891 (rows without a
+  # MD5 a905a3d5f9bff1705357b68717916219). Unmapped: 896 "Vietnam, North", 530 and 891 (rows without a
   # name; ISO numeric of the dissolved Netherlands Antilles and Serbia and Montenegro).
   soc_sscp:
     base: m49
@@ -374,14 +376,14 @@ schemes:
       - {code: "830", iso3: CHI, source: "SSCP row '830,Channel Islands,opportunistic,...' (ISO 3166 numeric 830 = Channel Islands, crosswalk CHI)"}
     source: {kind: provider_data, url: "https://dataverse.harvard.edu/api/access/datafile/14330927?format=original", md5: a905a3d5f9bff1705357b68717916219}
 
-  # Transparency International CPI ISO3 column (CPI2025_Results.xlsx). TWN (Taiwan) stays unmapped.
+  # Transparency International CPI ISO3 column (CPI2025_Results.xlsx).
   soc_ti:
     base: iso3
     aliases:
       - {code: KSV, iso3: XKX, source: "CPI2025_Results.xlsx sheet 'CPI Historical': 'Kosovo' carries ISO3 'KSV' (non-ISO, World Bank code)"}
     source: {kind: provider_data, url: "https://images.transparencycdn.org/images/CPI2025_Results.xlsx"}
 
-  # OECD SDMX REF_AREA of the SIGI / GID-DB 2023 dataflows. Aggregates W, A, E, F, S, OECD, EU, G7, G20 and TWN stay unmapped.
+  # OECD SDMX REF_AREA of the SIGI / GID-DB 2023 dataflows. Aggregates W, A, E, F, S, OECD, EU, G7, G20 stay unmapped.
   soc_oecd:
     base: iso3
     aliases:

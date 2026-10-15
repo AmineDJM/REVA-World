@@ -1,0 +1,210 @@
+# Provider geography schemes of the A-RESOURCES atlas tables (agent A-RESOURCES, 2026-10-15).
+#
+# usgs_name: USGS country names (U.S. Department of State short forms) as written in the ScienceBase data releases
+#   MCS2026_Commodities_Data.csv (column Country), 2024MYBv3_Production_table.csv (column 'Country (Short Form) or
+#   Locality') and 2019_MYBviii_Table1_08-21-2025.csv (column Country). Every alias is an exact crosswalk label /
+#   ISO name match (accents and punctuation folded) or a listed name match with its reason.
+#   Not mapped on purpose (kept, listed in each manifest): 'China, Germany, and Russia', 'Other countries', 'World total'.
+# eia: U.S. EIA International Energy Data (bulk INTL.zip) geography codes = ISO 3166-1 alpha-3 plus EIA codes;
+#   XKS is EIA's Kosovo. Aggregates (WORL, OECD, OPEC, EU27, AFRC, ...) and historical areas (SUN Former U.S.S.R.,
+#   YUG Former Yugoslavia, CSK Former Czechoslovakia, SCG Former Serbia and Montenegro, DDR Germany East, DEUW
+#   Germany West, NLDA Netherlands Antilles) and HITZ Hawaiian Trade Zone, USIQ U.S. Pacific Islands, USOH U.S.
+#   Territories, WAK Wake Island stay unmapped (kept, listed in each manifest).
+schemes:
+  usgs_name:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Afghanistan'"}
+      - {code: "Albania", iso3: ALB, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Albania'"}
+      - {code: "Algeria", iso3: DZA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Algeria'"}
+      - {code: "Angola", iso3: AGO, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Angola'"}
+      - {code: "Argentina", iso3: ARG, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Argentina'"}
+      - {code: "Armenia", iso3: ARM, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Armenia'"}
+      - {code: "Australia", iso3: AUS, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Australia'"}
+      - {code: "Austria", iso3: AUT, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Austria'"}
+      - {code: "Azerbaijan", iso3: AZE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Azerbaijan'"}
+      - {code: "Bahrain", iso3: BHR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Bahrain'"}
+      - {code: "Bangladesh", iso3: BGD, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Bangladesh'"}
+      - {code: "Belarus", iso3: BLR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Belarus'"}
+      - {code: "Belgium", iso3: BEL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Belgium'"}
+      - {code: "Belize", iso3: BLZ, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Belize'"}
+      - {code: "Benin", iso3: BEN, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Benin'"}
+      - {code: "Bhutan", iso3: BTN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Bhutan'"}
+      - {code: "Bolivia", iso3: BOL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk worldbank_name 'Bolivia'"}
+      - {code: "Bosnia and Herzegovina", iso3: BIH, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Bosnia and Herzegovina'"}
+      - {code: "Botswana", iso3: BWA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Botswana'"}
+      - {code: "Brazil", iso3: BRA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Brazil'"}
+      - {code: "Brunei", iso3: BRN, source: "MYB2019/MYB2024: USGS short-form name; crosswalk label 'Brunei Darussalam'"}
+      - {code: "Bulgaria", iso3: BGR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Bulgaria'"}
+      - {code: "Burkina Faso", iso3: BFA, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Burkina Faso'"}
+      - {code: "Burma", iso3: MMR, source: "MCS2026/MYB2019/MYB2024: USGS uses the U.S. Department of State short form 'Burma'; crosswalk label 'Myanmar'"}
+      - {code: "Burundi", iso3: BDI, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Burundi'"}
+      - {code: "Cambodia", iso3: KHM, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Cambodia'"}
+      - {code: "Cameroon", iso3: CMR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Cameroon'"}
+      - {code: "Canada", iso3: CAN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Canada'"}
+      - {code: "Central African Republic", iso3: CAF, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Central African Republic'"}
+      - {code: "Chad", iso3: TCD, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Chad'"}
+      - {code: "Chile", iso3: CHL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Chile'"}
+      - {code: "China", iso3: CHN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'China'"}
+      - {code: "Colombia", iso3: COL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Colombia'"}
+      - {code: "Congo (Brazzaville)", iso3: COG, source: "MYB2019/MYB2024: USGS/State Department short form for the Republic of the Congo; crosswalk label 'Congo'"}
+      - {code: "Congo (Kinshasa)", iso3: COD, source: "MCS2026/MYB2024: USGS/State Department short form for the Democratic Republic of the Congo; crosswalk label 'Democratic Republic of the Congo'"}
+      - {code: "Congo (Kinshasa) (DRC)", iso3: COD, source: "MYB2019: MYB 2019 table 1 name; crosswalk label 'Democratic Republic of the Congo'"}
+      - {code: "Costa Rica", iso3: CRI, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Costa Rica'"}
+      - {code: "Cote d'Ivoire", iso3: CIV, source: "MYB2019 name = crosswalk comtrade_reporter_label 'Côte d'Ivoire'"}
+      - {code: "Croatia", iso3: HRV, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Croatia'"}
+      - {code: "Cuba", iso3: CUB, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Cuba'"}
+      - {code: "Cyprus", iso3: CYP, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Cyprus'"}
+      - {code: "Czechia", iso3: CZE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Czechia'"}
+      - {code: "Côte d'Ivoire", iso3: CIV, source: "MYB2024 name = crosswalk comtrade_reporter_label 'Côte d'Ivoire'"}
+      - {code: "Côte d’Ivoire", iso3: CIV, source: "MCS2026 name = crosswalk label 'Côte d’Ivoire'"}
+      - {code: "Denmark", iso3: DNK, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Denmark'"}
+      - {code: "Djibouti", iso3: DJI, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Djibouti'"}
+      - {code: "Dominican Republic", iso3: DOM, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Dominican Republic'"}
+      - {code: "Ecuador", iso3: ECU, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Ecuador'"}
+      - {code: "Egypt", iso3: EGY, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Egypt'"}
+      - {code: "El Salvador", iso3: SLV, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'El Salvador'"}
+      - {code: "Equatorial Guinea", iso3: GNQ, source: "MYB2019 name = crosswalk comtrade_reporter_label 'Equatorial Guinea'"}
+      - {code: "Eritrea", iso3: ERI, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Eritrea'"}
+      - {code: "Estonia", iso3: EST, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Estonia'"}
+      - {code: "Eswatini", iso3: SWZ, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Eswatini'"}
+      - {code: "Ethiopia", iso3: ETH, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Ethiopia'"}
+      - {code: "Fiji", iso3: FJI, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Fiji'"}
+      - {code: "Finland", iso3: FIN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Finland'"}
+      - {code: "France", iso3: FRA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'France'"}
+      - {code: "French Guiana", iso3: GUF, source: "MYB2019/MYB2024 name = crosswalk iso_name 'French Guiana'"}
+      - {code: "Gabon", iso3: GAB, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Gabon'"}
+      - {code: "Georgia", iso3: GEO, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Georgia'"}
+      - {code: "Germany", iso3: DEU, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Germany'"}
+      - {code: "Ghana", iso3: GHA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Ghana'"}
+      - {code: "Greece", iso3: GRC, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Greece'"}
+      - {code: "Greenland", iso3: GRL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Greenland'"}
+      - {code: "Guadaloupe", iso3: GLP, source: "MYB2019: MYB 2019 table 1 spelling of Guadeloupe (chapter on France's overseas departments); crosswalk label 'Guadeloupe'"}
+      - {code: "Guatemala", iso3: GTM, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Guatemala'"}
+      - {code: "Guinea", iso3: GIN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Guinea'"}
+      - {code: "Guyana", iso3: GUY, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Guyana'"}
+      - {code: "Honduras", iso3: HND, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Honduras'"}
+      - {code: "Hungary", iso3: HUN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Hungary'"}
+      - {code: "Iceland", iso3: ISL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Iceland'"}
+      - {code: "India", iso3: IND, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'India'"}
+      - {code: "Indonesia", iso3: IDN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Indonesia'"}
+      - {code: "Iran", iso3: IRN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Iran'"}
+      - {code: "Iraq", iso3: IRQ, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Iraq'"}
+      - {code: "Ireland", iso3: IRL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Ireland'"}
+      - {code: "Israel", iso3: ISR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Israel'"}
+      - {code: "Italy", iso3: ITA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Italy'"}
+      - {code: "Jamaica", iso3: JAM, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Jamaica'"}
+      - {code: "Japan", iso3: JPN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Japan'"}
+      - {code: "Jordan", iso3: JOR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Jordan'"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Kazakhstan'"}
+      - {code: "Kenya", iso3: KEN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Kenya'"}
+      - {code: "Korea, North", iso3: PRK, source: "MCS2026: MCS 2026 name; crosswalk label \"Democratic People's Republic of Korea\""}
+      - {code: "Korea, Republic Of", iso3: KOR, source: "MYB2024 name = crosswalk iso_name 'Korea, Republic of'"}
+      - {code: "Korea, Republic of", iso3: KOR, source: "MCS2026 name = crosswalk iso_name 'Korea, Republic of'"}
+      - {code: "Kosovo", iso3: XKX, source: "MYB2019/MYB2024 name = crosswalk label 'Kosovo'"}
+      - {code: "Kuwait", iso3: KWT, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Kuwait'"}
+      - {code: "Kyrgyzstan", iso3: KGZ, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Kyrgyzstan'"}
+      - {code: "Laos", iso3: LAO, source: "MCS2026/MYB2019/MYB2024: USGS short form; crosswalk label \"Lao People's Democratic Republic\""}
+      - {code: "Latvia", iso3: LVA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Latvia'"}
+      - {code: "Lebanon", iso3: LBN, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Lebanon'"}
+      - {code: "Lesotho", iso3: LSO, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Lesotho'"}
+      - {code: "Liberia", iso3: LBR, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Liberia'"}
+      - {code: "Libya", iso3: LBY, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Libya'"}
+      - {code: "Lithuania", iso3: LTU, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Lithuania'"}
+      - {code: "Luxembourg", iso3: LUX, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Luxembourg'"}
+      - {code: "Madagascar", iso3: MDG, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Madagascar'"}
+      - {code: "Malawi", iso3: MWI, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Malawi'"}
+      - {code: "Malaysia", iso3: MYS, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Malaysia'"}
+      - {code: "Mali", iso3: MLI, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mali'"}
+      - {code: "Malta", iso3: MLT, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Malta'"}
+      - {code: "Mauritania", iso3: MRT, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mauritania'"}
+      - {code: "Mauritius", iso3: MUS, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mauritius'"}
+      - {code: "Mexico", iso3: MEX, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mexico'"}
+      - {code: "Moldova", iso3: MDA, source: "MYB2019/MYB2024 name = crosswalk worldbank_name 'Moldova'"}
+      - {code: "Mongolia", iso3: MNG, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mongolia'"}
+      - {code: "Montenegro", iso3: MNE, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Montenegro'"}
+      - {code: "Morocco", iso3: MAR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Morocco'"}
+      - {code: "Mozambique", iso3: MOZ, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Mozambique'"}
+      - {code: "Namibia", iso3: NAM, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Namibia'"}
+      - {code: "Nauru", iso3: NRU, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Nauru'"}
+      - {code: "Nepal", iso3: NPL, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Nepal'"}
+      - {code: "Netherlands", iso3: NLD, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Netherlands'"}
+      - {code: "New Caledonia", iso3: NCL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'New Caledonia'"}
+      - {code: "New Zealand", iso3: NZL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'New Zealand'"}
+      - {code: "Nicaragua", iso3: NIC, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Nicaragua'"}
+      - {code: "Niger", iso3: NER, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Niger'"}
+      - {code: "Nigeria", iso3: NGA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Nigeria'"}
+      - {code: "North Korea", iso3: PRK, source: "MYB2019/MYB2024: MYB name; crosswalk label \"Democratic People's Republic of Korea\""}
+      - {code: "North Macedonia", iso3: MKD, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'North Macedonia'"}
+      - {code: "Norway", iso3: NOR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Norway'"}
+      - {code: "Oman", iso3: OMN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Oman'"}
+      - {code: "Pakistan", iso3: PAK, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Pakistan'"}
+      - {code: "Panama", iso3: PAN, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Panama'"}
+      - {code: "Papua New Guinea", iso3: PNG, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Papua New Guinea'"}
+      - {code: "Paraguay", iso3: PRY, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Paraguay'"}
+      - {code: "Peru", iso3: PER, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Peru'"}
+      - {code: "Philippines", iso3: PHL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Philippines'"}
+      - {code: "Poland", iso3: POL, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Poland'"}
+      - {code: "Portugal", iso3: PRT, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Portugal'"}
+      - {code: "Qatar", iso3: QAT, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Qatar'"}
+      - {code: "Republic of Korea", iso3: KOR, source: "MYB2019 name = crosswalk label 'Republic of Korea'"}
+      - {code: "Reunion", iso3: REU, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Réunion'"}
+      - {code: "Romania", iso3: ROU, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Romania'"}
+      - {code: "Russia", iso3: RUS, source: "MCS2026/MYB2019/MYB2024: USGS short form; crosswalk label 'Russian Federation'"}
+      - {code: "Rwanda", iso3: RWA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Rwanda'"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Saudi Arabia'"}
+      - {code: "Senegal", iso3: SEN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Senegal'"}
+      - {code: "Serbia", iso3: SRB, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Serbia'"}
+      - {code: "Seychelles", iso3: SYC, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Seychelles'"}
+      - {code: "Sierra Leone", iso3: SLE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Sierra Leone'"}
+      - {code: "Singapore", iso3: SGP, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Singapore'"}
+      - {code: "Slovakia", iso3: SVK, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Slovakia'"}
+      - {code: "Slovenia", iso3: SVN, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Slovenia'"}
+      - {code: "Solomon Islands", iso3: SLB, source: "MYB2019/MYB2024 name = crosswalk iso_name 'Solomon Islands'"}
+      - {code: "South Africa", iso3: ZAF, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'South Africa'"}
+      - {code: "South Sudan", iso3: SSD, source: "MYB2019 name = crosswalk comtrade_reporter_label 'South Sudan'"}
+      - {code: "Spain", iso3: ESP, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Spain'"}
+      - {code: "Sri Lanka", iso3: LKA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Sri Lanka'"}
+      - {code: "Sudan", iso3: SDN, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Sudan'"}
+      - {code: "Suriname", iso3: SUR, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Suriname'"}
+      - {code: "Sweden", iso3: SWE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Sweden'"}
+      - {code: "Switzerland", iso3: CHE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Switzerland'"}
+      - {code: "Syria", iso3: SYR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Syria'"}
+      - {code: "Taiwan", iso3: TWN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk label 'Taiwan'"}
+      - {code: "Tajikistan", iso3: TJK, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Tajikistan'"}
+      - {code: "Tanzania", iso3: TZA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk worldbank_name 'Tanzania'"}
+      - {code: "Thailand", iso3: THA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Thailand'"}
+      - {code: "The Bahamas", iso3: BHS, source: "MCS2026: MCS 2026 import-sources partner name; crosswalk label 'Bahamas'"}
+      - {code: "Timor-Leste", iso3: TLS, source: "MYB2024 name = crosswalk comtrade_reporter_label 'Timor-Leste'"}
+      - {code: "Timor-Leste (East Timor)", iso3: TLS, source: "MYB2019: MYB 2019 table 1 name; crosswalk label 'Timor-Leste'"}
+      - {code: "Togo", iso3: TGO, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Togo'"}
+      - {code: "Trinidad And Tobago", iso3: TTO, source: "MYB2024 name = crosswalk comtrade_reporter_label 'Trinidad and Tobago'"}
+      - {code: "Trinidad and Tobago", iso3: TTO, source: "MCS2026/MYB2019 name = crosswalk comtrade_reporter_label 'Trinidad and Tobago'"}
+      - {code: "Tunisia", iso3: TUN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Tunisia'"}
+      - {code: "Turkey", iso3: TUR, source: "MCS2026/MYB2019/MYB2024: USGS short form; crosswalk label 'Türkiye'"}
+      - {code: "Turkmenistan", iso3: TKM, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Turkmenistan'"}
+      - {code: "Uganda", iso3: UGA, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Uganda'"}
+      - {code: "Ukraine", iso3: UKR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Ukraine'"}
+      - {code: "United Arab Emirates", iso3: ARE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'United Arab Emirates'"}
+      - {code: "United Kingdom", iso3: GBR, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'United Kingdom'"}
+      - {code: "United States", iso3: USA, source: "MCS2026 name = crosswalk iso_name 'United States'"}
+      - {code: "Uruguay", iso3: URY, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Uruguay'"}
+      - {code: "Uzbekistan", iso3: UZB, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Uzbekistan'"}
+      - {code: "Venezuela", iso3: VEN, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Venezuela'"}
+      - {code: "Vietnam", iso3: VNM, source: "MCS2026/MYB2019/MYB2024: USGS short form; crosswalk label 'Viet Nam'"}
+      - {code: "Yemen", iso3: YEM, source: "MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Yemen'"}
+      - {code: "Zambia", iso3: ZMB, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Zambia'"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "MCS2026/MYB2019/MYB2024 name = crosswalk comtrade_reporter_label 'Zimbabwe'"}
+    source:
+      kind: provider_data
+      url: "https://www.sciencebase.gov/catalog/item/69837e43b66b01367d7ec7c7 ; https://www.sciencebase.gov/catalog/item/6a8490171ba49b3133cd8055 ; https://www.sciencebase.gov/catalog/item/67febb3cd4be02350c2609bc"
+      retrieved_at: "2026-10-15"
+  eia:
+    base: iso3
+    aliases:
+      - code: XKS
+        iso3: XKX
+        source: "EIA bulk INTL.zip (Last-Modified 2026-10-03) member INTL.txt: series INTL.44-1-XKS-QBTU.A named 'Total energy production, Kosovo, Annual', geography 'XKS'"
+    source:
+      kind: provider_data
+      url: "https://www.eia.gov/opendata/bulk/INTL.zip"
+      retrieved_at: "2026-10-15"

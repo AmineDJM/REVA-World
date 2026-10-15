@@ -59,7 +59,9 @@ def _validate(frame: pl.DataFrame, geo_scheme: str | None = None) -> None:
 
 def _cell(frame: pl.DataFrame, indicator: str, geo: str, year: int) -> dict[str, Any]:
     rows = frame.filter(
-        (pl.col("indicator") == indicator) & (pl.col("provider_geo") == geo) & (pl.col("period_start").dt.year() == year)
+        (pl.col("indicator") == indicator)
+        & (pl.col("provider_geo") == geo)
+        & (pl.col("period_start").dt.year() == year)
     ).to_dicts()
     assert len(rows) == 1, (indicator, geo, year, len(rows))
     return rows[0]
@@ -154,7 +156,10 @@ async def test_wrp_parse_codes_and_shares() -> None:
 async def test_hief_windows_and_aliases() -> None:
     b = await _bodies(frac.HIEF_CONNECTOR, frac.hief_items())
     meta = common.check_dataverse_record(
-        b["hief.record"], doi=frac.HIEF_DOI, files={frac.HIEF_FILE_ID: (frac.HIEF_FILE, b["hief.data"])}, licences=("CC0 1.0",)
+        b["hief.record"],
+        doi=frac.HIEF_DOI,
+        files={frac.HIEF_FILE_ID: (frac.HIEF_FILE, b["hief.data"])},
+        licences=("CC0 1.0",),
     )
     assert meta["licence"] == "CC0 1.0"
     frame, _rep = frac.parse_hief(b["hief.data"], raw_sha256=_sha(b["hief.data"]), min_rows=1)
@@ -165,9 +170,14 @@ async def test_hief_windows_and_aliases() -> None:
     assert _cell(frame, "EFindex", "Serbia", 2006)["iso3"] is None
     assert _cell(frame, "EFindex", "Serbia", 2007)["iso3"] == "SRB"
     assert _cell(frame, "EFindex", "Iran", 2013)["iso3"] == "IRN"
-    assert _cell(frame, "EFindex", "Taiwan", 2013)["iso3"] is None
-    fr = _cell(frame, "EFindex", "France", 2013)
-    assert fr["iso3"] == "FRA" and fr["unit"] == "index (0-1)" and fr["concept_id"] == "society.fractionalization.ethnic_hief"
+    assert _cell(frame, "EFindex", "Taiwan", 2013)["iso3"] == "TWN"
+    assert _cell(frame, "EFindex", "USSR", 1990)["iso3"] is None
+    fr = _cell(frame, "EFindex", "United Kingdom", 2013)
+    assert (
+        fr["iso3"] == "GBR"
+        and fr["unit"] == "index (0-1)"
+        and fr["concept_id"] == "society.fractionalization.ethnic_hief"
+    )
 
 
 async def test_dataverse_record_refuses_licence_and_md5_drift() -> None:
@@ -177,7 +187,10 @@ async def test_dataverse_record_refuses_licence_and_md5_drift() -> None:
         common.check_dataverse_record(b["hief.record"], doi=frac.HIEF_DOI, files=files, licences=("CC BY 4.0",))
     with pytest.raises(SourceResponseError, match="MD5"):
         common.check_dataverse_record(
-            b["hief.record"], doi=frac.HIEF_DOI, files={frac.HIEF_FILE_ID: (frac.HIEF_FILE, b"x")}, licences=("CC0 1.0",)
+            b["hief.record"],
+            doi=frac.HIEF_DOI,
+            files={frac.HIEF_FILE_ID: (frac.HIEF_FILE, b"x")},
+            licences=("CC0 1.0",),
         )
     with pytest.raises(SourceResponseError, match="not in the latest"):
         common.check_dataverse_record(b["hief.record"], doi=frac.HIEF_DOI, files={1: ("x", b"")}, licences=("CC0 1.0",))
@@ -190,7 +203,10 @@ async def test_sscp_origins_periods_and_geo() -> None:
     common.check_dataverse_record(
         b["sscp.record"],
         doi=frac.SSCP_DOI,
-        files={frac.SSCP_FILE_ID: (frac.SSCP_FILE, b["sscp.data"]), frac.SSCP_README_ID: (frac.SSCP_README, b["sscp.readme"])},
+        files={
+            frac.SSCP_FILE_ID: (frac.SSCP_FILE, b["sscp.data"]),
+            frac.SSCP_README_ID: (frac.SSCP_README, b["sscp.readme"]),
+        },
         licences=("CC BY 4.0",),
     )
     frac.check_sscp_readme(b["sscp.readme"])
@@ -198,7 +214,9 @@ async def test_sscp_origins_periods_and_geo() -> None:
         frac.check_sscp_readme(b"no statements")
     frame, rep = frac.parse_sscp(b["sscp.data"], raw_sha256=_sha(b["sscp.data"]), min_rows=1)
     frame = frame.with_columns(
-        pl.col("provider_geo").map_elements(lambda g: country_iso3(g, frac.SSCP_SCHEME), return_dtype=pl.String).alias("iso3")
+        pl.col("provider_geo")
+        .map_elements(lambda g: country_iso3(g, frac.SSCP_SCHEME), return_dtype=pl.String)
+        .alias("iso3")
     )
     _validate(frame, frac.SSCP_SCHEME)
     afg = _cell(frame, "ethnic_frac", "4", 2003)
@@ -208,8 +226,8 @@ async def test_sscp_origins_periods_and_geo() -> None:
     kos = _cell(frame, "religion_frac", "689", 2015)  # RCS-Dem 2015 cross-section
     assert kos["iso3"] == "XKX"
     assert _cell(frame, "religion_frac", "830", 2015)["iso3"] == "CHI"
-    assert _cell(frame, "ethnic_frac", "158", 2003)["iso3"] is None  # Taiwan
-    assert "530" in rep["unmapped"] and "158" in rep["unmapped"]
+    assert _cell(frame, "ethnic_frac", "158", 2003)["iso3"] == "TWN"  # ISO numeric 158 (crosswalk iso_numeric)
+    assert "530" in rep["unmapped"] and "158" not in rep["unmapped"]
     assert frame.filter(pl.col("provider_geo") == "275").height == 1  # West Bank and Gaza: religion only
 
 
@@ -219,7 +237,10 @@ async def test_cdpd_status_codes_and_names() -> None:
 
     b = await _bodies(jus.CDPD_CONNECTOR, jus.cdpd_items())
     common.check_dataverse_record(
-        b["cdpd.record"], doi=jus.CDPD_DOI, files={jus.CDPD_FILE_ID: (jus.CDPD_FILE, b["cdpd.data"])}, licences=("CC0 1.0",)
+        b["cdpd.record"],
+        doi=jus.CDPD_DOI,
+        files={jus.CDPD_FILE_ID: (jus.CDPD_FILE, b["cdpd.data"])},
+        licences=("CC0 1.0",),
     )
     frame, rep = jus.parse_cdpd(b["cdpd.data"], raw_sha256=_sha(b["cdpd.data"]), min_rows=1)
     _validate(frame, jus.CDPD_SCHEME)
@@ -231,7 +252,7 @@ async def test_cdpd_status_codes_and_names() -> None:
     assert country_iso3("KYRGYZTAN", jus.CDPD_SCHEME) == "KGZ"
     assert country_iso3("USSR", jus.CDPD_SCHEME) is None
     assert country_iso3("GERMANY WEST", jus.CDPD_SCHEME) is None
-    assert country_iso3("TAIWAN", jus.CDPD_SCHEME) is None
+    assert country_iso3("TAIWAN", jus.CDPD_SCHEME) == "TWN"
 
 
 async def test_who_homicide_estimates() -> None:
@@ -245,7 +266,11 @@ async def test_who_homicide_estimates() -> None:
     assert fra.height > 10 and set(fra["unit"]) == {"per 100 000 population"}
     assert set(fra["concept_id"]) == {"society.homicide_rate_who"}
     f = json.loads(fra["flags"][0])
-    assert f["producer"] == "WHO Global Health Estimates (GHE)" and "low" in f and f["indicator_name"].startswith("Estimates")
+    assert (
+        f["producer"] == "WHO Global Health Estimates (GHE)"
+        and "low" in f
+        and f["indicator_name"].startswith("Estimates")
+    )
     assert rep["rows"]["VIOLENCE_HOMICIDENUM"] > 0
 
 
@@ -268,8 +293,8 @@ async def test_cpi_strict_ooxml_verbatim_values() -> None:
     assert dnk["value"] == "89" and dnk["concept_id"] == "society.cpi_score"
     se = _cell(frame, "standard_error", "DNK", 2025)["value"]
     assert re.fullmatch(r"\d+\.\d+", se)  # binary-float text kept as stored, never rounded by REVA
-    assert country_iso3("KSV", gov.CPI_SCHEME) == "XKX" and country_iso3("TWN", gov.CPI_SCHEME) is None
-    assert "TWN" in rep["unmapped"]
+    assert country_iso3("KSV", gov.CPI_SCHEME) == "XKX" and country_iso3("TWN", gov.CPI_SCHEME) == "TWN"
+    assert rep["unmapped"] == {}
     assert not any("Bertelsmann" in i or "Economist" in i for i in frame["indicator"].unique())
 
 
@@ -300,7 +325,7 @@ async def test_sigi_scores_and_legal_variables() -> None:
     assert not frame.filter(pl.col("indicator").str.ends_with("_PCT_1")).height
     fra = _cell(frame, "SIGI", "FRA", 2023)
     assert fra["unit"] == "0-100 scale" and fra["concept_id"] == "society.gender.sigi.score"
-    assert _cell(frame, "DF_CM_LAW", "AFG", 2023)["concept_id"] == "society.gender.sigi.law.child_marriage"
+    assert _cell(frame, "DF_CM_LAW", "NGA", 2023)["concept_id"] == "society.gender.sigi.law.child_marriage"
     assert country_iso3("XKV", gov.SIGI_SCHEME) == "XKX" and country_iso3("W", gov.SIGI_SCHEME) is None
     assert frame.filter(pl.col("value").is_null() & pl.col("value_text").is_null()).height == 0
     assert rep.get("sigi_empty_obs", 0) + rep.get("gid_empty_obs", 0) > 0  # empty observations omitted, counted
@@ -309,7 +334,10 @@ async def test_sigi_scores_and_legal_variables() -> None:
 async def test_parlgov_elections() -> None:
     b = await _bodies(gov.PG_CONNECTOR, gov.parlgov_items())
     common.check_dataverse_record(
-        b["parlgov.record"], doi=gov.PG_DOI, files={gov.PG_FILE_ID: (gov.PG_FILE, b["parlgov.election"])}, licences=("CC0 1.0",)
+        b["parlgov.record"],
+        doi=gov.PG_DOI,
+        files={gov.PG_FILE_ID: (gov.PG_FILE, b["parlgov.election"])},
+        licences=("CC0 1.0",),
     )
     frame, rep = gov.parse_parlgov(b["parlgov.election"], raw_sha256=_sha(b["parlgov.election"]), min_rows=1)
     _validate(frame, "iso3")
@@ -326,7 +354,16 @@ async def test_parlgov_elections() -> None:
 def test_society_catalog_is_valid_and_points_at_our_tables() -> None:
     cat = load_catalog()
     doc = yaml.safe_load((REPO / "registry/atlas/catalog/society.yaml").read_text())
-    ours = {"rcs.dem2", "wrp.national", "hief.hief", "sscp.frac_v1", "cdpd.cdpd_v1", "who.gho_violence", "ti.cpi", "oecd.sigi2023"}
+    ours = {
+        "rcs.dem2",
+        "wrp.national",
+        "hief.hief",
+        "sscp.frac_v1",
+        "cdpd.cdpd_v1",
+        "who.gho_violence",
+        "ti.cpi",
+        "oecd.sigi2023",
+    }
     assert doc["domain"] == "society"
     for c in doc["concepts"]:
         assert c["provider_declared"] is True and c["id"].startswith("society.")

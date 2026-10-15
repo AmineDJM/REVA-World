@@ -9,7 +9,7 @@ measured in that run. Gaps are listed and were never filled.
 | Piece | Where |
 |---|---|
 | Crosswalk builder (offline: `build`, `verify`) | `src/reva/adapters/connectors/country_crosswalk.py` |
-| Crosswalk (250 entities, flagged unmapped codes, source digests, `content_sha256`) | `registry/entities/country_crosswalk.json` |
+| Crosswalk (250 entities in V2 — 251 since V3 crosswalk 1.1.0 adds ISO 3166-1 `TWN`, see `docs/dev/v3_xwalk.md`; flagged unmapped codes, source digests, `content_sha256`) | `registry/entities/country_crosswalk.json` |
 | Raw provider reference lists (archived bytes, digests in the manifest) | `registry/reference/{unsd_m49_overview.html.gz, comtrade_Reporters.json, comtrade_partnerAreas.json, worldbank_country.json}`, `registry/reference/manifest.yaml` |
 | Seeding of crosswalk entities (small block marked "V2 step 1 (ALLC)"; the crosswalk digest is part of the seed fingerprint) | `src/reva/cli/seed.py` |
 | Comtrade connector for every reporter: multi-reporter requests, rotating | `src/reva/adapters/connectors/comtrade_batch.py` (`un.comtrade.public_batch@1.0.0`) |

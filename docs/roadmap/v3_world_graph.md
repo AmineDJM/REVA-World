@@ -68,7 +68,8 @@ decolonisation in the 1950s–60s. Research sources relentlessly; when a source 
 * **Disk**: the container has ~21 GB free. Budget per agent: ≤ 1.5 GB of archived raw + Parquet; KG database
   target ≤ 6 GB. Before any large download run `df -h /` and stop with a report if < 5 GB would remain. Delete
   scratch copies; never keep two copies of a raw file.
-* **Countries**: the canonical list is `registry/entities/country_crosswalk.json` (250 entities) plus
+* **Countries**: the canonical list is `registry/entities/country_crosswalk.json` (251 entities: the 249
+  ISO 3166-1 codes incl. Taiwan `TWN`, plus World Bank `XKX`, `CHI`; crosswalk 1.1.0, `docs/dev/v3_xwalk.md`) plus
   historical states as KG entities. Every atlas table maps provider codes through the crosswalk; unmapped
   codes are kept and listed, never dropped silently.
 

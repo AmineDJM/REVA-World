@@ -27,15 +27,16 @@ What a cell is
   through scheme ``soc_hief`` (``registry/atlas/geo_aliases/a_society.yaml``); four HIEF units that
   change state over the period are mapped only for the years in which they denote the crosswalk entity
   (:data:`HIEF_WINDOWS`, e.g. "German Federal Republic" = DEU from 1991 only; before, it is West Germany
-  and stays unmapped). USSR, Yugoslavia, Czechoslovakia, the GDR, South Vietnam, South Yemen and Taiwan
-  stay unmapped.
+  and stays unmapped). USSR, Yugoslavia, Czechoslovakia, the GDR, South Vietnam and South Yemen stay
+  unmapped. HIEF has no row for France.
 * SSCP: indicators ``ethnic_frac``, ``language_frac``, ``religion_frac`` (0-1, ``1 - sum(share_i^2)``),
   one cross-sectional value per polity. The file gives no year; the period is the reference year stated
   for the value's origin in README_frac.txt (``rcs_dem_2.0`` -> 2015; ``eb`` -> 2014 edition) and, where
   the README names no year, the publication year of the source (``alesina_2003`` -> 2003; ``cia`` and
   ``wdm`` -> 2026, the SSCP v1.0 release that consulted them), recorded in ``flags.period_basis``.
   ``provider_geo`` is SSCP's ``iso_num`` (ISO 3166 numeric; scheme ``soc_sscp``: m49 + Kosovo 689 ->
-  XKX, Channel Islands 830 -> CHI). Taiwan (158), North Vietnam (896) and the two unnamed rows 530 / 891
+  XKX, Channel Islands 830 -> CHI; Taiwan 158 -> TWN through the crosswalk). North Vietnam (896) and the two
+  unnamed rows 530 / 891
   (ISO numeric of the Netherlands Antilles and of Serbia and Montenegro) stay unmapped.
 """
 
@@ -113,8 +114,8 @@ def hief_iso3(name: str, year: int) -> tuple[str | None, str]:
     from reva.atlas.tables import country_iso3
 
     if name in HIEF_WINDOWS:
-        start, iso3 = HIEF_WINDOWS[name]
-        return (iso3, "hief_window") if year >= start else (None, "outside_hief_window")
+        start, window_iso3 = HIEF_WINDOWS[name]
+        return (window_iso3, "hief_window") if year >= start else (None, "outside_hief_window")
     iso3 = country_iso3(name, HIEF_SCHEME)
     return iso3, ("alias" if iso3 else "unmapped")
 
@@ -240,7 +241,12 @@ def sscp_items() -> tuple[FetchItem, ...]:
 def check_sscp_readme(body: bytes) -> None:
     """The README statements the period rules rely on must still be there (else: review, nothing registered)."""
     t = body.decode("utf-8", "replace")
-    for needle in ("2015 cross-section", "Britannica Book of the Year 2014", "current CIA World Factbook", "1 - sum(share_i^2)"):
+    for needle in (
+        "2015 cross-section",
+        "Britannica Book of the Year 2014",
+        "current CIA World Factbook",
+        "1 - sum(share_i^2)",
+    ):
         if needle not in t:
             raise err(f"{SSCP_README}: statement {needle!r} not found; review the period rules", kind="schema_drift")
 
@@ -314,8 +320,11 @@ def _spec(which: str) -> AtlasSourceSpec:
         name=HIEF_CONNECTOR if hief else SSCP_CONNECTOR,
         version=HIEF_VERSION if hief else SSCP_VERSION,
         source_key=HIEF_SOURCE_KEY if hief else SSCP_SOURCE_KEY,
+        budget_key=HIEF_SOURCE_KEY if hief else SSCP_SOURCE_KEY,
         atlas_source="hief" if hief else "sscp",
-        provider="Lenka Drazanova (Harvard Dataverse)" if hief else "Small State Coverage Project, E. R. Gordon (Harvard Dataverse)",
+        provider="Lenka Drazanova (Harvard Dataverse)"
+        if hief
+        else "Small State Coverage Project, E. R. Gordon (Harvard Dataverse)",
         licence="CC0-1.0" if hief else "CC-BY-4.0",
         allowed_hosts=(DATAVERSE, S3_HOST),
         datasets=("hief",) if hief else (SSCP_DATASET,),
@@ -345,7 +354,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             got.bodies["hief.record"], doi=HIEF_DOI, files={HIEF_FILE_ID: (HIEF_FILE, got.bodies["hief.data"])},
             licences=("CC0 1.0",),
         )  # fmt: skip
-        frame, rep = parse_hief(got.bodies["hief.data"], raw_sha256=got.shas["hief.data"], min_rows=HIEF_MIN_ROWS if live else 1)
+        frame, rep = parse_hief(
+            got.bodies["hief.data"], raw_sha256=got.shas["hief.data"], min_rows=HIEF_MIN_ROWS if live else 1
+        )
         note = (
             "HIEF (Drazanova 2019, Dataverse V2), EFindex 1945-2013 annual, 165 units keyed by HIEF name; units "
             "that change state are mapped only inside documented windows (DEU/YEM from 1991, VNM from 1976, SRB "
@@ -362,11 +373,16 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     meta = check_dataverse_record(
         got.bodies["sscp.record"],
         doi=SSCP_DOI,
-        files={SSCP_FILE_ID: (SSCP_FILE, got.bodies["sscp.data"]), SSCP_README_ID: (SSCP_README, got.bodies["sscp.readme"])},
+        files={
+            SSCP_FILE_ID: (SSCP_FILE, got.bodies["sscp.data"]),
+            SSCP_README_ID: (SSCP_README, got.bodies["sscp.readme"]),
+        },
         licences=("CC BY 4.0",),
     )
     check_sscp_readme(got.bodies["sscp.readme"])
-    frame, rep = parse_sscp(got.bodies["sscp.data"], raw_sha256=got.shas["sscp.data"], min_rows=SSCP_MIN_ROWS if live else 1)
+    frame, rep = parse_sscp(
+        got.bodies["sscp.data"], raw_sha256=got.shas["sscp.data"], min_rows=SSCP_MIN_ROWS if live else 1
+    )
     note = (
         "SSCP Fractionalisation v1.0 (Dataverse, CC BY 4.0): ethnic, language and religious fractionalisation "
         "(Herfindahl, 0-1), one cross-section per polity; Alesina et al. (2003) values plus SSCP's extension, origin "
@@ -389,8 +405,8 @@ __all__ = [
     "atlas_ingest",
     "atlas_source",
     "check_sscp_readme",
-    "hief_items",
     "hief_iso3",
+    "hief_items",
     "parse_hief",
     "parse_sscp",
     "sscp_items",

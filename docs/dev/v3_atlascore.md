@@ -30,8 +30,10 @@ Owner: agent ATLASCORE. Interface for atlas connector agents: `docs/dev/v3_atlas
   flags/selectors, empty selectors, `period_start >= period_end`, duplicate cells, raw hashes not declared, `iso3` not a
   crosswalk key or contradicting the geo scheme, and two provider geographies mapping to the same country for the
   same indicator and period (REVA never picks one silently).
-* Country keys: the ALLC crosswalk (250 entities; `XKX`, `CHI` are World Bank codes, not ISO). Taiwan (`TWN`) is not a
-  crosswalk entity (UNSD M49 does not list it): TWN rows stay unmapped and listed. Extra schemes:
+* Country keys: the crosswalk (251 entities since crosswalk 1.1.0 / XWALK: all 249 ISO 3166-1 codes, plus `XKX`, `CHI`,
+  World Bank codes, not ISO). Taiwan (`TWN`, ISO 3166-1, not listed by UNSD M49) is an entity since 1.1.0 (it was
+  absent from the 250-entity ALLC crosswalk, so tables registered before keep TWN rows unmapped until re-registered);
+  CHN/TWN carry `aggregation_overlap` (never summed or split), see `docs/dev/v3_xwalk.md`. Extra schemes:
   `country_codes_extra.json` (Eurostat EL/UK/XK from the quoted Eurostat glossary; FIPS 10-4 from the archived GeoNames
   `countryInfo.txt`, sha256 `c55f638c…`) and per-agent `registry/atlas/geo_aliases/*.yaml` (each alias with evidence;
   conflicting aliases refuse to load).

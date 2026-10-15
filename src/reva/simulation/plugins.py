@@ -442,6 +442,9 @@ KNOWN_MODEL_MODULES: tuple[str, ...] = (
     "reva.models.economic.io_price",
     "reva.models.population.cohort_component",
     "reva.models.social.retirement_age",
+    # V3 SIMWORLD: second registered versions (1.1.0) of the two models above (every country)
+    "reva.models.population.cohort_world",
+    "reva.models.social.retirement_world",
 )
 
 _REQUIRED_ATTRS = (

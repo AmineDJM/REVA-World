@@ -1,0 +1,58 @@
+[
+  {
+    "request_fingerprint": "8ba848ca8497f5edfa0aa8bf45aaa9a1c48cdd18ca8db61c0740c3a595599c13",
+    "url": "https://api.osf.io/v2/nodes/7sr4m/",
+    "file": "8ba848ca8497f5ed.json",
+    "sha256": "c921fd9886a00aa3cf534ef883ad69932a79f2eb5b3b2831241cee03e23fcb2a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "ARDA usage agreement (attribution); no licence declared on OSF",
+    "derived_from_sha256": null,
+    "note": "real OSF node record"
+  },
+  {
+    "request_fingerprint": "43e378a7c47ea09aeed0706e8222a1d80ddb51e91f663786f1b41b83daff6140",
+    "url": "https://api.osf.io/v2/nodes/7sr4m/files/osfstorage/?page%5Bsize%5D=100",
+    "file": "43e378a7c47ea09a.json",
+    "sha256": "3d32e79873f9e452e95583d5bd881f7f7e78f7c23b723f054bd4697f5cce7b91",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.api+json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "ARDA usage agreement (attribution); no licence declared on OSF",
+    "derived_from_sha256": "71800ae038b157e3d0a6803ab4b1e37e7f9fb6673d8da7e25feaa03cbf2511d4",
+    "note": "real OSF file listing; sha256/size of the XLSX replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "1fa05042efde1a8e6510eafb034d095dc85608e077b374238ce1d992ca73a77d",
+    "url": "https://osf.io/download/6c3xq/",
+    "file": "1fa05042efde1a8e.txt",
+    "sha256": "3e63eb753e7caed085f70414fad3c3dc55bfdd118d68fc5909b63f2036811f21",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "ARDA usage agreement (attribution); no licence declared on OSF",
+    "derived_from_sha256": null,
+    "note": "real usage agreement"
+  },
+  {
+    "request_fingerprint": "4e7f46898579a7d489fc19829199f8e7a67179aa111e1a5583c41f299a6385dc",
+    "url": "https://osf.io/download/asg25/",
+    "file": "4e7f46898579a7d4.xlsx",
+    "sha256": "aad4ab6840102a1894fce1590f758efebcb401fdb577ef57eaa4484df4e64a58",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "ARDA usage agreement (attribution); no licence declared on OSF",
+    "derived_from_sha256": "438831b2d5b9375f0369a7645b7af99342e4ace33aa6c844f7a600dc6c44afa6",
+    "note": "subset of RCS-Dem 2.0 XLSX: header + unit-years [('2', '2014'), ('2', '2015'), ('220', '2015'), ('260', '1980'), ('315', '1980'), ('347', '2015'), ('365', '1950'), ('750', '2015')]; exact cell text"
+  }
+]
