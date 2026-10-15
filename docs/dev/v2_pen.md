@@ -17,7 +17,7 @@ not a forecast**. Back-test: [v2_pen_backtest.md](v2_pen_backtest.md) - read its
 | Model plugin `social.retirement_age@1.0.0` | `src/reva/models/social/retirement_age.py`, `registry/models/methods.yaml` (candidate) |
 | 2010 back-test | `src/reva/models/social/backtest.py`, `docs/dev/v2_pen_backtest.{md,json}` |
 | Household extension (capability `population.household_margins`) | `src/reva/population/households.py` |
-| Tests | `tests/unit/social/` (82 offline tests), `tests/integration/test_labour_pensions_retirement_pipeline.py` (DB, fixtures, job path), `tests/integration/test_labour_pensions_live.py` (`live`) |
+| Tests | `tests/unit/social/` (99 offline tests, incl. `test_sfx1_retirement_review_fixes.py` for the review fixes), `tests/integration/test_labour_pensions_retirement_pipeline.py` (DB, fixtures, job path), `tests/integration/test_labour_pensions_live.py` (`live`) |
 
 ## Data (exact tables)
 
@@ -244,9 +244,8 @@ person x household source is used); member ages, sexes, income etc. are unsuppor
 
 ## Requests to other owners
 
-* **(SFX1) registry owner of `registry/models/methods.yaml`:** lines ~171 and ~202 still call the
-  pension-receipt drop an "upper-bound proxy"; replace with "proxy of unknown direction (bounding
-  variants rho 60-64 / 65-69 in L2)".
+* **(SFX1) `registry/models/methods.yaml`:** "upper-bound proxy" replaced by "proxy of unknown
+  direction" (done by the lead in f882881).
 * **(SFX1) SFX2 / NL drafts:** a stated age level ("passe à 65 ans", "to 65") maps to
   `{"kind": "retirement_age_target", "reference_path": <path>, "target_age_months": 12 * years +
   months, "first_birth_year": <first cohort>}`, never to `retirement_age_shift`.

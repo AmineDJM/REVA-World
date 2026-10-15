@@ -16,7 +16,7 @@ Back-test results: [`v2_pop_backtest.md`](v2_pop_backtest.md) (stored evaluation
 | Simulation plugin `demography.cohort_component@1.0.0` | `src/reva/models/population/cohort_component.py` (module listed in `plugins.KNOWN_MODEL_MODULES`) |
 | Stored back-test evaluation (DB side) | `src/reva/evaluation/population_backtest.py` |
 | Registry | `registry/sources/eurostat_demography.yaml`, `registry/concepts/demography_v2.yaml`, `registry/mappings/eurostat_demography.yaml`, `registry/models/methods.yaml` (model entry), `registry/policies/budgets.yaml` (`eurostat.demography: 300`, budgets-1.2.0, re-pinned in `src/reva/autonomy/policy.py` with a history line) |
-| Tests | `tests/unit/test_eurostat_demography_connector.py`, `tests/unit/test_population_cohort.py`, `tests/property/test_population_cohort_properties.py`, `tests/integration/test_demography_cohort.py` (DB, offline fixtures), `tests/integration/test_demography_live.py` (`live`) |
+| Tests | `tests/unit/test_eurostat_demography_connector.py`, `tests/unit/test_population_cohort.py`, `tests/unit/test_sfx1_population_migration_breaks.py` (review fixes H1, M1, M8, L3), `tests/property/test_population_cohort_properties.py`, `tests/integration/test_demography_cohort.py` (DB, offline fixtures), `tests/integration/test_demography_live.py` (`live`) |
 | Fixtures | `tests/fixtures/source/eurostat.demography/` (LI + LU since 2008 and the three EUROPOP2023 tables, recorded live 2026-10-15 with `RecordingHttp`, ~530 kB) |
 | Capability | `demography.cohort_component` → implemented in `src/reva/capabilities.py` (tests and this doc cited) |
 
