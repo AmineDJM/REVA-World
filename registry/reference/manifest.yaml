@@ -1,7 +1,7 @@
 - file: comtrade_partnerAreas.json
   url: https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json
   sha256: 2da5667693b5a7f8b203028964a431cdb46356d3a377c7369bb9736c59f03733
-  retrieved_at: '2026-10-15T00:59:20+00:00'
+  retrieved_at: '2026-10-14T22:29:00Z'
   licence: UN Comtrade terms of use (reference metadata)
   use: provider-declared partner-area identities for bilateral trade relations
 - file: unsd_m49_overview.html.gz

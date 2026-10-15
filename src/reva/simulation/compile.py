@@ -113,15 +113,24 @@ def resolve_inputs(conn: Connection, release: dict[str, Any], requirements: Iter
                           datasets=datasets)
 
 
-def compile_scenario(conn: Connection, spec: Any, store: ArtifactStore | None = None) -> Any:
-    """Validate (model), load the pinned release, resolve inputs and compile with the plugin.
+def compile_run(conn: Connection, spec_json: dict[str, Any], store: ArtifactStore | None = None
+                ) -> tuple[plugins.SimulationModel, Any, ResolvedInputs]:
+    """Model validation, pinned release, input resolution and plugin compile (in this order).
 
     Raises on unsupported requests; missing inputs are reported on the compiled object
     (or by ``ResolvedInputs.missing_problems()``), never raised away or zeroed.
     """
-    spec_json = spec.as_json()
     model = plugins.get(spec_json["model_key"])
+    if spec_json.get("model_version") != model.model_version:
+        raise CapabilityGap(
+            f"model {spec_json['model_key']}@{spec_json.get('model_version')} is not available "
+            f"(registered: {model.model_version})", capability=f"model.{spec_json['model_key']}")
     model.validate(spec_json)
     release = load_release(conn, UUID(spec_json["baseline_release_id"]), spec_json["knowledge_cutoff"])
     inputs = resolve_inputs(conn, release, model.requirements(spec_json), store)
-    return model.compile(inputs, spec if model.model_key == "economic.crude_exposure" else spec_json), inputs
+    return model, model.compile(inputs, spec_json), inputs
+
+
+def compile_scenario(conn: Connection, spec: Any, store: ArtifactStore | None = None) -> Any:
+    """V1 entry point: the compiled plan of a validated spec (any registered model)."""
+    return compile_run(conn, spec.as_json(), store)[1]

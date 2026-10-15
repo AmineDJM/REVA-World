@@ -470,7 +470,8 @@ def _write_archives(fetched: dict[str, tuple[bytes, str]]) -> None:
         data = gzip.compress(body, mtime=0) if s.gzip else body
         (REFERENCE_DIR / s.file).write_bytes(data)
         entry = by_file.get(s.file) or {"file": s.file}
-        entry.update({"url": s.url, "sha256": _sha256(body), "retrieved_at": retrieved})
+        if entry.get("sha256") != _sha256(body):  # same bytes: keep the first retrieval time
+            entry.update({"url": s.url, "sha256": _sha256(body), "retrieved_at": retrieved})
         if s.gzip:
             entry["stored_as"] = "gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes"
         entry.setdefault("licence", {

@@ -230,6 +230,7 @@ class AuthService:
             key = secrets.token_urlsafe(48)  # ephemeral local secret: sessions end on restart
         self._serializer = URLSafeTimedSerializer(key, salt="reva-session-v1")
         self._fp_key = hashlib.sha256(b"reva-session-password-binding\x00" + key.encode()).digest()
+        self._audit_key = hashlib.sha256(b"reva-audit-username-tag\x00" + key.encode()).digest()
 
     # --- configuration --------------------------------------------------
     @property
@@ -247,6 +248,20 @@ class AuthService:
     def _password_binding(self, admin_hash: str) -> str:
         """Keyed fingerprint of the admin hash carried in the session (reveals nothing about the hash)."""
         return hmac.new(self._fp_key, admin_hash.encode(), hashlib.sha256).hexdigest()[:32]
+
+    def username_tag(self, username: str) -> str:
+        """Keyed, truncated tag of a submitted username for failed-login audit rows.
+
+        Audit rows are immutable, and a password typed into the username field must never persist there,
+        so the typed value is not stored. The tag groups repeated attempts with the same input without
+        being reversible offline (it is keyed by the session secret, unlike a plain hash of a guessable
+        string).
+        """
+        return hmac.new(self._audit_key, username.encode(), hashlib.sha256).hexdigest()[:16]
+
+    def _login_target(self, username: str) -> dict[str, Any]:
+        matched = hmac.compare_digest(username.encode(), ADMIN_USERNAME.encode())
+        return {"username_matched_admin": matched, "username_tag": self.username_tag(username)}
 
     def _audit_rate_limited(self, ck: str) -> bool:
         """Audit one rate-limit rejection per client per window, not every rejected request.
@@ -282,7 +297,7 @@ class AuthService:
         wait = self.limiter.check_and_record(ck)
         if wait is not None:
             if self._audit_rate_limited(ck):
-                self.audit("anonymous", "session.login_rate_limited", {"username": username[:64]},
+                self.audit("anonymous", "session.login_rate_limited", self._login_target(username),
                            {"client": ck, "note": "first rejection in this window; later ones are not audited"})
             raise ApiProblem(429, "rate_limited", "too many login attempts; retry later",
                              retry_after=int(wait) + 1)
@@ -290,7 +305,7 @@ class AuthService:
         user_ok = hmac.compare_digest(username.encode(), ADMIN_USERNAME.encode())
         pw_ok = verify_password(stored if user_ok else _DUMMY_HASH, password)
         if not (user_ok and pw_ok):
-            self.audit("anonymous", "session.login_failed", {"username": username[:64]},
+            self.audit("anonymous", "session.login_failed", self._login_target(username),
                        {"client": ck, "reason": "invalid_credentials"})
             raise ApiProblem(401, "invalid_credentials", "invalid username or password")
         # A fresh session id on every login (no fixation); a still-valid session presented with this login is
