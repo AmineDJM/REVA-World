@@ -359,7 +359,13 @@ def verify(profile: str = typer.Option("local")) -> None:
     st = get_store()
     probe = st.put_bytes(b'{"probe":true}', "quarantine", "application/json")
     checks["object_store"] = {"backend": s.reva_object_backend, "probe_sha256": probe.sha256}
-    ok = all(v for v in checks.values())
+    # --- GATE2: the independent gate login connects and holds exactly its privileges (skipped, with a
+    # note, when REVA_GATE_DB_PASSWORD is not configured outside production)
+    from reva.gate.verify import verify_gate
+
+    checks["db_gate"] = verify_gate(s)
+    ok = all(v for v in checks.values()) and bool(checks["db_gate"]["ok"])
+    # --- end GATE2
     _out({"ok": ok, **checks})
     if not ok:
         raise typer.Exit(1)
