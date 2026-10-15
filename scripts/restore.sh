@@ -2,6 +2,12 @@
 # Restore a REVA backup into a NEW, EMPTY database and verify it.
 #
 #   scripts/restore.sh BACKUP_DIR [--identity AGE_IDENTITY_FILE] [--skip-bootstrap] [--verify-objects]
+#                      [--restore-objects] [--force --confirm-database TARGET_DB_NAME]
+#
+#   --restore-objects  put the backup's objects archive into the configured object store (verified)
+#   --verify-objects   every artifact backed by a correct object; sealed release manifests re-verified
+#   --force            the target is not empty: DROP its REVA schemas first (needs --confirm-database
+#                      equal to the target name; refused when REVA_ENV=production)
 #
 # Environment:
 #   REVA_RESTORE_DATABASE_URL    owner credential of the empty target database (must exist)

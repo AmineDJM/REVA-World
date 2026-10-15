@@ -68,12 +68,15 @@ class Applicability(_Frozen):
     subjects: tuple[str, ...] | None = None  # None = not restricted by subject
     year_from: int | None = None  # inclusive
     year_to: int | None = None  # inclusive
+    year_set: tuple[int, ...] | None = None  # explicit set of years (``years: {in: [...]}``)
     classifications: tuple[str, ...] | None = None
     reason: str | None = None
 
     def applies(self, *, subject: str | None = None, year: int | None = None,
                 classification: str | None = None) -> bool:
         if self.subjects is not None and (subject is None or subject not in self.subjects):
+            return False
+        if self.year_set is not None and (year is None or year not in self.year_set):
             return False
         if self.year_from is not None or self.year_to is not None:
             if year is None:
@@ -162,22 +165,36 @@ class ConceptMapping(_Frozen):
 REGISTRY_REVIEW_BASIS = "seed-reviewed-1"
 
 
+def _year(v: Any) -> int:
+    if isinstance(v, bool) or not isinstance(v, int) or not 1 <= v <= 9999:
+        raise ValidationProblem(f"applicability years must be integers: {v!r}")
+    return v
+
+
 def _applicability_from_registry(raw: Mapping[str, Any]) -> Applicability:
+    """Explicit year scopes only (R5-11): ``years: {from: y0, to: y1}`` (inclusive range) or
+    ``years: {in: [y, ...]}`` (explicit set). A bare list is ambiguous (range or set?) and rejected;
+    the same schema is enforced by the database on ``evidence.eligibility``."""
     years = raw.get("years")
     yf = yt = None
-    if years:
-        if len(years) == 1:
-            yf = yt = int(years[0])
-        elif len(years) == 2:
-            yf, yt = int(years[0]), int(years[1])
+    yset: tuple[int, ...] | None = None
+    if years is not None:
+        if isinstance(years, Mapping) and set(years) == {"from", "to"}:
+            yf, yt = _year(years["from"]), _year(years["to"])
+            if yf > yt:
+                raise ValidationProblem(f"applicability.years.from exceeds years.to: {dict(years)}")
+        elif isinstance(years, Mapping) and set(years) == {"in"} and isinstance(years["in"], list) and years["in"]:
+            yset = tuple(sorted({_year(y) for y in years["in"]}))
         else:
-            raise ValidationProblem(f"applicability.years must be [year] or [from, to]: {years}")
+            raise ValidationProblem(
+                f"applicability.years must be {{from: y0, to: y1}} or {{in: [y, ...]}}: {years!r}")
     subjects = raw.get("subjects")
     classes = raw.get("classifications")
     return Applicability(
         subjects=tuple(subjects) if subjects is not None else None,
         year_from=yf,
         year_to=yt,
+        year_set=yset,
         classifications=tuple(classes) if classes is not None else None,
         reason=raw.get("reason"),
     )

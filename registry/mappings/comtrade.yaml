@@ -9,40 +9,40 @@ mappings:
     target: {concept_id: trade.hs2709.import_value.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2020, 2024], classifications: [H4, H5, H6]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6]}
     eligibility: eligible
   - mapping_key: comtrade.2709.X.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: 0, field: primaryValue}
     target: {concept_id: trade.hs2709.export_value.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2020, 2024], classifications: [H4, H5, H6]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}, classifications: [H4, H5, H6]}
     eligibility: eligible
   - mapping_key: comtrade.2709.M.bilateral
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: "*", field: primaryValue}
     target: {concept_id: trade.hs2709.import_value.bilateral, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2023]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {in: [2023]}}
     eligibility: eligible
   - mapping_key: comtrade.2709.X.bilateral
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: "*", field: primaryValue}
     target: {concept_id: trade.hs2709.export_value.bilateral, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2023]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {in: [2023]}}
     eligibility: eligible
   - mapping_key: comtrade.2709.M.netWgt.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: 0, field: netWgt}
     target: {concept_id: trade.hs2709.import_net_weight.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2020, 2024]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}}
     eligibility: eligible
   - mapping_key: comtrade.2709.X.netWgt.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: 0, field: netWgt}
     target: {concept_id: trade.hs2709.export_net_weight.world_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.0.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [2020, 2024]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 2020, to: 2024}}
     eligibility: eligible

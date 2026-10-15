@@ -8,12 +8,12 @@ mappings:
     target: {concept_id: demography.population.wdi_midyear_total, version: "1.0.0"}
     mapping_kind: exact
     version: "1.1.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [1960, 2024]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 1960, to: 2024}}
     eligibility: eligible
   - mapping_key: wb.NY.GDP.MKTP.CD
     source_ref: {provider: worldbank, indicator: NY.GDP.MKTP.CD}
     target: {concept_id: economics.gdp.nominal_current_usd, version: "1.0.0"}
     mapping_kind: exact
     version: "1.1.0"
-    applicability: {subjects: [FRA, DZA, CHN, USA], years: [1960, 2024]}
+    applicability: {subjects: [FRA, DZA, CHN, USA], years: {from: 1960, to: 2024}}
     eligibility: eligible

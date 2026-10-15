@@ -7,12 +7,19 @@ Subcommands (wrapped by scripts/backup.sh and scripts/restore.sh):
             REPEATABLE READ snapshot; the logical manifest is computed from the
             *same* snapshot; object-store inventory (sha256 per object) and a
             cross-check of every meta.artifact_location; optional/required age
-            encryption; writes backup.json.
+            encryption; with --include-objects an objects tar (encrypted alike);
+            plaintext metadata files are scanned for environment secrets;
+            writes backup.json. The manifest includes the security catalog
+            (triggers, RLS policies, SECURITY DEFINER functions, grants).
   restore   verifies the dump checksum, decrypts if needed, refuses a non-empty
             target, ensures the runtime roles exist, pg_restore --no-owner (ACLs
             kept), re-applies database-level grants, re-runs bootstrap (role
             passwords, ownership verification) and compares the restored logical
-            manifest with the one recorded at backup time.
+            manifest with the one recorded at backup time; optionally restores
+            the objects archive into the configured store (--restore-objects),
+            verifies every artifact and the sealed release manifests
+            (--verify-objects); a non-empty target needs --force
+            --confirm-database <name> (refused in production).
   manifest  print the logical manifest of a database.
   inventory print the object-store inventory.
 

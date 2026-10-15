@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Nightly logical backup of the REVA database + object-store sha256 inventory.
 #
-#   scripts/backup.sh [--out DIR] [--no-objects] [--recipient AGE_PUBKEY] [--recipients-file FILE]
+#   scripts/backup.sh [--out DIR] [--no-objects] [--include-objects] [--recipient AGE_PUBKEY] [--recipients-file FILE]
+#
+#   --include-objects  also stream every object into objects.tar(.age) so a fresh object store can be rebuilt
 #
 # Environment:
 #   REVA_MIGRATION_DATABASE_URL  owner credential used read-only (REPEATABLE READ snapshot)
@@ -13,7 +15,7 @@
 #   REVA_OBJECT_BACKEND/REVA_OBJECT_ROOT/REVA_S3_*   object store to inventory
 #
 # Output: DIR/reva-backup-<UTC>/ {reva.dump.age (or reva.dump when unencrypted locally), objects.jsonl,
-#         backup.json, SHA256SUMS} (mode 0700/0600). With encryption, pg_dump is streamed into
+#         [objects.tar(.age)], backup.json, SHA256SUMS} (mode 0700/0600). With encryption, pg_dump is streamed into
 #         age: no plaintext dump is ever written to disk.
 # Copy the directory to storage in a separate account (see docs/operations.md).
 # Secrets are read from the environment only and never printed.
