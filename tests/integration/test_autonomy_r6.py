@@ -106,7 +106,8 @@ async def _t1(io, db, mutate_manifest=None, overrides=None, scope=None):
 
 
 def _gate(db, io) -> PolicyPromotionGate:
-    return PolicyPromotionGate(db.worker, io)
+    # the gate records with its own login (reva_gate) once GATE's process separation is in place
+    return PolicyPromotionGate(getattr(db, "gate", None) or db.worker, io)
 
 
 def _gate_rows(db, pid) -> int:
@@ -232,11 +233,11 @@ def test_r6_03_model_registration_never_approved_by_a_gate_pass(db, io):
                                          scope={"model_spec_sha256": spec.sha256}, risk={})
     d = _gate(db, io).decide(p.proposal_id, [], promotion_policy().ref())
     assert d.outcome == "needs_review" and any("model_registration is at least T2" in r for r in d.reasons)
-    # even a recorded pass (as a worker could write one through ops.record_gate_result) is refused
+    # even a recorded pass (as any login holding ops.record_gate_result could write one) is refused
     ev = io.put_json({"forged": str(uuid.uuid4())}, "evaluation")
     from reva.ports.autonomy import GateDecision
 
-    with db.worker.begin() as conn:
+    with (getattr(db, "gate", None) or db.worker).begin() as conn:
         io.register(conn, ev, "r6/1")
         gid = conn.execute(text("SELECT ops.record_gate_result(:p,'x',:v,'pass',:e,'gate-evaluator:x')"),
                            {"p": p.proposal_id, "e": ev.sha256, "v": promotion_policy().version}).scalar_one()

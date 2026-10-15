@@ -243,5 +243,7 @@ def test_l2_publishes_grid_and_level_free_sensitivity_range(env: Env) -> None:
 def test_wrong_year_and_uncovered_country_are_typed(env: Env) -> None:
     ref = run(env, create(env, scenario_doc(env, reference_year=2023)), "L1")
     assert ref["status"] == "unsupported" and ref["problems"][0]["code"] == "incompatible_semantics"
-    with pytest.raises(Exception, match="DZA|enum|not one of"):
+    from reva.kernel.errors import ValidationProblem
+
+    with pytest.raises(ValidationProblem, match="ScenarioSpec"):  # DZA is not a FIGARO economy (schema enum)
         create(env, scenario_doc(env, countries=["DZA"]))

@@ -137,7 +137,7 @@ def run(emp_rows: Sequence[Mapping[str, Any]], act_rows: Sequence[Mapping[str, A
         "rule_table_digest": table.digest(), "assumption_registry_digest": grid.source_digest,
         "central_point": CENTRAL, "benchmark": "benchmark_persistence",
         "grid_points": [p.as_dict() for p in points], "excluded_points": list(excluded),
-        "ineligible_share_60_64": {t: dstr(CTX.quantize(fr(rl.ineligible_share(scn, t, ages)), Decimal("0.0001")))
+        "ineligible_share_60_64": {str(t): dstr(CTX.quantize(fr(rl.ineligible_share(scn, t, ages)), Decimal("0.0001")))
                                    for t in TEST_YEARS},
         "base_data": base,
         "results": results,
