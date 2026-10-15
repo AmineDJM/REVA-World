@@ -15,12 +15,24 @@ from typing import Any
 import numpy as np
 
 GENERATOR = "numpy.random.Philox"
-DERIVATION = "SeedSequence(entropy=run_seed, spawn_key=(sha256(model_id\\x1fentity_id) words, draw_index))"
+DERIVATION = (
+    "SeedSequence(entropy=run_seed, spawn_key=(sha256(esc(model_id)\\x1fesc(entity_id)) words, draw_index)); "
+    "esc(s) is s with every backslash doubled and every U+001F replaced by the six characters \\u001f"
+)
 _MAX_SEED = 2**64 - 1
 
 
+def _esc(name: str) -> str:
+    """Injective escaping of the U+001F separator (R7-S2).
+
+    Identity for names without a backslash or U+001F, so ordinary (model, entity)
+    names keep the stream keys they had before escaping was introduced.
+    """
+    return name.replace("\\", "\\\\").replace("\x1f", "\\u001f")
+
+
 def _name_words(model_id: str, entity_id: str) -> tuple[int, ...]:
-    digest = hashlib.sha256(f"{model_id}\x1f{entity_id}".encode()).digest()
+    digest = hashlib.sha256(f"{_esc(model_id)}\x1f{_esc(entity_id)}".encode()).digest()
     return tuple(int.from_bytes(digest[i : i + 4], "little") for i in range(0, 32, 4))
 
 

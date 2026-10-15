@@ -25,7 +25,7 @@ from reva.adapters.connectors.comtrade import ComtradeConnector
 from reva.adapters.connectors.worldbank import WorldBankConnector
 from reva.adapters.http.safe_client import request_fingerprint
 from reva.autonomy import repair as R
-from reva.autonomy.common import ArtifactIO, AutonomyBlocked, stable_id
+from reva.autonomy.common import ArtifactIO, AutonomyBlocked
 from reva.autonomy.gate import PolicyPromotionGate
 from reva.autonomy.policy import promotion_policy
 from reva.evidence.runner import FixtureHttp, run_connector
@@ -404,11 +404,16 @@ async def test_auth_change_requires_credential_provisioning(db, io, gate) -> Non
 
 
 # --------------------------------------------------------------------------- pause / resume, handler
-def test_only_gate_promotion_or_named_human_resumes_publication(db) -> None:
+def test_only_gate_promotion_or_named_human_resumes_publication(db, advisor) -> None:
     probe = "test.repair.pause_probe"
+    wb = WorldBankConnector()
+    c = CASES["wb_added_field"]
+    rp = advisor.propose(wb, advisor.assess(wb, advisor.case_from_response(wb, c["url"], _body("wb_added_field"))))
+    assert rp is not None
+    pid = rp.proposal.proposal_id
     with db.worker.begin() as conn:
         pause = R.pause_belief_publication(conn, [probe], connector="worldbank.wdi.indicators",
-                                           classification=R.RENAME, proposal_id=stable_id("probe"),
+                                           classification=R.RENAME, proposal_id=pid,
                                            origin="test_fixture", item_key=None, acquisition_id=None,
                                            actor=R.AUTHOR)
     assert pause.node_keys == (R.PAUSE_PREFIX + probe,) and _paused(db, probe)
@@ -416,8 +421,23 @@ def test_only_gate_promotion_or_named_human_resumes_publication(db) -> None:
         R.resume_belief_publication(db.worker, probe, actor=R.AUTHOR, reason="agent may not resume")
     with pytest.raises(AutonomyBlocked):
         R.resume_belief_publication(db.worker, probe, actor="gate-evaluator:promotion", reason="no decision")
-    assert R.resume_belief_publication(db.worker, probe, actor="human:maintainer", reason="reviewed mapping v2")
+    # A human resume is never asserted by the worker: it cites the human's recorded approval.
+    with pytest.raises(AutonomyBlocked):
+        R.resume_belief_publication(db.worker, probe, actor="human:maintainer", reason="no review cited")
+    with db.api.begin() as conn:
+        review = conn.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', :m)"),
+                              {"p": pid, "m": "reviewed mapping v2"}).scalar_one()
+    with pytest.raises(AutonomyBlocked):
+        R.resume_belief_publication(db.worker, probe, actor="human:someone-else", reason="not the reviewer",
+                                    review_id=review)
+    assert R.resume_belief_publication(db.worker, probe, actor="human:maintainer", reason="reviewed mapping v2",
+                                       review_id=review)
     assert not _paused(db, probe)
+    with db.owner.connect() as conn:
+        audit = conn.execute(text("SELECT actor, details FROM ops.audit WHERE action = 'connector.publication_resumed' "
+                                  "AND target->>'concept' = :c ORDER BY recorded_at DESC LIMIT 1"),
+                             {"c": probe}).mappings().one()
+    assert audit["actor"] == R.RESUME_EXECUTOR and audit["details"]["reviewer"] == "human:maintainer"
 
 
 def test_job_handler_refuses_when_blocked_or_unknown(db) -> None:

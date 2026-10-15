@@ -1,4 +1,5 @@
 import { useMemo, useState, type FormEvent } from 'react';
+import { formatNumber } from '../lib/locale';
 import { getModelEvaluations, getModels, newIdempotencyKey, startReplay } from '../api/client';
 import type { Envelope, ModelEvaluation, ModelVersionOut, ReplayMode } from '../api/types';
 import { ContextBanner } from '../components/ContextBanner';
@@ -22,7 +23,7 @@ export function replayModeLabel(mode: string): string {
 function metric(m: Record<string, unknown>, k: string): string {
   const v = m[k];
   if (v === null || v === undefined) return 'not defined';
-  if (typeof v === 'number') return Number.isFinite(v) ? v.toLocaleString('en-US', { maximumSignificantDigits: 4 }) : 'not defined';
+  if (typeof v === 'number') return Number.isFinite(v) ? formatNumber(v, { maximumSignificantDigits: 4 }) : 'not defined';
   return String(v);
 }
 

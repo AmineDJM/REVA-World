@@ -1634,12 +1634,26 @@ def is_publication_paused(conn: Connection, concept_id: str) -> bool:
                         {"k": PAUSE_PREFIX + concept_id}).scalar_one_or_none() is not None
 
 
+RESUME_EXECUTOR = "worker:publication-resume"
+
+
 def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, reason: str,
-                              gate_result_id: UUID | None = None) -> bool:
-    """Lift a pause. Only a gate evaluator (with its promote decision) or a named human may do so."""
+                              gate_result_id: UUID | None = None, review_id: UUID | None = None) -> bool:
+    """Lift a pause. Only a gate evaluator (with its promote decision) or a named human may do so.
+
+    A human resume is never asserted by the worker: it must cite the human's recorded
+    review (``review_id``: an ``approve`` row in ``ops.proposal_review``, written only
+    through ``ops.review_proposal`` by the API/admin principal) of the proposal that
+    paused this concept, by that same reviewer. The audit row is attributed to the
+    executing worker (``worker:publication-resume``) and names the reviewer and review.
+    """
     if not actor.startswith(("gate-evaluator:", "human:")):
         raise AutonomyBlocked("only a gate evaluator or a named human can resume belief publication")
     with engine.begin() as conn:
+        marker = conn.execute(text("SELECT accumulated_error_bound FROM ops.dirty_node WHERE node_key = :k FOR UPDATE"),
+                              {"k": PAUSE_PREFIX + concept_id}).scalar_one_or_none()
+        pause_proposal = (marker or {}).get("proposal_id")
+        evidence: dict[str, Any] = {"reason": reason[:500]}
         if actor.startswith("gate-evaluator:"):
             if gate_result_id is None:
                 raise AutonomyBlocked("a gate evaluator resumes publication only with its promote decision")
@@ -1647,14 +1661,28 @@ def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, re
                               {"g": gate_result_id, "a": actor}).scalar_one_or_none()
             if not ok:
                 raise AutonomyBlocked("gate result is not a promote decision by this evaluator")
+            audit_actor = actor
+            evidence["gate_result_id"] = str(gate_result_id)
+        else:
+            if review_id is None:
+                raise AutonomyBlocked("a human resume must cite the reviewer's recorded approval (review_id)")
+            rv = conn.execute(text("SELECT proposal_id, decision, reviewer FROM ops.proposal_review WHERE id = :r"),
+                              {"r": review_id}).mappings().one_or_none()
+            if rv is None or rv["decision"] != "approve" or rv["reviewer"] != actor:
+                raise AutonomyBlocked("review is not an approval recorded by this reviewer")
+            if marker is not None and str(rv["proposal_id"]) != str(pause_proposal):
+                raise AutonomyBlocked("the review approves a different proposal than the one that paused publication")
+            audit_actor = RESUME_EXECUTOR
+            evidence.update({"reviewer": actor, "review_id": str(review_id)})
         n = conn.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"),
                          {"k": PAUSE_PREFIX + concept_id}).rowcount
         if n:
             repo.emit_outbox(conn, "connector.publication_resumed",
                              {"concept": concept_id, "actor": actor, "reason": reason[:500],
-                              "gate_result_id": str(gate_result_id) if gate_result_id else None})
-            repo.audit(conn, actor, "connector.publication_resumed", {"concept": concept_id},
-                       {"reason": reason[:500]})
+                              "proposal_id": pause_proposal,
+                              "gate_result_id": str(gate_result_id) if gate_result_id else None,
+                              "review_id": str(review_id) if review_id else None})
+            repo.audit(conn, audit_actor, "connector.publication_resumed", {"concept": concept_id}, evidence)
     return bool(n)
 
 
@@ -1712,10 +1740,11 @@ def handle_connector_repair(payload: dict[str, Any], ctx: Any) -> dict[str, Any]
 
 __all__ = [
     "ADDITIVE", "AUTH", "CLASSIFICATION", "CONTENT", "ENDPOINT", "MEANING", "PAUSE_WITHHOLD_REASON", "REMOVED",
-    "RENAME", "SCALE", "STRUCTURE", "TRANSIENT", "TYPE_CHANGE", "UNIT", "AttemptSignal", "ConnectorRepairAdvisor",
-    "DriftCase", "FixtureReplayChecker", "MappedParser", "MappingRevision", "PublicationPause", "RepairAssessment",
-    "RepairProposal", "RunSignals", "ScaleRule", "SchemaSemantics", "active_publication_pauses", "diff_payload",
-    "dumps_exact", "failure_history", "failure_streak", "handle_connector_repair", "is_publication_paused",
-    "last_accepted_release", "load_exact", "pause_belief_publication", "resume_belief_publication",
-    "schema_profile", "semantic_schema_fingerprint", "suggest_mapping", "value_comparison",
+    "RENAME", "RESUME_EXECUTOR", "SCALE", "STRUCTURE", "TRANSIENT", "TYPE_CHANGE", "UNIT", "AttemptSignal",
+    "ConnectorRepairAdvisor", "DriftCase", "FixtureReplayChecker", "MappedParser", "MappingRevision",
+    "PublicationPause", "RepairAssessment", "RepairProposal", "RunSignals", "ScaleRule", "SchemaSemantics",
+    "active_publication_pauses", "diff_payload", "dumps_exact", "failure_history", "failure_streak",
+    "handle_connector_repair", "is_publication_paused", "last_accepted_release", "load_exact",
+    "pause_belief_publication", "resume_belief_publication", "schema_profile", "semantic_schema_fingerprint",
+    "suggest_mapping", "value_comparison",
 ]

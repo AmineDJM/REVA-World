@@ -229,7 +229,11 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
     assert any("paused" in n for n in cmp.notes)
 
     # Resume (named human) -> the outbox re-enqueues the publication -> POP published again.
-    assert R.resume_belief_publication(db.worker, POP, actor="human:maintainer", reason="mapping v2 reviewed")
+    with db.api.begin() as c:  # the human decision is recorded through the API principal
+        review = c.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', 'mapping v2')"),
+                           {"p": proposal_id}).scalar_one()
+    assert R.resume_belief_publication(db.worker, POP, actor="human:maintainer", reason="mapping v2 reviewed",
+                                       review_id=review)
     report = invalidation.process_outbox(db.worker, environment="test")
     assert report.publish_jobs, "a resumed concept must re-enqueue its publication"
     r2 = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test")

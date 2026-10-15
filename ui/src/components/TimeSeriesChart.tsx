@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import type uPlot from 'uplot';
 import 'uplot/dist/uPlot.min.css';
+import { formatNumber, installLocaleGuard } from '../lib/locale';
 
 export interface SeriesPoint {
   /** Year (x). */
@@ -59,8 +60,10 @@ export function TimeSeriesChart({ points, label, yLabel, bandKind = null, height
     let plot: uPlot | null = null;
     let ro: ResizeObserver | null = null;
     let cancelled = false;
-    // Loaded lazily: a chart failure (e.g. an unsupported browser locale) must never break the page;
-    // the data table next to the chart carries the same values.
+    // uPlot builds Intl.NumberFormat(navigator.language) when its module loads; an invalid browser
+    // tag (e.g. "en-US@posix") would throw there, so the sanitised locale is installed first.
+    installLocaleGuard();
+    // Loaded lazily: a chart failure must never break the page; the data table carries the values.
     import('uplot')
       .then(({ default: UPlot }) => {
         if (cancelled) return;
@@ -98,11 +101,7 @@ export function TimeSeriesChart({ points, label, yLabel, bandKind = null, height
   return <div ref={el} className="chart" role="img" aria-label={label} />;
 }
 
-function compact(v: number): string {
-  const a = Math.abs(v);
-  if (a >= 1e12) return `${(v / 1e12).toFixed(1)}T`;
-  if (a >= 1e9) return `${(v / 1e9).toFixed(1)}B`;
-  if (a >= 1e6) return `${(v / 1e6).toFixed(1)}M`;
-  if (a >= 1e3) return `${(v / 1e3).toFixed(1)}k`;
-  return String(v);
+/** Compact axis label with the app locale (e.g. "57.1B"); never throws on a bad browser locale. */
+export function compact(v: number): string {
+  return formatNumber(v, { notation: 'compact', maximumFractionDigits: 1 });
 }

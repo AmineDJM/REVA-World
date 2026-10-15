@@ -28,6 +28,8 @@ from enum import StrEnum
 
 from pydantic import BaseModel, ConfigDict, model_validator
 
+from reva.kernel.values import _DECIMAL_RE
+
 
 class UncertaintyStatus(StrEnum):
     unquantified = "unquantified"
@@ -67,9 +69,14 @@ PROBABILISTIC_KINDS = frozenset(
 
 
 def _dec(v: str | None, name: str) -> Decimal | None:
-
+    """Parse a bound with the same plain-decimal grammar as ``ScalarDecimal`` (R7-K3)."""
     if v is None:
         return None
+    if not _DECIMAL_RE.fullmatch(v):
+        raise ValueError(
+            f"{name} must be a plain decimal string matching -?(0|[1-9][0-9]*)(\\.[0-9]+)? "
+            "(no exponent, '+', leading zeros, whitespace or '_')"
+        )
     try:
         d = Decimal(v)
     except InvalidOperation as e:

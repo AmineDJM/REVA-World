@@ -27,17 +27,18 @@ import { JsonView } from '../components/JsonView';
 import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { ErrorState, Loading, ProblemView } from '../components/StateViews';
 import { UncertaintyPanel } from '../components/UncertaintyPanel';
-import { ValueView } from '../components/ValueView';
+import { ExactToggle, ValueView } from '../components/ValueView';
+import { UncertaintyGlyph, UncertaintyLegend, glyphKindsOf } from '../components/UncertaintyGlyph';
+import { MissingValue } from '../components/MissingValue';
 import {
+  displayDecimal,
   formatDateTime,
-  formatDecimalString,
   humanize,
   isRecord,
   missingReasonLabel,
   pointInRange,
   shortId,
   sourceFlagNotes,
-  unitLabel,
 } from '../lib/format';
 import {
   ALL_OUTPUTS,
@@ -158,10 +159,12 @@ const INPUT_LABELS: Record<string, string> = {
 
 function BaselineCell({ input }: { input: BaselineInput | undefined }) {
   if (!input) return <span className="muted">not reported</span>;
-  if (input.value === null || input.value === undefined) return <span className="missing-value">missing (not in baseline)</span>;
+  if (input.value === null || input.value === undefined) return <MissingValue reason="not_in_baseline" />;
+  const d = displayDecimal(input.value, 'unit.usd');
   return (
-    <span>
-      <span className="num">{formatDecimalString(input.value)}</span> <span className="unit">US$</span>
+    <span title={`exact: ${input.value} unit.usd`} data-exact={input.value}>
+      <span className="num">{d.text}</span> <span className="unit">US$</span>
+      {d.rounded && <ExactToggle exact={d.exact} unitRef="unit.usd" />}
       {input.valuation && <span className="basis"> · {input.valuation}</span>}
       {input.estimate_id && (
         <>
@@ -235,6 +238,7 @@ function MissingInputs({ error }: { error: unknown }) {
               <td>{r.year ?? '—'}</td>
               <td>
                 <span className="missing-value">
+                  <UncertaintyGlyph kind="missing" className="uglyph-inline" />
                   {r.state?.startsWith('missing:') ? `missing (${missingReasonLabel(r.state.slice(8))})` : (r.state ?? 'missing')}
                 </span>
               </td>
@@ -311,6 +315,7 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
         </div>
       )}
 
+      {groups.length > 0 && <UncertaintyLegend present={glyphKindsOf(st.results)} />}
       {groups.length > 0 && (
         <div className="table-wrap">
           <table className="data-table" data-testid="comparison-table">
@@ -334,7 +339,7 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
                   <th scope="row">{g.country}</th>
                   <td>{outputLabel(g.output)}</td>
                   <td>
-                    <ValueView value={g.l1?.value} />
+                    <ValueView value={g.l1?.value} compact />
                   </td>
                   {isL2 && (
                     <td>
@@ -345,10 +350,15 @@ export function ResultsView({ simId, env }: { simId: string; env: Envelope<Simul
                         </>
                       ) : g.l1?.uncertainty?.kind === 'sensitivity_range' && g.l1.uncertainty.lower && g.l1.uncertainty.upper ? (
                         <>
-                          <span className="sensitivity-range">
-                            {formatDecimalString(g.l1.uncertainty.lower)} to {formatDecimalString(g.l1.uncertainty.upper)}{' '}
-                            {unitLabel(g.l1.value.kind === 'decimal' ? g.l1.value.unit_ref : undefined)}
-                          </span>
+                          <ValueView
+                            value={{
+                              kind: 'sensitivity_range',
+                              lower: g.l1.uncertainty.lower,
+                              upper: g.l1.uncertainty.upper,
+                              unit_ref: g.l1.value.kind === 'decimal' ? g.l1.value.unit_ref : '',
+                              statement: g.l1.uncertainty.description ?? 'assumption sensitivity range, not a confidence interval',
+                            }}
+                          />
                           <L1Position l1={g.l1} lower={g.l1.uncertainty.lower} upper={g.l1.uncertainty.upper} />
                         </>
                       ) : (

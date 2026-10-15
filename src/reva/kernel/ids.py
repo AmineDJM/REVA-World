@@ -70,7 +70,11 @@ def _normalise(obj: Any) -> Any:
     if isinstance(obj, datetime):
         if obj.tzinfo is None or obj.utcoffset() is None:
             raise ValueError("naive datetimes are forbidden in canonical JSON")
-        return {"$datetime": obj.astimezone(UTC).isoformat()}
+        try:
+            utc = obj.astimezone(UTC)
+        except OverflowError as e:  # e.g. 0001-01-01T00:00+05:00 is before datetime.min in UTC
+            raise ValueError("datetime instant is outside the representable UTC range") from e
+        return {"$datetime": utc.isoformat()}
     if isinstance(obj, date):
         return {"$date": obj.isoformat()}
     if isinstance(obj, uuid.UUID):

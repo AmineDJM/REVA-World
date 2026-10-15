@@ -75,6 +75,20 @@ class TimeExtent(BaseModel):
             self.end_uncertainty.earliest <= self.end <= self.end_uncertainty.latest
         ):
             raise ValueError("end lies outside its own uncertain bound")
+        if self.kind == "instant" and self.end_uncertainty is not None:
+            raise ValueError("instant must not have an end bound")
+        # R7-K4: the interval must be non-empty for at least one admissible (start, end) pair,
+        # i.e. the latest admissible end must lie after the earliest admissible start (half-open).
+        # An uncertain bound widens the admissible set; an unknown endpoint (None) leaves it open.
+        earliest_start = (
+            self.start_uncertainty.earliest if self.start_uncertainty is not None else self.start
+        )
+        latest_end = self.end_uncertainty.latest if self.end_uncertainty is not None else self.end
+        if earliest_start is not None and latest_end is not None and latest_end <= earliest_start:
+            raise ValueError(
+                "interval end must be after start (half-open): every admissible end precedes "
+                "or equals every admissible start"
+            )
         return self
 
     @classmethod
