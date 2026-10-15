@@ -5,8 +5,13 @@ set (request_id, job_id, activity_id, source_id, release_id, run_id), taken
 from ``extra=`` or from context variables set by the worker around a job.
 
 Redaction: values of secret environment variables (REVA_*PASSWORD*, *SECRET*,
-*KEY*, DATABASE URLs) and passwords embedded in URLs (``scheme://user:pw@``)
-are replaced by ``***`` in every formatted message, argument and exception.
+*KEY*, DATABASE URLs), values registered in-process (Settings secrets read from
+``.env``) and passwords embedded in URLs (``scheme://user:pw@``) are replaced
+by ``***`` in every formatted message, argument and exception. Shape rules also
+mask SQLAlchemy bound parameters, PostgreSQL DETAIL value echoes, credential
+headers, secret query parameters, application tokens/cookies and Argon2id
+hashes. ``redact_obj`` does the same for structured payloads without breaking
+their JSON shape.
 
 Metrics: a deliberately small, dependency-free text-exposition registry. Label
 names are fixed per metric and limited to {job_type, status, connector}; label
@@ -48,8 +53,65 @@ _KV_SECRET = re.compile(
 )
 
 
+# Shape-based rules (independent of which secrets this process knows by value). They apply to
+# plain text (messages, tracebacks, error strings); structured payloads go through redact_obj.
+#: SQLAlchemy appends the bound parameters to exception text ("[parameters: {...}]", one line).
+_SQL_PARAMETERS = re.compile(r"\[parameters: [^\n]*")
+#: PostgreSQL DETAIL/CONTEXT lines that echo row, key or input values.
+_PG_VALUE_ECHO = (
+    (re.compile(r"(Key \((?:[^()\n]|\([^()\n]*\))*\)=)\([^\n]*"), r"\1(***)"),
+    (re.compile(r"(Failing row contains )\([^\n]*"), r"\1(***)"),
+    (re.compile(r"(invalid input (?:syntax|value) for [^:\n]*: )\"[^\"\n]*\""), r'\1"***"'),
+    (re.compile(r"(JSON data, line \d+: )[^\n]*"), r"\1***"),
+    (re.compile(r"(Token )\"[^\"\n]*\"( is invalid)"), r'\1"***"\2'),
+)
+#: Credential-bearing HTTP headers rendered as text (``Authorization: Bearer x``, ``'cookie': '...'``).
+_AUTH_HEADER = re.compile(
+    r"(?i)\b(?P<k>(?:proxy-)?authorization|set-cookie|cookie|x-api-key|ocp-apim-subscription-key|x-amz-security-token)"
+    r"(?P<sep>['\"]?\s*[:=]\s*['\"]?)(?P<v>[^'\"\n]+)"
+)
+_BEARER = re.compile(r"(?i)\b(?P<k>bearer|basic)\s+[A-Za-z0-9._~+/=\-]{8,}")
+#: Secret query parameters in URLs (provider keys, presigned S3 signatures/credentials).
+_QUERY_SECRET = re.compile(
+    r"(?i)(?P<k>[?&](?:subscription-key|api[_-]?key|apikey|key|token|access_token|secret|password|signature|sig"
+    r"|x-amz-signature|x-amz-credential|x-amz-security-token)=)[^&\s#'\"]+"
+)
+#: Cookies/tokens issued by this application and Argon2id hashes (REVA_ADMIN_PASSWORD_HASH).
+_APP_SECRET_SHAPES = (
+    (re.compile(r"(?P<k>\breva_(?:session|csrf)=)[^;\s,'\"]+"), r"\g<k>***"),
+    (re.compile(r"\breva_[A-Za-z0-9_\-]{40,}"), "reva_***"),
+    (re.compile(r"\$argon2id\$v=\d+\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/=]+\$[A-Za-z0-9+/=]+"), "$argon2id$***"),
+)
+#: Mapping keys whose string values are always secret (structured payloads: audit, outbox, job errors).
+_SECRET_KEY = re.compile(
+    r"(?i)(password|passwd|passphrase|secret|api[_-]?key|apikey|authorization|cookie|private[_-]?key"
+    r"|access[_-]?key|credential|^token$|[_-]token$|token[_-]?(sha256|hash)$|^dsn$|database_url)"
+)
+_MIN_REGISTERED = 6
+_MAX_REGISTERED = 256
+_registered: dict[str, None] = {}  # insertion-ordered, bounded
+_registry_version = 0
+_registry_lock = threading.Lock()
+
+
 def is_secret_env_name(name: str) -> bool:
     return bool(_SECRET_NAME.search(name.upper()))
+
+
+def register_secret_values(values: Iterable[str | None]) -> None:
+    """Remember secret values known only in-process (e.g. read from ``.env`` by Settings, never exported to
+    ``os.environ``) so every redaction pass masks them by value. Bounded; short values are ignored."""
+    global _registry_version
+    with _registry_lock:
+        changed = False
+        for v in values:
+            if v and len(v) >= _MIN_REGISTERED and v not in _registered:
+                _registered[v] = None
+                changed = True
+                while len(_registered) > _MAX_REGISTERED:
+                    _registered.pop(next(iter(_registered)))
+        if changed:
+            _registry_version += 1
 
 
 def secret_values(environ: Mapping[str, str] | None = None) -> list[str]:
@@ -61,16 +123,49 @@ def secret_values(environ: Mapping[str, str] | None = None) -> list[str]:
             if m and len(m.group("pw")) >= 4:
                 vals.add(m.group("pw"))
         _ = k
+    with _registry_lock:
+        vals.update(_registered)
     return sorted(vals, key=len, reverse=True)
 
 
 def redact_text(s: str, secrets: Iterable[str] = ()) -> str:
+    """Mask secrets in free text: known values, URL passwords, ``key=value`` secrets, SQL bound parameters,
+    PostgreSQL value echoes, credential headers, secret query parameters and application token shapes."""
     for v in secrets:
         if v and v in s:
             s = s.replace(v, "***")
     s = _URL_PASSWORD.sub(lambda m: f"{m.group('scheme')}{m.group('user')}:***@", s)
+    s = _SQL_PARAMETERS.sub("[parameters: ***]", s)
+    for rx, repl in _PG_VALUE_ECHO:
+        s = rx.sub(repl, s)
+    s = _AUTH_HEADER.sub(lambda m: f"{m.group('k')}{m.group('sep')}***", s)
+    s = _BEARER.sub(lambda m: f"{m.group('k')} ***", s)
+    s = _QUERY_SECRET.sub(lambda m: f"{m.group('k')}***", s)
+    for rx, repl in _APP_SECRET_SHAPES:
+        s = rx.sub(repl, s)
     s = _KV_SECRET.sub(lambda m: f"{m.group('k')}***", s)
     return s
+
+
+def redact_obj(obj: Any, secrets: Iterable[str] | None = None, *, _depth: int = 0) -> Any:
+    """Structure-preserving redaction for JSON-like payloads (audit/outbox/job errors): string values under
+    secret-named keys become ``***``; every other string goes through :func:`redact_text`."""
+    known = list(secret_values() if secrets is None else secrets)
+    if _depth > 32:
+        return "***"
+    if isinstance(obj, str):
+        return redact_text(obj, known)
+    if isinstance(obj, Mapping):
+        out: dict[Any, Any] = {}
+        for k, v in obj.items():
+            if isinstance(v, str) and _SECRET_KEY.search(str(k)):
+                out[k] = "***"
+            else:
+                out[k] = redact_obj(v, known, _depth=_depth + 1)
+        return out
+    if isinstance(obj, list | tuple):
+        return [redact_obj(v, known, _depth=_depth + 1) for v in obj]
+    return obj
 
 
 class RedactionFilter(logging.Filter):
@@ -79,12 +174,16 @@ class RedactionFilter(logging.Filter):
     def __init__(self, environ: Mapping[str, str] | None = None) -> None:
         super().__init__()
         self.environ = environ
-        self._secrets = secret_values(environ)
+        self._version = -1
+        self.refresh()
 
     def refresh(self) -> None:
+        self._version = _registry_version
         self._secrets = secret_values(self.environ)
 
     def filter(self, record: logging.LogRecord) -> bool:
+        if self._version != _registry_version:
+            self.refresh()
         try:
             msg = record.getMessage()
         except Exception:
@@ -143,8 +242,22 @@ class JsonFormatter(logging.Formatter):
         return json.dumps(out, default=str, ensure_ascii=False)
 
 
+#: Server loggers that install their own (unredacted, plain-text) handlers; configure_logging routes them
+#: through the redacting JSON handler instead (uvicorn logs "Exception in ASGI application" tracebacks,
+#: and access lines with full query strings).
+ADOPTED_LOGGERS: tuple[str, ...] = ("uvicorn", "uvicorn.error", "uvicorn.access")
+#: Libraries whose DEBUG/INFO output carries request URLs, headers or SQL parameters: never below WARNING,
+#: whatever REVA_LOG_LEVEL says (httpx logs URLs with query-string keys at INFO; botocore logs signed
+#: request headers at DEBUG; sqlalchemy.engine logs statements with bound parameters at INFO).
+QUIET_LOGGERS: tuple[str, ...] = ("httpx", "httpcore", "botocore", "boto3", "s3transfer", "urllib3", "sqlalchemy")
+
+
 def configure_logging(level: str = "INFO", *, stream: Any = None) -> logging.Handler:
-    """Install a single JSON handler with redaction on the root logger (idempotent)."""
+    """Install a single JSON handler with redaction on the root logger (idempotent).
+
+    Also adopts the server loggers (their own handlers are removed, records propagate to the redacting
+    handler) and keeps credential-bearing library loggers at WARNING or above.
+    """
     root = logging.getLogger()
     for h in list(root.handlers):
         if getattr(h, "_reva_json", False):
@@ -155,6 +268,15 @@ def configure_logging(level: str = "INFO", *, stream: Any = None) -> logging.Han
     handler._reva_json = True  # type: ignore[attr-defined]
     root.addHandler(handler)
     root.setLevel(level.upper())
+    for name in ADOPTED_LOGGERS:
+        lg = logging.getLogger(name)
+        for h in list(lg.handlers):
+            lg.removeHandler(h)
+        lg.propagate = True
+    for name in QUIET_LOGGERS:
+        lg = logging.getLogger(name)
+        if lg.getEffectiveLevel() < logging.WARNING or lg.level == logging.NOTSET:
+            lg.setLevel(logging.WARNING)
     return handler
 
 

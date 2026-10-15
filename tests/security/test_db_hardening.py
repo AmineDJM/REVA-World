@@ -541,7 +541,8 @@ def _eligible(c: Connection, w: dict[str, Any], subject: str, year: int | None =
 
 
 def test_subject_scoped_quarantine_does_not_affect_other_subjects(w: dict[str, Any]) -> None:
-    with tx(w["db"].worker) as c:
+    # 'eligible' decisions are written only by the owner / registry approval functions (R5-01)
+    with tx(w["db"].owner) as c:
         assert _eligible(c, w, "FRA", 2020) and _eligible(c, w, "DZA", 2020)
         _decision(c, w, "quarantine", {"subject_ids": [str(entity_id("DZA"))]})
         assert _eligible(c, w, "FRA", 2020)

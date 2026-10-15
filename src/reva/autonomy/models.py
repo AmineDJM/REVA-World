@@ -80,19 +80,26 @@ class PostgresModelRegistry:
                 return ModelDescriptor(uuid.UUID(str(row["id"])), descriptor.model_key, descriptor.version,
                                        descriptor.manifest, descriptor.applicability)
             self.io.register(conn, descriptor.manifest, "model-spec/1")
-            act = repo.simple_activity("model.registration", "review", approval.reviewer_identity,
+            # (R5-01) Runtime roles cannot attribute rows to a human: the registration activity is the
+            # worker's (or the gate evaluator's); the human approver is recorded in its parameters and,
+            # by model.approve_version, in the audit row.
+            who = approval.reviewer_identity
+            act = repo.simple_activity("model.registration", "review",
+                                       who if who.startswith("gate-evaluator:") else "worker:model-registry",
                                        {"model_key": descriptor.model_key, "version": descriptor.version,
-                                        "gate_decision": str(approval.decision_id),
+                                        "gate_decision": str(approval.decision_id), "approved_by": who,
                                         "policy_version": approval.policy_version})
             repo.record_activity(conn, act, outputs=[descriptor.manifest.sha256])
             from reva.operations.environment import code_digest
 
+            # 'approved' only through the DB-checked path: a recorded passing gate result or an approving
+            # human review (recorded through reva_api) of this model_registration proposal; one approval
+            # registers one model version.
             mid = conn.execute(text(
-                """INSERT INTO model.version(model_key, version, kind, spec_sha256, code_digest, input_ports,
-                     output_ports, applicability, assumptions, approval_status, provenance_activity_id)
-                   VALUES (:k, :v, :kind, :sha, :cd, CAST(:ip AS jsonb), CAST(:op AS jsonb), CAST(:ap AS jsonb),
-                           CAST(:as AS jsonb), 'approved', :a) RETURNING id"""),
-                {"k": descriptor.model_key, "v": descriptor.version, "kind": spec["kind"],
+                """SELECT model.approve_version(:p, :g, :k, :v, :kind, :sha, :cd, CAST(:ip AS jsonb),
+                     CAST(:op AS jsonb), CAST(:ap AS jsonb), CAST(:as AS jsonb), :a)"""),
+                {"p": approval.proposal_id, "g": approval.decision_id,
+                 "k": descriptor.model_key, "v": descriptor.version, "kind": spec["kind"],
                  "sha": descriptor.manifest.sha256, "cd": code_digest(), "ip": json.dumps(spec["input_ports"]),
                  "op": json.dumps(spec["output_ports"]), "ap": json.dumps(dict(descriptor.applicability)),
                  "as": json.dumps(spec["assumptions"]), "a": act.id}).scalar_one()

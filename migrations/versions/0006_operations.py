@@ -201,15 +201,24 @@ CREATE INDEX session_revocation_expiry ON ops.session_revocation(expires_at);
 -- Narrow SECURITY DEFINER functions. search_path is fixed; arguments validated.
 -- ---------------------------------------------------------------------------
 -- Client idempotency keys are namespaced (R2-02): the stored key is
--- 'api:' || created_by || ':' || type || ':' || key, so a client key can never
--- collide with (and thereby return or block) an internal job whose key the
--- worker/scheduler chose (those enqueue directly with their own prefixes), nor
--- with another principal's or another job type's key.
+-- 'api:' || created_by || ':' || type || ':' || escaped key, so a client key can
+-- never collide with (and thereby return or block) an internal job whose key
+-- the worker/scheduler chose (those enqueue directly with their own prefixes),
+-- nor with another principal's or another job type's key. (R5-12) The client
+-- key is escaped ('%' -> '%25', ':' -> '%3A') and job types contain no ':', so
+-- the last two ':' always delimit type and key: the encoding is injective even
+-- though creators ('token:alice', 'human:alice') contain ':'. Only the API
+-- login (or the migration owner) may submit: the creator is the API's
+-- authenticated principal, never a name the worker chooses.
 CREATE FUNCTION ops.submit_job(p_type text, p_payload jsonb, p_idempotency_key text,
                                p_priority integer, p_created_by text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
 DECLARE jid uuid; k text;
 BEGIN
+  IF meta.session_principal() NOT IN ('reva_api','owner') THEN
+    RAISE EXCEPTION 'ops.submit_job is the API submission path; % may not submit jobs as an API principal',
+      session_user USING ERRCODE = 'insufficient_privilege';
+  END IF;
   IF p_created_by IS NULL OR length(p_created_by) < 1 OR length(p_created_by) > 200 THEN
     RAISE EXCEPTION 'invalid job creator';
   END IF;
@@ -219,7 +228,8 @@ BEGIN
   IF p_idempotency_key IS NULL OR length(p_idempotency_key) < 8 OR length(p_idempotency_key) > 200 THEN
     RAISE EXCEPTION 'invalid idempotency key';
   END IF;
-  k := 'api:' || p_created_by || ':' || p_type || ':' || p_idempotency_key;
+  k := 'api:' || p_created_by || ':' || p_type || ':'
+       || replace(replace(p_idempotency_key, '%', '%25'), ':', '%3A');
   IF p_priority < -10 OR p_priority > 10 THEN
     RAISE EXCEPTION 'priority out of API range';
   END IF;
@@ -245,6 +255,12 @@ CREATE FUNCTION ops.request_cancel(p_job uuid, p_actor text) RETURNS text
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
 DECLARE st text;
 BEGIN
+  IF meta.session_principal() NOT IN ('reva_api','owner') THEN
+    RAISE EXCEPTION 'job cancellation is an API action' USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  IF p_actor IS NULL OR btrim(p_actor) = '' OR length(p_actor) > 200 THEN
+    RAISE EXCEPTION 'invalid cancelling actor';
+  END IF;
   SELECT status INTO st FROM ops.job WHERE id = p_job FOR UPDATE;
   IF st IS NULL THEN RAISE EXCEPTION 'job not found'; END IF;
   IF st = 'queued' THEN
@@ -306,10 +322,17 @@ CREATE FUNCTION ops.review_proposal(p_proposal uuid, p_decision text, p_reviewer
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
 DECLARE rid uuid; tier integer; author text;
 BEGIN
+  -- (R5-01) A human review arrives through the API login (an authenticated
+  -- human principal) or the admin CLI (migration owner), never another login.
+  IF meta.session_principal() NOT IN ('reva_api','owner') THEN
+    RAISE EXCEPTION 'proposal reviews are recorded through the API only' USING ERRCODE = 'insufficient_privilege';
+  END IF;
   SELECT permission_tier, p.author INTO tier, author FROM ops.proposal p WHERE id = p_proposal;
   IF tier IS NULL THEN RAISE EXCEPTION 'proposal not found'; END IF;
   IF author = p_reviewer THEN RAISE EXCEPTION 'authors cannot review their own proposals'; END IF;
-  IF p_reviewer NOT LIKE 'human:%' THEN RAISE EXCEPTION 'reviews must be recorded by a named human reviewer'; END IF;
+  IF p_reviewer IS NULL OR p_reviewer !~ '^human:[^[:space:]]+$' OR length(p_reviewer) > 200 THEN
+    RAISE EXCEPTION 'reviews must be recorded by a named human reviewer';
+  END IF;
   INSERT INTO ops.proposal_review(proposal_id, decision, reviewer, comment)
   VALUES (p_proposal, p_decision, p_reviewer, left(p_comment, 4000)) RETURNING id INTO rid;
   INSERT INTO ops.audit(actor, action, target, details)
@@ -319,8 +342,12 @@ BEGIN
 END $$;
 
 -- (R-01) Governance writes through checked functions. The worker keeps a
--- direct INSERT grant on ops.gate_result and model.promotion for now (the BEFORE
--- INSERT triggers enforce the same rules); callers should migrate to these.
+-- direct INSERT grant on ops.gate_result and model.promotion (the BEFORE INSERT
+-- triggers enforce the same rules). (R5-01) Rows carry recorded_by =
+-- session_user, and meta.enforce_governance (0007) refuses human-attributed
+-- promotions/audits from any login but the API and the migration owner. In V1
+-- the gate runs inside the worker, so a gate result is attributable automation,
+-- not independent review (see docs/threat_model.md).
 CREATE FUNCTION ops.record_gate_result(p_proposal uuid, p_gate_name text, p_policy_version text,
                                        p_decision text, p_evidence_sha256 text, p_evaluator text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
@@ -367,6 +394,11 @@ BEGIN
   END IF;
   IF p_policy_version IS NULL OR length(p_policy_version) > 200 THEN
     RAISE EXCEPTION 'invalid policy version';
+  END IF;
+  -- (R5-01) the worker can never attribute a promotion to a human.
+  IF meta.is_human_identity(p_reviewer) AND meta.session_principal() NOT IN ('reva_api','owner') THEN
+    RAISE EXCEPTION 'governance: % may not record a promotion attributed to human reviewer %', session_user,
+      p_reviewer USING ERRCODE = 'insufficient_privilege';
   END IF;
   -- model.check_promotion (BEFORE INSERT) validates evaluation, replay mode,
   -- reviewer and policy version.

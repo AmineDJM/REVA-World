@@ -17,7 +17,7 @@ from uuid import UUID
 from sqlalchemy import Connection, text
 
 from reva.kernel.errors import ValidationProblem
-from reva.operations.telemetry import redact_text, secret_values
+from reva.operations.telemetry import redact_obj
 
 MAX_DETAILS_BYTES = 16_384
 _ACTION = re.compile(r"[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)+")
@@ -25,8 +25,11 @@ _ACTOR = re.compile(r"[A-Za-z0-9_.@:\-/]{1,200}")
 
 
 def _bounded_json(obj: Mapping[str, Any]) -> str:
-    raw = json.dumps(dict(obj), sort_keys=True, default=str, allow_nan=False)
-    raw = redact_text(raw, secret_values())
+    # Normalise to plain JSON values first (str() of UUIDs, datetimes...), then redact leaf by leaf:
+    # secret-named keys are masked whole and text values lose token/DSN/SQL-parameter shapes, while
+    # the document stays valid JSON (text-level redaction of serialized JSON could cut it).
+    plain = json.loads(json.dumps(dict(obj), sort_keys=True, default=str, allow_nan=False))
+    raw = json.dumps(redact_obj(plain), sort_keys=True, allow_nan=False)
     if len(raw.encode()) > MAX_DETAILS_BYTES:
         raw = json.dumps({"truncated": True, "preview": raw[: MAX_DETAILS_BYTES // 2]})
     return raw

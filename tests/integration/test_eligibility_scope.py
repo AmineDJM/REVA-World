@@ -56,6 +56,8 @@ def _support(c: Connection, valid_range: str | None) -> UUID:
 
 
 def _decision(c: Connection, w: dict[str, Any], applicability: Any, decision: str = "eligible") -> None:
+    """Append a decision. 'eligible' decisions need the owner (or the registry approval functions, R5-01),
+    so tests that approve run their transaction on ``db.owner``; scope semantics do not depend on the role."""
     o = w["obs"]
     c.execute(
         text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
@@ -102,7 +104,7 @@ def test_unknown_year_is_excluded_by_selection_and_rejected_by_trigger(w: dict[s
                                                                        valid_range: str | None) -> None:
     """Selection and belief.check_input agree: an unknown support year never satisfies the seeded
     years-scoped decision, and an infinite lower bound does not break the selection query."""
-    with tx(w["db"].worker) as c:
+    with tx(w["db"].owner) as c:
         sp = _support(c, valid_range)
         oid = copy_obs(c, w, f"r5:open-ended:{uuid.uuid4().hex}", support=sp)
         assert not _selected(c, oid)
@@ -168,12 +170,12 @@ def test_open_ended_observation_does_not_block_publication(w: dict[str, Any]) ->
 ])
 def test_ambiguous_or_unknown_scopes_are_rejected_at_insert(w: dict[str, Any], applicability: Any) -> None:
     with tx(w["db"].worker) as c, pytest.raises(DBAPIError, match=r"applicab|scope schema"):
-        _decision(c, w, applicability)
+        _decision(c, w, applicability, "quarantine")
 
 
 @pytest.mark.db
 def test_explicit_year_forms(w: dict[str, Any]) -> None:
-    with tx(w["db"].worker) as c:
+    with tx(w["db"].owner) as c:
         _decision(c, w, {"years": {"from": 1960, "to": 2024}}, "quarantine")  # everything quarantined ...
         _decision(c, w, {"years": {"in": [2019, 2023]}})  # ... except an explicit two-year set
         assert {y: _is_eligible(c, w, y) for y in (2019, 2021, 2023)} == {2019: True, 2021: False, 2023: True}
@@ -183,9 +185,8 @@ def test_explicit_year_forms(w: dict[str, Any]) -> None:
 
 @pytest.mark.db
 def test_classifications_are_enforced(w: dict[str, Any]) -> None:
-    db = w["db"]
     subj = str(w["obs"]["subject_id"])
-    with tx(db.worker) as c:
+    with tx(w["db"].owner) as c:
         # the latest decision whose scope covers a record wins: quarantine everything, then approve only
         # the reviewed classifications (as the Comtrade mapping does for HS editions H4..H6)
         _decision(c, w, {}, "quarantine")

@@ -97,13 +97,16 @@ def db_verify_schema(
 
 @app.command("seed")
 def seed_cmd(profile: str = typer.Option("mvp", help="registry profile")) -> None:
-    """Seed concepts, entities, sources, connectors, mappings, models (worker role)."""
+    """Seed concepts, entities, sources, connectors, mappings, models (migration owner).
+
+    The reviewed registry is approved state that runtime roles may not write (R5-01);
+    `reva db bootstrap` already seeds it, this re-runs the (idempotent) seed alone."""
     from reva.adapters.objects.factory import get_store
     from reva.adapters.postgres.engine import get_engine
     from reva.cli.seed import seed
     from reva.settings import get_settings
 
-    _out({"profile": profile, **seed(get_engine("worker"), get_store(),
+    _out({"profile": profile, **seed(get_engine("migration"), get_store(),
                                       contact_email=get_settings().reva_http_contact_email)})
 
 
@@ -135,19 +138,24 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
                 import uuid
 
                 from reva.evidence.runner import load_cursor
-                from reva.operations.budgets import reserve_ingest
+                from reva.operations.budgets import BudgetExhausted, budget_source_key, metered, reserve_ingest
                 from reva.ports.connectors import FetchBudget
 
                 default = FetchBudget()
                 planned = len(c.plan(load_cursor(get_engine("worker"), spec.name), default).items)
-                reservation = reserve_ingest(get_engine("worker"), job_id=f"cli-{uuid.uuid4()}", attempt=1,
-                                             source_key=spec.source_key, planned_requests=planned)
+                try:
+                    reservation = reserve_ingest(get_engine("worker"), job_id=f"cli-{uuid.uuid4()}", attempt=1,
+                                                 source_key=budget_source_key(spec), planned_requests=planned)
+                except BudgetExhausted as e:  # typed refusal; no client is created, no request is made
+                    reports.append({**e.problem(), "connector": spec.name, "mode": "live", "status": "refused"})
+                    continue
                 fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
                                            max_bytes=min(default.max_bytes, reservation.max_bytes))
                 client = make_live_client(spec, settings)
                 http: Any = RecordingHttp(client, spec.name, spec.licence) if capture else client
                 if not capture:
                     http.origin = "live"
+                http = metered(http, get_engine("worker"), reservation)  # each request covered by the ledger
             else:
                 http = FixtureHttp(spec.name)
             try:
@@ -157,12 +165,13 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
                 if capture and live:
                     http.write_manifest()
                 await http.aclose()
+            budget_info = None
             if reservation is not None:
-                from reva.operations.budgets import settle
+                from reva.operations.budgets import settle_metered
 
-                fetched = sum(1 for o in rep.outcomes if o.detail != "budget")
-                settle(get_engine("worker"), reservation, requests=fetched, nbytes=0)
+                budget_info = settle_metered(get_engine("worker"), http)  # actual requests/bytes made
             d = rep.as_dict()
+            d["budget"] = budget_info
             d.pop("quality", None)
             d["mode"] = "live" if live else "fixture"
             reports.append(d)

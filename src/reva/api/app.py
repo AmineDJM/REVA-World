@@ -130,6 +130,27 @@ def _lazy_engine(settings: Settings) -> Callable[[], Engine]:
     return get
 
 
+def _check_schema_contract(engine: Callable[[], Engine], settings: Settings) -> None:
+    """Startup guard: refuse to serve against a schema that differs from the committed contract.
+
+    ``SchemaDriftError`` (a ``ConfigurationError``) is enforced in production and only logged in warn mode
+    (``REVA_ENV=test`` default), where an unconfigured database (no runtime role password) is not fatal.
+    """
+    from reva.adapters.postgres.schema_contract import assert_schema_contract, contract_mode
+
+    mode = contract_mode(reva_env=settings.reva_env)
+    if mode == "off":
+        return
+    try:
+        eng = engine()
+    except ConfigurationError as e:
+        if mode == "warn":
+            log.warning("schema contract not verified: %s", type(e).__name__)
+            return
+        raise
+    assert_schema_contract(eng, mode=mode, reva_env=settings.reva_env)
+
+
 def create_app(
     settings: Settings | None = None,
     *,
@@ -159,9 +180,7 @@ def create_app(
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         # Refuse to serve against a schema that differs from the committed contract (SchemaDriftError, a
         # ConfigurationError): enforced in production, a logged warning under REVA_ENV=test.
-        from reva.adapters.postgres.schema_contract import assert_schema_contract
-
-        await asyncio.to_thread(assert_schema_contract, engine(), reva_env=settings.reva_env)
+        await asyncio.to_thread(_check_schema_contract, engine, settings)
         yield
         engine.dispose()  # type: ignore[attr-defined]
 

@@ -276,9 +276,59 @@ def verify_ownership(conn: Connection) -> None:
     ).scalars().all()
     if members:
         raise ConfigurationError(f"runtime roles must not hold deletion privilege: {members}")
+    verify_runtime_memberships(conn)
 
 
-def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = False) -> dict[str, Any]:
+#: NOLOGIN roles that own or receive privileged objects; no runtime role may be a member.
+PRIVILEGED_GROUP_ROLES = ("reva_registry", "reva_restricted_deletion")
+
+
+def verify_runtime_memberships(conn: Connection) -> None:
+    """(R5-09) Runtime roles hold no role memberships at all.
+
+    On PostgreSQL 16+ ``NOINHERIT`` is only the default for *new* grants: an explicit
+    ``GRANT x TO reva_worker WITH INHERIT TRUE, SET TRUE`` gives the worker x's privileges
+    (and ``SET ROLE x``) although ``rolinherit`` is false. So every membership held by a
+    runtime role (whatever its INHERIT/SET/ADMIN options) fails bootstrap, as does any
+    LOGIN role other than the migration owner in ``reva_registry`` (it owns the approval
+    functions) and a ``reva_registry`` that can log in.
+    """
+    held = conn.execute(
+        text(
+            "SELECT r.rolname || ' -> ' || g.rolname || ' (admin=' || m.admin_option || ', inherit='"
+            " || m.inherit_option || ', set=' || m.set_option || ')' "
+            "FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+            "JOIN pg_roles g ON g.oid = m.roleid WHERE r.rolname = ANY(:roles) ORDER BY 1"
+        ),
+        {"roles": list(RUNTIME_ROLES)},
+    ).scalars().all()
+    if held:
+        raise ConfigurationError(f"runtime roles must not be members of other roles (a superuser must revoke): {held}")
+    registry = conn.execute(
+        text("SELECT rolcanlogin FROM pg_roles WHERE rolname = 'reva_registry'")
+    ).scalar_one_or_none()
+    if registry:
+        raise ConfigurationError("reva_registry must be NOLOGIN")
+    logins = conn.execute(
+        text(
+            "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+            "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = ANY(:groups) "
+            "AND r.rolcanlogin AND r.rolname <> current_user AND NOT r.rolsuper ORDER BY 1"
+        ),
+        {"groups": ["reva_registry"]},
+    ).scalars().all()
+    if logins:
+        raise ConfigurationError(f"login roles must not be members of reva_registry: {logins}")
+
+
+def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = False,
+              seed_registry: bool = True) -> dict[str, Any]:
+    """Migrate, provision runtime roles, verify them and (by default) seed the reviewed registry.
+
+    (R5-01) The registry seed writes approved mappings, eligibility decisions and models,
+    which runtime roles may not write; it is a deploy-time step run with the migration
+    owner here, not a worker job.
+    """
     s = settings or load_settings()
     engine = make_engine("migration", s)
     report: dict[str, Any] = {}
@@ -297,12 +347,21 @@ def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = Fa
             conn.execute(text("GRANT SELECT ON public.alembic_version TO reva_api, reva_worker, reva_sim"))
             verify_ownership(conn)
             conn.commit()
+            from reva.adapters.postgres.schema_contract import assert_schema_contract
+
+            drift = assert_schema_contract(conn, reva_env=s.reva_env)
+            report["schema_fingerprint"] = drift.actual_digest if drift else None
             report["schema_version"] = conn.execute(
                 text("SELECT version_num FROM alembic_version")
             ).scalar_one()
         finally:
             conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": MIGRATION_LOCK_KEY})
             conn.commit()
+    if seed_registry:
+        from reva.adapters.objects.factory import build_store
+        from reva.cli.seed import seed
+
+        report["seed"] = seed(engine, build_store(s), contact_email=s.reva_http_contact_email)
     engine.dispose()
-    log.info("bootstrap complete %s", json.dumps(report))
+    log.info("bootstrap complete %s", json.dumps(report, default=str))
     return report

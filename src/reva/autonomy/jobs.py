@@ -242,9 +242,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     proposals = ProposalStore(engine, io_, guard)
     proposal = connector_change_proposal(io_, cp, manifest, primary, voi, policy)
     proposals.persist(proposal, proposal_type="connector_promotion",
-                      scope={"concept": primary.target_concept_version, "dataset": cand.dataset_id,
-                             "geo": manifest["request_parameters"]["filters"].get("geo"),
-                             "eligibility_scope": manifest["eligibility_scope"]},
+                      scope=connector_promotion_scope(io_, manifest, primary, dataset=cand.dataset_id),
                       risk={"tier": "T1", "hosts": manifest["allowed_hosts"], "code": "none (declarative)",
                             "promotion": "automatic if the gate finds it within the signed policy scope"},
                       dependencies=[f"gap:{gap.gap_id}", f"candidate:{cand.metadata.sha256}",
@@ -274,6 +272,22 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     else:
         summary["status"] = f"gate_{decision.outcome}"
     return summary
+
+
+def connector_promotion_scope(io_: ArtifactIO, manifest: dict[str, Any], mapping: MappingProposal, *,
+                              dataset: str | None = None) -> dict[str, Any]:
+    """The proposal scope recorded *before* the gate runs (ops.proposal.summary.scope).
+
+    (R5-01) The database binds approvals to it: ``evidence.approve_eligibility`` and
+    ``ontology.approve_mapping`` accept a passing gate result only for exactly this concept,
+    mapping key, subject_ids and years.
+    """
+    mm = io_.get_json(mapping.mapping_manifest)
+    subjects = sorted((mm.get("scope") or {}).get("subjects") or [])
+    return {"concept": mapping.target_concept_version, "dataset": dataset or manifest["dataset"],
+            "geo": manifest["request_parameters"]["filters"].get("geo"),
+            "eligibility_scope": manifest["eligibility_scope"], "mapping_key": mm["mapping_key"],
+            "subject_ids": [str(entity_id(x)) for x in subjects], "years": manifest["request_parameters"]["time"]}
 
 
 def connector_change_proposal(io_: ArtifactIO, cp: ConnectorProposal, manifest: dict[str, Any],
@@ -459,13 +473,18 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
                            ["resolution_dimensions"]},
             "target": {"concept_id": concept_id, "version": version}, "mapping_kind": "exact",
             "applicability": {"subjects": subjects}, "eligibility": "none",
-        }, act.id, policy_version=policy.version)
+        }, act.id, policy_version=policy.version, approval=(decision.proposal_id, decision.decision_id))
         applicability = {"subjects": subjects, "subject_ids": [str(entity_id(x)) for x in subjects],
                          "years": manifest["request_parameters"]["time"],
                          "geo": manifest["request_parameters"]["filters"].get("geo"),
                          "mapping_key": mm["mapping_key"], "gate_result_id": str(decision.decision_id),
                          "rollback_sha256": rb_ref.sha256}
-        _append_eligibility(conn, cv_id, concept_uuid, applicability, "eligible", policy.version, act.id)
+        # (R5-01) 'eligible' only through the DB-checked approval path (passing gate result of this
+        # proposal, whose recorded scope must cover this concept/subjects/years; one gate pass, one approval).
+        conn.execute(text(
+            "SELECT evidence.approve_eligibility(:p, :g, :cv, :c, CAST(:ap AS jsonb), :pv, :a)"),
+            {"p": decision.proposal_id, "g": decision.decision_id, "cv": cv_id, "c": concept_uuid,
+             "ap": json.dumps(applicability), "pv": policy.version, "a": act.id})
         for r in superseded:
             prev_app = conn.execute(text(
                 """SELECT applicability FROM evidence.eligibility WHERE connector_version_id = :cv
@@ -502,7 +521,8 @@ def rollback_promotion(engine: Engine, connector_name: str, version: str, concep
     """Append 'retired' for this version (latest decision wins) and restore the version it superseded.
 
     History stays immutable. Re-running discovery afterwards reports ``rolled_back_hold`` for the retired
-    content instead of re-enabling it.
+    content instead of re-enabling it. A ``human:`` actor needs the migration-owner engine (R5-01: the
+    database refuses human-attributed rows from runtime roles); a gate evaluator may use the worker.
     """
     if not actor.startswith(("gate-evaluator:", "human:")):
         raise AutonomyBlocked("rollback must be performed by a gate evaluator or a named human")
@@ -535,6 +555,8 @@ def reapprove_promotion(engine: Engine, connector_name: str, version: str, conce
 
     Rediscovery never re-enables a retired version by itself (``rolled_back_hold``); this is the
     explicit human path. The version must still run under the current reviewed template.
+    (R5-01) Human-attributed approvals are refused by the database from runtime roles: run it with
+    the migration-owner engine (admin CLI), like token minting.
     """
     if not actor.startswith("human:"):
         raise AutonomyBlocked("re-enabling a rolled-back connector needs a named human reviewer")
@@ -582,9 +604,10 @@ def _restore_superseded(conn: Any, cv: dict[str, Any], concept: Any, activity: A
             return None  # the previous version was retired for its own reasons: do not resurrect it
         if r["code_digest"] != et.template_digest():
             return None  # cannot run under the current template: stays retired (template_changed)
-        app = {k: v for k, v in dict(last["applicability"]).items() if k != "superseded_by"}
-        _append_eligibility(conn, r["id"], concept, {**app, "restored_by_rollback_of": str(cv["id"])},
-                            "eligible", last["policy_version"], activity)
+        # (R5-01) re-enabling goes through the DB check: only a version retired *because* it was
+        # superseded by this (now rolled back) version gets its last approved decision back.
+        conn.execute(text("SELECT evidence.restore_eligibility(:cv, :c, :rb, :a)"),
+                     {"cv": r["id"], "c": concept, "rb": cv["id"], "a": activity})
         return str(r["version"])
     return None
 

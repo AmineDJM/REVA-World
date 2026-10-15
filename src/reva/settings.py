@@ -35,7 +35,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import Field, SecretStr, ValidationError, model_validator
+from pydantic import Field, SecretStr, ValidationError, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sqlalchemy.engine import URL, make_url
 
@@ -101,6 +101,14 @@ class Settings(BaseSettings):
         except ValidationError as e:
             raise _redacted_validation_error(e) from None
 
+    @classmethod
+    def model_validate(cls, obj: Any, *args: Any, **kwargs: Any) -> Settings:  # type: ignore[override]
+        # Same guarantee for the model_validate path (scripts/tests rebuild Settings from model_dump()).
+        try:
+            return super().model_validate(obj, *args, **kwargs)
+        except ValidationError as e:
+            raise _redacted_validation_error(e) from None
+
     #: Which process this configuration is for; enables per-role production checks.
     reva_process_role: ProcessRole | None = None
     reva_log_level: str = "INFO"
@@ -161,6 +169,30 @@ class Settings(BaseSettings):
     reva_sandbox_token: SecretStr | None = None
 
     port: int = 8000
+
+    @field_validator("reva_s3_endpoint_url", "reva_public_base_url", "reva_sandbox_endpoint", "reva_cors_origins")
+    @classmethod
+    def _no_url_credentials(cls, value: str | None) -> str | None:
+        # Plain (non-SecretStr) settings appear in repr/model_dump/logs: credentials never ride in them.
+        if value and _URL_USERINFO.search(value):
+            raise ValueError("must not embed credentials (user:password@); use the dedicated secret settings")
+        return value
+
+    @model_validator(mode="after")
+    def _register_secrets_for_redaction(self) -> Settings:
+        # Secrets read from ./.env never reach os.environ, so log redaction would not know them by value.
+        from reva.operations.telemetry import register_secret_values
+
+        values: list[str | None] = []
+        for name in type(self).model_fields:
+            v = getattr(self, name)
+            if isinstance(v, SecretStr):
+                values.append(v.get_secret_value())
+        if self.reva_migration_database_url is not None:
+            m = _URL_USERINFO.search(self.reva_migration_database_url.get_secret_value())
+            values.append(m["pw"] if m else None)
+        register_secret_values(values)
+        return self
 
     @model_validator(mode="after")
     def _production(self) -> Settings:

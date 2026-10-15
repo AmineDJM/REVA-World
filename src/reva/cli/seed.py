@@ -1,7 +1,15 @@
-"""Idempotent registry seeding through the worker's controlled write path.
+"""Idempotent registry seeding: a deploy-time step run with the migration owner.
+
+The ``registry/`` YAML is reviewed in git, so seeding it writes *approved* rows
+(exact mappings, ``eligible`` decisions, approved model versions) that runtime
+roles may not write (R5-01: the database refuses them from ``reva_worker``).
+``bootstrap()`` seeds as the migration owner. Called with a runtime-role engine,
+``seed`` only confirms that the owner already seeded exactly this registry
+(fingerprint recorded on the seed activity) and otherwise refuses.
 
 Published concept versions are immutable: a registry entry whose content differs
-from the stored version for the same (concept_id, version) fails loudly.
+from the stored version for the same (concept_id, version) fails loudly; the same
+holds for a connector (name, version) whose spec or code changed.
 """
 
 from __future__ import annotations
@@ -15,7 +23,8 @@ from sqlalchemy import Connection, Engine, text
 from reva.adapters.connectors.registry import builtin_connectors
 from reva.adapters.postgres import repositories as repo
 from reva.evidence.locks import take_evidence_write_lock
-from reva.kernel.errors import ImmutableRecordViolation
+from reva.kernel.errors import ConfigurationError, ImmutableRecordViolation
+from reva.kernel.ids import canonical_bytes, logical_hash, sha256_bytes
 from reva.kernel.ids import entity_id as kernel_entity_id
 from reva.ontology.registry import Registry, concept_hash, load_registry
 from reva.ports.storage import ArtifactStore
@@ -189,13 +198,21 @@ def _seed_sources(conn: Connection, store: ArtifactStore, reg: Registry, act: UU
 
 
 def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any, act: UUID) -> UUID:
+    payload = spec.model_dump(mode="json")
     existing = repo.connector_version_row(conn, spec.name, spec.version)
     if existing:
+        # A (name, version) is immutable: changed spec or code needs a new version.
+        if existing["spec_sha256"] != sha256_bytes(canonical_bytes(payload)) or (
+            existing["code_digest"] != spec.code_digest
+        ):
+            raise ImmutableRecordViolation(
+                f"connector {spec.name}@{spec.version} is registered with different content; bump the version",
+                connector=spec.name, version=spec.version,
+            )
         return UUID(str(existing["id"]))
     src = repo.source_by_key(conn, spec.source_key)
     if src is None:
         raise KeyError(f"source {spec.source_key} not registered")
-    payload = spec.model_dump(mode="json")
     sha = repo.store_json_artifact(conn, store, payload, "models", schema_version="connector-spec/1")
     return UUID(
         str(
@@ -220,14 +237,39 @@ def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any
 
 
 def record_mapping_and_eligibility(
-    conn: Connection, m: dict[str, Any], act: UUID, *, policy_version: str = "seed-reviewed-1"
+    conn: Connection,
+    m: dict[str, Any],
+    act: UUID,
+    *,
+    policy_version: str = "seed-reviewed-1",
+    approval: tuple[UUID, UUID] | None = None,
 ) -> None:
+    """Record a mapping (and, for seeded exact mappings, its eligibility decision).
+
+    ``approval`` = ``(proposal_id, approval_id)`` (a passing gate result or an approving
+    human review of that proposal): an approved non-``incompatible`` mapping is then
+    written through ``ontology.approve_mapping``, the only path by which a runtime role
+    may record one (R5-01). Without it, an approved mapping can only be seeded by the
+    migration owner.
+    """
     exists = conn.execute(
         text("SELECT 1 FROM ontology.mapping WHERE mapping_key=:k AND version=:v"),
         {"k": m["mapping_key"], "v": m["version"]},
     ).scalar_one_or_none()
     target = repo.concept_version_id(conn, m["target"]["concept_id"], m["target"]["version"])
-    if not exists:
+    approval_state = "approved" if m["mapping_kind"] in ("exact", "incompatible") else "candidate"
+    transform = {"kind": "identity"} if m["mapping_kind"] == "exact" else {"kind": "none"}
+    if not exists and approval is not None and approval_state == "approved" and m["mapping_kind"] != "incompatible":
+        conn.execute(
+            text(
+                """SELECT ontology.approve_mapping(:p, :g, :k, :v, CAST(:sr AS jsonb), :t, :mk, CAST(:ts AS jsonb),
+                     CAST(:ap AS jsonb), :pv, :a)"""
+            ),
+            {"p": approval[0], "g": approval[1], "k": m["mapping_key"], "v": m["version"],
+             "sr": json.dumps(m["source_ref"]), "t": target, "mk": m["mapping_kind"], "ts": json.dumps(transform),
+             "ap": json.dumps(m.get("applicability", {})), "pv": policy_version, "a": act},
+        )
+    elif not exists:
         conn.execute(
             text(
                 """INSERT INTO ontology.mapping(mapping_key, source_ref, target_concept_id, mapping_kind, version,
@@ -240,9 +282,9 @@ def record_mapping_and_eligibility(
                 "t": target,
                 "mk": m["mapping_kind"],
                 "v": m["version"],
-                "ts": json.dumps({"kind": "identity"} if m["mapping_kind"] == "exact" else {"kind": "none"}),
+                "ts": json.dumps(transform),
                 "ap": json.dumps(m.get("applicability", {})),
-                "appr": "approved" if m["mapping_kind"] in ("exact", "incompatible") else "candidate",
+                "appr": approval_state,
                 "a": act,
             },
         )
@@ -344,11 +386,60 @@ def _seed_schedules(conn: Connection) -> None:
         )
 
 
+RUNTIME_PRINCIPALS = ("reva_api", "reva_worker", "reva_sim")
+
+
+def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
+    """Digest of everything ``seed`` writes (registry content, built-in connectors, schedules)."""
+    partners = reg.root / "reference" / "comtrade_partnerAreas.json"
+    return logical_hash({
+        "schema": "reva-seed-fingerprint/1",
+        "ontology": reg.manifest(),
+        "entities": list(reg.entities),
+        "sources": list(reg.sources),
+        "mappings": list(reg.mappings),
+        "models": list(reg.models),
+        "partners_sha256": sha256_bytes(partners.read_bytes()),
+        "connectors": sorted([s.name, s.version, s.code_digest]
+                             for s in (c.describe() for c in builtin_connectors(contact_email).values())),
+        "schedules": [list(x) for x in DEFAULT_SCHEDULES],
+    })
+
+
+def _already_seeded(conn: Connection, fingerprint: str) -> bool:
+    return conn.execute(
+        text("SELECT 1 FROM meta.activity WHERE kind = 'registry.seed' AND parameters->>'fingerprint' = :f "
+             "AND actor = :a LIMIT 1"),
+        {"f": fingerprint, "a": SEED_ACTOR},
+    ).scalar_one_or_none() is not None
+
+
 def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = None) -> dict[str, Any]:
+    """Seed the reviewed registry. Must run as the migration owner (``bootstrap`` does).
+
+    With a runtime-role engine this is a read-only check: it returns ``status:
+    already_seeded`` when the owner seeded exactly this registry, and otherwise raises
+    ``ConfigurationError`` (runtime roles cannot write approved registry state).
+    """
     reg = load_registry()
+    fingerprint = seed_fingerprint(reg, contact_email)
+    with engine.connect() as conn:
+        login = conn.execute(text("SELECT session_user")).scalar_one()
+        if login in RUNTIME_PRINCIPALS:
+            if _already_seeded(conn, fingerprint):
+                return {"new_concepts": 0, "entities": len(reg.entities), "new_models": 0,
+                        "status": "already_seeded", "fingerprint": fingerprint}
+            raise ConfigurationError(
+                f"registry seeding writes approved registry state and must run as the migration owner "
+                f"(`reva db bootstrap` / `reva seed`), not as {login}"
+            )
     with engine.begin() as conn:
         take_evidence_write_lock(conn)  # writes eligibility decisions: evidence lock protocol (R-03)
-        act = repo.simple_activity("registry.seed", "review", SEED_ACTOR, {"registry": "mvp"})
+        if _already_seeded(conn, fingerprint):
+            return {"new_concepts": 0, "entities": len(reg.entities), "new_models": 0,
+                    "status": "already_seeded", "fingerprint": fingerprint}
+        act = repo.simple_activity("registry.seed", "review", SEED_ACTOR,
+                                   {"registry": "mvp", "fingerprint": fingerprint})
         repo.record_activity(conn, act)
         concepts = _seed_concepts(conn, reg, act.id)
         entities = _seed_entities(conn, reg, act.id)
@@ -357,4 +448,5 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
             record_mapping_and_eligibility(conn, m, act.id)
         models = _seed_models(conn, store, reg, act.id)
         _seed_schedules(conn)
-    return {"new_concepts": concepts, "entities": entities, "new_models": models}
+    return {"new_concepts": concepts, "entities": entities, "new_models": models, "status": "seeded",
+            "fingerprint": fingerprint}

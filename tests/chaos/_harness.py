@@ -3,6 +3,7 @@ event logs and polling helpers. Never touches the dev database ``reva``."""
 
 from __future__ import annotations
 
+import inspect
 import json
 import os
 import signal
@@ -78,7 +79,8 @@ def fresh_db(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iterator[C
     pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 4})
     d = ChaosDB(settings, name, url, root, make_engine("migration", settings), make_engine("api", pooled),
                 make_engine("worker", pooled), make_engine("sim", settings), store)
-    seed(d.worker, store)
+    if "seed_registry" not in inspect.signature(bootstrap).parameters:
+        seed(d.worker, store)  # older bootstrap: seed separately (newer bootstrap seeds as the owner)
     with d.owner.begin() as c:
         c.execute(text("UPDATE ops.schedule SET enabled = false"))  # no scheduler noise
     try:

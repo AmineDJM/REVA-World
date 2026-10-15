@@ -330,13 +330,13 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     fetch_budget = None
     if mode == "live":
         from reva.evidence.runner import load_cursor
-        from reva.operations.budgets import reserve_ingest
+        from reva.operations.budgets import budget_source_key, reserve_ingest
         from reva.ports.connectors import FetchBudget
 
         default = FetchBudget()
         planned = len(connector.plan(load_cursor(ctx.worker_engine, spec.name), default).items)
         reservation = reserve_ingest(ctx.worker_engine, job_id=ctx.job_id, attempt=ctx.attempt,
-                                     source_key=spec.source_key, planned_requests=planned)
+                                     source_key=budget_source_key(spec), planned_requests=planned)
         fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
                                    max_bytes=min(default.max_bytes, reservation.max_bytes))
 
@@ -346,6 +346,9 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     else:
         client = make_live_client(spec, ctx.settings)
         http = RecordingHttp(client, spec.name, spec.licence) if capture else client
+        from reva.operations.budgets import metered  # every request is covered by the ledger reservation
+
+        http = metered(http, ctx.worker_engine, reservation)
 
     from reva.operations.tracing import span, traced_connector
 
@@ -386,14 +389,9 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
                           type(e).__name__)
     budget_info = None
     if reservation is not None:
-        from reva.operations.budgets import settle
+        from reva.operations.budgets import settle_metered
 
-        fetched = sum(1 for o in report.outcomes
-                      if o.detail != "budget" and not str(o.detail or "").startswith("blocked by"))
-        settle(ctx.worker_engine, reservation, requests=fetched, nbytes=int(nbytes))
-        budget_info = {"policy": reservation.policy_version, "source_key": reservation.source_key,
-                       "reserved_requests": reservation.planned_requests, "consumed_requests": fetched,
-                       "consumed_bytes": int(nbytes)}
+        budget_info = settle_metered(ctx.worker_engine, http)  # actual requests/bytes made
     result = {
         "connector": spec.name,
         "connector_version": spec.version,

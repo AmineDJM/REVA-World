@@ -446,7 +446,7 @@ BEGIN
     RAISE EXCEPTION 'proposal scope does not cover concept %', COALESCE(cref, p_concept::text);
   END IF;
   IF NOT COALESCE(jsonb_typeof(scope->'subject_ids') = 'array'
-                  AND scope->'subject_ids' @> p_applicability->'subject_ids', false) THEN
+                  AND (scope->'subject_ids') @> (p_applicability->'subject_ids'), false) THEN
     RAISE EXCEPTION 'proposal scope does not cover subject_ids %', p_applicability->'subject_ids';
   END IF;
   IF (scope->'years') IS DISTINCT FROM (p_applicability->'years') THEN

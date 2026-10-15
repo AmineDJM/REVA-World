@@ -1,18 +1,19 @@
 """Invariant 30: no external egress, LLM or scientific computation beyond the configured budget.
 
-Proven here for the paths V1 has:
+Proven here (DB cap/concurrency/rollover tests live in ``tests/integration/test_budget_caps.py``):
 
-* egress: the connector runner stops issuing requests once the per-run
+* egress, per run: the connector runner stops issuing requests once the per-run
   ``FetchBudget`` is spent, even when a connector plans more items than allowed;
+* egress, per day: budgets are keyed by registered *source* keys, every
+  connector maps to exactly one budgeted source (``budget_source_key``) and
+  ledger accounts come from one function (``account_key``); every code path
+  that creates a live provider client is a budgeted path (reserve before the
+  first request, metered client, settle afterwards) — a static scan fails on a
+  new unbudgeted call site;
 * LLM: disabled by default with a zero monthly budget (``budgets.yaml``) and the
   LLM extractor returns a typed blocked result;
 * computation: the CPU thread budget is explicit (``REVA_CPU_BUDGET_THREADS``),
   and external runner budgets must be bounded.
-
-Not proven (see coverage.yaml): the *daily* egress totals in
-``registry/policies/budgets.yaml`` (``daily.http_requests_total``,
-``per_source_daily_requests``) are not enforced by a persistent ledger across
-runs; scheduled live ingest relies on per-run budgets only.
 """
 
 from __future__ import annotations
@@ -113,3 +114,113 @@ def test_external_runner_budget_must_be_bounded() -> None:
 
     with pytest.raises(ValidationProblem, match="unbounded is not allowed"):
         runner.RunnerResourceBudget(0, 600, 2**31, 2**32, 900, 2**24)
+
+
+# --------------------------------------------------------------------------- daily egress budget keys
+REPO = __import__("pathlib").Path(__file__).resolve().parents[2]
+
+
+def _registered_sources() -> set[str]:
+    return {yaml.safe_load(p.read_text())["source_key"] for p in sorted((REPO / "registry/sources").glob("*.yaml"))}
+
+
+def test_budget_keys_are_registered_sources_and_cover_every_connector() -> None:
+    from reva.operations.budgets import account_key, budget_source_key, load_budget, source_accounts
+
+    b = load_budget()  # the pinned, digest-checked policy
+    assert set(b.per_source_requests) == _registered_sources()
+    assert all(v > 0 for v in b.per_source_requests.values())
+    for name, conn in builtin_connectors().items():
+        key = budget_source_key(conn)
+        assert key == conn.describe().source_key and key in b.per_source_requests, name
+    promo = yaml.safe_load((REPO / "registry/policies/promotion.yaml").read_text())
+    for tpl in (promo.get("approved_templates") or {}).values():  # promoted declarative connectors
+        assert tpl["source_key"] in b.per_source_requests
+    assert account_key("worldbank.wdi", "requests") == "source:worldbank.wdi:requests"
+    assert account_key("worldbank.wdi", "bytes", "discovery") == "autonomy:discovery:worldbank.wdi:bytes"
+    assert source_accounts("worldbank.wdi") == ["source:worldbank.wdi:requests",
+                                                "autonomy:discovery:worldbank.wdi:requests"]
+    for bad in (("", "requests", "ingest"), ("a:b", "requests", "ingest"), ("x", "calls", "ingest"),
+                ("x", "requests", "llm")):
+        with pytest.raises(ValueError):
+            account_key(*bad)
+
+
+def test_unknown_source_and_zero_limit_are_refused_without_a_database() -> None:
+    from reva.operations.budgets import BudgetExhausted, IngestBudget, budget_source_key, source_limit
+
+    b = IngestBudget("t", "", 10, 10, {"a.src": 0, "b.src": 3})
+    with pytest.raises(BudgetExhausted, match="no per-source"):
+        source_limit(b, "unknown.src")
+    with pytest.raises(BudgetExhausted, match="is 0"):
+        source_limit(b, "a.src")
+    assert source_limit(b, "b.src") == 3
+
+    class NoKey:
+        name = "x"
+        source_key = ""
+
+    with pytest.raises(BudgetExhausted):
+        budget_source_key(NoKey())
+
+
+# Every place that can create a live provider client, and how it is budgeted.
+LIVE_CALLS = ("make_live_client(", "SafeHttpClient(", "httpx.AsyncClient(", "httpx.Client(", "urlopen(")
+BUDGETED = {  # file -> markers that must all be present (reserve before, meter/cap, settle after)
+    "src/reva/operations/jobs.py": ("reserve_ingest(", "metered(", "settle_metered("),
+    "src/reva/cli/main.py": ("reserve_ingest(", "metered(", "settle_metered(", "except BudgetExhausted"),
+    "src/reva/autonomy/jobs.py": ("reserve_discovery(", "settle_discovery(", "max_requests=reservation.max_requests"),
+}
+NOT_PROVIDER_EGRESS = {
+    "src/reva/evidence/runner.py": "defines make_live_client (callers are budgeted)",
+    "src/reva/adapters/http/safe_client.py": "the HTTP client itself",
+    "src/reva/autonomy/sandbox.py": "POSTs to the operator's isolated sandbox runner, not a data provider "
+                                    "(bounded by RunnerResourceBudget)",
+}
+
+
+def test_every_live_provider_request_path_is_budgeted() -> None:
+    sites: set[str] = set()
+    for p in sorted((REPO / "src/reva").rglob("*.py")):
+        src = p.read_text()
+        if any(c in src for c in LIVE_CALLS):
+            sites.add(str(p.relative_to(REPO)))
+    unaccounted = sites - set(BUDGETED) - set(NOT_PROVIDER_EGRESS)
+    assert not unaccounted, f"live provider client created outside a budgeted path: {sorted(unaccounted)}"
+    for f, markers in BUDGETED.items():
+        text_ = (REPO / f).read_text()
+        missing = [m for m in markers if m not in text_]
+        assert not missing, (f, missing)
+    # connector repair and the scheduler make no provider request themselves: repair reads stored
+    # acquisitions and the fixture bank; schedules only enqueue ingest jobs (handled by handle_ingest)
+    repair = (REPO / "src/reva/autonomy/repair.py").read_text()
+    assert not any(c in repair for c in (*LIVE_CALLS, "run_connector(", ".fetch("))
+    from reva.operations.jobs import HANDLERS
+    from reva.operations.schedules import SCHEDULE_JOB_TYPES
+
+    assert HANDLERS["ingest"] == "reva.operations.jobs:handle_ingest" and "ingest" in SCHEDULE_JOB_TYPES
+    assert HANDLERS["discovery"] == "reva.autonomy.jobs:handle_discovery"
+
+
+def test_metered_client_refuses_before_calling_the_transport_and_skips_fixtures(monkeypatch) -> None:
+    from reva.evidence.runner import FixtureHttp
+    from reva.operations.budgets import BudgetExhausted, IngestBudget, MeteredHttp, Reservation, metered
+
+    class Forbidden:
+        origin = "live"
+
+        async def get(self, url: str, **kw: Any) -> Any:  # pragma: no cover - must not be reached
+            raise AssertionError("transport called although the budget is exhausted")
+
+    fx = FixtureHttp("worldbank.wdi.indicators")
+    r = Reservation("s.src", "op:requests", "op:bytes", 0, 0, 0, "t")
+    assert metered(fx, None, r) is fx  # fixture replays are never charged  # type: ignore[arg-type]
+    m = metered(Forbidden(), None, r, budget=IngestBudget("t", "", 0, 0, {"s.src": 1}))  # type: ignore[arg-type]
+    assert isinstance(m, MeteredHttp) and m.origin == "live"
+
+    import reva.operations.budgets as budgets
+
+    monkeypatch.setattr(budgets, "top_up", lambda *a, **k: 0)  # the ledger grants nothing more today
+    with pytest.raises(BudgetExhausted):
+        asyncio.run(m.get("https://api.worldbank.org/v2/x", max_bytes=10))
+    assert m.requests == 0 and m.refused == 1
