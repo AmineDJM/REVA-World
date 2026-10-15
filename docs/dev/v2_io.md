@@ -1,6 +1,8 @@
 # V2 step 3b / step 5 (IO part): FIGARO connector and `economic.io_price@1.0.0`
 
 Agent IO, 2026-10-15. Status: implemented, **experimental model (maintainer review pending)**.
+§4 and decision 8 updated after the scientific review V2 (M9, L1): basic-price basket wording, the
+purchasers'-price reading and the EA12 definition.
 Every result is labelled **"first-round cost-push under full pass-through; not an inflation
 forecast"** (L2 rows: "...under a stated pass-through share...").
 
@@ -156,7 +158,7 @@ direct purchases abroad, fixed weights, no second-round effects).
 Reading: the all-energy-like REVA run is about 2.6x the ECB 2005 result at basic prices (about
 2.3-2.4x with the purchasers'-price reading; the ECB figure is itself "before taxes"). Contributing reasons that are
 visible in the data: (i) in FIGARO 2024 French households' basic-price purchases of C19 + D35 are 5.4 % of
-the basket (2.2 % + 3.3 %), so the direct effect alone is about 0.54 % against the ECB's 0.21 % for France
+the basic-price basket (2.2 % + 3.3 %), so the direct effect alone is about 0.54 % against the ECB's 0.21 % for France
 (energy cost shares after the 2022-23 price surge are much higher than in 2005); (ii) setting B, C19 and
 D35 all exogenous at +10 % plus a broad B (metal ores, quarrying) adds non-energy cost; (iii) the
 inter-country table propagates foreign cost increases into imports, which the ECB national-table
@@ -169,9 +171,9 @@ figure (Monthly Bulletin 2014, about 0.6 pp of HICP for +10 % oil) is not IO-bas
 **Sanity table** (live, +10 % on B in every FIGARO economy, L1, mean price change across the 49 reported
 countries): B 10.000 (exogenous), C19 5.007, C24 1.982, D35 1.909, C23 1.406, C20 1.148, H51 0.933,
 C25 0.795, H49 0.652, H50 0.628 ... lowest: L 0.101, K65 0.098, N78 0.079, K64 0.062, T 0.000. Energy- and
-material-intensive industries rank highest, services lowest. FRA household basket +0.387945 % (L1), range
+material-intensive industries rank highest, services lowest. FRA basic-price household basket +0.387945 % (L1), range
 0.117169-0.387945 % over θ ∈ {0.5, 0.75, 1}; of which imported products 0.104, foreign shocks 0.379.
-Highest baskets: SRB 0.77, IDN 0.71, KOR 0.65; lowest: USA 0.21, CHE 0.22, LUX 0.22.
+Highest basic-price baskets: SRB 0.77, IDN 0.71, KOR 0.65; lowest: USA 0.21, CHE 0.22, LUX 0.22.
 
 ## 5. Live run, timings and memory
 

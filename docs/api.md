@@ -14,7 +14,8 @@ This page is an orientation only.
   The API connects to PostgreSQL only as `reva_api`: it reads, and writes only
   audit/session-revocation rows and through SECURITY DEFINER functions
   (`ops.submit_job`, `ops.request_cancel`, `ops.review_proposal`,
-  `sim.create_scenario`).
+  `sim.create_scenario`, and for scenario drafts `ops.reserve_llm_budget` /
+  `ops.settle_llm_budget`).
 * Authentication: private single-user deployment. `POST /v1/session` with
   username `admin` and the admin password (Argon2id hash in
   `REVA_ADMIN_PASSWORD_HASH`) sets an HttpOnly, SameSite=Strict signed session

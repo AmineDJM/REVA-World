@@ -171,7 +171,7 @@ models:
       Pension eligibility-age changes by birth cohort or claim year (rule tables transcribed from
       archived legal text, registry/rules/retirement_age) -> exact share of person-time below the
       eligibility age by single age 55-69 and year -> pension-receipt drop from the country's own
-      base-year LFS inactivity (upper-bound proxy) and employment response = cited literature share
+      base-year LFS inactivity (proxy of unknown direction; bounding variants in L2) and employment response = cited literature share
       (registry/assumptions, verified values only) -> employed persons 55-69, pension recipients,
       approximate expenditure change (average old-age pension x recipients change) and the
       old-age dependency ratio from the cohort-component projection. Annual to 2040. A conditional

@@ -607,7 +607,7 @@ invariants:
       from one account_key function); an unknown source or a limit of 0 is refused. Every egress reservation
       takes one advisory lock, so racing ingest/discovery reservations cannot exceed a shared cap; days are
       UTC on the database clock. Connector repair and the scheduler make no provider request themselves.
-      Per-run request budgets stop the connector runner, the LLM is disabled with a zero budget, external
+      Per-run request budgets stop the connector runner, LLM drafting is capped per day in the persistent ledger (budgets.yaml llm.scenario_drafts), external
       runner budgets must be bounded and CPU threads are explicitly budgeted.
     gaps: >-
       Operator scripts outside src/reva (scripts/live_source_checks.py, scripts/demo_workflow.py in live

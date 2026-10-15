@@ -268,6 +268,11 @@ clean on `src/reva/nl` and the route; `scripts/export_contracts.py --check` up t
    under `NOT_PROVIDER_EGRESS` or a new LLM section. Update the invariant 30 row of
    `docs/data_constitution.md` ("LLM disabled with a zero budget" → drafting
    budget bounded by `llm.scenario_drafts`, autonomy extraction still 0).
+   **Status (DOCV2, later):** the static scan now covers the LLM path
+   (`LlmHttpClient(` in `LIVE_CALLS`, `src/reva/nl/service.py` in the budgeted list)
+   and the `docs/data_constitution.md` row is updated; the I.30 `reason` text in
+   `tests/invariants/coverage.yaml` still says "the LLM is disabled with a zero
+   budget".
 3. **Lead — Settings**: `REVA_LLM_FALLBACK` / `REVA_LLM_FALLBACK_MODEL` are read
    from the environment by `reva.api.routes.nl` (Settings is not NLC's); move them
    into `Settings` if preferred. `reva_llm_api_key` is unused by design.

@@ -49,21 +49,24 @@ earlier 23:56 live run had step 8 failing).
 
 ## 0. Status counts
 
-Counted over every ledger row in §2–§8 (one row per gate, criterion, check or invariant):
+Counted over every ledger row in §2–§8 (one row per gate, criterion, check or invariant). Recounted by DOCV2
+after the update; the draft had 159 done, 23 partial, 207 rows (P2.14 was added).
 
 | Status | Rows |
 |---|---|
-| done | 159 |
-| partial | 23 |
+| done | 167 |
+| partial | 16 |
 | interface-only | 14 |
 | not started | 6 |
 | blocked-on-credentials | 5 |
-| **total** | **207** |
+| **total** | **208** |
 
-By section: P0–P7 (§3): 76 done, 11 partial, 3 blocked-on-credentials. P8–P12 (§4): 14 interface-only and
-6 not started (none done). §13 acceptance (§5): 34 done, 1 blocked-on-credentials. MVP gates/demo (§6): 6 done,
-2 partial. First actions + CI (§7): 15 done, 3 partial, 1 blocked-on-credentials. Invariants (§8.1): 28 done,
-7 partial.
+By section: P0–P7 (§3): 81 done, 7 partial, 3 blocked-on-credentials. P8–P12 (§4): 14 interface-only and
+6 not started (none done). §13 acceptance (§5): 34 done, 1 blocked-on-credentials. MVP gates/demo (§6): 7 done,
+1 partial. First actions + CI (§7): 15 done, 3 partial, 1 blocked-on-credentials. Invariants (§8.1): 30 done,
+5 partial.
+
+V2 ledger (§12, counted separately): 13 done (all V2 models experimental, maintainer review pending), 1 partial.
 
 "done" rows have code and a test or measurement that exists. **No row's test has been confirmed in the final
 full run** (§9). A done row can still turn into a failure there.
@@ -74,24 +77,30 @@ full run** (§9). A done row can still turn into a failure there.
 
 * Python 3.12 / uv / FastAPI / SQLAlchemy / Alembic backend in `src/reva/`. The mapping from the §22 layout to the
   actual modules is in `docs/architecture.md` ("Spec path (§22) | Implementation" table).
-* PostgreSQL 17 + PostGIS schema in `migrations/versions/0001_kernel.py` … `0007_security.py`.
-* React/TypeScript/Vite UI in `ui/` with seven screens: World, Country, Evidence, Graph, Simulation, Models and
-  Acquisition (`ui/src/pages/`).
+* PostgreSQL 17 + PostGIS schema in `migrations/versions/0001_kernel.py` … `0007_security.py`, plus `0008_v2.py`
+  (V2: result periods, dataset inputs, LLM budget ledger functions).
+* React/TypeScript/Vite UI in `ui/` with seven V1 screens: World, Country, Evidence, Graph, Simulation, Models and
+  Acquisition (`ui/src/pages/`), plus the V2 routes Map, Compose and Runs (§12).
+* Three runtime processes besides the pre-deploy: API, worker and the independent promotion gate
+  (`uv run reva gate` / `make gate`, login `reva_gate`; `docs/dev/gate_separation.md`).
 * Runbook: `README.md`, `Makefile`, `docs/operations.md`, `docs/deployment.md`. Local steps (spec §23):
   `cp .env.example .env`, `docker compose up -d db`, `uv sync --frozen --all-extras`, `uv run reva db bootstrap`,
   `uv run reva seed --profile mvp`, `uv run reva fixtures load --profile mvp` or
-  `uv run reva ingest --profile mvp --live`, `uv run reva api`, `uv run reva worker`, `npm --prefix ui run dev`.
+  `uv run reva ingest --profile mvp --live`, `uv run reva api`, `uv run reva worker`, `uv run reva gate`,
+  `npm --prefix ui run dev`.
 * §17.3 demonstration: `uv run python scripts/demo_workflow.py [--live]`. Acceptance report:
   `uv run python scripts/acceptance_report.py [--with-perf --with-live]`.
 
 ## 2. Git change summary and migrations (§14 item 2)
 
 * Migrations: `0001_kernel`, `0002_evidence`, `0003_belief_graph`, `0004_models_sim`,
-  `0005_science_population`, `0006_operations`, `0007_security`. Deviations from the reference SQL grouping
+  `0005_science_population`, `0006_operations`, `0007_security`, `0008_v2`. Deviations from the reference SQL grouping
   (dependency ordering) are documented in each migration's docstring (spec audit D-1).
 * **Open:** the migrations were edited in place after they had been applied (review R-15 / R5-04). The dev DB
   `reva` reports head `0007_security` but lacks the later fixes. A catalog drift check now exists
-  (`src/reva/adapters/postgres/schema_contract.py`, `migrations/schema_contract.json`). Freeze 0001–0007 at release. CI runs an upgrade
+  (`src/reva/adapters/postgres/schema_contract.py`, `migrations/schema_contract.json`,
+  `tests/integration/test_schema_contract.py`). The gate separation changed the 0007 governance section again on
+  2026-10-15 (`docs/dev/gate_separation.md`). Freeze 0001–0008 at release. CI runs an upgrade
   test from `0006_operations` (`.github/workflows/ci.yml`), but that is not an upgrade from a released version.
 * The final git summary (commits, tag, file counts) is **TBD by the lead** at release time.
 
@@ -121,10 +130,10 @@ full run** (§9). A done row can still turn into a failure there.
 | P1.4 | Missing/zero distinction (§25 P1, inv. 5) | **done** | `src/reva/kernel/values.py` (`Missing`); `tests/unit/test_kernel_values.py::test_missing_can_never_be_used_as_a_number`, `HC::test_comtrade_missing_flow_stays_missing_never_zero`, `HC::test_wb_null_values_stay_missing`, `RG::test_missing_value_cannot_carry_a_number` | — |
 | P1.5 | Failed upload invisible (§25 P1, §5) | **done** | `src/reva/adapters/objects/filesystem.py`, `s3.py`, `src/reva/evidence/ingest.py`; `tests/integration/test_storage_publication.py::test_failure_mid_upload_leaves_no_object_and_no_rows`, `tests/integration/test_storage_s3.py::test_upload_failure_leaves_no_object` | — |
 | P1.6 | Wrong unit rejected (§25 P1, inv. 6) | **done** | `src/reva/ontology/units.py`; `tests/unit/test_ontology_units.py::test_observation_unit_must_match_concept_and_missing_values_pass`, `::test_observation_unit_missing_or_unknown_rejected` | — |
-| P1.7 | SQL roles deny invalid writes; WHERE is not the boundary (§25 P1, §4) | **partial** | `migrations/versions/0007_security.py`; `RG::test_api_cannot_insert_directly`, `RG::test_runtime_roles_cannot_update_delete_truncate_history`, `RG::test_where_clause_is_not_the_boundary`, `DBH::test_worker_insert_grants_are_the_reviewed_set`, `DBH::test_worker_cannot_mint_api_tokens_or_record_human_reviews` | **Residual risk:** `reva_worker` can still insert self-approved governance rows: `evidence.eligibility` (`decision='eligible'`), `ontology.mapping` (`approval='approved'`) and `model.version` (`approval_status='approved'`). See `docs/limitations.md` "Governance limits", `docs/dev/review_db_fixes.md` R5-01 and §8.3 |
-| P1.8 | The twelve DB/application checks (§4 items 1–12) | **partial** | `migrations/versions/0002_evidence.py`, `0003_belief_graph.py`; `RG::test_acquisition_connector_must_belong_to_source`, `RG::test_observation_must_agree_with_its_acquisition`, `RG::test_release_requires_belief_mode_context`, `RG::test_belief_input_cannot_reference_simulation_or_evaluation_outputs`, `RG::test_provenance_cycles_rejected`, `RG::test_publication_rejects_unverified_artifacts`, `RG::test_restricted_privacy_classes_rejected`, `EF::test_selector_that_does_not_resolve_quarantines_the_item` | Check 6 (eligibility scope, R5-11) and check 11 (seal race and relation seal, R5-07): fixes landed in `migrations/versions/0002_evidence.py`, `0003_belief_graph.py` and `0005_science_population.py` (explicit applicability schema including `classifications`, fail-closed scope, shared release lock) **after the reviews, without dedicated tests yet**. Keep partial until tests exist |
+| P1.7 | SQL roles deny invalid writes; WHERE is not the boundary (§25 P1, §4) | **done** | `migrations/versions/0007_security.py` (`meta.enforce_governance`, approval functions owned by `reva_registry`); `RG::test_api_cannot_insert_directly`, `RG::test_runtime_roles_cannot_update_delete_truncate_history`, `RG::test_where_clause_is_not_the_boundary`, `DBH::test_worker_insert_grants_are_the_reviewed_set`, `DBH::test_worker_cannot_mint_api_tokens_or_record_human_reviews`, `GOV::test_worker_cannot_self_approve_registry_rows`, `GOV::test_eligibility_approval_requires_a_bound_passing_gate`, `GOV::test_model_approval_requires_a_human_review_recorded_by_the_api`, `GS::test_approval_functions_refuse_gate_results_not_recorded_by_the_gate` | Changed since the draft: approved governance states are written only by the owner or by approval functions that need a `reva_gate` pass or an API-recorded human review (§8.3). Residual: `model.record_promotion`, `model.evaluation` and `meta.artifact` stay worker-writable (`docs/limitations.md` "Governance limits") |
+| P1.8 | The twelve DB/application checks (§4 items 1–12) | **done** | `migrations/versions/0002_evidence.py`, `0003_belief_graph.py`; `RG::test_acquisition_connector_must_belong_to_source`, `RG::test_observation_must_agree_with_its_acquisition`, `RG::test_release_requires_belief_mode_context`, `RG::test_belief_input_cannot_reference_simulation_or_evaluation_outputs`, `RG::test_provenance_cycles_rejected`, `RG::test_publication_rejects_unverified_artifacts`, `RG::test_restricted_privacy_classes_rejected`, `EF::test_selector_that_does_not_resolve_quarantines_the_item` | Changed since the draft: check 6 (eligibility scope, R5-11) and check 11 (seal race, relation seal, R5-07) now have tests: `DBH::test_years_outside_the_decision_scope_are_ineligible`, `DBH::test_input_trigger_enforces_the_support_year_scope`, `DBH::test_subject_scoped_quarantine_does_not_affect_other_subjects`, `DBH::test_release_seal_race_publisher_waits_for_writers`, `DBH::test_release_seal_race_writer_waits_for_publisher`, `DBH::test_release_pinned_relations_are_sealed` |
 | P1.9 | Frozen typed kernel records; TimeExtent; Value union; UncertaintySpec; semantic profiles; component manifests (§4) | **done** | `src/reva/kernel/{records,time,values,uncertainty,support,context}.py`, `src/reva/ontology/components.py`, `registry/components/`; `tests/unit/test_kernel_values.py`, `tests/scientific/test_uncertainty_types.py`, `tests/unit/test_ontology_components.py`, `tests/contracts/test_registry_components.py::test_published_versions_match_pinned_digests` | Calendars limited to gregorian/proleptic/julian (documented limitation) |
-| P1.10 | ArtifactStore put/get/head/range_read; streamed hashes; no ETag-as-SHA (§5) | **done** | `src/reva/adapters/objects/`; `tests/unit/test_storage_fs.py`, `tests/integration/test_storage_s3.py`, `tests/security/test_http_storage_fixes.py::test_s3_existing_object_with_matching_metadata_but_wrong_bytes_rejected` | S3 tests use a fake/moto client; real-bucket behaviour is **blocked-on-credentials** (see P7.2) |
+| P1.10 | ArtifactStore put/get/head/range_read; streamed hashes; no ETag-as-SHA (§5) | **done** | `src/reva/adapters/objects/`; `tests/unit/test_storage_fs.py`, `tests/integration/test_storage_s3.py`, `tests/security/test_http_storage_fixes.py::test_s3_existing_object_with_matching_metadata_but_wrong_bytes_rejected` | Changed since the draft: checked against a real S3 API, a self-built MinIO (last community release), in `tests/integration/test_s3_store_minio.py` (marker `s3`; skips without `REVA_TEST_S3_ENDPOINT`): store contract, provider checksums, conditional writes and the API/worker credential split. Recorded result: 38 passed, 1 xfailed (`docs/dev/s3_check.md`). Not AWS and not a provider bucket: that stays **blocked-on-credentials** (P7.2) |
 | P1.11 | Manifests store Arrow schema fingerprint, dimension order, row counts, logical keys, temporal coverage (§5) | **partial** | `src/reva/belief/publication.py` (release manifest), population Parquet metadata | Source observations are not written as normalised Parquet batches with manifests (PostgreSQL only; allowed for small panels by §8.1). DuckDB is a dependency but unused |
 | P1.12 | Safe HTTP client: SSRF, private redirects, oversize, decompression bombs (§6) | **done** | `src/reva/adapters/http/safe_client.py`, `archive.py`; `SSRF::test_redirect_hop_is_checked`, `tests/security/test_http_storage_fixes.py::test_connection_targets_the_vetted_address_not_a_rebinding_answer`, `::test_stacked_gzip_bomb_fails_fast_with_small_peak_memory` | — |
 | P1.13 | APIs: observations, ontology, sources (§25 P1) | **done** | `src/reva/api/routes/evidence.py`, `catalog.py`; `API::test_timeseries_revision_filtering`, `API::test_catalog_endpoints` | — |
@@ -138,7 +147,7 @@ full run** (§9). A done row can still turn into a failure there.
 | P2.3 | Pagination complete (§25 P2, §6 WB) | **done** | `src/reva/adapters/connectors/worldbank.py`; `HC::test_wb_multi_page_header_schedules_all_pages`, `HC::test_wb_pagination_truncation_blocks`, `HC::test_comtrade_max_records_truncation_blocks` | — |
 | P2.4 | 429 / HTML-200 / API-error handled (§25 P2) | **done** | `SSRF::test_429_retry_after_is_honoured_then_succeeds`, `SSRF::test_html_error_page_with_200_is_a_failure`, `HC::test_wb_api_error_payload_is_a_failure`, `HC::test_comtrade_error_and_drift_payloads_fail`, `HC::test_runner_quarantines_row_level_schema_drift` | — |
 | P2.5 | Comtrade missing weight remains missing; no barrels (§25 P2, §6) | **done** | `src/reva/adapters/connectors/comtrade.py`; `HC::test_comtrade_unusable_weight_stays_missing`, `tests/unit/test_ontology_units.py::test_kg_to_barrel_refused_without_density_and_convention` | — |
-| P2.6 | Crash/retry produces one visible acquisition (§25 P2) | **done** | `QR::test_kill_after_object_upload_then_retry_yields_one_acquisition`, `QR::test_kill_after_db_commit_before_ack_yields_one_acquisition` | — |
+| P2.6 | Crash/retry produces one visible acquisition (§25 P2) | **done** | `QR::test_kill_after_object_upload_then_retry_yields_one_acquisition`, `QR::test_kill_after_db_commit_before_ack_yields_one_acquisition`; real-process fault injection in `tests/chaos/` (marker `chaos`; `docs/dev/chaos_check.md`: SIGKILL/SIGSTOP/SIGTERM, backend termination, DB outage, cancellation, publication) | CHAOS-1 (handler kept running past its lease during a DB outage) was fixed in `src/reva/operations/worker.py`; the report records `tests/chaos` 11/11 afterwards |
 | P2.7 | Comtrade specifics: reporter codes verified, CIF/FOB kept, flags recorded, exact keys only, partner-total ≠ bilateral (§6) | **done** | `registry/reference/comtrade_partnerAreas.json`; `tests/live/test_live_sources.py::test_comtrade_reporter_codes_match_provider_catalogue`, `EF::test_r23_valuation_is_flow_aware`, `HC::test_comtrade_dimension_mismatch_blocks`, `tests/integration/test_world_graph.py::test_aggregation_refuses_world_total_plus_bilateral` | Bilateral 2023 requests omit `partnerCode` (all partners, count-checked); arguably not an "exact key" (audit D-3) |
 | P2.8 | Natural Earth pinned by hash, reviewed keys, display only (§6) | **done** | `src/reva/adapters/connectors/naturalearth.py`, `src/reva/world/space.py`, `docs/adr/0010-natural-earth-display-only.md`; `EF::test_display_geometry_disputed_only_by_type`, `tests/live/test_live_sources.py::test_naturalearth_asset_structure` | No pre-declared expected hash (the first download becomes the pin) |
 | P2.9 | Crossref DOI 10.1257/aer.99.3.1053, cache/conditional requests, 429, reviewed EvidenceCard without invented coefficients (§6) | **done** | `src/reva/adapters/connectors/crossref.py`, `src/reva/evidence/cards.py`, `registry/evidence/kilian2009.yaml`; `EF::test_crossref_sends_conditional_headers_and_treats_304_as_unchanged`, `tests/live/test_live_sources.py::test_crossref_doi_metadata` | — |
@@ -146,6 +155,7 @@ full run** (§9). A done row can still turn into a failure there.
 | P2.11 | Scheduler: idempotent due slots, no duplicates; outbox invalidation, SCC, materiality budget (§7) | **done** | `src/reva/operations/schedules.py`, `invalidation.py`; `QR::test_two_schedulers_create_exactly_one_job_per_slot`, `tests/integration/test_scheduler_slots.py::test_slot_key_is_utc_whatever_the_offset`, `tests/integration/test_queue_invalidation.py::test_cycle_invalidates_coupled_component_as_a_whole`, `::test_materiality_skips_accumulate_error_budget_then_force_refresh` | — |
 | P2.12 | Default cadences (WDI/Comtrade monthly, NE/Crossref/Eurostat weekly) (§6) | **partial** | `src/reva/cli/seed.py` (`DEFAULT_SCHEDULES`, including `ingest:eurostat.demo_pjan.fr` weekly); `tests/integration/test_scheduler_slots.py` | No test asserts the cadence table itself (scheduler tests cover slot mechanics only). Comtrade "rolling recent-year revision checks" is implicit (re-fetches all years monthly) |
 | P2.13 | APIs: connectors/jobs (§25 P2) | **done** | `src/reva/api/routes/catalog.py`, `system.py`; `API::test_simulations_jobs`, `API::test_r2_07_cancel_is_scoped_by_job_type` | — |
+| P2.14 | Large acquisitions do not exhaust the PostgreSQL lock table (added after a live `demo_pjan` ingest of ~8,000 cells failed with `max_locks_per_transaction`) | **done** | `src/reva/evidence/ingest.py` (`lock_lineages`: at most 256 bucket locks per acquisition, namespaced by source/origin, one sorted statement, bounded wait); `tests/integration/test_lineage_locks.py::test_ten_thousand_observations_hold_a_bounded_number_of_locks`, `::test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock`; `docs/dev/lock_bounds.md` | Same-source acquisitions covering most buckets now run one after the other (documented trade-off) |
 
 ### P3 — beliefs, aliases, n-ary graph, cards
 
@@ -153,7 +163,7 @@ full run** (§9). A done row can still turn into a failure there.
 |---|---|---|---|---|
 | P3.1 | Every displayed value traces to raw source (§25 P3, inv. 1) | **done** | `src/reva/api/routes/provenance.py`; `API::test_provenance_reaches_raw_artifact_and_selector`, `API::test_provenance_of_run_and_scenario`; `ui/e2e/country.spec.ts` (drawer reaches raw SHA-256 + selector) | — |
 | P3.2 | Graph preserves participant roles (§25 P3) | **done** | `src/reva/world/graph.py`; `tests/integration/test_world_graph.py::test_participant_roles_and_directions_preserved`, `tests/unit/test_world_graph_core.py::test_incidence_preserves_roles_and_repeated_participants` | — |
-| P3.3 | World view is release-pinned; no unversioned current_facts (§25 P3, §4) | **partial** | `src/reva/belief/snapshots.py`; `API::test_beliefs_are_release_pinned_and_as_of`, `tests/integration/test_world_graph.py::test_release_pinned_context` | The last recorded demo (00:19) showed `release_pinned_edges=0`: `publish_release` did not pin `world.relation` rows, so the graph used the evidence-as-of-now context. **In flight:** `pin_release_relations` in `src/reva/belief/publication.py` and a relation seal in `migrations/versions/0003_belief_graph.py` (R5-07) landed after that run, with no test yet that asserts `publish_release` pins edges. Re-run demo step 4 |
+| P3.3 | World view is release-pinned; no unversioned current_facts (§25 P3, §4) | **partial** | `src/reva/belief/snapshots.py`; `API::test_beliefs_are_release_pinned_and_as_of`, `tests/integration/test_world_graph.py::test_release_pinned_context` | Both recorded demos (fixtures and live, started 00:19) show `release_pinned_edges=0` in step 4. `pin_release_relations` (`src/reva/belief/publication.py`) and the relation seal landed after those runs; the seal is tested (`DBH::test_release_pinned_relations_are_sealed`) and `tests/integration/test_world_graph.py::test_release_pinned_context` reads edges pinned during publication, but no test asserts that `publish_release` pins the ingested trade edges. Re-run demo step 4 |
 | P3.4 | WDI/Eurostat incompatible support cannot reconcile (§25 P3, §6 Eurostat) | **done** | `registry/mappings/eurostat.yaml`; `tests/unit/test_ontology_validation.py::test_jan1_support_does_not_satisfy_midyear_concept`, `tests/unit/test_ontology_mappings.py::test_eurostat_jan1_total_vs_wdi_midyear_is_incompatible`, `EUR::test_end_to_end_promotion_ingestion_and_belief_separation` | At 00:19 the EUR test failed on proposal-backlog order dependence. `tests/integration/test_connector_repair.py` now closes its proposals at teardown; drafting spot-check (autonomy_gates + connector_repair + eurostat_discovery + evidence_fixes: 116 passed) |
 | P3.5 | No scenario input allowed into beliefs (§25 P3, inv. 3) | **done** | `belief.input` FKs in `migrations/versions/0003_belief_graph.py`; `RG::test_belief_input_cannot_reference_simulation_or_evaluation_outputs` | — |
 | P3.6 | source_select_v1 publishes selected_report with original uncertainty (§8) | **done** | `src/reva/belief/selection.py`, `publication.py`, `docs/adr/0006-source-select-v1.md`; `EF::test_r05_r3_08_incompatible_lineages_withhold_the_estimand`, `EF::test_r27_retracted_latest_revision_is_not_replaced_by_superseded_value` | — |
@@ -169,7 +179,7 @@ full run** (§9). A done row can still turn into a failure there.
 | P4.3 | ε=0 equals L1 exactly (§25 P4) | **done** | `CE::test_zero_elasticity_l2_equals_l1_exactly`, `SIM::test_l2_sensitivity_range` | — |
 | P4.4 | Missing input blocks; all-four request returns missing_input for DZA (§25 P4, §6, §17.1) | **done** | `src/reva/simulation/compile.py`; `SIM::test_all_four_countries_returns_missing_input_for_dza`, `CE::test_missing_input_raises_never_zero`, `tests/e2e/test_demo_workflow.py::test_negative_demo_reports_the_algerian_blocker` | Holds for reference years 2020–2023 only. DZA 2024 has one estimated H4 row per flow (imports US$5,564, implausible; flagged as a review signal by `EF::test_comtrade_implausible_jump_is_a_review_signal_not_a_block`) |
 | P4.5 | 5-year GDP request rejected (§25 P4, inv. 33) | **done** | `SIM::test_five_year_horizon_rejected` | — |
-| P4.6 | Scenario writes cannot change beliefs (§25 P4) | **done** | `SIM::test_sim_role_cannot_write_evidence_or_beliefs`, `RG::test_sim_cannot_insert_evidence_or_beliefs` | R5-02 (scenario identity squatting) and R5-05 (sim pre-registering artifact metadata) have fixes in `migrations/versions/0004_models_sim.py` / `0007_security.py` (`sim.register_artifact`) with no dedicated tests yet |
+| P4.6 | Scenario writes cannot change beliefs (§25 P4) | **done** | `SIM::test_sim_role_cannot_write_evidence_or_beliefs`, `RG::test_sim_cannot_insert_evidence_or_beliefs` | Changed since the draft: R5-02 and R5-05 now have tests (`tests/security/test_sim_integrity.py::test_sim_cannot_squat_scenario_identity`, `::test_sim_cannot_preregister_artifact_metadata`, `::test_sim_register_artifact_derives_metadata_from_the_bytes`) |
 | P4.7 | Cancellation/checkpoint/retry verified (§25 P4) | **done** | `SIM::test_cancellation_before_publication`, `QR::test_cancel_running_job_is_honoured_cooperatively`, `tests/integration/test_worker_loop.py::test_sigterm_stops_claiming_signals_handler_and_drains` | — |
 | P4.8 | L0 cache, L1, L2 labelled sensitivity; L3/L4 unavailable (§9) | **done** | `src/reva/simulation/engine.py`, `src/reva/capabilities.py`; `SIM::test_l0_cache_miss_then_hit_after_l1`, `SIM::test_l3_and_l4_rejected`, `tests/scientific/test_crude_exposure_sensitivity_row.py` | — |
 | P4.9 | Run pins baseline, manifests, intervention, seed streams, profile, output digest; real baseline resolved (§9) | **done** | `src/reva/simulation/rng.py`, `src/reva/cli/demo.py`, `ui/src/lib/scenario.ts`; `tests/scientific/test_crude_exposure_coupling_rng.py::test_seed_plan_records_streams`, `RG::test_scenario_rejects_unpublished_baseline_direct_insert` | — |
@@ -204,7 +214,7 @@ full run** (§9). A done row can still turn into a failure there.
 | P6.6 | Generated code cannot run in worker (§25 P6, §10) | **done** | `src/reva/autonomy/sandbox.py`, `sandbox_child.py`; `tests/security/test_sandbox_isolation.py::test_worker_never_imports_proposed_code`, `::test_generated_code_is_blocked_without_external_runner`, `::test_isolation_evidence_is_measured_not_nominal` | Without namespaces the trusted-template child runs as the same uid ("process_isolation: none (same uid)"); generated code stays blocked |
 | P6.7 | Hostile document cannot alter policy (§25 P6) | **done** | `tests/security/test_prompt_injection.py::test_injected_paper_text_yields_only_a_candidate`, `::test_injected_catalogue_and_metadata_change_nothing` | — |
 | P6.8 | All 16 autonomy protocols with concrete V1 behaviour (§10, arch. §18.1) | **done** | `src/reva/ports/autonomy.py`, `src/reva/autonomy/*.py`; `tests/integration/test_autonomy_contracts.py::test_protocol_conformance` | BacktestRunner partial (see P5.2) |
-| P6.9 | T0–T3 tiers; LLM/agent cannot change its own gates (§10, arch. §18.2) | **partial** | `registry/policies/promotion.yaml`, `src/reva/autonomy/{policy,gate,binding}.py`; `tests/integration/test_autonomy_gates.py::test_proposer_cannot_write_its_own_gate_result`, `::test_r4_01_malicious_manifest_is_rejected`, `::test_r4_11_template_digest_is_pinned_in_policy` | The gate runs in the worker process with worker credentials. The DB cannot stop the worker from writing approved eligibility, mapping or model.version rows itself (R5-01, §8.3) |
+| P6.9 | T0–T3 tiers; LLM/agent cannot change its own gates (§10, arch. §18.2) | **done** | `registry/policies/promotion.yaml`, `src/reva/autonomy/{policy,gate,binding}.py`, `src/reva/gate/` (separate process, login `reva_gate`), `scripts/start_gate.py`; `tests/integration/test_autonomy_gates.py::test_proposer_cannot_write_its_own_gate_result`, `::test_r4_01_malicious_manifest_is_rejected`, `GS::test_worker_api_and_sim_cannot_record_gate_results`, `GS::test_r6_02_gate_pass_is_bound_to_the_gate_derived_scope_and_manifest`, `GS::test_r6_03_t2_proposals_need_a_human_review_not_a_gate_pass`, `tests/integration/test_gate_separation.py::test_worker_proposes_gate_process_decides_worker_promotes`, `tests/integration/test_gate_followup.py`, `tests/security/test_gate_verify.py` | Changed since the draft: only `reva_gate` records gate results and approvals accept only those (`docs/dev/gate_separation.md`). Residual: the gate decides on worker-stored inputs; both processes run the same image; locally the separation is a credential convention, not an isolation boundary |
 | P6.10 | Gap catalogue + analytic VOI with known answer + heuristic fallback (§10) | **done** | `registry/requirements/mvp.yaml`, `src/reva/autonomy/gaps.py`, `src/reva/evaluation/voi.py`; `tests/scientific/test_voi_analytic.py::test_evsi_exact_hand_check`, `tests/integration/test_autonomy_contracts.py::test_gap_detector_against_database_finds_dza_crude_missing` | — |
 | P6.11 | Population service end to end (Eurostat cells → Parquet → `model.population_dataset` → certificates) (§10, §17.3 step 10) | **done** | `src/reva/population/service.py`; `EF::test_population_from_promoted_eurostat_connector`; demo step 10 (fixtures) | The live release had no Jan-1 cells (P6.2), so this has only run on fixtures |
 | P6.12 | Self-healing repair proposals (arch. §10.3) | **done** | `src/reva/autonomy/repair.py`; `tests/integration/test_connector_repair.py` | — |
@@ -216,17 +226,17 @@ full run** (§9). A done row can still turn into a failure there.
 | P7.1 | Current schema/CLI validation (§25 P7, §12) | **done** | `scripts/validate_blueprint.py` (cached official schema, exit 0), `scripts/validate_contracts.py` (exit 0); `tests/contracts/` | `render blueprints validate` (Render CLI) not run, see P7.2 |
 | P7.2 | Deploy only when access exists (§25 P7, §1, §14 item 5) | **blocked-on-credentials** | `render.yaml`, `docs/deployment.md` (exact provisioning inputs) | Needs a Render API key/account plus an S3-compatible private bucket with two scoped key pairs (API read-only, worker prefix-write): `REVA_S3_BUCKET`, `REVA_S3_REGION`, `REVA_S3_ENDPOINT_URL`, `REVA_S3_ACCESS_KEY_ID`/`REVA_S3_SECRET_ACCESS_KEY` ×2. Not deployed |
 | P7.3 | Actual roles and credentials verified (§25 P7) | **blocked-on-credentials** | Locally: `RG::test_runtime_roles_are_unprivileged_noinherit_logins`, `DBH::test_provisioned_verifier_lets_the_runtime_role_log_in`, `tests/security/test_start_env.py::test_blueprint_as_written_starts_both_processes_in_production` | Verifying against the managed Render DB and S3 IAM policies needs deployment |
-| P7.4 | Restore from backups (§25 P7, §12, §13) | **done** | `scripts/backup.sh`, `scripts/restore.sh`, `scripts/backup_restore.py`; `tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of`, `::test_production_backup_requires_encryption`, `::test_restore_refuses_unverifiable_sets_and_non_empty_target` | Verified on small local data only; production RPO/RTO not measured |
+| P7.4 | Restore from backups (§25 P7, §12, §13) | **done** | `scripts/backup.sh`, `scripts/restore.sh`, `scripts/backup_restore.py`; `tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of`, `::test_production_backup_requires_encryption`, `::test_restore_refuses_unverifiable_sets_and_non_empty_target`, `tests/integration/test_backup_restore_roundtrip.py::test_backup_restore_round_trip_fresh_db_and_object_store`; end-to-end check `docs/dev/backup_check.md` (age-encrypted backup with objects restored into a new database and an empty object root, row counts, roles and RLS compared, secret scan 0 hits, refusals); S3 variant `tests/integration/test_s3_store_minio.py::test_backup_restore_cli_round_trip_with_s3` (MinIO) | Small local data only (4,010 rows, 64 objects); production RPO/RTO not measured |
 | P7.5 | No filesystem persistence assumptions (§25 P7) | **done** | `tests/unit/test_settings.py::test_production_never_silently_selects_filesystem`, `tests/integration/test_storage_s3.py::test_factory_builds_s3_store_for_production_settings` | — |
 | P7.6 | p95/RSS measurements recorded (§25 P7, §12, §14 item 6) | **done** | `scripts/measure_performance.py`, `var/perf/perf_results.json`, `docs/dev/perf_report.md` (API p95 171.9 ms at 1 CPU and 268.1 ms at emulated 0.5 CPU; metadata p95 37.3 ms; L1 four-country 12.1 ms; queue ack p95 241.3 ms; 100k population 3.379 s / 181.1 MiB; API peak RSS 120.2 MiB) | Measured on a 4-core dev container with emulated quotas, not on the named Render plans (see A.P3) |
-| P7.7 | Complete live demo (§25 P7, §17.4) | **partial** | `scripts/demo_workflow.py --live`; `var/acceptance/demo_live.json` (23:56: 12 pass, **step 8 failed**: "no eligible observations at this cutoff; nothing to publish") | Re-run after the WDI applicability widening (1960–2024) is TBD by the lead (§9). The MVP cannot be claimed operational until the live demo and the restore test both pass (§17.4) |
+| P7.7 | Complete live demo (§25 P7, §17.4) | **done** | `scripts/demo_workflow.py --live`; `var/acceptance/demo_live.json` (started 00:19:35 on `9ecd563`, dirty worktree: **13/13 pass**, including step 8; the 23:56 run had failed step 8) | Recorded before many later changes (gate separation, V2); repeat in the final run (§9). Step 4 still shows `release_pinned_edges=0` (P3.3) |
 | P7.8 | Docker multi-stage image, non-root, pinned digests (§2, §25 P7) | **done** | `Dockerfile`, `.dockerignore`; `docker` job in `.github/workflows/ci.yml` (build + non-root smoke) | Image build not run in this drafting session; result TBD (§9) |
 | P7.9 | Render Blueprint = full appendix; documented compatibility changes (§12) | **done** | `render.yaml`; `scripts/validate_blueprint.py`; `tests/security/test_start_env.py::test_blueprint_as_written_starts_both_processes_in_production` | `render.yaml` adds `REVA_DB_SSLMODE` and `REVA_PROCESS_ROLE` beyond the appendix (minimal, for production settings validation). Check that `docs/deployment.md` records this as the reviewed compatibility update |
-| P7.10 | bootstrap_runtime.py: advisory lock, PostGIS check, migrations as owner, idempotent roles, grants, report without secrets (§12) | **done** | `scripts/bootstrap_runtime.py`, `src/reva/cli/bootstrap.py`; `tests/security/test_start_env.py::test_bootstrap_runtime_reports_schema_without_secrets`, `DBH::test_scram_verifier_matches_rfc7677`, `DBH::test_bootstrap_with_non_superuser_createrole_owner` | Bootstrap does not check memberships *held by* runtime roles (R5-09); a CREATEROLE owner is implicitly a member of `reva_restricted_deletion` (R5-10) |
+| P7.10 | bootstrap_runtime.py: advisory lock, PostGIS check, migrations as owner, idempotent roles, grants, report without secrets (§12) | **done** | `scripts/bootstrap_runtime.py`, `src/reva/cli/bootstrap.py`; `tests/security/test_start_env.py::test_bootstrap_runtime_reports_schema_without_secrets`, `DBH::test_scram_verifier_matches_rfc7677`, `DBH::test_bootstrap_with_non_superuser_createrole_owner` | Changed since the draft: memberships held by runtime roles are rejected (`GOV::test_bootstrap_rejects_memberships_held_by_runtime_roles`, R5-09) and deletion needs an explicit `SET ROLE` (`GOV::test_deletion_needs_explicit_set_role`, R5-10). Not exercised on a managed database (P7.3) |
 | P7.11 | start_api.py: validate, scrub env, exec Uvicorn 0.0.0.0:$PORT with one worker; child env tested (§12) | **done** | `scripts/start_api.py`, `scripts/_runtime_env.py`; `tests/security/test_start_env.py::test_start_api_subprocess_child_environment`, `::test_api_child_env_keeps_only_api_credentials` | — |
 | P7.12 | start_worker.py: refuse owner URL, bounded schema wait, thread budget, SIGTERM drain (§12) | **done** | `scripts/start_worker.py`; `tests/security/test_start_env.py::test_start_worker_refuses_owner_url_in_production`, `::test_wait_for_schema_is_bounded`, `::test_thread_budget_is_explicit_and_capped_by_cgroup`, `tests/integration/test_worker_loop.py::test_sigterm_stops_claiming_signals_handler_and_drains` | — |
-| P7.13 | Object credentials: API read-only by prefix, worker prefix-write, sandbox none (§12) | **blocked-on-credentials** | `docs/deployment.md` (per-prefix IAM policies listed) | IAM policies cannot be exercised without a provider bucket |
-| P7.14 | JSON logs, metrics, traces with bounded cardinality (§12) | **done** | `src/reva/operations/telemetry.py`, `src/reva/operations/tracing.py` (optional OTLP via `OTEL_EXPORTER_OTLP_ENDPOINT`); `tests/integration/test_queue_telemetry.py::test_metrics_have_bounded_labels_and_render`, `::test_json_logs_carry_correlation_and_redact_secrets`, `API::test_metrics_after_traffic` | No test exercises the OTel exporter path (soft dependency, off by default) |
+| P7.13 | Object credentials: API read-only by prefix, worker prefix-write, sandbox none (§12) | **blocked-on-credentials** | `docs/deployment.md` (per-prefix IAM policies listed) | Provider IAM policies cannot be exercised without a provider bucket. Locally the API read-only and worker prefix-confined policies were proven on MinIO (`tests/integration/test_s3_store_minio.py::test_api_credential_is_read_only`, `::test_worker_credential_confined_to_prefix`); the gate's key pair (added later) was not part of that check |
+| P7.14 | JSON logs, metrics, traces with bounded cardinality (§12) | **done** | `src/reva/operations/telemetry.py`, `src/reva/operations/tracing.py` (optional OTLP via `OTEL_EXPORTER_OTLP_ENDPOINT`); `tests/integration/test_queue_telemetry.py::test_metrics_have_bounded_labels_and_render`, `::test_json_logs_carry_correlation_and_redact_secrets`, `API::test_metrics_after_traffic`; redaction (R7) of logs, errors, job records, audit, outbox and sandbox output: `tests/security/test_redaction_r7.py`, `docs/dev/redaction_check.md` | No test exercises the OTel exporter path (soft dependency, off by default) |
 | P7.15 | Machine-readable acceptance report; release docs (§25.1) | **done** | `scripts/acceptance_report.py` → `var/acceptance/acceptance_report.json` (schema `reva-acceptance-report/1`), `docs/dev/acceptance_report.md`; `.github/workflows/release.yml` | Must be regenerated from the final run (§9) |
 
 ---
@@ -281,17 +291,17 @@ implementation must satisfy. Those helpers have tests but do not make the phase 
 | A.T3 | Old raw + new parser distinguished from original vintage | **done** | `REV::test_replayed_raw_with_new_parser_is_distinguished_from_original_vintage`, `EF::test_r28_parser_version_change_reprocesses_same_bytes` | — |
 | A.T4 | Staged/uncommitted objects invisible | **done** | `tests/integration/test_storage_publication.py::test_crash_after_upload_before_commit_is_invisible_then_retry_publishes_once`, `tests/unit/test_storage_fs.py::test_mid_stream_failure_leaves_no_object` | — |
 | A.T5 | Missing publication time never filled with reference date | **done** | `REV::test_missing_source_publication_time_is_never_the_reference_date` | — |
-| A.T6 | Scientific UPDATE/DELETE fails under runtime roles | **done** | `RG::test_runtime_roles_cannot_update_delete_truncate_history`, `RG::test_owner_cannot_mutate_immutable_records_either` | Inserts of self-approved governance rows remain possible for `reva_worker` (§8.3) |
+| A.T6 | Scientific UPDATE/DELETE fails under runtime roles | **done** | `RG::test_runtime_roles_cannot_update_delete_truncate_history`, `RG::test_owner_cannot_mutate_immutable_records_either` | — (self-approved governance inserts are refused since the governance fix; §8.3) |
 | A.I1 | Simulation role cannot insert evidence or beliefs | **done** | `RG::test_sim_cannot_insert_evidence_or_beliefs`, `SIM::test_sim_role_cannot_write_evidence_or_beliefs` | — |
 | A.I2 | Generated code gets no production credentials or network by default | **done** | `tests/security/test_sandbox_isolation.py::test_trusted_template_env_has_no_secrets_and_network_is_template_only`, `::test_generated_code_is_blocked_without_external_runner`, `::test_python_guard_blocks_socket_and_raw_socket` | — |
 | A.I3 | Prompt injection in a paper cannot change policy/allowlist | **done** | `tests/security/test_prompt_injection.py::test_injected_paper_text_yields_only_a_candidate` | — |
 | A.I4 | SSRF, redirect-to-private-IP, zip bomb, SQL injection, secret-log tests | **done** | `SSRF::test_hosts_resolving_to_non_public_addresses_rejected`, `SSRF::test_redirect_hop_is_checked`, `SSRF::test_zip_bomb_ratio_rejected`, `tests/security/test_sql_injection.py::test_entity_listing_filters_treat_input_as_data`, `tests/security/test_secrets_logs.py::test_http_client_logs_do_not_contain_secret_query_values`, `::test_recorded_fixture_manifest_excludes_secret_query_values` | — |
 | A.I5 | App startup env has no migration-owner password/URL | **done** | `tests/security/test_start_env.py::test_api_child_env_keeps_only_api_credentials`, `::test_start_api_subprocess_child_environment`, `::test_worker_child_env_has_no_api_or_owner_secrets` | — |
-| A.R1 | Kill worker after upload / after commit → one visible result | **done** | `QR::test_kill_after_object_upload_then_retry_yields_one_acquisition`, `QR::test_kill_after_db_commit_before_ack_yields_one_acquisition` | — |
-| A.R2 | Expired lease/fencing holder cannot publish | **done** | `QR::test_expired_lease_reclaimed_with_higher_token_and_stale_holder_cannot_commit`, `SIM::test_stale_fencing_token_cannot_publish`, `tests/replay/test_replay_job.py::test_stale_lease_cannot_publish_a_replay` | — |
+| A.R1 | Kill worker after upload / after commit → one visible result | **done** | `QR::test_kill_after_object_upload_then_retry_yields_one_acquisition`, `QR::test_kill_after_db_commit_before_ack_yields_one_acquisition`; real OS processes: `tests/chaos/test_chaos_queue.py::test_sigkill_mid_simulation_reclaimed_after_lease_expiry_and_completed_once`, `tests/chaos/test_chaos_publication.py::test_sigkill_inside_publication_transaction_leaves_no_half_published_release` | — |
+| A.R2 | Expired lease/fencing holder cannot publish | **done** | `QR::test_expired_lease_reclaimed_with_higher_token_and_stale_holder_cannot_commit`, `SIM::test_stale_fencing_token_cannot_publish`, `tests/replay/test_replay_job.py::test_stale_lease_cannot_publish_a_replay`, `tests/chaos/test_chaos_queue.py::test_sigstop_zombie_wakes_after_reclaim_and_cannot_publish` | — |
 | A.R3 | Two workers claiming a due job → no duplicate effects | **done** | `QR::test_concurrent_claims_never_return_the_same_job`, `QR::test_two_schedulers_create_exactly_one_job_per_slot` | — |
 | A.R4 | Rate limiting, HTML-200, schema drift → retries/quarantine | **done** | `SSRF::test_429_retry_after_is_honoured_then_succeeds`, `HC::test_runner_quarantines_truncated_page_and_html`, `HC::test_runner_quarantines_row_level_schema_drift`, `HC::test_wb_schema_drift_is_a_failure` | — |
-| A.R5 | Restore reconstructs identical logical manifests and as-of results | **done** | `tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of` | Local only (see P7.4) |
+| A.R5 | Restore reconstructs identical logical manifests and as-of results | **done** | `tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of`, `tests/integration/test_backup_restore_roundtrip.py::test_backup_restore_round_trip_fresh_db_and_object_store`, `docs/dev/backup_check.md` | Local only (see P7.4) |
 | A.P1 | Leaf totals conserved; no double-counted totals | **done** | `tests/unit/population/test_population_materialise.py::test_leaf_totals_conserved_exactly`, `tests/unit/population/test_population_recipe.py::test_only_disjoint_leaves_are_counted` | — |
 | A.P2 | Structural-zero and unknown-category handling | **done** | `tests/unit/population/test_population_recipe.py::test_observed_zero_is_not_structural_zero_and_not_missing`, `::test_unknown_and_top_coded_retained_explicitly`, `tests/unit/population/test_population_partition.py::test_observed_zero_cells_are_not_structural_zeros` | — |
 | A.P3 | Same seed/config → same logical cohort | **done** | `tests/unit/population/test_population_materialise.py::test_same_inputs_identical_outputs`, `tests/unit/population/test_population_recipe.py::test_digest_is_deterministic_and_seed_sensitive` | — |
@@ -316,9 +326,9 @@ implementation must satisfy. Those helpers have tests but do not make the phase 
 | M.3 | All four country profiles exist even if a scenario input is unavailable | **done** | `API::test_entities_list_and_detail`, `API::test_dza_crude_import_belief_is_typed_missing`; `ui/e2e/country.spec.ts` (DZA rendered as missing, never 0) | **DZA data gap:** Comtrade returned zero HS2709 rows for DZA in 2020–2023 (both flows; `docs/dev/live_checks.md`), stored as typed `Missing(unavailable; provider_returned_no_rows)` |
 | M.4 | No scenario number retrievable through a canonical observation endpoint | **done** | `src/reva/api/routes/evidence.py` reads only `evidence.*` / `belief.*`; `RG::test_sim_cannot_insert_evidence_or_beliefs`, `RG::test_belief_input_cannot_reference_simulation_or_evaluation_outputs` | — |
 | M.5 | No synthetic record linked to a real individual | **done** | `tests/unit/population/test_population_recipe.py::test_forbidden_attributes_rejected`, `tests/contracts/test_registry_components.py::test_component_privacy_is_v1_admissible_and_no_gender_field` | — |
-| M.6 | MVP operational only after complete live demo **and** restore test pass | **partial** | Restore: P7.4. Live demo: P7.7 (step 8 failed at 23:56) | **Do not claim the MVP operational** until the lead's final live demo passes |
+| M.6 | MVP operational only after complete live demo **and** restore test pass | **partial** | Restore: P7.4. Live demo: P7.7 (13/13 recorded, started 00:19) | Both have recorded passes, but before later changes. **Do not claim the MVP operational** until the lead's final run confirms both (§9); it is also not deployed (§10) |
 | M.7 | §17.3 one workflow, steps 1–12 + negative demo (fixtures) | **done** | `scripts/demo_workflow.py`; `var/acceptance/demo_fixtures.json` (00:19, 13/13 pass); `tests/e2e/test_demo_workflow.py::test_all_non_blocked_steps_pass`, `::test_negative_demo_reports_the_algerian_blocker` | Step 4 relations are not release-pinned (P3.3) |
-| M.8 | §17.3 workflow, live mode | **partial** | `var/acceptance/demo_live.json` (23:56, 12/13) | Step 8 (two-vintage replay) failed. Re-run TBD |
+| M.8 | §17.3 workflow, live mode | **done** | `var/acceptance/demo_live.json` (started 00:19, 13/13 pass) | Repeat in the final run (§9) |
 
 ---
 
@@ -335,7 +345,7 @@ implementation must satisfy. Those helpers have tests but do not make the phase 
 | C.1 | Ruff/mypy/TS typecheck/import boundaries (§24 #1) | **partial** | `.github/workflows/ci.yml` | 1 ruff E501 at drafting; mypy `ports` only in CI (see P0.4) |
 | C.2 | JSON Schema/OpenAPI compatibility, registry validation (§24 #2) | **done** | `scripts/validate_contracts.py`, `tests/contracts/`, `tests/integration/test_api_contract.py::test_committed_contract_is_current` | No backward-compat diff (first release) |
 | C.3 | Unit/property/numerical identity tests (§24 #3) | **done** | `tests/unit/`, `tests/property/`, `tests/scientific/` | — |
-| C.4 | Migrations from empty and from previous version (§24 #4) | **partial** | conftest migrates from empty; CI upgrades from `0006_operations`; schema drift detection `src/reva/adapters/postgres/schema_contract.py` + `migrations/schema_contract.json` (`reva` CLI verify command, `scripts/update_schema_contract.py --check`) | No released previous version exists, and migrations were edited in place (R5-04). The drift check is new and has no test or CI step yet |
+| C.4 | Migrations from empty and from previous version (§24 #4) | **partial** | conftest migrates from empty; CI upgrades from `0006_operations`; schema drift detection `src/reva/adapters/postgres/schema_contract.py` + `migrations/schema_contract.json` (`reva` CLI verify command, `scripts/update_schema_contract.py --check`) | No released previous version exists, and migrations were edited in place (R5-04). The drift check now has tests (`tests/integration/test_schema_contract.py`, run by the pytest job); no separate CI step |
 | C.5 | Role/grant and cross-context tests with real logins (§24 #5) | **done** | `RG`, `DBH` | — |
 | C.6 | Captured connector replay, revisions, pagination, errors, drift (§24 #6) | **done** | `HC`, `REV`, `tests/integration/test_fixture_ingest.py` | — |
 | C.7 | Temporal/spatial consistency and leakage (§24 #7) | **done** | `tests/replay/`, `tests/unit/test_extensions_physical.py::test_antimeridian_region_on_both_longitude_conventions` | — |
@@ -372,10 +382,10 @@ every cited node is collected and every enforcement symbol exists. "proven" maps
 | I.12 | No replay with unavailable revisions/later preprocessing | **done** | — |
 | I.13 | No source-family duplicates counted as independent | **partial** | `lineage_family` is recorded but nothing consumes it (no pooling in V1); `EF::test_invariant13_alternatives_record_lineage_family_independence` covers recording only |
 | I.14 | No arbitrary code from documents/agents in production | **done** | — |
-| I.15 | No self-promotion / editing own gates | **partial** | coverage.yaml says proven (application gate path tested), but at DB level the worker can insert approved `model.version`/eligibility/mapping rows (§8.3) |
+| I.15 | No self-promotion / editing own gates | **done** | Changed since the draft: DB-enforced governance plus the separate gate login (P1.7, P6.9, §8.3) |
 | I.16 | No kernel/ontology mutation without version | **done** | — |
 | I.17 | No silent truncation | **done** | — |
-| I.18 | No partial multi-object publication visible | **partial** | coverage.yaml says proven (sequential case tested), but the seal is check-then-insert: a concurrent transaction can append to a release while it is published; `world.relation` unsealed (R5-07) |
+| I.18 | No partial multi-object publication visible | **done** | Changed since the draft: seal races and the relation seal are tested (P1.8); a SIGKILL inside the publication transaction leaves no half-published release (`tests/chaos/test_chaos_publication.py`) |
 | I.19 | No commit after losing fencing token | **done** | — |
 | I.20 | No model outside declared support | **done** | — |
 | I.21 | No fabricated probabilities | **done** | — |
@@ -387,7 +397,7 @@ every cited node is collected and every enforcement symbol exists. "proven" maps
 | I.27 | No calibration claim without denominator/holdout | **done** | — |
 | I.28 | No global knowledge % without finite catalogue | **done** | — |
 | I.29 | No `os.cpu_count()` concurrency | **done** | — |
-| I.30 | No egress/LLM/compute beyond budget | **partial** | Daily totals in `registry/policies/budgets.yaml` have no persistent ledger and are not enforced across scheduled live ingest runs |
+| I.30 | No egress/LLM/compute beyond budget | **partial** | Changed since the draft: daily egress budgets are enforced through the persistent ledger `ops.budget_ledger` on every live provider path in `src/reva` (`src/reva/operations/budgets.py`), and NL drafting reserves and settles against `llm.scenario_drafts` (`src/reva/nl/budget.py`). Still open (coverage.yaml): operator scripts outside `src/reva` (`scripts/live_source_checks.py`, live `scripts/demo_workflow.py`) are bounded only by per-run budgets; internal HTTP retries are not charged separately. The coverage.yaml text still says the LLM is "disabled with a zero budget", which is out of date for drafting (`docs/dev/v2_nlc.md` request 2) |
 | I.31 | No secrets in code/fixtures/logs/artifacts | **done** | — |
 | I.32 | Restricted-data deletion overrides retention | **partial** | No end-to-end deletion workflow (objects, backups, derived artifacts); V1 stores no restricted data |
 | I.33 | No dynamic economic effect from the accounting identity | **done** | — |
@@ -404,18 +414,28 @@ H4 row per flow (`isReported=false`, `legacyEstimationFlag=6`). The import value
 implausible, so a 2024 all-four request would run with a value that needs review. Keep the negative demonstration
 pinned to 2023 and the DZA gap visible (`/v1/gaps`, Country screen).
 
-### 8.3 Residual risk: worker role can self-approve governance rows
+### 8.3 Governance: enforced in the database, gate in its own process (resolved since the draft)
 
-`reva_worker` holds INSERT on the `evidence`, `ontology` and `model` schemas. No DB trigger restricts who inserts
-`evidence.eligibility` with `decision='eligible'`, `ontology.mapping` with `approval='approved'` or `model.version`
-with `approval_status='approved'`. The `review_activity_id` those rows cite is also worker-insertable. The
-application checks gates and reviews before it writes (`src/reva/autonomy/gate.py`, `binding.py`;
-`tests/integration/test_autonomy_gates.py`), but a compromised or buggy worker could make a connector version
-eligible (which `source_select_v1` would publish), approve a mapping or register an approved model. Token minting
-and human-review forgery are closed (`DBH::test_worker_cannot_mint_api_tokens_or_record_human_reviews`). Gate
-results and promotions check only the *format* of evaluator/reviewer identities (R5-01). The risk is documented in
-`docs/limitations.md` ("Governance limits") and `docs/threat_model.md`. The remedy, a separate governance role or
-SECURITY DEFINER approval functions bound to `ops.review_proposal`, needs a migration (lead).
+The draft recorded that `reva_worker` could insert self-approved `evidence.eligibility`, `ontology.mapping` and
+`model.version` rows (R5-01). That is closed:
+
+* `meta.enforce_governance` (0007) records the writing login (`recorded_by = session_user`). Approved states are
+  written only by the owner or by `reva_registry`-owned approval functions. Those functions need a passing gate
+  result **recorded by `reva_gate`** or a human review recorded through the API. The approval is bound to the
+  gate-derived scope and manifest (R6-02) and used once (`ops.approval_use`). T2+ changes need a human review
+  (R6-03). Tests: `GOV::test_worker_cannot_self_approve_registry_rows`, `GS::*`.
+* The promotion gate runs as a separate process with its own login, the only one that may record gate results.
+  The worker files `ops.gate_request` rows and waits. With no gate it reports `gate_pending` and promotes
+  nothing, and `gate_followup` promotes a late pass (`docs/dev/gate_separation.md`;
+  `tests/integration/test_gate_separation.py`, `tests/integration/test_gate_followup.py`).
+
+Residual risk (documented in `docs/limitations.md` "Governance limits" and `docs/dev/gate_separation.md`):
+* The gate decides on inputs the worker stored, so a compromised worker chooses *what* is evaluated, though not
+  the verdict.
+* The API, worker and gate run the same image.
+* In local development the gate shares the host and the `.env` with the worker, so the separation is a credential
+  convention there.
+* `model.record_promotion`, `model.evaluation` and `meta.artifact` stay worker-writable.
 
 ---
 
@@ -439,7 +459,12 @@ Context for the lead (not final results): collection at drafting time showed 167
 deselected). A drafting spot-check of `test_autonomy_gates.py`, `test_connector_repair.py`,
 `test_eurostat_discovery.py` and `test_evidence_fixes.py` gave 116 passed. The last full recorded run
 (`docs/dev/acceptance_report.md`, 00:19) gave 1454 passed, 4 failed and 5 skipped. Since then, the cause of
-3 of those failures has been fixed and the 4th test is fixed.
+3 of those failures has been fixed and the 4th test is fixed. DOCV2 spot-check during the update (02:53–03:00,
+other agents editing the tree): the V2 subset `test_backtest_api.py`, `test_nl_drafts_api.py`,
+`test_simulation_v2_datasets.py`, `test_nl_drafts.py`, `test_nl_crosschecks.py`, `test_simulation_v2_plugins.py`,
+`test_capabilities_v2.py` and `test_scenario_schema_v2.py` gave 126 passed and 1 failed. The failure,
+`test_backtest_api.py::test_api_post_enqueues_a_backtest_job`, was in a file being edited during the run; a
+re-run of `tests/integration/test_backtest_api.py` gave 10 passed. These are not final results.
 
 ## 10. Deployment readiness — **PLACEHOLDER (TBD by lead)**
 
@@ -447,8 +472,8 @@ deselected). A drafting spot-check of `test_autonomy_gates.py`, `test_connector_
 
 * Blockers (operator-supplied, see `docs/deployment.md`): a Render account/API key with authorisation to create
   paid resources; an S3-compatible private bucket (`REVA_S3_BUCKET`, `REVA_S3_REGION`, `REVA_S3_ENDPOINT_URL`); and
-  two scoped key pairs (`REVA_S3_ACCESS_KEY_ID`/`REVA_S3_SECRET_ACCESS_KEY`), read-only for `reva-api` and
-  prefix-write for `reva-worker`. Optional: `REVA_ADMIN_PASSWORD_HASH` (generate with
+  three scoped key pairs (`REVA_S3_ACCESS_KEY_ID`/`REVA_S3_SECRET_ACCESS_KEY`): read-only for `reva-api`,
+  prefix-write for `reva-worker` and a separate prefix-scoped pair for `reva-gate`. Optional: `REVA_ADMIN_PASSWORD_HASH` (generate with
   `uv run reva auth hash-password`), `REVA_BACKUP_AGE_RECIPIENT`, `REVA_COMTRADE_API_KEY`, `REVA_SANDBOX_ENDPOINT`.
 * Ready locally: `render.yaml` (validated offline), `Dockerfile`, start/bootstrap scripts, backup/restore.
 * Deployed URL, deploy log, production role verification, Render-hardware measurements: **TBD by lead.** Do not
@@ -458,27 +483,60 @@ deselected). A drafting spot-check of `test_autonomy_gates.py`, `test_connector_
 
 ## 11. Top gaps (ordered by risk to an honest P0–P7 claim)
 
+Updated by DOCV2. Items closed since the draft: worker self-approval of governance rows (now DB-enforced, separate
+gate); the live demo (13/13 recorded); untested seal, scope and `reva_sim` fixes (tests exist); persistent egress
+budgets (ledger exists).
+
 1. **Deployment blocked on credentials** (P7.2, P7.3, P7.13, A.P5, C.12). Needs a Render API key and the S3 bucket
-   with two scoped key pairs. Not deployed.
-2. **Live demo incomplete** (P7.7, M.6, M.8). Step 8 (two-vintage replay) failed in the last live run, so the MVP
-   cannot be declared operational until a live re-run passes.
-3. **Worker can self-approve governance rows** (P1.7, P6.9, §8.3, R5-01): eligibility, mapping and model.version
-   approvals are not DB-guarded.
-4. **Migrations edited in place** (§2, C.4, R5-04). Freeze 0001–0007 before release. The dev DB `reva` is at head
-   without the fixes.
-5. **Release seal and world.relation pinning** (P3.3, P1.8, R5-07). The last demo showed `release_pinned_edges=0`.
-   Pinning and seal fixes have just landed, untested.
-6. **DZA data gap** (§8.2, M.3). Zero Comtrade crude rows 2020–2023. The 2024 import value (US$5,564) is
+   with three scoped key pairs. Not deployed. S3 behaviour is checked only on a local MinIO.
+2. **No final full run yet** (§9). The recorded live demo and the restore runs predate later changes (gate
+   separation, V2, locks). The MVP cannot be declared operational until the final run confirms them (M.6).
+3. **Migrations edited in place** (§2, C.4, R5-04). Freeze 0001–0008 before release. The dev DB `reva` is at an
+   older head without the later fixes.
+4. **World.relation pinning not shown end to end** (P3.3). Both recorded demos show `release_pinned_edges=0`. The
+   pinning code and the relation seal landed later, and no test asserts that `publish_release` pins the ingested
+   edges.
+5. **DZA data gap** (§8.2, M.3). Zero Comtrade crude rows 2020–2023. The 2024 import value (US$5,564) is
    implausible and is only a review signal.
-7. **Eligibility scope semantics** (P1.8 check 6, R5-11). A fix (explicit applicability schema, classifications,
-   fail-closed) has just landed in the migrations with no test.
-8. **Budgets not enforced on scheduled ingest** (I.30). No persistent daily ledger for egress across live ingest.
-9. **Lint/type gate not clean** (P0.4, C.1). 1 ruff E501, and the local mypy config omits `reva.ports`.
-10. **Eurostat Jan-1 population absent from the live release** (P6.2, P6.11). The population service has only run on
-    fixtures. The live run validated but did not publish.
+6. **Budget gaps outside `src/reva`** (I.30). Operator scripts are bounded only per run.
+7. **Lint/type gate not confirmed** (P0.4, C.1). At drafting: 1 ruff E501, and the local mypy config omits
+   `reva.ports`; re-check in the final run.
+8. **Eurostat Jan-1 population absent from the live release** (P6.2, P6.11). The V1 population service has only
+   run on fixtures. The V2 cohort model has its own connector (§12).
+9. **V2 models are experimental** (§12). There is no maintainer review, and the scientific review's fixes were not
+   re-reviewed.
 
 Further open items: BacktestRunner strict/available-then modes blocked (P5.2); I.9, I.13 and I.32 partial;
-stale `ui/e2e/RESULTS.md` and the acceptance-report mapper ignoring Playwright drill-through (P5.5);
-untested in-flight fixes for `reva_sim` scenario squatting and artifact pre-registration (R5-02, R5-05); bootstrap membership checks (R5-09,
-R5-10); source observations not in Parquet manifests and DuckDB unused (P1.11); P8–P12 not implemented
-(interfaces only).
+stale `ui/e2e/RESULTS.md` and the acceptance-report mapper ignoring Playwright drill-through (P5.5); source
+observations not in Parquet manifests and DuckDB unused (P1.11); P8–P12 not implemented (interfaces only). The V2
+models in §12 are narrower and leave those capabilities `reserved`: `economic.io_price` is a single-period
+price model, not P9.1 (`economic.input_output`); `population.household_margins` is not P10.1 household synthesis
+(`population.households`).
+
+---
+
+## 12. V2 ledger (roadmap approved 2026-10-15; `docs/roadmap/v2_design.md`)
+
+Same status vocabulary as above. "done" here means the code and its tests exist; it does **not** mean reviewed.
+Every V2 model is registered as `candidate` with `review_status: maintainer_review_pending`, and every result says
+"experimental model, not yet reviewed". Projections say "conditional projection under stated assumptions, not a
+forecast". V2 capabilities are `implemented` in `src/reva/capabilities.py` only with cited tests and docs
+(`tests/unit/test_capabilities_v2.py`). The live runs below used throwaway databases and their own budgets. No row
+here has been confirmed in a final full run (§9).
+
+| ID | Item | Status | Evidence | Gaps |
+|---|---|---|---|---|
+| V2.P1 | Platform: model plugins, scenario spec 2.0.0 generated from the registered plugins, the crude model as plugin #1 with bit-identical outputs | **done** | `src/reva/simulation/plugins.py`, `scenario_schema.py`, `contracts/scenario.schema.json` (V1 frozen as `contracts/scenario.v1.schema.json`); `docs/dev/v2_eng.md`; `tests/unit/test_simulation_v2_plugins.py`, `tests/integration/test_simulation_v2_plugin_identity.py` (job path vs stored V1 goldens), `tests/contracts/test_scenario_schema_v2.py` | The implementation digest changed by design, so earlier L0 cache entries are not reused |
+| V2.P2 | Platform: dataset inputs (Parquet from archived raw bytes, manifest, release-pinned by digest) | **done** | `src/reva/simulation/datasets.py`, `migrations/versions/0008_v2.py` (`evidence.dataset`, `belief.release_dataset`, sealed like estimates); `tests/integration/test_simulation_v2_datasets.py` | Datasets have no separate human eligibility decision; they must come from reviewed built-in connectors (`docs/dev/v2_eng.md` decision 4). `publish_release` refuses a release with datasets but no eligible observation |
+| V2.P3 | Platform: multi-period results (`period_start`/`period_end`, half-open) served by the API | **done** | `0008_v2.py` (`result_period_half_open`); `src/reva/api/routes/sim.py` (`SimResult.period_*`, `results_truncated` above 5,000 rows); `tests/integration/test_simulation_v2_datasets.py` | Capabilities `horizon.multi_period` / `outputs.macroeconomic` (P9) stay reserved |
+| V2.1 | Step 1: crude scenario for every country with data (`countries: ["ALL"]`, `skip_missing_countries`) | **done** | `src/reva/adapters/connectors/{country_crosswalk,comtrade_batch,worldbank_all}.py`, `registry/entities/country_crosswalk.json`, `src/reva/simulation/compile.py` (`resolve_all_countries`); `docs/dev/v2_allc.md` (live throwaway run: 74–89 countries with complete inputs per reference year 2020–2024, the rest skipped with typed reasons); `tests/unit/test_country_crosswalk.py`, `tests/unit/test_comtrade_worldbank_all_connectors.py`, `tests/integration/test_comtrade_worldbank_all_countries.py`, `tests/integration/test_scenario_all_countries.py` | The crosswalk is `machine_derived_pending_maintainer_review`. HS H2/H3 values (e.g. Iraq's 2023 exports) stay ineligible without a reviewed mapping. A country missing one flow is skipped, never zero-filled (owner questions in `v2_allc.md`) |
+| V2.2 | Step 2: natural language → draft scenario (`POST /v1/scenario-drafts`) | **done** (`requires_config`) | `src/reva/nl/`, `src/reva/api/routes/nl.py`, budget `llm.scenario_drafts` in `registry/policies/budgets.yaml`, ledger functions in `0008_v2.py`; `docs/dev/v2_nlc.md` (15 recorded live OpenAI responses, all answered by `gpt-4.1-2025-04-14`); `tests/unit/test_nl_drafts.py`, `tests/unit/test_nl_crosschecks.py`, `tests/unit/test_nl_ledger_migration.py`, `tests/integration/test_nl_drafts_api.py`, `tests/integration/test_nl_live.py` (`live`) | Disabled by default (`REVA_LLM_ENABLED`), and it needs a credential-injecting egress proxy. The Gemini fallback has never answered successfully live (402). The server cross-checks are lexical (fr/en). `tests/invariants/test_invariant_30_budgets.py` scans the LLM path, but the I.30 text in `tests/invariants/coverage.yaml` still says the LLM is disabled with a zero budget |
+| V2.3a | Step 3a: cohort-component population projection `demography.cohort_component` (EU-27 + EFTA) | **done** (experimental) | `src/reva/adapters/connectors/eurostat_demography.py`, `src/reva/models/population/`, `src/reva/evaluation/population_backtest.py`; `docs/dev/v2_pop.md`, `docs/dev/v2_pop_backtest.md` (31 countries, 2013 → 2023); `tests/unit/test_population_cohort.py`, `tests/unit/test_eurostat_demography_connector.py`, `tests/property/test_population_cohort_properties.py`, `tests/integration/test_demography_cohort.py`, `tests/integration/test_demography_live.py` (`live`) | On totals the default projection beats naive no-change in most countries but a constant-growth benchmark only in a minority (`v2_pop_backtest.md`). Revised-data retrospective only. Migration breaks are excluded only when flagged |
+| V2.3b | Step 3b: multi-region IO price model `economic.io_price` (FIGARO 2024) | **done** (experimental) | `src/reva/adapters/connectors/io_tables.py` (identity checks, exact at published precision), `src/reva/models/economic/io_price.py`; `docs/dev/v2_io.md` (live run, 49 countries, all phases within 2 GB); `tests/unit/test_io_tables.py`, `tests/unit/test_io_price.py`, `tests/integration/test_io_price_pipeline.py`, `tests/integration/test_io_tables_live.py` (`live`) | Labelled "first-round cost-push under full pass-through; not an inflation forecast". The basket is at basic prices, with a purchasers'-price reading for fixed per-unit taxes; neither is a CPI. No external benchmark reproduced (plausibility only). `B` is all of mining and quarrying, broader than crude. OECD ICIO not implemented |
+| V2.4 | Step 4: retirement-age model for France `social.retirement_age` and household margins | **done** (experimental) | `src/reva/adapters/connectors/eurostat_labour.py`, `src/reva/models/social/`, `registry/rules/retirement_age/FRA.yaml`, `src/reva/population/households.py` (`population.household_margins`); `docs/dev/v2_pen.md`, `docs/dev/v2_pen_backtest.md`; `tests/unit/social/`, `tests/integration/test_labour_pensions_retirement_pipeline.py`, `tests/integration/test_labour_pensions_live.py` (`live`) | The 2010-reform back-test fits (MAE 0.55 pp women, 1.20 pp men, 2012–2019), but a placebo on ages 55–59 misses by 6–12 pp: two errors of opposite sign offset each other, so the fit is not validation. It was not pre-registered. The pension-receipt drop is a proxy of unknown direction. Every result is `qualified`. LFS rates exist only in five-year groups |
+| V2.5 | Step 5: retirement-age rule tables for other countries; IO shocks for every FIGARO country | **done** (experimental) | `registry/rules/retirement_age/{DEU,ESP,NLD}.yaml` with archived legal sources; ITA, BEL, SWE and POL refused with `capability_gap` (`registry/models/methods.yaml`); IO: the 49 FIGARO countries reported, others refused (`v2_io.md` §3) | Countries without a sourced rule table are refused. The rest of the world can be an IO shock origin but is not reported |
+| V2.6 | Gate separation (independent promotion gate process) | **done** | See P6.9 and §8.3; `docs/dev/gate_separation.md` | Residual risk in §8.3 |
+| V2.7 | Back-test API: `POST`/`GET /v1/models/{model_key}/backtests`, worker job `backtest`, `reva backtest` | **done** | `src/reva/evaluation/backtests.py` (back-test functions for `demography.cohort_component` and `social.retirement_age`), `src/reva/api/routes/{sim,catalog}.py`, `src/reva/cli/main.py`; `tests/integration/test_backtest_api.py`; `docs/api.md` | Revised-data retrospectives only. Other models return `backtest_unavailable` (GET) or `capability_gap` (POST) |
+| V2.8 | API fields: `period_start`/`period_end`, `results_truncated`, `source_flags`/`stale` on beliefs, `object_store` readiness check | **done** | `src/reva/api/routes/{sim,beliefs,evidence,system}.py`, `contracts/openapi.json`; `docs/api.md` "V2 additions" | The `object_store` check is reported, never fatal |
+| V2.9 | UI V2: world map, mirror view, scenario composer (confirm before run), multi-period run pages, IO heatmap, command palette | **done** | `ui/src/pages/{MapPage,ComposerPage,RunsPage,RunPage}.tsx`, `ui/e2e/v2_{map,composer,runs}.spec.ts`; `docs/dev/ui_v2.md` (typecheck pass, vitest 144 tests, e2e 53 passed / 1 skipped on the recorded-LLM stack) | E2E uses recorded LLM responses and fixture data. The IO screens run on a **synthetic** 3×2 table, not FIGARO figures. A live shock slider was deliberately not built. `ui/e2e/RESULTS.md` is not regenerated |
+| V2.10 | Independent scientific review of the V2 models | **partial** | `docs/dev/review_science_v2.md` (0 critical, 4 high, 9 medium, 7 low; numerics reproduced independently for POP and IO). Responses: H2/H3/M6 server cross-checks (`docs/dev/v2_nlc.md` decision 17); H1/M1/M8/L3 (`v2_pop.md`, `v2_pop_backtest.md`); H4/M2/M3/M4 (`v2_pen.md`); M9/L1 (`v2_io.md`, `docs/methodology.md`); L2 (`src/reva/capabilities.py`); M7 and L4–L7 documented in `docs/limitations.md` / `v2_pop_backtest.md` | The fixes have not been re-reviewed. M5 (back-test not pre-registered) cannot be fixed after the fact and is disclosed. No maintainer review of any V2 model |
