@@ -598,15 +598,36 @@ invariants:
     text: No external egress, LLM or scientific computation beyond the configured budget.
     status: partially_proven
     reason: >-
-      Per-run request budgets stop the connector runner, autonomy discovery is budgeted, the LLM is disabled
-      with a zero budget, external runner budgets must be bounded and CPU threads are explicitly budgeted.
+      Daily egress budgets (registry/policies/budgets.yaml) are enforced through the persistent ledger
+      ops.budget_ledger on every live provider request path in src/reva: CLI `reva ingest --live`, worker
+      ingest jobs (which scheduled ingests enqueue) and autonomy discovery reserve before the first request,
+      ingest runs meter every request against the ledger (top-up under the lock or refusal without calling
+      the transport) and settle actual requests/bytes afterwards; fixture runs are never charged. Budgets are
+      keyed by registered source keys (connector -> descriptor source_key via budget_source_key; accounts
+      from one account_key function); an unknown source or a limit of 0 is refused. Every egress reservation
+      takes one advisory lock, so racing ingest/discovery reservations cannot exceed a shared cap; days are
+      UTC on the database clock. Connector repair and the scheduler make no provider request themselves.
+      Per-run request budgets stop the connector runner, the LLM is disabled with a zero budget, external
+      runner budgets must be bounded and CPU threads are explicitly budgeted.
     gaps: >-
-      The daily totals in registry/policies/budgets.yaml (daily.http_requests_total, daily.http_bytes_total,
-      per_source_daily_requests) have no persistent ledger and are not enforced across scheduled live ingest
-      runs; per_source_daily_requests keys (e.g. worldbank.wdi) do not match connector names
-      (worldbank.wdi.indicators). No test proves a daily cap.
-    owner: "agent D (scheduler/ops: src/reva/operations/schedules.py, jobs.py) with lead (evidence/runner.py)"
+      Operator scripts outside src/reva (scripts/live_source_checks.py, scripts/demo_workflow.py in live
+      mode) create live clients against fresh throwaway databases without reserving against a persistent
+      ledger; they are bounded only by per-run FetchBudget defaults (the static path scan covers src/reva
+      only). The `requests` unit counts logical provider requests: the HTTP client's bounded internal retries
+      (max_attempts) and redirects (max_redirects) per request are not charged separately. A run that crashes
+      before settling keeps its reservation counted (fails closed, may under-use the budget).
+    owner: "agent I (scripts/live_source_checks.py, scripts/demo_workflow.py) with lead (evidence/runner.py)"
     enforcement:
+      - {file: src/reva/operations/budgets.py, symbol: "def reserve_ingest", kind: code}
+      - {file: src/reva/operations/budgets.py, symbol: "class MeteredHttp", kind: code}
+      - {file: src/reva/operations/budgets.py, symbol: "def account_key", kind: code}
+      - {file: src/reva/operations/budgets.py, symbol: "BUDGET_LOCK_KEY", kind: code}
+      - {file: src/reva/operations/budgets.py, symbol: "DAY_START_SQL", kind: code}
+      - {file: src/reva/autonomy/budget.py, symbol: "reserve_egress", kind: code}
+      - {file: src/reva/operations/jobs.py, symbol: "settle_metered", kind: code}
+      - {file: src/reva/cli/main.py, symbol: "settle_metered", kind: code}
+      - {file: migrations/versions/0006_operations.py, symbol: "CREATE TABLE ops.budget_ledger", kind: db_table}
+      - {file: registry/policies/budgets.yaml, symbol: "per_source_daily_requests", kind: policy}
       - {file: src/reva/evidence/runner.py, symbol: "request budget exhausted", kind: code}
       - {file: src/reva/autonomy/discovery.py, symbol: "budget.max_requests", kind: code}
       - {file: registry/policies/budgets.yaml, symbol: "monthly_usd", kind: policy}
@@ -616,6 +637,26 @@ invariants:
       - tests/invariants/test_invariant_30_budgets.py::test_runner_never_exceeds_the_request_budget
       - tests/invariants/test_invariant_30_budgets.py::test_llm_is_disabled_with_a_zero_budget_by_default
       - tests/invariants/test_invariant_30_budgets.py::test_external_runner_budget_must_be_bounded
+      - tests/invariants/test_invariant_30_budgets.py::test_budget_keys_are_registered_sources_and_cover_every_connector
+      - tests/invariants/test_invariant_30_budgets.py::test_unknown_source_and_zero_limit_are_refused_without_a_database
+      - tests/invariants/test_invariant_30_budgets.py::test_every_live_provider_request_path_is_budgeted
+      - tests/invariants/test_invariant_30_budgets.py::test_metered_client_refuses_before_calling_the_transport_and_skips_fixtures
+      - tests/integration/test_budget_caps.py::test_worker_ingest_refused_with_budget_exhausted_when_daily_cap_reached
+      - tests/integration/test_budget_caps.py::test_worker_ingest_charges_and_settles_actual_usage
+      - tests/integration/test_budget_caps.py::test_fixture_ingest_is_never_charged
+      - tests/integration/test_budget_caps.py::test_cli_live_ingest_reports_typed_refusal_without_requests
+      - tests/integration/test_budget_caps.py::test_unknown_source_and_zero_limit_are_refused
+      - tests/integration/test_budget_caps.py::test_worker_ingest_of_unbudgeted_source_is_refused
+      - tests/integration/test_budget_caps.py::test_requests_beyond_the_reservation_are_topped_up_then_refused_without_a_request
+      - tests/integration/test_budget_caps.py::test_byte_cap_limits_response_size_and_refuses_when_used_up
+      - tests/integration/test_budget_caps.py::test_racing_ingest_reservations_cannot_exceed_the_cap
+      - tests/integration/test_budget_caps.py::test_ingest_and_discovery_share_one_lock_and_one_cap
+      - tests/integration/test_budget_caps.py::test_in_run_top_ups_race_with_new_reservations_without_exceeding_the_cap
+      - tests/integration/test_budget_caps.py::test_day_rollover_uses_the_database_utc_midnight
+      - tests/integration/test_queue_reliability.py::test_budget_reservation_refuses_runs_that_would_exceed_daily_limits
+      - tests/integration/test_queue_reliability.py::test_live_ingest_over_budget_fails_with_budget_exhausted_without_requests
+      - tests/integration/test_autonomy_gates.py::test_r4_08_discovery_budget_zero_means_zero_and_daily_limit_holds
+      - tests/integration/test_autonomy_gates.py::test_r4_08_live_discovery_refused_when_budget_used_up
       - tests/integration/test_autonomy_gates.py::test_budgets_policy_is_used
       - tests/integration/test_autonomy_gates.py::test_llm_disabled_is_blocked_and_candidate_only
       - tests/integration/test_autonomy_gates.py::test_proposal_backlog_is_bounded

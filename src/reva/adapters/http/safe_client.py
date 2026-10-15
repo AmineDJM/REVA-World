@@ -79,7 +79,16 @@ SECRET_QUERY_PARAMS = frozenset(
         "password",
         "signature",
         "sig",
+        "x-amz-signature",
+        "x-amz-credential",
+        "x-amz-security-token",
     }
+)
+#: Request headers that carry credentials. They are sent only to the origin the caller addressed: a
+#: redirect to another origin (even an allowlisted one) drops them, like browsers and httpx do.
+CREDENTIAL_HEADERS = frozenset(
+    {"authorization", "proxy-authorization", "cookie", "x-api-key", "ocp-apim-subscription-key", "api-key",
+     "x-auth-token", "x-amz-security-token"}
 )
 
 # httpx logs every request URL at INFO (including query-string secrets such as
@@ -105,16 +114,33 @@ def address_is_public(addr: str) -> bool:
 
 
 def redact_url(url: str, secret_params: Iterable[str] = SECRET_QUERY_PARAMS) -> str:
-    """URL with the values of secret query parameters replaced by ``***``."""
+    """URL with the values of secret query parameters (and any userinfo password) replaced by ``***``."""
     parts = urlsplit(url)
+    netloc = parts.netloc
+    if "@" in netloc:
+        userinfo, _, hostport = netloc.rpartition("@")
+        user, sep, _pw = userinfo.partition(":")
+        netloc = f"{user}:***@{hostport}" if sep else f"***@{hostport}"
     if not parts.query:
-        return url
+        return url if netloc == parts.netloc else urlunsplit(
+            (parts.scheme, netloc, parts.path, parts.query, parts.fragment))
     secret = {s.lower() for s in secret_params}
     pairs = parse_qsl(parts.query, keep_blank_values=True)
     if not any(k.lower() in secret for k, _ in pairs):
-        return url  # unchanged (no re-encoding) when nothing is secret
+        # unchanged (no re-encoding) when nothing in the query is secret
+        return url if netloc == parts.netloc else urlunsplit(
+            (parts.scheme, netloc, parts.path, parts.query, parts.fragment))
     pairs = [(k, "***" if k.lower() in secret else v) for k, v in pairs]
-    return urlunsplit((parts.scheme, parts.netloc, parts.path, urlencode(pairs, safe="*"), parts.fragment))
+    return urlunsplit((parts.scheme, netloc, parts.path, urlencode(pairs, safe="*"), parts.fragment))
+
+
+def same_origin(a: str, b: str) -> bool:
+    pa, pb = urlsplit(a), urlsplit(b)
+    return (pa.scheme, (pa.hostname or "").lower(), pa.port) == (pb.scheme, (pb.hostname or "").lower(), pb.port)
+
+
+def strip_credential_headers(headers: Mapping[str, str]) -> dict[str, str]:
+    return {k: v for k, v in headers.items() if k.lower() not in CREDENTIAL_HEADERS}
 
 
 @dataclass(frozen=True)
@@ -128,6 +154,11 @@ class HttpResult:
     elapsed_seconds: float
     redirects: tuple[str, ...]
     attempts: int
+
+    def __repr__(self) -> str:
+        # Never the raw URL (query-string keys) or the body (untrusted, possibly large) in reprs/tracebacks.
+        return (f"HttpResult(url={redact_url(self.url)!r}, status={self.status}, bytes={len(self.body)}, "
+                f"redirects={len(self.redirects)}, attempts={self.attempts})")
 
     @property
     def media_type(self) -> str:
@@ -518,12 +549,13 @@ class SafeHttpClient:
     async def _get_once(self, url: str, headers: Mapping[str, str], limit: int, attempt: int) -> HttpResult:
         redirects: list[str] = []
         current = url
+        send_headers = dict(headers)
         start = time.monotonic()
         while True:
             host = self.check_url(current)
             await self.rate_limiter.acquire(host)
             try:
-                async with self._client.stream("GET", current, headers=dict(headers)) as resp:
+                async with self._client.stream("GET", current, headers=send_headers) as resp:
                     if resp.is_redirect:
                         loc = resp.headers.get("location")
                         if not loc:
@@ -532,6 +564,9 @@ class SafeHttpClient:
                             raise UnsafeRequest("too many redirects")
                         redirects.append(current)
                         current = urljoin(current, loc)
+                        if not same_origin(url, current):
+                            # Provider credentials stay with the origin they were issued for.
+                            send_headers = strip_credential_headers(send_headers)
                         continue
                     declared = resp.headers.get("content-length")
                     if declared and declared.isdigit() and int(declared) > limit:

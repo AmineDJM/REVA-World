@@ -202,7 +202,7 @@ def test_sigstop_zombie_wakes_after_reclaim_and_cannot_publish(
 def test_sigterm_releases_job_without_cancel_or_attempt_and_exits_within_grace(
         cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
     clear_queue(cdb)
-    jid = enqueue(cdb, "chaos_slow", {"steps": 400, "step_seconds": 0.05, "probe": uuid.uuid4().hex})
+    jid = enqueue(cdb, "chaos_slow", {"steps": 120, "step_seconds": 0.05, "probe": uuid.uuid4().hex})
     w = start_worker(cdb, tmp_path / "w")
     procs.append(w)
     wait_until(lambda: len(events(tmp_path / "w", "step", job=str(jid))) >= 10, 40, what="job running",
