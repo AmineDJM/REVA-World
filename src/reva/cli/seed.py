@@ -408,6 +408,9 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     ("health:connectors", "health", {}, 86400),
     ("gaps:mvp", "gaps", {}, 86400),
     ("gc:orphans", "gc", {}, 86400),
+    # --- GATE2: late gate decisions (discovery reported gate_pending) are promoted from the stored proposal
+    ("gate_followup:promotion", "gate_followup", {}, 300),
+    # --- end GATE2
 )
 
 

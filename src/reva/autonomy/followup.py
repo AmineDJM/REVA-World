@@ -45,6 +45,7 @@ from sqlalchemy import Engine, text
 from sqlalchemy.exc import DBAPIError, OperationalError, SQLAlchemyError
 
 from reva.adapters.postgres import repositories as repo
+from reva.adapters.postgres.queue import STALE_LEASE_SQLSTATE
 from reva.autonomy.common import ArtifactIO, AutonomyBlocked
 from reva.autonomy.policy import AutonomyGuard, promotion_policy
 from reva.gate import GATE_LOGIN
@@ -97,10 +98,16 @@ def pending_followups(engine: Engine, *, limit: int = DEFAULT_LIMIT, max_age_hou
 
 
 def _record(engine: Engine, ctx: Any, item: dict[str, Any]) -> None:
-    with engine.begin() as conn:
-        if getattr(ctx, "job_id", None) is not None and hasattr(ctx, "assert_lease"):
-            ctx.assert_lease(conn)  # fenced like the promotion itself
-        repo.emit_outbox(conn, EVENT, {**item, "job_id": str(getattr(ctx, "job_id", "") or "") or None})
+    try:
+        with engine.begin() as conn:
+            if getattr(ctx, "job_id", None) is not None and hasattr(ctx, "assert_lease"):
+                ctx.assert_lease(conn)  # fenced like the promotion itself
+            repo.emit_outbox(conn, EVENT, {**item, "job_id": str(getattr(ctx, "job_id", "") or "") or None})
+    except DBAPIError as e:
+        if getattr(getattr(e, "orig", None), "sqlstate", None) == STALE_LEASE_SQLSTATE:
+            raise StaleLease(f"lease lost for job {getattr(ctx, 'job_id', None)}",
+                             job_id=str(getattr(ctx, "job_id", None))) from None
+        raise
 
 
 def handle_gate_followup(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
@@ -164,6 +171,9 @@ def handle_gate_followup(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             continue
         except (DBAPIError, SQLAlchemyError) as e:  # trigger / governance refusal: terminal, typed, no params
             orig = getattr(e, "orig", None)
+            if getattr(orig, "sqlstate", None) == STALE_LEASE_SQLSTATE:  # fenced: lost the lease, record nothing
+                raise StaleLease(f"lease lost for job {getattr(ctx, 'job_id', None)}",
+                                 job_id=str(getattr(ctx, "job_id", None))) from None
             item.update(status="refused", code="database_refused", kind=type(orig or e).__name__[:60],
                         sqlstate=str(getattr(orig, "sqlstate", "") or "")[:10])
         _record(engine, ctx, item)

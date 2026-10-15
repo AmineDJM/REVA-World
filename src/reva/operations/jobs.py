@@ -60,6 +60,9 @@ HANDLERS: dict[str, str] = {
     "evaluation": "reva.evaluation.tournament_service:handle_evaluation",
     "population": "reva.population.service:handle_population",
     "connector_repair": "reva.autonomy.repair:handle_connector_repair",
+    # --- GATE2: promote connector proposals whose reva_gate decision arrived after discovery stopped waiting
+    "gate_followup": "reva.autonomy.followup:handle_gate_followup",
+    # --- end GATE2
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation

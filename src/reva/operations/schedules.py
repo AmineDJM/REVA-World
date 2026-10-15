@@ -41,7 +41,7 @@ from reva.adapters.postgres import queue
 
 log = logging.getLogger("reva.scheduler")
 
-SCHEDULE_JOB_TYPES = frozenset({"ingest", "health", "gaps", "gc"})
+SCHEDULE_JOB_TYPES = frozenset({"ingest", "health", "gaps", "gc", "gate_followup"})  # GATE2: gate_followup
 SCHEDULE_PRIORITY = -5
 MIN_INTERVAL_SECONDS = 60
 

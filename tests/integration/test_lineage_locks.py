@@ -63,16 +63,23 @@ def _restore_dirty_nodes(request: pytest.FixtureRequest) -> Iterator[None]:
         return
     db = request.getfixturevalue("db")
     with db.worker.connect() as c:
-        before = [dict(r) for r in c.execute(text(
-            "SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")).mappings()]
+        before = [
+            dict(r)
+            for r in c.execute(
+                text("SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")
+            ).mappings()
+        ]
     yield
     with db.worker.begin() as c:
         c.execute(text("DELETE FROM ops.dirty_node"))
         for r in before:
-            c.execute(text(
-                """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
-                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""),
-                {**r, "b": json.dumps(r["accumulated_error_bound"])})
+            c.execute(
+                text(
+                    """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
+                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""
+                ),
+                {**r, "b": json.dumps(r["accumulated_error_bound"])},
+            )
 
 
 def _spec(db: Any, which: str) -> Any:
@@ -83,16 +90,22 @@ def _spec(db: Any, which: str) -> Any:
         act = repo.simple_activity("registry.seed", "review", "maintainer:lockfix-test", {})
         repo.record_activity(c, act)
         if repo.source_by_key(c, source_key) is None:
-            sid = c.execute(text(
-                """INSERT INTO evidence.source(source_key, title, provider_url, lineage_family, rights, metadata,
+            sid = c.execute(
+                text(
+                    """INSERT INTO evidence.source(source_key, title, provider_url, lineage_family, rights, metadata,
                      provenance_activity_id)
                    VALUES (:k, 'lock bound test source', 'https://example.invalid/', 'lockfix_test',
-                           '{"licence":"test"}', '{}', :a) RETURNING id"""), {"k": source_key, "a": act.id}
+                           '{"licence":"test"}', '{}', :a) RETURNING id"""
+                ),
+                {"k": source_key, "a": act.id},
             ).scalar_one()
-            c.execute(text(
-                """INSERT INTO evidence.source_metadata_version(source_id, version, metadata, rights,
-                     provenance_activity_id) VALUES (:s, 1, '{}', '{"licence":"test"}', :a)"""),
-                {"s": sid, "a": act.id})
+            c.execute(
+                text(
+                    """INSERT INTO evidence.source_metadata_version(source_id, version, metadata, rights,
+                     provenance_activity_id) VALUES (:s, 1, '{}', '{"licence":"test"}', :a)"""
+                ),
+                {"s": sid, "a": act.id},
+            )
         register_connector_version(c, db.store, spec, act.id)
     return spec
 
@@ -112,30 +125,51 @@ def _support(tag: str) -> Support:
     )
 
 
-def _acquisition(spec: Any, request: str, keys: list[str], values: dict[str, str] | str, *,
-                 origin: str = "test_fixture", tag: str = "t") -> tuple[RawAcquisition, list[ObservationBatch]]:
+def _acquisition(
+    spec: Any,
+    request: str,
+    keys: list[str],
+    values: dict[str, str] | str,
+    *,
+    origin: str = "test_fixture",
+    tag: str = "t",
+) -> tuple[RawAcquisition, list[ObservationBatch]]:
     """One synthetic WDI-shaped acquisition (request fingerprint ``request``) with one observation per key,
     in the given key order."""
     vals = {k: (values if isinstance(values, str) else values[k]) for k in keys}
     rows = [{"suffix": k, "value": v} for k, v in vals.items()]  # each raw_selector resolves to one row
     body = json.dumps({"lockfix": request, "rows": rows}, sort_keys=True).encode()
-    item = FetchItem(key=f"lockfix:{request}", url=f"https://api.worldbank.org/v2/lockfix/{request}",
-                     max_bytes=50_000_000)
-    raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
-                         response_metadata={"status": 200}, request_fingerprint=f"lockfix:{request}", origin=origin)
+    item = FetchItem(
+        key=f"lockfix:{request}", url=f"https://api.worldbank.org/v2/lockfix/{request}", max_bytes=50_000_000
+    )
+    raw = RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/json",
+        retrieved_at=datetime.now(UTC),
+        response_metadata={"status": 200},
+        request_fingerprint=f"lockfix:{request}",
+        origin=origin,
+    )
     support = _support(tag)
     obs = tuple(
         ParsedObservation(
-            subject_provider="worldbank", subject_key="FRA", concept_id=POP, concept_version="1.0.0",
-            support=support, logical_key=k,
+            subject_provider="worldbank",
+            subject_key="FRA",
+            concept_id=POP,
+            concept_version="1.0.0",
+            support=support,
+            logical_key=k,
             value={"kind": "decimal", "value": vals[k], "unit_ref": "unit.persons", "basis": {"scale_factor": "1"}},
             uncertainty=UncertaintySpec.unknown("synthetic lock test value"),
-            source_flags={"lockfix": tag}, raw_selector={"match": {"suffix": k}},
+            source_flags={"lockfix": tag},
+            raw_selector={"match": {"suffix": k}},
         )
         for k in keys
     )
-    return raw, [ObservationBatch(connector=spec.name, connector_version=spec.version, item_key=item.key,
-                                  observations=obs)]
+    return raw, [
+        ObservationBatch(connector=spec.name, connector_version=spec.version, item_key=item.key, observations=obs)
+    ]
 
 
 def _publish(db: Any, spec: Any, raw: RawAcquisition, batches: list[ObservationBatch], **kw: Any) -> Any:
@@ -144,17 +178,27 @@ def _publish(db: Any, spec: Any, raw: RawAcquisition, batches: list[ObservationB
 
 def _lineage(db: Any, source_id: Any, key: str) -> list[tuple[int, Any, Any, str]]:
     with db.worker.connect() as c:
-        rows = c.execute(text(
-            """SELECT revision_no, id, supersedes_id, value->>'value' FROM evidence.observation
-               WHERE source_id = :s AND logical_key = :k ORDER BY revision_no"""), {"s": source_id, "k": key}).all()
+        rows = c.execute(
+            text(
+                """SELECT revision_no, id, supersedes_id, value->>'value' FROM evidence.observation
+               WHERE source_id = :s AND logical_key = :k ORDER BY revision_no"""
+            ),
+            {"s": source_id, "k": key},
+        ).all()
     return [tuple(r) for r in rows]
 
 
 def _waiting_lineage_locks(db: Any) -> int:
     with db.owner.connect() as c:
-        return int(c.execute(text(
-            "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND classid = :c AND objsubid = 2 "
-            "AND NOT granted"), {"c": LINEAGE_LOCK_CLASS}).scalar_one())
+        return int(
+            c.execute(
+                text(
+                    "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND classid = :c AND objsubid = 2 "
+                    "AND NOT granted"
+                ),
+                {"c": LINEAGE_LOCK_CLASS},
+            ).scalar_one()
+        )
 
 
 def _wait_for(pred: Any, seconds: float, what: str) -> None:
@@ -180,7 +224,8 @@ def test_ten_thousand_observations_hold_a_bounded_number_of_locks(db: Any) -> No
     def probe(conn: Any, summary: Any) -> None:
         seen["inserted"] = summary.inserted
         seen["lineage"], seen["advisory"], seen["all"] = conn.execute(
-            text(LINEAGE_LOCKS_SQL), {"c": LINEAGE_LOCK_CLASS}).one()
+            text(LINEAGE_LOCKS_SQL), {"c": LINEAGE_LOCK_CLASS}
+        ).one()
         seen["max_locks"] = int(conn.execute(text("SHOW max_locks_per_transaction")).scalar_one())
         seen["lock_timeout"] = conn.execute(text("SELECT current_setting('lock_timeout')")).scalar_one()
         raise _Rollback
@@ -196,11 +241,17 @@ def test_ten_thousand_observations_hold_a_bounded_number_of_locks(db: Any) -> No
     # all lock-table rows of this backend (relation/index locks, virtualxid, transactionid included)
     assert seen["all"] <= LINEAGE_LOCK_BUCKETS + 200, seen
     assert seen["lock_timeout"] == "5s"  # the bucket wait override did not leak into the rest of the txn
-    print(f"lock bound: lineage={seen['lineage']} advisory={seen['advisory']} all={seen['all']} "
-          f"max_locks_per_transaction={seen['max_locks']}")
+    print(
+        f"lock bound: lineage={seen['lineage']} advisory={seen['advisory']} all={seen['all']} "
+        f"max_locks_per_transaction={seen['max_locks']}"
+    )
     with db.worker.connect() as c:  # rolled back: nothing of the measured acquisition remains
-        assert c.execute(text("SELECT count(*) FROM evidence.observation WHERE logical_key = :k"),
-                         {"k": keys[0]}).scalar_one() == 0
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM evidence.observation WHERE logical_key = :k"), {"k": keys[0]}
+            ).scalar_one()
+            == 0
+        )
 
 
 def test_lineage_lock_keys_never_collide_with_fixed_keys() -> None:
@@ -280,8 +331,12 @@ def test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock(db: Any
     run = uuid.uuid4().hex[:8]
     shared = [f"lockfix:{run}:s:{i:04d}" for i in range(600)]
     own = {w: [f"lockfix:{run}:{w}:{i:04d}" for i in range(300)] for w in "abcd"}
-    orders = {"a": shared + own["a"], "b": list(reversed(shared)) + own["b"],
-              "c": own["c"] + shared[::2] + shared[1::2], "d": list(reversed(own["d"] + shared))}
+    orders = {
+        "a": shared + own["a"],
+        "b": list(reversed(shared)) + own["b"],
+        "c": own["c"] + shared[::2] + shared[1::2],
+        "d": list(reversed(own["d"] + shared)),
+    }
     out: dict[str, Any] = {}
     barrier = threading.Barrier(4)
 
@@ -301,10 +356,13 @@ def test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock(db: Any
     assert not [k for k in out if k.endswith("_error")], out
     assert all(out[w].inserted == len(orders[w]) for w in "abcd"), out
     with db.worker.connect() as c:
-        revs = c.execute(text(
-            """SELECT logical_key, array_agg(revision_no ORDER BY revision_no) FROM evidence.observation
-               WHERE source_id = :s AND logical_key LIKE :p GROUP BY logical_key"""),
-            {"s": sid, "p": f"lockfix:{run}:%"}).all()
+        revs = c.execute(
+            text(
+                """SELECT logical_key, array_agg(revision_no ORDER BY revision_no) FROM evidence.observation
+               WHERE source_id = :s AND logical_key LIKE :p GROUP BY logical_key"""
+            ),
+            {"s": sid, "p": f"lockfix:{run}:%"},
+        ).all()
     by_key = dict(revs)
     assert all(by_key[k] == [1, 2, 3, 4] for k in shared)  # four writers -> four revisions, none lost
     assert all(by_key[k] == [1] for w in "abcd" for k in own[w])
@@ -360,3 +418,59 @@ def test_large_acquisition_does_not_block_another_source(db: Any, monkeypatch: p
         t.join(60)
     assert "a_error" not in result, result.get("a_error")
     assert result["a"].inserted == len(keys) and result["a_buckets"] <= LINEAGE_LOCK_BUCKETS
+
+
+# --------------------------------------------------------------------------- belief publication
+def test_belief_publication_lock_entries_do_not_grow_with_rows(db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    """The per-row ``belief.reject_if_published`` trigger (estimates, inputs, release artifacts and the
+    pinned world.relation rows) re-takes the *same* release key shared: re-entrant, one lock-table
+    entry however many rows. Measured inside a real publication transaction, then rolled back."""
+    import asyncio
+
+    import reva.belief.publication as publication
+    from reva.adapters.connectors.registry import builtin_connectors
+    from reva.belief.publication import publish_release
+    from reva.evidence.runner import FixtureHttp, run_connector
+    from reva.kernel.context import Origin
+
+    for name in ("worldbank.wdi.indicators", "un.comtrade.public_exact"):
+        conn_ = builtin_connectors()[name]
+        asyncio.run(run_connector(conn_, FixtureHttp(conn_.describe().name), db.store, db.worker, persist_cursor=False))
+    seen: dict[str, int] = {}
+    original = publication.pin_release_relations
+
+    def probe(conn: Any, release_id: Any, activity_id: Any) -> int:
+        n = original(conn, release_id, activity_id)
+        seen["relations"] = n
+        seen["rows"] = (
+            int(
+                conn.execute(
+                    text(
+                        """SELECT (SELECT count(*) FROM belief.estimate WHERE release_id = :r)
+                    + (SELECT count(*) FROM belief.input i JOIN belief.estimate e ON e.id = i.estimate_id
+                       WHERE e.release_id = :r)"""
+                    ),
+                    {"r": release_id},
+                ).scalar_one()
+            )
+            + n
+        )
+        seen["advisory"], seen["all"] = conn.execute(
+            text(
+                "SELECT count(*) FILTER (WHERE locktype = 'advisory'), count(*) FROM pg_locks "
+                "WHERE pid = pg_backend_pid()"
+            )
+        ).one()
+        raise _Rollback
+
+    monkeypatch.setattr(publication, "pin_release_relations", probe)
+    with pytest.raises(_Rollback):
+        publish_release(db.worker, db.store, cutoff=None, origin=Origin.test_fixture, environment="test")
+    print(
+        f"belief publication: rows={seen['rows']} relations={seen['relations']} "
+        f"advisory={seen['advisory']} all={seen['all']}"
+    )
+    assert seen["rows"] >= 100
+    # evidence snapshot lock, publication lock, the release key, a handful of object locks
+    assert seen["advisory"] <= 12, seen
+    assert seen["all"] < seen["rows"], seen

@@ -45,7 +45,7 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Engine, text
-from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.exc import DBAPIError, SQLAlchemyError
 
 from reva.adapters.connectors import eurostat_template as et
 from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, EurostatJsonStatConnector
@@ -78,6 +78,7 @@ from reva.autonomy.validator import JsonStatConnectorValidator
 from reva.autonomy.voi import GapValueEstimator
 from reva.cli.seed import entity_id, record_mapping_and_eligibility, register_connector_version
 from reva.evidence.locks import take_evidence_write_lock
+from reva.gate import GATE_LOGIN  # GATE2
 from reva.gate.client import PENDING_REASON, GateClient  # GATE: decisions come from the reva_gate process
 from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied, RevaError
 from reva.ontology.registry import load_registry
@@ -435,15 +436,17 @@ def _existing_state(engine: Engine, io_: ArtifactIO, manifest: dict[str, Any],
 
 
 def _verify_gate_row(conn: Any, decision: GateDecision) -> dict[str, Any]:
-    """The decision must be a recorded pass of a gate evaluator for this very connector_promotion proposal."""
+    """The decision must be a recorded pass of a gate evaluator for this very connector_promotion proposal,
+    recorded by the independent gate login (GATE2: defence in depth; the approval functions enforce it too)."""
     row = conn.execute(text(
         """SELECT g.proposal_id, g.decision, g.evaluator, g.evidence_sha256, g.policy_version,
-                  p.proposal_type, p.manifest_sha256
+                  g.recorded_by, p.proposal_type, p.manifest_sha256
            FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id WHERE g.id = :i"""),
         {"i": decision.decision_id}).mappings().one_or_none()
     if (row is None or str(row["proposal_id"]) != str(decision.proposal_id) or row["decision"] != "pass"
             or row["evaluator"] != decision.reviewer_identity
             or not str(row["evaluator"]).startswith("gate-evaluator:")
+            or row["recorded_by"] != GATE_LOGIN  # GATE2
             or row["proposal_type"] != "connector_promotion"):
         raise PolicyDenied("promotion requires a recorded passing gate result for this connector_promotion "
                            "proposal", gate_result_id=str(decision.decision_id))
@@ -630,6 +633,12 @@ def rollback_promotion(engine: Engine, connector_name: str, version: str, concep
                        reason: str) -> UUID:
     """Append 'retired' for this version (latest decision wins) and restore the version it superseded.
 
+    (GATE2) Restoration happens only when the rolled-back version was the eligible one, and walks
+    back past versions that were rolled back themselves to the newest earlier version retired by
+    supersession of this chain (``_restore_superseded``). The retired row of a rollback never
+    carries ``superseded_by``: it is a rollback, not a supersession (so the R6-05 content hold
+    applies and a later restore walk skips it).
+
     History stays immutable. Re-running discovery afterwards reports ``rolled_back_hold`` for the retired
     content instead of re-enabling it. A ``human:`` actor needs the migration-owner engine (R5-01: the
     database refuses human-attributed rows from runtime roles); a gate evaluator may use the worker.
@@ -644,14 +653,16 @@ def rollback_promotion(engine: Engine, connector_name: str, version: str, concep
             raise RevaError(f"connector {connector_name}@{version} not registered")
         c = repo.concept_version_id(conn, concept_id, cversion)
         prev = conn.execute(text(
-            """SELECT applicability, policy_version FROM evidence.eligibility WHERE connector_version_id=:cv
+            """SELECT decision, applicability, policy_version FROM evidence.eligibility WHERE connector_version_id=:cv
                AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
             {"cv": cv["id"], "c": c}).mappings().one()
         act = repo.simple_activity("autonomy.rollback", "review", actor, {"reason": reason[:500]})
         repo.record_activity(conn, act)
-        rid = _append_eligibility(conn, cv["id"], c, dict(prev["applicability"]), "retired",
-                                  prev["policy_version"], act.id)
-        restored = _restore_superseded(conn, cv, c, act.id)
+        # --- GATE2: a rollback is not a supersession; restore only if this version was the eligible one
+        app = {k: v for k, v in dict(prev["applicability"]).items() if k != "superseded_by"}
+        rid = _append_eligibility(conn, cv["id"], c, app, "retired", prev["policy_version"], act.id)
+        restored = _restore_superseded(conn, cv, c, act.id) if prev["decision"] == "eligible" else None
+        # --- end GATE2
         repo.emit_outbox(conn, "autonomy.connector_rolled_back", {"connector": connector_name, "version": version,
                                                                    "concept": concept, "restored": restored})
         repo.audit(conn, actor, "autonomy.connector_rolled_back", {"connector": connector_name, "version": version},
@@ -699,7 +710,23 @@ def reapprove_promotion(engine: Engine, connector_name: str, version: str, conce
 
 
 def _restore_superseded(conn: Any, cv: dict[str, Any], concept: Any, activity: Any) -> str | None:
-    """Re-append 'eligible' for the version that ``cv`` superseded, if it is still runnable."""
+    """Re-append 'eligible' for the newest earlier version that the rolled-back chain superseded.
+
+    (GATE2) Walks back over the versions registered before ``cv``, newest first:
+
+    * a version that was rolled back itself (latest decision ``retired`` without ``superseded_by``)
+      sits in between: it stays retired and the walk continues past it;
+    * the first version retired *by supersession* of ``cv`` or of such a rolled-back version is
+      restored through ``evidence.restore_eligibility``, which re-checks that it was retired by
+      supersession of a version that is no longer eligible and that its approval was independent
+      (reva_gate pass, API review or owner);
+    * anything else ends the walk with nothing restored: an earlier version that is still eligible,
+      one retired for its own reasons or superseded by a version outside the chain, or one that
+      cannot run under the current template (``template_changed``).
+
+    A refused restoration leaves the rollback itself in place (savepoint) and restores nothing.
+    """
+    chain = {str(cv["id"])}
     for r in reversed(prom.versions_of(conn, cv["name"])):
         if str(r["id"]) == str(cv["id"]) or r["recorded_at"] > cv["recorded_at"]:
             continue
@@ -708,16 +735,23 @@ def _restore_superseded(conn: Any, cv: dict[str, Any], concept: Any, activity: A
                WHERE connector_version_id = :cv AND concept_version_id = :c
                ORDER BY recorded_at DESC, id DESC LIMIT 1"""), {"cv": r["id"], "c": concept}).mappings().one_or_none()
         if last is None:
+            continue  # never decided for this concept
+        sup = ((last["applicability"] or {}).get("superseded_by") or {}).get("connector_version_id")
+        if last["decision"] == "retired" and not sup:
+            chain.add(str(r["id"]))  # rolled back itself: stays retired, keep walking back
             continue
-        sup = (last["applicability"] or {}).get("superseded_by") or {}
-        if last["decision"] != "retired" or sup.get("connector_version_id") != str(cv["id"]):
-            return None  # the previous version was retired for its own reasons: do not resurrect it
+        if last["decision"] != "retired" or str(sup) not in chain:
+            return None  # still eligible, or retired for its own reasons: do not resurrect anything
         if r["code_digest"] != et.template_digest():
             return None  # cannot run under the current template: stays retired (template_changed)
-        # (R5-01) re-enabling goes through the DB check: only a version retired *because* it was
-        # superseded by this (now rolled back) version gets its last approved decision back.
-        conn.execute(text("SELECT evidence.restore_eligibility(:cv, :c, :rb, :a)"),
-                     {"cv": r["id"], "c": concept, "rb": cv["id"], "a": activity})
+        try:
+            with conn.begin_nested():
+                conn.execute(text("SELECT evidence.restore_eligibility(:cv, :c, :rb, :a)"),
+                             {"cv": r["id"], "c": concept, "rb": UUID(str(sup)), "a": activity})
+        except DBAPIError as e:
+            log.warning("rollback of %s@%s: restoring %s was refused (%s); nothing restored", cv["name"],
+                        cv["version"], r["version"], type(getattr(e, "orig", None) or e).__name__)
+            return None
         return str(r["version"])
     return None
 
