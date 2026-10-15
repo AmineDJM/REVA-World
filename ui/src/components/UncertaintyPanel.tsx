@@ -1,5 +1,6 @@
 import type { Uncertainty, UncertaintySummary } from '../api/types';
 import { formatDecimalString } from '../lib/format';
+import { UncertaintyGlyph, glyphKindFor } from './UncertaintyGlyph';
 
 /** Either a full uncertainty record or an envelope-level summary. */
 export interface AnyUncertainty {
@@ -110,14 +111,15 @@ export interface UncertaintyPanelProps {
  */
 export function UncertaintyPanel({ uncertainty, compact = false, unit }: UncertaintyPanelProps) {
   const d = describeUncertainty(uncertainty);
+  const glyph = glyphKindFor(uncertainty);
   const u = uncertainty ?? undefined;
   const hasRange = d.treatment !== 'none' && d.treatment !== 'definition' && !!u?.lower && !!u?.upper;
   const range = hasRange ? `${formatDecimalString(String(u!.lower))} – ${formatDecimalString(String(u!.upper))}${unit ? ` ${unit}` : ''}` : null;
 
   if (compact) {
     return (
-      <span className={`ubadge ubadge-${d.treatment}`} title={d.note ?? d.title}>
-        <span className="ubadge-mark" aria-hidden="true" />
+      <span className={`ubadge ubadge-${d.treatment}`} title={d.note ?? d.title} data-glyph-kind={glyph}>
+        <UncertaintyGlyph kind={glyph} />
         {d.title}
         {range && <span className="ubadge-range">: {range}</span>}
       </span>
@@ -127,7 +129,7 @@ export function UncertaintyPanel({ uncertainty, compact = false, unit }: Uncerta
   return (
     <section className={`uncertainty-panel u-${d.treatment}`} aria-label="Uncertainty">
       <h4 className="u-title">
-        <span className="ubadge-mark" aria-hidden="true" /> {d.title}
+        <UncertaintyGlyph kind={glyph} /> {d.title}
       </h4>
       {range && (
         <div className="u-range">

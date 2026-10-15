@@ -1,4 +1,5 @@
 import { missingReasonLabel } from '../lib/format';
+import { UncertaintyGlyph } from './UncertaintyGlyph';
 
 export interface MissingValueProps {
   reason?: string | null;
@@ -14,6 +15,7 @@ export function MissingValue({ reason, note }: MissingValueProps) {
   const label = missingReasonLabel(reason);
   return (
     <span className="missing-value" data-missing-reason={reason ?? 'unstated'} title={note}>
+      <UncertaintyGlyph kind="missing" className="uglyph-inline" />
       missing ({label})
     </span>
   );
