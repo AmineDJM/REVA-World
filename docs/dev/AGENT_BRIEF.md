@@ -78,3 +78,14 @@ unsupported capability returns a typed blocked/unavailable result.
 - Ingest job handler (agent D): `reva.operations.jobs:handle_ingest` payload `{"connector": name, "mode": "live"|"fixture"}`.
 - Belief publication handler (agent D): `reva.operations.jobs:handle_publish_beliefs`.
 - Bootstrap: `reva.cli.bootstrap:bootstrap(settings)`; seed: `reva.cli.seed:seed(engine, store)`.
+
+## Wave 6 ownership (added during integration)
+| Agent | Owns |
+|---|---|
+| DOC | docs/data_constitution.md, src/reva/ontology/components.py, registry/components/trade_crude* |
+| DOC2 | docs/methodology.md, limitations.md, api.md, scientific_validation.md, operations.md (not backup section), threat_model.md, README.md |
+| UIX | ui/** |
+| DKR | Dockerfile, .dockerignore, compose.yaml, scripts/start_*.py, scripts/_runtime_env.py, scripts/validate_blueprint.py, render.yaml, docs/deployment.md |
+| BKP | scripts/backup*.{sh,py}, scripts/restore.sh, tests/integration/test_backup_restore*.py, docs/operations.md backup section |
+| SEC | src/reva/api/**, tests/security/test_api_adv_*.py |
+| CI | .github/workflows/**, Makefile, pyproject.toml tool sections |
