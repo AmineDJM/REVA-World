@@ -319,6 +319,98 @@ def list_evaluations(
         if rows else s.Assessment(status="not_assessed", reason="no evaluation recorded"))
 
 
+BACKTEST_SQL = """
+SELECT ev.id, ev.model_version_id, mv.model_key, mv.version AS model_version, ev.context_id, c.origin,
+       c.knowledge_cutoff, ev.replay_mode, ev.task_scope, ev.metrics, ev.evaluation_manifest_sha256, ev.recorded_at,
+       a.parameters->>'release_id' AS release_id
+FROM model.evaluation ev JOIN model.version mv ON mv.id = ev.model_version_id
+JOIN meta.context c ON c.id = ev.context_id
+JOIN meta.activity a ON a.id = ev.provenance_activity_id
+WHERE mv.model_key = :k AND ev.task_scope->>'task' = :task
+  AND (CAST(:c0 AS timestamptz) IS NULL
+       OR (ev.recorded_at, ev.id) < (CAST(:c0 AS timestamptz), CAST(:c1 AS uuid)))
+ORDER BY ev.recorded_at DESC, ev.id DESC LIMIT :lim
+"""
+
+
+def _backtest_row(r: dict[str, Any], function: str) -> s.ModelBacktest:
+    from reva.evaluation.backtests import design_of
+
+    metrics = r["metrics"] or {}
+    scope = r["task_scope"] or {}
+    replay_label = REPLAY_MODE_LABELS.get(r["replay_mode"], r["replay_mode"])
+    labels = [replay_label] + [str(metrics[k]) for k in ("label", "model_label", "statement")
+                               if isinstance(metrics.get(k), str) and metrics[k]]
+    try:
+        release_id = UUID(r["release_id"]) if r["release_id"] else None
+    except ValueError:
+        release_id = None
+    return s.ModelBacktest(
+        id=r["id"], model_version_id=r["model_version_id"], model_key=r["model_key"],
+        model_version=r["model_version"], task=str(scope.get("task")), country=scope.get("country"),
+        backtest_function=function, context_id=r["context_id"], origin=r["origin"], release_id=release_id,
+        knowledge_cutoff=r["knowledge_cutoff"], replay_mode=r["replay_mode"], replay_mode_label=replay_label,
+        design=design_of(scope), metrics=metrics, labels=list(dict.fromkeys(labels)),
+        evaluation_manifest_sha256=r["evaluation_manifest_sha256"], recorded_at=r["recorded_at"])
+
+
+@router.get("/models/{model_key}/backtests", response_model=s.ModelBacktestListResponse,
+            responses={404: {"model": s.Problem}})
+def list_backtests(
+    model_key: str,
+    request: Request,
+    cursor: str | None = None,
+    limit: int = Depends(page_limit),
+) -> s.ModelBacktestListResponse:
+    """Stored back-tests of a model (all versions of the key), newest first: metrics, design, labels and the
+    sha256 of the evaluation artifact. Back-tests are revised-data retrospectives computed by the worker job
+    ``backtest`` from the datasets pinned by a published release; a model without a back-test function returns
+    an empty list with the warning ``backtest_unavailable``."""
+    from reva.evaluation.backtests import BACKTESTS
+
+    t = Timer()
+    cur = decode_cursor(cursor, "tu")
+    key = model_key[:200]
+    spec = BACKTESTS.get(key)
+    with read_conn(request) as conn:
+        found = conn.execute(text("SELECT count(*) FROM model.version WHERE model_key = :k"), {"k": key}).scalar_one()
+        if not found:
+            raise NotFound("model not found", model=key)
+        rows: list[dict[str, Any]] = []
+        if spec is not None:
+            rows = [dict(r) for r in conn.execute(text(BACKTEST_SQL), {
+                "k": key, "task": spec.task, "c0": cur[0] if cur else None, "c1": cur[1] if cur else None,
+                "lim": limit + 1}).mappings()]
+    rows, nxt = page(rows, limit, lambda r: (r["recorded_at"].isoformat(), r["id"]))
+    data = [_backtest_row(r, spec.function) for r in rows] if spec is not None else []
+    org = origin_of(r.origin for r in data)
+    warnings = origin_warnings(org)
+    if spec is None:
+        warnings.append(s.ApiWarning(code="backtest_unavailable",
+                                     message=f"Model {key} has no back-test function; nothing can be back-tested"))
+    elif not data:
+        warnings.append(s.ApiWarning(code="no_backtests", message="No back-test has been stored for this model yet "
+                                     "(worker job 'backtest')"))
+    if data:
+        warnings.append(s.ApiWarning(
+            code="revised_data_retrospective",
+            message=f"{RETROSPECTIVE_LABEL}: back-tests use today's revised provider data for past years; no "
+                    "forecast was issued at these jump-off years. Errors describe the method on past data, not a "
+                    "probability statement about future projections."))
+    known = [d.knowledge_cutoff for d in data if d.knowledge_cutoff is not None]
+    return s.ModelBacktestListResponse(
+        data=data, context_mode="evaluation", origin=org, modality="evaluation",  # type: ignore[arg-type]
+        warnings=warnings, cost=t.cost(len(data)), next_cursor=nxt,
+        knowledge_cutoff=max(known) if known else None,
+        knowledge_cutoff_basis="evaluation_context" if known else None,
+        assumptions=[spec.description] if spec is not None else [],
+        historical_validation=s.Assessment(status="reported", detail={"replay_modes": sorted({d.replay_mode
+                                                                                              for d in data}),
+                                                                      "labels": [RETROSPECTIVE_LABEL]})
+        if data else s.Assessment(status="not_assessed",
+                                  reason="no back-test stored" if spec is not None else "no back-test function"))
+
+
 # ---------------------------------------------------------------------------
 # Coverage and gaps (relative to the versioned requirement catalogue)
 # ---------------------------------------------------------------------------
