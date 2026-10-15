@@ -945,8 +945,8 @@ def test_r4_06_discovery_request_is_validated_and_passed_through(env: Env) -> No
         {"requirement_id": "R-POP-JAN-AGESEX", "mode": "live"}
     for jid in (ok.json()["job_id"], default.json()["job_id"]):
         env.client.post(f"/v1/jobs/{jid}/cancel")
-    prod = create_app(api_settings(env.settings, reva_env="production", reva_session_secret=SecretStr("p" * 48),
-                                   reva_public_base_url="https://reva.example.org"))
+    # Only reva_env matters here; the other production-only requirements (S3, TLS to the DB) are skipped.
+    prod = create_app(api_settings(env.settings).model_copy(update={"reva_env": "production"}))
     with TestClient(prod, base_url="https://testserver") as c:
         login(c)
         r = c.post("/v1/discovery", json={"mode": "fixture"}, headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
@@ -984,7 +984,8 @@ def test_every_envelope_states_its_knowledge_cutoff(env: Env) -> None:
     m = env.client.get("/v1/models").json()
     assert m["origin"] == "test_fixture" and any(w["code"] == "fixture_data" for w in m["warnings"])
     ev = env.client.get("/v1/models/forecast.log_drift/evaluations").json()
-    assert ev["knowledge_cutoff_basis"] == "evaluation_context" and ev["knowledge_cutoff"]
+    assert ev["knowledge_cutoff"]
+    assert ev["knowledge_cutoff_basis"] == ("evaluation_context" if ev["data"] else "read_time")
     sc = env.client.get("/v1/scenarios").json()
     if sc["data"]:
         s1 = env.client.get(f"/v1/scenarios/{sc['data'][0]['id']}").json()

@@ -22,10 +22,28 @@ def _f(code: str, severity: str, message: str) -> Finding:
     return Finding(code=code, severity=severity, message=message, evidence=())  # type: ignore[arg-type]
 
 
-def contract_for(manifest: dict[str, Any]) -> dict[str, Any]:
-    """Data contract implied by a validated eurostat_jsonstat manifest."""
+def contract_for(manifest: dict[str, Any], registry: Any = None) -> dict[str, Any]:
+    """Data contract for a validated eurostat_jsonstat manifest.
+
+    The *semantic* expectations (concept version, unit, aggregation, population
+    universe, temporal support) and the subject provider come from the registry
+    concept's semantic profile and the template's subject binding — never from the
+    manifest's own ``semantics`` block, so a manifest that lies about its support
+    or unit fails (review R4-01). Only the requested structure (subjects, years,
+    pinned categories) is taken from the manifest.
+    """
+    from reva.autonomy.binding import SUBJECT, expected_semantics
+    from reva.kernel.errors import ValidationProblem
+    from reva.ontology.registry import load_registry
+
     rp = manifest["request_parameters"]
-    sem = rp["semantics"]
+    reg = registry or load_registry()
+    try:
+        concept = reg.concept(str(rp["semantics"]["concept_id"]))
+    except KeyError:
+        raise ValidationProblem("manifest concept is not registered: no data contract can be derived",
+                                concept=str(rp["semantics"]["concept_id"])[:100]) from None
+    sem = expected_semantics(concept)
     res = rp["resolution_dimensions"]
     dims = {d: {"categories": list(rp["pinned_categories"][d]), "totals": list(rp["total_categories"].get(d, []))}
             for d in res}
@@ -37,7 +55,8 @@ def contract_for(manifest: dict[str, Any]) -> dict[str, Any]:
         "concept_id": sem["concept_id"], "concept_version": sem["concept_version"],
         "unit_ref": sem["unit_ref"], "aggregation": sem["aggregation"],
         "population_universe": sem["population_universe"], "temporal_support": sem["temporal_support"],
-        "subject_provider": rp["subject"]["alias_provider"],
+        "subject_provider": SUBJECT["alias_provider"],
+        "basis": "registry_semantic_profile",
         "subjects": list(rp["filters"][rp["subject"]["dimension"]]),
         "years": list(rp["time"]),
         "dimensions": dims,

@@ -1,6 +1,6 @@
 # REVA World — acceptance report
 
-Generated 2026-10-15T00:02:03.734454+00:00 by `scripts/acceptance_report.py` (machine-readable: `var/acceptance/acceptance_report.json`, schema `reva-acceptance-report/1`). Git `2f3cb7bc4c96` on `claude/kind-darwin-kyy8re` with 31 uncommitted paths. This file is generated; do not edit by hand.
+Generated 2026-10-15T00:05:00.773271+00:00 by `scripts/acceptance_report.py` (machine-readable: `var/acceptance/acceptance_report.json`, schema `reva-acceptance-report/1`). Git `7e2c0354e0bd` on `claude/kind-darwin-kyy8re` with 7 uncommitted paths. This file is generated; do not edit by hand.
 
 Status vocabulary: **passed** (all counted evidence passed), **failed**, **blocked** (could not run here: credentials, deployment, network, browser, or excluded from this run), **missing** (no automated evidence exists). A criterion is never reported passed without evidence.
 
@@ -10,21 +10,40 @@ Status vocabulary: **passed** (all counted evidence passed), **failed**, **block
 
 | Ledger | passed | failed | blocked | missing |
 |---|---|---|---|---|
-| P0–P7 gate criteria | 41 | 6 | 2 | 2 |
+| P0–P7 gate criteria | 39 | 8 | 2 | 2 |
 | §13 mandatory acceptance tests | 35 | 2 | 1 | 1 |
 | §17.4 MVP gates | 5 | 1 | 0 | 0 |
 
-Phases: P0 **FAILED**, P1 **FAILED**, P2 passed, P3 **FAILED**, P4 passed, P5 _missing_, P6 passed, P7 **FAILED**
+Phases: P0 **FAILED**, P1 **FAILED**, P2 passed, P3 **FAILED**, P4 passed, P5 _missing_, P6 **FAILED**, P7 **FAILED**
 
-pytest cases: 1424 passed, 6 failed, 0 skipped (groups: unit, contracts, property, scientific, replay, security, integration, e2e; excluded markers: live, perf). UI vitest: 46 passed, 0 failed.
+pytest cases: 1407 passed, 25 failed, 0 skipped (groups: unit, contracts, property, scientific, replay, security, integration, e2e; excluded markers: live, perf). UI vitest: 46 passed, 0 failed.
 
 Failing tests:
 
 - `tests/e2e/test_demo_workflow.py::test_all_non_blocked_steps_pass`
+- `tests/integration/test_api_endpoints.py::test_replay_and_discovery`
+- `tests/integration/test_autonomy_contracts.py::test_data_quality_dimension_rules`
 - `tests/integration/test_autonomy_contracts.py::test_model_evaluator_proper_metrics`
-- `tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of`
+- `tests/integration/test_autonomy_gates.py::test_gate_ignores_reports_from_the_proposer`
+- `tests/integration/test_autonomy_gates.py::test_policy_change_makes_gate_refuse`
+- `tests/integration/test_autonomy_gates.py::test_t1_out_of_scope_is_rejected`
+- `tests/integration/test_autonomy_gates.py::test_t1_with_foreign_reports_is_rejected`
+- `tests/integration/test_autonomy_gates.py::test_t1_within_signed_scope_promotes`
+- `tests/integration/test_autonomy_gates.py::test_t1_without_independent_reports_is_not_promoted`
+- `tests/integration/test_eurostat_discovery.py::test_discovers_demo_pjan_from_captured_catalogue`
+- `tests/integration/test_eurostat_discovery.py::test_end_to_end_promotion_ingestion_and_belief_separation`
+- `tests/integration/test_eurostat_discovery.py::test_generator_refuses_unapproved_template`
+- `tests/integration/test_eurostat_discovery.py::test_manifest_validates_against_contract_schema`
+- `tests/integration/test_eurostat_discovery.py::test_other_datasets_are_only_candidates`
+- `tests/integration/test_eurostat_discovery.py::test_rollback_retires_eligibility`
+- `tests/integration/test_eurostat_discovery.py::test_validator_blocks_without_sample`
+- `tests/integration/test_eurostat_discovery.py::test_validator_fails_mutated_sample [test_validator_fails_mutated_sample[_change_unit-unit_changed]]`
+- `tests/integration/test_eurostat_discovery.py::test_validator_fails_mutated_sample [test_validator_fails_mutated_sample[_drop_status-status_missing]]`
+- `tests/integration/test_eurostat_discovery.py::test_validator_fails_mutated_sample [test_validator_fails_mutated_sample[_swap_order-dimension_order_changed]]`
+- `tests/integration/test_eurostat_discovery.py::test_validator_passes_captured_sample`
+- `tests/integration/test_eurostat_discovery.py::test_wdi_midyear_equivalence_is_incompatible`
+- `tests/integration/test_evidence_fixes.py::test_population_from_promoted_eurostat_connector`
 - `tests/integration/test_revisions.py::test_two_revisions_yield_different_as_of_answers`
-- `tests/integration/test_worker_loop.py::test_demo_runs_through_the_worker_path_with_db_clock_cutoff`
 - `tests/replay/test_replay_job.py::test_operational_replay_job_writes_evaluation_context_and_manifest`
 
 ## Demonstration workflow (§17.3)
@@ -91,7 +110,7 @@ Failing tests:
 | Every displayed value traces to raw source | passed | pytest 1/1; demo[fixtures] step 7 |  |
 | Graph preserves participant roles | passed | pytest 2/2; demo[fixtures] step 4 |  |
 | World view is release-pinned | **FAILED** | pytest 2/2; demo evidence release_pinned_edges=0 | demo_evidence:4: failed |
-| WDI/Eurostat incompatible support cannot reconcile | passed | pytest 3/3; demo[fixtures] step 9 |  |
+| WDI/Eurostat incompatible support cannot reconcile | **FAILED** | pytest 2/3; demo[fixtures] step 9 | tests/integration/test_eurostat_discovery.py::test_end_to_end_promotion_ingestion_and_belief_separation: failed (reva.kernel.errors.ValidationProblem: logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain {dimension} placeholders only) |
 | No scenario input allowed into beliefs | passed | pytest 1/1; demo[fixtures] step 5 |  |
 
 ### P4 — scenario contract, crude exposure L1/L2, simulation queue: passed
@@ -117,13 +136,13 @@ Failing tests:
 | No-result/missing/auth flows tested | passed | vitest; vitest; vitest; pytest 1/1 |  |
 | Naive baseline always shown | passed | pytest 2/2; demo[fixtures] step 11 |  |
 
-### P6 — autonomy, Eurostat, demographic recipe, gaps: passed
+### P6 — autonomy, Eurostat, demographic recipe, gaps: **FAILED**
 
 | Gate criterion | Status | Evidence | Reasons |
 |---|---|---|---|
-| Discover demo_pjan from official catalogue | passed | pytest 1/1; demo[fixtures] step 9 |  |
+| Discover demo_pjan from official catalogue | **FAILED** | pytest 0/1; demo[fixtures] step 9 | tests/integration/test_eurostat_discovery.py::test_discovers_demo_pjan_from_captured_catalogue: failed (reva.kernel.errors.ValidationProblem: logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain {dimension} placeholders only) |
 | Validate live sample | passed | live eurostat_demo_pjan; pytest 0/2 |  |
-| Semantic mismatch rejected | passed | pytest 2/2; demo[fixtures] step 9 |  |
+| Semantic mismatch rejected | **FAILED** | pytest 0/2; demo[fixtures] step 9 | tests/integration/test_eurostat_discovery.py::test_wdi_midyear_equivalence_is_incompatible: failed (reva.kernel.errors.ValidationProblem: logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain {dimension} placeholders only); tests/integration/test_eurostat_discovery.py::test_validator_fails_mutated_sample: failed (reva.kernel.errors.ValidationProblem: logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain {dimension} placeholders only) |
 | 100k weighted records preserve leaf totals | passed | pytest 1/2; perf population_100k_wall_s=3.379; perf population_100k_peak_rss_mib=181.1; demo[fixtures] step 10 |  |
 | Coarsen/refine preserves mass | passed | pytest 2/2; demo[fixtures] step 10 |  |
 | Generated code cannot run in worker | passed | pytest 2/2 |  |
@@ -136,7 +155,7 @@ Failing tests:
 | Current schema/CLI validation | passed | cmd validate_contracts; cmd validate_blueprint; group contracts (93 cases) |  |
 | Deploy only when access exists | _blocked_ | manual | manual:manual: blocked (no deployment was performed from this environment: Render API access, the managed PostgreSQL instance and the private S3 bucket credentials are not available here (see docs/deployment.md)) |
 | Actual roles and credentials verified | _blocked_ | pytest 3/3; manual | manual:manual: blocked (production role/credential verification needs the deployed database: no deployment was performed from this environment: Render API access, the managed PostgreSQL instance and the private S3 bucket credentials are not available here (see docs/deployment.md)) |
-| Restore from backups | **FAILED** | pytest 0/1 | tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of: failed (AssertionError:   File "/home/user/REVA-World/scripts/backup_restore.py", line 1       age_args: list[str] \| None = None   IndentationError: unexpected indent    assert 1 == 0  +  where 1 = CompletedProcess(args=['bash', '/home/user/REVA-World/scripts/restore.sh', '/tmp/pytest-of-root/pytest-381/test_backup...orld/scripts/backup_restore.py", line 1\n    age_args: list[str] \| None = None\nIndentati) |
+| Restore from backups | passed | pytest 1/1 |  |
 | No filesystem persistence assumptions | passed | pytest 2/2 |  |
 | p95/RSS measurements recorded | passed | perf ordinary_api_p95_ms=171.914; perf cached_metadata_p95_ms=37.336; perf l1_four_country_ms=12.113; perf queue_ack_p95_ms=241.265; perf population_100k_peak_rss_mib=181.1; doc |  |
 | Complete live demo | **FAILED** | demo[live] step * | demo:*: failed |
@@ -150,7 +169,7 @@ Failing tests:
 | Scientific/semantic | Zero elasticities exactly recover the fixed-quantity calculation | passed | pytest 2/2 |  |
 | Scientific/semantic | Quantity/valuation missingness blocks unsupported conversions | passed | pytest 5/5 |  |
 | Scientific/semantic | Countries with different reference years or GDP bases cannot be silently combined | passed | pytest 4/4 |  |
-| Scientific/semantic | January and mid-year population are not identical concepts | passed | pytest 3/3; demo[fixtures] step 9 |  |
+| Scientific/semantic | January and mid-year population are not identical concepts | **FAILED** | pytest 2/3; demo[fixtures] step 9 | tests/integration/test_eurostat_discovery.py::test_wdi_midyear_equivalence_is_incompatible: failed (reva.kernel.errors.ValidationProblem: logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain {dimension} placeholders only) |
 | Scientific/semantic | Probability, credible/prediction intervals, bounds and sensitivity types remain distinct | passed | pytest 5/5; demo[fixtures] step 6 |  |
 | Temporal/storage | Two revisions yield different as-of answers at appropriate cutoffs | **FAILED** | pytest 1/2; demo[fixtures] step 8 | tests/integration/test_revisions.py::test_two_revisions_yield_different_as_of_answers: failed (AssertionError: ('wb:SP.POP.TOTL:FRA:1991', []) assert 0 == 1  +  where 0 = len([])); demo:8: failed (['recorded vintage years (1990-1991) are admitted into the belief release', 'cutoff between vintages uses release 1 and revision 1 (later revision excluded)', 'cutoff after vintage 2 uses release 2 and revision 2', 'the two as-of answers differ']) |
 | Temporal/storage | A->B->A creates three revisions; identical consecutive polls do not | passed | pytest 2/2 |  |
@@ -171,7 +190,7 @@ Failing tests:
 | Reliability | Expired lease/fencing holder cannot publish | passed | pytest 3/3 |  |
 | Reliability | Two workers claiming a due job do not duplicate visible effects | passed | pytest 2/2 |  |
 | Reliability | Rate limiting, HTML error page with HTTP 200 and schema drift lead to retries/quarantine | passed | pytest 5/5 |  |
-| Reliability | Restore reconstructs identical logical manifests and as-of results | **FAILED** | pytest 0/1 | tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of: failed (AssertionError:   File "/home/user/REVA-World/scripts/backup_restore.py", line 1       age_args: list[str] \| None = None   IndentationError: unexpected indent    assert 1 == 0  +  where 1 = CompletedProcess(args=['bash', '/home/user/REVA-World/scripts/restore.sh', '/tmp/pytest-of-root/pytest-381/test_backup...orld/scripts/backup_restore.py", line 1\n    age_args: list[str] \| None = None\nIndentati) |
+| Reliability | Restore reconstructs identical logical manifests and as-of results | passed | pytest 1/1 |  |
 | Population/compression | All leaf-cell totals conserved; no double-counted source totals | passed | pytest 3/3; demo[fixtures] step 10 |  |
 | Population/compression | Structural-zero and unknown-category handling | passed | pytest 4/4 |  |
 | Population/compression | Same seed/config produces same logical cohort | passed | pytest 2/2 |  |
@@ -194,7 +213,7 @@ Failing tests:
 | All four country profiles exist even if one scenario input is unavailable | passed | pytest 2/2; demo[fixtures] step N |  |
 | No scenario number can be retrieved through a canonical observation endpoint | passed | pytest 1/1; demo[fixtures] step 5 |  |
 | No synthetic record is linked to a real individual | passed | pytest 2/2; demo[fixtures] step 10 |  |
-| MVP operational only after complete live demonstration and restore test pass | **FAILED** | demo[live] step *; pytest 0/1 | demo:*: failed; tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of: failed (AssertionError:   File "/home/user/REVA-World/scripts/backup_restore.py", line 1       age_args: list[str] \| None = None   IndentationError: unexpected indent    assert 1 == 0  +  where 1 = CompletedProcess(args=['bash', '/home/user/REVA-World/scripts/restore.sh', '/tmp/pytest-of-root/pytest-381/test_backup...orld/scripts/backup_restore.py", line 1\n    age_args: list[str] \| None = None\nIndentati) |
+| MVP operational only after complete live demonstration and restore test pass | **FAILED** | demo[live] step *; pytest 1/1 | demo:*: failed |
 
 ## Commands
 

@@ -7,7 +7,10 @@ manifest. It checks, against the pinned manifest and the mapped concept:
   ``size`` product vs value count, status flags (known vocabulary, declared
   labels, status map present when labels are declared);
 * semantics: concept, unit_ref, aggregation, population universe, temporal point
-  support (e.g. 1 January) and resolution dimensions, via the data-quality rules;
+  support (e.g. 1 January) and resolution dimensions, via the data-quality rules
+  against a data contract derived from the *registry* concept profile (never from
+  the manifest's own semantics block, review R4-01);
+* malformed provider data yields a typed ``fail`` report (never an untyped crash);
 * drift against the structure fingerprint recorded at inspection.
 
 A live sample is captured into a new immutable fixture bank (``fixture_bank`` in
@@ -32,10 +35,12 @@ from reva.autonomy.fixtures import BankHttp, CapturingHttp
 from reva.autonomy.policy import AutonomyGuard
 from reva.autonomy.quality import contract_for, evaluate_batch
 from reva.kernel.errors import RevaError
+from reva.ontology.registry import Registry, load_registry
 from reva.ports.autonomy import ArtifactRef, ConnectorProposal, Finding, ResourceBudget, ValidationReport
 from reva.ports.connectors import FetchBudget
 
 EVALUATOR = "connector-validator:eurostat_jsonstat@1"
+MALFORMED_DATA = (ValueError, TypeError, AttributeError, KeyError, IndexError, RecursionError, ArithmeticError)
 
 
 def _f(code: str, severity: str, message: str, evidence: tuple[ArtifactRef, ...] = ()) -> Finding:
@@ -44,10 +49,11 @@ def _f(code: str, severity: str, message: str, evidence: tuple[ArtifactRef, ...]
 
 class JsonStatConnectorValidator:
     def __init__(self, io_: ArtifactIO, *, live_client_factory: Callable[[tuple[str, ...]], Any] | None = None,
-                 guard: AutonomyGuard | None = None) -> None:
+                 guard: AutonomyGuard | None = None, registry: Registry | None = None) -> None:
         self.io = io_
         self.live_client_factory = live_client_factory
         self.guard = guard
+        self.registry = registry or load_registry()
 
     async def validate(self, proposal: ConnectorProposal, fixtures: ArtifactRef,
                        budget: ResourceBudget) -> ValidationReport:
@@ -58,7 +64,7 @@ class JsonStatConnectorValidator:
         manifest = self.io.get_json(proposal.manifest)
         evidence: dict[str, Any] = {"schema": "reva-connector-validation/1", "evaluator": EVALUATOR,
                                     "proposal_id": str(proposal.proposal_id), "manifest": proposal.manifest.sha256,
-                                    "fixtures_in": fixtures.sha256}
+                                    "fixtures_in": fixtures.sha256, "template_digest": template_digest()}
 
         def finish(outcome: str, usage: dict[str, Any]) -> ValidationReport:
             evidence["findings"] = [{"code": x.code, "severity": x.severity, "message": x.message}
@@ -112,11 +118,18 @@ class JsonStatConnectorValidator:
             except RevaError as e:
                 findings.append(_f(e.details.get("kind", e.code), "blocker", e.message))
                 return finish("fail", {"requests": 1, "bytes": used_bytes})
+            except MALFORMED_DATA as e:  # defence in depth: never an untyped crash of the discovery job
+                findings.append(_f("schema_drift", "blocker", f"malformed provider data: {type(e).__name__}"))
+                return finish("fail", {"requests": 1, "bytes": used_bytes})
         if isinstance(http, CapturingHttp):
             new_bank = http.bank(self.io, manifest["name"])
             evidence["fixture_bank"] = new_bank.sha256
             await http.aclose()
-        contract = contract_for(manifest)
+        try:
+            contract = contract_for(manifest, self.registry)
+        except RevaError as e:
+            findings.append(_f("no_registry_contract", "blocker", e.message))
+            return finish("fail", {"requests": len(plan.items), "bytes": used_bytes})
         contract_ref = self.io.put_json(contract, "models")
         evidence["data_contract"] = contract_ref.sha256
         evidence["batches"] = []

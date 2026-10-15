@@ -39,6 +39,7 @@ CATALOGUE_ALLOWLIST: dict[str, dict[str, Any]] = {
 }
 STOPWORDS = {"on", "by", "and", "the", "of", "in", "at", "for", "a", "an", "to", "as", "per", "eurostat", "wdi"}
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
+MALFORMED = (ValueError, TypeError, AttributeError, KeyError, IndexError, RecursionError, ArithmeticError)
 TOC_COLUMNS = ("title", "code", "type", "last update of data", "last table structure change", "data start",
                "data end", "values")
 
@@ -158,7 +159,11 @@ class EurostatCatalogueDiscoverer:
             raise SourceResponseError("catalogue exceeds byte budget", retryable=False)
         used_bytes += len(res.body)
         toc_ref = self.io.put_bytes(res.body, "raw", "text/plain")
-        entries = parse_toc(res.body)
+        try:
+            entries = parse_toc(res.body)
+        except MALFORMED as e:
+            raise SourceResponseError(f"malformed Eurostat catalogue: {type(e).__name__}", retryable=False,
+                                      kind="schema_drift") from None
         scored = []
         for e in entries:
             if e["type"] != "dataset":
@@ -188,8 +193,8 @@ class EurostatCatalogueDiscoverer:
                     inspected += 1
                 except RevaError as e:  # one failed inspection never aborts discovery
                     inspection_error = f"{e.code}: {e.message[:300]}"
-                except ValueError as e:
-                    inspection_error = f"malformed metadata: {str(e)[:300]}"
+                except MALFORMED as e:  # malformed provider metadata: typed record, never a crash
+                    inspection_error = f"malformed metadata: {type(e).__name__}: {sanitise(str(e), 300)}"
                 self.last_search["inspections"].append({"code": entry["code"], "ok": inspection is not None,
                                                         "error": inspection_error})
             meta = {
