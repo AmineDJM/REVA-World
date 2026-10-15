@@ -1,8 +1,8 @@
 # V3 KGGEOPOL — geopolitics with history and evidence
 
 Agent KGGEOPOL, 2026-10-15. Spec: `docs/roadmap/v3_world_graph.md`. Status: connectors, fixtures, offline and
-throwaway-DB tests done; Wikidata specs written and schema-valid (execution by WDHARVEST); live ingest pending
-the budget merge (see §7).
+throwaway-DB tests done; full-scale load of the real files into a throwaway DB done (§4.4); budgets merged by
+ATLASCORE; Wikidata specs written and schema-valid (execution by WDHARVEST).
 
 ## 1. What exists
 
@@ -113,6 +113,21 @@ consistently modelled sanctions class/property (candidate class QIDs did not ver
 `ImmutableRecordViolation: connector atlas.bmr@1.0.0 is registered with different content` (A-POL's connector
 changed without a version bump) — not in my files; Wikidata was also throttling (429/maxlag) most of the session.
 
+### 4.4 Full-scale load (real 2026-10-15 bytes, throwaway DB `reva_kggeopol_*`, dropped afterwards)
+
+| Source | Time | Peak RSS | KG statements (rejected) | `kg.statement` size after |
+|---|---|---|---|---|
+| UCDP | 31 s | 0.7 GB | 10,159 (0) | 9.6 MB |
+| CShapes | 43 s | 0.8 GB | 1,957 (0) | 11.7 MB |
+| UNGA votes | 898 s | 2.8 GB | 950,213 (0) | 819 MB |
+
+The UNGA KG load is the expensive part (0.82 GB of the ≤ 6 GB KG target). If that is too much,
+`vote_statements(..., issues_only=True)` limits KG vote statements to issue-coded roll calls (the atlas keeps every
+vote). A first attempt that materialised every row as a dict was OOM-killed at 3.8 GB (cgroup); the pipeline now
+registers each table and releases it before the next, builds tables column-wise (`AtlasRows`) and streams KG
+statements to `load_batch` in 100k batches. KG cross-check: US votes on CO-coded roll calls dated 1960–1969 in
+`kg.statement` = 30 yes / 47 no / 41 abstain, identical to `unga.vote_shares` (1960s decade).
+
 ## 5. KG conventions (for KGCORE / LINKS / NLQA / UI3)
 
 * Entities: Wikidata QIDs when the state resolves (country QIDs from `registry/entities/country_qids.json`
@@ -140,10 +155,8 @@ changed without a version bump) — not in my files; Wikidata was also throttlin
 
 ## 7. Requests to other agents / lead (not edited by me)
 
-* **ATLASCORE**: merge `registry/atlas/budget_requests/kggeopol.yaml` (`ucdp.downloads`,
-  `harvard.dataverse.unvotes`, `cshapes.cran`). Until then `tests/invariants/test_invariant_30_budgets.py::
-  test_budget_keys_are_registered_sources_and_cover_every_connector` lists my three keys (expected, fail-closed)
-  and the live ingest (`tests/integration/test_atlas_geopol_live.py`) is refused.
+* **ATLASCORE**: budgets merged (`cshapes.cran` 8, `harvard.dataverse.unvotes` 12, `ucdp.downloads`); invariant 30
+  no longer lists my keys.
 * **WDHARVEST**: run `registry/kg/queries/geopolitics/**`; write `registry/entities/country_qids.json`.
 * **A-POL**: `atlas.bmr@1.0.0` changed content without a version bump (breaks `harvest try`).
 * Shared code: A-HISTECON's `atlas_cow.py` imports my `StateCodeCrosswalk` (API kept stable); my modules import

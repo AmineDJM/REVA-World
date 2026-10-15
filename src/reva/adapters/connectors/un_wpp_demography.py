@@ -430,21 +430,26 @@ class ParseReport:
         }
 
 
-def _keep(
-    rec: Mapping[str, str], rep: ParseReport, first: int, last: int, countries: Iterable[str] | None
-) -> str | None:
-    """The crosswalk key of a kept row, or None (and the reason counted)."""
+_IV, _ILT, _IISO, _ITIME = (_ID_COLS.index(c) for c in ("Variant", "LocTypeName", "ISO3_code", "Time"))
+
+
+def _prefilter(r: Sequence[str], rep: ParseReport, first: int, last: int) -> bool:
+    """Cheap row filter on the identifier columns (counted), before any per-row dict is built."""
     rep.rows_read += 1
-    if rec["Variant"] != VARIANT:
+    if r[_IV] != VARIANT:
         rep.other_variant_rows += 1
-        return None
-    if rec["LocTypeName"] != COUNTRY_LOC_TYPE or not rec["ISO3_code"]:
+        return False
+    if r[_ILT] != COUNTRY_LOC_TYPE or not r[_IISO]:
         rep.aggregate_rows += 1
-        return None
-    year = int(rec["Time"])
-    if not first <= year <= last:
+        return False
+    if not first <= int(r[_ITIME]) <= last:
         rep.out_of_range_year_rows += 1
-        return None
+        return False
+    return True
+
+
+def _keep(rec: Mapping[str, str], rep: ParseReport, countries: Iterable[str] | None) -> str | None:
+    """The crosswalk key of a pre-filtered row, or None (unmapped locations are listed)."""
     iso3 = rec["ISO3_code"]
     xw = crosswalk_iso3()
     if iso3 not in xw:
@@ -528,8 +533,10 @@ def parse_single_age(
     max_diff = Decimal(0)
     wanted = set(countries) if countries is not None else None
     for r in iter_rows(parts, cols):
+        if not _prefilter(r, rep, first_year, last_year):
+            continue
         rec = {c: r[i] for c, i in ix.items()}
-        iso3 = _keep(rec, rep, first_year, last_year, wanted)
+        iso3 = _keep(rec, rep, wanted)
         if iso3 is None:
             continue
         code, kind, a, b = age_cell(rec["AgeGrp"], rec["AgeGrpStart"], rec["AgeGrpSpan"])
@@ -565,8 +572,10 @@ def parse_fertility5(
     out: dict[str, list[dict[str, Any]]] = {}
     wanted = set(countries) if countries is not None else None
     for r in iter_rows(parts, wf.header):
+        if not _prefilter(r, rep, first_year, last_year):
+            continue
         rec = {c: r[i] for c, i in ix.items()}
-        iso3 = _keep(rec, rep, first_year, last_year, wanted)
+        iso3 = _keep(rec, rep, wanted)
         if iso3 is None:
             continue
         a, span = int(rec["AgeGrpStart"]), rec["AgeGrpSpan"]
@@ -610,8 +619,10 @@ def parse_indicators(
     by_sex: dict[str, list[dict[str, Any]]] = {}
     wanted = set(countries) if countries is not None else None
     for r in iter_rows(parts, INDICATOR_HEADER):
+        if not _prefilter(r, rep, first_year, last_year):
+            continue
         rec = {c: r[i] for c, i in ix.items()}
-        iso3 = _keep(rec, rep, first_year, last_year, wanted)
+        iso3 = _keep(rec, rep, wanted)
         if iso3 is None:
             continue
         year, loc = int(rec["Time"]), int(rec["LocID"])

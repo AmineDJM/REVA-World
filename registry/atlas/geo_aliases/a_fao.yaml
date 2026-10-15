@@ -1,14 +1,14 @@
 # FAOSTAT geography (agent A-FAO). Every FAOSTAT bulk row carries the FAO "Area Code" and its UN M49 code
-# ("Area Code (M49)", also in each zip's *_AreaCodes.csv = FAO's own country definitions, archived with
-# the zip). Connector src/reva/adapters/connectors/atlas_fao.py maps the row's M49 code through this
-# scheme: the crosswalk M49 codes, plus one FAO area that names exactly a crosswalk entity without an M49
-# code in the crosswalk. Everything else stays unmapped and is listed in each atlas table manifest:
+# ("Area Code (M49)", also in each zip's *_AreaCodes.csv = FAO's own country definitions, archived with the
+# zip). Connector src/reva/adapters/connectors/atlas_fao.py maps the row's M49 code through this scheme: the
+# crosswalk M49 codes (so FAO 41 "China, mainland" M49 156 -> CHN, FAO 214 "China, Taiwan Province of" M49 158
+# -> TWN), plus one FAO area that names exactly a crosswalk entity without an M49 code in the crosswalk
+# (Channel Islands -> CHI). Everything else stays unmapped and is listed in each atlas table manifest:
 # FAO aggregates (5000 World, 5100.. regions, 58xx/90xx groups, 351 "China" = mainland + Hong Kong SAR +
-# Macao SAR + Taiwan, M49 159), 214 "China, Taiwan Province of" (M49 158, not a crosswalk entity),
-# 285 Sark (M49 680) and historical areas: 228 USSR (810), 248 Yugoslav SFR (890), 51 Czechoslovakia
-# (200), 62 Ethiopia PDR (230), 206 Sudan (former) (736), 15 Belgium-Luxembourg (058), 186 Serbia and
-# Montenegro (891), 151 Netherlands Antilles (former) (530), 246 Yemen Ar Rp (886), 247 Yemen Dem (720),
-# 164 Pacific Islands Trust Territory (582), 242 Wake Island (872).
+# Macao SAR + Taiwan, M49 159), 285 Sark (M49 680) and historical areas: 228 USSR (810), 248 Yugoslav SFR
+# (890), 51 Czechoslovakia (200), 62 Ethiopia PDR (230), 206 Sudan (former) (736), 15 Belgium-Luxembourg
+# (058), 186 Serbia and Montenegro (891), 151 Netherlands Antilles (former) (530), 246 Yemen Ar Rp (886),
+# 247 Yemen Dem (720), 164 Pacific Islands Trust Territory (582), 242 Wake Island (872).
 scheme: fao_m49
 base: m49
 aliases:

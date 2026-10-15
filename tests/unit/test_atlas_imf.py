@@ -123,7 +123,8 @@ def test_weo_geography_mapping(weo):
     df, _, unmapped = weo
     assert _cells(df, "KOS", "LP")[2024]["iso3"] == "XKX"
     assert _cells(df, "WBG", "NGDPD")[2024]["iso3"] == "PSE"
-    assert {u["provider_geo"] for u in unmapped} == {"G001", "TWN"}  # kept, listed, never dropped
+    assert {u["provider_geo"] for u in unmapped} == {"G001"}  # kept, listed, never dropped
+    assert _cells(df, "TWN", "NGDPD")[2024]["iso3"] == "TWN"  # crosswalk 1.1.0 (ISO 3166-1)
     world = _cells(df, "G001", "NGDP_RPCH")
     assert world and all(r["iso3"] is None for r in world.values())
     # aggregates declare no latest actual: from the publication year on they are projections
@@ -182,7 +183,7 @@ def test_ex_ifs_exchange_rates_interest_rates_reserves(raws):
     il, unmapped = _validated(m.parse_il(m.parse_sdmx(raws["il"]), SHA)[0], "il")
     fr = _cells(il, "FRA", "TRGMV_REVS|unit=USD")
     assert fr and float(fr[2024]["value"]) > 1e11 and fr[2024]["flags"]["ifs_series"] == "true"
-    assert {"G001", "TWN"} >= {u["provider_geo"] for u in unmapped}
+    assert {"G001"} >= {u["provider_geo"] for u in unmapped}
 
 
 # --------------------------------------------------------------------------- IMTS (ex-DOTS)

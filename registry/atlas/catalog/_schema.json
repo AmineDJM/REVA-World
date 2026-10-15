@@ -16,7 +16,7 @@
     "labels": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["fr", "en"],
+      "required": ["en"],
       "properties": {
         "fr": {"type": "string", "minLength": 1, "maxLength": 300},
         "en": {"type": "string", "minLength": 1, "maxLength": 300}
@@ -49,6 +49,7 @@
         "unit": {"type": "string", "minLength": 1, "maxLength": 100},
         "domain": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,39}$"},
         "subdomain": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,59}$"},
+        "fr_label": {"const": "missing", "description": "No French label exists yet (labels.fr omitted; never filled with the English text)"},
         "theme": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,39}$", "description": "Optional REVA theme (registry/atlas/themes.yaml); overrides the theme rules"},
         "value_kind": {"enum": ["numeric", "text"]},
         "source_order": {"type": "array", "minItems": 1, "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/series"}},

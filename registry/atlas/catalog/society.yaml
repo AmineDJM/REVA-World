@@ -1,0 +1,1703 @@
+# Society & culture concepts of the atlas (agent A-SOCIETY). Provider-declared, not human-reviewed.
+# Tables: rcs.dem2 (RCS-Dem 2.0, religion shares 1700s-2015), wrp.national (World Religion Project 1945-2010),
+# hief.hief and sscp.frac_v1 (fractionalisation), cdpd.cdpd_v1 (death penalty status 1800-2022), who.gho_violence
+# (WHO homicide estimates), ti.cpi (Corruption Perceptions Index 2012-2025), oecd.sigi2023 (SIGI + legal-framework
+# variables), parlgov.elections (party vote shares and seats, 37 countries; no catalog concept: per-party series are
+# addressed by key 'parlgov.elections.vote_share|election=<parliament|ep>|party=<id>').
+#
+# Not duplicated here (already catalogued by other agents, same series): internet users / mobile and broadband
+# subscriptions (ITU via WDI: wb.it.net.user.zs, wb.it.cel.sets.p2, wb.it.net.bbnd.p2; A-WB), international tourism
+# arrivals / receipts (UN Tourism via WDI: wb.st.int.arvl, wb.st.int.rcpt.cd; A-WB), UNODC intentional homicides
+# (wb.vc.ihr.psrc.p5; A-WB), women in parliament (politics.parliament.women_lower_chamber_pct; A-POL), turnout
+# (politics.elections.turnout_parliamentary_lower, politics.vdem.turnout_*; A-POL), religions / ethnic groups /
+# languages as text (factbook.text.*; A-FACTBOOK). Licence decisions per source: docs/dev/v3_a_society.md.
+domain: society
+concepts:
+- id: society.religion.rcs.christians_pct
+  labels:
+    fr: Chrétiens, part de la population (RCS-Dem)
+    en: Christians, share of population (RCS-Dem)
+  definition: 'Percentage of Christians in the total population (RCS-Dem 2.0 variable CHRPC, codebook ''CHRPC: Percentage
+    of Christians'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.CHRPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.catholics_pct
+  labels:
+    fr: Catholiques, part de la population (RCS-Dem)
+    en: Catholics, share of population (RCS-Dem)
+  definition: 'Percentage of Catholics in the total population (RCS-Dem 2.0 variable CATPC, codebook ''CATPC: Percentage of
+    Catholics'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.CATPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.protestants_extended_pct
+  labels:
+    fr: Protestants au sens large (« Extended Protestants »), part de la population (RCS-Dem)
+    en: Extended Protestants, share of population (RCS-Dem)
+  definition: 'Percentage of Extended Protestants in the total population (RCS-Dem 2.0 variable XPRTPC, codebook ''XPRTPC:
+    Percentage of Extended Protestants'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.XPRTPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.protestants_pct
+  labels:
+    fr: Protestants, part de la population (RCS-Dem)
+    en: Protestants, share of population (RCS-Dem)
+  definition: 'Percentage of Protestants in the total population (RCS-Dem 2.0 variable PRTPC, codebook ''PRTPC: Percentage
+    of Protestants'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.PRTPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.anglicans_pct
+  labels:
+    fr: Anglicans, part de la population (RCS-Dem)
+    en: Anglicans, share of population (RCS-Dem)
+  definition: 'Percentage of Anglicans in the total population (RCS-Dem 2.0 variable ANGPC, codebook ''ANGPC: Percentage of
+    Anglicans'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.ANGPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.pentecostals_pct
+  labels:
+    fr: Pentecôtistes, part de la population (RCS-Dem)
+    en: Pentecostals, share of population (RCS-Dem)
+  definition: 'Percentage of Pentecostals in the total population (RCS-Dem 2.0 variable PENPC, codebook ''PENPC: Percentage
+    of Pentecostals'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.PENPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.orthodox_pct
+  labels:
+    fr: Chrétiens orthodoxes, part de la population (RCS-Dem)
+    en: Orthodox Christians, share of population (RCS-Dem)
+  definition: 'Percentage of Orthodox Christians in the total population (RCS-Dem 2.0 variable ORTPC, codebook ''ORTPC: Percentage
+    of Orthodox Christians'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.ORTPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.jews_pct
+  labels:
+    fr: Juifs, part de la population (RCS-Dem)
+    en: Jews, share of population (RCS-Dem)
+  definition: 'Percentage of Jews in the total population (RCS-Dem 2.0 variable JEWPC, codebook ''JEWPC: Percentage of Jews'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.JEWPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.muslims_pct
+  labels:
+    fr: Musulmans, part de la population (RCS-Dem)
+    en: Muslims, share of population (RCS-Dem)
+  definition: 'Percentage of Muslims in the total population (RCS-Dem 2.0 variable MUSPC, codebook ''MUSPC: Percentage of
+    Muslims'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.MUSPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.sunni_pct
+  labels:
+    fr: Musulmans sunnites, part de la population (RCS-Dem)
+    en: Sunni Muslims, share of population (RCS-Dem)
+  definition: 'Percentage of Sunni Muslims in the total population (RCS-Dem 2.0 variable SUNPC, codebook ''SUNPC: Percentage
+    of Sunni Muslims'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.SUNPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.shia_pct
+  labels:
+    fr: Musulmans chiites, part de la population (RCS-Dem)
+    en: Shiite Muslims, share of population (RCS-Dem)
+  definition: 'Percentage of Shiite Muslims in the total population (RCS-Dem 2.0 variable SHIPC, codebook ''SHIPC: Percentage
+    of Shiite Muslims'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.SHIPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.hindus_pct
+  labels:
+    fr: Hindous, part de la population (RCS-Dem)
+    en: Hindus, share of population (RCS-Dem)
+  definition: 'Percentage of Hindus in the total population (RCS-Dem 2.0 variable HINPC, codebook ''HINPC: Percentage of Hindus'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.HINPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.buddhists_pct
+  labels:
+    fr: Bouddhistes, part de la population (RCS-Dem)
+    en: Buddhists, share of population (RCS-Dem)
+  definition: 'Percentage of Buddhists in the total population (RCS-Dem 2.0 variable BUDPC, codebook ''BUDPC: Percentage of
+    Buddhists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.BUDPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.sikhs_pct
+  labels:
+    fr: Sikhs, part de la population (RCS-Dem)
+    en: Sikhs, share of population (RCS-Dem)
+  definition: 'Percentage of Sikhs in the total population (RCS-Dem 2.0 variable SIKPC, codebook ''SIKPC: Percentage of Sikhs'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.SIKPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.jains_pct
+  labels:
+    fr: Jaïns, part de la population (RCS-Dem)
+    en: Jains, share of population (RCS-Dem)
+  definition: 'Percentage of Jains in the total population (RCS-Dem 2.0 variable JAIPC, codebook ''JAIPC: Percentage of Jains'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.JAIPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.bahais_pct
+  labels:
+    fr: Bahaïs, part de la population (RCS-Dem)
+    en: Baha'is, share of population (RCS-Dem)
+  definition: 'Percentage of Baha''is in the total population (RCS-Dem 2.0 variable BAHPC, codebook ''BAHPC: Percentage of
+    Baha''is'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.BAHPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.zoroastrians_pct
+  labels:
+    fr: Zoroastriens, part de la population (RCS-Dem)
+    en: Zoroastrians, share of population (RCS-Dem)
+  definition: 'Percentage of Zoroastrians in the total population (RCS-Dem 2.0 variable ZORPC, codebook ''ZORPC: Percentage
+    of Zoroastrians'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.ZORPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.east_asian_complex_pct
+  labels:
+    fr: Complexe religieux est-asiatique, part de la population (RCS-Dem)
+    en: East Asian religious complex, share of population (RCS-Dem)
+  definition: 'Percentage of East Asian religious complex in the total population (RCS-Dem 2.0 variable EACPC, codebook ''EACPC:
+    Percentage of East Asian religious complex'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.EACPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.shintoists_pct
+  labels:
+    fr: Shintoïstes, part de la population (RCS-Dem)
+    en: Shintoists, share of population (RCS-Dem)
+  definition: 'Percentage of Shintoists in the total population (RCS-Dem 2.0 variable SHNPC, codebook ''SHNPC: Percentage
+    of Shintoists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.SHNPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.confucianists_pct
+  labels:
+    fr: Confucianistes, part de la population (RCS-Dem)
+    en: Confucianists, share of population (RCS-Dem)
+  definition: 'Percentage of Confucianists in the total population (RCS-Dem 2.0 variable CNFPC, codebook ''CNFPC: Percentage
+    of Confucianists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.CNFPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.taoists_pct
+  labels:
+    fr: Taoïstes, part de la population (RCS-Dem)
+    en: Taoists, share of population (RCS-Dem)
+  definition: 'Percentage of Taoists in the total population (RCS-Dem 2.0 variable TAOPC, codebook ''TAOPC: Percentage of
+    Taoists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.TAOPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.chinese_folk_pct
+  labels:
+    fr: Religion populaire chinoise, part de la population (RCS-Dem)
+    en: Chinese folk religionists, share of population (RCS-Dem)
+  definition: 'Percentage of Chinese folk religionists in the total population (RCS-Dem 2.0 variable CHFPC, codebook ''CHFPC:
+    Percentage of Chinese folk religionists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.CHFPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.indigenous_pct
+  labels:
+    fr: Religions indigènes (ethnoreligions), part de la population (RCS-Dem)
+    en: Indigenous religionists (ethnoreligionists), share of population (RCS-Dem)
+  definition: 'Percentage of Indigenous religionists (ethnoreligionists) in the total population (RCS-Dem 2.0 variable INDPC,
+    codebook ''INDPC: Percentage of Indigenous religionists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.INDPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.new_age_pct
+  labels:
+    fr: Religions New Age, part de la population (RCS-Dem)
+    en: New Age religionists, share of population (RCS-Dem)
+  definition: 'Percentage of New Age religionists in the total population (RCS-Dem 2.0 variable NEWPC, codebook ''NEWPC: Percentage
+    of New Age religionists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.NEWPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.not_religious_pct
+  labels:
+    fr: Sans religion, part de la population (RCS-Dem)
+    en: Not religious, share of population (RCS-Dem)
+  definition: 'Percentage of Not religious in the total population (RCS-Dem 2.0 variable NREPC, codebook ''NREPC: Percentage
+    of Not religious'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.NREPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.atheists_pct
+  labels:
+    fr: Athées, part de la population (RCS-Dem)
+    en: Atheists, share of population (RCS-Dem)
+  definition: 'Percentage of Atheists in the total population (RCS-Dem 2.0 variable ATHPC, codebook ''ATHPC: Percentage of
+    Atheists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.ATHPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.other_pct
+  labels:
+    fr: Autres religions, part de la population (RCS-Dem)
+    en: Other religionists, share of population (RCS-Dem)
+  definition: 'Percentage of Other religionists in the total population (RCS-Dem 2.0 variable OREPC, codebook ''OREPC: Percentage
+    of Other religionists'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.OREPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.unknown_pct
+  labels:
+    fr: Affiliation religieuse inconnue, part de la population (RCS-Dem)
+    en: Unknown religious affiliation, share of population (RCS-Dem)
+  definition: 'Percentage of Unknown religious affiliation in the total population (RCS-Dem 2.0 variable UNKPC, codebook ''UNKPC:
+    Percentage of Unknown religious affiliation'').'
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.UNKPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+  tags:
+  - source:rcs_dem
+  - licence:usage_agreement
+- id: society.religion.rcs.religionists_pct
+  labels:
+    fr: Croyants déclarés, part de la population (RCS-Dem)
+    en: Known religionists, share of population (RCS-Dem)
+  definition: Total percentage of known religionists (vice non-religionists), RCS-Dem 2.0 variable RELPC.
+  unit: '%'
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.RELPC
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+- id: society.religion.rcs.population
+  labels:
+    fr: Estimation de population (RCS-Dem)
+    en: Population estimate (RCS-Dem)
+  definition: RCS estimate of total population (RCS-Dem 2.0 variable TOTPP), the denominator of the RCS shares.
+  unit: persons
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.TOTPP
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).
+    Not a demographic source: use UN WPP for population.'
+- id: society.religion.rcs.majority_religion
+  labels:
+    fr: Religion majoritaire, code (RCS-Dem)
+    en: Majority religion code (RCS-Dem)
+  definition: ID code of the religion of the majority of the population (50% plus one), RCS-Dem 2.0 variable MAJID; value_text
+    = codebook label. Code 0 is not documented in the codebook (cells flagged undocumented_code; it appears where no group
+    reaches a majority).
+  unit: code
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.MAJID
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+- id: society.religion.rcs.supermajority_religion
+  labels:
+    fr: Religion supermajoritaire, code (RCS-Dem)
+    en: Supermajority religion code (RCS-Dem)
+  definition: ID code of the religion of the supermajority of the population (66 2/3% or greater), RCS-Dem 2.0 variable SUPID;
+    value_text = codebook label. Code 0 is not documented (flagged).
+  unit: code
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - rcs.dem2.SUPID
+  provider_declared: true
+  notes: 'RCS-Dem 2.0 (Brown & James 2019), OSF doi:10.17605/OSF.IO/7SR4M. Percent of the total population (0-100) as published;
+    units follow RCS continuity (flags.rcs_abbrev). Licence status: no licence declared, ARDA usage agreement (attribution)
+    -- not an open licence, flagged. Same concept in the World Religion Project is a proportion (0-1), filed separately (society.religion.wrp.*).'
+- id: society.religion.wrp.christians_share
+  labels:
+    fr: Chrétiens, part de la population (WRP)
+    en: Christians, share of population (WRP)
+  definition: Adherents of Christians as a proportion of the population (World Religion Project national variable chrstgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.chrstgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.catholics_share
+  labels:
+    fr: Catholiques romains, part de la population (WRP)
+    en: Roman Catholics, share of population (WRP)
+  definition: Adherents of Roman Catholics as a proportion of the population (World Religion Project national variable chrstcatpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.chrstcatpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.protestants_share
+  labels:
+    fr: Protestants, part de la population (WRP)
+    en: Protestants, share of population (WRP)
+  definition: Adherents of Protestants as a proportion of the population (World Religion Project national variable chrstprotpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.chrstprotpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.orthodox_share
+  labels:
+    fr: Orthodoxes orientaux, part de la population (WRP)
+    en: Eastern Orthodox, share of population (WRP)
+  definition: Adherents of Eastern Orthodox as a proportion of the population (World Religion Project national variable chrstorthpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.chrstorthpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.anglicans_share
+  labels:
+    fr: Anglicans, part de la population (WRP)
+    en: Anglicans, share of population (WRP)
+  definition: Adherents of Anglicans as a proportion of the population (World Religion Project national variable chrstangpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.chrstangpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.jews_share
+  labels:
+    fr: Juifs (toutes branches), part de la population (WRP)
+    en: Jews (all branches), share of population (WRP)
+  definition: Adherents of Jews (all branches) as a proportion of the population (World Religion Project national variable
+    judgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.judgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.muslims_share
+  labels:
+    fr: Musulmans, part de la population (WRP)
+    en: Muslims, share of population (WRP)
+  definition: Adherents of Muslims as a proportion of the population (World Religion Project national variable islmgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.islmgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.sunni_share
+  labels:
+    fr: Musulmans sunnites, part de la population (WRP)
+    en: Sunni Muslims, share of population (WRP)
+  definition: Adherents of Sunni Muslims as a proportion of the population (World Religion Project national variable islmsunpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.islmsunpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.shia_share
+  labels:
+    fr: Musulmans chiites, part de la population (WRP)
+    en: Shi'a Muslims, share of population (WRP)
+  definition: Adherents of Shi'a Muslims as a proportion of the population (World Religion Project national variable islmshipct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.islmshipct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.buddhists_share
+  labels:
+    fr: Bouddhistes, part de la population (WRP)
+    en: Buddhists, share of population (WRP)
+  definition: Adherents of Buddhists as a proportion of the population (World Religion Project national variable budgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.budgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.hindus_share
+  labels:
+    fr: Hindous, part de la population (WRP)
+    en: Hindus, share of population (WRP)
+  definition: Adherents of Hindus as a proportion of the population (World Religion Project national variable hindgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.hindgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.sikhs_share
+  labels:
+    fr: Sikhs, part de la population (WRP)
+    en: Sikhs, share of population (WRP)
+  definition: Adherents of Sikhs as a proportion of the population (World Religion Project national variable sikhgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.sikhgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.jains_share
+  labels:
+    fr: Jaïns, part de la population (WRP)
+    en: Jains, share of population (WRP)
+  definition: Adherents of Jains as a proportion of the population (World Religion Project national variable jaingenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.jaingenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.bahais_share
+  labels:
+    fr: Bahaïs, part de la population (WRP)
+    en: Baha'is, share of population (WRP)
+  definition: Adherents of Baha'is as a proportion of the population (World Religion Project national variable bahgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.bahgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.zoroastrians_share
+  labels:
+    fr: Zoroastriens, part de la population (WRP)
+    en: Zoroastrians, share of population (WRP)
+  definition: Adherents of Zoroastrians as a proportion of the population (World Religion Project national variable zorogenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.zorogenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.shinto_share
+  labels:
+    fr: Shintoïsme, part de la population (WRP)
+    en: Shinto, share of population (WRP)
+  definition: Adherents of Shinto as a proportion of the population (World Religion Project national variable shntgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.shntgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.confucianism_share
+  labels:
+    fr: Confucianisme, part de la population (WRP)
+    en: Confucianism, share of population (WRP)
+  definition: Adherents of Confucianism as a proportion of the population (World Religion Project national variable confgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.confgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.taoism_share
+  labels:
+    fr: Taoïsme, part de la population (WRP)
+    en: Taoism, share of population (WRP)
+  definition: Adherents of Taoism as a proportion of the population (World Religion Project national variable taogenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.taogenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.syncretic_share
+  labels:
+    fr: Religions syncrétiques, part de la population (WRP)
+    en: Syncretic religions, share of population (WRP)
+  definition: Adherents of Syncretic religions as a proportion of the population (World Religion Project national variable
+    syncgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.syncgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.animist_share
+  labels:
+    fr: Religions animistes, part de la population (WRP)
+    en: Animist religions, share of population (WRP)
+  definition: Adherents of Animist religions as a proportion of the population (World Religion Project national variable anmgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.anmgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.not_religious_share
+  labels:
+    fr: Sans religion, part de la population (WRP)
+    en: Non-religious, share of population (WRP)
+  definition: Adherents of Non-religious as a proportion of the population (World Religion Project national variable nonreligpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.nonreligpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.religion.wrp.other_share
+  labels:
+    fr: Autres religions, part de la population (WRP)
+    en: Other religions, share of population (WRP)
+  definition: Adherents of Other religions as a proportion of the population (World Religion Project national variable othrgenpct).
+  unit: proportion (0-1)
+  domain: society
+  subdomain: religion
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - wrp.national.othrgenpct
+  provider_declared: true
+  notes: 'World Religion Project national data v1.1 (Maoz & Henderson 2013), hosted by the Correlates of War project; 1945-2010
+    every 5 years; share of the population as a proportion (0-1) as published; flags carry datatype (interpolated / adjusted),
+    reliability and source codes. COW terms (cite; users cannot charge for access): not an open licence, flagged.'
+  tags:
+  - source:wrp
+  - licence:cow_terms
+- id: society.fractionalization.ethnic
+  labels:
+    fr: Fractionnement ethnique (Alesina et al. / SSCP)
+    en: Ethnic fractionalization (Alesina et al. / SSCP)
+  definition: 'Probability that two randomly selected individuals belong to different ethnic groups: 1 - sum of squared group
+    shares (0-1).'
+  unit: index (0-1)
+  domain: society
+  subdomain: fractionalization
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - sscp.frac_v1.ethnic_frac
+  provider_declared: true
+  notes: 'SSCP Fractionalisation v1.0 (Gordon 2026, Harvard Dataverse doi:10.7910/DVN/EVCQXC, CC BY 4.0): Alesina et al. (2003)
+    values plus SSCP''s extension with the same Herfindahl formula; one cross-section per polity, flags.value_origin names
+    the origin of each value and flags.period_basis how its year was set (the file itself has no year).'
+  tags:
+  - source:sscp
+  - licence:CC-BY-4.0
+- id: society.fractionalization.language
+  labels:
+    fr: Fractionnement linguistique (Alesina et al. / SSCP)
+    en: Linguistic fractionalization (Alesina et al. / SSCP)
+  definition: 'Probability that two randomly selected individuals belong to different linguistic groups: 1 - sum of squared
+    group shares (0-1).'
+  unit: index (0-1)
+  domain: society
+  subdomain: fractionalization
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - sscp.frac_v1.language_frac
+  provider_declared: true
+  notes: 'SSCP Fractionalisation v1.0 (Gordon 2026, Harvard Dataverse doi:10.7910/DVN/EVCQXC, CC BY 4.0): Alesina et al. (2003)
+    values plus SSCP''s extension with the same Herfindahl formula; one cross-section per polity, flags.value_origin names
+    the origin of each value and flags.period_basis how its year was set (the file itself has no year).'
+  tags:
+  - source:sscp
+  - licence:CC-BY-4.0
+- id: society.fractionalization.religion
+  labels:
+    fr: Fractionnement religieux (Alesina et al. / SSCP)
+    en: Religious fractionalization (Alesina et al. / SSCP)
+  definition: 'Probability that two randomly selected individuals belong to different broad religious groups: 1 - sum of squared
+    group shares (0-1).'
+  unit: index (0-1)
+  domain: society
+  subdomain: fractionalization
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - sscp.frac_v1.religion_frac
+  provider_declared: true
+  notes: 'SSCP Fractionalisation v1.0 (Gordon 2026, Harvard Dataverse doi:10.7910/DVN/EVCQXC, CC BY 4.0): Alesina et al. (2003)
+    values plus SSCP''s extension with the same Herfindahl formula; one cross-section per polity, flags.value_origin names
+    the origin of each value and flags.period_basis how its year was set (the file itself has no year).'
+  tags:
+  - source:sscp
+  - licence:CC-BY-4.0
+- id: society.fractionalization.ethnic_hief
+  labels:
+    fr: Indice historique de fractionnement ethnique (HIEF)
+    en: Historical Index of Ethnic Fractionalization (HIEF)
+  definition: Probability that two randomly drawn individuals in a country belong to different ethnic groups (HIEF EFindex,
+    0-1), annual 1945-2013, built from Cline Center CREG group shares.
+  unit: index (0-1)
+  domain: society
+  subdomain: fractionalization
+  theme: culture
+  value_kind: numeric
+  source_order:
+  - hief.hief.EFindex
+  provider_declared: true
+  notes: 'HIEF (Drazanova 2019), Harvard Dataverse doi:10.7910/DVN/4JQRCL, CC0. Different group lists and method than Alesina
+    et al.: not the same concept as society.fractionalization.ethnic.'
+  tags:
+  - source:hief
+  - licence:CC0-1.0
+- id: society.death_penalty_status
+  labels:
+    fr: Statut de la peine de mort (CDPD)
+    en: Death penalty status (CDPD)
+  definition: 'Death penalty status on 31 December: 0 abolished, 1 abolished for ordinary crimes only, 2 abolished for ordinary
+    crimes only but used during the last 10 years, 3 abolished in practice, 4 retained (CDPD codebook); value_text = label.'
+  unit: code
+  domain: society
+  subdomain: justice
+  theme: law
+  value_kind: numeric
+  source_order:
+  - cdpd.cdpd_v1.Deathpenalty
+  provider_declared: true
+  notes: Comparative Death Penalty Database v1 (Anckar & Denk 2024), Harvard Dataverse doi:10.7910/DVN/LI3WYK, CC0; 1800-2022.
+    Predecessor states are separate CDPD units (unmapped).
+  tags:
+  - source:cdpd
+  - licence:CC0-1.0
+  - ordinal
+- id: society.homicide_rate_who
+  labels:
+    fr: Taux d'homicide, estimation OMS
+    en: Homicide rate, WHO estimate
+  definition: WHO GHO indicator VIOLENCE_HOMICIDERATE ('Estimates of rates of homicides per 100 000 population'), SEX_BTSX.
+  unit: per 100 000 population
+  domain: society
+  subdomain: crime
+  theme: society
+  value_kind: numeric
+  source_order:
+  - who.gho_violence.VIOLENCE_HOMICIDERATE|sex=SEX_BTSX
+  provider_declared: true
+  notes: WHO Global Health Observatory, Global Health Estimates (CC BY 4.0 + WHO terms); uncertainty interval in flags.low/high.
+    WHO's modelled estimate, a different concept from the UNODC intentional-homicide series (criminal-justice/public-health
+    records) available as wb.vc.ihr.psrc.p5 (WDI copy, A-WB) and in the UN SDG table (VC_IHR_PSRC, A-UN).
+  tags:
+  - source:who
+  - licence:CC-BY-4.0
+- id: society.homicide_rate_who.female
+  labels:
+    fr: Taux d'homicide, femmes, estimation OMS
+    en: Homicide rate, females, WHO estimate
+  definition: WHO GHO indicator VIOLENCE_HOMICIDERATE ('Estimates of rates of homicides per 100 000 population'), SEX_FMLE.
+  unit: per 100 000 population
+  domain: society
+  subdomain: crime
+  theme: society
+  value_kind: numeric
+  source_order:
+  - who.gho_violence.VIOLENCE_HOMICIDERATE|sex=SEX_FMLE
+  provider_declared: true
+  notes: WHO Global Health Observatory, Global Health Estimates (CC BY 4.0 + WHO terms); uncertainty interval in flags.low/high.
+    WHO's modelled estimate, a different concept from the UNODC intentional-homicide series (criminal-justice/public-health
+    records) available as wb.vc.ihr.psrc.p5 (WDI copy, A-WB) and in the UN SDG table (VC_IHR_PSRC, A-UN).
+  tags:
+  - source:who
+  - licence:CC-BY-4.0
+- id: society.homicide_rate_who.male
+  labels:
+    fr: Taux d'homicide, hommes, estimation OMS
+    en: Homicide rate, males, WHO estimate
+  definition: WHO GHO indicator VIOLENCE_HOMICIDERATE ('Estimates of rates of homicides per 100 000 population'), SEX_MLE.
+  unit: per 100 000 population
+  domain: society
+  subdomain: crime
+  theme: society
+  value_kind: numeric
+  source_order:
+  - who.gho_violence.VIOLENCE_HOMICIDERATE|sex=SEX_MLE
+  provider_declared: true
+  notes: WHO Global Health Observatory, Global Health Estimates (CC BY 4.0 + WHO terms); uncertainty interval in flags.low/high.
+    WHO's modelled estimate, a different concept from the UNODC intentional-homicide series (criminal-justice/public-health
+    records) available as wb.vc.ihr.psrc.p5 (WDI copy, A-WB) and in the UN SDG table (VC_IHR_PSRC, A-UN).
+  tags:
+  - source:who
+  - licence:CC-BY-4.0
+- id: society.homicides_who
+  labels:
+    fr: Nombre d'homicides, estimation OMS
+    en: Number of homicides, WHO estimate
+  definition: WHO GHO indicator VIOLENCE_HOMICIDENUM ('Estimates of number of homicides'), SEX_BTSX.
+  unit: homicides (number)
+  domain: society
+  subdomain: crime
+  theme: society
+  value_kind: numeric
+  source_order:
+  - who.gho_violence.VIOLENCE_HOMICIDENUM|sex=SEX_BTSX
+  provider_declared: true
+  notes: WHO Global Health Observatory, Global Health Estimates (CC BY 4.0 + WHO terms); uncertainty interval in flags.low/high.
+    WHO's modelled estimate, a different concept from the UNODC intentional-homicide series (criminal-justice/public-health
+    records) available as wb.vc.ihr.psrc.p5 (WDI copy, A-WB) and in the UN SDG table (VC_IHR_PSRC, A-UN).
+  tags:
+  - source:who
+  - licence:CC-BY-4.0
+- id: society.cpi_score
+  labels:
+    fr: Indice de perception de la corruption, score (TI)
+    en: Corruption Perceptions Index score (TI)
+  definition: Perceived level of public-sector corruption on a scale of 0 (highly corrupt) to 100 (very clean), Transparency
+    International CPI.
+  unit: score (0-100)
+  domain: society
+  subdomain: governance
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ti.cpi.cpi_score
+  provider_declared: true
+  notes: 'Transparency International, CPI 2025 results workbook (sheet ''CPI Historical''), CC BY-ND 4.0: values exactly as
+    published. TI states that scores are comparable over time from CPI 2012. Not an observed corruption rate: an aggregate
+    of expert and business perception surveys (13 sources). Related V-Dem corruption indices: politics.vdem.*_corruption (A-POL).'
+  tags:
+  - source:ti
+  - licence:CC-BY-ND-4.0
+- id: society.cpi_rank
+  labels:
+    fr: Indice de perception de la corruption, rang (TI)
+    en: Corruption Perceptions Index rank (TI)
+  definition: Rank of the country among those scored in the CPI edition of that year (1 = least corrupt perception).
+  unit: rank
+  domain: society
+  subdomain: governance
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ti.cpi.rank
+  provider_declared: true
+  notes: 'Transparency International, CPI 2025 results workbook (sheet ''CPI Historical''), CC BY-ND 4.0: values exactly as
+    published. TI states that scores are comparable over time from CPI 2012. Not an observed corruption rate: an aggregate
+    of expert and business perception surveys (13 sources). Related V-Dem corruption indices: politics.vdem.*_corruption (A-POL).
+    The number of countries ranked varies by year.'
+- id: society.cpi_standard_error
+  labels:
+    fr: Indice de perception de la corruption, erreur type (TI)
+    en: Corruption Perceptions Index standard error (TI)
+  definition: Standard error of the CPI score as published by TI.
+  unit: score points
+  domain: society
+  subdomain: governance
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ti.cpi.standard_error
+  provider_declared: true
+  notes: 'Transparency International, CPI 2025 results workbook (sheet ''CPI Historical''), CC BY-ND 4.0: values exactly as
+    published. TI states that scores are comparable over time from CPI 2012. Not an observed corruption rate: an aggregate
+    of expert and business perception surveys (13 sources). Related V-Dem corruption indices: politics.vdem.*_corruption (A-POL).'
+- id: society.cpi_sources
+  labels:
+    fr: Indice de perception de la corruption, nombre de sources (TI)
+    en: Corruption Perceptions Index, number of sources (TI)
+  definition: Number of data sources used for the country's CPI score.
+  unit: count
+  domain: society
+  subdomain: governance
+  theme: politics
+  value_kind: numeric
+  source_order:
+  - ti.cpi.number_of_sources
+  provider_declared: true
+  notes: 'Transparency International, CPI 2025 results workbook (sheet ''CPI Historical''), CC BY-ND 4.0: values exactly as
+    published. TI states that scores are comparable over time from CPI 2012. Not an observed corruption rate: an aggregate
+    of expert and business perception surveys (13 sources). Related V-Dem corruption indices: politics.vdem.*_corruption (A-POL).'
+- id: society.gender.sigi.score
+  labels:
+    fr: Score SIGI (discrimination dans les institutions sociales) (OCDE SIGI 2023)
+    en: SIGI score (discrimination in social institutions) (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure SIGI: ''SIGI score (discrimination in social institutions)'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.SIGI
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.restricted_physical_integrity
+  labels:
+    fr: 'SIGI : intégrité physique restreinte (OCDE SIGI 2023)'
+    en: 'SIGI: restricted physical integrity (OECD SIGI 2023)'
+  definition: 'OECD SIGI 2023 measure SIGI_RPI: ''SIGI: restricted physical integrity'', 0 (no discrimination) to 100 (absolute
+    discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.SIGI_RPI
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.discrimination_in_family
+  labels:
+    fr: 'SIGI : discrimination au sein de la famille (OCDE SIGI 2023)'
+    en: 'SIGI: discrimination in the family (OECD SIGI 2023)'
+  definition: 'OECD SIGI 2023 measure SIGI_DF: ''SIGI: discrimination in the family'', 0 (no discrimination) to 100 (absolute
+    discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.SIGI_DF
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.restricted_assets
+  labels:
+    fr: 'SIGI : accès restreint aux ressources productives et financières (OCDE SIGI 2023)'
+    en: 'SIGI: restricted access to productive and financial resources (OECD SIGI 2023)'
+  definition: 'OECD SIGI 2023 measure SIGI_RAPFR: ''SIGI: restricted access to productive and financial resources'', 0 (no
+    discrimination) to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.SIGI_RAPFR
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.restricted_civil_liberties
+  labels:
+    fr: 'SIGI : libertés civiles restreintes (OCDE SIGI 2023)'
+    en: 'SIGI: restricted civil liberties (OECD SIGI 2023)'
+  definition: 'OECD SIGI 2023 measure SIGI_RCL: ''SIGI: restricted civil liberties'', 0 (no discrimination) to 100 (absolute
+    discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.SIGI_RCL
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.child_marriage
+  labels:
+    fr: 'Discrimination juridique : mariage des enfants (OCDE SIGI 2023)'
+    en: Legal discrimination on child marriage (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure DF_CM_LAW: ''Legal discrimination on child marriage'', 0 (no discrimination) to 100
+    (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.DF_CM_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.household_responsibilities
+  labels:
+    fr: 'Discrimination juridique : responsabilités au sein du ménage (OCDE SIGI 2023)'
+    en: Legal discrimination on household responsibilities (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure DF_HR_LAW: ''Legal discrimination on household responsibilities'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.DF_HR_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.divorce
+  labels:
+    fr: 'Discrimination juridique : divorce (OCDE SIGI 2023)'
+    en: Legal discrimination on divorce (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure DF_DV_LAW: ''Legal discrimination on divorce'', 0 (no discrimination) to 100 (absolute
+    discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.DF_DV_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.inheritance
+  labels:
+    fr: 'Discrimination juridique : héritage (OCDE SIGI 2023)'
+    en: Legal discrimination on inheritance (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure DF_IN_LAW: ''Legal discrimination on inheritance'', 0 (no discrimination) to 100 (absolute
+    discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.DF_IN_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.violence_against_women
+  labels:
+    fr: 'Discrimination juridique : violences faites aux femmes (OCDE SIGI 2023)'
+    en: Legal discrimination on violence against women (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RPI_VAW_LAW: ''Legal discrimination on violence against women'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RPI_VAW_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.fgm
+  labels:
+    fr: 'Discrimination juridique : mutilations génitales féminines (OCDE SIGI 2023)'
+    en: Legal discrimination on female genital mutilation (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RPI_FGM_LAW: ''Legal discrimination on female genital mutilation'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RPI_FGM_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.reproductive_autonomy
+  labels:
+    fr: 'Discrimination juridique : autonomie reproductive (OCDE SIGI 2023)'
+    en: Legal discrimination on reproductive autonomy (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RPI_RA_LAW: ''Legal discrimination on reproductive autonomy'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RPI_RA_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.land_assets
+  labels:
+    fr: 'Discrimination juridique : accès à la terre (OCDE SIGI 2023)'
+    en: Legal discrimination on access to land assets (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RAPFR_LND_LAW: ''Legal discrimination on access to land assets'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RAPFR_LND_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.non_land_assets
+  labels:
+    fr: 'Discrimination juridique : accès aux biens non fonciers (OCDE SIGI 2023)'
+    en: Legal discrimination on access to non-land assets (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RAPFR_HSE_LAW: ''Legal discrimination on access to non-land assets'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RAPFR_HSE_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.financial_assets
+  labels:
+    fr: 'Discrimination juridique : accès aux services financiers (OCDE SIGI 2023)'
+    en: Legal discrimination on access to financial assets (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RAPFR_AFS_LAW: ''Legal discrimination on access to financial assets'', 0 (no discrimination)
+    to 100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RAPFR_AFS_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.workplace_rights
+  labels:
+    fr: 'Discrimination juridique : droits au travail (OCDE SIGI 2023)'
+    en: Legal discrimination on workplace rights (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RAPFR_WR_LAW: ''Legal discrimination on workplace rights'', 0 (no discrimination) to
+    100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RAPFR_WR_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.citizenship_rights
+  labels:
+    fr: 'Discrimination juridique : droits de citoyenneté (OCDE SIGI 2023)'
+    en: Legal discrimination on citizenship rights (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RCL_CR_LAW: ''Legal discrimination on citizenship rights'', 0 (no discrimination) to
+    100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RCL_CR_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.political_voice
+  labels:
+    fr: 'Discrimination juridique : participation politique (OCDE SIGI 2023)'
+    en: Legal discrimination on political voice (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RCL_PV_LAW: ''Legal discrimination on political voice'', 0 (no discrimination) to 100
+    (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RCL_PV_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.freedom_of_movement
+  labels:
+    fr: 'Discrimination juridique : liberté de circulation (OCDE SIGI 2023)'
+    en: Legal discrimination on freedom of movement (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RCL_FM_LAW: ''Legal discrimination on freedom of movement'', 0 (no discrimination) to
+    100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RCL_FM_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender
+- id: society.gender.sigi.law.access_to_justice
+  labels:
+    fr: 'Discrimination juridique : accès à la justice (OCDE SIGI 2023)'
+    en: Legal discrimination on access to justice (OECD SIGI 2023)
+  definition: 'OECD SIGI 2023 measure RCL_AJ_LAW: ''Legal discrimination on access to justice'', 0 (no discrimination) to
+    100 (absolute discrimination).'
+  unit: 0-100 scale
+  domain: society
+  subdomain: gender
+  theme: society
+  value_kind: numeric
+  source_order:
+  - oecd.sigi2023.RCL_AJ_LAW
+  provider_declared: true
+  notes: OECD Development Centre, SIGI 2023 / GID-DB 2023 (SDMX dataflows DF_SIGI_2023, DF_GID_2023), OECD terms. Scale 0
+    (no discrimination) to 100 (absolute discrimination). Legal-framework variables are OECD's coding of laws (0, 25, 50,
+    75, 100 levels mostly). Women, Business and the Law (A-LAW) covers related legal questions with a different method.
+  tags:
+  - source:oecd
+  - gender

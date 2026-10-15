@@ -66,6 +66,7 @@ class Concept:
     file: str = ""
     provider_declared: bool = True
     theme: str | None = None
+    fr_label: str | None = None  # "missing": no French label yet (labels has no "fr")
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -76,6 +77,7 @@ class Concept:
             "domain": self.domain,
             "subdomain": self.subdomain,
             "theme": self.theme,
+            "fr_label": self.fr_label,
             "value_kind": self.value_kind,
             "source_order": [s.key for s in self.source_order],
             "provider_declared": self.provider_declared,
@@ -147,6 +149,11 @@ def _validate_doc(doc: Any, name: str) -> list[str]:
     if errs:
         return errs[:20]
     out = []
+    for c in doc["concepts"]:
+        if "fr" not in c["labels"] and c.get("fr_label") != "missing":
+            out.append(f"concept {c['id']}: labels.fr missing (declare fr_label: missing, never copy English)")
+        if "fr" in c["labels"] and c.get("fr_label") == "missing":
+            out.append(f"concept {c['id']}: fr_label: missing but labels.fr is given")
     stem = Path(name).stem
     if doc["domain"] != stem:
         out.append(f"domain {doc['domain']!r} must equal the file name {stem!r}")
@@ -208,6 +215,85 @@ def load_themes(path: Path = THEMES_PATH) -> Themes:
     return Themes(labels, rules, defaults, frozenset(doc.get("subdomain_themed_domains") or ()), aliases)
 
 
+#: Safe YAML loader, libyaml-backed when available (10x faster on the 9 MB World Bank catalog).
+_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+_PARSED: dict[tuple[str, str], tuple[Any, list[str]]] = {}
+
+
+_PARSE_FORMAT = "atlas-catalog-parsed/1"
+
+
+def _disk_path(name: str, sha: str) -> Path | None:
+    """JSON cache of a parsed + validated catalog file (big files: YAML parse + schema validation of
+    the 9 MB World Bank catalog take ~15 s). Keyed by the file's and the schema's sha256 and the cache
+    format; JSON only (never pickle), written atomically; any read problem means a fresh parse."""
+    import hashlib
+    import os
+    import tempfile
+
+    if len(sha) != 64:
+        return None
+    base = Path(os.environ.get("REVA_ATLAS_CACHE_DIR") or Path(tempfile.gettempdir()) / "reva-atlas-cache")
+    schema = hashlib.sha256(SCHEMA_PATH.read_bytes() + _PARSE_FORMAT.encode()).hexdigest()[:16]
+    return base / "catalog" / f"{Path(name).stem}-{sha}-{schema}.json"
+
+
+def _disk_cached(name: str, sha: str) -> tuple[Any, list[str]] | None:
+    p = _disk_path(name, sha)
+    try:
+        if p is None or not p.exists() or p.stat().st_size < 1_000_000:  # only worth it for big files
+            return None
+        d = json.loads(p.read_bytes())
+        if d.get("format") != _PARSE_FORMAT or d.get("sha256") != sha or d.get("file") != name:
+            return None
+        return d["doc"], list(d["errors"])
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
+
+
+def _disk_store(name: str, sha: str, hit: tuple[Any, list[str]]) -> None:
+    import os
+    import tempfile
+
+    p = _disk_path(name, sha)
+    if p is None or hit[1]:
+        return
+    try:
+        blob = json.dumps({"format": _PARSE_FORMAT, "file": name, "sha256": sha, "doc": hit[0], "errors": hit[1]})
+        if len(blob) < 1_000_000:
+            return
+        p.parent.mkdir(parents=True, exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=p.parent, suffix=".tmp")
+        with os.fdopen(fd, "w") as f:
+            f.write(blob)
+        os.replace(tmp, p)
+    except (OSError, TypeError, ValueError):  # a cache, never fatal
+        return
+
+
+def _parsed(name: str, data: bytes) -> tuple[Any, list[str]]:
+    """Parsed + validated document, cached per process by (file name, sha256 of its bytes): a file
+    is re-parsed and re-validated only when its content changes. Cached docs are never mutated."""
+    import hashlib
+
+    key = (name, hashlib.sha256(data).hexdigest())
+    hit = _PARSED.get(key)
+    if hit is None:
+        hit = _disk_cached(name, key[1])
+    if hit is None:
+        try:
+            doc = yaml.load(data, Loader=_YAML_LOADER)  # noqa: S506 - SafeLoader / CSafeLoader only
+        except yaml.YAMLError as e:
+            hit = (None, [f"invalid YAML: {str(e)[:200]}"])
+        else:
+            hit = (doc, _validate_doc(doc, name))
+            _disk_store(name, key[1], hit)
+        for k in [k for k in _PARSED if k[0] == name]:  # one cached version per file
+            _PARSED.pop(k)
+        _PARSED[key] = hit
+    return hit
+
+
 def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True, themes_path: Path = THEMES_PATH) -> Catalog:
     """Load and validate every ``<domain>.yaml``. ``strict`` raises on the first problem."""
     import hashlib
@@ -217,12 +303,7 @@ def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True, themes_p
     files = sorted(p for p in directory.glob("*.y*ml") if not p.name.startswith("_"))
     for p in files:
         data = p.read_bytes()
-        try:
-            doc = yaml.safe_load(data)
-        except yaml.YAMLError as e:
-            errs = [f"invalid YAML: {str(e)[:200]}"]
-        else:
-            errs = _validate_doc(doc, p.name)
+        doc, errs = _parsed(p.name, data)
         if not errs:
             dup = [c["id"] for c in doc["concepts"] if c["id"] in cat.concepts]
             if dup:
@@ -252,6 +333,7 @@ def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True, themes_p
                 tags=tuple(c.get("tags") or ()),
                 file=p.name,
                 theme=theme,
+                fr_label=c.get("fr_label"),
             )
     return cat
 

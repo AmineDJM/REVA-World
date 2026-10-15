@@ -13,9 +13,15 @@ each turns into an XPASS failure once its defect is fixed, so remove the marker 
 provider fixtures parsed through the real connectors (no DB) and compared with values fetched live from the
 providers (one small request at a time); the requested unit and integration suites.
 
-Test status (working tree at review end): `tests/unit/links tests/unit/nlqa tests/unit/test_kg_model.py
-tests/unit/test_atlas_*.py` — 471 passed (first run); integration `test_kg_api, test_kg_paths, test_kg_store,
-test_atlas_api, test_atlas_ingest, test_links_db, test_nlqa_api` + `tests/review_v3` — 60 passed, 14 xfailed.
+Test status: `tests/unit/links tests/unit/nlqa tests/unit/test_kg_model.py tests/unit/test_atlas_*.py` — 471
+passed at the start of the review; integration `test_kg_api, test_kg_paths, test_kg_store, test_atlas_api,
+test_atlas_ingest, test_links_db, test_nlqa_api` + `tests/review_v3` — 60 passed, 14 xfailed. Re-run at the end
+on the moving tree: 536 passed, 18 failed (+ `test_atlas_factbook_profiles.py` fails collection). Of the
+in-scope ones, `test_atlas_imf.py::test_weo_geography_mapping`, `test_atlas_ilo.py::test_mean_earnings_and_geo_mapping`
+and `test_atlas_qol_connectors.py::test_wid_reads_only_needed_members_by_range` fail because the crosswalk
+gained `TWN` (251 entities, commit of 23:26) while the tests and the IMF/ILO module docs still say Taiwan stays
+unmapped — owners A-IMF/A-ILO/A-QOL must update tests and docstrings (the others, e.g.
+`test_atlas_worldbank.py`, belong to agents outside this review).
 
 ## Findings by severity
 

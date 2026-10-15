@@ -30,7 +30,7 @@ from reva.adapters.connectors.atlas_fao import (
     parse_listing,
 )
 from reva.atlas.sources import MAX_ATLAS_RESPONSE_BYTES, discover
-from reva.atlas.tables import validate_atlas_frame
+from reva.atlas.tables import known_country_keys, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp, _fixture_fingerprint
 
 FIX = Path(__file__).resolve().parents[1] / "fixtures" / "source" / "atlas.fao"
@@ -122,7 +122,8 @@ def test_every_fixture_domain_parses_into_a_valid_atlas_table(ds: str) -> None:
 def test_area_mapping_uses_m49_and_keeps_aggregates_and_historical_states_unmapped() -> None:
     assert fao_area_iso3("'156") == "CHN"  # FAO 41 "China, mainland"
     assert fao_area_iso3("159") is None  # FAO 351 "China" (incl. Taiwan, Hong Kong, Macao): aggregate
-    assert fao_area_iso3("158") is None  # Taiwan: not a crosswalk entity
+    # FAO 214 "China, Taiwan Province of" (M49 158): mapped only when the crosswalk lists TWN
+    assert fao_area_iso3("158") == ("TWN" if "TWN" in known_country_keys() else None)
     assert fao_area_iso3("'830") == "CHI"  # alias a_fao.yaml
     assert fao_area_iso3("810") is None and fao_area_iso3("736") is None  # USSR, Sudan (former)
     assert fao_area_iso3("729") == "SDN" and fao_area_iso3("231") == "ETH"

@@ -100,12 +100,14 @@ def test_minimum_wage_keeps_provider_currencies(ilo_tables: dict[str, pl.DataFra
 def test_mean_earnings_and_geo_mapping(ilo_tables: dict[str, pl.DataFrame]) -> None:
     ea = ilo_tables["ilostat.ear_emta_sex_cur_nb_a"]
     assert _cell(ea, "FRA", "EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU", 2025)["value"] == "4445.62"
-    # ILOSTAT KOS -> crosswalk XKX (registry/atlas/geo_aliases/ilo.yaml); TWN / X01 stay unmapped but kept
+    # ILOSTAT KOS -> crosswalk XKX (registry/atlas/geo_aliases/ilo.yaml); X01 stays unmapped but kept;
+    # TWN "Taiwan, China" maps to the crosswalk entity TWN (crosswalk 1.1.0, ISO 3166-1)
     assert country_iso3("KOS", "ilo") == "XKX" and country_iso3("CHA", "ilo") == "CHI"
     assert "XKX" in set(ea["iso3"].drop_nulls().to_list())
     une = ilo_tables["ilostat.une_deap_sex_age_rt_a"]
     unmapped = set(une.filter(pl.col("iso3").is_null())["provider_geo"].to_list())
-    assert unmapped == {"TWN", "X01"}
+    assert unmapped == {"X01"}
+    assert set(une.filter(pl.col("provider_geo") == "TWN")["iso3"].to_list()) == {"TWN"}
 
 
 def test_modelled_and_national_estimates_are_labelled(ilo_tables: dict[str, pl.DataFrame]) -> None:

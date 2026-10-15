@@ -1,0 +1,174 @@
+# Anchor chains (owner: KGHIST): 20 connections the REVA path engine must be able to explain.
+#
+# These are ACCEPTANCE TESTS for the path engine (/v1/kg/path), not hard-coded paths. A chain passes when
+# the engine, restricted to the hop properties below (minus `exclude` and the global `excluded_properties`),
+# returns a simple path from `from` to `to` with at most `max_hops` hops such that
+#   * every class in `require_all` labels at least one hop,
+#   * every group in `require_any` has at least one class labelling at least one hop,
+#   * when `via_any` is given, the path passes through at least one of those entities
+#     (owner-named waypoints such as "via the Louisiana Purchase"; any route through them is accepted),
+# and every hop cites its statement (Wikidata statement id + entity revision, or WDQS query sha + raw sha).
+# Path engines are expected to search k shortest paths (k >= 10) under these filters, because the
+# plain shortest path is often a present-day shortcut (e.g. diplomatic relations) or a hub hop.
+#
+# Wording rule (docs/roadmap/v3_world_graph.md): a path is "connected via" + property labels; never causal.
+# `asserted_causation` hops (P828/P1542/...) may be shown only as "asserted by Wikidata".
+#
+# `expectation`:
+#   path_expected       a witness path satisfying the constraints exists in the recorded Wikidata claims
+#                       (registry/kg/queries/history/_recorded/snapshot_claims_*.json, checked offline by
+#                       tests/unit/test_kg_queries_history.py) -> the full KG must find one too.
+#   path_may_be_absent  Wikidata (as recorded) does not state the link the question is about; the engine must
+#                       answer honestly ("no sourced path within N hops") or find one in other sources
+#                       (e.g. UN General Assembly votes for the US position on decolonisation, KGGEOPOL).
+#                       It must never invent a hop.
+#
+# `expected_facts`: statements the explanation should be able to cite, each backed by the recorded snapshot
+# (subject, property, object or year).
+#
+# Entity QIDs were looked up in Wikidata (never typed from memory): `verified: enwiki_title_lookup` =
+# wbgetentities by English Wikipedia title (title_lookup*.json.raw); `wdqs_label_lookup` = English label
+# lookup through WDQS (label_lookup_1.srj). Retrieved 2026-10-15 through WDHARVEST's locked client.
+
+version: 1
+retrieved: "2026-10-15"
+
+excluded_properties: [P31, P279, P1343, P910, P1269, P2184, P921, P1889, P460, P5008, P373]
+
+hop_classes:
+  territorial:
+    label_en: "territorial or sovereignty tie (country, part of, has part, contains, located in, owned by, claimed by)"
+    properties: [P17, P361, P527, P150, P131, P127, P1336]
+  state_succession:
+    label_en: "replaces / replaced by / follows / followed by"
+    properties: [P1365, P1366, P155, P156]
+  official_language:
+    label_en: "official language / language used"
+    properties: [P37, P2936]
+  treaty_signatory:
+    label_en: "signatory"
+    properties: [P1891]
+  participation:
+    label_en: "participant / participant in / conflict / operator"
+    properties: [P710, P1344, P607, P137]
+  significant_event:
+    label_en: "significant event / part of a larger event"
+    properties: [P793, P361]
+  voyage_geography:
+    label_en: "start point / destination point / discoverer"
+    properties: [P1427, P1444, P61]
+  leadership:
+    label_en: "head of state or government, position held, allegiance, citizenship, employer, founder"
+    properties: [P35, P6, P39, P1906, P1313, P945, P27, P108, P112]
+  location:
+    label_en: "location / country of an event"
+    properties: [P276, P17]
+  asserted_causation:
+    label_en: "has cause / has effect (asserted by Wikidata, never inferred)"
+    properties: [P828, P1542, P1478, P1479, P1536, P1537]
+  era:
+    label_en: "time period"
+    properties: [P2348]
+  modern_relations:
+    label_en: "present-day relations that short-circuit historical explanations"
+    properties: [P530, P47, P463]
+
+entities:
+  christopher_columbus: {qid: Q7322, label_en: "Christopher Columbus", verified: enwiki_title_lookup}
+  pedro_alvares_cabral: {qid: Q174432, label_en: "Pedro Álvares Cabral", verified: enwiki_title_lookup}
+  treaty_of_tordesillas: {qid: Q180897, label_en: "Treaty of Tordesillas", verified: enwiki_title_lookup}
+  crown_of_castile: {qid: Q217196, label_en: "Crown of Castile", verified: enwiki_title_lookup}
+  kingdom_of_portugal: {qid: Q45670, label_en: "Kingdom of Portugal", verified: enwiki_title_lookup}
+  portuguese_empire: {qid: Q200464, label_en: "Portuguese Empire", verified: enwiki_title_lookup}
+  spanish_empire: {qid: Q80702, label_en: "Spanish Empire", verified: enwiki_title_lookup}
+  british_empire: {qid: Q8680, label_en: "British Empire", verified: enwiki_title_lookup}
+  french_colonial_empire: {qid: Q179023, label_en: "French colonial empire", verified: enwiki_title_lookup}
+  dutch_empire: {qid: Q130654, label_en: "Dutch Empire", verified: wdqs_label_lookup}
+  colonial_brazil: {qid: Q2088324, label_en: "Colonial Brazil", verified: enwiki_title_lookup}
+  state_of_brazil: {qid: Q11876909, label_en: "State of Brazil", verified: enwiki_title_lookup}
+  uk_portugal_brazil_algarves: {qid: Q903779, label_en: "United Kingdom of Portugal, Brazil and the Algarves", verified: enwiki_title_lookup}
+  empire_of_brazil: {qid: Q217230, label_en: "Empire of Brazil", verified: enwiki_title_lookup}
+  independence_of_brazil: {qid: Q1548600, label_en: "Independence of Brazil", verified: enwiki_title_lookup}
+  discovery_of_brazil: {qid: Q3042917, label_en: "Discovery of Brazil", verified: enwiki_title_lookup}
+  brazil: {qid: Q155, label_en: "Brazil", verified: enwiki_title_lookup}
+  portugal: {qid: Q45, label_en: "Portugal", verified: enwiki_title_lookup}
+  spain: {qid: Q29, label_en: "Spain", verified: enwiki_title_lookup}
+  united_states: {qid: Q30, label_en: "United States", verified: enwiki_title_lookup}
+  france: {qid: Q142, label_en: "France", verified: enwiki_title_lookup}
+  united_kingdom: {qid: Q145, label_en: "United Kingdom", verified: enwiki_title_lookup}
+  portuguese_language: {qid: Q5146, label_en: "Portuguese language", verified: enwiki_title_lookup}
+  spanish_language: {qid: Q1321, label_en: "Spanish language", verified: enwiki_title_lookup}
+  english_language: {qid: Q1860, label_en: "English language", verified: enwiki_title_lookup}
+  napoleon: {qid: Q517, label_en: "Napoleon", verified: enwiki_title_lookup}
+  louisiana_purchase: {qid: Q193155, label_en: "Louisiana Purchase", verified: enwiki_title_lookup}
+  louisiana_new_france: {qid: Q658054, label_en: "Louisiana (New France)", verified: enwiki_title_lookup}
+  kingdom_of_france: {qid: Q70972, label_en: "Kingdom of France", verified: enwiki_title_lookup}
+  french_first_republic: {qid: Q58296, label_en: "French First Republic", verified: enwiki_title_lookup}
+  first_french_empire: {qid: Q71084, label_en: "First French Empire", verified: enwiki_title_lookup}
+  berlin_conference: {qid: Q13582, label_en: "Berlin Conference", verified: enwiki_title_lookup}
+  scramble_for_africa: {qid: Q179848, label_en: "Scramble for Africa", verified: enwiki_title_lookup}
+  congo_free_state: {qid: Q76048, label_en: "Congo Free State", verified: enwiki_title_lookup}
+  belgian_congo: {qid: Q213510, label_en: "Belgian Congo", verified: enwiki_title_lookup}
+  leopold_ii: {qid: Q12967, label_en: "Leopold II of Belgium", verified: enwiki_title_lookup}
+  dr_congo: {qid: Q974, label_en: "Democratic Republic of the Congo", verified: enwiki_title_lookup}
+  suez_crisis: {qid: Q49101, label_en: "Suez Crisis", verified: enwiki_title_lookup}
+  cold_war: {qid: Q8683, label_en: "Cold War", verified: enwiki_title_lookup}
+  decolonisation_of_africa: {qid: Q1146918, label_en: "Decolonisation of Africa", verified: enwiki_title_lookup}
+  new_spain: {qid: Q170603, label_en: "New Spain", verified: enwiki_title_lookup}
+  mexico: {qid: Q96, label_en: "Mexico", verified: enwiki_title_lookup}
+  mexican_war_of_independence: {qid: Q68750, label_en: "Mexican War of Independence", verified: enwiki_title_lookup}
+  british_raj: {qid: Q129286, label_en: "British Raj", verified: enwiki_title_lookup}
+  dominion_of_pakistan: {qid: Q2006542, label_en: "Dominion of Pakistan", verified: enwiki_title_lookup}
+  pakistan: {qid: Q843, label_en: "Pakistan", verified: enwiki_title_lookup}
+  partition_of_india: {qid: Q129053, label_en: "Partition of India", verified: enwiki_title_lookup}
+  india: {qid: Q668, label_en: "India", verified: enwiki_title_lookup}
+  french_algeria: {qid: Q218272, label_en: "French Algeria", verified: enwiki_title_lookup}
+  algerian_war: {qid: Q200790, label_en: "Algerian War", verified: enwiki_title_lookup}
+  evian_accords: {qid: Q1471139, label_en: "Évian Accords", verified: enwiki_title_lookup}
+  algeria: {qid: Q262, label_en: "Algeria", verified: enwiki_title_lookup}
+  dutch_east_indies: {qid: Q188161, label_en: "Dutch East Indies", verified: enwiki_title_lookup}
+  indonesian_national_revolution: {qid: Q1332160, label_en: "Indonesian National Revolution", verified: enwiki_title_lookup}
+  indonesia: {qid: Q252, label_en: "Indonesia", verified: enwiki_title_lookup}
+  carnation_revolution: {qid: Q193245, label_en: "Carnation Revolution", verified: enwiki_title_lookup}
+  portuguese_colonial_war: {qid: Q609836, label_en: "Portuguese Colonial War", verified: enwiki_title_lookup}
+  portuguese_angola: {qid: Q2826232, label_en: "Portuguese Angola", verified: enwiki_title_lookup}
+  angolan_war_of_independence: {qid: Q1780216, label_en: "Angolan War of Independence", verified: enwiki_title_lookup}
+  angola: {qid: Q916, label_en: "Angola", verified: enwiki_title_lookup}
+  vasco_da_gama: {qid: Q7328, label_en: "Vasco da Gama", verified: enwiki_title_lookup}
+  sea_route_to_india: {qid: Q951383, label_en: "Portuguese discovery of the sea route to India", verified: enwiki_title_lookup}
+  portuguese_india: {qid: Q323904, label_en: "Portuguese India", verified: enwiki_title_lookup}
+  annexation_of_goa: {qid: Q626191, label_en: "Annexation of Goa", verified: wdqs_label_lookup}
+  goa: {qid: Q1171, label_en: "Goa", verified: enwiki_title_lookup}
+  ferdinand_magellan: {qid: Q1496, label_en: "Ferdinand Magellan", verified: enwiki_title_lookup}
+  magellan_expedition: {qid: Q1225170, label_en: "Magellan expedition", verified: enwiki_title_lookup}
+  spanish_east_indies: {qid: Q910648, label_en: "Spanish East Indies", verified: enwiki_title_lookup}
+  captaincy_general_philippines: {qid: Q2721139, label_en: "Captaincy General of the Philippines", verified: enwiki_title_lookup}
+  philippines: {qid: Q928, label_en: "Philippines", verified: enwiki_title_lookup}
+  american_revolutionary_war: {qid: Q40949, label_en: "American Revolutionary War", verified: enwiki_title_lookup}
+  treaty_of_paris_1783: {qid: Q217450, label_en: "Treaty of Paris (1783)", verified: enwiki_title_lookup}
+  treaty_of_alliance_1778: {qid: Q2788282, label_en: "Treaty of Alliance (1778)", verified: enwiki_title_lookup}
+  haitian_revolution: {qid: Q689128, label_en: "Haitian Revolution", verified: enwiki_title_lookup}
+  saint_domingue: {qid: Q861551, label_en: "Saint-Domingue", verified: enwiki_title_lookup}
+  haiti: {qid: Q790, label_en: "Haiti", verified: enwiki_title_lookup}
+  ottoman_empire: {qid: Q12560, label_en: "Ottoman Empire", verified: enwiki_title_lookup}
+  treaty_of_lausanne: {qid: Q193258, label_en: "Treaty of Lausanne", verified: enwiki_title_lookup}
+  turkish_war_of_independence: {qid: Q234738, label_en: "Turkish War of Independence", verified: enwiki_title_lookup}
+  turkey: {qid: Q43, label_en: "Turkey", verified: enwiki_title_lookup}
+  russian_empire: {qid: Q34266, label_en: "Russian Empire", verified: enwiki_title_lookup}
+  russian_revolution: {qid: Q8729, label_en: "Russian Revolution", verified: enwiki_title_lookup}
+  russian_sfsr: {qid: Q2184, label_en: "Russian Soviet Federative Socialist Republic", verified: enwiki_title_lookup}
+  soviet_union: {qid: Q15180, label_en: "Soviet Union", verified: enwiki_title_lookup}
+  russia: {qid: Q159, label_en: "Russia", verified: enwiki_title_lookup}
+  simon_bolivar: {qid: Q8605, label_en: "Simón Bolívar", verified: enwiki_title_lookup}
+  gran_colombia: {qid: Q199821, label_en: "Gran Colombia", verified: enwiki_title_lookup}
+  venezuelan_war_of_independence: {qid: Q8934, label_en: "Venezuelan War of Independence", verified: enwiki_title_lookup}
+  venezuela: {qid: Q717, label_en: "Venezuela", verified: enwiki_title_lookup}
+  hernan_cortes: {qid: Q7326, label_en: "Hernán Cortés", verified: enwiki_title_lookup}
+  spanish_conquest_of_aztec_empire: {qid: Q828435, label_en: "Spanish conquest of the Aztec Empire", verified: enwiki_title_lookup}
+  aztec_empire: {qid: Q2608489, label_en: "Aztec Empire", verified: enwiki_title_lookup}
+  nigeria: {qid: Q1033, label_en: "Nigeria", verified: enwiki_title_lookup}
+  voyages_of_columbus: {qid: Q18578423, label_en: "Voyages of Christopher Columbus", verified: enwiki_title_lookup}
+  catholic_monarchs: {qid: Q186851, label_en: "Catholic Monarchs of Spain", verified: enwiki_title_lookup}
+  third_treaty_of_san_ildefonso: {qid: Q1259275, label_en: "Third Treaty of San Ildefonso", verified: enwiki_title_lookup}
+
+chains: []

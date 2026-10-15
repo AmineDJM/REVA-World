@@ -20,7 +20,7 @@ sparql: |
     }
     ?item wdt:P31 wd:Q5 .
   }
-max_rows: 50000
+max_rows: 35000
 timeout_seconds: 55
 expand_hops: 1
 properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,

@@ -103,7 +103,9 @@ def test_geo_aliases_are_evidence_backed_and_minimal():
     assert country_iso3("830", U.GEO_SCHEME) == "CHI"  # IMS Channel Islands
     assert country_iso3("250", U.GEO_SCHEME) == "FRA"
     assert country_iso3("772", U.GEO_SCHEME) == "TKL"  # territory without a World Bank code
-    assert country_iso3("158", U.GEO_SCHEME) is None  # Taiwan: not a crosswalk entity, kept unmapped
+    # XWALK (crosswalk 1.1.0): 158 is the ISO 3166-1 numeric code of TWN; UN rows label it
+    # "China, Taiwan Province of China", so it maps to TWN (CHN/TWN are never summed).
+    assert country_iso3("158", U.GEO_SCHEME) == "TWN"
     assert country_iso3("900", U.GEO_SCHEME) is None  # World aggregate
 
 
@@ -156,7 +158,8 @@ def test_wpp_geographies_kept_and_mapped(wpp_demo):
     _, f = wpp_demo
     geo = dict(f.select("provider_geo", "iso3").unique().iter_rows())
     assert geo["250"] == "FRA" and geo["412"] == "XKX" and geo["772"] == "TKL"
-    assert geo["158"] is None and geo["900"] is None and geo["1834"] is None  # kept, unmapped
+    assert geo["158"] == "TWN"  # XWALK: ISO 3166-1 numeric 158, labelled Taiwan by the provider
+    assert geo["900"] is None and geo["1834"] is None  # kept, unmapped
     tw = f.filter((pl.col("provider_geo") == "158") & (pl.col("indicator") == "TPopulation1July")).to_dicts()[0]
     assert _flags(tw)["geo_label"] == "China, Taiwan Province of China"
     world = f.filter(pl.col("provider_geo") == "900").to_dicts()[0]
@@ -238,8 +241,8 @@ def test_ims_world_totals_and_unmapped_kept(ims):
     chi = f.filter(pl.col("provider_geo") == "830")
     assert set(chi["iso3"]) == {"CHI"}
     tw = f.filter(pl.col("indicator").str.contains("origin=158"))
-    assert tw.height > 0 and _flags(tw.to_dicts()[0])["counterpart_iso3"] is None
-    assert {"code": "158", "label": "China, Taiwan Province of China"} in plan.report["unmapped_origins"]
+    assert tw.height > 0 and _flags(tw.to_dicts()[0])["counterpart_iso3"] == "TWN"  # XWALK
+    assert "158" not in {u["code"] for u in plan.report["unmapped_origins"]}
     assert f.filter(pl.col("provider_geo") == "900")["iso3"].is_null().all()
 
 

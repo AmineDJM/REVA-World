@@ -36,8 +36,8 @@ kept row becomes one atlas cell:
   the rows, else the parse is refused. FAO aggregates (World, regions, income groups, "China" = mainland +
   Hong Kong + Macao + Taiwan) and historical areas (USSR, Yugoslav SFR, Czechoslovakia, Ethiopia PDR,
   Sudan (former), Belgium-Luxembourg, Serbia and Montenegro, Netherlands Antilles (former), Yemen Ar Rp /
-  Dem, Pacific Islands Trust Territory) stay unmapped and are listed in each manifest; Taiwan
-  ("China, Taiwan Province of") is not a crosswalk entity and stays unmapped too;
+  Dem, Pacific Islands Trust Territory) stay unmapped and are listed in each manifest; "China, Taiwan
+  Province of" (M49 158) maps to TWN through the crosswalk M49 code;
 * the period from ``Year`` (``2020`` -> 2020; FAOSTAT 3-year averages ``2000-2002`` -> [2000, 2003)) and,
   for monthly domains, ``Months Code`` (7001..7012 -> that month; 7021 = annual value);
 * ``value`` = the reported number verbatim (strict decimal check, never rescaled); a reported

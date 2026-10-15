@@ -19,7 +19,7 @@ split:
   source: list
   qids: [Q36180, Q49757, Q6625963, Q214917, Q1028181, Q1281618, Q36834, Q42973, Q2526255]
   chunk_size: 1
-max_rows: 40000
+max_rows: 35000
 timeout_seconds: 55
 expand_hops: 1
 properties: [P31, P21, P27, P19, P20, P569, P570, P106, P101, P39, P102, P140, P172, P1412, P1344, P607, P793,

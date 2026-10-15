@@ -516,7 +516,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         frame, rep = parse_cpi(got.bodies["cpi.xlsx"], raw_sha256=got.shas["cpi.xlsx"], min_rows=CPI_MIN_ROWS if live else 1)
         note = (
             "Transparency International CPI 2012-2025 (CPI2025_Results.xlsx, sheet 'CPI Historical', cross-checked "
-            "with sheet 'CPI2025'); score, rank, standard error, number of sources, 90% CI bounds as published. "
+            "with sheet 'CPI2025'); score, rank, standard error, number of sources, lower/upper CI bounds as published. "
             "CC BY-ND 4.0: values unchanged; third-party source scores not ingested."
         )
         reg = run.register(
