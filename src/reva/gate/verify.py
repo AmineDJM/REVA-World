@@ -32,14 +32,13 @@ EXPECTED_RELATION_PRIVILEGES: dict[str, frozenset[str]] = {
 }
 #: SECURITY DEFINER functions the gate may execute.
 EXPECTED_DEFINER_FUNCTIONS = frozenset({"ops.record_gate_result(uuid,text,text,text,text,text,jsonb)"})
-#: Schemas that are never inspected (system catalogs; ``public`` holds only alembic_version and
-#: extension objects, compared like any other schema below except for its default USAGE).
-SYSTEM_SCHEMAS = ("pg_catalog", "information_schema", "pg_toast")
 #: ``public`` keeps PostgreSQL's default USAGE for every role (extension functions, alembic_version).
 DEFAULT_USAGE_SCHEMAS = frozenset({"public"})
 
 RELATIONS_SQL = """
 SELECT n.nspname || '.' || c.relname AS name,
+       EXISTS (SELECT 1 FROM pg_depend d WHERE d.classid = 'pg_class'::regclass AND d.objid = c.oid
+                 AND d.deptype = 'e') AS extension_member,
        coalesce(array_agg(p.priv ORDER BY p.priv) FILTER (WHERE CASE
          WHEN c.relkind = 'S' THEN p.priv IN ('USAGE','SELECT','UPDATE') AND has_sequence_privilege(c.oid, p.priv)
          WHEN p.priv IN ('SELECT','INSERT','UPDATE','REFERENCES') THEN has_any_column_privilege(c.oid, p.priv)
@@ -50,7 +49,7 @@ CROSS JOIN unnest(ARRAY['SELECT','INSERT','UPDATE','DELETE','TRUNCATE','REFERENC
 WHERE c.relkind IN ('r','p','v','m','f','S')
   AND n.nspname NOT IN ('pg_catalog','information_schema','pg_toast') AND n.nspname NOT LIKE 'pg_temp%'
   AND n.nspname NOT LIKE 'pg_toast_temp%'
-GROUP BY 1
+GROUP BY 1, 2
 ORDER BY 1
 """
 SCHEMAS_SQL = """
@@ -60,7 +59,7 @@ WHERE n.nspname NOT IN ('pg_catalog','information_schema','pg_toast') AND n.nspn
   AND n.nspname NOT LIKE 'pg_toast_temp%'
 """
 DEFINER_SQL = """
-SELECT n.nspname || '.' || p.proname || '(' || pg_get_function_identity_arguments(p.oid) || ')' AS name,
+SELECT n.nspname || '.' || p.proname || '(' || oidvectortypes(p.proargtypes) || ')' AS name,
        has_function_privilege(p.oid, 'EXECUTE') AS can_execute
 FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace
 WHERE p.prosecdef AND n.nspname NOT IN ('pg_catalog','information_schema')
@@ -109,8 +108,10 @@ def gate_privilege_report(engine: Engine) -> dict[str, Any]:
         for r in conn.execute(text(RELATIONS_SQL)).mappings():
             name, have = str(r["name"]), set(r["privs"] or ())
             want = set(EXPECTED_RELATION_PRIVILEGES.get(name, frozenset()))
-            if name == "public.alembic_version":
-                want |= {"SELECT"} & have  # the schema version probe (check_gate_login) may read it
+            if name == "public.alembic_version" or r["extension_member"]:
+                # the schema version probe (check_gate_login) may read alembic_version; extension
+                # catalogues (PostGIS spatial_ref_sys, geometry_columns, ...) are readable by every role
+                want |= {"SELECT"} & have
             if have - want:
                 problems.append(f"{name}: unexpected {', '.join(sorted(have - want))}")
             if want - have:

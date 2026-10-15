@@ -63,6 +63,9 @@ HANDLERS: dict[str, str] = {
     # --- GATE2: promote connector proposals whose reva_gate decision arrived after discovery stopped waiting
     "gate_followup": "reva.autonomy.followup:handle_gate_followup",
     # --- end GATE2
+    # --- BTAPI: stored back-tests of V2 models from release-pinned datasets (worker credentials)
+    "backtest": "reva.evaluation.backtests:handle_backtest",
+    # --- end BTAPI
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation

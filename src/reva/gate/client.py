@@ -9,7 +9,8 @@ the worker supplied is echoed back as a decision.
 
 If no decision arrives in time the client returns an *unrecorded* ``blocked`` decision
 whose first reason starts with ``gate_pending``: nothing is promoted, and the request
-stays queued for the gate (a later discovery run re-requests).
+stays queued for the gate. Once the gate records a pass, the scheduled ``gate_followup``
+worker job (``reva.autonomy.followup``) promotes it from the stored proposal.
 """
 
 from __future__ import annotations
@@ -179,7 +180,7 @@ class GateClient:
             decision_id=req, outcome="blocked", proposal_id=pid, policy_version="n/a", reports=refs,
             reasons=(f"{PENDING_REASON}: the independent gate process has not recorded a decision within "
                      f"{self.wait_seconds:.0f}s (request {req}); nothing was promoted. The request stays queued; "
-                     "re-run the step after the gate has decided.",),
+                     "the gate_followup job promotes a later gate pass from the stored proposal.",),
             reviewer_identity=self.evaluator, signed_receipt=None,
         )
 

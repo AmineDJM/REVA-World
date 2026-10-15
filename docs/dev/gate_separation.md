@@ -175,7 +175,7 @@ A second test covers the service failing closed: the kill switch records nothing
   - `model.evaluation`;
   - `meta.artifact` metadata;
   - objects in the store. The gate verifies digests, so content under a digest cannot change, but the worker can write new objects.
-- **`gate_pending`.** If the gate service is down, discovery reports `gate_pending` and does not promote. The request stays queued, and the gate decides it later, but nothing re-runs the promotion automatically: the next discovery run requests again. A follow-up job (`gate_followup`) would remove the need to re-run discovery. It is not implemented.
+- **`gate_pending`.** If the gate service is down, discovery reports `gate_pending` and does not promote. The request stays queued and the gate decides it later. The `gate_followup` worker job (GATE2, below) then promotes the late pass from the stored proposal.
 
 ## Follow-ups for other owners
 
@@ -188,3 +188,47 @@ A second test covers the service failing closed: the kill switch records nothing
 - AFX:
   - `PolicyPromotionGate._record` could assert `session_user = 'reva_gate'` before recording, for a clearer error than `permission denied`;
   - `_verify_gate_row` in `jobs.py` could also require `recorded_by = 'reva_gate'` as defence in depth. The database already enforces it at approval time.
+
+## GATE2 follow-ups (implemented 2026-10-15)
+
+**Late gate decisions: `gate_followup`.**
+- Handler: `reva.autonomy.followup:handle_gate_followup`, registered in `operations/jobs.HANDLERS`.
+- Schedule: `gate_followup:promotion`, every 300 s, in `cli/seed.DEFAULT_SCHEDULES`. `operations/schedules.SCHEDULE_JOB_TYPES` allows it.
+- Candidates are `connector_promotion` proposals that meet all of these:
+  - their newest decision is a `reva_gate` pass;
+  - the pass is not consumed by an `ops.approval_use`;
+  - the pass has no recorded `autonomy.gate_followup` outcome;
+  - the pass is younger than `max_age_hours` (default 168);
+  - the pass is older than `REVA_GATE_WAIT_SECONDS` + 30 s, so a discovery step that is still waiting handles its own decision.
+- Promotion goes through `promote_connector`, from the stored proposal. No provider data is fetched.
+- Safety:
+  - the job is fenced by the lease, including the outcome record;
+  - the kill switch is checked before the run, before each candidate and inside the promotion transaction. A blocked run records nothing.
+- Outcomes:
+  - a typed or database refusal is recorded once and is terminal;
+  - an `OperationalError` is retried on the next run.
+- The gate login cannot write `ops.outbox` or submit jobs, so the job is scheduled rather than triggered by the gate.
+- Not covered: `connector_repair:*` proposals. Their promotion path is `repair.py` and needs a separate follow-up.
+
+**Rollback restore chain** (`autonomy/jobs.rollback_promotion`, `_restore_superseded`):
+- A rollback row no longer copies `superseded_by`, so a rolled-back version counts as rolled back, not as superseded.
+- Restoration happens only if the rolled-back version was the eligible one.
+- The restore walks back past versions that were themselves rolled back, to the newest version retired by supersession of that chain. It calls `evidence.restore_eligibility` with the chain member as `p_rolled_back`.
+- A refused restore leaves the rollback in place (savepoint).
+- Tests: `tests/integration/test_autonomy_rollback_chain.py`.
+
+**`_verify_gate_row`** also requires `recorded_by = 'reva_gate'`. Test: `tests/security/test_gate_row_recorded_by.py`.
+
+**`reva verify`** adds `db_gate`, which comes from `reva.gate.verify.verify_gate`:
+- It logs in as `reva_gate` and compares the login's actual privileges with the expected set:
+  - role attributes and memberships;
+  - schema USAGE and CREATE;
+  - relation privileges, at table or any-column level;
+  - EXECUTE on SECURITY DEFINER functions.
+- When `REVA_GATE_DB_PASSWORD` is unset, the check is skipped with a note outside production and fails in production.
+- Tests: `tests/security/test_gate_verify.py`.
+
+**Make and docs:**
+- `make gate`;
+- `docs/deployment.md`: the `reva-gate` service, its S3 key pair, and the gate password generated on `reva-api`;
+- `docs/operations.md`: running `reva gate` locally, `gate_pending`, `gate_followup`, rollback and the kill switch.

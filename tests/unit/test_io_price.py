@@ -232,3 +232,44 @@ def test_plugin_registration_manifest_and_schema() -> None:
     assert "B" in m.SHOCKABLE_INDUSTRIES and "broader than crude" in m.SHOCKABLE_INDUSTRIES["B"].lower()
     assert m.MODEL.fidelities == frozenset({"L1", "L2"})
     assert m.REGISTRY_ENTRY["approval_status"] == "candidate"
+
+
+# ------------------------------------------------------------------ valuation (review M9)
+def _built_with_household_taxes(fr_taxes: str) -> it.BuiltDataset:
+    over = {("DOM", "D21X31", "FR", "P3_S14"): fr_taxes}
+    items = [it.parse_sdmx_csv(syn.body(g, overrides=over if g == ("DOM",) else None), dataset=syn.DATASET,
+                               year=syn.YEAR, origins=g, dims=DIMS) for g in syn.groups()]
+    return it.build_dataset(items, dataset=syn.DATASET, year=syn.YEAR, origin="test_fixture", dims=DIMS)
+
+
+def test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixed_unit_taxes() -> None:
+    """Basic-price basket excludes product taxes; the labelled purchasers' reading divides by basket + taxes."""
+    doc = " ".join((m.__doc__ or "").split())
+    assert "taxes on products, margins already embedded" not in doc
+    assert "taxes less subsidies on products (VAT, excise duties) are not" in doc and "not a consumer price index" in doc
+    built = _built_with_household_taxes("25.000")  # FR households: 100 at basic prices + 25 product taxes
+    r = results(built, "L2")
+    row = r[(m.BASKET_KEY, "FRA", "L1")]
+    basket = (50 * P_FR_C + 30 * P_DE_C + 20 * Fraction(1, 10)) / 100
+    assert val(row) == q(100 * basket) == Decimal("3.216495")  # the basic-price value itself is unchanged
+    app = row.applicability
+    assert app["household_product_taxes_less_subsidies_mio_eur"] == "25.000"
+    assert Decimal(app[m.PURCHASERS_READING_KEY]) == q(100 * basket * Fraction(100, 125)) == Decimal("2.573196")
+    assert "fixed in money per unit" in app["purchasers_price_reading_note"]
+    assert "not a consumer price index" in app["valuation"] and row.value["basis"]["valuation"] == "basic_prices"
+    half = r[(m.BASKET_KEY, "FRA", "L2:pass_through=0.5")].applicability[m.PURCHASERS_READING_KEY]
+    assert Decimal(half) < Decimal(app[m.PURCHASERS_READING_KEY])  # per pass-through point, not a copy of L1
+    # DEU households buy nothing: no reading, typed not-applicable basket
+    assert r[(m.BASKET_KEY, "DEU", "L1")].applicability[m.PURCHASERS_READING_KEY] is None
+
+
+def test_zero_household_taxes_give_the_basic_price_reading(built: it.BuiltDataset) -> None:
+    row = results(built)[(m.BASKET_KEY, "FRA", "L1")]
+    assert row.applicability["household_product_taxes_less_subsidies_mio_eur"] == "0.000"
+    assert row.applicability[m.PURCHASERS_READING_KEY] == row.value["value"]
+
+
+def test_drafting_hints_carry_the_reviewed_industry_contents() -> None:
+    hints = m.MODEL.drafting_hints()
+    assert hints["choice_meanings"]["intervention.shocks[].industry"] == m.SHOCKABLE_INDUSTRIES
+    assert "never only in the reported country" in hints["parameters"]["intervention.shocks[].origin"]

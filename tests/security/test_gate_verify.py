@@ -85,8 +85,9 @@ def test_gate_check_is_skipped_without_a_password_and_required_in_production(db:
 def test_unreachable_gate_login_is_reported_without_secrets(gate_db: Any) -> None:
     from reva.gate.verify import verify_gate
 
-    url = gate_db.settings.runtime_url("gate").set(password="definitely-wrong-password")
-    out = verify_gate(gate_db.settings, engine_factory=lambda: create_engine(url))
+    # a closed port (local pg_hba may trust loopback, so a wrong password alone could still connect)
+    url = gate_db.settings.runtime_url("gate").set(password="definitely-wrong-password", port=1)
+    out = verify_gate(gate_db.settings, engine_factory=lambda: create_engine(url, connect_args={"connect_timeout": 3}))
     assert out["ok"] is False and out["status"] == "unreachable"
     blob = json.dumps(out)
     assert "definitely-wrong-password" not in blob

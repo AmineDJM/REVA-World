@@ -871,6 +871,35 @@ class ModelEvaluationListResponse(Envelope):
     data: list[ModelEvaluation]
 
 
+class ModelBacktest(ApiModel):
+    """A stored back-test of a model (one ``model.evaluation`` row; job type ``backtest``)."""
+
+    id: UUID = Field(description="model.evaluation id")
+    model_version_id: UUID
+    model_key: str
+    model_version: str
+    task: str = Field(description="Back-test task, e.g. population_backtest or retirement_backtest")
+    country: str | None = Field(None, description="ISO 3166 alpha-3 of the evaluated country")
+    backtest_function: str = Field(description="The model's own back-test function that produced the row")
+    context_id: UUID = Field(description="Evaluation-mode context of the run")
+    origin: Literal["live", "test_fixture"]
+    release_id: UUID | None = Field(None, description="Belief release whose pinned datasets were the only inputs")
+    knowledge_cutoff: datetime | None = Field(None, description="Knowledge cutoff of that release")
+    replay_mode: str
+    replay_mode_label: str
+    design: dict[str, Any] = Field(description="Back-test design (jump-off/base period/target or protocol, years)")
+    metrics: dict[str, Any] = Field(description="Error metrics as stored (status, per-variant/per-sex errors)")
+    labels: list[str] = Field(description="Labels that must be shown with the metrics (replay mode, model label, "
+                                          "statement)")
+    evaluation_manifest_sha256: str = Field(description="sha256 of the evaluation artifact (manifest with the "
+                                                        "inputs' digests, design and full results)")
+    recorded_at: datetime
+
+
+class ModelBacktestListResponse(Envelope):
+    data: list[ModelBacktest]
+
+
 # ---------------------------------------------------------------------------
 # Scenarios and simulations
 # ---------------------------------------------------------------------------

@@ -4,7 +4,7 @@ Status: **not deployed.** Everything below is prepared and locally verified
 (image build, pre-deploy bootstrap, API and worker started from the image in
 production mode against a throwaway TLS PostgreSQL 17/PostGIS 3.5 database,
 Blueprint schema validation; see `docs/dev/docker_check.md`). A deployment
-needs a Render account, an S3-compatible bucket with two scoped credentials and
+needs a Render account, an S3-compatible bucket with three scoped credentials and
 an admin password hash, which are external inputs.
 
 ## Blockers that need the owner's credentials
@@ -14,9 +14,10 @@ Nothing below can be done or verified from the repository:
 1. **Render account / API key** — to create the Blueprint (dashboard or
    `render blueprints` CLI) and observe the first deploy (internal TLS, owner
    `CREATEROLE`/PostGIS, health check passing).
-2. **S3-compatible bucket and two scoped key pairs** (read-only for `reva-api`,
-   prefix-scoped write for `reva-worker`), plus endpoint and region. Object storage
-   was not exercised by any container check.
+2. **S3-compatible bucket and three scoped key pairs** (read-only for `reva-api`,
+   prefix-scoped write for `reva-worker`, and a separate prefix-scoped pair for
+   `reva-gate`), plus endpoint and region. Object storage was not exercised by any
+   container check.
 3. **Admin password** — its Argon2id hash (`uv run reva auth hash-password`).
 4. **Contact e-mail** for provider user agents (`REVA_HTTP_CONTACT_EMAIL`).
 5. Optional: `REVA_COMTRADE_API_KEY`; a custom domain (then extend
@@ -34,13 +35,19 @@ with the Render CLI):
 | `reva-db` PostgreSQL 17 | `0.1c-256mb`, 5 GB, Frankfurt | `ipAllowList: []` (private network only) |
 | `reva-api` web (Docker) | `0.5c-512mb` | pre-deploy `python scripts/bootstrap_runtime.py`; start `python scripts/start_api.py`; health `/health/ready`; `autoDeployTrigger: checksPass` |
 | `reva-worker` background worker (Docker) | `1c-2g` | start `python scripts/start_worker.py`; never receives the owner URL |
+| `reva-gate` background worker (Docker) | `0.5c-512mb`, 1 instance | start `python scripts/start_gate.py`, `REVA_PROCESS_ROLE=gate`; the independent promotion gate (login `reva_gate`), the only process that records gate decisions; never receives the owner URL or any other runtime password |
 | env group `reva-common` | — | production mode, s3 backend, budgets, thread variables = 1 |
 
 Generated on `reva-api` (`generateValue: true`): `REVA_API_DB_PASSWORD`,
-`REVA_WORKER_DB_PASSWORD`, `REVA_SIM_DB_PASSWORD`, `REVA_SESSION_SECRET`. The worker
-references the worker/sim passwords from the API service. `REVA_MIGRATION_DATABASE_URL`
-is the database `connectionString` and exists only on `reva-api`; `start_api.py`
-removes it (and the worker/sim passwords) before Uvicorn starts.
+`REVA_WORKER_DB_PASSWORD`, `REVA_SIM_DB_PASSWORD`, `REVA_GATE_DB_PASSWORD`,
+`REVA_SESSION_SECRET`. The worker references the worker/sim passwords from the API
+service; `reva-gate` references only `REVA_GATE_DB_PASSWORD`. The gate password is
+generated on `reva-api` because the API's pre-deploy bootstrap provisions the
+`reva_gate` login (production refuses a bootstrap without it); `start_api.py` removes
+it from the Uvicorn child, and the worker never receives it (`scripts/validate_blueprint.py`
+checks both). `REVA_MIGRATION_DATABASE_URL` is the database `connectionString` and
+exists only on `reva-api`; `start_api.py` removes it (and the worker/sim/gate
+passwords) before Uvicorn starts.
 
 ## Minimal reviewed compatibility update to render.yaml (2026-10-14)
 
@@ -84,31 +91,48 @@ unmodified appendix Blueprint fails those checks with explicit messages.
    a separate admin credential that REVA never holds.
    Verify before go-live: `PutObject` and `DeleteObject` with the API key must fail
    with AccessDenied; any write outside `reva/` with the worker key must fail.
-4. **Admin password hash** — on a trusted machine:
+4. **Gate credential (prefix-scoped, no delete)** — set as `REVA_S3_ACCESS_KEY_ID` /
+   `REVA_S3_SECRET_ACCESS_KEY` on **reva-gate** (its own values, `sync: false`; never
+   the worker's). The gate re-reads the stored proposal, report evidence and captured
+   fixture bank and re-runs the validator and sandbox, then writes its decision
+   evidence: `s3:GetObject` and `s3:ListBucket` on `reva/*`; `s3:PutObject`
+   (conditional writes) on `reva/evaluation/*`, `reva/models/*` and
+   `reva/normalised/*` only; no `DeleteObject`, bucket policy/ACL/lifecycle or
+   versioning rights. Verify before go-live: a `PutObject` under `reva/raw/` and any
+   `DeleteObject` with the gate key must fail with AccessDenied.
+5. **Admin password hash** — on a trusted machine:
    `uv run reva auth hash-password` (prompts twice, prints an Argon2id hash).
    Paste into `REVA_ADMIN_PASSWORD_HASH` on `reva-api`. The API refuses to start in
    production unless the value starts with `$argon2id$`.
-5. **Contact e-mail** for provider user agents: `REVA_HTTP_CONTACT_EMAIL` on
+6. **Contact e-mail** for provider user agents: `REVA_HTTP_CONTACT_EMAIL` on
    `reva-api` (the worker references it). The worker refuses to start in
    production without it.
-6. Optional: `REVA_COMTRADE_API_KEY` (worker only; the no-key bounded preview
+7. Optional: `REVA_COMTRADE_API_KEY` (worker only; the no-key bounded preview
    works without it).
 
 ## First deploy order
 
-1. Create the bucket and both credentials; test the access-denied cases above.
+1. Create the bucket and the three credentials; test the access-denied cases above.
 2. Generate the admin hash.
 3. Render → New → Blueprint → select the repository; fill every `sync: false`
-   value when prompted (items 1–5).
+   value when prompted (items 1–6).
 4. Render creates `reva-db`, builds the image once per service and runs the API
    **pre-deploy**: advisory lock → PostgreSQL ≥ 17 / PostGIS / CREATEROLE checks →
-   Alembic upgrade → runtime role passwords → ownership verification. Its stdout is
+   Alembic upgrade → runtime role passwords (including the generated
+   `REVA_GATE_DB_PASSWORD` for `reva_gate`) → ownership verification. Its stdout is
    one JSON line with `schema_version` and no secrets. A failure aborts the deploy.
 5. The worker may start before the pre-deploy has finished: `start_worker.py`
    probes with the worker and simulation logins (schema head, queue function
    privileges) with exponential backoff up to
    `REVA_WORKER_STARTUP_DEADLINE_SECONDS` (default 300 s), then exits with status 75
    and a clear message; Render restarts it.
+   `reva-gate` does the same with the gate login (`start_gate.py`: it waits, bounded
+   by `REVA_GATE_STARTUP_DEADLINE_SECONDS`, until `reva_gate` can read
+   `ops.gate_request` and execute `ops.record_gate_result`). Until the gate runs,
+   discovery reports `gate_pending` and promotes nothing; the worker's
+   `gate_followup` schedule (every 5 minutes) promotes the passes the gate records
+   later. `reva verify`, run where `REVA_GATE_DB_PASSWORD` is set, also checks that the
+   gate login connects and holds exactly its expected privileges.
 6. Check `/health/ready`, log in, and let the worker's source-aware scheduler run
    the first live acquisitions (or run `reva ingest --profile mvp --live` from a
    Render shell on the worker service); then submit the demo scenario.

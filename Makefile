@@ -19,7 +19,7 @@ BACKUP_DIR ?= ./var/backups
 SCENARIO ?= crude-border-price-25
 PROFILE ?= mvp
 
-.PHONY: help env up down sync bootstrap upgrade seed fixtures verify api worker ui ui-dev ui-ci ui-check ui-build \
+.PHONY: help env up down sync bootstrap upgrade seed fixtures verify api worker gate ui ui-dev ui-ci ui-check ui-build \
         ui-test e2e ingest-live live-check demo test test-db test-live lint format format-check typecheck imports \
         registry blueprint blueprint-live image smoke backup restore check ci
 
@@ -58,6 +58,9 @@ api: ## Run the API (http://localhost:8000)
 
 worker: ## Run the durable worker/scheduler
 	$(PY) reva worker
+
+gate: ## Run the independent promotion gate (login reva_gate; next to the worker)
+	$(PY) reva gate
 
 ui: ui-ci ui-check ## = CI ui job: npm ci, typecheck, vitest, production build (network for npm ci)
 

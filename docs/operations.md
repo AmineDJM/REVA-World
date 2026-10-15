@@ -189,11 +189,63 @@ Orphan objects (uploaded but never committed) are collected by the `gc` job
 deletions confined to the configured prefix. Published history is never
 collected. Run inventory before and after large GC passes.
 
+## Promotion gate (`reva gate`)
+
+Autonomous connector promotion is decided by a separate process, the independent
+promotion gate, which logs in as `reva_gate`. That login is the only one that may
+record gate decisions (`ops.record_gate_result`), and the approval functions accept a
+gate pass only if `reva_gate` recorded it. The worker files a gate request
+(`ops.gate_request`) and waits; it cannot decide for itself. See
+`docs/dev/gate_separation.md` for the design and its residual risks.
+
+**Locally**, run the gate in its own terminal next to the worker:
+
+```sh
+make worker          # uv run reva worker
+make gate            # uv run reva gate     (or: uv run reva gate --once)
+```
+
+`reva gate` needs `REVA_GATE_DB_PASSWORD` (in `.env`, see `.env.example`) and refuses
+any login other than `reva_gate`. `reva verify` checks that the gate login connects and
+holds exactly its expected privileges. If `REVA_GATE_DB_PASSWORD` is not configured,
+it skips that check with a note outside production, and fails in production. Locally
+the separation is a credential convention, not an isolation boundary: the same OS user
+and the same `.env` hold every password. On Render, `reva-gate` is its own service (see
+`docs/deployment.md`).
+
+**`gate_pending`.** A discovery step waits up to `REVA_GATE_WAIT_SECONDS` (default
+120 s) for the gate's decision. If none arrives, for example because the gate is not
+running, the step reports `status: gate_pending` and promotes nothing. The request
+stays queued, and the gate decides it once it runs. Then the `gate_followup` worker
+job (schedule `gate_followup:promotion`, every 5 minutes) promotes each late pass:
+
+- it reads the stored proposal and manifest, so no provider data is fetched again;
+- it uses the same checked path (`promote_connector` → `evidence.approve_eligibility`);
+- it is idempotent: one gate pass is spent on at most one approval, and each pass
+  gets at most one recorded outcome (`ops.outbox` event `autonomy.gate_followup`);
+- it is fenced by the job lease.
+
+Passes older than 7 days, or refused (policy changed, content rolled back, binding
+mismatch), are not retried. Re-run discovery in that case. Nothing is ever promoted
+without a recorded `reva_gate` pass.
+
+**Rollback.** `rollback_promotion` retires the version and restores the newest earlier
+version in its supersession chain. It skips versions that were themselves rolled back,
+and restores only through `evidence.restore_eligibility`, so the restored version must
+have had an independent approval. Rolling back a version that is no longer the
+eligible one restores nothing.
+
 ## Kill switch and degradation
 
 * `REVA_AUTONOMY_KILL_SWITCH=true` (env group `reva-common`) blocks every autonomy
   action and discovery job submission; `REVA_AUTONOMY_MODE=disabled` disables the
-  subsystem. Redeploy (or restart the services) to apply.
+  subsystem. Redeploy (or restart the services) to apply. With
+  `REVA_AUTONOMY_KILL_FILE` set, creating that file (`touch <file>`) blocks autonomy in
+  the running processes without a restart, and removing the file re-enables it.
+  * Under the kill switch the gate records no decisions: requests stay pending.
+  * `gate_followup` promotes nothing and records nothing, so its candidates stay.
+  * Promoted template connectors are not loaded.
+  * The switch is re-read before every step and inside the promotion transaction.
 * `REVA_LLM_ENABLED=false` / budget 0 is the default; enabling requires a positive
   monthly budget (validated at startup).
 * A failing connector is quarantined; the last accepted release stays readable and

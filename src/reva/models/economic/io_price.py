@@ -31,11 +31,22 @@ before rounding):
 
 Assumptions (all stated on every result): fixed technical coefficients, no substitution,
 no quantity or demand response, single period, nominal prices at basic prices, uniform pass-
-through share θ for every non-shocked industry, taxes on products, margins already embedded
-in trade industries, wages and profits per unit unchanged except for the absorbed share
-(1 − θ). No exchange-rate, monetary, wage or second-round response. The basket is the
-households' basic-price purchases, not a consumer price index (no product taxes, no
-direct purchases abroad, fixed weights).
+through share θ for every non-shocked industry, wages and profits per unit unchanged except
+for the absorbed share (1 − θ). No exchange-rate, monetary, wage or second-round response.
+
+Valuation. The table is at **basic prices**: trade and transport margins are inside the basket
+(households buy them from the trade and transport industries), but **taxes less subsidies on
+products (VAT, excise duties) are not** — FIGARO records them in a separate primary-input row
+(``DOM`` x ``D21X31``) of each final-demand column. The basket is therefore the households'
+basic-price purchases, not a consumer price index (no product taxes, no direct purchases
+abroad, fixed weights). Each basket row also carries a labelled *purchasers'-price reading*:
+the same price change divided by the basket value **including** households' taxes less
+subsidies on products, i.e. product taxes held fixed in money per unit (no tax pass-through).
+With purely ad valorem taxes the purchasers'-price change would equal the basic-price figure,
+so the two readings bracket a pass-through of product taxes between "fixed per unit" and
+"proportional" (FIGARO 2024, +10 % on B, C19 and D35 in every economy, θ = 1: France
+0.93 % basic vs 0.82 % with fixed per-unit taxes; product taxes = 13.2 % of the French
+basic-price basket). Neither reading is a CPI.
 
 The shocked industry is an *industry* of the table, never a product sub-heading: FIGARO's
 ``B`` "Mining and quarrying" (NACE B05-B09) contains coal and lignite, crude petroleum and
@@ -82,6 +93,14 @@ DATASET_INPUT = "io_table"
 DATASET_CONCEPT = "economics.io.figaro_ii_table"
 DATASET_SUBJECT = "WORLD"
 HOUSEHOLD_FINAL_DEMAND = "P3_S14"
+#: FIGARO primary-input row (``c_orig = DOM``) holding taxes less subsidies on products.
+PRODUCT_TAXES_ROW = "D21X31"
+PURCHASERS_READING_KEY = "purchasers_price_reading_fixed_unit_taxes_percent"
+PURCHASERS_READING_NOTE = (
+    "purchasers'-price reading: the basket price change divided by the basket value including households' "
+    "taxes less subsidies on products (FIGARO DOM x D21X31 x P3_S14), i.e. product taxes held fixed in money "
+    "per unit; with purely ad valorem taxes the basic-price figure applies, so the two readings bracket the "
+    "tax treatment. Not a consumer price index.")
 REST_OF_WORLD_KEY = "FIGARO_ROW"
 
 #: Industries that may be shocked, with exactly what they contain (NACE Rev. 2 / CPA 2.1).
@@ -131,6 +150,23 @@ FIGARO_KEYS: tuple[str, ...] = (
     "AUS", REST_OF_WORLD_KEY,
 )
 
+#: Reviewed meanings for scenario drafting (``reva.nl.catalog`` shows them to the drafting LLM and the user).
+DRAFTING_HINTS: dict[str, Any] = {
+    "parameters": {
+        "intervention.shocks[].origin": (
+            "economy whose producers' output price of the industry changes (the location of the shock). Only an "
+            "origin the user states: a world price change (e.g. of crude oil) is a shock in every producing economy, "
+            "never only in the reported country. FIGARO_ROW = FIGARO's rest of the world."),
+        "intervention.shocks[].industry": (
+            "the whole table industry whose output price changes (see choice_meanings); never narrower than the "
+            "industry: B includes coal, metal ores and quarrying, not only crude oil and natural gas"),
+        "intervention.shocks[].price_change_percent": "percent change of that industry's output price (+25 % = 25)",
+        "assumptions.pass_through_grid[]": (
+            "L2 only: shares θ in (0, 1] of a cost increase passed on by the non-shocked industries (1 = full)"),
+    },
+    "choice_meanings": {"intervention.shocks[].industry": dict(SHOCKABLE_INDUSTRIES)},
+}
+
 NOT_CLAIMED = (
     "First-round cost-push price changes under fixed input-output coefficients with the stated pass-through. Not "
     "an inflation forecast, not a consumer price index, not a GDP, welfare, wage, exchange-rate or monetary-policy "
@@ -142,7 +178,8 @@ ASSUMPTIONS: tuple[str, ...] = (
     "the shocked industries' output prices change exactly by the stated percentage (exogenous prices)",
     "every other industry passes on the stated share θ of its unit-cost increase (L1: θ = 1, full pass-through)",
     "household basket weights: households' final consumption expenditure (P3_S14) by supplying industry at basic "
-    "prices, domestic and imported; product taxes and direct purchases abroad are outside the basket",
+    "prices, domestic and imported; product taxes and direct purchases abroad are outside the basket (a "
+    "purchasers'-price reading with product taxes fixed per unit is attached to each basket row)",
     "a shocked industry is a whole table industry (e.g. NACE B mining and quarrying is broader than crude oil)",
 )
 
@@ -267,6 +304,9 @@ class IOArrays:
     x: np.ndarray  # (N,) gross output, million EUR
     households: np.ndarray  # (N, C) household final consumption by supplying industry and consuming economy
     reference_year: int | None = None
+    #: (C,) households' taxes less subsidies on products per consuming economy (DOM x D21X31 x P3_S14), million
+    #: EUR; ``None`` when the table does not publish that row (the purchasers'-price reading is then absent).
+    household_product_taxes: np.ndarray | None = None
     provenance: dict[str, Any] = field(default_factory=dict)
     diagnostics: dict[str, Any] = field(default_factory=dict)
 
@@ -341,6 +381,7 @@ def arrays_from_table(table: Any, coverage: Mapping[str, Any]) -> IOArrays:
     households[row[hm], cc[hm]] = val[hm]
     if int(hm.sum()) != n * len(economies):
         raise IntegrityFailure("household final consumption block is incomplete")
+    taxes = _household_product_taxes(table, block, cc, ck, val, len(economies))
     del block, rc, rk, cc, ck, val, row
     pos = x > 0
     if (x < 0).any():
@@ -358,7 +399,30 @@ def arrays_from_table(table: Any, coverage: Mapping[str, Any]) -> IOArrays:
     }
     return IOArrays(economies, keys, industries, a, x, households,
                     reference_year=coverage.get("reference_year"),
-                    diagnostics=diagnostics)
+                    diagnostics=diagnostics, household_product_taxes=taxes)
+
+
+def _household_product_taxes(table: Any, block: np.ndarray, cc: np.ndarray, ck: np.ndarray, val: np.ndarray,
+                             n_economies: int) -> np.ndarray | None:
+    """Taxes less subsidies on products paid on each economy's household consumption (``DOM`` x ``D21X31``).
+
+    Exactly one cell per consuming economy, or none at all (then ``None``: no purchasers'-price reading).
+    """
+    import pyarrow as pa
+
+    cand = np.flatnonzero((block == 2) & (ck == -2))
+    if len(cand) == 0:
+        return None
+    codes = table.column("row_code").take(pa.array(cand)).to_pylist()
+    sel = cand[np.array([str(c) == PRODUCT_TAXES_ROW for c in codes], dtype=bool)]
+    if len(sel) == 0:
+        return None
+    if len(sel) != n_economies or (cc[sel] < 0).any() or len(set(cc[sel].tolist())) != n_economies:
+        raise IntegrityFailure(f"households' taxes less subsidies on products: {len(sel)} cells, expected one per "
+                               f"economy ({n_economies})")
+    out = np.zeros(n_economies, dtype=np.float64)
+    out[cc[sel]] = val[sel]
+    return out
 
 
 def spectral_radius_upper_bound(a: np.ndarray, iterations: int = SPECTRAL_ITERATIONS) -> float:
@@ -449,6 +513,15 @@ class BasketResult:
     domestic_shocks: float
     foreign_shocks: float
     weight_total_mio_eur: float
+    product_taxes_mio_eur: float | None = None  # households' taxes less subsidies on products (None: not published)
+
+    @property
+    def purchasers_reading(self) -> float | None:
+        """Basket change over the basket value incl. product taxes held fixed per unit (fraction), if defined."""
+        if self.product_taxes_mio_eur is None:
+            return None
+        denominator = self.weight_total_mio_eur + self.product_taxes_mio_eur
+        return None if not denominator > 0 else self.total * self.weight_total_mio_eur / denominator
 
 
 def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult | None:
@@ -474,7 +547,8 @@ def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult | Non
         dom_shock = float(h @ np.where(pos, sol.dp_by_origin[key], 0.0)) / w_tot
     else:
         dom_shock = 0.0
-    return BasketResult(total, dom, imp, dom_shock, total - dom_shock, w_tot)
+    taxes = None if arr.household_product_taxes is None else float(arr.household_product_taxes[economy_pos])
+    return BasketResult(total, dom, imp, dom_shock, total - dom_shock, w_tot, taxes)
 
 
 # --------------------------------------------------------------------------- result rows
@@ -548,10 +622,12 @@ def _rows_for(compiled: CompiledIO, fidelity: str) -> list[_Row]:
         variants += [(_variant(t), t) for t in s.pass_through_grid]
     rows: list[_Row] = []
 
-    def emit(key: str, country: str, values: dict[Decimal, float | None], extra: dict[str, Any], notes: str) -> None:
+    def emit(key: str, country: str, values: dict[Decimal, float | None], extra: dict[str, Any], notes: str,
+             extra_by_theta: Mapping[Decimal, Mapping[str, Any]] | None = None) -> None:
         for name, t in variants:
             v = values[t]
-            app = {**base_app, "country": country, "variant": name, "pass_through": dstr(t), **extra}
+            app = {**base_app, "country": country, "variant": name, "pass_through": dstr(t), **extra,
+                   **((extra_by_theta or {}).get(t) or {})}
             if name != "L1":
                 app["label"] = L2_LABEL
             rows.append(_Row(key, country, name, _missing() if v is None else _value(to_result_decimal(v), notes),
@@ -597,10 +673,17 @@ def _rows_for(compiled: CompiledIO, fidelity: str) -> list[_Row]:
             note = {} if b1 is not None else {
                 "note": "no household final consumption recorded for this economy; basket not applicable"}
             if BASKET_KEY in s.outputs:
+                taxes = None if b1 is None or b1.product_taxes_mio_eur is None else b1.product_taxes_mio_eur
+                readings = {t: {PURCHASERS_READING_KEY: None if r is None or r.purchasers_reading is None
+                                else dstr(to_result_decimal(100.0 * r.purchasers_reading))} for t, r in res.items()}
                 emit(BASKET_KEY, country, {t: None if r is None else 100.0 * r.total for t, r in res.items()},
                      {"basket": "households' final consumption (P3_S14) at basic prices, domestic and imported",
-                      "weight_total_mio_eur": None if b1 is None else f"{b1.weight_total_mio_eur:.3f}", **note},
-                     "price change of the household basket at basic prices, percent")
+                      "valuation": "basic prices: trade and transport margins included, taxes less subsidies on "
+                                   "products excluded; not a consumer price index",
+                      "weight_total_mio_eur": None if b1 is None else f"{b1.weight_total_mio_eur:.3f}",
+                      "household_product_taxes_less_subsidies_mio_eur": None if taxes is None else f"{taxes:.3f}",
+                      "purchasers_price_reading_note": PURCHASERS_READING_NOTE, **note},
+                     "price change of the household basket at basic prices, percent", readings)
             if "household_basket_contributions" in s.outputs:
                 parts = {CONTRIBUTION_KEYS[0]: "domestic_products", CONTRIBUTION_KEYS[1]: "imported_products",
                          CONTRIBUTION_KEYS[2]: "domestic_shocks", CONTRIBUTION_KEYS[3]: "foreign_shocks"}
@@ -699,6 +782,10 @@ class IOPriceModel:
     def seed_subjects(self, spec: dict[str, Any]) -> list[str]:
         return [str(c) for c in spec.get("countries", [])]
 
+    def drafting_hints(self) -> dict[str, Any]:
+        """Reviewed parameter and choice meanings for natural-language drafting (descriptive only)."""
+        return DRAFTING_HINTS
+
     def cost(self, spec: dict[str, Any]) -> dict[str, Any]:
         return {"pass_through_points": len((spec.get("assumptions") or {}).get("pass_through_grid")
                                            or DEFAULT_PASS_THROUGH_GRID)}
@@ -720,7 +807,9 @@ def explain(fidelity: str = "L1") -> dict[str, Any]:
         "modality": "assumption_conditioned_scenario",
         "formula": "(I − θ A_EEᵀ) Δp_E = θ A_SEᵀ π_S; Δp_S = π_S; basket_d = Σ_k h_kd Δp_k / Σ_k h_kd",
         "units": {"industry_price_change_percent:<industry>": "percent of the baseline output price",
-                  BASKET_KEY: "percent of the baseline household basket value (basic prices)",
+                  BASKET_KEY: "percent of the baseline household basket value (basic prices; taxes less "
+                              "subsidies on products excluded; each row also carries a purchasers'-price reading "
+                              "with product taxes fixed per unit)",
                   "household_basket_contribution_*": "percent of the baseline basket value (sums to the basket)"},
         "assumptions": list(ASSUMPTIONS),
         "uncertainty": ("Unquantified: FIGARO publishes no uncertainty. L2 publishes a separate pass-through "

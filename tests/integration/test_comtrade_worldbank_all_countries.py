@@ -67,12 +67,17 @@ async def test_all_country_fixture_ingest_keeps_gaps_typed(db) -> None:
     for c in (fixture_worldbank(), fixture_comtrade()):
         rep = await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
         assert all(o.status in ("published", "unchanged") for o in rep.outcomes), rep.as_dict()
+    # Lineage heads of the shared source, whichever connector wrote them: the batch connector
+    # shares lineage (source, origin, logical key) with `un.comtrade.public_exact`, so an
+    # identical row that an earlier module ingested through the exact connector stays the head
+    # ("unchanged") and is not re-inserted under the batch connector version.
     with db.owner.connect() as conn:
         rows = {r["lk"]: dict(r) for r in conn.execute(text(
-            "SELECT o.logical_key AS lk, o.value, o.source_flags, "
+            "SELECT DISTINCT ON (o.logical_key) o.logical_key AS lk, o.value, o.source_flags, "
             "evidence.observation_is_eligible(o.id, clock_timestamp()) AS eligible "
-            "FROM evidence.observation o JOIN evidence.connector_version cv ON cv.id = o.connector_version_id "
-            "WHERE cv.name = 'un.comtrade.public_batch' AND o.origin = 'test_fixture'")).mappings()}
+            "FROM evidence.observation o JOIN evidence.source s ON s.id = o.source_id "
+            "WHERE s.source_key = 'un.comtrade.public_preview' AND o.origin = 'test_fixture' "
+            "ORDER BY o.logical_key, o.revision_no DESC")).mappings()}
     dza = rows["comtrade:HS2709:M:12:0:2023:primaryValue"]
     assert dza["value"]["kind"] == "missing" and dza["source_flags"]["provider_returned_no_rows"] is True
     assert dza["eligible"] is True  # typed Missing is admitted (admit_unclassified_missing)
