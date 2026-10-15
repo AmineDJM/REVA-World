@@ -1,0 +1,22 @@
+# V3 (agent A-LAW): World Bank "Women, Business and the Law" (WBL) data downloads.
+# Atlas connector: src/reva/adapters/connectors/atlas_wbl.py (atlas tables wbl.panel_1971_2024,
+# wbl.wbl2026, wbl.wbl1_2026). Legal answers carry WBL's own "Legal basis" citations.
+source_key: worldbank.wbl
+title: World Bank Women, Business and the Law (panel 1971-2024 and WBL 2026 data downloads)
+provider_url: https://wbl.worldbank.org/en/data/download-data
+lineage_family: worldbank_wbl
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://datacatalog.worldbank.org/public-licenses#cc-by
+  attribution: "World Bank. Women, Business and the Law [dataset]. Washington, DC: World Bank. https://wbl.worldbank.org/en/wbl-data"
+metadata:
+  allowed_hosts: [wbl.worldbank.org]
+  authentication: none
+  cadence: annual (report published each year, February/March); check the download page yearly
+  time_semantics: >-
+    Report year Y is current as of 1 October of year Y-1 (panel file About sheet: "WBL2024 data is
+    current as of October 1, 2023"; WBL 2026 report: data current as of October 1, 2025). Atlas cells
+    use the as-of day [Y-1-10-01, Y-1-10-02) and keep report_year in flags.
+  editorial_status: >-
+    Provider-coded legal answers (de jure, formal law in the main business city). Legal basis texts are
+    WBL's citations, not verified by REVA. WBL 2.0 (2026) scores are not comparable with WBL 1.0 panel scores.

@@ -1,0 +1,25 @@
+id: history.wars
+domain: history
+owner: KGHIST
+description: >-
+  Wars: instances of war (Q198) or of a subclass (civil war, war of independence, colonial war, world
+  war, ...), windowed by their earliest start/point-in-time/inception year, plus undated wars once.
+  Snapshots keep participants (P710), start/end (P580/P582), point in time (P585), location (P276),
+  country (P17), part of (P361, e.g. a theatre of a larger war), cause/effect (P828/P1542, shown only as
+  "asserted by Wikidata") and significant events.
+purpose: seed_entities
+entity_kind: war
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q198 .
+    ?item (wdt:P580|wdt:P585|wdt:P571) ?d .
+    FILTER(YEAR(?d) >= {{year_from}} && YEAR(?d) <= {{year_to}})
+  }
+sparql_undated: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q198 .
+    FILTER NOT EXISTS { ?item (wdt:P580|wdt:P585|wdt:P571) ?d . }
+  }
+split: {by: year, from: -3000, to: 2029, step: 500, include_undated: true}
+max_rows: 25000
+expand_hops: 1

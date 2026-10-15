@@ -1,0 +1,34 @@
+# Budget request from agent A-GEO (geography: Natural Earth 1:10m, GeoNames, CCKP climate, INFORM hazards).
+# ATLASCORE merges into registry/policies/budgets.yaml. Every request is a whole-world download.
+agent: A-GEO
+requests:
+  - source_key: naturalearth.admin0_10m
+    # six ZIPs from naciscdn.org/naturalearth/10m/cultural/ (map units 5.0 MB, countries 4.9 MB,
+    # countries_lakes 5.1 MB, boundary_lines_land 1.0 MB, boundary_lines_disputed_areas 62 kB,
+    # disputed_areas 215 kB). Public domain. Release-versioned (5.1.1); monthly cadence is plenty.
+    daily_requests: 12
+    expected_bytes_per_day: 33000000
+    reason: "one full run = 6 requests / 16.4 MB; allow one retry"
+  - source_key: geonames.countryinfo
+    # download.geonames.org/export/dump/countryInfo.txt (32 kB). CC BY 4.0.
+    daily_requests: 2
+    expected_bytes_per_day: 100000
+    reason: "one request per run"
+  - source_key: worldbank.cckp
+    # cckpapi.worldbank.org all_countries climatologies: CRU TS 4.09 annual (12 kB) + monthly (195 kB),
+    # ERA5 annual (12 kB). CC BY 4.0.
+    daily_requests: 6
+    expected_bytes_per_day: 500000
+    reason: "one full run = 3 requests / 0.22 MB"
+  - source_key: jrc.inform_risk
+    # drmkc.jrc.ec.europa.eu INFORM API: workflow list (7 kB) + natural-hazard scores (200 kB).
+    daily_requests: 4
+    expected_bytes_per_day: 500000
+    reason: "one full run = 2 requests / 0.21 MB"
+daily_totals_increase:
+  http_requests_total: "+24"
+  http_bytes_total: "+34_100_000"
+notes: >-
+  Disk: raw archive ~17 MB + Parquet tables < 2 MB per run (far under the 1.5 GB agent budget).
+  Elevation (DEM summaries) not requested: no small open per-country DEM summary found that avoids
+  downloading global DEM tiles (GB scale).

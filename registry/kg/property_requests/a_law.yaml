@@ -1,0 +1,41 @@
+# Property requests from A-LAW (registry/kg/queries/society/law_*.yaml): legal ages of countries.
+# Labels checked against the Wikidata property entities on 2026-10-15 (wbgetentities, datatype quantity).
+- property: P2997
+  why: age of majority of a country (legal ages for the atlas law domain)
+  reva_predicate: age_of_majority
+  inverse: null
+  kind: quantity
+  label_en: age of majority
+  label_fr: âge de la majorité
+- property: P3000
+  why: marriageable age (minimum age to marry by law; qualifier P518 for males/females)
+  reva_predicate: marriageable_age
+  inverse: null
+  kind: quantity
+  label_en: marriageable age
+  label_fr: âge nubile
+- property: P3001
+  why: retirement age (Wikidata wording "age at which most people normally retire"; cross-check of WBL statutory ages)
+  reva_predicate: retirement_age
+  inverse: null
+  kind: quantity
+  label_en: retirement age
+  label_fr: âge de départ à la retraite
+- property: P2999
+  why: age of consent
+  reva_predicate: age_of_consent
+  inverse: null
+  kind: quantity
+  label_en: age of consent
+  label_fr: majorité sexuelle
+- property: P2998
+  why: age of candidacy (minimum age for elected office)
+  reva_predicate: age_of_candidacy
+  inverse: null
+  kind: quantity
+  label_en: age of candidacy
+  label_fr: âge d'éligibilité
+- property: P642
+  role: qualifier
+  why: '"of" qualifier on P2998 (which office the candidacy age applies to)'
+  label_en: of

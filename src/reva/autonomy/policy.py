@@ -48,9 +48,15 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # * budgets.yaml -> budgets-1.2.0 (2026-10-15, V2 step 3a, agent POP): adds the per-source
 #   daily request limit for the built-in connector eurostat.demography (300; a full run is
 #   282 small time-window requests). No other limit changed.
+# * budgets.yaml -> budgets-1.3.x (2026-10-15, V3, agent ATLASCORE, the only V3 editor of this
+#   pin): per-source daily limits for registered V3 atlas/KG sources merged from
+#   registry/atlas/budget_requests/*.yaml by src/reva/atlas/budget_merge.py (max request per
+#   source, <= 5000/day; pre-V3 limits never lowered); daily totals = 1.2.0 base + merged keys
+#   (requests) + declared bytes/day, capped at 20000 requests / 3 GiB. LLM budgets unchanged.
+#   Each later merge bumps the patch version and re-pins here.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "94c5a52ba485ae6a68437633637d610163dc0bddfeefc81ef52d3e0dda06281c",
+    "budgets.yaml": "4a7a956ee5f6a433e5520c5c1d3506a70f5287f7232de5fa915c295e9c8828e8",
 }
 
 

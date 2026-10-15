@@ -1,0 +1,58 @@
+[
+  {
+    "request_fingerprint": "a9b3023ee52ca8a182a3b0850291722c245927e7d47227bfb6904ef32ac7b778",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=IT_USE_ii99&pageSize=10000&page=1",
+    "file": "a9b3023ee52ca8a1.json",
+    "sha256": "f79ccc2a9b98ec1a45d0e8804186eb8b2b92665ddbc6421fe8a2d9f0553ce28e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "UNdata terms of use",
+    "excerpt": "real records of IT_USE_ii99 for six geographies x four years; page metadata set to the excerpt",
+    "excerpt_of_raw_sha256": "e4fb53ce0ac3274b42c3d1358c510e958c4f962509753ec0777e3e5b01802e1d"
+  },
+  {
+    "request_fingerprint": "89f3f8433897c11d3a1e02c9c110de831d07114817d7aa9a21dd05190e07856c",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=SH_STA_MORT&pageSize=10000&page=1",
+    "file": "89f3f8433897c11d.json",
+    "sha256": "415d05d5d68a7cacb6b98f51ad9584b79be9c167cfe928e103f792f583399e3b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "UNdata terms of use",
+    "excerpt": "real records (geo 4/250/158/412/1/772; 2000/2015/2020/2023) of SH_STA_MORT split over 2 pages; totalElements/totalPages/pageNumber set to the excerpt (page 1)",
+    "excerpt_of_raw_sha256": "3064e3dfa42f7db66531def1d86224208f60d8b750cb98fdb9175324aea3fa15"
+  },
+  {
+    "request_fingerprint": "3fde23fba701e38ca215e9cc04a6eeb716db15c2f8b1df5dbcc09824f3631faa",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/Data?seriesCode=SH_STA_MORT&pageSize=10000&page=2",
+    "file": "3fde23fba701e38c.json",
+    "sha256": "e9a61c4abb402bc914f0323f4a7cd04841d12fe3ea9714f6cb5c2a0476f28c9d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "UNdata terms of use",
+    "excerpt": "real records (geo 4/250/158/412/1/772; 2000/2015/2020/2023) of SH_STA_MORT split over 2 pages; totalElements/totalPages/pageNumber set to the excerpt (page 2)",
+    "excerpt_of_raw_sha256": "3064e3dfa42f7db66531def1d86224208f60d8b750cb98fdb9175324aea3fa15"
+  },
+  {
+    "request_fingerprint": "2c3c77dc89e96d12ea9f8116c94e1aefa5f5df0ac80d12821d3e1956268f0ff1",
+    "url": "https://unstats.un.org/sdgs/UNSDGAPIV5/v1/sdg/Series/List?allreleases=false",
+    "file": "2c3c77dc89e96d12.json",
+    "sha256": "a08224dbd2f6f5c0bf1e0d5ba96c3ec863c72d4a4e23812b27582cc414aff6cd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "UNdata terms of use",
+    "excerpt": "real Series/List response filtered to the connector's series",
+    "excerpt_of_raw_sha256": "6a2631ce8b6aaf1225909f208b8ec0bc3270b51194d73306b4c74f3853405d88"
+  }
+]

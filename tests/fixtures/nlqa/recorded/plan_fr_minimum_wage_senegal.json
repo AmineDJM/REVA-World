@@ -1,0 +1,35 @@
+{
+ "fixture_kind": "synthetic_plan",
+ "label": "fr_minimum_wage_senegal",
+ "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
+ "prompt_version": "nlqa-plan-1.0.0",
+ "text": "Quel est le salaire minimum au Sénégal ?",
+ "text_sha256": "f80f5e182e22a7aac9a5d472f79ebb7dc6178186a986b12ace748cbc682dd3ff",
+ "output": {
+  "input_language": "fr",
+  "restatement": "Quel est le salaire minimum au Sénégal ?",
+  "operations": [
+   {
+    "text": null,
+    "kind": null,
+    "entity": null,
+    "from_entity": null,
+    "to_entity": null,
+    "as_of": null,
+    "from_year": null,
+    "to_year": null,
+    "max_hops": null,
+    "concept": "labour.minimum_wage_monthly",
+    "country": "SEN",
+    "year": null,
+    "order": null,
+    "limit": null,
+    "properties": [],
+    "link_kinds": [],
+    "id": "s1",
+    "op": "atlas_value"
+   }
+  ],
+  "unsupported": []
+ }
+}

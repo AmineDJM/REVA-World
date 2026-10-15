@@ -1,0 +1,15 @@
+# CCKP (World Bank Climate Change Knowledge Portal) country keys (agent A-GEO).
+# CCKP all_countries responses key countries by ISO 3166-1 alpha-3, plus KSV (Kosovo, the World Bank's
+# legacy code) and TWN (Taiwan; not an entity of registry/entities/country_crosswalk.json, kept unmapped).
+scheme: cckp
+base: iso3
+aliases:
+  KSV: XKX  # World Bank API resolves country code KSV to id XKX "Kosovo" (quote below)
+source:
+  kind: provider_reference_api
+  url: "https://api.worldbank.org/v2/country/KSV?format=json"
+  retrieved_at: "2026-10-15T22:22:19Z"
+  response_sha256: "ef80488286ab84a2b4b9d3d0862e26058c4d7cb73213a93feabd898c80c65639"
+  quotes:
+    - '{"id":"XKX","iso2Code":"XK","name":"Kosovo", ...}'
+  corroboration: "Natural Earth 10m admin-0 map units record ADM0_A3=KOS (Kosovo) carries WB_A3=KSV"

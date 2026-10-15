@@ -1,0 +1,17 @@
+# V3 (agent A-SCI): WIPO Global Innovation Index data workbook (composite levels only), connector atlas.wipo_gii.
+source_key: wipo.gii
+title: WIPO Global Innovation Index 2025 data workbook
+provider_url: https://www.wipo.int/en/web/global-innovation-index/2025/index
+lineage_family: wipo
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://www.wipo.int/tools/en/disclaim.html
+  licence_basis: "WIPO Open Access Policy (site-level statement; the workbook carries no licence statement)"
+  attribution: "WIPO, Global Innovation Index 2025"
+  third_party: "indicator-level values from third parties (S&P Global, ITU, UNESCO, ...) are not ingested"
+metadata:
+  allowed_hosts: [www.wipo.int]
+  files: [https://www.wipo.int/edocs/pubdocs/en/wipo-pub-2000-2025-tech1.xlsx]
+  authentication: none
+  editorial_status: composite index computed by WIPO (Index, Sub-Index, Pillar, Sub-Pillar scores and ranks)
+  cadence: yearly edition (September)

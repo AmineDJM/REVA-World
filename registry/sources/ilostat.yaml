@@ -1,0 +1,25 @@
+# V3 (agent A-ILO): ILOSTAT bulk/API service. Connector: src/reva/adapters/connectors/atlas_ilo.py
+# (one gzip CSV per indicator + code dictionaries; atlas tables ilostat.<indicator id>).
+source_key: ilostat.rplumber
+title: ILOSTAT (International Labour Organization) bulk download / API service
+provider_url: https://rplumber.ilo.org/
+lineage_family: ilostat
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  terms_url: https://www.ilo.org/node/9321
+  attribution: "ILOSTAT, International Labour Organization (https://ilostat.ilo.org/data/)"
+metadata:
+  allowed_hosts: [rplumber.ilo.org]
+  api_docs: https://rplumber.ilo.org/__docs__/
+  bulk_index: https://rplumber.ilo.org/files/website/bulk/indicator.html
+  authentication: none
+  cadence: ILOSTAT updates series continuously (TOC 'last.update' per indicator); monthly re-download
+  notes: >-
+    The legacy bulk area www.ilo.org/ilostat-files/WEB_bulk_download answers 404 (2026-10-15).
+    rplumber.ilo.org answers HTTP 200 with an empty body to clients without a descriptive User-Agent;
+    the connector treats an empty body as a failed request. ILO modelled estimates (XA sources) and
+    national estimates are different lineages within the same provider; national series are
+    reported by national statistical offices (upstream lineage: national LFS / establishment surveys /
+    labour legislation), so ILOSTAT national values are not independent of Eurostat/OECD values for
+    the same country.

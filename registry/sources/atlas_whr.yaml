@@ -1,0 +1,20 @@
+# V3 atlas (agent A-QOL): World Happiness Report Figure 2.1 data. Connector
+# src/reva/adapters/connectors/atlas_whr.py (atlas table whr.whr26_fig21).
+source_key: whr.figure21
+title: World Happiness Report — data for Figure 2.1 (life evaluations and explained components)
+provider_url: https://worldhappiness.report/data-sharing/
+lineage_family: gallup_world_poll
+rights:
+  licence: "Free download; no explicit open licence stated (data-sharing page and FAQ checked 2026-10-15)"
+  licence_url: https://worldhappiness.report/data-sharing/
+  licence_status: free_download_no_explicit_licence
+  redistribution: unclear
+  attribution: "Helliwell, Layard, Sachs, De Neve, Aknin & Wang (eds.), World Happiness Report 2026. Data: Gallup World Poll."
+metadata:
+  allowed_hosts: [files.worldhappiness.report]
+  files: [https://files.worldhappiness.report/WHR26_Data_Figure_2.1.xlsx]
+  authentication: none
+  editorial_status: >-
+    Published aggregates of the proprietary Gallup World Poll (three-year averages). Gallup microdata are not
+    available openly and are not ingested.
+  cadence: annual (March)

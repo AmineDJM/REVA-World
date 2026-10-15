@@ -1,0 +1,11 @@
+{
+  "url": "https://wid.world/bulk_download/wid_all_data.zip",
+  "file": "wid_all_data_excerpt.zip",
+  "sha256": "72f746e6c85edb20dbe9edefa6174ae3796ea49a8763d031fefa6da1f9843918",
+  "etag": "\"fixture-3493b842-65b0d5b44437d\"",
+  "retrieved_at": "2026-10-15T22:23:46.767353+00:00",
+  "licence": "CC BY 4.0 per OWID origin metadata (not stated by WID)",
+  "live_archive_etag": "\"3493b842-65b0d5b44437d\"",
+  "live_archive_bytes": 882096194,
+  "excerpt": "A small zip REBUILT for tests from real member text retrieved 2026-10-15 by byte ranges: WID_countries.csv (whole), FR/KS/DZ data rows of the 14 selected series for years >= 2018 plus a non-selected series (npopuli999), their metadata rows, header-only XK and TW members (TW is unmapped: never fetched). Served by byte range in tests/unit/test_atlas_qol_connectors.py."
+}

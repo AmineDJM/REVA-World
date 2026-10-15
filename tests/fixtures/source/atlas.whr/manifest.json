@@ -1,0 +1,19 @@
+[
+  {
+    "request_fingerprint": "fb09a67b58b7a755fecc83a2cc46d8f7dd9cee255dce1d74784a9a53b5637487",
+    "url": "https://files.worldhappiness.report/WHR26_Data_Figure_2.1.xlsx",
+    "file": "fb09a67b58b7a755.xlsx",
+    "sha256": "576e382655cec3ae704a0b41cd2c04465b87cd84b7f131a0c4fa26d41f6d8028",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "etag": "\"2234718b202b7d6a847c003f13240bce\"",
+      "last-modified": "Wed, 18 Mar 2026 22:58:26 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:25:26.791197+00:00",
+    "licence": "free download, no explicit open licence",
+    "live_sha256": "576e382655cec3ae704a0b41cd2c04465b87cd84b7f131a0c4fa26d41f6d8028",
+    "live_bytes": 133553,
+    "excerpt": "whole file"
+  }
+]

@@ -1,0 +1,1260 @@
+# Quality of life (agent A-QOL). Provider-declared concepts, not human-reviewed.
+# Sources: UNDP HDR 2025 composite indices (CC BY 3.0 IGO; atlas table undp.hdr25) and Global MPI 2026
+# (undp.gmpi2026); World Happiness Report 2026 Figure 2.1 (whr.whr26_fig21; free download, NO explicit open
+# licence: rights.licence_status says so); World Inequality Database (wid.wid_key; CC BY 4.0 per OWID origin
+# metadata, not stated by WID itself). Connectors: src/reva/adapters/connectors/atlas_{undp,whr,wid}.py.
+# Not catalogued (see docs/dev/v3_a_qol.md): Global Peace Index (IEP: non-commercial licence behind a request
+# form), Social Progress Index (no open licence found), cost of living (Numbeo/Expatistan proprietary; open
+# price-level data = World Bank ICP, A-WB), World Bank PIP Gini (A-WB).
+domain: quality_of_life
+labels:
+  fr: Qualité de vie
+  en: Quality of life
+maintainer: A-QOL
+concepts:
+- id: quality_of_life.hdi
+  labels:
+    fr: Indice de développement humain (IDH)
+    en: Human Development Index (HDI)
+  definition: Human Development Index (value) (UNDP HDR25 codebook short name 'hdi').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.hdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.hdi_rank
+  labels:
+    fr: Rang IDH
+    en: HDI rank
+  definition: HDI Rank (UNDP HDR25 codebook short name 'hdi_rank').
+  unit: rank
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.hdi_rank
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.le
+  labels:
+    fr: Espérance de vie à la naissance (composante IDH)
+    en: Life expectancy at birth (HDI component)
+  definition: Life Expectancy at Birth (years) (UNDP HDR25 codebook short name 'le').
+  unit: years
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.le
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.eys
+  labels:
+    fr: Durée attendue de scolarisation
+    en: Expected years of schooling
+  definition: Expected Years of Schooling (years) (UNDP HDR25 codebook short name 'eys').
+  unit: years
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.eys
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.mys
+  labels:
+    fr: Durée moyenne de scolarisation
+    en: Mean years of schooling
+  definition: Mean Years of Schooling (years) (UNDP HDR25 codebook short name 'mys').
+  unit: years
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.mys
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gnipc
+  labels:
+    fr: RNB par habitant (PPA 2021, composante IDH)
+    en: GNI per capita (2021 PPP$, HDI component)
+  definition: Gross National Income Per Capita (2021 PPP$) (UNDP HDR25 codebook short name 'gnipc').
+  unit: 2021 PPP$
+  domain: quality_of_life
+  subdomain: human_development
+  source_order:
+  - undp.hdr25.gnipc
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.ihdi
+  labels:
+    fr: IDH ajusté aux inégalités (IDHI)
+    en: Inequality-adjusted HDI (IHDI)
+  definition: Inequality-adjusted Human Development Index (value) (UNDP HDR25 codebook short name 'ihdi').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.ihdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.loss
+  labels:
+    fr: Perte de développement humain due aux inégalités
+    en: Overall loss in HDI due to inequality
+  definition: Overall loss (%) (UNDP HDR25 codebook short name 'loss').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.loss
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Unit % per HDR25 Statistical Annex Table 3 (the codebook gives none).
+- id: quality_of_life.coef_ineq
+  labels:
+    fr: Coefficient d'inégalité humaine
+    en: Coefficient of human inequality
+  definition: Coefficient of human inequality (UNDP HDR25 codebook short name 'coef_ineq').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.coef_ineq
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Unit % per HDR25 Statistical Annex Table 3 (the codebook gives none).
+- id: quality_of_life.ineq_le
+  labels:
+    fr: Inégalité d'espérance de vie
+    en: Inequality in life expectancy
+  definition: Inequality in life expectancy (UNDP HDR25 codebook short name 'ineq_le').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.ineq_le
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Unit % per HDR25 Statistical Annex Table 3 (the codebook gives none).
+- id: quality_of_life.ineq_edu
+  labels:
+    fr: Inégalité d'éducation
+    en: Inequality in education
+  definition: Inequality in eduation (UNDP HDR25 codebook short name 'ineq_edu').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.ineq_edu
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Unit % per HDR25 Statistical Annex Table 3 (the codebook gives none).
+- id: quality_of_life.ineq_inc
+  labels:
+    fr: Inégalité de revenu (IDHI)
+    en: Inequality in income (IHDI)
+  definition: Inequality in income (UNDP HDR25 codebook short name 'ineq_inc').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: inequality_adjusted
+  source_order:
+  - undp.hdr25.ineq_inc
+  provider_declared: true
+  notes: 'UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Codebook time series ''2010-2021, 2022-2023=2022'': later years repeat an earlier value
+    (flag carried_forward_from). Unit % per HDR25 Statistical Annex Table 3 (the codebook gives none).'
+- id: quality_of_life.gdi
+  labels:
+    fr: Indice de développement de genre (IDG)
+    en: Gender Development Index (GDI)
+  definition: Gender Development Index (value) (UNDP HDR25 codebook short name 'gdi').
+  unit: index (female HDI / male HDI)
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.gdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.hdi_f
+  labels:
+    fr: IDH des femmes
+    en: HDI, female
+  definition: HDI female (value) (UNDP HDR25 codebook short name 'hdi_f').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.hdi_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.hdi_m
+  labels:
+    fr: IDH des hommes
+    en: HDI, male
+  definition: HDI male (value) (UNDP HDR25 codebook short name 'hdi_m').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.hdi_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.le_f
+  labels:
+    fr: Espérance de vie à la naissance, femmes (IDG)
+    en: Life expectancy at birth, female (GDI)
+  definition: Life Expectancy at Birth, female (years) (UNDP HDR25 codebook short name 'le_f').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.le_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.le_m
+  labels:
+    fr: Espérance de vie à la naissance, hommes (IDG)
+    en: Life expectancy at birth, male (GDI)
+  definition: Life Expectancy at Birth, male (years) (UNDP HDR25 codebook short name 'le_m').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.le_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.eys_f
+  labels:
+    fr: Durée attendue de scolarisation, femmes
+    en: Expected years of schooling, female
+  definition: Expected Years of Schooling, female (years) (UNDP HDR25 codebook short name 'eys_f').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.eys_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.eys_m
+  labels:
+    fr: Durée attendue de scolarisation, hommes
+    en: Expected years of schooling, male
+  definition: Expected Years of Schooling, male (years) (UNDP HDR25 codebook short name 'eys_m').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.eys_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.mys_f
+  labels:
+    fr: Durée moyenne de scolarisation, femmes
+    en: Mean years of schooling, female
+  definition: Mean Years of Schooling, female (years) (UNDP HDR25 codebook short name 'mys_f').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.mys_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.mys_m
+  labels:
+    fr: Durée moyenne de scolarisation, hommes
+    en: Mean years of schooling, male
+  definition: Mean Years of Schooling, male (years) (UNDP HDR25 codebook short name 'mys_m').
+  unit: years
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.mys_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gni_pc_f
+  labels:
+    fr: RNB par habitant estimé, femmes (PPA 2021)
+    en: Estimated GNI per capita, female (2021 PPP$)
+  definition: Gross National Income Per Capita, female (2021 PPP$) (UNDP HDR25 codebook short name 'gni_pc_f').
+  unit: 2021 PPP$
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.gni_pc_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gni_pc_m
+  labels:
+    fr: RNB par habitant estimé, hommes (PPA 2021)
+    en: Estimated GNI per capita, male (2021 PPP$)
+  definition: Gross National Income Per Capita, male (2021 PPP$) (UNDP HDR25 codebook short name 'gni_pc_m').
+  unit: 2021 PPP$
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.gni_pc_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gii
+  labels:
+    fr: Indice d'inégalité de genre (IIG)
+    en: Gender Inequality Index (GII)
+  definition: Gender Inequality Index (value) (UNDP HDR25 codebook short name 'gii').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.gii
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gii_rank
+  labels:
+    fr: Rang IIG
+    en: GII rank
+  definition: GII Rank (UNDP HDR25 codebook short name 'gii_rank').
+  unit: rank
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.gii_rank
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.mmr
+  labels:
+    fr: Taux de mortalité maternelle (IIG)
+    en: Maternal mortality ratio (GII)
+  definition: Maternal Mortality Ratio (deaths per 100,000 live births) (UNDP HDR25 codebook short name 'mmr').
+  unit: deaths per 100,000 live births
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.mmr
+  provider_declared: true
+  notes: 'UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Codebook time series ''1990-2019, 2020-2023=2020'': later years repeat an earlier value
+    (flag carried_forward_from).'
+- id: quality_of_life.abr
+  labels:
+    fr: Taux de natalité chez les adolescentes (IIG)
+    en: Adolescent birth rate (GII)
+  definition: Adolescent Birth Rate (births per 1,000 women ages 15-19) (UNDP HDR25 codebook short name 'abr').
+  unit: births per 1,000 women ages 15-19
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.abr
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.se_f
+  labels:
+    fr: Population ayant au moins un niveau secondaire, femmes
+    en: Population with at least some secondary education, female
+  definition: Population with at least some secondary education, female (% ages 25 and older) (UNDP HDR25 codebook short name
+    'se_f').
+  unit: '% of females ages 25 and older'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.se_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.se_m
+  labels:
+    fr: Population ayant au moins un niveau secondaire, hommes
+    en: Population with at least some secondary education, male
+  definition: Population with at least some secondary education, male (% ages 25 and older) (UNDP HDR25 codebook short name
+    'se_m').
+  unit: '% of males ages 25 and older'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.se_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.pr_f
+  labels:
+    fr: Part des sièges parlementaires détenus par des femmes
+    en: Share of seats in parliament held by women
+  definition: Share of seats in parliament, female (% held by women) (UNDP HDR25 codebook short name 'pr_f').
+  unit: '% of seats held by women'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.pr_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.pr_m
+  labels:
+    fr: Part des sièges parlementaires détenus par des hommes
+    en: Share of seats in parliament held by men
+  definition: Share of seats in parliament, male (% held by men) (UNDP HDR25 codebook short name 'pr_m').
+  unit: '% of seats held by men'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.pr_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.lfpr_f
+  labels:
+    fr: Taux d'activité, femmes (IIG)
+    en: Labour force participation rate, female (GII)
+  definition: Labour force participation rate, female (% ages 15 and older) (UNDP HDR25 codebook short name 'lfpr_f').
+  unit: '% of females ages 15 and older'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.lfpr_f
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.lfpr_m
+  labels:
+    fr: Taux d'activité, hommes (IIG)
+    en: Labour force participation rate, male (GII)
+  definition: Labour force participation rate, male (% ages 15 and older) (UNDP HDR25 codebook short name 'lfpr_m').
+  unit: '% of males ages 15 and older'
+  domain: quality_of_life
+  subdomain: gender
+  source_order:
+  - undp.hdr25.lfpr_m
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.phdi
+  labels:
+    fr: IDH ajusté aux pressions planétaires (IDHP)
+    en: Planetary pressures-adjusted HDI (PHDI)
+  definition: Planetary pressures–adjusted Human Development Index (value) (UNDP HDR25 codebook short name 'phdi').
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: planetary
+  source_order:
+  - undp.hdr25.phdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.diff_hdi_phdi
+  labels:
+    fr: Écart entre IDH et IDHP
+    en: Difference between HDI and PHDI
+  definition: Difference from HDI value (%) (UNDP HDR25 codebook short name 'diff_hdi_phdi').
+  unit: '%'
+  domain: quality_of_life
+  subdomain: planetary
+  source_order:
+  - undp.hdr25.diff_hdi_phdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.rankdiff_hdi_phdi
+  labels:
+    fr: Écart de rang IDH - IDHP
+    en: Rank difference HDI - PHDI
+  definition: Difference from HDI rank (UNDP HDR25 codebook short name 'rankdiff_hdi_phdi').
+  unit: rank difference
+  domain: quality_of_life
+  subdomain: planetary
+  source_order:
+  - undp.hdr25.rankdiff_hdi_phdi
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.hdi_group
+  labels:
+    fr: Groupe de développement humain
+    en: Human development group
+  definition: 'Human Development Groups (HDR25 codebook ''hdicode''): Very High / High / Medium / Low, by HDI 2023.'
+  unit: HDI group
+  domain: quality_of_life
+  subdomain: human_development
+  value_kind: text
+  source_order:
+  - undp.hdr25.hdicode
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.gdi_group
+  labels:
+    fr: Groupe IDG
+    en: GDI group
+  definition: 'GDI Group (HDR25 codebook ''gdi_group'', 1-5: absolute deviation of GDI from gender parity).'
+  unit: GDI group (1-5)
+  domain: quality_of_life
+  subdomain: gender
+  value_kind: text
+  source_order:
+  - undp.hdr25.gdi_group
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).
+- id: quality_of_life.whr_life_evaluation
+  labels:
+    fr: Évaluation de la vie (échelle de Cantril, moyenne 3 ans)
+    en: Life evaluation (Cantril ladder, 3-year average)
+  definition: 'Life evaluation (3-year average): national average answer to the Cantril ladder question (0 = worst possible
+    life, 10 = best possible life), Gallup World Poll, averaged over three survey years.'
+  unit: Cantril ladder score (0-10)
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.life_evaluation
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested.
+- id: quality_of_life.whr_life_evaluation_ci95_lower
+  labels:
+    fr: Évaluation de la vie, borne basse IC 95 %
+    en: Life evaluation, 95% CI lower bound
+  definition: Lower whisker of the 95% confidence interval of the 3-year average life evaluation (WHR Figure 2.1).
+  unit: Cantril ladder score (0-10)
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.life_evaluation_ci95_lower
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested.
+- id: quality_of_life.whr_life_evaluation_ci95_upper
+  labels:
+    fr: Évaluation de la vie, borne haute IC 95 %
+    en: Life evaluation, 95% CI upper bound
+  definition: Upper whisker of the 95% confidence interval of the 3-year average life evaluation (WHR Figure 2.1).
+  unit: Cantril ladder score (0-10)
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.life_evaluation_ci95_upper
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested.
+- id: quality_of_life.whr_rank
+  labels:
+    fr: Rang au World Happiness Report
+    en: World Happiness Report rank
+  definition: Rank of the country by 3-year average life evaluation in the WHR edition (Figure 2.1).
+  unit: rank
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.rank
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested.
+- id: quality_of_life.whr_explained_by_log_gdp_per_capita
+  labels:
+    fr: Part expliquée par le PIB par habitant (log)
+    en: 'Explained by: log GDP per capita'
+  definition: 'Contribution of log GDP per capita to the life evaluation relative to Dystopia: national average minus the
+    Dystopia value, times the WHR regression coefficient.'
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_log_gdp_per_capita
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_explained_by_social_support
+  labels:
+    fr: Part expliquée par le soutien social
+    en: 'Explained by: social support'
+  definition: Contribution of social support to the life evaluation relative to Dystopia (WHR Figure 2.1).
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_social_support
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_explained_by_healthy_life_expectancy
+  labels:
+    fr: Part expliquée par l'espérance de vie en bonne santé
+    en: 'Explained by: healthy life expectancy'
+  definition: Contribution of healthy life expectancy to the life evaluation relative to Dystopia (WHR Figure 2.1).
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_healthy_life_expectancy
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_explained_by_freedom
+  labels:
+    fr: Part expliquée par la liberté de faire ses choix de vie
+    en: 'Explained by: freedom to make life choices'
+  definition: Contribution of freedom to make life choices to the life evaluation relative to Dystopia (WHR Figure 2.1).
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_freedom
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_explained_by_generosity
+  labels:
+    fr: Part expliquée par la générosité
+    en: 'Explained by: generosity'
+  definition: Contribution of generosity to the life evaluation relative to Dystopia (WHR Figure 2.1).
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_generosity
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_explained_by_perceptions_of_corruption
+  labels:
+    fr: Part expliquée par la perception de la corruption
+    en: 'Explained by: perceptions of corruption'
+  definition: Contribution of perceptions of corruption to the life evaluation relative to Dystopia (WHR Figure 2.1).
+  unit: ladder points above Dystopia
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.explained_by_perceptions_of_corruption
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested. Explained-by parts are not causal estimates.
+- id: quality_of_life.whr_dystopia_plus_residual
+  labels:
+    fr: Dystopie + résidu
+    en: Dystopia + residual
+  definition: Dystopia life evaluation plus the country's unexplained residual (WHR Figure 2.1).
+  unit: Cantril ladder score (0-10)
+  domain: quality_of_life
+  subdomain: wellbeing
+  source_order:
+  - whr.whr26_fig21.dystopia_plus_residual
+  provider_declared: true
+  notes: World Happiness Report 2026, Figure 2.1 data (free download; no explicit open licence). Period = the three-year Gallup
+    World Poll window ending in the published Year. Gallup microdata not ingested.
+- id: quality_of_life.mpi_mpi
+  labels:
+    fr: Indice de pauvreté multidimensionnelle (IPM)
+    en: Multidimensional Poverty Index (MPI)
+  definition: Proportion of the population that is multidimensionally poor adjusted by the intensity of the deprivations.
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.mpi
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_headcount_pct
+  labels:
+    fr: Population en pauvreté multidimensionnelle (%)
+    en: Population in multidimensional poverty (headcount, %)
+  definition: Population with a weighted deprivation score of at least 33 percent.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.headcount_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_headcount_thousands_survey_year
+  labels:
+    fr: Population en pauvreté multidimensionnelle (milliers, année d'enquête)
+    en: Population in multidimensional poverty (thousands, survey year)
+  definition: Number of people in multidimensional poverty in the survey year.
+  unit: thousands
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.headcount_thousands_survey_year
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_headcount_thousands_2024
+  labels:
+    fr: Population en pauvreté multidimensionnelle (milliers, 2024)
+    en: Population in multidimensional poverty (thousands, 2024)
+  definition: Survey headcount ratio applied to the 2024 population (provider projection).
+  unit: thousands
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.headcount_thousands_2024
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_intensity_pct
+  labels:
+    fr: Intensité des privations (%)
+    en: Intensity of deprivation (%)
+  definition: Average deprivation score experienced by people in multidimensional poverty.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.intensity_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_inequality_among_poor
+  labels:
+    fr: Inégalité parmi les pauvres
+    en: Inequality among the poor
+  definition: Variance of individual deprivation scores of poor people.
+  unit: variance (0-1)
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.inequality_among_poor
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_severe_pct
+  labels:
+    fr: Population en pauvreté multidimensionnelle sévère (%)
+    en: Population in severe multidimensional poverty (%)
+  definition: Population with a deprivation score of at least 50 percent.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.severe_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_vulnerable_pct
+  labels:
+    fr: Population vulnérable à la pauvreté multidimensionnelle (%)
+    en: Population vulnerable to multidimensional poverty (%)
+  definition: Population with a deprivation score of at least 20 percent but less than 33 percent.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.vulnerable_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_contribution_health_pct
+  labels:
+    fr: Contribution de la santé à l'IPM (%)
+    en: Contribution of health deprivation to MPI (%)
+  definition: Percentage of the MPI attributed to deprivations in health.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.contribution_health_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_contribution_education_pct
+  labels:
+    fr: Contribution de l'éducation à l'IPM (%)
+    en: Contribution of education deprivation to MPI (%)
+  definition: Percentage of the MPI attributed to deprivations in education.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.contribution_education_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_contribution_living_standards_pct
+  labels:
+    fr: Contribution du niveau de vie à l'IPM (%)
+    en: Contribution of living-standards deprivation to MPI (%)
+  definition: Percentage of the MPI attributed to deprivations in standard of living.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.contribution_living_standards_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_below_national_poverty_line_pct
+  labels:
+    fr: Population sous le seuil national de pauvreté (%, tableau IPM)
+    en: Population below national poverty line (%, MPI table)
+  definition: Percentage of the population living below the national poverty line (World Bank data reproduced in the MPI table),
+    most recent year available in 2014-2025.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.below_national_poverty_line_pct
+  provider_declared: true
+  notes: 'Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised). Monetary
+    poverty: World Bank figures reproduced by UNDP; the year is not stated (period = 2014-2025 window). Prefer the World Bank
+    PIP series (A-WB) when available.'
+- id: quality_of_life.mpi_below_ppp_3_usd_day_pct
+  labels:
+    fr: Population sous 3,00 $ PPA par jour (%, tableau IPM)
+    en: Population below PPP $3.00 a day (%, MPI table)
+  definition: Percentage of the population living below the international poverty line of $3.00 (2021 PPP) a day (World Bank
+    data reproduced in the MPI table), most recent year available in 2014-2025.
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t1.below_ppp_3_usd_day_pct
+  provider_declared: true
+  notes: 'Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised). Monetary
+    poverty: World Bank figures reproduced by UNDP; the year is not stated (period = 2014-2025 window). Prefer the World Bank
+    PIP series (A-WB) when available.'
+- id: quality_of_life.mpi_harmonised_mpi
+  labels:
+    fr: Indice de pauvreté multidimensionnelle (IPM) (harmonisé)
+    en: Multidimensional Poverty Index (MPI) (harmonised)
+  definition: Proportion of the population that is multidimensionally poor adjusted by the intensity of the deprivations.
+    Harmonised estimate (Global MPI 2026 Table 2).
+  unit: index (0-1)
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.mpi
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_headcount_pct
+  labels:
+    fr: Population en pauvreté multidimensionnelle (%) (harmonisé)
+    en: Population in multidimensional poverty (headcount, %) (harmonised)
+  definition: Population with a weighted deprivation score of at least 33 percent. Harmonised estimate (Global MPI 2026 Table
+    2).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.headcount_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_headcount_thousands_survey_year
+  labels:
+    fr: Population en pauvreté multidimensionnelle (milliers, année d'enquête) (harmonisé)
+    en: Population in multidimensional poverty (thousands, survey year) (harmonised)
+  definition: Number of people in multidimensional poverty in the survey year. Harmonised estimate (Global MPI 2026 Table
+    2).
+  unit: thousands
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.headcount_thousands_survey_year
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_intensity_pct
+  labels:
+    fr: Intensité des privations (%) (harmonisé)
+    en: Intensity of deprivation (%) (harmonised)
+  definition: Average deprivation score experienced by people in multidimensional poverty. Harmonised estimate (Global MPI
+    2026 Table 2).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.intensity_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_nutrition_pct
+  labels:
+    fr: Pauvres et privés en nutrition (%, harmonisé)
+    en: Multidimensionally poor and deprived in nutrition (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the nutrition indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_nutrition_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_child_mortality_pct
+  labels:
+    fr: Pauvres et privés en mortalité infantile (%, harmonisé)
+    en: Multidimensionally poor and deprived in child mortality (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the child mortality indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_child_mortality_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_years_of_schooling_pct
+  labels:
+    fr: Pauvres et privés en années de scolarité (%, harmonisé)
+    en: Multidimensionally poor and deprived in years of schooling (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the years of schooling indicator
+    (Global MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_years_of_schooling_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_school_attendance_pct
+  labels:
+    fr: Pauvres et privés en fréquentation scolaire (%, harmonisé)
+    en: Multidimensionally poor and deprived in school attendance (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the school attendance indicator
+    (Global MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_school_attendance_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_cooking_fuel_pct
+  labels:
+    fr: Pauvres et privés en combustible de cuisson (%, harmonisé)
+    en: Multidimensionally poor and deprived in cooking fuel (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the cooking fuel indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_cooking_fuel_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_sanitation_pct
+  labels:
+    fr: Pauvres et privés en assainissement (%, harmonisé)
+    en: Multidimensionally poor and deprived in sanitation (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the sanitation indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_sanitation_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_drinking_water_pct
+  labels:
+    fr: Pauvres et privés en eau potable (%, harmonisé)
+    en: Multidimensionally poor and deprived in drinking water (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the drinking water indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_drinking_water_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_electricity_pct
+  labels:
+    fr: Pauvres et privés en électricité (%, harmonisé)
+    en: Multidimensionally poor and deprived in electricity (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the electricity indicator (Global
+    MPI 2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_electricity_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_housing_pct
+  labels:
+    fr: Pauvres et privés en logement (%, harmonisé)
+    en: Multidimensionally poor and deprived in housing (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the housing indicator (Global MPI
+    2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_housing_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.mpi_harmonised_deprived_assets_pct
+  labels:
+    fr: Pauvres et privés en biens (%, harmonisé)
+    en: Multidimensionally poor and deprived in assets (%, harmonised)
+  definition: Percentage of the population that is multidimensionally poor and deprived in the assets indicator (Global MPI
+    2026 Table 2, harmonised over time).
+  unit: '%'
+  domain: quality_of_life
+  subdomain: poverty
+  source_order:
+  - undp.gmpi2026.t2.deprived_assets_pct
+  provider_declared: true
+  notes: Global MPI 2026 (UNDP HDRO and OPHI). Period = survey years; survey type and footnotes in flags. Table 1 = latest
+    survey per country; Table 2 = harmonised estimates over time (differ from Table 1 where indicators were harmonised).
+- id: quality_of_life.wid_sptincj992_p0p50
+  labels:
+    fr: Part du revenu national avant impôt des 50 % les plus pauvres
+    en: Pre-tax national income share, bottom 50%
+  definition: 'Pre-tax national income (WID): the sum of all pre-tax personal income flows accruing to the owners of the production
+    factors, labor and capital, before taking into account the operation of the tax/transfer system, but after taking into
+    account the operation of pension system. Share of the total held by group p0p50. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sptincj992|p0p50
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_sptincj992_p50p90
+  labels:
+    fr: Part du revenu national avant impôt des 40 % du milieu
+    en: Pre-tax national income share, middle 40%
+  definition: 'Pre-tax national income (WID): the sum of all pre-tax personal income flows accruing to the owners of the production
+    factors, labor and capital, before taking into account the operation of the tax/transfer system, but after taking into
+    account the operation of pension system. Share of the total held by group p50p90. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sptincj992|p50p90
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_sptincj992_p90p100
+  labels:
+    fr: Part du revenu national avant impôt des 10 % les plus riches
+    en: Pre-tax national income share, top 10%
+  definition: 'Pre-tax national income (WID): the sum of all pre-tax personal income flows accruing to the owners of the production
+    factors, labor and capital, before taking into account the operation of the tax/transfer system, but after taking into
+    account the operation of pension system. Share of the total held by group p90p100. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sptincj992|p90p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_sptincj992_p99p100
+  labels:
+    fr: Part du revenu national avant impôt du 1 % le plus riche
+    en: Pre-tax national income share, top 1%
+  definition: 'Pre-tax national income (WID): the sum of all pre-tax personal income flows accruing to the owners of the production
+    factors, labor and capital, before taking into account the operation of the tax/transfer system, but after taking into
+    account the operation of pension system. Share of the total held by group p99p100. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sptincj992|p99p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_gptincj992_p0p100
+  labels:
+    fr: Indice de Gini du revenu national avant impôt (WID)
+    en: Gini of pre-tax national income (WID)
+  definition: 'Pre-tax national income (WID): the sum of all pre-tax personal income flows accruing to the owners of the production
+    factors, labor and capital, before taking into account the operation of the tax/transfer system, but after taking into
+    account the operation of pension system. Gini coefficient over the whole distribution (p0p100). Population unit: equal-split
+    adults.'
+  unit: Gini coefficient (0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.gptincj992|p0p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_sdiincj992_p0p50
+  labels:
+    fr: Part du revenu disponible après impôt des 50 % les plus pauvres
+    en: Post-tax disposable income share, bottom 50%
+  definition: 'Post-tax disposable income (WID code ''diinc''). WID''s metadata text for this code reads: ''Post-tax national
+    income is the sum of primary incomes over all sectors (private and public), minus taxes.'' Share of the total held by
+    group p0p50. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sdiincj992|p0p50
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages). WID''s metadata for ''diinc'' reuses the post-tax national income wording; label follows the WID
+    codes dictionary.'
+- id: quality_of_life.wid_sdiincj992_p90p100
+  labels:
+    fr: Part du revenu disponible après impôt des 10 % les plus riches
+    en: Post-tax disposable income share, top 10%
+  definition: 'Post-tax disposable income (WID code ''diinc''). WID''s metadata text for this code reads: ''Post-tax national
+    income is the sum of primary incomes over all sectors (private and public), minus taxes.'' Share of the total held by
+    group p90p100. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sdiincj992|p90p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages). WID''s metadata for ''diinc'' reuses the post-tax national income wording; label follows the WID
+    codes dictionary.'
+- id: quality_of_life.wid_sdiincj992_p99p100
+  labels:
+    fr: Part du revenu disponible après impôt du 1 % le plus riche
+    en: Post-tax disposable income share, top 1%
+  definition: 'Post-tax disposable income (WID code ''diinc''). WID''s metadata text for this code reads: ''Post-tax national
+    income is the sum of primary incomes over all sectors (private and public), minus taxes.'' Share of the total held by
+    group p99p100. Population unit: equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.sdiincj992|p99p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages). WID''s metadata for ''diinc'' reuses the post-tax national income wording; label follows the WID
+    codes dictionary.'
+- id: quality_of_life.wid_gdiincj992_p0p100
+  labels:
+    fr: Indice de Gini du revenu disponible après impôt (WID)
+    en: Gini of post-tax disposable income (WID)
+  definition: 'Post-tax disposable income (WID code ''diinc''). WID''s metadata text for this code reads: ''Post-tax national
+    income is the sum of primary incomes over all sectors (private and public), minus taxes.'' Gini coefficient over the whole
+    distribution (p0p100). Population unit: equal-split adults.'
+  unit: Gini coefficient (0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.gdiincj992|p0p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages). WID''s metadata for ''diinc'' reuses the post-tax national income wording; label follows the WID
+    codes dictionary.'
+- id: quality_of_life.wid_shwealj992_p0p50
+  labels:
+    fr: Part du patrimoine net des 50 % les plus pauvres
+    en: Net personal wealth share, bottom 50%
+  definition: 'Net personal wealth (WID): the total value of non-financial and financial assets (housing, land, deposits,
+    bonds, equities, etc.) held by households, minus their debts. Share of the total held by group p0p50. Population unit:
+    equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.shwealj992|p0p50
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_shwealj992_p90p100
+  labels:
+    fr: Part du patrimoine net des 10 % les plus riches
+    en: Net personal wealth share, top 10%
+  definition: 'Net personal wealth (WID): the total value of non-financial and financial assets (housing, land, deposits,
+    bonds, equities, etc.) held by households, minus their debts. Share of the total held by group p90p100. Population unit:
+    equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.shwealj992|p90p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_shwealj992_p99p100
+  labels:
+    fr: Part du patrimoine net du 1 % le plus riche
+    en: Net personal wealth share, top 1%
+  definition: 'Net personal wealth (WID): the total value of non-financial and financial assets (housing, land, deposits,
+    bonds, equities, etc.) held by households, minus their debts. Share of the total held by group p99p100. Population unit:
+    equal-split adults.'
+  unit: share (fraction of total, 0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.shwealj992|p99p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_ghwealj992_p0p100
+  labels:
+    fr: Indice de Gini du patrimoine net (WID)
+    en: Gini of net personal wealth (WID)
+  definition: 'Net personal wealth (WID): the total value of non-financial and financial assets (housing, land, deposits,
+    bonds, equities, etc.) held by households, minus their debts. Gini coefficient over the whole distribution (p0p100). Population
+    unit: equal-split adults.'
+  unit: Gini coefficient (0-1)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.ghwealj992|p0p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages).'
+- id: quality_of_life.wid_anninci992_p0p100
+  labels:
+    fr: Revenu national moyen par adulte (WID)
+    en: Average national income per adult (WID)
+  definition: 'National income (WID): gross domestic product minus fixed capital used in production processes plus the net
+    foreign income earned by residents in the rest of the world. Average over all adults (individuals). Population unit: individuals
+    (adults).'
+  unit: local currency (WID unit per country)
+  domain: quality_of_life
+  subdomain: inequality
+  source_order:
+  - wid.wid_key.anninci992|p0p100
+  provider_declared: true
+  notes: 'World Inequality Database (bulk archive read by byte ranges). Equal-split adults (age 20+) unless stated. WID back-casts/extrapolates
+    some years: flags carry WID''s data_quality and method text. Licence: CC BY 4.0 per OWID''s origin metadata (not stated
+    on WID''s own pages). Amount in the country''s currency as named by WID metadata ''unit'' (per-cell unit column); not
+    comparable across countries without WID''s PPP/exchange-rate series.'

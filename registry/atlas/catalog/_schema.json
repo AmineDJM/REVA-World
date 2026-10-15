@@ -1,0 +1,60 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reva-atlas-catalog/1",
+  "title": "REVA atlas catalog file (registry/atlas/catalog/<domain>.yaml)",
+  "description": "Provider-declared atlas concepts of one domain. Concepts are not human-reviewed (provider_declared: true). source_order lists the atlas series '<source>.<dataset>.<indicator>' (source and dataset have no dots; the indicator may) in best-available order.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["domain", "concepts"],
+  "properties": {
+    "domain": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,39}$"},
+    "labels": {"$ref": "#/$defs/labels"},
+    "maintainer": {"type": "string", "maxLength": 100},
+    "concepts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/concept"}}
+  },
+  "$defs": {
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fr", "en"],
+      "properties": {
+        "fr": {"type": "string", "minLength": 1, "maxLength": 300},
+        "en": {"type": "string", "minLength": 1, "maxLength": 300}
+      }
+    },
+    "series": {
+      "oneOf": [
+        {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,23}\\.[a-z0-9][a-z0-9_-]{0,38}\\.[^\\x00-\\x1f\\x7f]{1,200}$"},
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["source", "dataset", "indicator"],
+          "properties": {
+            "source": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,23}$"},
+            "dataset": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,38}$"},
+            "indicator": {"type": "string", "minLength": 1, "maxLength": 200, "pattern": "^[^\\x00-\\x1f\\x7f]+$"},
+            "note": {"type": "string", "maxLength": 1000}
+          }
+        }
+      ]
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "labels", "definition", "unit", "domain", "source_order", "provider_declared"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_.-]{0,199}$"},
+        "labels": {"$ref": "#/$defs/labels"},
+        "definition": {"type": "string", "minLength": 1, "maxLength": 4000},
+        "unit": {"type": "string", "minLength": 1, "maxLength": 100},
+        "domain": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,39}$"},
+        "subdomain": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,59}$"},
+        "value_kind": {"enum": ["numeric", "text"]},
+        "source_order": {"type": "array", "minItems": 1, "maxItems": 50, "uniqueItems": true, "items": {"$ref": "#/$defs/series"}},
+        "provider_declared": {"const": true},
+        "notes": {"type": "string", "maxLength": 4000},
+        "tags": {"type": "array", "items": {"type": "string", "maxLength": 60}, "maxItems": 30}
+      }
+    }
+  }
+}

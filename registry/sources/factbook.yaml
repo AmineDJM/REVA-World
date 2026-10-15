@@ -1,0 +1,19 @@
+# V3 (agent A-LAW): CIA World Factbook country profiles as JSON (factbook/factbook.json, CC0 mirror of
+# the public-domain Factbook; the CIA discontinued the Factbook in February 2026). Fetched per country
+# file from raw.githubusercontent.com at a pinned commit. Atlas connector:
+# src/reva/adapters/connectors/atlas_factbook.py (legal system, suffrage, constitution text fields).
+source_key: factbook.json
+title: CIA World Factbook country profiles (factbook.json mirror, final editions)
+provider_url: https://github.com/factbook/factbook.json
+lineage_family: cia_world_factbook
+rights:
+  licence: "Public domain (US Government work); mirror CC0-1.0"
+  licence_url: https://github.com/factbook/factbook.json/blob/master/LICENSE.md
+  attribution: "The World Factbook, Central Intelligence Agency (via factbook/factbook.json)"
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  authentication: none
+  cadence: none (discontinued February 2026); pinned mirror commit
+  editorial_status: >-
+    Short descriptive texts written by the Factbook editors; not legal sources. The edition date of
+    each profile is not recorded in the mirror; REVA records the mirror commit.

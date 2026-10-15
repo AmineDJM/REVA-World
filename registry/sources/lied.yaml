@@ -1,0 +1,19 @@
+# V3 (agent A-POL): Lexical Index of Electoral Democracy (LIED), Harvard Dataverse doi:10.7910/DVN/WPKNIT.
+source_key: lied.dataverse
+title: Lexical Index of Electoral Democracy (LIED) -- Skaaning, Gerring and Bartusevicius
+provider_url: https://doi.org/10.7910/DVN/WPKNIT
+lineage_family: lied
+rights:
+  licence: CC0-1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Skaaning, Svend-Erik; John Gerring; Henrikas Bartusevicius. "Lexical Index of Electoral Democracy (LIED)
+    dataset", Harvard Dataverse, doi:10.7910/DVN/WPKNIT (file LIED_6.9.xlsx).
+  licence_evidence: Dataverse dataset record license.name = "CC0 1.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/WPKNIT
+    - https://dataverse.harvard.edu/api/access/datafile/13640161  # LIED_6.9.xlsx (MD5 619479f645afd67fdeffc50a4244905c)
+  authentication: none
+  cadence: irregular (minor versions yearly)

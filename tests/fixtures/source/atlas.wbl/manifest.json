@@ -1,0 +1,56 @@
+[
+  {
+    "request_fingerprint": "7a067d95d117811459059eec0f66d504a916af371c70ad6a91b8654129392931",
+    "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2024/WBL2024-1-0-Historical-Panel-Data.xlsx",
+    "file": "panel.xlsx",
+    "sha256": "4d5de4a3d2dc0db0b0beaff91b751928c4e87cd67aebeb92237bc17ae87e2cfe",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from": {
+      "real_file": "WBL2024-1-0-Historical-Panel-Data.xlsx",
+      "real_sha256": "60d5504d47adacbe9ab46a83397e91bf1326b42a556923d0c4e6bf0d18c653e5",
+      "real_bytes": 9575624,
+      "derivation": "subset: economies ['AFG', 'FRA', 'KSV', 'SAU', 'USA'] (ISO Code column) + header rows; original row numbers and cell texts kept; rewritten with inline strings; WBL 2026 pillar sheets keep only their first rows (#REF! caches)"
+    }
+  },
+  {
+    "request_fingerprint": "b2bfbe9af2af1972a3ac192536b27ed184bd17232170bc0e575b61a7a162aac2",
+    "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026-02-26-WBL-2026-1-0-Scores-Values_F.xlsx",
+    "file": "wbl1_2026.xlsx",
+    "sha256": "23412918ae80056308dceb03239734a99931012109a656aea9f014f72b59bbe6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from": {
+      "real_file": "2026-02-26-WBL-2026-1-0-Scores-Values_F.xlsx",
+      "real_sha256": "c94f704d0c1e90888b078097bab0e0689b9596fe084ef5255fee7f7e5acb6d1b",
+      "real_bytes": 73324,
+      "derivation": "subset: economies ['AFG', 'FRA', 'KSV', 'SAU', 'USA'] (ISO Code column) + header rows; original row numbers and cell texts kept; rewritten with inline strings; WBL 2026 pillar sheets keep only their first rows (#REF! caches)"
+    }
+  },
+  {
+    "request_fingerprint": "f763e0f521206bd0edab0431ab8c5009f6a953263d934c8fd1876319d48b8ed9",
+    "url": "https://wbl.worldbank.org/content/dam/sites/wbl/documents/2026/2026.02.19_WBL26_FINAL%20Data%20for%20Download.xlsx",
+    "file": "wbl2026.xlsx",
+    "sha256": "ba4ae5acdb922fab095b2eb512b4293c57207783696a31340fb9302fb60a96e5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from": {
+      "real_file": "2026.02.19_WBL26_FINAL Data for Download.xlsx",
+      "real_sha256": "c51f7210b4abe5b5daf2c74f1c1410a066fad7673a4c15be36524665e8de666c",
+      "real_bytes": 2529593,
+      "derivation": "subset: economies ['AFG', 'FRA', 'KSV', 'SAU', 'USA'] (ISO Code column) + header rows; original row numbers and cell texts kept; rewritten with inline strings; WBL 2026 pillar sheets keep only their first rows (#REF! caches)"
+    }
+  }
+]

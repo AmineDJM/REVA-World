@@ -1,0 +1,658 @@
+# Labour concepts of the atlas (agent A-ILO). Provider-declared definitions, not human-reviewed.
+# Tables: ilostat.<indicator id> (src/reva/adapters/connectors/atlas_ilo.py, ILOSTAT, CC BY 4.0),
+# eurostat.earn_mw_cur and oecd.earnings_* (src/reva/adapters/connectors/atlas_wages_gapfill.py).
+# Rules: ILO modelled estimates and national estimates are separate concepts (never in one source_order);
+# a source_order only lists series of the same statistic and unit basis; currencies are never converted by
+# REVA (USD / PPP cells are the provider's own conversions, named in each cell's unit).
+# Not catalogued (not available as an open per-country series, see docs/dev/v3_a_ilo.md): real wage growth
+# (ILO Global Wage Report series are not an ILOSTAT indicator).
+# Edit with care: every series string must
+# exist in its atlas table (tests/unit/test_atlas_ilo.py checks against the recorded fixtures).
+domain: labour
+labels:
+  fr: Travail et salaires
+  en: Labour and wages
+maintainer: A-ILO
+concepts:
+- id: labour.unemployment_rate.ilo_modelled
+  labels:
+    fr: Taux de chômage, 15 ans et plus — estimations modélisées OIT
+    en: Unemployment rate, ages 15+ — ILO modelled estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, ILO modelled estimates.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.unemployment_rate.national
+  labels:
+    fr: Taux de chômage, 15 ans et plus — estimations nationales
+    en: Unemployment rate, ages 15+ — national estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, as reported by national sources.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_YGE15
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.unemployment_rate.ilo_modelled.female
+  labels:
+    fr: Taux de chômage, 15 ans et plus (femmes) — estimations modélisées OIT
+    en: Unemployment rate, ages 15+ (women) — ILO modelled estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, ILO modelled estimates.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_F|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.unemployment_rate.national.female
+  labels:
+    fr: Taux de chômage, 15 ans et plus (femmes) — estimations nationales
+    en: Unemployment rate, ages 15+ (women) — national estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, as reported by national sources.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_F|classif1=AGE_YTHADULT_YGE15
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_F|classif1=AGE_AGGREGATE_YGE15
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.unemployment_rate.ilo_modelled.male
+  labels:
+    fr: Taux de chômage, 15 ans et plus (hommes) — estimations modélisées OIT
+    en: Unemployment rate, ages 15+ (men) — ILO modelled estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, ILO modelled estimates.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_M|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.unemployment_rate.national.male
+  labels:
+    fr: Taux de chômage, 15 ans et plus (hommes) — estimations nationales
+    en: Unemployment rate, ages 15+ (men) — national estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15 and over, as reported by national sources.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_M|classif1=AGE_YTHADULT_YGE15
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_M|classif1=AGE_AGGREGATE_YGE15
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.youth_unemployment_rate.ilo_modelled
+  labels:
+    fr: Taux de chômage des jeunes (15-24 ans) — estimations modélisées OIT
+    en: Youth unemployment rate (ages 15-24) — ILO modelled estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15-24, ILO modelled estimates.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_2eap_sex_age_rt_a.UNE_2EAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_Y15-24
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.youth_unemployment_rate.national
+  labels:
+    fr: Taux de chômage des jeunes (15-24 ans) — estimations nationales
+    en: Youth unemployment rate (ages 15-24) — national estimates
+  definition: 'Unemployed persons as a percentage of the labour force (ILO definition: without work, available for and seeking
+    employment), ages 15-24, national sources.'
+  unit: '%'
+  domain: labour
+  subdomain: unemployment
+  source_order:
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_Y15-24
+  - ilostat.une_deap_sex_age_rt_a.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_Y15-24
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.participation_rate.ilo_modelled
+  labels:
+    fr: Taux d'activité, 15 ans et plus — estimations modélisées OIT
+    en: Labour force participation rate, ages 15+ — ILO modelled estimates
+  definition: Labour force (employed + unemployed) as a percentage of the working-age population, ages 15 and over, ILO modelled
+    estimates.
+  unit: '%'
+  domain: labour
+  subdomain: labour_force
+  source_order:
+  - ilostat.eap_2wap_sex_age_rt_a.EAP_2WAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.participation_rate.ilo_modelled.female
+  labels:
+    fr: Taux d'activité, 15 ans et plus (femmes) — estimations modélisées OIT
+    en: Labour force participation rate, ages 15+ (women) — ILO modelled estimates
+  definition: Labour force (employed + unemployed) as a percentage of the working-age population, ages 15 and over, ILO modelled
+    estimates.
+  unit: '%'
+  domain: labour
+  subdomain: labour_force
+  source_order:
+  - ilostat.eap_2wap_sex_age_rt_a.EAP_2WAP_SEX_AGE_RT|sex=SEX_F|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.participation_rate.ilo_modelled.male
+  labels:
+    fr: Taux d'activité, 15 ans et plus (hommes) — estimations modélisées OIT
+    en: Labour force participation rate, ages 15+ (men) — ILO modelled estimates
+  definition: Labour force (employed + unemployed) as a percentage of the working-age population, ages 15 and over, ILO modelled
+    estimates.
+  unit: '%'
+  domain: labour
+  subdomain: labour_force
+  source_order:
+  - ilostat.eap_2wap_sex_age_rt_a.EAP_2WAP_SEX_AGE_RT|sex=SEX_M|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.participation_rate.national
+  labels:
+    fr: Taux d'activité, 15 ans et plus — estimations nationales
+    en: Labour force participation rate, ages 15+ — national estimates
+  definition: Labour force (employed + unemployed) as a percentage of the working-age population, ages 15 and over, national
+    sources.
+  unit: '%'
+  domain: labour
+  subdomain: labour_force
+  source_order:
+  - ilostat.eap_dwap_sex_age_rt_a.EAP_DWAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  - ilostat.eap_dwap_sex_age_rt_a.EAP_DWAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_AGGREGATE_YGE15
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.employment_to_population.ilo_modelled
+  labels:
+    fr: Taux d'emploi (emploi/population), 15 ans et plus — estimations modélisées OIT
+    en: Employment-to-population ratio, ages 15+ — ILO modelled estimates
+  definition: Employed persons as a percentage of the working-age population, ages 15 and over, ILO modelled estimates.
+  unit: '%'
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2wap_sex_age_rt_a.EMP_2WAP_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.total.ilo_modelled
+  labels:
+    fr: Emploi total (milliers) — estimations modélisées OIT
+    en: Total employment (thousands) — ILO modelled estimates
+  definition: Employed persons (ILO definition), total employment; broad economic sector (ECO_SECTOR_TOTAL); thousands; ILO
+    modelled estimates.
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_eco_nb_a.EMP_2EMP_SEX_ECO_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.agriculture.ilo_modelled
+  labels:
+    fr: Emploi dans l'agriculture (milliers) — estimations modélisées OIT
+    en: Employment in agriculture (thousands) — ILO modelled estimates
+  definition: Employed persons (ILO definition), employment in agriculture; broad economic sector (ECO_SECTOR_AGR); thousands;
+    ILO modelled estimates.
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_eco_nb_a.EMP_2EMP_SEX_ECO_NB|sex=SEX_T|classif1=ECO_SECTOR_AGR
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.industry.ilo_modelled
+  labels:
+    fr: Emploi dans l'industrie (milliers) — estimations modélisées OIT
+    en: Employment in industry (thousands) — ILO modelled estimates
+  definition: Employed persons (ILO definition), employment in industry; broad economic sector (ECO_SECTOR_IND); thousands;
+    ILO modelled estimates.
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_eco_nb_a.EMP_2EMP_SEX_ECO_NB|sex=SEX_T|classif1=ECO_SECTOR_IND
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.services.ilo_modelled
+  labels:
+    fr: Emploi dans les services (milliers) — estimations modélisées OIT
+    en: Employment in services (thousands) — ILO modelled estimates
+  definition: Employed persons (ILO definition), employment in services; broad economic sector (ECO_SECTOR_SER); thousands;
+    ILO modelled estimates.
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_eco_nb_a.EMP_2EMP_SEX_ECO_NB|sex=SEX_T|classif1=ECO_SECTOR_SER
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.employees.ilo_modelled
+  labels:
+    fr: Salariés (milliers) — estimations modélisées OIT
+    en: Employees (thousands) — ILO modelled estimates
+  definition: 'Employed persons by status in employment: employees (STE_AGGREGATE_EES, ICSE-93 aggregate); thousands; ILO
+    modelled estimates.'
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_ste_nb_a.EMP_2EMP_SEX_STE_NB|sex=SEX_T|classif1=STE_AGGREGATE_EES
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.employment.self_employed.ilo_modelled
+  labels:
+    fr: Travailleurs indépendants (milliers) — estimations modélisées OIT
+    en: Self-employed (thousands) — ILO modelled estimates
+  definition: 'Employed persons by status in employment: self-employed (STE_AGGREGATE_SLF, ICSE-93 aggregate); thousands;
+    ILO modelled estimates.'
+  unit: thousands of persons
+  domain: labour
+  subdomain: employment
+  source_order:
+  - ilostat.emp_2emp_sex_ste_nb_a.EMP_2EMP_SEX_STE_NB|sex=SEX_T|classif1=STE_AGGREGATE_SLF
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.informal_employment_share.national
+  labels:
+    fr: Part de l'emploi informel dans l'emploi total (ODD 8.3.1)
+    en: Informal employment as a share of total employment (SDG 8.3.1)
+  definition: Proportion of informal employment in total employment, all economic activities (SDG indicator 8.3.1), national
+    estimates.
+  unit: '%'
+  domain: labour
+  subdomain: informality
+  source_order:
+  - ilostat.sdg_0831_sex_eco_rt_a.SDG_0831_SEX_ECO_RT|sex=SEX_T|classif1=ECO_SECTOR_TOTAL
+  - ilostat.sdg_0831_sex_eco_rt_a.SDG_0831_SEX_ECO_RT|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.informal_employment_rate.ilo_modelled
+  labels:
+    fr: Taux d'emploi informel — estimations modélisées OIT
+    en: Informal employment rate — ILO modelled estimates
+  definition: Informal employment as a percentage of total employment, ILO modelled estimates.
+  unit: '%'
+  domain: labour
+  subdomain: informality
+  source_order:
+  - ilostat.emp_2ifl_sex_rt_a.EMP_2IFL_SEX_RT|sex=SEX_T
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it. In the Nov. 2025 vintage this series is published for regional/income aggregates only (87
+    areas, 1 country).'
+- id: labour.weekly_hours.ilo_modelled
+  labels:
+    fr: Heures hebdomadaires effectivement travaillées par personne occupée — estimations modélisées OIT
+    en: Average weekly hours actually worked per employed person — ILO modelled estimates
+  definition: Mean weekly hours actually worked per employed person, ILO modelled estimates.
+  unit: hours per week
+  domain: labour
+  subdomain: hours
+  source_order:
+  - ilostat.how_2emp_sex_nb_a.HOW_2EMP_SEX_NB|sex=SEX_T
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it.'
+- id: labour.weekly_hours.national
+  labels:
+    fr: Heures hebdomadaires effectivement travaillées par personne occupée — estimations nationales
+    en: Average weekly hours actually worked per employed person — national estimates
+  definition: Mean weekly hours actually worked per employed person, national sources.
+  unit: hours per week
+  domain: labour
+  subdomain: hours
+  source_order:
+  - ilostat.how_temp_sex_nb_a.HOW_TEMP_SEX_NB|sex=SEX_T
+  provider_declared: true
+  notes: 'National estimates as reported to ILOSTAT (best source per country-year selected by ILOSTAT: labour force survey
+    preferred). Definitions, age bounds and coverage follow each national source; flags.notes carries the ILOSTAT notes (coverage,
+    breaks in series). Rows whose source is an ILO estimate (regional aggregates) are flagged estimate_type = ilo_estimate_in_national_series.'
+- id: labour.minimum_wage.monthly.local_currency
+  labels:
+    fr: Salaire minimum mensuel (monnaie nationale)
+    en: Monthly minimum wage (national currency)
+  definition: Statutory nominal gross monthly minimum wage in national currency (the currency of each cell is named in its
+    unit).
+  unit: national currency per month (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_LCU
+  - eurostat.earn_mw_cur.earn_mw_cur|currency=NAC
+  - oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=M|price_base=V
+  provider_declared: true
+  notes: Statutory minimum wage as published by ILOSTAT (best source per country-year; mostly labour legislation). flags.notes
+    gives the minimum-wage type (national floor, sectoral, lowest occupational, regional mean...), the reference month and
+    ILO calculations (e.g. 'Hourly figure multiplied by 40 hours and 4.33 weeks'). Countries without a statutory national
+    minimum wage have no ILOSTAT row; Eurostat earn_mw_cur states it explicitly for European countries (flag 'm', data cannot
+    exist). Eurostat cells are semi-annual (January / July); OECD monthly cells are only published for countries whose minimum
+    wage is set monthly.
+  tags:
+  - owner_request
+- id: labour.minimum_wage.monthly.usd
+  labels:
+    fr: Salaire minimum mensuel (dollars US, conversion OIT)
+    en: Monthly minimum wage (US dollars, ILOSTAT conversion)
+  definition: Statutory nominal gross monthly minimum wage converted to U.S. dollars by ILOSTAT.
+  unit: USD per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_USD
+  provider_declared: true
+  notes: Statutory minimum wage as published by ILOSTAT (best source per country-year; mostly labour legislation). flags.notes
+    gives the minimum-wage type (national floor, sectoral, lowest occupational, regional mean...), the reference month and
+    ILO calculations (e.g. 'Hourly figure multiplied by 40 hours and 4.33 weeks'). Countries without a statutory national
+    minimum wage have no ILOSTAT row; Eurostat earn_mw_cur states it explicitly for European countries (flag 'm', data cannot
+    exist).
+  tags:
+  - owner_request
+- id: labour.minimum_wage.monthly.ppp2021
+  labels:
+    fr: Salaire minimum mensuel (dollars PPA 2021, conversion OIT)
+    en: Monthly minimum wage (2021 PPP $, ILOSTAT conversion)
+  definition: Statutory nominal gross monthly minimum wage converted to 2021 PPP international dollars by ILOSTAT.
+  unit: 2021 PPP $ per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_inee_cur_nb_a.EAR_INEE_CUR_NB|classif1=CUR_TYPE_PPP
+  provider_declared: true
+  notes: Statutory minimum wage as published by ILOSTAT (best source per country-year; mostly labour legislation). flags.notes
+    gives the minimum-wage type (national floor, sectoral, lowest occupational, regional mean...), the reference month and
+    ILO calculations (e.g. 'Hourly figure multiplied by 40 hours and 4.33 weeks'). Countries without a statutory national
+    minimum wage have no ILOSTAT row; Eurostat earn_mw_cur states it explicitly for European countries (flag 'm', data cannot
+    exist).
+  tags:
+  - owner_request
+- id: labour.minimum_wage.monthly.eur
+  labels:
+    fr: Salaire minimum mensuel (euros, Eurostat)
+    en: Monthly minimum wage (EUR, Eurostat)
+  definition: Gross monthly national minimum wage in euro as published by Eurostat (earn_mw_cur), semi-annual.
+  unit: EUR per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - eurostat.earn_mw_cur.earn_mw_cur|currency=EUR
+  provider_declared: true
+  notes: Eurostat converts non-euro currencies at its own reference rates; rows flagged 'm' = no national minimum wage.
+- id: labour.minimum_wage.monthly.pps
+  labels:
+    fr: Salaire minimum mensuel (SPA, Eurostat)
+    en: Monthly minimum wage (PPS, Eurostat)
+  definition: Gross monthly national minimum wage in purchasing power standards as published by Eurostat (earn_mw_cur), semi-annual.
+  unit: PPS per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - eurostat.earn_mw_cur.earn_mw_cur|currency=PPS
+  provider_declared: true
+  notes: PPS = EU purchasing power standard (not the ILO 2021 PPP $).
+- id: labour.minimum_wage.annual.national_currency
+  labels:
+    fr: Salaire minimum annuel (monnaie nationale, OCDE)
+    en: Annual minimum wage (national currency, OECD)
+  definition: Statutory minimum wage per year at current prices in national currency units, as published by the OECD.
+  unit: national currency per year (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=A|price_base=V
+  provider_declared: true
+- id: labour.minimum_wage.hourly.national_currency
+  labels:
+    fr: Salaire minimum horaire (monnaie nationale, OCDE)
+    en: Hourly minimum wage (national currency, OECD)
+  definition: Statutory minimum wage per hour at current prices in national currency units, as published by the OECD (only
+    for countries whose minimum wage is set hourly).
+  unit: national currency per hour (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - oecd.earnings_mw_curp.SM_WG|unit=NCU|pay_period=H|price_base=V
+  provider_declared: true
+- id: labour.mean_monthly_earnings.local_currency
+  labels:
+    fr: Salaire mensuel moyen des salariés (monnaie nationale)
+    en: Average monthly earnings of employees (national currency)
+  definition: Mean nominal monthly earnings of employees, all economic activities, both sexes (national currency).
+  unit: national currency per month (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_LCU
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_LCU
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_LCU
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_LCU
+  provider_declared: true
+  notes: 'Mean nominal monthly earnings of employees as published by ILOSTAT (best source per country-year: labour force,
+    household income or establishment surveys). Coverage, gross/net concept and components differ by source and are given
+    in flags.notes (e.g. ''Accounting concept: Net'', establishment-size thresholds); compare countries with care. The by-economic-activity
+    table''s totals are the same ILOSTAT statistic; listed after the by-sex table.'
+  tags:
+  - owner_request
+- id: labour.mean_monthly_earnings.usd
+  labels:
+    fr: Salaire mensuel moyen des salariés (dollars US, conversion OIT)
+    en: Average monthly earnings of employees (US dollars, ILOSTAT conversion)
+  definition: Mean nominal monthly earnings of employees, all economic activities, both sexes (US dollars, ILOSTAT conversion).
+  unit: USD per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_USD
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_USD
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_USD
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_USD
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_USD
+  provider_declared: true
+  notes: 'Mean nominal monthly earnings of employees as published by ILOSTAT (best source per country-year: labour force,
+    household income or establishment surveys). Coverage, gross/net concept and components differ by source and are given
+    in flags.notes (e.g. ''Accounting concept: Net'', establishment-size thresholds); compare countries with care. The by-economic-activity
+    table''s totals are the same ILOSTAT statistic; listed after the by-sex table.'
+  tags:
+  - owner_request
+- id: labour.mean_monthly_earnings.ppp2021
+  labels:
+    fr: Salaire mensuel moyen des salariés (dollars PPA 2021, conversion OIT)
+    en: Average monthly earnings of employees (2021 PPP $, ILOSTAT conversion)
+  definition: Mean nominal monthly earnings of employees, all economic activities, both sexes (2021 PPP $, ILOSTAT conversion).
+  unit: 2021 PPP $ per month
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_emta_sex_cur_nb_a.EAR_EMTA_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_PPP
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_SECTOR_TOTAL|classif2=CUR_TYPE_PPP
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_AGGREGATE_TOTAL|classif2=CUR_TYPE_PPP
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC4_TOTAL|classif2=CUR_TYPE_PPP
+  - ilostat.ear_emta_sex_eco_cur_nb_a.EAR_EMTA_SEX_ECO_CUR_NB|sex=SEX_T|classif1=ECO_ISIC3_TOTAL|classif2=CUR_TYPE_PPP
+  provider_declared: true
+  notes: 'Mean nominal monthly earnings of employees as published by ILOSTAT (best source per country-year: labour force,
+    household income or establishment surveys). Coverage, gross/net concept and components differ by source and are given
+    in flags.notes (e.g. ''Accounting concept: Net'', establishment-size thresholds); compare countries with care. The by-economic-activity
+    table''s totals are the same ILOSTAT statistic; listed after the by-sex table.'
+  tags:
+  - owner_request
+- id: labour.median_monthly_earnings.local_currency
+  labels:
+    fr: Salaire mensuel médian des salariés (monnaie nationale)
+    en: Median monthly earnings of employees (national currency)
+  definition: Median nominal monthly earnings of employees, both sexes, national currency.
+  unit: national currency per month (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - ilostat.ear_emtm_sex_cur_nb_a.EAR_EMTM_SEX_CUR_NB|sex=SEX_T|classif1=CUR_TYPE_LCU
+  provider_declared: true
+  notes: 'Mean nominal monthly earnings of employees as published by ILOSTAT (best source per country-year: labour force,
+    household income or establishment surveys). Coverage, gross/net concept and components differ by source and are given
+    in flags.notes (e.g. ''Accounting concept: Net'', establishment-size thresholds); compare countries with care.'
+- id: labour.average_annual_wage.oecd.usd_ppp_constant
+  labels:
+    fr: Salaire annuel moyen (dollars PPA, prix constants, OCDE)
+    en: Average annual wage (US dollars PPP, constant prices, OECD)
+  definition: Average annual wages per full-time equivalent dependent employee (national-accounts wage bill divided by FTE
+    employees), US dollars PPP at constant prices of the base year stated in each cell's unit, OECD.
+  unit: USD PPP per year, constant prices
+  domain: labour
+  subdomain: wages
+  source_order:
+  - oecd.earnings_av_an_wage.WG|unit=USD_PPP|pay_period=A|price_base=Q|agg=MEAN
+  provider_declared: true
+  notes: 'Not the same statistic as ILOSTAT mean monthly earnings (survey-based, per employee): separate concept.'
+  tags:
+  - owner_request
+- id: labour.average_annual_wage.oecd.national_currency
+  labels:
+    fr: Salaire annuel moyen (monnaie nationale, prix courants, OCDE)
+    en: Average annual wage (national currency, current prices, OECD)
+  definition: Average annual wages per full-time equivalent dependent employee, national currency at current prices, OECD.
+  unit: national currency per year (named per cell)
+  domain: labour
+  subdomain: wages
+  source_order:
+  - oecd.earnings_av_an_wage.WG|unit=NCU|pay_period=A|price_base=V|agg=MEAN
+  provider_declared: true
+  tags:
+  - owner_request
+- id: labour.labour_income_share.ilo_modelled
+  labels:
+    fr: Part du revenu du travail dans le PIB — estimations modélisées OIT
+    en: Labour income share of GDP — ILO modelled estimates
+  definition: Labour income (employees' compensation plus imputed labour income of the self-employed) as a percentage of GDP
+    (SDG 10.4.1), ILO modelled estimates.
+  unit: '% of GDP'
+  domain: labour
+  subdomain: income
+  source_order:
+  - ilostat.lap_2gdp_noc_rt_a.LAP_2GDP_NOC_RT
+  provider_declared: true
+  notes: 'ILO modelled estimates (ILOSTAT ''ILO modelled estimates, Nov. 2025'' vintage): harmonised series covering every
+    country, including imputed values where no national data exist (obs_status ''R'' marks real/observed national inputs per
+    ILOSTAT); years after the vintage are ILO projections (flags.projection). Not the same concept as the national-estimate
+    series; never mixed with it. obs_status ''I'' = imputation, ''M'' = model-based extrapolation (labels in flags).'
+- id: labour.working_poverty_rate.ilo_modelled
+  labels:
+    fr: Taux de travailleurs pauvres (ODD 1.1.1) — estimations modélisées OIT
+    en: Working poverty rate (SDG 1.1.1) — ILO modelled estimates
+  definition: Share of employed persons, ages 15+, living in households below the international poverty line (SDG 1.1.1),
+    ILO modelled estimates.
+  unit: '%'
+  domain: labour
+  subdomain: income
+  source_order:
+  - ilostat.sdg_0111_sex_age_rt_a.SDG_0111_SEX_AGE_RT|sex=SEX_T|classif1=AGE_YTHADULT_YGE15
+  provider_declared: true
+  notes: Every row of this ILOSTAT series is sourced 'ILO - Modelled Estimates'. Poverty line as defined by ILOSTAT for the
+    series (see the ILOSTAT indicator description).
+- id: labour.child_labour_share.national
+  labels:
+    fr: Part des enfants (5-17 ans) en situation de travail des enfants
+    en: Share of children (ages 5-17) in child labour
+  definition: Children aged 5-17 in child labour as a percentage of all children aged 5-17 (national child labour, household
+    or labour force surveys).
+  unit: '%'
+  domain: labour
+  subdomain: child_labour
+  source_order:
+  - ilostat.cld_xchl_sex_age_rt_a.CLD_XCHL_SEX_AGE_RT|sex=SEX_T|classif1=AGE_CLDVERSION_Y05-17
+  provider_declared: true
+  notes: Survey years only (no annual series); definitions follow national surveys (MICS, DHS, national CLS); see flags.notes.
+- id: labour.trade_union_density
+  labels:
+    fr: Taux de syndicalisation
+    en: Trade union density rate
+  definition: Union members who are employees as a percentage of all employees (ILOSTAT IRdata).
+  unit: '%'
+  domain: labour
+  subdomain: industrial_relations
+  source_order:
+  - ilostat.ilr_tumt_noc_rt_a.ILR_TUMT_NOC_RT
+  provider_declared: true
+  notes: ILOSTAT IRdata covers 2000-2020 (no newer years in the 2026-10 file).
+- id: labour.collective_bargaining_coverage
+  labels:
+    fr: Taux de couverture de la négociation collective
+    en: Collective bargaining coverage rate
+  definition: Employees whose pay and/or conditions are determined by collective agreements, as a percentage of all employees
+    (ILOSTAT IRdata).
+  unit: '%'
+  domain: labour
+  subdomain: industrial_relations
+  source_order:
+  - ilostat.ilr_cbct_noc_rt_a.ILR_CBCT_NOC_RT
+  provider_declared: true
+  notes: ILOSTAT IRdata covers 2000-2020 (no newer years in the 2026-10 file).

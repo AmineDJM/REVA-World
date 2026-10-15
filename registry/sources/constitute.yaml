@@ -1,0 +1,21 @@
+# V3 (agent A-LAW): Constitute Project public JSON service (list of constitutions with years).
+# Atlas connector: src/reva/adapters/connectors/atlas_constitute.py. Only the metadata list is
+# fetched; constitution texts (several are copyrighted translations) are never downloaded.
+source_key: constitute.service
+title: Constitute Project - constitutions list (JSON service)
+provider_url: https://www.constituteproject.org/service/constitutions
+lineage_family: ccp
+rights:
+  licence: "Constitute terms of use (checked 2026-10-15): material may be printed for legitimate purposes; no fee may be charged and commercial use is expressly prohibited. No open data licence."
+  licence_url: https://www.constituteproject.org/content/terms
+  attribution: "Constitute Project (Comparative Constitutions Project), constituteproject.org"
+  commercial_use: prohibited
+  redistribution: not_granted
+metadata:
+  allowed_hosts: [www.constituteproject.org]
+  authentication: none
+  cadence: irregular (texts updated when constitutions are amended); one request per run
+  field_semantics: >-
+    The JSON service is not documented publicly; field values (year_enacted, year_revised,
+    year_updated, years_amended, years_in_force...) are stored verbatim under their field names.
+  lineage_note: Constitute is run by the CCP; never independent evidence of CCP data (same lineage family).

@@ -1,0 +1,24 @@
+# Budget request from agent A-HEALTHEDU (WHO GHO + UNESCO UIS atlas connectors). ATLASCORE merges into
+# registry/policies/budgets.yaml. Format as docs/dev/v3_atlas_interface.md section 5.
+agent: A-HEALTHEDU
+requests:
+  - source_key: who.gho
+    # WHO Global Health Observatory OData API (https://ghoapi.azureedge.net/api). One full run =
+    # 1 indicator-list request + 48 indicator requests (one per indicator, country rows only,
+    # $select'ed columns, no paging). Largest response ~45 MB (NCDMORTPERCENT), total ~300 MB per run.
+    # Monthly cadence; daily limit leaves room for one retry pass.
+    daily_requests: 120
+    expected_bytes_per_day: 350000000
+    reason: "one request per GHO indicator (the OData API has no bulk download); ~300 MB per full run, monthly"
+  - source_key: unesco.uis
+    # UNESCO UIS Data API (https://api.uis.unesco.org/api/public). One full run = 1 version request +
+    # ~6 batched data requests (<= 60k records each; the API caps a query at 100k records), ~60 MB.
+    daily_requests: 30
+    expected_bytes_per_day: 80000000
+    reason: "batched multi-indicator queries pinned to one UIS data version; ~60 MB per run, release cadence (2x/year)"
+daily_totals_increase:
+  http_requests_total: "+150"
+  http_bytes_total: "+430_000_000"
+notes: >-
+  Both sources are free, unauthenticated public APIs. UIS states no rate limiting (100k records/query cap);
+  WHO GHO OData publishes no rate limit. Requests are serialised (one at a time, >= 1 s apart).

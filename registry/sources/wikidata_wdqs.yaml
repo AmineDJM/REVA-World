@@ -1,0 +1,22 @@
+# V3 (agent WDHARVEST): Wikidata Query Service (SPARQL), used by reva.kg.harvest to select KG entities and
+# explicit statement rows. Client: src/reva/adapters/connectors/wikidata.py (machine-wide single-flight lock,
+# >= 1 s pacing, Retry-After/back-off, descriptive User-Agent, raw responses archived content-addressed).
+source_key: wikidata.wdqs
+title: Wikidata Query Service (SPARQL endpoint)
+provider_url: https://query.wikidata.org/sparql
+lineage_family: wikidata
+rights:
+  licence: CC0-1.0
+  licence_url: https://www.wikidata.org/wiki/Wikidata:Licensing
+  attribution: "Wikidata (CC0), community-edited"
+metadata:
+  allowed_hosts: [query.wikidata.org]
+  api_docs: https://www.mediawiki.org/wiki/Wikidata_Query_Service/User_Manual
+  usage_policy: https://meta.wikimedia.org/wiki/User-Agent_policy
+  authentication: none
+  query_time_limit_seconds: 60
+  editorial_status: >-
+    Community-edited knowledge base. Statements are labelled community_edited, never verified;
+    deprecated-rank statements are excluded. Same lineage family as wikidata.wbapi (same data):
+    the two are never independent evidence of each other.
+  cadence: on demand (harvest runs)

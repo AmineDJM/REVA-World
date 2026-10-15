@@ -1,0 +1,20 @@
+id: history.country_event_items
+domain: history
+owner: KGHIST
+description: >-
+  Seeds every item that a crosswalk country lists as a significant event (P793): independence events,
+  revolutions, unifications, purchases (Louisiana Purchase), partitions, annexations, wars... so that
+  their own claims (participants, dates, signatories, cause/effect) are harvested even when the item
+  is not typed as a war/treaty/revolution.
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P793 ?statement .
+    ?statement ps:P793 ?item ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 6000
+expand_hops: 1

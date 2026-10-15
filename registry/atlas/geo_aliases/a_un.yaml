@@ -1,0 +1,27 @@
+# Geography aliases of agent A-UN (UN WPP 2024, UN DESA International Migrant Stock 2024, UN SDG API,
+# UNSD Statistical Yearbook). UN products identify areas by their M49 location code; the crosswalk
+# (registry/entities/country_crosswalk.json) holds the M49 code of every ISO 3166 entity. Two UN
+# location codes name crosswalk entities that have no M49 code there (the two non-ISO World Bank
+# entities); each alias quotes the provider row that establishes it. Nothing else is added: e.g.
+# "China, Taiwan Province of China" (158) is not a crosswalk entity and stays unmapped (kept).
+scheme: un_m49x
+base: m49
+aliases:
+  - code: "412"
+    iso3: XKX
+    source: >-
+      WPP 2024 WPP2024_Demographic_Indicators_Medium.csv.gz (raw sha256
+      286ac36bb1415e2e1ade03acfef0a29f0e4c087e2f78e38c48f50c5df89082bc), rows LocID 412,
+      Location 'Kosovo (under UNSC res. 1244)', ISO3_code 'XKX', LocTypeName 'Country/Area'.
+      XKX is the World Bank / crosswalk key of Kosovo.
+  - code: "830"
+    iso3: CHI
+    source: >-
+      UN DESA International Migrant Stock 2024 workbook (raw sha256
+      0e10179d05186041a65cf5c6200943b2231701f9c1fd33cbbe21d23b8ea47316), Table 1 row 171:
+      origin 'Channel Islands*' with location code 830 (Guernsey 831 and Jersey 832 are not listed
+      separately there). CHI is the World Bank / crosswalk key of the Channel Islands.
+source:
+  kind: provider_data
+  url: https://population.un.org/wpp/downloads
+  retrieved_at: "2026-10-15T22:11:00Z"

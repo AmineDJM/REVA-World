@@ -1,0 +1,102 @@
+# Property requests from KGCULT (registry/kg/queries/culture/**). Main-statement properties first;
+# entries with `role: qualifier` are qualifiers to add to the `qualifiers:` list of properties.yaml.
+# Labels are the expected Wikidata labels; WDHARVEST checks them against the property entities.
+- property: P219
+  why: ISO 639-2 code of languages (bibliographic/terminologic codes used by libraries and older datasets)
+  reva_predicate: iso_639_2
+  inverse: null
+  kind: external_id
+  label_en: ISO 639-2 code
+  label_fr: code ISO 639-2
+- property: P305
+  why: IETF BCP 47 language tag (joins languages to locale-tagged sources)
+  reva_predicate: ietf_language_tag
+  inverse: null
+  kind: external_id
+  label_en: IETF language tag
+  label_fr: étiquette d'identification de langues IETF
+- property: P1394
+  why: Glottolog code (languoid genealogy anchor; join key to Glottolog CC-BY data)
+  reva_predicate: glottolog_code
+  inverse: null
+  kind: external_id
+  label_en: Glottolog code
+  label_fr: code Glottolog
+- property: P4913
+  why: dialect of (language genealogy below the language level)
+  reva_predicate: dialect_of
+  inverse: has_dialect
+  kind: entity
+  label_en: dialect of
+  label_fr: dialecte de
+- property: P1999
+  why: UNESCO language status (endangerment, Atlas of the World's Languages in Danger)
+  reva_predicate: unesco_language_status
+  inverse: unesco_language_status_of
+  kind: entity
+  label_en: UNESCO language status
+  label_fr: statut de langue de l'UNESCO
+- property: P3823
+  why: Ethnologue language status (EGIDS level as stated on Wikidata)
+  reva_predicate: ethnologue_language_status
+  inverse: ethnologue_language_status_of
+  kind: entity
+  label_en: Ethnologue language status
+  label_fr: statut de langue d'Ethnologue
+- property: P1018
+  why: language regulatory body (e.g. Académie française, Real Academia Española)
+  reva_predicate: language_regulatory_body
+  inverse: regulates_language
+  kind: entity
+  label_en: language regulatory body
+  label_fr: organisme de régulation de la langue
+- property: P506
+  why: ISO 15924 alpha-4 code of writing systems
+  reva_predicate: iso_15924_alpha4
+  inverse: null
+  kind: external_id
+  label_en: ISO 15924 alpha-4
+  label_fr: ISO 15924 alpha-4
+- property: P144
+  why: based on (writing-system derivation, e.g. Latin script based on Old Italic)
+  reva_predicate: based_on
+  inverse: basis_of
+  kind: entity
+  label_en: based on
+  label_fr: basé sur
+- property: P498
+  why: ISO 4217 currency code (join key for currency entities and FX datasets)
+  reva_predicate: iso_4217_code
+  inverse: null
+  kind: external_id
+  label_en: ISO 4217 code
+  label_fr: code ISO 4217
+- property: P2012
+  why: cuisine (country -> national cuisine)
+  reva_predicate: cuisine
+  inverse: cuisine_of
+  kind: entity
+  label_en: cuisine
+  label_fr: cuisine
+- property: P2614
+  why: World Heritage criteria of a site (criteria (i)-(x))
+  reva_predicate: world_heritage_criteria
+  inverse: world_heritage_criterion_of
+  kind: entity
+  label_en: World Heritage criteria
+  label_fr: critères du patrimoine mondial
+- property: P1107
+  role: qualifier
+  why: proportion qualifier on religion (P140) and language used (P2936) statements of countries
+  label_en: proportion
+  label_fr: proportion
+- property: P1098
+  role: qualifier
+  why: number of speakers as a qualifier on language used (P2936) statements of countries
+  label_en: number of speakers, writers, or signers
+  label_fr: nombre de locuteurs, scripteurs ou signeurs
+- property: P1114
+  role: qualifier
+  why: quantity qualifier (some P2936 statements give speaker counts with P1114)
+  label_en: quantity
+  label_fr: quantité

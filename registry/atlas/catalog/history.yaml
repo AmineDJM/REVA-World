@@ -1,0 +1,254 @@
+# Long-run history layer (agent A-HISTECON). Provider-declared concepts (not human-reviewed): each concept lists
+# only series with the same definition and unit; series of other units/bases are separate concepts (e.g. GDP per
+# capita in 2011$ (Maddison), 2021 PPP $ (Gapminder) and 1990 Geary-Khamis $ (Clio-Infra) are three concepts).
+# Atlas tables: maddison.mpd2023, clio.infra, gapminder.fasttrack, cow.nmc7, cow.system2024, cow.wars4.
+# Historical values carry the provider's own notes in flags (Maddison source spans, Clio polity/territory,
+# Gapminder segment and composite-reconstruction note, COW currency break). See docs/dev/v3_a_histecon.md.
+domain: history
+labels: {fr: "Histoire longue (économie, démographie, puissance)", en: "Long-run history (economy, population, power)"}
+maintainer: A-HISTECON
+concepts:
+  - id: history.gdp_per_capita_ppp_2011
+    labels: {fr: "PIB réel par habitant (dollars 2011, Maddison)", en: "Real GDP per capita (2011 dollars, Maddison)"}
+    definition: >-
+      Real GDP per capita in 2011 international dollars as published by the Maddison Project Database 2023
+      ("Real GDP per capita in 2011$"); years 1 CE to 2022, sparse benchmark years before 1820.
+    unit: "2011$ (real GDP per capita, provider: 'Real GDP per capita in 2011$')"
+    domain: history
+    subdomain: economy
+    source_order:
+      - maddison.mpd2023.gdppc
+    provider_declared: true
+    notes: "No per-cell benchmark/interpolation flag is published in MPD 2023; flags list the provider's source spans."
+  - id: history.gdp_per_capita_ppp_2021
+    labels: {fr: "PIB par habitant, PPA (dollars internationaux constants 2021, Gapminder)", en: "GDP per capita, PPP (constant 2021 international $, Gapminder)"}
+    definition: >-
+      Gapminder GDP per capita, PPP, constant 2021 international dollars: World Bank WDI from 1990, historic
+      series (Maddison 2023 / Gapminder) shifted to PPP 2021 and blended before; the provider's 'IF-scenario'
+      years (2025-2100) are not loaded.
+    unit: "international $, constant 2021 prices (PPP)"
+    domain: history
+    subdomain: economy
+    source_order:
+      - gapminder.fasttrack.gdp_pcap
+    provider_declared: true
+    notes: "Composite reconstruction before 1990 (flag composite_reconstruction); not independent of Maddison."
+  - id: history.gdp_per_capita_gk1990
+    labels: {fr: "PIB par habitant (dollars Geary-Khamis 1990, Clio-Infra)", en: "GDP per capita (1990 Geary-Khamis dollars, Clio-Infra)"}
+    definition: "Clio-Infra GDP per capita in 1990 international Geary-Khamis dollars (Maddison-based)."
+    unit: "in 1990 international Geary-Khamis dollars"
+    domain: history
+    subdomain: economy
+    source_order:
+      - clio.infra.GDP_Capita-historical
+    provider_declared: true
+  - id: history.population_thousands
+    labels: {fr: "Population (milliers)", en: "Population (thousands)"}
+    definition: >-
+      Total (mid-year) population in thousands as published by the Maddison Project Database 2023, and Clio-Infra
+      Total Population (thousands) where Maddison has no value.
+    unit: "thousands"
+    domain: history
+    subdomain: population
+    source_order:
+      - maddison.mpd2023.pop
+      - clio.infra.Total_Population-historical
+    provider_declared: true
+    notes: "Maddison unit is 'thousands (mid-year population)', Clio-Infra 'in thousands'; both total population."
+  - id: history.population_persons
+    labels: {fr: "Population (personnes, Gapminder)", en: "Population (persons, Gapminder)"}
+    definition: >-
+      Gapminder population v8: Clio-Infra/Gapminder v3 estimates 1800-1949 adjusted to meet UN WPP 2024
+      estimates 1950-2023; projections 2024-2100 not loaded.
+    unit: "persons"
+    domain: history
+    subdomain: population
+    source_order:
+      - gapminder.fasttrack.pop
+    provider_declared: true
+  - id: history.state_population_cow
+    labels: {fr: "Population de l'État (COW, milliers)", en: "State population (COW NMC, thousands)"}
+    definition: >-
+      Total population of the state as a member of the interstate system (COW National Material Capabilities v7.0,
+      thousands): the state's territory at the time (e.g. Ottoman Empire, USSR), not today's borders.
+    unit: "thousands (total population)"
+    domain: history
+    subdomain: power
+    source_order:
+      - cow.nmc7.tpop
+    provider_declared: true
+  - id: history.life_expectancy_at_birth
+    labels: {fr: "Espérance de vie à la naissance (longue période)", en: "Life expectancy at birth (long run)"}
+    definition: "Period life expectancy at birth, both sexes (years): Clio-Infra, then Gapminder (lex, estimates only)."
+    unit: "years"
+    domain: history
+    subdomain: health
+    source_order:
+      - clio.infra.Total_life_expectancy-historical
+      - gapminder.fasttrack.lex
+    provider_declared: true
+    notes: "Gapminder lex is loaded to 2019 only (documented v14 segments; data v15)."
+  - id: history.height_male_cm
+    labels: {fr: "Taille des hommes (cm, par décennie de naissance)", en: "Male height (cm, by birth decade)"}
+    definition: "Male height equivalent in cm by birth decade (1810 = born 1810-19), Baten and Blum (Clio-Infra)."
+    unit: "cm"
+    domain: history
+    subdomain: health
+    source_order:
+      - clio.infra.Height-historical
+    provider_declared: true
+  - id: history.labourers_real_wage
+    labels: {fr: "Salaire réel des manœuvres (paniers de subsistance)", en: "Labourers' real wage (subsistence baskets)"}
+    definition: "Number of daily subsistence baskets that a labourer's daily wage buys (Clio-Infra, de Zwart et al.)."
+    unit: "Number of daily subsistence baskets that a daily wage buys"
+    domain: history
+    subdomain: economy
+    source_order:
+      - clio.infra.Labourers_wage-historical
+    provider_declared: true
+  - id: history.homicide_rate
+    labels: {fr: "Taux d'homicide (pour 100 000)", en: "Homicide rate (per 100,000)"}
+    definition: "Homicides per 100,000 inhabitants (Clio-Infra)."
+    unit: "Homicides per 100,000 inhabitants"
+    domain: history
+    subdomain: society
+    source_order:
+      - clio.infra.Homicide_rates-historical
+    provider_declared: true
+  - id: history.urbanization_ratio
+    labels: {fr: "Taux d'urbanisation (%)", en: "Urbanization ratio (%)"}
+    definition: "Urban population as a percentage of total population (Clio-Infra)."
+    unit: "urban population as a percentage of total population"
+    domain: history
+    subdomain: population
+    source_order:
+      - clio.infra.Urbanization_ratio-historical
+    provider_declared: true
+  - id: history.urban_population_thousands
+    labels: {fr: "Population urbaine (milliers)", en: "Urban population (thousands)"}
+    definition: "Total urban population in thousands (Clio-Infra)."
+    unit: "in thousands"
+    domain: history
+    subdomain: population
+    source_order:
+      - clio.infra.Urban_population-historical
+    provider_declared: true
+  - id: history.income_inequality_gini
+    labels: {fr: "Inégalité de revenu (Gini)", en: "Income inequality (Gini)"}
+    definition: "Gini coefficient of income distribution, Gini points (Clio-Infra, van Zanden et al.)."
+    unit: "Gini points"
+    domain: history
+    subdomain: inequality
+    source_order:
+      - clio.infra.income_inequality-historical
+    provider_declared: true
+  - id: history.numeracy_abcc
+    labels: {fr: "Numératie (indice ABCC, %)", en: "Numeracy (ABCC index, %)"}
+    definition: "ABCC index of age heaping (share of people reporting their age correctly), Clio-Infra."
+    unit: "ABCC index (%)"
+    domain: history
+    subdomain: education
+    source_order:
+      - clio.infra.Numeracy(Total)-historical
+    provider_declared: true
+    notes: "CC BY-SA 4.0 dataset (share-alike)."
+  - id: history.average_years_education
+    labels: {fr: "Durée moyenne de scolarité (années)", en: "Average years of education"}
+    definition: "Average years of formal schooling of the population (Clio-Infra, van Leeuwen and van Leeuwen-Li)."
+    unit: "years of formal schooling"
+    domain: history
+    subdomain: education
+    source_order:
+      - clio.infra.Average_years_education-historical
+    provider_declared: true
+  - id: history.infant_mortality
+    labels: {fr: "Mortalité infantile (pour 1 000 naissances)", en: "Infant mortality (per 1,000 live births)"}
+    definition: "Deaths of children under one year of age per 1,000 live births (Clio-Infra)."
+    unit: "number of deaths of children under one year of age per 1000 live births"
+    domain: history
+    subdomain: health
+    source_order:
+      - clio.infra.Infant_mortality-historical
+    provider_declared: true
+    notes: "CC BY-SA 4.0 dataset (share-alike)."
+  - id: history.polity2
+    labels: {fr: "Indice Polity2 (-10 à 10)", en: "Polity2 index (-10 to 10)"}
+    definition: "Polity IV autocracy-democracy score on a -10 to 10 scale, as redistributed by Clio-Infra."
+    unit: "autocracy-democracy on a -10 to 10 scale"
+    domain: history
+    subdomain: politics
+    source_order:
+      - clio.infra.polity-historical
+    provider_declared: true
+  - id: history.gold_standard
+    labels: {fr: "Étalon-or (1 = oui)", en: "Gold standard (1 = yes)"}
+    definition: "1 if a country in a particular year had the gold standard, 0 otherwise (Clio-Infra)."
+    unit: "Binary: 1 if a country in a particular year had gold standard, 0 otherwise"
+    domain: history
+    subdomain: economy
+    source_order:
+      - clio.infra.gold_standard-historical
+    provider_declared: true
+  - id: history.armed_conflict_internal
+    labels: {fr: "Conflit armé interne (1 = oui)", en: "Internal armed conflict (1 = yes)"}
+    definition: "1 if there was an internal armed conflict in a given year, 0 otherwise (Clio-Infra, Brecke)."
+    unit: "1 if there was a conflict in a given year, 0 otherwise"
+    domain: history
+    subdomain: conflict
+    source_order:
+      - clio.infra.conflicts_domestic-historical
+    provider_declared: true
+  - id: history.armed_conflict_international
+    labels: {fr: "Conflit armé international (1 = oui)", en: "International armed conflict (1 = yes)"}
+    definition: "1 if there was an international armed conflict in a given year, 0 otherwise (Clio-Infra, Brecke)."
+    unit: "1 if there was a conflict in a given year, 0 otherwise"
+    domain: history
+    subdomain: conflict
+    source_order:
+      - clio.infra.conflicts_international-historical
+    provider_declared: true
+  - id: history.cinc_score
+    labels: {fr: "Indice composite de capacité nationale (CINC)", en: "Composite Index of National Capability (CINC)"}
+    definition: "Share of the interstate system's material capabilities (COW NMC v7.0, 1816-2022)."
+    unit: "share of the state system total (0-1)"
+    domain: history
+    subdomain: power
+    source_order:
+      - cow.nmc7.cinc
+    provider_declared: true
+  - id: history.military_personnel
+    labels: {fr: "Effectifs militaires (milliers)", en: "Military personnel (thousands)"}
+    definition: "Military personnel of the state (COW NMC v7.0, thousands)."
+    unit: "thousands of military personnel"
+    domain: history
+    subdomain: power
+    source_order:
+      - cow.nmc7.milper
+    provider_declared: true
+  - id: history.iron_steel_production
+    labels: {fr: "Production de fer et d'acier (milliers de tonnes)", en: "Iron and steel production (thousand tons)"}
+    definition: "Iron and steel production of the state (COW NMC v7.0, thousands of tons)."
+    unit: "thousands of tons (iron and steel production)"
+    domain: history
+    subdomain: power
+    source_order:
+      - cow.nmc7.irst
+    provider_declared: true
+  - id: history.primary_energy_consumption_cow
+    labels: {fr: "Consommation d'énergie primaire (milliers de t. éq. charbon)", en: "Primary energy consumption (thousand coal-ton equivalents)"}
+    definition: "Primary energy consumption of the state (COW NMC v7.0, thousands of coal-ton equivalents)."
+    unit: "thousands of coal-ton equivalents (primary energy consumption)"
+    domain: history
+    subdomain: power
+    source_order:
+      - cow.nmc7.pec
+    provider_declared: true
+  - id: history.state_system_member
+    labels: {fr: "Membre du système interétatique (COW)", en: "Member of the interstate system (COW)"}
+    definition: "1 for every year a state is listed as a member of the interstate system (COW State System Membership v2024)."
+    unit: "1 = member of the interstate system in that year"
+    domain: history
+    subdomain: politics
+    source_order:
+      - cow.system2024.system_member
+    provider_declared: true

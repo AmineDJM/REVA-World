@@ -1,0 +1,36 @@
+# Provider geography codes of the A-QOL atlas connectors (agent A-QOL): Our World in Data (scheme
+# `owid`) and the World Inequality Database (scheme `wid`). Everything not listed stays unmapped and
+# is listed in each atlas table manifest (OWID_WRL World, OWID_* continents/income groups, OWID
+# source-specific regions such as "Africa (EI)", WID world regions and sub-national areas).
+# Not mapped on purpose: OWID "Czechoslovakia", "East Germany", "Serbia and Montenegro", "USSR"-type
+# historical areas; WID AN (Netherlands Antilles), CS/XC (Czechoslovakia), DD (GDR), SU (USSR),
+# YU (Yugoslavia), XE (former Ethiopia), ZZ (Zanzibar), TW (Taiwan: not a crosswalk entity),
+# XK (WID lists a second "Kosovo" code whose data member is header-only: never mapped twice).
+schemes:
+  owid:
+    base: iso3
+    aliases:
+      # OWID grapher CSVs (column `code`) use OWID_KOS for Kosovo; the GitHub energy/CO2 CSVs leave
+      # iso_code empty for Kosovo, so the connector uses the entity name as provider_geo there.
+      - code: OWID_KOS
+        iso3: XKX
+        source: "OWID grapher annual-temperature-anomalies.csv row 'Kosovo,OWID_KOS,...' (sha256 16911f331e174a18040715d74df1a9d779b7b8db76a57a2b9ffcd7c2aebdf0b5, retrieved 2026-10-15)"
+      - code: Kosovo
+        iso3: XKX
+        source: "OWID co2-data owid-co2-data.csv row 'Kosovo,1851,,...' with empty iso_code (sha256 7f78e2b218ce4bb8c538bbec04fdc9a7982e8d40bff972e650df603899edd5f6, retrieved 2026-10-15)"
+    source:
+      kind: provider_data
+      url: "https://github.com/owid/co2-data ; https://ourworldindata.org/grapher"
+  wid:
+    base: iso2
+    aliases:
+      - code: KS
+        iso3: XKX
+        source: "WID bulk wid_all_data.zip (ETag \"3493b842-65b0d5b44437d\") member WID_countries.csv row 'KS;Kosovo;Kosovo;Europe;Eastern Europe'; member WID_data_KS.csv holds the Kosovo series (XK member is header-only)"
+      - code: XI
+        iso3: CHI
+        source: "WID bulk wid_all_data.zip (ETag \"3493b842-65b0d5b44437d\") member WID_countries.csv row 'XI;the Channel Islands;Channel Islands;Europe;Western Europe'; crosswalk CHI 'Channel Islands' (World Bank code)"
+    source:
+      kind: provider_reference_list
+      url: "https://wid.world/bulk_download/wid_all_data.zip (member WID_countries.csv)"
+      retrieved_at: "2026-10-15T22:20:00Z"

@@ -1,0 +1,62 @@
+[
+  {
+    "request_fingerprint": "b1b02c62bc20fd87d9d2057f5a2817d4c3605f7252316b022bd72fc48e42f1b9",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/east-n-southeast-asia/tw.json",
+    "file": "east-n-southeast-asia_tw.json",
+    "sha256": "975a910c05e95151da8a9a9ff074eafc02a6ae4b2856aa4c53b329846fad4707",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
+  },
+  {
+    "request_fingerprint": "0815ce4039d6a7484accfeaefde7692a2f510c338fedd0026fa7fbbd8d597252",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/europe/fr.json",
+    "file": "europe_fr.json",
+    "sha256": "c5d1106d08f85f374175dfb64daa1799b71519f606df7b56ec60308ba013909c",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
+  },
+  {
+    "request_fingerprint": "0b92597d71e5035a2cff80ae4ef484df42ed3f927dae7a2a25d107233d9a1dba",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/europe/kv.json",
+    "file": "europe_kv.json",
+    "sha256": "a03ea1b88c572269932f2e68da78ffc6d5810766defde6d585b0887efe24623d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
+  },
+  {
+    "request_fingerprint": "2e36805bae3588d1e21035cbad1e2b773d48e94db0787d13bb0e54df8aa9f83a",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/middle-east/sa.json",
+    "file": "middle-east_sa.json",
+    "sha256": "27f05fe5ad2f5ea39c9b6121537270e558285d2078758a7f0405fdd789a3d776",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
+  },
+  {
+    "request_fingerprint": "7aa1140abc2336e8c325ff274a3906665044a463faeaa40d9b6c3d9910f0781e",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/north-america/us.json",
+    "file": "north-america_us.json",
+    "sha256": "5cea8e0d12f88d14c9d8e4f8c6a7039216cb3d146eb2824fda935788b1fa76f4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Public domain (US Government work); mirror CC0-1.0"
+  }
+]

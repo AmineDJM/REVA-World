@@ -1,0 +1,24 @@
+# Budget request from agent WDHARVEST (Wikidata harvest for the KG). ATLASCORE merges into
+# registry/policies/budgets.yaml (per_source_daily_requests + daily totals).
+agent: WDHARVEST
+sources:
+  wikidata.wdqs:
+    # SPARQL (https://query.wikidata.org/sparql). Seed run: ~20 queries; domain specs (KGHIST, KGPEOPLE,
+    # KGCULT, KGGEOPOL) with year/values splits: a few hundred per full pass. All requests are serialised
+    # machine-wide (one at a time, >= 1 s apart, Retry-After honoured), so the limit is a ceiling, not a rate.
+    per_source_daily_requests: 1500
+    typical_response_bytes: 2_000_000
+  wikidata.wbapi:
+    # wbgetentities (https://www.wikidata.org/w/api.php), 50 ids per call. Seed run: ~3,500 states/empires
+    # + 250 countries = ~75 full-claims calls, plus label snapshots of referenced objects (expand_hops: 1,
+    # ~20-40k ids = 400-800 calls). Domain specs (people, wars, treaties, languages): ~100k entities = ~2,000
+    # calls per full pass.
+    per_source_daily_requests: 4000
+    typical_response_bytes: 400_000   # countries are 1-3 MB per 50-id call with all claims; labels ~100 KB
+daily_totals_increase:
+  # The current total (2,000 requests, 500 MB per day for every source together) cannot hold a KG harvest.
+  http_requests_total: "+5500"
+  http_bytes_total: "+2_000_000_000"   # ~2 GB/day worst case; archived raw for the whole seed run is < 0.5 GB
+notes: >-
+  Budgets are enforced through reva.operations.budgets (reserve_ingest + MeteredHttp per source key);
+  without these keys in the pinned policy every live harvest run is refused (fail closed).

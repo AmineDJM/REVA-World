@@ -1,0 +1,385 @@
+# Atlas catalog: laws and legal systems (V3, agent A-LAW). Provider-declared concepts, not human-reviewed.
+# Legal cells keep their statutory citation in the cell flags: WBL cells carry flags.legal_basis
+# ([{label, text, column}] copied from WBL's "Legal basis" columns); CCP cells carry
+# flags.constitution_article (CCP's article reference) and flags.codebook (page locator); Factbook
+# cells are short editorial texts (no legal citation). Agent-applied rules are flagged
+# flags.transcription = "transcribed by agent A-LAW from <doc>, maintainer review pending".
+# Connectors: src/reva/adapters/connectors/atlas_{wbl,constitute,ccp,factbook,ssa_ssptw}.py.
+# Coverage and gaps: docs/dev/v3_a_law.md.
+domain: law
+labels: {fr: "Droit et systèmes juridiques", en: "Laws and legal systems"}
+maintainer: A-LAW
+concepts:
+  # ------------------------------------------------------------------ retirement and pensions (WBL 2026)
+  - id: law.retirement_age.full_benefits.men
+    labels: {fr: "Âge légal de départ à la retraite à taux plein (hommes)", en: "Statutory retirement age with full pension benefits (men)"}
+    definition: >-
+      WBL 2026 question 10.1.1.1 "Ages men (full benefits)": the age at which a man can retire and receive full
+      (non-reduced) old-age pension benefits under the law in the main business city, as of 1 October 2025.
+      "NS" = no social security system (text cell). Legal basis in flags.legal_basis.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_PensAgeEq_FullM"]
+    provider_declared: true
+    notes: >-
+      Replaces SSA SSPTW retirement ages, which could not be read (www.ssa.gov HTTP 403 to this deployment).
+      Some economies report fractional ages or a single age of a phased reform as of the reference date.
+    tags: [retirement, pension, statutory_age, legal_basis]
+  - id: law.retirement_age.full_benefits.women
+    labels: {fr: "Âge légal de départ à la retraite à taux plein (femmes)", en: "Statutory retirement age with full pension benefits (women)"}
+    definition: >-
+      WBL 2026 question 10.1.1.2 "Ages women (full benefits)": the age at which a woman can retire and receive full
+      old-age pension benefits under the law in the main business city, as of 1 October 2025. Legal basis in flags.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_PensAgeEq_FullW"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, legal_basis]
+  - id: law.retirement_age.partial_benefits.men
+    labels: {fr: "Âge légal de départ anticipé à taux réduit (hommes)", en: "Statutory retirement age with partial pension benefits (men)"}
+    definition: >-
+      WBL 2026 question 10.1.2.1 "Ages men (partial benefits)": earliest age at which a man can retire with reduced
+      (partial) pension benefits; "N/A" when the law provides no partial benefits, "NS" when there is no system.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_PensAgeEq_PartM"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, legal_basis]
+  - id: law.retirement_age.partial_benefits.women
+    labels: {fr: "Âge légal de départ anticipé à taux réduit (femmes)", en: "Statutory retirement age with partial pension benefits (women)"}
+    definition: >-
+      WBL 2026 question 10.1.2.2 "Ages women (partial benefits)": earliest age at which a woman can retire with
+      reduced pension benefits; "N/A" when the law provides none, "NS" when there is no system.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_PensAgeEq_PartW"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, legal_basis]
+  - id: law.mandatory_retirement_age.men
+    labels: {fr: "Âge de mise à la retraite obligatoire (hommes)", en: "Mandatory retirement age (men)"}
+    definition: >-
+      WBL 2026 question 10.2.2 "At what age is it mandatory for a man to retire?"; "N/A" when the law sets none.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_MandAgeEq_Men"]
+    provider_declared: true
+    tags: [retirement, legal_basis]
+  - id: law.mandatory_retirement_age.women
+    labels: {fr: "Âge de mise à la retraite obligatoire (femmes)", en: "Mandatory retirement age (women)"}
+    definition: >-
+      WBL 2026 question 10.2.1 "At what age is it mandatory for a woman to retire?"; "N/A" when the law sets none.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Pen_Law_MandAgeEq_Women"]
+    provider_declared: true
+    tags: [retirement, legal_basis]
+  - id: law.retirement_age_equal_full_benefits
+    labels: {fr: "Âge de retraite à taux plein identique pour femmes et hommes", en: "Same age for women and men to retire with full pension benefits"}
+    definition: >-
+      WBL 1.0 question "Is the age at which women and men can retire with full pension benefits the same?" (Yes/No),
+      panel 1971-2024 and WBL 1.0 values for report year 2026. Legal basis per cell in flags (panel).
+    unit: yes/no
+    domain: law
+    subdomain: pensions
+    value_kind: text
+    source_order:
+      - "wbl.wbl1_2026.Is the age at which women and men can retire with full pension benefits the same?"
+      - "wbl.panel_1971_2024.Is the age at which women and men can retire with full pension benefits the same?"
+    provider_declared: true
+    notes: Report year Y = law as of 1 October Y-1 (cell period is that day).
+    tags: [retirement, gender, legal_basis, history]
+  # ------------------------------------------------------------------ WBL indexes
+  - id: law.wbl1_index
+    labels: {fr: "Indice Les Femmes, l'Entreprise et le Droit (WBL 1.0)", en: "Women, Business and the Law index (WBL 1.0)"}
+    definition: >-
+      World Bank WBL 1.0 index (0-100): average of 8 topic scores (mobility, workplace, pay, marriage, parenthood,
+      entrepreneurship, assets, pension) over 35 legal questions; higher = more gender-equal laws. Report years
+      1971-2024 (panel, recalculated for revisions) and 2026 (comparison file).
+    unit: score (0-100)
+    domain: law
+    subdomain: gender_equality
+    value_kind: numeric
+    source_order: ["wbl.wbl1_2026.WBL INDEX", "wbl.panel_1971_2024.WBL INDEX"]
+    provider_declared: true
+    notes: Not comparable with the WBL 2026 (2.0) legal frameworks index.
+    tags: [gender, index, history]
+  - id: law.wbl2026.legal_frameworks_index
+    labels: {fr: "WBL 2026 : indice des cadres juridiques", en: "WBL 2026 legal frameworks index"}
+    definition: >-
+      WBL 2026 (2.0) Legal Frameworks pillar index (0-100): unweighted average of 10 topic scores (safety, mobility,
+      work, pay, marriage, parenthood, childcare, entrepreneurship, assets, pension). Report years 2024-2026 (2024
+      and 2025 recomputed with the 2.0 methodology).
+    unit: score (0-100)
+    domain: law
+    subdomain: gender_equality
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.LF_econ_index"]
+    provider_declared: true
+    tags: [gender, index]
+  - id: law.wbl2026.supportive_frameworks_index
+    labels: {fr: "WBL 2026 : indice des cadres de soutien", en: "WBL 2026 supportive frameworks index"}
+    definition: WBL 2026 Supportive Frameworks pillar index (0-100), report year 2026.
+    unit: score (0-100)
+    domain: law
+    subdomain: gender_equality
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.SF_econ_index"]
+    provider_declared: true
+    tags: [gender, index]
+  - id: law.wbl2026.enforcement_perceptions_index
+    labels: {fr: "WBL 2026 : indice des perceptions de l'application", en: "WBL 2026 enforcement perceptions index"}
+    definition: >-
+      WBL 2026 Enforcement Perceptions pillar index (0-100) from legal experts' views; not reported ("..",
+      flags.missing = not_reported) where too few expert responses (178 economies reported).
+    unit: score (0-100)
+    domain: law
+    subdomain: gender_equality
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.EP_econ_index"]
+    provider_declared: true
+    tags: [gender, index, perception]
+  # ------------------------------------------------------------------ family law / safety (WBL)
+  - id: law.child_marriage.legal_age_18_both_sexes
+    labels: {fr: "Âge légal du mariage de 18 ans ou plus pour filles et garçons", en: "Legal age of marriage is 18 or higher for boys and girls"}
+    definition: WBL 2026 question 1.1.1 (Yes/No), as of 1 October 2025; legal basis in flags.
+    unit: yes/no
+    domain: law
+    subdomain: family_law
+    value_kind: text
+    source_order: ["wbl.wbl2026.Saf_Law_ChildMarr_Age"]
+    provider_declared: true
+    notes: WBL does not publish the minimum marriage age itself; Wikidata P3000 (marriageable age) is requested as a KG statement spec (registry/kg/queries/society/law_marriageable_age.yaml).
+    tags: [marriage, legal_age, legal_basis]
+  - id: law.child_marriage.no_parental_consent_exception
+    labels: {fr: "Pas d'exception au consentement parental pour l'âge du mariage", en: "Law free of parental-consent exceptions to the legal age of marriage"}
+    definition: WBL 2026 question 1.1.2 (Yes/No); legal basis in flags.
+    unit: yes/no
+    domain: law
+    subdomain: family_law
+    value_kind: text
+    source_order: ["wbl.wbl2026.Saf_Law_ChildMarr_ParEx18"]
+    provider_declared: true
+    tags: [marriage, legal_age, legal_basis]
+  - id: law.domestic_violence.law_exists
+    labels: {fr: "Existence d'une loi sur les violences domestiques", en: "Law or legal provision on domestic violence"}
+    definition: WBL 2026 question 1.3.1 "Is there a law or legal provision on domestic violence?" (Yes/No); legal basis in flags.
+    unit: yes/no
+    domain: law
+    subdomain: family_law
+    value_kind: text
+    source_order: ["wbl.wbl2026.Saf_Law_DomViolLaw"]
+    provider_declared: true
+    tags: [gender, violence, legal_basis]
+  - id: law.paid_leave.mothers_days
+    labels: {fr: "Durée du congé payé disponible pour les mères", en: "Length of paid leave available to mothers"}
+    definition: WBL 2026 question 6.1.1 "What is the length of paid leave available to mothers?" (days), legal basis in flags.
+    unit: days
+    domain: law
+    subdomain: labour_law
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Par_Law_MatLeave_Total"]
+    provider_declared: true
+    notes: The WBL 1.0 panel series "Length of paid maternity leave" (1971-2024) is a different definition and is a separate concept.
+    tags: [parenthood, legal_basis]
+  - id: law.paid_maternity_leave_days_wbl1
+    labels: {fr: "Durée du congé de maternité payé (WBL 1.0)", en: "Length of paid maternity leave (WBL 1.0)"}
+    definition: WBL 1.0 unscored data point "Length of paid maternity leave" (days), report years 1971-2024 and 2026.
+    unit: days
+    domain: law
+    subdomain: labour_law
+    value_kind: numeric
+    source_order: ["wbl.wbl1_2026.Length of paid maternity leave", "wbl.panel_1971_2024.Length of paid maternity leave"]
+    provider_declared: true
+    tags: [parenthood, history]
+  - id: law.paid_leave.fathers_days
+    labels: {fr: "Durée du congé payé disponible pour les pères", en: "Length of paid leave available to fathers"}
+    definition: WBL 2026 question 6.3.1 "What is the length of paid leave available to fathers?" (days), legal basis in flags.
+    unit: days
+    domain: law
+    subdomain: labour_law
+    value_kind: numeric
+    source_order: ["wbl.wbl2026.Par_Law_PatLeave_Total"]
+    provider_declared: true
+    tags: [parenthood, legal_basis]
+  # ------------------------------------------------------------------ constitutions
+  - id: law.constitution.in_force.year_enacted
+    labels: {fr: "Année d'adoption de la constitution en vigueur", en: "Year the constitution in force was enacted"}
+    definition: >-
+      Constitute Project list, record with in_force = true: field year_enacted (e.g. France 1958, USA 1789).
+      Snapshot on the retrieval day.
+    unit: year
+    domain: law
+    subdomain: constitution
+    value_kind: numeric
+    source_order: ["constitute.constitutions.in_force.year_enacted"]
+    provider_declared: true
+    notes: Constitute terms prohibit commercial use (flags.commercial_use). CCP systyear (law.constitution.system_year) is the related CCP country-year series.
+    tags: [constitution]
+  - id: law.constitution.in_force.latest_revision_year
+    labels: {fr: "Année de la dernière révision intégrée (constitution en vigueur)", en: "Year of the latest revision included (constitution in force)"}
+    definition: Constitute Project field year_updated of the in-force constitution (the text version's revision year).
+    unit: year
+    domain: law
+    subdomain: constitution
+    value_kind: numeric
+    source_order: ["constitute.constitutions.in_force.year_updated", "constitute.constitutions.in_force.year_revised"]
+    provider_declared: true
+    tags: [constitution, amendments]
+  - id: law.constitution.in_force.years_amended
+    labels: {fr: "Nombre d'années d'amendement (Constitute)", en: "Years amended count (Constitute)"}
+    definition: Constitute Project field years_amended of the in-force constitution (Constitute's own count; undocumented service field, stored verbatim).
+    unit: count
+    domain: law
+    subdomain: constitution
+    value_kind: numeric
+    source_order: ["constitute.constitutions.in_force.years_amended"]
+    provider_declared: true
+    tags: [constitution, amendments]
+  - id: law.constitution.system_year
+    labels: {fr: "Année de promulgation du système constitutionnel (CCP)", en: "Year the constitutional system was promulgated (CCP)"}
+    definition: CCP Characteristics v5 SYSTYEAR, country-year 1789-2023 (codebook p. 11).
+    unit: year
+    domain: law
+    subdomain: constitution
+    value_kind: numeric
+    source_order: ["ccp.characteristics_v5.systyear"]
+    provider_declared: true
+    notes: Characteristics v5 download blocked live by the 50 MB response bound (see report); table appears once the bound is raised.
+    tags: [constitution, history]
+  - id: law.constitution.event_type
+    labels: {fr: "Événement constitutionnel de l'année", en: "Constitutional event of the year"}
+    definition: >-
+      CCP Chronology of Constitutional Events v6 evnttype per country-year: new, amendment, interim, reinstated,
+      suspension, samendment or non-event. 1789-2019 complete; 2020-2025 only event rows for most countries.
+    unit: category
+    domain: law
+    subdomain: constitution
+    value_kind: text
+    source_order: ["ccp.chronology_v6.evnttype"]
+    provider_declared: true
+    tags: [constitution, amendments, history]
+  - id: law.constitution.min_voting_age
+    labels: {fr: "Âge minimum de vote fixé par la constitution", en: "Constitutional minimum voting age"}
+    definition: >-
+      CCP Characteristics v5 VOTEMIN (codebook p. 103): codes 1/2/3 = 18/20/21 years (numeric); other codes as
+      labels ("adult/majority/age of majority", "left explicitly to non-constitutional law", "Not Specified"...).
+      Constitutional text only. Article reference in flags.constitution_article.
+    unit: years (age)
+    domain: law
+    subdomain: legal_ages
+    value_kind: numeric
+    source_order: ["ccp.characteristics_v5.votemin"]
+    provider_declared: true
+    tags: [voting, legal_age, constitution]
+  - id: law.constitution.capital_punishment
+    labels: {fr: "Peine de mort dans la constitution", en: "Capital punishment in the constitution"}
+    definition: >-
+      CCP Characteristics v5 CAPPUN (codebook p. 122): Universally Prohibited / Prohibited Except in the Case of War /
+      Explicitly Allowed / left to non-constitutional law / Not Specified. Constitutional status only, not the
+      statutory or de facto status of the death penalty.
+    unit: category
+    domain: law
+    subdomain: criminal_law
+    value_kind: text
+    source_order: ["ccp.characteristics_v5.cappun"]
+    provider_declared: true
+    tags: [death_penalty, constitution]
+  - id: law.constitution.same_sex_marriage_right
+    labels: {fr: "Droit constitutionnel au mariage entre personnes de même sexe", en: "Constitutional right to same-sex marriage"}
+    definition: CCP Characteristics v5 SAMESEXM (codebook p. 140). Constitutional text only; not the statutory legality of same-sex unions.
+    unit: category
+    domain: law
+    subdomain: family_law
+    value_kind: text
+    source_order: ["ccp.characteristics_v5.samesexm"]
+    provider_declared: true
+    tags: [same_sex_union, constitution]
+  # ------------------------------------------------------------------ legal system, suffrage, citizenship (Factbook)
+  - id: law.legal_system
+    labels: {fr: "Système juridique (description)", en: "Legal system (description)"}
+    definition: CIA World Factbook "Legal system" text as last published (2026-01-22 mirror update), verbatim.
+    unit: text
+    domain: law
+    subdomain: legal_system
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.legal_system"]
+    provider_declared: true
+    tags: [legal_system]
+  - id: law.legal_system.families_mentioned
+    labels: {fr: "Familles juridiques mentionnées", en: "Legal families mentioned"}
+    definition: >-
+      Legal-family keywords (civil, common, customary, islamic, religious, socialist) found in the Factbook legal-system
+      text by an agent keyword rule; a list of mentions, not a classification (flagged transcription, review pending).
+    unit: category list
+    domain: law
+    subdomain: legal_system
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.legal_system.families_mentioned"]
+    provider_declared: true
+    notes: JuriGlobe (University of Ottawa) classification was not used (no open licence found); Wikidata has no legal-system property for countries.
+    tags: [legal_system, derived]
+  - id: law.minimum_voting_age
+    labels: {fr: "Âge minimum de vote", en: "Minimum voting age"}
+    definition: >-
+      Leading "<N> years of age" of the CIA World Factbook "Suffrage" text (agent rule; the full text, e.g. "18
+      years of age; universal; compulsory", is concept law.suffrage). Covers national rules as summarised by the Factbook.
+    unit: years (age)
+    domain: law
+    subdomain: legal_ages
+    value_kind: numeric
+    source_order: ["factbook.legal_2026_01.suffrage.minimum_age"]
+    provider_declared: true
+    notes: The constitutional voting age (CCP votemin) is a different concept (law.constitution.min_voting_age).
+    tags: [voting, legal_age, derived]
+  - id: law.suffrage
+    labels: {fr: "Suffrage (description)", en: "Suffrage (description)"}
+    definition: CIA World Factbook "Suffrage" text, verbatim.
+    unit: text
+    domain: law
+    subdomain: legal_ages
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.suffrage"]
+    provider_declared: true
+    tags: [voting]
+  - id: law.citizenship.by_birth
+    labels: {fr: "Nationalité par la naissance (droit du sol)", en: "Citizenship by birth"}
+    definition: CIA World Factbook "Citizenship - citizenship by birth" text (yes/no with qualifiers), verbatim.
+    unit: text
+    domain: law
+    subdomain: citizenship
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.citizenship.by_birth"]
+    provider_declared: true
+    tags: [citizenship]
+  - id: law.citizenship.dual_recognized
+    labels: {fr: "Double nationalité reconnue", en: "Dual citizenship recognized"}
+    definition: CIA World Factbook "Citizenship - dual citizenship recognized" text, verbatim.
+    unit: text
+    domain: law
+    subdomain: citizenship
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.citizenship.dual_recognized"]
+    provider_declared: true
+    tags: [citizenship]
+  - id: law.international_law_participation
+    labels: {fr: "Participation aux juridictions internationales (CIJ, CPI)", en: "International law organization participation (ICJ, ICCt)"}
+    definition: CIA World Factbook "International law organization participation" text (ICJ jurisdiction declaration, ICCt), verbatim.
+    unit: text
+    domain: law
+    subdomain: international_law
+    value_kind: text
+    source_order: ["factbook.legal_2026_01.international_law_participation"]
+    provider_declared: true
+    tags: [international_law]

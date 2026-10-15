@@ -1,0 +1,28 @@
+# Budget request of agent NLQA (natural-language questions, POST /v1/ask). ATLASCORE merges requests into
+# registry/policies/budgets.yaml. Until merged, LLM questions are OFF by default (REVA_NLQA_LLM unset) and,
+# when an operator turns them on, they share the existing llm.scenario_drafts daily caps and ledger accounts
+# (llm:scenario_drafts:{requests,tokens}; operation ids nl_draft:<sha256>:<attempt>).
+agent: NLQA
+requests:
+  - source_key: llm.nlqa
+    kind: llm_tokens            # an LLM section under `llm:` in budgets.yaml, not an HTTP source
+    daily_requests: 300         # planner (1/question) + optional rephrase (1/question when asked)
+    daily_tokens: 3000000       # measured planner prompt: ~7.5 kB system prompt + schema; reservation bound
+                                # (bytes sent + 64 + max_output_tokens) ~ 10 000 tokens per request
+    max_output_tokens: 1500
+    reason: >-
+      Translate a French/English question into a typed query plan (gpt-4.1, strict JSON schema, temperature 0)
+      and optionally rephrase the composed answer (accepted only if every number/date/name is in the cited
+      evidence). Answers are composed from sourced data only.
+    needs_migration: >-
+      The SECURITY DEFINER ledger functions of migration 0008_v2 (ops.reserve_llm_budget /
+      ops.settle_llm_budget) hard-code the llm:scenario_drafts accounts and the nl_draft: operation-id
+      prefix. A separate llm.nlqa line needs either a generalised function (account prefix parameter from an
+      allow-list) or a sibling pair for llm:nlqa:* with operation ids nlqa:<sha256>:<attempt>.
+  - source_key: wikidata.wbsearchentities
+    daily_requests: 500
+    expected_bytes_per_day: 5000000
+    reason: >-
+      Optional fallback identification of an entity absent from the REVA KG (MediaWiki action=wbsearchentities,
+      one GET per unresolved lookup, <= 10 results, labelled "live Wikidata search, not in REVA's graph").
+      Off by default (REVA_NLQA_WIKIDATA_SEARCH=1); also capped in-process at 120/hour.

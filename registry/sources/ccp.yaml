@@ -1,0 +1,21 @@
+# V3 (agent A-LAW): Comparative Constitutions Project (CCP) public data downloads (Box links listed on
+# https://comparativeconstitutionsproject.org/download-data/). Atlas connector:
+# src/reva/adapters/connectors/atlas_ccp.py.
+source_key: ccp.data
+title: Comparative Constitutions Project - Chronology of Constitutional Events v6 and Characteristics of National Constitutions v5
+provider_url: https://comparativeconstitutionsproject.org/download-data/
+lineage_family: ccp
+rights:
+  licence: "No explicit data licence (checked 2026-10-15): free public download with a requested citation; the CCP website terms (constituteproject.org/content/terms, same project) prohibit commercial use and charging a fee."
+  licence_url: https://www.constituteproject.org/content/terms
+  attribution: "Elkins, Zachary, Tom Ginsburg, and James Melton. 2026. Chronology of Constitutional Events, Version 6. Comparative Constitutions Project. / Elkins, Zachary and Tom Ginsburg. Characteristics of National Constitutions, Version 5.0. Comparative Constitutions Project."
+  commercial_use: not_permitted_without_permission
+  redistribution: not_granted
+metadata:
+  allowed_hosts: [utexas.box.com, public.boxcloud.com, comparativeconstitutionsproject.org]
+  authentication: none
+  cadence: irregular versioned releases (chronology v6 April 2026; characteristics v5 February 2025)
+  time_semantics: country-year; the year an event was promulgated (chronology); content as in force at the end of the year (characteristics)
+  editorial_status: >-
+    Expert-coded research data; constitutional (de jure, constitutional text) only, not statutes.
+    Sample = independent states (Gleditsch & Ward; COW codes).

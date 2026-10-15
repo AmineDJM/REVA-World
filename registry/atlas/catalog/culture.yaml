@@ -1,0 +1,85 @@
+# Culture concepts of the atlas (agent KGCULT). Provider-declared, not human-reviewed.
+# Source: UNESCO World Heritage List, data.unesco.org dataset whc001 (CC BY-SA 4.0, attribution
+# "UNESCO World Heritage Centre"); atlas table unesco_whc.whc001 built by
+# src/reva/adapters/connectors/atlas_unesco_whc.py. Every value is a count of the List's own records
+# (aggregation: count), per State Party: a transboundary property counts once for each of its States
+# Parties. The dataset holds the current List only: properties removed from the List are absent.
+#
+# Not catalogued (no openly licensed, sourced per-country series found, see docs/dev/v3_kgcult.md):
+# linguistic diversity index (Greenberg's LDI is published by Ethnologue/SIL under a proprietary
+# licence; not computed here from Wikidata, which would be an REVA estimate, not a source value);
+# number of official languages (derivable from KG statements P37, but that is a REVA count over
+# community-edited data with regional/temporal qualifiers: kept as KG statements, not an atlas cell).
+domain: culture
+concepts:
+  - id: culture.whc_properties_total
+    labels: {fr: "Biens du patrimoine mondial (UNESCO)", en: "World Heritage properties (UNESCO)"}
+    definition: >-
+      Number of properties on the UNESCO World Heritage List for which the country is a State Party,
+      as published in the List at the source revision (cultural, natural and mixed). A transboundary
+      property counts for each of its States Parties.
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_total"
+    provider_declared: true
+    notes: "Current List only (removed properties such as Dresden Elbe Valley 2009 or Liverpool 2021 are absent). Counted by REVA from the List's records; flags.aggregation = count."
+  - id: culture.whc_properties_cultural
+    labels: {fr: "Biens culturels du patrimoine mondial", en: "Cultural World Heritage properties"}
+    definition: "Number of properties of category 'Cultural' on the UNESCO World Heritage List for which the country is a State Party, at the source revision."
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_cultural"
+    provider_declared: true
+  - id: culture.whc_properties_natural
+    labels: {fr: "Biens naturels du patrimoine mondial", en: "Natural World Heritage properties"}
+    definition: "Number of properties of category 'Natural' on the UNESCO World Heritage List for which the country is a State Party, at the source revision."
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_natural"
+    provider_declared: true
+  - id: culture.whc_properties_mixed
+    labels: {fr: "Biens mixtes du patrimoine mondial", en: "Mixed World Heritage properties"}
+    definition: "Number of properties of category 'Mixed' (cultural and natural criteria) on the UNESCO World Heritage List for which the country is a State Party, at the source revision."
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_mixed"
+    provider_declared: true
+  - id: culture.whc_properties_in_danger
+    labels: {fr: "Biens du patrimoine mondial en péril", en: "World Heritage properties in danger"}
+    definition: "Number of the country's World Heritage properties that are on the List of World Heritage in Danger at the source revision."
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_in_danger"
+    provider_declared: true
+  - id: culture.whc_properties_transboundary
+    labels: {fr: "Biens transfrontaliers du patrimoine mondial", en: "Transboundary World Heritage properties"}
+    definition: "Number of the country's World Heritage properties that the List marks as transboundary (shared with at least one other State Party), at the source revision."
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_transboundary"
+    provider_declared: true
+  - id: culture.whc_properties_inscribed_in_year
+    labels: {fr: "Biens inscrits au patrimoine mondial dans l'année", en: "World Heritage properties inscribed in the year"}
+    definition: >-
+      Number of properties currently on the UNESCO World Heritage List (at the source revision) for
+      which the country is a State Party and whose first inscription year (date_inscribed) is the
+      period's year. Not a reconstruction of the List as it stood that year: removed properties are
+      absent and later extensions keep the original year.
+    unit: count
+    domain: culture
+    subdomain: heritage
+    source_order:
+      - "unesco_whc.whc001.whc_properties_inscribed_in_year"
+    provider_declared: true

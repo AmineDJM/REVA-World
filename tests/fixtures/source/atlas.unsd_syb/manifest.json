@@ -1,0 +1,16 @@
+[
+  {
+    "request_fingerprint": "e3c4e746c4131a35afad443f5db94419e943369d6100b7ad8af5e606debc6b6e",
+    "url": "https://data.un.org/_Docs/SYB/CSV/SYB68_1_202511_Population,%20Surface%20Area%20and%20Density.csv",
+    "file": "e3c4e746c4131a35.csv",
+    "sha256": "d12bb5692492d72f0adeebc0e649df4375e23158247cfce3d1f0e642a9139828",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "UNdata terms of use",
+    "excerpt": "real header lines + every line of codes 1, 250, 158, 830, 772, 446, 384 (Windows-1252 bytes kept)",
+    "excerpt_of_raw_sha256": "9ef7ab141b20519c1a009ee6c678c3164e2741b57b785f23fd885df59dddfb9b"
+  }
+]

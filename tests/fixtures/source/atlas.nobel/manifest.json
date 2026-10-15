@@ -1,0 +1,29 @@
+[
+  {
+    "request_fingerprint": "6165c0a0b18ad8ba89039cd997c6b981364b5ec2463082b2d6a8d07da635a499",
+    "url": "https://api.nobelprize.org/2.1/laureates?limit=1100&offset=0",
+    "file": "6165c0a0b18ad8ba.json",
+    "sha256": "aaa625ae12a9be2ca815721d0cd2a0959d54490f6ee271e15b43fdd2a4e2b351",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:20+00:00",
+    "licence": "CC0-1.0",
+    "note": "EXCERPT: 18 real laureate records copied verbatim from the live response of 2026-10-15 (sha256 of the full response in excerpt_of_sha256); meta.count/limit set to the excerpt size. Tests parse it with min_expected=1.",
+    "excerpt_of_sha256": "5f40a8836ea63cb078f5045c0dc61fc4778eb9d70af9a7533d78a047d3be2ab8"
+  },
+  {
+    "request_fingerprint": "779b694135b2bce68f6b3d74d24a04c421f0dd22149d231ec4caea20043d5555",
+    "url": "https://api.nobelprize.org/2.1/laureates?limit=3&offset=0",
+    "file": "779b694135b2bce6.json",
+    "sha256": "6ef18da4cd51a0cdabd8b5017c43b532aa20e3d18a23707917b0348997b97d12",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC0-1.0",
+    "note": "real live capture (limit=3): a partial page the parser must refuse"
+  }
+]

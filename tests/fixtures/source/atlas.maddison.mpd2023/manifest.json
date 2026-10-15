@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "ae6dcd894c4b9eaa9949d90790c31365e00db83a99c6174502550b4ae5bfbfb2",
+    "url": "https://dataverse.nl/api/access/datafile/421302",
+    "file": "ae6dcd894c4b9eaa.xlsx",
+    "sha256": "3b9d1968dfeb3d1df403bcb1a6cf04ca4fa9f4ffdedfbdfc0daf2d57cd658188",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED fixture derived from the live response: 'Full data' rows kept for FRA, DZA, GBR, SUN, TWN, CSK, CHN; wide sheets cut to headers"
+  },
+  {
+    "request_fingerprint": "fa18dc328eca8f1ae07c6245cc5d870d57c912feed8acf8626cfe0d7700ff45f",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/INZBF2",
+    "file": "fa18dc328eca8f1a.json",
+    "sha256": "e1ece5e78f32de359dea1760783b255555c57c9b311db9c0d85bb197cbf2df96",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "live record; data file checksum/filesize rewritten to the trimmed workbook"
+  }
+]

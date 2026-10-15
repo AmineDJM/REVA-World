@@ -1,0 +1,20 @@
+# V3 (agent A-UN): UN DESA International Migrant Stock 2024 (destination x origin workbook).
+source_key: un.desa_ims
+title: "UN DESA Population Division - International Migrant Stock 2024 (destination and origin)"
+provider_url: https://www.un.org/development/desa/pd/content/international-migrant-stock
+lineage_family: un_desa_ims
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: http://creativecommons.org/licenses/by/3.0/igo/
+  attribution: "United Nations Department of Economic and Social Affairs, Population Division (2024). International Migrant Stock 2024."
+  provider_statement: "Copyright (c) 2024 by United Nations, made available under a Creative Commons license CC BY 3.0 IGO (workbook header, Table 1 cell D6)"
+metadata:
+  allowed_hosts: [www.un.org]
+  file: undesa_pd_2024_ims_stock_by_sex_destination_and_origin.xlsx   # 6.0 MB, POP/DB/MIG/Stock/Rev.2024
+  authentication: none
+  cadence: about every 4-5 years (Rev.2020, Rev.2024)
+  editorial_status: >-
+    Estimates at 1 July of 1990, 1995, ..., 2020 and 2024, derived from foreign-born (B) or foreign-citizen (C)
+    counts, with refugees added (R, UNHCR/UNRWA figures) or imputed (I); not raw census counts.
+  upstream_lineages:
+    stock: [national_censuses, population_registers, surveys, unhcr, unrwa]

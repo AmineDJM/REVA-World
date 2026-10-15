@@ -1,0 +1,18 @@
+# V3 atlas (agent A-QOL): Our World in Data compilations. Connector src/reva/adapters/connectors/atlas_owid.py
+# (atlas tables owid.energy, owid.co2, owid.g_*). OWID is a compiler: the original producer of every series is
+# recorded per cell (flags.original_source) and in each table's rights.
+source_key: owid.compilations
+title: Our World in Data — energy, CO2/GHG datasets (GitHub) and selected grapher charts
+provider_url: https://ourworldindata.org
+lineage_family: owid_compilation
+rights:
+  licence: "CC BY 4.0 for OWID-produced data; third-party data subject to the original producers' licences"
+  licence_url: https://github.com/owid/co2-data#license
+  attribution: "Our World in Data, with the original sources cited per series"
+metadata:
+  allowed_hosts: [raw.githubusercontent.com, ourworldindata.org, api.ourworldindata.org]
+  repositories: [https://github.com/owid/energy-data, https://github.com/owid/co2-data]
+  grapher_charts: [ghg-emissions-by-sector, annual-temperature-anomalies]
+  authentication: none
+  editorial_status: compiler (secondary source); prefer original producers when ingested by another agent
+  cadence: weekly check (OWID republishes continuously)

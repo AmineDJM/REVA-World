@@ -1,0 +1,34 @@
+# Budget request from agent A-ILO (labour layer: unemployment, wages, minimum wage, ...).
+# ATLASCORE merges into registry/policies/budgets.yaml (per_source_daily_requests + daily totals).
+# Every request below is a bulk download of a whole dataset (all countries, all years).
+agent: A-ILO
+requests:
+  - source_key: ilostat.rplumber
+    # rplumber.ilo.org (ILOSTAT bulk/API service; the old www.ilo.org/ilostat-files bulk area now
+    # returns 404). One request per indicator file `/data/indicator/?id=<ID>&format=.csv.gz`
+    # (21 files, 5 KB - 5.7 MB each, ~20 MB in total) + 8 code dictionaries
+    # `/metadata/dic/?var=<var>&format=.csv.gz` (~3-50 KB each) + the table of contents
+    # (`/metadata/toc/indicator/?lang=en&format=.csv`, 0.7 MB). Licence CC BY 4.0 (ILO, since 2023-05-03).
+    daily_requests: 60
+    expected_bytes_per_day: 30000000
+    reason: "ILOSTAT bulk: ~30 requests per full run (indicator files + dictionaries + TOC)"
+  - source_key: eurostat.dissemination
+    # earn_mw_cur (minimum wages, semi-annual, EUR/NAC/PPS; SDMX-CSV, 0.4 MB) + the ESTAT/OBS_FLAG
+    # code list (23 KB). Licence: Eurostat reuse policy (CC BY 4.0 equivalent, source acknowledged).
+    daily_requests: 4
+    expected_bytes_per_day: 1000000
+    reason: "Eurostat earn_mw_cur gap-fill for minimum wages (2 requests per run)"
+  - source_key: oecd.sdmx
+    # sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_EARNINGS@MW_CURP (1.1 MB) and
+    # DSD_EARNINGS@AV_AN_WAGE (0.9 MB), csvfilewithlabels. OECD terms (CC BY 4.0 default since 2024-07).
+    daily_requests: 6
+    expected_bytes_per_day: 3000000
+    reason: "OECD minimum wages (NCU) and average annual wages: 2 requests per run"
+daily_totals_increase:
+  http_requests_total: "+70"
+  http_bytes_total: "+34_000_000"
+notes: >-
+  UNECE (w3.unece.org PXWeb) is not requested: no explicit open licence found and its data API
+  needs POST (SafeHttpClient is GET-only). WageIndicator is not requested: its terms restrict free data to private, internal,
+  non-commercial use and forbid processing by AI tools. Disk: raw archive ~25 MB, Parquet
+  tables ~40 MB (well under the 1.5 GB agent budget).

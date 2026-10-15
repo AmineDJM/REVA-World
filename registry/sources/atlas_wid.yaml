@@ -1,0 +1,18 @@
+# V3 atlas (agent A-QOL): World Inequality Database bulk archive read by HTTP byte ranges. Connector
+# src/reva/adapters/connectors/atlas_wid.py (atlas table wid.wid_key).
+source_key: wid.bulk
+title: World Inequality Database (WID.world) — bulk archive wid_all_data.zip (key series)
+provider_url: https://wid.world/data/
+lineage_family: wid
+rights:
+  licence: "CC BY 4.0 per Our World in Data origin metadata (url https://wid.world/); no licence stated on WID's own pages"
+  licence_url: https://wid.world/
+  licence_status: cc_by_4.0_per_owid_metadata_not_stated_by_wid
+  attribution: "World Inequality Database (WID), https://wid.world"
+metadata:
+  allowed_hosts: [wid.world]
+  archive: https://wid.world/bulk_download/wid_all_data.zip
+  access: "HTTP Range requests (central directory + per-country members), If-Range pinned to the archive ETag"
+  authentication: none
+  archive_bytes_2026_10_15: 882096194
+  cadence: monthly check of the archive ETag

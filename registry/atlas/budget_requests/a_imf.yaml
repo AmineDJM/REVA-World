@@ -1,0 +1,16 @@
+# Budget request from agent A-IMF (IMF data portal SDMX 2.1 API, https://api.imf.org/external/sdmx/2.1).
+# ATLASCORE merges into registry/policies/budgets.yaml. Connector: atlas.imf (src/reva/adapters/connectors/atlas_imf.py).
+agent: A-IMF
+requests:
+  - source_key: imf.sdmx
+    # One full run = 6 dataset requests (WEO ~15 MB, BOP ~20 MB, GFS_SOO ~5 MB, ER/MFS_IR/IL < 3 MB
+    # each) + 1 IMTS codelist (0.2 MB) + 22 IMTS reporter chunks (12 reporters x all partners x
+    # 2000..latest, ~5-15 MB each) = 29 requests, measured in the live run documented in
+    # docs/dev/v3_a_imf.md. Allow one full retry. WEO changes twice a year (April/October); BOP/IMTS
+    # and the ex-IFS flows monthly, so a weekly-to-monthly cadence is plenty.
+    daily_requests: 60
+    expected_bytes_per_day: 400000000
+    reason: "one full run (29 requests, ~200 MB) plus one retry; no API key; PUBLIC_OPEN datasets"
+daily_totals_increase:
+  http_requests_total: "+60"
+  http_bytes_total: "+400_000_000"

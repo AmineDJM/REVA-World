@@ -1,0 +1,543 @@
+# IMF atlas concepts (agent A-IMF). Provider-declared: definitions are the IMF's own (series names and
+# metadata of the IMF data portal SDMX dataflows), not human-reviewed. Tables: atlas.imf.<dataset>
+# (weo, bop, gfs_soo, er, mfs_ir, il, imts) built by src/reva/adapters/connectors/atlas_imf.py.
+#
+# Units: values are stored exactly as the IMF reports them -- monetary amounts in FULL units (US
+# dollars, national currency), not billions; the IMF display scale is in flags.display_scale.
+# Vintage: WEO cells carry flags.vintage ("2026-10" = WEO October 2026) and flags.latest_actual; every
+# WEO year after the series' latest actual year carries flags.estimate_kind = "projection".
+# Projections are never observations: consumers must show the flag.
+domain: imf
+labels: {fr: "FMI (Fonds monétaire international)", en: "IMF (International Monetary Fund)"}
+maintainer: A-IMF
+concepts:
+  # ------------------------------------------------------------------ national accounts (WEO)
+  - id: imf.gdp_current_usd
+    labels: {fr: "PIB, prix courants (dollars US)", en: "GDP, current prices (US dollars)"}
+    definition: "Gross domestic product at current prices converted to US dollars (IMF WEO NGDPD)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGDPD"]
+    provider_declared: true
+    notes: "WEO vintage in flags.vintage; years after flags.latest_actual are projections (flags.estimate_kind)."
+  - id: imf.gdp_current_lcu
+    labels: {fr: "PIB, prix courants (monnaie nationale)", en: "GDP, current prices (national currency)"}
+    definition: "Gross domestic product at current prices in national currency (IMF WEO NGDP)."
+    unit: "national currency"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGDP"]
+    provider_declared: true
+    notes: "Currency per country = WEO PRIMARY_DOMESTIC_CURRENCY; fiscal-year economies use WEO's calendar labels."
+  - id: imf.gdp_real_growth
+    labels: {fr: "Croissance du PIB réel", en: "Real GDP growth"}
+    definition: "Annual percent change of GDP at constant prices (IMF WEO NGDP_RPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGDP_RPCH"]
+    provider_declared: true
+  - id: imf.gdp_per_capita_usd
+    labels: {fr: "PIB par habitant (dollars US courants)", en: "GDP per capita (current US dollars)"}
+    definition: "GDP at current prices in US dollars divided by population (IMF WEO NGDPDPC)."
+    unit: "US dollars per person"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGDPDPC"]
+    provider_declared: true
+  - id: imf.gdp_ppp
+    labels: {fr: "PIB en parité de pouvoir d'achat", en: "GDP, purchasing power parity"}
+    definition: "GDP at current prices in international dollars, PPP (ICP benchmarks 2017-2021) (IMF WEO PPPGDP)."
+    unit: "international dollars"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.PPPGDP"]
+    provider_declared: true
+    notes: "WEO declares no latest-actual year for PPP series: years after the country's NGDP latest actual (or from the publication year) are flagged projection; earlier years estimate_kind=unknown_boundary."
+  - id: imf.gdp_per_capita_ppp
+    labels: {fr: "PIB par habitant en PPA", en: "GDP per capita, PPP"}
+    definition: "GDP per capita in current international dollars, PPP (ICP benchmarks 2017-2021) (IMF WEO PPPPC)."
+    unit: "international dollars per person"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.PPPPC"]
+    provider_declared: true
+    notes: "Projection boundary inherited as for imf.gdp_ppp."
+  - id: imf.ppp_conversion_rate
+    labels: {fr: "Taux de conversion PPA", en: "PPP conversion rate"}
+    definition: "National currency per international dollar, PPP (ICP benchmarks 2017-2021) (IMF WEO PPPEX)."
+    unit: "national currency per international dollar"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.PPPEX"]
+    provider_declared: true
+  - id: imf.gdp_deflator_index
+    labels: {fr: "Déflateur du PIB (indice)", en: "GDP deflator (index)"}
+    definition: "GDP price deflator index (IMF WEO NGDP_D); base year per country (WEO BASE_YEAR)."
+    unit: "index"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGDP_D"]
+    provider_declared: true
+  - id: imf.gross_national_savings_gdp
+    labels: {fr: "Épargne nationale brute (% du PIB)", en: "Gross national savings (% of GDP)"}
+    definition: "Gross national savings as a percent of GDP (IMF WEO NGSD_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NGSD_NGDP"]
+    provider_declared: true
+  - id: imf.gross_capital_formation_gdp
+    labels: {fr: "Formation brute de capital (% du PIB)", en: "Gross capital formation (% of GDP)"}
+    definition: "Gross capital formation (total investment) as a percent of GDP (IMF WEO NID_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: national_accounts
+    source_order: ["imf.weo.NID_NGDP"]
+    provider_declared: true
+  # ------------------------------------------------------------------ prices (WEO)
+  - id: imf.inflation_cpi_avg
+    labels: {fr: "Inflation (IPC, moyenne annuelle)", en: "Inflation (CPI, period average)"}
+    definition: "Annual percent change of the period-average consumer price index (IMF WEO PCPIPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: prices
+    source_order: ["imf.weo.PCPIPCH"]
+    provider_declared: true
+  - id: imf.inflation_cpi_eop
+    labels: {fr: "Inflation (IPC, fin de période)", en: "Inflation (CPI, end of period)"}
+    definition: "Annual percent change of the end-of-period consumer price index (IMF WEO PCPIEPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: prices
+    source_order: ["imf.weo.PCPIEPCH"]
+    provider_declared: true
+  - id: imf.cpi_index
+    labels: {fr: "Indice des prix à la consommation", en: "Consumer price index"}
+    definition: "Consumer price index, period average (IMF WEO PCPI); base year per country."
+    unit: "index"
+    domain: imf
+    subdomain: prices
+    source_order: ["imf.weo.PCPI"]
+    provider_declared: true
+  # ------------------------------------------------------------------ labour and population (WEO)
+  - id: imf.unemployment_rate
+    labels: {fr: "Taux de chômage (FMI)", en: "Unemployment rate (IMF)"}
+    definition: "Unemployed persons as a percent of the labour force, national definitions as compiled by the IMF WEO (LUR)."
+    unit: "% of labour force"
+    domain: imf
+    subdomain: labour
+    source_order: ["imf.weo.LUR"]
+    provider_declared: true
+    notes: "National definitions (WEO LABOR_SECTOR_EMPLOYMENT_TYPE metadata); not the ILO modelled estimates."
+  - id: imf.employment
+    labels: {fr: "Personnes employées", en: "Employed persons"}
+    definition: "Employed persons (IMF WEO LE); for country groups the IMF reports an index."
+    unit: "persons"
+    domain: imf
+    subdomain: labour
+    source_order: ["imf.weo.LE"]
+    provider_declared: true
+    notes: "Country-group rows (unmapped) are an index; their unit column says so."
+  - id: imf.population
+    labels: {fr: "Population (FMI)", en: "Population (IMF)"}
+    definition: "Population (IMF WEO LP), as used by the WEO for per-capita figures."
+    unit: "persons"
+    domain: imf
+    subdomain: population
+    source_order: ["imf.weo.LP"]
+    provider_declared: true
+    notes: "Country-group rows are an index (unit column). Projections flagged."
+  # ------------------------------------------------------------------ external sector (WEO, BOP)
+  - id: imf.current_account_balance_gdp
+    labels: {fr: "Solde du compte courant (% du PIB) : excédent (+) / déficit (−)", en: "Current account balance (% of GDP): surplus (+) / deficit (−)"}
+    definition: "Current account balance (credit less debit, BPM6) as a percent of GDP (IMF WEO BCA_NGDPD). Positive = surplus, negative = deficit."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.weo.BCA_NGDPD"]
+    provider_declared: true
+    tags: [trade_balance, surplus, deficit]
+  - id: imf.current_account_balance_usd
+    labels: {fr: "Solde du compte courant (dollars US)", en: "Current account balance (US dollars)"}
+    definition: "Current account balance, credit less debit (BPM6), in US dollars. Positive = surplus."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.CAB|entry=NETCD_T", "imf.weo.BCA"]
+    provider_declared: true
+    notes: "BOP = reported official BPM6 data; WEO = the same concept with IMF staff estimates/projections (flagged)."
+    tags: [trade_balance, surplus, deficit]
+  - id: imf.goods_balance_usd
+    labels: {fr: "Balance des biens (dollars US) : excédent / déficit commercial", en: "Goods balance (US dollars): merchandise trade surplus / deficit"}
+    definition: "Goods, net (credit less debit), balance of payments BPM6, in US dollars (IMF BOP indicator G, entry NETCD_T)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.G|entry=NETCD_T"]
+    provider_declared: true
+    tags: [trade_balance, surplus, deficit]
+  - id: imf.services_balance_usd
+    labels: {fr: "Balance des services (dollars US)", en: "Services balance (US dollars)"}
+    definition: "Services, net (credit less debit), BPM6, in US dollars (IMF BOP indicator S, NETCD_T)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.S|entry=NETCD_T"]
+    provider_declared: true
+    tags: [trade_balance]
+  - id: imf.goods_services_balance_usd
+    labels: {fr: "Balance des biens et services (dollars US)", en: "Goods and services balance (US dollars)"}
+    definition: "Goods and services, net (credit less debit), BPM6, in US dollars (IMF BOP indicator GS, NETCD_T)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.GS|entry=NETCD_T"]
+    provider_declared: true
+    tags: [trade_balance, surplus, deficit]
+  - id: imf.exports_goods_services_usd
+    labels: {fr: "Exportations de biens et services (dollars US)", en: "Exports of goods and services (US dollars)"}
+    definition: "Exports of goods and services (BOP credit, BPM6) in US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.GS|entry=CD_T"]
+    provider_declared: true
+  - id: imf.imports_goods_services_usd
+    labels: {fr: "Importations de biens et services (dollars US)", en: "Imports of goods and services (US dollars)"}
+    definition: "Imports of goods and services (BOP debit, BPM6) in US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.GS|entry=DB_T"]
+    provider_declared: true
+  - id: imf.goods_exports_bop_usd
+    labels: {fr: "Exportations de biens (BdP, dollars US)", en: "Goods exports (BOP, US dollars)"}
+    definition: "Goods, credit, balance of payments BPM6 basis, US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.G|entry=CD_T"]
+    provider_declared: true
+  - id: imf.goods_imports_bop_usd
+    labels: {fr: "Importations de biens (BdP, dollars US)", en: "Goods imports (BOP, US dollars)"}
+    definition: "Goods, debit, balance of payments BPM6 basis, US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.G|entry=DB_T"]
+    provider_declared: true
+  - id: imf.services_exports_bop_usd
+    labels: {fr: "Exportations de services (dollars US)", en: "Services exports (US dollars)"}
+    definition: "Services, credit, BPM6, US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.S|entry=CD_T"]
+    provider_declared: true
+  - id: imf.services_imports_bop_usd
+    labels: {fr: "Importations de services (dollars US)", en: "Services imports (US dollars)"}
+    definition: "Services, debit, BPM6, US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.S|entry=DB_T"]
+    provider_declared: true
+  - id: imf.primary_income_balance_usd
+    labels: {fr: "Solde des revenus primaires (dollars US)", en: "Primary income balance (US dollars)"}
+    definition: "Primary income, net (credit less debit), BPM6, US dollars."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.IN1|entry=NETCD_T"]
+    provider_declared: true
+  - id: imf.secondary_income_balance_usd
+    labels: {fr: "Solde des revenus secondaires (dollars US)", en: "Secondary income balance (US dollars)"}
+    definition: "Secondary income, net (credit less debit), BPM6, US dollars (includes remittances and current transfers)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.bop.IN2|entry=NETCD_T"]
+    provider_declared: true
+  - id: imf.exports_gs_volume_growth
+    labels: {fr: "Volume des exportations de biens et services (variation %)", en: "Volume of exports of goods and services (% change)"}
+    definition: "Percent change of the volume of exports of goods and services (IMF WEO TX_RPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.weo.TX_RPCH"]
+    provider_declared: true
+  - id: imf.imports_gs_volume_growth
+    labels: {fr: "Volume des importations de biens et services (variation %)", en: "Volume of imports of goods and services (% change)"}
+    definition: "Percent change of the volume of imports of goods and services (IMF WEO TM_RPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.weo.TM_RPCH"]
+    provider_declared: true
+  - id: imf.exports_goods_volume_growth
+    labels: {fr: "Volume des exportations de biens (variation %)", en: "Volume of exports of goods (% change)"}
+    definition: "Percent change of the volume of exports of goods (IMF WEO TXG_RPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.weo.TXG_RPCH"]
+    provider_declared: true
+  - id: imf.imports_goods_volume_growth
+    labels: {fr: "Volume des importations de biens (variation %)", en: "Volume of imports of goods (% change)"}
+    definition: "Percent change of the volume of imports of goods (IMF WEO TMG_RPCH)."
+    unit: "% change"
+    domain: imf
+    subdomain: external
+    source_order: ["imf.weo.TMG_RPCH"]
+    provider_declared: true
+  # ------------------------------------------------------------------ merchandise trade (IMTS, ex-DOTS)
+  - id: imf.goods_exports_world_usd
+    labels: {fr: "Exportations de marchandises vers le monde (DOTS/IMTS, dollars US)", en: "Merchandise exports to the world (DOTS/IMTS, US dollars)"}
+    definition: "Exports of goods, FOB, to all partners (IMF IMTS, counterpart G001 World), US dollars; customs basis, not BOP."
+    unit: "US dollars"
+    domain: imf
+    subdomain: trade
+    source_order: ["imf.imts.XG_FOB_USD|partner=G001"]
+    provider_declared: true
+    notes: "Bilateral rows (one per partner) are in atlas.imf.imts with flags.partner_iso3. IMTS includes IMF estimates for non-reporting economies; status 'e' kept in flags.provider_status."
+  - id: imf.goods_imports_world_usd
+    labels: {fr: "Importations de marchandises du monde (DOTS/IMTS, dollars US)", en: "Merchandise imports from the world (DOTS/IMTS, US dollars)"}
+    definition: "Imports of goods, CIF, from all partners (IMF IMTS, counterpart G001 World), US dollars; customs basis."
+    unit: "US dollars"
+    domain: imf
+    subdomain: trade
+    source_order: ["imf.imts.MG_CIF_USD|partner=G001"]
+    provider_declared: true
+    notes: "Exports are FOB and imports CIF: their difference is NOT the BOP goods balance (use imf.goods_balance_usd)."
+  # ------------------------------------------------------------------ fiscal (WEO)
+  - id: imf.gg_net_lending_gdp
+    labels: {fr: "Solde des administrations publiques (% du PIB)", en: "General government net lending/borrowing (% of GDP)"}
+    definition: "General government net lending (+) / net borrowing (−) as a percent of GDP (IMF WEO GGXCNL_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGXCNL_NGDP"]
+    provider_declared: true
+    notes: "WEO 'general government' coverage varies by country (WEO FISCAL_SECTOR_GENERAL_GOVERNMENT_COMPOSITION metadata); hence not merged with GFS S13."
+  - id: imf.gg_primary_balance_gdp
+    labels: {fr: "Solde primaire des administrations publiques (% du PIB)", en: "General government primary balance (% of GDP)"}
+    definition: "General government primary net lending/borrowing as a percent of GDP (IMF WEO GGXONLB_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGXONLB_NGDP"]
+    provider_declared: true
+  - id: imf.gg_revenue_gdp
+    labels: {fr: "Recettes des administrations publiques (% du PIB)", en: "General government revenue (% of GDP)"}
+    definition: "General government revenue as a percent of GDP (IMF WEO GGR_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGR_NGDP"]
+    provider_declared: true
+  - id: imf.gg_expenditure_gdp
+    labels: {fr: "Dépenses des administrations publiques (% du PIB)", en: "General government expenditure (% of GDP)"}
+    definition: "General government total expenditure as a percent of GDP (IMF WEO GGX_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGX_NGDP"]
+    provider_declared: true
+  - id: imf.gg_gross_debt_gdp
+    labels: {fr: "Dette brute des administrations publiques (% du PIB)", en: "General government gross debt (% of GDP)"}
+    definition: "General government gross debt as a percent of GDP (IMF WEO GGXWDG_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGXWDG_NGDP"]
+    provider_declared: true
+  - id: imf.gg_net_debt_gdp
+    labels: {fr: "Dette nette des administrations publiques (% du PIB)", en: "General government net debt (% of GDP)"}
+    definition: "General government net debt as a percent of GDP (IMF WEO GGXWDN_NGDP)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal
+    source_order: ["imf.weo.GGXWDN_NGDP"]
+    provider_declared: true
+  # ------------------------------------------------------------------ fiscal (GFS Statement of Operations)
+  - id: imf.gfs_gg_revenue_gdp
+    labels: {fr: "Recettes, administrations publiques (SFP, % du PIB)", en: "Revenue, general government (GFS, % of GDP)"}
+    definition: "Revenue (GFSM 2014 G1), general government (S13), transactions, percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G1_T|sector=S13"]
+    provider_declared: true
+    notes: "flags.recording_basis: AC accrual, CA cash (as reported)."
+  - id: imf.gfs_gg_expense_gdp
+    labels: {fr: "Charges, administrations publiques (SFP, % du PIB)", en: "Expense, general government (GFS, % of GDP)"}
+    definition: "Expense (GFSM 2014 G2), general government (S13), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G2_T|sector=S13"]
+    provider_declared: true
+  - id: imf.gfs_gg_expenditure_gdp
+    labels: {fr: "Dépenses, administrations publiques (SFP, % du PIB)", en: "Expenditure, general government (GFS, % of GDP)"}
+    definition: "Expenditure (expense plus net investment in nonfinancial assets, GFSM 2014 G2M), general government (S13), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G2M_T|sector=S13"]
+    provider_declared: true
+  - id: imf.gfs_gg_net_operating_balance_gdp
+    labels: {fr: "Solde de gestion opérationnelle, administrations publiques (SFP, % du PIB)", en: "Net operating balance, general government (GFS, % of GDP)"}
+    definition: "Net operating balance (revenue less expense), general government (S13), percent of GDP (IMF GFS_SOO GNOB_T)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.GNOB_T|sector=S13"]
+    provider_declared: true
+  - id: imf.gfs_gg_net_lending_gdp
+    labels: {fr: "Capacité/besoin de financement, administrations publiques (SFP, % du PIB)", en: "Net lending/borrowing, general government (GFS, % of GDP)"}
+    definition: "Net lending (+) / net borrowing (−), general government (S13), percent of GDP (IMF GFS_SOO GNLB_T)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.GNLB_T|sector=S13"]
+    provider_declared: true
+  - id: imf.gfs_bcg_revenue_gdp
+    labels: {fr: "Recettes, administration centrale budgétaire (SFP, % du PIB)", en: "Revenue, budgetary central government (GFS, % of GDP)"}
+    definition: "Revenue (G1), budgetary central government (S1311), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G1_T|sector=S1311"]
+    provider_declared: true
+  - id: imf.gfs_bcg_expense_gdp
+    labels: {fr: "Charges, administration centrale budgétaire (SFP, % du PIB)", en: "Expense, budgetary central government (GFS, % of GDP)"}
+    definition: "Expense (G2), budgetary central government (S1311), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G2_T|sector=S1311"]
+    provider_declared: true
+  - id: imf.gfs_bcg_expenditure_gdp
+    labels: {fr: "Dépenses, administration centrale budgétaire (SFP, % du PIB)", en: "Expenditure, budgetary central government (GFS, % of GDP)"}
+    definition: "Expenditure (G2M), budgetary central government (S1311), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.G2M_T|sector=S1311"]
+    provider_declared: true
+  - id: imf.gfs_bcg_net_operating_balance_gdp
+    labels: {fr: "Solde de gestion opérationnelle, administration centrale budgétaire (SFP, % du PIB)", en: "Net operating balance, budgetary central government (GFS, % of GDP)"}
+    definition: "Net operating balance (GNOB), budgetary central government (S1311), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.GNOB_T|sector=S1311"]
+    provider_declared: true
+  - id: imf.gfs_bcg_net_lending_gdp
+    labels: {fr: "Capacité/besoin de financement, administration centrale budgétaire (SFP, % du PIB)", en: "Net lending/borrowing, budgetary central government (GFS, % of GDP)"}
+    definition: "Net lending/borrowing (GNLB), budgetary central government (S1311), percent of GDP (IMF GFS_SOO)."
+    unit: "% of GDP"
+    domain: imf
+    subdomain: fiscal_gfs
+    source_order: ["imf.gfs_soo.GNLB_T|sector=S1311"]
+    provider_declared: true
+  # ------------------------------------------------------------------ monetary (ex-IFS: ER, MFS_IR, IL)
+  - id: imf.exchange_rate_lcu_per_usd_avg
+    labels: {fr: "Taux de change (monnaie nationale par dollar US, moyenne)", en: "Exchange rate (national currency per US dollar, period average)"}
+    definition: "Domestic currency per US dollar, period average (IMF ER XDC_USD, PA_RT; ex-IFS)."
+    unit: "national currency per US dollar"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.er.XDC_USD|PA_RT"]
+    provider_declared: true
+    notes: "The national currency is the one in use in each year as reported by the IMF (e.g. euro after adoption)."
+  - id: imf.exchange_rate_lcu_per_usd_eop
+    labels: {fr: "Taux de change (monnaie nationale par dollar US, fin de période)", en: "Exchange rate (national currency per US dollar, end of period)"}
+    definition: "Domestic currency per US dollar, end of period (IMF ER XDC_USD, EOP_RT; ex-IFS)."
+    unit: "national currency per US dollar"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.er.XDC_USD|EOP_RT"]
+    provider_declared: true
+  - id: imf.policy_rate
+    labels: {fr: "Taux directeur (taux lié à la politique monétaire)", en: "Monetary policy-related interest rate"}
+    definition: "Monetary policy-related interest rate, percent per annum, annual (IMF MFS_IR MFS166; ex-IFS 'central bank policy rate')."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.MFS166_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.discount_rate
+    labels: {fr: "Taux d'escompte", en: "Discount rate"}
+    definition: "Discount rate, percent per annum (IMF MFS_IR DISR)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.DISR_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.money_market_rate
+    labels: {fr: "Taux du marché monétaire", en: "Money market rate"}
+    definition: "Money market rate, percent per annum (IMF MFS_IR MMRT)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.MMRT_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.deposit_rate
+    labels: {fr: "Taux de dépôt", en: "Deposit rate"}
+    definition: "Deposit rate, percent per annum (IMF MFS_IR MFS135)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.MFS135_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.lending_rate
+    labels: {fr: "Taux débiteur (prêts)", en: "Lending rate"}
+    definition: "Lending rate, percent per annum (IMF MFS_IR MFS162)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.MFS162_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.treasury_bill_rate
+    labels: {fr: "Taux des bons du Trésor", en: "Treasury bill rate"}
+    definition: "Treasury bills rate, percent per annum (IMF MFS_IR IRTBILL)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.IRTBILL_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.government_bond_yield
+    labels: {fr: "Rendement des obligations d'État", en: "Government bond yield"}
+    definition: "Government bonds yield, percent per annum (IMF MFS_IR S13BONDS)."
+    unit: "% per annum"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.mfs_ir.S13BONDS_RT_PT_A_PT"]
+    provider_declared: true
+  - id: imf.total_reserves_usd
+    labels: {fr: "Réserves totales (or à la valeur de marché, dollars US)", en: "Total reserves (gold at market value, US dollars)"}
+    definition: "Total reserves including gold valued at market prices, US dollars, end of period (IMF IL TRGMV_REVS; ex-IFS)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.il.TRGMV_REVS|unit=USD"]
+    provider_declared: true
+  - id: imf.reserves_excl_gold_usd
+    labels: {fr: "Réserves hors or (dollars US)", en: "Reserves excluding gold (US dollars)"}
+    definition: "Total reserves minus gold, US dollars (IMF IL RXF11_REVS; ex-IFS)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.il.RXF11_REVS|unit=USD"]
+    provider_declared: true
+  - id: imf.gold_reserves_usd
+    labels: {fr: "Réserves d'or (valeur de marché, dollars US)", en: "Gold reserves (market value, US dollars)"}
+    definition: "Gold reserves at market value, US dollars (IMF IL RGOLDMV_REVS)."
+    unit: "US dollars"
+    domain: imf
+    subdomain: monetary
+    source_order: ["imf.il.RGOLDMV_REVS|unit=USD"]
+    provider_declared: true

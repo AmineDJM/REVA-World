@@ -1,0 +1,21 @@
+# V3 (agent WDHARVEST): Wikibase API wbgetentities, entity snapshots (claims with statement ids, ranks,
+# qualifiers, references; labels/descriptions/aliases in fr|en|es|pt|ar|zh|ru|de; sitelinks; lastrevid).
+source_key: wikidata.wbapi
+title: Wikidata Wikibase API (wbgetentities)
+provider_url: https://www.wikidata.org/w/api.php
+lineage_family: wikidata
+rights:
+  licence: CC0-1.0
+  licence_url: https://www.wikidata.org/wiki/Wikidata:Licensing
+  attribution: "Wikidata (CC0), community-edited"
+metadata:
+  allowed_hosts: [www.wikidata.org]
+  api_docs: https://www.wikidata.org/w/api.php?action=help&modules=wbgetentities
+  usage_policy: https://www.mediawiki.org/wiki/API:Etiquette
+  authentication: none
+  max_ids_per_request: 50
+  maxlag_seconds: 5
+  editorial_status: >-
+    Community-edited knowledge base. Statements are labelled community_edited, never verified;
+    deprecated-rank statements are excluded. Same lineage family as wikidata.wdqs.
+  cadence: on demand (harvest runs)

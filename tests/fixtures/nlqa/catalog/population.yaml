@@ -1,0 +1,21 @@
+# NLQA TEST FIXTURE (not the registry catalog): concepts in the shape of registry/atlas/catalog/_schema.json,
+# used by tests/unit/nlqa and by the recorded planner responses (tests/fixtures/nlqa/recorded).
+domain: population
+concepts:
+  - id: population.density
+    labels: {fr: "Densité de population", en: "Population density"}
+    definition: "People per sq. km of land area (provider definition)."
+    unit: "people per sq. km of land area"
+    domain: population
+    source_order:
+      - "wb.wdi.EN.POP.DNST"
+      - "un.wpp.PopDensity"
+    provider_declared: true
+  - id: population.total
+    labels: {fr: "Population totale", en: "Total population"}
+    definition: "All residents regardless of legal status or citizenship (provider definition)."
+    unit: "persons"
+    domain: population
+    source_order:
+      - "wb.wdi.SP.POP.TOTL"
+    provider_declared: true

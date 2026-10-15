@@ -1,0 +1,28 @@
+[
+  {
+    "request_fingerprint": "edd1d3c4902b8f5dcacde8ce837b0529f1142a63aff478612ae0713d8a5f137e",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_EARNINGS@AV_AN_WAGE,1.0/FRA+USA+OECD......?format=csvfilewithlabels",
+    "file": "edd1d3c4902b8f5d.json",
+    "sha256": "e4fb7b7ca0d20ce07b40603e2bb2f630a24e1bdcf60d9ce83028cea37eb50d78",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; charset=utf-8; labels=name; version=2",
+      "last-modified": "2023-11-14"
+    },
+    "retrieved_at": "2026-10-15T22:24:21.399144+00:00",
+    "licence": "OECD Terms and Conditions; CC BY 4.0 is the OECD default since 2024-07-01 (dataset-level licence not separately verified)"
+  },
+  {
+    "request_fingerprint": "b40ba8d576de7e3ba6e0a41d96b30e17caa5527bbbb6ab44a163b1b60275b313",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.ELS.SAE,DSD_EARNINGS@MW_CURP,1.0/FRA+USA+OECD......?format=csvfilewithlabels",
+    "file": "b40ba8d576de7e3b.json",
+    "sha256": "759f026be6ca5997316f10fff5f5c827b918ef7c4b5a4ecb011afa9e9f87f5ca",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv; labels=name; version=2; charset=utf-8",
+      "last-modified": "2023-11-14"
+    },
+    "retrieved_at": "2026-10-15T22:24:20.595492+00:00",
+    "licence": "OECD Terms and Conditions; CC BY 4.0 is the OECD default since 2024-07-01 (dataset-level licence not separately verified)"
+  }
+]

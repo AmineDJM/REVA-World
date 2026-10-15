@@ -1,0 +1,19 @@
+# ILOSTAT reference-area codes (agent A-ILO). ILOSTAT uses ISO 3166-1 alpha-3 codes for
+# countries and territories, plus its own codes for a few areas and "X.." codes for regional /
+# income aggregates. Only codes whose ILOSTAT label names exactly the same entity as a crosswalk
+# key are aliased; everything else (aggregates X01..X99, ANT "Netherlands Antilles" (historical),
+# TWN "Taiwan, China" (not an entity of registry/entities/country_crosswalk.json)) stays unmapped
+# and is listed in each atlas table's manifest, never dropped.
+scheme: ilo
+base: iso3
+aliases:
+  KOS: XKX  # ILOSTAT label "Kosovo"; crosswalk XKX "Kosovo" (World Bank code, not ISO 3166)
+  CHA: CHI  # ILOSTAT label "Channel Islands"; crosswalk CHI "Channel Islands" (World Bank code)
+source:
+  kind: provider_reference_list
+  url: "https://rplumber.ilo.org/metadata/dic/?var=ref_area&lang=en&format=.csv.gz"
+  retrieved_at: "2026-10-15T22:05:30Z"
+  csv_sha256: "63885e27089cda6abb5db0a9e2ddf5a5ff40d08c461da4ba13a034d2a600e011"
+  quotes:
+    - '"KOS","Kosovo"'
+    - '"CHA","Channel Islands"'

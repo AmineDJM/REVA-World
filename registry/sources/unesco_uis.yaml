@@ -1,0 +1,24 @@
+# V3 atlas (agent A-HEALTHEDU): UNESCO Institute for Statistics public Data API.
+# Connector: src/reva/adapters/connectors/atlas_uis.py (atlas table uis.api).
+source_key: unesco.uis
+title: UNESCO Institute for Statistics (UIS Data API)
+provider_url: https://api.uis.unesco.org/api/public
+lineage_family: unesco_uis
+rights:
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  terms_url: https://databrowser.uis.unesco.org/terms-and-conditions
+  attribution: "Source: UNESCO Institute for Statistics (UIS), https://api.uis.unesco.org, date of extraction"
+  share_alike: derived tables must be shared under CC BY-SA 4.0
+metadata:
+  allowed_hosts: [api.uis.unesco.org]
+  api_docs: https://api.uis.unesco.org/api/public/documentation/
+  authentication: none
+  limits: "no rate limiting stated; 100,000 records per query (HTTP 400 beyond)"
+  bulk_alternative: "Bulk Data Download Service (BDDS), https://uis.unesco.org/bdds"
+  cadence: two data releases per year (February, September); queries pinned to one data version
+  editorial_status: >-
+    Country-reported administrative, census and survey data with UIS estimates flagged per record
+    (qualifier UIS_EST / NAT_EST); some indicators are UIS/GEM model output (CR.MOD.*).
+  upstream_lineages:
+    XGDP.FSGOV: [national_ministries, uoe_joint_collection, worldbank_wdi_gdp]

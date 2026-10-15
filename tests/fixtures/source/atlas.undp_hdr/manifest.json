@@ -1,0 +1,53 @@
+[
+  {
+    "request_fingerprint": "cf16a96944aa1fe30cf9c578b22dbf8e486608d5d657bfcaefb77dd7e9f2035f",
+    "url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv",
+    "file": "cf16a96944aa1fe3.csv",
+    "sha256": "85861882eec25d61d8635bd02a5e828bc505d700c0af7c76cd0bf8926a3b9867",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv",
+      "etag": "\"68193e10-1e896f\"",
+      "last-modified": "Mon, 05 May 2025 22:39:12 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:25:17.824062+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "live_sha256": "61ed82e5b66c88dfca8ff9fac775c63981ecab6a254862af97acacc41c143117",
+    "live_bytes": 2001263,
+    "excerpt": "header + rows FRA, DZA, USA, CIV, HKG, PSE, AFG, COD, ZZK.WORLD, ZZJ.SSA (original bytes, cp1252, CRLF)"
+  },
+  {
+    "request_fingerprint": "698967d750e86d27be12c8effbd12595e406aee44130479746754c95e1332a62",
+    "url": "https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_metadata.xlsx",
+    "file": "698967d750e86d27.xlsx",
+    "sha256": "b4128881e81d208aa75920114e1189ca01dcea41c7d8e977732e9342f6de0a8d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "etag": "\"68193e11-35a3\"",
+      "last-modified": "Mon, 05 May 2025 22:39:13 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:25:18.166362+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "live_sha256": "b4128881e81d208aa75920114e1189ca01dcea41c7d8e977732e9342f6de0a8d",
+    "live_bytes": 13731,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "d0a6bbe1732eb7eabe8bc548572bbed9373530913c88eed1184f017442f86922",
+    "url": "https://hdr.undp.org/sites/default/files/publications/additional-files/2026-10/2026_gMPI_Table1and2.xlsx",
+    "file": "d0a6bbe1732eb7ea.xlsx",
+    "sha256": "7af20330132c46541d9d9696a7e8b6354cbb134f53977d91356bdbce6d0e0de4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "etag": "\"6acacb90-1ffa2\"",
+      "last-modified": "Sat, 10 Oct 2026 23:34:40 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:25:19.244539+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "live_sha256": "7af20330132c46541d9d9696a7e8b6354cbb134f53977d91356bdbce6d0e0de4",
+    "live_bytes": 130978,
+    "excerpt": "whole file"
+  }
+]

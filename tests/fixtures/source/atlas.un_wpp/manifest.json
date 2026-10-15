@@ -1,0 +1,44 @@
+[
+  {
+    "request_fingerprint": "1bb8e0a1d9fa9658cc67cd5a5f8ae2a3ba5b259160714d0e19c62538ee19d945",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_Demographic_Indicators_Medium.csv.gz",
+    "file": "1bb8e0a1d9fa9658.csv.gz",
+    "sha256": "f4877c1dc74d56c146b8a3a842ec3f2a259d3a2c456aea3cc617af239cd0b483",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + every row of LocID 250, 412, 158, 772, 900, 1834",
+    "excerpt_of_raw_sha256": "286ac36bb1415e2e1ade03acfef0a29f0e4c087e2f78e38c48f50c5df89082bc"
+  },
+  {
+    "request_fingerprint": "8b7e869a60ebde172e9c07179b4c01ed00fb237bc912edaa090543b212356140",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_PopulationByAge5GroupSex_Medium.csv.gz",
+    "file": "8b7e869a60ebde17.csv.gz",
+    "sha256": "9158550060aa992c764a80051f6e5a4bfcc1ac8516f37beb889fbbe0fcf753a0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + rows of the six locations for years 1950, 2023, 2024, 2100",
+    "excerpt_of_raw_sha256": "a04d7d1486a5eb2832cc812d599448f0a71e8ac9e1e7e6fa4066673d6a2487cd"
+  },
+  {
+    "request_fingerprint": "e9cbe112ab55f236c91cc7d01f5c5a13acf4d090b110b0d6ff8d5e007940ec92",
+    "url": "https://population.un.org/wpp/assets/Excel%20Files/1_Indicator%20(Standard)/CSV_FILES/WPP2024_TotalPopulationBySex.csv.gz",
+    "file": "e9cbe112ab55f236.csv.gz",
+    "sha256": "eda13da00beaab463323bceaff36007cfed1a992e975a3112ce12ca9e5a3141b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 3.0 IGO",
+    "excerpt": "real header + rows of the six locations for years 1950, 2023, 2024, 2050, 2100",
+    "excerpt_of_raw_sha256": "66b84489fd7875b62de9b40d960b803b8c8439367c98deab89c2f770970925b9"
+  }
+]

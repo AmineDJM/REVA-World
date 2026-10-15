@@ -1,0 +1,24 @@
+id: history.expedition_participants
+domain: history
+owner: KGHIST
+description: >-
+  Person -> "participant in" (P1344) -> expedition/voyage statements stated on the person (the inverse
+  of the expedition's own P710, which is often missing), e.g. a navigator who took part in a voyage of
+  exploration. Subjects are people (label snapshots only; their biographies come from KGPEOPLE).
+purpose: statements
+entity_kind: person
+sparql: |
+  SELECT ?person ?statement ?voyage ?rank ?start ?end ?pit WHERE {
+    ?voyage wdt:P31/wdt:P279* wd:Q2401485 .
+    ?person p:P1344 ?statement .
+    ?statement ps:P1344 ?voyage ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?person wdt:P31 wd:Q5 .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: person, property: P1344, object: voyage, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+max_rows: 20000
+expand_hops: 1

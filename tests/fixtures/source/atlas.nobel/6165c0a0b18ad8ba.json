@@ -1,0 +1,4490 @@
+{
+ "laureates": [
+  {
+   "id": "745",
+   "knownName": {
+    "en": "A. Michael Spence",
+    "se": "A. Michael Spence"
+   },
+   "givenName": {
+    "en": "A. Michael",
+    "se": "A. Michael"
+   },
+   "familyName": {
+    "en": "Spence",
+    "se": "Spence"
+   },
+   "fullName": {
+    "en": "A. Michael Spence",
+    "se": "A. Michael Spence"
+   },
+   "fileName": "spence",
+   "gender": "male",
+   "birth": {
+    "date": "1943-11-07",
+    "year": "1943",
+    "place": {
+     "city": {
+      "en": "Montclair, NJ",
+      "no": "Montclair, NJ",
+      "se": "Montclair, NJ"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA"
+     },
+     "cityNow": {
+      "en": "Montclair, NJ",
+      "no": "Montclair, NJ",
+      "se": "Montclair, NJ",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q678437",
+       "https://www.wikipedia.org/wiki/Montclair,_New_Jersey"
+      ],
+      "latitude": "40.825930",
+      "longitude": "-74.209030"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Montclair, NJ, USA",
+      "no": "Montclair, NJ, USA",
+      "se": "Montclair, NJ, USA"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Michael_Spence",
+    "english": "https://en.wikipedia.org/wiki/Michael_Spence"
+   },
+   "wikidata": {
+    "id": "Q157245",
+    "url": "https://www.wikidata.org/wiki/Q157245"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q157245",
+    "https://en.wikipedia.org/wiki/Michael_Spence"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/745",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/745",
+     "title": "A. Michael Spence - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "2001",
+     "category": {
+      "en": "Economic Sciences",
+      "no": "Økonomi",
+      "se": "Ekonomi"
+     },
+     "categoryFullName": {
+      "en": "The Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel",
+      "no": "Sveriges Riksbanks pris i økonomisk vitenskap til minne om Alfred Nobel",
+      "se": "Sveriges Riksbanks pris i ekonomisk vetenskap till Alfred Nobels minne"
+     },
+     "sortOrder": "2",
+     "portion": "1/3",
+     "dateAwarded": "2001-10-10",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for their analyses of markets with asymmetric information",
+      "se": "för deras analys av marknader med assymetrisk informations"
+     },
+     "prizeAmount": 10000000,
+     "prizeAmountAdjusted": 15547541,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Stanford University",
+        "no": "Stanford University",
+        "se": "Stanford University"
+       },
+       "nameNow": {
+        "en": "Stanford University"
+       },
+       "city": {
+        "en": "Stanford, CA",
+        "no": "Stanford, CA",
+        "se": "Stanford, CA"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Stanford, CA",
+        "no": "Stanford, CA",
+        "se": "Stanford, CA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q173813",
+         "https://www.wikipedia.org/wiki/Stanford,_California"
+        ],
+        "latitude": "37.424734",
+        "longitude": "-122.163858"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Stanford, CA, USA",
+        "no": "Stanford, CA, USA",
+        "se": "Stanford, CA, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/eco/2001",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/economic-sciences/2001/spence/facts/",
+       "title": "A. Michael Spence - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/economic-sciences/2001/summary/",
+       "title": "The Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel 2001",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "114",
+   "knownName": {
+    "en": "Abdus Salam",
+    "se": "Abdus Salam"
+   },
+   "givenName": {
+    "en": "Abdus",
+    "se": "Abdus"
+   },
+   "familyName": {
+    "en": "Salam",
+    "se": "Salam"
+   },
+   "fullName": {
+    "en": "Abdus Salam",
+    "se": "Abdus Salam"
+   },
+   "fileName": "salam",
+   "gender": "male",
+   "birth": {
+    "date": "1926-01-29",
+    "year": "1926",
+    "place": {
+     "city": {
+      "en": "Jhang Maghiāna",
+      "no": "Jhang Maghiāna",
+      "se": "Jhang Maghiāna"
+     },
+     "country": {
+      "en": "India",
+      "no": "India",
+      "se": "Indien"
+     },
+     "cityNow": {
+      "en": "Jhang Maghiāna",
+      "no": "Jhang Maghiāna",
+      "se": "Jhang Maghiāna",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1026616",
+       "https://www.wikipedia.org/wiki/Jhang"
+      ],
+      "latitude": "31.268056",
+      "longitude": "72.318056"
+     },
+     "countryNow": {
+      "en": "Pakistan",
+      "no": "Pakistan",
+      "se": "Pakistan",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q843"
+      ],
+      "latitude": "30.000000",
+      "longitude": "71.000000"
+     },
+     "continent": {
+      "en": "Asia",
+      "no": "Asia",
+      "se": "Asien"
+     },
+     "locationString": {
+      "en": "Jhang Maghiāna, India (now Pakistan)",
+      "no": "Jhang Maghiāna, India (nå Pakistan)",
+      "se": "Jhang Maghiāna, Indien (nu Pakistan)"
+     }
+    }
+   },
+   "death": {
+    "date": "1996-11-21",
+    "place": {
+     "city": {
+      "en": "Oxford",
+      "no": "Oxford",
+      "se": "Oxford"
+     },
+     "country": {
+      "en": "United Kingdom",
+      "no": "Storbritannia",
+      "se": "Storbritannien",
+      "sameAs": "https://www.wikidata.org/wiki/Q145"
+     },
+     "cityNow": {
+      "en": "Oxford",
+      "no": "Oxford",
+      "se": "Oxford",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q34217",
+       "https://www.wikipedia.org/wiki/Oxford"
+      ],
+      "latitude": "51.753363",
+      "longitude": "-1.260979"
+     },
+     "countryNow": {
+      "en": "United Kingdom",
+      "no": "Storbritannia",
+      "se": "Storbritannien",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q145"
+      ],
+      "latitude": "54.600000",
+      "longitude": "-2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Oxford, United Kingdom",
+      "no": "Oxford, Storbritannia",
+      "se": "Oxford, Storbritannien"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Abdus_Salam",
+    "english": "https://en.wikipedia.org/wiki/Abdus_Salam"
+   },
+   "wikidata": {
+    "id": "Q28189",
+    "url": "https://www.wikidata.org/wiki/Q28189"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q28189",
+    "https://en.wikipedia.org/wiki/Abdus_Salam"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/114",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/114",
+     "title": "Abdus Salam - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1979",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "2",
+     "portion": "1/3",
+     "dateAwarded": "1979-10-15",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for their contributions to the theory of the unified weak and electromagnetic interaction between elementary particles, including, inter alia, the prediction of the weak neutral current",
+      "se": "för deras insatser inom teorin för förenad svag och elektromagnetisk växelverkan mellan elementar partiklar, innefattande bl.a. förutsägelsen av den svaga neutrala strömmen"
+     },
+     "prizeAmount": 800000,
+     "prizeAmountAdjusted": 3778486,
+     "affiliations": [
+      {
+       "name": {
+        "en": "International Centre for Theoretical Physics",
+        "no": "International Centre for Theoretical Physics",
+        "se": "International Centre for Theoretical Physics"
+       },
+       "nameNow": {
+        "en": "International Centre for Theoretical Physics"
+       },
+       "city": {
+        "en": "Trieste",
+        "no": "Trieste",
+        "se": "Trieste"
+       },
+       "country": {
+        "en": "Italy",
+        "no": "Italia",
+        "se": "Italien"
+       },
+       "cityNow": {
+        "en": "Trieste",
+        "no": "Trieste",
+        "se": "Trieste",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q546",
+         "https://www.wikipedia.org/wiki/Trieste"
+        ],
+        "latitude": "45.649433",
+        "longitude": "13.776623"
+       },
+       "countryNow": {
+        "en": "Italy",
+        "no": "Italia",
+        "se": "Italien",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q38"
+        ],
+        "latitude": "42.500000",
+        "longitude": "12.500000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Trieste, Italy",
+        "no": "Trieste, Italia",
+        "se": "Trieste, Italien"
+       }
+      },
+      {
+       "name": {
+        "en": "Imperial College",
+        "no": "Imperial College",
+        "se": "Imperial College"
+       },
+       "nameNow": {
+        "en": "Imperial College"
+       },
+       "city": {
+        "en": "London",
+        "no": "London",
+        "se": "London"
+       },
+       "country": {
+        "en": "United Kingdom",
+        "no": "Storbritannia",
+        "se": "Storbritannien"
+       },
+       "cityNow": {
+        "en": "London",
+        "no": "London",
+        "se": "London",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q84",
+         "https://www.wikipedia.org/wiki/London"
+        ],
+        "latitude": "51.510235",
+        "longitude": "-0.120852"
+       },
+       "countryNow": {
+        "en": "United Kingdom",
+        "no": "Storbritannia",
+        "se": "Storbritannien",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q145"
+        ],
+        "latitude": "54.600000",
+        "longitude": "-2.000000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "London, United Kingdom",
+        "no": "London, Storbritannia",
+        "se": "London, Storbritannien"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1979",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1979/salam/facts/",
+       "title": "Abdus Salam - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1979/summary/",
+       "title": "The Nobel Prize in Physics 1979",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "26",
+   "knownName": {
+    "en": "Albert Einstein",
+    "se": "Albert Einstein"
+   },
+   "givenName": {
+    "en": "Albert",
+    "se": "Albert"
+   },
+   "familyName": {
+    "en": "Einstein",
+    "se": "Einstein"
+   },
+   "fullName": {
+    "en": "Albert Einstein",
+    "se": "Albert Einstein"
+   },
+   "fileName": "einstein",
+   "gender": "male",
+   "birth": {
+    "date": "1879-03-14",
+    "year": "1879",
+    "place": {
+     "city": {
+      "en": "Ulm",
+      "no": "Ulm",
+      "se": "Ulm"
+     },
+     "country": {
+      "en": "Germany",
+      "no": "Tyskland",
+      "se": "Tyskland"
+     },
+     "cityNow": {
+      "en": "Ulm",
+      "no": "Ulm",
+      "se": "Ulm",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q3012",
+       "https://www.wikipedia.org/wiki/Ulm"
+      ],
+      "latitude": "48.401072",
+      "longitude": "9.987585"
+     },
+     "countryNow": {
+      "en": "Germany",
+      "no": "Tyskland",
+      "se": "Tyskland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q183"
+      ],
+      "latitude": "51.000000",
+      "longitude": "10.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Ulm, Germany",
+      "no": "Ulm, Tyskland",
+      "se": "Ulm, Tyskland"
+     }
+    }
+   },
+   "death": {
+    "date": "1955-04-18",
+    "place": {
+     "city": {
+      "en": "Princeton, NJ",
+      "no": "Princeton, NJ",
+      "se": "Princeton, NJ"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": "https://www.wikidata.org/wiki/Q30"
+     },
+     "cityNow": {
+      "en": "Princeton, NJ",
+      "no": "Princeton, NJ",
+      "se": "Princeton, NJ",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q138518",
+       "https://www.wikipedia.org/wiki/Princeton,_New_Jersey"
+      ],
+      "latitude": "40.359783",
+      "longitude": "-74.668268"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Princeton, NJ, USA",
+      "no": "Princeton, NJ, USA",
+      "se": "Princeton, NJ, USA"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Albert_Einstein",
+    "english": "https://en.wikipedia.org/wiki/Albert_Einstein"
+   },
+   "wikidata": {
+    "id": "Q937",
+    "url": "https://www.wikidata.org/wiki/Q937"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q937",
+    "https://en.wikipedia.org/wiki/Albert_Einstein"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/26",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/26",
+     "title": "Albert Einstein - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1921",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1922-11-09",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for his services to Theoretical Physics, and especially for his discovery of the law of the photoelectric effect",
+      "se": "för hans förtjänster om den teoretiska fysiken, särskilt hans upptäckt av lagen för den fotoelektriska effekten"
+     },
+     "prizeAmount": 121573,
+     "prizeAmountAdjusted": 3202773,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Kaiser-Wilhelm-Institut (now Max-Planck-Institut) für Physik",
+        "no": "Kaiser-Wilhelm-Institut (now Max-Planck-Institut) für Physik",
+        "se": "Kaiser-Wilhelm-Institut (now Max-Planck-Institut) für Physik"
+       },
+       "nameNow": {
+        "en": "Kaiser-Wilhelm-Institut (now Max-Planck-Institut) für Physik"
+       },
+       "city": {
+        "en": "Berlin",
+        "no": "Berlin",
+        "se": "Berlin"
+       },
+       "country": {
+        "en": "Germany",
+        "no": "Tyskland",
+        "se": "Tyskland"
+       },
+       "cityNow": {
+        "en": "Berlin",
+        "no": "Berlin",
+        "se": "Berlin",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q64",
+         "https://www.wikipedia.org/wiki/Berlin"
+        ],
+        "latitude": "52.522265",
+        "longitude": "13.406852"
+       },
+       "countryNow": {
+        "en": "Germany",
+        "no": "Tyskland",
+        "se": "Tyskland",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q183"
+        ],
+        "latitude": "51.000000",
+        "longitude": "10.000000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Berlin, Germany",
+        "no": "Berlin, Tyskland",
+        "se": "Berlin, Tyskland"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1921",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1921/einstein/facts/",
+       "title": "Albert Einstein - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1921/summary/",
+       "title": "The Nobel Prize in Physics 1921",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "926",
+   "knownName": {
+    "en": "Angus Deaton",
+    "se": "Angus Deaton"
+   },
+   "givenName": {
+    "en": "Angus",
+    "se": "Angus"
+   },
+   "familyName": {
+    "en": "Deaton",
+    "se": "Deaton"
+   },
+   "fullName": {
+    "en": "Angus Deaton",
+    "se": "Angus Deaton"
+   },
+   "fileName": "deaton",
+   "gender": "male",
+   "birth": {
+    "date": "1945-10-19",
+    "year": "1945",
+    "place": {
+     "city": {
+      "en": "Edinburgh",
+      "no": "Edinburgh",
+      "se": "Edinburgh"
+     },
+     "country": {
+      "en": "Scotland",
+      "no": "Skottland",
+      "se": "Skottland"
+     },
+     "cityNow": {
+      "en": "Edinburgh",
+      "no": "Edinburgh",
+      "se": "Edinburgh",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q23436",
+       "https://www.wikipedia.org/wiki/Edinburgh"
+      ],
+      "latitude": "55.955709",
+      "longitude": "-3.207405"
+     },
+     "countryNow": {
+      "en": "Scotland",
+      "no": "Skottland",
+      "se": "Skottland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q145"
+      ],
+      "latitude": "54.600000",
+      "longitude": "-2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Edinburgh, Scotland",
+      "no": "Edinburgh, Skottland",
+      "se": "Edinburgh, Skottland"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Angus_Deaton",
+    "english": "https://en.wikipedia.org/wiki/Angus_Deaton"
+   },
+   "wikidata": {
+    "id": "Q204078",
+    "url": "https://www.wikidata.org/wiki/Q204078"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q204078",
+    "https://en.wikipedia.org/wiki/Angus_Deaton"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/926",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/926",
+     "title": "Angus Deaton - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "2015",
+     "category": {
+      "en": "Economic Sciences",
+      "no": "Økonomi",
+      "se": "Ekonomi"
+     },
+     "categoryFullName": {
+      "en": "The Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel",
+      "no": "Sveriges Riksbanks pris i økonomisk vitenskap til minne om Alfred Nobel",
+      "se": "Sveriges Riksbanks pris i ekonomisk vetenskap till Alfred Nobels minne"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "2015-10-12",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for his analysis of consumption, poverty, and welfare",
+      "se": "för hans analys av konsumtion, fattigdom och välfärd"
+     },
+     "prizeAmount": 8000000,
+     "prizeAmountAdjusted": 10602571,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Princeton University",
+        "no": "Princeton University",
+        "se": "Princeton University"
+       },
+       "nameNow": {
+        "en": "Princeton University"
+       },
+       "city": {
+        "en": "Princeton, NJ",
+        "no": "Princeton, NJ",
+        "se": "Princeton, NJ"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Princeton, NJ",
+        "no": "Princeton, NJ",
+        "se": "Princeton, NJ",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q138518",
+         "https://www.wikipedia.org/wiki/Princeton,_New_Jersey"
+        ],
+        "latitude": "40.359783",
+        "longitude": "-74.668268"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Princeton, NJ, USA",
+        "no": "Princeton, NJ, USA",
+        "se": "Princeton, NJ, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/eco/2015",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/economic-sciences/2015/deaton/facts/",
+       "title": "Angus Deaton - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/economic-sciences/2015/summary/",
+       "title": "The Sveriges Riksbank Prize in Economic Sciences in Memory of Alfred Nobel 2015",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "535",
+   "knownName": {
+    "en": "Betty Williams",
+    "se": "Betty Williams"
+   },
+   "givenName": {
+    "en": "Betty",
+    "se": "Betty"
+   },
+   "familyName": {
+    "en": "Williams",
+    "se": "Williams"
+   },
+   "fullName": {
+    "en": "Elizabeth Williams",
+    "se": "Elizabeth Williams"
+   },
+   "fileName": "williams",
+   "gender": "female",
+   "birth": {
+    "date": "1943-05-22",
+    "year": "1943",
+    "place": {
+     "city": {
+      "en": "Belfast",
+      "no": "Belfast",
+      "se": "Belfast"
+     },
+     "country": {
+      "en": "Northern Ireland",
+      "no": "Nord-Irland",
+      "se": "Nordirland"
+     },
+     "cityNow": {
+      "en": "Belfast",
+      "no": "Belfast",
+      "se": "Belfast",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q10686",
+       "https://www.wikipedia.org/wiki/Belfast"
+      ],
+      "latitude": "54.596439",
+      "longitude": "-5.930276"
+     },
+     "countryNow": {
+      "en": "Northern Ireland",
+      "no": "Nord-Irland",
+      "se": "Nordirland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q26"
+      ],
+      "latitude": "54.674427",
+      "longitude": "-6.681542"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Belfast, Northern Ireland",
+      "no": "Belfast, Nord-Irland",
+      "se": "Belfast, Nordirland"
+     }
+    }
+   },
+   "death": {
+    "date": "2020-03-17",
+    "place": {
+     "city": {
+      "en": "Belfast",
+      "no": "Belfast",
+      "se": "Belfast"
+     },
+     "country": {
+      "en": "Northern Ireland",
+      "no": "Nord-Irland",
+      "se": "Nordirland",
+      "sameAs": "https://www.wikidata.org/wiki/Q26"
+     },
+     "cityNow": {
+      "en": "Belfast",
+      "no": "Belfast",
+      "se": "Belfast",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q10686",
+       "https://www.wikipedia.org/wiki/Belfast"
+      ],
+      "latitude": "54.596439",
+      "longitude": "-5.930276"
+     },
+     "countryNow": {
+      "en": "Northern Ireland",
+      "no": "Nord-Irland",
+      "se": "Nordirland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q26"
+      ],
+      "latitude": "54.674427",
+      "longitude": "-6.681542"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Belfast, Northern Ireland",
+      "no": "Belfast, Nord-Irland",
+      "se": "Belfast, Nordirland"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Betty_Williams_(Nobel_laureate)",
+    "english": "https://en.wikipedia.org/wiki/Betty_Williams_(Nobel_laureate)"
+   },
+   "wikidata": {
+    "id": "Q157690",
+    "url": "https://www.wikidata.org/wiki/Q157690"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q157690",
+    "https://en.wikipedia.org/wiki/Betty_Williams_(Nobel_laureate)"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/535",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/535",
+     "title": "Betty Williams - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1976",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "1",
+     "portion": "1/2",
+     "dateAwarded": "1977-10-10",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for the courageous efforts in founding a movement to put an end to the violent conflict in Northern Ireland",
+      "no": "for deres modige innsats i forbindelse med opprettelsen av en bevegelse for å få slutt på den voldelige konflikten i Nord-Irland"
+     },
+     "prizeAmount": 681000,
+     "prizeAmountAdjusted": 4226835,
+     "residences": [
+      {
+       "country": {
+        "en": "United Kingdom",
+        "no": "Storbritannia",
+        "se": "Storbritannien"
+       },
+       "countryNow": {
+        "en": "United Kingdom",
+        "no": "Storbritannia",
+        "se": "Storbritannien"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "United Kingdom",
+        "no": "Storbritannia",
+        "se": "Storbritannien"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1976",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1976/williams/facts/",
+       "title": "Betty Williams - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1976/summary/",
+       "title": "The Nobel Peace Prize 1976",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "629",
+   "knownName": {
+    "en": "Boris Pasternak",
+    "se": "Boris Pasternak"
+   },
+   "givenName": {
+    "en": "Boris",
+    "se": "Boris"
+   },
+   "familyName": {
+    "en": "Pasternak",
+    "se": "Pasternak"
+   },
+   "fullName": {
+    "en": "Boris Leonidovich Pasternak",
+    "se": "Boris Leonidovitj Pasternak"
+   },
+   "fileName": "pasternak",
+   "gender": "male",
+   "birth": {
+    "date": "1890-02-10",
+    "year": "1890",
+    "place": {
+     "city": {
+      "en": "Moscow",
+      "no": "Moskva",
+      "se": "Moskva"
+     },
+     "country": {
+      "en": "Russia",
+      "no": "Russland",
+      "se": "Ryssland"
+     },
+     "cityNow": {
+      "en": "Moscow",
+      "no": "Moskva",
+      "se": "Moskva",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q649",
+       "https://www.wikipedia.org/wiki/Moscow"
+      ],
+      "latitude": "55.741387",
+      "longitude": "37.618892"
+     },
+     "countryNow": {
+      "en": "Russia",
+      "no": "Russland",
+      "se": "Ryssland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q159"
+      ],
+      "latitude": "66.416667",
+      "longitude": "94.250000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Moscow, Russia",
+      "no": "Moskva, Russland",
+      "se": "Moskva, Ryssland"
+     }
+    }
+   },
+   "death": {
+    "date": "1960-05-30",
+    "place": {
+     "city": {
+      "en": "Peredelkino",
+      "no": "Peredelkino",
+      "se": "Peredelkino"
+     },
+     "country": {
+      "en": "Russia",
+      "no": "Russland",
+      "se": "Ryssland",
+      "sameAs": "https://www.wikidata.org/wiki/Q159"
+     },
+     "cityNow": {
+      "en": "Peredelkino",
+      "no": "Peredelkino",
+      "se": "Peredelkino",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q593888",
+       "https://www.wikipedia.org/wiki/Peredelkino"
+      ],
+      "latitude": "55.655556",
+      "longitude": "37.332500"
+     },
+     "countryNow": {
+      "en": "Russia",
+      "no": "Russland",
+      "se": "Ryssland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q159"
+      ],
+      "latitude": "66.416667",
+      "longitude": "94.250000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Peredelkino, Russia",
+      "no": "Peredelkino, Russland",
+      "se": "Peredelkino, Ryssland"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Boris_Pasternak",
+    "english": "https://en.wikipedia.org/wiki/Boris_Pasternak"
+   },
+   "wikidata": {
+    "id": "Q41223",
+    "url": "https://www.wikidata.org/wiki/Q41223"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q41223",
+    "https://en.wikipedia.org/wiki/Boris_Pasternak"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/629",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/629",
+     "title": "Boris Pasternak - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1958",
+     "category": {
+      "en": "Literature",
+      "no": "Litteratur",
+      "se": "Litteratur"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Literature",
+      "no": "Nobelprisen i litteratur",
+      "se": "Nobelpriset i litteratur"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1958-10-28",
+     "prizeStatus": "restricted",
+     "motivation": {
+      "en": "for his important achievement both in contemporary lyrical poetry and in the field of the great Russian epic tradition",
+      "se": "för hans betydande insats såväl inom den samtida lyriken som på den stora ryska berättartraditionens område"
+     },
+     "prizeAmount": 214559,
+     "prizeAmountAdjusted": 3346838,
+     "residences": [
+      {
+       "country": {
+        "en": "USSR",
+        "no": "Sovjet",
+        "se": "Sovjetunionen"
+       },
+       "countryNow": {
+        "en": "Russia",
+        "no": "Russland",
+        "se": "Ryssland"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "USSR (now Russia)",
+        "no": "Sovjet (nå Russland)",
+        "se": "Sovjetunionen (nu Ryssland)"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/lit/1958",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1958/pasternak/facts/",
+       "title": "Boris Pasternak - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1958/summary/",
+       "title": "The Nobel Prize in Literature 1958",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "2",
+   "knownName": {
+    "en": "Hendrik A. Lorentz",
+    "se": "Hendrik A. Lorentz"
+   },
+   "givenName": {
+    "en": "Hendrik A.",
+    "se": "Hendrik A."
+   },
+   "familyName": {
+    "en": "Lorentz",
+    "se": "Lorentz"
+   },
+   "fullName": {
+    "en": "Hendrik Antoon Lorentz",
+    "se": "Hendrik Antoon Lorentz"
+   },
+   "fileName": "lorentz",
+   "gender": "male",
+   "birth": {
+    "date": "1853-07-18",
+    "year": "1853",
+    "place": {
+     "city": {
+      "en": "Arnhem",
+      "no": "Arnhem",
+      "se": "Arnhem"
+     },
+     "country": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna"
+     },
+     "cityNow": {
+      "en": "Arnhem",
+      "no": "Arnhem",
+      "se": "Arnhem",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1310",
+       "https://www.wikipedia.org/wiki/Arnhem"
+      ],
+      "latitude": "51.984257",
+      "longitude": "5.910857"
+     },
+     "countryNow": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q55"
+      ],
+      "latitude": "52.316667",
+      "longitude": "5.550000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Arnhem, the Netherlands",
+      "no": "Arnhem, Nederland",
+      "se": "Arnhem, Nederländerna"
+     }
+    }
+   },
+   "death": {
+    "date": "1928-02-04",
+    "place": {
+     "country": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": "https://www.wikidata.org/wiki/Q55"
+     },
+     "countryNow": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q55"
+      ],
+      "latitude": "52.316667",
+      "longitude": "5.550000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Hendrik_Lorentz",
+    "english": "https://en.wikipedia.org/wiki/Hendrik_Lorentz"
+   },
+   "wikidata": {
+    "id": "Q41688",
+    "url": "https://www.wikidata.org/wiki/Q41688"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q41688",
+    "https://en.wikipedia.org/wiki/Hendrik_Lorentz"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/2",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/2",
+     "title": "Hendrik A. Lorentz - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1902",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "1",
+     "portion": "1/2",
+     "dateAwarded": "1902-11-11",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena",
+      "se": "såsom ett erkännande av den utomordentliga förtjänst de inlagt genom sina undersökningar över magnetismens inflytande på strålningsfenomenen"
+     },
+     "prizeAmount": 141847,
+     "prizeAmountAdjusted": 10191492,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Leiden University",
+        "no": "Leiden University",
+        "se": "Leiden University"
+       },
+       "nameNow": {
+        "en": "Leiden University"
+       },
+       "city": {
+        "en": "Leiden",
+        "no": "Leiden",
+        "se": "Leiden"
+       },
+       "country": {
+        "en": "the Netherlands",
+        "no": "Nederland",
+        "se": "Nederländerna"
+       },
+       "cityNow": {
+        "en": "Leiden",
+        "no": "Leiden",
+        "se": "Leiden",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q43631",
+         "https://www.wikipedia.org/wiki/Leiden"
+        ],
+        "latitude": "52.160787",
+        "longitude": "4.495746"
+       },
+       "countryNow": {
+        "en": "the Netherlands",
+        "no": "Nederland",
+        "se": "Nederländerna",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q55"
+        ],
+        "latitude": "52.316667",
+        "longitude": "5.550000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Leiden, the Netherlands",
+        "no": "Leiden, Nederland",
+        "se": "Leiden, Nederländerna"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1902",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1902/lorentz/facts/",
+       "title": "Hendrik A. Lorentz - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1902/summary/",
+       "title": "The Nobel Prize in Physics 1902",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "482",
+   "orgName": {
+    "en": "International Committee of the Red Cross",
+    "no": "Den internasjonale Røde Kors-komiteen",
+    "se": "Internationella Rödakorskommittén"
+   },
+   "nativeName": "Comité international de la Croix Rouge",
+   "fileName": "red-cross",
+   "founded": {
+    "date": "1863-00-00",
+    "place": {
+     "city": {
+      "en": "Geneva",
+      "no": "Genève",
+      "se": "Genève"
+     },
+     "country": {
+      "en": "Switzerland",
+      "no": "Sveits",
+      "se": "Schweiz",
+      "sameAs": "https://www.wikidata.org/wiki/Q39"
+     },
+     "cityNow": {
+      "en": "Geneva",
+      "no": "Genève",
+      "se": "Genève",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q71",
+       "https://www.wikipedia.org/wiki/Geneva"
+      ]
+     },
+     "countryNow": {
+      "en": "Switzerland",
+      "no": "Sveits",
+      "se": "Schweiz",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q39"
+      ]
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Geneva, Switzerland",
+      "no": "Genève, Sveits",
+      "se": "Genève, Schweiz"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "International_Committee_of_the_Red_Cross",
+    "english": "https://en.wikipedia.org/wiki/International_Committee_of_the_Red_Cross"
+   },
+   "wikidata": {
+    "id": "Q5987345",
+    "url": "https://www.wikidata.org/wiki/Q5987345"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q5987345",
+    "https://en.wikipedia.org/wiki/International_Committee_of_the_Red_Cross"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/482",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/482",
+     "title": " - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1917",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1917-12-10",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for the efforts to take care of wounded soldiers and prisoners of war and their families",
+      "no": "for sin innsats for å ivareta sårede soldater og krigsfanger og deres familier"
+     },
+     "prizeAmount": 133823,
+     "prizeAmountAdjusted": 4957724,
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1917",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1917/red-cross/facts/",
+       "title": " - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1917/summary/",
+       "title": "The Nobel Peace Prize 1917",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    },
+    {
+     "awardYear": "1944",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1945-11-12",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for the great work it has performed during the war on behalf of humanity",
+      "no": "for det store arbeidet komiteen utførte på vegne av menneskeheten under krigen"
+     },
+     "prizeAmount": 121841,
+     "prizeAmountAdjusted": 3174561,
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1944",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1944/red-cross/facts/",
+       "title": " - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1944/summary/",
+       "title": "The Nobel Peace Prize 1944",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    },
+    {
+     "awardYear": "1963",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "1",
+     "portion": "1/2",
+     "dateAwarded": "1963-10-10",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for promoting the principles of the Geneva Convention and cooperation with the UN",
+      "no": "for å ha fremmet prinsippene i Genève-konvensjonen og samarbeidet med FN"
+     },
+     "prizeAmount": 265000,
+     "prizeAmountAdjusted": 3590371,
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1963",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1963/red-cross/facts/",
+       "title": " - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1963/summary/",
+       "title": "The Nobel Peace Prize 1963",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "637",
+   "knownName": {
+    "en": "Jean-Paul Sartre",
+    "se": "Jean-Paul Sartre"
+   },
+   "givenName": {
+    "en": "Jean-Paul",
+    "se": "Jean-Paul"
+   },
+   "familyName": {
+    "en": "Sartre",
+    "se": "Sartre"
+   },
+   "fullName": {
+    "en": "Jean-Paul Sartre",
+    "se": "Jean-Paul Sartre"
+   },
+   "fileName": "sartre",
+   "gender": "male",
+   "birth": {
+    "date": "1905-06-21",
+    "year": "1905",
+    "place": {
+     "city": {
+      "en": "Paris",
+      "no": "Paris",
+      "se": "Paris"
+     },
+     "country": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike"
+     },
+     "cityNow": {
+      "en": "Paris",
+      "no": "Paris",
+      "se": "Paris",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q90",
+       "https://www.wikipedia.org/wiki/Paris"
+      ],
+      "latitude": "48.860093",
+      "longitude": "2.355954"
+     },
+     "countryNow": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q142"
+      ],
+      "latitude": "47.000000",
+      "longitude": "2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Paris, France",
+      "no": "Paris, Frankrike",
+      "se": "Paris, Frankrike"
+     }
+    }
+   },
+   "death": {
+    "date": "1980-04-15",
+    "place": {
+     "city": {
+      "en": "Paris",
+      "no": "Paris",
+      "se": "Paris"
+     },
+     "country": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": "https://www.wikidata.org/wiki/Q142"
+     },
+     "cityNow": {
+      "en": "Paris",
+      "no": "Paris",
+      "se": "Paris",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q90",
+       "https://www.wikipedia.org/wiki/Paris"
+      ],
+      "latitude": "48.860093",
+      "longitude": "2.355954"
+     },
+     "countryNow": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q142"
+      ],
+      "latitude": "47.000000",
+      "longitude": "2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Paris, France",
+      "no": "Paris, Frankrike",
+      "se": "Paris, Frankrike"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Jean-Paul_Sartre",
+    "english": "https://en.wikipedia.org/wiki/Jean-Paul_Sartre"
+   },
+   "wikidata": {
+    "id": "Q9364",
+    "url": "https://www.wikidata.org/wiki/Q9364"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q9364",
+    "https://en.wikipedia.org/wiki/Jean-Paul_Sartre"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/637",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/637",
+     "title": "Jean-Paul Sartre - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1964",
+     "category": {
+      "en": "Literature",
+      "no": "Litteratur",
+      "se": "Litteratur"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Literature",
+      "no": "Nobelprisen i litteratur",
+      "se": "Nobelpriset i litteratur"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1964-10-22",
+     "prizeStatus": "declined",
+     "motivation": {
+      "en": "for his work which, rich in ideas and filled with the spirit of freedom and the quest for truth, has exerted a far-reaching influence on our age",
+      "se": "för hans idérika författarskap, som genom sin frihetsanda och sanningssträvan har utövat ett vidsträckt inflytande i vår samtid"
+     },
+     "prizeAmount": 273000,
+     "prizeAmountAdjusted": 3576149,
+     "residences": [
+      {
+       "country": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       },
+       "countryNow": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/lit/1964",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1964/sartre/facts/",
+       "title": "Jean-Paul Sartre - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1964/summary/",
+       "title": "The Nobel Prize in Literature 1964",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "66",
+   "knownName": {
+    "en": "John Bardeen",
+    "se": "John Bardeen"
+   },
+   "givenName": {
+    "en": "John",
+    "se": "John"
+   },
+   "familyName": {
+    "en": "Bardeen",
+    "se": "Bardeen"
+   },
+   "fullName": {
+    "en": "John Bardeen",
+    "se": "John Bardeen"
+   },
+   "fileName": "bardeen",
+   "gender": "male",
+   "birth": {
+    "date": "1908-05-23",
+    "year": "1908",
+    "place": {
+     "city": {
+      "en": "Madison, WI",
+      "no": "Madison, WI",
+      "se": "Madison, WI"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA"
+     },
+     "cityNow": {
+      "en": "Madison, WI",
+      "no": "Madison, WI",
+      "se": "Madison, WI",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q43788",
+       "https://www.wikipedia.org/wiki/Madison,_Wisconsin"
+      ],
+      "latitude": "43.071835",
+      "longitude": "-89.386688"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Madison, WI, USA",
+      "no": "Madison, WI, USA",
+      "se": "Madison, WI, USA"
+     }
+    }
+   },
+   "death": {
+    "date": "1991-01-30",
+    "place": {
+     "city": {
+      "en": "Boston, MA",
+      "no": "Boston, MA",
+      "se": "Boston, MA"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": "https://www.wikidata.org/wiki/Q30"
+     },
+     "cityNow": {
+      "en": "Boston, MA",
+      "no": "Boston, MA",
+      "se": "Boston, MA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q100",
+       "https://www.wikipedia.org/wiki/Boston"
+      ],
+      "latitude": "42.360420",
+      "longitude": "-71.056810"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Boston, MA, USA",
+      "no": "Boston, MA, USA",
+      "se": "Boston, MA, USA"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "John_Bardeen",
+    "english": "https://en.wikipedia.org/wiki/John_Bardeen"
+   },
+   "wikidata": {
+    "id": "Q949",
+    "url": "https://www.wikidata.org/wiki/Q949"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q949",
+    "https://en.wikipedia.org/wiki/John_Bardeen"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/66",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/66",
+     "title": "John Bardeen - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1956",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "2",
+     "portion": "1/3",
+     "dateAwarded": "1956-11-01",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for their researches on semiconductors and their discovery of the transistor effect",
+      "se": "för deras undersökningar över halvledare och upptäckt av transistor effekten"
+     },
+     "prizeAmount": 200123,
+     "prizeAmountAdjusted": 3413609,
+     "affiliations": [
+      {
+       "name": {
+        "en": "University of Illinois",
+        "no": "University of Illinois",
+        "se": "University of Illinois"
+       },
+       "nameNow": {
+        "en": "University of Illinois"
+       },
+       "city": {
+        "en": "Urbana, IL",
+        "no": "Urbana, IL",
+        "se": "Urbana, IL"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Urbana, IL",
+        "no": "Urbana, IL",
+        "se": "Urbana, IL",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q462184",
+         "https://www.wikipedia.org/wiki/Urbana,_Illinois"
+        ],
+        "latitude": "40.110863",
+        "longitude": "-88.206265"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Urbana, IL, USA",
+        "no": "Urbana, IL, USA",
+        "se": "Urbana, IL, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1956",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1956/bardeen/facts/",
+       "title": "John Bardeen - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1956/summary/",
+       "title": "The Nobel Prize in Physics 1956",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    },
+    {
+     "awardYear": "1972",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "1",
+     "portion": "1/3",
+     "dateAwarded": "1972-10-20",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for their jointly developed theory of superconductivity, usually called the BCS-theory",
+      "se": "för den av dem gemensamt utvecklade teorien för supraledningsfenomenet, vanligen kallad BCS-teorien"
+     },
+     "prizeAmount": 480000,
+     "prizeAmountAdjusted": 4230781,
+     "affiliations": [
+      {
+       "name": {
+        "en": "University of Illinois",
+        "no": "University of Illinois",
+        "se": "University of Illinois"
+       },
+       "nameNow": {
+        "en": "University of Illinois"
+       },
+       "city": {
+        "en": "Urbana, IL",
+        "no": "Urbana, IL",
+        "se": "Urbana, IL"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Urbana, IL",
+        "no": "Urbana, IL",
+        "se": "Urbana, IL",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q462184",
+         "https://www.wikipedia.org/wiki/Urbana,_Illinois"
+        ],
+        "latitude": "40.110863",
+        "longitude": "-88.206265"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Urbana, IL, USA",
+        "no": "Urbana, IL, USA",
+        "se": "Urbana, IL, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1972",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1972/bardeen/facts/",
+       "title": "John Bardeen - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1972/summary/",
+       "title": "The Nobel Prize in Physics 1972",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "531",
+   "knownName": {
+    "en": "Le Duc Tho ",
+    "se": "Le Duc Tho "
+   },
+   "givenName": {
+    "en": "Le Duc Tho",
+    "se": "Le Duc Tho"
+   },
+   "fullName": {
+    "en": "Le Duc Tho ",
+    "se": "Le Duc Tho "
+   },
+   "fileName": "tho",
+   "gender": "male",
+   "birth": {
+    "date": "1911-10-14",
+    "year": "1911",
+    "place": {
+     "city": {
+      "en": "Nam Ha province",
+      "no": "Nam ha provinsen",
+      "se": "Nam Ha province"
+     },
+     "country": {
+      "en": "Vietnam",
+      "no": "Vietnam",
+      "se": "Vietnam"
+     },
+     "cityNow": {
+      "en": "Nam Ha province",
+      "no": "Nam ha provinsen",
+      "se": "Nam Ha province",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q36413",
+       "https://www.wikipedia.org/wiki/H%C3%A0_Nam_Province"
+      ],
+      "latitude": "20.533333",
+      "longitude": "105.966667"
+     },
+     "countryNow": {
+      "en": "Vietnam",
+      "no": "Vietnam",
+      "se": "Vietnam",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q881"
+      ],
+      "latitude": "16.000000",
+      "longitude": "108.000000"
+     },
+     "continent": {
+      "en": "Asia",
+      "no": "Asia",
+      "se": "Asien"
+     },
+     "locationString": {
+      "en": "Nam Ha province, Vietnam",
+      "no": "Nam ha provinsen, Vietnam",
+      "se": "Nam Ha province, Vietnam"
+     }
+    }
+   },
+   "death": {
+    "date": "1990-10-13",
+    "place": {
+     "city": {
+      "en": "Hanoi",
+      "no": "Hanoi",
+      "se": "Hanoi"
+     },
+     "country": {
+      "en": "Vietnam",
+      "no": "Vietnam",
+      "se": "Vietnam",
+      "sameAs": "https://www.wikidata.org/wiki/Q881"
+     },
+     "cityNow": {
+      "en": "Hanoi",
+      "no": "Hanoi",
+      "se": "Hanoi",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1858",
+       "https://www.wikipedia.org/wiki/Hanoi"
+      ],
+      "latitude": "21.027764",
+      "longitude": "105.834160"
+     },
+     "countryNow": {
+      "en": "Vietnam",
+      "no": "Vietnam",
+      "se": "Vietnam",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q881"
+      ],
+      "latitude": "16.000000",
+      "longitude": "108.000000"
+     },
+     "continent": {
+      "en": "Asia",
+      "no": "Asia",
+      "se": "Asien"
+     },
+     "locationString": {
+      "en": "Hanoi, Vietnam",
+      "no": "Hanoi, Vietnam",
+      "se": "Hanoi, Vietnam"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Le_Duc_Tho",
+    "english": "https://en.wikipedia.org/wiki/Le_Duc_Tho"
+   },
+   "wikidata": {
+    "id": "Q233969",
+    "url": "https://www.wikidata.org/wiki/Q233969"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q233969",
+    "https://en.wikipedia.org/wiki/Le_Duc_Tho"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/531",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/531",
+     "title": "Le Duc Tho  - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1973",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "2",
+     "portion": "1/2",
+     "dateAwarded": "1973-10-17",
+     "prizeStatus": "declined",
+     "motivation": {
+      "en": "for jointly having negotiated a cease fire in Vietnam in 1973",
+      "no": "for å ha forhandlet frem våpenhvilen i Vietnam i 1973"
+     },
+     "prizeAmount": 510000,
+     "prizeAmountAdjusted": 4213275,
+     "residences": [
+      {
+       "country": {
+        "en": "Democratic Republic of Vietnam",
+        "no": "den demokratiske republikken Vietnam",
+        "se": "Demokratiska republiken Vietnam"
+       },
+       "countryNow": {
+        "en": "Vietnam",
+        "no": "Vietnam",
+        "se": "Vietnam"
+       },
+       "continent": {
+        "en": "Asia"
+       },
+       "locationString": {
+        "en": "Democratic Republic of Vietnam (now Vietnam)",
+        "no": "den demokratiske republikken Vietnam (nå Vietnam)",
+        "se": "Demokratiska republiken Vietnam (nu Vietnam)"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1973",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1973/tho/facts/",
+       "title": "Le Duc Tho  - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1973/summary/",
+       "title": "The Nobel Peace Prize 1973",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "217",
+   "knownName": {
+    "en": "Linus Pauling",
+    "se": "Linus Pauling"
+   },
+   "givenName": {
+    "en": "Linus",
+    "se": "Linus"
+   },
+   "familyName": {
+    "en": "Pauling",
+    "se": "Pauling"
+   },
+   "fullName": {
+    "en": "Linus Carl Pauling",
+    "se": "Linus Carl Pauling"
+   },
+   "fileName": "pauling",
+   "gender": "male",
+   "birth": {
+    "date": "1901-02-28",
+    "year": "1901",
+    "place": {
+     "city": {
+      "en": "Portland, OR",
+      "no": "Portland, OR",
+      "se": "Portland, OR"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA"
+     },
+     "cityNow": {
+      "en": "Portland, OR",
+      "no": "Portland, OR",
+      "se": "Portland, OR",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q6106",
+       "https://www.wikipedia.org/wiki/Portland,_Oregon"
+      ],
+      "latitude": "45.516667",
+      "longitude": "-122.666667"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Portland, OR, USA",
+      "no": "Portland, OR, USA",
+      "se": "Portland, OR, USA"
+     }
+    }
+   },
+   "death": {
+    "date": "1994-08-19",
+    "place": {
+     "city": {
+      "en": "Big Sur, CA",
+      "no": "Big Sur, CA",
+      "se": "Big Sur, CA"
+     },
+     "country": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": "https://www.wikidata.org/wiki/Q30"
+     },
+     "cityNow": {
+      "en": "Big Sur, CA",
+      "no": "Big Sur, CA",
+      "se": "Big Sur, CA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q859413",
+       "https://www.wikipedia.org/wiki/Big_Sur"
+      ],
+      "latitude": "36.252510",
+      "longitude": "-121.782700"
+     },
+     "countryNow": {
+      "en": "USA",
+      "no": "USA",
+      "se": "USA",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q30"
+      ],
+      "latitude": "39.828175",
+      "longitude": "-98.579500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Big Sur, CA, USA",
+      "no": "Big Sur, CA, USA",
+      "se": "Big Sur, CA, USA"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Linus_Pauling",
+    "english": "https://en.wikipedia.org/wiki/Linus_Pauling"
+   },
+   "wikidata": {
+    "id": "Q48983",
+    "url": "https://www.wikidata.org/wiki/Q48983"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q48983",
+    "https://en.wikipedia.org/wiki/Linus_Pauling"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/217",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/217",
+     "title": "Linus Pauling - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1954",
+     "category": {
+      "en": "Chemistry",
+      "no": "Kjemi",
+      "se": "Kemi"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Chemistry",
+      "no": "Nobelprisen i kjemi",
+      "se": "Nobelpriset i kemi"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1954-11-03",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for his research into the nature of the chemical bond and its application to the elucidation of the structure of complex substances",
+      "se": "för hans arbeten över den kemiska bindningens natur med tillämpning på komplicerade ämnens byggnad"
+     },
+     "prizeAmount": 181647,
+     "prizeAmountAdjusted": 3338644,
+     "affiliations": [
+      {
+       "name": {
+        "en": "California Institute of Technology (Caltech)",
+        "no": "California Institute of Technology (Caltech)",
+        "se": "California Institute of Technology (Caltech)"
+       },
+       "nameNow": {
+        "en": "California Institute of Technology (Caltech)"
+       },
+       "city": {
+        "en": "Pasadena, CA",
+        "no": "Pasadena, CA",
+        "se": "Pasadena, CA"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Pasadena, CA",
+        "no": "Pasadena, CA",
+        "se": "Pasadena, CA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q485176",
+         "https://www.wikipedia.org/wiki/Pasadena,_California"
+        ],
+        "latitude": "34.150071",
+        "longitude": "-118.142111"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Pasadena, CA, USA",
+        "no": "Pasadena, CA, USA",
+        "se": "Pasadena, CA, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/che/1954",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1954/pauling/facts/",
+       "title": "Linus Pauling - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1954/summary/",
+       "title": "The Nobel Prize in Chemistry 1954",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    },
+    {
+     "awardYear": "1962",
+     "category": {
+      "en": "Peace",
+      "no": "Fred",
+      "se": "Fred"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Peace Prize",
+      "no": "Nobels fredspris",
+      "se": "Nobels fredspris"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1963-10-10",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for his fight against the nuclear arms race between East and West",
+      "no": "for sin kamp mot atomvåpenkappløpet mellom Øst og Vest"
+     },
+     "prizeAmount": 257220,
+     "prizeAmountAdjusted": 3587462,
+     "affiliations": [
+      {
+       "name": {
+        "en": "California Institute of Technology (Caltech)",
+        "no": "California Institute of Technology (Caltech)",
+        "se": "California Institute of Technology (Caltech)"
+       },
+       "nameNow": {
+        "en": "California Institute of Technology (Caltech)"
+       },
+       "city": {
+        "en": "Pasadena, CA",
+        "no": "Pasadena, CA",
+        "se": "Pasadena, CA"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Pasadena, CA",
+        "no": "Pasadena, CA",
+        "se": "Pasadena, CA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q485176",
+         "https://www.wikipedia.org/wiki/Pasadena,_California"
+        ],
+        "latitude": "34.150071",
+        "longitude": "-118.142111"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Pasadena, CA, USA",
+        "no": "Pasadena, CA, USA",
+        "se": "Pasadena, CA, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/pea/1962",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1962/pauling/facts/",
+       "title": "Linus Pauling - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/peace/1962/summary/",
+       "title": "The Nobel Peace Prize 1962",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "6",
+   "knownName": {
+    "en": "Marie Curie",
+    "se": "Marie Curie"
+   },
+   "givenName": {
+    "en": "Marie",
+    "se": "Marie"
+   },
+   "familyName": {
+    "en": "Curie",
+    "se": "Curie"
+   },
+   "fullName": {
+    "en": "Marie Curie, née Skłodowska",
+    "se": "Marie Curie, née Skłodowska"
+   },
+   "fileName": "marie-curie",
+   "gender": "female",
+   "birth": {
+    "date": "1867-11-07",
+    "year": "1867",
+    "place": {
+     "city": {
+      "en": "Warsaw",
+      "no": "Warszawa",
+      "se": "Warszawa "
+     },
+     "country": {
+      "en": "Russian Empire",
+      "no": "Det russiske imperiet",
+      "se": "Kejsardömet Ryssland"
+     },
+     "cityNow": {
+      "en": "Warsaw",
+      "no": "Warszawa",
+      "se": "Warszawa ",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q270",
+       "https://www.wikipedia.org/wiki/Warsaw"
+      ],
+      "latitude": "52.230046",
+      "longitude": "21.011995"
+     },
+     "countryNow": {
+      "en": "Poland",
+      "no": "Polen",
+      "se": "Polen",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q36"
+      ],
+      "latitude": "52.000000",
+      "longitude": "19.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Warsaw, Russian Empire (now Poland)",
+      "no": "Warszawa, Det russiske imperiet (nå Polen)",
+      "se": "Warszawa , Kejsardömet Ryssland (nu Polen)"
+     }
+    }
+   },
+   "death": {
+    "date": "1934-07-04",
+    "place": {
+     "city": {
+      "en": "Sallanches",
+      "no": "Sallanches",
+      "se": "Sallanches"
+     },
+     "country": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": "https://www.wikidata.org/wiki/Q142"
+     },
+     "cityNow": {
+      "en": "Sallanches",
+      "no": "Sallanches",
+      "se": "Sallanches",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q845855",
+       "https://www.wikipedia.org/wiki/Sallanches"
+      ],
+      "latitude": "45.936661",
+      "longitude": "6.630557"
+     },
+     "countryNow": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q142"
+      ],
+      "latitude": "47.000000",
+      "longitude": "2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Sallanches, France",
+      "no": "Sallanches, Frankrike",
+      "se": "Sallanches, Frankrike"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Marie_Curie",
+    "english": "https://en.wikipedia.org/wiki/Marie_Curie"
+   },
+   "wikidata": {
+    "id": "Q7186",
+    "url": "https://www.wikidata.org/wiki/Q7186"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q7186",
+    "https://en.wikipedia.org/wiki/Marie_Curie"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/6",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/6",
+     "title": "Marie Curie - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1903",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "3",
+     "portion": "1/4",
+     "dateAwarded": "1903-11-12",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of the extraordinary services they have rendered by their joint researches on the radiation phenomena discovered by Professor Henri Becquerel",
+      "se": "såsom ett erkännande av den utomordentliga förtjänst de inlagt genom sina gemensamt utförda arbeten rörande de av Professor Henri Becquerel upptäckta strålningsfenomenen"
+     },
+     "prizeAmount": 141358,
+     "prizeAmountAdjusted": 9857642,
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1903",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1903/marie-curie/facts/",
+       "title": "Marie Curie - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1903/summary/",
+       "title": "The Nobel Prize in Physics 1903",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    },
+    {
+     "awardYear": "1911",
+     "category": {
+      "en": "Chemistry",
+      "no": "Kjemi",
+      "se": "Kemi"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Chemistry",
+      "no": "Nobelprisen i kjemi",
+      "se": "Nobelpriset i kemi"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1911-11-07",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of her services to the advancement of chemistry by the discovery of the elements radium and polonium, by the isolation of radium and the study of the nature and compounds of this remarkable element",
+      "se": "såsom ett erkännande för den förtjänst hon inlagt om kemiens utveckling genom upptäckten av grundämnena radium och polonium, genom karakteriserandet av radium och dess isolerande i metalliskt tillstånd samt genom sina undersökningar angående detta märkliga grundämnes föreningar"
+     },
+     "prizeAmount": 140695,
+     "prizeAmountAdjusted": 9266329,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Sorbonne University",
+        "no": "Sorbonne University",
+        "se": "Sorbonne University"
+       },
+       "nameNow": {
+        "en": "Sorbonne University"
+       },
+       "city": {
+        "en": "Paris",
+        "no": "Paris",
+        "se": "Paris"
+       },
+       "country": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       },
+       "cityNow": {
+        "en": "Paris",
+        "no": "Paris",
+        "se": "Paris",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q90",
+         "https://www.wikipedia.org/wiki/Paris"
+        ],
+        "latitude": "48.860093",
+        "longitude": "2.355954"
+       },
+       "countryNow": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q142"
+        ],
+        "latitude": "47.000000",
+        "longitude": "2.000000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Paris, France",
+        "no": "Paris, Frankrike",
+        "se": "Paris, Frankrike"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/che/1911",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1911/marie-curie/facts/",
+       "title": "Marie Curie - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1911/summary/",
+       "title": "The Nobel Prize in Chemistry 1911",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "295",
+   "knownName": {
+    "en": "Niels Ryberg Finsen",
+    "se": "Niels Ryberg Finsen"
+   },
+   "givenName": {
+    "en": "Niels Ryberg",
+    "se": "Niels Ryberg"
+   },
+   "familyName": {
+    "en": "Finsen",
+    "se": "Finsen"
+   },
+   "fullName": {
+    "en": "Niels Ryberg Finsen",
+    "se": "Niels Ryberg Finsen"
+   },
+   "fileName": "finsen",
+   "gender": "male",
+   "birth": {
+    "date": "1860-12-15",
+    "year": "1860",
+    "place": {
+     "city": {
+      "en": "Thorshavn",
+      "no": "Torshavn",
+      "se": "Thorshavn"
+     },
+     "country": {
+      "en": "Faroe Islands (Denmark)",
+      "no": "Færøyene (Danmark)",
+      "se": "Färöarna (Danmark)"
+     },
+     "cityNow": {
+      "en": "Thorshavn",
+      "no": "Torshavn",
+      "se": "Thorshavn",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q10704",
+       "https://www.wikipedia.org/wiki/T%C3%B3rshavn"
+      ],
+      "latitude": "62.010863",
+      "longitude": "-6.774051"
+     },
+     "countryNow": {
+      "en": "Faroe Islands (Denmark)",
+      "no": "Færøyene (Danmark)",
+      "se": "Färöarna (Danmark)",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q4628"
+      ],
+      "latitude": "61.970000",
+      "longitude": "-6.844444"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Thorshavn, Faroe Islands (Denmark)",
+      "no": "Torshavn, Færøyene (Danmark)",
+      "se": "Thorshavn, Färöarna (Danmark)"
+     }
+    }
+   },
+   "death": {
+    "date": "1904-09-24",
+    "place": {
+     "city": {
+      "en": "Copenhagen",
+      "no": "København",
+      "se": "Köpenhamn"
+     },
+     "country": {
+      "en": "Denmark",
+      "no": "Danmark",
+      "se": "Danmark",
+      "sameAs": "https://www.wikidata.org/wiki/Q35"
+     },
+     "cityNow": {
+      "en": "Copenhagen",
+      "no": "København",
+      "se": "Köpenhamn",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1748",
+       "https://www.wikipedia.org/wiki/Copenhagen"
+      ],
+      "latitude": "55.678127",
+      "longitude": "12.572532"
+     },
+     "countryNow": {
+      "en": "Denmark",
+      "no": "Danmark",
+      "se": "Danmark",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q35"
+      ],
+      "latitude": "56.000000",
+      "longitude": "10.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Copenhagen, Denmark",
+      "no": "København, Danmark",
+      "se": "Köpenhamn, Danmark"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Niels_Ryberg_Finsen",
+    "english": "https://en.wikipedia.org/wiki/Niels_Ryberg_Finsen"
+   },
+   "wikidata": {
+    "id": "Q182964",
+    "url": "https://www.wikidata.org/wiki/Q182964"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q182964",
+    "https://en.wikipedia.org/wiki/Niels_Ryberg_Finsen"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/295",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/295",
+     "title": "Niels Ryberg Finsen - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1903",
+     "category": {
+      "en": "Physiology or Medicine",
+      "no": "Fysiologi eller medisin",
+      "se": "Fysiologi eller medicin"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physiology or Medicine",
+      "no": "Nobelprisen i fysiologi eller medisin",
+      "se": "Nobelpriset i fysiologi eller medicin"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1903-10-15",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of his contribution to the treatment of diseases, especially lupus vulgaris, with concentrated light radiation, whereby he has opened a new avenue for medical science",
+      "se": "såsom ett erkännande åt hans arbete för behandling av sjukdomar och särskilt lupus vulgaris med koncentrerade ljusstrålar, varigenom han öppnat en ny väg för läkekonsten"
+     },
+     "prizeAmount": 141358,
+     "prizeAmountAdjusted": 9857642,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Finsen Medical Light Institute",
+        "no": "Finsen Medical Light Institute",
+        "se": "Finsen Medical Light Institute"
+       },
+       "nameNow": {
+        "en": "Finsen Medical Light Institute"
+       },
+       "city": {
+        "en": "Copenhagen",
+        "no": "København",
+        "se": "Köpenhamn"
+       },
+       "country": {
+        "en": "Denmark",
+        "no": "Danmark",
+        "se": "Danmark"
+       },
+       "cityNow": {
+        "en": "Copenhagen",
+        "no": "København",
+        "se": "Köpenhamn",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q1748",
+         "https://www.wikipedia.org/wiki/Copenhagen"
+        ],
+        "latitude": "55.678127",
+        "longitude": "12.572532"
+       },
+       "countryNow": {
+        "en": "Denmark",
+        "no": "Danmark",
+        "se": "Danmark",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q35"
+        ],
+        "latitude": "56.000000",
+        "longitude": "10.000000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Copenhagen, Denmark",
+        "no": "København, Danmark",
+        "se": "Köpenhamn, Danmark"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/med/1903",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/medicine/1903/finsen/facts/",
+       "title": "Niels Ryberg Finsen - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/medicine/1903/summary/",
+       "title": "The Nobel Prize in Physiology or Medicine 1903",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "3",
+   "knownName": {
+    "en": "Pieter Zeeman",
+    "se": "Pieter Zeeman"
+   },
+   "givenName": {
+    "en": "Pieter",
+    "se": "Pieter"
+   },
+   "familyName": {
+    "en": "Zeeman",
+    "se": "Zeeman"
+   },
+   "fullName": {
+    "en": "Pieter Zeeman",
+    "se": "Pieter Zeeman"
+   },
+   "fileName": "zeeman",
+   "gender": "male",
+   "birth": {
+    "date": "1865-05-25",
+    "year": "1865",
+    "place": {
+     "city": {
+      "en": "Zonnemaire",
+      "no": "Zonnemaire",
+      "se": "Zonnemaire"
+     },
+     "country": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna"
+     },
+     "cityNow": {
+      "en": "Zonnemaire",
+      "no": "Zonnemaire",
+      "se": "Zonnemaire",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1902634",
+       "https://www.wikipedia.org/wiki/Zonnemaire"
+      ],
+      "latitude": "51.713056",
+      "longitude": "3.951111"
+     },
+     "countryNow": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q55"
+      ],
+      "latitude": "52.316667",
+      "longitude": "5.550000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Zonnemaire, the Netherlands",
+      "no": "Zonnemaire, Nederland",
+      "se": "Zonnemaire, Nederländerna"
+     }
+    }
+   },
+   "death": {
+    "date": "1943-10-09",
+    "place": {
+     "city": {
+      "en": "Amsterdam",
+      "no": "Amsterdam",
+      "se": "Amsterdam"
+     },
+     "country": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": "https://www.wikidata.org/wiki/Q55"
+     },
+     "cityNow": {
+      "en": "Amsterdam",
+      "no": "Amsterdam",
+      "se": "Amsterdam",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q727",
+       "https://www.wikipedia.org/wiki/Amsterdam"
+      ],
+      "latitude": "52.369420",
+      "longitude": "4.907108"
+     },
+     "countryNow": {
+      "en": "the Netherlands",
+      "no": "Nederland",
+      "se": "Nederländerna",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q55"
+      ],
+      "latitude": "52.316667",
+      "longitude": "5.550000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Amsterdam, the Netherlands",
+      "no": "Amsterdam, Nederland",
+      "se": "Amsterdam, Nederländerna"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Pieter_Zeeman",
+    "english": "https://en.wikipedia.org/wiki/Pieter_Zeeman"
+   },
+   "wikidata": {
+    "id": "Q79000",
+    "url": "https://www.wikidata.org/wiki/Q79000"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q79000",
+    "https://en.wikipedia.org/wiki/Pieter_Zeeman"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/3",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/3",
+     "title": "Pieter Zeeman - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1902",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "2",
+     "portion": "1/2",
+     "dateAwarded": "1902-11-11",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of the extraordinary service they rendered by their researches into the influence of magnetism upon radiation phenomena",
+      "se": "såsom ett erkännande av den utomordentliga förtjänst de inlagt genom sina undersökningar över magnetismens inflytande på strålningsfenomenen"
+     },
+     "prizeAmount": 141847,
+     "prizeAmountAdjusted": 10191492,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Amsterdam University",
+        "no": "Amsterdam University",
+        "se": "Amsterdam University"
+       },
+       "nameNow": {
+        "en": "Amsterdam University"
+       },
+       "city": {
+        "en": "Amsterdam",
+        "no": "Amsterdam",
+        "se": "Amsterdam"
+       },
+       "country": {
+        "en": "the Netherlands",
+        "no": "Nederland",
+        "se": "Nederländerna"
+       },
+       "cityNow": {
+        "en": "Amsterdam",
+        "no": "Amsterdam",
+        "se": "Amsterdam",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q727",
+         "https://www.wikipedia.org/wiki/Amsterdam"
+        ],
+        "latitude": "52.369420",
+        "longitude": "4.907108"
+       },
+       "countryNow": {
+        "en": "the Netherlands",
+        "no": "Nederland",
+        "se": "Nederländerna",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q55"
+        ],
+        "latitude": "52.316667",
+        "longitude": "5.550000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Amsterdam, the Netherlands",
+        "no": "Amsterdam, Nederland",
+        "se": "Amsterdam, Nederländerna"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1902",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1902/zeeman/facts/",
+       "title": "Pieter Zeeman - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1902/summary/",
+       "title": "The Nobel Prize in Physics 1902",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "631",
+   "knownName": {
+    "en": "Saint-John Perse",
+    "se": "Saint-John Perse"
+   },
+   "givenName": {
+    "en": "Saint-John",
+    "se": "Saint-John"
+   },
+   "familyName": {
+    "en": "Perse",
+    "se": "Perse"
+   },
+   "fullName": {
+    "en": "Saint-John Perse",
+    "se": "Saint-John Perse"
+   },
+   "penName": "(pen-name of Alexis Léger)",
+   "penNameOf": {
+    "fullName": "Alexis Léger"
+   },
+   "fileName": "perse",
+   "gender": "male",
+   "birth": {
+    "date": "1887-05-31",
+    "year": "1887",
+    "place": {
+     "city": {
+      "en": "Pointe-à-Pitre",
+      "no": "Pointe-à-Pitre",
+      "se": "Pointe-à-Pitre"
+     },
+     "country": {
+      "en": "Guadeloupe, France",
+      "no": "Guadeloupe, Frankrike",
+      "se": "Guadeloupe, Frankrike"
+     },
+     "cityNow": {
+      "en": "Pointe-à-Pitre",
+      "no": "Pointe-à-Pitre",
+      "se": "Pointe-à-Pitre",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q335322",
+       "https://www.wikipedia.org/wiki/Pointe-%C3%A0-Pitre"
+      ],
+      "latitude": "16.241111",
+      "longitude": "-61.533056"
+     },
+     "countryNow": {
+      "en": "Guadeloupe, France",
+      "no": "Guadeloupe, Frankrike",
+      "se": "Guadeloupe, Frankrike",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q17012"
+      ],
+      "latitude": "16.259500",
+      "longitude": "-61.560500"
+     },
+     "continent": {
+      "en": "North America",
+      "no": "Nord-Amerika",
+      "se": "Nordamerika"
+     },
+     "locationString": {
+      "en": "Pointe-à-Pitre, Guadeloupe, France",
+      "no": "Pointe-à-Pitre, Guadeloupe, Frankrike",
+      "se": "Pointe-à-Pitre, Guadeloupe, Frankrike"
+     }
+    }
+   },
+   "death": {
+    "date": "1975-09-20",
+    "place": {
+     "city": {
+      "en": "Presqu'île-de-Giens",
+      "no": "presqu ' Île-de-Giens",
+      "se": "Presqu'île-de-Giens"
+     },
+     "country": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": "https://www.wikidata.org/wiki/Q142"
+     },
+     "cityNow": {
+      "en": "Presqu'île-de-Giens",
+      "no": "presqu ' Île-de-Giens",
+      "se": "Presqu'île-de-Giens",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q204645",
+       "https://www.wikipedia.org/wiki/Giens_Peninsula"
+      ],
+      "latitude": "43.038052",
+      "longitude": "6.126643"
+     },
+     "countryNow": {
+      "en": "France",
+      "no": "Frankrike",
+      "se": "Frankrike",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q142"
+      ],
+      "latitude": "47.000000",
+      "longitude": "2.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Presqu'île-de-Giens, France",
+      "no": "presqu ' Île-de-Giens, Frankrike",
+      "se": "Presqu'île-de-Giens, Frankrike"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Saint-John_Perse",
+    "english": "https://en.wikipedia.org/wiki/Saint-John_Perse"
+   },
+   "wikidata": {
+    "id": "Q132684",
+    "url": "https://www.wikidata.org/wiki/Q132684"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q132684",
+    "https://en.wikipedia.org/wiki/Saint-John_Perse"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/631",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/631",
+     "title": "Saint-John Perse - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1960",
+     "category": {
+      "en": "Literature",
+      "no": "Litteratur",
+      "se": "Litteratur"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Literature",
+      "no": "Nobelprisen i litteratur",
+      "se": "Nobelpriset i litteratur"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1960-10-26",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for the soaring flight and the evocative imagery of his poetry which in a visionary fashion reflects the conditions of our time",
+      "se": "för den höga flykten och den bildskapande fantasien i hans diktning, som visionärt avspeglar tidsläget"
+     },
+     "prizeAmount": 225987,
+     "prizeAmountAdjusted": 3369907,
+     "residences": [
+      {
+       "country": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       },
+       "countryNow": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "France",
+        "no": "Frankrike",
+        "se": "Frankrike"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/lit/1960",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1960/perse/facts/",
+       "title": "Saint-John Perse - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/literature/1960/summary/",
+       "title": "The Nobel Prize in Literature 1960",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "1",
+   "knownName": {
+    "en": "Wilhelm Conrad Röntgen",
+    "se": "Wilhelm Conrad Röntgen"
+   },
+   "givenName": {
+    "en": "Wilhelm Conrad",
+    "se": "Wilhelm Conrad"
+   },
+   "familyName": {
+    "en": "Röntgen",
+    "se": "Röntgen"
+   },
+   "fullName": {
+    "en": "Wilhelm Conrad Röntgen",
+    "se": "Wilhelm Conrad Röntgen"
+   },
+   "fileName": "rontgen",
+   "gender": "male",
+   "birth": {
+    "date": "1845-03-27",
+    "year": "1845",
+    "place": {
+     "city": {
+      "en": "Lennep",
+      "no": "Lennep",
+      "se": "Lennep"
+     },
+     "country": {
+      "en": "Prussia",
+      "no": "Preussen",
+      "se": "Preussen"
+     },
+     "cityNow": {
+      "en": "Remscheid",
+      "no": "Remscheid",
+      "se": "Remscheid",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q3097",
+       "https://www.wikipedia.org/wiki/Remscheid"
+      ],
+      "latitude": "51.178742",
+      "longitude": "7.189696"
+     },
+     "countryNow": {
+      "en": "Germany",
+      "no": "Tyskland",
+      "se": "Tyskland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q183"
+      ],
+      "latitude": "51.000000",
+      "longitude": "10.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Lennep, Prussia (now Remscheid, Germany)",
+      "no": "Lennep, Preussen (nå Remscheid, Tyskland)",
+      "se": "Lennep, Preussen (nu Remscheid, Tyskland)"
+     }
+    }
+   },
+   "death": {
+    "date": "1923-02-10",
+    "place": {
+     "city": {
+      "en": "Munich",
+      "no": "München",
+      "se": "München"
+     },
+     "country": {
+      "en": "Germany",
+      "no": "Tyskland",
+      "se": "Tyskland",
+      "sameAs": "https://www.wikidata.org/wiki/Q183"
+     },
+     "cityNow": {
+      "en": "Munich",
+      "no": "München",
+      "se": "München",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q1726",
+       "https://www.wikipedia.org/wiki/Munich"
+      ],
+      "latitude": "48.134703",
+      "longitude": "11.581995"
+     },
+     "countryNow": {
+      "en": "Germany",
+      "no": "Tyskland",
+      "se": "Tyskland",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q183"
+      ],
+      "latitude": "51.000000",
+      "longitude": "10.000000"
+     },
+     "continent": {
+      "en": "Europe",
+      "no": "Europa",
+      "se": "Europa"
+     },
+     "locationString": {
+      "en": "Munich, Germany",
+      "no": "München, Tyskland",
+      "se": "München, Tyskland"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Wilhelm_Röntgen",
+    "english": "https://en.wikipedia.org/wiki/Wilhelm_Röntgen"
+   },
+   "wikidata": {
+    "id": "Q35149",
+    "url": "https://www.wikidata.org/wiki/Q35149"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q35149",
+    "https://en.wikipedia.org/wiki/Wilhelm_Röntgen"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/1",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/1",
+     "title": "Wilhelm Conrad Röntgen - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1901",
+     "category": {
+      "en": "Physics",
+      "no": "Fysikk",
+      "se": "Fysik"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Physics",
+      "no": "Nobelprisen i fysikk",
+      "se": "Nobelpriset i fysik"
+     },
+     "sortOrder": "1",
+     "portion": "1",
+     "dateAwarded": "1901-11-12",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "in recognition of the extraordinary services he has rendered by the discovery of the remarkable rays subsequently named after him",
+      "se": "såsom ett erkännande av den utomordentliga förtjänst han inlagt genom upptäckten av de egendomliga strålar, som sedermera uppkallats efter honom"
+     },
+     "prizeAmount": 150782,
+     "prizeAmountAdjusted": 10892857,
+     "affiliations": [
+      {
+       "name": {
+        "en": "Munich University",
+        "no": "Munich University",
+        "se": "Munich University"
+       },
+       "nameNow": {
+        "en": "Munich University"
+       },
+       "city": {
+        "en": "Munich",
+        "no": "München",
+        "se": "München"
+       },
+       "country": {
+        "en": "Germany",
+        "no": "Tyskland",
+        "se": "Tyskland"
+       },
+       "cityNow": {
+        "en": "Munich",
+        "no": "München",
+        "se": "München",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q1726",
+         "https://www.wikipedia.org/wiki/Munich"
+        ],
+        "latitude": "48.134703",
+        "longitude": "11.581995"
+       },
+       "countryNow": {
+        "en": "Germany",
+        "no": "Tyskland",
+        "se": "Tyskland",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q183"
+        ],
+        "latitude": "51.000000",
+        "longitude": "10.000000"
+       },
+       "continent": {
+        "en": "Europe"
+       },
+       "locationString": {
+        "en": "Munich, Germany",
+        "no": "München, Tyskland",
+        "se": "München, Tyskland"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/phy/1901",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1901/rontgen/facts/",
+       "title": "Wilhelm Conrad Röntgen - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/physics/1901/summary/",
+       "title": "The Nobel Prize in Physics 1901",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "265",
+   "knownName": {
+    "en": "Yuan T. Lee",
+    "se": "Yuan T. Lee"
+   },
+   "givenName": {
+    "en": "Yuan T.",
+    "se": "Yuan T."
+   },
+   "familyName": {
+    "en": "Lee",
+    "se": "Lee"
+   },
+   "fullName": {
+    "en": "Yuan T. Lee",
+    "se": "Yuan T. Lee"
+   },
+   "fileName": "lee",
+   "gender": "male",
+   "birth": {
+    "date": "1936-11-19",
+    "year": "1936",
+    "place": {
+     "city": {
+      "en": "Hsinchu",
+      "no": "Hsinchu",
+      "se": "Hsinchu"
+     },
+     "country": {
+      "en": "Taiwan",
+      "no": "Taiwan",
+      "se": "Taiwan"
+     },
+     "cityNow": {
+      "en": "Hsinchu",
+      "no": "Hsinchu",
+      "se": "Hsinchu",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q249994",
+       "https://www.wikipedia.org/wiki/Hsinchu"
+      ],
+      "latitude": "24.814166",
+      "longitude": "120.966649"
+     },
+     "countryNow": {
+      "en": "Taiwan",
+      "no": "Taiwan",
+      "se": "Taiwan",
+      "sameAs": [
+       "https://www.wikidata.org/wiki/Q865"
+      ],
+      "latitude": "24.000000",
+      "longitude": "121.000000"
+     },
+     "continent": {
+      "en": "Asia",
+      "no": "Asia",
+      "se": "Asien"
+     },
+     "locationString": {
+      "en": "Hsinchu, Taiwan",
+      "no": "Hsinchu, Taiwan",
+      "se": "Hsinchu, Taiwan"
+     }
+    }
+   },
+   "wikipedia": {
+    "slug": "Yuan_T._Lee",
+    "english": "https://en.wikipedia.org/wiki/Yuan_T._Lee"
+   },
+   "wikidata": {
+    "id": "Q243190",
+    "url": "https://www.wikidata.org/wiki/Q243190"
+   },
+   "sameAs": [
+    "https://www.wikidata.org/wiki/Q243190",
+    "https://en.wikipedia.org/wiki/Yuan_T._Lee"
+   ],
+   "links": [
+    {
+     "rel": "laureate",
+     "href": "https://api.nobelprize.org/2/laureate/265",
+     "action": "GET",
+     "types": "application/json"
+    },
+    {
+     "rel": "external",
+     "href": "https://www.nobelprize.org/laureate/265",
+     "title": "Yuan T. Lee - Facts",
+     "action": "GET",
+     "types": "text/html",
+     "class": [
+      "laureate facts"
+     ]
+    }
+   ],
+   "nobelPrizes": [
+    {
+     "awardYear": "1986",
+     "category": {
+      "en": "Chemistry",
+      "no": "Kjemi",
+      "se": "Kemi"
+     },
+     "categoryFullName": {
+      "en": "The Nobel Prize in Chemistry",
+      "no": "Nobelprisen i kjemi",
+      "se": "Nobelpriset i kemi"
+     },
+     "sortOrder": "2",
+     "portion": "1/3",
+     "dateAwarded": "1986-10-15",
+     "prizeStatus": "received",
+     "motivation": {
+      "en": "for their contributions concerning the dynamics of chemical elementary processes",
+      "se": "för deras insatser rörande dynamiken hos kemiska elementarprocesser"
+     },
+     "prizeAmount": 2000000,
+     "prizeAmountAdjusted": 5182514,
+     "affiliations": [
+      {
+       "name": {
+        "en": "University of California",
+        "no": "University of California",
+        "se": "University of California"
+       },
+       "nameNow": {
+        "en": "University of California"
+       },
+       "city": {
+        "en": "Berkeley, CA",
+        "no": "Berkeley, CA",
+        "se": "Berkeley, CA"
+       },
+       "country": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA"
+       },
+       "cityNow": {
+        "en": "Berkeley, CA",
+        "no": "Berkeley, CA",
+        "se": "Berkeley, CA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q484678",
+         "https://www.wikipedia.org/wiki/Berkeley,_California"
+        ],
+        "latitude": "37.871790",
+        "longitude": "-122.274715"
+       },
+       "countryNow": {
+        "en": "USA",
+        "no": "USA",
+        "se": "USA",
+        "sameAs": [
+         "https://www.wikidata.org/wiki/Q30"
+        ],
+        "latitude": "39.828175",
+        "longitude": "-98.579500"
+       },
+       "continent": {
+        "en": "North America"
+       },
+       "locationString": {
+        "en": "Berkeley, CA, USA",
+        "no": "Berkeley, CA, USA",
+        "se": "Berkeley, CA, USA"
+       }
+      }
+     ],
+     "links": [
+      {
+       "rel": "nobelPrize",
+       "href": "https://api.nobelprize.org/2/nobelPrize/che/1986",
+       "action": "GET",
+       "types": "application/json"
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1986/lee/facts/",
+       "title": "Yuan T. Lee - Facts",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "laureate facts"
+       ]
+      },
+      {
+       "rel": "external",
+       "href": "https://www.nobelprize.org/prizes/chemistry/1986/summary/",
+       "title": "The Nobel Prize in Chemistry 1986",
+       "action": "GET",
+       "types": "text/html",
+       "class": [
+        "prize summary"
+       ]
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "meta": {
+  "offset": 0,
+  "limit": 1100,
+  "count": 18,
+  "terms": "https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/",
+  "license": "https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/#licence",
+  "disclaimer": "https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/#disclaimer"
+ },
+ "links": {
+  "first": "http://nobel-external-api-app.azurewebsites.net/2.1/laureates?offset=0&limit=1100",
+  "self": "http://nobel-external-api-app.azurewebsites.net/2.1/laureates?offset=0&limit=1100",
+  "last": "http://nobel-external-api-app.azurewebsites.net/2.1/laureates?offset=0&limit=1100"
+ }
+}

@@ -1,0 +1,16 @@
+# V3 (agent A-SCI): Nobel Prize laureates, atlas counts + KG statements (connector atlas.nobel).
+source_key: nobelprize.api
+title: Nobel Prize API v2.1 (laureates)
+provider_url: https://www.nobelprize.org/about/developer-zone-2/
+lineage_family: nobelprize
+rights:
+  licence: CC0-1.0
+  licence_url: https://www.nobelprize.org/about/terms-of-use-for-api-nobelprize-org-and-data-nobelprize-org/
+  attribution: "Nobel Prize Outreach, api.nobelprize.org"
+  terms: "do not alter or censor the data; minimise API load (cache locally); no Nobel trademarks in titles or logos"
+metadata:
+  allowed_hosts: [api.nobelprize.org]
+  api_docs: https://app.swaggerhub.com/apis/NobelMedia/NobelMasterData/2.1
+  authentication: none
+  editorial_status: curated by Nobel Prize Outreach (not community-edited)
+  cadence: after each October announcement

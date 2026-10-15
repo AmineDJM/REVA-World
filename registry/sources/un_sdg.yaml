@@ -1,0 +1,28 @@
+# V3 (agent A-UN): UN SDG Global Database API v5 (selected headline series).
+source_key: un.sdg
+title: "UN Statistics Division - Global SDG Indicators Database (API v5)"
+provider_url: https://unstats.un.org/sdgs/UNSDGAPIV5
+lineage_family: un_sdg
+rights:
+  licence: "UN Statistics Division / UNdata terms of use (free use with attribution)"
+  licence_url: https://data.un.org/Host.aspx?Content=UNdataUse
+  attribution: "United Nations Statistics Division, Global SDG Indicators Database, https://unstats.un.org/sdgs/dataportal"
+  review: >-
+    pending maintainer review: the SDG data portal terms page is JavaScript-rendered and could not be read
+    from the build container; the UNdata terms (read 2026-10-15) say "All data and metadata provided on
+    UNdata's website are available free of charge and may be copied freely, duplicated and further
+    distributed provided that UNdata is cited as the reference." Each series also names its custodian
+    agency source in the record's 'source' field (kept on every atlas row).
+metadata:
+  allowed_hosts: [unstats.un.org]
+  api_docs: https://unstats.un.org/sdgs/UNSDGAPIV5/swagger/index.html
+  endpoints: ["GET /v1/sdg/Series/List", "GET /v1/sdg/Series/Data?seriesCode&pageSize&page[&dimensions]"]
+  authentication: none
+  performance_note: "server answers in 10-90 s per page (2026-10-15); the connector uses 1000-row pages and a 180 s timeout"
+  cadence: quarterly releases (release code on every row)
+  editorial_status: >-
+    Compiled by custodian agencies (WHO, UNICEF, ILO, UNESCO, FAO, IPU, World Bank, ITU, UNODC, ...);
+    'Nature' attribute distinguishes country data (C), country-adjusted (CA), estimated (E), modelled (M),
+    global monitoring (G). The SDG series are therefore not independent of WHO/WB/ILO/UNESCO atlas tables.
+  upstream_lineages:
+    all: [custodian_agencies]

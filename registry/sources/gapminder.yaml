@@ -1,0 +1,20 @@
+# V3 (agent A-HISTECON): Gapminder Fast Track DDF dataset (population, life expectancy, GDP per capita).
+# Connector: src/reva/adapters/connectors/atlas_gapminder.py -> atlas table gapminder.fasttrack.
+source_key: gapminder.fasttrack
+title: Gapminder Fast Track (pop, lex, gdp_pcap by country since 1800)
+provider_url: https://www.gapminder.org/data/
+lineage_family: gapminder
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "Based on free material from GAPMINDER.ORG, CC-BY LICENSE"
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  repository: https://github.com/open-numbers/ddf--gapminder--fasttrack
+  terms_of_use: https://www.gapminder.org/free-material/
+  trademark: do not use the word GAPMINDER in a product name except in the required citation
+  projections: >-
+    Years after the documented last estimate year (pop 2023, lex 2019, gdp_pcap 2024) are projections or
+    an 'IF-scenario' and are not loaded.
+  authentication: none
+  cadence: monthly check

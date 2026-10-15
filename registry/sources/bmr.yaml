@@ -1,0 +1,19 @@
+# V3 (agent A-POL): Boix-Miller-Rosato dichotomous coding of democracy v4.0, Harvard Dataverse doi:10.7910/DVN/FENWWR.
+source_key: bmr.dataverse
+title: Boix-Miller-Rosato Dichotomous Coding of Democracy, 1800-2020 (v4.0)
+provider_url: https://doi.org/10.7910/DVN/FENWWR
+lineage_family: bmr
+rights:
+  licence: CC0-1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Boix, Carles; Michael K. Miller; Sebastian Rosato. "Boix-Miller-Rosato Dichotomous Coding of Democracy,
+    1800-2020", Harvard Dataverse, doi:10.7910/DVN/FENWWR (democracy-v4.0.csv).
+  licence_evidence: Dataverse dataset record license.name = "CC0 1.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/FENWWR
+    - https://dataverse.harvard.edu/api/access/datafile/5707006?format=original  # democracy-v4.0.csv (MD5 40dcce1cf6214c34d14cdae9014b3a8a)
+  authentication: none
+  cadence: irregular (last release 2022-01)

@@ -1,0 +1,19 @@
+[
+  {
+    "request_fingerprint": "3b92a0251cc587dde369acf334386331a1537a4e90445b50a238ce2145195a44",
+    "url": "https://utexas.box.com/shared/static/qzs6irrpbfzspvv6sq94r98yw9rsh5lz.zip",
+    "file": "chronology_subset.zip",
+    "sha256": "be8ec1b43d43814067f0c21968f20949991035826e38235fceaf44cec2181fa8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "No explicit data licence; free download with requested citation; CCP web terms prohibit commercial use",
+    "derived_from": {
+      "real_sha256": "ab04078953ae56b92eec21167f355746f36f50cf84d49851fe1c9e3af2b19ba2",
+      "real_bytes": 829263,
+      "derivation": "subset: COW codes ['2', '220', '255', '260', '340', '365', '670']; CSV lines verbatim (line numbers differ from the real file)"
+    }
+  }
+]

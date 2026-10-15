@@ -1,0 +1,19 @@
+# Property requests from KGHIST (history domain). WDHARVEST merges them into registry/kg/properties.yaml.
+- property: P945
+  why: >-
+    allegiance (person -> state/crown served), e.g. a navigator in the service of the Crown of Castile;
+    a person -> polity hop for explorer/conquistador anchor chains when no employer/citizenship is stated.
+  reva_predicate: allegiance
+  inverse: has_allegiance_of
+  kind: entity
+  label_fr: allégeance
+  label_en: allegiance
+- property: P137
+  why: >-
+    operator (expedition/voyage -> crown, state or company that ran it), e.g. voyages run by the Portuguese
+    Crown or the Dutch East India Company; voyage -> polity hop.
+  reva_predicate: operator
+  inverse: operator_of
+  kind: entity
+  label_fr: opérateur
+  label_en: operator

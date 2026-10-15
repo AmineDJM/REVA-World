@@ -1,0 +1,100 @@
+{
+ "fixture_kind": "synthetic_plan",
+ "label": "fr_us_decolonisation",
+ "note": "Hand-written planner output (NOT a model recording): live capture on 2026-10-15 failed (OpenAI 429 insufficient_quota, Gemini 402; see failures/). Re-capture with `uv run python -m reva.nlqa.recorded` when provider credits are restored.",
+ "prompt_version": "nlqa-plan-1.0.0",
+ "text": "Position des États-Unis sur la décolonisation dans les années 1950-60 ?",
+ "text_sha256": "989aa1979cb3a2c8e359afb3a1f1c2b352dc2d265e6382ab216724eb2c937c3e",
+ "output": {
+  "input_language": "fr",
+  "restatement": "Quelle était la position des États-Unis sur la décolonisation dans les années 1950 et 1960 ?",
+  "operations": [
+   {
+    "text": "États-Unis",
+    "kind": "country",
+    "entity": null,
+    "from_entity": null,
+    "to_entity": null,
+    "as_of": null,
+    "from_year": null,
+    "to_year": null,
+    "max_hops": null,
+    "concept": null,
+    "country": null,
+    "year": null,
+    "order": null,
+    "limit": null,
+    "properties": [],
+    "link_kinds": [],
+    "id": "s1",
+    "op": "entity_lookup"
+   },
+   {
+    "text": "décolonisation",
+    "kind": "event",
+    "entity": null,
+    "from_entity": null,
+    "to_entity": null,
+    "as_of": null,
+    "from_year": null,
+    "to_year": null,
+    "max_hops": null,
+    "concept": null,
+    "country": null,
+    "year": null,
+    "order": null,
+    "limit": null,
+    "properties": [],
+    "link_kinds": [],
+    "id": "s2",
+    "op": "entity_lookup"
+   },
+   {
+    "text": null,
+    "kind": null,
+    "entity": "s1",
+    "from_entity": null,
+    "to_entity": null,
+    "as_of": null,
+    "from_year": 1950,
+    "to_year": 1969,
+    "max_hops": null,
+    "concept": null,
+    "country": null,
+    "year": null,
+    "order": null,
+    "limit": null,
+    "properties": [],
+    "link_kinds": [],
+    "id": "s3",
+    "op": "kg_timeline"
+   },
+   {
+    "text": null,
+    "kind": null,
+    "entity": null,
+    "from_entity": "s1",
+    "to_entity": "s2",
+    "as_of": null,
+    "from_year": null,
+    "to_year": null,
+    "max_hops": 3,
+    "concept": null,
+    "country": null,
+    "year": null,
+    "order": null,
+    "limit": null,
+    "properties": [],
+    "link_kinds": [],
+    "id": "s4",
+    "op": "kg_path"
+   }
+  ],
+  "unsupported": [
+   {
+    "text": "Position des États-Unis sur la décolonisation",
+    "reason": "a political position is not a single lookup; dated statements are listed instead"
+   }
+  ]
+ }
+}

@@ -1,0 +1,78 @@
+# Path-engine hub damping (owner: LINKS). Read by src/reva/links/paths.py.
+#
+# A path through a huge hub ("Earth", "human", "country", "United Nations") is true but says nothing:
+# every state is a member of the UN, every person is a human. Three declarative levers, plus a degree
+# penalty for hubs nobody listed:
+#
+# * blocked:   never used as an *intermediate* node (still allowed as the start or the end of a path);
+# * penalised: allowed as an intermediate node at an extra cost (`penalty`, in hop units);
+# * excluded_properties: statement properties the path engine does not traverse by default (classification
+#   and attribute-like properties whose objects are hubs by construction). A caller may opt back in by
+#   naming the property explicitly in the `kinds` filter.
+# * degree_penalty: extra cost per doubling of a node's degree above `threshold` distinct neighbours:
+#   penalty = per_doubling * max(0, log2(degree) - log2(threshold)); intermediate nodes only.
+#
+# Penalties change which paths rank first; they never hide that a path exists through a blocked hub when
+# the caller asks for it (`include_blocked_hubs=true`).
+
+version: 1
+owner: LINKS
+
+blocked:
+  - {qid: Q2, label: Earth}
+  - {qid: Q5, label: human}
+  - {qid: Q6256, label: country}
+  - {qid: Q3624078, label: sovereign state}
+  - {qid: Q7275, label: state}
+  - {qid: Q3024240, label: historical country}
+  - {qid: Q515, label: city}
+  - {qid: Q35120, label: entity}
+  - {qid: Q6581097, label: male}
+  - {qid: Q6581072, label: female}
+  - {qid: Q82955, label: politician}
+  - {qid: Q11900058, label: explorer}
+  - {qid: Q131569, label: treaty}
+  - {qid: Q198, label: war}
+  - {qid: Q133156, label: colony}
+  - {qid: Q48349, label: empire}
+  - {qid: Q34770, label: language}
+  - {qid: Q1288568, label: modern language}
+  - {qid: Q33742, label: natural language}
+  - {qid: Q19860, label: Indo-European languages, note: "family root shared by hundreds of languages"}
+  - {qid: Q1860, label: English, note: "official or used language of ~60 states; use shared_official_language links instead"}
+
+penalised:
+  - {qid: Q1065, label: United Nations, penalty: 6.0}
+  - {qid: Q47423, label: United Nations General Assembly, penalty: 3.0}
+  - {qid: Q37470, label: United Nations Security Council, penalty: 1.0}
+  - {qid: Q7809, label: UNESCO, penalty: 5.0}
+  - {qid: Q7817, label: World Health Organization, penalty: 5.0}
+  - {qid: Q7825, label: World Trade Organization, penalty: 4.0}
+  - {qid: Q7164, label: International Monetary Fund, penalty: 5.0}
+  - {qid: Q7159, label: World Bank, penalty: 5.0}
+  - {qid: Q8475, label: Interpol, penalty: 5.0}
+  - {qid: Q17495, label: Universal Postal Union, penalty: 5.0}
+  - {qid: Q15180, label: Soviet Union, penalty: 0.5, note: "large polity; small penalty only"}
+  - {qid: Q15, label: Africa, penalty: 3.0}
+  - {qid: Q46, label: Europe, penalty: 3.0}
+  - {qid: Q48, label: Asia, penalty: 3.0}
+  - {qid: Q18, label: South America, penalty: 3.0}
+  - {qid: Q49, label: North America, penalty: 3.0}
+  - {qid: Q538, label: Oceania, penalty: 3.0}
+  - {qid: Q1321, label: Spanish, penalty: 1.0}
+  - {qid: Q150, label: French, penalty: 1.0}
+  - {qid: Q13955, label: Arabic, penalty: 1.0}
+
+excluded_properties:
+  - {property: P31, reason: "instance of: objects are classes (human, country, treaty) — hubs by construction"}
+  - {property: P21, reason: "sex or gender"}
+  - {property: P106, reason: "occupation: classes of people"}
+  - {property: P101, reason: "field of work: broad topics"}
+  - {property: P30, reason: "continent: five hubs; opt in with kinds=[statement:P30]"}
+  - {property: P2348, reason: "time period: era hubs; opt in when needed"}
+  - {property: P122, reason: "basic form of government: a handful of classes shared by every state"}
+  - {property: P166, reason: "award received: prize hubs"}
+
+degree_penalty:
+  threshold: 64
+  per_doubling: 1.0

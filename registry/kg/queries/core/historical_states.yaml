@@ -1,0 +1,14 @@
+id: core.historical_states
+domain: core
+owner: WDHARVEST
+description: >-
+  Historical countries/states: instances of historical country (Q3024240) or of one of its subclasses
+  (former kingdoms, principalities, historical empires...). Runs after history.empires and history.colonies
+  (KGHIST) so that items already seeded as country/empire/colony keep that more specific kind.
+purpose: seed_entities
+entity_kind: historical_state
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q3024240 . }
+max_rows: 25000
+depends_on: [core.sovereign_states, history.empires, history.colonies]
+expand_hops: 1

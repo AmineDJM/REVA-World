@@ -1,0 +1,72 @@
+[
+  {
+    "request_fingerprint": "71a45cf8c1144023b9fe059c7400d68ba74594433b7a139f6ab75d2e48fec46a",
+    "url": "https://api.unhcr.org/population/v1/population/?limit=10000&page=1&yearFrom=2024&yearTo=2024&coo_all=true&coa_all=true",
+    "file": "71a45cf8c1144023.json",
+    "sha256": "74528fc90ac688599e23e89e0b9f2cb3c174f9e0982031814050b044887f64cc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real bilateral records for nine origin x asylum pairs",
+    "excerpt_of_raw_sha256": "055270d06ab8764818408b2228915c7be08851b153a447442b6f7e15aee2e79e"
+  },
+  {
+    "request_fingerprint": "e14a96f2c57fb64db6cc48cf93f94a47cacc98ab1f24e41a94eb487d52a689d9",
+    "url": "https://api.unhcr.org/population/v1/population/?limit=10000&page=1&yearFrom=2024&yearTo=2025&coa_all=true",
+    "file": "e14a96f2c57fb64d.json",
+    "sha256": "720204a2523d2e7b6b1c6de198379ae6c99d85cfaffa144e69aa32a7ee29e84e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real by_asylum records for eight areas, 2024-2025",
+    "excerpt_of_raw_sha256": "f94eba2e416ee9638e75111783768bcaadaf0f4703e44aacc98ad348f988783e"
+  },
+  {
+    "request_fingerprint": "6b7a9871bc2747c12ff6080baed5da07756427ffa51c9170cfed0b7e1821e02b",
+    "url": "https://api.unhcr.org/population/v1/population/?limit=10000&page=1&yearFrom=2024&yearTo=2025&coo_all=true",
+    "file": "6b7a9871bc2747c1.json",
+    "sha256": "8be0f7b497a283dcd91362c7e22ee3a03f9149f10f7c6edf498c6fe5124b9840",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real by_origin records for eight areas, 2024-2025",
+    "excerpt_of_raw_sha256": "a06a202f4e8a66654e367f0802fe91ce22e6967c0d0aa52b7da70a03b671a9b0"
+  },
+  {
+    "request_fingerprint": "9655eeb54b2fa9b734679b6532d3149b903cdbe5888b2a70f31da0b93cd46019",
+    "url": "https://api.unhcr.org/population/v1/population/?limit=10000&page=1&yearFrom=2025&yearTo=2025&coo_all=true&coa_all=true",
+    "file": "9655eeb54b2fa9b7.json",
+    "sha256": "f9734416ffcd3c8861e4588475d83400d6b487f6f552e0b2266758c30e8981a8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real bilateral records for nine origin x asylum pairs",
+    "excerpt_of_raw_sha256": "c3ba5f093785189291a30049192c83a8b5202c9ae6850e08955a54bc105d0333"
+  },
+  {
+    "request_fingerprint": "4da759f05ad888954bcf3771e10c4480f75dd13c581c325f636fc2d86e48c136",
+    "url": "https://api.unhcr.org/population/v1/years/",
+    "file": "4da759f05ad88895.json",
+    "sha256": "b0ecd65e940f1fea3ca92bc0f191afdf6cd75e9c44da1c174a48e4d77b66f986",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:20:00+00:00",
+    "licence": "CC BY 4.0",
+    "excerpt": "real years list filtered to 2024-2026",
+    "excerpt_of_raw_sha256": "7b6d8fd313173a112f49b397cf43c97597270b5645093ed95a497d98b504072a"
+  }
+]

@@ -1,0 +1,158 @@
+[
+  {
+    "request_fingerprint": "423b039f37ffeab881fec9d3f8bdb98ef4bcc2b5d65750e23bc18dff2478fb8a",
+    "url": "https://dataverse.nl/api/access/datafile/575816",
+    "file": "423b039f37ffeab8.xlsx",
+    "sha256": "b1d6070a23ec528ebb007b845d79d7ca72b1df2ebe60d6f4ea21836322fe84dd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "per record",
+    "fixture_note": "live data file"
+  },
+  {
+    "request_fingerprint": "d12a9d2d5e95891a3e688e9e6e6ef6a3d51cfaeb49f4c1d0fb26e022903a1592",
+    "url": "https://dataverse.nl/api/access/datafile/575934",
+    "file": "d12a9d2d5e95891a.xlsx",
+    "sha256": "df826874a49039824e00ef9508fcb308600a22851605ef0aa79eae9502793c6b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "per record",
+    "fixture_note": "live data file"
+  },
+  {
+    "request_fingerprint": "209b78df86d1d9242c8f7318aeca25af137f6d8249f0c4861161ea9848d3f364",
+    "url": "https://dataverse.nl/api/access/datafile/575951",
+    "file": "209b78df86d1d924.xlsx",
+    "sha256": "61609532b9d3a7986572e458500d770611e43dfa6c263f82d0227d4096c38a15",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "per record",
+    "fixture_note": "live data file"
+  },
+  {
+    "request_fingerprint": "416fe0e003fe8f9a666bafddba97754832951372116bc4f22955e1c9484df7e8",
+    "url": "https://dataverse.nl/api/access/datafile/575963",
+    "file": "416fe0e003fe8f9a.xlsx",
+    "sha256": "d640cf167e76e072ee8e678214c4f9869eccbc61ff5032bcf4147b8e2d2c5258",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "per record",
+    "fixture_note": "live data file"
+  },
+  {
+    "request_fingerprint": "23e75effa823a49aa96eb52f01200789d113bffe57109fd22f7f3846db9848e3",
+    "url": "https://dataverse.nl/api/access/datafile/576062",
+    "file": "23e75effa823a49a.xlsx",
+    "sha256": "6f886743fba78e8409c02e9961e35504bded6e1bfe438f60f84bd86537d76f0a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "per record",
+    "fixture_note": "live data file"
+  },
+  {
+    "request_fingerprint": "7af4402d6cc22164083da8e8679fe5a5189f3d2079d2c4b136e4a9a1b677f24c",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/CGMOIO",
+    "file": "7af4402d6cc22164.json",
+    "sha256": "9c5d7057299dda09e7c985ab80652c15bb31be2da6bc275ba62b829e0ba0c89d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "7af42c6896d07107b65337424e0ef64f440243e3e9818f69d82fe37178ead8e2",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/DPHTH1",
+    "file": "7af42c6896d07107.json",
+    "sha256": "d7b2e401fc5c4ed0e13a8c687eebef1ab66239ce7884ff95d524cee0b4239dc7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "d1f0cdfdb1e68318e618a8d16f70d89352e20a52c8190dc9334985db0f4bb79d",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/G7NZ87",
+    "file": "d1f0cdfdb1e68318.json",
+    "sha256": "9e1450f7760306b000a31a73b19be8aa96c8b162fc90bfea259abe67da7d3e59",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "e9f32192851f9155272ed7ef417dd7ea073e0c048dec338d7df0163aa0e8aa69",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/HW27BU",
+    "file": "e9f32192851f9155.json",
+    "sha256": "fa223821ea2c6b90e021e990c03bb1bca54f26b18eec5b5b416e28f0dfd9e95c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "1495b1382a3569829c66f8050adf7d40e5662b9960ea5c3b17e70f84707c1552",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/JITFDV",
+    "file": "1495b1382a356982.json",
+    "sha256": "7daa6c7228b508d787f7b6a931a99090e6eb9a56fff65d4682330d6e61507403",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "ee0204a3a1d6a4165daffb65dfd8b96108b0961cd9ef80d5a739f12944a8225c",
+    "url": "https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/UFVNXT",
+    "file": "ee0204a3a1d6a416.json",
+    "sha256": "21587f993e2e349a73ac45f084a6de35195e1a1c5674d269b2b47319078eb81e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "dataset record",
+    "fixture_note": "live record"
+  },
+  {
+    "request_fingerprint": "4ab067f7277ae6052a2f3a55d6b18ff5f06268245c1a6d541ba57ef0ade44113",
+    "url": "https://dataverse.nl/api/search?q=*&subtree=clioinfra&type=dataset&per_page=100&start=0",
+    "file": "4ab067f7277ae605.json",
+    "sha256": "98aece0d36d54a69c800b65b39ddd181dcf5935ff1701fe97c0fe4dd7cc81daa",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC0 1.0 (metadata)",
+    "fixture_note": "TRIMMED: search items cut to 6 datasets, total_count adjusted"
+  }
+]

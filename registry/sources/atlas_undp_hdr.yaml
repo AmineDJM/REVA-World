@@ -1,0 +1,19 @@
+# V3 atlas (agent A-QOL): UNDP Human Development Report Office bulk files. Connector
+# src/reva/adapters/connectors/atlas_undp.py (atlas tables undp.hdr25, undp.gmpi2026).
+source_key: undp.hdr
+title: UNDP Human Development Report composite indices and Global MPI (bulk CSV/XLSX)
+provider_url: https://hdr.undp.org/data-center/documentation-and-downloads
+lineage_family: undp_hdro
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: https://hdr.undp.org/terms-use
+  attribution: "UNDP (United Nations Development Programme). 2025. Human Development Report 2025. New York. Global MPI 2026: UNDP and OPHI."
+metadata:
+  allowed_hosts: [hdr.undp.org]
+  files:
+    - https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_complete_time_series.csv
+    - https://hdr.undp.org/sites/default/files/2025_HDR/HDR25_Composite_indices_metadata.xlsx
+    - https://hdr.undp.org/sites/default/files/publications/additional-files/2026-10/2026_gMPI_Table1and2.xlsx
+  authentication: none
+  licence_checked: "2026-10-15"
+  cadence: annual HDR edition; MPI update each October

@@ -1,0 +1,933 @@
+# Energy (agent A-QOL). Provider-declared concepts, not human-reviewed.
+# Source: Our World in Data energy-data (github.com/owid/energy-data), a COMPILATION: Energy Institute Statistical
+# Review of World Energy (© Energy Institute), Ember (CC BY 4.0), U.S. EIA (public domain), The Shift Data Portal.
+# Each cell carries the original source in flags.original_source. No other atlas agent ingests these producers
+# directly (2026-10-15), so OWID is first in source_order; owid.co2.* duplicates of the same OWID series follow.
+domain: energy
+labels:
+  fr: Énergie
+  en: Energy
+maintainer: A-QOL
+concepts:
+- id: energy.primary_energy_consumption
+  labels:
+    fr: Consommation d'énergie primaire
+    en: Primary energy consumption
+  definition: 'Primary energy consumption: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: consumption
+  source_order:
+  - owid.energy.primary_energy_consumption
+  - owid.co2.primary_energy_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: U.S. Energy Information Administration - International Energy Data
+    (2025) [https://www.eia.gov/opendata/bulkfiles.php]; Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.energy_per_capita
+  labels:
+    fr: Consommation d'énergie primaire par habitant
+    en: Primary energy consumption per capita
+  definition: 'Primary energy consumption per capita: Measured in kilowatt-hours per person.'
+  unit: kilowatt-hours per person (kWh)
+  domain: energy
+  subdomain: consumption
+  source_order:
+  - owid.energy.energy_per_capita
+  - owid.co2.energy_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: U.S. Energy Information Administration - International Energy Data
+    (2025) [https://www.eia.gov/opendata/bulkfiles.php]; Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/];
+    Population based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: energy.energy_per_gdp
+  labels:
+    fr: Consommation d'énergie primaire par unité de PIB
+    en: Primary energy consumption per GDP
+  definition: 'Primary energy consumption per GDP: Measured in kilowatt-hours per international-$.'
+  unit: kilowatt-hours per $ (kWh)
+  domain: energy
+  subdomain: consumption
+  source_order:
+  - owid.energy.energy_per_gdp
+  - owid.co2.energy_per_gdp
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: U.S. Energy Information Administration - International Energy Data
+    (2025) [https://www.eia.gov/opendata/bulkfiles.php]; Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/];
+    Bolt and van Zanden – Maddison Project Database 2023 [https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023].'
+- id: energy.electricity_generation
+  labels:
+    fr: Production d'électricité totale
+    en: Total electricity generation
+  definition: 'Total electricity generation: Total electricity generated in each country or region, measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.electricity_generation
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.per_capita_electricity
+  labels:
+    fr: Production d'électricité par habitant
+    en: Total electricity generation per person
+  definition: 'Total electricity generation per person: Measured in kilowatt-hours per person.'
+  unit: kilowatt-hours (kWh)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.per_capita_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/]; Population based on various sources (2024)
+    [https://ourworldindata.org/population-sources].'
+- id: energy.electricity_demand
+  labels:
+    fr: Demande d'électricité
+    en: Electricity demand
+  definition: 'Electricity demand: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.electricity_demand
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.electricity_demand_per_capita
+  labels:
+    fr: Demande d'électricité par habitant
+    en: Total electricity demand per person
+  definition: 'Total electricity demand per person: Measured in kilowatt-hours per person.'
+  unit: kilowatt-hours (kWh)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.electricity_demand_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Population based on various
+    sources (2024) [https://ourworldindata.org/population-sources].'
+- id: energy.net_elec_imports
+  labels:
+    fr: Importations nettes d'électricité
+    en: Net electricity imports
+  definition: 'Net electricity imports: Electricity imports minus exports, measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.net_elec_imports
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.net_elec_imports_share_demand
+  labels:
+    fr: Importations nettes d'électricité en part de la demande
+    en: Net electricity imports as a share of demand
+  definition: 'Net electricity imports as a share of demand: Electricity imports minus exports, measured as a percentage of
+    total electricity demand in the country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.net_elec_imports_share_demand
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.electricity_share_energy
+  labels:
+    fr: Production d'électricité en part de l'énergie primaire
+    en: Total electricity generation as share of primary energy
+  definition: 'Total electricity generation as share of primary energy: Measured as a percentage of total, direct primary
+    energy consumption in the country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.electricity_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.carbon_intensity_elec
+  labels:
+    fr: Intensité carbone de l'électricité (cycle de vie)
+    en: Lifecycle carbon intensity of electricity generation
+  definition: 'Lifecycle carbon intensity of electricity generation: Greenhouse gases emitted per unit of generated electricity,
+    measured in grams of CO₂ equivalents per kilowatt-hour.'
+  unit: grams of CO₂ equivalents per kilowatt-hour (gCO₂)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.carbon_intensity_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.greenhouse_gas_emissions
+  labels:
+    fr: Émissions de GES du secteur électrique (cycle de vie)
+    en: Lifecycle emissions from electricity generation
+  definition: 'Lifecycle emissions from electricity generation: Measured in megatonnes of CO₂ equivalents.'
+  unit: million tonnes CO₂ equivalents (Mt)
+  domain: energy
+  subdomain: electricity
+  source_order:
+  - owid.energy.greenhouse_gas_emissions
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.coal_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : charbon'
+    en: Share of electricity generated by coal
+  definition: 'Share of electricity generated by coal: Measured as a percentage of total electricity produced in the country
+    or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.coal_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.coal_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : charbon'
+    en: Share of primary energy consumption that comes from coal
+  definition: 'Share of primary energy consumption that comes from coal: Measured as a percentage of the total primary energy,
+    using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.coal_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.coal_electricity
+  labels:
+    fr: 'Électricité produite à partir de : charbon'
+    en: Electricity generation from coal
+  definition: 'Electricity generation from coal: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.coal_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.coal_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : charbon'
+    en: Primary energy consumption from coal
+  definition: 'Primary energy consumption from coal: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.coal_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.gas_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : gaz'
+    en: Share of electricity generated by gas
+  definition: 'Share of electricity generated by gas: Measured as a percentage of total electricity produced in the country
+    or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.gas_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.gas_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : gaz'
+    en: Share of primary energy consumption that comes from gas
+  definition: 'Share of primary energy consumption that comes from gas: Measured as a percentage of the total primary energy,
+    using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.gas_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.gas_electricity
+  labels:
+    fr: 'Électricité produite à partir de : gaz'
+    en: Electricity generation from gas
+  definition: 'Electricity generation from gas: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.gas_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.gas_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : gaz'
+    en: Primary energy consumption from gas
+  definition: 'Primary energy consumption from gas: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.gas_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.oil_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : pétrole'
+    en: Share of electricity generated by oil
+  definition: 'Share of electricity generated by oil: Measured as a percentage of total electricity produced in the country
+    or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.oil_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.oil_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : pétrole'
+    en: Share of primary energy consumption that comes from oil
+  definition: 'Share of primary energy consumption that comes from oil: Measured as a percentage of the total primary energy,
+    using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.oil_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.oil_electricity
+  labels:
+    fr: 'Électricité produite à partir de : pétrole'
+    en: Electricity generation from oil
+  definition: 'Electricity generation from oil: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.oil_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.oil_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : pétrole'
+    en: Primary energy consumption from oil
+  definition: 'Primary energy consumption from oil: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.oil_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.nuclear_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : nucléaire'
+    en: Share of electricity generated by nuclear power
+  definition: 'Share of electricity generated by nuclear power: Measured as a percentage of total electricity produced in
+    the country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.nuclear_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.nuclear_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : nucléaire'
+    en: Share of primary energy consumption that comes from nuclear power
+  definition: 'Share of primary energy consumption that comes from nuclear power: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.nuclear_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.nuclear_electricity
+  labels:
+    fr: 'Électricité produite à partir de : nucléaire'
+    en: Electricity generation from nuclear
+  definition: 'Electricity generation from nuclear: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.nuclear_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.nuclear_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : nucléaire'
+    en: Primary energy consumption from nuclear power
+  definition: 'Primary energy consumption from nuclear power: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.nuclear_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.hydro_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : hydraulique'
+    en: Share of electricity generated by hydropower
+  definition: 'Share of electricity generated by hydropower: Measured as a percentage of total electricity produced in the
+    country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.hydro_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.hydro_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : hydraulique'
+    en: Share of primary energy consumption that comes from hydropower
+  definition: 'Share of primary energy consumption that comes from hydropower: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.hydro_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.hydro_electricity
+  labels:
+    fr: 'Électricité produite à partir de : hydraulique'
+    en: Electricity generation from hydropower
+  definition: 'Electricity generation from hydropower: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.hydro_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.hydro_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : hydraulique'
+    en: Primary energy consumption from hydropower
+  definition: 'Primary energy consumption from hydropower: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.hydro_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.solar_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : solaire'
+    en: Share of electricity generated by solar power
+  definition: 'Share of electricity generated by solar power: Measured as a percentage of total electricity produced in the
+    country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.solar_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.solar_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : solaire'
+    en: Share of primary energy consumption that comes from solar power
+  definition: 'Share of primary energy consumption that comes from solar power: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.solar_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.solar_electricity
+  labels:
+    fr: 'Électricité produite à partir de : solaire'
+    en: Electricity generation from solar power
+  definition: 'Electricity generation from solar power: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.solar_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.solar_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : solaire'
+    en: Primary energy consumption from solar power
+  definition: 'Primary energy consumption from solar power: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.solar_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.wind_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : éolien'
+    en: Share of electricity generated by wind power
+  definition: 'Share of electricity generated by wind power: Measured as a percentage of total electricity produced in the
+    country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.wind_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.wind_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : éolien'
+    en: Share of primary energy consumption that comes from wind power
+  definition: 'Share of primary energy consumption that comes from wind power: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.wind_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.wind_electricity
+  labels:
+    fr: 'Électricité produite à partir de : éolien'
+    en: Electricity generation from wind power
+  definition: 'Electricity generation from wind power: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.wind_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.wind_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : éolien'
+    en: Primary energy consumption from wind power
+  definition: 'Primary energy consumption from wind power: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.wind_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.biofuel_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : bioénergie'
+    en: Share of electricity generated by bioenergy
+  definition: 'Share of electricity generated by bioenergy: Measured as a percentage of total electricity produced in the
+    country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.biofuel_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.biofuel_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : bioénergie'
+    en: Share of primary energy consumption that comes from biofuels
+  definition: 'Share of primary energy consumption that comes from biofuels: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.biofuel_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.biofuel_electricity
+  labels:
+    fr: 'Électricité produite à partir de : bioénergie'
+    en: Electricity generation from bioenergy
+  definition: 'Electricity generation from bioenergy: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.biofuel_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/].'
+- id: energy.biofuel_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : bioénergie'
+    en: Primary energy consumption from biofuels
+  definition: 'Primary energy consumption from biofuels: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.biofuel_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.renewables_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : renouvelables'
+    en: Share of electricity generated by renewables
+  definition: 'Share of electricity generated by renewables: Measured as a percentage of total electricity produced in the
+    country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.renewables_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.renewables_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : renouvelables'
+    en: Share of primary energy consumption that comes from renewables
+  definition: 'Share of primary energy consumption that comes from renewables: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.renewables_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.renewables_electricity
+  labels:
+    fr: 'Électricité produite à partir de : renouvelables'
+    en: Electricity generation from renewables
+  definition: 'Electricity generation from renewables: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.renewables_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.renewables_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : renouvelables'
+    en: Primary energy consumption from renewables
+  definition: 'Primary energy consumption from renewables: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.renewables_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.low_carbon_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : bas carbone'
+    en: Share of electricity generated by low-carbon sources
+  definition: 'Share of electricity generated by low-carbon sources: Measured as a percentage of total electricity produced
+    in the country or region. Low-carbon sources correspond to renewables and nuclear power, that produce significantly less
+    greenhouse-gas emissions than fossil fuels. Renewables include solar, wind, hydropower, bioenergy, geothermal, wave, and
+    tidal.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.low_carbon_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.low_carbon_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : bas carbone'
+    en: Share of primary energy consumption that comes from low-carbon sources
+  definition: 'Share of primary energy consumption that comes from low-carbon sources: Measured as a percentage of the total
+    primary energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.low_carbon_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.low_carbon_electricity
+  labels:
+    fr: 'Électricité produite à partir de : bas carbone'
+    en: Electricity generation from low-carbon sources
+  definition: 'Electricity generation from low-carbon sources: Measured in terawatt-hours. Low-carbon sources correspond to
+    renewables and nuclear power, that produce significantly less greenhouse-gas emissions than fossil fuels. Renewables include
+    solar, wind, hydropower, bioenergy, geothermal, wave, and tidal.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.low_carbon_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.low_carbon_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : bas carbone'
+    en: Primary energy consumption from low-carbon sources
+  definition: 'Primary energy consumption from low-carbon sources: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.low_carbon_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.fossil_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : fossiles'
+    en: Share of electricity generated by fossil fuels
+  definition: 'Share of electricity generated by fossil fuels: Electricity generation from coal, oil, and gas, measured as
+    a percentage of total electricity produced in the country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.fossil_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.fossil_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : fossiles'
+    en: Share of primary energy consumption that comes from fossil fuels
+  definition: 'Share of primary energy consumption that comes from fossil fuels: Measured as a percentage of the total primary
+    energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.fossil_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.fossil_electricity
+  labels:
+    fr: 'Électricité produite à partir de : fossiles'
+    en: Electricity generation from fossil fuels
+  definition: 'Electricity generation from fossil fuels: Electricity generation from coal, oil, and gas, measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.fossil_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.fossil_fuel_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : fossiles'
+    en: Primary energy consumption from fossil fuels
+  definition: 'Primary energy consumption from fossil fuels: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.fossil_fuel_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.other_renewables_share_elec
+  labels:
+    fr: 'Part de l''électricité produite à partir de : autres renouvelables'
+    en: Share of electricity generated by other renewables, including bioenergy
+  definition: 'Share of electricity generated by other renewables, including bioenergy: Measured as a percentage of total
+    electricity produced in the country or region.'
+  unit: '%'
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.other_renewables_share_elec
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.other_renewables_share_energy
+  labels:
+    fr: 'Part de l''énergie primaire provenant de : autres renouvelables'
+    en: Share of primary energy consumption that comes from other renewables
+  definition: 'Share of primary energy consumption that comes from other renewables: Measured as a percentage of the total
+    primary energy, using the substitution method.'
+  unit: '%'
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.other_renewables_share_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.other_renewable_electricity
+  labels:
+    fr: 'Électricité produite à partir de : autres renouvelables'
+    en: Electricity generation from other renewables, including bioenergy
+  definition: 'Electricity generation from other renewables, including bioenergy: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: electricity_mix
+  source_order:
+  - owid.energy.other_renewable_electricity
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Ember - Yearly Electricity Data Europe (2026) [https://ember-energy.org/data/yearly-electricity-data/];
+    Ember - Yearly Electricity Data (2026) [https://ember-energy.org/data/yearly-electricity-data/]; Energy Institute - Statistical
+    Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.other_renewable_consumption
+  labels:
+    fr: 'Consommation d''énergie primaire : autres renouvelables'
+    en: Primary energy consumption from other renewables
+  definition: 'Primary energy consumption from other renewables: Measured in terawatt-hours, using the substitution method.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: energy_mix
+  source_order:
+  - owid.energy.other_renewable_consumption
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: energy.coal_production
+  labels:
+    fr: Production de charbon
+    en: Coal production
+  definition: 'Coal production: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: production
+  source_order:
+  - owid.energy.coal_production
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/];
+    The Shift Data Portal - Energy production from fossil fuels (2019) [https://www.theshiftdataportal.org/].'
+- id: energy.gas_production
+  labels:
+    fr: Production de gaz
+    en: Gas production
+  definition: 'Gas production: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: production
+  source_order:
+  - owid.energy.gas_production
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/];
+    The Shift Data Portal - Energy production from fossil fuels (2019) [https://www.theshiftdataportal.org/].'
+- id: energy.oil_production
+  labels:
+    fr: Production de pétrole
+    en: Oil production
+  definition: 'Oil production: Measured in terawatt-hours.'
+  unit: terawatt-hours (TWh)
+  domain: energy
+  subdomain: production
+  source_order:
+  - owid.energy.oil_production
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Energy Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/];
+    The Shift Data Portal - Energy production from fossil fuels (2019) [https://www.theshiftdataportal.org/].'

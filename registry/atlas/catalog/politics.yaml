@@ -1,0 +1,2138 @@
+# Atlas catalog: politics (V3, agent A-POL). Provider-declared concepts (not human-reviewed).
+# Sources and licences (see registry/sources/{vdem,ipu_parline,lied,bmr}.yaml and docs/dev/v3_a_pol.md):
+#   vdem.*  V-Dem v16 Country-Year Full+Others (V-Dem Institute vdemdata package)  CC BY-SA 4.0 (share alike)
+#   ipu.*   IPU Parline open-data API                                              CC BY-NC-SA 4.0 (NON-COMMERCIAL)
+#   lied.*  Lexical Index of Electoral Democracy v6.9 (Harvard Dataverse)           CC0 1.0
+#   bmr.*   Boix-Miller-Rosato dichotomous democracy v4.0 (Harvard Dataverse)       CC0 1.0
+# Not included: Polity5 (redistribution prohibited by CSP), Freedom House, IDEA turnout (non-commercial terms that
+# also claim rights in derived work), CCP characteristics (agent A-LAW), WGI (agent A-WB).
+# Category labels written by A-POL are short forms of the providers' codebook texts (codebooks archived with the raw
+# data); French labels are A-POL translations. Concepts list several sources only when the provider definitions match.
+domain: politics
+labels:
+  fr: Politique et régimes politiques
+  en: Politics and political regimes
+maintainer: A-POL
+concepts:
+- id: politics.vdem.electoral_democracy
+  labels:
+    fr: Indice de démocratie électorale (V-Dem)
+    en: Electoral democracy index (V-Dem)
+  definition: 'To what extent is the ideal of electoral democracy in its fullest sense achieved? (Dahl''s polyarchy: elected
+    officials, free and fair elections, freedom of expression, freedom of association, suffrage) (v2x_polyarchy). V-Dem index,
+    interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem''s Bayesian measurement model; country-year
+    value is the day-weighted mean. 68% highest-posterior-density bounds are published as v2x_polyarchy_codelow / v2x_polyarchy_codehigh
+    in the same table.'
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_polyarchy
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+  - high_level
+- id: politics.vdem.electoral_democracy.hpd_low
+  labels:
+    fr: Indice de démocratie électorale (V-Dem) — borne basse (IC 68 %)
+    en: Electoral democracy index (V-Dem) — lower bound (68% HPD)
+  definition: Lower bound of the 68% highest-posterior-density interval of v2x_polyarchy (v2x_polyarchy_codelow), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_polyarchy_codelow
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.electoral_democracy.hpd_high
+  labels:
+    fr: Indice de démocratie électorale (V-Dem) — borne haute (IC 68 %)
+    en: Electoral democracy index (V-Dem) — upper bound (68% HPD)
+  definition: Upper bound of the 68% highest-posterior-density interval of v2x_polyarchy (v2x_polyarchy_codehigh), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_polyarchy_codehigh
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.liberal_democracy
+  labels:
+    fr: Indice de démocratie libérale (V-Dem)
+    en: Liberal democracy index (V-Dem)
+  definition: To what extent is the ideal of liberal democracy achieved? (electoral democracy plus individual liberties, rule
+    of law and constraints on the executive) (v2x_libdem). V-Dem index, interval scale from low (0) to high (1); point estimate
+    (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_libdem_codelow / v2x_libdem_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_libdem
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+  - high_level
+- id: politics.vdem.liberal_democracy.hpd_low
+  labels:
+    fr: Indice de démocratie libérale (V-Dem) — borne basse (IC 68 %)
+    en: Liberal democracy index (V-Dem) — lower bound (68% HPD)
+  definition: Lower bound of the 68% highest-posterior-density interval of v2x_libdem (v2x_libdem_codelow), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_libdem_codelow
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.liberal_democracy.hpd_high
+  labels:
+    fr: Indice de démocratie libérale (V-Dem) — borne haute (IC 68 %)
+    en: Liberal democracy index (V-Dem) — upper bound (68% HPD)
+  definition: Upper bound of the 68% highest-posterior-density interval of v2x_libdem (v2x_libdem_codehigh), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_libdem_codehigh
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.participatory_democracy
+  labels:
+    fr: Indice de démocratie participative (V-Dem)
+    en: Participatory democracy index (V-Dem)
+  definition: To what extent is the ideal of participatory democracy achieved? (electoral democracy plus active citizen participation)
+    (v2x_partipdem). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian
+    measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds are published as
+    v2x_partipdem_codelow / v2x_partipdem_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_partipdem
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+  - high_level
+- id: politics.vdem.participatory_democracy.hpd_low
+  labels:
+    fr: Indice de démocratie participative (V-Dem) — borne basse (IC 68 %)
+    en: Participatory democracy index (V-Dem) — lower bound (68% HPD)
+  definition: Lower bound of the 68% highest-posterior-density interval of v2x_partipdem (v2x_partipdem_codelow), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_partipdem_codelow
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.participatory_democracy.hpd_high
+  labels:
+    fr: Indice de démocratie participative (V-Dem) — borne haute (IC 68 %)
+    en: Participatory democracy index (V-Dem) — upper bound (68% HPD)
+  definition: Upper bound of the 68% highest-posterior-density interval of v2x_partipdem (v2x_partipdem_codehigh), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_partipdem_codehigh
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.deliberative_democracy
+  labels:
+    fr: Indice de démocratie délibérative (V-Dem)
+    en: Deliberative democracy index (V-Dem)
+  definition: To what extent is the ideal of deliberative democracy achieved? (electoral democracy plus reasoned public deliberation)
+    (v2x_delibdem). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian
+    measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds are published as
+    v2x_delibdem_codelow / v2x_delibdem_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_delibdem
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+  - high_level
+- id: politics.vdem.deliberative_democracy.hpd_low
+  labels:
+    fr: Indice de démocratie délibérative (V-Dem) — borne basse (IC 68 %)
+    en: Deliberative democracy index (V-Dem) — lower bound (68% HPD)
+  definition: Lower bound of the 68% highest-posterior-density interval of v2x_delibdem (v2x_delibdem_codelow), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_delibdem_codelow
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.deliberative_democracy.hpd_high
+  labels:
+    fr: Indice de démocratie délibérative (V-Dem) — borne haute (IC 68 %)
+    en: Deliberative democracy index (V-Dem) — upper bound (68% HPD)
+  definition: Upper bound of the 68% highest-posterior-density interval of v2x_delibdem (v2x_delibdem_codehigh), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_delibdem_codehigh
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.egalitarian_democracy
+  labels:
+    fr: Indice de démocratie égalitaire (V-Dem)
+    en: Egalitarian democracy index (V-Dem)
+  definition: To what extent is the ideal of egalitarian democracy achieved? (electoral democracy plus equal protection, access
+    and resource distribution) (v2x_egaldem). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior
+    median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_egaldem_codelow / v2x_egaldem_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_egaldem
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+  - high_level
+- id: politics.vdem.egalitarian_democracy.hpd_low
+  labels:
+    fr: Indice de démocratie égalitaire (V-Dem) — borne basse (IC 68 %)
+    en: Egalitarian democracy index (V-Dem) — lower bound (68% HPD)
+  definition: Lower bound of the 68% highest-posterior-density interval of v2x_egaldem (v2x_egaldem_codelow), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_egaldem_codelow
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.egalitarian_democracy.hpd_high
+  labels:
+    fr: Indice de démocratie égalitaire (V-Dem) — borne haute (IC 68 %)
+    en: Egalitarian democracy index (V-Dem) — upper bound (68% HPD)
+  definition: Upper bound of the 68% highest-posterior-density interval of v2x_egaldem (v2x_egaldem_codehigh), V-Dem measurement
+    model.
+  unit: index 0-1
+  domain: politics
+  subdomain: democracy_indices
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_egaldem_codehigh
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - uncertainty
+- id: politics.vdem.liberal_component
+  labels:
+    fr: Composante libérale (V-Dem)
+    en: Liberal component index (V-Dem)
+  definition: To what extent is the liberal principle of democracy achieved? (v2x_liberal). V-Dem index, interval scale from
+    low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the
+    day-weighted mean. 68% highest-posterior-density bounds are published as v2x_liberal_codelow / v2x_liberal_codehigh in
+    the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_liberal
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.participatory_component
+  labels:
+    fr: Composante participative (V-Dem)
+    en: Participatory component index (V-Dem)
+  definition: To what extent is the participatory principle achieved? (v2x_partip). V-Dem index, interval scale from low (0)
+    to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted
+    mean. 68% highest-posterior-density bounds are published as v2x_partip_codelow / v2x_partip_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_partip
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.deliberative_component
+  labels:
+    fr: Composante délibérative (V-Dem)
+    en: Deliberative component index (V-Dem)
+  definition: To what extent is the deliberative principle achieved? (v2xdl_delib). V-Dem index, interval scale from low (0)
+    to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted
+    mean. 68% highest-posterior-density bounds are published as v2xdl_delib_codelow / v2xdl_delib_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xdl_delib
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.egalitarian_component
+  labels:
+    fr: Composante égalitaire (V-Dem)
+    en: Egalitarian component index (V-Dem)
+  definition: To what extent is the egalitarian principle achieved? (v2x_egal). V-Dem index, interval scale from low (0) to
+    high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted
+    mean. 68% highest-posterior-density bounds are published as v2x_egal_codelow / v2x_egal_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_egal
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.freedom_expression_alt_info
+  labels:
+    fr: Liberté d'expression et sources d'information alternatives (V-Dem)
+    en: Freedom of expression and alternative sources of information index (V-Dem)
+  definition: To what extent does government respect press and media freedom, freedom of ordinary people to discuss political
+    matters, and academic and cultural expression? (v2x_freexp_altinf). V-Dem index, interval scale from low (0) to high (1);
+    point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean.
+    68% highest-posterior-density bounds are published as v2x_freexp_altinf_codelow / v2x_freexp_altinf_codehigh in the same
+    table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_freexp_altinf
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.freedom_association
+  labels:
+    fr: Liberté d'association (V-Dem)
+    en: Freedom of association index (thick) (V-Dem)
+  definition: To what extent are parties, including opposition parties, allowed to form and participate in elections, and
+    civil society organisations able to form and operate freely? (v2x_frassoc_thick). V-Dem index, interval scale from low
+    (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted
+    mean. 68% highest-posterior-density bounds are published as v2x_frassoc_thick_codelow / v2x_frassoc_thick_codehigh in
+    the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_frassoc_thick
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.share_suffrage
+  labels:
+    fr: Part de la population disposant du droit de vote (V-Dem)
+    en: Share of population with suffrage (V-Dem)
+  definition: What share of adult citizens (as defined by statute) has the legal right to vote in national elections? (index
+    0-1) (v2x_suffr). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian
+    measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds are published as
+    v2x_suffr_codelow / v2x_suffr_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_suffr
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.clean_elections
+  labels:
+    fr: Élections propres (V-Dem)
+    en: Clean elections index (V-Dem)
+  definition: To what extent are elections free and fair? (EMB autonomy and capacity, registry, vote buying, irregularities,
+    intimidation, violence, free and fair overall) (v2xel_frefair). V-Dem index, interval scale from low (0) to high (1);
+    point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean.
+    68% highest-posterior-density bounds are published as v2xel_frefair_codelow / v2xel_frefair_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xel_frefair
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.elected_officials
+  labels:
+    fr: Responsables élus (V-Dem)
+    en: Elected officials index (V-Dem)
+  definition: Is the chief executive appointed through popular elections (directly or indirectly)? (v2x_elecoff). V-Dem index,
+    interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year
+    value is the day-weighted mean. 68% highest-posterior-density bounds are published as v2x_elecoff_codelow / v2x_elecoff_codehigh
+    in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: components
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_elecoff
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.civil_liberties
+  labels:
+    fr: Libertés civiles (V-Dem)
+    en: Civil liberties index (V-Dem)
+  definition: To what extent is civil liberty respected? (absence of physical violence by the state and of constraints of
+    private and political liberties) (v2x_civlib). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior
+    median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_civlib_codelow / v2x_civlib_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_civlib
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.physical_violence
+  labels:
+    fr: Protection contre la violence physique d'État (V-Dem)
+    en: Physical violence index (V-Dem)
+  definition: To what extent is physical integrity respected? (freedom from political killings and torture by the government;
+    higher = more respect) (v2x_clphy). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median)
+    of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds
+    are published as v2x_clphy_codelow / v2x_clphy_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_clphy
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.political_civil_liberties
+  labels:
+    fr: Libertés civiles politiques (V-Dem)
+    en: Political civil liberties index (V-Dem)
+  definition: To what extent are political liberties respected? (v2x_clpol). V-Dem index, interval scale from low (0) to high
+    (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean.
+    68% highest-posterior-density bounds are published as v2x_clpol_codelow / v2x_clpol_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_clpol
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.private_civil_liberties
+  labels:
+    fr: Libertés civiles privées (V-Dem)
+    en: Private civil liberties index (V-Dem)
+  definition: To what extent are private liberties respected? (v2x_clpriv). V-Dem index, interval scale from low (0) to high
+    (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean.
+    68% highest-posterior-density bounds are published as v2x_clpriv_codelow / v2x_clpriv_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_clpriv
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.political_corruption
+  labels:
+    fr: Corruption politique (V-Dem)
+    en: Political corruption index (V-Dem)
+  definition: How pervasive is political corruption? (higher = MORE corruption; average of public sector, executive, legislative
+    and judicial corruption) (v2x_corr). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median)
+    of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds
+    are published as v2x_corr_codelow / v2x_corr_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: corruption
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_corr
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.public_sector_corruption
+  labels:
+    fr: Corruption du secteur public (V-Dem)
+    en: Public sector corruption index (V-Dem)
+  definition: To what extent do public sector employees grant favours in exchange for bribes and steal or embezzle public
+    funds? (higher = more corruption) (v2x_pubcorr). V-Dem index, interval scale from low (0) to high (1); point estimate
+    (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_pubcorr_codelow / v2x_pubcorr_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: corruption
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_pubcorr
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.executive_corruption
+  labels:
+    fr: Corruption de l'exécutif (V-Dem)
+    en: Executive corruption index (V-Dem)
+  definition: How routinely do members of the executive grant favours in exchange for bribes and steal or embezzle public
+    funds? (higher = more corruption) (v2x_execorr). V-Dem index, interval scale from low (0) to high (1); point estimate
+    (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_execorr_codelow / v2x_execorr_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: corruption
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_execorr
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.rule_of_law
+  labels:
+    fr: État de droit (V-Dem)
+    en: Rule of law index (V-Dem)
+  definition: To what extent are laws transparently, independently, predictably, impartially and equally enforced, and to
+    what extent do the actions of government officials comply with the law? (v2x_rule). V-Dem index, interval scale from low
+    (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted
+    mean. 68% highest-posterior-density bounds are published as v2x_rule_codelow / v2x_rule_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: rule_of_law
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_rule
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.equality_before_law
+  labels:
+    fr: Égalité devant la loi et liberté individuelle (V-Dem)
+    en: Equality before the law and individual liberty index (V-Dem)
+  definition: To what extent are laws transparent and rigorously enforced and public administration impartial, and to what
+    extent do citizens enjoy access to justice, secure property rights, freedom from forced labour, freedom of movement, physical
+    integrity and freedom of religion? (v2xcl_rol). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior
+    median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2xcl_rol_codelow / v2xcl_rol_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: rule_of_law
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xcl_rol
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.judicial_constraints
+  labels:
+    fr: Contraintes judiciaires sur l'exécutif (V-Dem)
+    en: Judicial constraints on the executive index (V-Dem)
+  definition: To what extent does the executive respect the constitution and comply with court rulings, and to what extent
+    is the judiciary able to act independently? (v2x_jucon). V-Dem index, interval scale from low (0) to high (1); point estimate
+    (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2x_jucon_codelow / v2x_jucon_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: checks_and_balances
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_jucon
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.legislative_constraints
+  labels:
+    fr: Contraintes législatives sur l'exécutif (V-Dem)
+    en: Legislative constraints on the executive index (V-Dem)
+  definition: To what extent are the legislature and government agencies capable of questioning, investigating and exercising
+    oversight over the executive? (v2xlg_legcon). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior
+    median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density
+    bounds are published as v2xlg_legcon_codelow / v2xlg_legcon_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: checks_and_balances
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xlg_legcon
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.accountability
+  labels:
+    fr: Redevabilité (V-Dem)
+    en: Accountability index (V-Dem)
+  definition: 'To what extent is the ideal of government accountability achieved? (vertical, diagonal, horizontal) NOTE: V-Dem
+    publishes this index on an unbounded interval scale (not 0-1); see the codebook. (v2x_accountability). V-Dem measurement-model
+    point estimate; country-year day-weighted mean.'
+  unit: V-Dem interval scale (unbounded)
+  domain: politics
+  subdomain: checks_and_balances
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_accountability
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.womens_political_empowerment
+  labels:
+    fr: Autonomisation politique des femmes (V-Dem)
+    en: Women's political empowerment index (V-Dem)
+  definition: How politically empowered are women? (civil liberties, civil society participation, political participation)
+    (v2x_gender). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian
+    measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds are published as
+    v2x_gender_codelow / v2x_gender_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: gender
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_gender
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.neopatrimonial_rule
+  labels:
+    fr: Gouvernement néopatrimonial (V-Dem)
+    en: Neopatrimonial rule index (V-Dem)
+  definition: To what extent is the exercise of political authority based on personal authority (clientelism, presidentialism,
+    regime corruption)? (higher = more neopatrimonial) (v2x_neopat). V-Dem index, interval scale from low (0) to high (1);
+    point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean.
+    68% highest-posterior-density bounds are published as v2x_neopat_codelow / v2x_neopat_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2x_neopat
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.academic_freedom
+  labels:
+    fr: Liberté académique (V-Dem)
+    en: Academic freedom index (V-Dem)
+  definition: To what extent is academic freedom respected? (freedom to research and teach, academic exchange, institutional
+    autonomy, campus integrity, freedom of academic and cultural expression) (v2xca_academ). V-Dem index, interval scale from
+    low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model; country-year value is the
+    day-weighted mean. 68% highest-posterior-density bounds are published as v2xca_academ_codelow / v2xca_academ_codehigh
+    in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xca_academ
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.core_civil_society
+  labels:
+    fr: Société civile (indice central, V-Dem)
+    en: Core civil society index (V-Dem)
+  definition: How robust is civil society? (CSO entry and exit, repression, participatory environment) (v2xcs_ccsi). V-Dem
+    index, interval scale from low (0) to high (1); point estimate (posterior median) of V-Dem's Bayesian measurement model;
+    country-year value is the day-weighted mean. 68% highest-posterior-density bounds are published as v2xcs_ccsi_codelow
+    / v2xcs_ccsi_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: civil_society
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xcs_ccsi
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.party_institutionalization
+  labels:
+    fr: Institutionnalisation des partis (V-Dem)
+    en: Party institutionalization index (V-Dem)
+  definition: To what extent are political parties institutionalised? (organisations, branches, linkages, distinct platforms,
+    legislative cohesion) (v2xps_party). V-Dem index, interval scale from low (0) to high (1); point estimate (posterior median)
+    of V-Dem's Bayesian measurement model; country-year value is the day-weighted mean. 68% highest-posterior-density bounds
+    are published as v2xps_party_codelow / v2xps_party_codehigh in the same table.
+  unit: index 0-1
+  domain: politics
+  subdomain: parties
+  value_kind: numeric
+  source_order:
+  - vdem.indices.v2xps_party
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - index
+- id: politics.vdem.regimes_of_the_world
+  labels:
+    fr: Régimes du monde (RoW, V-Dem)
+    en: Regimes of the World (RoW, V-Dem)
+  definition: 'Regimes of the World classification (v2x_regime, Lührmann, Tannenberg & Lindberg): 0 Closed autocracy (no multiparty
+    elections for chief executive or legislature); 1 Electoral autocracy (de-jure multiparty elections that fail to be free
+    and fair, de-facto multiparty or to reach a minimum of Dahl''s prerequisites); 2 Electoral democracy (de-facto free and
+    fair multiparty elections and a minimum level of polyarchy, but liberal component not satisfied); 3 Liberal democracy
+    (additionally access to justice, transparent law enforcement and liberal principles satisfied). Cells carry the code in
+    value and the category label in value_text. Coded from 1900.'
+  unit: category (0-3)
+  domain: politics
+  subdomain: regime
+  value_kind: text
+  source_order:
+  - vdem.indices.v2x_regime
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Not covered before 1900 in v16.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - regime_type
+  - categorical
+- id: politics.vdem.regimes_of_the_world_ambiguous
+  labels:
+    fr: Régimes du monde avec cas ambigus (V-Dem)
+    en: Regimes of the World with ambiguous categories (V-Dem)
+  definition: 'RoW with categories for cases whose confidence intervals overlap a neighbouring regime type (v2x_regime_amb):
+    0 Closed autocracy, 1 Closed autocracy upper bound, 2 Electoral autocracy lower bound, 3 Electoral autocracy, 4 Electoral
+    autocracy upper bound, 5 Electoral democracy lower bound, 6 Electoral democracy, 7 Electoral democracy upper bound, 8
+    Liberal democracy lower bound, 9 Liberal democracy. Code in value, label in value_text.'
+  unit: category (0-9)
+  domain: politics
+  subdomain: regime
+  value_kind: text
+  source_order:
+  - vdem.indices.v2x_regime_amb
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - regime_type
+  - categorical
+  - uncertainty
+- id: politics.vdem.electoral_regime
+  labels:
+    fr: Régime électoral en cours (V-Dem)
+    en: Electoral regime index (V-Dem)
+  definition: At this time, are regularly scheduled national elections on course, as stipulated by election law or well-established
+    precedent? (v2x_elecreg; 0 No, 1 Yes; country-year maximum).
+  unit: category (0/1)
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - vdem.indices.v2x_elecreg
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.lied.lexical_index
+  labels:
+    fr: Indice lexical de démocratie électorale (LIED)
+    en: Lexical Index of Electoral Democracy (LIED)
+  definition: 'LIED (Skaaning, Gerring & Bartusevicius) ordinal 0-6 built lexically from six binary indicators, status on
+    31 December: 0 non-electoral autocracy; 1 one-party autocracy; 2 multiparty autocracy without elected executive; 3 multiparty
+    autocracy (elections not competitive); 4 exclusive democracy (competitive, no universal male suffrage); 5 male democracy;
+    6 electoral democracy (universal suffrage). Code in value, label in value_text.'
+  unit: ordinal 0-6
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - lied.lied.lexical_index
+  provider_declared: true
+  notes: Source LIED v6.9 (Harvard Dataverse doi:10.7910/DVN/WPKNIT), CC0 1.0. Covers colonies and semi-sovereign polities
+    too (see flags/sovereign).
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - regime_type
+  - ordinal
+- id: politics.lied.lexical_index_plus
+  labels:
+    fr: Indice lexical de démocratie électorale+ (LIED+)
+    en: Lexical Index of Electoral Democracy+ (LIED+)
+  definition: 'LIED+ ordinal 0-7: levels 0-5 as LIED; 6 electoral democracy without respected political liberties; 7 polyarchy
+    (political liberties respected). Status on 31 December. Code in value, label in value_text.'
+  unit: ordinal 0-7
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - lied.lied.lexical_index_plus
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - regime_type
+  - ordinal
+- id: politics.lied.competitive_elections
+  labels:
+    fr: Élections compétitives (LIED)
+    en: Competitive elections (LIED)
+  definition: Chief executive offices and seats in the effective legislature are filled by elections characterised by uncertainty
+    (opposition could win); 1 present, 0 absent; status on 31 December (LIED competitive_elections).
+  unit: 0/1
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - lied.lied.competitive_elections
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+- id: politics.lied.universal_female_suffrage
+  labels:
+    fr: Suffrage féminin universel (LIED)
+    en: Universal female suffrage (LIED)
+  definition: Virtually all female citizens are allowed to vote in national elections (legal restrictions of age, conviction,
+    incompetence, residency not considered); 1 present, 0 absent; status on 31 December (LIED female_suffrage).
+  unit: 0/1
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - lied.lied.female_suffrage
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - gender
+- id: politics.lied.universal_male_suffrage
+  labels:
+    fr: Suffrage masculin universel (LIED)
+    en: Universal male suffrage (LIED)
+  definition: Virtually all male citizens are allowed to vote in national elections; 1 present, 0 absent; status on 31 December
+    (LIED male_suffrage).
+  unit: 0/1
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - lied.lied.male_suffrage
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+- id: politics.lied.democratic_transition
+  labels:
+    fr: Transition démocratique dans l'année (LIED)
+    en: Democratic transition in the year (LIED)
+  definition: competitive_elections changed from 0 in the previous year to 1 in this year (LIED democratic_transition, 1 present,
+    0 absent); the mode is in politics.lied.transition_type.
+  unit: 0/1
+  domain: politics
+  subdomain: regime_change
+  value_kind: numeric
+  source_order:
+  - lied.lied.democratic_transition
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - event
+- id: politics.lied.transition_type
+  labels:
+    fr: Mode de transition démocratique (LIED)
+    en: Mode of democratic transition (LIED)
+  definition: 'LIED transition_type: 0 no transition; 1 conversion (incumbent-led); 2 cooperative (pact); 3 collapse (opposition-led);
+    4 foreign supervision; 5 foreign liberalization. Code in value, label in value_text.'
+  unit: category (0-5)
+  domain: politics
+  subdomain: regime_change
+  value_kind: text
+  source_order:
+  - lied.lied.transition_type
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - event
+  - categorical
+- id: politics.lied.democratic_breakdown
+  labels:
+    fr: Effondrement démocratique dans l'année (LIED)
+    en: Democratic breakdown in the year (LIED)
+  definition: competitive_elections changed from 1 to 0 (LIED democratic_breakdown, 1 present, 0 absent); mode in politics.lied.breakdown_type.
+  unit: 0/1
+  domain: politics
+  subdomain: regime_change
+  value_kind: numeric
+  source_order:
+  - lied.lied.democratic_breakdown
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - event
+- id: politics.lied.breakdown_type
+  labels:
+    fr: Mode d'effondrement démocratique (LIED)
+    en: Mode of democratic breakdown (LIED)
+  definition: 'LIED breakdown_type: 0 none; 1 implicit regression induced by incumbents; 2 military coup; 3 foreign occupation;
+    4 self-coup; 5 coup or civil conflict headed by opposition; 6 coup headed by monarch. Code in value, label in value_text.'
+  unit: category (0-6)
+  domain: politics
+  subdomain: regime_change
+  value_kind: text
+  source_order:
+  - lied.lied.breakdown_type
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0.
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+  - event
+  - categorical
+- id: politics.lied.sovereign
+  labels:
+    fr: Souveraineté (LIED)
+    en: Sovereign polity (LIED)
+  definition: The polity is a separate unit in the international system of states (1) or subject to foreign colonisation or
+    occupation with formal loss of autonomy (0) (LIED sovereign).
+  unit: 0/1
+  domain: politics
+  subdomain: statehood
+  value_kind: numeric
+  source_order:
+  - lied.lied.sovereign
+  provider_declared: true
+  notes: Source LIED v6.9, CC0 1.0. Differs from V-Dem v2svindep (Gleditsch-Ward list).
+  tags:
+  - source:lied
+  - licence:CC0-1.0
+- id: politics.bmr.democracy
+  labels:
+    fr: Démocratie (codage dichotomique BMR)
+    en: Democracy, dichotomous (Boix-Miller-Rosato)
+  definition: 'BMR dichotomous democracy (democracy): 1 = political leaders chosen through free and fair elections AND a minimal
+    level of suffrage (BMR: majority of adult men); 0 otherwise. Occupation/state-collapse years are filled as continuations
+    of the regime (see politics.bmr.democracy_omitted_data). Code in value, label in value_text.'
+  unit: 0/1
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - bmr.bmr.democracy
+  provider_declared: true
+  notes: Source BMR v4.0 (Harvard Dataverse doi:10.7910/DVN/FENWWR), 1800-2020, sovereign states only. CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+  - regime_type
+- id: politics.bmr.democracy_female_suffrage
+  labels:
+    fr: Démocratie avec suffrage féminin (BMR)
+    en: Democracy requiring female suffrage (BMR)
+  definition: BMR democracy additionally requiring that at least half of adult women have the right to vote (democracy_femalesuffrage).
+  unit: 0/1
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - bmr.bmr.democracy_femalesuffrage
+  provider_declared: true
+  notes: Source BMR v4.0, CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+  - regime_type
+  - gender
+- id: politics.bmr.democracy_omitted_data
+  labels:
+    fr: Démocratie, années d'occupation omises (BMR)
+    en: Democracy with occupation/collapse years omitted (BMR)
+  definition: Same as BMR democracy but NA for countries occupied during an international war or in state collapse during
+    a civil war (democracy_omitteddata); those NA cells are kept as missing cells with flags.missing = not_applicable and
+    the codebook note.
+  unit: 0/1
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - bmr.bmr.democracy_omitteddata
+  provider_declared: true
+  notes: Source BMR v4.0, CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+- id: politics.bmr.democratic_transition
+  labels:
+    fr: Changement de régime dans l'année (BMR)
+    en: Regime change in the year (BMR)
+  definition: 'BMR democracy_trans: -1 democratic breakdown, 0 no change, 1 transition to democracy (current year). Code in
+    value, label in value_text.'
+  unit: category (-1/0/1)
+  domain: politics
+  subdomain: regime_change
+  value_kind: text
+  source_order:
+  - bmr.bmr.democracy_trans
+  provider_declared: true
+  notes: Source BMR v4.0, CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+  - event
+  - categorical
+- id: politics.bmr.democratic_breakdowns
+  labels:
+    fr: Nombre cumulé d'effondrements démocratiques (BMR)
+    en: Cumulative democratic breakdowns (BMR)
+  definition: Country's total number of democratic breakdowns up through the current year (democracy_breakdowns).
+  unit: count
+  domain: politics
+  subdomain: regime_change
+  value_kind: numeric
+  source_order:
+  - bmr.bmr.democracy_breakdowns
+  provider_declared: true
+  notes: Source BMR v4.0, CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+- id: politics.bmr.regime_duration
+  labels:
+    fr: Durée du régime en cours (BMR)
+    en: Duration of current regime type (BMR)
+  definition: Consecutive years of the current regime type (democracy_duration).
+  unit: years
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - bmr.bmr.democracy_duration
+  provider_declared: true
+  notes: Source BMR v4.0, CC0 1.0.
+  tags:
+  - source:bmr
+  - licence:CC0-1.0
+- id: politics.parliament.women_lower_chamber_pct
+  labels:
+    fr: Femmes à la chambre basse ou unique (%)
+    en: Women in the lower or single chamber (%)
+  definition: 'Percentage of seats in the lower (or unicameral) chamber of the national parliament held by women, as of 31
+    December. IPU: the provider''s value whose validity interval (date_from..date_to) contains 31 December (|at=year_end;
+    exact intervals are in the same table without the suffix). V-Dem v2lgfemleg: ''What percentage of the lower (or unicameral)
+    chamber of the legislature is female?'', country-year value = last value of the year.'
+  unit: '%'
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.current_women_percent|chamber=lower|at=year_end
+  - vdem.institutions.v2lgfemleg
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike). Source V-Dem v16 (CC BY-SA 4.0: attribute
+    V-Dem; share derived tables alike). IPU history starts 1945; V-Dem 1900. Largely the same underlying parliamentary records;
+    shown per source.'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - licence:CC-BY-SA-4.0
+  - source:vdem
+  - gender
+- id: politics.parliament.women_upper_chamber_pct
+  labels:
+    fr: Femmes à la chambre haute (%)
+    en: Women in the upper chamber (%)
+  definition: Percentage of seats in the upper chamber held by women, as of 31 December (IPU value whose validity interval
+    contains 31 December).
+  unit: '%'
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.current_women_percent|chamber=upper|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - gender
+- id: politics.parliament.women_lower_chamber_count
+  labels:
+    fr: Nombre de femmes à la chambre basse
+    en: Women members of the lower or single chamber
+  definition: Number of women members of the lower or unicameral chamber, as of 31 December (IPU).
+  unit: persons
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.current_women_number|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - gender
+- id: politics.parliament.members_lower_chamber
+  labels:
+    fr: Nombre de membres de la chambre basse
+    en: Members of the lower or single chamber
+  definition: Current number of members of the lower or unicameral chamber, as of 31 December (IPU current_members_number).
+  unit: persons
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.current_members_number|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+- id: politics.parliament.statutory_seats_lower_chamber
+  labels:
+    fr: Sièges statutaires de la chambre basse
+    en: Statutory seats of the lower or single chamber
+  definition: Statutory number of members of the lower or unicameral chamber, as of 31 December (IPU statutory_members_number).
+  unit: seats
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.statutory_members_number|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+- id: politics.parliament.structure
+  labels:
+    fr: Structure du parlement (IPU)
+    en: Structure of parliament (IPU)
+  definition: Unicameral or bicameral parliament (IPU structure_of_parliament; value_text 'unicameral' / 'bicameral'), as
+    of 31 December where IPU dates it, else as of retrieval (flags.as_of_retrieval).
+  unit: category
+  domain: politics
+  subdomain: parliament
+  value_kind: text
+  source_order:
+  - ipu.parline.structure_of_parliament|at=year_end
+  - ipu.parline.structure_of_parliament
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - categorical
+- id: politics.vdem.legislature_chambers
+  labels:
+    fr: Nombre de chambres du parlement (V-Dem)
+    en: Number of legislative chambers (V-Dem)
+  definition: 'How many chambers does the legislature contain? (v2lgbicam: 0 none, 1 one, 2 two or more; country-year minimum).
+    Code in value, label in value_text.'
+  unit: category (0-2)
+  domain: politics
+  subdomain: parliament
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2lgbicam
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.parliament.term_lower_chamber
+  labels:
+    fr: Durée du mandat parlementaire (chambre basse, années)
+    en: Parliamentary term of the lower chamber (years)
+  definition: Length of the parliamentary term of the lower or unicameral chamber in years, as of 31 December (IPU parliamentary_term).
+  unit: years
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.parliamentary_term|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+- id: politics.parliament.gender_quota_lower
+  labels:
+    fr: Quota électoral de genre (chambre basse, IPU)
+    en: Electoral gender quota, lower chamber (IPU)
+  definition: Whether an electoral quota for women applies to the lower or unicameral chamber (IPU is_electoral_quota_women;
+    'yes'/'no'), as of 31 December.
+  unit: yes/no
+  domain: politics
+  subdomain: parliament
+  value_kind: text
+  source_order:
+  - ipu.parline.is_electoral_quota_women|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - gender
+  - categorical
+- id: politics.vdem.gender_quota_lower
+  labels:
+    fr: Quota de genre à la chambre basse (V-Dem)
+    en: Lower chamber gender quota (V-Dem)
+  definition: 'Is there a national-level gender quota for the lower chamber? (v2lgqugen: 0 none; 1 statutory, no sanctions;
+    2 statutory, weak sanctions; 3 statutory, strong sanctions; 4 reserved seats). Code in value, label in value_text.'
+  unit: category (0-4)
+  domain: politics
+  subdomain: parliament
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2lgqugen
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - gender
+  - categorical
+- id: politics.parliament.first_woman_year
+  labels:
+    fr: Année d'entrée de la première femme au parlement
+    en: Year the first woman entered parliament
+  definition: Year in which the first woman entered (was elected or appointed to) the national parliament (IPU first_woman_in_parliament_year),
+    as recorded at retrieval.
+  unit: year
+  domain: politics
+  subdomain: parliament
+  value_kind: numeric
+  source_order:
+  - ipu.parline.first_woman_in_parliament_year
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - gender
+- id: politics.suffrage.universal_national_year
+  labels:
+    fr: Année du suffrage universel (élections nationales, IPU)
+    en: Year of universal suffrage, national elections (IPU)
+  definition: Year from which the right to vote in national elections was universal, per IPU's suffrage record (scope national,
+    restriction universal), as recorded at retrieval.
+  unit: year
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - ipu.parline.suffrage_right_to_vote_year|scope=national|restriction=universal
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+- id: politics.elections.turnout_parliamentary_lower
+  labels:
+    fr: Participation aux élections législatives (chambre basse, % des inscrits)
+    en: Turnout in lower-chamber elections (% of registered voters)
+  definition: Voters as a percentage of registered electors in the election of the lower or unicameral chamber (IPU turnout).
+    Calendar-year cell only when the chamber held exactly one election that year (|at=year); every election with its exact
+    dates is in ipu.elections without the suffix.
+  unit: '%'
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - ipu.elections.turnout|chamber=lower|at=year
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - turnout
+- id: politics.vdem.turnout_national_election
+  labels:
+    fr: Participation aux élections nationales (V-Dem, % des inscrits)
+    en: Turnout in national elections (V-Dem, % of registered voters)
+  definition: In this national election, what percentage of all registered voters cast a vote according to official results?
+    (v2eltrnout; when executive and legislative elections are held the same day with different turnout, the executive turnout
+    is coded). Election years only.
+  unit: '%'
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2eltrnout
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Differs from the IPU parliamentary
+    turnout on same-day executive elections.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - turnout
+- id: politics.vdem.turnout_vap
+  labels:
+    fr: Participation en % de la population en âge de voter (V-Dem)
+    en: Voting-age-population turnout (V-Dem)
+  definition: In this national election, what percentage of the adult voting-age population cast a vote according to official
+    results? (v2elvaptrn). Election years only.
+  unit: '%'
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2elvaptrn
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - turnout
+- id: politics.elections.date_lower_chamber
+  labels:
+    fr: Date des élections de la chambre basse
+    en: Lower-chamber election date
+  definition: Date (or date range for multi-round/multi-day elections) of the election of the lower or unicameral chamber
+    (IPU election_date, value_text 'YYYY-MM-DD' or 'start/end'). Calendar-year cell when the chamber held exactly one election
+    that year; all elections with exact dates in ipu.elections.
+  unit: date
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - ipu.elections.election_date|chamber=lower|at=year
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - event
+- id: politics.elections.women_elected_pct_lower
+  labels:
+    fr: Femmes élues lors des élections de la chambre basse (%)
+    en: Women elected in lower-chamber elections (%)
+  definition: Percentage of women among members elected in the election of the lower or unicameral chamber (IPU percentage_women_elected);
+    calendar-year cell when unique in the year.
+  unit: '%'
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - ipu.elections.percentage_women_elected|chamber=lower|at=year
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - gender
+- id: politics.elections.registered_electors_lower
+  labels:
+    fr: Électeurs inscrits (élections de la chambre basse)
+    en: Registered electors (lower-chamber elections)
+  definition: Number of registered electors in the election of the lower or unicameral chamber (IPU number_registered_electors);
+    calendar-year cell when unique in the year.
+  unit: persons
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - ipu.elections.number_registered_electors|chamber=lower|at=year
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+- id: politics.elections.electoral_system_lower
+  labels:
+    fr: Système électoral de la chambre basse (IPU)
+    en: Electoral system of the lower chamber (IPU)
+  definition: Electoral system used for the lower or unicameral chamber (IPU electoral_system term, e.g. majoritarian / proportional_representation
+    / mixed_system), as of 31 December.
+  unit: category
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - ipu.parline.electoral_system|chamber=lower|at=year_end
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - categorical
+- id: politics.vdem.electoral_system_lower
+  labels:
+    fr: Système électoral de la chambre basse (V-Dem, 4 catégories)
+    en: Lower chamber electoral system (V-Dem, 4 categories)
+  definition: 'Electoral system used in this election for the lower or unicameral chamber (v2elparlel: 0 majoritarian, 1 proportional,
+    2 mixed, 3 other). Election years only. Code in value, label in value_text.'
+  unit: category (0-3)
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2elparlel
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.vdem.electoral_system_lower_detailed
+  labels:
+    fr: Système électoral de la chambre basse (V-Dem, 13 catégories)
+    en: Lower chamber electoral system (V-Dem, 13 categories)
+  definition: 'Electoral system used in this election for the lower chamber (v2elloelsy: FPP, two-round, alternative vote,
+    block vote, party block vote, parallel, MMP, list PR small/large districts, STV, SNTV, limited vote, Borda). Election
+    years only.'
+  unit: category (0-12)
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2elloelsy
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.voting_age_minimum
+  labels:
+    fr: Âge minimum pour voter
+    en: Minimum voting age
+  definition: Minimum age to vote in national (lower-chamber) elections. IPU min_age_vote_elect (lower chamber) as of 31 December;
+    V-Dem v2elage (minimum voting age, country-year).
+  unit: years
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - ipu.parline.min_age_vote_elect|chamber=lower|at=year_end
+  - vdem.institutions.v2elage
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike). Source V-Dem v16 (CC BY-SA 4.0: attribute
+    V-Dem; share derived tables alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+- id: politics.vdem.suffrage_share_pct
+  labels:
+    fr: Part des citoyens adultes ayant le droit de vote (V-Dem, %)
+    en: Percentage of adult citizens with suffrage (V-Dem)
+  definition: What percentage of adult citizens (as defined by statute) has the legal right to vote in national elections?
+    (v2elsuffrage; day-weighted mean).
+  unit: '%'
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2elsuffrage
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+- id: politics.vdem.female_suffrage
+  labels:
+    fr: Suffrage féminin (V-Dem)
+    en: Female suffrage (V-Dem)
+  definition: 'Are women eligible to vote in national elections? (v2elfemrst: 0 no female suffrage, 1 restricted, 2 universal).
+    Code in value, label in value_text.'
+  unit: category (0-2)
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2elfemrst
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - gender
+  - categorical
+- id: politics.compulsory_voting_ipu
+  labels:
+    fr: Vote obligatoire (IPU)
+    en: Compulsory voting (IPU)
+  definition: Whether voting is compulsory (IPU compulsory_voting term), as of 31 December where dated.
+  unit: category
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - ipu.parline.compulsory_voting|at=year_end
+  - ipu.parline.compulsory_voting
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - categorical
+- id: politics.vdem.compulsory_voting
+  labels:
+    fr: Vote obligatoire (V-Dem)
+    en: Compulsory voting (V-Dem)
+  definition: 'Is voting compulsory? (v2elcomvot: 0 no; 1 yes, no (enforced) sanctions; 2 yes, enforced minimal sanctions;
+    3 yes, enforced considerable sanctions). Code in value, label in value_text.'
+  unit: category (0-3)
+  domain: politics
+  subdomain: elections
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2elcomvot
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.vdem.election_free_fair
+  labels:
+    fr: Élections libres et équitables (V-Dem, échelle d'origine 0-4)
+    en: Election free and fair (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Taking all aspects into account, would you consider this national election to
+    be free and fair?' 0 not at all ... 4 yes). The series listed is the original-scale posterior (v2elfrfair_osp, posterior
+    mean on the 0-4 response scale); the latent measurement-model estimate (v2elfrfair) and its 68% bounds are in the same
+    table. Election years only.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2elfrfair_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.elections_multiparty
+  labels:
+    fr: Élections multipartites (V-Dem, échelle d'origine 0-4)
+    en: Elections multiparty (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Was this national election multiparty?' 0 no ... 4 yes). The series listed is
+    the original-scale posterior (v2elmulpar_osp, posterior mean on the 0-4 response scale); the latent measurement-model
+    estimate (v2elmulpar) and its 68% bounds are in the same table. Election years only.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: elections
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2elmulpar_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.political_system_ipu
+  labels:
+    fr: Système politique (IPU)
+    en: Political system (IPU)
+  definition: Political system as classified by the IPU (e.g. presidential, parliamentary, presidential_parliamentary, monarchy
+    terms), as of 31 December where dated.
+  unit: category
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - ipu.parline.political_system|at=year_end
+  - ipu.parline.political_system
+  provider_declared: true
+  notes: 'Source IPU Parline (CC BY-NC-SA 4.0: NON-COMMERCIAL use only; share alike).'
+  tags:
+  - source:ipu
+  - licence:CC-BY-NC-SA-4.0
+  - non_commercial
+  - categorical
+- id: politics.vdem.head_of_state_name
+  labels:
+    fr: Chef de l'État (nom, V-Dem)
+    en: Head of state name (V-Dem)
+  definition: 'Name of the head of state (v2exnamhos, as coded by V-Dem research assistants; country-year: last).'
+  unit: text
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2exnamhos
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - person
+- id: politics.vdem.head_of_state_title
+  labels:
+    fr: Titre du chef de l'État (V-Dem)
+    en: Head of state title (V-Dem)
+  definition: Title of the head of state (v2extithos).
+  unit: text
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2extithos
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+- id: politics.vdem.head_of_government_name
+  labels:
+    fr: Chef du gouvernement (nom, V-Dem)
+    en: Head of government name (V-Dem)
+  definition: Name of the head of government (v2exnamhog).
+  unit: text
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2exnamhog
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - person
+- id: politics.vdem.head_of_government_title
+  labels:
+    fr: Titre du chef du gouvernement (V-Dem)
+    en: Head of government title (V-Dem)
+  definition: Title of the head of government (v2extithog).
+  unit: text
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2extithog
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+- id: politics.vdem.hos_is_hog
+  labels:
+    fr: Chef de l'État également chef du gouvernement (V-Dem)
+    en: Head of state is also head of government (V-Dem)
+  definition: 'Is the head of state also head of government? (v2exhoshog: 0 no, 1 yes). Code in value, label in value_text.'
+  unit: category (0/1)
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2exhoshog
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). IPU head_gov_is_head_state (yes/no)
+    is in ipu.parline.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.vdem.hos_appointment
+  labels:
+    fr: Mode d'accession du chef de l'État (V-Dem)
+    en: How the head of state reached office (V-Dem)
+  definition: 'How did the head of state reach office? (v2expathhs: 0 force; 1 foreign power; 2 ruling party; 3 royal council;
+    4 hereditary succession; 5 military; 6 legislature; 7 popular election; 8 other). Code in value, label in value_text.'
+  unit: category (0-8)
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2expathhs
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical
+- id: politics.vdem.female_head_of_state
+  labels:
+    fr: Femme chef de l'État (V-Dem)
+    en: Female head of state (V-Dem)
+  definition: 'Is the head of state female? (v2exfemhos: 0 no, 1 yes).'
+  unit: category (0/1)
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2exfemhos
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - gender
+  - categorical
+- id: politics.vdem.female_head_of_government
+  labels:
+    fr: Femme chef du gouvernement (V-Dem)
+    en: Female head of government (V-Dem)
+  definition: 'Is the head of government female? (v2exfemhog: 0 no, 1 yes).'
+  unit: category (0/1)
+  domain: politics
+  subdomain: executive
+  value_kind: text
+  source_order:
+  - vdem.institutions.v2exfemhog
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - gender
+  - categorical
+- id: politics.vdem.executive_respects_constitution
+  labels:
+    fr: L'exécutif respecte la constitution (V-Dem, 0-4)
+    en: Executive respects constitution (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Do members of the executive respect the constitution?' 0 violated without legal
+    consequences ... 4 never violated). The series listed is the original-scale posterior (v2exrescon_osp, posterior mean
+    on the 0-4 response scale); the latent measurement-model estimate (v2exrescon) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: checks_and_balances
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2exrescon_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.regime_duration_days
+  labels:
+    fr: Durée du régime en cours (V-Dem, jours)
+    en: Regime duration (V-Dem, days)
+  definition: 'How many days have passed since the current regime started? (v2regdur; country-year: last).'
+  unit: days
+  domain: politics
+  subdomain: regime
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2regdur
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+- id: politics.vdem.judicial_corruption
+  labels:
+    fr: Corruption judiciaire (V-Dem, 0-4)
+    en: Judicial corruption decision (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('How often do individuals or businesses make undocumented extra payments or bribes
+    to speed up or delay the process or to obtain a favourable judicial decision?' 0 always ... 4 never). The series listed
+    is the original-scale posterior (v2jucorrdc_osp, posterior mean on the 0-4 response scale); the latent measurement-model
+    estimate (v2jucorrdc) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: corruption
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2jucorrdc_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.legislature_corruption
+  labels:
+    fr: Activités corrompues au parlement (V-Dem, 0-4)
+    en: Legislature corrupt activities (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Do members of the legislature abuse their position for financial gain?' 0 commonly
+    ... 4 never or hardly ever). The series listed is the original-scale posterior (v2lgcrrpt_osp, posterior mean on the 0-4
+    response scale); the latent measurement-model estimate (v2lgcrrpt) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: corruption
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2lgcrrpt_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.high_court_independence
+  labels:
+    fr: Indépendance de la cour suprême (V-Dem, 0-4)
+    en: High court independence (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('When the high court rules in cases salient to the government, how often would
+    you say that it makes decisions that merely reflect government wishes regardless of its sincere view of the legal record?'
+    0 always ... 4 never). The series listed is the original-scale posterior (v2juhcind_osp, posterior mean on the 0-4 response
+    scale); the latent measurement-model estimate (v2juhcind) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: rule_of_law
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2juhcind_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.freedom_from_torture
+  labels:
+    fr: Protection contre la torture (V-Dem, 0-4)
+    en: Freedom from torture (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Is there freedom from torture?' 0 not respected ... 4 fully respected). The series
+    listed is the original-scale posterior (v2cltort_osp, posterior mean on the 0-4 response scale); the latent measurement-model
+    estimate (v2cltort) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2cltort_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.freedom_from_political_killings
+  labels:
+    fr: Protection contre les assassinats politiques (V-Dem, 0-4)
+    en: Freedom from political killings (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Is there freedom from political killings?' 0 not respected ... 4 fully respected).
+    The series listed is the original-scale posterior (v2clkill_osp, posterior mean on the 0-4 response scale); the latent
+    measurement-model estimate (v2clkill) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2clkill_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.freedom_of_religion
+  labels:
+    fr: Liberté de religion (V-Dem, 0-4)
+    en: Freedom of religion (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Is there freedom of religion?' 0 not respected ... 4 fully respected). The series
+    listed is the original-scale posterior (v2clrelig_osp, posterior mean on the 0-4 response scale); the latent measurement-model
+    estimate (v2clrelig) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: civil_liberties
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2clrelig_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.media_censorship
+  labels:
+    fr: Censure des médias par l'État (V-Dem, 0-4)
+    en: Government censorship effort - media (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Does the government directly or indirectly attempt to censor the print or broadcast
+    media?' 0 routinely ... 4 rarely or never). The series listed is the original-scale posterior (v2mecenefm_osp, posterior
+    mean on the 0-4 response scale); the latent measurement-model estimate (v2mecenefm) and its 68% bounds are in the same
+    table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: media
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2mecenefm_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.harassment_journalists
+  labels:
+    fr: Harcèlement des journalistes (V-Dem, 0-4)
+    en: Harassment of journalists (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Are individual journalists harassed for engaging in legitimate journalistic activities?'
+    0 no journalists dare ... 4 not harassed). The series listed is the original-scale posterior (v2meharjrn_osp, posterior
+    mean on the 0-4 response scale); the latent measurement-model estimate (v2meharjrn) and its 68% bounds are in the same
+    table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: media
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2meharjrn_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.cso_repression
+  labels:
+    fr: Répression des organisations de la société civile (V-Dem, 0-4)
+    en: CSO repression (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Does the government attempt to repress civil society organizations?' 0 severely
+    ... 4 no). The series listed is the original-scale posterior (v2csreprss_osp, posterior mean on the 0-4 response scale);
+    the latent measurement-model estimate (v2csreprss) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: civil_society
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2csreprss_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.party_ban
+  labels:
+    fr: Interdiction de partis (V-Dem, 0-4)
+    en: Party ban (V-Dem, original scale 0-4)
+  definition: V-Dem expert-coded indicator ('Are any parties banned?' 0 all parties except the state-sponsored party ... 4
+    no parties officially banned). The series listed is the original-scale posterior (v2psparban_osp, posterior mean on the
+    0-4 response scale); the latent measurement-model estimate (v2psparban) and its 68% bounds are in the same table.
+  unit: ordinal 0-4 (posterior mean)
+  domain: politics
+  subdomain: parties
+  value_kind: numeric
+  source_order:
+  - vdem.institutions.v2psparban_osp
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike). Higher = better (less corruption /
+    more freedom) on these original scales.'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.state_territorial_control
+  labels:
+    fr: Contrôle effectif du territoire par l'État (V-Dem, %)
+    en: State authority over territory (V-Dem, %)
+  definition: Over what percentage of the territory does the state have effective control? (v2svstterr; expert-coded, measurement-model
+    point estimate in percent).
+  unit: '%'
+  domain: politics
+  subdomain: statehood
+  value_kind: numeric
+  source_order:
+  - vdem.liberties.v2svstterr
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - expert_coded
+- id: politics.vdem.independent_state
+  labels:
+    fr: État indépendant (V-Dem)
+    en: Independent state (V-Dem)
+  definition: 'Is the polity an independent state? (v2svindep: 0 no, 1 yes; Gleditsch-Ward list reconciled by V-Dem). Code
+    in value, label in value_text.'
+  unit: category (0/1)
+  domain: politics
+  subdomain: statehood
+  value_kind: text
+  source_order:
+  - vdem.liberties.v2svindep
+  provider_declared: true
+  notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
+  tags:
+  - source:vdem
+  - licence:CC-BY-SA-4.0
+  - categorical

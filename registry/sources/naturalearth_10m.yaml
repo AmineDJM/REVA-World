@@ -1,0 +1,17 @@
+# V3 (agent A-GEO): Natural Earth 1:10m Admin-0 layers used to compute country area, 1:10m coastline,
+# land-border adjacency/lengths, landlocked status, exclaves and disputed-area areas
+# (src/reva/adapters/connectors/atlas_naturalearth10m.py). The 1:110m display layer keeps its own entry.
+source_key: naturalearth.admin0_10m
+title: Natural Earth 1:10m Admin 0 (map units, countries, boundary lines, disputed areas)
+provider_url: https://www.naturalearthdata.com/downloads/10m-cultural-vectors/
+lineage_family: natural_earth
+rights:
+  licence: Public domain
+  licence_url: https://www.naturalearthdata.com/about/terms-of-use/
+  attribution: "Made with Natural Earth"
+metadata:
+  allowed_hosts: [naciscdn.org]
+  role: >-
+    computed geography (areas/lengths derived by REVA from public-domain 1:10m geometry); Natural Earth's
+    default layers are a de facto political view and not authoritative boundaries
+  cadence: monthly check; release-versioned (VERSION.txt)

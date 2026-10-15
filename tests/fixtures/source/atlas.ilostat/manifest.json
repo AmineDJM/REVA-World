@@ -1,0 +1,314 @@
+[
+  {
+    "request_fingerprint": "7fb7a06cd90d89e49b2260edbc8276334be281ed922278b8bf7a9c690908d067",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=CLD_XCHL_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "7fb7a06cd90d89e4.zip",
+    "sha256": "1b02891da4d430b7ac91c37d0d03331e4bf6e76b0776f5dcc97dff761add8de0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:15.548170+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "9bdeac3b571f27444ba46804e62536cefda7157e63f80cf14d47947bc552a51c",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAP_2WAP_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "9bdeac3b571f2744.zip",
+    "sha256": "a3ff34f00305cf06cbe3ac7079a209b5d185645461c4650b09870da0a7b1e0d0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:00.076147+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "4893d7a336370a87a5ef11327f77b43dcde9d46dcaf344a5a359c5629f9d7ceb",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAP_DWAP_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "4893d7a336370a87.zip",
+    "sha256": "72c85d6517a7c00fd53e55f49f245d3dfed06a6c9ed32579357bd289e5123ba7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:01.440356+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "1543c206650d98612ebf68f0fe706bfb3a2d919f081a7f4abf190e296bed6c3e",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAR_EMTA_SEX_CUR_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "1543c206650d9861.zip",
+    "sha256": "be028f65a76d0f8038ac9b99b9476921a7f69bbc15578e5e2c01e15a71c6aba7",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:10.279622+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "53eb9baa8151c7613fe8b535558a5e2bb593e4001b0105552f78b7cd70f328d7",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAR_EMTA_SEX_ECO_CUR_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "53eb9baa8151c761.zip",
+    "sha256": "5f8b6377316e0b9558dec0302ec4a3bc74915d54a7a6ba5f22105195854ef82f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:12.068704+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "04c01ab700e83227505d3591ffc2ef34b593d9a983239ec1d97ae8726220408f",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAR_EMTM_SEX_CUR_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "04c01ab700e83227.zip",
+    "sha256": "90d405f0c21df60a6ae9570ba055c5af9dd62776feb9cb381258af807eb0d727",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:12.648765+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "54a340c196c06b3f927af532aff85b123a61c4538d7a57d2460b1211b01b9def",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EAR_INEE_CUR_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "54a340c196c06b3f.zip",
+    "sha256": "409673812d7b4f6ee7b06b1fac55f72093d6c6cee028d7bceadd74d8eb255ec2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:09.340948+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "838ba52f1ec072920420ce88b02a23e8b4b194cd4c6633b21e880d37c7904289",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EMP_2EMP_SEX_ECO_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "838ba52f1ec07292.zip",
+    "sha256": "4418abc6360aa89ec08a88caffe8d546e57d9968e8e8cc4209ec9a69dc478182",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:03.753465+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "bec0495842f61213ff0e0581e537284a187b84a1611467d2e177b0b14a3e082d",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EMP_2EMP_SEX_STE_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "bec0495842f61213.zip",
+    "sha256": "771cdc51ca7a66d7cbcdced85d75d56f561ed9db7ff76f752b82e8a55af5d8e4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:04.559012+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "be9ac0ede432a0a1087069fdfe61bd9ba7a118a3d0b8655ccaa1d2d0f1e49d12",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EMP_2IFL_SEX_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "be9ac0ede432a0a1.zip",
+    "sha256": "c05dc1c13dd9b2dee76f6e2e562ced8da3d81dcab6bcc41a8f55ba18f23c557e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:06.228120+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "c56814e222b8dc96c66c1cb2b830faacd9a2a83bbaff88bb87987b3368f3eb1b",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=EMP_2WAP_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "c56814e222b8dc96.zip",
+    "sha256": "cd0f01b7eafea91d9e4cb884fa67b8537a7b703b533c3f8e51d84d5e220a1544",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:02.128838+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "5b71db4a5c3fa3a25cac5941c0380502d6625596df5437216cfc5d7726803c20",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=HOW_2EMP_SEX_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "5b71db4a5c3fa3a2.zip",
+    "sha256": "5e213ec306e89e654b4c9238af88200e98fb226c02504bb4c3e2264f3dc9d072",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:07.324775+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "837981686885e6145b7066108fbcd394fd557c589b171fe5610b7b0e3e8ede65",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=HOW_TEMP_SEX_NB_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "837981686885e614.zip",
+    "sha256": "a2a4141b449b91b0d9c7ae5686e17377ca6d4241a3bb6e08527cfc17dc35ae2b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:08.283584+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "2d0674ae0372a872f6297f43015320a8ef3423a52e38a2a20e71dc9c01d87400",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=ILR_CBCT_NOC_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "2d0674ae0372a872.zip",
+    "sha256": "07c8d7d34d85cfcd1ea9595b536b56e4009ff2a27f828eea6e539590e478f121",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:17.595731+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "b42a54c0a7a1651a085e1fab21d0ae792e45f4efd4192a6aeddee0ac22829acb",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=ILR_TUMT_NOC_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "b42a54c0a7a1651a.zip",
+    "sha256": "b84a594623018937edd6372edf70796346cf8464586ab24d7dc0995f6ba57be1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:16.544518+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "8b4d58c2098273b2f106058008b0840d4c3e83563a369c2b0f380b14992c8fbb",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=LAP_2GDP_NOC_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "8b4d58c2098273b2.zip",
+    "sha256": "2c29c4f676213bc149bed4b8c5ece046f66ebf95ad8576d0109bb64cfa38cd6a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:13.646951+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "ab706114199c3451913ab39defe718a9093ae2f1328221e115b6558c6b5d0a5d",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=SDG_0111_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "ab706114199c3451.zip",
+    "sha256": "0867076a434add4972152a1cc570bf5a9f500a6cc0bf953f2f5436634139d117",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:14.616913+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "88677ed48d433a8afc48edab1ae0ff4e8acf78b4256f004bba55325efcad5304",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=SDG_0831_SEX_ECO_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "88677ed48d433a8a.zip",
+    "sha256": "1e25df3149a51fdab8b0271d6697e3e8a16d9cd5d472821217a4bebf89822b0f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:24:05.383476+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "be9908ed1bf1d8bde9c4207323d8f68a6a25d64e9446ab360f8a5cdc7815b9b6",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=UNE_2EAP_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "be9908ed1bf1d8bd.zip",
+    "sha256": "d11cf15d6be9773cd6495c258a83238a5d49093372c50e22e7e2869a9a00a315",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:57.783571+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "cc34f1f71366645c9c34d5c96a769cd81bb787b855ad51e1c63dad354f349dea",
+    "url": "https://rplumber.ilo.org/data/indicator/?id=UNE_DEAP_SEX_AGE_RT_A&ref_area=FRA+DZA+KOS+AUT+TWN+X01&format=.csv.gz",
+    "file": "cc34f1f71366645c.zip",
+    "sha256": "8db730ad4a0284ca7d979e50f80416f9dba5331c952c328049d69a6948735b6f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:59.282418+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "665377ab94fa4392715afda8a5f8b1732be97bfda3ee7574dc81440511acffb8",
+    "url": "https://rplumber.ilo.org/metadata/dic/?var=note_classif&lang=en&format=.csv.gz",
+    "file": "665377ab94fa4392.zip",
+    "sha256": "49e7add778cb12e76b84686b73665896baf66e69d828add7694ce270986055f5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:56.680936+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "138b347872e1c04fb2fabfe253d74d7ce155f2dd3982625ae5fcf2db8cb4afde",
+    "url": "https://rplumber.ilo.org/metadata/dic/?var=note_indicator&lang=en&format=.csv.gz",
+    "file": "138b347872e1c04f.zip",
+    "sha256": "16776bbe2819ebdd48b54125298ca58dc8b523518942e752b37388a9b28656d6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:54.667823+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "e1a90be0ea2ac32ff8684266468c0c5a8eeab2896b335c034c02610b9c7b6163",
+    "url": "https://rplumber.ilo.org/metadata/dic/?var=note_source&lang=en&format=.csv.gz",
+    "file": "e1a90be0ea2ac32f.zip",
+    "sha256": "3ba76717505e52ab3376149bdda10a5a2fab1670469b971fd9af3edfdf99f5cd",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:55.651664+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "55ff5fe0c77be4fe131b4cfc473511d88a6d8cd38e544f331457b05503bb6729",
+    "url": "https://rplumber.ilo.org/metadata/dic/?var=obs_status&lang=en&format=.csv.gz",
+    "file": "55ff5fe0c77be4fe.zip",
+    "sha256": "a0363ace99ab35889a288652f78b84e1412b011fd92876cd4cbed522e6d5289e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:53.607520+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "84caca485fd22c9b8be8b70e353359053160ac4d7562c4eb2b66d72983814b96",
+    "url": "https://rplumber.ilo.org/metadata/dic/?var=source&lang=en&format=.csv.gz",
+    "file": "84caca485fd22c9b.zip",
+    "sha256": "29c768aa434863dfc7fd619932ad8e2de3e8735a3f6ffc692da86f980e823f76",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:52.870607+00:00",
+    "licence": "CC BY 4.0"
+  },
+  {
+    "request_fingerprint": "00746b6c8bce32eb5b2ad225fddf172de0e5ee03a9a6c60fe45c228f2edaeb95",
+    "url": "https://rplumber.ilo.org/metadata/toc/indicator/?lang=en&format=.csv.gz",
+    "file": "00746b6c8bce32eb.zip",
+    "sha256": "6acc59aefb87660217bdb5dc6f0434ceaaf7a20f2d0404dcaabfc8118bade405",
+    "status": 200,
+    "headers": {
+      "content-type": "application/octet-stream"
+    },
+    "retrieved_at": "2026-10-15T22:23:52.163760+00:00",
+    "licence": "CC BY 4.0"
+  }
+]

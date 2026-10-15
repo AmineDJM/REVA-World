@@ -1,0 +1,23 @@
+# V3 (agent A-UN): UNSD Statistical Yearbook table T02 (population, density, surface area).
+source_key: unsd.syb
+title: "UN Statistics Division - Statistical Yearbook, table 'Population, surface area and density'"
+provider_url: https://data.un.org/
+lineage_family: unsd_syb
+rights:
+  licence: "UNdata terms of use (free use with attribution)"
+  licence_url: https://data.un.org/Host.aspx?Content=UNdataUse
+  attribution: "United Nations Statistics Division, Statistical Yearbook (SYB68), data.un.org"
+  provider_statement: >-
+    "All data and metadata provided on UNdata's website are available free of charge and may be copied
+    freely, duplicated and further distributed provided that UNdata is cited as the reference." (read 2026-10-15)
+metadata:
+  allowed_hosts: [data.un.org]
+  file: "SYB68_1_202511_Population, Surface Area and Density.csv"
+  authentication: none
+  cadence: annual Statistical Yearbook edition
+  editorial_status: >-
+    Surface area (thousand km2, rounded to whole thousands) from the UN Demographic Yearbook 2023;
+    population and density series re-published from WPP 2024 (same lineage as un.wpp, not independent).
+  upstream_lineages:
+    surface_area: [un_demographic_yearbook, national_statistical_offices]
+    population: [un_wpp]

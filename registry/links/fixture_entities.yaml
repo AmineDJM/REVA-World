@@ -1,0 +1,83 @@
+# Entities of the offline LINKS fixture (tests/unit/links/fixtures/wikidata_links_fixture.json).
+# QIDs were checked against Wikidata (wbgetentities labels) when the fixture was captured; `label` is the
+# English label seen then. The fixture keeps only statements between these entities (+ dates, ISO codes).
+version: 1
+owner: LINKS
+groups:
+  - name: columbus_tordesillas_brazil
+    description: Columbus → Castile/Portugal → Treaty of Tordesillas → colonial Brazil → Brazil → Portuguese.
+    entities:
+      - {qid: Q7322, label: Christopher Columbus}
+      - {qid: Q3771259, label: first voyage of Christopher Columbus}
+      - {qid: Q221474, label: first arrival of Christopher Columbus to America}
+      - {qid: Q66626376, label: Governor of the Indies}
+      - {qid: Q77380502, label: Viceroy of the Indies}
+      - {qid: Q174306, label: Republic of Genoa}
+      - {qid: Q66555529, label: Spanish colonization of Hispaniola}
+      - {qid: Q180897, label: Treaty of Tordesillas}
+      - {qid: Q3930651, label: Demarcation line of Alexander VI}
+      - {qid: Q1134342, label: Inter caetera}
+      - {qid: Q108316, label: Alexander VI}
+      - {qid: Q217637, label: John II of Portugal}
+      - {qid: Q45859, label: Isabella I of Castile}
+      - {qid: Q12860, label: Ferdinand II of Aragon}
+      - {qid: Q1570124, label: Portuguese discoveries}
+      - {qid: Q10265487, label: Spanish discoveries}
+      - {qid: Q1047607, label: Spanish colonization of the Americas}
+      - {qid: Q45670, label: Kingdom of Portugal}
+      - {qid: Q80702, label: Spanish Empire}
+      - {qid: Q200464, label: Portuguese Empire}
+      - {qid: Q2088324, label: Colonial Brazil}
+      - {qid: Q11876909, label: State of Brazil}
+      - {qid: Q155, label: Brazil}
+      - {qid: Q45, label: Portugal}
+      - {qid: Q29, label: Spain}
+      - {qid: Q5146, label: Portuguese}
+      - {qid: Q1321, label: Spanish}
+  - name: lusophone_and_colonies
+    description: Other Portuguese-speaking states (shared official language, former colonies).
+    entities:
+      - {qid: Q916, label: Angola}
+      - {qid: Q1029, label: Mozambique}
+      - {qid: Q1011, label: Cape Verde}
+      - {qid: Q1007, label: Guinea-Bissau}
+      - {qid: Q1039, label: São Tomé and Príncipe}
+      - {qid: Q574, label: East Timor}
+  - name: us_decolonisation_1950s_60s
+    description: >-
+      The United States and European decolonisation in the 1950s–60s: Eisenhower, the Suez Crisis (1956),
+      UNGA Resolution 1514 (1960), the UN. Only what the sources state; no "the US supported/opposed"
+      claim is made unless a sourced statement says so.
+    entities:
+      - {qid: Q30, label: United States}
+      - {qid: Q9916, label: Dwight D. Eisenhower}
+      - {qid: Q11696, label: President of the United States}
+      - {qid: Q49101, label: Suez Crisis}
+      - {qid: Q145, label: United Kingdom}
+      - {qid: Q142, label: France}
+      - {qid: Q801, label: Israel}
+      - {qid: Q79, label: Egypt}
+      - {qid: Q15180, label: Soviet Union}
+      - {qid: Q1065, label: United Nations}
+      - {qid: Q47423, label: United Nations General Assembly}
+      - {qid: Q37470, label: United Nations Security Council}
+      - {qid: Q2629473, label: United Nations General Assembly Resolution 1514}
+      - {qid: Q230533, label: decolonization}
+  - name: classes
+    description: Classes used by the derivations (colonies, polities, alliances, languages) and by hub damping.
+    entities:
+      - {qid: Q133156, label: colony}
+      - {qid: Q164142, label: protectorate}
+      - {qid: Q161243, label: dependent territory}
+      - {qid: Q48349, label: empire}
+      - {qid: Q3024240, label: historical country}
+      - {qid: Q6256, label: country}
+      - {qid: Q3624078, label: sovereign state}
+      - {qid: Q7275, label: state}
+      - {qid: Q417175, label: kingdom}
+      - {qid: Q1127126, label: military alliance}
+      - {qid: Q131569, label: treaty}
+      - {qid: Q5, label: human}
+      - {qid: Q34770, label: language}
+      - {qid: Q19860, label: Indo-European languages}
+      - {qid: Q19814, label: Romance languages}

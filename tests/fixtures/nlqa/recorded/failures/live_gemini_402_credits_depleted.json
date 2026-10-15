@@ -1,0 +1,22 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "live_gemini_402_credits_depleted",
+ "recorded_at": "2026-10-15T22:24:45+00:00",
+ "provider": "gemini",
+ "model_requested": "gemini-3.8-flash",
+ "http_status": 402,
+ "latency_ms": 1066.6,
+ "prompt_version": "nlqa-plan-1.0.0",
+ "prompt_sha256": "10879fd1eb685aa383630633394c9312c5856f3345d26cd4f85db4526f23a2e8",
+ "catalog_digest": "63d70855831bb2031506497c04880b649b74d3ed35bd6f57ec42af7a728bb937",
+ "text": "Quel est le salaire minimum au Sénégal ?",
+ "text_sha256": "f80f5e182e22a7aac9a5d472f79ebb7dc6178186a986b12ace748cbc682dd3ff",
+ "response_body": {
+  "error": {
+   "code": 402,
+   "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
+   "status": "RESOURCE_EXHAUSTED"
+  }
+ },
+ "note": "Real response of the fallback provider probe (2026-10-15): Gemini answered HTTP 402 (prepayment credits depleted)."
+}

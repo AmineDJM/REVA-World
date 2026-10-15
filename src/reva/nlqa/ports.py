@@ -1,0 +1,339 @@
+"""Adapter ports of the question-answering executor (V3, agent NLQA).
+
+The executor never talks to a database, DuckDB or the network directly: it calls these
+protocols. Real adapters (:mod:`reva.nlqa.adapters`) wrap the KG (``reva.kg`` /
+``kg.*`` tables), the atlas (``reva.atlas.query``), the interconnection layer
+(``reva.links``) and the optional Wikidata search; tests use in-memory fakes. A backend
+that is absent or fails raises :class:`CapabilityUnavailable`, which the executor turns into
+a typed ``capability_unavailable`` result — never into a guess.
+
+Every record carries its provenance: a KG statement keeps its Wikidata statement id,
+revision, retrieval time and raw artifact sha256; an atlas cell keeps source, dataset,
+indicator, raw sha256 and selector. The composer cites these, nothing else.
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
+from typing import Any, Protocol, runtime_checkable
+
+from reva.kernel.errors import RevaError
+
+#: Wikidata properties whose statements assert causation (shown only as "asserted by <source>").
+CAUSAL_PROPERTIES = frozenset({"P828", "P1542", "P1478", "P1536", "P1479", "P1537"})
+
+
+class CapabilityUnavailable(RevaError):
+    """A backend (KG, atlas, links, entity search) is absent or failed; nothing is guessed."""
+
+    code = "capability_unavailable"
+    http_status = 503
+
+
+def pick_label(labels: Mapping[str, str] | None, lang: str, fallback: str = "") -> str:
+    """The label in ``lang``, else English, else any label, else ``fallback``."""
+    labels = labels or {}
+    for k in (lang, "en", "fr"):
+        v = labels.get(k)
+        if v:
+            return str(v)
+    for v in labels.values():
+        if v:
+            return str(v)
+    return fallback
+
+
+@dataclass(frozen=True)
+class TimeValue:
+    """A Wikidata-style time: ISO date ``YYYY[-MM[-DD]]`` (``-`` prefix for BCE) and precision
+    (7 century, 8 decade, 9 year, 10 month, 11 day)."""
+
+    iso: str
+    precision: int = 11
+
+    @property
+    def year(self) -> int | None:
+        s = self.iso.lstrip("+")
+        neg = s.startswith("-")
+        digits = s.lstrip("-").split("-")[0]
+        try:
+            y = int(digits)
+        except ValueError:
+            return None
+        return -y if neg else y
+
+    def display(self) -> str:
+        s = self.iso.lstrip("+")
+        neg = s.startswith("-")
+        parts = s.lstrip("-").split("T")[0].split("-")
+        y = parts[0].lstrip("0") or "0"
+        prefix = "-" if neg else ""
+        if self.precision >= 11 and len(parts) >= 3:
+            return f"{prefix}{y}-{parts[1]}-{parts[2]}"
+        if self.precision == 10 and len(parts) >= 2:
+            return f"{prefix}{y}-{parts[1]}"
+        return f"{prefix}{y}"
+
+    def sort_key(self) -> tuple[int, str]:
+        y = self.year
+        return (y if y is not None else 10**9, self.iso)
+
+
+@dataclass(frozen=True)
+class Entity:
+    qid: str
+    labels: Mapping[str, str] = field(default_factory=dict)
+    descriptions: Mapping[str, str] = field(default_factory=dict)
+    kind: str | None = None
+    sitelinks: int = 0
+    iso3: str | None = None
+    #: where the identification came from: ``kg`` (REVA KG) or ``wikidata.wbsearchentities`` (live search)
+    source: str = "kg"
+    source_revision: str | None = None
+    retrieved_at: str | None = None
+
+    def label(self, lang: str) -> str:
+        return pick_label(self.labels, lang, self.qid)
+
+
+@dataclass(frozen=True)
+class EntityMatch:
+    entity: Entity
+    #: label_exact | alias_exact | label_prefix | fuzzy | search
+    match: str
+    matched_text: str = ""
+
+
+@dataclass(frozen=True)
+class KgStatement:
+    """One sourced KG statement (subject —property→ object|literal), as stored in ``kg.statement``."""
+
+    statement_id: str
+    subject_qid: str
+    property: str
+    subject_labels: Mapping[str, str] = field(default_factory=dict)
+    property_labels: Mapping[str, str] = field(default_factory=dict)
+    object_qid: str | None = None
+    object_labels: Mapping[str, str] = field(default_factory=dict)
+    literal: str | None = None
+    literal_unit: str | None = None
+    start: TimeValue | None = None
+    end: TimeValue | None = None
+    point_in_time: TimeValue | None = None
+    rank: str = "normal"
+    qualifiers: Mapping[str, Any] = field(default_factory=dict)
+    references: Sequence[Mapping[str, Any]] = ()
+    source_key: str = "wikidata"
+    source_revision: str | None = None
+    retrieved_at: str | None = None
+    raw_sha256: str | None = None
+    origin: str | None = None
+
+    def subject_label(self, lang: str) -> str:
+        return pick_label(self.subject_labels, lang, self.subject_qid)
+
+    def object_label(self, lang: str) -> str:
+        if self.object_qid is not None:
+            return pick_label(self.object_labels, lang, self.object_qid)
+        if self.literal is None:
+            return ""
+        return f"{self.literal} {self.literal_unit}".strip() if self.literal_unit else self.literal
+
+    def property_label(self, lang: str) -> str:
+        return pick_label(self.property_labels, lang, self.property)
+
+    @property
+    def causal(self) -> bool:
+        return self.property in CAUSAL_PROPERTIES
+
+    def when(self) -> TimeValue | None:
+        return self.point_in_time or self.start
+
+
+@dataclass(frozen=True)
+class DerivedLinkHop:
+    """A hop over a *derived* link of the interconnection layer (e.g. ``former_colony_of``), which rests on
+    several sourced records; it is cited through all of them."""
+
+    link_type: str
+    subject_qid: str
+    object_qid: str
+    subject_labels: Mapping[str, str] = field(default_factory=dict)
+    object_labels: Mapping[str, str] = field(default_factory=dict)
+    statements: tuple[KgStatement, ...] = ()
+    cells: tuple[AtlasCell, ...] = ()
+    period: str | None = None
+    derived_by: str = "reva.links"
+
+
+@dataclass(frozen=True)
+class PathHop:
+    """One hop of a path: a sourced statement (``forward`` False when it is followed against its direction)
+    or a derived link."""
+
+    statement: KgStatement | None = None
+    forward: bool = True
+    link: DerivedLinkHop | None = None
+
+    @property
+    def causal(self) -> bool:
+        return self.statement is not None and self.statement.causal
+
+    @property
+    def from_qid(self) -> str:
+        if self.statement is None:
+            assert self.link is not None
+            return self.link.subject_qid if self.forward else self.link.object_qid
+        return self.statement.subject_qid if self.forward else str(self.statement.object_qid)
+
+    @property
+    def to_qid(self) -> str:
+        if self.statement is None:
+            assert self.link is not None
+            return self.link.object_qid if self.forward else self.link.subject_qid
+        return str(self.statement.object_qid) if self.forward else self.statement.subject_qid
+
+
+@dataclass(frozen=True)
+class KgPath:
+    hops: tuple[PathHop, ...]
+    #: who computed it: ``links.paths`` (LINKS path engine) or ``nlqa.bfs`` (bounded BFS here)
+    engine: str = "links.paths"
+
+
+@dataclass(frozen=True)
+class Concept:
+    """An atlas catalog concept (``registry/atlas/catalog/<domain>.yaml``), provider_declared."""
+
+    id: str
+    labels: Mapping[str, str] = field(default_factory=dict)
+    unit: str | None = None
+    domain: str | None = None
+    definition: str | None = None
+    source_order: tuple[str, ...] = ()
+    review_status: str = "provider_declared"
+
+    def label(self, lang: str) -> str:
+        return pick_label(self.labels, lang, self.id)
+
+
+@dataclass(frozen=True)
+class AtlasCell:
+    """One atlas cell exactly as a source reports it (long schema of an atlas table)."""
+
+    source: str
+    dataset: str
+    indicator: str
+    iso3: str
+    period_start: str
+    period_end: str
+    value: str | None = None  # decimal string
+    value_text: str | None = None
+    unit: str | None = None
+    concept_id: str | None = None
+    entity_qid: str | None = None
+    flags: Mapping[str, Any] = field(default_factory=dict)
+    raw_sha256: str | None = None
+    selector: str | None = None
+    country_label: str | None = None
+    #: further provenance from the backend (table artifact sha256, dataset key, snapshot)
+    provenance: Mapping[str, Any] = field(default_factory=dict)
+
+    @property
+    def year(self) -> int | None:
+        try:
+            return int(str(self.period_start)[:4])
+        except ValueError:
+            return None
+
+
+@dataclass(frozen=True)
+class AtlasResult:
+    cells: tuple[AtlasCell, ...]
+    #: every source the backend looked in for this request (named in "missing" sentences)
+    sources_consulted: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
+class CountryLink:
+    """One interconnection edge between two countries (LINKS layer); its evidence is cited. ``kind`` is the
+    user-level group (border, shared_language, colonial…), ``link_type`` the LINKS type id."""
+
+    kind: str
+    a_iso3: str
+    b_iso3: str
+    a_label: str | None = None
+    b_label: str | None = None
+    period: str | None = None
+    weight: str | None = None
+    unit: str | None = None
+    statements: tuple[KgStatement, ...] = ()
+    cells: tuple[AtlasCell, ...] = ()
+    source: str | None = None
+    derived_by: str = "links"
+    link_type: str | None = None
+
+
+@runtime_checkable
+class KgPort(Protocol):
+    name: str
+
+    def search_entities(self, text: str, *, kind: str | None, lang: str, limit: int) -> list[EntityMatch]: ...
+
+    def entity(self, qid: str) -> Entity | None: ...
+
+    def neighbours(
+        self, qid: str, *, properties: Sequence[str] | None, as_of: str | None, limit: int
+    ) -> list[KgStatement]: ...
+
+    def timeline(self, qid: str, *, from_year: int | None, to_year: int | None, limit: int) -> list[KgStatement]: ...
+
+
+@runtime_checkable
+class PathPort(Protocol):
+    name: str
+
+    def paths(self, from_qid: str, to_qid: str, *, max_hops: int, as_of: str | None, limit: int) -> list[KgPath]: ...
+
+
+@runtime_checkable
+class AtlasPort(Protocol):
+    name: str
+
+    def concepts(self) -> list[Concept]: ...
+
+    def values(self, concept_id: str, iso3s: Sequence[str] | None, year: int | None) -> AtlasResult:
+        """Cells for ``concept_id``; ``iso3s=None`` means every country; ``year=None`` the latest per
+        country and source."""
+        ...
+
+    def series(self, concept_id: str, iso3: str, from_year: int | None, to_year: int | None) -> AtlasResult: ...
+
+
+@runtime_checkable
+class LinksPort(Protocol):
+    name: str
+
+    def links(self, iso3: str, kinds: Sequence[str] | None, limit: int) -> list[CountryLink]: ...
+
+
+@runtime_checkable
+class EntitySearchPort(Protocol):
+    """Fallback identification outside the REVA KG (e.g. Wikidata ``wbsearchentities``), labelled."""
+
+    name: str
+
+    def search(self, text: str, *, lang: str, limit: int) -> list[EntityMatch]: ...
+
+
+@dataclass
+class Backends:
+    """The adapters an executor runs against; ``None`` = capability unavailable on this server."""
+
+    kg: KgPort | None = None
+    paths: PathPort | None = None
+    atlas: AtlasPort | None = None
+    links: LinksPort | None = None
+    search: EntitySearchPort | None = None
+    notes: list[str] = field(default_factory=list)

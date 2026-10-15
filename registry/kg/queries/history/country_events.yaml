@@ -1,0 +1,25 @@
+id: history.country_events
+domain: history
+owner: KGHIST
+description: >-
+  Significant events (P793) of the 250 crosswalk countries as explicit statements with their dates
+  (P585 / P580 / P582 qualifiers), e.g. Brazil -> significant event -> independence of Brazil (1822).
+  Gives the country -> event hop with the statement id; the events themselves are seeded by
+  history.country_event_items.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?event ?rank ?start ?end ?pit WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P793 ?statement .
+    ?statement ps:P793 ?event ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: country, property: P793, object: event, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 6000
+expand_hops: 1

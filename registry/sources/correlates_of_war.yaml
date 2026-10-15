@@ -1,0 +1,22 @@
+# V3 (agent A-HISTECON): Correlates of War (state system membership, major powers, NMC, wars).
+# Connector: src/reva/adapters/connectors/atlas_cow.py -> atlas tables cow.nmc7, cow.system2024, cow.wars4
+# + KG statements (source_key cow.data).
+source_key: cow.data
+title: Correlates of War (State System Membership v2024, Major Powers v2024, NMC v7.0, War Data v4.0)
+provider_url: https://correlatesofwar.org/data-sets/
+lineage_family: correlates_of_war
+rights:
+  licence: "COW terms of use (not an open licence): data must be cited; users cannot charge for access"
+  licence_url: https://correlatesofwar.org/faq/
+  attribution: >-
+    Correlates of War Project. 2025. State System Membership, v2024. Singer, Bremer and Stuckey (1972),
+    National Material Capabilities v7.0. Sarkees and Wayman (2010), Resort to War: 1816-2007.
+metadata:
+  allowed_hosts: [correlatesofwar.org, cran.r-project.org]
+  open_licence: false
+  redistribution: free of charge with citation (COW FAQ); flagged for maintainer review
+  code_crosswalk: >-
+    COW state numbers -> crosswalk entities through KGGEOPOL's StateCodeCrosswalk (countrycode 1.9.0
+    panel from CRAN, GPL-3, + documented policy windows); the countrycode tarball is archived with the run
+  authentication: none
+  cadence: quarterly check

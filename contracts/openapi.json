@@ -80,6 +80,211 @@
         "title": "ApiWarning",
         "type": "object"
       },
+      "AskResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "answer_text": {
+            "title": "Answer Text",
+            "type": "string"
+          },
+          "catalog_digest": {
+            "title": "Catalog Digest",
+            "type": "string"
+          },
+          "evidence": {
+            "description": "Every cited record with its full provenance",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "number"
+          },
+          "llm_restatement": {
+            "description": "The planner model's own restatement (untrusted, for comparison)",
+            "title": "Llm Restatement",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Model as reported by the provider (e.g. gpt-4.1-2025-04-14)",
+            "title": "Model"
+          },
+          "model_requested": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Requested"
+          },
+          "plan": {
+            "additionalProperties": true,
+            "description": "The validated typed query plan (planner, operations, rejected)",
+            "title": "Plan",
+            "type": "object"
+          },
+          "planner": {
+            "description": "llm | keyword_fallback",
+            "title": "Planner",
+            "type": "string"
+          },
+          "prompt_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Sha256"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider"
+          },
+          "question_sha256": {
+            "title": "Question Sha256",
+            "type": "string"
+          },
+          "rephrase": {
+            "additionalProperties": true,
+            "title": "Rephrase",
+            "type": "object"
+          },
+          "restatement": {
+            "description": "Server restatement of the validated plan",
+            "title": "Restatement",
+            "type": "string"
+          },
+          "sentences": {
+            "items": {
+              "$ref": "#/components/schemas/AskSentence"
+            },
+            "title": "Sentences",
+            "type": "array"
+          },
+          "unsupported": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Unsupported",
+            "type": "array"
+          },
+          "usage": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Usage",
+            "type": "object"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "question_sha256",
+          "language",
+          "plan",
+          "restatement",
+          "llm_restatement",
+          "answer_text",
+          "sentences",
+          "evidence",
+          "unsupported",
+          "planner",
+          "provider",
+          "model",
+          "model_requested",
+          "prompt_version",
+          "prompt_sha256",
+          "catalog_digest",
+          "usage",
+          "rephrase",
+          "warnings",
+          "latency_ms"
+        ],
+        "title": "AskResponse",
+        "type": "object"
+      },
+      "AskSentence": {
+        "additionalProperties": true,
+        "properties": {
+          "citation_refs": {
+            "description": "Compact human-readable form of each citation",
+            "items": {
+              "type": "string"
+            },
+            "title": "Citation Refs",
+            "type": "array"
+          },
+          "citations": {
+            "description": "Evidence ids (E1, E2, …) this sentence rests on",
+            "items": {
+              "type": "string"
+            },
+            "title": "Citations",
+            "type": "array"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "description": "fact | path | identification | missing | unavailable | unsupported | note",
+            "title": "Kind",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "kind",
+          "citations",
+          "citation_refs"
+        ],
+        "title": "AskSentence",
+        "type": "object"
+      },
       "Assessment": {
         "additionalProperties": false,
         "description": "An explanation field that may not apply to this result.\n\n``not_applicable``: the concept does not apply (e.g. compression error of a\nsource report). ``not_assessed``: it applies but no assessment exists yet.\n``reported``: ``detail`` carries the assessment.",
@@ -123,6 +328,1078 @@
           "detail"
         ],
         "title": "Assessment",
+        "type": "object"
+      },
+      "AtlasCell": {
+        "additionalProperties": true,
+        "properties": {
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "entity_qid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Entity Qid"
+          },
+          "flags": {
+            "additionalProperties": true,
+            "title": "Flags",
+            "type": "object"
+          },
+          "indicator": {
+            "title": "Indicator",
+            "type": "string"
+          },
+          "iso3": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Iso3"
+          },
+          "period_end": {
+            "description": "Exclusive end (half-open period)",
+            "format": "date",
+            "title": "Period End",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "title": "Period Start",
+            "type": "string"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/AtlasProvenance"
+          },
+          "provider_geo": {
+            "title": "Provider Geo",
+            "type": "string"
+          },
+          "series": {
+            "description": "<source>.<dataset>.<indicator>",
+            "title": "Series",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "source_rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Position of the series in the concept's source order",
+            "title": "Source Rank"
+          },
+          "sources_reporting": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How many declared sources report this cell",
+            "title": "Sources Reporting"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Exact decimal string as reported; null when the cell is textual or missing",
+            "title": "Value"
+          },
+          "value_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Text"
+          },
+          "year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year"
+          }
+        },
+        "required": [
+          "iso3",
+          "year",
+          "value",
+          "value_text",
+          "unit",
+          "source",
+          "dataset",
+          "indicator",
+          "series",
+          "provider_geo",
+          "entity_qid",
+          "period_start",
+          "period_end",
+          "flags",
+          "provenance",
+          "source_rank",
+          "sources_reporting"
+        ],
+        "title": "AtlasCell",
+        "type": "object"
+      },
+      "AtlasConcept": {
+        "additionalProperties": true,
+        "properties": {
+          "catalog_file": {
+            "title": "Catalog File",
+            "type": "string"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "provider_declared": {
+            "title": "Provider Declared",
+            "type": "boolean"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "source_order": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Source Order",
+            "type": "array"
+          },
+          "subdomain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subdomain"
+          },
+          "tags": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Tags",
+            "type": "array"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value_kind": {
+            "title": "Value Kind",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "labels",
+          "definition",
+          "unit",
+          "domain",
+          "subdomain",
+          "value_kind",
+          "source_order",
+          "provider_declared",
+          "review_status",
+          "notes",
+          "tags",
+          "catalog_file"
+        ],
+        "title": "AtlasConcept",
+        "type": "object"
+      },
+      "AtlasConceptCoverage": {
+        "additionalProperties": true,
+        "properties": {
+          "by_source": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasSourceCoverage"
+            },
+            "title": "By Source",
+            "type": "array"
+          },
+          "cells": {
+            "title": "Cells",
+            "type": "integer"
+          },
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "countries": {
+            "title": "Countries",
+            "type": "integer"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "year_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Max"
+          },
+          "year_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Min"
+          }
+        },
+        "required": [
+          "concept_id",
+          "domain",
+          "countries",
+          "cells",
+          "year_min",
+          "year_max",
+          "by_source"
+        ],
+        "title": "AtlasConceptCoverage",
+        "type": "object"
+      },
+      "AtlasConceptList": {
+        "additionalProperties": true,
+        "properties": {
+          "catalog_errors": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Catalog Errors",
+            "type": "array"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasConcept"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "domains": {
+            "additionalProperties": true,
+            "title": "Domains",
+            "type": "object"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "domains",
+          "catalog_errors",
+          "warnings"
+        ],
+        "title": "AtlasConceptList",
+        "type": "object"
+      },
+      "AtlasCountryCoverage": {
+        "additionalProperties": true,
+        "properties": {
+          "best_sources_used": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Best Sources Used",
+            "type": "array"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          },
+          "year_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Max"
+          },
+          "year_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Min"
+          },
+          "years": {
+            "title": "Years",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "iso3",
+          "years",
+          "year_min",
+          "year_max",
+          "best_sources_used"
+        ],
+        "title": "AtlasCountryCoverage",
+        "type": "object"
+      },
+      "AtlasCoverageResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "by_country": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AtlasCountryCoverage"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "By Country"
+          },
+          "catalog_errors": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Catalog Errors",
+            "type": "array"
+          },
+          "countries_total": {
+            "title": "Countries Total",
+            "type": "integer"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasConceptCoverage"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "by_country",
+          "snapshot",
+          "countries_total",
+          "catalog_errors",
+          "warnings"
+        ],
+        "title": "AtlasCoverageResponse",
+        "type": "object"
+      },
+      "AtlasDossier": {
+        "additionalProperties": true,
+        "properties": {
+          "concepts_with_data": {
+            "title": "Concepts With Data",
+            "type": "integer"
+          },
+          "concepts_without_data": {
+            "title": "Concepts Without Data",
+            "type": "integer"
+          },
+          "domains": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasDossierDomain"
+            },
+            "title": "Domains",
+            "type": "array"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "non_annual_cells": {
+            "title": "Non Annual Cells",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "iso3",
+          "label",
+          "domains",
+          "concepts_with_data",
+          "concepts_without_data",
+          "non_annual_cells"
+        ],
+        "title": "AtlasDossier",
+        "type": "object"
+      },
+      "AtlasDossierConcept": {
+        "additionalProperties": true,
+        "properties": {
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "latest": {
+            "$ref": "#/components/schemas/AtlasCell"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/AtlasSeriesPoint"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series"
+          },
+          "sources_used": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources Used",
+            "type": "array"
+          },
+          "subdomain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Subdomain"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "year_max": {
+            "title": "Year Max",
+            "type": "integer"
+          },
+          "year_min": {
+            "title": "Year Min",
+            "type": "integer"
+          },
+          "years": {
+            "title": "Years",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concept_id",
+          "labels",
+          "unit",
+          "subdomain",
+          "latest",
+          "years",
+          "year_min",
+          "year_max",
+          "sources_used",
+          "series"
+        ],
+        "title": "AtlasDossierConcept",
+        "type": "object"
+      },
+      "AtlasDossierDomain": {
+        "additionalProperties": true,
+        "properties": {
+          "concepts": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasDossierConcept"
+            },
+            "title": "Concepts",
+            "type": "array"
+          },
+          "domain": {
+            "title": "Domain",
+            "type": "string"
+          },
+          "without_data": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Without Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "domain",
+          "concepts",
+          "without_data"
+        ],
+        "title": "AtlasDossierDomain",
+        "type": "object"
+      },
+      "AtlasDossierResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "catalog_errors": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Catalog Errors",
+            "type": "array"
+          },
+          "data": {
+            "$ref": "#/components/schemas/AtlasDossier"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "catalog_errors",
+          "warnings"
+        ],
+        "title": "AtlasDossierResponse",
+        "type": "object"
+      },
+      "AtlasMap": {
+        "additionalProperties": true,
+        "properties": {
+          "by_source": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Source",
+            "type": "object"
+          },
+          "concept": {
+            "$ref": "#/components/schemas/AtlasConcept"
+          },
+          "countries_with_value": {
+            "title": "Countries With Value",
+            "type": "integer"
+          },
+          "countries_without_value": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Countries Without Value",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasCell"
+            },
+            "title": "Values",
+            "type": "array"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concept",
+          "year",
+          "values",
+          "countries_with_value",
+          "countries_without_value",
+          "by_source"
+        ],
+        "title": "AtlasMap",
+        "type": "object"
+      },
+      "AtlasMapResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AtlasMap"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasMapResponse",
+        "type": "object"
+      },
+      "AtlasProvenance": {
+        "additionalProperties": true,
+        "properties": {
+          "dataset_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Id"
+          },
+          "dataset_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dataset Key"
+          },
+          "raw_sha256": {
+            "description": "sha256 of the archived raw artifact the cell was parsed from",
+            "title": "Raw Sha256",
+            "type": "string"
+          },
+          "selector": {
+            "additionalProperties": true,
+            "description": "Locator of the cell inside the raw artifact",
+            "title": "Selector",
+            "type": "object"
+          },
+          "table_artifact_sha256": {
+            "title": "Table Artifact Sha256",
+            "type": "string"
+          }
+        },
+        "required": [
+          "raw_sha256",
+          "selector",
+          "table_artifact_sha256",
+          "dataset_key",
+          "dataset_id"
+        ],
+        "title": "AtlasProvenance",
+        "type": "object"
+      },
+      "AtlasSeries": {
+        "additionalProperties": true,
+        "properties": {
+          "best": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasCell"
+            },
+            "title": "Best",
+            "type": "array"
+          },
+          "concept": {
+            "$ref": "#/components/schemas/AtlasConcept"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          },
+          "per_source": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasSourceCells"
+            },
+            "title": "Per Source",
+            "type": "array"
+          },
+          "sources_without_data": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources Without Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "concept",
+          "iso3",
+          "best",
+          "per_source",
+          "sources_without_data"
+        ],
+        "title": "AtlasSeries",
+        "type": "object"
+      },
+      "AtlasSeriesPoint": {
+        "additionalProperties": true,
+        "properties": {
+          "flags": {
+            "additionalProperties": true,
+            "title": "Flags",
+            "type": "object"
+          },
+          "series": {
+            "title": "Series",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          },
+          "value_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value Text"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "value",
+          "value_text",
+          "series",
+          "flags"
+        ],
+        "title": "AtlasSeriesPoint",
+        "type": "object"
+      },
+      "AtlasSeriesResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AtlasSeries"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasSeriesResponse",
+        "type": "object"
+      },
+      "AtlasSnapshotRef": {
+        "additionalProperties": true,
+        "properties": {
+          "knowledge_cutoff": {
+            "format": "date-time",
+            "title": "Knowledge Cutoff",
+            "type": "string"
+          },
+          "origin": {
+            "title": "Origin",
+            "type": "string"
+          },
+          "rows": {
+            "title": "Rows",
+            "type": "integer"
+          },
+          "snapshot_sha256": {
+            "title": "Snapshot Sha256",
+            "type": "string"
+          },
+          "tables": {
+            "title": "Tables",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "snapshot_sha256",
+          "origin",
+          "knowledge_cutoff",
+          "tables",
+          "rows"
+        ],
+        "title": "AtlasSnapshotRef",
+        "type": "object"
+      },
+      "AtlasSourceCells": {
+        "additionalProperties": true,
+        "properties": {
+          "cells": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasCell"
+            },
+            "title": "Cells",
+            "type": "array"
+          },
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "in_source_order": {
+            "title": "In Source Order",
+            "type": "boolean"
+          },
+          "indicator": {
+            "title": "Indicator",
+            "type": "string"
+          },
+          "series": {
+            "title": "Series",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "source_rank": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Rank"
+          }
+        },
+        "required": [
+          "series",
+          "source",
+          "dataset",
+          "indicator",
+          "source_rank",
+          "in_source_order",
+          "cells"
+        ],
+        "title": "AtlasSourceCells",
+        "type": "object"
+      },
+      "AtlasSourceCoverage": {
+        "additionalProperties": true,
+        "properties": {
+          "cells": {
+            "title": "Cells",
+            "type": "integer"
+          },
+          "countries": {
+            "title": "Countries",
+            "type": "integer"
+          },
+          "series": {
+            "title": "Series",
+            "type": "string"
+          },
+          "source_rank": {
+            "title": "Source Rank",
+            "type": "integer"
+          },
+          "year_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Max"
+          },
+          "year_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Min"
+          }
+        },
+        "required": [
+          "series",
+          "source_rank",
+          "countries",
+          "cells",
+          "year_min",
+          "year_max"
+        ],
+        "title": "AtlasSourceCoverage",
         "type": "object"
       },
       "BacktestRequest": {
@@ -6018,6 +7295,2593 @@
           "next_cursor"
         ],
         "title": "JobListResponse",
+        "type": "object"
+      },
+      "KgEntityOut": {
+        "additionalProperties": false,
+        "properties": {
+          "aliases": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Aliases",
+            "type": "object"
+          },
+          "degree_capped_at": {
+            "title": "Degree Capped At",
+            "type": "integer"
+          },
+          "descriptions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Descriptions",
+            "type": "object"
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kind"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgEntityProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          },
+          "sitelinks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sitelinks"
+          },
+          "snapshot": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Snapshot row id; null when the entity is only a statement endpoint",
+            "title": "Snapshot"
+          },
+          "statements_in": {
+            "title": "Statements In",
+            "type": "integer"
+          },
+          "statements_out": {
+            "title": "Statements Out",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "qid",
+          "snapshot",
+          "kind",
+          "labels",
+          "descriptions",
+          "aliases",
+          "sitelinks",
+          "provenance",
+          "statements_out",
+          "statements_in",
+          "degree_capped_at"
+        ],
+        "title": "KgEntityOut",
+        "type": "object"
+      },
+      "KgEntityProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "content_sha256": {
+            "title": "Content Sha256",
+            "type": "string"
+          },
+          "load_id": {
+            "title": "Load Id",
+            "type": "integer"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "test_fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "raw_sha256s": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Raw Sha256S",
+            "type": "array"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "source_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Revision"
+          },
+          "verification": {
+            "enum": [
+              "community_edited_not_verified",
+              "source_reported_not_verified"
+            ],
+            "title": "Verification",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_key",
+          "source_revision",
+          "content_sha256",
+          "retrieved_at",
+          "recorded_at",
+          "load_id",
+          "raw_sha256s",
+          "origin",
+          "verification"
+        ],
+        "title": "KgEntityProvenance",
+        "type": "object"
+      },
+      "KgEntityResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/KgEntityOut"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "KgEntityResponse",
+        "type": "object"
+      },
+      "KgHop": {
+        "additionalProperties": false,
+        "properties": {
+          "causal_assertion": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Set only for has cause / has effect: who asserts the causal relation",
+            "title": "Causal Assertion"
+          },
+          "dated": {
+            "title": "Dated",
+            "type": "boolean"
+          },
+          "direction": {
+            "enum": [
+              "forward",
+              "inverse"
+            ],
+            "title": "Direction",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "from": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "object": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "point_in_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "property": {
+            "$ref": "#/components/schemas/KgPropertyOut"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/KgProvenance"
+          },
+          "qualifiers": {
+            "additionalProperties": true,
+            "title": "Qualifiers",
+            "type": "object"
+          },
+          "relation_label_en": {
+            "title": "Relation Label En",
+            "type": "string"
+          },
+          "relation_label_fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Relation Label Fr"
+          },
+          "row_id": {
+            "title": "Row Id",
+            "type": "integer"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subject": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "time_calendars": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Calendars"
+          },
+          "time_status": {
+            "enum": [
+              "dated",
+              "undated",
+              "within_window"
+            ],
+            "title": "Time Status",
+            "type": "string"
+          },
+          "to": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive start date used for filtering (null: open)",
+            "title": "Valid From"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive end date used for filtering (null: open)",
+            "title": "Valid To"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Typed literal (quantities as decimal strings)",
+            "title": "Value"
+          },
+          "wording": {
+            "title": "Wording",
+            "type": "string"
+          }
+        },
+        "required": [
+          "row_id",
+          "subject",
+          "property",
+          "object",
+          "value",
+          "start",
+          "end",
+          "point_in_time",
+          "time_calendars",
+          "valid_from",
+          "valid_to",
+          "qualifiers",
+          "provenance",
+          "direction",
+          "from",
+          "to",
+          "relation_label_en",
+          "relation_label_fr",
+          "dated",
+          "time_status",
+          "wording",
+          "causal_assertion"
+        ],
+        "title": "KgHop",
+        "type": "object"
+      },
+      "KgHub": {
+        "additionalProperties": false,
+        "properties": {
+          "degree_at_least": {
+            "title": "Degree At Least",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "degree_at_least"
+        ],
+        "title": "KgHub",
+        "type": "object"
+      },
+      "KgNeighbours": {
+        "additionalProperties": false,
+        "properties": {
+          "edges": {
+            "items": {
+              "$ref": "#/components/schemas/KgStatementOut"
+            },
+            "title": "Edges",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "edges"
+        ],
+        "title": "KgNeighbours",
+        "type": "object"
+      },
+      "KgNeighboursResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/KgNeighbours"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "KgNeighboursResponse",
+        "type": "object"
+      },
+      "KgPath": {
+        "additionalProperties": false,
+        "properties": {
+          "hops": {
+            "items": {
+              "$ref": "#/components/schemas/KgHop"
+            },
+            "title": "Hops",
+            "type": "array"
+          },
+          "length": {
+            "title": "Length",
+            "type": "integer"
+          },
+          "origins": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Origins",
+            "type": "array"
+          },
+          "wording": {
+            "title": "Wording",
+            "type": "string"
+          }
+        },
+        "required": [
+          "length",
+          "hops",
+          "wording",
+          "origins"
+        ],
+        "title": "KgPath",
+        "type": "object"
+      },
+      "KgPathResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/KgPathResult"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "KgPathResponse",
+        "type": "object"
+      },
+      "KgPathResult": {
+        "additionalProperties": false,
+        "properties": {
+          "community_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Community Note"
+          },
+          "found": {
+            "title": "Found",
+            "type": "boolean"
+          },
+          "from": {
+            "title": "From",
+            "type": "string"
+          },
+          "from_label": {
+            "title": "From Label",
+            "type": "string"
+          },
+          "not_found_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Not Found Reason"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "paths": {
+            "items": {
+              "$ref": "#/components/schemas/KgPath"
+            },
+            "title": "Paths",
+            "type": "array"
+          },
+          "search": {
+            "$ref": "#/components/schemas/KgPathSearch"
+          },
+          "to": {
+            "title": "To",
+            "type": "string"
+          },
+          "to_label": {
+            "title": "To Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "from",
+          "to",
+          "from_label",
+          "to_label",
+          "found",
+          "paths",
+          "note",
+          "search",
+          "not_found_reason",
+          "community_note"
+        ],
+        "title": "KgPathResult",
+        "type": "object"
+      },
+      "KgPathSearch": {
+        "additionalProperties": false,
+        "properties": {
+          "allowed_properties": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Allowed Properties"
+          },
+          "edges_scanned": {
+            "title": "Edges Scanned",
+            "type": "integer"
+          },
+          "excluded_properties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Excluded Properties",
+            "type": "array"
+          },
+          "hub_limit": {
+            "title": "Hub Limit",
+            "type": "integer"
+          },
+          "hubs_skipped": {
+            "items": {
+              "$ref": "#/components/schemas/KgHub"
+            },
+            "title": "Hubs Skipped",
+            "type": "array"
+          },
+          "hubs_skipped_count": {
+            "title": "Hubs Skipped Count",
+            "type": "integer"
+          },
+          "levels_expanded": {
+            "title": "Levels Expanded",
+            "type": "integer"
+          },
+          "max_hops": {
+            "title": "Max Hops",
+            "type": "integer"
+          },
+          "nodes_visited": {
+            "title": "Nodes Visited",
+            "type": "integer"
+          },
+          "time_window": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Window"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          },
+          "truncation_reasons": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Truncation Reasons",
+            "type": "array"
+          }
+        },
+        "required": [
+          "max_hops",
+          "hub_limit",
+          "allowed_properties",
+          "excluded_properties",
+          "time_window",
+          "levels_expanded",
+          "nodes_visited",
+          "edges_scanned",
+          "hubs_skipped",
+          "hubs_skipped_count",
+          "truncated",
+          "truncation_reasons"
+        ],
+        "title": "KgPathSearch",
+        "type": "object"
+      },
+      "KgPropertyOut": {
+        "additionalProperties": false,
+        "properties": {
+          "causal_assertion": {
+            "description": "True only for has cause / has effect (a source's assertion)",
+            "title": "Causal Assertion",
+            "type": "boolean"
+          },
+          "label_en": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label En"
+          },
+          "label_fr": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label Fr"
+          },
+          "pid": {
+            "title": "Pid",
+            "type": "string"
+          },
+          "reva_predicate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reva Predicate"
+          }
+        },
+        "required": [
+          "pid",
+          "label_en",
+          "label_fr",
+          "reva_predicate",
+          "causal_assertion"
+        ],
+        "title": "KgPropertyOut",
+        "type": "object"
+      },
+      "KgProvenance": {
+        "additionalProperties": false,
+        "properties": {
+          "load_id": {
+            "title": "Load Id",
+            "type": "integer"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "test_fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "rank": {
+            "enum": [
+              "preferred",
+              "normal"
+            ],
+            "title": "Rank",
+            "type": "string"
+          },
+          "raw_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Raw Sha256"
+          },
+          "recorded_at": {
+            "format": "date-time",
+            "title": "Recorded At",
+            "type": "string"
+          },
+          "references": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "retrieved_at": {
+            "format": "date-time",
+            "title": "Retrieved At",
+            "type": "string"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "source_revision": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Revision"
+          },
+          "statement_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statement Id"
+          },
+          "statement_key": {
+            "title": "Statement Key",
+            "type": "string"
+          },
+          "verification": {
+            "enum": [
+              "community_edited_not_verified",
+              "source_reported_not_verified"
+            ],
+            "title": "Verification",
+            "type": "string"
+          }
+        },
+        "required": [
+          "source_key",
+          "statement_id",
+          "statement_key",
+          "source_revision",
+          "raw_sha256",
+          "retrieved_at",
+          "recorded_at",
+          "load_id",
+          "origin",
+          "rank",
+          "references",
+          "verification"
+        ],
+        "title": "KgProvenance",
+        "type": "object"
+      },
+      "KgRef": {
+        "additionalProperties": false,
+        "properties": {
+          "label": {
+            "description": "English label, else French, else the id itself",
+            "title": "Label",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "qid",
+          "label"
+        ],
+        "title": "KgRef",
+        "type": "object"
+      },
+      "KgSearch": {
+        "additionalProperties": false,
+        "properties": {
+          "mode": {
+            "enum": [
+              "prefix",
+              "substring"
+            ],
+            "title": "Mode",
+            "type": "string"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/KgSearchHit"
+            },
+            "title": "Results",
+            "type": "array"
+          }
+        },
+        "required": [
+          "query",
+          "mode",
+          "results"
+        ],
+        "title": "KgSearch",
+        "type": "object"
+      },
+      "KgSearchHit": {
+        "additionalProperties": false,
+        "properties": {
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "match": {
+            "enum": [
+              "exact",
+              "prefix",
+              "substring"
+            ],
+            "title": "Match",
+            "type": "string"
+          },
+          "matched": {
+            "items": {
+              "$ref": "#/components/schemas/KgSearchMatch"
+            },
+            "title": "Matched",
+            "type": "array"
+          },
+          "origin": {
+            "enum": [
+              "live",
+              "test_fixture"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          },
+          "sitelinks": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sitelinks"
+          }
+        },
+        "required": [
+          "qid",
+          "kind",
+          "sitelinks",
+          "origin",
+          "match",
+          "matched",
+          "labels"
+        ],
+        "title": "KgSearchHit",
+        "type": "object"
+      },
+      "KgSearchMatch": {
+        "additionalProperties": false,
+        "properties": {
+          "alias": {
+            "title": "Alias",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "lang": {
+            "title": "Lang",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lang",
+          "label",
+          "alias"
+        ],
+        "title": "KgSearchMatch",
+        "type": "object"
+      },
+      "KgSearchResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/KgSearch"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "KgSearchResponse",
+        "type": "object"
+      },
+      "KgStatementOut": {
+        "additionalProperties": false,
+        "properties": {
+          "direction": {
+            "anyOf": [
+              {
+                "enum": [
+                  "out",
+                  "in"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "object": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "point_in_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "property": {
+            "$ref": "#/components/schemas/KgPropertyOut"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/KgProvenance"
+          },
+          "qualifiers": {
+            "additionalProperties": true,
+            "title": "Qualifiers",
+            "type": "object"
+          },
+          "row_id": {
+            "title": "Row Id",
+            "type": "integer"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subject": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "time_calendars": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Calendars"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive start date used for filtering (null: open)",
+            "title": "Valid From"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive end date used for filtering (null: open)",
+            "title": "Valid To"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Typed literal (quantities as decimal strings)",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "row_id",
+          "subject",
+          "property",
+          "object",
+          "value",
+          "start",
+          "end",
+          "point_in_time",
+          "time_calendars",
+          "valid_from",
+          "valid_to",
+          "qualifiers",
+          "provenance",
+          "direction"
+        ],
+        "title": "KgStatementOut",
+        "type": "object"
+      },
+      "KgTimeOut": {
+        "additionalProperties": false,
+        "properties": {
+          "precision": {
+            "description": "Wikibase precision: 9 year, 10 month, 11 day; < 9 coarser",
+            "title": "Precision",
+            "type": "integer"
+          },
+          "time": {
+            "description": "Source time string, astronomical year numbering (year 0 = 1 BCE)",
+            "title": "Time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "time",
+          "precision"
+        ],
+        "title": "KgTimeOut",
+        "type": "object"
+      },
+      "KgTimeline": {
+        "additionalProperties": false,
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/KgTimelineEvent"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "qid": {
+            "title": "Qid",
+            "type": "string"
+          },
+          "truncated": {
+            "title": "Truncated",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "qid",
+          "label",
+          "events",
+          "truncated"
+        ],
+        "title": "KgTimeline",
+        "type": "object"
+      },
+      "KgTimelineEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "dated_by": {
+            "enum": [
+              "validity_qualifiers",
+              "time_value"
+            ],
+            "title": "Dated By",
+            "type": "string"
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "enum": [
+                  "out",
+                  "in"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "object": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "point_in_time": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "property": {
+            "$ref": "#/components/schemas/KgPropertyOut"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/KgProvenance"
+          },
+          "qualifiers": {
+            "additionalProperties": true,
+            "title": "Qualifiers",
+            "type": "object"
+          },
+          "row_id": {
+            "title": "Row Id",
+            "type": "integer"
+          },
+          "sort_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sort Date"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/KgTimeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "subject": {
+            "$ref": "#/components/schemas/KgRef"
+          },
+          "time_calendars": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "string"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Calendars"
+          },
+          "valid_from": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive start date used for filtering (null: open)",
+            "title": "Valid From"
+          },
+          "valid_to": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Derived inclusive end date used for filtering (null: open)",
+            "title": "Valid To"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Typed literal (quantities as decimal strings)",
+            "title": "Value"
+          }
+        },
+        "required": [
+          "row_id",
+          "subject",
+          "property",
+          "object",
+          "value",
+          "start",
+          "end",
+          "point_in_time",
+          "time_calendars",
+          "valid_from",
+          "valid_to",
+          "qualifiers",
+          "provenance",
+          "direction",
+          "sort_date",
+          "dated_by"
+        ],
+        "title": "KgTimelineEvent",
+        "type": "object"
+      },
+      "KgTimelineResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "applicability": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "assumptions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Assumptions",
+            "type": "array"
+          },
+          "baseline_release": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BaselineReleaseRef"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "compression_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "context_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Context the data belongs to (null for registry metadata)",
+            "title": "Context Id"
+          },
+          "context_mode": {
+            "enum": [
+              "evidence",
+              "belief",
+              "simulation",
+              "evaluation",
+              "population",
+              "registry",
+              "operations"
+            ],
+            "title": "Context Mode",
+            "type": "string"
+          },
+          "cost": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CostReport"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "data": {
+            "$ref": "#/components/schemas/KgTimeline"
+          },
+          "data_freshness": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Freshness"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimand": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Estimand"
+          },
+          "evidence_profile": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "historical_validation": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "knowledge_cutoff": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
+            "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
+          },
+          "modality": {
+            "enum": [
+              "reported_observation",
+              "selected_estimate",
+              "forecast",
+              "identified_causal_estimate",
+              "assumption_conditioned_scenario",
+              "unsupported",
+              "metadata",
+              "evaluation"
+            ],
+            "title": "Modality",
+            "type": "string"
+          },
+          "model_disagreement": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "model_versions": {
+            "items": {
+              "$ref": "#/components/schemas/ModelVersionRef"
+            },
+            "title": "Model Versions",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opaque keyset cursor; null when no further page",
+            "title": "Next Cursor"
+          },
+          "numerical_error": {
+            "$ref": "#/components/schemas/Assessment"
+          },
+          "origin": {
+            "description": "live, test_fixture (labelled fixture data), mixed or none",
+            "enum": [
+              "live",
+              "test_fixture",
+              "mixed",
+              "none"
+            ],
+            "title": "Origin",
+            "type": "string"
+          },
+          "provenance_links": {
+            "items": {
+              "$ref": "#/components/schemas/ProvenanceLink"
+            },
+            "title": "Provenance Links",
+            "type": "array"
+          },
+          "support": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Support"
+          },
+          "uncertainty": {
+            "$ref": "#/components/schemas/UncertaintySummary"
+          },
+          "units": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Units",
+            "type": "array"
+          },
+          "valid_time": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid-time window of the returned data",
+            "title": "Valid Time"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "context_id",
+          "context_mode",
+          "origin",
+          "modality",
+          "estimand",
+          "units",
+          "support",
+          "baseline_release",
+          "knowledge_cutoff",
+          "knowledge_cutoff_basis",
+          "valid_time",
+          "model_versions",
+          "assumptions",
+          "uncertainty",
+          "data_freshness",
+          "evidence_profile",
+          "applicability",
+          "numerical_error",
+          "compression_error",
+          "model_disagreement",
+          "historical_validation",
+          "provenance_links",
+          "warnings",
+          "cost",
+          "next_cursor"
+        ],
+        "title": "KgTimelineResponse",
         "type": "object"
       },
       "LocationResponse": {
@@ -13148,6 +17012,600 @@
         ]
       }
     },
+    "/v1/ask": {
+      "post": {
+        "description": "Answer a question about the world **only from sourced data** (KG statements, atlas cells, derived\nlinks). Every sentence cites evidence; missing data is said as missing; paths are connections, not causes.",
+        "operationId": "ask_v1_ask_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "lang": {
+                    "anyOf": [
+                      {
+                        "enum": [
+                          "fr",
+                          "en"
+                        ],
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Answer language (default: the question's)",
+                    "title": "Lang"
+                  },
+                  "question": {
+                    "description": "The question in French or English (≤ 2048 UTF-8 bytes). Treated as data.",
+                    "title": "Question",
+                    "type": "string"
+                  },
+                  "rephrase": {
+                    "default": false,
+                    "description": "Let the LLM rephrase the composed answer; accepted only if every number, date and name is found in the cited evidence (else the template text is returned)",
+                    "title": "Rephrase",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "question"
+                ],
+                "title": "AskRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AskResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "413": {
+            "description": "Body larger than 8 KiB or question larger than 2048 bytes"
+          },
+          "422": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Rate limited, or the daily LLM budget is exhausted (nothing was sent)"
+          },
+          "502": {
+            "description": "LLM provider failed"
+          },
+          "503": {
+            "description": "LLM budget ledger unavailable"
+          }
+        },
+        "summary": "Ask",
+        "tags": [
+          "ask"
+        ]
+      }
+    },
+    "/v1/atlas/concepts": {
+      "get": {
+        "operationId": "list_concepts_v1_atlas_concepts_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "domain",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Domain"
+            }
+          },
+          {
+            "in": "query",
+            "name": "subdomain",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,59}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Subdomain"
+            }
+          },
+          {
+            "description": "Case-insensitive search (id, labels, definition)",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Case-insensitive search (id, labels, definition)",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 5000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasConceptList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Concepts",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/countries/{iso3}": {
+      "get": {
+        "operationId": "country_dossier_v1_atlas_countries__iso3__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "iso3",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z]{3}$",
+              "title": "Iso3",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "domain",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Domain"
+            }
+          },
+          {
+            "description": "Include annual best-available series per concept",
+            "in": "query",
+            "name": "series",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Include annual best-available series per concept",
+              "title": "Series",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasDossierResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Country Dossier",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/coverage": {
+      "get": {
+        "operationId": "coverage_v1_atlas_coverage_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "domain",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Domain"
+            }
+          },
+          {
+            "description": "Adds the per-country matrix",
+            "in": "query",
+            "name": "concept",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "minLength": 1,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Adds the per-country matrix",
+              "title": "Concept"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasCoverageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Coverage",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/map": {
+      "get": {
+        "operationId": "concept_map_v1_atlas_map_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concept",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Concept",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "maximum": 3000,
+              "minimum": -10000,
+              "title": "Year",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasMapResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Concept Map",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/series": {
+      "get": {
+        "operationId": "concept_series_v1_atlas_series_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concept",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Concept",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "iso3",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z]{3}$",
+              "title": "Iso3",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasSeriesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Concept Series",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
     "/v1/belief-releases": {
       "get": {
         "description": "Published releases, newest publication sequence first.",
@@ -14555,6 +19013,653 @@
         "summary": "Cancel Job",
         "tags": [
           "jobs"
+        ]
+      }
+    },
+    "/v1/kg/entities/{qid}": {
+      "get": {
+        "operationId": "get_entity_v1_kg_entities__qid__get",
+        "parameters": [
+          {
+            "description": "Wikidata Q-id or provider-scoped key",
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "description": "Wikidata Q-id or provider-scoped key",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Qid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KgEntityResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Entity",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/entities/{qid}/neighbours": {
+      "get": {
+        "operationId": "get_neighbours_v1_kg_entities__qid__neighbours_get",
+        "parameters": [
+          {
+            "description": "Wikidata Q-id or provider-scoped key",
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "description": "Wikidata Q-id or provider-scoped key",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Qid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "direction",
+            "required": false,
+            "schema": {
+              "default": "both",
+              "enum": [
+                "out",
+                "in",
+                "both"
+              ],
+              "title": "Direction",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Restrict to these property ids",
+            "in": "query",
+            "name": "property",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Restrict to these property ids",
+              "title": "Property"
+            }
+          },
+          {
+            "description": "Neighbour entity kind",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Neighbour entity kind",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "YYYY, YYYY-MM or YYYY-MM-DD",
+            "in": "query",
+            "name": "valid_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "YYYY, YYYY-MM or YYYY-MM-DD",
+              "title": "Valid From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_undated",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Undated",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Also return literal-valued outgoing statements",
+            "in": "query",
+            "name": "include_literals",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Also return literal-valued outgoing statements",
+              "title": "Include Literals",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KgNeighboursResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Neighbours",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/entities/{qid}/timeline": {
+      "get": {
+        "operationId": "get_timeline_v1_kg_entities__qid__timeline_get",
+        "parameters": [
+          {
+            "description": "Wikidata Q-id or provider-scoped key",
+            "in": "path",
+            "name": "qid",
+            "required": true,
+            "schema": {
+              "description": "Wikidata Q-id or provider-scoped key",
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "Qid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_incoming",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Incoming",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 2000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KgTimelineResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Timeline",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/path": {
+      "get": {
+        "operationId": "get_path_v1_kg_path_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "from",
+            "required": true,
+            "schema": {
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "From",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": true,
+            "schema": {
+              "maxLength": 161,
+              "pattern": "^(Q[1-9][0-9]{0,11}|[a-z][a-z0-9_]{1,31}:[A-Za-z0-9_.:-]{1,128})$",
+              "title": "To",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_hops",
+            "required": false,
+            "schema": {
+              "default": 4,
+              "maximum": 5,
+              "minimum": 1,
+              "title": "Max Hops",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Allowed hop properties",
+            "in": "query",
+            "name": "property",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 50,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Allowed hop properties",
+              "title": "Property"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "valid_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^-?[0-9]{1,7}(-[0-9]{2}(-[0-9]{2})?)?$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Valid To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "include_undated",
+            "required": false,
+            "schema": {
+              "default": true,
+              "title": "Include Undated",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "query",
+            "name": "hub_limit",
+            "required": false,
+            "schema": {
+              "default": 2000,
+              "maximum": 100000,
+              "minimum": 1,
+              "title": "Hub Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Hub entities that may be traversed",
+            "in": "query",
+            "name": "allow_hub",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 20,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Hub entities that may be traversed",
+              "title": "Allow Hub"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_paths",
+            "required": false,
+            "schema": {
+              "default": 5,
+              "maximum": 20,
+              "minimum": 1,
+              "title": "Max Paths",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KgPathResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Get Path",
+        "tags": [
+          "knowledge-graph"
+        ]
+      }
+    },
+    "/v1/kg/search": {
+      "get": {
+        "operationId": "search_v1_kg_search_get",
+        "parameters": [
+          {
+            "description": "Label or alias text (case-insensitive)",
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "description": "Label or alias text (case-insensitive)",
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": [
+                "fr",
+                "en"
+              ],
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 10,
+              "title": "Lang",
+              "type": "array"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,63}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KgSearchResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Search",
+        "tags": [
+          "knowledge-graph"
         ]
       }
     },

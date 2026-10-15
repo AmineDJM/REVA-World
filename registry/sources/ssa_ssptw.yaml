@@ -1,0 +1,17 @@
+# V3 (agent A-LAW): US Social Security Administration, "Social Security Programs Throughout the World"
+# (SSPTW, with the ISSA). Connector src/reva/adapters/connectors/atlas_ssa_ssptw.py. Status 2026-10-15:
+# www.ssa.gov answers HTTP 403 (Akamai "Access Denied") to this deployment's egress for every path,
+# so the connector reports a typed blocked outcome and extracts nothing.
+source_key: ssa.ssptw
+title: SSA Social Security Programs Throughout the World (regional editions)
+provider_url: https://www.ssa.gov/policy/docs/progdesc/ssptw/
+lineage_family: ssa_issa_ssptw
+rights:
+  licence: "US Government work (SSA), public domain in the US; content compiled with the ISSA"
+  licence_url: https://www.ssa.gov/agency/privacy.html
+  attribution: "U.S. Social Security Administration and International Social Security Association, Social Security Programs Throughout the World"
+metadata:
+  allowed_hosts: [www.ssa.gov]
+  authentication: none
+  cadence: biennial regional editions (Europe, Asia and the Pacific, Africa, the Americas)
+  access_status: blocked_http_403_2026-10-15

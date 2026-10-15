@@ -1,0 +1,20 @@
+id: history.treaties
+domain: history
+owner: KGHIST
+description: >-
+  Treaties: instances of treaty (Q131569) or of a subclass (peace treaty, bilateral treaty, ...) that
+  have at least one signatory (P1891) or at least two Wikipedia sitelinks (keeps historically notable
+  treaties and drops bare treaty-series imports without parties). Snapshots keep signatories (P1891),
+  date (P585/P571/P577), location of signing (P276), parties' depositary (P3342 qualifiers), valid in
+  place (P3005), main subject (P921), cause/effect (asserted by Wikidata).
+purpose: seed_entities
+entity_kind: treaty
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q131569 .
+    {{qid_filter}}
+    { ?item wdt:P1891 [] . } UNION { ?item wikibase:sitelinks ?n . FILTER(?n >= 2) }
+  }
+split: {by: qid_prefix}
+max_rows: 15000
+expand_hops: 1

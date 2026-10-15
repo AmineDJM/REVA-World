@@ -1,0 +1,22 @@
+# V3 (agent A-HISTECON): Maddison Project Database 2023 on DataverseNL.
+# Connector: src/reva/adapters/connectors/atlas_maddison.py -> atlas table maddison.mpd2023.
+source_key: maddison.mpd
+title: Maddison Project Database 2023 (GDP per capita and population, year 1-2022)
+provider_url: https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023
+lineage_family: maddison_project
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Maddison Project Database, version 2023. Bolt, Jutta and Jan Luiten van Zanden (2024), "Maddison style
+    estimates of the evolution of the world economy: A new 2023 update", Journal of Economic Surveys, 1-41.
+metadata:
+  allowed_hosts: [dataverse.nl, objectstore.surf.nl]
+  dataset_record: https://dataverse.nl/api/datasets/:persistentId/?persistentId=doi:10.34894/INZBF2
+  doi: 10.34894/INZBF2
+  citation_policy: >-
+    Original country papers must be cited when the data are shown graphically or when fewer than 12
+    countries are used (MPD 'Notes' sheet); the per-row flags carry the provider's source list.
+  cell_flags: MPD 2023 publishes no per-cell benchmark/interpolation flag
+  authentication: none
+  cadence: monthly check of the dataset record; releases every few years

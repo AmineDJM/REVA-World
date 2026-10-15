@@ -1,0 +1,497 @@
+"""United Nations General Assembly roll-call votes (Voeten et al., Harvard Dataverse) -- agent KGGEOPOL.
+
+Source and access
+-----------------
+Erik Voeten, Anton Strezhnev & Michael Bailey, "United Nations General Assembly Voting Data",
+Harvard Dataverse ``doi:10.7910/DVN/LEJUQZ``, licence **CC0 1.0** (dataset terms). The raw roll-call
+file is ``UNVotes-1.RData`` (file id 10295576, 8.7 MB, R data frame ``completeVotes``) published in
+**dataset version 33.0** (2024-06-24); later versions (34-39, now titled "United Nations General
+Assembly Ideal Points") dropped the raw votes and point to the UNGA-DM database
+(https://unvotes.unige.ch/) for them. Files of earlier versions stay downloadable by file id, so the
+connector pins version 33.0: it fetches the version's metadata (licence, file md5) and the RData file
+(the access URL redirects to the Dataverse S3 bucket) and checks the md5 Dataverse publishes.
+Coverage: roll calls 1946-12 .. 2023-12 (sessions 1-78), 6,551 roll calls, 1,283,746 country rows.
+Votes after 2023 are **not** in this file (gap documented in docs/dev/v3_kggeopol.md).
+
+Codebook (``Codebook-1.docx``, same version, archived too): vote 1 yes, 2 abstain, 3 no, 8 absent,
+9 not a member; ``ccode`` = Correlates-of-War code; issue codes (ME Palestinian conflict, NU nuclear
+weapons, DI arms control/disarmament, CO colonialism, HR human rights, EC economic development) "are
+based on searches in descriptions ... subjected to a rudimentary visual check but may not be 100%
+accurate"; since the 2019 release votes on amendments and paragraphs are included after 1990
+(``amend``/``para``; often NA before).
+
+Outputs
+-------
+* atlas ``unga.votes`` -- one row per (roll call, country) with a recorded position (yes / no /
+  abstain / absent); "not a member" rows (vote 9) are not votes and are counted, not stored.
+* atlas ``unga.rollcalls`` -- one row per roll call (provider_geo ``UNGA``, iso3 null): description
+  text, symbol, date, issue codes, provider yes/no/abstain totals.
+* atlas ``unga.vote_shares`` -- **computed** per country x period (calendar year, decade) x issue code
+  (co, hr, me, nu, di, ec, all): counts of yes/no/abstain/absent and ``share_yes = yes / (yes + no +
+  abstain)``; every row says it is computed from this file, with the formula and the issue-code caveat.
+* KG: roll-call entities ``unga:rcid:<rcid>`` (date, symbol, short title, issue codes) and statements
+  ``<state> unga:voted_yes|voted_no|voted_abstain unga:rcid:<rcid>`` at the vote date.
+
+Provider defect handled explicitly: in 56 roll calls of session 78 a few rows carry another roll
+call's description/symbol/date (misaligned rows). Such rows are kept in ``unga.votes`` flagged
+``provider_row_inconsistent`` and excluded from shares and KG statements.
+"""
+
+from __future__ import annotations
+
+import hashlib
+import json
+from collections import Counter, defaultdict
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass
+from datetime import date, timedelta
+from typing import Any
+
+from reva.adapters.connectors.atlas_geopol_common import (
+    KgEntity,
+    KgStatement,
+    StateCodeCrosswalk,
+    StateEntityResolver,
+    atlas_frame,
+    make_spec,
+)
+from reva.adapters.connectors.base import to_raw
+from reva.kernel.errors import SourceResponseError
+from reva.ports.connectors import FetchItem, RawAcquisition
+
+SOURCE_KEY = "harvard.dataverse.unvotes"
+CONNECTOR_NAME = "atlas.unga_votes"
+CONNECTOR_VERSION = "1.0.0"
+PARSER_VERSION = "atlas-unga-votes-parse-1"
+ATLAS_SOURCE = "unga"
+DOI = "doi:10.7910/DVN/LEJUQZ"
+DATASET_VERSION = "33.0"
+VOTES_FILE_ID = 10295576
+VOTES_FILE_NAME = "UNVotes-1.RData"
+CODEBOOK_FILE_ID = 10295577
+HOSTS = ("dataverse.harvard.edu", "dvn-cloud-iqss.s3.amazonaws.com")
+VERSION_URL = (f"https://dataverse.harvard.edu/api/datasets/:persistentId/versions/{DATASET_VERSION}"
+               f"?persistentId={DOI}")
+FILE_URL = "https://dataverse.harvard.edu/api/access/datafile/{}"
+MAX_BYTES = 12_000_000
+FRAME = "completeVotes"
+COLUMNS = ("rcid", "ccode", "vote", "Country", "Countryname", "session", "importantvote", "date", "unres", "amend",
+           "para", "short", "descr", "me", "nu", "di", "hr", "co", "ec", "resid", "yes", "no", "abstain")
+VOTE = {1: "yes", 2: "abstain", 3: "no", 8: "absent"}
+NOT_MEMBER = 9
+ISSUES = ("co", "hr", "me", "nu", "di", "ec")
+ISSUE_LABELS = {"me": "Palestinian conflict", "nu": "nuclear weapons and nuclear material",
+                "di": "arms control and disarmament", "co": "colonialism", "hr": "human rights",
+                "ec": "(economic) development"}
+ISSUE_CAVEAT = ("Voeten codebook: issue codes are based on searches in descriptions, subjected to a rudimentary "
+                "visual check; they may not be 100% accurate")
+MIN_ROWS = 1_200_000
+
+RIGHTS: dict[str, str] = {
+    "licence": "CC0 1.0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0",
+    "attribution": "Voeten, Erik; Strezhnev, Anton; Bailey, Michael, 'United Nations General Assembly Voting Data', "
+                   "Harvard Dataverse, doi:10.7910/DVN/LEJUQZ, version 33.0 (UNVotes-1.RData)",
+    "citation": "Bailey, Strezhnev & Voeten (2017), Estimating dynamic state preferences from United Nations "
+                "voting data, Journal of Conflict Resolution 61(2): 430-456",
+}
+
+
+class UngaParseError(SourceResponseError):
+    pass
+
+
+def fetch_items() -> tuple[FetchItem, ...]:
+    return (
+        FetchItem(key="version", url=VERSION_URL, max_bytes=2_000_000, expected_media_types=("application/json",)),
+        FetchItem(key="votes", url=FILE_URL.format(VOTES_FILE_ID), max_bytes=MAX_BYTES,
+                  expected_media_types=("application/x-rlang-transport", "application/octet-stream")),
+        FetchItem(key="codebook", url=FILE_URL.format(CODEBOOK_FILE_ID), max_bytes=1_000_000,
+                  expected_media_types=("application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                                        "application/octet-stream")),
+    )
+
+
+async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
+    result = await http.get(item.url, max_bytes=item.max_bytes)
+    return to_raw(item, result, getattr(http, "origin", "live"))
+
+
+def check_version(meta_body: bytes, votes_body: bytes) -> dict[str, Any]:
+    """Licence and file md5 from the pinned dataset version; raises on drift."""
+    doc = json.loads(meta_body)
+    data = doc.get("data") or {}
+    if f"{data.get('versionNumber')}.{data.get('versionMinorNumber')}" != DATASET_VERSION:
+        raise UngaParseError("Dataverse returned another dataset version", retryable=False, kind="schema_drift")
+    lic = (data.get("license") or {}).get("name")
+    if lic != "CC0 1.0":
+        raise UngaParseError(f"licence changed: {lic!r}", retryable=False, kind="licence_change")
+    files = {f["dataFile"]["id"]: f["dataFile"] for f in data.get("files", [])}
+    df = files.get(VOTES_FILE_ID)
+    if df is None or df.get("filename") != VOTES_FILE_NAME:
+        raise UngaParseError("votes file not in the pinned version", retryable=False, kind="schema_drift")
+    md5 = hashlib.md5(votes_body, usedforsecurity=False).hexdigest()
+    if df.get("md5") and df["md5"] != md5:
+        raise UngaParseError("votes file md5 differs from Dataverse metadata", retryable=False, kind="checksum")
+    return {"licence": lic, "md5": md5, "release_time": data.get("releaseTime"), "file_size": df.get("filesize")}
+
+
+@dataclass
+class Votes:
+    """Columns of ``completeVotes`` as Python lists (row i = provider row i + 1)."""
+
+    n: int
+    cols: dict[str, list[Any]]
+
+
+def parse_votes(body: bytes) -> Votes:
+    from reva.adapters.connectors.atlas_rdata import RDataError, RealColumn, column_text, read_rdata_frame
+
+    try:
+        frame = read_rdata_frame(body, FRAME, COLUMNS)
+    except RDataError as e:
+        raise UngaParseError(f"UNVotes RData unreadable: {e}", retryable=False, kind="schema_drift") from e
+    if frame.nrows < MIN_ROWS:
+        raise UngaParseError(f"only {frame.nrows} rows (truncated?)", retryable=False, kind="incomplete")
+    cols: dict[str, list[Any]] = {}
+    for name, col in frame.columns.items():
+        if name == "date":
+            if not isinstance(col, RealColumn):
+                raise UngaParseError("date column is not an R Date", retryable=False, kind="schema_drift")
+            epoch = date(1970, 1, 1)
+            cols[name] = [None if (col.na[i] or col.nan[i]) else epoch + timedelta(days=int(col.values[i]))
+                          for i in range(frame.nrows)]
+        elif isinstance(col, RealColumn) or name in ("rcid", "ccode", "importantvote"):
+            vals = []
+            for i in range(frame.nrows):
+                t = column_text(col, i)
+                vals.append(None if t is None else int(float(t)))
+            cols[name] = vals
+        else:
+            cols[name] = [column_text(col, i) for i in range(frame.nrows)]
+    return Votes(frame.nrows, cols)
+
+
+@dataclass(frozen=True)
+class RollCall:
+    rcid: int
+    date: date
+    session: int | None
+    unres: str | None
+    resid: int | None
+    short: str | None
+    descr: str | None
+    issues: tuple[str, ...]
+    amend: int | None
+    para: int | None
+    important: int | None
+    totals: dict[str, int | None]
+    first_row: int
+    inconsistent_rows: int
+
+
+def _majority(c: Counter[Any]) -> Any:
+    return sorted(c.items(), key=lambda kv: (-kv[1], str(kv[0])))[0][0]
+
+
+def rollcalls(v: Votes) -> tuple[dict[int, RollCall], list[bool]]:
+    """Roll-call metadata (majority value per rcid) and a per-row 'consistent with its roll call' mask."""
+    c = v.cols
+    keyf = ("date", "unres", "descr")
+    counts: dict[int, dict[str, Counter[Any]]] = defaultdict(lambda: defaultdict(Counter))
+    first: dict[int, int] = {}
+    for i in range(v.n):
+        r = c["rcid"][i]
+        first.setdefault(r, i)
+        for k in (*keyf, "session", "resid", "short", "amend", "para", "importantvote", "yes", "no", "abstain",
+                  *ISSUES):
+            counts[r][k][c[k][i]] += 1
+    maj = {r: {k: _majority(cnt) for k, cnt in d.items()} for r, d in counts.items()}
+    ok = [all(c[k][i] == maj[c["rcid"][i]][k] for k in keyf) for i in range(v.n)]
+    bad = Counter(c["rcid"][i] for i in range(v.n) if not ok[i])
+    out = {}
+    for r, m in maj.items():
+        if m["date"] is None:
+            raise UngaParseError(f"roll call {r} has no date", retryable=False)
+        out[r] = RollCall(
+            rcid=r, date=m["date"], session=m["session"], unres=m["unres"], resid=m["resid"],
+            short=(m["short"] or "").strip() or None, descr=(m["descr"] or "").strip() or None,
+            issues=tuple(k for k in ISSUES if m[k] == 1), amend=m["amend"], para=m["para"],
+            important=m["importantvote"], totals={k: m[k] for k in ("yes", "no", "abstain")},
+            first_row=first[r] + 1, inconsistent_rows=bad.get(r, 0))
+    return out, ok
+
+
+# ----------------------------------------------------------------------------- atlas tables
+
+
+def _period(d: date) -> tuple[date, date]:
+    return d, d + timedelta(days=1)
+
+
+def vote_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
+              crosswalk: StateCodeCrosswalk) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    from reva.atlas.tables import json_obj
+
+    c = v.cols
+    out = []
+    stats: Counter[str] = Counter()
+    for i in range(v.n):
+        vote = c["vote"][i]
+        if vote == NOT_MEMBER:
+            stats["not_member_rows_skipped"] += 1
+            continue
+        if vote not in VOTE:
+            stats["unknown_vote_code_rows"] += 1
+            continue
+        rc = rcs[c["rcid"][i]]
+        d = c["date"][i] if ok[i] else rc.date
+        res = crosswalk.resolve("cow", c["ccode"][i], d)
+        flags: dict[str, Any] = {"rcid": rc.rcid, "code_resolution": res.reason, "provider_country": c["Country"][i]}
+        if not ok[i]:
+            flags["provider_row_inconsistent"] = ("row's description/symbol/date differ from the roll call's "
+                                                 "majority metadata; excluded from shares and KG")
+            flags["row_unres"] = c["unres"][i]
+            stats["inconsistent_rows"] += 1
+        if res.iso3 is None and res.label:
+            flags["historical_state"] = res.label
+        start, end = _period(rc.date)
+        out.append({
+            "source": ATLAS_SOURCE, "dataset": "votes", "indicator": f"vote|rcid={rc.rcid}", "concept_id": None,
+            "iso3": res.iso3, "provider_geo": f"cow:{c['ccode'][i]}", "entity_qid": None, "period_start": start,
+            "period_end": end, "value": None, "value_text": VOTE[vote], "unit": "vote position",
+            "flags": json_obj(flags), "raw_sha256": raw_sha256,
+            "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME, row=i + 1, column="vote"),
+        })
+        stats[f"vote_{VOTE[vote]}"] += 1
+    return out, dict(stats)
+
+
+def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[str, Any]]:
+    from reva.atlas.tables import MAX_TEXT, json_obj
+
+    out = []
+    for r in sorted(rcs):
+        rc = rcs[r]
+        start, end = _period(rc.date)
+        flags = {"rcid": rc.rcid, "resid": rc.resid, "unres": rc.unres, "session": rc.session, "short": rc.short,
+                 "issue_codes": list(rc.issues), "amend": rc.amend, "para": rc.para, "importantvote": rc.important,
+                 "provider_totals": rc.totals, "provider_inconsistent_rows": rc.inconsistent_rows}
+        out.append({
+            "source": ATLAS_SOURCE, "dataset": "rollcalls", "indicator": f"rollcall|rcid={rc.rcid}",
+            "concept_id": None, "iso3": None, "provider_geo": "UNGA", "entity_qid": None, "period_start": start,
+            "period_end": end, "value": None,
+            "value_text": (rc.descr or rc.short or rc.unres or f"roll call {rc.rcid}")[:MAX_TEXT],
+            "unit": "description", "flags": json_obj(flags), "raw_sha256": raw_sha256,
+            "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME, row=rc.first_row, column="descr"),
+        })
+    return out
+
+
+def share_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
+               crosswalk: StateCodeCrosswalk) -> list[dict[str, Any]]:
+    """Computed counts and yes-shares per (COW code, period, issue); see module docstring."""
+    from reva.atlas.tables import json_obj, year_period
+
+    c = v.cols
+    # votes are grouped by the state the code denotes *at the vote date* (e.g. COW 365 = USSR until
+    # 1991-12-20, then RUS): one group never mixes two states.
+    acc: dict[tuple[int, str | None, str | None, str, int, str], Counter[str]] = defaultdict(Counter)
+    cache: dict[tuple[int, date], Any] = {}
+    for i in range(v.n):
+        vote = c["vote"][i]
+        if vote not in VOTE or not ok[i]:
+            continue
+        rc = rcs[c["rcid"][i]]
+        k = (c["ccode"][i], rc.date)
+        res = cache.get(k)
+        if res is None:
+            res = cache[k] = crosswalk.resolve("cow", c["ccode"][i], rc.date)
+        y = rc.date.year
+        for issue in (*rc.issues, "all"):
+            for grain, p in (("year", y), ("decade", y // 10 * 10)):
+                acc[(c["ccode"][i], res.iso3, res.label if res.iso3 is None else None, grain, p, issue)][
+                    VOTE[vote]] += 1
+    out = []
+    for (ccode, iso3, hist, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
+        if grain == "year":
+            start, end = year_period(p)
+        else:
+            start, end = date(p, 1, 1), date(p + 10, 1, 1)
+        res_reason = "resolved per vote date"
+        n_rec = cnt["yes"] + cnt["no"] + cnt["abstain"]
+        base: dict[str, Any] = {
+            "computed_from": f"Voeten et al. UNGA votes, {DOI} v{DATASET_VERSION} ({VOTES_FILE_NAME})",
+            "issue_code": issue, "issue_label": ISSUE_LABELS.get(issue, "all roll calls"), "grain": grain,
+            "includes": "all roll calls (final passage, paragraph and amendment votes as in the file)",
+            "code_resolution": res_reason,
+        }
+        if issue != "all":
+            base["issue_code_caveat"] = ISSUE_CAVEAT
+        if grain == "decade":
+            base["decade"] = f"{p}s"
+        if hist:
+            base["historical_state"] = hist
+        geo = f"cow:{ccode}" if iso3 is not None or not hist else f"cow:{ccode}|{hist}"
+        vals: dict[str, tuple[str, str, dict[str, Any]]] = {
+            f"n_{k}": (str(cnt[k]), "count", {}) for k in ("yes", "no", "abstain", "absent")
+        }
+        if n_rec:
+            share = cnt["yes"] / n_rec
+            vals["share_yes"] = (f"{share:.6f}".rstrip("0").rstrip(".") if share else "0", "ratio",
+                                 {"formula": "n_yes / (n_yes + n_no + n_abstain); absences excluded",
+                                  "n_recorded": n_rec})
+        for meas, (val, unit, extra) in vals.items():
+            out.append({
+                "source": ATLAS_SOURCE, "dataset": "vote_shares", "indicator": f"{meas}|issue={issue}|grain={grain}",
+                "concept_id": None, "iso3": iso3, "provider_geo": geo, "entity_qid": None,
+                "period_start": start, "period_end": end, "value": val, "value_text": None, "unit": unit,
+                "flags": json_obj({**base, **extra}), "raw_sha256": raw_sha256,
+                "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME,
+                                     filter={"ccode": ccode, "issue": issue, grain: p}),
+            })
+    return out
+
+
+# ----------------------------------------------------------------------------- KG
+
+
+def kg_records(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
+               resolver: StateEntityResolver, issues_only: bool = False) -> tuple[list[KgEntity], list[KgStatement]]:
+    """Roll-call entities + one vote statement per (state, roll call) with a yes/no/abstain position.
+
+    ``issues_only`` restricts vote statements to issue-coded roll calls (smaller KG); the atlas keeps all.
+    """
+    c = v.cols
+    ents: list[KgEntity] = []
+    stmts: list[KgStatement] = []
+    for r in sorted(rcs):
+        rc = rcs[r]
+        subj = f"unga:rcid:{r}"
+        title = rc.short or rc.unres or f"roll call {r}"
+        ents.append(KgEntity(qid=subj, kind="un_roll_call", labels={"en": f"UNGA roll call {r}: {title}"[:500]},
+                             descriptions={"en": (rc.descr or title)[:500]}))
+        pit = rc.date.isoformat()
+        sel = {"file": VOTES_FILE_NAME, "object": FRAME, "row": rc.first_row}
+        if rc.unres:
+            stmts.append(KgStatement(key=f"{r}:symbol", subject=subj, property="unga:resolution_symbol",
+                                     value={"type": "string", "value": rc.unres}, point_in_time=pit, pit_precision=11,
+                                     qualifiers={"caveat": "before 1985 the number may not match the official "
+                                                           "resolution number (Voeten codebook)"},
+                                     raw_sha256=raw_sha256, selector=sel))
+        for issue in rc.issues:
+            stmts.append(KgStatement(key=f"{r}:issue:{issue}", subject=subj, property="unga:issue_code",
+                                     value={"type": "string", "value": issue},
+                                     qualifiers={"label": ISSUE_LABELS[issue], "caveat": ISSUE_CAVEAT},
+                                     raw_sha256=raw_sha256, selector=sel))
+        stmts.append(KgStatement(key=f"{r}:date", subject=subj, property="unga:vote_date",
+                                 value={"type": "time", "time": pit, "precision": 11},
+                                 qualifiers={"session": rc.session, "amend": rc.amend, "para": rc.para,
+                                             "importantvote": rc.important, "provider_totals": rc.totals},
+                                 raw_sha256=raw_sha256, selector=sel))
+    for i in range(v.n):
+        vote = c["vote"][i]
+        if vote not in (1, 2, 3) or not ok[i]:
+            continue
+        rc = rcs[c["rcid"][i]]
+        if issues_only and not rc.issues:
+            continue
+        subj = resolver.entity("cow", c["ccode"][i], rc.date, provider_label=c["Countryname"][i])
+        pos = VOTE[vote]
+        stmts.append(KgStatement(
+            key=f"{rc.rcid}:cow{c['ccode'][i]}", subject=subj, property=f"unga:voted_{pos}",
+            object_qid=f"unga:rcid:{rc.rcid}", point_in_time=rc.date.isoformat(), pit_precision=11,
+            qualifiers={"ccode": c["ccode"][i]}, raw_sha256=raw_sha256,
+            selector={"file": VOTES_FILE_NAME, "object": FRAME, "row": i + 1, "column": "vote"}))
+    return ents, stmts
+
+
+# ----------------------------------------------------------------------------- connector + ingest
+
+
+class UngaVotesConnector:
+    def describe(self) -> Any:
+        from reva.adapters.connectors.base import module_digest
+
+        return make_spec(
+            name=CONNECTOR_NAME, version=CONNECTOR_VERSION, source_key=SOURCE_KEY,
+            provider="Harvard Dataverse (Voeten, Strezhnev & Bailey)", licence=RIGHTS["licence"],
+            allowed_hosts=HOSTS, dataset_ids=(f"{DOI}@{DATASET_VERSION}#{VOTES_FILE_ID}",),
+            field_mappings={"geo": "COW ccode", "time": "date of the roll call"}, units={"vote": "vote position"},
+            geography=("world",), time_semantics="date of each roll-call vote (1946-12 .. 2023-12)",
+            lineage_family="unga_votes_voeten", cadence_seconds=90 * 86400,
+            revision_strategy="pinned dataset version 33.0 and file id; md5 checked against Dataverse metadata",
+            max_response_bytes=MAX_BYTES, max_pages=1, parser_version=PARSER_VERSION,
+            code_digest=module_digest(UngaVotesConnector),
+        )
+
+    def plan(self, cursor: Any, budget: Any) -> Any:
+        from reva.ports.connectors import FetchPlan
+
+        return FetchPlan(connector=CONNECTOR_NAME, items=fetch_items(), pagination="none (3 files)")
+
+    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
+        return await fetch(item, http)
+
+    def parse(self, raw: RawAcquisition) -> Any:
+        from reva.ports.connectors import ObservationBatch
+
+        yield ObservationBatch(connector=CONNECTOR_NAME, connector_version=CONNECTOR_VERSION, item_key=raw.item.key,
+                               observations=(), metadata={"bytes": len(raw.body)})
+
+    def validate(self, batch: Any) -> Any:
+        from reva.ports.connectors import QualityReport
+
+        return QualityReport(outcome="pass")
+
+    def next_cursor(self, plan: Any, outcomes: Sequence[Any]) -> Any:
+        from reva.ports.connectors import Cursor
+
+        return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})
+
+
+def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk, qid_for_iso3: Mapping[str, str],
+          kg_issues_only: bool = False) -> dict[str, Any]:
+    meta = check_version(raws["version"].body, raws["votes"].body)
+    sha = hashlib.sha256(raws["votes"].body).hexdigest()
+    v = parse_votes(raws["votes"].body)
+    rcs, ok = rollcalls(v)
+    votes, stats = vote_rows(v, rcs, ok, raw_sha256=sha, crosswalk=crosswalk)
+    resolver = StateEntityResolver(crosswalk, qid_for_iso3)
+    ents, stmts = kg_records(v, rcs, ok, raw_sha256=sha, resolver=resolver, issues_only=kg_issues_only)
+    return {
+        "meta": meta, "sha": sha, "votes": votes, "rollcalls": rollcall_rows(rcs, raw_sha256=sha),
+        "shares": share_rows(v, rcs, ok, raw_sha256=sha, crosswalk=crosswalk), "stats": stats,
+        "entities": ents + resolver.code_entities(), "statements": stmts, "n_rows": v.n, "n_rollcalls": len(rcs),
+        "date_range": [min(r.date for r in rcs.values()).isoformat(), max(r.date for r in rcs.values()).isoformat()],
+        "unresolved_state_codes": {k: sorted(x) for k, x in resolver.unresolved.items()},
+    }
+
+
+async def ingest(engine: Any, store: Any, http: Any, *, crosswalk: StateCodeCrosswalk,
+                 qid_for_iso3: Mapping[str, str], kg_loader: Any = None, kg_issues_only: bool = False) -> dict[str, Any]:
+    from reva.atlas.tables import register_atlas_table
+    from reva.evidence.ingest import publish_acquisition
+
+    spec = UngaVotesConnector().describe()
+    conn = UngaVotesConnector()
+    raws = {it.key: await conn.fetch(it, http) for it in fetch_items()}
+    out = build(raws, crosswalk=crosswalk, qid_for_iso3=qid_for_iso3, kg_issues_only=kg_issues_only)
+    shas = []
+    for raw in raws.values():
+        s = publish_acquisition(engine, store, spec, raw, [], [], actor="worker:atlas")
+        shas.append(s.raw_sha256)
+    origin = raws["votes"].origin
+    note = (f"Voeten UNGA roll calls {out['date_range'][0]}..{out['date_range'][1]} ({out['n_rollcalls']} roll calls) "
+            f"from {DOI} v{DATASET_VERSION}")
+    res: dict[str, Any] = {"stats": out["stats"], "meta": out["meta"]}
+    for ds, rows, extra in (("votes", out["votes"], "; not-a-member rows skipped"),
+                            ("rollcalls", out["rollcalls"], "; provider_geo UNGA (not a country)"),
+                            ("vote_shares", out["shares"], "; COMPUTED counts and yes-shares (see flags)")):
+        res[ds] = register_atlas_table(engine, store, source=ATLAS_SOURCE, dataset=ds, frame=atlas_frame(rows),
+                                       raw_sha256s=[out["sha"]], parser_version=PARSER_VERSION, origin=origin,
+                                       rights=RIGHTS, coverage_note=note + extra)
+    if kg_loader is not None:
+        res["kg"] = kg_loader(out["entities"], out["statements"], [out["sha"]], origin, raws["votes"].retrieved_at)
+    res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
+    return res

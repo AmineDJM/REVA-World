@@ -1,0 +1,16 @@
+id: history.revolutions
+domain: history
+owner: KGHIST
+description: >-
+  Revolutions: instances of revolution (Q10931) or of a subclass (political revolution, ...). Snapshots
+  keep country (P17), location (P276), start/end (P580/P582), participants (P710), part of (P361),
+  cause/effect (asserted by Wikidata only) and the regime it replaced/produced (P1365/P1366 when
+  present).
+purpose: seed_entities
+entity_kind: event
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q10931 .
+  }
+max_rows: 5000
+expand_hops: 1

@@ -1,0 +1,405 @@
+# Geography concepts of the atlas (agent A-GEO). Provider-declared, not human-reviewed.
+# Sources: Natural Earth 1:10m Admin-0 (public domain; values *computed* by REVA from the geometry, see
+# src/reva/adapters/connectors/atlas_naturalearth10m.py), GeoNames countryInfo (CC BY 4.0), World Bank CCKP
+# climatologies (CC BY 4.0; CRU TS 4.09 and ERA5), INFORM Risk 2026 natural-hazard scores (EC JRC).
+# Not catalogued: per-neighbour border rows (naturalearth.admin0_10m_borders: one indicator per partner;
+# consumed by LINKS and the KG), exclave rows, monthly climate normals (in the CRU table), elevation
+# (no small open per-country DEM summary found; not computed). Coverage: docs/dev/v3_a_geo.md.
+domain: geography
+labels:
+  fr: Géographie
+  en: Geography
+maintainer: A-GEO
+concepts:
+- id: geography.area_ne10m_computed
+  labels:
+    fr: Superficie calculée (Natural Earth 1:10m)
+    en: Area computed from Natural Earth 1:10m
+  definition: WGS 84 ellipsoidal area of the country's Natural Earth 1:10m Admin-0 map-unit polygons, including inland water
+    inside the polygons; computed by REVA (authalic-latitude equal-area method). Natural Earth default (de facto) view.
+  unit: km2
+  domain: geography
+  subdomain: area
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.area_km2
+  provider_declared: true
+  notes: Computed, not declared by a statistical office. Differs from official areas where territorial scope differs (overseas
+    parts, disputed areas, Svalbard...) and for small islands (1:10m generalisation). See docs/dev/v3_a_geo.md.
+- id: geography.area_geonames_declared
+  labels:
+    fr: Superficie déclarée (GeoNames)
+    en: Area as declared by GeoNames
+  definition: Country area in square kilometres as listed in GeoNames countryInfo.txt (undated; definition not stated by GeoNames,
+    mostly total area incl. inland water).
+  unit: km2
+  domain: geography
+  subdomain: area
+  value_kind: numeric
+  source_order:
+  - geonames.countryinfo.area_km2
+  provider_declared: true
+  notes: 'Kept as a separate concept from the computed area: definitions are not the same.'
+- id: geography.boundary_lakes_area_ne10m
+  labels:
+    fr: Superficie des grands lacs frontaliers (Natural Earth)
+    en: Area of major boundary lakes (Natural Earth 1:10m)
+  definition: Area removed from the country's Admin-0 polygon by Natural Earth's 'countries without boundary lakes' layer
+    (Great Lakes, Lake Victoria, Lake Malawi, Lake Tanganyika, Aral Sea...). Only countries with such lakes have a value.
+  unit: km2
+  domain: geography
+  subdomain: area
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.boundary_lakes_area_km2
+  provider_declared: true
+- id: geography.coastline_length_ne10m
+  labels:
+    fr: Longueur du littoral à l'échelle 1:10M (Natural Earth)
+    en: Coastline length at 1:10m scale (Natural Earth)
+  definition: 'Length of the country''s Admin-0 polygon boundary not shared with another Admin-0 polygon, measured on WGS
+    84 at Natural Earth 1:10,000,000 scale, including islands, excluding Caspian Sea shores and antimeridian/pole cuts. Coastline
+    length is scale-dependent: values at another scale differ (often by a factor of 2 or more).'
+  unit: km
+  domain: geography
+  subdomain: coast
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.coastline_length_km|scale=ne_1:10m
+  provider_declared: true
+  notes: Always quote with its scale. Not comparable with CIA World Factbook coastlines (larger-scale sources).
+- id: geography.caspian_shore_length_ne10m
+  labels:
+    fr: Rivage de la Caspienne à 1:10M (Natural Earth)
+    en: Caspian Sea shore length at 1:10m (Natural Earth)
+  definition: Length of the country's unshared Admin-0 boundary on the Caspian Sea (endorheic; not sea coast), Natural Earth
+    1:10m.
+  unit: km
+  domain: geography
+  subdomain: coast
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.caspian_shore_km|scale=ne_1:10m
+  provider_declared: true
+- id: geography.land_border_length_ne10m
+  labels:
+    fr: Longueur des frontières terrestres à 1:10M (Natural Earth)
+    en: Land border length at 1:10m (Natural Earth)
+  definition: Total length of Admin-0 polygon edges the country shares with other Admin-0 features (countries and Natural
+    Earth disputed/indeterminate features), including river and lake boundaries, Natural Earth 1:10m, WGS 84 geodesic.
+  unit: km
+  domain: geography
+  subdomain: borders
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.land_border_length_km|scale=ne_1:10m
+  provider_declared: true
+  notes: 'Per-neighbour lengths, boundary classes and disputed flags: atlas table naturalearth.admin0_10m_borders (indicator
+    land_border_km|partner=<ISO3 or NE code>) and KG statements P47 (source naturalearth.admin0_10m).'
+- id: geography.land_neighbours_count_ne10m
+  labels:
+    fr: Nombre de voisins terrestres (Natural Earth 1:10m)
+    en: Number of land neighbours (Natural Earth 1:10m)
+  definition: Number of distinct Admin-0 features sharing at least one polygon edge with the country (Natural Earth 1:10m
+    default view); neighbours touching only at a point are not counted.
+  unit: count
+  domain: geography
+  subdomain: borders
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.land_neighbours_count
+  provider_declared: true
+- id: geography.landlocked
+  labels:
+    fr: Pays enclavé (sans littoral)
+    en: Landlocked
+  definition: '''yes'' when the country has no sea coastline in Natural Earth 1:10m (Caspian-only shores count as landlocked,
+    the usual convention); flags.doubly_landlocked when every land neighbour is landlocked too.'
+  unit: '1'
+  domain: geography
+  subdomain: coast
+  value_kind: text
+  source_order:
+  - naturalearth.admin0_10m.landlocked
+  provider_declared: true
+- id: geography.enclave_of
+  labels:
+    fr: Enclavé dans (pays entièrement entouré)
+    en: Enclave of (fully surrounded by)
+  definition: For a country with no coastline and exactly one land neighbour (e.g. Lesotho, San Marino, Vatican), the code
+    of that neighbour (Natural Earth 1:10m).
+  unit: '1'
+  domain: geography
+  subdomain: borders
+  value_kind: text
+  source_order:
+  - naturalearth.admin0_10m.enclave_of
+  provider_declared: true
+- id: geography.land_components_count_ne10m
+  labels:
+    fr: Nombre de parties terrestres (Natural Earth 1:10m)
+    en: Number of land pieces (Natural Earth 1:10m)
+  definition: Number of connected pieces (main territory, islands, exclaves) of the country's Natural Earth 1:10m Admin-0
+    geometry; polygons joined by shared internal edges or split at the antimeridian count once.
+  unit: count
+  domain: geography
+  subdomain: area
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m.land_components_count
+  provider_declared: true
+  notes: 'Exclaves: indicator exclave_area_km2|component=<n> in naturalearth.admin0_10m with exclave_kind (enclosed/coastal)
+    and neighbours in flags.'
+- id: geography.population_geonames
+  labels:
+    fr: Population (instantané GeoNames)
+    en: Population (GeoNames snapshot)
+  definition: Population as declared by GeoNames countryInfo.txt; undated snapshot maintained by GeoNames.
+  unit: persons
+  domain: geography
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - geonames.countryinfo.population
+  provider_declared: true
+  notes: Not a census or UN estimate; prefer the population domain (WPP, WDI) for statistics.
+- id: geography.capital_geonames
+  labels:
+    fr: Capitale (GeoNames)
+    en: Capital (GeoNames)
+  definition: Capital city name as listed by GeoNames.
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.capital
+  provider_declared: true
+- id: geography.continent_geonames
+  labels:
+    fr: Continent (code GeoNames)
+    en: Continent (GeoNames code)
+  definition: 'GeoNames continent code: AF, AN, AS, EU, NA, OC, SA.'
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.continent
+  provider_declared: true
+- id: geography.languages_geonames
+  labels:
+    fr: Langues (codes GeoNames)
+    en: Languages (GeoNames codes)
+  definition: Comma-separated language locale codes (ISO 639 primary tag, optional ISO 3166 region), ordered by number of
+    speakers as declared by GeoNames.
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.languages
+  provider_declared: true
+- id: geography.currency_code_geonames
+  labels:
+    fr: Monnaie (code ISO 4217, GeoNames)
+    en: Currency code (ISO 4217, GeoNames)
+  definition: ISO 4217 currency code as listed by GeoNames.
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.currency_code
+  provider_declared: true
+- id: geography.currency_name_geonames
+  labels:
+    fr: Nom de la monnaie (GeoNames)
+    en: Currency name (GeoNames)
+  definition: Currency name as listed by GeoNames.
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.currency_name
+  provider_declared: true
+- id: geography.neighbours_geonames
+  labels:
+    fr: Voisins (codes ISO2, GeoNames)
+    en: Neighbours (ISO2 codes, GeoNames)
+  definition: Comma-separated ISO 3166 alpha-2 codes of neighbouring countries as declared by GeoNames (no lengths; may include
+    maritime/lake neighbours as GeoNames sees fit).
+  unit: '1'
+  domain: geography
+  subdomain: country_info
+  value_kind: text
+  source_order:
+  - geonames.countryinfo.neighbours
+  provider_declared: true
+- id: geography.climate.tas_annual_1991_2020
+  labels:
+    fr: Température moyenne annuelle 1991-2020
+    en: Mean annual temperature 1991-2020
+  definition: 1991-2020 climatological mean of near-surface air temperature, national aggregate of a gridded product as published
+    by the World Bank Climate Change Knowledge Portal.
+  unit: °C
+  domain: geography
+  subdomain: climate
+  value_kind: numeric
+  source_order:
+  - cckp.cru_ts4_09_clim_1991_2020.tas|period=annual
+  - cckp.era5_clim_1991_2020.tas|period=annual
+  provider_declared: true
+  notes: CRU TS 4.09 (station-based gridded) first, ERA5 reanalysis second; both kept per source, never blended. Monthly normals
+    (tas, tasmax, tasmin, pr) are in the CRU table as <var>|month=MM.
+- id: geography.climate.pr_annual_1991_2020
+  labels:
+    fr: Précipitations annuelles moyennes 1991-2020
+    en: Mean annual precipitation 1991-2020
+  definition: 1991-2020 climatological mean annual precipitation total, national aggregate of a gridded product (World Bank
+    CCKP).
+  unit: mm/year
+  domain: geography
+  subdomain: climate
+  value_kind: numeric
+  source_order:
+  - cckp.cru_ts4_09_clim_1991_2020.pr|period=annual
+  - cckp.era5_clim_1991_2020.pr|period=annual
+  provider_declared: true
+  notes: CRU and ERA5 precipitation can differ markedly (e.g. France 841 vs 947 mm); the best-available view names its source.
+- id: geography.hazard.inform_ha_nat
+  labels:
+    fr: Exposition aux aléas naturels (INFORM, composite)
+    en: Natural hazard & exposure (INFORM, composite)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT of the natural hazard & exposure dimension;
+    a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_eq
+  labels:
+    fr: Exposition aux séismes (INFORM)
+    en: Earthquake exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.EQ of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.EQ
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_fl
+  labels:
+    fr: Exposition aux crues fluviales (INFORM)
+    en: River flood exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.FL of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.FL
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_cfl
+  labels:
+    fr: Exposition aux submersions côtières (INFORM)
+    en: Coastal flood exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.CFL of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.CFL
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_tc
+  labels:
+    fr: Exposition aux cyclones tropicaux (INFORM)
+    en: Tropical cyclone exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.TC of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.TC
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_dr
+  labels:
+    fr: Exposition à la sécheresse (INFORM)
+    en: Drought exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.DR of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.DR
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_ts
+  labels:
+    fr: Exposition aux tsunamis (INFORM)
+    en: Tsunami exposure (INFORM)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.TS of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.TS
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.hazard.inform_ha_nat_epi
+  labels:
+    fr: Exposition aux épidémies (INFORM, dimension aléas naturels)
+    en: Epidemic exposure (INFORM natural-hazard dimension)
+  definition: INFORM Risk 2026 score (0-10, higher = more exposed) for indicator HA.NAT.EPI of the natural hazard & exposure
+    dimension; a modelled composite index, not an observation.
+  unit: index (0-10)
+  domain: geography
+  subdomain: hazards
+  value_kind: numeric
+  source_order:
+  - inform.risk_2026_natural_hazards.HA.NAT.EPI
+  provider_declared: true
+  notes: Edition-year period (INFORM Risk 2026); inputs are mostly from earlier years. Licence to be confirmed by a maintainer
+    (EC reuse policy).
+- id: geography.disputed_area_ne10m
+  labels:
+    fr: Superficie des zones disputées (Natural Earth)
+    en: Area of disputed areas (Natural Earth)
+  definition: Area of a Natural Earth 1:10m disputed / breakaway / claim polygon, attached to the Admin-0 feature Natural
+    Earth attaches it to (administering side in the de facto view); provider_geo is the Natural Earth BRK_A3 code and flags.ne_note
+    quotes who administers and who claims.
+  unit: km2
+  domain: geography
+  subdomain: disputes
+  value_kind: numeric
+  source_order:
+  - naturalearth.admin0_10m_disputed.disputed_area_km2
+  provider_declared: true
+  notes: Several rows per country are possible (one per area, provider_geo distinguishes them). Not a judgement on any claim.

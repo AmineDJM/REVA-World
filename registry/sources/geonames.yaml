@@ -1,0 +1,15 @@
+# V3 (agent A-GEO): GeoNames country information file (src/reva/adapters/connectors/atlas_geonames.py).
+source_key: geonames.countryinfo
+title: GeoNames countryInfo.txt
+provider_url: https://download.geonames.org/export/dump/
+lineage_family: geonames
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "GeoNames (www.geonames.org)"
+metadata:
+  allowed_hosts: [download.geonames.org]
+  editorial_status: >-
+    GeoNames-declared values (area, capital, population snapshot, languages, currency, neighbours);
+    undated and partly community-maintained
+  cadence: monthly

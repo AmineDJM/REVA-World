@@ -1,0 +1,7 @@
+{
+ "file": "characteristics_subset.zip",
+ "sha256": "a6aeaa590a409a86da755575d6c7b378a384ebbcb1568421abad511f65c942f9",
+ "real_sha256": "761308d6addd1cfca493540911c223067aa00a7ba863ec500490073185f4af6d",
+ "real_bytes": 118231611,
+ "derivation": "subset: COW codes ['2', '220', '255', '260', '340', '365', '670'], years >= 1990, columns ['cowcode', 'country', 'year', 'systid', 'systyear', 'evntid', 'c_inforce', 'coding_available', 'coding_imputed', 'votemin', 'votemin_article', 'votemin_comments', 'cappun', 'cappun_article', 'cappun_comments', 'marriage', 'marriage_article', 'marriage_comments', 'samesexm', 'samesexm_article', 'samesexm_comments', 'civmar', 'civmar_article', 'civmar_comments']; cell texts verbatim. Not served by FixtureHttp: the live item is blocked by the 50 MB response bound; tests call parse_characteristics directly."
+}

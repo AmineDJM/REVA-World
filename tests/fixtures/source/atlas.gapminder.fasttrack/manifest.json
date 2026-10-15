@@ -1,0 +1,80 @@
+[
+  {
+    "request_fingerprint": "1353a460a55691c42b7a7926209994a697aba8acb0659a3f5965dacc517d3eae",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/countries_etc_datapoints/ddf--datapoints--gdp_pcap--by--country--time.csv",
+    "file": "1353a460a55691c4.csv",
+    "sha256": "ca89f9378755467742aa5030fc2a1772b91257d8488bd226d558681f302353ad",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED: geos ['deu', 'dza', 'fra', 'kos', 'twn', 'usa'] only"
+  },
+  {
+    "request_fingerprint": "ea0832fa2edd71001af56034a18485966c22f9d8c29daed984c431a83daa8859",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/countries_etc_datapoints/ddf--datapoints--lex--by--country--time.csv",
+    "file": "ea0832fa2edd7100.csv",
+    "sha256": "a5788396a9a383c9aba1225fd78ec2f58f89fd2968434d3daa9d9f48a42fa87d",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED: geos ['deu', 'dza', 'fra', 'kos', 'twn', 'usa'] only"
+  },
+  {
+    "request_fingerprint": "c3417821529be87f43989905e33695075c9933c941019d32e811587652453fbb",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/countries_etc_datapoints/ddf--datapoints--pop--by--country--time.csv",
+    "file": "c3417821529be87f.csv",
+    "sha256": "89ec92b36a5140dfa237cfb0e486cbaa1ffd356e009841bb20de01bc57d8453b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED: geos ['deu', 'dza', 'fra', 'kos', 'twn', 'usa'] only"
+  },
+  {
+    "request_fingerprint": "39b8092a5bc3ffaf41a5c1a890f5d1fe221b5f3c8d1c37c15a1db4b83b102147",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/datapackage.json",
+    "file": "39b8092a5bc3ffaf.json",
+    "sha256": "827c1f828c10b11053ac51def5dd612efc483171230409c6ff17fded56da06d4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED: top-level keys only"
+  },
+  {
+    "request_fingerprint": "96ee8e98961de753d69f1912599adc684fbf9d7d30d6044d7d99e5472a7579a2",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/ddf--concepts.csv",
+    "file": "96ee8e98961de753.csv",
+    "sha256": "e56951bf3bfb557dcfacf5984d3f39b60ae39c8b1a0b99f03978cf2aca241c88",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "TRIMMED: pop, lex, gdp_pcap rows only"
+  },
+  {
+    "request_fingerprint": "7294fbb904a1c4246ea9e3d4a123fb412b3e867d94354d9c4f33e16dc90cc128",
+    "url": "https://raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack/master/ddf--entities--geo--country.csv",
+    "file": "7294fbb904a1c424.csv",
+    "sha256": "0b24dc8a3bc6c35991f695fb8ede4c4bb1c63af822554b7683fb1f510c1654da",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T22:05:11+00:00",
+    "licence": "CC BY 4.0",
+    "fixture_note": "live"
+  }
+]

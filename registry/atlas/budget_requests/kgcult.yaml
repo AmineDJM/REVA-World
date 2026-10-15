@@ -1,0 +1,8 @@
+agent: KGCULT
+requests:
+  - source_key: unesco.whc
+    daily_requests: 4
+    expected_bytes_per_day: 1500000
+    reason: >-
+      data.unesco.org dataset whc001 (World Heritage List, CC BY-SA 4.0): one dataset record (~26 kB) +
+      one JSON export of 19 columns (~0.7 MB) per run; weekly cadence; 4/day allows one retry of a run.

@@ -1,0 +1,23 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "live_openai_429_insufficient_quota",
+ "recorded_at": "2026-10-15T22:24:29+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 429,
+ "latency_ms": 1785.3,
+ "prompt_version": "nlqa-plan-1.0.0",
+ "prompt_sha256": "10879fd1eb685aa383630633394c9312c5856f3345d26cd4f85db4526f23a2e8",
+ "catalog_digest": "63d70855831bb2031506497c04880b649b74d3ed35bd6f57ec42af7a728bb937",
+ "text": "Quel est le salaire minimum au Sénégal ?",
+ "text_sha256": "f80f5e182e22a7aac9a5d472f79ebb7dc6178186a986b12ace748cbc682dd3ff",
+ "response_body": {
+  "error": {
+   "message": "You have no credits remaining. Add credits to continue using the API at https://platform.openai.com/settings/organization/billing/.",
+   "type": "insufficient_quota",
+   "param": null,
+   "code": "credit_balance_exhausted"
+  }
+ },
+ "note": "Real response of the first live capture attempt (2026-10-15): the OpenAI account answered HTTP 429 insufficient_quota / credit_balance_exhausted. Kept as a recording of that failure; the question is answered by the keyword planner."
+}

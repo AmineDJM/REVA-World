@@ -1,0 +1,661 @@
+# Environment (agent A-QOL). Provider-declared concepts, not human-reviewed.
+# Sources: OWID co2-data compilation (Global Carbon Budget, Jones et al.; CC BY 4.0), OWID grapher charts
+# (Climate Watch sectoral GHG, CC BY 4.0; ERA5 temperature anomalies, Copernicus licence), UNDP HDR25 PHDI
+# components. Original source per cell in flags.original_source.
+domain: environment
+labels:
+  fr: Environnement
+  en: Environment
+maintainer: A-QOL
+concepts:
+- id: environment.co2
+  labels:
+    fr: Émissions annuelles de CO₂ (fossiles et industrie)
+    en: Annual CO₂ emissions
+  definition: 'Annual CO₂ emissions: Annual total emissions of carbon dioxide (CO₂), excluding land-use change, measured in
+    million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.co2_per_capita
+  labels:
+    fr: Émissions de CO₂ par habitant
+    en: CO₂ emissions per capita
+  definition: 'CO₂ emissions per capita: Carbon dioxide (CO₂) emissions from burning fossil fuels and industrial processes.
+    This includes emissions from transport, electricity generation, and heating, but not land-use change.'
+  unit: tonnes per person (t/person)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/]; Population
+    based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.co2_per_gdp
+  labels:
+    fr: Émissions de CO₂ par unité de PIB
+    en: Annual CO₂ emissions per GDP (kg per international-$)
+  definition: 'Annual CO₂ emissions per GDP (kg per international-$): Annual total emissions of carbon dioxide (CO₂), excluding
+    land-use change, measured in kilograms per dollar of GDP (2011 international-$).'
+  unit: kilograms per international-$ (kg/$)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_per_gdp
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/]; Bolt
+    and van Zanden – Maddison Project Database 2023 [https://www.rug.nl/ggdc/historicaldevelopment/maddison/releases/maddison-project-database-2023].'
+- id: environment.co2_per_unit_energy
+  labels:
+    fr: Émissions de CO₂ par unité d'énergie
+    en: CO₂ emissions per unit energy
+  definition: 'CO₂ emissions per unit energy: Carbon dioxide (CO₂) emitted per unit of primary energy consumption, measured
+    in grams of CO₂ per kilowatt-hour.'
+  unit: grams per kilowatt-hour (g/kWh)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_per_unit_energy
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/]; U.S.
+    Energy Information Administration - International Energy Data (2026) [https://www.eia.gov/opendata/bulkfiles.php]; Energy
+    Institute - Statistical Review of World Energy (2025) [https://www.energyinst.org/statistical-review/].'
+- id: environment.co2_growth_prct
+  labels:
+    fr: Croissance annuelle des émissions de CO₂ (%)
+    en: Annual CO₂ emissions growth (%)
+  definition: 'Annual CO₂ emissions growth (%): Annual percentage growth in total emissions of carbon dioxide (CO₂), excluding
+    land-use change.'
+  unit: '%'
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_growth_prct
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.co2_including_luc
+  labels:
+    fr: Émissions de CO₂ y compris changement d'affectation des terres
+    en: Annual CO₂ emissions including land-use change
+  definition: 'Annual CO₂ emissions including land-use change: Annual total emissions of carbon dioxide (CO₂), including land-use
+    change, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_including_luc
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.co2_including_luc_per_capita
+  labels:
+    fr: Émissions de CO₂ par habitant y compris changement d'affectation des terres
+    en: Annual CO₂ emissions including land-use change per capita
+  definition: 'Annual CO₂ emissions including land-use change per capita: Annual emissions of carbon dioxide (CO₂), including
+    land-use change, measured in tonnes per person.'
+  unit: tonnes per person (t/person)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.co2_including_luc_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/]; Population
+    based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.land_use_change_co2
+  labels:
+    fr: Émissions de CO₂ dues au changement d'affectation des terres
+    en: Annual CO₂ emissions from land-use change
+  definition: 'Annual CO₂ emissions from land-use change: Annual emissions of carbon dioxide (CO₂) from land-use change, measured
+    in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2
+  source_order:
+  - owid.co2.land_use_change_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.coal_co2
+  labels:
+    fr: Émissions de CO₂ du charbon
+    en: Annual CO₂ emissions from coal
+  definition: 'Annual CO₂ emissions from coal: Annual emissions of carbon dioxide (CO₂) from coal, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.coal_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.oil_co2
+  labels:
+    fr: Émissions de CO₂ du pétrole
+    en: Annual CO₂ emissions from oil
+  definition: 'Annual CO₂ emissions from oil: Annual emissions of carbon dioxide (CO₂) from oil, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.oil_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.gas_co2
+  labels:
+    fr: Émissions de CO₂ du gaz
+    en: Annual CO₂ emissions from gas
+  definition: 'Annual CO₂ emissions from gas: Annual emissions of carbon dioxide (CO₂) from gas, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.gas_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.cement_co2
+  labels:
+    fr: Émissions de CO₂ du ciment
+    en: Annual CO₂ emissions from cement
+  definition: 'Annual CO₂ emissions from cement: Annual emissions of carbon dioxide (CO₂) from cement, measured in million
+    tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.cement_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.flaring_co2
+  labels:
+    fr: Émissions de CO₂ du torchage
+    en: Annual CO₂ emissions from flaring
+  definition: 'Annual CO₂ emissions from flaring: Annual emissions of carbon dioxide (CO₂) from flaring, measured in million
+    tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.flaring_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.other_industry_co2
+  labels:
+    fr: Émissions de CO₂ des autres industries
+    en: Annual CO₂ emissions from other industry
+  definition: 'Annual CO₂ emissions from other industry: Annual emissions of carbon dioxide (CO₂) from other industry sources,
+    measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_by_fuel
+  source_order:
+  - owid.co2.other_industry_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.consumption_co2
+  labels:
+    fr: Émissions de CO₂ fondées sur la consommation
+    en: Annual consumption-based CO₂ emissions
+  definition: 'Annual consumption-based CO₂ emissions: Annual consumption-based emissions of carbon dioxide (CO₂), measured
+    in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_consumption
+  source_order:
+  - owid.co2.consumption_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.consumption_co2_per_capita
+  labels:
+    fr: Émissions de CO₂ fondées sur la consommation par habitant
+    en: Per capita consumption-based CO₂ emissions
+  definition: 'Per capita consumption-based CO₂ emissions: Annual consumption-based emissions of carbon dioxide (CO₂), measured
+    in tonnes per person.'
+  unit: tonnes per person (t/person)
+  domain: environment
+  subdomain: co2_consumption
+  source_order:
+  - owid.co2.consumption_co2_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/]; Population
+    based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.trade_co2
+  labels:
+    fr: CO₂ incorporé dans les échanges (net)
+    en: Annual CO₂ emissions embedded in trade
+  definition: 'Annual CO₂ emissions embedded in trade: Annual net carbon dioxide (CO₂) emissions embedded in trade, measured
+    in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_consumption
+  source_order:
+  - owid.co2.trade_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.trade_co2_share
+  labels:
+    fr: Part du CO₂ incorporé dans les échanges
+    en: Share of annual CO₂ emissions embedded in trade
+  definition: 'Share of annual CO₂ emissions embedded in trade: Annual net carbon dioxide (CO₂) emissions embedded in trade,
+    measured as a percentage of emissions of CO₂.'
+  unit: '%'
+  domain: environment
+  subdomain: co2_consumption
+  source_order:
+  - owid.co2.trade_co2_share
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.cumulative_co2
+  labels:
+    fr: Émissions cumulées de CO₂
+    en: Cumulative CO₂ emissions
+  definition: 'Cumulative CO₂ emissions: Total cumulative emissions of carbon dioxide (CO₂), excluding land-use change, since
+    the first year of available data, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_cumulative
+  source_order:
+  - owid.co2.cumulative_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.cumulative_co2_including_luc
+  labels:
+    fr: Émissions cumulées de CO₂ y compris affectation des terres
+    en: Cumulative CO₂ emissions including land-use change
+  definition: 'Cumulative CO₂ emissions including land-use change: Total cumulative emissions of carbon dioxide (CO₂), including
+    land-use change, since the first year of available data, measured in million tonnes.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: co2_cumulative
+  source_order:
+  - owid.co2.cumulative_co2_including_luc
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.share_global_co2
+  labels:
+    fr: Part des émissions mondiales annuelles de CO₂
+    en: Share of global annual CO₂ emissions
+  definition: 'Share of global annual CO₂ emissions: Annual total emissions of carbon dioxide (CO₂), excluding land-use change,
+    measured as a percentage of global emissions of CO₂ in the same year.'
+  unit: '%'
+  domain: environment
+  subdomain: co2_cumulative
+  source_order:
+  - owid.co2.share_global_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.share_global_cumulative_co2
+  labels:
+    fr: Part des émissions mondiales cumulées de CO₂
+    en: Share of global cumulative CO₂ emissions
+  definition: 'Share of global cumulative CO₂ emissions: Total cumulative emissions of carbon dioxide (CO₂), excluding land-use
+    change, since the first year of available data, measured as a percentage of global total cumulative emissions of CO₂.'
+  unit: '%'
+  domain: environment
+  subdomain: co2_cumulative
+  source_order:
+  - owid.co2.share_global_cumulative_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Global Carbon Budget (2025) [https://globalcarbonbudget.org/].'
+- id: environment.total_ghg
+  labels:
+    fr: Émissions annuelles de gaz à effet de serre (y compris affectation des terres)
+    en: Annual greenhouse gas emissions including land use
+  definition: 'Annual greenhouse gas emissions including land use: Greenhouse gas emissions are measured in tonnes of carbon
+    dioxide-equivalents over a 100-year timescale.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.total_ghg
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.total_ghg_excluding_lucf
+  labels:
+    fr: Émissions annuelles de GES hors affectation des terres
+    en: Annual greenhouse gas emissions from fossil fuels and industry
+  definition: 'Annual greenhouse gas emissions from fossil fuels and industry: Greenhouse gas emissions are measured in tonnes
+    of carbon dioxide-equivalents over a 100-year timescale.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.total_ghg_excluding_lucf
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.ghg_per_capita
+  labels:
+    fr: Émissions de GES par habitant (y compris affectation des terres)
+    en: Per capita greenhouse gas emissions including land use
+  definition: 'Per capita greenhouse gas emissions including land use: Greenhouse gas emissions are measured in tonnes per
+    person of carbon dioxide-equivalents over a 100-year timescale.'
+  unit: tonnes of CO₂ equivalents per person (t/person)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.ghg_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest];
+    Population based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.ghg_excluding_lucf_per_capita
+  labels:
+    fr: Émissions de GES par habitant hors affectation des terres
+    en: Per capita greenhouse gas emissions from fossil fuels and industry
+  definition: 'Per capita greenhouse gas emissions from fossil fuels and industry: Greenhouse gas emissions are measured in
+    tonnes per person of carbon dioxide-equivalents over a 100-year timescale.'
+  unit: tonnes of CO₂ equivalents per person (t/person)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.ghg_excluding_lucf_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest];
+    Population based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.methane
+  labels:
+    fr: Émissions annuelles de méthane
+    en: Annual methane emissions including land use
+  definition: 'Annual methane emissions including land use: Measured in tonnes of carbon dioxide-equivalents over a 100-year
+    timescale.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.methane
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.methane_per_capita
+  labels:
+    fr: Émissions de méthane par habitant
+    en: Per capita methane emissions including land use
+  definition: 'Per capita methane emissions including land use: Measured in tonnes per person of carbon dioxide-equivalents
+    over a 100-year timescale.'
+  unit: tonnes of CO₂ equivalents per person (t/person)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.methane_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest];
+    Population based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.nitrous_oxide
+  labels:
+    fr: Émissions annuelles de protoxyde d'azote
+    en: Annual nitrous oxide emissions including land use
+  definition: 'Annual nitrous oxide emissions including land use: Measured in tonnes of carbon dioxide-equivalents over a
+    100-year timescale.'
+  unit: million tonnes (Mt)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.nitrous_oxide
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.nitrous_oxide_per_capita
+  labels:
+    fr: Émissions de protoxyde d'azote par habitant
+    en: Per capita nitrous oxide emissions including land use
+  definition: 'Per capita nitrous oxide emissions including land use: Measured in tonnes per person of carbon dioxide-equivalents
+    over a 100-year timescale.'
+  unit: tonnes of CO₂ equivalents per person (t/person)
+  domain: environment
+  subdomain: ghg
+  source_order:
+  - owid.co2.nitrous_oxide_per_capita
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest];
+    Population based on various sources (2024) [https://ourworldindata.org/population-sources].'
+- id: environment.temperature_change_from_ghg
+  labels:
+    fr: Contribution au réchauffement mondial (°C, GES)
+    en: Change in global mean surface temperature caused by greenhouse gas emissions
+  definition: 'Change in global mean surface temperature caused by greenhouse gas emissions: Measured in °C.'
+  unit: °C
+  domain: environment
+  subdomain: warming_contribution
+  source_order:
+  - owid.co2.temperature_change_from_ghg
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.temperature_change_from_co2
+  labels:
+    fr: Contribution au réchauffement mondial (°C, CO₂)
+    en: Change in global mean surface temperature caused by CO₂ emissions
+  definition: 'Change in global mean surface temperature caused by CO₂ emissions: Measured in °C.'
+  unit: °C
+  domain: environment
+  subdomain: warming_contribution
+  source_order:
+  - owid.co2.temperature_change_from_co2
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.share_of_temperature_change_from_ghg
+  labels:
+    fr: Part de la contribution au réchauffement mondial
+    en: Share of contribution to global warming
+  definition: 'Share of contribution to global warming: Measured as a percentage of the world''s temperature change.'
+  unit: '%'
+  domain: environment
+  subdomain: warming_contribution
+  source_order:
+  - owid.co2.share_of_temperature_change_from_ghg
+  provider_declared: true
+  notes: 'Our World in Data compilation (CC BY 4.0 for OWID''s work; original source as cited per cell in flags.original_source).
+    OWID is a compiler: original source for this series: Jones et al. - National contributions to climate change (2025) [https://zenodo.org/records/7636699/latest].'
+- id: environment.ghg_sector_agriculture
+  labels:
+    fr: 'Émissions de GES : agriculture'
+    en: Agriculture
+  definition: 'Agriculture: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.agriculture_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_land_use_change_and_forestry
+  labels:
+    fr: 'Émissions de GES : changement d''affectation des terres et foresterie'
+    en: Land-use change and forestry
+  definition: 'Land-use change and forestry: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.land_use_change_and_forestry_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_waste
+  labels:
+    fr: 'Émissions de GES : déchets'
+    en: Waste
+  definition: 'Waste: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.waste_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_buildings
+  labels:
+    fr: 'Émissions de GES : bâtiments'
+    en: Buildings
+  definition: 'Buildings: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.buildings_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_industry
+  labels:
+    fr: 'Émissions de GES : industrie'
+    en: Industry
+  definition: 'Industry: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.industry_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_manufacturing_and_construction
+  labels:
+    fr: 'Émissions de GES : industrie manufacturière et construction'
+    en: Manufacturing and construction
+  definition: 'Manufacturing and construction: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.manufacturing_and_construction_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_transport
+  labels:
+    fr: 'Émissions de GES : transports'
+    en: Transport
+  definition: 'Transport: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.transport_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_electricity_and_heat
+  labels:
+    fr: 'Émissions de GES : électricité et chaleur'
+    en: Electricity and heat
+  definition: 'Electricity and heat: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.electricity_and_heat_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_fugitive
+  labels:
+    fr: 'Émissions de GES : émissions fugitives (production d''énergie)'
+    en: Fugitive emissions
+  definition: 'Fugitive emissions: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.fugitive_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_other_fuel_combustion
+  labels:
+    fr: 'Émissions de GES : autres combustions'
+    en: Other fuel combustion
+  definition: 'Other fuel combustion: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.other_fuel_combustion_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.ghg_sector_aviation_and_shipping
+  labels:
+    fr: 'Émissions de GES : aviation et transport maritime internationaux'
+    en: Aviation and shipping
+  definition: 'Aviation and shipping: Emissions are measured in tonnes of carbon dioxide-equivalents.'
+  unit: tonnes
+  domain: environment
+  subdomain: ghg_by_sector
+  source_order:
+  - owid.g_ghg_by_sector.aviation_and_shipping_ghg_emissions
+  provider_declared: true
+  notes: OWID grapher chart 'ghg-emissions-by-sector'; original source Climate Watch (2026) – with major processing by Our
+    World in Data (Climate Watch, CC BY 4.0). Values in tonnes of CO2 equivalents as published.
+- id: environment.temperature_anomaly
+  labels:
+    fr: Anomalie de température annuelle
+    en: Temperature anomaly
+  definition: 'Temperature anomaly: Difference of a specific year''s average surface temperature from the 1991-2020 mean,
+    in degrees Celsius.'
+  unit: °C
+  domain: environment
+  subdomain: climate
+  source_order:
+  - owid.g_temperature_anomaly.temperature_anomaly
+  provider_declared: true
+  notes: OWID grapher chart 'annual-temperature-anomalies'; original source Contains modified Copernicus Climate Change Service
+    information (2026) – with major processing by Our World in Data (ERA5, Copernicus licence). Major processing by OWID (country
+    averages of a reanalysis grid); not station observations.
+- id: environment.hdr_co2_prod
+  labels:
+    fr: Émissions de CO₂ par habitant (production, IDHP)
+    en: CO2 emissions per capita (production, PHDI)
+  definition: Carbon dioxide emissions per capita (production) (tonnes) (UNDP HDR25 codebook short name 'co2_prod'), used
+    in the PHDI.
+  unit: tonnes per capita
+  domain: environment
+  subdomain: planetary_pressures
+  source_order:
+  - undp.hdr25.co2_prod
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series). Same Global Carbon Budget lineage as environment.co2_per_capita (not independent).
+- id: environment.hdr_mf
+  labels:
+    fr: Empreinte matières par habitant (IDHP)
+    en: Material footprint per capita (PHDI)
+  definition: Material footprint per capita (tonnes) (UNDP HDR25 codebook short name 'mf'), used in the PHDI.
+  unit: tonnes per capita
+  domain: environment
+  subdomain: planetary_pressures
+  source_order:
+  - undp.hdr25.mf
+  provider_declared: true
+  notes: UNDP Human Development Report 2025 complete time series (1990-2023); values as published in the 2025 edition (each
+    edition revises the whole series).

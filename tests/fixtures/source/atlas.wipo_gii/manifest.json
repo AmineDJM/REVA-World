@@ -1,0 +1,15 @@
+[
+  {
+    "request_fingerprint": "76983ed5beb4d052f17f0ae9782d9069de989d3fdb7587a3afba0c35e587aa1b",
+    "url": "https://www.wipo.int/edocs/pubdocs/en/wipo-pub-2000-2025-tech1.xlsx",
+    "file": "76983ed5beb4d052.xlsx",
+    "sha256": "29dac5fadb7c1ef3ae54044887db8eedd232a08f7cae930cf886e131afd55b81",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T22:10:00+00:00",
+    "licence": "CC-BY-4.0",
+    "note": "real live capture"
+  }
+]

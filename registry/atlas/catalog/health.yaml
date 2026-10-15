@@ -1,0 +1,472 @@
+# Atlas catalog: health (agent A-HEALTHEDU). Provider-declared concepts, not human-reviewed.
+# Series: who.gho.<GHO code>|<dimension>=<code>... (src/reva/adapters/connectors/atlas_who.py folds every
+# GHO dimension into the indicator; SEX_BTSX = both sexes). Every WHO cell carries flags.estimate_class:
+# who_comparable_estimate | country_reported | country_reported_with_who_estimates.
+# wb.wdi_social.* fallbacks are World Bank redistributions of the SAME WHO/inter-agency series (same lineage,
+# not independent evidence); they answer only where the WHO table has no cell for the country-year.
+domain: health
+labels: {fr: "Santé", en: "Health"}
+maintainer: A-HEALTHEDU
+concepts:
+  - id: health.life_expectancy_birth
+    labels: {fr: "Espérance de vie à la naissance", en: "Life expectancy at birth"}
+    definition: "Average number of years a newborn would live if subject to the age-specific mortality rates of the year (WHO Global Health Estimates, both sexes)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000001|sex=SEX_BTSX"]
+    provider_declared: true
+    notes: "WHO GHE comparable estimates (2000-2023 in the 2026 vintage). Not the UN WPP series used by the World Bank (different model), hence no WDI fallback."
+  - id: health.life_expectancy_birth.female
+    labels: {fr: "Espérance de vie à la naissance (femmes)", en: "Life expectancy at birth (female)"}
+    definition: "Life expectancy at birth, females (WHO Global Health Estimates)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000001|sex=SEX_FMLE"]
+    provider_declared: true
+  - id: health.life_expectancy_birth.male
+    labels: {fr: "Espérance de vie à la naissance (hommes)", en: "Life expectancy at birth (male)"}
+    definition: "Life expectancy at birth, males (WHO Global Health Estimates)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000001|sex=SEX_MLE"]
+    provider_declared: true
+  - id: health.life_expectancy_60
+    labels: {fr: "Espérance de vie à 60 ans", en: "Life expectancy at age 60"}
+    definition: "Average number of remaining years at age 60 (WHO Global Health Estimates, both sexes)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000015|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.healthy_life_expectancy_birth
+    labels: {fr: "Espérance de vie en bonne santé à la naissance", en: "Healthy life expectancy (HALE) at birth"}
+    definition: "Average number of years a newborn can expect to live in full health (WHO GHE, both sexes)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000002|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.healthy_life_expectancy_60
+    labels: {fr: "Espérance de vie en bonne santé à 60 ans", en: "Healthy life expectancy (HALE) at age 60"}
+    definition: "Average number of years a person aged 60 can expect to live in full health (WHO GHE, both sexes)."
+    unit: years
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000007|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.adult_mortality_15_60
+    labels: {fr: "Mortalité adulte (15-60 ans)", en: "Adult mortality rate (15-60)"}
+    definition: "Probability of dying between ages 15 and 60 per 1000 population (WHO GHE, both sexes)."
+    unit: "per 1000 population (probability of dying between 15 and 60)"
+    domain: health
+    subdomain: mortality
+    source_order: ["who.gho.WHOSIS_000004|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.maternal_mortality_ratio
+    labels: {fr: "Taux de mortalité maternelle", en: "Maternal mortality ratio"}
+    definition: "Maternal deaths per 100 000 live births (UN MMEIG modelled estimates)."
+    unit: per 100 000 live births
+    domain: health
+    subdomain: maternal_child
+    source_order: ["who.gho.MDG_0000000026", "wb.wdi_social.SH.STA.MMRT"]
+    provider_declared: true
+    notes: "Comparable MMEIG estimates. WHO's separate country-reported series (MDG_0000000032, 1987-2009, text values) is the concept health.maternal_mortality_ratio.country_reported and is never mixed in."
+  - id: health.maternal_mortality_ratio.country_reported
+    labels: {fr: "Taux de mortalité maternelle (déclaré par les pays)", en: "Maternal mortality ratio (country-reported)"}
+    definition: "Maternal mortality ratio as reported by countries to WHO (not adjusted for comparability)."
+    unit: per 100 000 live births
+    domain: health
+    subdomain: maternal_child
+    value_kind: text
+    source_order: ["who.gho.MDG_0000000032"]
+    provider_declared: true
+    notes: "WHO serves these values as display text only (NumericValue null): kept as value_text, never parsed. Country-reported, not comparable across countries."
+  - id: health.under5_mortality
+    labels: {fr: "Mortalité des moins de 5 ans", en: "Under-five mortality rate"}
+    definition: "Probability of dying by age 5 per 1000 live births (UN IGME, both sexes, all wealth quintiles)."
+    unit: per 1000 live births
+    domain: health
+    subdomain: maternal_child
+    source_order: ["who.gho.MDG_0000000007|sex=SEX_BTSX|agegroup=AGEGROUP_YEARSUNDER5|wealthquintile=WEALTHQUINTILE_TOTL", "wb.wdi_social.SH.DYN.MORT"]
+    provider_declared: true
+    notes: "UN IGME estimates are not the official statistics of some countries (WHO row comments say so, kept in flags.comments). Wealth-quintile rows (household surveys) are separate series."
+  - id: health.infant_mortality
+    labels: {fr: "Mortalité infantile", en: "Infant mortality rate"}
+    definition: "Probability of dying between birth and age 1 per 1000 live births (UN IGME, both sexes)."
+    unit: per 1000 live births
+    domain: health
+    subdomain: maternal_child
+    source_order: ["who.gho.MDG_0000000001|sex=SEX_BTSX|agegroup=AGEGROUP_MONTHS0-11", "wb.wdi_social.SP.DYN.IMRT.IN"]
+    provider_declared: true
+  - id: health.neonatal_mortality
+    labels: {fr: "Mortalité néonatale", en: "Neonatal mortality rate"}
+    definition: "Deaths in the first 28 days per 1000 live births (UN IGME)."
+    unit: per 1000 live births
+    domain: health
+    subdomain: maternal_child
+    source_order: ["who.gho.WHOSIS_000003|sex=SEX_BTSX|agegroup=AGEGROUP_DAYS0-27", "wb.wdi_social.SH.DYN.NMRT"]
+    provider_declared: true
+  - id: health.ncd_mortality_30_70
+    labels: {fr: "Probabilité de décès prématuré par MNT (30-70 ans)", en: "Probability of dying 30-70 from the four main NCDs"}
+    definition: "Probability (%) of dying between exact ages 30 and 70 from cardiovascular disease, cancer, diabetes or chronic respiratory disease (WHO GHE, SDG 3.4.1, both sexes)."
+    unit: "%"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORT3070|sex=SEX_BTSX|agegroup=AGEGROUP_YEARS30-69"]
+    provider_declared: true
+    notes: "WHO flags 2020-2021 values as possibly underestimated where NCD deaths fell into 'other pandemic-related mortality' (kept in flags.comments)."
+  - id: health.ncd_mortality_rate
+    labels: {fr: "Mortalité par MNT standardisée", en: "Age-standardized NCD mortality rate"}
+    definition: "Age-standardized death rate from noncommunicable diseases per 100 000 population (WHO GHE, both sexes)."
+    unit: per 100 000 population (age-standardized)
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.WHS2_131|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.deaths_share.ncd
+    labels: {fr: "Part des décès dus aux MNT", en: "Share of deaths due to noncommunicable diseases"}
+    definition: "Percentage of all deaths due to noncommunicable diseases (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE060"]
+    provider_declared: true
+  - id: health.deaths_share.communicable
+    labels: {fr: "Part des décès dus aux maladies transmissibles, maternelles, périnatales et nutritionnelles", en: "Share of deaths due to communicable, maternal, perinatal and nutritional conditions"}
+    definition: "Percentage of all deaths due to communicable, maternal, perinatal and nutritional conditions (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE010"]
+    provider_declared: true
+  - id: health.deaths_share.injuries
+    labels: {fr: "Part des décès dus aux traumatismes", en: "Share of deaths due to injuries"}
+    definition: "Percentage of all deaths due to injuries (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE151"]
+    provider_declared: true
+  - id: health.deaths_share.cardiovascular
+    labels: {fr: "Part des décès dus aux maladies cardiovasculaires", en: "Share of deaths due to cardiovascular diseases"}
+    definition: "Percentage of all deaths due to cardiovascular diseases (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE110"]
+    provider_declared: true
+  - id: health.deaths_share.cancer
+    labels: {fr: "Part des décès dus aux cancers", en: "Share of deaths due to malignant neoplasms"}
+    definition: "Percentage of all deaths due to malignant neoplasms (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE061"]
+    provider_declared: true
+  - id: health.deaths_share.diabetes
+    labels: {fr: "Part des décès dus au diabète", en: "Share of deaths due to diabetes"}
+    definition: "Percentage of all deaths due to diabetes mellitus (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE080"]
+    provider_declared: true
+  - id: health.deaths_share.chronic_respiratory
+    labels: {fr: "Part des décès dus aux maladies respiratoires chroniques", en: "Share of deaths due to chronic respiratory diseases"}
+    definition: "Percentage of all deaths due to chronic respiratory diseases (WHO GHE, both sexes)."
+    unit: "% of total deaths"
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.NCDMORTPERCENT|sex=SEX_BTSX|ghecauses=GHECAUSES_GHE117"]
+    provider_declared: true
+  - id: health.suicide_rate
+    labels: {fr: "Taux de suicide standardisé", en: "Age-standardized suicide rate"}
+    definition: "Age-standardized suicide deaths per 100 000 population (WHO GHE, both sexes)."
+    unit: per 100 000 population (age-standardized)
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.MH_12|sex=SEX_BTSX"]
+    provider_declared: true
+    notes: "Crude rates (SDG 3.4.2) by age group are in who.gho.SDGSUICIDE|sex=...|agegroup=..."
+  - id: health.suicide_rate.crude
+    labels: {fr: "Taux brut de suicide", en: "Crude suicide rate"}
+    definition: "Suicide deaths per 100 000 population, all ages (WHO GHE, SDG 3.4.2, both sexes)."
+    unit: per 100 000 population (crude)
+    domain: health
+    subdomain: causes_of_death
+    source_order: ["who.gho.SDGSUICIDE|sex=SEX_BTSX|agegroup=AGEGROUP_YEARSALL"]
+    provider_declared: true
+  - id: health.road_traffic_death_rate
+    labels: {fr: "Taux de mortalité routière", en: "Road traffic death rate"}
+    definition: "Estimated road traffic deaths per 100 000 population (WHO Global status report on road safety 2023; reference year 2021)."
+    unit: per 100 000 population
+    domain: health
+    subdomain: injuries
+    source_order: ["who.gho.RS_198"]
+    provider_declared: true
+    notes: "Single reference year (2021). Hong Kong and Macao: WHO serves display text '0.0' without a numeric value (kept as value_text)."
+  - id: health.road_traffic_deaths
+    labels: {fr: "Décès sur les routes (estimation)", en: "Estimated road traffic deaths"}
+    definition: "Estimated number of road traffic deaths (WHO Global status report on road safety 2023; reference year 2021)."
+    unit: deaths
+    domain: health
+    subdomain: injuries
+    source_order: ["who.gho.RS_196"]
+    provider_declared: true
+  - id: health.air_pollution_death_rate
+    labels: {fr: "Mortalité attribuable à la pollution de l'air (ambiante et domestique)", en: "Death rate attributable to household and ambient air pollution"}
+    definition: "Age-standardized deaths attributable to the joint effects of household and ambient air pollution per 100 000 population, all causes (WHO, SDG 3.9.1, both sexes)."
+    unit: per 100 000 population (age-standardized)
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.SDGAIRBODA|sex=SEX_BTSX|ghecause=GHECAUSE_GHE000000"]
+    provider_declared: true
+  - id: health.ambient_air_pollution_death_rate
+    labels: {fr: "Mortalité attribuable à la pollution de l'air ambiant", en: "Death rate attributable to ambient air pollution"}
+    definition: "Age-standardized deaths attributable to ambient air pollution per 100 000 population, all causes (WHO, both sexes)."
+    unit: per 100 000 population (age-standardized)
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.AIR_42|sex=SEX_BTSX|ghecause=GHECAUSE_GHE000000"]
+    provider_declared: true
+  - id: health.pm25_concentration
+    labels: {fr: "Concentration de particules fines (PM2,5)", en: "Fine particulate matter (PM2.5) concentration"}
+    definition: "Annual mean concentration of PM2.5, total (urban and rural) areas (WHO modelled, SDG 11.6.2)."
+    unit: "µg/m³ (annual mean)"
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.SDGPM25|residenceareatype=RESIDENCEAREATYPE_TOTL"]
+    provider_declared: true
+  - id: health.wash_death_rate
+    labels: {fr: "Mortalité attribuable à l'eau, l'assainissement et l'hygiène insalubres", en: "Mortality attributed to unsafe water, sanitation and hygiene"}
+    definition: "Deaths attributable to unsafe WASH services per 100 000 population (WHO, SDG 3.9.2, both sexes; reference year 2019)."
+    unit: per 100 000 population
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.SDGWSHBOD|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.basic_drinking_water
+    labels: {fr: "Accès à l'eau potable (au moins basique)", en: "Population using at least basic drinking-water services"}
+    definition: "Share of the population using at least basic drinking-water services, total (WHO/UNICEF JMP)."
+    unit: "%"
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.WSH_WATER_BASIC|residenceareatype=RESIDENCEAREATYPE_TOTL"]
+    provider_declared: true
+  - id: health.basic_sanitation
+    labels: {fr: "Accès à l'assainissement (au moins basique)", en: "Population using at least basic sanitation services"}
+    definition: "Share of the population using at least basic sanitation services, total (WHO/UNICEF JMP)."
+    unit: "%"
+    domain: health
+    subdomain: environment
+    source_order: ["who.gho.WSH_SANITATION_BASIC|residenceareatype=RESIDENCEAREATYPE_TOTL"]
+    provider_declared: true
+  - id: health.expenditure_gdp
+    labels: {fr: "Dépenses courantes de santé (% du PIB)", en: "Current health expenditure (% of GDP)"}
+    definition: "Current health expenditure as a percentage of GDP (WHO Global Health Expenditure Database, SHA 2011)."
+    unit: "% of GDP"
+    domain: health
+    subdomain: financing
+    source_order: ["who.gho.GHED_CHEGDP_SHA2011", "wb.wdi_social.SH.XPD.CHEX.GD.ZS"]
+    provider_declared: true
+    notes: "GHED mixes country-reported health accounts with WHO estimates where countries do not report (not separable per cell in the GHO API): flags.estimate_class = country_reported_with_who_estimates."
+  - id: health.expenditure_per_capita_usd
+    labels: {fr: "Dépenses courantes de santé par habitant (US$ courants)", en: "Current health expenditure per capita (current US$)"}
+    definition: "Current health expenditure per capita in current US dollars (WHO GHED)."
+    unit: current US$ per capita
+    domain: health
+    subdomain: financing
+    source_order: ["who.gho.GHED_CHE_pc_US_SHA2011", "wb.wdi_social.SH.XPD.CHEX.PC.CD"]
+    provider_declared: true
+  - id: health.expenditure_public_share
+    labels: {fr: "Part publique domestique des dépenses de santé", en: "Domestic general government health expenditure (% of CHE)"}
+    definition: "Domestic general government health expenditure as a percentage of current health expenditure (WHO GHED)."
+    unit: "% of current health expenditure"
+    domain: health
+    subdomain: financing
+    source_order: ["who.gho.GHED_GGHE-DCHE_SHA2011"]
+    provider_declared: true
+  - id: health.out_of_pocket_share
+    labels: {fr: "Paiements directs des ménages (% des dépenses de santé)", en: "Out-of-pocket expenditure (% of CHE)"}
+    definition: "Out-of-pocket expenditure as a percentage of current health expenditure (WHO GHED)."
+    unit: "% of current health expenditure"
+    domain: health
+    subdomain: financing
+    source_order: ["who.gho.GHED_OOPSCHE_SHA2011", "wb.wdi_social.SH.XPD.OOPC.CH.ZS"]
+    provider_declared: true
+  - id: health.physicians_density
+    labels: {fr: "Densité de médecins", en: "Medical doctors density"}
+    definition: "Medical doctors per 10 000 population (country-reported, National Health Workforce Accounts)."
+    unit: per 10 000 population
+    domain: health
+    subdomain: workforce
+    source_order: ["who.gho.HWF_0001"]
+    provider_declared: true
+    notes: "Country-reported (flags.estimate_class = country_reported). The World Bank SH.MED.PHYS.ZS is per 1000 population (different unit), so it is not listed."
+  - id: health.nurses_midwives_density
+    labels: {fr: "Densité d'infirmiers et sages-femmes", en: "Nursing and midwifery personnel density"}
+    definition: "Nursing and midwifery personnel per 10 000 population (country-reported, NHWA)."
+    unit: per 10 000 population
+    domain: health
+    subdomain: workforce
+    source_order: ["who.gho.HWF_0006"]
+    provider_declared: true
+  - id: health.dentists_density
+    labels: {fr: "Densité de dentistes", en: "Dentists density"}
+    definition: "Dentists per 10 000 population (country-reported, NHWA)."
+    unit: per 10 000 population
+    domain: health
+    subdomain: workforce
+    source_order: ["who.gho.HWF_0010"]
+    provider_declared: true
+  - id: health.pharmacists_density
+    labels: {fr: "Densité de pharmaciens", en: "Pharmacists density"}
+    definition: "Pharmacists per 10 000 population (country-reported, NHWA)."
+    unit: per 10 000 population
+    domain: health
+    subdomain: workforce
+    source_order: ["who.gho.HWF_0014"]
+    provider_declared: true
+  - id: health.hospital_beds_density
+    labels: {fr: "Lits d'hôpital", en: "Hospital beds"}
+    definition: "Hospital beds per 10 000 population (country/regional databases compiled by WHO; source named per cell in flags.comments)."
+    unit: per 10 000 population
+    domain: health
+    subdomain: workforce
+    source_order: ["who.gho.WHS6_102"]
+    provider_declared: true
+  - id: health.uhc_service_coverage_index
+    labels: {fr: "Indice de couverture des services de santé (CSU)", en: "UHC service coverage index"}
+    definition: "Universal health coverage service coverage index, 0-100 (WHO/World Bank, SDG 3.8.1)."
+    unit: index (0-100)
+    domain: health
+    subdomain: health_system
+    source_order: ["who.gho.UHC_INDEX_REPORTED", "wb.wdi_social.SH.UHC.SRVS.CV.XD"]
+    provider_declared: true
+  - id: health.immunization_dtp3
+    labels: {fr: "Vaccination DTC3 (enfants d'un an)", en: "DTP3 immunization coverage among 1-year-olds"}
+    definition: "Diphtheria-tetanus-pertussis third-dose coverage among 1-year-olds (WHO/UNICEF WUENIC estimates)."
+    unit: "%"
+    domain: health
+    subdomain: immunization
+    source_order: ["who.gho.WHS4_100", "wb.wdi_social.SH.IMM.IDPT"]
+    provider_declared: true
+  - id: health.immunization_mcv1
+    labels: {fr: "Vaccination rougeole, 1re dose (enfants d'un an)", en: "Measles first-dose (MCV1) immunization coverage"}
+    definition: "Measles-containing-vaccine first-dose coverage among 1-year-olds (WUENIC)."
+    unit: "%"
+    domain: health
+    subdomain: immunization
+    source_order: ["who.gho.WHS8_110", "wb.wdi_social.SH.IMM.MEAS"]
+    provider_declared: true
+  - id: health.immunization_mcv2
+    labels: {fr: "Vaccination rougeole, 2e dose", en: "Measles second-dose (MCV2) immunization coverage"}
+    definition: "Measles-containing-vaccine second-dose coverage by the locally recommended age (WUENIC)."
+    unit: "%"
+    domain: health
+    subdomain: immunization
+    source_order: ["who.gho.MCV2"]
+    provider_declared: true
+  - id: health.immunization_hepb3
+    labels: {fr: "Vaccination hépatite B, 3e dose", en: "Hepatitis B (HepB3) immunization coverage"}
+    definition: "Hepatitis B third-dose coverage among 1-year-olds (WUENIC)."
+    unit: "%"
+    domain: health
+    subdomain: immunization
+    source_order: ["who.gho.WHS4_117", "wb.wdi_social.SH.IMM.HEPB"]
+    provider_declared: true
+  - id: health.obesity_adults
+    labels: {fr: "Obésité des adultes (IMC ≥ 30)", en: "Obesity among adults (BMI ≥ 30)"}
+    definition: "Prevalence of obesity (BMI ≥ 30 kg/m²) among adults 18+, age-standardized (NCD-RisC/WHO, both sexes)."
+    unit: "% (age-standardized)"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.NCD_BMI_30A|sex=SEX_BTSX|agegroup=AGEGROUP_YEARS18-PLUS"]
+    provider_declared: true
+  - id: health.obesity_children
+    labels: {fr: "Obésité des enfants et adolescents (5-19 ans)", en: "Obesity among children and adolescents (5-19)"}
+    definition: "Prevalence of obesity (BMI-for-age > +2 SD) among children and adolescents 5-19, crude (NCD-RisC/WHO, both sexes)."
+    unit: "% (crude)"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.NCD_BMI_PLUS2C|sex=SEX_BTSX|agegroup=AGEGROUP_YEARS05-19"]
+    provider_declared: true
+  - id: health.hypertension_prevalence
+    labels: {fr: "Hypertension (30-79 ans)", en: "Hypertension prevalence (30-79)"}
+    definition: "Prevalence of hypertension among adults aged 30-79, age-standardized (NCD-RisC/WHO, both sexes; 1990-2019)."
+    unit: "% (age-standardized)"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.NCD_HYP_PREVALENCE_A|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.tobacco_use
+    labels: {fr: "Consommation de tabac (15 ans et plus)", en: "Current tobacco use prevalence (15+)"}
+    definition: "Estimated prevalence of current tobacco use among persons 15+, age-standardized (WHO trends report, both sexes)."
+    unit: "% (age-standardized)"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.M_Est_tob_curr_std|sex=SEX_BTSX"]
+    provider_declared: true
+    notes: "WHO's series runs to 2030: years after the latest national survey are projections (flags.projection = true when WHO's row comment says so). Where tobacco-use estimates are unavailable WHO substitutes smoking estimates (stated in flags.comments)."
+  - id: health.tobacco_smoking
+    labels: {fr: "Tabagisme (15 ans et plus)", en: "Current tobacco smoking prevalence (15+)"}
+    definition: "Estimated prevalence of current tobacco smoking among persons 15+, age-standardized (WHO trends report, both sexes)."
+    unit: "% (age-standardized)"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.M_Est_smk_curr_std|sex=SEX_BTSX"]
+    provider_declared: true
+    notes: "Includes WHO projections to 2030 (flags.projection)."
+  - id: health.alcohol_per_capita
+    labels: {fr: "Consommation d'alcool par habitant (15 ans et plus)", en: "Alcohol consumption per capita (15+)"}
+    definition: "Total (recorded + unrecorded) alcohol per capita (15+) consumption in litres of pure alcohol, three-year average (WHO GISAH, SDG 3.5.2)."
+    unit: "litres of pure alcohol per capita (15+), three-year average"
+    domain: health
+    subdomain: risk_factors
+    source_order: ["who.gho.SA_0000001688|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.stunting_children
+    labels: {fr: "Retard de croissance (moins de 5 ans)", en: "Stunting prevalence (under 5)"}
+    definition: "Prevalence of stunting (height-for-age < -2 SD) among children under 5, model-based (UNICEF/WHO/World Bank JME, both sexes)."
+    unit: "%"
+    domain: health
+    subdomain: nutrition
+    source_order: ["who.gho.NUTSTUNTINGPREV|sex=SEX_BTSX"]
+    provider_declared: true
+  - id: health.skilled_birth_attendance
+    labels: {fr: "Accouchements assistés par du personnel qualifié", en: "Births attended by skilled health personnel"}
+    definition: "Percentage of births attended by skilled health personnel (country data from surveys and routine systems compiled by WHO/UNICEF)."
+    unit: "%"
+    domain: health
+    subdomain: maternal_child
+    source_order: ["who.gho.MDG_0000000025", "wb.wdi_social.SH.STA.BRTC.ZS"]
+    provider_declared: true
+    notes: "Country-reported; the data source of each cell is in flags.comments."
+  - id: health.tuberculosis_incidence
+    labels: {fr: "Incidence de la tuberculose", en: "Tuberculosis incidence"}
+    definition: "Estimated incidence of tuberculosis per 100 000 population per year (WHO Global TB Programme)."
+    unit: per 100 000 population per year
+    domain: health
+    subdomain: infectious_diseases
+    source_order: ["who.gho.MDG_0000000020", "wb.wdi_social.SH.TBS.INCD"]
+    provider_declared: true
+  - id: health.hiv_prevalence_15_49
+    labels: {fr: "Prévalence du VIH (15-49 ans)", en: "HIV prevalence among adults 15-49"}
+    definition: "Prevalence of HIV among adults aged 15 to 49 (UNAIDS/WHO estimates)."
+    unit: "%"
+    domain: health
+    subdomain: infectious_diseases
+    source_order: ["who.gho.MDG_0000000029", "wb.wdi_social.SH.DYN.AIDS.ZS"]
+    provider_declared: true
+  - id: health.malaria_incidence
+    labels: {fr: "Incidence du paludisme", en: "Malaria incidence"}
+    definition: "Estimated malaria incidence per 1000 population at risk (WHO World Malaria Report); endemic countries only."
+    unit: per 1000 population at risk
+    domain: health
+    subdomain: infectious_diseases
+    source_order: ["who.gho.MALARIA_EST_INCIDENCE", "wb.wdi_social.SH.MLR.INCD.P3"]
+    provider_declared: true
+    notes: "A country without a row is not malaria-free by inference: WHO publishes estimates for endemic countries only."

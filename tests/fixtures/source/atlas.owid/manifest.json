@@ -1,0 +1,332 @@
+[
+  {
+    "request_fingerprint": "d86f2d261390ebd2d0c108fb35553837c0a49a9c4083ece987d50754df4a94de",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146642.metadata.json",
+    "file": "d86f2d261390ebd2.json",
+    "sha256": "8a7303e09c1748c7000d2c5314c57bb28461f0f86ed0bf4d7c6a9459002978a1",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"d9e643074b5aba739d4fef20acec096b\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:10 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:08.615871+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "8a7303e09c1748c7000d2c5314c57bb28461f0f86ed0bf4d7c6a9459002978a1",
+    "live_bytes": 13866,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "6771ed34f1e9ec757e02dfa9605ded8ae7cb5af99b94a0c90dd09613937a025e",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146644.metadata.json",
+    "file": "6771ed34f1e9ec75.json",
+    "sha256": "de5819311bd3c1483611a13eccc965a58d42331c4a1b22259ba6ff5fdc4f3d81",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"a226470fa8e1f28c0f5faa07535906dd\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:10 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:18.175399+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "de5819311bd3c1483611a13eccc965a58d42331c4a1b22259ba6ff5fdc4f3d81",
+    "live_bytes": 13685,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "316afd0a494abf67e0cd0761eba81accba46d0f8b9a72fffc0e338dc656fbe80",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146645.metadata.json",
+    "file": "316afd0a494abf67.json",
+    "sha256": "3f69294e84faebf14e8fabed01683954633c84160be77f3f01c1af7e782356d4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"2df1be23e913bbe68cab3cd26c93e610\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:10 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:15.180644+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "3f69294e84faebf14e8fabed01683954633c84160be77f3f01c1af7e782356d4",
+    "live_bytes": 13545,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "d0cd5e28f4ffd271dcb5b7ad425b7e23d90bc776052aa55bde27e46739801f31",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146646.metadata.json",
+    "file": "d0cd5e28f4ffd271.json",
+    "sha256": "195aac38f467044939142f75cc6e6fc61e2fb8156045841636cf156437228696",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"5e8dbb9e2f20783596e4f5f4cd4425a7\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:10 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:11.251094+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "195aac38f467044939142f75cc6e6fc61e2fb8156045841636cf156437228696",
+    "live_bytes": 13176,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "a15b793387890905a261337f51f92a04dce21714f09bdd197f0cd612da7fae49",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146652.metadata.json",
+    "file": "a15b793387890905.json",
+    "sha256": "cae8da40c25e9c14ef962b69db21c68338e09c10c309ee040a4a1e869081b25a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"ce309861cd50278fd518df7894df54ea\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:16.246513+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "cae8da40c25e9c14ef962b69db21c68338e09c10c309ee040a4a1e869081b25a",
+    "live_bytes": 13565,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "a5dd9364cc2f4e28758625010494646975192e98ced52797830e0e6939007fef",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146654.metadata.json",
+    "file": "a5dd9364cc2f4e28.json",
+    "sha256": "11096456c7bac2c889fd240e0881b98d23c9aec8caf573d1420597d5859caf88",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"350ad846fe200688f245afff1a75e54e\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:12.214138+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "11096456c7bac2c889fd240e0881b98d23c9aec8caf573d1420597d5859caf88",
+    "live_bytes": 13931,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "73e45bc7d69b7b81b338d9686ceec6c9238802c167cb34feeb4806832d195e01",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146656.metadata.json",
+    "file": "73e45bc7d69b7b81.json",
+    "sha256": "03281e3bc763f9a4af6e697f4babac2409eb246994dbe70944fdd53f91a65138",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"706d2c9a06d1b52d0a76ecd5dc7a18aa\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:09.196588+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "03281e3bc763f9a4af6e697f4babac2409eb246994dbe70944fdd53f91a65138",
+    "live_bytes": 14210,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "910e9cdb247cc17ed658775c96013f3a6020932db0be0913390dc77146ab4428",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146658.metadata.json",
+    "file": "910e9cdb247cc17e.json",
+    "sha256": "b2d9809f79fed79c3dd8a05c6a7297bd6619c702c47cf6b2578d24a440a8929e",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"837425d33a605ca20015e7e4ddd00e88\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:13.177643+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "b2d9809f79fed79c3dd8a05c6a7297bd6619c702c47cf6b2578d24a440a8929e",
+    "live_bytes": 13168,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "94307c7384dcd831dba58671b27bb21300ee8691142b6ea7977c3f135210fc40",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146660.metadata.json",
+    "file": "94307c7384dcd831.json",
+    "sha256": "f5cec5c09e20a8ef9493f7ce4308e78e884677e7cdf2520381d562e4fc8708b2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"4d345f5acd0f01e38664ea09ada7bdae\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:17.229831+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "f5cec5c09e20a8ef9493f7ce4308e78e884677e7cdf2520381d562e4fc8708b2",
+    "live_bytes": 12816,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "61e11152bcc8ba4c1b9b7c8ad4e24cd4ebc136454ad0caef9dd57c547e06e8d4",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146666.metadata.json",
+    "file": "61e11152bcc8ba4c.json",
+    "sha256": "74383275f82fb7a3918d4a6fc65e0d992ef0735fae24a488075c9dd2759861be",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"566400a913e594bdf2ba314d78cf893e\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:11 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:14.241900+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "74383275f82fb7a3918d4a6fc65e0d992ef0735fae24a488075c9dd2759861be",
+    "live_bytes": 13572,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "b982db5babf2e34a511e109136a0de6df90b5c1b791e33c620e10e32924a5e11",
+    "url": "https://api.ourworldindata.org/v1/indicators/1146669.metadata.json",
+    "file": "b982db5babf2e34a.json",
+    "sha256": "2044070e950ffdf72323f5fb6782ffad943f61975b3c8b2406b2369a817ef115",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"9176b27c02f73f60cbc6fc753e02505b\"",
+      "last-modified": "Wed, 12 Aug 2026 12:24:12 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:10.227659+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "2044070e950ffdf72323f5fb6782ffad943f61975b3c8b2406b2369a817ef115",
+    "live_bytes": 13375,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "b9cf1b33a35dd220689851ddb21da7c42ca12aa0ce11fea53be90fd0ba29ad4d",
+    "url": "https://api.ourworldindata.org/v1/indicators/1325256.metadata.json",
+    "file": "b9cf1b33a35dd220.json",
+    "sha256": "f2e339a32c58af9c6e0f8b297d7036ed09926cda58a2662b3383b224a637068f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json",
+      "etag": "W/\"cdef31e5d9383878a9e3f5f72a1a595b\"",
+      "last-modified": "Tue, 13 Oct 2026 08:42:33 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:19.189214+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "f2e339a32c58af9c6e0f8b297d7036ed09926cda58a2662b3383b224a637068f",
+    "live_bytes": 16633,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "aa37265be29267651d9d0dd8684e3b5938abde5b55a0e4efe62bfd6f187bc191",
+    "url": "https://ourworldindata.org/grapher/annual-temperature-anomalies.csv?v=1&csvType=full&useColumnShortNames=true",
+    "file": "aa37265be2926765.csv",
+    "sha256": "85b13a891f2ee639b506359fa5cbdf7d0e6d5638327f2da136b44e4a698bf975",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv",
+      "last-modified": "Thu, 15 Oct 2026 22:18:41 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:06.847820+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "16911f331e174a18040715d74df1a9d779b7b8db76a57a2b9ffcd7c2aebdf0b5",
+    "live_bytes": 570765,
+    "excerpt": "header + rows France, Algeria, Kosovo, World, Africa (NIAID) for years >= 2019"
+  },
+  {
+    "request_fingerprint": "ad6d441d6608e4298bff7e1f2b781ccff440495e7ff3d697237739ed4e81d310",
+    "url": "https://ourworldindata.org/grapher/annual-temperature-anomalies.metadata.json?v=1&csvType=full&useColumnShortNames=true",
+    "file": "ad6d441d6608e429.json",
+    "sha256": "6b25891309abb191ef5d8b9e889dcb481746a74f23f2b1a2b8882eccdf97a62d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:21:08.066631+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "6b25891309abb191ef5d8b9e889dcb481746a74f23f2b1a2b8882eccdf97a62d",
+    "live_bytes": 3528,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "34e3f96ff95a01f6090aa833b60966fc5e831dc5a9d07732ef787d9480c2125c",
+    "url": "https://ourworldindata.org/grapher/ghg-emissions-by-sector.csv?v=1&csvType=full&useColumnShortNames=true",
+    "file": "34e3f96ff95a01f6.csv",
+    "sha256": "c7fcb8ae91b4da229b6035298a132eab5935eddf0bc6c18a8fe91847d61ad409",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv",
+      "last-modified": "Thu, 15 Oct 2026 22:21:05 GMT"
+    },
+    "retrieved_at": "2026-10-15T22:21:05.691734+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "926ba4d942945c7b2eefde1bc228cfe6a0c3139b5000116034b6b86746479eb3",
+    "live_bytes": 687595,
+    "excerpt": "header + rows France, Algeria, Kosovo, World, Africa (NIAID) for years >= 2019"
+  },
+  {
+    "request_fingerprint": "a1159d3b37eb8f2b4156a80984cdcc959d436ff0121461b932b83fbb725f4c56",
+    "url": "https://ourworldindata.org/grapher/ghg-emissions-by-sector.metadata.json?v=1&csvType=full&useColumnShortNames=true",
+    "file": "a1159d3b37eb8f2b.json",
+    "sha256": "fe766af72a2f08c91d761c2396a912df04ba5baf5a5dbee168b1d681d03ed160",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:21:06.537876+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "fe766af72a2f08c91d761c2396a912df04ba5baf5a5dbee168b1d681d03ed160",
+    "live_bytes": 8616,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "7eb7825db191a05a8684485b207ebb74a5583507fed3b3cf83cc26a27744f497",
+    "url": "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-codebook.csv",
+    "file": "7eb7825db191a05a.csv",
+    "sha256": "33b4f5e00efd58c7b83863f736beba1af4df946b43642b0400c3ec38648e0e8e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8",
+      "etag": "W/\"95d33c85f64e9440e763278fead43caed1e752fad8cbd092e0348e29c4edd404\""
+    },
+    "retrieved_at": "2026-10-15T22:21:04.161611+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "33b4f5e00efd58c7b83863f736beba1af4df946b43642b0400c3ec38648e0e8e",
+    "live_bytes": 24149,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "78de055ac4bf5fefb1b73a9fa163bb4f5f903888b770b40da8720ced34c313c9",
+    "url": "https://raw.githubusercontent.com/owid/co2-data/master/owid-co2-data.csv",
+    "file": "78de055ac4bf5fef.csv",
+    "sha256": "737423e6340ef3e68a5f8c0dc8e22d9f6cc18359b711cd0f9f6b6bd4a3e92898",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8",
+      "etag": "W/\"dc7ee293972de15d8b7ecc1eb498f2491855b643afb9ac31f0b2eadc3146893b\""
+    },
+    "retrieved_at": "2026-10-15T22:21:04.057179+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "7f78e2b218ce4bb8c538bbec04fdc9a7982e8d40bff972e650df603899edd5f6",
+    "live_bytes": 14377942,
+    "excerpt": "header + rows France, Algeria, Kosovo, World, Africa (EI), Taiwan for years >= 2019"
+  },
+  {
+    "request_fingerprint": "38f51df257604e3494c3f4d6d4c3908a2bc803ca9994a52d6084854d73a7e793",
+    "url": "https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-codebook.csv",
+    "file": "38f51df257604e34.csv",
+    "sha256": "3cc9b7db0d921496e2988568ce3aee5ed41f50431dd234a0663b5f0a4b2e32bb",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8",
+      "etag": "W/\"e6cc9cdaba39797298dd8cbd972353100dbd31f2c0cfe80e7001cbd7edae2443\""
+    },
+    "retrieved_at": "2026-10-15T22:21:01.459791+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "3cc9b7db0d921496e2988568ce3aee5ed41f50431dd234a0663b5f0a4b2e32bb",
+    "live_bytes": 45793,
+    "excerpt": "whole file"
+  },
+  {
+    "request_fingerprint": "4667d63944f067d24d009e6e9968284102dd80623d6ea193fdc3038847711ca0",
+    "url": "https://raw.githubusercontent.com/owid/energy-data/master/owid-energy-data.csv",
+    "file": "4667d63944f067d2.csv",
+    "sha256": "b7454c1be59d1c6ed26d98d5de44c8deb063c16c63a7895d332183c7372d728a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8",
+      "etag": "W/\"1cebf72a4d52a9d72b5c6a9d9ef22e158651663365513ec49adde4f6332a1105\""
+    },
+    "retrieved_at": "2026-10-15T22:21:01.369387+00:00",
+    "licence": "CC BY 4.0 (OWID); third-party per series",
+    "live_sha256": "266f2e2baad7975351bc9bb4aa061d22b1da9fe4c47d51d2ac6071e01e171f76",
+    "live_bytes": 9229369,
+    "excerpt": "header + rows France, Algeria, Kosovo, World, Africa (EI), Taiwan for years >= 2019"
+  }
+]

@@ -1,0 +1,12 @@
+{
+  "kind": "label_lookup",
+  "endpoint": "https://query.wikidata.org/sparql",
+  "query": "SELECT ?l ?item ?sl WHERE {\n  VALUES ?l { \"Christopher Columbus\"@en \"Pedro Álvares Cabral\"@en \"Treaty of Tordesillas\"@en \"Portuguese Empire\"@en\n   \"Spanish Empire\"@en \"British Empire\"@en \"French colonial empire\"@en \"Dutch Empire\"@en \"Crown of Castile\"@en\n   \"Colonial Brazil\"@en \"Empire of Brazil\"@en \"United Kingdom of Portugal, Brazil and the Algarves\"@en\n   \"Independence of Brazil\"@en \"Napoleon\"@en \"Louisiana Purchase\"@en \"Berlin Conference\"@en \"Congo Free State\"@en\n   \"Belgian Congo\"@en \"Suez Crisis\"@en \"decolonization\"@en \"decolonisation of Africa\"@en \"Decolonization of Africa\"@en\n   \"Decolonisation of Asia\"@en \"Vasco da Gama\"@en \"Portuguese India\"@en \"Annexation of Goa\"@en \"Ferdinand Magellan\"@en }\n  ?item rdfs:label ?l .\n  ?item wikibase:sitelinks ?sl .\n}\nLIMIT 200",
+  "query_sha256": "02ad26ab13332de084bbe513c9303501b2fa3c3b0a449ce9256fbf461bdac1c6",
+  "raw_file": "label_lookup_1.srj",
+  "raw_sha256": "112628c717551d205c5e10abf976e473d3fe8490a83075492399489ec310ce00",
+  "retrieved_at": "2026-10-15T22:28:37.033072+00:00",
+  "rows": 157,
+  "client": "reva.adapters.connectors.wikidata.WikidataClient (machine lock)",
+  "note": "exploratory English-label lookup of anchor candidates; copied from the content-addressed archive var/kg/objects"
+}

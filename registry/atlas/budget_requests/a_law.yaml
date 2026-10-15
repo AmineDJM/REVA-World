@@ -1,0 +1,29 @@
+# Budget request from agent A-LAW (laws and legal systems). ATLASCORE merges into
+# registry/policies/budgets.yaml. Every source key below has a registry/sources/*.yaml entry.
+# Note: tests/invariants/test_invariant_30_budgets.py requires the pinned budget keys to equal the
+# registered source keys, so these five keys must be merged (or the source files removed) for it to pass.
+agent: A-LAW
+requests:
+  - source_key: worldbank.wbl
+    daily_requests: 10
+    expected_bytes_per_day: 30000000
+    reason: "3 XLSX downloads per run (WBL panel 1971-2024 ~9.6 MB, WBL 2026 full data ~2.5 MB, WBL 1.0 2026 scores ~75 kB); one run per year"
+  - source_key: constitute.service
+    daily_requests: 5
+    expected_bytes_per_day: 1000000
+    reason: "1 JSON request per run (constitutions list, ~150 kB)"
+  - source_key: ccp.data
+    daily_requests: 10
+    expected_bytes_per_day: 300000000
+    reason: >-
+      Chronology v6 ZIP (~0.8 MB, 1 request + 1 Box redirect). The Characteristics v5 ZIP is 118 MB:
+      above the 50 MB ConnectorSpec.max_response_bytes cap, so it is not fetched until the lead
+      raises that cap for atlas bulk connectors (see docs/dev/v3_a_law.md); the byte figure reserves for it.
+  - source_key: factbook.json
+    daily_requests: 300
+    expected_bytes_per_day: 20000000
+    reason: "one ~60 kB JSON per Factbook entity (262 files at a pinned commit of factbook/factbook.json); one run total (source discontinued)"
+  - source_key: ssa.ssptw
+    daily_requests: 10
+    expected_bytes_per_day: 50000000
+    reason: "access probe only (www.ssa.gov answers 403 to this deployment); regional PDFs (~5-15 MB each) if access is restored"

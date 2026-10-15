@@ -1,0 +1,25 @@
+# Budget request from agent A-UN (UN WPP 2024, UN DESA migrant stock, UN SDG API, UNHCR, UNSD SYB).
+# ATLASCORE merges into registry/policies/budgets.yaml. One full refresh of every UN table = ~ the
+# figures below; refreshes are rare (WPP biennial, IMS ~5-yearly, SDG quarterly, UNHCR twice a year).
+agent: A-UN
+requests:
+  - source_key: un.wpp
+    daily_requests: 10
+    expected_bytes_per_day: 70000000
+    reason: "3 bulk CSV.gz files (16.6 + 17.0 + 29.9 MB), one request each; retries"
+  - source_key: un.desa_ims
+    daily_requests: 5
+    expected_bytes_per_day: 13000000
+    reason: "one 6.0 MB xlsx workbook (destination x origin), retries"
+  - source_key: un.sdg
+    daily_requests: 400
+    expected_bytes_per_day: 250000000
+    reason: "series list + ~45 headline series x 1000-row pages (~250 pages, ~0.6 KB per row); server is slow (10-90 s per page)"
+  - source_key: unhcr.population
+    daily_requests: 150
+    expected_bytes_per_day: 60000000
+    reason: "years list + one bilateral page per year 1951-latest (~75) + paged totals by asylum / by origin"
+  - source_key: unsd.syb
+    daily_requests: 5
+    expected_bytes_per_day: 5000000
+    reason: "one 2.1 MB CSV (SYB68 T02 population, surface area and density)"

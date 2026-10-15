@@ -1,0 +1,44 @@
+[
+  {
+    "request_fingerprint": "a75d03b8a7b417b5a864003c3e4c94a601921d0d86e294356c62608def4dfe22",
+    "url": "https://www.wipo.int/documents/d/ip-statistics/docs-en-wipo-data-design-indicators.zip",
+    "file": "a75d03b8a7b417b5.zip",
+    "sha256": "fdcfbaf3c00e26d9ea778aa27579e2c1eaa360988f42cf4b85a5b97cfbc3a7f0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:40+00:00",
+    "licence": "CC-BY-4.0",
+    "note": "EXCERPT: real rows of the 2026-10-15 live ZIP (years 2020-2021, selected offices/origins/ids) copied verbatim into a new ZIP with the same member names; patent ZIP keeps the real field-name workbook.",
+    "excerpt_of_sha256": "c0bc564fd72efc6abaf7ff574a6fe6c23f71dd3f0a5004a55f64ae0f079eabcd"
+  },
+  {
+    "request_fingerprint": "8bf03d71aed6345b6b6cef6c6d036c2be285a9ed24f35e8b8cc27f74762bba5a",
+    "url": "https://www.wipo.int/documents/d/ip-statistics/wipo-data-patent-indicators.zip",
+    "file": "8bf03d71aed6345b.zip",
+    "sha256": "0c8c07319df67a39933df8ad132de96e41b23ab1a7b7ee59ade23bdb9cab7dca",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:40+00:00",
+    "licence": "CC-BY-4.0",
+    "note": "EXCERPT: real rows of the 2026-10-15 live ZIP (years 2020-2021, selected offices/origins/ids) copied verbatim into a new ZIP with the same member names; patent ZIP keeps the real field-name workbook.",
+    "excerpt_of_sha256": "e60659bc6abf8a595d9dac839212c15d42c43f5a64c534004810c0c2a7609ccd"
+  },
+  {
+    "request_fingerprint": "c0bb5d2b4740d124899846909494349602785e2549b14fdce4e17dd25f487080",
+    "url": "https://www.wipo.int/documents/d/ip-statistics/wipo-data-trademark-indicators.zip",
+    "file": "c0bb5d2b4740d124.zip",
+    "sha256": "4cf9776903bc083b3eb00f609a9097c7d47c199b7e7425c844c0b1072c6ce353",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:40+00:00",
+    "licence": "CC-BY-4.0",
+    "note": "EXCERPT: real rows of the 2026-10-15 live ZIP (years 2020-2021, selected offices/origins/ids) copied verbatim into a new ZIP with the same member names; patent ZIP keeps the real field-name workbook.",
+    "excerpt_of_sha256": "0fe95bba0fa63506951503c9837b60c27944b2f89b31704517920f66068a774c"
+  }
+]

@@ -1,0 +1,26 @@
+[
+  {
+    "request_fingerprint": "014c2619a2ac6294c4afe63f3d849b33b0d75da46ffa4d3c1e65175860f4dcca",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/codelist/ESTAT/OBS_FLAG",
+    "file": "014c2619a2ac6294.json",
+    "sha256": "34fc65a6d77899221473941b0e64fd16b5324ec9717486933ed41e4fe57e25c6",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+    },
+    "retrieved_at": "2026-10-15T22:24:18.699435+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0 equivalent; acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "e041abdce7c63bfa8191113999736909cd75f17344ceb25bdde755c91bd1a59d",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/earn_mw_cur/S..FR+AT+EL+UK+DE?format=SDMX-CSV&compressed=false",
+    "file": "e041abdce7c63bfa.json",
+    "sha256": "884ce6862c7d6872680457c3e10a264a8c8615eff9fe345cea3d301c00dd1ad3",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv;version=1.0.0"
+    },
+    "retrieved_at": "2026-10-15T22:24:19.246154+00:00",
+    "licence": "Eurostat reuse policy (CC BY 4.0 equivalent; acknowledgement required)"
+  }
+]

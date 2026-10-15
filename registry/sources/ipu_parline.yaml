@@ -1,0 +1,28 @@
+# V3 (agent A-POL): IPU Parline open-data API (chambers, parliaments, countries, elections).
+source_key: ipu.parline
+title: Inter-Parliamentary Union -- Parline open data API
+provider_url: https://api.data.ipu.org/
+lineage_family: ipu_parline
+rights:
+  licence: CC-BY-NC-SA-4.0
+  licence_url: https://creativecommons.org/licenses/by-nc-sa/4.0/
+  attribution: "Inter-Parliamentary Union (IPU), Parline database (https://data.ipu.org)"
+  non_commercial: true
+  share_alike: derived tables must be shared under CC BY-NC-SA 4.0
+  licence_evidence: >-
+    Every API response carries meta.licence = "This work is licensed under Creative Commons
+    Attribution-NonCommercial-ShareAlike 4.0 International" and meta.terms_of_use
+    (https://www.ipu.org/terms-use; that page is behind a Cloudflare challenge for non-browser clients,
+    2026-10-15). The connector refuses a response whose declared licence differs.
+  restriction: >-
+    NON-COMMERCIAL. Atlas tables from this source must not be used or served commercially; a commercial
+    deployment must exclude source "ipu".
+metadata:
+  allowed_hosts: [api.data.ipu.org]
+  endpoints:
+    - https://api.data.ipu.org/v1/chambers?page%5Bsize%5D=300
+    - https://api.data.ipu.org/v1/parliaments?page%5Bsize%5D=300
+    - https://api.data.ipu.org/v1/countries?page%5Bsize%5D=300
+    - https://api.data.ipu.org/v1/elections?page%5Bsize%5D=3500
+  authentication: none
+  cadence: continuous updates; monthly refresh is enough

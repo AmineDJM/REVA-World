@@ -1,0 +1,19 @@
+# V3 (agent A-ILO): OECD Data Explorer SDMX REST API, earnings dataflows (OECD.ELS.SAE).
+# Connector: src/reva/adapters/connectors/atlas_wages_gapfill.py (OecdEarningsConnector).
+source_key: oecd.sdmx
+title: OECD Data Explorer SDMX API (sdmx.oecd.org)
+provider_url: https://sdmx.oecd.org/public/rest/
+lineage_family: oecd
+rights:
+  licence: "OECD Terms and Conditions (open access; CC BY 4.0 is the OECD default since 2024-07-01, dataset-level licence not separately verified)"
+  licence_url: https://www.oecd.org/en/about/oecd-open-by-default-policy.html
+  terms_url: https://www.oecd.org/en/about/terms-conditions.html
+  attribution: "OECD Data Explorer (OECD.ELS.SAE earnings database)"
+metadata:
+  allowed_hosts: [sdmx.oecd.org]
+  data_explorer: https://data-explorer.oecd.org/
+  authentication: none
+  cadence: annual (earnings database), monthly re-download check
+  notes: >-
+    Minimum wages and average wages are compiled by the OECD from national sources (national
+    accounts, labour legislation); not independent of ILOSTAT/Eurostat values for the same country.

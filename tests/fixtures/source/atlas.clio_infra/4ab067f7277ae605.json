@@ -1,0 +1,249 @@
+{
+ "status": "OK",
+ "data": {
+  "q": "*",
+  "total_count": 6,
+  "start": 0,
+  "spelling_alternatives": {},
+  "items": [
+   {
+    "name": "Labourers Real Wage",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/UFVNXT",
+    "global_id": "doi:10.34894/UFVNXT",
+    "description": "The building labourers\u2019 real wage is given annually for the period 1850-2010.",
+    "published_at": "2026-01-08T18:39:13Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "de Zwart, Pim; van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2026, \"Labourers Real Wage\", <a href=\"https://doi.org/10.34894/UFVNXT\" target=\"_blank\">https://doi.org/10.34894/UFVNXT</a>, DataverseNL, V1",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "de Zwart, Pim; van Leeuwen, Bas; van Leeuwen-Li, Jieli, 2026, \"Labourers Real Wage\", https://doi.org/10.34894/UFVNXT, DataverseNL, V1",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/UFVNXT",
+    "keywords": [
+     "wage",
+     "building labourer"
+    ],
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 2,
+    "versionId": 32525,
+    "versionState": "RELEASED",
+    "majorVersion": 1,
+    "minorVersion": 1,
+    "createdAt": "2026-01-08T18:39:11Z",
+    "updatedAt": "2026-01-08T18:39:18Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": ""
+     }
+    ],
+    "authors": [
+     "de Zwart, Pim",
+     "van Leeuwen, Bas",
+     "van Leeuwen-Li, Jieli"
+    ]
+   },
+   {
+    "name": "Total Population",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/HW27BU",
+    "global_id": "doi:10.34894/HW27BU",
+    "description": "The World Countries Population Size ratio dataset comprises information on total population per each country for the period 1500-2000. Data has been gathered and organized in 50-years intervals for the period 1500-1800 and in 10-years intervals for the period 1800-2000, using as geographical reference the current list of existing world countries.",
+    "published_at": "2026-01-08T18:43:38Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "Fink-Jensen, Jonathan, 2026, \"Total Population\", <a href=\"https://doi.org/10.34894/HW27BU\" target=\"_blank\">https://doi.org/10.34894/HW27BU</a>, DataverseNL, V1",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "Fink-Jensen, Jonathan, 2026, \"Total Population\", https://doi.org/10.34894/HW27BU, DataverseNL, V1",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/HW27BU",
+    "keywords": [
+     "population",
+     "demography"
+    ],
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 2,
+    "versionId": 32581,
+    "versionState": "RELEASED",
+    "majorVersion": 1,
+    "minorVersion": 0,
+    "createdAt": "2026-01-08T18:43:36Z",
+    "updatedAt": "2026-01-08T18:43:38Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": ""
+     }
+    ],
+    "authors": [
+     "Fink-Jensen, Jonathan"
+    ]
+   },
+   {
+    "name": "index file clio-infra",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/G7NZ87",
+    "global_id": "doi:10.34894/G7NZ87",
+    "description": "index file with indicator names for clio-infra. It will allow the indictaors to be recognised by the front end and Data Processing Engine (DPE). If an additional variable needs to be added to clio-infra, just add it to this file and upload it as a new version.",
+    "published_at": "2026-01-08T18:34:14Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "van Leeuwen, Bas, 2026, \"index file clio-infra\", <a href=\"https://doi.org/10.34894/G7NZ87\" target=\"_blank\">https://doi.org/10.34894/G7NZ87</a>, DataverseNL, V4",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "van Leeuwen, Bas, 2026, \"index file clio-infra\", https://doi.org/10.34894/G7NZ87, DataverseNL, V4",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/G7NZ87",
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 1,
+    "versionId": 32464,
+    "versionState": "RELEASED",
+    "majorVersion": 4,
+    "minorVersion": 1,
+    "createdAt": "2026-01-08T18:33:59Z",
+    "updatedAt": "2026-01-08T18:34:18Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": ""
+     }
+    ],
+    "authors": [
+     "van Leeuwen, Bas"
+    ]
+   },
+   {
+    "name": "Geocoder",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/DPHTH1",
+    "global_id": "doi:10.34894/DPHTH1",
+    "description": "Geocoder dataset",
+    "published_at": "2026-01-08T18:45:02Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "van Leeuwen, Bas, 2026, \"Geocoder\", <a href=\"https://doi.org/10.34894/DPHTH1\" target=\"_blank\">https://doi.org/10.34894/DPHTH1</a>, DataverseNL, V1",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "van Leeuwen, Bas, 2026, \"Geocoder\", https://doi.org/10.34894/DPHTH1, DataverseNL, V1",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/DPHTH1",
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 1,
+    "versionId": 32601,
+    "versionState": "RELEASED",
+    "majorVersion": 1,
+    "minorVersion": 1,
+    "createdAt": "2026-01-08T18:45:01Z",
+    "updatedAt": "2026-01-08T18:45:06Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": ""
+     }
+    ],
+    "authors": [
+     "van Leeuwen, Bas"
+    ]
+   },
+   {
+    "name": "Infant Mortality",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/JITFDV",
+    "global_id": "doi:10.34894/JITFDV",
+    "description": "Infant mortality was large component of overall mortailtiy, because children in their first year of life are particularly vulnerable. Moreover, the variable can serve as an indicator of the disease environment, when it comes to assessing the proximate determinants of height.",
+    "published_at": "2026-01-08T18:38:39Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "Baten, Joerg; Blum, Mathias, 2026, \"Infant Mortality\", <a href=\"https://doi.org/10.34894/JITFDV\" target=\"_blank\">https://doi.org/10.34894/JITFDV</a>, DataverseNL, V1",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "Baten, Joerg; Blum, Mathias, 2026, \"Infant Mortality\", https://doi.org/10.34894/JITFDV, DataverseNL, V1",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/JITFDV",
+    "keywords": [
+     "infant",
+     "mortality"
+    ],
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 2,
+    "versionId": 35379,
+    "versionState": "RELEASED",
+    "majorVersion": 1,
+    "minorVersion": 1,
+    "createdAt": "2026-01-08T18:38:36Z",
+    "updatedAt": "2026-09-19T21:20:48Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": "International Institute of Social History"
+     }
+    ],
+    "authors": [
+     "Baten, Joerg",
+     "Blum, Mathias"
+    ]
+   },
+   {
+    "name": "Height",
+    "type": "dataset",
+    "url": "https://doi.org/10.34894/CGMOIO",
+    "global_id": "doi:10.34894/CGMOIO",
+    "description": "This variable contains anthropometric information which can be used as an indicator for human health and welfare in 165 countries spanning the period 1810-1989, and a smaller number of countries 1500-1800",
+    "published_at": "2026-01-08T18:37:54Z",
+    "publisher": "Clio Infra",
+    "citationHtml": "Baten, Joerg; Blum, Mathias, 2026, \"Height\", <a href=\"https://doi.org/10.34894/CGMOIO\" target=\"_blank\">https://doi.org/10.34894/CGMOIO</a>, DataverseNL, V1",
+    "identifier_of_dataverse": "clioinfra",
+    "name_of_dataverse": "Clio Infra",
+    "citation": "Baten, Joerg; Blum, Mathias, 2026, \"Height\", https://doi.org/10.34894/CGMOIO, DataverseNL, V1",
+    "publicationStatuses": [
+     "Published"
+    ],
+    "storageIdentifier": "surf://10.34894/CGMOIO",
+    "keywords": [
+     "height",
+     "anthropometrics",
+     "standard of living"
+    ],
+    "subjects": [
+     "Arts and Humanities"
+    ],
+    "fileCount": 2,
+    "versionId": 35376,
+    "versionState": "RELEASED",
+    "majorVersion": 1,
+    "minorVersion": 2,
+    "createdAt": "2026-01-08T18:37:52Z",
+    "updatedAt": "2026-09-19T21:14:36Z",
+    "contacts": [
+     {
+      "name": "van Leeuwen, Bas",
+      "affiliation": "International Institute of Social History"
+     }
+    ],
+    "authors": [
+     "Baten, Joerg",
+     "Blum, Mathias"
+    ]
+   }
+  ],
+  "count_in_response": 6
+ }
+}

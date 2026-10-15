@@ -1,0 +1,14 @@
+[
+  {
+    "request_fingerprint": "258157c9ffb2df3d86ccb37d5467b516c3e70cf53d87ac0ae1e50cb6b7f1c2f8",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/",
+    "file": "index_403.html",
+    "sha256": "4e1eec1696a27e5f60faf668aa7c9745899ac16bebe1b392eb67f4ba34437890",
+    "status": 403,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "US Government work"
+  }
+]

@@ -1,0 +1,19 @@
+id: core.sovereign_states
+domain: core
+owner: WDHARVEST
+description: >-
+  Current sovereign states (instance of sovereign state Q3624078, statement without end time, item without
+  dissolution date). Mostly overlaps core.countries; it checks that no sovereign state is missing from the
+  crosswalk mapping.
+purpose: seed_entities
+entity_kind: country
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item p:P31 ?st . ?st ps:P31 wd:Q3624078 ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    FILTER NOT EXISTS { ?st pq:P582 ?end }
+    FILTER NOT EXISTS { ?item wdt:P576 ?dissolved }
+  }
+max_rows: 400
+depends_on: [core.countries]
+expand_hops: 1

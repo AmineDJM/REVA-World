@@ -1,0 +1,31 @@
+# V3 (agent A-UN): UN World Population Prospects 2024, official CSV bulk files.
+# Connector: src/reva/adapters/connectors/atlas_un.py (atlas.un_wpp) -> atlas tables un_wpp.*
+source_key: un.wpp
+title: "UN DESA Population Division - World Population Prospects 2024 (CSV bulk files)"
+provider_url: https://population.un.org/wpp/downloads
+lineage_family: un_wpp
+rights:
+  licence: CC BY 3.0 IGO
+  licence_url: https://creativecommons.org/licenses/by/3.0/igo/
+  attribution: "United Nations, Department of Economic and Social Affairs, Population Division (2024). World Population Prospects 2024."
+  review: >-
+    pending maintainer review: the WPP 2024 CSV files carry no licence text; CC BY 3.0 IGO is the licence
+    the Population Division states on its WPP 2024 publications and on the International Migrant Stock 2024
+    workbook (same division, quoted in un_desa_ims.yaml).
+metadata:
+  allowed_hosts: [population.un.org]
+  files:
+    - WPP2024_Demographic_Indicators_Medium.csv.gz      # 16.6 MB; estimates 1950-2023 + medium variant 2024-2100
+    - WPP2024_TotalPopulationBySex.csv.gz              # 17.0 MB; all projection variants 2024-2100
+    - WPP2024_PopulationByAge5GroupSex_Medium.csv.gz   # 29.9 MB; 5-year age groups x sex, 1950-2100
+  not_ingested:
+    - "WPP2024_PopulationBySingleAgeSex_Medium_{1950-2023,2024-2100}.csv.gz (62 + 67 MB; ~14 M atlas rows): over the per-table row guidance and the shared container's memory; 5-year groups used"
+    - "WPP2024_Demographic_Indicators_OtherVariants.csv.gz (75 MB): only total population of the variants is ingested (TotalPopulationBySex)"
+  authentication: none
+  cadence: biennial revision (WPP 2024 released July 2024; files dated 2024-12-13)
+  editorial_status: >-
+    Official UN estimates (1950-2023) and projections (2024-2100). Estimates are model-based
+    reconstructions from censuses, surveys and registers, not raw national figures. Every year >= 2024
+    is a projection and is flagged (projection: true) with its variant.
+  upstream_lineages:
+    population: [national_censuses, civil_registration, surveys, un_wpp_model]

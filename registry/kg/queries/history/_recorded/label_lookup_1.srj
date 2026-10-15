@@ -1,0 +1,2363 @@
+{
+  "head" : {
+    "vars" : [ "l", "item", "sl" ]
+  },
+  "results" : {
+    "bindings" : [ {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q517"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "287"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ferdinand Magellan"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1496"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "197"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7322"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "244"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q7328"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "184"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Spanish Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q80702"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "105"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q193415"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "59"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "decolonization"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q230533"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "79"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q416008"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "9"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q504716"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "9"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q733369"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "26"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q958465"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "35"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q978780"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "43"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q986312"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "41"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q996166"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "40"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1063221"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "9"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1077653"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1084704"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "6"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Ferdinand Magellan"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1405590"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "7"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1578710"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "27"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1848741"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "21"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1898195"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "15"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2094623"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2394507"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "11"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2423375"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "29"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3018979"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "13"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3201635"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3534639"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "13"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3870242"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q3870243"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4008878"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "7"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5112137"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q5112140"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6964999"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965000"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965001"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "5"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965004"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965007"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965008"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6965009"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10335798"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10335799"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10389352"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10594523"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q10594524"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q12386745"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16958121"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q16958126"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17232640"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q17522194"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "4"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q18809271"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19234596"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19948474"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q19949500"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q20200218"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q20267859"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q20671305"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q20791791"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q24027370"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27242163"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q27688783"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q30610115"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q31681921"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q36982451"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q50809784"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "7"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q55008336"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q60749942"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q60832358"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63887670"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63891159"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63892515"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q63893164"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q64706221"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65026130"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65364511"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q80008249"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q80023503"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q97854186"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q97889933"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q103843088"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q103843562"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q103888037"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q105806948"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "44"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629161"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629191"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q110654411"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Vasco da Gama"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q110880142"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q115622105"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q115803480"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q116992894"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q117349992"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q120933023"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q122793107"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q123758107"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q124465630"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q134341043"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q135475830"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q135990429"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q136304370"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q137939804"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Napoleon"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q140133129"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "British Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q8680"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "170"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Berlin Conference"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q13582"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "71"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Suez Crisis"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q49101"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "87"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Congo Free State"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q76048"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "66"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Dutch Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q130654"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "67"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q174432"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "82"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "French colonial empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q179023"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "80"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Treaty of Tordesillas"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q180897"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "67"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q193155"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "61"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Portuguese Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q200464"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "92"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Belgian Congo"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q213510"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "66"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Crown of Castile"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q217196"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "46"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Empire of Brazil"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q217230"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "68"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Portuguese India"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q323904"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "51"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Annexation of Goa"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q626191"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "29"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "United Kingdom of Portugal, Brazil and the Algarves"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q903779"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "37"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "decolonisation of Africa"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1146918"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "41"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Berlin Conference"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1178291"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "15"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Independence of Brazil"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q1548600"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "27"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Colonial Brazil"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q2088324"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "27"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Berlin Conference"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q4892411"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "9"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6689252"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6689255"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "10"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q6689258"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "3"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q11815406"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q45052250"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q65070571"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q78647762"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Pedro Álvares Cabral"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q83631528"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q99484680"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q99773833"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629312"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629320"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629332"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629420"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629423"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629471"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629475"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629481"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629497"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q108629500"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q112041358"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q114498525"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Louisiana Purchase"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q114518412"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q116958530"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Treaty of Tordesillas"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q117804047"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q124329587"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q124385300"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Colonial Brazil"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q126088500"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q126188036"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "British Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q126595280"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q128789720"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q131289311"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "2"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "British Empire"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q133012110"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "0"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q133252286"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q137710471"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    }, {
+      "l" : {
+        "xml:lang" : "en",
+        "type" : "literal",
+        "value" : "Christopher Columbus"
+      },
+      "item" : {
+        "type" : "uri",
+        "value" : "http://www.wikidata.org/entity/Q138725786"
+      },
+      "sl" : {
+        "datatype" : "http://www.w3.org/2001/XMLSchema#integer",
+        "type" : "literal",
+        "value" : "1"
+      }
+    } ]
+  }
+}

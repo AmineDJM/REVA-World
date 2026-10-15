@@ -1,0 +1,22 @@
+# V3 (agent KGCULT): UNESCO World Heritage List via UNESCO's open-data portal (Opendatasoft).
+# Connector: src/reva/adapters/connectors/atlas_unesco_whc.py -> atlas table unesco_whc.whc001.
+source_key: unesco.whc
+title: UNESCO World Heritage List (data.unesco.org dataset whc001)
+provider_url: https://data.unesco.org/explore/dataset/whc001/
+lineage_family: unesco_whc
+rights:
+  licence: CC BY-SA 4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: "UNESCO World Heritage Centre - World Heritage List (data.unesco.org, whc001)"
+metadata:
+  allowed_hosts: [data.unesco.org]
+  dataset_record: https://data.unesco.org/api/explore/v2.1/catalog/datasets/whc001
+  terms_of_use: >-
+    The dataset record links the World Heritage Centre "Terms and Conditions of Use"
+    (https://whc.unesco.org/en/syndication); that page is behind a Cloudflare browser challenge
+    for non-browser clients (HTTP 403, 2026-10-15) and could not be read. The licence used is the
+    one the dataset record declares (CC BY-SA 4.0): attribution + share-alike on derived tables.
+  share_alike: derived atlas tables are distributed under CC BY-SA 4.0
+  coverage: current List only (removed properties absent); one property (Old City of Jerusalem) has no State Party code
+  authentication: none
+  cadence: weekly check; the List changes once a year (World Heritage Committee session)

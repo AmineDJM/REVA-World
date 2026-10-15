@@ -1,0 +1,22 @@
+# V3 (agent A-HISTECON): Clio-Infra datasets (IISH / Utrecht University) on DataverseNL.
+# Connector: src/reva/adapters/connectors/atlas_clio.py -> atlas table clio.infra.
+source_key: clio_infra.dataverse
+title: Clio-Infra historical indicators (DataverseNL collection clioinfra)
+provider_url: https://clio-infra.eu/
+lineage_family: clio_infra
+rights:
+  licence: CC0 1.0 or CC BY-SA 4.0 (per dataset record; recorded on every row)
+  licence_url: https://creativecommons.org/publicdomain/zero/1.0/
+  attribution: "Clio-Infra (clio-infra.eu), IISH / Utrecht University; DataverseNL collection clioinfra"
+metadata:
+  allowed_hosts: [dataverse.nl, objectstore.surf.nl]
+  search: https://dataverse.nl/api/search?q=*&subtree=clioinfra&type=dataset
+  share_alike: >-
+    Rows from the CC BY-SA 4.0 datasets (Global Hunger, Infant Mortality, Numeracy (Total), Gender Equality
+    of Numeracy at 2026-10-15) must be shared under CC BY-SA 4.0.
+  website_note: >-
+    clio-infra.eu states no licence; its 'Compact' files are a derived view of the DataverseNL deposits
+    (checked identical for Height) and are not used.
+  restricted: the 'Geocoder' file is restricted on DataverseNL (HTTP 403) and is not fetched
+  authentication: none
+  cadence: quarterly check

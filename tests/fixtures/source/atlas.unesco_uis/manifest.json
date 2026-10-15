@@ -1,0 +1,38 @@
+[
+  {
+    "request_fingerprint": "03522dc9a1940387d199143096ada354f8a8f3b3c4aed0a116abfa29e31688f4",
+    "url": "https://api.uis.unesco.org/api/public/data/indicators?indicator=LR.AG15T99&indicator=LR.AG15T99.F&geoUnit=DZA&geoUnit=FRA&geoUnit=IND&geoUnit=NGA&geoUnit=TUR&version=20260507-91260335&indicatorMetadata=true&footnotes=true",
+    "file": "03522dc9a1940387.json",
+    "sha256": "c45c551217260729bc2331b8c96d56339cf2cd951067b9daa2c8854835ac6243",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:43.676285+00:00",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "request_fingerprint": "d00643d3768880734e30dee6971a3eb29e150e042fa6f6741d69b29beceeada4",
+    "url": "https://api.uis.unesco.org/api/public/data/indicators?indicator=XGDP.FSGOV&indicator=EXPGDP.TOT&indicator=CR.MOD.1&geoUnit=DZA&geoUnit=FRA&geoUnit=IND&geoUnit=NGA&geoUnit=TUR&version=20260507-91260335&indicatorMetadata=true&footnotes=true",
+    "file": "d00643d376888073.json",
+    "sha256": "4471915602ec420013579db9f3e015cd60f0f27e3d0a5edf6041f277fff97128",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:44.733251+00:00",
+    "licence": "CC BY-SA 4.0"
+  },
+  {
+    "request_fingerprint": "a2f6647e46620e8e1436e3cfd6e25008d06546395ebf74edbc5d1f8ff8a23de1",
+    "url": "https://api.uis.unesco.org/api/public/versions/default",
+    "file": "a2f6647e46620e8e.json",
+    "sha256": "0a477d4df91b0eec26ea6d0e409a4d59348ce755191b6a7662b9c04974031c08",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:42.878818+00:00",
+    "licence": "CC BY-SA 4.0"
+  }
+]

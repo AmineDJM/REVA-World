@@ -1,0 +1,35 @@
+# V3 (agent A-POL): V-Dem Country-Year Full+Others dataset, as distributed by the V-Dem Institute in its
+# own R package vdemdata (data/vdem.RData, data/codebook.RData on raw.githubusercontent.com).
+source_key: vdem.vdemdata
+title: Varieties of Democracy (V-Dem) Country-Year dataset, Full+Others (vdemdata R package)
+provider_url: https://www.v-dem.net/data/the-v-dem-dataset/
+lineage_family: vdem
+rights:
+  licence: CC-BY-SA-4.0
+  licence_url: https://creativecommons.org/licenses/by-sa/4.0/
+  attribution: >-
+    Coppedge, Michael, John Gerring, Carl Henrik Knutsen, Staffan I. Lindberg, Jan Teorell, et al. 2026.
+    "V-Dem Country-Year Dataset v16". Varieties of Democracy (V-Dem) Project. https://doi.org/10.23696/vdemds26
+    -- and Pemstein et al., "The V-Dem Measurement Model" (V-Dem Working Paper 21, 2026 ed.).
+  share_alike: derived tables must be shared under CC BY-SA 4.0
+  licence_evidence: >-
+    V-Dem FAQ (https://v-dem.net/about/faq/, read 2026-10-15): "The V-Dem Dataset is publicly available and
+    published under a Creative Commons Attribution-ShareAlike (CC BY-SA) 4.0 license."
+  excluded_third_party_variables: >-
+    The "Others" part re-distributes third-party variables (e_*: Polity5, Freedom House, WGI, UDS, TI CPI,
+    BMR, LIED, ...). Their original licences apply and are not covered by V-Dem's; none is loaded from here
+    (Polity5 forbids redistribution; WGI belongs to agent A-WB; BMR and LIED are loaded from their own CC0
+    releases).
+metadata:
+  allowed_hosts: [raw.githubusercontent.com]
+  files:
+    - https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/DESCRIPTION
+    - https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/codebook.RData
+    - https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
+  access_note: >-
+    The v-dem.net download form requires an e-mail address, gender and consent to personal-data processing;
+    an autonomous agent does not submit the owner's personal data, so the V-Dem Institute's own GitHub
+    distribution (same Full+Others dataset, version stated in DESCRIPTION) is used.
+  format: gzip-compressed R serialization (RDX3/XDR), read by reva.adapters.connectors.atlas_rdata
+  cadence: annual release (March); the GitHub master branch moves with releases
+  authentication: none

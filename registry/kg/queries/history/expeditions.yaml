@@ -1,0 +1,17 @@
+id: history.expeditions
+domain: history
+owner: KGHIST
+description: >-
+  Voyages and expeditions: instances of expedition (Q2401485) or of a subclass (voyage of exploration,
+  military expedition, scientific expedition, ...). Snapshots keep participants (P710), start/end
+  (P580/P582), start and destination points (P1427/P1444), country/sponsor (P17), part of (P361) and
+  significant events. Person -> expedition links stated on the person (P1344) come from
+  history.expedition_participants.
+purpose: seed_entities
+entity_kind: voyage
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q2401485 .
+  }
+max_rows: 8000
+expand_hops: 1

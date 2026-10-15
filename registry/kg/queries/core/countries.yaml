@@ -1,0 +1,13 @@
+id: core.countries
+domain: core
+owner: WDHARVEST
+description: >-
+  The 250 crosswalk countries/territories (registry/entities/country_qids.json), full claims filtered to the
+  allow-list; objects referenced by their statements get label snapshots.
+purpose: seed_entities
+entity_kind: country
+sparql: |
+  SELECT ?item WHERE { VALUES ?item { {{values}} } }
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 300
+expand_hops: 1

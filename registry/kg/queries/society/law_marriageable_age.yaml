@@ -1,0 +1,28 @@
+id: society.law_marriageable_age
+domain: society
+owner: A-LAW
+description: >-
+  Marriageable age (P3000) statements of the 250 crosswalk countries: minimum age at which a person is generally allowed by law to marry; P518 qualifier distinguishes males/females/both. Quantity in years with
+  start/end/point-in-time qualifiers, applies-to-part (P518, e.g. male/female), "of" (P642), "statement is
+  subject of" (P805) and the statement's references; deprecated rank excluded. Community-edited legal ages for
+  the atlas law domain (agent A-LAW); never presented as verified law.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?age ?rank ?start ?end ?pit ?part ?of ?subjectof WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P3000 ?statement .
+    ?statement ps:P3000 ?age ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+    OPTIONAL { ?statement pq:P518 ?part }
+    OPTIONAL { ?statement pq:P642 ?of }
+    OPTIONAL { ?statement pq:P805 ?subjectof }
+  }
+columns: {subject: country, property: P3000, object: age, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit, qualifiers: {P518: part, P642: of, P805: subjectof}}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 3000
+expand_hops: 1

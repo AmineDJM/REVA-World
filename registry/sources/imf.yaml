@@ -1,0 +1,35 @@
+# V3 (agent A-IMF): IMF data portal SDMX 2.1 REST API -- WEO, BOP, IMTS (ex-DOTS), GFS, ER/MFS_IR/IL (ex-IFS).
+source_key: imf.sdmx
+title: International Monetary Fund data portal (SDMX 2.1 API)
+provider_url: https://api.imf.org/external/sdmx/2.1
+lineage_family: imf
+rights:
+  licence: "IMF Copyright and Usage terms"
+  licence_url: https://www.imf.org/external/terms.htm
+  attribution: "International Monetary Fund, <dataset name>, https://data.imf.org/en/datasets/<agency>:<flow>"
+  provider_license_attribute: "(c) International Monetary Fund Copyright. All Rights Reserved. https://www.imf.org/external/terms.htm"
+  review: >-
+    pending maintainer review: the IMF terms page could not be retrieved from the build container
+    (HTTP 403 from the CDN on 2026-10-15); the IMF publishes these datasets openly (PUBLIC_OPEN access
+    level, no key) and asks for the citation above.
+metadata:
+  allowed_hosts: [api.imf.org]
+  api_docs: https://data.imf.org/en/Resource-Pages/IMF-API
+  authentication: none
+  formats: "SDMX-ML 2.1 structure-specific data (Accept: application/vnd.sdmx.structurespecificdata+xml;version=2.1)"
+  dataflows:
+    - IMF.RES:WEO        # World Economic Outlook, current vintage (Oct 2026 = 9.0.0); past vintages WEO_<yyyy>_<MON>_VINTAGE
+    - IMF.STA:BOP        # Balance of Payments, BPM6
+    - IMF.STA:IMTS       # International Trade in Goods by partner country (successor of DOTS)
+    - IMF.STA:GFS_SOO    # GFS Statement of Operations
+    - IMF.STA:ER         # Exchange rates (ex-IFS)
+    - IMF.STA:MFS_IR     # Interest rates (ex-IFS)
+    - IMF.STA:IL         # International liquidity / reserves (ex-IFS)
+  cadence: "WEO April and October; BOP/IMTS/IFS-successor flows monthly/quarterly updates"
+  editorial_status: >-
+    Official statistics compiled by the IMF from national authorities plus IMF staff estimates and
+    projections. WEO years after LATEST_ACTUAL_ANNUAL_DATA are projections (flagged). IMTS includes
+    IMF estimates for non-reporting economies.
+  upstream_lineages:
+    weo: [national_statistical_offices, central_banks, imf_staff]
+    imts: [national_customs, imf_staff_partner_estimates]

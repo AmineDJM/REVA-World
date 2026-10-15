@@ -1,0 +1,20 @@
+# V3 (agent A-SCI): WIPO IP Statistics "complete data sets for indicators by class and by technology" (bulk ZIPs),
+# connector atlas.wipo_ipstats.
+source_key: wipo.ipstats_bulk
+title: WIPO IP Statistics bulk indicator files (patents by technology, trademarks and designs by class)
+provider_url: https://www.wipo.int/en/web/ip-statistics
+lineage_family: wipo
+rights:
+  licence: CC-BY-4.0
+  licence_url: https://www.wipo.int/tools/en/disclaim.html
+  licence_basis: "WIPO Open Access Policy (site-level statement; the files carry no file-level licence)"
+  attribution: "World Intellectual Property Organization (WIPO), IP Statistics Data Center"
+metadata:
+  allowed_hosts: [www.wipo.int]
+  files:
+    - https://www.wipo.int/documents/d/ip-statistics/wipo-data-patent-indicators.zip
+    - https://www.wipo.int/documents/d/ip-statistics/wipo-data-trademark-indicators.zip
+    - https://www.wipo.int/documents/d/ip-statistics/docs-en-wipo-data-design-indicators.zip
+  authentication: none
+  editorial_status: official statistics compiled by WIPO from national/regional IP offices
+  cadence: irregular (files dated 2023-12-06 at 2026-10-15)

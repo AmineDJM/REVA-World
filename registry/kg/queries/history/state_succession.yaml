@@ -1,0 +1,29 @@
+id: history.state_succession
+domain: history
+owner: KGHIST
+description: >-
+  State succession as explicit statements: replaces (P1365), replaced by (P1366), follows (P155) and
+  followed by (P156) of polities (historical countries, empires, colonies, protectorates, dependent
+  territories, countries), with statement ids and P580/P582/P585 qualifiers. Both directions are kept
+  because editors often state only one side (a colony says "replaced by" while the successor is silent).
+purpose: statements
+entity_kind: historical_state
+sparql: |
+  SELECT DISTINCT ?state ?statement ?prop ?other ?rank ?start ?end ?pit WHERE {
+    VALUES ?class { wd:Q3024240 wd:Q48349 wd:Q133156 wd:Q164142 wd:Q161243 wd:Q6256 }
+    VALUES (?p ?ps ?prop) { (p:P1365 ps:P1365 wd:P1365) (p:P1366 ps:P1366 wd:P1366)
+                            (p:P155 ps:P155 wd:P155) (p:P156 ps:P156 wd:P156) }
+    ?state wdt:P31/wdt:P279* ?class .
+    {{qid_filter}}
+    ?state ?p ?statement .
+    ?statement ?ps ?other ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: state, property_var: prop, object: other, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+split: {by: qid_prefix, variable: state}
+max_rows: 60000
+expand_hops: 1

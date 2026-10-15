@@ -1,0 +1,448 @@
+# Provider geography schemes of the politics atlas tables (agent A-POL). Every mapping below is either
+# the provider's own ISO 3166 alpha-3 code (scheme base) or an alias with the provider evidence quoted.
+# Codes that do not name the same entity as a crosswalk key stay unmapped (kept, listed in each atlas
+# table's manifest coverage.unmapped_provider_geo) and get a Wikidata QID from
+# registry/entities/vdem_qids.json where one could be verified.
+schemes:
+  # V-Dem country_text_id (vdem.RData v16, raw sha256 39b412d39a061c18f20c98e4ad4d6355b05a0441df31be4ee9aec420dc3d95ea).
+  # 176 of V-Dem's 202 units use ISO 3166 alpha-3 codes that are crosswalk keys (incl. XKX Kosovo).
+  # V-Dem country units follow V-Dem's own continuity rules (DEU 1789-1870 = Kingdom of Prussia, RUS 1922-1991 =
+  # USSR, ...); each atlas row says so in flags.vdem_histname.
+  # Excluded: PSE -- V-Dem's unit "Palestine/West Bank" covers the West Bank only (Gaza is unit PSG), so it is
+  # not the crosswalk entity PSE "State of Palestine".
+  # Unmapped (not crosswalk keys): BDN BRW BVR DDR HDM HKS HRG HVR MCL MDN NSS OLD PPS PRM PSB PSG SAX SML SPD
+  # SXN TSC TWN TWS VDR WRG YMD ZZB (historical states, sub-national units, Taiwan).
+  vdem:
+    base: iso3
+    exclude: [PSE]
+    aliases: {}
+    source:
+      kind: provider_data
+      url: https://raw.githubusercontent.com/vdeminstitute/vdemdata/master/data/vdem.RData
+      raw_sha256: 39b412d39a061c18f20c98e4ad4d6355b05a0441df31be4ee9aec420dc3d95ea
+      retrieved_at: "2026-10-15T22:08:36Z"
+
+  # LIED v6.9 unit keys '<countryn>|vdem=<id>' or '<countryn>|cow=<code>' (LIED_6.9.xlsx, raw sha256 4de421e6ab9636247e332b69cf3964b8c915e5ad797d3f2c4381185f78deefc7). Rule: a name maps through LIED's own
+  # vdem id -> V-Dem v16 country_text_id when that is a crosswalk key (PSE excluded, see vdem), else by exact
+  # crosswalk label, else by the three listed name matches. Unmapped keys (kept): Newfoundland|cow=21, Hanover|vdem=357, Hamburg|vdem=362, Brunswick|vdem=363, Bavaria|vdem=350, Germany, East|vdem=137, Oldenburg|vdem=364, Baden|vdem=349, Saxe-Weimar-Eisenach|vdem=365, Saxony|vdem=353, Wuerttemberg|vdem=355, Hesse-Kassel|vdem=358, Hesse-Darmstadt|vdem=359, Nassau|vdem=366, Mecklenburg-Schwerin|vdem=360, Sardinia|vdem=373, Papal states, the|vdem=361, Sicily|vdem=356, Modena|vdem=351, Parma|vdem=352, Tuscany|vdem=354, Zanzibar|vdem=236, Somaliland|vdem=139, Orange Free State|cow=556, Transvaal|cow=557, Natal|cow=558, Cape Colony|cow=559, Sahrawi|cow=601, Palestine/British Mandate|vdem=209, Palestine/West Bank|vdem=128, Palestine/Gaza|vdem=138, Yemen, South|vdem=23, Tibet|cow=711, Taiwan|vdem=48, Vietnam|vdem=35, Vietnam, South|vdem=35.
+  lied:
+    aliases:
+      - {code: "Afghanistan|vdem=36", iso3: AFG, source: "LIED vdem=36 = V-Dem v16 country_text_id AFG (years 1789-2025)"}
+      - {code: "Albania|vdem=12", iso3: ALB, source: "LIED vdem=12 = V-Dem v16 country_text_id ALB (years 1912-2025)"}
+      - {code: "Algeria|vdem=103", iso3: DZA, source: "LIED vdem=103 = V-Dem v16 country_text_id DZA (years 1789-2025)"}
+      - {code: "Andorra|vdem=142", iso3: AND, source: "LIED name \"Andorra\" = crosswalk label of AND (years 1814-2025)"}
+      - {code: "Angola|vdem=104", iso3: AGO, source: "LIED vdem=104 = V-Dem v16 country_text_id AGO (years 1885-2025)"}
+      - {code: "Antigua and Barbuda|vdem=143", iso3: ATG, source: "LIED name \"Antigua and Barbuda\" = crosswalk label of ATG (years 1951-2025)"}
+      - {code: "Argentina|vdem=37", iso3: ARG, source: "LIED vdem=37 = V-Dem v16 country_text_id ARG (years 1789-2025)"}
+      - {code: "Armenia|vdem=105", iso3: ARM, source: "LIED vdem=105 = V-Dem v16 country_text_id ARM (years 1991-2025)"}
+      - {code: "Australia|vdem=67", iso3: AUS, source: "LIED vdem=67 = V-Dem v16 country_text_id AUS (years 1789-2025)"}
+      - {code: "Austria-Hungary|vdem=144", iso3: AUT, source: "LIED vdem=144 = V-Dem v16 country_text_id AUT (years 1789-1866)"}
+      - {code: "Austria|vdem=144", iso3: AUT, source: "LIED vdem=144 = V-Dem v16 country_text_id AUT (years 1867-2025)"}
+      - {code: "Azerbaijan|vdem=106", iso3: AZE, source: "LIED vdem=106 = V-Dem v16 country_text_id AZE (years 1991-2025)"}
+      - {code: "Bahamas|vdem=145", iso3: BHS, source: "LIED name \"Bahamas\" = crosswalk label of BHS (years 1789-2025)"}
+      - {code: "Bahrain|vdem=146", iso3: BHR, source: "LIED vdem=146 = V-Dem v16 country_text_id BHR (years 1789-2025)"}
+      - {code: "Bangladesh|vdem=24", iso3: BGD, source: "LIED vdem=24 = V-Dem v16 country_text_id BGD (years 1971-2025)"}
+      - {code: "Barbados|vdem=147", iso3: BRB, source: "LIED vdem=147 = V-Dem v16 country_text_id BRB (years 1839-2025)"}
+      - {code: "Belarus|vdem=107", iso3: BLR, source: "LIED vdem=107 = V-Dem v16 country_text_id BLR (years 1991-2025)"}
+      - {code: "Belgium|vdem=148", iso3: BEL, source: "LIED vdem=148 = V-Dem v16 country_text_id BEL (years 1789-2025)"}
+      - {code: "Belize|vdem=149", iso3: BLZ, source: "LIED name \"Belize\" = crosswalk label of BLZ (years 1862-2025)"}
+      - {code: "Benin|vdem=52", iso3: BEN, source: "LIED vdem=52 = V-Dem v16 country_text_id BEN (years 1892-2025)"}
+      - {code: "Bhutan|vdem=53", iso3: BTN, source: "LIED vdem=53 = V-Dem v16 country_text_id BTN (years 1789-2025)"}
+      - {code: "Bolivia|vdem=25", iso3: BOL, source: "LIED vdem=25 = V-Dem v16 country_text_id BOL (years 1825-2025)"}
+      - {code: "Bosnia and Herzegovina|vdem=150", iso3: BIH, source: "LIED vdem=150 = V-Dem v16 country_text_id BIH (years 1990-2025)"}
+      - {code: "Botswana|vdem=68", iso3: BWA, source: "LIED vdem=68 = V-Dem v16 country_text_id BWA (years 1885-2025)"}
+      - {code: "Brazil|vdem=19", iso3: BRA, source: "LIED vdem=19 = V-Dem v16 country_text_id BRA (years 1789-2025)"}
+      - {code: "Brunei|vdem=151", iso3: BRN, source: "LIED name \"Brunei\"; crosswalk BRN \"Brunei Darussalam\" (years 1789-2025)"}
+      - {code: "Bulgaria|vdem=152", iso3: BGR, source: "LIED vdem=152 = V-Dem v16 country_text_id BGR (years 1878-2025)"}
+      - {code: "Burkina Faso|vdem=54", iso3: BFA, source: "LIED vdem=54 = V-Dem v16 country_text_id BFA (years 1919-2025)"}
+      - {code: "Burundi|vdem=69", iso3: BDI, source: "LIED vdem=69 = V-Dem v16 country_text_id BDI (years 1916-2025)"}
+      - {code: "Cambodia|vdem=55", iso3: KHM, source: "LIED vdem=55 = V-Dem v16 country_text_id KHM (years 1789-2025)"}
+      - {code: "Cameroon|vdem=108", iso3: CMR, source: "LIED vdem=108 = V-Dem v16 country_text_id CMR (years 1884-2025)"}
+      - {code: "Canada|vdem=66", iso3: CAN, source: "LIED vdem=66 = V-Dem v16 country_text_id CAN (years 1841-2025)"}
+      - {code: "Cape Verde|vdem=70", iso3: CPV, source: "LIED vdem=70 = V-Dem v16 country_text_id CPV (years 1789-2025)"}
+      - {code: "Central African Republic|vdem=71", iso3: CAF, source: "LIED vdem=71 = V-Dem v16 country_text_id CAF (years 1894-2025)"}
+      - {code: "Chad|vdem=109", iso3: TCD, source: "LIED vdem=109 = V-Dem v16 country_text_id TCD (years 1920-2025)"}
+      - {code: "Chile|vdem=72", iso3: CHL, source: "LIED vdem=72 = V-Dem v16 country_text_id CHL (years 1789-2025)"}
+      - {code: "China|vdem=110", iso3: CHN, source: "LIED vdem=110 = V-Dem v16 country_text_id CHN (years 1789-2025)"}
+      - {code: "Colombia|vdem=15", iso3: COL, source: "LIED vdem=15 = V-Dem v16 country_text_id COL (years 1789-2025)"}
+      - {code: "Comoros|vdem=153", iso3: COM, source: "LIED vdem=153 = V-Dem v16 country_text_id COM (years 1886-2025)"}
+      - {code: "Congo Brazzaville|vdem=112", iso3: COG, source: "LIED vdem=112 = V-Dem v16 country_text_id COG (years 1882-2025)"}
+      - {code: "Congo, Democratic Republic|vdem=111", iso3: COD, source: "LIED vdem=111 = V-Dem v16 country_text_id COD (years 1877-2025)"}
+      - {code: "Costa Rica|vdem=73", iso3: CRI, source: "LIED vdem=73 = V-Dem v16 country_text_id CRI (years 1838-2025)"}
+      - {code: "Cote d'Ivoire|vdem=64", iso3: CIV, source: "LIED vdem=64 = V-Dem v16 country_text_id CIV (years 1893-2025)"}
+      - {code: "Croatia|vdem=154", iso3: HRV, source: "LIED vdem=154 = V-Dem v16 country_text_id HRV (years 1990-2025)"}
+      - {code: "Cuba|vdem=155", iso3: CUB, source: "LIED vdem=155 = V-Dem v16 country_text_id CUB (years 1789-2025)"}
+      - {code: "Cyprus|vdem=156", iso3: CYP, source: "LIED vdem=156 = V-Dem v16 country_text_id CYP (years 1878-2025)"}
+      - {code: "Czech Republic|vdem=157", iso3: CZE, source: "LIED vdem=157 = V-Dem v16 country_text_id CZE (years 1993-2025)"}
+      - {code: "Czechoslovakia|vdem=157", iso3: CZE, source: "LIED vdem=157 = V-Dem v16 country_text_id CZE (years 1918-1992)"}
+      - {code: "Denmark|vdem=158", iso3: DNK, source: "LIED vdem=158 = V-Dem v16 country_text_id DNK (years 1789-2025)"}
+      - {code: "Djibouti|vdem=113", iso3: DJI, source: "LIED vdem=113 = V-Dem v16 country_text_id DJI (years 1885-2025)"}
+      - {code: "Dominican Republic|vdem=114", iso3: DOM, source: "LIED vdem=114 = V-Dem v16 country_text_id DOM (years 1789-2025)"}
+      - {code: "Dominica|vdem=159", iso3: DMA, source: "LIED name \"Dominica\" = crosswalk label of DMA (years 1924-2025)"}
+      - {code: "East Timor|vdem=74", iso3: TLS, source: "LIED vdem=74 = V-Dem v16 country_text_id TLS (years 1859-2025)"}
+      - {code: "Ecuador|vdem=75", iso3: ECU, source: "LIED vdem=75 = V-Dem v16 country_text_id ECU (years 1830-2025)"}
+      - {code: "Egypt|vdem=13", iso3: EGY, source: "LIED vdem=13 = V-Dem v16 country_text_id EGY (years 1789-2025)"}
+      - {code: "El Salvador|vdem=22", iso3: SLV, source: "LIED vdem=22 = V-Dem v16 country_text_id SLV (years 1838-2025)"}
+      - {code: "Equatorial Guinea|vdem=160", iso3: GNQ, source: "LIED vdem=160 = V-Dem v16 country_text_id GNQ (years 1900-2025)"}
+      - {code: "Eritrea|vdem=115", iso3: ERI, source: "LIED vdem=115 = V-Dem v16 country_text_id ERI (years 1889-2025)"}
+      - {code: "Estonia|vdem=161", iso3: EST, source: "LIED vdem=161 = V-Dem v16 country_text_id EST (years 1917-2025)"}
+      - {code: "Ethiopia|vdem=38", iso3: ETH, source: "LIED vdem=38 = V-Dem v16 country_text_id ETH (years 1789-2025)"}
+      - {code: "Fiji|vdem=162", iso3: FJI, source: "LIED vdem=162 = V-Dem v16 country_text_id FJI (years 1874-2025)"}
+      - {code: "Finland|vdem=163", iso3: FIN, source: "LIED vdem=163 = V-Dem v16 country_text_id FIN (years 1809-2025)"}
+      - {code: "France|vdem=76", iso3: FRA, source: "LIED vdem=76 = V-Dem v16 country_text_id FRA (years 1789-2025)"}
+      - {code: "Gabon|vdem=116", iso3: GAB, source: "LIED vdem=116 = V-Dem v16 country_text_id GAB (years 1885-2025)"}
+      - {code: "Gambia|vdem=117", iso3: GMB, source: "LIED vdem=117 = V-Dem v16 country_text_id GMB (years 1889-2025)"}
+      - {code: "Georgia|vdem=118", iso3: GEO, source: "LIED vdem=118 = V-Dem v16 country_text_id GEO (years 1991-2025)"}
+      - {code: "Germany, West|vdem=77", iso3: DEU, source: "LIED vdem=77 = V-Dem v16 country_text_id DEU (years 1945-1989)"}
+      - {code: "Germany|vdem=77", iso3: DEU, source: "LIED vdem=77 = V-Dem v16 country_text_id DEU (years 1867-2025)"}
+      - {code: "Ghana|vdem=7", iso3: GHA, source: "LIED vdem=7 = V-Dem v16 country_text_id GHA (years 1902-2025)"}
+      - {code: "Gran Colombia|vdem=15", iso3: COL, source: "LIED vdem=15 = V-Dem v16 country_text_id COL (years 1821-1829)"}
+      - {code: "Greece|vdem=164", iso3: GRC, source: "LIED vdem=164 = V-Dem v16 country_text_id GRC (years 1822-2025)"}
+      - {code: "Grenada|vdem=165", iso3: GRD, source: "LIED name \"Grenada\" = crosswalk label of GRD (years 1951-2025)"}
+      - {code: "Guatemala|vdem=78", iso3: GTM, source: "LIED vdem=78 = V-Dem v16 country_text_id GTM (years 1789-2025)"}
+      - {code: "Guinea-Bissau|vdem=119", iso3: GNB, source: "LIED vdem=119 = V-Dem v16 country_text_id GNB (years 1892-2025)"}
+      - {code: "Guinea|vdem=63", iso3: GIN, source: "LIED vdem=63 = V-Dem v16 country_text_id GIN (years 1891-2025)"}
+      - {code: "Guyana|vdem=166", iso3: GUY, source: "LIED vdem=166 = V-Dem v16 country_text_id GUY (years 1892-2025)"}
+      - {code: "Haiti|vdem=26", iso3: HTI, source: "LIED vdem=26 = V-Dem v16 country_text_id HTI (years 1789-2025)"}
+      - {code: "Honduras|vdem=27", iso3: HND, source: "LIED vdem=27 = V-Dem v16 country_text_id HND (years 1838-2025)"}
+      - {code: "Hungary|vdem=210", iso3: HUN, source: "LIED vdem=210 = V-Dem v16 country_text_id HUN (years 1867-2025)"}
+      - {code: "Iceland|vdem=168", iso3: ISL, source: "LIED vdem=168 = V-Dem v16 country_text_id ISL (years 1844-2025)"}
+      - {code: "India|vdem=39", iso3: IND, source: "LIED vdem=39 = V-Dem v16 country_text_id IND (years 1789-2025)"}
+      - {code: "Indonesia|vdem=56", iso3: IDN, source: "LIED vdem=56 = V-Dem v16 country_text_id IDN (years 1800-2025)"}
+      - {code: "Iran|vdem=79", iso3: IRN, source: "LIED vdem=79 = V-Dem v16 country_text_id IRN (years 1789-2025)"}
+      - {code: "Iraq|vdem=80", iso3: IRQ, source: "LIED vdem=80 = V-Dem v16 country_text_id IRQ (years 1920-2025)"}
+      - {code: "Ireland|vdem=81", iso3: IRL, source: "LIED vdem=81 = V-Dem v16 country_text_id IRL (years 1918-2025)"}
+      - {code: "Israel|vdem=169", iso3: ISR, source: "LIED vdem=169 = V-Dem v16 country_text_id ISR (years 1948-2025)"}
+      - {code: "Italy|vdem=82", iso3: ITA, source: "LIED vdem=82 = V-Dem v16 country_text_id ITA (years 1861-2025)"}
+      - {code: "Jamaica|vdem=120", iso3: JAM, source: "LIED vdem=120 = V-Dem v16 country_text_id JAM (years 1884-2025)"}
+      - {code: "Japan|vdem=9", iso3: JPN, source: "LIED vdem=9 = V-Dem v16 country_text_id JPN (years 1789-2025)"}
+      - {code: "Jordan|vdem=83", iso3: JOR, source: "LIED vdem=83 = V-Dem v16 country_text_id JOR (years 1922-2025)"}
+      - {code: "Kazakhstan|vdem=121", iso3: KAZ, source: "LIED vdem=121 = V-Dem v16 country_text_id KAZ (years 1990-2025)"}
+      - {code: "Kenya|vdem=40", iso3: KEN, source: "LIED vdem=40 = V-Dem v16 country_text_id KEN (years 1895-2025)"}
+      - {code: "Kiribati|vdem=170", iso3: KIR, source: "LIED name \"Kiribati\" = crosswalk label of KIR (years 1892-2025)"}
+      - {code: "Korea, North|vdem=41", iso3: PRK, source: "LIED vdem=41 = V-Dem v16 country_text_id PRK (years 1948-2025)"}
+      - {code: "Korea, South|vdem=42", iso3: KOR, source: "LIED vdem=42 = V-Dem v16 country_text_id KOR (years 1948-2025)"}
+      - {code: "Korea|vdem=42", iso3: KOR, source: "LIED vdem=42 = V-Dem v16 country_text_id KOR (years 1789-1947)"}
+      - {code: "Kosovo|vdem=43", iso3: XKX, source: "LIED vdem=43 = V-Dem v16 country_text_id XKX (years 2008-2025)"}
+      - {code: "Kuwait|vdem=171", iso3: KWT, source: "LIED vdem=171 = V-Dem v16 country_text_id KWT (years 1789-2025)"}
+      - {code: "Kyrgyzstan|vdem=122", iso3: KGZ, source: "LIED vdem=122 = V-Dem v16 country_text_id KGZ (years 1990-2025)"}
+      - {code: "Laos|vdem=123", iso3: LAO, source: "LIED vdem=123 = V-Dem v16 country_text_id LAO (years 1789-2025)"}
+      - {code: "Latvia|vdem=84", iso3: LVA, source: "LIED vdem=84 = V-Dem v16 country_text_id LVA (years 1918-2025)"}
+      - {code: "Lebanon|vdem=44", iso3: LBN, source: "LIED vdem=44 = V-Dem v16 country_text_id LBN (years 1918-2025)"}
+      - {code: "Lesotho|vdem=85", iso3: LSO, source: "LIED vdem=85 = V-Dem v16 country_text_id LSO (years 1884-2025)"}
+      - {code: "Liberia|vdem=86", iso3: LBR, source: "LIED vdem=86 = V-Dem v16 country_text_id LBR (years 1821-2025)"}
+      - {code: "Libya|vdem=124", iso3: LBY, source: "LIED vdem=124 = V-Dem v16 country_text_id LBY (years 1795-2025)"}
+      - {code: "Liechtenstein|vdem=172", iso3: LIE, source: "LIED name \"Liechtenstein\" = crosswalk label of LIE (years 1814-2025)"}
+      - {code: "Lithuania|vdem=173", iso3: LTU, source: "LIED vdem=173 = V-Dem v16 country_text_id LTU (years 1918-2025)"}
+      - {code: "Luxembourg|vdem=174", iso3: LUX, source: "LIED vdem=174 = V-Dem v16 country_text_id LUX (years 1815-2025)"}
+      - {code: "Macedonia|vdem=176", iso3: MKD, source: "LIED vdem=176 = V-Dem v16 country_text_id MKD (years 1990-2025)"}
+      - {code: "Madagascar|vdem=125", iso3: MDG, source: "LIED vdem=125 = V-Dem v16 country_text_id MDG (years 1817-2025)"}
+      - {code: "Malawi|vdem=87", iso3: MWI, source: "LIED vdem=87 = V-Dem v16 country_text_id MWI (years 1891-2025)"}
+      - {code: "Malaysia|vdem=177", iso3: MYS, source: "LIED vdem=177 = V-Dem v16 country_text_id MYS (years 1874-2025)"}
+      - {code: "Maldives|vdem=88", iso3: MDV, source: "LIED vdem=88 = V-Dem v16 country_text_id MDV (years 1789-2025)"}
+      - {code: "Mali|vdem=28", iso3: MLI, source: "LIED vdem=28 = V-Dem v16 country_text_id MLI (years 1892-2025)"}
+      - {code: "Malta|vdem=178", iso3: MLT, source: "LIED vdem=178 = V-Dem v16 country_text_id MLT (years 1840-2025)"}
+      - {code: "Marshall Islands|vdem=179", iso3: MHL, source: "LIED name \"Marshall Islands\" = crosswalk label of MHL (years 1875-2025)"}
+      - {code: "Mauritania|vdem=65", iso3: MRT, source: "LIED vdem=65 = V-Dem v16 country_text_id MRT (years 1904-2025)"}
+      - {code: "Mauritius|vdem=180", iso3: MUS, source: "LIED vdem=180 = V-Dem v16 country_text_id MUS (years 1885-2025)"}
+      - {code: "Mexico|vdem=3", iso3: MEX, source: "LIED vdem=3 = V-Dem v16 country_text_id MEX (years 1789-2025)"}
+      - {code: "Micronesia|vdem=181", iso3: FSM, source: "LIED name \"Micronesia\" (cow 987, Federated States); crosswalk FSM \"Micronesia (Federated States of)\" (years 1947-2025)"}
+      - {code: "Moldova|vdem=126", iso3: MDA, source: "LIED vdem=126 = V-Dem v16 country_text_id MDA (years 1991-2025)"}
+      - {code: "Monaco|vdem=182", iso3: MCO, source: "LIED name \"Monaco\" = crosswalk label of MCO (years 1814-2025)"}
+      - {code: "Mongolia|vdem=89", iso3: MNG, source: "LIED vdem=89 = V-Dem v16 country_text_id MNG (years 1911-2025)"}
+      - {code: "Montenegro|vdem=183", iso3: MNE, source: "LIED vdem=183 = V-Dem v16 country_text_id MNE (years 1789-2025)"}
+      - {code: "Morocco|vdem=90", iso3: MAR, source: "LIED vdem=90 = V-Dem v16 country_text_id MAR (years 1789-2025)"}
+      - {code: "Mozambique|vdem=57", iso3: MOZ, source: "LIED vdem=57 = V-Dem v16 country_text_id MOZ (years 1893-2025)"}
+      - {code: "Myanmar|vdem=10", iso3: MMR, source: "LIED vdem=10 = V-Dem v16 country_text_id MMR (years 1789-2025)"}
+      - {code: "Namibia|vdem=127", iso3: NAM, source: "LIED vdem=127 = V-Dem v16 country_text_id NAM (years 1884-2025)"}
+      - {code: "Nauru|vdem=184", iso3: NRU, source: "LIED name \"Nauru\"; crosswalk NRU (years 1888-2025)"}
+      - {code: "Nepal|vdem=58", iso3: NPL, source: "LIED vdem=58 = V-Dem v16 country_text_id NPL (years 1789-2025)"}
+      - {code: "Netherlands|vdem=91", iso3: NLD, source: "LIED vdem=91 = V-Dem v16 country_text_id NLD (years 1789-2025)"}
+      - {code: "New Zealand|vdem=185", iso3: NZL, source: "LIED vdem=185 = V-Dem v16 country_text_id NZL (years 1841-2025)"}
+      - {code: "Nicaragua|vdem=59", iso3: NIC, source: "LIED vdem=59 = V-Dem v16 country_text_id NIC (years 1838-2025)"}
+      - {code: "Nigeria|vdem=45", iso3: NGA, source: "LIED vdem=45 = V-Dem v16 country_text_id NGA (years 1914-2025)"}
+      - {code: "Niger|vdem=60", iso3: NER, source: "LIED vdem=60 = V-Dem v16 country_text_id NER (years 1922-2025)"}
+      - {code: "Norway|vdem=186", iso3: NOR, source: "LIED vdem=186 = V-Dem v16 country_text_id NOR (years 1789-2025)"}
+      - {code: "Oman|vdem=187", iso3: OMN, source: "LIED vdem=187 = V-Dem v16 country_text_id OMN (years 1789-2025)"}
+      - {code: "Ottoman Empire|vdem=99", iso3: TUR, source: "LIED vdem=99 = V-Dem v16 country_text_id TUR (years 1789-1920)"}
+      - {code: "Pakistan|vdem=29", iso3: PAK, source: "LIED vdem=29 = V-Dem v16 country_text_id PAK (years 1947-2025)"}
+      - {code: "Palau|vdem=188", iso3: PLW, source: "LIED name \"Palau\" = crosswalk label of PLW (years 1947-2025)"}
+      - {code: "Panama|vdem=92", iso3: PAN, source: "LIED vdem=92 = V-Dem v16 country_text_id PAN (years 1903-2025)"}
+      - {code: "Papua New Guinea|vdem=93", iso3: PNG, source: "LIED vdem=93 = V-Dem v16 country_text_id PNG (years 1884-2025)"}
+      - {code: "Paraguay|vdem=189", iso3: PRY, source: "LIED vdem=189 = V-Dem v16 country_text_id PRY (years 1811-2025)"}
+      - {code: "Peru|vdem=30", iso3: PER, source: "LIED vdem=30 = V-Dem v16 country_text_id PER (years 1789-2025)"}
+      - {code: "Philippines|vdem=46", iso3: PHL, source: "LIED vdem=46 = V-Dem v16 country_text_id PHL (years 1789-2025)"}
+      - {code: "Poland|vdem=17", iso3: POL, source: "LIED vdem=17 = V-Dem v16 country_text_id POL (years 1789-2025)"}
+      - {code: "Portugal|vdem=21", iso3: PRT, source: "LIED vdem=21 = V-Dem v16 country_text_id PRT (years 1789-2025)"}
+      - {code: "Prussia|vdem=77", iso3: DEU, source: "LIED vdem=77 = V-Dem v16 country_text_id DEU (years 1789-1866)"}
+      - {code: "Qatar|vdem=94", iso3: QAT, source: "LIED vdem=94 = V-Dem v16 country_text_id QAT (years 1871-2025)"}
+      - {code: "Romania|vdem=190", iso3: ROU, source: "LIED vdem=190 = V-Dem v16 country_text_id ROU (years 1789-2025)"}
+      - {code: "Russia|vdem=11", iso3: RUS, source: "LIED vdem=11 = V-Dem v16 country_text_id RUS (years 1789-2025)"}
+      - {code: "Rwanda|vdem=129", iso3: RWA, source: "LIED vdem=129 = V-Dem v16 country_text_id RWA (years 1916-2025)"}
+      - {code: "Samoa|vdem=194", iso3: WSM, source: "LIED name \"Samoa\" = crosswalk label of WSM (years 1902-2025)"}
+      - {code: "San Marino|vdem=195", iso3: SMR, source: "LIED name \"San Marino\" = crosswalk label of SMR (years 1789-2025)"}
+      - {code: "Sao Tome and Principe|vdem=196", iso3: STP, source: "LIED vdem=196 = V-Dem v16 country_text_id STP (years 1789-2025)"}
+      - {code: "Saudi Arabia|vdem=197", iso3: SAU, source: "LIED vdem=197 = V-Dem v16 country_text_id SAU (years 1789-2025)"}
+      - {code: "Senegal|vdem=31", iso3: SEN, source: "LIED vdem=31 = V-Dem v16 country_text_id SEN (years 1904-2025)"}
+      - {code: "Serbia-Montenegro|vdem=198", iso3: SRB, source: "LIED vdem=198 = V-Dem v16 country_text_id SRB (years 1992-2005)"}
+      - {code: "Serbia|vdem=198", iso3: SRB, source: "LIED vdem=198 = V-Dem v16 country_text_id SRB (years 1804-2025)"}
+      - {code: "Seychelles|vdem=199", iso3: SYC, source: "LIED vdem=199 = V-Dem v16 country_text_id SYC (years 1903-2025)"}
+      - {code: "Sierra Leone|vdem=95", iso3: SLE, source: "LIED vdem=95 = V-Dem v16 country_text_id SLE (years 1896-2025)"}
+      - {code: "Singapore|vdem=200", iso3: SGP, source: "LIED vdem=200 = V-Dem v16 country_text_id SGP (years 1867-2025)"}
+      - {code: "Slovakia|vdem=201", iso3: SVK, source: "LIED vdem=201 = V-Dem v16 country_text_id SVK (years 1993-2025)"}
+      - {code: "Slovenia|vdem=202", iso3: SVN, source: "LIED vdem=202 = V-Dem v16 country_text_id SVN (years 1990-2025)"}
+      - {code: "Solomon Islands|vdem=203", iso3: SLB, source: "LIED vdem=203 = V-Dem v16 country_text_id SLB (years 1893-2025)"}
+      - {code: "Somalia|vdem=130", iso3: SOM, source: "LIED vdem=130 = V-Dem v16 country_text_id SOM (years 1890-2025)"}
+      - {code: "South Africa|vdem=8", iso3: ZAF, source: "LIED vdem=8 = V-Dem v16 country_text_id ZAF (years 1900-2025)"}
+      - {code: "South Sudan|vdem=32", iso3: SSD, source: "LIED vdem=32 = V-Dem v16 country_text_id SSD (years 2011-2025)"}
+      - {code: "Spain|vdem=96", iso3: ESP, source: "LIED vdem=96 = V-Dem v16 country_text_id ESP (years 1789-2025)"}
+      - {code: "Sri Lanka|vdem=131", iso3: LKA, source: "LIED vdem=131 = V-Dem v16 country_text_id LKA (years 1789-2025)"}
+      - {code: "St. Kitts and Nevis|vdem=191", iso3: KNA, source: "LIED name \"St. Kitts and Nevis\" = crosswalk label of KNA (years 1937-2025)"}
+      - {code: "St. Lucia|vdem=192", iso3: LCA, source: "LIED name \"St. Lucia\" = crosswalk label of LCA (years 1951-2025)"}
+      - {code: "St. Vincent and the Grenadines|vdem=193", iso3: VCT, source: "LIED name \"St. Vincent and the Grenadines\" = crosswalk label of VCT (years 1951-2025)"}
+      - {code: "Sudan|vdem=33", iso3: SDN, source: "LIED vdem=33 = V-Dem v16 country_text_id SDN (years 1899-2025)"}
+      - {code: "Suriname|vdem=4", iso3: SUR, source: "LIED vdem=4 = V-Dem v16 country_text_id SUR (years 1863-2025)"}
+      - {code: "Swaziland|vdem=132", iso3: SWZ, source: "LIED vdem=132 = V-Dem v16 country_text_id SWZ (years 1899-2025)"}
+      - {code: "Sweden|vdem=5", iso3: SWE, source: "LIED vdem=5 = V-Dem v16 country_text_id SWE (years 1789-2025)"}
+      - {code: "Switzerland|vdem=6", iso3: CHE, source: "LIED vdem=6 = V-Dem v16 country_text_id CHE (years 1798-2025)"}
+      - {code: "Syria|vdem=97", iso3: SYR, source: "LIED vdem=97 = V-Dem v16 country_text_id SYR (years 1918-2025)"}
+      - {code: "Tajikistan|vdem=133", iso3: TJK, source: "LIED vdem=133 = V-Dem v16 country_text_id TJK (years 1990-2025)"}
+      - {code: "Tanzania|vdem=47", iso3: TZA, source: "LIED vdem=47 = V-Dem v16 country_text_id TZA (years 1914-2025)"}
+      - {code: "Thailand|vdem=49", iso3: THA, source: "LIED vdem=49 = V-Dem v16 country_text_id THA (years 1789-2025)"}
+      - {code: "Togo|vdem=134", iso3: TGO, source: "LIED vdem=134 = V-Dem v16 country_text_id TGO (years 1916-2025)"}
+      - {code: "Tonga|vdem=204", iso3: TON, source: "LIED name \"Tonga\" = crosswalk label of TON (years 1845-2025)"}
+      - {code: "Trinidad and Tobago|vdem=135", iso3: TTO, source: "LIED vdem=135 = V-Dem v16 country_text_id TTO (years 1889-2025)"}
+      - {code: "Tunisia|vdem=98", iso3: TUN, source: "LIED vdem=98 = V-Dem v16 country_text_id TUN (years 1789-2025)"}
+      - {code: "Turkey|vdem=99", iso3: TUR, source: "LIED vdem=99 = V-Dem v16 country_text_id TUR (years 1921-2025)"}
+      - {code: "Turkmenistan|vdem=136", iso3: TKM, source: "LIED vdem=136 = V-Dem v16 country_text_id TKM (years 1990-2025)"}
+      - {code: "Tuvalu|vdem=205", iso3: TUV, source: "LIED name \"Tuvalu\" = crosswalk label of TUV (years 1975-2025)"}
+      - {code: "USSR|vdem=11", iso3: RUS, source: "LIED vdem=11 = V-Dem v16 country_text_id RUS (years 1922-1990)"}
+      - {code: "Uganda|vdem=50", iso3: UGA, source: "LIED vdem=50 = V-Dem v16 country_text_id UGA (years 1894-2025)"}
+      - {code: "Ukraine|vdem=100", iso3: UKR, source: "LIED vdem=100 = V-Dem v16 country_text_id UKR (years 1991-2025)"}
+      - {code: "United Arab Emirates|vdem=207", iso3: ARE, source: "LIED vdem=207 = V-Dem v16 country_text_id ARE (years 1971-2025)"}
+      - {code: "United Kingdom|vdem=101", iso3: GBR, source: "LIED vdem=101 = V-Dem v16 country_text_id GBR (years 1789-2025)"}
+      - {code: "United Provinces of Central America|vdem=78", iso3: GTM, source: "LIED vdem=78 = V-Dem v16 country_text_id GTM (years 1823-1839)"}
+      - {code: "United States|vdem=20", iso3: USA, source: "LIED vdem=20 = V-Dem v16 country_text_id USA (years 1789-2025)"}
+      - {code: "Uruguay|vdem=102", iso3: URY, source: "LIED vdem=102 = V-Dem v16 country_text_id URY (years 1825-2025)"}
+      - {code: "Uzbekistan|vdem=140", iso3: UZB, source: "LIED vdem=140 = V-Dem v16 country_text_id UZB (years 1990-2025)"}
+      - {code: "Vanuatu|vdem=206", iso3: VUT, source: "LIED vdem=206 = V-Dem v16 country_text_id VUT (years 1906-2025)"}
+      - {code: "Venezuela|vdem=51", iso3: VEN, source: "LIED vdem=51 = V-Dem v16 country_text_id VEN (years 1789-2025)"}
+      - {code: "Vietnam, North|vdem=34", iso3: VNM, source: "LIED vdem=34 = V-Dem v16 country_text_id VNM (years 1945-1974)"}
+      - {code: "Vietnam|vdem=34", iso3: VNM, source: "LIED vdem=34 = V-Dem v16 country_text_id VNM (years 1976-2025)"}
+      - {code: "Yemen, North|vdem=14", iso3: YEM, source: "LIED vdem=14 = V-Dem v16 country_text_id YEM (years 1789-1989)"}
+      - {code: "Yemen|vdem=14", iso3: YEM, source: "LIED vdem=14 = V-Dem v16 country_text_id YEM (years 1990-2025)"}
+      - {code: "Yugoslavia|vdem=198", iso3: SRB, source: "LIED vdem=198 = V-Dem v16 country_text_id SRB (years 1918-1991)"}
+      - {code: "Zambia|vdem=61", iso3: ZMB, source: "LIED vdem=61 = V-Dem v16 country_text_id ZMB (years 1911-2025)"}
+      - {code: "Zimbabwe|vdem=62", iso3: ZWE, source: "LIED vdem=62 = V-Dem v16 country_text_id ZWE (years 1895-2025)"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu/api/access/datafile/13640161
+      raw_sha256: 4de421e6ab9636247e332b69cf3964b8c915e5ad797d3f2c4381185f78deefc7
+
+  # BMR v4.0 COW ccodes (democracy-v4.0.csv, raw sha256 18e2ea831875e0d163d44f933e4ccf3f6beca199f94adf4784405e0993a0d6b6). Rule: ccode -> its BMR abbreviation when that is
+  # a current World Bank code of the crosswalk ('abbreviation: World Bank 3-letter code', BMR codebook), plus the
+  # listed aliases. Unmapped ccodes (kept): 89 Central American Union, 99 Great Colombia, 245 Bavaria, 260 Germany, West, 265 Germany, East, 267 Baden, 269 Saxony, 271 Wurttemberg, 315 Czechoslovakia, 324 Sardinia, 327 Papal States, 329 Sicily, 332 Modena, 335 Parma, 337 Tuscany, 345 Yugoslavia, 347 Yugoslavia, Fed. Rep., 364 Ussr, 564 Orange Free State, 680 Yemen, South, 713 Taiwan, 730 Korea, 816 Vietnam, North, 817 Vietnam, South.
+  bmr:
+    aliases:
+      - {code: "2", iso3: USA, source: "abbreviation USA (World Bank code per BMR codebook), country UNITED STATES OF AMERICA (years 1800-2020)"}
+      - {code: "20", iso3: CAN, source: "abbreviation CAN (World Bank code per BMR codebook), country CANADA (years 1867-2020)"}
+      - {code: "31", iso3: BHS, source: "abbreviation BHS (World Bank code per BMR codebook), country BAHAMAS (years 1973-2020)"}
+      - {code: "40", iso3: CUB, source: "abbreviation CUB (World Bank code per BMR codebook), country CUBA (years 1902-2020)"}
+      - {code: "41", iso3: HTI, source: "abbreviation HTI (World Bank code per BMR codebook), country HAITI (years 1820-2020)"}
+      - {code: "42", iso3: DOM, source: "abbreviation DOM (World Bank code per BMR codebook), country DOMINICAN REPUBLIC (years 1844-2020)"}
+      - {code: "51", iso3: JAM, source: "abbreviation JAM (World Bank code per BMR codebook), country JAMAICA (years 1962-2020)"}
+      - {code: "52", iso3: TTO, source: "abbreviation TTO (World Bank code per BMR codebook), country TRINIDAD & TOBAGO (years 1962-2020)"}
+      - {code: "53", iso3: BRB, source: "abbreviation BRB (World Bank code per BMR codebook), country BARBADOS (years 1966-2020)"}
+      - {code: "54", iso3: DMA, source: "abbreviation DMA (World Bank code per BMR codebook), country DOMINICA (years 1978-2020)"}
+      - {code: "55", iso3: GRD, source: "abbreviation GRD (World Bank code per BMR codebook), country GRENADA (years 1974-2020)"}
+      - {code: "56", iso3: LCA, source: "abbreviation LCA (World Bank code per BMR codebook), country ST. LUCIA (years 1979-2020)"}
+      - {code: "57", iso3: VCT, source: "abbreviation VCT (World Bank code per BMR codebook), country ST. VINCENT & GREN. (years 1979-2020)"}
+      - {code: "58", iso3: ATG, source: "abbreviation ATG (World Bank code per BMR codebook), country ANTIGUA (years 1982-2020)"}
+      - {code: "60", iso3: KNA, source: "abbreviation KNA (World Bank code per BMR codebook), country ST. KITTS & NEVIS (years 1984-2020)"}
+      - {code: "70", iso3: MEX, source: "abbreviation MEX (World Bank code per BMR codebook), country MEXICO (years 1822-2020)"}
+      - {code: "80", iso3: BLZ, source: "abbreviation BLZ (World Bank code per BMR codebook), country BELIZE (years 1981-2020)"}
+      - {code: "90", iso3: GTM, source: "abbreviation GTM (World Bank code per BMR codebook), country GUATEMALA (years 1839-2020)"}
+      - {code: "91", iso3: HND, source: "abbreviation HND (World Bank code per BMR codebook), country HONDURAS (years 1839-2020)"}
+      - {code: "92", iso3: SLV, source: "abbreviation SLV (World Bank code per BMR codebook), country EL SALVADOR (years 1841-2020)"}
+      - {code: "93", iso3: NIC, source: "abbreviation NIC (World Bank code per BMR codebook), country NICARAGUA (years 1838-2020)"}
+      - {code: "94", iso3: CRI, source: "abbreviation CRI (World Bank code per BMR codebook), country COSTA RICA (years 1838-2020)"}
+      - {code: "95", iso3: PAN, source: "abbreviation PAN (World Bank code per BMR codebook), country PANAMA (years 1903-2020)"}
+      - {code: "100", iso3: COL, source: "abbreviation COL (World Bank code per BMR codebook), country COLOMBIA (years 1832-2020)"}
+      - {code: "101", iso3: VEN, source: "abbreviation VEN (World Bank code per BMR codebook), country VENEZUELA (years 1830-2020)"}
+      - {code: "110", iso3: GUY, source: "abbreviation GUY (World Bank code per BMR codebook), country GUYANA (years 1966-2020)"}
+      - {code: "115", iso3: SUR, source: "abbreviation SUR (World Bank code per BMR codebook), country SURINAME (years 1975-2020)"}
+      - {code: "130", iso3: ECU, source: "abbreviation ECU (World Bank code per BMR codebook), country ECUADOR (years 1830-2020)"}
+      - {code: "135", iso3: PER, source: "abbreviation PER (World Bank code per BMR codebook), country PERU (years 1820-2020)"}
+      - {code: "140", iso3: BRA, source: "abbreviation BRA (World Bank code per BMR codebook), country BRAZIL (years 1824-2020)"}
+      - {code: "145", iso3: BOL, source: "abbreviation BOL (World Bank code per BMR codebook), country BOLIVIA (years 1825-2020)"}
+      - {code: "150", iso3: PRY, source: "abbreviation PRY (World Bank code per BMR codebook), country PARAGUAY (years 1811-2020)"}
+      - {code: "155", iso3: CHL, source: "abbreviation CHL (World Bank code per BMR codebook), country CHILE (years 1818-2020)"}
+      - {code: "160", iso3: ARG, source: "abbreviation ARG (World Bank code per BMR codebook), country ARGENTINA (years 1825-2020)"}
+      - {code: "165", iso3: URY, source: "abbreviation URY (World Bank code per BMR codebook), country URUGUAY (years 1830-2020)"}
+      - {code: "200", iso3: GBR, source: "abbreviation GBR (World Bank code per BMR codebook), country UNITED KINGDOM (years 1800-2020)"}
+      - {code: "205", iso3: IRL, source: "abbreviation IRL (World Bank code per BMR codebook), country IRELAND (years 1921-2020)"}
+      - {code: "210", iso3: NLD, source: "abbreviation NLD (World Bank code per BMR codebook), country NETHERLANDS (years 1815-2020)"}
+      - {code: "211", iso3: BEL, source: "abbreviation BEL (World Bank code per BMR codebook), country BELGIUM (years 1830-2020)"}
+      - {code: "212", iso3: LUX, source: "abbreviation LUX (World Bank code per BMR codebook), country LUXEMBOURG (years 1867-2020)"}
+      - {code: "220", iso3: FRA, source: "abbreviation FRA (World Bank code per BMR codebook), country FRANCE (years 1800-2020)"}
+      - {code: "221", iso3: MCO, source: "abbreviation MCO (World Bank code per BMR codebook), country MONACO (years 1994-2020)"}
+      - {code: "223", iso3: LIE, source: "abbreviation LIE (World Bank code per BMR codebook), country LIECHSTENSTEIN (years 1991-2020)"}
+      - {code: "225", iso3: CHE, source: "abbreviation CHE (World Bank code per BMR codebook), country SWITZERLAND (years 1848-2020)"}
+      - {code: "230", iso3: ESP, source: "abbreviation ESP (World Bank code per BMR codebook), country SPAIN (years 1800-2020)"}
+      - {code: "232", iso3: AND, source: "abbreviation AND (World Bank code per BMR codebook), country ANDORRA (years 1994-2020)"}
+      - {code: "235", iso3: PRT, source: "abbreviation PRT (World Bank code per BMR codebook), country PORTUGAL (years 1800-2020)"}
+      - {code: "255", iso3: DEU, source: "abbreviation DEU (World Bank code per BMR codebook), country GERMANY (years 1800-2020)"}
+      - {code: "290", iso3: POL, source: "abbreviation POL (World Bank code per BMR codebook), country POLAND (years 1918-2020)"}
+      - {code: "305", iso3: AUT, source: "abbreviation AUT (World Bank code per BMR codebook), country AUSTRIA (years 1800-2020)"}
+      - {code: "310", iso3: HUN, source: "abbreviation HUN (World Bank code per BMR codebook), country HUNGARY (years 1867-2020)"}
+      - {code: "316", iso3: CZE, source: "abbreviation CZE (World Bank code per BMR codebook), country CZECH REPUBLIC (years 1993-2020)"}
+      - {code: "317", iso3: SVK, source: "abbreviation SVK (World Bank code per BMR codebook), country SLOVAKIA (years 1993-2020)"}
+      - {code: "325", iso3: ITA, source: "abbreviation ITA (World Bank code per BMR codebook), country ITALY (years 1861-2020)"}
+      - {code: "331", iso3: SMR, source: "abbreviation SMR (World Bank code per BMR codebook), country SAN MARINO (years 1800-2020)"}
+      - {code: "338", iso3: MLT, source: "abbreviation MLT (World Bank code per BMR codebook), country MALTA (years 1964-2020)"}
+      - {code: "339", iso3: ALB, source: "abbreviation ALB (World Bank code per BMR codebook), country ALBANIA (years 1914-2020)"}
+      - {code: "341", iso3: XKX, source: "country KOSOVO, no abbreviation (years 2010-2020)"}
+      - {code: "342", iso3: SRB, source: "country SERBIA (1830-1920, 2006-2020), no abbreviation (years 1830-2020)"}
+      - {code: "343", iso3: MKD, source: "abbreviation MKD (World Bank code per BMR codebook), country MACEDONIA (years 1991-2020)"}
+      - {code: "344", iso3: HRV, source: "abbreviation HRV (World Bank code per BMR codebook), country CROATIA (years 1830-2020)"}
+      - {code: "346", iso3: BIH, source: "abbreviation BIH (World Bank code per BMR codebook), country BOSNIA (years 1992-2020)"}
+      - {code: "348", iso3: MNE, source: "country MONTENEGRO, no abbreviation (years 2006-2020)"}
+      - {code: "349", iso3: SVN, source: "abbreviation SVN (World Bank code per BMR codebook), country SLOVENIA (years 1991-2020)"}
+      - {code: "350", iso3: GRC, source: "abbreviation GRC (World Bank code per BMR codebook), country GREECE (years 1827-2020)"}
+      - {code: "352", iso3: CYP, source: "abbreviation CYP (World Bank code per BMR codebook), country CYPRUS (years 1960-2020)"}
+      - {code: "355", iso3: BGR, source: "abbreviation BGR (World Bank code per BMR codebook), country BULGARIA (years 1879-2020)"}
+      - {code: "359", iso3: MDA, source: "abbreviation MDA (World Bank code per BMR codebook), country MOLDOVA (years 1991-2020)"}
+      - {code: "360", iso3: ROU, source: "abbreviation ROM = former World Bank code of Romania (years 1859-2020)"}
+      - {code: "365", iso3: RUS, source: "abbreviation RUS (World Bank code per BMR codebook), country RUSSIA (years 1800-2020)"}
+      - {code: "366", iso3: EST, source: "abbreviation EST (World Bank code per BMR codebook), country ESTONIA (years 1917-2020)"}
+      - {code: "367", iso3: LVA, source: "abbreviation LVA (World Bank code per BMR codebook), country LATVIA (years 1920-2020)"}
+      - {code: "368", iso3: LTU, source: "abbreviation LTU (World Bank code per BMR codebook), country LITHUANIA (years 1918-2020)"}
+      - {code: "369", iso3: UKR, source: "abbreviation UKR (World Bank code per BMR codebook), country UKRAINE (years 1991-2020)"}
+      - {code: "370", iso3: BLR, source: "abbreviation BLR (World Bank code per BMR codebook), country BELARUS (years 1991-2020)"}
+      - {code: "371", iso3: ARM, source: "abbreviation ARM (World Bank code per BMR codebook), country ARMENIA (years 1991-2020)"}
+      - {code: "372", iso3: GEO, source: "abbreviation GEO (World Bank code per BMR codebook), country GEORGIA (years 1991-2020)"}
+      - {code: "373", iso3: AZE, source: "abbreviation AZE (World Bank code per BMR codebook), country AZERBAIJAN (years 1991-2020)"}
+      - {code: "375", iso3: FIN, source: "abbreviation FIN (World Bank code per BMR codebook), country FINLAND (years 1917-2020)"}
+      - {code: "380", iso3: SWE, source: "country SWEDEN, abbreviation SWD (not a World Bank code) (years 1800-2020)"}
+      - {code: "385", iso3: NOR, source: "abbreviation NOR (World Bank code per BMR codebook), country NORWAY (years 1814-2020)"}
+      - {code: "390", iso3: DNK, source: "abbreviation DNK (World Bank code per BMR codebook), country DENMARK (years 1800-2020)"}
+      - {code: "395", iso3: ISL, source: "abbreviation ISL (World Bank code per BMR codebook), country ICELAND (years 1918-2020)"}
+      - {code: "402", iso3: CPV, source: "abbreviation CPV (World Bank code per BMR codebook), country CAPE VERDE (years 1975-2020)"}
+      - {code: "403", iso3: STP, source: "abbreviation STP (World Bank code per BMR codebook), country SAO TOME & PRINCIPE (years 1976-2020)"}
+      - {code: "404", iso3: GNB, source: "abbreviation GNB (World Bank code per BMR codebook), country GUINEA-BISSAU (years 1974-2020)"}
+      - {code: "411", iso3: GNQ, source: "abbreviation GNQ (World Bank code per BMR codebook), country EQUATORIAL GUINEA (years 1968-2020)"}
+      - {code: "420", iso3: GMB, source: "abbreviation GMB (World Bank code per BMR codebook), country GAMBIA (years 1965-2020)"}
+      - {code: "432", iso3: MLI, source: "abbreviation MLI (World Bank code per BMR codebook), country MALI (years 1960-2020)"}
+      - {code: "433", iso3: SEN, source: "abbreviation SEN (World Bank code per BMR codebook), country SENEGAL (years 1960-2020)"}
+      - {code: "434", iso3: BEN, source: "abbreviation BEN (World Bank code per BMR codebook), country BENIN (years 1960-2020)"}
+      - {code: "435", iso3: MRT, source: "abbreviation MRT (World Bank code per BMR codebook), country MAURITANIA (years 1960-2020)"}
+      - {code: "436", iso3: NER, source: "abbreviation NER (World Bank code per BMR codebook), country NIGER (years 1960-2020)"}
+      - {code: "437", iso3: CIV, source: "abbreviation CIV (World Bank code per BMR codebook), country COTE D'IVOIRE (years 1960-2020)"}
+      - {code: "438", iso3: GIN, source: "abbreviation GIN (World Bank code per BMR codebook), country GUINEA (years 1958-2020)"}
+      - {code: "439", iso3: BFA, source: "abbreviation BFA (World Bank code per BMR codebook), country BURKINA FASO (years 1960-2020)"}
+      - {code: "450", iso3: LBR, source: "abbreviation LBR (World Bank code per BMR codebook), country LIBERIA (years 1847-2020)"}
+      - {code: "451", iso3: SLE, source: "abbreviation SLE (World Bank code per BMR codebook), country SIERRA LEONE (years 1961-2020)"}
+      - {code: "452", iso3: GHA, source: "abbreviation GHA (World Bank code per BMR codebook), country GHANA (years 1957-2020)"}
+      - {code: "461", iso3: TGO, source: "abbreviation TGO (World Bank code per BMR codebook), country TOGO (years 1960-2020)"}
+      - {code: "471", iso3: CMR, source: "abbreviation CMR (World Bank code per BMR codebook), country CAMEROON (years 1960-2020)"}
+      - {code: "475", iso3: NGA, source: "abbreviation NGA (World Bank code per BMR codebook), country NIGERIA (years 1960-2020)"}
+      - {code: "481", iso3: GAB, source: "abbreviation GAB (World Bank code per BMR codebook), country GABON (years 1960-2020)"}
+      - {code: "482", iso3: CAF, source: "abbreviation CAF (World Bank code per BMR codebook), country CENTRAL AFRICAN REP. (years 1960-2020)"}
+      - {code: "483", iso3: TCD, source: "abbreviation TCD (World Bank code per BMR codebook), country CHAD (years 1960-2020)"}
+      - {code: "484", iso3: COG, source: "abbreviation COG (World Bank code per BMR codebook), country CONGO, REP. (years 1960-2020)"}
+      - {code: "490", iso3: COD, source: "abbreviation ZAR = former World Bank code of Zaire / DR Congo (years 1960-2020)"}
+      - {code: "500", iso3: UGA, source: "abbreviation UGA (World Bank code per BMR codebook), country UGANDA (years 1962-2020)"}
+      - {code: "501", iso3: KEN, source: "abbreviation KEN (World Bank code per BMR codebook), country KENYA (years 1963-2020)"}
+      - {code: "510", iso3: TZA, source: "abbreviation TZA (World Bank code per BMR codebook), country TANZANIA (years 1961-2020)"}
+      - {code: "516", iso3: BDI, source: "abbreviation BDI (World Bank code per BMR codebook), country BURUNDI (years 1962-2020)"}
+      - {code: "517", iso3: RWA, source: "abbreviation RWA (World Bank code per BMR codebook), country RWANDA (years 1962-2020)"}
+      - {code: "520", iso3: SOM, source: "abbreviation SOM (World Bank code per BMR codebook), country SOMALIA (years 1960-2020)"}
+      - {code: "522", iso3: DJI, source: "abbreviation DJI (World Bank code per BMR codebook), country DJIBOUTI (years 1977-2020)"}
+      - {code: "529", iso3: ETH, source: "country ETHIOPIA 1993-2020, abbreviation ETF (not a World Bank code); ccode 530 = Ethiopia before 1993 (years 1993-2020)"}
+      - {code: "530", iso3: ETH, source: "abbreviation ETH (World Bank code per BMR codebook), country ETHIOPIA/ETHIOPIA  (INCL. ERIT) (years 1855-1992)"}
+      - {code: "531", iso3: ERI, source: "abbreviation ERI (World Bank code per BMR codebook), country ERITREA (years 1993-2020)"}
+      - {code: "540", iso3: AGO, source: "abbreviation AGO (World Bank code per BMR codebook), country ANGOLA (years 1975-2020)"}
+      - {code: "541", iso3: MOZ, source: "abbreviation MOZ (World Bank code per BMR codebook), country MOZAMBIQUE (years 1975-2020)"}
+      - {code: "551", iso3: ZMB, source: "abbreviation ZMB (World Bank code per BMR codebook), country ZAMBIA (years 1964-2020)"}
+      - {code: "552", iso3: ZWE, source: "abbreviation ZWE (World Bank code per BMR codebook), country ZIMBABWE (years 1923-2020)"}
+      - {code: "553", iso3: MWI, source: "abbreviation MWI (World Bank code per BMR codebook), country MALAWI (years 1964-2020)"}
+      - {code: "560", iso3: ZAF, source: "abbreviation ZAF (World Bank code per BMR codebook), country SOUTH AFRICA (years 1856-2020)"}
+      - {code: "565", iso3: NAM, source: "abbreviation NAM (World Bank code per BMR codebook), country NAMIBIA (years 1990-2020)"}
+      - {code: "570", iso3: LSO, source: "abbreviation LSO (World Bank code per BMR codebook), country LESOTHO (years 1966-2020)"}
+      - {code: "571", iso3: BWA, source: "abbreviation BWA (World Bank code per BMR codebook), country BOTSWANA (years 1966-2020)"}
+      - {code: "572", iso3: SWZ, source: "abbreviation SWZ (World Bank code per BMR codebook), country SWAZILAND (years 1968-2020)"}
+      - {code: "580", iso3: MDG, source: "abbreviation MDG (World Bank code per BMR codebook), country MADAGASCAR (years 1960-2020)"}
+      - {code: "581", iso3: COM, source: "abbreviation COM (World Bank code per BMR codebook), country COMOROS (years 1975-2020)"}
+      - {code: "590", iso3: MUS, source: "abbreviation MUS (World Bank code per BMR codebook), country MAURITIUS (years 1968-2020)"}
+      - {code: "591", iso3: SYC, source: "abbreviation SYC (World Bank code per BMR codebook), country SEYCHELLES (years 1976-2020)"}
+      - {code: "600", iso3: MAR, source: "abbreviation MAR (World Bank code per BMR codebook), country MOROCCO (years 1800-2020)"}
+      - {code: "615", iso3: DZA, source: "abbreviation DZA (World Bank code per BMR codebook), country ALGERIA (years 1962-2020)"}
+      - {code: "616", iso3: TUN, source: "abbreviation TUN (World Bank code per BMR codebook), country TUNISIA (years 1956-2020)"}
+      - {code: "620", iso3: LBY, source: "abbreviation LBY (World Bank code per BMR codebook), country LIBYA (years 1951-2020)"}
+      - {code: "624", iso3: SDN, source: "country SUDAN, NORTH (2011-2020), no abbreviation; ccode 625 = Sudan 1956-2010 (years 2011-2020)"}
+      - {code: "625", iso3: SDN, source: "abbreviation SDN (World Bank code per BMR codebook), country SUDAN (years 1956-2010)"}
+      - {code: "626", iso3: SSD, source: "country SUDAN, SOUTH, no abbreviation (years 2011-2020)"}
+      - {code: "630", iso3: IRN, source: "abbreviation IRN (World Bank code per BMR codebook), country IRAN (years 1800-2020)"}
+      - {code: "640", iso3: TUR, source: "abbreviation TUR (World Bank code per BMR codebook), country TURKEY (years 1800-2020)"}
+      - {code: "645", iso3: IRQ, source: "abbreviation IRQ (World Bank code per BMR codebook), country IRAQ (years 1924-2020)"}
+      - {code: "651", iso3: EGY, source: "abbreviation EGY (World Bank code per BMR codebook), country EGYPT (years 1811-2020)"}
+      - {code: "652", iso3: SYR, source: "abbreviation SYR (World Bank code per BMR codebook), country SYRIA (years 1944-2020)"}
+      - {code: "660", iso3: LBN, source: "abbreviation LBN (World Bank code per BMR codebook), country LEBANON (years 1943-2020)"}
+      - {code: "663", iso3: JOR, source: "abbreviation JOR (World Bank code per BMR codebook), country JORDAN (years 1946-2020)"}
+      - {code: "666", iso3: ISR, source: "abbreviation ISR (World Bank code per BMR codebook), country ISRAEL (years 1948-2020)"}
+      - {code: "670", iso3: SAU, source: "abbreviation SAU (World Bank code per BMR codebook), country SAUDI ARABIA (years 1926-2020)"}
+      - {code: "678", iso3: YEM, source: "abbreviation YEM (World Bank code per BMR codebook), country YEMEN, NORTH (years 1918-1989)"}
+      - {code: "679", iso3: YEM, source: "abbreviation YEM (World Bank code per BMR codebook), country YEMEN (years 1990-2020)"}
+      - {code: "690", iso3: KWT, source: "abbreviation KWT (World Bank code per BMR codebook), country KUWAIT (years 1961-2020)"}
+      - {code: "692", iso3: BHR, source: "abbreviation BHR (World Bank code per BMR codebook), country BAHRAIN (years 1971-2020)"}
+      - {code: "694", iso3: QAT, source: "abbreviation QAT (World Bank code per BMR codebook), country QATAR (years 1971-2020)"}
+      - {code: "696", iso3: ARE, source: "abbreviation ARE (World Bank code per BMR codebook), country UNITED ARAB EMIRATES (years 1971-2020)"}
+      - {code: "698", iso3: OMN, source: "abbreviation OMN (World Bank code per BMR codebook), country OMAN (years 1800-2020)"}
+      - {code: "700", iso3: AFG, source: "abbreviation AFG (World Bank code per BMR codebook), country AFGHANISTAN (years 1800-2020)"}
+      - {code: "701", iso3: TKM, source: "abbreviation TKM (World Bank code per BMR codebook), country TURKMENISTAN (years 1991-2020)"}
+      - {code: "702", iso3: TJK, source: "abbreviation TJK (World Bank code per BMR codebook), country TAJIKISTAN (years 1991-2020)"}
+      - {code: "703", iso3: KGZ, source: "abbreviation KGZ (World Bank code per BMR codebook), country KYRGYZSTAN (years 1991-2020)"}
+      - {code: "704", iso3: UZB, source: "abbreviation UZB (World Bank code per BMR codebook), country UZBEKISTAN (years 1991-2020)"}
+      - {code: "705", iso3: KAZ, source: "abbreviation KAZ (World Bank code per BMR codebook), country KAZAKHSTAN (years 1991-2020)"}
+      - {code: "710", iso3: CHN, source: "abbreviation CHN (World Bank code per BMR codebook), country CHINA (years 1800-2020)"}
+      - {code: "712", iso3: MNG, source: "abbreviation MNG (World Bank code per BMR codebook), country MONGOLIA (years 1924-2020)"}
+      - {code: "731", iso3: PRK, source: "abbreviation PRK (World Bank code per BMR codebook), country KOREA, NORTH (years 1948-2020)"}
+      - {code: "732", iso3: KOR, source: "abbreviation KOR (World Bank code per BMR codebook), country KOREA, SOUTH (years 1948-2020)"}
+      - {code: "740", iso3: JPN, source: "abbreviation JPN (World Bank code per BMR codebook), country JAPAN (years 1800-2020)"}
+      - {code: "750", iso3: IND, source: "abbreviation IND (World Bank code per BMR codebook), country INDIA (years 1950-2020)"}
+      - {code: "760", iso3: BTN, source: "abbreviation BTN (World Bank code per BMR codebook), country BHUTAN (years 1907-2020)"}
+      - {code: "769", iso3: PAK, source: "abbreviation PAK (World Bank code per BMR codebook), country PAKISTAN  (INCL. BANGLAD.) (years 1947-1971)"}
+      - {code: "770", iso3: PAK, source: "abbreviation PAK (World Bank code per BMR codebook), country PAKISTAN (years 1972-2020)"}
+      - {code: "771", iso3: BGD, source: "abbreviation BGD (World Bank code per BMR codebook), country BANGLADESH (years 1971-2020)"}
+      - {code: "775", iso3: MMR, source: "abbreviation MMR (World Bank code per BMR codebook), country MYANMAR (years 1948-2020)"}
+      - {code: "780", iso3: LKA, source: "abbreviation LKA (World Bank code per BMR codebook), country SRI LANKA (years 1948-2020)"}
+      - {code: "781", iso3: MDV, source: "abbreviation MDV (World Bank code per BMR codebook), country MALDIVES (years 1966-2020)"}
+      - {code: "790", iso3: NPL, source: "abbreviation NPL (World Bank code per BMR codebook), country NEPAL (years 1800-2020)"}
+      - {code: "800", iso3: THA, source: "abbreviation THA (World Bank code per BMR codebook), country THAILAND (years 1800-2020)"}
+      - {code: "811", iso3: KHM, source: "abbreviation KHM (World Bank code per BMR codebook), country CAMBODIA (years 1949-2020)"}
+      - {code: "812", iso3: LAO, source: "abbreviation LAO (World Bank code per BMR codebook), country LAOS (years 1954-2020)"}
+      - {code: "818", iso3: VNM, source: "abbreviation VNM (World Bank code per BMR codebook), country VIETNAM (years 1976-2020)"}
+      - {code: "820", iso3: MYS, source: "abbreviation MYS (World Bank code per BMR codebook), country MALAYSIA (years 1957-2020)"}
+      - {code: "830", iso3: SGP, source: "abbreviation SGP (World Bank code per BMR codebook), country SINGAPORE (years 1965-2020)"}
+      - {code: "835", iso3: BRN, source: "abbreviation BRN (World Bank code per BMR codebook), country BRUNEI (years 1985-2020)"}
+      - {code: "840", iso3: PHL, source: "abbreviation PHL (World Bank code per BMR codebook), country PHILIPPINES (years 1935-2020)"}
+      - {code: "850", iso3: IDN, source: "abbreviation IDN (World Bank code per BMR codebook), country INDONESIA (years 1945-2020)"}
+      - {code: "860", iso3: TLS, source: "abbreviation TMP = former World Bank code of East Timor (years 2002-2020)"}
+      - {code: "900", iso3: AUS, source: "abbreviation AUS (World Bank code per BMR codebook), country AUSTRALIA (years 1901-2020)"}
+      - {code: "910", iso3: PNG, source: "abbreviation PNG (World Bank code per BMR codebook), country PAPUA NEW GUINEA (years 1975-2020)"}
+      - {code: "920", iso3: NZL, source: "abbreviation NZL (World Bank code per BMR codebook), country NEW ZEALAND (years 1857-2020)"}
+      - {code: "935", iso3: VUT, source: "abbreviation VUT (World Bank code per BMR codebook), country VANUATU (years 1980-2020)"}
+      - {code: "940", iso3: SLB, source: "abbreviation SLB (World Bank code per BMR codebook), country SOLOMON ISLANDS (years 1978-2020)"}
+      - {code: "946", iso3: KIR, source: "abbreviation KIR (World Bank code per BMR codebook), country KIRIBATI (years 1997-2020)"}
+      - {code: "947", iso3: TUV, source: "abbreviation TUV (World Bank code per BMR codebook), country TUVALU (years 1978-2020)"}
+      - {code: "950", iso3: FJI, source: "abbreviation FJI (World Bank code per BMR codebook), country FIJI (years 1970-2020)"}
+      - {code: "955", iso3: TON, source: "abbreviation TON (World Bank code per BMR codebook), country TONGA (years 1970-2020)"}
+      - {code: "970", iso3: NRU, source: "abbreviation NRU (World Bank code per BMR codebook), country NAURU (years 1968-2020)"}
+      - {code: "983", iso3: MHL, source: "abbreviation MHL (World Bank code per BMR codebook), country MARSHALL ISLANDS (years 1992-2020)"}
+      - {code: "986", iso3: PLW, source: "abbreviation PLW (World Bank code per BMR codebook), country PALAU (years 1995-2020)"}
+      - {code: "987", iso3: FSM, source: "abbreviation FSM (World Bank code per BMR codebook), country MICRONESIA, FED. (years 1992-2020)"}
+      - {code: "990", iso3: WSM, source: "abbreviation WSM (World Bank code per BMR codebook), country SAMOA (WESTERN) (years 1962-2020)"}
+    source:
+      kind: provider_data
+      url: https://dataverse.harvard.edu/api/access/datafile/5707006?format=original
+      raw_sha256: 18e2ea831875e0d163d44f933e4ccf3f6beca199f94adf4784405e0993a0d6b6

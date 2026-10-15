@@ -1,0 +1,19 @@
+# V3 (agent A-SCI): OpenAlex group_by aggregates (works per country/year/domain), atlas connector atlas.openalex.
+source_key: openalex.api
+title: OpenAlex API (group_by aggregates of works)
+provider_url: https://openalex.org/
+lineage_family: openalex
+rights:
+  licence: CC0-1.0
+  licence_url: https://openalex.org/about
+  attribution: "OpenAlex (OurResearch), CC0"
+metadata:
+  allowed_hosts: [api.openalex.org]
+  api_docs: https://docs.openalex.org/how-to-use-the-api/get-groups-of-entities
+  authentication: >-
+    optional API key (api_key query parameter, redacted by the safe client); without a key requests draw on a small
+    free daily budget shared by every client behind the same IP (HTTP 429 "Insufficient budget" observed 2026-10-15)
+  editorial_status: >-
+    Live bibliographic index built by OurResearch from Crossref, PubMed, institutional repositories and its own
+    affiliation matching; counts drift as records are added, merged or re-attributed.
+  cadence: monthly re-query (atlas table versioned by content)

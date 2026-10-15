@@ -1,0 +1,311 @@
+# Atlas catalog: education and research & development (agent A-HEALTHEDU). Provider-declared concepts,
+# not human-reviewed. Series: uis.api.<UIS indicator id> (src/reva/adapters/connectors/atlas_uis.py); sex and
+# age are part of the UIS id and named in each concept. Per-cell flags: qualifier (UIS_EST = UIS estimate,
+# NAT_EST = national estimate), magnitude (NIL = nil or negligible), footnotes (data source, coverage),
+# estimate_class (country_reported | uis_modelled | uis_estimate), uis_data_version.
+# wb.wdi_social.* fallbacks are World Bank redistributions of the SAME UIS series (same lineage, possibly an
+# older UIS vintage); they answer only where the UIS table has no cell for the country-year.
+# Values are kept exactly as the UIS API serialises them, including binary-float artefacts
+# (97.29000091552734): REVA does not round provider values.
+domain: education
+labels: {fr: "Éducation et recherche", en: "Education and research"}
+maintainer: A-HEALTHEDU
+concepts:
+  - id: education.literacy_rate_adult
+    labels: {fr: "Taux d'alphabétisation des adultes (15 ans et plus)", en: "Adult literacy rate (15+)"}
+    definition: "Percentage of the population aged 15 and over who can read and write a short simple statement on everyday life (UIS, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: literacy
+    source_order: ["uis.api.LR.AG15T99", "wb.wdi_social.SE.ADT.LITR.ZS"]
+    provider_declared: true
+    notes: "National literacy definitions differ (each cell's footnotes quote the census/survey definition). Many high-income countries report no literacy data."
+  - id: education.literacy_rate_adult.female
+    labels: {fr: "Taux d'alphabétisation des adultes (femmes)", en: "Adult literacy rate (15+, female)"}
+    definition: "Adult literacy rate, population 15+ years, female (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: literacy
+    source_order: ["uis.api.LR.AG15T99.F", "wb.wdi_social.SE.ADT.LITR.FE.ZS"]
+    provider_declared: true
+  - id: education.literacy_rate_adult.male
+    labels: {fr: "Taux d'alphabétisation des adultes (hommes)", en: "Adult literacy rate (15+, male)"}
+    definition: "Adult literacy rate, population 15+ years, male (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: literacy
+    source_order: ["uis.api.LR.AG15T99.M", "wb.wdi_social.SE.ADT.LITR.MA.ZS"]
+    provider_declared: true
+  - id: education.literacy_rate_youth
+    labels: {fr: "Taux d'alphabétisation des jeunes (15-24 ans)", en: "Youth literacy rate (15-24)"}
+    definition: "Youth literacy rate, population 15-24 years, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: literacy
+    source_order: ["uis.api.LR.AG15T24", "wb.wdi_social.SE.ADT.1524.LT.ZS"]
+    provider_declared: true
+  - id: education.out_of_school_rate.primary
+    labels: {fr: "Taux de non-scolarisation (âge du primaire)", en: "Out-of-school rate, primary school age"}
+    definition: "Percentage of children of official primary school age not enrolled in primary or secondary education (UIS, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: access
+    source_order: ["uis.api.ROFST.1.CP"]
+    provider_declared: true
+  - id: education.out_of_school_rate.lower_secondary
+    labels: {fr: "Taux de non-scolarisation (âge du premier cycle du secondaire)", en: "Out-of-school rate, lower secondary school age"}
+    definition: "Out-of-school rate for adolescents of lower secondary school age, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: access
+    source_order: ["uis.api.ROFST.2.CP"]
+    provider_declared: true
+  - id: education.out_of_school_rate.upper_secondary
+    labels: {fr: "Taux de non-scolarisation (âge du second cycle du secondaire)", en: "Out-of-school rate, upper secondary school age"}
+    definition: "Out-of-school rate for youth of upper secondary school age, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: access
+    source_order: ["uis.api.ROFST.3.CP"]
+    provider_declared: true
+  - id: education.out_of_school_children.primary
+    labels: {fr: "Enfants non scolarisés (âge du primaire)", en: "Out-of-school children of primary school age"}
+    definition: "Number of children of official primary school age not enrolled (UIS, both sexes)."
+    unit: persons
+    domain: education
+    subdomain: access
+    source_order: ["uis.api.OFST.1.CP"]
+    provider_declared: true
+  - id: education.out_of_school.primary_secondary
+    labels: {fr: "Enfants, adolescents et jeunes non scolarisés (primaire et secondaire)", en: "Out-of-school children, adolescents and youth (primary and secondary age)"}
+    definition: "Number of out-of-school children, adolescents and youth of primary and secondary school age (UIS, both sexes)."
+    unit: persons
+    domain: education
+    subdomain: access
+    source_order: ["uis.api.OFST.1T3.CP"]
+    provider_declared: true
+  - id: education.completion_rate.primary
+    labels: {fr: "Taux d'achèvement du primaire", en: "Completion rate, primary education"}
+    definition: "Percentage of a cohort 3-5 years above the intended age for the last grade of primary who completed primary (UIS, household survey data, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.1"]
+    provider_declared: true
+    notes: "Survey-based (DHS, MICS, LFS...): years with a survey only. The modelled series is education.completion_rate_modelled.primary (never mixed in)."
+  - id: education.completion_rate.lower_secondary
+    labels: {fr: "Taux d'achèvement du premier cycle du secondaire", en: "Completion rate, lower secondary education"}
+    definition: "Completion rate, lower secondary education, both sexes (UIS, household survey data)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.2"]
+    provider_declared: true
+  - id: education.completion_rate.upper_secondary
+    labels: {fr: "Taux d'achèvement du second cycle du secondaire", en: "Completion rate, upper secondary education"}
+    definition: "Completion rate, upper secondary education, both sexes (UIS, household survey data)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.3"]
+    provider_declared: true
+  - id: education.completion_rate_modelled.primary
+    labels: {fr: "Taux d'achèvement du primaire (modélisé)", en: "Completion rate, primary (modelled)"}
+    definition: "Completion rate, primary education, both sexes - UIS/GEM Report model estimates combining surveys (modelled data)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.MOD.1"]
+    provider_declared: true
+    notes: "Model output (flags.estimate_class = uis_modelled), annual and comparable, not an observation."
+  - id: education.completion_rate_modelled.lower_secondary
+    labels: {fr: "Taux d'achèvement du premier cycle du secondaire (modélisé)", en: "Completion rate, lower secondary (modelled)"}
+    definition: "Completion rate, lower secondary education, both sexes (UIS/GEM modelled data)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.MOD.2"]
+    provider_declared: true
+  - id: education.completion_rate_modelled.upper_secondary
+    labels: {fr: "Taux d'achèvement du second cycle du secondaire (modélisé)", en: "Completion rate, upper secondary (modelled)"}
+    definition: "Completion rate, upper secondary education, both sexes (UIS/GEM modelled data)."
+    unit: "%"
+    domain: education
+    subdomain: completion
+    source_order: ["uis.api.CR.MOD.3"]
+    provider_declared: true
+  - id: education.gross_enrolment.primary
+    labels: {fr: "Taux brut de scolarisation, primaire", en: "Gross enrolment ratio, primary"}
+    definition: "Total enrolment in primary education, regardless of age, as a percentage of the official primary school-age population (UIS, both sexes; may exceed 100)."
+    unit: "%"
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.GER.1", "wb.wdi_social.SE.PRM.ENRR"]
+    provider_declared: true
+  - id: education.gross_enrolment.lower_secondary
+    labels: {fr: "Taux brut de scolarisation, premier cycle du secondaire", en: "Gross enrolment ratio, lower secondary"}
+    definition: "Gross enrolment ratio, lower secondary, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.GER.2"]
+    provider_declared: true
+  - id: education.gross_enrolment.upper_secondary
+    labels: {fr: "Taux brut de scolarisation, second cycle du secondaire", en: "Gross enrolment ratio, upper secondary"}
+    definition: "Gross enrolment ratio, upper secondary, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.GER.3"]
+    provider_declared: true
+  - id: education.gross_enrolment.tertiary
+    labels: {fr: "Taux brut de scolarisation, supérieur", en: "Gross enrolment ratio, tertiary"}
+    definition: "Gross enrolment ratio for tertiary education, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.GER.5T8", "wb.wdi_social.SE.TER.ENRR"]
+    provider_declared: true
+  - id: education.net_enrolment.primary
+    labels: {fr: "Taux net total de scolarisation, primaire", en: "Total net enrolment rate, primary"}
+    definition: "Total net enrolment rate, primary, both sexes (UIS)."
+    unit: "%"
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.NERT.1.CP"]
+    provider_declared: true
+  - id: education.tertiary_enrolment
+    labels: {fr: "Effectifs de l'enseignement supérieur", en: "Enrolment in tertiary education"}
+    definition: "Enrolment in tertiary education, all programmes, both sexes (UIS)."
+    unit: persons
+    domain: education
+    subdomain: enrolment
+    source_order: ["uis.api.25053"]
+    provider_declared: true
+  - id: education.mean_years_schooling
+    labels: {fr: "Durée moyenne de scolarisation (25 ans et plus)", en: "Mean years of schooling (25+)"}
+    definition: "Mean years of schooling (ISCED 1 or higher), population 25+ years, both sexes (UIS)."
+    unit: years
+    domain: education
+    subdomain: attainment
+    source_order: ["uis.api.MYS.1T8.AG25T99"]
+    provider_declared: true
+    notes: "UNDP's HDI mean years of schooling (A-QOL) uses other sources and imputation; different series, not listed here."
+  - id: education.mean_years_schooling.female
+    labels: {fr: "Durée moyenne de scolarisation (25 ans et plus, femmes)", en: "Mean years of schooling (25+, female)"}
+    definition: "Mean years of schooling (ISCED 1 or higher), population 25+ years, female (UIS)."
+    unit: years
+    domain: education
+    subdomain: attainment
+    source_order: ["uis.api.MYS.1T8.AG25T99.F"]
+    provider_declared: true
+  - id: education.mean_years_schooling.male
+    labels: {fr: "Durée moyenne de scolarisation (25 ans et plus, hommes)", en: "Mean years of schooling (25+, male)"}
+    definition: "Mean years of schooling (ISCED 1 or higher), population 25+ years, male (UIS)."
+    unit: years
+    domain: education
+    subdomain: attainment
+    source_order: ["uis.api.MYS.1T8.AG25T99.M"]
+    provider_declared: true
+  - id: education.tertiary_attainment_25plus
+    labels: {fr: "Diplômés du supérieur (25 ans et plus)", en: "Tertiary attainment (25+)"}
+    definition: "Percentage of the population 25+ that completed at least short-cycle tertiary education (UIS, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: attainment
+    source_order: ["uis.api.EA.5T8.AG25T99"]
+    provider_declared: true
+  - id: education.school_life_expectancy
+    labels: {fr: "Espérance de vie scolaire (primaire au supérieur)", en: "School life expectancy (primary to tertiary)"}
+    definition: "Expected number of years of schooling from primary to tertiary, both sexes (UIS)."
+    unit: years
+    domain: education
+    subdomain: attainment
+    source_order: ["uis.api.SLE.1T8"]
+    provider_declared: true
+  - id: education.min_proficiency_math.lower_secondary
+    labels: {fr: "Élèves atteignant le niveau minimal en mathématiques (fin du premier cycle du secondaire)", en: "Minimum proficiency in mathematics, end of lower secondary"}
+    definition: "Proportion of students at the end of lower secondary achieving at least a minimum proficiency level in mathematics (SDG 4.1.1c; UIS from PISA/TIMSS/regional assessments, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: learning
+    source_order: ["uis.api.MATH.LOWERSEC"]
+    provider_declared: true
+    notes: "Assessment years only; different assessments are linked by UIS, comparability is limited (see footnotes)."
+  - id: education.min_proficiency_reading.lower_secondary
+    labels: {fr: "Élèves atteignant le niveau minimal en lecture (fin du premier cycle du secondaire)", en: "Minimum proficiency in reading, end of lower secondary"}
+    definition: "Proportion of students at the end of lower secondary achieving at least a minimum proficiency level in reading (SDG 4.1.1c; UIS, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: learning
+    source_order: ["uis.api.READ.LOWERSEC"]
+    provider_declared: true
+  - id: education.expenditure_gdp
+    labels: {fr: "Dépenses publiques d'éducation (% du PIB)", en: "Government expenditure on education (% of GDP)"}
+    definition: "Government expenditure on education as a percentage of GDP (UIS)."
+    unit: "% of GDP"
+    domain: education
+    subdomain: financing
+    source_order: ["uis.api.XGDP.FSGOV", "wb.wdi_social.SE.XPD.TOTL.GD.ZS"]
+    provider_declared: true
+    notes: "A value 0 flagged magnitude NIL is UIS's report of nil/negligible expenditure, not a filled zero."
+  - id: education.expenditure_government_share
+    labels: {fr: "Dépenses d'éducation (% des dépenses publiques)", en: "Expenditure on education (% of government expenditure)"}
+    definition: "Expenditure on education as a percentage of total government expenditure (UIS calculation)."
+    unit: "% of total government expenditure"
+    domain: education
+    subdomain: financing
+    source_order: ["uis.api.XGOVEXP.IMF", "wb.wdi_social.SE.XPD.TOTL.GB.ZS"]
+    provider_declared: true
+  - id: education.inbound_mobility_rate
+    labels: {fr: "Taux de mobilité entrante (étudiants internationaux)", en: "Inbound mobility rate (tertiary)"}
+    definition: "Internationally mobile students enrolled in the country as a percentage of total tertiary enrolment (UIS estimate, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: mobility
+    source_order: ["uis.api.MSEP.5T8"]
+    provider_declared: true
+  - id: education.inbound_mobile_students
+    labels: {fr: "Étudiants internationaux entrants", en: "Inbound internationally mobile students"}
+    definition: "Total inbound internationally mobile students, both sexes (UIS)."
+    unit: persons
+    domain: education
+    subdomain: mobility
+    source_order: ["uis.api.26637"]
+    provider_declared: true
+  - id: education.outbound_mobility_ratio
+    labels: {fr: "Ratio de mobilité sortante (étudiants)", en: "Outbound mobility ratio (tertiary)"}
+    definition: "Students from the country studying abroad as a percentage of the country's tertiary enrolment, all destination regions (UIS estimate, both sexes)."
+    unit: "%"
+    domain: education
+    subdomain: mobility
+    source_order: ["uis.api.MOR.5T8.40510"]
+    provider_declared: true
+  - id: rd.gerd_gdp
+    labels: {fr: "Dépense intérieure brute de R-D (% du PIB)", en: "Gross domestic expenditure on R&D (% of GDP)"}
+    definition: "GERD as a percentage of GDP (UIS)."
+    unit: "% of GDP"
+    domain: education
+    subdomain: research_development
+    source_order: ["uis.api.EXPGDP.TOT"]
+    provider_declared: true
+    tags: [science]
+    notes: "Footnotes flag partial coverage (e.g. 'Partial data' when some sectors are not surveyed)."
+  - id: rd.researchers_per_million
+    labels: {fr: "Chercheurs par million d'habitants (ETP)", en: "Researchers per million inhabitants (FTE)"}
+    definition: "Researchers in full-time equivalent per million inhabitants (UIS)."
+    unit: per million inhabitants (FTE)
+    domain: education
+    subdomain: research_development
+    source_order: ["uis.api.RESDEN.INHAB.TFTE"]
+    provider_declared: true
+    tags: [science]
+  - id: rd.female_researchers_share
+    labels: {fr: "Part des femmes parmi les chercheurs (effectifs)", en: "Female researchers (% of researchers, headcount)"}
+    definition: "Women as a percentage of researchers, headcount (UIS)."
+    unit: "% of researchers (headcount)"
+    domain: education
+    subdomain: research_development
+    source_order: ["uis.api.FRESP.THC"]
+    provider_declared: true
+    tags: [science]

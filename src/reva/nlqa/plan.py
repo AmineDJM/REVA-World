@@ -1,0 +1,407 @@
+"""The typed query plan: a closed set of operations, validated server-side.
+
+The LLM (or the keyword fallback) only proposes a plan; :func:`validate_plan` turns the
+untrusted JSON into a :class:`QueryPlan` and enforces:
+
+* operations from the closed set :data:`OPS` only, at most :data:`MAX_OPERATIONS`;
+* entity references are *lookup refs* (ids of earlier ``entity_lookup`` steps): the model
+  never supplies a QID — entity resolution happens on the server;
+* concept ids, ISO3 codes, KG property ids and link kinds from the allow-lists in
+  :class:`~reva.nlqa.catalog.QaCatalog`; anything else **rejects that operation** (and every
+  operation depending on it) with a typed reason — never a substitution;
+* bounded numbers (years, hops, limits); a server limit (hops ≤ 4, limit ≤ 50) is applied
+  with a warning, a user-stated year is never changed (out of range → rejected).
+"""
+
+from __future__ import annotations
+
+import re
+from collections.abc import Mapping
+from dataclasses import dataclass, field
+from typing import Any
+
+from reva.nlqa.catalog import ENTITY_KINDS, QaCatalog, fold
+
+OPS: tuple[str, ...] = (
+    "entity_lookup",
+    "kg_neighbours",
+    "kg_timeline",
+    "kg_path",
+    "atlas_value",
+    "atlas_rank",
+    "atlas_series",
+    "links",
+)
+MAX_OPERATIONS = 12
+MAX_HOPS = 4
+MAX_LIMIT = 50
+DEFAULT_LIMIT = 10
+MIN_YEAR, MAX_YEAR = -3000, 2100
+MAX_LOOKUP_CHARS = 120
+MAX_TEXT_CHARS = 300
+_ID_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_]{0,15}$")
+_PID_RE = re.compile(r"^P[1-9][0-9]{0,6}$")
+_ISO3_RE = re.compile(r"^[A-Z]{3}$")
+_AS_OF_RE = re.compile(r"^-?\d{1,4}(-\d{2}(-\d{2})?)?$")
+_CTRL = re.compile(r"[\x00-\x1f\x7f]")
+
+
+def _clean(v: Any, n: int = MAX_TEXT_CHARS) -> str:
+    return _CTRL.sub(" ", str(v if v is not None else "")).strip()[:n]
+
+
+@dataclass
+class PlanOp:
+    id: str
+    op: str
+    args: dict[str, Any]
+
+    def as_json(self) -> dict[str, Any]:
+        return {"id": self.id, "op": self.op, **self.args}
+
+
+@dataclass
+class QueryPlan:
+    language: str
+    operations: list[PlanOp]
+    unsupported: list[dict[str, Any]] = field(default_factory=list)
+    rejected: list[dict[str, Any]] = field(default_factory=list)
+    warnings: list[str] = field(default_factory=list)
+    llm_restatement: str = ""
+    planner: str = "llm"  # llm | keyword_fallback
+
+    def as_json(self) -> dict[str, Any]:
+        return {
+            "planner": self.planner,
+            "language": self.language,
+            "operations": [o.as_json() for o in self.operations],
+            "rejected": self.rejected,
+        }
+
+    def op(self, op_id: str) -> PlanOp | None:
+        return next((o for o in self.operations if o.id == op_id), None)
+
+
+def in_question(fragment: str, question: str) -> bool:
+    """True when ``fragment`` occurs in the question (accent/case-insensitive) — the only way an
+    LLM-written string may be quoted in an answer."""
+    f = fold(fragment)
+    return bool(f) and f in fold(question)
+
+
+def _year(v: Any) -> int | None:
+    if v is None:
+        return None
+    if isinstance(v, bool) or not isinstance(v, int | float) or int(v) != v:
+        raise ValueError("year must be an integer")
+    y = int(v)
+    if not MIN_YEAR <= y <= MAX_YEAR:
+        raise ValueError(f"year {y} outside {MIN_YEAR}..{MAX_YEAR}")
+    return y
+
+
+class _Reject(Exception):
+    def __init__(self, reason: str, **details: Any) -> None:
+        super().__init__(reason)
+        self.reason = reason
+        self.details = details
+
+
+def validate_plan(raw: Any, catalog: QaCatalog, question: str, *, planner: str = "llm") -> QueryPlan:
+    """Untrusted planner output → :class:`QueryPlan` (rejects, never substitutes)."""
+    if not isinstance(raw, Mapping):
+        raise ValueError("plan is not a JSON object")
+    lang = raw.get("input_language")
+    lang = lang if lang in ("fr", "en") else ("fr" if _looks_french(question) else "en")
+    plan = QueryPlan(language=lang, operations=[], planner=planner)
+    plan.llm_restatement = _clean(raw.get("restatement"), 600)
+    for u in raw.get("unsupported") or []:
+        if isinstance(u, Mapping):
+            text = _clean(u.get("text"))
+            plan.unsupported.append(
+                {
+                    "text": text,
+                    "reason": _clean(u.get("reason")),
+                    "source": planner,
+                    "in_question": in_question(text, question),
+                }
+            )
+    ops = raw.get("operations") or []
+    if not isinstance(ops, list):
+        raise ValueError("operations is not a list")
+    if len(ops) > MAX_OPERATIONS:
+        plan.warnings.append(f"plan_truncated: {len(ops)} operations proposed, the first {MAX_OPERATIONS} kept")
+        for extra in ops[MAX_OPERATIONS:]:
+            plan.rejected.append(
+                {
+                    "id": _clean((extra or {}).get("id"), 16),
+                    "op": _clean((extra or {}).get("op"), 32),
+                    "reason": "too_many_operations",
+                }
+            )
+        ops = ops[:MAX_OPERATIONS]
+    lookups: dict[str, str | None] = {}  # id -> kind
+    seen: set[str] = set()
+    for i, o in enumerate(ops):
+        if not isinstance(o, Mapping):
+            plan.rejected.append({"id": f"#{i}", "op": "", "reason": "not_an_object"})
+            continue
+        op_id = str(o.get("id") or f"s{i + 1}")
+        name = str(o.get("op") or "")
+        try:
+            if not _ID_RE.match(op_id) or op_id in seen:
+                raise _Reject("invalid_or_duplicate_id")
+            if name not in OPS:
+                raise _Reject("unknown_operation", op=_clean(name, 40))
+            args = _validate_args(name, o, catalog, lookups, plan)
+        except _Reject as r:
+            plan.rejected.append({"id": _clean(op_id, 16), "op": _clean(name, 32), "reason": r.reason, **r.details})
+            continue
+        except ValueError as e:
+            plan.rejected.append(
+                {"id": _clean(op_id, 16), "op": _clean(name, 32), "reason": "invalid_argument", "detail": str(e)[:200]}
+            )
+            continue
+        seen.add(op_id)
+        if name == "entity_lookup":
+            lookups[op_id] = args.get("kind")
+        plan.operations.append(PlanOp(op_id, name, args))
+    for r in plan.rejected:
+        plan.unsupported.append(
+            {
+                "text": "",
+                "reason": f"operation {r.get('op') or '?'} rejected: {r['reason']}"
+                + (f" ({r['value']})" if r.get("value") else ""),
+                "source": "server",
+                "in_question": False,
+            }
+        )
+    return plan
+
+
+def _ref(o: Mapping[str, Any], key: str, lookups: Mapping[str, Any]) -> str:
+    v = o.get(key)
+    if not isinstance(v, str) or v not in lookups:
+        raise _Reject("unknown_entity_ref", field=key, value=_clean(v, 40))
+    return v
+
+
+def _concept(o: Mapping[str, Any], catalog: QaCatalog) -> str:
+    c = o.get("concept")
+    if not isinstance(c, str) or c not in catalog.concepts:
+        raise _Reject("concept_not_in_catalog", value=_clean(c, 80))
+    return c
+
+
+def _country(o: Mapping[str, Any], catalog: QaCatalog, lookups: Mapping[str, Any], *, allow_all: bool) -> str:
+    c = o.get("country")
+    if isinstance(c, str) and c in lookups:
+        return c
+    if isinstance(c, str) and c == "ALL" and allow_all:
+        return c
+    if isinstance(c, str) and _ISO3_RE.match(c) and c in catalog.countries:
+        return c
+    raise _Reject("country_not_in_list", value=_clean(c, 40))
+
+
+def _limit(o: Mapping[str, Any], plan: QueryPlan) -> int:
+    v = o.get("limit")
+    if v is None:
+        return DEFAULT_LIMIT
+    if isinstance(v, bool) or not isinstance(v, int) or v < 1:
+        raise ValueError("limit must be a positive integer")
+    if v > MAX_LIMIT:
+        plan.warnings.append(f"limit_capped: {v} -> {MAX_LIMIT}")
+        return MAX_LIMIT
+    return int(v)
+
+
+def _validate_args(
+    name: str, o: Mapping[str, Any], catalog: QaCatalog, lookups: Mapping[str, Any], plan: QueryPlan
+) -> dict[str, Any]:
+    if name == "entity_lookup":
+        text = _clean(o.get("text"), MAX_LOOKUP_CHARS + 1)
+        if not text or len(text) > MAX_LOOKUP_CHARS:
+            raise ValueError("lookup text empty or too long")
+        kind = o.get("kind")
+        if kind is not None and kind not in ENTITY_KINDS:
+            kind = None
+        return {"text": text, "kind": kind}
+    if name in ("kg_neighbours", "kg_timeline"):
+        args: dict[str, Any] = {"entity": _ref(o, "entity", lookups)}
+        if name == "kg_neighbours":
+            props = o.get("properties") or []
+            if not isinstance(props, list):
+                raise ValueError("properties must be a list")
+            bad = [p for p in props if not (isinstance(p, str) and _PID_RE.match(p) and p in catalog.properties)]
+            if bad:
+                raise _Reject("property_not_in_list", value=", ".join(_clean(b, 12) for b in bad[:5]))
+            args["properties"] = list(dict.fromkeys(props))[:20]
+            args["as_of"] = _as_of(o.get("as_of"))
+        else:
+            args["from_year"], args["to_year"] = _range(o)
+        return args
+    if name == "kg_path":
+        a, b = _ref(o, "from_entity", lookups), _ref(o, "to_entity", lookups)
+        if a == b:
+            raise _Reject("path_to_itself")
+        hops = o.get("max_hops")
+        if hops is None:
+            hops = 3
+        if isinstance(hops, bool) or not isinstance(hops, int) or hops < 1:
+            raise ValueError("max_hops must be a positive integer")
+        if hops > MAX_HOPS:
+            plan.warnings.append(f"max_hops_capped: {hops} -> {MAX_HOPS}")
+            hops = MAX_HOPS
+        return {"from_entity": a, "to_entity": b, "max_hops": int(hops), "as_of": _as_of(o.get("as_of"))}
+    if name == "atlas_value":
+        return {
+            "concept": _concept(o, catalog),
+            "country": _country(o, catalog, lookups, allow_all=True),
+            "year": _year(o.get("year")),
+        }
+    if name == "atlas_rank":
+        order = o.get("order") or "desc"
+        if order not in ("desc", "asc"):
+            raise ValueError("order must be desc or asc")
+        return {"concept": _concept(o, catalog), "year": _year(o.get("year")), "order": order, "limit": _limit(o, plan)}
+    if name == "atlas_series":
+        f, t = _range(o)
+        return {
+            "concept": _concept(o, catalog),
+            "country": _country(o, catalog, lookups, allow_all=False),
+            "from_year": f,
+            "to_year": t,
+        }
+    if name == "links":
+        kinds = o.get("link_kinds") or []
+        if not isinstance(kinds, list):
+            raise ValueError("link_kinds must be a list")
+        bad = [k for k in kinds if k not in catalog.link_kinds]
+        if bad:
+            raise _Reject("link_kind_not_in_list", value=", ".join(_clean(b, 30) for b in bad[:5]))
+        return {
+            "country": _country(o, catalog, lookups, allow_all=False),
+            "kinds": list(dict.fromkeys(kinds)),
+            "limit": _limit(o, plan),
+        }
+    raise _Reject("unknown_operation")
+
+
+def _range(o: Mapping[str, Any]) -> tuple[int | None, int | None]:
+    f, t = _year(o.get("from_year")), _year(o.get("to_year"))
+    if f is not None and t is not None and f > t:
+        raise ValueError("from_year after to_year")
+    return f, t
+
+
+def _as_of(v: Any) -> str | None:
+    if v is None or v == "":
+        return None
+    if isinstance(v, int) and not isinstance(v, bool):
+        v = str(v)
+    if not isinstance(v, str) or not _AS_OF_RE.match(v):
+        raise ValueError("as_of must be YYYY, YYYY-MM or YYYY-MM-DD")
+    return v
+
+
+_FR_HINTS = re.compile(
+    r"\b(le|la|les|des|du|est|sont|quel(le)?s?|comment|pourquoi|quand|où|ou|au|aux|une?|pays|salaire|"
+    r"position|depuis|entre|avec|sur|dans|années)\b",
+    re.IGNORECASE,
+)
+_EN_HINTS = re.compile(r"\b(the|is|are|what|which|how|why|when|where|of|in|with|between|countries)\b", re.IGNORECASE)
+
+
+def _looks_french(text: str) -> bool:
+    return len(_FR_HINTS.findall(text)) > len(_EN_HINTS.findall(text))
+
+
+def detect_language(text: str) -> str:
+    return "fr" if _looks_french(text) else "en"
+
+
+def restate(plan: QueryPlan, catalog: QaCatalog) -> str:
+    """Server restatement of the validated plan (fr/en); LLM text never enters it except lookup
+    search terms, shown in quotes as search terms."""
+    fr = plan.language == "fr"
+    lookups = {o.id: o.args for o in plan.operations if o.op == "entity_lookup"}
+
+    def ent(ref: str) -> str:
+        a = lookups.get(ref) or {}
+        return f"« {a.get('text', ref)} »" if fr else f"“{a.get('text', ref)}”"
+
+    def country(c: str) -> str:
+        if c in lookups:
+            return ent(c)
+        if c == "ALL":
+            return "tous les pays" if fr else "all countries"
+        return catalog.country_label(c)
+
+    def concept(cid: str) -> str:
+        c = catalog.concepts.get(cid)
+        return c.label(plan.language) if c else cid
+
+    def year(y: Any) -> str:
+        return str(y) if y is not None else ("dernière année disponible" if fr else "latest available year")
+
+    parts: list[str] = []
+    for o in plan.operations:
+        a = o.args
+        if o.op == "entity_lookup":
+            continue
+        if o.op == "kg_neighbours":
+            props = ", ".join(
+                catalog.properties[p].labels.get("en", p) if p in catalog.properties else p for p in a["properties"]
+            )
+            what = (
+                (f"les relations ({props})" if props else "les relations")
+                if fr
+                else (f"the relations ({props})" if props else "the relations")
+            )
+            parts.append(f"{what} de {ent(a['entity'])}" if fr else f"{what} of {ent(a['entity'])}")
+        elif o.op == "kg_timeline":
+            parts.append(f"la chronologie de {ent(a['entity'])}" if fr else f"the timeline of {ent(a['entity'])}")
+        elif o.op == "kg_path":
+            parts.append(
+                f"les chemins (≤ {a['max_hops']} étapes) reliant {ent(a['from_entity'])} à {ent(a['to_entity'])}"
+                if fr
+                else f"the paths (≤ {a['max_hops']} hops) connecting {ent(a['from_entity'])} to {ent(a['to_entity'])}"
+            )
+        elif o.op == "atlas_value":
+            parts.append(f"{concept(a['concept'])} — {country(a['country'])}, {year(a['year'])}")
+        elif o.op == "atlas_rank":
+            order = (
+                ("les plus élevés" if a["order"] == "desc" else "les plus faibles")
+                if fr
+                else ("highest" if a["order"] == "desc" else "lowest")
+            )
+            parts.append(
+                f"le classement ({order}, {a['limit']} pays) de {concept(a['concept'])}, {year(a['year'])}"
+                if fr
+                else f"the ranking ({order}, {a['limit']} countries) of {concept(a['concept'])}, {year(a['year'])}"
+            )
+        elif o.op == "atlas_series":
+            span = f"{a['from_year'] or '…'}–{a['to_year'] or '…'}"
+            parts.append(f"{concept(a['concept'])} — {country(a['country'])}, {span}")
+        elif o.op == "links":
+            kinds = ", ".join(a["kinds"]) or ("tous types" if fr else "all kinds")
+            parts.append(
+                f"les liens ({kinds}) de {country(a['country'])}"
+                if fr
+                else f"the links ({kinds}) of {country(a['country'])}"
+            )
+    head = "Question interprétée comme : " if fr else "Question read as: "
+    if not parts:
+        body = "aucune requête exécutable" if fr else "no executable query"
+    else:
+        body = "; ".join(parts)
+    tail = ""
+    if plan.unsupported:
+        tail = (
+            f" Parties non couvertes : {len(plan.unsupported)}."
+            if fr
+            else f" Unsupported parts: {len(plan.unsupported)}."
+        )
+    origin = (" (plan par mots-clés, sans LLM)" if fr else " (keyword plan, no LLM)") if plan.planner != "llm" else ""
+    return head + body + "." + origin + tail

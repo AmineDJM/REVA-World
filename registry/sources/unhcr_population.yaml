@@ -1,0 +1,25 @@
+# V3 (agent A-UN): UNHCR Refugee Population Statistics API (population figures by origin and asylum).
+source_key: unhcr.population
+title: "UNHCR Refugee Population Statistics Database (API v1, population)"
+provider_url: https://api.unhcr.org/population/v1/
+lineage_family: unhcr
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "UNHCR Refugee Population Statistics Database, https://www.unhcr.org/refugee-statistics/"
+  review: >-
+    pending maintainer review: UNHCR states CC BY 4.0 for the Refugee Data Finder; the statement page
+    could not be read from the build container (JavaScript-rendered).
+metadata:
+  allowed_hosts: [api.unhcr.org]
+  api_docs: https://api.unhcr.org/docs/refugee-statistics.html
+  endpoints: ["GET /population/v1/years/", "GET /population/v1/population/?yearFrom&yearTo&coo_all&coa_all&limit&page"]
+  authentication: none
+  cadence: end-year figures published each June (Global Trends); mid-year figures in November
+  value_encoding: >-
+    The API renders a cell that has no figure as the *string* "0" (and "-" for not applicable); real
+    figures are JSON integers (no integer 0 occurs in 2024/2025 responses, checked 2026-10-15). Only
+    integers are stored; string "0"/"-" cells are counted and omitted, never stored as zero.
+  editorial_status: "UNHCR figures from governments and UNHCR registration; end-year stocks"
+  upstream_lineages:
+    all: [national_governments, unhcr_registration]

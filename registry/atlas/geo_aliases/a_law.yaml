@@ -1,0 +1,1393 @@
+# Agent A-LAW: provider geography schemes for WBL (KSV), Constitute (country_id) and CCP (COW code|name).
+# Built by scratch script from the archived provider lists; reviewed entry by entry by the agent.
+note: Agent A-LAW provider geography schemes. Every alias names its evidence; manual entries are agent decisions pending maintainer review. Unmapped provider geographies (historical states, Taiwan) are
+  deliberately absent and stay unmapped (kept, listed) in the atlas tables.
+schemes:
+  wbl:
+    base: iso3
+    aliases:
+    - code: KSV
+      iso3: XKX
+      source: 'WBL panel/2026 files: economy "Kosovo" carries "ISO Code" KSV (non-ISO); crosswalk Kosovo key XKX'
+    source:
+      kind: provider_data
+      url: https://wbl.worldbank.org/en/data/download-data
+  constitute:
+    base: null
+    aliases:
+    - code: Afghanistan
+      iso3: AFG
+      source: 'exact normalised name match: provider country_id "Afghanistan" / country "The Islamic Republic of Afghanistan" = crosswalk label "Afghanistan"'
+    - code: Albania
+      iso3: ALB
+      source: 'exact normalised name match: provider country_id "Albania" / country "Republic of Albania" = crosswalk label "Albania"'
+    - code: Algeria
+      iso3: DZA
+      source: 'exact normalised name match: provider country_id "Algeria" / country "People''s Democratic Republic of Algeria" = crosswalk label "Algeria"'
+    - code: Andorra
+      iso3: AND
+      source: 'exact normalised name match: provider country_id "Andorra" / country "Principality of Andorra" = crosswalk label "Andorra"'
+    - code: Angola
+      iso3: AGO
+      source: 'exact normalised name match: provider country_id "Angola" / country "Republic of Angola" = crosswalk label "Angola"'
+    - code: Antigua_and_Barbuda
+      iso3: ATG
+      source: 'exact normalised name match: provider country_id "Antigua_and_Barbuda" / country "Antigua and Barbuda" = crosswalk label "Antigua and Barbuda"'
+    - code: Argentina
+      iso3: ARG
+      source: 'exact normalised name match: provider country_id "Argentina" / country "Argentine Republic" = crosswalk label "Argentina"'
+    - code: Armenia
+      iso3: ARM
+      source: 'exact normalised name match: provider country_id "Armenia" / country "Republic of Armenia" = crosswalk label "Armenia"'
+    - code: Australia
+      iso3: AUS
+      source: 'exact normalised name match: provider country_id "Australia" / country "Australia" = crosswalk label "Australia"'
+    - code: Austria
+      iso3: AUT
+      source: 'exact normalised name match: provider country_id "Austria" / country "Republic of Austria" = crosswalk label "Austria"'
+    - code: Azerbaijan
+      iso3: AZE
+      source: 'exact normalised name match: provider country_id "Azerbaijan" / country "Republic of Azerbaijan" = crosswalk label "Azerbaijan"'
+    - code: Bahamas_the
+      iso3: BHS
+      source: 'exact normalised name match: provider country_id "Bahamas_the" / country "Commonwealth of the Bahamas" = crosswalk label "Bahamas"'
+    - code: Bahrain
+      iso3: BHR
+      source: 'exact normalised name match: provider country_id "Bahrain" / country "Kingdom of Bahrain" = crosswalk label "Bahrain"'
+    - code: Bangladesh
+      iso3: BGD
+      source: 'exact normalised name match: provider country_id "Bangladesh" / country "People''s Republic of Bangladesh" = crosswalk label "Bangladesh"'
+    - code: Barbados
+      iso3: BRB
+      source: 'exact normalised name match: provider country_id "Barbados" / country "Barbados" = crosswalk label "Barbados"'
+    - code: Belarus
+      iso3: BLR
+      source: 'exact normalised name match: provider country_id "Belarus" / country "Republic of Belarus" = crosswalk label "Belarus"'
+    - code: Belgium
+      iso3: BEL
+      source: 'exact normalised name match: provider country_id "Belgium" / country "Kingdom of Belgium" = crosswalk label "Belgium"'
+    - code: Belize
+      iso3: BLZ
+      source: 'exact normalised name match: provider country_id "Belize" / country "Belize" = crosswalk label "Belize"'
+    - code: Benin
+      iso3: BEN
+      source: 'exact normalised name match: provider country_id "Benin" / country "Republic of Benin" = crosswalk label "Benin"'
+    - code: Bhutan
+      iso3: BTN
+      source: 'exact normalised name match: provider country_id "Bhutan" / country "Kingdom of Bhutan" = crosswalk label "Bhutan"'
+    - code: Bolivia
+      iso3: BOL
+      source: 'exact normalised name match: provider country_id "Bolivia" / country "Plurinational State of Bolivia" = crosswalk label "Bolivia (Plurinational State of)"'
+    - code: Bosnia_and_Herzegovina
+      iso3: BIH
+      source: 'exact normalised name match: provider country_id "Bosnia_and_Herzegovina" / country "Bosnia and Herzegovina" = crosswalk label "Bosnia and Herzegovina"'
+    - code: Botswana
+      iso3: BWA
+      source: 'exact normalised name match: provider country_id "Botswana" / country "Republic of Botswana" = crosswalk label "Botswana"'
+    - code: Brazil
+      iso3: BRA
+      source: 'exact normalised name match: provider country_id "Brazil" / country "Federative Republic of Brazil" = crosswalk label "Brazil"'
+    - code: Brunei_Darussalam
+      iso3: BRN
+      source: 'exact normalised name match: provider country_id "Brunei_Darussalam" / country "Brunei Darussalam" = crosswalk label "Brunei Darussalam"'
+    - code: Bulgaria
+      iso3: BGR
+      source: 'exact normalised name match: provider country_id "Bulgaria" / country "Republic of Bulgaria" = crosswalk label "Bulgaria"'
+    - code: Burkina_Faso
+      iso3: BFA
+      source: 'exact normalised name match: provider country_id "Burkina_Faso" / country "Burkina Faso" = crosswalk label "Burkina Faso"'
+    - code: Burundi
+      iso3: BDI
+      source: 'exact normalised name match: provider country_id "Burundi" / country "Republic of Burundi" = crosswalk label "Burundi"'
+    - code: Cambodia
+      iso3: KHM
+      source: 'exact normalised name match: provider country_id "Cambodia" / country "Kingdom of Cambodia" = crosswalk label "Cambodia"'
+    - code: Cameroon
+      iso3: CMR
+      source: 'exact normalised name match: provider country_id "Cameroon" / country "Republic of Cameroon" = crosswalk label "Cameroon"'
+    - code: Canada
+      iso3: CAN
+      source: 'exact normalised name match: provider country_id "Canada" / country "Canada" = crosswalk label "Canada"'
+    - code: Cape_Verde
+      iso3: CPV
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Republic of Cape Verde" = Cabo Verde; crosswalk label "Cabo Verde"'
+    - code: Central_African_Republic_the
+      iso3: CAF
+      source: 'exact normalised name match: provider country_id "Central_African_Republic_the" / country "Central African Republic" = crosswalk label "Central African Republic"'
+    - code: Chad
+      iso3: TCD
+      source: 'exact normalised name match: provider country_id "Chad" / country "Republic of Chad" = crosswalk label "Chad"'
+    - code: Chile
+      iso3: CHL
+      source: 'exact normalised name match: provider country_id "Chile" / country "Republic of Chile" = crosswalk label "Chile"'
+    - code: China
+      iso3: CHN
+      source: 'exact normalised name match: provider country_id "China" / country "People''s Republic of China" = crosswalk label "China"'
+    - code: Colombia
+      iso3: COL
+      source: 'exact normalised name match: provider country_id "Colombia" / country "Republic of Colombia" = crosswalk label "Colombia"'
+    - code: Comoros_the
+      iso3: COM
+      source: 'exact normalised name match: provider country_id "Comoros_the" / country "Union of the Comoros" = crosswalk label "Comoros"'
+    - code: Congo_the
+      iso3: COG
+      source: 'exact normalised name match: provider country_id "Congo_the" / country "Republic of the Congo" = crosswalk label "Congo"'
+    - code: Costa_Rica
+      iso3: CRI
+      source: 'exact normalised name match: provider country_id "Costa_Rica" / country "Republic of Costa Rica" = crosswalk label "Costa Rica"'
+    - code: Cote_d_Ivoire
+      iso3: CIV
+      source: 'exact normalised name match: provider country_id "Cote_d_Ivoire" / country "Republic of Côte d''Ivoire" = crosswalk label "Côte d’Ivoire"'
+    - code: Croatia
+      iso3: HRV
+      source: 'exact normalised name match: provider country_id "Croatia" / country "Republic of Croatia" = crosswalk label "Croatia"'
+    - code: Cuba
+      iso3: CUB
+      source: 'exact normalised name match: provider country_id "Cuba" / country "Republic of Cuba" = crosswalk label "Cuba"'
+    - code: Cyprus
+      iso3: CYP
+      source: 'exact normalised name match: provider country_id "Cyprus" / country "Republic of Cyprus" = crosswalk label "Cyprus"'
+    - code: Czech_Republic_the
+      iso3: CZE
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Czech Republic" = Czechia; crosswalk label "Czechia"'
+    - code: Democratic_People_s_Republic_of_Korea_the
+      iso3: PRK
+      source: 'exact normalised name match: provider country_id "Democratic_People_s_Republic_of_Korea_the" / country "Democratic People''s Republic of Korea" = crosswalk label "Democratic People''s Republic
+        of Korea"'
+    - code: Democratic_Republic_of_the_Congo
+      iso3: COD
+      source: 'exact normalised name match: provider country_id "Democratic_Republic_of_the_Congo" / country "Democratic Republic of the Congo" = crosswalk label "Democratic Republic of the Congo"'
+    - code: Denmark
+      iso3: DNK
+      source: 'exact normalised name match: provider country_id "Denmark" / country "Kingdom of Denmark" = crosswalk label "Denmark"'
+    - code: Djibouti
+      iso3: DJI
+      source: 'exact normalised name match: provider country_id "Djibouti" / country "Republic of Djibouti" = crosswalk label "Djibouti"'
+    - code: Dominica
+      iso3: DMA
+      source: 'exact normalised name match: provider country_id "Dominica" / country "Commonwealth of Dominica" = crosswalk label "Dominica"'
+    - code: Dominican_Republic_the
+      iso3: DOM
+      source: 'exact normalised name match: provider country_id "Dominican_Republic_the" / country "Dominican Republic" = crosswalk label "Dominican Republic"'
+    - code: Ecuador
+      iso3: ECU
+      source: 'exact normalised name match: provider country_id "Ecuador" / country "Republic of Ecuador" = crosswalk label "Ecuador"'
+    - code: Egypt
+      iso3: EGY
+      source: 'exact normalised name match: provider country_id "Egypt" / country "Arab Republic of Egypt" = crosswalk label "Egypt"'
+    - code: El_Salvador
+      iso3: SLV
+      source: 'exact normalised name match: provider country_id "El_Salvador" / country "Republic of El Salvador" = crosswalk label "El Salvador"'
+    - code: Equatorial_Guinea
+      iso3: GNQ
+      source: 'exact normalised name match: provider country_id "Equatorial_Guinea" / country "Republic of Equatorial Guinea" = crosswalk label "Equatorial Guinea"'
+    - code: Eritrea
+      iso3: ERI
+      source: 'exact normalised name match: provider country_id "Eritrea" / country "Eritrea" = crosswalk label "Eritrea"'
+    - code: Estonia
+      iso3: EST
+      source: 'exact normalised name match: provider country_id "Estonia" / country "Republic of Estonia" = crosswalk label "Estonia"'
+    - code: Ethiopia
+      iso3: ETH
+      source: 'exact normalised name match: provider country_id "Ethiopia" / country "Federal Democratic Republic of Ethiopia" = crosswalk label "Ethiopia"'
+    - code: Fiji
+      iso3: FJI
+      source: 'exact normalised name match: provider country_id "Fiji" / country "Republic of Fiji" = crosswalk label "Fiji"'
+    - code: Finland
+      iso3: FIN
+      source: 'exact normalised name match: provider country_id "Finland" / country "Republic of Finland" = crosswalk label "Finland"'
+    - code: France
+      iso3: FRA
+      source: 'exact normalised name match: provider country_id "France" / country "French Republic" = crosswalk label "France"'
+    - code: Gabon
+      iso3: GAB
+      source: 'exact normalised name match: provider country_id "Gabon" / country "Gabonese Republic" = crosswalk label "Gabon"'
+    - code: Gambia__the
+      iso3: GMB
+      source: 'exact normalised name match: provider country_id "Gambia__the" / country "Republic of the Gambia" = crosswalk label "Gambia"'
+    - code: Georgia
+      iso3: GEO
+      source: 'exact normalised name match: provider country_id "Georgia" / country "Georgia" = crosswalk label "Georgia"'
+    - code: Germany
+      iso3: DEU
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Federal Republic of Germany" (in-force constitution German_Federal_Republic_2014, Basic Law 1949); crosswalk label "Germany"'
+    - code: Ghana
+      iso3: GHA
+      source: 'exact normalised name match: provider country_id "Ghana" / country "Republic of Ghana" = crosswalk label "Ghana"'
+    - code: Greece
+      iso3: GRC
+      source: 'exact normalised name match: provider country_id "Greece" / country "Hellenic Republic" = crosswalk label "Greece"'
+    - code: Grenada
+      iso3: GRD
+      source: 'exact normalised name match: provider country_id "Grenada" / country "Grenada" = crosswalk label "Grenada"'
+    - code: Guatemala
+      iso3: GTM
+      source: 'exact normalised name match: provider country_id "Guatemala" / country "Republic of Guatemala" = crosswalk label "Guatemala"'
+    - code: Guinea
+      iso3: GIN
+      source: 'exact normalised name match: provider country_id "Guinea" / country "Republic of Guinea" = crosswalk label "Guinea"'
+    - code: Guinea-Bissau
+      iso3: GNB
+      source: 'exact normalised name match: provider country_id "Guinea-Bissau" / country "Republic of Guinea-Bissau" = crosswalk label "Guinea-Bissau"'
+    - code: Guyana
+      iso3: GUY
+      source: 'exact normalised name match: provider country_id "Guyana" / country "Republic of Guyana" = crosswalk label "Guyana"'
+    - code: Haiti
+      iso3: HTI
+      source: 'exact normalised name match: provider country_id "Haiti" / country "Republic of Haiti" = crosswalk label "Haiti"'
+    - code: Honduras
+      iso3: HND
+      source: 'exact normalised name match: provider country_id "Honduras" / country "Republic of Honduras" = crosswalk label "Honduras"'
+    - code: Hungary
+      iso3: HUN
+      source: 'exact normalised name match: provider country_id "Hungary" / country "Hungary" = crosswalk label "Hungary"'
+    - code: Iceland
+      iso3: ISL
+      source: 'exact normalised name match: provider country_id "Iceland" / country "Republic of Iceland" = crosswalk label "Iceland"'
+    - code: India
+      iso3: IND
+      source: 'exact normalised name match: provider country_id "India" / country "Republic of India" = crosswalk label "India"'
+    - code: Indonesia
+      iso3: IDN
+      source: 'exact normalised name match: provider country_id "Indonesia" / country "Republic of Indonesia" = crosswalk label "Indonesia"'
+    - code: Iran_Islamic_Rep_of_
+      iso3: IRN
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Islamic Republic of Iran"; crosswalk label "Iran (Islamic Republic of)"'
+    - code: Iraq
+      iso3: IRQ
+      source: 'exact normalised name match: provider country_id "Iraq" / country "Republic of Iraq" = crosswalk label "Iraq"'
+    - code: Ireland
+      iso3: IRL
+      source: 'exact normalised name match: provider country_id "Ireland" / country "Ireland" = crosswalk label "Ireland"'
+    - code: Israel
+      iso3: ISR
+      source: 'exact normalised name match: provider country_id "Israel" / country "State of Israel" = crosswalk label "Israel"'
+    - code: Italy
+      iso3: ITA
+      source: 'exact normalised name match: provider country_id "Italy" / country "Republic of Italy" = crosswalk label "Italy"'
+    - code: Jamaica
+      iso3: JAM
+      source: 'exact normalised name match: provider country_id "Jamaica" / country "Jamaica" = crosswalk label "Jamaica"'
+    - code: Japan
+      iso3: JPN
+      source: 'exact normalised name match: provider country_id "Japan" / country "Japan" = crosswalk label "Japan"'
+    - code: Jordan
+      iso3: JOR
+      source: 'exact normalised name match: provider country_id "Jordan" / country "Hashemite Kingdom of Jordan" = crosswalk label "Jordan"'
+    - code: Kazakhstan
+      iso3: KAZ
+      source: 'exact normalised name match: provider country_id "Kazakhstan" / country "Republic of Kazakhstan" = crosswalk label "Kazakhstan"'
+    - code: Kenya
+      iso3: KEN
+      source: 'exact normalised name match: provider country_id "Kenya" / country "Republic of Kenya" = crosswalk label "Kenya"'
+    - code: Kiribati
+      iso3: KIR
+      source: 'exact normalised name match: provider country_id "Kiribati" / country "Republic of Kiribati" = crosswalk label "Kiribati"'
+    - code: Kosovo
+      iso3: XKX
+      source: 'exact normalised name match: provider country_id "Kosovo" / country "Republic of Kosovo" = crosswalk label "Kosovo"'
+    - code: Kuwait
+      iso3: KWT
+      source: 'exact normalised name match: provider country_id "Kuwait" / country "State of Kuwait" = crosswalk label "Kuwait"'
+    - code: Kyrgyzstan
+      iso3: KGZ
+      source: 'exact normalised name match: provider country_id "Kyrgyzstan" / country "Kyrgyz Republic" = crosswalk label "Kyrgyzstan"'
+    - code: Lao_People_s_Democratic_Republic__the
+      iso3: LAO
+      source: 'exact normalised name match: provider country_id "Lao_People_s_Democratic_Republic__the" / country "Lao People''s Democratic Republic" = crosswalk label "Lao People''s Democratic Republic"'
+    - code: Latvia
+      iso3: LVA
+      source: 'exact normalised name match: provider country_id "Latvia" / country "Republic of Latvia" = crosswalk label "Latvia"'
+    - code: Lebanon
+      iso3: LBN
+      source: 'exact normalised name match: provider country_id "Lebanon" / country "Lebanese Republic" = crosswalk label "Lebanon"'
+    - code: Lesotho
+      iso3: LSO
+      source: 'exact normalised name match: provider country_id "Lesotho" / country "Kingdom of Lesotho" = crosswalk label "Lesotho"'
+    - code: Liberia
+      iso3: LBR
+      source: 'exact normalised name match: provider country_id "Liberia" / country "Republic of Liberia" = crosswalk label "Liberia"'
+    - code: Libya
+      iso3: LBY
+      source: 'exact normalised name match: provider country_id "Libya" / country "Libya" = crosswalk label "Libya"'
+    - code: Liechtenstein
+      iso3: LIE
+      source: 'exact normalised name match: provider country_id "Liechtenstein" / country "Principality of Liechtenstein" = crosswalk label "Liechtenstein"'
+    - code: Lithuania
+      iso3: LTU
+      source: 'exact normalised name match: provider country_id "Lithuania" / country "Republic of Lithuania" = crosswalk label "Lithuania"'
+    - code: Luxembourg
+      iso3: LUX
+      source: 'exact normalised name match: provider country_id "Luxembourg" / country "Grand Duchy of Luxembourg" = crosswalk label "Luxembourg"'
+    - code: Madagascar
+      iso3: MDG
+      source: 'exact normalised name match: provider country_id "Madagascar" / country "Republic of Madagascar" = crosswalk label "Madagascar"'
+    - code: Malawi
+      iso3: MWI
+      source: 'exact normalised name match: provider country_id "Malawi" / country "Republic of Malawi" = crosswalk label "Malawi"'
+    - code: Malaysia
+      iso3: MYS
+      source: 'exact normalised name match: provider country_id "Malaysia" / country "Malaysia" = crosswalk label "Malaysia"'
+    - code: Maldives
+      iso3: MDV
+      source: 'exact normalised name match: provider country_id "Maldives" / country "Republic of Maldives" = crosswalk label "Maldives"'
+    - code: Mali
+      iso3: MLI
+      source: 'exact normalised name match: provider country_id "Mali" / country "Republic of Mali" = crosswalk label "Mali"'
+    - code: Malta
+      iso3: MLT
+      source: 'exact normalised name match: provider country_id "Malta" / country "Republic of Malta" = crosswalk label "Malta"'
+    - code: Marshall_Islands__the
+      iso3: MHL
+      source: 'exact normalised name match: provider country_id "Marshall_Islands__the" / country "Republic of the Marshall Islands" = crosswalk label "Marshall Islands"'
+    - code: Mauritania
+      iso3: MRT
+      source: 'exact normalised name match: provider country_id "Mauritania" / country "Islamic Republic of Mauritania" = crosswalk label "Mauritania"'
+    - code: Mauritius
+      iso3: MUS
+      source: 'exact normalised name match: provider country_id "Mauritius" / country "Republic of Mauritius" = crosswalk label "Mauritius"'
+    - code: Mexico
+      iso3: MEX
+      source: 'exact normalised name match: provider country_id "Mexico" / country "United Mexican States" = crosswalk label "Mexico"'
+    - code: Micronesia__Fed_States_of_
+      iso3: FSM
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Federated States of Micronesia"; crosswalk label "Micronesia (Federated States of)"'
+    - code: Monaco
+      iso3: MCO
+      source: 'exact normalised name match: provider country_id "Monaco" / country "Principality of Monaco" = crosswalk label "Monaco"'
+    - code: Mongolia
+      iso3: MNG
+      source: 'exact normalised name match: provider country_id "Mongolia" / country "Mongolia" = crosswalk label "Mongolia"'
+    - code: Montenegro
+      iso3: MNE
+      source: 'exact normalised name match: provider country_id "Montenegro" / country "Montenegro" = crosswalk label "Montenegro"'
+    - code: Morocco
+      iso3: MAR
+      source: 'exact normalised name match: provider country_id "Morocco" / country "Kingdom of Morocco" = crosswalk label "Morocco"'
+    - code: Mozambique
+      iso3: MOZ
+      source: 'exact normalised name match: provider country_id "Mozambique" / country "Republic of Mozambique" = crosswalk label "Mozambique"'
+    - code: Myanmar
+      iso3: MMR
+      source: 'exact normalised name match: provider country_id "Myanmar" / country "Republic of the Union of Myanmar" = crosswalk label "Myanmar"'
+    - code: Namibia
+      iso3: NAM
+      source: 'exact normalised name match: provider country_id "Namibia" / country "Republic of Namibia" = crosswalk label "Namibia"'
+    - code: Nauru
+      iso3: NRU
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Republic of Nauru"; crosswalk label "Naoero"'
+    - code: Nepal
+      iso3: NPL
+      source: 'exact normalised name match: provider country_id "Nepal" / country "Federal Democratic Republic of Nepal" = crosswalk label "Nepal"'
+    - code: Netherlands_the
+      iso3: NLD
+      source: 'exact normalised name match: provider country_id "Netherlands_the" / country "Kingdom of the Netherlands" = crosswalk label "Netherlands (Kingdom of the)"'
+    - code: New_Zealand
+      iso3: NZL
+      source: 'exact normalised name match: provider country_id "New_Zealand" / country "New Zealand" = crosswalk label "New Zealand"'
+    - code: Nicaragua
+      iso3: NIC
+      source: 'exact normalised name match: provider country_id "Nicaragua" / country "Republic of Nicaragua" = crosswalk label "Nicaragua"'
+    - code: Niger_the
+      iso3: NER
+      source: 'exact normalised name match: provider country_id "Niger_the" / country "Republic of the Niger" = crosswalk label "Niger"'
+    - code: Nigeria
+      iso3: NGA
+      source: 'exact normalised name match: provider country_id "Nigeria" / country "Federal Republic of Nigeria" = crosswalk label "Nigeria"'
+    - code: Norway
+      iso3: NOR
+      source: 'exact normalised name match: provider country_id "Norway" / country "Kingdom of Norway" = crosswalk label "Norway"'
+    - code: Oman
+      iso3: OMN
+      source: 'exact normalised name match: provider country_id "Oman" / country "Sultanate of Oman" = crosswalk label "Oman"'
+    - code: Pakistan
+      iso3: PAK
+      source: 'exact normalised name match: provider country_id "Pakistan" / country "Islamic Republic of Pakistan" = crosswalk label "Pakistan"'
+    - code: Palau
+      iso3: PLW
+      source: 'exact normalised name match: provider country_id "Palau" / country "Republic of Palau" = crosswalk label "Palau"'
+    - code: Palestine
+      iso3: PSE
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Palestine" = crosswalk State of Palestine (PSE); crosswalk label "State of Palestine"'
+    - code: Panama
+      iso3: PAN
+      source: 'exact normalised name match: provider country_id "Panama" / country "Republic of Panama" = crosswalk label "Panama"'
+    - code: Papua_New_Guinea
+      iso3: PNG
+      source: 'exact normalised name match: provider country_id "Papua_New_Guinea" / country "Papua New Guinea" = crosswalk label "Papua New Guinea"'
+    - code: Paraguay
+      iso3: PRY
+      source: 'exact normalised name match: provider country_id "Paraguay" / country "Republic of Paraguay" = crosswalk label "Paraguay"'
+    - code: Peru
+      iso3: PER
+      source: 'exact normalised name match: provider country_id "Peru" / country "Republic of Peru" = crosswalk label "Peru"'
+    - code: Philippines__the
+      iso3: PHL
+      source: 'exact normalised name match: provider country_id "Philippines__the" / country "Republic of the Philippines" = crosswalk label "Philippines"'
+    - code: Poland
+      iso3: POL
+      source: 'exact normalised name match: provider country_id "Poland" / country "Republic of Poland" = crosswalk label "Poland"'
+    - code: Portugal
+      iso3: PRT
+      source: 'exact normalised name match: provider country_id "Portugal" / country "Portuguese Republic" = crosswalk label "Portugal"'
+    - code: Qatar
+      iso3: QAT
+      source: 'exact normalised name match: provider country_id "Qatar" / country "State of Qatar" = crosswalk label "Qatar"'
+    - code: Republic_of_Korea__the
+      iso3: KOR
+      source: 'exact normalised name match: provider country_id "Republic_of_Korea__the" / country "Republic of Korea" = crosswalk label "Republic of Korea"'
+    - code: Republic_of_Moldova
+      iso3: MDA
+      source: 'exact normalised name match: provider country_id "Republic_of_Moldova" / country "Republic of Moldova" = crosswalk label "Republic of Moldova"'
+    - code: Romania
+      iso3: ROU
+      source: 'exact normalised name match: provider country_id "Romania" / country "Romania" = crosswalk label "Romania"'
+    - code: Russian_Federation__the
+      iso3: RUS
+      source: 'exact normalised name match: provider country_id "Russian_Federation__the" / country "Russian Federation" = crosswalk label "Russian Federation"'
+    - code: Rwanda
+      iso3: RWA
+      source: 'exact normalised name match: provider country_id "Rwanda" / country "Republic of Rwanda" = crosswalk label "Rwanda"'
+    - code: Saint_Kitts_and_Nevis
+      iso3: KNA
+      source: 'exact normalised name match: provider country_id "Saint_Kitts_and_Nevis" / country "Saint Kitts and Nevis" = crosswalk label "Saint Kitts and Nevis"'
+    - code: Saint_Lucia
+      iso3: LCA
+      source: 'exact normalised name match: provider country_id "Saint_Lucia" / country "Saint Lucia" = crosswalk label "Saint Lucia"'
+    - code: Saint_Vincent_and_the_Grenadines
+      iso3: VCT
+      source: 'exact normalised name match: provider country_id "Saint_Vincent_and_the_Grenadines" / country "Saint Vincent and the Grenadines" = crosswalk label "Saint Vincent and the Grenadines"'
+    - code: Samoa
+      iso3: WSM
+      source: 'exact normalised name match: provider country_id "Samoa" / country "Independent State of Samoa" = crosswalk label "Samoa"'
+    - code: Sao_Tome_and_Principe
+      iso3: STP
+      source: 'exact normalised name match: provider country_id "Sao_Tome_and_Principe" / country "Democratic Republic of Sao Tome and Principe" = crosswalk label "Sao Tome and Principe"'
+    - code: Saudi_Arabia
+      iso3: SAU
+      source: 'exact normalised name match: provider country_id "Saudi_Arabia" / country "Kingdom of Saudi Arabia" = crosswalk label "Saudi Arabia"'
+    - code: Senegal
+      iso3: SEN
+      source: 'exact normalised name match: provider country_id "Senegal" / country "Republic of Senegal" = crosswalk label "Senegal"'
+    - code: Serbia
+      iso3: SRB
+      source: 'exact normalised name match: provider country_id "Serbia" / country "Republic of Serbia" = crosswalk label "Serbia"'
+    - code: Seychelles
+      iso3: SYC
+      source: 'exact normalised name match: provider country_id "Seychelles" / country "Republic of Seychelles" = crosswalk label "Seychelles"'
+    - code: Sierra_Leone
+      iso3: SLE
+      source: 'exact normalised name match: provider country_id "Sierra_Leone" / country "Republic of Sierra Leone" = crosswalk label "Sierra Leone"'
+    - code: Singapore
+      iso3: SGP
+      source: 'exact normalised name match: provider country_id "Singapore" / country "Republic of Singapore" = crosswalk label "Singapore"'
+    - code: Slovakia
+      iso3: SVK
+      source: 'exact normalised name match: provider country_id "Slovakia" / country "Slovak Republic" = crosswalk label "Slovakia"'
+    - code: Slovenia
+      iso3: SVN
+      source: 'exact normalised name match: provider country_id "Slovenia" / country "Republic of Slovenia" = crosswalk label "Slovenia"'
+    - code: Solomon_Islands
+      iso3: SLB
+      source: 'exact normalised name match: provider country_id "Solomon_Islands" / country "Solomon Islands" = crosswalk label "Solomon Islands"'
+    - code: Somalia
+      iso3: SOM
+      source: 'exact normalised name match: provider country_id "Somalia" / country "Somali Republic" = crosswalk label "Somalia"'
+    - code: South_Africa
+      iso3: ZAF
+      source: 'exact normalised name match: provider country_id "South_Africa" / country "Republic of South Africa" = crosswalk label "South Africa"'
+    - code: South_Sudan
+      iso3: SSD
+      source: 'exact normalised name match: provider country_id "South_Sudan" / country "Republic of South Sudan" = crosswalk label "South Sudan"'
+    - code: Spain
+      iso3: ESP
+      source: 'exact normalised name match: provider country_id "Spain" / country "Kingdom of Spain" = crosswalk label "Spain"'
+    - code: Sri_Lanka
+      iso3: LKA
+      source: 'exact normalised name match: provider country_id "Sri_Lanka" / country "Democratic Socialist Republic of Sri Lanka" = crosswalk label "Sri Lanka"'
+    - code: Sudan_the
+      iso3: SDN
+      source: 'exact normalised name match: provider country_id "Sudan_the" / country "Republic of the Sudan" = crosswalk label "Sudan"'
+    - code: Suriname
+      iso3: SUR
+      source: 'exact normalised name match: provider country_id "Suriname" / country "Republic of Suriname" = crosswalk label "Suriname"'
+    - code: Swaziland
+      iso3: SWZ
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Kingdom of Eswatini"; crosswalk label "Eswatini"'
+    - code: Sweden
+      iso3: SWE
+      source: 'exact normalised name match: provider country_id "Sweden" / country "Kingdom of Sweden" = crosswalk label "Sweden"'
+    - code: Switzerland
+      iso3: CHE
+      source: 'exact normalised name match: provider country_id "Switzerland" / country "Swiss Confederation" = crosswalk label "Switzerland"'
+    - code: Syrian_Arab_Republic_the
+      iso3: SYR
+      source: 'exact normalised name match: provider country_id "Syrian_Arab_Republic_the" / country "Syrian Arab Republic" = crosswalk label "Syrian Arab Republic"'
+    - code: Tajikistan
+      iso3: TJK
+      source: 'exact normalised name match: provider country_id "Tajikistan" / country "Republic of Tajikistan" = crosswalk label "Tajikistan"'
+    - code: Thailand
+      iso3: THA
+      source: 'exact normalised name match: provider country_id "Thailand" / country "Kingdom of Thailand" = crosswalk label "Thailand"'
+    - code: The_former_Yugoslav_Republic_of_Macedonia
+      iso3: MKD
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "The Republic of North Macedonia"; crosswalk label "North Macedonia"'
+    - code: Timor-Leste
+      iso3: TLS
+      source: 'exact normalised name match: provider country_id "Timor-Leste" / country "Democratic Republic of Timor-Leste" = crosswalk label "Timor-Leste"'
+    - code: Togo
+      iso3: TGO
+      source: 'exact normalised name match: provider country_id "Togo" / country "Togolese Republic" = crosswalk label "Togo"'
+    - code: Tonga
+      iso3: TON
+      source: 'exact normalised name match: provider country_id "Tonga" / country "Kingdom of Tonga" = crosswalk label "Tonga"'
+    - code: Trinidad_and_Tobago
+      iso3: TTO
+      source: 'exact normalised name match: provider country_id "Trinidad_and_Tobago" / country "Republic of Trinidad and Tobago" = crosswalk label "Trinidad and Tobago"'
+    - code: Tunisia
+      iso3: TUN
+      source: 'exact normalised name match: provider country_id "Tunisia" / country "Republic of Tunisia" = crosswalk label "Tunisia"'
+    - code: Turkey
+      iso3: TUR
+      source: 'manual (agent A-LAW, maintainer review pending): provider country "Republic of Turkey" = Türkiye; crosswalk label "Türkiye"'
+    - code: Turkmenistan
+      iso3: TKM
+      source: 'exact normalised name match: provider country_id "Turkmenistan" / country "Turkmenistan" = crosswalk label "Turkmenistan"'
+    - code: Tuvalu
+      iso3: TUV
+      source: 'exact normalised name match: provider country_id "Tuvalu" / country "Tuvalu" = crosswalk label "Tuvalu"'
+    - code: Uganda
+      iso3: UGA
+      source: 'exact normalised name match: provider country_id "Uganda" / country "Republic of Uganda" = crosswalk label "Uganda"'
+    - code: Ukraine
+      iso3: UKR
+      source: 'exact normalised name match: provider country_id "Ukraine" / country "Ukraine" = crosswalk label "Ukraine"'
+    - code: United_Arab_Emirates__the
+      iso3: ARE
+      source: 'exact normalised name match: provider country_id "United_Arab_Emirates__the" / country "United Arab Emirates" = crosswalk label "United Arab Emirates"'
+    - code: United_Kingdom_of_Great_Britain_and_Northern_Ireland__the
+      iso3: GBR
+      source: 'exact normalised name match: provider country_id "United_Kingdom_of_Great_Britain_and_Northern_Ireland__the" / country "United Kingdom of Great Britain and Northern Ireland" = crosswalk label
+        "United Kingdom of Great Britain and Northern Ireland"'
+    - code: United_Republic_of_Tanzania__the
+      iso3: TZA
+      source: 'exact normalised name match: provider country_id "United_Republic_of_Tanzania__the" / country "United Republic of Tanzania" = crosswalk label "United Republic of Tanzania"'
+    - code: United_States_of_America
+      iso3: USA
+      source: 'exact normalised name match: provider country_id "United_States_of_America" / country "United States of America" = crosswalk label "United States of America"'
+    - code: Uruguay
+      iso3: URY
+      source: 'exact normalised name match: provider country_id "Uruguay" / country "Eastern Republic of Uruguay" = crosswalk label "Uruguay"'
+    - code: Uzbekistan
+      iso3: UZB
+      source: 'exact normalised name match: provider country_id "Uzbekistan" / country "Republic of Uzbekistan" = crosswalk label "Uzbekistan"'
+    - code: Vanuatu
+      iso3: VUT
+      source: 'exact normalised name match: provider country_id "Vanuatu" / country "Republic of Vanuatu" = crosswalk label "Vanuatu"'
+    - code: Venezuela
+      iso3: VEN
+      source: 'exact normalised name match: provider country_id "Venezuela" / country "Bolivarian Republic of Venezuela" = crosswalk label "Venezuela (Bolivarian Republic of)"'
+    - code: Viet_Nam
+      iso3: VNM
+      source: 'exact normalised name match: provider country_id "Viet_Nam" / country "Socialist Republic of Viet Nam" = crosswalk label "Viet Nam"'
+    - code: Yemen
+      iso3: YEM
+      source: 'exact normalised name match: provider country_id "Yemen" / country "Republic of Yemen" = crosswalk label "Yemen"'
+    - code: Zambia
+      iso3: ZMB
+      source: 'exact normalised name match: provider country_id "Zambia" / country "Republic of Zambia" = crosswalk label "Zambia"'
+    - code: Zimbabwe
+      iso3: ZWE
+      source: 'exact normalised name match: provider country_id "Zimbabwe" / country "Republic of Zimbabwe" = crosswalk label "Zimbabwe"'
+    unmapped:
+    - code: Baden
+      reason: historical state (Grand Duchy of Baden, constitution 1818); no crosswalk entity
+    - code: Bavaria
+      reason: historical state (Kingdom of Bavaria, constitution 1808); no crosswalk entity
+    - code: Germany_Prussia
+      reason: provider country "Germany (Prussia)" (Weimar constitution 1919); predecessor state, not mapped to DEU
+    - code: Taiwan
+      reason: Republic of China (Taiwan) is not an entity of the ALLC crosswalk
+    source:
+      kind: provider_data
+      url: https://www.constituteproject.org/service/constitutions?lang=en
+      raw_sha256: 0d9f1944f4870b4e7531b494814f6712b1483f22ccb991d32493427200b85e15
+      retrieved_at: '2026-10-15'
+  ccp:
+    base: null
+    aliases:
+    - code: 2|United States
+      iso3: USA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 2 "United States" (1789-2023) -> United States of America; crosswalk label "United States of America"'
+    - code: 2|United States of America
+      iso3: USA
+      source: 'exact normalised name match: CCP COW 2 "United States of America" (1789-2019) = crosswalk label "United States of America"'
+    - code: 20|Canada
+      iso3: CAN
+      source: 'exact normalised name match: CCP COW 20 "Canada" (1867-2023) = crosswalk label "Canada"'
+    - code: 31|Bahamas
+      iso3: BHS
+      source: 'exact normalised name match: CCP COW 31 "Bahamas" (1973-2023) = crosswalk label "Bahamas"'
+    - code: 40|Cuba
+      iso3: CUB
+      source: 'exact normalised name match: CCP COW 40 "Cuba" (1901-2025) = crosswalk label "Cuba"'
+    - code: 41|Haiti
+      iso3: HTI
+      source: 'exact normalised name match: CCP COW 41 "Haiti" (1801-2023) = crosswalk label "Haiti"'
+    - code: 42|Dominican Republic
+      iso3: DOM
+      source: 'exact normalised name match: CCP COW 42 "Dominican Republic" (1844-2024) = crosswalk label "Dominican Republic"'
+    - code: 51|Jamaica
+      iso3: JAM
+      source: 'exact normalised name match: CCP COW 51 "Jamaica" (1962-2023) = crosswalk label "Jamaica"'
+    - code: 52|Trinidad and Tobago
+      iso3: TTO
+      source: 'exact normalised name match: CCP COW 52 "Trinidad and Tobago" (1962-2023) = crosswalk label "Trinidad and Tobago"'
+    - code: 53|Barbados
+      iso3: BRB
+      source: 'exact normalised name match: CCP COW 53 "Barbados" (1966-2023) = crosswalk label "Barbados"'
+    - code: 54|Dominica
+      iso3: DMA
+      source: 'exact normalised name match: CCP COW 54 "Dominica" (1978-2023) = crosswalk label "Dominica"'
+    - code: 55|Grenada
+      iso3: GRD
+      source: 'exact normalised name match: CCP COW 55 "Grenada" (1974-2023) = crosswalk label "Grenada"'
+    - code: 56|Saint Lucia
+      iso3: LCA
+      source: 'exact normalised name match: CCP COW 56 "Saint Lucia" (1978-2023) = crosswalk label "Saint Lucia"'
+    - code: 57|Saint Vincent and the Grenadines
+      iso3: VCT
+      source: 'exact normalised name match: CCP COW 57 "Saint Vincent and the Grenadines" (1979-2023) = crosswalk label "Saint Vincent and the Grenadines"'
+    - code: 58|Antigua and Barbuda
+      iso3: ATG
+      source: 'exact normalised name match: CCP COW 58 "Antigua and Barbuda" (1981-2023) = crosswalk label "Antigua and Barbuda"'
+    - code: 60|Saint Kitts and Nevis
+      iso3: KNA
+      source: 'exact normalised name match: CCP COW 60 "Saint Kitts and Nevis" (1983-2023) = crosswalk label "Saint Kitts and Nevis"'
+    - code: 70|Mexico
+      iso3: MEX
+      source: 'exact normalised name match: CCP COW 70 "Mexico" (1814-2025) = crosswalk label "Mexico"'
+    - code: 80|Belize
+      iso3: BLZ
+      source: 'exact normalised name match: CCP COW 80 "Belize" (1981-2023) = crosswalk label "Belize"'
+    - code: 90|Guatemala
+      iso3: GTM
+      source: 'exact normalised name match: CCP COW 90 "Guatemala" (1839-2023) = crosswalk label "Guatemala"'
+    - code: 91|Honduras
+      iso3: HND
+      source: 'exact normalised name match: CCP COW 91 "Honduras" (1839-2023) = crosswalk label "Honduras"'
+    - code: 92|El Salvador
+      iso3: SLV
+      source: 'exact normalised name match: CCP COW 92 "El Salvador" (1840-2025) = crosswalk label "El Salvador"'
+    - code: 93|Nicaragua
+      iso3: NIC
+      source: 'exact normalised name match: CCP COW 93 "Nicaragua" (1838-2025) = crosswalk label "Nicaragua"'
+    - code: 94|Costa Rica
+      iso3: CRI
+      source: 'exact normalised name match: CCP COW 94 "Costa Rica" (1840-2023) = crosswalk label "Costa Rica"'
+    - code: 95|Panama
+      iso3: PAN
+      source: 'exact normalised name match: CCP COW 95 "Panama" (1903-2023) = crosswalk label "Panama"'
+    - code: 100|Colombia
+      iso3: COL
+      source: 'exact normalised name match: CCP COW 100 "Colombia" (1830-2025) = crosswalk label "Colombia"'
+    - code: 101|Venezuela
+      iso3: VEN
+      source: 'exact normalised name match: CCP COW 101 "Venezuela" (1829-2023) = crosswalk label "Venezuela (Bolivarian Republic of)"'
+    - code: 110|Guyana
+      iso3: GUY
+      source: 'exact normalised name match: CCP COW 110 "Guyana" (1966-2023) = crosswalk label "Guyana"'
+    - code: 115|Surinam
+      iso3: SUR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 115 "Surinam" (1975-2019) -> spelling of Suriname; crosswalk label "Suriname"'
+    - code: 115|Suriname
+      iso3: SUR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 115 "Suriname" (1975-2023) -> Suriname; crosswalk label "Suriname"'
+    - code: 130|Ecuador
+      iso3: ECU
+      source: 'exact normalised name match: CCP COW 130 "Ecuador" (1830-2024) = crosswalk label "Ecuador"'
+    - code: 135|Peru
+      iso3: PER
+      source: 'exact normalised name match: CCP COW 135 "Peru" (1824-2024) = crosswalk label "Peru"'
+    - code: 140|Brazil
+      iso3: BRA
+      source: 'exact normalised name match: CCP COW 140 "Brazil" (1822-2025) = crosswalk label "Brazil"'
+    - code: 145|Bolivia
+      iso3: BOL
+      source: 'exact normalised name match: CCP COW 145 "Bolivia" (1825-2023) = crosswalk label "Bolivia (Plurinational State of)"'
+    - code: 150|Paraguay
+      iso3: PRY
+      source: 'exact normalised name match: CCP COW 150 "Paraguay" (1811-2023) = crosswalk label "Paraguay"'
+    - code: 155|Chile
+      iso3: CHL
+      source: 'exact normalised name match: CCP COW 155 "Chile" (1818-2025) = crosswalk label "Chile"'
+    - code: 160|Argentina
+      iso3: ARG
+      source: 'exact normalised name match: CCP COW 160 "Argentina" (1815-2023) = crosswalk label "Argentina"'
+    - code: 165|Uruguay
+      iso3: URY
+      source: 'exact normalised name match: CCP COW 165 "Uruguay" (1830-2023) = crosswalk label "Uruguay"'
+    - code: 200|United Kingdom
+      iso3: GBR
+      source: 'exact normalised name match: CCP COW 200 "United Kingdom" (1789-2023) = crosswalk label "United Kingdom of Great Britain and Northern Ireland"'
+    - code: 205|Ireland
+      iso3: IRL
+      source: 'exact normalised name match: CCP COW 205 "Ireland" (1919-2023) = crosswalk label "Ireland"'
+    - code: 210|Netherlands
+      iso3: NLD
+      source: 'exact normalised name match: CCP COW 210 "Netherlands" (1789-2023) = crosswalk label "Netherlands (Kingdom of the)"'
+    - code: 211|Belgium
+      iso3: BEL
+      source: 'exact normalised name match: CCP COW 211 "Belgium" (1830-2025) = crosswalk label "Belgium"'
+    - code: 212|Luxembourg
+      iso3: LUX
+      source: 'exact normalised name match: CCP COW 212 "Luxembourg" (1856-2023) = crosswalk label "Luxembourg"'
+    - code: 220|France
+      iso3: FRA
+      source: 'exact normalised name match: CCP COW 220 "France" (1789-2024) = crosswalk label "France"'
+    - code: 221|Monaco
+      iso3: MCO
+      source: 'exact normalised name match: CCP COW 221 "Monaco" (1789-2023) = crosswalk label "Monaco"'
+    - code: 223|Liechtenstein
+      iso3: LIE
+      source: 'exact normalised name match: CCP COW 223 "Liechtenstein" (1806-2023) = crosswalk label "Liechtenstein"'
+    - code: 225|Switzerland
+      iso3: CHE
+      source: 'exact normalised name match: CCP COW 225 "Switzerland" (1789-2025) = crosswalk label "Switzerland"'
+    - code: 230|Spain
+      iso3: ESP
+      source: 'exact normalised name match: CCP COW 230 "Spain" (1789-2024) = crosswalk label "Spain"'
+    - code: 232|Andorra
+      iso3: AND
+      source: 'exact normalised name match: CCP COW 232 "Andorra" (1789-2023) = crosswalk label "Andorra"'
+    - code: 235|Portugal
+      iso3: PRT
+      source: 'exact normalised name match: CCP COW 235 "Portugal" (1789-2023) = crosswalk label "Portugal"'
+    - code: 260|German Federal Republic
+      iso3: DEU
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 260 "German Federal Republic" (1949-2025) -> Federal Republic of Germany (1949-, incl. post-1990 unified Germany); crosswalk label
+        "Germany"'
+    - code: 260|Germany
+      iso3: DEU
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 260 "Germany" (1949-2023) -> Federal Republic of Germany (COW 260, 1949-); COW 255 "Germany" (1789-1945, Prussia/German Reich) is
+        not mapped; crosswalk label "Germany"'
+    - code: 290|Poland
+      iso3: POL
+      source: 'exact normalised name match: CCP COW 290 "Poland" (1791-2023) = crosswalk label "Poland"'
+    - code: 305|Austria
+      iso3: AUT
+      source: 'exact normalised name match: CCP COW 305 "Austria" (1918-2024) = crosswalk label "Austria"'
+    - code: 310|Hungary
+      iso3: HUN
+      source: 'exact normalised name match: CCP COW 310 "Hungary" (1918-2025) = crosswalk label "Hungary"'
+    - code: 316|Czech Republic
+      iso3: CZE
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 316 "Czech Republic" (1993-2023) -> Czechia; crosswalk label "Czechia"'
+    - code: 317|Slovak Republic
+      iso3: SVK
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 317 "Slovak Republic" (1992-2023) -> Slovakia; crosswalk label "Slovakia"'
+    - code: 317|Slovakia
+      iso3: SVK
+      source: 'exact normalised name match: CCP COW 317 "Slovakia" (1993-2025) = crosswalk label "Slovakia"'
+    - code: 325|Italy
+      iso3: ITA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 325 "Italy" (1789-2023) -> Kingdom of Sardinia -> Italy. CCP codes predecessor and successor as one country under this COW code; rows
+        before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Italy"'
+    - code: 325|Italy/Sardinia
+      iso3: ITA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 325 "Italy/Sardinia" (1789-2023) -> Kingdom of Sardinia -> Italy. CCP codes predecessor and successor as one country under this COW
+        code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Italy"'
+    - code: 331|San Marino
+      iso3: SMR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 331 "San Marino" (1789-2023) -> San Marino; crosswalk label "San Marino"'
+    - code: 338|Malta
+      iso3: MLT
+      source: 'exact normalised name match: CCP COW 338 "Malta" (1964-2025) = crosswalk label "Malta"'
+    - code: 339|Albania
+      iso3: ALB
+      source: 'exact normalised name match: CCP COW 339 "Albania" (1913-2023) = crosswalk label "Albania"'
+    - code: 340|Serbia
+      iso3: SRB
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 340 "Serbia" (1869-2023) -> Kingdom of Serbia (1878-1918) and Republic of Serbia (2006-) rows; Yugoslavia and Serbia and Montenegro
+        rows of the same COW code are separate provider names and are not mapped; crosswalk label "Serbia"'
+    - code: 341|Montenegro
+      iso3: MNE
+      source: 'exact normalised name match: CCP COW 341 "Montenegro" (1868-2023) = crosswalk label "Montenegro"'
+    - code: 343|Macedonia (Former Yugoslav Republic of)
+      iso3: MKD
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 343 "Macedonia (Former Yugoslav Republic of)" (1991-2019) -> North Macedonia; crosswalk label "North Macedonia"'
+    - code: 343|North Macedonia
+      iso3: MKD
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 343 "North Macedonia" (1991-2023) -> North Macedonia; crosswalk label "North Macedonia"'
+    - code: 344|Croatia
+      iso3: HRV
+      source: 'exact normalised name match: CCP COW 344 "Croatia" (1991-2023) = crosswalk label "Croatia"'
+    - code: 346|Bosnia and Herzegovina
+      iso3: BIH
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 346 "Bosnia and Herzegovina" (1992-2023) -> Bosnia and Herzegovina; crosswalk label "Bosnia and Herzegovina"'
+    - code: 346|Bosnia-Herzegovina
+      iso3: BIH
+      source: 'exact normalised name match: CCP COW 346 "Bosnia-Herzegovina" (1992-2019) = crosswalk label "Bosnia and Herzegovina"'
+    - code: 347|Kosovo
+      iso3: XKX
+      source: 'exact normalised name match: CCP COW 347 "Kosovo" (2008-2023) = crosswalk label "Kosovo"'
+    - code: 349|Slovenia
+      iso3: SVN
+      source: 'exact normalised name match: CCP COW 349 "Slovenia" (1991-2023) = crosswalk label "Slovenia"'
+    - code: 350|Greece
+      iso3: GRC
+      source: 'exact normalised name match: CCP COW 350 "Greece" (1827-2023) = crosswalk label "Greece"'
+    - code: 352|Cyprus
+      iso3: CYP
+      source: 'exact normalised name match: CCP COW 352 "Cyprus" (1960-2025) = crosswalk label "Cyprus"'
+    - code: 355|Bulgaria
+      iso3: BGR
+      source: 'exact normalised name match: CCP COW 355 "Bulgaria" (1878-2023) = crosswalk label "Bulgaria"'
+    - code: 359|Moldova
+      iso3: MDA
+      source: 'exact normalised name match: CCP COW 359 "Moldova" (1978-2024) = crosswalk label "Republic of Moldova"'
+    - code: 360|Romania
+      iso3: ROU
+      source: 'exact normalised name match: CCP COW 360 "Romania" (1866-2023) = crosswalk label "Romania"'
+    - code: 365|Russia
+      iso3: RUS
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 365 "Russia" (1789-2023) -> Russian Empire / Soviet Union / Russian Federation. CCP codes predecessor and successor as one country
+        under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Russian Federation"'
+    - code: 365|Russia (Soviet Union)
+      iso3: RUS
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 365 "Russia (Soviet Union)" (1789-2022) -> Russian Empire / Soviet Union / Russian Federation. CCP codes predecessor and successor
+        as one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Russian Federation"'
+    - code: 366|Estonia
+      iso3: EST
+      source: 'exact normalised name match: CCP COW 366 "Estonia" (1918-2025) = crosswalk label "Estonia"'
+    - code: 367|Latvia
+      iso3: LVA
+      source: 'exact normalised name match: CCP COW 367 "Latvia" (1918-2023) = crosswalk label "Latvia"'
+    - code: 368|Lithuania
+      iso3: LTU
+      source: 'exact normalised name match: CCP COW 368 "Lithuania" (1918-2023) = crosswalk label "Lithuania"'
+    - code: 369|Ukraine
+      iso3: UKR
+      source: 'exact normalised name match: CCP COW 369 "Ukraine" (1978-2023) = crosswalk label "Ukraine"'
+    - code: 370|Belarus
+      iso3: BLR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 370 "Belarus" (1991-2023) -> Belarus; crosswalk label "Belarus"'
+    - code: 370|Belarus (Byelorussia)
+      iso3: BLR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 370 "Belarus (Byelorussia)" (1991-2022) -> name variant; crosswalk label "Belarus"'
+    - code: 371|Armenia
+      iso3: ARM
+      source: 'exact normalised name match: CCP COW 371 "Armenia" (1978-2023) = crosswalk label "Armenia"'
+    - code: 372|Georgia
+      iso3: GEO
+      source: 'exact normalised name match: CCP COW 372 "Georgia" (1921-2023) = crosswalk label "Georgia"'
+    - code: 373|Azerbaijan
+      iso3: AZE
+      source: 'exact normalised name match: CCP COW 373 "Azerbaijan" (1991-2023) = crosswalk label "Azerbaijan"'
+    - code: 375|Finland
+      iso3: FIN
+      source: 'exact normalised name match: CCP COW 375 "Finland" (1917-2023) = crosswalk label "Finland"'
+    - code: 380|Sweden
+      iso3: SWE
+      source: 'exact normalised name match: CCP COW 380 "Sweden" (1789-2023) = crosswalk label "Sweden"'
+    - code: 385|Norway
+      iso3: NOR
+      source: 'exact normalised name match: CCP COW 385 "Norway" (1814-2024) = crosswalk label "Norway"'
+    - code: 390|Denmark
+      iso3: DNK
+      source: 'exact normalised name match: CCP COW 390 "Denmark" (1789-2023) = crosswalk label "Denmark"'
+    - code: 395|Iceland
+      iso3: ISL
+      source: 'exact normalised name match: CCP COW 395 "Iceland" (1944-2023) = crosswalk label "Iceland"'
+    - code: 402|Cape Verde
+      iso3: CPV
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 402 "Cape Verde" (1975-2023) -> Cabo Verde; crosswalk label "Cabo Verde"'
+    - code: 403|Sao Tome and Principe
+      iso3: STP
+      source: 'exact normalised name match: CCP COW 403 "Sao Tome and Principe" (1975-2023) = crosswalk label "Sao Tome and Principe"'
+    - code: 404|Guinea-Bissau
+      iso3: GNB
+      source: 'exact normalised name match: CCP COW 404 "Guinea-Bissau" (1973-2023) = crosswalk label "Guinea-Bissau"'
+    - code: 411|Equatorial Guinea
+      iso3: GNQ
+      source: 'exact normalised name match: CCP COW 411 "Equatorial Guinea" (1968-2023) = crosswalk label "Equatorial Guinea"'
+    - code: 420|Gambia
+      iso3: GMB
+      source: 'exact normalised name match: CCP COW 420 "Gambia" (1962-2023) = crosswalk label "Gambia"'
+    - code: 432|Mali
+      iso3: MLI
+      source: 'exact normalised name match: CCP COW 432 "Mali" (1960-2023) = crosswalk label "Mali"'
+    - code: 433|Senegal
+      iso3: SEN
+      source: 'exact normalised name match: CCP COW 433 "Senegal" (1960-2023) = crosswalk label "Senegal"'
+    - code: 434|Benin
+      iso3: BEN
+      source: 'exact normalised name match: CCP COW 434 "Benin" (1960-2025) = crosswalk label "Benin"'
+    - code: 435|Mauritania
+      iso3: MRT
+      source: 'exact normalised name match: CCP COW 435 "Mauritania" (1959-2023) = crosswalk label "Mauritania"'
+    - code: 436|Niger
+      iso3: NER
+      source: 'exact normalised name match: CCP COW 436 "Niger" (1960-2023) = crosswalk label "Niger"'
+    - code: 437|Cote d'Ivoire
+      iso3: CIV
+      source: 'exact normalised name match: CCP COW 437 "Cote d''Ivoire" (1960-2023) = crosswalk label "Côte d’Ivoire"'
+    - code: 438|Guinea
+      iso3: GIN
+      source: 'exact normalised name match: CCP COW 438 "Guinea" (1958-2025) = crosswalk label "Guinea"'
+    - code: 439|Burkina Faso
+      iso3: BFA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 439 "Burkina Faso" (1960-2023) -> Upper Volta -> Burkina Faso (name change 1984); crosswalk label "Burkina Faso"'
+    - code: 439|Burkina Faso (Upper Volta)
+      iso3: BFA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 439 "Burkina Faso (Upper Volta)" (1960-2022) -> Upper Volta -> Burkina Faso (name change 1984); crosswalk label "Burkina Faso"'
+    - code: 450|Liberia
+      iso3: LBR
+      source: 'exact normalised name match: CCP COW 450 "Liberia" (1847-2023) = crosswalk label "Liberia"'
+    - code: 451|Sierra Leone
+      iso3: SLE
+      source: 'exact normalised name match: CCP COW 451 "Sierra Leone" (1961-2023) = crosswalk label "Sierra Leone"'
+    - code: 452|Ghana
+      iso3: GHA
+      source: 'exact normalised name match: CCP COW 452 "Ghana" (1957-2023) = crosswalk label "Ghana"'
+    - code: 461|Togo
+      iso3: TGO
+      source: 'exact normalised name match: CCP COW 461 "Togo" (1960-2024) = crosswalk label "Togo"'
+    - code: 471|Cameroon
+      iso3: CMR
+      source: 'exact normalised name match: CCP COW 471 "Cameroon" (1960-2023) = crosswalk label "Cameroon"'
+    - code: 475|Nigeria
+      iso3: NGA
+      source: 'exact normalised name match: CCP COW 475 "Nigeria" (1960-2023) = crosswalk label "Nigeria"'
+    - code: 481|Gabon
+      iso3: GAB
+      source: 'exact normalised name match: CCP COW 481 "Gabon" (1960-2024) = crosswalk label "Gabon"'
+    - code: 482|Central African Republic
+      iso3: CAF
+      source: 'exact normalised name match: CCP COW 482 "Central African Republic" (1959-2023) = crosswalk label "Central African Republic"'
+    - code: 483|Chad
+      iso3: TCD
+      source: 'exact normalised name match: CCP COW 483 "Chad" (1960-2023) = crosswalk label "Chad"'
+    - code: 484|Congo
+      iso3: COG
+      source: 'exact normalised name match: CCP COW 484 "Congo" (1960-2023) = crosswalk label "Congo"'
+    - code: 490|Congo, Democratic Republic of (Zaire)
+      iso3: COD
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 490 "Congo, Democratic Republic of (Zaire)" (1960-2019) -> Democratic Republic of the Congo (Zaire 1971-1997); crosswalk label "Democratic
+        Republic of the Congo"'
+    - code: 490|Democratic Republic of the Congo
+      iso3: COD
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 490 "Democratic Republic of the Congo" (1960-2023) -> Democratic Republic of the Congo; crosswalk label "Democratic Republic of the
+        Congo"'
+    - code: 500|Uganda
+      iso3: UGA
+      source: 'exact normalised name match: CCP COW 500 "Uganda" (1962-2023) = crosswalk label "Uganda"'
+    - code: 501|Kenya
+      iso3: KEN
+      source: 'exact normalised name match: CCP COW 501 "Kenya" (1963-2023) = crosswalk label "Kenya"'
+    - code: 510|Tanzania
+      iso3: TZA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 510 "Tanzania" (1961-2023) -> Tanganyika -> United Republic of Tanzania (1964). CCP codes predecessor and successor as one country
+        under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "United Republic of Tanzania"'
+    - code: 510|Tanzania/Tanganyika
+      iso3: TZA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 510 "Tanzania/Tanganyika" (1961-2019) -> Tanganyika -> United Republic of Tanzania (1964). CCP codes predecessor and successor as
+        one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "United Republic of Tanzania"'
+    - code: 516|Burundi
+      iso3: BDI
+      source: 'exact normalised name match: CCP COW 516 "Burundi" (1962-2023) = crosswalk label "Burundi"'
+    - code: 517|Rwanda
+      iso3: RWA
+      source: 'exact normalised name match: CCP COW 517 "Rwanda" (1962-2023) = crosswalk label "Rwanda"'
+    - code: 520|Somalia
+      iso3: SOM
+      source: 'exact normalised name match: CCP COW 520 "Somalia" (1960-2024) = crosswalk label "Somalia"'
+    - code: 522|Djibouti
+      iso3: DJI
+      source: 'exact normalised name match: CCP COW 522 "Djibouti" (1977-2025) = crosswalk label "Djibouti"'
+    - code: 530|Ethiopia
+      iso3: ETH
+      source: 'exact normalised name match: CCP COW 530 "Ethiopia" (1855-2023) = crosswalk label "Ethiopia"'
+    - code: 531|Eritrea
+      iso3: ERI
+      source: 'exact normalised name match: CCP COW 531 "Eritrea" (1993-2023) = crosswalk label "Eritrea"'
+    - code: 540|Angola
+      iso3: AGO
+      source: 'exact normalised name match: CCP COW 540 "Angola" (1975-2023) = crosswalk label "Angola"'
+    - code: 541|Mozambique
+      iso3: MOZ
+      source: 'exact normalised name match: CCP COW 541 "Mozambique" (1975-2023) = crosswalk label "Mozambique"'
+    - code: 551|Zambia
+      iso3: ZMB
+      source: 'exact normalised name match: CCP COW 551 "Zambia" (1964-2025) = crosswalk label "Zambia"'
+    - code: 552|Zimbabwe
+      iso3: ZWE
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 552 "Zimbabwe" (1965-2023) -> Rhodesia (UDI 1965) -> Zimbabwe (1980). CCP codes predecessor and successor as one country under this
+        COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Zimbabwe"'
+    - code: 552|Zimbabwe (Rhodesia)
+      iso3: ZWE
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 552 "Zimbabwe (Rhodesia)" (1965-2021) -> Rhodesia (UDI 1965) -> Zimbabwe (1980). CCP codes predecessor and successor as one country
+        under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Zimbabwe"'
+    - code: 553|Malawi
+      iso3: MWI
+      source: 'exact normalised name match: CCP COW 553 "Malawi" (1964-2023) = crosswalk label "Malawi"'
+    - code: 560|South Africa
+      iso3: ZAF
+      source: 'exact normalised name match: CCP COW 560 "South Africa" (1909-2023) = crosswalk label "South Africa"'
+    - code: 565|Namibia
+      iso3: NAM
+      source: 'exact normalised name match: CCP COW 565 "Namibia" (1990-2023) = crosswalk label "Namibia"'
+    - code: 570|Lesotho
+      iso3: LSO
+      source: 'exact normalised name match: CCP COW 570 "Lesotho" (1966-2025) = crosswalk label "Lesotho"'
+    - code: 571|Botswana
+      iso3: BWA
+      source: 'exact normalised name match: CCP COW 571 "Botswana" (1966-2023) = crosswalk label "Botswana"'
+    - code: 572|Eswatini
+      iso3: SWZ
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 572 "Eswatini" (1968-2023) -> Eswatini; crosswalk label "Eswatini"'
+    - code: 572|Swaziland
+      iso3: SWZ
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 572 "Swaziland" (1968-2019) -> Eswatini; crosswalk label "Eswatini"'
+    - code: 580|Madagascar
+      iso3: MDG
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 580 "Madagascar" (1816-2023) -> Madagascar; crosswalk label "Madagascar"'
+    - code: 580|Madagascar (Malagasy)
+      iso3: MDG
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 580 "Madagascar (Malagasy)" (1816-2019) -> Malagasy Republic -> Madagascar (name change); crosswalk label "Madagascar"'
+    - code: 581|Comoros
+      iso3: COM
+      source: 'exact normalised name match: CCP COW 581 "Comoros" (1975-2023) = crosswalk label "Comoros"'
+    - code: 590|Mauritius
+      iso3: MUS
+      source: 'exact normalised name match: CCP COW 590 "Mauritius" (1968-2023) = crosswalk label "Mauritius"'
+    - code: 591|Seychelles
+      iso3: SYC
+      source: 'exact normalised name match: CCP COW 591 "Seychelles" (1975-2025) = crosswalk label "Seychelles"'
+    - code: 600|Morocco
+      iso3: MAR
+      source: 'exact normalised name match: CCP COW 600 "Morocco" (1789-2023) = crosswalk label "Morocco"'
+    - code: 615|Algeria
+      iso3: DZA
+      source: 'exact normalised name match: CCP COW 615 "Algeria" (1816-2023) = crosswalk label "Algeria"'
+    - code: 616|Tunisia
+      iso3: TUN
+      source: 'exact normalised name match: CCP COW 616 "Tunisia" (1789-2023) = crosswalk label "Tunisia"'
+    - code: 620|Libya
+      iso3: LBY
+      source: 'exact normalised name match: CCP COW 620 "Libya" (1816-2023) = crosswalk label "Libya"'
+    - code: 625|Sudan
+      iso3: SDN
+      source: 'exact normalised name match: CCP COW 625 "Sudan" (1955-2025) = crosswalk label "Sudan"'
+    - code: 626|South Sudan
+      iso3: SSD
+      source: 'exact normalised name match: CCP COW 626 "South Sudan" (2011-2024) = crosswalk label "South Sudan"'
+    - code: 630|Iran
+      iso3: IRN
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 630 "Iran" (1789-2023) -> Persia -> Iran (name change 1935); crosswalk label "Iran (Islamic Republic of)"'
+    - code: 630|Iran (Persia)
+      iso3: IRN
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 630 "Iran (Persia)" (1789-2019) -> Persia -> Iran (name change 1935); crosswalk label "Iran (Islamic Republic of)"'
+    - code: 640|Turkey
+      iso3: TUR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 640 "Turkey" (1789-2023) -> Ottoman Empire -> Republic of Turkey (1923). CCP codes predecessor and successor as one country under
+        this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Türkiye"'
+    - code: 640|Turkey/Ottoman Empire
+      iso3: TUR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 640 "Turkey/Ottoman Empire" (1789-2019) -> Ottoman Empire -> Republic of Turkey (1923). CCP codes predecessor and successor as one
+        country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Türkiye"'
+    - code: 645|Iraq
+      iso3: IRQ
+      source: 'exact normalised name match: CCP COW 645 "Iraq" (1925-2023) = crosswalk label "Iraq"'
+    - code: 651|Egypt
+      iso3: EGY
+      source: 'exact normalised name match: CCP COW 651 "Egypt" (1827-2023) = crosswalk label "Egypt"'
+    - code: 652|Syria
+      iso3: SYR
+      source: 'exact normalised name match: CCP COW 652 "Syria" (1930-2025) = crosswalk label "Syrian Arab Republic"'
+    - code: 660|Lebanon
+      iso3: LBN
+      source: 'exact normalised name match: CCP COW 660 "Lebanon" (1926-2023) = crosswalk label "Lebanon"'
+    - code: 663|Jordan
+      iso3: JOR
+      source: 'exact normalised name match: CCP COW 663 "Jordan" (1946-2023) = crosswalk label "Jordan"'
+    - code: 666|Israel
+      iso3: ISR
+      source: 'exact normalised name match: CCP COW 666 "Israel" (1948-2023) = crosswalk label "Israel"'
+    - code: 670|Saudi Arabia
+      iso3: SAU
+      source: 'exact normalised name match: CCP COW 670 "Saudi Arabia" (1926-2023) = crosswalk label "Saudi Arabia"'
+    - code: 678|Yemen (Arab Republic of Yemen)
+      iso3: YEM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 678 "Yemen (Arab Republic of Yemen)" (1918-2019) -> Yemen Arab Republic (North Yemen) -> Republic of Yemen (1990). CCP codes predecessor
+        and successor as one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Yemen"'
+    - code: 678|Yemen Arab Republic
+      iso3: YEM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 678 "Yemen Arab Republic" (1918-2023) -> Yemen Arab Republic (North Yemen) -> Republic of Yemen (1990). CCP codes predecessor and
+        successor as one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Yemen"'
+    - code: 690|Kuwait
+      iso3: KWT
+      source: 'exact normalised name match: CCP COW 690 "Kuwait" (1961-2023) = crosswalk label "Kuwait"'
+    - code: 692|Bahrain
+      iso3: BHR
+      source: 'exact normalised name match: CCP COW 692 "Bahrain" (1971-2023) = crosswalk label "Bahrain"'
+    - code: 694|Qatar
+      iso3: QAT
+      source: 'exact normalised name match: CCP COW 694 "Qatar" (1970-2024) = crosswalk label "Qatar"'
+    - code: 696|United Arab Emirates
+      iso3: ARE
+      source: 'exact normalised name match: CCP COW 696 "United Arab Emirates" (1971-2023) = crosswalk label "United Arab Emirates"'
+    - code: 698|Oman
+      iso3: OMN
+      source: 'exact normalised name match: CCP COW 698 "Oman" (1789-2023) = crosswalk label "Oman"'
+    - code: 700|Afghanistan
+      iso3: AFG
+      source: 'exact normalised name match: CCP COW 700 "Afghanistan" (1816-2023) = crosswalk label "Afghanistan"'
+    - code: 701|Turkmenistan
+      iso3: TKM
+      source: 'exact normalised name match: CCP COW 701 "Turkmenistan" (1991-2023) = crosswalk label "Turkmenistan"'
+    - code: 702|Tajikistan
+      iso3: TJK
+      source: 'exact normalised name match: CCP COW 702 "Tajikistan" (1991-2023) = crosswalk label "Tajikistan"'
+    - code: 703|Kyrgyz Republic
+      iso3: KGZ
+      source: 'exact normalised name match: CCP COW 703 "Kyrgyz Republic" (1991-2023) = crosswalk label "Kyrgyzstan"'
+    - code: 704|Uzbekistan
+      iso3: UZB
+      source: 'exact normalised name match: CCP COW 704 "Uzbekistan" (1991-2023) = crosswalk label "Uzbekistan"'
+    - code: 705|Kazakhstan
+      iso3: KAZ
+      source: 'exact normalised name match: CCP COW 705 "Kazakhstan" (1991-2023) = crosswalk label "Kazakhstan"'
+    - code: 710|China
+      iso3: CHN
+      source: 'exact normalised name match: CCP COW 710 "China" (1789-2023) = crosswalk label "China"'
+    - code: 712|Mongolia
+      iso3: MNG
+      source: 'exact normalised name match: CCP COW 712 "Mongolia" (1921-2023) = crosswalk label "Mongolia"'
+    - code: 731|Korea, People's Republic of
+      iso3: PRK
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 731 "Korea, People''s Republic of" (1948-2025) -> Democratic People''s Republic of Korea; crosswalk label "Democratic People''s Republic
+        of Korea"'
+    - code: 731|North Korea
+      iso3: PRK
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 731 "North Korea" (1948-2023) -> Democratic People''s Republic of Korea; crosswalk label "Democratic People''s Republic of Korea"'
+    - code: 732|Korea, Republic of
+      iso3: KOR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 732 "Korea, Republic of" (1948-2019) -> Republic of Korea; crosswalk label "Republic of Korea"'
+    - code: 732|South Korea
+      iso3: KOR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 732 "South Korea" (1948-2023) -> Republic of Korea; crosswalk label "Republic of Korea"'
+    - code: 740|Japan
+      iso3: JPN
+      source: 'exact normalised name match: CCP COW 740 "Japan" (1789-2023) = crosswalk label "Japan"'
+    - code: 750|India
+      iso3: IND
+      source: 'exact normalised name match: CCP COW 750 "India" (1947-2023) = crosswalk label "India"'
+    - code: 760|Bhutan
+      iso3: BTN
+      source: 'exact normalised name match: CCP COW 760 "Bhutan" (1949-2023) = crosswalk label "Bhutan"'
+    - code: 770|Pakistan
+      iso3: PAK
+      source: 'exact normalised name match: CCP COW 770 "Pakistan" (1947-2025) = crosswalk label "Pakistan"'
+    - code: 771|Bangladesh
+      iso3: BGD
+      source: 'exact normalised name match: CCP COW 771 "Bangladesh" (1971-2023) = crosswalk label "Bangladesh"'
+    - code: 775|Myanmar
+      iso3: MMR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 775 "Myanmar" (1816-2023) -> Burma -> Myanmar (name change 1989); crosswalk label "Myanmar"'
+    - code: 775|Myanmar (Burma)
+      iso3: MMR
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 775 "Myanmar (Burma)" (1816-2020) -> Burma -> Myanmar (name change 1989); crosswalk label "Myanmar"'
+    - code: 780|Sri Lanka
+      iso3: LKA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 780 "Sri Lanka" (1946-2023) -> Ceylon -> Sri Lanka (name change 1972); crosswalk label "Sri Lanka"'
+    - code: 780|Sri Lanka (Ceylon)
+      iso3: LKA
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 780 "Sri Lanka (Ceylon)" (1948-2022) -> Ceylon -> Sri Lanka (name change 1972); crosswalk label "Sri Lanka"'
+    - code: 781|Maldives
+      iso3: MDV
+      source: 'exact normalised name match: CCP COW 781 "Maldives" (1965-2025) = crosswalk label "Maldives"'
+    - code: 790|Nepal
+      iso3: NPL
+      source: 'exact normalised name match: CCP COW 790 "Nepal" (1789-2023) = crosswalk label "Nepal"'
+    - code: 800|Thailand
+      iso3: THA
+      source: 'exact normalised name match: CCP COW 800 "Thailand" (1789-2023) = crosswalk label "Thailand"'
+    - code: 811|Cambodia
+      iso3: KHM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 811 "Cambodia" (1947-2023) -> Cambodia; crosswalk label "Cambodia"'
+    - code: 811|Cambodia (Kampuchea)
+      iso3: KHM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 811 "Cambodia (Kampuchea)" (1953-2025) -> name variants; crosswalk label "Cambodia"'
+    - code: 812|Laos
+      iso3: LAO
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 812 "Laos" (1947-2025) -> Lao People''s Democratic Republic; crosswalk label "Lao People''s Democratic Republic"'
+    - code: 816|Vietnam
+      iso3: VNM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 816 "Vietnam" (1946-2023) -> Democratic Republic of Vietnam -> Socialist Republic of Viet Nam (1976). CCP codes predecessor and successor
+        as one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Viet Nam"'
+    - code: 816|Vietnam, Democratic Republic of
+      iso3: VNM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 816 "Vietnam, Democratic Republic of" (1954-2025) -> Democratic Republic of Vietnam -> Socialist Republic of Viet Nam (1976). CCP
+        codes predecessor and successor as one country under this COW code; rows before the successor existed concern the predecessor state (flags.provider_continuity on every row); crosswalk label "Viet
+        Nam"'
+    - code: 820|Malaysia
+      iso3: MYS
+      source: 'exact normalised name match: CCP COW 820 "Malaysia" (1957-2025) = crosswalk label "Malaysia"'
+    - code: 830|Singapore
+      iso3: SGP
+      source: 'exact normalised name match: CCP COW 830 "Singapore" (1963-2024) = crosswalk label "Singapore"'
+    - code: 835|Brunei
+      iso3: BRN
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 835 "Brunei" (1959-2023) -> Brunei Darussalam; crosswalk label "Brunei Darussalam"'
+    - code: 840|Philippines
+      iso3: PHL
+      source: 'exact normalised name match: CCP COW 840 "Philippines" (1945-2023) = crosswalk label "Philippines"'
+    - code: 850|Indonesia
+      iso3: IDN
+      source: 'exact normalised name match: CCP COW 850 "Indonesia" (1945-2023) = crosswalk label "Indonesia"'
+    - code: 860|East Timor
+      iso3: TLS
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 860 "East Timor" (2002-2019) -> Timor-Leste; crosswalk label "Timor-Leste"'
+    - code: 860|Timor
+      iso3: TLS
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 860 "Timor" (2002-2023) -> Timor-Leste; crosswalk label "Timor-Leste"'
+    - code: 900|Australia
+      iso3: AUS
+      source: 'exact normalised name match: CCP COW 900 "Australia" (1901-2023) = crosswalk label "Australia"'
+    - code: 910|Papua New Guinea
+      iso3: PNG
+      source: 'exact normalised name match: CCP COW 910 "Papua New Guinea" (1975-2023) = crosswalk label "Papua New Guinea"'
+    - code: 920|New Zealand
+      iso3: NZL
+      source: 'exact normalised name match: CCP COW 920 "New Zealand" (1852-2023) = crosswalk label "New Zealand"'
+    - code: 935|Vanuatu
+      iso3: VUT
+      source: 'exact normalised name match: CCP COW 935 "Vanuatu" (1980-2024) = crosswalk label "Vanuatu"'
+    - code: 940|Solomon Islands
+      iso3: SLB
+      source: 'exact normalised name match: CCP COW 940 "Solomon Islands" (1978-2023) = crosswalk label "Solomon Islands"'
+    - code: 946|Kiribati
+      iso3: KIR
+      source: 'exact normalised name match: CCP COW 946 "Kiribati" (1979-2023) = crosswalk label "Kiribati"'
+    - code: 947|Tuvalu
+      iso3: TUV
+      source: 'exact normalised name match: CCP COW 947 "Tuvalu" (1978-2023) = crosswalk label "Tuvalu"'
+    - code: 950|Fiji
+      iso3: FJI
+      source: 'exact normalised name match: CCP COW 950 "Fiji" (1970-2023) = crosswalk label "Fiji"'
+    - code: 955|Tonga
+      iso3: TON
+      source: 'exact normalised name match: CCP COW 955 "Tonga" (1875-2025) = crosswalk label "Tonga"'
+    - code: 970|Nauru
+      iso3: NRU
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 970 "Nauru" (1968-2025) -> Nauru; crosswalk label "Naoero"'
+    - code: 983|Marshall Islands
+      iso3: MHL
+      source: 'exact normalised name match: CCP COW 983 "Marshall Islands" (1979-2023) = crosswalk label "Marshall Islands"'
+    - code: 986|Palau
+      iso3: PLW
+      source: 'exact normalised name match: CCP COW 986 "Palau" (1981-2023) = crosswalk label "Palau"'
+    - code: 987|Micronesia
+      iso3: FSM
+      source: 'manual (agent A-LAW, maintainer review pending): CCP COW 987 "Micronesia" (1978-2023) -> Federated States of Micronesia; crosswalk label "Micronesia (Federated States of)"'
+    - code: 987|Micronesia, Fed. Sts.
+      iso3: FSM
+      source: 'exact normalised name match: CCP COW 987 "Micronesia, Fed. Sts." (1986-2019) = crosswalk label "Micronesia (Federated States of)"'
+    - code: 990|Samoa
+      iso3: WSM
+      source: 'exact normalised name match: CCP COW 990 "Samoa" (1962-2025) = crosswalk label "Samoa"'
+    unmapped:
+    - code: 240|Hanover
+      reason: historical or non-crosswalk state
+    - code: 245|Bavaria
+      reason: historical or non-crosswalk state
+    - code: 255|Germany
+      reason: historical or non-crosswalk state
+    - code: 255|Germany (Prussia)
+      reason: historical or non-crosswalk state
+    - code: 265|German Democratic Republic
+      reason: historical or non-crosswalk state
+    - code: 267|Baden
+      reason: historical or non-crosswalk state
+    - code: 269|Saxony
+      reason: historical or non-crosswalk state
+    - code: 271|Wuerttemburg
+      reason: historical or non-crosswalk state
+    - code: 271|Wurttemberg
+      reason: historical or non-crosswalk state
+    - code: 273|Hesse Electoral
+      reason: historical or non-crosswalk state
+    - code: 273|Hesse-Kassel (Electoral)
+      reason: historical or non-crosswalk state
+    - code: 275|Hesse Grand Ducal
+      reason: historical or non-crosswalk state
+    - code: 275|Hesse-Darmstadt (Ducal)
+      reason: historical or non-crosswalk state
+    - code: 280|Mecklenburg Schwerin
+      reason: historical or non-crosswalk state
+    - code: 280|Mecklenburg-Schwerin
+      reason: historical or non-crosswalk state
+    - code: 300|Austria-Hungary
+      reason: historical or non-crosswalk state
+    - code: 315|Czechoslovakia
+      reason: historical or non-crosswalk state
+    - code: 327|Papal States
+      reason: historical or non-crosswalk state
+    - code: 327|Vatican
+      reason: historical or non-crosswalk state
+    - code: 329|Two Sicilies
+      reason: historical or non-crosswalk state
+    - code: 332|Modena
+      reason: historical or non-crosswalk state
+    - code: 335|Parma
+      reason: historical or non-crosswalk state
+    - code: 337|Tuscany
+      reason: historical or non-crosswalk state
+    - code: 340|Serbia and Montenegro
+      reason: historical or non-crosswalk state
+    - code: 340|Yugoslavia
+      reason: historical or non-crosswalk state
+    - code: 396|Abkhazia
+      reason: historical or non-crosswalk state
+    - code: 397|South Ossetia
+      reason: historical or non-crosswalk state
+    - code: 511|Zanzibar
+      reason: historical or non-crosswalk state
+    - code: 563|Transvaal
+      reason: historical or non-crosswalk state
+    - code: 564|Orange Free State
+      reason: historical or non-crosswalk state
+    - code: 680|Yemen People's Republic
+      reason: historical or non-crosswalk state
+    - code: 680|Yemen, People's Republic of
+      reason: historical or non-crosswalk state
+    - code: 711|Tibet
+      reason: historical or non-crosswalk state
+    - code: 713|Taiwan
+      reason: historical or non-crosswalk state
+    - code: 730|Korea
+      reason: historical or non-crosswalk state
+    - code: 815|Vietnam
+      reason: historical or non-crosswalk state
+    - code: 815|Vietnam (Annam/Cochin China/Tonkin)
+      reason: historical or non-crosswalk state
+    - code: 817|Republic of Vietnam
+      reason: historical or non-crosswalk state
+    - code: 817|Vietnam, Republic of
+      reason: historical or non-crosswalk state
+    - code: 89|Federal Republic of Central America
+      reason: historical or non-crosswalk state
+    - code: 89|United Provinces of Central America
+      reason: historical or non-crosswalk state
+    - code: 99|Great Colombia
+      reason: historical or non-crosswalk state
+    code_format: <COW code>|<CCP country name> (CCP uses one COW code for several names, e.g. 340 Serbia / Yugoslavia / Serbia and Montenegro)
+    source:
+      kind: provider_data
+      url: https://comparativeconstitutionsproject.org/download-data/
+      raw_sha256: ab04078953ae56b92eec21167f355746f36f50cf84d49851fe1c9e3af2b19ba2
+      files:
+      - ccpcce_v6/ccpcce/ccpcce_v6.csv (Chronology v6 zip)
+      - ccpcnc_v5/ccpcnc/ccpcnc_v5.csv (Characteristics v5 zip, sha256 761308d6addd1cfc...)
+      retrieved_at: '2026-10-15'

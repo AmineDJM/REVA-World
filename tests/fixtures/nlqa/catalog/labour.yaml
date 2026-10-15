@@ -1,0 +1,28 @@
+# NLQA TEST FIXTURE (not the registry catalog).
+domain: labour
+concepts:
+  - id: labour.minimum_wage_monthly
+    labels: {fr: "Salaire minimum mensuel (monnaie locale)", en: "Monthly minimum wage (local currency)"}
+    definition: "Statutory nominal gross monthly minimum wage, local currency (provider definition)."
+    unit: "local currency per month"
+    domain: labour
+    source_order:
+      - "ilo.ilostat_mw.EAR_INEE_NOC_NB|cur=LCU"
+    provider_declared: true
+  - id: labour.unemployment_rate
+    labels: {fr: "Taux de chômage", en: "Unemployment rate"}
+    definition: "Share of the labour force without work but available and seeking (provider definition)."
+    unit: "%"
+    domain: labour
+    source_order:
+      - "ilo.ilostat_une.UNE_DEAP_SEX_AGE_RT|sex=SEX_T|age=AGE_YTHADULT_YGE15"
+      - "wb.wdi.SL.UEM.TOTL.ZS"
+    provider_declared: true
+  - id: labour.average_monthly_earnings
+    labels: {fr: "Salaire mensuel moyen", en: "Average monthly earnings"}
+    definition: "Mean nominal monthly earnings of employees, local currency (provider definition)."
+    unit: "local currency per month"
+    domain: labour
+    source_order:
+      - "ilo.ilostat_ear.EAR_4MTH_SEX_ECO_CUR_NB|sex=SEX_T|cur=LCU"
+    provider_declared: true

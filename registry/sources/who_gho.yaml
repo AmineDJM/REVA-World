@@ -1,0 +1,28 @@
+# V3 atlas (agent A-HEALTHEDU): WHO Global Health Observatory OData API.
+# Connector: src/reva/adapters/connectors/atlas_who.py (atlas table who.gho).
+source_key: who.gho
+title: WHO Global Health Observatory (GHO OData API)
+provider_url: https://ghoapi.azureedge.net/api
+lineage_family: who_gho
+rights:
+  licence: CC BY 4.0 (WHO additional terms)
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  terms_url: https://data.who.int/redirect-pages/footer/learn-more/terms-and-conditions
+  attribution: "World Health Organization, Global Health Observatory (GHO) data"
+metadata:
+  allowed_hosts: [ghoapi.azureedge.net]
+  api_docs: https://www.who.int/data/gho/info/gho-odata-api
+  authentication: none
+  cadence: monthly check; WHO updates indicators independently (per-row Date)
+  deprecation_notice: >-
+    https://www.who.int/data/gho/legacy announces that this OData implementation will be replaced by one
+    with standardised field names (announced for end of 2025; still serving current data on 2026-10-15).
+    Field renames are detected as schema drift and block registration.
+  editorial_status: >-
+    Mixes WHO/inter-agency comparable estimates (GHE, UN IGME, MMEIG, NCD-RisC, WUENIC, JME, JMP) with
+    country-reported data (NHWA workforce, hospital beds, country-reported MMR); every atlas cell carries
+    flags.estimate_class.
+  upstream_lineages:
+    MDG_0000000007: [un_igme]
+    MDG_0000000026: [un_mmeig]
+    GHED_CHEGDP_SHA2011: [who_ghed, national_health_accounts]

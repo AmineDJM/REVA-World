@@ -1,0 +1,86 @@
+[
+  {
+    "request_fingerprint": "542662913c82a18f80cda6a009a2571d6c054f348981fb49083185f8c28872c3",
+    "url": "https://ghoapi.azureedge.net/api/GHED_CHEGDP_SHA2011?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "542662913c82a18f.json",
+    "sha256": "aef94914c77a969f89ec96bc0865c02e7d3f461676c6b0b5ba2a1a11e79cc687",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:41.311766+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "242769544b25a6d5ec1be7008343fefcad8bc695296c1c449ab2b163e8944a4a",
+    "url": "https://ghoapi.azureedge.net/api/Indicator",
+    "file": "242769544b25a6d5.json",
+    "sha256": "3a7dc572409e5eed7d85607987b9c6e35a0aaf7a232e15c6bd12a1dd30b1be0b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:33.498591+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "4b65fdf63c364ec99b75f5945615858e18179adf1593a1525943a638f8efa79c",
+    "url": "https://ghoapi.azureedge.net/api/MDG_0000000007?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "4b65fdf63c364ec9.json",
+    "sha256": "af328360beaf8259bb0f2007226c7ed7641cb6fcc6f5b00537de07194f71bbf9",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:38.237156+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "78d2752713a286141431c41b44aea59c7703b3e0764666742e413154bc071a20",
+    "url": "https://ghoapi.azureedge.net/api/MDG_0000000032?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "78d2752713a28614.json",
+    "sha256": "ae1345346c43a2759af8278b4dfc736bee4716cf8cbf14a4b7d7e83bf946dbf2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:35.524231+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "ce5ad9754237bf265bc3563b27548ab631e5482c50cc7a75bc7b4548f8a9f909",
+    "url": "https://ghoapi.azureedge.net/api/M_Est_tob_curr_std?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "ce5ad9754237bf26.json",
+    "sha256": "3308937bea69e506c3290a100cebfeccd0f89fd37b1bae9fbe52e3606df6c34b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:39.634468+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "489a3405701697ab86d9eb049711b2b06675469d8b4e0527cec2f79c3684f7e1",
+    "url": "https://ghoapi.azureedge.net/api/RS_198?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "489a3405701697ab.json",
+    "sha256": "67adfafb7b2da4be8d83e42e80665733d46ded82375a1b96e72ae146651ddd69",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:41.932348+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  },
+  {
+    "request_fingerprint": "e6792f091f1c82b045999575d501908e35e3d8ebcd66695745a8b81004ef2273",
+    "url": "https://ghoapi.azureedge.net/api/WHOSIS_000001?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'DZA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'HKG'%20or%20SpatialDim%20eq%20'IND'%20or%20SpatialDim%20eq%20'NGA')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "e6792f091f1c82b0.json",
+    "sha256": "95f11a9aaf01144cec0df7c33fe08c3acc8fcbc7e8e560f2c370f8c19a9c815b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; odata.metadata=minimal; odata.streaming=true; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T22:25:34.633197+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)"
+  }
+]

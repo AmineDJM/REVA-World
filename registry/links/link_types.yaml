@@ -1,0 +1,542 @@
+# REVA World V3 — interconnection taxonomy (owner: LINKS; schema: link_types.schema.json).
+#
+# Two sections:
+#
+# * derived_links    — typed country–country / entity–entity links that src/reva/links/derive.py computes
+#                      from KG statements (kg.statement) or atlas rows (atlas tables). Each one says which
+#                      source properties / atlas concepts feed it, its temporal semantics, whether it may
+#                      carry a weight (only a quantity the source itself reports) and its honesty wording.
+# * statement_edges  — KG properties the path engine may traverse directly (one statement = one hop), with
+#                      French/English labels for both traversal directions.
+#
+# Honesty (docs/roadmap/v3_world_graph.md):
+# * A link says "connected via <label>". It is never a cause. Causal wording is reserved to statement edges
+#   whose property is causal (P828 has cause, P1542 has effect; the immediate-cause / contributing-factor
+#   sub-properties follow the same rule) and is always attributed: "selon <source>, X a pour cause Y".
+# * A link exists only with evidence (statement ids, or atlas raw_sha256 + selector). No evidence, no link.
+# * Missing is missing: no zero-filling, no imputation; an undated statement is "undated", not "always".
+# * status: derivable          — the derivation is implemented and its inputs are (or will be) in the KG/atlas
+#                                through an existing spec or connector;
+#           awaiting_source    — implemented against the stated interface; the owning agent's data is not
+#                                delivered yet (the link simply does not exist until it is);
+#           no_open_source     — no open, licence-compatible source identified; nothing is derived.
+#
+# temporal.kind: interval (start/end of the statements, intersected for shared-* links; open bounds stay
+# open), point (a dated event), snapshot (one reference year of an atlas row), undated (source gives no date).
+
+version: 1
+owner: LINKS
+
+derived_links:
+  # ---------------------------------------------------------------- geography
+  - id: border_wikidata
+    labels: {fr: "frontière commune (Wikidata)", en: "shared border (Wikidata)"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_symmetric_property
+      properties: [P47]
+      sources: [wikidata]
+      notes: >-
+        Wikidata P47 "shares border with" between two polities. Wikidata does not distinguish land from
+        maritime borders on this property: the link says "shared border", never "land border".
+    temporal: {kind: interval, description: "P580/P582 qualifiers of the P47 statement(s); undated otherwise"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : frontière commune (selon Wikidata)", en: "connected via: shared border (per Wikidata)"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: land_border
+    labels: {fr: "frontière terrestre", en: "land border"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: atlas_dyadic
+      concepts: [geography.land_border_length]
+      sources: [naturalearth]
+      notes: >-
+        Adjacency of Natural Earth 10m admin-0 polygons computed by A-GEO (one row per pair with the shared
+        boundary length when the source geometry provides it). Display-grade geometry: disputed segments are
+        not resolved.
+    temporal: {kind: snapshot, description: "Natural Earth release year of the geometry"}
+    weight: {kind: source_quantity, unit: km, notes: "shared boundary length as measured on the source geometry"}
+    honesty: {fr: "relié via : frontière terrestre (Natural Earth)", en: "connected via: land border (Natural Earth)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.0
+
+  - id: maritime_neighbour
+    labels: {fr: "voisin maritime", en: "maritime neighbour"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: atlas_dyadic
+      concepts: [geography.maritime_boundary]
+      sources: [marineregions_eez]
+      notes: >-
+        Candidate source: Flanders Marine Institute, Maritime Boundaries / EEZ v12 (marineregions.org, CC BY
+        4.0). Not ingested by any V3 agent yet; requested from A-GEO. Until then no maritime link exists.
+    temporal: {kind: snapshot, description: "dataset version year"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : frontière maritime (Marine Regions)", en: "connected via: maritime boundary (Marine Regions)"}
+    causal: false
+    status: no_open_source
+    path_cost: 1.2
+
+  # ---------------------------------------------------------------- language
+  - id: shared_official_language
+    labels: {fr: "langue officielle commune", en: "shared official language"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P37]
+      sources: [wikidata]
+      via: language
+    temporal: {kind: interval, description: "intersection of the two P37 statements' P580/P582; undated if either is undated"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : langue officielle commune ({via})", en: "connected via: shared official language ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: shared_language_used
+    labels: {fr: "langue parlée commune", en: "shared language used"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P2936]
+      sources: [wikidata]
+      via: language
+    temporal: {kind: interval, description: "intersection of the two P2936 statements' qualifiers; usually undated"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : langue utilisée dans les deux pays ({via})", en: "connected via: language used in both ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.2
+
+  - id: shared_language_family
+    labels: {fr: "famille de langues commune", en: "shared language family"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_language_family
+      properties: [P37, P2936, P279, P361]
+      sources: [wikidata]
+      via: language_family
+      notes: >-
+        The official/used languages of the two countries differ but have a common ancestor through the
+        P279 (subclass of) / P361 (part of) genealogy within max_depth steps. The nearest common ancestor is
+        the `via` node; every genealogy statement on both chains is evidence.
+    temporal: {kind: interval, description: "intersection of the two language statements; genealogy statements are undated"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : langues de la même famille ({via})", en: "connected via: languages of the same family ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  # ---------------------------------------------------------------- colonial ties, succession
+  - id: colony_of
+    labels: {fr: "colonie de", en: "colony of"}
+    inverse_labels: {fr: "a pour colonie", en: "has colony"}
+    scope: entity_entity
+    directed: true
+    derivation:
+      method: kg_colonial
+      properties: [P31, P279, P17, P361, P571, P576]
+      sources: [wikidata]
+      notes: >-
+        Wikidata has no "colony of" property. A subject classified (P31, through P279 subclasses present in
+        the KG) as colony Q133156, protectorate Q164142 or dependent territory Q161243, whose P17 (country)
+        or P361 (part of) points to a polity, is linked colony_of that polity. Dates: the P17/P361 statement
+        qualifiers, else the colony's inception (P571) / dissolution (P576) statements, else undated.
+    temporal: {kind: interval, description: "qualifiers of P17/P361, else P571..P576 of the colony"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : colonie de (classement et appartenance selon Wikidata)", en: "connected via: colony of (classification and membership per Wikidata)"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: former_colony_of
+    labels: {fr: "ancienne colonie de", en: "former colony of"}
+    inverse_labels: {fr: "ancienne puissance coloniale de", en: "former colonial power of"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: kg_former_colony
+      properties: [P1365, P1366, P155, P156]
+      sources: [wikidata]
+      via: colony_and_intermediate_states
+      notes: >-
+        A state S that replaces (P1365 / inverse P1366, or follows P155 / P156) — directly or through at most
+        max_chain intermediate states — an entity C that is colony_of P. `via` lists C and the intermediate
+        states; the evidence is every succession statement plus the colony_of evidence. It is a chain of
+        sourced statements, not a claim about causes or about present-day ties.
+    temporal: {kind: interval, description: "the colony_of interval of C"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : succession d'Etats depuis une colonie ({via})", en: "connected via: succession of states from a colony ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: successor_of
+    labels: {fr: "successeur de", en: "successor of"}
+    inverse_labels: {fr: "prédécesseur de", en: "predecessor of"}
+    scope: entity_entity
+    directed: true
+    derivation:
+      method: kg_succession
+      properties: [P1365, P1366, P155, P156]
+      sources: [wikidata]
+      notes: "S replaces P (P1365) or P is replaced by S (P1366); P155/P156 only between polities."
+    temporal: {kind: point, description: "statement P585/P580 qualifier, else undated"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : succède à", en: "connected via: succeeds"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  # ---------------------------------------------------------------- organisations, treaties, alliances
+  - id: co_member
+    labels: {fr: "membres d'une même organisation", en: "co-members of an organisation"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P463]
+      sources: [wikidata, kggeopol_memberships]
+      via: organisation
+      notes: >-
+        Overlap of the two dated memberships (P463 with P580/P582). Disjoint memberships give no link.
+        Organisations with more members than max_members (UN, UNESCO, WHO...) are not expanded into
+        pairwise links: the membership hop through the organisation node remains available to the path
+        engine, with hub damping (registry/links/hubs.yaml).
+    temporal: {kind: interval, description: "intersection of the two memberships"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : membres de {via} sur la même période", en: "connected via: both members of {via} over the same period"}
+    causal: false
+    status: derivable
+    path_cost: 1.2
+
+  - id: alliance_co_member
+    labels: {fr: "membres d'une même alliance", en: "co-members of an alliance"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P463, P31]
+      sources: [wikidata, kggeopol_memberships]
+      via: organisation
+      notes: "As co_member, restricted to organisations that are instances (P31/P279) of military alliance Q1127126."
+    temporal: {kind: interval, description: "intersection of the two memberships"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : membres de l'alliance {via} sur la même période", en: "connected via: both members of the alliance {via} over the same period"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: co_signatory
+    labels: {fr: "co-signataires d'un traité", en: "treaty co-signatories"}
+    scope: entity_entity
+    directed: false
+    derivation:
+      method: kg_shared_subject
+      properties: [P1891, P585, P571]
+      sources: [wikidata]
+      via: treaty
+      notes: >-
+        Two signatories (P1891 on the treaty) of the same treaty. Signatories may be persons (heads of state
+        who signed) or states, as Wikidata records them; the link is between what the source names.
+    temporal: {kind: point, description: "signature date qualifier (P585) of each signatory statement, else the treaty's P585/P571"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : signataires de {via}", en: "connected via: signatories of {via}"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  # ---------------------------------------------------------------- conflicts
+  - id: conflict_co_participant
+    labels: {fr: "participants à un même conflit", en: "participants in the same conflict"}
+    scope: entity_entity
+    directed: false
+    derivation:
+      method: kg_conflict
+      properties: [P710, P1344, P607, P580, P582, P585]
+      sources: [wikidata]
+      via: conflict
+      notes: >-
+        Wikidata P710 (participant) / P1344 (participant in) / P607 (conflict) do not record sides. The link
+        says "both participants in", never "allies" or "enemies".
+    temporal: {kind: interval, description: "the conflict's P580/P582 (or P585), else the statements' qualifiers"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : tous deux participants à {via} (camps non précisés par la source)", en: "connected via: both participants in {via} (sides not stated by the source)"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: conflict_same_side
+    labels: {fr: "même camp dans un conflit", en: "same side in a conflict"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_conflict_sides
+      properties: ["ucdp:side_a", "ucdp:side_b"]
+      sources: [ucdp]
+      via: conflict
+      notes: >-
+        UCDP/PRIO armed conflict dyads (side_a / side_b per conflict-year), loaded by KGGEOPOL as dataset
+        statements carrying the side. Two states on the same side of the same conflict.
+    temporal: {kind: snapshot, description: "UCDP conflict-year"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : même camp dans {via} (UCDP)", en: "connected via: same side in {via} (UCDP)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.0
+
+  - id: conflict_opposing_sides
+    labels: {fr: "camps opposés dans un conflit", en: "opposing sides in a conflict"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_conflict_sides
+      properties: ["ucdp:side_a", "ucdp:side_b"]
+      sources: [ucdp]
+      via: conflict
+    temporal: {kind: snapshot, description: "UCDP conflict-year"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : camps opposés dans {via} (UCDP)", en: "connected via: opposing sides in {via} (UCDP)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.0
+
+  # ---------------------------------------------------------------- diplomacy, politics
+  - id: diplomatic_relation
+    labels: {fr: "relations diplomatiques", en: "diplomatic relations"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_symmetric_property
+      properties: [P530]
+      sources: [wikidata]
+    temporal: {kind: interval, description: "P580/P582 qualifiers; usually undated in Wikidata"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : relations diplomatiques (selon Wikidata)", en: "connected via: diplomatic relations (per Wikidata)"}
+    causal: false
+    status: derivable
+    path_cost: 1.5
+
+  - id: shared_head_of_state
+    labels: {fr: "même chef d'Etat", en: "shared head of state"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P35]
+      sources: [wikidata]
+      via: person
+      notes: "Personal unions and Commonwealth realms: the same person is head of state (P35) of both, over overlapping periods."
+    temporal: {kind: interval, description: "intersection of the two P35 statements"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : même chef d'Etat ({via}) sur la même période", en: "connected via: same head of state ({via}) over the same period"}
+    causal: false
+    status: derivable
+    path_cost: 1.0
+
+  - id: shared_currency
+    labels: {fr: "monnaie commune", en: "shared currency"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: kg_shared_object
+      properties: [P38]
+      sources: [wikidata]
+      via: currency
+    temporal: {kind: interval, description: "intersection of the two P38 statements"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : même monnaie ({via})", en: "connected via: same currency ({via})"}
+    causal: false
+    status: derivable
+    path_cost: 1.2
+
+  - id: shared_legal_family
+    labels: {fr: "même famille juridique", en: "same legal family"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: atlas_shared_value
+      concepts: [law.legal_system_family]
+      sources: [a_law]
+      notes: >-
+        Only if A-LAW ingests an open, licence-compatible classification (JuriGlobe's licence does not allow
+        redistribution; CIA World Factbook "legal system" text is public domain but free text). Equal
+        value_text in the same reference year.
+    temporal: {kind: snapshot, description: "reference year of the classification"}
+    weight: {kind: none}
+    honesty: {fr: "relié via : même famille juridique ({value}) selon {source}", en: "connected via: same legal family ({value}) per {source}"}
+    causal: false
+    status: awaiting_source
+    path_cost: 2.0
+
+  - id: unga_vote_agreement
+    labels: {fr: "concordance des votes à l'AG de l'ONU", en: "UN General Assembly vote agreement"}
+    scope: country_country
+    directed: false
+    derivation:
+      method: atlas_dyadic
+      concepts: [geopolitics.unga_vote_agreement]
+      sources: [unga_votes]
+      notes: >-
+        Agreement score per country pair and session year exactly as the source dataset publishes it (e.g.
+        Voeten/Bailey/Strezhnev "Agree" index). LINKS does not compute it.
+    temporal: {kind: snapshot, description: "UNGA session year"}
+    weight: {kind: source_quantity, unit: "1 (share of votes in agreement)"}
+    honesty: {fr: "relié via : concordance des votes à l'AG de l'ONU ({weight}, {year})", en: "connected via: UNGA vote agreement ({weight}, {year})"}
+    causal: false
+    status: awaiting_source
+    path_cost: 2.0
+
+  # ---------------------------------------------------------------- flows (atlas)
+  - id: bilateral_trade
+    labels: {fr: "commerce bilatéral (exportations)", en: "bilateral trade (exports)"}
+    inverse_labels: {fr: "destination des exportations de", en: "export destination of"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      concepts: [trade.bilateral_exports_total]
+      sources: [imf_dots]
+      notes: >-
+        IMF Direction of Trade Statistics, goods exports FOB reported by `iso3` to `counterpart_iso3`, one
+        reference year. A zero reported by the source is a reported zero: it is kept in the derivation
+        report and does not create a link. A missing cell is missing.
+    temporal: {kind: snapshot, description: "reference year"}
+    weight: {kind: source_quantity, unit: "USD (as reported, see row unit)"}
+    honesty: {fr: "relié via : exportations déclarées ({weight} {unit}, {year}, FMI DOTS)", en: "connected via: reported exports ({weight} {unit}, {year}, IMF DOTS)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.5
+
+  - id: migrant_stock
+    labels: {fr: "stock de migrants (origine → destination)", en: "migrant stock (origin → destination)"}
+    inverse_labels: {fr: "pays de destination des migrants nés en", en: "destination of migrants born in"}
+    scope: country_country
+    directed: true
+    derivation:
+      method: atlas_dyadic
+      concepts: [population.migrant_stock_by_origin]
+      sources: [un_desa_migrant_stock]
+      notes: "UN DESA International Migrant Stock: persons born in `iso3` (origin) living in `counterpart_iso3` (destination) at mid-year."
+    temporal: {kind: snapshot, description: "reference year (1990, 1995, ..., 2020, 2024)"}
+    weight: {kind: source_quantity, unit: persons}
+    honesty: {fr: "relié via : migrants nés dans l'un et vivant dans l'autre ({weight}, {year}, ONU DESA)", en: "connected via: migrants born in one living in the other ({weight}, {year}, UN DESA)"}
+    causal: false
+    status: awaiting_source
+    path_cost: 1.5
+
+# Properties the path engine traverses as single hops. labels: subject -> object; inverse_labels: object ->
+# subject. causal: true only for properties whose statements are causal claims of the source.
+statement_edges:
+  - {property: P17, labels: {fr: "pays", en: "country"}, inverse_labels: {fr: "pays de", en: "country of"}, path_cost: 1.0}
+  - {property: P30, labels: {fr: "continent", en: "continent"}, inverse_labels: {fr: "continent de", en: "continent of"}, path_cost: 2.0}
+  - {property: P36, labels: {fr: "capitale", en: "capital"}, inverse_labels: {fr: "capitale de", en: "capital of"}, path_cost: 1.0}
+  - {property: P1376, labels: {fr: "capitale de", en: "capital of"}, inverse_labels: {fr: "a pour capitale", en: "has capital"}, path_cost: 1.0}
+  - {property: P131, labels: {fr: "situé dans l'entité administrative", en: "located in the administrative entity"}, inverse_labels: {fr: "contient l'entité administrative", en: "contains the administrative entity"}, path_cost: 1.0}
+  - {property: P150, labels: {fr: "contient l'entité administrative", en: "contains the administrative entity"}, inverse_labels: {fr: "situé dans l'entité administrative", en: "located in the administrative entity"}, path_cost: 1.0}
+  - {property: P47, labels: {fr: "frontière commune avec", en: "shares border with"}, inverse_labels: {fr: "frontière commune avec", en: "shares border with"}, path_cost: 1.0}
+  - {property: P206, labels: {fr: "bordé par l'étendue d'eau", en: "located next to body of water"}, inverse_labels: {fr: "borde", en: "borders"}, path_cost: 1.5}
+  - {property: P276, labels: {fr: "lieu", en: "location"}, inverse_labels: {fr: "lieu de", en: "location of"}, path_cost: 1.0}
+  - {property: P3842, labels: {fr: "situé dans l'entité actuelle", en: "located in present-day entity"}, inverse_labels: {fr: "contient (aujourd'hui)", en: "present-day location of"}, path_cost: 1.0}
+  - {property: P1382, labels: {fr: "coïncide partiellement avec", en: "partially coincident with"}, inverse_labels: {fr: "coïncide partiellement avec", en: "partially coincident with"}, path_cost: 1.0}
+  - {property: P361, labels: {fr: "partie de", en: "part of"}, inverse_labels: {fr: "comprend", en: "has part"}, path_cost: 1.0}
+  - {property: P527, labels: {fr: "comprend", en: "has part"}, inverse_labels: {fr: "partie de", en: "part of"}, path_cost: 1.0}
+  - {property: P279, labels: {fr: "sous-classe de", en: "subclass of"}, inverse_labels: {fr: "a pour sous-classe", en: "has subclass"}, path_cost: 2.0}
+  - {property: P1269, labels: {fr: "aspect de", en: "facet of"}, inverse_labels: {fr: "a pour aspect", en: "has facet"}, path_cost: 1.2}
+  - {property: P2184, labels: {fr: "histoire du sujet", en: "history of topic"}, inverse_labels: {fr: "a pour histoire", en: "history topic of"}, path_cost: 1.2}
+  - {property: P921, labels: {fr: "sujet principal", en: "main subject"}, inverse_labels: {fr: "sujet principal de", en: "main subject of"}, path_cost: 1.2}
+  - {property: P2348, labels: {fr: "période", en: "time period"}, inverse_labels: {fr: "période de", en: "period of"}, path_cost: 1.5}
+  - {property: P1365, labels: {fr: "remplace", en: "replaces"}, inverse_labels: {fr: "remplacé par", en: "replaced by"}, path_cost: 1.0}
+  - {property: P1366, labels: {fr: "remplacé par", en: "replaced by"}, inverse_labels: {fr: "remplace", en: "replaces"}, path_cost: 1.0}
+  - {property: P155, labels: {fr: "précédé par", en: "follows"}, inverse_labels: {fr: "suivi par", en: "followed by"}, path_cost: 1.2}
+  - {property: P156, labels: {fr: "suivi par", en: "followed by"}, inverse_labels: {fr: "précédé par", en: "follows"}, path_cost: 1.2}
+  - {property: P35, labels: {fr: "chef d'Etat", en: "head of state"}, inverse_labels: {fr: "chef d'Etat de", en: "head of state of"}, path_cost: 1.0}
+  - {property: P6, labels: {fr: "chef du gouvernement", en: "head of government"}, inverse_labels: {fr: "chef du gouvernement de", en: "head of government of"}, path_cost: 1.0}
+  - {property: P1906, labels: {fr: "fonction de chef d'Etat", en: "office held by head of state"}, inverse_labels: {fr: "fonction de chef d'Etat de", en: "head-of-state office of"}, path_cost: 1.0}
+  - {property: P1313, labels: {fr: "fonction de chef du gouvernement", en: "office held by head of government"}, inverse_labels: {fr: "fonction de chef du gouvernement de", en: "head-of-government office of"}, path_cost: 1.0}
+  - {property: P39, labels: {fr: "fonction occupée", en: "position held"}, inverse_labels: {fr: "fonction occupée par", en: "position held by"}, path_cost: 1.0}
+  - {property: P194, labels: {fr: "corps législatif", en: "legislative body"}, inverse_labels: {fr: "corps législatif de", en: "legislative body of"}, path_cost: 1.0}
+  - {property: P208, labels: {fr: "organe exécutif", en: "executive body"}, inverse_labels: {fr: "organe exécutif de", en: "executive body of"}, path_cost: 1.0}
+  - {property: P209, labels: {fr: "plus haute autorité judiciaire", en: "highest judicial authority"}, inverse_labels: {fr: "plus haute autorité judiciaire de", en: "highest judicial authority of"}, path_cost: 1.0}
+  - {property: P122, labels: {fr: "forme de gouvernement", en: "basic form of government"}, inverse_labels: {fr: "forme de gouvernement de", en: "form of government of"}, path_cost: 2.0}
+  - {property: P1142, labels: {fr: "idéologie politique", en: "political ideology"}, inverse_labels: {fr: "idéologie de", en: "ideology of"}, path_cost: 1.5}
+  - {property: P102, labels: {fr: "membre du parti", en: "member of political party"}, inverse_labels: {fr: "a pour membre", en: "party member"}, path_cost: 1.0}
+  - {property: P1001, labels: {fr: "s'applique à la juridiction", en: "applies to jurisdiction"}, inverse_labels: {fr: "juridiction de", en: "jurisdiction of"}, path_cost: 1.0}
+  - {property: P1336, labels: {fr: "territoire revendiqué par", en: "territory claimed by"}, inverse_labels: {fr: "revendique le territoire", en: "claims territory"}, path_cost: 1.0}
+  - {property: P38, labels: {fr: "monnaie", en: "currency"}, inverse_labels: {fr: "monnaie de", en: "currency of"}, path_cost: 1.0}
+  - {property: P37, labels: {fr: "langue officielle", en: "official language"}, inverse_labels: {fr: "langue officielle de", en: "official language of"}, path_cost: 1.0}
+  - {property: P2936, labels: {fr: "langue utilisée", en: "language used"}, inverse_labels: {fr: "langue utilisée dans", en: "language used in"}, path_cost: 1.2}
+  - {property: P103, labels: {fr: "langue maternelle", en: "native language"}, inverse_labels: {fr: "langue maternelle de", en: "native language of"}, path_cost: 1.0}
+  - {property: P1412, labels: {fr: "langues parlées, écrites ou signées", en: "languages spoken, written or signed"}, inverse_labels: {fr: "langue parlée par", en: "spoken by"}, path_cost: 1.2}
+  - {property: P407, labels: {fr: "langue de l'œuvre", en: "language of work"}, inverse_labels: {fr: "langue de", en: "language of"}, path_cost: 1.5}
+  - {property: P2341, labels: {fr: "indigène de", en: "indigenous to"}, inverse_labels: {fr: "a pour langue indigène", en: "has indigenous"}, path_cost: 1.0}
+  - {property: P140, labels: {fr: "religion", en: "religion or worldview"}, inverse_labels: {fr: "religion de", en: "religion of"}, path_cost: 1.5}
+  - {property: P3075, labels: {fr: "religion officielle", en: "official religion"}, inverse_labels: {fr: "religion officielle de", en: "official religion of"}, path_cost: 1.0}
+  - {property: P172, labels: {fr: "groupe ethnique", en: "ethnic group"}, inverse_labels: {fr: "groupe ethnique de", en: "ethnic group of"}, path_cost: 1.5}
+  - {property: P463, labels: {fr: "membre de", en: "member of"}, inverse_labels: {fr: "a pour membre", en: "has member"}, path_cost: 1.0}
+  - {property: P530, labels: {fr: "relations diplomatiques avec", en: "diplomatic relation with"}, inverse_labels: {fr: "relations diplomatiques avec", en: "diplomatic relation with"}, path_cost: 1.5}
+  - {property: P607, labels: {fr: "conflit", en: "conflict"}, inverse_labels: {fr: "a pour belligérant", en: "conflict of"}, path_cost: 1.0}
+  - {property: P710, labels: {fr: "participant", en: "participant"}, inverse_labels: {fr: "participant à", en: "participant in"}, path_cost: 1.0}
+  - {property: P1344, labels: {fr: "participant à", en: "participant in"}, inverse_labels: {fr: "a pour participant", en: "participant"}, path_cost: 1.0}
+  - {property: P793, labels: {fr: "événement clé", en: "significant event"}, inverse_labels: {fr: "événement clé de", en: "significant event of"}, path_cost: 1.0}
+  - {property: P828, labels: {fr: "a pour cause", en: "has cause"}, inverse_labels: {fr: "cause de", en: "cause of"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "a pour cause", en: "has cause"}}
+  - {property: P1542, labels: {fr: "a pour effet", en: "has effect"}, inverse_labels: {fr: "effet de", en: "effect of"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "a pour effet", en: "has effect"}}
+  - {property: P1478, labels: {fr: "a pour cause immédiate", en: "has immediate cause"}, inverse_labels: {fr: "cause immédiate de", en: "immediate cause of"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "a pour cause immédiate", en: "has immediate cause"}}
+  - {property: P1536, labels: {fr: "cause immédiate de", en: "immediate cause of"}, inverse_labels: {fr: "a pour cause immédiate", en: "has immediate cause"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "est la cause immédiate de", en: "is the immediate cause of"}}
+  - {property: P1479, labels: {fr: "a pour facteur contributif", en: "has contributing factor"}, inverse_labels: {fr: "facteur contributif de", en: "contributing factor of"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "a pour facteur contributif", en: "has contributing factor"}}
+  - {property: P1537, labels: {fr: "facteur contributif de", en: "contributing factor of"}, inverse_labels: {fr: "a pour facteur contributif", en: "has contributing factor"}, path_cost: 1.0, causal: true, causal_phrase: {fr: "est un facteur contributif de", en: "is a contributing factor of"}}
+  - {property: P1891, labels: {fr: "signataire", en: "signatory"}, inverse_labels: {fr: "signataire de", en: "signatory of"}, path_cost: 1.0}
+  - {property: P790, labels: {fr: "approuvé par", en: "approved by"}, inverse_labels: {fr: "a approuvé", en: "approved"}, path_cost: 1.0}
+  - {property: P3005, labels: {fr: "valide dans le lieu", en: "valid in place"}, inverse_labels: {fr: "lieu de validité de", en: "place of validity of"}, path_cost: 1.0}
+  - {property: P1346, labels: {fr: "vainqueur", en: "winner"}, inverse_labels: {fr: "a remporté", en: "won"}, path_cost: 1.0}
+  - {property: P3342, labels: {fr: "personnalité importante", en: "significant person"}, inverse_labels: {fr: "personnalité importante pour", en: "significant person for"}, path_cost: 1.0}
+  - {property: P664, labels: {fr: "organisateur", en: "organizer"}, inverse_labels: {fr: "organisateur de", en: "organizer of"}, path_cost: 1.0}
+  - {property: P1427, labels: {fr: "point de départ", en: "start point"}, inverse_labels: {fr: "point de départ de", en: "start point of"}, path_cost: 1.0}
+  - {property: P1444, labels: {fr: "destination", en: "destination point"}, inverse_labels: {fr: "destination de", en: "destination of"}, path_cost: 1.0}
+  - {property: P1029, labels: {fr: "membre d'équipage", en: "crew member"}, inverse_labels: {fr: "membre d'équipage de", en: "crew member of"}, path_cost: 1.0}
+  - {property: P61, labels: {fr: "découvreur ou inventeur", en: "discoverer or inventor"}, inverse_labels: {fr: "a découvert ou inventé", en: "discovered or invented"}, path_cost: 1.0}
+  - {property: P27, labels: {fr: "nationalité", en: "country of citizenship"}, inverse_labels: {fr: "a pour ressortissant", en: "citizen"}, path_cost: 1.0}
+  - {property: P19, labels: {fr: "lieu de naissance", en: "place of birth"}, inverse_labels: {fr: "lieu de naissance de", en: "birthplace of"}, path_cost: 1.2}
+  - {property: P20, labels: {fr: "lieu de mort", en: "place of death"}, inverse_labels: {fr: "lieu de mort de", en: "deathplace of"}, path_cost: 1.2}
+  - {property: P108, labels: {fr: "employeur", en: "employer"}, inverse_labels: {fr: "employeur de", en: "employee"}, path_cost: 1.2}
+  - {property: P69, labels: {fr: "scolarité", en: "educated at"}, inverse_labels: {fr: "a pour ancien élève", en: "alumnus"}, path_cost: 1.5}
+  - {property: P166, labels: {fr: "distinction reçue", en: "award received"}, inverse_labels: {fr: "décernée à", en: "awarded to"}, path_cost: 2.0}
+  - {property: P22, labels: {fr: "père", en: "father"}, inverse_labels: {fr: "enfant de (père)", en: "child of (father)"}, path_cost: 1.2}
+  - {property: P25, labels: {fr: "mère", en: "mother"}, inverse_labels: {fr: "enfant de (mère)", en: "child of (mother)"}, path_cost: 1.2}
+  - {property: P26, labels: {fr: "conjoint", en: "spouse"}, inverse_labels: {fr: "conjoint", en: "spouse"}, path_cost: 1.2}
+  - {property: P40, labels: {fr: "enfant", en: "child"}, inverse_labels: {fr: "parent", en: "parent"}, path_cost: 1.2}
+  - {property: P3373, labels: {fr: "frère ou sœur", en: "sibling"}, inverse_labels: {fr: "frère ou sœur", en: "sibling"}, path_cost: 1.2}
+  - {property: P53, labels: {fr: "famille", en: "family"}, inverse_labels: {fr: "membre de la famille", en: "family member"}, path_cost: 1.2}
+  - {property: P97, labels: {fr: "titre de noblesse", en: "noble title"}, inverse_labels: {fr: "titre porté par", en: "noble title holder"}, path_cost: 1.5}
+  - {property: P551, labels: {fr: "résidence", en: "residence"}, inverse_labels: {fr: "résidence de", en: "residence of"}, path_cost: 1.5}
+  - {property: P937, labels: {fr: "lieu de travail", en: "work location"}, inverse_labels: {fr: "lieu de travail de", en: "work location of"}, path_cost: 1.5}
+  - {property: P135, labels: {fr: "mouvement", en: "movement"}, inverse_labels: {fr: "a pour membre", en: "movement member"}, path_cost: 1.5}
+  - {property: P737, labels: {fr: "influencé par", en: "influenced by"}, inverse_labels: {fr: "a influencé", en: "influenced"}, path_cost: 1.2}
+  - {property: P800, labels: {fr: "œuvre notable", en: "notable work"}, inverse_labels: {fr: "œuvre notable de", en: "notable work of"}, path_cost: 1.0}
+  - {property: P50, labels: {fr: "auteur", en: "author"}, inverse_labels: {fr: "auteur de", en: "author of"}, path_cost: 1.0}
+  - {property: P170, labels: {fr: "créateur", en: "creator"}, inverse_labels: {fr: "créateur de", en: "creator of"}, path_cost: 1.0}
+  - {property: P495, labels: {fr: "pays d'origine", en: "country of origin"}, inverse_labels: {fr: "pays d'origine de", en: "country of origin of"}, path_cost: 1.2}
+  - {property: P2596, labels: {fr: "culture", en: "culture"}, inverse_labels: {fr: "culture de", en: "culture of"}, path_cost: 1.2}
+  - {property: P1435, labels: {fr: "statut patrimonial", en: "heritage designation"}, inverse_labels: {fr: "statut patrimonial de", en: "heritage designation of"}, path_cost: 2.0}
+  - {property: P1066, labels: {fr: "élève de", en: "student of"}, inverse_labels: {fr: "professeur de", en: "teacher of"}, path_cost: 1.0}
+  - {property: P802, labels: {fr: "étudiant", en: "student"}, inverse_labels: {fr: "étudiant de", en: "student of"}, path_cost: 1.0}
+  - {property: P184, labels: {fr: "directeur de thèse", en: "doctoral advisor"}, inverse_labels: {fr: "a pour doctorant", en: "doctoral student"}, path_cost: 1.0}
+  - {property: P112, labels: {fr: "fondateur", en: "founded by"}, inverse_labels: {fr: "fondateur de", en: "founder of"}, path_cost: 1.0}
+  - {property: P127, labels: {fr: "propriétaire", en: "owned by"}, inverse_labels: {fr: "propriétaire de", en: "owner of"}, path_cost: 1.2}
+  - {property: P1830, labels: {fr: "propriétaire de", en: "owner of"}, inverse_labels: {fr: "appartient à", en: "owned by"}, path_cost: 1.2}
+  - {property: P749, labels: {fr: "organisation mère", en: "parent organization"}, inverse_labels: {fr: "filiale", en: "subsidiary"}, path_cost: 1.2}
+  - {property: P355, labels: {fr: "filiale", en: "has subsidiary"}, inverse_labels: {fr: "organisation mère", en: "parent organization"}, path_cost: 1.2}
+  - {property: P488, labels: {fr: "président", en: "chairperson"}, inverse_labels: {fr: "préside", en: "chairperson of"}, path_cost: 1.0}
+  - {property: P1037, labels: {fr: "directeur", en: "director / manager"}, inverse_labels: {fr: "dirige", en: "directs"}, path_cost: 1.0}
+  - {property: P159, labels: {fr: "siège", en: "headquarters location"}, inverse_labels: {fr: "siège de", en: "headquarters of"}, path_cost: 1.5}
+  - {property: P740, labels: {fr: "lieu de fondation", en: "location of formation"}, inverse_labels: {fr: "lieu de fondation de", en: "formation location of"}, path_cost: 1.5}

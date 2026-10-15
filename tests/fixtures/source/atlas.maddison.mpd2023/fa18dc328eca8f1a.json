@@ -1,0 +1,366 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 421301,
+  "identifier": "INZBF2",
+  "persistentUrl": "https://doi.org/10.34894/INZBF2",
+  "protocol": "doi",
+  "authority": "10.34894",
+  "separator": "/",
+  "publisher": "DataverseNL",
+  "publicationDate": "2024-04-26",
+  "storageIdentifier": "surf://10.34894/INZBF2",
+  "effectiveDatasetFileCountLimit": 10000,
+  "datasetFileUploadsAvailable": 9998,
+  "datasetType": "dataset",
+  "locks": [],
+  "latestVersion": {
+   "id": 27662,
+   "datasetId": 421301,
+   "datasetPersistentId": "doi:10.34894/INZBF2",
+   "datasetType": "dataset",
+   "storageIdentifier": "surf://10.34894/INZBF2",
+   "versionNumber": 1,
+   "internalVersionNumber": 19,
+   "versionMinorNumber": 0,
+   "versionState": "RELEASED",
+   "latestVersionPublishingState": "RELEASED",
+   "deaccessionLink": "",
+   "lastUpdateTime": "2024-04-26T08:43:37Z",
+   "releaseTime": "2024-04-26T08:43:37Z",
+   "createTime": "2024-04-26T07:21:55Z",
+   "publicationDate": "2024-04-26",
+   "citationDate": "2024-04-26",
+   "effectiveDatasetFileCountLimit": 10000,
+   "datasetFileUploadsAvailable": 9998,
+   "license": {
+    "name": "CC-BY-4.0",
+    "uri": "http://creativecommons.org/licenses/by/4.0",
+    "iconUri": "https://i.creativecommons.org/l/by/4.0/88x31.png"
+   },
+   "fileAccessRequest": true,
+   "metadataBlocks": {
+    "citation": {
+     "displayName": "Citation Metadata",
+     "name": "citation",
+     "fields": [
+      {
+       "typeName": "title",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "Maddison Project Database 2023"
+      },
+      {
+       "typeName": "alternativeTitle",
+       "multiple": true,
+       "typeClass": "primitive",
+       "value": [
+        "MPD 2023"
+       ]
+      },
+      {
+       "typeName": "alternativeURL",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "https://www.rug.nl/ggdc/historicaldevelopment/maddison/"
+      },
+      {
+       "typeName": "author",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "authorName": {
+          "typeName": "authorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Bolt, Jutta"
+         },
+         "authorAffiliation": {
+          "typeName": "authorAffiliation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "University of Groningen"
+         }
+        },
+        {
+         "authorName": {
+          "typeName": "authorName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Van Zanden, Jan Luiten"
+         },
+         "authorAffiliation": {
+          "typeName": "authorAffiliation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Utrecht University"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "datasetContact",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "datasetContactName": {
+          "typeName": "datasetContactName",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "GGDC"
+         },
+         "datasetContactAffiliation": {
+          "typeName": "datasetContactAffiliation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "University of Groningen"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "dsDescription",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "dsDescriptionValue": {
+          "typeName": "dsDescriptionValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "The Maddison Project Database 2023 release is the latest iteration of the Maddison Project Database (MPD). The dataset incorporates new time series data on GDP per capita and population for 169 countries and aggregate regions from 1 AD up to 2022. The original Maddison methodology has been refined. The data includes information on comparative economic growth and income levels over the very long run. The 2023 version of this database covers 169 countries and the period up to 2022.<br><br>\n\n<b>When using these data (for whatever purpose), please make the following reference:</b><br>\n\nMPD version 2023: Bolt, Jutta and Jan Luiten van Zanden (2024). Maddison style estimates of the evolution of the world economy: A new 2023 update. Journal of Economic Surveys, 1\u201341. <a href= \"https://doi.org/10.1111/joes.12618\" target=\"_blank\">DOI: 10.1111/joes.12618</a>\n\n<br><br>\n<b>All original papers must be cited when:</b><br>\n<ol>\n<li>The data is shown in any graphical form</li>\n<li> Subsets of the full dataset that include less than a dozen (12) countries are used for statistical analysis or any other purposes</li>\n</ol>\n\nA list of original papers can be found in the source sheet of the database. When neither 1) or 2) apply, then the MPD as a whole should be cited.\n\n<br><br>\n\nMore information about this release of the of the Maddison Project Database can be found on the <a href=\"https://www.rug.nl/ggdc/historicaldevelopment/maddison/\">associated page</a> on the website of the <a href=\"https://www.rug.nl/ggdc/\" target=_blank\">Groningen Growth and Development Centre</a>."
+         },
+         "dsDescriptionDate": {
+          "typeName": "dsDescriptionDate",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "2024-04-26"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "subject",
+       "multiple": true,
+       "typeClass": "controlledVocabulary",
+       "value": [
+        "Social Sciences"
+       ]
+      },
+      {
+       "typeName": "keyword",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "GDP"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Economic growth"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Maddison"
+         }
+        },
+        {
+         "keywordValue": {
+          "typeName": "keywordValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "historical time series"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "topicClassification",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "topicClassValue": {
+          "typeName": "topicClassValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "GDP"
+         }
+        },
+        {
+         "topicClassValue": {
+          "typeName": "topicClassValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Economic growth"
+         }
+        },
+        {
+         "topicClassValue": {
+          "typeName": "topicClassValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Industrial Revolution"
+         }
+        },
+        {
+         "topicClassValue": {
+          "typeName": "topicClassValue",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "Maddison Project"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "publication",
+       "multiple": true,
+       "typeClass": "compound",
+       "value": [
+        {
+         "publicationCitation": {
+          "typeName": "publicationCitation",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "MPD version 2023: Bolt, Jutta and Jan Luiten van Zanden (2024). Maddison style estimates of the evolution of the world economy: A new 2023 update. Journal of Economic Surveys, 1\u201341"
+         },
+         "publicationIDType": {
+          "typeName": "publicationIDType",
+          "multiple": false,
+          "typeClass": "controlledVocabulary",
+          "value": "doi"
+         },
+         "publicationIDNumber": {
+          "typeName": "publicationIDNumber",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "10.1111/joes.12618"
+         },
+         "publicationURL": {
+          "typeName": "publicationURL",
+          "multiple": false,
+          "typeClass": "primitive",
+          "value": "https://doi.org/10.1111/joes.12618"
+         }
+        }
+       ]
+      },
+      {
+       "typeName": "depositor",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "Gouma, Reitze"
+      },
+      {
+       "typeName": "dateOfDeposit",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "2024-04-26"
+      }
+     ]
+    },
+    "dansDataVaultMetadata": {
+     "displayName": "Data Vault Metadata",
+     "name": "dansDataVaultMetadata",
+     "fields": [
+      {
+       "typeName": "dansDataversePid",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "doi:10.34894/INZBF2"
+      },
+      {
+       "typeName": "dansDataversePidVersion",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "1.0"
+      },
+      {
+       "typeName": "dansBagId",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "urn:uuid:fdb268dc-c6f4-4398-a8b9-9a47bfd0c8b2"
+      },
+      {
+       "typeName": "dansNbn",
+       "multiple": false,
+       "typeClass": "primitive",
+       "value": "urn:nbn:nl:ui:13-90abda5f-51d2-4916-b931-443f0a8ad413"
+      }
+     ]
+    }
+   },
+   "files": [
+    {
+     "description": "Maddison Project Database STATA file",
+     "label": "maddison2023_web.dta",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 27662,
+     "dataFile": {
+      "id": 421303,
+      "persistentId": "",
+      "filename": "maddison2023_web.dta",
+      "contentType": "application/x-stata-14",
+      "friendlyType": "Stata 14 Binary",
+      "filesize": 10892389,
+      "description": "Maddison Project Database STATA file",
+      "storageIdentifier": "surf://store:18f1947b459-7fbdbbff0a80",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "264862c8a188d4bc770b607663211ec1c4eb0d5d"
+      },
+      "tabularData": false,
+      "creationDate": "2024-04-26",
+      "publicationDate": "2024-04-26",
+      "lastUpdateTime": "2024-04-26T08:43:37Z",
+      "fileAccessRequest": true
+     }
+    },
+    {
+     "description": "Maddison Project Database Excel file",
+     "label": "mpd2023_web.xlsx",
+     "restricted": false,
+     "version": 1,
+     "datasetVersionId": 27662,
+     "dataFile": {
+      "id": 421302,
+      "persistentId": "",
+      "filename": "mpd2023_web.xlsx",
+      "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "friendlyType": "MS Excel Spreadsheet",
+      "filesize": 196190,
+      "description": "Maddison Project Database Excel file",
+      "storageIdentifier": "surf://store:18f1947b695-c2971390baa0",
+      "rootDataFileId": -1,
+      "checksum": {
+       "type": "SHA-1",
+       "value": "27f193b18169653a43df7ef574d4c2cc4ee16a8c"
+      },
+      "tabularData": false,
+      "creationDate": "2024-04-26",
+      "publicationDate": "2024-04-26",
+      "lastUpdateTime": "2024-04-26T08:43:37Z",
+      "fileAccessRequest": true
+     }
+    }
+   ]
+  }
+ }
+}

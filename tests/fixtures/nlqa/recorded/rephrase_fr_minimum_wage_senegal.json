@@ -1,0 +1,16 @@
+{
+ "fixture_kind": "synthetic_plan",
+ "label": "rephrase_fr_minimum_wage_senegal",
+ "note": "Hand-written rephrase output (NOT a model recording); see the plan fixtures' note.",
+ "prompt_version": "nlqa-rephrase-1.0.0",
+ "text": "Quel est le salaire minimum au Sénégal ?",
+ "text_sha256": "d2501f0675a8d0d23108865c39af702c13ce9c48830c2b63f5d3ccbaf46f5342",
+ "output": {
+  "sentences": [
+   {
+    "id": "S1",
+    "text": "Au Sénégal, le salaire minimum mensuel (monnaie locale) était de 58 900 XOF per month en 2019 (source : ilo/ilostat_mw, indicateur EAR_INEE_NOC_NB|cur=LCU ; signalement de la source : note=national legislation)."
+   }
+  ]
+ }
+}

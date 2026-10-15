@@ -1,0 +1,36 @@
+# Budget request from agent A-HISTECON (long-run history layer). ATLASCORE merges into
+# registry/policies/budgets.yaml (per_source_daily_requests + daily totals). Every source below is a
+# bulk download (whole dataset per request); a full refresh of all of them is ~200 requests / ~60 MB.
+agent: A-HISTECON
+requests:
+  - source_key: maddison.mpd
+    # dataverse.nl dataset record (doi:10.34894/INZBF2) + mpd2023_web.xlsx (4.9 MB; the access URL
+    # redirects to objectstore.surf.nl). CC BY 4.0.
+    daily_requests: 10
+    expected_bytes_per_day: 12000000
+    reason: "Maddison Project Database 2023: 2 requests per run (record + workbook)"
+  - source_key: clio_infra.dataverse
+    # dataverse.nl search API (subtree clioinfra, 1 request), one dataset record per Clio-Infra dataset
+    # (89) and its '-historical.xlsx' data file (89, 15-400 KB each). CC0-1.0 per dataset record.
+    daily_requests: 250
+    expected_bytes_per_day: 60000000
+    reason: "Clio-Infra (89 datasets, IISH deposit migrated to dataverse.nl): ~180 small requests per full run"
+  - source_key: gapminder.fasttrack
+    # raw.githubusercontent.com/open-numbers/ddf--gapminder--fasttrack: ddf--concepts.csv,
+    # ddf--entities--geo--country.csv, 3 datapoint CSVs (pop, lex, gdp_pcap; ~1 MB each). CC BY 4.0.
+    daily_requests: 20
+    expected_bytes_per_day: 10000000
+    reason: "Gapminder Fast Track DDF repository: 5 requests per run"
+  - source_key: cow.data
+    # correlatesofwar.org/wp-content/uploads: States2024.zip, System2024.zip, MajorPowers2024.zip,
+    # NMCv7.zip, Inter-/Extra-/Non-State war CSVs, Intra-State-Wars-v5.1.zip. COW terms: cite, no charging.
+    daily_requests: 20
+    expected_bytes_per_day: 30000000
+    reason: "Correlates of War: ~8 bulk files per run"
+daily_totals_increase:
+  http_requests_total: "+300"
+  http_bytes_total: "+112_000_000"
+notes: >-
+  HYDE 3.x is not requested: HYDE 3.3 (public.yoda.uu.nl / geo.public.data.uu.nl) sits behind an
+  Anubis proof-of-work bot challenge (not circumvented), and HYDE 3.2.1 on DANS ships the country
+  summaries only inside a 5.3 GB zip (over the 1.5 GB agent disk budget). See docs/dev/v3_a_histecon.md.

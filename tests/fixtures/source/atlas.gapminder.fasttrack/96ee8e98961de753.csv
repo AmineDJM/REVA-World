@@ -1,0 +1,4 @@
+concept,concept_type,source_url,version,updated,name_short,name,name_catalog,description,unit,tags,color,format,scales,domain,indicator_url,drill_up
+gdp_pcap,measure,http://gapm.io/dgdpcap_cppp,v32,"September 20, 2025",GDP per capita,"GDP per capita, PPP (constant 2021 international $)",GDP per capita,"Gross domestic product per person adjusted for differences in purchasing power (in international dollars, fixed 2021 prices, PPP based on 2021 ICP).",,_root incomes_growth,,,log linear,,,
+lex,measure,http://gapm.io/dlex,v15,"April 5, 2026",Life expectancy,"Life expectancy, at birth",Life expectancy,The number of years a newborn infant would live if the current mortality rates at different ages were to stay the same throughout its life.,,_root health,,,,,,
+pop,measure,http://gapm.io/dpop,v8,"July 29, 2024",Population,Population,Population,Total population counts the number of inhabitants in the territory.,,_root population,,,,,,

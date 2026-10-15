@@ -223,6 +223,10 @@ def create_app(
     ):
         app.include_router(r)
     app.include_router(__import__("reva.api.routes.nl", fromlist=["router"]).router)  # V2 NL drafts (agent NLC)
+    app.include_router(__import__("reva.api.routes.ask", fromlist=["router"]).router)  # V3 questions (NLQA)
+    app.include_router(__import__("reva.api.routes.atlas", fromlist=["router"]).router)  # V3 atlas (ATLASCORE)
+    app.include_router(__import__("reva.api.routes.kg", fromlist=["router"]).router)  # V3 knowledge graph (KGCORE)
+    app.include_router(__import__("reva.api.routes.links", fromlist=["router"]).router)  # V3 links (LINKS)
 
     # Added before the header middleware so that it runs inside it: its 413 responses get headers/metrics.
     app.add_middleware(BodySizeLimit, max_bytes=max_body_bytes)

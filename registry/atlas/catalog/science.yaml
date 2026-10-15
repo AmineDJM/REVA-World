@@ -1,0 +1,2380 @@
+# Science & technology concepts of the atlas (agent A-SCI). Provider-declared, not human-reviewed.
+# Generated (concept list) from the connectors' constants and the WIPO technology-field table; see
+# docs/dev/v3_a_sci.md. Sources: OpenAlex (CC0), Nobel Prize Outreach API (CC0), WIPO IP Statistics bulk files and
+# Global Innovation Index 2025 (CC BY 4.0, WIPO Open Access Policy). World Bank IP.JRN.ARTC.SC / TX.VAL.TECH.* and
+# IP.PAT.* (WIPO via WDI) are catalogued by A-WB; UNESCO UIS R&D by A-HEALTHEDU.
+domain: science
+labels:
+  fr: Science et technologie
+  en: Science and technology
+maintainer: A-SCI
+concepts:
+- id: sci.openalex.works
+  labels:
+    fr: Publications scientifiques (articles et revues, OpenAlex)
+    en: Scholarly works (articles and reviews, OpenAlex)
+  definition: 'Number of scholarly works of type article or review indexed by OpenAlex with publication year Y and at least
+    one authorship affiliated to an institution in the country (OpenAlex authorships.countries; full counting: a work counts
+    once for every country among its authors, so country counts do not sum to the world total).'
+  unit: works
+  domain: science
+  subdomain: publications
+  source_order:
+  - openalex.works_country_year.works|type=article,review
+  provider_declared: true
+  notes: 'OpenAlex is a live index: counts are as indexed at retrieval (flags.retrieved_at) and drift as records are added,
+    merged or re-attributed. Affiliation-country coverage is sparse before ~1990. Rows provider_geo ''_all_works'' (all matching
+    works) and ''unknown'' (works without a country) are kept unmapped for shares and coverage. Not comparable with WDI IP.JRN.ARTC.SC
+    (Scopus-based, fractional counting).'
+  tags:
+  - openalex
+  - cc0
+  - full_counting
+- id: sci.openalex.works.domain_1
+  labels:
+    fr: Publications scientifiques — Sciences de la vie (OpenAlex)
+    en: Scholarly works — Life Sciences (OpenAlex)
+  definition: 'Number of scholarly works of type article or review indexed by OpenAlex with publication year Y and at least
+    one authorship affiliated to an institution in the country (OpenAlex authorships.countries; full counting: a work counts
+    once for every country among its authors, so country counts do not sum to the world total). Restricted to works whose
+    primary topic belongs to the OpenAlex domain ''Life Sciences'' (domain id 1).'
+  unit: works
+  domain: science
+  subdomain: publications
+  source_order:
+  - openalex.works_country_domain.works|type=article,review|domain=1
+  provider_declared: true
+  notes: 'OpenAlex is a live index: counts are as indexed at retrieval (flags.retrieved_at) and drift as records are added,
+    merged or re-attributed. Affiliation-country coverage is sparse before ~1990. Rows provider_geo ''_all_works'' (all matching
+    works) and ''unknown'' (works without a country) are kept unmapped for shares and coverage. Not comparable with WDI IP.JRN.ARTC.SC
+    (Scopus-based, fractional counting).'
+  tags:
+  - openalex
+  - cc0
+  - full_counting
+- id: sci.openalex.works.domain_2
+  labels:
+    fr: Publications scientifiques — Sciences sociales (OpenAlex)
+    en: Scholarly works — Social Sciences (OpenAlex)
+  definition: 'Number of scholarly works of type article or review indexed by OpenAlex with publication year Y and at least
+    one authorship affiliated to an institution in the country (OpenAlex authorships.countries; full counting: a work counts
+    once for every country among its authors, so country counts do not sum to the world total). Restricted to works whose
+    primary topic belongs to the OpenAlex domain ''Social Sciences'' (domain id 2).'
+  unit: works
+  domain: science
+  subdomain: publications
+  source_order:
+  - openalex.works_country_domain.works|type=article,review|domain=2
+  provider_declared: true
+  notes: 'OpenAlex is a live index: counts are as indexed at retrieval (flags.retrieved_at) and drift as records are added,
+    merged or re-attributed. Affiliation-country coverage is sparse before ~1990. Rows provider_geo ''_all_works'' (all matching
+    works) and ''unknown'' (works without a country) are kept unmapped for shares and coverage. Not comparable with WDI IP.JRN.ARTC.SC
+    (Scopus-based, fractional counting).'
+  tags:
+  - openalex
+  - cc0
+  - full_counting
+- id: sci.openalex.works.domain_3
+  labels:
+    fr: Publications scientifiques — Sciences physiques (OpenAlex)
+    en: Scholarly works — Physical Sciences (OpenAlex)
+  definition: 'Number of scholarly works of type article or review indexed by OpenAlex with publication year Y and at least
+    one authorship affiliated to an institution in the country (OpenAlex authorships.countries; full counting: a work counts
+    once for every country among its authors, so country counts do not sum to the world total). Restricted to works whose
+    primary topic belongs to the OpenAlex domain ''Physical Sciences'' (domain id 3).'
+  unit: works
+  domain: science
+  subdomain: publications
+  source_order:
+  - openalex.works_country_domain.works|type=article,review|domain=3
+  provider_declared: true
+  notes: 'OpenAlex is a live index: counts are as indexed at retrieval (flags.retrieved_at) and drift as records are added,
+    merged or re-attributed. Affiliation-country coverage is sparse before ~1990. Rows provider_geo ''_all_works'' (all matching
+    works) and ''unknown'' (works without a country) are kept unmapped for shares and coverage. Not comparable with WDI IP.JRN.ARTC.SC
+    (Scopus-based, fractional counting).'
+  tags:
+  - openalex
+  - cc0
+  - full_counting
+- id: sci.openalex.works.domain_4
+  labels:
+    fr: Publications scientifiques — Sciences de la santé (OpenAlex)
+    en: Scholarly works — Health Sciences (OpenAlex)
+  definition: 'Number of scholarly works of type article or review indexed by OpenAlex with publication year Y and at least
+    one authorship affiliated to an institution in the country (OpenAlex authorships.countries; full counting: a work counts
+    once for every country among its authors, so country counts do not sum to the world total). Restricted to works whose
+    primary topic belongs to the OpenAlex domain ''Health Sciences'' (domain id 4).'
+  unit: works
+  domain: science
+  subdomain: publications
+  source_order:
+  - openalex.works_country_domain.works|type=article,review|domain=4
+  provider_declared: true
+  notes: 'OpenAlex is a live index: counts are as indexed at retrieval (flags.retrieved_at) and drift as records are added,
+    merged or re-attributed. Affiliation-country coverage is sparse before ~1990. Rows provider_geo ''_all_works'' (all matching
+    works) and ''unknown'' (works without a country) are kept unmapped for shares and coverage. Not comparable with WDI IP.JRN.ARTC.SC
+    (Scopus-based, fractional counting).'
+  tags:
+  - openalex
+  - cc0
+  - full_counting
+- id: sci.nobel.born.all
+  labels:
+    fr: Lauréats Nobel nés dans le pays — toutes catégories (par année)
+    en: Nobel laureates born in the country — all categories (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=all
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.all
+  labels:
+    fr: Lauréats Nobel nés dans le pays — toutes catégories (cumul depuis 1901)
+    en: Nobel laureates born in the country — all categories (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Period: 1901 to the latest award year of the list
+    (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=all
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.phy
+  labels:
+    fr: Lauréats Nobel nés dans le pays — physique (par année)
+    en: Nobel laureates born in the country — Physics (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Physics. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=phy
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.phy
+  labels:
+    fr: Lauréats Nobel nés dans le pays — physique (cumul depuis 1901)
+    en: Nobel laureates born in the country — Physics (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Physics. Period: 1901 to the latest award
+    year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=phy
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.che
+  labels:
+    fr: Lauréats Nobel nés dans le pays — chimie (par année)
+    en: Nobel laureates born in the country — Chemistry (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Chemistry. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=che
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.che
+  labels:
+    fr: Lauréats Nobel nés dans le pays — chimie (cumul depuis 1901)
+    en: Nobel laureates born in the country — Chemistry (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Chemistry. Period: 1901 to the latest award
+    year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=che
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.med
+  labels:
+    fr: Lauréats Nobel nés dans le pays — physiologie ou médecine (par année)
+    en: Nobel laureates born in the country — Physiology or Medicine (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Physiology or Medicine. Period: the award
+    year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=med
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.med
+  labels:
+    fr: Lauréats Nobel nés dans le pays — physiologie ou médecine (cumul depuis 1901)
+    en: Nobel laureates born in the country — Physiology or Medicine (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Physiology or Medicine. Period: 1901 to
+    the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=med
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.lit
+  labels:
+    fr: Lauréats Nobel nés dans le pays — littérature (par année)
+    en: Nobel laureates born in the country — Literature (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Literature. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=lit
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.lit
+  labels:
+    fr: Lauréats Nobel nés dans le pays — littérature (cumul depuis 1901)
+    en: Nobel laureates born in the country — Literature (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Literature. Period: 1901 to the latest award
+    year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=lit
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.pea
+  labels:
+    fr: Lauréats Nobel nés dans le pays — paix (par année)
+    en: Nobel laureates born in the country — Peace (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Peace. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=pea
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.pea
+  labels:
+    fr: Lauréats Nobel nés dans le pays — paix (cumul depuis 1901)
+    en: Nobel laureates born in the country — Peace (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Peace. Period: 1901 to the latest award
+    year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=pea
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born.eco
+  labels:
+    fr: Lauréats Nobel nés dans le pays — sciences économiques (par année)
+    en: Nobel laureates born in the country — Economic Sciences (per award year)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Economic Sciences. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born|category=eco
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.born_total.eco
+  labels:
+    fr: Lauréats Nobel nés dans le pays — sciences économiques (cumul depuis 1901)
+    en: Nobel laureates born in the country — Economic Sciences (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records (an individual laureate in one award year and category) whose birth
+    place lies, in present-day borders, in the country (Nobel API birth.place.countryNow; e.g. born in Breslau, Germany, counts
+    for Poland). Organisations have no birth place and are not counted. Category: Economic Sciences. Period: 1901 to the latest
+    award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.born_total|category=eco
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.all
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — toutes catégories (par année)
+    en: Nobel laureates affiliated in the country — all categories (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=all
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.all
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — toutes catégories (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — all categories (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=all
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.phy
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — physique (par année)
+    en: Nobel laureates affiliated in the country — Physics (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Physics. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=phy
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.phy
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — physique (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Physics (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Physics. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=phy
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.che
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — chimie (par année)
+    en: Nobel laureates affiliated in the country — Chemistry (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Chemistry. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=che
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.che
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — chimie (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Chemistry (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Chemistry. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=che
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.med
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — physiologie ou médecine (par année)
+    en: Nobel laureates affiliated in the country — Physiology or Medicine (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Physiology or Medicine. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=med
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.med
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — physiologie ou médecine (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Physiology or Medicine (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Physiology or Medicine. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=med
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.lit
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — littérature (par année)
+    en: Nobel laureates affiliated in the country — Literature (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Literature. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=lit
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.lit
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — littérature (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Literature (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Literature. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=lit
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.pea
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — paix (par année)
+    en: Nobel laureates affiliated in the country — Peace (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Peace. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=pea
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.pea
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — paix (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Peace (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Peace. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=pea
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated.eco
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — sciences économiques (par année)
+    en: Nobel laureates affiliated in the country — Economic Sciences (per award year)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Economic Sciences. Period: the award year.'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated|category=eco
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.nobel.affiliated_total.eco
+  labels:
+    fr: Lauréats Nobel affiliés dans le pays — sciences économiques (cumul depuis 1901)
+    en: Nobel laureates affiliated in the country — Economic Sciences (cumulative since 1901)
+  definition: 'Number of Nobel laureate-prize records with at least one affiliation at the time of the award located in the
+    country (present-day borders, Nobel API affiliations[].countryNow); full counting: a laureate with affiliations in two
+    countries counts in both. Category: Economic Sciences. Period: 1901 to the latest award year of the list (one cell).'
+  unit: laureate-prize records
+  domain: science
+  subdomain: nobel
+  source_order:
+  - nobel.laureates.affiliated_total|category=eco
+  provider_declared: true
+  notes: Counted by REVA from the complete Nobel Prize Outreach laureate list (api.nobelprize.org v2.1, CC0); flags.aggregation
+    = count, computed_by = reva. A country without a row has no such laureate in the list (not a reported zero). Economic
+    Sciences = Sveriges Riksbank Prize (from 1969). Prizes declined or restricted are counted and flagged (flags.includes_prize_status).
+  tags:
+  - nobel
+  - cc0
+  - count
+- id: sci.gii.index.score
+  labels:
+    fr: Indice mondial de l'innovation — score (GII 2025)
+    en: Global Innovation Index — score (GII 2025)
+  definition: Score (0-100) of the GII index 'Global Innovation Index' as published by WIPO in the Global Innovation Index
+    2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.GII|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.index.rank
+  labels:
+    fr: Indice mondial de l'innovation — rang (GII 2025)
+    en: Global Innovation Index — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the index 'Global Innovation Index' (1 = highest score), as published
+    by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.GII|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in.score
+  labels:
+    fr: Sous-indice des intrants de l'innovation — score (GII 2025)
+    en: Innovation Input Sub-Index — score (GII 2025)
+  definition: Score (0-100) of the GII sub-index 'Innovation Input Sub-Index' as published by WIPO in the Global Innovation
+    Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in.rank
+  labels:
+    fr: Sous-indice des intrants de l'innovation — rang (GII 2025)
+    en: Innovation Input Sub-Index — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the sub-index 'Innovation Input Sub-Index' (1 = highest score), as
+    published by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out.score
+  labels:
+    fr: Sous-indice des extrants de l'innovation — score (GII 2025)
+    en: Innovation Output Sub-Index — score (GII 2025)
+  definition: Score (0-100) of the GII sub-index 'Innovation Output Sub-Index' as published by WIPO in the Global Innovation
+    Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out.rank
+  labels:
+    fr: Sous-indice des extrants de l'innovation — rang (GII 2025)
+    en: Innovation Output Sub-Index — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the sub-index 'Innovation Output Sub-Index' (1 = highest score), as
+    published by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_1.score
+  labels:
+    fr: Institutions — score (GII 2025)
+    en: Institutions — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Institutions' as published by WIPO in the Global Innovation Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.1|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_1.rank
+  labels:
+    fr: Institutions — rang (GII 2025)
+    en: Institutions — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Institutions' (1 = highest score), as published by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.1|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_2.score
+  labels:
+    fr: Capital humain et recherche — score (GII 2025)
+    en: Human capital and research — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Human capital and research' as published by WIPO in the Global Innovation Index
+    2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.2|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_2.rank
+  labels:
+    fr: Capital humain et recherche — rang (GII 2025)
+    en: Human capital and research — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Human capital and research' (1 = highest score), as published
+    by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.2|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_3.score
+  labels:
+    fr: Infrastructure — score (GII 2025)
+    en: Infrastructure — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Infrastructure' as published by WIPO in the Global Innovation Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.3|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_3.rank
+  labels:
+    fr: Infrastructure — rang (GII 2025)
+    en: Infrastructure — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Infrastructure' (1 = highest score), as published by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.3|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_4.score
+  labels:
+    fr: Sophistication du marché — score (GII 2025)
+    en: Market sophistication — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Market sophistication' as published by WIPO in the Global Innovation Index
+    2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.4|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_4.rank
+  labels:
+    fr: Sophistication du marché — rang (GII 2025)
+    en: Market sophistication — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Market sophistication' (1 = highest score), as published
+    by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.4|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_5.score
+  labels:
+    fr: Sophistication des entreprises — score (GII 2025)
+    en: Business sophistication — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Business sophistication' as published by WIPO in the Global Innovation Index
+    2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.5|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.in_5.rank
+  labels:
+    fr: Sophistication des entreprises — rang (GII 2025)
+    en: Business sophistication — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Business sophistication' (1 = highest score), as published
+    by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.IN.5|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out_6.score
+  labels:
+    fr: Production de connaissances et de technologies — score (GII 2025)
+    en: Knowledge and technology outputs — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Knowledge and technology outputs' as published by WIPO in the Global Innovation
+    Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT.6|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out_6.rank
+  labels:
+    fr: Production de connaissances et de technologies — rang (GII 2025)
+    en: Knowledge and technology outputs — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Knowledge and technology outputs' (1 = highest score),
+    as published by WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT.6|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out_7.score
+  labels:
+    fr: Production créative — score (GII 2025)
+    en: Creative outputs — score (GII 2025)
+  definition: Score (0-100) of the GII pillar 'Creative outputs' as published by WIPO in the Global Innovation Index 2025.
+  unit: score 0-100
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT.7|measure=score
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.gii.out_7.rank
+  labels:
+    fr: Production créative — rang (GII 2025)
+    en: Creative outputs — rank (GII 2025)
+  definition: Rank among the 139 GII 2025 economies on the pillar 'Creative outputs' (1 = highest score), as published by
+    WIPO.
+  unit: rank
+  domain: science
+  subdomain: innovation
+  source_order:
+  - wipo.gii_2025.OUT.7|measure=rank
+  provider_declared: true
+  notes: 'WIPO Global Innovation Index 2025 data workbook (edition year as period; component data years vary). Composite levels
+    only (computed by WIPO); third-party indicator values are not ingested. Licence basis: WIPO Open Access Policy (CC BY
+    4.0, site-level). flags.dmc_not_met marks WIPO''s data-minimum-coverage note.'
+  tags:
+  - wipo
+  - gii
+- id: sci.wipo.patent_publications.ep.tech_01
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Machines, appareils et énergie électriques, par origine
+    en: Patent publications at the European Patent Office — Electrical machinery, apparatus, energy, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 1 ('Electrical machinery,
+    apparatus, energy') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=1
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_02
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Techniques audiovisuelles, par origine
+    en: Patent publications at the European Patent Office — Audio-visual technology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 2 ('Audio-visual technology')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=2
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_03
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Télécommunications, par origine
+    en: Patent publications at the European Patent Office — Telecommunications, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 3 ('Telecommunications')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=3
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_04
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Communication numérique, par origine
+    en: Patent publications at the European Patent Office — Digital communication, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 4 ('Digital communication')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=4
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_05
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Techniques de communication de base, par origine
+    en: Patent publications at the European Patent Office — Basic communication processes, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 5 ('Basic communication
+    processes') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=5
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_06
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Informatique, par origine
+    en: Patent publications at the European Patent Office — Computer technology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 6 ('Computer technology')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=6
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_07
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Méthodes de traitement des données à des fins de gestion,
+      par origine
+    en: Patent publications at the European Patent Office — IT methods for management, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 7 ('IT methods for management')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=7
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_08
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Semiconducteurs, par origine
+    en: Patent publications at the European Patent Office — Semiconductors, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 8 ('Semiconductors') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=8
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_09
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Optique, par origine
+    en: Patent publications at the European Patent Office — Optics, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 9 ('Optics') whose first-named
+    applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=9
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_10
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Techniques de mesure, par origine
+    en: Patent publications at the European Patent Office — Measurement, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 10 ('Measurement') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=10
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_11
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Analyse de matériels biologiques, par origine
+    en: Patent publications at the European Patent Office — Analysis of biological materials, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 11 ('Analysis of biological
+    materials') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=11
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_12
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Dispositifs de commande, par origine
+    en: Patent publications at the European Patent Office — Control, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 12 ('Control') whose first-named
+    applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=12
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_13
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Technologie médicale, par origine
+    en: Patent publications at the European Patent Office — Medical technology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 13 ('Medical technology')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=13
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_14
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Chimie fine organique, par origine
+    en: Patent publications at the European Patent Office — Organic fine chemistry, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 14 ('Organic fine chemistry')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=14
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_15
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Biotechnologie, par origine
+    en: Patent publications at the European Patent Office — Biotechnology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 15 ('Biotechnology') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=15
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_16
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Produits pharmaceutiques, par origine
+    en: Patent publications at the European Patent Office — Pharmaceuticals, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 16 ('Pharmaceuticals')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=16
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_17
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Chimie macromoléculaire, polymères, par origine
+    en: Patent publications at the European Patent Office — Macromolecular chemistry, polymers, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 17 ('Macromolecular chemistry,
+    polymers') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=17
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_18
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Chimie alimentaire, par origine
+    en: Patent publications at the European Patent Office — Food chemistry, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 18 ('Food chemistry') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=18
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_19
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Chimie de base, par origine
+    en: Patent publications at the European Patent Office — Basic materials chemistry, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 19 ('Basic materials chemistry')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=19
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_20
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Matériaux, métallurgie, par origine
+    en: Patent publications at the European Patent Office — Materials, metallurgy, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 20 ('Materials, metallurgy')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=20
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_21
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Technique de surface, revêtement, par origine
+    en: Patent publications at the European Patent Office — Surface technology, coating, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 21 ('Surface technology,
+    coating') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=21
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_22
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Technologie des microstructures, nanotechnologie, par origine
+    en: Patent publications at the European Patent Office — Micro-structural and nano-technology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 22 ('Micro-structural and
+    nano-technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=22
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_23
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Génie chimique, par origine
+    en: Patent publications at the European Patent Office — Chemical engineering, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 23 ('Chemical engineering')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=23
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_24
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Écotechnologie, par origine
+    en: Patent publications at the European Patent Office — Environmental technology, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 24 ('Environmental technology')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=24
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_25
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Manutention, par origine
+    en: Patent publications at the European Patent Office — Handling, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 25 ('Handling') whose first-named
+    applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=25
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_26
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Machines-outils, par origine
+    en: Patent publications at the European Patent Office — Machine tools, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 26 ('Machine tools') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=26
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_27
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Moteurs, pompes, turbines, par origine
+    en: Patent publications at the European Patent Office — Engines, pumps, turbines, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 27 ('Engines, pumps, turbines')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=27
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_28
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Machines à fabriquer du papier et des textiles, par origine
+    en: Patent publications at the European Patent Office — Textile and paper machines, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 28 ('Textile and paper
+    machines') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=28
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_29
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Autres machines spéciales, par origine
+    en: Patent publications at the European Patent Office — Other special machines, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 29 ('Other special machines')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=29
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_30
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Procédés et appareils thermiques, par origine
+    en: Patent publications at the European Patent Office — Thermal processes and apparatus, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 30 ('Thermal processes
+    and apparatus') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=30
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_31
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Éléments mécaniques, par origine
+    en: Patent publications at the European Patent Office — Mechanical elements, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 31 ('Mechanical elements')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=31
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_32
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Transport, par origine
+    en: Patent publications at the European Patent Office — Transport, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 32 ('Transport') whose
+    first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=32
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_33
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Mobilier, jeux, par origine
+    en: Patent publications at the European Patent Office — Furniture, games, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 33 ('Furniture, games')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=33
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_34
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Autres biens de consommation, par origine
+    en: Patent publications at the European Patent Office — Other consumer goods, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 34 ('Other consumer goods')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=34
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.ep.tech_35
+  labels:
+    fr: Publications de brevets à l'Office européen des brevets — Génie civil, par origine
+    en: Patent publications at the European Patent Office — Civil engineering, by origin
+  definition: Number of patent publications at the European Patent Office in WIPO technology field 35 ('Civil engineering')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=EP|tech=35
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_01
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Machines, appareils et énergie électriques,
+      par origine
+    en: Patent publications at the United States Patent and Trademark Office — Electrical machinery, apparatus, energy, by
+      origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 1 ('Electrical
+    machinery, apparatus, energy') whose first-named applicant resides in the country, by publication year, as reported by
+    WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=1
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_02
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Techniques audiovisuelles, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Audio-visual technology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 2 ('Audio-visual
+    technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=2
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_03
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Télécommunications, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Telecommunications, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 3 ('Telecommunications')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=3
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_04
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Communication numérique, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Digital communication, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 4 ('Digital
+    communication') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=4
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_05
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Techniques de communication de base, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Basic communication processes, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 5 ('Basic
+    communication processes') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=5
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_06
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Informatique, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Computer technology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 6 ('Computer
+    technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=6
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_07
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Méthodes de traitement des données à des fins
+      de gestion, par origine
+    en: Patent publications at the United States Patent and Trademark Office — IT methods for management, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 7 ('IT
+    methods for management') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=7
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_08
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Semiconducteurs, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Semiconductors, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 8 ('Semiconductors')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=8
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_09
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Optique, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Optics, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 9 ('Optics')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=9
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_10
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Techniques de mesure, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Measurement, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 10 ('Measurement')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=10
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_11
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Analyse de matériels biologiques, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Analysis of biological materials, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 11 ('Analysis
+    of biological materials') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=11
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_12
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Dispositifs de commande, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Control, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 12 ('Control')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=12
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_13
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Technologie médicale, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Medical technology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 13 ('Medical
+    technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=13
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_14
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Chimie fine organique, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Organic fine chemistry, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 14 ('Organic
+    fine chemistry') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=14
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_15
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Biotechnologie, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Biotechnology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 15 ('Biotechnology')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=15
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_16
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Produits pharmaceutiques, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Pharmaceuticals, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 16 ('Pharmaceuticals')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=16
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_17
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Chimie macromoléculaire, polymères, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Macromolecular chemistry, polymers, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 17 ('Macromolecular
+    chemistry, polymers') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=17
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_18
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Chimie alimentaire, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Food chemistry, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 18 ('Food
+    chemistry') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=18
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_19
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Chimie de base, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Basic materials chemistry, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 19 ('Basic
+    materials chemistry') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=19
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_20
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Matériaux, métallurgie, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Materials, metallurgy, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 20 ('Materials,
+    metallurgy') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=20
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_21
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Technique de surface, revêtement, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Surface technology, coating, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 21 ('Surface
+    technology, coating') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=21
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_22
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Technologie des microstructures, nanotechnologie,
+      par origine
+    en: Patent publications at the United States Patent and Trademark Office — Micro-structural and nano-technology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 22 ('Micro-structural
+    and nano-technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=22
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_23
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Génie chimique, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Chemical engineering, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 23 ('Chemical
+    engineering') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=23
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_24
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Écotechnologie, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Environmental technology, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 24 ('Environmental
+    technology') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=24
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_25
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Manutention, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Handling, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 25 ('Handling')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=25
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_26
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Machines-outils, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Machine tools, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 26 ('Machine
+    tools') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=26
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_27
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Moteurs, pompes, turbines, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Engines, pumps, turbines, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 27 ('Engines,
+    pumps, turbines') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=27
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_28
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Machines à fabriquer du papier et des textiles,
+      par origine
+    en: Patent publications at the United States Patent and Trademark Office — Textile and paper machines, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 28 ('Textile
+    and paper machines') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=28
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_29
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Autres machines spéciales, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Other special machines, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 29 ('Other
+    special machines') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=29
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_30
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Procédés et appareils thermiques, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Thermal processes and apparatus, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 30 ('Thermal
+    processes and apparatus') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=30
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_31
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Éléments mécaniques, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Mechanical elements, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 31 ('Mechanical
+    elements') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=31
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_32
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Transport, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Transport, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 32 ('Transport')
+    whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=32
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_33
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Mobilier, jeux, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Furniture, games, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 33 ('Furniture,
+    games') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=33
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_34
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Autres biens de consommation, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Other consumer goods, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 34 ('Other
+    consumer goods') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=34
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents
+- id: sci.wipo.patent_publications.us.tech_35
+  labels:
+    fr: Publications de brevets à l'Office des brevets des États-Unis (USPTO) — Génie civil, par origine
+    en: Patent publications at the United States Patent and Trademark Office — Civil engineering, by origin
+  definition: Number of patent publications at the United States Patent and Trademark Office in WIPO technology field 35 ('Civil
+    engineering') whose first-named applicant resides in the country, by publication year, as reported by WIPO.
+  unit: patent publications
+  domain: science
+  subdomain: patents
+  source_order:
+  - wipo.patent_pub_tech.patent_publications|office=US|tech=35
+  provider_declared: true
+  notes: WIPO IP Statistics bulk file dc_indicator_patent_4_publication_by_technology.csv (dated 2023-12-06, years 2000-2022).
+    Origin = residence of the first-named applicant. Technology fields per the WIPO IPC-technology concordance; counts per
+    field are not summed by REVA (fields may overlap). Every other office of the file is in the same atlas table (series wipo.patent_pub_tech.patent_publications|office=<code>|tech=<id>),
+    as are grants (wipo.patent_grant_tech), trademark and design class counts (wipo.tm_*_class, wipo.design_*_class).
+  tags:
+  - wipo
+  - patents

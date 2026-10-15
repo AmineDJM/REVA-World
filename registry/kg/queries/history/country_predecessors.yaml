@@ -1,0 +1,28 @@
+id: history.country_predecessors
+domain: history
+owner: KGHIST
+description: >-
+  Predecessor polities of the 250 crosswalk countries: the transitive closure of replaces (P1365) and of
+  the inverse of replaced by (P1366), plus the direct follows (P155) / inverse followed-by (P156)
+  neighbour, kept only when the predecessor is a polity (historical country, empire, colony, protectorate,
+  dependent territory, country, state or other political territorial entity). E.g. Brazil -> Empire of
+  Brazil -> United Kingdom of Portugal, Brazil and the Algarves -> colonial Brazil. Seeds every
+  predecessor, so colonies typed outside the colony class tree (and their P17/P361 links to the colonial
+  power, their official languages and dates) are still harvested.
+purpose: seed_entities
+entity_kind: historical_state
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?country { {{values}} }
+    { ?country (wdt:P1365|^wdt:P1366)+ ?item . }
+    UNION
+    { ?country (wdt:P155|^wdt:P156) ?item . }
+    FILTER(?item != ?country)
+    FILTER EXISTS {
+      VALUES ?polity { wd:Q3024240 wd:Q48349 wd:Q133156 wd:Q164142 wd:Q161243 wd:Q6256 wd:Q7275 wd:Q1048835 }
+      ?item wdt:P31/wdt:P279* ?polity .
+    }
+  }
+split: {by: values, source: countries, chunk_size: 25}
+max_rows: 8000
+expand_hops: 1

@@ -1,0 +1,14 @@
+# V3 (agent A-GEO): World Bank Climate Change Knowledge Portal API, national climatologies 1991-2020
+# (src/reva/adapters/connectors/atlas_climate.py).
+source_key: worldbank.cckp
+title: World Bank Climate Change Knowledge Portal (CCKP) API
+provider_url: https://climateknowledgeportal.worldbank.org/
+lineage_family: worldbank_cckp
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: "World Bank Climate Change Knowledge Portal; CRU TS (UEA CRU); ERA5 (Copernicus C3S/ECMWF)"
+metadata:
+  allowed_hosts: [cckpapi.worldbank.org]
+  products: [cru_ts4.09 climatology 1991-2020, era5_x0.25 climatology 1991-2020]
+  cadence: on product release (version in URL)

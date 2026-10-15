@@ -1,0 +1,24 @@
+id: history.empire_territories
+domain: history
+owner: KGHIST
+description: >-
+  Territories of empires: historical countries, colonies, protectorates and dependent territories that are
+  part of (P361) an empire, listed as a part (P527) or contained administrative entity (P150) of an
+  empire, or whose country (P17) is an empire. Catches colonies that are not typed as colony but are linked
+  to an empire (e.g. a viceroyalty that is part of the Spanish Empire). Snapshots keep the dated P17/P361
+  claims that carry "colonial power" in Wikidata (there is no dedicated "colony of" property).
+purpose: seed_entities
+entity_kind: colony
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?empire wdt:P31/wdt:P279* wd:Q48349 .
+    { ?item wdt:P361 ?empire . } UNION { ?empire wdt:P527 ?item . }
+    UNION { ?empire wdt:P150 ?item . } UNION { ?item wdt:P17 ?empire . }
+    FILTER EXISTS {
+      VALUES ?polity { wd:Q3024240 wd:Q133156 wd:Q164142 wd:Q161243 }
+      ?item wdt:P31/wdt:P279* ?polity .
+    }
+  }
+max_rows: 12000
+expand_hops: 1
+depends_on: [history.empires]

@@ -1,0 +1,14 @@
+[
+  {
+    "request_fingerprint": "d6b068e93850444b77e9d54fed045b79862bc892883bd644c8fb5a1e659f09c0",
+    "url": "https://www.constituteproject.org/service/constitutions?lang=en",
+    "file": "constitutions.json",
+    "sha256": "0d9f1944f4870b4e7531b494814f6712b1483f22ccb991d32493427200b85e15",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:07:00+00:00",
+    "licence": "Constitute terms of use: no fee, commercial use prohibited (no open data licence)"
+  }
+]
