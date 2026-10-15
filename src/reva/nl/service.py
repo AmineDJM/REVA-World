@@ -43,12 +43,13 @@ from reva.kernel.errors import CapabilityGap, ValidationProblem
 from reva.nl.budget import LlmBudget, LlmLedger, token_upper_bound
 from reva.nl.catalog import (
     EXPLICIT_FIELDS,
-    _const,
     SERVER_FIELDS,
     DraftableModel,
     DraftCatalog,
+    _const,
     current_catalog,
     registered_plugins,
+    select_variant,
 )
 from reva.nl.guards import keyword_gaps, number_provenance, sanitize_text, stated_numbers
 from reva.nl.ports import LlmProviderError, LlmRequest, LlmResponse, ScenarioDrafter
@@ -241,6 +242,9 @@ def _fill_defaults(node: Mapping[str, Any], value: Any) -> Any:
         return value
     if _const(node)[0]:
         return _const(node)[1] if value is None else value
+    if object_variants(node):
+        variant = select_variant(node, value)
+        return _fill_defaults(variant, value) if variant is not None else value
     if node.get("type") == "object" or "properties" in node:
         out = dict(value) if isinstance(value, dict) else {}
         props = node.get("properties") or {}
@@ -266,6 +270,12 @@ def _fill_defaults(node: Mapping[str, Any], value: Any) -> Any:
 
 def _missing_leaves(node: Mapping[str, Any], value: Any, prefix: str) -> list[str]:
     """Required non-constant leaves the draft does not set (they are asked for, never guessed)."""
+    if object_variants(node):
+        variant = select_variant(node, value if isinstance(value, dict) else {})
+        if variant is None:  # which alternative (e.g. intervention kind) is meant is not known
+            disc = discriminator(object_variants(node))
+            return [f"{prefix}.{disc}" if disc else prefix]
+        return _missing_leaves(variant, value, prefix)
     if not (node.get("type") == "object" or "properties" in node):
         return [] if value is not None else [prefix]
     if not isinstance(value, dict):

@@ -360,7 +360,7 @@ def test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected(l
 
 @pytest.mark.parametrize("bad", [
     {"extra_field": 1},
-    {"parameters": [{"path": "intervention", "number": 1.2, "text": None, "quote": ""}]},
+    {"parameters": [{"path": "intervention.bogus_field", "number": 1.2, "text": None, "quote": ""}]},
     {"parameters": [{"path": "baseline_release_id", "number": None, "text": "x", "quote": ""}]},
     {"countries": "FRA"},
     {"input_language": "de"},

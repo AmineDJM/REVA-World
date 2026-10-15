@@ -24,6 +24,7 @@ LLM's output is checked against the same catalogue by :mod:`reva.nl.service`.
 from __future__ import annotations
 
 import copy
+import json
 import logging
 import re
 from collections.abc import Iterator, Mapping
@@ -251,8 +252,52 @@ def model_branches(schema: Mapping[str, Any]) -> Iterator[dict[str, Any]]:
         yield root
 
 
+def object_variants(node: Mapping[str, Any]) -> list[dict[str, Any]]:
+    """The object alternatives of a ``oneOf``/``anyOf`` node (e.g. intervention kinds), else ``[]``."""
+    alts = node.get("oneOf") or node.get("anyOf") or []
+    objs = [a for a in alts if isinstance(a, dict) and (a.get("type") == "object" or "properties" in a)]
+    return objs if objs and len(objs) == len(alts) else []
+
+
+def discriminator(variants: list[dict[str, Any]]) -> str | None:
+    """A property that is a distinct constant in every variant (``kind``), if any."""
+    if not variants:
+        return None
+    common = set.intersection(*(set(v.get("properties") or {}) for v in variants))
+    for name in sorted(common):
+        values = [_const((v.get("properties") or {}).get(name)) for v in variants]
+        if all(ok for ok, _ in values) and len({json.dumps(val) for _, val in values}) == len(values):
+            return name
+    return None
+
+
+def select_variant(node: Mapping[str, Any], value: Any) -> dict[str, Any] | None:
+    """The variant a (partial) object belongs to: by discriminator, else the only one covering its keys."""
+    variants = object_variants(node)
+    if not variants or not isinstance(value, dict):
+        return None
+    disc = discriminator(variants)
+    if disc is not None and disc in value:
+        return next((v for v in variants if _const((v.get("properties") or {}).get(disc))[1] == value[disc]), None)
+    fits = [v for v in variants if set(value) <= set(v.get("properties") or {})]
+    return fits[0] if len(fits) == 1 else None
+
+
 def _leaves(node: Mapping[str, Any], prefix: str) -> Iterator[tuple[str, dict[str, Any]]]:
     if _const(node)[0] or not node:
+        return
+    variants = object_variants(node)
+    if variants:
+        disc = discriminator(variants)
+        seen: set[str] = set()
+        if disc is not None:
+            seen.add(f"{prefix}.{disc}")
+            yield f"{prefix}.{disc}", {"enum": [_const(v["properties"][disc])[1] for v in variants]}
+        for v in variants:
+            for path, leaf in _leaves(v, prefix):
+                if path not in seen:
+                    seen.add(path)
+                    yield path, leaf
         return
     t = node.get("type")
     if t == "object" or "properties" in node:
