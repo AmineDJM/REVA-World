@@ -1488,26 +1488,38 @@ def build(args: argparse.Namespace) -> dict[str, Any]:
         groups.append("perf")
     if args.with_live and "live" not in groups:
         groups.append("live")
-    excluded = [m for m, on in (("live", "live" in groups), ("perf", "perf" in groups)) if not on]
+    unknown = [g for g in groups if g not in PYTEST_GROUPS and g != "ui"]
+    if unknown:
+        raise SystemExit(f"unknown groups {unknown}; known: {sorted(PYTEST_GROUPS)} + ui")
+    groups = [g for g in groups if g in PYTEST_GROUPS]
     runs: dict[str, dict[str, Any]] = {}
     commands: dict[str, dict[str, Any]] = {}
     if args.reuse:
         prev = load_json(REPORT_JSON) or {}
-        runs = {g: r for g, r in (prev.get("pytest_runs") or {}).items() if g in groups}
+        runs = {g: r for g, r in (prev.get("pytest_runs") or {}).items() if g in groups or not args.groups}
+        groups = sorted(set(groups) | set(runs), key=list(PYTEST_GROUPS).index)
         commands = prev.get("commands") or {}
         vit = prev.get("ui_run")
     else:
-        for name in COMMANDS:
-            print(f"[acceptance] command {name} ...", flush=True)
-            commands[name] = run_command(name)
+        vit = None
+        if args.groups:  # partial refresh: keep the other groups/commands/UI results of the previous report
+            prev = load_json(REPORT_JSON) or {}
+            runs = dict(prev.get("pytest_runs") or {})
+            commands = dict(prev.get("commands") or {})
+            vit = prev.get("ui_run")
+        if not args.groups or args.commands:
+            for name in COMMANDS:
+                print(f"[acceptance] command {name} ...", flush=True)
+                commands[name] = run_command(name)
         for g in groups:
             print(f"[acceptance] pytest group {g} ...", flush=True)
             runs[g] = run_group(g)
             print(f"[acceptance]   {runs[g]['summary']} ({runs[g]['duration_s']} s)", flush=True)
-        vit = None
-        if not args.no_ui:
+        if not args.no_ui and (not args.groups or "ui" in args.groups.split(",")):
             print("[acceptance] ui vitest ...", flush=True)
             vit = run_vitest()
+        groups = sorted(set(groups) | set(runs), key=list(PYTEST_GROUPS).index)
+    excluded = [m for m in ("live", "perf") if m not in runs]
     cases = parse_pytest_junit([JUNIT_DIR / f"{g}.xml" for g in runs])
     vitest_cases = parse_vitest_junit(JUNIT_DIR / "ui_vitest.xml") if vit and vit.get("junit") else []
     demos: dict[str, dict[str, Any] | None] = {"fixtures": None, "live": None}
@@ -1841,6 +1853,11 @@ def main(argv: list[str] | None = None) -> int:
         help="fixture-mode demonstration: run it, reuse var/acceptance/demo_fixtures.json, or skip",
     )
     ap.add_argument("--no-ui", action="store_true", help="do not run the UI vitest suite")
+    ap.add_argument(
+        "--commands",
+        action="store_true",
+        help="with --groups: also re-run the command checks (lint, contracts, imports)",
+    )
     ap.add_argument(
         "--reuse",
         action="store_true",

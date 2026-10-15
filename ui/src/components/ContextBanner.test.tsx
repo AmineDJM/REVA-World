@@ -58,4 +58,9 @@ describe('ContextBanner', () => {
     render(<ContextBanner meta={{ ...base, warnings: [{ code: 'missing_values', message: '2 period(s) are typed missing' }] }} />);
     expect(screen.getByText(/2 period\(s\) are typed missing/)).toBeInTheDocument();
   });
+
+  it('labels how the knowledge cutoff was determined (read as of)', () => {
+    render(<ContextBanner meta={{ ...base, context_mode: 'evidence', knowledge_cutoff_basis: 'read_time' }} />);
+    expect(screen.getByText('(read as of)')).toBeInTheDocument();
+  });
 });

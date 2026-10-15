@@ -177,7 +177,8 @@ class Settings(BaseSettings):
             not self.reva_session_secret or len(self.reva_session_secret.get_secret_value()) < 32
         ):
             missing.append("REVA_SESSION_SECRET (>=32 chars)")
-        if self.reva_public_base_url.startswith("http://"):
+        # Only the API serves HTTP; non-API processes have no public URL.
+        if self.reva_process_role in (None, "api") and self.reva_public_base_url.startswith("http://"):
             missing.append("REVA_PUBLIC_BASE_URL must be https in production")
         if self.reva_llm_enabled and self.reva_llm_monthly_budget_usd <= 0:
             missing.append("REVA_LLM_MONTHLY_BUDGET_USD > 0 when LLM is enabled")

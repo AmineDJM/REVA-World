@@ -367,7 +367,8 @@ def test_replay_and_discovery(env: Env) -> None:
     r = env.client.post("/v1/replay", json=body, headers={"Idempotency-Key": f"replay-{uuid.uuid4()}"})
     assert r.status_code == 202, r.text
     assert r.json()["job_type"] == "replay" and r.json()["status_url"].startswith("/v1/jobs/")
-    d = env.client.post("/v1/discovery", json={"catalogue": "eurostat", "query": "population age sex"},
+    d = env.client.post("/v1/discovery", json={"catalogue": "eurostat", "requirement_id": "R-POP-JAN-AGESEX",
+                                               "mode": "fixture"},
                         headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
     assert d.status_code == 202, d.text
 
@@ -921,3 +922,70 @@ def test_r2_04_timeseries_skips_and_flags_retracted(env: Env) -> None:
     then = env.client.get("/v1/timeseries", params={**base, "as_of": iso(t0)}).json()
     assert next(p for p in then["data"]["points"] if p["period_label"].startswith("2023"))["revision_no"] == 2
     assert not any(w["code"] == "retracted_records" for w in then["warnings"])
+
+
+def test_r4_06_discovery_request_is_validated_and_passed_through(env: Env) -> None:
+    def post(body: dict[str, Any]) -> Any:
+        return env.client.post("/v1/discovery", json=body, headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
+
+    for body in ({"catalogue": "worldbank"}, {"catalogue": "comtrade"}):
+        assert problem(post(body), 422, "capability_gap")["details"]["supported"] == ["eurostat"]
+    for body in ({"query": "nominal GDP"}, {"concept_id": "economics.gdp"}, {"max_candidates": 3}):
+        problem(post(body), 422, "capability_gap")
+    assert problem(post({"requirement_id": "R-CRUDE-M"}), 422, "capability_gap")["details"]["supported"] == \
+        ["R-POP-JAN-AGESEX"]
+    problem(post({"mode": "replay"}), 422, "validation_error")
+    problem(post({"unknown": 1}), 422, "validation_error")
+    ok = post({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"})
+    assert ok.status_code == 202, ok.text
+    job = env.client.get(f"/v1/jobs/{ok.json()['job_id']}").json()
+    assert job["payload"] == {"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}
+    default = post({})
+    assert env.client.get(f"/v1/jobs/{default.json()['job_id']}").json()["payload"] == \
+        {"requirement_id": "R-POP-JAN-AGESEX", "mode": "live"}
+    for jid in (ok.json()["job_id"], default.json()["job_id"]):
+        env.client.post(f"/v1/jobs/{jid}/cancel")
+    prod = create_app(api_settings(env.settings, reva_env="production", reva_session_secret=SecretStr("p" * 48),
+                                   reva_public_base_url="https://reva.example.org"))
+    with TestClient(prod, base_url="https://testserver") as c:
+        login(c)
+        r = c.post("/v1/discovery", json={"mode": "fixture"}, headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
+        assert r.status_code == 422 and "production" in r.json()["detail"]
+    prod.state.engine.dispose()
+    # R4-17: no endpoint text claims that nothing is promoted without review.
+    w = env.client.get("/v1/discovery/candidates").json()["warnings"]
+    note = next(x for x in w if x["code"] == "unreviewed_candidates")["message"]
+    assert "tier-1" in note and "automatically" in note
+
+
+def test_every_envelope_states_its_knowledge_cutoff(env: Env) -> None:
+    rel_cut = env.client.get(f"/v1/belief-releases/{env.r2.release_id}").json()["data"]["knowledge_cutoff"][:10]
+    before = datetime.now(UTC) - timedelta(minutes=5)
+    for path, params in (("/v1/observations", {"limit": 5}), ("/v1/evidence", {}), ("/v1/connectors", {}),
+                         ("/v1/sources", {}), ("/v1/models", {}), ("/v1/ontology", {}), ("/v1/entities", {}),
+                         ("/v1/relations", {"entity_id": "FRA", "max_edges": 5}), ("/v1/jobs", {}),
+                         ("/v1/proposals", {}), ("/v1/discovery/candidates", {}), ("/v1/events", {}),
+                         ("/v1/locations", {"entity_id": "FRA"}), ("/v1/belief-releases", {})):
+        body = env.client.get(path, params=params).json()
+        assert body["knowledge_cutoff"], path
+        assert body["knowledge_cutoff_basis"] == "read_time", (path, body["knowledge_cutoff_basis"])
+        assert datetime.fromisoformat(body["knowledge_cutoff"]) >= before
+        assert body["knowledge_cutoff"][:10] >= rel_cut
+    asof = iso(env.t_between_releases)
+    o = env.client.get("/v1/observations", params={"as_of": asof, "limit": 1}).json()
+    assert o["knowledge_cutoff_basis"] == "as_of" and o["knowledge_cutoff"].startswith(asof[:19])
+    b = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP}).json()
+    assert b["knowledge_cutoff_basis"] == "release_cutoff"
+    assert b["valid_time"]["start"].startswith("2000") and b["valid_time"]["end"] >= "2024"
+    obs = env.client.get("/v1/observations", params={"subject_id": "FRA", "concept": POP}).json()
+    assert obs["valid_time"]["start"].startswith("2000")
+    rels = env.client.get("/v1/relations", params={"entity_id": "FRA", "period": 2023}).json()
+    assert rels["valid_time"]["start"].startswith("2023")
+    m = env.client.get("/v1/models").json()
+    assert m["origin"] == "test_fixture" and any(w["code"] == "fixture_data" for w in m["warnings"])
+    ev = env.client.get("/v1/models/forecast.log_drift/evaluations").json()
+    assert ev["knowledge_cutoff_basis"] == "evaluation_context" and ev["knowledge_cutoff"]
+    sc = env.client.get("/v1/scenarios").json()
+    if sc["data"]:
+        s1 = env.client.get(f"/v1/scenarios/{sc['data'][0]['id']}").json()
+        assert s1["knowledge_cutoff"] and s1["knowledge_cutoff_basis"] == "scenario_cutoff"
