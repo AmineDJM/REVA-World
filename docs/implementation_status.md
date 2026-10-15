@@ -49,9 +49,10 @@ Counted over every ledger row in §2–§8 (one row per gate, criterion, check o
 | blocked-on-credentials | 5 |
 | **total** | **207** |
 
-By section: P0–P7 (§3): 74 done, 13 partial, 3 blocked. P8–P12 (§4): 14 interface-only, 6 not started (none
-done). §13 acceptance (§5): 34 done, 1 blocked. MVP gates/demo (§6): 6 done, 2 partial. First actions + CI (§7):
-15 done, 3 partial, 1 blocked. Invariants (§8.1): 30 done… see the recount note below.
+By section: P0–P7 (§3): 76 done, 11 partial, 3 blocked-on-credentials. P8–P12 (§4): 14 interface-only and
+6 not started (none done). §13 acceptance (§5): 34 done, 1 blocked-on-credentials. MVP gates/demo (§6): 6 done,
+2 partial. First actions + CI (§7): 15 done, 3 partial, 1 blocked-on-credentials. Invariants (§8.1): 28 done,
+7 partial.
 
 "done" rows have code and a test or measurement that exists. **No row's test has been confirmed in the final
 full run** (§9). A done row can still turn into a failure there.

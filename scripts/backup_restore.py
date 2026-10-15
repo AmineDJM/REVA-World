@@ -57,6 +57,7 @@ ensure_importable()
 import psycopg  # noqa: E402
 from psycopg import sql  # noqa: E402
 from sqlalchemy.engine import make_url  # noqa: E402
+from sqlalchemy.exc import ArgumentError  # noqa: E402
 
 SCHEMAS = ("meta", "ontology", "world", "evidence", "belief", "model", "sim", "ops")
 RUNTIME_ROLES = ("reva_api", "reva_worker", "reva_sim")
@@ -424,8 +425,8 @@ def secret_values(environ: Mapping[str, str] | None = None) -> list[str]:
         if k.endswith("DATABASE_URL"):
             try:
                 pw = make_url(v).password
-            except Exception:  # noqa: S112 - not a URL: nothing to extract
-                continue
+            except (ArgumentError, ValueError):
+                pw = None  # not a parseable URL: there is no password component to protect
             if pw:
                 vals.add(str(pw))
         elif any(s in k for s in _SECRET_NAME) and len(v) >= 8:

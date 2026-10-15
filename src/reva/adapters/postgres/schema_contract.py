@@ -40,7 +40,8 @@ import hashlib
 import json
 import logging
 import os
-from collections.abc import Iterable, Mapping
+from collections.abc import Iterable, Iterator, Mapping
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
@@ -465,14 +466,12 @@ def assert_schema_contract(target: Engine | Connection, *, mode: str | None = No
 
 
 # --------------------------------------------------------------------------- reference generation
-def build_reference_contract(base: Any, *, keep: bool = False) -> dict[str, Any]:
-    """Bootstrap a throwaway database (fresh ``alembic upgrade head`` + runtime role
-    provisioning, exactly what a deployment runs) and return its contract.
-
-    ``base`` is a ``Settings`` with the migration-owner URL (any database on the target
-    cluster); the throwaway ``reva_contract_<random>`` database is dropped afterwards
-    unless ``keep``. The dev database is never touched.
-    """
+@contextmanager
+def throwaway_database(base: Any, *, keep: bool = False, prefix: str = "reva_contract") -> Iterator[Any]:
+    """Create ``<prefix>_<random>`` on the cluster of ``base``'s migration-owner URL, bootstrap it
+    (fresh ``alembic upgrade head`` + runtime role provisioning, exactly what a deployment runs)
+    and yield its ``Settings`` (``reva_env=test``). Dropped afterwards unless ``keep``. The
+    database named in ``base`` (e.g. the dev database) is never touched."""
     import uuid
 
     from sqlalchemy import create_engine
@@ -480,7 +479,7 @@ def build_reference_contract(base: Any, *, keep: bool = False) -> dict[str, Any]
     from reva.cli.bootstrap import bootstrap  # lazy: bootstrap imports alembic
 
     admin = create_engine(base.migration_url().set(database="postgres"), isolation_level="AUTOCOMMIT")
-    name = f"reva_contract_{uuid.uuid4().hex[:10]}"
+    name = f"{prefix}_{uuid.uuid4().hex[:10]}"
     with admin.connect() as c:
         c.execute(text(f'CREATE DATABASE "{name}"'))
     try:
@@ -489,14 +488,22 @@ def build_reference_contract(base: Any, *, keep: bool = False) -> dict[str, Any]
         data.update(reva_migration_database_url=url, reva_db_name=name, reva_env="test")
         settings = type(base).model_validate(data)
         bootstrap(settings)
+        yield settings
+    finally:
+        if not keep:
+            with admin.connect() as c:
+                c.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+        admin.dispose()
+
+
+def build_reference_contract(base: Any, *, keep: bool = False) -> dict[str, Any]:
+    """Contract of a freshly bootstrapped throwaway database (see ``throwaway_database``)."""
+    from sqlalchemy import create_engine
+
+    with throwaway_database(base, keep=keep) as settings:
         eng = create_engine(settings.migration_url())
         try:
             with eng.connect() as conn:
                 return build_contract(compute_fingerprint(conn), _alembic_head(conn))
         finally:
             eng.dispose()
-    finally:
-        if not keep:
-            with admin.connect() as c:
-                c.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
-        admin.dispose()

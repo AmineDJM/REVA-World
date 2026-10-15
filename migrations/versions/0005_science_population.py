@@ -82,7 +82,7 @@ CREATE TRIGGER input_claim BEFORE INSERT ON belief.input
 
 -- Recreate the generic input trigger to skip the claim path.
 CREATE OR REPLACE FUNCTION belief.check_input() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE r belief.release; o evidence.observation; prior_cutoff timestamptz; ref_year integer;
+DECLARE r belief.release; o evidence.observation; prior_cutoff timestamptz;
 BEGIN
   IF NEW.claim_id IS NOT NULL THEN RETURN NEW; END IF;
   SELECT rel.* INTO r FROM belief.estimate e JOIN belief.release rel ON rel.id = e.release_id
@@ -92,14 +92,11 @@ BEGIN
     IF o.recorded_at > r.knowledge_cutoff THEN
       RAISE EXCEPTION 'observation % recorded after release cutoff', o.id;
     END IF;
-    -- (R-07) eligibility is evaluated inside the decision's scope: subject and the
-    -- support year (UTC year of lower(valid_range); 0 = unknown, which no
-    -- years-scoped decision covers, so it fails closed).
-    SELECT CASE WHEN sp.valid_range IS NULL OR lower_inf(sp.valid_range) OR NOT isfinite(lower(sp.valid_range))
-                THEN 0 ELSE extract(year FROM lower(sp.valid_range) AT TIME ZONE 'UTC')::int END
-      INTO ref_year FROM world.support sp WHERE sp.id = o.support_id;
-    IF NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, r.knowledge_cutoff,
-                                COALESCE(ref_year, 0)) THEN
+    -- (R-07, R5-03, R5-11) eligibility is evaluated inside the decision's scope
+    -- (subject, support year, classification) by the single authority shared
+    -- with belief selection; an unknown year/classification never satisfies a
+    -- decision scoped on it (fails closed).
+    IF NOT evidence.observation_is_eligible(o.id, r.knowledge_cutoff) THEN
       RAISE EXCEPTION 'observation % is not eligible for concept % under connector %',
         o.id, o.concept_version_id, o.connector_version_id;
     END IF;

@@ -114,7 +114,7 @@ CREATE TABLE belief.input (
 CREATE INDEX input_estimate ON belief.input(estimate_id);
 
 CREATE FUNCTION belief.check_input() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE r belief.release; o evidence.observation; prior_cutoff timestamptz; ref_year integer;
+DECLARE r belief.release; o evidence.observation; prior_cutoff timestamptz;
 BEGIN
   SELECT rel.* INTO r FROM belief.estimate e JOIN belief.release rel ON rel.id = e.release_id
    WHERE e.id = NEW.estimate_id;
@@ -124,14 +124,11 @@ BEGIN
     IF o.recorded_at > r.knowledge_cutoff THEN
       RAISE EXCEPTION 'observation % recorded after release cutoff', o.id;
     END IF;
-    -- (6) eligible only for concepts/scopes approved for that connector version
-    -- Support year (UTC) of the observation; 0 (no such year) when the support has no
-    -- bounded time range, so years-scoped decisions fail closed.
-    SELECT CASE WHEN sp.valid_range IS NULL OR lower_inf(sp.valid_range) OR NOT isfinite(lower(sp.valid_range))
-                THEN 0 ELSE extract(year FROM lower(sp.valid_range) AT TIME ZONE 'UTC')::int END
-      INTO ref_year FROM world.support sp WHERE sp.id = o.support_id;
-    IF NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id, r.knowledge_cutoff,
-                                COALESCE(ref_year, 0)) THEN
+    -- (6) eligible only for concepts/scopes approved for that connector version;
+    -- evidence.observation_is_eligible is the single authority shared with
+    -- belief selection (R5-03): an unknown support year never satisfies a
+    -- years-scoped decision.
+    IF NOT evidence.observation_is_eligible(o.id, r.knowledge_cutoff) THEN
       RAISE EXCEPTION 'observation % is not eligible for concept % under connector %',
         o.id, o.concept_version_id, o.connector_version_id;
     END IF;
@@ -165,29 +162,30 @@ CREATE TABLE ops.publication (
 
 -- (11) published release manifests reference only committed, checksum-verified artifacts
 CREATE FUNCTION ops.check_publication() RETURNS trigger LANGUAGE plpgsql AS $$
-DECLARE r belief.release; bad text; cmm text; session_held boolean;
+DECLARE r belief.release; bad text;
 BEGIN
   -- The identity value is allocated before this trigger runs, so the caller
-  -- must take the publication lock before INSERT for sequence = commit order,
-  -- and it must stay held until commit: only pg_advisory_xact_lock(7262011)
-  -- (single bigint key: classid 0, objid 7262011, objsubid 1) qualifies.
+  -- must hold the publication lock (single bigint key: classid 0, objid
+  -- 7262011, objsubid 1) before INSERT for sequence = commit order.
   IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_locks WHERE locktype = 'advisory' AND pid = pg_catalog.pg_backend_pid()
                  AND classid = 0 AND objid = 7262011 AND objsubid = 1 AND mode = 'ExclusiveLock' AND granted) THEN
     RAISE EXCEPTION 'publication advisory lock (7262011) not held by this transaction';
   END IF;
-  -- (R-19) pg_locks shows session-level and transaction-level advisory holds
-  -- identically (verified on PostgreSQL 17: same row, same virtualtransaction).
-  -- pg_advisory_unlock releases only a session-level hold and returns true iff
-  -- one existed, so it detects a session lock (which could be released before
-  -- commit). The probe emits a WARNING when no session hold exists (the normal
-  -- case); it is hidden from the client here (the server log may record it).
-  cmm := current_setting('client_min_messages');
-  PERFORM set_config('client_min_messages', 'error', true);
-  session_held := pg_catalog.pg_advisory_unlock(7262011);
-  PERFORM set_config('client_min_messages', cmm, true);
-  IF session_held THEN
-    RAISE EXCEPTION 'publication advisory lock must be transaction-scoped (pg_advisory_xact_lock), not session-level';
+  -- (R-19, R5-08) It must also stay held until commit. Re-acquiring the same key
+  -- at transaction scope is re-entrant for this backend (never waits, never
+  -- warns) and pins the hold to commit even if the caller held it at session
+  -- level and releases that early. No unlock probe: it would release a caller's
+  -- session hold and log a WARNING on every publication.
+  PERFORM pg_catalog.pg_advisory_xact_lock(7262011);
+  -- (R5-07) Seal race: estimate/input/artifact/relation writers hold the
+  -- release's lock shared (belief.reject_if_published) until they commit; the
+  -- publisher waits for them here, and every check below runs in a fresh
+  -- READ COMMITTED snapshot that sees their committed rows.
+  IF pg_catalog.current_setting('transaction_isolation') <> 'read committed' THEN
+    RAISE EXCEPTION 'release publication must run at READ COMMITTED isolation (got %)',
+      pg_catalog.current_setting('transaction_isolation');
   END IF;
+  PERFORM pg_catalog.pg_advisory_xact_lock(pg_catalog.hashtextextended('reva.release:' || NEW.release_id::text, 0));
   SELECT * INTO r FROM belief.release WHERE id = NEW.release_id;
   FOR bad IN
     SELECT a FROM unnest(ARRAY[r.manifest_sha256, r.ontology_manifest_sha256, r.model_manifest_sha256]) a
@@ -210,20 +208,33 @@ END $$;
 CREATE TRIGGER publication_verified BEFORE INSERT ON ops.publication
   FOR EACH ROW EXECUTE FUNCTION ops.check_publication();
 
--- (R-08) published_at is server time; only the table owner may supply it.
+-- (R-08, R5-14) published_at is server time; only a session whose login owns
+-- the table may supply it (session_user, never current_user: see
+-- meta.force_recorded_at). Other supplied values are rejected, not replaced.
 CREATE FUNCTION ops.force_published_at() RETURNS trigger LANGUAGE plpgsql AS $$
+DECLARE server_now timestamptz := pg_catalog.clock_timestamp();
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM pg_catalog.pg_class c
-                 WHERE c.oid = TG_RELID AND c.relowner = (SELECT r.oid FROM pg_catalog.pg_roles r
-                                                          WHERE r.rolname = current_user)) THEN
-    NEW.published_at := clock_timestamp();
+  IF EXISTS (SELECT 1 FROM pg_catalog.pg_class c JOIN pg_catalog.pg_roles r ON r.oid = c.relowner
+             WHERE c.oid = TG_RELID AND r.rolname = session_user) THEN
+    RETURN NEW;
   END IF;
+  IF NEW.published_at IS NOT NULL
+     AND abs(extract(epoch FROM (NEW.published_at - server_now))) > 1 THEN
+    RAISE EXCEPTION 'published_at is server-generated: a caller-supplied value is not accepted (%)',
+      NEW.published_at USING ERRCODE = '42501';
+  END IF;
+  NEW.published_at := server_now;
   RETURN NEW;
 END $$;
 CREATE TRIGGER a00_server_published_at BEFORE INSERT ON ops.publication
   FOR EACH ROW EXECUTE FUNCTION ops.force_published_at();
 
 -- (R-02) A published release is sealed: nothing can be appended to it.
+-- (R5-07) Writers take the release's lock shared (held until commit) before the
+-- check; ops.check_publication takes it exclusively. Either the writer commits
+-- first (and the publisher, waiting, validates its rows) or the publication
+-- commits first (and the writer, waiting, sees it in a fresh snapshot and
+-- fails). Snapshot freshness after the wait requires READ COMMITTED.
 CREATE FUNCTION belief.reject_if_published() RETURNS trigger LANGUAGE plpgsql AS $$
 DECLARE rel uuid;
 BEGIN
@@ -232,6 +243,14 @@ BEGIN
   ELSE
     rel := NEW.release_id;
   END IF;
+  IF rel IS NULL THEN
+    RETURN NEW;  -- world.relation without a release (evidence-backed edge)
+  END IF;
+  IF pg_catalog.current_setting('transaction_isolation') <> 'read committed' THEN
+    RAISE EXCEPTION 'rows of release % must be written at READ COMMITTED isolation (got %)',
+      rel, pg_catalog.current_setting('transaction_isolation');
+  END IF;
+  PERFORM pg_catalog.pg_advisory_xact_lock_shared(pg_catalog.hashtextextended('reva.release:' || rel::text, 0));
   IF EXISTS (SELECT 1 FROM ops.publication p WHERE p.release_id = rel) THEN
     RAISE EXCEPTION 'release % is published and sealed; publish a new release instead', rel;
   END IF;
@@ -261,6 +280,9 @@ CREATE TABLE world.relation (
 CREATE INDEX relation_release ON world.relation(release_id, layer);
 CREATE INDEX relation_observation ON world.relation(evidence_observation_id);
 CREATE INDEX relation_layer ON world.relation(layer, support_id);
+-- (R5-07) Release-pinned graph edges are sealed with their release.
+CREATE TRIGGER release_sealed BEFORE INSERT ON world.relation
+  FOR EACH ROW WHEN (NEW.release_id IS NOT NULL) EXECUTE FUNCTION belief.reject_if_published();
 CREATE TABLE world.relation_participant (
   relation_id uuid NOT NULL REFERENCES world.relation,
   ordinal integer NOT NULL CHECK (ordinal >= 0),

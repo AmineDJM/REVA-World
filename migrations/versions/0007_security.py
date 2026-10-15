@@ -70,7 +70,8 @@ def _grants() -> str:
     # Trigger/check helper functions must remain callable by the invoking role.
     s.append(
         "GRANT EXECUTE ON FUNCTION meta.artifact_is_verified(text), meta.activity_reaches(uuid,uuid), "
-        "meta.require_context_mode(uuid,text), evidence.is_eligible(uuid,uuid,uuid,timestamptz,integer), "
+        "meta.require_context_mode(uuid,text), evidence.is_eligible(uuid,uuid,uuid,timestamptz,integer,text), "
+        "evidence.observation_is_eligible(uuid,timestamptz), world.support_ref_year(uuid), "
         "meta.inserted_in_current_xact(xid), world.assert_relation_cardinality(uuid) "
         "TO reva_api, reva_worker, reva_sim;"
     )
@@ -125,10 +126,16 @@ def _grants() -> str:
         s.append(f"GRANT SELECT ON ALL TABLES IN SCHEMA {sch} TO reva_sim;")
     s.append("GRANT SELECT ON ops.publication TO reva_sim;")
     s.append("GRANT INSERT ON ALL TABLES IN SCHEMA sim TO reva_sim;")
+    # (R5-02) Scenarios are created only by sim.create_scenario (API), which
+    # stores and verifies the canonical spec bytes; the worker has no sim INSERT.
+    s.append("REVOKE INSERT ON sim.scenario FROM reva_sim;")
+    # (R5-05) No direct meta.artifact INSERT: artifact metadata (sha, size,
+    # label) is derived from the bytes by sim.register_artifact.
     s.append(
-        "GRANT INSERT ON meta.artifact, meta.artifact_location, meta.activity, meta.activity_input, "
+        "GRANT INSERT ON meta.artifact_location, meta.activity, meta.activity_input, "
         "meta.activity_output, meta.context, model.evaluation TO reva_sim;"
     )
+    s.append("GRANT EXECUTE ON FUNCTION sim.register_artifact(bytea) TO reva_sim;")
     s.append(
         "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint), "
         "ops.heartbeat(uuid,text,bigint,integer,jsonb), "

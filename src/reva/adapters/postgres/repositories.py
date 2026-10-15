@@ -15,6 +15,7 @@ from uuid import UUID
 
 from sqlalchemy import Connection, text
 
+from reva.kernel.errors import IntegrityFailure
 from reva.kernel.ids import canonical_bytes, logical_hash, sha256_bytes
 from reva.kernel.records import Activity
 from reva.kernel.support import Support
@@ -63,6 +64,24 @@ def register_artifact(
             "lsha": logical_sha256,
         },
     )
+    # (R5-05) Content-addressed reuse: an existing row describes the same bytes,
+    # so its size must equal the size the store just verified. A mismatch means
+    # the row was registered without the bytes and is reported as a typed
+    # integrity failure (never retried into the location trigger). Labels
+    # (schema_version, media type, rights) of an earlier registration of the
+    # same bytes are kept: identical bytes legitimately recur across writers
+    # (e.g. an empty provider response), and the simulation role -- the only
+    # lower-trust registrant -- can no longer choose any metadata
+    # (sim.register_artifact derives it from the bytes).
+    stored = conn.execute(
+        text("SELECT byte_size FROM meta.artifact WHERE sha256 = :sha"), {"sha": obj.sha256}
+    ).scalar_one()
+    if stored != obj.byte_size:
+        raise IntegrityFailure(
+            f"artifact {obj.sha256} is registered with byte_size {stored}, but the verified object has "
+            f"{obj.byte_size} bytes",
+            sha256=obj.sha256, registered_byte_size=stored, verified_byte_size=obj.byte_size,
+        )
     conn.execute(
         text(
             """INSERT INTO meta.artifact_location(artifact_sha256, storage_uri, namespace,
