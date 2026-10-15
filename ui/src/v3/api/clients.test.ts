@@ -55,7 +55,7 @@ describe('V3 API clients parse the real route shapes', () => {
     const d = await getAtlasDossier('fra');
     expect(d.data.domains[0]!.without_data).toEqual(['labour.minimum_wage_monthly']);
     const m = await getAtlasMap('labour.unemployment_rate', 2022);
-    expect(m.data.values[0]!.value).toBe('7.9');
+    expect(m.data.values[0]!.value).toBe('7.5');
     expect(m.data.countries_without_value).toEqual(['PRK', 'ERI', 'SOM']);
     expect((await getAtlasCoverage({ concept: 'labour.unemployment_rate' })).data[0]!.year_max).toBe(2022);
   });

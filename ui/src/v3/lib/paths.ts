@@ -68,6 +68,16 @@ export function relationFromText(text: string | null | undefined): string | null
   return m ? m[1]!.trim() : null;
 }
 
+/** French labels of properties whose hop text is not of the "A — label → B" form (causal ones). */
+export const PID_LABEL_FR: Record<string, string> = {
+  P828: 'a pour cause',
+  P1542: 'a pour effet',
+  P1478: 'a pour cause immédiate',
+  P1479: 'a pour cause contributive',
+  P1536: 'a pour cause sous-jacente',
+  P1537: 'a pour effet contributif',
+};
+
 export function connectedSentence(relation: string): string {
   return `relié via « ${relation} »`;
 }
@@ -85,7 +95,7 @@ export function fromLinks(d: LinksPathData): PathsView {
       nodes: p.nodes.map(L),
       hops: p.hops.map((h) => {
         const relation =
-          (h.kind === 'link' ? LINK_TYPE_LABEL[h.type] : null) ?? relationFromText(h.text.fr) ?? relationFromText(h.text.en) ?? h.type;
+          (h.kind === 'link' ? LINK_TYPE_LABEL[h.type] : null) ?? relationFromText(h.text.fr) ?? PID_LABEL_FR[h.type] ?? relationFromText(h.text.en) ?? h.type;
         const citations = h.evidence.map(citeLinkEvidence);
         const stmtEvidence = h.evidence.find((e) => e.kind === 'kg_statement');
         const isCausal = h.causal === true && h.kind === 'statement' && !!stmtEvidence;

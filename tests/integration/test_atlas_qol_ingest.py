@@ -6,10 +6,8 @@ run with identical bytes is a no-op.
 
 from __future__ import annotations
 
-import hashlib
 import json
-from datetime import UTC, date, datetime
-from pathlib import Path
+from datetime import date
 from typing import Any
 
 import polars as pl
@@ -17,48 +15,27 @@ import pytest
 from sqlalchemy import text
 
 from reva.adapters.connectors import atlas_owid, atlas_undp, atlas_whr, atlas_wid
-from reva.adapters.connectors.atlas_qol_common import ingest, register_connector
-from reva.adapters.http.safe_client import HttpResult
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered
 from reva.atlas.tables import read_atlas_table
-from reva.evidence.runner import FixtureHttp
 
 pytestmark = pytest.mark.db
-FIX = Path(__file__).resolve().parents[1] / "fixtures" / "source"
 
 
-class _WidRanges:
-    origin = "test_fixture"
-
-    def __init__(self) -> None:
-        man = json.loads((FIX / "atlas.wid" / "manifest.json").read_text())
-        self.url, self.etag = man["url"], man["etag"]
-        self.body = (FIX / "atlas.wid" / man["file"]).read_bytes()
-        assert hashlib.sha256(self.body).hexdigest() == man["sha256"]
-
-    async def get(self, url: str, *, headers: dict[str, str], max_bytes: int, accept_status: Any) -> HttpResult:
-        spec, n = headers["Range"].removeprefix("bytes="), len(self.body)
-        a, b = (n - int(spec[1:]), n - 1) if spec.startswith("-") else tuple(int(x) for x in spec.split("-"))
-        a, b = max(0, a), min(b, n - 1)
-        return HttpResult(
-            url,
-            url,
-            206,
-            {"content-range": f"bytes {a}-{b}/{n}", "etag": self.etag},
-            self.body[a : b + 1],
-            datetime(2026, 10, 15, tzinfo=UTC),
-            0.0,
-            (),
-            1,
-        )
+async def _ingest(db: Any, module: Any, **kw: Any) -> dict[str, Any]:
+    """One platform run in fixture mode (``reva atlas ingest <source> --fixture``)."""
+    out = await run_atlas_ingest(db.settings, db.worker, db.store, module.CONNECTOR_NAME, mode="fixture", **kw)
+    assert out["status"] == "completed" and out["budget"] is None
+    return out["summary"]  # type: ignore[no-any-return]
 
 
-async def _run(db: Any, connector: Any, http: Any) -> dict[str, Any]:
-    register_connector(db.owner, db.store, connector.describe())
-    return await ingest(db.worker, db.store, connector, http)
+async def _run(db: Any, module: Any, **kw: Any) -> dict[str, Any]:
+    ensure_registered(db.owner, db.store, module.atlas_source())
+    return await _ingest(db, module, **kw)
 
 
 async def test_undp_and_whr_ingest_idempotent(db: Any) -> None:
-    rep = await _run(db, atlas_undp.UndpHdrConnector(), FixtureHttp(atlas_undp.CONNECTOR_NAME))
+    rep = await _run(db, atlas_undp)
     keys = {t["dataset_key"]: t for t in rep["tables"]}
     assert set(keys) == {"atlas.undp.hdr25", "atlas.undp.gmpi2026"}
     hdr = keys["atlas.undp.hdr25"]
@@ -77,10 +54,12 @@ async def test_undp_and_whr_ingest_idempotent(db: Any) -> None:
         ).scalar_one()
         ds = c.execute(text("SELECT count(*) FROM evidence.dataset WHERE dataset_key LIKE 'atlas.undp.%'")).scalar_one()
     assert n_acq == 3 and ds == 2
-    again = await ingest(db.worker, db.store, atlas_undp.UndpHdrConnector(), FixtureHttp(atlas_undp.CONNECTOR_NAME))
+    again = await _ingest(db, atlas_undp)
     assert all(t["created"] is False for t in again["tables"])
+    only = await _ingest(db, atlas_undp, dataset="gmpi2026")  # --dataset: the other table is not registered
+    assert [t["dataset_key"] for t in only["tables"]] == ["atlas.undp.gmpi2026"]
 
-    w = await _run(db, atlas_whr.WhrConnector(), FixtureHttp(atlas_whr.CONNECTOR_NAME))
+    w = await _run(db, atlas_whr)
     (t,) = w["tables"]
     assert t["dataset_key"] == "atlas.whr.whr26_fig21" and t["row_count"] > 10_000
     with db.owner.connect() as c:
@@ -91,7 +70,7 @@ async def test_undp_and_whr_ingest_idempotent(db: Any) -> None:
 
 
 async def test_owid_and_wid_ingest(db: Any) -> None:
-    rep = await _run(db, atlas_owid.OwidConnector(), FixtureHttp(atlas_owid.CONNECTOR_NAME))
+    rep = await _run(db, atlas_owid)
     keys = {t["dataset_key"]: t for t in rep["tables"]}
     assert set(keys) == {
         "atlas.owid.energy",
@@ -103,7 +82,7 @@ async def test_owid_and_wid_ingest(db: Any) -> None:
     assert co2.filter(pl.col("provider_geo") == "Kosovo")["iso3"].unique().to_list() == ["XKX"]
     assert all("original_source" in json.loads(f) for f in co2["flags"].unique().to_list())
 
-    wid = await _run(db, atlas_wid.WidConnector(), _WidRanges())
+    wid = await _run(db, atlas_wid)  # byte-range archive fixture (ArchiveRangeFixtureHttp)
     (t,) = wid["tables"]
     assert t["dataset_key"] == "atlas.wid.wid_key" and t["unmapped_provider_geo"] == []
     assert t["coverage"]["countries"] == 3
@@ -114,3 +93,6 @@ async def test_owid_and_wid_ingest(db: Any) -> None:
             {"n": atlas_wid.CONNECTOR_NAME},
         ).scalar_one()
     assert n == 2 + 3 * 2  # tail + WID_countries.csv + data/metadata of FR, KS, DZ (one raw per byte range)
+    sub = await _ingest(db, atlas_wid, options={"countries": "FR"})  # run option: a country subset
+    (t2,) = sub["tables"]
+    assert t2["coverage"]["countries"] == 1 and t2["created"] is True

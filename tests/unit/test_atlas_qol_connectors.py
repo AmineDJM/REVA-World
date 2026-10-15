@@ -17,8 +17,9 @@ import polars as pl
 import pytest
 
 from reva.adapters.connectors import atlas_owid, atlas_undp, atlas_whr, atlas_wid
-from reva.adapters.connectors.atlas_qol_common import NameIndex, atlas_spec, decimal_text, fetch_all
+from reva.adapters.connectors.atlas_qol_common import NameIndex, decimal_text, fetch_all
 from reva.adapters.http.safe_client import HttpResult
+from reva.atlas.ingest import ArchiveRangeFixtureHttp, AtlasRun
 from reva.atlas.tables import validate_atlas_frame
 from reva.evidence.runner import FixtureHttp, _fixture_fingerprint
 from reva.kernel.errors import SourceResponseError
@@ -27,7 +28,7 @@ FIX = Path(__file__).resolve().parents[1] / "fixtures" / "source"
 
 
 async def _builds(connector: Any, http: Any) -> dict[str, Any]:
-    raws = await fetch_all(connector, http)
+    raws = await fetch_all(connector, AtlasRun.offline(connector.describe(), http))
     out = {}
     for b in connector.build(raws):
         f, unmapped = validate_atlas_frame(
@@ -68,18 +69,24 @@ def test_name_index_uses_aliases_then_crosswalk_labels_only() -> None:
         NameIndex({"X": "ZZZ"})
 
 
-def test_specs_are_atlas_bulk_and_hosts_are_pinned() -> None:
-    specs = [
-        atlas_undp.UndpHdrConnector().describe(),
-        atlas_whr.WhrConnector().describe(),
-        atlas_owid.OwidConnector().describe(),
-        atlas_wid.WidConnector().describe(),
-    ]
+def test_specs_are_atlas_sources_and_hosts_are_pinned() -> None:
+    from reva.atlas.sources import atlas_sources
+
+    mods = (atlas_undp, atlas_whr, atlas_owid, atlas_wid)
+    specs = [m.atlas_source() for m in mods]
     assert [s.template for s in specs] == ["atlas_bulk"] * 4
     assert specs[0].allowed_hosts == ("hdr.undp.org",)
     assert specs[3].allowed_hosts == ("wid.world",)
     assert all(s.code_digest.startswith("sha256:") for s in specs)
-    assert atlas_spec  # imported helper stays available
+    assert [s.budget_key for s in specs] == ["undp.hdr", "whr.figure21", "owid.compilations", "wid.bulk"]
+    found = atlas_sources()
+    for m, s in zip(mods, specs, strict=True):
+        assert found[s.name].module == m.__name__  # discovered by the atlas platform
+    common = Path(atlas_undp.__file__).with_name("atlas_qol_common.py")
+    for f in (*(Path(m.__file__) for m in mods), common):  # fetch only through the run (metered)
+        src = f.read_text()
+        for forbidden in ("SafeHttpClient(", "make_live_client(", "httpx.", "model_copy(", "ConnectorSpec"):
+            assert forbidden not in src, (f.name, forbidden)
 
 
 # ----------------------------------------------------------------------------- UNDP
@@ -202,7 +209,7 @@ async def test_owid_refuses_non_redistributable_columns() -> None:
     doc["nonRedistributable"] = True
     http = FixtureHttp("atlas.owid", overrides={_fixture_fingerprint(entry["url"]): json.dumps(doc).encode()})
     conn = atlas_owid.OwidConnector(charts={"annual-temperature-anomalies": ("g_temperature_anomaly", "test")})
-    raws = await fetch_all(conn, http)
+    raws = await fetch_all(conn, AtlasRun.offline(conn.describe(), http))
     builds = {f"{b.source}.{b.dataset}" for b in conn.build(raws)}
     assert "owid.g_temperature_anomaly" not in builds and "owid.co2" in builds
 
@@ -277,6 +284,9 @@ async def test_wid_reads_only_needed_members_by_range() -> None:
     assert sel["member"] == "WID_data_FR.csv" and sel["etag"] == http.etag
     avg = f.filter((pl.col("iso3") == "DZA") & (pl.col("indicator") == "anninci992|p0p100")).row(0, named=True)
     assert avg["unit"].startswith("DZD")
+    # the platform's byte-range fixture client (used by `reva atlas ingest atlas.wid --fixture`) serves the same
+    same = await _builds(atlas_wid.WidConnector(), ArchiveRangeFixtureHttp(atlas_wid.CONNECTOR_NAME))
+    assert same["wid.wid_key"][1].equals(f)
 
 
 async def test_wid_refuses_corrupt_member_and_changed_archive() -> None:
