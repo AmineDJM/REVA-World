@@ -625,6 +625,18 @@ def classify_error(item: str, code: str, message: str, status: int | None = None
     return AttemptSignal(item, None, "other", message[:300])
 
 
+def _structured_status(v: Any) -> int | None:
+    """The run record's structured HTTP status (``errors[].status``); ``None`` for old rows,
+    which fall back to parsing ``HTTP nnn`` out of the message."""
+    if isinstance(v, bool):
+        return None
+    if isinstance(v, int) and 100 <= v <= 599:
+        return v
+    if isinstance(v, str) and v.isdigit() and 100 <= int(v) <= 599:
+        return int(v)
+    return None
+
+
 def failure_history(conn: Connection, connector_name: str, *, version: str | None = None,
                     origin: str | None = None, since: datetime | None = None,
                     window: int = 20) -> tuple[RunSignals, ...]:
@@ -641,11 +653,35 @@ def failure_history(conn: Connection, connector_name: str, *, version: str | Non
     out = []
     for r in reversed(rows):
         m = dict(r["metrics"])
-        sigs = tuple(classify_error(str(e.get("item", "")), str(e.get("code", "")), str(e.get("error", "")))
+        sigs = tuple(classify_error(str(e.get("item", "")), str(e.get("code", "")), str(e.get("error", "")),
+                                    _structured_status(e.get("status")))
                      for e in m.get("errors") or [] if e.get("code"))
         ratio = m.get("request_success_ratio")
         out.append(RunSignals(r["recorded_at"], float(ratio) if ratio is not None else None, sigs))
     return tuple(out)
+
+
+def failure_streak(conn: Connection, connector_name: str, *, origin: str | None = None,
+                   window: int = 20) -> dict[str, Any] | None:
+    """The current streak of consecutive runs failing with authentication (401/403) or
+    gone (404/410/DNS) signals, newest run last; ``None`` when the newest run has neither.
+
+    ``connector_wide`` is true when no item of any run in the streak succeeded.
+    ``since`` (the streak's first run) is a stable identity for the streak.
+    """
+    runs = failure_history(conn, connector_name, origin=origin, window=window)
+    if not runs:
+        return None
+    for kind, pred in ((AUTH, _is_auth), (ENDPOINT, _is_gone)):
+        n = _consecutive(runs, pred, None)
+        if n:
+            streak = runs[-n:]
+            return {"kind": kind, "runs": n, "since": streak[0].recorded_at, "latest": streak[-1].recorded_at,
+                    "statuses": sorted({sig.status for r in streak for sig in r.signals
+                                        if pred(sig) and sig.status is not None}),
+                    "items": sorted({sig.item_key for sig in streak[-1].signals if pred(sig)}),
+                    "connector_wide": all(r.success_ratio is not None and r.success_ratio <= 0 for r in streak)}
+    return None
 
 
 def _is_gone(s: AttemptSignal) -> bool:
@@ -1528,7 +1564,14 @@ def last_accepted_release(conn: Connection, origin: str, concept_id: str | None 
 def pause_belief_publication(conn: Connection, concepts: Sequence[str], *, connector: str, classification: str,
                              proposal_id: UUID, origin: str, item_key: str | None, acquisition_id: str | None,
                              actor: str) -> PublicationPause:
-    """Mark concepts as paused (``publication_pause:belief:<concept>``) and announce the stale release."""
+    """Mark concepts as paused (``publication_pause:belief:<concept>``) and announce the stale release.
+
+    Takes the publication advisory lock first, so a pause either commits before a
+    concurrent release reads the markers (the release withholds the concepts) or
+    waits until that release has committed (and then names it as the last
+    accepted release) -- never in between.
+    """
+    repo.take_publication_lock(conn)
     seq = int(conn.execute(text("SELECT COALESCE(max(id), 0) FROM ops.outbox")).scalar_one())
     reason = f"schema_quarantine:{connector}:{classification}"[:200]
     keys = []
@@ -1557,11 +1600,16 @@ def pause_belief_publication(conn: Connection, concepts: Sequence[str], *, conne
     return PublicationPause(tuple(keys), tuple(sorted(set(concepts))), reason, last)
 
 
+PAUSE_WITHHOLD_REASON = "source_schema_quarantine"
+
+
 def active_publication_pauses(conn: Connection) -> list[dict[str, Any]]:
+    """Active pause markers (readable by every runtime role: ops.dirty_node is granted to reva_api)."""
     rows = conn.execute(text(
         "SELECT node_key, reason, accumulated_error_bound, updated_at FROM ops.dirty_node "
         "WHERE node_key LIKE :p ORDER BY node_key"), {"p": PAUSE_PREFIX + "%"}).mappings().all()
     return [{"concept": r["node_key"][len(PAUSE_PREFIX):], "reason": r["reason"],
+             "basis": (r["accumulated_error_bound"] or {}).get("basis", PAUSE_WITHHOLD_REASON),
              "proposal_id": (r["accumulated_error_bound"] or {}).get("proposal_id"),
              "since": r["updated_at"].isoformat()} for r in rows]
 
@@ -1648,11 +1696,11 @@ def handle_connector_repair(payload: dict[str, Any], ctx: Any) -> dict[str, Any]
 
 
 __all__ = [
-    "ADDITIVE", "AUTH", "CLASSIFICATION", "CONTENT", "ENDPOINT", "MEANING", "REMOVED", "RENAME", "SCALE",
-    "STRUCTURE", "TRANSIENT", "TYPE_CHANGE", "UNIT", "AttemptSignal", "ConnectorRepairAdvisor", "DriftCase",
-    "FixtureReplayChecker", "MappedParser", "MappingRevision", "PublicationPause", "RepairAssessment",
+    "ADDITIVE", "AUTH", "CLASSIFICATION", "CONTENT", "ENDPOINT", "MEANING", "PAUSE_WITHHOLD_REASON", "REMOVED",
+    "RENAME", "SCALE", "STRUCTURE", "TRANSIENT", "TYPE_CHANGE", "UNIT", "AttemptSignal", "ConnectorRepairAdvisor",
+    "DriftCase", "FixtureReplayChecker", "MappedParser", "MappingRevision", "PublicationPause", "RepairAssessment",
     "RepairProposal", "RunSignals", "ScaleRule", "SchemaSemantics", "active_publication_pauses", "diff_payload",
-    "dumps_exact", "failure_history", "handle_connector_repair", "is_publication_paused", "last_accepted_release",
-    "load_exact", "pause_belief_publication", "resume_belief_publication", "schema_profile",
-    "semantic_schema_fingerprint", "suggest_mapping", "value_comparison",
+    "dumps_exact", "failure_history", "failure_streak", "handle_connector_repair", "is_publication_paused",
+    "last_accepted_release", "load_exact", "pause_belief_publication", "resume_belief_publication",
+    "schema_profile", "semantic_schema_fingerprint", "suggest_mapping", "value_comparison",
 ]

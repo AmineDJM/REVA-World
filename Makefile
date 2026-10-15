@@ -7,13 +7,21 @@ UV ?= uv
 PY := $(UV) run --frozen
 NPM ?= npm
 IMAGE ?= reva-world:local
+# Offline pytest selection, identical to ci.yml (pyproject addopts deselect the same markers).
+PYTEST_MARKERS ?= not live and not perf
+PYTEST_ARGS ?=
+# Local UI build output for `make ui` (CI and the image build into src/reva/api/static).
+UI_OUT ?= $(CURDIR)/var/ui-build
+# Playwright browsers: preinstalled in the dev container; CI installs its own (ci.yml e2e job).
+PLAYWRIGHT_BROWSERS_PATH ?= /opt/pw-browsers
+export PLAYWRIGHT_BROWSERS_PATH
 BACKUP_DIR ?= ./var/backups
 SCENARIO ?= crude-border-price-25
 PROFILE ?= mvp
 
-.PHONY: help env up down sync bootstrap upgrade seed fixtures verify api worker ui ui-ci ui-build ui-test \
-        ingest-live demo test test-db test-live lint format typecheck imports registry blueprint blueprint-live \
-        image smoke backup restore check
+.PHONY: help env up down sync bootstrap upgrade seed fixtures verify api worker ui ui-dev ui-ci ui-check ui-build \
+        ui-test e2e ingest-live live-check demo test test-db test-live lint format format-check typecheck imports \
+        registry blueprint blueprint-live image smoke backup restore check ci
 
 help: ## List targets
 	@grep -E '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  %-16s %s\n", $$1, $$2}'
@@ -51,7 +59,14 @@ api: ## Run the API (http://localhost:8000)
 worker: ## Run the durable worker/scheduler
 	$(PY) reva worker
 
-ui: ## Vite dev server (proxies /v1 and /health to the local API)
+ui: ui-ci ui-check ## = CI ui job: npm ci, typecheck, vitest, production build (network for npm ci)
+
+ui-check: ## UI typecheck + vitest + build into UI_OUT, using the installed node_modules (offline)
+	$(NPM) --prefix ui run typecheck
+	$(NPM) --prefix ui test -- --run
+	$(NPM) --prefix ui run build -- --outDir $(UI_OUT) --emptyOutDir
+
+ui-dev: ## Vite dev server (proxies /v1 and /health to the local API)
 	$(NPM) --prefix ui ci
 	$(NPM) --prefix ui run dev
 
@@ -68,20 +83,28 @@ ui-test: ui-ci ## UI typecheck + unit tests
 ingest-live: ## Live ingestion from real providers (network; origin=live)
 	$(PY) reva ingest --profile $(PROFILE) --live
 
+live-check: ## = live-smoke.yml: live source checks into a fresh database (network; writes var/live/)
+	$(PY) python scripts/live_source_checks.py
+
+e2e: ## = CI e2e job: disposable stack (fresh DB, offline fixtures) + Playwright suite (needs `make up`)
+	$(PY) python scripts/e2e_stack.py --run
+
 demo: ## Run the default crude border-price scenario end to end
 	$(PY) reva demo --scenario $(SCENARIO)
 
-test: ## Offline test suite (DB tests use a fresh per-session database)
-	$(PY) pytest
+test: ## = CI tests job: offline pytest (DB tests use a fresh per-session database; needs `make up`)
+	$(PY) pytest -q -m "$(PYTEST_MARKERS)" $(PYTEST_ARGS)
 
 test-db: ## Only database-backed tests
 	$(PY) pytest -m db
 
 test-live: ## Live provider smoke tests (network)
-	$(PY) pytest -m live
+	$(PY) pytest -m live -o addopts=""
 
-lint: imports ## Ruff lint + format check, import boundaries
+lint: imports ## = CI static job lint steps: Ruff lint + import boundaries
 	$(PY) ruff check .
+
+format-check: ## Ruff format check (advisory in CI until the tree is formatted)
 	$(PY) ruff format --check .
 
 format: ## Apply Ruff formatting
@@ -115,4 +138,6 @@ restore: ## Restore BACKUP=<dir> into the empty database in REVA_RESTORE_DATABAS
 	@test -n "$(BACKUP)" || (echo "usage: make restore BACKUP=var/backups/reva-backup-<ts>" && exit 2)
 	scripts/restore.sh $(BACKUP) --verify-objects
 
-check: lint typecheck registry blueprint test ## Everything CI runs offline (except UI and image)
+check: lint typecheck registry blueprint test ## CI static + tests jobs, offline (except UI, e2e, audit, image)
+
+ci: check ui-check e2e ## Everything in ci.yml that runs offline with installed dependencies

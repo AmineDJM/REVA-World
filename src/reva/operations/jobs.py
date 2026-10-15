@@ -21,6 +21,7 @@ import asyncio
 import importlib
 import logging
 from collections.abc import Callable
+from datetime import datetime
 from typing import Any
 
 from sqlalchemy import Connection, Engine, text
@@ -184,27 +185,36 @@ def dirty_belief_nodes(conn: Connection) -> int:
     ).scalar_one())
 
 
-def repair_idempotency_key(connector: str, acquisition_id: str) -> str:
-    """Stable key per (connector, quarantined acquisition): one repair job per case."""
+def repair_idempotency_key(connector: str, *, acquisition_id: str | None = None, trigger: str | None = None,
+                           origin: str | None = None) -> str:
+    """Stable key per (connector, quarantined acquisition), or per (connector, origin, failure streak)."""
     from reva.adapters.postgres.queue import idempotency_key
 
-    return idempotency_key("connector_repair", {"connector": connector, "acquisition_id": str(acquisition_id)})
+    if acquisition_id is not None:
+        return idempotency_key("connector_repair", {"connector": connector, "acquisition_id": str(acquisition_id)})
+    return idempotency_key("connector_repair", {"connector": connector, "origin": origin, "trigger": trigger})
 
 
-def enqueue_connector_repair(conn: Connection, connector: str, origin: str, acquisition_id: str, *,
-                             created_by: str, audit_actor: str | None = None) -> Any:
-    """Idempotent ``connector_repair`` job for one quarantined acquisition.
+def enqueue_connector_repair(conn: Connection, connector: str, origin: str, *, acquisition_id: str | None = None,
+                             trigger: str | None = None, created_by: str, audit_actor: str | None = None) -> Any:
+    """Idempotent ``connector_repair`` job for one quarantined acquisition or one failure streak.
 
-    The payload names only the connector and origin the handler reads (plus the
-    triggering acquisition for traceability); the handler re-derives the case
-    from the database, so nothing in the payload selects hosts, fixtures or tiers.
+    The payload names only what the handler reads (connector, origin) plus the
+    triggering acquisition/streak for traceability; the handler re-derives the
+    case from the database, so nothing in the payload selects hosts, fixtures or tiers.
     """
     from reva.adapters.postgres.queue import enqueue_resolving_conflict
 
-    payload = {"connector": connector, "origin": origin, "acquisition_id": str(acquisition_id)}
-    res = enqueue_resolving_conflict(conn, "connector_repair", payload,
-                                     repair_idempotency_key(connector, str(acquisition_id)),
-                                     priority=REPAIR_PRIORITY, created_by=created_by)
+    if (acquisition_id is None) == (trigger is None):
+        raise ValidationProblem("a repair job is triggered by exactly one acquisition or failure streak")
+    payload: dict[str, Any] = {"connector": connector, "origin": origin}
+    if acquisition_id is not None:
+        payload["acquisition_id"] = str(acquisition_id)
+    else:
+        payload["trigger"] = trigger
+    key = repair_idempotency_key(connector, acquisition_id=acquisition_id, trigger=trigger, origin=origin)
+    res = enqueue_resolving_conflict(conn, "connector_repair", payload, key, priority=REPAIR_PRIORITY,
+                                     created_by=created_by)
     if res.conflict is not None and res.created:
         from reva.operations.audit import record
         from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
@@ -220,6 +230,36 @@ def enqueue_connector_repair(conn: Connection, connector: str, origin: str, acqu
         except Exception as e:
             log.warning("could not audit repair key conflict: %s", type(e).__name__)
     return res
+
+
+def after_run_failures(engine: Engine, connector: str, origin: str, *, actor: str,
+                       environment: str = "local") -> dict[str, Any]:
+    """Operations response to a persistent request-failure streak (§10.3).
+
+    * ``PERSISTENT_RUNS`` consecutive runs with auth (401/403) or gone (404/410/DNS)
+      signals enqueue one ``connector_repair`` job per streak (key: connector, origin,
+      streak kind and first run).
+    * A connector-wide auth streak (no item succeeded) disables the connector's
+      ingest schedules for that mode, with an audit row
+      (:func:`reva.operations.schedules.disable_ingest_on_auth_failure`).
+    """
+    from reva.autonomy.repair import AUTH, PERSISTENT_RUNS, failure_streak
+    from reva.operations.schedules import disable_ingest_on_auth_failure
+
+    out: dict[str, Any] = {"repair_job_id": None, "schedules_disabled": []}
+    with engine.begin() as conn:
+        streak = failure_streak(conn, connector, origin=origin)
+        if streak is None or streak["runs"] < PERSISTENT_RUNS:
+            return out
+        out["streak"] = {k: (v.isoformat() if isinstance(v, datetime) else v) for k, v in streak.items()}
+        if not (environment == "production" and origin != "live"):
+            trigger = f"failure_streak:{streak['kind']}:{streak['since'].isoformat()}"
+            res = enqueue_connector_repair(conn, connector, origin, trigger=trigger, created_by=actor,
+                                           audit_actor=actor)
+            out["repair_job_id"] = str(res.job_id)
+        if streak["kind"] == AUTH and streak["connector_wide"]:
+            out["schedules_disabled"] = disable_ingest_on_auth_failure(conn, connector, origin, streak, actor=actor)
+    return out
 
 
 # --------------------------------------------------------------------------- ingest
@@ -370,6 +410,14 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         "budget": budget_info,
         "status": "partial" if report.errors else "complete",
     }
+    if report.errors:
+        try:
+            follow = after_run_failures(ctx.worker_engine, spec.name, origin, actor=f"worker:{ctx.worker_id}"[:200],
+                                        environment=ctx.settings.reva_env)
+        except Exception as e:  # the ingest outcome stands; the streak is re-evaluated on the next run
+            log.error("failure-streak follow-up for %s failed: %s", spec.name, type(e).__name__)
+            follow = {"error": type(e).__name__}
+        result["failure_followup"] = follow
     if report.outcomes and all(o.status == "failed" for o in report.outcomes):
         raise IngestFailed(f"all {len(report.outcomes)} acquisition items failed for {spec.name}",
                            retryable=(mode == "live"), errors=report.errors[:5])

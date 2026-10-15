@@ -12,6 +12,20 @@ flow-specific concepts ``trade.hs2709.{import,export}_net_weight.world_total``
 (1.0.0 emitted both flows under one concept, collapsing two quantities); the
 valuation label is inferred per flow (exports are FOB; a CIF label on an export
 is impossible); value bases record the exchange-rate transform.
+
+Structural drift blocks (the acquisition is quarantined; nothing is coerced):
+a row lacking a consumed field (e.g. ``primaryValue`` renamed) is a schema
+change, not a missing flow -- only a present ``null`` is a provider Missing;
+a value field that is not a JSON number or null (e.g. a string-typed number)
+is a type drift; a ``classificationCode`` outside the reviewed mapping's
+applicability (``REVIEWED_CLASSIFICATIONS``, mirroring
+registry/mappings/comtrade.yaml) needs a reviewed mapping first. A silent
+rescale (e.g. every value divided by 1000 with no marker change) keeps types,
+units and dimensions and cannot be told apart from a genuine revision in one
+payload; it is detected by the repair advisor's comparison with the accepted
+vintage of the same request (``reva.autonomy.repair.value_comparison``) and,
+within a run, only surfaces as the adjacent-year ``implausible_jump`` review
+signal. Validation adds no magnitude heuristic that could reject real revisions.
 """
 
 from __future__ import annotations
@@ -70,6 +84,14 @@ VALUATION_UNDETERMINED = "primaryValue (basis not determinable from response)"
 EXCHANGE_RATE_TRANSFORM = "provider_reported_usd (UN Comtrade methodology)"
 FIXED_DIMS = {"typeCode": "C", "freqCode": "A", "cmdCode": "2709", "customsCode": "C00", "motCode": 0,
               "partner2Code": 0}
+DIM_FIELDS = ("period", "reporterCode", "flowCode", "partnerCode", "partner2Code", "cmdCode", "customsCode",
+              "motCode", "typeCode", "freqCode", "classificationCode")
+# Value fields the parser publishes or derives the valuation label from: each must be
+# present in every row (null allowed = provider Missing) and a JSON number when not null.
+VALUE_FIELDS = ("primaryValue", "cifvalue", "fobvalue", "netWgt")
+# HS editions for which the reviewed HS2709 mapping applies (registry/mappings/comtrade.yaml
+# applicability.classifications); an edition outside it (e.g. H7) is blocked until reviewed.
+REVIEWED_CLASSIFICATIONS = ("H4", "H5", "H6")
 
 
 def _nonzero(v: Any) -> bool:
@@ -203,15 +225,14 @@ class ComtradeConnector:
             item_key=raw.item.key,
             observations=tuple(obs),
             expected_keys=expected,
-            metadata={**meta, "rows": [self._dims(r) for r in rows][:MAX_RECORDS]},
+            metadata={**meta, "rows": [self._dims(r) for r in rows][:MAX_RECORDS],
+                      "row_structure": _row_structure(rows)},
             schema_fingerprint=schema_fingerprint(rows[:5]),
         )
 
     @staticmethod
     def _dims(r: dict[str, Any]) -> dict[str, Any]:
-        keys = ("period", "reporterCode", "flowCode", "partnerCode", "partner2Code", "cmdCode", "customsCode",
-                "motCode", "typeCode", "freqCode", "classificationCode")
-        return {k: plain(r.get(k)) for k in keys}
+        return {k: plain(r.get(k)) for k in DIM_FIELDS}
 
     def _flags(self, r: dict[str, Any]) -> dict[str, Any]:
         return {
@@ -403,6 +424,7 @@ class ComtradeConnector:
                 findings.append(Finding(code="ambiguous_duplicate", severity="blocker",
                                         message=f"duplicate rows for {key}"))
             seen.add(dims_key)
+        findings.extend(_structure_findings(meta))
         missing = [o.logical_key for o in batch.observations if o.value.get("kind") == "missing"
                    and o.logical_key.endswith("primaryValue")]
         if missing:
@@ -453,3 +475,59 @@ class ComtradeConnector:
         required = {i.key for i in plan.items if i.required}
         ok = all(o.status in ("published", "unchanged") for o in outcomes if o.item_key in required)
         return Cursor(state={"complete": ok and not plan.budget_exhausted, "recheck_years": list(self.total_years)})
+
+
+def _json_type(v: Any) -> str:
+    if v is None:
+        return "null"
+    if isinstance(v, bool):
+        return "boolean"
+    if isinstance(v, Decimal | int | float):
+        return "number"
+    return "string" if isinstance(v, str) else type(v).__name__
+
+
+def _row_structure(rows: Sequence[Any]) -> list[dict[str, Any]]:
+    """Per-row structural facts, recorded only for rows that deviate (absent keys, non-numeric values)."""
+    out: list[dict[str, Any]] = []
+    for i, r in enumerate(rows):
+        if not isinstance(r, dict):
+            out.append({"row": i, "not_an_object": True})
+            continue
+        absent = [k for k in (*DIM_FIELDS, *VALUE_FIELDS) if k not in r]
+        types = {k: _json_type(r[k]) for k in VALUE_FIELDS if k in r and _json_type(r[k]) not in ("number", "null")}
+        if absent or types:
+            out.append({"row": i, "absent": absent, "value_types": types})
+    return out
+
+
+def _structure_findings(meta: dict[str, Any]) -> list[Finding]:
+    """Blockers for structural drift: absent consumed fields, non-numeric values, unreviewed classification."""
+    out: list[Finding] = []
+    structure = meta.get("row_structure")
+    if structure is None:
+        return [Finding(code="structure_unverifiable", severity="blocker",
+                        message="batch carries no row structure record; drift cannot be excluded")]
+    absent: dict[str, int] = {}
+    types: dict[str, set[str]] = {}
+    for s in structure:
+        if s.get("not_an_object"):
+            out.append(Finding(code="row_schema_drift", severity="blocker", message=f"row {s['row']} is not an object"))
+        for k in s.get("absent", ()):
+            absent[k] = absent.get(k, 0) + 1
+        for k, t in (s.get("value_types") or {}).items():
+            types.setdefault(k, set()).add(t)
+    for k, n in sorted(absent.items()):
+        out.append(Finding(code="field_absent", severity="blocker",
+                           message=f"{n} rows lack the consumed field '{k}' (renamed or removed?); a structurally "
+                                   "absent field is schema drift, not a provider Missing"))
+    for k, ts in sorted(types.items()):
+        out.append(Finding(code="value_type_drift", severity="blocker",
+                           message=f"'{k}' is {'/'.join(sorted(ts))}, expected a JSON number or null (never coerced)"))
+    unreviewed = sorted({str(d.get("classificationCode")) for d in meta.get("rows", ())
+                         if d.get("classificationCode") not in REVIEWED_CLASSIFICATIONS})
+    if unreviewed:
+        out.append(Finding(code="classification_unreviewed", severity="blocker",
+                           message=f"classificationCode {', '.join(unreviewed)} is outside the reviewed mapping's "
+                                   f"applicability ({', '.join(REVIEWED_CLASSIFICATIONS)})"))
+    return out

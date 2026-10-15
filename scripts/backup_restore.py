@@ -282,6 +282,165 @@ def stream_restore(tools: PgTools, args: list[str], url: Any, archive: Path, ide
         raise
 
 
+class _HashingWriter:
+    """Write-only file object that hashes what passes through (tarfile stream sink)."""
+
+    def __init__(self, dst: Any):
+        self.dst, self.h, self.n = dst, hashlib.sha256(), 0
+
+    def write(self, b: bytes) -> int:
+        self.h.update(b)
+        self.n += len(b)
+        self.dst.write(b)
+        return len(b)
+
+    def flush(self) -> None:
+        pass
+
+
+class _HashingReader:
+    """Read-only file object over a byte iterator or a file, hashing what is read."""
+
+    def __init__(self, src: Any):
+        self._it = None if hasattr(src, "read") else iter(src)
+        self._src = src if hasattr(src, "read") else None
+        self._buf = b""
+        self.h, self.n = hashlib.sha256(), 0
+
+    def _more(self, size: int) -> bytes:
+        if self._src is not None:
+            return self._src.read(size)  # type: ignore[no-any-return]
+        return next(self._it, b"")  # type: ignore[arg-type]
+
+    def read(self, size: int = -1) -> bytes:
+        want = CHUNK if size is None or size < 0 else size
+        while len(self._buf) < want:
+            chunk = self._more(CHUNK)
+            if not chunk:
+                break
+            self._buf += chunk
+        out, self._buf = self._buf[:want], self._buf[want:]
+        self.h.update(out)
+        self.n += len(out)
+        return out
+
+    def drain(self) -> None:
+        while self.read(CHUNK):
+            pass
+
+
+def write_objects_archive(
+    store: Any, inventory: list[dict[str, Any]], prefix: str, out: Path, age_args: list[str] | None
+) -> tuple[str, int, int]:
+    """Stream every inventoried object into a tar (age-encrypted when age_args).
+
+    Members are named by store key and their bytes are re-hashed while streaming:
+    an object whose content does not match its address fails the backup. Returns
+    sha256/bytes of the plaintext tar and the member count.
+    """
+    import tarfile
+
+    enc = None
+    with _private_umask():
+        if age_args is None:
+            sink: Any = out.open("wb")
+        else:
+            enc = _Proc("age", [_age(), "--encrypt", *age_args, "-o", str(out)], os.environ, stdin=subprocess.PIPE)
+            sink = enc.p.stdin
+    w = _HashingWriter(sink)
+    count = 0
+    try:
+        with tarfile.open(fileobj=w, mode="w|", format=tarfile.PAX_FORMAT) as tar:  # type: ignore[call-overload]
+            for item in sorted(inventory, key=lambda i: i["key"]):
+                namespace, sha = _parse_key(item["key"], prefix)
+                src = _HashingReader(store.open(namespace, sha))
+                ti = tarfile.TarInfo(item["key"])
+                ti.size, ti.mode, ti.mtime, ti.uname, ti.gname = item["bytes"], 0o444, 0, "", ""
+                tar.addfile(ti, src)
+                src.drain()
+                if src.h.hexdigest() != sha or src.n != item["bytes"]:
+                    raise BackupError(f"object {item['key']} does not match its address/size")
+                count += 1
+    except BaseException:
+        if enc is not None:
+            enc.kill()
+        sink.close()
+        out.unlink(missing_ok=True)
+        raise
+    sink.close()
+    if enc is not None:
+        _require_ok((enc, enc.finish()))
+    return w.h.hexdigest(), w.n, count
+
+
+def restore_objects_archive(
+    archive: Path, identity: str | None, store: Any, prefix: str, media_types: Mapping[str, str]
+) -> dict[str, Any]:
+    """Put every archived object into the configured store (verified, never overwriting).
+
+    Member names are validated against the content-addressed key layout (no path is
+    ever taken from the archive); each put re-hashes the bytes and must yield the
+    member's address. Existing identical objects are reused (idempotent).
+    """
+    import tarfile
+
+    src, dec = _plaintext_source(archive, identity)
+    reader = _HashingReader(src)
+    count = total = 0
+    try:
+        with tarfile.open(fileobj=reader, mode="r|") as tar:  # type: ignore[call-overload]
+            for m in tar:
+                if not m.isfile():
+                    raise BackupError(f"objects archive member {m.name[:120]!r} is not a regular file")
+                namespace, sha = _parse_key(m.name, prefix)
+                f = tar.extractfile(m)
+                obj = store.put(f, namespace, media_types.get(sha, "application/octet-stream"), max_bytes=max(m.size, 1))
+                if obj.sha256 != sha:
+                    raise BackupError(f"archived object {m.name[:120]!r} does not hash to its address")
+                count += 1
+                total += m.size
+        reader.drain()
+    finally:
+        src.close()
+    if dec is not None:
+        _require_ok((dec, dec.finish()))
+    return {"objects": count, "bytes": total, "plaintext_sha256": reader.h.hexdigest()}
+
+
+# --- secrets ---------------------------------------------------------------------------
+
+_SECRET_NAME = ("PASSWORD", "SECRET", "TOKEN", "API_KEY", "ACCESS_KEY")
+
+
+def secret_values(environ: Mapping[str, str] | None = None) -> list[str]:
+    """Secret values present in the environment (DB URL passwords included)."""
+    env = os.environ if environ is None else environ
+    vals: set[str] = set()
+    for k, v in env.items():
+        if not v:
+            continue
+        if k.endswith("DATABASE_URL"):
+            try:
+                pw = make_url(v).password
+            except Exception:
+                continue
+            if pw:
+                vals.add(str(pw))
+        elif any(s in k for s in _SECRET_NAME) and len(v) >= 8:
+            vals.add(v)
+    return sorted(vals)
+
+
+def files_containing_secrets(paths: list[Path], secrets: list[str]) -> list[str]:
+    bad = []
+    needles = [s.encode() for s in secrets]
+    for p in paths:
+        data = p.read_bytes()
+        if any(n in data for n in needles):
+            bad.append(p.name)
+    return bad
+
+
 def write_checksums(directory: Path, names: list[str]) -> Path:
     """SHA256SUMS (``sha256sum -c`` format) over every file of the backup set."""
     path = directory / "SHA256SUMS"
@@ -728,8 +887,11 @@ def backup(
     recipients_file: str | None,
     tools: PgTools,
     environment: str,
+    include_objects: bool = False,
 ) -> dict[str, Any]:
     encrypt = bool(recipients or recipients_file)
+    if include_objects and not objects:
+        raise BackupError("--include-objects needs the object inventory (drop --no-objects)")
     if environment == "production" and not encrypt:
         raise BackupError("production backups must be encrypted: set REVA_BACKUP_AGE_RECIPIENT(S_FILE)")
     if encrypt and not shutil.which("age"):
@@ -788,6 +950,26 @@ def backup(
             timings["object_inventory_seconds"] = round(time.perf_counter() - t0, 3)
     finally:
         conn.close()
+    objects_archive: dict[str, Any] | None = None
+    if include_objects:
+        from reva.adapters.objects.factory import build_store
+
+        arch = target / ("objects.tar.age" if encrypt else "objects.tar")
+        t0 = time.perf_counter()
+        a_sha, a_bytes, a_count = write_objects_archive(
+            build_store(settings), inventory, settings.reva_s3_prefix, arch, age_args
+        )
+        timings["objects_archive_seconds"] = round(time.perf_counter() - t0, 3)
+        objects_archive = {
+            "file": arch.name,
+            "sha256": _sha256_file(arch),
+            "bytes": arch.stat().st_size,
+            "plaintext_sha256": a_sha,
+            "plaintext_bytes": a_bytes,
+            "members": a_count,
+            "prefix": settings.reva_s3_prefix,
+            "encrypted": encrypt,
+        }
     inv_path = target / "objects.jsonl"
     with _private_umask():
         inv_path.write_text("".join(json.dumps(i, sort_keys=True) + "\n" for i in inventory))
@@ -817,11 +999,18 @@ def backup(
         }
         if objects
         else None,
+        "objects_archive": objects_archive,
         "timings": timings,
     }
     with _private_umask():
         (target / "backup.json").write_text(json.dumps(record, indent=2, sort_keys=True) + "\n")
-    write_checksums(target, [dump_file.name, inv_path.name, "backup.json"])
+    # The metadata files are plaintext even for encrypted backups: none may carry a
+    # credential (DB passwords, S3/API keys, session secret) from the environment.
+    leaked = files_containing_secrets([target / "backup.json", inv_path], secret_values())
+    if leaked:
+        raise BackupError(f"refusing to finish: a secret value appears in {leaked} (no SHA256SUMS written)")
+    members = [dump_file.name, inv_path.name, "backup.json"] + ([objects_archive["file"]] if objects_archive else [])
+    write_checksums(target, members)
     if objects and (locations.get("missing") or locations.get("mismatched") or locations.get("corrupt_objects")):
         raise BackupError(f"object store inconsistent with database (see {target / 'backup.json'})")
     record["path"] = str(target)

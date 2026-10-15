@@ -90,4 +90,4 @@ jobs:
       - name: Record digest
         env:
           DIGEST: ${{ steps.build.outputs.digest }}
-        run: echo "image digest ${DIGEST} (pushed: ${PUSH})" >> "$GITHUB_STEP_SUMMARY"
+        run: echo "image digest ${DIGEST} (pushed=${PUSH})" >> "$GITHUB_STEP_SUMMARY"

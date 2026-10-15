@@ -158,3 +158,32 @@ def next_due(engine: Engine) -> datetime | None:
         sql = text("SELECT min(next_due_at) FROM ops.schedule WHERE enabled")
         due: datetime | None = conn.execute(sql).scalar_one()
         return due
+
+
+def disable_ingest_on_auth_failure(conn: Any, connector: str, origin: str, streak: dict[str, Any], *,
+                                   actor: str) -> list[str]:
+    """Disable the enabled ingest schedules of ``connector`` whose mode matches ``origin``
+    (``live`` <-> mode ``live``, ``test_fixture`` <-> mode ``fixture``) after a persistent,
+    connector-wide authentication failure. One ``schedule.disabled_auth_failure`` audit row
+    per schedule commits with the update; re-enabling is a maintainer action after a
+    credential is provisioned (never automatic, never a bypass).
+    """
+    from reva.operations.audit import record
+
+    mode = "live" if origin == "live" else "fixture"
+    keys = list(conn.execute(
+        text(
+            "UPDATE ops.schedule SET enabled = false WHERE enabled AND job_type = 'ingest' "
+            "AND parameters->>'connector' = :c AND COALESCE(parameters->>'mode', 'live') = :m "
+            "RETURNING schedule_key"
+        ),
+        {"c": connector, "m": mode},
+    ).scalars())
+    for key in sorted(keys):
+        log.error("schedule %s disabled: %d consecutive runs of %s failed authentication (%s)", key,
+                  streak.get("runs", 0), connector, streak.get("statuses"))
+        record(conn, actor, "schedule.disabled_auth_failure", {"schedule_key": key, "connector": connector},
+               {"origin": origin, "consecutive_auth_failure_runs": streak.get("runs"),
+                "statuses": streak.get("statuses"), "since": str(streak.get("since")),
+                "reenable": "maintainer action after credential provisioning (no bypass)"})
+    return sorted(keys)

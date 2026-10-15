@@ -7,6 +7,9 @@ revocable API tokens.
   be echoed in ``X-CSRF-Token`` on every unsafe cookie-authenticated request; it is
   compared in constant time with both the cookie and the value bound inside the
   signed session.
+* A session is bound to the admin password hash in force when it was issued (an HMAC fingerprint inside
+  the signed cookie): rotating ``REVA_ADMIN_PASSWORD_HASH`` ends every existing session. Logging in again
+  with a still-valid session cookie revokes that older session.
 * API tokens (``Authorization: Bearer``) are looked up by SHA-256 in
   ``ops.api_token``; only the hash is stored. Tokens are never stored client-side
   by the app (no localStorage).
@@ -213,6 +216,8 @@ class AuthService:
     limiter: LoginRateLimiter = field(init=False)
     _revoked: dict[str, float] = field(default_factory=dict)
     _lock: threading.Lock = field(default_factory=threading.Lock)
+    # Client key -> monotonic time of the last audited rate-limit rejection (bounded, LRU).
+    _rl_audited: OrderedDict[str, float] = field(default_factory=OrderedDict)
 
     def __post_init__(self) -> None:
         self.limiter = LoginRateLimiter(login_rate_limit_per_minute(self.settings, self.login_limit_override))
@@ -224,6 +229,7 @@ class AuthService:
         else:
             key = secrets.token_urlsafe(48)  # ephemeral local secret: sessions end on restart
         self._serializer = URLSafeTimedSerializer(key, salt="reva-session-v1")
+        self._fp_key = hashlib.sha256(b"reva-session-password-binding\x00" + key.encode()).digest()
 
     # --- configuration --------------------------------------------------
     @property
@@ -237,6 +243,27 @@ class AuthService:
             raise ApiProblem(503, "auth_not_configured",
                              "REVA_ADMIN_PASSWORD_HASH is not set to an Argon2id hash")
         return value
+
+    def _password_binding(self, admin_hash: str) -> str:
+        """Keyed fingerprint of the admin hash carried in the session (reveals nothing about the hash)."""
+        return hmac.new(self._fp_key, admin_hash.encode(), hashlib.sha256).hexdigest()[:32]
+
+    def _audit_rate_limited(self, ck: str) -> bool:
+        """Audit one rate-limit rejection per client per window, not every rejected request.
+
+        Rejected requests cost nothing else; auditing each would let an unauthenticated client append
+        unbounded rows to the append-only ops.audit table.
+        """
+        now = time.monotonic()
+        with self._lock:
+            last = self._rl_audited.get(ck)
+            if last is not None and now - last < self.limiter.window:
+                return False
+            self._rl_audited[ck] = now
+            self._rl_audited.move_to_end(ck)
+            while len(self._rl_audited) > self.limiter.max_keys:
+                self._rl_audited.popitem(last=False)
+            return True
 
     # --- audit ----------------------------------------------------------
     def audit(self, actor: str, action: str, target: dict[str, Any], details: dict[str, Any]) -> None:
@@ -254,7 +281,9 @@ class AuthService:
         ck = client_key(request)
         wait = self.limiter.check_and_record(ck)
         if wait is not None:
-            self.audit("anonymous", "session.login_rate_limited", {"username": username[:64]}, {"client": ck})
+            if self._audit_rate_limited(ck):
+                self.audit("anonymous", "session.login_rate_limited", {"username": username[:64]},
+                           {"client": ck, "note": "first rejection in this window; later ones are not audited"})
             raise ApiProblem(429, "rate_limited", "too many login attempts; retry later",
                              retry_after=int(wait) + 1)
         stored = self._admin_hash()
@@ -264,10 +293,19 @@ class AuthService:
             self.audit("anonymous", "session.login_failed", {"username": username[:64]},
                        {"client": ck, "reason": "invalid_credentials"})
             raise ApiProblem(401, "invalid_credentials", "invalid username or password")
+        # A fresh session id on every login (no fixation); a still-valid session presented with this login is
+        # revoked so at most the new cookie remains usable from this client.
+        previous = request.cookies.get(SESSION_COOKIE)
+        if previous:
+            try:
+                self.logout(self._from_session(previous))
+            except Unauthenticated:
+                pass
         csrf = secrets.token_urlsafe(32)
         sid = secrets.token_urlsafe(16)
         expires = datetime.now(UTC) + SESSION_TTL
-        cookie = self._serializer.dumps({"u": ADMIN_USERNAME, "sid": sid, "csrf": csrf})
+        cookie = self._serializer.dumps({"u": ADMIN_USERNAME, "sid": sid, "csrf": csrf,
+                                         "pb": self._password_binding(stored)})
         principal = Principal(ADMIN_USERNAME, f"human:{ADMIN_USERNAME}", "session", ALL_SCOPES, csrf, sid, expires)
         self.audit(principal.actor, "session.login", {"username": ADMIN_USERNAME},
                    {"client": ck, "session": hashlib.sha256(sid.encode()).hexdigest()[:16]})
@@ -308,6 +346,12 @@ class AuthService:
         sid = str(data.get("sid", ""))
         if len(sid) < 16:
             raise Unauthenticated("session is invalid")
+        try:
+            binding = self._password_binding(self._admin_hash())
+        except ApiProblem:
+            raise Unauthenticated("session is invalid") from None
+        if not hmac.compare_digest(str(data.get("pb", "")).encode(), binding.encode()):
+            raise Unauthenticated("session is invalid")  # issued under a different admin password hash
         with self._lock:
             if sid in self._revoked:
                 raise Unauthenticated("session has ended")

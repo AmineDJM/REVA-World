@@ -63,6 +63,8 @@ packages = ["src/reva"]
 line-length = 120
 target-version = "py312"
 src = ["src", "tests"]
+# Verbatim normative copy from the specification (implemented in src/reva/ports/autonomy.py); kept unmodified.
+extend-exclude = ["contracts/autonomy_interfaces.py"]
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "RUF"]
@@ -85,7 +87,7 @@ markers = [
   "db: requires PostgreSQL/PostGIS (REVA_MIGRATION_DATABASE_URL)",
   "live: performs real network requests to public providers",
   "perf: performance measurement",
-  "e2e: end-to-end workflow tests",
+  "e2e: end-to-end demonstration workflow (fresh database)",
 ]
 addopts = "-m 'not live and not perf'"
 

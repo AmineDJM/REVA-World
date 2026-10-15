@@ -83,9 +83,8 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(StarletteHTTPException)
     async def _http(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-        code = {404: "not_found", 405: "method_not_allowed", 401: "unauthenticated", 403: "forbidden"}.get(
-            exc.status_code, "http_error"
-        )
+        code = {404: "not_found", 405: "method_not_allowed", 401: "unauthenticated", 403: "forbidden",
+                413: "payload_too_large"}.get(exc.status_code, "http_error")
         return problem_response(request, _problem(exc.status_code, code, str(exc.detail)),
                                 dict(exc.headers) if exc.headers else None)
 
@@ -112,4 +111,10 @@ def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
         log.exception("unhandled error")
-        return problem_response(request, _problem(500, "internal_error", "internal error"))
+        response = problem_response(request, _problem(500, "internal_error", "internal error"))
+        # This handler runs in the outermost (server error) middleware, outside the header middleware:
+        # apply the same security headers here so 500 pages are not the one response without them.
+        apply = getattr(request.app.state, "apply_security_headers", None)
+        if apply is not None:
+            apply(response.headers, request.url.path)
+        return response
