@@ -39,9 +39,11 @@ estimate register with one narrow scenario model — not a world model.
   returns one row per flow, in classification H4 rather than H6, with
   `isReported=false` and `legacyEstimationFlag=6` (`provider_estimation_flagged`):
   imports 5,564 USD (about 9 t) and exports about 14.2 billion USD. These are
-  provider estimates, not direct customs observations; the meaning of flag 6 has
-  not been checked. This is an endpoint gap, not evidence about Algeria's crude
-  trade. The default live scenario uses FRA, CHN, USA for 2023.
+  provider-flagged rows; flag 6 coincides exactly with `isQtyEstimated` and
+  `isNetWgtEstimated` (UNSD coding: quantity and net weight estimated), so it is
+  the tonnage, not necessarily the USD value, that the provider estimated
+  (docs/dev/numeric_audit.md). This is an endpoint gap, not evidence about
+  Algeria's crude trade. The default live scenario uses FRA, CHN, USA for 2023.
 * Comtrade (connector 1.1.0, one period per request): values keep the raw
   `isReported`/`isAggregate` flags; `provider_estimation_flagged` marks only rows
   the provider flags as estimated (`legacyEstimationFlag != 0`). Valuation is
@@ -49,6 +51,13 @@ estimate register with one narrow scenario model — not a world model.
   `primaryValue` matches exactly one of them, otherwise "basis not determinable").
   Quantities/net weights are often unusable and are kept missing; no barrels are
   inferred.
+* Valuation basis and source choice move the headline numbers. An independent
+  recomputation from raw provider data reproduces the 2023 demo exactly
+  (docs/dev/numeric_audit.md), but: the US import row also carries a FOB value,
+  and using it gives 0.0433 % of GDP instead of 0.0497 % (CIF); France's Comtrade
+  import value (31.5 bn USD) is about 7 % above the French energy ministry's
+  (SDES) 2023 crude bill (27.3 bn EUR), which would give 0.241 % instead of
+  0.258 %. REVA does not reconcile national sources with Comtrade.
 * Population: WDI mid-year totals and Eurostat 1 January age × recorded-sex
   (France only, available only through the autonomy Eurostat template) are
   different concepts and are never reconciled as one quantity. The synthetic

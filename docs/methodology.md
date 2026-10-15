@@ -103,7 +103,10 @@ L2 run publishes, per country and output:
   contains the L1 value) and whose uncertainty kind is `sensitivity_range`
   **without any coverage or confidence level**. It is assumption sensitivity,
   not a confidence, credible or prediction interval, and says nothing about input
-  measurement uncertainty.
+  measurement uncertainty. With the demo grid (ε_M ∈ {−0.5, −0.25, 0},
+  ε_X ∈ {0, 0.25}) every non-zero assumption lowers the net bill, so the range is
+  **one-sided by construction**: L1 is its upper end. It is not an interval
+  around L1.
 
 **L0** is an exact-specification cache lookup: the same full specification
 (excluding only the fidelity), the same pinned baseline release and the same
