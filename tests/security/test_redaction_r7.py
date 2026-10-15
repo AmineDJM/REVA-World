@@ -539,7 +539,8 @@ def test_api_auth_flows_leave_no_credentials_in_bodies_logs_audit_outbox_jobs(
     assert r.status_code == 200
     cookie, csrf = client.cookies.get("reva_session"), client.cookies.get("reva_csrf")
     assert cookie and csrf
-    bodies.append(r.text)
+    assert r.json()["csrf_token"] == csrf  # by design: the double-submit token is handed to its own client
+    assert_absent(r.text, ADMIN_PASSWORD, cookie)
     r = client.get(f"/v1/jobs?token={token}", headers={"X-CSRF-Token": csrf})  # secret in a query string
     bodies.append(r.text)
     r = client.delete("/v1/session", headers={"X-CSRF-Token": csrf})

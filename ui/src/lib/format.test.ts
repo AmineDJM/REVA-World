@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { compareDecimalStrings, formatDecimalString, pointInRange, sourceFlagNotes } from './format';
+import { compareDecimalStrings, formatDecimalString, isQuantityConcept, pointInRange, sourceFlagNotes } from './format';
 
 describe('formatDecimalString', () => {
   it('keeps the rounding carry into the integer part', () => {
@@ -21,22 +21,61 @@ describe('formatDecimalString', () => {
 });
 
 describe('sourceFlagNotes', () => {
-  it('surfaces provider estimation and not-reported flags', () => {
-    expect(
-      sourceFlagNotes({ isReported: false, legacyEstimationFlag: '6', provider_estimation_flagged: true, classificationCode: 'H4' }),
-    ).toEqual(['provider estimate (legacyEstimationFlag 6)']);
-    expect(sourceFlagNotes({ isReported: false, legacyEstimationFlag: '0', provider_estimation_flagged: false })).toEqual([
+  const VALUE = 'trade.hs2709.import_value.world_total';
+  const WEIGHT = 'trade.hs2709.import_net_weight.world_total';
+
+  it('labels a value as provider-estimated only when provider_value_estimated === true', () => {
+    expect(sourceFlagNotes({ provider_value_estimated: true, isReported: false }, { concept: VALUE })).toEqual([
+      'provider estimate (value marked estimated by the provider)',
+    ]);
+    // Comtrade 1.2.0 value rows: null = undeterminable, never claimed either way.
+    expect(sourceFlagNotes({ provider_value_estimated: null, legacyEstimationFlag: '6', isReported: false }, { concept: VALUE })).toEqual([
+      'not directly reported (isReported=false)',
+    ]);
+    expect(sourceFlagNotes({ provider_value_estimated: false, legacyEstimationFlag: '6' }, { concept: VALUE })).toEqual([]);
+  });
+
+  it('shows quantity estimation only on quantity / net-weight concepts', () => {
+    const f = { provider_quantity_estimated: true, legacyEstimationFlag: '6', isReported: true };
+    expect(sourceFlagNotes(f, { concept: WEIGHT })).toEqual(['provider estimate of quantity/net weight (legacyEstimationFlag 6)']);
+    expect(sourceFlagNotes(f, { concept: VALUE })).toEqual([]);
+    expect(sourceFlagNotes({ provider_quantity_estimated: false }, { concept: WEIGHT })).toEqual([]);
+  });
+
+  it('reads the legacy provider_estimation_flagged key on old rows as quantity/net weight, never as value-estimated', () => {
+    const notes = sourceFlagNotes({ isReported: false, legacyEstimationFlag: '6', provider_estimation_flagged: true, classificationCode: 'H4' }, { concept: VALUE });
+    expect(notes).toEqual(['legacy flag (meaning: quantity/net weight estimated), legacyEstimationFlag 6', 'not directly reported (isReported=false)']);
+    expect(notes.join(' ')).not.toMatch(/provider estimate/);
+    // An old API note that read the legacy flag as a value estimate is not repeated.
+    const old = sourceFlagNotes({ note: 'provider estimation flagged (legacyEstimationFlag != 0): not a direct customs observation', provider_estimation_flagged: true });
+    expect(old).toEqual(['legacy flag (meaning: quantity/net weight estimated)']);
+  });
+
+  it('surfaces not-reported, no-rows and unrecognised-code flags', () => {
+    expect(sourceFlagNotes({ isReported: false, legacyEstimationFlag: '0', provider_value_estimated: null })).toEqual([
       'not directly reported (isReported=false)',
     ]);
     expect(sourceFlagNotes({ provider_returned_no_rows: true, flowCode: 'M' })).toEqual(['provider returned no rows for this key']);
+    expect(sourceFlagNotes({ legacy_estimation_code_unrecognised: true, legacyEstimationFlag: '9', provider_value_estimated: null })).toEqual([
+      'unrecognised provider estimation code (legacyEstimationFlag 9)',
+    ]);
   });
 
   it('uses an API note verbatim and says nothing for clean flags', () => {
-    expect(
-      sourceFlagNotes({ note: 'provider estimation flagged: not a direct customs observation', provider_estimation_flagged: true, isReported: false }),
-    ).toEqual(['provider estimation flagged: not a direct customs observation']);
+    expect(sourceFlagNotes({ note: 'provider marks this value as estimated', provider_value_estimated: true })).toEqual([
+      'provider marks this value as estimated',
+    ]);
+    expect(sourceFlagNotes({ note: 'provider marks this value as not directly reported (isReported=false)', isReported: false })).toEqual([
+      'provider marks this value as not directly reported (isReported=false)',
+    ]);
     expect(sourceFlagNotes({ indicator: 'SP.POP.TOTL', obs_status: '' })).toEqual([]);
     expect(sourceFlagNotes(null)).toEqual([]);
+  });
+
+  it('uses the concept carried in simulation input flags', () => {
+    expect(isQuantityConcept(WEIGHT)).toBe(true);
+    expect(isQuantityConcept(VALUE)).toBe(false);
+    expect(sourceFlagNotes({ concept: WEIGHT, provider_quantity_estimated: true })).toEqual(['provider estimate of quantity/net weight']);
   });
 });
 

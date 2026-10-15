@@ -131,7 +131,10 @@ describe('SimulationPage', () => {
         value: { kind: 'decimal', value: '250', unit_ref: 'unit.usd', basis: {} }, uncertainty: { status: 'unquantified', kind: 'unknown' },
         applicability: {
           inputs: { M: { value: '1000', valuation: 'CIF' }, X: { value: '10', valuation: 'FOB' }, G: { value: '5000' } },
-          source_flags: { M: { note: 'provider estimation flagged (legacyEstimationFlag != 0): not a direct customs observation', provider_estimation_flagged: true } },
+          source_flags: {
+            M: { concept: 'trade.hs2709.import_value.world_total', provider_value_estimated: true, note: 'provider marks this value as estimated', legacyEstimationFlag: '6' },
+            X: { concept: 'trade.hs2709.export_value.world_total', provider_value_estimated: null, legacyEstimationFlag: '6', isReported: false },
+          },
         },
       },
     ];
@@ -154,7 +157,11 @@ describe('SimulationPage', () => {
     expect(limits).toHaveTextContent(notClaimed);
     expect(limits).toHaveTextContent('Unquantified: no error model.');
     expect(limits).toHaveTextContent('Positive means higher net payment.');
-    expect(screen.getByText(/not a direct customs observation/)).toBeInTheDocument();
+    expect(screen.getByText(/provider marks this value as estimated/)).toBeInTheDocument();
+    // legacyEstimationFlag 6 codes quantity/net weight: the X value is not called an estimate.
+    expect(screen.getByText(/not directly reported \(isReported=false\)/)).toBeInTheDocument();
+    const flagTexts = [...document.querySelectorAll('.source-flag')].map((e) => e.textContent ?? '');
+    expect(flagTexts.filter((t) => /estimat/.test(t))).toHaveLength(1);
   });
 
   it('renders the L2 sensitivity-range row in the range column, not as a grid variant', () => {

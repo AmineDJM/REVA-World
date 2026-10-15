@@ -25,7 +25,9 @@ from reva.adapters.postgres.engine import make_engine
 from reva.settings import Settings
 
 REPO = Path(__file__).resolve().parents[2]
-LAUNCHER = Path(__file__).with_name("_chaos_worker.py")
+# CHAOS_LAUNCHER lets a reviewer run the same tests against a launcher that applies a candidate
+# src patch in-process (e.g. to validate the CHAOS-1 fix before it lands); default: the plain launcher.
+LAUNCHER = Path(os.environ.get("CHAOS_LAUNCHER") or Path(__file__).with_name("_chaos_worker.py"))
 LEASE_SECONDS = 10  # Settings.reva_job_lease_seconds minimum
 HEARTBEAT_SECONDS = 1
 DRAIN_SECONDS = 5
