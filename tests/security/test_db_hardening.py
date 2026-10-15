@@ -305,6 +305,75 @@ def test_published_release_is_sealed(w: dict[str, Any]) -> None:
                 stmt()
 
 
+def test_release_seal_race_publisher_waits_for_writers(w: dict[str, Any]) -> None:
+    """(R5-07) Check-then-insert race: B appends an estimate (no inputs) to a committed, unpublished release
+    while A publishes it. A now waits for B (release lock) and then sees B's row, so publication fails
+    instead of sealing a release with an estimate that has no provenance."""
+    db = w["db"]
+    with db.worker.connect() as a, db.worker.connect() as b:
+        rid = draft_release(a, w)
+        add_input(a, add_estimate(a, w, rid), w["obs"]["id"])
+        a.commit()  # staged by one job, published by another
+        b.begin()
+        add_estimate(b, w, rid, modality="forecast")  # uncommitted, no inputs yet
+        a.execute(text("SET lock_timeout = '300ms'"))
+        with pytest.raises(DBAPIError, match="lock timeout"):
+            publish(a, rid)  # waits for B instead of validating a snapshot without B's row
+        a.rollback()
+        b.commit()
+        with pytest.raises(DBAPIError, match="estimate without inputs"):
+            publish(a, rid)
+        a.rollback()
+        assert a.execute(text("SELECT count(*) FROM ops.publication WHERE release_id = :r"),
+                         {"r": rid}).scalar_one() == 0
+
+
+def test_release_seal_race_writer_waits_for_publisher(w: dict[str, Any]) -> None:
+    db = w["db"]
+    with db.worker.connect() as a, db.worker.connect() as b:
+        rid = draft_release(a, w)
+        add_input(a, add_estimate(a, w, rid), w["obs"]["id"])
+        a.commit()
+        publish(a, rid)  # uncommitted publication holds the release lock exclusively
+        b.execute(text("SET lock_timeout = '300ms'"))
+        with pytest.raises(DBAPIError, match="lock timeout"):
+            add_estimate(b, w, rid, modality="forecast")
+        b.rollback()
+        a.rollback()
+        add_estimate(b, w, rid, modality="forecast")  # positive control: unpublished again after rollback
+        b.rollback()
+
+
+def test_release_rows_require_read_committed(w: dict[str, Any]) -> None:
+    db = w["db"]
+    with db.worker.connect() as c:
+        rid = draft_release(c, w)
+        c.commit()
+        c.execute(text("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"))
+        with pytest.raises(DBAPIError, match="READ COMMITTED"):
+            add_estimate(c, w, rid)
+        c.rollback()
+
+
+def test_release_pinned_relations_are_sealed(w: dict[str, Any]) -> None:
+    """(R5-07) world.relation rows pinned to a release cannot be added once it is published."""
+    def pinned(c: Connection, rid: UUID) -> None:
+        c.execute(
+            text("""INSERT INTO world.relation(predicate_id, layer, support_id, release_id, existence_uncertainty,
+                      component, provenance_activity_id)
+                    VALUES (:p, 'test.r5_sealed', :s, :r, '{"status":"unquantified"}', '{}', :a)"""),
+            {"p": repo.concept_version_id(c, "predicate.trade_flow"), "s": w["obs"]["support_id"], "r": rid,
+             "a": activity(c, "belief")})
+
+    with tx(w["db"].worker) as c:
+        rid = draft_release(c, w)
+        add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
+        pinned(c, rid)  # positive control: before publication
+        publish(c, rid)
+        with pytest.raises(DBAPIError, match="published and sealed"):
+            pinned(c, rid)
+
+
 # =========================================================================== R-04 per-origin lineages
 def test_observation_origin_follows_acquisition_and_lineages_are_per_origin(w: dict[str, Any]) -> None:
     db = w["db"]
@@ -356,38 +425,66 @@ def test_live_release_rejects_fixture_observation(w: dict[str, Any]) -> None:
 
 # =========================================================================== R-08 server-side recorded_at
 def test_runtime_roles_cannot_backdate_recorded_at(w: dict[str, Any]) -> None:
+    """(R-08, R5-14) A runtime role's supplied recorded_at is rejected (not silently replaced)."""
     db = w["db"]
     old = datetime(2001, 1, 1, tzinfo=UTC)
+    o = w["obs"]
     with tx(db.worker) as c:
+        with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+            copy_obs(c, w, "fx1:backdated", extra_cols=", recorded_at", extra_vals=", CAST(:old AS timestamptz)",
+                     old=old)
+        with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+            c.execute(
+                text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+                          decision, policy_version, review_activity_id, recorded_at)
+                        VALUES (:cv, :c, '{}', 'eligible', 'p', :a, :old)"""),
+                {"cv": o["connector_version_id"], "c": o["concept_version_id"], "a": activity(c, "review"),
+                 "old": old},
+            )
+        with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
+            c.execute(text("INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
+                           "VALUES ('worker:x', 'x', '{}', '{}', :old)"), {"old": old})
+        # positive controls: omitted (column default) and "now" are accepted; the stored value is server time
         start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
-        oid = copy_obs(c, w, "fx1:backdated", extra_cols=", recorded_at", extra_vals=", CAST(:old AS timestamptz)",
-                       old=old)
-        rec = c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"), {"o": oid}).scalar_one()
-        assert rec >= start
-        o = w["obs"]
-        eid = c.execute(
-            text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
-                      decision, policy_version, review_activity_id, recorded_at)
-                    VALUES (:cv, :c, '{}', 'eligible', 'p', :a, :old) RETURNING recorded_at"""),
-            {"cv": o["connector_version_id"], "c": o["concept_version_id"], "a": activity(c, "review"), "old": old},
-        ).scalar_one()
-        assert eid >= start
+        oid = copy_obs(c, w, "fx1:not-backdated")
         c.execute(text("INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
-                       "VALUES ('worker:x', 'x', '{}', '{}', :old)"), {"old": old})
+                       "VALUES ('worker:x', 'x', '{}', '{}', clock_timestamp())"))
+        assert c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"),
+                         {"o": oid}).scalar_one() >= start
         assert c.execute(text("SELECT min(recorded_at) FROM ops.audit WHERE actor = 'worker:x'")).scalar_one() >= start
-    with tx(db.sim) as c:
-        start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
-        sha = uuid.uuid4().hex * 2
-        rec = c.execute(
+    with tx(db.sim) as c, pytest.raises(DBAPIError, match="recorded_at is server-generated"):
+        c.execute(
             text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, rights, "
-                 "recorded_at) VALUES (:s, 'application/json', 1, 't', 'public_aggregate', '{}', :old) "
-                 "RETURNING recorded_at"), {"s": sha, "old": old}).scalar_one()
-        assert rec >= start
+                 "recorded_at) VALUES (:s, 'application/json', 1, 't', 'public_aggregate', '{}', :old)"),
+            {"s": uuid.uuid4().hex * 2, "old": old})
     with tx(db.owner) as c:  # the owner (migrations, historical test fixtures) may supply the value
         oid = copy_obs(c, w, "fx1:owner-backdated", extra_cols=", recorded_at",
                        extra_vals=", CAST(:old AS timestamptz)", old=old)
         assert c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"),
                          {"o": oid}).scalar_one() == old
+
+
+def test_security_definer_code_cannot_forward_a_backdated_recorded_at(w: dict[str, Any]) -> None:
+    """(R5-14) Inside a SECURITY DEFINER function current_user is the table owner; the exemption keys on
+    session_user, so a definer function forwarding a caller-supplied value cannot backdate rows."""
+    db = w["db"]
+    fn = f"ops.r5_definer_audit_{uuid.uuid4().hex[:8]}"
+    with db.owner.begin() as c:
+        c.execute(text(f"""CREATE FUNCTION {fn}(at timestamptz) RETURNS timestamptz LANGUAGE sql
+                            SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+                            INSERT INTO ops.audit(actor, action, target, details, recorded_at)
+                            VALUES ('definer:x', 'x', '{{}}', '{{}}', at) RETURNING recorded_at $$"""))
+        c.execute(text(f"REVOKE ALL ON FUNCTION {fn}(timestamptz) FROM PUBLIC"))
+        c.execute(text(f"GRANT EXECUTE ON FUNCTION {fn}(timestamptz) TO reva_worker"))
+    try:
+        with tx(db.worker) as c, pytest.raises(DBAPIError, match="recorded_at is server-generated"):
+            c.execute(text(f"SELECT {fn}('2001-01-01Z')"))
+        with tx(db.worker) as c:  # positive control: a current value passes and is stored as server time
+            start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
+            assert c.execute(text(f"SELECT {fn}(clock_timestamp())")).scalar_one() >= start
+    finally:
+        with db.owner.begin() as c:
+            c.execute(text(f"DROP FUNCTION {fn}(timestamptz)"))
 
 
 def test_every_recorded_at_table_has_the_server_trigger(w: dict[str, Any]) -> None:
@@ -408,8 +505,11 @@ def test_publication_published_at_is_server_time(w: dict[str, Any]) -> None:
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
         repo.take_publication_lock(c)
         start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
-        pub = c.execute(text("INSERT INTO ops.publication(release_id, activity_id, published_at) "
-                             "VALUES (:r, :a, '2001-01-01Z') RETURNING published_at"),
+        with pytest.raises(DBAPIError, match="published_at is server-generated"), c.begin_nested():
+            c.execute(text("INSERT INTO ops.publication(release_id, activity_id, published_at) "
+                           "VALUES (:r, :a, '2001-01-01Z')"), {"r": rid, "a": activity(c)})
+        pub = c.execute(text("INSERT INTO ops.publication(release_id, activity_id) "
+                             "VALUES (:r, :a) RETURNING published_at"),
                         {"r": rid, "a": activity(c)}).scalar_one()
         assert pub >= start
 
@@ -427,7 +527,7 @@ def _decision(c: Connection, w: dict[str, Any], decision: str, applicability: di
 
 def _eligible(c: Connection, w: dict[str, Any], subject: str, year: int | None = None) -> bool:
     o = w["obs"]
-    if year is None:  # the 4-argument form keeps working (callers that do not know the year)
+    if year is None:  # the 4-argument form: year unknown, never covered by a years-scoped decision (R5-03)
         sql = "SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"
     else:
         sql = "SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp(), :y)"
@@ -439,7 +539,8 @@ def test_subject_scoped_quarantine_does_not_affect_other_subjects(w: dict[str, A
     with tx(w["db"].worker) as c:
         assert _eligible(c, w, "FRA", 2020) and _eligible(c, w, "DZA", 2020)
         _decision(c, w, "quarantine", {"subject_ids": [str(entity_id("DZA"))]})
-        assert _eligible(c, w, "FRA", 2020) and _eligible(c, w, "FRA")
+        assert _eligible(c, w, "FRA", 2020)
+        assert not _eligible(c, w, "FRA")  # the seeded decision is years-scoped: unknown year fails closed
         assert not _eligible(c, w, "DZA", 2020) and not _eligible(c, w, "DZA")
         # a global quarantine followed by an eligible decision for CHN only: only CHN is eligible
         _decision(c, w, "quarantine", {})
@@ -450,11 +551,11 @@ def test_subject_scoped_quarantine_does_not_affect_other_subjects(w: dict[str, A
 
 def test_years_outside_the_decision_scope_are_ineligible(w: dict[str, Any]) -> None:
     with tx(w["db"].worker) as c:
-        # the seeded WDI decision is scoped to years [1960, 2024] (WDI series begin in 1960)
+        # the seeded WDI decision is scoped to years {from: 1960, to: 2024} (WDI series begin in 1960)
         assert _eligible(c, w, "FRA", 1960) and _eligible(c, w, "FRA", 2024)
         assert not _eligible(c, w, "FRA", 1959) and not _eligible(c, w, "FRA", 2025)
         # a single-year scope covers exactly that year; a year-scoped quarantine leaves other years alone
-        _decision(c, w, "quarantine", {"years": [2010]})
+        _decision(c, w, "quarantine", {"years": {"in": [2010]}})
         assert not _eligible(c, w, "FRA", 2010)
         assert _eligible(c, w, "FRA", 2011)
 
@@ -522,6 +623,19 @@ def test_participant_insert_rechecks_cardinality(w: dict[str, Any]) -> None:
             c.execute(text("SET CONSTRAINTS world.participant_cardinality IMMEDIATE"))
 
 
+def test_inserted_in_current_xact_returns_false_for_future_xids(w: dict[str, Any]) -> None:
+    """(R5-13) A widened xid beyond nextXid (what a frozen raw xmin 2^31..2^32 xids old looks like) gives
+    false instead of raising "transaction ID ... is in the future"."""
+    with tx(w["db"].worker) as c:
+        cur = int(c.execute(text("SELECT pg_current_xact_id()::text")).scalar_one())
+        for fut in ((cur + 100_000) % (1 << 32), (cur + 1_000_000_000) % (1 << 32)):
+            assert c.execute(text("SELECT meta.inserted_in_current_xact(CAST(:x AS xid))"),
+                             {"x": str(fut)}).scalar_one() is False
+        x = c.execute(text("INSERT INTO ops.outbox(event_type, payload) VALUES ('r5', '{}') RETURNING xmin")
+                      ).scalar_one()
+        assert c.execute(text("SELECT meta.inserted_in_current_xact(CAST(:x AS xid))"), {"x": x}).scalar_one()
+
+
 # =========================================================================== R-18 simulation provenance
 def test_sim_cannot_attach_provenance_to_source_activities(w: dict[str, Any]) -> None:
     db = w["db"]
@@ -578,29 +692,77 @@ def test_sim_cannot_register_locations_for_other_artifacts(w: dict[str, Any]) ->
 
 
 # =========================================================================== R-19 publication lock
-def test_publication_requires_a_transaction_scoped_lock(w: dict[str, Any]) -> None:
+def _session_lock_rows(c: Connection) -> int:
+    return int(c.execute(text(
+        "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND pid = pg_backend_pid() "
+        "AND classid = 0 AND objid = :k AND objsubid = 1"), {"k": repo.PUBLICATION_LOCK}).scalar_one())
+
+
+def test_publication_lock_check_keeps_a_callers_session_lock(w: dict[str, Any]) -> None:
+    """(R5-08) The trigger re-acquires the lock at transaction scope (re-entrant) instead of probing with
+    pg_advisory_unlock, which released a caller's session-level hold and logged a WARNING each time."""
+    db = w["db"]
+    with db.worker.connect() as c:
+        try:
+            c.execute(text("SELECT pg_advisory_lock(:k)"), {"k": repo.PUBLICATION_LOCK})  # session-level hold
+            c.commit()
+            t = c.begin()
+            rid = draft_release(c, w)
+            add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
+            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                      {"r": rid, "a": activity(c)})
+            t.rollback()
+            # the caller's session hold survives the publication attempt and its rollback
+            assert c.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": repo.PUBLICATION_LOCK}).scalar_one()
+            c.commit()
+        finally:
+            c.execute(text("SELECT pg_advisory_unlock_all()"))
+            c.commit()
+    with db.owner.connect() as c:
+        src = c.execute(text("SELECT prosrc FROM pg_proc WHERE oid = 'ops.check_publication'::regproc")).scalar_one()
+    assert "advisory_unlock" not in src and "client_min_messages" not in src
+
+
+def test_publication_lock_is_held_until_commit(w: dict[str, Any]) -> None:
+    """A session-level hold is accepted, and the trigger pins a transaction-level hold until commit."""
     db = w["db"]
     with db.worker.connect() as c:
         try:
             t = c.begin()
             rid = draft_release(c, w)
             add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
-            c.execute(text("SELECT pg_advisory_lock(:k)"), {"k": repo.PUBLICATION_LOCK})  # session-level
-            with pytest.raises(DBAPIError, match="transaction-scoped"):
-                c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                          {"r": rid, "a": activity(c)})
+            c.execute(text("SELECT pg_advisory_lock(:k)"), {"k": repo.PUBLICATION_LOCK})
+            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                      {"r": rid, "a": activity(c)})
+            # releasing the session hold early does not release the transaction-level one
+            assert c.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": repo.PUBLICATION_LOCK}).scalar_one()
+            assert _session_lock_rows(c) == 1
+            with db.worker.connect() as other:
+                assert other.execute(text("SELECT pg_try_advisory_xact_lock(:k)"),
+                                     {"k": repo.PUBLICATION_LOCK}).scalar_one() is False
+                other.rollback()
             t.rollback()
+            assert _session_lock_rows(c) == 0
         finally:
             c.execute(text("SELECT pg_advisory_unlock_all()"))
             c.commit()
-    with tx(db.worker) as c:  # the two-int4 form (objsubid 2) does not count either
+
+
+def test_publication_requires_the_lock_before_insert(w: dict[str, Any]) -> None:
+    with tx(w["db"].worker) as c:  # no lock at all
+        rid = draft_release(c, w)
+        add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
+        with pytest.raises(DBAPIError, match="advisory lock"):
+            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                      {"r": rid, "a": activity(c)})
+    with tx(w["db"].worker) as c:  # the two-int4 form (objsubid 2) does not count either
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
         c.execute(text("SELECT pg_advisory_xact_lock(0, :k)"), {"k": repo.PUBLICATION_LOCK})
         with pytest.raises(DBAPIError, match="advisory lock"):
             c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
                       {"r": rid, "a": activity(c)})
-    with tx(db.worker) as c:  # positive control
+    with tx(w["db"].worker) as c:  # positive control
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
         publish(c, rid)

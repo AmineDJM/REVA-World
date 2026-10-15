@@ -156,6 +156,13 @@ def create_scenario(
                                          {"h": spec_sha}).scalar_one_or_none()
             if sid is None:
                 raise
+        if existed is None:
+            # sim.create_scenario serialises identical creators (advisory lock) and returns the row a
+            # concurrent caller committed while we waited: that is an existing scenario, not a new one.
+            inserted = conn.execute(text("SELECT meta.inserted_in_current_xact(xmin) FROM sim.scenario "
+                                         "WHERE id = :i"), {"i": sid}).scalar_one_or_none()
+            if not inserted:
+                existed = sid
         row = fetch_scenario(conn, sid)
     assert row is not None
     if existed is not None:

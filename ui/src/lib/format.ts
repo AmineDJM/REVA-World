@@ -260,3 +260,49 @@ export function sourceFlagNotes(flags: Record<string, unknown> | null | undefine
   if (typeof flags.obs_status === 'string' && flags.obs_status.trim()) out.push(`provider status: ${flags.obs_status.trim()}`);
   return out;
 }
+
+/**
+ * Exact comparison of two decimal strings (no float rounding): -1, 0 or 1, or null if either is
+ * not a plain decimal. Used to place a point (e.g. the L1 value) relative to a range's ends.
+ */
+export function compareDecimalStrings(a: string, b: string): -1 | 0 | 1 | null {
+  const parse = (s: string) => {
+    const m = /^([+-]?)(\d*)(?:\.(\d*))?$/.exec(s.trim().replace(/^−/, '-'));
+    if (!m || (m[2] === '' && (m[3] ?? '') === '')) return null;
+    const int = (m[2] ?? '').replace(/^0+/, '');
+    const frac = (m[3] ?? '').replace(/0+$/, '');
+    const zero = int === '' && frac === '';
+    return { neg: m[1] === '-' && !zero, int, frac };
+  };
+  const x = parse(a);
+  const y = parse(b);
+  if (!x || !y) return null;
+  if (x.neg !== y.neg) return x.neg ? -1 : 1;
+  const sign = x.neg ? -1 : 1;
+  let mag: number;
+  if (x.int.length !== y.int.length) mag = x.int.length > y.int.length ? 1 : -1;
+  else if (x.int !== y.int) mag = x.int > y.int ? 1 : -1;
+  else {
+    const n = Math.max(x.frac.length, y.frac.length);
+    const fx = x.frac.padEnd(n, '0');
+    const fy = y.frac.padEnd(n, '0');
+    mag = fx === fy ? 0 : fx > fy ? 1 : -1;
+  }
+  return (mag * sign) as -1 | 0 | 1;
+}
+
+/**
+ * Where a point value sits relative to a range: used to say "L1 = upper end under this grid"
+ * instead of drawing an interval around L1 (the L2 range over an assumed elasticity grid is
+ * often one-sided by construction).
+ */
+export function pointInRange(point: string, lower: string, upper: string): 'lower_end' | 'upper_end' | 'degenerate' | 'inside' | 'outside' | null {
+  const lo = compareDecimalStrings(point, lower);
+  const hi = compareDecimalStrings(point, upper);
+  if (lo === null || hi === null) return null;
+  if (lo === 0 && hi === 0) return 'degenerate';
+  if (hi === 0) return 'upper_end';
+  if (lo === 0) return 'lower_end';
+  if (lo > 0 && hi < 0) return 'inside';
+  return 'outside';
+}

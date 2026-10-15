@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatDecimalString, sourceFlagNotes } from './format';
+import { compareDecimalStrings, formatDecimalString, pointInRange, sourceFlagNotes } from './format';
 
 describe('formatDecimalString', () => {
   it('keeps the rounding carry into the integer part', () => {
@@ -37,5 +37,24 @@ describe('sourceFlagNotes', () => {
     ).toEqual(['provider estimation flagged: not a direct customs observation']);
     expect(sourceFlagNotes({ indicator: 'SP.POP.TOTL', obs_status: '' })).toEqual([]);
     expect(sourceFlagNotes(null)).toEqual([]);
+  });
+});
+
+describe('compareDecimalStrings / pointInRange', () => {
+  it('compares decimal strings exactly, including sign and trailing zeros', () => {
+    expect(compareDecimalStrings('84411166795', '84411166795.000')).toBe(0);
+    expect(compareDecimalStrings('-10279108880.596527', '13816425164.75')).toBe(-1);
+    expect(compareDecimalStrings('0.0000000000000000001', '0')).toBe(1);
+    expect(compareDecimalStrings('-0', '0')).toBe(0);
+    expect(compareDecimalStrings('-2.5', '-2.25')).toBe(-1);
+    expect(compareDecimalStrings('abc', '1')).toBeNull();
+  });
+
+  it('places L1 at an end of a one-sided sensitivity range', () => {
+    expect(pointInRange('13816425164.75', '-10279108880.596527', '13816425164.75')).toBe('upper_end');
+    expect(pointInRange('210950531.25', '210950531.25', '283975909.495112')).toBe('lower_end');
+    expect(pointInRange('5', '1', '9')).toBe('inside');
+    expect(pointInRange('3', '3', '3')).toBe('degenerate');
+    expect(pointInRange('10', '1', '9')).toBe('outside');
   });
 });
