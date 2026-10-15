@@ -104,7 +104,8 @@ def test_sim_cannot_squat_scenario_identity(baseline: dict[str, Any]) -> None:
                         {"s": baseline_manifest(db, baseline)}).scalar_one()
         with pytest.raises(DBAPIError, match="permission denied for table scenario"):
             c.execute(text("""INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest,
-                                spec_sha256, created_by) VALUES (:c, :r, CAST(:sp AS jsonb), 'x', :s, 'human:admin')"""),
+                                spec_sha256, created_by)
+                              VALUES (:c, :r, CAST(:sp AS jsonb), 'x', :s, 'human:admin')"""),
                       {"c": ctx, "r": baseline["release_id"], "sp": forged(s), "s": sha})
     # The API's create_scenario stores the caller's spec and its canonical bytes.
     with db.api.begin() as c:
@@ -197,7 +198,7 @@ def test_concurrent_identical_create_scenario_returns_one_id(baseline: dict[str,
         try:
             with db.api.begin() as c2:
                 out["sid"] = c2.execute(text(CREATE), params(s)).scalar_one()
-        except Exception as e:  # noqa: BLE001 - reported below
+        except Exception as e:  # reported below
             out["error"] = e
 
     with db.api.connect() as c1:

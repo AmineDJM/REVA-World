@@ -12,6 +12,7 @@ Tests marked ``xfail(strict=True)`` encode a property the current code violates
 
 from __future__ import annotations
 
+import itertools
 import json
 import random
 import uuid
@@ -21,7 +22,7 @@ from datetime import UTC, date, datetime
 from typing import Any
 
 import pytest
-from hypothesis import HealthCheck, example, given, settings
+from hypothesis import HealthCheck, event, example, given, settings
 from hypothesis import strategies as st
 
 from reva.belief.selection import select_report
@@ -158,7 +159,8 @@ def test_retracting_the_selected_lineage_drops_it(data: Any) -> None:
     rows, prefs = data
     for s in select_report(rows, prefs).selections:
         mutated = [{**r, "selection_status": "retracted"} if r["id"] == s.observation_id else r for r in rows]
-        after = {(x.subject_id, x.concept_version_id, x.support_id): x for x in select_report(mutated, prefs).selections}
+        after = {(x.subject_id, x.concept_version_id, x.support_id): x
+                 for x in select_report(mutated, prefs).selections}
         x = after.get((s.subject_id, s.concept_version_id, s.support_id))
         assert x is None or x.observation_id != s.observation_id
         if x is not None:
@@ -242,14 +244,17 @@ def _lineage_row(db: Any, cutoff: datetime, tag: str, *, include_retracted: bool
 @settings(max_examples=6, deadline=None,
           suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
 @given(values=st.lists(st.integers(1, 10**6).map(str), min_size=1, max_size=4).filter(
-           lambda v: all(a != b for a, b in zip(v, v[1:], strict=False))),
+           lambda v: all(a != b for a, b in itertools.pairwise(v))),
        retract=st.sampled_from(["none", "head", "older"]))
+@example(values=["10", "20", "30"], retract="older")
+@example(values=["10", "20"], retract="head")
 def test_eligible_latest_respects_cutoff_and_retraction(db: Any, _restore_dirty_nodes: None, values: list[str],
                                                         retract: str) -> None:
     from sqlalchemy import text
 
     from reva.evidence.retractions import retract_observation
 
+    event(f"retract={retract} revisions={len(values)}")
     tag = uuid.uuid4().hex[:10]
     t_before = _now(db.worker)
     cutoffs = []

@@ -105,6 +105,8 @@ def test_concurrent_publish_jobs_on_two_workers_make_one_release(
     wait_until(all_done, 50, interval=0.2, what="all publish jobs terminal", procs=[a, b])
     js = [j for j in publish_jobs(pdb) if str(j["id"]) in ids]
     assert all(j["status"] == "succeeded" for j in js), js
+    print("\npublish jobs:", [(j["result_ref"]["status"], j["attempts"], (j["last_error"] or {}).get("code"))
+                            for j in js])
     statuses = sorted(j["result_ref"]["status"] for j in js)
     assert statuses == ["published", "up_to_date", "up_to_date"], js
     after = snapshot(pdb)

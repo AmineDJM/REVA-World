@@ -40,7 +40,7 @@ local equivalents of every offline job. Files: `.github/workflows/{ci,live-smoke
 
 The DB environment matches what the tests expect:
 
-- The service uses `POSTGRES_USER=reva_owner`, `POSTGRES_PASSWORD=local_reva_owner_only` and
+- The service uses `POSTGRES_USER=reva_owner`, the throwaway `POSTGRES_PASSWORD` from `.env.example` and
   `POSTGRES_DB=reva`. These are the values in `.env.example`'s `REVA_MIGRATION_DATABASE_URL`.
 - `tests/conftest.py` reads `.env`. It creates a fresh `reva_test_<hex>` database, then bootstraps
   and seeds it.

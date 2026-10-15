@@ -1,5 +1,6 @@
 /** Formatting helpers. Values travel as decimal strings; we never coerce missing to 0. */
 import type { MeasurementBasis, Modality, ContextMode, TimeExtent, TypedValue, MissingReason } from '../api/types';
+import { formatNumber, separators } from './locale';
 
 export const MISSING_REASON_LABEL: Record<MissingReason, string> = {
   not_collected: 'not collected',
@@ -48,15 +49,20 @@ export function contextModeLabel(m: string | null | undefined): string {
   return (CONTEXT_MODE_LABEL as Record<string, string>)[m] ?? m;
 }
 
-/** Group the integer part of a decimal string without float conversion. */
-export function formatDecimalString(value: string, maxFractionDigits = 6): string {
+/**
+ * Group the integer part of a decimal string without float conversion (separators of the app
+ * locale). Fractions longer than `maxFractionDigits` are rounded half-up for display; with
+ * `padFraction`, a value that has a fraction is shown with exactly `maxFractionDigits` digits
+ * (e.g. US$ to the cent: "57,082,396,439.60").
+ */
+export function formatDecimalString(value: string, maxFractionDigits = 6, padFraction = false): string {
   const trimmed = value.trim();
   const m = /^([+-]?)(\d*)(?:\.(\d*))?(?:[eE]([+-]?\d+))?$/.exec(trimmed);
   if (!m) return trimmed;
   if (m[4] !== undefined) {
     // Exponent form: fall back to Number formatting only for display.
     const n = Number(trimmed);
-    return Number.isFinite(n) ? n.toLocaleString('en-US', { maximumSignificantDigits: 15 }) : trimmed;
+    return Number.isFinite(n) ? formatNumber(n, { maximumSignificantDigits: 15 }) : trimmed;
   }
   let intPart = (m[2] || '0').replace(/^0+(?=\d)/, '');
   let frac = m[3] ?? '';
@@ -66,11 +72,49 @@ export function formatDecimalString(value: string, maxFractionDigits = 6): strin
     intPart = r.int.replace(/^0+(?=\d)/, '');
     frac = r.frac;
   }
-  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const { group, decimal } = separators();
+  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, group);
+  const hadFraction = /[1-9]/.test(m[3] ?? '');
   frac = frac.replace(/0+$/, '');
-  const isZero = /^0*$/.test(intPart) && !frac;
+  if (padFraction && hadFraction && maxFractionDigits > 0) frac = frac.padEnd(maxFractionDigits, '0');
+  const isZero = /^0*$/.test(intPart) && !/[1-9]/.test(frac);
   const sign = m[1] === '-' && !isZero ? '−' : '';
-  return `${sign}${grouped}${frac ? `.${frac}` : ''}`;
+  return `${sign}${grouped}${frac ? `${decimal}${frac}` : ''}`;
+}
+
+/**
+ * Display precision per unit. Simulation outputs and estimates travel as exact decimal strings
+ * with many digits (e.g. "57082396439.600717"); printing all of them implies a precision the
+ * inputs do not have. US$ are shown to the cent and percentages to 4 decimals; everything else
+ * keeps up to 6. The exact string is never altered: it stays available on hover/expand and is
+ * what CSV/JSON exports carry.
+ */
+export const DISPLAY_FRACTION_DIGITS: Record<string, { digits: number; pad: boolean }> = {
+  'unit.usd': { digits: 2, pad: true },
+  'unit.percent': { digits: 4, pad: false },
+  'unit.percent_of_baseline_gdp': { digits: 4, pad: false },
+};
+
+export interface DisplayDecimal {
+  /** Display text (rounded for display, locale separators). */
+  text: string;
+  /** The exact decimal string as served. */
+  exact: string;
+  /** Whether display rounding dropped digits (so the exact value differs from the text). */
+  rounded: boolean;
+}
+
+/** Display form of an exact decimal string for a given unit; see DISPLAY_FRACTION_DIGITS. */
+export function displayDecimal(value: string, unitRef?: string | null): DisplayDecimal {
+  const p = (unitRef && DISPLAY_FRACTION_DIGITS[unitRef]) || { digits: 6, pad: false };
+  const exact = String(value).trim();
+  const m = /^[+-]?\d*(?:\.(\d*))?$/.exec(exact);
+  const significantFrac = m ? (m[1] ?? '').replace(/0+$/, '') : '';
+  return {
+    text: formatDecimalString(exact, p.digits, p.pad),
+    exact,
+    rounded: !!m && significantFrac.length > p.digits,
+  };
 }
 
 function roundFraction(intPart: string, frac: string, digits: number): { int: string; frac: string } {
@@ -102,7 +146,7 @@ export function compactMagnitude(value: string): string | null {
     [1e6, 'million'],
   ];
   for (const [s, label] of scales) {
-    if (abs >= s) return `${(n / s).toLocaleString('en-US', { maximumFractionDigits: 2 })} ${label}`;
+    if (abs >= s) return `${formatNumber(n / s, { maximumFractionDigits: 2 })} ${label}`;
   }
   return null;
 }
@@ -132,16 +176,16 @@ export function basisLabel(basis: MeasurementBasis | null | undefined): string {
   return parts.join(', ');
 }
 
-/** Plain-text rendering of a typed value (used in exports and aria labels). */
+/** Plain-text display rendering of a typed value (aria labels, graph labels). Exports use valueNumericString. */
 export function valueToText(v: TypedValue | null | undefined): string {
   if (!v) return 'missing (not provided by API)';
   switch (v.kind) {
     case 'missing':
       return `missing (${missingReasonLabel(String(v.reason))})`;
     case 'decimal':
-      return `${formatDecimalString(String(v.value))} ${unitLabel(String(v.unit_ref))}`.trim();
+      return `${displayDecimal(String(v.value), String(v.unit_ref)).text} ${unitLabel(String(v.unit_ref))}`.trim();
     case 'float':
-      return `${Number(v.value).toLocaleString('en-US', { maximumSignificantDigits: 15 })} ${unitLabel(String(v.unit_ref))}`.trim();
+      return `${formatNumber(Number(v.value), { maximumSignificantDigits: 15 })} ${unitLabel(String(v.unit_ref))}`.trim();
     case 'category':
       return String(v.code ?? '');
     case 'text':

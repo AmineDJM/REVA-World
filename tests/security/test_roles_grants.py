@@ -458,9 +458,11 @@ def test_sim_object_locations_limited_to_scenario_namespaces(w: World) -> None:
     # Nor may it re-home an existing belief/raw artifact into its own namespace.
     fails(w.db.sim, sql, {"ns": "scenarios", "s": w.manifest_sha}, match="row-level security")
     fails(w.db.sim, sql, {"ns": "scenarios", "s": w.raw_sha}, match="row-level security")
-    # Positive control: an artifact the simulation role creates itself, in this transaction.
+    # Positive control: an artifact the simulation role creates itself, in this transaction
+    # (R5-05: only through sim.register_artifact, which derives the metadata from the bytes).
     with tx(w.db.sim) as c:
-        sha = _artifact(c)
+        doc = json.dumps({"schema": "reva-simulation-result/1", "nonce": uuid.uuid4().hex}).encode()
+        sha = c.execute(text("SELECT sim.register_artifact(:b)"), {"b": doc}).scalar_one()
         c.execute(text(sql), {"ns": "scenarios", "s": sha})
     with tx(w.db.worker) as c:
         sha = _artifact(c)
@@ -760,8 +762,16 @@ def test_scenario_rejects_unpublished_baseline_direct_insert(w: World) -> None:
         "INSERT INTO sim.scenario(context_id, baseline_release_id, spec, spec_digest, spec_sha256, "
         "created_by) VALUES (:c, :b, CAST(:spec AS jsonb), :d, :sha, 'sim')"
     )
+    with tx(w.db.sim) as c:  # (R5-02) scenarios are created only through sim.create_scenario
+        ctx = c.execute(text(sql_ctx), {"sha": w.manifest_sha}).scalar_one()
+        with pytest.raises(DBAPIError, match="permission denied for table scenario"):
+            c.execute(text(sql_scn), {"c": ctx, "b": w.release_id, "d": uuid.uuid4().hex, "sha": w.manifest_sha,
+                                      "spec": json.dumps({"baseline_release_id": str(w.release_id)})})
+    # The trigger still guards every path (exercised as the owner): an unpublished baseline is
+    # refused; a published one passes that check and then fails the spec-bytes binding, because
+    # spec_sha256 here is not the sha of inline canonical bytes encoding the spec.
     for baseline, expect_ok in ((w.unpublished_release_id, False), (w.release_id, True)):
-        with tx(w.db.sim) as c:
+        with tx(w.db.owner) as c:
             ctx = c.execute(text(sql_ctx), {"sha": w.manifest_sha}).scalar_one()
             params = {
                 "c": ctx,
@@ -770,15 +780,12 @@ def test_scenario_rejects_unpublished_baseline_direct_insert(w: World) -> None:
                 "d": uuid.uuid4().hex,
                 "sha": w.manifest_sha,
             }
-            if expect_ok:
+            with pytest.raises(DBAPIError, match="verified canonical bytes" if expect_ok else "is not published"):
                 c.execute(text(sql_scn), params)
-            else:
-                with pytest.raises(DBAPIError, match="is not published"):
-                    c.execute(text(sql_scn), params)
 
 
 def test_scenario_spec_baseline_must_match_pinned_baseline(w: World) -> None:
-    with tx(w.db.sim) as c:
+    with tx(w.db.owner) as c:  # (R5-02) the sim role has no INSERT on sim.scenario; the trigger guards all paths
         ctx = c.execute(
             text(
                 "INSERT INTO meta.context(mode, origin, manifest_sha256, knowledge_cutoff) "

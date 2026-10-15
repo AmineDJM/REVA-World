@@ -65,6 +65,12 @@ def new_artifact(c: Connection) -> str:
     return sha
 
 
+def sim_artifact(c: Connection) -> str:
+    """(R5-05) The simulation role registers artifact metadata only through sim.register_artifact."""
+    doc = json.dumps({"schema": "reva-simulation-result/1", "nonce": uuid.uuid4().hex}).encode()
+    return str(c.execute(text("SELECT sim.register_artifact(:b)"), {"b": doc}).scalar_one())
+
+
 @pytest.fixture(scope="module")
 def w(db: Any) -> dict[str, Any]:
     return build_world(db)
@@ -651,11 +657,11 @@ def test_sim_cannot_attach_provenance_to_source_activities(w: dict[str, Any]) ->
         ("input", "INSERT INTO meta.activity_input(activity_id, ordinal, artifact_sha256) VALUES (:a, 99, :s)"),
     ):
         with tx(db.sim) as c:
-            sha = new_artifact(c)
+            sha = sim_artifact(c)
             with pytest.raises(DBAPIError, match="row-level security"):
                 c.execute(text(sql), {"a": src_act, "s": sha})
         with tx(db.sim) as c:  # positive control: its own simulation activity
-            sha = new_artifact(c)
+            sha = sim_artifact(c)
             c.execute(text(sql), {"a": activity(c, "simulation", "sim:test"), "s": sha})
         with tx(db.worker) as c:  # the worker keeps writing non-simulation provenance
             sha = new_artifact(c)
@@ -681,16 +687,16 @@ def test_sim_cannot_register_locations_for_other_artifacts(w: dict[str, Any]) ->
     with tx(db.sim) as c, pytest.raises(DBAPIError, match="row-level security"):
         c.execute(text(LOCATION_SQL), {"uri": "s3://attacker/raw", "ns": "scenarios", "s": raw})
     with db.sim.begin() as c:  # an artifact committed earlier without any location
-        orphan = new_artifact(c)
+        orphan = sim_artifact(c)
     with tx(db.sim) as c, pytest.raises(DBAPIError, match="row-level security"):
         c.execute(text(LOCATION_SQL), {"uri": "s3://attacker/orphan", "ns": "scenarios", "s": orphan})
     with tx(db.sim) as c:  # positive: an artifact created in this transaction, in a sim namespace
-        sha = new_artifact(c)
+        sha = sim_artifact(c)
         c.execute(text(LOCATION_SQL), {"uri": f"file:///scenarios/{sha}", "ns": "scenarios", "s": sha})
         with pytest.raises(DBAPIError, match="row-level security"), c.begin_nested():
             c.execute(text(LOCATION_SQL), {"uri": f"file:///belief/{sha}", "ns": "belief", "s": sha})
     with db.sim.begin() as c:  # content-addressed reuse of an existing simulation artifact stays possible
-        sha = new_artifact(c)
+        sha = sim_artifact(c)
         c.execute(text(LOCATION_SQL), {"uri": f"file:///evaluation/{sha}", "ns": "evaluation", "s": sha})
     with tx(db.sim) as c:
         c.execute(text(LOCATION_SQL + " ON CONFLICT (artifact_sha256, storage_uri) DO NOTHING"),
