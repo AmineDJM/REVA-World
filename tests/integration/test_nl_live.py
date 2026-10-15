@@ -37,10 +37,15 @@ class OneRequestLedger:
 def test_live_openai_drafts_the_basic_request() -> None:
     model = os.environ.get("REVA_LLM_MODEL") or DEFAULT_OPENAI_MODEL
     text = "What happens to France and the USA if crude oil import prices rise by 20% in 2023?"
-    inp = DraftInput(text=text, baseline_release_id="11111111-1111-4111-8111-111111111111",
-                     knowledge_cutoff="2026-10-01T00:00:00Z", operation_key=hashlib.sha256(text.encode()).hexdigest())
-    r = asyncio.run(draft_scenario(inp, drafters=[OpenAIDrafter(model)], ledger=OneRequestLedger(),
-                                   budget=load_llm_budget()))
+    inp = DraftInput(
+        text=text,
+        baseline_release_id="11111111-1111-4111-8111-111111111111",
+        knowledge_cutoff="2026-10-01T00:00:00Z",
+        operation_key=hashlib.sha256(text.encode()).hexdigest(),
+    )
+    r = asyncio.run(
+        draft_scenario(inp, drafters=[OpenAIDrafter(model)], ledger=OneRequestLedger(), budget=load_llm_budget())
+    )
     print(f"live model={r.model} latency_ms={r.latency_ms} usage={r.usage} status={r.status}")
     assert r.provider == "openai" and r.model.startswith(model)
     assert r.status in ("draft_ready", "needs_input")

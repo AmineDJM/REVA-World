@@ -49,17 +49,27 @@ def _now(engine) -> datetime:
 
 def _lineage(engine, logical_key: str) -> list[dict]:
     with engine.connect() as c:
-        return [dict(r) for r in c.execute(text(
-            """SELECT o.id, o.revision_no, o.supersedes_id, o.value->>'value' AS v, o.recorded_at,
+        return [
+            dict(r)
+            for r in c.execute(
+                text(
+                    """SELECT o.id, o.revision_no, o.supersedes_id, o.value->>'value' AS v, o.recorded_at,
                       o.acquisition_id, o.parser_version, o.source_published_at, cv.version AS connector_version
                FROM evidence.observation o JOIN evidence.connector_version cv ON cv.id = o.connector_version_id
-               WHERE o.logical_key = :k ORDER BY o.revision_no"""), {"k": logical_key}).mappings()]
+               WHERE o.logical_key = :k ORDER BY o.revision_no"""
+                ),
+                {"k": logical_key},
+            ).mappings()
+        ]
 
 
 def _value_for(manifest: dict, logical_key: str) -> str:
     by_obs = {i["observation_id"]: i["logical_key"] for i in manifest["inputs"]}
-    vals = [o["value"]["value"] for o in manifest["outputs"]
-            if any(by_obs.get(x) == logical_key for x in o["input_observation_ids"])]
+    vals = [
+        o["value"]["value"]
+        for o in manifest["outputs"]
+        if any(by_obs.get(x) == logical_key for x in o["input_observation_ids"])
+    ]
     assert len(vals) == 1, (logical_key, vals)
     return vals[0]
 
@@ -69,16 +79,17 @@ async def test_two_revisions_yield_different_as_of_answers(db):
     key = "wb:SP.POP.TOTL:FRA:1991"
     s1, _ = await vl.ingest_vintage(db.worker, db.store, name, "v1")
     assert (s1.inserted, s1.unchanged) == (2, 0)
-    r1 = publish_release(db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture,
-                         environment="test", concepts=[POP])
+    r1 = publish_release(
+        db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture, environment="test", concepts=[POP]
+    )
     t_between = _now(db.worker)
     with db.api.connect() as conn:
-        before_correction = operational_as_known(conn, t_between, origin="test_fixture", concepts=[POP],
-                                                 store=db.store)
+        before_correction = operational_as_known(conn, t_between, origin="test_fixture", concepts=[POP], store=db.store)
     s2, _ = await vl.ingest_vintage(db.worker, db.store, name, "v2")
     assert (s2.inserted, s2.unchanged) == (1, 1)  # only the revised 1991 value
-    r2 = publish_release(db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture,
-                         environment="test", concepts=[POP])
+    r2 = publish_release(
+        db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture, environment="test", concepts=[POP]
+    )
     t_after = _now(db.worker)
 
     lineage = _lineage(db.worker, key)
@@ -98,12 +109,17 @@ async def test_two_revisions_yield_different_as_of_answers(db):
         # A later correction cannot change an earlier as-of query.
         strip = ("replayed_at",)
         assert {k: v for k, v in between.items() if k not in strip} == {
-            k: v for k, v in before_correction.items() if k not in strip}
+            k: v for k, v in before_correction.items() if k not in strip
+        }
         # Filtering precedes revision selection in the cutoff-scoped repository as well.
-        rows_between = {r["logical_key"]: r for r in CutoffRepository(
-            conn, t_between, "as_known", origins=["test_fixture"]).observations([POP]).rows}
-        rows_after = {r["logical_key"]: r for r in CutoffRepository(
-            conn, t_after, "as_known", origins=["test_fixture"]).observations([POP]).rows}
+        rows_between = {
+            r["logical_key"]: r
+            for r in CutoffRepository(conn, t_between, "as_known", origins=["test_fixture"]).observations([POP]).rows
+        }
+        rows_after = {
+            r["logical_key"]: r
+            for r in CutoffRepository(conn, t_after, "as_known", origins=["test_fixture"]).observations([POP]).rows
+        }
         assert rows_between[key]["revision_no"] == 1 and rows_between[key]["value"]["value"] == "56976123"
         assert rows_after[key]["revision_no"] == 2 and rows_after[key]["value"]["value"] == "56982040"
         assert rows_after[key]["first_release_value"]["value"] == "56976123"
@@ -134,8 +150,10 @@ async def test_aba_creates_three_revisions_identical_polls_create_none(db):
     assert lin[1]["supersedes_id"] == lin[0]["id"] and lin[2]["supersedes_id"] == lin[1]["id"]
     assert len(_lineage(db.worker, "wb:SP.POP.TOTL:FRA:1985")) == 1
     with db.worker.connect() as c:
-        n_acq = c.execute(text("SELECT count(*) FROM evidence.acquisition WHERE raw_sha256 = ANY(:s)"),
-                          {"s": [sa.raw_sha256, rep.raw_sha256, sb.raw_sha256, sa2.raw_sha256]}).scalar_one()
+        n_acq = c.execute(
+            text("SELECT count(*) FROM evidence.acquisition WHERE raw_sha256 = ANY(:s)"),
+            {"s": [sa.raw_sha256, rep.raw_sha256, sb.raw_sha256, sa2.raw_sha256]},
+        ).scalar_one()
     assert n_acq == 4
 
 
@@ -156,17 +174,31 @@ async def test_replayed_raw_with_new_parser_is_distinguished_from_original_vinta
     replay_conn = vl.ReplayParserWorldBank(countries=("FRA",), years=(y0, y1))
     vl.register_connector_variant(db.owner, db.store, replay_conn)  # reviewed registry change: owner (R5-01)
     archived = db.store.get("raw", orig.raw_sha256)  # the original vintage bytes, as archived
-    rep, _raw1 = await vl.ingest_vintage(db.worker, db.store, name, "v1", connector=replay_conn,
-                                        replay_of=str(orig.acquisition_id), retrieved_at=raw0.retrieved_at,
-                                        body=archived)
+    rep, _raw1 = await vl.ingest_vintage(
+        db.worker,
+        db.store,
+        name,
+        "v1",
+        connector=replay_conn,
+        replay_of=str(orig.acquisition_id),
+        retrieved_at=raw0.retrieved_at,
+        body=archived,
+    )
     assert not rep.duplicate_acquisition and rep.acquisition_id != orig.acquisition_id
     assert rep.raw_sha256 == orig.raw_sha256
     assert (rep.inserted, rep.unchanged) == (0, 2)  # no spurious revision for unchanged values
     with db.worker.connect() as c:
-        acqs = {str(r["id"]): dict(r) for r in c.execute(text(
-            """SELECT a.id, a.retrieved_at, a.recorded_at, a.response_metadata, cv.version, cv.name
+        acqs = {
+            str(r["id"]): dict(r)
+            for r in c.execute(
+                text(
+                    """SELECT a.id, a.retrieved_at, a.recorded_at, a.response_metadata, cv.version, cv.name
                FROM evidence.acquisition a JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
-               WHERE a.id = ANY(:ids)"""), {"ids": [orig.acquisition_id, rep.acquisition_id]}).mappings()}
+               WHERE a.id = ANY(:ids)"""
+                ),
+                {"ids": [orig.acquisition_id, rep.acquisition_id]},
+            ).mappings()
+        }
     o, r = acqs[str(orig.acquisition_id)], acqs[str(rep.acquisition_id)]
     assert o["version"] == "1.0.0" and r["version"] == vl.ReplayParserWorldBank.VERSION
     assert o["name"] == r["name"] == "worldbank.wdi.indicators"
@@ -179,9 +211,16 @@ async def test_replayed_raw_with_new_parser_is_distinguished_from_original_vinta
         assert len(lin) == 1
         assert lin[0]["connector_version"] == "1.0.0" and lin[0]["parser_version"] == "wb-parse-1"
     # replaying the same bytes with the same new parser again is idempotent
-    again, _ = await vl.ingest_vintage(db.worker, db.store, name, "v1", connector=replay_conn,
-                                       replay_of=str(orig.acquisition_id), retrieved_at=raw0.retrieved_at,
-                                       body=archived)
+    again, _ = await vl.ingest_vintage(
+        db.worker,
+        db.store,
+        name,
+        "v1",
+        connector=replay_conn,
+        replay_of=str(orig.acquisition_id),
+        retrieved_at=raw0.retrieved_at,
+        body=archived,
+    )
     assert again.duplicate_acquisition and again.acquisition_id == rep.acquisition_id
 
 
@@ -192,17 +231,25 @@ async def test_missing_source_publication_time_is_never_the_reference_date(db):
         await run_connector(c, FixtureHttp(name), db.store, db.worker, persist_cursor=False)
     await vl.ingest_vintage(db.worker, db.store, "pop_fra_1950_1951_chain", "v1")
     with db.worker.connect() as c:
-        rows = c.execute(text(
-            """SELECT s.source_key, count(*) AS n, count(o.source_published_at) AS with_pub
+        rows = (
+            c.execute(
+                text(
+                    """SELECT s.source_key, count(*) AS n, count(o.source_published_at) AS with_pub
                FROM evidence.observation o JOIN evidence.source s ON s.id = o.source_id
                WHERE s.source_key IN ('worldbank.wdi', 'un.comtrade.public_preview')
                GROUP BY s.source_key"""
-        )).mappings().all()
-        dataset_dates = c.execute(text(
-            """SELECT count(*) FROM evidence.acquisition a,
+                )
+            )
+            .mappings()
+            .all()
+        )
+        dataset_dates = c.execute(
+            text(
+                """SELECT count(*) FROM evidence.acquisition a,
                       jsonb_array_elements(a.response_metadata->'batch_metadata') b
                WHERE b ? 'dataset_last_updated' AND b->>'dataset_last_updated' IS NOT NULL"""
-        )).scalar_one()
+            )
+        ).scalar_one()
     stats = {r["source_key"]: r for r in rows}
     assert stats["worldbank.wdi"]["n"] > 0 and stats["un.comtrade.public_preview"]["n"] > 0
     for r in stats.values():
@@ -225,15 +272,15 @@ async def test_supersedes_chain_constraints_are_enforced_by_the_database(db):
            SELECT source_id, connector_version_id, acquisition_id, :lk, :rev, :sup, subject_id,
              concept_version_id, support_id, '{"kind":"decimal","value":"1","unit_ref":"unit.persons"}'::jsonb,
              uncertainty, source_flags, raw_selector, parser_version, provenance_activity_id, 'x', 'y'
-           FROM evidence.observation WHERE id = :base""")
+           FROM evidence.observation WHERE id = :base"""
+    )
     head51 = l51[1]
     cases = {
         "skips_a_revision_number": {"lk": k51, "rev": 4, "sup": head51["id"], "base": head51["id"]},
         "points_to_another_logical_key": {"lk": k50, "rev": 3, "sup": head51["id"], "base": head51["id"]},
         "forks_an_already_superseded_revision": {"lk": k51, "rev": 2, "sup": l51[0]["id"], "base": head51["id"]},
         "later_revision_without_supersedes": {"lk": k51, "rev": 3, "sup": None, "base": head51["id"]},
-        "first_revision_with_supersedes": {"lk": k50 + ":bogus", "rev": 1, "sup": l50[0]["id"],
-                                           "base": head51["id"]},
+        "first_revision_with_supersedes": {"lk": k50 + ":bogus", "rev": 1, "sup": l50[0]["id"], "base": head51["id"]},
     }
     for label, params in cases.items():
         with pytest.raises(sa_exc.DBAPIError), db.worker.begin() as c:

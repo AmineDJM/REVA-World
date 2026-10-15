@@ -70,11 +70,19 @@ def test_rotation_covers_the_sweep_within_the_daily_budget() -> None:
     bad = c.next_cursor(plan, [FetchOutcome(item_key=plan.items[0].key, status="failed")])
     assert bad.state["complete"] is False
     # A smaller request budget shrinks the slice; a changed reporter list restarts the sweep.
-    assert len(c.plan(Cursor(state={"offset": 5, "plan_digest": cursor.state["plan_digest"]}),
-                      FetchBudget(max_requests=3)).items) == 3
+    assert (
+        len(
+            c.plan(
+                Cursor(state={"offset": 5, "plan_digest": cursor.state["plan_digest"]}), FetchBudget(max_requests=3)
+            ).items
+        )
+        == 3
+    )
     other = ComtradeBatchConnector(CT_SUBSET)
-    assert other.plan(Cursor(state={"offset": 5, "plan_digest": cursor.state["plan_digest"]}),
-                      FetchBudget()).items[0].key == other.units()[0].key
+    assert (
+        other.plan(Cursor(state={"offset": 5, "plan_digest": cursor.state["plan_digest"]}), FetchBudget()).items[0].key
+        == other.units()[0].key
+    )
 
 
 async def test_multi_reporter_totals_keep_missing_typed_and_old_editions_ineligible() -> None:
@@ -118,11 +126,27 @@ async def test_bilateral_truncation_blocks_and_splits_into_halves() -> None:
     c = subset()
     item = next(u for u in c.units() if u.params["scope"] == "bilateral")
     codes = item.params["reporters"]
-    rows = [{"typeCode": "C", "freqCode": "A", "period": "2023", "reporterCode": codes[i % len(codes)],
-             "flowCode": "M", "partnerCode": 1000 + i, "partner2Code": 0, "cmdCode": "2709", "customsCode": "C00",
-             "motCode": 0, "classificationCode": "H6", "primaryValue": 1.0, "cifvalue": None, "fobvalue": None,
-             "netWgt": None, "legacyEstimationFlag": 0}
-            for i in range(cb.MAX_RECORDS)]  # synthetic truncated response (test-only bytes)
+    rows = [
+        {
+            "typeCode": "C",
+            "freqCode": "A",
+            "period": "2023",
+            "reporterCode": codes[i % len(codes)],
+            "flowCode": "M",
+            "partnerCode": 1000 + i,
+            "partner2Code": 0,
+            "cmdCode": "2709",
+            "customsCode": "C00",
+            "motCode": 0,
+            "classificationCode": "H6",
+            "primaryValue": 1.0,
+            "cifvalue": None,
+            "fobvalue": None,
+            "netWgt": None,
+            "legacyEstimationFlag": 0,
+        }
+        for i in range(cb.MAX_RECORDS)
+    ]  # synthetic truncated response (test-only bytes)
     payload = json.dumps({"elapsedTime": "0", "count": cb.MAX_RECORDS, "data": rows, "error": ""}).encode()
     (batch,), (report,) = await _parse(c, item, {_fixture_fingerprint(item.url): payload})
     assert "possible_truncation" in _codes(report, "blocker")

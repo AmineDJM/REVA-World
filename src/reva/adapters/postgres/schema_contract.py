@@ -116,12 +116,12 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
 
     for r in rows(f"""
         SELECT n.nspname, pg_catalog.pg_get_userbyid(n.nspowner) AS owner,
-               {_acl_sql('n.nspacl', "'n'", 'n.nspowner')} AS acl
+               {_acl_sql("n.nspacl", "'n'", "n.nspowner")} AS acl
         FROM pg_catalog.pg_namespace n WHERE n.nspname = ANY(:s)"""):
         objs[f"schema:{r['nspname']}"] = {"owner": _role(r["owner"], None), "acl": _acl(r["acl"], r["owner"])}
 
     for r in rows(f"""
-        SELECT pg_catalog.pg_get_userbyid(d.datdba) AS owner, {_acl_sql('d.datacl', "'d'", 'd.datdba')} AS acl
+        SELECT pg_catalog.pg_get_userbyid(d.datdba) AS owner, {_acl_sql("d.datacl", "'d'", "d.datdba")} AS acl
         FROM pg_catalog.pg_database d WHERE d.datname = current_database()"""):
         objs["database"] = {"acl": _acl(r["acl"], r["owner"])}
 
@@ -135,24 +135,36 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
                CASE WHEN c.relkind = 'p' THEN pg_catalog.pg_get_partkeydef(c.oid) END AS partkey,
                CASE WHEN c.relkind IN ('v', 'm') THEN pg_catalog.pg_get_viewdef(c.oid) END AS viewdef,
                pg_catalog.pg_get_userbyid(c.relowner) AS owner,
-               {_acl_sql('c.relacl', "CASE WHEN c.relkind = 'S' THEN 's' ELSE 'r' END::\"char\"", 'c.relowner')} AS acl,
+               {_acl_sql("c.relacl", "CASE WHEN c.relkind = 'S' THEN 's' ELSE 'r' END::\"char\"", "c.relowner")} AS acl,
                s.seqtypid::regtype::text AS seqtype, s.seqstart, s.seqincrement, s.seqmin, s.seqmax,
                s.seqcache, s.seqcycle
         FROM pg_catalog.pg_class c JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
         LEFT JOIN pg_catalog.pg_sequence s ON s.seqrelid = c.oid
         WHERE n.nspname = ANY(:s) AND c.relkind IN ('r', 'p', 'v', 'm', 'f', 'S', 'c')
-          AND {_NOT_EXT.format(cat='pg_class', oid='c.oid')}"""):
+          AND {_NOT_EXT.format(cat="pg_class", oid="c.oid")}"""):
         attrs = {
-            "kind": r["relkind"], "persistence": r["relpersistence"], "rls": r["relrowsecurity"],
-            "force_rls": r["relforcerowsecurity"], "options": sorted(r["reloptions"] or []),
-            "partition_of": r["partbound"], "partkey": r["partkey"],
-            "owner": _role(r["owner"], None), "acl": _acl(r["acl"], r["owner"]),
+            "kind": r["relkind"],
+            "persistence": r["relpersistence"],
+            "rls": r["relrowsecurity"],
+            "force_rls": r["relforcerowsecurity"],
+            "options": sorted(r["reloptions"] or []),
+            "partition_of": r["partbound"],
+            "partkey": r["partkey"],
+            "owner": _role(r["owner"], None),
+            "acl": _acl(r["acl"], r["owner"]),
         }
         if r["viewdef"] is not None:
             attrs["viewdef_sha256"] = _body_hash(r["viewdef"])
         if r["relkind"] == "S":
-            attrs["sequence"] = [r["seqtype"], r["seqstart"], r["seqincrement"], r["seqmin"], r["seqmax"],
-                                 r["seqcache"], r["seqcycle"]]
+            attrs["sequence"] = [
+                r["seqtype"],
+                r["seqstart"],
+                r["seqincrement"],
+                r["seqmin"],
+                r["seqmax"],
+                r["seqcache"],
+                r["seqcycle"],
+            ]
         objs[f"relation:{r['nspname']}.{r['relname']}"] = attrs
 
     for r in rows(f"""
@@ -161,7 +173,7 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
                CASE WHEN a.attcollation <> 0 AND a.attcollation <> t.typcollation
                     THEN a.attcollation::regcollation::text END AS coll,
                pg_catalog.pg_get_userbyid(c.relowner) AS owner,
-               CASE WHEN a.attacl IS NOT NULL THEN {_ACL_SQL.format(acl='a.attacl')} END AS acl
+               CASE WHEN a.attacl IS NOT NULL THEN {_ACL_SQL.format(acl="a.attacl")} END AS acl
         FROM pg_catalog.pg_attribute a
         JOIN pg_catalog.pg_class c ON c.oid = a.attrelid
         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
@@ -169,10 +181,14 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
         LEFT JOIN pg_catalog.pg_attrdef ad ON ad.adrelid = a.attrelid AND ad.adnum = a.attnum
         WHERE n.nspname = ANY(:s) AND c.relkind IN ('r', 'p', 'v', 'm', 'f', 'c')
           AND a.attnum > 0 AND NOT a.attisdropped
-          AND {_NOT_EXT.format(cat='pg_class', oid='c.oid')}"""):
+          AND {_NOT_EXT.format(cat="pg_class", oid="c.oid")}"""):
         objs[f"column:{r['nspname']}.{r['relname']}.{r['attname']}"] = {
-            "type": r["type"], "not_null": r["attnotnull"], "default": r["dflt"],
-            "identity": r["attidentity"], "generated": r["attgenerated"], "collation": r["coll"],
+            "type": r["type"],
+            "not_null": r["attnotnull"],
+            "default": r["dflt"],
+            "identity": r["attidentity"],
+            "generated": r["attgenerated"],
+            "collation": r["coll"],
             "acl": _acl(r["acl"], r["owner"]),
         }
 
@@ -182,9 +198,12 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
         FROM pg_catalog.pg_constraint co JOIN pg_catalog.pg_namespace n ON n.oid = co.connamespace
         LEFT JOIN pg_catalog.pg_class c ON c.oid = co.conrelid
         LEFT JOIN pg_catalog.pg_type t ON t.oid = co.contypid
-        WHERE n.nspname = ANY(:s) AND (c.oid IS NULL OR {_NOT_EXT.format(cat='pg_class', oid='c.oid')})"""):
+        WHERE n.nspname = ANY(:s) AND (c.oid IS NULL OR {_NOT_EXT.format(cat="pg_class", oid="c.oid")})"""):
         objs[f"constraint:{r['nspname']}.{r['parent']}.{r['conname']}"] = {
-            "type": r["contype"], "def": r["def"], "validated": r["convalidated"]}
+            "type": r["contype"],
+            "def": r["def"],
+            "validated": r["convalidated"],
+        }
 
     for r in rows(f"""
         SELECT n.nspname, ci.relname, pg_catalog.pg_get_indexdef(i.indexrelid) AS def, i.indisvalid
@@ -192,7 +211,7 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
         JOIN pg_catalog.pg_class ci ON ci.oid = i.indexrelid
         JOIN pg_catalog.pg_class ct ON ct.oid = i.indrelid
         JOIN pg_catalog.pg_namespace n ON n.oid = ct.relnamespace
-        WHERE n.nspname = ANY(:s) AND {_NOT_EXT.format(cat='pg_class', oid='ct.oid')}"""):
+        WHERE n.nspname = ANY(:s) AND {_NOT_EXT.format(cat="pg_class", oid="ct.oid")}"""):
         objs[f"index:{r['nspname']}.{r['relname']}"] = {"def": r["def"], "valid": r["indisvalid"]}
 
     for r in rows("""
@@ -204,9 +223,13 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
 
     for r in rows(f"""
         SELECT e.evtname, e.evtevent, e.evtenabled, e.evttags, e.evtfoid::regproc::text AS fn
-        FROM pg_catalog.pg_event_trigger e WHERE {_NOT_EXT.format(cat='pg_event_trigger', oid='e.oid')}"""):
-        objs[f"event_trigger:{r['evtname']}"] = {"event": r["evtevent"], "enabled": r["evtenabled"],
-                                                 "tags": sorted(r["evttags"] or []), "function": r["fn"]}
+        FROM pg_catalog.pg_event_trigger e WHERE {_NOT_EXT.format(cat="pg_event_trigger", oid="e.oid")}"""):
+        objs[f"event_trigger:{r['evtname']}"] = {
+            "event": r["evtevent"],
+            "enabled": r["evtenabled"],
+            "tags": sorted(r["evttags"] or []),
+            "function": r["fn"],
+        }
 
     for r in rows(f"""
         SELECT n.nspname, t.typname, t.typtype, t.typnotnull, t.typdefault,
@@ -216,14 +239,20 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
                ARRAY(SELECT e.enumlabel::text FROM pg_catalog.pg_enum e WHERE e.enumtypid = t.oid
                      ORDER BY e.enumsortorder) AS labels,
                pg_catalog.pg_get_userbyid(t.typowner) AS owner,
-               {_acl_sql('t.typacl', "'T'", 't.typowner')} AS acl
+               {_acl_sql("t.typacl", "'T'", "t.typowner")} AS acl
         FROM pg_catalog.pg_type t JOIN pg_catalog.pg_namespace n ON n.oid = t.typnamespace
         WHERE n.nspname = ANY(:s) AND t.typtype IN ('e', 'd', 'r')
-          AND {_NOT_EXT.format(cat='pg_type', oid='t.oid')}"""):
+          AND {_NOT_EXT.format(cat="pg_type", oid="t.oid")}"""):
         objs[f"type:{r['nspname']}.{r['typname']}"] = {
-            "kind": r["typtype"], "base": r["base"], "subtype": r["subtype"], "labels": list(r["labels"]),
-            "not_null": r["typnotnull"], "default": r["typdefault"],
-            "owner": _role(r["owner"], None), "acl": _acl(r["acl"], r["owner"])}
+            "kind": r["typtype"],
+            "base": r["base"],
+            "subtype": r["subtype"],
+            "labels": list(r["labels"]),
+            "not_null": r["typnotnull"],
+            "default": r["typdefault"],
+            "owner": _role(r["owner"], None),
+            "acl": _acl(r["acl"], r["owner"]),
+        }
 
     for r in rows(f"""
         SELECT n.nspname, p.proname, pg_catalog.oidvectortypes(p.proargtypes) AS ident,
@@ -232,16 +261,26 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
                p.provolatile, p.proisstrict, p.proleakproof, p.proparallel, p.proretset, p.proconfig,
                p.prosrc, pg_catalog.pg_get_function_sqlbody(p.oid) AS sqlbody,
                pg_catalog.pg_get_userbyid(p.proowner) AS owner,
-               {_acl_sql('p.proacl', "'f'", 'p.proowner')} AS acl
+               {_acl_sql("p.proacl", "'f'", "p.proowner")} AS acl
         FROM pg_catalog.pg_proc p JOIN pg_catalog.pg_namespace n ON n.oid = p.pronamespace
         JOIN pg_catalog.pg_language l ON l.oid = p.prolang
-        WHERE n.nspname = ANY(:s) AND {_NOT_EXT.format(cat='pg_proc', oid='p.oid')}"""):
+        WHERE n.nspname = ANY(:s) AND {_NOT_EXT.format(cat="pg_proc", oid="p.oid")}"""):
         objs[f"function:{r['nspname']}.{r['proname']}({r['ident']})"] = {
-            "kind": r["prokind"], "args": r["args"], "result": r["result"], "language": r["lanname"],
-            "security_definer": r["prosecdef"], "volatility": r["provolatile"], "strict": r["proisstrict"],
-            "leakproof": r["proleakproof"], "parallel": r["proparallel"], "returns_set": r["proretset"],
-            "config": sorted(r["proconfig"] or []), "body_sha256": _body_hash(r["prosrc"], r["sqlbody"]),
-            "owner": _role(r["owner"], None), "acl": _acl(r["acl"], r["owner"])}
+            "kind": r["prokind"],
+            "args": r["args"],
+            "result": r["result"],
+            "language": r["lanname"],
+            "security_definer": r["prosecdef"],
+            "volatility": r["provolatile"],
+            "strict": r["proisstrict"],
+            "leakproof": r["proleakproof"],
+            "parallel": r["proparallel"],
+            "returns_set": r["proretset"],
+            "config": sorted(r["proconfig"] or []),
+            "body_sha256": _body_hash(r["prosrc"], r["sqlbody"]),
+            "owner": _role(r["owner"], None),
+            "acl": _acl(r["acl"], r["owner"]),
+        }
 
     for r in rows("""
         SELECT n.nspname, c.relname, pol.polname, pol.polcmd, pol.polpermissive,
@@ -254,13 +293,16 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
         JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
         WHERE n.nspname = ANY(:s)"""):
         objs[f"policy:{r['nspname']}.{r['relname']}.{r['polname']}"] = {
-            "cmd": r["polcmd"], "permissive": r["polpermissive"],
-            "roles": sorted(_role(x, r["owner"]) for x in r["roles"]), "using": r["qual"],
-            "with_check": r["with_check"]}
+            "cmd": r["polcmd"],
+            "permissive": r["polpermissive"],
+            "roles": sorted(_role(x, r["owner"]) for x in r["roles"]),
+            "using": r["qual"],
+            "with_check": r["with_check"],
+        }
 
     for r in rows(f"""
         SELECT pg_catalog.pg_get_userbyid(d.defaclrole) AS role, n.nspname, d.defaclobjtype,
-               {_ACL_SQL.format(acl='d.defaclacl')} AS acl
+               {_ACL_SQL.format(acl="d.defaclacl")} AS acl
         FROM pg_catalog.pg_default_acl d LEFT JOIN pg_catalog.pg_namespace n ON n.oid = d.defaclnamespace
         WHERE n.nspname IS NULL OR n.nspname = ANY(:s)"""):
         who = _role(r["role"], None) if r["role"] in APP_ROLES else "<role>"
@@ -270,8 +312,10 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
     for r in rows("""
         SELECT rolname, rolsuper, rolinherit, rolcreaterole, rolcreatedb, rolbypassrls, rolreplication,
                rolcanlogin FROM pg_catalog.pg_roles WHERE rolname = ANY(:roles)"""):
-        attrs = {k: r[k] for k in ("rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolbypassrls",
-                                   "rolreplication")}
+        attrs = {
+            k: r[k]
+            for k in ("rolsuper", "rolinherit", "rolcreaterole", "rolcreatedb", "rolbypassrls", "rolreplication")
+        }
         if r["rolname"] not in RUNTIME_ROLES:  # runtime LOGIN is set per environment by bootstrap
             attrs["rolcanlogin"] = r["rolcanlogin"]
         objs[f"role:{r['rolname']}"] = attrs
@@ -283,7 +327,8 @@ def collect_objects(conn: Connection) -> dict[str, dict[str, Any]]:
         JOIN pg_catalog.pg_roles m ON m.oid = am.member JOIN pg_catalog.pg_roles g ON g.oid = am.roleid
         WHERE m.rolname = ANY(:roles)"""):
         member_of.setdefault(r["member"], []).append(
-            [_role(r["grp"], None), r["admin_option"], r["inherit_option"], r["set_option"]])
+            [_role(r["grp"], None), r["admin_option"], r["inherit_option"], r["set_option"]]
+        )
     for member, groups in member_of.items():
         objs[f"membership:{member}"] = {"member_of": sorted(groups)}
     return objs
@@ -346,8 +391,11 @@ class SchemaDiff:
             f"(contract head {self.contract_head}, database alembic_version {self.live_head}; "
             f"fingerprint {self.actual_digest[:16]} != {self.expected_digest[:16]})"
         ]
-        for title, keys in (("missing from database", self.missing), ("not in contract", self.unexpected),
-                            ("definition differs", self.changed)):
+        for title, keys in (
+            ("missing from database", self.missing),
+            ("not in contract", self.unexpected),
+            ("definition differs", self.changed),
+        ):
             if keys:
                 lines.append(f"  {title}: {len(keys)}")
                 lines.extend(f"    - {k}" for k in keys[:limit])
@@ -362,10 +410,15 @@ class SchemaDiff:
 
     def as_dict(self, limit: int = 50) -> dict[str, Any]:
         return {
-            "ok": self.ok, "contract_head": self.contract_head, "database_head": self.live_head,
-            "expected_fingerprint": self.expected_digest, "actual_fingerprint": self.actual_digest,
-            **{k: {"count": len(v), "objects": v[:limit]}
-               for k, v in (("missing", self.missing), ("unexpected", self.unexpected), ("changed", self.changed))},
+            "ok": self.ok,
+            "contract_head": self.contract_head,
+            "database_head": self.live_head,
+            "expected_fingerprint": self.expected_digest,
+            "actual_fingerprint": self.actual_digest,
+            **{
+                k: {"count": len(v), "objects": v[:limit]}
+                for k, v in (("missing", self.missing), ("unexpected", self.unexpected), ("changed", self.changed))
+            },
         }
 
 
@@ -439,8 +492,13 @@ def contract_mode(environ: Mapping[str, str] | None = None, reva_env: str | None
     return mode
 
 
-def assert_schema_contract(target: Engine | Connection, *, mode: str | None = None,
-                           reva_env: str | None = None, contract_path: Path | None = None) -> SchemaDiff | None:
+def assert_schema_contract(
+    target: Engine | Connection,
+    *,
+    mode: str | None = None,
+    reva_env: str | None = None,
+    contract_path: Path | None = None,
+) -> SchemaDiff | None:
     """Startup guard: raise ``SchemaDriftError`` (mode enforce) when the live schema differs.
 
     Returns the diff (``None`` when the mode is ``off``, or in ``warn`` mode when the check
@@ -470,8 +528,7 @@ def assert_schema_contract(target: Engine | Connection, *, mode: str | None = No
     if mode == "warn":
         log.warning("%s", d.summary())
         return d
-    raise SchemaDriftError(d.summary(), missing=len(d.missing), unexpected=len(d.unexpected),
-                           changed=len(d.changed))
+    raise SchemaDriftError(d.summary(), missing=len(d.missing), unexpected=len(d.unexpected), changed=len(d.changed))
 
 
 # --------------------------------------------------------------------------- reference generation

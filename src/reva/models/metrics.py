@@ -71,9 +71,7 @@ class MaseScale:
         return self.value is not None
 
 
-def mase_scale(
-    train_values: Sequence[float], years: Sequence[int] | None = None
-) -> MaseScale:
+def mase_scale(train_values: Sequence[float], years: Sequence[int] | None = None) -> MaseScale:
     """In-sample mean absolute one-step naive difference over the training window.
 
     Requires at least :data:`MIN_SCALE_POINTS` values and, when ``years`` is
@@ -109,9 +107,7 @@ class MaseResult:
     flag: str | None
 
 
-def mase(
-    points: Sequence[float], actuals: Sequence[float], train_values: Sequence[float]
-) -> MaseResult:
+def mase(points: Sequence[float], actuals: Sequence[float], train_values: Sequence[float]) -> MaseResult:
     """MASE of forecasts made from one training window (shared scale)."""
     if len(points) != len(actuals) or len(points) == 0:
         raise ValueError("points and actuals must be equal-length and non-empty")

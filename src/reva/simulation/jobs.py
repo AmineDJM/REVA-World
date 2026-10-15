@@ -41,18 +41,23 @@ DEFAULT_SCHEDULING = "deterministic: countries sorted by ISO3; acyclic one-way c
 
 
 def load_scenario(conn: Connection, scenario_id: UUID) -> dict[str, Any]:
-    row = conn.execute(
-        text("""SELECT id, context_id, baseline_release_id, spec, spec_digest, spec_sha256, created_by
+    row = (
+        conn.execute(
+            text("""SELECT id, context_id, baseline_release_id, spec, spec_digest, spec_sha256, created_by
                 FROM sim.scenario WHERE id = :i"""),
-        {"i": scenario_id},
-    ).mappings().one_or_none()
+            {"i": scenario_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if row is None:
         raise ValidationProblem(f"scenario {scenario_id} not found")
     return dict(row)
 
 
-def default_idempotency_key(spec_digest: str, fidelity: str, baseline_release_id: Any,
-                            model_manifest_digest: str) -> str:
+def default_idempotency_key(
+    spec_digest: str, fidelity: str, baseline_release_id: Any, model_manifest_digest: str
+) -> str:
     return f"sim:{spec_digest}:{fidelity}:{baseline_release_id}:{model_manifest_digest}"
 
 
@@ -75,8 +80,12 @@ def _job_status(plan_status: str) -> str:
 def _error_for(ref: dict[str, Any]) -> dict[str, Any] | None:
     if ref["status"] == "succeeded":
         return None
-    return {"code": ref["status"], "detail": f"simulation run recorded with status {ref['status']}",
-            "run_id": ref["run_id"], "problems": ref.get("problems", [])}
+    return {
+        "code": ref["status"],
+        "detail": f"simulation run recorded with status {ref['status']}",
+        "run_id": ref["run_id"],
+        "problems": ref.get("problems", []),
+    }
 
 
 def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
@@ -124,8 +133,11 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
         if ctx.shutdown_requested() and not ctx.cancel_requested():
             # Worker shutdown, not a user cancel: nothing is published and the worker
             # releases/requeues the job (it handles JobCancelled); never "cancelled".
-            raise JobCancelled(f"worker shutting down; simulation job {ctx.job_id} released unpublished",
-                               scenario_id=str(scenario_id), published=False)
+            raise JobCancelled(
+                f"worker shutting down; simulation job {ctx.job_id} released unpublished",
+                scenario_id=str(scenario_id),
+                published=False,
+            )
         try:
             with engine.begin() as conn:
                 ctx.complete_in(conn, "cancelled", {"scenario_id": str(scenario_id), "published": False})
@@ -144,8 +156,15 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
                 ref = {**res.result_ref(prior), "idempotent_replay": True}
             else:
                 ref = res.publish_run(
-                    conn, ctx.store, plan, scenario=scenario, manifest=manifest, idempotency_key=key,
-                    execution_profile=execution_profile, job_id=ctx.job_id, actor=f"worker:{ctx.worker_id}",
+                    conn,
+                    ctx.store,
+                    plan,
+                    scenario=scenario,
+                    manifest=manifest,
+                    idempotency_key=key,
+                    execution_profile=execution_profile,
+                    job_id=ctx.job_id,
+                    actor=f"worker:{ctx.worker_id}",
                 )
             ctx.complete_in(conn, _job_status(ref["status"]), ref, _error_for(ref))
     except DBAPIError as e:

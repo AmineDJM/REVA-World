@@ -101,9 +101,18 @@ class PublicationBusy(RevaError):
 
 
 NON_RETRYABLE: tuple[type[RevaError], ...] = (
-    ValidationProblem, CapabilityGap, MissingInput, IncompatibleSemantics, LeakageBlocked,
-    ImmutableRecordViolation, PolicyDenied, ConfigurationError, UnsafeRequest, IntegrityFailure,
-    HandlerUnavailable, BudgetExhausted,
+    ValidationProblem,
+    CapabilityGap,
+    MissingInput,
+    IncompatibleSemantics,
+    LeakageBlocked,
+    ImmutableRecordViolation,
+    PolicyDenied,
+    ConfigurationError,
+    UnsafeRequest,
+    IntegrityFailure,
+    HandlerUnavailable,
+    BudgetExhausted,
 )
 
 
@@ -115,8 +124,9 @@ def resolve_handler(job_type: str) -> Callable[[dict[str, Any], JobContext], dic
     try:
         module = importlib.import_module(module_name)
     except ImportError as e:
-        raise HandlerUnavailable(f"handler module {module_name} is unavailable: {e}", job_type=job_type,
-                                 handler=path) from e
+        raise HandlerUnavailable(
+            f"handler module {module_name} is unavailable: {e}", job_type=job_type, handler=path
+        ) from e
     fn = getattr(module, func_name, None)
     if not callable(fn):
         raise HandlerUnavailable(f"handler {path} is not defined", job_type=job_type, handler=path)
@@ -140,13 +150,16 @@ def classify_exception(exc: BaseException) -> tuple[str, bool]:
 
 # --------------------------------------------------------------------------- publish helpers
 def latest_observation_event(conn: Connection) -> int:
-    return int(conn.execute(
-        text("SELECT COALESCE(max(id), 0) FROM ops.outbox WHERE event_type = 'evidence.observations_changed'")
-    ).scalar_one())
+    return int(
+        conn.execute(
+            text("SELECT COALESCE(max(id), 0) FROM ops.outbox WHERE event_type = 'evidence.observations_changed'")
+        ).scalar_one()
+    )
 
 
-def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: int, *, created_by: str,
-                            audit_actor: str | None = None) -> Any:
+def enqueue_publish_beliefs(
+    conn: Connection, origin: str, through_outbox_id: int, *, created_by: str, audit_actor: str | None = None
+) -> Any:
     """Idempotent publish_beliefs job for (origin, through_outbox_id).
 
     A key held by a foreign job (R2-02) never blocks publication: the job is
@@ -156,20 +169,36 @@ def enqueue_publish_beliefs(conn: Connection, origin: str, through_outbox_id: in
     from reva.adapters.postgres.queue import enqueue_resolving_conflict, idempotency_key
 
     payload = {"origin": origin, "through_outbox_id": int(through_outbox_id)}
-    res = enqueue_resolving_conflict(conn, "publish_beliefs", payload, idempotency_key("publish_beliefs", payload),
-                                     priority=PUBLISH_PRIORITY, created_by=created_by)
+    res = enqueue_resolving_conflict(
+        conn,
+        "publish_beliefs",
+        payload,
+        idempotency_key("publish_beliefs", payload),
+        priority=PUBLISH_PRIORITY,
+        created_by=created_by,
+    )
     if res.conflict is not None and res.created:  # surface once, when the disambiguated job is created
         from reva.operations.audit import record
         from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
 
-        log.error("publish_beliefs key %s is held by foreign job %s (%s); created job %s under %s",
-                  res.conflict["idempotency_key"], res.conflict["foreign_job_id"], res.conflict["foreign_job_type"],
-                  res.job_id, res.conflict["disambiguated_key"])
+        log.error(
+            "publish_beliefs key %s is held by foreign job %s (%s); created job %s under %s",
+            res.conflict["idempotency_key"],
+            res.conflict["foreign_job_id"],
+            res.conflict["foreign_job_type"],
+            res.job_id,
+            res.conflict["disambiguated_key"],
+        )
         IDEMPOTENCY_CONFLICTS.inc(job_type="publish_beliefs")
         try:
             with conn.begin_nested():
-                record(conn, audit_actor or "system", "jobs.publish_key_conflict",
-                       {"job_id": str(res.job_id)}, res.conflict)
+                record(
+                    conn,
+                    audit_actor or "system",
+                    "jobs.publish_key_conflict",
+                    {"job_id": str(res.job_id)},
+                    res.conflict,
+                )
         except Exception as e:
             log.warning("could not audit publish key conflict: %s", type(e).__name__)
     return res.job_id
@@ -183,16 +212,21 @@ def dirty_belief_nodes(conn: Connection) -> int:
     dirty until the pause is lifted (``connector.publication_resumed`` re-enqueues the
     publication) instead of triggering identical releases.
     """
-    return int(conn.execute(
-        text("SELECT count(*) FROM ops.dirty_node d WHERE d.node_key LIKE 'belief:%' "
-             "AND d.reason NOT LIKE 'materiality_skip%' "
-             "AND NOT EXISTS (SELECT 1 FROM ops.dirty_node p WHERE p.node_key = :pp || d.node_key)"),
-        {"pp": PAUSE_NODE_PREFIX},
-    ).scalar_one())
+    return int(
+        conn.execute(
+            text(
+                "SELECT count(*) FROM ops.dirty_node d WHERE d.node_key LIKE 'belief:%' "
+                "AND d.reason NOT LIKE 'materiality_skip%' "
+                "AND NOT EXISTS (SELECT 1 FROM ops.dirty_node p WHERE p.node_key = :pp || d.node_key)"
+            ),
+            {"pp": PAUSE_NODE_PREFIX},
+        ).scalar_one()
+    )
 
 
-def repair_idempotency_key(connector: str, *, acquisition_id: str | None = None, trigger: str | None = None,
-                           origin: str | None = None) -> str:
+def repair_idempotency_key(
+    connector: str, *, acquisition_id: str | None = None, trigger: str | None = None, origin: str | None = None
+) -> str:
     """Stable key per (connector, quarantined acquisition), or per (connector, origin, failure streak)."""
     from reva.adapters.postgres.queue import idempotency_key
 
@@ -201,8 +235,16 @@ def repair_idempotency_key(connector: str, *, acquisition_id: str | None = None,
     return idempotency_key("connector_repair", {"connector": connector, "origin": origin, "trigger": trigger})
 
 
-def enqueue_connector_repair(conn: Connection, connector: str, origin: str, *, acquisition_id: str | None = None,
-                             trigger: str | None = None, created_by: str, audit_actor: str | None = None) -> Any:
+def enqueue_connector_repair(
+    conn: Connection,
+    connector: str,
+    origin: str,
+    *,
+    acquisition_id: str | None = None,
+    trigger: str | None = None,
+    created_by: str,
+    audit_actor: str | None = None,
+) -> Any:
     """Idempotent ``connector_repair`` job for one quarantined acquisition or one failure streak.
 
     The payload names only what the handler reads (connector, origin) plus the
@@ -219,27 +261,34 @@ def enqueue_connector_repair(conn: Connection, connector: str, origin: str, *, a
     else:
         payload["trigger"] = trigger
     key = repair_idempotency_key(connector, acquisition_id=acquisition_id, trigger=trigger, origin=origin)
-    res = enqueue_resolving_conflict(conn, "connector_repair", payload, key, priority=REPAIR_PRIORITY,
-                                     created_by=created_by)
+    res = enqueue_resolving_conflict(
+        conn, "connector_repair", payload, key, priority=REPAIR_PRIORITY, created_by=created_by
+    )
     if res.conflict is not None and res.created:
         from reva.operations.audit import record
         from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
 
-        log.error("connector_repair key %s is held by foreign job %s; created job %s under %s",
-                  res.conflict["idempotency_key"], res.conflict["foreign_job_id"], res.job_id,
-                  res.conflict["disambiguated_key"])
+        log.error(
+            "connector_repair key %s is held by foreign job %s; created job %s under %s",
+            res.conflict["idempotency_key"],
+            res.conflict["foreign_job_id"],
+            res.job_id,
+            res.conflict["disambiguated_key"],
+        )
         IDEMPOTENCY_CONFLICTS.inc(job_type="connector_repair")
         try:
             with conn.begin_nested():
-                record(conn, audit_actor or "system", "jobs.repair_key_conflict", {"job_id": str(res.job_id)},
-                       res.conflict)
+                record(
+                    conn, audit_actor or "system", "jobs.repair_key_conflict", {"job_id": str(res.job_id)}, res.conflict
+                )
         except Exception as e:
             log.warning("could not audit repair key conflict: %s", type(e).__name__)
     return res
 
 
-def after_run_failures(engine: Engine, connector: str, origin: str, *, actor: str,
-                       environment: str = "local") -> dict[str, Any]:
+def after_run_failures(
+    engine: Engine, connector: str, origin: str, *, actor: str, environment: str = "local"
+) -> dict[str, Any]:
     """Operations response to a persistent request-failure streak (§10.3).
 
     * ``PERSISTENT_RUNS`` consecutive runs with auth (401/403) or gone (404/410/DNS)
@@ -260,8 +309,9 @@ def after_run_failures(engine: Engine, connector: str, origin: str, *, actor: st
         out["streak"] = {k: (v.isoformat() if isinstance(v, datetime) else v) for k, v in streak.items()}
         if not (environment == "production" and origin != "live"):
             trigger = f"failure_streak:{streak['kind']}:{streak['since'].isoformat()}"
-            res = enqueue_connector_repair(conn, connector, origin, trigger=trigger, created_by=actor,
-                                           audit_actor=actor)
+            res = enqueue_connector_repair(
+                conn, connector, origin, trigger=trigger, created_by=actor, audit_actor=actor
+            )
             out["repair_job_id"] = str(res.job_id)
         if streak["kind"] == AUTH and streak["connector_wide"]:
             out["schedules_disabled"] = disable_ingest_on_auth_failure(conn, connector, origin, streak, actor=actor)
@@ -294,8 +344,13 @@ def _all_connectors(ctx: JobContext) -> dict[str, Any]:
             from reva.operations.audit import record
 
             with ctx.worker_engine.begin() as conn:
-                record(conn, f"worker:{ctx.worker_id}"[:200], "connectors.promoted_name_collision",
-                       {"job_id": str(ctx.job_id)}, {"names": collisions[:50]})
+                record(
+                    conn,
+                    f"worker:{ctx.worker_id}"[:200],
+                    "connectors.promoted_name_collision",
+                    {"job_id": str(ctx.job_id)},
+                    {"names": collisions[:50]},
+                )
         except Exception as e:  # the anomaly record is best effort; the override is refused regardless
             log.warning("could not audit connector name collision: %s", type(e).__name__)
     return {**promoted, **builtins}
@@ -341,10 +396,17 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
 
         default = FetchBudget()
         planned = len(connector.plan(load_cursor(ctx.worker_engine, spec.name), default).items)
-        reservation = reserve_ingest(ctx.worker_engine, job_id=ctx.job_id, attempt=ctx.attempt,
-                                     source_key=budget_source_key(spec), planned_requests=planned)
-        fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
-                                   max_bytes=min(default.max_bytes, reservation.max_bytes))
+        reservation = reserve_ingest(
+            ctx.worker_engine,
+            job_id=ctx.job_id,
+            attempt=ctx.attempt,
+            source_key=budget_source_key(spec),
+            planned_requests=planned,
+        )
+        fetch_budget = FetchBudget(
+            max_requests=min(default.max_requests, reservation.max_requests),
+            max_bytes=min(default.max_bytes, reservation.max_bytes),
+        )
 
     http: Any
     if mode == "fixture":
@@ -360,11 +422,16 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
 
     async def _run() -> Any:
         try:
-            return await run_connector(traced_connector(connector), http, ctx.store, ctx.worker_engine,
-                                       budget=fetch_budget, persist_cursor=(mode == "live"),
-                                       post_publish=getattr(connector, "post_publish", None)
-                                       or post_publish_for(spec.template),
-                                       fence=ctx.assert_lease)
+            return await run_connector(
+                traced_connector(connector),
+                http,
+                ctx.store,
+                ctx.worker_engine,
+                budget=fetch_budget,
+                persist_cursor=(mode == "live"),
+                post_publish=getattr(connector, "post_publish", None) or post_publish_for(spec.template),
+                fence=ctx.assert_lease,
+            )
         finally:
             await http.aclose()
 
@@ -384,24 +451,29 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         # V2: a complete FIGARO year becomes a verified dataset input (identity checks; refuses otherwise)
         from reva.adapters.connectors.io_tables import publish_io_dataset
 
-        dataset_info = publish_io_dataset(ctx.worker_engine, ctx.store, year=int(report.cursor["year"]),
-                                          origin=origin)
+        dataset_info = publish_io_dataset(ctx.worker_engine, ctx.store, year=int(report.cursor["year"]), origin=origin)
     publish_job = None
     nbytes = 0
     with ctx.worker_engine.begin() as conn:
         if shas:
-            nbytes = conn.execute(text("SELECT COALESCE(sum(byte_size), 0) FROM meta.artifact WHERE sha256 = ANY(:s)"),
-                                  {"s": shas}).scalar_one()
+            nbytes = conn.execute(
+                text("SELECT COALESCE(sum(byte_size), 0) FROM meta.artifact WHERE sha256 = ANY(:s)"), {"s": shas}
+            ).scalar_one()
             INGEST_BYTES.inc(float(nbytes), connector=spec.name)
         if (report.inserted > 0 or dataset_info) and not (production and origin != "live"):
             try:
                 with conn.begin_nested():
-                    publish_job = enqueue_publish_beliefs(conn, origin, latest_observation_event(conn),
-                                                          created_by=f"job:{ctx.job_id}",
-                                                          audit_actor=f"worker:{ctx.worker_id}"[:200])
+                    publish_job = enqueue_publish_beliefs(
+                        conn,
+                        origin,
+                        latest_observation_event(conn),
+                        created_by=f"job:{ctx.job_id}",
+                        audit_actor=f"worker:{ctx.worker_id}"[:200],
+                    )
             except Exception as e:  # data is already published; the outbox path enqueues it as a backstop
-                log.error("publish_beliefs enqueue after ingest failed (%s); outbox processing will retry",
-                          type(e).__name__)
+                log.error(
+                    "publish_beliefs enqueue after ingest failed (%s); outbox processing will retry", type(e).__name__
+                )
     budget_info = None
     if reservation is not None:
         from reva.operations.budgets import settle_metered
@@ -426,15 +498,23 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     }
     if report.errors:
         try:
-            follow = after_run_failures(ctx.worker_engine, spec.name, origin, actor=f"worker:{ctx.worker_id}"[:200],
-                                        environment=ctx.settings.reva_env)
+            follow = after_run_failures(
+                ctx.worker_engine,
+                spec.name,
+                origin,
+                actor=f"worker:{ctx.worker_id}"[:200],
+                environment=ctx.settings.reva_env,
+            )
         except Exception as e:  # the ingest outcome stands; the streak is re-evaluated on the next run
             log.error("failure-streak follow-up for %s failed: %s", spec.name, type(e).__name__)
             follow = {"error": type(e).__name__}
         result["failure_followup"] = follow
     if report.outcomes and all(o.status == "failed" for o in report.outcomes):
-        raise IngestFailed(f"all {len(report.outcomes)} acquisition items failed for {spec.name}",
-                           retryable=(mode == "live"), errors=report.errors[:5])
+        raise IngestFailed(
+            f"all {len(report.outcomes)} acquisition items failed for {spec.name}",
+            retryable=(mode == "live"),
+            errors=report.errors[:5],
+        )
     return result
 
 
@@ -475,8 +555,15 @@ def handle_publish_beliefs(payload: dict[str, Any], ctx: JobContext) -> dict[str
             # heartbeat that keeps the lease alive. Publication is idempotent (it clears
             # the dirty nodes it covers) and serialised by advisory locks, and the
             # worker's completion afterwards is fenced.
-            rr = publish_release(eng, ctx.store, cutoff=None, origin=origin, environment=env,
-                                 actor="worker:publish_beliefs", fence=ctx.check_lease)
+            rr = publish_release(
+                eng,
+                ctx.store,
+                cutoff=None,
+                origin=origin,
+                environment=env,
+                actor="worker:publish_beliefs",
+                fence=ctx.check_lease,
+            )
         finally:
             lock_conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": PUBLISH_JOB_LOCK})
             lock_conn.commit()
@@ -510,8 +597,12 @@ def handle_health(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
             out[name] = {"status": "unregistered"}
             continue
         append_health(ctx.worker_engine, name, vec)
-        out[name] = {"status": vec["status"], "lag_cadences": vec["freshness"]["lag_cadences"],
-                     "success_ratio": vec["success_ratio"], "schema_drift": vec["schema_drift"]["drift"]}
+        out[name] = {
+            "status": vec["status"],
+            "lag_cadences": vec["freshness"]["lag_cadences"],
+            "success_ratio": vec["success_ratio"],
+            "schema_drift": vec["schema_drift"]["drift"],
+        }
     return {"status": "recorded", "connectors": out}
 
 
@@ -530,6 +621,8 @@ def save_checkpoint(ctx: JobContext, checkpoint: dict[str, Any], engine: Engine 
     eng = engine or ctx.worker_engine
     with eng.begin() as conn:
         ctx.assert_lease(conn)
-        conn.execute(text("UPDATE ops.job SET checkpoint = CAST(:c AS jsonb), updated_at = clock_timestamp() "
-                          "WHERE id = :j"), {"c": to_json(checkpoint), "j": ctx.job_id})
+        conn.execute(
+            text("UPDATE ops.job SET checkpoint = CAST(:c AS jsonb), updated_at = clock_timestamp() WHERE id = :j"),
+            {"c": to_json(checkpoint), "j": ctx.job_id},
+        )
     ctx.checkpoint = checkpoint

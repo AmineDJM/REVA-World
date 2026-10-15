@@ -45,8 +45,18 @@ class _FittedOffset:
 
     def predict(self, horizons, level=0.8):
         return [
-            Forecast(self.model_key, self.model_version, self.origin_year, self.origin_year + h, h,
-                     self.last + self.slope * h, None, None, None, UncertaintySpec.unknown("synthetic"))
+            Forecast(
+                self.model_key,
+                self.model_version,
+                self.origin_year,
+                self.origin_year + h,
+                h,
+                self.last + self.slope * h,
+                None,
+                None,
+                None,
+                UncertaintySpec.unknown("synthetic"),
+            )
             for h in horizons
         ]
 
@@ -69,8 +79,7 @@ def _null_panel(rng: np.random.Generator, n_series: int, n_years: int, rho: floa
         f"s{i}": [
             (2000 + t, float(v))
             for t, v in enumerate(
-                100.0 + np.cumsum(math.sqrt(rho) * common
-                                  + math.sqrt(1.0 - rho) * rng.standard_normal(n_years))
+                100.0 + np.cumsum(math.sqrt(rho) * common + math.sqrt(1.0 - rho) * rng.standard_normal(n_years))
             )
         ]
         for i in range(n_series)
@@ -114,12 +123,20 @@ def _drift_power(n_series: int, reps: int, seed: int) -> tuple[float, float]:
     promote = review = 0
     for r in range(reps):
         panel = {
-            f"s{i}": [(2000 + t, float(math.exp(v)))
-                      for t, v in enumerate(10.0 + np.cumsum(rng.normal(0.02, 0.03, 23)))]
+            f"s{i}": [
+                (2000 + t, float(math.exp(v))) for t, v in enumerate(10.0 + np.cumsum(rng.normal(0.02, 0.03, 23)))
+            ]
             for i in range(n_series)
         }
-        d = run_tournament(panel, [LastValue(), LogDrift()], "forecast.last_value", (1, 2, 3),
-                           replay_mode="synthetic", seed=r, policy=POLICY).decisions["forecast.log_drift"]
+        d = run_tournament(
+            panel,
+            [LastValue(), LogDrift()],
+            "forecast.last_value",
+            (1, 2, 3),
+            replay_mode="synthetic",
+            seed=r,
+            policy=POLICY,
+        ).decisions["forecast.log_drift"]
         promote += d.decision == "promote"
         review += d.decision == "needs_review"
     return promote / reps, review / reps

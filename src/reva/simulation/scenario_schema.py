@@ -31,21 +31,43 @@ SCHEMA_FILE = CONTRACTS / "scenario.schema.json"
 MAX_SAFE_INT = 9007199254740991
 
 #: Fragment keys a plugin's ``spec_schema()`` may return.
-FRAGMENT_KEYS = frozenset({"intervention", "assumptions", "outputs", "countries", "reference_year", "horizon",
-                           "fidelity", "missing_input_policy", "schema_version", "allOf"})
+FRAGMENT_KEYS = frozenset(
+    {
+        "intervention",
+        "assumptions",
+        "outputs",
+        "countries",
+        "reference_year",
+        "horizon",
+        "fidelity",
+        "missing_input_policy",
+        "schema_version",
+        "allOf",
+    }
+)
 
 COMMON_PROPERTIES: dict[str, Any] = {
     "schema_version": {"const": SCHEMA_VERSION},
     "title": {"type": "string", "minLength": 1, "maxLength": 200},
     "baseline_release_id": {"type": "string", "format": "uuid"},
     "knowledge_cutoff": {"type": "string", "format": "date-time"},
-    "countries": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{3}$"}, "minItems": 1,
-                  "maxItems": 300, "uniqueItems": True},
+    "countries": {
+        "type": "array",
+        "items": {"type": "string", "pattern": "^[A-Z]{3}$"},
+        "minItems": 1,
+        "maxItems": 300,
+        "uniqueItems": True,
+    },
     "reference_year": {"type": "integer", "minimum": 1950, "maximum": 2100},
-    "horizon": {"type": "object", "additionalProperties": False,
-                "properties": {"periods": {"type": "integer", "minimum": 1, "maximum": 100},
-                               "unit": {"enum": ["annual_accounting_period", "calendar_year"]}},
-                "required": ["periods", "unit"]},
+    "horizon": {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": {
+            "periods": {"type": "integer", "minimum": 1, "maximum": 100},
+            "unit": {"enum": ["annual_accounting_period", "calendar_year"]},
+        },
+        "required": ["periods", "unit"],
+    },
     "intervention": {"type": "object"},
     "assumptions": {"type": "object"},
     "fidelity": {"enum": ["L0", "L1", "L2"]},
@@ -53,12 +75,40 @@ COMMON_PROPERTIES: dict[str, Any] = {
     "outputs": {"type": "array", "minItems": 1, "uniqueItems": True, "items": {"type": "string", "minLength": 1}},
     "seed": {"type": "integer", "minimum": 0, "maximum": MAX_SAFE_INT},
 }
-REQUIRED = ["schema_version", "title", "baseline_release_id", "knowledge_cutoff", "model_key", "model_version",
-            "countries", "reference_year", "horizon", "intervention", "assumptions", "fidelity",
-            "missing_input_policy", "outputs", "seed"]
-PROPERTY_ORDER = ["schema_version", "title", "baseline_release_id", "knowledge_cutoff", "model_key",
-                  "model_version", "countries", "reference_year", "horizon", "intervention", "assumptions",
-                  "fidelity", "missing_input_policy", "outputs", "seed"]
+REQUIRED = [
+    "schema_version",
+    "title",
+    "baseline_release_id",
+    "knowledge_cutoff",
+    "model_key",
+    "model_version",
+    "countries",
+    "reference_year",
+    "horizon",
+    "intervention",
+    "assumptions",
+    "fidelity",
+    "missing_input_policy",
+    "outputs",
+    "seed",
+]
+PROPERTY_ORDER = [
+    "schema_version",
+    "title",
+    "baseline_release_id",
+    "knowledge_cutoff",
+    "model_key",
+    "model_version",
+    "countries",
+    "reference_year",
+    "horizon",
+    "intervention",
+    "assumptions",
+    "fidelity",
+    "missing_input_policy",
+    "outputs",
+    "seed",
+]
 
 
 def crude_branch_schema() -> dict[str, Any]:
@@ -67,14 +117,23 @@ def crude_branch_schema() -> dict[str, Any]:
         "schema_version": {"enum": ["1.0.0", "2.0.0"]},
         # V2 step 1 (ALLC): registry country keys or exactly ["ALL"] (resolved at compile);
         # schema_version 1.0.0 keeps the V1 four countries and the "fail" policy (allOf below).
-        "countries": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{3}$"}, "minItems": 1,
-                      "maxItems": 300, "uniqueItems": True},
+        "countries": {
+            "type": "array",
+            "items": {"type": "string", "pattern": "^[A-Z]{3}$"},
+            "minItems": 1,
+            "maxItems": 300,
+            "uniqueItems": True,
+        },
         "reference_year": {"type": "integer", "minimum": 2020, "maximum": 2024},
-        "horizon": {"type": "object", "additionalProperties": False,
-                    "properties": {"periods": {"const": 1}, "unit": {"const": "annual_accounting_period"}},
-                    "required": ["periods", "unit"]},
+        "horizon": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {"periods": {"const": 1}, "unit": {"const": "annual_accounting_period"}},
+            "required": ["periods", "unit"],
+        },
         "intervention": {
-            "type": "object", "additionalProperties": False,
+            "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "kind": {"const": "set_exogenous_border_price_multiplier"},
                 "import_multiplier": {"type": "number", "exclusiveMinimum": 0, "maximum": 3},
@@ -84,16 +143,23 @@ def crude_branch_schema() -> dict[str, Any]:
             "required": ["kind", "import_multiplier", "export_multiplier", "unit"],
         },
         "assumptions": {
-            "type": "object", "additionalProperties": False,
+            "type": "object",
+            "additionalProperties": False,
             "properties": {
                 "quantity_response": {"enum": ["fixed", "elasticity_sensitivity"]},
                 "elasticity_grid": {
-                    "type": "array", "maxItems": 100,
-                    "items": {"type": "object", "additionalProperties": False,
-                              "properties": {"import_elasticity": {"type": "number", "minimum": -2, "maximum": 1},
-                                             "export_elasticity": {"type": "number", "minimum": -1, "maximum": 2},
-                                             "basis": {"const": "scenario_assumption"}},
-                              "required": ["import_elasticity", "export_elasticity", "basis"]},
+                    "type": "array",
+                    "maxItems": 100,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "properties": {
+                            "import_elasticity": {"type": "number", "minimum": -2, "maximum": 1},
+                            "export_elasticity": {"type": "number", "minimum": -1, "maximum": 2},
+                            "basis": {"const": "scenario_assumption"},
+                        },
+                        "required": ["import_elasticity", "export_elasticity", "basis"],
+                    },
                 },
                 "no_general_equilibrium": {"const": True},
             },
@@ -101,21 +167,56 @@ def crude_branch_schema() -> dict[str, Any]:
         },
         "fidelity": {"enum": ["L0", "L1", "L2"]},
         "missing_input_policy": {"enum": ["fail", "skip_missing_countries"]},
-        "outputs": {"type": "array", "minItems": 1, "uniqueItems": True,
-                    "items": {"enum": ["import_value_change_usd", "export_value_change_usd",
-                                       "net_external_cost_change_usd", "exposure_percent_baseline_gdp"]}},
+        "outputs": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": True,
+            "items": {
+                "enum": [
+                    "import_value_change_usd",
+                    "export_value_change_usd",
+                    "net_external_cost_change_usd",
+                    "exposure_percent_baseline_gdp",
+                ]
+            },
+        },
         "allOf": [
-            {"if": {"properties": {"schema_version": {"const": "1.0.0"}}},
-             "then": {"properties": {"countries": {"items": {"enum": ["FRA", "DZA", "CHN", "USA"]}, "maxItems": 4},
-                                     "missing_input_policy": {"const": "fail"}}}},
-            {"if": {"properties": {"countries": {"contains": {"const": "ALL"}}}},
-             "then": {"properties": {"countries": {"maxItems": 1}}}},
-            {"if": {"properties": {"fidelity": {"const": "L1"}}},
-             "then": {"properties": {"assumptions": {"properties": {"quantity_response": {"const": "fixed"},
-                                                                    "elasticity_grid": {"maxItems": 0}}}}}},
-            {"if": {"properties": {"fidelity": {"const": "L2"}}},
-             "then": {"properties": {"assumptions": {"properties": {
-                 "quantity_response": {"const": "elasticity_sensitivity"}, "elasticity_grid": {"minItems": 1}}}}}},
+            {
+                "if": {"properties": {"schema_version": {"const": "1.0.0"}}},
+                "then": {
+                    "properties": {
+                        "countries": {"items": {"enum": ["FRA", "DZA", "CHN", "USA"]}, "maxItems": 4},
+                        "missing_input_policy": {"const": "fail"},
+                    }
+                },
+            },
+            {
+                "if": {"properties": {"countries": {"contains": {"const": "ALL"}}}},
+                "then": {"properties": {"countries": {"maxItems": 1}}},
+            },
+            {
+                "if": {"properties": {"fidelity": {"const": "L1"}}},
+                "then": {
+                    "properties": {
+                        "assumptions": {
+                            "properties": {"quantity_response": {"const": "fixed"}, "elasticity_grid": {"maxItems": 0}}
+                        }
+                    }
+                },
+            },
+            {
+                "if": {"properties": {"fidelity": {"const": "L2"}}},
+                "then": {
+                    "properties": {
+                        "assumptions": {
+                            "properties": {
+                                "quantity_response": {"const": "elasticity_sensitivity"},
+                                "elasticity_grid": {"minItems": 1},
+                            }
+                        }
+                    }
+                },
+            },
         ],
     }
 
@@ -154,10 +255,12 @@ def build_schema(models: dict[str, Any] | None = None) -> dict[str, Any]:
     return {
         "$schema": "https://json-schema.org/draft/2020-12/schema",
         "title": "REVA ScenarioSpec v2.0.0 — discriminated union on model_key",
-        "description": ("Common fields are shared by every model; intervention, assumptions and outputs (and any "
-                        "narrower common field) come from the model plugin's spec_schema(). Crude-exposure specs "
-                        "with schema_version 1.0.0 (the V1 appendix, contracts/scenario.v1.schema.json) remain "
-                        "valid. Generated by `python -m reva.simulation.scenario_schema`; do not edit by hand."),
+        "description": (
+            "Common fields are shared by every model; intervention, assumptions and outputs (and any "
+            "narrower common field) come from the model plugin's spec_schema(). Crude-exposure specs "
+            "with schema_version 1.0.0 (the V1 appendix, contracts/scenario.v1.schema.json) remain "
+            "valid. Generated by `python -m reva.simulation.scenario_schema`; do not edit by hand."
+        ),
         "type": "object",
         "additionalProperties": False,
         "required": ["model_key"],
@@ -165,8 +268,10 @@ def build_schema(models: dict[str, Any] | None = None) -> dict[str, Any]:
         # then constrains them (and is itself closed).
         "properties": {k: ({"enum": keys} if k == "model_key" else {}) for k in PROPERTY_ORDER},
         "allOf": [
-            {"if": {"properties": {"model_key": {"const": k}}, "required": ["model_key"]},
-             "then": {"$ref": f"#/$defs/{k}"}}
+            {
+                "if": {"properties": {"model_key": {"const": k}}, "required": ["model_key"]},
+                "then": {"$ref": f"#/$defs/{k}"},
+            }
             for k in keys
         ],
         "$defs": {k: branch_schema(models[k]) for k in keys},

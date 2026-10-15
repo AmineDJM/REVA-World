@@ -54,8 +54,7 @@ jobs:
       - run: uv sync --frozen --all-extras
       - name: Ruff lint
         run: uv run ruff check .
-      - name: Ruff format (advisory until the tree is formatted; see docs/dev/ci_check.md)
-        continue-on-error: true
+      - name: Ruff format
         run: uv run ruff format --check .
       - name: mypy (strict, kernel + ports)
         run: uv run mypy -p reva.kernel -p reva.ports

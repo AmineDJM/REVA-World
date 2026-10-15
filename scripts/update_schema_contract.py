@@ -44,15 +44,23 @@ def main(argv: list[str] | None = None) -> int:
             return 0
         d.contract_head = (old or {}).get("alembic_head")
         d.live_head = fresh["alembic_head"]
-        print("schema contract is STALE relative to the migrations "
-              "(\"missing from database\" = only in the committed contract):", file=sys.stderr)
+        print(
+            "schema contract is STALE relative to the migrations "
+            '("missing from database" = only in the committed contract):',
+            file=sys.stderr,
+        )
         print(d.summary(), file=sys.stderr)
         return 1
     write_contract(fresh)
-    changes = "unchanged" if old is not None and d.ok else (
-        f"{len(d.missing)} removed, {len(d.unexpected)} added, {len(d.changed)} changed")
-    print(f"wrote {CONTRACT_PATH} (fingerprint {fresh['fingerprint'][:16]}, head {fresh['alembic_head']}, "
-          f"{sum(fresh['counts'].values())} objects; {changes})")
+    changes = (
+        "unchanged"
+        if old is not None and d.ok
+        else (f"{len(d.missing)} removed, {len(d.unexpected)} added, {len(d.changed)} changed")
+    )
+    print(
+        f"wrote {CONTRACT_PATH} (fingerprint {fresh['fingerprint'][:16]}, head {fresh['alembic_head']}, "
+        f"{sum(fresh['counts'].values())} objects; {changes})"
+    )
     return 0
 
 

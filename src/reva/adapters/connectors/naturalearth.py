@@ -31,8 +31,21 @@ from reva.ports.connectors import (
 )
 
 ASSET_URL = "https://naciscdn.org/naturalearth/110m/cultural/ne_110m_admin_0_countries.zip"
-KEEP_PROPS = ("ADM0_A3", "ISO_A3", "ISO_A3_EH", "NAME", "NAME_LONG", "SOVEREIGNT", "SOV_A3", "TYPE",
-              "CONTINENT", "REGION_UN", "SUBREGION", "NOTE_ADM0", "NOTE_BRK")
+KEEP_PROPS = (
+    "ADM0_A3",
+    "ISO_A3",
+    "ISO_A3_EH",
+    "NAME",
+    "NAME_LONG",
+    "SOVEREIGNT",
+    "SOV_A3",
+    "TYPE",
+    "CONTINENT",
+    "REGION_UN",
+    "SUBREGION",
+    "NOTE_ADM0",
+    "NOTE_BRK",
+)
 DISPUTED_TYPES = {"Disputed", "Indeterminate"}
 
 
@@ -65,9 +78,15 @@ class NaturalEarthConnector:
         params = {k: state[k] for k in ("etag", "last_modified") if state.get(k)}
         return FetchPlan(
             connector="naturalearth.admin0_110m",
-            items=(FetchItem(key="admin0_110m", url=ASSET_URL, max_bytes=10_000_000,
-                             expected_media_types=("application/zip", "application/octet-stream"),
-                             params=params),),
+            items=(
+                FetchItem(
+                    key="admin0_110m",
+                    url=ASSET_URL,
+                    max_bytes=10_000_000,
+                    expected_media_types=("application/zip", "application/octet-stream"),
+                    params=params,
+                ),
+            ),
             pagination="single asset",
         )
 
@@ -88,8 +107,10 @@ class NaturalEarthConnector:
         dbf = next((v for k, v in members.items() if k.endswith(".dbf")), None)
         if not (shp and shx and dbf):
             raise SourceResponseError("Natural Earth archive lacks shp/shx/dbf", retryable=False, kind="schema_drift")
-        version = next((v.decode("utf-8", "replace").strip() for k, v in members.items()
-                        if k.upper().endswith("VERSION.TXT")), None)
+        version = next(
+            (v.decode("utf-8", "replace").strip() for k, v in members.items() if k.upper().endswith("VERSION.TXT")),
+            None,
+        )
         reader = shapefile.Reader(shp=io.BytesIO(shp), shx=io.BytesIO(shx), dbf=io.BytesIO(dbf), encoding="utf-8")
         fields = [f[0] for f in reader.fields[1:]]
         features = []
@@ -97,13 +118,17 @@ class NaturalEarthConnector:
             rec = dict(zip(fields, sr.record, strict=True))
             props = {k: rec.get(k) for k in KEEP_PROPS if k in rec}
             features.append({"type": "Feature", "properties": props, "geometry": sr.shape.__geo_interface__})
-        return {"type": "FeatureCollection", "features": features, "ne_version": version,
-                "crs": "EPSG:4326 (lon,lat)"}
+        return {"type": "FeatureCollection", "features": features, "ne_version": version, "crs": "EPSG:4326 (lon,lat)"}
 
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
         if raw.response_metadata.get("status") == 304:
-            yield ObservationBatch(connector="naturalearth.admin0_110m", connector_version="1.0.0",
-                                   item_key=raw.item.key, observations=(), metadata={"not_modified": True})
+            yield ObservationBatch(
+                connector="naturalearth.admin0_110m",
+                connector_version="1.0.0",
+                item_key=raw.item.key,
+                observations=(),
+                metadata={"not_modified": True},
+            )
             return
         gj = self.to_geojson(raw.body)
         fields = sorted({k for f in gj["features"] for k in f["properties"]})
@@ -112,8 +137,12 @@ class NaturalEarthConnector:
             connector_version="1.0.0",
             item_key=raw.item.key,
             observations=(),
-            metadata={"feature_count": len(gj["features"]), "ne_version": gj["ne_version"], "fields": fields,
-                      "types": sorted({str(f["properties"].get("TYPE")) for f in gj["features"]})},
+            metadata={
+                "feature_count": len(gj["features"]),
+                "ne_version": gj["ne_version"],
+                "fields": fields,
+                "types": sorted({str(f["properties"].get("TYPE")) for f in gj["features"]}),
+            },
             schema_fingerprint=schema_fingerprint(fields),
         )
 
@@ -125,8 +154,11 @@ class NaturalEarthConnector:
             findings.append(Finding(code="incomplete", severity="blocker", message="too few features"))
         if "ADM0_A3" not in batch.metadata.get("fields", []):
             findings.append(Finding(code="schema_drift", severity="blocker", message="ADM0_A3 missing"))
-        return QualityReport(outcome="blocked" if findings else "pass", findings=tuple(findings),
-                             received_count=batch.metadata.get("feature_count", 0))
+        return QualityReport(
+            outcome="blocked" if findings else "pass",
+            findings=tuple(findings),
+            received_count=batch.metadata.get("feature_count", 0),
+        )
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
         return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes)})

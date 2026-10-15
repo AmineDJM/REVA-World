@@ -180,8 +180,11 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
         "REVA_API_DB_PASSWORD": s.reva_api_db_password.get_secret_value(),
         "REVA_WORKER_DB_PASSWORD": s.reva_worker_db_password.get_secret_value(),
         "REVA_SIM_DB_PASSWORD": s.reva_sim_db_password.get_secret_value(),
-        **({"REVA_GATE_DB_PASSWORD": s.reva_gate_db_password.get_secret_value()}
-           if getattr(s, "reva_gate_db_password", None) is not None else {}),
+        **(
+            {"REVA_GATE_DB_PASSWORD": s.reva_gate_db_password.get_secret_value()}
+            if getattr(s, "reva_gate_db_password", None) is not None
+            else {}
+        ),
         **tools_env,
     }
     backup_env = {**base_env, "REVA_MIGRATION_DATABASE_URL": source_url, "REVA_DB_NAME": db.name}

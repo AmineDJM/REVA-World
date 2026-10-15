@@ -52,8 +52,14 @@ def baseline(db) -> dict[str, Any]:
 
 def spec(baseline: dict[str, Any], **over: Any) -> dict[str, Any]:
     s = json.loads((CONTRACTS / "scenario.example.json").read_text())
-    s.update({"schema_version": "2.0.0", "baseline_release_id": str(baseline["release_id"]),
-              "knowledge_cutoff": baseline["cutoff"].isoformat(), "title": "ALLC test"})
+    s.update(
+        {
+            "schema_version": "2.0.0",
+            "baseline_release_id": str(baseline["release_id"]),
+            "knowledge_cutoff": baseline["cutoff"].isoformat(),
+            "title": "ALLC test",
+        }
+    )
     s.update(over)
     return s
 
@@ -61,8 +67,7 @@ def spec(baseline: dict[str, Any], **over: Any) -> dict[str, Any]:
 def run(db, s: dict[str, Any], fidelity: str = "L1") -> Any:
     validate_scenario_spec(s)
     with db.sim.connect() as conn:
-        return plan_run(conn, {"id": uuid.uuid4(), "spec": s, "spec_digest": "test"}, fidelity,
-                        model_manifest(conn))
+        return plan_run(conn, {"id": uuid.uuid4(), "spec": s, "spec_digest": "test"}, fidelity, model_manifest(conn))
 
 
 def test_all_countries_with_skip_policy_runs_complete_countries_and_lists_the_rest(db, baseline) -> None:

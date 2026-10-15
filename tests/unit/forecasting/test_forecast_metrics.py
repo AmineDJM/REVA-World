@@ -44,8 +44,11 @@ def test_mase_scale_uses_training_window_only():
 
 
 def test_mase_undefined_on_constant_or_short_training_series():
-    for train, reason in (([5.0, 5.0, 5.0, 5.0], "zero_scale"), ([5.0], "too_few_points"),
-                          ([5.0, 9.0], "too_few_points")):
+    for train, reason in (
+        ([5.0, 5.0, 5.0, 5.0], "zero_scale"),
+        ([5.0], "too_few_points"),
+        ([5.0, 9.0], "too_few_points"),
+    ):
         s = mase_scale(train)
         assert s.value is None and s.flag == UNDEFINED_SCALE and s.reason == reason
         r = mase([6.0], [7.0], train)
@@ -102,9 +105,7 @@ def test_coverage_of_specs_rejects_sensitivity_range():
 
 def test_crps_gaussian_matches_numerical_integral():
     mu, sigma, y = 1.0, 2.0, 2.5
-    num, _ = integrate.quad(
-        lambda x: (norm.cdf(x, mu, sigma) - (x >= y)) ** 2, -40, 40, points=[y], limit=200
-    )
+    num, _ = integrate.quad(lambda x: (norm.cdf(x, mu, sigma) - (x >= y)) ** 2, -40, 40, points=[y], limit=200)
     assert crps_gaussian(y, mu, sigma) == pytest.approx(num, rel=1e-6)
     assert crps_gaussian(mu, mu, 1.0) == pytest.approx((math.sqrt(2) - 1) / math.sqrt(math.pi))
 
@@ -131,17 +132,20 @@ def test_interval_score_is_proper_for_the_central_quantiles():
         assert expected(lo, hi) > best
 
 
-@pytest.mark.parametrize(("y", "loc", "scale", "df"), [(0.3, 0.1, 0.5, 3.0), (-2.0, 0.0, 1.0, 2.5),
-                                                       (1.0, 0.2, 0.05, 10.0), (5.0, 0.0, 1.0, 1.5)])
+@pytest.mark.parametrize(
+    ("y", "loc", "scale", "df"),
+    [(0.3, 0.1, 0.5, 3.0), (-2.0, 0.0, 1.0, 2.5), (1.0, 0.2, 0.05, 10.0), (5.0, 0.0, 1.0, 1.5)],
+)
 def test_crps_student_t_matches_numerical_integral(y, loc, scale, df):
     from scipy.stats import t as student_t
 
     def cdf(x):
         return student_t.cdf((x - loc) / scale, df)
 
-    num = integrate.quad(lambda x: cdf(x) ** 2, -np.inf, y, limit=500)[0] + integrate.quad(
-        lambda x: (1 - cdf(x)) ** 2, y, np.inf, limit=500
-    )[0]
+    num = (
+        integrate.quad(lambda x: cdf(x) ** 2, -np.inf, y, limit=500)[0]
+        + integrate.quad(lambda x: (1 - cdf(x)) ** 2, y, np.inf, limit=500)[0]
+    )
     assert crps_student_t(y, loc, scale, df) == pytest.approx(num, rel=1e-7)
     with pytest.raises(ValueError):
         crps_student_t(y, loc, scale, 1.0)  # infinite CRPS

@@ -66,9 +66,29 @@ src = ["src", "tests"]
 # Verbatim normative copy from the specification (implemented in src/reva/ports/autonomy.py); kept unmodified.
 extend-exclude = ["contracts/autonomy_interfaces.py"]
 
+[tool.ruff.format]
+# The autonomy template's reviewed code closure is digest-pinned in registry/policies/promotion.yaml
+# (template_sha256). Reformatting these files changes the digest and disables T1 auto-promotion until a
+# maintainer re-pins (a T3 action), so the formatter leaves them byte-identical. Keep in sync with
+# reva.adapters.connectors.eurostat_template.template_closure().
+exclude = [
+  "src/reva/adapters/connectors/base.py",
+  "src/reva/adapters/connectors/eurostat_template.py",
+  "src/reva/adapters/http/rate_limit.py",
+  "src/reva/adapters/http/safe_client.py",
+  "src/reva/kernel/errors.py",
+  "src/reva/kernel/ids.py",
+  "src/reva/kernel/support.py",
+  "src/reva/kernel/time.py",
+  "src/reva/kernel/uncertainty.py",
+  "src/reva/kernel/values.py",
+  "src/reva/ports/connectors.py",
+]
+
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "B", "UP", "S", "RUF"]
-ignore = ["S101", "S311", "S603", "S608", "RUF001", "RUF002", "RUF003", "B008", "S105", "S106"]
+ignore = ["S101", "S311", "S603", "S608", "RUF001", "RUF002", "RUF003", "B008", "S105", "S106",
+          "E501"]  # line length is owned by `ruff format` (line-length 120); it cannot split long strings
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**" = ["S", "B"]

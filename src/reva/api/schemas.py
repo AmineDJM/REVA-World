@@ -89,8 +89,9 @@ class OtherValue(OpenModel):
     kind: Literal["category", "text", "entity", "array", "distribution", "geometry"]
 
 
-TypedValue = Annotated[DecimalValue | FloatValue | MissingValue | SensitivityRangeValue | OtherValue,
-                       Field(discriminator="kind")]
+TypedValue = Annotated[
+    DecimalValue | FloatValue | MissingValue | SensitivityRangeValue | OtherValue, Field(discriminator="kind")
+]
 
 
 class Uncertainty(OpenModel):
@@ -205,20 +206,23 @@ class Envelope(ApiModel):
     support: dict[str, Any] | None = None
     baseline_release: BaselineReleaseRef | None = None
     knowledge_cutoff: datetime | None = Field(
-        None, description="Latest information the result may reflect. Rule: pinned release -> its cutoff; "
+        None,
+        description="Latest information the result may reflect. Rule: pinned release -> its cutoff; "
         "explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's "
         "cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. "
-        "See knowledge_cutoff_basis.")
-    knowledge_cutoff_basis: Literal["release_cutoff", "as_of", "scenario_cutoff", "evaluation_context",
-                                    "read_time"] | None = Field(
-        None, description="How knowledge_cutoff was determined; read_time = 'read as of' the database time the "
-        "query was answered")
+        "See knowledge_cutoff_basis.",
+    )
+    knowledge_cutoff_basis: (
+        Literal["release_cutoff", "as_of", "scenario_cutoff", "evaluation_context", "read_time"] | None
+    ) = Field(
+        None,
+        description="How knowledge_cutoff was determined; read_time = 'read as of' the database time the "
+        "query was answered",
+    )
     valid_time: dict[str, Any] | None = Field(None, description="Valid-time window of the returned data")
     model_versions: list[ModelVersionRef] = Field(default_factory=list)
     assumptions: list[str] = Field(default_factory=list)
-    uncertainty: UncertaintySummary = Field(
-        default_factory=lambda: UncertaintySummary(status="not_applicable")
-    )
+    uncertainty: UncertaintySummary = Field(default_factory=lambda: UncertaintySummary(status="not_applicable"))
     data_freshness: Freshness | None = None
     evidence_profile: Assessment = Field(default_factory=lambda: _na("no evidence aggregation in this response"))
     applicability: Assessment = Field(default_factory=lambda: _na("no model applied"))
@@ -245,8 +249,7 @@ class Envelope(ApiModel):
         elif self.knowledge_cutoff_basis is None:
             if self.context_mode == "simulation":
                 self.knowledge_cutoff_basis = "scenario_cutoff"
-            elif (self.baseline_release is not None
-                  and self.baseline_release.knowledge_cutoff == self.knowledge_cutoff):
+            elif self.baseline_release is not None and self.baseline_release.knowledge_cutoff == self.knowledge_cutoff:
                 self.knowledge_cutoff_basis = "release_cutoff"
             else:
                 self.knowledge_cutoff_basis = "as_of"
@@ -555,7 +558,8 @@ SOURCE_FLAGS_DOC = (
     "legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means "
     "undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: "
     "at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about "
-    "4 KiB; never a raw payload. The full record is at /v1/observations.")
+    "4 KiB; never a raw payload. The full record is at /v1/observations."
+)
 SOURCE_FLAGS_TRUNCATED_DOC = "True when source_flags was cut to its size bound (see /v1/observations)"
 
 
@@ -576,12 +580,13 @@ class TimeseriesPoint(ApiModel):
     retrieved_at: datetime
     source_published_at: datetime | None = None
     origin: Literal["live", "test_fixture"]
-    source_flags: dict[str, Any] | None = Field(
-        None, description=SOURCE_FLAGS_DOC)
+    source_flags: dict[str, Any] | None = Field(None, description=SOURCE_FLAGS_DOC)
     source_flags_truncated: bool = Field(False, description=SOURCE_FLAGS_TRUNCATED_DOC)
     retracted_revisions_skipped: int = Field(
-        0, description="Later revisions retracted at/before as_of that were skipped: the point is the latest "
-        "non-retracted revision (the same rule as belief selection)")
+        0,
+        description="Later revisions retracted at/before as_of that were skipped: the point is the latest "
+        "non-retracted revision (the same rule as belief selection)",
+    )
     revisions: list[RevisionEntry] | None = Field(
         None, description="Full lineage visible at as_of (revisions=all only)"
     )
@@ -621,15 +626,21 @@ class BeliefEstimate(ApiModel):
     observation_revision_no: int | None = None
     retrieved_at: datetime | None = None
     source_flags: dict[str, Any] | None = Field(
-        None, description=SOURCE_FLAGS_DOC + " Null when the estimate has no selected observation.")
+        None, description=SOURCE_FLAGS_DOC + " Null when the estimate has no selected observation."
+    )
     source_flags_truncated: bool = Field(False, description=SOURCE_FLAGS_TRUNCATED_DOC)
-    stale: bool = Field(False, description="Publication of this concept is paused (e.g. a source schema "
-                        "quarantine awaiting a reviewed repair): the value is the last accepted one, not fresh")
+    stale: bool = Field(
+        False,
+        description="Publication of this concept is paused (e.g. a source schema "
+        "quarantine awaiting a reviewed repair): the value is the last accepted one, not fresh",
+    )
     stale_reason: str | None = Field(None, description="Why the concept is stale, e.g. source_schema_quarantine")
     proposal_id: UUID | None = Field(None, description="Repair proposal whose review lifts the pause")
     served_from_release_id: UUID | None = Field(
-        None, description="Release this row was read from. Differs from the envelope's baseline release when the "
-        "pinned release withheld the concept and the last earlier release that published it is served (stale)")
+        None,
+        description="Release this row was read from. Differs from the envelope's baseline release when the "
+        "pinned release withheld the concept and the last earlier release that published it is served (stale)",
+    )
     method: ModelVersionRef
 
 
@@ -731,8 +742,9 @@ class EvidenceDetailResponse(Envelope):
 # ---------------------------------------------------------------------------
 
 
-ProvenanceKind = Literal["estimate", "observation", "acquisition", "artifact", "sim_result", "release", "run",
-                         "scenario"]
+ProvenanceKind = Literal[
+    "estimate", "observation", "acquisition", "artifact", "sim_result", "release", "run", "scenario"
+]
 
 
 class ProvenanceNode(ApiModel):
@@ -864,8 +876,9 @@ class BacktestRequest(ApiModel):
 class EvaluationRequest(ApiModel):
     """Start a model evaluation (rolling-origin tournament, revised-data retrospective) as a job."""
 
-    concepts: list[str] | None = Field(None, min_length=1, max_length=10,
-                                       description="Concept ids (default: every supported positive annual series)")
+    concepts: list[str] | None = Field(
+        None, min_length=1, max_length=10, description="Concept ids (default: every supported positive annual series)"
+    )
     horizons: list[int] | None = Field(None, min_length=1, max_length=5, description="Forecast horizons in years")
     seed: int | None = Field(None, ge=0, le=2**31 - 1, description="Deterministic seed (default: service seed)")
 
@@ -896,10 +909,12 @@ class ModelBacktest(ApiModel):
     replay_mode_label: str
     design: dict[str, Any] = Field(description="Back-test design (jump-off/base period/target or protocol, years)")
     metrics: dict[str, Any] = Field(description="Error metrics as stored (status, per-variant/per-sex errors)")
-    labels: list[str] = Field(description="Labels that must be shown with the metrics (replay mode, model label, "
-                                          "statement)")
-    evaluation_manifest_sha256: str = Field(description="sha256 of the evaluation artifact (manifest with the "
-                                                        "inputs' digests, design and full results)")
+    labels: list[str] = Field(
+        description="Labels that must be shown with the metrics (replay mode, model label, statement)"
+    )
+    evaluation_manifest_sha256: str = Field(
+        description="sha256 of the evaluation artifact (manifest with the inputs' digests, design and full results)"
+    )
     recorded_at: datetime
 
 
@@ -1017,11 +1032,16 @@ class DiscoveryRequest(ApiModel):
     """
 
     catalogue: Literal["eurostat", "worldbank", "comtrade"] = Field(
-        "eurostat", description="Only 'eurostat' is supported in V1; others return 422 capability_gap")
-    requirement_id: str = Field("R-POP-JAN-AGESEX", max_length=50,
-                                description="Requirement from the versioned catalogue with a discovery template")
+        "eurostat", description="Only 'eurostat' is supported in V1; others return 422 capability_gap"
+    )
+    requirement_id: str = Field(
+        "R-POP-JAN-AGESEX",
+        max_length=50,
+        description="Requirement from the versioned catalogue with a discovery template",
+    )
     mode: Literal["live", "fixture"] = Field(
-        "live", description="fixture replays captured catalogue responses (refused in production)")
+        "live", description="fixture replays captured catalogue responses (refused in production)"
+    )
     query: str | None = Field(None, max_length=200, description="Not supported in V1 (422 when set)")
     concept_id: str | None = Field(None, max_length=200, description="Not supported in V1 (422 when set)")
     max_candidates: int | None = Field(None, ge=1, le=50, description="Not supported in V1 (422 when set)")
@@ -1039,7 +1059,8 @@ class DiscoveryCandidate(ApiModel):
     job_id: UUID | None = None
     proposal_id: UUID | None = None
     origin: Literal["live", "test_fixture"] | None = Field(
-        None, description="test_fixture when the discovery ran against captured catalogue responses")
+        None, description="test_fixture when the discovery ran against captured catalogue responses"
+    )
     provider: str | None = None
     dataset_code: str | None = None
     requirement_id: str | None = None
@@ -1091,10 +1112,13 @@ class ConnectorOut(ApiModel):
     cursor: dict[str, Any] | None = None
     acquisitions: int
     last_retrieved_at: datetime | None = None
-    origin: OriginLabel = Field(description="Origins of this connector's acquisitions: live, test_fixture, mixed "
-                                "(both) or none (never acquired)")
+    origin: OriginLabel = Field(
+        description="Origins of this connector's acquisitions: live, test_fixture, mixed "
+        "(both) or none (never acquired)"
+    )
     latest_acquisition_origin: Literal["live", "test_fixture"] | None = Field(
-        description="Origin of the most recent acquisition (null when none)")
+        description="Origin of the most recent acquisition (null when none)"
+    )
     acquisitions_by_origin: AcquisitionOriginCounts
 
 
@@ -1305,5 +1329,3 @@ class RelationsQuery(ApiModel):
 
 
 QuerySpec = Annotated[TimeseriesQuery | BeliefsQuery | RelationsQuery, Field(discriminator="kind")]
-
-

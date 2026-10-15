@@ -72,8 +72,9 @@ class Applicability(_Frozen):
     classifications: tuple[str, ...] | None = None
     reason: str | None = None
 
-    def applies(self, *, subject: str | None = None, year: int | None = None,
-                classification: str | None = None) -> bool:
+    def applies(
+        self, *, subject: str | None = None, year: int | None = None, classification: str | None = None
+    ) -> bool:
         if self.subjects is not None and (subject is None or subject not in self.subjects):
             return False
         if self.year_set is not None and (year is None or year not in self.year_set):
@@ -85,8 +86,9 @@ class Applicability(_Frozen):
                 return False
             if self.year_to is not None and year > self.year_to:
                 return False
-        return not (self.classifications is not None
-                    and (classification is None or classification not in self.classifications))
+        return not (
+            self.classifications is not None and (classification is None or classification not in self.classifications)
+        )
 
 
 class MappingEvidence(_Frozen):
@@ -142,21 +144,28 @@ class ConceptMapping(_Frozen):
     def usable_as_identity(self) -> bool:
         return self.relation is RelationType.exact and self.approval.status == "approved"
 
-    def require_identity(self, *, subject: str | None = None, year: int | None = None,
-                         classification: str | None = None) -> ConceptRef:
+    def require_identity(
+        self, *, subject: str | None = None, year: int | None = None, classification: str | None = None
+    ) -> ConceptRef:
         """Return the target for identity use or raise ``IncompatibleSemantics``."""
         if self.relation is not RelationType.exact:
             raise IncompatibleSemantics(
                 f"mapping {self.mapping_key}@{self.version} is {self.relation.value}; only exact mappings can be "
-                "used as identity", mapping_key=self.mapping_key, relation=self.relation.value,
-                reason=self.applicability.reason)
+                "used as identity",
+                mapping_key=self.mapping_key,
+                relation=self.relation.value,
+                reason=self.applicability.reason,
+            )
         if self.approval.status != "approved":
-            raise IncompatibleSemantics(f"mapping {self.mapping_key}@{self.version} is {self.approval.status}",
-                                        mapping_key=self.mapping_key)
+            raise IncompatibleSemantics(
+                f"mapping {self.mapping_key}@{self.version} is {self.approval.status}", mapping_key=self.mapping_key
+            )
         if not self.applicability.applies(subject=subject, year=year, classification=classification):
             raise IncompatibleSemantics(
                 f"mapping {self.mapping_key}@{self.version} does not apply to subject={subject} year={year} "
-                f"classification={classification}", mapping_key=self.mapping_key)
+                f"classification={classification}",
+                mapping_key=self.mapping_key,
+            )
         return self.target
 
 
@@ -186,8 +195,7 @@ def _applicability_from_registry(raw: Mapping[str, Any]) -> Applicability:
         elif isinstance(years, Mapping) and set(years) == {"in"} and isinstance(years["in"], list) and years["in"]:
             yset = tuple(sorted({_year(y) for y in years["in"]}))
         else:
-            raise ValidationProblem(
-                f"applicability.years must be {{from: y0, to: y1}} or {{in: [y, ...]}}: {years!r}")
+            raise ValidationProblem(f"applicability.years must be {{from: y0, to: y1}} or {{in: [y, ...]}}: {years!r}")
     subjects = raw.get("subjects")
     classes = raw.get("classifications")
     return Applicability(
@@ -217,11 +225,13 @@ def mapping_from_registry(raw: Mapping[str, Any]) -> ConceptMapping:
     }.get(relation, {"kind": "unquantified"})
     default_status = "approved" if relation in (RelationType.exact, RelationType.incompatible) else "candidate"
     approval = raw.get("approval") or {"status": default_status, "basis": REGISTRY_REVIEW_BASIS}
-    evidence = raw.get("evidence") or [{
-        "kind": "registry_review",
-        "ref": f"registry/mappings:{raw['mapping_key']}@{raw['version']}",
-        "note": (raw.get("applicability") or {}).get("reason"),
-    }]
+    evidence = raw.get("evidence") or [
+        {
+            "kind": "registry_review",
+            "ref": f"registry/mappings:{raw['mapping_key']}@{raw['version']}",
+            "note": (raw.get("applicability") or {}).get("reason"),
+        }
+    ]
     src_concept = raw.get("source_concept")
     return ConceptMapping(
         mapping_key=raw["mapping_key"],
@@ -284,11 +294,13 @@ def check_mapping_against_concepts(mapping: ConceptMapping, source: Concept, tar
     """A declared ``exact`` mapping between two concepts must not contradict their semantics."""
     if mapping.target.key() != f"{target.concept_id}@{target.version}":
         raise ValidationProblem(
-            f"mapping {mapping.mapping_key} targets {mapping.target.key()}, not {target.concept_id}")
+            f"mapping {mapping.mapping_key} targets {mapping.target.key()}, not {target.concept_id}"
+        )
     report = compare_concepts(source, target)
     if mapping.relation is RelationType.exact and report.verdict is not Verdict.compatible:
         raise IncompatibleSemantics(
-            f"mapping {mapping.mapping_key} declared exact but concepts differ: " + "; ".join(report.reasons))
+            f"mapping {mapping.mapping_key} declared exact but concepts differ: " + "; ".join(report.reasons)
+        )
     return report
 
 
@@ -322,14 +334,18 @@ class CrosswalkLink(_Frozen):
 
     @model_validator(mode="after")
     def _years(self) -> CrosswalkLink:
-        if self.valid_from_year is not None and self.valid_to_year is not None and \
-                self.valid_to_year < self.valid_from_year:
+        if (
+            self.valid_from_year is not None
+            and self.valid_to_year is not None
+            and self.valid_to_year < self.valid_from_year
+        ):
             raise ValueError("valid_to_year before valid_from_year")
         return self
 
     def active(self, year: int) -> bool:
         return (self.valid_from_year is None or year >= self.valid_from_year) and (
-            self.valid_to_year is None or year <= self.valid_to_year)
+            self.valid_to_year is None or year <= self.valid_to_year
+        )
 
 
 class WeightedCrosswalk(_Frozen):
@@ -365,8 +381,9 @@ class WeightedCrosswalk(_Frozen):
                     raise ValueError(f"weights for {code} sum to {total} > 1 in {y}: mass would be created")
         return self
 
-    def apply(self, values: Mapping[str, Decimal | str | Missing], year: int, *, unit_ref: str,
-              require_approved: bool = True) -> CrosswalkResult:
+    def apply(
+        self, values: Mapping[str, Decimal | str | Missing], year: int, *, unit_ref: str, require_approved: bool = True
+    ) -> CrosswalkResult:
         """Map extensive source-classified values to target codes for ``year``.
 
         * mapped share  = value x weight per active link,
@@ -450,5 +467,3 @@ class CrosswalkResult(_Frozen):
     def complete(self) -> bool:
         """True only if nothing was unmapped and no input was missing."""
         return not self.residual_by_source and not self.missing_source_codes
-
-

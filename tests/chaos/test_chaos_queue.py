@@ -81,12 +81,17 @@ def create_scenario(d: ChaosDB, baseline: dict[str, Any], label: str) -> uuid.UU
     from reva.simulation.spec import CONTRACTS, validate_scenario_spec
 
     spec = json.loads((CONTRACTS / "scenario.example.json").read_text())
-    spec.update(baseline_release_id=str(baseline["release_id"]), knowledge_cutoff=baseline["cutoff"].isoformat(),
-                title=f"chaos {label} {uuid.uuid4().hex[:6]}")
+    spec.update(
+        baseline_release_id=str(baseline["release_id"]),
+        knowledge_cutoff=baseline["cutoff"].isoformat(),
+        title=f"chaos {label} {uuid.uuid4().hex[:6]}",
+    )
     s = validate_scenario_spec(spec)
     with d.api.begin() as c:
-        return c.execute(text("SELECT sim.create_scenario(CAST(:s AS jsonb), :b, :dg, 'human:chaos')"),
-                         {"s": json.dumps(s.as_json()), "b": s.canonical_bytes(), "dg": s.digest()}).scalar_one()
+        return c.execute(
+            text("SELECT sim.create_scenario(CAST(:s AS jsonb), :b, :dg, 'human:chaos')"),
+            {"s": json.dumps(s.as_json()), "b": s.canonical_bytes(), "dg": s.digest()},
+        ).scalar_one()
 
 
 def sim_runs(d: ChaosDB, jid: uuid.UUID) -> int:
@@ -96,8 +101,12 @@ def sim_runs(d: ChaosDB, jid: uuid.UUID) -> int:
 
 def seen_since(d: ChaosDB, w: WorkerProc, t: Any) -> bool:
     with d.owner.connect() as c:
-        return bool(c.execute(text("SELECT bool_or(last_seen > :t) FROM ops.worker_presence WHERE worker_id LIKE :w"),
-                              {"t": t, "w": f"%:{w.pid}:%"}).scalar())
+        return bool(
+            c.execute(
+                text("SELECT bool_or(last_seen > :t) FROM ops.worker_presence WHERE worker_id LIKE :w"),
+                {"t": t, "w": f"%:{w.pid}:%"},
+            ).scalar()
+        )
 
 
 def terminal(d: ChaosDB, jid: uuid.UUID) -> bool:
@@ -106,7 +115,8 @@ def terminal(d: ChaosDB, jid: uuid.UUID) -> bool:
 
 # =========================================================================== 1. SIGKILL mid-job
 def test_sigkill_mid_simulation_reclaimed_after_lease_expiry_and_completed_once(
-        cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
     sid = create_scenario(cdb, sim_baseline, "sigkill")
     payload = {"scenario_id": str(sid), "fidelity": "L1"}
@@ -144,13 +154,34 @@ def test_sigkill_mid_simulation_reclaimed_after_lease_expiry_and_completed_once(
     from reva.operations.context import JobContext
     from reva.simulation.jobs import handle_simulation
 
-    zombie = JobContext(job_id=jid, job_type="simulation", worker_id=worker_a, fencing_token=token_a, attempt=1,
-                        settings=cdb.settings, worker_engine=cdb.worker, sim_engine=cdb.sim, store=cdb.store)
+    zombie = JobContext(
+        job_id=jid,
+        job_type="simulation",
+        worker_id=worker_a,
+        fencing_token=token_a,
+        attempt=1,
+        settings=cdb.settings,
+        worker_engine=cdb.worker,
+        sim_engine=cdb.sim,
+        store=cdb.store,
+    )
     with pytest.raises(StaleLease):
         handle_simulation(dict(payload), zombie)  # full handler: compute, then fenced publication
-    stale = ClaimedJob(id=jid, job_type="simulation", payload=payload, worker_id=worker_a, fencing_token=token_a,
-                       attempts=1, max_attempts=5, lease_until=lease_a, claimed_at=lease_a, created_at=lease_a,
-                       checkpoint=None, lease_seconds=LEASE_SECONDS, claimed_monotonic=0.0)
+    stale = ClaimedJob(
+        id=jid,
+        job_type="simulation",
+        payload=payload,
+        worker_id=worker_a,
+        fencing_token=token_a,
+        attempts=1,
+        max_attempts=5,
+        lease_until=lease_a,
+        claimed_at=lease_a,
+        created_at=lease_a,
+        checkpoint=None,
+        lease_seconds=LEASE_SECONDS,
+        claimed_monotonic=0.0,
+    )
     with pytest.raises(StaleLease):
         queue.complete(cdb.worker, stale, {"zombie": True})
     with pytest.raises(StaleLease):
@@ -160,8 +191,9 @@ def test_sigkill_mid_simulation_reclaimed_after_lease_expiry_and_completed_once(
     with pytest.raises(StaleLease):
         queue.fail(cdb.worker, stale, {"code": "zombie"}, retryable=True)
     with pytest.raises(DBAPIError) as ei, cdb.sim.begin() as c:
-        c.execute(text("SELECT ops.complete_job(:j, :w, :t, 'failed', NULL, NULL)"),
-                  {"j": jid, "w": worker_a, "t": token_a})
+        c.execute(
+            text("SELECT ops.complete_job(:j, :w, :t, 'failed', NULL, NULL)"), {"j": jid, "w": worker_a, "t": token_a}
+        )
     assert getattr(ei.value.orig, "sqlstate", None) == "RV001"
     after = job(cdb, jid)
     assert after["status"] == "succeeded" and after["result_ref"] == result_before
@@ -170,7 +202,8 @@ def test_sigkill_mid_simulation_reclaimed_after_lease_expiry_and_completed_once(
 
 
 def test_sigstop_zombie_wakes_after_reclaim_and_cannot_publish(
-        cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     """A *live* zombie: worker A is frozen (SIGSTOP) mid-job, its lease expires, B completes
     the job, then A resumes and runs into the fence instead of publishing a second run."""
     clear_queue(cdb)
@@ -200,13 +233,13 @@ def test_sigstop_zombie_wakes_after_reclaim_and_cannot_publish(
 
 # =========================================================================== 2. SIGTERM
 def test_sigterm_releases_job_without_cancel_or_attempt_and_exits_within_grace(
-        cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
     jid = enqueue(cdb, "chaos_slow", {"steps": 120, "step_seconds": 0.05, "probe": uuid.uuid4().hex})
     w = start_worker(cdb, tmp_path / "w")
     procs.append(w)
-    wait_until(lambda: len(events(tmp_path / "w", "step", job=str(jid))) >= 10, 40, what="job running",
-               procs=[w])
+    wait_until(lambda: len(events(tmp_path / "w", "step", job=str(jid))) >= 10, 40, what="job running", procs=[w])
     t0 = time.monotonic()
     w.signal(signal.SIGTERM)
     rc = w.wait(DRAIN_SECONDS + 10)
@@ -231,10 +264,14 @@ def test_sigterm_releases_job_without_cancel_or_attempt_and_exits_within_grace(
 
 
 def test_sigterm_with_uncooperative_handler_exits_at_grace_and_lease_recovers(
-        cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
-    jid = enqueue(cdb, "chaos_slow", {"mode": "stubborn", "stubborn_seconds": 120, "steps": 3,
-                                      "step_seconds": 0.05, "probe": uuid.uuid4().hex})
+    jid = enqueue(
+        cdb,
+        "chaos_slow",
+        {"mode": "stubborn", "stubborn_seconds": 120, "steps": 3, "step_seconds": 0.05, "probe": uuid.uuid4().hex},
+    )
     w = start_worker(cdb, tmp_path / "w")
     procs.append(w)
     wait_until(lambda: events(tmp_path / "w", "start", job=str(jid)), 40, what="job running", procs=[w])
@@ -256,7 +293,8 @@ def test_sigterm_with_uncooperative_handler_exits_at_grace_and_lease_recovers(
 
 # =========================================================================== 3. DB connection loss
 def test_backend_terminated_mid_heartbeat_worker_reconnects_and_keeps_lease(
-        cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
     jid = enqueue(cdb, "chaos_slow", {"steps": 160, "step_seconds": 0.05, "probe": uuid.uuid4().hex})
     w = start_worker(cdb, tmp_path / "w")
@@ -271,9 +309,16 @@ def test_backend_terminated_mid_heartbeat_worker_reconnects_and_keeps_lease(
 
         def blocked() -> list[int]:
             with cdb.owner.connect() as c:
-                return [int(p) for p in c.execute(text(
-                    "SELECT pid FROM pg_stat_activity WHERE datname = :db AND usename = 'reva_worker' "
-                    "AND wait_event_type = 'Lock' AND query LIKE '%ops.heartbeat%'"), {"db": cdb.name}).scalars()]
+                return [
+                    int(p)
+                    for p in c.execute(
+                        text(
+                            "SELECT pid FROM pg_stat_activity WHERE datname = :db AND usename = 'reva_worker' "
+                            "AND wait_event_type = 'Lock' AND query LIKE '%ops.heartbeat%'"
+                        ),
+                        {"db": cdb.name},
+                    ).scalars()
+                ]
 
         pids = wait_until(blocked, 10, interval=0.02, what="a heartbeat blocked on the job row", procs=[w])
         with cdb.owner.connect() as c:
@@ -286,8 +331,12 @@ def test_backend_terminated_mid_heartbeat_worker_reconnects_and_keeps_lease(
     terminate_worker_backends(cdb)
     cut = db_now(cdb)
     lease_at_cut = job(cdb, jid)["lease_until"]
-    wait_until(lambda: job(cdb, jid)["lease_until"] > lease_at_cut or terminal(cdb, jid), 8,
-               what="lease extended again after reconnect", procs=[w])
+    wait_until(
+        lambda: job(cdb, jid)["lease_until"] > lease_at_cut or terminal(cdb, jid),
+        8,
+        what="lease extended again after reconnect",
+        procs=[w],
+    )
     wait_until(lambda: seen_since(cdb, w, cut), 8, what="presence updated after reconnect", procs=[w])
     wait_until(lambda: terminal(cdb, jid), 30, what="job completes", procs=[w])
     r = job(cdb, jid)
@@ -296,10 +345,10 @@ def test_backend_terminated_mid_heartbeat_worker_reconnects_and_keeps_lease(
 
 
 def test_sustained_db_outage_handler_stops_by_lease_expiry_then_worker_reconnects(
-        cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
-    jid = enqueue(cdb, "chaos_slow", {"steps": 600, "step_seconds": 0.1, "retry_steps": 5,
-                                      "probe": uuid.uuid4().hex})
+    jid = enqueue(cdb, "chaos_slow", {"steps": 600, "step_seconds": 0.1, "retry_steps": 5, "probe": uuid.uuid4().hex})
     w = start_worker(cdb, tmp_path / "w")
     procs.append(w)
     wait_until(lambda: len(events(tmp_path / "w", "step", job=str(jid))) >= 3, 40, what="job running", procs=[w])
@@ -325,13 +374,15 @@ def test_sustained_db_outage_handler_stops_by_lease_expiry_then_worker_reconnect
     assert r["status"] == "succeeded" and r["fencing_token"] > token
     # Safety: without a lease the old attempt must stop working (lease = last good beat + LEASE_SECONDS).
     late = [e for e in events(tmp_path / "w", "step", token=token) if e["t"] > outage + LEASE_SECONDS + 2]
-    assert not late, (f"{len(late)} steps of the expired attempt ran after its lease; "
-                      f"last at +{late[-1]['t'] - outage:.1f}s")
+    assert not late, (
+        f"{len(late)} steps of the expired attempt ran after its lease; last at +{late[-1]['t'] - outage:.1f}s"
+    )
 
 
 # =========================================================================== 4. cancellation
 def test_request_cancel_during_simulation_cancels_and_publishes_nothing(
-        cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, sim_baseline: dict, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
     sid = create_scenario(cdb, sim_baseline, "cancel")
     jid = enqueue(cdb, "simulation", {"scenario_id": str(sid), "fidelity": "L1"})
@@ -339,8 +390,9 @@ def test_request_cancel_during_simulation_cancels_and_publishes_nothing(
     procs.append(w)
     wait_until(lambda: events(tmp_path / "w", "plan_sleep_start"), 40, what="simulation computing", procs=[w])
     with cdb.api.begin() as c:  # the API role, as POST /jobs/{id}/cancel does
-        assert c.execute(text("SELECT ops.request_cancel(:j, 'human:chaos')"), {"j": jid}).scalar() == \
-            "cancel_requested"
+        assert (
+            c.execute(text("SELECT ops.request_cancel(:j, 'human:chaos')"), {"j": jid}).scalar() == "cancel_requested"
+        )
     wait_until(lambda: terminal(cdb, jid), 30, what="cancellation", procs=[w])
     r = job(cdb, jid)
     assert r["status"] == "cancelled" and r["finished_at"] is not None
@@ -355,7 +407,8 @@ def test_request_cancel_during_simulation_cancels_and_publishes_nothing(
 
 
 def test_request_cancel_stops_cooperative_handler_promptly(
-        cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
+    cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]
+) -> None:
     clear_queue(cdb)
     jid = enqueue(cdb, "chaos_slow", {"steps": 400, "step_seconds": 0.05, "probe": uuid.uuid4().hex})
     w = start_worker(cdb, tmp_path / "w")
@@ -399,10 +452,15 @@ def test_twenty_parallel_submissions_with_one_idempotency_key_create_one_job(cdb
     key = f"chaos-{uuid.uuid4().hex}"
     payload = {"probe": key}
     try:
+
         def submit(_i: int) -> str:
             with api.begin() as c:
-                return str(c.execute(text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'human:chaos')"),
-                                     {"p": json.dumps(payload), "k": key}).scalar_one())
+                return str(
+                    c.execute(
+                        text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'human:chaos')"),
+                        {"p": json.dumps(payload), "k": key},
+                    ).scalar_one()
+                )
 
         ids = _parallel(20, submit)
         assert all(isinstance(i, str) for i in ids), [i for i in ids if not isinstance(i, str)]
@@ -424,17 +482,21 @@ def test_twenty_parallel_submissions_with_one_idempotency_key_create_one_job(cdb
 
         def conflicting(i: int) -> str:
             with api.begin() as c:
-                return str(c.execute(text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'human:chaos')"),
-                                     {"p": json.dumps({"probe": i}), "k": ckey}).scalar_one())
+                return str(
+                    c.execute(
+                        text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'human:chaos')"),
+                        {"p": json.dumps({"probe": i}), "k": ckey},
+                    ).scalar_one()
+                )
 
         cres = _parallel(20, conflicting)
         wins = [r for r in cres if isinstance(r, str)]
         assert len(wins) == 1 and all("reused with a different request" in str(r) for r in cres if r not in wins)
         with cdb.owner.connect() as c:
-            rows = c.execute(text("SELECT idempotency_key, count(*) FROM ops.job WHERE idempotency_key IN "
-                                  "(:a, :b, :c) GROUP BY 1"),
-                             {"a": f"api:human:chaos:health:{key}", "b": ikey,
-                              "c": f"api:human:chaos:health:{ckey}"}).all()
+            rows = c.execute(
+                text("SELECT idempotency_key, count(*) FROM ops.job WHERE idempotency_key IN (:a, :b, :c) GROUP BY 1"),
+                {"a": f"api:human:chaos:health:{key}", "b": ikey, "c": f"api:human:chaos:health:{ckey}"},
+            ).all()
         assert sorted(n for _, n in rows) == [1, 1, 1]
     finally:
         api.dispose()

@@ -58,24 +58,42 @@ class WorldBankAllConnector(WorldBankConnector):
 
     def describe(self) -> ConnectorSpec:
         spec = super().describe()
-        return spec.model_copy(update={
-            "name": CONNECTOR_NAME,
-            "version": CONNECTOR_VERSION,
-            "geography": self.countries,
-            "parser_version": PARSER_VERSION,
-            "code_digest": _code_digest(),
-        })
+        return spec.model_copy(
+            update={
+                "name": CONNECTOR_NAME,
+                "version": CONNECTOR_VERSION,
+                "geography": self.countries,
+                "parser_version": PARSER_VERSION,
+                "code_digest": _code_digest(),
+            }
+        )
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
-        items = [FetchItem(key="countries",
-                           url=f"{BASE}/country/{';'.join(self.countries)}?format=json&per_page=400",
-                           max_bytes=2_000_000, params={"kind": "country_metadata"})]
+        items = [
+            FetchItem(
+                key="countries",
+                url=f"{BASE}/country/{';'.join(self.countries)}?format=json&per_page=400",
+                max_bytes=2_000_000,
+                params={"kind": "country_metadata"},
+            )
+        ]
         for ind in INDICATORS:
-            items.append(FetchItem(key=f"indicator:{ind}", url=f"{BASE}/indicator/{ind}?format=json",
-                                   max_bytes=500_000, params={"kind": "indicator_metadata", "indicator": ind}))
-            items.append(FetchItem(key=f"series:{ind}:p1", url=self._series_url(ind, 1), max_bytes=5_000_000,
-                                   params={"kind": "series", "indicator": ind, "page": 1,
-                                           "depends_on": f"indicator:{ind}"}))
+            items.append(
+                FetchItem(
+                    key=f"indicator:{ind}",
+                    url=f"{BASE}/indicator/{ind}?format=json",
+                    max_bytes=500_000,
+                    params={"kind": "indicator_metadata", "indicator": ind},
+                )
+            )
+            items.append(
+                FetchItem(
+                    key=f"series:{ind}:p1",
+                    url=self._series_url(ind, 1),
+                    max_bytes=5_000_000,
+                    params={"kind": "series", "indicator": ind, "page": 1, "depends_on": f"indicator:{ind}"},
+                )
+            )
         return FetchPlan(
             connector=CONNECTOR_NAME,
             items=tuple(items[: budget.max_requests]),
@@ -91,8 +109,9 @@ class WorldBankAllConnector(WorldBankConnector):
                 header = meta.get("page_header") or {}
                 meta["requested_countries"] = len(self.countries)
                 meta["paged"] = str(header.get("pages", "1")) != "1"
-            yield b.model_copy(update={"connector": CONNECTOR_NAME, "connector_version": CONNECTOR_VERSION,
-                                       "metadata": meta})
+            yield b.model_copy(
+                update={"connector": CONNECTOR_NAME, "connector_version": CONNECTOR_VERSION, "metadata": meta}
+            )
 
 
 __all__ = ["CONNECTOR_NAME", "CONNECTOR_VERSION", "WorldBankAllConnector"]

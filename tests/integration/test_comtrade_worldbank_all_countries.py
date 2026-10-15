@@ -34,9 +34,16 @@ def fixture_worldbank() -> WorldBankAllConnector:
 
 
 def _alias(conn: Any, provider: str, key: str) -> list[dict[str, Any]]:
-    return [dict(r) for r in conn.execute(
-        text("SELECT entity_id, confidence_kind, mapping_version FROM world.alias WHERE provider=:p "
-             "AND external_key=:k ORDER BY recorded_at DESC"), {"p": provider, "k": key}).mappings()]
+    return [
+        dict(r)
+        for r in conn.execute(
+            text(
+                "SELECT entity_id, confidence_kind, mapping_version FROM world.alias WHERE provider=:p "
+                "AND external_key=:k ORDER BY recorded_at DESC"
+            ),
+            {"p": provider, "k": key},
+        ).mappings()
+    ]
 
 
 def test_seed_creates_crosswalk_entities_with_provider_declared_aliases(db) -> None:
@@ -53,8 +60,9 @@ def test_seed_creates_crosswalk_entities_with_provider_declared_aliases(db) -> N
         # Reviewed entities keep their reviewed aliases only (nothing added from the crosswalk).
         fra = _alias(conn, "comtrade_reporter", "251")
         assert [a["confidence_kind"] for a in fra] == ["reviewed_exact"]
-        n = conn.execute(text("SELECT count(DISTINCT entity_id) FROM world.alias WHERE provider='iso3166_alpha3'"
-                              )).scalar_one()
+        n = conn.execute(
+            text("SELECT count(DISTINCT entity_id) FROM world.alias WHERE provider='iso3166_alpha3'")
+        ).scalar_one()
     assert n == 248
 
 
@@ -72,12 +80,18 @@ async def test_all_country_fixture_ingest_keeps_gaps_typed(db) -> None:
     # identical row that an earlier module ingested through the exact connector stays the head
     # ("unchanged") and is not re-inserted under the batch connector version.
     with db.owner.connect() as conn:
-        rows = {r["lk"]: dict(r) for r in conn.execute(text(
-            "SELECT DISTINCT ON (o.logical_key) o.logical_key AS lk, o.value, o.source_flags, "
-            "evidence.observation_is_eligible(o.id, clock_timestamp()) AS eligible "
-            "FROM evidence.observation o JOIN evidence.source s ON s.id = o.source_id "
-            "WHERE s.source_key = 'un.comtrade.public_preview' AND o.origin = 'test_fixture' "
-            "ORDER BY o.logical_key, o.revision_no DESC")).mappings()}
+        rows = {
+            r["lk"]: dict(r)
+            for r in conn.execute(
+                text(
+                    "SELECT DISTINCT ON (o.logical_key) o.logical_key AS lk, o.value, o.source_flags, "
+                    "evidence.observation_is_eligible(o.id, clock_timestamp()) AS eligible "
+                    "FROM evidence.observation o JOIN evidence.source s ON s.id = o.source_id "
+                    "WHERE s.source_key = 'un.comtrade.public_preview' AND o.origin = 'test_fixture' "
+                    "ORDER BY o.logical_key, o.revision_no DESC"
+                )
+            ).mappings()
+        }
     dza = rows["comtrade:HS2709:M:12:0:2023:primaryValue"]
     assert dza["value"]["kind"] == "missing" and dza["source_flags"]["provider_returned_no_rows"] is True
     assert dza["eligible"] is True  # typed Missing is admitted (admit_unclassified_missing)
@@ -91,9 +105,13 @@ async def test_all_country_fixture_ingest_keeps_gaps_typed(db) -> None:
 
     rel = publish_release(db.worker, db.store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
     with db.owner.connect() as conn:
+
         def est(key: str, concept: str) -> list[dict[str, Any]]:
-            return [e for e in estimates(conn, rel.release_id, subject_id=entity_id(key), concept_id=concept)
-                    if e["temporal_extent"].get("start", "").startswith("2023")]
+            return [
+                e
+                for e in estimates(conn, rel.release_id, subject_id=entity_id(key), concept_id=concept)
+                if e["temporal_extent"].get("start", "").startswith("2023")
+            ]
 
         che_m = est("CHE", "trade.hs2709.import_value.world_total")
         assert len(che_m) == 1 and che_m[0]["value"]["kind"] == "decimal"

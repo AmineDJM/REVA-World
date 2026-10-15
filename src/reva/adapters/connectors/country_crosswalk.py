@@ -90,14 +90,22 @@ class SourceFile:
 
 
 SOURCES: tuple[SourceFile, ...] = (
-    SourceFile("unsd_m49", "unsd_m49_overview.html.gz", "https://unstats.un.org/unsd/methodology/m49/overview/",
-               gzip=True),
-    SourceFile("comtrade_reporters", "comtrade_Reporters.json",
-               "https://comtradeapi.un.org/files/v1/app/reference/Reporters.json"),
-    SourceFile("comtrade_partners", "comtrade_partnerAreas.json",
-               "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json"),
-    SourceFile("worldbank_countries", "worldbank_country.json",
-               "https://api.worldbank.org/v2/country?format=json&per_page=400"),
+    SourceFile(
+        "unsd_m49", "unsd_m49_overview.html.gz", "https://unstats.un.org/unsd/methodology/m49/overview/", gzip=True
+    ),
+    SourceFile(
+        "comtrade_reporters",
+        "comtrade_Reporters.json",
+        "https://comtradeapi.un.org/files/v1/app/reference/Reporters.json",
+    ),
+    SourceFile(
+        "comtrade_partners",
+        "comtrade_partnerAreas.json",
+        "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json",
+    ),
+    SourceFile(
+        "worldbank_countries", "worldbank_country.json", "https://api.worldbank.org/v2/country?format=json&per_page=400"
+    ),
 )
 
 
@@ -142,8 +150,7 @@ class _M49Table(HTMLParser):
             self._cell += data
 
 
-M49_COLUMNS = ("Country or Area", "M49 Code", "ISO-alpha2 Code", "ISO-alpha3 Code", "Region Name",
-               "Sub-region Name")
+M49_COLUMNS = ("Country or Area", "M49 Code", "ISO-alpha2 Code", "ISO-alpha3 Code", "Region Name", "Sub-region Name")
 
 
 def parse_m49(html: bytes) -> list[dict[str, str]]:
@@ -192,8 +199,9 @@ def _is_nes(label: str) -> bool:
     return "nes" in words
 
 
-def _code_flags(*, label: str, iso3_field: str, is_group: bool, effective: Any, expired: Any,
-                iso3_known: set[str]) -> list[str]:
+def _code_flags(
+    *, label: str, iso3_field: str, is_group: bool, effective: Any, expired: Any, iso3_known: set[str]
+) -> list[str]:
     flags = []
     if is_group:
         flags.append("group")
@@ -243,29 +251,57 @@ def build(raw: dict[str, bytes], *, retrieved: dict[str, str], reviewed_keys: se
 
     unmapped: list[dict[str, Any]] = []
 
-    def candidates(rows: list[dict[str, Any]], code_f: str, iso_f: str, note_f: str, provider: str,
-                   ) -> dict[str, list[dict[str, Any]]]:
+    def candidates(
+        rows: list[dict[str, Any]],
+        code_f: str,
+        iso_f: str,
+        note_f: str,
+        provider: str,
+    ) -> dict[str, list[dict[str, Any]]]:
         out: dict[str, list[dict[str, Any]]] = defaultdict(list)
         for r in rows:
             label = str(r.get("text") or "")
             iso = str(r.get(iso_f) or "").strip()
-            flags = _code_flags(label=label, iso3_field=iso, is_group=bool(r.get("isGroup")),
-                                effective=r.get("entryEffectiveDate"), expired=r.get("entryExpiredDate"),
-                                iso3_known=iso3_known)
+            flags = _code_flags(
+                label=label,
+                iso3_field=iso,
+                is_group=bool(r.get("isGroup")),
+                effective=r.get("entryEffectiveDate"),
+                expired=r.get("entryExpiredDate"),
+                iso3_known=iso3_known,
+            )
             if flags:
-                unmapped.append({"provider": provider, "code": str(r[code_f]), "label": label,
-                                 "provider_note": r.get(note_f), "provider_iso3_field": iso or None,
-                                 "valid_from": r.get("entryEffectiveDate"), "valid_to": r.get("entryExpiredDate"),
-                                 "flags": flags, "mapped_iso3": None})
+                unmapped.append(
+                    {
+                        "provider": provider,
+                        "code": str(r[code_f]),
+                        "label": label,
+                        "provider_note": r.get(note_f),
+                        "provider_iso3_field": iso or None,
+                        "valid_from": r.get("entryEffectiveDate"),
+                        "valid_to": r.get("entryExpiredDate"),
+                        "flags": flags,
+                        "mapped_iso3": None,
+                    }
+                )
                 continue
             out[iso].append(r)
         for iso, rs in list(out.items()):
             if len(rs) > 1:
                 for r in rs:
-                    unmapped.append({"provider": provider, "code": str(r[code_f]), "label": r.get("text"),
-                                     "provider_note": r.get(note_f), "provider_iso3_field": iso,
-                                     "valid_from": r.get("entryEffectiveDate"), "valid_to": r.get("entryExpiredDate"),
-                                     "flags": ["ambiguous_iso3"], "mapped_iso3": None})
+                    unmapped.append(
+                        {
+                            "provider": provider,
+                            "code": str(r[code_f]),
+                            "label": r.get("text"),
+                            "provider_note": r.get(note_f),
+                            "provider_iso3_field": iso,
+                            "valid_from": r.get("entryEffectiveDate"),
+                            "valid_to": r.get("entryExpiredDate"),
+                            "flags": ["ambiguous_iso3"],
+                            "mapped_iso3": None,
+                        }
+                    )
                 del out[iso]
         return out
 
@@ -324,10 +360,18 @@ def build(raw: dict[str, bytes], *, retrieved: dict[str, str], reviewed_keys: se
         entities.append(entry)
 
     unmapped.sort(key=lambda u: (u["provider"], int(u["code"]) if str(u["code"]).isdigit() else 0, u["code"]))
-    body = {"entities": entities, "unmapped_provider_codes": unmapped,
-            "excluded_worldbank_aggregates": wb_aggregates}
-    sources = [{"name": s.name, "file": s.file, "url": s.url, "sha256": _sha256(raw[s.name]),
-                "archive_gzip": s.gzip, "retrieved_at": retrieved.get(s.name)} for s in SOURCES]
+    body = {"entities": entities, "unmapped_provider_codes": unmapped, "excluded_worldbank_aggregates": wb_aggregates}
+    sources = [
+        {
+            "name": s.name,
+            "file": s.file,
+            "url": s.url,
+            "sha256": _sha256(raw[s.name]),
+            "archive_gzip": s.gzip,
+            "retrieved_at": retrieved.get(s.name),
+        }
+        for s in SOURCES
+    ]
     stats = {
         "entities": len(entities),
         "iso3166_entities": sum(1 for e in entities if e["iso3"]),

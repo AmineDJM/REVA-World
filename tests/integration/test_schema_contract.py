@@ -64,7 +64,7 @@ def test_committed_contract_matches_fresh_migrations(fresh: tuple[Settings, Engi
     d.contract_head = contract.get("alembic_head")
     assert d.ok, (
         "migrations/schema_contract.json is stale: regenerate it with "
-        f"`{REGENERATE_HINT}` (\"missing from database\" = only in the committed contract)\n" + d.summary(40)
+        f'`{REGENERATE_HINT}` ("missing from database" = only in the committed contract)\n' + d.summary(40)
     )
     assert contract["fingerprint"] == fp.digest
 

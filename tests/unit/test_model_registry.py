@@ -52,10 +52,17 @@ POLICY = {"model_promotion": load_registry().policies["promotion"]["model_promot
 
 
 def port(name: str, direction: str, **kw) -> PortSpec:
-    base = dict(concept="trade.hs2709.import_value.world_total", concept_version="1.0.0", unit="unit.usd",
-                basis="nominal_current", spatial_support="provider_reporter_territory:country",
-                population_universe="economy", temporal_resolution="annual",
-                temporal_aggregation="period_flow_total", interpretation="flow")
+    base = dict(
+        concept="trade.hs2709.import_value.world_total",
+        concept_version="1.0.0",
+        unit="unit.usd",
+        basis="nominal_current",
+        spatial_support="provider_reporter_territory:country",
+        population_universe="economy",
+        temporal_resolution="annual",
+        temporal_aggregation="period_flow_total",
+        interpretation="flow",
+    )
     base.update(kw)
     return PortSpec(name=name, direction=direction, **base)  # type: ignore[arg-type]
 
@@ -74,8 +81,16 @@ def test_annual_flow_cannot_feed_monthly_port_without_approved_disaggregation():
     assert not c.ok
     assert any("approved disaggregation operator" in r for r in c.reasons)
 
-    unapproved = TransformOperator("temporal.denton", "1.0.0", "temporal_disaggregation", "annual", "monthly",
-                                   approved=False, method="denton", interpretations=("flow",))
+    unapproved = TransformOperator(
+        "temporal.denton",
+        "1.0.0",
+        "temporal_disaggregation",
+        "annual",
+        "monthly",
+        approved=False,
+        method="denton",
+        interpretations=("flow",),
+    )
     assert not compatible(out, inp, [unapproved]).ok
 
     approved = replace(unapproved, approved=True)
@@ -96,14 +111,22 @@ def test_monthly_to_annual_needs_aggregation_operator():
     out = port("m", "out", temporal_resolution="monthly")
     inp = port("a", "in")
     assert not compatible(out, inp).ok
-    agg = TransformOperator("temporal.sum", "1.0.0", "temporal_aggregation", "monthly", "annual", approved=True,
-                            interpretations=("flow",))
+    agg = TransformOperator(
+        "temporal.sum", "1.0.0", "temporal_aggregation", "monthly", "annual", approved=True, interpretations=("flow",)
+    )
     assert compatible(out, inp, [agg]).ok
 
 
 def test_semantic_mismatches_are_all_reported():
-    out = port("G", "out", unit="unit.eur", basis="real_2015", interpretation="stock",
-               temporal_aggregation="point_in_time_stock", conservation_role="conserved_quantity")
+    out = port(
+        "G",
+        "out",
+        unit="unit.eur",
+        basis="real_2015",
+        interpretation="stock",
+        temporal_aggregation="point_in_time_stock",
+        conservation_role="conserved_quantity",
+    )
     inp = port("M", "in", concept="economics.gdp.nominal_current_usd")
     c = compatible(out, inp)
     joined = " | ".join(c.reasons)
@@ -244,8 +267,14 @@ def synthetic_growth_panel(n_series: int = 5, years: tuple[int, int] = (2004, 20
 
 def test_pure_evaluation_promotes_only_after_locked_holdout_and_blocks_reuse():
     panel = synthetic_growth_panel()
-    kw = dict(incumbent_key="forecast.last_value", horizons=(1, 2, 3), seed=1, policy=POLICY,
-              holdout_years=2, max_holdout_accesses=1)
+    kw = dict(
+        incumbent_key="forecast.last_value",
+        horizons=(1, 2, 3),
+        seed=1,
+        policy=POLICY,
+        holdout_years=2,
+        max_holdout_accesses=1,
+    )
     first = evaluate(panel, prior_holdout_accesses={}, **kw)
     assert first.holdout.years == (2023, 2024)
     assert max(r.target_year for r in first.tournament.records) <= 2022  # selection never saw the holdout
@@ -269,8 +298,16 @@ def test_pure_evaluation_promotes_only_after_locked_holdout_and_blocks_reuse():
 
 def test_pure_evaluation_insufficient_evidence_keeps_incumbent():
     panel = {"S0:test.concept": [(2010 + i, 100.0 * 1.05**i) for i in range(8)]}
-    out = evaluate(panel, incumbent_key="forecast.last_value", horizons=(1, 2, 3), seed=1, policy=POLICY,
-                   holdout_years=2, max_holdout_accesses=1, prior_holdout_accesses={})
+    out = evaluate(
+        panel,
+        incumbent_key="forecast.last_value",
+        horizons=(1, 2, 3),
+        seed=1,
+        policy=POLICY,
+        holdout_years=2,
+        max_holdout_accesses=1,
+        prior_holdout_accesses={},
+    )
     assert out.status == "insufficient_evaluation"
     assert all(d["decision"] == "keep_incumbent" for d in out.decisions.values())
     assert out.holdout_status == "locked_unopened"
@@ -279,12 +316,22 @@ def test_pure_evaluation_insufficient_evidence_keeps_incumbent():
 
 def test_panel_rows_drop_missing_and_exclude_non_positive_series():
     def row(iso, year, v, kind="decimal"):
-        return {"concept_id": "c", "spatial_spec": {"key": f"WB:{iso}"}, "aggregation": "period_flow_total",
-                "temporal_extent": {"kind": "interval", "start": f"{year}-01-01", "end": f"{year + 1}-01-01"},
-                "value": {"kind": kind, "value": v, "unit_ref": "unit.usd"}}
+        return {
+            "concept_id": "c",
+            "spatial_spec": {"key": f"WB:{iso}"},
+            "aggregation": "period_flow_total",
+            "temporal_extent": {"kind": "interval", "start": f"{year}-01-01", "end": f"{year + 1}-01-01"},
+            "value": {"kind": kind, "value": v, "unit_ref": "unit.usd"},
+        }
 
-    rows = [row("AAA", 2000, "1"), row("AAA", 2001, None, kind="missing"), row("AAA", 2002, "3"),
-            row("BBB", 2000, "5"), row("BBB", 2001, "0"), row("CCC", 2000, "2")]
+    rows = [
+        row("AAA", 2000, "1"),
+        row("AAA", 2001, None, kind="missing"),
+        row("AAA", 2002, "3"),
+        row("BBB", 2000, "5"),
+        row("BBB", 2001, "0"),
+        row("CCC", 2000, "2"),
+    ]
     series, meta, dropped = panel_from_rows(rows, concepts=["c"], countries=["AAA", "BBB"], years=(2000, 2024))
     assert set(series) == {"AAA:c"} and meta["AAA:c"]["gaps"] == [2001]
     reasons = {d["reason"] for d in dropped}
@@ -295,15 +342,34 @@ def test_panel_rows_drop_missing_and_exclude_non_positive_series():
 
 
 def _rec(model: str, origin: int, err: float, sid: str = "S") -> PredictionRecord:
-    return PredictionRecord(series_id=sid, origin=origin, horizon=1, target_year=origin + 1, model=model,
-                            model_version="1.0.0", point=1.0, interval=None, interval_kind=None, level=None,
-                            target=1.0, abs_error=err, mase_scaled_error=err, scale_flag=None, covered=None)
+    return PredictionRecord(
+        series_id=sid,
+        origin=origin,
+        horizon=1,
+        target_year=origin + 1,
+        model=model,
+        model_version="1.0.0",
+        point=1.0,
+        interval=None,
+        interval_kind=None,
+        level=None,
+        target=1.0,
+        abs_error=err,
+        mase_scaled_error=err,
+        scale_flag=None,
+        covered=None,
+    )
 
 
 def test_paired_metrics_use_common_cases_where_unpaired_ranking_flips():
     # "a" is scored on a hard early origin that "b" never faces (ineligible there).
-    recs = [_rec("a", 2001, 10.0), _rec("a", 2010, 1.0), _rec("a", 2011, 1.0),
-            _rec("b", 2010, 2.0), _rec("b", 2011, 2.0)]
+    recs = [
+        _rec("a", 2001, 10.0),
+        _rec("a", 2010, 1.0),
+        _rec("a", 2011, 1.0),
+        _rec("b", 2010, 2.0),
+        _rec("b", 2011, 2.0),
+    ]
     unpaired_a = (10.0 + 1.0 + 1.0) / 3
     assert unpaired_a > 2.0  # unpaired: "b" looks better
     pm = paired_common_metrics(recs, ["a", "b"])
@@ -313,11 +379,13 @@ def test_paired_metrics_use_common_cases_where_unpaired_ranking_flips():
 
 def test_challenger_choice_requires_a_distinguishable_paired_winner():
     pol = {"paired_test": {"alpha": 0.025, "min_origins_per_horizon": 8}}
-    clear = [_rec("a", y, 1.0 + 0.01 * (y % 3)) for y in range(2000, 2040)] + \
-            [_rec("b", y, 2.0 + 0.01 * (y % 5)) for y in range(2000, 2040)]
+    clear = [_rec("a", y, 1.0 + 0.01 * (y % 3)) for y in range(2000, 2040)] + [
+        _rec("b", y, 2.0 + 0.01 * (y % 5)) for y in range(2000, 2040)
+    ]
     assert choose_among_challengers(clear, ["a", "b"], pol)["winner"] == "a"
-    noisy = [_rec("a", y, 1.0 + (0.5 if y % 2 else -0.5)) for y in range(2000, 2040)] + \
-            [_rec("b", y, 1.0 + (-0.5 if y % 2 else 0.5)) for y in range(2000, 2040)]
+    noisy = [_rec("a", y, 1.0 + (0.5 if y % 2 else -0.5)) for y in range(2000, 2040)] + [
+        _rec("b", y, 1.0 + (-0.5 if y % 2 else 0.5)) for y in range(2000, 2040)
+    ]
     sel = choose_among_challengers(noisy, ["a", "b"], pol)
     assert sel["winner"] is None and sel["n_common"] == 40
 

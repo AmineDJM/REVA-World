@@ -21,8 +21,12 @@ UNMAPPED = {(u["provider"], u["code"]): u for u in DOC["unmapped_provider_codes"
 def test_committed_crosswalk_is_a_rebuild_of_the_archived_provider_lists() -> None:
     rebuilt = cw.build_from_archive()
     assert rebuilt["content_sha256"] == DOC["content_sha256"]
-    assert [s["name"] for s in DOC["sources"]] == ["unsd_m49", "comtrade_reporters", "comtrade_partners",
-                                                    "worldbank_countries"]
+    assert [s["name"] for s in DOC["sources"]] == [
+        "unsd_m49",
+        "comtrade_reporters",
+        "comtrade_partners",
+        "worldbank_countries",
+    ]
     assert all(len(s["sha256"]) == 64 and s["retrieved_at"] for s in DOC["sources"])
 
 
@@ -53,8 +57,13 @@ def test_worldbank_aggregates_excluded_and_wb_only_economies_flagged() -> None:
 
 
 def test_comtrade_codes_differ_from_m49_and_territory_notes_are_flagged() -> None:
-    for key, ct, m49 in (("FRA", "251", "250"), ("USA", "842", "840"), ("CHE", "757", "756"),
-                         ("NOR", "579", "578"), ("IND", "699", "356")):
+    for key, ct, m49 in (
+        ("FRA", "251", "250"),
+        ("USA", "842", "840"),
+        ("CHE", "757", "756"),
+        ("NOR", "579", "578"),
+        ("IND", "699", "356"),
+    ):
         e = BY_KEY[key]
         assert (e["comtrade_reporter"], e["m49"]) == (ct, m49)
         assert "comtrade_code_differs_from_m49" in e["flags"]

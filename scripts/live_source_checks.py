@@ -58,11 +58,22 @@ REPORTERS_URL = "https://comtradeapi.un.org/files/v1/app/reference/Reporters.jso
 PARTNERS_URL = "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json"
 EXPECTED_REPORTERS = {"FRA": 251, "DZA": 12, "CHN": 156, "USA": 842}
 ISO3 = ("FRA", "DZA", "CHN", "USA")
-EUROSTAT_SAMPLE_URL = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan"
-                       "?format=JSON&lang=EN&geo=FR&time=2023")
-TRACE_HEADERS = ("content-type", "content-length", "etag", "last-modified", "date", "cache-control",
-                 "x-rate-limit-limit", "x-rate-limit-interval", "x-concurrency-limit", "retry-after",
-                 "x-api-pool")
+EUROSTAT_SAMPLE_URL = (
+    "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=FR&time=2023"
+)
+TRACE_HEADERS = (
+    "content-type",
+    "content-length",
+    "etag",
+    "last-modified",
+    "date",
+    "cache-control",
+    "x-rate-limit-limit",
+    "x-rate-limit-interval",
+    "x-concurrency-limit",
+    "retry-after",
+    "x-api-pool",
+)
 
 log = logging.getLogger("reva.live_checks")
 
@@ -96,24 +107,32 @@ class TracingHttp:
             r = await self.client.get(url, **kw)
         except Exception as e:
             details = getattr(e, "details", None) or {}
-            self.trace.append({"url": url, "requested_at": started, "error": type(e).__name__,
-                               "message": str(getattr(e, "message", e))[:400],
-                               "status": details.get("status")})
+            self.trace.append(
+                {
+                    "url": url,
+                    "requested_at": started,
+                    "error": type(e).__name__,
+                    "message": str(getattr(e, "message", e))[:400],
+                    "status": details.get("status"),
+                }
+            )
             raise
         self.bodies[url] = r.body
-        self.trace.append({
-            "url": url,
-            "final_url": r.final_url,
-            "requested_at": started,
-            "retrieved_at": r.retrieved_at.isoformat(),
-            "status": r.status,
-            "bytes": len(r.body),
-            "sha256": sha256(r.body),
-            "elapsed_seconds": round(r.elapsed_seconds, 3),
-            "attempts": r.attempts,
-            "redirects": list(r.redirects),
-            "headers": {k: v for k, v in r.headers.items() if k in TRACE_HEADERS},
-        })
+        self.trace.append(
+            {
+                "url": url,
+                "final_url": r.final_url,
+                "requested_at": started,
+                "retrieved_at": r.retrieved_at.isoformat(),
+                "status": r.status,
+                "bytes": len(r.body),
+                "sha256": sha256(r.body),
+                "elapsed_seconds": round(r.elapsed_seconds, 3),
+                "attempts": r.attempts,
+                "redirects": list(r.redirects),
+                "headers": {k: v for k, v in r.headers.items() if k in TRACE_HEADERS},
+            }
+        )
         return r
 
     async def aclose(self) -> None:
@@ -159,8 +178,9 @@ def fresh_database(object_root: Path, keep: bool = False, prefix: str = "reva_li
         c.execute(text(f'CREATE DATABASE "{name}"'))
     url = base.migration_url().set(database=name).render_as_string(hide_password=False)
     object_root.mkdir(parents=True, exist_ok=True)
-    settings = _base_settings(reva_migration_database_url=url, reva_db_name=name, reva_env="test",
-                              reva_object_root=object_root)
+    settings = _base_settings(
+        reva_migration_database_url=url, reva_db_name=name, reva_env="test", reva_object_root=object_root
+    )
     d: LiveDB | None = None
     try:
         for attempt in range(3):  # concurrent sessions may race on cluster-global role DDL
@@ -172,8 +192,7 @@ def fresh_database(object_root: Path, keep: bool = False, prefix: str = "reva_li
                     raise
                 time.sleep(1 + attempt)
         store = FilesystemArtifactStore(object_root, settings.reva_s3_prefix)
-        d = LiveDB(settings, name, make_engine("migration", settings), make_engine("worker", settings), store,
-                   admin)
+        d = LiveDB(settings, name, make_engine("migration", settings), make_engine("worker", settings), store, admin)
         for attempt in range(12):  # the runtime roles have a cluster-wide connection limit shared by agents
             try:
                 seed(d.worker, store)
@@ -200,8 +219,10 @@ async def check_comtrade_reference(contact_email: str | None = None) -> dict[str
     from reva.adapters.http.safe_client import SafeHttpClient
 
     out: dict[str, Any] = {"checked_at": now(), "requests": []}
-    tr = TracingHttp(SafeHttpClient(allowed_hosts=("comtradeapi.un.org",), max_bytes=5_000_000,
-                                    contact_email=contact_email), "comtrade.reference")
+    tr = TracingHttp(
+        SafeHttpClient(allowed_hosts=("comtradeapi.un.org",), max_bytes=5_000_000, contact_email=contact_email),
+        "comtrade.reference",
+    )
     try:
         r = await tr.get(REPORTERS_URL)
         rows = json.loads(r.body)["results"]
@@ -216,25 +237,47 @@ async def check_comtrade_reference(contact_email: str | None = None) -> dict[str
                 "provider_codes_for_iso3": [x.get("reporterCode") for x in hits],
                 "provider_entries_for_iso3": [
                     {k: x.get(k) for k in ("reporterCode", "reporterDesc", "entryEffectiveDate", "entryExpiredDate")}
-                    for x in hits],
-                "provider_entry": {k: entry.get(k) for k in ("reporterCode", "reporterDesc", "reporterNote",
-                                                              "reporterCodeIsoAlpha3", "entryEffectiveDate",
-                                                              "entryExpiredDate", "isGroup")} if entry else None,
-                "verified": bool(entry) and entry.get("reporterCodeIsoAlpha3") == iso
-                and REPORTERS.get(iso) == code and not entry.get("isGroup")
+                    for x in hits
+                ],
+                "provider_entry": {
+                    k: entry.get(k)
+                    for k in (
+                        "reporterCode",
+                        "reporterDesc",
+                        "reporterNote",
+                        "reporterCodeIsoAlpha3",
+                        "entryEffectiveDate",
+                        "entryExpiredDate",
+                        "isGroup",
+                    )
+                }
+                if entry
+                else None,
+                "verified": bool(entry)
+                and entry.get("reporterCodeIsoAlpha3") == iso
+                and REPORTERS.get(iso) == code
+                and not entry.get("isGroup")
                 and not entry.get("entryExpiredDate"),
             }
-        out["reporters"] = {"url": REPORTERS_URL, "count": len(rows), "codes": found,
-                            "all_verified": all(v["verified"] for v in found.values())}
+        out["reporters"] = {
+            "url": REPORTERS_URL,
+            "count": len(rows),
+            "codes": found,
+            "all_verified": all(v["verified"] for v in found.values()),
+        }
         await asyncio.sleep(1.6)  # Comtrade spacing
         p = await tr.get(PARTNERS_URL)
         pinned = yaml.safe_load((REPO / "registry" / "reference" / "manifest.yaml").read_text())
         pin = next((e for e in pinned if e["url"] == PARTNERS_URL), {})
         prow = json.loads(p.body)["results"]
-        out["partner_areas"] = {"url": PARTNERS_URL, "count": len(prow), "sha256": sha256(p.body),
-                                "pinned_sha256": pin.get("sha256"),
-                                "matches_pin": sha256(p.body) == pin.get("sha256"),
-                                "world_code_0": next((x.get("text") for x in prow if x.get("id") == 0), None)}
+        out["partner_areas"] = {
+            "url": PARTNERS_URL,
+            "count": len(prow),
+            "sha256": sha256(p.body),
+            "pinned_sha256": pin.get("sha256"),
+            "matches_pin": sha256(p.body) == pin.get("sha256"),
+            "world_code_0": next((x.get("text") for x in prow if x.get("id") == 0), None),
+        }
     except Exception as e:
         out["error"] = f"{type(e).__name__}: {getattr(e, 'message', e)}"
     finally:
@@ -256,19 +299,30 @@ async def run_live_connectors(db: LiveDB, names: list[str] | None = None) -> dic
         http = TracingHttp(make_live_client(spec, db.settings), name)
         started = now()
         try:
-            rep = await run_connector(c, http, db.store, db.worker, post_publish=post_publish_for(spec.template),
-                                      persist_cursor=True)
+            rep = await run_connector(
+                c, http, db.store, db.worker, post_publish=post_publish_for(spec.template), persist_cursor=True
+            )
             report = rep.as_dict()
         except Exception as e:
-            report = {"connector": name, "crash": f"{type(e).__name__}: {e}",
-                      "traceback": traceback.format_exc()[-2000:]}
+            report = {
+                "connector": name,
+                "crash": f"{type(e).__name__}: {e}",
+                "traceback": traceback.format_exc()[-2000:],
+            }
         finally:
             await http.aclose()
         statuses = Counter(o["status"] for o in report.get("outcomes", []))
         results[name] = {
-            "spec": {"name": spec.name, "version": spec.version, "template": spec.template,
-                     "source_key": spec.source_key, "licence": spec.licence, "hosts": list(spec.allowed_hosts)},
-            "started_at": started, "finished_at": now(),
+            "spec": {
+                "name": spec.name,
+                "version": spec.version,
+                "template": spec.template,
+                "source_key": spec.source_key,
+                "licence": spec.licence,
+                "hosts": list(spec.allowed_hosts),
+            },
+            "started_at": started,
+            "finished_at": now(),
             "requests": http.trace,
             "request_count": len(http.trace),
             "bytes_total": sum(t.get("bytes", 0) for t in http.trace),
@@ -284,13 +338,19 @@ def publish_live_release(db: LiveDB) -> dict[str, Any]:
     from reva.kernel.context import Origin
 
     try:
-        r = publish_release(db.worker, db.store, cutoff=None, origin=Origin.live,
-                            environment=db.settings.reva_env)
+        r = publish_release(db.worker, db.store, cutoff=None, origin=Origin.live, environment=db.settings.reva_env)
     except Exception as e:
         return {"published": False, "error": f"{type(e).__name__}: {getattr(e, 'message', e)}"}
-    return {"published": True, "release_id": str(r.release_id), "context_id": str(r.context_id),
-            "sequence": r.sequence, "estimates": r.estimates, "manifest_sha256": r.manifest_sha256,
-            "knowledge_cutoff": r.knowledge_cutoff.isoformat(), "origin": "live"}
+    return {
+        "published": True,
+        "release_id": str(r.release_id),
+        "context_id": str(r.context_id),
+        "sequence": r.sequence,
+        "estimates": r.estimates,
+        "manifest_sha256": r.manifest_sha256,
+        "knowledge_cutoff": r.knowledge_cutoff.isoformat(),
+        "origin": "live",
+    }
 
 
 # --------------------------------------------------------------------------- coverage matrix
@@ -303,9 +363,19 @@ def _year(temporal: Any) -> int | None:
 
 def _flag_summary(flags: dict[str, Any] | None) -> dict[str, Any]:
     flags = flags or {}
-    keep = ("provider_returned_no_rows", "weight_unusable", "obs_status", "isReported", "isAggregate",
-            "classificationCode", "legacyEstimationFlag", "provider_derived_aggregate", "flowCode",
-            "cifvalue", "fobvalue")
+    keep = (
+        "provider_returned_no_rows",
+        "weight_unusable",
+        "obs_status",
+        "isReported",
+        "isAggregate",
+        "classificationCode",
+        "legacyEstimationFlag",
+        "provider_derived_aggregate",
+        "flowCode",
+        "cifvalue",
+        "fobvalue",
+    )
     return {k: flags[k] for k in keep if k in flags and flags[k] not in ("", None)}
 
 
@@ -331,40 +401,67 @@ def coverage_matrix(db: LiveDB, release_id: str | None) -> dict[str, Any]:
                 for y in range(req["period"][0], req["period"][1] + 1):
                     hits = idx.get((iso, y), [])
                     if not hits:
-                        n_obs = conn.execute(text(
-                            """SELECT count(*) FROM evidence.observation o
+                        n_obs = conn.execute(
+                            text(
+                                """SELECT count(*) FROM evidence.observation o
                                JOIN ontology.concept_version cv ON cv.id = o.concept_version_id
                                JOIN world.support s ON s.id = o.support_id
                                JOIN evidence.acquisition a ON a.id = o.acquisition_id
                                WHERE cv.concept_id = :c AND o.subject_id = :s AND a.origin = 'live'
-                                 AND substr(s.temporal_extent->>'start', 1, 4) = :y"""),
-                            {"c": req["concept"], "s": entity_id(iso), "y": str(y)}).scalar_one()
-                        cells.append({"geo": iso, "year": y, "status": "absent",
-                                      "live_observations_in_evidence": int(n_obs)})
+                                 AND substr(s.temporal_extent->>'start', 1, 4) = :y"""
+                            ),
+                            {"c": req["concept"], "s": entity_id(iso), "y": str(y)},
+                        ).scalar_one()
+                        cells.append(
+                            {"geo": iso, "year": y, "status": "absent", "live_observations_in_evidence": int(n_obs)}
+                        )
                         totals["absent"] += 1
                         continue
                     h = hits[0]
                     v = h["value"] if isinstance(h["value"], dict) else json.loads(h["value"])
-                    flags = h["source_flags"] if isinstance(h["source_flags"], dict) else json.loads(
-                        h["source_flags"] or "{}")
-                    cell: dict[str, Any] = {"geo": iso, "year": y, "source": h["source_key"],
-                                            "observation_id": str(h["observation_id"]),
-                                            "retrieved_at": str(h["retrieved_at"]),
-                                            "estimates_for_cell": len(hits), "flags": _flag_summary(flags)}
+                    flags = (
+                        h["source_flags"]
+                        if isinstance(h["source_flags"], dict)
+                        else json.loads(h["source_flags"] or "{}")
+                    )
+                    cell: dict[str, Any] = {
+                        "geo": iso,
+                        "year": y,
+                        "source": h["source_key"],
+                        "observation_id": str(h["observation_id"]),
+                        "retrieved_at": str(h["retrieved_at"]),
+                        "estimates_for_cell": len(hits),
+                        "flags": _flag_summary(flags),
+                    }
                     if v.get("kind") == "missing":
                         cell.update(status="missing", reason=v.get("reason"))
                     else:
-                        cell.update(status="value", value=v.get("value"), unit=v.get("unit_ref"),
-                                    valuation=(v.get("basis") or {}).get("valuation"))
+                        cell.update(
+                            status="value",
+                            value=v.get("value"),
+                            unit=v.get("unit_ref"),
+                            valuation=(v.get("basis") or {}).get("valuation"),
+                        )
                     totals[cell["status"]] += 1
                     cells.append(cell)
             counts = Counter(c["status"] for c in cells)
-            reqs.append({"id": req["id"], "concept": req["concept"], "task": req["task"],
-                         "geography": req["geography"], "period": req["period"],
-                         "counts": {k: counts.get(k, 0) for k in ("value", "missing", "absent")},
-                         "cells": cells})
-    return {"catalogue_version": cat["catalogue_version"], "release_id": release_id,
-            "totals": {k: totals.get(k, 0) for k in ("value", "missing", "absent")}, "requirements": reqs}
+            reqs.append(
+                {
+                    "id": req["id"],
+                    "concept": req["concept"],
+                    "task": req["task"],
+                    "geography": req["geography"],
+                    "period": req["period"],
+                    "counts": {k: counts.get(k, 0) for k in ("value", "missing", "absent")},
+                    "cells": cells,
+                }
+            )
+    return {
+        "catalogue_version": cat["catalogue_version"],
+        "release_id": release_id,
+        "totals": {k: totals.get(k, 0) for k in ("value", "missing", "absent")},
+        "requirements": reqs,
+    }
 
 
 # --------------------------------------------------------------------------- per-source details
@@ -386,38 +483,77 @@ def comtrade_details(run: dict[str, Any]) -> dict[str, Any]:
         except ValueError:
             payload = {"data": None, "error": "non-JSON body"}
         rows = payload.get("data") or []
-        base = {"url": url, "status": t.get("status"), "bytes": t.get("bytes"), "sha256": t.get("sha256"),
-                "retrieved_at": t.get("retrieved_at"), "count": payload.get("count"), "rows": len(rows),
-                "error": payload.get("error") or None}
+        base = {
+            "url": url,
+            "status": t.get("status"),
+            "bytes": t.get("bytes"),
+            "sha256": t.get("sha256"),
+            "retrieved_at": t.get("retrieved_at"),
+            "count": payload.get("count"),
+            "rows": len(rows),
+            "error": payload.get("error") or None,
+        }
         if "partnerCode" in q:
             row = next((r for r in rows if str(r.get("period")) == period and r.get("partnerCode") == 0), None)
             if row:
-                base.update({k: row.get(k) for k in ("primaryValue", "cifvalue", "fobvalue", "netWgt", "qty",
-                                                     "qtyUnitCode", "classificationCode", "isReported",
-                                                     "isAggregate", "isOriginalClassification",
-                                                     "legacyEstimationFlag", "isNetWgtEstimated")})
+                base.update(
+                    {
+                        k: row.get(k)
+                        for k in (
+                            "primaryValue",
+                            "cifvalue",
+                            "fobvalue",
+                            "netWgt",
+                            "qty",
+                            "qtyUnitCode",
+                            "classificationCode",
+                            "isReported",
+                            "isAggregate",
+                            "isOriginalClassification",
+                            "legacyEstimationFlag",
+                            "isNetWgtEstimated",
+                        )
+                    }
+                )
             base["present"] = row is not None and row.get("primaryValue") is not None
             totals[iso][flow][period] = base
         else:
             partners = [r for r in rows if r.get("partnerCode") != 0]
-            base.update({
-                "partner_rows_excluding_world": len(partners),
-                "world_row_in_response": any(r.get("partnerCode") == 0 for r in rows),
-                "distinct_partners": len({r.get("partnerCode") for r in partners}),
-                "null_primary_values": sum(1 for r in partners if r.get("primaryValue") is None),
-                "classification_codes": sorted({str(r.get("classificationCode")) for r in rows}),
-                "top_partners_by_primaryValue": [
-                    {"partnerCode": r.get("partnerCode"), "partnerDesc": r.get("partnerDesc"),
-                     "primaryValue": r.get("primaryValue")}
-                    for r in sorted(partners, key=lambda r: -(r.get("primaryValue") or 0))[:5]],
-            })
+            base.update(
+                {
+                    "partner_rows_excluding_world": len(partners),
+                    "world_row_in_response": any(r.get("partnerCode") == 0 for r in rows),
+                    "distinct_partners": len({r.get("partnerCode") for r in partners}),
+                    "null_primary_values": sum(1 for r in partners if r.get("primaryValue") is None),
+                    "classification_codes": sorted({str(r.get("classificationCode")) for r in rows}),
+                    "top_partners_by_primaryValue": [
+                        {
+                            "partnerCode": r.get("partnerCode"),
+                            "partnerDesc": r.get("partnerDesc"),
+                            "primaryValue": r.get("primaryValue"),
+                        }
+                        for r in sorted(partners, key=lambda r: -(r.get("primaryValue") or 0))[:5]
+                    ],
+                }
+            )
             bilateral[iso][f"{flow}:{period}"] = base
-    dza = {f"{flow}:{y}": {"present": v.get("present"), "rows": v.get("rows"), "primaryValue": v.get("primaryValue"),
-                          "netWgt": v.get("netWgt"), "isReported": v.get("isReported"),
-                          "isAggregate": v.get("isAggregate")}
-           for flow, years in totals.get("DZA", {}).items() for y, v in sorted(years.items())}
-    return {"totals": {k: {f: dict(sorted(v.items())) for f, v in d.items()} for k, d in totals.items()},
-            "bilateral": dict(bilateral), "dza_negative_demonstration": dza}
+    dza = {
+        f"{flow}:{y}": {
+            "present": v.get("present"),
+            "rows": v.get("rows"),
+            "primaryValue": v.get("primaryValue"),
+            "netWgt": v.get("netWgt"),
+            "isReported": v.get("isReported"),
+            "isAggregate": v.get("isAggregate"),
+        }
+        for flow, years in totals.get("DZA", {}).items()
+        for y, v in sorted(years.items())
+    }
+    return {
+        "totals": {k: {f: dict(sorted(v.items())) for f, v in d.items()} for k, d in totals.items()},
+        "bilateral": dict(bilateral),
+        "dza_negative_demonstration": dza,
+    }
 
 
 def worldbank_details(run: dict[str, Any]) -> dict[str, Any]:
@@ -430,38 +566,71 @@ def worldbank_details(run: dict[str, Any]) -> dict[str, Any]:
         path = urlsplit(url).path
         if "/indicator/" in path and "/country/" in path:
             nulls = Counter(r.get("countryiso3code") for r in rows if r.get("value") is None)
-            out["series_pages"].append({
-                "url": url, "status": t.get("status"), "bytes": t.get("bytes"), "sha256": t.get("sha256"),
-                "retrieved_at": t.get("retrieved_at"),
-                "header": {k: header.get(k) for k in ("page", "pages", "per_page", "total", "sourceid",
-                                                       "lastupdated")},
-                "rows": len(rows), "null_values_by_country": dict(nulls),
-                "latest_year_with_value": {iso: max((int(r["date"]) for r in rows if r.get("countryiso3code") == iso
-                                                     and r.get("value") is not None), default=None)
-                                           for iso in ISO3},
-            })
+            out["series_pages"].append(
+                {
+                    "url": url,
+                    "status": t.get("status"),
+                    "bytes": t.get("bytes"),
+                    "sha256": t.get("sha256"),
+                    "retrieved_at": t.get("retrieved_at"),
+                    "header": {
+                        k: header.get(k) for k in ("page", "pages", "per_page", "total", "sourceid", "lastupdated")
+                    },
+                    "rows": len(rows),
+                    "null_values_by_country": dict(nulls),
+                    "latest_year_with_value": {
+                        iso: max(
+                            (
+                                int(r["date"])
+                                for r in rows
+                                if r.get("countryiso3code") == iso and r.get("value") is not None
+                            ),
+                            default=None,
+                        )
+                        for iso in ISO3
+                    },
+                }
+            )
         elif "/indicator/" in path:
             r = rows[0] if rows else {}
-            out["indicators"][r.get("id")] = {"url": url, "status": t.get("status"), "sha256": t.get("sha256"),
-                                              "name": r.get("name"),
-                                              "source": (r.get("source") or {}).get("value"),
-                                              "sourceOrganization": r.get("sourceOrganization"),
-                                              "sourceNote_head": (r.get("sourceNote") or "")[:300]}
+            out["indicators"][r.get("id")] = {
+                "url": url,
+                "status": t.get("status"),
+                "sha256": t.get("sha256"),
+                "name": r.get("name"),
+                "source": (r.get("source") or {}).get("value"),
+                "sourceOrganization": r.get("sourceOrganization"),
+                "sourceNote_head": (r.get("sourceNote") or "")[:300],
+            }
         else:
-            out["countries"] = [{"id": r.get("id"), "name": r.get("name"),
-                                 "region": (r.get("region") or {}).get("value"),
-                                 "incomeLevel": (r.get("incomeLevel") or {}).get("value")} for r in rows]
-            out["countries_request"] = {"url": url, "status": t.get("status"), "sha256": t.get("sha256"),
-                                        "header": header}
+            out["countries"] = [
+                {
+                    "id": r.get("id"),
+                    "name": r.get("name"),
+                    "region": (r.get("region") or {}).get("value"),
+                    "incomeLevel": (r.get("incomeLevel") or {}).get("value"),
+                }
+                for r in rows
+            ]
+            out["countries_request"] = {
+                "url": url,
+                "status": t.get("status"),
+                "sha256": t.get("sha256"),
+                "header": header,
+            }
     pag: dict[str, Any] = {}
     for ind in ("SP.POP.TOTL", "NY.GDP.MKTP.CD"):
         pages = [p for p in out["series_pages"] if f"/indicator/{ind}?" in p["url"]]
         declared_pages = max((int(p["header"].get("pages") or 0) for p in pages), default=0)
         declared_total = max((int(p["header"].get("total") or 0) for p in pages), default=-1)
         rows = sum(p["rows"] for p in pages)
-        pag[ind] = {"pages_fetched": len(pages), "pages_declared": declared_pages, "rows": rows,
-                    "total_declared": declared_total,
-                    "fully_consumed": bool(pages) and len(pages) == declared_pages and rows == declared_total}
+        pag[ind] = {
+            "pages_fetched": len(pages),
+            "pages_declared": declared_pages,
+            "rows": rows,
+            "total_declared": declared_total,
+            "fully_consumed": bool(pages) and len(pages) == declared_pages and rows == declared_total,
+        }
     out["pagination"] = pag
     out["pagination_fully_consumed"] = all(v["fully_consumed"] for v in pag.values())
     return out
@@ -474,23 +643,38 @@ def naturalearth_details(run: dict[str, Any], db: LiveDB) -> dict[str, Any]:
     for url, body in run["_bodies"].items():
         t = next(x for x in run["requests"] if x["url"] == url)
         gj = NaturalEarthConnector.to_geojson(body)
-        out.update({"url": url, "status": t.get("status"), "bytes": len(body), "sha256": sha256(body),
-                    "retrieved_at": t.get("retrieved_at"), "etag": t["headers"].get("etag"),
-                    "last_modified": t["headers"].get("last-modified"), "ne_version": gj.get("ne_version"),
-                    "feature_count": len(gj["features"]),
-                    "types": dict(Counter(str(f["properties"].get("TYPE")) for f in gj["features"]))})
+        out.update(
+            {
+                "url": url,
+                "status": t.get("status"),
+                "bytes": len(body),
+                "sha256": sha256(body),
+                "retrieved_at": t.get("retrieved_at"),
+                "etag": t["headers"].get("etag"),
+                "last_modified": t["headers"].get("last-modified"),
+                "ne_version": gj.get("ne_version"),
+                "feature_count": len(gj["features"]),
+                "types": dict(Counter(str(f["properties"].get("TYPE")) for f in gj["features"])),
+            }
+        )
         with db.owner.connect() as conn:
-            rows = conn.execute(text(
-                """SELECT match_status, count(*) FROM world.display_geometry WHERE dataset_sha256 = :d
-                   GROUP BY match_status ORDER BY 1"""), {"d": sha256(body)}).all()
+            rows = conn.execute(
+                text(
+                    """SELECT match_status, count(*) FROM world.display_geometry WHERE dataset_sha256 = :d
+                   GROUP BY match_status ORDER BY 1"""
+                ),
+                {"d": sha256(body)},
+            ).all()
             out["match_status_counts"] = {r[0]: int(r[1]) for r in rows}
-            ours = conn.execute(text(
-                """SELECT g.feature_key, g.match_status, e.label FROM world.display_geometry g
+            ours = conn.execute(
+                text(
+                    """SELECT g.feature_key, g.match_status, e.label FROM world.display_geometry g
                    LEFT JOIN world.entity e ON e.id = g.entity_id
-                   WHERE g.dataset_sha256 = :d AND g.match_status <> 'unmatched' ORDER BY 1"""),
-                {"d": sha256(body)}).all()
-            out["non_unmatched_features"] = [{"feature_key": r[0], "match_status": r[1], "entity": r[2]}
-                                             for r in ours]
+                   WHERE g.dataset_sha256 = :d AND g.match_status <> 'unmatched' ORDER BY 1"""
+                ),
+                {"d": sha256(body)},
+            ).all()
+            out["non_unmatched_features"] = [{"feature_key": r[0], "match_status": r[1], "entity": r[2]} for r in ours]
     return out
 
 
@@ -499,19 +683,32 @@ def crossref_details(run: dict[str, Any], db: LiveDB) -> dict[str, Any]:
     for url, body in run["_bodies"].items():
         t = next(x for x in run["requests"] if x["url"] == url)
         m = json.loads(body).get("message", {})
-        out.update({"url": url, "status": t.get("status"), "bytes": len(body), "sha256": sha256(body),
-                    "retrieved_at": t.get("retrieved_at"),
-                    "rate_limit_headers": {k: v for k, v in t["headers"].items() if k.startswith("x-")},
-                    "doi": m.get("DOI"), "title": (m.get("title") or [None])[0],
-                    "container_title": (m.get("container-title") or [None])[0],
-                    "published": (m.get("published") or {}).get("date-parts"),
-                    "updated_by": m.get("updated-by"), "update_to": m.get("update-to"),
-                    "relation_keys": sorted((m.get("relation") or {}).keys()),
-                    "indexed": (m.get("indexed") or {}).get("date-time"),
-                    "is_referenced_by_count": m.get("is-referenced-by-count")})
+        out.update(
+            {
+                "url": url,
+                "status": t.get("status"),
+                "bytes": len(body),
+                "sha256": sha256(body),
+                "retrieved_at": t.get("retrieved_at"),
+                "rate_limit_headers": {k: v for k, v in t["headers"].items() if k.startswith("x-")},
+                "doi": m.get("DOI"),
+                "title": (m.get("title") or [None])[0],
+                "container_title": (m.get("container-title") or [None])[0],
+                "published": (m.get("published") or {}).get("date-parts"),
+                "updated_by": m.get("updated-by"),
+                "update_to": m.get("update-to"),
+                "relation_keys": sorted((m.get("relation") or {}).keys()),
+                "indexed": (m.get("indexed") or {}).get("date-time"),
+                "is_referenced_by_count": m.get("is-referenced-by-count"),
+            }
+        )
     with db.owner.connect() as conn:
-        out["studies_in_db"] = [dict(r) for r in conn.execute(text(
-            "SELECT doi, source_artifact_sha256 FROM evidence.study ORDER BY doi")).mappings()]
+        out["studies_in_db"] = [
+            dict(r)
+            for r in conn.execute(
+                text("SELECT doi, source_artifact_sha256 FROM evidence.study ORDER BY doi")
+            ).mappings()
+        ]
     return out
 
 
@@ -542,8 +739,13 @@ def fixture_drift(bodies_by_connector: dict[str, dict[str, bytes]]) -> dict[str,
             out[name] = {"fixtures": False}
             continue
         entries = {e["url"]: e for e in json.loads(mpath.read_text())}
-        res: dict[str, Any] = {"compared": 0, "byte_identical": 0, "semantically_identical": 0,
-                               "changed": [], "not_in_fixtures": []}
+        res: dict[str, Any] = {
+            "compared": 0,
+            "byte_identical": 0,
+            "semantically_identical": 0,
+            "changed": [],
+            "not_in_fixtures": [],
+        }
         for url, body in bodies.items():
             e = entries.get(url)
             if e is None:
@@ -555,8 +757,14 @@ def fixture_drift(bodies_by_connector: dict[str, dict[str, bytes]]) -> dict[str,
             if _semantic(fbody) == _semantic(body):
                 res["semantically_identical"] += 1
             else:
-                res["changed"].append({"url": url, "fixture_sha256": e["sha256"], "live_sha256": sha256(body),
-                                       "fixture_retrieved_at": e.get("retrieved_at")})
+                res["changed"].append(
+                    {
+                        "url": url,
+                        "fixture_sha256": e["sha256"],
+                        "live_sha256": sha256(body),
+                        "fixture_retrieved_at": e.get("retrieved_at"),
+                    }
+                )
         out[name] = res
     return out
 
@@ -568,10 +776,13 @@ async def eurostat_check(settings: Any, work: Path) -> dict[str, Any]:
     from reva.adapters.http.safe_client import SafeHttpClient
 
     def client() -> Any:
-        return SafeHttpClient(allowed_hosts=("ec.europa.eu",), timeout_seconds=settings.reva_http_timeout_seconds,
-                              max_bytes=4_000_000, contact_email=settings.reva_http_contact_email,
-                              rate_limiter=RateLimiter({"ec.europa.eu": HostPolicy(min_interval_seconds=1.0,
-                                                                                    max_concurrency=1)}))
+        return SafeHttpClient(
+            allowed_hosts=("ec.europa.eu",),
+            timeout_seconds=settings.reva_http_timeout_seconds,
+            max_bytes=4_000_000,
+            contact_email=settings.reva_http_contact_email,
+            rate_limiter=RateLimiter({"ec.europa.eu": HostPolicy(min_interval_seconds=1.0, max_concurrency=1)}),
+        )
 
     try:
         from reva.adapters.connectors.eurostat_template import EurostatJsonStatConnector  # noqa: F401
@@ -581,8 +792,7 @@ async def eurostat_check(settings: Any, work: Path) -> dict[str, Any]:
     try:
         return await _eurostat_template(client(), work)
     except Exception as e:
-        res = await _eurostat_probe(client(), f"template path failed: {type(e).__name__}: "
-                                              f"{getattr(e, 'message', e)}")
+        res = await _eurostat_probe(client(), f"template path failed: {type(e).__name__}: {getattr(e, 'message', e)}")
         res["template_traceback"] = traceback.format_exc()[-1500:]
         return res
 
@@ -601,16 +811,22 @@ async def _eurostat_template(c: Any, work: Path) -> dict[str, Any]:
     http = TracingHttp(c, "eurostat")
     try:
         ctx = make_context(io_, "evidence", datetime.now(UTC), {"schema": "live-check"})
-        gap = KnowledgeGap(gap_id=uuid.uuid4(), requirement_id="R-POP-JAN-AGESEX",
-                           concept_version="demography.population.jan1_age_sex@1.0.0", geography=("FRA",),
-                           temporal_support={"years": [2023]}, reason="live check", priority=1.0,
-                           priority_method="live-check", context=ctx)
+        gap = KnowledgeGap(
+            gap_id=uuid.uuid4(),
+            requirement_id="R-POP-JAN-AGESEX",
+            concept_version="demography.population.jan1_age_sex@1.0.0",
+            geography=("FRA",),
+            temporal_support={"years": [2023]},
+            reason="live check",
+            priority=1.0,
+            priority_method="live-check",
+            context=ctx,
+        )
         disc = EurostatCatalogueDiscoverer(io_, http)
         cands = await disc.discover(gap, default_budget())
         search = disc.last_search or {}
         if not cands:
-            return {"mode": "template", "status": "no_candidate", "search": _small(search),
-                    "requests": http.trace}
+            return {"mode": "template", "status": "no_candidate", "search": _small(search), "requests": http.trace}
         mappings = RegistryOntologyMapper(io_).assess(cands[0], gap.context)
         cp = DeclarativeConnectorGenerator(io_).generate(cands[0], mappings[0], ("eurostat_jsonstat",))
         manifest = io_.get_json(cp.manifest)
@@ -621,8 +837,9 @@ async def _eurostat_template(c: Any, work: Path) -> dict[str, Any]:
         batch = next(iter(conn.parse(raw)))
         q = conn.validate(batch)
         md = batch.metadata
-        flags = Counter(o.source_flags.get("status") or o.source_flags.get("obs_status") or ""
-                        for o in batch.observations)
+        flags = Counter(
+            o.source_flags.get("status") or o.source_flags.get("obs_status") or "" for o in batch.observations
+        )
         total = next((o for o in batch.observations if o.logical_key.endswith(":T:TOTAL:2023")), None)
         return {
             "mode": "template",
@@ -630,22 +847,30 @@ async def _eurostat_template(c: Any, work: Path) -> dict[str, Any]:
             "published": False,
             "note": "validated through the approved template; not published (promotion requires the autonomy gate)",
             "template_digest": template_digest(),
-            "catalogue": {"url": EUROSTAT_TOC_URL,
-                          "datasets_in_catalogue": search.get("datasets_in_catalogue"),
-                          "ranked_top": [r.get("code") for r in (search.get("ranked") or [])][:5],
-                          "search": _small(search)},
+            "catalogue": {
+                "url": EUROSTAT_TOC_URL,
+                "datasets_in_catalogue": search.get("datasets_in_catalogue"),
+                "ranked_top": [r.get("code") for r in (search.get("ranked") or [])][:5],
+                "search": _small(search),
+            },
             "candidate": cands[0].dataset_id,
-            "mapping": [{"target": m.target_concept_version, "relation": m.relation,
-                         "review_required": m.review_required} for m in mappings],
+            "mapping": [
+                {"target": m.target_concept_version, "relation": m.relation, "review_required": m.review_required}
+                for m in mappings
+            ],
             "manifest_sha256": cp.manifest.sha256,
             "data_url": item.url,
             "matches_captured_sample_url": item.url == EUROSTAT_SAMPLE_URL,
             "dimension_order": md.get("dimension_order"),
             "pinned_dimension_order": md.get("pinned_dimension_order"),
-            "size": md.get("size"), "cube_positions": md.get("cube_positions"),
-            "value_count": md.get("value_count"), "status_count": md.get("status_count"),
-            "status_codes_seen": md.get("status_codes_seen"), "status_labels": md.get("status_labels"),
-            "dataset_updated": md.get("dataset_updated"), "annotations": md.get("annotations"),
+            "size": md.get("size"),
+            "cube_positions": md.get("cube_positions"),
+            "value_count": md.get("value_count"),
+            "status_count": md.get("status_count"),
+            "status_codes_seen": md.get("status_codes_seen"),
+            "status_labels": md.get("status_labels"),
+            "dataset_updated": md.get("dataset_updated"),
+            "annotations": md.get("annotations"),
             "observations": len(batch.observations),
             "missing_cells": sum(1 for o in batch.observations if o.value.get("kind") == "missing"),
             "per_cell_status_counts": dict(flags),
@@ -665,14 +890,26 @@ async def _eurostat_probe(c: Any, why: str) -> dict[str, Any]:
         r = await http.get(EUROSTAT_SAMPLE_URL)
         doc = json.loads(r.body)
         status = doc.get("status") or {}
-        return {"mode": "probe only", "why": why, "url": EUROSTAT_SAMPLE_URL, "dimension_order": doc.get("id"),
-                "size": doc.get("size"), "value_count": len(doc.get("value") or {}),
-                "status_codes_seen": sorted(set(status.values())) if isinstance(status, dict) else None,
-                "status_labels": ((doc.get("extension") or {}).get("status") or {}).get("label"),
-                "dataset_updated": doc.get("updated"), "requests": http.trace}
+        return {
+            "mode": "probe only",
+            "why": why,
+            "url": EUROSTAT_SAMPLE_URL,
+            "dimension_order": doc.get("id"),
+            "size": doc.get("size"),
+            "value_count": len(doc.get("value") or {}),
+            "status_codes_seen": sorted(set(status.values())) if isinstance(status, dict) else None,
+            "status_labels": ((doc.get("extension") or {}).get("status") or {}).get("label"),
+            "dataset_updated": doc.get("updated"),
+            "requests": http.trace,
+        }
     except Exception as e:
-        return {"mode": "probe only", "why": why, "status": "blocked",
-                "error": f"{type(e).__name__}: {getattr(e, 'message', e)}", "requests": http.trace}
+        return {
+            "mode": "probe only",
+            "why": why,
+            "status": "blocked",
+            "error": f"{type(e).__name__}: {getattr(e, 'message', e)}",
+            "requests": http.trace,
+        }
     finally:
         await http.aclose()
 
@@ -684,8 +921,12 @@ def _small(d: dict[str, Any]) -> dict[str, Any]:
 # --------------------------------------------------------------------------- orchestration
 def git_head() -> str | None:
     try:
-        return subprocess.run(["git", "-C", str(REPO), "rev-parse", "HEAD"], capture_output=True, text=True,  # noqa: S607
-                              check=True).stdout.strip()
+        return subprocess.run(
+            ["git", "-C", str(REPO), "rev-parse", "HEAD"],  # noqa: S607
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
     except Exception:
         return None
 
@@ -724,27 +965,38 @@ async def run_all(db: LiveDB, names: list[str] | None, eurostat: bool, work: Pat
         run.pop("_bodies", None)
         rep = run["report"]
         if "quality" in rep:  # keep findings, drop bulky repetition
-            rep["quality_findings"] = {k: [f for q in v for f in q.get("findings", [])]
-                                       for k, v in rep.pop("quality").items()}
+            rep["quality_findings"] = {
+                k: [f for q in v for f in q.get("findings", [])] for k, v in rep.pop("quality").items()
+            }
     result["connectors"] = runs
     with db.owner.connect() as conn:
         result["database"]["counts"] = {
-            "acquisitions_live": conn.execute(text(
-                "SELECT count(*) FROM evidence.acquisition WHERE origin='live'")).scalar_one(),
-            "acquisitions_non_live": conn.execute(text(
-                "SELECT count(*) FROM evidence.acquisition WHERE origin<>'live'")).scalar_one(),
+            "acquisitions_live": conn.execute(
+                text("SELECT count(*) FROM evidence.acquisition WHERE origin='live'")
+            ).scalar_one(),
+            "acquisitions_non_live": conn.execute(
+                text("SELECT count(*) FROM evidence.acquisition WHERE origin<>'live'")
+            ).scalar_one(),
             "observations": conn.execute(text("SELECT count(*) FROM evidence.observation")).scalar_one(),
             "relations": conn.execute(text("SELECT count(*) FROM world.relation")).scalar_one()
-            if conn.execute(text("SELECT to_regclass('world.relation')")).scalar_one() else None,
-            "connector_health": [dict(r) for r in conn.execute(text(
-                """SELECT cv.name, h.status, h.metrics->>'request_success_ratio' AS success_ratio
+            if conn.execute(text("SELECT to_regclass('world.relation')")).scalar_one()
+            else None,
+            "connector_health": [
+                dict(r)
+                for r in conn.execute(
+                    text(
+                        """SELECT cv.name, h.status, h.metrics->>'request_success_ratio' AS success_ratio
                    FROM ops.connector_health h JOIN evidence.connector_version cv ON cv.id = h.connector_version_id
-                   ORDER BY cv.name""")).mappings()],
+                   ORDER BY cv.name"""
+                    )
+                ).mappings()
+            ],
         }
     result["eurostat"] = await eurostat_check(db.settings, work) if eurostat else {"mode": "skipped"}
     if "_bodies" in result["eurostat"]:
         result["fixture_drift"]["eurostat.demo_pjan.fr"] = fixture_drift(
-            {"eurostat.demo_pjan.fr": result["eurostat"].pop("_bodies")})["eurostat.demo_pjan.fr"]
+            {"eurostat.demo_pjan.fr": result["eurostat"].pop("_bodies")}
+        )["eurostat.demo_pjan.fr"]
     result["finished_at"] = now()
     result["gates"] = gates(result)
     return result
@@ -766,9 +1018,13 @@ def gates(r: dict[str, Any]) -> dict[str, Any]:
     g["live_release_published"] = bool(r.get("release", {}).get("published"))
     g["no_fixture_origin_in_db"] = r["database"]["counts"]["acquisitions_non_live"] == 0
     eu = r.get("eurostat", {})
-    g["eurostat_demo_pjan"] = ("pass" if eu.get("mode") == "template" and eu.get("quality", {}).get("outcome") == "pass"
-                               else eu.get("mode", "unknown") if eu.get("mode") != "template"
-                               else f"template:{eu.get('quality', {}).get('outcome', eu.get('status'))}")
+    g["eurostat_demo_pjan"] = (
+        "pass"
+        if eu.get("mode") == "template" and eu.get("quality", {}).get("outcome") == "pass"
+        else eu.get("mode", "unknown")
+        if eu.get("mode") != "template"
+        else f"template:{eu.get('quality', {}).get('outcome', eu.get('status'))}"
+    )
     return g
 
 
@@ -781,8 +1037,10 @@ def render_markdown(r: dict[str, Any]) -> str:
     for k, v in r["gates"].items():
         L.append(f"- `{k}`: **{v}**")
     rel = r["release"]
-    L.append(f"\nRelease: `{rel.get('release_id')}` seq {rel.get('sequence')}, {rel.get('estimates')} estimates, "
-             f"manifest `{rel.get('manifest_sha256')}`, cutoff {rel.get('knowledge_cutoff')}.\n")
+    L.append(
+        f"\nRelease: `{rel.get('release_id')}` seq {rel.get('sequence')}, {rel.get('estimates')} estimates, "
+        f"manifest `{rel.get('manifest_sha256')}`, cutoff {rel.get('knowledge_cutoff')}.\n"
+    )
     L.append("## Coverage matrix\n")
     for req in r["coverage"]["requirements"]:
         years = list(range(req["period"][0], req["period"][1] + 1))
@@ -792,9 +1050,11 @@ def render_markdown(r: dict[str, Any]) -> str:
             for iso in req["geography"]:
                 cs = [c for c in req["cells"] if c["geo"] == iso]
                 vy = [c["year"] for c in cs if c["status"] == "value"]
-                L.append(f"| {iso} | {sum(c['status'] == 'value' for c in cs)} | "
-                         f"{sum(c['status'] == 'missing' for c in cs)} | {sum(c['status'] == 'absent' for c in cs)} | "
-                         f"{min(vy) if vy else '-'}/{max(vy) if vy else '-'} |")
+                L.append(
+                    f"| {iso} | {sum(c['status'] == 'value' for c in cs)} | "
+                    f"{sum(c['status'] == 'missing' for c in cs)} | {sum(c['status'] == 'absent' for c in cs)} | "
+                    f"{min(vy) if vy else '-'}/{max(vy) if vy else '-'} |"
+                )
         else:
             L.append("| geo | " + " | ".join(map(str, years)) + " |")
             L.append("|---" * (len(years) + 1) + "|")
@@ -814,29 +1074,39 @@ def render_markdown(r: dict[str, Any]) -> str:
     ct = r.get("source_details", {}).get("un.comtrade.public_exact", {})
     if ct.get("totals"):
         L.append("## Comtrade HS2709 world totals (partner 0)\n")
-        L.append("| reporter | flow | year | rows | primaryValue | cif | fob | netWgt | cls | isReported | isAggregate "
-                 "| legacyEst |\n|---|---|---|---|---|---|---|---|---|---|---|---|")
+        L.append(
+            "| reporter | flow | year | rows | primaryValue | cif | fob | netWgt | cls | isReported | isAggregate "
+            "| legacyEst |\n|---|---|---|---|---|---|---|---|---|---|---|---|"
+        )
         for iso, flows in ct["totals"].items():
             for flow, years in flows.items():
                 for y, v in years.items():
-                    L.append(f"| {iso} | {flow} | {y} | {v['rows']} | {v.get('primaryValue')} | {v.get('cifvalue')} | "
-                             f"{v.get('fobvalue')} | {v.get('netWgt')} | {v.get('classificationCode')} | "
-                             f"{v.get('isReported')} | {v.get('isAggregate')} | {v.get('legacyEstimationFlag')} |")
+                    L.append(
+                        f"| {iso} | {flow} | {y} | {v['rows']} | {v.get('primaryValue')} | {v.get('cifvalue')} | "
+                        f"{v.get('fobvalue')} | {v.get('netWgt')} | {v.get('classificationCode')} | "
+                        f"{v.get('isReported')} | {v.get('isAggregate')} | {v.get('legacyEstimationFlag')} |"
+                    )
         L.append("\n## Comtrade bilateral 2023 (partner rows excl. World)\n")
-        L.append("| reporter | flow:year | rows | partner rows | world row in response | null values | cls |\n"
-                 "|---|---|---|---|---|---|---|")
+        L.append(
+            "| reporter | flow:year | rows | partner rows | world row in response | null values | cls |\n"
+            "|---|---|---|---|---|---|---|"
+        )
         for iso, d in ct["bilateral"].items():
             for k, v in d.items():
-                L.append(f"| {iso} | {k} | {v['rows']} | {v['partner_rows_excluding_world']} | "
-                         f"{v['world_row_in_response']} | {v['null_primary_values']} | "
-                         f"{','.join(v['classification_codes'])} |")
+                L.append(
+                    f"| {iso} | {k} | {v['rows']} | {v['partner_rows_excluding_world']} | "
+                    f"{v['world_row_in_response']} | {v['null_primary_values']} | "
+                    f"{','.join(v['classification_codes'])} |"
+                )
         L.append("")
     if r.get("fixture_drift"):
         L.append("## Drift against captured CI fixtures\n")
         L.append("| connector | compared | byte identical | semantically identical | changed |\n|---|---|---|---|---|")
         for name, d in r["fixture_drift"].items():
-            L.append(f"| {name} | {d.get('compared')} | {d.get('byte_identical')} | "
-                     f"{d.get('semantically_identical')} | {len(d.get('changed') or [])} |")
+            L.append(
+                f"| {name} | {d.get('compared')} | {d.get('byte_identical')} | "
+                f"{d.get('semantically_identical')} | {len(d.get('changed') or [])} |"
+            )
         L.append("")
     L.append("## Requests\n")
     L.append("| connector | requests | bytes | outcomes |\n|---|---|---|---|")
@@ -874,8 +1144,9 @@ def main(argv: list[str] | None = None) -> int:
     args.out.write_text(json.dumps(result, indent=2, default=_default, sort_keys=False))
     (work / "live_checks.json").write_text(args.out.read_text())
     args.md.write_text(render_markdown(result))
-    print(json.dumps({"out": str(args.out), "gates": result["gates"], "coverage": result["coverage"]["totals"]},
-                     indent=2))
+    print(
+        json.dumps({"out": str(args.out), "gates": result["gates"], "coverage": result["coverage"]["totals"]}, indent=2)
+    )
     return 0
 
 

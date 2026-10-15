@@ -143,8 +143,12 @@ class ScalarInput:
         return MissingReason.unavailable.value if self.value is None else None
 
     def provenance(self) -> dict[str, Any]:
-        return {"estimate_id": self.estimate_id, "concept": self.requirement.concept,
-                "subject": self.requirement.subject, "year": self.year}
+        return {
+            "estimate_id": self.estimate_id,
+            "concept": self.requirement.concept,
+            "subject": self.requirement.subject,
+            "year": self.year,
+        }
 
 
 @dataclass(frozen=True)
@@ -183,8 +187,12 @@ class DatasetInput:
         return pl.from_arrow(self.table)  # type: ignore[return-value]
 
     def provenance(self) -> dict[str, Any]:
-        return {"dataset_id": self.dataset_id, "artifact_sha256": self.artifact_sha256,
-                "concept": self.requirement.concept, "subject": self.requirement.subject}
+        return {
+            "dataset_id": self.dataset_id,
+            "artifact_sha256": self.artifact_sha256,
+            "concept": self.requirement.concept,
+            "subject": self.requirement.subject,
+        }
 
 
 def _freeze(d: Mapping[Any, Any]) -> Mapping[Any, Any]:
@@ -249,23 +257,39 @@ class ResolvedInputs:
                 for y in req.years:
                     s = self.scalars.get((req.name, req.subject, y))
                     if s is None or s.is_missing:
-                        out.append({"code": "missing_input", "country": req.subject, "input": req.name,
-                                    "concept": req.concept, "reference_year": y,
-                                    "reason": s.missing_reason if s else MissingReason.unavailable.value})
+                        out.append(
+                            {
+                                "code": "missing_input",
+                                "country": req.subject,
+                                "input": req.name,
+                                "concept": req.concept,
+                                "reference_year": y,
+                                "reason": s.missing_reason if s else MissingReason.unavailable.value,
+                            }
+                        )
             else:
                 d = self.datasets.get((req.name, req.subject))
                 if d is None or d.is_missing:
-                    out.append({"code": "missing_input", "country": req.subject, "input": req.name,
-                                "concept": req.concept, "kind": "dataset", "years": list(req.years),
-                                "reason": d.missing_reason if d else MissingReason.unavailable.value})
+                    out.append(
+                        {
+                            "code": "missing_input",
+                            "country": req.subject,
+                            "input": req.name,
+                            "concept": req.concept,
+                            "kind": "dataset",
+                            "years": list(req.years),
+                            "reason": d.missing_reason if d else MissingReason.unavailable.value,
+                        }
+                    )
         return out
 
     def provenance(self) -> dict[str, Any]:
         """Provenance ids of every resolved input (for run manifests)."""
         return {
             "release_id": str(self.release.get("id")),
-            "scalars": [{"name": k[0], "subject": k[1], "year": k[2], **v.provenance()}
-                        for k, v in sorted(self.scalars.items())],
+            "scalars": [
+                {"name": k[0], "subject": k[1], "year": k[2], **v.provenance()} for k, v in sorted(self.scalars.items())
+            ],
             "datasets": [{"name": k[0], "subject": k[1], **v.provenance()} for k, v in sorted(self.datasets.items())],
         }
 
@@ -297,8 +321,10 @@ class ResolvedInputs:
         scalars = dict(scalars or {})
         datasets = dict(datasets or {})
         ids = dict(subject_ids or {})
-        subjects = {r.subject: SubjectRef(r.subject, ids.get(r.subject) or external_id("reva.entity", r.subject),
-                                          "fixture") for r in reqs}
+        subjects = {
+            r.subject: SubjectRef(r.subject, ids.get(r.subject) or external_id("reva.entity", r.subject), "fixture")
+            for r in reqs
+        }
         sc: dict[tuple[str, str, int], ScalarInput] = {}
         ds: dict[tuple[str, str], DatasetInput] = {}
         for r in reqs:
@@ -307,20 +333,29 @@ class ResolvedInputs:
                     vd = scalars.get((r.name, r.subject, y))
                     value = parse_value(dict(vd)) if vd is not None else None
                     sc[(r.name, r.subject, y)] = ScalarInput(
-                        r, y, subjects[r.subject].entity_id, value, vd, None,
+                        r,
+                        y,
+                        subjects[r.subject].entity_id,
+                        value,
+                        vd,
+                        None,
                         {"kind": "interval", "precision": "year", "start": f"{y}-01-01", "end": f"{y + 1}-01-01"},
-                        aggregation, {}, "selected_report")
+                        aggregation,
+                        {},
+                        "selected_report",
+                    )
             else:
                 got = datasets.get((r.name, r.subject))
                 if got is None:
-                    ds[(r.name, r.subject)] = DatasetInput(r, None, None, {}, None,
-                                                           Missing(reason=MissingReason.unavailable))
+                    ds[(r.name, r.subject)] = DatasetInput(
+                        r, None, None, {}, None, Missing(reason=MissingReason.unavailable)
+                    )
                 else:
                     table, manifest = got
-                    ds[(r.name, r.subject)] = DatasetInput(r, manifest.get("dataset_id"),
-                                                           manifest.get("artifact_sha256"), dict(manifest), table)
-        return cls(release=dict(release or {"id": None}), requirements=reqs, subjects=subjects, scalars=sc,
-                   datasets=ds)
+                    ds[(r.name, r.subject)] = DatasetInput(
+                        r, manifest.get("dataset_id"), manifest.get("artifact_sha256"), dict(manifest), table
+                    )
+        return cls(release=dict(release or {"id": None}), requirements=reqs, subjects=subjects, scalars=sc, datasets=ds)
 
 
 # --------------------------------------------------------------------------- results
@@ -345,8 +380,12 @@ class ResultRow:
                 raise ValidationProblem("result period must be a half-open (start, end) date pair with start < end")
 
     def digest_view(self) -> dict[str, Any]:
-        view: dict[str, Any] = {"output_key": self.output_key, "subject_id": str(self.subject_id),
-                                "variant": self.variant, "value": self.value}
+        view: dict[str, Any] = {
+            "output_key": self.output_key,
+            "subject_id": str(self.subject_id),
+            "variant": self.variant,
+            "value": self.value,
+        }
         if self.period is not None:  # single-period digests are unchanged from V1
             view["period"] = [self.period[0].isoformat(), self.period[1].isoformat()]
         return view
@@ -397,8 +436,16 @@ KNOWN_MODEL_MODULES: tuple[str, ...] = (
     "reva.models.social.retirement_age",
 )
 
-_REQUIRED_ATTRS = ("model_key", "model_version", "fidelities", "validate", "requirements", "compile", "compute",
-                   "manifest")
+_REQUIRED_ATTRS = (
+    "model_key",
+    "model_version",
+    "fidelities",
+    "validate",
+    "requirements",
+    "compile",
+    "compute",
+    "manifest",
+)
 
 
 def register(model: SimulationModel, *, replace: bool = False) -> SimulationModel:
@@ -444,8 +491,11 @@ def get(model_key: str) -> SimulationModel:
         load_all()
     model = REGISTRY.get(model_key)
     if model is None:
-        raise CapabilityGap(f"no simulation model is registered for model_key {model_key!r}",
-                            capability=f"model.{model_key}", available=sorted(REGISTRY))
+        raise CapabilityGap(
+            f"no simulation model is registered for model_key {model_key!r}",
+            capability=f"model.{model_key}",
+            available=sorted(REGISTRY),
+        )
     return model
 
 

@@ -50,8 +50,12 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp(f"objects_{label}")
     data = base.model_dump()
-    data.update(reva_migration_database_url=base.migration_url().set(database=name).render_as_string(
-        hide_password=False), reva_db_name=name, reva_env="test", reva_object_root=root)
+    data.update(
+        reva_migration_database_url=base.migration_url().set(database=name).render_as_string(hide_password=False),
+        reva_db_name=name,
+        reva_env="test",
+        reva_object_root=root,
+    )
     settings = Settings.model_validate(data)
     from reva.cli.bootstrap import bootstrap
     from reva.cli.seed import seed
@@ -66,8 +70,9 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
             time.sleep(1)
     store = FilesystemArtifactStore(root, settings.reva_s3_prefix)
     pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 0})
-    d = FreshDB(settings, make_engine("migration", settings), make_engine("worker", pooled),
-                make_engine("sim", settings), store)
+    d = FreshDB(
+        settings, make_engine("migration", settings), make_engine("worker", pooled), make_engine("sim", settings), store
+    )
     seed(d.worker, store)
     try:
         yield d
@@ -88,22 +93,35 @@ def idb(tmp_path_factory: pytest.TempPathFactory) -> Iterator[FreshDB]:
 def _deps(d: FreshDB, edges: list[tuple[str, str]], policy: dict | None = None) -> None:
     with d.owner.begin() as c:
         for up, down in edges:
-            c.execute(text("INSERT INTO ops.dependency(upstream_key, downstream_key, version, approximation_policy) "
-                           "VALUES (:u, :d, '1', CAST(:p AS jsonb))"),
-                      {"u": up, "d": down, "p": json.dumps(policy or {"kind": "exact"})})
+            c.execute(
+                text(
+                    "INSERT INTO ops.dependency(upstream_key, downstream_key, version, approximation_policy) "
+                    "VALUES (:u, :d, '1', CAST(:p AS jsonb))"
+                ),
+                {"u": up, "d": down, "p": json.dumps(policy or {"kind": "exact"})},
+            )
 
 
 def _event(d: FreshDB, payload: dict, created_at_sql: str = "clock_timestamp()") -> int:
     with d.worker.begin() as c:
-        return int(c.execute(text(f"INSERT INTO ops.outbox(event_type, payload, created_at) VALUES "
-                                  f"('evidence.observations_changed', CAST(:p AS jsonb), {created_at_sql}) "
-                                  "RETURNING id"), {"p": json.dumps(payload)}).scalar_one())
+        return int(
+            c.execute(
+                text(
+                    f"INSERT INTO ops.outbox(event_type, payload, created_at) VALUES "
+                    f"('evidence.observations_changed', CAST(:p AS jsonb), {created_at_sql}) "
+                    "RETURNING id"
+                ),
+                {"p": json.dumps(payload)},
+            ).scalar_one()
+        )
 
 
 def _dirty(d: FreshDB) -> dict[str, tuple[str, dict]]:
     with d.owner.connect() as c:
-        return {r.node_key: (r.reason, r.accumulated_error_bound)
-                for r in c.execute(text("SELECT node_key, reason, accumulated_error_bound FROM ops.dirty_node"))}
+        return {
+            r.node_key: (r.reason, r.accumulated_error_bound)
+            for r in c.execute(text("SELECT node_key, reason, accumulated_error_bound FROM ops.dirty_node"))
+        }
 
 
 def _reset(d: FreshDB) -> None:
@@ -120,13 +138,27 @@ def test_tarjan_components() -> None:
 
 def test_dag_descendants_only(idb: FreshDB) -> None:
     _reset(idb)
-    _deps(idb, [("belief:t.dag.x", "model:dag.a"), ("model:dag.a", "scenario:dag.s1"), ("model:dag.a", "card:dag.c"),
-                ("belief:t.dag.y", "model:dag.b"), ("observation:t.dag.x:FRA", "model:dag.f")])
+    _deps(
+        idb,
+        [
+            ("belief:t.dag.x", "model:dag.a"),
+            ("model:dag.a", "scenario:dag.s1"),
+            ("model:dag.a", "card:dag.c"),
+            ("belief:t.dag.y", "model:dag.b"),
+            ("observation:t.dag.x:FRA", "model:dag.f"),
+        ],
+    )
     eid = _event(idb, {"keys": [["t.dag.x", "FRA"]]})
     rep = invalidation.process_outbox(idb.worker)
     dirty = _dirty(idb)
-    assert {"belief:t.dag.x", "observation:t.dag.x:FRA", "model:dag.a", "scenario:dag.s1", "card:dag.c",
-            "model:dag.f"} <= set(dirty)
+    assert {
+        "belief:t.dag.x",
+        "observation:t.dag.x:FRA",
+        "model:dag.a",
+        "scenario:dag.s1",
+        "card:dag.c",
+        "model:dag.f",
+    } <= set(dirty)
     assert "model:dag.b" not in dirty and "belief:t.dag.y" not in dirty
     assert rep.events >= 1 and rep.publish_jobs == []  # no acquisition origin -> nothing to publish
     with idb.owner.connect() as c:
@@ -138,8 +170,17 @@ def test_dag_descendants_only(idb: FreshDB) -> None:
 
 def test_cycle_invalidates_coupled_component_as_a_whole(idb: FreshDB) -> None:
     _reset(idb)
-    _deps(idb, [("belief:t.cyc", "model:cyc.p"), ("model:cyc.p", "model:cyc.q"), ("model:cyc.q", "model:cyc.u"),
-                ("model:cyc.u", "model:cyc.p"), ("model:cyc.q", "model:cyc.r"), ("model:cyc.s", "model:cyc.p")])
+    _deps(
+        idb,
+        [
+            ("belief:t.cyc", "model:cyc.p"),
+            ("model:cyc.p", "model:cyc.q"),
+            ("model:cyc.q", "model:cyc.u"),
+            ("model:cyc.u", "model:cyc.p"),
+            ("model:cyc.q", "model:cyc.r"),
+            ("model:cyc.s", "model:cyc.p"),
+        ],
+    )
     _event(idb, {"keys": [["t.cyc", "CHN"]]})
     rep = invalidation.process_outbox(idb.worker)
     dirty = _dirty(idb)
@@ -151,8 +192,11 @@ def test_cycle_invalidates_coupled_component_as_a_whole(idb: FreshDB) -> None:
 
 def test_materiality_skips_accumulate_error_budget_then_force_refresh(idb: FreshDB) -> None:
     _reset(idb)
-    _deps(idb, [("belief:t.mat", "model:mat.m")],
-          {"kind": "materiality", "threshold": "0.01", "error_budget": "0.025", "metric": "abs_relative_change"})
+    _deps(
+        idb,
+        [("belief:t.mat", "model:mat.m")],
+        {"kind": "materiality", "threshold": "0.01", "error_budget": "0.025", "metric": "abs_relative_change"},
+    )
     reasons = []
     for _ in range(3):
         _event(idb, {"keys": [["t.mat", "USA"]], "change_bounds": {"belief:t.mat": "0.01"}})
@@ -181,17 +225,31 @@ def test_ingest_events_enqueue_one_publication_and_releases_are_not_redirtied(id
 
     _reset(idb)
     with idb.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
-                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                "WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
     conn_ = builtin_connectors()["worldbank.wdi.indicators"]
-    rep = asyncio.run(run_connector(conn_, FixtureHttp(conn_.describe().name), idb.store, idb.worker,
-                                    persist_cursor=False))
+    rep = asyncio.run(
+        run_connector(conn_, FixtureHttp(conn_.describe().name), idb.store, idb.worker, persist_cursor=False)
+    )
     assert rep.inserted > 0
     r1 = invalidation.process_outbox(idb.worker, environment="test")
     assert len(r1.publish_jobs) == 1 and any(k.startswith("belief:") for k in r1.dirty)
     assert invalidation.process_outbox(idb.worker).publish_jobs == []  # nothing new, no duplicate job
-    w = Worker(idb.settings, idb.worker, idb.store, idb.sim, scheduler=False, invalidation=False,
-               lease_seconds=30, heartbeat_seconds=5, job_types=["publish_beliefs"])
+    w = Worker(
+        idb.settings,
+        idb.worker,
+        idb.store,
+        idb.sim,
+        scheduler=False,
+        invalidation=False,
+        lease_seconds=30,
+        heartbeat_seconds=5,
+        job_types=["publish_beliefs"],
+    )
     job = w.claim_one()
     assert job is not None and str(job.id) == r1.publish_jobs[0]
     assert w.execute(job).status == "succeeded"
@@ -199,8 +257,9 @@ def test_ingest_events_enqueue_one_publication_and_releases_are_not_redirtied(id
         acq = c.execute(text("SELECT id FROM evidence.acquisition LIMIT 1")).scalar()
         assert c.execute(text("SELECT count(*) FROM belief.release")).scalar() == 1
     # A late-processed event that the release already covers does not re-dirty beliefs.
-    _event(idb, {"acquisition_id": str(acq), "keys": [["wdi.population", "FRA"]]},
-           "clock_timestamp() - interval '1 hour'")
+    _event(
+        idb, {"acquisition_id": str(acq), "keys": [["wdi.population", "FRA"]]}, "clock_timestamp() - interval '1 hour'"
+    )
     r2 = invalidation.process_outbox(idb.worker, environment="test")
     assert not any(k.startswith("belief:") for k in _dirty(idb)) and r2.publish_jobs == []
     # In production, fixture-origin events never enqueue a publication.
@@ -225,10 +284,22 @@ def test_failing_event_is_isolated_retried_with_backoff_and_surfaced(idb: FreshD
     rep = invalidation.process_outbox(idb.worker)
     assert rep.failed_events == [bad] and "belief:concept.good" in rep.dirty
     with idb.owner.connect() as c:
-        processed = dict(c.execute(text("SELECT id, processed_at IS NOT NULL FROM ops.outbox WHERE id = ANY(:i)"),
-                                   {"i": [bad, good]}).all())
-        audit = c.execute(text("SELECT details FROM ops.audit WHERE action = 'outbox.event_failed' "
-                               "AND (target->>'outbox_id')::bigint = :i"), {"i": bad}).scalars().all()
+        processed = dict(
+            c.execute(
+                text("SELECT id, processed_at IS NOT NULL FROM ops.outbox WHERE id = ANY(:i)"), {"i": [bad, good]}
+            ).all()
+        )
+        audit = (
+            c.execute(
+                text(
+                    "SELECT details FROM ops.audit WHERE action = 'outbox.event_failed' "
+                    "AND (target->>'outbox_id')::bigint = :i"
+                ),
+                {"i": bad},
+            )
+            .scalars()
+            .all()
+        )
     assert processed == {bad: False, good: True}
     assert len(audit) == 1 and audit[0]["failures"] == 1 and audit[0]["exception"] == "DataError"
     assert "belief:concept.bad" not in _dirty(idb)
@@ -255,8 +326,12 @@ def test_publish_enqueue_failure_never_aborts_the_batch(idb: FreshDB, monkeypatc
     _reset(idb)
     with idb.owner.begin() as c:
         acq = c.execute(text("SELECT id FROM evidence.acquisition WHERE origin = 'test_fixture' LIMIT 1")).scalar()
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
-                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                "WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
     if acq is None:
         pytest.skip("needs the fixture acquisition created by the ingest test above")
     ev = _event(idb, {"acquisition_id": str(acq), "keys": [["concept.pubfail", "FRA"]]})
@@ -272,15 +347,32 @@ def test_publish_enqueue_failure_never_aborts_the_batch(idb: FreshDB, monkeypatc
     assert "belief:concept.pubfail" in _dirty(idb)
     with idb.owner.connect() as c:
         assert c.execute(text("SELECT processed_at IS NOT NULL FROM ops.outbox WHERE id = :i"), {"i": ev}).scalar()
-        req = c.execute(text("SELECT payload FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
-                             "AND processed_at IS NULL")).scalars().all()
+        req = (
+            c.execute(
+                text(
+                    "SELECT payload FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
+                    "AND processed_at IS NULL"
+                )
+            )
+            .scalars()
+            .all()
+        )
     assert len(req) == 1 and req[0]["origin"] == "test_fixture"
     # The deferred request goes through the normal per-event retry path once enqueue works again.
     monkeypatch.setattr(jobs_mod, "enqueue_publish_beliefs", real)
     rep = invalidation.process_outbox(idb.worker, environment="test")
     assert len(rep.publish_jobs) == 1
     with idb.owner.connect() as c:
-        assert c.execute(text("SELECT job_type FROM ops.job WHERE id = :j"),
-                         {"j": rep.publish_jobs[0]}).scalar() == "publish_beliefs"
-        assert c.execute(text("SELECT count(*) FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
-                              "AND processed_at IS NULL")).scalar() == 0
+        assert (
+            c.execute(text("SELECT job_type FROM ops.job WHERE id = :j"), {"j": rep.publish_jobs[0]}).scalar()
+            == "publish_beliefs"
+        )
+        assert (
+            c.execute(
+                text(
+                    "SELECT count(*) FROM ops.outbox WHERE event_type = 'beliefs.publish_requested' "
+                    "AND processed_at IS NULL"
+                )
+            ).scalar()
+            == 0
+        )

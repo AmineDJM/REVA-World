@@ -39,8 +39,9 @@ def test_eurostat_jan1_total_vs_wdi_midyear_is_incompatible() -> None:
     with pytest.raises(IncompatibleSemantics, match="only exact"):
         m.require_identity(subject="FRA", year=2023)
     # The registry declaration agrees with an independent semantic assessment.
-    assessed = assess_identity(REG.concept("demography.population.jan1_age_sex"),
-                               REG.concept("demography.population.wdi_midyear_total"))
+    assessed = assess_identity(
+        REG.concept("demography.population.jan1_age_sex"), REG.concept("demography.population.wdi_midyear_total")
+    )
     assert assessed.relation is RelationType.incompatible
     assert {"temporal_point_mismatch", "population_universe_mismatch"} <= assessed.report.codes
 
@@ -60,10 +61,14 @@ def test_exact_mapping_is_identity_only_within_applicability() -> None:
 
 
 def test_non_exact_relations_are_never_identity() -> None:
-    raw = {"mapping_key": "test.overlap", "version": "1.0.0", "source_ref": {"provider": "x"},
-           "target": {"concept_id": "demography.population.wdi_midyear_total", "version": "1.0.0"},
-           "mapping_kind": "overlap",
-           "approval": {"status": "approved", "basis": "test-review"}}
+    raw = {
+        "mapping_key": "test.overlap",
+        "version": "1.0.0",
+        "source_ref": {"provider": "x"},
+        "target": {"concept_id": "demography.population.wdi_midyear_total", "version": "1.0.0"},
+        "mapping_kind": "overlap",
+        "approval": {"status": "approved", "basis": "test-review"},
+    }
     m = mapping_from_registry(raw)
     assert not m.usable_as_identity
     with pytest.raises(IncompatibleSemantics):
@@ -75,12 +80,23 @@ def test_mapping_coherence_rules() -> None:
     with pytest.raises(ValidationError, match="identity"):
         ConceptMapping.model_validate({**base, "relation": "approximate_transform"})
     with pytest.raises(ValidationError, match="uncertainty"):
-        ConceptMapping.model_validate({**base, "relation": "approximate_transform",
-                                       "transform": {"kind": "linear", "params": {"factor": "1"}},
-                                       "uncertainty": {"kind": "not_applicable"}})
+        ConceptMapping.model_validate(
+            {
+                **base,
+                "relation": "approximate_transform",
+                "transform": {"kind": "linear", "params": {"factor": "1"}},
+                "uncertainty": {"kind": "not_applicable"},
+            }
+        )
     with pytest.raises(ValidationError, match="crosswalk"):
-        ConceptMapping.model_validate({**base, "relation": "weighted_crosswalk", "transform": {"kind": "none"},
-                                       "uncertainty": {"kind": "unquantified"}})
+        ConceptMapping.model_validate(
+            {
+                **base,
+                "relation": "weighted_crosswalk",
+                "transform": {"kind": "none"},
+                "uncertainty": {"kind": "unquantified"},
+            }
+        )
 
 
 def test_declared_exact_mapping_cannot_contradict_concepts() -> None:
@@ -95,13 +111,17 @@ def test_declared_exact_mapping_cannot_contradict_concepts() -> None:
 
 
 def _crosswalk(links: list[dict], approval: str = "approved") -> WeightedCrosswalk:
-    return WeightedCrosswalk.model_validate({
-        "crosswalk_key": "test.hs_to_sitc", "version": "1.0.0",
-        "source_classification": "HS:H5", "target_classification": "SITC:4",
-        "links": links,
-        "evidence": [{"kind": "methodology_document", "ref": "test-fixture: synthetic crosswalk"}],
-        "approval": {"status": approval, "basis": "test-review"},
-    })
+    return WeightedCrosswalk.model_validate(
+        {
+            "crosswalk_key": "test.hs_to_sitc",
+            "version": "1.0.0",
+            "source_classification": "HS:H5",
+            "target_classification": "SITC:4",
+            "links": links,
+            "evidence": [{"kind": "methodology_document", "ref": "test-fixture: synthetic crosswalk"}],
+            "approval": {"status": approval, "basis": "test-review"},
+        }
+    )
 
 
 LINKS = [
@@ -131,8 +151,7 @@ def test_crosswalk_is_time_dependent() -> None:
 
 
 def test_crosswalk_missing_inputs_flag_targets_incomplete() -> None:
-    r = _crosswalk(LINKS).apply({"A": Missing(reason=MissingReason.suppressed), "B": "5"}, 2023,
-                                unit_ref="unit.usd")
+    r = _crosswalk(LINKS).apply({"A": Missing(reason=MissingReason.suppressed), "B": "5"}, 2023, unit_ref="unit.usd")
     assert r.missing_source_codes == ("A",)
     assert r.incomplete_target_codes == ("X", "Y")
     assert r.targets == {"Z": "5"}  # never a zero-filled X
@@ -140,20 +159,35 @@ def test_crosswalk_missing_inputs_flag_targets_incomplete() -> None:
 
 def test_crosswalk_weights_cannot_create_mass() -> None:
     with pytest.raises(ValidationError, match="> 1"):
-        _crosswalk([{"source_code": "A", "target_code": "X", "weight": "0.7"},
-                    {"source_code": "A", "target_code": "Y", "weight": "0.4", "valid_from_year": 2020}])
+        _crosswalk(
+            [
+                {"source_code": "A", "target_code": "X", "weight": "0.7"},
+                {"source_code": "A", "target_code": "Y", "weight": "0.4", "valid_from_year": 2020},
+            ]
+        )
     # non-overlapping periods may each sum to 1
-    _crosswalk([{"source_code": "A", "target_code": "X", "weight": "0.7", "valid_to_year": 2019},
-                {"source_code": "A", "target_code": "Y", "weight": "0.4", "valid_from_year": 2020}])
+    _crosswalk(
+        [
+            {"source_code": "A", "target_code": "X", "weight": "0.7", "valid_to_year": 2019},
+            {"source_code": "A", "target_code": "Y", "weight": "0.4", "valid_from_year": 2020},
+        ]
+    )
     with pytest.raises(ValidationError):
         _crosswalk([{"source_code": "A", "target_code": "X", "weight": "0"}])
 
 
 def test_crosswalk_requires_classification_revision_and_approval() -> None:
     with pytest.raises(ValidationError):
-        WeightedCrosswalk.model_validate({
-            "crosswalk_key": "k", "version": "1", "source_classification": "HS",
-            "target_classification": "SITC:4", "links": LINKS,
-            "evidence": [{"kind": "review_note", "ref": "r"}], "approval": {"status": "approved", "basis": "b"}})
+        WeightedCrosswalk.model_validate(
+            {
+                "crosswalk_key": "k",
+                "version": "1",
+                "source_classification": "HS",
+                "target_classification": "SITC:4",
+                "links": LINKS,
+                "evidence": [{"kind": "review_note", "ref": "r"}],
+                "approval": {"status": "approved", "basis": "b"},
+            }
+        )
     with pytest.raises(IncompatibleSemantics, match="candidate"):
         _crosswalk(LINKS, approval="candidate").apply({"A": "1"}, 2023, unit_ref="unit.usd")

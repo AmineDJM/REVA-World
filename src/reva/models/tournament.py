@@ -317,8 +317,7 @@ def resolve_policy(policy: Mapping[str, Any]) -> dict[str, Any]:
         raise ValueError("bootstrap block_length and replicates must be >= 1")
     if out["paired_test"]["method"] != TEST_METHOD:
         raise ValueError(f"unsupported paired_test method {out['paired_test']['method']!r}")
-    for blk, key in (("paired_test", "alpha"), ("subgroup_test", "alpha"),
-                     ("holdout_non_inferiority", "alpha")):
+    for blk, key in (("paired_test", "alpha"), ("subgroup_test", "alpha"), ("holdout_non_inferiority", "alpha")):
         a = float(out[blk][key])
         if not (0.0 < a < 0.5):
             raise ValueError(f"{blk}.{key} must be in (0, 0.5)")
@@ -359,11 +358,7 @@ def _metrics(model: str, recs: Sequence[PredictionRecord], baseline: str) -> Mod
     with_int = [r for r in recs if r.interval is not None]
     levels = sorted({r.level for r in with_int if r.level is not None})
     nominal = levels[0] if len(levels) == 1 else None
-    coverage = (
-        aggregate_coverage([(r.interval_kind or "", bool(r.covered)) for r in with_int])
-        if with_int
-        else None
-    )
+    coverage = aggregate_coverage([(r.interval_kind or "", bool(r.covered)) for r in with_int]) if with_int else None
     msis = [r.interval_score_scaled for r in with_int if r.interval_score_scaled is not None]
     crps = [r.crps_log for r in recs if r.crps_log is not None]
     has_predictive = any(r.crps_log is not None for r in recs)
@@ -467,8 +462,14 @@ def dm_hln_test(x: Sequence[float], horizon: int) -> DMTest:
         return DMTest(T, mean, None, df, lag, kernel, p_less, p_greater)
     stat = math.sqrt(factor_sq) * mean / math.sqrt(lrv / T)
     return DMTest(
-        T, mean, stat, df, lag, kernel,
-        float(stdtr(df, stat)), float(stdtr(df, -stat)),
+        T,
+        mean,
+        stat,
+        df,
+        lag,
+        kernel,
+        float(stdtr(df, stat)),
+        float(stdtr(df, -stat)),
     )
 
 
@@ -550,9 +551,15 @@ def _decide(
     alpha = float(pt["alpha"])
     if n == 0:
         return PromotionDecision(
-            challenger, incumbent, "keep_incumbent",
+            challenger,
+            incumbent,
+            "keep_incumbent",
             (f"insufficient_evaluation: n_pairs=0 < {min_pairs}",),
-            0, None, None, {}, alpha=alpha,
+            0,
+            None,
+            None,
+            {},
+            alpha=alpha,
         )
     diffs = [c - i for *_, c, i in paired]
     mean_diff = math.fsum(diffs) / n
@@ -606,8 +613,13 @@ def _decide(
     rejected = holm_rejections(pvals, alpha)
     horizon_tests = {
         h: HorizonTest(
-            horizon=h, n_pairs=r[0], n_origins=r[1], mean_loss_difference=r[2],
-            tested=r[3] is not None, test=r[3], holm_threshold=rejected.get(h),
+            horizon=h,
+            n_pairs=r[0],
+            n_origins=r[1],
+            mean_loss_difference=r[2],
+            tested=r[3] is not None,
+            test=r[3],
+            holm_threshold=rejected.get(h),
             rejected=h in rejected,
             significantly_worse=r[3] is not None and r[3].p_greater <= alpha,
         )
@@ -615,10 +627,18 @@ def _decide(
     }
 
     common = dict(
-        n_pairs=n, mean_loss_difference=mean_diff, bootstrap_interval=ci,
-        subgroup_degradation=degradation, test_method=TEST_METHOD, alpha=alpha,
-        horizon_tests=horizon_tests, subgroup_tests=subgroup_tests, n_origins=len(origins),
-        n_series=n_series, n_subgroups_tested=len(subgroup_tests), paired_mase=paired_mase,
+        n_pairs=n,
+        mean_loss_difference=mean_diff,
+        bootstrap_interval=ci,
+        subgroup_degradation=degradation,
+        test_method=TEST_METHOD,
+        alpha=alpha,
+        horizon_tests=horizon_tests,
+        subgroup_tests=subgroup_tests,
+        n_origins=len(origins),
+        n_series=n_series,
+        n_subgroups_tested=len(subgroup_tests),
+        paired_mase=paired_mase,
         bootstrap_block_length=block,
     )
 
@@ -629,9 +649,7 @@ def _decide(
     if n < min_pairs:
         keep.append(f"insufficient_evaluation: n_pairs={n} < {min_pairs}")
     elif not pvals:
-        keep.append(
-            f"insufficient_evaluation: no horizon has >= {min_o} origin years for the paired test"
-        )
+        keep.append(f"insufficient_evaluation: no horizon has >= {min_o} origin years for the paired test")
     elif not rejected:
         detail = ", ".join(f"h={h}: p={p:.3g}" for h, p in sorted(pvals.items()))
         keep.append(
@@ -676,10 +694,7 @@ def _decide(
         f"n_pairs={n} >= {min_pairs} over {len(origins)} origin years and {n_series} series",
         f"DM-HLN paired test with Holm across {len(pvals)} horizons at alpha={alpha:g}: {sig}",
     ]
-    subgroup_note = (
-        f"{len(subgroup_tests)} prespecified subgroups checked for credible degradation "
-        f"> {delta:.0%}"
-    )
+    subgroup_note = f"{len(subgroup_tests)} prespecified subgroups checked for credible degradation > {delta:.0%}"
     if review:
         return out("needs_review", [*evidence, *review, *notes, subgroup_note])
     return out(
@@ -716,13 +731,21 @@ def holdout_non_inferiority(
     if m < 0 or not math.isfinite(m):
         raise ValueError("margin must be finite and >= 0")
     a = float(alpha)
-    rule: Literal["point_estimate", "one_sided_test"] = (
-        "one_sided_test" if require_statistical else "point_estimate"
-    )
+    rule: Literal["point_estimate", "one_sided_test"] = "one_sided_test" if require_statistical else "point_estimate"
     used = [(str(s), float(c), float(i)) for s, c, i in pairs if c is not None and i is not None]
     if not used:
         return NonInferiorityCheck(
-            False, rule, m, a, 0, 0, None, None, None, None, False,
+            False,
+            rule,
+            m,
+            a,
+            0,
+            0,
+            None,
+            None,
+            None,
+            None,
+            False,
             ("locked_holdout_undefined: no paired holdout cells with a defined scaled error",),
         )
     mc = math.fsum(c for _, c, _ in used) / len(used)
@@ -765,9 +788,7 @@ def holdout_non_inferiority(
             f"{mi:.4g} on {len(used)} paired cells; {stat_txt}"
             + ("" if require_statistical else " (non-inferiority screen; holdout sample is small)")
         )
-    return NonInferiorityCheck(
-        passed, rule, m, a, len(used), k, mc, mi, rel, p, established, tuple(reasons)
-    )
+    return NonInferiorityCheck(passed, rule, m, a, len(used), k, mc, mi, rel, p, established, tuple(reasons))
 
 
 # --------------------------------------------------------------------------- tournament
@@ -842,9 +863,7 @@ def run_tournament(
                             abs_error=ae,
                             mase_scaled_error=None if scale.value is None else ae / scale.value,
                             scale_flag=scale.flag,
-                            covered=None
-                            if fc.interval is None
-                            else interval_covers(fc.interval, y),
+                            covered=None if fc.interval is None else interval_covers(fc.interval, y),
                             interval_score_scaled=msis,
                             crps_log=_crps_log(fc.predictive, y),
                             scale_reason=scale.reason,
@@ -852,17 +871,14 @@ def run_tournament(
                     )
 
     by_model: dict[str, list[PredictionRecord]] = defaultdict(list)
-    by_group: dict[tuple[str, str], dict[str, list[PredictionRecord]]] = defaultdict(
-        lambda: defaultdict(list)
-    )
+    by_group: dict[tuple[str, str], dict[str, list[PredictionRecord]]] = defaultdict(lambda: defaultdict(list))
     for r in records:
         by_model[r.model].append(r)
         by_group[("series_id", r.series_id)][r.model].append(r)
         by_group[("horizon", str(r.horizon))][r.model].append(r)
     metrics = {k: _metrics(k, by_model.get(k, []), NAIVE_KEY) for k in model_keys}
     subgroup_metrics = {
-        g: {k: _metrics(k, recs, NAIVE_KEY) for k, recs in sorted(per.items())}
-        for g, per in sorted(by_group.items())
+        g: {k: _metrics(k, recs, NAIVE_KEY) for k, recs in sorted(per.items())} for g, per in sorted(by_group.items())
     }
 
     # Common-case (paired) metrics over the models that produced any scored case.
@@ -884,11 +900,7 @@ def run_tournament(
     }
 
     by_key = {(r.series_id, r.origin, r.horizon, r.model): r for r in records}
-    decisions = {
-        k: _decide(k, incumbent_key, by_key, cases, pol, seed)
-        for k in model_keys
-        if k != incumbent_key
-    }
+    decisions = {k: _decide(k, incumbent_key, by_key, cases, pol, seed) for k in model_keys if k != incumbent_key}
     return TournamentResult(
         replay_mode=replay_mode,
         seed=seed,

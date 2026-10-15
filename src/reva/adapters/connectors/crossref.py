@@ -68,10 +68,15 @@ class CrossrefConnector:
         known = dict((cursor.state if cursor else {}).get("validators") or {})
         self._validators = {d: dict(v) for d, v in known.items() if d in self.dois and isinstance(v, dict)}
         items = tuple(
-            FetchItem(key=f"doi:{d}", url=f"https://api.crossref.org/works/{quote(d, safe='/.')}{suffix}",
-                      max_bytes=2_000_000,
-                      params={"doi": d, **{k: str(v) for k, v in known.get(d, {}).items()
-                                           if k in ("etag", "last_modified") and v}})
+            FetchItem(
+                key=f"doi:{d}",
+                url=f"https://api.crossref.org/works/{quote(d, safe='/.')}{suffix}",
+                max_bytes=2_000_000,
+                params={
+                    "doi": d,
+                    **{k: str(v) for k, v in known.get(d, {}).items() if k in ("etag", "last_modified") and v},
+                },
+            )
             for d in self.dois
         )
         return FetchPlan(connector="crossref.works.doi", items=items[: budget.max_requests], pagination="none")
@@ -96,8 +101,13 @@ class CrossrefConnector:
 
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
         if raw.response_metadata.get("status") == 304:
-            yield ObservationBatch(connector="crossref.works.doi", connector_version=CONNECTOR_VERSION,
-                                   item_key=raw.item.key, observations=(), metadata={"not_modified": True})
+            yield ObservationBatch(
+                connector="crossref.works.doi",
+                connector_version=CONNECTOR_VERSION,
+                item_key=raw.item.key,
+                observations=(),
+                metadata={"not_modified": True},
+            )
             return
         require_json_like(raw)
         payload = json_decimal(raw.body)
@@ -127,10 +137,14 @@ class CrossrefConnector:
             "crossref_indexed": plain((m.get("indexed") or {}).get("date-time")),
             "note": "Citation counts are ranking signals only, never effect validity.",
         }
-        yield ObservationBatch(connector="crossref.works.doi", connector_version=CONNECTOR_VERSION,
-                               item_key=raw.item.key,
-                               observations=(), metadata={"study": study},
-                               schema_fingerprint=schema_fingerprint({k: m.get(k) for k in sorted(m)[:40]}))
+        yield ObservationBatch(
+            connector="crossref.works.doi",
+            connector_version=CONNECTOR_VERSION,
+            item_key=raw.item.key,
+            observations=(),
+            metadata={"study": study},
+            schema_fingerprint=schema_fingerprint({k: m.get(k) for k in sorted(m)[:40]}),
+        )
 
     def validate(self, batch: ObservationBatch) -> QualityReport:
         if batch.metadata.get("not_modified"):
@@ -142,11 +156,21 @@ class CrossrefConnector:
         if not study.get("title"):
             findings.append(Finding(code="missing_title", severity="blocker", message="no title"))
         if study.get("updated_by"):
-            findings.append(Finding(code="update_signal", severity="warning",
-                                    message="Crossref reports an update/correction/retraction relation"))
-        return QualityReport(outcome="blocked" if any(f.severity == "blocker" for f in findings) else "pass",
-                             findings=tuple(findings))
+            findings.append(
+                Finding(
+                    code="update_signal",
+                    severity="warning",
+                    message="Crossref reports an update/correction/retraction relation",
+                )
+            )
+        return QualityReport(
+            outcome="blocked" if any(f.severity == "blocker" for f in findings) else "pass", findings=tuple(findings)
+        )
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
-        return Cursor(state={"complete": all(o.status in ("published", "unchanged") for o in outcomes),
-                             "validators": self._validators})
+        return Cursor(
+            state={
+                "complete": all(o.status in ("published", "unchanged") for o in outcomes),
+                "validators": self._validators,
+            }
+        )

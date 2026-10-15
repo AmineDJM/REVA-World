@@ -46,8 +46,9 @@ def compare_profiles(source: dict[str, Any], target: dict[str, Any]) -> tuple[st
 
 
 class RegistryOntologyMapper:
-    def __init__(self, io_: ArtifactIO, *, registry: Registry | None = None,
-                 policy: PinnedPolicy | None = None) -> None:
+    def __init__(
+        self, io_: ArtifactIO, *, registry: Registry | None = None, policy: PinnedPolicy | None = None
+    ) -> None:
         self.io = io_
         self.registry = registry or load_registry()
         self.policy = policy or promotion_policy()
@@ -57,8 +58,9 @@ class RegistryOntologyMapper:
         return dict(self.io.get_json(candidate.metadata))
 
     def _gap_concept(self, meta: dict[str, Any]) -> Any:
-        req = next((r for r in self.registry.requirements["requirements"] if r["id"] == meta.get("requirement_id")),
-                   None)
+        req = next(
+            (r for r in self.registry.requirements["requirements"] if r["id"] == meta.get("requirement_id")), None
+        )
         if req is None:
             raise KeyError(f"requirement {meta.get('requirement_id')} not in catalogue")
         return self.registry.concept(req["concept"])
@@ -67,9 +69,14 @@ class RegistryOntologyMapper:
         template = TEMPLATE_FOR_PROVIDER.get(candidate.provider)
         for m in self.policy.content.get("approved_exact_mappings") or []:
             tgt = m.get("target") or {}
-            if (m.get("template") == template and m.get("dataset") == candidate.dataset_id
-                    and tgt.get("concept_id") == concept.concept_id and str(tgt.get("version")) == concept.version
-                    and geo and set(geo) <= set((m.get("scope") or {}).get("geo") or [])):
+            if (
+                m.get("template") == template
+                and m.get("dataset") == candidate.dataset_id
+                and tgt.get("concept_id") == concept.concept_id
+                and str(tgt.get("version")) == concept.version
+                and geo
+                and set(geo) <= set((m.get("scope") or {}).get("geo") or [])
+            ):
                 return dict(m)
         return None
 
@@ -91,15 +98,25 @@ class RegistryOntologyMapper:
             problems.append("inspection returned no values")
         return problems
 
-    def _proposal(self, candidate: SourceCandidate, mapping_key: str, concept: Any, relation: str,
-                  review: bool, body: dict[str, Any]) -> MappingProposal:
+    def _proposal(
+        self,
+        candidate: SourceCandidate,
+        mapping_key: str,
+        concept: Any,
+        relation: str,
+        review: bool,
+        body: dict[str, Any],
+    ) -> MappingProposal:
         manifest = {
             "schema": "reva-mapping-proposal/1",
             "mapping_key": mapping_key,
             "version": MAPPING_VERSION,
-            "source_ref": {"provider": candidate.provider, "dataset": candidate.dataset_id,
-                           "template": TEMPLATE_FOR_PROVIDER.get(candidate.provider),
-                           "candidate_metadata_sha256": candidate.metadata.sha256},
+            "source_ref": {
+                "provider": candidate.provider,
+                "dataset": candidate.dataset_id,
+                "template": TEMPLATE_FOR_PROVIDER.get(candidate.provider),
+                "candidate_metadata_sha256": candidate.metadata.sha256,
+            },
             "target": {"concept_id": concept.concept_id, "version": concept.version},
             "relation": relation,
             "review_required": review,
@@ -135,15 +152,25 @@ class RegistryOntologyMapper:
             problems += inspection_structure_problems(inspection, approved)
         resolution = [d for d in (inspection or {}).get("dimension_order", []) if d not in STRUCTURAL_DIMS]
         out: list[MappingProposal] = []
-        if approved and not problems and candidate.rights_status == "verified" \
-                and approved.get("rights") == "verified":
+        if approved and not problems and candidate.rights_status == "verified" and approved.get("rights") == "verified":
             source_profile = _profile(concept)
-            out.append(self._proposal(
-                candidate, mapping_key(candidate.dataset_id, concept.concept_id),
-                concept, "exact", False,
-                {"basis": "approved_exact_mapping", "approved_entry": approved,
-                 "scope": {"geo": geo, "subjects": iso3}, "resolution_dimensions": resolution,
-                 "source_semantic_profile": source_profile, "structure_problems": []}))
+            out.append(
+                self._proposal(
+                    candidate,
+                    mapping_key(candidate.dataset_id, concept.concept_id),
+                    concept,
+                    "exact",
+                    False,
+                    {
+                        "basis": "approved_exact_mapping",
+                        "approved_entry": approved,
+                        "scope": {"geo": geo, "subjects": iso3},
+                        "resolution_dimensions": resolution,
+                        "source_semantic_profile": source_profile,
+                        "structure_problems": [],
+                    },
+                )
+            )
         else:
             reasons = list(problems)
             if not approved:
@@ -151,12 +178,23 @@ class RegistryOntologyMapper:
             if candidate.rights_status != "verified":
                 reasons.append(f"rights status {candidate.rights_status}")
             source_profile = {}
-            out.append(self._proposal(
-                candidate, f"{candidate.provider}.{candidate.dataset_id}.{concept.concept_id.split('.')[-1]}",
-                concept, "overlap", True,
-                {"basis": "candidate_only", "reasons": reasons, "scope": {"geo": geo, "subjects": iso3},
-                 "resolution_dimensions": resolution, "structure_problems": problems,
-                 "note": "new semantics remain a reviewable proposal (T2)"}))
+            out.append(
+                self._proposal(
+                    candidate,
+                    f"{candidate.provider}.{candidate.dataset_id}.{concept.concept_id.split('.')[-1]}",
+                    concept,
+                    "overlap",
+                    True,
+                    {
+                        "basis": "candidate_only",
+                        "reasons": reasons,
+                        "scope": {"geo": geo, "subjects": iso3},
+                        "resolution_dimensions": resolution,
+                        "structure_problems": problems,
+                        "note": "new semantics remain a reviewable proposal (T2)",
+                    },
+                )
+            )
         if not source_profile:
             return out
         # Compare with every other registered concept of the same unit and scale.
@@ -164,23 +202,43 @@ class RegistryOntologyMapper:
             if other.concept_id == concept.concept_id or other.semantic_profile is None:
                 continue
             op = _profile(other)
-            if (op.get("unit_ref"), op.get("scale_type")) != (source_profile.get("unit_ref"),
-                                                               source_profile.get("scale_type")):
+            if (op.get("unit_ref"), op.get("scale_type")) != (
+                source_profile.get("unit_ref"),
+                source_profile.get("scale_type"),
+            ):
                 continue
             relation, reasons = compare_profiles(source_profile, op)
             registry_mapping = next(
-                (m for m in self.registry.mappings
-                 if m["source_ref"].get("dataset") == candidate.dataset_id
-                 and m["target"]["concept_id"] == other.concept_id), None)
+                (
+                    m
+                    for m in self.registry.mappings
+                    if m["source_ref"].get("dataset") == candidate.dataset_id
+                    and m["target"]["concept_id"] == other.concept_id
+                ),
+                None,
+            )
             if registry_mapping and registry_mapping["mapping_kind"] == "incompatible":
                 relation = "incompatible"
-            mk = (registry_mapping or {}).get("mapping_key") or \
-                f"{candidate.provider}.{candidate.dataset_id}.to_{other.concept_id.split('.')[-1]}"
-            out.append(self._proposal(
-                candidate, mk, other, relation, relation != "incompatible",
-                {"basis": "semantic_profile_comparison", "profile_differences": reasons,
-                 "source_semantic_profile": source_profile, "target_semantic_profile": op,
-                 "registry_mapping": registry_mapping, "eligibility": "none",
-                 "decision": "rejected_false_equivalence" if relation == "incompatible" else "candidate",
-                 "scope": {"geo": geo, "subjects": iso3}}))
+            mk = (registry_mapping or {}).get(
+                "mapping_key"
+            ) or f"{candidate.provider}.{candidate.dataset_id}.to_{other.concept_id.split('.')[-1]}"
+            out.append(
+                self._proposal(
+                    candidate,
+                    mk,
+                    other,
+                    relation,
+                    relation != "incompatible",
+                    {
+                        "basis": "semantic_profile_comparison",
+                        "profile_differences": reasons,
+                        "source_semantic_profile": source_profile,
+                        "target_semantic_profile": op,
+                        "registry_mapping": registry_mapping,
+                        "eligibility": "none",
+                        "decision": "rejected_false_equivalence" if relation == "incompatible" else "candidate",
+                        "scope": {"geo": geo, "subjects": iso3},
+                    },
+                )
+            )
         return out

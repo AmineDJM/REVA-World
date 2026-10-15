@@ -32,8 +32,14 @@ YEAR = 2024
 
 
 def phase(env: dict[str, str], name: str, **args: Any) -> dict[str, Any]:
-    out = subprocess.run([sys.executable, str(PHASE), name, json.dumps(args)], env=env, capture_output=True,
-                         text=True, timeout=3600, cwd=Path(__file__).resolve().parents[2])
+    out = subprocess.run(
+        [sys.executable, str(PHASE), name, json.dumps(args)],
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=3600,
+        cwd=Path(__file__).resolve().parents[2],
+    )
     assert out.returncode == 0, out.stderr[-4000:]
     return json.loads(out.stdout.strip().splitlines()[-1])
 
@@ -56,10 +62,16 @@ def test_live_figaro_to_scenario(tmp_path: Path) -> None:
             act = repo.simple_activity("registry.seed", "review", "maintainer:registry-seed", {"test": it.NAME})
             repo.record_activity(conn, act)
             register_connector_version(conn, store, it.FigaroConnector().describe(), act.id)
-        env = {**os.environ, "REVA_MIGRATION_DATABASE_URL": settings.migration_url().render_as_string(
-            hide_password=False), "REVA_DB_NAME": settings.reva_db_name, "REVA_ENV": "test",
-            "REVA_OBJECT_ROOT": str(root), "OMP_NUM_THREADS": "2", "OPENBLAS_NUM_THREADS": "2",
-            "POLARS_MAX_THREADS": "2"}
+        env = {
+            **os.environ,
+            "REVA_MIGRATION_DATABASE_URL": settings.migration_url().render_as_string(hide_password=False),
+            "REVA_DB_NAME": settings.reva_db_name,
+            "REVA_ENV": "test",
+            "REVA_OBJECT_ROOT": str(root),
+            "OMP_NUM_THREADS": "2",
+            "OPENBLAS_NUM_THREADS": "2",
+            "POLARS_MAX_THREADS": "2",
+        }
         timings: dict[str, Any] = {}
 
         fig = phase(env, "ingest_figaro", year=YEAR)
@@ -79,33 +91,49 @@ def test_live_figaro_to_scenario(tmp_path: Path) -> None:
         timings["release"] = {k: rel[k] for k in ("seconds", "max_rss_mb")}
 
         doc = json.loads((CONTRACTS / "scenario.example.json").read_text())
-        doc.update(schema_version="2.0.0", title="Live: +10% NACE B output price in every FIGARO economy",
-                   model_key=m.MODEL_KEY, model_version=m.MODEL_VERSION,
-                   baseline_release_id=rel["result"]["release_id"],
-                   knowledge_cutoff=rel["result"]["knowledge_cutoff"],
-                   countries=[k for k in m.FIGARO_KEYS if k != m.REST_OF_WORLD_KEY], reference_year=YEAR,
-                   horizon={"periods": 1, "unit": "annual_accounting_period"},
-                   intervention={"kind": "set_exogenous_industry_price_change", "shocks": [
-                       {"origin": k, "industry": "B", "price_change_percent": "10"} for k in m.FIGARO_KEYS]},
-                   assumptions={"pass_through_grid": ["0.5", "0.75", "1"]}, outputs=list(m.OUTPUT_GROUPS),
-                   missing_input_policy="fail", fidelity="L2")
+        doc.update(
+            schema_version="2.0.0",
+            title="Live: +10% NACE B output price in every FIGARO economy",
+            model_key=m.MODEL_KEY,
+            model_version=m.MODEL_VERSION,
+            baseline_release_id=rel["result"]["release_id"],
+            knowledge_cutoff=rel["result"]["knowledge_cutoff"],
+            countries=[k for k in m.FIGARO_KEYS if k != m.REST_OF_WORLD_KEY],
+            reference_year=YEAR,
+            horizon={"periods": 1, "unit": "annual_accounting_period"},
+            intervention={
+                "kind": "set_exogenous_industry_price_change",
+                "shocks": [{"origin": k, "industry": "B", "price_change_percent": "10"} for k in m.FIGARO_KEYS],
+            },
+            assumptions={"pass_through_grid": ["0.5", "0.75", "1"]},
+            outputs=list(m.OUTPUT_GROUPS),
+            missing_input_policy="fail",
+            fidelity="L2",
+        )
         s = validate_scenario_spec(doc)
         from reva.adapters.postgres.engine import make_engine
 
         api = make_engine("api", settings)
         with api.begin() as conn:
-            sid = conn.execute(text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:test')"),
-                               {"spec": json.dumps(s.as_json()), "b": s.canonical_bytes(),
-                                "d": s.digest()}).scalar_one()
+            sid = conn.execute(
+                text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:test')"),
+                {"spec": json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()},
+            ).scalar_one()
         for fid in ("L1", "L2"):
             run = phase(env, "simulate", scenario_id=str(sid), fidelity=fid)
             timings[f"simulate_{fid}"] = {k: run[k] for k in ("seconds", "max_rss_mb")}
             assert run["result"]["status"] == "succeeded", run["result"]
             assert run["max_rss_mb"] < WORKER_MEMORY_MB
         with owner.connect() as conn:
-            rows = conn.execute(text("""SELECT output_key, applicability->>'country' AS c, variant, value
+            rows = (
+                conn.execute(
+                    text("""SELECT output_key, applicability->>'country' AS c, variant, value
                                          FROM sim.result WHERE run_id = :r AND variant = 'L1'"""),
-                                {"r": run["result"]["run_id"]}).mappings().all()
+                    {"r": run["result"]["run_id"]},
+                )
+                .mappings()
+                .all()
+            )
         fra = {r["output_key"]: r["value"] for r in rows if r["c"] == "FRA"}
         basket = float(fra[m.BASKET_KEY]["value"])
         assert 0 < basket < 10  # +10 % on B cannot raise a basket by more than the shock

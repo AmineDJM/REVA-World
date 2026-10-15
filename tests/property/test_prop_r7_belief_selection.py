@@ -57,21 +57,31 @@ def candidate_rows(draw: Any) -> tuple[list[dict[str, Any]], dict[str, list[str]
             if (src, origin, lk) in lineages:
                 continue
             lineages.add((src, origin, lk))
-            rows.append({
-                "id": _u(f"obs:{e}:{src}:{origin}:{lk}"),
-                "subject_id": subject, "concept_version_id": cv, "support_id": support, "concept_id": concept,
-                "source_key": src, "lineage_family": draw(st.sampled_from(["fam1", "fam2", None])),
-                "origin": origin, "logical_key": lk,
-                "value": {"kind": "decimal", "value": draw(st.sampled_from(["100", "100.0", "101", "7"])),
-                          "unit_ref": "unit.usd"},
-                "uncertainty": UNKNOWN,
-                "source_flags": {"flowCode": draw(st.sampled_from(["M", "M", "M", "X"])), "partnerCode": "0"},
-                "selection_status": draw(st.sampled_from(["current", "current", "superseded_revision_selected",
-                                                          "retracted"])),
-                "revision_no": draw(st.integers(1, 3)),
-            })
-    prefs = {c: draw(st.permutations(SOURCES).map(lambda p: list(p[: draw(st.integers(1, 3))])))
-             for c in CONCEPTS}
+            rows.append(
+                {
+                    "id": _u(f"obs:{e}:{src}:{origin}:{lk}"),
+                    "subject_id": subject,
+                    "concept_version_id": cv,
+                    "support_id": support,
+                    "concept_id": concept,
+                    "source_key": src,
+                    "lineage_family": draw(st.sampled_from(["fam1", "fam2", None])),
+                    "origin": origin,
+                    "logical_key": lk,
+                    "value": {
+                        "kind": "decimal",
+                        "value": draw(st.sampled_from(["100", "100.0", "101", "7"])),
+                        "unit_ref": "unit.usd",
+                    },
+                    "uncertainty": UNKNOWN,
+                    "source_flags": {"flowCode": draw(st.sampled_from(["M", "M", "M", "X"])), "partnerCode": "0"},
+                    "selection_status": draw(
+                        st.sampled_from(["current", "current", "superseded_revision_selected", "retracted"])
+                    ),
+                    "revision_no": draw(st.integers(1, 3)),
+                }
+            )
+    prefs = {c: draw(st.permutations(SOURCES).map(lambda p: list(p[: draw(st.integers(1, 3))]))) for c in CONCEPTS}
     return rows, prefs
 
 
@@ -96,9 +106,18 @@ def test_selection_is_invariant_to_candidate_order(data: Any, rnd: random.Random
 
 
 def _two_retracted_lineages() -> tuple[list[dict[str, Any]], dict[str, list[str]]]:
-    base = {"subject_id": _u("s"), "concept_version_id": _u("cv"), "support_id": _u("sup"), "concept_id": "c",
-            "lineage_family": "f", "origin": "test_fixture", "uncertainty": UNKNOWN, "source_flags": {},
-            "value": {"kind": "decimal", "value": "1", "unit_ref": "u"}, "revision_no": 1}
+    base = {
+        "subject_id": _u("s"),
+        "concept_version_id": _u("cv"),
+        "support_id": _u("sup"),
+        "concept_id": "c",
+        "lineage_family": "f",
+        "origin": "test_fixture",
+        "uncertainty": UNKNOWN,
+        "source_flags": {},
+        "value": {"kind": "decimal", "value": "1", "unit_ref": "u"},
+        "revision_no": 1,
+    }
     rows = [
         {**base, "id": _u("cur"), "source_key": "src.a", "logical_key": "a:1", "selection_status": "current"},
         {**base, "id": _u("r1"), "source_key": "src.a", "logical_key": "a:2", "selection_status": "retracted"},
@@ -129,12 +148,18 @@ def test_retracted_lineage_is_never_selected_and_preference_is_respected(data: A
         assert r["selection_status"] != "retracted"
         assert s.value == r["value"] and s.uncertainty == r["uncertainty"]
         p = prefs[s.concept_id]
-        usable = [c for c in rows if (c["subject_id"], c["concept_version_id"], c["support_id"]) ==
-                  (s.subject_id, s.concept_version_id, s.support_id)
-                  and c["selection_status"] != "retracted" and c["source_key"] in p]
+        usable = [
+            c
+            for c in rows
+            if (c["subject_id"], c["concept_version_id"], c["support_id"])
+            == (s.subject_id, s.concept_version_id, s.support_id)
+            and c["selection_status"] != "retracted"
+            and c["source_key"] in p
+        ]
         assert p.index(r["source_key"]) == min(p.index(c["source_key"]) for c in usable)
         assert ("superseded_revision_selected" in s.discrepancy_flags) == (
-            r["selection_status"] == "superseded_revision_selected")
+            r["selection_status"] == "superseded_revision_selected"
+        )
         for a in s.alternatives:
             if a.get("selection_status") == "retracted":
                 assert "value" not in a  # a retracted value is never carried forward
@@ -156,8 +181,9 @@ def test_retracting_the_selected_lineage_drops_it(data: Any) -> None:
     rows, prefs = data
     for s in select_report(rows, prefs).selections:
         mutated = [{**r, "selection_status": "retracted"} if r["id"] == s.observation_id else r for r in rows]
-        after = {(x.subject_id, x.concept_version_id, x.support_id): x
-                 for x in select_report(mutated, prefs).selections}
+        after = {
+            (x.subject_id, x.concept_version_id, x.support_id): x for x in select_report(mutated, prefs).selections
+        }
         x = after.get((s.subject_id, s.concept_version_id, s.support_id))
         assert x is None or x.observation_id != s.observation_id
         if x is not None:
@@ -173,16 +199,23 @@ def _restore_dirty_nodes(db: Any) -> Iterator[None]:
     from sqlalchemy import text
 
     with db.worker.connect() as c:
-        before = [dict(r) for r in c.execute(text(
-            "SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")).mappings()]
+        before = [
+            dict(r)
+            for r in c.execute(
+                text("SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")
+            ).mappings()
+        ]
     yield
     with db.worker.begin() as c:
         c.execute(text("DELETE FROM ops.dirty_node"))
         for r in before:
-            c.execute(text(
-                """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
-                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""),
-                {**r, "b": json.dumps(r["accumulated_error_bound"])})
+            c.execute(
+                text(
+                    """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
+                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""
+                ),
+                {**r, "b": json.dumps(r["accumulated_error_bound"])},
+            )
 
 
 def _now(engine: Any) -> datetime:
@@ -208,8 +241,15 @@ def _ingest_revision(db: Any, tag: str, value: str, salt: str) -> None:
     wb = WorldBankConnector().describe()
     body = json.dumps({"r7": tag, "value": value, "salt": salt}, sort_keys=True).encode()
     item = FetchItem(key=f"r7:{tag}", url=f"https://api.worldbank.org/v2/r7-test/{tag}", max_bytes=10_000)
-    raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
-                         response_metadata={"status": 200}, request_fingerprint=f"r7:{tag}", origin="test_fixture")
+    raw = RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/json",
+        retrieved_at=datetime.now(UTC),
+        response_metadata={"status": 200},
+        request_fingerprint=f"r7:{tag}",
+        origin="test_fixture",
+    )
     support = Support(
         temporal=TimeExtent(kind="instant", precision=Precision.day, start=date(2021, 7, 1), label="2021 midyear"),
         spatial=SpatialRef(scheme="provider_reporter_territory", key="WB:FRA", authority="World Bank"),
@@ -217,13 +257,25 @@ def _ingest_revision(db: Any, tag: str, value: str, salt: str) -> None:
         aggregation="point_in_time_stock",
         resolution={"r7_test": tag},
     )
-    obs = (ParsedObservation(
-        subject_provider="worldbank", subject_key="FRA", concept_id=POP, concept_version="1.0.0", support=support,
-        logical_key=f"r7:{tag}:a", value={"kind": "decimal", "value": value, "unit_ref": "unit.persons",
-               "basis": {"scale_factor": "1"}},  # a complete kernel value: ingest validates it
-        uncertainty=UncertaintySpec.unknown("synthetic r7 value"), source_flags={"r7": tag},
-        raw_selector={"match": {"value": value}},
-    ),)
+    obs = (
+        ParsedObservation(
+            subject_provider="worldbank",
+            subject_key="FRA",
+            concept_id=POP,
+            concept_version="1.0.0",
+            support=support,
+            logical_key=f"r7:{tag}:a",
+            value={
+                "kind": "decimal",
+                "value": value,
+                "unit_ref": "unit.persons",
+                "basis": {"scale_factor": "1"},
+            },  # a complete kernel value: ingest validates it
+            uncertainty=UncertaintySpec.unknown("synthetic r7 value"),
+            source_flags={"r7": tag},
+            raw_selector={"match": {"value": value}},
+        ),
+    )
     batch = ObservationBatch(connector=wb.name, connector_version=wb.version, item_key=item.key, observations=obs)
     publish_acquisition(db.worker, db.store, wb, raw, [batch], [QualityReport(outcome="pass")])
 
@@ -232,22 +284,30 @@ def _lineage_row(db: Any, cutoff: datetime, tag: str, *, include_retracted: bool
     from reva.belief.selection import eligible_latest
 
     with db.api.connect() as c:
-        rows = [r for r in eligible_latest(c, cutoff, ["test_fixture"], [POP], include_retracted=include_retracted)
-                if r["logical_key"] == f"r7:{tag}:a"]
+        rows = [
+            r
+            for r in eligible_latest(c, cutoff, ["test_fixture"], [POP], include_retracted=include_retracted)
+            if r["logical_key"] == f"r7:{tag}:a"
+        ]
     assert len(rows) <= 1
     return rows[0] if rows else None
 
 
 @pytest.mark.db
-@settings(max_examples=6, deadline=None,
-          suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture])
-@given(values=st.lists(st.integers(1, 10**6).map(str), min_size=1, max_size=4).filter(
-           lambda v: all(a != b for a, b in itertools.pairwise(v))),
-       retract=st.sampled_from(["none", "head", "older"]))
+@settings(
+    max_examples=6, deadline=None, suppress_health_check=[HealthCheck.too_slow, HealthCheck.function_scoped_fixture]
+)
+@given(
+    values=st.lists(st.integers(1, 10**6).map(str), min_size=1, max_size=4).filter(
+        lambda v: all(a != b for a, b in itertools.pairwise(v))
+    ),
+    retract=st.sampled_from(["none", "head", "older"]),
+)
 @example(values=["10", "20", "30"], retract="older")
 @example(values=["10", "20"], retract="head")
-def test_eligible_latest_respects_cutoff_and_retraction(db: Any, _restore_dirty_nodes: None, values: list[str],
-                                                        retract: str) -> None:
+def test_eligible_latest_respects_cutoff_and_retraction(
+    db: Any, _restore_dirty_nodes: None, values: list[str], retract: str
+) -> None:
     from sqlalchemy import text
 
     from reva.evidence.retractions import retract_observation
@@ -269,8 +329,14 @@ def test_eligible_latest_respects_cutoff_and_retraction(db: Any, _restore_dirty_
     if retract == "none" or (retract == "older" and len(values) < 2):
         return
     with db.worker.connect() as c:
-        revs = c.execute(text("SELECT id, revision_no FROM evidence.observation WHERE logical_key = :k "
-                              "ORDER BY revision_no"), {"k": f"r7:{tag}:a"}).mappings().all()
+        revs = (
+            c.execute(
+                text("SELECT id, revision_no FROM evidence.observation WHERE logical_key = :k ORDER BY revision_no"),
+                {"k": f"r7:{tag}:a"},
+            )
+            .mappings()
+            .all()
+        )
     target = revs[-1] if retract == "head" else revs[0]
     with db.owner.begin() as c:  # human-attributed retraction: a reviewer path, not the worker role
         retract_observation(c, target["id"], "r7 property test retraction", actor="human:r7-test")

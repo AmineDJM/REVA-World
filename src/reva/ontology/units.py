@@ -197,8 +197,9 @@ def conversion_factor(src: str, dst: str) -> Decimal:
     try:
         q = ureg.Quantity(Decimal(1), a.pint_unit).to(b.pint_unit)
     except pint.DimensionalityError as e:
-        raise IncompatibleSemantics(f"{a.ref} -> {b.ref}: dimensionally incompatible ({e})",
-                                    src=a.ref, dst=b.ref) from e
+        raise IncompatibleSemantics(
+            f"{a.ref} -> {b.ref}: dimensionally incompatible ({e})", src=a.ref, dst=b.ref
+        ) from e
     return _dec(q.magnitude)
 
 
@@ -243,12 +244,14 @@ def _require_kind(ref: str, kind: QuantityKind) -> UnitDefinition:
     return d
 
 
-def mass_to_volume(value: Decimal | str, mass_unit: str, volume_unit: str,
-                   convention: DensityConvention | None) -> Decimal:
+def mass_to_volume(
+    value: Decimal | str, mass_unit: str, volume_unit: str, convention: DensityConvention | None
+) -> Decimal:
     if convention is None:
         raise IncompatibleSemantics(
             "mass -> volume requires an explicit DensityConvention (density and convention)",
-            src=mass_unit, dst=volume_unit,
+            src=mass_unit,
+            dst=volume_unit,
         )
     _require_kind(mass_unit, QuantityKind.mass)
     _require_kind(volume_unit, QuantityKind.volume)
@@ -259,12 +262,14 @@ def mass_to_volume(value: Decimal | str, mass_unit: str, volume_unit: str,
         return convert(m3, "unit.m3", volume_unit)
 
 
-def volume_to_mass(value: Decimal | str, volume_unit: str, mass_unit: str,
-                   convention: DensityConvention | None) -> Decimal:
+def volume_to_mass(
+    value: Decimal | str, volume_unit: str, mass_unit: str, convention: DensityConvention | None
+) -> Decimal:
     if convention is None:
         raise IncompatibleSemantics(
             "volume -> mass requires an explicit DensityConvention (density and convention)",
-            src=volume_unit, dst=mass_unit,
+            src=volume_unit,
+            dst=mass_unit,
         )
     _require_kind(volume_unit, QuantityKind.volume)
     _require_kind(mass_unit, QuantityKind.mass)
@@ -314,8 +319,9 @@ def _basis(obj: MeasurementBasis | Mapping[str, Any] | None) -> MeasurementBasis
     return MeasurementBasis.model_validate(dict(obj))
 
 
-def currency_basis_issues(unit_ref: str, basis: MeasurementBasis | Mapping[str, Any] | None,
-                          path: str = "") -> tuple[UnitIssue, ...]:
+def currency_basis_issues(
+    unit_ref: str, basis: MeasurementBasis | Mapping[str, Any] | None, path: str = ""
+) -> tuple[UnitIssue, ...]:
     """Issues that make a currency amount economically incomplete.
 
     Errors: no basis, no/mismatching currency, no price basis, real/PPP without
@@ -330,32 +336,69 @@ def currency_basis_issues(unit_ref: str, basis: MeasurementBasis | Mapping[str, 
         return (UnitIssue(code="basis_invalid", severity="error", message=str(e), path=path),)
     out: list[UnitIssue] = []
     if b is None:
-        return (UnitIssue(code="currency_basis_missing", severity="error", path=path,
-                          message=f"{d.ref} amount without a measurement basis; currency alone is incomplete"),)
+        return (
+            UnitIssue(
+                code="currency_basis_missing",
+                severity="error",
+                path=path,
+                message=f"{d.ref} amount without a measurement basis; currency alone is incomplete",
+            ),
+        )
     if not b.currency:
-        out.append(UnitIssue(code="currency_missing", severity="error", path=path,
-                             message="currency amount without ISO 4217 currency in its basis"))
+        out.append(
+            UnitIssue(
+                code="currency_missing",
+                severity="error",
+                path=path,
+                message="currency amount without ISO 4217 currency in its basis",
+            )
+        )
     elif b.currency != d.currency:
-        out.append(UnitIssue(code="currency_unit_mismatch", severity="error", path=path,
-                             message=f"basis currency {b.currency} does not match unit {d.ref}"))
+        out.append(
+            UnitIssue(
+                code="currency_unit_mismatch",
+                severity="error",
+                path=path,
+                message=f"basis currency {b.currency} does not match unit {d.ref}",
+            )
+        )
     if b.price_basis is None:
-        out.append(UnitIssue(code="price_basis_missing", severity="error", path=path,
-                             message="currency amount without nominal/real/PPP price basis"))
+        out.append(
+            UnitIssue(
+                code="price_basis_missing",
+                severity="error",
+                path=path,
+                message="currency amount without nominal/real/PPP price basis",
+            )
+        )
     elif b.price_basis in ("real", "ppp") and b.price_reference_year is None:
-        out.append(UnitIssue(code="price_reference_year_missing", severity="error", path=path,
-                             message=f"{b.price_basis} amount without a price reference year"))
+        out.append(
+            UnitIssue(
+                code="price_reference_year_missing",
+                severity="error",
+                path=path,
+                message=f"{b.price_basis} amount without a price reference year",
+            )
+        )
     if not b.exchange_rate_transform:
-        out.append(UnitIssue(code="exchange_rate_transform_unrecorded", severity="warning", path=path,
-                             message="exchange-rate transformation not recorded; cross-source combination "
-                                     "must treat the conversion basis as unknown"))
+        out.append(
+            UnitIssue(
+                code="exchange_rate_transform_unrecorded",
+                severity="warning",
+                path=path,
+                message="exchange-rate transformation not recorded; cross-source combination "
+                "must treat the conversion basis as unknown",
+            )
+        )
     return tuple(out)
 
 
 _UNIT_VALUE_KINDS = frozenset({"decimal", "float", "array"})
 
 
-def validate_observation_units(observation: Mapping[str, Any], *, expected_unit_ref: str | None = None
-                               ) -> UnitCheckReport:
+def validate_observation_units(
+    observation: Mapping[str, Any], *, expected_unit_ref: str | None = None
+) -> UnitCheckReport:
     """Reject numeric observations whose ``unit_ref`` is missing or unknown.
 
     ``observation`` is either a normalised observation (with a ``value`` key)
@@ -369,30 +412,54 @@ def validate_observation_units(observation: Mapping[str, Any], *, expected_unit_
     elif "value" in observation:
         value, path = observation["value"], "value"
     else:
-        return UnitCheckReport(issues=(UnitIssue(code="value_missing", severity="error", path="value",
-                                                 message="observation has no value"),))
+        return UnitCheckReport(
+            issues=(
+                UnitIssue(code="value_missing", severity="error", path="value", message="observation has no value"),
+            )
+        )
     if not isinstance(value, Mapping):
-        return UnitCheckReport(issues=(UnitIssue(code="value_invalid", severity="error", path=path,
-                                                 message="value must be an object"),))
+        return UnitCheckReport(
+            issues=(UnitIssue(code="value_invalid", severity="error", path=path, message="value must be an object"),)
+        )
     kind = value.get("kind")
     if kind not in _UNIT_VALUE_KINDS:
         return UnitCheckReport()
     ref = value.get("unit_ref")
     p = f"{path}.unit_ref" if path else "unit_ref"
     if ref is None or (isinstance(ref, str) and not ref.strip()):
-        return UnitCheckReport(issues=(UnitIssue(code="unit_ref_missing", severity="error", path=p,
-                                                 message="numeric value without unit_ref"),))
+        return UnitCheckReport(
+            issues=(
+                UnitIssue(code="unit_ref_missing", severity="error", path=p, message="numeric value without unit_ref"),
+            )
+        )
     if not isinstance(ref, str) or not is_known_unit(ref):
-        return UnitCheckReport(issues=(UnitIssue(code="unit_ref_unknown", severity="error", path=p,
-                                                 message=f"unit_ref {ref!r} is not registered"),))
+        return UnitCheckReport(
+            issues=(
+                UnitIssue(
+                    code="unit_ref_unknown", severity="error", path=p, message=f"unit_ref {ref!r} is not registered"
+                ),
+            )
+        )
     issues: list[UnitIssue] = []
     if expected_unit_ref is not None:
         if not is_known_unit(expected_unit_ref):
-            issues.append(UnitIssue(code="expected_unit_unknown", severity="error", path=p,
-                                    message=f"concept unit {expected_unit_ref!r} is not registered"))
+            issues.append(
+                UnitIssue(
+                    code="expected_unit_unknown",
+                    severity="error",
+                    path=p,
+                    message=f"concept unit {expected_unit_ref!r} is not registered",
+                )
+            )
         elif canonical_unit_ref(ref) != canonical_unit_ref(expected_unit_ref):
-            issues.append(UnitIssue(code="unit_ref_mismatch", severity="error", path=p,
-                                    message=f"value unit {ref} differs from concept unit {expected_unit_ref}"))
+            issues.append(
+                UnitIssue(
+                    code="unit_ref_mismatch",
+                    severity="error",
+                    path=p,
+                    message=f"value unit {ref} differs from concept unit {expected_unit_ref}",
+                )
+            )
     bpath = f"{path}.basis" if path else "basis"
     issues.extend(currency_basis_issues(ref, value.get("basis"), bpath))
     return UnitCheckReport(issues=tuple(issues))
@@ -469,8 +536,9 @@ def apply_currency_transform(value: ScalarDecimal, period_year: int, transform: 
         )
     errors = [i for i in currency_basis_issues(value.unit_ref, value.basis) if i.severity == "error"]
     if errors:
-        raise IncompatibleSemantics("source amount has an incomplete currency basis: "
-                                    + "; ".join(i.message for i in errors))
+        raise IncompatibleSemantics(
+            "source amount has an incomplete currency basis: " + "; ".join(i.message for i in errors)
+        )
     b = value.basis
     src = transform.source
     if (b.currency, b.price_basis) != (src.currency, src.price_basis) or (
@@ -486,18 +554,21 @@ def apply_currency_transform(value: ScalarDecimal, period_year: int, transform: 
     if factor is None:
         raise MissingInput(
             f"transform {transform.transform_key}@{transform.version} has no factor for {period_year}",
-            input="currency_factor", reason="unavailable",
+            input="currency_factor",
+            reason="unavailable",
         )
     with localcontext() as ctx:
         ctx.prec = _PRECISION
         out = value.as_decimal() * _dec(factor)
     tgt = transform.target
-    new_basis = b.model_copy(update={
-        "currency": tgt.currency,
-        "price_basis": tgt.price_basis,
-        "price_reference_year": tgt.price_reference_year,
-        "exchange_rate_transform": (
-            f"{transform.transform_key}@{transform.version}: {transform.exchange_rate_transform}"
-        ),
-    })
+    new_basis = b.model_copy(
+        update={
+            "currency": tgt.currency,
+            "price_basis": tgt.price_basis,
+            "price_reference_year": tgt.price_reference_year,
+            "exchange_rate_transform": (
+                f"{transform.transform_key}@{transform.version}: {transform.exchange_rate_transform}"
+            ),
+        }
+    )
     return ScalarDecimal(value=decimal_str(out), unit_ref=_unit_for_currency(tgt.currency), basis=new_basis)

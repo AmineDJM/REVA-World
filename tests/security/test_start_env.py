@@ -493,8 +493,7 @@ def test_bootstrap_runtime_reports_schema_without_secrets(db, tmp_path: Path) ->
 
     assert report["schema_version"] == ScriptDirectory.from_config(alembic_config()).get_current_head()
     owner_pw = s.migration_url().password
-    for secret in (owner_pw, env["REVA_API_DB_PASSWORD"], env["REVA_WORKER_DB_PASSWORD"],
-                   env["REVA_GATE_DB_PASSWORD"]):
+    for secret in (owner_pw, env["REVA_API_DB_PASSWORD"], env["REVA_WORKER_DB_PASSWORD"], env["REVA_GATE_DB_PASSWORD"]):
         assert secret and secret not in proc.stdout + proc.stderr
 
 

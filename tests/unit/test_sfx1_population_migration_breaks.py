@@ -28,8 +28,13 @@ from reva.models.population import cohort as C
 from reva.models.population.cohort_component import MODEL
 from reva.simulation.plugins import ResolvedInputs
 
-DS = {"population": "demo_pjan", "deaths": "demo_magec", "births": "demo_fasec",
-      "europop_migration": "proj_23nanmig", "europop_fertility": "proj_23naasfr"}
+DS = {
+    "population": "demo_pjan",
+    "deaths": "demo_magec",
+    "births": "demo_fasec",
+    "europop_migration": "proj_23nanmig",
+    "europop_fertility": "proj_23naasfr",
+}
 
 
 @cache
@@ -54,14 +59,21 @@ def table(name: str, iso3: str) -> Any:
 
 def country(iso3: str) -> C.CountryDemography:
     return C.CountryDemography.from_tables(
-        iso3, population=table("population", iso3), deaths=table("deaths", iso3), births=table("births", iso3),
-        europop_migration=table("europop_migration", iso3), europop_fertility=table("europop_fertility", iso3))
+        iso3,
+        population=table("population", iso3),
+        deaths=table("deaths", iso3),
+        births=table("births", iso3),
+        europop_migration=table("europop_migration", iso3),
+        europop_fertility=table("europop_fertility", iso3),
+    )
 
 
 def mean_residual(rates: C.BaseRates, years: list[int]) -> dict[str, list[Decimal]]:
     n = Decimal(len(years))
-    return {s: [C.qp(C.div(C.xsum(rates.residual_migration[y][s][x] for y in years), n))
-                for x in range(rates.omega + 1)] for s in C.SEXES}
+    return {
+        s: [C.qp(C.div(C.xsum(rates.residual_migration[y][s][x] for y in years), n)) for x in range(rates.omega + 1)]
+        for s in C.SEXES
+    }
 
 
 # --------------------------------------------------------------------------- H1
@@ -69,7 +81,8 @@ def test_break_flag_on_the_following_january_marks_the_residual_year() -> None:
     lu = country("LUX")
     rates = C.base_rates(lu, 2008, 2012)
     assert "b" in lu.population[(2012, "F")]["Y_OPEN"].status or any(
-        "b" in c.status for (y, _s), cells in lu.population.items() if y == 2012 for c in cells.values())
+        "b" in c.status for (y, _s), cells in lu.population.items() if y == 2012 for c in cells.values()
+    )
     assert rates.residual_breaks == {2011: ["b"]}  # 1 Jan 2012 is flagged -> the 2011 residual spans the break
 
 
@@ -137,29 +150,46 @@ def test_single_year_migration_window_is_refused_unless_explicit() -> None:
     lu = country("LUX")
     with pytest.raises(ValidationProblem, match="fewer than 2"):
         C.project(lu, jump_off=2024, end_year=2025, assumptions=C.Assumptions(base_period=(2023, 2023)))
-    p = C.project(lu, jump_off=2024, end_year=2025,
-                  assumptions=C.Assumptions(base_period=(2023, 2023), allow_single_year_migration=True))
+    p = C.project(
+        lu,
+        jump_off=2024,
+        end_year=2025,
+        assumptions=C.Assumptions(base_period=(2023, 2023), allow_single_year_migration=True),
+    )
     codes = {x["code"] for x in p.warnings}
     assert {"base_period_single_year", "migration_window_single_year"} <= codes
     one = next(x for x in p.warnings if x["code"] == "base_period_single_year")
     assert one["components"]["mortality"] == [2023]
     # zero migration with a one-year base period: allowed, but still warned
-    pz = C.project(lu, jump_off=2024, end_year=2025, assumptions=C.Assumptions(migration="zero",
-                                                                               base_period=(2023, 2023)))
+    pz = C.project(
+        lu, jump_off=2024, end_year=2025, assumptions=C.Assumptions(migration="zero", base_period=(2023, 2023))
+    )
     assert [x["code"] for x in pz.warnings] == ["base_period_single_year"]
 
 
 # --------------------------------------------------------------------------- plugin
 def _spec(**over: Any) -> dict[str, Any]:
     doc = {
-        "schema_version": "2.0.0", "title": "Population projection (SFX1 test)",
+        "schema_version": "2.0.0",
+        "title": "Population projection (SFX1 test)",
         "baseline_release_id": "00000000-0000-4000-8000-000000000001",
-        "knowledge_cutoff": "2026-10-01T00:00:00Z", "model_key": "demography.cohort_component",
-        "model_version": "1.0.0", "countries": ["LUX"], "reference_year": 2013,
-        "horizon": {"periods": 2, "unit": "calendar_year"}, "intervention": {"kind": "baseline_projection"},
-        "assumptions": {"mortality": "constant_base_period_rates", "fertility": "constant_base_period_rates",
-                        "migration": "average_residual", "base_period": {"first_year": 2008, "last_year": 2012}},
-        "fidelity": "L1", "missing_input_policy": "fail", "outputs": ["population.total.all_ages"], "seed": 0,
+        "knowledge_cutoff": "2026-10-01T00:00:00Z",
+        "model_key": "demography.cohort_component",
+        "model_version": "1.0.0",
+        "countries": ["LUX"],
+        "reference_year": 2013,
+        "horizon": {"periods": 2, "unit": "calendar_year"},
+        "intervention": {"kind": "baseline_projection"},
+        "assumptions": {
+            "mortality": "constant_base_period_rates",
+            "fertility": "constant_base_period_rates",
+            "migration": "average_residual",
+            "base_period": {"first_year": 2008, "last_year": 2012},
+        },
+        "fidelity": "L1",
+        "missing_input_policy": "fail",
+        "outputs": ["population.total.all_ages"],
+        "seed": 0,
     }
     doc.update(over)
     return doc
@@ -167,8 +197,9 @@ def _spec(**over: Any) -> dict[str, Any]:
 
 def _resolved(doc: dict[str, Any]) -> ResolvedInputs:
     reqs = MODEL.requirements(doc)
-    data = {(r.name, r.subject): (table(r.name, r.subject), {"dataset_id": f"fixture:{r.name}:{r.subject}"})
-            for r in reqs}
+    data = {
+        (r.name, r.subject): (table(r.name, r.subject), {"dataset_id": f"fixture:{r.name}:{r.subject}"}) for r in reqs
+    }
     return ResolvedInputs.from_values(reqs, datasets=data)
 
 
@@ -191,8 +222,9 @@ def test_plugin_window_too_short_is_missing_input_and_single_year_needs_opt_in()
     assert comp.countries[0].status == "missing_input" and comp.missing[0]["excluded_years"] == [2011]
     with pytest.raises(ValidationProblem):
         MODEL.validate(_spec(assumptions={**a, "base_period": {"first_year": 2012, "last_year": 2012}}))
-    ok = _spec(assumptions={**a, "base_period": {"first_year": 2012, "last_year": 2012},
-                            "allow_single_year_migration": True})
+    ok = _spec(
+        assumptions={**a, "base_period": {"first_year": 2012, "last_year": 2012}, "allow_single_year_migration": True}
+    )
     MODEL.validate(ok)
     comp = MODEL.compile(_resolved(ok), ok)
     codes = [w["code"] for w in comp.countries[0].warnings]
@@ -218,8 +250,7 @@ def test_backtest_reports_constant_growth_and_linear_benchmarks() -> None:
     assert Decimal(bt["naive_no_change_total_ape"]) > 0
     v = bt["variants"]["mig=average_residual;fert=constant_base_period_rates"]
     assert v["migration_window"]["years_used"] == [2008, 2009, 2010, 2012]
-    with_breaks = C.backtest(lu, jump_off=2013, target_year=2023, base_period=(2008, 2012),
-                             include_break_variant=True)
+    with_breaks = C.backtest(lu, jump_off=2013, target_year=2023, base_period=(2008, 2012), include_break_variant=True)
     assert "mig=average_residual+breaks_included;fert=constant_base_period_rates" in with_breaks["variants"]
 
 
@@ -247,5 +278,7 @@ def test_backtest_open_age_comes_from_the_jump_off_not_the_target() -> None:
     key = "mig=average_residual;fert=constant_base_period_rates"
     # same projection, same totals: the target's open age changes only how old ages are scored
     assert bt["variants"][key]["total_ape"] == ref["variants"][key]["total_ape"]
-    assert bt["variants"][key]["groups"]["age_65_plus"]["predicted"] == \
-        ref["variants"][key]["groups"]["age_65_plus"]["predicted"]
+    assert (
+        bt["variants"][key]["groups"]["age_65_plus"]["predicted"]
+        == ref["variants"][key]["groups"]["age_65_plus"]["predicted"]
+    )

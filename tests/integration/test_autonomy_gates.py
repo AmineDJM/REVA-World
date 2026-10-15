@@ -44,37 +44,74 @@ def io(db) -> ArtifactIO:
 
 
 def _value(io) -> ValueEstimate:
-    return ValueEstimate("unsupported", None, None, {"status": "unquantified"}, io.put_json({"t": 1}, "evaluation"),
-                         "test")
+    return ValueEstimate(
+        "unsupported", None, None, {"status": "unquantified"}, io.put_json({"t": 1}, "evaluation"), "test"
+    )
 
 
-def _proposal(io, *, tier=0, paths=(), caps=("report",), author="agent:test-proposer", scientific=False,
-              migration=False, manifest=None) -> PlatformChangeProposal:
+def _proposal(
+    io,
+    *,
+    tier=0,
+    paths=(),
+    caps=("report",),
+    author="agent:test-proposer",
+    scientific=False,
+    migration=False,
+    manifest=None,
+) -> PlatformChangeProposal:
     ref = io.put_json(manifest or {"schema": "test", "nonce": str(uuid.uuid4())}, "models")
-    return PlatformChangeProposal(uuid.uuid4(), author, tier, tuple(paths), base_commit(), ref, tuple(caps),
-                                  scientific, migration, _value(io), promotion_policy().version)
+    return PlatformChangeProposal(
+        uuid.uuid4(),
+        author,
+        tier,
+        tuple(paths),
+        base_commit(),
+        ref,
+        tuple(caps),
+        scientific,
+        migration,
+        _value(io),
+        promotion_policy().version,
+    )
 
 
 async def _t1(io, db, mutate_manifest=None):
     """A genuine T1 connector change with independent validator + sandbox reports."""
     bank = bank_from_dir(io, CONNECTOR)
     ctx = make_context(io, "evidence", datetime.now(UTC), {"t": 1})
-    gap = KnowledgeGap(uuid.uuid4(), "R-POP-JAN-AGESEX", "demography.population.jan1_age_sex@1.0.0", ("FRA",),
-                       {"years": [2023]}, "unsupported", 1.0, "test", ctx)
+    gap = KnowledgeGap(
+        uuid.uuid4(),
+        "R-POP-JAN-AGESEX",
+        "demography.population.jan1_age_sex@1.0.0",
+        ("FRA",),
+        {"years": [2023]},
+        "unsupported",
+        1.0,
+        "test",
+        ctx,
+    )
     cands = await EurostatCatalogueDiscoverer(io, BankHttp(io, bank)).discover(gap, default_budget())
     mapping = RegistryOntologyMapper(io).assess(cands[0], ctx)[0]
     cp = DeclarativeConnectorGenerator(io).generate(cands[0], mapping, ("eurostat_jsonstat",))
     manifest = io.get_json(cp.manifest)
     if mutate_manifest:
         mutate_manifest(manifest)
-        cp = type(cp)(cp.proposal_id, cp.candidate, cp.template_id, cp.template_digest,
-                      io.put_json(manifest, "models"), cp.mapping)
+        cp = type(cp)(
+            cp.proposal_id,
+            cp.candidate,
+            cp.template_id,
+            cp.template_digest,
+            io.put_json(manifest, "models"),
+            cp.mapping,
+        )
     v = await JsonStatConnectorValidator(io).validate(cp, bank, default_budget())
     p = connector_change_proposal(io, cp, manifest, mapping, _value(io), promotion_policy())
     from reva.autonomy.jobs import connector_promotion_scope
 
-    ProposalStore(db.worker, io).persist(p, proposal_type="connector_promotion",
-                                         scope=connector_promotion_scope(io, manifest, mapping), risk={})
+    ProposalStore(db.worker, io).persist(
+        p, proposal_type="connector_promotion", scope=connector_promotion_scope(io, manifest, mapping), risk={}
+    )
     s = await TrustedTemplateSandbox(io, fixtures=bank).run(p, trusted_template_policy(default_budget()))
     return p, v, s
 
@@ -125,13 +162,16 @@ async def test_t1_with_foreign_reports_is_rejected(db, io):
     assert d.outcome == "reject" and any("does not cover" in r for r in d.reasons)
 
 
-@pytest.mark.parametrize("paths,caps,expected_tier", [
-    ((), ("run_backtest",), 2),
-    (("src/reva/models/forecasting/new_model.py",), ("propose",), 2),
-    (("src/reva/kernel/values.py",), ("propose",), 3),
-    (("migrations/versions/0008_x.py",), ("propose",), 3),
-    ((), ("causal_claim",), 3),
-])
+@pytest.mark.parametrize(
+    "paths,caps,expected_tier",
+    [
+        ((), ("run_backtest",), 2),
+        (("src/reva/models/forecasting/new_model.py",), ("propose",), 2),
+        (("src/reva/kernel/values.py",), ("propose",), 3),
+        (("migrations/versions/0008_x.py",), ("propose",), 3),
+        ((), ("causal_claim",), 3),
+    ],
+)
 def test_t2_t3_need_review(db, io, paths, caps, expected_tier):
     p = _proposal(io, tier=0, paths=paths, caps=caps, scientific=True)  # declares T0: must be raised
     _persist(db, io, p)
@@ -148,8 +188,11 @@ def test_t0_is_automatic(db, io):
     d = _gate(db, io).decide(p, [], promotion_policy().ref())
     assert d.outcome == "promote"
     with db.owner.connect() as conn:
-        row = conn.execute(text("SELECT decision, evaluator FROM ops.gate_result WHERE id=:i"),
-                           {"i": d.decision_id}).mappings().one()
+        row = (
+            conn.execute(text("SELECT decision, evaluator FROM ops.gate_result WHERE id=:i"), {"i": d.decision_id})
+            .mappings()
+            .one()
+        )
     assert row["decision"] == "pass" and row["evaluator"] == "gate-evaluator:promotion"
 
 
@@ -170,21 +213,25 @@ def test_proposer_cannot_write_its_own_gate_result(db, io):
         io.register(conn, ev, "test/1")
     for evaluator in ("gate-evaluator:agent:sneaky", "agent:sneaky"):
         with pytest.raises(sqlalchemy.exc.DBAPIError) as exc, db.worker.begin() as conn:
-            conn.execute(text("""INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision,
+            conn.execute(
+                text("""INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision,
                                     evidence_sha256, evaluator) VALUES (:p, 'promotion', 'x', 'pass', :e, :ev)"""),
-                         {"p": p.proposal_id, "e": ev.sha256, "ev": evaluator})
+                {"p": p.proposal_id, "e": ev.sha256, "ev": evaluator},
+            )
         # GATE: the worker (proposer's process) holds no INSERT on ops.gate_result at all
         assert "permission denied" in str(exc.value)
     # even the independent gate login cannot record a result for a proposal authored under its own name
     p2 = _proposal(io, author="sneaky")
     _persist(db, io, p2)
-    with pytest.raises(sqlalchemy.exc.DBAPIError, match="cannot evaluate its own proposal"), \
-            db.gate.begin() as conn:
-        conn.execute(text("SELECT ops.record_gate_result(:p, 'sneaky', 'x', 'pass', :e, 'gate-evaluator:sneaky')"),
-                     {"p": p2.proposal_id, "e": ev.sha256})
+    with pytest.raises(sqlalchemy.exc.DBAPIError, match="cannot evaluate its own proposal"), db.gate.begin() as conn:
+        conn.execute(
+            text("SELECT ops.record_gate_result(:p, 'sneaky', 'x', 'pass', :e, 'gate-evaluator:sneaky')"),
+            {"p": p2.proposal_id, "e": ev.sha256},
+        )
     with pytest.raises(PolicyDenied):
         PolicyPromotionGate(db.gate, io, name="sneaky").decide(
-            _proposal(io, author="sneaky"), [], promotion_policy().ref())
+            _proposal(io, author="sneaky"), [], promotion_policy().ref()
+        )
 
 
 async def test_gate_ignores_reports_from_the_proposer(db, io):
@@ -204,10 +251,12 @@ async def test_policy_change_makes_gate_refuse(db, io, tmp_path):
     pinned = promotion_policy().sha256
     ok = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=pinned)
     assert ok.decide(p, [v, s], promotion_policy().ref()).outcome == "promote"
-    copy.write_text(copy.read_text().replace("allowed_hosts: [ec.europa.eu]",
-                                             "allowed_hosts: [ec.europa.eu, evil.example.com]"))
+    copy.write_text(
+        copy.read_text().replace("allowed_hosts: [ec.europa.eu]", "allowed_hosts: [ec.europa.eu, evil.example.com]")
+    )
     d = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=pinned).decide(
-        p, [v, s], promotion_policy().ref())
+        p, [v, s], promotion_policy().ref()
+    )
     assert d.outcome == "blocked" and any("changed" in r for r in d.reasons)
     # a forged 'signed policy' reference is refused as well
     from reva.ports.autonomy import ArtifactRef
@@ -231,15 +280,25 @@ def _ctx(db, **settings_over):
     from reva.operations.context import JobContext
 
     s = db.settings.model_copy(update=settings_over)
-    return JobContext(job_id=None, job_type="discovery", worker_id="t", fencing_token=0, attempt=1,  # type: ignore[arg-type]
-                      settings=s, worker_engine=db.worker, sim_engine=None, store=db.store)
+    return JobContext(
+        job_id=None,
+        job_type="discovery",
+        worker_id="t",
+        fencing_token=0,
+        attempt=1,  # type: ignore[arg-type]
+        settings=s,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
 
 
 @pytest.mark.parametrize("over", [{"reva_autonomy_kill_switch": True}, {"reva_autonomy_mode": "disabled"}])
 async def test_kill_switch_blocks_everything(db, io, over):
     with db.owner.connect() as conn:
-        before = conn.execute(text("SELECT (SELECT count(*) FROM ops.proposal), (SELECT count(*) FROM ops.gate_result)"
-                                   )).one()
+        before = conn.execute(
+            text("SELECT (SELECT count(*) FROM ops.proposal), (SELECT count(*) FROM ops.gate_result)")
+        ).one()
     ctx = _ctx(db, **over)
     assert handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)["status"] == "blocked"
     assert handle_gaps({}, ctx)["status"] == "blocked"
@@ -248,8 +307,17 @@ async def test_kill_switch_blocks_everything(db, io, over):
         guard.check("discover")
     bank = bank_from_dir(io, CONNECTOR)
     gctx = make_context(io, "evidence", datetime.now(UTC), {"t": 1})
-    gap = KnowledgeGap(uuid.uuid4(), "R-POP-JAN-AGESEX", "demography.population.jan1_age_sex@1.0.0", ("FRA",),
-                       {"years": [2023]}, "unsupported", 1.0, "t", gctx)
+    gap = KnowledgeGap(
+        uuid.uuid4(),
+        "R-POP-JAN-AGESEX",
+        "demography.population.jan1_age_sex@1.0.0",
+        ("FRA",),
+        {"years": [2023]},
+        "unsupported",
+        1.0,
+        "t",
+        gctx,
+    )
     with pytest.raises(AutonomyBlocked):
         await EurostatCatalogueDiscoverer(io, BankHttp(io, bank), guard=guard).discover(gap, default_budget())
     p = _proposal(io)
@@ -259,8 +327,9 @@ async def test_kill_switch_blocks_everything(db, io, over):
     assert rep.outcome == "blocked"
     assert PolicyPromotionGate(db.gate, io, guard=guard).decide(p, [], promotion_policy().ref()).outcome == "blocked"
     with db.owner.connect() as conn:
-        after = conn.execute(text("SELECT (SELECT count(*) FROM ops.proposal), (SELECT count(*) FROM ops.gate_result)"
-                                  )).one()
+        after = conn.execute(
+            text("SELECT (SELECT count(*) FROM ops.proposal), (SELECT count(*) FROM ops.gate_result)")
+        ).one()
     assert tuple(after) == tuple(before)
 
 
@@ -312,8 +381,9 @@ def test_structured_importer_validates_spans(db, io):
     ctx = make_context(io, "evidence", datetime.now(UTC), {"t": 1})
     good, bad = _card("Not All Oil Price Shocks Are Alike"), _card("a quote that is not in the source")
     bad["claim_id"] = good["claim_id"] + ".bad"
-    doc = io.put_json({"cards": [good, bad, {"claim_id": "x"}], "source_text": {"crossref_metadata": title}},
-                      "normalised")
+    doc = io.put_json(
+        {"cards": [good, bad, {"claim_id": "x"}], "source_text": {"crossref_metadata": title}}, "normalised"
+    )
     out = StructuredCardImporter(io).run(doc, ctx)
     assert len(out.candidates) == 1 and out.candidates[0].status == "candidate"
     assert len(out.rejected) == 2
@@ -323,12 +393,12 @@ def test_structured_importer_validates_spans(db, io):
 def _r4_tamper(m):
     """The reviewer's malicious manifest (R4-01): approved dataset/concept/geo, lying semantics and identity."""
     sem = m["request_parameters"]["semantics"]
-    sem["temporal_support"] = "point:07-01"            # midyear instead of 1 January
+    sem["temporal_support"] = "point:07-01"  # midyear instead of 1 January
     sem["population_universe"] = "de_facto_population"  # different universe
-    sem["unit_ref"] = "unit.thousand_persons"           # different unit/scale
-    m["source_key"] = "worldbank.wdi"                   # registered under another source
-    m["lineage_family"] = "worldbank"                   # source-family independence bypass
-    m["name"] = "worldbank.wdi.indicators"              # squats a built-in connector name
+    sem["unit_ref"] = "unit.thousand_persons"  # different unit/scale
+    m["source_key"] = "worldbank.wdi"  # registered under another source
+    m["lineage_family"] = "worldbank"  # source-family independence bypass
+    m["name"] = "worldbank.wdi.indicators"  # squats a built-in connector name
     m["version"] = "9.9.9"
     m["cadence"]["minimum_interval_seconds"] = 60
 
@@ -348,14 +418,22 @@ async def test_r4_01_malicious_manifest_is_rejected(db, io):
     assert d2.outcome == "reject", d2.reasons
     text_ = " | ".join(d2.reasons)
     assert "disagrees with its stored evidence" in text_
-    for needle in ("semantics.temporal_support", "semantics.population_universe", "semantics.unit_ref",
-                   "source_key 'worldbank.wdi'", "lineage_family", "collides with a built-in connector",
-                   "is not the derived name", "cadence"):
+    for needle in (
+        "semantics.temporal_support",
+        "semantics.population_universe",
+        "semantics.unit_ref",
+        "source_key 'worldbank.wdi'",
+        "lineage_family",
+        "collides with a built-in connector",
+        "is not the derived name",
+        "cadence",
+    ):
         assert needle in text_, needle
 
 
 async def test_r4_01_scope_is_rederived_even_with_genuine_pass_reports(db, io):
     """Fields the validator cannot see (name, source, lineage) are still bound by the gate."""
+
     def rename(m):
         m["name"] = "eurostat.demo_pjan.fr-shadow"
         m["lineage_family"] = "worldbank_wdi"
@@ -394,15 +472,24 @@ async def test_r4_11_template_digest_is_pinned_in_policy(db, io, tmp_path):
     copy.write_text(_re.sub(r'template_sha256: "[^"]*"', 'template_sha256: "sha256:' + "0" * 64 + '"', text0))
     sha = hashlib.sha256(copy.read_bytes()).hexdigest()
     d = PolicyPromotionGate(db.gate, io, policy_path=copy, pinned_sha256=sha).decide(
-        p, [v, s], ArtifactRef(sha, "policy", "application/yaml"))
+        p, [v, s], ArtifactRef(sha, "policy", "application/yaml")
+    )
     assert d.outcome == "reject" and any("pinned in the signed policy" in r for r in d.reasons)
 
 
-@pytest.mark.parametrize("path,tier", [
-    ("./src/reva/kernel/values.py", 3), ("registry/./policies/promotion.yaml", 3), ("SRC/Reva/Kernel/x.py", 3),
-    ("src/reva/adapters/connectors/eurostat_template.py", 3), ("../outside.txt", 3), ("/etc/passwd", 3),
-    ("a\\b.json", 3), ("connectors/eurostat.demo_pjan.fr/1.0.1/manifest.json", 1),
-])
+@pytest.mark.parametrize(
+    "path,tier",
+    [
+        ("./src/reva/kernel/values.py", 3),
+        ("registry/./policies/promotion.yaml", 3),
+        ("SRC/Reva/Kernel/x.py", 3),
+        ("src/reva/adapters/connectors/eurostat_template.py", 3),
+        ("../outside.txt", 3),
+        ("/etc/passwd", 3),
+        ("a\\b.json", 3),
+        ("connectors/eurostat.demo_pjan.fr/1.0.1/manifest.json", 1),
+    ],
+)
 def test_r4_11_paths_are_normalised_before_tiering(path, tier):
     from reva.autonomy.policy import derive_tier
 
@@ -415,8 +502,16 @@ async def test_r4_01_promote_connector_refuses_fabricated_decision(db, io):
 
     p, _v, _s = await _t1(io, db)
     change = io.get_json(p.patch_or_manifest)
-    fake = GateDecision(uuid.uuid4(), "promote", p.proposal_id, promotion_policy().version, (), ("trust me",),
-                        "gate-evaluator:promotion", None)
+    fake = GateDecision(
+        uuid.uuid4(),
+        "promote",
+        p.proposal_id,
+        promotion_policy().version,
+        (),
+        ("trust me",),
+        "gate-evaluator:promotion",
+        None,
+    )
     with db.owner.connect() as conn:
         before = conn.execute(text("SELECT count(*) FROM evidence.connector_version")).scalar_one()
     with pytest.raises(PolicyDenied):
@@ -450,8 +545,7 @@ def _budget_policy(**per_source):
     from reva.autonomy.policy import budgets_policy
 
     base = budgets_policy()
-    content = {**base.content, "per_source_daily_requests": {**base.content["per_source_daily_requests"],
-                                                             **per_source}}
+    content = {**base.content, "per_source_daily_requests": {**base.content["per_source_daily_requests"], **per_source}}
     return type(base)(base.path, base.sha256, content)
 
 
@@ -472,16 +566,22 @@ def test_r4_08_discovery_budget_zero_means_zero_and_daily_limit_holds(db):
     with pytest.raises(BudgetExhausted):  # unsettled reservation keeps counting (fail closed)
         reserve_discovery(db.worker, src, policy=pol)
     with db.owner.connect() as conn:
-        rows = conn.execute(text("SELECT account_key, consumed FROM ops.budget_ledger WHERE account_key LIKE :a"),
-                            {"a": f"autonomy:discovery:{src}:%"}).all()
+        rows = conn.execute(
+            text("SELECT account_key, consumed FROM ops.budget_ledger WHERE account_key LIKE :a"),
+            {"a": f"autonomy:discovery:{src}:%"},
+        ).all()
     assert {r[0] for r in rows} == {f"autonomy:discovery:{src}:requests", f"autonomy:discovery:{src}:bytes"}
 
 
 def test_r4_08_live_discovery_refused_when_budget_used_up(db):
     with db.owner.begin() as conn:
-        conn.execute(text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
-                          "VALUES ('autonomy:discovery:eurostat.dissemination:requests', :o, 'requests', 0, 1000)"),
-                     {"o": f"test-exhaust-{uuid.uuid4()}"})
+        conn.execute(
+            text(
+                "INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
+                "VALUES ('autonomy:discovery:eurostat.dissemination:requests', :o, 'requests', 0, 1000)"
+            ),
+            {"o": f"test-exhaust-{uuid.uuid4()}"},
+        )
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "live"}, _ctx(db))
     assert out["status"] == "blocked" and out["code"] == "budget_exhausted", out
 

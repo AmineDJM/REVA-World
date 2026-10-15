@@ -164,9 +164,7 @@ def _find_operator(
     return None
 
 
-def compatible(
-    out_port: PortSpec, in_port: PortSpec, operators: Sequence[TransformOperator] = ()
-) -> Compatibility:
+def compatible(out_port: PortSpec, in_port: PortSpec, operators: Sequence[TransformOperator] = ()) -> Compatibility:
     """May ``out_port`` feed ``in_port`` (possibly through approved operators)?
 
     Returns a :class:`Compatibility` carrying every blocking reason (not only the
@@ -200,18 +198,14 @@ def compatible(
     bridge("unit", "unit_conversion", out_port.unit, in_port.unit)
     bridge("basis", "basis_conversion", out_port.basis, in_port.basis)
     bridge("spatial_support", "support_crosswalk", out_port.spatial_support, in_port.spatial_support)
-    bridge(
-        "population_universe", "support_crosswalk", out_port.population_universe, in_port.population_universe
-    )
+    bridge("population_universe", "support_crosswalk", out_port.population_universe, in_port.population_universe)
 
     if tuple(out_port.dimensions) != tuple(in_port.dimensions):
         reasons.append(f"dimensions: {list(out_port.dimensions)} -> {list(in_port.dimensions)} differ")
 
     # Stock / flow / rate interpretation never changes implicitly.
     if out_port.interpretation != in_port.interpretation:
-        bridge(
-            "interpretation", "stock_flow_conversion", out_port.interpretation, in_port.interpretation
-        )
+        bridge("interpretation", "stock_flow_conversion", out_port.interpretation, in_port.interpretation)
 
     # Temporal resolution: coarse -> fine needs disaggregation (+ a permitted
     # interpolation method); fine -> coarse needs an aggregation operator.
@@ -265,11 +259,7 @@ def compatible(
         )
 
     # Dependence: not blocking, but joint uncertainty must not be silently assumed independent.
-    if (
-        out_port.dependence_group
-        and in_port.dependence_group
-        and out_port.dependence_group != in_port.dependence_group
-    ):
+    if out_port.dependence_group and in_port.dependence_group and out_port.dependence_group != in_port.dependence_group:
         warnings.append(
             f"dependence_group: {out_port.dependence_group!r} vs {in_port.dependence_group!r}; joint "
             "uncertainty propagation must declare the dependence explicitly"

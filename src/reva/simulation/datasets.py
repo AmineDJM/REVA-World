@@ -92,10 +92,15 @@ def _origin(origin: Any) -> str:
 
 
 def _row(conn: Connection, where: str, params: Mapping[str, Any]) -> dict[str, Any] | None:
-    row = conn.execute(
-        text(f"""SELECT id, dataset_key, concept_id, subject_key, origin, artifact_sha256, manifest_sha256,
-                        row_count, recorded_at FROM evidence.dataset WHERE {where}"""), dict(params),
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text(f"""SELECT id, dataset_key, concept_id, subject_key, origin, artifact_sha256, manifest_sha256,
+                        row_count, recorded_at FROM evidence.dataset WHERE {where}"""),
+            dict(params),
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 
@@ -137,20 +142,29 @@ def register_dataset(
 
     data = parquet_bytes(table)
     sha = hashlib.sha256(data).hexdigest()
-    existing = _row(conn, "dataset_key = :k AND subject_key = :s AND origin = :o AND artifact_sha256 = :a",
-                    {"k": dataset_key, "s": subject_key, "o": org, "a": sha})
+    existing = _row(
+        conn,
+        "dataset_key = :k AND subject_key = :s AND origin = :o AND artifact_sha256 = :a",
+        {"k": dataset_key, "s": subject_key, "o": org, "a": sha},
+    )
     if existing is not None:
         return DatasetRecord(**existing, created=False)
 
-    acqs = conn.execute(
-        text("""SELECT id::text AS id, raw_sha256, origin FROM evidence.acquisition
-                WHERE id = ANY(CAST(:ids AS uuid[])) ORDER BY id"""), {"ids": acq_ids},
-    ).mappings().all()
+    acqs = (
+        conn.execute(
+            text("""SELECT id::text AS id, raw_sha256, origin FROM evidence.acquisition
+                WHERE id = ANY(CAST(:ids AS uuid[])) ORDER BY id"""),
+            {"ids": acq_ids},
+        )
+        .mappings()
+        .all()
+    )
     found = {a["id"]: a for a in acqs}
     unknown = [a for a in acq_ids if a not in found or found[a]["origin"] != org]
     if unknown:
-        raise ValidationProblem("dataset source acquisitions are unknown or have another origin",
-                                acquisitions=unknown, origin=org)
+        raise ValidationProblem(
+            "dataset source acquisitions are unknown or have another origin", acquisitions=unknown, origin=org
+        )
 
     schema = table_schema(table)
     obj = store.put_bytes(data, NAMESPACE, PARQUET_MEDIA_TYPE)
@@ -173,29 +187,58 @@ def register_dataset(
         "coverage": dict(coverage or {}),
         "byte_hash_note": "Parquet bytes are pinned by sha256 and are not promised identical across library versions",
     }
-    act = repo.simple_activity("dataset.derive", "normalisation", actor,
-                               {"dataset_key": dataset_key, "concept_id": concept_id, "subject_key": subject_key,
-                                "parser_version": parser_version, "source_acquisition_ids": acq_ids})
-    repo.register_artifact(conn, obj, schema_version=TABLE_SCHEMA_VERSION,
-                           rights=dict(rights or {"licence": "derived from source licences; see inputs"}))
+    act = repo.simple_activity(
+        "dataset.derive",
+        "normalisation",
+        actor,
+        {
+            "dataset_key": dataset_key,
+            "concept_id": concept_id,
+            "subject_key": subject_key,
+            "parser_version": parser_version,
+            "source_acquisition_ids": acq_ids,
+        },
+    )
+    repo.register_artifact(
+        conn,
+        obj,
+        schema_version=TABLE_SCHEMA_VERSION,
+        rights=dict(rights or {"licence": "derived from source licences; see inputs"}),
+    )
     manifest_sha = repo.store_json_artifact(conn, store, manifest, NAMESPACE, schema_version=MANIFEST_SCHEMA_VERSION)
     repo.record_activity(
-        conn, act,
+        conn,
+        act,
         inputs=[(raw, {"role": "source_raw"}) for raw in manifest["source_raw_sha256"]],
         outputs=[sha, manifest_sha],
     )
-    row = conn.execute(
-        text("""INSERT INTO evidence.dataset(dataset_key, concept_id, subject_key, origin, artifact_sha256,
+    row = (
+        conn.execute(
+            text("""INSERT INTO evidence.dataset(dataset_key, concept_id, subject_key, origin, artifact_sha256,
                      manifest_sha256, source_acquisition_ids, parser_version, table_schema, row_count, coverage,
                      provenance_activity_id)
                 VALUES (:k, :c, :s, :o, :a, :m, CAST(:acq AS uuid[]), :pv, CAST(:ts AS jsonb), :n,
                         CAST(:cov AS jsonb), :act)
                 RETURNING id, dataset_key, concept_id, subject_key, origin, artifact_sha256, manifest_sha256,
                           row_count, recorded_at"""),
-        {"k": dataset_key, "c": concept_id, "s": subject_key, "o": org, "a": sha, "m": manifest_sha,
-         "acq": acq_ids, "pv": parser_version, "ts": json.dumps(schema), "n": table.num_rows,
-         "cov": json.dumps(dict(coverage or {}), sort_keys=True, default=str), "act": act.id},
-    ).mappings().one()
+            {
+                "k": dataset_key,
+                "c": concept_id,
+                "s": subject_key,
+                "o": org,
+                "a": sha,
+                "m": manifest_sha,
+                "acq": acq_ids,
+                "pv": parser_version,
+                "ts": json.dumps(schema),
+                "n": table.num_rows,
+                "cov": json.dumps(dict(coverage or {}), sort_keys=True, default=str),
+                "act": act.id,
+            },
+        )
+        .mappings()
+        .one()
+    )
     return DatasetRecord(**dict(row), created=True)
 
 
@@ -227,11 +270,17 @@ def dataset_schema_present(conn: Connection) -> bool:
 def manifest_entries(datasets: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
     """The release manifest's ``dataset_inputs`` (pinned by digest)."""
     return [
-        {"dataset_id": str(d["id"]), "dataset_key": d["dataset_key"], "concept_id": d["concept_id"],
-         "subject_key": d["subject_key"], "artifact_sha256": d["artifact_sha256"],
-         "manifest_sha256": d["manifest_sha256"], "parser_version": d["parser_version"],
-         "row_count": int(d["row_count"]),
-         "source_acquisition_ids": sorted(str(a) for a in d["source_acquisition_ids"])}
+        {
+            "dataset_id": str(d["id"]),
+            "dataset_key": d["dataset_key"],
+            "concept_id": d["concept_id"],
+            "subject_key": d["subject_key"],
+            "artifact_sha256": d["artifact_sha256"],
+            "manifest_sha256": d["manifest_sha256"],
+            "parser_version": d["parser_version"],
+            "row_count": int(d["row_count"]),
+            "source_acquisition_ids": sorted(str(a) for a in d["source_acquisition_ids"]),
+        }
         for d in sorted(datasets, key=lambda d: (d["concept_id"], d["subject_key"]))
     ]
 
@@ -272,13 +321,18 @@ def publication_hook(conn: Connection, *, cutoff: datetime, origin: Any) -> tupl
 
 # --------------------------------------------------------------------------- simulation side
 def pinned_datasets(conn: Connection, release_id: Any) -> list[dict[str, Any]]:
-    rows = conn.execute(
-        text("""SELECT d.id, d.dataset_key, d.concept_id, d.subject_key, d.origin, d.artifact_sha256,
+    rows = (
+        conn.execute(
+            text("""SELECT d.id, d.dataset_key, d.concept_id, d.subject_key, d.origin, d.artifact_sha256,
                        d.manifest_sha256, d.parser_version, d.table_schema, d.row_count, d.coverage,
                        d.source_acquisition_ids, d.recorded_at
                 FROM belief.release_dataset p JOIN evidence.dataset d ON d.id = p.dataset_id
-                WHERE p.release_id = :r ORDER BY d.concept_id, d.subject_key"""), {"r": release_id},
-    ).mappings().all()
+                WHERE p.release_id = :r ORDER BY d.concept_id, d.subject_key"""),
+            {"r": release_id},
+        )
+        .mappings()
+        .all()
+    )
     return [dict(r) for r in rows]
 
 
@@ -291,22 +345,31 @@ def _verified_bytes(store: ArtifactStore, sha: str) -> bytes:
 
 def resolve_dataset(conn: Connection, store: ArtifactStore, release_id: Any, req: InputRequirement) -> DatasetInput:
     """The dataset the release pinned for (concept, subject), loaded read-only and verified."""
-    row = conn.execute(
-        text("""SELECT d.id, d.artifact_sha256, d.manifest_sha256, d.table_schema, d.row_count
+    row = (
+        conn.execute(
+            text("""SELECT d.id, d.artifact_sha256, d.manifest_sha256, d.table_schema, d.row_count
                 FROM belief.release_dataset p JOIN evidence.dataset d ON d.id = p.dataset_id
                 WHERE p.release_id = :r AND p.concept_id = :c AND p.subject_key = :s"""),
-        {"r": release_id, "c": req.concept, "s": req.subject},
-    ).mappings().one_or_none()
+            {"r": release_id, "c": req.concept, "s": req.subject},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if row is None:
         return DatasetInput(req, None, None, {}, None, Missing(reason=MissingReason.unavailable))
     manifest_bytes = _verified_bytes(store, row["manifest_sha256"])
     manifest = json.loads(manifest_bytes)
     table = pq.read_table(io.BytesIO(_verified_bytes(store, row["artifact_sha256"])))
     if table.num_rows != row["row_count"] or table_schema(table) != dict(row["table_schema"]):
-        raise IntegrityFailure("pinned dataset does not match its registered row count or schema",
-                               dataset_id=str(row["id"]))
+        raise IntegrityFailure(
+            "pinned dataset does not match its registered row count or schema", dataset_id=str(row["id"])
+        )
     if manifest.get("artifact_sha256") != row["artifact_sha256"]:
         raise IntegrityFailure("dataset manifest does not name the pinned table", dataset_id=str(row["id"]))
-    return DatasetInput(req, str(row["id"]), row["artifact_sha256"], {**manifest, "dataset_id": str(row["id"]),
-                                                                      "manifest_sha256": row["manifest_sha256"]},
-                        table)
+    return DatasetInput(
+        req,
+        str(row["id"]),
+        row["artifact_sha256"],
+        {**manifest, "dataset_id": str(row["id"]), "manifest_sha256": row["manifest_sha256"]},
+        table,
+    )

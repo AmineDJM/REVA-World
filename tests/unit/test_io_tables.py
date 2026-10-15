@@ -32,8 +32,10 @@ DIMS = it.TableDims(countries=syn.COUNTRIES, industries=syn.INDUSTRIES)
 
 
 def parsed_items(**kw: object) -> list[it.ParsedItem]:
-    return [it.parse_sdmx_csv(syn.body(g, **kw), dataset=syn.DATASET, year=syn.YEAR, origins=g, dims=DIMS)
-            for g in syn.groups()]
+    return [
+        it.parse_sdmx_csv(syn.body(g, **kw), dataset=syn.DATASET, year=syn.YEAR, origins=g, dims=DIMS)
+        for g in syn.groups()
+    ]
 
 
 def test_synthetic_table_passes_identities_and_serialises_exact_decimals() -> None:
@@ -52,8 +54,10 @@ def test_synthetic_table_passes_identities_and_serialises_exact_decimals() -> No
     rows = table.to_pylist()
     z = [r for r in rows if r["block"] == "Z" and r["value"] != 0]
     assert {(r["row_country"], r["row_code"], r["col_country"], r["col_code"], r["value"]) for r in z} == {
-        ("DE", "B", "FR", "C10-12", Decimal("20.000")), ("FR", "C10-12", "DE", "C10-12", Decimal("30.000")),
-        ("DE", "C10-12", "FR", "C10-12", Decimal("10.000"))}
+        ("DE", "B", "FR", "C10-12", Decimal("20.000")),
+        ("FR", "C10-12", "DE", "C10-12", Decimal("30.000")),
+        ("DE", "C10-12", "FR", "C10-12", Decimal("10.000")),
+    }
     x = {(r["row_country"], r["row_code"]): r["value"] for r in rows if r["block"] == "X"}
     assert x[("WRL_REST", "C10-12")] == 0 and x[("FR", "B")] == Decimal(100)
     assert built.manifest["economy_iso3"] == {"FR": "FRA", "DE": "DEU", "WRL_REST": "FIGARO_ROW"}
@@ -91,11 +95,21 @@ def test_structural_zero_violation_refuses() -> None:
 
 
 def test_missing_cell_or_empty_value_is_never_zero() -> None:
-    dropped = it.parse_sdmx_csv(syn.body(("FR", "DE"), drop={("FR", "B", "DE", "B")}), dataset=syn.DATASET,
-                                year=syn.YEAR, origins=("FR", "DE"), dims=DIMS)
+    dropped = it.parse_sdmx_csv(
+        syn.body(("FR", "DE"), drop={("FR", "B", "DE", "B")}),
+        dataset=syn.DATASET,
+        year=syn.YEAR,
+        origins=("FR", "DE"),
+        dims=DIMS,
+    )
     assert dropped.blocking and {f.code for f in dropped.findings} == {"incomplete_table"}
-    empty = it.parse_sdmx_csv(syn.body(("FR", "DE"), overrides={("FR", "B", "DE", "B"): ""}),
-                              dataset=syn.DATASET, year=syn.YEAR, origins=("FR", "DE"), dims=DIMS)
+    empty = it.parse_sdmx_csv(
+        syn.body(("FR", "DE"), overrides={("FR", "B", "DE", "B"): ""}),
+        dataset=syn.DATASET,
+        year=syn.YEAR,
+        origins=("FR", "DE"),
+        dims=DIMS,
+    )
     assert "missing_or_non_numeric_value" in {f.code for f in empty.findings}
     items = parsed_items()
     items[0] = dropped
@@ -108,25 +122,26 @@ def test_missing_cell_or_empty_value_is_never_zero() -> None:
 
 def test_schema_drift_is_blocking() -> None:
     wrong_unit = gzip.decompress(syn.body(("WRL_REST",))).replace(b"MIO_EUR", b"MIO_NAC")
-    p = it.parse_sdmx_csv(gzip.compress(wrong_unit), dataset=syn.DATASET, year=syn.YEAR, origins=("WRL_REST",),
-                          dims=DIMS)
+    p = it.parse_sdmx_csv(
+        gzip.compress(wrong_unit), dataset=syn.DATASET, year=syn.YEAR, origins=("WRL_REST",), dims=DIMS
+    )
     assert "unit_mismatch" in {f.code for f in p.findings}
     p = it.parse_sdmx_csv(syn.body(("WRL_REST",)), dataset=syn.DATASET, year=2023, origins=("WRL_REST",), dims=DIMS)
     assert "period_mismatch" in {f.code for f in p.findings}
     p = it.parse_sdmx_csv(syn.body(("FR", "DE")), dataset=syn.DATASET, year=syn.YEAR, origins=("FR",), dims=DIMS)
     assert "origin_mismatch" in {f.code for f in p.findings}
     flagged = gzip.decompress(syn.body(("WRL_REST",))).replace(b",,\n", b",,c\n", 1)
-    p = it.parse_sdmx_csv(gzip.compress(flagged), dataset=syn.DATASET, year=syn.YEAR, origins=("WRL_REST",),
-                          dims=DIMS)
+    p = it.parse_sdmx_csv(gzip.compress(flagged), dataset=syn.DATASET, year=syn.YEAR, origins=("WRL_REST",), dims=DIMS)
     assert "confidential_cells" in {f.code for f in p.findings}
     with pytest.raises(SourceResponseError, match="header"):
-        it.parse_sdmx_csv(gzip.compress(b"a,b\n1,2\n"), dataset=syn.DATASET, year=syn.YEAR, origins=("FR",),
-                          dims=DIMS)
+        it.parse_sdmx_csv(gzip.compress(b"a,b\n1,2\n"), dataset=syn.DATASET, year=syn.YEAR, origins=("FR",), dims=DIMS)
 
 
 def test_async_queued_envelope_is_a_typed_retryable_error_not_data() -> None:
-    body = (b'<?xml version="1.0" encoding="UTF-8" ?><env:Envelope><env:Body><ns0:syncResponse>'
-            b"<queued><id>x</id><status>SUBMITTED</status></queued></ns0:syncResponse></env:Body></env:Envelope>")
+    body = (
+        b'<?xml version="1.0" encoding="UTF-8" ?><env:Envelope><env:Body><ns0:syncResponse>'
+        b"<queued><id>x</id><status>SUBMITTED</status></queued></ns0:syncResponse></env:Body></env:Envelope>"
+    )
     with pytest.raises(SourceResponseError) as e:
         it.csv_bytes(body)
     assert e.value.details["kind"] == "provider_async_queued" and e.value.retryable
@@ -189,15 +204,26 @@ def test_plan_and_follow_up_items() -> None:
     assert item.url.endswith("/contentconstraint/ESTAT/NAIO_10_FCP_II4")
     from reva.ports.connectors import RawAcquisition
 
-    raw = RawAcquisition(item=item, body=syn.constraint_xml(), media_type="application/xml",
-                         retrieved_at="2026-10-15T00:00:00+00:00", response_metadata={}, request_fingerprint="x",
-                         origin="test_fixture")
+    raw = RawAcquisition(
+        item=item,
+        body=syn.constraint_xml(),
+        media_type="application/xml",
+        retrieved_at="2026-10-15T00:00:00+00:00",
+        response_metadata={},
+        request_fingerprint="x",
+        origin="test_fixture",
+    )
     [batch] = list(c.parse(raw))
     keys = [f.key for f in batch.follow_up]
-    assert keys == ["data:NAIO_10_FCP_II4:2024:FR+DE", "data:NAIO_10_FCP_II4:2024:WRL_REST",
-                    "data:NAIO_10_FCP_II4:2024:DOM"]
-    assert all("format=SDMX-CSV&compressed=true" in f.url and "startPeriod=2024&endPeriod=2024" in f.url
-               for f in batch.follow_up)
+    assert keys == [
+        "data:NAIO_10_FCP_II4:2024:FR+DE",
+        "data:NAIO_10_FCP_II4:2024:WRL_REST",
+        "data:NAIO_10_FCP_II4:2024:DOM",
+    ]
+    assert all(
+        "format=SDMX-CSV&compressed=true" in f.url and "startPeriod=2024&endPeriod=2024" in f.url
+        for f in batch.follow_up
+    )
     figaro = it.origin_groups()
     assert len(figaro) == 26 and figaro[-1] == ("DOM",) and all(len(g) == 2 for g in figaro[:-1])
 

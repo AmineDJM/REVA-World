@@ -27,8 +27,13 @@ from reva.simulation import plugins
 from reva.simulation.plugins import ResolvedInputs
 from reva.simulation.spec import validate_scenario_spec
 
-DS = {"population": "demo_pjan", "deaths": "demo_magec", "births": "demo_fasec",
-      "europop_migration": "proj_23nanmig", "europop_fertility": "proj_23naasfr"}
+DS = {
+    "population": "demo_pjan",
+    "deaths": "demo_magec",
+    "births": "demo_fasec",
+    "europop_migration": "proj_23nanmig",
+    "europop_fertility": "proj_23naasfr",
+}
 
 
 @cache
@@ -55,8 +60,13 @@ def table(name: str, iso3: str) -> Any:
 
 def country(iso3: str) -> C.CountryDemography:
     return C.CountryDemography.from_tables(
-        iso3, population=table("population", iso3), deaths=table("deaths", iso3), births=table("births", iso3),
-        europop_migration=table("europop_migration", iso3), europop_fertility=table("europop_fertility", iso3))
+        iso3,
+        population=table("population", iso3),
+        deaths=table("deaths", iso3),
+        births=table("births", iso3),
+        europop_migration=table("europop_migration", iso3),
+        europop_fertility=table("europop_fertility", iso3),
+    )
 
 
 # --------------------------------------------------------------------------- numerics
@@ -111,8 +121,9 @@ def test_projection_conservation_every_year_and_outputs() -> None:
     vals = C.output_values(p)
     assert {k for k, _ in vals} == set(OUTPUT_KEYS)
     y = 2030
-    assert vals[("population.total.all_ages", y)] == C.xadd(vals[("population.female.all_ages", y)],
-                                                           vals[("population.male.all_ages", y)])
+    assert vals[("population.total.all_ages", y)] == C.xadd(
+        vals[("population.female.all_ages", y)], vals[("population.male.all_ages", y)]
+    )
     r = vals[("old_age_dependency_ratio_65plus_per_15_64", y)]
     assert r == C.div(100 * vals[("population.total.age_65_plus", y)], vals[("population.total.age_15_64", y)])
     r67 = vals[("old_age_dependency_ratio_67plus_per_20_66", y)]
@@ -126,14 +137,20 @@ def test_no_information_after_jump_off() -> None:
     with pytest.raises(ValidationProblem):
         C.project(lu, jump_off=2013, end_year=2023, assumptions=C.Assumptions(base_period=(2009, 2013)))
     with pytest.raises(ValidationProblem):
-        C.project(lu, jump_off=2013, end_year=2023,
-                  assumptions=C.Assumptions(base_period=(2008, 2012), migration_window=(2010, 2013)))
+        C.project(
+            lu,
+            jump_off=2013,
+            end_year=2023,
+            assumptions=C.Assumptions(base_period=(2008, 2012), migration_window=(2010, 2013)),
+        )
 
 
 def test_backtest_reports_metrics_without_tuning() -> None:
     bt = C.backtest(country("LUX"), jump_off=2013, target_year=2023, base_period=(2008, 2012))
-    assert set(bt["variants"]) == {"mig=average_residual;fert=constant_base_period_rates",
-                                   "mig=zero;fert=constant_base_period_rates"}
+    assert set(bt["variants"]) == {
+        "mig=average_residual;fert=constant_base_period_rates",
+        "mig=zero;fert=constant_base_period_rates",
+    }
     for v in bt["variants"].values():
         assert set(v["groups"]) == set(C.COMPARISON_GROUPS)
         assert Decimal(v["total_ape"]) >= 0
@@ -155,14 +172,24 @@ def test_unknown_assumption_refused() -> None:
 # --------------------------------------------------------------------------- plugin
 def spec(**over: Any) -> dict[str, Any]:
     doc = {
-        "schema_version": "2.0.0", "title": "Population projection (test)",
+        "schema_version": "2.0.0",
+        "title": "Population projection (test)",
         "baseline_release_id": "00000000-0000-4000-8000-000000000001",
-        "knowledge_cutoff": "2026-10-01T00:00:00Z", "model_key": "demography.cohort_component",
-        "model_version": "1.0.0", "countries": ["LUX", "LIE"], "reference_year": 2025,
-        "horizon": {"periods": 10, "unit": "calendar_year"}, "intervention": {"kind": "baseline_projection"},
-        "assumptions": {"mortality": "constant_base_period_rates", "fertility": "constant_base_period_rates",
-                        "migration": "average_residual", "base_period": {"first_year": 2019, "last_year": 2023}},
-        "fidelity": "L1", "missing_input_policy": "fail",
+        "knowledge_cutoff": "2026-10-01T00:00:00Z",
+        "model_key": "demography.cohort_component",
+        "model_version": "1.0.0",
+        "countries": ["LUX", "LIE"],
+        "reference_year": 2025,
+        "horizon": {"periods": 10, "unit": "calendar_year"},
+        "intervention": {"kind": "baseline_projection"},
+        "assumptions": {
+            "mortality": "constant_base_period_rates",
+            "fertility": "constant_base_period_rates",
+            "migration": "average_residual",
+            "base_period": {"first_year": 2019, "last_year": 2023},
+        },
+        "fidelity": "L1",
+        "missing_input_policy": "fail",
         "outputs": ["population.total.all_ages", "old_age_dependency_ratio_65plus_per_15_64", "births.total"],
         "seed": 0,
     }
@@ -190,16 +217,32 @@ def test_plugin_is_registered_and_spec_validates() -> None:
     assert m["review_status"] == "maintainer_review_pending" and "not a forecast" in m["label"]
 
 
-@pytest.mark.parametrize("over, err", [
-    ({"assumptions": {**spec()["assumptions"], "base_period": {"first_year": 2021, "last_year": 2025}}},
-     ValidationProblem),
-    ({"assumptions": {**spec()["assumptions"], "sensitivity": {"migration": ["zero"],
-                                                               "fertility": ["constant_base_period_rates"]}}},
-     ValidationProblem),
-    ({"fidelity": "L2"}, ValidationProblem),
-    ({"horizon": {"periods": 40, "unit": "calendar_year"},
-      "assumptions": {**spec()["assumptions"], "migration": "europop2023_bsl"}}, CapabilityGap),
-])
+@pytest.mark.parametrize(
+    "over, err",
+    [
+        (
+            {"assumptions": {**spec()["assumptions"], "base_period": {"first_year": 2021, "last_year": 2025}}},
+            ValidationProblem,
+        ),
+        (
+            {
+                "assumptions": {
+                    **spec()["assumptions"],
+                    "sensitivity": {"migration": ["zero"], "fertility": ["constant_base_period_rates"]},
+                }
+            },
+            ValidationProblem,
+        ),
+        ({"fidelity": "L2"}, ValidationProblem),
+        (
+            {
+                "horizon": {"periods": 40, "unit": "calendar_year"},
+                "assumptions": {**spec()["assumptions"], "migration": "europop2023_bsl"},
+            },
+            CapabilityGap,
+        ),
+    ],
+)
 def test_plugin_validation_refusals(over: dict[str, Any], err: type[Exception]) -> None:
     with pytest.raises(err):
         MODEL.validate(spec(**over))
@@ -232,16 +275,25 @@ def test_l1_rows_have_periods_labels_and_rounded_values() -> None:
 
 
 def test_l2_grid_range_contains_l1_and_europop_gap_for_liechtenstein() -> None:
-    doc = spec(fidelity="L2", assumptions={
-        **spec()["assumptions"],
-        "sensitivity": {"migration": ["zero", "average_residual", "europop2023_bsl"],
-                        "fertility": ["constant_base_period_rates", "europop2023_bsl"]}})
+    doc = spec(
+        fidelity="L2",
+        assumptions={
+            **spec()["assumptions"],
+            "sensitivity": {
+                "migration": ["zero", "average_residual", "europop2023_bsl"],
+                "fertility": ["constant_base_period_rates", "europop2023_bsl"],
+            },
+        },
+    )
     comp = MODEL.compile(resolved(doc), doc)
     assert [c.status for c in comp.countries] == ["ready", "ready"]
     lie = next(c for c in comp.countries if c.iso3 == "LIE")
     assert {u["variant"] for u in lie.unavailable_variants} == {
-        "mig=europop2023_bsl;fert=constant_base_period_rates", "mig=europop2023_bsl;fert=europop2023_bsl",
-        "mig=zero;fert=europop2023_bsl", "mig=average_residual;fert=europop2023_bsl"}
+        "mig=europop2023_bsl;fert=constant_base_period_rates",
+        "mig=europop2023_bsl;fert=europop2023_bsl",
+        "mig=zero;fert=europop2023_bsl",
+        "mig=average_residual;fert=europop2023_bsl",
+    }
     rows = MODEL.compute(comp, "L2")
     lux_variants = {r.variant for r in rows if r.iso3 == "LUX"}
     assert len(lux_variants) == 1 + 5 + 1  # L1, 5 other grid points, range
@@ -268,8 +320,11 @@ def test_missing_dataset_is_missing_input_or_skipped_never_zero() -> None:
 
 
 def test_single_age_output_is_opt_in() -> None:
-    doc = spec(countries=["LUX"], horizon={"periods": 2, "unit": "calendar_year"},
-               outputs=["population.total.all_ages", SINGLE_AGE_TOKEN])
+    doc = spec(
+        countries=["LUX"],
+        horizon={"periods": 2, "unit": "calendar_year"},
+        outputs=["population.total.all_ages", SINGLE_AGE_TOKEN],
+    )
     comp = MODEL.compile(resolved(doc), doc)
     rows = MODEL.compute(comp, "L1")
     omega = comp.countries[0].rates.omega

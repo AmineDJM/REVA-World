@@ -30,8 +30,9 @@ from reva.ports.autonomy import KnowledgeGap
 pytestmark = pytest.mark.db
 
 CONNECTOR = "eurostat.demo_pjan.fr"
-SAMPLE_URL = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan"
-              "?format=JSON&lang=EN&geo=FR&time=2023")
+SAMPLE_URL = (
+    "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=FR&time=2023"
+)
 
 
 def _sample() -> dict:
@@ -42,10 +43,17 @@ def _sample() -> dict:
 
 def _gap(io, **over) -> KnowledgeGap:
     ctx = make_context(io, "evidence", datetime.now(UTC), {"schema": "test"})
-    base = dict(gap_id=uuid.uuid4(), requirement_id="R-POP-JAN-AGESEX",
-                concept_version="demography.population.jan1_age_sex@1.0.0", geography=("FRA",),
-                temporal_support={"years": [2023]}, reason="unsupported: no eligible connector", priority=1.0,
-                priority_method="test", context=ctx)
+    base = dict(
+        gap_id=uuid.uuid4(),
+        requirement_id="R-POP-JAN-AGESEX",
+        concept_version="demography.population.jan1_age_sex@1.0.0",
+        geography=("FRA",),
+        temporal_support={"years": [2023]},
+        reason="unsupported: no eligible connector",
+        priority=1.0,
+        priority_method="test",
+        context=ctx,
+    )
     base.update(over)
     return KnowledgeGap(**base)
 
@@ -144,9 +152,10 @@ def _drop_status(doc):
     del doc["status"]
 
 
-@pytest.mark.parametrize("mutation,code", [(_swap_order, "dimension_order_changed"),
-                                           (_change_unit, "unit_changed"),
-                                           (_drop_status, "status_missing")])
+@pytest.mark.parametrize(
+    "mutation,code",
+    [(_swap_order, "dimension_order_changed"), (_change_unit, "unit_changed"), (_drop_status, "status_missing")],
+)
 async def test_validator_fails_mutated_sample(io, mutation, code):
     # the manifest is generated from the genuine sample; validation replays a mutated one
     _, _, _cands, _mappings, cp = await _pipeline(io)
@@ -190,13 +199,24 @@ def _job_ctx(db, tmp_path):
 
     jid = uuid.uuid4()
     with db.owner.begin() as conn:
-        conn.execute(text("""INSERT INTO ops.job(id, job_type, payload, idempotency_key, status, worker_id,
+        conn.execute(
+            text("""INSERT INTO ops.job(id, job_type, payload, idempotency_key, status, worker_id,
                                  lease_until, fencing_token, attempts)
                              VALUES (:i, 'discovery', '{}'::jsonb, :k, 'running', 'test-worker',
                                      clock_timestamp() + interval '10 minutes', 7, 1)"""),
-                     {"i": jid, "k": f"test-discovery-{jid}"})
-    return JobContext(job_id=jid, job_type="discovery", worker_id="test-worker", fencing_token=7, attempt=1,
-                      settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+            {"i": jid, "k": f"test-discovery-{jid}"},
+        )
+    return JobContext(
+        job_id=jid,
+        job_type="discovery",
+        worker_id="test-worker",
+        fencing_token=7,
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
 
 
 async def test_end_to_end_promotion_ingestion_and_belief_separation(db, gate_service, tmp_path):
@@ -211,37 +231,69 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, gate_ser
     assert out["value_estimate"]["kind"] == "uncertainty_reduction_proxy"
     assert out["rejected_equivalences"] and out["rejected_equivalences"][0]["outcome"] == "reject"
     with db.owner.connect() as conn:
-        cv = conn.execute(text("SELECT id, code_digest, declared_capabilities FROM evidence.connector_version "
-                               "WHERE name=:n AND version='1.0.0'"), {"n": CONNECTOR}).mappings().one()
+        cv = (
+            conn.execute(
+                text(
+                    "SELECT id, code_digest, declared_capabilities FROM evidence.connector_version "
+                    "WHERE name=:n AND version='1.0.0'"
+                ),
+                {"n": CONNECTOR},
+            )
+            .mappings()
+            .one()
+        )
         assert cv["declared_capabilities"]["template"] == "eurostat_jsonstat"
-        elig = conn.execute(text(
-            """SELECT e.decision, e.applicability, e.policy_version FROM evidence.eligibility e
+        elig = (
+            conn.execute(
+                text(
+                    """SELECT e.decision, e.applicability, e.policy_version FROM evidence.eligibility e
                JOIN ontology.concept_version c ON c.id = e.concept_version_id
-               WHERE e.connector_version_id = :cv AND c.concept_id = 'demography.population.jan1_age_sex'"""),
-            {"cv": cv["id"]}).mappings().all()
+               WHERE e.connector_version_id = :cv AND c.concept_id = 'demography.population.jan1_age_sex'"""
+                ),
+                {"cv": cv["id"]},
+            )
+            .mappings()
+            .all()
+        )
         assert len(elig) == 1 and elig[0]["decision"] == "eligible"
         assert elig[0]["applicability"]["subjects"] == ["FRA"]
         assert elig[0]["policy_version"] == "promotion-1.1.0"
-        wdi_elig = conn.execute(text(
-            """SELECT count(*) FROM evidence.eligibility e JOIN ontology.concept_version c
+        wdi_elig = conn.execute(
+            text(
+                """SELECT count(*) FROM evidence.eligibility e JOIN ontology.concept_version c
                ON c.id = e.concept_version_id WHERE e.connector_version_id = :cv
-               AND c.concept_id = 'demography.population.wdi_midyear_total'"""), {"cv": cv["id"]}).scalar_one()
+               AND c.concept_id = 'demography.population.wdi_midyear_total'"""
+            ),
+            {"cv": cv["id"]},
+        ).scalar_one()
         assert wdi_elig == 0
-        gates = conn.execute(text(
-            """SELECT p.proposal_type, g.decision, g.evaluator, p.author FROM ops.gate_result g
+        gates = (
+            conn.execute(
+                text(
+                    """SELECT p.proposal_type, g.decision, g.evaluator, p.author FROM ops.gate_result g
                JOIN ops.proposal p ON p.id = g.proposal_id
-               WHERE p.id IN (:a, :b)"""),
-            {"a": uuid.UUID(out["gate"]["proposal_id"]),
-             "b": uuid.UUID(out["rejected_equivalences"][0]["proposal_id"])}).mappings().all()
+               WHERE p.id IN (:a, :b)"""
+                ),
+                {
+                    "a": uuid.UUID(out["gate"]["proposal_id"]),
+                    "b": uuid.UUID(out["rejected_equivalences"][0]["proposal_id"]),
+                },
+            )
+            .mappings()
+            .all()
+        )
         kinds = {(g["proposal_type"], g["decision"]) for g in gates}
         assert ("connector_promotion", "pass") in kinds and ("mapping_equivalence", "fail") in kinds
         assert all(g["evaluator"] == "gate-evaluator:promotion" != "gate-evaluator:" + g["author"] for g in gates)
-        incompatible = conn.execute(text(
-            "SELECT mapping_kind FROM ontology.mapping WHERE mapping_key='eurostat.demo_pjan.to_wdi_midyear'"
-        )).scalar_one()
+        incompatible = conn.execute(
+            text("SELECT mapping_kind FROM ontology.mapping WHERE mapping_key='eurostat.demo_pjan.to_wdi_midyear'")
+        ).scalar_one()
         assert incompatible == "incompatible"
-        outbox = conn.execute(text("SELECT payload FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
-                                   )).scalars().all()
+        outbox = (
+            conn.execute(text("SELECT payload FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"))
+            .scalars()
+            .all()
+        )
         assert outbox and outbox[-1]["rollback_sha256"]
 
     # Ingest the captured sample through the existing run_connector/publish_acquisition path.
@@ -250,11 +302,18 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, gate_ser
     rep = await run_connector(conn_obj, FixtureHttp(CONNECTOR), db.store, db.worker, persist_cursor=False)
     assert rep.inserted == 309, rep.as_dict()
     with db.owner.connect() as conn:
-        rows = conn.execute(text(
-            """SELECT o.logical_key, o.value, o.source_flags, s.temporal_extent, s.population_spec, s.aggregation,
+        rows = (
+            conn.execute(
+                text(
+                    """SELECT o.logical_key, o.value, o.source_flags, s.temporal_extent, s.population_spec, s.aggregation,
                       s.resolution FROM evidence.observation o JOIN world.support s ON s.id = o.support_id
-               JOIN evidence.connector_version cv ON cv.id = o.connector_version_id WHERE cv.name = :n"""),
-            {"n": CONNECTOR}).mappings().all()
+               JOIN evidence.connector_version cv ON cv.id = o.connector_version_id WHERE cv.name = :n"""
+                ),
+                {"n": CONNECTOR},
+            )
+            .mappings()
+            .all()
+        )
     by_key = {r["logical_key"]: r for r in rows}
     total = by_key["eurostat:demo_pjan:FR:T:TOTAL:2023"]
     assert total["value"]["value"] == "68277210" and total["source_flags"]["status"] == "p"
@@ -275,17 +334,30 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, gate_ser
 
     wb = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(wb, FixtureHttp(wb.describe().name), db.store, db.worker, persist_cursor=False)
-    rel = publish_release(db.worker, db.store, cutoff=None, origin=Origin.test_fixture, environment="test",
-                          concepts=["demography.population.jan1_age_sex", "demography.population.wdi_midyear_total"])
+    rel = publish_release(
+        db.worker,
+        db.store,
+        cutoff=None,
+        origin=Origin.test_fixture,
+        environment="test",
+        concepts=["demography.population.jan1_age_sex", "demography.population.wdi_midyear_total"],
+    )
     with db.owner.connect() as conn:
-        est = conn.execute(text(
-            """SELECT c.concept_id, o.source_id, s.source_key, e.alternatives, sp.temporal_extent
+        est = (
+            conn.execute(
+                text(
+                    """SELECT c.concept_id, o.source_id, s.source_key, e.alternatives, sp.temporal_extent
                FROM belief.estimate e JOIN belief.input i ON i.estimate_id = e.id
                JOIN evidence.observation o ON o.id = i.observation_id
                JOIN evidence.source s ON s.id = o.source_id
                JOIN ontology.concept_version c ON c.id = e.concept_version_id
-               JOIN world.support sp ON sp.id = e.support_id WHERE e.release_id = :r"""),
-            {"r": rel.release_id}).mappings().all()
+               JOIN world.support sp ON sp.id = e.support_id WHERE e.release_id = :r"""
+                ),
+                {"r": rel.release_id},
+            )
+            .mappings()
+            .all()
+        )
     jan = [e for e in est if e["concept_id"] == "demography.population.jan1_age_sex"]
     mid = [e for e in est if e["concept_id"] == "demography.population.wdi_midyear_total"]
     assert len(jan) == 309 and mid
@@ -303,26 +375,44 @@ async def test_rollback_retires_eligibility(db, gate_service, tmp_path):
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
     assert out["status"] in ("promoted", "no_gap", "already_promoted"), out
     with pytest.raises(Exception):
-        rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
-                           "agent:autonomy-discovery", "test")
+        rollback_promotion(
+            db.worker,
+            CONNECTOR,
+            "1.0.0",
+            "demography.population.jan1_age_sex@1.0.0",
+            "agent:autonomy-discovery",
+            "test",
+        )
     # a named human acts through the admin path; the database refuses human attribution from the
     # worker login (R5-01)
-    rollback_promotion(db.owner, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
-                       "human:maintainer", "rollback drill")
+    rollback_promotion(
+        db.owner, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0", "human:maintainer", "rollback drill"
+    )
     with db.owner.connect() as conn:
-        cv = conn.execute(text("SELECT id FROM evidence.connector_version WHERE name=:n"),
-                          {"n": CONNECTOR}).scalar_one()
-        c = conn.execute(text("SELECT id FROM ontology.concept_version WHERE concept_id="
-                              "'demography.population.jan1_age_sex'")).scalar_one()
-        ok = conn.execute(text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"),
-                          {"cv": cv, "c": c, "s": entity_id("FRA")}).scalar_one()
+        cv = conn.execute(
+            text("SELECT id FROM evidence.connector_version WHERE name=:n"), {"n": CONNECTOR}
+        ).scalar_one()
+        c = conn.execute(
+            text("SELECT id FROM ontology.concept_version WHERE concept_id='demography.population.jan1_age_sex'")
+        ).scalar_one()
+        ok = conn.execute(
+            text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"),
+            {"cv": cv, "c": c, "s": entity_id("FRA")},
+        ).scalar_one()
     assert ok is False
 
 
 # --------------------------------------------------------------------------- R4-09 / R4-14 (offline)
-@pytest.mark.parametrize("template", ["k:{geo.__class__.__mro__}:{time}", "eurostat:{dataset}:{time:>200000}",
-                                      "eurostat:{dataset}:{geo}:{nope}:{time}", "eurostat:{dataset}:{geo}",
-                                      "eurostat:{dataset}:{geo[0]}:{time}"])
+@pytest.mark.parametrize(
+    "template",
+    [
+        "k:{geo.__class__.__mro__}:{time}",
+        "eurostat:{dataset}:{time:>200000}",
+        "eurostat:{dataset}:{geo}:{nope}:{time}",
+        "eurostat:{dataset}:{geo}",
+        "eurostat:{dataset}:{geo[0]}:{time}",
+    ],
+)
 async def test_r4_09_logical_key_template_is_strict(io, template):
     from reva.adapters.connectors.eurostat_template import validate_manifest
     from reva.kernel.errors import ValidationProblem
@@ -338,8 +428,10 @@ def test_r4_09_render_is_plain_substitution():
     from reva.adapters.connectors.eurostat_template import render_logical_key
     from reva.kernel.errors import SourceResponseError
 
-    assert render_logical_key("eurostat:{dataset}:{geo}:{time}",
-                              {"dataset": "d", "geo": "{time}", "time": "2023"}) == "eurostat:d:{time}:2023"
+    assert (
+        render_logical_key("eurostat:{dataset}:{geo}:{time}", {"dataset": "d", "geo": "{time}", "time": "2023"})
+        == "eurostat:d:{time}:2023"
+    )
     with pytest.raises(SourceResponseError):
         render_logical_key("eurostat:{dataset}:{geo}", {"dataset": "d", "geo": "x" * 600})
 
@@ -349,8 +441,11 @@ async def test_r4_09_generated_key_layout_is_template_derived(io):
 
     *_, cp = await _pipeline(io)
     m = io.get_json(cp.manifest)
-    assert m["request_parameters"]["logical_key_template"] == canonical_logical_key_template(m) == \
-        "eurostat:{dataset}:{geo}:{sex}:{age}:{time}"
+    assert (
+        m["request_parameters"]["logical_key_template"]
+        == canonical_logical_key_template(m)
+        == "eurostat:{dataset}:{geo}:{sex}:{age}:{time}"
+    )
 
 
 def _bad_index(doc):
@@ -399,8 +494,14 @@ CONCEPT = "demography.population.jan1_age_sex@1.0.0"
 
 def _version_rows(db):
     with db.owner.connect() as conn:
-        return conn.execute(text("SELECT version FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at"),
-                            {"n": CONNECTOR}).scalars().all()
+        return (
+            conn.execute(
+                text("SELECT version FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at"),
+                {"n": CONNECTOR},
+            )
+            .scalars()
+            .all()
+        )
 
 
 def _count(db, sql):
@@ -416,8 +517,10 @@ async def test_r4_04_rediscovery_after_rollback_holds(db, gate_service, tmp_path
     if out["status"] != "rolled_back_hold":  # make the precondition explicit (shared session DB)
         rollback_promotion(db.owner, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill")
     events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
-    passes = ("SELECT count(*) FROM ops.gate_result g JOIN ops.proposal p ON p.id=g.proposal_id "
-              "WHERE p.proposal_type='connector_promotion' AND g.decision='pass'")
+    passes = (
+        "SELECT count(*) FROM ops.gate_result g JOIN ops.proposal p ON p.id=g.proposal_id "
+        "WHERE p.proposal_type='connector_promotion' AND g.decision='pass'"
+    )
     elig = "SELECT count(*) FROM evidence.eligibility"
     before = (_count(db, events), _count(db, passes), _count(db, elig))
     out2 = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
@@ -465,14 +568,21 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     assert new_id is None and new_v not in _version_rows(db)
 
     async def gate_pass(manifest):
-        cp2 = type(cp)(cp.proposal_id, cp.candidate, cp.template_id, cp.template_digest,
-                       io_.put_json(manifest, "models"), cp.mapping)
+        cp2 = type(cp)(
+            cp.proposal_id,
+            cp.candidate,
+            cp.template_id,
+            cp.template_digest,
+            io_.put_json(manifest, "models"),
+            cp.mapping,
+        )
         v = await JsonStatConnectorValidator(io_).validate(cp2, bank, default_budget())
         val = ValueEstimate("unsupported", None, None, {}, io_.put_json({"t": 1}, "evaluation"), "t")
         p = connector_change_proposal(io_, cp2, manifest, mappings[0], val, promotion_policy())
         # (R5-01) the recorded scope is what the database binds the gate pass to
-        ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion",
-                                              scope=connector_promotion_scope(io_, manifest, mp), risk={})
+        ProposalStore(db.worker, io_).persist(
+            p, proposal_type="connector_promotion", scope=connector_promotion_scope(io_, manifest, mp), risk={}
+        )
         s = await TrustedTemplateSandbox(io_, fixtures=bank).run(p, trusted_template_policy(default_budget()))
         return PolicyPromotionGate(db.gate, io_).decide(p, [v, s], promotion_policy().ref())
 
@@ -519,8 +629,11 @@ async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, gate_
     with db.worker.connect() as conn:
         snap = build_coverage_snapshot(conn, datetime.now(UTC), ["test_fixture"], load_registry())
     assert "FRA" in snap["template_changed"]["demography.population.jan1_age_sex"]
-    rows = [r for r in classify(load_registry().requirements, snap, datetime.now(UTC))
-            if r["requirement_id"] == "R-POP-JAN-AGESEX"]
+    rows = [
+        r
+        for r in classify(load_registry().requirements, snap, datetime.now(UTC))
+        if r["requirement_id"] == "R-POP-JAN-AGESEX"
+    ]
     assert rows and all(r["status"] == "unsupported" and "template_changed" in r["detail"] for r in rows)
     avail = promoted_connector_availability(db.worker, CONNECTOR)
     assert avail is not None and avail["status"] == "not_promoted" and avail["state"] == "template_changed"
@@ -579,6 +692,7 @@ async def test_live_catalogue_and_sample_still_conform(io):
     cp = DeclarativeConnectorGenerator(io).generate(cands[0], mapping, ("eurostat_jsonstat",))
     empty = io.put_json({"schema": "reva-fixture-bank/1", "connector": CONNECTOR, "entries": []}, "raw")
     rep = await JsonStatConnectorValidator(io, live_client_factory=lambda hosts: client).validate(
-        cp, empty, default_budget())
+        cp, empty, default_budget()
+    )
     assert rep.outcome == "pass", [(f.code, f.message) for f in rep.findings]
     assert io.get_json(rep.evidence_manifest)["fixture_bank"]

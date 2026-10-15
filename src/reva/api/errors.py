@@ -83,10 +83,16 @@ def install_error_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(StarletteHTTPException)
     async def _http(request: Request, exc: StarletteHTTPException) -> JSONResponse:
-        code = {404: "not_found", 405: "method_not_allowed", 401: "unauthenticated", 403: "forbidden",
-                413: "payload_too_large"}.get(exc.status_code, "http_error")
-        return problem_response(request, _problem(exc.status_code, code, str(exc.detail)),
-                                dict(exc.headers) if exc.headers else None)
+        code = {
+            404: "not_found",
+            405: "method_not_allowed",
+            401: "unauthenticated",
+            403: "forbidden",
+            413: "payload_too_large",
+        }.get(exc.status_code, "http_error")
+        return problem_response(
+            request, _problem(exc.status_code, code, str(exc.detail)), dict(exc.headers) if exc.headers else None
+        )
 
     @app.exception_handler(OperationalError)
     async def _db_unavailable(request: Request, exc: OperationalError) -> JSONResponse:
@@ -101,8 +107,9 @@ def install_error_handlers(app: FastAPI) -> None:
             return problem_response(request, _problem(422, "rejected_by_database", _db_message(exc)))
         if isinstance(sqlstate, str) and sqlstate.startswith("22"):
             # data exception (bad cast, out of range...): a client parameter problem, not a server fault
-            return problem_response(request, _problem(400, "invalid_parameter",
-                                                      "a request parameter has an invalid value"))
+            return problem_response(
+                request, _problem(400, "invalid_parameter", "a request parameter has an invalid value")
+            )
         if sqlstate == "57014":
             return problem_response(request, _problem(503, "statement_timeout", "query exceeded the time budget"))
         log.exception("database error", extra={"request_id": getattr(request.state, "request_id", None)})

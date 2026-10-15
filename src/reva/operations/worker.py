@@ -62,8 +62,13 @@ from reva.settings import Settings, threads_budget
 log = logging.getLogger("reva.worker")
 
 THREAD_ENV_VARS = (
-    "OMP_NUM_THREADS", "OPENBLAS_NUM_THREADS", "MKL_NUM_THREADS", "POLARS_MAX_THREADS",
-    "NUMEXPR_NUM_THREADS", "VECLIB_MAXIMUM_THREADS", "RAYON_NUM_THREADS",
+    "OMP_NUM_THREADS",
+    "OPENBLAS_NUM_THREADS",
+    "MKL_NUM_THREADS",
+    "POLARS_MAX_THREADS",
+    "NUMEXPR_NUM_THREADS",
+    "VECLIB_MAXIMUM_THREADS",
+    "RAYON_NUM_THREADS",
 )
 MIN_SCHEMA_REVISION = 7  # 0007_security
 DEFAULT_DRAIN_SECONDS = 100.0
@@ -129,9 +134,11 @@ def verify_runtime(conn: Connection, *, expected_role: str = "reva_worker") -> d
         revision = "0007_security(marker)" if marker else None
     if revision is None or _revision_number(revision) < MIN_SCHEMA_REVISION:
         raise SchemaNotReady(f"schema revision {revision!r} is older than 0007_security")
-    roles: dict[str, bool] = dict(conn.execute(
-        text("SELECT rolname, rolcanlogin FROM pg_roles WHERE rolname IN ('reva_worker','reva_sim','reva_api')")
-    ).all())
+    roles: dict[str, bool] = dict(
+        conn.execute(
+            text("SELECT rolname, rolcanlogin FROM pg_roles WHERE rolname IN ('reva_worker','reva_sim','reva_api')")
+        ).all()
+    )
     missing = [r for r in ("reva_worker", "reva_sim") if not roles.get(r)]
     if missing:
         raise SchemaNotReady(f"runtime roles not provisioned for login: {missing}")
@@ -160,9 +167,10 @@ def wait_for_schema(
             return info
         except (OperationalError, SchemaNotReady) as e:
             last = e
-            delay = min(max_delay, base_delay * (2 ** i))
-            log.warning("waiting for schema/roles (attempt %d/%d): %s", i + 1, attempts,
-                        getattr(e, "message", type(e).__name__))
+            delay = min(max_delay, base_delay * (2**i))
+            log.warning(
+                "waiting for schema/roles (attempt %d/%d): %s", i + 1, attempts, getattr(e, "message", type(e).__name__)
+            )
             sleep(delay)
     raise ConfigurationError(f"schema/runtime roles not ready after {attempts} attempts: {last}")
 
@@ -189,7 +197,7 @@ def heartbeat_engine_for(worker_engine: Engine, concurrency: int = 1) -> Engine:
             pool_recycle=1800,
             connect_args={
                 "options": f"-c lock_timeout={HEARTBEAT_LOCK_TIMEOUT_MS} "
-                           f"-c statement_timeout={HEARTBEAT_STATEMENT_TIMEOUT_MS}",
+                f"-c statement_timeout={HEARTBEAT_STATEMENT_TIMEOUT_MS}",
                 "application_name": "reva-worker-heartbeat",
                 "connect_timeout": 5,
             },
@@ -264,8 +272,9 @@ class Worker:
             raise ConfigurationError("heartbeat interval must be shorter than the lease")
         self.poll_interval = poll_interval
         env_drain = os.environ.get("REVA_WORKER_DRAIN_SECONDS")
-        self.drain_seconds = drain_seconds if drain_seconds is not None else (
-            float(env_drain) if env_drain else DEFAULT_DRAIN_SECONDS)
+        self.drain_seconds = (
+            drain_seconds if drain_seconds is not None else (float(env_drain) if env_drain else DEFAULT_DRAIN_SECONDS)
+        )
         self.scheduler = scheduler
         self.scheduler_tick = scheduler_tick_seconds or float(settings.reva_scheduler_tick_seconds)
         self.invalidation = invalidation
@@ -316,8 +325,10 @@ class Worker:
         try:
             with self.engine.begin() as conn:
                 conn.execute(
-                    text("INSERT INTO ops.worker_presence(worker_id) VALUES (:w) ON CONFLICT (worker_id) "
-                         "DO UPDATE SET last_seen = clock_timestamp()"),
+                    text(
+                        "INSERT INTO ops.worker_presence(worker_id) VALUES (:w) ON CONFLICT (worker_id) "
+                        "DO UPDATE SET last_seen = clock_timestamp()"
+                    ),
                     {"w": self.worker_id},
                 )
         except Exception as e:  # presence is advisory; never kill the worker over it
@@ -339,9 +350,14 @@ class Worker:
         sent = time.monotonic()
         st.last_attempt = sent
         try:
-            status = queue.heartbeat(self.heartbeat_engine, st.job, progress, self.lease_seconds,
-                                     lock_timeout_ms=HEARTBEAT_LOCK_TIMEOUT_MS,
-                                     statement_timeout_ms=HEARTBEAT_STATEMENT_TIMEOUT_MS)
+            status = queue.heartbeat(
+                self.heartbeat_engine,
+                st.job,
+                progress,
+                self.lease_seconds,
+                lock_timeout_ms=HEARTBEAT_LOCK_TIMEOUT_MS,
+                statement_timeout_ms=HEARTBEAT_STATEMENT_TIMEOUT_MS,
+            )
         except StaleLease:
             st.lost = True
             log.warning("lease lost for job %s", st.job.id, extra={"job_id": str(st.job.id)})
@@ -352,8 +368,10 @@ class Worker:
             else:
                 log.warning("heartbeat failed for job %s: %s", st.job.id, type(e).__name__)
             if self._lease_presumed_lost(st):
-                raise StaleLease(f"lease presumed lost for job {st.job.id}: no successful heartbeat "
-                                 f"within the {self.lease_seconds}s lease") from e
+                raise StaleLease(
+                    f"lease presumed lost for job {st.job.id}: no successful heartbeat "
+                    f"within the {self.lease_seconds}s lease"
+                ) from e
             return st.status
         st.status = status
         st.last_hb = time.monotonic()
@@ -371,8 +389,13 @@ class Worker:
         elapsed = time.monotonic() - basis
         if elapsed >= self.lease_seconds * (1 - LEASE_SAFETY_FRACTION):
             st.lost = True
-            log.error("lease for job %s presumed lost: no successful heartbeat for %.1fs (lease %ss)",
-                      st.job.id, elapsed, self.lease_seconds, extra={"job_id": str(st.job.id)})
+            log.error(
+                "lease for job %s presumed lost: no successful heartbeat for %.1fs (lease %ss)",
+                st.job.id,
+                elapsed,
+                self.lease_seconds,
+                extra={"job_id": str(st.job.id)},
+            )
         return st.lost
 
     def _active_state(self, job_id: UUID) -> _Active:
@@ -414,8 +437,9 @@ class Worker:
     def shutdown_requested(self) -> bool:
         return self._shutdown.is_set()
 
-    def _release_on_shutdown(self, job: ClaimedJob, checkpoint: dict[str, Any] | None,
-                             done: Callable[..., JobOutcome], ack: float) -> JobOutcome:
+    def _release_on_shutdown(
+        self, job: ClaimedJob, checkpoint: dict[str, Any] | None, done: Callable[..., JobOutcome], ack: float
+    ) -> JobOutcome:
         """Shutdown is not a cancellation: hand the job back without consuming an attempt.
 
         ``queue.release`` re-reads the status under the row lock, so a real user cancel
@@ -455,18 +479,23 @@ class Worker:
             log.info("job %s (%s) -> %s in %.3fs", job.id, job.job_type, status, dur)
             return out
 
-        def failed(exc: BaseException, ack: float, code: str | None = None,
-                   retryable: bool | None = None) -> JobOutcome:
+        def failed(
+            exc: BaseException, ack: float, code: str | None = None, retryable: bool | None = None
+        ) -> JobOutcome:
             c, r = classify_exception(exc)
             code, retryable = code or c, r if retryable is None else retryable
             details = getattr(exc, "details", None)
-            err = queue.error_document(code, getattr(exc, "message", None) or str(exc) or type(exc).__name__,
-                                       retryable=retryable, attempt=job.attempts, exception=type(exc).__name__,
-                                       **({"details": details} if isinstance(details, dict) and details else {}))
+            err = queue.error_document(
+                code,
+                getattr(exc, "message", None) or str(exc) or type(exc).__name__,
+                retryable=retryable,
+                attempt=job.attempts,
+                exception=type(exc).__name__,
+                **({"details": details} if isinstance(details, dict) and details else {}),
+            )
             tm.JOBS_FAILED.inc(job_type=job.job_type, status="retry" if retryable else "failed")
             try:
-                status = queue.fail(self.engine, job, err, retryable=retryable,
-                                    backoff_base_seconds=self.backoff_base)
+                status = queue.fail(self.engine, job, err, retryable=retryable, backoff_base_seconds=self.backoff_base)
             except StaleLease:
                 return done("lost_lease", err, ack)
             return done(status, err, ack)
@@ -478,8 +507,13 @@ class Worker:
         except HandlerUnavailable as e:
             return failed(e, 0.0, "handler_unavailable", False)
         if job.job_type in SIM_ENGINE_JOB_TYPES and job.job_type == "simulation" and self.sim_engine is None:
-            return failed(ConfigurationError("simulation credentials (reva_sim) are not configured"), 0.0,
-                          "sim_engine_unavailable", False)
+            return failed(
+                ConfigurationError("simulation credentials (reva_sim) are not configured"),
+                0.0,
+                "sim_engine_unavailable",
+                False,
+            )
+
         def ctx_heartbeat(p: dict[str, Any] | None = None) -> str:
             return self._ctx_heartbeat(job.id, p)
 
@@ -508,8 +542,9 @@ class Worker:
             if self._shutdown.is_set():
                 status = queue.release(self.engine, job, None, "worker_shutdown_before_start")
                 return done("released" if status == "queued" else status, None, ack)
-            with tracing.span("job.execute", job_type=job.job_type, job_id=str(job.id), attempt=job.attempts,
-                              worker_id=self.worker_id):
+            with tracing.span(
+                "job.execute", job_type=job.job_type, job_id=str(job.id), attempt=job.attempts, worker_id=self.worker_id
+            ):
                 result = handler(dict(job.payload), ctx)
         except JobCancelled as e:
             try:
@@ -578,8 +613,7 @@ class Worker:
 
         self._start_heartbeats()
         next_sched = next_inv = next_metrics = time.monotonic()
-        log.info("worker %s started (concurrency=%d, lease=%ss)", self.worker_id, self.concurrency,
-                 self.lease_seconds)
+        log.info("worker %s started (concurrency=%d, lease=%ss)", self.worker_id, self.concurrency, self.lease_seconds)
         try:
             while not self._stop.is_set():
                 now = time.monotonic()
@@ -640,8 +674,9 @@ class Worker:
                 return True
             remaining = deadline - time.monotonic()
             if remaining <= 0:
-                log.warning("drain deadline reached with %d running job(s); leases will expire and be re-queued",
-                            len(threads))
+                log.warning(
+                    "drain deadline reached with %d running job(s); leases will expire and be re-queued", len(threads)
+                )
                 return False
             threads[0].join(timeout=min(remaining, 0.5))
 
@@ -661,8 +696,7 @@ def main(argv: list[str] | None = None) -> int:
     threads = configure_threads()
     log.info("thread budget: %d", threads)
     pool = settings.reva_worker_concurrency + 3  # claim loop + heartbeat + per-job + lock connection
-    engine = make_engine("worker", settings.model_copy(update={"reva_db_pool_size": pool,
-                                                                "reva_db_max_overflow": 0}))
+    engine = make_engine("worker", settings.model_copy(update={"reva_db_pool_size": pool, "reva_db_max_overflow": 0}))
     sim_engine = make_engine("sim", settings) if settings.reva_sim_db_password is not None else None
     store = build_store(settings)
     try:

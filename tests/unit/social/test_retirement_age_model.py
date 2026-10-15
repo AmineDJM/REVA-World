@@ -16,13 +16,25 @@ from .fixture_inputs import resolved_inputs
 
 
 def spec(**kw: Any) -> dict[str, Any]:
-    base = {"schema_version": "2.0.0", "title": "FRA 2023 reform as amended vs 2010 law",
-            "model_key": ra.MODEL_KEY, "model_version": ra.MODEL_VERSION, "countries": ["FRA"],
-            "reference_year": 2024, "horizon": {"periods": 16, "unit": "calendar_year"}, "fidelity": "L1",
-            "intervention": {"kind": "retirement_age_rule_path", "scenario_path": "law_in_force_2026",
-                             "reference_path": "law_2010_as_amended_2011"},
-            "assumptions": {"observed_path": "law_in_force_2026"}, "missing_input_policy": "fail",
-            "outputs": sorted(ra.OUTPUTS), "seed": 0}
+    base = {
+        "schema_version": "2.0.0",
+        "title": "FRA 2023 reform as amended vs 2010 law",
+        "model_key": ra.MODEL_KEY,
+        "model_version": ra.MODEL_VERSION,
+        "countries": ["FRA"],
+        "reference_year": 2024,
+        "horizon": {"periods": 16, "unit": "calendar_year"},
+        "fidelity": "L1",
+        "intervention": {
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force_2026",
+            "reference_path": "law_2010_as_amended_2011",
+        },
+        "assumptions": {"observed_path": "law_in_force_2026"},
+        "missing_input_policy": "fail",
+        "outputs": sorted(ra.OUTPUTS),
+        "seed": 0,
+    }
     base.update(kw)
     return base
 
@@ -36,8 +48,9 @@ def run(s: dict[str, Any], fidelity: str = "L1", drop: tuple[tuple[str, str], ..
 
 
 def by(rows: list[Any], output: str, variant: str) -> dict[int, Decimal]:
-    return {r.period[0].year: Decimal(r.value["value"]) for r in rows if r.output_key == output and
-            r.variant == variant}
+    return {
+        r.period[0].year: Decimal(r.value["value"]) for r in rows if r.output_key == output and r.variant == variant
+    }
 
 
 @pytest.fixture(scope="module")
@@ -100,8 +113,14 @@ def test_l2_grid_range_contains_every_point_and_no_response_reference(l2: tuple[
     for r in rng:
         lo, hi = Decimal(r.value["lower"]), Decimal(r.value["upper"])
         assert lo == 0  # the no-response reference point
-        pv = [Decimal(x.value["value"]) for x in rows if x.output_key == r.output_key and x.period == r.period
-              and x.variant.startswith("L2:") and x.variant != ra.SENSITIVITY_VARIANT]
+        pv = [
+            Decimal(x.value["value"])
+            for x in rows
+            if x.output_key == r.output_key
+            and x.period == r.period
+            and x.variant.startswith("L2:")
+            and x.variant != ra.SENSITIVITY_VARIANT
+        ]
         # every grid point plus the two pension-drop bounding variants of the central point (review H4)
         assert len(pv) == len(pts) + 2 and min(pv) == lo and max(pv) == hi
         assert r.uncertainty["kind"] == "sensitivity_range" and r.uncertainty.get("level") is None
@@ -109,9 +128,14 @@ def test_l2_grid_range_contains_every_point_and_no_response_reference(l2: tuple[
 
 def test_pension_drop_comes_from_own_country_data_not_the_study(l2: tuple[Any, list[Any]]) -> None:
     _, rows = l2
-    rec = {r.variant: Decimal(r.value["value"]) for r in rows
-           if r.output_key == "pension_recipients_change" and r.period[0].year == 2035 and "range" not in r.variant
-           and "pension_drop=" not in r.variant}  # bounding variants (review H4) use other French LFS groups
+    rec = {
+        r.variant: Decimal(r.value["value"])
+        for r in rows
+        if r.output_key == "pension_recipients_change"
+        and r.period[0].year == 2035
+        and "range" not in r.variant
+        and "pension_drop=" not in r.variant
+    }  # bounding variants (review H4) use other French LFS groups
     assert len(set(rec.values())) == 1  # every grid point shares the French data-based drop
 
 
@@ -131,10 +155,18 @@ def test_l1_is_deterministic(l1: tuple[Any, list[Any]]) -> None:
 def test_larger_shift_gives_larger_effects() -> None:
     out = []
     for m in (6, 18):
-        _, rows = run(spec(intervention={"kind": "retirement_age_shift", "reference_path": "law_in_force_2026",
-                                         "shift_months": m, "first_birth_year": 1968,
-                                         "phase_in_months_per_cohort": 3},
-                           horizon={"periods": 12, "unit": "calendar_year"}))
+        _, rows = run(
+            spec(
+                intervention={
+                    "kind": "retirement_age_shift",
+                    "reference_path": "law_in_force_2026",
+                    "shift_months": m,
+                    "first_birth_year": 1968,
+                    "phase_in_months_per_cohort": 3,
+                },
+                horizon={"periods": 12, "unit": "calendar_year"},
+            )
+        )
         out.append(by(rows, "pension_recipients_change", "L1")[2036])
     assert out[1] < out[0] < 0
 
@@ -145,9 +177,13 @@ def test_missing_dataset_is_missing_input_never_zero() -> None:
     assert c.missing[0]["code"] == "missing_input"
 
 
-@pytest.mark.parametrize("bad", [
-    {"outputs": ["gdp_loss"]}, {"outputs": ["unemployment_rate"]},
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"outputs": ["gdp_loss"]},
+        {"outputs": ["unemployment_rate"]},
+    ],
+)
 def test_macro_outputs_are_capability_gaps(bad: dict[str, Any]) -> None:
     with pytest.raises(CapabilityGap):
         ra.MODEL.validate(spec(**bad))
@@ -157,8 +193,15 @@ def test_horizon_beyond_2040_and_unknown_paths_refused() -> None:
     with pytest.raises(ValidationProblem):
         ra.MODEL.validate(spec(horizon={"periods": 17, "unit": "calendar_year"}))
     with pytest.raises(ValidationProblem):
-        ra.MODEL.validate(spec(intervention={"kind": "retirement_age_rule_path", "scenario_path": "nope",
-                                             "reference_path": "law_2010_as_amended_2011"}))
+        ra.MODEL.validate(
+            spec(
+                intervention={
+                    "kind": "retirement_age_rule_path",
+                    "scenario_path": "nope",
+                    "reference_path": "law_2010_as_amended_2011",
+                }
+            )
+        )
 
 
 def test_countries_without_rule_tables_are_capability_gaps() -> None:
@@ -169,18 +212,32 @@ def test_countries_without_rule_tables_are_capability_gaps() -> None:
 
 
 def test_uncovered_years_are_refused_not_extrapolated() -> None:
-    s = spec(countries=["NLD"], intervention={"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                                              "reference_path": "pre_2013_counterfactual"},
-             assumptions={"observed_path": "law_in_force"}, horizon={"periods": 2, "unit": "calendar_year"})
+    s = spec(
+        countries=["NLD"],
+        intervention={
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force",
+            "reference_path": "pre_2013_counterfactual",
+        },
+        assumptions={"observed_path": "law_in_force"},
+        horizon={"periods": 2, "unit": "calendar_year"},
+    )
     with pytest.raises(CapabilityGap) as e:
         ra.MODEL.validate(s)
     assert e.value.code == "retirement_rule_coverage_gap"
 
 
 def test_netherlands_runs_within_coverage_without_expenditure_output() -> None:
-    s = spec(countries=["NLD"], intervention={"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                                              "reference_path": "pre_2013_counterfactual"},
-             assumptions={"observed_path": "law_in_force"}, horizon={"periods": 1, "unit": "calendar_year"})
+    s = spec(
+        countries=["NLD"],
+        intervention={
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force",
+            "reference_path": "pre_2013_counterfactual",
+        },
+        assumptions={"observed_path": "law_in_force"},
+        horizon={"periods": 1, "unit": "calendar_year"},
+    )
     c, rows = run(s)
     assert {r.output_key for r in rows} == set(ra.OUTPUTS) - {"pension_expenditure_change_approx_eur"}
     assert c.countries[0].notes[0]["code"] == "output_not_computable"
@@ -188,18 +245,34 @@ def test_netherlands_runs_within_coverage_without_expenditure_output() -> None:
 
 
 def test_spain_short_track_assumption_is_refused_by_the_data() -> None:
-    s = spec(countries=["ESP"], intervention={"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                                              "reference_path": "pre_2013_counterfactual"},
-             assumptions={"observed_path": "law_in_force",
-                          "employment_response": {"central": "staubli_zweimuller_2013_aut"}})
+    s = spec(
+        countries=["ESP"],
+        intervention={
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force",
+            "reference_path": "pre_2013_counterfactual",
+        },
+        assumptions={
+            "observed_path": "law_in_force",
+            "employment_response": {"central": "staubli_zweimuller_2013_aut"},
+        },
+    )
     with pytest.raises(ValidationProblem, match="leaves"):
         run(s)
 
 
 def test_germany_requires_an_explicit_central_estimate() -> None:
-    s = spec(countries=["DEU"], reference_year=2023, horizon={"periods": 17, "unit": "calendar_year"},
-             intervention={"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                           "reference_path": "pre_2007_counterfactual"}, assumptions={"observed_path": "law_in_force"})
+    s = spec(
+        countries=["DEU"],
+        reference_year=2023,
+        horizon={"periods": 17, "unit": "calendar_year"},
+        intervention={
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force",
+            "reference_path": "pre_2007_counterfactual",
+        },
+        assumptions={"observed_path": "law_in_force"},
+    )
     with pytest.raises(ValidationProblem, match="central"):
         ra.MODEL.validate(s)
 

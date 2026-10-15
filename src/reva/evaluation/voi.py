@@ -291,13 +291,9 @@ def estimate_value(
     if decision_spec is None:
         prior_sd = _gap_field(gap, "prior_sd")
         post_sd = _gap_field(gap, "expected_posterior_sd")
-        missing = [
-            n for n, v in (("prior_sd", prior_sd), ("expected_posterior_sd", post_sd)) if v is None
-        ]
+        missing = [n for n, v in (("prior_sd", prior_sd), ("expected_posterior_sd", post_sd)) if v is None]
         if missing:
-            raise MissingInput(
-                "gap lacks inputs for the uncertainty-reduction proxy", missing=missing
-            )
+            raise MissingInput("gap lacks inputs for the uncertainty-reduction proxy", missing=missing)
         return uncertainty_reduction_proxy(
             float(prior_sd), float(post_sd), float(_gap_field(gap, "relevance_weight", 1.0))
         )

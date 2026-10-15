@@ -10,8 +10,13 @@ import pytest
 from reva import capabilities as caps
 
 ROOT = Path(__file__).resolve().parents[2]
-V2_RESERVED = ("demography.cohort_component", "economic.io_price", "social.retirement_age", "nl.scenario_drafts",
-               "scenario.all_countries")
+V2_RESERVED = (
+    "demography.cohort_component",
+    "economic.io_price",
+    "social.retirement_age",
+    "nl.scenario_drafts",
+    "scenario.all_countries",
+)
 
 
 def _test_names(path: Path) -> set[str]:
@@ -20,8 +25,9 @@ def _test_names(path: Path) -> set[str]:
     return {n for n in names if n.startswith("test_")}
 
 
-@pytest.mark.parametrize("cap", [c for c in caps.catalogue() if c.status == "implemented"],
-                         ids=lambda c: c.capability_id)
+@pytest.mark.parametrize(
+    "cap", [c for c in caps.catalogue() if c.status == "implemented"], ids=lambda c: c.capability_id
+)
 def test_implemented_capability_cites_existing_tests(cap: caps.Capability) -> None:
     assert cap.tests, f"{cap.capability_id} is implemented but cites no test"
     for ref in cap.tests:

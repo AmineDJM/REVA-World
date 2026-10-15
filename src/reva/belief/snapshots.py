@@ -19,9 +19,10 @@ def release_as_of(conn: Connection, as_of: datetime | None, origin: str | None =
     with the highest publication sequence. A release whose knowledge cutoff lies
     after T is never returned, whatever its sequence (R-20).
     """
-    row = conn.execute(
-        text(
-            """WITH t AS (SELECT COALESCE(CAST(:t AS timestamptz), clock_timestamp()) AS at)
+    row = (
+        conn.execute(
+            text(
+                """WITH t AS (SELECT COALESCE(CAST(:t AS timestamptz), clock_timestamp()) AS at)
                SELECT r.*, p.sequence, p.published_at FROM belief.release r
                JOIN ops.publication p ON p.release_id = r.id
                CROSS JOIN t
@@ -29,26 +30,31 @@ def release_as_of(conn: Connection, as_of: datetime | None, origin: str | None =
                  AND r.knowledge_cutoff <= t.at
                  AND (CAST(:o AS text) IS NULL OR r.origin = :o)
                ORDER BY p.sequence DESC LIMIT 1"""
-        ),
-        {"t": as_of, "o": origin},
-    ).mappings().one_or_none()
+            ),
+            {"t": as_of, "o": origin},
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 
-def release_by_id(
-    conn: Connection, release_id: UUID, *, include_unpublished: bool = False
-) -> dict[str, Any] | None:
+def release_by_id(conn: Connection, release_id: UUID, *, include_unpublished: bool = False) -> dict[str, Any] | None:
     """A release by id. Read paths only ever see *published* releases (a release row
     without an ops.publication row is not visible); ``include_unpublished`` is for
     internal diagnostics only and must not back a read API."""
-    row = conn.execute(
-        text(
-            """SELECT r.*, p.sequence, p.published_at FROM belief.release r
+    row = (
+        conn.execute(
+            text(
+                """SELECT r.*, p.sequence, p.published_at FROM belief.release r
                LEFT JOIN ops.publication p ON p.release_id = r.id
                WHERE r.id = :i AND (CAST(:all AS boolean) OR p.release_id IS NOT NULL)"""
-        ),
-        {"i": release_id, "all": include_unpublished},
-    ).mappings().one_or_none()
+            ),
+            {"i": release_id, "all": include_unpublished},
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 

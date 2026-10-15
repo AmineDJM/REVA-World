@@ -168,10 +168,14 @@ def _reachable_edges(conn: Connection, seeds: list[str]) -> list[Edge]:
     for (up, down), policies in grouped.items():
         thresholds = [_dec(p.get("threshold")) for p in policies]
         budgets = [_dec(p.get("error_budget")) for p in policies]
-        if all(p.get("kind") == "materiality" for p in policies) and all(
-            t is not None for t in thresholds) and all(b is not None for b in budgets):
-            edges.append(Edge(up, down, min(t for t in thresholds if t is not None),
-                              min(b for b in budgets if b is not None)))
+        if (
+            all(p.get("kind") == "materiality" for p in policies)
+            and all(t is not None for t in thresholds)
+            and all(b is not None for b in budgets)
+        ):
+            edges.append(
+                Edge(up, down, min(t for t in thresholds if t is not None), min(b for b in budgets if b is not None))
+            )
         else:  # any exact version makes the edge exact (strictest wins)
             edges.append(Edge(up, down, None, None))
     return edges
@@ -189,8 +193,9 @@ def _event_seeds(payload: dict[str, Any]) -> list[str]:
     return sorted(seeds)
 
 
-def _propagate(seeds: list[str], edges: list[Edge], bounds: dict[str, Decimal]
-               ) -> tuple[dict[str, str], dict[str, tuple[Decimal, Decimal]], list[list[str]]]:
+def _propagate(
+    seeds: list[str], edges: list[Edge], bounds: dict[str, Decimal]
+) -> tuple[dict[str, str], dict[str, tuple[Decimal, Decimal]], list[list[str]]]:
     """Returns (dirty node -> reason, skipped node -> (bound, budget), coupled components)."""
     adj: dict[str, list[str]] = defaultdict(list)
     out_edges: dict[str, list[Edge]] = defaultdict(list)
@@ -231,8 +236,13 @@ def _propagate(seeds: list[str], edges: list[Edge], bounds: dict[str, Decimal]
                 continue
             same_component = comp_of.get(u) is not None and comp_of.get(u) == comp_of.get(v)
             b = bounds.get(u)
-            if (e.threshold is not None and e.budget is not None and b is not None and b <= e.threshold
-                    and not same_component):
+            if (
+                e.threshold is not None
+                and e.budget is not None
+                and b is not None
+                and b <= e.threshold
+                and not same_component
+            ):
                 prev = skipped.get(v)
                 skipped[v] = ((prev[0] if prev else Decimal(0)) + b, min(e.budget, prev[1]) if prev else e.budget)
                 continue
@@ -240,16 +250,24 @@ def _propagate(seeds: list[str], edges: list[Edge], bounds: dict[str, Decimal]
     return dirty, skipped, [comps[i] for i in sorted(touched_components)]
 
 
-def _apply(conn: Connection, seq: int, dirty: dict[str, str], skipped: dict[str, tuple[Decimal, Decimal]],
-           report: InvalidationReport) -> None:
+def _apply(
+    conn: Connection,
+    seq: int,
+    dirty: dict[str, str],
+    skipped: dict[str, tuple[Decimal, Decimal]],
+    report: InvalidationReport,
+) -> None:
     keys = sorted(set(dirty) | set(skipped))
     if not keys:
         return
     existing = {
         r.node_key: (r.reason, dict(r.accumulated_error_bound))
         for r in conn.execute(
-            text("SELECT node_key, reason, accumulated_error_bound FROM ops.dirty_node "
-                 "WHERE node_key = ANY(:k) FOR UPDATE"), {"k": keys}
+            text(
+                "SELECT node_key, reason, accumulated_error_bound FROM ops.dirty_node "
+                "WHERE node_key = ANY(:k) FOR UPDATE"
+            ),
+            {"k": keys},
         )
     }
     upsert = text(
@@ -267,8 +285,13 @@ def _apply(conn: Connection, seq: int, dirty: dict[str, str], skipped: dict[str,
             continue  # already dirty: a refresh is pending anyway
         acc = (_dec(prev_bound.get("value")) or Decimal(0)) + bound
         skips = int(prev_bound.get("skips", 0)) + 1
-        doc = {"kind": "materiality", "metric": "declared_change_bound", "value": str(acc), "budget": str(budget),
-               "skips": skips}
+        doc = {
+            "kind": "materiality",
+            "metric": "declared_change_bound",
+            "value": str(acc),
+            "budget": str(budget),
+            "skips": skips,
+        }
         if acc > budget:
             conn.execute(upsert, {"k": k, "s": seq, "b": json.dumps({**doc, "exhausted": True}), "r": EXHAUSTED})
             report.forced.append(k)
@@ -319,12 +342,29 @@ def _record_event_failure(conn: Connection, actor: str, ev: Any, exc: BaseExcept
 
     failures = int(ev.failures) + 1
     msg = redact_text(getattr(exc, "message", None) or str(exc) or type(exc).__name__, secret_values())[:500]
-    log.error("outbox event %s (%s) failed (failure %d, next retry in %.0fs): %s: %s", ev.id, ev.event_type,
-              failures, outbox_backoff_seconds(failures), type(exc).__name__, msg)
+    log.error(
+        "outbox event %s (%s) failed (failure %d, next retry in %.0fs): %s: %s",
+        ev.id,
+        ev.event_type,
+        failures,
+        outbox_backoff_seconds(failures),
+        type(exc).__name__,
+        msg,
+    )
     OUTBOX_EVENT_FAILURES.inc()
-    _audit(conn, actor, "outbox.event_failed", {"outbox_id": int(ev.id)},
-           {"event_type": ev.event_type, "failures": failures, "exception": type(exc).__name__,
-            "message": msg, "retry_in_seconds": outbox_backoff_seconds(failures)})
+    _audit(
+        conn,
+        actor,
+        "outbox.event_failed",
+        {"outbox_id": int(ev.id)},
+        {
+            "event_type": ev.event_type,
+            "failures": failures,
+            "exception": type(exc).__name__,
+            "message": msg,
+            "retry_in_seconds": outbox_backoff_seconds(failures),
+        },
+    )
 
 
 def _enqueue_publish(conn: Connection, origin: str, through: int, actor: str, report: InvalidationReport) -> None:
@@ -334,14 +374,20 @@ def _enqueue_publish(conn: Connection, origin: str, through: int, actor: str, re
     report.publish_jobs.append(str(res))
 
 
-def _process_observation_event(conn: Connection, ev: Any, release_cutoffs: dict[str, datetime],
-                               report: InvalidationReport, origins_seen: dict[str, int]) -> None:
+def _process_observation_event(
+    conn: Connection,
+    ev: Any,
+    release_cutoffs: dict[str, datetime],
+    report: InvalidationReport,
+    origins_seen: dict[str, int],
+) -> None:
     report.observation_events += 1
     payload = dict(ev.payload)
     origin = None
     if payload.get("acquisition_id"):
-        origin = conn.execute(text("SELECT origin FROM evidence.acquisition WHERE id = :a"),
-                              {"a": payload["acquisition_id"]}).scalar_one_or_none()
+        origin = conn.execute(
+            text("SELECT origin FROM evidence.acquisition WHERE id = :a"), {"a": payload["acquisition_id"]}
+        ).scalar_one_or_none()
     seeds = _event_seeds(payload)
     if not seeds:
         return
@@ -361,18 +407,25 @@ def _process_observation_event(conn: Connection, ev: Any, release_cutoffs: dict[
         origins_seen[origin] = max(origins_seen.get(origin, 0), int(ev.id))
 
 
-def _process_quarantine_event(conn: Connection, ev: Any, environment: str, actor: str,
-                              report: InvalidationReport) -> None:
+def _process_quarantine_event(
+    conn: Connection, ev: Any, environment: str, actor: str, report: InvalidationReport
+) -> None:
     """``evidence.acquisition_quarantined`` -> one idempotent ``connector_repair`` job per
     (connector, acquisition). Connector and origin come from the acquisition row, not the payload."""
     from reva.operations.jobs import enqueue_connector_repair
 
     acq = str(dict(ev.payload).get("acquisition_id") or "")
-    row = conn.execute(
-        text("SELECT a.origin, cv.name FROM evidence.acquisition a "
-             "JOIN evidence.connector_version cv ON cv.id = a.connector_version_id WHERE a.id = CAST(:a AS uuid)"),
-        {"a": acq},
-    ).one_or_none() if acq else None
+    row = (
+        conn.execute(
+            text(
+                "SELECT a.origin, cv.name FROM evidence.acquisition a "
+                "JOIN evidence.connector_version cv ON cv.id = a.connector_version_id WHERE a.id = CAST(:a AS uuid)"
+            ),
+            {"a": acq},
+        ).one_or_none()
+        if acq
+        else None
+    )
     if row is None:
         log.warning("outbox event %s: quarantined acquisition %r not found; no repair job", ev.id, acq[:64])
         return
@@ -394,8 +447,7 @@ def _resume_origins(reason: str | None) -> list[str]:
     return ["live"]
 
 
-def _process_resume_event(conn: Connection, ev: Any, environment: str, actor: str,
-                          report: InvalidationReport) -> None:
+def _process_resume_event(conn: Connection, ev: Any, environment: str, actor: str, report: InvalidationReport) -> None:
     """``connector.publication_resumed``: the concept's belief node was kept dirty while
     paused (releases withheld it); now that it is publishable again, enqueue the publication.
     The key uses the resume event id: no new observation event exists to key on."""
@@ -403,19 +455,25 @@ def _process_resume_event(conn: Connection, ev: Any, environment: str, actor: st
 
     concept = str(dict(ev.payload).get("concept") or "")
     node = f"belief:{concept}"
-    if not concept or conn.execute(text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"),
-                                   {"k": PAUSE_NODE_PREFIX + node}).scalar_one_or_none():
+    if (
+        not concept
+        or conn.execute(
+            text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"), {"k": PAUSE_NODE_PREFIX + node}
+        ).scalar_one_or_none()
+    ):
         return  # still (or again) paused
-    reason = conn.execute(text("SELECT reason FROM ops.dirty_node WHERE node_key = :k"),
-                          {"k": node}).scalar_one_or_none()
+    reason = conn.execute(
+        text("SELECT reason FROM ops.dirty_node WHERE node_key = :k"), {"k": node}
+    ).scalar_one_or_none()
     for origin in _resume_origins(reason):
         if environment == "production" and origin != "live":
             continue
         _enqueue_publish(conn, origin, int(ev.id), actor, report)
 
 
-def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "local",
-                   actor: str = "worker:invalidation") -> InvalidationReport:
+def process_outbox(
+    engine: Engine, *, batch: int = 200, environment: str = "local", actor: str = "worker:invalidation"
+) -> InvalidationReport:
     """Process one batch of unprocessed outbox events (one transaction, one savepoint per event)."""
     from reva.operations.jobs import dirty_belief_nodes, latest_observation_event
     from reva.operations.telemetry import OUTBOX_FAILING_EVENTS
@@ -429,9 +487,12 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
         if events:
             report.events = len(events)
             release_cutoffs: dict[str, datetime] = {
-                o: c for o, c in conn.execute(
-                    text("SELECT r.origin, max(r.knowledge_cutoff) FROM belief.release r "
-                         "JOIN ops.publication p ON p.release_id = r.id GROUP BY r.origin")
+                o: c
+                for o, c in conn.execute(
+                    text(
+                        "SELECT r.origin, max(r.knowledge_cutoff) FROM belief.release r "
+                        "JOIN ops.publication p ON p.release_id = r.id GROUP BY r.origin"
+                    )
                 ).all()
             }
             origins_seen: dict[str, int] = {}
@@ -456,8 +517,9 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
                     continue
                 done.append(int(ev.id))
             if done:
-                conn.execute(text("UPDATE ops.outbox SET processed_at = clock_timestamp() WHERE id = ANY(:ids)"),
-                             {"ids": done})
+                conn.execute(
+                    text("UPDATE ops.outbox SET processed_at = clock_timestamp() WHERE id = ANY(:ids)"), {"ids": done}
+                )
             if origins_seen and dirty_belief_nodes(conn) > 0:
                 # Same key derivation as the ingest handler (origin + newest observation
                 # event) so both paths usually coincide; any residual duplicate is a
@@ -471,27 +533,46 @@ def process_outbox(engine: Engine, *, batch: int = 200, environment: str = "loca
                             _enqueue_publish(conn, origin, through, actor, report)
                     except Exception as e:
                         # never abort the batch: hand the request to the durable retry path
-                        log.error("publish_beliefs enqueue for origin %s failed (%s); deferred via outbox",
-                                  origin, type(e).__name__)
+                        log.error(
+                            "publish_beliefs enqueue for origin %s failed (%s); deferred via outbox",
+                            origin,
+                            type(e).__name__,
+                        )
                         conn.execute(
                             text("INSERT INTO ops.outbox(event_type, payload) VALUES (:t, CAST(:p AS jsonb))"),
-                            {"t": PUBLISH_REQUEST_EVENT,
-                             "p": json.dumps({"origin": origin, "through_outbox_id": through})},
+                            {
+                                "t": PUBLISH_REQUEST_EVENT,
+                                "p": json.dumps({"origin": origin, "through_outbox_id": through}),
+                            },
                         )
-                        _audit(conn, actor, "outbox.publish_enqueue_deferred", {"origin": origin},
-                               {"through_outbox_id": through, "exception": type(e).__name__})
+                        _audit(
+                            conn,
+                            actor,
+                            "outbox.publish_enqueue_deferred",
+                            {"origin": origin},
+                            {"through_outbox_id": through, "exception": type(e).__name__},
+                        )
                         report.publish_requests_deferred.append(origin)
         failing = conn.execute(
-            text("SELECT count(DISTINCT (a.target->>'outbox_id')::bigint) FROM ops.audit a "
-                 "JOIN ops.outbox o ON o.id = (a.target->>'outbox_id')::bigint "
-                 "WHERE a.action = 'outbox.event_failed' AND o.processed_at IS NULL "
-                 "AND a.recorded_at > clock_timestamp() - make_interval(days => :mem)"),
+            text(
+                "SELECT count(DISTINCT (a.target->>'outbox_id')::bigint) FROM ops.audit a "
+                "JOIN ops.outbox o ON o.id = (a.target->>'outbox_id')::bigint "
+                "WHERE a.action = 'outbox.event_failed' AND o.processed_at IS NULL "
+                "AND a.recorded_at > clock_timestamp() - make_interval(days => :mem)"
+            ),
             {"mem": FAILURE_MEMORY_DAYS},
         ).scalar_one()
         OUTBOX_FAILING_EVENTS.set(float(failing))
     report.dirty = sorted(set(report.dirty))
     if report.events:
-        log.info("outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs, %d repair jobs, %d failed",
-                 report.events, len(report.dirty), len(report.skipped), len(report.forced), len(report.publish_jobs),
-                 len(report.repair_jobs), len(report.failed_events))
+        log.info(
+            "outbox: %d events, %d dirty, %d skipped, %d forced, %d publish jobs, %d repair jobs, %d failed",
+            report.events,
+            len(report.dirty),
+            len(report.skipped),
+            len(report.forced),
+            len(report.publish_jobs),
+            len(report.repair_jobs),
+            len(report.failed_events),
+        )
     return report

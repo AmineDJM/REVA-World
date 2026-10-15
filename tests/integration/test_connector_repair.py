@@ -82,25 +82,42 @@ def _clear_pause_markers(db) -> Iterator[None]:
     # Close this module's proposals through the human-review function so they do not occupy
     # the bounded open-proposal backlog of later modules in the same session database.
     with db.api.begin() as c:
-        for pid in c.execute(text(
+        for pid in c.execute(
+            text(
                 "SELECT p.id FROM ops.proposal p WHERE p.author = :a AND NOT EXISTS "
-                "(SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"), {"a": R.AUTHOR}).scalars():
-            c.execute(text("SELECT ops.review_proposal(:p, 'reject', 'human:test-teardown', :m)"),
-                      {"p": pid, "m": "test proposal closed at module teardown"})
+                "(SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"
+            ),
+            {"a": R.AUTHOR},
+        ).scalars():
+            c.execute(
+                text("SELECT ops.review_proposal(:p, 'reject', 'human:test-teardown', :m)"),
+                {"p": pid, "m": "test proposal closed at module teardown"},
+            )
 
 
 def _gate_rows(db, proposal_id) -> list[dict[str, Any]]:
     with db.owner.connect() as c:
-        return [dict(r) for r in c.execute(text(
-            "SELECT decision, evaluator, policy_version FROM ops.gate_result WHERE proposal_id = :p"),
-            {"p": proposal_id}).mappings()]
+        return [
+            dict(r)
+            for r in c.execute(
+                text("SELECT decision, evaluator, policy_version FROM ops.gate_result WHERE proposal_id = :p"),
+                {"p": proposal_id},
+            ).mappings()
+        ]
 
 
 def _proposal_row(db, proposal_id) -> dict[str, Any]:
     with db.owner.connect() as c:
-        return dict(c.execute(text(
-            "SELECT proposal_type, permission_tier, author, manifest_sha256, summary FROM ops.proposal WHERE id = :p"),
-            {"p": proposal_id}).mappings().one())
+        return dict(
+            c.execute(
+                text(
+                    "SELECT proposal_type, permission_tier, author, manifest_sha256, summary FROM ops.proposal WHERE id = :p"
+                ),
+                {"p": proposal_id},
+            )
+            .mappings()
+            .one()
+        )
 
 
 def _registered(db, sha: str) -> bool:
@@ -124,17 +141,18 @@ class StubHttp:
 
     origin = "test_fixture"
 
-    def __init__(self, connector: str, *, overrides: dict[str, bytes] | None = None,
-                 status_for: Any = None) -> None:
-        self.base = FixtureHttp(connector, overrides={request_fingerprint("GET", u): b
-                                                      for u, b in (overrides or {}).items()})
+    def __init__(self, connector: str, *, overrides: dict[str, bytes] | None = None, status_for: Any = None) -> None:
+        self.base = FixtureHttp(
+            connector, overrides={request_fingerprint("GET", u): b for u, b in (overrides or {}).items()}
+        )
         self.status_for = status_for or (lambda url: None)
 
     async def get(self, url: str, **kw: Any) -> Any:
         st = self.status_for(url)
         if st is not None:
-            raise SourceResponseError(f"HTTP {st} from {urlsplit(url).hostname}", retryable=False, status=st,
-                                      attempts=1)
+            raise SourceResponseError(
+                f"HTTP {st} from {urlsplit(url).hostname}", retryable=False, status=st, attempts=1
+            )
         return await self.base.get(url, **kw)
 
     async def aclose(self) -> None:
@@ -216,8 +234,11 @@ def test_payload_drift_is_classified_proposed_and_gated(db, io, advisor, gate, c
     manifest = io.get_json(rp.manifest)
     assert manifest["schema"] == R.REPAIR_SCHEMA and manifest["semantic_diff"] == a.semantic_diff.sha256
     if tier == 1:
-        assert manifest["mapping"] == {"version": conn_.describe().parser_version, "change": "none",
-                                       "accept_schema_fingerprint": a.new_fingerprint}
+        assert manifest["mapping"] == {
+            "version": conn_.describe().parser_version,
+            "change": "none",
+            "accept_schema_fingerprint": a.new_fingerprint,
+        }
     else:
         assert manifest["mapping"]["requires_new_version"] is True
         assert (manifest["proposed_mapping_version"] is not None) == bool(expected_reports)
@@ -263,8 +284,9 @@ def test_replay_blocks_a_mapping_that_rescales_history(db, io, advisor, gate) ->
     c = CASES["wb_unit_text_and_scale"]
     wb = WorldBankConnector()
     a = advisor.assess(wb, advisor.case_from_response(wb, c["url"], _body("wb_unit_text_and_scale")))
-    unconditional = R.MappingRevision(wb.describe().parser_version,
-                                      scales=(R.ScaleRule("$[1][].value", "1000"),), note="test: forgets the unit")
+    unconditional = R.MappingRevision(
+        wb.describe().parser_version, scales=(R.ScaleRule("$[1][].value", "1000"),), note="test: forgets the unit"
+    )
     rp = advisor.propose(wb, a, mapping=unconditional)
     assert rp is not None
     (rep,) = rp.reports
@@ -353,8 +375,16 @@ def test_replay_only_warns_on_flags_outside_the_semantic_set(io, advisor) -> Non
 
 
 def test_semantic_flag_subset_covers_status_and_classification_flags() -> None:
-    assert {"isReported", "isAggregate", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated",
-            "obs_status", "status", "classificationCode"} <= R.SEMANTIC_FLAG_KEYS
+    assert {
+        "isReported",
+        "isAggregate",
+        "legacyEstimationFlag",
+        "isQtyEstimated",
+        "isNetWgtEstimated",
+        "obs_status",
+        "status",
+        "classificationCode",
+    } <= R.SEMANTIC_FLAG_KEYS
     for key in ("obs_status", "status", "classificationCode"):
         a = json.dumps({key: "E", "provider_country_id": "FR"})
         assert R._semantic_flags(a) != R._semantic_flags(json.dumps({key: "", "provider_country_id": "FR"}))
@@ -364,8 +394,9 @@ def test_semantic_flag_subset_covers_status_and_classification_flags() -> None:
 
 def test_replay_reports_truncated_accepted_history(io, advisor) -> None:
     wb = WorldBankConnector()
-    rep = R.FixtureReplayChecker(io).check(wb, wb, advisor.bank("worldbank.wdi.indicators"),
-                                           proposal_key="r6-14-cap", history_truncated=True)
+    rep = R.FixtureReplayChecker(io).check(
+        wb, wb, advisor.bank("worldbank.wdi.indicators"), proposal_key="r6-14-cap", history_truncated=True
+    )
     assert rep.outcome == "pass"
     assert ("accepted_history_truncated", "warning") in {(f.code, f.severity) for f in rep.findings}
     assert io.get_json(rep.evidence_manifest)["accepted_history_truncated"] is True
@@ -395,8 +426,13 @@ async def test_quarantined_acquisition_is_found_and_repaired(db, io, gate) -> No
     wb = WorldBankConnector()
     since = _db_now(db)
     c = CASES["wb_renamed_field"]
-    rep = await run_connector(wb, StubHttp(c["connector"], overrides={c["url"]: _body("wb_renamed_field")}),
-                              db.store, db.worker, persist_cursor=False)
+    rep = await run_connector(
+        wb,
+        StubHttp(c["connector"], overrides={c["url"]: _body("wb_renamed_field")}),
+        db.store,
+        db.worker,
+        persist_cursor=False,
+    )
     by_item = {o.item_key: o.status for o in rep.outcomes}
     assert by_item["series:SP.POP.TOTL:p1"] == "quarantined"
     adv = R.ConnectorRepairAdvisor(db.worker, db.store)
@@ -417,9 +453,13 @@ async def test_quarantined_acquisition_is_found_and_repaired(db, io, gate) -> No
         pauses = {p["concept"]: p for p in R.active_publication_pauses(conn)}
         assert pauses[POP]["proposal_id"] is not None
         before = dirty_belief_nodes(conn)
-        ev_row = conn.execute(text(
-            "SELECT payload FROM ops.outbox WHERE event_type = 'connector.publication_paused' "
-            "AND payload->>'proposal_id' = :p"), {"p": str(rp.proposal.proposal_id)}).scalar_one()
+        ev_row = conn.execute(
+            text(
+                "SELECT payload FROM ops.outbox WHERE event_type = 'connector.publication_paused' "
+                "AND payload->>'proposal_id' = :p"
+            ),
+            {"p": str(rp.proposal.proposal_id)},
+        ).scalar_one()
     assert ev_row["concepts"] == [POP] and "stale" in ev_row["visibility"]
     with db.owner.connect() as conn:
         assert dirty_belief_nodes(conn) == before
@@ -445,8 +485,10 @@ async def test_persistent_404_triggers_documentation_discovery_not_url_guessing(
     assert rp is not None and rp.reports == ()
     task = io.get_json(rp.manifest)["task"]
     assert task["kind"] == "documentation_discovery"
-    assert task["allowed_documentation"] == ["https://api.worldbank.org/v2/",
-                                             "https://datahelpdesk.worldbank.org/knowledgebase/articles/889392"]
+    assert task["allowed_documentation"] == [
+        "https://api.worldbank.org/v2/",
+        "https://datahelpdesk.worldbank.org/knowledgebase/articles/889392",
+    ]
     assert "random_url_guessing" in task["forbidden"]
     assert rp.proposal.changed_paths == () and set(rp.proposal.requested_capabilities) <= {"discover", "report"}
     d = gate.decide(rp.proposal, [], promotion_policy().ref())
@@ -486,10 +528,17 @@ def test_only_gate_promotion_or_named_human_resumes_publication(db, advisor) -> 
     assert rp is not None
     pid = rp.proposal.proposal_id
     with db.worker.begin() as conn:
-        pause = R.pause_belief_publication(conn, [probe], connector="worldbank.wdi.indicators",
-                                           classification=R.RENAME, proposal_id=pid,
-                                           origin="test_fixture", item_key=None, acquisition_id=None,
-                                           actor=R.AUTHOR)
+        pause = R.pause_belief_publication(
+            conn,
+            [probe],
+            connector="worldbank.wdi.indicators",
+            classification=R.RENAME,
+            proposal_id=pid,
+            origin="test_fixture",
+            item_key=None,
+            acquisition_id=None,
+            actor=R.AUTHOR,
+        )
     assert pause.node_keys == (R.PAUSE_PREFIX + probe,) and _paused(db, probe)
     with pytest.raises(AutonomyBlocked):
         R.resume_belief_publication(db.worker, probe, actor=R.AUTHOR, reason="agent may not resume")
@@ -499,39 +548,72 @@ def test_only_gate_promotion_or_named_human_resumes_publication(db, advisor) -> 
     with pytest.raises(AutonomyBlocked):
         R.resume_belief_publication(db.worker, probe, actor="human:maintainer", reason="no review cited")
     with db.api.begin() as conn:
-        review = conn.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', :m)"),
-                              {"p": pid, "m": "reviewed mapping v2"}).scalar_one()
+        review = conn.execute(
+            text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', :m)"),
+            {"p": pid, "m": "reviewed mapping v2"},
+        ).scalar_one()
     with pytest.raises(AutonomyBlocked):
-        R.resume_belief_publication(db.worker, probe, actor="human:someone-else", reason="not the reviewer",
-                                    review_id=review)
-    assert R.resume_belief_publication(db.worker, probe, actor="human:maintainer", reason="reviewed mapping v2",
-                                       review_id=review)
+        R.resume_belief_publication(
+            db.worker, probe, actor="human:someone-else", reason="not the reviewer", review_id=review
+        )
+    assert R.resume_belief_publication(
+        db.worker, probe, actor="human:maintainer", reason="reviewed mapping v2", review_id=review
+    )
     assert not _paused(db, probe)
     with db.owner.connect() as conn:
-        audit = conn.execute(text("SELECT actor, details FROM ops.audit WHERE action = 'connector.publication_resumed' "
-                                  "AND target->>'concept' = :c ORDER BY recorded_at DESC LIMIT 1"),
-                             {"c": probe}).mappings().one()
+        audit = (
+            conn.execute(
+                text(
+                    "SELECT actor, details FROM ops.audit WHERE action = 'connector.publication_resumed' "
+                    "AND target->>'concept' = :c ORDER BY recorded_at DESC LIMIT 1"
+                ),
+                {"c": probe},
+            )
+            .mappings()
+            .one()
+        )
     assert audit["actor"] == R.RESUME_EXECUTOR and audit["details"]["reviewer"] == "human:maintainer"
 
 
 def _t0_repair_proposal(db, io, proposal_type: str) -> PlatformChangeProposal:
     """A persisted read-only (T0, ``report``) proposal: the gate passes it automatically."""
     p = PlatformChangeProposal(
-        uuid.uuid4(), R.AUTHOR, 0, (), base_commit(), io.put_json({"schema": "r6-08", "n": str(uuid.uuid4())},
-                                                                    "models"),
-        ("report",), False, False,
-        ValueEstimate("unsupported", None, None, {"status": "unquantified"},
-                      io.put_json({"t": str(uuid.uuid4())}, "evaluation"), "r6-08"),
-        promotion_policy().version)
+        uuid.uuid4(),
+        R.AUTHOR,
+        0,
+        (),
+        base_commit(),
+        io.put_json({"schema": "r6-08", "n": str(uuid.uuid4())}, "models"),
+        ("report",),
+        False,
+        False,
+        ValueEstimate(
+            "unsupported",
+            None,
+            None,
+            {"status": "unquantified"},
+            io.put_json({"t": str(uuid.uuid4())}, "evaluation"),
+            "r6-08",
+        ),
+        promotion_policy().version,
+    )
     ProposalStore(db.worker, io).persist(p, proposal_type=proposal_type, scope={}, risk={})
     return p
 
 
 def _pause(db, concept: str, proposal_id: uuid.UUID) -> None:
     with db.worker.begin() as conn:
-        R.pause_belief_publication(conn, [concept], connector="worldbank.wdi.indicators", classification=R.UNIT,
-                                   proposal_id=proposal_id, origin="test_fixture", item_key=None,
-                                   acquisition_id=None, actor=R.AUTHOR)
+        R.pause_belief_publication(
+            conn,
+            [concept],
+            connector="worldbank.wdi.indicators",
+            classification=R.UNIT,
+            proposal_id=proposal_id,
+            origin="test_fixture",
+            item_key=None,
+            acquisition_id=None,
+            actor=R.AUTHOR,
+        )
 
 
 def test_gate_resume_requires_a_later_pass_for_the_pausing_repair_proposal(db, io, gate) -> None:
@@ -553,8 +635,9 @@ def test_gate_resume_requires_a_later_pass_for_the_pausing_repair_proposal(db, i
     assert sibling_pass.outcome == "promote"
     for d in (early, other, sibling_pass):
         with pytest.raises(AutonomyBlocked, match="not for the repair proposal"):
-            R.resume_belief_publication(db.worker, probe, actor=d.reviewer_identity, reason="r6-08",
-                                        gate_result_id=d.decision_id)
+            R.resume_belief_publication(
+                db.worker, probe, actor=d.reviewer_identity, reason="r6-08", gate_result_id=d.decision_id
+            )
         assert _paused(db, probe)
     # 4. The pausing proposal's type must be connector_repair:* even when ids match.
     probe2 = "test.repair.r6_08_probe_nonrepair"
@@ -562,8 +645,9 @@ def test_gate_resume_requires_a_later_pass_for_the_pausing_repair_proposal(db, i
     _pause(db, probe2, plain.proposal_id)
     plain_pass = gate.decide(plain, [], policy)
     with pytest.raises(AutonomyBlocked, match="not for the repair proposal"):
-        R.resume_belief_publication(db.worker, probe2, actor=plain_pass.reviewer_identity, reason="r6-08",
-                                    gate_result_id=plain_pass.decision_id)
+        R.resume_belief_publication(
+            db.worker, probe2, actor=plain_pass.reviewer_identity, reason="r6-08", gate_result_id=plain_pass.decision_id
+        )
     assert _paused(db, probe2)
     with db.owner.begin() as c:
         c.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"), {"k": R.PAUSE_PREFIX + probe2})
@@ -571,27 +655,37 @@ def test_gate_resume_requires_a_later_pass_for_the_pausing_repair_proposal(db, i
     late = gate.decide(repair, [], policy)
     assert late.outcome == "promote"
     with db.owner.connect() as c:
-        row = c.execute(text("SELECT evaluator, proposal_id FROM ops.gate_result WHERE id = :g"),
-                        {"g": late.decision_id}).mappings().one()
+        row = (
+            c.execute(text("SELECT evaluator, proposal_id FROM ops.gate_result WHERE id = :g"), {"g": late.decision_id})
+            .mappings()
+            .one()
+        )
     assert row["evaluator"] == late.reviewer_identity and row["proposal_id"] == repair.proposal_id
-    assert R.resume_belief_publication(db.worker, probe, actor=late.reviewer_identity, reason="r6-08 repaired",
-                                       gate_result_id=late.decision_id)
+    assert R.resume_belief_publication(
+        db.worker, probe, actor=late.reviewer_identity, reason="r6-08 repaired", gate_result_id=late.decision_id
+    )
     assert not _paused(db, probe)
 
 
 def test_job_handler_refuses_when_blocked_or_unknown(db) -> None:
-    ctx = SimpleNamespace(settings=db.settings.model_copy(update={"reva_autonomy_kill_switch": True}),
-                          worker_engine=db.worker, store=db.store)
+    ctx = SimpleNamespace(
+        settings=db.settings.model_copy(update={"reva_autonomy_kill_switch": True}),
+        worker_engine=db.worker,
+        store=db.store,
+    )
     assert R.handle_connector_repair({"connector": "worldbank.wdi.indicators"}, ctx)["status"] == "blocked"
     ctx.settings = db.settings
     assert R.handle_connector_repair({"connector": "https://example.org/x"}, ctx)["status"] == "rejected"
-    assert R.handle_connector_repair({"connector": "crossref.works.doi", "origin": "test_fixture"},
-                                     ctx)["status"] in ("unsupported", "rejected")
+    assert R.handle_connector_repair({"connector": "crossref.works.doi", "origin": "test_fixture"}, ctx)["status"] in (
+        "unsupported",
+        "rejected",
+    )
 
 
 def test_assessment_requires_matching_connector(advisor) -> None:
     wb = WorldBankConnector()
-    case = R.DriftCase(connector="un.comtrade.public_exact", observed_at=datetime.now(UTC), origin="live",
-                       item_key="x", body=b"{}")
+    case = R.DriftCase(
+        connector="un.comtrade.public_exact", observed_at=datetime.now(UTC), origin="live", item_key="x", body=b"{}"
+    )
     with pytest.raises(Exception, match="different connector"):
         advisor.assess(wb, case)

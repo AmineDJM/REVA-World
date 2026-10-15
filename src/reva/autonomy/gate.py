@@ -95,22 +95,48 @@ class StoredProposal:
     summary: dict[str, Any]
 
 
-def record_gate_result(conn: Connection, proposal_id: uuid.UUID, gate_name: str, policy_version: str,
-                       decision: str, evidence_sha256: str, evaluator: str,
-                       scope: dict[str, Any] | None = None) -> uuid.UUID:
+def record_gate_result(
+    conn: Connection,
+    proposal_id: uuid.UUID,
+    gate_name: str,
+    policy_version: str,
+    decision: str,
+    evidence_sha256: str,
+    evaluator: str,
+    scope: dict[str, Any] | None = None,
+) -> uuid.UUID:
     """Checked DB path (``ops.record_gate_result``, SECURITY DEFINER, executable by ``reva_gate`` only):
     evaluator must be ``gate-evaluator:<gate name>`` and not the author; evidence must be a verified
     artifact. (GATE/R6-02) ``scope`` is the scope the gate derived; the approval functions bind a pass to it."""
-    return uuid.UUID(str(conn.execute(
-        text("SELECT ops.record_gate_result(:p, :g, :v, :d, :e, :ev, CAST(:sc AS jsonb))"),
-        {"p": proposal_id, "g": gate_name, "v": policy_version, "d": decision, "e": evidence_sha256,
-         "ev": evaluator, "sc": json.dumps(scope) if scope is not None else None},
-    ).scalar_one()))
+    return uuid.UUID(
+        str(
+            conn.execute(
+                text("SELECT ops.record_gate_result(:p, :g, :v, :d, :e, :ev, CAST(:sc AS jsonb))"),
+                {
+                    "p": proposal_id,
+                    "g": gate_name,
+                    "v": policy_version,
+                    "d": decision,
+                    "e": evidence_sha256,
+                    "ev": evaluator,
+                    "sc": json.dumps(scope) if scope is not None else None,
+                },
+            ).scalar_one()
+        )
+    )
 
 
 class PolicyPromotionGate:
-    def __init__(self, engine: Engine, io_: ArtifactIO, *, name: str = "promotion", policy_path: Path | None = None,
-                 pinned_sha256: str | None = None, guard: AutonomyGuard | None = None) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        io_: ArtifactIO,
+        *,
+        name: str = "promotion",
+        policy_path: Path | None = None,
+        pinned_sha256: str | None = None,
+        guard: AutonomyGuard | None = None,
+    ) -> None:
         if not name or ":" in name:
             raise ValueError("gate name must be a plain identifier")
         self.engine = engine
@@ -129,44 +155,69 @@ class PolicyPromotionGate:
     def load_stored(self, proposal_id: uuid.UUID, obj: PlatformChangeProposal | None = None) -> StoredProposal:
         """The ``ops.proposal`` row + its digest-verified document; ``obj`` must equal it (R6-03)."""
         with self.engine.connect() as conn:
-            row = conn.execute(text(
-                "SELECT proposal_type, manifest_sha256, permission_tier, author, summary "
-                "FROM ops.proposal WHERE id = :i"),
-                {"i": proposal_id}).mappings().one_or_none()
+            row = (
+                conn.execute(
+                    text(
+                        "SELECT proposal_type, manifest_sha256, permission_tier, author, summary "
+                        "FROM ops.proposal WHERE id = :i"
+                    ),
+                    {"i": proposal_id},
+                )
+                .mappings()
+                .one_or_none()
+            )
         if row is None:
             raise ValidationProblem("gate evaluates only persisted proposals (ops.proposal)")
         doc = self.io.get_json(ArtifactRef(str(row["manifest_sha256"]), "models", "application/json"))
-        if not isinstance(doc, dict) or doc.get("schema") != PROPOSAL_SCHEMA \
-                or doc.get("proposal_type") != row["proposal_type"]:
-            raise PolicyDenied("persisted proposal document is not a proposal of the recorded type",
-                               proposal_id=str(proposal_id))
+        if (
+            not isinstance(doc, dict)
+            or doc.get("schema") != PROPOSAL_SCHEMA
+            or doc.get("proposal_type") != row["proposal_type"]
+        ):
+            raise PolicyDenied(
+                "persisted proposal document is not a proposal of the recorded type", proposal_id=str(proposal_id)
+            )
         stored = proposal_from(doc["proposal"])
         if stored.proposal_id != proposal_id or stored.author != row["author"]:
-            raise PolicyDenied("persisted proposal document does not match its ops.proposal row",
-                               proposal_id=str(proposal_id))
+            raise PolicyDenied(
+                "persisted proposal document does not match its ops.proposal row", proposal_id=str(proposal_id)
+            )
         if obj is not None and json.loads(plain_json_bytes(proposal_json(obj))) != doc["proposal"]:
-            raise PolicyDenied("the proposal object differs from the persisted proposal; the gate evaluates "
-                               "only the stored proposal", proposal_id=str(proposal_id))
-        return StoredProposal(stored, str(row["proposal_type"]), int(row["permission_tier"]),
-                              str(row["manifest_sha256"]), dict(row["summary"] or {}))
+            raise PolicyDenied(
+                "the proposal object differs from the persisted proposal; the gate evaluates only the stored proposal",
+                proposal_id=str(proposal_id),
+            )
+        return StoredProposal(
+            stored,
+            str(row["proposal_type"]),
+            int(row["permission_tier"]),
+            str(row["manifest_sha256"]),
+            dict(row["summary"] or {}),
+        )
 
     # ------------------------------------------------------------------ protocol
-    def decide(self, proposal: PlatformChangeProposal | uuid.UUID, independent_reports: Sequence[ValidationReport],
-               signed_policy: ArtifactRef) -> GateDecision:
+    def decide(
+        self,
+        proposal: PlatformChangeProposal | uuid.UUID,
+        independent_reports: Sequence[ValidationReport],
+        signed_policy: ArtifactRef,
+    ) -> GateDecision:
         """Evaluate the persisted proposal ``proposal`` (an id, or an object that must equal the stored one)."""
         obj = proposal if isinstance(proposal, PlatformChangeProposal) else None
         pid = obj.proposal_id if obj is not None else uuid.UUID(str(proposal))
         if obj is not None:
             self._check_author(obj.author)
         if self.guard is not None and self.guard.blocked_reason():
-            return GateDecision(uuid.uuid4(), "blocked", pid, "n/a", (),
-                                (self.guard.blocked_reason() or "",), self.evaluator, None)
+            return GateDecision(
+                uuid.uuid4(), "blocked", pid, "n/a", (), (self.guard.blocked_reason() or "",), self.evaluator, None
+            )
         stored = self.load_stored(pid, obj)
         self._check_author(stored.proposal.author)
         return self._decide(stored, independent_reports, signed_policy)
 
-    def _decide(self, stored: StoredProposal, independent_reports: Sequence[ValidationReport],
-                signed_policy: ArtifactRef) -> GateDecision:
+    def _decide(
+        self, stored: StoredProposal, independent_reports: Sequence[ValidationReport], signed_policy: ArtifactRef
+    ) -> GateDecision:
         proposal = stored.proposal
         reasons: list[str] = []
         policy: PinnedPolicy | None = None
@@ -178,18 +229,26 @@ class PolicyPromotionGate:
             reasons.append("signed policy reference does not match the pinned policy digest")
         if reasons or policy is None:
             return self._record(stored, "blocked", reasons, [], None, {"stage": "policy_integrity"})
-        derived, why = derive_tier(proposal.changed_paths, proposal.requested_capabilities,
-                                   proposal.scientific_change, proposal.migration_required)
+        derived, why = derive_tier(
+            proposal.changed_paths,
+            proposal.requested_capabilities,
+            proposal.scientific_change,
+            proposal.migration_required,
+        )
         type_min = MIN_TIER_BY_TYPE.get(stored.proposal_type, 0)
         if type_min > derived:
             derived = type_min
             why = [*why, f"proposal type {stored.proposal_type} is at least T{type_min}"]
         declared = max(int(proposal.permission_tier), stored.row_tier)
         tier = max(declared, derived)
-        trace: dict[str, Any] = {"declared_tier": declared, "derived_tier": derived,
-                                 "derivation": why, "effective_tier": tier,
-                                 "proposal_type": stored.proposal_type,
-                                 "proposal_sha256": stored.document_sha256}
+        trace: dict[str, Any] = {
+            "declared_tier": declared,
+            "derived_tier": derived,
+            "derivation": why,
+            "effective_tier": tier,
+            "proposal_type": stored.proposal_type,
+            "proposal_sha256": stored.document_sha256,
+        }
         if derived > declared:
             reasons.append(f"declared tier T{declared} raised to T{derived}: {'; '.join(why)}")
         if proposal.policy_version != policy.version:
@@ -199,12 +258,22 @@ class PolicyPromotionGate:
         reasons += verify_reasons
         trace["reports_verified"] = verified
         if any(r.outcome == "blocked" for r in reports):
-            reasons += [f"{r.evaluator_version}: {f.message}" for r in reports if r.outcome == "blocked"
-                        for f in r.findings if f.severity == "blocker"]
+            reasons += [
+                f"{r.evaluator_version}: {f.message}"
+                for r in reports
+                if r.outcome == "blocked"
+                for f in r.findings
+                if f.severity == "blocker"
+            ]
             return self._record(stored, "blocked", reasons, reports, policy, trace)
         if any(r.outcome == "fail" for r in reports):
-            reasons += [f"{r.evaluator_version}: {f.code}" for r in reports if r.outcome == "fail"
-                        for f in r.findings if f.severity == "blocker"]
+            reasons += [
+                f"{r.evaluator_version}: {f.code}"
+                for r in reports
+                if r.outcome == "fail"
+                for f in r.findings
+                if f.severity == "blocker"
+            ]
             return self._record(stored, "reject", reasons, reports, policy, trace)
         if tier == 0:
             reasons.append("T0: read/discover/propose within budget is automatic")
@@ -216,16 +285,19 @@ class PolicyPromotionGate:
         ok, scope_reasons, scope = self._t1_scope(stored, reports, policy)
         trace["t1_scope"] = scope
         if ok:
-            reasons.append("T1 within signed policy scope: promoted automatically without human review "
-                           "(pinned template digest, registry-bound semantics and source, approved exact mapping, "
-                           "verified rights, known hosts, verified validator and sandbox reports)")
+            reasons.append(
+                "T1 within signed policy scope: promoted automatically without human review "
+                "(pinned template digest, registry-bound semantics and source, approved exact mapping, "
+                "verified rights, known hosts, verified validator and sandbox reports)"
+            )
             return self._record(stored, "promote", reasons, reports, policy, trace)
         reasons += ["T1 out of signed policy scope", *scope_reasons]
         return self._record(stored, "reject", reasons, reports, policy, trace)
 
     # ------------------------------------------------------------------ report verification
-    def _verified_reports(self, proposal: PlatformChangeProposal, reports: Sequence[ValidationReport]
-                          ) -> tuple[list[ValidationReport], list[str], list[dict[str, Any]]]:
+    def _verified_reports(
+        self, proposal: PlatformChangeProposal, reports: Sequence[ValidationReport]
+    ) -> tuple[list[ValidationReport], list[str], list[dict[str, Any]]]:
         """Keep only reports whose object matches their stored, digest-verified evidence."""
         kept: list[ValidationReport] = []
         reasons: list[str] = []
@@ -248,15 +320,26 @@ class PolicyPromotionGate:
                 entry["verdict"] = "malformed"
                 continue
             stored_evaluator = str(ev.get("evaluator") or "")
-            stored_blockers = sorted(str(f.get("code")) for f in ev.get("findings") or []
-                                     if isinstance(f, dict) and f.get("severity") == "blocker")
+            stored_blockers = sorted(
+                str(f.get("code"))
+                for f in ev.get("findings") or []
+                if isinstance(f, dict) and f.get("severity") == "blocker"
+            )
             obj_blockers = sorted(f.code for f in r.findings if f.severity == "blocker")
-            mismatch = [k for k, ok in (("outcome", ev.get("outcome") == r.outcome),
-                                        ("evaluator", stored_evaluator == r.evaluator_version),
-                                        ("blockers", stored_blockers == obj_blockers)) if not ok]
+            mismatch = [
+                k
+                for k, ok in (
+                    ("outcome", ev.get("outcome") == r.outcome),
+                    ("evaluator", stored_evaluator == r.evaluator_version),
+                    ("blockers", stored_blockers == obj_blockers),
+                )
+                if not ok
+            ]
             if mismatch:
-                reasons.append(f"ignored report {r.report_id}: report object disagrees with its stored evidence "
-                               f"({', '.join(mismatch)})")
+                reasons.append(
+                    f"ignored report {r.report_id}: report object disagrees with its stored evidence "
+                    f"({', '.join(mismatch)})"
+                )
                 entry["verdict"] = "mismatch"
                 continue
             if proposal.author in stored_evaluator or stored_evaluator.startswith(GATE_PREFIX):
@@ -268,16 +351,23 @@ class PolicyPromotionGate:
         return kept, reasons, trace
 
     # ------------------------------------------------------------------ T1 scope
-    def _t1_scope(self, stored: StoredProposal, reports: Sequence[ValidationReport],
-                  policy: PinnedPolicy) -> tuple[bool, list[str], dict[str, Any]]:
+    def _t1_scope(
+        self, stored: StoredProposal, reports: Sequence[ValidationReport], policy: PinnedPolicy
+    ) -> tuple[bool, list[str], dict[str, Any]]:
         from reva.autonomy import promotion as prom
         from reva.ontology.registry import load_registry
 
         proposal = stored.proposal
         problems: list[str] = []
         if stored.proposal_type != "connector_promotion":
-            return False, [f"T1 auto-promotion only covers declarative connector manifests (connector_promotion "
-                           f"proposals), not {stored.proposal_type!r}"], {}
+            return (
+                False,
+                [
+                    f"T1 auto-promotion only covers declarative connector manifests (connector_promotion "
+                    f"proposals), not {stored.proposal_type!r}"
+                ],
+                {},
+            )
         try:
             change = self.io.get_json(proposal.patch_or_manifest)
         except Exception as e:
@@ -310,8 +400,10 @@ class PolicyPromotionGate:
             if not hosts <= set(tpl.get("allowed_hosts") or []) or not hosts <= set(TEMPLATE_HOSTS):
                 problems.append(f"hosts {sorted(hosts)} outside approved template hosts")
             if pinned_digest is None or current_digest != pinned_digest:
-                problems.append("template code digest differs from the digest pinned in the signed policy "
-                                "(template = reviewed code; a maintainer must re-pin it)")
+                problems.append(
+                    "template code digest differs from the digest pinned in the signed policy "
+                    "(template = reviewed code; a maintainer must re-pin it)"
+                )
         if change.get("template_digest") != current_digest:
             problems.append("proposal was generated against a different template revision")
         registry = load_registry()
@@ -321,8 +413,10 @@ class PolicyPromotionGate:
             problems += binding.name_conflicts(conn, manifest["name"], str(manifest["source_key"]), template)
             expected_version, _ = prom.resolve_connector_version(conn, self.io, manifest, current_digest)
         if manifest["version"] != expected_version:
-            problems.append(f"version {manifest['version']!r} is not the content-derived version "
-                            f"{expected_version!r} (versions are never proposer-chosen)")
+            problems.append(
+                f"version {manifest['version']!r} is not the content-derived version "
+                f"{expected_version!r} (versions are never proposer-chosen)"
+            )
         mapping = change.get("mapping") or {}
         sem = manifest["request_parameters"]["semantics"]
         target = {"concept_id": sem["concept_id"], "version": sem["concept_version"]}
@@ -332,8 +426,7 @@ class PolicyPromotionGate:
             problems.append("mapping target differs from the manifest concept")
         rp = manifest["request_parameters"]
         geo = sorted(rp["filters"].get("geo", []))
-        entry = binding.approved_entry(policy, template, manifest["dataset"], target["concept_id"],
-                                       target["version"])
+        entry = binding.approved_entry(policy, template, manifest["dataset"], target["concept_id"], target["version"])
         if (change.get("candidate") or {}).get("rights_status") != "verified":
             problems.append("candidate rights are not verified")
         manifest_sha = (change.get("manifest_ref") or {}).get("sha256")
@@ -380,28 +473,53 @@ class PolicyPromotionGate:
         # it must be exactly the scope derived here (concept, dataset, subjects, years, manifest digest).
         from reva.cli.seed import entity_id
 
-        derived_db_scope = {"concept": f"{target['concept_id']}@{target['version']}", "dataset": manifest["dataset"],
-                            "subject_ids": [str(entity_id(x)) for x in subjects],
-                            "years": {"in": sorted({int(y) for y in rp["time"]})},
-                            "manifest_sha256": et.manifest_digest(manifest),
-                            "mapping_key": mm.get("mapping_key")}
+        derived_db_scope = {
+            "concept": f"{target['concept_id']}@{target['version']}",
+            "dataset": manifest["dataset"],
+            "subject_ids": [str(entity_id(x)) for x in subjects],
+            "years": {"in": sorted({int(y) for y in rp["time"]})},
+            "manifest_sha256": et.manifest_digest(manifest),
+            "mapping_key": mm.get("mapping_key"),
+        }
         recorded = dict(stored.summary.get("scope") or {})
         off = sorted(k for k, v in derived_db_scope.items() if recorded.get(k) != v)
         if off:
             problems.append(f"recorded proposal scope differs from the derived scope in {off}")
-        scope = {"template": template, "template_digest": current_digest, "pinned_template_digest": pinned_digest,
-                 "dataset": manifest["dataset"], "target": target, "geo": geo,
-                 "hosts": manifest["allowed_hosts"], "approved_entry": entry, "connector": manifest["name"],
-                 "version": manifest["version"], "expected_version": expected_version,
-                 "source_key": manifest["source_key"], "data_contract_sha256": expected_contract,
-                 "proposal_sha256": stored.document_sha256, "manifest_sha256": manifest_sha,
-                 "mapping_manifest_sha256": mapping_ref.sha256, "mapping_key": mm.get("mapping_key"),
-                 "subjects": subjects, "years": {"in": sorted(int(y) for y in rp["time"])},
-                 "fixture_bank_sha256": bank_sha, "recomputed": recomputed, "db_scope": derived_db_scope}
+        scope = {
+            "template": template,
+            "template_digest": current_digest,
+            "pinned_template_digest": pinned_digest,
+            "dataset": manifest["dataset"],
+            "target": target,
+            "geo": geo,
+            "hosts": manifest["allowed_hosts"],
+            "approved_entry": entry,
+            "connector": manifest["name"],
+            "version": manifest["version"],
+            "expected_version": expected_version,
+            "source_key": manifest["source_key"],
+            "data_contract_sha256": expected_contract,
+            "proposal_sha256": stored.document_sha256,
+            "manifest_sha256": manifest_sha,
+            "mapping_manifest_sha256": mapping_ref.sha256,
+            "mapping_key": mm.get("mapping_key"),
+            "subjects": subjects,
+            "years": {"in": sorted(int(y) for y in rp["time"])},
+            "fixture_bank_sha256": bank_sha,
+            "recomputed": recomputed,
+            "db_scope": derived_db_scope,
+        }
         return not problems, problems, scope
 
-    def _recompute(self, proposal: PlatformChangeProposal, change: dict[str, Any], manifest_sha: str | None,
-                   mapping_ref: ArtifactRef, bank_sha: str | None, problems: list[str]) -> dict[str, Any]:
+    def _recompute(
+        self,
+        proposal: PlatformChangeProposal,
+        change: dict[str, Any],
+        manifest_sha: str | None,
+        mapping_ref: ArtifactRef,
+        bank_sha: str | None,
+        problems: list[str],
+    ) -> dict[str, Any]:
         """Re-run the validator (captured replay, no network) and the sandbox on the stored proposal."""
         from reva.autonomy.common import default_budget
         from reva.autonomy.sandbox import TrustedTemplateSandbox, trusted_template_policy
@@ -415,17 +533,25 @@ class PolicyPromotionGate:
         try:
             cp = ConnectorProposal(
                 proposal_id=proposal.proposal_id,
-                candidate=SourceCandidate(proposal.proposal_id, str(cand.get("provider", "")), "",
-                                          str(cand.get("dataset_id", "")), ref_from(cand["metadata"]),
-                                          cand.get("rights_status", "unknown"), tuple(cand.get("allowed_hosts") or ())),
-                template_id=str(change.get("template_id")), template_digest=str(change.get("template_digest")),
+                candidate=SourceCandidate(
+                    proposal.proposal_id,
+                    str(cand.get("provider", "")),
+                    "",
+                    str(cand.get("dataset_id", "")),
+                    ref_from(cand["metadata"]),
+                    cand.get("rights_status", "unknown"),
+                    tuple(cand.get("allowed_hosts") or ()),
+                ),
+                template_id=str(change.get("template_id")),
+                template_digest=str(change.get("template_digest")),
                 manifest=ArtifactRef(manifest_sha, "models", "application/json"),
-                mapping=MappingProposal(proposal.proposal_id, ref_from(cand["metadata"]), "", "exact", mapping_ref,
-                                        False))
+                mapping=MappingProposal(
+                    proposal.proposal_id, ref_from(cand["metadata"]), "", "exact", mapping_ref, False
+                ),
+            )
             budget = default_budget()
             v = run_sync(JsonStatConnectorValidator(self.io, live_client_factory=None).validate(cp, bank, budget))
-            s = run_sync(TrustedTemplateSandbox(self.io, fixtures=bank).run(proposal,
-                                                                           trusted_template_policy(budget)))
+            s = run_sync(TrustedTemplateSandbox(self.io, fixtures=bank).run(proposal, trusted_template_policy(budget)))
         except (RevaError, KeyError, TypeError, ValueError) as e:
             problems.append(f"gate could not recompute the reports: {type(e).__name__}")
             return {}
@@ -433,8 +559,12 @@ class PolicyPromotionGate:
         for label, r in (("connector-validator", v), ("sandbox", s)):
             blockers = sorted(f.code for f in r.findings if f.severity == "blocker")
             t1_block = sorted(f.code for f in r.findings if f.code in T1_BLOCKING_FINDINGS)
-            out[label] = {"outcome": r.outcome, "evidence_sha256": r.evidence_manifest.sha256,
-                          "blockers": blockers, "t1_blocking": t1_block}
+            out[label] = {
+                "outcome": r.outcome,
+                "evidence_sha256": r.evidence_manifest.sha256,
+                "blockers": blockers,
+                "t1_blocking": t1_block,
+            }
             if r.outcome != "pass":
                 problems.append(f"gate-recomputed {label} report is {r.outcome}: {blockers[:5]}")
             if t1_block:
@@ -442,34 +572,64 @@ class PolicyPromotionGate:
         return out
 
     # ------------------------------------------------------------------ recording
-    def _record(self, stored: StoredProposal, outcome: str, reasons: list[str],
-                reports: Sequence[ValidationReport], policy: PinnedPolicy | None,
-                trace: dict[str, Any]) -> GateDecision:
+    def _record(
+        self,
+        stored: StoredProposal,
+        outcome: str,
+        reasons: list[str],
+        reports: Sequence[ValidationReport],
+        policy: PinnedPolicy | None,
+        trace: dict[str, Any],
+    ) -> GateDecision:
         proposal = stored.proposal
         version = policy.version if policy is not None else "policy-integrity-failure"
         evidence = {
-            "schema": "reva-gate-decision/1", "gate": self.name, "evaluator": self.evaluator,
-            "proposal_id": str(proposal.proposal_id), "proposal_author": proposal.author,
-            "proposal_type": stored.proposal_type, "proposal_sha256": stored.document_sha256,
-            "outcome": outcome, "db_decision": DB_DECISION[outcome], "reasons": reasons,
-            "policy": {"version": version, "sha256": policy.sha256 if policy else None,
-                       "pinned_sha256": self.pinned_sha256, "path": self.policy_path.name},
-            "tier": trace, "reports": [report_json(r) for r in reports],
+            "schema": "reva-gate-decision/1",
+            "gate": self.name,
+            "evaluator": self.evaluator,
+            "proposal_id": str(proposal.proposal_id),
+            "proposal_author": proposal.author,
+            "proposal_type": stored.proposal_type,
+            "proposal_sha256": stored.document_sha256,
+            "outcome": outcome,
+            "db_decision": DB_DECISION[outcome],
+            "reasons": reasons,
+            "policy": {
+                "version": version,
+                "sha256": policy.sha256 if policy else None,
+                "pinned_sha256": self.pinned_sha256,
+                "path": self.policy_path.name,
+            },
+            "tier": trace,
+            "reports": [report_json(r) for r in reports],
         }
         ref = self.io.put_json(evidence, "evaluation")
         with self.engine.begin() as conn:
-            sha = conn.execute(text("SELECT manifest_sha256 FROM ops.proposal WHERE id = :i"),
-                               {"i": proposal.proposal_id}).scalar_one_or_none()
+            sha = conn.execute(
+                text("SELECT manifest_sha256 FROM ops.proposal WHERE id = :i"), {"i": proposal.proposal_id}
+            ).scalar_one_or_none()
             if sha is None or str(sha) != stored.document_sha256:
                 raise ValidationProblem("gate evaluates only persisted proposals (ops.proposal)")
             self.io.register(conn, ref, "gate-decision/1")
             # GATE/R6-02: a pass carries the scope this gate derived (t1_scope.db_scope)
             db_scope = (trace.get("t1_scope") or {}).get("db_scope") if outcome == "promote" else None
-            gid = record_gate_result(conn, proposal.proposal_id, self.name, version, DB_DECISION[outcome],
-                                     ref.sha256, self.evaluator, scope=db_scope)
+            gid = record_gate_result(
+                conn,
+                proposal.proposal_id,
+                self.name,
+                version,
+                DB_DECISION[outcome],
+                ref.sha256,
+                self.evaluator,
+                scope=db_scope,
+            )
         return GateDecision(
-            decision_id=gid, outcome=outcome,  # type: ignore[arg-type]
-            proposal_id=proposal.proposal_id, policy_version=version,
-            reports=tuple(r.evidence_manifest for r in reports), reasons=tuple(reasons),
-            reviewer_identity=self.evaluator, signed_receipt=ref,
+            decision_id=gid,
+            outcome=outcome,  # type: ignore[arg-type]
+            proposal_id=proposal.proposal_id,
+            policy_version=version,
+            reports=tuple(r.evidence_manifest for r in reports),
+            reasons=tuple(reasons),
+            reviewer_identity=self.evaluator,
+            signed_receipt=ref,
         )

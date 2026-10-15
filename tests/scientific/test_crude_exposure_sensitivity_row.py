@@ -29,11 +29,23 @@ def _compiled(grid: list[dict]) -> SimpleNamespace:
     raw = json.loads((CONTRACTS / "scenario.example.json").read_text())
     raw.update(countries=["FRA"], baseline_release_id=str(uuid4()))
     if grid:
-        raw.update(fidelity="L2", assumptions={"quantity_response": "elasticity_sensitivity",
-                                               "elasticity_grid": grid, "no_general_equilibrium": True})
+        raw.update(
+            fidelity="L2",
+            assumptions={
+                "quantity_response": "elasticity_sensitivity",
+                "elasticity_grid": grid,
+                "no_general_equilibrium": True,
+            },
+        )
     spec = validate_scenario_spec(raw)
-    country = SimpleNamespace(iso3="FRA", subject_id=uuid4(), status="ready", inputs=None,
-                              values=(Decimal(100), Decimal(40), Decimal(1000)), input_refs=lambda: {})
+    country = SimpleNamespace(
+        iso3="FRA",
+        subject_id=uuid4(),
+        status="ready",
+        inputs=None,
+        values=(Decimal(100), Decimal(40), Decimal(1000)),
+        input_refs=lambda: {},
+    )
     change = SimpleNamespace(import_multiplier=Decimal("1.25"), export_multiplier=Decimal("1.25"))
     return SimpleNamespace(spec=spec, change=change, countries=[country])
 
@@ -73,8 +85,10 @@ def test_range_contains_l1_even_when_grid_omits_zero():
     l1 = Decimal(rows[(k, "L1")].value["value"])
     assert l1 == Decimal("1.5")
     # grid-only range from the review: [-0.410, 0.608], which excludes 1.5
-    grid_only = [ce.exposure_l2(100, 40, 1000, 1.25, 1.25, g["import_elasticity"], g["export_elasticity"])
-                 for g in GRID_WITHOUT_ZERO]
+    grid_only = [
+        ce.exposure_l2(100, 40, 1000, 1.25, 1.25, g["import_elasticity"], g["export_elasticity"])
+        for g in GRID_WITHOUT_ZERO
+    ]
     lo_g, hi_g = ce.sensitivity_range(grid_only, k)
     assert not lo_g <= l1 <= hi_g
     r = rows[(k, engine.SENSITIVITY_VARIANT)].value
@@ -104,11 +118,17 @@ def test_l1_run_has_no_range_row():
 
 def test_kernel_sensitivity_range_needs_both_bounds():
     with pytest.raises(ValidationError):
-        UncertaintySpec(status="quantified", kind="sensitivity_range", description="d", method_version="m@1",
-                        lower="1")
+        UncertaintySpec(status="quantified", kind="sensitivity_range", description="d", method_version="m@1", lower="1")
     s = UncertaintySpec.sensitivity("1", "2", "m@1", "grid", conditioning=("eM=-0.5",))
     assert s.is_assumption_sensitivity and not s.quantifies_measurement and s.conditioning == ("eM=-0.5",)
-    pi = UncertaintySpec(status="quantified", kind="prediction_interval", description="d", method_version="m@1",
-                         level=0.8, lower="1", upper="2")
+    pi = UncertaintySpec(
+        status="quantified",
+        kind="prediction_interval",
+        description="d",
+        method_version="m@1",
+        level=0.8,
+        lower="1",
+        upper="2",
+    )
     assert pi.quantifies_measurement and not pi.is_assumption_sensitivity
     assert not UncertaintySpec.unknown().quantifies_measurement

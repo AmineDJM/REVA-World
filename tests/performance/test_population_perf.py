@@ -29,9 +29,7 @@ def _france_like_cells() -> list[SourceCell]:
     for sex in ("F", "M"):
         counts = rng.integers(300_000, 370_000, size=len(AGES))
         for age, c in zip(AGES, counts, strict=True):
-            cells.append(
-                SourceCell(age, sex, int(c), ("p",) if age == "UNK" else (), f"{sex}.{age}")
-            )
+            cells.append(SourceCell(age, sex, int(c), ("p",) if age == "UNK" else (), f"{sex}.{age}"))
     total = sum(c.count or 0 for c in cells)
     cells.append(SourceCell("TOTAL", "T", total, (), "T.TOTAL"))
     return cells

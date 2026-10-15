@@ -41,20 +41,27 @@ def contract_for(manifest: dict[str, Any], registry: Any = None) -> dict[str, An
     try:
         concept = reg.concept(str(rp["semantics"]["concept_id"]))
     except KeyError:
-        raise ValidationProblem("manifest concept is not registered: no data contract can be derived",
-                                concept=str(rp["semantics"]["concept_id"])[:100]) from None
+        raise ValidationProblem(
+            "manifest concept is not registered: no data contract can be derived",
+            concept=str(rp["semantics"]["concept_id"])[:100],
+        ) from None
     sem = expected_semantics(concept)
     res = rp["resolution_dimensions"]
-    dims = {d: {"categories": list(rp["pinned_categories"][d]), "totals": list(rp["total_categories"].get(d, []))}
-            for d in res}
+    dims = {
+        d: {"categories": list(rp["pinned_categories"][d]), "totals": list(rp["total_categories"].get(d, []))}
+        for d in res
+    }
     expected = len(rp["time"]) * len(rp["filters"][rp["subject"]["dimension"]])
     for d in res:
         expected *= len(dims[d]["categories"])
     return {
         "schema": "reva-data-contract/1",
-        "concept_id": sem["concept_id"], "concept_version": sem["concept_version"],
-        "unit_ref": sem["unit_ref"], "aggregation": sem["aggregation"],
-        "population_universe": sem["population_universe"], "temporal_support": sem["temporal_support"],
+        "concept_id": sem["concept_id"],
+        "concept_version": sem["concept_version"],
+        "unit_ref": sem["unit_ref"],
+        "aggregation": sem["aggregation"],
+        "population_universe": sem["population_universe"],
+        "temporal_support": sem["temporal_support"],
         "subject_provider": SUBJECT["alias_provider"],
         "basis": "registry_semantic_profile",
         "subjects": list(rp["filters"][rp["subject"]["dimension"]]),
@@ -69,8 +76,11 @@ def evaluate_batch(batch: dict[str, Any], contract: dict[str, Any]) -> tuple[lis
     obs: list[dict[str, Any]] = list(batch.get("observations") or [])
     f: list[Finding] = []
     detail: dict[str, Any] = {"cells": len(obs)}
-    wrong_concept = [o for o in obs if (o["concept_id"], o["concept_version"])
-                     != (contract["concept_id"], contract["concept_version"])]
+    wrong_concept = [
+        o
+        for o in obs
+        if (o["concept_id"], o["concept_version"]) != (contract["concept_id"], contract["concept_version"])
+    ]
     if wrong_concept:
         f.append(_f("concept_mismatch", "blocker", f"{len(wrong_concept)} cells map to another concept"))
     units = Counter(o["value"].get("unit_ref") for o in obs if o["value"].get("kind") == "decimal")
@@ -94,8 +104,13 @@ def evaluate_batch(batch: dict[str, Any], contract: dict[str, Any]) -> tuple[lis
     if bad_support:
         f.append(_f("support_mismatch", "blocker", f"{bad_support} cells with aggregation/universe off contract"))
     if bad_time:
-        f.append(_f("temporal_support_mismatch", "blocker",
-                    f"{bad_time} cells not on the {contract['temporal_support']} point support"))
+        f.append(
+            _f(
+                "temporal_support_mismatch",
+                "blocker",
+                f"{bad_time} cells not on the {contract['temporal_support']} point support",
+            )
+        )
     if years - set(contract["years"]):
         f.append(_f("unexpected_period", "blocker", f"periods {sorted(years - set(contract['years']))}"))
     subj = {(o["subject_provider"], o["subject_key"]) for o in obs}
@@ -111,15 +126,25 @@ def evaluate_batch(batch: dict[str, Any], contract: dict[str, Any]) -> tuple[lis
         for o in obs:
             if o["value"].get("kind") == "missing":
                 missing_by_cat[str(o["support"]["resolution"].get(dim))] += 1
-        per_dim[dim] = {"categories_seen": len(seen), "unexpected": unexpected, "absent": absent,
-                        "missing_values_by_category": dict(missing_by_cat), "totals": spec["totals"]}
+        per_dim[dim] = {
+            "categories_seen": len(seen),
+            "unexpected": unexpected,
+            "absent": absent,
+            "missing_values_by_category": dict(missing_by_cat),
+            "totals": spec["totals"],
+        }
         if unexpected:
             f.append(_f("unexpected_category", "blocker", f"{dim}: unexpected categories {unexpected[:10]}"))
         if absent:
             f.append(_f("missing_category", "blocker", f"{dim}: expected categories absent {absent[:10]}"))
         if missing_by_cat:
-            f.append(_f("missing_values", "warning",
-                        f"{dim}: {sum(missing_by_cat.values())} Missing cells in {len(missing_by_cat)} categories"))
+            f.append(
+                _f(
+                    "missing_values",
+                    "warning",
+                    f"{dim}: {sum(missing_by_cat.values())} Missing cells in {len(missing_by_cat)} categories",
+                )
+            )
     detail["dimensions"] = per_dim
     if len(obs) != int(contract["expected_cells"]):
         f.append(_f("incomplete", "blocker", f"{len(obs)} cells, contract expects {contract['expected_cells']}"))
@@ -149,9 +174,16 @@ class DimensionRuleQualityEvaluator:
         contract = self.io.get_json(data_contract)
         findings, detail = evaluate_batch(batch, contract)
         outcome = "fail" if any(x.severity == "blocker" for x in findings) else "pass"
-        ev = self.io.put_json({"schema": "reva-quality-report/1", "evaluator": EVALUATOR,
-                               "batch": observation_batch.sha256, "contract": data_contract.sha256,
-                               "outcome": outcome, "detail": detail,
-                               "findings": [{"code": x.code, "severity": x.severity, "message": x.message}
-                                            for x in findings]}, "evaluation")
+        ev = self.io.put_json(
+            {
+                "schema": "reva-quality-report/1",
+                "evaluator": EVALUATOR,
+                "batch": observation_batch.sha256,
+                "contract": data_contract.sha256,
+                "outcome": outcome,
+                "detail": detail,
+                "findings": [{"code": x.code, "severity": x.severity, "message": x.message} for x in findings],
+            },
+            "evaluation",
+        )
         return report(outcome, findings, ev, EVALUATOR, {"cells": detail["cells"]})

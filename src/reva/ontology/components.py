@@ -151,8 +151,9 @@ def load_component_manifests(root: Path | None = None) -> dict[str, ComponentMan
     return out
 
 
-def verify_published(manifests: Mapping[str, ComponentManifest],
-                     pinned: Mapping[str, str] = PUBLISHED_COMPONENT_DIGESTS) -> None:
+def verify_published(
+    manifests: Mapping[str, ComponentManifest], pinned: Mapping[str, str] = PUBLISHED_COMPONENT_DIGESTS
+) -> None:
     """Every pinned published version must exist and be byte-for-byte (logically) unchanged."""
     for key, digest in pinned.items():
         m = manifests.get(key)
@@ -162,7 +163,8 @@ def verify_published(manifests: Mapping[str, ComponentManifest],
         if actual != digest:
             raise ImmutableRecordViolation(
                 f"published component {key} changed (digest {actual} != pinned {digest}); publish a new version",
-                component=key)
+                component=key,
+            )
 
 
 # --------------------------------------------------------------------------- instance validation
@@ -184,8 +186,12 @@ _GENDER_KEYS = frozenset({"gender", "gender_identity"})
 
 
 def _rule_no_gender(inst: Mapping[str, Any]) -> list[str]:
-    return [f"{p or '/'}: field {k!r} is not part of recorded sex and is not collected"
-            for p, d in _walk(inst) for k in d if k in _GENDER_KEYS]
+    return [
+        f"{p or '/'}: field {k!r} is not part of recorded sex and is not collected"
+        for p, d in _walk(inst)
+        for k in d
+        if k in _GENDER_KEYS
+    ]
 
 
 def _rule_age(inst: Mapping[str, Any]) -> list[str]:
@@ -208,8 +214,11 @@ def _rule_age(inst: Mapping[str, Any]) -> list[str]:
 
 
 def _rule_units(inst: Mapping[str, Any]) -> list[str]:
-    return [f"{p}: unit_ref {d['unit_ref']!r} is not registered" for p, d in _walk(inst)
-            if "unit_ref" in d and not (isinstance(d["unit_ref"], str) and is_known_unit(d["unit_ref"]))]
+    return [
+        f"{p}: unit_ref {d['unit_ref']!r} is not registered"
+        for p, d in _walk(inst)
+        if "unit_ref" in d and not (isinstance(d["unit_ref"], str) and is_known_unit(d["unit_ref"]))
+    ]
 
 
 def _rule_currency(inst: Mapping[str, Any]) -> list[str]:
@@ -217,8 +226,9 @@ def _rule_currency(inst: Mapping[str, Any]) -> list[str]:
     for p, d in _walk(inst):
         u = d.get("unit_ref")
         if isinstance(u, str) and is_known_unit(u) and is_currency_unit(u):
-            errs.extend(f"{p}: {i.message}" for i in currency_basis_issues(u, d.get("basis"), p)
-                        if i.severity == "error")
+            errs.extend(
+                f"{p}: {i.message}" for i in currency_basis_issues(u, d.get("basis"), p) if i.severity == "error"
+            )
     return errs
 
 
@@ -259,19 +269,24 @@ class ComponentValidationReport(BaseModel):
 
     def require(self) -> None:
         if not self.ok:
-            raise ValidationProblem(f"{self.component} instance invalid",
-                                    schema_errors=list(self.schema_errors), rule_errors=list(self.rule_errors))
+            raise ValidationProblem(
+                f"{self.component} instance invalid",
+                schema_errors=list(self.schema_errors),
+                rule_errors=list(self.rule_errors),
+            )
 
 
 def validate_component_instance(m: ComponentManifest, instance: Mapping[str, Any]) -> ComponentValidationReport:
     validator = Draft202012Validator(m.json_schema, format_checker=FormatChecker())
-    schema_errors = tuple(sorted(f"/{'/'.join(str(x) for x in e.absolute_path)}: {e.message}"
-                                 for e in validator.iter_errors(instance)))
+    schema_errors = tuple(
+        sorted(f"/{'/'.join(str(x) for x in e.absolute_path)}: {e.message}" for e in validator.iter_errors(instance))
+    )
     rule_errors: list[str] = []
     for r in m.validation_rules:
         rule_errors.extend(VALIDATION_RULES[r](instance))
-    return ComponentValidationReport(component=version_key(m), schema_errors=schema_errors,
-                                     rule_errors=tuple(rule_errors))
+    return ComponentValidationReport(
+        component=version_key(m), schema_errors=schema_errors, rule_errors=tuple(rule_errors)
+    )
 
 
 # --------------------------------------------------------------------------- change classification
@@ -298,13 +313,42 @@ class ChangeReport(BaseModel):
 
 
 # Keywords whose change alters what a valid instance is or means.
-_MEANING_KEYWORDS = frozenset({
-    "type", "enum", "const", "format", "pattern", "minimum", "maximum", "exclusiveMinimum", "exclusiveMaximum",
-    "minLength", "maxLength", "multipleOf", "minItems", "maxItems", "uniqueItems", "additionalProperties",
-    "$ref", "minProperties", "maxProperties", "dependentRequired", "if", "then", "else", "not",
-    "prefixItems", "contains", "patternProperties", "propertyNames", "unevaluatedProperties",
-    "unevaluatedItems", "x-reva-unit", "x-reva-concept",
-})
+_MEANING_KEYWORDS = frozenset(
+    {
+        "type",
+        "enum",
+        "const",
+        "format",
+        "pattern",
+        "minimum",
+        "maximum",
+        "exclusiveMinimum",
+        "exclusiveMaximum",
+        "minLength",
+        "maxLength",
+        "multipleOf",
+        "minItems",
+        "maxItems",
+        "uniqueItems",
+        "additionalProperties",
+        "$ref",
+        "minProperties",
+        "maxProperties",
+        "dependentRequired",
+        "if",
+        "then",
+        "else",
+        "not",
+        "prefixItems",
+        "contains",
+        "patternProperties",
+        "propertyNames",
+        "unevaluatedProperties",
+        "unevaluatedItems",
+        "x-reva-unit",
+        "x-reva-concept",
+    }
+)
 _DEFINITION_KEYWORDS = frozenset({"description"})
 _ANNOTATION_KEYWORDS = frozenset({"title", "examples", "$comment", "default", "deprecated", "readOnly", "writeOnly"})
 _COMPOSITION = ("oneOf", "anyOf", "allOf")
@@ -322,28 +366,42 @@ def _diff_schema(old: Any, new: Any, path: str, out: list[ChangeReason]) -> None
         out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/properties/{name}", message="field removed"))
     for name in sorted(set(new_props) - set(old_props)):
         if name in new_req:
-            out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/properties/{name}",
-                                    message="new required field"))
+            out.append(
+                ChangeReason(level=ChangeLevel.major, path=f"{path}/properties/{name}", message="new required field")
+            )
         else:
-            out.append(ChangeReason(level=ChangeLevel.minor, path=f"{path}/properties/{name}",
-                                    message="additive optional field"))
+            out.append(
+                ChangeReason(
+                    level=ChangeLevel.minor, path=f"{path}/properties/{name}", message="additive optional field"
+                )
+            )
     for name in sorted(set(old_props) & set(new_props)):
         _diff_schema(old_props[name], new_props[name], f"{path}/properties/{name}", out)
     for name in sorted((new_req - old_req) & set(old_props)):
-        out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/required/{name}",
-                                message="existing field became required"))
+        out.append(
+            ChangeReason(
+                level=ChangeLevel.major, path=f"{path}/required/{name}", message="existing field became required"
+            )
+        )
     for name in sorted((old_req - new_req) & set(new_props)):
-        out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/required/{name}",
-                                message="required field became optional (consumers may rely on it)"))
+        out.append(
+            ChangeReason(
+                level=ChangeLevel.major,
+                path=f"{path}/required/{name}",
+                message="required field became optional (consumers may rely on it)",
+            )
+        )
     for kw in ("$defs", "definitions"):
         o, n = old.get(kw, {}), new.get(kw, {})
         for name in sorted(set(o) | set(n)):
             if name not in n:
-                out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/{kw}/{name}",
-                                        message="definition removed"))
+                out.append(
+                    ChangeReason(level=ChangeLevel.major, path=f"{path}/{kw}/{name}", message="definition removed")
+                )
             elif name not in o:
-                out.append(ChangeReason(level=ChangeLevel.minor, path=f"{path}/{kw}/{name}",
-                                        message="definition added"))
+                out.append(
+                    ChangeReason(level=ChangeLevel.minor, path=f"{path}/{kw}/{name}", message="definition added")
+                )
             else:
                 _diff_schema(o[name], n[name], f"{path}/{kw}/{name}", out)
     for kw in _COMPOSITION:
@@ -368,19 +426,30 @@ def _diff_schema(old: Any, new: Any, path: str, out: list[ChangeReason]) -> None
             what = "category definition" if kw in ("enum", "const") else "constraint/unit"
             out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/{kw}", message=f"{what} changed"))
         elif kw in _DEFINITION_KEYWORDS:
-            out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/{kw}",
-                                    message="definition text changed (meaning change; requires review)"))
+            out.append(
+                ChangeReason(
+                    level=ChangeLevel.major,
+                    path=f"{path}/{kw}",
+                    message="definition text changed (meaning change; requires review)",
+                )
+            )
         elif kw in _ANNOTATION_KEYWORDS:
             out.append(ChangeReason(level=ChangeLevel.patch, path=f"{path}/{kw}", message="annotation changed"))
         elif kw in ("$id", "$schema"):
             continue  # $id tracks the version; $schema is fixed by check_manifest
         else:
-            out.append(ChangeReason(level=ChangeLevel.major, path=f"{path}/{kw}",
-                                    message=f"unrecognised keyword {kw} changed (treated as meaning change)"))
+            out.append(
+                ChangeReason(
+                    level=ChangeLevel.major,
+                    path=f"{path}/{kw}",
+                    message=f"unrecognised keyword {kw} changed (treated as meaning change)",
+                )
+            )
 
 
-def _set_diff(path: str, old: Iterable[str], new: Iterable[str], added: ChangeLevel, removed: ChangeLevel,
-              out: list[ChangeReason]) -> None:
+def _set_diff(
+    path: str, old: Iterable[str], new: Iterable[str], added: ChangeLevel, removed: ChangeLevel, out: list[ChangeReason]
+) -> None:
     o, n = set(old), set(new)
     for x in sorted(n - o):
         out.append(ChangeReason(level=added, path=f"{path}/{x}", message="added"))
@@ -394,8 +463,14 @@ def classify_change(old: ComponentManifest, new: ComponentManifest) -> ChangeRep
         raise ValidationProblem(f"different components: {old.name} vs {new.name}")
     out: list[ChangeReason] = []
     _diff_schema(old.json_schema, new.json_schema, "#", out)
-    _set_diff("applicable_entity_kinds", old.applicable_entity_kinds, new.applicable_entity_kinds,
-              ChangeLevel.minor, ChangeLevel.major, out)
+    _set_diff(
+        "applicable_entity_kinds",
+        old.applicable_entity_kinds,
+        new.applicable_entity_kinds,
+        ChangeLevel.minor,
+        ChangeLevel.major,
+        out,
+    )
     old_c = {c.split("@")[0]: c for c in old.concepts}
     new_c = {c.split("@")[0]: c for c in new.concepts}
     for cid in sorted(set(old_c) | set(new_c)):
@@ -404,14 +479,18 @@ def classify_change(old: ComponentManifest, new: ComponentManifest) -> ChangeRep
         elif cid not in old_c:
             out.append(ChangeReason(level=ChangeLevel.minor, path=f"concepts/{cid}", message="concept added"))
         elif old_c[cid] != new_c[cid]:
-            out.append(ChangeReason(level=ChangeLevel.major, path=f"concepts/{cid}",
-                                    message=f"concept version changed {old_c[cid]} -> {new_c[cid]}"))
+            out.append(
+                ChangeReason(
+                    level=ChangeLevel.major,
+                    path=f"concepts/{cid}",
+                    message=f"concept version changed {old_c[cid]} -> {new_c[cid]}",
+                )
+            )
     if old.support_requirements != new.support_requirements:
         out.append(ChangeReason(level=ChangeLevel.major, path="support_requirements", message="support changed"))
     if old.privacy_class != new.privacy_class:
         out.append(ChangeReason(level=ChangeLevel.major, path="privacy_class", message="privacy class changed"))
-    _set_diff("validation_rules", old.validation_rules, new.validation_rules, ChangeLevel.major, ChangeLevel.minor,
-              out)
+    _set_diff("validation_rules", old.validation_rules, new.validation_rules, ChangeLevel.major, ChangeLevel.minor, out)
     level = max((r.level for r in out), default=ChangeLevel.none)
     return ChangeReport(level=level, reasons=tuple(out))
 
@@ -427,7 +506,8 @@ def check_version_bump(old: ComponentManifest, new: ComponentManifest) -> Change
     if nv <= ov:
         raise ImmutableRecordViolation(
             f"{new.name}@{old.version} is published; a {report.level.name} change needs a new version",
-            reasons=[r.model_dump(mode="json") for r in report.reasons])
+            reasons=[r.model_dump(mode="json") for r in report.reasons],
+        )
     if nv[0] > ov[0]:
         bump = ChangeLevel.major
     elif nv[1] > ov[1]:
@@ -437,7 +517,8 @@ def check_version_bump(old: ComponentManifest, new: ComponentManifest) -> Change
     if bump < report.level:
         raise ValidationProblem(
             f"{new.name}: {old.version} -> {new.version} is a {bump.name} bump but the change is {report.level.name}",
-            reasons=[r.model_dump(mode="json") for r in report.reasons])
+            reasons=[r.model_dump(mode="json") for r in report.reasons],
+        )
     return report
 
 
@@ -455,8 +536,11 @@ class ComponentCatalog:
             if manifest_digest(existing) != manifest_digest(m):
                 raise ImmutableRecordViolation(f"{key} is published and immutable", component=key)
             return key
-        prior = [p for p in self._published.values() if p.name == m.name and
-                 parse_semver(p.version) < parse_semver(m.version)]
+        prior = [
+            p
+            for p in self._published.values()
+            if p.name == m.name and parse_semver(p.version) < parse_semver(m.version)
+        ]
         if prior:
             check_version_bump(max(prior, key=lambda p: parse_semver(p.version)), m)
         self._published[key] = m

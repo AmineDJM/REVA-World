@@ -59,26 +59,44 @@ class StructuredCardImporter:
             except ValidationProblem as e:
                 rejected.append({"index": i, "reason": e.message[:500]})
                 continue
-            bad_spans = [s.locator for s in card.source_spans
-                         if s.artifact not in sources or s.quote not in sources[s.artifact]]
+            bad_spans = [
+                s.locator for s in card.source_spans if s.artifact not in sources or s.quote not in sources[s.artifact]
+            ]
             if bad_spans:
-                rejected.append({"index": i, "claim_id": card.claim_id,
-                                 "reason": f"span quotes not found verbatim in supplied source text: {bad_spans}"})
+                rejected.append(
+                    {
+                        "index": i,
+                        "claim_id": card.claim_id,
+                        "reason": f"span quotes not found verbatim in supplied source text: {bad_spans}",
+                    }
+                )
                 continue
             data = card.model_dump(mode="json")
             unsupported = tuple(sorted(k for k, v in data.items() if v == NOT_EXTRACTED or v is None))
-            ref = self.io.put_json({"schema": "reva-evidence-candidate/1", "status": "candidate",
-                                    "card": data, "document": document.sha256,
-                                    "context_id": str(context.context_id), "extractor": self.EXTRACTOR}, "models")
-            out.append(EvidenceCandidate(
-                candidate_id=stable_id("evidence-candidate", document.sha256, card.claim_id,
-                                       str(card.claim_version)),
-                card=ref,
-                source_spans=tuple({"artifact": s.artifact, "locator": s.locator, "quote": s.quote}
-                                   for s in card.source_spans),
-                status="candidate",
-                unsupported_fields=unsupported,
-            ))
+            ref = self.io.put_json(
+                {
+                    "schema": "reva-evidence-candidate/1",
+                    "status": "candidate",
+                    "card": data,
+                    "document": document.sha256,
+                    "context_id": str(context.context_id),
+                    "extractor": self.EXTRACTOR,
+                },
+                "models",
+            )
+            out.append(
+                EvidenceCandidate(
+                    candidate_id=stable_id(
+                        "evidence-candidate", document.sha256, card.claim_id, str(card.claim_version)
+                    ),
+                    card=ref,
+                    source_spans=tuple(
+                        {"artifact": s.artifact, "locator": s.locator, "quote": s.quote} for s in card.source_spans
+                    ),
+                    status="candidate",
+                    unsupported_fields=unsupported,
+                )
+            )
         return ExtractionOutcome("candidates", tuple(out), tuple(rejected), extractor=self.EXTRACTOR)
 
     def extract(self, document: ArtifactRef, context: ScopedContext) -> tuple[EvidenceCandidate, ...]:
@@ -97,8 +115,12 @@ class LlmEvidenceExtractor:
         if reason is None and self.provider is None:
             reason = "blocked: no LLM provider adapter is implemented in V1"
         if reason is not None:
-            return ExtractionOutcome("blocked", reason=reason, extractor=self.EXTRACTOR,
-                                     notes=("an LLM can only ever produce candidate cards with exact spans",))
+            return ExtractionOutcome(
+                "blocked",
+                reason=reason,
+                extractor=self.EXTRACTOR,
+                notes=("an LLM can only ever produce candidate cards with exact spans",),
+            )
         raise CapabilityGap("LLM extraction provider adapters are not part of V1")  # pragma: no cover
 
     def extract(self, document: ArtifactRef, context: ScopedContext) -> tuple[EvidenceCandidate, ...]:

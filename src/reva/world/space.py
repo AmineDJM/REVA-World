@@ -32,19 +32,33 @@ def display_match_status(props: dict[str, Any], *, matched: bool) -> str:
 
 
 def publish_display_geometries(
-    conn: Connection, store: ArtifactStore, raw: RawAcquisition, batches: list[ObservationBatch],
+    conn: Connection,
+    store: ArtifactStore,
+    raw: RawAcquisition,
+    batches: list[ObservationBatch],
     summary: PublishSummary,
 ) -> dict[str, int]:
     """Post-publish step for Natural Earth: runs inside the acquisition publication
     transaction (``conn``), so geometries commit atomically with the acquisition."""
     gj = NaturalEarthConnector.to_geojson(raw.body)
     counts = {"reviewed_match": 0, "unmatched": 0, "disputed": 0}
-    act = repo.simple_activity("geometry.normalisation", "normalisation", "worker:geometry",
-                               {"dataset_sha256": summary.raw_sha256, "ne_version": gj.get("ne_version")})
-    norm_sha = repo.store_json_artifact(conn, store, gj, "normalised", schema_version="geojson/naturalearth-1",
-                                        rights={"licence": "Public domain", "attribution": "Made with Natural Earth"})
-    repo.record_activity(conn, act, inputs=[(summary.raw_sha256, {"archive": "ne_110m_admin_0_countries"})],
-                         outputs=[norm_sha])
+    act = repo.simple_activity(
+        "geometry.normalisation",
+        "normalisation",
+        "worker:geometry",
+        {"dataset_sha256": summary.raw_sha256, "ne_version": gj.get("ne_version")},
+    )
+    norm_sha = repo.store_json_artifact(
+        conn,
+        store,
+        gj,
+        "normalised",
+        schema_version="geojson/naturalearth-1",
+        rights={"licence": "Public domain", "attribution": "Made with Natural Earth"},
+    )
+    repo.record_activity(
+        conn, act, inputs=[(summary.raw_sha256, {"archive": "ne_110m_admin_0_countries"})], outputs=[norm_sha]
+    )
     for i, f in enumerate(gj["features"]):
         props = dict(f["properties"])
         key = str(props.get("ADM0_A3") or f"feature-{i}")
@@ -67,11 +81,21 @@ def publish_display_geometries(
                            :a)
                    ON CONFLICT (dataset_sha256, feature_key) DO NOTHING"""
             ),
-            {"d": summary.raw_sha256, "k": f"{key}:{i}", "e": entity, "s": status,
-             "p": json.dumps(props, default=str), "g": json.dumps(f["geometry"]), "a": act.id},
+            {
+                "d": summary.raw_sha256,
+                "k": f"{key}:{i}",
+                "e": entity,
+                "s": status,
+                "p": json.dumps(props, default=str),
+                "g": json.dumps(f["geometry"]),
+                "a": act.id,
+            },
         )
-    repo.emit_outbox(conn, "world.display_geometry_published",
-                     {"dataset_sha256": summary.raw_sha256, "normalised_sha256": norm_sha, **counts})
+    repo.emit_outbox(
+        conn,
+        "world.display_geometry_published",
+        {"dataset_sha256": summary.raw_sha256, "normalised_sha256": norm_sha, **counts},
+    )
     return counts
 
 

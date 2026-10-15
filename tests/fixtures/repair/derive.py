@@ -35,44 +35,113 @@ ROOT = Path(__file__).parent
 SOURCE = ROOT.parent / "source"
 WB = "worldbank.wdi.indicators"
 CT = "un.comtrade.public_exact"
-WB_POP = ("https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json"
-          "&date=2000:2024&per_page=1000&page=1")
-CT_FRA_M_2023 = ("https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709"
-                 "&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500")
+WB_POP = (
+    "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json"
+    "&date=2000:2024&per_page=1000&page=1"
+)
+CT_FRA_M_2023 = (
+    "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709"
+    "&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500"
+)
 
 CASES: list[dict[str, Any]] = [
-    {"case": "wb_added_field", "connector": WB, "url": WB_POP, "status": 200,
-     "derivation": {"op": "add_field", "records": "$[1][]", "field": "footnote", "value": ""},
-     "expected": ADDITIVE},
-    {"case": "wb_renamed_field", "connector": WB, "url": WB_POP, "status": 200,
-     "derivation": {"op": "rename", "records": "$[1][]", "from": "countryiso3code", "to": "countryIso3Code"},
-     "expected": RENAME},
-    {"case": "wb_unit_text_and_scale", "connector": WB, "url": WB_POP, "status": 200,
-     "derivation": {"op": "unit_scale", "records": "$[1][]", "unit_field": "unit", "unit": "thousands",
-                    "value_fields": ["value"], "divide_by": "1000"},
-     "expected": UNIT},
-    {"case": "ct_added_field", "connector": CT, "url": CT_FRA_M_2023, "status": 200,
-     "derivation": {"op": "add_field", "records": "$.data[]", "field": "isLegacyFlagged", "value": False},
-     "expected": ADDITIVE},
-    {"case": "ct_renamed_field", "connector": CT, "url": CT_FRA_M_2023, "status": 200,
-     "derivation": {"op": "rename", "records": "$.data[]", "from": "primaryValue", "to": "primaryValueUsd"},
-     "expected": RENAME},
-    {"case": "ct_silent_scale", "connector": CT, "url": CT_FRA_M_2023, "status": 200,
-     "derivation": {"op": "unit_scale", "records": "$.data[]", "unit_field": None, "unit": None,
-                    "value_fields": ["primaryValue", "cifvalue", "fobvalue"], "divide_by": "1000"},
-     "expected": SCALE},
-    {"case": "ct_value_type_change", "connector": CT, "url": CT_FRA_M_2023, "status": 200,
-     "derivation": {"op": "stringify", "records": "$.data[]", "field": "primaryValue"},
-     "expected": TYPE_CHANGE},
-    {"case": "ct_classification_change", "connector": CT, "url": CT_FRA_M_2023, "status": 200,
-     "derivation": {"op": "set_value", "records": "$.data[]", "field": "classificationCode", "value": "H7"},
-     "expected": CLASSIFICATION},
-    {"case": "wb_endpoint_404", "connector": WB, "url": WB_POP, "status": 404,
-     "derivation": {"op": "status_only", "note": "series endpoint answers 404 on every scheduled run"},
-     "expected": ENDPOINT},
-    {"case": "ct_auth_401", "connector": CT, "url": "*", "status": 401,
-     "derivation": {"op": "status_only", "note": "public preview starts requiring a subscription key (all requests)"},
-     "expected": AUTH},
+    {
+        "case": "wb_added_field",
+        "connector": WB,
+        "url": WB_POP,
+        "status": 200,
+        "derivation": {"op": "add_field", "records": "$[1][]", "field": "footnote", "value": ""},
+        "expected": ADDITIVE,
+    },
+    {
+        "case": "wb_renamed_field",
+        "connector": WB,
+        "url": WB_POP,
+        "status": 200,
+        "derivation": {"op": "rename", "records": "$[1][]", "from": "countryiso3code", "to": "countryIso3Code"},
+        "expected": RENAME,
+    },
+    {
+        "case": "wb_unit_text_and_scale",
+        "connector": WB,
+        "url": WB_POP,
+        "status": 200,
+        "derivation": {
+            "op": "unit_scale",
+            "records": "$[1][]",
+            "unit_field": "unit",
+            "unit": "thousands",
+            "value_fields": ["value"],
+            "divide_by": "1000",
+        },
+        "expected": UNIT,
+    },
+    {
+        "case": "ct_added_field",
+        "connector": CT,
+        "url": CT_FRA_M_2023,
+        "status": 200,
+        "derivation": {"op": "add_field", "records": "$.data[]", "field": "isLegacyFlagged", "value": False},
+        "expected": ADDITIVE,
+    },
+    {
+        "case": "ct_renamed_field",
+        "connector": CT,
+        "url": CT_FRA_M_2023,
+        "status": 200,
+        "derivation": {"op": "rename", "records": "$.data[]", "from": "primaryValue", "to": "primaryValueUsd"},
+        "expected": RENAME,
+    },
+    {
+        "case": "ct_silent_scale",
+        "connector": CT,
+        "url": CT_FRA_M_2023,
+        "status": 200,
+        "derivation": {
+            "op": "unit_scale",
+            "records": "$.data[]",
+            "unit_field": None,
+            "unit": None,
+            "value_fields": ["primaryValue", "cifvalue", "fobvalue"],
+            "divide_by": "1000",
+        },
+        "expected": SCALE,
+    },
+    {
+        "case": "ct_value_type_change",
+        "connector": CT,
+        "url": CT_FRA_M_2023,
+        "status": 200,
+        "derivation": {"op": "stringify", "records": "$.data[]", "field": "primaryValue"},
+        "expected": TYPE_CHANGE,
+    },
+    {
+        "case": "ct_classification_change",
+        "connector": CT,
+        "url": CT_FRA_M_2023,
+        "status": 200,
+        "derivation": {"op": "set_value", "records": "$.data[]", "field": "classificationCode", "value": "H7"},
+        "expected": CLASSIFICATION,
+    },
+    {
+        "case": "wb_endpoint_404",
+        "connector": WB,
+        "url": WB_POP,
+        "status": 404,
+        "derivation": {"op": "status_only", "note": "series endpoint answers 404 on every scheduled run"},
+        "expected": ENDPOINT,
+    },
+    {
+        "case": "ct_auth_401",
+        "connector": CT,
+        "url": "*",
+        "status": 401,
+        "derivation": {
+            "op": "status_only",
+            "note": "public preview starts requiring a subscription key (all requests)",
+        },
+        "expected": AUTH,
+    },
 ]
 
 

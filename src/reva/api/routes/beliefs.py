@@ -51,8 +51,10 @@ def resolve_release(
     rel = release_as_of(conn, as_of, origin)
     if rel is None:
         raise ApiProblem(
-            404, "no_release",
-            "no belief release was published at or before the requested time" if as_of
+            404,
+            "no_release",
+            "no belief release was published at or before the requested time"
+            if as_of
             else "no belief release has been published",
             as_of=as_of.isoformat() if as_of else None,
         )
@@ -108,33 +110,70 @@ def _uuid_or_none(v: Any) -> UUID | None:
 def estimate_model(r: dict[str, Any], mark: dict[str, Any] | None = None) -> s.BeliefEstimate:
     flags, flags_cut = bounded_source_flags(r.get("source_flags"))
     return s.BeliefEstimate(
-        id=r["id"], release_id=r["release_id"],
+        id=r["id"],
+        release_id=r["release_id"],
         subject=s.EntityRef(id=r["subject_id"], label=r["subject_label"], kind=r["subject_kind"]),
-        concept_id=r["concept_id"], concept_version=r["concept_version"], support=support_summary(r),
-        modality=r["modality"], value=r["value"], uncertainty=r["uncertainty"], alternatives=r["alternatives"],
-        discrepancy_flags=r["discrepancy_flags"], source_key=r["source_key"], observation_id=r["observation_id"],
-        observation_revision_no=r["revision_no"], retrieved_at=r["retrieved_at"],
-        source_flags=flags, source_flags_truncated=flags_cut,
-        stale=mark is not None, stale_reason=None if mark is None else mark.get("reason"),
+        concept_id=r["concept_id"],
+        concept_version=r["concept_version"],
+        support=support_summary(r),
+        modality=r["modality"],
+        value=r["value"],
+        uncertainty=r["uncertainty"],
+        alternatives=r["alternatives"],
+        discrepancy_flags=r["discrepancy_flags"],
+        source_key=r["source_key"],
+        observation_id=r["observation_id"],
+        observation_revision_no=r["revision_no"],
+        retrieved_at=r["retrieved_at"],
+        source_flags=flags,
+        source_flags_truncated=flags_cut,
+        stale=mark is not None,
+        stale_reason=None if mark is None else mark.get("reason"),
         proposal_id=None if mark is None else _uuid_or_none(mark.get("proposal_id")),
         served_from_release_id=r.get("served_from_release_id", r["release_id"]),
-        method=s.ModelVersionRef(id=r["method_id"], model_key=r["model_key"], version=r["method_version"],
-                                 approval_status=r["approval_status"]),
+        method=s.ModelVersionRef(
+            id=r["method_id"],
+            model_key=r["model_key"],
+            version=r["method_version"],
+            approval_status=r["approval_status"],
+        ),
     )
 
 
 def beliefs_response(
-    conn: Connection, t: Timer, *, release_id: UUID | None, as_of: datetime | None, origin: str | None,
-    subjects: list[UUID] | None, concepts: list[str] | None, year: int | None, cursor: str | None, limit: int,
+    conn: Connection,
+    t: Timer,
+    *,
+    release_id: UUID | None,
+    as_of: datetime | None,
+    origin: str | None,
+    subjects: list[UUID] | None,
+    concepts: list[str] | None,
+    year: int | None,
+    cursor: str | None,
+    limit: int,
 ) -> s.BeliefListResponse:
     rel = resolve_release(conn, release_id, as_of, origin)
     cur = decode_cursor(cursor, "sssu")
 
     def fetch(release_id: Any, concept_filter: list[str] | None) -> list[dict[str, Any]]:
-        return [dict(r, served_from_release_id=release_id) for r in conn.execute(text(ESTIMATE_SQL), {
-            "r": release_id, "subjects": subjects or None, "concepts": concept_filter or None, "y": year,
-            "c0": cur[0] if cur else None, "c1": cur[1] if cur else None, "c2": cur[2] if cur else None,
-            "c3": cur[3] if cur else None, "lim": limit + 1}).mappings()]
+        return [
+            dict(r, served_from_release_id=release_id)
+            for r in conn.execute(
+                text(ESTIMATE_SQL),
+                {
+                    "r": release_id,
+                    "subjects": subjects or None,
+                    "concepts": concept_filter or None,
+                    "y": year,
+                    "c0": cur[0] if cur else None,
+                    "c1": cur[1] if cur else None,
+                    "c2": cur[2] if cur else None,
+                    "c3": cur[3] if cur else None,
+                    "lim": limit + 1,
+                },
+            ).mappings()
+        ]
 
     def key(r: dict[str, Any]) -> tuple[Any, ...]:
         # Byte order (COLLATE "C" in ESTIMATE_SQL) so the merged order equals the SQL keyset order.
@@ -158,46 +197,82 @@ def beliefs_response(
     if served_from:
         rows.sort(key=key)
     rows, nxt = page(rows, limit, key)
-    method = conn.execute(text("SELECT id, model_key, version, approval_status, assumptions FROM model.version "
-                               "WHERE model_key || '@' || version = :m"), {"m": rel["method"]}).mappings().one_or_none()
+    method = (
+        conn.execute(
+            text(
+                "SELECT id, model_key, version, approval_status, assumptions FROM model.version "
+                "WHERE model_key || '@' || version = :m"
+            ),
+            {"m": rel["method"]},
+        )
+        .mappings()
+        .one_or_none()
+    )
     data = [estimate_model(r, marks.get(r["concept_id"])) for r in rows]
     warnings = origin_warnings(rel["origin"])
     if marks:
         parts = []
         for concept, mark in sorted(marks.items()):
-            how = (f"withheld from this release; serving release #{served_from[concept]['sequence']} as stale"
-                   if concept in served_from else
-                   "withheld from this release; no earlier release published it" if mark.get("withheld_in_release")
-                   else f"paused since {mark.get('paused_since')}; values are stale")
+            how = (
+                f"withheld from this release; serving release #{served_from[concept]['sequence']} as stale"
+                if concept in served_from
+                else "withheld from this release; no earlier release published it"
+                if mark.get("withheld_in_release")
+                else f"paused since {mark.get('paused_since')}; values are stale"
+            )
             parts.append(f"{concept} ({mark.get('reason')}): {how}")
-        warnings.append(s.ApiWarning(
-            code="publication_paused",
-            message="Belief publication is paused pending a reviewed connector repair: " + "; ".join(parts)[:1500]))
+        warnings.append(
+            s.ApiWarning(
+                code="publication_paused",
+                message="Belief publication is paused pending a reviewed connector repair: " + "; ".join(parts)[:1500],
+            )
+        )
     n_missing = sum(1 for d in data if d.value.kind == "missing")
     if n_missing:
-        warnings.append(s.ApiWarning(code="missing_values",
-                                     message=f"{n_missing} estimate(s) are typed missing (never zero)"))
+        warnings.append(
+            s.ApiWarning(code="missing_values", message=f"{n_missing} estimate(s) are typed missing (never zero)")
+        )
     flags = Counter(f for d in data for f in d.discrepancy_flags)
     sources = Counter(d.source_key for d in data if d.source_key)
     assumptions = list(method["assumptions"]) if method and isinstance(method["assumptions"], list) else []
     return s.BeliefListResponse(
-        data=data, context_id=rel["context_id"], context_mode="belief", origin=rel["origin"],
-        modality="selected_estimate", units=units_of(r["value"] for r in rows), baseline_release=release_ref(rel),
-        knowledge_cutoff=rel["knowledge_cutoff"], valid_time=valid_window(r["temporal_extent"] for r in rows),
-        model_versions=[s.ModelVersionRef(id=method["id"], model_key=method["model_key"], version=method["version"],
-                                          approval_status=method["approval_status"])] if method else [],
-        assumptions=assumptions, uncertainty=uncertainty_summary(r["uncertainty"] for r in rows),
+        data=data,
+        context_id=rel["context_id"],
+        context_mode="belief",
+        origin=rel["origin"],
+        modality="selected_estimate",
+        units=units_of(r["value"] for r in rows),
+        baseline_release=release_ref(rel),
+        knowledge_cutoff=rel["knowledge_cutoff"],
+        valid_time=valid_window(r["temporal_extent"] for r in rows),
+        model_versions=[
+            s.ModelVersionRef(
+                id=method["id"],
+                model_key=method["model_key"],
+                version=method["version"],
+                approval_status=method["approval_status"],
+            )
+        ]
+        if method
+        else [],
+        assumptions=assumptions,
+        uncertainty=uncertainty_summary(r["uncertainty"] for r in rows),
         data_freshness=freshness((r["retrieved_at"] for r in rows), []),
         evidence_profile=s.Assessment(status="reported", detail={"selected_from_sources": dict(sources)}),
-        applicability=s.Assessment(status="reported", detail={
-            "method": rel["method"], "note": "selected source reports; no imputation or averaging"}),
-        model_disagreement=s.Assessment(status="reported", detail={"discrepancy_flags": dict(flags)}) if flags
+        applicability=s.Assessment(
+            status="reported",
+            detail={"method": rel["method"], "note": "selected source reports; no imputation or averaging"},
+        ),
+        model_disagreement=s.Assessment(status="reported", detail={"discrepancy_flags": dict(flags)})
+        if flags
         else s.Assessment(status="not_assessed", reason="no alternative eligible source in this page"),
-        historical_validation=s.Assessment(status="not_applicable",
-                                           reason="selected source reports are not forecasts"),
-        provenance_links=[link("release", rel["id"])] + [link("release", p["id"]) for p in served_from.values()]
+        historical_validation=s.Assessment(status="not_applicable", reason="selected source reports are not forecasts"),
+        provenance_links=[link("release", rel["id"])]
+        + [link("release", p["id"]) for p in served_from.values()]
         + [link("estimate", d.id) for d in data[:50]],
-        warnings=warnings, cost=t.cost(len(rows)), next_cursor=nxt,
+        warnings=warnings,
+        cost=t.cost(len(rows)),
+        next_cursor=nxt,
     )
 
 
@@ -218,8 +293,18 @@ def list_beliefs(
     require_aware(as_of, "as_of")
     with read_conn(request) as conn:
         subj = [resolve_entity(conn, subject_id)] if subject_id else None
-        return beliefs_response(conn, t, release_id=release_id, as_of=as_of, origin=origin, subjects=subj,
-                                concepts=[concept] if concept else None, year=period, cursor=cursor, limit=limit)
+        return beliefs_response(
+            conn,
+            t,
+            release_id=release_id,
+            as_of=as_of,
+            origin=origin,
+            subjects=subj,
+            concepts=[concept] if concept else None,
+            year=period,
+            cursor=cursor,
+            limit=limit,
+        )
 
 
 RELEASE_LIST = """
@@ -233,25 +318,44 @@ ORDER BY p.sequence DESC LIMIT :lim
 
 
 def release_model(conn: Connection, rel: dict[str, Any]) -> s.BeliefRelease:
-    concepts = [s.ReleaseConceptCount(concept_id=r["concept_id"], estimates=r["n"], missing=r["missing"])
-                for r in conn.execute(text(
-                    """SELECT c.concept_id, count(*) AS n, count(*) FILTER (WHERE e.value->>'kind' = 'missing')
+    concepts = [
+        s.ReleaseConceptCount(concept_id=r["concept_id"], estimates=r["n"], missing=r["missing"])
+        for r in conn.execute(
+            text(
+                """SELECT c.concept_id, count(*) AS n, count(*) FILTER (WHERE e.value->>'kind' = 'missing')
                               AS missing
                        FROM belief.estimate e JOIN ontology.concept_version c ON c.id = e.concept_version_id
-                       WHERE e.release_id = :r GROUP BY c.concept_id ORDER BY c.concept_id"""),
-                    {"r": rel["id"]}).mappings()]
-    arts = [s.ReleaseArtifact(sha256=r["artifact_sha256"], role=r["role"]) for r in conn.execute(text(
-        "SELECT artifact_sha256, role FROM belief.release_artifact WHERE release_id = :r ORDER BY role"),
-        {"r": rel["id"]}).mappings()]
-    arts += [s.ReleaseArtifact(sha256=rel["manifest_sha256"], role="release_manifest"),
-             s.ReleaseArtifact(sha256=rel["ontology_manifest_sha256"], role="ontology_manifest"),
-             s.ReleaseArtifact(sha256=rel["model_manifest_sha256"], role="model_manifest")]
+                       WHERE e.release_id = :r GROUP BY c.concept_id ORDER BY c.concept_id"""
+            ),
+            {"r": rel["id"]},
+        ).mappings()
+    ]
+    arts = [
+        s.ReleaseArtifact(sha256=r["artifact_sha256"], role=r["role"])
+        for r in conn.execute(
+            text("SELECT artifact_sha256, role FROM belief.release_artifact WHERE release_id = :r ORDER BY role"),
+            {"r": rel["id"]},
+        ).mappings()
+    ]
+    arts += [
+        s.ReleaseArtifact(sha256=rel["manifest_sha256"], role="release_manifest"),
+        s.ReleaseArtifact(sha256=rel["ontology_manifest_sha256"], role="ontology_manifest"),
+        s.ReleaseArtifact(sha256=rel["model_manifest_sha256"], role="model_manifest"),
+    ]
     return s.BeliefRelease(
-        id=rel["id"], sequence=rel.get("sequence"), published_at=rel.get("published_at"),
-        knowledge_cutoff=rel["knowledge_cutoff"], origin=rel["origin"], method=rel["method"],
-        context_id=rel["context_id"], manifest_sha256=rel["manifest_sha256"],
-        ontology_manifest_sha256=rel["ontology_manifest_sha256"], model_manifest_sha256=rel["model_manifest_sha256"],
-        recorded_at=rel["recorded_at"], estimate_count=sum(c.estimates for c in concepts), concepts=concepts,
+        id=rel["id"],
+        sequence=rel.get("sequence"),
+        published_at=rel.get("published_at"),
+        knowledge_cutoff=rel["knowledge_cutoff"],
+        origin=rel["origin"],
+        method=rel["method"],
+        context_id=rel["context_id"],
+        manifest_sha256=rel["manifest_sha256"],
+        ontology_manifest_sha256=rel["ontology_manifest_sha256"],
+        model_manifest_sha256=rel["model_manifest_sha256"],
+        recorded_at=rel["recorded_at"],
+        estimate_count=sum(c.estimates for c in concepts),
+        concepts=concepts,
         artifacts=arts,
     )
 
@@ -269,27 +373,46 @@ def list_releases(
     require_aware(as_of, "as_of")
     cur = decode_cursor(cursor, "i")
     with read_conn(request) as conn:
-        rows = [dict(r) for r in conn.execute(text(RELEASE_LIST), {
-            "as_of": as_of, "origin": origin, "c0": cur[0] if cur else None, "lim": limit + 1}).mappings()]
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(RELEASE_LIST), {"as_of": as_of, "origin": origin, "c0": cur[0] if cur else None, "lim": limit + 1}
+            ).mappings()
+        ]
         rows, nxt = page(rows, limit, lambda r: (r["sequence"],))
         data = [release_model(conn, r) for r in rows]
     origins = {d.origin for d in data}
     org = "none" if not origins else (origins.pop() if len(origins) == 1 else "mixed")
     return s.BeliefReleaseListResponse(
-        data=data, context_mode="belief", origin=org, modality="metadata",  # type: ignore[arg-type]
-        knowledge_cutoff=as_of, warnings=origin_warnings(org), cost=t.cost(len(data)), next_cursor=nxt)
+        data=data,
+        context_mode="belief",
+        origin=org,
+        modality="metadata",  # type: ignore[arg-type]
+        knowledge_cutoff=as_of,
+        warnings=origin_warnings(org),
+        cost=t.cost(len(data)),
+        next_cursor=nxt,
+    )
 
 
-@router.get("/belief-releases/{release_id}", response_model=s.BeliefReleaseResponse,
-            responses={404: {"model": s.Problem}})
+@router.get(
+    "/belief-releases/{release_id}", response_model=s.BeliefReleaseResponse, responses={404: {"model": s.Problem}}
+)
 def get_release(release_id: UUID, request: Request) -> s.BeliefReleaseResponse:
     t = Timer()
     with read_conn(request) as conn:
         rel = resolve_release(conn, release_id, None)
         data = release_model(conn, rel)
     return s.BeliefReleaseResponse(
-        data=data, context_id=rel["context_id"], context_mode="belief", origin=rel["origin"], modality="metadata",
-        baseline_release=release_ref(rel), knowledge_cutoff=rel["knowledge_cutoff"],
-        model_versions=[s.ModelVersionRef(model_key=rel["method"].split("@")[0],
-                                          version=rel["method"].split("@")[-1])],
-        provenance_links=[link("release", rel["id"])], warnings=origin_warnings(rel["origin"]), cost=t.cost(1))
+        data=data,
+        context_id=rel["context_id"],
+        context_mode="belief",
+        origin=rel["origin"],
+        modality="metadata",
+        baseline_release=release_ref(rel),
+        knowledge_cutoff=rel["knowledge_cutoff"],
+        model_versions=[s.ModelVersionRef(model_key=rel["method"].split("@")[0], version=rel["method"].split("@")[-1])],
+        provenance_links=[link("release", rel["id"])],
+        warnings=origin_warnings(rel["origin"]),
+        cost=t.cost(1),
+    )

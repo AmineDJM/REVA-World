@@ -88,8 +88,13 @@ def db_verify_schema(
             conn.rollback()
     finally:
         eng.dispose()
-    _out({"database": s.reva_db_name if kind != "migration" else s.migration_url().database, "role": kind,
-          **d.as_dict(limit=limit)})
+    _out(
+        {
+            "database": s.reva_db_name if kind != "migration" else s.migration_url().database,
+            "role": kind,
+            **d.as_dict(limit=limit),
+        }
+    )
     typer.echo(d.summary(limit=limit), err=True)
     if not d.ok:
         raise typer.Exit(1)
@@ -106,8 +111,12 @@ def seed_cmd(profile: str = typer.Option("mvp", help="registry profile")) -> Non
     from reva.cli.seed import seed
     from reva.settings import get_settings
 
-    _out({"profile": profile, **seed(get_engine("migration"), get_store(),
-                                      contact_email=get_settings().reva_http_contact_email)})
+    _out(
+        {
+            "profile": profile,
+            **seed(get_engine("migration"), get_store(), contact_email=get_settings().reva_http_contact_email),
+        }
+    )
 
 
 def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, Any]]:
@@ -144,13 +153,20 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
                 default = FetchBudget()
                 planned = len(c.plan(load_cursor(get_engine("worker"), spec.name), default).items)
                 try:
-                    reservation = reserve_ingest(get_engine("worker"), job_id=f"cli-{uuid.uuid4()}", attempt=1,
-                                                 source_key=budget_source_key(spec), planned_requests=planned)
+                    reservation = reserve_ingest(
+                        get_engine("worker"),
+                        job_id=f"cli-{uuid.uuid4()}",
+                        attempt=1,
+                        source_key=budget_source_key(spec),
+                        planned_requests=planned,
+                    )
                 except BudgetExhausted as e:  # typed refusal; no client is created, no request is made
                     reports.append({**e.problem(), "connector": spec.name, "mode": "live", "status": "refused"})
                     continue
-                fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
-                                           max_bytes=min(default.max_bytes, reservation.max_bytes))
+                fetch_budget = FetchBudget(
+                    max_requests=min(default.max_requests, reservation.max_requests),
+                    max_bytes=min(default.max_bytes, reservation.max_bytes),
+                )
                 client = make_live_client(spec, settings)
                 http: Any = RecordingHttp(client, spec.name, spec.licence) if capture else client
                 if not capture:
@@ -160,8 +176,15 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
                 http = FixtureHttp(spec.name)
             try:
                 hook = getattr(c, "post_publish", None) or post_publish_for(spec.template)  # dataset inputs
-                rep = await run_connector(c, http, get_store(), get_engine("worker"), budget=fetch_budget,
-                                          post_publish=hook, persist_cursor=live)
+                rep = await run_connector(
+                    c,
+                    http,
+                    get_store(),
+                    get_engine("worker"),
+                    budget=fetch_budget,
+                    post_publish=hook,
+                    persist_cursor=live,
+                )
             finally:
                 if capture and live:
                     http.write_manifest()
@@ -225,8 +248,9 @@ def beliefs_publish(origin: str = typer.Option("live", help="live or test_fixtur
     from reva.settings import get_settings
 
     # cutoff=None: the DB clock is read inside the publication lock
-    r = publish_release(get_engine("worker"), get_store(), cutoff=None, origin=Origin(origin),
-                        environment=get_settings().reva_env)
+    r = publish_release(
+        get_engine("worker"), get_store(), cutoff=None, origin=Origin(origin), environment=get_settings().reva_env
+    )
     _out(r.__dict__)
 
 
@@ -265,18 +289,29 @@ def create_token(
     eng = make_engine("migration")
     with eng.begin() as c:
         tid = c.execute(
-            text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
-                 "VALUES (:s, :sc, :l, :pk) RETURNING id"),
+            text(
+                "INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
+                "VALUES (:s, :sc, :l, :pk) RETURNING id"
+            ),
             {"s": sha, "sc": sc, "l": label, "pk": "human" if human else "service"},
         ).scalar_one()
         c.execute(
-            text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
-                 "jsonb_build_object('token_id', CAST(:i AS text)), jsonb_build_object('label', CAST(:l AS text)))"),
+            text(
+                "INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
+                "jsonb_build_object('token_id', CAST(:i AS text)), jsonb_build_object('label', CAST(:l AS text)))"
+            ),
             {"i": str(tid), "l": label},
         )
     eng.dispose()
-    _out({"token_id": str(tid), "label": label, "scopes": sc, "token": token,
-          "note": "store this token securely; only its SHA-256 is kept"})
+    _out(
+        {
+            "token_id": str(tid),
+            "label": label,
+            "scopes": sc,
+            "token": token,
+            "note": "store this token securely; only its SHA-256 is kept",
+        }
+    )
 
 
 @auth_app.command("revoke-token")
@@ -289,13 +324,17 @@ def revoke_token(token_id: str) -> None:
     eng = make_engine("migration")
     with eng.begin() as c:
         n = c.execute(
-            text("UPDATE ops.api_token SET revoked_at = clock_timestamp() WHERE id = CAST(:i AS uuid) "
-                 "AND revoked_at IS NULL"),
+            text(
+                "UPDATE ops.api_token SET revoked_at = clock_timestamp() WHERE id = CAST(:i AS uuid) "
+                "AND revoked_at IS NULL"
+            ),
             {"i": token_id},
         ).rowcount
         c.execute(
-            text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.revoke', "
-                 "jsonb_build_object('token_id', CAST(:i AS text)), '{}'::jsonb)"),
+            text(
+                "INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.revoke', "
+                "jsonb_build_object('token_id', CAST(:i AS text)), '{}'::jsonb)"
+            ),
             {"i": token_id},
         )
     eng.dispose()
@@ -344,8 +383,9 @@ def backtest(
     from reva.adapters.postgres.engine import get_engine
     from reva.evaluation.backtests import enqueue_backtest
 
-    jid = enqueue_backtest(get_engine("worker"), model, release_id=release, countries=country or None,
-                           created_by="cli:backtest")
+    jid = enqueue_backtest(
+        get_engine("worker"), model, release_id=release, countries=country or None, created_by="cli:backtest"
+    )
     _out({"job_id": str(jid), "model_key": model})
 
 
@@ -369,7 +409,8 @@ def verify(profile: str = typer.Option("local")) -> None:
             checks[f"db_{role}"] = {
                 "current_user": c.execute(text("SELECT current_user")).scalar_one(),
                 "schema_version": c.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
-                if role == "worker" else "n/a",
+                if role == "worker"
+                else "n/a",
             }
     st = get_store()
     probe = st.put_bytes(b'{"probe":true}', "quarantine", "application/json")
@@ -397,8 +438,15 @@ def demo(
     """Create and run the crude border-price scenario against the latest published baseline."""
     from reva.cli.demo import run_demo
 
-    _out(run_demo(scenario=scenario, countries=countries.split(","), fidelity=fidelity, origin=origin,
-                  wait_seconds=wait_seconds))
+    _out(
+        run_demo(
+            scenario=scenario,
+            countries=countries.split(","),
+            fidelity=fidelity,
+            origin=origin,
+            wait_seconds=wait_seconds,
+        )
+    )
 
 
 def main() -> None:  # pragma: no cover

@@ -43,8 +43,9 @@ def now_utc() -> datetime:
 
 def plain_json_bytes(payload: Any) -> bytes:
     """Deterministic plain JSON (sorted keys, no NaN); decimals/dates as strings."""
-    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False,
-                      allow_nan=False, default=_default).encode("utf-8")
+    return json.dumps(
+        payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False, allow_nan=False, default=_default
+    ).encode("utf-8")
 
 
 def _default(o: Any) -> Any:
@@ -81,23 +82,37 @@ class ArtifactIO:
     def get_json(self, ref: ArtifactRef) -> Any:
         return json.loads(self.get_bytes(ref))
 
-    def register(self, conn: Connection, ref: ArtifactRef, schema_version: str,
-                 rights: Mapping[str, Any] | None = None) -> str:
+    def register(
+        self, conn: Connection, ref: ArtifactRef, schema_version: str, rights: Mapping[str, Any] | None = None
+    ) -> str:
         """Record the (already stored) artifact in meta.artifact inside the caller's transaction."""
         obj = self.store.put_bytes(self.get_bytes(ref), ref.namespace, ref.media_type)  # idempotent
-        return repo.register_artifact(conn, obj, schema_version=schema_version,
-                                      rights=rights or {"licence": "internal-derived"})
+        return repo.register_artifact(
+            conn, obj, schema_version=schema_version, rights=rights or {"licence": "internal-derived"}
+        )
 
 
 def default_budget(**over: Any) -> ResourceBudget:
-    base: dict[str, Any] = {"max_requests": 5, "max_bytes": 8_000_000, "max_wall_seconds": 120,
-                            "max_cpu_seconds": 60, "max_memory_bytes": 1_073_741_824, "max_cost_usd": "0"}
+    base: dict[str, Any] = {
+        "max_requests": 5,
+        "max_bytes": 8_000_000,
+        "max_wall_seconds": 120,
+        "max_cpu_seconds": 60,
+        "max_memory_bytes": 1_073_741_824,
+        "max_cost_usd": "0",
+    }
     base.update(over)
     return ResourceBudget(**base)
 
 
-def report(outcome: str, findings: list[Finding], evidence: ArtifactRef, evaluator: str,
-           usage: Mapping[str, Any] | None = None, report_id: uuid.UUID | None = None) -> ValidationReport:
+def report(
+    outcome: str,
+    findings: list[Finding],
+    evidence: ArtifactRef,
+    evaluator: str,
+    usage: Mapping[str, Any] | None = None,
+    report_id: uuid.UUID | None = None,
+) -> ValidationReport:
     return ValidationReport(
         report_id=report_id or uuid.uuid4(),
         outcome=outcome,  # type: ignore[arg-type]
@@ -116,8 +131,10 @@ def report_json(r: ValidationReport) -> dict[str, Any]:
     return {
         "report_id": str(r.report_id),
         "outcome": r.outcome,
-        "findings": [{"code": f.code, "severity": f.severity, "message": f.message,
-                      "evidence": [e.sha256 for e in f.evidence]} for f in r.findings],
+        "findings": [
+            {"code": f.code, "severity": f.severity, "message": f.message, "evidence": [e.sha256 for e in f.evidence]}
+            for f in r.findings
+        ],
         "evidence_manifest": r.evidence_manifest.sha256,
         "evaluator_version": r.evaluator_version,
         "resource_usage": dict(r.resource_usage),
@@ -134,11 +151,16 @@ def ref_from(d: Mapping[str, Any]) -> ArtifactRef:
     return ArtifactRef(sha256=str(d["sha256"]), namespace=str(d["namespace"]), media_type=str(d["media_type"]))
 
 
-def make_context(io: ArtifactIO, mode: str, cutoff: datetime, ontology_manifest: Any,
-                 context_id: uuid.UUID | None = None) -> ScopedContext:
+def make_context(
+    io: ArtifactIO, mode: str, cutoff: datetime, ontology_manifest: Any, context_id: uuid.UUID | None = None
+) -> ScopedContext:
     ref = io.put_json(ontology_manifest, "models")
-    return ScopedContext(context_id=context_id or uuid.uuid4(), mode=mode,  # type: ignore[arg-type]
-                         knowledge_cutoff=cutoff, ontology_manifest=ref)
+    return ScopedContext(
+        context_id=context_id or uuid.uuid4(),
+        mode=mode,  # type: ignore[arg-type]
+        knowledge_cutoff=cutoff,
+        ontology_manifest=ref,
+    )
 
 
 def run_sync[T](coro: Coroutine[Any, Any, T]) -> T:

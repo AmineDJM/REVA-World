@@ -21,8 +21,11 @@ class LlmUsage:
     total_tokens: int
 
     def as_json(self) -> dict[str, int]:
-        return {"input_tokens": self.input_tokens, "output_tokens": self.output_tokens,
-                "total_tokens": self.total_tokens}
+        return {
+            "input_tokens": self.input_tokens,
+            "output_tokens": self.output_tokens,
+            "total_tokens": self.total_tokens,
+        }
 
 
 @dataclass(frozen=True)

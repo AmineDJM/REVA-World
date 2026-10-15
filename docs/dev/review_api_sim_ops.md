@@ -105,6 +105,7 @@ worker outcome: completed_in_handler | job status: cancelled | result_ref: {'pub
    ```python
    if ctx.is_cancelled():
        from reva.operations.jobs import JobCancelled
+
        raise JobCancelled("cancelled before publication; nothing was published")
    ```
 2. In `operations/worker.py`, make every cancellation path shutdown-aware. `queue.release()` already re-reads the DB status under the row lock and maps a real `cancel_requested` to `cancelled`, so during shutdown it is always correct to call it:
@@ -207,8 +208,11 @@ f0b33c0d job: succeeded run: True  results: 12 warnings: ['fixture_data', 'scena
 1. After the lookup, add:
    ```python
    if run is None and job and job["status"] == "succeeded" and (job["result_ref"] or {}).get("run_id"):
-       run = conn.execute(text("SELECT * FROM sim.run WHERE id = :r"),
-                          {"r": job["result_ref"]["run_id"]}).mappings().one_or_none()
+       run = (
+           conn.execute(text("SELECT * FROM sim.run WHERE id = :r"), {"r": job["result_ref"]["run_id"]})
+           .mappings()
+           .one_or_none()
+       )
    ```
 2. Add a warning `idempotent_replay` naming the run's original job.
 3. Also use `result_ref.run_id`, not `ORDER BY recorded_at DESC LIMIT 1`, whenever it is present.
@@ -289,8 +293,11 @@ GET L2 simulation: 500 {"type":"https://reva.invalid/problems/internal_error", â
        evaluated_points: int | None = None
        includes_fixed_quantity_point: bool | None = None
        statement: str = Field(description="assumption sensitivity, not a confidence interval")
-   TypedValue = Annotated[DecimalValue | FloatValue | MissingValue | SensitivityRangeValue | OtherValue,
-                          Field(discriminator="kind")]
+
+
+   TypedValue = Annotated[
+       DecimalValue | FloatValue | MissingValue | SensitivityRangeValue | OtherValue, Field(discriminator="kind")
+   ]
    ```
 2. Re-export `contracts/openapi.json` and the UI types, and make the UI render it as a range, never as a point.
 3. Add an L2 case to `tests/integration/test_api_endpoints.py`.

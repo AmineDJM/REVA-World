@@ -112,8 +112,7 @@ class FittedLocalLevel:
                         interval_kind=None,
                         level=None,
                         uncertainty=UncertaintySpec.unknown(
-                            f"{METHOD_VERSION}: degenerate predictive variance ({v!r}); "
-                            "uncertainty not quantified"
+                            f"{METHOD_VERSION}: degenerate predictive variance ({v!r}); uncertainty not quantified"
                         ),
                         assumptions=ASSUMPTIONS,
                     )
@@ -143,9 +142,7 @@ class FittedLocalLevel:
                         conditioning=ASSUMPTIONS,
                     ),
                     assumptions=ASSUMPTIONS,
-                    predictive=PredictiveDistribution(
-                        family="normal", loc=centre, scale=math.sqrt(v)
-                    ),
+                    predictive=PredictiveDistribution(family="normal", loc=centre, scale=math.sqrt(v)),
                 )
             )
         return out

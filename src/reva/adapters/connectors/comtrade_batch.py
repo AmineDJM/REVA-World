@@ -110,7 +110,7 @@ def _code_digest() -> str:
 
 
 def _chunks(seq: Sequence[Any], n: int) -> list[list[Any]]:
-    return [list(seq[i:i + n]) for i in range(0, len(seq), n)]
+    return [list(seq[i : i + n]) for i in range(0, len(seq), n)]
 
 
 class ComtradeBatchConnector(ComtradeConnector):
@@ -134,8 +134,9 @@ class ComtradeBatchConnector(ComtradeConnector):
         self.by_code: dict[int, str] = {c: k for k, c in self.codes.items()}
         if len(self.by_code) != len(self.codes):
             raise ValueError("two entities share one Comtrade reporter code")
-        super().__init__(reporters=tuple(self.codes), total_years=tuple(total_years),
-                         bilateral_years=tuple(bilateral_years))
+        super().__init__(
+            reporters=tuple(self.codes), total_years=tuple(total_years), bilateral_years=tuple(bilateral_years)
+        )
         self.max_requests_per_run = max(1, int(max_requests_per_run))
         self.total_batch = max(1, int(total_batch))
         self.bilateral_batch = max(1, int(bilateral_batch))
@@ -152,8 +153,10 @@ class ComtradeBatchConnector(ComtradeConnector):
             licence="UN Comtrade terms of use",
             allowed_hosts=("comtradeapi.un.org",),
             dataset_ids=("C/A/HS/2709",),
-            field_mappings={**{f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
-                            **{f"{k}:netWgt:total": v for k, v in WEIGHT_CONCEPT.items()}},
+            field_mappings={
+                **{f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
+                **{f"{k}:netWgt:total": v for k, v in WEIGHT_CONCEPT.items()},
+            },
             units={"primaryValue": "unit.usd", "netWgt": "unit.kg"},
             geography=tuple(self.codes),
             time_semantics="annual calendar-year flow totals",
@@ -168,8 +171,9 @@ class ComtradeBatchConnector(ComtradeConnector):
 
     # ------------------------------------------------------------------ planning
     def _batch_url(self, codes: Sequence[int], year: int, partner: int | None) -> str:
-        url = (f"{BASE_URL}?period={year}&reporterCode={','.join(map(str, codes))}&cmdCode=2709"
-               f"&flowCode={','.join(FLOWS)}")
+        url = (
+            f"{BASE_URL}?period={year}&reporterCode={','.join(map(str, codes))}&cmdCode=2709&flowCode={','.join(FLOWS)}"
+        )
         if partner is not None:
             url += f"&partnerCode={partner}"
         return url + f"&partner2Code=0&customsCode=C00&motCode=0&maxRecords={MAX_RECORDS}"
@@ -189,8 +193,9 @@ class ComtradeBatchConnector(ComtradeConnector):
         """The full, deterministic sweep (world totals for every year first, then bilateral)."""
         codes = sorted(self.by_code)
         items = [self._item("total", y, b) for y in self.total_years for b in _chunks(codes, self.total_batch)]
-        items += [self._item("bilateral", y, b) for y in self.bilateral_years
-                  for b in _chunks(codes, self.bilateral_batch)]
+        items += [
+            self._item("bilateral", y, b) for y in self.bilateral_years for b in _chunks(codes, self.bilateral_batch)
+        ]
         return items
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
@@ -201,15 +206,14 @@ class ComtradeBatchConnector(ComtradeConnector):
         if not 0 <= offset < len(units):
             offset = 0
         n = max(0, min(self.max_requests_per_run, budget.max_requests, len(units) - offset))
-        items = units[offset:offset + n]
+        items = units[offset : offset + n]
         sweep = int(state.get("sweep", 0)) if state.get("plan_digest") == digest else 0
-        self._slice = {"offset": offset, "end": offset + n, "units": len(units), "plan_digest": digest,
-                       "sweep": sweep}
+        self._slice = {"offset": offset, "end": offset + n, "units": len(units), "plan_digest": digest, "sweep": sweep}
         return FetchPlan(
             connector=CONNECTOR_NAME,
             items=tuple(items),
             pagination="none: one period and one reporter batch per request; maxRecords bound; a batch reaching "
-                       "maxRecords is blocked and re-requested in halves",
+            "maxRecords is blocked and re-requested in halves",
             availability_expectation="annual data released with lags; reporters report at different times",
             budget_exhausted=n == 0 and len(units) > 0,
         )
@@ -222,9 +226,17 @@ class ComtradeBatchConnector(ComtradeConnector):
         end, sweep = s["end"], s["sweep"]
         if end >= s["units"]:
             end, sweep = 0, sweep + 1
-        return Cursor(state={"complete": ok and not plan.budget_exhausted, "offset": end, "sweep": sweep,
-                             "units": s["units"], "plan_digest": s["plan_digest"],
-                             "last_slice": [s["offset"], s["end"]], "recheck_years": list(self.total_years)})
+        return Cursor(
+            state={
+                "complete": ok and not plan.budget_exhausted,
+                "offset": end,
+                "sweep": sweep,
+                "units": s["units"],
+                "plan_digest": s["plan_digest"],
+                "last_slice": [s["offset"], s["end"]],
+                "recheck_years": list(self.total_years),
+            }
+        )
 
     # ------------------------------------------------------------------ parsing
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
@@ -264,8 +276,10 @@ class ComtradeBatchConnector(ComtradeConnector):
         else:
             if len(rows) >= MAX_RECORDS and len(codes) > 1:
                 half = len(codes) // 2
-                follow = (self._item("bilateral", year, codes[:half], split="a"),
-                          self._item("bilateral", year, codes[half:], split="b"))
+                follow = (
+                    self._item("bilateral", year, codes[:half], split="a"),
+                    self._item("bilateral", year, codes[half:], split="b"),
+                )
                 meta["split_into"] = [i.key for i in follow]
             for r in rows:
                 if int(r.get("partnerCode", -1)) == 0:
@@ -301,8 +315,7 @@ class ComtradeBatchConnector(ComtradeConnector):
             resolution={"classification": "HS", "heading": "2709", "partner": partner},
         )
 
-    def _total_obs(self, code: int, flow: str, year: int, r: dict[str, Any] | None,
-                   what: str) -> ParsedObservation:
+    def _total_obs(self, code: int, flow: str, year: int, r: dict[str, Any] | None, what: str) -> ParsedObservation:
         """Same value/flags/keys as ``ComtradeConnector._total`` (shared lineage)."""
         if what == "value":
             concept = FLOW_CONCEPT[(flow, "total")]
@@ -315,8 +328,12 @@ class ComtradeBatchConnector(ComtradeConnector):
                 flags = self._value_flags(r)
             else:
                 flags = self._value_flags(r)
-                value = {"kind": "decimal", "value": dec_str(r["primaryValue"]), "unit_ref": "unit.usd",
-                         "basis": self._value_basis(flow, r, flags)}
+                value = {
+                    "kind": "decimal",
+                    "value": dec_str(r["primaryValue"]),
+                    "unit_ref": "unit.usd",
+                    "basis": self._value_basis(flow, r, flags),
+                }
         else:
             concept = WEIGHT_CONCEPT[flow]
             lk = f"comtrade:HS2709:{flow}:{code}:0:{year}:netWgt"
@@ -329,8 +346,12 @@ class ComtradeBatchConnector(ComtradeConnector):
                     value = {"kind": "missing", "reason": "unavailable"}
                     flags["weight_unusable"] = True
                 else:
-                    value = {"kind": "decimal", "value": dec_str(w), "unit_ref": "unit.kg",
-                             "basis": {"scale_factor": "1"}}
+                    value = {
+                        "kind": "decimal",
+                        "value": dec_str(w),
+                        "unit_ref": "unit.kg",
+                        "basis": {"scale_factor": "1"},
+                    }
         flags["flowCode"] = flow
         return ParsedObservation(
             subject_provider="comtrade_reporter",
@@ -342,8 +363,10 @@ class ComtradeBatchConnector(ComtradeConnector):
             value=value,
             uncertainty=UncertaintySpec.unknown("UN Comtrade publishes no uncertainty for this value"),
             source_flags=flags,
-            raw_selector={"match": {"period": str(year), "reporterCode": code, "partnerCode": 0, "flowCode": flow},
-                          "field": "primaryValue" if what == "value" else "netWgt"},
+            raw_selector={
+                "match": {"period": str(year), "reporterCode": code, "partnerCode": 0, "flowCode": flow},
+                "field": "primaryValue" if what == "value" else "netWgt",
+            },
         )
 
     def _bilateral_obs(self, r: dict[str, Any]) -> ParsedObservation:
@@ -354,9 +377,15 @@ class ComtradeBatchConnector(ComtradeConnector):
         v = r.get("primaryValue")
         flags = {**self._value_flags(r), "flowCode": flow, "partnerCode": partner}
         value: dict[str, Any] = (
-            {"kind": "missing", "reason": "unavailable"} if v is None
-            else {"kind": "decimal", "value": dec_str(v), "unit_ref": "unit.usd",
-                  "basis": self._value_basis(flow, r, flags)})
+            {"kind": "missing", "reason": "unavailable"}
+            if v is None
+            else {
+                "kind": "decimal",
+                "value": dec_str(v),
+                "unit_ref": "unit.usd",
+                "basis": self._value_basis(flow, r, flags),
+            }
+        )
         reporter_dir, partner_dir = ("in", "out") if flow == "M" else ("out", "in")
         return ParsedObservation(
             subject_provider="comtrade_reporter",
@@ -368,20 +397,28 @@ class ComtradeBatchConnector(ComtradeConnector):
             value=value,
             uncertainty=UncertaintySpec.unknown("UN Comtrade publishes no uncertainty for this value"),
             source_flags=flags,
-            raw_selector={"match": {"period": str(year), "reporterCode": code, "partnerCode": int(partner),
-                                    "flowCode": flow}, "field": "primaryValue"},
+            raw_selector={
+                "match": {"period": str(year), "reporterCode": code, "partnerCode": int(partner), "flowCode": flow},
+                "field": "primaryValue",
+            },
             relation=RelationSpec(
                 predicate="predicate.trade_flow",
                 layer="trade.crude_petroleum",
                 participants=(
-                    {"role": "role.reporter", "provider": "comtrade_reporter", "key": str(code),
-                     "direction": reporter_dir},
-                    {"role": "role.partner", "provider": "comtrade_partner", "key": partner,
-                     "direction": partner_dir},
+                    {
+                        "role": "role.reporter",
+                        "provider": "comtrade_reporter",
+                        "key": str(code),
+                        "direction": reporter_dir,
+                    },
+                    {"role": "role.partner", "provider": "comtrade_partner", "key": partner, "direction": partner_dir},
                     {"role": "role.product", "provider": "hs_heading", "key": "2709", "direction": "undirected"},
                 ),
-                component={"flow": flow, "valuation": value.get("basis", {}).get("valuation"),
-                           "classification": r.get("classificationCode")},
+                component={
+                    "flow": flow,
+                    "valuation": value.get("basis", {}).get("valuation"),
+                    "classification": r.get("classificationCode"),
+                },
             ),
         )
 
@@ -392,73 +429,140 @@ class ComtradeBatchConnector(ComtradeConnector):
         req = meta["request"]
         count, n = meta.get("count"), meta["returned_rows"]
         if count is None or int(count) != n:
-            findings.append(Finding(code="count_mismatch", severity="blocker",
-                                    message=f"count={count} but {n} rows returned"))
+            findings.append(
+                Finding(code="count_mismatch", severity="blocker", message=f"count={count} but {n} rows returned")
+            )
         if n >= MAX_RECORDS:
-            findings.append(Finding(code="possible_truncation", severity="blocker",
-                                    message="row count reached maxRecords; preview truncation cannot be excluded"
-                                            + (" (re-requested in halves)" if meta.get("split_into") else "")))
+            findings.append(
+                Finding(
+                    code="possible_truncation",
+                    severity="blocker",
+                    message="row count reached maxRecords; preview truncation cannot be excluded"
+                    + (" (re-requested in halves)" if meta.get("split_into") else ""),
+                )
+            )
         wanted_codes = {str(c) for c in req["reporters"]}
         seen: set[tuple[Any, ...]] = set()
         for d in meta["rows"]:
             for k, v in FIXED_DIMS.items():
                 if str(d.get(k)) != str(v):
-                    findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                            message=f"{k}={d.get(k)} differs from requested {v}"))
+                    findings.append(
+                        Finding(
+                            code="dimension_mismatch",
+                            severity="blocker",
+                            message=f"{k}={d.get(k)} differs from requested {v}",
+                        )
+                    )
             if str(d.get("reporterCode")) not in wanted_codes:
-                findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                        message=f"unrequested reporterCode {d.get('reporterCode')}"))
+                findings.append(
+                    Finding(
+                        code="dimension_mismatch",
+                        severity="blocker",
+                        message=f"unrequested reporterCode {d.get('reporterCode')}",
+                    )
+                )
             if str(d.get("flowCode")) not in FLOWS:
-                findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                        message=f"unrequested flowCode {d.get('flowCode')}"))
+                findings.append(
+                    Finding(
+                        code="dimension_mismatch",
+                        severity="blocker",
+                        message=f"unrequested flowCode {d.get('flowCode')}",
+                    )
+                )
             if req["scope"] == "total" and str(d.get("partnerCode")) != "0":
-                findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                        message=f"partnerCode={d.get('partnerCode')} in a world-total request"))
+                findings.append(
+                    Finding(
+                        code="dimension_mismatch",
+                        severity="blocker",
+                        message=f"partnerCode={d.get('partnerCode')} in a world-total request",
+                    )
+                )
             if str(d.get("period")) != str(req["year"]):
-                findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                        message=f"unexpected period {d.get('period')}"))
+                findings.append(
+                    Finding(
+                        code="dimension_mismatch", severity="blocker", message=f"unexpected period {d.get('period')}"
+                    )
+                )
             key = (d.get("reporterCode"), d.get("flowCode"), d.get("period"), d.get("partnerCode"))
             if key in seen:
-                findings.append(Finding(code="ambiguous_duplicate", severity="blocker",
-                                        message=f"duplicate rows for reporter/flow/period/partner {key}"))
+                findings.append(
+                    Finding(
+                        code="ambiguous_duplicate",
+                        severity="blocker",
+                        message=f"duplicate rows for reporter/flow/period/partner {key}",
+                    )
+                )
             seen.add(key)
         # Classification: a known but unreviewed HS edition is per row (stored, ineligible by the
         # mapping scope); anything else outside the reviewed editions blocks as in connector 1.2.0.
         known_unreviewed = [d for d in meta["rows"] if d.get("classificationCode") in KNOWN_UNREVIEWED_EDITIONS]
-        structural = {**meta, "rows": [d for d in meta["rows"]
-                                       if d.get("classificationCode") not in KNOWN_UNREVIEWED_EDITIONS]}
+        structural = {
+            **meta,
+            "rows": [d for d in meta["rows"] if d.get("classificationCode") not in KNOWN_UNREVIEWED_EDITIONS],
+        }
         findings.extend(_structure_findings(structural))
         if known_unreviewed:
-            reps = sorted({f"{d.get('reporterCode')}:{d.get('flowCode')}:{d.get('classificationCode')}"
-                           for d in known_unreviewed})
-            findings.append(Finding(
-                code="classification_unreviewed_ineligible", severity="warning",
-                message=f"{len(known_unreviewed)} rows are reported under an HS edition outside the reviewed "
-                        f"mapping ({', '.join(REVIEWED_CLASSIFICATIONS)}): stored, ineligible for releases "
-                        f"(e.g. {', '.join(reps[:8])})"))
-        missing = [o.logical_key for o in batch.observations
-                   if o.value.get("kind") == "missing" and o.logical_key.endswith("primaryValue")]
+            reps = sorted(
+                {f"{d.get('reporterCode')}:{d.get('flowCode')}:{d.get('classificationCode')}" for d in known_unreviewed}
+            )
+            findings.append(
+                Finding(
+                    code="classification_unreviewed_ineligible",
+                    severity="warning",
+                    message=f"{len(known_unreviewed)} rows are reported under an HS edition outside the reviewed "
+                    f"mapping ({', '.join(REVIEWED_CLASSIFICATIONS)}): stored, ineligible for releases "
+                    f"(e.g. {', '.join(reps[:8])})",
+                )
+            )
+        missing = [
+            o.logical_key
+            for o in batch.observations
+            if o.value.get("kind") == "missing" and o.logical_key.endswith("primaryValue")
+        ]
         if missing:
-            findings.append(Finding(code="missing_flow", severity="warning",
-                                    message=f"{len(missing)} requested reporter flows returned no value "
-                                            "(kept Missing)"))
+            findings.append(
+                Finding(
+                    code="missing_flow",
+                    severity="warning",
+                    message=f"{len(missing)} requested reporter flows returned no value (kept Missing)",
+                )
+            )
         undetermined = [o for o in batch.observations if o.source_flags.get("valuation_warning")]
         if undetermined:
             codes = sorted({str(o.source_flags["valuation_warning"]) for o in undetermined})
-            findings.append(Finding(code="valuation_basis_undetermined", severity="warning",
-                                    message=f"{len(undetermined)} values carry an undeterminable valuation basis "
-                                            f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'"))
+            findings.append(
+                Finding(
+                    code="valuation_basis_undetermined",
+                    severity="warning",
+                    message=f"{len(undetermined)} values carry an undeterminable valuation basis "
+                    f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'",
+                )
+            )
         estimated = [o for o in batch.observations if o.source_flags.get("provider_quantity_estimated")]
         if estimated:
-            findings.append(Finding(code="provider_quantity_estimated", severity="info",
-                                    message=f"{len(estimated)} net weights are estimated by the provider; "
-                                            "trade values are as reported"))
-        unknown = sorted({str(o.source_flags.get("legacyEstimationFlag")) for o in batch.observations
-                          if o.source_flags.get("legacy_estimation_code_unrecognised")})
+            findings.append(
+                Finding(
+                    code="provider_quantity_estimated",
+                    severity="info",
+                    message=f"{len(estimated)} net weights are estimated by the provider; trade values are as reported",
+                )
+            )
+        unknown = sorted(
+            {
+                str(o.source_flags.get("legacyEstimationFlag"))
+                for o in batch.observations
+                if o.source_flags.get("legacy_estimation_code_unrecognised")
+            }
+        )
         if unknown:
-            findings.append(Finding(code="estimation_code_unrecognised", severity="warning",
-                                    message=f"legacyEstimationFlag {', '.join(unknown)} is outside the UNSD codes "
-                                            "0/2/4/6; estimation status of these rows needs review"))
+            findings.append(
+                Finding(
+                    code="estimation_code_unrecognised",
+                    severity="warning",
+                    message=f"legacyEstimationFlag {', '.join(unknown)} is outside the UNSD codes "
+                    "0/2/4/6; estimation status of these rows needs review",
+                )
+            )
         findings.extend(self._jump_signals(batch))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
 

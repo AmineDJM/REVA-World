@@ -132,7 +132,7 @@ def _verifier_matches(stored: str | None, password: str) -> bool:
     if not stored or not stored.startswith("SCRAM-SHA-256$"):
         return False
     try:
-        head, _keys = stored[len("SCRAM-SHA-256$"):].split("$", 1)
+        head, _keys = stored[len("SCRAM-SHA-256$") :].split("$", 1)
         iterations, salt = head.split(":", 1)
         expected = scram_sha256_verifier(password, iterations=int(iterations), salt=base64.b64decode(salt))
     except (ValueError, ConfigurationError):
@@ -143,13 +143,17 @@ def _verifier_matches(stored: str | None, password: str) -> bool:
 def _role_already_provisioned(conn: Connection, login: str, password: str, limit: int) -> bool:
     """Skip a needless catalog update (fewer concurrent ALTER ROLE races). Needs pg_authid
     (superuser); otherwise the role is always (re)provisioned."""
-    row = conn.execute(
-        text(
-            "SELECT rolpassword, rolcanlogin, rolinherit, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, "
-            "rolreplication, rolconnlimit FROM pg_authid WHERE rolname = :r"
-        ),
-        {"r": login},
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text(
+                "SELECT rolpassword, rolcanlogin, rolinherit, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, "
+                "rolreplication, rolconnlimit FROM pg_authid WHERE rolname = :r"
+            ),
+            {"r": login},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if row is None:
         return False
     flags_ok = row["rolcanlogin"] and not any(
@@ -180,8 +184,11 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
     skipped: list[str] = []
     for role, login in ROLE_LOGIN.items():
         pw = settings.role_password(role)  # type: ignore[arg-type]
-        if (pw is None or not pw.get_secret_value()) and role in OPTIONAL_OUTSIDE_PRODUCTION \
-                and getattr(settings, "reva_env", "local") != "production":
+        if (
+            (pw is None or not pw.get_secret_value())
+            and role in OPTIONAL_OUTSIDE_PRODUCTION
+            and getattr(settings, "reva_env", "local") != "production"
+        ):
             # (GATE) Outside production the independent gate login may be left unprovisioned:
             # nothing can then record gate results, so nothing is auto-promoted (fail closed).
             # The role is left as it is (roles are cluster-global; other databases may use it).
@@ -242,11 +249,18 @@ def verify_runtime_role_attributes(conn: Connection, logins: list[str], *, requi
     ``require_login=False`` is used for an optional role that was not provisioned (no password):
     it must still exist and hold no privileged attribute, but may be NOLOGIN.
     """
-    rows = conn.execute(
-        text("SELECT rolname, rolcanlogin, rolinherit, " + ", ".join(FORBIDDEN_ROLE_ATTRIBUTES)
-             + " FROM pg_roles WHERE rolname = ANY(:r)"),
-        {"r": logins},
-    ).mappings().all()
+    rows = (
+        conn.execute(
+            text(
+                "SELECT rolname, rolcanlogin, rolinherit, "
+                + ", ".join(FORBIDDEN_ROLE_ATTRIBUTES)
+                + " FROM pg_roles WHERE rolname = ANY(:r)"
+            ),
+            {"r": logins},
+        )
+        .mappings()
+        .all()
+    )
     found = {r["rolname"]: r for r in rows}
     problems = []
     for login in logins:
@@ -262,33 +276,42 @@ def verify_runtime_role_attributes(conn: Connection, logins: list[str], *, requi
         if bad:
             problems.append(f"{login}: {', '.join(bad)}")
     if problems:
-        raise ConfigurationError("runtime roles have unsafe attributes (a superuser must fix them): "
-                                 + "; ".join(problems))
+        raise ConfigurationError(
+            "runtime roles have unsafe attributes (a superuser must fix them): " + "; ".join(problems)
+        )
 
 
 def verify_ownership(conn: Connection) -> None:
-    owned = conn.execute(
-        text(
-            """
+    owned = (
+        conn.execute(
+            text(
+                """
             SELECT n.nspname || '.' || c.relname
             FROM pg_class c JOIN pg_namespace n ON n.oid = c.relnamespace
             JOIN pg_roles r ON r.oid = c.relowner
             WHERE n.nspname IN ('meta','ontology','world','evidence','belief','model','sim','ops')
               AND r.rolname = ANY(:roles)
             """
-        ),
-        {"roles": list(RUNTIME_ROLES)},
-    ).scalars().all()
+            ),
+            {"roles": list(RUNTIME_ROLES)},
+        )
+        .scalars()
+        .all()
+    )
     if owned:
         raise ConfigurationError(f"runtime roles own scientific objects: {owned}")
-    members = conn.execute(
-        text(
-            "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
-            "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = 'reva_restricted_deletion' "
-            "AND r.rolname = ANY(:roles)"
-        ),
-        {"roles": list(RUNTIME_ROLES)},
-    ).scalars().all()
+    members = (
+        conn.execute(
+            text(
+                "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+                "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = 'reva_restricted_deletion' "
+                "AND r.rolname = ANY(:roles)"
+            ),
+            {"roles": list(RUNTIME_ROLES)},
+        )
+        .scalars()
+        .all()
+    )
     if members:
         raise ConfigurationError(f"runtime roles must not hold deletion privilege: {members}")
     verify_runtime_memberships(conn)
@@ -308,15 +331,19 @@ def verify_runtime_memberships(conn: Connection) -> None:
     LOGIN role other than the migration owner in ``reva_registry`` (it owns the approval
     functions) and a ``reva_registry`` that can log in.
     """
-    held = conn.execute(
-        text(
-            "SELECT r.rolname || ' -> ' || g.rolname || ' (admin=' || m.admin_option || ', inherit='"
-            " || m.inherit_option || ', set=' || m.set_option || ')' "
-            "FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
-            "JOIN pg_roles g ON g.oid = m.roleid WHERE r.rolname = ANY(:roles) ORDER BY 1"
-        ),
-        {"roles": list(RUNTIME_ROLES)},
-    ).scalars().all()
+    held = (
+        conn.execute(
+            text(
+                "SELECT r.rolname || ' -> ' || g.rolname || ' (admin=' || m.admin_option || ', inherit='"
+                " || m.inherit_option || ', set=' || m.set_option || ')' "
+                "FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+                "JOIN pg_roles g ON g.oid = m.roleid WHERE r.rolname = ANY(:roles) ORDER BY 1"
+            ),
+            {"roles": list(RUNTIME_ROLES)},
+        )
+        .scalars()
+        .all()
+    )
     if held:
         raise ConfigurationError(f"runtime roles must not be members of other roles (a superuser must revoke): {held}")
     registry = conn.execute(
@@ -324,20 +351,25 @@ def verify_runtime_memberships(conn: Connection) -> None:
     ).scalar_one_or_none()
     if registry:
         raise ConfigurationError("reva_registry must be NOLOGIN")
-    logins = conn.execute(
-        text(
-            "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
-            "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = ANY(:groups) "
-            "AND r.rolcanlogin AND r.rolname <> current_user AND NOT r.rolsuper ORDER BY 1"
-        ),
-        {"groups": ["reva_registry"]},
-    ).scalars().all()
+    logins = (
+        conn.execute(
+            text(
+                "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+                "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = ANY(:groups) "
+                "AND r.rolcanlogin AND r.rolname <> current_user AND NOT r.rolsuper ORDER BY 1"
+            ),
+            {"groups": ["reva_registry"]},
+        )
+        .scalars()
+        .all()
+    )
     if logins:
         raise ConfigurationError(f"login roles must not be members of reva_registry: {logins}")
 
 
-def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = False,
-              seed_registry: bool = True) -> dict[str, Any]:
+def bootstrap(
+    settings: Settings | None = None, *, allow_older_server: bool = False, seed_registry: bool = True
+) -> dict[str, Any]:
     """Migrate, provision runtime roles, verify them and (by default) seed the reviewed registry.
 
     (R5-01) The registry seed writes approved mappings, eligibility decisions and models,
@@ -366,9 +398,7 @@ def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = Fa
 
             drift = assert_schema_contract(conn, reva_env=s.reva_env)
             report["schema_fingerprint"] = drift.actual_digest if drift else None
-            report["schema_version"] = conn.execute(
-                text("SELECT version_num FROM alembic_version")
-            ).scalar_one()
+            report["schema_version"] = conn.execute(text("SELECT version_num FROM alembic_version")).scalar_one()
         finally:
             conn.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": MIGRATION_LOCK_KEY})
             conn.commit()

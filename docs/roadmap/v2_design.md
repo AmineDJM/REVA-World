@@ -55,21 +55,23 @@ started once the APIs below exist.
 ```python
 # src/reva/simulation/plugins.py
 class InputRequirement(NamedTuple):
-    name: str                 # model-local input name
-    concept: str              # registry concept id@version
-    subject: str              # ISO3 or a registry entity key
+    name: str  # model-local input name
+    concept: str  # registry concept id@version
+    subject: str  # ISO3 or a registry entity key
     years: tuple[int, ...]
     kind: Literal["scalar", "dataset"]
 
+
 class SimulationModel(Protocol):
-    model_key: str                       # "economic.crude_exposure"
+    model_key: str  # "economic.crude_exposure"
     model_version: str
-    fidelities: frozenset[str]           # e.g. {"L1", "L2"}
-    def validate(self, spec: dict) -> None: ...                 # raises ValidationProblem
+    fidelities: frozenset[str]  # e.g. {"L1", "L2"}
+
+    def validate(self, spec: dict) -> None: ...  # raises ValidationProblem
     def requirements(self, spec: dict) -> list[InputRequirement]: ...
-    def compile(self, inputs: ResolvedInputs, spec: dict) -> Any: ...   # pure, no DB
+    def compile(self, inputs: ResolvedInputs, spec: dict) -> Any: ...  # pure, no DB
     def compute(self, compiled: Any, fidelity: str) -> list[ResultRow]: ...  # pure, Decimal
-    def manifest(self) -> dict: ...      # source digest, assumptions, review_status
+    def manifest(self) -> dict: ...  # source digest, assumptions, review_status
 ```
 
 `ResolvedInputs` gives scalars (Value or typed Missing, with provenance ids) and datasets

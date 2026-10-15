@@ -34,16 +34,19 @@ def harness() -> ModuleType:
 
 @pytest.fixture(scope="module")
 def perf_env(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Any]:
-    with harness().perf_database(db.settings, label="perfapi",
-                                 object_root=tmp_path_factory.mktemp("perf_api_objects")) as env:
+    with harness().perf_database(
+        db.settings, label="perfapi", object_root=tmp_path_factory.mktemp("perf_api_objects")
+    ) as env:
         yield env
 
 
 def _check(h: ModuleType, res: dict[str, Any], label: str) -> None:
     o, c, srv = res["ordinary"], res["cached_metadata"], res["server"]
-    print(f"\n[perf] API {label}: ordinary n={o['requests']} p50={o['overall']['p50_ms']} "
-          f"p95={o['overall']['p95_ms']} max={o['overall']['max_ms']} ms; cached n={c['requests']} "
-          f"p50={c['overall']['p50_ms']} p95={c['overall']['p95_ms']} ms; rss peak {srv['peak_rss_vmhwm_mib']} MiB")
+    print(
+        f"\n[perf] API {label}: ordinary n={o['requests']} p50={o['overall']['p50_ms']} "
+        f"p95={o['overall']['p95_ms']} max={o['overall']['max_ms']} ms; cached n={c['requests']} "
+        f"p50={c['overall']['p50_ms']} p95={c['overall']['p95_ms']} ms; rss peak {srv['peak_rss_vmhwm_mib']} MiB"
+    )
     for n, s in o["per_endpoint"].items():
         print(f"[perf]   {n:<24} p50={s['p50_ms']:>8} p95={s['p95_ms']:>8} max={s['max_ms']:>8}")
     assert o["error_count"] == 0, o["errors"]
@@ -61,7 +64,6 @@ def test_api_latency_one_cpu(perf_env: Any) -> None:
 
 def test_api_latency_half_cpu_quota(perf_env: Any) -> None:
     h = harness()
-    res = h.bench_api(perf_env, requests_per_client=40, cached_requests_per_client=30,
-                      cpu_fraction=h.API_PLAN_CPU)
+    res = h.bench_api(perf_env, requests_per_client=40, cached_requests_per_client=30, cpu_fraction=h.API_PLAN_CPU)
     assert res["server"]["cpu_throttle"]["cpu_fraction"] == 0.5
     _check(h, res, f"{h.API_PLAN_CPU} CPU emulated")

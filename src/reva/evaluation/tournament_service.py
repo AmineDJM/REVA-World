@@ -175,8 +175,12 @@ def panel_from_rows(
             continue
         m = meta.setdefault(
             sid,
-            {"concept_id": concept, "iso3": iso3, "unit_ref": value.get("unit_ref"),
-             "aggregation": r.get("aggregation")},
+            {
+                "concept_id": concept,
+                "iso3": iso3,
+                "unit_ref": value.get("unit_ref"),
+                "aggregation": r.get("aggregation"),
+            },
         )
         if m["unit_ref"] != value.get("unit_ref") or m["aggregation"] != r.get("aggregation"):
             m["inconsistent"] = True
@@ -195,11 +199,23 @@ def panel_from_rows(
             continue
         bad = [y for y, v in obs if v <= 0]
         if bad:
-            dropped.append({"series_id": sid, "reason": "non_positive_values", "years": bad,
-                            "note": "strictly positive series required; values are never clipped"})
+            dropped.append(
+                {
+                    "series_id": sid,
+                    "reason": "non_positive_values",
+                    "years": bad,
+                    "note": "strictly positive series required; values are never clipped",
+                }
+            )
             continue
-        m.update({"n": len(obs), "first_year": obs[0][0], "last_year": obs[-1][0],
-                  "gaps": [y for y in range(obs[0][0], obs[-1][0] + 1) if y not in raw[sid]]})
+        m.update(
+            {
+                "n": len(obs),
+                "first_year": obs[0][0],
+                "last_year": obs[-1][0],
+                "gaps": [y for y in range(obs[0][0], obs[-1][0] + 1) if y not in raw[sid]],
+            }
+        )
         series[sid] = obs
     for sid in sorted(set(meta) - set(series)):
         meta.pop(sid)
@@ -265,9 +281,11 @@ def load_observation_panel(
         ).mappings()
     }
     rows = [
-        {"concept_id": s.concept_id, **{k: supports[s.support_id][k]
-                                        for k in ("spatial_spec", "temporal_extent", "aggregation")},
-         "value": s.value}
+        {
+            "concept_id": s.concept_id,
+            **{k: supports[s.support_id][k] for k in ("spatial_spec", "temporal_extent", "aggregation")},
+            "value": s.value,
+        }
         for s in sels
     ]
     series, meta, dropped = panel_from_rows(rows, concepts=concepts, countries=countries, years=years)
@@ -341,13 +359,23 @@ def score_holdout(
             for fc in fitted.predict([t - origin for t in targets], level=level):
                 y = actual[fc.target_year]
                 ae = absolute_error(fc.point, y)
-                recs.append({
-                    "series_id": sid, "origin": origin, "horizon": fc.horizon, "target_year": fc.target_year,
-                    "model": fc.model_key, "model_version": fc.model_version, "point": fc.point,
-                    "interval": list(fc.interval) if fc.interval else None, "level": fc.level, "target": y,
-                    "abs_error": ae, "mase_scaled_error": None if scale.value is None else ae / scale.value,
-                    "covered": None if fc.interval is None else interval_covers(fc.interval, y),
-                })
+                recs.append(
+                    {
+                        "series_id": sid,
+                        "origin": origin,
+                        "horizon": fc.horizon,
+                        "target_year": fc.target_year,
+                        "model": fc.model_key,
+                        "model_version": fc.model_version,
+                        "point": fc.point,
+                        "interval": list(fc.interval) if fc.interval else None,
+                        "level": fc.level,
+                        "target": y,
+                        "abs_error": ae,
+                        "mase_scaled_error": None if scale.value is None else ae / scale.value,
+                        "covered": None if fc.interval is None else interval_covers(fc.interval, y),
+                    }
+                )
         scaled = [r["mase_scaled_error"] for r in recs if r["mase_scaled_error"] is not None]
         ints = [r for r in recs if r["covered"] is not None]
         out[model_ref(m)] = {
@@ -392,27 +420,34 @@ def paired_common_metrics(records: Sequence[PredictionRecord], model_keys: Seque
         ints = [r for r in recs if r.interval is not None]
         metrics[k] = {
             "mase": math.fsum(r.mase_scaled_error for r in recs if r.mase_scaled_error is not None) / len(recs)
-            if recs else None,
+            if recs
+            else None,
             "mae": math.fsum(r.abs_error for r in recs) / len(recs) if recs else None,
             "coverage": sum(bool(r.covered) for r in ints) / len(ints) if ints else None,
             "n_intervals": len(ints),
             "mean_interval_width": math.fsum(r.interval[1] - r.interval[0] for r in ints if r.interval) / len(ints)
-            if ints else None,
+            if ints
+            else None,
         }
-    return {"models": list(model_keys), "n_common_cases": len(common),
-            "definition": "cases (series, origin, horizon) where every listed model has a defined scaled error",
-            "metrics": metrics}
+    return {
+        "models": list(model_keys),
+        "n_common_cases": len(common),
+        "definition": "cases (series, origin, horizon) where every listed model has a defined scaled error",
+        "metrics": metrics,
+    }
 
 
 def _headline_paired(result: TournamentResult, keys: Sequence[str]) -> dict[str, Any]:
     """Paired common-case metrics: the tournament's own when provided, else computed here."""
     pm = getattr(result, "paired_metrics", None)
     if pm:
-        return {"models": list(getattr(result, "paired_models", ()) or keys),
-                "n_common_cases": int(getattr(result, "n_paired_cases", 0)),
-                "definition": "cases (series, origin, horizon) where every compared model has a defined "
-                "scaled error (reva.models.tournament paired_metrics)",
-                "metrics": {k: _jsonable(m) for k, m in pm.items()}}
+        return {
+            "models": list(getattr(result, "paired_models", ()) or keys),
+            "n_common_cases": int(getattr(result, "n_paired_cases", 0)),
+            "definition": "cases (series, origin, horizon) where every compared model has a defined "
+            "scaled error (reva.models.tournament paired_metrics)",
+            "metrics": {k: _jsonable(m) for k, m in pm.items()},
+        }
     return paired_common_metrics(result.records, keys)
 
 
@@ -430,8 +465,13 @@ def choose_among_challengers(
     """
     pm = paired_common_metrics(records, keys)
     n = pm["n_common_cases"]
-    out: dict[str, Any] = {"n_common": n, "paired_mase": {k: pm["metrics"][k]["mase"] for k in keys},
-                           "comparisons": {}, "winner": None, "test": "dm_hln_holm (origin-aggregated)"}
+    out: dict[str, Any] = {
+        "n_common": n,
+        "paired_mase": {k: pm["metrics"][k]["mase"] for k in keys},
+        "comparisons": {},
+        "winner": None,
+        "test": "dm_hln_holm (origin-aggregated)",
+    }
     if n == 0:
         return out
     pt = {"alpha": 0.025, "min_origins_per_horizon": 8, **dict(policy.get("paired_test") or {})}
@@ -458,12 +498,20 @@ def choose_among_challengers(
             dm = dm_hln_test(xs, h)
             p_less[h] = dm.p_less
             worse = worse or dm.p_greater <= alpha
-            tests[str(h)] = {"tested": True, "n_origins": len(xs), "mean": dm.mean, "p_less": dm.p_less,
-                             "p_greater": dm.p_greater}
+            tests[str(h)] = {
+                "tested": True,
+                "n_origins": len(xs),
+                "mean": dm.mean,
+                "p_less": dm.p_less,
+                "p_greater": dm.p_greater,
+            }
         rejected = holm_rejections(p_less, alpha) if p_less else {}
         sig = bool(rejected) and not worse
-        out["comparisons"][f"{best} vs {other}"] = {"horizons": tests, "holm_rejected": sorted(rejected),
-                                                    "significant": sig}
+        out["comparisons"][f"{best} vs {other}"] = {
+            "horizons": tests,
+            "holm_rejected": sorted(rejected),
+            "significant": sig,
+        }
         all_sig = all_sig and sig
     out["winner"] = best if all_sig else None
     return out
@@ -517,8 +565,13 @@ def evaluate(
     if not dev:
         raise MissingInput("no development years remain after reserving the locked holdout")
     result = run_tournament(  # Decimal values are converted explicitly by the tournament (to_float)
-        dev, list(models.values()), incumbent_key, horizons,  # type: ignore[arg-type]
-        replay_mode=REPLAY_MODE, seed=seed, policy=policy,
+        dev,
+        list(models.values()),
+        incumbent_key,
+        horizons,  # type: ignore[arg-type]
+        replay_mode=REPLAY_MODE,
+        seed=seed,
+        policy=policy,
     )
     pol = result.policy
     inc_ref = model_ref(models[incumbent_key])
@@ -530,8 +583,11 @@ def evaluate(
     elif passing:
         needed = sorted({*passing, incumbent_key})
     access_before = {model_ref(models[k]): int(prior_holdout_accesses.get(model_ref(models[k]), 0)) for k in models}
-    blocked = {model_ref(models[k]): access_before[model_ref(models[k])] for k in needed
-               if access_before[model_ref(models[k])] + 1 > spec.max_accesses}
+    blocked = {
+        model_ref(models[k]): access_before[model_ref(models[k])]
+        for k in needed
+        if access_before[model_ref(models[k])] + 1 > spec.max_accesses
+    }
     holdout_scores: dict[str, dict[str, Any]] = {}
     if not needed:
         status_h = "locked_unopened"
@@ -547,7 +603,9 @@ def evaluate(
     for k, d in sorted(result.decisions.items()):
         ci = getattr(d, "bootstrap_interval", None)
         base = {
-            "challenger": model_ref(models[k]), "incumbent": inc_ref, "n_pairs": getattr(d, "n_pairs", None),
+            "challenger": model_ref(models[k]),
+            "incumbent": inc_ref,
+            "n_pairs": getattr(d, "n_pairs", None),
             "mean_loss_difference": getattr(d, "mean_loss_difference", None),
             "bootstrap_interval": list(ci) if ci else None,
             "subgroup_degradation": dict(getattr(d, "subgroup_degradation", None) or {}),
@@ -563,18 +621,25 @@ def evaluate(
             decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
             continue
         if status_h == "blocked":
-            reasons += [f"locked_holdout_reuse_blocked: {r} already scored {n}x on this holdout "
-                        f"(limit {spec.max_accesses} per model version)" for r, n in sorted(blocked.items())]
+            reasons += [
+                f"locked_holdout_reuse_blocked: {r} already scored {n}x on this holdout "
+                f"(limit {spec.max_accesses} per model version)"
+                for r, n in sorted(blocked.items())
+            ]
             decisions[k] = {**base, "decision": "keep_incumbent", "reasons": reasons}
             continue
         ch_ref = model_ref(models[k])
         ch_cells = {_case_key(r): r for r in holdout_scores[ch_ref]["predictions"]}
         in_cells = {_case_key(r): r for r in holdout_scores[inc_ref]["predictions"]}
-        pairs = [(c[0], ch_cells[c]["mase_scaled_error"], in_cells[c]["mase_scaled_error"])
-                 for c in sorted(set(ch_cells) & set(in_cells))]
+        pairs = [
+            (c[0], ch_cells[c]["mase_scaled_error"], in_cells[c]["mase_scaled_error"])
+            for c in sorted(set(ch_cells) & set(in_cells))
+        ]
         ni_pol = dict(pol.get("holdout_non_inferiority") or {})
         ni = holdout_non_inferiority(
-            pairs, margin=float(ni_pol.get("margin", 0.0)), alpha=float(ni_pol.get("alpha", 0.025)),
+            pairs,
+            margin=float(ni_pol.get("margin", 0.0)),
+            alpha=float(ni_pol.get("alpha", 0.025)),
             require_statistical=bool(ni_pol.get("require_statistical", False)),
         )
         base["holdout_non_inferiority"] = _jsonable(ni)
@@ -593,16 +658,19 @@ def evaluate(
                 decisions[k]["decision"] = "keep_incumbent"
                 decisions[k]["reasons"].append(
                     "requires_review: several challengers passed every gate but none is distinguishable from the "
-                    f"others on {selection['n_common']} paired common development cases; incumbent kept")
+                    f"others on {selection['n_common']} paired common development cases; incumbent kept"
+                )
             elif k != winner:
                 decisions[k]["decision"] = "reject"
                 decisions[k]["reasons"].append(
                     f"passed all gates but not selected: {model_ref(models[winner])} has a lower paired MASE on "
-                    f"{selection['n_common']} common development cases (block-bootstrap interval excludes zero)")
+                    f"{selection['n_common']} common development cases (block-bootstrap interval excludes zero)"
+                )
     if any(d["decision"] == "promote" for d in decisions.values()):
         status = "promoted"
-    elif any(d.get("needs_review") or any(r.startswith("requires_review") for r in d["reasons"])
-             for d in decisions.values()):
+    elif any(
+        d.get("needs_review") or any(r.startswith("requires_review") for r in d["reasons"]) for d in decisions.values()
+    ):
         status = "needs_review"
     elif decisions and all(
         any(r.startswith("insufficient_evaluation") for r in d["reasons"]) for d in decisions.values()
@@ -611,10 +679,19 @@ def evaluate(
     else:
         status = "incumbent_kept"
     return EvaluationOutcome(
-        tournament=result, holdout=spec, holdout_status=status_h, holdout_scores=holdout_scores,
-        holdout_blocked=blocked, access_before=access_before, access_after=access_after, decisions=decisions,
-        status=status, runtime_seconds=time.perf_counter() - t0, models=models,
-        paired=_headline_paired(result, sorted(models)), challenger_selection=selection,
+        tournament=result,
+        holdout=spec,
+        holdout_status=status_h,
+        holdout_scores=holdout_scores,
+        holdout_blocked=blocked,
+        access_before=access_before,
+        access_after=access_after,
+        decisions=decisions,
+        status=status,
+        runtime_seconds=time.perf_counter() - t0,
+        models=models,
+        paired=_headline_paired(result, sorted(models)),
+        challenger_selection=selection,
     )
 
 
@@ -670,93 +747,103 @@ def build_manifest(
     inc_ref = model_ref(outcome.models[t.incumbent])
     sub = {f"{g}={v}": {k: _metrics_dict(m) for k, m in per.items()} for (g, v), per in t.subgroup_metrics.items()}
     dev_targets = sorted({(r.series_id, r.target_year, r.target) for r in t.records})
-    manifest: dict[str, Any] = finite_json({
-        "schema": SCHEMA,
-        "kind": "forecast_tournament",
-        "label": LABEL,
-        "replay_mode": REPLAY_MODE,
-        "honesty_statement": HONESTY_STATEMENT,
-        "service_version": SERVICE_VERSION,
-        "tournament_method": TOURNAMENT_METHOD,
-        "job_id": job_id,
-        "task_scope": dict(task_scope),
-        "task_key": task_key,
-        "evaluation_status": outcome.status,
-        "inputs": {
-            "source": panel.source,
-            "panel_digest": panel.digest(),
-            "series": panel.meta,
-            "dropped": panel.dropped,
-        },
-        "models": {
-            model_ref(m): {
-                "model_version_id": model_version_ids[model_ref(m)],
-                "role": "incumbent" if k == t.incumbent else "challenger",
-                "is_naive_baseline": k == NAIVE_KEY,
-            }
-            for k, m in sorted(outcome.models.items())
-        },
-        "incumbent": inc_ref,
-        "naive_baseline": model_ref(outcome.models[NAIVE_KEY]),
-        "policy": {**dict(t.policy), "policy_version": policy_version},
-        "seed": seed,
-        "horizons": list(t.horizons),
-        "development": {
-            "years": [min(y for obs in panel.series.values() for y, _ in obs), outcome.holdout.last_dev_year],
-            "predictions": [dataclasses.asdict(r) for r in t.records],
-            "targets": [{"series_id": s, "year": y, "value": v} for s, y, v in dev_targets],
-            "target_vintage": "latest revised values only; first-release targets unavailable (not archived in V1)",
-            "paired_scores": outcome.paired,
-            "scores_unpaired": {k: _metrics_dict(m) for k, m in t.metrics.items()},
-            "scores_unpaired_note": "each model over its own eligible cases; not comparable across models "
-            "(use paired_scores)",
-            "challenger_selection": outcome.challenger_selection,
-            "subgroup_scores": sub,
-            "ineligible": [
-                {"series_id": i.series_id, "origin": i.origin, "model": i.report.model_key,
-                 "reason": i.report.reason, "n_train": i.report.n_train}
-                for i in t.ineligible
-            ],
-            "tournament_decisions": {
-                k: _jsonable(d) for k, d in t.decisions.items()
+    manifest: dict[str, Any] = finite_json(
+        {
+            "schema": SCHEMA,
+            "kind": "forecast_tournament",
+            "label": LABEL,
+            "replay_mode": REPLAY_MODE,
+            "honesty_statement": HONESTY_STATEMENT,
+            "service_version": SERVICE_VERSION,
+            "tournament_method": TOURNAMENT_METHOD,
+            "job_id": job_id,
+            "task_scope": dict(task_scope),
+            "task_key": task_key,
+            "evaluation_status": outcome.status,
+            "inputs": {
+                "source": panel.source,
+                "panel_digest": panel.digest(),
+                "series": panel.meta,
+                "dropped": panel.dropped,
             },
-        },
-        "locked_holdout": {
-            "key": outcome.holdout.key,
-            "years": list(outcome.holdout.years),
-            "cells": list(outcome.holdout.cells),
-            "mode": holdout_mode,
-            "status": outcome.holdout_status,
-            "max_accesses_per_model_version": outcome.holdout.max_accesses,
-            "access_count_before": outcome.access_before,
-            "access_count_after": outcome.access_after,
-            "blocked": outcome.holdout_blocked,
-            "scores": outcome.holdout_scores,
-            "used_for_challenger_selection": False,
-        },
-        "holdout_usage_count": outcome.access_after,
-        "final_decisions": outcome.decisions,
-        "researcher_degrees_of_freedom": {
-            "candidate_models": "fixed by specification (last_value, log_drift, local_level_log); no search",
-            "hyperparameter_tuning_budget": 0,
-            "preprocessing": "log transform inside each model's fit, within the training window only",
-            "metrics_predeclared": ["mase (primary loss)", "mae (descriptive)", "interval coverage", "interval width"],
-            "subgroups_predeclared": ["series_id", "horizon"],
-            "horizons": list(t.horizons),
-            "holdout_definition": f"last {len(outcome.holdout.years)} calendar years of the panel, fixed by policy",
-            "policy_version": policy_version,
+            "models": {
+                model_ref(m): {
+                    "model_version_id": model_version_ids[model_ref(m)],
+                    "role": "incumbent" if k == t.incumbent else "challenger",
+                    "is_naive_baseline": k == NAIVE_KEY,
+                }
+                for k, m in sorted(outcome.models.items())
+            },
+            "incumbent": inc_ref,
+            "naive_baseline": model_ref(outcome.models[NAIVE_KEY]),
+            "policy": {**dict(t.policy), "policy_version": policy_version},
             "seed": seed,
-            "task_scope_choice": "payload-selected concepts/countries/years (recorded in task_scope)",
-            "prior_development_runs_on_this_task": prior_runs,
-            "repeated_holdout_use": {r: n for r, n in outcome.access_before.items() if n},
-            "multiple_comparisons": "each challenger compared with the incumbent separately; no correction",
-        },
-        "execution": {
-            "code_digest": code_digest(),
-            "environment_digest": environment_digest(),
-            "tournament_runtime_seconds": round(outcome.runtime_seconds, 3),
-        },
-    })
+            "horizons": list(t.horizons),
+            "development": {
+                "years": [min(y for obs in panel.series.values() for y, _ in obs), outcome.holdout.last_dev_year],
+                "predictions": [dataclasses.asdict(r) for r in t.records],
+                "targets": [{"series_id": s, "year": y, "value": v} for s, y, v in dev_targets],
+                "target_vintage": "latest revised values only; first-release targets unavailable (not archived in V1)",
+                "paired_scores": outcome.paired,
+                "scores_unpaired": {k: _metrics_dict(m) for k, m in t.metrics.items()},
+                "scores_unpaired_note": "each model over its own eligible cases; not comparable across models "
+                "(use paired_scores)",
+                "challenger_selection": outcome.challenger_selection,
+                "subgroup_scores": sub,
+                "ineligible": [
+                    {
+                        "series_id": i.series_id,
+                        "origin": i.origin,
+                        "model": i.report.model_key,
+                        "reason": i.report.reason,
+                        "n_train": i.report.n_train,
+                    }
+                    for i in t.ineligible
+                ],
+                "tournament_decisions": {k: _jsonable(d) for k, d in t.decisions.items()},
+            },
+            "locked_holdout": {
+                "key": outcome.holdout.key,
+                "years": list(outcome.holdout.years),
+                "cells": list(outcome.holdout.cells),
+                "mode": holdout_mode,
+                "status": outcome.holdout_status,
+                "max_accesses_per_model_version": outcome.holdout.max_accesses,
+                "access_count_before": outcome.access_before,
+                "access_count_after": outcome.access_after,
+                "blocked": outcome.holdout_blocked,
+                "scores": outcome.holdout_scores,
+                "used_for_challenger_selection": False,
+            },
+            "holdout_usage_count": outcome.access_after,
+            "final_decisions": outcome.decisions,
+            "researcher_degrees_of_freedom": {
+                "candidate_models": "fixed by specification (last_value, log_drift, local_level_log); no search",
+                "hyperparameter_tuning_budget": 0,
+                "preprocessing": "log transform inside each model's fit, within the training window only",
+                "metrics_predeclared": [
+                    "mase (primary loss)",
+                    "mae (descriptive)",
+                    "interval coverage",
+                    "interval width",
+                ],
+                "subgroups_predeclared": ["series_id", "horizon"],
+                "horizons": list(t.horizons),
+                "holdout_definition": f"last {len(outcome.holdout.years)} calendar years of the panel, fixed by policy",
+                "policy_version": policy_version,
+                "seed": seed,
+                "task_scope_choice": "payload-selected concepts/countries/years (recorded in task_scope)",
+                "prior_development_runs_on_this_task": prior_runs,
+                "repeated_holdout_use": {r: n for r, n in outcome.access_before.items() if n},
+                "multiple_comparisons": "each challenger compared with the incumbent separately; no correction",
+            },
+            "execution": {
+                "code_digest": code_digest(),
+                "environment_digest": environment_digest(),
+                "tournament_runtime_seconds": round(outcome.runtime_seconds, 3),
+            },
+        }
+    )
     return manifest
 
 
@@ -771,8 +858,9 @@ def _model_version_ids(conn: Connection, models: Mapping[str, ForecastModel]) ->
             {"k": m.key, "v": m.version},
         ).one_or_none()
         if row is None:
-            raise MissingInput(f"model version {model_ref(m)} is not registered (seed the registry)",
-                               model=model_ref(m))
+            raise MissingInput(
+                f"model version {model_ref(m)} is not registered (seed the registry)", model=model_ref(m)
+            )
         out[model_ref(m)] = str(row.id)
     return out
 
@@ -815,8 +903,10 @@ def incumbent_for_task(conn: Connection, task_key: str) -> str:
 def _prior_runs(conn: Connection, task_key: str) -> int:
     return int(
         conn.execute(
-            text("SELECT count(DISTINCT context_id) FROM model.evaluation "
-                 "WHERE task_scope->>'task_key' = :k AND task_scope->>'period' = 'development'"),
+            text(
+                "SELECT count(DISTINCT context_id) FROM model.evaluation "
+                "WHERE task_scope->>'task_key' = :k AND task_scope->>'period' = 'development'"
+            ),
             {"k": task_key},
         ).scalar_one()
     )
@@ -846,8 +936,9 @@ def _parse_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     if not concepts or any(c not in SUPPORTED_CONCEPTS for c in concepts):
         raise CapabilityGap(f"concepts must be among {list(SUPPORTED_CONCEPTS)} (positive annual series)")
     countries = list(payload.get("countries") or DEFAULT_COUNTRIES)
-    if not countries or any(not (isinstance(c, str) and len(c) == 3 and c.isalpha() and c.isupper())
-                            for c in countries):
+    if not countries or any(
+        not (isinstance(c, str) and len(c) == 3 and c.isalpha() and c.isupper()) for c in countries
+    ):
         raise ValidationProblem("countries must be ISO3 codes")
     years = tuple(payload.get("years") or DEFAULT_YEARS)
     if len(years) != 2 or not all(isinstance(y, int) and not isinstance(y, bool) for y in years) or years[0] > years[1]:
@@ -867,9 +958,17 @@ def _parse_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     release_id = payload.get("release_id")
     if release_id is not None:
         release_id = UUID(str(release_id))
-    return {"source": source, "concepts": sorted(set(concepts)), "countries": sorted(set(countries)),
-            "years": (int(years[0]), int(years[1])), "horizons": sorted(set(horizons)), "seed": int(seed),
-            "holdout_mode": mode, "origin": origin, "release_id": release_id}
+    return {
+        "source": source,
+        "concepts": sorted(set(concepts)),
+        "countries": sorted(set(countries)),
+        "years": (int(years[0]), int(years[1])),
+        "horizons": sorted(set(horizons)),
+        "seed": int(seed),
+        "holdout_mode": mode,
+        "origin": origin,
+        "release_id": release_id,
+    }
 
 
 def task_scope_of(p: Mapping[str, Any]) -> tuple[dict[str, Any], str]:
@@ -902,21 +1001,26 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
         if p["source"] == "belief_release":
             release = release_by_id(conn, p["release_id"]) if p["release_id"] else release_as_of(conn, None)
             if release is None or release.get("sequence") is None:
-                raise MissingInput("no published belief release is available for evaluation",
-                                   release_id=str(p["release_id"]) if p["release_id"] else None)
-            panel = load_release_panel(conn, release, concepts=p["concepts"], countries=p["countries"],
-                                       years=p["years"])
+                raise MissingInput(
+                    "no published belief release is available for evaluation",
+                    release_id=str(p["release_id"]) if p["release_id"] else None,
+                )
+            panel = load_release_panel(
+                conn, release, concepts=p["concepts"], countries=p["countries"], years=p["years"]
+            )
             origin = str(release["origin"])
             cutoff: datetime = release["knowledge_cutoff"]
         else:
             origin = p["origin"]
             cutoff = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
-            panel = load_observation_panel(conn, origin=origin, cutoff=cutoff, concepts=p["concepts"],
-                                           countries=p["countries"], years=p["years"])
+            panel = load_observation_panel(
+                conn, origin=origin, cutoff=cutoff, concepts=p["concepts"], countries=p["countries"], years=p["years"]
+            )
         assert_publishable(Origin(origin), ctx.settings.reva_env)
         if not panel.series:
-            raise MissingInput("no strictly positive annual series in the requested scope",
-                               dropped=panel.dropped[:20], scope=scope)
+            raise MissingInput(
+                "no strictly positive annual series in the requested scope", dropped=panel.dropped[:20], scope=scope
+            )
         incumbent_key = incumbent_for_task(conn, task_key)
         spec = holdout_spec(panel.series, int(holdout_cfg["years"]), int(holdout_cfg["max_accesses_per_model_version"]))
         prior_access = holdout_access_counts(conn, spec.cells)
@@ -926,16 +1030,28 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     if ctx.heartbeat({"stage": "tournament", "series": len(panel.series)}) == "cancel_requested":
         return {"status": "cancelled"}
     outcome = evaluate(
-        panel.series, incumbent_key=incumbent_key, horizons=p["horizons"], seed=p["seed"], policy=policy,
+        panel.series,
+        incumbent_key=incumbent_key,
+        horizons=p["horizons"],
+        seed=p["seed"],
+        policy=policy,
         holdout_years=int(holdout_cfg["years"]),
         max_holdout_accesses=int(holdout_cfg["max_accesses_per_model_version"]),
-        prior_holdout_accesses=prior_access, holdout_mode=p["holdout_mode"],
+        prior_holdout_accesses=prior_access,
+        holdout_mode=p["holdout_mode"],
     )
     if ctx.heartbeat({"stage": "persist"}) == "cancel_requested":
         return {"status": "cancelled"}
     manifest = build_manifest(
-        outcome, panel, task_scope=scope, task_key=task_key, seed=p["seed"], policy_version=policy_version,
-        holdout_mode=p["holdout_mode"], prior_runs=prior_runs, model_version_ids=version_ids,
+        outcome,
+        panel,
+        task_scope=scope,
+        task_key=task_key,
+        seed=p["seed"],
+        policy_version=policy_version,
+        holdout_mode=p["holdout_mode"],
+        prior_runs=prior_runs,
+        model_version_ids=version_ids,
         job_id=str(ctx.job_id),
     )
     t = outcome.tournament
@@ -946,21 +1062,36 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
         conn.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": HOLDOUT_LOCK})
         if outcome.holdout_scores:
             now_counts = holdout_access_counts(conn, spec.cells)
-            raced = {r: n for r, n in now_counts.items()
-                     if r in outcome.holdout_scores and n + 1 > spec.max_accesses}
+            raced = {r: n for r, n in now_counts.items() if r in outcome.holdout_scores and n + 1 > spec.max_accesses}
             if raced:
-                raise PolicyDenied("locked holdout was scored concurrently; refusing repeated holdout use",
-                                   holdout_key=spec.key, counts=raced)
+                raise PolicyDenied(
+                    "locked holdout was scored concurrently; refusing repeated holdout use",
+                    holdout_key=spec.key,
+                    counts=raced,
+                )
         sha = repo.store_json_artifact(conn, ctx.store, manifest, "evaluation", schema_version="evaluation-manifest/1")
         act = repo.simple_activity(
-            "evaluation.tournament", "evaluation", actor,
-            {"task_key": task_key, "replay_mode": REPLAY_MODE, "seed": p["seed"], "policy_version": policy_version,
-             "holdout_mode": p["holdout_mode"], "job_id": str(ctx.job_id), "label": LABEL},
+            "evaluation.tournament",
+            "evaluation",
+            actor,
+            {
+                "task_key": task_key,
+                "replay_mode": REPLAY_MODE,
+                "seed": p["seed"],
+                "policy_version": policy_version,
+                "holdout_mode": p["holdout_mode"],
+                "job_id": str(ctx.job_id),
+                "label": LABEL,
+            },
         )
         inputs = [(release["manifest_sha256"], {"role": "panel_source_release"})] if release else []
         repo.record_activity(conn, act, inputs=inputs, outputs=[sha])
         context_id = repo.create_context(
-            conn, mode="evaluation", origin=origin, manifest_sha256=sha, knowledge_cutoff=cutoff,
+            conn,
+            mode="evaluation",
+            origin=origin,
+            manifest_sha256=sha,
+            knowledge_cutoff=cutoff,
             parent_context_id=UUID(str(release["context_id"])) if release else None,
         )
         dev_years = manifest["development"]["years"]
@@ -974,9 +1105,15 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             ref = model_ref(m)
             role = "incumbent" if k == incumbent_key else "challenger"
             metrics = {
-                "label": LABEL, "period": "development", "role": role, "is_naive_baseline": k == NAIVE_KEY,
-                "paired": {**outcome.paired["metrics"][k], "n_common_cases": outcome.paired["n_common_cases"],
-                           "models": outcome.paired["models"]},
+                "label": LABEL,
+                "period": "development",
+                "role": role,
+                "is_naive_baseline": k == NAIVE_KEY,
+                "paired": {
+                    **outcome.paired["metrics"][k],
+                    "n_common_cases": outcome.paired["n_common_cases"],
+                    "models": outcome.paired["models"],
+                },
                 "unpaired": _metrics_dict(t.metrics[k]),
                 "unpaired_note": "over this model's own eligible cases; compare models with 'paired'",
                 "subgroups": sub_by_model.get(k, {}),
@@ -985,34 +1122,67 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
                 "evaluation_status": outcome.status,
             }
             eval_ids[k] = _insert_evaluation(
-                conn, version_ids[ref], context_id, sha,
-                {**scope, "task_key": task_key, "period": "development", "years_scored": dev_years}, metrics, act.id)
+                conn,
+                version_ids[ref],
+                context_id,
+                sha,
+                {**scope, "task_key": task_key, "period": "development", "years_scored": dev_years},
+                metrics,
+                act.id,
+            )
         holdout_eval_ids: dict[str, str] = {}
         for ref, h in sorted(outcome.holdout_scores.items()):
             holdout_eval_ids[ref] = _insert_evaluation(
-                conn, version_ids[ref], context_id, sha,
-                {**scope, "task_key": task_key, "period": "locked_holdout", "holdout_key": spec.key,
-                 "holdout_years": list(spec.years), "holdout_cells": list(spec.cells)},
-                {"label": LABEL, "period": "locked_holdout", "holdout_status": "scored",
-                 "access_count": outcome.access_after[ref], **h["metrics"],
-                 "ineligible": h["ineligible"]},
-                act.id)
+                conn,
+                version_ids[ref],
+                context_id,
+                sha,
+                {
+                    **scope,
+                    "task_key": task_key,
+                    "period": "locked_holdout",
+                    "holdout_key": spec.key,
+                    "holdout_years": list(spec.years),
+                    "holdout_cells": list(spec.cells),
+                },
+                {
+                    "label": LABEL,
+                    "period": "locked_holdout",
+                    "holdout_status": "scored",
+                    "access_count": outcome.access_after[ref],
+                    **h["metrics"],
+                    "ineligible": h["ineligible"],
+                },
+                act.id,
+            )
         promotion_ids: dict[str, str] = {}
         for k, d in sorted(outcome.decisions.items()):
-            promotion_ids[k] = str(conn.execute(
-                text(
-                    """INSERT INTO model.promotion(model_version_id, task_scope, decision, evaluation_id,
+            promotion_ids[k] = str(
+                conn.execute(
+                    text(
+                        """INSERT INTO model.promotion(model_version_id, task_scope, decision, evaluation_id,
                          policy_version, reviewer, reasons)
                        VALUES (:m, CAST(:s AS jsonb), :d, :e, :pv, :rv, CAST(:r AS jsonb)) RETURNING id"""
-                ),
-                {"m": version_ids[model_ref(outcome.models[k])],
-                 "s": json.dumps({**scope, "task_key": task_key}), "d": d["decision"], "e": eval_ids[k],
-                 "pv": policy_version, "rv": REVIEWER, "r": json.dumps(d["reasons"])},
-            ).scalar_one())
+                    ),
+                    {
+                        "m": version_ids[model_ref(outcome.models[k])],
+                        "s": json.dumps({**scope, "task_key": task_key}),
+                        "d": d["decision"],
+                        "e": eval_ids[k],
+                        "pv": policy_version,
+                        "rv": REVIEWER,
+                        "r": json.dumps(d["reasons"]),
+                    },
+                ).scalar_one()
+            )
         if outcome.holdout_status == "blocked":
-            repo.audit(conn, actor, "evaluation.holdout_reuse_blocked",
-                       {"holdout_key": spec.key, "task_key": task_key},
-                       {"blocked": outcome.holdout_blocked, "limit": spec.max_accesses, "manifest_sha256": sha})
+            repo.audit(
+                conn,
+                actor,
+                "evaluation.holdout_reuse_blocked",
+                {"holdout_key": spec.key, "task_key": task_key},
+                {"blocked": outcome.holdout_blocked, "limit": spec.max_accesses, "manifest_sha256": sha},
+            )
         result = {
             "status": "succeeded",
             "evaluation_status": outcome.status,
@@ -1028,8 +1198,12 @@ def handle_evaluation(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             "holdout_evaluation_ids": holdout_eval_ids,
             "promotion_ids": {model_ref(outcome.models[k]): v for k, v in promotion_ids.items()},
             "decisions": {model_ref(outcome.models[k]): d["decision"] for k, d in outcome.decisions.items()},
-            "holdout": {"status": outcome.holdout_status, "years": list(spec.years),
-                        "access_count": outcome.access_after, "blocked": outcome.holdout_blocked},
+            "holdout": {
+                "status": outcome.holdout_status,
+                "years": list(spec.years),
+                "access_count": outcome.access_after,
+                "blocked": outcome.holdout_blocked,
+            },
             "tournament_runtime_seconds": round(outcome.runtime_seconds, 3),
         }
         repo.emit_outbox(conn, "evaluation.tournament_completed", {"job_id": str(ctx.job_id), **result})
@@ -1047,16 +1221,24 @@ def _insert_evaluation(
     activity_id: UUID,
     replay_mode: str = REPLAY_MODE,
 ) -> str:
-    return str(conn.execute(
-        text(
-            """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
+    return str(
+        conn.execute(
+            text(
+                """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
                  task_scope, metrics, provenance_activity_id)
                VALUES (:m, :c, :s, :rm, CAST(:ts AS jsonb), CAST(:mt AS jsonb), :a) RETURNING id"""
-        ),
-        {"m": model_version_id, "c": context_id, "s": manifest_sha, "rm": replay_mode,
-         "ts": json.dumps(finite_json(dict(task_scope)), default=str, allow_nan=False),
-         "mt": json.dumps(finite_json(dict(metrics)), default=str, allow_nan=False), "a": activity_id},
-    ).scalar_one())
+            ),
+            {
+                "m": model_version_id,
+                "c": context_id,
+                "s": manifest_sha,
+                "rm": replay_mode,
+                "ts": json.dumps(finite_json(dict(task_scope)), default=str, allow_nan=False),
+                "mt": json.dumps(finite_json(dict(metrics)), default=str, allow_nan=False),
+                "a": activity_id,
+            },
+        ).scalar_one()
+    )
 
 
 __all__ = [

@@ -80,7 +80,9 @@ def register_artifact(
         raise IntegrityFailure(
             f"artifact {obj.sha256} is registered with byte_size {stored}, but the verified object has "
             f"{obj.byte_size} bytes",
-            sha256=obj.sha256, registered_byte_size=stored, verified_byte_size=obj.byte_size,
+            sha256=obj.sha256,
+            registered_byte_size=stored,
+            verified_byte_size=obj.byte_size,
         )
     conn.execute(
         text(
@@ -237,11 +239,17 @@ def concept_version_id(conn: Connection, concept_id: str, version: str | None = 
 
 
 def concept_profile(conn: Connection, concept_uuid: UUID) -> dict[str, Any]:
-    row = conn.execute(
-        text("SELECT concept_id, version, kind, semantic_profile, definition "
-             "FROM ontology.concept_version WHERE id=:i"),
-        {"i": concept_uuid},
-    ).mappings().one()
+    row = (
+        conn.execute(
+            text(
+                "SELECT concept_id, version, kind, semantic_profile, definition "
+                "FROM ontology.concept_version WHERE id=:i"
+            ),
+            {"i": concept_uuid},
+        )
+        .mappings()
+        .one()
+    )
     return dict(row)
 
 
@@ -294,9 +302,7 @@ def ensure_support(conn: Connection, support: Support, activity_id: UUID) -> UUI
                     "d": digest,
                 },
             ).scalar_one_or_none()
-            or conn.execute(
-                text("SELECT id FROM world.support WHERE support_digest = :d"), {"d": digest}
-            ).scalar_one()
+            or conn.execute(text("SELECT id FROM world.support WHERE support_digest = :d"), {"d": digest}).scalar_one()
         )
     )
 
@@ -309,27 +315,30 @@ def support_record(conn: Connection, support_id: UUID) -> dict[str, Any]:
                 "FROM world.support WHERE id = :i"
             ),
             {"i": support_id},
-        ).mappings().one()
+        )
+        .mappings()
+        .one()
     )
 
 
 # --------------------------------------------------------------------------- sources
 def source_by_key(conn: Connection, source_key: str) -> dict[str, Any] | None:
-    row = conn.execute(
-        text("SELECT * FROM evidence.source WHERE source_key = :k"), {"k": source_key}
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(text("SELECT * FROM evidence.source WHERE source_key = :k"), {"k": source_key})
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 
 def latest_source_metadata_version(conn: Connection, source_id: UUID) -> dict[str, Any]:
     return dict(
         conn.execute(
-            text(
-                "SELECT * FROM evidence.source_metadata_version WHERE source_id = :s "
-                "ORDER BY version DESC LIMIT 1"
-            ),
+            text("SELECT * FROM evidence.source_metadata_version WHERE source_id = :s ORDER BY version DESC LIMIT 1"),
             {"s": source_id},
-        ).mappings().one()
+        )
+        .mappings()
+        .one()
     )
 
 
@@ -362,10 +371,14 @@ def append_source_metadata_if_changed(
 
 
 def connector_version_row(conn: Connection, name: str, version: str) -> dict[str, Any] | None:
-    row = conn.execute(
-        text("SELECT * FROM evidence.connector_version WHERE name = :n AND version = :v"),
-        {"n": name, "v": version},
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text("SELECT * FROM evidence.connector_version WHERE name = :n AND version = :v"),
+            {"n": name, "v": version},
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 

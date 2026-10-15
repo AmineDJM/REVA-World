@@ -50,9 +50,13 @@ def resolve_subject(conn: Connection, iso3: str) -> tuple[UUID, str]:
         # V2 step 1 (ALLC): crosswalk aliases are provider_declared, not reviewed; say which.
         from sqlalchemy import text
 
-        kind = conn.execute(text(
-            "SELECT confidence_kind FROM world.alias WHERE provider = 'iso3166_alpha3' AND external_key = :k "
-            "AND entity_id = :e ORDER BY recorded_at DESC LIMIT 1"), {"k": iso3, "e": sid}).scalar_one_or_none()
+        kind = conn.execute(
+            text(
+                "SELECT confidence_kind FROM world.alias WHERE provider = 'iso3166_alpha3' AND external_key = :k "
+                "AND entity_id = :e ORDER BY recorded_at DESC LIMIT 1"
+            ),
+            {"k": iso3, "e": sid},
+        ).scalar_one_or_none()
         if kind == "provider_declared":
             return sid, "provider_declared_alias:iso3166_alpha3"
         return sid, "reviewed_alias:iso3166_alpha3"
@@ -72,10 +76,14 @@ def load_release(conn: Connection, release_id: UUID, knowledge_cutoff: str) -> d
     return rel
 
 
-def _resolve_scalars(conn: Connection, release_id: UUID, req: InputRequirement,
-                     subj: SubjectRef) -> dict[tuple[str, str, int], ScalarInput]:
-    rows = [r for r in estimates(conn, release_id, subject_id=subj.entity_id, concept_id=req.concept)
-            if r["modality"] == "selected_report"]
+def _resolve_scalars(
+    conn: Connection, release_id: UUID, req: InputRequirement, subj: SubjectRef
+) -> dict[tuple[str, str, int], ScalarInput]:
+    rows = [
+        r
+        for r in estimates(conn, release_id, subject_id=subj.entity_id, concept_id=req.concept)
+        if r["modality"] == "selected_report"
+    ]
     out: dict[tuple[str, str, int], ScalarInput] = {}
     for year in req.years:
         hits = [r for r in rows if calendar_year_of(r["temporal_extent"]) == year]
@@ -84,17 +92,31 @@ def _resolve_scalars(conn: Connection, release_id: UUID, req: InputRequirement,
             continue
         if len({str(r["id"]) for r in hits}) > 1:
             raise IncompatibleSemantics(
-                f"{len(hits)} distinct selected estimates for {req.concept} {year}; "
-                "the baseline is ambiguous", input=req.name)
+                f"{len(hits)} distinct selected estimates for {req.concept} {year}; the baseline is ambiguous",
+                input=req.name,
+            )
         r = hits[0]
         out[(req.name, req.subject, year)] = ScalarInput(
-            req, year, subj.entity_id, parse_value(dict(r["value"])), dict(r["value"]), str(r["id"]),
-            dict(r["temporal_extent"]), r["aggregation"], dict(r.get("source_flags") or {}), r["modality"])
+            req,
+            year,
+            subj.entity_id,
+            parse_value(dict(r["value"])),
+            dict(r["value"]),
+            str(r["id"]),
+            dict(r["temporal_extent"]),
+            r["aggregation"],
+            dict(r.get("source_flags") or {}),
+            r["modality"],
+        )
     return out
 
 
-def resolve_inputs(conn: Connection, release: dict[str, Any], requirements: Iterable[InputRequirement],
-                   store: ArtifactStore | None = None) -> ResolvedInputs:
+def resolve_inputs(
+    conn: Connection,
+    release: dict[str, Any],
+    requirements: Iterable[InputRequirement],
+    store: ArtifactStore | None = None,
+) -> ResolvedInputs:
     """Resolve every declared requirement against the pinned release (read only)."""
     reqs = tuple(requirements)
     for r in reqs:
@@ -114,15 +136,18 @@ def resolve_inputs(conn: Connection, release: dict[str, Any], requirements: Iter
             from reva.simulation.datasets import resolve_dataset
 
             if store is None:
-                raise CapabilityGap("dataset inputs need the artifact store; this execution path has none",
-                                    capability="simulation.dataset_inputs", input=r.name)
+                raise CapabilityGap(
+                    "dataset inputs need the artifact store; this execution path has none",
+                    capability="simulation.dataset_inputs",
+                    input=r.name,
+                )
             datasets[(r.name, r.subject)] = resolve_dataset(conn, store, release["id"], r)
-    return ResolvedInputs(release=release, requirements=reqs, subjects=subjects, scalars=scalars,
-                          datasets=datasets)
+    return ResolvedInputs(release=release, requirements=reqs, subjects=subjects, scalars=scalars, datasets=datasets)
 
 
-def compile_run(conn: Connection, spec_json: dict[str, Any], store: ArtifactStore | None = None
-                ) -> tuple[plugins.SimulationModel, Any, ResolvedInputs]:
+def compile_run(
+    conn: Connection, spec_json: dict[str, Any], store: ArtifactStore | None = None
+) -> tuple[plugins.SimulationModel, Any, ResolvedInputs]:
     """Model validation, pinned release, input resolution and plugin compile (in this order).
 
     Raises on unsupported requests; missing inputs are reported on the compiled object
@@ -132,7 +157,9 @@ def compile_run(conn: Connection, spec_json: dict[str, Any], store: ArtifactStor
     if spec_json.get("model_version") != model.model_version:
         raise CapabilityGap(
             f"model {spec_json['model_key']}@{spec_json.get('model_version')} is not available "
-            f"(registered: {model.model_version})", capability=f"model.{spec_json['model_key']}")
+            f"(registered: {model.model_version})",
+            capability=f"model.{spec_json['model_key']}",
+        )
     model.validate(spec_json)
     release = load_release(conn, UUID(spec_json["baseline_release_id"]), spec_json["knowledge_cutoff"])
     selection = None
@@ -148,17 +175,20 @@ def compile_run(conn: Connection, spec_json: dict[str, Any], store: ArtifactStor
 
 # --- V2 step 1 (agent ALLC): countries ["ALL"] -------------------------------------------
 ALL_COUNTRIES = "ALL"
-ALL_RULE = ("every entity.country subject of the pinned release holding a selected_report estimate (a value or "
-            "a typed Missing) of at least one concept the model requires, for a required year; keyed by its "
-            "ISO 3166 alpha-3 alias, or by its World Bank code when it has none (CHI, XKX)")
+ALL_RULE = (
+    "every entity.country subject of the pinned release holding a selected_report estimate (a value or "
+    "a typed Missing) of at least one concept the model requires, for a required year; keyed by its "
+    "ISO 3166 alpha-3 alias, or by its World Bank code when it has none (CHI, XKX)"
+)
 
 
 def is_all_countries(countries: Any) -> bool:
     return isinstance(countries, list | tuple) and len(countries) == 1 and countries[0] == ALL_COUNTRIES
 
 
-def resolve_all_countries(conn: Connection, model: Any, release: dict[str, Any],
-                          spec_json: dict[str, Any]) -> dict[str, Any]:
+def resolve_all_countries(
+    conn: Connection, model: Any, release: dict[str, Any], spec_json: dict[str, Any]
+) -> dict[str, Any]:
     """Resolve countries ["ALL"] against the pinned release (deterministic, read only).
 
     Only models declaring ``supports_all_countries`` accept it. The required concepts
@@ -169,36 +199,62 @@ def resolve_all_countries(conn: Connection, model: Any, release: dict[str, Any],
     from sqlalchemy import text
 
     if not getattr(model, "supports_all_countries", False):
-        raise CapabilityGap(f"model {model.model_key} does not accept countries [\"ALL\"]",
-                            capability="scenario.all_countries", model=model.model_key)
+        raise CapabilityGap(
+            f'model {model.model_key} does not accept countries ["ALL"]',
+            capability="scenario.all_countries",
+            model=model.model_key,
+        )
     probe = model.requirements(spec_json)
     concepts = sorted({r.concept for r in probe if r.kind == "scalar"})
     years = sorted({y for r in probe if r.kind == "scalar" for y in r.years})
-    rows = conn.execute(text(
-        """SELECT DISTINCT e.subject_id FROM belief.estimate e
+    rows = (
+        conn.execute(
+            text(
+                """SELECT DISTINCT e.subject_id FROM belief.estimate e
            JOIN ontology.concept_version c ON c.id = e.concept_version_id
            JOIN world.entity ent ON ent.id = e.subject_id
            JOIN ontology.concept_version k ON k.id = ent.kind_concept_id AND k.concept_id = 'entity.country'
            WHERE e.release_id = :r AND e.modality = 'selected_report' AND c.concept_id = ANY(:c)
-             AND world.support_ref_year(e.support_id) = ANY(:y)"""),
-        {"r": release["id"], "c": concepts, "y": years}).scalars().all()
+             AND world.support_ref_year(e.support_id) = ANY(:y)"""
+            ),
+            {"r": release["id"], "c": concepts, "y": years},
+        )
+        .scalars()
+        .all()
+    )
     ids = sorted({UUID(str(i)) for i in rows}, key=str)
-    keys = conn.execute(text(
-        """SELECT DISTINCT ON (entity_id) entity_id, external_key FROM world.alias
+    keys = conn.execute(
+        text(
+            """SELECT DISTINCT ON (entity_id) entity_id, external_key FROM world.alias
            WHERE entity_id = ANY(:ids) AND provider IN ('iso3166_alpha3', 'worldbank')
              AND external_key ~ '^[A-Z]{3}$'
-           ORDER BY entity_id, (provider = 'iso3166_alpha3') DESC, recorded_at DESC"""),
-        {"ids": ids}).all()
+           ORDER BY entity_id, (provider = 'iso3166_alpha3') DESC, recorded_at DESC"""
+        ),
+        {"ids": ids},
+    ).all()
     resolved: dict[str, UUID] = {}
     for eid, key in keys:
         if resolve_subject(conn, key)[0] == UUID(str(eid)):  # the key must resolve back to this entity
             resolved[key] = UUID(str(eid))
     unkeyed = sorted(str(i) for i in set(ids) - set(resolved.values()))
     if not resolved:
-        raise ValidationProblem("countries [\"ALL\"] resolved to no country: the pinned release holds no estimate "
-                                "of the required concepts for the reference year", concepts=concepts, years=years)
-    return {"requested": [ALL_COUNTRIES], "rule": ALL_RULE, "concepts": concepts, "years": years,
-            "resolved": sorted(resolved), "resolved_count": len(resolved), "unkeyed_subject_ids": unkeyed}
+        raise ValidationProblem(
+            'countries ["ALL"] resolved to no country: the pinned release holds no estimate '
+            "of the required concepts for the reference year",
+            concepts=concepts,
+            years=years,
+        )
+    return {
+        "requested": [ALL_COUNTRIES],
+        "rule": ALL_RULE,
+        "concepts": concepts,
+        "years": years,
+        "resolved": sorted(resolved),
+        "resolved_count": len(resolved),
+        "unkeyed_subject_ids": unkeyed,
+    }
+
+
 # --- end V2 step 1 (ALLC) -------------------------------------------------------------------
 
 
@@ -232,11 +288,25 @@ def preflight_missing(conn: Connection, spec_json: dict[str, Any]) -> list[dict[
     for r in reqs:
         if r.kind != "dataset":
             continue
-        pinned = has_datasets and conn.execute(
-            text("""SELECT 1 FROM belief.release_dataset WHERE release_id = :r AND concept_id = :c
-                    AND subject_key = :s"""), {"r": release_id, "c": r.concept, "s": r.subject},
-        ).first() is not None
+        pinned = (
+            has_datasets
+            and conn.execute(
+                text("""SELECT 1 FROM belief.release_dataset WHERE release_id = :r AND concept_id = :c
+                    AND subject_key = :s"""),
+                {"r": release_id, "c": r.concept, "s": r.subject},
+            ).first()
+            is not None
+        )
         if not pinned:
-            problems.append({"code": "missing_input", "country": r.subject, "input": r.name, "concept": r.concept,
-                             "kind": "dataset", "years": list(r.years), "reason": "unavailable"})
+            problems.append(
+                {
+                    "code": "missing_input",
+                    "country": r.subject,
+                    "input": r.name,
+                    "concept": r.concept,
+                    "kind": "dataset",
+                    "years": list(r.years),
+                    "reason": "unavailable",
+                }
+            )
     return problems

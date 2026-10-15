@@ -88,10 +88,15 @@ def build_world(db: Any) -> dict[str, Any]:
                     "ORDER BY revision_no DESC LIMIT 1"
                 ),
                 {"k": FRA_POP},
-            ).mappings().one()
+            )
+            .mappings()
+            .one()
         )
-        acq = dict(c.execute(text("SELECT * FROM evidence.acquisition WHERE id = :a"),
-                             {"a": obs["acquisition_id"]}).mappings().one())
+        acq = dict(
+            c.execute(text("SELECT * FROM evidence.acquisition WHERE id = :a"), {"a": obs["acquisition_id"]})
+            .mappings()
+            .one()
+        )
         verified = c.execute(
             text("SELECT artifact_sha256 FROM meta.artifact_location WHERE namespace = 'raw' LIMIT 1")
         ).scalar_one()
@@ -113,43 +118,82 @@ def obs_copy_sql(extra_cols: str = "", extra_vals: str = "") -> str:
         FROM evidence.observation WHERE id = :o RETURNING id"""
 
 
-def copy_obs(c: Connection, w: dict[str, Any], lk: str, *, rev: int = 1, sup: Any = None, acq: Any = None,
-             support: Any = None, extra_cols: str = "", extra_vals: str = "", **params: Any) -> UUID:
-    return UUID(str(c.execute(
-        text(obs_copy_sql(extra_cols, extra_vals)),
-        {"o": w["obs"]["id"], "lk": lk, "rev": rev, "sup": sup, "acq": acq, "support": support, **params},
-    ).scalar_one()))
+def copy_obs(
+    c: Connection,
+    w: dict[str, Any],
+    lk: str,
+    *,
+    rev: int = 1,
+    sup: Any = None,
+    acq: Any = None,
+    support: Any = None,
+    extra_cols: str = "",
+    extra_vals: str = "",
+    **params: Any,
+) -> UUID:
+    return UUID(
+        str(
+            c.execute(
+                text(obs_copy_sql(extra_cols, extra_vals)),
+                {"o": w["obs"]["id"], "lk": lk, "rev": rev, "sup": sup, "acq": acq, "support": support, **params},
+            ).scalar_one()
+        )
+    )
 
 
-def draft_release(c: Connection, w: dict[str, Any], *, origin: str = "test_fixture",
-                  cutoff: datetime | None = None) -> UUID:
+def draft_release(
+    c: Connection, w: dict[str, Any], *, origin: str = "test_fixture", cutoff: datetime | None = None
+) -> UUID:
     act = activity(c)
     cut = cutoff or c.execute(text("SELECT clock_timestamp()")).scalar_one()
     sha = w["verified"]
     ctx = repo.create_context(c, mode="belief", origin=origin, manifest_sha256=sha, knowledge_cutoff=cut)
-    return UUID(str(c.execute(
-        text(
-            """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
+    return UUID(
+        str(
+            c.execute(
+                text(
+                    """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
                  model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
                VALUES (:c, :o, :m, :m, :m, :cut, 'test', :a) RETURNING id"""
-        ),
-        {"c": ctx, "o": origin, "m": sha, "cut": cut, "a": act},
-    ).scalar_one()))
+                ),
+                {"c": ctx, "o": origin, "m": sha, "cut": cut, "a": act},
+            ).scalar_one()
+        )
+    )
 
 
-def add_estimate(c: Connection, w: dict[str, Any], rid: UUID, *, modality: str = "selected_report",
-                 subject: Any = None, support: Any = None) -> UUID:
+def add_estimate(
+    c: Connection,
+    w: dict[str, Any],
+    rid: UUID,
+    *,
+    modality: str = "selected_report",
+    subject: Any = None,
+    support: Any = None,
+) -> UUID:
     o = w["obs"]
-    return UUID(str(c.execute(
-        text(
-            """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id, method_version_id,
+    return UUID(
+        str(
+            c.execute(
+                text(
+                    """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id, method_version_id,
                  modality, value, uncertainty, provenance_activity_id)
                VALUES (:r, :s, :c, :sp, :m, :mod, CAST(:v AS jsonb), CAST(:u AS jsonb), :a) RETURNING id"""
-        ),
-        {"r": rid, "s": subject or o["subject_id"], "c": o["concept_version_id"], "sp": support or o["support_id"],
-         "m": w["mv"], "mod": modality, "v": json.dumps(o["value"]), "u": json.dumps(o["uncertainty"]),
-         "a": activity(c)},
-    ).scalar_one()))
+                ),
+                {
+                    "r": rid,
+                    "s": subject or o["subject_id"],
+                    "c": o["concept_version_id"],
+                    "sp": support or o["support_id"],
+                    "m": w["mv"],
+                    "mod": modality,
+                    "v": json.dumps(o["value"]),
+                    "u": json.dumps(o["uncertainty"]),
+                    "a": activity(c),
+                },
+            ).scalar_one()
+        )
+    )
 
 
 def add_input(c: Connection, eid: UUID, oid: Any) -> None:
@@ -158,27 +202,39 @@ def add_input(c: Connection, eid: UUID, oid: Any) -> None:
 
 def publish(c: Connection, rid: UUID) -> None:
     repo.take_publication_lock(c)
-    c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-              {"r": rid, "a": activity(c)})
+    c.execute(
+        text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"), {"r": rid, "a": activity(c)}
+    )
 
 
 def proposal(c: Connection, w: dict[str, Any], author: str = "agent:discovery") -> UUID:
-    return UUID(str(c.execute(
-        text("INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, author) "
-             "VALUES ('connector', :s, 1, :a) RETURNING id"),
-        {"s": w["verified"], "a": author},
-    ).scalar_one()))
+    return UUID(
+        str(
+            c.execute(
+                text(
+                    "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, author) "
+                    "VALUES ('connector', :s, 1, :a) RETURNING id"
+                ),
+                {"s": w["verified"], "a": author},
+            ).scalar_one()
+        )
+    )
 
 
 def evaluation(c: Connection, w: dict[str, Any], mv: Any, replay_mode: str = "revised_data_retrospective") -> UUID:
-    ctx = repo.create_context(c, mode="evaluation", origin="test_fixture", manifest_sha256=w["verified"],
-                              knowledge_cutoff=datetime.now(UTC))
-    return UUID(str(c.execute(
-        text("""INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
+    ctx = repo.create_context(
+        c, mode="evaluation", origin="test_fixture", manifest_sha256=w["verified"], knowledge_cutoff=datetime.now(UTC)
+    )
+    return UUID(
+        str(
+            c.execute(
+                text("""INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
                   task_scope, metrics, provenance_activity_id)
                 VALUES (:m, :c, :s, :rm, '{}', '{}', :a) RETURNING id"""),
-        {"m": mv, "c": ctx, "s": w["verified"], "rm": replay_mode, "a": activity(c, "evaluation")},
-    ).scalar_one()))
+                {"m": mv, "c": ctx, "s": w["verified"], "rm": replay_mode, "a": activity(c, "evaluation")},
+            ).scalar_one()
+        )
+    )
 
 
 PROMOTION_SQL = """INSERT INTO model.promotion(model_version_id, task_scope, decision, evaluation_id, policy_version,
@@ -189,20 +245,33 @@ PROMOTION_SQL = """INSERT INTO model.promotion(model_version_id, task_scope, dec
 def test_worker_cannot_mint_api_tokens_or_record_human_reviews(w: dict[str, Any]) -> None:
     db = w["db"]
     with tx(db.worker) as c, pytest.raises(DBAPIError, match="permission denied"):
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) "
-                       "VALUES (repeat('a', 64), ARRAY['read','review'], 'minted-by-worker')"))
+        c.execute(
+            text(
+                "INSERT INTO ops.api_token(token_sha256, scopes, label) "
+                "VALUES (repeat('a', 64), ARRAY['read','review'], 'minted-by-worker')"
+            )
+        )
     with tx(db.worker) as c:
         pid = proposal(c, w)
         with pytest.raises(DBAPIError, match="permission denied"):
-            c.execute(text("INSERT INTO ops.proposal_review(proposal_id, decision, reviewer) "
-                           "VALUES (:p, 'approve', 'human:admin')"), {"p": pid})
+            c.execute(
+                text(
+                    "INSERT INTO ops.proposal_review(proposal_id, decision, reviewer) "
+                    "VALUES (:p, 'approve', 'human:admin')"
+                ),
+                {"p": pid},
+            )
     with tx(db.worker) as c:
         pid = proposal(c, w)
         with pytest.raises(DBAPIError, match="permission denied"):
             c.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:admin', '')"), {"p": pid})
     with tx(db.owner) as c:  # positive control: the migration owner (admin CLI) can mint tokens
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) "
-                       "VALUES (repeat('b', 64), ARRAY['read'], 'owner')"))
+        c.execute(
+            text(
+                "INSERT INTO ops.api_token(token_sha256, scopes, label) "
+                "VALUES (repeat('b', 64), ARRAY['read'], 'owner')"
+            )
+        )
 
 
 @pytest.mark.parametrize(
@@ -240,11 +309,20 @@ def test_gate_result_function_validates_and_audits(w: dict[str, Any]) -> None:
     db = w["db"]
     pid = _committed_proposal(w)
     with db.gate.begin() as c:  # GATE: only the independent gate login records gate results
-        gid = c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, "
-                             "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]}).scalar_one()
+        gid = c.execute(
+            text(
+                "SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, 'gate-evaluator:promotion')"
+            ),
+            {"p": pid, "s": w["verified"]},
+        ).scalar_one()
     with db.owner.connect() as c:  # the gate login cannot read the audit trail; the owner can
-        assert c.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'gate.result' "
-                              "AND target->>'gate_result_id' = :g"), {"g": str(gid)}).scalar_one() == 1
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM ops.audit WHERE action = 'gate.result' AND target->>'gate_result_id' = :g"),
+                {"g": str(gid)},
+            ).scalar_one()
+            == 1
+        )
     bad = [
         ("promotion", "gate-evaluator:other", w["verified"], "evaluator must be"),
         ("promotion", "gate-evaluator:promotion", "0" * 64, "not a verified artifact"),
@@ -254,17 +332,26 @@ def test_gate_result_function_validates_and_audits(w: dict[str, Any]) -> None:
         with tx(db.gate) as c:
             pid = _committed_proposal(w)
             with pytest.raises(DBAPIError, match=match):
-                c.execute(text("SELECT ops.record_gate_result(:p, :g, 'promotion-1', 'pass', :s, :e)"),
-                          {"p": pid, "g": gate, "s": sha, "e": evaluator})
+                c.execute(
+                    text("SELECT ops.record_gate_result(:p, :g, 'promotion-1', 'pass', :s, :e)"),
+                    {"p": pid, "g": gate, "s": sha, "e": evaluator},
+                )
     with tx(db.gate) as c:  # the proposer cannot launder itself through the function either
         pid = _committed_proposal(w, author="promotion")
         with pytest.raises(DBAPIError, match="cannot evaluate its own proposal"):
-            c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, "
-                           "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
+            c.execute(
+                text(
+                    "SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'pass', :s, "
+                    "'gate-evaluator:promotion')"
+                ),
+                {"p": pid, "s": w["verified"]},
+            )
     for engine in (db.sim, db.worker, db.api):  # GATE: no other login may execute it
         with tx(engine) as c, pytest.raises(DBAPIError, match="permission denied"):
-            c.execute(text("SELECT ops.record_gate_result(gen_random_uuid(), 'g', 'p', 'pass', :s, "
-                           "'gate-evaluator:g')"), {"s": w["verified"]})
+            c.execute(
+                text("SELECT ops.record_gate_result(gen_random_uuid(), 'g', 'p', 'pass', :s, 'gate-evaluator:g')"),
+                {"s": w["verified"]},
+            )
 
 
 def test_model_promotion_requires_matching_replay_evaluation_and_named_reviewer(w: dict[str, Any]) -> None:
@@ -279,8 +366,9 @@ def test_model_promotion_requires_matching_replay_evaluation_and_named_reviewer(
     ]
     for decision, kind, ev_model, reviewer, policy, match in cases:
         with tx(db.worker) as c:
-            ev = evaluation(c, w, ev_model, "revised_data_retrospective" if kind == "replay"
-                            else "analytic_verification")
+            ev = evaluation(
+                c, w, ev_model, "revised_data_retrospective" if kind == "replay" else "analytic_verification"
+            )
             with pytest.raises(DBAPIError, match=match):
                 c.execute(text(PROMOTION_SQL), {"m": mv, "d": decision, "e": ev, "p": policy, "r": reviewer})
     # positive controls: a replay-evaluated promotion by the gate evaluator; a reject backed only by analytic
@@ -290,21 +378,36 @@ def test_model_promotion_requires_matching_replay_evaluation_and_named_reviewer(
         c.execute(text(PROMOTION_SQL), {"m": mv, "d": "promote", "e": ev, "p": "p", "r": "gate-evaluator:tournament"})
         ev2 = evaluation(c, w, mv, "analytic_verification")
         c.execute(text(PROMOTION_SQL), {"m": mv, "d": "reject", "e": ev2, "p": "p", "r": "gate-evaluator:tournament"})
-        pid = c.execute(text("SELECT model.record_promotion(:m, '{}'::jsonb, 'promote', :e, 'p', "
-                             "'gate-evaluator:tournament', '[]'::jsonb)"), {"m": mv, "e": ev}).scalar_one()
+        pid = c.execute(
+            text(
+                "SELECT model.record_promotion(:m, '{}'::jsonb, 'promote', :e, 'p', "
+                "'gate-evaluator:tournament', '[]'::jsonb)"
+            ),
+            {"m": mv, "e": ev},
+        ).scalar_one()
         assert pid is not None
         with pytest.raises(DBAPIError, match="replay-based evaluation"):
             with c.begin_nested():
-                c.execute(text("SELECT model.record_promotion(:m, '{}'::jsonb, 'promote', :e, 'p', "
-                               "'gate-evaluator:tournament', NULL)"), {"m": mv, "e": ev2})
+                c.execute(
+                    text(
+                        "SELECT model.record_promotion(:m, '{}'::jsonb, 'promote', :e, 'p', "
+                        "'gate-evaluator:tournament', NULL)"
+                    ),
+                    {"m": mv, "e": ev2},
+                )
 
 
 def test_worker_insert_grants_are_the_reviewed_set(w: dict[str, Any]) -> None:
     """Every table the worker may INSERT into directly (reviewed for forgery risk in R-01)."""
     with w["db"].owner.connect() as c:
-        rows = set(c.execute(text(
-            """SELECT table_schema || '.' || table_name FROM information_schema.role_table_grants
-               WHERE grantee = 'reva_worker' AND privilege_type = 'INSERT'""")).scalars())
+        rows = set(
+            c.execute(
+                text(
+                    """SELECT table_schema || '.' || table_name FROM information_schema.role_table_grants
+               WHERE grantee = 'reva_worker' AND privilege_type = 'INSERT'"""
+                )
+            ).scalars()
+        )
     assert "ops.api_token" not in rows and "ops.proposal_review" not in rows
     # GATE: gate results come from reva_gate; the worker only files gate requests
     assert "ops.gate_result" not in rows
@@ -325,8 +428,10 @@ def test_published_release_is_sealed(w: dict[str, Any]) -> None:
         for stmt in (
             lambda: add_estimate(c, w, rid, modality="forecast"),
             lambda: add_input(c, eid, w["obs"]["id"]),
-            lambda: c.execute(text("INSERT INTO belief.release_artifact(release_id, artifact_sha256, role) "
-                                   "VALUES (:r, :s, 'extra')"), {"r": rid, "s": new_artifact(c)}),
+            lambda: c.execute(
+                text("INSERT INTO belief.release_artifact(release_id, artifact_sha256, role) VALUES (:r, :s, 'extra')"),
+                {"r": rid, "s": new_artifact(c)},
+            ),
         ):
             with pytest.raises(DBAPIError, match="published and sealed"), c.begin_nested():
                 stmt()
@@ -351,8 +456,9 @@ def test_release_seal_race_publisher_waits_for_writers(w: dict[str, Any]) -> Non
         with pytest.raises(DBAPIError, match="estimate without inputs"):
             publish(a, rid)
         a.rollback()
-        assert a.execute(text("SELECT count(*) FROM ops.publication WHERE release_id = :r"),
-                         {"r": rid}).scalar_one() == 0
+        assert (
+            a.execute(text("SELECT count(*) FROM ops.publication WHERE release_id = :r"), {"r": rid}).scalar_one() == 0
+        )
 
 
 def test_release_seal_race_writer_waits_for_publisher(w: dict[str, Any]) -> None:
@@ -384,13 +490,19 @@ def test_release_rows_require_read_committed(w: dict[str, Any]) -> None:
 
 def test_release_pinned_relations_are_sealed(w: dict[str, Any]) -> None:
     """(R5-07) world.relation rows pinned to a release cannot be added once it is published."""
+
     def pinned(c: Connection, rid: UUID) -> None:
         c.execute(
             text("""INSERT INTO world.relation(predicate_id, layer, support_id, release_id, existence_uncertainty,
                       component, provenance_activity_id)
                     VALUES (:p, 'test.r5_sealed', :s, :r, '{"status":"unquantified"}', '{}', :a)"""),
-            {"p": repo.concept_version_id(c, "predicate.trade_flow"), "s": w["obs"]["support_id"], "r": rid,
-             "a": activity(c, "belief")})
+            {
+                "p": repo.concept_version_id(c, "predicate.trade_flow"),
+                "s": w["obs"]["support_id"],
+                "r": rid,
+                "a": activity(c, "belief"),
+            },
+        )
 
     with tx(w["db"].worker) as c:
         rid = draft_release(c, w)
@@ -408,12 +520,15 @@ def test_observation_origin_follows_acquisition_and_lineages_are_per_origin(w: d
     with tx(db.worker) as c:
         # omitted origin is derived from the acquisition
         oid = copy_obs(c, w, "fx1:origin-derived")
-        assert c.execute(text("SELECT origin FROM evidence.observation WHERE id = :o"),
-                         {"o": oid}).scalar_one() == "test_fixture"
+        assert (
+            c.execute(text("SELECT origin FROM evidence.observation WHERE id = :o"), {"o": oid}).scalar_one()
+            == "test_fixture"
+        )
         with pytest.raises(DBAPIError, match="does not match its acquisition origin"), c.begin_nested():
             copy_obs(c, w, "fx1:origin-mismatch", extra_cols=", origin", extra_vals=", 'live'")
         with pytest.raises(DBAPIError, match=r"check constraint|does not match"), c.begin_nested():
             copy_obs(c, w, "fx1:origin-bogus", extra_cols=", origin", extra_vals=", 'staging'")
+
         # live acquisitions of the same source/connector and raw bytes
         def live_acquisition() -> Any:
             return c.execute(
@@ -428,8 +543,10 @@ def test_observation_origin_follows_acquisition_and_lineages_are_per_origin(w: d
 
         # the live lineage of the same logical key starts at revision 1 (no clash with the fixture lineage)
         live1 = copy_obs(c, w, FRA_POP, rev=1, acq=live_acquisition())
-        assert c.execute(text("SELECT origin FROM evidence.observation WHERE id = :o"),
-                         {"o": live1}).scalar_one() == "live"
+        assert (
+            c.execute(text("SELECT origin FROM evidence.observation WHERE id = :o"), {"o": live1}).scalar_one()
+            == "live"
+        )
         second = live_acquisition()
         # a live revision cannot supersede a fixture-origin record
         fixture_head = w["obs"]
@@ -458,37 +575,55 @@ def test_runtime_roles_cannot_backdate_recorded_at(w: dict[str, Any]) -> None:
     o = w["obs"]
     with tx(db.worker) as c:
         with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
-            copy_obs(c, w, "fx1:backdated", extra_cols=", recorded_at", extra_vals=", CAST(:old AS timestamptz)",
-                     old=old)
+            copy_obs(
+                c, w, "fx1:backdated", extra_cols=", recorded_at", extra_vals=", CAST(:old AS timestamptz)", old=old
+            )
         with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
             c.execute(
                 text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
                           decision, policy_version, review_activity_id, recorded_at)
                         VALUES (:cv, :c, '{}', 'eligible', 'p', :a, :old)"""),
-                {"cv": o["connector_version_id"], "c": o["concept_version_id"], "a": activity(c, "review"),
-                 "old": old},
+                {"cv": o["connector_version_id"], "c": o["concept_version_id"], "a": activity(c, "review"), "old": old},
             )
         with pytest.raises(DBAPIError, match="recorded_at is server-generated"), c.begin_nested():
-            c.execute(text("INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
-                           "VALUES ('worker:x', 'x', '{}', '{}', :old)"), {"old": old})
+            c.execute(
+                text(
+                    "INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
+                    "VALUES ('worker:x', 'x', '{}', '{}', :old)"
+                ),
+                {"old": old},
+            )
         # positive controls: omitted (column default) and "now" are accepted; the stored value is server time
         start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         oid = copy_obs(c, w, "fx1:not-backdated")
-        c.execute(text("INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
-                       "VALUES ('worker:x', 'x', '{}', '{}', clock_timestamp())"))
-        assert c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"),
-                         {"o": oid}).scalar_one() >= start
+        c.execute(
+            text(
+                "INSERT INTO ops.audit(actor, action, target, details, recorded_at) "
+                "VALUES ('worker:x', 'x', '{}', '{}', clock_timestamp())"
+            )
+        )
+        assert (
+            c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"), {"o": oid}).scalar_one()
+            >= start
+        )
         assert c.execute(text("SELECT min(recorded_at) FROM ops.audit WHERE actor = 'worker:x'")).scalar_one() >= start
     with tx(db.sim) as c, pytest.raises(DBAPIError, match="recorded_at is server-generated"):
         c.execute(
-            text("INSERT INTO meta.activity(kind, origin, code_digest, parameters, environment_digest, actor, "
-                 "started_at, ended_at, recorded_at) VALUES ('t', 'simulation', 'c', '{}', 'e', 'sim:test', "
-                 ":old, :old, :old)"), {"old": old})
+            text(
+                "INSERT INTO meta.activity(kind, origin, code_digest, parameters, environment_digest, actor, "
+                "started_at, ended_at, recorded_at) VALUES ('t', 'simulation', 'c', '{}', 'e', 'sim:test', "
+                ":old, :old, :old)"
+            ),
+            {"old": old},
+        )
     with tx(db.owner) as c:  # the owner (migrations, historical test fixtures) may supply the value
-        oid = copy_obs(c, w, "fx1:owner-backdated", extra_cols=", recorded_at",
-                       extra_vals=", CAST(:old AS timestamptz)", old=old)
-        assert c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"),
-                         {"o": oid}).scalar_one() == old
+        oid = copy_obs(
+            c, w, "fx1:owner-backdated", extra_cols=", recorded_at", extra_vals=", CAST(:old AS timestamptz)", old=old
+        )
+        assert (
+            c.execute(text("SELECT recorded_at FROM evidence.observation WHERE id = :o"), {"o": oid}).scalar_one()
+            == old
+        )
 
 
 def test_security_definer_code_cannot_forward_a_backdated_recorded_at(w: dict[str, Any]) -> None:
@@ -497,10 +632,12 @@ def test_security_definer_code_cannot_forward_a_backdated_recorded_at(w: dict[st
     db = w["db"]
     fn = f"ops.r5_definer_audit_{uuid.uuid4().hex[:8]}"
     with db.owner.begin() as c:
-        c.execute(text(f"""CREATE FUNCTION {fn}(at timestamptz) RETURNS timestamptz LANGUAGE sql
+        c.execute(
+            text(f"""CREATE FUNCTION {fn}(at timestamptz) RETURNS timestamptz LANGUAGE sql
                             SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
                             INSERT INTO ops.audit(actor, action, target, details, recorded_at)
-                            VALUES ('definer:x', 'x', '{{}}', '{{}}', at) RETURNING recorded_at $$"""))
+                            VALUES ('definer:x', 'x', '{{}}', '{{}}', at) RETURNING recorded_at $$""")
+        )
         c.execute(text(f"REVOKE ALL ON FUNCTION {fn}(timestamptz) FROM PUBLIC"))
         c.execute(text(f"GRANT EXECUTE ON FUNCTION {fn}(timestamptz) TO reva_worker"))
     try:
@@ -516,13 +653,20 @@ def test_security_definer_code_cannot_forward_a_backdated_recorded_at(w: dict[st
 
 def test_every_recorded_at_table_has_the_server_trigger(w: dict[str, Any]) -> None:
     with w["db"].owner.connect() as c:
-        missing = c.execute(text(
-            """SELECT n.nspname || '.' || c.relname FROM pg_attribute a
+        missing = (
+            c.execute(
+                text(
+                    """SELECT n.nspname || '.' || c.relname FROM pg_attribute a
                JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace
                WHERE a.attname = 'recorded_at' AND NOT a.attisdropped AND c.relkind IN ('r','p')
                  AND n.nspname IN ('meta','ontology','world','evidence','belief','model','sim','ops')
                  AND NOT EXISTS (SELECT 1 FROM pg_trigger g WHERE g.tgrelid = c.oid
-                                 AND g.tgname = 'a00_server_recorded_at')""")).scalars().all()
+                                 AND g.tgname = 'a00_server_recorded_at')"""
+                )
+            )
+            .scalars()
+            .all()
+        )
     assert missing == []
 
 
@@ -533,11 +677,16 @@ def test_publication_published_at_is_server_time(w: dict[str, Any]) -> None:
         repo.take_publication_lock(c)
         start = c.execute(text("SELECT clock_timestamp()")).scalar_one()
         with pytest.raises(DBAPIError, match="published_at is server-generated"), c.begin_nested():
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id, published_at) "
-                           "VALUES (:r, :a, '2001-01-01Z')"), {"r": rid, "a": activity(c)})
-        pub = c.execute(text("INSERT INTO ops.publication(release_id, activity_id) "
-                             "VALUES (:r, :a) RETURNING published_at"),
-                        {"r": rid, "a": activity(c)}).scalar_one()
+            c.execute(
+                text(
+                    "INSERT INTO ops.publication(release_id, activity_id, published_at) VALUES (:r, :a, '2001-01-01Z')"
+                ),
+                {"r": rid, "a": activity(c)},
+            )
+        pub = c.execute(
+            text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a) RETURNING published_at"),
+            {"r": rid, "a": activity(c)},
+        ).scalar_one()
         assert pub >= start
 
 
@@ -547,8 +696,13 @@ def _decision(c: Connection, w: dict[str, Any], decision: str, applicability: di
     c.execute(
         text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
                   policy_version, review_activity_id) VALUES (:cv, :c, CAST(:ap AS jsonb), :d, 'fx1', :a)"""),
-        {"cv": o["connector_version_id"], "c": o["concept_version_id"], "ap": json.dumps(applicability),
-         "d": decision, "a": activity(c, "review")},
+        {
+            "cv": o["connector_version_id"],
+            "c": o["concept_version_id"],
+            "ap": json.dumps(applicability),
+            "d": decision,
+            "a": activity(c, "review"),
+        },
     )
 
 
@@ -558,8 +712,12 @@ def _eligible(c: Connection, w: dict[str, Any], subject: str, year: int | None =
         sql = "SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"
     else:
         sql = "SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp(), :y)"
-    return bool(c.execute(text(sql), {"cv": o["connector_version_id"], "c": o["concept_version_id"],
-                                      "s": entity_id(subject), "y": year}).scalar_one())
+    return bool(
+        c.execute(
+            text(sql),
+            {"cv": o["connector_version_id"], "c": o["concept_version_id"], "s": entity_id(subject), "y": year},
+        ).scalar_one()
+    )
 
 
 def test_subject_scoped_quarantine_does_not_affect_other_subjects(w: dict[str, Any]) -> None:
@@ -591,12 +749,14 @@ def test_years_outside_the_decision_scope_are_ineligible(w: dict[str, Any]) -> N
 def test_input_trigger_enforces_the_support_year_scope(w: dict[str, Any]) -> None:
     db = w["db"]
     with tx(db.worker) as c:
-        sup = c.execute(text(
-            """INSERT INTO world.support(temporal_extent, valid_range, spatial_spec, population_spec, aggregation,
+        sup = c.execute(
+            text(
+                """INSERT INTO world.support(temporal_extent, valid_range, spatial_spec, population_spec, aggregation,
                  resolution, provenance_activity_id, support_digest)
                SELECT temporal_extent, tstzrange('1950-01-01 00:00:00+00', '1951-01-01 00:00:00+00', '[)'),
                  spatial_spec, population_spec, aggregation, resolution, provenance_activity_id, :d
-               FROM world.support WHERE id = :s RETURNING id"""),
+               FROM world.support WHERE id = :s RETURNING id"""
+            ),
             {"s": w["obs"]["support_id"], "d": f"fx1-{uuid.uuid4()}"},
         ).scalar_one()
         old = copy_obs(c, w, "fx1:year-1950", support=sup)  # before the reviewed 1960-2024 scope
@@ -608,19 +768,29 @@ def test_input_trigger_enforces_the_support_year_scope(w: dict[str, Any]) -> Non
 
 # =========================================================================== R-09 sealed relations
 def _relation(c: Connection, w: dict[str, Any]) -> UUID:
-    return UUID(str(c.execute(
-        text("""INSERT INTO world.relation(predicate_id, layer, support_id, evidence_observation_id,
+    return UUID(
+        str(
+            c.execute(
+                text("""INSERT INTO world.relation(predicate_id, layer, support_id, evidence_observation_id,
                   existence_uncertainty, component, provenance_activity_id)
                 VALUES (:p, 'test.fx1_sealed', :s, :o, '{"status":"unquantified"}', '{}', :a) RETURNING id"""),
-        {"p": repo.concept_version_id(c, "predicate.trade_flow"), "s": w["obs"]["support_id"],
-         "o": w["obs"]["id"], "a": activity(c, "normalisation")},
-    ).scalar_one()))
+                {
+                    "p": repo.concept_version_id(c, "predicate.trade_flow"),
+                    "s": w["obs"]["support_id"],
+                    "o": w["obs"]["id"],
+                    "a": activity(c, "normalisation"),
+                },
+            ).scalar_one()
+        )
+    )
 
 
 def _participant(c: Connection, rid: UUID, ordinal: int, role: str, entity: str) -> None:
     c.execute(
-        text("INSERT INTO world.relation_participant(relation_id, ordinal, role_concept_id, entity_id, direction) "
-             "VALUES (:r, :o, :role, :e, 'undirected')"),
+        text(
+            "INSERT INTO world.relation_participant(relation_id, ordinal, role_concept_id, entity_id, direction) "
+            "VALUES (:r, :o, :role, :e, 'undirected')"
+        ),
         {"r": rid, "o": ordinal, "role": repo.concept_version_id(c, role), "e": entity_id(entity)},
     )
 
@@ -637,16 +807,26 @@ def test_participants_cannot_be_added_after_the_relation_committed(w: dict[str, 
         with tx(db.worker) as c, pytest.raises(DBAPIError, match="is sealed"):
             _participant(c, rid, 3, role, ent)
     with db.owner.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM world.relation_participant WHERE relation_id = :r"),
-                         {"r": rid}).scalar_one() == 3
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM world.relation_participant WHERE relation_id = :r"), {"r": rid}
+            ).scalar_one()
+            == 3
+        )
 
 
 def test_participant_insert_rechecks_cardinality(w: dict[str, Any]) -> None:
     with pytest.raises(DBAPIError, match="participants, outside"), w["db"].worker.connect() as c:
         with c.begin():
             rid = _relation(c, w)
-            for i, (role, ent) in enumerate((("role.reporter", "FRA"), ("role.partner", "WORLD"),
-                                             ("role.product", "HS2709"), ("role.reporter", "USA"))):
+            for i, (role, ent) in enumerate(
+                (
+                    ("role.reporter", "FRA"),
+                    ("role.partner", "WORLD"),
+                    ("role.product", "HS2709"),
+                    ("role.reporter", "USA"),
+                )
+            ):
                 _participant(c, rid, i, role, ent)
             c.execute(text("SET CONSTRAINTS world.participant_cardinality IMMEDIATE"))
 
@@ -657,10 +837,13 @@ def test_inserted_in_current_xact_returns_false_for_future_xids(w: dict[str, Any
     with tx(w["db"].worker) as c:
         cur = int(c.execute(text("SELECT pg_current_xact_id()::text")).scalar_one())
         for fut in ((cur + 100_000) % (1 << 32), (cur + 1_000_000_000) % (1 << 32)):
-            assert c.execute(text("SELECT meta.inserted_in_current_xact(CAST(:x AS xid))"),
-                             {"x": str(fut)}).scalar_one() is False
-        x = c.execute(text("INSERT INTO ops.outbox(event_type, payload) VALUES ('r5', '{}') RETURNING xmin")
-                      ).scalar_one()
+            assert (
+                c.execute(text("SELECT meta.inserted_in_current_xact(CAST(:x AS xid))"), {"x": str(fut)}).scalar_one()
+                is False
+            )
+        x = c.execute(
+            text("INSERT INTO ops.outbox(event_type, payload) VALUES ('r5', '{}') RETURNING xmin")
+        ).scalar_one()
         assert c.execute(text("SELECT meta.inserted_in_current_xact(CAST(:x AS xid))"), {"x": x}).scalar_one()
 
 
@@ -688,8 +871,10 @@ def test_sim_cannot_attach_provenance_to_source_activities(w: dict[str, Any]) ->
     with tx(db.worker) as c:  # ... but never onto simulation activities
         sha = new_artifact(c)
         with pytest.raises(DBAPIError, match="row-level security"):
-            c.execute(text("INSERT INTO meta.activity_output(activity_id, artifact_sha256) VALUES (:a, :s)"),
-                      {"a": sim_act, "s": sha})
+            c.execute(
+                text("INSERT INTO meta.activity_output(activity_id, artifact_sha256) VALUES (:a, :s)"),
+                {"a": sim_act, "s": sha},
+            )
 
 
 LOCATION_SQL = """INSERT INTO meta.artifact_location(artifact_sha256, storage_uri, namespace, verified_byte_size,
@@ -715,15 +900,23 @@ def test_sim_cannot_register_locations_for_other_artifacts(w: dict[str, Any]) ->
         sha = sim_artifact(c)
         c.execute(text(LOCATION_SQL), {"uri": f"file:///evaluation/{sha}", "ns": "evaluation", "s": sha})
     with tx(db.sim) as c:
-        c.execute(text(LOCATION_SQL + " ON CONFLICT (artifact_sha256, storage_uri) DO NOTHING"),
-                  {"uri": f"file:///evaluation/{sha}", "ns": "evaluation", "s": sha})
+        c.execute(
+            text(LOCATION_SQL + " ON CONFLICT (artifact_sha256, storage_uri) DO NOTHING"),
+            {"uri": f"file:///evaluation/{sha}", "ns": "evaluation", "s": sha},
+        )
 
 
 # =========================================================================== R-19 publication lock
 def _session_lock_rows(c: Connection) -> int:
-    return int(c.execute(text(
-        "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND pid = pg_backend_pid() "
-        "AND classid = 0 AND objid = :k AND objsubid = 1"), {"k": repo.PUBLICATION_LOCK}).scalar_one())
+    return int(
+        c.execute(
+            text(
+                "SELECT count(*) FROM pg_locks WHERE locktype = 'advisory' AND pid = pg_backend_pid() "
+                "AND classid = 0 AND objid = :k AND objsubid = 1"
+            ),
+            {"k": repo.PUBLICATION_LOCK},
+        ).scalar_one()
+    )
 
 
 def test_publication_lock_check_keeps_a_callers_session_lock(w: dict[str, Any]) -> None:
@@ -737,8 +930,10 @@ def test_publication_lock_check_keeps_a_callers_session_lock(w: dict[str, Any]) 
             t = c.begin()
             rid = draft_release(c, w)
             add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": rid, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": rid, "a": activity(c)},
+            )
             t.rollback()
             # the caller's session hold survives the publication attempt and its rollback
             assert c.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": repo.PUBLICATION_LOCK}).scalar_one()
@@ -760,14 +955,20 @@ def test_publication_lock_is_held_until_commit(w: dict[str, Any]) -> None:
             rid = draft_release(c, w)
             add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
             c.execute(text("SELECT pg_advisory_lock(:k)"), {"k": repo.PUBLICATION_LOCK})
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": rid, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": rid, "a": activity(c)},
+            )
             # releasing the session hold early does not release the transaction-level one
             assert c.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": repo.PUBLICATION_LOCK}).scalar_one()
             assert _session_lock_rows(c) == 1
             with db.worker.connect() as other:
-                assert other.execute(text("SELECT pg_try_advisory_xact_lock(:k)"),
-                                     {"k": repo.PUBLICATION_LOCK}).scalar_one() is False
+                assert (
+                    other.execute(
+                        text("SELECT pg_try_advisory_xact_lock(:k)"), {"k": repo.PUBLICATION_LOCK}
+                    ).scalar_one()
+                    is False
+                )
                 other.rollback()
             t.rollback()
             assert _session_lock_rows(c) == 0
@@ -781,15 +982,19 @@ def test_publication_requires_a_transaction_scoped_lock(w: dict[str, Any]) -> No
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
         with pytest.raises(DBAPIError, match="advisory lock"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": rid, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": rid, "a": activity(c)},
+            )
     with tx(w["db"].worker) as c:  # the two-int4 form (objsubid 2) does not count either
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
         c.execute(text("SELECT pg_advisory_xact_lock(0, :k)"), {"k": repo.PUBLICATION_LOCK})
         with pytest.raises(DBAPIError, match="advisory lock"):
-            c.execute(text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
-                      {"r": rid, "a": activity(c)})
+            c.execute(
+                text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a)"),
+                {"r": rid, "a": activity(c)},
+            )
     with tx(w["db"].worker) as c:  # positive control
         rid = draft_release(c, w)
         add_input(c, add_estimate(c, w, rid), w["obs"]["id"])
@@ -813,11 +1018,14 @@ def test_submit_job_payload_is_bounded(w: dict[str, Any]) -> None:
     db = w["db"]
     big = json.dumps({"blob": "x" * 70_000})
     with tx(db.api) as c, pytest.raises(DBAPIError, match="64 KiB"):
-        c.execute(text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'api:test')"),
-                  {"p": big, "k": f"fx1-{uuid.uuid4()}"})
+        c.execute(
+            text("SELECT ops.submit_job('health', CAST(:p AS jsonb), :k, 0, 'api:test')"),
+            {"p": big, "k": f"fx1-{uuid.uuid4()}"},
+        )
     with tx(db.api) as c:
-        assert c.execute(text("SELECT ops.submit_job('health', '{}'::jsonb, :k, 0, 'api:test')"),
-                         {"k": f"fx1-{uuid.uuid4()}"}).scalar_one()
+        assert c.execute(
+            text("SELECT ops.submit_job('health', '{}'::jsonb, :k, 0, 'api:test')"), {"k": f"fx1-{uuid.uuid4()}"}
+        ).scalar_one()
 
 
 # =========================================================================== R-17 bootstrap secrets
@@ -829,14 +1037,17 @@ def test_scram_verifier_matches_rfc7677() -> None:
 
     # RFC 7677 section 3 example: password "pencil", salt W22ZaJ0SNY7soEsUEjb6gQ==, 4096 iterations.
     v = scram_sha256_verifier("pencil", salt=base64.b64decode("W22ZaJ0SNY7soEsUEjb6gQ=="))
-    assert v == ("SCRAM-SHA-256$4096:W22ZaJ0SNY7soEsUEjb6gQ==$WG5d8oPm3OtcPnkdi4Uo7BkeZkBFzpcXkuLmtbsT4qY=:"
-                 "wfPLwcE6nTWhTAmQ7tl2KeoiWGPlZqQxSrmfPwDl2dU=")
+    assert v == (
+        "SCRAM-SHA-256$4096:W22ZaJ0SNY7soEsUEjb6gQ==$WG5d8oPm3OtcPnkdi4Uo7BkeZkBFzpcXkuLmtbsT4qY=:"
+        "wfPLwcE6nTWhTAmQ7tl2KeoiWGPlZqQxSrmfPwDl2dU="
+    )
     nonce = "rOprNGfwEbeRWgbNEkqO%hvYDpWUa2RaTCAfuxFIlj)hNlF$k0"
     auth = (f"n=user,r=rOprNGfwEbeRWgbNEkqO,r={nonce},s=W22ZaJ0SNY7soEsUEjb6gQ==,i=4096,c=biws,r={nonce}").encode()
     server_key = base64.b64decode(v.rsplit(":", 1)[1])
     # the RFC's server signature v=6rriTRBi... proves the ServerKey part is right
     assert base64.b64encode(hmac.new(server_key, auth, "sha256").digest()).decode() == (
-        "6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4=")
+        "6rriTRBi23WpRR/wtup+mMhUZUn/dB5nLTJRsjl95G4="
+    )
     assert "pencil" not in v
     with pytest.raises(Exception, match="printable ASCII"):
         scram_sha256_verifier("pässwörd-with-umlauts")
@@ -902,19 +1113,34 @@ def test_role_connection_limit_is_configurable(monkeypatch: pytest.MonkeyPatch) 
 def test_gate_result_accepts_needs_review(w: dict[str, Any]) -> None:
     with tx(w["db"].gate) as c:
         pid = _committed_proposal(w)
-        c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'needs_review', :s, "
-                       "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
+        c.execute(
+            text(
+                "SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'needs_review', :s, "
+                "'gate-evaluator:promotion')"
+            ),
+            {"p": pid, "s": w["verified"]},
+        )
         with pytest.raises(DBAPIError, match="invalid gate decision"), c.begin_nested():
-            c.execute(text("SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'approve', :s, "
-                           "'gate-evaluator:promotion')"), {"p": pid, "s": w["verified"]})
+            c.execute(
+                text(
+                    "SELECT ops.record_gate_result(:p, 'promotion', 'promotion-1', 'approve', :s, "
+                    "'gate-evaluator:promotion')"
+                ),
+                {"p": pid, "s": w["verified"]},
+            )
 
 
 def test_client_idempotency_keys_are_namespaced(w: dict[str, Any]) -> None:
     db = w["db"]
     key = f"fx1-ns-{uuid.uuid4().hex}"
     with tx(db.worker) as c:  # an internal job whose key a client might guess
-        internal = c.execute(text("INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
-                                  "VALUES ('health', '{}', :k, 'scheduler') RETURNING id"), {"k": key}).scalar_one()
+        internal = c.execute(
+            text(
+                "INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
+                "VALUES ('health', '{}', :k, 'scheduler') RETURNING id"
+            ),
+            {"k": key},
+        ).scalar_one()
         c.commit()
     try:
         sql = "SELECT ops.submit_job('health', '{}'::jsonb, :k, 0, :a)"
@@ -936,14 +1162,25 @@ def test_session_revocation_grants(w: dict[str, Any]) -> None:
     db = w["db"]
     sid = f"fx1-session-{uuid.uuid4().hex}"
     with tx(db.api) as c:
-        c.execute(text("INSERT INTO ops.session_revocation(session_id, expires_at) "
-                       "VALUES (:s, clock_timestamp() + interval '1 hour')"), {"s": sid})
-        assert c.execute(text("SELECT count(*) FROM ops.session_revocation WHERE session_id = :s"),
-                         {"s": sid}).scalar_one() == 1
+        c.execute(
+            text(
+                "INSERT INTO ops.session_revocation(session_id, expires_at) "
+                "VALUES (:s, clock_timestamp() + interval '1 hour')"
+            ),
+            {"s": sid},
+        )
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM ops.session_revocation WHERE session_id = :s"), {"s": sid}
+            ).scalar_one()
+            == 1
+        )
     for engine in (db.worker, db.sim):
         with tx(engine) as c, pytest.raises(DBAPIError, match="permission denied"):
-            c.execute(text("INSERT INTO ops.session_revocation(session_id, expires_at) "
-                           "VALUES (:s, clock_timestamp())"), {"s": sid})
+            c.execute(
+                text("INSERT INTO ops.session_revocation(session_id, expires_at) VALUES (:s, clock_timestamp())"),
+                {"s": sid},
+            )
     with tx(db.worker) as c:  # the worker may prune expired rows
         c.execute(text("DELETE FROM ops.session_revocation WHERE expires_at < clock_timestamp()"))
 
@@ -972,30 +1209,45 @@ def test_bootstrap_with_non_superuser_createrole_owner(w: dict[str, Any]) -> Non
             c.execute(text(f'CREATE DATABASE "{dbname}" OWNER "{owner}"'))
             # the runtime roles already exist cluster-wide (created by another owner): on a fresh managed
             # cluster the CREATEROLE owner creates them and so holds ADMIN on them; simulate that.
-            c.execute(text(f'GRANT reva_api, reva_worker, reva_sim, reva_gate, reva_registry TO "{owner}" '
-                           'WITH ADMIN OPTION'))
+            c.execute(
+                text(f'GRANT reva_api, reva_worker, reva_sim, reva_gate, reva_registry TO "{owner}" WITH ADMIN OPTION')
+            )
         su = create_engine(db.settings.migration_url().set(database=dbname), isolation_level="AUTOCOMMIT")
         with su.connect() as c:  # PostGIS is provisioned by the platform, not by the owner
             c.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
         su.dispose()
         url = db.settings.migration_url().set(database=dbname, username=owner, password=pw)
-        settings = Settings.model_validate({**db.settings.model_dump(),
-                                            "reva_migration_database_url": url.render_as_string(hide_password=False),
-                                            "reva_db_name": dbname})
+        settings = Settings.model_validate(
+            {
+                **db.settings.model_dump(),
+                "reva_migration_database_url": url.render_as_string(hide_password=False),
+                "reva_db_name": dbname,
+            }
+        )
         with create_engine(url).connect() as c:
             assert c.execute(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")).scalar_one() is False
         report = bootstrap(settings)
         assert report["roles"] == ["reva_api", "reva_worker", "reva_sim", "reva_gate"]
         with admin.connect() as c:
-            attrs = c.execute(text(
-                "SELECT rolname, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, rolreplication, rolinherit, "
-                "rolcanlogin FROM pg_roles WHERE rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')")).all()
+            attrs = c.execute(
+                text(
+                    "SELECT rolname, rolsuper, rolcreatedb, rolcreaterole, rolbypassrls, rolreplication, rolinherit, "
+                    "rolcanlogin FROM pg_roles WHERE rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')"
+                )
+            ).all()
             assert len(attrs) == 4
             assert all(not any(r[1:7]) and r[7] for r in attrs), attrs
-            members = c.execute(text(
-                "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
-                "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = 'reva_restricted_deletion' "
-                "AND r.rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')")).scalars().all()
+            members = (
+                c.execute(
+                    text(
+                        "SELECT r.rolname FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.member "
+                        "JOIN pg_roles g ON g.oid = m.roleid WHERE g.rolname = 'reva_restricted_deletion' "
+                        "AND r.rolname IN ('reva_api','reva_worker','reva_sim','reva_gate')"
+                    )
+                )
+                .scalars()
+                .all()
+            )
             assert members == []
     finally:
         with admin.connect() as c:

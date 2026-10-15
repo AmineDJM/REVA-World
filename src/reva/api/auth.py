@@ -145,8 +145,7 @@ def login_rate_limit_per_minute(settings: Settings, override: int | None = None)
     except (TypeError, ValueError):
         raise ConfigurationError(f"{LOGIN_RATE_LIMIT_ENV} must be an integer", source=source) from None
     if not 1 <= n <= LOGIN_RATE_LIMIT_MAX:
-        raise ConfigurationError(f"{LOGIN_RATE_LIMIT_ENV} must be between 1 and {LOGIN_RATE_LIMIT_MAX}",
-                                 source=source)
+        raise ConfigurationError(f"{LOGIN_RATE_LIMIT_ENV} must be between 1 and {LOGIN_RATE_LIMIT_MAX}", source=source)
     return n
 
 
@@ -161,8 +160,13 @@ class LoginRateLimiter:
 
     GLOBAL_KEY = "__global__"
 
-    def __init__(self, limit: int = LOGIN_ATTEMPTS_PER_MINUTE, window_seconds: float = 60.0,
-                 max_keys: int = 10_000, global_limit: int | None = None) -> None:
+    def __init__(
+        self,
+        limit: int = LOGIN_ATTEMPTS_PER_MINUTE,
+        window_seconds: float = 60.0,
+        max_keys: int = 10_000,
+        global_limit: int | None = None,
+    ) -> None:
         self.limit = limit
         self.window = window_seconds
         self.max_keys = max_keys
@@ -241,8 +245,7 @@ class AuthService:
         h = self.settings.reva_admin_password_hash
         value = h.get_secret_value() if h is not None else ""
         if not value.startswith("$argon2id$"):
-            raise ApiProblem(503, "auth_not_configured",
-                             "REVA_ADMIN_PASSWORD_HASH is not set to an Argon2id hash")
+            raise ApiProblem(503, "auth_not_configured", "REVA_ADMIN_PASSWORD_HASH is not set to an Argon2id hash")
         return value
 
     def _password_binding(self, admin_hash: str) -> str:
@@ -297,16 +300,23 @@ class AuthService:
         wait = self.limiter.check_and_record(ck)
         if wait is not None:
             if self._audit_rate_limited(ck):
-                self.audit("anonymous", "session.login_rate_limited", self._login_target(username),
-                           {"client": ck, "note": "first rejection in this window; later ones are not audited"})
-            raise ApiProblem(429, "rate_limited", "too many login attempts; retry later",
-                             retry_after=int(wait) + 1)
+                self.audit(
+                    "anonymous",
+                    "session.login_rate_limited",
+                    self._login_target(username),
+                    {"client": ck, "note": "first rejection in this window; later ones are not audited"},
+                )
+            raise ApiProblem(429, "rate_limited", "too many login attempts; retry later", retry_after=int(wait) + 1)
         stored = self._admin_hash()
         user_ok = hmac.compare_digest(username.encode(), ADMIN_USERNAME.encode())
         pw_ok = verify_password(stored if user_ok else _DUMMY_HASH, password)
         if not (user_ok and pw_ok):
-            self.audit("anonymous", "session.login_failed", self._login_target(username),
-                       {"client": ck, "reason": "invalid_credentials"})
+            self.audit(
+                "anonymous",
+                "session.login_failed",
+                self._login_target(username),
+                {"client": ck, "reason": "invalid_credentials"},
+            )
             raise ApiProblem(401, "invalid_credentials", "invalid username or password")
         # A fresh session id on every login (no fixation); a still-valid session presented with this login is
         # revoked so at most the new cookie remains usable from this client.
@@ -319,11 +329,16 @@ class AuthService:
         csrf = secrets.token_urlsafe(32)
         sid = secrets.token_urlsafe(16)
         expires = datetime.now(UTC) + SESSION_TTL
-        cookie = self._serializer.dumps({"u": ADMIN_USERNAME, "sid": sid, "csrf": csrf,
-                                         "pb": self._password_binding(stored)})
+        cookie = self._serializer.dumps(
+            {"u": ADMIN_USERNAME, "sid": sid, "csrf": csrf, "pb": self._password_binding(stored)}
+        )
         principal = Principal(ADMIN_USERNAME, f"human:{ADMIN_USERNAME}", "session", ALL_SCOPES, csrf, sid, expires)
-        self.audit(principal.actor, "session.login", {"username": ADMIN_USERNAME},
-                   {"client": ck, "session": hashlib.sha256(sid.encode()).hexdigest()[:16]})
+        self.audit(
+            principal.actor,
+            "session.login",
+            {"username": ADMIN_USERNAME},
+            {"client": ck, "session": hashlib.sha256(sid.encode()).hexdigest()[:16]},
+        )
         return principal, cookie
 
     @staticmethod
@@ -341,12 +356,18 @@ class AuthService:
             expires = principal.expires_at or (datetime.now(UTC) + SESSION_TTL)
             with self.engine_getter().begin() as conn:
                 conn.execute(
-                    text("INSERT INTO ops.session_revocation(session_id, expires_at) VALUES (:s, :e) "
-                         "ON CONFLICT (session_id) DO NOTHING"),
+                    text(
+                        "INSERT INTO ops.session_revocation(session_id, expires_at) VALUES (:s, :e) "
+                        "ON CONFLICT (session_id) DO NOTHING"
+                    ),
                     {"s": self._sid_key(principal.session_id), "e": expires},
                 )
-            self.audit(principal.actor, "session.logout", {"username": principal.username},
-                       {"session": self._sid_key(principal.session_id)[:16]})
+            self.audit(
+                principal.actor,
+                "session.logout",
+                {"username": principal.username},
+                {"session": self._sid_key(principal.session_id)[:16]},
+            )
 
     # --- authentication -------------------------------------------------
     def _from_session(self, cookie: str) -> Principal:
@@ -371,27 +392,46 @@ class AuthService:
             if sid in self._revoked:
                 raise Unauthenticated("session has ended")
         with self.engine_getter().connect() as conn:
-            revoked = conn.execute(text("SELECT 1 FROM ops.session_revocation WHERE session_id = :s"),
-                                   {"s": self._sid_key(sid)}).scalar_one_or_none()
+            revoked = conn.execute(
+                text("SELECT 1 FROM ops.session_revocation WHERE session_id = :s"), {"s": self._sid_key(sid)}
+            ).scalar_one_or_none()
         if revoked is not None:
             raise Unauthenticated("session has ended")
-        return Principal(ADMIN_USERNAME, f"human:{ADMIN_USERNAME}", "session", ALL_SCOPES,
-                         str(data.get("csrf", "")), sid, signed_at + SESSION_TTL)
+        return Principal(
+            ADMIN_USERNAME,
+            f"human:{ADMIN_USERNAME}",
+            "session",
+            ALL_SCOPES,
+            str(data.get("csrf", "")),
+            sid,
+            signed_at + SESSION_TTL,
+        )
 
     def _from_token(self, token: str) -> Principal:
         if not token or len(token) > 512:
             raise Unauthenticated("invalid token")
         with self.engine_getter().connect() as conn:
-            row = conn.execute(
-                text("SELECT * FROM ops.api_token WHERE token_sha256 = :h"),
-                {"h": token_sha256(token)},
-            ).mappings().one_or_none()
+            row = (
+                conn.execute(
+                    text("SELECT * FROM ops.api_token WHERE token_sha256 = :h"),
+                    {"h": token_sha256(token)},
+                )
+                .mappings()
+                .one_or_none()
+            )
         if row is None or row["revoked_at"] is not None:
             raise Unauthenticated("token is invalid or revoked")
         scopes = frozenset(s for s in (row["scopes"] or []) if s in ALL_SCOPES)
         label = str(row["label"])
-        return Principal(label, f"token:{label}", "token", scopes, token_id=str(row["id"]), token_label=label,
-                         principal_kind=row.get("principal_kind"))
+        return Principal(
+            label,
+            f"token:{label}",
+            "token",
+            scopes,
+            token_id=str(row["id"]),
+            token_label=label,
+            principal_kind=row.get("principal_kind"),
+        )
 
     def authenticate(self, request: Request) -> Principal:
         cached = getattr(request.state, "principal", None)

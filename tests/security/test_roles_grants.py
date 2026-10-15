@@ -765,8 +765,16 @@ def test_scenario_rejects_unpublished_baseline_direct_insert(w: World) -> None:
     with tx(w.db.sim) as c:  # (R5-02) scenarios are created only through sim.create_scenario
         ctx = c.execute(text(sql_ctx), {"sha": w.manifest_sha}).scalar_one()
         with pytest.raises(DBAPIError, match="permission denied for table scenario"):
-            c.execute(text(sql_scn), {"c": ctx, "b": w.release_id, "d": uuid.uuid4().hex, "sha": w.manifest_sha,
-                                      "spec": json.dumps({"baseline_release_id": str(w.release_id)})})
+            c.execute(
+                text(sql_scn),
+                {
+                    "c": ctx,
+                    "b": w.release_id,
+                    "d": uuid.uuid4().hex,
+                    "sha": w.manifest_sha,
+                    "spec": json.dumps({"baseline_release_id": str(w.release_id)}),
+                },
+            )
     # The trigger still guards every path (exercised as the owner): an unpublished baseline is
     # refused; a published one passes that check and then fails the spec-bytes binding, because
     # spec_sha256 here is not the sha of inline canonical bytes encoding the spec.

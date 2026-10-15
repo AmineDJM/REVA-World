@@ -30,11 +30,15 @@ def _quiet(sdb: FreshDB) -> None:
 
 def _schedule(d: FreshDB, key: str, job_type: str = "health", params: str = "{}") -> datetime:
     with d.owner.begin() as c:
-        return c.execute(text(
-            """INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at)
+        return c.execute(
+            text(
+                """INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at)
                VALUES (:k, :t, CAST(:p AS jsonb), '{"interval_seconds": 3600}',
                        date_trunc('second', clock_timestamp()) - interval '10 seconds')
-               RETURNING next_due_at"""), {"k": key, "t": job_type, "p": params}).scalar_one()
+               RETURNING next_due_at"""
+            ),
+            {"k": key, "t": job_type, "p": params},
+        ).scalar_one()
 
 
 def test_slot_key_is_utc_whatever_the_offset() -> None:
@@ -65,20 +69,28 @@ def test_foreign_job_holding_the_slot_key_does_not_suppress_the_schedule(sdb: Fr
     due = _schedule(sdb, key, "ingest", '{"connector": "worldbank.wdi.indicators"}')
     slot_key = schedules.slot_key(key, due)
     with sdb.owner.begin() as c:  # e.g. an API-submitted job that pre-claimed the slot key
-        foreign = c.execute(text("INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
-                                 "VALUES ('replay', '{}', :k, 'api:attacker') RETURNING id"),
-                            {"k": slot_key}).scalar_one()
+        foreign = c.execute(
+            text(
+                "INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
+                "VALUES ('replay', '{}', :k, 'api:attacker') RETURNING id"
+            ),
+            {"k": slot_key},
+        ).scalar_one()
     out = [s for s in schedules.tick(sdb.worker, actor="scheduler:test") if s.schedule_key == key]
     assert len(out) == 1
     s = out[0]
     assert s.created and s.job_id != foreign and s.conflict is not None
     row = queue.job_row(sdb.owner, s.job_id)
-    assert row["job_type"] == "ingest" and row["payload"] == {"connector": "worldbank.wdi.indicators",
-                                                               "mode": "live"}
+    assert row["job_type"] == "ingest" and row["payload"] == {"connector": "worldbank.wdi.indicators", "mode": "live"}
     assert row["idempotency_key"] == f"{slot_key}#alt1"
     with sdb.owner.connect() as c:
-        audit = c.execute(text("SELECT actor, details FROM ops.audit WHERE action = 'schedule.slot_key_conflict' "
-                               "AND target->>'schedule_key' = :k"), {"k": key}).all()
+        audit = c.execute(
+            text(
+                "SELECT actor, details FROM ops.audit WHERE action = 'schedule.slot_key_conflict' "
+                "AND target->>'schedule_key' = :k"
+            ),
+            {"k": key},
+        ).all()
         nxt = c.execute(text("SELECT next_due_at FROM ops.schedule WHERE schedule_key = :k"), {"k": key}).scalar()
     assert len(audit) == 1 and audit[0].actor == "scheduler:test"
     assert audit[0].details["foreign_job_id"] == str(foreign) and audit[0].details["foreign_job_type"] == "replay"
@@ -89,8 +101,16 @@ def test_foreign_job_holding_the_slot_key_does_not_suppress_the_schedule(sdb: Fr
     again = [s for s in schedules.tick(sdb.worker, actor="scheduler:test") if s.schedule_key == key]
     assert again[0].job_id == s.job_id and not again[0].created
     with sdb.owner.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'schedule.slot_key_conflict' "
-                              "AND target->>'schedule_key' = :k"), {"k": key}).scalar() == 1
+        assert (
+            c.execute(
+                text(
+                    "SELECT count(*) FROM ops.audit WHERE action = 'schedule.slot_key_conflict' "
+                    "AND target->>'schedule_key' = :k"
+                ),
+                {"k": key},
+            ).scalar()
+            == 1
+        )
 
 
 def test_one_broken_schedule_does_not_block_the_others(sdb: FreshDB, monkeypatch) -> None:
@@ -109,5 +129,7 @@ def test_one_broken_schedule_does_not_block_the_others(sdb: FreshDB, monkeypatch
     assert out[good].created and out[good].job_id is not None
     assert out[bad].job_id is None and (out[bad].skipped_reason or "").startswith("error")
     with sdb.owner.connect() as c:  # the broken one is retried next tick (not advanced)
-        assert c.execute(text("SELECT next_due_at FROM ops.schedule WHERE schedule_key = :k"),
-                         {"k": bad}).scalar() == bad_due
+        assert (
+            c.execute(text("SELECT next_due_at FROM ops.schedule WHERE schedule_key = :k"), {"k": bad}).scalar()
+            == bad_due
+        )

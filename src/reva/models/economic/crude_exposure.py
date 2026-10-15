@@ -89,14 +89,25 @@ DESCRIPTOR: dict[str, Any] = {
     "model_key": MODEL_KEY,
     "version": MODEL_VERSION,
     "input_ports": [
-        {"name": n, "concept": c, "unit": USD, "basis": "nominal_current_usd",
-         "aggregation": "period_flow_total", "temporal_support": "calendar_year"}
+        {
+            "name": n,
+            "concept": c,
+            "unit": USD,
+            "basis": "nominal_current_usd",
+            "aggregation": "period_flow_total",
+            "temporal_support": "calendar_year",
+        }
         for n, c in INPUT_CONCEPTS.items()
     ],
     "output_ports": [
-        {"name": k, "concept": f"scenario.{MODEL_KEY}.{k}", "unit": u,
-         "basis": "nominal_current_usd" if u == USD else "ratio_to_baseline_gdp",
-         "aggregation": "period_flow_total", "temporal_support": "calendar_year"}
+        {
+            "name": k,
+            "concept": f"scenario.{MODEL_KEY}.{k}",
+            "unit": u,
+            "basis": "nominal_current_usd" if u == USD else "ratio_to_baseline_gdp",
+            "aggregation": "period_flow_total",
+            "temporal_support": "calendar_year",
+        }
         for k, u in OUTPUT_UNITS.items()
     ],
 }
@@ -126,8 +137,9 @@ def _dec(x: Any, what: str) -> Decimal:
     """
     if x is None or isinstance(x, Missing):
         reason = x.reason.value if isinstance(x, Missing) else MissingReason.unavailable.value
-        raise MissingInput(f"{what} is missing ({reason})", input=what, reason=reason,
-                           missing=[{"input": what, "reason": reason}])
+        raise MissingInput(
+            f"{what} is missing ({reason})", input=what, reason=reason, missing=[{"input": what, "reason": reason}]
+        )
     if isinstance(x, bool):
         raise ValidationProblem(f"{what} must be numeric, not boolean")
     if isinstance(x, Decimal):
@@ -159,14 +171,17 @@ def _check_multiplier(p: Decimal, what: str) -> None:
     if p <= 0:
         raise ValidationProblem(f"{what} must be > 0 (got {p})", input=what)
     if p > MULTIPLIER_MAX:
-        raise CapabilityGap(f"{what} {p} is outside the registered multiplier envelope (0, 3]",
-                            capability="multiplier_envelope")
+        raise CapabilityGap(
+            f"{what} {p} is outside the registered multiplier envelope (0, 3]", capability="multiplier_envelope"
+        )
 
 
 def _check_elasticity(e: Decimal, envelope: tuple[Decimal, Decimal], what: str) -> None:
     if not envelope[0] <= e <= envelope[1]:
-        raise CapabilityGap(f"{what} {e} is outside the registered envelope [{envelope[0]}, {envelope[1]}]",
-                            capability="elasticity_envelope")
+        raise CapabilityGap(
+            f"{what} {e} is outside the registered envelope [{envelope[0]}, {envelope[1]}]",
+            capability="elasticity_envelope",
+        )
 
 
 @dataclass(frozen=True)
@@ -192,14 +207,12 @@ class ExposureResult:
         return {k: getattr(self, k) for k in OUTPUT_KEYS}
 
     def as_json(self) -> dict[str, str]:
-        return {
-            k: (dstr(v) if isinstance(v, Decimal) else str(v))
-            for k, v in self.__dict__.items()
-        }
+        return {k: (dstr(v) if isinstance(v, Decimal) else str(v)) for k, v in self.__dict__.items()}
 
 
-def _compute(M: Decimal, X: Decimal, G: Decimal, p_m: Decimal, p_x: Decimal,
-             e_m: Decimal, e_x: Decimal, variant: str) -> ExposureResult:
+def _compute(
+    M: Decimal, X: Decimal, G: Decimal, p_m: Decimal, p_x: Decimal, e_m: Decimal, e_x: Decimal, variant: str
+) -> ExposureResult:
     with localcontext(_CTX):
         f_m = _power(p_m, 1 + e_m)
         f_x = _power(p_x, 1 + e_x)
@@ -247,8 +260,15 @@ def l2_variant_name(import_elasticity: Any, export_elasticity: Any) -> str:
     return f"L2:eM={dstr(e_m)};eX={dstr(e_x)}"
 
 
-def exposure_l2(M: Any, X: Any, G: Any, import_multiplier: Any, export_multiplier: Any,
-                import_elasticity: Any, export_elasticity: Any) -> ExposureResult:
+def exposure_l2(
+    M: Any,
+    X: Any,
+    G: Any,
+    import_multiplier: Any,
+    export_multiplier: Any,
+    import_elasticity: Any,
+    export_elasticity: Any,
+) -> ExposureResult:
     """Elasticity-sensitivity variant (L2). ε = 0 reproduces L1 exactly."""
     m, x, g = _dec(M, "M"), _dec(X, "X"), _dec(G, "G")
     p_m, p_x = _dec(import_multiplier, "import_multiplier"), _dec(export_multiplier, "export_multiplier")
@@ -279,17 +299,36 @@ class MonetaryInput:
     estimate_id: str | None = None
 
     @classmethod
-    def from_value_dict(cls, name: str, value: Mapping[str, Any] | None, *, reference_year: int | None,
-                        aggregation: str | None, source_flags: Mapping[str, Any] | None = None,
-                        estimate_id: str | None = None) -> MonetaryInput:
+    def from_value_dict(
+        cls,
+        name: str,
+        value: Mapping[str, Any] | None,
+        *,
+        reference_year: int | None,
+        aggregation: str | None,
+        source_flags: Mapping[str, Any] | None = None,
+        estimate_id: str | None = None,
+    ) -> MonetaryInput:
         """Build from a kernel value dict (as stored on belief estimates)."""
         if value is None:
-            return cls(name, None, reference_year, aggregation=aggregation,
-                       source_flags=dict(source_flags or {}), estimate_id=estimate_id)
+            return cls(
+                name,
+                None,
+                reference_year,
+                aggregation=aggregation,
+                source_flags=dict(source_flags or {}),
+                estimate_id=estimate_id,
+            )
         v = parse_value(dict(value))
         if isinstance(v, Missing):
-            return cls(name, v, reference_year, aggregation=aggregation,
-                       source_flags=dict(source_flags or {}), estimate_id=estimate_id)
+            return cls(
+                name,
+                v,
+                reference_year,
+                aggregation=aggregation,
+                source_flags=dict(source_flags or {}),
+                estimate_id=estimate_id,
+            )
         kind = getattr(v, "kind", None)
         if kind not in ("decimal", "float"):
             raise IncompatibleSemantics(f"input {name} is a {kind} value, not a monetary quantity", input=name)
@@ -334,8 +373,9 @@ def check_horizon(periods: int, unit: str) -> None:
         )
 
 
-def validate_country_inputs(ci: CountryInputs, *, reference_year: int, horizon_periods: int = 1,
-                            horizon_unit: str = "annual_accounting_period") -> tuple[Decimal, Decimal, Decimal]:
+def validate_country_inputs(
+    ci: CountryInputs, *, reference_year: int, horizon_periods: int = 1, horizon_unit: str = "annual_accounting_period"
+) -> tuple[Decimal, Decimal, Decimal]:
     """Return (M, X, G) or raise MissingInput / IncompatibleSemantics / CapabilityGap.
 
     Missing inputs are never replaced with zero. All inputs must be current-USD
@@ -343,19 +383,30 @@ def validate_country_inputs(ci: CountryInputs, *, reference_year: int, horizon_p
     """
     check_horizon(horizon_periods, horizon_unit)
     missing = [
-        {"country": ci.country, "input": n, "concept": INPUT_CONCEPTS[n], "reference_year": reference_year,
-         "reason": (inp.value.reason.value if isinstance(inp.value, Missing) else MissingReason.unavailable.value)}
-        for n, inp in ci.by_name().items() if inp.is_missing
+        {
+            "country": ci.country,
+            "input": n,
+            "concept": INPUT_CONCEPTS[n],
+            "reference_year": reference_year,
+            "reason": (inp.value.reason.value if isinstance(inp.value, Missing) else MissingReason.unavailable.value),
+        }
+        for n, inp in ci.by_name().items()
+        if inp.is_missing
     ]
     if missing:
         names = ", ".join(f"{m['input']} ({m['concept']})" for m in missing)
-        raise MissingInput(f"{ci.country} {reference_year}: required input(s) missing: {names}",
-                           country=ci.country, reference_year=reference_year, missing=missing)
+        raise MissingInput(
+            f"{ci.country} {reference_year}: required input(s) missing: {names}",
+            country=ci.country,
+            reference_year=reference_year,
+            missing=missing,
+        )
     years = {n: inp.reference_year for n, inp in ci.by_name().items()}
     if any(y != reference_year for y in years.values()):
         raise IncompatibleSemantics(
             f"{ci.country}: inputs must share the requested reference year {reference_year} (got {years})",
-            country=ci.country, reference_years=years,
+            country=ci.country,
+            reference_years=years,
         )
     for n, inp in ci.by_name().items():
         problems = []
@@ -372,7 +423,9 @@ def validate_country_inputs(ci: CountryInputs, *, reference_year: int, horizon_p
         if problems:
             raise IncompatibleSemantics(
                 f"{ci.country} input {n}: mixed or unsupported basis: " + "; ".join(problems),
-                country=ci.country, input=n, problems=problems,
+                country=ci.country,
+                input=n,
+                problems=problems,
             )
     m, x, g = (inp.value for inp in (ci.imports, ci.exports, ci.gdp))
     assert isinstance(m, Decimal) and isinstance(x, Decimal) and isinstance(g, Decimal)
@@ -380,13 +433,20 @@ def validate_country_inputs(ci: CountryInputs, *, reference_year: int, horizon_p
     return m, x, g
 
 
-def evaluate_country(ci: CountryInputs, *, reference_year: int, import_multiplier: Any, export_multiplier: Any,
-                     elasticity_grid: tuple[tuple[Any, Any], ...] | None = None,
-                     horizon_periods: int = 1, horizon_unit: str = "annual_accounting_period",
-                     ) -> list[ExposureResult]:
+def evaluate_country(
+    ci: CountryInputs,
+    *,
+    reference_year: int,
+    import_multiplier: Any,
+    export_multiplier: Any,
+    elasticity_grid: tuple[tuple[Any, Any], ...] | None = None,
+    horizon_periods: int = 1,
+    horizon_unit: str = "annual_accounting_period",
+) -> list[ExposureResult]:
     """Validate typed inputs then compute L1 (no grid) or every L2 grid point."""
-    m, x, g = validate_country_inputs(ci, reference_year=reference_year, horizon_periods=horizon_periods,
-                                      horizon_unit=horizon_unit)
+    m, x, g = validate_country_inputs(
+        ci, reference_year=reference_year, horizon_periods=horizon_periods, horizon_unit=horizon_unit
+    )
     if not elasticity_grid:
         return [exposure_l1(m, x, g, import_multiplier, export_multiplier)]
     return [exposure_l2(m, x, g, import_multiplier, export_multiplier, em, ex) for em, ex in elasticity_grid]
@@ -415,8 +475,17 @@ def _input_flags(inp: MonetaryInput) -> dict[str, Any]:
     # quantity/net weight, never the USD value, so neither it nor the 1.1.0 derived key
     # provider_estimation_flagged (code != 0) labels a value input as estimated; only an explicit
     # provider_value_estimated=true does (Comtrade 1.2.0 emits null: undeterminable from the response).
-    for k in ("provider_value_estimated", "legacyEstimationFlag", "provider_derived_aggregate", "isReported",
-              "isAggregate", "classificationCode", "indicator", "obs_status", "provider_returned_no_rows"):
+    for k in (
+        "provider_value_estimated",
+        "legacyEstimationFlag",
+        "provider_derived_aggregate",
+        "isReported",
+        "isAggregate",
+        "classificationCode",
+        "indicator",
+        "obs_status",
+        "provider_returned_no_rows",
+    ):
         if k in f:
             out[k] = f[k]
     if f.get("provider_value_estimated") is True:
@@ -433,9 +502,11 @@ def explain(inputs: CountryInputs | None = None, *, fidelity: str = "L1") -> dic
     if inputs is not None:
         flags = {n: _input_flags(i) for n, i in inputs.by_name().items()}
         if inputs.imports.valuation or inputs.exports.valuation:
-            valuation_note = (f"import value basis: {inputs.imports.valuation or 'undeclared'}; "
-                              f"export value basis: {inputs.exports.valuation or 'undeclared'}. Applying a "
-                              "multiplier to a CIF value includes that border-value convention.")
+            valuation_note = (
+                f"import value basis: {inputs.imports.valuation or 'undeclared'}; "
+                f"export value basis: {inputs.exports.valuation or 'undeclared'}. Applying a "
+                "multiplier to a CIF value includes that border-value convention."
+            )
     return {
         "model": f"{MODEL_KEY}@{MODEL_VERSION}",
         "modality": "assumption_conditioned_scenario",
@@ -454,8 +525,9 @@ def explain(inputs: CountryInputs | None = None, *, fidelity: str = "L1") -> dic
             "same-year source-reported border values and nominal GDP, all in current USD",
             valuation_note,
             "one annual accounting period; no dynamics",
-            "fixed quantities (L1)" if fidelity != "L2" else
-            "assumed quantity elasticities over a labelled grid (L2); elasticities are scenario assumptions "
+            "fixed quantities (L1)"
+            if fidelity != "L2"
+            else "assumed quantity elasticities over a labelled grid (L2); elasticities are scenario assumptions "
             "with no probability interpretation",
             "no general equilibrium, exchange-rate, fiscal or second-round effects",
             "a headline crude benchmark price change is not automatically this border-price intervention",

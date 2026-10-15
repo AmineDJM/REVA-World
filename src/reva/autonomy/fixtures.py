@@ -23,8 +23,9 @@ from reva.ports.autonomy import ArtifactRef
 BANK_SCHEMA = "reva-fixture-bank/1"
 
 
-def bank_from_dir(io_: ArtifactIO, connector: str, root: Path = FIXTURE_ROOT,
-                  overrides: Mapping[str, bytes] | None = None) -> ArtifactRef:
+def bank_from_dir(
+    io_: ArtifactIO, connector: str, root: Path = FIXTURE_ROOT, overrides: Mapping[str, bytes] | None = None
+) -> ArtifactRef:
     """Load captured fixtures (tests/fixtures/source/<connector>/manifest.json) into a bank.
 
     ``overrides`` maps URL -> replacement body (used to build mutated samples).
@@ -41,12 +42,23 @@ def bank_from_dir(io_: ArtifactIO, connector: str, root: Path = FIXTURE_ROOT,
             body, mutated = overrides[e["url"]], True
         media = (e.get("headers") or {}).get("content-type", "application/octet-stream")
         ref = io_.put_bytes(body, "raw", media.split(";")[0].strip() or "application/octet-stream")
-        out.append({"request_fingerprint": e["request_fingerprint"], "url": e["url"], "body_sha256": ref.sha256,
-                    "media_type": ref.media_type, "status": e["status"], "headers": e.get("headers") or {},
-                    "retrieved_at": e["retrieved_at"], "licence": e.get("licence", ""),
-                    "captured_file": e["file"], "mutated": mutated})
-    return io_.put_json({"schema": BANK_SCHEMA, "connector": connector,
-                         "entries": sorted(out, key=lambda x: x["url"])}, "raw")
+        out.append(
+            {
+                "request_fingerprint": e["request_fingerprint"],
+                "url": e["url"],
+                "body_sha256": ref.sha256,
+                "media_type": ref.media_type,
+                "status": e["status"],
+                "headers": e.get("headers") or {},
+                "retrieved_at": e["retrieved_at"],
+                "licence": e.get("licence", ""),
+                "captured_file": e["file"],
+                "mutated": mutated,
+            }
+        )
+    return io_.put_json(
+        {"schema": BANK_SCHEMA, "connector": connector, "entries": sorted(out, key=lambda x: x["url"])}, "raw"
+    )
 
 
 class BankHttp:
@@ -84,8 +96,9 @@ class BankHttp:
         self.bytes += len(body)
         headers = {**{k.lower(): v for k, v in (e.get("headers") or {}).items()}}
         headers.setdefault("content-type", e["media_type"])
-        return HttpResult(url, url, int(e["status"]), headers, body,
-                          datetime.fromisoformat(e["retrieved_at"]), 0.0, (), 1)
+        return HttpResult(
+            url, url, int(e["status"]), headers, body, datetime.fromisoformat(e["retrieved_at"]), 0.0, (), 1
+        )
 
     async def aclose(self) -> None:
         return None
@@ -114,14 +127,23 @@ class CapturingHttp:
         out = []
         for url, r in self.captured:
             ref = io_.put_bytes(r.body, "raw", r.media_type or "application/octet-stream")
-            out.append({"request_fingerprint": request_fingerprint("GET", url), "url": url, "body_sha256": ref.sha256,
-                        "media_type": ref.media_type, "status": r.status,
-                        "headers": {k: v for k, v in r.headers.items()
-                                    if k in ("content-type", "etag", "last-modified")},
-                        "retrieved_at": r.retrieved_at.astimezone(UTC).isoformat(), "licence": self.licence,
-                        "captured_file": None, "mutated": False})
-        return io_.put_json({"schema": BANK_SCHEMA, "connector": connector,
-                             "entries": sorted(out, key=lambda x: x["url"])}, "raw")
+            out.append(
+                {
+                    "request_fingerprint": request_fingerprint("GET", url),
+                    "url": url,
+                    "body_sha256": ref.sha256,
+                    "media_type": ref.media_type,
+                    "status": r.status,
+                    "headers": {k: v for k, v in r.headers.items() if k in ("content-type", "etag", "last-modified")},
+                    "retrieved_at": r.retrieved_at.astimezone(UTC).isoformat(),
+                    "licence": self.licence,
+                    "captured_file": None,
+                    "mutated": False,
+                }
+            )
+        return io_.put_json(
+            {"schema": BANK_SCHEMA, "connector": connector, "entries": sorted(out, key=lambda x: x["url"])}, "raw"
+        )
 
     async def aclose(self) -> None:
         await self.client.aclose()

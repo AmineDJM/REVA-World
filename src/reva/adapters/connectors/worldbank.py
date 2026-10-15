@@ -184,8 +184,14 @@ class WorldBankConnector:
                 }
                 for r in rows
             ]
-            yield ObservationBatch(connector="worldbank.wdi.indicators", connector_version="1.0.0",
-                                   item_key=raw.item.key, observations=(), metadata=meta, schema_fingerprint=fp)
+            yield ObservationBatch(
+                connector="worldbank.wdi.indicators",
+                connector_version="1.0.0",
+                item_key=raw.item.key,
+                observations=(),
+                metadata=meta,
+                schema_fingerprint=fp,
+            )
             return
         if kind == "indicator_metadata":
             r = rows[0] if rows else {}
@@ -196,8 +202,14 @@ class WorldBankConnector:
                 "sourceOrganization": r.get("sourceOrganization"),
                 "source": (r.get("source") or {}).get("value"),
             }
-            yield ObservationBatch(connector="worldbank.wdi.indicators", connector_version="1.0.0",
-                                   item_key=raw.item.key, observations=(), metadata=meta, schema_fingerprint=fp)
+            yield ObservationBatch(
+                connector="worldbank.wdi.indicators",
+                connector_version="1.0.0",
+                item_key=raw.item.key,
+                observations=(),
+                metadata=meta,
+                schema_fingerprint=fp,
+            )
             return
         indicator = raw.item.params["indicator"]
         page = int(header.get("page", 1))
@@ -238,8 +250,9 @@ class WorldBankConnector:
         iso3 = r.get("countryiso3code") or ""
         year = int(str(r["date"]))
         if spec["concept"].startswith("demography"):
-            temporal = TimeExtent(kind="instant", precision=Precision.day, start=date(year, 7, 1),
-                                  label=f"{year} midyear")
+            temporal = TimeExtent(
+                kind="instant", precision=Precision.day, start=date(year, 7, 1), label=f"{year} midyear"
+            )
             agg = "point_in_time_stock"
             universe = "de_facto_residents_wdi"
             basis = MeasurementBasis()
@@ -284,8 +297,10 @@ class WorldBankConnector:
                 "unit_field": r.get("unit") or "",
                 "provider_country_id": (r.get("country") or {}).get("id"),
             },
-            raw_selector={"json_pointer_hint": f"/1/*[countryiso3code={iso3},date={year}]",
-                          "match": {"countryiso3code": iso3, "date": str(year)}},
+            raw_selector={
+                "json_pointer_hint": f"/1/*[countryiso3code={iso3},date={year}]",
+                "match": {"countryiso3code": iso3, "date": str(year)},
+            },
         )
 
     # -------------------------------------------------------------- validation
@@ -299,8 +314,13 @@ class WorldBankConnector:
             required = INDICATORS.get(ind.get("id") or "", {}).get("definition_must_contain", [])
             for word in required:
                 if word.lower() not in note:
-                    findings.append(Finding(code="semantic_drift", severity="blocker",
-                                            message=f"indicator definition no longer mentions '{word}'"))
+                    findings.append(
+                        Finding(
+                            code="semantic_drift",
+                            severity="blocker",
+                            message=f"indicator definition no longer mentions '{word}'",
+                        )
+                    )
             return _report(findings, 0, 0, ())
         if kind == "series":
             per_page = int(str(header.get("per_page", "0")))
@@ -308,25 +328,40 @@ class WorldBankConnector:
             page = int(str(header.get("page", "1")))
             expected_rows = max(0, min(per_page, total - (page - 1) * per_page))
             if len(batch.observations) != expected_rows:
-                findings.append(Finding(
-                    code="pagination_truncated", severity="blocker",
-                    message=f"page has {len(batch.observations)} rows, header implies {expected_rows}"))
+                findings.append(
+                    Finding(
+                        code="pagination_truncated",
+                        severity="blocker",
+                        message=f"page has {len(batch.observations)} rows, header implies {expected_rows}",
+                    )
+                )
             findings.extend(_marker_findings(batch.metadata))
             keys = [o.logical_key for o in batch.observations]
             if len(keys) != len(set(keys)):
                 findings.append(Finding(code="duplicate_keys", severity="blocker", message="duplicate series keys"))
             missing = tuple(sorted(set(batch.expected_keys) - set(keys)))
             if missing:
-                findings.append(Finding(code="incomplete", severity="blocker",
-                                        message=f"{len(missing)} expected keys absent"))
+                findings.append(
+                    Finding(code="incomplete", severity="blocker", message=f"{len(missing)} expected keys absent")
+                )
             unknown = [o.subject_key for o in batch.observations if o.subject_key not in self.countries]
             if unknown:
-                findings.append(Finding(code="unexpected_subject", severity="blocker",
-                                        message=f"unexpected countries {sorted(set(unknown))}"))
+                findings.append(
+                    Finding(
+                        code="unexpected_subject",
+                        severity="blocker",
+                        message=f"unexpected countries {sorted(set(unknown))}",
+                    )
+                )
             n_missing = sum(1 for o in batch.observations if o.value.get("kind") == "missing")
             if n_missing:
-                findings.append(Finding(code="missing_values", severity="info",
-                                        message=f"{n_missing} values are null at source (kept as Missing)"))
+                findings.append(
+                    Finding(
+                        code="missing_values",
+                        severity="info",
+                        message=f"{n_missing} values are null at source (kept as Missing)",
+                    )
+                )
             return _report(findings, len(batch.expected_keys), len(keys), missing)
         return _report(findings, 0, 0, ())
 
@@ -356,12 +391,16 @@ def _row_markers(rows: Sequence[Any]) -> list[dict[str, Any]]:
             seen[(None, False, None, False, None, "not_an_object")] += 1
             continue
         ind = r.get("indicator")
-        seen[(
-            plain(ind.get("id")) if isinstance(ind, dict) else None,
-            "unit" in r, plain(r.get("unit")),
-            "decimal" in r, plain(r.get("decimal")),
-            _value_type(r, "value"),
-        )] += 1
+        seen[
+            (
+                plain(ind.get("id")) if isinstance(ind, dict) else None,
+                "unit" in r,
+                plain(r.get("unit")),
+                "decimal" in r,
+                plain(r.get("decimal")),
+                _value_type(r, "value"),
+            )
+        ] += 1
     keys = ("indicator", "unit_present", "unit", "decimal_present", "decimal", "value_type")
     return [{**dict(zip(keys, k, strict=True)), "rows": n} for k, n in sorted(seen.items(), key=lambda kv: str(kv[0]))]
 
@@ -372,28 +411,52 @@ def _marker_findings(meta: dict[str, Any]) -> list[Finding]:
     spec = INDICATORS.get(str(indicator))
     markers = meta.get("row_markers")
     if spec is None or markers is None:
-        return [Finding(code="mapping_unverifiable", severity="blocker",
-                        message=f"series page for {indicator!r} carries no reviewed row markers")]
+        return [
+            Finding(
+                code="mapping_unverifiable",
+                severity="blocker",
+                message=f"series page for {indicator!r} carries no reviewed row markers",
+            )
+        ]
     out: list[Finding] = []
     for m in markers:
         n = m["rows"]
         if m["indicator"] != indicator:
-            out.append(Finding(code="indicator_mismatch", severity="blocker",
-                               message=f"{n} rows carry indicator {m['indicator']!r}, requested {indicator}"))
+            out.append(
+                Finding(
+                    code="indicator_mismatch",
+                    severity="blocker",
+                    message=f"{n} rows carry indicator {m['indicator']!r}, requested {indicator}",
+                )
+            )
         if not m["unit_present"] or m["unit"] != spec["provider_unit"]:
             got = repr(m["unit"]) if m["unit_present"] else "no unit field"
-            out.append(Finding(code="unit_drift", severity="blocker",
-                               message=f"{n} rows carry unit {got}; reviewed mapping expects "
-                                       f"{spec['provider_unit']!r} (values may be on another scale)"))
+            out.append(
+                Finding(
+                    code="unit_drift",
+                    severity="blocker",
+                    message=f"{n} rows carry unit {got}; reviewed mapping expects "
+                    f"{spec['provider_unit']!r} (values may be on another scale)",
+                )
+            )
         if not m["decimal_present"] or str(m["decimal"]) != spec["provider_decimal"]:
             got = repr(m["decimal"]) if m["decimal_present"] else "no decimal field"
-            out.append(Finding(code="decimal_drift", severity="blocker",
-                               message=f"{n} rows carry decimal {got}; reviewed mapping expects "
-                                       f"{spec['provider_decimal']}"))
+            out.append(
+                Finding(
+                    code="decimal_drift",
+                    severity="blocker",
+                    message=f"{n} rows carry decimal {got}; reviewed mapping expects {spec['provider_decimal']}",
+                )
+            )
         if m["value_type"] not in ("number", "null"):
-            out.append(Finding(code="value_type_drift", severity="blocker",
-                               message=f"{n} rows carry a {m['value_type']} value; reviewed mapping expects a "
-                                       "JSON number or null (never coerced)"))
+            out.append(
+                Finding(
+                    code="value_type_drift",
+                    severity="blocker",
+                    message=f"{n} rows carry a {m['value_type']} value; reviewed mapping expects a "
+                    "JSON number or null (never coerced)",
+                )
+            )
     return out
 
 
@@ -401,12 +464,18 @@ def require_json_like(raw: RawAcquisition) -> None:
     from reva.adapters.http.safe_client import HttpResult
 
     require_json(
-        HttpResult(raw.item.url, raw.item.url, 200, {"content-type": raw.media_type}, raw.body,
-                   raw.retrieved_at, 0.0, (), 1)
+        HttpResult(
+            raw.item.url, raw.item.url, 200, {"content-type": raw.media_type}, raw.body, raw.retrieved_at, 0.0, (), 1
+        )
     )
 
 
 def _report(findings: list[Finding], expected: int, received: int, missing: tuple[str, ...]) -> QualityReport:
     outcome = "blocked" if any(f.severity == "blocker" for f in findings) else "pass"
-    return QualityReport(outcome=outcome, findings=tuple(findings), expected_count=expected,
-                         received_count=received, missing_keys=missing)
+    return QualityReport(
+        outcome=outcome,
+        findings=tuple(findings),
+        expected_count=expected,
+        received_count=received,
+        missing_keys=missing,
+    )

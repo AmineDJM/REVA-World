@@ -33,8 +33,11 @@ class Chain:
         self.name = f"test.rollback_chain.{uuid.uuid4().hex[:10]}"
         self.ids: dict[str, uuid.UUID] = {}
         with db.owner.connect() as c:
-            row = c.execute(text("SELECT id, concept_id, version FROM ontology.concept_version "
-                                 "ORDER BY concept_id, version LIMIT 1")).one()
+            row = c.execute(
+                text(
+                    "SELECT id, concept_id, version FROM ontology.concept_version ORDER BY concept_id, version LIMIT 1"
+                )
+            ).one()
             self.concept_id, self.concept = row.id, f"{row.concept_id}@{row.version}"
             self.source = c.execute(text("SELECT id FROM evidence.source ORDER BY source_key LIMIT 1")).scalar_one()
             self.spec = c.execute(text("SELECT sha256 FROM meta.artifact ORDER BY sha256 LIMIT 1")).scalar_one()
@@ -50,24 +53,32 @@ class Chain:
         return act.id
 
     def _elig(self, c: Any, v: str, decision: str, app: dict[str, Any]) -> None:
-        c.execute(text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+        c.execute(
+            text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
                             decision, policy_version, review_activity_id)
                           VALUES (:cv, :c, CAST(:ap AS jsonb), :d, 'promotion-test', :a)"""),
-                  {"cv": self.ids[v], "c": self.concept_id, "ap": json.dumps(app), "d": decision,
-                   "a": self._activity(c)})
+            {"cv": self.ids[v], "c": self.concept_id, "ap": json.dumps(app), "d": decision, "a": self._activity(c)},
+        )
 
     def promote(self, v: str, *, digest: str | None = None) -> None:
         """Register v as eligible and retire every currently eligible version as superseded by it."""
         with self.db.owner.begin() as c:
-            self.ids[v] = c.execute(text(
-                """INSERT INTO evidence.connector_version(source_id, name, version, spec_sha256, code_digest,
-                     declared_capabilities) VALUES (:s, :n, :v, :sp, :cd, '{"datasets": ["test"]}') RETURNING id"""),
-                {"s": self.source, "n": self.name, "v": v, "sp": self.spec, "cd": digest or self.digest}).scalar_one()
+            self.ids[v] = c.execute(
+                text(
+                    """INSERT INTO evidence.connector_version(source_id, name, version, spec_sha256, code_digest,
+                     declared_capabilities) VALUES (:s, :n, :v, :sp, :cd, '{"datasets": ["test"]}') RETURNING id"""
+                ),
+                {"s": self.source, "n": self.name, "v": v, "sp": self.spec, "cd": digest or self.digest},
+            ).scalar_one()
             active = [o for o in self.ids if o != v and self.latest(o, c) == "eligible"]
             self._elig(c, v, "eligible", self.app)
             for o in active:
-                self._elig(c, o, "retired", {**self.app, "superseded_by": {"connector_version_id": str(self.ids[v]),
-                                                                          "version": v}})
+                self._elig(
+                    c,
+                    o,
+                    "retired",
+                    {**self.app, "superseded_by": {"connector_version_id": str(self.ids[v]), "version": v}},
+                )
 
     def latest(self, v: str, c: Any = None) -> str | None:
         sql = text("""SELECT decision FROM evidence.eligibility WHERE connector_version_id = :cv
@@ -80,20 +91,30 @@ class Chain:
 
     def last_applicability(self, v: str) -> dict[str, Any]:
         with self.db.owner.connect() as c:
-            return dict(c.execute(text(
-                """SELECT applicability FROM evidence.eligibility WHERE connector_version_id = :cv
-                   AND concept_version_id = :c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
-                {"cv": self.ids[v], "c": self.concept_id}).scalar_one())
+            return dict(
+                c.execute(
+                    text(
+                        """SELECT applicability FROM evidence.eligibility WHERE connector_version_id = :cv
+                   AND concept_version_id = :c ORDER BY recorded_at DESC, id DESC LIMIT 1"""
+                    ),
+                    {"cv": self.ids[v], "c": self.concept_id},
+                ).scalar_one()
+            )
 
     def rollback(self, v: str) -> dict[str, Any]:
         from reva.autonomy.jobs import rollback_promotion
 
         rollback_promotion(self.db.owner, self.name, v, self.concept, ACTOR, "rollback chain test")
         with self.db.owner.connect() as c:
-            return dict(c.execute(text(
-                """SELECT payload FROM ops.outbox WHERE event_type = 'autonomy.connector_rolled_back'
-                   AND payload->>'connector' = :n AND payload->>'version' = :v ORDER BY id DESC LIMIT 1"""),
-                {"n": self.name, "v": v}).scalar_one())
+            return dict(
+                c.execute(
+                    text(
+                        """SELECT payload FROM ops.outbox WHERE event_type = 'autonomy.connector_rolled_back'
+                   AND payload->>'connector' = :n AND payload->>'version' = :v ORDER BY id DESC LIMIT 1"""
+                    ),
+                    {"n": self.name, "v": v},
+                ).scalar_one()
+            )
 
     def states(self) -> dict[str, str | None]:
         return {v: self.latest(v) for v in self.ids}
@@ -123,9 +144,14 @@ def test_rollback_walks_past_an_intermediate_rolled_back_version(db: Any) -> Non
     assert ch.rollback("1.0.2")["restored"] == "1.0.0"
     assert ch.states() == {"1.0.0": "eligible", "1.0.1": "retired", "1.0.2": "retired"}
     with db.owner.connect() as c:  # restored through the DB-checked function (audited)
-        assert c.execute(text("""SELECT count(*) FROM ops.audit WHERE action = 'eligibility.restore'
+        assert (
+            c.execute(
+                text("""SELECT count(*) FROM ops.audit WHERE action = 'eligibility.restore'
                                  AND details->>'rolled_back_connector_version_id' = :rb"""),
-                         {"rb": str(ch.ids["1.0.1"])}).scalar_one() == 1
+                {"rb": str(ch.ids["1.0.1"])},
+            ).scalar_one()
+            == 1
+        )
 
 
 def test_rollback_restores_a_version_superseded_after_an_earlier_rollback(db: Any) -> None:
@@ -163,8 +189,10 @@ def test_a_refused_restoration_keeps_the_rollback(db: Any) -> None:
     ch.promote("1.0.0")
     with db.owner.begin() as c:  # v1's eligibility as the worker would have written it without any approval
         c.execute(text("SET LOCAL session_replication_role = replica"))
-        c.execute(text("UPDATE evidence.eligibility SET recorded_by = 'reva_worker' WHERE connector_version_id = :cv"),
-                  {"cv": ch.ids["1.0.0"]})
+        c.execute(
+            text("UPDATE evidence.eligibility SET recorded_by = 'reva_worker' WHERE connector_version_id = :cv"),
+            {"cv": ch.ids["1.0.0"]},
+        )
         c.execute(text("SET LOCAL session_replication_role = origin"))
     ch.promote("1.0.1")
     assert ch.rollback("1.0.1")["restored"] is None

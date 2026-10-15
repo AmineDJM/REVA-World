@@ -33,13 +33,22 @@ IMPORTS_BILATERAL = REG.concept("trade.hs2709.import_value.bilateral")
 
 
 def _support(t: TimeExtent, scheme: str, key: str, universe: str, agg: str, **res: str) -> Support:
-    return Support(temporal=t, spatial=SpatialRef(scheme=scheme, key=key, authority="test"),
-                   population=PopulationRef(universe=universe), aggregation=agg, resolution=res)  # type: ignore[arg-type]
+    return Support(
+        temporal=t,
+        spatial=SpatialRef(scheme=scheme, key=key, authority="test"),
+        population=PopulationRef(universe=universe),
+        aggregation=agg,
+        resolution=res,
+    )  # type: ignore[arg-type]
 
 
 def _usd(valuation: str | None = None, **kw: object) -> MeasurementBasis:
-    data: dict = {"currency": "USD", "price_basis": "nominal",
-                  "exchange_rate_transform": "provider_converted_to_usd", "valuation": valuation}
+    data: dict = {
+        "currency": "USD",
+        "price_basis": "nominal",
+        "exchange_rate_transform": "provider_converted_to_usd",
+        "valuation": valuation,
+    }
     data.update(kw)
     return MeasurementBasis.model_validate(data)
 
@@ -68,8 +77,13 @@ def test_same_concept_is_identical_to_itself() -> None:
 
 
 def test_jan1_support_does_not_satisfy_midyear_concept() -> None:
-    jan_support = _support(TimeExtent.on_date(date(2023, 1, 1)), "provider_reporter_territory", "WB:FRA",
-                           "de_facto_residents_wdi", "point_in_time_stock")
+    jan_support = _support(
+        TimeExtent.on_date(date(2023, 1, 1)),
+        "provider_reporter_territory",
+        "WB:FRA",
+        "de_facto_residents_wdi",
+        "point_in_time_stock",
+    )
     mid_support = jan_support.model_copy(update={"temporal": TimeExtent.on_date(date(2023, 7, 1))})
     a = SemanticSide.from_concept(MIDYEAR, support=jan_support)
     b = SemanticSide.from_concept(MIDYEAR, support=mid_support)
@@ -87,8 +101,14 @@ def test_temporal_support_parsing() -> None:
 
 
 def _imports_side(concept: Concept, iso: str, valuation: str, year: int = 2023, cls: str = "HS:H6") -> SemanticSide:
-    sup = _support(TimeExtent.calendar_year(year), "provider_reporter_territory", f"COMTRADE:{iso}",
-                   "not_applicable", "period_flow_total", classification=cls)
+    sup = _support(
+        TimeExtent.calendar_year(year),
+        "provider_reporter_territory",
+        f"COMTRADE:{iso}",
+        "not_applicable",
+        "period_flow_total",
+        classification=cls,
+    )
     return SemanticSide.from_concept(concept, support=sup, basis=_usd(valuation))
 
 
@@ -120,34 +140,53 @@ def test_registry_identity_only_concept_does_not_license_summation() -> None:
 
 def test_classification_revision_mismatch_and_missing() -> None:
     summable = _with_profile(IMPORTS, permitted_transformations=("sum",))
-    rep = can_aggregate(_imports_side(summable, "251", "CIF", cls="HS:H5"),
-                        _imports_side(summable, "12", "CIF", cls="HS:H6"))
+    rep = can_aggregate(
+        _imports_side(summable, "251", "CIF", cls="HS:H5"), _imports_side(summable, "12", "CIF", cls="HS:H6")
+    )
     assert rep.codes == {"classification_revision_mismatch"}
     b = _imports_side(summable, "12", "CIF")
-    b = SemanticSide(ref=b.ref, profile=b.profile, basis=b.basis,
-                     support=b.support.model_copy(update={"resolution": {}}))  # type: ignore[union-attr]
+    b = SemanticSide(
+        ref=b.ref, profile=b.profile, basis=b.basis, support=b.support.model_copy(update={"resolution": {}})
+    )  # type: ignore[union-attr]
     rep2 = can_aggregate(_imports_side(summable, "251", "CIF"), b)
     assert rep2.verdict is Verdict.blocked and "classification_missing" in rep2.codes
 
 
 def test_eurostat_leaf_cells_at_same_date_can_be_summed() -> None:
     def cell(age: str) -> SemanticSide:
-        sup = _support(TimeExtent.on_date(date(2023, 1, 1)), "eurostat_geo_code", "ESTAT:FR",
-                       "usually_resident_population_eurostat", "point_in_time_stock", age=age, sex="F")
+        sup = _support(
+            TimeExtent.on_date(date(2023, 1, 1)),
+            "eurostat_geo_code",
+            "ESTAT:FR",
+            "usually_resident_population_eurostat",
+            "point_in_time_stock",
+            age=age,
+            sex="F",
+        )
         return SemanticSide.from_concept(JAN1, support=sup)
 
     assert can_aggregate(cell("Y1"), cell("Y2")).verdict is Verdict.compatible
     later = cell("Y3")
-    later = SemanticSide(ref=later.ref, profile=later.profile,
-                         support=later.support.model_copy(  # type: ignore[union-attr]
-                             update={"temporal": TimeExtent.on_date(date(2024, 1, 1))}))
+    later = SemanticSide(
+        ref=later.ref,
+        profile=later.profile,
+        support=later.support.model_copy(  # type: ignore[union-attr]
+            update={"temporal": TimeExtent.on_date(date(2024, 1, 1))}
+        ),
+    )
     assert "temporal_extent_mismatch" in can_aggregate(cell("Y1"), later).codes
 
 
 def test_non_additive_scale_type_refused() -> None:
-    ratio = SemanticProfile(population_universe="u", temporal_support="annual_total", spatial_support="s",
-                            aggregation="period_rate", scale_type="ratio", unit_ref="unit.ratio",
-                            permitted_transformations=("sum",))
+    ratio = SemanticProfile(
+        population_universe="u",
+        temporal_support="annual_total",
+        spatial_support="s",
+        aggregation="period_rate",
+        scale_type="ratio",
+        unit_ref="unit.ratio",
+        permitted_transformations=("sum",),
+    )
     sup = _support(TimeExtent.calendar_year(2023), "s", "k", "u", "period_rate")
     a = SemanticSide(ref="r@1", profile=ratio, support=sup)
     assert "non_additive_scale_type" in can_aggregate(a, a).codes
@@ -185,8 +224,13 @@ def test_currency_amount_without_basis_blocks_aggregation() -> None:
 
 
 def _gdp(iso: str, year: int, basis: MeasurementBasis | None) -> CountryValue:
-    sup = _support(TimeExtent.calendar_year(year), "provider_reporter_territory", f"WB:{iso}",
-                   "resident_producers_of_economy", "period_flow_total")
+    sup = _support(
+        TimeExtent.calendar_year(year),
+        "provider_reporter_territory",
+        f"WB:{iso}",
+        "resident_producers_of_economy",
+        "period_flow_total",
+    )
     return CountryValue(entity_key=iso, side=SemanticSide.from_concept(GDP, support=sup, basis=basis))
 
 
@@ -204,8 +248,10 @@ def test_countries_with_different_gdp_bases_cannot_be_combined() -> None:
     rep = can_combine_countries([_gdp("FRA", 2023, _usd()), _gdp("CHN", 2023, ppp)])
     assert {"price_basis_mismatch", "price_reference_year_mismatch", "exchange_rate_transform_mismatch"} <= rep.codes
     fx = _usd(exchange_rate_transform="atlas_method")
-    assert "exchange_rate_transform_mismatch" in can_combine_countries(
-        [_gdp("FRA", 2023, _usd()), _gdp("USA", 2023, fx)]).codes
+    assert (
+        "exchange_rate_transform_mismatch"
+        in can_combine_countries([_gdp("FRA", 2023, _usd()), _gdp("USA", 2023, fx)]).codes
+    )
 
 
 def test_combination_blocked_without_basis_or_reference_year() -> None:

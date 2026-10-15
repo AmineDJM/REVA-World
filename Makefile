@@ -107,7 +107,7 @@ test-live: ## Live provider smoke tests (network)
 lint: imports ## = CI static job lint steps: Ruff lint + import boundaries
 	$(PY) ruff check .
 
-format-check: ## Ruff format check (advisory in CI until the tree is formatted)
+format-check: ## Ruff format check (blocking in CI)
 	$(PY) ruff format --check .
 
 format: ## Apply Ruff formatting

@@ -30,13 +30,25 @@ ROOT = Path(__file__).resolve().parents[3]
 
 
 def spec(**kw: Any) -> dict[str, Any]:
-    base = {"schema_version": "2.0.0", "title": "SFX1 retirement test", "model_key": ra.MODEL_KEY,
-            "model_version": ra.MODEL_VERSION, "countries": ["FRA"], "reference_year": 2024,
-            "horizon": {"periods": 16, "unit": "calendar_year"}, "fidelity": "L1",
-            "intervention": {"kind": "retirement_age_rule_path", "scenario_path": "law_in_force_2026",
-                             "reference_path": "law_2010_as_amended_2011"},
-            "assumptions": {"observed_path": "law_in_force_2026"}, "missing_input_policy": "fail",
-            "outputs": sorted(ra.OUTPUTS), "seed": 0}
+    base = {
+        "schema_version": "2.0.0",
+        "title": "SFX1 retirement test",
+        "model_key": ra.MODEL_KEY,
+        "model_version": ra.MODEL_VERSION,
+        "countries": ["FRA"],
+        "reference_year": 2024,
+        "horizon": {"periods": 16, "unit": "calendar_year"},
+        "fidelity": "L1",
+        "intervention": {
+            "kind": "retirement_age_rule_path",
+            "scenario_path": "law_in_force_2026",
+            "reference_path": "law_2010_as_amended_2011",
+        },
+        "assumptions": {"observed_path": "law_in_force_2026"},
+        "missing_input_policy": "fail",
+        "outputs": sorted(ra.OUTPUTS),
+        "seed": 0,
+    }
     base.update(kw)
     return base
 
@@ -49,8 +61,9 @@ def run(s: dict[str, Any], fidelity: str = "L1") -> tuple[Any, list[Any]]:
 
 
 def by(rows: list[Any], output: str, variant: str) -> dict[int, Decimal]:
-    return {r.period[0].year: Decimal(r.value["value"]) for r in rows if r.output_key == output
-            and r.variant == variant}
+    return {
+        r.period[0].year: Decimal(r.value["value"]) for r in rows if r.output_key == output and r.variant == variant
+    }
 
 
 def nld_path() -> rl.TablePath:
@@ -96,8 +109,9 @@ def test_born_august_1950_stays_eligible_in_january_2016() -> None:
     assert not rl.is_eligible(p, 1950, 8, 2015, 10)  # 65y2m in October 2015: not yet
 
 
-def _brute_force_eligible(table: rl.RuleTable, path: str, kind: str, track: str, by_: int, bm: int, year: int,
-                          month: int, first_year: int) -> bool:
+def _brute_force_eligible(
+    table: rl.RuleTable, path: str, kind: str, track: str, by_: int, bm: int, year: int, month: int, first_year: int
+) -> bool:
     """Independent check: any month tau <= observation with age(tau) >= age of tau's calendar year
     (scanned from age 60 or the table's first covered year, whichever is later)."""
     obs = 12 * year + month - 1
@@ -123,8 +137,7 @@ def test_claim_year_eligibility_is_monotone_and_matches_brute_force(which: str) 
                 now = rl.is_eligible(p, by_, bm, y, m)
                 assert not (was and not now), f"{which}: born {by_}-{bm:02d} loses eligibility in {y}-{m:02d}"
                 if y >= first_year + 3:  # brute force needs coverage of the years it scans
-                    assert now == _brute_force_eligible(p.table, p.path, p.age_kind, p.track, by_, bm, y, m,
-                                                        first_year)
+                    assert now == _brute_force_eligible(p.table, p.path, p.age_kind, p.track, by_, bm, y, m, first_year)
                 was = was or now
 
 
@@ -142,31 +155,51 @@ def test_nld_ineligible_share_no_longer_counts_revoked_persons() -> None:
 
 # --------------------------------------------------------------------------- M3
 def deu_spec(intervention: dict[str, Any]) -> dict[str, Any]:
-    return spec(countries=["DEU"], reference_year=2023, horizon={"periods": 17, "unit": "calendar_year"},
-                intervention=intervention,
-                assumptions={"observed_path": "law_in_force",
-                             "employment_response": {"central": "staubli_zweimuller_2013_aut"}})
+    return spec(
+        countries=["DEU"],
+        reference_year=2023,
+        horizon={"periods": 17, "unit": "calendar_year"},
+        intervention=intervention,
+        assumptions={
+            "observed_path": "law_in_force",
+            "employment_response": {"central": "staubli_zweimuller_2013_aut"},
+        },
+    )
 
 
 def test_shift_beyond_age_69_is_refused_not_cut() -> None:
-    s = deu_spec({"kind": "retirement_age_shift", "reference_path": "law_in_force", "shift_months": 60,
-                  "first_birth_year": 1964})
+    s = deu_spec(
+        {"kind": "retirement_age_shift", "reference_path": "law_in_force", "shift_months": 60, "first_birth_year": 1964}
+    )
     with pytest.raises(CapabilityGap) as e:
         ra.MODEL.validate(s)
     assert e.value.details["capability"] == "social.retirement_age.age_range"
     assert {c["age"] for c in e.value.details["cells"]} >= {70}
-    ok = deu_spec({"kind": "retirement_age_shift", "reference_path": "law_in_force", "shift_months": 12,
-                   "first_birth_year": 1964})  # 67 -> 68: inside 55-69
+    ok = deu_spec(
+        {"kind": "retirement_age_shift", "reference_path": "law_in_force", "shift_months": 12, "first_birth_year": 1964}
+    )  # 67 -> 68: inside 55-69
     ra.MODEL.validate(ok)
 
 
 def test_eligibility_below_55_is_refused() -> None:
-    s = spec(intervention={"kind": "retirement_age_shift", "reference_path": "law_in_force_2026",
-                           "shift_months": -60, "first_birth_year": 1975},
-             horizon={"periods": 16, "unit": "calendar_year"})
+    s = spec(
+        intervention={
+            "kind": "retirement_age_shift",
+            "reference_path": "law_in_force_2026",
+            "shift_months": -60,
+            "first_birth_year": 1975,
+        },
+        horizon={"periods": 16, "unit": "calendar_year"},
+    )
     ra.MODEL.validate(s)  # 64 - 5 = 59: inside the range
-    s2 = spec(intervention={"kind": "retirement_age_target", "reference_path": "law_in_force_2026",
-                            "target_age_months": 12 * 54, "first_birth_year": 1975})
+    s2 = spec(
+        intervention={
+            "kind": "retirement_age_target",
+            "reference_path": "law_in_force_2026",
+            "target_age_months": 12 * 54,
+            "first_birth_year": 1975,
+        }
+    )
     with pytest.raises(CapabilityGap) as e:
         ra.MODEL.validate(s2)
     assert e.value.details["capability"] == "social.retirement_age.age_range"
@@ -177,10 +210,18 @@ def test_eligibility_below_55_is_refused() -> None:
 def test_target_age_level_equals_the_equivalent_shift() -> None:
     """FRA law in force: 64 years for cohorts from 1969. A target of 65 years (780 months) from 1969 must
     give exactly the results of a +12-month shift from 1969."""
-    target = {"kind": "retirement_age_target", "reference_path": "law_in_force_2026", "target_age_months": 780,
-              "first_birth_year": 1969}
-    shift = {"kind": "retirement_age_shift", "reference_path": "law_in_force_2026", "shift_months": 12,
-             "first_birth_year": 1969}
+    target = {
+        "kind": "retirement_age_target",
+        "reference_path": "law_in_force_2026",
+        "target_age_months": 780,
+        "first_birth_year": 1969,
+    }
+    shift = {
+        "kind": "retirement_age_shift",
+        "reference_path": "law_in_force_2026",
+        "shift_months": 12,
+        "first_birth_year": 1969,
+    }
     _, rt = run(spec(intervention=target))
     _, rs = run(spec(intervention=shift))
     for out in ("pension_recipients_change", "employment_change_55_69"):
@@ -207,14 +248,24 @@ def test_target_level_keeps_earlier_cohorts_and_phases_in() -> None:
 def test_target_intervention_is_in_the_plugin_schema_and_scenario_contract() -> None:
     kinds = [b["properties"]["kind"]["const"] for b in ra.spec_schema()["intervention"]["oneOf"]]
     assert "retirement_age_target" in kinds
-    branch = next(b for b in ra.spec_schema()["intervention"]["oneOf"]
-                  if b["properties"]["kind"]["const"] == "retirement_age_target")
+    branch = next(
+        b
+        for b in ra.spec_schema()["intervention"]["oneOf"]
+        if b["properties"]["kind"]["const"] == "retirement_age_target"
+    )
     assert branch["required"] == ["kind", "reference_path", "target_age_months", "first_birth_year"]
     contract = (ROOT / "contracts" / "scenario.schema.json").read_text(encoding="utf-8")
     assert "retirement_age_target" in contract and "target_age_months" in contract
     with pytest.raises(ValidationProblem):
-        ra.MODEL.validate(spec(intervention={"kind": "retirement_age_target", "reference_path": "law_in_force_2026",
-                                             "first_birth_year": 1969}))
+        ra.MODEL.validate(
+            spec(
+                intervention={
+                    "kind": "retirement_age_target",
+                    "reference_path": "law_in_force_2026",
+                    "first_birth_year": 1969,
+                }
+            )
+        )
 
 
 # --------------------------------------------------------------------------- H4 and M4
@@ -232,15 +283,17 @@ def test_l2_has_pension_drop_bounding_variants_inside_the_range(l2: tuple[Any, l
     # France: every affected age (62-64) is in the 60-64 group, so the central equals the 60-64 variant;
     # the 65-69 group's inactivity (mostly retired) gives a larger drop
     assert a and b and a == own and abs(b[2035]) > abs(a[2035]) > 0
-    rng = {r.period[0].year: r for r in rows if r.variant == ra.SENSITIVITY_VARIANT
-           and r.output_key == "pension_recipients_change"}
+    rng = {
+        r.period[0].year: r
+        for r in rows
+        if r.variant == ra.SENSITIVITY_VARIANT and r.output_key == "pension_recipients_change"
+    }
     for y, r in rng.items():
         lo, hi = Decimal(r.value["lower"]), Decimal(r.value["upper"])
         assert lo <= min(a[y], b[y], own[y]) and max(a[y], b[y], own[y]) <= hi
         assert lo_v in r.applicability["range_over"] and hi_v in r.applicability["range_over"]
     row = next(r for r in rows if r.variant == lo_v)
-    assert row.applicability["pension_drop"] == {"basis": "Y60-64", "direction": "unknown",
-                                                 "role": "bounding variant"}
+    assert row.applicability["pension_drop"] == {"basis": "Y60-64", "direction": "unknown", "role": "bounding variant"}
 
 
 def test_no_upper_bound_claim_for_the_proxy(l2: tuple[Any, list[Any]]) -> None:
@@ -262,8 +315,15 @@ def test_france_is_qualified_and_every_value_carries_its_qualification(l2: tuple
 
 
 def test_germany_central_value_is_published_with_its_qualification() -> None:
-    _, rows = run(deu_spec({"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                            "reference_path": "pre_2007_counterfactual"}))
+    _, rows = run(
+        deu_spec(
+            {
+                "kind": "retirement_age_rule_path",
+                "scenario_path": "law_in_force",
+                "reference_path": "pre_2007_counterfactual",
+            }
+        )
+    )
     central = [r for r in rows if r.variant == "L1" and r.output_key == "pension_recipients_change"]
     assert central
     for r in central:
@@ -274,13 +334,19 @@ def test_germany_central_value_is_published_with_its_qualification() -> None:
 
 # --------------------------------------------------------------------------- M8 and H1 through PEN
 def test_one_year_population_base_needs_explicit_opt_in_and_is_warned() -> None:
-    s = spec(horizon={"periods": 2, "unit": "calendar_year"},
-             assumptions={"observed_path": "law_in_force_2026", "population": {"base_period_years": 1}})
+    s = spec(
+        horizon={"periods": 2, "unit": "calendar_year"},
+        assumptions={"observed_path": "law_in_force_2026", "population": {"base_period_years": 1}},
+    )
     with pytest.raises(ValidationProblem, match="allow_single_year_migration"):
         ra.MODEL.validate(s)
-    ok = spec(horizon={"periods": 2, "unit": "calendar_year"},
-              assumptions={"observed_path": "law_in_force_2026",
-                           "population": {"base_period_years": 1, "allow_single_year_migration": True}})
+    ok = spec(
+        horizon={"periods": 2, "unit": "calendar_year"},
+        assumptions={
+            "observed_path": "law_in_force_2026",
+            "population": {"base_period_years": 1, "allow_single_year_migration": True},
+        },
+    )
     c, rows = run(ok)
     codes = [w["code"] for w in c.countries[0].data.population_summary["warnings"]]
     assert "migration_window_single_year" in codes and "base_period_single_year" in codes
@@ -288,8 +354,15 @@ def test_one_year_population_base_needs_explicit_opt_in_and_is_warned() -> None:
 
 
 def test_germany_population_excludes_the_2023_census_break() -> None:
-    c, rows = run(deu_spec({"kind": "retirement_age_rule_path", "scenario_path": "law_in_force",
-                            "reference_path": "pre_2007_counterfactual"}))
+    c, rows = run(
+        deu_spec(
+            {
+                "kind": "retirement_age_rule_path",
+                "scenario_path": "law_in_force",
+                "reference_path": "pre_2007_counterfactual",
+            }
+        )
+    )
     summary = c.countries[0].data.population_summary
     assert summary["migration_window"]["years_used"] == [2019, 2020, 2021, 2023]
     w = summary["warnings"][0]

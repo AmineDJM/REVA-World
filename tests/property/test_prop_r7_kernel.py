@@ -54,15 +54,17 @@ SLOW = settings(max_examples=60, deadline=None, suppress_health_check=[HealthChe
 TAGS = ("$float", "$decimal", "$datetime", "$date")
 
 # --------------------------------------------------------------------------- strategies
-_offsets = st.integers(min_value=-(24 * 60 - 1), max_value=24 * 60 - 1).map(
-    lambda m: timezone(timedelta(minutes=m)))
+_offsets = st.integers(min_value=-(24 * 60 - 1), max_value=24 * 60 - 1).map(lambda m: timezone(timedelta(minutes=m)))
 # Instants away from datetime.min/max so every offset is representable (edge case tested below).
 _utc_instants = st.datetimes(min_value=datetime(2, 1, 1), max_value=datetime(9998, 12, 31)).map(
-    lambda d: d.replace(tzinfo=UTC))
+    lambda d: d.replace(tzinfo=UTC)
+)
 _aware = st.builds(lambda d, tz: d.astimezone(tz), _utc_instants, _offsets)
 _decimals = st.builds(
     lambda sign, digits, exp: Decimal((sign, tuple(int(c) for c in str(digits)), exp)),
-    st.integers(0, 1), st.integers(0, 10**40), st.integers(-60, 60),
+    st.integers(0, 1),
+    st.integers(0, 10**40),
+    st.integers(-60, 60),
 )
 _keys = st.one_of(
     st.text(max_size=6),
@@ -70,10 +72,16 @@ _keys = st.one_of(
     st.text(max_size=4).map(lambda s: "$" + s),
 )
 _scalars = st.one_of(
-    st.none(), st.booleans(), st.integers(min_value=-(10**30), max_value=10**30),
-    st.floats(allow_nan=False, allow_infinity=False), _decimals, st.text(max_size=8),
+    st.none(),
+    st.booleans(),
+    st.integers(min_value=-(10**30), max_value=10**30),
+    st.floats(allow_nan=False, allow_infinity=False),
+    _decimals,
+    st.text(max_size=8),
     st.sampled_from(["$float", "$decimal", "1.5", "2020-01-01"]),
-    st.dates(), _aware, st.uuids(),
+    st.dates(),
+    _aware,
+    st.uuids(),
 )
 json_like = st.recursive(
     _scalars,
@@ -114,7 +122,7 @@ def _decode(j: Any) -> Any:
         return [_decode(v) for v in j]
     if isinstance(j, dict):
         if len(j) == 1:
-            (k, v), = j.items()
+            ((k, v),) = j.items()
             if k == "$float":
                 return float(v)
             if k == "$decimal":
@@ -179,8 +187,7 @@ def test_distinct_objects_have_distinct_hashes(a: Any, b: Any) -> None:
 
 @FAST
 @given(st.sampled_from(TAGS), _decimals, st.floats(allow_nan=False, allow_infinity=False), st.dates(), _aware)
-def test_user_mapping_never_hashes_like_a_tagged_scalar(tag: str, d: Decimal, f: float, dd: date,
-                                                        dt: datetime) -> None:
+def test_user_mapping_never_hashes_like_a_tagged_scalar(tag: str, d: Decimal, f: float, dd: date, dt: datetime) -> None:
     tagged = {"$float": f, "$decimal": d, "$datetime": dt, "$date": dd}[tag]
     payload = json.loads(canonical_bytes(tagged))[tag]
     spoof = {tag: payload}
@@ -212,15 +219,21 @@ def test_naive_datetimes_are_rejected_anywhere(naive: datetime, ctx: Any) -> Non
 
 def test_edge_of_calendar_aware_datetime_is_encoded_or_rejected_with_valueerror() -> None:
     # R7-K1: 0000-12-31T19:00Z and 10000-01-01T04:00Z are not representable in UTC.
-    for edge in (datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=5))),
-                 datetime(9999, 12, 31, 23, tzinfo=timezone(timedelta(hours=-5)))):
+    for edge in (
+        datetime(1, 1, 1, tzinfo=timezone(timedelta(hours=5))),
+        datetime(9999, 12, 31, 23, tzinfo=timezone(timedelta(hours=-5))),
+    ):
         with pytest.raises(ValueError, match="representable UTC range"):
             canonical_bytes(edge)
     # Representable instants keep their reva-cjson-2 encoding (the fix changes no successful output).
-    assert canonical_bytes(datetime(1, 1, 1, 5, tzinfo=timezone(timedelta(hours=5)))) == \
-        b'{"$datetime":"0001-01-01T00:00:00+00:00"}'
-    assert canonical_bytes(datetime(2020, 1, 1, 1, tzinfo=timezone(timedelta(hours=1)))) == \
-        b'{"$datetime":"2020-01-01T00:00:00+00:00"}'
+    assert (
+        canonical_bytes(datetime(1, 1, 1, 5, tzinfo=timezone(timedelta(hours=5))))
+        == b'{"$datetime":"0001-01-01T00:00:00+00:00"}'
+    )
+    assert (
+        canonical_bytes(datetime(2020, 1, 1, 1, tzinfo=timezone(timedelta(hours=1))))
+        == b'{"$datetime":"2020-01-01T00:00:00+00:00"}'
+    )
 
 
 def test_lone_surrogate_string_is_rejected_with_valueerror() -> None:
@@ -243,15 +256,28 @@ _basis = st.builds(
 _sha = st.text(alphabet="0123456789abcdef", min_size=64, max_size=64)
 values = st.one_of(
     st.builds(ScalarDecimal, value=_dec_strings, unit_ref=st.text(min_size=1, max_size=8), basis=_basis),
-    st.builds(ScalarFloat, value=st.floats(allow_nan=False, allow_infinity=False),
-              unit_ref=st.text(min_size=1, max_size=8), basis=_basis),
+    st.builds(
+        ScalarFloat,
+        value=st.floats(allow_nan=False, allow_infinity=False),
+        unit_ref=st.text(min_size=1, max_size=8),
+        basis=_basis,
+    ),
     st.builds(Category, code=st.text(max_size=8), vocabulary_version=st.text(max_size=4)),
-    st.builds(Text, language_tag=st.sampled_from(["en", "fr"]), text=st.one_of(st.none(), st.text(max_size=10)),
-              artifact_sha256=st.one_of(st.none(), _sha)),
+    st.builds(
+        Text,
+        language_tag=st.sampled_from(["en", "fr"]),
+        text=st.one_of(st.none(), st.text(max_size=10)),
+        artifact_sha256=st.one_of(st.none(), _sha),
+    ),
     st.builds(EntityRefValue, entity_id=st.uuids()),
-    st.builds(ArrayValue, artifact_sha256=_sha, dtype=st.sampled_from(["float64", "int32"]),
-              shape=st.lists(st.integers(0, 9), max_size=3).map(tuple),
-              axes=st.lists(st.text(max_size=3), max_size=3).map(tuple), unit_ref=st.text(max_size=5)),
+    st.builds(
+        ArrayValue,
+        artifact_sha256=_sha,
+        dtype=st.sampled_from(["float64", "int32"]),
+        shape=st.lists(st.integers(0, 9), max_size=3).map(tuple),
+        axes=st.lists(st.text(max_size=3), max_size=3).map(tuple),
+        unit_ref=st.text(max_size=5),
+    ),
     st.builds(DistributionValue, uncertainty_ref=st.text(max_size=8)),
     st.builds(GeometryValue, spatial_support_ref=st.text(max_size=8)),
     st.builds(Missing, reason=st.sampled_from(list(MissingReason))),
@@ -345,8 +371,9 @@ _bound_str = st.one_of(st.none(), _dec_strings)
 _levels = st.one_of(st.none(), st.sampled_from([0.0, 0.5, 0.9, 0.95, 1.0, -0.1, 1.5]))
 
 
-def _expected_valid(status: str, kind: str, level: float | None, lower: str | None, upper: str | None,
-                    method: str | None) -> bool:
+def _expected_valid(
+    status: str, kind: str, level: float | None, lower: str | None, upper: str | None, method: str | None
+) -> bool:
     if status == "unquantified" and kind != "unknown":
         return False
     if status == "exact_by_definition" and kind != "definition":
@@ -367,13 +394,21 @@ def _expected_valid(status: str, kind: str, level: float | None, lower: str | No
 
 
 @settings(max_examples=400, deadline=None)
-@given(st.sampled_from([s.value for s in UncertaintyStatus]), st.sampled_from([k.value for k in UncertaintyKind]),
-       _levels, _bound_str, _bound_str, st.sampled_from([None, "", "m@1"]))
-def test_uncertainty_spec_invariants(status: str, kind: str, level: float | None, lower: str | None,
-                                     upper: str | None, method: str | None) -> None:
+@given(
+    st.sampled_from([s.value for s in UncertaintyStatus]),
+    st.sampled_from([k.value for k in UncertaintyKind]),
+    _levels,
+    _bound_str,
+    _bound_str,
+    st.sampled_from([None, "", "m@1"]),
+)
+def test_uncertainty_spec_invariants(
+    status: str, kind: str, level: float | None, lower: str | None, upper: str | None, method: str | None
+) -> None:
     try:
-        spec = UncertaintySpec(status=status, kind=kind, description="d", level=level, lower=lower, upper=upper,
-                               method_version=method)
+        spec = UncertaintySpec(
+            status=status, kind=kind, description="d", level=level, lower=lower, upper=upper, method_version=method
+        )
         ok = True
     except ValidationError:
         ok = False
@@ -400,8 +435,9 @@ def test_sensitivity_range_never_carries_a_level(a: str, b: str, level: float) -
 @given(st.sampled_from([" 1", "1_0", "1e5", "+1", "01"]))
 def test_uncertainty_bounds_must_be_plain_decimals(bad: str) -> None:
     with pytest.raises(ValidationError):
-        UncertaintySpec(status="quantified", kind="bounds", description="d", method_version="m",
-                        lower=bad, upper="999999")
+        UncertaintySpec(
+            status="quantified", kind="bounds", description="d", method_version="m", lower=bad, upper="999999"
+        )
 
 
 # --------------------------------------------------------------------------- TimeExtent
@@ -458,36 +494,42 @@ def test_bound_lies_within_its_uncertain_bound(x: date, e: date, l_: date, end_s
 @settings(max_examples=50, deadline=None)
 @given(_dates, st.integers(1, 3650), st.integers(0, 3650), st.booleans())
 @example(date(2020, 1, 1), 365, 0, False)
-def test_interval_whose_end_precedes_every_admissible_start_is_rejected(s: date, gap: int, width: int,
-                                                                        end_side: bool) -> None:
+def test_interval_whose_end_precedes_every_admissible_start_is_rejected(
+    s: date, gap: int, width: int, end_side: bool
+) -> None:
     assume(s.toordinal() - (gap + width) > 1)  # ordinal arithmetic: date subtraction below year 1 overflows
     before = UncertainBound(earliest=s - timedelta(days=gap + width), latest=s - timedelta(days=gap))
     if end_side:  # every admissible end is before the start
         kw = {"start": s, "end_uncertainty": before}
     else:  # end is before every admissible start
-        kw = {"start": None, "start_uncertainty": UncertainBound(earliest=s, latest=s + timedelta(days=width)),
-              "end": s - timedelta(days=gap)}
+        kw = {
+            "start": None,
+            "start_uncertainty": UncertainBound(earliest=s, latest=s + timedelta(days=width)),
+            "end": s - timedelta(days=gap),
+        }
     with pytest.raises(ValidationError):
         TimeExtent(kind="interval", precision=Precision.day, **kw)
 
 
 def test_instant_never_has_an_end_bound() -> None:
     with pytest.raises(ValidationError):
-        TimeExtent(kind="instant", precision=Precision.day, start=date(2020, 1, 1),
-                   end_uncertainty=UncertainBound(earliest=date(2020, 1, 2), latest=date(2020, 2, 1)))
+        TimeExtent(
+            kind="instant",
+            precision=Precision.day,
+            start=date(2020, 1, 1),
+            end_uncertainty=UncertainBound(earliest=date(2020, 1, 2), latest=date(2020, 2, 1)),
+        )
 
 
 @FAST
 @given(_dates, st.integers(0, 400), st.integers(0, 400), st.integers(-400, 400))
-def test_uncertain_interval_accepted_iff_some_admissible_pair_is_non_empty(s: date, sw: int, ew: int,
-                                                                          off: int) -> None:
+def test_uncertain_interval_accepted_iff_some_admissible_pair_is_non_empty(s: date, sw: int, ew: int, off: int) -> None:
     assume(date(1, 1, 1) + timedelta(days=sw + ew + 800) < s < date(9998, 1, 1))
     su = UncertainBound(earliest=s, latest=s + timedelta(days=sw))
     e0 = s + timedelta(days=off)
     eu = UncertainBound(earliest=e0, latest=e0 + timedelta(days=ew))
     try:
-        TimeExtent(kind="interval", precision=Precision.day, start=None, start_uncertainty=su,
-                   end_uncertainty=eu)
+        TimeExtent(kind="interval", precision=Precision.day, start=None, start_uncertainty=su, end_uncertainty=eu)
         ok = True
     except ValidationError:
         ok = False
@@ -515,8 +557,10 @@ def test_external_id_is_deterministic(p: str, k: str, ep: str) -> None:
 
 
 @settings(max_examples=300, deadline=None)
-@given(st.tuples(_component.filter(bool), _component.filter(bool), _component),
-       st.tuples(_component.filter(bool), _component.filter(bool), _component))
+@given(
+    st.tuples(_component.filter(bool), _component.filter(bool), _component),
+    st.tuples(_component.filter(bool), _component.filter(bool), _component),
+)
 @example(("a\x1fb", "c", "1"), ("a", "b\x1fc", "1"))
 @example(("a\\u001f", "b", "1"), ("a\x1f", "b", "1"))
 def test_external_id_is_injective_over_components(t1: tuple[str, str, str], t2: tuple[str, str, str]) -> None:

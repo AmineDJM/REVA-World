@@ -84,7 +84,9 @@ def load_pinned(path: Path, expected_sha256: str) -> PinnedPolicy:
         raise PolicyIntegrityError(
             f"policy {path.name} changed (sha256 {got[:12]}… != pinned {expected_sha256[:12]}…); "
             "gates refuse until a maintainer re-pins it",
-            policy=path.name, expected=expected_sha256, actual=got,
+            policy=path.name,
+            expected=expected_sha256,
+            actual=got,
         )
     content = yaml.safe_load(data)
     if not isinstance(content, dict):
@@ -114,8 +116,10 @@ class AutonomyGuard:
     @classmethod
     def from_settings(cls, settings: Any, budgets: PinnedPolicy | None = None) -> AutonomyGuard:
         b = budgets.content if budgets is not None else budgets_policy().content
-        llm_budget = min(float(getattr(settings, "reva_llm_monthly_budget_usd", 0) or 0),
-                         float((b.get("llm") or {}).get("monthly_usd", 0)))
+        llm_budget = min(
+            float(getattr(settings, "reva_llm_monthly_budget_usd", 0) or 0),
+            float((b.get("llm") or {}).get("monthly_usd", 0)),
+        )
         return cls(
             kill_switch=bool(getattr(settings, "reva_autonomy_kill_switch", False)),
             mode=str(getattr(settings, "reva_autonomy_mode", "template_only")),
@@ -160,7 +164,8 @@ class AutonomyGuard:
         if n >= self.max_open_proposals:
             raise AutonomyBlocked(
                 f"proposal backlog is full ({n} open >= {self.max_open_proposals}); no new proposals",
-                open=n, limit=self.max_open_proposals,
+                open=n,
+                limit=self.max_open_proposals,
             )
         return n
 
@@ -196,31 +201,61 @@ def live_kill_reason(env: Mapping[str, str] | None = None) -> str | None:
 
 def open_proposal_count(conn: Connection) -> int:
     """Proposals without a final gate decision (pass/fail) and without a human review."""
-    return int(conn.execute(text(
-        """SELECT count(*) FROM ops.proposal p
+    return int(
+        conn.execute(
+            text(
+                """SELECT count(*) FROM ops.proposal p
            WHERE NOT EXISTS (SELECT 1 FROM ops.gate_result g WHERE g.proposal_id = p.id
                              AND g.decision IN ('pass','fail'))
              AND NOT EXISTS (SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"""
-    )).scalar_one())
+            )
+        ).scalar_one()
+    )
 
 
 # --------------------------------------------------------------------------- tiers
-T3_PATH_PREFIXES = ("src/reva/kernel", "src/reva/adapters/http", "src/reva/adapters/postgres",
-                    "src/reva/autonomy", "migrations", "registry/policies", "src/reva/settings.py",
-                    "src/reva/api/security", "contracts/", ".github", "dockerfile", "pyproject.toml",
-                    "uv.lock", "registry/sources",
-                    # (R4-11) the reviewed template that T1 auto-promotion trusts, and the code
-                    # its digest/behaviour depends on, are reviewed code: changing them is T3.
-                    "src/reva/adapters/connectors/eurostat_template.py",
-                    "src/reva/adapters/connectors/base.py", "src/reva/operations/budgets.py",
-                    # (R6-16) registry data and ontology code that T1 binding treats as ground truth
-                    # (concept semantic profiles, eurostat_geo aliases feeding eligibility scopes).
-                    "registry/concepts", "registry/entities", "registry/requirements",
-                    "src/reva/ontology", "src/reva/ports")
+T3_PATH_PREFIXES = (
+    "src/reva/kernel",
+    "src/reva/adapters/http",
+    "src/reva/adapters/postgres",
+    "src/reva/autonomy",
+    "migrations",
+    "registry/policies",
+    "src/reva/settings.py",
+    "src/reva/api/security",
+    "contracts/",
+    ".github",
+    "dockerfile",
+    "pyproject.toml",
+    "uv.lock",
+    "registry/sources",
+    # (R4-11) the reviewed template that T1 auto-promotion trusts, and the code
+    # its digest/behaviour depends on, are reviewed code: changing them is T3.
+    "src/reva/adapters/connectors/eurostat_template.py",
+    "src/reva/adapters/connectors/base.py",
+    "src/reva/operations/budgets.py",
+    # (R6-16) registry data and ontology code that T1 binding treats as ground truth
+    # (concept semantic profiles, eurostat_geo aliases feeding eligibility scopes).
+    "registry/concepts",
+    "registry/entities",
+    "registry/requirements",
+    "src/reva/ontology",
+    "src/reva/ports",
+)
 # (R6-16) mapping records change what source data means: never below named review (T2).
 T2_PATH_PREFIXES = ("registry/mappings",)
-T3_CAPABILITIES = {"paid_resources", "sensitive_data", "licence_change", "causal_claim", "destructive_migration",
-                   "secret_access", "network_any", "edit_policy", "edit_allowlist", "edit_gate"}
+T3_CAPABILITIES = {
+    "paid_resources",
+    "sensitive_data",
+    "licence_change",
+    "causal_claim",
+    "destructive_migration",
+    "secret_access",
+    "network_any",
+    "edit_policy",
+    "edit_allowlist",
+    "edit_gate",
+}
 T2_CAPABILITIES = {"execute_code", "new_model", "ontology_mapping", "new_parser", "legal_rule", "run_backtest"}
 T1_CAPABILITIES = {"register_connector_version", "concept_eligibility"}
 T0_CAPABILITIES = {"read", "discover", "report", "propose"}
@@ -237,8 +272,14 @@ def normalise_path(path: str) -> str | None:
     backslashes, drive letters, NUL, or ``..`` escaping the repository): such
     paths are treated as protected (T3).
     """
-    if not isinstance(path, str) or not path or "\\" in path or "\x00" in path or path.startswith("/") \
-            or _DRIVE_RE.match(path):
+    if (
+        not isinstance(path, str)
+        or not path
+        or "\\" in path
+        or "\x00" in path
+        or path.startswith("/")
+        or _DRIVE_RE.match(path)
+    ):
         return None
     n = posixpath.normpath(path)
     if n in (".", "..") or n.startswith("../"):
@@ -248,11 +289,13 @@ def normalise_path(path: str) -> str | None:
 
 def contains_code(changed_paths: tuple[str, ...], capabilities: tuple[str, ...]) -> bool:
     return "execute_code" in capabilities or any(
-        (normalise_path(p) or p.lower()).endswith(CODE_SUFFIXES) for p in changed_paths)
+        (normalise_path(p) or p.lower()).endswith(CODE_SUFFIXES) for p in changed_paths
+    )
 
 
-def derive_tier(changed_paths: tuple[str, ...], capabilities: tuple[str, ...], scientific_change: bool,
-                migration_required: bool) -> tuple[int, list[str]]:
+def derive_tier(
+    changed_paths: tuple[str, ...], capabilities: tuple[str, ...], scientific_change: bool, migration_required: bool
+) -> tuple[int, list[str]]:
     """Minimum tier implied by what a proposal touches. The proposer cannot lower it."""
     reasons: list[str] = []
     tier = 0

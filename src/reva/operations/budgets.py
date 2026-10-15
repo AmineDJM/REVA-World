@@ -120,8 +120,11 @@ def budget_source_key(connector_or_spec: Any) -> str:
     spec = connector_or_spec.describe() if hasattr(connector_or_spec, "describe") else connector_or_spec
     key = getattr(spec, "source_key", None)
     if not isinstance(key, str) or not key:
-        raise BudgetExhausted("connector declares no source_key: no budget applies, refused (fail closed)",
-                              reason="unknown_source", connector=str(getattr(spec, "name", ""))[:128])
+        raise BudgetExhausted(
+            "connector declares no source_key: no budget applies, refused (fail closed)",
+            reason="unknown_source",
+            connector=str(getattr(spec, "name", ""))[:128],
+        )
     return key
 
 
@@ -129,12 +132,20 @@ def source_limit(b: IngestBudget, source_key: str) -> int:
     """The per-source daily request limit; unknown sources and limit 0 are refused."""
     limit = b.per_source_requests.get(source_key)
     if limit is None:
-        raise BudgetExhausted(f"no per-source daily request budget for {source_key}: refused (fail closed)",
-                              reason="unknown_source", source_key=source_key, policy=b.policy_version)
+        raise BudgetExhausted(
+            f"no per-source daily request budget for {source_key}: refused (fail closed)",
+            reason="unknown_source",
+            source_key=source_key,
+            policy=b.policy_version,
+        )
     if limit <= 0:
-        raise BudgetExhausted(f"the daily request budget for {source_key} is 0: no requests allowed",
-                              reason="zero_limit", source_key=source_key, per_source_daily_requests=limit,
-                              policy=b.policy_version)
+        raise BudgetExhausted(
+            f"the daily request budget for {source_key} is 0: no requests allowed",
+            reason="zero_limit",
+            source_key=source_key,
+            per_source_daily_requests=limit,
+            policy=b.policy_version,
+        )
     return limit
 
 
@@ -184,13 +195,22 @@ def _remaining(b: IngestBudget, limit: int, used: Mapping[str, int]) -> tuple[in
     return rem_source, rem_total, min(rem_source, rem_total), b.total_bytes - used["total_bytes"]
 
 
-_INSERT = text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved) VALUES (:a, :o, :u, :r) "
-               "ON CONFLICT (operation_id) DO NOTHING")
+_INSERT = text(
+    "INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved) VALUES (:a, :o, :u, :r) "
+    "ON CONFLICT (operation_id) DO NOTHING"
+)
 
 
 # --------------------------------------------------------------------------- ingestion
-def reserve_ingest(engine: Engine, *, job_id: UUID | str, attempt: int, source_key: str, planned_requests: int,
-                   budget: IngestBudget | None = None) -> Reservation:
+def reserve_ingest(
+    engine: Engine,
+    *,
+    job_id: UUID | str,
+    attempt: int,
+    source_key: str,
+    planned_requests: int,
+    budget: IngestBudget | None = None,
+) -> Reservation:
     """Reserve ``planned_requests`` for this live run or raise :class:`BudgetExhausted`.
 
     Nothing is recorded when the run is refused. ``max_requests`` / ``max_bytes`` of
@@ -206,31 +226,56 @@ def reserve_ingest(engine: Engine, *, job_id: UUID | str, attempt: int, source_k
         _lock(conn)
         used = usage_today(conn, source_key)
         remaining_source, remaining_total, remaining, remaining_bytes = _remaining(b, per_source, used)
-        limits = {"source_key": source_key, "planned_requests": planned_requests, "policy": b.policy_version,
-                  "per_source_daily_requests": per_source, "used_source_requests": used["source_requests"],
-                  "daily_requests_total": b.total_requests, "used_total_requests": used["total_requests"],
-                  "daily_bytes_total": b.total_bytes, "used_total_bytes": used["total_bytes"]}
+        limits = {
+            "source_key": source_key,
+            "planned_requests": planned_requests,
+            "policy": b.policy_version,
+            "per_source_daily_requests": per_source,
+            "used_source_requests": used["source_requests"],
+            "daily_requests_total": b.total_requests,
+            "used_total_requests": used["total_requests"],
+            "daily_bytes_total": b.total_bytes,
+            "used_total_bytes": used["total_bytes"],
+        }
         if remaining_source <= 0 or planned_requests > remaining_source:
             raise BudgetExhausted(
                 f"daily request budget for {source_key} would be exceeded "
                 f"({used['source_requests']} used + {planned_requests} planned > {per_source}); run not started",
-                reason="source_limit", **limits)
+                reason="source_limit",
+                **limits,
+            )
         if remaining_total <= 0 or planned_requests > remaining_total:
             raise BudgetExhausted(
                 f"total daily request budget would be exceeded ({used['total_requests']} used + "
-                f"{planned_requests} planned > {b.total_requests}); run not started", reason="total_limit", **limits)
+                f"{planned_requests} planned > {b.total_requests}); run not started",
+                reason="total_limit",
+                **limits,
+            )
         if remaining_bytes <= 0:
-            raise BudgetExhausted(f"total daily byte budget exhausted ({used['total_bytes']} >= {b.total_bytes}); "
-                                  "run not started", reason="byte_limit", **limits)
-        conn.execute(_INSERT, {"a": account_key(source_key, "requests"), "o": f"{op}:requests", "u": "requests",
-                               "r": planned_requests})
+            raise BudgetExhausted(
+                f"total daily byte budget exhausted ({used['total_bytes']} >= {b.total_bytes}); run not started",
+                reason="byte_limit",
+                **limits,
+            )
+        conn.execute(
+            _INSERT,
+            {"a": account_key(source_key, "requests"), "o": f"{op}:requests", "u": "requests", "r": planned_requests},
+        )
         conn.execute(_INSERT, {"a": account_key(source_key, "bytes"), "o": f"{op}:bytes", "u": "bytes", "r": 0})
-    return Reservation(source_key, f"{op}:requests", f"{op}:bytes", planned_requests, max(0, remaining),
-                       max(0, remaining_bytes), b.policy_version)
+    return Reservation(
+        source_key,
+        f"{op}:requests",
+        f"{op}:bytes",
+        planned_requests,
+        max(0, remaining),
+        max(0, remaining_bytes),
+        b.policy_version,
+    )
 
 
-def top_up(engine: Engine, reservation: Reservation, *, unit: str, want: int,
-           budget: IngestBudget | None = None) -> int:
+def top_up(
+    engine: Engine, reservation: Reservation, *, unit: str, want: int, budget: IngestBudget | None = None
+) -> int:
     """Grow a live reservation by up to ``want`` units (under the egress lock).
 
     Returns the units granted (``0`` when the daily budget is used up). The ledger
@@ -247,8 +292,12 @@ def top_up(engine: Engine, reservation: Reservation, *, unit: str, want: int,
         _, _, remaining, remaining_bytes = _remaining(b, per_source, used)
         grant = max(0, min(want, remaining if unit == "requests" else remaining_bytes))
         if grant:
-            n = conn.execute(text("UPDATE ops.budget_ledger SET reserved = reserved + :g "
-                                  "WHERE operation_id = :o AND consumed IS NULL"), {"g": grant, "o": op}).rowcount
+            n = conn.execute(
+                text(
+                    "UPDATE ops.budget_ledger SET reserved = reserved + :g WHERE operation_id = :o AND consumed IS NULL"
+                ),
+                {"g": grant, "o": op},
+            ).rowcount
             if n != 1:  # settled or unknown reservation: nothing more may be charged to it
                 return 0
     return grant
@@ -263,8 +312,15 @@ class MeteredHttp:
     reserved bytes. ``requests`` / ``bytes`` are the actual usage for :func:`settle`.
     """
 
-    def __init__(self, inner: Any, engine: Engine, reservation: Reservation, *, budget: IngestBudget | None = None,
-                 request_chunk: int = 10) -> None:
+    def __init__(
+        self,
+        inner: Any,
+        engine: Engine,
+        reservation: Reservation,
+        *,
+        budget: IngestBudget | None = None,
+        request_chunk: int = 10,
+    ) -> None:
         self.inner = inner
         self.engine = engine
         self.reservation = reservation
@@ -285,22 +341,27 @@ class MeteredHttp:
 
     def _refuse(self, unit: str) -> BudgetExhausted:
         self.refused += 1
-        return BudgetExhausted(f"daily {unit} budget for {self.reservation.source_key} is used up: request not made",
-                               reason=f"in_run_{unit}_limit", source_key=self.reservation.source_key,
-                               policy=self.reservation.policy_version)
+        return BudgetExhausted(
+            f"daily {unit} budget for {self.reservation.source_key} is used up: request not made",
+            reason=f"in_run_{unit}_limit",
+            source_key=self.reservation.source_key,
+            policy=self.reservation.policy_version,
+        )
 
     async def get(self, url: str, **kw: Any) -> Any:
         if self.requests + 1 > self.reserved_requests:
-            granted = await asyncio.to_thread(top_up, self.engine, self.reservation, unit="requests",
-                                              want=self.request_chunk, budget=self.budget)
+            granted = await asyncio.to_thread(
+                top_up, self.engine, self.reservation, unit="requests", want=self.request_chunk, budget=self.budget
+            )
             self.reserved_requests += granted
             if self.requests + 1 > self.reserved_requests:
                 raise self._refuse("requests")
         per_request = int(kw.get("max_bytes") or getattr(self.inner, "max_bytes", 0) or DEFAULT_REQUEST_BYTES)
         headroom = self.reserved_bytes - self.bytes
         if headroom < per_request:
-            granted = await asyncio.to_thread(top_up, self.engine, self.reservation, unit="bytes",
-                                              want=per_request - headroom, budget=self.budget)
+            granted = await asyncio.to_thread(
+                top_up, self.engine, self.reservation, unit="bytes", want=per_request - headroom, budget=self.budget
+            )
             self.reserved_bytes += granted
             headroom += granted
             if headroom <= 0:
@@ -314,8 +375,7 @@ class MeteredHttp:
         await self.inner.aclose()
 
 
-def metered(http: Any, engine: Engine, reservation: Reservation | None, *,
-            budget: IngestBudget | None = None) -> Any:
+def metered(http: Any, engine: Engine, reservation: Reservation | None, *, budget: IngestBudget | None = None) -> Any:
     """Wrap a live client in :class:`MeteredHttp`; fixture clients (never charged) are returned as is."""
     if reservation is None or getattr(http, "origin", "live") == "test_fixture":
         return http
@@ -334,8 +394,14 @@ def settle_metered(engine: Engine, http: Any) -> dict[str, Any] | None:
         return None
     r = http.reservation
     settle(engine, r, requests=http.requests, nbytes=http.bytes)
-    return {"policy": r.policy_version, "source_key": r.source_key, "reserved_requests": r.planned_requests,
-            "consumed_requests": http.requests, "consumed_bytes": http.bytes, "refused_requests": http.refused}
+    return {
+        "policy": r.policy_version,
+        "source_key": r.source_key,
+        "reserved_requests": r.planned_requests,
+        "consumed_requests": http.requests,
+        "consumed_bytes": http.bytes,
+        "refused_requests": http.refused,
+    }
 
 
 # --------------------------------------------------------------------------- shared egress reservation
@@ -347,8 +413,16 @@ class EgressGrant:
     bytes: int
 
 
-def reserve_egress(engine: Engine, *, purpose: str, source_key: str, operation_id: str, want_requests: int,
-                   want_bytes: int, budget: IngestBudget | None = None) -> EgressGrant:
+def reserve_egress(
+    engine: Engine,
+    *,
+    purpose: str,
+    source_key: str,
+    operation_id: str,
+    want_requests: int,
+    want_bytes: int,
+    budget: IngestBudget | None = None,
+) -> EgressGrant:
     """Reserve up to ``want_requests``/``want_bytes`` for ``purpose`` traffic (all-or-refuse on zero).
 
     Used by autonomy discovery. Serialised by the same lock as ingestion; refuses
@@ -356,8 +430,13 @@ def reserve_egress(engine: Engine, *, purpose: str, source_key: str, operation_i
     """
     b = budget or load_budget()
     per_source = source_limit(b, source_key)
-    limits = {"source_key": source_key, "purpose": purpose, "per_source_daily_requests": per_source,
-              "daily_requests_total": b.total_requests, "policy": b.policy_version}
+    limits = {
+        "source_key": source_key,
+        "purpose": purpose,
+        "per_source_daily_requests": per_source,
+        "daily_requests_total": b.total_requests,
+        "policy": b.policy_version,
+    }
     if want_requests <= 0:
         raise BudgetExhausted(f"no requests requested for {purpose} on {source_key}", reason="zero_request", **limits)
     req_op, byte_op = f"{operation_id}:requests", f"{operation_id}:bytes"
@@ -366,15 +445,17 @@ def reserve_egress(engine: Engine, *, purpose: str, source_key: str, operation_i
         used = usage_today(conn, source_key)
         _, _, remaining, remaining_bytes = _remaining(b, per_source, used)
         if remaining <= 0:
-            raise BudgetExhausted(f"daily request budget for {purpose} on {source_key} is exhausted "
-                                  f"(limit {per_source}/day, total {b.total_requests}/day)", reason="source_limit",
-                                  used_source_requests=used["source_requests"], **limits)
+            raise BudgetExhausted(
+                f"daily request budget for {purpose} on {source_key} is exhausted "
+                f"(limit {per_source}/day, total {b.total_requests}/day)",
+                reason="source_limit",
+                used_source_requests=used["source_requests"],
+                **limits,
+            )
         if remaining_bytes <= 0:
-            raise BudgetExhausted(f"daily byte budget exhausted; {purpose} not started", reason="byte_limit",
-                                  **limits)
+            raise BudgetExhausted(f"daily byte budget exhausted; {purpose} not started", reason="byte_limit", **limits)
         n, nb = min(want_requests, remaining), min(max(0, want_bytes), remaining_bytes)
-        conn.execute(_INSERT, {"a": account_key(source_key, "requests", purpose), "o": req_op, "u": "requests",
-                               "r": n})
+        conn.execute(_INSERT, {"a": account_key(source_key, "requests", purpose), "o": req_op, "u": "requests", "r": n})
         conn.execute(_INSERT, {"a": account_key(source_key, "bytes", purpose), "o": byte_op, "u": "bytes", "r": nb})
     return EgressGrant(req_op, byte_op, n, nb)
 
@@ -387,11 +468,15 @@ def reserve_egress(engine: Engine, *, purpose: str, source_key: str, operation_i
 #   consume(engine, operation_id, actually_used)
 def used_today(conn: Connection, account_key: str) -> int:
     """Units charged to ``account_key`` today (UTC, DB clock); unsettled rows count their reservation."""
-    return int(conn.execute(
-        text(f"SELECT COALESCE(sum(COALESCE(consumed, reserved)), 0) FROM ops.budget_ledger "
-             f"WHERE account_key = :a AND recorded_at >= {DAY_START_SQL}"),
-        {"a": account_key},
-    ).scalar_one())
+    return int(
+        conn.execute(
+            text(
+                f"SELECT COALESCE(sum(COALESCE(consumed, reserved)), 0) FROM ops.budget_ledger "
+                f"WHERE account_key = :a AND recorded_at >= {DAY_START_SQL}"
+            ),
+            {"a": account_key},
+        ).scalar_one()
+    )
 
 
 def _lock_key_for(account: str) -> str:
@@ -401,8 +486,7 @@ def _lock_key_for(account: str) -> str:
     return f"reva:budget:{account}"
 
 
-def reserve(engine: Engine, *, account_key: str, operation_id: str, unit: str, amount: int,
-            daily_limit: int) -> int:
+def reserve(engine: Engine, *, account_key: str, operation_id: str, unit: str, amount: int, daily_limit: int) -> int:
     """Atomically reserve ``amount`` units against ``daily_limit`` for ``account_key``.
 
     Serialised by an advisory transaction lock (the egress lock for egress
@@ -417,9 +501,14 @@ def reserve(engine: Engine, *, account_key: str, operation_id: str, unit: str, a
         _lock(conn, _lock_key_for(account_key))
         used = used_today(conn, account_key)
         if used + amount > daily_limit:
-            raise BudgetExhausted(f"daily budget for {account_key} would be exceeded ({used} used + {amount} "
-                                  f"requested > {daily_limit})", account_key=account_key, used=used,
-                                  requested=amount, daily_limit=daily_limit, unit=unit)
+            raise BudgetExhausted(
+                f"daily budget for {account_key} would be exceeded ({used} used + {amount} requested > {daily_limit})",
+                account_key=account_key,
+                used=used,
+                requested=amount,
+                daily_limit=daily_limit,
+                unit=unit,
+            )
         conn.execute(_INSERT, {"a": account_key, "o": operation_id, "u": unit, "r": amount})
     return daily_limit - used
 
@@ -427,5 +516,7 @@ def reserve(engine: Engine, *, account_key: str, operation_id: str, unit: str, a
 def consume(engine: Engine, operation_id: str, amount: int) -> None:
     """Record the units an operation actually consumed (replaces its reservation)."""
     with engine.begin() as conn:
-        conn.execute(text("UPDATE ops.budget_ledger SET consumed = :c WHERE operation_id = :o"),
-                     {"c": max(0, int(amount)), "o": operation_id})
+        conn.execute(
+            text("UPDATE ops.budget_ledger SET consumed = :c WHERE operation_id = :o"),
+            {"c": max(0, int(amount)), "o": operation_id},
+        )

@@ -34,8 +34,9 @@ REGISTRY = Path(__file__).parents[2] / "registry"
 CT = "un.comtrade.public_exact"
 
 
-async def _parse(iso: str, flow: str, year: int, edit: Any = None
-                 ) -> tuple[ParsedObservation, ParsedObservation, ObservationBatch, QualityReport]:
+async def _parse(
+    iso: str, flow: str, year: int, edit: Any = None
+) -> tuple[ParsedObservation, ParsedObservation, ObservationBatch, QualityReport]:
     ct = ComtradeConnector(reporters=(iso,), total_years=(year,), bilateral_years=())
     item = next(i for i in ct.plan(None, FetchBudget()).items if i.key == f"total:{iso}:{flow}:{year}")
     raw = await ct.fetch(item, FixtureHttp(CT))
@@ -104,19 +105,28 @@ async def test_unrecognised_code_is_a_review_warning_not_a_claim() -> None:
 
 
 # --------------------------------------------------------------------------- readers
-_V = {"kind": "decimal", "value": "337600000000", "unit_ref": "unit.usd",
-      "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"}}
+_V = {
+    "kind": "decimal",
+    "value": "337600000000",
+    "unit_ref": "unit.usd",
+    "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"},
+}
 
 
 def _explain_flags(flags: dict[str, Any]) -> dict[str, Any]:
-    m = MonetaryInput.from_value_dict("M", _V, reference_year=2023, aggregation="period_flow_total",
-                                      source_flags=flags)
+    m = MonetaryInput.from_value_dict("M", _V, reference_year=2023, aggregation="period_flow_total", source_flags=flags)
     return explain(CountryInputs("CHN", m, m, m))["source_flags"]["M"]
 
 
 def test_crude_exposure_does_not_label_quantity_estimation_as_an_estimated_value() -> None:
-    new_row = {"provider_value_estimated": None, "legacyEstimationFlag": "6", "isQtyEstimated": True,
-               "isNetWgtEstimated": True, "isReported": False, "isAggregate": True}
+    new_row = {
+        "provider_value_estimated": None,
+        "legacyEstimationFlag": "6",
+        "isQtyEstimated": True,
+        "isNetWgtEstimated": True,
+        "isReported": False,
+        "isAggregate": True,
+    }
     f = _explain_flags(new_row)
     assert f["note"] == "provider marks this value as not directly reported (isReported=false)"
     assert "estimat" not in f["note"] and f["legacyEstimationFlag"] == "6"
@@ -133,9 +143,19 @@ def test_crude_exposure_labels_an_explicit_value_estimate() -> None:
 
 
 def _flow_row(flags: dict[str, Any]) -> dict[str, Any]:
-    return {"id": uuid.uuid4(), "subject_id": uuid.uuid4(), "concept_id": "trade.hs2709.import_value.world_total",
-            "concept_version": "1.0.0", "semantic_profile": {}, "spatial_spec": {}, "resolution": {"partner": "0"},
-            "support_id": uuid.uuid4(), "temporal_extent": {}, "value": _V, "source_flags": flags}
+    return {
+        "id": uuid.uuid4(),
+        "subject_id": uuid.uuid4(),
+        "concept_id": "trade.hs2709.import_value.world_total",
+        "concept_version": "1.0.0",
+        "semantic_profile": {},
+        "spatial_spec": {},
+        "resolution": {"partner": "0"},
+        "support_id": uuid.uuid4(),
+        "temporal_extent": {},
+        "value": _V,
+        "source_flags": flags,
+    }
 
 
 @pytest.mark.parametrize(

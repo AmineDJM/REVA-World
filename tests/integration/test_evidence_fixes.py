@@ -76,16 +76,23 @@ def _restore_dirty_nodes(request: pytest.FixtureRequest) -> Iterator[None]:
         return
     db = request.getfixturevalue("db")
     with db.worker.connect() as c:
-        before = [dict(r) for r in c.execute(text(
-            "SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")).mappings()]
+        before = [
+            dict(r)
+            for r in c.execute(
+                text("SELECT node_key, since_sequence, accumulated_error_bound, reason FROM ops.dirty_node")
+            ).mappings()
+        ]
     yield
     with db.worker.begin() as c:
         c.execute(text("DELETE FROM ops.dirty_node"))
         for r in before:
-            c.execute(text(
-                """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
-                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""),
-                {**r, "b": json.dumps(r["accumulated_error_bound"])})
+            c.execute(
+                text(
+                    """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
+                   VALUES (:node_key, :since_sequence, CAST(:b AS jsonb), :reason)"""
+                ),
+                {**r, "b": json.dumps(r["accumulated_error_bound"])},
+            )
 
 
 def _now(engine: Any) -> datetime:
@@ -103,23 +110,36 @@ def _support(tag: str, year: int = 2021) -> Support:
     )
 
 
-def _synthetic(tag: str, values: dict[str, str], *, origin: str = "test_fixture", year: int = 2021,
-               body_salt: str = "") -> tuple[RawAcquisition, list[ObservationBatch], list[QualityReport]]:
+def _synthetic(
+    tag: str, values: dict[str, str], *, origin: str = "test_fixture", year: int = 2021, body_salt: str = ""
+) -> tuple[RawAcquisition, list[ObservationBatch], list[QualityReport]]:
     """A synthetic WDI-shaped acquisition: one observation per logical-key suffix in ``values``."""
     rows = [{"suffix": k, "value": v} for k, v in sorted(values.items())]
     body = json.dumps({"fx2": tag, "rows": rows, "salt": body_salt}, sort_keys=True).encode()
     item = FetchItem(key=f"fx2:{tag}", url=f"https://api.worldbank.org/v2/fx2-test/{tag}", max_bytes=10_000)
-    raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
-                         response_metadata={"status": 200}, request_fingerprint=f"fx2:{tag}", origin=origin)
+    raw = RawAcquisition(
+        item=item,
+        body=body,
+        media_type="application/json",
+        retrieved_at=datetime.now(UTC),
+        response_metadata={"status": 200},
+        request_fingerprint=f"fx2:{tag}",
+        origin=origin,
+    )
     obs = tuple(
         ParsedObservation(
-            subject_provider="worldbank", subject_key="FRA", concept_id=POP, concept_version="1.0.0",
-            support=_support(tag, year), logical_key=f"fx2:{tag}:{suffix}",
+            subject_provider="worldbank",
+            subject_key="FRA",
+            concept_id=POP,
+            concept_version="1.0.0",
+            support=_support(tag, year),
+            logical_key=f"fx2:{tag}:{suffix}",
             # A complete kernel ScalarDecimal (basis is required): these rows share the session DB with
             # tests that export/validate every stored WDI observation (tests/contracts/test_observation_export.py).
             value={"kind": "decimal", "value": v, "unit_ref": "unit.persons", "basis": {"scale_factor": "1"}},
             uncertainty=UncertaintySpec.unknown("synthetic test value"),
-            source_flags={"fx2": tag}, raw_selector={"match": {"suffix": suffix}},
+            source_flags={"fx2": tag},
+            raw_selector={"match": {"suffix": suffix}},
         )
         for suffix, v in sorted(values.items())
     )
@@ -136,20 +156,32 @@ def _ingest(db: Any, tag: str, values: dict[str, str], **kw: Any) -> Any:
 
 def _obs(db: Any, logical_key: str) -> list[dict[str, Any]]:
     with db.worker.connect() as c:
-        return [dict(r) for r in c.execute(text(
-            """SELECT o.id, o.origin, o.revision_no, o.supersedes_id, o.value->>'value' AS v, o.recorded_at
-               FROM evidence.observation o WHERE o.logical_key = :k ORDER BY o.origin, o.revision_no"""),
-            {"k": logical_key}).mappings()]
+        return [
+            dict(r)
+            for r in c.execute(
+                text(
+                    """SELECT o.id, o.origin, o.revision_no, o.supersedes_id, o.value->>'value' AS v, o.recorded_at
+               FROM evidence.observation o WHERE o.logical_key = :k ORDER BY o.origin, o.revision_no"""
+                ),
+                {"k": logical_key},
+            ).mappings()
+        ]
 
 
 def _estimate_for_support(db: Any, release_id: Any, tag: str) -> list[dict[str, Any]]:
     with db.worker.connect() as c:
-        return [dict(r) for r in c.execute(text(
-            """SELECT e.id, e.value, e.alternatives, e.discrepancy_flags, i.observation_id
+        return [
+            dict(r)
+            for r in c.execute(
+                text(
+                    """SELECT e.id, e.value, e.alternatives, e.discrepancy_flags, i.observation_id
                FROM belief.estimate e JOIN world.support s ON s.id = e.support_id
                LEFT JOIN belief.input i ON i.estimate_id = e.id
-               WHERE e.release_id = :r AND s.resolution->>'fx2_test' = :t"""),
-            {"r": release_id, "t": tag}).mappings()]
+               WHERE e.release_id = :r AND s.resolution->>'fx2_test' = :t"""
+                ),
+                {"r": release_id, "t": tag},
+            ).mappings()
+        ]
 
 
 # --------------------------------------------------------------------------- kernel value validation
@@ -158,15 +190,20 @@ def test_non_kernel_values_quarantine_the_acquisition(db: Any) -> None:
     (or any non-kernel value) quarantines the item; nothing is stored as an observation."""
     tag = f"kv-{uuid.uuid4().hex[:8]}"
     raw, batches, reports = _synthetic(tag, {"a": "100", "b": "987654321"})
-    bad = batches[0].observations[1].model_copy(
-        update={"value": {"kind": "decimal", "value": "987654321", "unit_ref": "unit.persons"}})  # no basis
+    bad = (
+        batches[0]
+        .observations[1]
+        .model_copy(update={"value": {"kind": "decimal", "value": "987654321", "unit_ref": "unit.persons"}})
+    )  # no basis
     batches = [batches[0].model_copy(update={"observations": (batches[0].observations[0], bad)})]
     summary = publish_acquisition(db.worker, db.store, WB, raw, batches, reports)
     assert summary.namespace == "quarantine" and summary.inserted == 0
     assert _obs(db, f"fx2:{tag}:a") == [] and _obs(db, f"fx2:{tag}:b") == []
     with db.worker.connect() as c:
-        quality = c.execute(text("SELECT response_metadata->'quality' FROM evidence.acquisition WHERE id = :i"),
-                            {"i": summary.acquisition_id}).scalar_one()
+        quality = c.execute(
+            text("SELECT response_metadata->'quality' FROM evidence.acquisition WHERE id = :i"),
+            {"i": summary.acquisition_id},
+        ).scalar_one()
     (finding,) = [f for q in quality for f in q["findings"] if f["code"] == "invalid_kernel_value"]
     assert finding["severity"] == "blocker" and f"fx2:{tag}:b" in finding["message"]
     assert "987654321" not in finding["message"]  # the value itself is not echoed
@@ -181,9 +218,13 @@ def test_large_acquisition_holds_a_bounded_number_of_lineage_locks(db: Any) -> N
     seen: dict[str, int] = {}
 
     def probe(conn: Any, _summary: Any) -> None:
-        seen["lineage"], seen["all"] = conn.execute(text(
-            """SELECT count(*) FILTER (WHERE locktype = 'advisory' AND classid = :c AND objsubid = 2), count(*)
-               FROM pg_locks WHERE pid = pg_backend_pid()"""), {"c": LINEAGE_LOCK_CLASS}).one()
+        seen["lineage"], seen["all"] = conn.execute(
+            text(
+                """SELECT count(*) FILTER (WHERE locktype = 'advisory' AND classid = :c AND objsubid = 2), count(*)
+               FROM pg_locks WHERE pid = pg_backend_pid()"""
+            ),
+            {"c": LINEAGE_LOCK_CLASS},
+        ).one()
 
     n = 2 * LINEAGE_LOCK_BUCKETS + 100
     summary = _ingest(db, tag, {f"k{i:04d}": str(i + 1) for i in range(n)}, post_publish=probe)
@@ -206,8 +247,9 @@ def test_r03_release_waits_for_inflight_ingest(db: Any) -> None:
 
     def publish() -> None:
         try:
-            result["release"] = publish_release(db.worker, db.store, cutoff=None, origin=Origin.test_fixture,
-                                                environment="test", concepts=[POP])
+            result["release"] = publish_release(
+                db.worker, db.store, cutoff=None, origin=Origin.test_fixture, environment="test", concepts=[POP]
+            )
         except Exception as e:
             result["error"] = e
 
@@ -238,8 +280,14 @@ def test_r03_release_waits_for_inflight_ingest(db: Any) -> None:
 def test_r03_future_cutoff_rejected_and_none_means_db_now(db: Any) -> None:
     _ingest(db, f"r03b-{uuid.uuid4().hex[:8]}", {"a": "5"})
     with pytest.raises(ValidationProblem, match="future"):
-        publish_release(db.worker, db.store, cutoff=datetime.now(UTC) + timedelta(hours=1),
-                        origin=Origin.test_fixture, environment="test", concepts=[POP])
+        publish_release(
+            db.worker,
+            db.store,
+            cutoff=datetime.now(UTC) + timedelta(hours=1),
+            origin=Origin.test_fixture,
+            environment="test",
+            concepts=[POP],
+        )
     before = _now(db.worker)
     rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     assert before <= rel.knowledge_cutoff <= _now(db.worker)
@@ -257,26 +305,35 @@ def _isolated_spec(db: Any) -> Any:
         act = repo.simple_activity("registry.seed", "review", "maintainer:fx2-test", {})
         repo.record_activity(c, act)
         if repo.source_by_key(c, TEST_SOURCE) is None:
-            sid = c.execute(text(
-                """INSERT INTO evidence.source(source_key, title, provider_url, lineage_family, rights, metadata,
+            sid = c.execute(
+                text(
+                    """INSERT INTO evidence.source(source_key, title, provider_url, lineage_family, rights, metadata,
                      provenance_activity_id)
                    VALUES (:k, 'FX2 test source', 'https://example.invalid/', 'fx2_test',
-                           '{"licence":"test"}', '{}', :a) RETURNING id"""), {"k": TEST_SOURCE, "a": act.id}
+                           '{"licence":"test"}', '{}', :a) RETURNING id"""
+                ),
+                {"k": TEST_SOURCE, "a": act.id},
             ).scalar_one()
-            c.execute(text(
-                """INSERT INTO evidence.source_metadata_version(source_id, version, metadata, rights,
-                     provenance_activity_id) VALUES (:s, 1, '{}', '{"licence":"test"}', :a)"""),
-                {"s": sid, "a": act.id})
+            c.execute(
+                text(
+                    """INSERT INTO evidence.source_metadata_version(source_id, version, metadata, rights,
+                     provenance_activity_id) VALUES (:s, 1, '{}', '{"licence":"test"}', :a)"""
+                ),
+                {"s": sid, "a": act.id},
+            )
         cv = register_connector_version(c, db.store, spec, act.id)
         concept = repo.concept_version_id(c, POP, "1.0.0")
-        if not c.execute(text("SELECT 1 FROM evidence.eligibility WHERE connector_version_id=:cv"),
-                         {"cv": cv}).scalar_one_or_none():
-            c.execute(text(
-                """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+        if not c.execute(
+            text("SELECT 1 FROM evidence.eligibility WHERE connector_version_id=:cv"), {"cv": cv}
+        ).scalar_one_or_none():
+            c.execute(
+                text(
+                    """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
                      decision, policy_version, review_activity_id)
-                   VALUES (:cv, :c, CAST(:ap AS jsonb), 'eligible', 'fx2-test', :a)"""),
-                {"cv": cv, "c": concept, "a": act.id,
-                 "ap": json.dumps({"subject_ids": [str(entity_id("FRA"))]})})
+                   VALUES (:cv, :c, CAST(:ap AS jsonb), 'eligible', 'fx2-test', :a)"""
+                ),
+                {"cv": cv, "c": concept, "a": act.id, "ap": json.dumps({"subject_ids": [str(entity_id("FRA"))]})},
+            )
     return spec
 
 
@@ -288,7 +345,9 @@ def test_r04_live_ingest_identical_to_fixture_creates_live_lineage(db: Any) -> N
     assert fx.inserted == 1 and live.inserted == 1 and live.unchanged == 0
     rows = _obs(db, f"fx2:{tag}:a")
     assert [(r["origin"], r["revision_no"], r["supersedes_id"]) for r in rows] == [
-        ("live", 1, None), ("test_fixture", 1, None)]
+        ("live", 1, None),
+        ("test_fixture", 1, None),
+    ]
     # Re-fetching the same live state is unchanged within the live lineage only.
     again = _ingest(db, tag, {"a": "42"}, origin="live", body_salt="refetch", spec=spec)
     assert again.inserted == 0 and again.unchanged == 1
@@ -302,17 +361,27 @@ def _ct_body(iso_code: int, flow: str, year: int) -> dict[str, Any]:
     d = FIXTURE_ROOT / "un.comtrade.public_exact"
     for e in json.loads((d / "manifest.json").read_text()):
         url = e["url"]
-        if (f"reporterCode={iso_code}&" in url and f"flowCode={flow}&" in url and f"period={year}&" in url
-                and "partnerCode=0&" in url):
+        if (
+            f"reporterCode={iso_code}&" in url
+            and f"flowCode={flow}&" in url
+            and f"period={year}&" in url
+            and "partnerCode=0&" in url
+        ):
             return json.loads((d / e["file"]).read_bytes())
     raise KeyError((iso_code, flow, year))
 
 
 def _ct_parse(ct: ComtradeConnector, key: str, body: dict[str, Any]) -> tuple[list[ObservationBatch], QualityReport]:
     item = next(i for i in ct.plan(None, FetchBudget()).items if i.key == key)
-    raw = RawAcquisition(item=item, body=json.dumps(body).encode(), media_type="application/json",
-                         retrieved_at=datetime.now(UTC), response_metadata={"status": 200},
-                         request_fingerprint="t", origin="test_fixture")
+    raw = RawAcquisition(
+        item=item,
+        body=json.dumps(body).encode(),
+        media_type="application/json",
+        retrieved_at=datetime.now(UTC),
+        response_metadata={"status": 200},
+        request_fingerprint="t",
+        origin="test_fixture",
+    )
     batches = list(ct.parse(raw))
     return batches, ct.validate(batches[0])
 
@@ -340,36 +409,71 @@ async def test_r05_import_and_export_weights_are_separate_estimates(db: Any) -> 
     with db.worker.connect() as c:
         cv = repo.connector_version_row(c, "un.comtrade.public_exact", "1.2.0")
         assert cv is not None, "seed must register Comtrade 1.2.0"
-        n_elig = c.execute(text(
-            """SELECT count(*) FROM evidence.eligibility e
+        n_elig = c.execute(
+            text(
+                """SELECT count(*) FROM evidence.eligibility e
                JOIN ontology.concept_version k ON k.id = e.concept_version_id
-               WHERE e.connector_version_id = :cv AND e.decision = 'eligible' AND k.concept_id = ANY(:c)"""),
-            {"cv": cv["id"], "c": list(WEIGHT_CONCEPT.values())}).scalar_one()
+               WHERE e.connector_version_id = :cv AND e.decision = 'eligible' AND k.concept_id = ANY(:c)"""
+            ),
+            {"cv": cv["id"], "c": list(WEIGHT_CONCEPT.values())},
+        ).scalar_one()
         assert n_elig == 2
     ct = builtin_connectors()["un.comtrade.public_exact"]
     rep = await run_connector(ct, FixtureHttp(ct.describe().name), db.store, db.worker, persist_cursor=False)
     assert not rep.errors, rep.errors[:3]
-    rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test",
-                          concepts=[*WEIGHT_CONCEPT.values(), "trade.hs2709.net_weight.world_total"])
+    rel = publish_release(
+        db.worker,
+        db.store,
+        origin=Origin.test_fixture,
+        environment="test",
+        concepts=[*WEIGHT_CONCEPT.values(), "trade.hs2709.net_weight.world_total"],
+    )
     with db.worker.connect() as c:
-        rows = c.execute(text(
-            """SELECT k.concept_id, e.discrepancy_flags FROM belief.estimate e
-               JOIN ontology.concept_version k ON k.id = e.concept_version_id WHERE e.release_id = :r"""),
-            {"r": rel.release_id}).mappings().all()
+        rows = (
+            c.execute(
+                text(
+                    """SELECT k.concept_id, e.discrepancy_flags FROM belief.estimate e
+               JOIN ontology.concept_version k ON k.id = e.concept_version_id WHERE e.release_id = :r"""
+                ),
+                {"r": rel.release_id},
+            )
+            .mappings()
+            .all()
+        )
     by_concept = {r["concept_id"] for r in rows}
     assert by_concept == set(WEIGHT_CONCEPT.values())  # the collapsed 1.0.0 concept is no longer produced
     assert not any(f.startswith("source_disagreement") for r in rows for f in r["discrepancy_flags"])
 
 
-_BASE = {"subject_id": 1, "concept_version_id": 2, "support_id": 3, "concept_id": "c", "source_key": "s",
-         "uncertainty": {"status": "unquantified"}, "selection_status": "current", "origin": "test_fixture"}
+_BASE = {
+    "subject_id": 1,
+    "concept_version_id": 2,
+    "support_id": 3,
+    "concept_id": "c",
+    "source_key": "s",
+    "uncertainty": {"status": "unquantified"},
+    "selection_status": "current",
+    "origin": "test_fixture",
+}
 
 
 def test_r05_r3_08_incompatible_lineages_withhold_the_estimand() -> None:
-    rows = [{**_BASE, "id": 10, "logical_key": "a", "value": {"kind": "decimal", "value": "100"},
-             "source_flags": {"flowCode": "M"}},
-            {**_BASE, "id": 11, "logical_key": "b", "value": {"kind": "decimal", "value": "40"},
-             "source_flags": {"flowCode": "X"}}]
+    rows = [
+        {
+            **_BASE,
+            "id": 10,
+            "logical_key": "a",
+            "value": {"kind": "decimal", "value": "100"},
+            "source_flags": {"flowCode": "M"},
+        },
+        {
+            **_BASE,
+            "id": 11,
+            "logical_key": "b",
+            "value": {"kind": "decimal", "value": "40"},
+            "source_flags": {"flowCode": "X"},
+        },
+    ]
     assert select(rows, {"c": ["s"]}) == []  # no arbitrary pick among different quantities
     res = select_report(rows, {"c": ["s"]})
     (w,) = res.withheld
@@ -378,9 +482,10 @@ def test_r05_r3_08_incompatible_lineages_withhold_the_estimand() -> None:
 
 
 def test_r3_08_decimal_values_compare_numerically() -> None:
-    rows = [{**_BASE, "id": 10, "logical_key": "a", "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
-            {**_BASE, "id": 11, "logical_key": "b", "value": {"kind": "decimal", "value": "100.0"},
-             "source_flags": {}}]
+    rows = [
+        {**_BASE, "id": 10, "logical_key": "a", "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
+        {**_BASE, "id": 11, "logical_key": "b", "value": {"kind": "decimal", "value": "100.0"}, "source_flags": {}},
+    ]
     (sel,) = select(rows, {"c": ["s"]})
     assert not any(f.startswith("source_disagreement") for f in sel.discrepancy_flags)
 
@@ -402,8 +507,9 @@ def test_r3_08_decimal_values_compare_numerically() -> None:
         ("X", "0", None, "0", VALUATION_UNDETERMINED, None),
     ],
 )
-def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: str | None, label: str,
-                                     warning: str | None) -> None:
+def test_r23_valuation_is_flow_aware(
+    flow: str, pv: str, cif: str | None, fob: str | None, label: str, warning: str | None
+) -> None:
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
     body = copy.deepcopy(_ct_body(156, flow, 2023))
     row = body["data"][0]
@@ -425,8 +531,15 @@ def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: s
 def test_comtrade_estimation_flag_replaces_uninformative_derived_flag() -> None:
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
     body = copy.deepcopy(_ct_body(156, "M", 2023))
-    body["data"][0].update({"isReported": False, "isAggregate": True, "legacyEstimationFlag": 0,
-                            "isQtyEstimated": False, "isNetWgtEstimated": False})
+    body["data"][0].update(
+        {
+            "isReported": False,
+            "isAggregate": True,
+            "legacyEstimationFlag": 0,
+            "isQtyEstimated": False,
+            "isNetWgtEstimated": False,
+        }
+    )
     batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
     w = next(o for o in batches[0].observations if o.logical_key.endswith("netWgt"))
@@ -456,6 +569,7 @@ def test_display_geometry_disputed_only_by_type() -> None:
 # --------------------------------------------------------------------------- R-10
 def test_r10_partner_codes_get_distinct_entities(db: Any) -> None:
     with db.worker.connect() as c:
+
         def resolve(code: str) -> Any:
             return repo.resolve_alias(c, "comtrade_partner", code)
 
@@ -468,13 +582,19 @@ def test_r10_partner_codes_get_distinct_entities(db: Any) -> None:
             assert resolve(code) not in (None, entity_id(country)), code
         assert len({resolve(c) for c in ("250", "251")}) == 2
         assert len({resolve(c) for c in ("840", "841", "842")}) == 3
-        conf = c.execute(text(
-            """SELECT confidence_kind FROM world.alias WHERE provider='comtrade_partner' AND external_key='251'
-               ORDER BY recorded_at DESC LIMIT 1""")).scalar_one()
+        conf = c.execute(
+            text(
+                """SELECT confidence_kind FROM world.alias WHERE provider='comtrade_partner' AND external_key='251'
+               ORDER BY recorded_at DESC LIMIT 1"""
+            )
+        ).scalar_one()
         assert conf == "reviewed_exact"
-        upper = c.execute(text(
-            """SELECT upper(valid_range) FROM world.alias WHERE provider='comtrade_partner' AND external_key='841'
-               ORDER BY recorded_at DESC LIMIT 1""")).scalar_one()
+        upper = c.execute(
+            text(
+                """SELECT upper(valid_range) FROM world.alias WHERE provider='comtrade_partner' AND external_key='841'
+               ORDER BY recorded_at DESC LIMIT 1"""
+            )
+        ).scalar_one()
         assert upper == date(1981, 1, 1)  # entryExpiredDate 1980-12-31 honoured
 
 
@@ -521,10 +641,15 @@ async def test_r14_post_publish_failure_rolls_back_and_is_retried(db: Any) -> No
 
     def counts() -> tuple[int, int]:
         with db.worker.connect() as c:
-            acq = c.execute(text("SELECT count(*) FROM evidence.acquisition WHERE request_fingerprint=:f"),
-                            {"f": f"fx2:{tag}"}).scalar_one()
-            ev = c.execute(text("SELECT count(*) FROM ops.outbox WHERE event_type='test.fx2_post_publish' "
-                                "AND payload->>'tag' = :t"), {"t": tag}).scalar_one()
+            acq = c.execute(
+                text("SELECT count(*) FROM evidence.acquisition WHERE request_fingerprint=:f"), {"f": f"fx2:{tag}"}
+            ).scalar_one()
+            ev = c.execute(
+                text(
+                    "SELECT count(*) FROM ops.outbox WHERE event_type='test.fx2_post_publish' AND payload->>'tag' = :t"
+                ),
+                {"t": tag},
+            ).scalar_one()
         return acq, ev
 
     assert counts() == (0, 0) and _obs(db, f"fx2:{tag}:a") == []  # the acquisition rolled back too
@@ -540,17 +665,25 @@ async def test_r14_post_publish_failure_rolls_back_and_is_retried(db: Any) -> No
 def test_r06_partial_publication_clears_only_published_concepts_of_its_origin(db: Any) -> None:
     _ingest(db, f"r06-{uuid.uuid4().hex[:8]}", {"a": "9"})
     with db.worker.begin() as c:
-        c.execute(text("DELETE FROM ops.dirty_node WHERE node_key IN (:g, :p)"),
-                  {"g": f"belief:{GDP}", "p": f"belief:{POP}"})
-        c.execute(text(
-            """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
+        c.execute(
+            text("DELETE FROM ops.dirty_node WHERE node_key IN (:g, :p)"), {"g": f"belief:{GDP}", "p": f"belief:{POP}"}
+        )
+        c.execute(
+            text(
+                """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
                VALUES (:g, 1, '{}'::jsonb, 'upstream_changed:test_fixture'),
-                      (:p, 1, '{}'::jsonb, 'upstream_changed:mixed')"""),
-            {"g": f"belief:{GDP}", "p": f"belief:{POP}"})
+                      (:p, 1, '{}'::jsonb, 'upstream_changed:mixed')"""
+            ),
+            {"g": f"belief:{GDP}", "p": f"belief:{POP}"},
+        )
     publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     with db.worker.connect() as c:
-        left = dict(c.execute(text("SELECT node_key, reason FROM ops.dirty_node WHERE node_key IN (:g, :p)"),
-                              {"g": f"belief:{GDP}", "p": f"belief:{POP}"}).all())
+        left = dict(
+            c.execute(
+                text("SELECT node_key, reason FROM ops.dirty_node WHERE node_key IN (:g, :p)"),
+                {"g": f"belief:{GDP}", "p": f"belief:{POP}"},
+            ).all()
+        )
     assert left[f"belief:{GDP}"] == "upstream_changed:test_fixture"  # not published: still dirty
     assert left[f"belief:{POP}"] == "upstream_changed:live"  # mixed marker narrowed to the other origin
 
@@ -561,25 +694,31 @@ def test_r20_release_as_of_never_returns_release_with_later_cutoff(db: Any) -> N
     r1 = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     with db.worker.connect() as c:
         assert release_as_of(c, None, "test_fixture")["id"] == r1.release_id
-        pub_at = c.execute(text("SELECT published_at FROM ops.publication WHERE release_id=:r"),
-                           {"r": r1.release_id}).scalar_one()
+        pub_at = c.execute(
+            text("SELECT published_at FROM ops.publication WHERE release_id=:r"), {"r": r1.release_id}
+        ).scalar_one()
     # Simulate a historical row whose cutoff lies after its publication time (possible before
     # future cutoffs were rejected): an as-of between the two must not return it.
     with db.owner.begin() as c:
         c.execute(text("SET LOCAL session_replication_role = replica"))
-        c.execute(text("UPDATE ops.publication SET published_at = :t WHERE release_id = :r"),
-                  {"t": r1.knowledge_cutoff - timedelta(seconds=10), "r": r1.release_id})
+        c.execute(
+            text("UPDATE ops.publication SET published_at = :t WHERE release_id = :r"),
+            {"t": r1.knowledge_cutoff - timedelta(seconds=10), "r": r1.release_id},
+        )
     try:
         with db.worker.connect() as c:
             got = release_as_of(c, r1.knowledge_cutoff - timedelta(seconds=5), "test_fixture")
-            assert got is None or (got["id"] != r1.release_id
-                                   and got["knowledge_cutoff"] <= r1.knowledge_cutoff - timedelta(seconds=5))
+            assert got is None or (
+                got["id"] != r1.release_id and got["knowledge_cutoff"] <= r1.knowledge_cutoff - timedelta(seconds=5)
+            )
             assert release_as_of(c, r1.knowledge_cutoff, "test_fixture")["id"] == r1.release_id
     finally:
         with db.owner.begin() as c:
             c.execute(text("SET LOCAL session_replication_role = replica"))
-            c.execute(text("UPDATE ops.publication SET published_at = :t WHERE release_id = :r"),
-                      {"t": pub_at, "r": r1.release_id})
+            c.execute(
+                text("UPDATE ops.publication SET published_at = :t WHERE release_id = :r"),
+                {"t": pub_at, "r": r1.release_id},
+            )
 
 
 # --------------------------------------------------------------------------- R-27
@@ -603,12 +742,20 @@ def test_r27_retracted_latest_revision_is_not_replaced_by_superseded_value(db: A
     assert est["value"]["value"] == "500"
     assert f"retracted_lineage_excluded:{WB.source_key}" in est["discrepancy_flags"]
     alt = [a for a in est["alternatives"] if a.get("selection_status") == "retracted"]
-    assert alt == [{"observation_id": str(rev2["id"]), "source_key": WB.source_key,
-                    "logical_key": f"fx2:{tag}:a", "selection_status": "retracted",
-                    "lineage_family": "worldbank_wdi", "independence": "same_family"}]
+    assert alt == [
+        {
+            "observation_id": str(rev2["id"]),
+            "source_key": WB.source_key,
+            "logical_key": f"fx2:{tag}:a",
+            "selection_status": "retracted",
+            "lineage_family": "worldbank_wdi",
+            "independence": "same_family",
+        }
+    ]
     with db.worker.connect() as c:
-        manifest_sha = c.execute(text("SELECT manifest_sha256 FROM belief.release WHERE id=:r"),
-                                 {"r": rel.release_id}).scalar_one()
+        manifest_sha = c.execute(
+            text("SELECT manifest_sha256 FROM belief.release WHERE id=:r"), {"r": rel.release_id}
+        ).scalar_one()
     manifest = json.loads(db.store.get("belief", manifest_sha))
     assert str(rev2["id"]) in manifest["excluded_retracted_lineage_heads"]
 
@@ -623,8 +770,11 @@ def test_r27_ineligible_latest_revision_falls_back_with_flag(db: Any) -> None:
         register_connector_version(c, db.store, spec2, act.id)  # no eligibility decision: ineligible
     _ingest(db, tag, {"a": "300"}, spec=spec2, body_salt="v2")
     with db.worker.connect() as c:
-        (row,) = [r for r in eligible_latest(c, _now(db.worker), ["test_fixture"], [POP])
-                  if r["logical_key"] == f"fx2:{tag}:a"]
+        (row,) = [
+            r
+            for r in eligible_latest(c, _now(db.worker), ["test_fixture"], [POP])
+            if r["logical_key"] == f"fx2:{tag}:a"
+        ]
     assert row["revision_no"] == 1 and row["selection_status"] == "superseded_revision_selected"
     rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     (est,) = _estimate_for_support(db, rel.release_id, tag)
@@ -635,30 +785,67 @@ def test_r27_prior_estimate_input_respects_origin_and_cutoff(db: Any) -> None:
     _ingest(db, f"r27c-{uuid.uuid4().hex[:8]}", {"a": "1"})
     rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     with db.worker.connect() as c:
-        prior = c.execute(text("SELECT id, subject_id, concept_version_id, support_id, method_version_id "
-                               "FROM belief.estimate WHERE release_id=:r LIMIT 1"),
-                          {"r": rel.release_id}).mappings().one()
-        meta = c.execute(text("SELECT manifest_sha256, ontology_manifest_sha256, model_manifest_sha256 "
-                              "FROM belief.release WHERE id=:r"), {"r": rel.release_id}).mappings().one()
+        prior = (
+            c.execute(
+                text(
+                    "SELECT id, subject_id, concept_version_id, support_id, method_version_id "
+                    "FROM belief.estimate WHERE release_id=:r LIMIT 1"
+                ),
+                {"r": rel.release_id},
+            )
+            .mappings()
+            .one()
+        )
+        meta = (
+            c.execute(
+                text(
+                    "SELECT manifest_sha256, ontology_manifest_sha256, model_manifest_sha256 "
+                    "FROM belief.release WHERE id=:r"
+                ),
+                {"r": rel.release_id},
+            )
+            .mappings()
+            .one()
+        )
 
     def draft(c: Any, origin: str, cutoff: datetime) -> Any:
         act = repo.simple_activity("test.belief", "belief", "test:fx2", {})
         repo.record_activity(c, act)
-        ctx = repo.create_context(c, mode="belief", origin=origin, manifest_sha256=meta["manifest_sha256"],
-                                  knowledge_cutoff=cutoff)
-        rid = c.execute(text(
-            """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
+        ctx = repo.create_context(
+            c, mode="belief", origin=origin, manifest_sha256=meta["manifest_sha256"], knowledge_cutoff=cutoff
+        )
+        rid = c.execute(
+            text(
+                """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
                  model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
-               VALUES (:c, :o, :m, :om, :mm, :cut, 'test', :a) RETURNING id"""),
-            {"c": ctx, "o": origin, "m": meta["manifest_sha256"], "om": meta["ontology_manifest_sha256"],
-             "mm": meta["model_manifest_sha256"], "cut": cutoff, "a": act.id}).scalar_one()
-        return c.execute(text(
-            """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id,
+               VALUES (:c, :o, :m, :om, :mm, :cut, 'test', :a) RETURNING id"""
+            ),
+            {
+                "c": ctx,
+                "o": origin,
+                "m": meta["manifest_sha256"],
+                "om": meta["ontology_manifest_sha256"],
+                "mm": meta["model_manifest_sha256"],
+                "cut": cutoff,
+                "a": act.id,
+            },
+        ).scalar_one()
+        return c.execute(
+            text(
+                """INSERT INTO belief.estimate(release_id, subject_id, concept_version_id, support_id,
                  method_version_id, modality, value, uncertainty, provenance_activity_id)
                VALUES (:r, :s, :c, :sp, :m, 'selected_report', '{"kind":"missing","reason":"unavailable"}',
-                       '{"status":"unquantified"}', :a) RETURNING id"""),
-            {"r": rid, "s": prior["subject_id"], "c": prior["concept_version_id"], "sp": prior["support_id"],
-             "m": prior["method_version_id"], "a": act.id}).scalar_one()
+                       '{"status":"unquantified"}', :a) RETURNING id"""
+            ),
+            {
+                "r": rid,
+                "s": prior["subject_id"],
+                "c": prior["concept_version_id"],
+                "sp": prior["support_id"],
+                "m": prior["method_version_id"],
+                "a": act.id,
+            },
+        ).scalar_one()
 
     with db.worker.connect() as c, c.begin():
         live_est = draft(c, "live", _now(db.worker))
@@ -685,7 +872,6 @@ def test_r28_parser_version_change_reprocesses_same_bytes(db: Any) -> None:
     assert reparsed.unchanged == 1  # same semantics: no new revision, but the bytes were reprocessed
 
 
-
 # --------------------------------------------------------------------------- population from Eurostat
 def _ensure_reapproved(db: Any, name: str) -> None:
     """If the promotion was rolled back elsewhere in the session (shared session DB), re-enable it through
@@ -699,8 +885,14 @@ def _ensure_reapproved(db: Any, name: str) -> None:
     with db.worker.connect() as c:
         retired = [s for s in prom.connector_states(c) if s["name"] == name and s["state"] == "retired"]
     assert retired, f"{name}: neither active nor retired under the current template"
-    reapprove_promotion(db.owner, name, retired[-1]["version"], "demography.population.jan1_age_sex@1.0.0",
-                        "human:fx2-test", "re-enable after a rollback drill in another test module")
+    reapprove_promotion(
+        db.owner,
+        name,
+        retired[-1]["version"],
+        "demography.population.jan1_age_sex@1.0.0",
+        "human:fx2-test",
+        "re-enable after a rollback drill in another test module",
+    )
 
 
 async def test_population_from_promoted_eurostat_connector(db: Any, gate_service: Any) -> None:
@@ -710,13 +902,24 @@ async def test_population_from_promoted_eurostat_connector(db: Any, gate_service
 
     jid = uuid.uuid4()
     with db.owner.begin() as conn:
-        conn.execute(text("""INSERT INTO ops.job(id, job_type, payload, idempotency_key, status, worker_id,
+        conn.execute(
+            text("""INSERT INTO ops.job(id, job_type, payload, idempotency_key, status, worker_id,
                                  lease_until, fencing_token, attempts)
                              VALUES (:i, 'discovery', '{}'::jsonb, :k, 'running', 'fx2-worker',
                                      clock_timestamp() + interval '10 minutes', 7, 1)"""),
-                     {"i": jid, "k": f"fx2-discovery-{jid}"})
-    ctx = JobContext(job_id=jid, job_type="discovery", worker_id="fx2-worker", fencing_token=7, attempt=1,
-                     settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+            {"i": jid, "k": f"fx2-discovery-{jid}"},
+        )
+    ctx = JobContext(
+        job_id=jid,
+        job_type="discovery",
+        worker_id="fx2-worker",
+        fencing_token=7,
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)
     # rolled_back_hold: an earlier module's rollback drill retired this content; re-approved below
     assert out["status"] in ("promoted", "no_gap", "already_promoted", "rolled_back_hold"), out
@@ -725,8 +928,13 @@ async def test_population_from_promoted_eurostat_connector(db: Any, gate_service
     connector = promoted_connectors(db.worker, db.store)[name]
     rep = await run_connector(connector, FixtureHttp(name), db.store, db.worker, persist_cursor=False)
     assert not rep.errors, rep.errors[:3]
-    rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test",
-                          concepts=["demography.population.jan1_age_sex"])
+    rel = publish_release(
+        db.worker,
+        db.store,
+        origin=Origin.test_fixture,
+        environment="test",
+        concepts=["demography.population.jan1_age_sex"],
+    )
     assert rel.estimates >= 309
 
     cells = load_cells(db.worker, geo_entity="FRA", year=2023, cutoff=_now(db.worker), origin="test_fixture")
@@ -738,8 +946,14 @@ async def test_population_from_promoted_eurostat_connector(db: Any, gate_service
     res = build_population(db.worker, db.store, n_records=100_000, origin="test_fixture")
     assert res["records"] == 100_000
     with db.worker.connect() as c:
-        row = c.execute(text("SELECT recipe_sha256, record_count, privacy_class FROM model.population_dataset "
-                             "WHERE id = :i"), {"i": res["population_dataset_id"]}).mappings().one()
+        row = (
+            c.execute(
+                text("SELECT recipe_sha256, record_count, privacy_class FROM model.population_dataset WHERE id = :i"),
+                {"i": res["population_dataset_id"]},
+            )
+            .mappings()
+            .one()
+        )
     assert row["record_count"] == 100_000 and row["privacy_class"] == "synthetic_public_aggregate_derived"
     recipe = json.loads(db.store.get("models", row["recipe_sha256"]))
     assert sum(int(leaf["count"]) for leaf in recipe["leaf_cells"]) == 68_277_210
@@ -747,12 +961,33 @@ async def test_population_from_promoted_eurostat_connector(db: Any, gate_service
 
 # --------------------------------------------------------------------------- spec audit items
 def test_invariant13_alternatives_record_lineage_family_independence() -> None:
-    rows = [{**_BASE, "id": 10, "logical_key": "a", "lineage_family": "worldbank_wdi",
-             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
-            {**_BASE, "id": 11, "logical_key": "b", "lineage_family": "worldbank_wdi",
-             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}},
-            {**_BASE, "id": 12, "logical_key": "c", "source_key": "t", "lineage_family": "eurostat",
-             "value": {"kind": "decimal", "value": "100"}, "source_flags": {}}]
+    rows = [
+        {
+            **_BASE,
+            "id": 10,
+            "logical_key": "a",
+            "lineage_family": "worldbank_wdi",
+            "value": {"kind": "decimal", "value": "100"},
+            "source_flags": {},
+        },
+        {
+            **_BASE,
+            "id": 11,
+            "logical_key": "b",
+            "lineage_family": "worldbank_wdi",
+            "value": {"kind": "decimal", "value": "100"},
+            "source_flags": {},
+        },
+        {
+            **_BASE,
+            "id": 12,
+            "logical_key": "c",
+            "source_key": "t",
+            "lineage_family": "eurostat",
+            "value": {"kind": "decimal", "value": "100"},
+            "source_flags": {},
+        },
+    ]
     (sel,) = select(rows, {"c": ["s", "t"]})
     by_id = {a["observation_id"]: a for a in sel.alternatives}
     assert by_id["11"]["independence"] == "same_family" and by_id["11"]["lineage_family"] == "worldbank_wdi"
@@ -762,20 +997,31 @@ def test_invariant13_alternatives_record_lineage_family_independence() -> None:
 def test_selector_that_does_not_resolve_quarantines_the_item(db: Any) -> None:
     tag = f"sel-{uuid.uuid4().hex[:8]}"
     raw, batches, reports = _synthetic(tag, {"a": "1"})
-    bad = batches[0].model_copy(update={"observations": tuple(
-        o.model_copy(update={"raw_selector": {"match": {"suffix": "nope"}}}) for o in batches[0].observations)})
+    bad = batches[0].model_copy(
+        update={
+            "observations": tuple(
+                o.model_copy(update={"raw_selector": {"match": {"suffix": "nope"}}}) for o in batches[0].observations
+            )
+        }
+    )
     s = publish_acquisition(db.worker, db.store, WB, raw, [bad], reports)
     assert s.namespace == "quarantine" and s.inserted == 0
     with db.worker.connect() as c:
-        meta = c.execute(text("SELECT response_metadata FROM evidence.acquisition WHERE id=:i"),
-                         {"i": s.acquisition_id}).scalar_one()
+        meta = c.execute(
+            text("SELECT response_metadata FROM evidence.acquisition WHERE id=:i"), {"i": s.acquisition_id}
+        ).scalar_one()
     assert "selector_unresolved" in {f["code"] for q in meta["quality"] for f in q["findings"]}
     # A duplicated element is ambiguous, also quarantined; the well-formed payload publishes.
-    dup_raw = raw.model_copy(update={"body": json.dumps({"rows": [{"suffix": "a"}, {"suffix": "a"}]}).encode(),
-                                     "request_fingerprint": f"fx2:{tag}:dup"})
+    dup_raw = raw.model_copy(
+        update={
+            "body": json.dumps({"rows": [{"suffix": "a"}, {"suffix": "a"}]}).encode(),
+            "request_fingerprint": f"fx2:{tag}:dup",
+        }
+    )
     assert publish_acquisition(db.worker, db.store, WB, dup_raw, batches, reports).namespace == "quarantine"
-    ok = publish_acquisition(db.worker, db.store, WB, raw.model_copy(update={"request_fingerprint": f"fx2:{tag}:ok"}),
-                             batches, reports)
+    ok = publish_acquisition(
+        db.worker, db.store, WB, raw.model_copy(update={"request_fingerprint": f"fx2:{tag}:ok"}), batches, reports
+    )
     assert ok.namespace == "raw" and ok.inserted == 1
 
 
@@ -785,9 +1031,15 @@ def test_comtrade_implausible_jump_is_a_review_signal_not_a_block() -> None:
         body = copy.deepcopy(_ct_body(156, "M", 2023))
         body["data"][0].update({"period": year, "refYear": year, "primaryValue": value, "cifvalue": value})
         item = next(i for i in ct.plan(None, FetchBudget()).items if i.key == f"total:CHN:M:{year}")
-        raw = RawAcquisition(item=item, body=json.dumps(body, default=str).encode(), media_type="application/json",
-                             retrieved_at=datetime.now(UTC), response_metadata={"status": 200},
-                             request_fingerprint="t", origin="test_fixture")
+        raw = RawAcquisition(
+            item=item,
+            body=json.dumps(body, default=str).encode(),
+            media_type="application/json",
+            retrieved_at=datetime.now(UTC),
+            response_metadata={"status": 200},
+            request_fingerprint="t",
+            origin="test_fixture",
+        )
         report = ct.validate(next(iter(ct.parse(raw))))
     jumps = [f for f in report.findings if f.code == "implausible_jump"]
     assert jumps and all(f.severity == "warning" for f in jumps) and report.outcome == "pass"
@@ -798,8 +1050,9 @@ async def test_crossref_sends_conditional_headers_and_treats_304_as_unchanged() 
     from reva.adapters.http.safe_client import HttpResult
 
     calls: list[dict[str, Any]] = []
-    body = json.dumps({"status": "ok", "message-type": "work",
-                       "message": {"DOI": "10.1257/aer.99.3.1053", "title": ["T"]}}).encode()
+    body = json.dumps(
+        {"status": "ok", "message-type": "work", "message": {"DOI": "10.1257/aer.99.3.1053", "title": ["T"]}}
+    ).encode()
 
     class Http:
         origin = "test_fixture"
@@ -808,8 +1061,9 @@ async def test_crossref_sends_conditional_headers_and_treats_304_as_unchanged() 
             calls.append(kw)
             if (kw.get("headers") or {}).get("If-None-Match") == '"v1"':
                 return HttpResult(url, url, 304, {}, b"", datetime.now(UTC), 0.0, (), 1)
-            return HttpResult(url, url, 200, {"content-type": "application/json", "etag": '"v1"'}, body,
-                              datetime.now(UTC), 0.0, (), 1)
+            return HttpResult(
+                url, url, 200, {"content-type": "application/json", "etag": '"v1"'}, body, datetime.now(UTC), 0.0, (), 1
+            )
 
     c1 = CrossrefConnector()
     plan = c1.plan(None, FetchBudget())

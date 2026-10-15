@@ -49,9 +49,7 @@ def test_restricted_privacy_classes_cannot_be_stored_in_v1(db) -> None:
 
 def test_reviewed_deletion_ticket_can_delete_an_immutable_record(db) -> None:
     with db.owner.connect() as conn:
-        member = conn.execute(
-            text("SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'SET')")
-        ).scalar_one()
+        member = conn.execute(text("SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'SET')")).scalar_one()
     if not member:
         pytest.skip("migration owner is not a member of reva_restricted_deletion in this cluster")
     with db.owner.connect() as conn:

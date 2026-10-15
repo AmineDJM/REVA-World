@@ -30,20 +30,32 @@ class GapValueEstimator:
         self.io = io_
         self.max_priority = max_priority
 
-    def estimate(self, gap: KnowledgeGap, acquisition_plan: ArtifactRef, decision_spec: ArtifactRef | None,
-                 budget: ResourceBudget) -> ValueEstimate:
+    def estimate(
+        self,
+        gap: KnowledgeGap,
+        acquisition_plan: ArtifactRef,
+        decision_spec: ArtifactRef | None,
+        budget: ResourceBudget,
+    ) -> ValueEstimate:
         plan = self.io.get_json(acquisition_plan) or {}
-        assumptions: dict[str, Any] = {"schema": "reva-voi-assumptions/1", "gap_id": str(gap.gap_id),
-                                       "requirement_id": gap.requirement_id, "plan": acquisition_plan.sha256,
-                                       "adapter": ADAPTER_VERSION}
+        assumptions: dict[str, Any] = {
+            "schema": "reva-voi-assumptions/1",
+            "gap_id": str(gap.gap_id),
+            "requirement_id": gap.requirement_id,
+            "plan": acquisition_plan.sha256,
+            "adapter": ADAPTER_VERSION,
+        }
         if decision_spec is not None:
             spec = self.io.get_json(decision_spec)
             try:
                 problem = voi_core.DecisionProblem(
                     prior=float(spec["prior"]),
                     utility=tuple(tuple(float(u) for u in row) for row in spec["utility"]),  # type: ignore[arg-type]
-                    sensitivity=float(spec["sensitivity"]), specificity=float(spec["specificity"]),
-                    cost=float(spec.get("cost", 0.0)), utility_unit=str(spec.get("utility_unit", "utility")))
+                    sensitivity=float(spec["sensitivity"]),
+                    specificity=float(spec["specificity"]),
+                    cost=float(spec.get("cost", 0.0)),
+                    utility_unit=str(spec.get("utility_unit", "utility")),
+                )
                 est = voi_core.estimate_value({"gap_id": str(gap.gap_id)}, problem)
             except (KeyError, TypeError, ValueError, ValidationProblem) as e:
                 assumptions["unsupported_reason"] = f"decision specification is not a finite binary problem: {e}"
@@ -60,25 +72,44 @@ class GapValueEstimator:
         if relevance is None:
             relevance = max(0.0, min(1.0, float(gap.priority) / self.max_priority))
         try:
-            est = voi_core.estimate_value({"gap_id": str(gap.gap_id), "prior_sd": prior_sd,
-                                           "expected_posterior_sd": post_sd, "relevance_weight": relevance})
+            est = voi_core.estimate_value(
+                {
+                    "gap_id": str(gap.gap_id),
+                    "prior_sd": prior_sd,
+                    "expected_posterior_sd": post_sd,
+                    "relevance_weight": relevance,
+                }
+            )
         except (MissingInput, ValidationProblem) as e:
             assumptions["unsupported_reason"] = e.message
             return self._unsupported(assumptions)
-        assumptions.update({"inputs": {"prior_sd": prior_sd, "expected_posterior_sd": post_sd,
-                                       "relevance_weight": relevance},
-                            "core_assumptions": list(est.assumptions),
-                            "not_money": True})
+        assumptions.update(
+            {
+                "inputs": {"prior_sd": prior_sd, "expected_posterior_sd": post_sd, "relevance_weight": relevance},
+                "core_assumptions": list(est.assumptions),
+                "not_money": True,
+            }
+        )
         return self._wrap(est, assumptions)
 
     def _wrap(self, est: Any, assumptions: dict[str, Any]) -> ValueEstimate:
         ref = self.io.put_json(assumptions, "evaluation")
-        return ValueEstimate(kind=est.kind, value=est.value, unit=est.unit, uncertainty=dict(est.uncertainty),
-                             assumptions=ref, method_version=est.method_version)
+        return ValueEstimate(
+            kind=est.kind,
+            value=est.value,
+            unit=est.unit,
+            uncertainty=dict(est.uncertainty),
+            assumptions=ref,
+            method_version=est.method_version,
+        )
 
     def _unsupported(self, assumptions: dict[str, Any]) -> ValueEstimate:
         ref = self.io.put_json(assumptions, "evaluation")
-        return ValueEstimate(kind="unsupported", value=None, unit=None,
-                             uncertainty={"status": "unquantified", "kind": "unknown",
-                                          "description": "no value estimate"},
-                             assumptions=ref, method_version=ADAPTER_VERSION)
+        return ValueEstimate(
+            kind="unsupported",
+            value=None,
+            unit=None,
+            uncertainty={"status": "unquantified", "kind": "unknown", "description": "no value estimate"},
+            assumptions=ref,
+            method_version=ADAPTER_VERSION,
+        )

@@ -76,8 +76,15 @@ class EvidenceCard(BaseModel):
     extraction_version: str
     human_review: Any
     licence: str
-    evidence_kind: Literal["experimental", "quasi_experimental", "observational", "mechanistic",
-                           "structural_calibration", "expert_judgment", "hypothesis"]
+    evidence_kind: Literal[
+        "experimental",
+        "quasi_experimental",
+        "observational",
+        "mechanistic",
+        "structural_calibration",
+        "expert_judgment",
+        "hypothesis",
+    ]
     ratings: dict[str, Any]
     relevance_to_reva: str
     supersedes_id: str | None = None
@@ -104,7 +111,10 @@ def validate_card(data: dict[str, Any]) -> EvidenceCard:
 
 
 def publish_study(
-    conn: Connection, store: ArtifactStore, raw: RawAcquisition, batches: list[ObservationBatch],
+    conn: Connection,
+    store: ArtifactStore,
+    raw: RawAcquisition,
+    batches: list[ObservationBatch],
     summary: PublishSummary,
 ) -> str | None:
     """Post-publish step for Crossref: runs inside the acquisition publication
@@ -128,41 +138,59 @@ def publish_study(
             """INSERT INTO evidence.study(doi, metadata, source_artifact_sha256, acquisition_id,
                  provenance_activity_id) VALUES (:d, CAST(:m AS jsonb), :s, :acq, :a) RETURNING id"""
         ),
-        {"d": study["doi"], "m": json.dumps(study), "s": summary.raw_sha256,
-         "acq": summary.acquisition_id, "a": act.id},
+        {
+            "d": study["doi"],
+            "m": json.dumps(study),
+            "s": summary.raw_sha256,
+            "acq": summary.acquisition_id,
+            "a": act.id,
+        },
     ).scalar_one()
-    repo.emit_outbox(conn, "evidence.study_metadata", {"doi": study["doi"], "study_id": str(sid),
-                                                        "update_signal": bool(study.get("updated_by"))})
+    repo.emit_outbox(
+        conn,
+        "evidence.study_metadata",
+        {"doi": study["doi"], "study_id": str(sid), "update_signal": bool(study.get("updated_by"))},
+    )
     return str(sid)
 
 
-def import_card(
-    conn: Connection, card: EvidenceCard, *, status: Literal["candidate", "reviewed"], actor: str
-) -> str:
+def import_card(conn: Connection, card: EvidenceCard, *, status: Literal["candidate", "reviewed"], actor: str) -> str:
     if status == "reviewed" and not actor.startswith(("human:", "maintainer:")):
         raise ValidationProblem("only a named human/maintainer can record a reviewed card")
     if card.extraction_method.startswith("llm") and status != "candidate":
         raise ValidationProblem("LLM-extracted cards are candidate-only")
     take_evidence_write_lock(conn)  # R-03 lock protocol: claims inform releases
-    existing = conn.execute(
-        text("SELECT id, card FROM evidence.claim WHERE claim_key=:k AND version=:v"),
-        {"k": card.claim_id, "v": card.claim_version},
-    ).mappings().one_or_none()
+    existing = (
+        conn.execute(
+            text("SELECT id, card FROM evidence.claim WHERE claim_key=:k AND version=:v"),
+            {"k": card.claim_id, "v": card.claim_version},
+        )
+        .mappings()
+        .one_or_none()
+    )
     payload = card.model_dump(mode="json")
     if existing:
         if logical_hash(existing["card"]) != logical_hash(payload):
             raise ValidationProblem("claim version already published with different content; bump claim_version")
         return str(existing["id"])
-    act = repo.simple_activity("evidence.card_import", "review", actor, {"claim": card.claim_id,
-                                                                         "version": card.claim_version})
+    act = repo.simple_activity(
+        "evidence.card_import", "review", actor, {"claim": card.claim_id, "version": card.claim_version}
+    )
     repo.record_activity(conn, act)
     cid = conn.execute(
         text(
             """INSERT INTO evidence.claim(claim_key, version, card, evidence_kind, status, extraction_method,
                  provenance_activity_id) VALUES (:k, :v, CAST(:c AS jsonb), :ek, :st, :em, :a) RETURNING id"""
         ),
-        {"k": card.claim_id, "v": card.claim_version, "c": json.dumps(payload), "ek": card.evidence_kind,
-         "st": status, "em": card.extraction_method, "a": act.id},
+        {
+            "k": card.claim_id,
+            "v": card.claim_version,
+            "c": json.dumps(payload),
+            "ek": card.evidence_kind,
+            "st": status,
+            "em": card.extraction_method,
+            "a": act.id,
+        },
     ).scalar_one()
     return str(cid)
 

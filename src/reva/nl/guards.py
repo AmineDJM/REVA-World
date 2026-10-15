@@ -67,48 +67,81 @@ def _rx(p: str) -> re.Pattern[str]:
 
 
 RULES: tuple[GuardRule, ...] = (
-    GuardRule("outputs.macroeconomic",
-              _rx(r"\b(gdp|pib)\b.{0,40}\b(loss|losses|perte|pertes|baisse|drop|fall|recul|impact|effet|effect)"
-                  r"|\b(loss|losses|perte|pertes|baisse|recul)\b.{0,20}\b(de |of )?(gdp|pib)\b"
-                  r"|\b(croissance|growth|r[ée]cession|recession)\b"),
-              "GDP loss, growth or recession effects are not computed by any registered model",
-              "La perte de PIB, la croissance ou la récession ne sont calculées par aucun modèle enregistré"),
-    GuardRule("outputs.macroeconomic", _rx(r"\b(unemploy\w*|ch[ôo]mage|jobless\w*)"),
-              "Unemployment is not computed by any registered model",
-              "Le chômage n'est calculé par aucun modèle enregistré"),
-    GuardRule("outputs.macroeconomic", _rx(r"\b(inflation|consumer prices?|prix [àa] la consommation|cpi)\b"),
-              "Consumer inflation is not computed (at most a listed model's first-round price effect)",
-              "L'inflation n'est pas calculée (au plus l'effet prix de premier tour d'un modèle listé)"),
-    GuardRule("outputs.macroeconomic", _rx(r"\b(welfare|bien-[êe]tre|pouvoir d'achat|purchasing power)\b"),
-              "Household welfare or purchasing power is not computed by any registered model",
-              "Le bien-être ou le pouvoir d'achat des ménages n'est calculé par aucun modèle enregistré"),
-    GuardRule("social.retirement_age",
-              _rx(r"\b(retraite|retirement|pension\w*|[âa]ge l[ée]gal|retire)\b"),
-              "No retirement-age model is registered", "Aucun modèle d'âge de départ à la retraite n'est enregistré",
-              provided_by=("social.retirement_age",)),
-    GuardRule("demography.cohort_component",
-              _rx(r"\b(projection (de la |d[ue] )?population|population projection|vieillissement|ageing|aging"
-                  r"|fertilit\w*|f[ée]condit[ée]|mortalit\w*|cohort\w*)"),
-              "No population projection model is registered", "Aucun modèle de projection démographique n'est "
-              "enregistré", provided_by=("demography.cohort_component",)),
-    GuardRule("horizon.multi_period",
-              _rx(r"\b(over|during|for|sur|pendant)\s+(the next\s+|les\s+)?\d{1,2}\s+(years|ans|ann[ée]es)\b"
-                  r"|\b(d'ici|by|until|jusqu'en|jusqu'à)\s+20\d\d\b|\b(long[- ]term|long terme|dynamics?|dynamique)"),
-              "Multi-year dynamics are not computed by a single-period model",
-              "Les dynamiques pluriannuelles ne sont pas calculées par un modèle à une seule période"),
-    GuardRule("nl.input_value_override",
-              _rx(r"\b(value|valeur|data|donn[ée]es?|figure|chiffre)s?\b\s*(=|:|of|de|à|a|to|is|est|égale?)?\s*"
-                  r"([-+−]?0(?![.,]?\d)|z[ée]ro\b|nulle?\b|missing\b|manquante?s?\b)"
-                  r"|\b(treat|traite[rz]?|consid[èe]re[rz]?)\b.{0,30}\b(missing|manquant\w*)\b.{0,20}\b(as|comme)\b"),
-              "Data values come only from the pinned baseline release; they cannot be set in a scenario",
-              "Les valeurs des données viennent uniquement de la publication de référence ; elles ne peuvent pas "
-              "être fixées dans un scénario"),
-    GuardRule("nl.instruction_in_text",
-              _rx(r"\b(ignore|disregard|forget|oublie[rz]?|ignore[rz]?)\b.{0,40}\b(instructions?|rules?|r[èe]gles?"
-                  r"|prompts?|consignes?)\b|\bsystem prompt\b|\byou are now\b|\btu es (maintenant|d[ée]sormais)\b"
-                  r"|\bnew instructions?\b|\bnouvelles? instructions?\b|\bdeveloper mode\b"),
-              "Instructions addressed to the system were treated as data and not followed",
-              "Les instructions adressées au système ont été traitées comme des données et non suivies"),
+    GuardRule(
+        "outputs.macroeconomic",
+        _rx(
+            r"\b(gdp|pib)\b.{0,40}\b(loss|losses|perte|pertes|baisse|drop|fall|recul|impact|effet|effect)"
+            r"|\b(loss|losses|perte|pertes|baisse|recul)\b.{0,20}\b(de |of )?(gdp|pib)\b"
+            r"|\b(croissance|growth|r[ée]cession|recession)\b"
+        ),
+        "GDP loss, growth or recession effects are not computed by any registered model",
+        "La perte de PIB, la croissance ou la récession ne sont calculées par aucun modèle enregistré",
+    ),
+    GuardRule(
+        "outputs.macroeconomic",
+        _rx(r"\b(unemploy\w*|ch[ôo]mage|jobless\w*)"),
+        "Unemployment is not computed by any registered model",
+        "Le chômage n'est calculé par aucun modèle enregistré",
+    ),
+    GuardRule(
+        "outputs.macroeconomic",
+        _rx(r"\b(inflation|consumer prices?|prix [àa] la consommation|cpi)\b"),
+        "Consumer inflation is not computed (at most a listed model's first-round price effect)",
+        "L'inflation n'est pas calculée (au plus l'effet prix de premier tour d'un modèle listé)",
+    ),
+    GuardRule(
+        "outputs.macroeconomic",
+        _rx(r"\b(welfare|bien-[êe]tre|pouvoir d'achat|purchasing power)\b"),
+        "Household welfare or purchasing power is not computed by any registered model",
+        "Le bien-être ou le pouvoir d'achat des ménages n'est calculé par aucun modèle enregistré",
+    ),
+    GuardRule(
+        "social.retirement_age",
+        _rx(r"\b(retraite|retirement|pension\w*|[âa]ge l[ée]gal|retire)\b"),
+        "No retirement-age model is registered",
+        "Aucun modèle d'âge de départ à la retraite n'est enregistré",
+        provided_by=("social.retirement_age",),
+    ),
+    GuardRule(
+        "demography.cohort_component",
+        _rx(
+            r"\b(projection (de la |d[ue] )?population|population projection|vieillissement|ageing|aging"
+            r"|fertilit\w*|f[ée]condit[ée]|mortalit\w*|cohort\w*)"
+        ),
+        "No population projection model is registered",
+        "Aucun modèle de projection démographique n'est enregistré",
+        provided_by=("demography.cohort_component",),
+    ),
+    GuardRule(
+        "horizon.multi_period",
+        _rx(
+            r"\b(over|during|for|sur|pendant)\s+(the next\s+|les\s+)?\d{1,2}\s+(years|ans|ann[ée]es)\b"
+            r"|\b(d'ici|by|until|jusqu'en|jusqu'à)\s+20\d\d\b|\b(long[- ]term|long terme|dynamics?|dynamique)"
+        ),
+        "Multi-year dynamics are not computed by a single-period model",
+        "Les dynamiques pluriannuelles ne sont pas calculées par un modèle à une seule période",
+    ),
+    GuardRule(
+        "nl.input_value_override",
+        _rx(
+            r"\b(value|valeur|data|donn[ée]es?|figure|chiffre)s?\b\s*(=|:|of|de|à|a|to|is|est|égale?)?\s*"
+            r"([-+−]?0(?![.,]?\d)|z[ée]ro\b|nulle?\b|missing\b|manquante?s?\b)"
+            r"|\b(treat|traite[rz]?|consid[èe]re[rz]?)\b.{0,30}\b(missing|manquant\w*)\b.{0,20}\b(as|comme)\b"
+        ),
+        "Data values come only from the pinned baseline release; they cannot be set in a scenario",
+        "Les valeurs des données viennent uniquement de la publication de référence ; elles ne peuvent pas "
+        "être fixées dans un scénario",
+    ),
+    GuardRule(
+        "nl.instruction_in_text",
+        _rx(
+            r"\b(ignore|disregard|forget|oublie[rz]?|ignore[rz]?)\b.{0,40}\b(instructions?|rules?|r[èe]gles?"
+            r"|prompts?|consignes?)\b|\bsystem prompt\b|\byou are now\b|\btu es (maintenant|d[ée]sormais)\b"
+            r"|\bnew instructions?\b|\bnouvelles? instructions?\b|\bdeveloper mode\b"
+        ),
+        "Instructions addressed to the system were treated as data and not followed",
+        "Les instructions adressées au système ont été traitées comme des données et non suivies",
+    ),
 )
 
 
@@ -119,8 +152,9 @@ class GuardHit:
     reason: str
 
 
-def keyword_gaps(text: str, *, language: str, registered: Iterable[str],
-                 multi_period_available: bool) -> list[GuardHit]:
+def keyword_gaps(
+    text: str, *, language: str, registered: Iterable[str], multi_period_available: bool
+) -> list[GuardHit]:
     regs = set(registered)
     hits: list[GuardHit] = []
     seen: set[tuple[str, str]] = set()

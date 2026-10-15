@@ -26,14 +26,25 @@ T0 = datetime(2026, 1, 1, tzinfo=UTC)
 
 
 def _act(kind: str, origin: str) -> dict:
-    return {"id": uuid4(), "kind": kind, "origin": origin, "code_digest": "git:abc", "environment_digest": "env:1",
-            "parameters": {"connector": "worldbank"}, "actor": "worker:reva", "started_at": T0, "ended_at": T0}
+    return {
+        "id": uuid4(),
+        "kind": kind,
+        "origin": origin,
+        "code_digest": "git:abc",
+        "environment_digest": "env:1",
+        "parameters": {"connector": "worldbank"},
+        "actor": "worker:reva",
+        "started_at": T0,
+        "ended_at": T0,
+    }
 
 
 def _lineage() -> tuple[list, list, list, list]:
     acq, norm = _act("acquisition", "source"), _act("normalise", "normalisation")
-    arts = [{"sha256": s, "media_type": "application/json", "byte_size": 10, "privacy_class": "public_aggregate"}
-            for s in (RAW, NORM, BELIEF)]
+    arts = [
+        {"sha256": s, "media_type": "application/json", "byte_size": 10, "privacy_class": "public_aggregate"}
+        for s in (RAW, NORM, BELIEF)
+    ]
     usages = [{"activity_id": norm["id"], "artifact_sha256": RAW, "ordinal": 0, "selector": {"json_pointer": "/1"}}]
     gens = [{"activity_id": acq["id"], "artifact_sha256": RAW}, {"activity_id": norm["id"], "artifact_sha256": NORM}]
     return [acq, norm], arts, usages, gens
@@ -89,14 +100,19 @@ def test_owl_time_point_and_half_open_interval() -> None:
 
 
 def test_owl_time_uncertain_open_and_julian_extents() -> None:
-    te = TimeExtent(kind="interval", precision=Precision.year, start=None,
-                    start_uncertainty=UncertainBound(earliest=date(1500, 1, 1), latest=date(1510, 1, 1)))
+    te = TimeExtent(
+        kind="interval",
+        precision=Precision.year,
+        start=None,
+        start_uncertainty=UncertainBound(earliest=date(1500, 1, 1), latest=date(1510, 1, 1)),
+    )
     node = time_extent_to_owl_time(te)
     assert node["reva:openEnded"] is True
     assert node["time:hasBeginning"]["reva:earliestPossible"]["@value"] == "1500-01-01"
     assert "time:inXSDGYear" not in node["time:hasBeginning"]
-    jul = time_extent_to_owl_time(TimeExtent(kind="instant", precision=Precision.day, calendar=Calendar.julian,
-                                             start=date(1582, 10, 4)))
+    jul = time_extent_to_owl_time(
+        TimeExtent(kind="instant", precision=Precision.day, calendar=Calendar.julian, start=date(1582, 10, 4))
+    )
     desc = jul["time:inDateTime"]
     assert desc["@type"] == "time:GeneralDateTimeDescription"
     assert desc["time:day"]["@value"] == "---04" and "time:inXSDDate" not in jul

@@ -45,8 +45,13 @@ from _runtime_env import (
 
 OWNER_KEYS = ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL")
 #: Other processes' secrets; the gate must never receive them (checked on the child env).
-FOREIGN_SECRETS = ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_API_DB_PASSWORD",
-                   "REVA_SESSION_SECRET", "REVA_ADMIN_PASSWORD_HASH")
+FOREIGN_SECRETS = (
+    "REVA_WORKER_DB_PASSWORD",
+    "REVA_SIM_DB_PASSWORD",
+    "REVA_API_DB_PASSWORD",
+    "REVA_SESSION_SECRET",
+    "REVA_ADMIN_PASSWORD_HASH",
+)
 DEFAULT_DEADLINE_SECONDS = 300
 REQUIRED_FUNCTION = "ops.record_gate_result(uuid,text,text,text,text,text,jsonb)"
 
@@ -191,8 +196,9 @@ def main() -> int:
         emit({"event": "reva.start", "component": "gate", "status": "error", "error": redact(str(e))})
         return EX_CONFIG
     except Exception as e:
-        emit({"event": "reva.start", "component": "gate", "status": "error",
-              "error": redact(f"{type(e).__name__}: {e}")})
+        emit(
+            {"event": "reva.start", "component": "gate", "status": "error", "error": redact(f"{type(e).__name__}: {e}")}
+        )
         return EX_CONFIG
     skip_wait = environ.get("REVA_ENV") == "test" and environ.get("REVA_SKIP_SCHEMA_WAIT") == "1"
     if not skip_wait:

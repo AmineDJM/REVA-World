@@ -108,27 +108,37 @@ class JobContext:
         Requires SELECT on ops.job (worker role).
         """
         ok = conn.execute(
-            text("SELECT 1 FROM ops.job WHERE id = :j AND worker_id = :w AND fencing_token = :t "
-                 "AND lease_until > clock_timestamp() AND status IN ('running','cancel_requested')"),
+            text(
+                "SELECT 1 FROM ops.job WHERE id = :j AND worker_id = :w AND fencing_token = :t "
+                "AND lease_until > clock_timestamp() AND status IN ('running','cancel_requested')"
+            ),
             {"j": self.job_id, "w": self.worker_id, "t": self.fencing_token},
         ).scalar_one_or_none()
         if ok is None:
-            raise StaleLease(f"lease lost for job {self.job_id} (fencing token {self.fencing_token})",
-                             job_id=str(self.job_id), fencing_token=self.fencing_token)
+            raise StaleLease(
+                f"lease lost for job {self.job_id} (fencing token {self.fencing_token})",
+                job_id=str(self.job_id),
+                fencing_token=self.fencing_token,
+            )
 
-    def complete_in(self, conn: Connection, status: str, result_ref: dict[str, Any] | None,
-                    error: dict[str, Any] | None = None) -> None:
+    def complete_in(
+        self, conn: Connection, status: str, result_ref: dict[str, Any] | None, error: dict[str, Any] | None = None
+    ) -> None:
         import json
 
         if status == "cancelled" and self.shutdown_requested() and not self.cancel_requested():
             # R2-01: a shutdown is not a cancellation; abort the handler's transaction so
             # the worker releases the job for a retry instead of ending it.
-            raise JobCancelled(f"worker shutting down; job {self.job_id} released, not cancelled",
-                               shutdown=True)
+            raise JobCancelled(f"worker shutting down; job {self.job_id} released, not cancelled", shutdown=True)
         conn.execute(
             text("SELECT ops.complete_job(:j, :w, :t, :s, CAST(:r AS jsonb), CAST(:e AS jsonb))"),
-            {"j": self.job_id, "w": self.worker_id, "t": self.fencing_token, "s": status,
-             "r": json.dumps(result_ref, default=str) if result_ref is not None else None,
-             "e": json.dumps(error, default=str) if error is not None else None},
+            {
+                "j": self.job_id,
+                "w": self.worker_id,
+                "t": self.fencing_token,
+                "s": status,
+                "r": json.dumps(result_ref, default=str) if result_ref is not None else None,
+                "e": json.dumps(error, default=str) if error is not None else None,
+            },
         )
         self.completed_in_handler = True

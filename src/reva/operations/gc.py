@@ -63,10 +63,16 @@ class GcReport:
     skipped_locked: int = 0
 
     def as_dict(self) -> dict[str, Any]:
-        return {"scanned": self.scanned, "referenced": self.referenced, "candidates": self.candidates,
-                "deleted": len(self.deleted), "retained_young": self.retained_young,
-                "retained_unconfirmed": self.retained_unconfirmed, "dropped_candidates": self.dropped_candidates,
-                "skipped_locked": self.skipped_locked}
+        return {
+            "scanned": self.scanned,
+            "referenced": self.referenced,
+            "candidates": self.candidates,
+            "deleted": len(self.deleted),
+            "retained_young": self.retained_young,
+            "retained_unconfirmed": self.retained_unconfirmed,
+            "dropped_candidates": self.dropped_candidates,
+            "skipped_locked": self.skipped_locked,
+        }
 
 
 def _sha_from_uri(uri: str) -> str | None:
@@ -77,14 +83,24 @@ def _sha_from_uri(uri: str) -> str | None:
 def _referenced(conn: Any, ns: str, uris: list[str]) -> set[str]:
     if not uris:
         return set()
-    by_uri = set(conn.execute(
-        text("SELECT storage_uri FROM meta.artifact_location WHERE storage_uri = ANY(:u)"), {"u": uris}
-    ).scalars())
+    by_uri = set(
+        conn.execute(
+            text("SELECT storage_uri FROM meta.artifact_location WHERE storage_uri = ANY(:u)"), {"u": uris}
+        ).scalars()
+    )
     shas = {u: s for u in uris if (s := _sha_from_uri(u))}
-    by_sha = set(conn.execute(
-        text("SELECT artifact_sha256 FROM meta.artifact_location WHERE namespace = :ns AND artifact_sha256 = ANY(:s)"),
-        {"ns": ns, "s": sorted(set(shas.values()))},
-    ).scalars()) if shas else set()
+    by_sha = (
+        set(
+            conn.execute(
+                text(
+                    "SELECT artifact_sha256 FROM meta.artifact_location WHERE namespace = :ns AND artifact_sha256 = ANY(:s)"
+                ),
+                {"ns": ns, "s": sorted(set(shas.values()))},
+            ).scalars()
+        )
+        if shas
+        else set()
+    )
     return {u for u in uris if u in by_uri or shas.get(u) in by_sha}
 
 
@@ -115,7 +131,7 @@ def gc_scan(
         with engine.connect() as conn:
             refs: set[str] = set()
             for i in range(0, len(uris), 1000):
-                refs |= _referenced(conn, ns, uris[i:i + 1000])
+                refs |= _referenced(conn, ns, uris[i : i + 1000])
         report.referenced += len(refs)
         for uri, mtime in listing:
             if uri not in refs:
@@ -129,12 +145,14 @@ def gc_scan(
             report.dropped_candidates = len(drop)
         scans: dict[str, int] = {}
         for uri in sorted(seen_orphans):
-            scans[uri] = int(conn.execute(
-                text("""INSERT INTO ops.gc_candidate(storage_uri) VALUES (:u)
+            scans[uri] = int(
+                conn.execute(
+                    text("""INSERT INTO ops.gc_candidate(storage_uri) VALUES (:u)
                         ON CONFLICT (storage_uri) DO UPDATE SET confirmed_scans = ops.gc_candidate.confirmed_scans + 1
                         RETURNING confirmed_scans"""),
-                {"u": uri},
-            ).scalar_one())
+                    {"u": uri},
+                ).scalar_one()
+            )
     report.candidates = len(seen_orphans)
     for uri in sorted(seen_orphans):
         mtime, ns = seen_orphans[uri]
@@ -168,8 +186,13 @@ def gc_scan(
                 continue
             store.delete_orphan(uri)
             conn.execute(text("DELETE FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": uri})
-            audit.record(conn, actor, "gc.delete_orphan", {"storage_uri": uri},
-                         {"age_seconds": int(age.total_seconds()), "confirmed_scans": scans[uri]})
+            audit.record(
+                conn,
+                actor,
+                "gc.delete_orphan",
+                {"storage_uri": uri},
+                {"age_seconds": int(age.total_seconds()), "confirmed_scans": scans[uri]},
+            )
         report.deleted.append(uri)
     if report.deleted:
         log.info("gc deleted %d orphan objects", len(report.deleted))

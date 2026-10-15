@@ -88,13 +88,28 @@ def _bounded_int(payload: dict[str, Any], key: str, default: int, lo: int, hi: i
     return v
 
 
-def pending_followups(engine: Engine, *, limit: int = DEFAULT_LIMIT, max_age_hours: int = DEFAULT_MAX_AGE_HOURS,
-                      min_age_seconds: float = 0.0) -> list[dict[str, Any]]:
+def pending_followups(
+    engine: Engine,
+    *,
+    limit: int = DEFAULT_LIMIT,
+    max_age_hours: int = DEFAULT_MAX_AGE_HOURS,
+    min_age_seconds: float = 0.0,
+) -> list[dict[str, Any]]:
     """Passing ``reva_gate`` decisions of connector promotions that no promotion has consumed yet."""
     with engine.connect() as conn:
-        return [dict(r) for r in conn.execute(text(CANDIDATES_SQL), {
-            "login": GATE_LOGIN, "max_age_hours": int(max_age_hours), "min_age_seconds": float(min_age_seconds),
-            "event": EVENT, "n": int(limit)}).mappings()]
+        return [
+            dict(r)
+            for r in conn.execute(
+                text(CANDIDATES_SQL),
+                {
+                    "login": GATE_LOGIN,
+                    "max_age_hours": int(max_age_hours),
+                    "min_age_seconds": float(min_age_seconds),
+                    "event": EVENT,
+                    "n": int(limit),
+                },
+            ).mappings()
+        ]
 
 
 def _record(engine: Engine, ctx: Any, item: dict[str, Any]) -> None:
@@ -105,8 +120,9 @@ def _record(engine: Engine, ctx: Any, item: dict[str, Any]) -> None:
             repo.emit_outbox(conn, EVENT, {**item, "job_id": str(getattr(ctx, "job_id", "") or "") or None})
     except DBAPIError as e:
         if getattr(getattr(e, "orig", None), "sqlstate", None) == STALE_LEASE_SQLSTATE:
-            raise StaleLease(f"lease lost for job {getattr(ctx, 'job_id', None)}",
-                             job_id=str(getattr(ctx, "job_id", None))) from None
+            raise StaleLease(
+                f"lease lost for job {getattr(ctx, 'job_id', None)}", job_id=str(getattr(ctx, "job_id", None))
+            ) from None
         raise
 
 
@@ -148,13 +164,19 @@ def handle_gate_followup(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             decision = recorded_decision(engine, io_, pid)
             if decision is None or decision.decision_id != gid or decision.outcome != "promote":
                 # newest decision changed meanwhile, or its evidence disagrees with the row: fail closed
-                item.update(status="not_promotable",
-                            reason=(decision.reasons[0][:300] if decision is not None and decision.reasons
-                                    else "the newest gate decision is not this promote decision"))
+                item.update(
+                    status="not_promotable",
+                    reason=(
+                        decision.reasons[0][:300]
+                        if decision is not None and decision.reasons
+                        else "the newest gate decision is not this promote decision"
+                    ),
+                )
             else:
                 out = promote_connector(engine, io_, ctx, decision, policy, guard=guard)  # type: ignore[arg-type]
-                item.update({k: out[k] for k in ("status", "version", "connector_version_id", "superseded")
-                             if k in out})
+                item.update(
+                    {k: out[k] for k in ("status", "version", "connector_version_id", "superseded") if k in out}
+                )
         except StaleLease:
             raise  # fenced: this worker no longer owns the job; record nothing
         except AutonomyBlocked as e:  # kill switch flipped mid-run: record nothing, stop
@@ -172,16 +194,26 @@ def handle_gate_followup(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
         except (DBAPIError, SQLAlchemyError) as e:  # trigger / governance refusal: terminal, typed, no params
             orig = getattr(e, "orig", None)
             if getattr(orig, "sqlstate", None) == STALE_LEASE_SQLSTATE:  # fenced: lost the lease, record nothing
-                raise StaleLease(f"lease lost for job {getattr(ctx, 'job_id', None)}",
-                                 job_id=str(getattr(ctx, "job_id", None))) from None
-            item.update(status="refused", code="database_refused", kind=type(orig or e).__name__[:60],
-                        sqlstate=str(getattr(orig, "sqlstate", "") or "")[:10])
+                raise StaleLease(
+                    f"lease lost for job {getattr(ctx, 'job_id', None)}", job_id=str(getattr(ctx, "job_id", None))
+                ) from None
+            item.update(
+                status="refused",
+                code="database_refused",
+                kind=type(orig or e).__name__[:60],
+                sqlstate=str(getattr(orig, "sqlstate", "") or "")[:10],
+            )
         _record(engine, ctx, item)
         results.append(item)
         log.info("gate_followup: proposal %s gate result %s -> %s", pid, gid, item["status"])
     promoted = sum(1 for r in results if r.get("status") == "promoted")
-    return {"status": status, "candidates": len(candidates), "promoted": promoted, "results": results,
-            **({"reason": guard.blocked_reason()} if status == "blocked" and guard.blocked_reason() else {})}
+    return {
+        "status": status,
+        "candidates": len(candidates),
+        "promoted": promoted,
+        "results": results,
+        **({"reason": guard.blocked_reason()} if status == "blocked" and guard.blocked_reason() else {}),
+    }
 
 
 __all__ = ["EVENT", "handle_gate_followup", "pending_followups"]

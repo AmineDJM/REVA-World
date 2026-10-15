@@ -143,7 +143,7 @@ class DraftResult:
             "fallback_from": self.fallback_from,
             "warnings": self.warnings,
             "next_step": "Review the draft and its numbers. Nothing has run. To run it, submit draft_spec "
-                         "unchanged (or edited) to POST /v1/scenarios, then POST /v1/scenarios/{id}/runs.",
+            "unchanged (or edited) to POST /v1/scenarios, then POST /v1/scenarios/{id}/runs.",
         }
 
 
@@ -152,15 +152,21 @@ def text_digest(text: str) -> str:
 
 
 def build_request(text: str, catalog: DraftCatalog, budget: LlmBudget) -> LlmRequest:
-    return LlmRequest(system_prompt=system_prompt(catalog), user_content=user_envelope(text),
-                      output_schema=output_schema(catalog), schema_name=SCHEMA_NAME,
-                      max_output_tokens=budget.max_output_tokens, prompt_version=PROMPT_VERSION,
-                      text_sha256=text_digest(text))
+    return LlmRequest(
+        system_prompt=system_prompt(catalog),
+        user_content=user_envelope(text),
+        output_schema=output_schema(catalog),
+        schema_name=SCHEMA_NAME,
+        max_output_tokens=budget.max_output_tokens,
+        prompt_version=PROMPT_VERSION,
+        text_sha256=text_digest(text),
+    )
 
 
 # --------------------------------------------------------------------------- provider calls
-async def call_providers(request: LlmRequest, drafters: Sequence[ScenarioDrafter], ledger: LlmLedger,
-                         operation_key: str) -> tuple[LlmResponse, list[dict[str, Any]]]:
+async def call_providers(
+    request: LlmRequest, drafters: Sequence[ScenarioDrafter], ledger: LlmLedger, operation_key: str
+) -> tuple[LlmResponse, list[dict[str, Any]]]:
     """Primary provider, then the fallback on retryable failures only. Every attempt is budgeted."""
     if not drafters:
         from reva.nl.ports import LlmUnavailable
@@ -179,8 +185,14 @@ async def call_providers(request: LlmRequest, drafters: Sequence[ScenarioDrafter
             used = (e.details.get("usage") or {}).get("total_tokens")
             # unknown usage stays charged at the reserved upper bound (fail closed)
             await asyncio.to_thread(ledger.settle, op, requests=1, tokens=int(used) if used else tokens)
-            failures.append({"provider": drafter.provider, "model": drafter.model,
-                             "reason": e.details.get("reason"), "retryable": e.retryable})
+            failures.append(
+                {
+                    "provider": drafter.provider,
+                    "model": drafter.model,
+                    "reason": e.details.get("reason"),
+                    "retryable": e.retryable,
+                }
+            )
             last = e
             if not e.retryable:
                 raise
@@ -188,8 +200,12 @@ async def call_providers(request: LlmRequest, drafters: Sequence[ScenarioDrafter
         await asyncio.to_thread(ledger.settle, op, requests=1, tokens=response.usage.total_tokens or tokens)
         return response, failures
     assert last is not None
-    raise LlmProviderError("every configured LLM provider failed; no draft was produced", retryable=True,
-                           reason="all_providers_failed", attempts=failures)
+    raise LlmProviderError(
+        "every configured LLM provider failed; no draft was produced",
+        retryable=True,
+        reason="all_providers_failed",
+        attempts=failures,
+    )
 
 
 # --------------------------------------------------------------------------- interpretation
@@ -203,9 +219,11 @@ def _check_output(output: Any, catalog: DraftCatalog) -> dict[str, Any]:
     v = jsonschema.Draft202012Validator(output_schema(catalog))
     errors = sorted(v.iter_errors(output), key=lambda e: list(e.path))
     if errors:
-        raise LlmProviderError("LLM output does not match the drafting schema", reason="output_invalid",
-                               errors=[{"path": "/" + "/".join(map(str, e.path)), "message": e.message[:200]}
-                                       for e in errors[:10]])
+        raise LlmProviderError(
+            "LLM output does not match the drafting schema",
+            reason="output_invalid",
+            errors=[{"path": "/" + "/".join(map(str, e.path)), "message": e.message[:200]} for e in errors[:10]],
+        )
     for key in ("countries", "outputs", "parameters", "unsupported", "assumptions_added"):
         if len(output[key]) > MAX_LIST:
             raise LlmProviderError(f"LLM output list {key} is longer than {MAX_LIST}", reason="output_invalid")
@@ -217,8 +235,13 @@ def _gap(catalog: DraftCatalog, key: str, text: str, reason: str, source: str) -
     known = norm is not None
     g = catalog.gap_keys.get(norm if norm is not None else "nl.unclassified")
     assert g is not None
-    item: dict[str, Any] = {"text": _s(text, 500), "capability_key": g.key, "kind": g.kind, "reason": _s(reason, 500),
-            "source": source}
+    item: dict[str, Any] = {
+        "text": _s(text, 500),
+        "capability_key": g.key,
+        "kind": g.kind,
+        "reason": _s(reason, 500),
+        "source": source,
+    }
     if not known:
         item["llm_capability_key_rejected"] = True
     return item
@@ -348,36 +371,57 @@ def _walk_numbers(doc: Any, prefix: str = "") -> list[tuple[str, float]]:
     return out
 
 
-def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftCatalog,
-              *, now: datetime | None = None) -> DraftResult:
+def interpret(
+    response: LlmResponse, text: str, inp: DraftInput, catalog: DraftCatalog, *, now: datetime | None = None
+) -> DraftResult:
     """Turn an (untrusted) LLM output into a checked draft. Pure apart from the registries."""
     from reva.simulation.spec import validate_scenario_spec
 
-    base: dict[str, Any] = dict(provider=response.provider, model=response.model,
-                                model_requested=response.model_requested,
-                prompt_version=PROMPT_VERSION, prompt_sha256=prompt_digest(catalog),
-                catalog_digest=catalog.digest(), usage={**response.usage.as_json(), "requests": 1},
-                latency_ms=response.latency_ms, text_sha256=text_digest(text), text_length=len(text))
+    base: dict[str, Any] = dict(
+        provider=response.provider,
+        model=response.model,
+        model_requested=response.model_requested,
+        prompt_version=PROMPT_VERSION,
+        prompt_sha256=prompt_digest(catalog),
+        catalog_digest=catalog.digest(),
+        usage={**response.usage.as_json(), "requests": 1},
+        latency_ms=response.latency_ms,
+        text_sha256=text_digest(text),
+        text_length=len(text),
+    )
     warnings: list[str] = []
     if response.recorded:
         warnings.append("recorded_llm_response: replayed from a test fixture, not a live provider call")
     if response.output is None:
         reason = response.refusal or "the provider returned no draft"
         unsupported = [_gap(catalog, "nl.out_of_scope", text[:200], f"no draft: {reason}", "provider")]
-        return DraftResult(status="nothing_draftable", draft_spec=None, candidate_spec=None,
-                           validation={"valid": False, "errors": []},
-                           restatement=_restate_none("en", unsupported, catalog),
-                           language="en", llm_restatement="", unsupported=unsupported, rejected_ids=[],
-                           missing_fields=[], assumptions_added=[], numbers_to_confirm=[], warnings=warnings, **base)
+        return DraftResult(
+            status="nothing_draftable",
+            draft_spec=None,
+            candidate_spec=None,
+            validation={"valid": False, "errors": []},
+            restatement=_restate_none("en", unsupported, catalog),
+            language="en",
+            llm_restatement="",
+            unsupported=unsupported,
+            rejected_ids=[],
+            missing_fields=[],
+            assumptions_added=[],
+            numbers_to_confirm=[],
+            warnings=warnings,
+            **base,
+        )
     out = _check_output(response.output, catalog)
     lang = out["input_language"] if out["input_language"] in ("fr", "en") else "en"
-    unsupported = [_gap(catalog, _s(u["capability_key"], 100), u["text"], u["reason"], "llm")
-                   for u in out["unsupported"]]
+    unsupported = [
+        _gap(catalog, _s(u["capability_key"], 100), u["text"], u["reason"], "llm") for u in out["unsupported"]
+    ]
     plugin_state, registry = registered_plugins()
     registered = set(registry) if plugin_state == "registered" else set(catalog.models)
     present = {u["capability_key"] for u in unsupported}
-    for hit in keyword_gaps(text, language=lang, registered=registered,
-                            multi_period_available=catalog.horizon_multi_period):
+    for hit in keyword_gaps(
+        text, language=lang, registered=registered, multi_period_available=catalog.horizon_multi_period
+    ):
         gk = catalog.normalize_gap(hit.capability_key)
         if gk is not None and gk not in present:
             unsupported.append(_gap(catalog, gk, hit.text, hit.reason, "server_guard"))
@@ -386,28 +430,48 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     rejected: list[dict[str, Any]] = []
     missing: list[str] = []
     key = _s(out["model_key"], 100).strip()
-    common: dict[str, Any] = dict(llm_restatement=_s(out["request_restatement"], 2000), language=lang,
-                                  warnings=warnings,
-                  assumptions_added=assumptions, **base)
+    common: dict[str, Any] = dict(
+        llm_restatement=_s(out["request_restatement"], 2000),
+        language=lang,
+        warnings=warnings,
+        assumptions_added=assumptions,
+        **base,
+    )
     if not key:
         if not unsupported:
-            unsupported.append(_gap(catalog, "nl.out_of_scope", text[:200],
-                                    "no registered model matches the request", "server"))
-        return DraftResult(status="nothing_draftable", draft_spec=None, candidate_spec=None,
-                           validation={"valid": False, "errors": []},
-                           restatement=_restate_none(lang, unsupported, catalog),
-                           unsupported=unsupported, rejected_ids=[], missing_fields=[], numbers_to_confirm=[],
-                           **common)
+            unsupported.append(
+                _gap(catalog, "nl.out_of_scope", text[:200], "no registered model matches the request", "server")
+            )
+        return DraftResult(
+            status="nothing_draftable",
+            draft_spec=None,
+            candidate_spec=None,
+            validation={"valid": False, "errors": []},
+            restatement=_restate_none(lang, unsupported, catalog),
+            unsupported=unsupported,
+            rejected_ids=[],
+            missing_fields=[],
+            numbers_to_confirm=[],
+            **common,
+        )
     model = catalog.models.get(key)
     if model is None:
         rejected.append({"field": "model_key", "value": key[:100]})
         gap_key = catalog.model_gap(key) or "nl.unclassified"
         if gap_key not in present:
             unsupported.append(_gap(catalog, gap_key, key, "model is not registered for drafting", "server"))
-        return DraftResult(status="draft_rejected", draft_spec=None, candidate_spec=None,
-                           validation={"valid": False, "errors": []},
-                           restatement=_restate_rejected(lang, rejected, unsupported, catalog), unsupported=unsupported,
-                           rejected_ids=rejected, missing_fields=[], numbers_to_confirm=[], **common)
+        return DraftResult(
+            status="draft_rejected",
+            draft_spec=None,
+            candidate_spec=None,
+            validation={"valid": False, "errors": []},
+            restatement=_restate_rejected(lang, rejected, unsupported, catalog),
+            unsupported=unsupported,
+            rejected_ids=rejected,
+            missing_fields=[],
+            numbers_to_confirm=[],
+            **common,
+        )
     if model.experimental:
         warnings.append(f"experimental_model: {model.model_key} is not yet reviewed ({model.review_status})")
 
@@ -423,8 +487,15 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         else:
             rejected.append({"field": "countries", "value": code})
             listed = list(model.countries) if len(model.countries) <= 20 else f"({len(model.countries)} countries)"
-            unsupported.append(_gap(catalog, "geography.not_covered", code,
-                                    f"{_safe(code)} is not in {model.model_key}'s countries {listed}", "server"))
+            unsupported.append(
+                _gap(
+                    catalog,
+                    "geography.not_covered",
+                    code,
+                    f"{_safe(code)} is not in {model.model_key}'s countries {listed}",
+                    "server",
+                )
+            )
     if not countries and not any(r["field"] == "countries" for r in rejected):
         missing.append("countries")
     # outputs
@@ -453,8 +524,9 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         if fid not in model.fidelities:
             rejected.append({"field": "fidelity", "value": fid})
             gk = f"fidelity.{fid}" if f"fidelity.{fid}" in catalog.gap_keys else "nl.unclassified"
-            unsupported.append(_gap(catalog, gk, fid, f"fidelity {fid} is not available for {model.model_key}",
-                                    "server"))
+            unsupported.append(
+                _gap(catalog, gk, fid, f"fidelity {fid} is not available for {model.model_key}", "server")
+            )
         explicit.add("fidelity")
     # reference year
     year = out["reference_year"]
@@ -468,8 +540,15 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         spec_p = model.param(path) if _PATH.match(path) else None
         if spec_p is None:
             rejected.append({"field": "parameters", "value": path[:200]})
-            unsupported.append(_gap(catalog, "nl.parameter_not_draftable", path,
-                                    f"{path} is not a parameter of {model.model_key}", "server"))
+            unsupported.append(
+                _gap(
+                    catalog,
+                    "nl.parameter_not_draftable",
+                    path,
+                    f"{path} is not a parameter of {model.model_key}",
+                    "server",
+                )
+            )
             continue
         if any(int(i) > MAX_INDEX for i in re.findall(r"\[(\d+)\]", path)):
             rejected.append({"field": "parameters", "value": path})
@@ -497,15 +576,17 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         param_meta[path] = {"quote": _s(p["quote"], 300)}
 
     title = _s(out["title"], 120).strip() or f"Draft: {model.model_key}"
-    spec.update({
-        "title": title,
-        "baseline_release_id": inp.baseline_release_id,
-        "knowledge_cutoff": inp.knowledge_cutoff,
-        "model_key": model.model_key,
-        "countries": countries,
-        "outputs": outputs,
-        "seed": DEFAULT_SEED,
-    })
+    spec.update(
+        {
+            "title": title,
+            "baseline_release_id": inp.baseline_release_id,
+            "knowledge_cutoff": inp.knowledge_cutoff,
+            "model_key": model.model_key,
+            "countries": countries,
+            "outputs": outputs,
+            "seed": DEFAULT_SEED,
+        }
+    )
     if model.schema_version is not None:
         spec["schema_version"] = model.schema_version
     if model.model_version is not None:
@@ -540,17 +621,27 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     numbers = stated_numbers(text)
     confirm: list[dict[str, Any]] = []
     if "reference_year" in spec:
-        confirm.append({"path": "reference_year", "value": spec["reference_year"],
-                        "provenance": "server_default" if year_source == "server_default"
-                        else number_provenance(float(spec["reference_year"]), numbers)})
+        confirm.append(
+            {
+                "path": "reference_year",
+                "value": spec["reference_year"],
+                "provenance": "server_default"
+                if year_source == "server_default"
+                else number_provenance(float(spec["reference_year"]), numbers),
+            }
+        )
     for name in spec:
         if name in ("reference_year", "seed") or not isinstance(spec[name], (dict, list)):
             continue
         for path, v in _walk_numbers(spec[name], name):
             if path in explicit:
                 prov = number_provenance(v, numbers)
-                item = {"path": path, "value": spec_value(spec, path), "provenance": prov,
-                        "quote": param_meta.get(path, {}).get("quote", "")}
+                item = {
+                    "path": path,
+                    "value": spec_value(spec, path),
+                    "provenance": prov,
+                    "quote": param_meta.get(path, {}).get("quote", ""),
+                }
                 if prov == "not_in_text":
                     warnings.append(f"number_not_in_text: {path} was proposed by the LLM, not written by the user")
             else:
@@ -566,8 +657,10 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
             item["blocks_draft"] = True
             unsupported.append(item)
     if spec.get("countries") == ["ALL"] and spec.get("missing_input_policy") == "fail":
-        warnings.append("all_countries_with_fail_policy: with missing_input_policy fail, any country with a missing "
-                        "input refuses the whole run; set skip_missing_countries explicitly to run the complete ones")
+        warnings.append(
+            "all_countries_with_fail_policy: with missing_input_policy fail, any country with a missing "
+            "input refuses the whole run; set skip_missing_countries explicitly to run the complete ones"
+        )
     candidate = copy.deepcopy(spec)
     errors: list[dict[str, Any]] = []
     valid = False
@@ -583,19 +676,27 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
             valid = True
         except (ValidationProblem, CapabilityGap) as e:
             errors = [{"code": e.code, "message": e.message[:300]}]
-            errors += [{"path": d.get("path"), "message": _s(d.get("message"), 300)}
-                       for d in (e.details.get("errors") or [])[:20] if isinstance(d, dict)]
+            errors += [
+                {"path": d.get("path"), "message": _s(d.get("message"), 300)}
+                for d in (e.details.get("errors") or [])[:20]
+                if isinstance(d, dict)
+            ]
             cap = e.details.get("capability")
             if isinstance(cap, str) and cap in catalog.gap_keys and cap not in present:
                 unsupported.append(_gap(catalog, cap, cap, e.message, "validator"))
+
     def _is_missing(e: Mapping[str, Any]) -> bool:
         where = str(e.get("path") or "").strip("/").replace("/", ".")
         message = str(e.get("message", ""))
         # a oneOf object (e.g. an intervention kind) fails as a whole when its required leaves are missing
         parent_of_missing = "is not valid under any of the given schemas" in message and any(
-            m.startswith(where + ".") for m in missing if where)
-        return "required property" in message or parent_of_missing or any(
-            where == m or where.startswith(m + ".") for m in missing)
+            m.startswith(where + ".") for m in missing if where
+        )
+        return (
+            "required property" in message
+            or parent_of_missing
+            or any(where == m or where.startswith(m + ".") for m in missing)
+        )
 
     details = [e for e in errors if "path" in e]
     only_missing = bool(details) and all(_is_missing(e) for e in details)
@@ -614,24 +715,41 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         if f.field and f.field not in missing:
             missing.append(f.field)
     result = DraftResult(
-        status=status, draft_spec=spec if status == "draft_ready" else None,
+        status=status,
+        draft_spec=spec if status == "draft_ready" else None,
         candidate_spec=None if status in ("draft_ready", "draft_rejected") else candidate,
-        validation={"valid": status == "draft_ready", "errors": errors,
-                    "validator": "reva.simulation.spec.validate_scenario_spec"},
-        restatement="", unsupported=unsupported, rejected_ids=rejected, missing_fields=missing,
-        numbers_to_confirm=confirm, draft_spec_sha256=canonical_sha if status == "draft_ready" else None,
-        parameters_set=[{"path": p, "value": spec_value(spec if valid else candidate, p),
-                         "quote": param_meta.get(p, {}).get("quote", "")} for p in sorted(param_meta)],
-        **common)
+        validation={
+            "valid": status == "draft_ready",
+            "errors": errors,
+            "validator": "reva.simulation.spec.validate_scenario_spec",
+        },
+        restatement="",
+        unsupported=unsupported,
+        rejected_ids=rejected,
+        missing_fields=missing,
+        numbers_to_confirm=confirm,
+        draft_spec_sha256=canonical_sha if status == "draft_ready" else None,
+        parameters_set=[
+            {
+                "path": p,
+                "value": spec_value(spec if valid else candidate, p),
+                "quote": param_meta.get(p, {}).get("quote", ""),
+            }
+            for p in sorted(param_meta)
+        ],
+        **common,
+    )
     result.restatement = restate(result, model, catalog)
     return result
 
 
-def crosscheck(text: str, spec: Mapping[str, Any], model: DraftableModel,
-               unsupported: Sequence[Mapping[str, Any]]) -> list[Finding]:
+def crosscheck(
+    text: str, spec: Mapping[str, Any], model: DraftableModel, unsupported: Sequence[Mapping[str, Any]]
+) -> list[Finding]:
     """Server cross-checks between the text and the composed draft (see :mod:`reva.nl.crosschecks`)."""
-    llm_geo = any(u.get("source") == "llm" and str(u.get("capability_key", "")).startswith("geography.")
-                  for u in unsupported)
+    llm_geo = any(
+        u.get("source") == "llm" and str(u.get("capability_key", "")).startswith("geography.") for u in unsupported
+    )
     out = geography_findings(text, [str(c) for c in spec.get("countries") or []], llm_geo)
     if model.model_key == "economic.io_price":
         industry = model.param("intervention.shocks[].industry")
@@ -678,50 +796,74 @@ def _gaps_text(lang: str, unsupported: Sequence[Mapping[str, Any]], catalog: Dra
         key = str(u["capability_key"])
         if u.get("source") == "llm" or u.get("llm_capability_key_rejected"):
             g = catalog.gap_keys.get(key) if catalog is not None else None
-            label = g.title if g is not None else ("élément signalé par le modèle de rédaction" if lang == "fr"
-                                                   else "item reported by the drafting model")
+            label = (
+                g.title
+                if g is not None
+                else (
+                    "élément signalé par le modèle de rédaction"
+                    if lang == "fr"
+                    else "item reported by the drafting model"
+                )
+            )
             items.append(f"{key} ({label})")
         else:
             items.append(f"{key} ({u['reason']})")
     if not items:
         return ""
-    return (f" Non pris en charge : {'; '.join(items)}." if lang == "fr" else f" Not supported: {'; '.join(items)}.")
+    return f" Non pris en charge : {'; '.join(items)}." if lang == "fr" else f" Not supported: {'; '.join(items)}."
 
 
 def _questions_text(lang: str, unsupported: Sequence[Mapping[str, Any]]) -> str:
     qs = [str(u["reason"]) for u in unsupported if u.get("blocks_draft")]
     if not qs:
         return ""
-    return (" À préciser avant tout brouillon exécutable : " if lang == "fr" else
-            " To clarify before a runnable draft: ") + " ".join(qs)
+    return (
+        " À préciser avant tout brouillon exécutable : " if lang == "fr" else " To clarify before a runnable draft: "
+    ) + " ".join(qs)
 
 
 def _restate_none(lang: str, unsupported: Sequence[Mapping[str, Any]], catalog: DraftCatalog | None = None) -> str:
     if lang == "fr":
-        return "Aucun brouillon de scénario n'a pu être établi : aucun modèle enregistré ne calcule cette " \
-               "demande." + _gaps_text(lang, unsupported, catalog) + " Rien n'a été exécuté."
-    return "No scenario draft could be made: no registered model computes this request." + \
-        _gaps_text(lang, unsupported, catalog) + " Nothing was run."
+        return (
+            "Aucun brouillon de scénario n'a pu être établi : aucun modèle enregistré ne calcule cette "
+            "demande." + _gaps_text(lang, unsupported, catalog) + " Rien n'a été exécuté."
+        )
+    return (
+        "No scenario draft could be made: no registered model computes this request."
+        + _gaps_text(lang, unsupported, catalog)
+        + " Nothing was run."
+    )
 
 
-def _restate_rejected(lang: str, rejected: Sequence[Mapping[str, Any]], unsupported: Sequence[Mapping[str, Any]],
-                      catalog: DraftCatalog | None = None) -> str:
+def _restate_rejected(
+    lang: str,
+    rejected: Sequence[Mapping[str, Any]],
+    unsupported: Sequence[Mapping[str, Any]],
+    catalog: DraftCatalog | None = None,
+) -> str:
     ids = ", ".join(f"{r['field']}={_safe(r['value'])}" for r in rejected[:10])
     if lang == "fr":
-        return (f"Brouillon rejeté : il fait référence à des identifiants hors de la liste autorisée ({ids}). "
-                "Rien n'a été remplacé ni exécuté ; reformulez la demande sans ces éléments."
-                + _gaps_text(lang, unsupported, catalog))
-    return (f"Draft rejected: it references identifiers outside the allow-list ({ids}). Nothing was substituted "
-            "or run; rephrase the request without them." + _gaps_text(lang, unsupported, catalog))
+        return (
+            f"Brouillon rejeté : il fait référence à des identifiants hors de la liste autorisée ({ids}). "
+            "Rien n'a été remplacé ni exécuté ; reformulez la demande sans ces éléments."
+            + _gaps_text(lang, unsupported, catalog)
+        )
+    return (
+        f"Draft rejected: it references identifiers outside the allow-list ({ids}). Nothing was substituted "
+        "or run; rephrase the request without them." + _gaps_text(lang, unsupported, catalog)
+    )
 
 
 def _countries_text(lang: str, countries: Sequence[str]) -> str:
     if not countries:
         return "(aucun pays)" if lang == "fr" else "(no country)"
     if list(countries) == ["ALL"]:
-        return ("ALL = tous les pays ayant des données dans la publication de référence (résolu à l'exécution, "
-                "aucune exclusion)" if lang == "fr" else
-                "ALL = every country with data in the baseline release (resolved at run time, no exclusions)")
+        return (
+            "ALL = tous les pays ayant des données dans la publication de référence (résolu à l'exécution, "
+            "aucune exclusion)"
+            if lang == "fr"
+            else "ALL = every country with data in the baseline release (resolved at run time, no exclusions)"
+        )
     return ", ".join(_safe(c) for c in countries)
 
 
@@ -745,23 +887,34 @@ def restate(r: DraftResult, model: DraftableModel, catalog: DraftCatalog | None 
     outs = list(spec.get("outputs") or [])
     outputs = ", ".join(outs[:6]) + (f" (+{len(outs) - 6})" if len(outs) > 6 else "")
     if lang == "fr":
-        head = {"draft_ready": "Brouillon valide (non exécuté)", "needs_input": "Brouillon incomplet",
-                "draft_invalid": "Brouillon non valide"}[r.status]
+        head = {
+            "draft_ready": "Brouillon valide (non exécuté)",
+            "needs_input": "Brouillon incomplet",
+            "draft_invalid": "Brouillon non valide",
+        }[r.status]
         year = spec.get("reference_year") or "(non précisée)"
-        text = (f"{head} : modèle {model.model_key}, pays {countries}, année de référence "
-                f"{year}, fidélité {spec.get('fidelity')}"
-                + (f" ; paramètres : {nums}" if nums else "") + f" ; sorties : {outputs}.")
+        text = (
+            f"{head} : modèle {model.model_key}, pays {countries}, année de référence "
+            f"{year}, fidélité {spec.get('fidelity')}"
+            + (f" ; paramètres : {nums}" if nums else "")
+            + f" ; sorties : {outputs}."
+        )
         if r.missing_fields:
             text += f" Informations manquantes : {', '.join(r.missing_fields)}."
         if r.validation.get("errors") and r.status in ("draft_invalid", "needs_input"):
             text += " Refusé par le validateur : " + "; ".join(e["message"] for e in r.validation["errors"][:5]) + "."
         text += _questions_text(lang, r.unsupported) + _gaps_text(lang, r.unsupported, catalog)
         return text + " Vérifiez chaque valeur ; rien ne s'exécute sans votre confirmation."
-    head = {"draft_ready": "Valid draft (not run)", "needs_input": "Incomplete draft",
-            "draft_invalid": "Invalid draft"}[r.status]
+    head = {
+        "draft_ready": "Valid draft (not run)",
+        "needs_input": "Incomplete draft",
+        "draft_invalid": "Invalid draft",
+    }[r.status]
     year = spec.get("reference_year") or "(not stated)"
-    text = (f"{head}: model {model.model_key}, countries {countries}, reference year {year}, "
-            f"fidelity {spec.get('fidelity')}" + (f"; parameters: {nums}" if nums else "") + f"; outputs: {outputs}.")
+    text = (
+        f"{head}: model {model.model_key}, countries {countries}, reference year {year}, "
+        f"fidelity {spec.get('fidelity')}" + (f"; parameters: {nums}" if nums else "") + f"; outputs: {outputs}."
+    )
     if r.missing_fields:
         text += f" Missing information: {', '.join(r.missing_fields)}."
     if r.validation.get("errors") and r.status in ("draft_invalid", "needs_input"):
@@ -771,9 +924,15 @@ def restate(r: DraftResult, model: DraftableModel, catalog: DraftCatalog | None 
 
 
 # --------------------------------------------------------------------------- entry point
-async def draft_scenario(inp: DraftInput, *, drafters: Sequence[ScenarioDrafter], ledger: LlmLedger,
-                         budget: LlmBudget, catalog: DraftCatalog | None = None,
-                         now: datetime | None = None) -> DraftResult:
+async def draft_scenario(
+    inp: DraftInput,
+    *,
+    drafters: Sequence[ScenarioDrafter],
+    ledger: LlmLedger,
+    budget: LlmBudget,
+    catalog: DraftCatalog | None = None,
+    now: datetime | None = None,
+) -> DraftResult:
     """Draft a scenario from text. Raises ``budget_exhausted`` (429) before any provider call when over budget."""
     text = sanitize_text(inp.text)
     if not re.fullmatch(r"[0-9a-f]{32,64}", inp.operation_key):
@@ -784,6 +943,7 @@ async def draft_scenario(inp: DraftInput, *, drafters: Sequence[ScenarioDrafter]
     result = interpret(response, text, inp, catalog, now=now)
     result.fallback_from = failures
     if failures:
-        result.warnings.append(f"fallback_provider: {response.provider} answered after "
-                               f"{', '.join(f['provider'] for f in failures)} failed")
+        result.warnings.append(
+            f"fallback_provider: {response.provider} answered after {', '.join(f['provider'] for f in failures)} failed"
+        )
     return result

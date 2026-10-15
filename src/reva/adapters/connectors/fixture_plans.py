@@ -25,8 +25,16 @@ from pathlib import Path
 from typing import Any
 
 #: Reporter subset (ISO3 -> Comtrade reporter code) of tests/fixtures/source/un.comtrade.public_batch.
-COMTRADE_FIXTURE_REPORTERS = {"FRA": 251, "DZA": 12, "CHN": 156, "USA": 842, "CHE": 757, "IRQ": 368, "NLD": 528,
-                              "ATG": 28}
+COMTRADE_FIXTURE_REPORTERS = {
+    "FRA": 251,
+    "DZA": 12,
+    "CHN": 156,
+    "USA": 842,
+    "CHE": 757,
+    "IRQ": 368,
+    "NLD": 528,
+    "ATG": 28,
+}
 #: Economy subset of tests/fixtures/source/worldbank.wdi.all_economies.
 WORLDBANK_FIXTURE_ECONOMIES = ("FRA", "DZA", "CHN", "USA", "CHE", "IRQ", "NLD", "ATG", "XKX", "PRI")
 #: Eurostat geo codes of tests/fixtures/source/eurostat.demography (since 2008, windowed URLs, + EUROPOP2023).
@@ -45,15 +53,17 @@ def _worldbank() -> Any:
 def _comtrade() -> Any:
     from reva.adapters.connectors.comtrade_batch import ComtradeBatchConnector
 
-    return ComtradeBatchConnector(dict(COMTRADE_FIXTURE_REPORTERS), total_years=(2023,), bilateral_years=(2023,),
-                                  bilateral_batch=4)
+    return ComtradeBatchConnector(
+        dict(COMTRADE_FIXTURE_REPORTERS), total_years=(2023,), bilateral_years=(2023,), bilateral_batch=4
+    )
 
 
 def _demography() -> Any:
     from reva.adapters.connectors import eurostat_demography as ed
 
-    return ed.EurostatDemographyConnector(countries=DEMOGRAPHY_FIXTURE_GEOS, since_year=DEMOGRAPHY_FIXTURE_SINCE,
-                                          window_years=ed.WINDOW_YEARS)
+    return ed.EurostatDemographyConnector(
+        countries=DEMOGRAPHY_FIXTURE_GEOS, since_year=DEMOGRAPHY_FIXTURE_SINCE, window_years=ed.WINDOW_YEARS
+    )
 
 
 def _figaro() -> Any:

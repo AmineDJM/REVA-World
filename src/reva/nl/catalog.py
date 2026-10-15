@@ -52,41 +52,69 @@ PLANNED_MODELS: Mapping[str, str] = {
 NL_GAP_KEYS: Mapping[str, tuple[str, str]] = {
     "geography.not_covered": ("capability_gap", "A named country or region is not covered by the selected model"),
     "nl.parameter_not_draftable": ("capability_gap", "A requested setting has no parameter in the selected model"),
-    "nl.input_value_override": ("policy_refusal", "Setting, replacing or assuming data values is refused: inputs "
-                                "come only from the pinned baseline release and missing stays missing"),
-    "nl.instruction_in_text": ("policy_refusal", "The text contains instructions addressed to the system; "
-                               "they were treated as data and not followed"),
+    "nl.input_value_override": (
+        "policy_refusal",
+        "Setting, replacing or assuming data values is refused: inputs "
+        "come only from the pinned baseline release and missing stays missing",
+    ),
+    "nl.instruction_in_text": (
+        "policy_refusal",
+        "The text contains instructions addressed to the system; they were treated as data and not followed",
+    ),
     "nl.out_of_scope": ("capability_gap", "The text is not a scenario request REVA can draft"),
     # server cross-checks (reva.nl.crosschecks): the draft is withheld and the user is asked
-    "geography.exclusion_not_supported": ("capability_gap", "Excluding countries from a set ('all countries except "
-                                          "X') cannot be expressed in a scenario: list the countries to include"),
-    "geography.region_not_resolved": ("capability_gap", "A named region or country group has no reviewed membership "
-                                      "list for drafting: list its countries explicitly"),
-    "nl.shock_origin_not_stated": ("capability_gap", "The economies where a price change originates are not stated "
-                                   "(never defaulted to the reported country)"),
-    "nl.age_level_not_shift": ("capability_gap", "A stated target age is a level, not a shift in months: it is "
-                               "never converted silently"),
+    "geography.exclusion_not_supported": (
+        "capability_gap",
+        "Excluding countries from a set ('all countries except "
+        "X') cannot be expressed in a scenario: list the countries to include",
+    ),
+    "geography.region_not_resolved": (
+        "capability_gap",
+        "A named region or country group has no reviewed membership list for drafting: list its countries explicitly",
+    ),
+    "nl.shock_origin_not_stated": (
+        "capability_gap",
+        "The economies where a price change originates are not stated (never defaulted to the reported country)",
+    ),
+    "nl.age_level_not_shift": (
+        "capability_gap",
+        "A stated target age is a level, not a shift in months: it is never converted silently",
+    ),
     "nl.unclassified": ("capability_gap", "Unsupported request that matches no more specific key"),
 }
 
 #: Short, reviewed hints for parameters whose schema carries no description (keyed by model_key, path).
 PARAMETER_HINTS: Mapping[tuple[str, str], str] = {
-    ("economic.crude_exposure", "intervention.import_multiplier"):
-        "ratio applied to the crude-oil import border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
-    ("economic.crude_exposure", "intervention.export_multiplier"):
-        "ratio applied to the crude-oil export border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
-    ("economic.crude_exposure", "assumptions.elasticity_grid[].import_elasticity"):
-        "import quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
-    ("economic.crude_exposure", "assumptions.elasticity_grid[].export_elasticity"):
-        "export quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
-    ("economic.crude_exposure", "assumptions.quantity_response"):
-        "fixed (L1) or elasticity_sensitivity (L2); normally implied by the fidelity",
-    ("social.retirement_age", "intervention.shift_months"):
-        "change in months of the eligibility age relative to reference_path (+36 = three years later). Not a "
-        "target age: 'retirement at 65' states a level, which is never converted into a shift",
-    ("social.retirement_age", "intervention.target_age_months"):
-        "target eligibility age as a level, in months of age (65 years = 780; 62 years 9 months = 753), for the "
-        "birth cohorts from first_birth_year",
+    (
+        "economic.crude_exposure",
+        "intervention.import_multiplier",
+    ): "ratio applied to the crude-oil import border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
+    (
+        "economic.crude_exposure",
+        "intervention.export_multiplier",
+    ): "ratio applied to the crude-oil export border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
+    (
+        "economic.crude_exposure",
+        "assumptions.elasticity_grid[].import_elasticity",
+    ): "import quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
+    (
+        "economic.crude_exposure",
+        "assumptions.elasticity_grid[].export_elasticity",
+    ): "export quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
+    (
+        "economic.crude_exposure",
+        "assumptions.quantity_response",
+    ): "fixed (L1) or elasticity_sensitivity (L2); normally implied by the fidelity",
+    (
+        "social.retirement_age",
+        "intervention.shift_months",
+    ): "change in months of the eligibility age relative to reference_path (+36 = three years later). Not a "
+    "target age: 'retirement at 65' states a level, which is never converted into a shift",
+    (
+        "social.retirement_age",
+        "intervention.target_age_months",
+    ): "target eligibility age as a level, in months of age (65 years = 780; 62 years 9 months = 753), for the "
+    "birth cohorts from first_birth_year",
 }
 
 
@@ -143,13 +171,21 @@ class DraftableModel:
             "model_key": self.model_key,
             "description": self.description,
             "countries": [c for c in self.countries if c != "ALL"],
-            **({"all_countries": 'write countries ["ALL"] when the user asks for every country / all countries / '
-                                 'tous les pays (the platform resolves it to every country with data). A scenario '
-                                 'cannot exclude countries: for "all countries except X" do not write ALL; report '
-                                 'it with capability_key geography.exclusion_not_supported'}
-               if "ALL" in self.countries else {}),
-            "reference_years": (f"any year from {self.reference_years[0]} to {self.reference_years[1]} inclusive"
-                                if self.reference_years else None),
+            **(
+                {
+                    "all_countries": 'write countries ["ALL"] when the user asks for every country / all countries / '
+                    "tous les pays (the platform resolves it to every country with data). A scenario "
+                    'cannot exclude countries: for "all countries except X" do not write ALL; report '
+                    "it with capability_key geography.exclusion_not_supported"
+                }
+                if "ALL" in self.countries
+                else {}
+            ),
+            "reference_years": (
+                f"any year from {self.reference_years[0]} to {self.reference_years[1]} inclusive"
+                if self.reference_years
+                else None
+            ),
             "fidelities": {f: _fidelity_title(f) for f in self.fidelities},
             "outputs": [{"id": o, "unit": self.output_units.get(o, "")} for o in self.outputs],
             "parameters": [p.prompt_view() for p in self.parameters],
@@ -342,12 +378,20 @@ def _leaves(node: Mapping[str, Any], prefix: str) -> Iterator[tuple[str, dict[st
 
 def _param(model_key: str, path: str, node: Mapping[str, Any], hints: Mapping[str, Any] | None = None) -> ParamSpec:
     hints = hints or {}
-    hint = (PARAMETER_HINTS.get((model_key, path)) or str((hints.get("parameters") or {}).get(path) or "")
-            or str(node.get("description") or ""))
+    hint = (
+        PARAMETER_HINTS.get((model_key, path))
+        or str((hints.get("parameters") or {}).get(path) or "")
+        or str(node.get("description") or "")
+    )
     if isinstance(node.get("enum"), list):
         meanings = (hints.get("choice_meanings") or {}).get(path) or {}
-        return ParamSpec(path, "choice", tuple(node["enum"]), hint,
-                         tuple((c, str(meanings[c])) for c in node["enum"] if isinstance(c, str) and c in meanings))
+        return ParamSpec(
+            path,
+            "choice",
+            tuple(node["enum"]),
+            hint,
+            tuple((c, str(meanings[c])) for c in node["enum"] if isinstance(c, str) and c in meanings),
+        )
     t = node.get("type")
     alternatives = [a.get("type") for a in (node.get("oneOf") or node.get("anyOf") or []) if isinstance(a, dict)]
     if t is None and alternatives:  # e.g. a number or a decimal string: the draft always sends a JSON number
@@ -390,8 +434,11 @@ def registered_countries() -> tuple[str, ...]:
     keys: set[str] = set()
     try:
         for e in load_yaml(REGISTRY_ROOT / "entities" / "countries.yaml").get("entities") or []:
-            if isinstance(e, dict) and e.get("kind") == "entity.country" and re.fullmatch(r"[A-Z]{3}",
-                                                                                        str(e.get("key"))):
+            if (
+                isinstance(e, dict)
+                and e.get("kind") == "entity.country"
+                and re.fullmatch(r"[A-Z]{3}", str(e.get("key")))
+            ):
                 keys.add(str(e["key"]))
     except (OSError, AttributeError):
         pass
@@ -436,8 +483,9 @@ def registered_plugins() -> tuple[str, dict[str, Any]]:
     except ImportError as e:
         if getattr(e, "name", "") in ("reva.simulation.plugins",):
             return "absent", {}
-        log.warning("simulation plugin registry failed to import (%s); drafting uses the schema alone",
-                    type(e).__name__)
+        log.warning(
+            "simulation plugin registry failed to import (%s); drafting uses the schema alone", type(e).__name__
+        )
         return "unavailable", {}
     try:
         load_all = getattr(plugins, "load_all", None)
@@ -445,8 +493,7 @@ def registered_plugins() -> tuple[str, dict[str, Any]]:
             load_all()
         reg = getattr(plugins, "REGISTRY", None)
     except Exception as e:  # a broken plugin must not take drafting down silently
-        log.warning("simulation plugin registry failed to load (%s); drafting uses the schema alone",
-                    type(e).__name__)
+        log.warning("simulation plugin registry failed to load (%s); drafting uses the schema alone", type(e).__name__)
         return "unavailable", {}
     if not isinstance(reg, Mapping):
         return "unavailable", {}
@@ -461,8 +508,11 @@ def _plugin_hints(plugin: Any) -> dict[str, Any]:
         return {}
     if not isinstance(h, Mapping):
         return {}
-    return {k: {str(p): v for p, v in (h.get(k) or {}).items()} for k in ("parameters", "choice_meanings")
-            if isinstance(h.get(k), Mapping)}
+    return {
+        k: {str(p): v for p, v in (h.get(k) or {}).items()}
+        for k in ("parameters", "choice_meanings")
+        if isinstance(h.get(k), Mapping)
+    }
 
 
 def _plugin_manifest(plugin: Any) -> dict[str, Any]:
@@ -483,8 +533,9 @@ def _description(key: str, manifest: Mapping[str, Any], reg_entry: Mapping[str, 
     return " ".join(" ".join(parts).split())[:1200]
 
 
-def build_catalog(schema: Mapping[str, Any] | None = None, *,
-                  plugins: tuple[str, Mapping[str, Any]] | None = None) -> DraftCatalog:
+def build_catalog(
+    schema: Mapping[str, Any] | None = None, *, plugins: tuple[str, Mapping[str, Any]] | None = None
+) -> DraftCatalog:
     """Build the allow-list from the scenario schema, the plugin registry and the capability catalogue."""
     from reva import capabilities
     from reva.simulation.spec import scenario_schema
@@ -503,8 +554,9 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
         reg_entry = methods.get(key, {})
         manifest = _plugin_manifest(registry[key]) if key in registry else {}
         years = props.get("reference_year") or {}
-        ref_years = (int(years["minimum"]), int(years["maximum"])) if "minimum" in years and "maximum" in years \
-            else None
+        ref_years = (
+            (int(years["minimum"]), int(years["maximum"])) if "minimum" in years and "maximum" in years else None
+        )
         horizon = props.get("horizon") or {}
         periods = (horizon.get("properties") or {}).get("periods") or {}
         if not (_const(periods)[0] and _const(periods)[1] == 1):
@@ -515,8 +567,11 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
             if name in SERVER_FIELDS or name in EXPLICIT_FIELDS:
                 continue
             params.extend(_param(key, path, node, hints) for path, node in _leaves(sub, name))
-        units = {str(p["name"]): str(p.get("unit", "")) for p in reg_entry.get("output_ports", [])
-                 if isinstance(p, dict) and "name" in p}
+        units = {
+            str(p["name"]): str(p.get("unit", ""))
+            for p in reg_entry.get("output_ports", [])
+            if isinstance(p, dict) and "name" in p
+        }
         applicability = reg_entry.get("applicability") or {}
         models[key] = DraftableModel(
             model_key=key,
@@ -546,8 +601,9 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
 
 
 @lru_cache(maxsize=2)
-def _cached(schema_digest: str, plugin_keys: tuple[str, ...], state: str, entity_stamp: tuple[int, ...]
-            ) -> DraftCatalog:
+def _cached(
+    schema_digest: str, plugin_keys: tuple[str, ...], state: str, entity_stamp: tuple[int, ...]
+) -> DraftCatalog:
     return build_catalog()
 
 

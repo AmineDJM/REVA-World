@@ -138,19 +138,25 @@ _ROADMAP = "architecture §25 phase table"
 #: Tests holding the V1 implemented entries (path::test_name); V2 entries cite theirs inline.
 _V1_TESTS: dict[str, tuple[str, ...]] = {
     "fidelity.L0": ("tests/integration/test_simulation_engine.py::test_l0_cache_miss_then_hit_after_l1",),
-    "fidelity.L1": ("tests/integration/test_simulation_engine.py::test_l1_exposure_matches_hand_computation",
-                    "tests/unit/test_simulation_v2_plugins.py::test_crude_plugin_is_bit_identical_to_v1_engine"),
+    "fidelity.L1": (
+        "tests/integration/test_simulation_engine.py::test_l1_exposure_matches_hand_computation",
+        "tests/unit/test_simulation_v2_plugins.py::test_crude_plugin_is_bit_identical_to_v1_engine",
+    ),
     "fidelity.L2": ("tests/integration/test_simulation_engine.py::test_l2_sensitivity_range",),
-    "coupling.acyclic": ("tests/scientific/test_crude_exposure_coupling_rng.py::"
-                         "test_acyclic_graph_schedules_and_cycle_rejected",),
+    "coupling.acyclic": (
+        "tests/scientific/test_crude_exposure_coupling_rng.py::test_acyclic_graph_schedules_and_cycle_rejected",
+    ),
     "forecasting.baselines": ("tests/unit/forecasting/test_forecast_models.py::test_models_satisfy_protocol",),
     "verification.analytic_field_aggregation": (
-        "tests/unit/test_extensions_physical.py::test_linear_in_latitude_matches_closed_form_spherical_integral",),
-    "verification.double_entry_balance": ("tests/unit/test_extensions_interfaces.py::test_balanced_ledger_passes",
-                                          "tests/unit/test_extensions_interfaces.py::"
-                                          "test_imbalance_detected_with_residual"),
+        "tests/unit/test_extensions_physical.py::test_linear_in_latitude_matches_closed_form_spherical_integral",
+    ),
+    "verification.double_entry_balance": (
+        "tests/unit/test_extensions_interfaces.py::test_balanced_ledger_passes",
+        "tests/unit/test_extensions_interfaces.py::test_imbalance_detected_with_residual",
+    ),
     "verification.external_model_lifecycle": (
-        "tests/unit/test_extensions_physical.py::test_lifecycle_conformance_passes_for_conforming_model",),
+        "tests/unit/test_extensions_physical.py::test_lifecycle_conformance_passes_for_conforming_model",
+    ),
 }
 
 _BASE: tuple[Capability, ...] = (
@@ -404,10 +410,12 @@ _BASE: tuple[Capability, ...] = (
             "uncertainty over unidentified joints",
             "held-out joints scored",
         ),
-        reason=("no approved joint person x household data: households cannot be linked to synthetic persons "
-                "(member ages/sexes), household-aware IPU and multiple completed populations are not implemented; "
-                "V2 provides household units from public composition x children cells only "
-                "(population.household_margins)"),
+        reason=(
+            "no approved joint person x household data: households cannot be linked to synthetic persons "
+            "(member ages/sexes), household-aware IPU and multiple completed populations are not implemented; "
+            "V2 provides household units from public composition x children cells only "
+            "(population.household_margins)"
+        ),
         interface="reva.extensions.population",
         available_instead=("population.household_margins",),
     ),
@@ -509,13 +517,17 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.simulation.datasets",
-        ("datasets derive from archived acquisitions with the release origin", "a release pins datasets "
-         "eligible at its cutoff, sealed with the release", "simulations read only pinned, re-hashed tables; "
-         "unpinned is a typed missing input"),
-        tests=("tests/integration/test_simulation_v2_datasets.py::test_release_pins_dataset_by_digest_and_seals_it",
-               "tests/integration/test_simulation_v2_datasets.py::test_dataset_registration_requires_archived_sources",
-               "tests/integration/test_simulation_v2_datasets.py::test_unpinned_dataset_is_missing_input_never_zero",
-               "tests/integration/test_simulation_v2_datasets.py::test_dataset_recorded_after_cutoff_is_not_pinned"),
+        (
+            "datasets derive from archived acquisitions with the release origin",
+            "a release pins datasets eligible at its cutoff, sealed with the release",
+            "simulations read only pinned, re-hashed tables; unpinned is a typed missing input",
+        ),
+        tests=(
+            "tests/integration/test_simulation_v2_datasets.py::test_release_pins_dataset_by_digest_and_seals_it",
+            "tests/integration/test_simulation_v2_datasets.py::test_dataset_registration_requires_archived_sources",
+            "tests/integration/test_simulation_v2_datasets.py::test_unpinned_dataset_is_missing_input_never_zero",
+            "tests/integration/test_simulation_v2_datasets.py::test_dataset_recorded_after_cutoff_is_not_pinned",
+        ),
         docs=("docs/dev/v2_eng.md",),
         notes="Platform capability only: no model consumes dataset inputs until its own entry is implemented.",
     ),
@@ -525,11 +537,16 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.simulation.plugins",
-        ("period both null or both set with start < end", "L0 reuse and output digests cover periods",
-         "single-period digests unchanged"),
-        tests=("tests/integration/test_simulation_v2_datasets.py::test_multi_period_dataset_model_runs_through_the_job_path",
-               "tests/integration/test_simulation_v2_datasets.py::test_result_period_constraints",
-               "tests/unit/test_simulation_v2_plugins.py::test_result_row_period_is_half_open_and_extends_digest_only_when_set"),
+        (
+            "period both null or both set with start < end",
+            "L0 reuse and output digests cover periods",
+            "single-period digests unchanged",
+        ),
+        tests=(
+            "tests/integration/test_simulation_v2_datasets.py::test_multi_period_dataset_model_runs_through_the_job_path",
+            "tests/integration/test_simulation_v2_datasets.py::test_result_period_constraints",
+            "tests/unit/test_simulation_v2_plugins.py::test_result_row_period_is_half_open_and_extends_digest_only_when_set",
+        ),
         docs=("docs/dev/v2_eng.md",),
         notes="Platform capability only: the crude model stays single-period (horizon.multi_period is reserved).",
     ),
@@ -539,23 +556,30 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.models.population.cohort_component",
-        ("Eurostat demography inputs as pinned dataset inputs", "back-test 2013 -> 2023 by age and sex with "
-         "published error metrics", "labelled conditional projection under stated assumptions"),
+        (
+            "Eurostat demography inputs as pinned dataset inputs",
+            "back-test 2013 -> 2023 by age and sex with published error metrics",
+            "labelled conditional projection under stated assumptions",
+        ),
         interface="reva.simulation.plugins",
-        tests=("tests/integration/test_demography_cohort.py::test_ingest_publishes_observations_and_registers_dataset_inputs",
-               "tests/integration/test_demography_cohort.py::test_l1_projection_runs_through_the_job_path",
-               "tests/integration/test_demography_cohort.py::test_l2_sensitivity_grid_and_range_rows",
-               "tests/integration/test_demography_cohort.py::test_backtest_evaluation_is_stored_from_pinned_datasets",
-               "tests/unit/test_population_cohort.py::test_residual_migration_reconstructs_observed_population_exactly",
-               "tests/unit/test_population_cohort.py::test_no_information_after_jump_off",
-               "tests/property/test_population_cohort_properties.py::"
-               "test_population_balancing_equation_exact_and_negative_cohorts_flagged"),
+        tests=(
+            "tests/integration/test_demography_cohort.py::test_ingest_publishes_observations_and_registers_dataset_inputs",
+            "tests/integration/test_demography_cohort.py::test_l1_projection_runs_through_the_job_path",
+            "tests/integration/test_demography_cohort.py::test_l2_sensitivity_grid_and_range_rows",
+            "tests/integration/test_demography_cohort.py::test_backtest_evaluation_is_stored_from_pinned_datasets",
+            "tests/unit/test_population_cohort.py::test_residual_migration_reconstructs_observed_population_exactly",
+            "tests/unit/test_population_cohort.py::test_no_information_after_jump_off",
+            "tests/property/test_population_cohort_properties.py::"
+            "test_population_balancing_equation_exact_and_negative_cohorts_flagged",
+        ),
         docs=("docs/dev/v2_pop.md", "docs/dev/v2_pop_backtest.md"),
-        notes=("Experimental model (maintainer review pending). EU-27 + EFTA from Eurostat demo_pjan/demo_magec/"
-               "demo_fasec; constant base-period mortality (no improvement); migration and fertility as labelled "
-               "assumptions (zero, residual average, EUROPOP2023 baseline); L2 is an assumption grid without "
-               "probability levels. Back-test errors are published, including countries where it does worse "
-               "than a no-change benchmark."),
+        notes=(
+            "Experimental model (maintainer review pending). EU-27 + EFTA from Eurostat demo_pjan/demo_magec/"
+            "demo_fasec; constant base-period mortality (no improvement); migration and fertility as labelled "
+            "assumptions (zero, residual average, EUROPOP2023 baseline); L2 is an assumption grid without "
+            "probability levels. Back-test errors are published, including countries where it does worse "
+            "than a no-change benchmark."
+        ),
     ),
     Capability(
         "economic.io_price",
@@ -563,25 +587,31 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.models.economic.io_price",
-        ("Eurostat FIGARO inter-country tables as pinned dataset inputs with accounting identities verified "
-         "(OECD ICIO is not implemented)",
-         "Leontief price solution checked against a hand-computed small system",
-         "labelled first-round cost-push, full pass-through"),
+        (
+            "Eurostat FIGARO inter-country tables as pinned dataset inputs with accounting identities verified "
+            "(OECD ICIO is not implemented)",
+            "Leontief price solution checked against a hand-computed small system",
+            "labelled first-round cost-push, full pass-through",
+        ),
         interface="reva.simulation.plugins",
-        tests=("tests/unit/test_io_tables.py::test_identity_violation_refuses_publication",
-               "tests/unit/test_io_price.py::test_industry_prices_match_the_hand_computed_solution",
-               "tests/unit/test_io_price.py::test_l2_pass_through_grid_and_one_sided_sensitivity_range",
-               "tests/integration/test_io_price_pipeline.py::test_l1_scenario_end_to_end_matches_hand_computation",
-               "tests/integration/test_io_price_pipeline.py::test_identity_failure_refuses_registration",
-               "tests/unit/test_io_price.py::"
-               "test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixed_unit_taxes"),
+        tests=(
+            "tests/unit/test_io_tables.py::test_identity_violation_refuses_publication",
+            "tests/unit/test_io_price.py::test_industry_prices_match_the_hand_computed_solution",
+            "tests/unit/test_io_price.py::test_l2_pass_through_grid_and_one_sided_sensitivity_range",
+            "tests/integration/test_io_price_pipeline.py::test_l1_scenario_end_to_end_matches_hand_computation",
+            "tests/integration/test_io_price_pipeline.py::test_identity_failure_refuses_registration",
+            "tests/unit/test_io_price.py::"
+            "test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixed_unit_taxes",
+        ),
         docs=("docs/dev/v2_io.md", "docs/methodology.md", "docs/limitations.md"),
-        notes=("Experimental model (maintainer review pending). Eurostat FIGARO industry-by-industry table; "
-               "exogenous output-price change of NACE B, C19 or D35 (B is mining and quarrying, broader than "
-               "crude oil); fixed coefficients, no substitution or demand response, one period. Household "
-               "basket at basic prices (taxes less subsidies on products excluded; each basket row carries a "
-               "labelled purchasers'-price reading with product taxes fixed per unit). Not an inflation "
-               "forecast, CPI or macro outcome (outputs.macroeconomic stays reserved)."),
+        notes=(
+            "Experimental model (maintainer review pending). Eurostat FIGARO industry-by-industry table; "
+            "exogenous output-price change of NACE B, C19 or D35 (B is mining and quarrying, broader than "
+            "crude oil); fixed coefficients, no substitution or demand response, one period. Household "
+            "basket at basic prices (taxes less subsidies on products excluded; each basket row carries a "
+            "labelled purchasers'-price reading with product taxes fixed per unit). Not an inflation "
+            "forecast, CPI or macro outcome (outputs.macroeconomic stays reserved)."
+        ),
     ),
     Capability(
         "social.retirement_age",
@@ -589,26 +619,32 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.models.social.retirement_age",
-        ("legal-age rule tables with per-row citations verified against archived legal text (transcribed by an "
-         "agent; maintainer review pending)", "literature parameters as cited assumptions with a "
-         "sensitivity grid (verified values only)", "2010-reform back-test 2012 -> 2019 reported, including "
-         "its weaknesses (placebo 55-59)"),
+        (
+            "legal-age rule tables with per-row citations verified against archived legal text (transcribed by an "
+            "agent; maintainer review pending)",
+            "literature parameters as cited assumptions with a sensitivity grid (verified values only)",
+            "2010-reform back-test 2012 -> 2019 reported, including its weaknesses (placebo 55-59)",
+        ),
         interface="reva.simulation.plugins",
-        tests=("tests/unit/social/test_retirement_rules.py::test_every_row_is_cited_and_its_locator_is_in_the_archived_source",
-               "tests/unit/social/test_retirement_age_model.py::test_change_equals_difference_of_levels_and_signs",
-               "tests/unit/social/test_retirement_age_model.py::test_l2_grid_range_contains_every_point_and_no_response_reference",
-               "tests/unit/social/test_retirement_age_model.py::test_countries_without_rule_tables_are_capability_gaps",
-               "tests/unit/social/test_retirement_age_model.py::test_macro_outputs_are_capability_gaps",
-               "tests/unit/social/test_retirement_backtest.py::test_no_grid_estimate_overlaps_the_backtested_reform_or_period",
-               "tests/unit/social/test_retirement_backtest.py::test_backtest_is_reproducible_and_matches_the_committed_artifact",
-               "tests/integration/test_labour_pensions_retirement_pipeline.py::test_retirement_scenario_runs_through_the_job_path_with_pinned_datasets"),
+        tests=(
+            "tests/unit/social/test_retirement_rules.py::test_every_row_is_cited_and_its_locator_is_in_the_archived_source",
+            "tests/unit/social/test_retirement_age_model.py::test_change_equals_difference_of_levels_and_signs",
+            "tests/unit/social/test_retirement_age_model.py::test_l2_grid_range_contains_every_point_and_no_response_reference",
+            "tests/unit/social/test_retirement_age_model.py::test_countries_without_rule_tables_are_capability_gaps",
+            "tests/unit/social/test_retirement_age_model.py::test_macro_outputs_are_capability_gaps",
+            "tests/unit/social/test_retirement_backtest.py::test_no_grid_estimate_overlaps_the_backtested_reform_or_period",
+            "tests/unit/social/test_retirement_backtest.py::test_backtest_is_reproducible_and_matches_the_committed_artifact",
+            "tests/integration/test_labour_pensions_retirement_pipeline.py::test_retirement_scenario_runs_through_the_job_path_with_pinned_datasets",
+        ),
         docs=("docs/dev/v2_pen.md", "docs/dev/v2_pen_backtest.md"),
-        notes=("Experimental model (maintainer review pending); conditional projection under stated assumptions, "
-               "not a forecast. Outputs: employed persons 55-69, pension recipients, approximate pension "
-               "expenditure change, old-age dependency ratio (from demography.cohort_component). No GDP, "
-               "unemployment or welfare output. ITA, BEL, SWE, POL are refused (no sourced rule table); Spain is "
-               "refused by its own data (contribution-track heterogeneity). The back-test fits well partly by "
-               "offsetting errors; see docs/dev/v2_pen_backtest.md."),
+        notes=(
+            "Experimental model (maintainer review pending); conditional projection under stated assumptions, "
+            "not a forecast. Outputs: employed persons 55-69, pension recipients, approximate pension "
+            "expenditure change, old-age dependency ratio (from demography.cohort_component). No GDP, "
+            "unemployment or welfare output. ITA, BEL, SWE, POL are refused (no sourced rule table); Spain is "
+            "refused by its own data (contribution-track heterogeneity). The back-test fits well partly by "
+            "offsetting errors; see docs/dev/v2_pen_backtest.md."
+        ),
     ),
     Capability(
         "population.household_margins",
@@ -623,15 +659,19 @@ _BASE: tuple[Capability, ...] = (
             "unidentified joints kept as bounds (open household sizes never imputed)",
             "held-out EU-SILC size distribution and average size scored; discrepancies reported, not corrected",
         ),
-        tests=("tests/unit/social/test_households.py::test_france_recipe_cells_structural_zeros_and_totals",
-               "tests/unit/social/test_households.py::test_exact_weight_conservation_and_no_support_violations",
-               "tests/unit/social/test_households.py::test_structural_zero_with_a_reported_value_is_refused",
-               "tests/unit/social/test_households.py::test_missing_leaf_stays_missing_and_totals_gate_reports_remainder",
-               "tests/unit/social/test_households.py::test_held_out_silc_scoring_is_reported_including_misses",
-               "tests/unit/social/test_households.py::test_records_carry_no_person_attributes"),
+        tests=(
+            "tests/unit/social/test_households.py::test_france_recipe_cells_structural_zeros_and_totals",
+            "tests/unit/social/test_households.py::test_exact_weight_conservation_and_no_support_violations",
+            "tests/unit/social/test_households.py::test_structural_zero_with_a_reported_value_is_refused",
+            "tests/unit/social/test_households.py::test_missing_leaf_stays_missing_and_totals_gate_reports_remainder",
+            "tests/unit/social/test_households.py::test_held_out_silc_scoring_is_reported_including_misses",
+            "tests/unit/social/test_households.py::test_records_carry_no_person_attributes",
+        ),
         docs=("docs/dev/v2_pen.md",),
-        notes=("V2 step 4 (agent PEN). Household units only: not linked to synthetic persons, no member age, sex or "
-               "other attribute. The full P10 capability population.households stays reserved."),
+        notes=(
+            "V2 step 4 (agent PEN). Household units only: not linked to synthetic persons, no member age, sex or "
+            "other attribute. The full P10 capability population.households stays reserved."
+        ),
     ),
     Capability(
         "nl.scenario_drafts",
@@ -639,32 +679,40 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.nl",
-        ("draft validated by the same schema and compiler", "unsupported asks become capability_gap items",
-         "recorded-response tests; prompt-injection hardening; bounded LLM budget"),
+        (
+            "draft validated by the same schema and compiler",
+            "unsupported asks become capability_gap items",
+            "recorded-response tests; prompt-injection hardening; bounded LLM budget",
+        ),
         interface="reva.nl.ports",
-        requires_config=("REVA_LLM_ENABLED=true", "egress proxy injecting the provider credentials",
-                         "ops.reserve_llm_budget / ops.settle_llm_budget (shipped in migration 0008_v2)"),
-        tests=("tests/unit/test_nl_drafts.py::test_french_sensitivity_request_is_a_valid_draft_checked_by_the_same_validator",
-               "tests/unit/test_nl_drafts.py::test_gdp_loss_and_unemployment_become_typed_gaps_never_another_output",
-               "tests/unit/test_nl_drafts.py::test_stale_recorded_capability_gap_never_runs",
-               "tests/unit/test_nl_drafts.py::test_hostile_multiplier_1000_is_rejected_by_the_validator_not_clamped",
-               "tests/unit/test_nl_drafts.py::test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected",
-               "tests/unit/test_nl_drafts.py::test_over_budget_refuses_before_any_provider_call",
-               "tests/unit/test_nl_drafts.py::test_a_draft_never_runs_without_confirmation",
-               "tests/integration/test_nl_drafts_api.py::test_draft_returns_a_valid_spec_and_runs_nothing",
-               "tests/integration/test_nl_drafts_api.py::test_over_budget_is_429_and_nothing_is_sent",
-               "tests/integration/test_nl_drafts_api.py::test_audit_row_has_hash_and_length_but_never_the_text",
-               "tests/unit/test_nl_crosschecks.py::test_h2_all_countries_except_china_is_never_a_ready_draft",
-               "tests/unit/test_nl_crosschecks.py::test_h3_oil_price_is_not_defaulted_to_french_refineries",
-               "tests/unit/test_nl_crosschecks.py::test_m6_stated_age_level_is_never_converted_into_a_shift",
-               "tests/unit/test_nl_crosschecks.py::test_restatement_never_contains_llm_written_text"),
+        requires_config=(
+            "REVA_LLM_ENABLED=true",
+            "egress proxy injecting the provider credentials",
+            "ops.reserve_llm_budget / ops.settle_llm_budget (shipped in migration 0008_v2)",
+        ),
+        tests=(
+            "tests/unit/test_nl_drafts.py::test_french_sensitivity_request_is_a_valid_draft_checked_by_the_same_validator",
+            "tests/unit/test_nl_drafts.py::test_gdp_loss_and_unemployment_become_typed_gaps_never_another_output",
+            "tests/unit/test_nl_drafts.py::test_stale_recorded_capability_gap_never_runs",
+            "tests/unit/test_nl_drafts.py::test_hostile_multiplier_1000_is_rejected_by_the_validator_not_clamped",
+            "tests/unit/test_nl_drafts.py::test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected",
+            "tests/unit/test_nl_drafts.py::test_over_budget_refuses_before_any_provider_call",
+            "tests/unit/test_nl_drafts.py::test_a_draft_never_runs_without_confirmation",
+            "tests/integration/test_nl_drafts_api.py::test_draft_returns_a_valid_spec_and_runs_nothing",
+            "tests/integration/test_nl_drafts_api.py::test_over_budget_is_429_and_nothing_is_sent",
+            "tests/integration/test_nl_drafts_api.py::test_audit_row_has_hash_and_length_but_never_the_text",
+            "tests/unit/test_nl_crosschecks.py::test_h2_all_countries_except_china_is_never_a_ready_draft",
+            "tests/unit/test_nl_crosschecks.py::test_h3_oil_price_is_not_defaulted_to_french_refineries",
+            "tests/unit/test_nl_crosschecks.py::test_m6_stated_age_level_is_never_converted_into_a_shift",
+            "tests/unit/test_nl_crosschecks.py::test_restatement_never_contains_llm_written_text",
+        ),
         docs=("docs/dev/v2_nlc.md", "docs/methodology.md", "docs/limitations.md"),
         notes="Drafts only: nothing runs until the user submits the reviewed spec to POST /v1/scenarios. Disabled "
-              "unless REVA_LLM_ENABLED; budget llm.scenario_drafts (200 requests, 2,000,000 tokens per day); "
-              "without the two ledger functions the API role fails closed (503). Lexical server cross-checks "
-              "(French/English) withhold a draft that excludes countries, names a region with ALL, leaves an "
-              "IO shock origin unstated or turns a stated retirement age into a shift; they can miss "
-              "paraphrases, so the server restatement must still be reviewed.",
+        "unless REVA_LLM_ENABLED; budget llm.scenario_drafts (200 requests, 2,000,000 tokens per day); "
+        "without the two ledger functions the API role fails closed (503). Lexical server cross-checks "
+        "(French/English) withhold a draft that excludes countries, names a region with ALL, leaves an "
+        "IO shock origin unstated or turns a stated retirement age into a shift; they can miss "
+        "paraphrases, so the server restatement must still be reviewed.",
     ),
     Capability(
         "scenario.all_countries",
@@ -672,22 +720,26 @@ _BASE: tuple[Capability, ...] = (
         "implemented",
         "V2",
         "reva.simulation.crude_plugin",
-        ("M49/ISO3 crosswalk from archived provider lists; aggregates and composite reporters never mapped "
-         "silently", "per-country typed gaps"),
-        tests=("tests/unit/test_country_crosswalk.py::test_composite_and_special_codes_are_flagged_and_never_mapped",
-               "tests/unit/test_country_crosswalk.py::test_committed_crosswalk_is_a_rebuild_of_the_archived_provider_lists",
-               "tests/unit/test_comtrade_worldbank_all_connectors.py::"
-               "test_rotation_covers_the_sweep_within_the_daily_budget",
-               "tests/integration/test_comtrade_worldbank_all_countries.py::"
-               "test_all_country_fixture_ingest_keeps_gaps_typed",
-               "tests/integration/test_scenario_all_countries.py::"
-               "test_all_countries_with_skip_policy_runs_complete_countries_and_lists_the_rest",
-               "tests/integration/test_scenario_all_countries.py::"
-               "test_all_countries_with_fail_policy_refuses_listing_every_missing_input"),
+        (
+            "M49/ISO3 crosswalk from archived provider lists; aggregates and composite reporters never mapped silently",
+            "per-country typed gaps",
+        ),
+        tests=(
+            "tests/unit/test_country_crosswalk.py::test_composite_and_special_codes_are_flagged_and_never_mapped",
+            "tests/unit/test_country_crosswalk.py::test_committed_crosswalk_is_a_rebuild_of_the_archived_provider_lists",
+            "tests/unit/test_comtrade_worldbank_all_connectors.py::"
+            "test_rotation_covers_the_sweep_within_the_daily_budget",
+            "tests/integration/test_comtrade_worldbank_all_countries.py::"
+            "test_all_country_fixture_ingest_keeps_gaps_typed",
+            "tests/integration/test_scenario_all_countries.py::"
+            "test_all_countries_with_skip_policy_runs_complete_countries_and_lists_the_rest",
+            "tests/integration/test_scenario_all_countries.py::"
+            "test_all_countries_with_fail_policy_refuses_listing_every_missing_input",
+        ),
         docs=("docs/dev/v2_allc.md",),
         notes="Engine/job path. POST /v1/simulations still pre-checks inputs as policy 'fail' and refuses "
-              "countries [\"ALL\"] with a typed missing_input until the API preflight change requested in "
-              "docs/dev/v2_allc.md lands. Crosswalk aliases are provider_declared (pending maintainer review).",
+        'countries ["ALL"] with a typed missing_input until the API preflight change requested in '
+        "docs/dev/v2_allc.md lands. Crosswalk aliases are provider_declared (pending maintainer review).",
     ),
     Capability(
         "scenario.skip_missing_countries",
@@ -696,11 +748,13 @@ _BASE: tuple[Capability, ...] = (
         "V2",
         "reva.simulation.crude_plugin",
         ("skipped countries listed with typed missing inputs", "never zero-filled"),
-        tests=("tests/integration/test_scenario_all_countries.py::"
-               "test_explicit_list_with_skip_policy_and_all_missing_is_refused",
-               "tests/integration/test_scenario_all_countries.py::"
-               "test_skip_policy_gives_the_same_numbers_as_fail_for_complete_countries",
-               "tests/integration/test_scenario_all_countries.py::test_v1_specs_keep_the_v1_contract"),
+        tests=(
+            "tests/integration/test_scenario_all_countries.py::"
+            "test_explicit_list_with_skip_policy_and_all_missing_is_refused",
+            "tests/integration/test_scenario_all_countries.py::"
+            "test_skip_policy_gives_the_same_numbers_as_fail_for_complete_countries",
+            "tests/integration/test_scenario_all_countries.py::test_v1_specs_keep_the_v1_contract",
+        ),
         docs=("docs/dev/v2_allc.md",),
         notes="Engine/job path; the API preflight change is requested in docs/dev/v2_allc.md.",
     ),

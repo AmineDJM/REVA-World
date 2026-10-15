@@ -48,27 +48,38 @@ def _f(code: str, severity: str, message: str, evidence: tuple[ArtifactRef, ...]
 
 
 class JsonStatConnectorValidator:
-    def __init__(self, io_: ArtifactIO, *, live_client_factory: Callable[[tuple[str, ...]], Any] | None = None,
-                 guard: AutonomyGuard | None = None, registry: Registry | None = None) -> None:
+    def __init__(
+        self,
+        io_: ArtifactIO,
+        *,
+        live_client_factory: Callable[[tuple[str, ...]], Any] | None = None,
+        guard: AutonomyGuard | None = None,
+        registry: Registry | None = None,
+    ) -> None:
         self.io = io_
         self.live_client_factory = live_client_factory
         self.guard = guard
         self.registry = registry or load_registry()
 
-    async def validate(self, proposal: ConnectorProposal, fixtures: ArtifactRef,
-                       budget: ResourceBudget) -> ValidationReport:
+    async def validate(
+        self, proposal: ConnectorProposal, fixtures: ArtifactRef, budget: ResourceBudget
+    ) -> ValidationReport:
         if self.guard is not None:
             self.guard.check("validate_connector")
         started = time.monotonic()
         findings: list[Finding] = []
         manifest = self.io.get_json(proposal.manifest)
-        evidence: dict[str, Any] = {"schema": "reva-connector-validation/1", "evaluator": EVALUATOR,
-                                    "proposal_id": str(proposal.proposal_id), "manifest": proposal.manifest.sha256,
-                                    "fixtures_in": fixtures.sha256, "template_digest": template_digest()}
+        evidence: dict[str, Any] = {
+            "schema": "reva-connector-validation/1",
+            "evaluator": EVALUATOR,
+            "proposal_id": str(proposal.proposal_id),
+            "manifest": proposal.manifest.sha256,
+            "fixtures_in": fixtures.sha256,
+            "template_digest": template_digest(),
+        }
 
         def finish(outcome: str, usage: dict[str, Any]) -> ValidationReport:
-            evidence["findings"] = [{"code": x.code, "severity": x.severity, "message": x.message}
-                                    for x in findings]
+            evidence["findings"] = [{"code": x.code, "severity": x.severity, "message": x.message} for x in findings]
             evidence["outcome"] = outcome
             usage = {**usage, "wall_seconds": round(time.monotonic() - started, 3)}
             evidence["resource_usage"] = usage
@@ -79,23 +90,32 @@ class JsonStatConnectorValidator:
             findings.append(_f("template_not_supported", "blocker", "validator only runs eurostat_jsonstat"))
             return finish("fail", {})
         if proposal.template_digest != template_digest():
-            findings.append(_f("template_digest_mismatch", "blocker",
-                               "proposal was generated against a different template revision"))
+            findings.append(
+                _f(
+                    "template_digest_mismatch",
+                    "blocker",
+                    "proposal was generated against a different template revision",
+                )
+            )
         try:
             connector = EurostatJsonStatConnector(manifest)
         except RevaError as e:
             findings.append(_f("manifest_invalid", "blocker", e.message))
             return finish("fail", {})
         hosts = tuple(sorted(set(manifest["allowed_hosts"]) & set(TEMPLATE_HOSTS)))
-        plan = connector.plan(None, FetchBudget(max_requests=max(0, budget.max_requests),
-                                                max_bytes=budget.max_bytes))
+        plan = connector.plan(None, FetchBudget(max_requests=max(0, budget.max_requests), max_bytes=budget.max_bytes))
         bank = BankHttp(self.io, fixtures, allowed_hosts=hosts)
         http: Any = bank
         mode = "captured_replay"
         if not all(bank.has(i.url) for i in plan.items):
             if self.live_client_factory is None:
-                findings.append(_f("no_sample", "blocker",
-                                   "no captured fixture for the planned request and live sampling is disabled"))
+                findings.append(
+                    _f(
+                        "no_sample",
+                        "blocker",
+                        "no captured fixture for the planned request and live sampling is disabled",
+                    )
+                )
                 return finish("blocked", {"requests": 0, "bytes": 0})
             http = CapturingHttp(self.live_client_factory(hosts), str(manifest["request_parameters"].get("licence")))
             mode = "live_sample"
@@ -143,15 +163,29 @@ class JsonStatConnectorValidator:
             findings.extend(dq)
             md = b.metadata
             if md.get("structure_fingerprint") != manifest["request_parameters"].get("inspection_fingerprint"):
-                findings.append(_f("structure_drift_since_inspection", "blocker",
-                                   "sample structure differs from the structure inspected at discovery"))
-            evidence["batches"].append({
-                "item": b.item_key, "batch_sha256": batch_ref.sha256, "quality": q.model_dump(mode="json"),
-                "dimension_order": md.get("dimension_order"), "size": md.get("size"),
-                "cube_positions": md.get("cube_positions"), "value_count": md.get("value_count"),
-                "status_codes_seen": md.get("status_codes_seen"), "status_labels": md.get("status_labels"),
-                "unit_codes": md.get("unit_codes"), "dataset_updated": md.get("dataset_updated"),
-                "structure_fingerprint": md.get("structure_fingerprint"), "data_quality": detail,
-            })
+                findings.append(
+                    _f(
+                        "structure_drift_since_inspection",
+                        "blocker",
+                        "sample structure differs from the structure inspected at discovery",
+                    )
+                )
+            evidence["batches"].append(
+                {
+                    "item": b.item_key,
+                    "batch_sha256": batch_ref.sha256,
+                    "quality": q.model_dump(mode="json"),
+                    "dimension_order": md.get("dimension_order"),
+                    "size": md.get("size"),
+                    "cube_positions": md.get("cube_positions"),
+                    "value_count": md.get("value_count"),
+                    "status_codes_seen": md.get("status_codes_seen"),
+                    "status_labels": md.get("status_labels"),
+                    "unit_codes": md.get("unit_codes"),
+                    "dataset_updated": md.get("dataset_updated"),
+                    "structure_fingerprint": md.get("structure_fingerprint"),
+                    "data_quality": detail,
+                }
+            )
         outcome = "fail" if any(x.severity == "blocker" for x in findings) else "pass"
         return finish(outcome, {"requests": len(plan.items), "bytes": used_bytes, "mode": mode})

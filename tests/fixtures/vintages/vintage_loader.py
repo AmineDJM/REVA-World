@@ -62,8 +62,9 @@ def series_item(connector: WorldBankConnector) -> FetchItem:
     return next(i for i in plan.items if i.key == f"series:{MANIFEST['indicator']}:p1")
 
 
-async def fetch_vintage(name: str, label: str, connector: WorldBankConnector | None = None,
-                        body: bytes | None = None) -> RawAcquisition:
+async def fetch_vintage(
+    name: str, label: str, connector: WorldBankConnector | None = None, body: bytes | None = None
+) -> RawAcquisition:
     c = connector or connector_for(name)
     item = series_item(c)
     data = vintage_bytes(name, label) if body is None else body
@@ -76,16 +77,29 @@ def with_availability(batches: list[Any], availability: dict[str, Any]) -> list[
     at = datetime.fromisoformat(availability["source_available_at"])
     basis = availability["availability_basis"]
     return [
-        b.model_copy(update={"observations": tuple(
-            o.model_copy(update={"source_available_at": at, "availability_basis": basis}) for o in b.observations)})
+        b.model_copy(
+            update={
+                "observations": tuple(
+                    o.model_copy(update={"source_available_at": at, "availability_basis": basis})
+                    for o in b.observations
+                )
+            }
+        )
         for b in batches
     ]
 
 
-async def ingest_vintage(engine: Engine, store: Any, name: str, label: str, *,
-                         connector: WorldBankConnector | None = None, replay_of: str | None = None,
-                         retrieved_at: datetime | None = None, body: bytes | None = None
-                         ) -> tuple[PublishSummary, RawAcquisition]:
+async def ingest_vintage(
+    engine: Engine,
+    store: Any,
+    name: str,
+    label: str,
+    *,
+    connector: WorldBankConnector | None = None,
+    replay_of: str | None = None,
+    retrieved_at: datetime | None = None,
+    body: bytes | None = None,
+) -> tuple[PublishSummary, RawAcquisition]:
     c = connector or connector_for(name)
     raw = await fetch_vintage(name, label, c, body)
     update: dict[str, Any] = {}
@@ -115,12 +129,18 @@ def register_connector_variant(engine: Engine, store: Any, connector: WorldBankC
     reg = load_registry()
     base = [m for m in reg.mappings if m["connector"]["name"] == spec.name]
     with engine.begin() as conn:
-        act = repo.simple_activity("registry.connector_variant", "review", "maintainer:test-vintages",
-                                   {"connector": spec.name, "version": spec.version})
+        act = repo.simple_activity(
+            "registry.connector_variant",
+            "review",
+            "maintainer:test-vintages",
+            {"connector": spec.name, "version": spec.version},
+        )
         repo.record_activity(conn, act)
         register_connector_version(conn, store, spec, act.id)
         for m in base:
             record_mapping_and_eligibility(
-                conn, {**m, "connector": {"name": spec.name, "version": spec.version}}, act.id,
+                conn,
+                {**m, "connector": {"name": spec.name, "version": spec.version}},
+                act.id,
                 policy_version=f"test-{spec.version}",
             )

@@ -72,9 +72,11 @@ def connector_registration(conn: Connection, spec: ConnectorSpec) -> ConnectorRe
     cv = repo.connector_version_row(conn, spec.name, spec.version)
     if cv is None:
         raise ValidationProblem(f"connector {spec.name}@{spec.version} is not registered (run seed)")
-    src = conn.execute(
-        text("SELECT id, rights FROM evidence.source WHERE id = :i"), {"i": cv["source_id"]}
-    ).mappings().one()
+    src = (
+        conn.execute(text("SELECT id, rights FROM evidence.source WHERE id = :i"), {"i": cv["source_id"]})
+        .mappings()
+        .one()
+    )
     smv = repo.latest_source_metadata_version(conn, src["id"])
     return ConnectorRegistration(src["id"], cv["id"], smv["id"], dict(smv["rights"]))
 
@@ -124,32 +126,48 @@ def selector_report(raw: RawAcquisition, batches: Sequence[ObservationBatch]) ->
     try:
         payload = json.loads(raw.body, parse_float=Decimal)
     except (ValueError, UnicodeDecodeError):
-        return QualityReport(outcome="quarantine", findings=(Finding(
-            code="selector_unresolved", severity="blocker",
-            message="observations carry JSON selectors but the raw payload is not JSON"),))
+        return QualityReport(
+            outcome="quarantine",
+            findings=(
+                Finding(
+                    code="selector_unresolved",
+                    severity="blocker",
+                    message="observations carry JSON selectors but the raw payload is not JSON",
+                ),
+            ),
+        )
     counters: dict[tuple[str, ...], Counter[tuple[str, ...]]] = {}
     bad: list[str] = []
     for o in checked:
         missing = o.value.get("kind") == "missing"
         if "jsonstat_position" in o.raw_selector:
             ok = _jsonstat_position(payload, dict(o.raw_selector.get("coordinates") or {})) == int(
-                o.raw_selector["jsonstat_position"])
+                o.raw_selector["jsonstat_position"]
+            )
         else:
             match = o.raw_selector["match"]
             keys = tuple(sorted(match))
             if keys not in counters:
                 counters[keys] = Counter(
-                    tuple(str(d[k]) for k in keys) for d in _walk_dicts(payload) if all(k in d for k in keys))
+                    tuple(str(d[k]) for k in keys) for d in _walk_dicts(payload) if all(k in d for k in keys)
+                )
             n = counters[keys][tuple(str(match[k]) for k in keys)]
             ok = n == 1 or (missing and n == 0)
         if not ok:
             bad.append(o.logical_key)
     if not bad:
         return None
-    return QualityReport(outcome="quarantine", findings=(Finding(
-        code="selector_unresolved", severity="blocker",
-        message=f"{len(bad)} observation selectors do not resolve to exactly one payload element "
-                f"(e.g. {', '.join(bad[:5])})"),))
+    return QualityReport(
+        outcome="quarantine",
+        findings=(
+            Finding(
+                code="selector_unresolved",
+                severity="blocker",
+                message=f"{len(bad)} observation selectors do not resolve to exactly one payload element "
+                f"(e.g. {', '.join(bad[:5])})",
+            ),
+        ),
+    )
 
 
 def value_report(batches: Sequence[ObservationBatch]) -> QualityReport | None:
@@ -168,14 +186,24 @@ def value_report(batches: Sequence[ObservationBatch]) -> QualityReport | None:
                 bad.append(o.logical_key)
                 if first is None:
                     errs = e.errors(include_input=False) if hasattr(e, "errors") else []
-                    first = (f"{'.'.join(map(str, errs[0].get('loc', ())))}: {errs[0].get('type', '')}"
-                             if errs else type(e).__name__)
+                    first = (
+                        f"{'.'.join(map(str, errs[0].get('loc', ())))}: {errs[0].get('type', '')}"
+                        if errs
+                        else type(e).__name__
+                    )
     if not bad:
         return None
-    return QualityReport(outcome="quarantine", findings=(Finding(
-        code="invalid_kernel_value", severity="blocker",
-        message=f"{len(bad)} observation values are not valid kernel values (first: {first}; "
-                f"e.g. {', '.join(bad[:5])})"),))
+    return QualityReport(
+        outcome="quarantine",
+        findings=(
+            Finding(
+                code="invalid_kernel_value",
+                severity="blocker",
+                message=f"{len(bad)} observation values are not valid kernel values (first: {first}; "
+                f"e.g. {', '.join(bad[:5])})",
+            ),
+        ),
+    )
 
 
 def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: bool) -> StoredObject:
@@ -246,8 +274,10 @@ def _lineage_head(conn: Connection, source_id: UUID, origin: str, logical_key: s
     # supersedes, a fixture-origin head (R-04). The caller holds the lineage's lock
     # (``lock_lineages``) for the duration of the transaction; re-taking it here (one statement,
     # re-entrant: no wait and no new lock-table entry) keeps this helper safe on its own.
-    conn.execute(text("SELECT pg_advisory_xact_lock(:c, :k)"),
-                 {"c": LINEAGE_LOCK_CLASS, "k": lineage_lock_id(source_id, origin, logical_key)})
+    conn.execute(
+        text("SELECT pg_advisory_xact_lock(:c, :k)"),
+        {"c": LINEAGE_LOCK_CLASS, "k": lineage_lock_id(source_id, origin, logical_key)},
+    )
     row = conn.execute(
         text(
             "SELECT id, revision_no, semantic_hash FROM evidence.observation "
@@ -353,8 +383,13 @@ def _insert_relation(
             "layer": rel.layer,
             "s": support_id,
             "o": observation_id,
-            "eu": canonical_json({"status": "unquantified", "kind": "unknown",
-                                  "description": "reported flow; existence as reported by source"}),
+            "eu": canonical_json(
+                {
+                    "status": "unquantified",
+                    "kind": "unknown",
+                    "description": "reported flow; existence as reported by source",
+                }
+            ),
             "c": canonical_json(rel.component),
             "a": activity_id,
         },
@@ -429,8 +464,12 @@ def publish_acquisition(
             ),
             {"cv": reg.connector_version_id, "fp": raw.request_fingerprint, "o": raw.origin},
         ).one_or_none()
-        if (latest is not None and latest[1] == obj.sha256 and latest[2] == spec.parser_version
-                and not raw.replay_of_acquisition_id):
+        if (
+            latest is not None
+            and latest[1] == obj.sha256
+            and latest[2] == spec.parser_version
+            and not raw.replay_of_acquisition_id
+        ):
             summary.acquisition_id = UUID(str(latest[0]))
             summary.duplicate_acquisition = True
             return summary
@@ -504,8 +543,9 @@ def publish_acquisition(
         )
         summary.acquisition_id = acq_id
         if quarantined:
-            repo.emit_outbox(conn, "evidence.acquisition_quarantined",
-                             {"acquisition_id": str(acq_id), "connector": spec.name})
+            repo.emit_outbox(
+                conn, "evidence.acquisition_quarantined", {"acquisition_id": str(acq_id), "connector": spec.name}
+            )
             return summary
         norm_act = repo.simple_activity(
             "source.normalisation",
@@ -514,8 +554,9 @@ def publish_acquisition(
             {"connector": spec.name, "parser_version": spec.parser_version, "acquisition_id": str(acq_id)},
         )
         repo.record_activity(conn, norm_act, inputs=[(obj.sha256, {"item": raw.item.key})])
-        lock_lineages(conn, reg.source_id, raw.origin,
-                      [o.logical_key for b in batches for o in b.observations])  # bounded, ascending
+        lock_lineages(
+            conn, reg.source_id, raw.origin, [o.logical_key for b in batches for o in b.observations]
+        )  # bounded, ascending
         for batch in batches:
             for obs in batch.observations:
                 status, oid = _insert_observation(

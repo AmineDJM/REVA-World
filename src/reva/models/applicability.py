@@ -97,8 +97,9 @@ def capability_status(level: str | CapabilityLevel, supported: Iterable[str | Ca
         return ApplicabilityReport(False, (f"capability: unknown level {level!r}",), checked=("capability",))
     desc = CAPABILITY_LEVELS[lv]
     if not desc.implemented:
-        return ApplicabilityReport(False, (f"capability: {lv.value} {desc.unavailable_reason}",),
-                                   checked=("capability",))
+        return ApplicabilityReport(
+            False, (f"capability: {lv.value} {desc.unavailable_reason}",), checked=("capability",)
+        )
     sup = {CapabilityLevel(str(s.value if isinstance(s, CapabilityLevel) else s)) for s in supported}
     if lv not in sup:
         return ApplicabilityReport(

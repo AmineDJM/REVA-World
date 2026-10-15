@@ -34,8 +34,9 @@ class BoundedModelChallenger:
         self.io = io_
         self.policy = policy or promotion_policy()
 
-    def propose(self, task: Mapping[str, JSON], incumbent: ModelDescriptor, context: ScopedContext,
-                budget: ResourceBudget) -> list[PlatformChangeProposal]:
+    def propose(
+        self, task: Mapping[str, JSON], incumbent: ModelDescriptor, context: ScopedContext, budget: ResourceBudget
+    ) -> list[PlatformChangeProposal]:
         if incumbent.model_key not in BOUNDED_CHALLENGERS:
             return []
         holdout = str(task.get("holdout_id") or logical_hash({"task": dict(task)}))
@@ -48,24 +49,46 @@ class BoundedModelChallenger:
             if ch == incumbent.model_key or (ch, incumbent.model_key, holdout) in tested:
                 continue
             plan: dict[str, Any] = {
-                "schema": "reva-model-challenge/1", "challenger": ch, "incumbent": incumbent.model_key,
-                "incumbent_version": incumbent.version, "task": dict(task), "holdout_id": holdout,
+                "schema": "reva-model-challenge/1",
+                "challenger": ch,
+                "incumbent": incumbent.model_key,
+                "incumbent_version": incumbent.version,
+                "task": dict(task),
+                "holdout_id": holdout,
                 "replay_mode": "revised_data_retrospective",
                 "promotion_rule": dict(self.policy.content.get("model_promotion") or {}),
-                "context_id": str(context.context_id), "cutoff": context.knowledge_cutoff.isoformat(),
+                "context_id": str(context.context_id),
+                "cutoff": context.knowledge_cutoff.isoformat(),
                 "keep_naive_baseline": True,
             }
             plan_ref = self.io.put_json(plan, "models")
-            note = self.io.put_json({"reason": "no decision specification for forecast selection; "
-                                               "benefit is unknown until the tournament is run"}, "evaluation")
-            out.append(PlatformChangeProposal(
-                proposal_id=stable_id("challenge", ch, incumbent.model_key, holdout, plan_ref.sha256),
-                author=AUTHOR, permission_tier=2, changed_paths=(), base_commit=base_commit(),
-                patch_or_manifest=plan_ref, requested_capabilities=("run_backtest",), scientific_change=True,
-                migration_required=False,
-                expected_benefit=ValueEstimate("unsupported", None, None,
-                                               {"status": "unquantified", "kind": "unknown",
-                                                "description": "not evaluated"}, note, "challenger@1"),
-                policy_version=self.policy.version,
-            ))
+            note = self.io.put_json(
+                {
+                    "reason": "no decision specification for forecast selection; "
+                    "benefit is unknown until the tournament is run"
+                },
+                "evaluation",
+            )
+            out.append(
+                PlatformChangeProposal(
+                    proposal_id=stable_id("challenge", ch, incumbent.model_key, holdout, plan_ref.sha256),
+                    author=AUTHOR,
+                    permission_tier=2,
+                    changed_paths=(),
+                    base_commit=base_commit(),
+                    patch_or_manifest=plan_ref,
+                    requested_capabilities=("run_backtest",),
+                    scientific_change=True,
+                    migration_required=False,
+                    expected_benefit=ValueEstimate(
+                        "unsupported",
+                        None,
+                        None,
+                        {"status": "unquantified", "kind": "unknown", "description": "not evaluated"},
+                        note,
+                        "challenger@1",
+                    ),
+                    policy_version=self.policy.version,
+                )
+            )
         return out

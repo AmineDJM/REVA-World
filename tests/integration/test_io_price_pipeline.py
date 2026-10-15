@@ -38,7 +38,8 @@ from reva.simulation.spec import CONTRACTS, validate_scenario_spec
 pytestmark = pytest.mark.db
 
 _spec = importlib.util.spec_from_file_location(
-    "io_synthetic", Path(__file__).resolve().parents[1] / "fixtures" / "io_tables" / "synthetic.py")
+    "io_synthetic", Path(__file__).resolve().parents[1] / "fixtures" / "io_tables" / "synthetic.py"
+)
 assert _spec and _spec.loader
 syn = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(syn)
@@ -59,9 +60,18 @@ def write_fixtures(root: Path) -> None:
     for url, body in bodies.items():
         fp = _fixture_fingerprint(url)
         (d / f"{fp[:16]}.bin").write_bytes(body)
-        entries.append({"request_fingerprint": fp, "url": url, "file": f"{fp[:16]}.bin", "sha256": sha256_bytes(body),
-                        "status": 200, "headers": {"content-type": "application/vnd.sdmx.data+csv"},
-                        "retrieved_at": "2026-10-15T00:00:00+00:00", "licence": it.LICENCE})
+        entries.append(
+            {
+                "request_fingerprint": fp,
+                "url": url,
+                "file": f"{fp[:16]}.bin",
+                "sha256": sha256_bytes(body),
+                "status": 200,
+                "headers": {"content-type": "application/vnd.sdmx.data+csv"},
+                "retrieved_at": "2026-10-15T00:00:00+00:00",
+                "licence": it.LICENCE,
+            }
+        )
     (d / "manifest.json").write_text(json.dumps(entries))
 
 
@@ -107,8 +117,9 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
 
         async def ingest(year: int) -> Any:
             c = it.FigaroConnector(year, dims=DIMS)
-            return await run_connector(c, FixtureHttp(it.NAME, root=fixtures), store, eng["worker"],
-                                       persist_cursor=False)
+            return await run_connector(
+                c, FixtureHttp(it.NAME, root=fixtures), store, eng["worker"], persist_cursor=False
+            )
 
         # a release needs at least one eligible observation (V1 rule): ingest the captured WDI fixtures
         from reva.adapters.connectors.registry import builtin_connectors
@@ -125,11 +136,20 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
             refused: Exception = AssertionError("not refused")
         except it.IdentityCheckFailed as e:
             refused = e
-        rel = publish_release(eng["worker"], store, cutoff=utc_now(), origin=Origin.test_fixture,
-                              environment="test")
+        rel = publish_release(eng["worker"], store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
         try:
-            yield Env(settings, eng["migration"], eng["api"], eng["worker"], eng["sim"], store, rel.release_id,
-                      rel.knowledge_cutoff, published, refused)
+            yield Env(
+                settings,
+                eng["migration"],
+                eng["api"],
+                eng["worker"],
+                eng["sim"],
+                store,
+                rel.release_id,
+                rel.knowledge_cutoff,
+                published,
+                refused,
+            )
         finally:
             for e in eng.values():
                 e.dispose()
@@ -142,14 +162,25 @@ def q(engine: Engine, sql: str, **p: Any) -> list[dict[str, Any]]:
 
 def scenario_doc(env: Env, **over: Any) -> dict[str, Any]:
     doc = json.loads((CONTRACTS / "scenario.example.json").read_text())
-    doc.update(schema_version="2.0.0", title="Test: synthetic IO cost push", model_key=m.MODEL_KEY,
-               model_version=m.MODEL_VERSION, baseline_release_id=str(env.release_id),
-               knowledge_cutoff=env.cutoff.isoformat(), countries=["FRA", "DEU"], reference_year=2024,
-               horizon={"periods": 1, "unit": "annual_accounting_period"},
-               intervention={"kind": "set_exogenous_industry_price_change",
-                             "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "10"}]},
-               assumptions={"pass_through_grid": ["0.5", "0.75", "1"]}, outputs=list(m.OUTPUT_GROUPS),
-               missing_input_policy="fail", fidelity="L1")
+    doc.update(
+        schema_version="2.0.0",
+        title="Test: synthetic IO cost push",
+        model_key=m.MODEL_KEY,
+        model_version=m.MODEL_VERSION,
+        baseline_release_id=str(env.release_id),
+        knowledge_cutoff=env.cutoff.isoformat(),
+        countries=["FRA", "DEU"],
+        reference_year=2024,
+        horizon={"periods": 1, "unit": "annual_accounting_period"},
+        intervention={
+            "kind": "set_exogenous_industry_price_change",
+            "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "10"}],
+        },
+        assumptions={"pass_through_grid": ["0.5", "0.75", "1"]},
+        outputs=list(m.OUTPUT_GROUPS),
+        missing_input_policy="fail",
+        fidelity="L1",
+    )
     doc.update(over)
     return doc
 
@@ -157,31 +188,52 @@ def scenario_doc(env: Env, **over: Any) -> dict[str, Any]:
 def create(env: Env, doc: dict[str, Any]) -> UUID:
     s = validate_scenario_spec(doc)
     with env.api.begin() as conn:
-        return UUID(str(conn.execute(
-            text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:test')"),
-            {"spec": json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()}).scalar_one()))
+        return UUID(
+            str(
+                conn.execute(
+                    text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:test')"),
+                    {"spec": json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()},
+                ).scalar_one()
+            )
+        )
 
 
 def run(env: Env, sid: UUID, fidelity: str) -> dict[str, Any]:
     payload = {"scenario_id": str(sid), "fidelity": fidelity}
     with env.owner.begin() as conn:
-        jid = conn.execute(text("""INSERT INTO ops.job(job_type, payload, idempotency_key, created_by)
+        jid = conn.execute(
+            text("""INSERT INTO ops.job(job_type, payload, idempotency_key, created_by)
                                    VALUES ('simulation', CAST(:p AS jsonb), :k, 'human:test') RETURNING id"""),
-                           {"p": json.dumps(payload), "k": f"io-{sid}-{fidelity}-{utc_now().timestamp()}"}
-                           ).scalar_one()
-        token = conn.execute(text("""UPDATE ops.job SET status='running', worker_id='t', attempts=attempts+1,
+            {"p": json.dumps(payload), "k": f"io-{sid}-{fidelity}-{utc_now().timestamp()}"},
+        ).scalar_one()
+        token = conn.execute(
+            text("""UPDATE ops.job SET status='running', worker_id='t', attempts=attempts+1,
                                      lease_until=now()+interval '10 minutes', fencing_token=nextval('ops.fencing_seq')
-                                     WHERE id=:j RETURNING fencing_token"""), {"j": jid}).scalar_one()
-    ctx = JobContext(job_id=jid, job_type="simulation", worker_id="t", fencing_token=int(token), attempt=1,
-                     settings=env.settings, worker_engine=env.worker, sim_engine=env.sim, store=env.store,
-                     heartbeat=lambda _p=None: "running")
+                                     WHERE id=:j RETURNING fencing_token"""),
+            {"j": jid},
+        ).scalar_one()
+    ctx = JobContext(
+        job_id=jid,
+        job_type="simulation",
+        worker_id="t",
+        fencing_token=int(token),
+        attempt=1,
+        settings=env.settings,
+        worker_engine=env.worker,
+        sim_engine=env.sim,
+        store=env.store,
+        heartbeat=lambda _p=None: "running",
+    )
     return handle_simulation(payload, ctx)
 
 
 def results(env: Env, run_id: str) -> dict[tuple[str, str, str], dict[str, Any]]:
-    rows = q(env.owner, """SELECT r.output_key, e.id AS subject_id, r.variant, r.value, r.uncertainty, r.applicability
+    rows = q(
+        env.owner,
+        """SELECT r.output_key, e.id AS subject_id, r.variant, r.value, r.uncertainty, r.applicability
                            FROM sim.result r JOIN world.entity e ON e.id = r.subject_id WHERE r.run_id = :r""",
-             r=run_id)
+        r=run_id,
+    )
     return {(r["output_key"], r["applicability"]["country"], r["variant"]): r for r in rows}
 
 
@@ -192,8 +244,14 @@ def test_dataset_registered_with_identity_report_and_raw_provenance(env: Env) ->
     assert ds["concept_id"] == m.DATASET_CONCEPT and ds["subject_key"] == "WORLD" and ds["origin"] == "test_fixture"
     assert ds["coverage"]["identity_report"]["passed"] is True and ds["coverage"]["reference_year"] == 2024
     assert ds["row_count"] == DIMS.dense_cells() + 6
-    raw = {r["raw_sha256"] for r in q(env.owner, "SELECT raw_sha256 FROM evidence.acquisition WHERE id = ANY(:i)",
-                                       i=list(ds["source_acquisition_ids"]))}
+    raw = {
+        r["raw_sha256"]
+        for r in q(
+            env.owner,
+            "SELECT raw_sha256 FROM evidence.acquisition WHERE id = ANY(:i)",
+            i=list(ds["source_acquisition_ids"]),
+        )
+    }
     assert raw == {a for a in json.loads(env.store.get("normalised", ds["manifest_sha256"]))["source_raw_sha256"]}
     pins = q(env.owner, "SELECT dataset_id FROM belief.release_dataset WHERE release_id = :r", r=env.release_id)
     assert [p["dataset_id"] for p in pins] == [ds["id"]]
@@ -202,8 +260,10 @@ def test_dataset_registered_with_identity_report_and_raw_provenance(env: Env) ->
 def test_identity_failure_refuses_registration(env: Env) -> None:
     assert isinstance(env.refused, it.IdentityCheckFailed)
     assert env.refused.details["report"]["passed"] is False
-    assert q(env.owner, "SELECT count(*) AS n FROM evidence.dataset WHERE dataset_key = 'figaro.iciot_ii.2023'"
-             )[0]["n"] == 0
+    assert (
+        q(env.owner, "SELECT count(*) AS n FROM evidence.dataset WHERE dataset_key = 'figaro.iciot_ii.2023'")[0]["n"]
+        == 0
+    )
 
 
 def test_l1_scenario_end_to_end_matches_hand_computation(env: Env) -> None:

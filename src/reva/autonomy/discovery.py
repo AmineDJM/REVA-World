@@ -40,8 +40,16 @@ CATALOGUE_ALLOWLIST: dict[str, dict[str, Any]] = {
 STOPWORDS = {"on", "by", "and", "the", "of", "in", "at", "for", "a", "an", "to", "as", "per", "eurostat", "wdi"}
 _CTRL = re.compile(r"[\x00-\x1f\x7f]")
 MALFORMED = (ValueError, TypeError, AttributeError, KeyError, IndexError, RecursionError, ArithmeticError)
-TOC_COLUMNS = ("title", "code", "type", "last update of data", "last table structure change", "data start",
-               "data end", "values")
+TOC_COLUMNS = (
+    "title",
+    "code",
+    "type",
+    "last update of data",
+    "last table structure change",
+    "data start",
+    "data end",
+    "values",
+)
 
 
 def sanitise(text: str, limit: int = 500) -> str:
@@ -59,8 +67,12 @@ def parse_toc(body: bytes) -> list[dict[str, Any]]:
     reader = csv.reader(io.StringIO(text), delimiter="\t", quotechar='"')
     header = next(reader, None)
     if header is None or [h.strip().lower() for h in header[: len(TOC_COLUMNS)]] != list(TOC_COLUMNS):
-        raise SourceResponseError("Eurostat catalogue header changed", retryable=False, kind="schema_drift",
-                                  header=[sanitise(h, 60) for h in (header or [])][:10])
+        raise SourceResponseError(
+            "Eurostat catalogue header changed",
+            retryable=False,
+            kind="schema_drift",
+            header=[sanitise(h, 60) for h in (header or [])][:10],
+        )
     path: list[str] = []
     out: list[dict[str, Any]] = []
     seen: set[str] = set()
@@ -76,13 +88,23 @@ def parse_toc(body: bytes) -> list[dict[str, Any]]:
         if kind not in ("dataset", "table") or code in seen or not re.fullmatch(r"[a-z0-9_]{2,64}", code):
             continue
         seen.add(code)
+
         def cell(i: int, r: list[str] = row) -> str:
             return sanitise(r[i], 40) if len(r) > i else ""
-        out.append({
-            "title": title, "code": code, "type": kind, "folder_path": path[:depth],
-            "last_update_of_data": cell(3), "last_structure_change": cell(4),
-            "data_start": cell(5), "data_end": cell(6), "values": cell(7),
-        })
+
+        out.append(
+            {
+                "title": title,
+                "code": code,
+                "type": kind,
+                "folder_path": path[:depth],
+                "last_update_of_data": cell(3),
+                "last_structure_change": cell(4),
+                "data_start": cell(5),
+                "data_end": cell(6),
+                "values": cell(7),
+            }
+        )
     return out
 
 
@@ -98,10 +120,20 @@ def score(query: set[str], title: str) -> tuple[float, float]:
 class EurostatCatalogueDiscoverer:
     """Allowlisted catalogue search + bounded structural inspection."""
 
-    def __init__(self, io_: ArtifactIO, http: Any, *, registry: Registry | None = None,
-                 guard: AutonomyGuard | None = None, max_toc_bytes: int = 4_000_000, top_k: int = 5,
-                 max_inspections: int = 1, max_inspection_attempts: int = 3, min_score: float = 0.6,
-                 max_sample_bytes: int = 2_000_000) -> None:
+    def __init__(
+        self,
+        io_: ArtifactIO,
+        http: Any,
+        *,
+        registry: Registry | None = None,
+        guard: AutonomyGuard | None = None,
+        max_toc_bytes: int = 4_000_000,
+        top_k: int = 5,
+        max_inspections: int = 1,
+        max_inspection_attempts: int = 3,
+        min_score: float = 0.6,
+        max_sample_bytes: int = 2_000_000,
+    ) -> None:
         self.io = io_
         self.http = http
         self.registry = registry or load_registry()
@@ -162,8 +194,9 @@ class EurostatCatalogueDiscoverer:
         try:
             entries = parse_toc(res.body)
         except MALFORMED as exc:
-            raise SourceResponseError(f"malformed Eurostat catalogue: {type(exc).__name__}", retryable=False,
-                                      kind="schema_drift") from None
+            raise SourceResponseError(
+                f"malformed Eurostat catalogue: {type(exc).__name__}", retryable=False, kind="schema_drift"
+            ) from None
         scored = []
         for e in entries:
             if e["type"] != "dataset":
@@ -172,9 +205,12 @@ class EurostatCatalogueDiscoverer:
             scored.append({**e, "score": round(recall, 6), "jaccard": round(jacc, 6)})
         scored.sort(key=lambda e: (-e["score"], -e["jaccard"], e["code"]))
         ranked = [e for e in scored if e["score"] >= self.min_score][: self.top_k]
-        self.last_search = {"query_tokens": sorted(query), "datasets_in_catalogue": len(entries),
-                            "ranked": [{"code": e["code"], "score": e["score"], "jaccard": e["jaccard"]}
-                                       for e in ranked], "inspections": []}
+        self.last_search = {
+            "query_tokens": sorted(query),
+            "datasets_in_catalogue": len(entries),
+            "ranked": [{"code": e["code"], "score": e["score"], "jaccard": e["jaccard"]} for e in ranked],
+            "inspections": [],
+        }
         source = next(s for s in self.registry.sources if s["source_key"] == "eurostat.dissemination")
         rights = "verified" if (source.get("rights") or {}).get("licence") else "unknown"
         out: list[SourceCandidate] = []
@@ -182,32 +218,48 @@ class EurostatCatalogueDiscoverer:
         for entry in ranked:
             inspection: dict[str, Any] | None = None
             inspection_error = None
-            if (inspected < self.max_inspections and attempts < self.max_inspection_attempts and geo and years
-                    and requests < budget.max_requests and budget.max_bytes - used_bytes > 0):
+            if (
+                inspected < self.max_inspections
+                and attempts < self.max_inspection_attempts
+                and geo
+                and years
+                and requests < budget.max_requests
+                and budget.max_bytes - used_bytes > 0
+            ):
                 attempts += 1
                 requests += 1
                 try:
                     inspection, nbytes = await self._inspect(
-                        entry["code"], geo, years, min(self.max_sample_bytes, budget.max_bytes - used_bytes))
+                        entry["code"], geo, years, min(self.max_sample_bytes, budget.max_bytes - used_bytes)
+                    )
                     used_bytes += nbytes
                     inspected += 1
                 except RevaError as e:  # one failed inspection never aborts discovery
                     inspection_error = f"{e.code}: {e.message[:300]}"
                 except MALFORMED as e:  # malformed provider metadata: typed record, never a crash
                     inspection_error = f"malformed metadata: {type(e).__name__}: {sanitise(str(e), 300)}"
-                self.last_search["inspections"].append({"code": entry["code"], "ok": inspection is not None,
-                                                        "error": inspection_error})
+                self.last_search["inspections"].append(
+                    {"code": entry["code"], "ok": inspection is not None, "error": inspection_error}
+                )
             meta = {
                 "schema": "reva-source-candidate/1",
                 "provider": "eurostat",
                 "gap_id": str(gap.gap_id),
                 "requirement_id": gap.requirement_id,
-                "catalogue": {"url": url, "raw_sha256": toc_ref.sha256, "bytes": len(res.body),
-                              "retrieved_at": res.retrieved_at.isoformat(),
-                              "max_bytes_override": limit},
+                "catalogue": {
+                    "url": url,
+                    "raw_sha256": toc_ref.sha256,
+                    "bytes": len(res.body),
+                    "retrieved_at": res.retrieved_at.isoformat(),
+                    "max_bytes_override": limit,
+                },
                 "entry": entry,
-                "match": {"method": "title_token_recall_then_jaccard@1", "query_tokens": sorted(query),
-                          "score": entry["score"], "jaccard": entry["jaccard"]},
+                "match": {
+                    "method": "title_token_recall_then_jaccard@1",
+                    "query_tokens": sorted(query),
+                    "score": entry["score"],
+                    "jaccard": entry["jaccard"],
+                },
                 "geography": {"iso3": list(gap.geography), "eurostat_geo": geo},
                 "years": years,
                 "inspection": inspection,
@@ -215,28 +267,38 @@ class EurostatCatalogueDiscoverer:
                 "lifecycle": "inspected" if inspection else "discovered",
             }
             ref = self.io.put_json(meta, "normalised")
-            out.append(SourceCandidate(
-                candidate_id=stable_id("candidate", str(gap.gap_id), entry["code"], toc_ref.sha256),
-                provider="eurostat",
-                catalogue_url=url,
-                dataset_id=entry["code"],
-                metadata=ref,
-                rights_status=rights,  # type: ignore[arg-type]
-                allowed_hosts=tuple(CATALOGUE_ALLOWLIST["eurostat"]["hosts"]),
-            ))
-        self.last_search["usage"] = {"requests": requests, "bytes": used_bytes,
-                                     "wall_seconds": round(time.monotonic() - started, 3),
-                                     "at": now_utc().isoformat()}
+            out.append(
+                SourceCandidate(
+                    candidate_id=stable_id("candidate", str(gap.gap_id), entry["code"], toc_ref.sha256),
+                    provider="eurostat",
+                    catalogue_url=url,
+                    dataset_id=entry["code"],
+                    metadata=ref,
+                    rights_status=rights,  # type: ignore[arg-type]
+                    allowed_hosts=tuple(CATALOGUE_ALLOWLIST["eurostat"]["hosts"]),
+                )
+            )
+        self.last_search["usage"] = {
+            "requests": requests,
+            "bytes": used_bytes,
+            "wall_seconds": round(time.monotonic() - started, 3),
+            "at": now_utc().isoformat(),
+        }
         return out
 
     @staticmethod
     def inspection_url(dataset: str, geo: list[str], years: list[int]) -> str:
-        params = [("format", "JSON"), ("lang", "EN"), *[("geo", g) for g in sorted(geo)],
-                  *[("time", str(y)) for y in sorted(years)]]
+        params = [
+            ("format", "JSON"),
+            ("lang", "EN"),
+            *[("geo", g) for g in sorted(geo)],
+            *[("time", str(y)) for y in sorted(years)],
+        ]
         return DATA_BASE + dataset + "?" + urlencode(params)
 
-    async def _inspect(self, dataset: str, geo: list[str], years: list[int],
-                       max_bytes: int) -> tuple[dict[str, Any], int]:
+    async def _inspect(
+        self, dataset: str, geo: list[str], years: list[int], max_bytes: int
+    ) -> tuple[dict[str, Any], int]:
         url = self.inspection_url(dataset, geo, years)
         self._check_allowlisted(url)
         if max_bytes <= 0:
@@ -244,16 +306,16 @@ class EurostatCatalogueDiscoverer:
         res = await self.http.get(url, max_bytes=max_bytes)
         doc = json_decimal(res.body)
         if not isinstance(doc, dict) or str(doc.get("version")) != "2.0":
-            raise SourceResponseError("inspection did not return a JSON-stat 2.0 object", retryable=False,
-                                      kind="schema_drift")
+            raise SourceResponseError(
+                "inspection did not return a JSON-stat 2.0 object", retryable=False, kind="schema_drift"
+            )
         raw_ref = self.io.put_bytes(res.body, "raw", "application/json")
         ids = [str(d) for d in doc.get("id", [])]
         dims = doc.get("dimension") or {}
         cats = {}
         for d in ids:
             idx = (dims.get(d) or {}).get("category", {}).get("index") or {}
-            order = sorted(idx.items(), key=lambda kv: int(kv[1])) if isinstance(idx, dict) else list(
-                enumerate(idx))
+            order = sorted(idx.items(), key=lambda kv: int(kv[1])) if isinstance(idx, dict) else list(enumerate(idx))
             cats[d] = [str(k) for k, _ in order] if isinstance(idx, dict) else [str(v) for _, v in order]
         ext = doc.get("extension") or {}
         inspection = {
@@ -267,10 +329,13 @@ class EurostatCatalogueDiscoverer:
             "dimension_order": ids,
             "size": [int(str(s)) for s in doc.get("size", [])],
             "categories": cats,
-            "status_labels": {sanitise(str(k), 4): sanitise(str(v), 80)
-                              for k, v in (((ext.get("status") or {}).get("label")) or {}).items()},
+            "status_labels": {
+                sanitise(str(k), 4): sanitise(str(v), 80)
+                for k, v in (((ext.get("status") or {}).get("label")) or {}).items()
+            },
             "status_codes_seen": sorted({str(v) for v in (doc.get("status") or {}).values()})
-            if isinstance(doc.get("status"), dict) else [],
+            if isinstance(doc.get("status"), dict)
+            else [],
             "value_count": len(doc.get("value") or {}),
             "dataset_updated": str(doc.get("updated", "")),
             "structure_fingerprint": structure_fingerprint(doc),

@@ -117,8 +117,10 @@ MODEL_VERSION = "1.0.0"
 LABEL = "conditional projection under stated assumptions, not a forecast"
 PRECISION = 50
 QUANTUM = Decimal("1e-9")
-NUMERIC_TYPE = (f"decimal.Decimal, precision {PRECISION}, ROUND_HALF_EVEN; person counts quantized to {QUANTUM} "
-                "persons; accounting identities computed with Inexact trapped (exact)")
+NUMERIC_TYPE = (
+    f"decimal.Decimal, precision {PRECISION}, ROUND_HALF_EVEN; person counts quantized to {QUANTUM} "
+    "persons; accounting identities computed with Inexact trapped (exact)"
+)
 MAX_OPEN_AGE = 100
 MIN_OPEN_AGE = 85
 SEXES = ("F", "M")
@@ -136,19 +138,22 @@ FERTILITY_OPTIONS = ("constant_base_period_rates", "europop2023_bsl")
 MORTALITY_OPTIONS = ("constant_base_period_rates",)
 ASSUMPTION_LABELS = {
     "migration:zero": "zero net migration at every age (closed population)",
-    "migration:average_residual": ("net migration by age and sex = mean of the residual estimates over the stated "
-                                   "window (residual method: includes statistical adjustment)"),
-    "migration:europop2023_bsl": ("EUROPOP2023 baseline net-migration assumption by age and sex "
-                                  "(Eurostat proj_23nanmig)"),
+    "migration:average_residual": (
+        "net migration by age and sex = mean of the residual estimates over the stated "
+        "window (residual method: includes statistical adjustment)"
+    ),
+    "migration:europop2023_bsl": (
+        "EUROPOP2023 baseline net-migration assumption by age and sex (Eurostat proj_23nanmig)"
+    ),
     "fertility:constant_base_period_rates": "age-specific fertility rates held at their base-period level",
-    "fertility:europop2023_bsl": ("EUROPOP2023 baseline age-specific fertility-rate assumption "
-                                  "(Eurostat proj_23naasfr)"),
+    "fertility:europop2023_bsl": (
+        "EUROPOP2023 baseline age-specific fertility-rate assumption (Eurostat proj_23naasfr)"
+    ),
     "mortality:constant_base_period_rates": "age- and sex-specific death rates held at their base-period level",
 }
 
 _CTX = Context(prec=PRECISION, rounding=ROUND_HALF_EVEN, traps=[InvalidOperation, DivisionByZero, Overflow])
-_EXACT = Context(prec=PRECISION, rounding=ROUND_HALF_EVEN,
-                 traps=[InvalidOperation, DivisionByZero, Overflow, Inexact])
+_EXACT = Context(prec=PRECISION, rounding=ROUND_HALF_EVEN, traps=[InvalidOperation, DivisionByZero, Overflow, Inexact])
 
 
 def qp(x: Decimal) -> Decimal:
@@ -226,8 +231,13 @@ def _table(rows: Iterable[Mapping[str, Any]], dataset: str | None = None) -> Tab
             continue
         v = r.get("value")
         out.setdefault((int(r["year"]), str(r.get("sex") or "T")), {})[str(r["age"])] = Cell(
-            Decimal(str(v)) if v is not None else None, str(r["age_kind"]),
-            r.get("age_start"), r.get("age_end"), str(r.get("cell_type") or "leaf"), str(r.get("status") or ""))
+            Decimal(str(v)) if v is not None else None,
+            str(r["age_kind"]),
+            r.get("age_start"),
+            r.get("age_end"),
+            str(r.get("cell_type") or "leaf"),
+            str(r.get("status") or ""),
+        )
     return out
 
 
@@ -245,14 +255,29 @@ class CountryDemography:
     provenance: dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_tables(cls, iso3: str, *, population: Any, deaths: Any, births: Any, europop_migration: Any = None,
-                    europop_fertility: Any = None, europop_population: Any = None,
-                    provenance: Mapping[str, Any] | None = None) -> CountryDemography:
+    def from_tables(
+        cls,
+        iso3: str,
+        *,
+        population: Any,
+        deaths: Any,
+        births: Any,
+        europop_migration: Any = None,
+        europop_fertility: Any = None,
+        europop_population: Any = None,
+        provenance: Mapping[str, Any] | None = None,
+    ) -> CountryDemography:
         """Tables are Arrow tables, Polars frames or row dicts in the dataset-input schema."""
-        return cls(iso3, _table(_rows(population), "demo_pjan"), _table(_rows(deaths), "demo_magec"),
-                   _table(_rows(births), "demo_fasec"), _table(_rows(europop_migration), "proj_23nanmig"),
-                   _table(_rows(europop_fertility), "proj_23naasfr"),
-                   _table(_rows(europop_population), "proj_23np"), dict(provenance or {}))
+        return cls(
+            iso3,
+            _table(_rows(population), "demo_pjan"),
+            _table(_rows(deaths), "demo_magec"),
+            _table(_rows(births), "demo_fasec"),
+            _table(_rows(europop_migration), "proj_23nanmig"),
+            _table(_rows(europop_fertility), "proj_23naasfr"),
+            _table(_rows(europop_population), "proj_23np"),
+            dict(provenance or {}),
+        )
 
     def years(self, which: str) -> list[int]:
         return sorted({y for (y, _s) in getattr(self, which)})
@@ -295,8 +320,13 @@ def to_vector(cells: Mapping[str, Cell] | None, omega: int) -> list[Decimal] | N
     singles = {c.start: c.value for c in cells.values() if c.kind == "single" and c.value is not None}
     vec = [singles[a] for a in range(omega)]
     top = [singles[a] for a in range(omega, s)]
-    top.append(next(c.value for c in cells.values()
-                    if c.kind in ("open", "open_upper") and c.cell_type == "leaf" and c.value is not None))
+    top.append(
+        next(
+            c.value
+            for c in cells.values()
+            if c.kind in ("open", "open_upper") and c.cell_type == "leaf" and c.value is not None
+        )
+    )
     vec.append(xsum(top))
     return vec
 
@@ -357,11 +387,11 @@ def life_table(m: Sequence[Decimal], sex: str) -> LifeTable:
         Lx.append(_CTX.add(nxt, mul(a[x], d)))
         lx.append(nxt)
         if nxt <= 0 and x < omega - 1:
-            raise ValidationProblem(f"life table exhausted at age {x + 1} before the open group {omega}",
-                                    sex=sex, age=x + 1)
+            raise ValidationProblem(
+                f"life table exhausted at age {x + 1} before the open group {omega}", sex=sex, age=x + 1
+            )
     if m[omega] <= 0:
-        raise ValidationProblem("open age group has no deaths: open-group survival is undefined", sex=sex,
-                                omega=omega)
+        raise ValidationProblem("open age group has no deaths: open-group survival is undefined", sex=sex, omega=omega)
     q.append(ONE)
     Lx.append(div(lx[omega], m[omega]))
     s_birth = div(Lx[0], lx[0])
@@ -422,7 +452,7 @@ UNK_GROUP = FertilityGroup("UNK", 15, 50)
 
 
 def group_sum(vec: Sequence[Decimal], g: FertilityGroup) -> Decimal:
-    return xsum(vec[g.start:g.end])
+    return xsum(vec[g.start : g.end])
 
 
 @dataclass(frozen=True)
@@ -449,34 +479,54 @@ class BaseRates:
 
     def years_used(self) -> dict[str, Any]:
         """Which base-period years fed each component (explicit label; gaps are never filled)."""
-        return {"base_period": list(self.years), "mortality": list(self.years),
-                "fertility": list(self.fertility_years), "sex_ratio_at_birth": list(self.sex_ratio_years),
-                "excluded_never_filled": dict(self.excluded_years)}
+        return {
+            "base_period": list(self.years),
+            "mortality": list(self.years),
+            "fertility": list(self.fertility_years),
+            "sex_ratio_at_birth": list(self.sex_ratio_years),
+            "excluded_never_filled": dict(self.excluded_years),
+        }
 
     @property
     def tfr(self) -> Decimal:
-        return _CTX.add(csum(mul(r, Decimal(g.end - g.start)) for g, r in self.fertility),
-                        mul(self.unknown_age_birth_rate, Decimal(35)))
+        return _CTX.add(
+            csum(mul(r, Decimal(g.end - g.start)) for g, r in self.fertility),
+            mul(self.unknown_age_birth_rate, Decimal(35)),
+        )
 
 
 def _vec(data: CountryDemography, which: str, year: int, sex: str, omega: int) -> list[Decimal]:
     v = to_vector(getattr(data, which).get((year, sex)), omega)
     if v is None:
-        raise _gap(data.iso3, f"{which} {year} {sex} incomplete for single ages 0..{omega - 1} and open group",
-                   input=which, year=year, sex=sex)
+        raise _gap(
+            data.iso3,
+            f"{which} {year} {sex} incomplete for single ages 0..{omega - 1} and open group",
+            input=which,
+            year=year,
+            sex=sex,
+        )
     return v
 
 
-def determine_omega(data: CountryDemography, pop_years: Iterable[int], death_years: Iterable[int],
-                    extra: Iterable[Mapping[str, Cell] | None] = ()) -> int:
+def determine_omega(
+    data: CountryDemography,
+    pop_years: Iterable[int],
+    death_years: Iterable[int],
+    extra: Iterable[Mapping[str, Cell] | None] = (),
+) -> int:
     starts: list[int] = []
     for which, years in (("population", pop_years), ("deaths", death_years)):
         for y in years:
             for s in SEXES:
                 st = open_start(getattr(data, which).get((y, s)))
                 if st is None:
-                    raise _gap(data.iso3, f"{which} {y} {s} has no usable single-age table with an open group",
-                               input=which, year=y, sex=s)
+                    raise _gap(
+                        data.iso3,
+                        f"{which} {y} {s} has no usable single-age table with an open group",
+                        input=which,
+                        year=y,
+                        sex=s,
+                    )
                 starts.append(st)
     for cells in extra:
         st = open_start(cells)
@@ -485,9 +535,13 @@ def determine_omega(data: CountryDemography, pop_years: Iterable[int], death_yea
         starts.append(st)
     omega = min([MAX_OPEN_AGE, *starts])
     if omega < MIN_OPEN_AGE:
-        raise CapabilityGap(f"{data.iso3}: open age group starts at {omega} (< {MIN_OPEN_AGE}); a single-age "
-                            "projection would need the open group to be split, which this model never does",
-                            capability="demography.cohort_component.open_age", country=data.iso3, omega=omega)
+        raise CapabilityGap(
+            f"{data.iso3}: open age group starts at {omega} (< {MIN_OPEN_AGE}); a single-age "
+            "projection would need the open group to be split, which this model never does",
+            capability="demography.cohort_component.open_age",
+            country=data.iso3,
+            omega=omega,
+        )
     return omega
 
 
@@ -501,9 +555,14 @@ def _status_flags(table: Table, years: Iterable[int]) -> dict[str, list[str]]:
     return out
 
 
-def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
-               extra_open_tables: Iterable[Mapping[str, Cell] | None] = (),
-               migration_window: tuple[int, int] | None = None) -> BaseRates:
+def base_rates(
+    data: CountryDemography,
+    first_year: int,
+    last_year: int,
+    *,
+    extra_open_tables: Iterable[Mapping[str, Cell] | None] = (),
+    migration_window: tuple[int, int] | None = None,
+) -> BaseRates:
     """Base-period rates from events of calendar years first..last (populations first..last+1)."""
     if last_year < first_year:
         raise ValidationProblem("base period must contain at least one year")
@@ -528,18 +587,24 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
             exp[s], dth[s] = e, d
         # zero exposure, an open group without deaths, or m_x >= 2 below the open group (q_x would
         # reach 1 and exhaust the life table: a small-number artefact) -> lower omega
-        bad = [x for s in SEXES for x in range(omega + 1) if exp[s][x] <= 0] + \
-              [omega for s in SEXES if dth[s][omega] <= 0] + \
-              [x for s in SEXES for x in range(1, omega) if exp[s][x] > 0 and dth[s][x] >= 2 * exp[s][x]]
+        bad = (
+            [x for s in SEXES for x in range(omega + 1) if exp[s][x] <= 0]
+            + [omega for s in SEXES if dth[s][omega] <= 0]
+            + [x for s in SEXES for x in range(1, omega) if exp[s][x] > 0 and dth[s][x] >= 2 * exp[s][x]]
+        )
         if not bad:
             break
         new = min(bad) if min(bad) < omega else omega - 1
         if new < MIN_OPEN_AGE:
-            raise CapabilityGap(f"{data.iso3}: zero base-period exposure/deaths at age {min(bad)} below "
-                                f"{MIN_OPEN_AGE}", capability="demography.cohort_component.open_age",
-                                country=data.iso3)
-        notes.append(f"open age lowered from {omega} to {new}: zero base-period exposure, no open-group deaths "
-                     "or a death rate >= 2 (small numbers)")
+            raise CapabilityGap(
+                f"{data.iso3}: zero base-period exposure/deaths at age {min(bad)} below {MIN_OPEN_AGE}",
+                capability="demography.cohort_component.open_age",
+                country=data.iso3,
+            )
+        notes.append(
+            f"open age lowered from {omega} to {new}: zero base-period exposure, no open-group deaths "
+            "or a death rate >= 2 (small numbers)"
+        )
         omega = new
     lts = {s: life_table([div(dth[s][x], exp[s][x]) for x in range(omega + 1)], s) for s in SEXES}
     for s, lt in lts.items():
@@ -551,8 +616,10 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
             for which in ("population", "deaths"):
                 u = unknown_age(getattr(data, which).get((t, s)))
                 if u is not None and u != 0:
-                    notes.append(f"{which} {t} {s}: {dstr(u)} persons of unknown age excluded (absorbed by the "
-                                 "migration residual)")
+                    notes.append(
+                        f"{which} {t} {s}: {dstr(u)} persons of unknown age excluded (absorbed by the "
+                        "migration residual)"
+                    )
     # fertility: rates from the base-period years whose mother's-age table is complete (a year
     # with a missing leaf class is left out of the rate estimation, never imputed; reported)
     num: dict[tuple[int, int], Decimal] = {}
@@ -589,21 +656,29 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
         unk_e = xadd(unk_e, mul(HALF, xadd(group_sum(f0, UNK_GROUP), group_sum(f1, UNK_GROUP))))
         fert_years.append(t)
     if not fert_years:
-        raise _gap(data.iso3, f"no base-period year {years[0]}-{years[-1]} has a complete births-by-mother's-age "
-                   "table", input="births", years=list(years))
+        raise _gap(
+            data.iso3,
+            f"no base-period year {years[0]}-{years[-1]} has a complete births-by-mother's-age table",
+            input="births",
+            years=list(years),
+        )
     if not sex_years:
         raise _gap(data.iso3, "no base-period year has births by newborn sex", input="births", years=list(years))
     for label, used in (("fertility rates", fert_years), ("sex ratio at birth", sex_years)):
         if len(used) < len(years):
-            notes.append(f"{label} estimated from {used} (other base-period years have incomplete or "
-                         "unpublished birth tables; left out, never imputed)")
+            notes.append(
+                f"{label} estimated from {used} (other base-period years have incomplete or "
+                "unpublished birth tables; left out, never imputed)"
+            )
     for k in groups:
         if den[k] <= 0:
             raise _gap(data.iso3, f"zero female exposure for mother's age {groups[k].code}")
     fert = tuple(sorted(((groups[k], div(num[k], den[k])) for k in groups), key=lambda gr: gr[0].start))
     if unk_b:
-        notes.append(f"{dstr(unk_b)} births with unknown mother's age: separate rate per woman aged 15-49 "
-                     "(never spread over ages)")
+        notes.append(
+            f"{dstr(unk_b)} births with unknown mother's age: separate rate per woman aged 15-49 "
+            "(never spread over ages)"
+        )
     male_share = div(b_m, xadd(b_m, b_f))
     # residual migration with base-period survival
     residual: dict[int, dict[str, list[Decimal]]] = {}
@@ -621,8 +696,15 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
             residual[t][s] = m
     breaks: dict[int, list[str]] = {}
     for t in mig_years:
-        seen = sorted({c.status for (yy, _s), cells in data.population.items() if yy == t + 1
-                       for c in cells.values() if BREAK_FLAG in c.status})
+        seen = sorted(
+            {
+                c.status
+                for (yy, _s), cells in data.population.items()
+                if yy == t + 1
+                for c in cells.values()
+                if BREAK_FLAG in c.status
+            }
+        )
         if seen:
             breaks[t] = seen
     flags = {
@@ -630,11 +712,26 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
         "demo_magec": _status_flags(data.deaths, years),
         "demo_fasec": _status_flags(data.births, years),
     }
-    excluded = {k: [y for y in years if y not in used] for k, used in (("fertility", fert_years),
-                                                                        ("sex_ratio_at_birth", sex_years))}
-    return BaseRates(data.iso3, omega, years, lts, fert, div(unk_b, unk_e) if unk_e > 0 else ZERO, male_share,
-                     residual, tuple(notes), flags, tuple(fert_years), tuple(sex_years),
-                     {k: v for k, v in excluded.items() if v}, breaks)
+    excluded = {
+        k: [y for y in years if y not in used]
+        for k, used in (("fertility", fert_years), ("sex_ratio_at_birth", sex_years))
+    }
+    return BaseRates(
+        data.iso3,
+        omega,
+        years,
+        lts,
+        fert,
+        div(unk_b, unk_e) if unk_e > 0 else ZERO,
+        male_share,
+        residual,
+        tuple(notes),
+        flags,
+        tuple(fert_years),
+        tuple(sex_years),
+        {k: v for k, v in excluded.items() if v},
+        breaks,
+    )
 
 
 # --------------------------------------------------------------------------- assumptions
@@ -654,8 +751,9 @@ class Assumptions:
         if self.migration not in MIGRATION_OPTIONS:
             raise ValidationProblem(f"unknown migration assumption {self.migration!r}", allowed=MIGRATION_OPTIONS)
         if self.migration_breaks not in MIGRATION_BREAK_OPTIONS:
-            raise ValidationProblem(f"unknown migration_breaks option {self.migration_breaks!r}",
-                                    allowed=MIGRATION_BREAK_OPTIONS)
+            raise ValidationProblem(
+                f"unknown migration_breaks option {self.migration_breaks!r}", allowed=MIGRATION_BREAK_OPTIONS
+            )
         if not isinstance(self.allow_single_year_migration, bool):
             raise ValidationProblem("allow_single_year_migration must be a boolean")
         if self.fertility not in FERTILITY_OPTIONS:
@@ -674,14 +772,18 @@ class Assumptions:
         mw = self.migration_window or self.base_period
         avg = self.migration == "average_residual"
         return {
-            "migration": self.migration, "fertility": self.fertility, "mortality": self.mortality,
+            "migration": self.migration,
+            "fertility": self.fertility,
+            "mortality": self.mortality,
             "base_period": {"first_year": self.base_period[0], "last_year": self.base_period[1]},
             "migration_window": {"first_year": mw[0], "last_year": mw[1]} if avg else None,
             "migration_breaks": self.migration_breaks if avg else None,
             "allow_single_year_migration": self.allow_single_year_migration if avg else None,
-            "labels": [ASSUMPTION_LABELS[f"migration:{self.migration}"],
-                       ASSUMPTION_LABELS[f"fertility:{self.fertility}"],
-                       ASSUMPTION_LABELS[f"mortality:{self.mortality}"]],
+            "labels": [
+                ASSUMPTION_LABELS[f"migration:{self.migration}"],
+                ASSUMPTION_LABELS[f"fertility:{self.fertility}"],
+                ASSUMPTION_LABELS[f"mortality:{self.mortality}"],
+            ],
         }
 
 
@@ -690,8 +792,12 @@ def _europop_migration(data: CountryDemography, year: int, omega: int) -> dict[s
     for s in SEXES:
         v = to_vector(data.europop_migration.get((year, s)), omega)
         if v is None:
-            raise CapabilityGap(f"{data.iso3}: no EUROPOP2023 net-migration assumption for {year}",
-                                capability="demography.assumption.europop2023", country=data.iso3, year=year)
+            raise CapabilityGap(
+                f"{data.iso3}: no EUROPOP2023 net-migration assumption for {year}",
+                capability="demography.assumption.europop2023",
+                country=data.iso3,
+                year=year,
+            )
         out[s] = [qp(x) for x in v]
     return out
 
@@ -699,20 +805,27 @@ def _europop_migration(data: CountryDemography, year: int, omega: int) -> dict[s
 def _europop_fertility(data: CountryDemography, year: int) -> tuple[tuple[FertilityGroup, Decimal], ...]:
     cells = data.europop_fertility.get((year, "T"))
     if not cells:
-        raise CapabilityGap(f"{data.iso3}: no EUROPOP2023 fertility assumption for {year}",
-                            capability="demography.assumption.europop2023", country=data.iso3, year=year)
+        raise CapabilityGap(
+            f"{data.iso3}: no EUROPOP2023 fertility assumption for {year}",
+            capability="demography.assumption.europop2023",
+            country=data.iso3,
+            year=year,
+        )
     out = []
     for g in fertility_groups(cells):
         v = cells[g.code].value
         if v is None:
-            raise CapabilityGap(f"{data.iso3}: EUROPOP2023 fertility {year} {g.code} missing",
-                                capability="demography.assumption.europop2023", country=data.iso3, year=year)
+            raise CapabilityGap(
+                f"{data.iso3}: EUROPOP2023 fertility {year} {g.code} missing",
+                capability="demography.assumption.europop2023",
+                country=data.iso3,
+                year=year,
+            )
         out.append((g, v))
     return tuple(out)
 
 
-def check_assumption_inputs(data: CountryDemography, a: Assumptions, jump_off: int, end_year: int,
-                            omega: int) -> None:
+def check_assumption_inputs(data: CountryDemography, a: Assumptions, jump_off: int, end_year: int, omega: int) -> None:
     """Raise ``CapabilityGap`` when an assumption's own data (EUROPOP2023) is unavailable for a year."""
     for t in range(jump_off, end_year):
         if a.migration == "europop2023_bsl":
@@ -731,9 +844,11 @@ class MigrationWindow:
     warnings: tuple[dict[str, Any], ...]
 
     def as_json(self) -> dict[str, Any]:
-        return {"requested": {"first_year": self.requested[0], "last_year": self.requested[1]},
-                "years_used": list(self.years_used),
-                "excluded": {str(y): v for y, v in sorted(self.excluded.items())}}
+        return {
+            "requested": {"first_year": self.requested[0], "last_year": self.requested[1]},
+            "years_used": list(self.years_used),
+            "excluded": {str(y): v for y, v in sorted(self.excluded.items())},
+        }
 
 
 def _median(xs: Sequence[Decimal]) -> Decimal:
@@ -742,8 +857,9 @@ def _median(xs: Sequence[Decimal]) -> Decimal:
     return v[n // 2] if n % 2 else div(_CTX.add(v[n // 2 - 1], v[n // 2]), Decimal(2))
 
 
-def resolve_migration_window(rates: BaseRates, window: tuple[int, int], *, breaks: str = "exclude",
-                             allow_single_year: bool = False) -> MigrationWindow:
+def resolve_migration_window(
+    rates: BaseRates, window: tuple[int, int], *, breaks: str = "exclude", allow_single_year: bool = False
+) -> MigrationWindow:
     """Years of ``window`` whose residuals enter the average (series-break years excluded by default).
 
     Refusals: a stated window shorter than ``MIN_MIGRATION_YEARS`` -> ``ValidationProblem``; a window
@@ -759,38 +875,71 @@ def resolve_migration_window(rates: BaseRates, window: tuple[int, int], *, break
         raise ValidationProblem(
             f"{rates.iso3}: the migration window {window[0]}-{window[1]} has {len(years)} year; averaging residual "
             f"migration over fewer than {MIN_MIGRATION_YEARS} years is refused unless "
-            "allow_single_year_migration is set explicitly", country=rates.iso3,
-            migration_window=list(window), min_years=MIN_MIGRATION_YEARS)
+            "allow_single_year_migration is set explicitly",
+            country=rates.iso3,
+            migration_window=list(window),
+            min_years=MIN_MIGRATION_YEARS,
+        )
     warnings: list[dict[str, Any]] = []
     flagged = [y for y in years if y in rates.residual_breaks]
     excluded: dict[int, dict[str, Any]] = {}
     if flagged:
-        detail = {str(y): {"residual_persons": dstr(_CTX.quantize(rates.residual_total(y), Decimal(1))),
-                           "demo_pjan_flags_year": y + 1, "flags": rates.residual_breaks[y]} for y in flagged}
+        detail = {
+            str(y): {
+                "residual_persons": dstr(_CTX.quantize(rates.residual_total(y), Decimal(1))),
+                "demo_pjan_flags_year": y + 1,
+                "flags": rates.residual_breaks[y],
+            }
+            for y in flagged
+        }
         if breaks == "exclude":
             excluded = {y: {"reason": "series_break", **detail[str(y)]} for y in flagged}
-        warnings.append({
-            "code": "migration_residual_contains_break", "country": rates.iso3,
-            "action": "excluded from the average" if breaks == "exclude" else
-            "included in the average (explicitly requested: migration_breaks='include')",
-            "years": flagged, "residuals": detail,
-            "message": (f"{rates.iso3}: residual migration of {flagged} spans a Eurostat series break ('b' flag on "
-                        "the following 1 January population, e.g. a census revision); the residual books the "
-                        "revision as migration")})
+        warnings.append(
+            {
+                "code": "migration_residual_contains_break",
+                "country": rates.iso3,
+                "action": "excluded from the average"
+                if breaks == "exclude"
+                else "included in the average (explicitly requested: migration_breaks='include')",
+                "years": flagged,
+                "residuals": detail,
+                "message": (
+                    f"{rates.iso3}: residual migration of {flagged} spans a Eurostat series break ('b' flag on "
+                    "the following 1 January population, e.g. a census revision); the residual books the "
+                    "revision as migration"
+                ),
+            }
+        )
     used = [y for y in years if y not in excluded]
     if not used or (len(used) < MIN_MIGRATION_YEARS and not allow_single_year):
         raise DataGap(
             f"{rates.iso3}: the migration window {window[0]}-{window[1]} keeps {len(used)} year(s) after excluding "
             f"series-break years {flagged}; at least {MIN_MIGRATION_YEARS} are needed (state another window, "
             "migration_breaks='include' or allow_single_year_migration explicitly)",
-            missing=[{"country": rates.iso3, "detail": "residual migration window too short after excluding "
-                      "series breaks", "migration_window": list(window), "excluded_years": flagged,
-                      "years_left": used, "min_years": MIN_MIGRATION_YEARS}])
+            missing=[
+                {
+                    "country": rates.iso3,
+                    "detail": "residual migration window too short after excluding series breaks",
+                    "migration_window": list(window),
+                    "excluded_years": flagged,
+                    "years_left": used,
+                    "min_years": MIN_MIGRATION_YEARS,
+                }
+            ],
+        )
     if len(used) == 1:
-        warnings.append({"code": "migration_window_single_year", "country": rates.iso3, "years": used,
-                         "residual_persons": dstr(_CTX.quantize(rates.residual_total(used[0]), Decimal(1))),
-                         "message": (f"{rates.iso3}: net migration is the residual of the single year {used[0]}, "
-                                     "held constant (allow_single_year_migration was set explicitly)")})
+        warnings.append(
+            {
+                "code": "migration_window_single_year",
+                "country": rates.iso3,
+                "years": used,
+                "residual_persons": dstr(_CTX.quantize(rates.residual_total(used[0]), Decimal(1))),
+                "message": (
+                    f"{rates.iso3}: net migration is the residual of the single year {used[0]}, "
+                    "held constant (allow_single_year_migration was set explicitly)"
+                ),
+            }
+        )
     if len(used) >= 3:
         totals = {y: rates.residual_total(y) for y in used}
         med = _median(list(totals.values()))
@@ -798,33 +947,55 @@ def resolve_migration_window(rates: BaseRates, window: tuple[int, int], *, break
         threshold = mul(mul(OUTLIER_MAD_MULTIPLIER, MAD_NORMAL_SCALE), mad)
         out = [y for y, v in totals.items() if mad > 0 and _CTX.abs(_CTX.subtract(v, med)) > threshold]
         if out:
-            warnings.append({
-                "code": "migration_residual_outlier", "country": rates.iso3, "years": out,
-                "residuals": {str(y): dstr(_CTX.quantize(totals[y], Decimal(1))) for y in out},
-                "median_persons": dstr(_CTX.quantize(med, Decimal(1))),
-                "threshold_persons": dstr(_CTX.quantize(threshold, Decimal(1))),
-                "rule": "|residual - median| > 5 x 1.4826 x MAD over the years used",
-                "action": "kept in the average (diagnostic only: no Eurostat break flag)",
-                "message": (f"{rates.iso3}: total residual of {out} is far from the window median: an exceptional "
-                            "migration year (e.g. 2022 arrivals from Ukraine) or an unflagged statistical revision; "
-                            "held constant in the average")})
+            warnings.append(
+                {
+                    "code": "migration_residual_outlier",
+                    "country": rates.iso3,
+                    "years": out,
+                    "residuals": {str(y): dstr(_CTX.quantize(totals[y], Decimal(1))) for y in out},
+                    "median_persons": dstr(_CTX.quantize(med, Decimal(1))),
+                    "threshold_persons": dstr(_CTX.quantize(threshold, Decimal(1))),
+                    "rule": "|residual - median| > 5 x 1.4826 x MAD over the years used",
+                    "action": "kept in the average (diagnostic only: no Eurostat break flag)",
+                    "message": (
+                        f"{rates.iso3}: total residual of {out} is far from the window median: an exceptional "
+                        "migration year (e.g. 2022 arrivals from Ukraine) or an unflagged statistical revision; "
+                        "held constant in the average"
+                    ),
+                }
+            )
     return MigrationWindow((window[0], window[1]), tuple(used), excluded, tuple(warnings))
 
 
 def base_period_warnings(rates: BaseRates) -> list[dict[str, Any]]:
     """Typed warning when mortality, fertility or the sex ratio at birth rests on a single year."""
-    one = {k: v for k, v in (("mortality", rates.years), ("fertility", rates.fertility_years),
-                            ("sex_ratio_at_birth", rates.sex_ratio_years)) if len(v) == 1}
+    one = {
+        k: v
+        for k, v in (
+            ("mortality", rates.years),
+            ("fertility", rates.fertility_years),
+            ("sex_ratio_at_birth", rates.sex_ratio_years),
+        )
+        if len(v) == 1
+    }
     if not one:
         return []
-    return [{"code": "base_period_single_year", "country": rates.iso3,
-             "components": {k: list(v) for k, v in one.items()},
-             "message": (f"{rates.iso3}: {sorted(one)} estimated from a single calendar year (year-specific "
-                         "fluctuations are held constant over the whole projection)")}]
+    return [
+        {
+            "code": "base_period_single_year",
+            "country": rates.iso3,
+            "components": {k: list(v) for k, v in one.items()},
+            "message": (
+                f"{rates.iso3}: {sorted(one)} estimated from a single calendar year (year-specific "
+                "fluctuations are held constant over the whole projection)"
+            ),
+        }
+    ]
 
 
-def average_migration(rates: BaseRates, window: tuple[int, int],
-                      years: Sequence[int] | None = None) -> dict[str, list[Decimal]]:
+def average_migration(
+    rates: BaseRates, window: tuple[int, int], years: Sequence[int] | None = None
+) -> dict[str, list[Decimal]]:
     """Mean residual by sex and age over ``years`` (default: every year of ``window``)."""
     years = list(years) if years is not None else [y for y in range(window[0], window[1] + 1)]
     missing = [y for y in years if y not in rates.residual_migration]
@@ -833,8 +1004,10 @@ def average_migration(rates: BaseRates, window: tuple[int, int],
     if not years:
         raise ValidationProblem("no residual year to average")
     n = Decimal(len(years))
-    return {s: [qp(div(xsum(rates.residual_migration[y][s][x] for y in years), n))
-                for x in range(rates.omega + 1)] for s in SEXES}
+    return {
+        s: [qp(div(xsum(rates.residual_migration[y][s][x] for y in years), n)) for x in range(rates.omega + 1)]
+        for s in SEXES
+    }
 
 
 # --------------------------------------------------------------------------- projection
@@ -875,14 +1048,21 @@ class Projection:
 
     def summary(self) -> dict[str, Any]:
         return {
-            "model": f"{MODEL_KEY}@{MODEL_VERSION}", "label": self.label, "country": self.iso3,
-            "jump_off": self.jump_off, "end_year": self.end_year, "open_age": self.omega,
-            "assumptions": self.assumptions.as_json(), "numeric_type": NUMERIC_TYPE,
+            "model": f"{MODEL_KEY}@{MODEL_VERSION}",
+            "label": self.label,
+            "country": self.iso3,
+            "jump_off": self.jump_off,
+            "end_year": self.end_year,
+            "open_age": self.omega,
+            "assumptions": self.assumptions.as_json(),
+            "numeric_type": NUMERIC_TYPE,
             "implied_tfr_base_period": dstr(_CTX.quantize(self.rates.tfr, Decimal("0.0001"))),
-            "life_expectancy_at_birth_base_period": {s: dstr(_CTX.quantize(self.rates.life_tables[s].e0,
-                                                                          Decimal("0.01"))) for s in SEXES},
+            "life_expectancy_at_birth_base_period": {
+                s: dstr(_CTX.quantize(self.rates.life_tables[s].e0, Decimal("0.01"))) for s in SEXES
+            },
             "male_share_at_birth": dstr(_CTX.quantize(self.rates.male_share_at_birth, Decimal("0.0001"))),
-            "data_notes": list(self.rates.notes), "input_status_flags": self.rates.input_status_flags,
+            "data_notes": list(self.rates.notes),
+            "input_status_flags": self.rates.input_status_flags,
             "base_period_years_used": self.rates.years_used(),
             "migration_window": self.migration_window.as_json() if self.migration_window else None,
             "warnings": list(self.warnings),
@@ -895,21 +1075,40 @@ class Projection:
         for y in sorted(self.population):
             for s in SEXES:
                 for x, v in enumerate(self.population[y][s]):
-                    rows.append({"iso3": self.iso3, "year": y, "sex": s, "age": x, "open_group": x == self.omega,
-                                 "persons": dstr(v), "variant": self.assumptions.variant})
+                    rows.append(
+                        {
+                            "iso3": self.iso3,
+                            "year": y,
+                            "sex": s,
+                            "age": x,
+                            "open_group": x == self.omega,
+                            "persons": dstr(v),
+                            "variant": self.assumptions.variant,
+                        }
+                    )
         return rows
 
     def single_age_table(self) -> Any:
         import pyarrow as pa
 
         rows = self.single_age_rows()
-        schema = pa.schema([("iso3", pa.string()), ("year", pa.int32()), ("sex", pa.string()), ("age", pa.int32()),
-                            ("open_group", pa.bool_()), ("persons", pa.string()), ("variant", pa.string())])
+        schema = pa.schema(
+            [
+                ("iso3", pa.string()),
+                ("year", pa.int32()),
+                ("sex", pa.string()),
+                ("age", pa.int32()),
+                ("open_group", pa.bool_()),
+                ("persons", pa.string()),
+                ("variant", pa.string()),
+            ]
+        )
         return pa.table({k: [r[k] for r in rows] for k in schema.names}, schema=schema)
 
 
-def project(data: CountryDemography, *, jump_off: int, end_year: int, assumptions: Assumptions,
-            rates: BaseRates | None = None) -> Projection:
+def project(
+    data: CountryDemography, *, jump_off: int, end_year: int, assumptions: Assumptions, rates: BaseRates | None = None
+) -> Projection:
     """Project 1 January ``jump_off`` -> 1 January ``end_year`` under ``assumptions``.
 
     No information after the jump-off enters: the base period (and migration window) must
@@ -917,25 +1116,31 @@ def project(data: CountryDemography, *, jump_off: int, end_year: int, assumption
     """
     first, last = assumptions.base_period
     if not first or last >= jump_off:
-        raise ValidationProblem("base period must end before the jump-off year (no information after the jump-off)",
-                                base_period=[first, last], jump_off=jump_off)
+        raise ValidationProblem(
+            "base period must end before the jump-off year (no information after the jump-off)",
+            base_period=[first, last],
+            jump_off=jump_off,
+        )
     mw = assumptions.migration_window or assumptions.base_period
     if mw[1] >= jump_off:
         raise ValidationProblem("migration window must end before the jump-off year", migration_window=list(mw))
     if end_year <= jump_off:
         raise ValidationProblem("end_year must be after the jump-off year")
     if rates is None:
-        rates = base_rates(data, first, last, migration_window=mw if assumptions.migration == "average_residual"
-                           else None)
+        rates = base_rates(
+            data, first, last, migration_window=mw if assumptions.migration == "average_residual" else None
+        )
     omega = rates.omega
     pop: dict[int, dict[str, tuple[Decimal, ...]]] = {
-        jump_off: {s: tuple(_vec(data, "population", jump_off, s, omega)) for s in SEXES}}
+        jump_off: {s: tuple(_vec(data, "population", jump_off, s, omega)) for s in SEXES}
+    }
     fixed_mig = None
     warnings = base_period_warnings(rates)
     window = None
     if assumptions.migration == "average_residual":
-        window = resolve_migration_window(rates, mw, breaks=assumptions.migration_breaks,
-                                          allow_single_year=assumptions.allow_single_year_migration)
+        window = resolve_migration_window(
+            rates, mw, breaks=assumptions.migration_breaks, allow_single_year=assumptions.allow_single_year_migration
+        )
         warnings += list(window.warnings)
         fixed_mig = average_migration(rates, mw, window.years_used)
     elif assumptions.migration == "zero":
@@ -945,8 +1150,7 @@ def project(data: CountryDemography, *, jump_off: int, end_year: int, assumption
     for t in range(jump_off, end_year):
         p = pop[t]
         mig = fixed_mig if fixed_mig is not None else _europop_migration(data, t, omega)
-        fert = rates.fertility if assumptions.fertility == "constant_base_period_rates" else \
-            _europop_fertility(data, t)
+        fert = rates.fertility if assumptions.fertility == "constant_base_period_rates" else _europop_fertility(data, t)
         unk_rate = rates.unknown_age_birth_rate if assumptions.fertility == "constant_base_period_rates" else ZERO
         nxt: dict[str, list[Decimal]] = {}
         deaths: dict[str, Decimal] = {}
@@ -975,18 +1179,44 @@ def project(data: CountryDemography, *, jump_off: int, end_year: int, assumption
                 if v < 0:  # kept (clipping would break the balancing equation) and flagged
                     origin = [x - 1] if 0 < x < omega else ([omega - 1, omega] if x == omega else [])
                     inherited = any(p[s][o] < 0 for o in origin) or (x == 0 and births[s] < 0)
-                    cause = ("negative net migration larger than the surviving cohort" if mig[s][x] < 0 else
-                             "inherited from a negative cohort" if inherited else "unexplained")
-                    flags.append({"code": "negative_cohort", "year": t + 1, "sex": s, "age": x,
-                                  "persons": dstr(v), "net_migration": dstr(mig[s][x]), "cause": cause})
+                    cause = (
+                        "negative net migration larger than the surviving cohort"
+                        if mig[s][x] < 0
+                        else "inherited from a negative cohort"
+                        if inherited
+                        else "unexplained"
+                    )
+                    flags.append(
+                        {
+                            "code": "negative_cohort",
+                            "year": t + 1,
+                            "sex": s,
+                            "age": x,
+                            "persons": dstr(v),
+                            "net_migration": dstr(mig[s][x]),
+                            "cause": cause,
+                        }
+                    )
         pop[t + 1] = {s: tuple(nxt[s]) for s in SEXES}
         flows[t] = StepFlows(t, births, deaths, netmig, {s: tuple(mig[s]) for s in SEXES})
-    return Projection(data.iso3, jump_off, end_year, omega, assumptions, pop, flows, rates, tuple(flags),
-                      warnings=tuple(warnings), migration_window=window)
+    return Projection(
+        data.iso3,
+        jump_off,
+        end_year,
+        omega,
+        assumptions,
+        pop,
+        flows,
+        rates,
+        tuple(flags),
+        warnings=tuple(warnings),
+        migration_window=window,
+    )
 
 
-def reconstruct(data: CountryDemography, rates: BaseRates, first: int,
-                last: int) -> dict[int, dict[str, list[Decimal]]]:
+def reconstruct(
+    data: CountryDemography, rates: BaseRates, first: int, last: int
+) -> dict[int, dict[str, list[Decimal]]]:
     """Re-run years first..last with observed births and the residual migration of each year;
     returns the reconstructed 1 January populations (must equal the observed ones exactly)."""
     omega = rates.omega
@@ -1008,8 +1238,13 @@ def reconstruct(data: CountryDemography, rates: BaseRates, first: int,
 
 # --------------------------------------------------------------------------- outputs
 BROAD_GROUPS: dict[str, tuple[int, int | None]] = {
-    "all_ages": (0, None), "age_0_14": (0, 15), "age_15_64": (15, 65), "age_65_plus": (65, None),
-    "age_80_plus": (80, None), "age_20_66": (20, 67), "age_67_plus": (67, None),
+    "all_ages": (0, None),
+    "age_0_14": (0, 15),
+    "age_15_64": (15, 65),
+    "age_65_plus": (65, None),
+    "age_80_plus": (80, None),
+    "age_20_66": (20, 67),
+    "age_67_plus": (67, None),
 }
 SEX_KEYS = {"total": None, "female": "F", "male": "M"}
 DEPENDENCY_RATIOS = {
@@ -1049,7 +1284,10 @@ def output_keys() -> list[str]:
 
 # --------------------------------------------------------------------------- back-test
 COMPARISON_GROUPS: dict[str, tuple[int, int | None]] = {
-    "age_0_14": (0, 15), "age_15_64": (15, 65), "age_65_plus": (65, None), "all_ages": (0, None),
+    "age_0_14": (0, 15),
+    "age_15_64": (15, 65),
+    "age_65_plus": (65, None),
+    "all_ages": (0, None),
 }
 
 
@@ -1064,9 +1302,15 @@ def _collapse(vec: Sequence[Decimal], omega: int) -> list[Decimal]:
     return [*vec[:omega], xsum(vec[omega:])]
 
 
-def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_period: tuple[int, int],
-             migrations: Sequence[str] = ("average_residual", "zero"),
-             include_break_variant: bool = False) -> dict[str, Any]:
+def backtest(
+    data: CountryDemography,
+    *,
+    jump_off: int,
+    target_year: int,
+    base_period: tuple[int, int],
+    migrations: Sequence[str] = ("average_residual", "zero"),
+    include_break_variant: bool = False,
+) -> dict[str, Any]:
     """Project from observed ``jump_off`` with rates from ``base_period`` (events before the
     jump-off only) and compare with observed demo_pjan of ``target_year``. Nothing from after
     the jump-off is used to fit anything (no tuning). Metrics (percent):
@@ -1090,18 +1334,27 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
     omega = rates.omega
     t_starts = [open_start(data.population.get((target_year, s))) for s in SEXES]
     if any(st is None for st in t_starts):
-        raise _gap(data.iso3, f"population {target_year} has no usable single-age table with an open group",
-                   input="population", year=target_year)
+        raise _gap(
+            data.iso3,
+            f"population {target_year} has no usable single-age table with an open group",
+            input="population",
+            year=target_year,
+        )
     omega_s = min([omega, *[st for st in t_starts if st is not None]])
     observed = {s: _vec(data, "population", target_year, s, omega_s) for s in SEXES}
     start = {s: _vec(data, "population", jump_off, s, omega) for s in SEXES}
     first = {s: _vec(data, "population", base_period[0], s, omega) for s in SEXES}
     result: dict[str, Any] = {
-        "country": data.iso3, "jump_off": jump_off, "target_year": target_year,
-        "base_period": list(base_period), "open_age": omega, "scoring_open_age": omega_s,
+        "country": data.iso3,
+        "jump_off": jump_off,
+        "target_year": target_year,
+        "base_period": list(base_period),
+        "open_age": omega,
+        "scoring_open_age": omega_s,
         "open_age_source": "base-period and jump-off tables only (no information after the jump-off)",
         "variants": {},
-        "data_notes": list(rates.notes), "input_status_flags": rates.input_status_flags,
+        "data_notes": list(rates.notes),
+        "input_status_flags": rates.input_status_flags,
         "base_period_years_used": rates.years_used(),
         "target_status_flags": _status_flags(data.population, [target_year]),
         # reported, never used: breaks/estimates in the test period explain part of the error
@@ -1121,8 +1374,11 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
         try:
             proj = project(data, jump_off=jump_off, end_year=target_year, assumptions=a, rates=rates)
         except MissingInput as e:  # e.g. the migration window is too short once series breaks are excluded
-            result["variants"][a.variant] = {"assumptions": a.as_json(), "status": "not_evaluated",
-                                             "problem": e.problem()}
+            result["variants"][a.variant] = {
+                "assumptions": a.as_json(),
+                "status": "not_evaluated",
+                "problem": e.problem(),
+            }
             continue
         pred = {s: _collapse(proj.population[target_year][s], omega_s) for s in SEXES}
         groups: dict[str, Any] = {}
@@ -1136,12 +1392,15 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
                 "predicted": dstr(_CTX.quantize(g_pred, Decimal(1))),
                 "observed": dstr(g_obs),
                 "ape": dstr(_CTX.quantize(_ape(g_pred, g_obs) or ZERO, Decimal("0.001"))),
-                "mape_single_age_sex": dstr(_CTX.quantize(div(csum(apes), Decimal(len(apes))),
-                                                          Decimal("0.001"))) if apes else None,
-                "cells": len(apes), "cells_with_zero_observed": len(cells) - len(apes),
+                "mape_single_age_sex": dstr(_CTX.quantize(div(csum(apes), Decimal(len(apes))), Decimal("0.001")))
+                if apes
+                else None,
+                "cells": len(apes),
+                "cells_with_zero_observed": len(cells) - len(apes),
             }
         result["variants"][a.variant] = {
-            "assumptions": a.as_json(), "groups": groups,
+            "assumptions": a.as_json(),
+            "groups": groups,
             "total_ape": groups["all_ages"]["ape"],
             "negative_cohorts": len(proj.flags),
             "migration_window": proj.migration_window.as_json() if proj.migration_window else None,
@@ -1151,28 +1410,43 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
     result["constant_growth_total_ape"] = dstr(_CTX.quantize(_ape(growth, obs_total) or ZERO, Decimal("0.001")))
     result["linear_trend_total_ape"] = dstr(_CTX.quantize(_ape(linear, obs_total) or ZERO, Decimal("0.001")))
     result["benchmarks"] = {
-        "naive_no_change": {"predicted_total": dstr(_CTX.quantize(naive, Decimal(1))),
-                            "definition": f"total population of 1 January {jump_off} (the jump-off) carried forward"},
-        "constant_growth": {"predicted_total": dstr(_CTX.quantize(growth, Decimal(1))),
-                            "definition": (f"P({jump_off}) x (P({jump_off}) / P({base_period[0]}))^"
-                                           f"({target_year - jump_off}/{jump_off - base_period[0]}): average annual "
-                                           "growth of the total compounded to the target year")},
-        "linear_trend": {"predicted_total": dstr(_CTX.quantize(linear, Decimal(1))),
-                         "definition": (f"P({jump_off}) + (P({jump_off}) - P({base_period[0]})) x "
-                                        f"{target_year - jump_off}/{jump_off - base_period[0]}")},
+        "naive_no_change": {
+            "predicted_total": dstr(_CTX.quantize(naive, Decimal(1))),
+            "definition": f"total population of 1 January {jump_off} (the jump-off) carried forward",
+        },
+        "constant_growth": {
+            "predicted_total": dstr(_CTX.quantize(growth, Decimal(1))),
+            "definition": (
+                f"P({jump_off}) x (P({jump_off}) / P({base_period[0]}))^"
+                f"({target_year - jump_off}/{jump_off - base_period[0]}): average annual "
+                "growth of the total compounded to the target year"
+            ),
+        },
+        "linear_trend": {
+            "predicted_total": dstr(_CTX.quantize(linear, Decimal(1))),
+            "definition": (
+                f"P({jump_off}) + (P({jump_off}) - P({base_period[0]})) x "
+                f"{target_year - jump_off}/{jump_off - base_period[0]}"
+            ),
+        },
         "observed_total": dstr(obs_total),
     }
     return result
 
 
-def europop_comparison(proj: Projection, data: CountryDemography,
-                       years: Sequence[int] = (2030, 2040, 2050)) -> dict[str, Any]:
+def europop_comparison(
+    proj: Projection, data: CountryDemography, years: Sequence[int] = (2030, 2040, 2050)
+) -> dict[str, Any]:
     """Plausibility comparison with the EUROPOP2023 baseline projection (proj_23np), NOT a
     validation: both are conditional projections (EUROPOP2023 also assumes mortality
     improvement, which this model does not). Differences in percent of EUROPOP2023."""
-    out: dict[str, Any] = {"country": proj.iso3, "assumptions": proj.assumptions.as_json(), "years": {},
-                           "migration_window": proj.migration_window.as_json() if proj.migration_window else None,
-                           "warnings": list(proj.warnings)}
+    out: dict[str, Any] = {
+        "country": proj.iso3,
+        "assumptions": proj.assumptions.as_json(),
+        "years": {},
+        "migration_window": proj.migration_window.as_json() if proj.migration_window else None,
+        "warnings": list(proj.warnings),
+    }
     for y in years:
         if y not in proj.population:
             continue
@@ -1185,15 +1459,20 @@ def europop_comparison(proj: Projection, data: CountryDemography,
             hi_ = proj.omega + 1 if hi is None else hi
             mine = proj.total(y, None, lo, None if hi is None else hi)
             theirs = xsum(ev[s][x] for s in SEXES for x in range(lo, hi_))  # type: ignore[index]
-            row[gk] = {"reva": dstr(_CTX.quantize(mine, Decimal(1))), "europop2023_bsl": dstr(theirs),
-                       "difference_percent": dstr(_CTX.quantize(div(mul(Decimal(100), _CTX.subtract(mine, theirs)),
-                                                                    theirs), Decimal("0.01")))}
+            row[gk] = {
+                "reva": dstr(_CTX.quantize(mine, Decimal(1))),
+                "europop2023_bsl": dstr(theirs),
+                "difference_percent": dstr(
+                    _CTX.quantize(div(mul(Decimal(100), _CTX.subtract(mine, theirs)), theirs), Decimal("0.01"))
+                ),
+            }
         ratio_mine = div(mul(Decimal(100), proj.total(y, None, 65)), proj.total(y, None, 15, 65))
         e65 = xsum(ev[s][x] for s in SEXES for x in range(65, proj.omega + 1))  # type: ignore[index]
         e1564 = xsum(ev[s][x] for s in SEXES for x in range(15, 65))  # type: ignore[index]
         row["old_age_dependency_ratio_65plus_per_15_64"] = {
             "reva": dstr(_CTX.quantize(ratio_mine, Decimal("0.01"))),
-            "europop2023_bsl": dstr(_CTX.quantize(div(mul(Decimal(100), e65), e1564), Decimal("0.01")))}
+            "europop2023_bsl": dstr(_CTX.quantize(div(mul(Decimal(100), e65), e1564), Decimal("0.01"))),
+        }
         out["years"][str(y)] = row
     return out
 

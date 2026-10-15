@@ -78,71 +78,113 @@ async def test_six_leakage_cases_blocked_in_strict_mode(db):
     with db.owner.begin() as conn:  # reviewed identity/ontology (maintainer-attributed: owner, R5-01)
         act = _activity(conn, "test.alias")
         provider = f"test.boundaries.{uuid.uuid4().hex[:8]}"
-        conn.execute(text(
-            """INSERT INTO world.alias(entity_id, provider, external_key, mapping_version, confidence_kind,
-                 provenance_activity_id) VALUES (:e, :p, 'XBOUND', '1.0.0', 'reviewed_exact', :a)"""),
-            {"e": entity_id("FRA"), "p": provider, "a": act})
+        conn.execute(
+            text(
+                """INSERT INTO world.alias(entity_id, provider, external_key, mapping_version, confidence_kind,
+                 provenance_activity_id) VALUES (:e, :p, 'XBOUND', '1.0.0', 'reviewed_exact', :a)"""
+            ),
+            {"e": entity_id("FRA"), "p": provider, "a": act},
+        )
     cutoff = _now(db.worker)
 
     await vl.ingest_vintage(db.worker, db.store, name, "v2")
     with db.owner.begin() as conn:  # maintainer-attributed registry records: owner (R5-01)
         act = _activity(conn, "test.future_records")
         # (2) renamed country boundary: new alias version and a new ontology mapping recorded after cutoff
-        new_alias = conn.execute(text(
-            """INSERT INTO world.alias(entity_id, provider, external_key, mapping_version, confidence_kind,
+        new_alias = conn.execute(
+            text(
+                """INSERT INTO world.alias(entity_id, provider, external_key, mapping_version, confidence_kind,
                  provenance_activity_id) VALUES (:e, :p, 'XBOUND', '2.0.0-renamed', 'reviewed_exact', :a)
-               RETURNING id"""), {"e": entity_id("DZA"), "p": provider, "a": act}).scalar_one()
+               RETURNING id"""
+            ),
+            {"e": entity_id("DZA"), "p": provider, "a": act},
+        ).scalar_one()
         target = repo.concept_version_id(conn, POP, "1.0.0")
-        new_mapping = conn.execute(text(
-            """INSERT INTO ontology.mapping(mapping_key, source_ref, target_concept_id, mapping_kind, version,
+        new_mapping = conn.execute(
+            text(
+                """INSERT INTO ontology.mapping(mapping_key, source_ref, target_concept_id, mapping_kind, version,
                  transform_spec, applicability, approval, review_activity_id)
                VALUES (:k, '{"provider":"test"}', :t, 'exact', '2.0.0', '{"kind":"identity"}', '{}', 'approved', :a)
-               RETURNING id"""), {"k": f"test.boundary_rename.{uuid.uuid4().hex[:8]}", "t": target, "a": act}
+               RETURNING id"""
+            ),
+            {"k": f"test.boundary_rename.{uuid.uuid4().hex[:8]}", "t": target, "a": act},
         ).scalar_one()
         # (3) a later-fitted scaler (fit manifest committed as a models artifact)
-        scaler_manifest = {"id": f"scaler:log_standardise:{uuid.uuid4().hex[:8]}", "transform": "log_standardise",
-                           "fitted_on_data_until": (cutoff + timedelta(days=30)).isoformat()}
-        scaler_sha = repo.store_json_artifact(conn, db.store, scaler_manifest, "models",
-                                              schema_version="fitted-scaler/1")
-        scaler_recorded = conn.execute(text("SELECT recorded_at FROM meta.artifact WHERE sha256=:s"),
-                                       {"s": scaler_sha}).scalar_one()
+        scaler_manifest = {
+            "id": f"scaler:log_standardise:{uuid.uuid4().hex[:8]}",
+            "transform": "log_standardise",
+            "fitted_on_data_until": (cutoff + timedelta(days=30)).isoformat(),
+        }
+        scaler_sha = repo.store_json_artifact(
+            conn, db.store, scaler_manifest, "models", schema_version="fitted-scaler/1"
+        )
+        scaler_recorded = conn.execute(
+            text("SELECT recorded_at FROM meta.artifact WHERE sha256=:s"), {"s": scaler_sha}
+        ).scalar_one()
         # (4) a later-trained model
-        spec_sha = repo.store_json_artifact(conn, db.store, {"model": "test.trained", "n": uuid.uuid4().hex},
-                                            "models", schema_version="model-spec/1")
-        train_sha = repo.store_json_artifact(conn, db.store, {"training": "window", "n": uuid.uuid4().hex},
-                                             "models", schema_version="training-manifest/1")
-        model_id = conn.execute(text(
-            """INSERT INTO model.version(model_key, version, kind, spec_sha256, code_digest, input_ports,
+        spec_sha = repo.store_json_artifact(
+            conn, db.store, {"model": "test.trained", "n": uuid.uuid4().hex}, "models", schema_version="model-spec/1"
+        )
+        train_sha = repo.store_json_artifact(
+            conn,
+            db.store,
+            {"training": "window", "n": uuid.uuid4().hex},
+            "models",
+            schema_version="training-manifest/1",
+        )
+        model_id = conn.execute(
+            text(
+                """INSERT INTO model.version(model_key, version, kind, spec_sha256, code_digest, input_ports,
                  output_ports, applicability, assumptions, training_manifest_sha256, training_cutoff,
                  approval_status, provenance_activity_id)
                VALUES ('forecast.test_trained', :v, 'forecast', :s, 'test', '[]', '[]', '{}', '[]', :tm,
-                       clock_timestamp(), 'candidate', :a) RETURNING id"""),
-            {"v": f"1.0.0-{uuid.uuid4().hex[:8]}", "s": spec_sha, "tm": train_sha, "a": act}).scalar_one()
+                       clock_timestamp(), 'candidate', :a) RETURNING id"""
+            ),
+            {"v": f"1.0.0-{uuid.uuid4().hex[:8]}", "s": spec_sha, "tm": train_sha, "a": act},
+        ).scalar_one()
         # (5) a later paper coefficient
-        claim_id = conn.execute(text(
-            """INSERT INTO evidence.claim(claim_key, version, card, evidence_kind, status, extraction_method,
+        claim_id = conn.execute(
+            text(
+                """INSERT INTO evidence.claim(claim_key, version, card, evidence_kind, status, extraction_method,
                  provenance_activity_id)
                VALUES (:k, 1, CAST(:c AS jsonb), 'quasi_experimental', 'reviewed', 'manual_review', :a)
-               RETURNING id"""),
-            {"k": f"test.later_paper.{uuid.uuid4().hex[:8]}",
-             "c": json.dumps({"coefficient": "-0.25", "note": "test card recorded after cutoff"}), "a": act}
+               RETURNING id"""
+            ),
+            {
+                "k": f"test.later_paper.{uuid.uuid4().hex[:8]}",
+                "c": json.dumps({"coefficient": "-0.25", "note": "test card recorded after cutoff"}),
+                "a": act,
+            },
         ).scalar_one()
         # (6) a subsequent population recalibration
-        recipe = repo.store_json_artifact(conn, db.store, {"recipe": "recalibration", "n": uuid.uuid4().hex},
-                                          "models", schema_version="population-recipe/1")
-        pctx = repo.create_context(conn, mode="population", origin="test_fixture", manifest_sha256=recipe,
-                                   knowledge_cutoff=_now(db.worker))
-        pop_id = conn.execute(text(
-            """INSERT INTO model.population_dataset(context_id, recipe_sha256, supported_attributes, diagnostics,
+        recipe = repo.store_json_artifact(
+            conn,
+            db.store,
+            {"recipe": "recalibration", "n": uuid.uuid4().hex},
+            "models",
+            schema_version="population-recipe/1",
+        )
+        pctx = repo.create_context(
+            conn, mode="population", origin="test_fixture", manifest_sha256=recipe, knowledge_cutoff=_now(db.worker)
+        )
+        pop_id = conn.execute(
+            text(
+                """INSERT INTO model.population_dataset(context_id, recipe_sha256, supported_attributes, diagnostics,
                  seed_plan, privacy_class, provenance_activity_id)
-               VALUES (:c, :r, '{}', '{}', '{}', 'synthetic_public_aggregate_derived', :a) RETURNING id"""),
-            {"c": pctx, "r": recipe, "a": act}).scalar_one()
+               VALUES (:c, :r, '{}', '{}', '{}', 'synthetic_public_aggregate_derived', :a) RETURNING id"""
+            ),
+            {"c": pctx, "r": recipe, "a": act},
+        ).scalar_one()
 
     with db.api.connect() as conn:
-        rev2 = conn.execute(text("SELECT id FROM evidence.observation WHERE logical_key = :k AND revision_no = 2"),
-                            {"k": "wb:SP.POP.TOTL:FRA:1976"}).scalar_one()
-        rev1 = conn.execute(text("SELECT id FROM evidence.observation WHERE logical_key = :k AND revision_no = 1"),
-                            {"k": "wb:SP.POP.TOTL:FRA:1976"}).scalar_one()
+        rev2 = conn.execute(
+            text("SELECT id FROM evidence.observation WHERE logical_key = :k AND revision_no = 2"),
+            {"k": "wb:SP.POP.TOTL:FRA:1976"},
+        ).scalar_one()
+        rev1 = conn.execute(
+            text("SELECT id FROM evidence.observation WHERE logical_key = :k AND revision_no = 1"),
+            {"k": "wb:SP.POP.TOTL:FRA:1976"},
+        ).scalar_one()
         refs = {
             "revised_historical_value": observation_ref(conn, rev2),
             "renamed_boundary_alias": alias_ref(conn, new_alias),
@@ -235,8 +277,9 @@ async def test_available_then_excludes_records_without_availability_proof(db):
     await vl.ingest_vintage(db.worker, db.store, name, "current")  # today's vintage: no availability proof
     await vl.ingest_vintage(db.worker, db.store, name, "archived_2015")  # archived vintage with proof
     with db.api.connect() as conn:
-        m = available_then_reconstruction(conn, datetime(2016, 1, 1, tzinfo=UTC), origins=["test_fixture"],
-                                          concepts=[POP])
+        m = available_then_reconstruction(
+            conn, datetime(2016, 1, 1, tzinfo=UTC), origins=["test_fixture"], concepts=[POP]
+        )
         assert m["mode"] == m["label"] == "available_then_reconstruction"
         assert "not what REVA actually believed" in m["honesty_statement"]
         assert m["status"] == "ok"
@@ -256,8 +299,9 @@ async def test_available_then_excludes_records_without_availability_proof(db):
         assert design["method"] == "belief.source_select@1.0.0" and design["method_registered_at"] > "2026"
         assert m["availability"]["latest_source_available_at"].startswith("2015-07-01")
 
-        early = available_then_reconstruction(conn, datetime(2014, 1, 1, tzinfo=UTC), origins=["test_fixture"],
-                                              concepts=[POP])
+        early = available_then_reconstruction(
+            conn, datetime(2014, 1, 1, tzinfo=UTC), origins=["test_fixture"], concepts=[POP]
+        )
         assert early["mode"] == "available_then_reconstruction"  # no fallback to another mode
         assert early["status"] == "no_available_inputs" and early["outputs"] == []
         assert {e["reason"]: e["count"] for e in early["exclusions"]}["available_after_cutoff"] >= 2
@@ -288,19 +332,38 @@ async def test_available_then_applies_retractions_and_eligibility_as_of_the_cuto
         conn.rollback()
 
         # Within a rolled-back transaction: retract the record and quarantine its scope *now*.
-        obs = conn.execute(text("SELECT connector_version_id, concept_version_id, subject_id "
-                                "FROM evidence.observation WHERE id = :o"),
-                           {"o": target["observation_id"]}).mappings().one()
+        obs = (
+            conn.execute(
+                text(
+                    "SELECT connector_version_id, concept_version_id, subject_id "
+                    "FROM evidence.observation WHERE id = :o"
+                ),
+                {"o": target["observation_id"]},
+            )
+            .mappings()
+            .one()
+        )
         act = _activity(conn, "test.r3_10")
-        conn.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
-                          "VALUES (:o, 'test: withdrawn after the cutoff', :a)"),
-                     {"o": target["observation_id"], "a": act})
-        conn.execute(text(
-            """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
+        conn.execute(
+            text(
+                "INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                "VALUES (:o, 'test: withdrawn after the cutoff', :a)"
+            ),
+            {"o": target["observation_id"], "a": act},
+        )
+        conn.execute(
+            text(
+                """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability,
                  decision, policy_version, review_activity_id)
-               VALUES (:cv, :c, CAST(:ap AS jsonb), 'quarantine', 'r3-10-test', :a)"""),
-            {"cv": obs["connector_version_id"], "c": obs["concept_version_id"], "a": act,
-             "ap": json.dumps({"subject_ids": [str(obs["subject_id"])]})})
+               VALUES (:cv, :c, CAST(:ap AS jsonb), 'quarantine', 'r3-10-test', :a)"""
+            ),
+            {
+                "cv": obs["connector_version_id"],
+                "c": obs["concept_version_id"],
+                "a": act,
+                "ap": json.dumps({"subject_ids": [str(obs["subject_id"])]}),
+            },
+        )
         m = available_then_reconstruction(conn, cutoff, origins=["test_fixture"], concepts=[POP])
         again = {i["logical_key"]: i for i in m["inputs"]}
         kept = again["wb:SP.POP.TOTL:FRA:1970"]
@@ -325,8 +388,9 @@ async def test_revised_data_retrospective_is_labelled_everywhere(db):
     c = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
     with db.api.connect() as conn:
-        m = revised_data_retrospective(conn, origins=["test_fixture"], concepts=[POP, GDP], min_train=5,
-                                       horizons=(1, 2))
+        m = revised_data_retrospective(
+            conn, origins=["test_fixture"], concepts=[POP, GDP], min_train=5, horizons=(1, 2)
+        )
     assert m["mode"] == m["label"] == "revised_data_retrospective"
     assert RETROSPECTIVE_DISCLAIMER == "not a real-time backtest; forecasts were not issued at these origins"
     assert RETROSPECTIVE_DISCLAIMER in m["honesty_statement"] and m["disclaimer"] == RETROSPECTIVE_DISCLAIMER
@@ -343,8 +407,9 @@ async def test_revised_data_retrospective_is_labelled_everywhere(db):
     # publication lag (R3-14): default 1 year, so at the 31 Dec 2010 information date the last
     # available reference year is 2009 and h=1 targets 2011 (two steps after the last observation)
     assert m["design"]["publication_lag_years"] == 1 and "publication" in m["design"]["publication_lag_note"]
-    fold = next(f for f in m["outputs"] if f["origin_year"] == 2010 and f["horizon"] == 1
-                and f["series"]["concept_id"] == POP)
+    fold = next(
+        f for f in m["outputs"] if f["origin_year"] == 2010 and f["horizon"] == 1 and f["series"]["concept_id"] == POP
+    )
     assert fold["target_year"] == 2011 and fold["train_years"] == [2000, 2009]
     assert fold["last_train_year"] == 2009 and fold["steps_after_last_observation"] == 2
     assert fold["information_date"] == "2010-12-31" and fold["publication_lag_years"] == 1
@@ -368,16 +433,23 @@ async def test_publication_lag_is_configurable_and_validated(db):
     c = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
     with db.api.connect() as conn:
-        m0 = revised_data_retrospective(conn, origins=["test_fixture"], concepts=[POP], min_train=5,
-                                        horizons=(1,), publication_lag_years=0)
+        m0 = revised_data_retrospective(
+            conn, origins=["test_fixture"], concepts=[POP], min_train=5, horizons=(1,), publication_lag_years=0
+        )
         assert m0["design"]["publication_lag_years"] == 0
-        assert all(f["last_train_year"] == f["origin_year"] and f["steps_after_last_observation"] == 1
-                   for f in m0["outputs"])
-        m2 = run_replay(conn, "revised_data_retrospective", _now_conn(conn), origin="test_fixture",
-                        concepts=[POP], options={"min_train": 5, "horizons": [1], "publication_lag_years": 2})
+        assert all(
+            f["last_train_year"] == f["origin_year"] and f["steps_after_last_observation"] == 1 for f in m0["outputs"]
+        )
+        m2 = run_replay(
+            conn,
+            "revised_data_retrospective",
+            _now_conn(conn),
+            origin="test_fixture",
+            concepts=[POP],
+            options={"min_train": 5, "horizons": [1], "publication_lag_years": 2},
+        )
         assert m2["design"]["publication_lag_years"] == 2
         assert all(f["steps_after_last_observation"] == 3 for f in m2["outputs"])
         for bad in (-1, 11, 1.5, True):
             with pytest.raises(ValidationProblem):
-                revised_data_retrospective(conn, origins=["test_fixture"], concepts=[POP],
-                                           publication_lag_years=bad)
+                revised_data_retrospective(conn, origins=["test_fixture"], concepts=[POP], publication_lag_years=bad)

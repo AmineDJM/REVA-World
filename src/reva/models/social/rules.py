@@ -60,11 +60,20 @@ RULES_ROOT = Path(__file__).resolve().parents[4] / "registry" / "rules"
 RULE_DIR = RULES_ROOT / "retirement_age"
 SOURCE_DIR = RULES_ROOT / "sources"
 SCHEMA_ID = "reva-retirement-age-rules/1"
-AGE_KINDS = ("minimum_pension_age", "full_rate_age", "normal_pension_age", "early_pension_age_long_insured",
-             "state_pension_age")
+AGE_KINDS = (
+    "minimum_pension_age",
+    "full_rate_age",
+    "normal_pension_age",
+    "early_pension_age_long_insured",
+    "state_pension_age",
+)
 DERIVATIONS = ("verbatim", "counterfactual_extension", "secondary_table")
-SOURCE_KINDS = ("official_consolidated_text", "official_information_page", "secondary_consolidated_mirror",
-                "secondary_statutory_fund_table")
+SOURCE_KINDS = (
+    "official_consolidated_text",
+    "official_information_page",
+    "secondary_consolidated_mirror",
+    "secondary_statutory_fund_table",
+)
 PATH_STATUSES = ("in_force", "enacted_superseded", "enacted_as_amended", "counterfactual")
 CLAIM_YEAR_SEMANTICS = ("attained_once",)
 CLAIM_YEAR_DERIVATIONS = ("verbatim", "model_assumption")
@@ -143,12 +152,20 @@ class RuleRow:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "row_id": self.row_id, "paths": list(self.paths), "age_kind": self.age_kind, "basis": self.basis,
+            "row_id": self.row_id,
+            "paths": list(self.paths),
+            "age_kind": self.age_kind,
+            "basis": self.basis,
             "age": {"years": self.age_months // 12, "months": self.age_months % 12},
             "born_from": self.born_from.isoformat() if self.born_from else None,
             "born_to": self.born_to.isoformat() if self.born_to else None,
-            "year_from": self.year_from, "year_to": self.year_to, "track": self.track, "condition": self.condition,
-            "citation": dict(self.citation), "derivation": self.derivation, "note": self.note,
+            "year_from": self.year_from,
+            "year_to": self.year_to,
+            "track": self.track,
+            "condition": self.condition,
+            "citation": dict(self.citation),
+            "derivation": self.derivation,
+            "note": self.note,
         }
 
 
@@ -185,8 +202,9 @@ class RuleTable:
             raise ValidationProblem(f"{self.country}: unknown rule path {path!r}", known=sorted(self.paths))
         return tuple(r for r in self.rows if path in r.paths and r.age_kind == age_kind and r.track == track)
 
-    def age_months_at(self, path: str, age_kind: str, birth_y: int, birth_m: int, claim_year: int,
-                      track: str = "general") -> int:
+    def age_months_at(
+        self, path: str, age_kind: str, birth_y: int, birth_m: int, claim_year: int, track: str = "general"
+    ) -> int:
         """Eligibility age in months for a birth month and claim year; RuleCoverageGap outside coverage."""
         hits = []
         for r in self.rows_for(path, age_kind, track):
@@ -200,16 +218,26 @@ class RuleTable:
             raise RuleCoverageGap(
                 f"{self.country} rule path {path!r} ({age_kind}, track {track}) has no sourced row for birth "
                 f"{birth_y}-{birth_m:02d} / claim year {claim_year}",
-                country=self.country, path=path, age_kind=age_kind, birth=f"{birth_y}-{birth_m:02d}",
-                claim_year=claim_year)
+                country=self.country,
+                path=path,
+                age_kind=age_kind,
+                birth=f"{birth_y}-{birth_m:02d}",
+                claim_year=claim_year,
+            )
         return hits[0].age_months
 
     def as_dict(self) -> dict[str, Any]:
-        return {"country": self.country, "version": self.version, "review_status": self.review_status,
-                "transcription": self.transcription, "digest": self.digest(),
-                "model_lever": dict(self.model_lever),
-                "paths": {k: vars(v) for k, v in self.paths.items()},
-                "rows": [r.as_dict() for r in self.rows], "sources": {k: dict(v) for k, v in self.sources.items()}}
+        return {
+            "country": self.country,
+            "version": self.version,
+            "review_status": self.review_status,
+            "transcription": self.transcription,
+            "digest": self.digest(),
+            "model_lever": dict(self.model_lever),
+            "paths": {k: vars(v) for k, v in self.paths.items()},
+            "rows": [r.as_dict() for r in self.rows],
+            "sources": {k: dict(v) for k, v in self.sources.items()},
+        }
 
 
 # --------------------------------------------------------------------------- loading
@@ -270,14 +298,16 @@ def parse_rule_table(doc: Mapping[str, Any], *, check_locators: bool = True) -> 
         seen.add(rid)
         cit = r.get("citation") or {}
         if not (cit.get("source_id") in sources and cit.get("legal_reference") and cit.get("locator")):
-            raise ValidationProblem(f"{country}: row {rid} must cite a declared source with legal_reference and "
-                                    "a verbatim locator")
+            raise ValidationProblem(
+                f"{country}: row {rid} must cite a declared source with legal_reference and a verbatim locator"
+            )
         if check_locators:
             src = source_text(sources[cit["source_id"]]["archived_file"])
             if normalise_text(str(cit["locator"])) not in src:
-                raise ValidationProblem(f"{country}: row {rid} locator not found verbatim in "
-                                        f"{sources[cit['source_id']]['archived_file']}",
-                                        locator=cit["locator"])
+                raise ValidationProblem(
+                    f"{country}: row {rid} locator not found verbatim in {sources[cit['source_id']]['archived_file']}",
+                    locator=cit["locator"],
+                )
         derivation = r.get("derivation", "verbatim")
         if derivation not in DERIVATIONS:
             raise ValidationProblem(f"{country}: row {rid} derivation {derivation!r} invalid")
@@ -290,17 +320,37 @@ def parse_rule_table(doc: Mapping[str, Any], *, check_locators: bool = True) -> 
             raise ValidationProblem(f"{country}: row {rid} age_kind invalid")
         basis = r.get("basis")
         if basis == "birth_cohort":
-            row = RuleRow(rid, rpaths, r["age_kind"], basis, _age_months(r.get("age") or {}, rid),
-                          born_from=_date(r.get("born_from"), rid), born_to=_date(r.get("born_to"), rid),
-                          track=r.get("track", "general"), condition=r.get("condition"), citation=dict(cit),
-                          derivation=derivation, note=r.get("note"))
+            row = RuleRow(
+                rid,
+                rpaths,
+                r["age_kind"],
+                basis,
+                _age_months(r.get("age") or {}, rid),
+                born_from=_date(r.get("born_from"), rid),
+                born_to=_date(r.get("born_to"), rid),
+                track=r.get("track", "general"),
+                condition=r.get("condition"),
+                citation=dict(cit),
+                derivation=derivation,
+                note=r.get("note"),
+            )
             if row.born_from and row.born_to and row.born_to < row.born_from:
                 raise ValidationProblem(f"{country}: row {rid} born_to < born_from")
         elif basis == "claim_year":
-            row = RuleRow(rid, rpaths, r["age_kind"], basis, _age_months(r.get("age") or {}, rid),
-                          year_from=r.get("year_from"), year_to=r.get("year_to"),
-                          track=r.get("track", "general"), condition=r.get("condition"), citation=dict(cit),
-                          derivation=derivation, note=r.get("note"))
+            row = RuleRow(
+                rid,
+                rpaths,
+                r["age_kind"],
+                basis,
+                _age_months(r.get("age") or {}, rid),
+                year_from=r.get("year_from"),
+                year_to=r.get("year_to"),
+                track=r.get("track", "general"),
+                condition=r.get("condition"),
+                citation=dict(cit),
+                derivation=derivation,
+                note=r.get("note"),
+            )
             if row.year_from is not None and row.year_to is not None and row.year_to < row.year_from:
                 raise ValidationProblem(f"{country}: row {rid} year_to < year_from")
         else:
@@ -309,24 +359,41 @@ def parse_rule_table(doc: Mapping[str, Any], *, check_locators: bool = True) -> 
     semantics = dict(doc.get("claim_year_semantics") or {})
     if any(r.basis == "claim_year" for r in rows):
         if semantics.get("rule") not in CLAIM_YEAR_SEMANTICS:
-            raise ValidationProblem(f"{country}: a table with claim-year rows must declare claim_year_semantics.rule "
-                                    f"in {CLAIM_YEAR_SEMANTICS}")
+            raise ValidationProblem(
+                f"{country}: a table with claim-year rows must declare claim_year_semantics.rule "
+                f"in {CLAIM_YEAR_SEMANTICS}"
+            )
         deriv = semantics.get("derivation")
         if deriv not in CLAIM_YEAR_DERIVATIONS:
-            raise ValidationProblem(f"{country}: claim_year_semantics.derivation must be one of "
-                                    f"{CLAIM_YEAR_DERIVATIONS}")
+            raise ValidationProblem(
+                f"{country}: claim_year_semantics.derivation must be one of {CLAIM_YEAR_DERIVATIONS}"
+            )
         if deriv == "verbatim":
             cit = semantics.get("citation") or {}
             if cit.get("source_id") not in sources or not cit.get("locator"):
                 raise ValidationProblem(f"{country}: claim_year_semantics must cite a declared source with a locator")
             if check_locators and normalise_text(str(cit["locator"])) not in source_text(
-                    sources[cit["source_id"]]["archived_file"]):
-                raise ValidationProblem(f"{country}: claim_year_semantics locator not found verbatim in "
-                                        f"{sources[cit['source_id']]['archived_file']}", locator=cit["locator"])
+                sources[cit["source_id"]]["archived_file"]
+            ):
+                raise ValidationProblem(
+                    f"{country}: claim_year_semantics locator not found verbatim in "
+                    f"{sources[cit['source_id']]['archived_file']}",
+                    locator=cit["locator"],
+                )
         elif not semantics.get("note"):
             raise ValidationProblem(f"{country}: a model_assumption claim_year_semantics must explain itself in note")
-    table = RuleTable(country, str(doc.get("version", "")), doc["review_status"], doc["transcription"], lever,
-                      sources, paths, tuple(rows), dict(doc), semantics)
+    table = RuleTable(
+        country,
+        str(doc.get("version", "")),
+        doc["review_status"],
+        doc["transcription"],
+        lever,
+        sources,
+        paths,
+        tuple(rows),
+        dict(doc),
+        semantics,
+    )
     _check_disjoint(table)
     return table
 
@@ -363,8 +430,12 @@ def available_countries() -> tuple[str, ...]:
 def load_rule_table(iso3: str) -> RuleTable:
     p = RULE_DIR / f"{iso3}.yaml"
     if not p.exists():
-        raise CapabilityGap(f"no sourced retirement-age rule table for {iso3}", capability="social.retirement_age",
-                            country=iso3, reason=gap_reason(iso3))
+        raise CapabilityGap(
+            f"no sourced retirement-age rule table for {iso3}",
+            capability="social.retirement_age",
+            country=iso3,
+            reason=gap_reason(iso3),
+        )
     with open(p, encoding="utf-8") as f:
         return parse_rule_table(yaml.safe_load(f))
 
@@ -396,8 +467,9 @@ class TablePath:
 
     def __post_init__(self) -> None:
         if not self.table.rows_for(self.path, self.age_kind, self.track):
-            raise ValidationProblem(f"{self.table.country}: path {self.path!r} has no {self.age_kind} rows for "
-                                    f"track {self.track!r}")
+            raise ValidationProblem(
+                f"{self.table.country}: path {self.path!r} has no {self.age_kind} rows for track {self.track!r}"
+            )
 
     @property
     def basis(self) -> str:
@@ -407,8 +479,9 @@ class TablePath:
     def age_months(self, birth_y: int, birth_m: int, claim_year: int) -> int:
         key = (birth_y, birth_m, claim_year if self.basis == "claim_year" else None)
         if key not in self._cache:
-            self._cache[key] = self.table.age_months_at(self.path, self.age_kind, birth_y, birth_m, claim_year,
-                                                        self.track)
+            self._cache[key] = self.table.age_months_at(
+                self.path, self.age_kind, birth_y, birth_m, claim_year, self.track
+            )
         return self._cache[key]
 
     def age_bounds_months(self) -> tuple[int, int]:
@@ -422,10 +495,19 @@ class TablePath:
 
     def describe(self) -> dict[str, Any]:
         p = self.table.paths[self.path]
-        return {"kind": "rule_table_path", "country": self.table.country, "path": self.path, "label": p.label,
-                "status": p.status, "age_kind": self.age_kind, "track": self.track, "basis": self.basis,
-                "rule_table_version": self.table.version, "rule_table_digest": self.table.digest(),
-                "review_status": self.table.review_status}
+        return {
+            "kind": "rule_table_path",
+            "country": self.table.country,
+            "path": self.path,
+            "label": p.label,
+            "status": p.status,
+            "age_kind": self.age_kind,
+            "track": self.track,
+            "basis": self.basis,
+            "rule_table_version": self.table.version,
+            "rule_table_digest": self.table.digest(),
+            "review_status": self.table.review_status,
+        }
 
 
 @dataclass(frozen=True)
@@ -470,10 +552,14 @@ class ShiftedPath:
         return self.base.claim_floor_months(birth_y) + self.extra_months(birth_y)
 
     def describe(self) -> dict[str, Any]:
-        return {"kind": "shift_of_rule_table_path", "base": self.base.describe(), "shift_months": self.shift_months,
-                "first_birth_year": self.first_birth_year,
-                "phase_in_months_per_cohort": self.phase_in_months_per_cohort,
-                "status": "scenario_assumption (not law)"}
+        return {
+            "kind": "shift_of_rule_table_path",
+            "base": self.base.describe(),
+            "shift_months": self.shift_months,
+            "first_birth_year": self.first_birth_year,
+            "phase_in_months_per_cohort": self.phase_in_months_per_cohort,
+            "status": "scenario_assumption (not law)",
+        }
 
 
 TARGET_AGE_RANGE_MONTHS = (12 * 40, 12 * 80)
@@ -526,10 +612,15 @@ class TargetPath:
 
     def describe(self) -> dict[str, Any]:
         t = self.target_age_months
-        return {"kind": "target_level_on_rule_table_path", "base": self.base.describe(), "target_age_months": t,
-                "target_age": {"years": t // 12, "months": t % 12}, "first_birth_year": self.first_birth_year,
-                "phase_in_months_per_cohort": self.phase_in_months_per_cohort,
-                "status": "scenario_assumption (not law)"}
+        return {
+            "kind": "target_level_on_rule_table_path",
+            "base": self.base.describe(),
+            "target_age_months": t,
+            "target_age": {"years": t // 12, "months": t % 12},
+            "first_birth_year": self.first_birth_year,
+            "phase_in_months_per_cohort": self.phase_in_months_per_cohort,
+            "status": "scenario_assumption (not law)",
+        }
 
 
 AgePath = TablePath | ShiftedPath | TargetPath
@@ -568,8 +659,9 @@ def ineligible_share_single_age(path: AgePath, year: int, age: int) -> Fraction:
     return Fraction(below, 144)
 
 
-def ineligible_share(path: AgePath, year: int, ages: Iterable[int],
-                     weights: Mapping[int, Fraction] | None = None) -> Fraction:
+def ineligible_share(
+    path: AgePath, year: int, ages: Iterable[int], weights: Mapping[int, Fraction] | None = None
+) -> Fraction:
     """Share for an age group (``weights`` by single age; uniform when ``None``)."""
     ages = tuple(ages)
     w = weights or {a: Fraction(1) for a in ages}
@@ -587,7 +679,12 @@ def coverage_problems(path: AgePath, years: Sequence[int], ages: Sequence[int]) 
             try:
                 ineligible_share_single_age(path, y, a)
             except RuleCoverageGap as e:
-                out.append({"code": e.code, "year": y, "age": a, **{k: v for k, v in e.details.items()
-                                                                     if k in ("country", "path", "birth",
-                                                                              "claim_year")}})
+                out.append(
+                    {
+                        "code": e.code,
+                        "year": y,
+                        "age": a,
+                        **{k: v for k, v in e.details.items() if k in ("country", "path", "birth", "claim_year")},
+                    }
+                )
     return out

@@ -60,8 +60,12 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp(f"objects_{label}")
     data = base.model_dump()
-    data.update(reva_migration_database_url=base.migration_url().set(database=name).render_as_string(
-        hide_password=False), reva_db_name=name, reva_env="test", reva_object_root=root)
+    data.update(
+        reva_migration_database_url=base.migration_url().set(database=name).render_as_string(hide_password=False),
+        reva_db_name=name,
+        reva_env="test",
+        reva_object_root=root,
+    )
     settings = Settings.model_validate(data)
     from reva.cli.bootstrap import bootstrap
     from reva.cli.seed import seed
@@ -76,8 +80,14 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
             time.sleep(1)
     store = FilesystemArtifactStore(root, settings.reva_s3_prefix)
     pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 0})
-    d = FreshDB(settings, make_engine("migration", settings), make_engine("api", settings),
-                make_engine("worker", pooled), make_engine("sim", settings), store)
+    d = FreshDB(
+        settings,
+        make_engine("migration", settings),
+        make_engine("api", settings),
+        make_engine("worker", pooled),
+        make_engine("sim", settings),
+        store,
+    )
     seed(d.worker, store)
     try:
         yield d
@@ -98,8 +108,12 @@ def qdb(tmp_path_factory: pytest.TempPathFactory) -> Iterator[FreshDB]:
 @pytest.fixture(autouse=True)
 def _clean_queue(qdb: FreshDB) -> None:
     with qdb.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL, "
-                       "finished_at = clock_timestamp() WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL, "
+                "finished_at = clock_timestamp() WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
         c.execute(text("UPDATE ops.schedule SET enabled = false"))
 
 
@@ -121,8 +135,9 @@ def _make_available(d: FreshDB, jid: uuid.UUID) -> None:
 
 def _expire_lease(d: FreshDB, jid: uuid.UUID) -> None:
     with d.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET lease_until = clock_timestamp() - interval '1 second' WHERE id = :j"),
-                  {"j": jid})
+        c.execute(
+            text("UPDATE ops.job SET lease_until = clock_timestamp() - interval '1 second' WHERE id = :j"), {"j": jid}
+        )
 
 
 def _worker(d: FreshDB, **kw) -> Worker:
@@ -134,10 +149,18 @@ def _worker(d: FreshDB, **kw) -> Worker:
 
 
 def _ctx(d: FreshDB, job: queue.ClaimedJob) -> JobContext:
-    return JobContext(job_id=job.id, job_type=job.job_type, worker_id=job.worker_id,
-                      fencing_token=job.fencing_token, attempt=job.attempts, settings=d.settings,
-                      worker_engine=d.worker, sim_engine=None, store=d.store,
-                      heartbeat=lambda p=None: queue.heartbeat(d.worker, job, p))
+    return JobContext(
+        job_id=job.id,
+        job_type=job.job_type,
+        worker_id=job.worker_id,
+        fencing_token=job.fencing_token,
+        attempt=job.attempts,
+        settings=d.settings,
+        worker_engine=d.worker,
+        sim_engine=None,
+        store=d.store,
+        heartbeat=lambda p=None: queue.heartbeat(d.worker, job, p),
+    )
 
 
 # --------------------------------------------------------------------------- enqueue / claim
@@ -162,14 +185,14 @@ def test_claim_commits_and_releases_row_locks_before_work(qdb: FreshDB) -> None:
     # Immediately afterwards another session can lock and update the row: no lock is held.
     with qdb.owner.begin() as c:
         c.execute(text("SET LOCAL lock_timeout = '200ms'"))
-        row = c.execute(text("SELECT status, worker_id FROM ops.job WHERE id = :j FOR UPDATE NOWAIT"),
-                        {"j": jid}).one()
+        row = c.execute(text("SELECT status, worker_id FROM ops.job WHERE id = :j FOR UPDATE NOWAIT"), {"j": jid}).one()
         assert row.status == "running" and row.worker_id == "w-locks"
         c.execute(text("UPDATE ops.job SET progress = '{\"probe\": 1}' WHERE id = :j"), {"j": jid})
     # Lease comes from the database clock.
     with qdb.owner.connect() as c:
-        remaining = c.execute(text("SELECT EXTRACT(EPOCH FROM lease_until - clock_timestamp()) FROM ops.job "
-                                   "WHERE id = :j"), {"j": jid}).scalar()
+        remaining = c.execute(
+            text("SELECT EXTRACT(EPOCH FROM lease_until - clock_timestamp()) FROM ops.job WHERE id = :j"), {"j": jid}
+        ).scalar()
     assert 20 < float(remaining) <= 30
     queue.complete(qdb.worker, job, {"ok": True})
     assert _status(qdb, jid)["status"] == "succeeded"
@@ -188,8 +211,10 @@ def test_expired_lease_reclaimed_with_higher_token_and_stale_holder_cannot_commi
     with pytest.raises(StaleLease):
         queue.heartbeat(qdb.worker, a)
     with pytest.raises(DBAPIError) as ei, qdb.worker.begin() as c:  # the raw function raises too
-        c.execute(text("SELECT ops.complete_job(:j, :w, :t, 'succeeded', NULL, NULL)"),
-                  {"j": jid, "w": a.worker_id, "t": a.fencing_token})
+        c.execute(
+            text("SELECT ops.complete_job(:j, :w, :t, 'succeeded', NULL, NULL)"),
+            {"j": jid, "w": a.worker_id, "t": a.fencing_token},
+        )
     assert getattr(ei.value.orig, "sqlstate", None) == "RV001"
     assert queue.heartbeat(qdb.worker, b) == "running"
     queue.complete(qdb.worker, b, {"by": "B"})
@@ -232,16 +257,18 @@ def test_concurrent_claims_never_return_the_same_job(qdb: FreshDB) -> None:
     assert len(claimed) == len(set(claimed))
     assert ids <= set(claimed)
     with qdb.owner.connect() as c:
-        tokens = c.execute(text("SELECT fencing_token FROM ops.job WHERE id = ANY(:i)"),
-                           {"i": list(ids)}).scalars().all()
+        tokens = (
+            c.execute(text("SELECT fencing_token FROM ops.job WHERE id = ANY(:i)"), {"i": list(ids)}).scalars().all()
+        )
     assert len(set(tokens)) == len(ids)
 
 
 def test_priority_and_starvation_protection(qdb: FreshDB) -> None:
     old_low = _enqueue(qdb, "health", {"probe": "aging-low"}, priority=-100)
     with qdb.owner.begin() as c:  # waited 4 hours -> +200 aging cap
-        c.execute(text("UPDATE ops.job SET created_at = clock_timestamp() - interval '4 hours' WHERE id = :j"),
-                  {"j": old_low})
+        c.execute(
+            text("UPDATE ops.job SET created_at = clock_timestamp() - interval '4 hours' WHERE id = :j"), {"j": old_low}
+        )
     fresh_high = _enqueue(qdb, "health", {"probe": "aging-high"}, priority=100)
     mid = _enqueue(qdb, "health", {"probe": "mid"}, priority=50)
     order = [queue.claim(qdb.worker, "w", 30) for _ in range(3)]
@@ -253,10 +280,12 @@ def test_two_schedulers_create_exactly_one_job_per_slot(qdb: FreshDB) -> None:
     keys = [f"test:sched:{uuid.uuid4().hex[:8]}" for _ in range(6)]
     with qdb.owner.begin() as c:
         for i, k in enumerate(keys):
-            c.execute(text("""INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at)
+            c.execute(
+                text("""INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at)
                               VALUES (:k, 'health', '{}', '{"interval_seconds": 3600}',
                                       clock_timestamp() - make_interval(secs => :lag))"""),
-                      {"k": k, "lag": 10 + i * 3600 * (i % 2)})  # some schedules missed several slots
+                {"k": k, "lag": 10 + i * 3600 * (i % 2)},
+            )  # some schedules missed several slots
     barrier = threading.Barrier(2)
     results: list[list[schedules.ScheduledJob]] = []
 
@@ -273,14 +302,17 @@ def test_two_schedulers_create_exactly_one_job_per_slot(qdb: FreshDB) -> None:
     assert sorted(s.schedule_key for s in created) == sorted(keys)
     with qdb.owner.connect() as c:
         for k in keys:
-            n = c.execute(text("SELECT count(*) FROM ops.job WHERE idempotency_key LIKE :p"),
-                          {"p": f"schedule:{k}:%"}).scalar()
+            n = c.execute(
+                text("SELECT count(*) FROM ops.job WHERE idempotency_key LIKE :p"), {"p": f"schedule:{k}:%"}
+            ).scalar()
             assert n == 1, k
-            nxt, last = c.execute(text("SELECT next_due_at, last_slot FROM ops.schedule WHERE schedule_key = :k"),
-                                  {"k": k}).one()
+            nxt, last = c.execute(
+                text("SELECT next_due_at, last_slot FROM ops.schedule WHERE schedule_key = :k"), {"k": k}
+            ).one()
             assert nxt - last == timedelta(hours=1)
-            assert c.execute(text("SELECT next_due_at > clock_timestamp() FROM ops.schedule WHERE schedule_key=:k"),
-                             {"k": k}).scalar()
+            assert c.execute(
+                text("SELECT next_due_at > clock_timestamp() FROM ops.schedule WHERE schedule_key=:k"), {"k": k}
+            ).scalar()
         # Re-processing the same slot (e.g. a reset) is absorbed by the idempotency key.
         c.commit()
     with qdb.owner.begin() as c:
@@ -288,8 +320,12 @@ def test_two_schedulers_create_exactly_one_job_per_slot(qdb: FreshDB) -> None:
     again = schedules.tick(qdb.worker)
     assert [s.created for s in again if s.schedule_key == keys[0]] == [False]
     with qdb.owner.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM ops.job WHERE idempotency_key LIKE :p"),
-                         {"p": f"schedule:{keys[0]}:%"}).scalar() == 1
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM ops.job WHERE idempotency_key LIKE :p"), {"p": f"schedule:{keys[0]}:%"}
+            ).scalar()
+            == 1
+        )
 
 
 def test_schedule_payload_and_slot_key() -> None:
@@ -308,15 +344,21 @@ def test_retry_with_exponential_backoff_then_dead_letter(qdb: FreshDB) -> None:
     for attempt in (1, 2, 3):
         job = queue.claim(qdb.worker, "w-retry", 30)
         assert job is not None and job.id == jid and job.attempts == attempt
-        st = queue.fail(qdb.worker, job, queue.error_document("transient_error", "boom", retryable=True,
-                                                              attempt=attempt), retryable=True,
-                        backoff_base_seconds=5)
+        st = queue.fail(
+            qdb.worker,
+            job,
+            queue.error_document("transient_error", "boom", retryable=True, attempt=attempt),
+            retryable=True,
+            backoff_base_seconds=5,
+        )
         statuses.append(st)
         row = _status(qdb, jid)
         if st == "queued":
             with qdb.owner.connect() as c:
-                delay = c.execute(text("SELECT EXTRACT(EPOCH FROM available_at - clock_timestamp()) FROM ops.job "
-                                       "WHERE id = :j"), {"j": jid}).scalar()
+                delay = c.execute(
+                    text("SELECT EXTRACT(EPOCH FROM available_at - clock_timestamp()) FROM ops.job WHERE id = :j"),
+                    {"j": jid},
+                ).scalar()
             expected = 5 * 2 ** (attempt - 1)
             assert expected - 2 < float(delay) <= expected
             assert row["last_error"]["backoff_seconds"] == expected
@@ -386,17 +428,29 @@ def test_cancel_running_job_is_honoured_cooperatively(qdb: FreshDB, monkeypatch)
     row = _status(qdb, jid)
     assert row["status"] == "cancelled" and row["finished_at"] is not None
     with qdb.owner.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'job.cancel' AND target->>'job_id' = :j"),
-                         {"j": str(jid)}).scalar() == 1
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM ops.audit WHERE action = 'job.cancel' AND target->>'job_id' = :j"),
+                {"j": str(jid)},
+            ).scalar()
+            == 1
+        )
 
 
 # --------------------------------------------------------------------------- crash windows (ingest)
 def _acquisitions(d: FreshDB, connector: str) -> list[tuple[str, int]]:
     with d.owner.connect() as c:
-        return [tuple(r) for r in c.execute(text(
-            """SELECT a.request_fingerprint, count(*) FROM evidence.acquisition a
+        return [
+            tuple(r)
+            for r in c.execute(
+                text(
+                    """SELECT a.request_fingerprint, count(*) FROM evidence.acquisition a
                  JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
-                WHERE cv.name = :n GROUP BY a.request_fingerprint"""), {"n": connector}).all()]
+                WHERE cv.name = :n GROUP BY a.request_fingerprint"""
+                ),
+                {"n": connector},
+            ).all()
+        ]
 
 
 def test_kill_after_object_upload_then_retry_yields_one_acquisition(qdb: FreshDB, monkeypatch) -> None:
@@ -450,18 +504,25 @@ def test_kill_after_db_commit_before_ack_yields_one_acquisition(qdb: FreshDB) ->
     acq = _acquisitions(qdb, "worldbank.wdi.indicators")
     assert len(acq) == 5 and all(n == 1 for _, n in acq)
     with qdb.owner.connect() as c:
-        pubs = c.execute(text("SELECT count(*) FROM ops.job WHERE job_type = 'publish_beliefs' AND created_by = :c"),
-                         {"c": f"job:{jid}"}).scalar()
+        pubs = c.execute(
+            text("SELECT count(*) FROM ops.job WHERE job_type = 'publish_beliefs' AND created_by = :c"),
+            {"c": f"job:{jid}"},
+        ).scalar()
     assert pubs == 1  # the first (crashed) attempt enqueued publication; the retry did not duplicate it
 
 
 # --------------------------------------------------------------------------- start-up refusals
 def _production_settings(**over) -> Settings:
     data = {
-        "reva_env": "production", "reva_object_backend": "s3", "reva_s3_bucket": "b",
-        "reva_s3_access_key_id": "AKIAEXAMPLE", "reva_s3_secret_access_key": "x" * 40,
-        "reva_session_secret": "s" * 40, "reva_public_base_url": "https://reva.example",
-        "reva_worker_db_password": "pw-worker-example", "reva_db_sslmode": "require",
+        "reva_env": "production",
+        "reva_object_backend": "s3",
+        "reva_s3_bucket": "b",
+        "reva_s3_access_key_id": "AKIAEXAMPLE",
+        "reva_s3_secret_access_key": "x" * 40,
+        "reva_session_secret": "s" * 40,
+        "reva_public_base_url": "https://reva.example",
+        "reva_worker_db_password": "pw-worker-example",
+        "reva_db_sslmode": "require",
     }
     data.update(over)
     return Settings(_env_file=None, **data)  # type: ignore[call-arg]
@@ -478,8 +539,11 @@ def test_worker_refuses_migration_url_in_production() -> None:
 
 def test_worker_ignores_migration_url_locally(caplog) -> None:
     env = {"REVA_MIGRATION_DATABASE_URL": "postgresql://owner:hunter2@db/reva", "OTHER": "1"}
-    s = Settings(_env_file=None, reva_env="local",  # type: ignore[call-arg]
-                 reva_migration_database_url="postgresql://o:p@db/r")
+    s = Settings(
+        _env_file=None,
+        reva_env="local",  # type: ignore[call-arg]
+        reva_migration_database_url="postgresql://o:p@db/r",
+    )
     out = check_environment(s, env)
     assert out.reva_migration_database_url is None and "REVA_MIGRATION_DATABASE_URL" not in env
     assert any("ignoring" in r.getMessage() for r in caplog.records)
@@ -518,11 +582,14 @@ def test_health_job_appends_cadence_relative_vector(qdb: FreshDB) -> None:
     assert job is not None and job.id == jid
     assert w.execute(job).status == "succeeded"
     with qdb.owner.connect() as c:
-        m, status = c.execute(text(
-            """SELECT h.metrics, h.status FROM ops.connector_health h
+        m, status = c.execute(
+            text(
+                """SELECT h.metrics, h.status FROM ops.connector_health h
                  JOIN evidence.connector_version cv ON cv.id = h.connector_version_id
                 WHERE cv.name = 'worldbank.wdi.indicators' AND h.metrics->>'kind' = 'health_vector'
-                ORDER BY h.recorded_at DESC LIMIT 1""")).one()
+                ORDER BY h.recorded_at DESC LIMIT 1"""
+            )
+        ).one()
     assert m["runs_considered"] >= 1 and m["success_ratio"] == 1.0
     f = m["freshness"]
     assert f["cadence_seconds"] == 30 * 86400 and f["lag_cadences"] < 0.01 and f["late"] is False
@@ -534,8 +601,10 @@ def test_health_job_appends_cadence_relative_vector(qdb: FreshDB) -> None:
 # --------------------------------------------------------------------------- R2-08 bounded waiting
 def _backdate(d: FreshDB, jid: uuid.UUID, minutes: float) -> None:
     with d.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET created_at = clock_timestamp() - make_interval(mins => :m) "
-                       "WHERE id = :j"), {"j": jid, "m": minutes})
+        c.execute(
+            text("UPDATE ops.job SET created_at = clock_timestamp() - make_interval(mins => :m) WHERE id = :j"),
+            {"j": jid, "m": minutes},
+        )
 
 
 def test_old_low_priority_job_beats_aged_high_priority_backlog(qdb: FreshDB) -> None:
@@ -582,8 +651,9 @@ def test_heartbeat_gives_up_quickly_when_row_is_locked(qdb: FreshDB) -> None:
     w = _worker(qdb)
     assert w.heartbeat_engine is not w.engine  # dedicated heartbeat pool
     with qdb.worker.connect() as holder:  # a long publication holding the job row lock
-        holder.execute(text("SELECT ops.assert_lease(:j, :w, :t)"),
-                       {"j": job.id, "w": job.worker_id, "t": job.fencing_token})
+        holder.execute(
+            text("SELECT ops.assert_lease(:j, :w, :t)"), {"j": job.id, "w": job.worker_id, "t": job.fencing_token}
+        )
         t0 = time.monotonic()
         with pytest.raises(DBAPIError) as ei:
             queue.heartbeat(w.heartbeat_engine, job, None, 30, lock_timeout_ms=200, statement_timeout_ms=2000)
@@ -623,19 +693,34 @@ def test_publish_beliefs_key_held_by_foreign_job_is_disambiguated_and_audited(qd
     payload = {"origin": "test_fixture", "through_outbox_id": 987654}
     key = queue.idempotency_key("publish_beliefs", payload)
     with qdb.owner.begin() as c:  # a foreign job pre-claims the internal key
-        foreign = c.execute(text("INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
-                                 "VALUES ('replay', '{}', :k, 'api:attacker') RETURNING id"), {"k": key}).scalar()
+        foreign = c.execute(
+            text(
+                "INSERT INTO ops.job(job_type, payload, idempotency_key, created_by) "
+                "VALUES ('replay', '{}', :k, 'api:attacker') RETURNING id"
+            ),
+            {"k": key},
+        ).scalar()
     with qdb.worker.begin() as c:
-        jid = jobs.enqueue_publish_beliefs(c, "test_fixture", 987654, created_by="worker:test",
-                                           audit_actor="worker:test")
+        jid = jobs.enqueue_publish_beliefs(
+            c, "test_fixture", 987654, created_by="worker:test", audit_actor="worker:test"
+        )
     with qdb.worker.begin() as c:  # converges on the same job
         assert jobs.enqueue_publish_beliefs(c, "test_fixture", 987654, created_by="worker:test") == jid
     row = _status(qdb, jid)
     assert jid != foreign and row["job_type"] == "publish_beliefs" and row["payload"] == payload
     assert row["idempotency_key"] == f"{key}#alt1"
     with qdb.owner.connect() as c:
-        audit = c.execute(text("SELECT details FROM ops.audit WHERE action = 'jobs.publish_key_conflict' "
-                               "AND target->>'job_id' = :j"), {"j": str(jid)}).scalars().all()
+        audit = (
+            c.execute(
+                text(
+                    "SELECT details FROM ops.audit WHERE action = 'jobs.publish_key_conflict' "
+                    "AND target->>'job_id' = :j"
+                ),
+                {"j": str(jid)},
+            )
+            .scalars()
+            .all()
+        )
     assert len(audit) == 1 and audit[0]["foreign_job_id"] == str(foreign)
 
 
@@ -678,9 +763,13 @@ def test_live_ingest_over_budget_fails_with_budget_exhausted_without_requests(qd
 
     monkeypatch.setattr(runner, "make_live_client", no_network)
     with qdb.owner.begin() as c:  # today's WDI request budget (200) already consumed
-        c.execute(text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
-                       "VALUES ('source:worldbank.wdi:requests', :o, 'requests', 200, 200)"),
-                  {"o": f"test-prefill-{uuid.uuid4().hex}"})
+        c.execute(
+            text(
+                "INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
+                "VALUES ('source:worldbank.wdi:requests', :o, 'requests', 200, 200)"
+            ),
+            {"o": f"test-prefill-{uuid.uuid4().hex}"},
+        )
     jid = _enqueue(qdb, "ingest", {"connector": "worldbank.wdi.indicators", "mode": "live", "probe": "budget"})
     w = _worker(qdb)
     job = w.claim_one()
@@ -709,8 +798,9 @@ def test_generic_budget_helpers(qdb: FreshDB) -> None:
     from reva.operations.budgets import BudgetExhausted, consume, reserve, used_today
 
     acct = f"autonomy:test:{uuid.uuid4().hex[:6]}:requests"
-    assert reserve(qdb.worker, account_key=acct, operation_id=f"{acct}:1", unit="requests", amount=7,
-                   daily_limit=10) == 10
+    assert (
+        reserve(qdb.worker, account_key=acct, operation_id=f"{acct}:1", unit="requests", amount=7, daily_limit=10) == 10
+    )
     with pytest.raises(BudgetExhausted):
         reserve(qdb.worker, account_key=acct, operation_id=f"{acct}:2", unit="requests", amount=4, daily_limit=10)
     consume(qdb.worker, f"{acct}:1", 5)
@@ -722,14 +812,21 @@ def test_promoted_connector_cannot_shadow_a_builtin(qdb: FreshDB, monkeypatch) -
     import reva.autonomy.jobs as aj
 
     impostor = object()
-    monkeypatch.setattr(aj, "promoted_connectors", lambda engine, store: {"worldbank.wdi.indicators": impostor,
-                                                                           "eurostat.test.promoted": impostor})
+    monkeypatch.setattr(
+        aj,
+        "promoted_connectors",
+        lambda engine, store: {"worldbank.wdi.indicators": impostor, "eurostat.test.promoted": impostor},
+    )
     job = queue.claim(qdb.worker, "w", 30) if _enqueue(qdb, "health", {"probe": "shadow"}) else None
     assert job is not None
     got = jobs._all_connectors(_ctx(qdb, job))
     assert got["worldbank.wdi.indicators"] is not impostor and got["eurostat.test.promoted"] is impostor
     with qdb.owner.connect() as c:
-        names = c.execute(text("SELECT details->'names' FROM ops.audit WHERE action = "
-                               "'connectors.promoted_name_collision' AND target->>'job_id' = :j"),
-                          {"j": str(job.id)}).scalar()
+        names = c.execute(
+            text(
+                "SELECT details->'names' FROM ops.audit WHERE action = "
+                "'connectors.promoted_name_collision' AND target->>'job_id' = :j"
+            ),
+            {"j": str(job.id)},
+        ).scalar()
     assert names == ["worldbank.wdi.indicators"]

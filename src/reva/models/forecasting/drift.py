@@ -91,14 +91,10 @@ class FittedLogDrift:
     def unquantified_reason(self) -> str | None:
         if self.df < MIN_INTERVAL_DF:
             return (
-                f"too few log-differences for a calibrated interval: T={self.n_diffs}, "
-                f"df={self.df} < {MIN_INTERVAL_DF}"
+                f"too few log-differences for a calibrated interval: T={self.n_diffs}, df={self.df} < {MIN_INTERVAL_DF}"
             )
         if self.resid_sd <= ZERO_SD_TOL:
-            return (
-                "zero sample variance of training log-differences; "
-                "innovation variance not identified"
-            )
+            return "zero sample variance of training log-differences; innovation variance not identified"
         return None
 
     def predict(self, horizons: Sequence[int], level: float = 0.8) -> list[Forecast]:
@@ -122,9 +118,7 @@ class FittedLogDrift:
                         interval=None,
                         interval_kind=None,
                         level=None,
-                        uncertainty=UncertaintySpec.unknown(
-                            f"{METHOD_VERSION}: uncertainty not quantified ({reason})"
-                        ),
+                        uncertainty=UncertaintySpec.unknown(f"{METHOD_VERSION}: uncertainty not quantified ({reason})"),
                         assumptions=ASSUMPTIONS,
                     )
                 )
@@ -149,15 +143,12 @@ class FittedLogDrift:
                         lower=lo,
                         upper=hi,
                         description=(
-                            f"Student-t (df={self.df}) log-scale prediction interval, "
-                            "s*sqrt(h*(1+h/T)), exponentiated"
+                            f"Student-t (df={self.df}) log-scale prediction interval, s*sqrt(h*(1+h/T)), exponentiated"
                         ),
                         conditioning=ASSUMPTIONS,
                     ),
                     assumptions=ASSUMPTIONS,
-                    predictive=PredictiveDistribution(
-                        family="student_t", loc=centre, scale=scale, df=float(self.df)
-                    ),
+                    predictive=PredictiveDistribution(family="student_t", loc=centre, scale=scale, df=float(self.df)),
                 )
             )
         return out

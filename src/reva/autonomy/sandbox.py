@@ -85,10 +85,22 @@ def scrubbed_environment(source: Mapping[str, str] | None = None) -> dict[str, s
     """Minimal allowlisted environment: nothing secret survives (default deny)."""
     src = dict(os.environ if source is None else source)
     env = {k: src[k] for k in SAFE_ENV_KEYS if k in src}
-    env.update({"PATH": "/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONHASHSEED": "0",
-                "REVA_SANDBOX_ISOLATION": "trusted_template", "HOME": "/nonexistent",
-                "HTTP_PROXY": DEAD_PROXY, "HTTPS_PROXY": DEAD_PROXY, "ALL_PROXY": DEAD_PROXY,
-                "http_proxy": DEAD_PROXY, "https_proxy": DEAD_PROXY, "all_proxy": DEAD_PROXY, "NO_PROXY": ""})
+    env.update(
+        {
+            "PATH": "/usr/bin:/bin",
+            "PYTHONDONTWRITEBYTECODE": "1",
+            "PYTHONHASHSEED": "0",
+            "REVA_SANDBOX_ISOLATION": "trusted_template",
+            "HOME": "/nonexistent",
+            "HTTP_PROXY": DEAD_PROXY,
+            "HTTPS_PROXY": DEAD_PROXY,
+            "ALL_PROXY": DEAD_PROXY,
+            "http_proxy": DEAD_PROXY,
+            "https_proxy": DEAD_PROXY,
+            "all_proxy": DEAD_PROXY,
+            "NO_PROXY": "",
+        }
+    )
     return env
 
 
@@ -100,8 +112,13 @@ def namespace_isolation() -> tuple[str, ...] | None:
             continue
         for args in UNSHARE_VARIANTS:
             try:
-                r = subprocess.run([exe, *args, "--", "/bin/true"], capture_output=True, timeout=5,
-                                   env={"PATH": "/usr/bin:/bin"}, check=False)
+                r = subprocess.run(
+                    [exe, *args, "--", "/bin/true"],
+                    capture_output=True,
+                    timeout=5,
+                    env={"PATH": "/usr/bin:/bin"},
+                    check=False,
+                )
             except (OSError, subprocess.SubprocessError):
                 return None
             if r.returncode == 0:
@@ -123,8 +140,9 @@ class ExternalRunner(Protocol):
 class HttpExternalRunner:
     """POSTs a run request to REVA_SANDBOX_ENDPOINT. Constructed only when configured."""
 
-    def __init__(self, endpoint: str, token: str | None = None, *, transport: Any = None,
-                 timeout_seconds: float = 600.0) -> None:
+    def __init__(
+        self, endpoint: str, token: str | None = None, *, transport: Any = None, timeout_seconds: float = 600.0
+    ) -> None:
         parts = urlsplit(endpoint)
         if parts.scheme != "https" or not parts.hostname or parts.username or parts.password:
             raise ConfigurationError("REVA_SANDBOX_ENDPOINT must be an https URL without credentials")
@@ -139,12 +157,19 @@ class HttpExternalRunner:
         headers = {"Content-Type": "application/json"}
         if self._token:
             headers["Authorization"] = f"Bearer {self._token}"
-        async with httpx.AsyncClient(transport=self._transport, timeout=self.timeout,
-                                     follow_redirects=False) as client:
+        async with httpx.AsyncClient(transport=self._transport, timeout=self.timeout, follow_redirects=False) as client:
             r = await client.post(self.endpoint, content=json.dumps(dict(request), default=str), headers=headers)
         if r.status_code != 200:
-            return {"outcome": "blocked", "findings": [{"code": "external_runner_http", "severity": "blocker",
-                                                         "message": f"runner returned HTTP {r.status_code}"}]}
+            return {
+                "outcome": "blocked",
+                "findings": [
+                    {
+                        "code": "external_runner_http",
+                        "severity": "blocker",
+                        "message": f"runner returned HTTP {r.status_code}",
+                    }
+                ],
+            }
         data = r.json()
         return data if isinstance(data, dict) else {"outcome": "blocked", "findings": []}
 
@@ -158,8 +183,14 @@ def external_runner_from_settings(settings: Any) -> HttpExternalRunner | None:
 
 
 class TrustedTemplateSandbox:
-    def __init__(self, io_: ArtifactIO, *, fixtures: ArtifactRef | None = None,
-                 external_runner: ExternalRunner | None = None, guard: AutonomyGuard | None = None) -> None:
+    def __init__(
+        self,
+        io_: ArtifactIO,
+        *,
+        fixtures: ArtifactRef | None = None,
+        external_runner: ExternalRunner | None = None,
+        guard: AutonomyGuard | None = None,
+    ) -> None:
         self.io = io_
         self.fixtures = fixtures
         self.external_runner = external_runner
@@ -170,11 +201,17 @@ class TrustedTemplateSandbox:
     async def run(self, proposal: PlatformChangeProposal, policy: SandboxPolicy) -> ValidationReport:
         started = time.monotonic()
         findings: list[Finding] = []
-        evidence: dict[str, Any] = {"schema": "reva-sandbox-run/1", "proposal_id": str(proposal.proposal_id),
-                                    "policy": {"version": policy.policy_version, "isolation": policy.isolation,
-                                               "network_hosts": list(policy.network_hosts),
-                                               "writable_paths": list(policy.writable_paths),
-                                               "secret_access": policy.secret_access}}
+        evidence: dict[str, Any] = {
+            "schema": "reva-sandbox-run/1",
+            "proposal_id": str(proposal.proposal_id),
+            "policy": {
+                "version": policy.policy_version,
+                "isolation": policy.isolation,
+                "network_hosts": list(policy.network_hosts),
+                "writable_paths": list(policy.writable_paths),
+                "secret_access": policy.secret_access,
+            },
+        }
 
         def finish(outcome: str, evaluator: str, usage: dict[str, Any] | None = None) -> ValidationReport:
             evidence["outcome"] = outcome
@@ -196,8 +233,13 @@ class TrustedTemplateSandbox:
             findings.append(_f("isolation_mismatch", "blocker", "declarative manifests run in trusted_template"))
             return finish("blocked", EVALUATOR_TEMPLATE)
         if not set(policy.network_hosts) <= set(TEMPLATE_HOSTS):
-            findings.append(_f("network_allowlist_too_wide", "blocker",
-                               f"sandbox network hosts {sorted(policy.network_hosts)} exceed template hosts"))
+            findings.append(
+                _f(
+                    "network_allowlist_too_wide",
+                    "blocker",
+                    f"sandbox network hosts {sorted(policy.network_hosts)} exceed template hosts",
+                )
+            )
             return finish("blocked", EVALUATOR_TEMPLATE)
         try:
             change = self.io.get_json(proposal.patch_or_manifest)
@@ -212,8 +254,13 @@ class TrustedTemplateSandbox:
             findings.append(_f("template_not_trusted", "blocker", "only the approved template can run"))
             return finish("blocked", EVALUATOR_TEMPLATE)
         if not set(manifest["allowed_hosts"]) <= set(policy.network_hosts):
-            findings.append(_f("manifest_hosts_outside_policy", "blocker",
-                               f"manifest hosts {manifest['allowed_hosts']} not in sandbox allowlist"))
+            findings.append(
+                _f(
+                    "manifest_hosts_outside_policy",
+                    "blocker",
+                    f"manifest hosts {manifest['allowed_hosts']} not in sandbox allowlist",
+                )
+            )
             return finish("fail", EVALUATOR_TEMPLATE)
         try:
             inputs = self._inputs(manifest, policy)
@@ -223,9 +270,14 @@ class TrustedTemplateSandbox:
         if inputs is None:
             findings.append(_f("no_read_only_inputs", "blocker", "no captured fixture bank for the planned requests"))
             return finish("blocked", EVALUATOR_TEMPLATE)
-        request = {"manifest": manifest, "fixtures": inputs, "network_hosts": list(policy.network_hosts),
-                   "max_items": policy.budget.max_requests, "max_bytes": policy.budget.max_bytes,
-                   "network_probe": self.network_probe}
+        request = {
+            "manifest": manifest,
+            "fixtures": inputs,
+            "network_hosts": list(policy.network_hosts),
+            "max_items": policy.budget.max_requests,
+            "max_bytes": policy.budget.max_bytes,
+            "network_probe": self.network_probe,
+        }
         out, usage = self._spawn(request, policy)
         evidence["child"] = out
         if out.get("timeout"):
@@ -238,18 +290,33 @@ class TrustedTemplateSandbox:
         if leaked:
             findings.append(_f("secret_in_environment", "blocker", f"secret-like env keys present: {leaked}"))
         if out.get("network_mode") != "blocked_verified":
-            findings.append(_f("network_not_os_isolated", "warning",
-                               "outbound network was not verified blocked at OS level: python guard only "
-                               "(trusted-template isolation is not a security boundary)"))
+            findings.append(
+                _f(
+                    "network_not_os_isolated",
+                    "warning",
+                    "outbound network was not verified blocked at OS level: python guard only "
+                    "(trusted-template isolation is not a security boundary)",
+                )
+            )
         fs = out.get("filesystem") or {}
         if fs.get("outside_private_dir_writable") or fs.get("shared_host_filesystem", True):
-            findings.append(_f("filesystem_shared", "warning",
-                               "the child shares the worker's filesystem (no mount isolation of the root "
-                               f"filesystem; write outside its private dir: {fs.get('outside_private_dir_writable')})"
-                               "; trusted-template isolation is not a security boundary"))
+            findings.append(
+                _f(
+                    "filesystem_shared",
+                    "warning",
+                    "the child shares the worker's filesystem (no mount isolation of the root "
+                    f"filesystem; write outside its private dir: {fs.get('outside_private_dir_writable')})"
+                    "; trusted-template isolation is not a security boundary",
+                )
+            )
         if out.get("parent_environ_readable"):
-            findings.append(_f("parent_environment_readable", "warning",
-                               "the child could read the worker's /proc/<pid>/environ (same UID, no PID namespace)"))
+            findings.append(
+                _f(
+                    "parent_environment_readable",
+                    "warning",
+                    "the child could read the worker's /proc/<pid>/environ (same UID, no PID namespace)",
+                )
+            )
         for r in out.get("results", []):
             for x in r["quality"]["findings"]:
                 findings.append(_f(x["code"], x["severity"], x["message"]))
@@ -258,22 +325,38 @@ class TrustedTemplateSandbox:
         outcome = "fail" if any(x.severity == "blocker" for x in findings) else "pass"
         return finish(outcome, EVALUATOR_TEMPLATE, usage)
 
-    async def _code_proposal(self, proposal: PlatformChangeProposal, policy: SandboxPolicy,
-                             findings: list[Finding], evidence: dict[str, Any], finish: Any) -> ValidationReport:
+    async def _code_proposal(
+        self,
+        proposal: PlatformChangeProposal,
+        policy: SandboxPolicy,
+        findings: list[Finding],
+        evidence: dict[str, Any],
+        finish: Any,
+    ) -> ValidationReport:
         evidence["contains_code"] = True
         if self.external_runner is None or policy.isolation != "external_disposable_vm":
-            findings.append(_f("no_isolated_runner", "blocker",
-                               "proposal contains code; no isolated external runner is configured "
-                               "(REVA_SANDBOX_ENDPOINT unset or isolation is not external_disposable_vm); "
-                               "the proposal remains unexecuted"))
+            findings.append(
+                _f(
+                    "no_isolated_runner",
+                    "blocker",
+                    "proposal contains code; no isolated external runner is configured "
+                    "(REVA_SANDBOX_ENDPOINT unset or isolation is not external_disposable_vm); "
+                    "the proposal remains unexecuted",
+                )
+            )
             return finish("blocked", EVALUATOR_EXTERNAL)
-        request = {"proposal": proposal_json(proposal),
-                   "patch_b64": base64.b64encode(self.io.get_bytes(proposal.patch_or_manifest)).decode(),
-                   "policy": evidence["policy"],
-                   "budget": {"max_cpu_seconds": policy.budget.max_cpu_seconds,
-                              "max_memory_bytes": policy.budget.max_memory_bytes,
-                              "max_wall_seconds": policy.budget.max_wall_seconds},
-                   "network": "blocked_by_default", "secrets": "none"}
+        request = {
+            "proposal": proposal_json(proposal),
+            "patch_b64": base64.b64encode(self.io.get_bytes(proposal.patch_or_manifest)).decode(),
+            "policy": evidence["policy"],
+            "budget": {
+                "max_cpu_seconds": policy.budget.max_cpu_seconds,
+                "max_memory_bytes": policy.budget.max_memory_bytes,
+                "max_wall_seconds": policy.budget.max_wall_seconds,
+            },
+            "network": "blocked_by_default",
+            "secrets": "none",
+        }
         from reva.operations.telemetry import redact_obj
 
         resp = redact_obj(dict(await self.external_runner.run(request)))
@@ -289,8 +372,9 @@ class TrustedTemplateSandbox:
             return None
         from reva.adapters.connectors.eurostat_template import EurostatJsonStatConnector
 
-        plan = EurostatJsonStatConnector(manifest).plan(None, FetchBudget(max_requests=policy.budget.max_requests,
-                                                                          max_bytes=policy.budget.max_bytes))
+        plan = EurostatJsonStatConnector(manifest).plan(
+            None, FetchBudget(max_requests=policy.budget.max_requests, max_bytes=policy.budget.max_bytes)
+        )
         bank = BankHttp(self.io, self.fixtures)
         out = []
         for item in plan.items:
@@ -300,14 +384,26 @@ class TrustedTemplateSandbox:
 
             e = bank.entries[request_fingerprint("GET", item.url)]
             body = self.io.get_bytes(ArtifactRef(e["body_sha256"], "raw", e["media_type"]))
-            out.append({"url": item.url, "body_b64": base64.b64encode(body).decode(), "media_type": e["media_type"],
-                        "status": e["status"], "retrieved_at": e["retrieved_at"]})
+            out.append(
+                {
+                    "url": item.url,
+                    "body_b64": base64.b64encode(body).decode(),
+                    "media_type": e["media_type"],
+                    "status": e["status"],
+                    "retrieved_at": e["retrieved_at"],
+                }
+            )
         return out
 
     @staticmethod
     def _spawn(request: dict[str, Any], policy: SandboxPolicy) -> tuple[dict[str, Any], dict[str, Any]]:
-        limits = {"cpu": max(1, int(policy.budget.max_cpu_seconds)), "as": int(policy.budget.max_memory_bytes),
-                  "nofile": 64, "fsize": 1_048_576, "nproc": 1}
+        limits = {
+            "cpu": max(1, int(policy.budget.max_cpu_seconds)),
+            "as": int(policy.budget.max_memory_bytes),
+            "nofile": 64,
+            "fsize": 1_048_576,
+            "nproc": 1,
+        }
         unshare = namespace_isolation()
         child = [sys.executable, "-I", "-m", "reva.autonomy.sandbox_child", "--limits", json.dumps(limits)]
         cmd = [*unshare, *child] if unshare else child
@@ -316,22 +412,37 @@ class TrustedTemplateSandbox:
         listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         listener.bind(("127.0.0.1", 0))
         listener.listen(8)
-        req = {**request, "probe_port": listener.getsockname()[1], "parent_uid": os.getuid(),
-               "public_probe": list(PUBLIC_PROBE_ADDR),
-               "namespaces": bool(unshare)}
-        with tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd, \
-                tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home, \
-                tempfile.TemporaryDirectory(prefix="reva-sandbox-outside-") as outside:
+        req = {
+            **request,
+            "probe_port": listener.getsockname()[1],
+            "parent_uid": os.getuid(),
+            "public_probe": list(PUBLIC_PROBE_ADDR),
+            "namespaces": bool(unshare),
+        }
+        with (
+            tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd,
+            tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home,
+            tempfile.TemporaryDirectory(prefix="reva-sandbox-outside-") as outside,
+        ):
             os.chmod(cwd, 0o500)  # read-only working directory
             req["outside_probe_dir"] = outside  # a worker-owned 0700 dir the child must not be able to write
             env = {**scrubbed_environment(), "HOME": home, "TMPDIR": home}
             try:
-                proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                                        env=env, cwd=cwd, close_fds=True, start_new_session=True)
+                proc = subprocess.Popen(
+                    cmd,
+                    stdin=subprocess.PIPE,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                    env=env,
+                    cwd=cwd,
+                    close_fds=True,
+                    start_new_session=True,
+                )
                 _prlimit(proc.pid, limits)  # belt and braces; the child applies them itself first
                 try:
-                    stdout, stderr = proc.communicate(json.dumps(req).encode(),
-                                                      timeout=max(1, int(policy.budget.max_wall_seconds)))
+                    stdout, stderr = proc.communicate(
+                        json.dumps(req).encode(), timeout=max(1, int(policy.budget.max_wall_seconds))
+                    )
                 except subprocess.TimeoutExpired:
                     proc.kill()
                     proc.communicate()
@@ -339,8 +450,12 @@ class TrustedTemplateSandbox:
             finally:
                 os.chmod(cwd, 0o700)
                 listener.close()
-        usage = {"wall_seconds": round(time.monotonic() - started, 3), "exit_code": proc.returncode,
-                 "stdout_bytes": len(stdout), "requests": 0}
+        usage = {
+            "wall_seconds": round(time.monotonic() - started, 3),
+            "exit_code": proc.returncode,
+            "stdout_bytes": len(stdout),
+            "requests": 0,
+        }
         try:
             out = json.loads(stdout or b"{}")
         except ValueError:
@@ -358,8 +473,12 @@ class TrustedTemplateSandbox:
 
 
 def _prlimit(pid: int, limits: Mapping[str, int]) -> None:
-    pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
-             "fsize": resource.RLIMIT_FSIZE}
+    pairs = {
+        "cpu": resource.RLIMIT_CPU,
+        "as": resource.RLIMIT_AS,
+        "nofile": resource.RLIMIT_NOFILE,
+        "fsize": resource.RLIMIT_FSIZE,
+    }
     # RLIMIT_NPROC is set by the child itself only: applied from here it could hit the ``unshare``
     # launcher before it forks the child (the limit counts every process of the host uid).
     for k, r in pairs.items():
@@ -371,11 +490,20 @@ def _prlimit(pid: int, limits: Mapping[str, int]) -> None:
 
 def _secretish(key: str) -> bool:
     k = key.upper()
-    return ("DATABASE" in k or (k.endswith("_URL") and "DB" in k) or any(
-        s in k for s in ("PASSWORD", "SECRET", "TOKEN", "API_KEY", "ACCESS_KEY", "PRIVATE"))
-        or (k.startswith("REVA_") and k.endswith("_KEY")))
+    return (
+        "DATABASE" in k
+        or (k.endswith("_URL") and "DB" in k)
+        or any(s in k for s in ("PASSWORD", "SECRET", "TOKEN", "API_KEY", "ACCESS_KEY", "PRIVATE"))
+        or (k.startswith("REVA_") and k.endswith("_KEY"))
+    )
 
 
 def trusted_template_policy(budget: Any, version: str = "sandbox-1.0.0") -> SandboxPolicy:
-    return SandboxPolicy(policy_version=version, isolation="trusted_template", network_hosts=TEMPLATE_HOSTS,
-                         writable_paths=(), secret_access=False, budget=budget)
+    return SandboxPolicy(
+        policy_version=version,
+        isolation="trusted_template",
+        network_hosts=TEMPLATE_HOSTS,
+        writable_paths=(),
+        secret_access=False,
+        budget=budget,
+    )

@@ -223,27 +223,42 @@ def benchmark_spec(fx: dict[str, Any], fidelity: str) -> dict[str, Any]:
         },
         "fidelity": fidelity,
         "missing_input_policy": "fail",
-        "outputs": ["import_value_change_usd", "export_value_change_usd", "net_external_cost_change_usd",
-                    "exposure_percent_baseline_gdp"],
+        "outputs": [
+            "import_value_change_usd",
+            "export_value_change_usd",
+            "net_external_cost_change_usd",
+            "exposure_percent_baseline_gdp",
+        ],
         "seed": 1729,
     }
 
 
 def _value_dicts(fx: dict[str, Any]) -> dict[str, dict[str, dict[str, Any]]]:
     tpl = fx["value_dict_template"]
-    return {iso3: {n: {**tpl, "basis": dict(tpl["basis"]), "value": v} for n, v in vals.items()}
-            for iso3, vals in fx["countries"].items()}
+    return {
+        iso3: {n: {**tpl, "basis": dict(tpl["basis"]), "value": v} for n, v in vals.items()}
+        for iso3, vals in fx["countries"].items()
+    }
 
 
 def _country_inputs(fx: dict[str, Any], vdicts: dict[str, dict[str, dict[str, Any]]], iso3: str) -> Any:
     from reva.models.economic import crude_exposure as ce
 
     year = fx["reference_year"]
-    return ce.CountryInputs(iso3, *(
-        ce.MonetaryInput.from_value_dict(n, vdicts[iso3][n], reference_year=year, aggregation=fx["aggregation"],
-                                         source_flags={"fixture": fx["fixture_id"]},
-                                         estimate_id=f"fixture:{iso3}:{n}")
-        for n in ("M", "X", "G")))
+    return ce.CountryInputs(
+        iso3,
+        *(
+            ce.MonetaryInput.from_value_dict(
+                n,
+                vdicts[iso3][n],
+                reference_year=year,
+                aggregation=fx["aggregation"],
+                source_flags={"fixture": fx["fixture_id"]},
+                estimate_id=f"fixture:{iso3}:{n}",
+            )
+            for n in ("M", "X", "G")
+        ),
+    )
 
 
 def model_core(fx: dict[str, Any], vdicts: dict[str, Any], fidelity: str) -> list[Any]:
@@ -256,14 +271,19 @@ def model_core(fx: dict[str, Any], vdicts: dict[str, Any], fidelity: str) -> lis
         grid = tuple((g["import_elasticity"], g["export_elasticity"]) for g in fx["l2_elasticity_grid"])
     out: list[Any] = []
     for iso3 in ("FRA", "DZA", "CHN", "USA"):
-        out += ce.evaluate_country(_country_inputs(fx, vdicts, iso3), reference_year=fx["reference_year"],
-                                   import_multiplier=p["import_multiplier"],
-                                   export_multiplier=p["export_multiplier"], elasticity_grid=grid)
+        out += ce.evaluate_country(
+            _country_inputs(fx, vdicts, iso3),
+            reference_year=fx["reference_year"],
+            import_multiplier=p["import_multiplier"],
+            export_multiplier=p["export_multiplier"],
+            elasticity_grid=grid,
+        )
     return out
 
 
-def engine_compute(fx: dict[str, Any], vdicts: dict[str, Any], spec_dict: dict[str, Any],
-                   *, validate_spec: bool) -> tuple[list[Any], str]:
+def engine_compute(
+    fx: dict[str, Any], vdicts: dict[str, Any], spec_dict: dict[str, Any], *, validate_spec: bool
+) -> tuple[list[Any], str]:
     """Tier 2/3: what the simulation job does between reading inputs and publishing, all in memory:
     (spec validation), intervention compilation, typed inputs, coupling schedule, L1/L2 rows, output digest."""
     from reva.cli.seed import entity_id
@@ -281,13 +301,21 @@ def engine_compute(fx: dict[str, Any], vdicts: dict[str, Any], spec_dict: dict[s
     for iso3 in spec.countries:
         inputs = _country_inputs(fx, vdicts, iso3)
         plan = CountryPlan(iso3, entity_id(iso3), "fixture", inputs)
-        plan.values = ce.validate_country_inputs(inputs, reference_year=spec.reference_year,
-                                                 horizon_periods=spec.horizon.periods,
-                                                 horizon_unit=spec.horizon.unit)
+        plan.values = ce.validate_country_inputs(
+            inputs,
+            reference_year=spec.reference_year,
+            horizon_periods=spec.horizon.periods,
+            horizon_unit=spec.horizon.unit,
+        )
         plans.append(plan)
     schedule = build_coupling(plans)
-    compiled = CompiledScenario(spec=spec, release={"id": spec.baseline_release_id, "origin": "test_fixture"},
-                                change=change, countries=plans, schedule=schedule)
+    compiled = CompiledScenario(
+        spec=spec,
+        release={"id": spec.baseline_release_id, "origin": "test_fixture"},
+        change=change,
+        countries=plans,
+        schedule=schedule,
+    )
     rows = engine.compute(compiled, spec.fidelity)
     return rows, engine.output_digest(rows)
 
@@ -306,7 +334,7 @@ def bench_simulation(repeats: int = 300, *, pin: bool = True) -> dict[str, Any]:
         "tiers": {
             "model_core": "4x crude_exposure.evaluate_country (typed input validation + Decimal L1/L2 math)",
             "engine": "intervention compile + typed inputs + coupling schedule + simulation.engine.compute rows "
-                      "(values, uncertainty, applicability) + output digest",
+            "(values, uncertainty, applicability) + output digest",
             "engine_with_spec_validation": "engine + ScenarioSpec JSON-Schema/scope validation",
         },
     }
@@ -320,8 +348,10 @@ def bench_simulation(repeats: int = 300, *, pin: bool = True) -> dict[str, Any]:
             for tier, fn in (
                 ("model_core", lambda f=fidelity: model_core(fx, vdicts, f)),
                 ("engine", lambda f=fidelity: engine_compute(fx, vdicts, specs[f], validate_spec=False)),
-                ("engine_with_spec_validation",
-                 lambda f=fidelity: engine_compute(fx, vdicts, specs[f], validate_spec=True)),
+                (
+                    "engine_with_spec_validation",
+                    lambda f=fidelity: engine_compute(fx, vdicts, specs[f], validate_spec=True),
+                ),
             ):
                 fn()  # warm
                 samples = []
@@ -369,15 +399,17 @@ async def _ingest(name: str, worker: Any, store: Any) -> None:
 
     c = builtin_connectors()[name]
     spec = c.describe()
-    rep = await run_connector(c, FixtureHttp(spec.name), store, worker, persist_cursor=False,
-                              post_publish=post_publish_for(spec.template))
+    rep = await run_connector(
+        c, FixtureHttp(spec.name), store, worker, persist_cursor=False, post_publish=post_publish_for(spec.template)
+    )
     if rep.errors:
         raise RuntimeError(f"fixture ingestion of {name} failed: {rep.errors}")
 
 
 @contextlib.contextmanager
-def perf_database(base: Any | None = None, *, label: str = "perf", keep: bool = False,
-                  object_root: Path | None = None) -> Iterator[PerfEnv]:
+def perf_database(
+    base: Any | None = None, *, label: str = "perf", keep: bool = False, object_root: Path | None = None
+) -> Iterator[PerfEnv]:
     """Fresh uniquely named database (never the dev DB): bootstrap, seed, ingest captured fixtures for
     worldbank + comtrade + naturalearth + crossref, publish a test_fixture release."""
     from sqlalchemy import create_engine, text
@@ -403,8 +435,15 @@ def perf_database(base: Any | None = None, *, label: str = "perf", keep: bool = 
         tmp = tempfile.mkdtemp(prefix="reva_perf_objects_")
         object_root = Path(tmp)
     url = base.migration_url().set(database=name).render_as_string(hide_password=False)
-    settings = Settings.model_validate({**base.model_dump(), "reva_migration_database_url": url,
-                                        "reva_db_name": name, "reva_env": "test", "reva_object_root": object_root})
+    settings = Settings.model_validate(
+        {
+            **base.model_dump(),
+            "reva_migration_database_url": url,
+            "reva_db_name": name,
+            "reva_env": "test",
+            "reva_object_root": object_root,
+        }
+    )
     engines: list[Any] = []
     try:
         for attempt in range(3):  # concurrent sessions may race on cluster-global role DDL
@@ -417,8 +456,11 @@ def perf_database(base: Any | None = None, *, label: str = "perf", keep: bool = 
                 time.sleep(1)
         store = FilesystemArtifactStore(object_root, settings.reva_s3_prefix)
         pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 0})
-        owner, worker, sim = make_engine("migration", settings), make_engine("worker", pooled), make_engine(
-            "sim", settings)
+        owner, worker, sim = (
+            make_engine("migration", settings),
+            make_engine("worker", pooled),
+            make_engine("sim", settings),
+        )
         engines = [owner, worker, sim]
         timings: dict[str, float] = {}
         t = time.perf_counter()
@@ -433,12 +475,22 @@ def perf_database(base: Any | None = None, *, label: str = "perf", keep: bool = 
         finally:
             loop.close()
         t = time.perf_counter()
-        rel = publish_release(worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
-                              environment="test")
+        rel = publish_release(worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test")
         timings["publish_release_s"] = time.perf_counter() - t
-        env = PerfEnv(settings, name, owner, worker, sim, store, rel.release_id, rel.estimates,
-                      time.perf_counter() - t_start, admin, keep,
-                      {k: round(v, 3) for k, v in timings.items()})
+        env = PerfEnv(
+            settings,
+            name,
+            owner,
+            worker,
+            sim,
+            store,
+            rel.release_id,
+            rel.estimates,
+            time.perf_counter() - t_start,
+            admin,
+            keep,
+            {k: round(v, 3) for k, v in timings.items()},
+        )
         yield env
     finally:
         for e in engines:
@@ -466,8 +518,10 @@ def create_api_token(env: PerfEnv, scopes: tuple[str, ...] = ("read",)) -> str:
 
     tok, sha = new_api_token()
     with env.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
-                  {"h": sha, "s": list(scopes), "l": "perf:benchmark"})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
+            {"h": sha, "s": list(scopes), "l": "perf:benchmark"},
+        )
     return tok
 
 
@@ -573,8 +627,9 @@ class ApiServer:
 
 
 @contextlib.contextmanager
-def api_server(settings: Any, *, pin: bool = True, cpu_fraction: float | None = None,
-               startup_timeout: float = 60.0) -> Iterator[ApiServer]:
+def api_server(
+    settings: Any, *, pin: bool = True, cpu_fraction: float | None = None, startup_timeout: float = 60.0
+) -> Iterator[ApiServer]:
     """Run ``uvicorn reva.api.app:app`` (one worker, as production) in a subprocess; optionally pinned to
     CPU 0 and throttled to ``cpu_fraction`` of that CPU after it is live."""
     import httpx
@@ -582,15 +637,28 @@ def api_server(settings: Any, *, pin: bool = True, cpu_fraction: float | None = 
     port = _free_port()
     workdir = tempfile.mkdtemp(prefix="reva_perf_api_")  # no .env in cwd: config comes from env only
     log_path = Path(workdir) / "api.log"
-    cmd = [sys.executable, "-m", "uvicorn", "reva.api.app:app", "--host", "127.0.0.1", "--port", str(port),
-           "--workers", "1", "--no-access-log", "--log-level", "warning", "--no-server-header"]
+    cmd = [
+        sys.executable,
+        "-m",
+        "uvicorn",
+        "reva.api.app:app",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        str(port),
+        "--workers",
+        "1",
+        "--no-access-log",
+        "--log-level",
+        "warning",
+        "--no-server-header",
+    ]
     taskset = shutil.which("taskset")
     use_pin = bool(pin and taskset and _cpu0())
     if use_pin and taskset:
         cmd = [taskset, "-c", str(sorted(_cpu0() or {0})[0]), *cmd]
     with open(log_path, "wb") as logf:
-        proc = subprocess.Popen(cmd, cwd=workdir, env=api_child_env(settings), stdout=logf,
-                                stderr=subprocess.STDOUT)
+        proc = subprocess.Popen(cmd, cwd=workdir, env=api_child_env(settings), stdout=logf, stderr=subprocess.STDOUT)
     base_url = f"http://127.0.0.1:{port}"
     server = ApiServer(proc, base_url, use_pin, workdir, log_path)
     try:
@@ -626,10 +694,13 @@ def provenance_estimate_id(env: PerfEnv) -> str:
     from sqlalchemy import text
 
     with env.owner.connect() as c:
-        eid = c.execute(text(
-            """SELECT e.id FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id
-               WHERE e.release_id = :r AND cv.concept_id = :c ORDER BY e.id LIMIT 1"""),
-            {"r": env.release_id, "c": POP}).scalar_one()
+        eid = c.execute(
+            text(
+                """SELECT e.id FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id
+               WHERE e.release_id = :r AND cv.concept_id = :c ORDER BY e.id LIMIT 1"""
+            ),
+            {"r": env.release_id, "c": POP},
+        ).scalar_one()
     return str(eid)
 
 
@@ -650,8 +721,9 @@ def endpoint_mix(estimate_id: str) -> tuple[dict[str, str], dict[str, str]]:
     return ordinary, cached
 
 
-def drive_load(base_url: str, token: str, paths: dict[str, str], *, clients: int, requests_per_client: int,
-               seed: int = 7) -> dict[str, Any]:
+def drive_load(
+    base_url: str, token: str, paths: dict[str, str], *, clients: int, requests_per_client: int, seed: int = 7
+) -> dict[str, Any]:
     """Closed-loop load: ``clients`` concurrent users, each issuing requests back to back (no think time)
     over a shuffled cycle of the endpoint mix. Latency = full request/response incl. body read."""
     import httpx
@@ -718,13 +790,23 @@ def warm_up(base_url: str, token: str, paths: dict[str, str]) -> dict[str, Any]:
         for n, p in paths.items():
             t = time.perf_counter()
             r = cl.get(p)
-            out[n] = {"status": r.status_code, "ms": round((time.perf_counter() - t) * 1000, 3),
-                      "bytes": len(r.content)}
+            out[n] = {
+                "status": r.status_code,
+                "ms": round((time.perf_counter() - t) * 1000, 3),
+                "bytes": len(r.content),
+            }
     return out
 
 
-def bench_api(env: PerfEnv, *, requests_per_client: int = 60, cached_requests_per_client: int = 40,
-              pin: bool = True, cpu_fraction: float | None = None, token: str | None = None) -> dict[str, Any]:
+def bench_api(
+    env: PerfEnv,
+    *,
+    requests_per_client: int = 60,
+    cached_requests_per_client: int = 40,
+    pin: bool = True,
+    cpu_fraction: float | None = None,
+    token: str | None = None,
+) -> dict[str, Any]:
     token = token or create_api_token(env)
     ordinary, cached = endpoint_mix(provenance_estimate_id(env))
     with api_server(env.settings, pin=pin, cpu_fraction=cpu_fraction) as srv:
@@ -734,16 +816,30 @@ def bench_api(env: PerfEnv, *, requests_per_client: int = 60, cached_requests_pe
             bad = {n: w for n, w in first.items() if w["status"] != 200}
             if bad:
                 raise RuntimeError(f"endpoints not healthy before load: {bad}")
-            load = drive_load(srv.base_url, token, ordinary, clients=CONCURRENT_USERS,
-                              requests_per_client=requests_per_client)
-            cached_load = drive_load(srv.base_url, token, cached, clients=CONCURRENT_USERS,
-                                     requests_per_client=cached_requests_per_client, seed=11)
+            load = drive_load(
+                srv.base_url, token, ordinary, clients=CONCURRENT_USERS, requests_per_client=requests_per_client
+            )
+            cached_load = drive_load(
+                srv.base_url,
+                token,
+                cached,
+                clients=CONCURRENT_USERS,
+                requests_per_client=cached_requests_per_client,
+                seed=11,
+            )
         rss_end = srv.status_kib()
         thr = srv.throttle
-        throttle_info = None if thr is None else {
-            "cpu_fraction": thr.fraction, "period_s": thr.period, "periods": thr.periods,
-            "throttled_periods": thr.throttled_periods,
-            "method": "SIGSTOP/SIGCONT quota emulation over /proc/<pid>/task/*/schedstat (not a cgroup)"}
+        throttle_info = (
+            None
+            if thr is None
+            else {
+                "cpu_fraction": thr.fraction,
+                "period_s": thr.period,
+                "periods": thr.periods,
+                "throttled_periods": thr.throttled_periods,
+                "method": "SIGSTOP/SIGCONT quota emulation over /proc/<pid>/task/*/schedstat (not a cgroup)",
+            }
+        )
         log_tail = srv.log_path.read_text(errors="replace")[-1500:] if srv.log_path.exists() else ""
     return {
         "server": {
@@ -751,7 +847,8 @@ def bench_api(env: PerfEnv, *, requests_per_client: int = 60, cached_requests_pe
             "pinned_to_cpu0_with_taskset": srv.pinned_cpu0,
             "cpu_throttle": throttle_info,
             "load_generator_cpus": sorted(client_cpus) if client_cpus else None,
-            "db_pool_size": 2, "db_max_overflow": 0,
+            "db_pool_size": 2,
+            "db_max_overflow": 0,
             "rss_after_start_mib": round(rss_after_start.get("VmRSS", 0) / 1024, 1),
             "rss_end_mib": round(rss_end.get("VmRSS", 0) / 1024, 1),
             "peak_rss_vmhwm_mib": round(rss_end.get("VmHWM", 0) / 1024, 1),
@@ -760,15 +857,18 @@ def bench_api(env: PerfEnv, *, requests_per_client: int = 60, cached_requests_pe
         "first_request_per_endpoint": first,
         "ordinary": load,
         "cached_metadata": cached_load,
-        "cached_metadata_note": ("/v1/ontology and /v1/sources are read from PostgreSQL on every request; the API "
-                                 "has no application-level cache for them, so these numbers are uncached "
-                                 "server-side latency."),
+        "cached_metadata_note": (
+            "/v1/ontology and /v1/sources are read from PostgreSQL on every request; the API "
+            "has no application-level cache for them, so these numbers are uncached "
+            "server-side latency."
+        ),
     }
 
 
 # =========================================================================== queue acknowledgement
-def bench_queue(env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, pin: bool = True,
-                timeout_s: float = 120.0) -> dict[str, Any]:
+def bench_queue(
+    env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, pin: bool = True, timeout_s: float = 120.0
+) -> dict[str, Any]:
     """Enqueue (committed) -> claim -> handler start with the real Worker loop in a thread and a no-op
     handler substituted for the ``health`` job type (restored afterwards)."""
     from reva.adapters.postgres import queue
@@ -790,8 +890,17 @@ def bench_queue(env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, 
         return noop if job_type == "health" else real_resolve(job_type)
 
     jobs.resolve_handler = resolve
-    w = Worker(env.settings, env.worker, env.store, env.sim, lease_seconds=60, heartbeat_seconds=5,
-               poll_interval=poll_interval, scheduler=False, job_types=["health"])
+    w = Worker(
+        env.settings,
+        env.worker,
+        env.store,
+        env.sim,
+        lease_seconds=60,
+        heartbeat_seconds=5,
+        poll_interval=poll_interval,
+        scheduler=False,
+        job_types=["health"],
+    )
     enq_to_start: list[float] = []
     enq_commit: list[float] = []
     rng = random.Random(3)
@@ -804,8 +913,9 @@ def bench_queue(env: PerfEnv, *, jobs_n: int = 40, poll_interval: float = 0.25, 
                 time.sleep(rng.uniform(0, poll_interval * 1.2))  # sample all phases of the poll cycle
                 t_begin = time.monotonic()
                 with env.worker.begin() as c:
-                    jid = queue.enqueue(c, "health", {"perf": i}, f"perf-ack-{uuid.uuid4().hex}",
-                                        created_by="perf:benchmark")
+                    jid = queue.enqueue(
+                        c, "health", {"perf": i}, f"perf-ack-{uuid.uuid4().hex}", created_by="perf:benchmark"
+                    )
                     started_ev[str(jid)] = threading.Event()
                 t_commit = time.monotonic()
                 enq_commit.append((t_commit - t_begin) * 1000)
@@ -872,8 +982,13 @@ def population_child(records: int) -> dict[str, Any]:
     )
 
     t0 = time.perf_counter()
-    recipe = build_recipe(_france_like_cells(), geography="FR-like-synthetic", reference_date=date(2024, 1, 1),
-                          source_ref={"dataset": "demo_pjan", "fixture": "synthetic"}, seed=11)
+    recipe = build_recipe(
+        _france_like_cells(),
+        geography="FR-like-synthetic",
+        reference_date=date(2024, 1, 1),
+        source_ref={"dataset": "demo_pjan", "fixture": "synthetic"},
+        seed=11,
+    )
     t1 = time.perf_counter()
     table = materialise(recipe, records)
     t2 = time.perf_counter()
@@ -889,9 +1004,14 @@ def population_child(records: int) -> dict[str, Any]:
         "records": table.num_rows,
         "exact_total_weight": exact,
         "calibration_max_abs_error": diag["calibration_error"]["joint_age_sex"]["max_abs_error"],
-        "stages_s": {"import": round(t0 - t_imp, 3), "recipe": round(t1 - t0, 3),
-                     "materialise": round(t2 - t1, 3), "table_hash": round(t3 - t2, 3),
-                     "parquet": round(t4 - t3, 3), "diagnose": round(t5 - t4, 3)},
+        "stages_s": {
+            "import": round(t0 - t_imp, 3),
+            "recipe": round(t1 - t0, 3),
+            "materialise": round(t2 - t1, 3),
+            "table_hash": round(t3 - t2, 3),
+            "parquet": round(t4 - t3, 3),
+            "diagnose": round(t5 - t4, 3),
+        },
         "compute_s": round(t5 - t0, 3),
         "parquet_bytes": len(data),
         "hash_prefix": digest[:12],
@@ -907,8 +1027,14 @@ def bench_population(records: int = 100_000, *, pin: bool = True) -> dict[str, A
     use_pin = bool(pin and taskset and _cpu0())
     if use_pin and taskset:
         cmd = [taskset, "-c", str(sorted(_cpu0() or {0})[0]), *cmd]
-    env = {**os.environ, "OMP_NUM_THREADS": "1", "OPENBLAS_NUM_THREADS": "1", "MKL_NUM_THREADS": "1",
-           "POLARS_MAX_THREADS": "1", "REVA_CPU_BUDGET_THREADS": "1"}
+    env = {
+        **os.environ,
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "POLARS_MAX_THREADS": "1",
+        "REVA_CPU_BUDGET_THREADS": "1",
+    }
     t0 = time.perf_counter()
     proc = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, cwd=str(REPO))
     # wait4 on this specific child: its own rusage (ru_maxrss in KiB on Linux), unaffected by other children.
@@ -938,30 +1064,52 @@ def evaluate(results: dict[str, Any]) -> dict[str, dict[str, Any]]:
 
     def add(key: str, value: float | None, how: str, suffix: str = "") -> None:
         lim = TARGETS[key]["limit"]
-        checks[key + suffix] = {"target": TARGETS[key]["text"], "limit": lim, "value": value, "measured_as": how,
-                       "status": "not_measured" if value is None else ("pass" if value < lim else "FAIL")}
+        checks[key + suffix] = {
+            "target": TARGETS[key]["text"],
+            "limit": lim,
+            "value": value,
+            "measured_as": how,
+            "status": "not_measured" if value is None else ("pass" if value < lim else "FAIL"),
+        }
 
     sim = results.get("simulation")
-    add("l1_four_country_ms", sim["L1"]["engine_with_spec_validation"]["p95_ms"] if sim else None,
-        "p95 of the in-memory four-country L1 engine path incl. spec validation (warm)")
-    for res_key, suffix, label in (("api", "", "API pinned to 1 full CPU"),
-                                   ("api_half_cpu", "@0.5cpu", f"API at {API_PLAN_CPU} CPU (emulated quota)")):
+    add(
+        "l1_four_country_ms",
+        sim["L1"]["engine_with_spec_validation"]["p95_ms"] if sim else None,
+        "p95 of the in-memory four-country L1 engine path incl. spec validation (warm)",
+    )
+    for res_key, suffix, label in (
+        ("api", "", "API pinned to 1 full CPU"),
+        ("api_half_cpu", "@0.5cpu", f"API at {API_PLAN_CPU} CPU (emulated quota)"),
+    ):
         api = results.get(res_key)
         if api is None and res_key == "api_half_cpu":
             continue
-        add("ordinary_api_p95_ms", api["ordinary"]["overall"]["p95_ms"] if api else None,
+        add(
+            "ordinary_api_p95_ms",
+            api["ordinary"]["overall"]["p95_ms"] if api else None,
             f"p95 over all requests of the ordinary endpoint mix, 5 closed-loop concurrent clients; {label}",
-            suffix)
-        add("cached_metadata_p95_ms", api["cached_metadata"]["overall"]["p95_ms"] if api else None,
-            f"p95 over /v1/ontology + /v1/sources, 5 closed-loop concurrent clients; {label}", suffix)
+            suffix,
+        )
+        add(
+            "cached_metadata_p95_ms",
+            api["cached_metadata"]["overall"]["p95_ms"] if api else None,
+            f"p95 over /v1/ontology + /v1/sources, 5 closed-loop concurrent clients; {label}",
+            suffix,
+        )
     q = results.get("queue")
-    add("queue_ack_p95_ms", q["enqueue_commit_to_handler_start"]["p95_ms"] if q else None,
-        "p95 enqueue-commit -> handler start (real Worker loop, 0.25 s poll)")
+    add(
+        "queue_ack_p95_ms",
+        q["enqueue_commit_to_handler_start"]["p95_ms"] if q else None,
+        "p95 enqueue-commit -> handler start (real Worker loop, 0.25 s poll)",
+    )
     pop = results.get("population")
-    add("population_100k_wall_s", pop["process_wall_s"] if pop else None,
-        "whole child process wall time incl. interpreter start and imports, pinned to 1 CPU")
-    add("population_100k_peak_rss_mib", pop["child_peak_rss_mib"] if pop else None,
-        "child ru_maxrss from wait4")
+    add(
+        "population_100k_wall_s",
+        pop["process_wall_s"] if pop else None,
+        "whole child process wall time incl. interpreter start and imports, pinned to 1 CPU",
+    )
+    add("population_100k_peak_rss_mib", pop["child_peak_rss_mib"] if pop else None, "child ru_maxrss from wait4")
     return checks
 
 
@@ -979,10 +1127,12 @@ def render_report(results: dict[str, Any]) -> str:
     L: list[str] = []
     L.append("# Performance measurements (architecture §20.3 targets)")
     L.append("")
-    L.append(f"Generated by `scripts/measure_performance.py` at {results['generated_at']} "
-             f"(machine-readable copy: `var/perf/perf_results.json`). **Single run on a development "
-             "container, not on the Render reference plans.** Regenerate with "
-             "`uv run python scripts/measure_performance.py`.")
+    L.append(
+        f"Generated by `scripts/measure_performance.py` at {results['generated_at']} "
+        f"(machine-readable copy: `var/perf/perf_results.json`). **Single run on a development "
+        "container, not on the Render reference plans.** Regenerate with "
+        "`uv run python scripts/measure_performance.py`."
+    )
     L.append("")
     L.append("## Results against targets")
     L.append("")
@@ -995,23 +1145,29 @@ def render_report(results: dict[str, Any]) -> str:
     L.append("")
     L.append("## Hardware actually used")
     L.append("")
-    L.append(f"- CPU: {hw.get('cpu_model')} — nproc {hw.get('nproc')}, affinity {hw.get('affinity_cpus')}, "
-             f"cgroup cpu.max `{hw.get('cgroup_cpu_max')}`")
+    L.append(
+        f"- CPU: {hw.get('cpu_model')} — nproc {hw.get('nproc')}, affinity {hw.get('affinity_cpus')}, "
+        f"cgroup cpu.max `{hw.get('cgroup_cpu_max')}`"
+    )
     L.append(f"- Memory: {hw.get('mem_total_mib')} MiB total, cgroup memory.max `{hw.get('cgroup_memory_max')}`")
     L.append(f"- Kernel {hw.get('kernel')}, Python {hw.get('python')}, PostgreSQL: {hw.get('postgres')}")
-    L.append(f"- Load average at start {hw.get('loadavg_at_start')}, at end {hw.get('loadavg_at_end')} "
-             "(other agents/processes share this machine)")
+    L.append(
+        f"- Load average at start {hw.get('loadavg_at_start')}, at end {hw.get('loadavg_at_end')} "
+        "(other agents/processes share this machine)"
+    )
     L.append(f"- taskset: {hw.get('taskset') or 'not available'}")
     L.append("")
     sim = results.get("simulation")
     if sim:
         L.append("## L1/L2 four-country numerical benchmark")
         L.append("")
-        L.append(f"Fixture `{sim['fixture']}` — origin `{sim['fixture_origin']}`, label "
-                 f"“{sim['fixture_label']}”. Synthetic values, never ingested; countries {sim['countries']}; "
-                 f"L2 grid {sim['l2_grid_points']} points. {sim['repeats']} timed repetitions per tier after one "
-                 f"warm-up call, measuring process pinned to CPUs {sim.get('pinned_cpus')}. Cold first call "
-                 f"(includes lazy imports and schema file read): {_fmt(sim['cold_first_call_l1_ms'])} ms.")
+        L.append(
+            f"Fixture `{sim['fixture']}` — origin `{sim['fixture_origin']}`, label "
+            f"“{sim['fixture_label']}”. Synthetic values, never ingested; countries {sim['countries']}; "
+            f"L2 grid {sim['l2_grid_points']} points. {sim['repeats']} timed repetitions per tier after one "
+            f"warm-up call, measuring process pinned to CPUs {sim.get('pinned_cpus')}. Cold first call "
+            f"(includes lazy imports and schema file read): {_fmt(sim['cold_first_call_l1_ms'])} ms."
+        )
         L.append("")
         L.append("| Fidelity | Tier | p50 ms | p95 ms | max ms |")
         L.append("|---|---|---:|---:|---:|")
@@ -1022,45 +1178,58 @@ def render_report(results: dict[str, Any]) -> str:
         L.append("")
         for tier, desc in sim["tiers"].items():
             L.append(f"- `{tier}`: {desc}")
-        L.append(f"- L1 rows {sim['L1']['result_rows']}, L2 rows {sim['L2']['result_rows']} "
-                 f"(variants {len(sim['L2']['variants'])}); excluded: DB reads of baseline estimates, "
-                 "queue, result publication.")
+        L.append(
+            f"- L1 rows {sim['L1']['result_rows']}, L2 rows {sim['L2']['result_rows']} "
+            f"(variants {len(sim['L2']['variants'])}); excluded: DB reads of baseline estimates, "
+            "queue, result publication."
+        )
         L.append("")
-    for res_key, heading in (("api", "API latency (5 concurrent users) — API pinned to one full CPU"),
-                             ("api_half_cpu", f"API latency (5 concurrent users) — API at {API_PLAN_CPU} CPU "
-                                              "(emulated Render plan quota)")):
+    for res_key, heading in (
+        ("api", "API latency (5 concurrent users) — API pinned to one full CPU"),
+        ("api_half_cpu", f"API latency (5 concurrent users) — API at {API_PLAN_CPU} CPU (emulated Render plan quota)"),
+    ):
         api = results.get(res_key)
         if not api:
             continue
         srv = api["server"]
         L.append(f"## {heading}")
         L.append("")
-        L.append(f"Fresh database `{results.get('database', {}).get('name')}` (bootstrap + seed + captured "
-                 f"fixtures for {', '.join(FIXTURE_CONNECTORS)} + `publish_release(origin=test_fixture)`, "
-                 f"{results.get('database', {}).get('estimates')} estimates). One Uvicorn worker in a subprocess, "
-                 f"pinned to CPU 0 with taskset: {srv['pinned_to_cpu0_with_taskset']}; load generator CPUs "
-                 f"{srv['load_generator_cpus']}; DB pool {srv['db_pool_size']}+{srv['db_max_overflow']} as in "
-                 "render.yaml. Bearer API token (read scope). Closed loop, no think time, warm-up excluded.")
+        L.append(
+            f"Fresh database `{results.get('database', {}).get('name')}` (bootstrap + seed + captured "
+            f"fixtures for {', '.join(FIXTURE_CONNECTORS)} + `publish_release(origin=test_fixture)`, "
+            f"{results.get('database', {}).get('estimates')} estimates). One Uvicorn worker in a subprocess, "
+            f"pinned to CPU 0 with taskset: {srv['pinned_to_cpu0_with_taskset']}; load generator CPUs "
+            f"{srv['load_generator_cpus']}; DB pool {srv['db_pool_size']}+{srv['db_max_overflow']} as in "
+            "render.yaml. Bearer API token (read scope). Closed loop, no think time, warm-up excluded."
+        )
         thr = srv.get("cpu_throttle")
         if thr:
-            L.append(f"CPU quota emulation: {thr['cpu_fraction']} CPU per {thr['period_s']} s period, "
-                     f"{thr['throttled_periods']}/{thr['periods']} periods throttled; {thr['method']}.")
+            L.append(
+                f"CPU quota emulation: {thr['cpu_fraction']} CPU per {thr['period_s']} s period, "
+                f"{thr['throttled_periods']}/{thr['periods']} periods throttled; {thr['method']}."
+            )
         L.append("")
         for title, key in (("Ordinary endpoint mix", "ordinary"), ("Cached metadata endpoints", "cached_metadata")):
             d = api[key]
-            L.append(f"### {title}: {d['requests']} requests in {d['wall_s']} s "
-                     f"({d['throughput_rps']} req/s), errors {d['error_count']}")
+            L.append(
+                f"### {title}: {d['requests']} requests in {d['wall_s']} s "
+                f"({d['throughput_rps']} req/s), errors {d['error_count']}"
+            )
             L.append("")
             L.append("| Endpoint | n | p50 ms | p95 ms | max ms |")
             L.append("|---|---:|---:|---:|---:|")
             for n, s in d["per_endpoint"].items():
-                L.append(f"| `{s['path']}` ({n}) | {s['n']} | {_fmt(s['p50_ms'])} | {_fmt(s['p95_ms'])} | "
-                         f"{_fmt(s['max_ms'])} |")
+                L.append(
+                    f"| `{s['path']}` ({n}) | {s['n']} | {_fmt(s['p50_ms'])} | {_fmt(s['p95_ms'])} | "
+                    f"{_fmt(s['max_ms'])} |"
+                )
             o = d["overall"]
             L.append(f"| **overall** | {o['n']} | {_fmt(o['p50_ms'])} | {_fmt(o['p95_ms'])} | {_fmt(o['max_ms'])} |")
             L.append("")
-        L.append(f"API process RSS: {srv['rss_after_start_mib']} MiB after start, {srv['rss_end_mib']} MiB at end, "
-                 f"peak (VmHWM) {srv['peak_rss_vmhwm_mib']} MiB (Render API plan: 512 MB).")
+        L.append(
+            f"API process RSS: {srv['rss_after_start_mib']} MiB after start, {srv['rss_end_mib']} MiB at end, "
+            f"peak (VmHWM) {srv['peak_rss_vmhwm_mib']} MiB (Render API plan: 512 MB)."
+        )
         L.append("")
         L.append(f"Note: {api['cached_metadata_note']}")
         L.append("")
@@ -1068,9 +1237,11 @@ def render_report(results: dict[str, Any]) -> str:
     if q:
         L.append("## Worker queue acknowledgement")
         L.append("")
-        L.append(f"{q['jobs']} `health` jobs enqueued one at a time at random offsets within the poll cycle; "
-                 f"{q['worker']}; poll interval {q['poll_interval_s']} s; no-op handler substituted in-process "
-                 f"(restored afterwards); pinned CPUs {q['pinned_cpus']}. Outcomes: {q['outcomes']}.")
+        L.append(
+            f"{q['jobs']} `health` jobs enqueued one at a time at random offsets within the poll cycle; "
+            f"{q['worker']}; poll interval {q['poll_interval_s']} s; no-op handler substituted in-process "
+            f"(restored afterwards); pinned CPUs {q['pinned_cpus']}. Outcomes: {q['outcomes']}."
+        )
         L.append("")
         L.append("| Interval | p50 ms | p95 ms | max ms |")
         L.append("|---|---:|---:|---:|")
@@ -1083,38 +1254,58 @@ def render_report(results: dict[str, Any]) -> str:
         ch = pop["child"]
         L.append("## Population: 100k demographic records")
         L.append("")
-        L.append(f"Synthetic France-like age×sex leaf set (demo_pjan layout, random counts — not observed data), "
-                 f"`reva.population` recipe → materialise {pop['records']:,} records → logical hash → Parquet → "
-                 f"diagnostics, in a child process pinned with taskset: {pop['pinned_with_taskset']} "
-                 f"(affinity seen by child {ch.get('affinity')}).")
+        L.append(
+            f"Synthetic France-like age×sex leaf set (demo_pjan layout, random counts — not observed data), "
+            f"`reva.population` recipe → materialise {pop['records']:,} records → logical hash → Parquet → "
+            f"diagnostics, in a child process pinned with taskset: {pop['pinned_with_taskset']} "
+            f"(affinity seen by child {ch.get('affinity')})."
+        )
         L.append("")
-        L.append(f"- Process wall time {pop['process_wall_s']} s ({pop['process_wall_includes']}); in-process compute "
-                 f"{ch['compute_s']} s; stages {ch['stages_s']}")
-        L.append(f"- Peak RSS {pop['child_peak_rss_mib']} MiB (wait4 ru_maxrss; child VmHWM {ch['self_vmhwm_mib']} "
-                 f"MiB); CPU user {pop['child_user_cpu_s']} s, sys {pop['child_sys_cpu_s']} s")
-        L.append(f"- Exact total weight {ch['exact_total_weight']}; joint age×sex calibration max abs error "
-                 f"{ch['calibration_max_abs_error']}; Parquet {ch['parquet_bytes']:,} bytes")
+        L.append(
+            f"- Process wall time {pop['process_wall_s']} s ({pop['process_wall_includes']}); in-process compute "
+            f"{ch['compute_s']} s; stages {ch['stages_s']}"
+        )
+        L.append(
+            f"- Peak RSS {pop['child_peak_rss_mib']} MiB (wait4 ru_maxrss; child VmHWM {ch['self_vmhwm_mib']} "
+            f"MiB); CPU user {pop['child_user_cpu_s']} s, sys {pop['child_sys_cpu_s']} s"
+        )
+        L.append(
+            f"- Exact total weight {ch['exact_total_weight']}; joint age×sex calibration max abs error "
+            f"{ch['calibration_max_abs_error']}; Parquet {ch['parquet_bytes']:,} bytes"
+        )
         L.append("")
     L.append("## Caveats (read before citing these numbers)")
     L.append("")
-    L.append("- **Not the reference hardware.** Render plans are API 0.5 CPU/512 MB, worker 1 CPU/2 GB and "
-             "PostgreSQL 0.1 CPU/256 MB. Here `taskset -c 0` gives the API and the measured processes one *full* "
-             "core; the API is additionally measured under an emulated 0.5 CPU quota (SIGSTOP/SIGCONT, not a "
-             "cgroup, so throttling granularity differs from Render's), memory is not capped (no cgroup limit "
-             "was applied; the 2 GiB budget is checked only against measured peak RSS), and PostgreSQL runs in "
-             "a local Docker container with unconstrained CPU on the same host and no network latency. Expect "
-             "slower API/DB numbers on Render.")
-    L.append("- **Single run.** Percentiles come from one measurement session on a shared machine where other "
-             "processes (parallel agents, test suites) were running; see the load averages above.")
-    L.append("- **Small data.** The database holds only captured test fixtures (four countries, few concepts), "
-             "so query latencies do not reflect a larger live corpus.")
-    L.append("- **Cached metadata is not cached.** No application/HTTP cache exists for `/v1/ontology` or "
-             "`/v1/sources`; the measured values are server-side uncached latency (an upper bound for a cached path).")
-    L.append("- **Four-country numbers are synthetic.** The labelled benchmark fixture is used only for the "
-             "numerical timing; the live scenario uses the three verified countries (DZA crude flows are typed "
-             "Missing in live data).")
-    L.append("- **Queue acknowledgement** is measured for an idle worker with concurrency 1; with a long job "
-             "occupying the only slot, acknowledgement waits for that job (by design).")
+    L.append(
+        "- **Not the reference hardware.** Render plans are API 0.5 CPU/512 MB, worker 1 CPU/2 GB and "
+        "PostgreSQL 0.1 CPU/256 MB. Here `taskset -c 0` gives the API and the measured processes one *full* "
+        "core; the API is additionally measured under an emulated 0.5 CPU quota (SIGSTOP/SIGCONT, not a "
+        "cgroup, so throttling granularity differs from Render's), memory is not capped (no cgroup limit "
+        "was applied; the 2 GiB budget is checked only against measured peak RSS), and PostgreSQL runs in "
+        "a local Docker container with unconstrained CPU on the same host and no network latency. Expect "
+        "slower API/DB numbers on Render."
+    )
+    L.append(
+        "- **Single run.** Percentiles come from one measurement session on a shared machine where other "
+        "processes (parallel agents, test suites) were running; see the load averages above."
+    )
+    L.append(
+        "- **Small data.** The database holds only captured test fixtures (four countries, few concepts), "
+        "so query latencies do not reflect a larger live corpus."
+    )
+    L.append(
+        "- **Cached metadata is not cached.** No application/HTTP cache exists for `/v1/ontology` or "
+        "`/v1/sources`; the measured values are server-side uncached latency (an upper bound for a cached path)."
+    )
+    L.append(
+        "- **Four-country numbers are synthetic.** The labelled benchmark fixture is used only for the "
+        "numerical timing; the live scenario uses the three verified countries (DZA crude flows are typed "
+        "Missing in live data)."
+    )
+    L.append(
+        "- **Queue acknowledgement** is measured for an idle worker with concurrency 1; with a long job "
+        "occupying the only slot, acknowledgement waits for that job (by design)."
+    )
     L.append("")
     return "\n".join(L) + "\n"
 
@@ -1130,8 +1321,16 @@ def postgres_version(env: PerfEnv | None) -> str | None:
     return f"{str(v).split(',')[0]}; PostGIS {pg}"
 
 
-def run_all(only: set[str], *, requests_per_client: int, cached_requests_per_client: int, queue_jobs: int,
-            sim_repeats: int, records: int, keep_db: bool) -> dict[str, Any]:
+def run_all(
+    only: set[str],
+    *,
+    requests_per_client: int,
+    cached_requests_per_client: int,
+    queue_jobs: int,
+    sim_repeats: int,
+    records: int,
+    keep_db: bool,
+) -> dict[str, Any]:
     results: dict[str, Any] = {
         "schema": "reva.perf_results.v1",
         "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),
@@ -1149,18 +1348,31 @@ def run_all(only: set[str], *, requests_per_client: int, cached_requests_per_cli
     if only & {"api", "queue"}:
         print("[perf] building fresh database (bootstrap + seed + fixture ingest + release) ...", flush=True)
         with perf_database(keep=keep_db) as env:
-            results["database"] = {"name": env.name, "estimates": env.estimates, "setup_s": round(env.setup_seconds, 3),
-                                   "timings": env.timings, "kept": keep_db}
+            results["database"] = {
+                "name": env.name,
+                "estimates": env.estimates,
+                "setup_s": round(env.setup_seconds, 3),
+                "timings": env.timings,
+                "kept": keep_db,
+            }
             results["hardware"]["postgres"] = postgres_version(env)
             if "api" in only:
                 token = create_api_token(env)
                 print("[perf] api: 5 concurrent clients, API pinned to 1 CPU ...", flush=True)
-                results["api"] = bench_api(env, requests_per_client=requests_per_client,
-                                           cached_requests_per_client=cached_requests_per_client, token=token)
+                results["api"] = bench_api(
+                    env,
+                    requests_per_client=requests_per_client,
+                    cached_requests_per_client=cached_requests_per_client,
+                    token=token,
+                )
                 print(f"[perf] api: 5 concurrent clients, API at {API_PLAN_CPU} CPU (emulated) ...", flush=True)
-                results["api_half_cpu"] = bench_api(env, requests_per_client=requests_per_client,
-                                                    cached_requests_per_client=cached_requests_per_client,
-                                                    cpu_fraction=API_PLAN_CPU, token=token)
+                results["api_half_cpu"] = bench_api(
+                    env,
+                    requests_per_client=requests_per_client,
+                    cached_requests_per_client=cached_requests_per_client,
+                    cpu_fraction=API_PLAN_CPU,
+                    token=token,
+                )
             if "queue" in only:
                 print("[perf] queue: enqueue -> handler start ...", flush=True)
                 results["queue"] = bench_queue(env, jobs_n=queue_jobs)
@@ -1174,8 +1386,11 @@ def main(argv: list[str] | None = None) -> int:
     sub = ap.add_subparsers(dest="cmd")
     child = sub.add_parser("_population-child", help=argparse.SUPPRESS)
     child.add_argument("--records", type=int, default=100_000)
-    ap.add_argument("--only", default="simulation,api,queue,population",
-                    help="comma-separated subset of simulation,api,queue,population")
+    ap.add_argument(
+        "--only",
+        default="simulation,api,queue,population",
+        help="comma-separated subset of simulation,api,queue,population",
+    )
     ap.add_argument("--requests-per-client", type=int, default=80)
     ap.add_argument("--cached-requests-per-client", type=int, default=60)
     ap.add_argument("--queue-jobs", type=int, default=40)
@@ -1193,9 +1408,15 @@ def main(argv: list[str] | None = None) -> int:
     unknown = only - {"simulation", "api", "queue", "population"}
     if unknown:
         ap.error(f"unknown measurement(s): {sorted(unknown)}")
-    results = run_all(only, requests_per_client=args.requests_per_client,
-                      cached_requests_per_client=args.cached_requests_per_client, queue_jobs=args.queue_jobs,
-                      sim_repeats=args.sim_repeats, records=args.records, keep_db=args.keep_db)
+    results = run_all(
+        only,
+        requests_per_client=args.requests_per_client,
+        cached_requests_per_client=args.cached_requests_per_client,
+        queue_jobs=args.queue_jobs,
+        sim_repeats=args.sim_repeats,
+        records=args.records,
+        keep_db=args.keep_db,
+    )
     args.json.parent.mkdir(parents=True, exist_ok=True)
     args.json.write_text(json.dumps(results, indent=2, default=str) + "\n")
     print(f"[perf] wrote {args.json}")

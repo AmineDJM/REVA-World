@@ -22,8 +22,12 @@ from reva.ports.connectors import FetchBudget
 from reva.simulation.plugins import InputRequirement, ResolvedInputs
 
 ROOT = Path(__file__).resolve().parents[2] / "fixtures"
-TABLE_OF = {"employment_rate": "lfsa_ergan", "activity_rate": "lfsa_argan", "pension_beneficiaries": "spr_pns_ben",
-            "pension_expenditure": "spr_exp_pens"}
+TABLE_OF = {
+    "employment_rate": "lfsa_ergan",
+    "activity_rate": "lfsa_argan",
+    "pension_beneficiaries": "spr_pns_ben",
+    "pension_expenditure": "spr_exp_pens",
+}
 DEMO_OF = {"population": "demo_pjan", "deaths": "demo_magec", "births": "demo_fasec"}
 
 
@@ -61,6 +65,8 @@ def resolved_inputs(requirements: list[InputRequirement], drop: tuple[tuple[str,
     for r in requirements:
         t = tables_for(r.subject).get(r.name)
         if t is not None and (r.name, r.subject) not in drop:
-            datasets[(r.name, r.subject)] = (t, {"dataset_id": f"fixture:{r.name}:{r.subject}",
-                                                 "concept": CONCEPTS[r.name]})
+            datasets[(r.name, r.subject)] = (
+                t,
+                {"dataset_id": f"fixture:{r.name}:{r.subject}", "concept": CONCEPTS[r.name]},
+            )
     return ResolvedInputs.from_values(requirements, datasets=datasets, release={"id": "fixture-release"})

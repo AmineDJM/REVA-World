@@ -58,9 +58,7 @@ def test_interval_kinds_require_a_level(kind):
 
 
 def test_probability_kind_is_probabilistic():
-    p = UncertaintySpec(
-        status=Q, kind=UncertaintyKind.probability, description="p", method_version="m@1"
-    )
+    p = UncertaintySpec(status=Q, kind=UncertaintyKind.probability, description="p", method_version="m@1")
     assert p.is_probabilistic
 
 
@@ -82,13 +80,9 @@ def test_kinds_are_distinct_values_and_not_interchangeable():
 
 def test_quantified_requires_method_version_and_concrete_kind():
     with pytest.raises(ValidationError):
-        UncertaintySpec(
-            status=Q, kind=UncertaintyKind.prediction_interval, description="x", level=0.8
-        )
+        UncertaintySpec(status=Q, kind=UncertaintyKind.prediction_interval, description="x", level=0.8)
     with pytest.raises(ValidationError):
-        UncertaintySpec(
-            status=Q, kind=UncertaintyKind.unknown, description="x", method_version="m@1"
-        )
+        UncertaintySpec(status=Q, kind=UncertaintyKind.unknown, description="x", method_version="m@1")
     with pytest.raises(ValidationError):
         UncertaintySpec(
             status=UncertaintyStatus.unquantified,

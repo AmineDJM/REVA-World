@@ -112,8 +112,9 @@ class BodySizeLimit:
         await self.app(scope, limited, send)
 
     async def _reject(self, scope: Scope, receive: Receive, send: Send) -> None:
-        problem = ApiProblem(413, "payload_too_large", f"request body larger than {self.max_bytes} bytes",
-                             max_bytes=self.max_bytes).problem()
+        problem = ApiProblem(
+            413, "payload_too_large", f"request body larger than {self.max_bytes} bytes", max_bytes=self.max_bytes
+        ).problem()
         await problem_response(Request(scope), problem, {"Connection": "close"})(scope, receive, send)
 
 
@@ -172,8 +173,7 @@ def create_app(
     production = settings.reva_env == "production"
     if "*" in settings.cors_origins:
         # Starlette reflects any Origin for allow_origins=["*"] with credentials: never allow it.
-        raise ConfigurationError("REVA_CORS_ORIGINS must list explicit origins, not '*'",
-                                 source="REVA_CORS_ORIGINS")
+        raise ConfigurationError("REVA_CORS_ORIGINS must list explicit origins, not '*'", source="REVA_CORS_ORIGINS")
     ui_dir = static_dir or STATIC_DIR
     engine = _lazy_engine(settings)
 
@@ -208,9 +208,19 @@ def create_app(
 
     install_error_handlers(app)
 
-    for r in (system.health_router, system.session_router, system.jobs_router, system.metrics_router,
-              world.router, evidence.router, beliefs.router, provenance.router, catalog.router, sim.router,
-              sim.query_router):
+    for r in (
+        system.health_router,
+        system.session_router,
+        system.jobs_router,
+        system.metrics_router,
+        world.router,
+        evidence.router,
+        beliefs.router,
+        provenance.router,
+        catalog.router,
+        sim.router,
+        sim.query_router,
+    ):
         app.include_router(r)
     app.include_router(__import__("reva.api.routes.nl", fromlist=["router"]).router)  # V2 NL drafts (agent NLC)
 
@@ -232,8 +242,17 @@ def create_app(
         h = response.headers
         h["X-Request-ID"] = rid
         apply_security_headers(h, request.url.path, production)
-        log.info(json.dumps({"request_id": rid, "method": request.method, "route": route,
-                             "status": response.status_code, "ms": round(ms, 2)}))
+        log.info(
+            json.dumps(
+                {
+                    "request_id": rid,
+                    "method": request.method,
+                    "route": route,
+                    "status": response.status_code,
+                    "ms": round(ms, 2),
+                }
+            )
+        )
         return response
 
     if settings.cors_origins:
@@ -249,6 +268,7 @@ def create_app(
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=settings.allowed_hosts or ["localhost"])
 
     if production:
+
         @app.get("/openapi.json", include_in_schema=False, dependencies=[Depends(require_scope("read"))])
         def openapi_authenticated() -> JSONResponse:
             return JSONResponse(app.openapi())
@@ -258,9 +278,15 @@ def create_app(
         index = ui_dir / "index.html"
         if index.is_file():
             return FileResponse(index, headers={"Cache-Control": "no-cache"})
-        return JSONResponse({"service": "reva-world-api", "api": "/v1", "health": "/health/ready",
-                             "openapi": "/openapi.json" + (" (authenticated)" if production else ""),
-                             "ui": "not built (src/reva/api/static/index.html absent)"})
+        return JSONResponse(
+            {
+                "service": "reva-world-api",
+                "api": "/v1",
+                "health": "/health/ready",
+                "openapi": "/openapi.json" + (" (authenticated)" if production else ""),
+                "ui": "not built (src/reva/api/static/index.html absent)",
+            }
+        )
 
     @app.get("/{path:path}", include_in_schema=False)
     def spa(path: str) -> Response:
@@ -275,8 +301,10 @@ def create_app(
             is_file = candidate.is_file()
         except (ValueError, OSError):  # NUL byte, over-long name, ...: never a static file
             raise NotFound("no such endpoint") from None
-        if candidate.is_relative_to(root_dir) and is_file and not any(
-            part.startswith(".") for part in candidate.relative_to(root_dir).parts
+        if (
+            candidate.is_relative_to(root_dir)
+            and is_file
+            and not any(part.startswith(".") for part in candidate.relative_to(root_dir).parts)
         ):
             cache = "public, max-age=31536000, immutable" if "/assets/" in f"/{path}" else "no-cache"
             return FileResponse(candidate, headers={"Cache-Control": cache})

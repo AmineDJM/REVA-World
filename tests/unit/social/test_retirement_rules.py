@@ -68,14 +68,26 @@ def test_overlapping_rows_and_agent_review_claims_are_refused() -> None:
         rl.parse_rule_table(reviewed)
 
 
-@pytest.mark.parametrize(("path", "birth", "months"), [
-    ("law_in_force_2026", (1951, 6), 720), ("law_in_force_2026", (1951, 7), 724), ("law_in_force_2026", (1952, 3), 729),
-    ("law_in_force_2026", (1955, 1), 744), ("law_in_force_2026", (1961, 8), 744), ("law_in_force_2026", (1961, 9), 747),
-    ("law_in_force_2026", (1964, 5), 753), ("law_in_force_2026", (1965, 3), 753), ("law_in_force_2026", (1965, 4), 756),
-    ("law_in_force_2026", (1968, 12), 765), ("law_in_force_2026", (1980, 1), 768),
-    ("law_2023_as_enacted", (1964, 5), 756), ("law_2023_as_enacted", (1968, 1), 768),
-    ("law_2010_as_amended_2011", (1970, 1), 744), ("pre_2010_counterfactual", (1970, 1), 720),
-])
+@pytest.mark.parametrize(
+    ("path", "birth", "months"),
+    [
+        ("law_in_force_2026", (1951, 6), 720),
+        ("law_in_force_2026", (1951, 7), 724),
+        ("law_in_force_2026", (1952, 3), 729),
+        ("law_in_force_2026", (1955, 1), 744),
+        ("law_in_force_2026", (1961, 8), 744),
+        ("law_in_force_2026", (1961, 9), 747),
+        ("law_in_force_2026", (1964, 5), 753),
+        ("law_in_force_2026", (1965, 3), 753),
+        ("law_in_force_2026", (1965, 4), 756),
+        ("law_in_force_2026", (1968, 12), 765),
+        ("law_in_force_2026", (1980, 1), 768),
+        ("law_2023_as_enacted", (1964, 5), 756),
+        ("law_2023_as_enacted", (1968, 1), 768),
+        ("law_2010_as_amended_2011", (1970, 1), 744),
+        ("pre_2010_counterfactual", (1970, 1), 720),
+    ],
+)
 def test_france_minimum_ages_match_the_law(path: str, birth: tuple[int, int], months: int) -> None:
     t = rl.load_rule_table("FRA")
     assert t.age_months_at(path, "minimum_pension_age", birth[0], birth[1], 2030) == months
@@ -102,8 +114,11 @@ def test_ineligible_share_is_exact_and_bounded() -> None:
     for y in range(2010, 2021):
         for a in range(55, 70):
             s = rl.ineligible_share_single_age(p, y, a)
-            assert isinstance(s, Fraction) and 0 <= s <= 1 and s.denominator in (1, 2, 3, 4, 6, 8, 9, 12, 16, 18, 24,
-                                                                                    36, 48, 72, 144)
+            assert (
+                isinstance(s, Fraction)
+                and 0 <= s <= 1
+                and s.denominator in (1, 2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 36, 48, 72, 144)
+            )
             assert rl.ineligible_share_single_age(ref, y, a) == (1 if a < 60 else 0)
     assert rl.ineligible_share(p, 2019, range(60, 65)) == Fraction(2, 5)  # ages 60 and 61 fully below 62
     assert rl.ineligible_share(p, 2011, range(60, 65)) > 0
@@ -115,7 +130,8 @@ def test_shift_path_is_monotone_in_the_shift() -> None:
     vals = [rl.ineligible_share(rl.ShiftedPath(base, m, 1970, 0), 2038, range(55, 70)) for m in (6, 12, 24)]
     assert vals[0] < vals[1] < vals[2]
     assert rl.ineligible_share(rl.ShiftedPath(base, 12, 1990, 0), 2038, range(55, 70)) == rl.ineligible_share(
-        base, 2038, range(55, 70))  # cohorts born 1990 are under 55 in 2038
+        base, 2038, range(55, 70)
+    )  # cohorts born 1990 are under 55 in 2038
     with pytest.raises(ValidationProblem):
         rl.ShiftedPath(base, 0, 1970)
 

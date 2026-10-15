@@ -86,9 +86,11 @@ def list_entities(
     if q:
         pattern = "%" + q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
     with read_conn(request) as conn:
-        rows = [dict(r) for r in conn.execute(
-            text(
-                r"""SELECT e.id, e.label, c.concept_id AS kind, e.namespace, e.referent_mode,
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(
+                    r"""SELECT e.id, e.label, c.concept_id AS kind, e.namespace, e.referent_mode,
                        (SELECT count(*) FROM world.alias a WHERE a.entity_id = e.id) AS alias_count
                 FROM world.entity e JOIN ontology.concept_version c ON c.id = e.kind_concept_id
                 WHERE (CAST(:kind AS text) IS NULL OR c.concept_id = :kind)
@@ -99,99 +101,174 @@ def list_entities(
                           AND (CAST(:ak AS text) IS NULL OR a.external_key = :ak)))
                   AND (CAST(:c0 AS text) IS NULL OR (e.label, e.id) > (CAST(:c0 AS text), CAST(:c1 AS uuid)))
                 ORDER BY e.label, e.id LIMIT :lim"""
-            ),
-            {"kind": kind, "mode": referent_mode, "pat": pattern, "ap": alias_provider, "ak": alias_key,
-             "c0": cur[0] if cur else None, "c1": cur[1] if cur else None, "lim": limit + 1},
-        ).mappings()]
+                ),
+                {
+                    "kind": kind,
+                    "mode": referent_mode,
+                    "pat": pattern,
+                    "ap": alias_provider,
+                    "ak": alias_key,
+                    "c0": cur[0] if cur else None,
+                    "c1": cur[1] if cur else None,
+                    "lim": limit + 1,
+                },
+            ).mappings()
+        ]
     rows, nxt = page(rows, limit, lambda r: (r["label"], r["id"]))
     return s.EntityListResponse(
-        data=[s.EntitySummary(**r) for r in rows], context_mode="registry", origin="none", modality="metadata",
-        cost=t.cost(len(rows)), next_cursor=nxt,
+        data=[s.EntitySummary(**r) for r in rows],
+        context_mode="registry",
+        origin="none",
+        modality="metadata",
+        cost=t.cost(len(rows)),
+        next_cursor=nxt,
     )
 
 
-@router.get("/entities/{entity_ref}", response_model=s.EntityDetailResponse,
-            responses={404: {"model": s.Problem}})
+@router.get("/entities/{entity_ref}", response_model=s.EntityDetailResponse, responses={404: {"model": s.Problem}})
 def get_entity(entity_ref: str, request: Request) -> s.EntityDetailResponse:
     t = Timer()
     with read_conn(request) as conn:
         eid = resolve_entity(conn, entity_ref)
-        ent = conn.execute(
-            text("""SELECT e.id, e.label, c.concept_id AS kind, e.namespace, e.referent_mode, e.recorded_at
+        ent = (
+            conn.execute(
+                text("""SELECT e.id, e.label, c.concept_id AS kind, e.namespace, e.referent_mode, e.recorded_at
                     FROM world.entity e JOIN ontology.concept_version c ON c.id = e.kind_concept_id
-                    WHERE e.id = :i"""), {"i": eid},
-        ).mappings().one()
-        aliases = [s.Alias(provider=a["provider"], external_key=a["external_key"],
-                           confidence_kind=a["confidence_kind"], mapping_version=a["mapping_version"],
-                           valid_range=str(a["valid_range"]) if a["valid_range"] is not None else None)
-                   for a in conn.execute(text(
-                       "SELECT * FROM world.alias WHERE entity_id = :i ORDER BY provider, external_key"),
-                       {"i": eid}).mappings()]
+                    WHERE e.id = :i"""),
+                {"i": eid},
+            )
+            .mappings()
+            .one()
+        )
+        aliases = [
+            s.Alias(
+                provider=a["provider"],
+                external_key=a["external_key"],
+                confidence_kind=a["confidence_kind"],
+                mapping_version=a["mapping_version"],
+                valid_range=str(a["valid_range"]) if a["valid_range"] is not None else None,
+            )
+            for a in conn.execute(
+                text("SELECT * FROM world.alias WHERE entity_id = :i ORDER BY provider, external_key"), {"i": eid}
+            ).mappings()
+        ]
         comps: list[s.EntityComponent] = []
-        for r in conn.execute(text(
-            """SELECT c.concept_id, count(*) AS n, min(sp.temporal_extent->>'start') AS first,
+        for r in conn.execute(
+            text(
+                """SELECT c.concept_id, count(*) AS n, min(sp.temporal_extent->>'start') AS first,
                       max(sp.temporal_extent->>'start') AS last
                FROM evidence.observation o JOIN ontology.concept_version c ON c.id = o.concept_version_id
                JOIN world.support sp ON sp.id = o.support_id
-               WHERE o.subject_id = :i GROUP BY c.concept_id ORDER BY c.concept_id"""), {"i": eid}).mappings():
-            comps.append(s.EntityComponent(component="observations", concept_id=r["concept_id"], count=r["n"],
-                                           first_period=r["first"], last_period=r["last"]))
+               WHERE o.subject_id = :i GROUP BY c.concept_id ORDER BY c.concept_id"""
+            ),
+            {"i": eid},
+        ).mappings():
+            comps.append(
+                s.EntityComponent(
+                    component="observations",
+                    concept_id=r["concept_id"],
+                    count=r["n"],
+                    first_period=r["first"],
+                    last_period=r["last"],
+                )
+            )
         latest = release_as_of(conn, None)
         if latest:
-            for r in conn.execute(text(
-                """SELECT c.concept_id, count(*) AS n, min(sp.temporal_extent->>'start') AS first,
+            for r in conn.execute(
+                text(
+                    """SELECT c.concept_id, count(*) AS n, min(sp.temporal_extent->>'start') AS first,
                           max(sp.temporal_extent->>'start') AS last
                    FROM belief.estimate e JOIN ontology.concept_version c ON c.id = e.concept_version_id
                    JOIN world.support sp ON sp.id = e.support_id
-                   WHERE e.subject_id = :i AND e.release_id = :r GROUP BY c.concept_id ORDER BY c.concept_id"""),
-                    {"i": eid, "r": latest["id"]}).mappings():
-                comps.append(s.EntityComponent(component="estimates", concept_id=r["concept_id"], count=r["n"],
-                                               first_period=r["first"], last_period=r["last"]))
+                   WHERE e.subject_id = :i AND e.release_id = :r GROUP BY c.concept_id ORDER BY c.concept_id"""
+                ),
+                {"i": eid, "r": latest["id"]},
+            ).mappings():
+                comps.append(
+                    s.EntityComponent(
+                        component="estimates",
+                        concept_id=r["concept_id"],
+                        count=r["n"],
+                        first_period=r["first"],
+                        last_period=r["last"],
+                    )
+                )
         # Origin of the data this entity actually has: acquisitions behind its observations, plus the
         # release its listed estimates come from. Registry metadata alone has no origin ("none").
-        origins = set(conn.execute(text(
-            """SELECT DISTINCT a.origin FROM evidence.observation o
-               JOIN evidence.acquisition a ON a.id = o.acquisition_id WHERE o.subject_id = :i"""),
-            {"i": eid}).scalars())
+        origins = set(
+            conn.execute(
+                text(
+                    """SELECT DISTINCT a.origin FROM evidence.observation o
+               JOIN evidence.acquisition a ON a.id = o.acquisition_id WHERE o.subject_id = :i"""
+                ),
+                {"i": eid},
+            ).scalars()
+        )
         if latest and any(c.component == "estimates" for c in comps):
             origins.add(latest["origin"])
-        n_geo = conn.execute(text("SELECT count(*) FROM world.display_geometry WHERE entity_id = :i"),
-                             {"i": eid}).scalar_one()
+        n_geo = conn.execute(
+            text("SELECT count(*) FROM world.display_geometry WHERE entity_id = :i"), {"i": eid}
+        ).scalar_one()
         if n_geo:
             comps.append(s.EntityComponent(component="display_geometry", count=n_geo))
-        for r in conn.execute(text(
-            """SELECT r.layer, count(DISTINCT r.id) AS n FROM world.relation_participant p
-               JOIN world.relation r ON r.id = p.relation_id WHERE p.entity_id = :i GROUP BY r.layer"""),
-                {"i": eid}).mappings():
+        for r in conn.execute(
+            text(
+                """SELECT r.layer, count(DISTINCT r.id) AS n FROM world.relation_participant p
+               JOIN world.relation r ON r.id = p.relation_id WHERE p.entity_id = :i GROUP BY r.layer"""
+            ),
+            {"i": eid},
+        ).mappings():
             comps.append(s.EntityComponent(component="relations", layer=r["layer"], count=r["n"]))
         contexts: list[s.SupportedContext] = []
         if any(c.component == "observations" for c in comps):
             contexts.append(s.SupportedContext(mode="evidence", description="Source records (all vintages)"))
         if latest and any(c.component == "estimates" for c in comps):
-            contexts.append(s.SupportedContext(
-                mode="belief", context_id=latest["context_id"], release_id=latest["id"], origin=latest["origin"],
-                knowledge_cutoff=latest["knowledge_cutoff"],
-                description=f"Pinned belief release #{latest['sequence']}"))
+            contexts.append(
+                s.SupportedContext(
+                    mode="belief",
+                    context_id=latest["context_id"],
+                    release_id=latest["id"],
+                    origin=latest["origin"],
+                    knowledge_cutoff=latest["knowledge_cutoff"],
+                    description=f"Pinned belief release #{latest['sequence']}",
+                )
+            )
         iso = next((a.external_key for a in aliases if a.provider == "iso3166_alpha3"), None)
         if iso:
-            for r in conn.execute(text(
-                """SELECT sc.id, sc.context_id, c.origin, c.knowledge_cutoff, sc.spec->>'title' AS title
+            for r in conn.execute(
+                text(
+                    """SELECT sc.id, sc.context_id, c.origin, c.knowledge_cutoff, sc.spec->>'title' AS title
                    FROM sim.scenario sc JOIN meta.context c ON c.id = sc.context_id
-                   WHERE sc.spec->'countries' ? :iso ORDER BY sc.recorded_at DESC LIMIT 20"""),
-                    {"iso": iso}).mappings():
-                contexts.append(s.SupportedContext(
-                    mode="simulation", context_id=r["context_id"], origin=r["origin"],
-                    knowledge_cutoff=r["knowledge_cutoff"], description=f"Scenario {r['id']}: {r['title']}"))
+                   WHERE sc.spec->'countries' ? :iso ORDER BY sc.recorded_at DESC LIMIT 20"""
+                ),
+                {"iso": iso},
+            ).mappings():
+                contexts.append(
+                    s.SupportedContext(
+                        mode="simulation",
+                        context_id=r["context_id"],
+                        origin=r["origin"],
+                        knowledge_cutoff=r["knowledge_cutoff"],
+                        description=f"Scenario {r['id']}: {r['title']}",
+                    )
+                )
     detail = s.EntityDetail(**dict(ent), aliases=aliases, components=comps, supported_contexts=contexts)
     org = origin_of(origins)
-    return s.EntityDetailResponse(data=detail, context_mode="registry", origin=org,  # type: ignore[arg-type]
-                                  modality="metadata", baseline_release=release_ref(latest),
-                                  warnings=origin_warnings(org), cost=t.cost(len(comps)))
+    return s.EntityDetailResponse(
+        data=detail,
+        context_mode="registry",
+        origin=org,  # type: ignore[arg-type]
+        modality="metadata",
+        baseline_release=release_ref(latest),
+        warnings=origin_warnings(org),
+        cost=t.cost(len(comps)),
+    )
 
 
 # ---------------------------------------------------------------------------
 # Relations
 # ---------------------------------------------------------------------------
+
 
 def _year_interval(period: int | None) -> tuple[datetime, datetime] | None:
     if period is None:
@@ -208,23 +285,51 @@ def _relation(e: Hyperedge) -> s.Relation:
     sup = e.support
     temporal = sup.get("temporal_extent") or {}
     return s.Relation(
-        id=e.id, predicate=e.predicate, layer=e.layer,
-        support=s.SupportSummary(id=sup["id"], temporal=temporal, spatial=sup.get("spatial_spec") or {},
-                                 population=sup.get("population_spec") or {}, aggregation=sup.get("aggregation"),
-                                 period_label=period_label(temporal)),
-        component=e.component, existence_uncertainty=e.existence_uncertainty, strength=e.tie_strength,
-        value=value, concept_id=fm.get("concept_id") if has_value else None,
-        evidence_observation_id=e.provenance.observation_id, release_id=e.provenance.release_id,
-        origin=e.provenance.origin, recorded_at=e.recorded_at,  # type: ignore[arg-type]
-        participants=[s.Participant(ordinal=p.ordinal, role=p.role, entity_id=p.entity_id,
-                                    entity_label=p.entity_label, entity_kind=p.entity_kind, direction=p.direction)
-                      for p in e.participants],
+        id=e.id,
+        predicate=e.predicate,
+        layer=e.layer,
+        support=s.SupportSummary(
+            id=sup["id"],
+            temporal=temporal,
+            spatial=sup.get("spatial_spec") or {},
+            population=sup.get("population_spec") or {},
+            aggregation=sup.get("aggregation"),
+            period_label=period_label(temporal),
+        ),
+        component=e.component,
+        existence_uncertainty=e.existence_uncertainty,
+        strength=e.tie_strength,
+        value=value,
+        concept_id=fm.get("concept_id") if has_value else None,
+        evidence_observation_id=e.provenance.observation_id,
+        release_id=e.provenance.release_id,
+        origin=e.provenance.origin,
+        recorded_at=e.recorded_at,  # type: ignore[arg-type]
+        participants=[
+            s.Participant(
+                ordinal=p.ordinal,
+                role=p.role,
+                entity_id=p.entity_id,
+                entity_label=p.entity_label,
+                entity_kind=p.entity_kind,
+                direction=p.direction,
+            )
+            for p in e.participants
+        ],
     )
 
 
 def relation_graph(
-    conn: Connection, *, entity_id: UUID | None, layer: str | None, period: int | None, as_of: datetime | None,
-    origin: str | None, depth: int, max_edges: int, release_id: UUID | None = None,
+    conn: Connection,
+    *,
+    entity_id: UUID | None,
+    layer: str | None,
+    period: int | None,
+    as_of: datetime | None,
+    origin: str | None,
+    depth: int,
+    max_edges: int,
+    release_id: UUID | None = None,
 ) -> tuple[s.RelationGraph, list[str], list[str]]:
     """Visible hyperedges via ``reva.world.queries`` (supersession- and retraction-aware, bounded).
 
@@ -248,8 +353,9 @@ def relation_graph(
         nb = wq.neighbourhood(conn, entity_id, context=ctx, layers=layers, valid_during=during, max_edges=max_edges)
         edges, truncated, notes = list(nb.edges), nb.truncated, list(nb.notes)
     else:
-        pr = wq.path_search(conn, entity_id, None, context=ctx, layers=layers, valid_during=during,
-                            max_depth=depth, max_edges=max_edges)
+        pr = wq.path_search(
+            conn, entity_id, None, context=ctx, layers=layers, valid_during=during, max_depth=depth, max_edges=max_edges
+        )
         edges, truncated = list(pr.edges), pr.truncated
         notes = list(pr.notes) + [f"bound reached: {r}" for r in pr.truncation_reasons]
     rels = [_relation(e) for e in edges]
@@ -257,9 +363,14 @@ def relation_graph(
     for r in rels:
         for p in r.participants:
             nodes[p.entity_id] = s.GraphNode(id=p.entity_id, label=p.entity_label, kind=p.entity_kind)
-    graph = s.RelationGraph(relations=rels, nodes=sorted(nodes.values(), key=lambda n: (n.label, str(n.id))),
-                            truncated=truncated, max_edges=max_edges, depth=depth,
-                            matched_lower_bound=len(rels) + (1 if truncated else 0))
+    graph = s.RelationGraph(
+        relations=rels,
+        nodes=sorted(nodes.values(), key=lambda n: (n.label, str(n.id))),
+        truncated=truncated,
+        max_edges=max_edges,
+        depth=depth,
+        matched_lower_bound=len(rels) + (1 if truncated else 0),
+    )
     return graph, [r.origin for r in rels if r.origin], notes
 
 
@@ -268,23 +379,32 @@ def relations_response(conn: Connection, t: Timer, **kw: Any) -> s.RelationListR
     origin = origin_of(origins)
     warnings = origin_warnings(origin)
     if graph.truncated:
-        warnings.append(s.ApiWarning(
-            code="truncated",
-            message=f"Result bounded at max_edges={graph.max_edges}, depth={graph.depth}; more relations match. "
-                    "Narrow the query (layer, period, entity) to see them."))
+        warnings.append(
+            s.ApiWarning(
+                code="truncated",
+                message=f"Result bounded at max_edges={graph.max_edges}, depth={graph.depth}; more relations match. "
+                "Narrow the query (layer, period, entity) to see them.",
+            )
+        )
     warnings += [s.ApiWarning(code="graph_note", message=n[:500]) for n in notes]
     rel = None
     if kw.get("release_id") is not None:
         rel = release_by_id(conn, kw["release_id"])
     return s.RelationListResponse(
-        data=graph, context_id=rel["context_id"] if rel else None,
-        context_mode="belief" if rel else "evidence", origin=origin,  # type: ignore[arg-type]
+        data=graph,
+        context_id=rel["context_id"] if rel else None,
+        context_mode="belief" if rel else "evidence",
+        origin=origin,  # type: ignore[arg-type]
         modality="selected_estimate" if rel else "reported_observation",
-        baseline_release=release_ref(rel), knowledge_cutoff=rel["knowledge_cutoff"] if rel else kw.get("as_of"),
+        baseline_release=release_ref(rel),
+        knowledge_cutoff=rel["knowledge_cutoff"] if rel else kw.get("as_of"),
         valid_time=valid_window(r.support.temporal for r in graph.relations),
-        assumptions=["Relations are reported flows; existence is as reported by the source",
-                     "Superseded and retracted observations are excluded as known at the as_of time"],
-        warnings=warnings, cost=t.cost(len(graph.relations), truncated=graph.truncated),
+        assumptions=[
+            "Relations are reported flows; existence is as reported by the source",
+            "Superseded and retracted observations are excluded as known at the as_of time",
+        ],
+        warnings=warnings,
+        cost=t.cost(len(graph.relations), truncated=graph.truncated),
     )
 
 
@@ -294,11 +414,14 @@ def list_relations(
     entity_id: str | None = Query(None, max_length=64, description="Entity UUID or ISO3 key"),
     layer: str | None = Query(None, max_length=200),
     period: int | None = Query(None, ge=1900, le=2100, description="Calendar year of the valid support"),
-    as_of: datetime | None = Query(None, description="Evidence as known at this instant (recorded, not "
-                                   "superseded, not retracted at/before it)"),
+    as_of: datetime | None = Query(
+        None, description="Evidence as known at this instant (recorded, not superseded, not retracted at/before it)"
+    ),
     origin: str | None = Query(None, pattern="^(live|test_fixture)$"),
-    release_id: UUID | None = Query(None, description="Relations pinned to this published belief release instead "
-                                    "of evidence (excludes as_of/origin)"),
+    release_id: UUID | None = Query(
+        None,
+        description="Relations pinned to this published belief release instead of evidence (excludes as_of/origin)",
+    ),
     depth: int = Query(1, ge=1, le=MAX_DEPTH),
     max_edges: int = Query(MAX_EDGES, ge=1, le=MAX_EDGES),
 ) -> s.RelationListResponse:
@@ -307,8 +430,18 @@ def list_relations(
     require_aware(as_of, "as_of")
     with read_conn(request) as conn:
         eid = resolve_entity(conn, entity_id) if entity_id else None
-        return relations_response(conn, t, entity_id=eid, layer=layer, period=period, as_of=as_of, origin=origin,
-                                  depth=depth, max_edges=max_edges, release_id=release_id)
+        return relations_response(
+            conn,
+            t,
+            entity_id=eid,
+            layer=layer,
+            period=period,
+            as_of=as_of,
+            origin=origin,
+            depth=depth,
+            max_edges=max_edges,
+            release_id=release_id,
+        )
 
 
 # ---------------------------------------------------------------------------
@@ -328,8 +461,11 @@ def list_events(
     t = Timer()
     cur = decode_cursor(cursor, "u")
     with read_conn(request) as conn:
-        rows = [dict(r) for r in conn.execute(text(
-            """SELECT oc.entity_id, e.label, c.concept_id AS event_type, oc.component, sp.id AS support_id,
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(
+                    """SELECT oc.entity_id, e.label, c.concept_id AS event_type, oc.component, sp.id AS support_id,
                       sp.temporal_extent, sp.spatial_spec, sp.population_spec, sp.aggregation
                FROM world.occurrence oc JOIN world.entity e ON e.id = oc.entity_id
                JOIN ontology.concept_version c ON c.id = oc.event_type_id
@@ -337,14 +473,32 @@ def list_events(
                WHERE (CAST(:e AS uuid) IS NULL OR oc.entity_id = :e)
                  AND (CAST(:et AS text) IS NULL OR c.concept_id = :et)
                  AND (CAST(:c0 AS uuid) IS NULL OR oc.entity_id > CAST(:c0 AS uuid))
-               ORDER BY oc.entity_id LIMIT :lim"""),
-            {"e": entity_id, "et": event_type, "c0": cur[0] if cur else None, "lim": limit + 1}).mappings()]
+               ORDER BY oc.entity_id LIMIT :lim"""
+                ),
+                {"e": entity_id, "et": event_type, "c0": cur[0] if cur else None, "lim": limit + 1},
+            ).mappings()
+        ]
     rows, nxt = page(rows, limit, lambda r: (r["entity_id"],))
-    data = [s.Event(entity_id=r["entity_id"], label=r["label"], event_type=r["event_type"],
-                    support=support_summary(r), component=r["component"]) for r in rows]
+    data = [
+        s.Event(
+            entity_id=r["entity_id"],
+            label=r["label"],
+            event_type=r["event_type"],
+            support=support_summary(r),
+            component=r["component"],
+        )
+        for r in rows
+    ]
     warnings = [] if data else [s.ApiWarning(code="no_events", message="No occurrences are recorded for this query")]
-    return s.EventListResponse(data=data, context_mode="evidence", origin="none", modality="reported_observation",
-                               warnings=warnings, cost=t.cost(len(data)), next_cursor=nxt)
+    return s.EventListResponse(
+        data=data,
+        context_mode="evidence",
+        origin="none",
+        modality="reported_observation",
+        warnings=warnings,
+        cost=t.cost(len(data)),
+        next_cursor=nxt,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -364,30 +518,56 @@ def list_locations(
     t = Timer()
     with read_conn(request) as conn:
         eid = resolve_entity(conn, entity_id) if entity_id else None
-        ds = dataset_sha256 or conn.execute(text(
-            "SELECT dataset_sha256 FROM world.display_geometry ORDER BY recorded_at DESC LIMIT 1")).scalar_one_or_none()
-        rows = [dict(r) for r in conn.execute(text(
-            """SELECT g.id, g.feature_key, g.entity_id, e.label AS entity_label, g.match_status, g.properties,
+        ds = (
+            dataset_sha256
+            or conn.execute(
+                text("SELECT dataset_sha256 FROM world.display_geometry ORDER BY recorded_at DESC LIMIT 1")
+            ).scalar_one_or_none()
+        )
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(
+                    """SELECT g.id, g.feature_key, g.entity_id, e.label AS entity_label, g.match_status, g.properties,
                       g.dataset_sha256, ST_AsGeoJSON(g.geometry_4326, :prec)::jsonb AS geometry
                FROM world.display_geometry g LEFT JOIN world.entity e ON e.id = g.entity_id
                WHERE g.dataset_sha256 = :ds
                  AND (CAST(:e AS uuid) IS NULL OR g.entity_id = :e)
                  AND (CAST(:ms AS text) IS NULL OR g.match_status = :ms)
-               ORDER BY g.feature_key LIMIT :lim"""),
-            {"ds": ds, "e": eid, "ms": match_status, "prec": precision, "lim": MAX_FEATURES + 1}).mappings()]
-        origins = list(conn.execute(text(
-            "SELECT DISTINCT origin FROM evidence.acquisition WHERE raw_sha256 = :ds"), {"ds": ds}).scalars()) if ds \
+               ORDER BY g.feature_key LIMIT :lim"""
+                ),
+                {"ds": ds, "e": eid, "ms": match_status, "prec": precision, "lim": MAX_FEATURES + 1},
+            ).mappings()
+        ]
+        origins = (
+            list(
+                conn.execute(
+                    text("SELECT DISTINCT origin FROM evidence.acquisition WHERE raw_sha256 = :ds"), {"ds": ds}
+                ).scalars()
+            )
+            if ds
             else []
+        )
     truncated = len(rows) > MAX_FEATURES
     rows = rows[:MAX_FEATURES]
     feats = []
     for r in rows:
         props = r["properties"] or {}
         name = props.get("NAME") or props.get("ADMIN") or props.get("name")
-        feats.append(s.GeoFeature(id=str(r["id"]), geometry=r["geometry"], properties=s.GeoFeatureProperties(
-            feature_key=r["feature_key"], entity_id=r["entity_id"], entity_label=r["entity_label"],
-            match_status=r["match_status"], name=str(name) if name is not None else None,
-            dataset_sha256=r["dataset_sha256"])))
+        feats.append(
+            s.GeoFeature(
+                id=str(r["id"]),
+                geometry=r["geometry"],
+                properties=s.GeoFeatureProperties(
+                    feature_key=r["feature_key"],
+                    entity_id=r["entity_id"],
+                    entity_label=r["entity_label"],
+                    match_status=r["match_status"],
+                    name=str(name) if name is not None else None,
+                    dataset_sha256=r["dataset_sha256"],
+                ),
+            )
+        )
     origin = origin_of(origins)
     warnings = [*origin_warnings(origin), s.ApiWarning(code="display_only", message=DISPLAY_NOTE)]
     if truncated:
@@ -396,6 +576,9 @@ def list_locations(
         warnings.append(s.ApiWarning(code="no_geometry", message="No display geometry has been ingested"))
     return s.LocationResponse(
         data=s.FeatureCollection(features=feats, display_note=DISPLAY_NOTE, truncated=truncated),
-        context_mode="evidence", origin=origin, modality="metadata", warnings=warnings,  # type: ignore[arg-type]
+        context_mode="evidence",
+        origin=origin,
+        modality="metadata",
+        warnings=warnings,  # type: ignore[arg-type]
         cost=t.cost(len(feats)),
     )

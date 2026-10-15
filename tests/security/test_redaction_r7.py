@@ -67,9 +67,17 @@ def json_log() -> Iterator[io.StringIO]:
 
 
 # =========================================================================== 1. settings
-SECRET_FIELDS = ("reva_api_db_password", "reva_worker_db_password", "reva_sim_db_password", "reva_s3_access_key_id",
-                 "reva_s3_secret_access_key", "reva_session_secret", "reva_comtrade_api_key", "reva_llm_api_key",
-                 "reva_sandbox_token")
+SECRET_FIELDS = (
+    "reva_api_db_password",
+    "reva_worker_db_password",
+    "reva_sim_db_password",
+    "reva_s3_access_key_id",
+    "reva_s3_secret_access_key",
+    "reva_session_secret",
+    "reva_comtrade_api_key",
+    "reva_llm_api_key",
+    "reva_sandbox_token",
+)
 
 
 def _canary_settings() -> tuple[Settings, list[str]]:
@@ -87,10 +95,19 @@ def _canary_settings() -> tuple[Settings, list[str]]:
 
 def test_settings_repr_str_dump_and_dsns_never_show_secrets() -> None:
     s, secrets = _canary_settings()
-    rendered = "\n".join([
-        repr(s), str(s), str(s.model_dump()), s.model_dump_json(), json.dumps(s.model_dump(mode="json")),
-        str(s.runtime_url("api")), repr(s.runtime_url("worker")), str(s.migration_url()), repr(s.migration_url()),
-    ])
+    rendered = "\n".join(
+        [
+            repr(s),
+            str(s),
+            str(s.model_dump()),
+            s.model_dump_json(),
+            json.dumps(s.model_dump(mode="json")),
+            str(s.runtime_url("api")),
+            repr(s.runtime_url("worker")),
+            str(s.migration_url()),
+            repr(s.migration_url()),
+        ]
+    )
     assert_absent(rendered, *secrets)
     # sensitivity: the values are really there behind SecretStr / URL.create
     assert s.runtime_url("api").password == s.reva_api_db_password.get_secret_value()  # type: ignore[union-attr]
@@ -117,8 +134,9 @@ def test_plain_url_settings_refuse_embedded_credentials(field: str) -> None:
     assert "credentials" in str(ei.value)
 
 
-def test_env_file_only_secrets_are_redacted_from_logs(tmp_path: Path, json_log: io.StringIO,
-                                                      monkeypatch: pytest.MonkeyPatch) -> None:
+def test_env_file_only_secrets_are_redacted_from_logs(
+    tmp_path: Path, json_log: io.StringIO, monkeypatch: pytest.MonkeyPatch
+) -> None:
     """Secrets read from ./.env never enter os.environ; Settings registers them for value redaction."""
     pw = canary("dotenv")
     for k in [k for k in os.environ if k.startswith("REVA_")]:
@@ -139,15 +157,35 @@ def test_production_default_log_level_is_info_and_documented() -> None:
 
 def test_worker_startup_refusal_logs_no_secret(tmp_path: Path) -> None:
     """Real entrypoint, real stderr: a refused production start names settings, never values."""
-    secrets = {k: canary(k[5:11]) for k in ("REVA_API_DB_PASSWORD", "REVA_WORKER_DB_PASSWORD",
-                                            "REVA_SIM_DB_PASSWORD", "REVA_S3_SECRET_ACCESS_KEY",
-                                            "REVA_S3_ACCESS_KEY_ID", "REVA_COMTRADE_API_KEY")}
+    secrets = {
+        k: canary(k[5:11])
+        for k in (
+            "REVA_API_DB_PASSWORD",
+            "REVA_WORKER_DB_PASSWORD",
+            "REVA_SIM_DB_PASSWORD",
+            "REVA_S3_SECRET_ACCESS_KEY",
+            "REVA_S3_ACCESS_KEY_ID",
+            "REVA_COMTRADE_API_KEY",
+        )
+    }
     owner_pw = canary("owner")
-    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(tmp_path), "REVA_ENV": "production",
-           "REVA_PROCESS_ROLE": "worker", "REVA_SESSION_SECRET": "short",
-           "REVA_MIGRATION_DATABASE_URL": f"postgresql://reva_owner:{owner_pw}@db:5432/reva", **secrets}
-    r = subprocess.run([sys.executable, "-c", "from reva.operations.worker import main; raise SystemExit(main())"],
-                       env=env, cwd=tmp_path, capture_output=True, text=True, timeout=120)
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(tmp_path),
+        "REVA_ENV": "production",
+        "REVA_PROCESS_ROLE": "worker",
+        "REVA_SESSION_SECRET": "short",
+        "REVA_MIGRATION_DATABASE_URL": f"postgresql://reva_owner:{owner_pw}@db:5432/reva",
+        **secrets,
+    }
+    r = subprocess.run(
+        [sys.executable, "-c", "from reva.operations.worker import main; raise SystemExit(main())"],
+        env=env,
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
     assert r.returncode == 2, r.stderr[-2000:]
     assert "worker start refused" in r.stderr
     assert_absent(r.stdout + r.stderr, owner_pw, *secrets.values())
@@ -158,7 +196,7 @@ def test_redact_text_masks_every_secret_shape() -> None:
     tok, sha, cookie, pw, key, sig = (canary(k) for k in ("tok", "sha", "cookie", "pw", "key", "sig"))
     samples = [
         f"(psycopg.errors.X) boom\n[SQL: SELECT 1 WHERE h = %(h)s]\n[parameters: {{'h': '{sha}'}}]\n(Background",
-        f'DETAIL:  Key (token_sha256)=({sha}) already exists.',
+        f"DETAIL:  Key (token_sha256)=({sha}) already exists.",
         f"DETAIL:  Failing row contains ({sha}, x, y).",
         f'invalid input syntax for type uuid: "{tok}"',
         f"Authorization: Bearer {tok}",
@@ -179,9 +217,14 @@ def test_redact_text_masks_every_secret_shape() -> None:
 
 def test_redact_obj_masks_by_key_and_shape_and_keeps_valid_json() -> None:
     tok, sha = canary("tok"), canary("sha")
-    doc = {"token_sha256": sha, "authorization": f"Bearer {tok}", "token_id": "1b9d6bcd", "fencing_token": 7,
-           "nested": [{"message": f"DETAIL:  Failing row contains ({sha}, \"q\")"}, {"api_key": tok}],
-           "url": f"https://h.example/p?subscription-key={tok}"}
+    doc = {
+        "token_sha256": sha,
+        "authorization": f"Bearer {tok}",
+        "token_id": "1b9d6bcd",
+        "fencing_token": 7,
+        "nested": [{"message": f'DETAIL:  Failing row contains ({sha}, "q")'}, {"api_key": tok}],
+        "url": f"https://h.example/p?subscription-key={tok}",
+    }
     red = tm.redact_obj(doc)
     blob = json.dumps(red)
     assert_absent(blob, tok, sha)
@@ -192,7 +235,7 @@ def test_audit_details_are_redacted_and_remain_valid_json() -> None:
     from reva.operations.audit import _bounded_json
 
     tok, sha = canary("tok"), canary("sha")
-    raw = _bounded_json({"token": tok, "error": f"DETAIL:  Failing row contains ({sha}, \"x\")", "n": 1})
+    raw = _bounded_json({"token": tok, "error": f'DETAIL:  Failing row contains ({sha}, "x")', "n": 1})
     assert json.loads(raw)["n"] == 1
     assert_absent(raw, tok, sha)
 
@@ -215,8 +258,9 @@ def test_log_pipeline_redacts_tracebacks_chained_causes_and_server_loggers(json_
                 raise RuntimeError(f"connect postgresql://reva_api:{pw}@db/reva failed") from inner
         except RuntimeError:
             logging.getLogger("uvicorn.error").exception("Exception in ASGI application")
-        logging.getLogger("uvicorn.access").info('%s - "%s %s HTTP/%s" %d', "10.0.0.1", "GET",
-                                                 f"/v1/x?token={tok}", "1.1", 200)
+        logging.getLogger("uvicorn.access").info(
+            '%s - "%s %s HTTP/%s" %d', "10.0.0.1", "GET", f"/v1/x?token={tok}", "1.1", 200
+        )
     finally:
         logging.getLogger().removeHandler(root_handler)
     out = json_log.getvalue()
@@ -240,11 +284,14 @@ async def _noop(_: float = 0) -> None:
 
 
 def _client(handler: Any, hosts: tuple[str, ...] = ("comtradeapi.un.org",), **kw: Any) -> SafeHttpClient:
-    return SafeHttpClient(allowed_hosts=list(hosts), transport=httpx.MockTransport(handler),
-                          resolver=lambda h: ["93.184.216.34"],
-                          rate_limiter=RateLimiter(
-                              default=HostPolicy(min_interval_seconds=0, max_retry_after_seconds=5)),
-                          sleep=_noop, **kw)
+    return SafeHttpClient(
+        allowed_hosts=list(hosts),
+        transport=httpx.MockTransport(handler),
+        resolver=lambda h: ["93.184.216.34"],
+        rate_limiter=RateLimiter(default=HostPolicy(min_interval_seconds=0, max_retry_after_seconds=5)),
+        sleep=_noop,
+        **kw,
+    )
 
 
 async def test_cross_origin_redirect_drops_credential_headers() -> None:
@@ -260,8 +307,10 @@ async def test_cross_origin_redirect_drops_credential_headers() -> None:
         return httpx.Response(200, json={})
 
     async with _client(handler, ("a.example", "b.example")) as c:
-        await c.get("https://a.example/start", headers={"Authorization": f"Bearer {tok}",
-                                                         "Ocp-Apim-Subscription-Key": key, "Accept": "x/y"})
+        await c.get(
+            "https://a.example/start",
+            headers={"Authorization": f"Bearer {tok}", "Ocp-Apim-Subscription-Key": key, "Accept": "x/y"},
+        )
     assert seen["a.example/same"]["authorization"] == f"Bearer {tok}"  # same origin keeps credentials
     other = seen["b.example/other"]
     assert "accept" in other
@@ -332,8 +381,9 @@ def test_real_db_errors_are_scrubbed_in_job_errors_and_logs(db: Any, json_log: i
     # (b) unique violation: PostgreSQL echoes the key value in DETAIL
     with pytest.raises(DBAPIError) as e2, db.owner.begin() as conn:
         for _ in range(2):
-            conn.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, '{read}', 'r7')"),
-                         {"h": sha})
+            conn.execute(
+                text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, '{read}', 'r7')"), {"h": sha}
+            )
     raw = str(e1.value) + str(e2.value)
     # sensitivity: PostgreSQL echoes the key value in DETAIL whatever the engine does with parameters
     assert sha in str(e2.value) and "Key (token_sha256)" in raw
@@ -342,8 +392,7 @@ def test_real_db_errors_are_scrubbed_in_job_errors_and_logs(db: Any, json_log: i
         # in which case the redaction below must mask them; they must never survive redaction
         assert "[SQL parameters hidden" in str(exc) or ("[parameters:" in str(exc) and sha in str(exc))
     for exc in (e1.value, e2.value):
-        doc = queue.error_document("transient_error", str(exc), retryable=True, attempt=1,
-                                   exception=type(exc).__name__)
+        doc = queue.error_document("transient_error", str(exc), retryable=True, attempt=1, exception=type(exc).__name__)
         assert_absent(json.dumps(doc), sha, tok)
         try:
             raise exc
@@ -391,8 +440,12 @@ def fresh(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Fresh]:
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp("objects_r7")
     data = base.model_dump()
-    data.update(reva_migration_database_url=base.migration_url().set(database=name).render_as_string(
-        hide_password=False), reva_db_name=name, reva_env="test", reva_object_root=root)
+    data.update(
+        reva_migration_database_url=base.migration_url().set(database=name).render_as_string(hide_password=False),
+        reva_db_name=name,
+        reva_env="test",
+        reva_object_root=root,
+    )
     settings = Settings.model_validate(data)
     engines: list[Engine] = []
     try:
@@ -418,8 +471,10 @@ def fresh(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Fresh]:
 def _sweep(owner: Engine) -> str:
     """Every operator/client-visible ops row (api_token itself holds the hash by design)."""
     with owner.connect() as c:
-        parts = [c.execute(text(f"SELECT coalesce(jsonb_agg(to_jsonb(t))::text, '') FROM {t} t")).scalar_one()
-                 for t in ("ops.audit", "ops.outbox", "ops.job")]
+        parts = [
+            c.execute(text(f"SELECT coalesce(jsonb_agg(to_jsonb(t))::text, '') FROM {t} t")).scalar_one()
+            for t in ("ops.audit", "ops.outbox", "ops.job")
+        ]
     return "\n".join(parts)
 
 
@@ -441,8 +496,17 @@ def _run_failing_job(f: Fresh, monkeypatch: pytest.MonkeyPatch, handler: Any) ->
 
     jid = _enqueue(f, {"probe": uuid.uuid4().hex})
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: handler)
-    w = Worker(f.settings, f.worker, f.store, f.sim, scheduler=False, invalidation=False, lease_seconds=30,
-               heartbeat_seconds=5, job_types=["health"])
+    w = Worker(
+        f.settings,
+        f.worker,
+        f.store,
+        f.sim,
+        scheduler=False,
+        invalidation=False,
+        lease_seconds=30,
+        heartbeat_seconds=5,
+        job_types=["health"],
+    )
     job = w.claim_one()
     assert job is not None and job.id == jid
     w.execute(job)
@@ -452,7 +516,8 @@ def _run_failing_job(f: Fresh, monkeypatch: pytest.MonkeyPatch, handler: Any) ->
 
 
 def test_worker_db_failure_last_error_and_api_view_hold_no_parameters(
-        fresh: Fresh, monkeypatch: pytest.MonkeyPatch, json_log: io.StringIO) -> None:
+    fresh: Fresh, monkeypatch: pytest.MonkeyPatch, json_log: io.StringIO
+) -> None:
     from reva.api.routes.system import public_error
 
     sha = canary("sha")
@@ -467,8 +532,13 @@ def test_worker_db_failure_last_error_and_api_view_hold_no_parameters(
     msg = row["last_error"]["message"]
     # parameters are either never rendered (hide_parameters=True) or masked by redaction
     assert "[SQL parameters hidden" in msg or "[parameters: ***]" in msg
-    assert_absent(json.dumps(row["last_error"], default=str) + json.dumps(public_error(row["last_error"]))
-                  + json_log.getvalue() + _sweep(fresh.owner), sha)
+    assert_absent(
+        json.dumps(row["last_error"], default=str)
+        + json.dumps(public_error(row["last_error"]))
+        + json_log.getvalue()
+        + _sweep(fresh.owner),
+        sha,
+    )
 
 
 def test_worker_failure_details_are_redacted(fresh: Fresh, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -477,9 +547,12 @@ def test_worker_failure_details_are_redacted(fresh: Fresh, monkeypatch: pytest.M
     key = canary("key")
 
     def handler(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
-        raise SourceResponseError("provider refused", retryable=False,
-                                  request=f"https://p.example/x?subscription-key={key}",
-                                  authorization=f"Bearer {key}")
+        raise SourceResponseError(
+            "provider refused",
+            retryable=False,
+            request=f"https://p.example/x?subscription-key={key}",
+            authorization=f"Bearer {key}",
+        )
 
     row = _run_failing_job(fresh, monkeypatch, handler)
     assert_absent(json.dumps(row["last_error"], default=str) + json.dumps(public_error(row["last_error"])), key)
@@ -497,9 +570,13 @@ def api(fresh: Fresh) -> Iterator[Any]:
     from reva.api.auth import hash_password
 
     data = fresh.settings.model_dump()
-    data.update(reva_admin_password_hash=SecretStr(hash_password(ADMIN_PASSWORD)),
-                reva_session_secret=SecretStr(canary("sess") * 2), reva_allowed_hosts="testserver,localhost",
-                reva_cors_origins="", reva_env="test")
+    data.update(
+        reva_admin_password_hash=SecretStr(hash_password(ADMIN_PASSWORD)),
+        reva_session_secret=SecretStr(canary("sess") * 2),
+        reva_allowed_hosts="testserver,localhost",
+        reva_cors_origins="",
+        reva_env="test",
+    )
     app = create_app(Settings.model_validate(data), login_rate_limit_per_minute=1000)
 
     @app.get("/v1/_r7_boom", include_in_schema=False)
@@ -517,18 +594,27 @@ def _mint_token(f: Fresh, label: str) -> tuple[str, str]:
 
     token, sha = new_api_token()
     with f.owner.begin() as c:  # exactly what `reva auth create-token` does
-        tid = c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
-                             "VALUES (:s, :sc, :l, 'service') RETURNING id"),
-                        {"s": sha, "sc": ["read", "ingest"], "l": label}).scalar_one()
-        c.execute(text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
-                       "jsonb_build_object('token_id', CAST(:i AS text)), "
-                       "jsonb_build_object('label', CAST(:l AS text)))"),
-                  {"i": str(tid), "l": label})
+        tid = c.execute(
+            text(
+                "INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
+                "VALUES (:s, :sc, :l, 'service') RETURNING id"
+            ),
+            {"s": sha, "sc": ["read", "ingest"], "l": label},
+        ).scalar_one()
+        c.execute(
+            text(
+                "INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "
+                "jsonb_build_object('token_id', CAST(:i AS text)), "
+                "jsonb_build_object('label', CAST(:l AS text)))"
+            ),
+            {"i": str(tid), "l": label},
+        )
     return token, sha
 
 
 def test_api_auth_flows_leave_no_credentials_in_bodies_logs_audit_outbox_jobs(
-        fresh: Fresh, api: Any, json_log: io.StringIO) -> None:
+    fresh: Fresh, api: Any, json_log: io.StringIO
+) -> None:
     app, client = api
     token, sha = _mint_token(fresh, "service:r7")
     wrong = canary("wrongpw")
@@ -623,11 +709,23 @@ _API_PROCESS = textwrap.dedent("""
 
 
 def _api_process(tmp_path: Path, mode: str, secret: str) -> subprocess.CompletedProcess[str]:
-    env = {"PATH": os.environ.get("PATH", "/usr/bin:/bin"), "HOME": str(tmp_path), "REVA_ENV": "local",
-           "REVA_API_DB_PASSWORD": canary("apipw"), "REVA_ALLOWED_HOSTS": "testserver",
-           "REVA_DB_PORT": "1", "REVA_DB_NAME": "reva_r7_unreachable"}  # never the dev database
-    return subprocess.run([sys.executable, "-c", _API_PROCESS, mode, secret], env=env, cwd=tmp_path,
-                          capture_output=True, text=True, timeout=120)
+    env = {
+        "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+        "HOME": str(tmp_path),
+        "REVA_ENV": "local",
+        "REVA_API_DB_PASSWORD": canary("apipw"),
+        "REVA_ALLOWED_HOSTS": "testserver",
+        "REVA_DB_PORT": "1",
+        "REVA_DB_NAME": "reva_r7_unreachable",
+    }  # never the dev database
+    return subprocess.run(
+        [sys.executable, "-c", _API_PROCESS, mode, secret],
+        env=env,
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        timeout=120,
+    )
 
 
 def test_api_process_logs_are_redacted_once_logging_is_configured(tmp_path: Path) -> None:
@@ -649,19 +747,50 @@ def test_api_process_as_shipped_redacts_error_logs(tmp_path: Path) -> None:
 def test_sandbox_child_environment_contains_no_secret(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     from reva.autonomy.sandbox import scrubbed_environment
 
-    planted = {k: canary(k[:6]) for k in ("REVA_API_DB_PASSWORD", "REVA_MIGRATION_DATABASE_URL", "PGPASSWORD",
-                                          "REVA_SESSION_SECRET", "REVA_ADMIN_PASSWORD_HASH", "AWS_SECRET_ACCESS_KEY",
-                                          "REVA_COMTRADE_API_KEY", "REVA_S3_SECRET_ACCESS_KEY", "DATABASE_URL")}
+    planted = {
+        k: canary(k[:6])
+        for k in (
+            "REVA_API_DB_PASSWORD",
+            "REVA_MIGRATION_DATABASE_URL",
+            "PGPASSWORD",
+            "REVA_SESSION_SECRET",
+            "REVA_ADMIN_PASSWORD_HASH",
+            "AWS_SECRET_ACCESS_KEY",
+            "REVA_COMTRADE_API_KEY",
+            "REVA_S3_SECRET_ACCESS_KEY",
+            "DATABASE_URL",
+        )
+    }
     planted["HTTPS_PROXY"] = f"http://proxyuser:{canary('proxypw')}@proxy.internal:3128"
     for k, v in planted.items():
         monkeypatch.setenv(k, v)
     env = scrubbed_environment()
-    r = subprocess.run([sys.executable, "-I", "-c", "import os, json; print(json.dumps(dict(os.environ)))"],
-                       env={**env, "HOME": str(tmp_path)}, capture_output=True, text=True, timeout=60)
+    r = subprocess.run(
+        [sys.executable, "-I", "-c", "import os, json; print(json.dumps(dict(os.environ)))"],
+        env={**env, "HOME": str(tmp_path)},
+        capture_output=True,
+        text=True,
+        timeout=60,
+    )
     child = json.loads(r.stdout)
-    assert set(child) <= {"LANG", "LC_ALL", "TZ", "LC_CTYPE", "PATH", "PYTHONDONTWRITEBYTECODE", "PYTHONHASHSEED",
-                          "REVA_SANDBOX_ISOLATION", "HOME", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "http_proxy",
-                          "https_proxy", "all_proxy", "NO_PROXY"}
+    assert set(child) <= {
+        "LANG",
+        "LC_ALL",
+        "TZ",
+        "LC_CTYPE",
+        "PATH",
+        "PYTHONDONTWRITEBYTECODE",
+        "PYTHONHASHSEED",
+        "REVA_SANDBOX_ISOLATION",
+        "HOME",
+        "HTTP_PROXY",
+        "HTTPS_PROXY",
+        "ALL_PROXY",
+        "http_proxy",
+        "https_proxy",
+        "all_proxy",
+        "NO_PROXY",
+    }
     assert child["HTTPS_PROXY"] == "http://127.0.0.1:9"
     assert_absent(r.stdout, *planted.values(), planted["HTTPS_PROXY"].split(":")[2].split("@")[0])
 
@@ -674,12 +803,30 @@ def test_sandbox_child_stderr_is_scrubbed_before_it_becomes_evidence(monkeypatch
     monkeypatch.setenv("REVA_COMTRADE_API_KEY", key)
     # A child that obtained the worker's secret (e.g. via /proc/<ppid>/environ without a PID namespace)
     # and writes it to stderr before failing.
-    monkeypatch.setattr(sandbox, "namespace_isolation",
-                        lambda: ("/bin/sh", "-c", f"echo 'leak {key} Authorization: Bearer {key}' >&2; exit 3", "--"))
-    budget = type("B", (), {"max_cpu_seconds": 5, "max_memory_bytes": 1 << 30, "max_wall_seconds": 20,
-                            "max_requests": 1, "max_bytes": 1000})()
-    policy = SandboxPolicy(policy_version="r7", isolation="trusted_template", network_hosts=(), writable_paths=(),
-                           secret_access=False, budget=budget)
+    monkeypatch.setattr(
+        sandbox,
+        "namespace_isolation",
+        lambda: ("/bin/sh", "-c", f"echo 'leak {key} Authorization: Bearer {key}' >&2; exit 3", "--"),
+    )
+    budget = type(
+        "B",
+        (),
+        {
+            "max_cpu_seconds": 5,
+            "max_memory_bytes": 1 << 30,
+            "max_wall_seconds": 20,
+            "max_requests": 1,
+            "max_bytes": 1000,
+        },
+    )()
+    policy = SandboxPolicy(
+        policy_version="r7",
+        isolation="trusted_template",
+        network_hosts=(),
+        writable_paths=(),
+        secret_access=False,
+        budget=budget,
+    )
     out, _ = sandbox.TrustedTemplateSandbox._spawn({"manifest": {}}, policy)
     assert out["ok"] is False and "leak" in out["error"]
     assert_absent(json.dumps(out), key)
@@ -696,8 +843,9 @@ async def test_fixture_ingest_logs_no_raw_bodies(fresh: Fresh, json_log: io.Stri
     http = FixtureHttp(spec.name)
     bodies = [(http.dir / e["file"]).read_bytes() for e in http.entries.values()]
     assert bodies
-    rep = await run_connector(conn, http, fresh.store, fresh.worker, persist_cursor=False,
-                              post_publish=post_publish_for(spec.template))
+    rep = await run_connector(
+        conn, http, fresh.store, fresh.worker, persist_cursor=False, post_publish=post_publish_for(spec.template)
+    )
     assert rep.inserted > 0
     out = json_log.getvalue()
     assert "published acquisition" in out

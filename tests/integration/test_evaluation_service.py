@@ -61,8 +61,9 @@ def wdi_release(db):
     asyncio.run(run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False))
     with db.owner.connect() as conn:
         cutoff = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
-    rel = publish_release(db.worker, db.store, cutoff=cutoff, origin=Origin.test_fixture, environment="test",
-                          concepts=[POP, GDP])
+    rel = publish_release(
+        db.worker, db.store, cutoff=cutoff, origin=Origin.test_fixture, environment="test", concepts=[POP, GDP]
+    )
     return rel
 
 
@@ -70,8 +71,10 @@ def claim_job(db, payload: dict) -> JobContext:
     """Insert an evaluation job and claim it by hand (fencing token + lease)."""
     with db.owner.begin() as conn:
         jid = conn.execute(
-            text("INSERT INTO ops.job(job_type, payload, idempotency_key) "
-                 "VALUES ('evaluation', CAST(:p AS jsonb), :k) RETURNING id"),
+            text(
+                "INSERT INTO ops.job(job_type, payload, idempotency_key) "
+                "VALUES ('evaluation', CAST(:p AS jsonb), :k) RETURNING id"
+            ),
             {"p": json.dumps(payload, default=str), "k": f"test-eval-{uuid.uuid4()}"},
         ).scalar_one()
         token = conn.execute(
@@ -81,8 +84,17 @@ def claim_job(db, payload: dict) -> JobContext:
                     WHERE id = :j RETURNING fencing_token"""),
             {"j": jid},
         ).scalar_one()
-    return JobContext(job_id=jid, job_type="evaluation", worker_id="test-worker-L", fencing_token=int(token),
-                      attempt=1, settings=db.settings, worker_engine=db.worker, sim_engine=db.sim, store=db.store)
+    return JobContext(
+        job_id=jid,
+        job_type="evaluation",
+        worker_id="test-worker-L",
+        fencing_token=int(token),
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=db.sim,
+        store=db.store,
+    )
 
 
 def run_job(db, payload: dict) -> dict:
@@ -92,8 +104,10 @@ def run_job(db, payload: dict) -> dict:
     result["_wall_seconds"] = time.perf_counter() - t0
     assert ctx.completed_in_handler
     with db.owner.connect() as conn:
-        assert conn.execute(text("SELECT status FROM ops.job WHERE id = :j"), {"j": ctx.job_id}).scalar_one() \
+        assert (
+            conn.execute(text("SELECT status FROM ops.job WHERE id = :j"), {"j": ctx.job_id}).scalar_one()
             == "succeeded"
+        )
     return result
 
 
@@ -103,29 +117,46 @@ def manifest_of(db, sha: str) -> dict:
 
 def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
     res = run_job(db, {"release_id": str(wdi_release.release_id)})
-    print(f"\nfull-panel tournament runtime {res['tournament_runtime_seconds']}s "
-          f"(handler wall {res['_wall_seconds']:.2f}s); decisions {res['decisions']}; "
-          f"status {res['evaluation_status']}; holdout {res['holdout']['status']}")
+    print(
+        f"\nfull-panel tournament runtime {res['tournament_runtime_seconds']}s "
+        f"(handler wall {res['_wall_seconds']:.2f}s); decisions {res['decisions']}; "
+        f"status {res['evaluation_status']}; holdout {res['holdout']['status']}"
+    )
     assert res["label"] == LABEL and res["replay_mode"] == REPLAY_MODE
     assert res["series"] == 8  # 4 countries x (population, GDP)
 
     with db.owner.connect() as conn:
-        ctx_row = conn.execute(text("SELECT mode, origin, parent_context_id FROM meta.context WHERE id = :c"),
-                               {"c": res["context_id"]}).mappings().one()
-        evals = conn.execute(
-            text("""SELECT v.model_key, e.replay_mode, e.task_scope, e.metrics, e.evaluation_manifest_sha256
+        ctx_row = (
+            conn.execute(
+                text("SELECT mode, origin, parent_context_id FROM meta.context WHERE id = :c"), {"c": res["context_id"]}
+            )
+            .mappings()
+            .one()
+        )
+        evals = (
+            conn.execute(
+                text("""SELECT v.model_key, e.replay_mode, e.task_scope, e.metrics, e.evaluation_manifest_sha256
                     FROM model.evaluation e JOIN model.version v ON v.id = e.model_version_id
                     WHERE e.context_id = :c"""),
-            {"c": res["context_id"]},
-        ).mappings().all()
-        promos = conn.execute(
-            text("""SELECT v.model_key, p.decision, p.reviewer, p.reasons, p.policy_version, p.task_scope
+                {"c": res["context_id"]},
+            )
+            .mappings()
+            .all()
+        )
+        promos = (
+            conn.execute(
+                text("""SELECT v.model_key, p.decision, p.reviewer, p.reasons, p.policy_version, p.task_scope
                     FROM model.promotion p JOIN model.version v ON v.id = p.model_version_id
                     JOIN model.evaluation e ON e.id = p.evaluation_id WHERE e.context_id = :c"""),
-            {"c": res["context_id"]},
-        ).mappings().all()
-        loc = conn.execute(text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256 = :s"),
-                           {"s": res["manifest_sha256"]}).scalar_one()
+                {"c": res["context_id"]},
+            )
+            .mappings()
+            .all()
+        )
+        loc = conn.execute(
+            text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256 = :s"),
+            {"s": res["manifest_sha256"]},
+        ).scalar_one()
     assert ctx_row["mode"] == "evaluation" and ctx_row["origin"] == "test_fixture"
     assert str(ctx_row["parent_context_id"]) == str(wdi_release.context_id)
     assert loc == "evaluation"
@@ -153,8 +184,12 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
     m = manifest_of(db, res["manifest_sha256"])
     for ref, d in m["final_decisions"].items():
         print(f"  {ref}: {d['decision']} n_pairs={d['n_pairs']} reasons={d['reasons'][1:]}")
-    print("  paired dev MASE:", {k: v["mase"] for k, v in m["development"]["paired_scores"]["metrics"].items()},
-          "n_common", m["development"]["paired_scores"]["n_common_cases"])
+    print(
+        "  paired dev MASE:",
+        {k: v["mase"] for k, v in m["development"]["paired_scores"]["metrics"].items()},
+        "n_common",
+        m["development"]["paired_scores"]["n_common_cases"],
+    )
     print("  unpaired dev MASE:", {k: v["mase"] for k, v in m["development"]["scores_unpaired"].items()})
     assert m["label"] == LABEL and m["replay_mode"] == REPLAY_MODE
     assert {"DZA:" + POP, "DZA:" + GDP, "FRA:" + POP, "CHN:" + GDP, "USA:" + GDP} <= set(m["inputs"]["series"])
@@ -182,8 +217,9 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
 
 
 def test_insufficient_evidence_keeps_incumbent(db, wdi_release):
-    res = run_job(db, {"release_id": str(wdi_release.release_id), "countries": ["DZA"], "concepts": [POP],
-                       "years": [2015, 2024]})
+    res = run_job(
+        db, {"release_id": str(wdi_release.release_id), "countries": ["DZA"], "concepts": [POP], "years": [2015, 2024]}
+    )
     assert res["evaluation_status"] == "insufficient_evaluation"
     assert set(res["decisions"].values()) == {"keep_incumbent"}
     assert res["incumbent"].startswith("forecast.last_value@")
@@ -195,14 +231,22 @@ def test_insufficient_evidence_keeps_incumbent(db, wdi_release):
     assert m["holdout_usage_count"] == m["locked_holdout"]["access_count_before"]
     with db.owner.connect() as conn:
         n_hold = conn.execute(
-            text("SELECT count(*) FROM model.evaluation WHERE context_id = :c "
-                 "AND task_scope->>'period' = 'locked_holdout'"), {"c": res["context_id"]}).scalar_one()
+            text(
+                "SELECT count(*) FROM model.evaluation WHERE context_id = :c "
+                "AND task_scope->>'period' = 'locked_holdout'"
+            ),
+            {"c": res["context_id"]},
+        ).scalar_one()
     assert n_hold == 0
 
 
 def test_locked_holdout_reuse_is_blocked(db, wdi_release):
-    payload = {"release_id": str(wdi_release.release_id), "countries": ["FRA", "USA"], "years": [2000, 2020],
-               "holdout_mode": "final_report"}
+    payload = {
+        "release_id": str(wdi_release.release_id),
+        "countries": ["FRA", "USA"],
+        "years": [2000, 2020],
+        "holdout_mode": "final_report",
+    }
     first = run_job(db, payload)
     assert first["holdout"]["status"] == "scored"
     assert first["holdout"]["years"] == [2019, 2020]
@@ -223,14 +267,26 @@ def test_locked_holdout_reuse_is_blocked(db, wdi_release):
             assert any(r.startswith("locked_holdout_reuse_blocked") for r in d["reasons"])
     with db.owner.connect() as conn:
         audits = conn.execute(
-            text("SELECT count(*) FROM ops.audit WHERE action = 'evaluation.holdout_reuse_blocked' "
-                 "AND details->>'manifest_sha256' = :s"), {"s": second["manifest_sha256"]}).scalar_one()
+            text(
+                "SELECT count(*) FROM ops.audit WHERE action = 'evaluation.holdout_reuse_blocked' "
+                "AND details->>'manifest_sha256' = :s"
+            ),
+            {"s": second["manifest_sha256"]},
+        ).scalar_one()
     assert audits == 1
 
 
 def test_observation_source_and_payload_validation(db, wdi_release):
-    res = run_job(db, {"source": "observations", "origin": "test_fixture", "countries": ["DZA", "CHN"],
-                       "concepts": [GDP], "years": [2000, 2024]})
+    res = run_job(
+        db,
+        {
+            "source": "observations",
+            "origin": "test_fixture",
+            "countries": ["DZA", "CHN"],
+            "concepts": [GDP],
+            "years": [2000, 2024],
+        },
+    )
     m = manifest_of(db, res["manifest_sha256"])
     assert m["inputs"]["source"]["kind"] == "observations_latest_revision"
     assert set(m["inputs"]["series"]) == {"DZA:" + GDP, "CHN:" + GDP}
@@ -249,19 +305,30 @@ def test_observation_source_and_payload_validation(db, wdi_release):
 
 
 def test_ledger_freezes_and_refuses_to_score_before_outcomes(db, wdi_release):
-    issued = ledger.issue_forecasts(db.worker, db.store, model_key="forecast.log_drift", environment="test",
-                                    horizons=(1, 2), release_id=wdi_release.release_id,
-                                    countries=["DZA", "FRA"])
+    issued = ledger.issue_forecasts(
+        db.worker,
+        db.store,
+        model_key="forecast.log_drift",
+        environment="test",
+        horizons=(1, 2),
+        release_id=wdi_release.release_id,
+        countries=["DZA", "FRA"],
+    )
     assert issued.target_years == (2025, 2026)
     assert issued.n_forecasts == 8  # 2 countries x 2 concepts x 2 horizons
     frozen = ledger.load_frozen_manifest(db.store, issued.manifest_sha256)
     assert ledger.manifest_sha256(frozen) == issued.manifest_sha256
     assert frozen["label"] == ledger.LEDGER_LABEL and frozen["model"] == "forecast.log_drift@1.0.0"
     with db.owner.connect() as conn:
-        row = conn.execute(text("SELECT replay_mode, metrics, context_id FROM model.evaluation WHERE id = :i"),
-                           {"i": issued.evaluation_id}).mappings().one()
-        mode = conn.execute(text("SELECT mode FROM meta.context WHERE id = :c"),
-                            {"c": row["context_id"]}).scalar_one()
+        row = (
+            conn.execute(
+                text("SELECT replay_mode, metrics, context_id FROM model.evaluation WHERE id = :i"),
+                {"i": issued.evaluation_id},
+            )
+            .mappings()
+            .one()
+        )
+        mode = conn.execute(text("SELECT mode FROM meta.context WHERE id = :c"), {"c": row["context_id"]}).scalar_one()
     assert mode == "evaluation"
     assert row["replay_mode"] == "operational_as_known"
     assert row["metrics"]["kind"] == "prospective_issue"
@@ -279,8 +346,9 @@ def test_ledger_freezes_and_refuses_to_score_before_outcomes(db, wdi_release):
     sid = "DZA:" + POP
     later = issued.issued_at + timedelta(days=400)
     out = {(sid, 2025): ledger.Outcome(Decimal("47000000"), recorded_at=later)}
-    scored = ledger.score_issue(frozen, out, scored_at=later + timedelta(seconds=1),
-                                issue_sha256=issued.manifest_sha256)
+    scored = ledger.score_issue(
+        frozen, out, scored_at=later + timedelta(seconds=1), issue_sha256=issued.manifest_sha256
+    )
     assert scored["summary"]["n_scored"] == 1 and scored["summary"]["n_pending"] == 7
     assert scored["scores"][0]["covered"] in (True, False)
     # An outcome REVA already held at issue time is not a prospective score.
@@ -292,8 +360,15 @@ def test_ledger_freezes_and_refuses_to_score_before_outcomes(db, wdi_release):
 
 
 def test_ledger_tamper_detection_and_envelope(db, wdi_release):
-    issued = ledger.issue_forecasts(db.worker, db.store, model_key="forecast.last_value", environment="test",
-                                    horizons=(1,), release_id=wdi_release.release_id, countries=["CHN"])
+    issued = ledger.issue_forecasts(
+        db.worker,
+        db.store,
+        model_key="forecast.last_value",
+        environment="test",
+        horizons=(1,),
+        release_id=wdi_release.release_id,
+        countries=["CHN"],
+    )
     frozen = ledger.load_frozen_manifest(db.store, issued.manifest_sha256)
     tampered = dict(frozen, issued_at="1999-01-01T00:00:00+00:00")
     assert ledger.manifest_sha256(tampered) != issued.manifest_sha256
@@ -306,5 +381,12 @@ def test_ledger_tamper_detection_and_envelope(db, wdi_release):
         ledger.load_frozen_manifest(TamperedStore(), issued.manifest_sha256)  # type: ignore[arg-type]
     # Horizons beyond the evaluated envelope (max 3 years) are refused, not extrapolated.
     with pytest.raises(CapabilityGap):
-        ledger.issue_forecasts(db.worker, db.store, model_key="forecast.log_drift", environment="test",
-                               horizons=(5,), release_id=wdi_release.release_id, countries=["FRA"])
+        ledger.issue_forecasts(
+            db.worker,
+            db.store,
+            model_key="forecast.log_drift",
+            environment="test",
+            horizons=(5,),
+            release_id=wdi_release.release_id,
+            countries=["FRA"],
+        )

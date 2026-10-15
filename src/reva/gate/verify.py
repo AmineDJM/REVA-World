@@ -138,11 +138,17 @@ def verify_gate(settings: Any, engine_factory: Any = None) -> dict[str, Any]:
     """
     if getattr(settings, "reva_gate_db_password", None) is None:
         if str(getattr(settings, "reva_env", "")) == "production":
-            return {"ok": False, "status": "missing",
-                    "note": "REVA_GATE_DB_PASSWORD is required in production (independent promotion gate)"}
-        return {"ok": True, "status": "skipped",
-                "note": "REVA_GATE_DB_PASSWORD is not configured: the reva_gate login was not checked. Without "
-                        "the gate process no proposal is auto-promoted (discovery reports gate_pending)."}
+            return {
+                "ok": False,
+                "status": "missing",
+                "note": "REVA_GATE_DB_PASSWORD is required in production (independent promotion gate)",
+            }
+        return {
+            "ok": True,
+            "status": "skipped",
+            "note": "REVA_GATE_DB_PASSWORD is not configured: the reva_gate login was not checked. Without "
+            "the gate process no proposal is auto-promoted (discovery reports gate_pending).",
+        }
     if engine_factory is None:
         from reva.adapters.postgres.engine import make_engine
 
@@ -159,5 +165,10 @@ def verify_gate(settings: Any, engine_factory: Any = None) -> dict[str, Any]:
     return {"status": "ok" if report["ok"] else "privilege_mismatch", **report}
 
 
-__all__ = ["EXPECTED_DEFINER_FUNCTIONS", "EXPECTED_RELATION_PRIVILEGES", "EXPECTED_SCHEMA_USAGE",
-           "gate_privilege_report", "verify_gate"]
+__all__ = [
+    "EXPECTED_DEFINER_FUNCTIONS",
+    "EXPECTED_RELATION_PRIVILEGES",
+    "EXPECTED_SCHEMA_USAGE",
+    "gate_privilege_report",
+    "verify_gate",
+]

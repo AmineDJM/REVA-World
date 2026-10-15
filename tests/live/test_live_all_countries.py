@@ -24,8 +24,7 @@ pytestmark = pytest.mark.live
 
 
 async def test_comtrade_preview_accepts_multi_reporter_and_refuses_multi_period() -> None:
-    c = ComtradeBatchConnector({"FRA": 251, "CHN": 156, "USA": 842, "DZA": 12}, total_years=(2023,),
-                               bilateral_years=())
+    c = ComtradeBatchConnector({"FRA": 251, "CHN": 156, "USA": 842, "DZA": 12}, total_years=(2023,), bilateral_years=())
     http = make_live_client(c.describe(), get_settings())
     try:
         item = c.units()[0]
@@ -36,8 +35,10 @@ async def test_comtrade_preview_accepts_multi_reporter_and_refuses_multi_period(
         reporters = {d["reporterCode"] for d in batch.metadata["rows"]}
         assert {"156", "251", "842"} <= {str(r) for r in reporters}
         with pytest.raises(RevaError):
-            await http.get(f"{BASE_URL}?period=2022,2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0"
-                           "&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500")
+            await http.get(
+                f"{BASE_URL}?period=2022,2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0"
+                "&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500"
+            )
     finally:
         await http.aclose()
 

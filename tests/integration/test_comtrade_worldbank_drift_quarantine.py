@@ -28,28 +28,50 @@ CASES = {c["case"]: c for c in json.loads((REPAIR / "manifest.json").read_text()
 
 def _quarantined(db: Any, raw_sha256: str) -> tuple[set[str], int]:
     with db.owner.connect() as c:
-        rows = c.execute(text(
-            "SELECT a.id, a.response_metadata FROM evidence.acquisition a WHERE a.raw_sha256 = :s"),
-            {"s": raw_sha256}).mappings().all()
+        rows = (
+            c.execute(
+                text("SELECT a.id, a.response_metadata FROM evidence.acquisition a WHERE a.raw_sha256 = :s"),
+                {"s": raw_sha256},
+            )
+            .mappings()
+            .all()
+        )
         assert rows
-        codes = {f["code"] for r in rows for q in r["response_metadata"]["quality"] for f in q["findings"]
-                 if f["severity"] == "blocker"}
-        n_obs = c.execute(text("SELECT count(*) FROM evidence.observation WHERE acquisition_id = ANY(:ids)"),
-                          {"ids": [r["id"] for r in rows]}).scalar_one()
+        codes = {
+            f["code"]
+            for r in rows
+            for q in r["response_metadata"]["quality"]
+            for f in q["findings"]
+            if f["severity"] == "blocker"
+        }
+        n_obs = c.execute(
+            text("SELECT count(*) FROM evidence.observation WHERE acquisition_id = ANY(:ids)"),
+            {"ids": [r["id"] for r in rows]},
+        ).scalar_one()
     return codes, n_obs
 
 
 @pytest.mark.parametrize(
     ("case", "connector", "item_key", "blocker"),
     [
-        ("ct_renamed_field", lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
-         "total:FRA:M:2023", "field_absent"),
-        ("ct_value_type_change",
-         lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
-         "total:FRA:M:2023", "value_type_drift"),
-        ("ct_classification_change",
-         lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
-         "total:FRA:M:2023", "classification_unreviewed"),
+        (
+            "ct_renamed_field",
+            lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
+            "total:FRA:M:2023",
+            "field_absent",
+        ),
+        (
+            "ct_value_type_change",
+            lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
+            "total:FRA:M:2023",
+            "value_type_drift",
+        ),
+        (
+            "ct_classification_change",
+            lambda: ComtradeConnector(reporters=("FRA",), total_years=(2023,), bilateral_years=()),
+            "total:FRA:M:2023",
+            "classification_unreviewed",
+        ),
         ("wb_unit_text_and_scale", WorldBankConnector, "series:SP.POP.TOTL:p1", "unit_drift"),
     ],
 )

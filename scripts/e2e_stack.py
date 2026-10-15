@@ -273,15 +273,19 @@ class Stack:
 
         def ingest(name: str, conn: Any, http: Any) -> dict[str, Any]:
             hook = getattr(conn, "post_publish", None) or post_publish_for(conn.describe().template)
-            rep = with_connection_retry(f"ingest {name}", lambda: asyncio.run(
-                run_connector(conn, http, store, worker, persist_cursor=False, post_publish=hook)))
+            rep = with_connection_retry(
+                f"ingest {name}",
+                lambda: asyncio.run(run_connector(conn, http, store, worker, persist_cursor=False, post_publish=hook)),
+            )
             if rep.errors:
                 log.warning("V2 fixture ingest %s reported errors: %s", name, rep.errors[:5])
             log.info("ingested V2 fixture %s: %d inserted", name, rep.inserted)
             return self._summary(rep, conn)
 
-        restricted = [*V2_FIXTURE_PLAN_CONNECTORS,
-                      *(("eurostat.figaro.iciot_ii",) if self.args.figaro == "recorded" else ())]
+        restricted = [
+            *V2_FIXTURE_PLAN_CONNECTORS,
+            *(("eurostat.figaro.iciot_ii",) if self.args.figaro == "recorded" else ()),
+        ]
         for name in restricted:
             if not self.args.fixture_plan:
                 out[name] = {"skipped": "fixtures captured for a restricted plan; run with --fixture-plan"}
@@ -292,9 +296,11 @@ class Stack:
         fr = fp.fixture_plan_connector(ed.NAME, fr_conn, root=SOCIAL_FIXTURES)
         out["eurostat.demography:FR"] = ingest(ed.NAME, fr, FixtureHttp(ed.NAME, root=SOCIAL_FIXTURES))
         # labour/pensions: default plan captured as is; its connector hook registers the dataset inputs
-        out["eurostat.labour_pensions"] = ingest("eurostat.labour_pensions",
-                                                 fp.fixture_plan_connector("eurostat.labour_pensions"),
-                                                 FixtureHttp("eurostat.labour_pensions"))
+        out["eurostat.labour_pensions"] = ingest(
+            "eurostat.labour_pensions",
+            fp.fixture_plan_connector("eurostat.labour_pensions"),
+            FixtureHttp("eurostat.labour_pensions"),
+        )
         if self.args.figaro == "synthetic":
             out["io_dataset"] = self.ingest_synthetic_io(settings, store, worker)
         return out
@@ -312,8 +318,9 @@ class Stack:
         from reva.evidence.runner import FixtureHttp, _fixture_fingerprint, run_connector
         from reva.kernel.ids import sha256_bytes
 
-        spec = importlib.util.spec_from_file_location("io_synthetic",
-                                                      ROOT / "tests" / "fixtures" / "io_tables" / "synthetic.py")
+        spec = importlib.util.spec_from_file_location(
+            "io_synthetic", ROOT / "tests" / "fixtures" / "io_tables" / "synthetic.py"
+        )
         assert spec and spec.loader
         syn = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(syn)
@@ -329,10 +336,18 @@ class Stack:
         for url, body in bodies.items():
             fpr = _fixture_fingerprint(url)
             (d / f"{fpr[:16]}.bin").write_bytes(body)
-            entries.append({"request_fingerprint": fpr, "url": url, "file": f"{fpr[:16]}.bin",
-                            "sha256": sha256_bytes(body), "status": 200,
-                            "headers": {"content-type": "application/vnd.sdmx.data+csv"},
-                            "retrieved_at": "2026-10-15T00:00:00+00:00", "licence": it.LICENCE})
+            entries.append(
+                {
+                    "request_fingerprint": fpr,
+                    "url": url,
+                    "file": f"{fpr[:16]}.bin",
+                    "sha256": sha256_bytes(body),
+                    "status": 200,
+                    "headers": {"content-type": "application/vnd.sdmx.data+csv"},
+                    "retrieved_at": "2026-10-15T00:00:00+00:00",
+                    "licence": it.LICENCE,
+                }
+            )
         (d / "manifest.json").write_text(json.dumps(entries))
         owner = make_engine("migration", settings)
         try:
@@ -342,8 +357,15 @@ class Stack:
                 register_connector_version(c, store, it.FigaroConnector(dims=dims).describe(), act.id)
         finally:
             owner.dispose()
-        rep = asyncio.run(run_connector(it.FigaroConnector(syn.YEAR, dims=dims), FixtureHttp(it.NAME, root=root),
-                                        store, worker, persist_cursor=False))
+        rep = asyncio.run(
+            run_connector(
+                it.FigaroConnector(syn.YEAR, dims=dims),
+                FixtureHttp(it.NAME, root=root),
+                store,
+                worker,
+                persist_cursor=False,
+            )
+        )
         if rep.errors:
             log.warning("synthetic IO ingest reported errors: %s", rep.errors[:5])
             return {"errors": rep.errors}
@@ -370,8 +392,12 @@ class Stack:
         owner = make_engine("migration", settings)
         try:
             with owner.begin() as c:
-                present = c.execute(text("SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,"
-                                         "bigint)') IS NOT NULL")).scalar_one()
+                present = c.execute(
+                    text(
+                        "SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,"
+                        "bigint)') IS NOT NULL"
+                    )
+                ).scalar_one()
                 if not present:
                     c.execute(text(LEDGER_FUNCTIONS_SQL))
         finally:
@@ -551,17 +577,34 @@ def main(argv: list[str] | None = None) -> int:
     )
     ap.add_argument("--keep-db", action="store_true", help="keep the database and temp files for debugging")
     ap.add_argument("--run", action="store_true", help="run the Playwright suite against the stack, then exit")
-    ap.add_argument("--recorded-drafter", action="store_true",
-                    help="replay recorded LLM responses for POST /v1/scenario-drafts (never a live LLM)")
-    ap.add_argument("--v2-fixtures", action="store_true",
-                    help="also ingest the V2 recorded fixtures (dataset inputs) before the release cutoff")
-    ap.add_argument("--fixture-plan", action=argparse.BooleanOptionalAction, default=None,
-                    help="replay restricted-plan fixtures with their captured plans (default: on with --v2-fixtures)")
-    ap.add_argument("--figaro", choices=("synthetic", "recorded", "none"), default="synthetic",
-                    help="IO table for --v2-fixtures: synthetic 3x2 table (default), the recorded one-group capture, "
-                         "or none")
-    ap.add_argument("--no-backtests", dest="backtests", action="store_false",
-                    help="with --v2-fixtures, do not enqueue back-test jobs after publication")
+    ap.add_argument(
+        "--recorded-drafter",
+        action="store_true",
+        help="replay recorded LLM responses for POST /v1/scenario-drafts (never a live LLM)",
+    )
+    ap.add_argument(
+        "--v2-fixtures",
+        action="store_true",
+        help="also ingest the V2 recorded fixtures (dataset inputs) before the release cutoff",
+    )
+    ap.add_argument(
+        "--fixture-plan",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="replay restricted-plan fixtures with their captured plans (default: on with --v2-fixtures)",
+    )
+    ap.add_argument(
+        "--figaro",
+        choices=("synthetic", "recorded", "none"),
+        default="synthetic",
+        help="IO table for --v2-fixtures: synthetic 3x2 table (default), the recorded one-group capture, or none",
+    )
+    ap.add_argument(
+        "--no-backtests",
+        dest="backtests",
+        action="store_false",
+        help="with --v2-fixtures, do not enqueue back-test jobs after publication",
+    )
     ap.add_argument("playwright_args", nargs="*", help="extra Playwright arguments (after --)")
     args = ap.parse_args(argv)
     if args.fixture_plan is None:

@@ -53,8 +53,12 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp(f"objects_{label}")
     data = base.model_dump()
-    data.update(reva_migration_database_url=base.migration_url().set(database=name).render_as_string(
-        hide_password=False), reva_db_name=name, reva_env="test", reva_object_root=root)
+    data.update(
+        reva_migration_database_url=base.migration_url().set(database=name).render_as_string(hide_password=False),
+        reva_db_name=name,
+        reva_env="test",
+        reva_object_root=root,
+    )
     settings = Settings.model_validate(data)
     from reva.cli.bootstrap import bootstrap
     from reva.cli.seed import seed
@@ -69,8 +73,9 @@ def fresh_database(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iter
             time.sleep(1)
     store = FilesystemArtifactStore(root, settings.reva_s3_prefix)
     pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 0})
-    d = FreshDB(settings, make_engine("migration", settings), make_engine("worker", pooled),
-                make_engine("sim", settings), store)
+    d = FreshDB(
+        settings, make_engine("migration", settings), make_engine("worker", pooled), make_engine("sim", settings), store
+    )
     seed(d.worker, store)
     try:
         yield d
@@ -108,13 +113,24 @@ def test_worker_loop_fixture_ingest_publishes_one_release(wdb: FreshDB) -> None:
     def finished(_w: Worker) -> bool:
         with wdb.owner.connect() as c:
             releases = c.execute(text("SELECT count(*) FROM belief.release")).scalar()
-            pending = c.execute(text("SELECT count(*) FROM ops.job WHERE status IN "
-                                     "('queued','running','cancel_requested')")).scalar()
+            pending = c.execute(
+                text("SELECT count(*) FROM ops.job WHERE status IN ('queued','running','cancel_requested')")
+            ).scalar()
             unprocessed = c.execute(text("SELECT count(*) FROM ops.outbox WHERE processed_at IS NULL")).scalar()
         return releases >= 1 and pending == 0 and unprocessed == 0
 
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               poll_interval=0.05, scheduler=True, invalidation=True, invalidation_tick_seconds=0.5)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        poll_interval=0.05,
+        scheduler=True,
+        invalidation=True,
+        invalidation_tick_seconds=0.5,
+    )
     t, out = _run_in_thread(w, stop_when=finished)
     t.join(180)
     if t.is_alive():
@@ -136,8 +152,10 @@ def test_worker_loop_fixture_ingest_publishes_one_release(wdb: FreshDB) -> None:
     assert queue.job_row(wdb.owner, jid)["status"] == "succeeded"
     acks_ms = sorted(a * 1000 for a in w.ack_latencies)
     assert len(acks_ms) >= 2 and max(acks_ms) < 1000  # claim -> handler start well under the 1 s target
-    print(f"\nqueue ack latency (claim->handler start) ms: n={len(acks_ms)} min={acks_ms[0]:.2f} "
-          f"median={statistics.median(acks_ms):.2f} max={acks_ms[-1]:.2f}")
+    print(
+        f"\nqueue ack latency (claim->handler start) ms: n={len(acks_ms)} min={acks_ms[0]:.2f} "
+        f"median={statistics.median(acks_ms):.2f} max={acks_ms[-1]:.2f}"
+    )
     outcomes = {o.job_type: o for o in w.outcomes}
     print("job durations s: " + ", ".join(f"{k}={v.duration_seconds:.3f}" for k, v in outcomes.items()))
 
@@ -156,12 +174,27 @@ def test_sigterm_stops_claiming_signals_handler_and_drains(wdb: FreshDB, monkeyp
 
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: cooperative if jt == "health" else real(jt))
     with wdb.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
-                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                "WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
     first = _enqueue(wdb, "health", {"probe": "sigterm-1"}, priority=10)
     second = _enqueue(wdb, "health", {"probe": "sigterm-2"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, concurrency=1, lease_seconds=60,
-               heartbeat_seconds=2, poll_interval=0.05, scheduler=False, invalidation=False, drain_seconds=10)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        concurrency=1,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        poll_interval=0.05,
+        scheduler=False,
+        invalidation=False,
+        drain_seconds=10,
+    )
     old_term, old_int = signal.getsignal(signal.SIGTERM), signal.getsignal(signal.SIGINT)
     w.install_signal_handlers()
     try:
@@ -193,11 +226,25 @@ def test_drain_deadline_leaves_uncooperative_job_to_lease_expiry(wdb: FreshDB, m
 
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: stubborn)
     with wdb.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
-                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                "WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
     jid = _enqueue(wdb, "health", {"probe": "stubborn"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               poll_interval=0.05, scheduler=False, invalidation=False, drain_seconds=0.3)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        poll_interval=0.05,
+        scheduler=False,
+        invalidation=False,
+        drain_seconds=0.3,
+    )
     t, out = _run_in_thread(w)
     assert started.wait(15)
     w.request_stop("SIGTERM")
@@ -213,8 +260,12 @@ def test_drain_deadline_leaves_uncooperative_job_to_lease_expiry(wdb: FreshDB, m
 # --------------------------------------------------------------------------- R2-01 shutdown is not a cancel
 def _clear_queue(d: FreshDB) -> None:
     with d.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
-                       "WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL "
+                "WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
         c.execute(text("UPDATE ops.schedule SET enabled = false"))
 
 
@@ -245,8 +296,16 @@ def test_sigterm_releases_job_whatever_the_handler_does(wdb: FreshDB, monkeypatc
     started = threading.Event()
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like(style, started))
     jid = _enqueue(wdb, "health", {"probe": f"r2-01-{style}"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               scheduler=False, invalidation=False)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        scheduler=False,
+        invalidation=False,
+    )
     job = w.claim_one()
     assert job is not None and job.id == jid
     out: dict = {}
@@ -268,16 +327,25 @@ def test_user_cancel_still_cancels(wdb: FreshDB, monkeypatch, style: str) -> Non
     started = threading.Event()
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like(style, started))
     jid = _enqueue(wdb, "health", {"probe": f"r2-01-user-{style}"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               scheduler=False, invalidation=False)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        scheduler=False,
+        invalidation=False,
+    )
     job = w.claim_one()
     out: dict = {}
     t = threading.Thread(target=lambda: out.setdefault("o", w.execute(job)))
     t.start()
     assert started.wait(10)
     with wdb.owner.begin() as c:
-        assert c.execute(text("SELECT ops.request_cancel(:j, 'human:tester')"), {"j": jid}).scalar() == \
-            "cancel_requested"
+        assert (
+            c.execute(text("SELECT ops.request_cancel(:j, 'human:tester')"), {"j": jid}).scalar() == "cancel_requested"
+        )
     t.join(20)
     row = queue.job_row(wdb.owner, jid)
     assert row["status"] == "cancelled" and row["finished_at"] is not None
@@ -290,8 +358,16 @@ def test_user_cancel_during_shutdown_ends_cancelled(wdb: FreshDB, monkeypatch) -
     started = threading.Event()
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: _sim_like("return", started))
     jid = _enqueue(wdb, "health", {"probe": "r2-01-both"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               scheduler=False, invalidation=False)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        scheduler=False,
+        invalidation=False,
+    )
     job = w.claim_one()
     assert started.wait(0) is False
     with wdb.owner.begin() as c:
@@ -318,8 +394,16 @@ def test_context_signals_distinguish_shutdown_from_user_cancel(wdb: FreshDB, mon
 
     monkeypatch.setattr(jobs, "resolve_handler", lambda jt: handler)
     jid = _enqueue(wdb, "health", {"probe": "r2-01-signals"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, lease_seconds=60, heartbeat_seconds=2,
-               scheduler=False, invalidation=False)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        lease_seconds=60,
+        heartbeat_seconds=2,
+        scheduler=False,
+        invalidation=False,
+    )
     job = w.claim_one()
     t = threading.Thread(target=lambda: w.execute(job))
     t.start()
@@ -361,19 +445,32 @@ def test_sigterm_during_real_simulation_requeues_job(wdb: FreshDB, sim_baseline:
 
     _clear_queue(wdb)
     spec = _json.loads((CONTRACTS / "scenario.example.json").read_text())
-    spec.update(baseline_release_id=str(sim_baseline["release_id"]),
-                knowledge_cutoff=sim_baseline["cutoff"].isoformat(), title=f"R2-01 {uuid.uuid4().hex[:6]}")
+    spec.update(
+        baseline_release_id=str(sim_baseline["release_id"]),
+        knowledge_cutoff=sim_baseline["cutoff"].isoformat(),
+        title=f"R2-01 {uuid.uuid4().hex[:6]}",
+    )
     s = validate_scenario_spec(spec)
     api = make_engine("api", wdb.settings)
     try:
         with api.begin() as c:
-            sid = c.execute(text("SELECT sim.create_scenario(CAST(:s AS jsonb), :b, :d, 'human:test')"),
-                            {"s": _json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()}).scalar_one()
+            sid = c.execute(
+                text("SELECT sim.create_scenario(CAST(:s AS jsonb), :b, :d, 'human:test')"),
+                {"s": _json.dumps(s.as_json()), "b": s.canonical_bytes(), "d": s.digest()},
+            ).scalar_one()
     finally:
         api.dispose()
     jid = _enqueue(wdb, "simulation", {"scenario_id": str(sid), "fidelity": "L1"})
-    w = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, scheduler=False, invalidation=False,
-               lease_seconds=60, heartbeat_seconds=5)
+    w = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        scheduler=False,
+        invalidation=False,
+        lease_seconds=60,
+        heartbeat_seconds=5,
+    )
     real = sj.plan_run
 
     def plan_then_sigterm(*a, **k):
@@ -392,8 +489,16 @@ def test_sigterm_during_real_simulation_requeues_job(wdb: FreshDB, sim_baseline:
         assert c.execute(text("SELECT count(*) FROM sim.run WHERE job_id = :j"), {"j": jid}).scalar() == 0
     # A fresh worker later runs it to completion.
     monkeypatch.setattr(sj, "plan_run", real)
-    w2 = Worker(wdb.settings, wdb.worker, wdb.store, wdb.sim, scheduler=False, invalidation=False,
-                lease_seconds=60, heartbeat_seconds=5)
+    w2 = Worker(
+        wdb.settings,
+        wdb.worker,
+        wdb.store,
+        wdb.sim,
+        scheduler=False,
+        invalidation=False,
+        lease_seconds=60,
+        heartbeat_seconds=5,
+    )
     job2 = w2.claim_one()
     assert job2 is not None and job2.id == jid and job2.attempts == 1
     w2.execute(job2)
@@ -403,8 +508,7 @@ def test_sigterm_during_real_simulation_requeues_job(wdb: FreshDB, sim_baseline:
 
 
 # --------------------------------------------------------------------------- R2-16 demo CLI
-def test_demo_runs_through_the_worker_path_with_db_clock_cutoff(wdb: FreshDB, sim_baseline: dict,
-                                                                 monkeypatch) -> None:
+def test_demo_runs_through_the_worker_path_with_db_clock_cutoff(wdb: FreshDB, sim_baseline: dict, monkeypatch) -> None:
     from reva.cli import demo
 
     _clear_queue(wdb)
@@ -417,20 +521,35 @@ def test_demo_runs_through_the_worker_path_with_db_clock_cutoff(wdb: FreshDB, si
         with pytest.raises(Exception, match="origin"):
             demo.run_demo(scenario="crude-border-price-25", countries=["FRA"], fidelity="L1", origin="bogus")
         # A worker is "running": the job is left queued for it and polled with a timeout.
-        queued = demo.run_demo(scenario="crude-border-price-25", countries=["FRA", "USA"], fidelity="L1",
-                               origin="test_fixture", execute_locally=False, wait_seconds=0.5)
+        queued = demo.run_demo(
+            scenario="crude-border-price-25",
+            countries=["FRA", "USA"],
+            fidelity="L1",
+            origin="test_fixture",
+            execute_locally=False,
+            wait_seconds=0.5,
+        )
         assert queued["execution"] == "worker" and queued["job"]["status"] == "queued"
         assert queued["results"] == [] and queued["warnings"]
         # No worker: the demo executes the job itself through the fenced worker path.
-        out = demo.run_demo(scenario="crude-border-price-25", countries=["FRA", "USA"], fidelity="L1",
-                            origin="test_fixture", execute_locally=True)
+        out = demo.run_demo(
+            scenario="crude-border-price-25",
+            countries=["FRA", "USA"],
+            fidelity="L1",
+            origin="test_fixture",
+            execute_locally=True,
+        )
         assert out["execution"].startswith("local:") and out["job"]["status"] == "succeeded"
         assert out["run_id"] and out["results"]
         assert out["baseline_release"]["origin"] == "test_fixture"
         cutoff = datetime.fromisoformat(out["knowledge_cutoff"].replace("Z", "+00:00"))
         assert cutoff >= out["baseline_release"]["knowledge_cutoff"]
         with wdb.owner.connect() as c:
-            assert c.execute(text("SELECT count(DISTINCT r.run_id) FROM sim.result r WHERE r.run_id = :r"),
-                             {"r": out["run_id"]}).scalar() == 1
+            assert (
+                c.execute(
+                    text("SELECT count(DISTINCT r.run_id) FROM sim.result r WHERE r.run_id = :r"), {"r": out["run_id"]}
+                ).scalar()
+                == 1
+            )
     finally:
         api.dispose()

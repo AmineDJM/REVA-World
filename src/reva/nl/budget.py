@@ -60,21 +60,37 @@ def load_llm_budget(policy: Any = None) -> LlmBudget:
     section = (content.get("llm") or {}).get("scenario_drafts") or {}
     version = str(content.get("policy_version", "unversioned"))
     try:
-        b = LlmBudget(version, str(getattr(policy, "sha256", "")), int(section["daily_requests"]),
-                      int(section["daily_tokens"]), int(section["max_output_tokens"]))
+        b = LlmBudget(
+            version,
+            str(getattr(policy, "sha256", "")),
+            int(section["daily_requests"]),
+            int(section["daily_tokens"]),
+            int(section["max_output_tokens"]),
+        )
     except (KeyError, TypeError, ValueError):
-        raise BudgetExhausted("no LLM drafting budget in budgets.yaml (llm.scenario_drafts): refused (fail closed)",
-                              reason="unknown_source", source_key="llm.scenario_drafts", policy=version) from None
+        raise BudgetExhausted(
+            "no LLM drafting budget in budgets.yaml (llm.scenario_drafts): refused (fail closed)",
+            reason="unknown_source",
+            source_key="llm.scenario_drafts",
+            policy=version,
+        ) from None
     if b.daily_requests <= 0 or b.daily_tokens <= 0 or b.max_output_tokens <= 0:
-        raise BudgetExhausted("the LLM drafting budget is 0: no requests allowed", reason="zero_limit",
-                              source_key="llm.scenario_drafts", policy=version)
+        raise BudgetExhausted(
+            "the LLM drafting budget is 0: no requests allowed",
+            reason="zero_limit",
+            source_key="llm.scenario_drafts",
+            policy=version,
+        )
     return b
 
 
 def token_upper_bound(request: LlmRequest) -> int:
     """Upper bound of the tokens one request can consume (input bytes + overhead + max output)."""
-    sent = (len(request.system_prompt.encode()) + len(request.user_content.encode())
-            + len(json.dumps(request.output_schema, separators=(",", ":")).encode()))
+    sent = (
+        len(request.system_prompt.encode())
+        + len(request.user_content.encode())
+        + len(json.dumps(request.output_schema, separators=(",", ":")).encode())
+    )
     return sent + MESSAGE_OVERHEAD_TOKENS + request.max_output_tokens
 
 
@@ -156,7 +172,8 @@ GRANT EXECUTE ON FUNCTION ops.reserve_llm_budget(text, integer, bigint, integer,
 
 _HAS_FUNCTIONS = text(
     "SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,bigint)') IS NOT NULL "
-    "AND to_regprocedure('ops.settle_llm_budget(text,integer,bigint)') IS NOT NULL")
+    "AND to_regprocedure('ops.settle_llm_budget(text,integer,bigint)') IS NOT NULL"
+)
 
 
 class DbLlmLedger:
@@ -176,25 +193,33 @@ class DbLlmLedger:
             msg = f"daily LLM request budget exhausted ({used_r} used + {requests} > {b.daily_requests})"
         else:
             msg = f"daily LLM token budget exhausted ({used_t} used + {tokens} reserved > {b.daily_tokens})"
-        return BudgetExhausted(msg + "; nothing was sent to a provider", reason=reason,
-                               source_key="llm.scenario_drafts", policy=b.policy_version,
-                               daily_requests=b.daily_requests, daily_tokens=b.daily_tokens,
-                               used_requests=int(used_r or 0), used_tokens=int(used_t or 0))
+        return BudgetExhausted(
+            msg + "; nothing was sent to a provider",
+            reason=reason,
+            source_key="llm.scenario_drafts",
+            policy=b.policy_version,
+            daily_requests=b.daily_requests,
+            daily_tokens=b.daily_tokens,
+            used_requests=int(used_r or 0),
+            used_tokens=int(used_t or 0),
+        )
 
     def reserve(self, operation_id: str, *, requests: int, tokens: int) -> None:
         b = self.budget
         if self._functions():
             with self.engine.begin() as conn:
-                res = conn.execute(text("SELECT ops.reserve_llm_budget(:o, :r, :t, :dr, :dt)"),
-                                   {"o": operation_id, "r": requests, "t": tokens, "dr": b.daily_requests,
-                                    "dt": b.daily_tokens}).scalar_one()
+                res = conn.execute(
+                    text("SELECT ops.reserve_llm_budget(:o, :r, :t, :dr, :dt)"),
+                    {"o": operation_id, "r": requests, "t": tokens, "dr": b.daily_requests, "dt": b.daily_tokens},
+                ).scalar_one()
             res = res if isinstance(res, dict) else json.loads(res)
             if res.get("granted"):
                 return
             if res.get("reason") == "operation_exists":
                 raise IdempotencyReplay()
-            raise self._exhausted(str(res.get("reason")), res.get("used_requests"), res.get("used_tokens"),
-                                  requests, tokens)
+            raise self._exhausted(
+                str(res.get("reason")), res.get("used_requests"), res.get("used_tokens"), requests, tokens
+            )
         self._reserve_direct(operation_id, requests=requests, tokens=tokens)
 
     def _reserve_direct(self, operation_id: str, *, requests: int, tokens: int) -> None:
@@ -203,15 +228,29 @@ class DbLlmLedger:
         b = self.budget
         try:
             with self.engine.connect() as conn:
-                exists = conn.execute(text("SELECT count(*) FROM ops.budget_ledger WHERE operation_id = ANY(:o)"),
-                                      {"o": [f"{operation_id}:requests", f"{operation_id}:tokens"]}).scalar_one()
+                exists = conn.execute(
+                    text("SELECT count(*) FROM ops.budget_ledger WHERE operation_id = ANY(:o)"),
+                    {"o": [f"{operation_id}:requests", f"{operation_id}:tokens"]},
+                ).scalar_one()
             if exists:
                 raise IdempotencyReplay()
-            reserve(self.engine, account_key=REQUESTS_ACCOUNT, operation_id=f"{operation_id}:requests",
-                    unit="requests", amount=requests, daily_limit=b.daily_requests)
+            reserve(
+                self.engine,
+                account_key=REQUESTS_ACCOUNT,
+                operation_id=f"{operation_id}:requests",
+                unit="requests",
+                amount=requests,
+                daily_limit=b.daily_requests,
+            )
             try:
-                reserve(self.engine, account_key=TOKENS_ACCOUNT, operation_id=f"{operation_id}:tokens",
-                        unit="tokens", amount=tokens, daily_limit=b.daily_tokens)
+                reserve(
+                    self.engine,
+                    account_key=TOKENS_ACCOUNT,
+                    operation_id=f"{operation_id}:tokens",
+                    unit="tokens",
+                    amount=tokens,
+                    daily_limit=b.daily_tokens,
+                )
             except BudgetExhausted as e:
                 consume(self.engine, f"{operation_id}:requests", 0)  # nothing was sent
                 raise self._exhausted("token_limit", None, e.details.get("used"), requests, tokens) from None
@@ -224,14 +263,17 @@ class DbLlmLedger:
                 raise LlmUnavailable(
                     "the LLM budget ledger is not writable by this database role and the ledger functions "
                     "(ops.reserve_llm_budget / ops.settle_llm_budget, migration 0008_v2) are absent: drafting "
-                    "is refused (fail closed)", reason="budget_ledger_unavailable") from None
+                    "is refused (fail closed)",
+                    reason="budget_ledger_unavailable",
+                ) from None
             raise
 
     def settle(self, operation_id: str, *, requests: int, tokens: int) -> None:
         if self._functions():
             with self.engine.begin() as conn:
-                conn.execute(text("SELECT ops.settle_llm_budget(:o, :r, :t)"),
-                             {"o": operation_id, "r": requests, "t": tokens})
+                conn.execute(
+                    text("SELECT ops.settle_llm_budget(:o, :r, :t)"), {"o": operation_id, "r": requests, "t": tokens}
+                )
             return
         from reva.operations.budgets import consume
 
@@ -246,6 +288,8 @@ class IdempotencyReplay(BudgetExhausted):
     http_status = 409
 
     def __init__(self) -> None:
-        super().__init__("this Idempotency-Key was already used for a scenario draft; drafts are not stored, so "
-                         "the earlier result cannot be replayed: send the request with a new key",
-                         reason="operation_exists")
+        super().__init__(
+            "this Idempotency-Key was already used for a scenario draft; drafts are not stored, so "
+            "the earlier result cannot be replayed: send the request with a new key",
+            reason="operation_exists",
+        )

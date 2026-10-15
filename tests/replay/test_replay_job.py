@@ -48,16 +48,31 @@ def _now(engine) -> datetime:
 
 def _claimed_job(db, payload: dict, *, lease: str = "10 minutes") -> JobContext:
     with db.api.begin() as c:
-        jid = c.execute(text("SELECT ops.submit_job('replay', CAST(:p AS jsonb), :k, 0, 'test:h1')"),
-                        {"p": json.dumps(payload), "k": f"replay-test-{uuid.uuid4().hex}"}).scalar_one()
+        jid = c.execute(
+            text("SELECT ops.submit_job('replay', CAST(:p AS jsonb), :k, 0, 'test:h1')"),
+            {"p": json.dumps(payload), "k": f"replay-test-{uuid.uuid4().hex}"},
+        ).scalar_one()
     with db.owner.begin() as c:  # claim manually, as the worker's claim would
-        token = c.execute(text(
-            """UPDATE ops.job SET status = 'running', worker_id = :w, attempts = attempts + 1,
+        token = c.execute(
+            text(
+                """UPDATE ops.job SET status = 'running', worker_id = :w, attempts = attempts + 1,
                  lease_until = clock_timestamp() + CAST(:l AS interval),
                  fencing_token = nextval('ops.fencing_seq'), updated_at = clock_timestamp()
-               WHERE id = :j RETURNING fencing_token"""), {"w": WORKER, "l": lease, "j": jid}).scalar_one()
-    return JobContext(job_id=jid, job_type="replay", worker_id=WORKER, fencing_token=int(token), attempt=1,
-                      settings=db.settings, worker_engine=db.worker, sim_engine=db.sim, store=db.store)
+               WHERE id = :j RETURNING fencing_token"""
+            ),
+            {"w": WORKER, "l": lease, "j": jid},
+        ).scalar_one()
+    return JobContext(
+        job_id=jid,
+        job_type="replay",
+        worker_id=WORKER,
+        fencing_token=int(token),
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=db.sim,
+        store=db.store,
+    )
 
 
 def _job(db, jid) -> dict:
@@ -67,11 +82,16 @@ def _job(db, jid) -> dict:
 
 async def test_operational_replay_job_writes_evaluation_context_and_manifest(db):
     await vl.ingest_vintage(db.worker, db.store, "pop_fra_1960_1961_job", "v1")
-    rel = publish_release(db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture,
-                          environment="test", concepts=[POP])
+    rel = publish_release(
+        db.worker, db.store, cutoff=_now(db.worker), origin=Origin.test_fixture, environment="test", concepts=[POP]
+    )
     cutoff = _now(db.worker)
-    payload = {"mode": "operational_as_known", "cutoff": cutoff.isoformat(), "origin": "test_fixture",
-               "concepts": [POP]}
+    payload = {
+        "mode": "operational_as_known",
+        "cutoff": cutoff.isoformat(),
+        "origin": "test_fixture",
+        "concepts": [POP],
+    }
     ctx = _claimed_job(db, payload)
     result = handle_replay(payload, ctx)
 
@@ -80,22 +100,43 @@ async def test_operational_replay_job_writes_evaluation_context_and_manifest(db)
     assert job["status"] == "succeeded" and job["result_ref"] == json.loads(json.dumps(result))
     assert result["status"] == "ok" and result["label"] == "operational_as_known"
     with db.api.connect() as c:
-        context = c.execute(text("SELECT * FROM meta.context WHERE id = :i"),
-                            {"i": result["context_id"]}).mappings().one()
-        release_ctx = c.execute(text("SELECT context_id FROM belief.release WHERE id = :r"),
-                                {"r": rel.release_id}).scalar_one()
-        loc = c.execute(text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256 = :s"),
-                        {"s": result["manifest_sha256"]}).scalars().all()
-        act = c.execute(text(
-            """SELECT a.kind, a.origin FROM meta.activity a JOIN meta.activity_output o ON o.activity_id = a.id
-               WHERE o.artifact_sha256 = :s"""), {"s": result["manifest_sha256"]}).mappings().one()
+        context = (
+            c.execute(text("SELECT * FROM meta.context WHERE id = :i"), {"i": result["context_id"]}).mappings().one()
+        )
+        release_ctx = c.execute(
+            text("SELECT context_id FROM belief.release WHERE id = :r"), {"r": rel.release_id}
+        ).scalar_one()
+        loc = (
+            c.execute(
+                text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256 = :s"),
+                {"s": result["manifest_sha256"]},
+            )
+            .scalars()
+            .all()
+        )
+        act = (
+            c.execute(
+                text(
+                    """SELECT a.kind, a.origin FROM meta.activity a JOIN meta.activity_output o ON o.activity_id = a.id
+               WHERE o.artifact_sha256 = :s"""
+                ),
+                {"s": result["manifest_sha256"]},
+            )
+            .mappings()
+            .one()
+        )
     assert context["mode"] == "evaluation" and context["origin"] == "test_fixture"
     assert context["knowledge_cutoff"] == cutoff and context["manifest_sha256"] == result["manifest_sha256"]
     assert context["parent_context_id"] == release_ctx
     assert loc == ["evaluation"] and dict(act) == {"kind": "evaluation.replay", "origin": "evaluation"}
     with db.worker.connect() as c:
-        events = c.execute(text("SELECT count(*) FROM ops.outbox WHERE event_type = 'evaluation.replay_completed' "
-                                "AND payload->>'job_id' = :j"), {"j": str(ctx.job_id)}).scalar_one()
+        events = c.execute(
+            text(
+                "SELECT count(*) FROM ops.outbox WHERE event_type = 'evaluation.replay_completed' "
+                "AND payload->>'job_id' = :j"
+            ),
+            {"j": str(ctx.job_id)},
+        ).scalar_one()
     assert events == 1
 
     manifest = json.loads(db.store.get("evaluation", result["manifest_sha256"]))
@@ -113,8 +154,13 @@ async def test_operational_replay_job_writes_evaluation_context_and_manifest(db)
 async def test_retrospective_job_result_carries_label_and_disclaimer(db):
     c = builtin_connectors()["worldbank.wdi.indicators"]
     await run_connector(c, FixtureHttp(c.describe().name), db.store, db.worker, persist_cursor=False)
-    payload = {"mode": "revised_data_retrospective", "cutoff": _now(db.worker).isoformat(),
-               "origin": "test_fixture", "concepts": [POP], "options": {"min_train": 5, "horizons": [1]}}
+    payload = {
+        "mode": "revised_data_retrospective",
+        "cutoff": _now(db.worker).isoformat(),
+        "origin": "test_fixture",
+        "concepts": [POP],
+        "options": {"min_train": 5, "horizons": [1]},
+    }
     ctx = _claimed_job(db, payload)
     result = handle_replay(payload, ctx)
     assert result["label"] == "revised_data_retrospective"

@@ -20,10 +20,17 @@ def _rows(iso3: str) -> list[dict]:
 
 def _synth(iso3: str, n: int = 5000, seed: int = 3) -> hh.HouseholdSynthesis:
     lt = labour_tables()
-    return hh.synthesise_households(_rows(iso3), geography=iso3, year=YEAR, seed=seed, n_records=n,
-                                    source_ref={"table": "lfst_hhnhtych"},
-                                    size_rows=lt["ilc_lvph03"][iso3].to_pylist(),
-                                    avg_rows=lt["ilc_lvph01"][iso3].to_pylist(), person_total=68_000_000)
+    return hh.synthesise_households(
+        _rows(iso3),
+        geography=iso3,
+        year=YEAR,
+        seed=seed,
+        n_records=n,
+        source_ref={"table": "lfst_hhnhtych"},
+        size_rows=lt["ilc_lvph03"][iso3].to_pylist(),
+        avg_rows=lt["ilc_lvph01"][iso3].to_pylist(),
+        person_total=68_000_000,
+    )
 
 
 def test_france_recipe_cells_structural_zeros_and_totals() -> None:
@@ -81,8 +88,9 @@ def test_inconsistent_total_is_blocked_unless_explained() -> None:
             r["value"] = "30000"  # leaves (32154 thousand) exceed it: missing leaves cannot explain that
     with pytest.raises(hh.InconsistentHouseholdSource):
         hh.build_household_recipe(rows, geography="FRA", year=YEAR, source_ref={}, seed=1)
-    rec = hh.build_household_recipe(rows, geography="FRA", year=YEAR, source_ref={}, seed=1,
-                                    inconsistency_explanation="test: total edited")
+    rec = hh.build_household_recipe(
+        rows, geography="FRA", year=YEAR, source_ref={}, seed=1, inconsistency_explanation="test: total edited"
+    )
     assert rec.accepted_inconsistency == "test: total edited"
 
 

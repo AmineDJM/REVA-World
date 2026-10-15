@@ -86,8 +86,12 @@ def _env_keys(service: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {e["key"]: e for e in service.get("envVars", []) if "key" in e}
 
 
-GATE_FORBIDDEN = API_FORBIDDEN_ON_WORKER | {"REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD",
-                                          "REVA_COMTRADE_API_KEY", "REVA_LLM_API_KEY"}
+GATE_FORBIDDEN = API_FORBIDDEN_ON_WORKER | {
+    "REVA_WORKER_DB_PASSWORD",
+    "REVA_SIM_DB_PASSWORD",
+    "REVA_COMTRADE_API_KEY",
+    "REVA_LLM_API_KEY",
+}
 
 
 def gate_checks(services: dict[str, Any], wkeys: dict[str, dict[str, Any]]) -> list[str]:
@@ -151,8 +155,13 @@ def reva_checks(doc: dict[str, Any]) -> list[str]:
     mig = akeys.get("REVA_MIGRATION_DATABASE_URL")
     if not mig or mig.get("fromDatabase", {}).get("property") != "connectionString":
         problems.append("REVA_MIGRATION_DATABASE_URL must come from the database connectionString")
-    for key in ("REVA_API_DB_PASSWORD", "REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_GATE_DB_PASSWORD",
-                "REVA_SESSION_SECRET"):
+    for key in (
+        "REVA_API_DB_PASSWORD",
+        "REVA_WORKER_DB_PASSWORD",
+        "REVA_SIM_DB_PASSWORD",
+        "REVA_GATE_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+    ):
         if not akeys.get(key, {}).get("generateValue"):
             problems.append(f"{key} must be generated on reva-api (generateValue: true)")
     for key in ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD"):

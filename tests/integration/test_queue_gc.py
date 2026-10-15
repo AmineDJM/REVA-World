@@ -31,8 +31,7 @@ def test_two_pass_orphan_gc(db) -> None:
     old_orphan = db.store.put_bytes(b"orphan-staged-" + tag, "raw", "application/octet-stream")
     young_orphan = db.store.put_bytes(b"young-staged-" + tag, "normalised", "application/octet-stream")
     with db.worker.begin() as c:
-        sha = repo.store_json_artifact(c, db.store, {"published": tag.decode()}, "belief",
-                                       schema_version="test/1")
+        sha = repo.store_json_artifact(c, db.store, {"published": tag.decode()}, "belief", schema_version="test/1")
         ref_uri = repo.artifact_locations(c, sha)[0]["storage_uri"]
     _age(old_orphan.storage_uri, EIGHT_DAYS)
     _age(ref_uri, EIGHT_DAYS)
@@ -41,11 +40,14 @@ def test_two_pass_orphan_gc(db) -> None:
     assert Path(old_orphan.storage_uri.removeprefix("file://")).exists()  # one scan is never enough
     assert old_orphan.storage_uri not in first.deleted
     with db.owner.connect() as c:
-        scans = c.execute(text("SELECT confirmed_scans FROM ops.gc_candidate WHERE storage_uri = :u"),
-                          {"u": old_orphan.storage_uri}).scalar()
+        scans = c.execute(
+            text("SELECT confirmed_scans FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": old_orphan.storage_uri}
+        ).scalar()
         assert scans == 1
-        assert c.execute(text("SELECT count(*) FROM ops.gc_candidate WHERE storage_uri = :u"),
-                         {"u": ref_uri}).scalar() == 0
+        assert (
+            c.execute(text("SELECT count(*) FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": ref_uri}).scalar()
+            == 0
+        )
 
     second = gc_scan(db.worker, db.store)
     assert old_orphan.storage_uri in second.deleted
@@ -54,16 +56,41 @@ def test_two_pass_orphan_gc(db) -> None:
     assert Path(ref_uri.removeprefix("file://")).exists()  # published objects are never deleted
     assert db.store.get("belief", sha)
     with db.owner.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM ops.gc_candidate WHERE storage_uri = :u"),
-                         {"u": old_orphan.storage_uri}).scalar() == 0
-        assert c.execute(text("SELECT confirmed_scans FROM ops.gc_candidate WHERE storage_uri = :u"),
-                         {"u": young_orphan.storage_uri}).scalar() == 2
-        assert c.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'gc.delete_orphan' "
-                              "AND target->>'storage_uri' = :u"), {"u": old_orphan.storage_uri}).scalar() == 1
+        assert (
+            c.execute(
+                text("SELECT count(*) FROM ops.gc_candidate WHERE storage_uri = :u"), {"u": old_orphan.storage_uri}
+            ).scalar()
+            == 0
+        )
+        assert (
+            c.execute(
+                text("SELECT confirmed_scans FROM ops.gc_candidate WHERE storage_uri = :u"),
+                {"u": young_orphan.storage_uri},
+            ).scalar()
+            == 2
+        )
+        assert (
+            c.execute(
+                text(
+                    "SELECT count(*) FROM ops.audit WHERE action = 'gc.delete_orphan' AND target->>'storage_uri' = :u"
+                ),
+                {"u": old_orphan.storage_uri},
+            ).scalar()
+            == 1
+        )
 
 
 def test_gc_job_refuses_short_retention(db) -> None:
-    ctx = JobContext(job_id=uuid.uuid4(), job_type="gc", worker_id="w", fencing_token=1, attempt=1,
-                     settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+    ctx = JobContext(
+        job_id=uuid.uuid4(),
+        job_type="gc",
+        worker_id="w",
+        fencing_token=1,
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
     with pytest.raises(PolicyDenied):
         handle_gc({"min_age_days": 1}, ctx)

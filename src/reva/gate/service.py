@@ -63,9 +63,20 @@ UNLOCK_SQL = "SELECT pg_advisory_unlock(hashtextextended('reva-gate-request|' ||
 class GateService:
     """Evaluates pending gate requests with the reva_gate login."""
 
-    def __init__(self, engine: Engine, store: Any, settings: Any = None, *, name: str = "promotion",
-                 poll_seconds: float | None = None, max_attempts: int = 5, batch: int = 10,
-                 policy_path: Path | None = None, pinned_sha256: str | None = None, guard: Any = None) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        store: Any,
+        settings: Any = None,
+        *,
+        name: str = "promotion",
+        poll_seconds: float | None = None,
+        max_attempts: int = 5,
+        batch: int = 10,
+        policy_path: Path | None = None,
+        pinned_sha256: str | None = None,
+        guard: Any = None,
+    ) -> None:
         from reva.autonomy.policy import AutonomyGuard
 
         if not name or ":" in name:
@@ -75,14 +86,16 @@ class GateService:
         self.settings = settings
         self.name = name
         self.evaluator = f"{GATE_PREFIX}{name}"
-        self.poll_seconds = float(poll_seconds if poll_seconds is not None
-                                  else getattr(settings, "reva_gate_poll_seconds", 2.0) or 2.0)
+        self.poll_seconds = float(
+            poll_seconds if poll_seconds is not None else getattr(settings, "reva_gate_poll_seconds", 2.0) or 2.0
+        )
         self.max_attempts = max(1, int(max_attempts))
         self.batch = max(1, int(batch))
         self.policy_path = policy_path
         self.pinned_sha256 = pinned_sha256
-        self.guard = guard if guard is not None else (AutonomyGuard.from_settings(settings)
-                                                      if settings is not None else None)
+        self.guard = (
+            guard if guard is not None else (AutonomyGuard.from_settings(settings) if settings is not None else None)
+        )
         self._attempts: dict[uuid.UUID, int] = {}
         self._poisoned: set[uuid.UUID] = set()
         self._stop = threading.Event()
@@ -110,8 +123,11 @@ class GateService:
 
     def run(self, stop: threading.Event | None = None) -> None:
         stop = stop or self._stop
-        log.info(json.dumps({"event": "reva.gate", "status": "started", "gate": self.name,
-                             "poll_seconds": self.poll_seconds}))
+        log.info(
+            json.dumps(
+                {"event": "reva.gate", "status": "started", "gate": self.name, "poll_seconds": self.poll_seconds}
+            )
+        )
         while not stop.is_set():
             try:
                 self.run_once()
@@ -168,8 +184,10 @@ class GateService:
         if self.policy_path is not None or self.pinned_sha256 is not None:
             from reva.autonomy.policy import PINNED_POLICY_DIGESTS, POLICY_DIR
 
-            return load_pinned(self.policy_path or POLICY_DIR / "promotion.yaml",
-                               self.pinned_sha256 or PINNED_POLICY_DIGESTS["promotion.yaml"]).ref()
+            return load_pinned(
+                self.policy_path or POLICY_DIR / "promotion.yaml",
+                self.pinned_sha256 or PINNED_POLICY_DIGESTS["promotion.yaml"],
+            ).ref()
         return promotion_policy().ref()
 
     def _evaluate(self, req: Mapping[str, Any]) -> dict[str, Any] | None:
@@ -190,25 +208,59 @@ class GateService:
             d = self._gate().decide(pid, reports, signed)
         except RevaError as e:
             gid = self._record_failure(pid, rid, [f"gate refused the request: {e.code}: {e.message[:500]}"])
-            return {**summary, "outcome": "blocked", "recorded": gid is not None,
-                    "gate_result_id": str(gid) if gid else None, "error": e.code}
+            return {
+                **summary,
+                "outcome": "blocked",
+                "recorded": gid is not None,
+                "gate_result_id": str(gid) if gid else None,
+                "error": e.code,
+            }
         except Exception as e:
             n = self._attempts.get(rid, 0) + 1
             self._attempts[rid] = n
-            log.warning(json.dumps({"event": "reva.gate", "status": "evaluation_failed", "request_id": str(rid),
-                                    "attempt": n, "error": type(e).__name__}))
+            log.warning(
+                json.dumps(
+                    {
+                        "event": "reva.gate",
+                        "status": "evaluation_failed",
+                        "request_id": str(rid),
+                        "attempt": n,
+                        "error": type(e).__name__,
+                    }
+                )
+            )
             if n < self.max_attempts:
                 return {**summary, "outcome": "retry", "recorded": False, "error": type(e).__name__}
             gid = self._record_failure(pid, rid, [f"gate evaluation failed {n} times: {type(e).__name__}"])
-            return {**summary, "outcome": "blocked", "recorded": gid is not None,
-                    "gate_result_id": str(gid) if gid else None, "error": type(e).__name__}
+            return {
+                **summary,
+                "outcome": "blocked",
+                "recorded": gid is not None,
+                "gate_result_id": str(gid) if gid else None,
+                "error": type(e).__name__,
+            }
         self._attempts.pop(rid, None)
         recorded = d.signed_receipt is not None
-        log.info(json.dumps({"event": "reva.gate", "status": "decided", "request_id": str(rid),
-                             "proposal_id": str(pid), "outcome": d.outcome, "recorded": recorded,
-                             "gate_result_id": str(d.decision_id)}))
-        return {**summary, "outcome": d.outcome, "recorded": recorded, "gate_result_id": str(d.decision_id),
-                "reasons": list(d.reasons)}
+        log.info(
+            json.dumps(
+                {
+                    "event": "reva.gate",
+                    "status": "decided",
+                    "request_id": str(rid),
+                    "proposal_id": str(pid),
+                    "outcome": d.outcome,
+                    "recorded": recorded,
+                    "gate_result_id": str(d.decision_id),
+                }
+            )
+        )
+        return {
+            **summary,
+            "outcome": d.outcome,
+            "recorded": recorded,
+            "gate_result_id": str(d.decision_id),
+            "reasons": list(d.reasons),
+        }
 
     def _record_failure(self, pid: uuid.UUID, rid: uuid.UUID, reasons: list[str]) -> uuid.UUID | None:
         """Record a fail-closed ``blocked`` decision; if even that is refused, stop retrying this request."""
@@ -217,10 +269,19 @@ class GateService:
         version = "policy-integrity-failure"
         with contextlib.suppress(Exception):
             version = self._gate_policy_version()
-        evidence = {"schema": "reva-gate-decision/1", "gate": self.name, "evaluator": self.evaluator,
-                    "proposal_id": str(pid), "gate_request_id": str(rid), "outcome": "blocked",
-                    "db_decision": "blocked", "reasons": reasons, "policy": {"version": version},
-                    "tier": {}, "reports": []}
+        evidence = {
+            "schema": "reva-gate-decision/1",
+            "gate": self.name,
+            "evaluator": self.evaluator,
+            "proposal_id": str(pid),
+            "gate_request_id": str(rid),
+            "outcome": "blocked",
+            "db_decision": "blocked",
+            "reasons": reasons,
+            "policy": {"version": version},
+            "tier": {},
+            "reports": [],
+        }
         try:
             ref = self.io.put_json(evidence, "evaluation")
             with self.engine.begin() as conn:
@@ -228,33 +289,55 @@ class GateService:
                 gid = record_gate_result(conn, pid, self.name, version, "blocked", ref.sha256, self.evaluator)
         except Exception as e:
             self._poisoned.add(rid)
-            log.error(json.dumps({"event": "reva.gate", "status": "unrecordable", "request_id": str(rid),
-                                  "error": type(e).__name__}))
+            log.error(
+                json.dumps(
+                    {"event": "reva.gate", "status": "unrecordable", "request_id": str(rid), "error": type(e).__name__}
+                )
+            )
             return None
         self._attempts.pop(rid, None)
-        log.warning(json.dumps({"event": "reva.gate", "status": "decided", "request_id": str(rid),
-                                "proposal_id": str(pid), "outcome": "blocked", "recorded": True,
-                                "gate_result_id": str(gid), "reason": reasons[0][:300]}))
+        log.warning(
+            json.dumps(
+                {
+                    "event": "reva.gate",
+                    "status": "decided",
+                    "request_id": str(rid),
+                    "proposal_id": str(pid),
+                    "outcome": "blocked",
+                    "recorded": True,
+                    "gate_result_id": str(gid),
+                    "reason": reasons[0][:300],
+                }
+            )
+        )
         return gid
 
     def _gate_policy_version(self) -> str:
         from reva.autonomy.policy import PINNED_POLICY_DIGESTS, POLICY_DIR, load_pinned
 
-        return load_pinned(self.policy_path or POLICY_DIR / "promotion.yaml",
-                           self.pinned_sha256 or PINNED_POLICY_DIGESTS["promotion.yaml"]).version
+        return load_pinned(
+            self.policy_path or POLICY_DIR / "promotion.yaml",
+            self.pinned_sha256 or PINNED_POLICY_DIGESTS["promotion.yaml"],
+        ).version
 
 
 # --------------------------------------------------------------------------- entrypoint
 def check_gate_login(engine: Engine) -> dict[str, Any]:
     """Fail closed unless this engine is the reva_gate login and can record gate results."""
     with engine.connect() as conn:
-        row = conn.execute(text(
-            """SELECT session_user::text AS login,
+        row = (
+            conn.execute(
+                text(
+                    """SELECT session_user::text AS login,
                       has_function_privilege('ops.record_gate_result(uuid,text,text,text,text,text,jsonb)', 'EXECUTE')
                         AS can_record,
                       has_table_privilege('ops.gate_request', 'SELECT') AS can_read_requests,
                       (SELECT version_num FROM public.alembic_version LIMIT 1) AS schema_version"""
-        )).mappings().one()
+                )
+            )
+            .mappings()
+            .one()
+        )
     state = dict(row)
     if state["login"] != GATE_LOGIN:
         raise RevaError(f"the gate process must log in as {GATE_LOGIN}, not {state['login']}")
@@ -284,8 +367,7 @@ def main(argv: list[str] | None = None) -> int:
     try:
         check_gate_login(engine)
     except Exception as e:
-        print(json.dumps({"event": "reva.gate", "status": "error",
-                          "error": getattr(e, "message", type(e).__name__)}))
+        print(json.dumps({"event": "reva.gate", "status": "error", "error": getattr(e, "message", type(e).__name__)}))
         engine.dispose()
         return 75
     service = GateService(engine, build_store(settings), settings, poll_seconds=args.poll_seconds)

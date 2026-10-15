@@ -48,9 +48,11 @@ def test_other_logins_and_extra_grants_are_reported(gate_db: Any) -> None:
     assert worker["ok"] is False and any("not reva_gate" in p for p in worker["problems"])
     assert any("unexpected" in p for p in worker["problems"])
 
-    grants = ("GRANT SELECT ON ops.job TO reva_gate",
-              "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint) TO reva_gate",
-              "GRANT INSERT ON ops.gate_result TO reva_gate")
+    grants = (
+        "GRANT SELECT ON ops.job TO reva_gate",
+        "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint) TO reva_gate",
+        "GRANT INSERT ON ops.gate_result TO reva_gate",
+    )
     try:
         for g in grants:
             _owner_exec(gate_db, g)
@@ -121,8 +123,11 @@ def test_reva_verify_reports_the_gate_login(gate_db: Any, monkeypatch: pytest.Mo
     assert out["ok"] is False and out["db_gate"]["status"] == "privilege_mismatch"
     assert "ops.job: unexpected SELECT" in out["db_gate"]["problems"]
 
-    monkeypatch.setattr(settings_mod, "load_settings",
-                        lambda *a, **k: gate_db.settings.model_copy(update={"reva_gate_db_password": None}))
+    monkeypatch.setattr(
+        settings_mod,
+        "load_settings",
+        lambda *a, **k: gate_db.settings.model_copy(update={"reva_gate_db_password": None}),
+    )
     res = CliRunner().invoke(app, ["verify"])
     assert res.exit_code == 0, res.output
     assert json.loads(res.output)["db_gate"]["status"] == "skipped"

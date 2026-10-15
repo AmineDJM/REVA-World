@@ -78,8 +78,9 @@ class CapturingStream(httpcore.AsyncNetworkStream):
     async def aclose(self) -> None:
         return None
 
-    async def start_tls(self, ssl_context: Any, server_hostname: str | None = None,
-                        timeout: float | None = None) -> httpcore.AsyncNetworkStream:
+    async def start_tls(
+        self, ssl_context: Any, server_hostname: str | None = None, timeout: float | None = None
+    ) -> httpcore.AsyncNetworkStream:
         self.log["sni"] = server_hostname
         return self
 
@@ -93,9 +94,14 @@ class CapturingBackend(httpcore.AsyncNetworkBackend):
         self.log: dict[str, Any] = {}
         self.response = response
 
-    async def connect_tcp(self, host: str, port: int, timeout: float | None = None,
-                          local_address: str | None = None,
-                          socket_options: typing.Iterable[Any] | None = None) -> httpcore.AsyncNetworkStream:
+    async def connect_tcp(
+        self,
+        host: str,
+        port: int,
+        timeout: float | None = None,
+        local_address: str | None = None,
+        socket_options: typing.Iterable[Any] | None = None,
+    ) -> httpcore.AsyncNetworkStream:
         self.hosts.append(host)
         return CapturingStream(self.response, self.log)
 
@@ -235,8 +241,9 @@ def _streamed(body: bytes, encoding: str | None, chunk: int = 65536) -> Any:
         headers["content-encoding"] = encoding
 
     def handler(_: httpx.Request) -> httpx.Response:
-        return httpx.Response(200, headers=headers,
-                              stream=httpx.ByteStream(body) if len(body) <= chunk else Chunks(body, chunk))
+        return httpx.Response(
+            200, headers=headers, stream=httpx.ByteStream(body) if len(body) <= chunk else Chunks(body, chunk)
+        )
 
     return handler
 
@@ -333,8 +340,11 @@ def _zip(entries: list[tuple[str, bytes]]) -> bytes:
     buf = io.BytesIO()
     with zipfile.ZipFile(buf, "w") as z:
         for name, data in entries:
-            with pytest.warns(UserWarning) if any(n == name for n, _ in entries[: entries.index((name, data))]) \
-                    else _nullcontext():
+            with (
+                pytest.warns(UserWarning)
+                if any(n == name for n, _ in entries[: entries.index((name, data))])
+                else _nullcontext()
+            ):
                 z.writestr(name, data)
     return buf.getvalue()
 
@@ -432,9 +442,22 @@ def _example() -> dict[str, Any]:
 
 @pytest.mark.parametrize(
     "value",
-    ["infinity", "-infinity", "yesterday", "now", "2026-99-99", "not a date", "2024-02-30T00:00:00Z",
-     "2024-01-01T00:00:00", "2024-01-01", "2024-01-01 00:00:00Z", "2024-01-01T24:00:00Z",
-     "２０２４-01-01T00:00:00Z", "2024-01-01T00:00:00+25:00", "2999-01-01T00:00:00Z"],
+    [
+        "infinity",
+        "-infinity",
+        "yesterday",
+        "now",
+        "2026-99-99",
+        "not a date",
+        "2024-02-30T00:00:00Z",
+        "2024-01-01T00:00:00",
+        "2024-01-01",
+        "2024-01-01 00:00:00Z",
+        "2024-01-01T24:00:00Z",
+        "２０２４-01-01T00:00:00Z",
+        "2024-01-01T00:00:00+25:00",
+        "2999-01-01T00:00:00Z",
+    ],
 )
 def test_invalid_or_future_knowledge_cutoff_rejected(value: str) -> None:
     from reva.simulation.spec import validate_scenario_spec
@@ -480,8 +503,11 @@ class FakeS3:
         if Key not in self.objs:
             raise _CE("404")
         data, md = self.objs[Key]
-        r: dict[str, Any] = {"ContentLength": len(data), "Metadata": md,
-                             "LastModified": datetime(2020, 1, 1, tzinfo=UTC)}
+        r: dict[str, Any] = {
+            "ContentLength": len(data),
+            "Metadata": md,
+            "LastModified": datetime(2020, 1, 1, tzinfo=UTC),
+        }
         if kw.get("ChecksumMode") == "ENABLED" and self.server_checksums:
             r["ChecksumSHA256"] = base64.b64encode(hashlib.sha256(data).digest()).decode()
         return r
@@ -641,8 +667,15 @@ def test_required_for_each_process_role() -> None:
     assert s.required_for("worker") == ["REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD"]
     assert s.required_for("sim") == ["REVA_SIM_DB_PASSWORD"]
     assert "REVA_MIGRATION_DATABASE_URL" in s.required_for("bootstrap")
-    ready = _settings(**_prod(reva_api_db_password="p", reva_worker_db_password="w", reva_sim_db_password="s",
-                              reva_admin_password_hash=ARGON, reva_allowed_hosts="reva.example.org"))
+    ready = _settings(
+        **_prod(
+            reva_api_db_password="p",
+            reva_worker_db_password="w",
+            reva_sim_db_password="s",
+            reva_admin_password_hash=ARGON,
+            reva_allowed_hosts="reva.example.org",
+        )
+    )
     for role in ("api", "worker", "sim"):
         assert ready.required_for(role) == []  # type: ignore[arg-type]
         assert ready.validate_for(role) is ready  # type: ignore[arg-type]
@@ -659,12 +692,21 @@ def test_process_role_enforced_by_validator() -> None:
     with pytest.raises(ValidationError, match="REVA_WORKER_DB_PASSWORD"):
         _settings(**_prod(reva_process_role="worker"))
     # The worker never receives the session secret; its role does not need it.
-    w = _settings(**_prod(reva_process_role="worker", reva_session_secret=None,
-                          reva_worker_db_password="w", reva_sim_db_password="s"))
+    w = _settings(
+        **_prod(
+            reva_process_role="worker", reva_session_secret=None, reva_worker_db_password="w", reva_sim_db_password="s"
+        )
+    )
     assert w.reva_process_role == "worker"
     with pytest.raises(ValidationError, match="must not be present"):
-        _settings(**_prod(reva_process_role="worker", reva_worker_db_password="w", reva_sim_db_password="s",
-                          reva_migration_database_url="postgresql://owner:pw@db/reva"))
+        _settings(
+            **_prod(
+                reva_process_role="worker",
+                reva_worker_db_password="w",
+                reva_sim_db_password="s",
+                reva_migration_database_url="postgresql://owner:pw@db/reva",
+            )
+        )
     with pytest.raises(ValidationError, match="REVA_SESSION_SECRET"):
         _settings(**_prod(reva_process_role="api", reva_session_secret=None))
 
@@ -697,8 +739,17 @@ def test_redaction_covers_common_secret_names_and_url_credentials() -> None:
     }
     red = redact_env(env)
     dumped = json.dumps(red)
-    for secret in ("pg-pass-1", "aws-secret-2", "aws-token-3", "gh-4", "key-5", "pk-6", "dsn-pw-7", "proxy-pw-8",
-                   "url-pw-9"):
+    for secret in (
+        "pg-pass-1",
+        "aws-secret-2",
+        "aws-token-3",
+        "gh-4",
+        "key-5",
+        "pk-6",
+        "dsn-pw-7",
+        "proxy-pw-8",
+        "url-pw-9",
+    ):
         assert secret not in dumped
     assert red["HTTPS_PROXY"] == "http://user:***@proxy.internal:3128"
     assert red["REVA_ENV"] == "production" and red["PATH"] == "/usr/bin"

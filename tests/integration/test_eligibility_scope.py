@@ -28,7 +28,8 @@ from reva.ontology.mappings import _applicability_from_registry
 
 # Shared DB-hardening helpers (tests are not a package): load the module by path.
 _spec = importlib.util.spec_from_file_location(
-    "_reva_db_hardening_helpers", Path(__file__).parents[1] / "security" / "test_db_hardening.py")
+    "_reva_db_hardening_helpers", Path(__file__).parents[1] / "security" / "test_db_hardening.py"
+)
 assert _spec is not None and _spec.loader is not None
 _h = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(_h)
@@ -46,13 +47,17 @@ def w(db: Any) -> dict[str, Any]:
 
 def _support(c: Connection, valid_range: str | None) -> UUID:
     act = activity(c, "normalisation")
-    return UUID(str(c.execute(
-        text("""INSERT INTO world.support(temporal_extent, valid_range, spatial_spec, population_spec, aggregation,
+    return UUID(
+        str(
+            c.execute(
+                text("""INSERT INTO world.support(temporal_extent, valid_range, spatial_spec, population_spec, aggregation,
                   resolution, provenance_activity_id, support_digest)
                 VALUES ('{"kind":"interval","start":"2020-01-01"}', CAST(:vr AS tstzrange), '{}', '{}', 'total',
                         '{}', :a, :d) RETURNING id"""),
-        {"vr": valid_range, "a": act, "d": f"r5-{uuid.uuid4().hex}"},
-    ).scalar_one()))
+                {"vr": valid_range, "a": act, "d": f"r5-{uuid.uuid4().hex}"},
+            ).scalar_one()
+        )
+    )
 
 
 def _decision(c: Connection, w: dict[str, Any], applicability: Any, decision: str = "eligible") -> None:
@@ -62,18 +67,30 @@ def _decision(c: Connection, w: dict[str, Any], applicability: Any, decision: st
     c.execute(
         text("""INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
                   policy_version, review_activity_id) VALUES (:cv, :c, CAST(:ap AS jsonb), :d, 'r5', :a)"""),
-        {"cv": o["connector_version_id"], "c": o["concept_version_id"], "ap": json.dumps(applicability),
-         "d": decision, "a": activity(c, "review")},
+        {
+            "cv": o["connector_version_id"],
+            "c": o["concept_version_id"],
+            "ap": json.dumps(applicability),
+            "d": decision,
+            "a": activity(c, "review"),
+        },
     )
 
 
 def _is_eligible(c: Connection, w: dict[str, Any], year: int | None, classification: str | None = None) -> bool:
     o = w["obs"]
-    return bool(c.execute(
-        text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp(), CAST(:y AS integer), CAST(:k AS text))"),
-        {"cv": o["connector_version_id"], "c": o["concept_version_id"], "s": o["subject_id"], "y": year,
-         "k": classification},
-    ).scalar_one())
+    return bool(
+        c.execute(
+            text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp(), CAST(:y AS integer), CAST(:k AS text))"),
+            {
+                "cv": o["connector_version_id"],
+                "c": o["concept_version_id"],
+                "s": o["subject_id"],
+                "y": year,
+                "k": classification,
+            },
+        ).scalar_one()
+    )
 
 
 def _selected(c: Connection, oid: UUID) -> bool:
@@ -100,16 +117,19 @@ def test_support_ref_year_is_null_when_unknown(w: dict[str, Any]) -> None:
 
 @pytest.mark.db
 @pytest.mark.parametrize("valid_range", [None, "[-infinity,2000-01-01)", "(,2000-01-01)"])
-def test_unknown_year_is_excluded_by_selection_and_rejected_by_trigger(w: dict[str, Any],
-                                                                       valid_range: str | None) -> None:
+def test_unknown_year_is_excluded_by_selection_and_rejected_by_trigger(
+    w: dict[str, Any], valid_range: str | None
+) -> None:
     """Selection and belief.check_input agree: an unknown support year never satisfies the seeded
     years-scoped decision, and an infinite lower bound does not break the selection query."""
     with tx(w["db"].owner) as c:
         sp = _support(c, valid_range)
         oid = copy_obs(c, w, f"r5:open-ended:{uuid.uuid4().hex}", support=sp)
         assert not _selected(c, oid)
-        assert c.execute(text("SELECT evidence.observation_is_eligible(:o, clock_timestamp())"),
-                         {"o": oid}).scalar_one() is False
+        assert (
+            c.execute(text("SELECT evidence.observation_is_eligible(:o, clock_timestamp())"), {"o": oid}).scalar_one()
+            is False
+        )
         rid = draft_release(c, w)
         with pytest.raises(DBAPIError, match="is not eligible"), c.begin_nested():
             add_input(c, add_estimate(c, w, rid, support=sp), oid)
@@ -139,35 +159,45 @@ def test_open_ended_observation_does_not_block_publication(w: dict[str, Any]) ->
     res = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test", concepts=[POP])
     assert res.estimates > 0
     with db.worker.connect() as c:
-        assert c.execute(text("SELECT count(*) FROM belief.input i JOIN belief.estimate e ON e.id = i.estimate_id "
-                              "WHERE e.release_id = :r AND i.observation_id = :o"),
-                         {"r": res.release_id, "o": oid}).scalar_one() == 0
+        assert (
+            c.execute(
+                text(
+                    "SELECT count(*) FROM belief.input i JOIN belief.estimate e ON e.id = i.estimate_id "
+                    "WHERE e.release_id = :r AND i.observation_id = :o"
+                ),
+                {"r": res.release_id, "o": oid},
+            ).scalar_one()
+            == 0
+        )
 
 
 # =========================================================================== R5-11 explicit scope schema
 @pytest.mark.db
-@pytest.mark.parametrize("applicability", [
-    {"years": [2019, 2023]},  # ambiguous list form (range or set?)
-    {"years": [2020]},
-    {"years": ["2019", "2020", "2021"]},
-    {"years": {"from": 2023, "to": 2019}},
-    {"years": {"from": 2020}},
-    {"years": {"from": 2020, "to": 2024, "in": [2021]}},
-    {"years": {"from": "2020", "to": "2024"}},
-    {"years": {"from": 2020.5, "to": 2024}},
-    {"years": {"in": []}},
-    {"years": {"in": ["2020"]}},
-    {"years": {"in": 2020}},
-    {"years": "any"},
-    {"classifications": "H6"},
-    {"classifications": []},
-    {"classifications": [6]},
-    {"subject_ids": "FRA"},
-    {"subject_ids": ["FRA"]},
-    {"subjects_ids": []},  # misspelt scope key would otherwise be ignored
-    {"region": ["EU"]},
-    [],
-])
+@pytest.mark.parametrize(
+    "applicability",
+    [
+        {"years": [2019, 2023]},  # ambiguous list form (range or set?)
+        {"years": [2020]},
+        {"years": ["2019", "2020", "2021"]},
+        {"years": {"from": 2023, "to": 2019}},
+        {"years": {"from": 2020}},
+        {"years": {"from": 2020, "to": 2024, "in": [2021]}},
+        {"years": {"from": "2020", "to": "2024"}},
+        {"years": {"from": 2020.5, "to": 2024}},
+        {"years": {"in": []}},
+        {"years": {"in": ["2020"]}},
+        {"years": {"in": 2020}},
+        {"years": "any"},
+        {"classifications": "H6"},
+        {"classifications": []},
+        {"classifications": [6]},
+        {"subject_ids": "FRA"},
+        {"subject_ids": ["FRA"]},
+        {"subjects_ids": []},  # misspelt scope key would otherwise be ignored
+        {"region": ["EU"]},
+        [],
+    ],
+)
 def test_ambiguous_or_unknown_scopes_are_rejected_at_insert(w: dict[str, Any], applicability: Any) -> None:
     with tx(w["db"].worker) as c, pytest.raises(DBAPIError, match=r"applicab|scope schema"):
         _decision(c, w, applicability, "quarantine")
@@ -190,8 +220,9 @@ def test_classifications_are_enforced(w: dict[str, Any]) -> None:
         # the latest decision whose scope covers a record wins: quarantine everything, then approve only
         # the reviewed classifications (as the Comtrade mapping does for HS editions H4..H6)
         _decision(c, w, {}, "quarantine")
-        _decision(c, w, {"subject_ids": [subj], "years": {"from": 1960, "to": 2024},
-                         "classifications": ["H4", "H5", "H6"]})
+        _decision(
+            c, w, {"subject_ids": [subj], "years": {"from": 1960, "to": 2024}, "classifications": ["H4", "H5", "H6"]}
+        )
         assert _is_eligible(c, w, 2020, "H6")
         assert not _is_eligible(c, w, 2020, "H3")
         assert not _is_eligible(c, w, 2020, None)  # unknown classification fails closed
@@ -226,11 +257,13 @@ def test_unclassified_missing_is_admitted_only_explicitly(w: dict[str, Any]) -> 
         _decision(c, w, {"admit_unclassified_missing": True}, "quarantine")  # meaningless without classifications
 
 
-def _obs_with_flags(c: Connection, w: dict[str, Any], flags: dict[str, Any],
-                    value: dict[str, Any] | None = None) -> UUID:
-    return UUID(str(
-        c.execute(
-            text("""INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
+def _obs_with_flags(
+    c: Connection, w: dict[str, Any], flags: dict[str, Any], value: dict[str, Any] | None = None
+) -> UUID:
+    return UUID(
+        str(
+            c.execute(
+                text("""INSERT INTO evidence.observation(source_id, connector_version_id, acquisition_id, logical_key,
                       revision_no, subject_id, concept_version_id, support_id, value, uncertainty, source_flags,
                       raw_selector, parser_version, provenance_activity_id, semantic_hash, record_hash)
                     SELECT source_id, connector_version_id, acquisition_id, :lk, 1, subject_id, concept_version_id,
@@ -238,21 +271,38 @@ def _obs_with_flags(c: Connection, w: dict[str, Any], flags: dict[str, Any],
                       (source_flags - 'classificationCode') || CAST(:f AS jsonb), raw_selector, parser_version,
                       provenance_activity_id, 'x', 'y'
                     FROM evidence.observation WHERE id = :o RETURNING id"""),
-            {"o": w["obs"]["id"], "lk": f"r5:flags:{uuid.uuid4().hex}", "f": json.dumps(flags),
-             "v": json.dumps(value) if value is not None else None},
-        ).scalar_one()))
+                {
+                    "o": w["obs"]["id"],
+                    "lk": f"r5:flags:{uuid.uuid4().hex}",
+                    "f": json.dumps(flags),
+                    "v": json.dumps(value) if value is not None else None,
+                },
+            ).scalar_one()
+        )
+    )
 
 
 @pytest.mark.db
 def test_seeded_decisions_use_the_explicit_schema(w: dict[str, Any]) -> None:
     with w["db"].owner.connect() as c:
-        years = c.execute(text("SELECT DISTINCT jsonb_typeof(applicability->'years') FROM evidence.eligibility "
-                               "WHERE applicability ? 'years'")).scalars().all()
-        comtrade = c.execute(text(
-            """SELECT e.applicability FROM evidence.eligibility e
+        years = (
+            c.execute(
+                text(
+                    "SELECT DISTINCT jsonb_typeof(applicability->'years') FROM evidence.eligibility "
+                    "WHERE applicability ? 'years'"
+                )
+            )
+            .scalars()
+            .all()
+        )
+        comtrade = c.execute(
+            text(
+                """SELECT e.applicability FROM evidence.eligibility e
                JOIN evidence.connector_version cv ON cv.id = e.connector_version_id
                WHERE cv.name = 'un.comtrade.public_exact' AND e.applicability->>'mapping_key' = 'comtrade.2709.M.world'
-               ORDER BY e.recorded_at DESC LIMIT 1""")).scalar_one()
+               ORDER BY e.recorded_at DESC LIMIT 1"""
+            )
+        ).scalar_one()
     assert years == ["object"]
     assert comtrade["years"] == {"from": 2020, "to": 2024} and comtrade["classifications"] == ["H4", "H5", "H6"]
     assert comtrade["admit_unclassified_missing"] is True
@@ -271,8 +321,14 @@ def test_registry_loader_parses_explicit_forms_and_rejects_lists() -> None:
     assert rng.applies(year=2021) and not rng.applies(year=2024) and not rng.applies(year=None)
     st = _applicability_from_registry({"years": {"in": [2019, 2023]}})
     assert st.applies(year=2019) and st.applies(year=2023) and not st.applies(year=2021)
-    for bad in ([2019, 2023], [2020], {"from": 2023, "to": 2019}, {"in": []}, {"in": ["2020"]},
-                {"from": 2020}, {"from": True, "to": 2020}):
+    for bad in (
+        [2019, 2023],
+        [2020],
+        {"from": 2023, "to": 2019},
+        {"in": []},
+        {"in": ["2020"]},
+        {"from": 2020},
+        {"from": True, "to": 2020},
+    ):
         with pytest.raises(ValidationProblem):
             _applicability_from_registry({"years": bad})
-

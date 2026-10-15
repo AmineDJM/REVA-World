@@ -46,9 +46,7 @@ class SemanticProfile(_Frozen):
     permitted_transformations: tuple[str, ...] = ()
     missingness: tuple[str, ...] = ()
     measurement_method: str | None = None
-    sensitivity: Literal["public_aggregate", "synthetic_public_aggregate_derived"] = (
-        "public_aggregate"
-    )
+    sensitivity: Literal["public_aggregate", "synthetic_public_aggregate_derived"] = "public_aggregate"
     signature: dict[str, Any] | None = None  # predicate role signature
 
 
@@ -107,9 +105,7 @@ class EpistemicProfile(_Frozen):
         "hypothesis",
         "computed",
     ]
-    relation_type: Literal["descriptive", "statistical", "mechanistic", "identified_causal"] = (
-        "descriptive"
-    )
+    relation_type: Literal["descriptive", "statistical", "mechanistic", "identified_causal"] = "descriptive"
 
 
 class Assertion(_Frozen):

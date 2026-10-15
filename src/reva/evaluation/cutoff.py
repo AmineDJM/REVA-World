@@ -89,10 +89,7 @@ class ObservationScope:
             "ineligible": "connector/concept/subject not eligible under the eligibility decisions in force",
             "retracted": "observation retracted",
         }
-        return [
-            {"reason": k, "count": v, "explanation": reasons.get(k, k)}
-            for k, v in sorted(self.exclusions.items())
-        ]
+        return [{"reason": k, "count": v, "explanation": reasons.get(k, k)} for k, v in sorted(self.exclusions.items())]
 
     def flag_report(self) -> list[dict[str, Any]]:
         """Post-cutoff quality knowledge about *included* rows: flagged, never used to exclude."""
@@ -100,12 +97,10 @@ class ObservationScope:
             "retracted_after_cutoff": "retracted after the cutoff; it was available then, so it stays in",
             "ineligible_after_cutoff": "eligible under the decision in force at the cutoff, ineligible today",
             "eligibility_from_first_decision_after_cutoff": (
-                "REVA had no eligibility decision at the cutoff; the first recorded (design) decision was used"),
+                "REVA had no eligibility decision at the cutoff; the first recorded (design) decision was used"
+            ),
         }
-        return [
-            {"flag": k, "count": v, "explanation": reasons.get(k, k)}
-            for k, v in sorted(self.flags.items())
-        ]
+        return [{"flag": k, "count": v, "explanation": reasons.get(k, k)} for k, v in sorted(self.flags.items())]
 
 
 _OBS_CTE = """
@@ -152,7 +147,9 @@ WITH base AS (
 )
 """
 
-_OBS_SELECT = _OBS_CTE + """
+_OBS_SELECT = (
+    _OBS_CTE
+    + """
 , ranked AS (
   SELECT cand.*,
          count(*) OVER (PARTITION BY source_id, logical_key) AS eligible_revisions,
@@ -170,10 +167,14 @@ LEFT JOIN evidence.observation f
 WHERE r.rn = 1
 ORDER BY r.concept_id, r.logical_key
 """
+)
 
-_OBS_COUNTS = _OBS_CTE + """
+_OBS_COUNTS = (
+    _OBS_CTE
+    + """
 SELECT exclusion, count(*) AS n FROM cand GROUP BY exclusion
 """
+)
 
 
 class CutoffRepository:
@@ -265,8 +266,11 @@ class CutoffRepository:
             recorded_at=row["recorded_at"],
             source_available_at=row.get("source_available_at"),
             availability_basis=row.get("availability_basis"),
-            detail={"logical_key": row["logical_key"], "revision_no": row["revision_no"],
-                    "source_key": row["source_key"]},
+            detail={
+                "logical_key": row["logical_key"],
+                "revision_no": row["revision_no"],
+                "source_key": row["source_key"],
+            },
         )
 
     def claims(self, status: Sequence[str] = ("reviewed",)) -> list[dict[str, Any]]:
@@ -297,13 +301,17 @@ class CutoffRepository:
 
     def resolve_alias(self, provider: str, external_key: str) -> UUID | None:
         """Entity for a provider key using only aliases recorded at/before the cutoff."""
-        row = self._conn.execute(
-            text("""SELECT id, entity_id, recorded_at FROM world.alias
+        row = (
+            self._conn.execute(
+                text("""SELECT id, entity_id, recorded_at FROM world.alias
                     WHERE provider = :p AND external_key = :k AND recorded_at <= :c
                       AND confidence_kind IN ('reviewed_exact','provider_declared')
                     ORDER BY recorded_at DESC LIMIT 1"""),
-            {"p": provider, "k": external_key, "c": self._cutoff},
-        ).mappings().one_or_none()
+                {"p": provider, "k": external_key, "c": self._cutoff},
+            )
+            .mappings()
+            .one_or_none()
+        )
         if row is None:
             return None
         self._guard.check(InputRef(RefKind.alias_or_boundary_mapping, str(row["id"]), recorded_at=row["recorded_at"]))
@@ -345,8 +353,14 @@ class CutoffRepository:
         out = [dict(r) for r in rows]
         for r in out:
             if r["training_cutoff"] is not None:
-                self._guard.check(InputRef(RefKind.trained_model, str(r["id"]), recorded_at=r["recorded_at"],
-                                           training_cutoff=r["training_cutoff"]))
+                self._guard.check(
+                    InputRef(
+                        RefKind.trained_model,
+                        str(r["id"]),
+                        recorded_at=r["recorded_at"],
+                        training_cutoff=r["training_cutoff"],
+                    )
+                )
         return out
 
     def population_datasets(self) -> list[dict[str, Any]]:
@@ -360,8 +374,14 @@ class CutoffRepository:
         ).mappings()
         out = [dict(r) for r in rows]
         for r in out:
-            self._guard.check(InputRef(RefKind.population_calibration, str(r["id"]), recorded_at=r["recorded_at"],
-                                       fitted_on_data_until=r["knowledge_cutoff"]))
+            self._guard.check(
+                InputRef(
+                    RefKind.population_calibration,
+                    str(r["id"]),
+                    recorded_at=r["recorded_at"],
+                    fitted_on_data_until=r["knowledge_cutoff"],
+                )
+            )
         return out
 
     # ----------------------------------------------------------------- belief releases
@@ -390,7 +410,8 @@ class CutoffRepository:
         if pub is None or pub > self._cutoff:
             raise LeakageBlocked(
                 f"release {release_id} was not published at/before the cutoff",
-                release_id=str(release_id), cutoff=self._cutoff.isoformat(),
+                release_id=str(release_id),
+                cutoff=self._cutoff.isoformat(),
                 published_at=pub.isoformat() if pub else None,
             )
         rows = self._conn.execute(
@@ -417,6 +438,9 @@ class CutoffRepository:
         operational = LeakageGuard(self._cutoff, GuardMode.strict)
         for r in out:
             if r["observation_id"] is not None:
-                operational.check(InputRef(RefKind.observation_revision, str(r["observation_id"]),
-                                           recorded_at=r["observation_recorded_at"]))
+                operational.check(
+                    InputRef(
+                        RefKind.observation_revision, str(r["observation_id"]), recorded_at=r["observation_recorded_at"]
+                    )
+                )
         return out

@@ -30,9 +30,11 @@ HEADER = "DATAFLOW,LAST UPDATE,freq,ind_use,ind_ava,c_dest,unit,c_orig,TIME_PERI
 DATASET = "NAIO_10_FCP_II4"
 YEAR = 2024
 
-Z = {(("DE", "B"), ("FR", "C10-12")): Decimal(20),
-     (("FR", "C10-12"), ("DE", "C10-12")): Decimal(30),
-     (("DE", "C10-12"), ("FR", "C10-12")): Decimal(10)}
+Z = {
+    (("DE", "B"), ("FR", "C10-12")): Decimal(20),
+    (("FR", "C10-12"), ("DE", "C10-12")): Decimal(30),
+    (("DE", "C10-12"), ("FR", "C10-12")): Decimal(10),
+}
 HH_FR = {("FR", "C10-12"): Decimal(50), ("DE", "C10-12"): Decimal(30), ("DE", "B"): Decimal(20)}
 ZERO_OUTPUT = {("WRL_REST", "C10-12")}
 
@@ -68,8 +70,12 @@ def cells() -> dict[tuple[str, str, str, str], Decimal]:
     return out
 
 
-def body(origins: tuple[str, ...], overrides: dict[tuple[str, str, str, str], str] | None = None,
-         drop: set[tuple[str, str, str, str]] | None = None, year: int = YEAR) -> bytes:
+def body(
+    origins: tuple[str, ...],
+    overrides: dict[tuple[str, str, str, str], str] | None = None,
+    drop: set[tuple[str, str, str, str]] | None = None,
+    year: int = YEAR,
+) -> bytes:
     """gzip SDMX-CSV response for the given supplying economies (or ("DOM",))."""
     rows = [HEADER]
     for k, v in sorted(cells().items()):
@@ -88,8 +94,17 @@ def constraint_xml(years: tuple[int, ...] = (2022, 2023, YEAR)) -> bytes:
     def kv(dim: str, values: list[str]) -> str:
         return f'<c:KeyValue id="{dim}">' + "".join(f"<c:Value>{v}</c:Value>" for v in values) + "</c:KeyValue>"
 
-    parts = [kv("freq", ["A"]), kv("ind_use", [*INDUSTRIES, *FINAL]), kv("ind_ava", [*INDUSTRIES, *PRIMARY]),
-             kv("c_dest", list(COUNTRIES)), kv("unit", ["MIO_EUR"]), kv("c_orig", [*COUNTRIES, "DOM"]),
-             kv("TIME_PERIOD", [str(y) for y in years])]
-    return ('<?xml version="1.0" encoding="UTF-8"?><m:Structure xmlns:m="m" xmlns:c="c"><c:CubeRegion>'
-            + "".join(parts) + "</c:CubeRegion></m:Structure>").encode()
+    parts = [
+        kv("freq", ["A"]),
+        kv("ind_use", [*INDUSTRIES, *FINAL]),
+        kv("ind_ava", [*INDUSTRIES, *PRIMARY]),
+        kv("c_dest", list(COUNTRIES)),
+        kv("unit", ["MIO_EUR"]),
+        kv("c_orig", [*COUNTRIES, "DOM"]),
+        kv("TIME_PERIOD", [str(y) for y in years]),
+    ]
+    return (
+        '<?xml version="1.0" encoding="UTF-8"?><m:Structure xmlns:m="m" xmlns:c="c"><c:CubeRegion>'
+        + "".join(parts)
+        + "</c:CubeRegion></m:Structure>"
+    ).encode()

@@ -51,16 +51,21 @@ def chaos_slow(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     step_s = float(payload.get("step_seconds", 0.1))
     mode = payload.get("mode", "cooperative")
     start = int((ctx.checkpoint or {}).get("step", 0))
-    emit("start", job=str(ctx.job_id), token=ctx.fencing_token, attempt=ctx.attempt, worker=ctx.worker_id,
-         resume_from=start)
+    emit(
+        "start",
+        job=str(ctx.job_id),
+        token=ctx.fencing_token,
+        attempt=ctx.attempt,
+        worker=ctx.worker_id,
+        resume_from=start,
+    )
     if mode == "stubborn" and ctx.attempt <= int(payload.get("stubborn_attempts", 1)):
         time.sleep(float(payload.get("stubborn_seconds", 30)))
         emit("finish", job=str(ctx.job_id), token=ctx.fencing_token, attempt=ctx.attempt)
         return {"status": "finished", "token": ctx.fencing_token}
     for i in range(start, steps):
         if ctx.is_cancelled():
-            emit("stop", job=str(ctx.job_id), token=ctx.fencing_token, step=i,
-                 shutdown=ctx.shutdown_requested())
+            emit("stop", job=str(ctx.job_id), token=ctx.fencing_token, step=i, shutdown=ctx.shutdown_requested())
             if ctx.shutdown_requested() and not ctx.cancel_requested():
                 return {"status": "interrupted", "checkpoint": {"step": i}}
             raise JobCancelled("user cancel honoured at a safe point")

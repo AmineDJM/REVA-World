@@ -122,9 +122,7 @@ def coverage_of_specs(items: Iterable[tuple[UncertaintySpec, float | Decimal]]) 
     pairs: list[tuple[UncertaintyKind, bool]] = []
     for spec, actual in items:
         if spec.kind != UncertaintyKind.prediction_interval:
-            raise ValueError(
-                f"coverage is defined only for prediction intervals; got {spec.kind.value!r}"
-            )
+            raise ValueError(f"coverage is defined only for prediction intervals; got {spec.kind.value!r}")
         if spec.lower is None or spec.upper is None:
             raise ValueError("prediction interval spec lacks lower/upper")
         interval = (float(Decimal(spec.lower)), float(Decimal(spec.upper)))

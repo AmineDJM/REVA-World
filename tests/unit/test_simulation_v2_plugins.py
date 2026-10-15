@@ -40,8 +40,12 @@ DEMO = ROOT / "var/acceptance/demo_live.json"
 
 
 def _value(v: str) -> dict[str, Any]:
-    return {"kind": "decimal", "value": v, "unit_ref": "unit.usd",
-            "basis": {"currency": "USD", "price_basis": "nominal"}}
+    return {
+        "kind": "decimal",
+        "value": v,
+        "unit_ref": "unit.usd",
+        "basis": {"currency": "USD", "price_basis": "nominal"},
+    }
 
 
 def resolved(spec: dict[str, Any], inputs: dict[str, dict[str, str]]) -> ResolvedInputs:
@@ -55,11 +59,24 @@ def resolved(spec: dict[str, Any], inputs: dict[str, dict[str, str]]) -> Resolve
         from reva.kernel.values import parse_value
 
         scalars[(r.name, r.subject, y)] = ScalarInput(
-            r, y, subjects[r.subject].entity_id, parse_value(vd), vd, f"est-{r.subject}-{r.name}",
+            r,
+            y,
+            subjects[r.subject].entity_id,
+            parse_value(vd),
+            vd,
+            f"est-{r.subject}-{r.name}",
             {"kind": "interval", "precision": "year", "start": f"{y}-01-01", "end": f"{y + 1}-01-01"},
-            "period_flow_total", {}, "selected_report")
-    return ResolvedInputs(release={"id": "00000000-0000-4000-8000-0000000000aa"}, requirements=tuple(reqs),
-                          subjects=subjects, scalars=scalars, datasets={})
+            "period_flow_total",
+            {},
+            "selected_report",
+        )
+    return ResolvedInputs(
+        release={"id": "00000000-0000-4000-8000-0000000000aa"},
+        requirements=tuple(reqs),
+        subjects=subjects,
+        scalars=scalars,
+        datasets={},
+    )
 
 
 def run_plugin(spec: dict[str, Any], inputs: dict[str, dict[str, str]]) -> tuple[Any, list[ResultRow]]:
@@ -74,8 +91,18 @@ def run_plugin(spec: dict[str, Any], inputs: dict[str, dict[str, str]]) -> tuple
 def test_crude_plugin_is_bit_identical_to_v1_engine(case: str) -> None:
     g = GOLDEN["cases"][case]
     compiled, rows = run_plugin(g["spec"], GOLDEN["inputs"])
-    got = [{"output_key": r.output_key, "iso3": r.iso3, "subject_id": str(r.subject_id), "variant": r.variant,
-            "value": r.value, "uncertainty": r.uncertainty, "applicability": r.applicability} for r in rows]
+    got = [
+        {
+            "output_key": r.output_key,
+            "iso3": r.iso3,
+            "subject_id": str(r.subject_id),
+            "variant": r.variant,
+            "value": r.value,
+            "uncertainty": r.uncertainty,
+            "applicability": r.applicability,
+        }
+        for r in rows
+    ]
     assert json.loads(json.dumps(got)) == g["rows"]
     assert engine.output_digest(rows) == g["output_digest"]
     assert engine.cache_key(g["spec"]) == g["cache_key"]
@@ -109,16 +136,28 @@ def test_crude_plugin_reproduces_recorded_live_demo() -> None:
     assert engine.output_digest(rows) == l1["job"]["result_ref"]["output_digest"]
 
     l2 = steps["l2_sensitivity"]["evidence"]
-    spec2 = {**spec, "fidelity": "L2", "assumptions": {"quantity_response": "elasticity_sensitivity",
-                                                        "no_general_equilibrium": True,
-                                                        "elasticity_grid": l2["grid"]}}
+    spec2 = {
+        **spec,
+        "fidelity": "L2",
+        "assumptions": {
+            "quantity_response": "elasticity_sensitivity",
+            "no_general_equilibrium": True,
+            "elasticity_grid": l2["grid"],
+        },
+    }
     _, rows2 = run_plugin(spec2, inputs)
     for iso, ex in l2["exposure"].items():
-        rng = next(r for r in rows2 if r.iso3 == iso and r.variant == engine.SENSITIVITY_VARIANT
-                   and r.output_key == "exposure_percent_baseline_gdp")
+        rng = next(
+            r
+            for r in rows2
+            if r.iso3 == iso
+            and r.variant == engine.SENSITIVITY_VARIANT
+            and r.output_key == "exposure_percent_baseline_gdp"
+        )
         assert [rng.value["lower"], rng.value["upper"]] == ex["sensitivity_range"]
-        l1row = next(r for r in rows2 if r.iso3 == iso and r.variant == "L1"
-                     and r.output_key == "exposure_percent_baseline_gdp")
+        l1row = next(
+            r for r in rows2 if r.iso3 == iso and r.variant == "L1" and r.output_key == "exposure_percent_baseline_gdp"
+        )
         assert l1row.value["value"] == ex["exposure_percent_L1"]
 
 
@@ -186,14 +225,17 @@ def test_load_all_skips_only_absent_plugin_modules(monkeypatch: pytest.MonkeyPat
 
 # --------------------------------------------------------------------------- resolved inputs / rows
 def test_resolved_inputs_are_typed_read_only_and_never_zero_fill() -> None:
-    reqs = [InputRequirement("M", "c.m", "FRA", (2022, 2023), "scalar"),
-            InputRequirement("io", "d.io", "EU27", (2021,), "dataset"),
-            InputRequirement("pop", "d.pop", "FRA", (2023,), "dataset")]
+    reqs = [
+        InputRequirement("M", "c.m", "FRA", (2022, 2023), "scalar"),
+        InputRequirement("io", "d.io", "EU27", (2021,), "dataset"),
+        InputRequirement("pop", "d.pop", "FRA", (2023,), "dataset"),
+    ]
     table = pa.table({"row": ["A", "B"], "value": [1.5, 2.5]})
     ri = ResolvedInputs.from_values(
-        reqs, scalars={("M", "FRA", 2023): _value("10"),
-                       ("M", "FRA", 2022): {"kind": "missing", "reason": "suppressed"}},
-        datasets={("io", "EU27"): (table, {"dataset_id": "d1", "artifact_sha256": "ab" * 32, "row_count": 2})})
+        reqs,
+        scalars={("M", "FRA", 2023): _value("10"), ("M", "FRA", 2022): {"kind": "missing", "reason": "suppressed"}},
+        datasets={("io", "EU27"): (table, {"dataset_id": "d1", "artifact_sha256": "ab" * 32, "row_count": 2})},
+    )
     assert isinstance(ri.scalars, MappingProxyType) and isinstance(ri.datasets, MappingProxyType)
     with pytest.raises(TypeError):
         ri.scalars[("M", "FRA", 2023)] = None  # type: ignore[index]
@@ -206,7 +248,9 @@ def test_resolved_inputs_are_typed_read_only_and_never_zero_fill() -> None:
     assert ri.dataset("io", "EU27").frame()["value"].to_list() == [1.5, 2.5]
     problems = ri.missing_problems()
     assert [(p["input"], p.get("reference_year"), p["reason"]) for p in problems] == [
-        ("M", 2022, "suppressed"), ("pop", None, "unavailable")]
+        ("M", 2022, "suppressed"),
+        ("pop", None, "unavailable"),
+    ]
     assert ri.missing_problems(subjects=["EU27"]) == []
     with pytest.raises(ValidationProblem):
         ri.scalar("X", "FRA", 2023)
@@ -225,6 +269,5 @@ def test_result_row_period_is_half_open_and_extends_digest_only_when_set() -> No
     assert engine.output_digest([single]) != engine.output_digest([p])
     with pytest.raises(ValidationProblem):
         ResultRow("k", "FRA", sid, "L1", v, {}, {}, (date(2025, 1, 1), date(2025, 1, 1)))
-    rows = [ResultRow("k", "FRA", sid, "L1", v, {}, {}, (date(2025 - i, 1, 1), date(2026 - i, 1, 1)))
-            for i in range(3)]
+    rows = [ResultRow("k", "FRA", sid, "L1", v, {}, {}, (date(2025 - i, 1, 1), date(2026 - i, 1, 1))) for i in range(3)]
     assert engine.output_digest(rows) == engine.output_digest(list(reversed(rows)))

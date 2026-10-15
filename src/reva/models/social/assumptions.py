@@ -43,8 +43,9 @@ import yaml
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import logical_hash
 
-ASSUMPTIONS_FILE = Path(__file__).resolve().parents[4] / "registry" / "assumptions" / \
-    "retirement_employment_response.yaml"
+ASSUMPTIONS_FILE = (
+    Path(__file__).resolve().parents[4] / "registry" / "assumptions" / "retirement_employment_response.yaml"
+)
 VERIFIED = "verified_from_text"
 NO_RESPONSE_ID = "reference_no_employment_response"
 _YEAR_RE = re.compile(r"\b(19[5-9]\d|20[0-4]\d)\b")
@@ -79,13 +80,18 @@ class GridPoint:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "point_id": self.point_id, "label": self.label, "kind": self.kind, "country": self.country,
-            "doi": self.doi, "citation": self.citation,
+            "point_id": self.point_id,
+            "label": self.label,
+            "kind": self.kind,
+            "country": self.country,
+            "doi": self.doi,
+            "citation": self.citation,
             "share_employed": {k: str(v) for k, v in self.share_employed.items()},
             "pension_drop": {k: str(v) for k, v in self.pension_drop.items()},
             "study_employment_effect_full_cell": {k: str(self.study_employment_effect(k)) for k in SEXES},
             "pension_drop_used_by_model": "own-country data (not this study's value)",
-            "evidence": list(self.evidence), "sex_transfer": self.sex_transfer,
+            "evidence": list(self.evidence),
+            "sex_transfer": self.sex_transfer,
             "provenance": dict(self.provenance),
             "status": "stated scenario assumption with citation (not a reviewed evidence claim)",
         }
@@ -102,8 +108,9 @@ class AssumptionGrid:
         for p in self.points:
             if p.point_id == point_id:
                 return p
-        raise ValidationProblem(f"unknown employment-response grid point {point_id!r}",
-                                known=[p.point_id for p in self.points])
+        raise ValidationProblem(
+            f"unknown employment-response grid point {point_id!r}", known=[p.point_id for p in self.points]
+        )
 
     def literature(self) -> tuple[GridPoint, ...]:
         return tuple(p for p in self.points if p.kind == "literature")
@@ -114,9 +121,13 @@ class AssumptionGrid:
         return own[0] if len(own) == 1 else None
 
     def as_dict(self) -> dict[str, Any]:
-        return {"source_file": str(ASSUMPTIONS_FILE.name), "source_digest": self.source_digest,
-                "curation": dict(self.curation), "points": [p.as_dict() for p in self.points],
-                "excluded": [dict(e) for e in self.excluded]}
+        return {
+            "source_file": str(ASSUMPTIONS_FILE.name),
+            "source_digest": self.source_digest,
+            "curation": dict(self.curation),
+            "points": [p.as_dict() for p in self.points],
+            "excluded": [dict(e) for e in self.excluded],
+        }
 
 
 def _proportion(v: Mapping[str, Any]) -> Decimal:
@@ -146,11 +157,19 @@ def build_grid(doc: Mapping[str, Any]) -> AssumptionGrid:
             excluded.append({"id": eid, "reason": f"verification_status {e.get('verification_status')!r}"})
             continue
         values = {v["name"]: v for v in e.get("values") or []}
-        derived = [d for d in e.get("derived") or [] if str(d.get("name", "")).startswith("employment_share_of_")
-                   and "staggered" not in str(d.get("name"))]
+        derived = [
+            d
+            for d in e.get("derived") or []
+            if str(d.get("name", "")).startswith("employment_share_of_") and "staggered" not in str(d.get("name"))
+        ]
         if not derived:
-            excluded.append({"id": eid, "reason": "no derived employment share of the pension/retirement drop "
-                             "(needs both an employment effect and a pension-receipt effect)"})
+            excluded.append(
+                {
+                    "id": eid,
+                    "reason": "no derived employment share of the pension/retirement drop "
+                    "(needs both an employment effect and a pension-receipt effect)",
+                }
+            )
             continue
         s_by: dict[str, Decimal] = {}
         rho_by: dict[str, Decimal] = {}
@@ -170,7 +189,7 @@ def build_grid(doc: Mapping[str, Any]) -> AssumptionGrid:
                 bad = f"derived {d.get('name')} outside [0, 1]"
                 break
             sex = _sex_of(str(d["name"]))
-            for sx in ((sex,) if sex else SEXES):
+            for sx in (sex,) if sex else SEXES:
                 s_by[sx], rho_by[sx] = s, rho
             evidence.update({str(num.get("evidence")), str(den.get("evidence"))})
         if bad:
@@ -185,14 +204,28 @@ def build_grid(doc: Mapping[str, Any]) -> AssumptionGrid:
                 rho_by.setdefault(sx, rho_by[only])
         elif len(derived) == 1:
             transfer = "single estimate (sexes pooled or one population) applied to both sexes"
-        points.append(GridPoint(
-            point_id=eid, label=str(e.get("citation", eid)).split(".")[0], share_employed=s_by, pension_drop=rho_by,
-            country=e.get("country"), doi=e.get("doi"), citation=str(e.get("citation")), kind="literature",
-            evidence=tuple(sorted(evidence)), sex_transfer=transfer,
-            provenance={"policy_change": e.get("policy_change"), "population": e.get("population"),
-                        "period": e.get("period"),
-                        "design": e.get("design"), "text_sources": [t.get("id") for t in e.get("text_sources") or []],
-                        "derived": [d.get("name") for d in derived]}))
+        points.append(
+            GridPoint(
+                point_id=eid,
+                label=str(e.get("citation", eid)).split(".")[0],
+                share_employed=s_by,
+                pension_drop=rho_by,
+                country=e.get("country"),
+                doi=e.get("doi"),
+                citation=str(e.get("citation")),
+                kind="literature",
+                evidence=tuple(sorted(evidence)),
+                sex_transfer=transfer,
+                provenance={
+                    "policy_change": e.get("policy_change"),
+                    "population": e.get("population"),
+                    "period": e.get("period"),
+                    "design": e.get("design"),
+                    "text_sources": [t.get("id") for t in e.get("text_sources") or []],
+                    "derived": [d.get("name") for d in derived],
+                },
+            )
+        )
     if not points:
         raise ValidationProblem("the literature registry contains no verified employment-response entry")
     return AssumptionGrid(tuple(points), tuple(excluded), logical_hash(doc), dict(doc.get("curation") or {}))
@@ -202,9 +235,15 @@ def no_response_point(rho_from: GridPoint) -> GridPoint:
     """Reference point: the eligibility change moves nobody into employment (``s = 0``); pension drop of
     ``rho_from`` so the recipients change stays comparable."""
     return GridPoint(
-        point_id=NO_RESPONSE_ID, label="Reference: no employment response (not literature)",
-        share_employed={s: Decimal(0) for s in SEXES}, pension_drop=dict(rho_from.pension_drop), country=None,
-        doi=None, citation=f"reference point (pension drop taken from {rho_from.point_id})", kind="reference")
+        point_id=NO_RESPONSE_ID,
+        label="Reference: no employment response (not literature)",
+        share_employed={s: Decimal(0) for s in SEXES},
+        pension_drop=dict(rho_from.pension_drop),
+        country=None,
+        doi=None,
+        citation=f"reference point (pension drop taken from {rho_from.point_id})",
+        kind="reference",
+    )
 
 
 @lru_cache(maxsize=1)

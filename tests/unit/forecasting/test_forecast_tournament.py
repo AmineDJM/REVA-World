@@ -41,9 +41,7 @@ def geometric_panel(n_series: int, n_years: int):
 
 def test_short_panel_keeps_incumbent_insufficient_evaluation():
     panel = geometric_panel(2, 6)
-    res = run_tournament(
-        panel, [LogDrift()], replay_mode="revised_data_retrospective", seed=3, policy=load_policy()
-    )
+    res = run_tournament(panel, [LogDrift()], replay_mode="revised_data_retrospective", seed=3, policy=load_policy())
     d = res.decisions["forecast.log_drift"]
     assert d.decision == "keep_incumbent"
     assert d.n_pairs < 30
@@ -97,9 +95,7 @@ def test_long_geometric_panel_promotes_log_drift():
 
 
 def test_naive_baseline_added_when_not_a_candidate():
-    res = run_tournament(
-        geometric_panel(3, 8), [LogDrift()], replay_mode="vintage_strict", seed=0, policy={}
-    )
+    res = run_tournament(geometric_panel(3, 8), [LogDrift()], replay_mode="vintage_strict", seed=0, policy={})
     assert res.replay_mode == "vintage_strict"
     assert res.metrics["forecast.last_value"].n_predictions > 0
     assert set(res.decisions) == {"forecast.log_drift"}
@@ -121,10 +117,7 @@ def test_driftless_random_walks_do_not_promote_log_drift():
 
     rng = np.random.default_rng(5)
     panel = {
-        f"s{i}": [
-            (2000 + t, float(100 * math.exp(v)))
-            for t, v in enumerate(np.cumsum(0.05 * rng.standard_normal(20)))
-        ]
+        f"s{i}": [(2000 + t, float(100 * math.exp(v))) for t, v in enumerate(np.cumsum(0.05 * rng.standard_normal(20)))]
         for i in range(12)
     }
     res = run_tournament(panel, [LogDrift()], replay_mode="synthetic", seed=1, policy={})
@@ -148,8 +141,9 @@ def test_origins_need_three_consecutive_training_years():
 def test_log_drift_records_carry_proper_scores_when_quantified():
     rng = np.random.default_rng(3)
     panel = {
-        f"s{i}": [(2000 + t, float(math.exp(v))) for t, v in enumerate(
-            np.log(50.0) + np.cumsum(rng.normal(0.02, 0.03, 15)))]
+        f"s{i}": [
+            (2000 + t, float(math.exp(v))) for t, v in enumerate(np.log(50.0) + np.cumsum(rng.normal(0.02, 0.03, 15)))
+        ]
         for i in range(3)
     }
     res = run_tournament(panel, [LogDrift()], replay_mode="synthetic", seed=0, policy={})
@@ -214,8 +208,18 @@ class _FittedOffset:
 
     def predict(self, horizons, level=0.8):
         return [
-            Forecast(self.model_key, self.model_version, self.origin_year, self.origin_year + h, h,
-                     self.last + self.slope * h, None, None, None, UncertaintySpec.unknown("synthetic"))
+            Forecast(
+                self.model_key,
+                self.model_version,
+                self.origin_year,
+                self.origin_year + h,
+                h,
+                self.last + self.slope * h,
+                None,
+                None,
+                None,
+                UncertaintySpec.unknown("synthetic"),
+            )
             for h in horizons
         ]
 
@@ -238,11 +242,14 @@ def test_subgroup_point_breach_without_credibility_does_not_block_and_credible_b
     # Challenger "up" is much better overall (series drift up) except on one series
     # that drifts down, where it is credibly worse -> needs_review, not promote.
     rng = np.random.default_rng(11)
-    panel = {f"s{i}": [(2000 + t, float(v)) for t, v in enumerate(100 + np.cumsum(rng.normal(1.5, 0.5, 24)))]
-             for i in range(8)}
+    panel = {
+        f"s{i}": [(2000 + t, float(v)) for t, v in enumerate(100 + np.cumsum(rng.normal(1.5, 0.5, 24)))]
+        for i in range(8)
+    }
     panel["down"] = [(2000 + t, float(v)) for t, v in enumerate(100 + np.cumsum(rng.normal(-1.5, 0.5, 24)))]
-    res = run_tournament(panel, [Offset("up", 1.5), Offset("flat", 0.0)], "flat", (1, 2, 3),
-                         replay_mode="synthetic", seed=1, policy={})
+    res = run_tournament(
+        panel, [Offset("up", 1.5), Offset("flat", 0.0)], "flat", (1, 2, 3), replay_mode="synthetic", seed=1, policy={}
+    )
     d = res.decisions["up"]
     assert d.decision == "needs_review", d.reasons
     assert d.subgroup_tests["series_id=down"].status == "credible_degradation"

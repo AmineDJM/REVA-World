@@ -51,8 +51,9 @@ def settings() -> Any:
     return lsc._base_settings()
 
 
-async def _fetch_parse(connector: Any, settings: Any, keys: set[str] | None = None,
-                       include_follow_up: bool = False) -> list[tuple[Any, Any, Any]]:
+async def _fetch_parse(
+    connector: Any, settings: Any, keys: set[str] | None = None, include_follow_up: bool = False
+) -> list[tuple[Any, Any, Any]]:
     """Fetch selected plan items live (origin=live, no recording), parse and validate."""
     spec = connector.describe()
     http = lsc.TracingHttp(make_live_client(spec, settings), spec.name)

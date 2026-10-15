@@ -43,9 +43,14 @@ DEFAULT_CADENCE_SECONDS = 7 * 86400  # weekly metadata/update check
 
 
 class DeclarativeConnectorGenerator:
-    def __init__(self, io_: ArtifactIO, *, registry: Registry | None = None,
-                 policy: PinnedPolicy | None = None,
-                 version_resolver: Callable[[dict[str, Any]], str] | None = None) -> None:
+    def __init__(
+        self,
+        io_: ArtifactIO,
+        *,
+        registry: Registry | None = None,
+        policy: PinnedPolicy | None = None,
+        version_resolver: Callable[[dict[str, Any]], str] | None = None,
+    ) -> None:
         """``version_resolver(manifest) -> version``: content-derived connector version
         (``jobs.resolve_connector_version``): identical content keeps its registered
         version, changed content gets a new semver patch (review R4-03)."""
@@ -54,15 +59,17 @@ class DeclarativeConnectorGenerator:
         self.policy = policy or promotion_policy()
         self.version_resolver = version_resolver
 
-    def generate(self, candidate: SourceCandidate, mapping: MappingProposal,
-                 approved_template_ids: tuple[str, ...]) -> ConnectorProposal:
+    def generate(
+        self, candidate: SourceCandidate, mapping: MappingProposal, approved_template_ids: tuple[str, ...]
+    ) -> ConnectorProposal:
         template = TEMPLATE_FOR_PROVIDER.get(candidate.provider)
         policy_templates = self.policy.content.get("approved_templates") or {}
         if template is None:
             raise PolicyDenied(f"no approved template for provider {candidate.provider!r}")
         if template not in approved_template_ids or template not in policy_templates:
-            raise PolicyDenied(f"template {template!r} is not approved; refusing to generate",
-                               approved=list(approved_template_ids))
+            raise PolicyDenied(
+                f"template {template!r} is not approved; refusing to generate", approved=list(approved_template_ids)
+            )
         if template != TEMPLATE_ID:
             raise PolicyDenied(f"template {template!r} has no declarative generator")
         if mapping.source_metadata.sha256 != candidate.metadata.sha256:
@@ -72,8 +79,9 @@ class DeclarativeConnectorGenerator:
         if not inspection:
             raise ValidationProblem("candidate must be inspected before a manifest can be generated")
         mm = self.io.get_json(mapping.mapping_manifest)
-        manifest = self.build_manifest(candidate, meta, inspection, mm, mapping,
-                                       list(policy_templates[template].get("allowed_hosts") or []))
+        manifest = self.build_manifest(
+            candidate, meta, inspection, mm, mapping, list(policy_templates[template].get("allowed_hosts") or [])
+        )
         if self.version_resolver is not None:
             manifest["version"] = str(self.version_resolver(manifest))
         validate_manifest(manifest)
@@ -87,8 +95,15 @@ class DeclarativeConnectorGenerator:
             mapping=mapping,
         )
 
-    def build_manifest(self, candidate: SourceCandidate, meta: dict[str, Any], inspection: dict[str, Any],
-                       mm: dict[str, Any], mapping: MappingProposal, policy_hosts: list[str]) -> dict[str, Any]:
+    def build_manifest(
+        self,
+        candidate: SourceCandidate,
+        meta: dict[str, Any],
+        inspection: dict[str, Any],
+        mm: dict[str, Any],
+        mapping: MappingProposal,
+        policy_hosts: list[str],
+    ) -> dict[str, Any]:
         hosts = sorted(set(policy_hosts) & set(TEMPLATE_HOSTS))
         if not hosts:
             raise PolicyDenied("approved template has no allowed hosts in the pinned policy")
@@ -110,16 +125,46 @@ class DeclarativeConnectorGenerator:
         if source is None:
             raise PolicyDenied("approved template names no registered source in the pinned policy")
         tpl = template_entry(self.policy, TEMPLATE_ID) or {}
-        manifest = self._manifest(candidate, inspection, mm, hosts, concept_id, version, sem, order, cats, geo,
-                                  years, resolution, units, exact, source, str(tpl.get("rights_ref") or ""))
+        manifest = self._manifest(
+            candidate,
+            inspection,
+            mm,
+            hosts,
+            concept_id,
+            version,
+            sem,
+            order,
+            cats,
+            geo,
+            years,
+            resolution,
+            units,
+            exact,
+            source,
+            str(tpl.get("rights_ref") or ""),
+        )
         manifest["request_parameters"]["logical_key_template"] = canonical_logical_key_template(manifest)
         return manifest
 
     @staticmethod
-    def _manifest(candidate: SourceCandidate, inspection: dict[str, Any], mm: dict[str, Any], hosts: list[str],
-                  concept_id: str, version: str, sem: dict[str, str], order: list[str],
-                  cats: dict[str, list[str]], geo: list[str], years: list[int], resolution: list[str],
-                  units: list[str], exact: bool, source: dict[str, Any], rights_ref: str) -> dict[str, Any]:
+    def _manifest(
+        candidate: SourceCandidate,
+        inspection: dict[str, Any],
+        mm: dict[str, Any],
+        hosts: list[str],
+        concept_id: str,
+        version: str,
+        sem: dict[str, str],
+        order: list[str],
+        cats: dict[str, list[str]],
+        geo: list[str],
+        years: list[int],
+        resolution: list[str],
+        units: list[str],
+        exact: bool,
+        source: dict[str, Any],
+        rights_ref: str,
+    ) -> dict[str, Any]:
         # (R6-12) no free fields: provider labels (dataset title, status labels) are not copied into
         # the manifest; licence/rights come from the registered source and the pinned policy.
         pinned = {d: list(cats[d]) for d in order if d != "time"}
@@ -139,8 +184,12 @@ class DeclarativeConnectorGenerator:
                 "dimension_order": order,
                 "pinned_categories": pinned,
                 "status_vocabulary": sorted(EUROSTAT_FLAGS),
-                "semantics": {**sem, "concept_id": concept_id, "concept_version": version,
-                              "unit_category": units[0] if len(units) == 1 else ""},
+                "semantics": {
+                    **sem,
+                    "concept_id": concept_id,
+                    "concept_version": version,
+                    "unit_category": units[0] if len(units) == 1 else "",
+                },
                 "subject": {"dimension": "geo", "alias_provider": "eurostat_geo"},
                 "resolution_dimensions": resolution,
                 "total_categories": {d: [c for c in cats[d] if c in EUROSTAT_TOTAL_CODES] for d in resolution},
@@ -156,6 +205,7 @@ class DeclarativeConnectorGenerator:
             "max_pages": 1,
             "cadence": {"minimum_interval_seconds": DEFAULT_CADENCE_SECONDS, "release_aware": True},
             "eligibility_scope": [f"{concept_id}@{version}:{s}" for s in (mm.get("scope") or {}).get("subjects", [])]
-            if exact else [],
+            if exact
+            else [],
             "generation_mode": "declarative_only",
         }

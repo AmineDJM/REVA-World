@@ -62,14 +62,24 @@ class FixtureHttp:
         else:
             e = self.entries.get(fp)
             if e is None:
-                raise SourceResponseError(f"no captured fixture for {redact_url(url)}", retryable=False,
-                                          kind="fixture_missing")
+                raise SourceResponseError(
+                    f"no captured fixture for {redact_url(url)}", retryable=False, kind="fixture_missing"
+                )
             body = (self.dir / e["file"]).read_bytes()
             if sha256_bytes(body) != e["sha256"]:
                 raise SourceResponseError("fixture bytes do not match manifest hash", retryable=False)
             status, headers = e["status"], e["headers"]
-        return HttpResult(url, url, status, dict(headers), body, datetime.fromisoformat(
-            self.entries.get(fp, {}).get("retrieved_at", "2026-10-14T00:00:00+00:00")), 0.0, (), 1)
+        return HttpResult(
+            url,
+            url,
+            status,
+            dict(headers),
+            body,
+            datetime.fromisoformat(self.entries.get(fp, {}).get("retrieved_at", "2026-10-14T00:00:00+00:00")),
+            0.0,
+            (),
+            1,
+        )
 
     async def aclose(self) -> None:
         return None
@@ -248,20 +258,40 @@ async def run_connector(
                 batches = list(connector.parse(raw))
                 reports: list[QualityReport] = [connector.validate(b) for b in batches]
             except SourceResponseError as e:
-                batches, reports = [], [
-                    QualityReport(outcome="quarantine", findings=(Finding(
-                        code=str(e.details.get("kind", "parse_error")), severity="blocker", message=e.message),))
-                ]
+                batches, reports = (
+                    [],
+                    [
+                        QualityReport(
+                            outcome="quarantine",
+                            findings=(
+                                Finding(
+                                    code=str(e.details.get("kind", "parse_error")),
+                                    severity="blocker",
+                                    message=e.message,
+                                ),
+                            ),
+                        )
+                    ],
+                )
             except (KeyError, IndexError, TypeError, ValueError, AttributeError, ArithmeticError) as e:
                 # Row-level schema drift (a missing/renamed field, an unexpected type) in
                 # an otherwise well-formed response: quarantine this item, keep the run going.
-                log.warning("connector %s item %s: row-level schema drift: %s", spec.name, item.key,
-                            type(e).__name__)
-                batches, reports = [], [
-                    QualityReport(outcome="quarantine", findings=(Finding(
-                        code="row_schema_drift", severity="blocker",
-                        message=f"parser failed on a row ({type(e).__name__}: {str(e)[:200]})"),))
-                ]
+                log.warning("connector %s item %s: row-level schema drift: %s", spec.name, item.key, type(e).__name__)
+                batches, reports = (
+                    [],
+                    [
+                        QualityReport(
+                            outcome="quarantine",
+                            findings=(
+                                Finding(
+                                    code="row_schema_drift",
+                                    severity="blocker",
+                                    message=f"parser failed on a row ({type(e).__name__}: {str(e)[:200]})",
+                                ),
+                            ),
+                        )
+                    ],
+                )
             for b in batches:
                 queue.extend(b.follow_up)
             report.quality[item.key] = [r.model_dump(mode="json") for r in reports]
@@ -271,14 +301,15 @@ async def run_connector(
             step = _bind_post_publish(post_publish, store, raw, batches)
             # Post-publish steps run inside the acquisition transaction (R-14): a crash
             # rolls the acquisition back, so the retry is not a duplicate and re-runs them.
-            summary = publish_acquisition(engine, store, spec, raw, batches, reports, fence=fence,
-                                          post_publish=step)
+            summary = publish_acquisition(engine, store, spec, raw, batches, reports, fence=fence, post_publish=step)
             report.inserted += summary.inserted
             report.unchanged += summary.unchanged
             report.relations += summary.relations
             status: Literal["published", "unchanged", "quarantined", "failed"] = (
-                "quarantined" if summary.namespace == "quarantine" else (
-                    "published" if (summary.inserted or not summary.duplicate_acquisition) else "unchanged"))
+                "quarantined"
+                if summary.namespace == "quarantine"
+                else ("published" if (summary.inserted or not summary.duplicate_acquisition) else "unchanged")
+            )
             report.outcomes.append(FetchOutcome(item_key=item.key, status=status, raw_sha256=summary.raw_sha256))
         except RevaError as e:
             log.warning("connector %s item %s failed: %s", spec.name, item.key, e.message)

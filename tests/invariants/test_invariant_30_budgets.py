@@ -138,10 +138,16 @@ def test_budget_keys_are_registered_sources_and_cover_every_connector() -> None:
         assert tpl["source_key"] in b.per_source_requests
     assert account_key("worldbank.wdi", "requests") == "source:worldbank.wdi:requests"
     assert account_key("worldbank.wdi", "bytes", "discovery") == "autonomy:discovery:worldbank.wdi:bytes"
-    assert source_accounts("worldbank.wdi") == ["source:worldbank.wdi:requests",
-                                                "autonomy:discovery:worldbank.wdi:requests"]
-    for bad in (("", "requests", "ingest"), ("a:b", "requests", "ingest"), ("x", "calls", "ingest"),
-                ("x", "requests", "llm")):
+    assert source_accounts("worldbank.wdi") == [
+        "source:worldbank.wdi:requests",
+        "autonomy:discovery:worldbank.wdi:requests",
+    ]
+    for bad in (
+        ("", "requests", "ingest"),
+        ("a:b", "requests", "ingest"),
+        ("x", "calls", "ingest"),
+        ("x", "requests", "llm"),
+    ):
         with pytest.raises(ValueError):
             account_key(*bad)
 
@@ -165,8 +171,14 @@ def test_unknown_source_and_zero_limit_are_refused_without_a_database() -> None:
 
 
 # Every place that can create a live provider client, and how it is budgeted.
-LIVE_CALLS = ("make_live_client(", "SafeHttpClient(", "LlmHttpClient(", "httpx.AsyncClient(", "httpx.Client(",
-              "urlopen(")
+LIVE_CALLS = (
+    "make_live_client(",
+    "SafeHttpClient(",
+    "LlmHttpClient(",
+    "httpx.AsyncClient(",
+    "httpx.Client(",
+    "urlopen(",
+)
 BUDGETED = {  # file -> markers that must all be present (reserve before, meter/cap, settle after)
     "src/reva/operations/jobs.py": ("reserve_ingest(", "metered(", "settle_metered("),
     "src/reva/cli/main.py": ("reserve_ingest(", "metered(", "settle_metered(", "except BudgetExhausted"),
@@ -178,10 +190,11 @@ NOT_PROVIDER_EGRESS = {
     "src/reva/adapters/http/safe_client.py": "the HTTP client itself",
     "src/reva/nl/http.py": "the LLM HTTP client itself",
     "src/reva/nl/providers.py": "builds the LLM client; every call goes through nl/service.py (ledger reserve/settle)",
-    "src/reva/nl/recorded.py": ("maintainer-only capture of recorded responses for offline tests "
-                                "(not reachable from the API)"),
+    "src/reva/nl/recorded.py": (
+        "maintainer-only capture of recorded responses for offline tests (not reachable from the API)"
+    ),
     "src/reva/autonomy/sandbox.py": "POSTs to the operator's isolated sandbox runner, not a data provider "
-                                    "(bounded by RunnerResourceBudget)",
+    "(bounded by RunnerResourceBudget)",
 }
 
 

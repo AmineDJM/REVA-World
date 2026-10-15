@@ -63,14 +63,18 @@ These impossible extents validate:
 
 Proposed patch for `src/reva/kernel/time.py` `TimeExtent._check`, appended before `return self`:
 ```python
-        if self.kind == "instant" and self.end_uncertainty is not None:
-            raise ValueError("instant must not have an end bound")
-        earliest_start = self.start if self.start is not None else (
-            self.start_uncertainty.earliest if self.start_uncertainty is not None else None)
-        latest_end = self.end if self.end is not None else (
-            self.end_uncertainty.latest if self.end_uncertainty is not None else None)
-        if earliest_start is not None and latest_end is not None and latest_end <= earliest_start:
-            raise ValueError("interval end must be after start (half-open), including uncertain bounds")
+if self.kind == "instant" and self.end_uncertainty is not None:
+    raise ValueError("instant must not have an end bound")
+earliest_start = (
+    self.start
+    if self.start is not None
+    else (self.start_uncertainty.earliest if self.start_uncertainty is not None else None)
+)
+latest_end = (
+    self.end if self.end is not None else (self.end_uncertainty.latest if self.end_uncertainty is not None else None)
+)
+if earliest_start is not None and latest_end is not None and latest_end <= earliest_start:
+    raise ValueError("interval end must be after start (half-open), including uncertain bounds")
 ```
 
 ### R7-S1 (crude exposure, low): `exposure_l1`/`exposure_l2` map a kernel `Missing` (or `None`) to `validation_error`
@@ -94,6 +98,7 @@ backslash or U+001F unchanged, so existing seed plans keep their stream keys:
 ```python
 def _esc(s: str) -> str:
     return s.replace("\\", "\\\\").replace("\x1f", "\\u001f")
+
 
 def _name_words(model_id: str, entity_id: str) -> tuple[int, ...]:
     digest = hashlib.sha256(f"{_esc(model_id)}\x1f{_esc(entity_id)}".encode()).digest()

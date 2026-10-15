@@ -59,8 +59,7 @@ def test_nested_mc_agrees_with_exact(problem):
 
 
 # Review R3-13 problem (verified with exact rational arithmetic: net EVSI = 7.2).
-R313 = DecisionProblem(prior=0.3, utility=((0.0, 0.0), (-20.0, 100.0)), sensitivity=0.9,
-                       specificity=0.8, cost=1.0)
+R313 = DecisionProblem(prior=0.3, utility=((0.0, 0.0), (-20.0, 100.0)), sensitivity=0.9, specificity=0.8, cost=1.0)
 
 
 def test_nested_mc_inner_bias_sign_is_not_determined():

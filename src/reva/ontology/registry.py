@@ -45,8 +45,10 @@ class Registry:
                 key=lambda x: (x["concept_id"], x["version"]),
             ),
             "mappings": sorted(
-                [{"mapping_key": m["mapping_key"], "version": m["version"], "kind": m["mapping_kind"]}
-                 for m in self.mappings],
+                [
+                    {"mapping_key": m["mapping_key"], "version": m["version"], "kind": m["mapping_kind"]}
+                    for m in self.mappings
+                ],
                 key=lambda x: (x["mapping_key"], x["version"]),
             ),
         }

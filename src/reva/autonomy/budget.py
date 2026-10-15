@@ -41,17 +41,33 @@ class DiscoveryReservation:
     max_bytes: int
 
     def as_dict(self) -> dict[str, Any]:
-        return {"source_key": self.source_key, "max_requests": self.max_requests, "max_bytes": self.max_bytes,
-                "requests_operation_id": self.requests_operation_id}
+        return {
+            "source_key": self.source_key,
+            "max_requests": self.max_requests,
+            "max_bytes": self.max_bytes,
+            "requests_operation_id": self.requests_operation_id,
+        }
 
 
-def reserve_discovery(engine: Engine, source_key: str, *, job_key: str | None = None,
-                      wanted_requests: int = DEFAULT_MAX_REQUESTS_PER_JOB, wanted_bytes: int = 8_000_000,
-                      policy: Any = None) -> DiscoveryReservation:
+def reserve_discovery(
+    engine: Engine,
+    source_key: str,
+    *,
+    job_key: str | None = None,
+    wanted_requests: int = DEFAULT_MAX_REQUESTS_PER_JOB,
+    wanted_bytes: int = 8_000_000,
+    policy: Any = None,
+) -> DiscoveryReservation:
     """Reserve today's discovery allowance or raise ``BudgetExhausted`` (nothing is fetched)."""
-    g = reserve_egress(engine, purpose="discovery", source_key=source_key,
-                       operation_id=f"discovery:{job_key or uuid.uuid4()}", want_requests=wanted_requests,
-                       want_bytes=wanted_bytes, budget=load_budget(policy))
+    g = reserve_egress(
+        engine,
+        purpose="discovery",
+        source_key=source_key,
+        operation_id=f"discovery:{job_key or uuid.uuid4()}",
+        want_requests=wanted_requests,
+        want_bytes=wanted_bytes,
+        budget=load_budget(policy),
+    )
     return DiscoveryReservation(source_key, g.requests_operation_id, g.bytes_operation_id, g.requests, g.bytes)
 
 
@@ -70,8 +86,15 @@ class DiscoveryMeteredHttp(MeteredHttp):
     """
 
     def __init__(self, inner: Any, engine: Engine, r: DiscoveryReservation) -> None:
-        res = Reservation(r.source_key, r.requests_operation_id, r.bytes_operation_id, r.max_requests,
-                          r.max_requests, r.max_bytes, "budgets")
+        res = Reservation(
+            r.source_key,
+            r.requests_operation_id,
+            r.bytes_operation_id,
+            r.max_requests,
+            r.max_requests,
+            r.max_bytes,
+            "budgets",
+        )
         super().__init__(inner, engine, res, request_chunk=1)
         self.reserved_bytes = r.max_bytes
         self.hard_requests = r.max_requests
@@ -94,5 +117,11 @@ def metered_discovery(http: Any, engine: Engine, reservation: DiscoveryReservati
     return DiscoveryMeteredHttp(http, engine, reservation)
 
 
-__all__ = ["BudgetExhausted", "DiscoveryMeteredHttp", "DiscoveryReservation", "metered_discovery",
-           "reserve_discovery", "settle_discovery"]
+__all__ = [
+    "BudgetExhausted",
+    "DiscoveryMeteredHttp",
+    "DiscoveryReservation",
+    "metered_discovery",
+    "reserve_discovery",
+    "settle_discovery",
+]

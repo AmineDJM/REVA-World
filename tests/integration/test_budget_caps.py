@@ -55,8 +55,9 @@ def _src() -> str:
 
 
 def _budget(src: str, limit: int, *, total_requests: int = HUGE, total_bytes: int = HUGE) -> IngestBudget:
-    return IngestBudget("budgets-test", "", total_requests=total_requests, total_bytes=total_bytes,
-                        per_source_requests={src: limit})
+    return IngestBudget(
+        "budgets-test", "", total_requests=total_requests, total_bytes=total_bytes, per_source_requests={src: limit}
+    )
 
 
 def _prefill(db: Any, account: str, amount: int, *, at_sql: str | None = None) -> None:
@@ -65,17 +66,21 @@ def _prefill(db: Any, account: str, amount: int, *, at_sql: str | None = None) -
     if at_sql:
         cols, vals = cols + ", recorded_at", vals + f", {at_sql}"
     with db.owner.begin() as c:
-        c.execute(text(f"INSERT INTO ops.budget_ledger({cols}) VALUES ({vals})"),
-                  {"a": account, "o": f"test-prefill-{uuid.uuid4().hex}", "u": account.rsplit(":", 1)[1],
-                   "n": amount})
+        c.execute(
+            text(f"INSERT INTO ops.budget_ledger({cols}) VALUES ({vals})"),
+            {"a": account, "o": f"test-prefill-{uuid.uuid4().hex}", "u": account.rsplit(":", 1)[1], "n": amount},
+        )
 
 
 def _rows(db: Any, src: str) -> list[Any]:
     with db.owner.connect() as c:
-        return c.execute(text("SELECT account_key, unit, reserved, consumed FROM ops.budget_ledger "
-                              "WHERE account_key = ANY(:a) ORDER BY recorded_at"),
-                         {"a": [account_key(src, u, p) for u in ("requests", "bytes")
-                                for p in ("ingest", "discovery")]}).all()
+        return c.execute(
+            text(
+                "SELECT account_key, unit, reserved, consumed FROM ops.budget_ledger "
+                "WHERE account_key = ANY(:a) ORDER BY recorded_at"
+            ),
+            {"a": [account_key(src, u, p) for u in ("requests", "bytes") for p in ("ingest", "discovery")]},
+        ).all()
 
 
 class Transport:
@@ -93,8 +98,7 @@ class Transport:
         if self.forbidden:
             raise AssertionError(f"no provider request may be made (budget exhausted): {url}")
         self.calls.append((url, kw.get("max_bytes")))
-        return HttpResult(url, url, 200, {"content-type": "application/json"}, self.body, datetime.now(UTC),
-                          0.0, (), 1)
+        return HttpResult(url, url, 200, {"content-type": "application/json"}, self.body, datetime.now(UTC), 0.0, (), 1)
 
     async def aclose(self) -> None:
         return None
@@ -111,12 +115,15 @@ class ProbeConnector:
 
     def describe(self) -> Any:
         # an unregistered name: record_health and the failure streak find nothing to update
-        return self.inner.describe().model_copy(update={"name": "invariant30.caps_probe",
-                                                        "source_key": self.source_key})
+        return self.inner.describe().model_copy(
+            update={"name": "invariant30.caps_probe", "source_key": self.source_key}
+        )
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
-        items = tuple(FetchItem(key=f"probe-{i}", url=f"https://api.worldbank.org/v2/probe/{i}", max_bytes=1000)
-                      for i in range(self.n_items))
+        items = tuple(
+            FetchItem(key=f"probe-{i}", url=f"https://api.worldbank.org/v2/probe/{i}", max_bytes=1000)
+            for i in range(self.n_items)
+        )
         return FetchPlan(connector="invariant30.caps_probe", items=items, pagination="none")
 
     async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
@@ -137,8 +144,17 @@ class ProbeConnector:
 def _ctx(db: Any) -> Any:
     from reva.operations.context import JobContext
 
-    return JobContext(job_id=uuid.uuid4(), job_type="ingest", worker_id="budget-test", fencing_token=0, attempt=1,
-                      settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+    return JobContext(
+        job_id=uuid.uuid4(),
+        job_type="ingest",
+        worker_id="budget-test",
+        fencing_token=0,
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
 
 
 @pytest.fixture
@@ -223,8 +239,7 @@ def test_cli_live_ingest_reports_typed_refusal_without_requests(db, monkeypatch)
     src = _src()
     conn = ProbeConnector(src, 2)
     monkeypatch.setattr(budgets, "load_budget", lambda policy=None: _budget(src, 4))
-    monkeypatch.setattr("reva.adapters.connectors.registry.builtin_connectors",
-                        lambda *a, **k: {"budget.probe": conn})
+    monkeypatch.setattr("reva.adapters.connectors.registry.builtin_connectors", lambda *a, **k: {"budget.probe": conn})
     monkeypatch.setattr(engine_mod, "get_engine", lambda kind="worker", *a, **k: db.worker)
     monkeypatch.setattr(factory, "get_store", lambda *a, **k: db.store)
     monkeypatch.setattr("reva.autonomy.jobs.promoted_connectors", lambda *a, **k: {})
@@ -235,8 +250,9 @@ def test_cli_live_ingest_reports_typed_refusal_without_requests(db, monkeypatch)
     monkeypatch.setattr(runner, "make_live_client", no_client)
     _prefill(db, account_key(src, "requests"), 4)
     reports = cli._run_ingest(["budget.probe"], live=True, capture=False)
-    assert reports == [{**reports[0], "connector": "invariant30.caps_probe", "status": "refused",
-                        "code": "budget_exhausted"}]
+    assert reports == [
+        {**reports[0], "connector": "invariant30.caps_probe", "status": "refused", "code": "budget_exhausted"}
+    ]
     assert conn.fetched == []
 
 
@@ -248,8 +264,15 @@ def test_unknown_source_and_zero_limit_are_refused(db) -> None:
             reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=0, budget=b)
         assert ei.value.details["reason"] == reason
         with pytest.raises(BudgetExhausted):
-            reserve_egress(db.worker, purpose="discovery", source_key=src, operation_id=f"t:{uuid.uuid4()}",
-                           want_requests=1, want_bytes=1, budget=b)
+            reserve_egress(
+                db.worker,
+                purpose="discovery",
+                source_key=src,
+                operation_id=f"t:{uuid.uuid4()}",
+                want_requests=1,
+                want_bytes=1,
+                budget=b,
+            )
     assert _rows(db, src) == []
 
 
@@ -274,8 +297,9 @@ def test_requests_beyond_the_reservation_are_topped_up_then_refused_without_a_re
     transport = Transport()
     http = metered(transport, db.worker, r, budget=b)
     # the per-run FetchBudget allows all 8: only the persistent daily ledger stops the run
-    report = asyncio.run(run_connector(conn, http, db.store, db.worker, budget=FetchBudget(max_requests=100),
-                                       persist_cursor=False))
+    report = asyncio.run(
+        run_connector(conn, http, db.store, db.worker, budget=FetchBudget(max_requests=100), persist_cursor=False)
+    )
     assert len(transport.calls) == 5 and len(conn.fetched) == 8
     assert all(mb is not None and mb <= 1000 for _, mb in transport.calls)
     refused = [e for e in report.errors if e.get("code") == "budget_exhausted"]
@@ -331,8 +355,10 @@ def _race(fns: list[Any]) -> list[Any]:
 def test_racing_ingest_reservations_cannot_exceed_the_cap(db) -> None:
     src = _src()
     b = _budget(src, 10)
-    fns = [lambda: reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=4,
-                                  budget=b) for _ in range(6)]
+    fns = [
+        lambda: reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=4, budget=b)
+        for _ in range(6)
+    ]
     out = _race(fns)
     ok = [o for o in out if not isinstance(o, BudgetExhausted)]
     assert len(ok) == 2 and sum(isinstance(o, BudgetExhausted) for o in out) == 4
@@ -347,16 +373,23 @@ def test_ingest_and_discovery_share_one_lock_and_one_cap(db) -> None:
 
     def ingest() -> None:
         try:
-            results["ingest"] = reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src,
-                                               planned_requests=4, budget=b)
+            results["ingest"] = reserve_ingest(
+                db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=4, budget=b
+            )
         except BudgetExhausted as e:
             results["ingest"] = e
 
     def discovery() -> None:
         try:
-            results["discovery"] = reserve_egress(db.worker, purpose="discovery", source_key=src,
-                                                  operation_id=f"discovery:{uuid.uuid4()}", want_requests=5,
-                                                  want_bytes=10, budget=b)
+            results["discovery"] = reserve_egress(
+                db.worker,
+                purpose="discovery",
+                source_key=src,
+                operation_id=f"discovery:{uuid.uuid4()}",
+                want_requests=5,
+                want_bytes=10,
+                budget=b,
+            )
         except BudgetExhausted as e:
             results["discovery"] = e
 
@@ -387,8 +420,10 @@ def test_in_run_top_ups_race_with_new_reservations_without_exceeding_the_cap(db)
     b = _budget(src, 12)
     r = reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=1, budget=b)
     fns: list[Any] = [lambda: budgets.top_up(db.worker, r, unit="requests", want=5, budget=b) for _ in range(3)]
-    fns += [lambda: reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=3,
-                                   budget=b) for _ in range(3)]
+    fns += [
+        lambda: reserve_ingest(db.worker, job_id=uuid.uuid4(), attempt=1, source_key=src, planned_requests=3, budget=b)
+        for _ in range(3)
+    ]
     _race(fns)
     with db.worker.connect() as c:
         assert usage_today(c, src)["source_requests"] <= 12

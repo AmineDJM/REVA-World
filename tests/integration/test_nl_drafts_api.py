@@ -55,9 +55,14 @@ class Env:
 
 def _settings(base: Settings, **over: Any) -> Settings:
     data = base.model_dump()
-    data.update(reva_admin_password_hash=SecretStr(hash_password(ADMIN_PASSWORD)),
-                reva_session_secret=SecretStr("s" * 48), reva_allowed_hosts="testserver,localhost",
-                reva_cors_origins="", reva_env="test", reva_llm_enabled=True)
+    data.update(
+        reva_admin_password_hash=SecretStr(hash_password(ADMIN_PASSWORD)),
+        reva_session_secret=SecretStr("s" * 48),
+        reva_allowed_hosts="testserver,localhost",
+        reva_cors_origins="",
+        reva_env="test",
+        reva_llm_enabled=True,
+    )
     data.update(over)
     return Settings.model_validate(data)
 
@@ -72,19 +77,34 @@ def env(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp("nl_objects")
     url = db.settings.migration_url().set(database=name).render_as_string(hide_password=False)
-    base = Settings.model_validate({**db.settings.model_dump(), "reva_migration_database_url": SecretStr(url),
-                                    "reva_db_name": name, "reva_object_root": root})
+    base = Settings.model_validate(
+        {
+            **db.settings.model_dump(),
+            "reva_migration_database_url": SecretStr(url),
+            "reva_db_name": name,
+            "reva_object_root": root,
+        }
+    )
     bootstrap(base)
     store = FilesystemArtifactStore(root, base.reva_s3_prefix)
     owner, worker = make_engine("migration", base), make_engine("worker", base)
     conn_ = builtin_connectors()["worldbank.wdi.indicators"]
     spec = conn_.describe()
-    asyncio.run(run_connector(conn_, FixtureHttp(spec.name), store, worker, persist_cursor=False,
-                              post_publish=post_publish_for(spec.template)))
+    asyncio.run(
+        run_connector(
+            conn_,
+            FixtureHttp(spec.name),
+            store,
+            worker,
+            persist_cursor=False,
+            post_publish=post_publish_for(spec.template),
+        )
+    )
     rel = publish_release(worker, store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test")
     with owner.begin() as c:
-        present = c.execute(text("SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,"
-                                 "bigint)') IS NOT NULL")).scalar_one()
+        present = c.execute(
+            text("SELECT to_regprocedure('ops.reserve_llm_budget(text,integer,bigint,integer,bigint)') IS NOT NULL")
+        ).scalar_one()
         if not present:
             c.execute(text(LEDGER_FUNCTIONS_SQL))
     app = create_app(_settings(base))
@@ -110,28 +130,41 @@ def post(env: Env, text_: str, key: str | None = None, **kw: Any) -> Any:
 
 def counts(env: Env) -> dict[str, int]:
     with env.owner.connect() as c:
-        return {t: int(c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one())
-                for t in ("sim.scenario", "ops.job", "sim.run")
-                if c.execute(text("SELECT to_regclass(:t)"), {"t": t}).scalar_one() is not None}
+        return {
+            t: int(c.execute(text(f"SELECT count(*) FROM {t}")).scalar_one())
+            for t in ("sim.scenario", "ops.job", "sim.run")
+            if c.execute(text("SELECT to_regclass(:t)"), {"t": t}).scalar_one() is not None
+        }
 
 
 def token(env: Env, scopes: list[str]) -> dict[str, str]:
     tok, sha = new_api_token()
     with env.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
-                  {"h": sha, "s": scopes, "l": f"nl-{uuid.uuid4().hex[:6]}"})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
+            {"h": sha, "s": scopes, "l": f"nl-{uuid.uuid4().hex[:6]}"},
+        )
     return {"Authorization": f"Bearer {tok}"}
 
 
 # ---------------------------------------------------------------------------
 def test_ledger_functions_come_from_the_migration_when_present(env: Env) -> None:
     with env.owner.connect() as c:
-        fn = c.execute(text("SELECT p.prosecdef FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace "
-                            "WHERE n.nspname = 'ops' AND p.proname = 'reserve_llm_budget'")).scalar_one()
-        can = c.execute(text("SELECT has_function_privilege('reva_api', 'ops.reserve_llm_budget(text,integer,"
-                             "bigint,integer,bigint)', 'EXECUTE')")).scalar_one()
-        public = c.execute(text("SELECT has_function_privilege('public', 'ops.settle_llm_budget(text,integer,"
-                                "bigint)', 'EXECUTE')")).scalar_one()
+        fn = c.execute(
+            text(
+                "SELECT p.prosecdef FROM pg_proc p JOIN pg_namespace n ON n.oid = p.pronamespace "
+                "WHERE n.nspname = 'ops' AND p.proname = 'reserve_llm_budget'"
+            )
+        ).scalar_one()
+        can = c.execute(
+            text(
+                "SELECT has_function_privilege('reva_api', 'ops.reserve_llm_budget(text,integer,"
+                "bigint,integer,bigint)', 'EXECUTE')"
+            )
+        ).scalar_one()
+        public = c.execute(
+            text("SELECT has_function_privilege('public', 'ops.settle_llm_budget(text,integer,bigint)', 'EXECUTE')")
+        ).scalar_one()
     assert fn is True and can is True and public is False
     print(f"ledger functions from migration: {env.functions_from_migration}")
 
@@ -165,8 +198,11 @@ def test_audit_row_has_hash_and_length_but_never_the_text(env: Env) -> None:
     assert r.status_code == 502 and r.json()["code"] == "llm_provider_error"
     post(env, TEXTS["openai_en_retirement"])
     with env.owner.connect() as c:
-        rows = c.execute(text("SELECT action, target, details FROM ops.audit WHERE action LIKE 'scenario_draft.%'"
-                              )).mappings().all()
+        rows = (
+            c.execute(text("SELECT action, target, details FROM ops.audit WHERE action LIKE 'scenario_draft.%'"))
+            .mappings()
+            .all()
+        )
     dump = json.dumps([dict(x) for x in rows], default=str)
     assert "Dupont" not in dump and "retirement age" not in dump
     actions = {x["action"] for x in rows}
@@ -184,11 +220,15 @@ def test_scope_idempotency_and_size_limits(env: Env) -> None:
     calls = len(env.drafter.calls)
     r = post(env, "é" * 2049)
     assert r.status_code == 413 and r.json()["code"] == "payload_too_large"
-    r = env.client.post(URL, content=b'{"text": "' + b"a" * 9000 + b'"}',
-                        headers={"Idempotency-Key": "big-body-1", "Content-Type": "application/json"})
+    r = env.client.post(
+        URL,
+        content=b'{"text": "' + b"a" * 9000 + b'"}',
+        headers={"Idempotency-Key": "big-body-1", "Content-Type": "application/json"},
+    )
     assert r.status_code == 413
-    r = env.client.post(URL, json={"text": "PRIVATE-TEXT-123", "spec": {}},
-                        headers={"Idempotency-Key": "extra-field-1"})
+    r = env.client.post(
+        URL, json={"text": "PRIVATE-TEXT-123", "spec": {}}, headers={"Idempotency-Key": "extra-field-1"}
+    )
     assert r.status_code == 422 and "PRIVATE-TEXT-123" not in r.text
     assert len(env.drafter.calls) == calls  # none of these reached the provider
 
@@ -210,8 +250,16 @@ def test_budget_is_charged_and_settled_in_the_ledger(env: Env) -> None:
     r = post(env, TEXTS["openai_en_multiyear"])
     usage = r.json()["usage"]["total_tokens"]
     with env.owner.connect() as c:
-        rows = c.execute(text("SELECT account_key, unit, reserved, consumed FROM ops.budget_ledger "
-                              "WHERE account_key LIKE 'llm:%' ORDER BY recorded_at DESC LIMIT 2")).mappings().all()
+        rows = (
+            c.execute(
+                text(
+                    "SELECT account_key, unit, reserved, consumed FROM ops.budget_ledger "
+                    "WHERE account_key LIKE 'llm:%' ORDER BY recorded_at DESC LIMIT 2"
+                )
+            )
+            .mappings()
+            .all()
+        )
     by_unit = {x["unit"]: x for x in rows}
     assert by_unit["requests"]["account_key"] == "llm:scenario_drafts:requests" and by_unit["requests"]["consumed"] == 1
     assert by_unit["tokens"]["consumed"] == usage and by_unit["tokens"]["reserved"] >= usage

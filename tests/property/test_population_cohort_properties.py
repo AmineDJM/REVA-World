@@ -24,8 +24,18 @@ YEARS = range(2010, 2017)  # populations 2010..2016, events 2010..2015
 
 
 def _row(ds: str, year: int, sex: str, age: str, kind: str, start: int | None, value: int) -> dict[str, Any]:
-    return {"dataset": ds, "year": year, "sex": sex, "age": age, "age_kind": kind, "age_start": start,
-            "age_end": None if start is None else start + 1, "cell_type": "leaf", "value": str(value), "status": ""}
+    return {
+        "dataset": ds,
+        "year": year,
+        "sex": sex,
+        "age": age,
+        "age_kind": kind,
+        "age_start": start,
+        "age_end": None if start is None else start + 1,
+        "cell_type": "leaf",
+        "value": str(value),
+        "status": "",
+    }
 
 
 def synthetic(seed: int, scale: int, shock: int) -> C.CountryDemography:
@@ -52,10 +62,16 @@ def synthetic(seed: int, scale: int, shock: int) -> C.CountryDemography:
 
 
 @settings(max_examples=25, deadline=None)
-@given(seed=st.integers(0, 10_000), scale=st.integers(1, 50), shock=st.integers(0, 900),
-       migration=st.sampled_from(["zero", "average_residual"]), horizon=st.integers(1, 12))
+@given(
+    seed=st.integers(0, 10_000),
+    scale=st.integers(1, 50),
+    shock=st.integers(0, 900),
+    migration=st.sampled_from(["zero", "average_residual"]),
+    horizon=st.integers(1, 12),
+)
 def test_population_balancing_equation_exact_and_negative_cohorts_flagged(
-        seed: int, scale: int, shock: int, migration: str, horizon: int) -> None:
+    seed: int, scale: int, shock: int, migration: str, horizon: int
+) -> None:
     data = synthetic(seed, scale, shock)
     a = C.Assumptions(migration=migration, base_period=(2010, 2014))
     p = C.project(data, jump_off=2015, end_year=2015 + horizon, assumptions=a)

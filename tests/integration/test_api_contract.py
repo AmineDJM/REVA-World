@@ -19,8 +19,9 @@ def _export() -> Any:
 
 def test_committed_contract_is_current() -> None:
     mod = _export()
-    assert (ROOT / "contracts" / "openapi.json").read_text(encoding="utf-8") == mod.render(), \
+    assert (ROOT / "contracts" / "openapi.json").read_text(encoding="utf-8") == mod.render(), (
         "contracts/openapi.json is stale: run scripts/export_contracts.py"
+    )
 
 
 def test_response_fields_with_defaults_are_required() -> None:

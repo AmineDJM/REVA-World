@@ -63,12 +63,15 @@ JOIN evidence.connector_version cv ON cv.id = e.connector_version_id
 WHERE e.recorded_at <= :cutoff
 ORDER BY e.connector_version_id, e.concept_version_id, e.recorded_at DESC, e.id DESC
 """
-TEMPLATE_CHANGED_DETAIL = ("promoted connector disabled: template_changed (the reviewed template code changed "
-                           "since promotion; re-validation and a new connector version are required)")
+TEMPLATE_CHANGED_DETAIL = (
+    "promoted connector disabled: template_changed (the reviewed template code changed "
+    "since promotion; re-validation and a new connector version are required)"
+)
 
 
-def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequence[str],
-                            registry: Registry | None = None) -> dict[str, Any]:
+def build_coverage_snapshot(
+    conn: Connection, cutoff: datetime, origins: Sequence[str], registry: Registry | None = None
+) -> dict[str, Any]:
     reg = registry or load_registry()
     reqs = reg.requirements["requirements"]
     concepts = sorted({r["concept"] for r in reqs})
@@ -88,20 +91,37 @@ def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequenc
         if row["template"] == et.TEMPLATE_ID and row["code_digest"] != current_template:
             # Not loaded for ingestion any more (jobs.promoted_connectors): not support, but a visible gap.
             template_changed[row["concept_id"]].update(targets)
-            changed_connectors.append({"connector": row["name"], "version": row["version"],
-                                       "concept_id": row["concept_id"], "state": "template_changed"})
+            changed_connectors.append(
+                {
+                    "connector": row["name"],
+                    "version": row["version"],
+                    "concept_id": row["concept_id"],
+                    "state": "template_changed",
+                }
+            )
             continue
         eligible[row["concept_id"]].update(targets)
     cells: dict[tuple[str, str, int], dict[str, Any]] = {}
-    for row in conn.execute(text(LATEST_SQL), {"cutoff": cutoff, "origins": list(origins),
-                                               "concepts": concepts}).mappings():
+    for row in conn.execute(
+        text(LATEST_SQL), {"cutoff": cutoff, "origins": list(origins), "concepts": concepts}
+    ).mappings():
         geo = by_entity.get(str(row["subject_id"]))
         if geo is None or not row["eligible"] or not (row["start"] or "")[:4].isdigit():
             continue
         key = (row["concept_id"], geo, int(row["start"][:4]))
-        cell = cells.setdefault(key, {"concept_id": key[0], "geo": geo, "year": key[2], "values": 0,
-                                      "missing": 0, "missing_reasons": set(), "sources": set(),
-                                      "latest_recorded_at": None})
+        cell = cells.setdefault(
+            key,
+            {
+                "concept_id": key[0],
+                "geo": geo,
+                "year": key[2],
+                "values": 0,
+                "missing": 0,
+                "missing_reasons": set(),
+                "sources": set(),
+                "latest_recorded_at": None,
+            },
+        )
         cell["sources"].add(row["source_key"])
         if row["kind"] == "missing":
             cell["missing"] += 1
@@ -113,17 +133,29 @@ def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequenc
                 cell["latest_recorded_at"] = ts
     out_cells = []
     for c in sorted(cells.values(), key=lambda c: (c["concept_id"], c["geo"], c["year"])):
-        out_cells.append({**c, "status": "value" if c["values"] else "missing",
-                          "missing_reasons": sorted(c["missing_reasons"]), "sources": sorted(c["sources"]),
-                          "latest_recorded_at": c["latest_recorded_at"].isoformat() if c["latest_recorded_at"]
-                          else None})
-    return {"schema": "reva-coverage-snapshot/1", "as_of": cutoff.isoformat(), "origins": list(origins),
-            "catalogue_version": reg.requirements.get("catalogue_version"),
-            "eligible": {k: sorted(v) for k, v in sorted(eligible.items())},
-            "template_changed": {k: sorted(v - eligible.get(k, set())) for k, v in sorted(template_changed.items())
-                                 if v - eligible.get(k, set())},
-            "template_changed_connectors": sorted(changed_connectors, key=lambda d: (d["connector"], d["version"])),
-            "cells": out_cells}
+        out_cells.append(
+            {
+                **c,
+                "status": "value" if c["values"] else "missing",
+                "missing_reasons": sorted(c["missing_reasons"]),
+                "sources": sorted(c["sources"]),
+                "latest_recorded_at": c["latest_recorded_at"].isoformat() if c["latest_recorded_at"] else None,
+            }
+        )
+    return {
+        "schema": "reva-coverage-snapshot/1",
+        "as_of": cutoff.isoformat(),
+        "origins": list(origins),
+        "catalogue_version": reg.requirements.get("catalogue_version"),
+        "eligible": {k: sorted(v) for k, v in sorted(eligible.items())},
+        "template_changed": {
+            k: sorted(v - eligible.get(k, set()))
+            for k, v in sorted(template_changed.items())
+            if v - eligible.get(k, set())
+        },
+        "template_changed_connectors": sorted(changed_connectors, key=lambda d: (d["connector"], d["version"])),
+        "cells": out_cells,
+    }
 
 
 def _runs(years: Iterable[int]) -> list[list[int]]:
@@ -136,8 +168,7 @@ def _runs(years: Iterable[int]) -> list[list[int]]:
     return out
 
 
-def classify(requirements: dict[str, Any], snapshot: dict[str, Any], cutoff: datetime
-             ) -> list[dict[str, Any]]:
+def classify(requirements: dict[str, Any], snapshot: dict[str, Any], cutoff: datetime) -> list[dict[str, Any]]:
     """Per (requirement, geography, year) status: covered / unsupported / missing / stale."""
     cells = {(c["concept_id"], c["geo"], int(c["year"])): c for c in snapshot["cells"]}
     eligible = {k: set(v) for k, v in snapshot["eligible"].items()}
@@ -150,20 +181,36 @@ def classify(requirements: dict[str, Any], snapshot: dict[str, Any], cutoff: dat
                 cell = cells.get((r["concept"], g, y))
                 if g not in eligible.get(r["concept"], set()):
                     status = "unsupported"
-                    detail = (TEMPLATE_CHANGED_DETAIL if g in changed.get(r["concept"], set())
-                              else "no eligible connector version for concept and subject")
+                    detail = (
+                        TEMPLATE_CHANGED_DETAIL
+                        if g in changed.get(r["concept"], set())
+                        else "no eligible connector version for concept and subject"
+                    )
                 elif cell is None or cell["status"] != "value":
                     status = "missing"
-                    detail = ("source returned no value (typed Missing: "
-                              + ",".join(cell["missing_reasons"]) + ")") if cell else "no observation"
+                    detail = (
+                        ("source returned no value (typed Missing: " + ",".join(cell["missing_reasons"]) + ")")
+                        if cell
+                        else "no observation"
+                    )
                 else:
                     age_days = (cutoff - datetime.fromisoformat(cell["latest_recorded_at"])).days
                     if age_days > int(r["acceptable_freshness_days"]):
                         status, detail = "stale", f"newest eligible value is {age_days} days old"
                     else:
                         status, detail = "covered", ""
-                out.append({"requirement_id": r["id"], "task": r["task"], "concept": r["concept"], "geo": g,
-                            "year": y, "status": status, "detail": detail, "weight": r["weight"]})
+                out.append(
+                    {
+                        "requirement_id": r["id"],
+                        "task": r["task"],
+                        "concept": r["concept"],
+                        "geo": g,
+                        "year": y,
+                        "status": status,
+                        "detail": detail,
+                        "weight": r["weight"],
+                    }
+                )
     return out
 
 
@@ -171,9 +218,17 @@ def coverage_report(requirements: dict[str, Any], snapshot: dict[str, Any], cuto
     rows = classify(requirements, snapshot, cutoff)
     per: dict[str, dict[str, Any]] = {}
     for row in rows:
-        p = per.setdefault(row["requirement_id"], {"concept": row["concept"], "weight": row["weight"],
-                                                    "denominator": 0, "available": 0, "semantically_supported": 0,
-                                                    "fresh": 0})
+        p = per.setdefault(
+            row["requirement_id"],
+            {
+                "concept": row["concept"],
+                "weight": row["weight"],
+                "denominator": 0,
+                "available": 0,
+                "semantically_supported": 0,
+                "fresh": 0,
+            },
+        )
         p["denominator"] += 1
         p["semantically_supported"] += row["status"] != "unsupported"
         p["available"] += row["status"] in ("covered", "stale")
@@ -183,8 +238,9 @@ def coverage_report(requirements: dict[str, Any], snapshot: dict[str, Any], cuto
         "statement": "coverage of this finite requirement catalogue under its stated thresholds only",
         "catalogue_version": requirements.get("catalogue_version"),
         "per_requirement": per,
-        "unweighted": {k: sum(p[k] for p in per.values()) for k in
-                       ("denominator", "available", "semantically_supported", "fresh")},
+        "unweighted": {
+            k: sum(p[k] for p in per.values()) for k in ("denominator", "available", "semantically_supported", "fresh")
+        },
         "weighted_availability": sum(p["weight"] * p["available"] for p in per.values()) / tot_w,
         "weighted_freshness": sum(p["weight"] * p["fresh"] for p in per.values()) / tot_w,
     }
@@ -195,8 +251,9 @@ class CatalogueGapDetector:
         self.io = io_
         self.registry = registry or load_registry()
 
-    def detect(self, requirements: ArtifactRef, coverage_snapshot: ArtifactRef,
-               context: ScopedContext) -> list[KnowledgeGap]:
+    def detect(
+        self, requirements: ArtifactRef, coverage_snapshot: ArtifactRef, context: ScopedContext
+    ) -> list[KnowledgeGap]:
         reqs = self.io.get_json(requirements)
         snap = self.io.get_json(coverage_snapshot)
         rows = classify(reqs, snap, context.knowledge_cutoff)
@@ -212,17 +269,30 @@ class CatalogueGapDetector:
             years = sorted(i["year"] for i in items)
             span = int(r["period"][1]) - int(r["period"][0]) + 1
             details = sorted({i["detail"] for i in items})
-            gaps.append(KnowledgeGap(
-                gap_id=stable_id("gap", str(reqs.get("catalogue_version")), rid, geo, status,
-                                 ",".join(map(str, years)), coverage_snapshot.sha256),
-                requirement_id=rid,
-                concept_version=f"{concept.concept_id}@{concept.version}",
-                geography=(geo,),
-                temporal_support={"years": years, "runs": _runs(years), "period": list(r["period"]),
-                                  "task": r["task"]},
-                reason=f"{status}: {'; '.join(details)}",
-                priority=float(r["weight"]) * len(years) / span,
-                priority_method=PRIORITY_METHOD,
-                context=context,
-            ))
+            gaps.append(
+                KnowledgeGap(
+                    gap_id=stable_id(
+                        "gap",
+                        str(reqs.get("catalogue_version")),
+                        rid,
+                        geo,
+                        status,
+                        ",".join(map(str, years)),
+                        coverage_snapshot.sha256,
+                    ),
+                    requirement_id=rid,
+                    concept_version=f"{concept.concept_id}@{concept.version}",
+                    geography=(geo,),
+                    temporal_support={
+                        "years": years,
+                        "runs": _runs(years),
+                        "period": list(r["period"]),
+                        "task": r["task"],
+                    },
+                    reason=f"{status}: {'; '.join(details)}",
+                    priority=float(r["weight"]) * len(years) / span,
+                    priority_method=PRIORITY_METHOD,
+                    context=context,
+                )
+            )
         return gaps

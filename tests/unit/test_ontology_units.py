@@ -59,8 +59,13 @@ def test_kg_to_barrel_refused_without_density_and_convention() -> None:
 
 
 def test_mass_volume_with_explicit_convention_round_trips() -> None:
-    conv = DensityConvention(convention_key="test.crude_at_15c", version="1", density_kg_per_m3="850",
-                             reference_temperature_c="15", evidence_ref="test-fixture: assumed density")
+    conv = DensityConvention(
+        convention_key="test.crude_at_15c",
+        version="1",
+        density_kg_per_m3="850",
+        reference_temperature_c="15",
+        evidence_ref="test-fixture: assumed density",
+    )
     bbl = mass_to_volume("850", "unit.kg", "unit.m3", conv)
     assert bbl == Decimal(1)
     back = volume_to_mass(mass_to_volume("1000", "unit.kg", "unit.barrel", conv), "unit.barrel", "unit.kg", conv)
@@ -84,8 +89,9 @@ def test_ratio_denominators_are_not_interchangeable() -> None:
 
 
 def test_currency_without_basis_rejected() -> None:
-    rep = validate_observation_units({"value": {"kind": "decimal", "value": "10", "unit_ref": "unit.usd",
-                                                "basis": {"scale_factor": "1"}}})
+    rep = validate_observation_units(
+        {"value": {"kind": "decimal", "value": "10", "unit_ref": "unit.usd", "basis": {"scale_factor": "1"}}}
+    )
     assert not rep.ok
     assert {"currency_missing", "price_basis_missing"} <= {i.code for i in rep.errors}
     assert not validate_observation_units({"kind": "decimal", "value": "1", "unit_ref": "unit.usd"}).ok
@@ -96,8 +102,14 @@ def test_currency_without_basis_rejected() -> None:
 
 
 def test_complete_currency_basis_passes_but_unrecorded_fx_is_flagged() -> None:
-    obs = {"value": {"kind": "decimal", "value": "10", "unit_ref": "unit.usd",
-                     "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"}}}
+    obs = {
+        "value": {
+            "kind": "decimal",
+            "value": "10",
+            "unit_ref": "unit.usd",
+            "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"},
+        }
+    }
     rep = validate_observation_units(obs, expected_unit_ref="unit.usd")
     assert rep.ok
     assert [i.code for i in rep.issues] == ["exchange_rate_transform_unrecorded"]
@@ -121,8 +133,9 @@ def test_observation_unit_missing_or_unknown_rejected(value: dict, code: str) ->
 
 
 def test_observation_unit_must_match_concept_and_missing_values_pass() -> None:
-    rep = validate_observation_units({"value": {"kind": "decimal", "value": "1", "unit_ref": "unit.kg"}},
-                                     expected_unit_ref="unit.persons")
+    rep = validate_observation_units(
+        {"value": {"kind": "decimal", "value": "1", "unit_ref": "unit.kg"}}, expected_unit_ref="unit.persons"
+    )
     assert [i.code for i in rep.errors] == ["unit_ref_mismatch"]
     assert validate_observation_units({"value": {"kind": "missing", "reason": "unavailable"}}).ok
     assert not validate_observation_units({"logical_key": "no value"}).ok
@@ -151,8 +164,9 @@ def _transform(**kw: object) -> CurrencyTransform:
 
 
 def test_currency_transform_carries_basis_and_requires_period_factor() -> None:
-    v = ScalarDecimal(value="100", unit_ref="unit.usd",
-                      basis=MeasurementBasis(currency="USD", price_basis="nominal", valuation="FOB"))
+    v = ScalarDecimal(
+        value="100", unit_ref="unit.usd", basis=MeasurementBasis(currency="USD", price_basis="nominal", valuation="FOB")
+    )
     out = apply_currency_transform(v, 2023, _transform())
     assert out.unit_ref == "unit.eur" and out.value == "90"
     assert out.basis.currency == "EUR" and out.basis.valuation == "FOB"
@@ -167,8 +181,11 @@ def test_currency_transform_rejects_incomplete_or_mismatched_basis() -> None:
     no_basis = ScalarDecimal(value="1", unit_ref="unit.usd", basis=MeasurementBasis())
     with pytest.raises(IncompatibleSemantics, match="incomplete"):
         apply_currency_transform(no_basis, 2023, _transform())
-    ppp = ScalarDecimal(value="1", unit_ref="unit.usd",
-                        basis=MeasurementBasis(currency="USD", price_basis="ppp", price_reference_year=2017))
+    ppp = ScalarDecimal(
+        value="1",
+        unit_ref="unit.usd",
+        basis=MeasurementBasis(currency="USD", price_basis="ppp", price_reference_year=2017),
+    )
     with pytest.raises(IncompatibleSemantics, match="does not match"):
         apply_currency_transform(ppp, 2023, _transform())
     with pytest.raises(ValueError, match="reference year"):

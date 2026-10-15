@@ -49,7 +49,8 @@ RETIREMENT_SCHEMA = "reva-retirement-backtest/1"
 RETIREMENT_STATEMENT = (
     "Out-of-sample back-test of a conditional projection on the current (revised) Eurostat LFS vintage, protocol "
     "fixed before the test years were examined; no parameter was fitted on the test years. A good fit is not "
-    "validation of the mechanism (see the placebo on ages 55-59 in the manifest).")
+    "validation of the mechanism (see the placebo on ages 55-59 in the manifest)."
+)
 MAX_COUNTRIES = 60
 PAYLOAD_KEYS = frozenset({"model_key", "release_id", "countries", "reuse"})
 
@@ -66,15 +67,23 @@ class BacktestSpec:
 
 BACKTESTS: dict[str, BacktestSpec] = {
     "demography.cohort_component": BacktestSpec(
-        "demography.cohort_component", "1.0.0", "population_backtest",
-        "reva.evaluation.population_backtest:run_population_evaluation", "evaluation.population_backtest",
+        "demography.cohort_component",
+        "1.0.0",
+        "population_backtest",
+        "reva.evaluation.population_backtest:run_population_evaluation",
+        "evaluation.population_backtest",
         "Cohort-component projection from 1 January 2013 (rates of 2008-2012) compared with the observed "
-        "population of 2023, per country; plus a labelled EUROPOP2023 plausibility comparison (not validation)."),
+        "population of 2023, per country; plus a labelled EUROPOP2023 plausibility comparison (not validation).",
+    ),
     "social.retirement_age": BacktestSpec(
-        "social.retirement_age", "1.0.0", "retirement_backtest",
-        "reva.models.social.backtest:run", "evaluation.retirement_backtest",
+        "social.retirement_age",
+        "1.0.0",
+        "retirement_backtest",
+        "reva.models.social.backtest:run",
+        "evaluation.retirement_backtest",
         "France 2010 pension reform: employment rate 60-64 by sex predicted for 2012-2019 from 2010 data, the "
-        "as-applied rule path and the literature grid (pre-registered central point), against observations."),
+        "as-applied rule path and the literature grid (pre-registered central point), against observations.",
+    ),
 }
 BACKTEST_TASKS = tuple(sorted(b.task for b in BACKTESTS.values()))
 
@@ -82,8 +91,12 @@ BACKTEST_TASKS = tuple(sorted(b.task for b in BACKTESTS.values()))
 def backtest_spec(model_key: str) -> BacktestSpec:
     spec = BACKTESTS.get(model_key)
     if spec is None:
-        raise CapabilityGap(f"model {model_key!r} has no back-test function", capability="backtest",
-                            model_key=str(model_key)[:200], supported=sorted(BACKTESTS))
+        raise CapabilityGap(
+            f"model {model_key!r} has no back-test function",
+            capability="backtest",
+            model_key=str(model_key)[:200],
+            supported=sorted(BACKTESTS),
+        )
     return spec
 
 
@@ -104,10 +117,15 @@ def parse_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
     countries = payload.get("countries")
     if countries is not None:
         if spec.task != "population_backtest":
-            raise ValidationProblem("countries applies to the population back-test only (the retirement back-test is "
-                                    "the pre-registered France 2010 protocol)")
-        if (not isinstance(countries, list) or not 1 <= len(countries) <= MAX_COUNTRIES
-                or not all(isinstance(c, str) and len(c) == 3 and c.isalpha() and c.isupper() for c in countries)):
+            raise ValidationProblem(
+                "countries applies to the population back-test only (the retirement back-test is "
+                "the pre-registered France 2010 protocol)"
+            )
+        if (
+            not isinstance(countries, list)
+            or not 1 <= len(countries) <= MAX_COUNTRIES
+            or not all(isinstance(c, str) and len(c) == 3 and c.isalpha() and c.isupper() for c in countries)
+        ):
             raise ValidationProblem(f"countries must be 1-{MAX_COUNTRIES} ISO 3166 alpha-3 codes")
         countries = sorted(set(countries))
     reuse = payload.get("reuse", True)
@@ -122,14 +140,18 @@ def _release(conn: Connection, release_id: UUID | None) -> dict[str, Any]:
 
     rel = release_by_id(conn, release_id) if release_id else release_as_of(conn, None)
     if rel is None or rel.get("sequence") is None:
-        raise MissingInput("no published belief release is available for the back-test",
-                           release_id=str(release_id) if release_id else None)
+        raise MissingInput(
+            "no published belief release is available for the back-test",
+            release_id=str(release_id) if release_id else None,
+        )
     return rel
 
 
 def _model_version_id(conn: Connection, spec: BacktestSpec) -> UUID:
-    mv = conn.execute(text("SELECT id FROM model.version WHERE model_key=:k AND version=:v"),
-                      {"k": spec.model_key, "v": spec.model_version}).scalar_one_or_none()
+    mv = conn.execute(
+        text("SELECT id FROM model.version WHERE model_key=:k AND version=:v"),
+        {"k": spec.model_key, "v": spec.model_version},
+    ).scalar_one_or_none()
     if mv is None:
         raise MissingInput("model version is not registered", model=f"{spec.model_key}@{spec.model_version}")
     return UUID(str(mv))
@@ -138,24 +160,49 @@ def _model_version_id(conn: Connection, spec: BacktestSpec) -> UUID:
 def pinned_population_countries(conn: Connection, release_id: Any) -> list[str]:
     from reva.models.population.cohort_component import DATASET_CONCEPTS
 
-    return [str(r) for r in conn.execute(text(
-        """SELECT DISTINCT subject_key FROM belief.release_dataset WHERE release_id = :r AND concept_id = :c
-           ORDER BY 1"""), {"r": release_id, "c": DATASET_CONCEPTS["population"]}).scalars()]
+    return [
+        str(r)
+        for r in conn.execute(
+            text(
+                """SELECT DISTINCT subject_key FROM belief.release_dataset WHERE release_id = :r AND concept_id = :c
+           ORDER BY 1"""
+            ),
+            {"r": release_id, "c": DATASET_CONCEPTS["population"]},
+        ).scalars()
+    ]
 
 
-def stored_backtests(conn: Connection, spec: BacktestSpec, release_id: Any, code: str | None = None,
-                     countries: Sequence[str] | None = None) -> list[dict[str, Any]]:
+def stored_backtests(
+    conn: Connection,
+    spec: BacktestSpec,
+    release_id: Any,
+    code: str | None = None,
+    countries: Sequence[str] | None = None,
+) -> list[dict[str, Any]]:
     """Back-test rows of this model version computed from ``release_id`` (optionally by the same code)."""
-    rows = conn.execute(text(
-        """SELECT ev.id, ev.evaluation_manifest_sha256, ev.context_id, ev.task_scope, a.parameters
+    rows = (
+        conn.execute(
+            text(
+                """SELECT ev.id, ev.evaluation_manifest_sha256, ev.context_id, ev.task_scope, a.parameters
            FROM model.evaluation ev JOIN model.version mv ON mv.id = ev.model_version_id
            JOIN meta.activity a ON a.id = ev.provenance_activity_id
            WHERE mv.model_key = :k AND mv.version = :v AND ev.task_scope->>'task' = :t
              AND a.kind = :ak AND a.parameters->>'release_id' = :r
              AND (CAST(:code AS text) IS NULL OR a.code_digest = :code)
-           ORDER BY ev.recorded_at DESC, ev.id DESC"""),
-        {"k": spec.model_key, "v": spec.model_version, "t": spec.task, "ak": spec.activity_kind,
-         "r": str(release_id), "code": code}).mappings().all()
+           ORDER BY ev.recorded_at DESC, ev.id DESC"""
+            ),
+            {
+                "k": spec.model_key,
+                "v": spec.model_version,
+                "t": spec.task,
+                "ak": spec.activity_kind,
+                "r": str(release_id),
+                "code": code,
+            },
+        )
+        .mappings()
+        .all()
+    )
     out = [dict(r) for r in rows]
     if countries is not None and out:
         # one manifest = one run: reuse only a run over exactly this country set
@@ -173,16 +220,22 @@ def stored_backtests(conn: Connection, spec: BacktestSpec, release_id: Any, code
 
 
 def _summary(rows: Sequence[Mapping[str, Any]], reused: bool) -> dict[str, Any]:
-    return {"status": "succeeded", "reused": reused, "replay_mode": REPLAY_MODE,
-            "evaluation_ids": [str(r["id"]) for r in rows],
-            "evaluation_manifest_sha256": sorted({r["evaluation_manifest_sha256"] for r in rows}),
-            "context_ids": sorted({str(r["context_id"]) for r in rows})}
+    return {
+        "status": "succeeded",
+        "reused": reused,
+        "replay_mode": REPLAY_MODE,
+        "evaluation_ids": [str(r["id"]) for r in rows],
+        "evaluation_manifest_sha256": sorted({r["evaluation_manifest_sha256"] for r in rows}),
+        "context_ids": sorted({str(r["context_id"]) for r in rows}),
+    }
 
 
 # --------------------------------------------------------------------------- retirement (PEN)
 def _err(by_sex: Mapping[str, Any]) -> dict[str, Any]:
-    return {s: {"mean_error_pp": v.get("mean_error_pp"), "mean_absolute_error_pp": v.get("mean_absolute_error_pp")}
-            for s, v in by_sex.items()}
+    return {
+        s: {"mean_error_pp": v.get("mean_error_pp"), "mean_absolute_error_pp": v.get("mean_absolute_error_pp")}
+        for s, v in by_sex.items()
+    }
 
 
 def retirement_metrics(report: Mapping[str, Any]) -> dict[str, Any]:
@@ -195,10 +248,14 @@ def retirement_metrics(report: Mapping[str, Any]) -> dict[str, Any]:
         placebo[s] = {"mean_error_pp": round(sum(errs) / len(errs), 2) if errs else None}
     return {
         "label": "conditional projection under stated assumptions, not a forecast",
-        "model_label": EXPERIMENTAL_LABEL, "statement": RETIREMENT_STATEMENT, "status": "evaluated",
+        "model_label": EXPERIMENTAL_LABEL,
+        "statement": RETIREMENT_STATEMENT,
+        "status": "evaluated",
         "unit": "percentage points of the employment rate (predicted - observed)",
-        "central_point": central, "central": _err(results[central]),
-        "benchmark": bench, "benchmark_errors": _err(results[bench]),
+        "central_point": central,
+        "central": _err(results[central]),
+        "benchmark": bench,
+        "benchmark_errors": _err(results[bench]),
         "grid": {pid: _err(v) for pid, v in sorted(results.items())},
         "excluded_points": [e["point_id"] for e in report.get("excluded_points") or []],
         "placebo_55_59": placebo,
@@ -206,8 +263,9 @@ def retirement_metrics(report: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def run_retirement_backtest(engine: Engine, store: Any, release_id: Any, *, actor: str = "worker:backtest",
-                            lease: Any = None) -> dict[str, Any]:
+def run_retirement_backtest(
+    engine: Engine, store: Any, release_id: Any, *, actor: str = "worker:backtest", lease: Any = None
+) -> dict[str, Any]:
     """Run the PEN back-test on the release's pinned FRA LFS tables and store it (one row)."""
     from reva.adapters.postgres import repositories as repo
     from reva.models.social import backtest as bt
@@ -220,65 +278,136 @@ def run_retirement_backtest(engine: Engine, store: Any, release_id: Any, *, acto
         if lease is not None:
             lease(conn)
         rel = _release(conn, UUID(str(release_id)))
-        inputs = {name: resolve_dataset(conn, store, rel["id"],
-                                        InputRequirement(name, ra.CONCEPTS[name], bt.COUNTRY, (), "dataset"))
-                  for name in ("employment_rate", "activity_rate")}
+        inputs = {
+            name: resolve_dataset(
+                conn, store, rel["id"], InputRequirement(name, ra.CONCEPTS[name], bt.COUNTRY, (), "dataset")
+            )
+            for name in ("employment_rate", "activity_rate")
+        }
         missing = sorted(n for n, d in inputs.items() if d.is_missing)
         if missing:
-            raise MissingInput("the release pins no Eurostat LFS table needed by the retirement back-test",
-                               missing=missing, country=bt.COUNTRY, release_id=str(rel["id"]),
-                               concepts=[ra.CONCEPTS[n] for n in missing])
+            raise MissingInput(
+                "the release pins no Eurostat LFS table needed by the retirement back-test",
+                missing=missing,
+                country=bt.COUNTRY,
+                release_id=str(rel["id"]),
+                concepts=[ra.CONCEPTS[n] for n in missing],
+            )
         emp = inputs["employment_rate"].table.to_pylist()  # type: ignore[union-attr]
         act = inputs["activity_rate"].table.to_pylist()  # type: ignore[union-attr]
         try:
             report = bt.run(emp, act)
         except (StopIteration, KeyError) as e:
-            raise MissingInput("pinned LFS tables lack rows required by the back-test protocol",
-                               country=bt.COUNTRY, detail=type(e).__name__) from None
-        prov = {n: {**d.provenance(), "manifest_sha256": d.manifest.get("manifest_sha256")}
-                for n, d in inputs.items()}
-        design = {"protocol": report["protocol"], "country": report["country"], "age_group": report["age_group"],
-                  "base_year": report["base_year"], "test_years": report["test_years"],
-                  "scenario_path": report["scenario_path"], "reference_path": report["reference_path"],
-                  "central_point": report["central_point"], "benchmark": report["benchmark"],
-                  "weights": report["weights"], "rule_table_digest": report["rule_table_digest"],
-                  "assumption_registry_digest": report["assumption_registry_digest"],
-                  "information_set": f"LFS rows with year <= {report['base_year']} only (the prediction function "
-                                     "refuses later rows)"}
+            raise MissingInput(
+                "pinned LFS tables lack rows required by the back-test protocol",
+                country=bt.COUNTRY,
+                detail=type(e).__name__,
+            ) from None
+        prov = {n: {**d.provenance(), "manifest_sha256": d.manifest.get("manifest_sha256")} for n, d in inputs.items()}
+        design = {
+            "protocol": report["protocol"],
+            "country": report["country"],
+            "age_group": report["age_group"],
+            "base_year": report["base_year"],
+            "test_years": report["test_years"],
+            "scenario_path": report["scenario_path"],
+            "reference_path": report["reference_path"],
+            "central_point": report["central_point"],
+            "benchmark": report["benchmark"],
+            "weights": report["weights"],
+            "rule_table_digest": report["rule_table_digest"],
+            "assumption_registry_digest": report["assumption_registry_digest"],
+            "information_set": f"LFS rows with year <= {report['base_year']} only (the prediction function "
+            "refuses later rows)",
+        }
         metrics = retirement_metrics(report)
         manifest = {
-            "schema": RETIREMENT_SCHEMA, "model": f"{ra.MODEL_KEY}@{ra.MODEL_VERSION}",
+            "schema": RETIREMENT_SCHEMA,
+            "model": f"{ra.MODEL_KEY}@{ra.MODEL_VERSION}",
             "implementation_digest": ra.manifest_dict()["implementation_digest"],
-            "backtest_function": spec.function, "label": metrics["label"], "model_label": EXPERIMENTAL_LABEL,
-            "replay_mode": REPLAY_MODE, "replay_mode_label": REPLAY_MODE_LABEL, "statement": RETIREMENT_STATEMENT,
-            "baseline_release": {"id": str(rel["id"]), "manifest_sha256": rel["manifest_sha256"],
-                                 "knowledge_cutoff": rel["knowledge_cutoff"].isoformat(), "origin": rel["origin"]},
-            "inputs": prov, "design": design, "metrics": metrics, "report": report,
+            "backtest_function": spec.function,
+            "label": metrics["label"],
+            "model_label": EXPERIMENTAL_LABEL,
+            "replay_mode": REPLAY_MODE,
+            "replay_mode_label": REPLAY_MODE_LABEL,
+            "statement": RETIREMENT_STATEMENT,
+            "baseline_release": {
+                "id": str(rel["id"]),
+                "manifest_sha256": rel["manifest_sha256"],
+                "knowledge_cutoff": rel["knowledge_cutoff"].isoformat(),
+                "origin": rel["origin"],
+            },
+            "inputs": prov,
+            "design": design,
+            "metrics": metrics,
+            "report": report,
         }
         sha = repo.store_json_artifact(conn, store, manifest, "evaluation", schema_version="evaluation-manifest/1")
         act_inputs = [(rel["manifest_sha256"], {"role": "baseline_release"})]
-        act_inputs += [(p["artifact_sha256"], {"role": "dataset_input", "name": n, "country": bt.COUNTRY})
-                       for n, p in prov.items()]
-        activity = repo.simple_activity(spec.activity_kind, "evaluation", actor,
-                                        {"model": manifest["model"], "replay_mode": REPLAY_MODE,
-                                         "release_id": str(rel["id"]), "countries": [bt.COUNTRY],
-                                         "protocol": report["protocol"]})
+        act_inputs += [
+            (p["artifact_sha256"], {"role": "dataset_input", "name": n, "country": bt.COUNTRY}) for n, p in prov.items()
+        ]
+        activity = repo.simple_activity(
+            spec.activity_kind,
+            "evaluation",
+            actor,
+            {
+                "model": manifest["model"],
+                "replay_mode": REPLAY_MODE,
+                "release_id": str(rel["id"]),
+                "countries": [bt.COUNTRY],
+                "protocol": report["protocol"],
+            },
+        )
         repo.record_activity(conn, activity, inputs=act_inputs, outputs=[sha])
-        ctx_id = repo.create_context(conn, mode="evaluation", origin=rel["origin"], manifest_sha256=sha,
-                                     knowledge_cutoff=rel["knowledge_cutoff"],
-                                     parent_context_id=UUID(str(rel["context_id"])) if rel["context_id"] else None)
+        ctx_id = repo.create_context(
+            conn,
+            mode="evaluation",
+            origin=rel["origin"],
+            manifest_sha256=sha,
+            knowledge_cutoff=rel["knowledge_cutoff"],
+            parent_context_id=UUID(str(rel["context_id"])) if rel["context_id"] else None,
+        )
         mv = _model_version_id(conn, spec)
-        task_scope = {"task": spec.task, "country": bt.COUNTRY, **{k: design[k] for k in (
-            "protocol", "age_group", "base_year", "test_years", "scenario_path", "reference_path", "central_point",
-            "benchmark")}}
-        eid = conn.execute(text(
-            """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
+        task_scope = {
+            "task": spec.task,
+            "country": bt.COUNTRY,
+            **{
+                k: design[k]
+                for k in (
+                    "protocol",
+                    "age_group",
+                    "base_year",
+                    "test_years",
+                    "scenario_path",
+                    "reference_path",
+                    "central_point",
+                    "benchmark",
+                )
+            },
+        }
+        eid = conn.execute(
+            text(
+                """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
                  task_scope, metrics, provenance_activity_id)
-               VALUES (:m, :c, :s, :rm, CAST(:ts AS jsonb), CAST(:mt AS jsonb), :a) RETURNING id"""),
-            {"m": mv, "c": ctx_id, "s": sha, "rm": REPLAY_MODE, "ts": json.dumps(task_scope),
-             "mt": json.dumps(metrics, default=str), "a": activity.id}).scalar_one()
-    return {"evaluation_manifest_sha256": sha, "context_id": str(ctx_id), "evaluation_ids": {bt.COUNTRY: str(eid)},
-            "manifest": manifest}
+               VALUES (:m, :c, :s, :rm, CAST(:ts AS jsonb), CAST(:mt AS jsonb), :a) RETURNING id"""
+            ),
+            {
+                "m": mv,
+                "c": ctx_id,
+                "s": sha,
+                "rm": REPLAY_MODE,
+                "ts": json.dumps(task_scope),
+                "mt": json.dumps(metrics, default=str),
+                "a": activity.id,
+            },
+        ).scalar_one()
+    return {
+        "evaluation_manifest_sha256": sha,
+        "context_id": str(ctx_id),
+        "evaluation_ids": {bt.COUNTRY: str(eid)},
+        "manifest": manifest,
+    }
 
 
 # --------------------------------------------------------------------------- job handler
@@ -298,11 +427,15 @@ def handle_backtest(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
         if spec.task == "population_backtest" and countries is None:
             countries = pinned_population_countries(conn, rel["id"])[:MAX_COUNTRIES]
             if not countries:
-                raise MissingInput("the release pins no population table: nothing to back-test",
-                                   release_id=str(rel["id"]), model=spec.model_key)
+                raise MissingInput(
+                    "the release pins no population table: nothing to back-test",
+                    release_id=str(rel["id"]),
+                    model=spec.model_key,
+                )
         if p["reuse"]:
-            have = stored_backtests(conn, spec, rel["id"], code,
-                                    countries if spec.task == "population_backtest" else None)
+            have = stored_backtests(
+                conn, spec, rel["id"], code, countries if spec.task == "population_backtest" else None
+            )
             if have:
                 return {**_summary(have, True), "model_key": spec.model_key, "release_id": str(rel["id"])}
     if ctx.heartbeat({"stage": "backtest", "model_key": spec.model_key}) == "cancel_requested":
@@ -317,14 +450,27 @@ def handle_backtest(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     else:
         out = run_retirement_backtest(ctx.worker_engine, ctx.store, rel["id"], actor=actor, lease=ctx.assert_lease)
     ids = out["evaluation_ids"]
-    return {"status": "succeeded", "reused": False, "replay_mode": REPLAY_MODE, "model_key": spec.model_key,
-            "release_id": str(rel["id"]), "evaluation_ids": sorted(ids.values()),
-            "evaluation_manifest_sha256": [out["evaluation_manifest_sha256"]], "context_ids": [out["context_id"]],
-            "units": sorted(ids)}
+    return {
+        "status": "succeeded",
+        "reused": False,
+        "replay_mode": REPLAY_MODE,
+        "model_key": spec.model_key,
+        "release_id": str(rel["id"]),
+        "evaluation_ids": sorted(ids.values()),
+        "evaluation_manifest_sha256": [out["evaluation_manifest_sha256"]],
+        "context_ids": [out["context_id"]],
+        "units": sorted(ids),
+    }
 
 
-def enqueue_backtest(engine: Engine, model_key: str, *, release_id: Any = None,
-                     countries: Sequence[str] | None = None, created_by: str = "worker:backtest") -> UUID:
+def enqueue_backtest(
+    engine: Engine,
+    model_key: str,
+    *,
+    release_id: Any = None,
+    countries: Sequence[str] | None = None,
+    created_by: str = "worker:backtest",
+) -> UUID:
     """Enqueue (idempotently) a ``backtest`` job with worker credentials. The release defaults to the
     current published release, resolved now so the job key names it."""
     from reva.adapters.postgres import queue
@@ -366,8 +512,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = ap.parse_args(argv)
     engine = make_engine("worker", Settings())
     try:
-        jid = enqueue_backtest(engine, args.model, release_id=args.release, countries=args.country,
-                               created_by="worker:backtest-cli")
+        jid = enqueue_backtest(
+            engine, args.model, release_id=args.release, countries=args.country, created_by="worker:backtest-cli"
+        )
     finally:
         engine.dispose()
     print(json.dumps({"job_id": str(jid), "job_type": JOB_TYPE}), file=sys.stdout)

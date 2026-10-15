@@ -55,9 +55,7 @@ END $$;
 def _grants() -> str:
     s = []
     db_revoke = "REVOKE ALL ON DATABASE {db} FROM PUBLIC;"
-    s.append(
-        "DO $$ BEGIN EXECUTE format('" + db_revoke.replace("{db}", "%I") + "', current_database()); END $$;"
-    )
+    s.append("DO $$ BEGIN EXECUTE format('" + db_revoke.replace("{db}", "%I") + "', current_database()); END $$;")
     s.append(
         "DO $$ BEGIN EXECUTE format('GRANT CONNECT ON DATABASE %I TO reva_api, reva_worker, reva_sim, reva_gate',"
         " current_database()); END $$;"
@@ -110,8 +108,9 @@ def _grants() -> str:
     # reva_gate (separate process): the worker has neither a direct INSERT on
     # ops.gate_result nor EXECUTE on ops.record_gate_result; it files an
     # ops.gate_request and waits for the gate's decision.
-    s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation, ops.gate_result "
-             "FROM reva_worker;")
+    s.append(
+        "REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation, ops.gate_result FROM reva_worker;"
+    )
     s.append(
         "GRANT UPDATE ON ops.job, ops.schedule, ops.dirty_node, ops.outbox, ops.connector_cursor, "
         "ops.gc_candidate, ops.budget_ledger, ops.worker_presence TO reva_worker;"
@@ -245,12 +244,28 @@ CREATE POLICY activity_output_worker_insert ON meta.activity_output FOR INSERT T
 #: that wrote the row: ``session_user``, which a SECURITY DEFINER function does
 #: not change) and the governance rules of meta.enforce_governance().
 RECORDED_BY_TABLES = (
-    "meta.activity", "ontology.mapping", "evidence.eligibility", "evidence.claim", "model.version",
-    "model.evaluation", "model.promotion", "ops.audit", "ops.proposal", "ops.proposal_review", "ops.gate_result",
+    "meta.activity",
+    "ontology.mapping",
+    "evidence.eligibility",
+    "evidence.claim",
+    "model.version",
+    "model.evaluation",
+    "model.promotion",
+    "ops.audit",
+    "ops.proposal",
+    "ops.proposal_review",
+    "ops.gate_result",
 )
 GOVERNED_TABLES = (
-    "meta.activity", "ontology.mapping", "evidence.eligibility", "evidence.claim", "model.version",
-    "model.promotion", "ops.audit", "ops.proposal", "ops.gate_result",
+    "meta.activity",
+    "ontology.mapping",
+    "evidence.eligibility",
+    "evidence.claim",
+    "model.version",
+    "model.promotion",
+    "ops.audit",
+    "ops.proposal",
+    "ops.gate_result",
 )
 
 SQL_GOVERNANCE = r"""
@@ -824,13 +839,16 @@ def _governance_triggers() -> str:
     s = []
     for t in RECORDED_BY_TABLES:
         s.append(f"ALTER TABLE {t} ADD COLUMN recorded_by text NOT NULL DEFAULT session_user;")
-        s.append(f"CREATE TRIGGER a01_recorded_by BEFORE INSERT ON {t} "
-                 "FOR EACH ROW EXECUTE FUNCTION meta.force_recorded_by();")
+        s.append(
+            f"CREATE TRIGGER a01_recorded_by BEFORE INSERT ON {t} "
+            "FOR EACH ROW EXECUTE FUNCTION meta.force_recorded_by();"
+        )
     # 'z' sorts after the existing BEFORE INSERT checks, so their more specific
     # errors (identity format, evaluation, policy version) are reported first.
     for t in GOVERNED_TABLES:
-        s.append(f"CREATE TRIGGER z_governance BEFORE INSERT ON {t} "
-                 "FOR EACH ROW EXECUTE FUNCTION meta.enforce_governance();")
+        s.append(
+            f"CREATE TRIGGER z_governance BEFORE INSERT ON {t} FOR EACH ROW EXECUTE FUNCTION meta.enforce_governance();"
+        )
     return "\n".join(s)
 
 

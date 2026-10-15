@@ -181,15 +181,31 @@ class LeakageGuard:
         if k is RefKind.observation_revision:
             if avail_mode:
                 if ref.source_available_at is None or not ref.availability_basis:
-                    return (False, "source_available_at", ref.source_available_at,
-                            "no independently evidenced availability (source_available_at + basis)")
+                    return (
+                        False,
+                        "source_available_at",
+                        ref.source_available_at,
+                        "no independently evidenced availability (source_available_at + basis)",
+                    )
                 return after("source_available_at", ref.source_available_at) or (
-                    True, "source_available_at", ref.source_available_at, "available at/before cutoff")
+                    True,
+                    "source_available_at",
+                    ref.source_available_at,
+                    "available at/before cutoff",
+                )
             return after("recorded_at", ref.recorded_at) or (
-                True, "recorded_at", ref.recorded_at, "recorded at/before cutoff")
+                True,
+                "recorded_at",
+                ref.recorded_at,
+                "recorded at/before cutoff",
+            )
         if k is RefKind.alias_or_boundary_mapping:
             return after("recorded_at", ref.recorded_at) or (
-                True, "recorded_at", ref.recorded_at, "mapping recorded at/before cutoff")
+                True,
+                "recorded_at",
+                ref.recorded_at,
+                "mapping recorded at/before cutoff",
+            )
         if k is RefKind.fitted_scaler:
             bad = after("fitted_on_data_until", ref.fitted_on_data_until)
             if bad:
@@ -211,9 +227,17 @@ class LeakageGuard:
         if k is RefKind.paper_coefficient:
             if avail_mode and ref.source_available_at is not None and ref.availability_basis:
                 return after("source_available_at", ref.source_available_at) or (
-                    True, "source_available_at", ref.source_available_at, "publication proven before cutoff")
+                    True,
+                    "source_available_at",
+                    ref.source_available_at,
+                    "publication proven before cutoff",
+                )
             return after("recorded_at", ref.recorded_at) or (
-                True, "recorded_at", ref.recorded_at, "claim recorded at/before cutoff")
+                True,
+                "recorded_at",
+                ref.recorded_at,
+                "claim recorded at/before cutoff",
+            )
         if k is RefKind.population_calibration:
             bad = after("recorded_at", ref.recorded_at)
             if bad:
@@ -248,9 +272,16 @@ class LeakageGuard:
                 cutoff=self._cutoff.isoformat(),
                 mode=self._mode.value,
             )
-        v = Verdict(ref, True, self._mode, fld, t,
-                    f"admitted only because mode is {RETROSPECTIVE_LABEL}: {reason}", RETROSPECTIVE_LABEL,
-                    would_block_in_strict=True)
+        v = Verdict(
+            ref,
+            True,
+            self._mode,
+            fld,
+            t,
+            f"admitted only because mode is {RETROSPECTIVE_LABEL}: {reason}",
+            RETROSPECTIVE_LABEL,
+            would_block_in_strict=True,
+        )
         self._verdicts.append(v)
         return v
 
@@ -266,86 +297,150 @@ class LeakageGuard:
 # Loaders read one specific record in order to check it; they are not general
 # current-data reads and are not exposed by the cutoff-scoped repository.
 
+
 def observation_ref(conn: Connection, observation_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text(
-            """SELECT o.id, o.logical_key, o.revision_no, o.recorded_at, o.source_available_at,
+    r = (
+        conn.execute(
+            text(
+                """SELECT o.id, o.logical_key, o.revision_no, o.recorded_at, o.source_available_at,
                       o.availability_basis, o.source_published_at, s.source_key, a.retrieved_at
                FROM evidence.observation o JOIN evidence.source s ON s.id = o.source_id
                JOIN evidence.acquisition a ON a.id = o.acquisition_id WHERE o.id = :i"""
-        ),
-        {"i": observation_id},
-    ).mappings().one()
+            ),
+            {"i": observation_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
         RefKind.observation_revision,
         str(r["id"]),
         recorded_at=r["recorded_at"],
         source_available_at=r["source_available_at"],
         availability_basis=r["availability_basis"],
-        detail={"logical_key": r["logical_key"], "revision_no": r["revision_no"], "source_key": r["source_key"],
-                "retrieved_at": _iso(r["retrieved_at"]), "source_published_at": _iso(r["source_published_at"])},
+        detail={
+            "logical_key": r["logical_key"],
+            "revision_no": r["revision_no"],
+            "source_key": r["source_key"],
+            "retrieved_at": _iso(r["retrieved_at"]),
+            "source_published_at": _iso(r["source_published_at"]),
+        },
     )
 
 
 def alias_ref(conn: Connection, alias_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text("SELECT id, provider, external_key, entity_id, mapping_version, valid_range, recorded_at "
-             "FROM world.alias WHERE id = :i"),
-        {"i": alias_id},
-    ).mappings().one()
+    r = (
+        conn.execute(
+            text(
+                "SELECT id, provider, external_key, entity_id, mapping_version, valid_range, recorded_at "
+                "FROM world.alias WHERE id = :i"
+            ),
+            {"i": alias_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
-        RefKind.alias_or_boundary_mapping, str(r["id"]), recorded_at=r["recorded_at"],
-        detail={"table": "world.alias", "provider": r["provider"], "external_key": r["external_key"],
-                "entity_id": str(r["entity_id"]), "mapping_version": r["mapping_version"],
-                "valid_range": str(r["valid_range"]) if r["valid_range"] is not None else None},
+        RefKind.alias_or_boundary_mapping,
+        str(r["id"]),
+        recorded_at=r["recorded_at"],
+        detail={
+            "table": "world.alias",
+            "provider": r["provider"],
+            "external_key": r["external_key"],
+            "entity_id": str(r["entity_id"]),
+            "mapping_version": r["mapping_version"],
+            "valid_range": str(r["valid_range"]) if r["valid_range"] is not None else None,
+        },
     )
 
 
 def mapping_ref(conn: Connection, mapping_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text("SELECT id, mapping_key, version, mapping_kind, recorded_at FROM ontology.mapping WHERE id = :i"),
-        {"i": mapping_id},
-    ).mappings().one()
+    r = (
+        conn.execute(
+            text("SELECT id, mapping_key, version, mapping_kind, recorded_at FROM ontology.mapping WHERE id = :i"),
+            {"i": mapping_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
-        RefKind.alias_or_boundary_mapping, str(r["id"]), recorded_at=r["recorded_at"],
-        detail={"table": "ontology.mapping", "mapping_key": r["mapping_key"], "version": r["version"],
-                "mapping_kind": r["mapping_kind"]},
+        RefKind.alias_or_boundary_mapping,
+        str(r["id"]),
+        recorded_at=r["recorded_at"],
+        detail={
+            "table": "ontology.mapping",
+            "mapping_key": r["mapping_key"],
+            "version": r["version"],
+            "mapping_kind": r["mapping_kind"],
+        },
     )
 
 
 def model_version_ref(conn: Connection, model_version_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text("SELECT id, model_key, version, kind, training_cutoff, training_manifest_sha256, recorded_at "
-             "FROM model.version WHERE id = :i"),
-        {"i": model_version_id},
-    ).mappings().one()
+    r = (
+        conn.execute(
+            text(
+                "SELECT id, model_key, version, kind, training_cutoff, training_manifest_sha256, recorded_at "
+                "FROM model.version WHERE id = :i"
+            ),
+            {"i": model_version_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
-        RefKind.trained_model, str(r["id"]), recorded_at=r["recorded_at"], training_cutoff=r["training_cutoff"],
-        detail={"model_key": r["model_key"], "version": r["version"], "kind": r["kind"],
-                "training_manifest_sha256": r["training_manifest_sha256"]},
+        RefKind.trained_model,
+        str(r["id"]),
+        recorded_at=r["recorded_at"],
+        training_cutoff=r["training_cutoff"],
+        detail={
+            "model_key": r["model_key"],
+            "version": r["version"],
+            "kind": r["kind"],
+            "training_manifest_sha256": r["training_manifest_sha256"],
+        },
     )
 
 
 def claim_ref(conn: Connection, claim_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text("SELECT id, claim_key, version, status, evidence_kind, recorded_at FROM evidence.claim WHERE id = :i"),
-        {"i": claim_id},
-    ).mappings().one()
+    r = (
+        conn.execute(
+            text("SELECT id, claim_key, version, status, evidence_kind, recorded_at FROM evidence.claim WHERE id = :i"),
+            {"i": claim_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
-        RefKind.paper_coefficient, str(r["id"]), recorded_at=r["recorded_at"],
-        detail={"claim_key": r["claim_key"], "version": r["version"], "status": r["status"],
-                "evidence_kind": r["evidence_kind"]},
+        RefKind.paper_coefficient,
+        str(r["id"]),
+        recorded_at=r["recorded_at"],
+        detail={
+            "claim_key": r["claim_key"],
+            "version": r["version"],
+            "status": r["status"],
+            "evidence_kind": r["evidence_kind"],
+        },
     )
 
 
 def population_ref(conn: Connection, dataset_id: UUID | str) -> InputRef:
-    r = conn.execute(
-        text("SELECT d.id, d.recipe_sha256, d.recorded_at, c.knowledge_cutoff "
-             "FROM model.population_dataset d JOIN meta.context c ON c.id = d.context_id WHERE d.id = :i"),
-        {"i": dataset_id},
-    ).mappings().one()
+    r = (
+        conn.execute(
+            text(
+                "SELECT d.id, d.recipe_sha256, d.recorded_at, c.knowledge_cutoff "
+                "FROM model.population_dataset d JOIN meta.context c ON c.id = d.context_id WHERE d.id = :i"
+            ),
+            {"i": dataset_id},
+        )
+        .mappings()
+        .one()
+    )
     return InputRef(
-        RefKind.population_calibration, str(r["id"]), recorded_at=r["recorded_at"],
+        RefKind.population_calibration,
+        str(r["id"]),
+        recorded_at=r["recorded_at"],
         fitted_on_data_until=r["knowledge_cutoff"],
         detail={"recipe_sha256": r["recipe_sha256"]},
     )
@@ -365,7 +460,9 @@ def scaler_ref(manifest: Mapping[str, Any]) -> InputRef:
         return datetime.fromisoformat(str(v))
 
     return InputRef(
-        RefKind.fitted_scaler, str(manifest["id"]), recorded_at=ts("recorded_at"),
+        RefKind.fitted_scaler,
+        str(manifest["id"]),
+        recorded_at=ts("recorded_at"),
         fitted_on_data_until=ts("fitted_on_data_until"),
         detail={k: v for k, v in manifest.items() if k not in ("id", "recorded_at", "fitted_on_data_until")},
     )

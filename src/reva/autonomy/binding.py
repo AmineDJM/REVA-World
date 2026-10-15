@@ -54,10 +54,24 @@ SEMANTIC_KEYS = frozenset({"concept_id", "concept_version", "unit_category", *SE
 SPECIAL_CODES = {"UNK": "unknown", "Y_OPEN": "open_ended_top", "NAP": "not_applicable"}
 TEMPLATE_LANG = "EN"
 MAPPING_VERSION = "1.0.0"
-REQUEST_PARAMETER_KEYS = frozenset({
-    "filters", "time", "lang", "dimension_order", "pinned_categories", "status_vocabulary", "semantics",
-    "subject", "resolution_dimensions", "total_categories", "special_categories", "logical_key_template",
-    "licence", "inspection_fingerprint"})
+REQUEST_PARAMETER_KEYS = frozenset(
+    {
+        "filters",
+        "time",
+        "lang",
+        "dimension_order",
+        "pinned_categories",
+        "status_vocabulary",
+        "semantics",
+        "subject",
+        "resolution_dimensions",
+        "total_categories",
+        "special_categories",
+        "logical_key_template",
+        "licence",
+        "inspection_fingerprint",
+    }
+)
 _GEO_RE = re.compile(r"[A-Z][A-Z0-9_]{1,11}")
 
 
@@ -109,12 +123,17 @@ def approved_template_digest(policy: PinnedPolicy, template: str) -> str | None:
     return str(v) if v else None
 
 
-def approved_entry(policy: PinnedPolicy, template: str, dataset: str, concept_id: str,
-                   version: str) -> dict[str, Any] | None:
+def approved_entry(
+    policy: PinnedPolicy, template: str, dataset: str, concept_id: str, version: str
+) -> dict[str, Any] | None:
     for m in policy.content.get("approved_exact_mappings") or []:
         tgt = m.get("target") or {}
-        if (m.get("template") == template and m.get("dataset") == dataset
-                and tgt.get("concept_id") == concept_id and str(tgt.get("version")) == version):
+        if (
+            m.get("template") == template
+            and m.get("dataset") == dataset
+            and tgt.get("concept_id") == concept_id
+            and str(tgt.get("version")) == version
+        ):
             return dict(m)
     return None
 
@@ -166,8 +185,9 @@ def _structure_problems(order: list[str], cats: Mapping[str, list[str]], pins: M
     return problems
 
 
-def scope_problems(manifest: Mapping[str, Any], registry: Registry, policy: PinnedPolicy,
-                   entry: Mapping[str, Any] | None) -> list[str]:
+def scope_problems(
+    manifest: Mapping[str, Any], registry: Registry, policy: PinnedPolicy, entry: Mapping[str, Any] | None
+) -> list[str]:
     """Approved entry, geography scope, rights and pinned provider structure (shared by gate + promotion)."""
     if entry is None:
         return ["no approved exact mapping for this template/dataset/concept"]
@@ -215,8 +235,13 @@ def builtin_connector_names() -> set[str]:
     return set(builtin_connectors(None))
 
 
-def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: PinnedPolicy, *,
-                     mapping_manifest: Mapping[str, Any] | None = None) -> list[str]:
+def binding_problems(
+    manifest: Mapping[str, Any],
+    registry: Registry,
+    policy: PinnedPolicy,
+    *,
+    mapping_manifest: Mapping[str, Any] | None = None,
+) -> list[str]:
     """Differences between a (schema-valid) manifest and what policy + registry + template code imply.
 
     ``mapping_manifest`` (the proposal's mapping document) is checked too when given: exact,
@@ -247,11 +272,15 @@ def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: Pi
         problems.append("approved template has no registered source in the pinned policy")
     else:
         if manifest.get("source_key") != source["source_key"]:
-            problems.append(f"source_key {manifest.get('source_key')!r} is not the template's registered source "
-                            f"{source['source_key']!r}")
+            problems.append(
+                f"source_key {manifest.get('source_key')!r} is not the template's registered source "
+                f"{source['source_key']!r}"
+            )
         if manifest.get("lineage_family") != source.get("lineage_family"):
-            problems.append(f"lineage_family {manifest.get('lineage_family')!r} differs from the registered "
-                            f"{source.get('lineage_family')!r}")
+            problems.append(
+                f"lineage_family {manifest.get('lineage_family')!r} differs from the registered "
+                f"{source.get('lineage_family')!r}"
+            )
     extra = sorted(set(rp) - REQUEST_PARAMETER_KEYS)
     if extra:
         problems.append(f"request_parameters {extra[:10]} are not template fields (no free manifest fields)")
@@ -264,16 +293,19 @@ def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: Pi
     if source is not None and rp.get("licence") != str((source.get("rights") or {}).get("licence", "")):
         problems.append("licence differs from the registered source licence")
     if manifest.get("rights_ref") != tpl.get("rights_ref"):
-        problems.append(f"rights_ref {str(manifest.get('rights_ref'))[:120]!r} is not the policy's "
-                        f"{tpl.get('rights_ref')!r}")
+        problems.append(
+            f"rights_ref {str(manifest.get('rights_ref'))[:120]!r} is not the policy's {tpl.get('rights_ref')!r}"
+        )
     if int(manifest.get("max_pages") or 0) != 1:
         problems.append("max_pages must be 1 (one filtered cube per request)")
     if not isinstance(manifest.get("version"), str) or not et.SEMVER_RE.fullmatch(manifest["version"]):
         problems.append(f"version {str(manifest.get('version'))[:40]!r} is not a canonical MAJOR.MINOR.PATCH")
     exp_mapping = mapping_key(str(manifest.get("dataset")), concept_id)
     if manifest.get("mapping_version") != f"{exp_mapping}@{MAPPING_VERSION}":
-        problems.append(f"mapping_version {str(manifest.get('mapping_version'))[:120]!r} is not the derived "
-                        f"{exp_mapping}@{MAPPING_VERSION}")
+        problems.append(
+            f"mapping_version {str(manifest.get('mapping_version'))[:120]!r} is not the derived "
+            f"{exp_mapping}@{MAPPING_VERSION}"
+        )
     if mapping_manifest is not None:
         mm = mapping_manifest
         if (mm.get("mapping_key"), str(mm.get("version"))) != (exp_mapping, MAPPING_VERSION):
@@ -310,8 +342,10 @@ def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: Pi
     except (KeyError, TypeError) as e:
         canonical = f"<underivable: {type(e).__name__}>"
     if rp.get("logical_key_template") != canonical:
-        problems.append(f"logical_key_template {str(rp.get('logical_key_template'))[:120]!r} is not the "
-                        f"template-derived {canonical!r}")
+        problems.append(
+            f"logical_key_template {str(rp.get('logical_key_template'))[:120]!r} is not the "
+            f"template-derived {canonical!r}"
+        )
     if set(pinned.get("geo") or []) != set(geo):
         problems.append("pinned geo categories differ from the geo filter")
     cadence = int((manifest.get("cadence") or {}).get("minimum_interval_seconds") or 0)
@@ -328,17 +362,32 @@ def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: Pi
         derived = iso3_for_geo(registry, geo)
         if subjects != derived or not subjects:
             problems.append(f"mapping subjects {subjects} differ from the registry-derived {derived}")
-    problems += scope_problems(manifest, registry, policy,
-                               approved_entry(policy, str(template), str(manifest.get("dataset")), concept_id, version))
+    problems += scope_problems(
+        manifest,
+        registry,
+        policy,
+        approved_entry(policy, str(template), str(manifest.get("dataset")), concept_id, version),
+    )
     return problems
 
 
 def name_conflicts(conn: Connection, name: str, source_key: str, template: str) -> list[str]:
     """A connector name already registered under another source or template is never reused."""
-    rows = conn.execute(text(
-        """SELECT cv.version, s.source_key, cv.declared_capabilities->>'template' AS template
+    rows = (
+        conn.execute(
+            text(
+                """SELECT cv.version, s.source_key, cv.declared_capabilities->>'template' AS template
            FROM evidence.connector_version cv JOIN evidence.source s ON s.id = cv.source_id
-           WHERE cv.name = :n"""), {"n": name}).mappings().all()
-    return [f"connector name {name!r} is registered as {r['version']} under source {r['source_key']!r} "
-            f"template {r['template']!r}" for r in rows
-            if r["source_key"] != source_key or r["template"] != template]
+           WHERE cv.name = :n"""
+            ),
+            {"n": name},
+        )
+        .mappings()
+        .all()
+    )
+    return [
+        f"connector name {name!r} is registered as {r['version']} under source {r['source_key']!r} "
+        f"template {r['template']!r}"
+        for r in rows
+        if r["source_key"] != source_key or r["template"] != template
+    ]

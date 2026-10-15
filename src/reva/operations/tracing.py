@@ -44,8 +44,9 @@ def _setup() -> Any:
             from opentelemetry.sdk.trace import TracerProvider  # type: ignore[import-not-found,unused-ignore]
             from opentelemetry.sdk.trace.export import BatchSpanProcessor  # type: ignore[import-not-found,unused-ignore]
 
-            provider = TracerProvider(resource=Resource.create(
-                {"service.name": os.environ.get("OTEL_SERVICE_NAME", "reva-worker")}))
+            provider = TracerProvider(
+                resource=Resource.create({"service.name": os.environ.get("OTEL_SERVICE_NAME", "reva-worker")})
+            )
             provider.add_span_processor(BatchSpanProcessor(OTLPSpanExporter()))
             trace.set_tracer_provider(provider)
         except ImportError:

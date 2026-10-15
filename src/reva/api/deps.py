@@ -127,8 +127,9 @@ class Timer:
         self.t0 = time.perf_counter()
 
     def cost(self, rows: int, **detail: Any) -> s.CostReport:
-        return s.CostReport(wall_time_ms=round((time.perf_counter() - self.t0) * 1000, 3), rows=rows,
-                            detail=detail or None)
+        return s.CostReport(
+            wall_time_ms=round((time.perf_counter() - self.t0) * 1000, 3), rows=rows, detail=detail or None
+        )
 
 
 SCENARIO_BANNER = s.ApiWarning(
@@ -233,9 +234,18 @@ MAX_FLAG_KEY_CHARS = 64
 MAX_FLAG_STR_CHARS = 200
 MAX_FLAG_BYTES = 4096
 # Interpreted provider-estimation flags first, so they survive any key-count or byte bound.
-PRIORITY_FLAG_KEYS = ("provider_value_estimated", "provider_quantity_estimated", "provider_estimation_flagged",
-                      "legacy_estimation_code_unrecognised", "valuation_warning", "isReported",
-                      "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated", "obs_status")
+PRIORITY_FLAG_KEYS = (
+    "provider_value_estimated",
+    "provider_quantity_estimated",
+    "provider_estimation_flagged",
+    "legacy_estimation_code_unrecognised",
+    "valuation_warning",
+    "isReported",
+    "legacyEstimationFlag",
+    "isQtyEstimated",
+    "isNetWgtEstimated",
+    "obs_status",
+)
 
 
 def _flag_scalar(v: Any) -> tuple[Any, bool]:

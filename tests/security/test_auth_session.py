@@ -23,8 +23,12 @@ PASSWORD = "a very long local test password"
 
 def settings_for(db: Any, **over: Any) -> Settings:
     data = db.settings.model_dump()
-    data.update(reva_admin_password_hash=SecretStr(hash_password(PASSWORD)), reva_session_secret=SecretStr("k" * 48),
-                reva_allowed_hosts="testserver,localhost", reva_env="test")
+    data.update(
+        reva_admin_password_hash=SecretStr(hash_password(PASSWORD)),
+        reva_session_secret=SecretStr("k" * 48),
+        reva_allowed_hosts="testserver,localhost",
+        reva_env="test",
+    )
     data.update(over)
     return Settings.model_validate(data)
 
@@ -37,15 +41,20 @@ def client(db: Any) -> Iterator[TestClient]:
     app.state.engine.dispose()
 
 
-def _token(db: Any, scopes: list[str], label: str = "test-token", revoked: bool = False,
-           principal_kind: str | None = None) -> str:
+def _token(
+    db: Any, scopes: list[str], label: str = "test-token", revoked: bool = False, principal_kind: str | None = None
+) -> str:
     """Tokens labelled human:* are issued as human principals unless stated otherwise."""
     tok, sha = new_api_token()
     pk = principal_kind or ("human" if label.startswith("human:") else "service")
     with db.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind, revoked_at) "
-                       "VALUES (:h, :s, :l, :pk, CASE WHEN :r THEN clock_timestamp() END)"),
-                  {"h": sha, "s": scopes, "l": label, "pk": pk, "r": revoked})
+        c.execute(
+            text(
+                "INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind, revoked_at) "
+                "VALUES (:h, :s, :l, :pk, CASE WHEN :r THEN clock_timestamp() END)"
+            ),
+            {"h": sha, "s": scopes, "l": label, "pk": pk, "r": revoked},
+        )
     return tok
 
 
@@ -68,11 +77,21 @@ def test_health_is_public(client: TestClient) -> None:
     assert r.status_code == 200 and r.json()["status"] == "ready"
 
 
-@pytest.mark.parametrize("method,path", [
-    ("GET", "/v1/entities"), ("GET", "/v1/beliefs"), ("GET", "/v1/session"), ("POST", "/v1/simulations"),
-    ("POST", "/v1/scenarios"), ("POST", "/v1/discovery"), ("POST", "/v1/query"), ("GET", "/metrics"),
-    ("GET", f"/v1/jobs/{uuid.UUID(int=1)}"), ("DELETE", "/v1/session"),
-])
+@pytest.mark.parametrize(
+    "method,path",
+    [
+        ("GET", "/v1/entities"),
+        ("GET", "/v1/beliefs"),
+        ("GET", "/v1/session"),
+        ("POST", "/v1/simulations"),
+        ("POST", "/v1/scenarios"),
+        ("POST", "/v1/discovery"),
+        ("POST", "/v1/query"),
+        ("GET", "/metrics"),
+        ("GET", f"/v1/jobs/{uuid.UUID(int=1)}"),
+        ("DELETE", "/v1/session"),
+    ],
+)
 def test_unauthenticated_is_401(client: TestClient, method: str, path: str) -> None:
     r = client.request(method, path, json={}, headers={"Idempotency-Key": "unauth-test-key"})
     assert r.status_code == 401, (path, r.text)
@@ -89,11 +108,27 @@ def test_wrong_password_is_401_and_audited(db: Any, client: TestClient) -> None:
     assert r2.status_code == 401
     tag = client.app.state.auth.username_tag(marker)  # type: ignore[attr-defined]
     with db.owner.connect() as c:
-        rows = c.execute(text("SELECT actor, target, details FROM ops.audit WHERE action = 'session.login_failed' "
-                              "AND target->>'username_tag' = :u"), {"u": tag}).mappings().all()
-        admin_rows = c.execute(text(
-            "SELECT target FROM ops.audit WHERE action = 'session.login_failed' AND target->>'username_tag' = :u"),
-            {"u": client.app.state.auth.username_tag("admin")}).scalars().all()  # type: ignore[attr-defined]
+        rows = (
+            c.execute(
+                text(
+                    "SELECT actor, target, details FROM ops.audit WHERE action = 'session.login_failed' "
+                    "AND target->>'username_tag' = :u"
+                ),
+                {"u": tag},
+            )
+            .mappings()
+            .all()
+        )
+        admin_rows = (
+            c.execute(
+                text(
+                    "SELECT target FROM ops.audit WHERE action = 'session.login_failed' AND target->>'username_tag' = :u"
+                ),
+                {"u": client.app.state.auth.username_tag("admin")},
+            )
+            .scalars()
+            .all()
+        )  # type: ignore[attr-defined]
     assert len(rows) == 1 and rows[0]["actor"] == "anonymous"
     assert "nope" not in str(rows[0]["details"])
     # P8: the typed username is never stored (a password typed there would persist in immutable audit).
@@ -159,8 +194,11 @@ def test_token_scopes_and_revocation(db: Any, client: TestClient) -> None:
     assert client.get("/v1/entities", headers=h).status_code == 200
     assert client.get("/metrics", headers=h).status_code == 200
     # bearer requests are not cookie-authenticated: no CSRF needed, but scope is enforced
-    r = client.post("/v1/simulations", json={"scenario_id": str(uuid.uuid4()), "fidelity": "L1"},
-                    headers={**h, "Idempotency-Key": "token-scope-test"})
+    r = client.post(
+        "/v1/simulations",
+        json={"scenario_id": str(uuid.uuid4()), "fidelity": "L1"},
+        headers={**h, "Idempotency-Key": "token-scope-test"},
+    )
     assert r.status_code == 403 and r.json()["details"]["required_scope"] == "simulate"
     r = client.post("/v1/discovery", json={"query": "population"}, headers={**h, "Idempotency-Key": "token-scope-2"})
     assert r.status_code == 403
@@ -173,16 +211,18 @@ def test_token_scopes_and_revocation(db: Any, client: TestClient) -> None:
 
 def test_review_requires_human_identity(db: Any, client: TestClient) -> None:
     svc = _token(db, ["read", "review"], label="service-bot")
-    r = client.post(f"/v1/proposals/{uuid.uuid4()}/review", json={"decision": "approve"},
-                    headers={"Authorization": f"Bearer {svc}"})
+    r = client.post(
+        f"/v1/proposals/{uuid.uuid4()}/review", json={"decision": "approve"}, headers={"Authorization": f"Bearer {svc}"}
+    )
     assert r.status_code == 403
 
 
 def test_login_rate_limited_after_repeated_failures(db: Any) -> None:
     app = create_app(settings_for(db))
     with TestClient(app) as c:
-        codes = [c.post("/v1/session", json={"username": "admin", "password": f"bad-{i}"}).status_code
-                 for i in range(6)]
+        codes = [
+            c.post("/v1/session", json={"username": "admin", "password": f"bad-{i}"}).status_code for i in range(6)
+        ]
         assert codes[:5] == [401] * 5 and codes[5] == 429
         r = c.post("/v1/session", json={"username": "admin", "password": PASSWORD})
         assert r.status_code == 429 and int(r.headers["retry-after"]) >= 1
@@ -239,8 +279,9 @@ def test_login_rate_limit_from_environment(db: Any, monkeypatch: pytest.MonkeyPa
     from reva.api.auth import LOGIN_RATE_LIMIT_ENV
 
     monkeypatch.setenv(LOGIN_RATE_LIMIT_ENV, "3")
-    extra = {"reva_login_rate_limit_per_minute": 3} if "reva_login_rate_limit_per_minute" in Settings.model_fields \
-        else {}
+    extra = (
+        {"reva_login_rate_limit_per_minute": 3} if "reva_login_rate_limit_per_minute" in Settings.model_fields else {}
+    )
     app = create_app(settings_for(db, **extra))
     assert app.state.auth.limiter.limit == 3
     with TestClient(app) as c:
@@ -334,10 +375,12 @@ def test_r2_12_human_reviewer_identity_rules() -> None:
 def test_r2_12_review_endpoint_gate(db: Any, client: TestClient) -> None:
     pid = uuid.uuid4()
     reserved = _token(db, ["read", "review"], label="human:admin")
-    r = client.post(f"/v1/proposals/{pid}/review", json={"decision": "approve"},
-                    headers={"Authorization": f"Bearer {reserved}"})
+    r = client.post(
+        f"/v1/proposals/{pid}/review", json={"decision": "approve"}, headers={"Authorization": f"Bearer {reserved}"}
+    )
     assert r.status_code == 403
     alice = _token(db, ["read", "review"], label="human:alice")
-    r = client.post(f"/v1/proposals/{pid}/review", json={"decision": "approve"},
-                    headers={"Authorization": f"Bearer {alice}"})
+    r = client.post(
+        f"/v1/proposals/{pid}/review", json={"decision": "approve"}, headers={"Authorization": f"Bearer {alice}"}
+    )
     assert r.status_code == 404  # passed the identity gate; the proposal does not exist

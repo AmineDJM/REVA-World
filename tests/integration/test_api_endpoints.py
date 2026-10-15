@@ -89,8 +89,14 @@ def _pop_override(new_value: int) -> tuple[dict[str, bytes], str]:
 async def _ingest(name: str, worker: Engine, store: FilesystemArtifactStore, http: Any = None) -> None:
     c = builtin_connectors()[name]
     spec = c.describe()
-    rep = await run_connector(c, http or FixtureHttp(spec.name), store, worker, persist_cursor=False,
-                              post_publish=post_publish_for(spec.template))
+    rep = await run_connector(
+        c,
+        http or FixtureHttp(spec.name),
+        store,
+        worker,
+        persist_cursor=False,
+        post_publish=post_publish_for(spec.template),
+    )
     assert not rep.errors, rep.errors
 
 
@@ -107,8 +113,14 @@ def env(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         c.execute(text(f'CREATE DATABASE "{name}"'))
     root = tmp_path_factory.mktemp("api_objects")
     url = db.settings.migration_url().set(database=name).render_as_string(hide_password=False)
-    base = Settings.model_validate({**db.settings.model_dump(), "reva_migration_database_url": SecretStr(url),
-                                    "reva_db_name": name, "reva_object_root": root})
+    base = Settings.model_validate(
+        {
+            **db.settings.model_dump(),
+            "reva_migration_database_url": SecretStr(url),
+            "reva_db_name": name,
+            "reva_object_root": root,
+        }
+    )
     bootstrap(base)
     store = FilesystemArtifactStore(root, base.reva_s3_prefix)
     owner, worker = make_engine("migration", base), make_engine("worker", base)
@@ -129,8 +141,7 @@ def env(db: Any, tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
     app = create_app(api_settings(base))
     with TestClient(app) as client:
         login(client)
-        yield Env(base, owner, worker, store, r1, r2, t_between_revisions, t_between_releases, old, "46999999",
-                  client)
+        yield Env(base, owner, worker, store, r1, r2, t_between_revisions, t_between_releases, old, "46999999", client)
     app.state.engine.dispose()
     for e in (owner, worker):
         e.dispose()
@@ -177,7 +188,8 @@ def test_entities_list_and_detail(env: Env) -> None:
     body = d.json()["data"]
     assert body["label"] == "France"
     assert {"provider": "comtrade_reporter", "external_key": "251"}.items() <= next(
-        a for a in body["aliases"] if a["provider"] == "comtrade_reporter").items()
+        a for a in body["aliases"] if a["provider"] == "comtrade_reporter"
+    ).items()
     comps = {(c["component"], c["concept_id"]) for c in body["components"]}
     assert ("observations", POP) in comps and ("estimates", POP) in comps
     assert {c["mode"] for c in body["supported_contexts"]} >= {"evidence", "belief"}
@@ -185,8 +197,10 @@ def test_entities_list_and_detail(env: Env) -> None:
 
 
 def test_dza_crude_import_belief_is_typed_missing(env: Env) -> None:
-    r = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "subject_id": "DZA",
-                                              "concept": CRUDE_M, "period": 2023})
+    r = env.client.get(
+        "/v1/beliefs",
+        params={"release_id": str(env.r1.release_id), "subject_id": "DZA", "concept": CRUDE_M, "period": 2023},
+    )
     assert r.status_code == 200, r.text
     body = r.json()
     assert len(body["data"]) == 1
@@ -224,8 +238,9 @@ def test_beliefs_are_release_pinned_and_as_of(env: Env) -> None:
     assert [d["id"] for d in lst.json()["data"]] == [str(env.r1.release_id)]
     # pagination over a pinned release
     p1 = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "limit": 50})
-    p2 = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "limit": 50,
-                                               "cursor": p1.json()["next_cursor"]})
+    p2 = env.client.get(
+        "/v1/beliefs", params={"release_id": str(env.r1.release_id), "limit": 50, "cursor": p1.json()["next_cursor"]}
+    )
     assert {d["id"] for d in p1.json()["data"]}.isdisjoint({d["id"] for d in p2.json()["data"]})
 
 
@@ -252,28 +267,45 @@ def test_timeseries_revision_filtering(env: Env) -> None:
     assert full["origin"] == "test_fixture" and full["modality"] == "reported_observation"
     problem(env.client.get("/v1/timeseries", params={**base, "as_of": "2024-01-01T00:00:00"}), 422)
 
-    obs = env.client.get("/v1/observations", params={"logical_key": "wb:SP.POP.TOTL:DZA:2023",
-                                                     "revisions": "all"}).json()["data"]
+    obs = env.client.get(
+        "/v1/observations", params={"logical_key": "wb:SP.POP.TOTL:DZA:2023", "revisions": "all"}
+    ).json()["data"]
     assert [o["revision_no"] for o in obs] == [1, 2]
     assert obs[1]["supersedes_id"] == obs[0]["id"] and obs[0]["superseded_by_id"] == obs[1]["id"]
-    old = env.client.get("/v1/observations", params={"logical_key": "wb:SP.POP.TOTL:DZA:2023",
-                                                     "as_of": iso(env.t_between_revisions)}).json()["data"]
+    old = env.client.get(
+        "/v1/observations", params={"logical_key": "wb:SP.POP.TOTL:DZA:2023", "as_of": iso(env.t_between_revisions)}
+    ).json()["data"]
     assert len(old) == 1 and old[0]["revision_no"] == 1 and old[0]["superseded_by_id"] is None
 
 
 def test_provenance_reaches_raw_artifact_and_selector(env: Env) -> None:
-    est = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "subject_id": "FRA",
-                                                "concept": CRUDE_M, "period": 2023}).json()["data"][0]
+    est = env.client.get(
+        "/v1/beliefs",
+        params={"release_id": str(env.r1.release_id), "subject_id": "FRA", "concept": CRUDE_M, "period": 2023},
+    ).json()["data"][0]
     r = env.client.get(f"/v1/provenance/estimate/{est['id']}")
     assert r.status_code == 200, r.text
     g = r.json()["data"]
     kinds = {n["kind"] for n in g["nodes"]}
-    assert {"estimate", "release", "observation", "activity", "acquisition", "artifact", "storage_location",
-            "connector_version", "source"} <= kinds
+    assert {
+        "estimate",
+        "release",
+        "observation",
+        "activity",
+        "acquisition",
+        "artifact",
+        "storage_location",
+        "connector_version",
+        "source",
+    } <= kinds
     with env.owner.connect() as c:
-        raw_sha = c.execute(text(
-            "SELECT a.raw_sha256 FROM evidence.observation o JOIN evidence.acquisition a ON a.id = o.acquisition_id "
-            "WHERE o.id = :i"), {"i": est["observation_id"]}).scalar_one()
+        raw_sha = c.execute(
+            text(
+                "SELECT a.raw_sha256 FROM evidence.observation o JOIN evidence.acquisition a ON a.id = o.acquisition_id "
+                "WHERE o.id = :i"
+            ),
+            {"i": est["observation_id"]},
+        ).scalar_one()
     sel = next(e for e in g["edges"] if e["relation"] == "selected_from")
     assert sel["target"] == f"artifact:{raw_sha}"
     assert sel["attributes"]["selector"]["artifact_sha256"] == raw_sha
@@ -323,14 +355,35 @@ def test_simulations_jobs(env: Env) -> None:
     body = {"scenario_id": sid, "fidelity": "L1"}
     problem(env.client.post("/v1/simulations", json=body), 400, "idempotency_key_required")
     problem(env.client.post("/v1/simulations", json=body, headers={"Idempotency-Key": "short"}), 400)
-    problem(env.client.post("/v1/simulations", json={**body, "fidelity": "L3"},
-                            headers={"Idempotency-Key": "sim-test-L3-0001"}), 422, "capability_gap")
-    problem(env.client.post("/v1/simulations", json={**body, "fidelity": "L9"},
-                            headers={"Idempotency-Key": "sim-test-L9-0001"}), 422, "validation_error")
-    problem(env.client.post("/v1/simulations", json={**body, "fidelity": "L2"},
-                            headers={"Idempotency-Key": "sim-test-L2-0001"}), 422, "validation_error")
-    problem(env.client.post("/v1/simulations", json={**body, "scenario_id": str(uuid.uuid4())},
-                            headers={"Idempotency-Key": "sim-test-404-0001"}), 404)
+    problem(
+        env.client.post(
+            "/v1/simulations", json={**body, "fidelity": "L3"}, headers={"Idempotency-Key": "sim-test-L3-0001"}
+        ),
+        422,
+        "capability_gap",
+    )
+    problem(
+        env.client.post(
+            "/v1/simulations", json={**body, "fidelity": "L9"}, headers={"Idempotency-Key": "sim-test-L9-0001"}
+        ),
+        422,
+        "validation_error",
+    )
+    problem(
+        env.client.post(
+            "/v1/simulations", json={**body, "fidelity": "L2"}, headers={"Idempotency-Key": "sim-test-L2-0001"}
+        ),
+        422,
+        "validation_error",
+    )
+    problem(
+        env.client.post(
+            "/v1/simulations",
+            json={**body, "scenario_id": str(uuid.uuid4())},
+            headers={"Idempotency-Key": "sim-test-404-0001"},
+        ),
+        404,
+    )
     key = {"Idempotency-Key": f"sim-test-{uuid.uuid4()}"}
     r = env.client.post("/v1/simulations", json=body, headers=key)
     assert r.status_code == 202, r.text
@@ -338,8 +391,9 @@ def test_simulations_jobs(env: Env) -> None:
     assert r.json()["status_url"] == f"/v1/simulations/{job_id}" and r.headers["location"] == r.json()["status_url"]
     again = env.client.post("/v1/simulations", json=body, headers=key)
     assert again.status_code == 202 and again.json()["job_id"] == job_id
-    problem(env.client.post("/v1/simulations", json={**body, "fidelity": "L0"}, headers=key), 409,
-            "idempotency_conflict")
+    problem(
+        env.client.post("/v1/simulations", json={**body, "fidelity": "L0"}, headers=key), 409, "idempotency_conflict"
+    )
     job = env.client.get(f"/v1/jobs/{job_id}").json()
     assert job["job_type"] == "simulation" and job["status"] == "queued" and job["cancellable"]
     assert job["payload"] == {"scenario_id": sid, "fidelity": "L1"}
@@ -353,26 +407,44 @@ def test_simulations_jobs(env: Env) -> None:
     # Algeria lacks eligible crude inputs: the all-four-country run is rejected, not imputed.
     four = env.client.post("/v1/scenarios", json=_scenario(env, title="four", countries=["FRA", "DZA", "CHN", "USA"]))
     assert four.status_code == 201, four.text
-    miss = problem(env.client.post("/v1/simulations", json={"scenario_id": four.json()["scenario_id"],
-                                                            "fidelity": "L1"},
-                                   headers={"Idempotency-Key": f"sim-four-{uuid.uuid4()}"}), 422, "missing_input")
+    miss = problem(
+        env.client.post(
+            "/v1/simulations",
+            json={"scenario_id": four.json()["scenario_id"], "fidelity": "L1"},
+            headers={"Idempotency-Key": f"sim-four-{uuid.uuid4()}"},
+        ),
+        422,
+        "missing_input",
+    )
     assert {m["country"] for m in miss["details"]["missing"]} == {"DZA"}
 
 
 def test_replay_and_discovery(env: Env) -> None:
     body = {"mode": "operational_as_known", "cutoff": iso(env.t_between_releases), "concepts": [POP]}
-    problem(env.client.post("/v1/replay", json={**body, "mode": "time_travel"},
-                            headers={"Idempotency-Key": "replay-bad-mode-1"}), 422, "validation_error")
+    problem(
+        env.client.post(
+            "/v1/replay", json={**body, "mode": "time_travel"}, headers={"Idempotency-Key": "replay-bad-mode-1"}
+        ),
+        422,
+        "validation_error",
+    )
     problem(env.client.post("/v1/replay", json=body), 400, "idempotency_key_required")
     r = env.client.post("/v1/replay", json=body, headers={"Idempotency-Key": f"replay-{uuid.uuid4()}"})
     assert r.status_code == 202, r.text
     assert r.json()["job_type"] == "replay" and r.json()["status_url"].startswith("/v1/jobs/")
-    d = env.client.post("/v1/discovery", json={"catalogue": "eurostat", "requirement_id": "R-POP-JAN-AGESEX",
-                                               "mode": "fixture"},
-                        headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
+    d = env.client.post(
+        "/v1/discovery",
+        json={"catalogue": "eurostat", "requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"},
+        headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"},
+    )
     assert d.status_code == 202, d.text
-    problem(env.client.post("/v1/discovery", json={"catalogue": "worldbank"},
-                            headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"}), 422, "capability_gap")
+    problem(
+        env.client.post(
+            "/v1/discovery", json={"catalogue": "worldbank"}, headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"}
+        ),
+        422,
+        "capability_gap",
+    )
     env.client.post(f"/v1/jobs/{d.json()['job_id']}/cancel")
 
 
@@ -415,10 +487,18 @@ def test_relations_bounded_with_truncation_flag(env: Env) -> None:
 
 def test_query_spec(env: Env) -> None:
     with env.owner.connect() as c:
-        dza = c.execute(text("SELECT entity_id FROM world.alias WHERE provider='iso3166_alpha3' "
-                             "AND external_key='DZA'")).scalar_one()
-    q = env.client.post("/v1/query", json={"kind": "beliefs", "release_id": str(env.r1.release_id),
-                                           "subject_ids": [str(dza)], "concepts": [CRUDE_M]})
+        dza = c.execute(
+            text("SELECT entity_id FROM world.alias WHERE provider='iso3166_alpha3' AND external_key='DZA'")
+        ).scalar_one()
+    q = env.client.post(
+        "/v1/query",
+        json={
+            "kind": "beliefs",
+            "release_id": str(env.r1.release_id),
+            "subject_ids": [str(dza)],
+            "concepts": [CRUDE_M],
+        },
+    )
     assert q.status_code == 200, q.text
     by_year = {d["support"]["period_label"]: d["value"]["kind"] for d in q.json()["data"]}
     assert by_year["2023"] == "missing" and len(by_year) == 5
@@ -460,9 +540,13 @@ def test_catalog_endpoints(env: Env) -> None:
 def test_proposal_review_records_human_reviewer(env: Env) -> None:
     with env.owner.begin() as c:
         sha = c.execute(text("SELECT manifest_sha256 FROM belief.release LIMIT 1")).scalar_one()
-        pid = c.execute(text(
-            "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, summary, author) "
-            "VALUES ('mapping', :s, 1, '{}'::jsonb, 'agent:discovery') RETURNING id"), {"s": sha}).scalar_one()
+        pid = c.execute(
+            text(
+                "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, summary, author) "
+                "VALUES ('mapping', :s, 1, '{}'::jsonb, 'agent:discovery') RETURNING id"
+            ),
+            {"s": sha},
+        ).scalar_one()
     r = env.client.post(f"/v1/proposals/{pid}/review", json={"decision": "reject", "comment": "needs evidence"})
     assert r.status_code == 201, r.text
     assert r.json()["reviewer"] == "human:admin"
@@ -500,16 +584,32 @@ def _run_claimed(env: Env, job_id: str, handler: Any) -> dict[str, Any]:
     from reva.operations.context import JobContext
 
     with env.owner.begin() as c:
-        row = c.execute(text(
-            """UPDATE ops.job SET status = 'running', worker_id = 'test-worker-E2',
+        row = (
+            c.execute(
+                text(
+                    """UPDATE ops.job SET status = 'running', worker_id = 'test-worker-E2',
                  lease_until = clock_timestamp() + interval '15 minutes',
                  fencing_token = nextval('ops.fencing_seq'), attempts = attempts + 1
-               WHERE id = :j RETURNING job_type, payload, fencing_token"""), {"j": job_id}).mappings().one()
+               WHERE id = :j RETURNING job_type, payload, fencing_token"""
+                ),
+                {"j": job_id},
+            )
+            .mappings()
+            .one()
+        )
     sim = make_engine("sim", env.settings)
     try:
-        ctx = JobContext(job_id=uuid.UUID(job_id), job_type=row["job_type"], worker_id="test-worker-E2",
-                         fencing_token=int(row["fencing_token"]), attempt=1, settings=env.settings,
-                         worker_engine=env.worker, sim_engine=sim, store=env.store)
+        ctx = JobContext(
+            job_id=uuid.UUID(job_id),
+            job_type=row["job_type"],
+            worker_id="test-worker-E2",
+            fencing_token=int(row["fencing_token"]),
+            attempt=1,
+            settings=env.settings,
+            worker_engine=env.worker,
+            sim_engine=sim,
+            store=env.store,
+        )
         result = handler(dict(row["payload"]), ctx)
         if not ctx.completed_in_handler:
             with env.worker.begin() as c:
@@ -524,8 +624,11 @@ def test_provenance_of_run_and_scenario(env: Env) -> None:
     from reva.simulation.jobs import handle_simulation
 
     sid = env.client.post("/v1/scenarios", json=_scenario(env, title="provenance run")).json()["scenario_id"]
-    acc = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L1"},
-                          headers={"Idempotency-Key": f"prov-run-{uuid.uuid4()}"})
+    acc = env.client.post(
+        "/v1/simulations",
+        json={"scenario_id": sid, "fidelity": "L1"},
+        headers={"Idempotency-Key": f"prov-run-{uuid.uuid4()}"},
+    )
     assert acc.status_code == 202, acc.text
     _run_claimed(env, acc.json()["job_id"], handle_simulation)
     st = env.client.get(f"/v1/simulations/{acc.json()['job_id']}").json()
@@ -549,8 +652,12 @@ def test_provenance_of_run_and_scenario(env: Env) -> None:
     roles = {e["attributes"].get("role") for e in g["edges"] if e["source"] == g["root"]}
     assert {"model_manifest", "ontology_manifest", "result_manifest"} <= roles
     assert any(e["relation"] == "of_scenario" and e["target"] == f"scenario:{sid}" for e in g["edges"])
-    assert any(e["relation"] == "baseline_release" and e["source"] == f"scenario:{sid}"
-               and e["target"] == f"release:{env.r1.release_id}" for e in g["edges"])
+    assert any(
+        e["relation"] == "baseline_release"
+        and e["source"] == f"scenario:{sid}"
+        and e["target"] == f"release:{env.r1.release_id}"
+        for e in g["edges"]
+    )
     assert all(e["source"] in nodes and e["target"] in nodes for e in g["edges"])
 
     sc = env.client.get(f"/v1/provenance/scenario/{sid}").json()
@@ -582,8 +689,7 @@ def test_connector_and_source_origin_is_derived(env: Env) -> None:
     wdi = next(s for s in src["data"] if s["source_key"] == "worldbank.wdi")
     assert wdi["origin"] == "test_fixture" and wdi["acquisitions_by_origin"]["test_fixture"] >= 2
     assert src["origin"] == "test_fixture"
-    assert [_acq_origin(a, b) for a, b in ((0, 0), (3, 0), (0, 2), (1, 1))] == \
-        ["none", "live", "test_fixture", "mixed"]
+    assert [_acq_origin(a, b) for a, b in ((0, 0), (3, 0), (0, 2), (1, 1))] == ["none", "live", "test_fixture", "mixed"]
 
 
 def test_evaluation_job_and_scorecard_labels(env: Env) -> None:
@@ -593,14 +699,30 @@ def test_evaluation_job_and_scorecard_labels(env: Env) -> None:
     handler = resolve_handler("evaluation")
     body = {"concepts": [POP], "horizons": [1], "seed": 7}
     problem(env.client.post("/v1/evaluations", json=body), 400, "idempotency_key_required")
-    problem(env.client.post("/v1/evaluations", json={"concepts": [CRUDE_M]},
-                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "capability_gap")
-    problem(env.client.post("/v1/evaluations", json={"horizons": [9]},
-                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
-    problem(env.client.post("/v1/evaluations", json={"seed": -1},
-                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
-    problem(env.client.post("/v1/evaluations", json={"extra": 1},
-                            headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}), 422, "validation_error")
+    problem(
+        env.client.post(
+            "/v1/evaluations", json={"concepts": [CRUDE_M]}, headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}
+        ),
+        422,
+        "capability_gap",
+    )
+    problem(
+        env.client.post(
+            "/v1/evaluations", json={"horizons": [9]}, headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}
+        ),
+        422,
+        "validation_error",
+    )
+    problem(
+        env.client.post("/v1/evaluations", json={"seed": -1}, headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}),
+        422,
+        "validation_error",
+    )
+    problem(
+        env.client.post("/v1/evaluations", json={"extra": 1}, headers={"Idempotency-Key": f"eval-bad-{uuid.uuid4()}"}),
+        422,
+        "validation_error",
+    )
     key = {"Idempotency-Key": f"eval-{uuid.uuid4()}"}
     acc = env.client.post("/v1/evaluations", json=body, headers=key)
     assert acc.status_code == 202, acc.text
@@ -628,8 +750,9 @@ def test_evaluation_job_and_scorecard_labels(env: Env) -> None:
     assert mine and all(r["model_key"] == "forecast.log_drift" and not r["is_naive_baseline"] for r in mine)
     assert naive and all(r["model_key"] == "forecast.last_value" and r["is_naive_baseline"] for r in naive)
     dev_manifests = {r["evaluation_manifest_sha256"] for r in mine if r["task_scope"]["period"] == "development"}
-    assert dev_manifests <= {r["evaluation_manifest_sha256"] for r in naive
-                             if r["task_scope"]["period"] == "development"}
+    assert dev_manifests <= {
+        r["evaluation_manifest_sha256"] for r in naive if r["task_scope"]["period"] == "development"
+    }
     label = "revised-data retrospective — not a real-time backtest"
     assert all(r["replay_mode"] == "revised_data_retrospective" and r["replay_mode_label"] == label for r in rows)
     assert any(w["code"] == "revised_data_retrospective" and label in w["message"] for w in out["warnings"])
@@ -644,10 +767,15 @@ def test_evaluation_job_and_scorecard_labels(env: Env) -> None:
 
     tok, sha = new_api_token()
     with env.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'e2-read')"),
-                  {"h": sha, "s": ["read"]})
-    r = env.client.post("/v1/evaluations", json={}, headers={"Authorization": f"Bearer {tok}",
-                                                             "Idempotency-Key": f"eval-{uuid.uuid4()}"})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'e2-read')"),
+            {"h": sha, "s": ["read"]},
+        )
+    r = env.client.post(
+        "/v1/evaluations",
+        json={},
+        headers={"Authorization": f"Bearer {tok}", "Idempotency-Key": f"eval-{uuid.uuid4()}"},
+    )
     assert r.status_code == 403
 
 
@@ -657,25 +785,38 @@ def test_discovery_candidates_from_jobs_and_proposals(env: Env) -> None:
     assert any(w["code"] == "unreviewed_candidates" for w in empty.json()["warnings"])
     with env.owner.begin() as c:
         sha = c.execute(text("SELECT manifest_sha256 FROM belief.release LIMIT 1")).scalar_one()
-        pid = c.execute(text(
-            "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, summary, author) "
-            "VALUES ('connector_promotion', :s, 1, CAST(:sm AS jsonb), 'agent:discovery') RETURNING id"),
-            {"s": sha, "sm": json.dumps({"scope": {"dataset": "demo_pjan", "concept": "x@1"}})}).scalar_one()
+        pid = c.execute(
+            text(
+                "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, summary, author) "
+                "VALUES ('connector_promotion', :s, 1, CAST(:sm AS jsonb), 'agent:discovery') RETURNING id"
+            ),
+            {"s": sha, "sm": json.dumps({"scope": {"dataset": "demo_pjan", "concept": "x@1"}})},
+        ).scalar_one()
         result = {
-            "status": "gate_hold", "requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture",
-            "search": {"ranked": [{"code": "demo_pjan", "score": 3.5, "jaccard": 0.6},
-                                  {"code": "demo_pjanaggr3", "score": 2.0, "jaccard": 0.4},
-                                  {"code": "not-inspected", "score": 1.0, "jaccard": 0.1}],
-                       "inspections": [{"code": "demo_pjan", "ok": True, "error": None},
-                                       {"code": "demo_pjanaggr3", "ok": False, "error": "timeout"}]},
+            "status": "gate_hold",
+            "requirement_id": "R-POP-JAN-AGESEX",
+            "mode": "fixture",
+            "search": {
+                "ranked": [
+                    {"code": "demo_pjan", "score": 3.5, "jaccard": 0.6},
+                    {"code": "demo_pjanaggr3", "score": 2.0, "jaccard": 0.4},
+                    {"code": "not-inspected", "score": 1.0, "jaccard": 0.1},
+                ],
+                "inspections": [
+                    {"code": "demo_pjan", "ok": True, "error": None},
+                    {"code": "demo_pjanaggr3", "ok": False, "error": "timeout"},
+                ],
+            },
             "connector": {"name": "eurostat.demo_pjan", "version": "1.0.0"},
             "gate": {"proposal_id": str(pid), "outcome": "hold"},
         }
-        jid = c.execute(text(
-            "INSERT INTO ops.job(job_type, payload, idempotency_key, status, result_ref, finished_at) "
-            "VALUES ('discovery', CAST(:p AS jsonb), :k, 'succeeded', CAST(:r AS jsonb), clock_timestamp()) "
-            "RETURNING id"),
-            {"p": json.dumps({"mode": "fixture"}), "k": f"disc-cand-{uuid.uuid4()}", "r": json.dumps(result)}
+        jid = c.execute(
+            text(
+                "INSERT INTO ops.job(job_type, payload, idempotency_key, status, result_ref, finished_at) "
+                "VALUES ('discovery', CAST(:p AS jsonb), :k, 'succeeded', CAST(:r AS jsonb), clock_timestamp()) "
+                "RETURNING id"
+            ),
+            {"p": json.dumps({"mode": "fixture"}), "k": f"disc-cand-{uuid.uuid4()}", "r": json.dumps(result)},
         ).scalar_one()
     r = env.client.get("/v1/discovery/candidates")
     assert r.status_code == 200, r.text
@@ -705,11 +846,17 @@ def test_relations_exclude_retracted_observations(env: Env) -> None:
     target = rels[0]
     t_before = datetime.now(UTC)
     with env.owner.begin() as c:
-        act = c.execute(text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"),
-                        {"o": target["evidence_observation_id"]}).scalar_one()
-        c.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
-                       "VALUES (:o, 'test: provider withdrew the record', :a)"),
-                  {"o": target["evidence_observation_id"], "a": act})
+        act = c.execute(
+            text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"),
+            {"o": target["evidence_observation_id"]},
+        ).scalar_one()
+        c.execute(
+            text(
+                "INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                "VALUES (:o, 'test: provider withdrew the record', :a)"
+            ),
+            {"o": target["evidence_observation_id"], "a": act},
+        )
     after = env.client.get("/v1/relations", params=params).json()
     ids_after = {r["id"] for r in after["data"]["relations"]}
     assert target["id"] not in ids_after and len(ids_after) == len(before["data"]["relations"]) - 1
@@ -718,18 +865,22 @@ def test_relations_exclude_retracted_observations(env: Env) -> None:
     assert target["id"] in {r["id"] for r in then["data"]["relations"]}
     # Same through the typed QuerySpec and at depth 2.
     with env.owner.connect() as c:
-        fra = c.execute(text("SELECT entity_id FROM world.alias WHERE provider='iso3166_alpha3' "
-                             "AND external_key='FRA'")).scalar_one()
+        fra = c.execute(
+            text("SELECT entity_id FROM world.alias WHERE provider='iso3166_alpha3' AND external_key='FRA'")
+        ).scalar_one()
     q = env.client.post("/v1/query", json={"kind": "relations", "entity_id": str(fra), "period": 2023})
     assert q.status_code == 200 and target["id"] not in {r["id"] for r in q.json()["data"]["relations"]}
     d2 = env.client.get("/v1/relations", params={**params, "depth": 2, "max_edges": 500}).json()
     assert target["id"] not in {r["id"] for r in d2["data"]["relations"]}
     # Roles stay ordered and role-bound; the release context rejects evidence-only filters.
-    assert [p["ordinal"] for p in after["data"]["relations"][0]["participants"]] == [0, 1, 2] or \
-        after["data"]["relations"][0]["participants"] == sorted(after["data"]["relations"][0]["participants"],
-                                                                key=lambda p: p["ordinal"])
-    problem(env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id),
-                                                    "as_of": iso(t_before)}), 422, "validation_error")
+    assert [p["ordinal"] for p in after["data"]["relations"][0]["participants"]] == [0, 1, 2] or after["data"][
+        "relations"
+    ][0]["participants"] == sorted(after["data"]["relations"][0]["participants"], key=lambda p: p["ordinal"])
+    problem(
+        env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id), "as_of": iso(t_before)}),
+        422,
+        "validation_error",
+    )
     pinned = env.client.get("/v1/relations", params={"release_id": str(env.r1.release_id), "max_edges": 5})
     assert pinned.status_code == 200 and pinned.json()["context_mode"] == "belief"
     assert pinned.json()["baseline_release"]["id"] == str(env.r1.release_id)
@@ -741,10 +892,20 @@ def test_relations_exclude_retracted_observations(env: Env) -> None:
 
 
 def _l2_spec(env: Env, title: str) -> dict[str, Any]:
-    return _scenario(env, title=title, countries=["FRA"], fidelity="L2", assumptions={
-        "quantity_response": "elasticity_sensitivity", "no_general_equilibrium": True,
-        "elasticity_grid": [{"import_elasticity": -0.5, "export_elasticity": -0.5, "basis": "scenario_assumption"},
-                            {"import_elasticity": -1.0, "export_elasticity": -1.0, "basis": "scenario_assumption"}]})
+    return _scenario(
+        env,
+        title=title,
+        countries=["FRA"],
+        fidelity="L2",
+        assumptions={
+            "quantity_response": "elasticity_sensitivity",
+            "no_general_equilibrium": True,
+            "elasticity_grid": [
+                {"import_elasticity": -0.5, "export_elasticity": -0.5, "basis": "scenario_assumption"},
+                {"import_elasticity": -1.0, "export_elasticity": -1.0, "basis": "scenario_assumption"},
+            ],
+        },
+    )
 
 
 def test_r2_20_l2_sensitivity_range_and_r2_03_replayed_run(env: Env) -> None:
@@ -753,8 +914,11 @@ def test_r2_20_l2_sensitivity_range_and_r2_03_replayed_run(env: Env) -> None:
     created = env.client.post("/v1/scenarios", json=_l2_spec(env, "L2 range"))
     assert created.status_code == 201, created.text
     sid = created.json()["scenario_id"]
-    first = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L2"},
-                            headers={"Idempotency-Key": f"l2-a-{uuid.uuid4()}"}).json()["job_id"]
+    first = env.client.post(
+        "/v1/simulations",
+        json={"scenario_id": sid, "fidelity": "L2"},
+        headers={"Idempotency-Key": f"l2-a-{uuid.uuid4()}"},
+    ).json()["job_id"]
     _run_claimed(env, first, handle_simulation)
     st = env.client.get(f"/v1/simulations/{first}")
     assert st.status_code == 200, st.text  # R2-20: was a 500 (TypedValue rejected sensitivity_range)
@@ -768,8 +932,11 @@ def test_r2_20_l2_sensitivity_range_and_r2_03_replayed_run(env: Env) -> None:
     run_id = body["data"]["run"]["id"]
 
     # R2-03: a second job for the same scenario/fidelity reuses the run; its status shows that run.
-    second = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L2"},
-                             headers={"Idempotency-Key": f"l2-b-{uuid.uuid4()}"}).json()["job_id"]
+    second = env.client.post(
+        "/v1/simulations",
+        json={"scenario_id": sid, "fidelity": "L2"},
+        headers={"Idempotency-Key": f"l2-b-{uuid.uuid4()}"},
+    ).json()["job_id"]
     res = _run_claimed(env, second, handle_simulation)
     assert res.get("run_id") == run_id
     again = env.client.get(f"/v1/simulations/{second}").json()
@@ -796,19 +963,29 @@ def _token_for(env: Env, scopes: list[str], label: str) -> dict[str, str]:
 
     tok, sha = new_api_token()
     with env.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
-                  {"h": sha, "s": scopes, "l": label})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, :l)"),
+            {"h": sha, "s": scopes, "l": label},
+        )
     return {"Authorization": f"Bearer {tok}"}
 
 
 def _insert_job(env: Env, job_type: str, **cols: Any) -> str:
     extra = {"last_error": None, **cols}
     with env.owner.begin() as c:
-        return str(c.execute(text(
-            "INSERT INTO ops.job(job_type, payload, idempotency_key, last_error) "
-            "VALUES (:t, '{}'::jsonb, :k, CAST(:e AS jsonb)) RETURNING id"),
-            {"t": job_type, "k": f"test-{job_type}-{uuid.uuid4()}",
-             "e": json.dumps(extra["last_error"]) if extra["last_error"] is not None else None}).scalar_one())
+        return str(
+            c.execute(
+                text(
+                    "INSERT INTO ops.job(job_type, payload, idempotency_key, last_error) "
+                    "VALUES (:t, '{}'::jsonb, :k, CAST(:e AS jsonb)) RETURNING id"
+                ),
+                {
+                    "t": job_type,
+                    "k": f"test-{job_type}-{uuid.uuid4()}",
+                    "e": json.dumps(extra["last_error"]) if extra["last_error"] is not None else None,
+                },
+            ).scalar_one()
+        )
 
 
 def test_r2_07_cancel_is_scoped_by_job_type(env: Env) -> None:
@@ -831,11 +1008,17 @@ def test_r2_07_cancel_is_scoped_by_job_type(env: Env) -> None:
 def test_r2_11_malformed_cursor_is_400(env: Env) -> None:
     from reva.api.deps import encode_cursor
 
-    for path, cur in (("/v1/jobs", ["not-a-date", "x"]), ("/v1/jobs", ["2026-01-01T00:00:00+00:00", "x"]),
-                      ("/v1/jobs", ["2026-01-01T00:00:00", str(uuid.uuid4())]),
-                      ("/v1/beliefs", ["a", "b", "c", "not-a-uuid"]), ("/v1/belief-releases", ["seven"]),
-                      ("/v1/observations", ["k", "1", str(uuid.uuid4())]), ("/v1/scenarios", [1, 2]),
-                      ("/v1/entities", ["x", 5]), ("/v1/proposals", ["2026", str(uuid.uuid4())])):
+    for path, cur in (
+        ("/v1/jobs", ["not-a-date", "x"]),
+        ("/v1/jobs", ["2026-01-01T00:00:00+00:00", "x"]),
+        ("/v1/jobs", ["2026-01-01T00:00:00", str(uuid.uuid4())]),
+        ("/v1/beliefs", ["a", "b", "c", "not-a-uuid"]),
+        ("/v1/belief-releases", ["seven"]),
+        ("/v1/observations", ["k", "1", str(uuid.uuid4())]),
+        ("/v1/scenarios", [1, 2]),
+        ("/v1/entities", ["x", 5]),
+        ("/v1/proposals", ["2026", str(uuid.uuid4())]),
+    ):
         problem(env.client.get(path, params={"cursor": encode_cursor(cur)}), 400, "invalid_cursor")
     problem(env.client.get("/v1/jobs", params={"cursor": "%%%"}), 400, "invalid_cursor")
     first = env.client.get("/v1/jobs", params={"limit": 1}).json()
@@ -843,15 +1026,27 @@ def test_r2_11_malformed_cursor_is_400(env: Env) -> None:
 
 
 def test_r2_13_job_errors_never_expose_sql(env: Env) -> None:
-    leaked = ("(psycopg.errors.UndefinedColumn) column \"secretcol\" does not exist\nLINE 1: SELECT secretcol\n"
-              "[SQL: SELECT secretcol FROM ops.job WHERE id = %(id)s]\n[parameters: {'id': 'payload-value'}]\n"
-              "(Background on this error at: https://sqlalche.me/e/21/f405)")
-    jid = _insert_job(env, "health", last_error={"code": "internal_error", "message": leaked, "retryable": False,
-                                                 "attempt": 1, "exception": "ProgrammingError"})
+    leaked = (
+        '(psycopg.errors.UndefinedColumn) column "secretcol" does not exist\nLINE 1: SELECT secretcol\n'
+        "[SQL: SELECT secretcol FROM ops.job WHERE id = %(id)s]\n[parameters: {'id': 'payload-value'}]\n"
+        "(Background on this error at: https://sqlalche.me/e/21/f405)"
+    )
+    jid = _insert_job(
+        env,
+        "health",
+        last_error={
+            "code": "internal_error",
+            "message": leaked,
+            "retryable": False,
+            "attempt": 1,
+            "exception": "ProgrammingError",
+        },
+    )
     read_tok = _token_for(env, ["read"], "reader")
-    for r in (env.client.get(f"/v1/jobs/{jid}", headers=read_tok).json(),
-              next(j for j in env.client.get("/v1/jobs", params={"job_type": "health"}).json()["data"]
-                   if j["id"] == jid)):
+    for r in (
+        env.client.get(f"/v1/jobs/{jid}", headers=read_tok).json(),
+        next(j for j in env.client.get("/v1/jobs", params={"job_type": "health"}).json()["data"] if j["id"] == jid),
+    ):
         err = r["last_error"]
         assert err["code"] == "internal_error" and err["exception"] == "ProgrammingError"
         text_ = json.dumps(err)
@@ -869,9 +1064,10 @@ def test_r2_15_concurrent_identical_scenario_returns_existing(env: Env) -> None:
     out: dict[str, Any] = {}
     with env.owner.connect() as c:
         tx = c.begin()
-        winner = c.execute(text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:other')"),
-                           {"spec": json.dumps(parsed.as_json()), "b": parsed.canonical_bytes(),
-                            "d": parsed.digest()}).scalar_one()
+        winner = c.execute(
+            text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :b, :d, 'human:other')"),
+            {"spec": json.dumps(parsed.as_json()), "b": parsed.canonical_bytes(), "d": parsed.digest()},
+        ).scalar_one()
 
         def post() -> None:
             out["r"] = env.client.post("/v1/scenarios", json=spec)
@@ -889,10 +1085,15 @@ def test_r2_15_concurrent_identical_scenario_returns_existing(env: Env) -> None:
 def test_r2_18_query_requires_aware_as_of(env: Env) -> None:
     naive = (datetime.now() - timedelta(days=1)).isoformat()
     problem(env.client.post("/v1/query", json={"kind": "beliefs", "as_of": naive}), 422)
-    problem(env.client.post("/v1/query", json={"kind": "relations", "entity_id": str(uuid.uuid4()),
-                                               "as_of": naive}), 422)
-    problem(env.client.post("/v1/query", json={"kind": "timeseries", "subject_id": str(uuid.uuid4()),
-                                               "concept": POP, "as_of": naive}), 422)
+    problem(
+        env.client.post("/v1/query", json={"kind": "relations", "entity_id": str(uuid.uuid4()), "as_of": naive}), 422
+    )
+    problem(
+        env.client.post(
+            "/v1/query", json={"kind": "timeseries", "subject_id": str(uuid.uuid4()), "concept": POP, "as_of": naive}
+        ),
+        422,
+    )
 
 
 def test_r2_04_timeseries_skips_and_flags_retracted(env: Env) -> None:
@@ -904,10 +1105,16 @@ def test_r2_04_timeseries_skips_and_flags_retracted(env: Env) -> None:
     t0 = datetime.now(UTC)
     with env.owner.begin() as c:
         for oid in (p23["observation_id"], p22["observation_id"]):
-            act = c.execute(text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"),
-                            {"o": oid}).scalar_one()
-            c.execute(text("INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
-                           "VALUES (:o, 'test retraction', :a)"), {"o": oid, "a": act})
+            act = c.execute(
+                text("SELECT provenance_activity_id FROM evidence.observation WHERE id = :o"), {"o": oid}
+            ).scalar_one()
+            c.execute(
+                text(
+                    "INSERT INTO evidence.observation_retraction(observation_id, reason, activity_id) "
+                    "VALUES (:o, 'test retraction', :a)"
+                ),
+                {"o": oid, "a": act},
+            )
     after = env.client.get("/v1/timeseries", params=base).json()
     pts = after["data"]["points"]
     q23 = next(p for p in pts if p["period_label"].startswith("2023"))
@@ -935,8 +1142,9 @@ def test_r4_06_discovery_request_is_validated_and_passed_through(env: Env) -> No
         assert problem(post(body), 422, "capability_gap")["details"]["supported"] == ["eurostat"]
     for body in ({"query": "nominal GDP"}, {"concept_id": "economics.gdp"}, {"max_candidates": 3}):
         problem(post(body), 422, "capability_gap")
-    assert problem(post({"requirement_id": "R-CRUDE-M"}), 422, "capability_gap")["details"]["supported"] == \
-        ["R-POP-JAN-AGESEX"]
+    assert problem(post({"requirement_id": "R-CRUDE-M"}), 422, "capability_gap")["details"]["supported"] == [
+        "R-POP-JAN-AGESEX"
+    ]
     problem(post({"mode": "replay"}), 422, "validation_error")
     problem(post({"unknown": 1}), 422, "validation_error")
     ok = post({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"})
@@ -944,8 +1152,10 @@ def test_r4_06_discovery_request_is_validated_and_passed_through(env: Env) -> No
     job = env.client.get(f"/v1/jobs/{ok.json()['job_id']}").json()
     assert job["payload"] == {"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}
     default = post({})
-    assert env.client.get(f"/v1/jobs/{default.json()['job_id']}").json()["payload"] == \
-        {"requirement_id": "R-POP-JAN-AGESEX", "mode": "live"}
+    assert env.client.get(f"/v1/jobs/{default.json()['job_id']}").json()["payload"] == {
+        "requirement_id": "R-POP-JAN-AGESEX",
+        "mode": "live",
+    }
     for jid in (ok.json()["job_id"], default.json()["job_id"]):
         env.client.post(f"/v1/jobs/{jid}/cancel")
     # Only reva_env matters here; the other production-only requirements (S3, TLS to the DB) are skipped.
@@ -964,11 +1174,22 @@ def test_r4_06_discovery_request_is_validated_and_passed_through(env: Env) -> No
 def test_every_envelope_states_its_knowledge_cutoff(env: Env) -> None:
     rel_cut = env.client.get(f"/v1/belief-releases/{env.r2.release_id}").json()["data"]["knowledge_cutoff"][:10]
     before = datetime.now(UTC) - timedelta(minutes=5)
-    for path, params in (("/v1/observations", {"limit": 5}), ("/v1/evidence", {}), ("/v1/connectors", {}),
-                         ("/v1/sources", {}), ("/v1/models", {}), ("/v1/ontology", {}), ("/v1/entities", {}),
-                         ("/v1/relations", {"entity_id": "FRA", "max_edges": 5}), ("/v1/jobs", {}),
-                         ("/v1/proposals", {}), ("/v1/discovery/candidates", {}), ("/v1/events", {}),
-                         ("/v1/locations", {"entity_id": "FRA"}), ("/v1/belief-releases", {})):
+    for path, params in (
+        ("/v1/observations", {"limit": 5}),
+        ("/v1/evidence", {}),
+        ("/v1/connectors", {}),
+        ("/v1/sources", {}),
+        ("/v1/models", {}),
+        ("/v1/ontology", {}),
+        ("/v1/entities", {}),
+        ("/v1/relations", {"entity_id": "FRA", "max_edges": 5}),
+        ("/v1/jobs", {}),
+        ("/v1/proposals", {}),
+        ("/v1/discovery/candidates", {}),
+        ("/v1/events", {}),
+        ("/v1/locations", {"entity_id": "FRA"}),
+        ("/v1/belief-releases", {}),
+    ):
         body = env.client.get(path, params=params).json()
         assert body["knowledge_cutoff"], path
         assert body["knowledge_cutoff_basis"] == "read_time", (path, body["knowledge_cutoff_basis"])
@@ -1004,13 +1225,16 @@ CRUDE_M_WEIGHT = "trade.hs2709.import_net_weight.world_total"
 
 def _stored_flags(env: Env, observation_id: str) -> dict[str, Any]:
     with env.owner.connect() as c:
-        return c.execute(text("SELECT source_flags FROM evidence.observation WHERE id = :i"),
-                         {"i": observation_id}).scalar_one()  # type: ignore[no-any-return]
+        return c.execute(
+            text("SELECT source_flags FROM evidence.observation WHERE id = :i"), {"i": observation_id}
+        ).scalar_one()  # type: ignore[no-any-return]
 
 
 def test_r7_beliefs_carry_selected_observation_source_flags(env: Env) -> None:
-    r = env.client.get("/v1/beliefs", params={"release_id": str(env.r1.release_id), "subject_id": "CHN",
-                                              "concept": CRUDE_M, "period": 2023})
+    r = env.client.get(
+        "/v1/beliefs",
+        params={"release_id": str(env.r1.release_id), "subject_id": "CHN", "concept": CRUDE_M, "period": 2023},
+    )
     assert r.status_code == 200, r.text
     est = r.json()["data"][0]
     flags = est["source_flags"]
@@ -1021,14 +1245,22 @@ def test_r7_beliefs_carry_selected_observation_source_flags(env: Env) -> None:
     assert "provider_value_estimated" in flags and flags["provider_value_estimated"] is None
     assert {"isReported", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated"} <= set(flags)
     # Same as the observation endpoint shows for that record.
-    obs = env.client.get("/v1/observations", params={"subject_id": "CHN", "concept": CRUDE_M,
-                                                     "period_start": 2023, "period_end": 2023}).json()["data"]
+    obs = env.client.get(
+        "/v1/observations", params={"subject_id": "CHN", "concept": CRUDE_M, "period_start": 2023, "period_end": 2023}
+    ).json()["data"]
     assert next(o for o in obs if o["id"] == est["observation_id"])["source_flags"] == flags
     pop = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP, "period": 2023}).json()
     assert {"indicator", "obs_status"} <= set(pop["data"][0]["source_flags"])
     # The QuerySpec path shares the serializer.
-    q = env.client.post("/v1/query", json={"kind": "beliefs", "release_id": str(env.r1.release_id),
-                                            "subject_ids": [est["subject"]["id"]], "concepts": [CRUDE_M]})
+    q = env.client.post(
+        "/v1/query",
+        json={
+            "kind": "beliefs",
+            "release_id": str(env.r1.release_id),
+            "subject_ids": [est["subject"]["id"]],
+            "concepts": [CRUDE_M],
+        },
+    )
     assert q.status_code == 200, q.text
     assert all("source_flags" in d for d in q.json()["data"])
 
@@ -1043,8 +1275,9 @@ def test_r7_timeseries_points_carry_source_flags(env: Env) -> None:
         assert "provider_quantity_estimated" in p["source_flags"] and p["source_flags_truncated"] is False
     # A revised lineage reports the flags of the point's own selected revision (test_r2_04 may have retracted
     # revision 2 earlier in the module, so the revision number is not fixed here).
-    dza = env.client.get("/v1/timeseries", params={"subject_id": "DZA", "concept": POP,
-                                                   "revisions": "all"}).json()["data"]["points"]
+    dza = env.client.get("/v1/timeseries", params={"subject_id": "DZA", "concept": POP, "revisions": "all"}).json()[
+        "data"
+    ]["points"]
     p23 = next(p for p in dza if p["period_label"].startswith("2023"))
     assert len(p23["revisions"]) == 2
     assert p23["source_flags"] == _stored_flags(env, p23["observation_id"])
@@ -1056,12 +1289,21 @@ def test_r7_source_flags_are_bounded() -> None:
 
     assert bounded_source_flags(None) == (None, False)
     assert bounded_source_flags(["not", "a", "dict"]) == (None, False)
-    small = {"isReported": False, "legacyEstimationFlag": 6, "provider_value_estimated": None,
-             "categories": {"geo": "FR", "unit": "THS_T"}}
+    small = {
+        "isReported": False,
+        "legacyEstimationFlag": 6,
+        "provider_value_estimated": None,
+        "categories": {"geo": "FR", "unit": "THS_T"},
+    }
     assert bounded_source_flags(small) == (small, False)
     big: dict[str, Any] = {f"k{i:03d}": "x" * 50 for i in range(200)}
-    big.update(provider_quantity_estimated=True, provider_value_estimated=None, long="y" * 5000,
-               deep={"a": {"b": {"c": 1}}, "ok": 1}, lst=list(range(100)))
+    big.update(
+        provider_quantity_estimated=True,
+        provider_value_estimated=None,
+        long="y" * 5000,
+        deep={"a": {"b": {"c": 1}}, "ok": 1},
+        lst=list(range(100)),
+    )
     out, cut = bounded_source_flags(big)
     assert cut and out is not None
     assert len(out) <= MAX_FLAG_KEYS and len(json.dumps(out)) <= MAX_FLAG_BYTES
@@ -1075,12 +1317,20 @@ def test_r7_simulation_and_scenario_valid_time_is_reference_year(env: Env) -> No
     from reva.api.routes.sim import scenario_valid_time
 
     year = json.loads(EXAMPLE.read_text())["reference_year"]
-    want = {"start": f"{year}-01-01T00:00:00Z", "end": f"{year + 1}-01-01T00:00:00Z", "bounds": "[)",
-            "basis": "scenario_reference_year", "reference_year": year}
+    want = {
+        "start": f"{year}-01-01T00:00:00Z",
+        "end": f"{year + 1}-01-01T00:00:00Z",
+        "bounds": "[)",
+        "basis": "scenario_reference_year",
+        "reference_year": year,
+    }
     sid = env.client.post("/v1/scenarios", json=_scenario(env, title="r7 valid time")).json()["scenario_id"]
     assert env.client.get(f"/v1/scenarios/{sid}").json()["valid_time"] == want
-    acc = env.client.post("/v1/simulations", json={"scenario_id": sid, "fidelity": "L0"},
-                          headers={"Idempotency-Key": f"r7-vt-{uuid.uuid4()}"})
+    acc = env.client.post(
+        "/v1/simulations",
+        json={"scenario_id": sid, "fidelity": "L0"},
+        headers={"Idempotency-Key": f"r7-vt-{uuid.uuid4()}"},
+    )
     assert acc.status_code == 202, acc.text
     st = env.client.get(f"/v1/simulations/{acc.json()['job_id']}").json()
     assert st["valid_time"] == want
@@ -1094,10 +1344,12 @@ def test_r7_entity_origin_is_derived_from_its_data(env: Env) -> None:
     assert d["origin"] == "test_fixture"
     assert any(w["code"] == "fixture_data" for w in d["warnings"])
     with env.owner.connect() as c:
-        bare = c.execute(text(
-            """SELECT e.id FROM world.entity e WHERE NOT EXISTS (
+        bare = c.execute(
+            text(
+                """SELECT e.id FROM world.entity e WHERE NOT EXISTS (
                  SELECT 1 FROM evidence.observation o WHERE o.subject_id = e.id)
-               AND NOT EXISTS (SELECT 1 FROM belief.estimate b WHERE b.subject_id = e.id) LIMIT 1""")
+               AND NOT EXISTS (SELECT 1 FROM belief.estimate b WHERE b.subject_id = e.id) LIMIT 1"""
+            )
         ).scalar_one_or_none()
     if bare is not None:
         b = env.client.get(f"/v1/entities/{bare}").json()
@@ -1119,16 +1371,30 @@ def test_r7_paused_concept_is_served_stale_from_last_accepted_release(env: Env) 
     proposal = stable_id(f"api-r7-pause-{uuid.uuid4()}")
     t_before = datetime.now(UTC)
     with env.worker.begin() as c:
-        R.pause_belief_publication(c, [POP], connector=WB, classification=R.RENAME, proposal_id=proposal,
-                                   origin="test_fixture", item_key=None, acquisition_id=None, actor=R.AUTHOR)
+        R.pause_belief_publication(
+            c,
+            [POP],
+            connector=WB,
+            classification=R.RENAME,
+            proposal_id=proposal,
+            origin="test_fixture",
+            item_key=None,
+            acquisition_id=None,
+            actor=R.AUTHOR,
+        )
     try:
-        r3 = publish_release(env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
-                             environment="test")
+        r3 = publish_release(
+            env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test"
+        )
         b = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP}).json()
         assert b["baseline_release"]["id"] == str(r3.release_id)
         assert b["data"] and all(
-            d["stale"] and d["stale_reason"] == "source_schema_quarantine" and d["proposal_id"] == str(proposal)
-            and d["served_from_release_id"] == str(env.r2.release_id) for d in b["data"])
+            d["stale"]
+            and d["stale_reason"] == "source_schema_quarantine"
+            and d["proposal_id"] == str(proposal)
+            and d["served_from_release_id"] == str(env.r2.release_id)
+            for d in b["data"]
+        )
         w = next(x for x in b["warnings"] if x["code"] == "publication_paused")
         assert POP in w["message"] and "stale" in w["message"]
         assert any(lk["kind"] == "release" and lk["id"] == str(env.r2.release_id) for lk in b["provenance_links"])
@@ -1151,21 +1417,23 @@ def test_r7_paused_concept_is_served_stale_from_last_accepted_release(env: Env) 
         assert seen == [d["id"] for d in full] and len(set(seen)) == len(seen)
 
         # Pinned earlier release under an active pause: its own POP values, marked stale.
-        pinned = env.client.get("/v1/beliefs", params={"release_id": str(env.r2.release_id), "subject_id": "FRA",
-                                                        "concept": POP}).json()
-        assert pinned["data"] and all(d["stale"] and d["served_from_release_id"] == str(env.r2.release_id)
-                                      for d in pinned["data"])
+        pinned = env.client.get(
+            "/v1/beliefs", params={"release_id": str(env.r2.release_id), "subject_id": "FRA", "concept": POP}
+        ).json()
+        assert pinned["data"] and all(
+            d["stale"] and d["served_from_release_id"] == str(env.r2.release_id) for d in pinned["data"]
+        )
         # As known before the pause: nothing is stale.
-        before = env.client.get("/v1/beliefs", params={"as_of": iso(t_before), "subject_id": "FRA",
-                                                       "concept": POP}).json()
+        before = env.client.get(
+            "/v1/beliefs", params={"as_of": iso(t_before), "subject_id": "FRA", "concept": POP}
+        ).json()
         assert before["baseline_release"]["id"] == str(env.r2.release_id)
         assert not any(d["stale"] for d in before["data"])
         assert not any(x["code"] == "publication_paused" for x in before["warnings"])
     finally:
         with env.owner.begin() as c:
             c.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"), {"k": R.PAUSE_PREFIX + POP})
-        publish_release(env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
-                        environment="test")
+        publish_release(env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture, environment="test")
     after = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP}).json()
     assert after["data"] and not any(d["stale"] for d in after["data"])
     assert not any(x["code"] == "publication_paused" for x in after["warnings"])

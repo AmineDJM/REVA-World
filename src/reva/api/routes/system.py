@@ -48,26 +48,33 @@ def ready(request: Request) -> Any:
             checks.append(s.HealthCheck(name="database", ok=True))
             ver = conn.execute(text("SELECT version_num FROM public.alembic_version")).scalars().all()
             checks.append(s.HealthCheck(name="migrations", ok=bool(ver), detail=",".join(ver) or "no version"))
-            row = conn.execute(
-                text(
-                    """SELECT current_user AS role,
+            row = (
+                conn.execute(
+                    text(
+                        """SELECT current_user AS role,
                          (SELECT count(*) FROM unnest(CAST(:schemas AS text[])) sch
                            WHERE has_schema_privilege(sch, 'USAGE')) AS schemas_visible,
                          has_table_privilege('belief.release', 'SELECT') AS can_read_releases,
                          has_table_privilege('evidence.observation', 'INSERT') AS can_write_evidence"""
-                ),
-                {"schemas": list(EXPECTED_SCHEMAS)},
-            ).mappings().one()
+                    ),
+                    {"schemas": list(EXPECTED_SCHEMAS)},
+                )
+                .mappings()
+                .one()
+            )
             role_ok = (
                 row["role"] == "reva_api"
                 and row["schemas_visible"] == len(EXPECTED_SCHEMAS)
                 and row["can_read_releases"]
                 and not row["can_write_evidence"]
             )
-            checks.append(s.HealthCheck(
-                name="runtime_role", ok=bool(role_ok),
-                detail=f"role={row['role']} schemas={row['schemas_visible']}/{len(EXPECTED_SCHEMAS)}",
-            ))
+            checks.append(
+                s.HealthCheck(
+                    name="runtime_role",
+                    ok=bool(role_ok),
+                    detail=f"role={row['role']} schemas={row['schemas_visible']}/{len(EXPECTED_SCHEMAS)}",
+                )
+            )
     except ApiProblem:
         raise
     except Exception as e:
@@ -91,21 +98,36 @@ def ready(request: Request) -> Any:
 
 
 def _session_info(p: Principal) -> s.SessionInfo:
-    return s.SessionInfo(username=p.username, principal=p.actor, auth_method=p.method,  # type: ignore[arg-type]
-                         scopes=sorted(p.scopes), expires_at=p.expires_at, csrf_token=p.csrf)
+    return s.SessionInfo(
+        username=p.username,
+        principal=p.actor,
+        auth_method=p.method,  # type: ignore[arg-type]
+        scopes=sorted(p.scopes),
+        expires_at=p.expires_at,
+        csrf_token=p.csrf,
+    )
 
 
-@session_router.post("/session", response_model=s.SessionInfo,
-                     responses={401: {"model": s.Problem}, 429: {"model": s.Problem}})
+@session_router.post(
+    "/session", response_model=s.SessionInfo, responses={401: {"model": s.Problem}, 429: {"model": s.Problem}}
+)
 def login(body: s.LoginRequest, request: Request, response: Response) -> s.SessionInfo:
     """Private UI login. Sets an HttpOnly signed session cookie and a CSRF cookie."""
     auth = get_auth(request)
     principal, cookie = auth.login(request, body.username, body.password)
     max_age = int(SESSION_TTL.total_seconds())
-    response.set_cookie(SESSION_COOKIE, cookie, max_age=max_age, httponly=True, secure=auth.secure_cookies,
-                        samesite="strict", path="/")
-    response.set_cookie(CSRF_COOKIE, principal.csrf or "", max_age=max_age, httponly=False,
-                        secure=auth.secure_cookies, samesite="strict", path="/")
+    response.set_cookie(
+        SESSION_COOKIE, cookie, max_age=max_age, httponly=True, secure=auth.secure_cookies, samesite="strict", path="/"
+    )
+    response.set_cookie(
+        CSRF_COOKIE,
+        principal.csrf or "",
+        max_age=max_age,
+        httponly=False,
+        secure=auth.secure_cookies,
+        samesite="strict",
+        path="/",
+    )
     response.headers["Cache-Control"] = "no-store"
     return _session_info(principal)
 
@@ -134,11 +156,22 @@ JOB_SQL = """SELECT id, job_type, payload, priority, status, attempts, max_attem
   created_by, created_at, updated_at, available_at, finished_at FROM ops.job"""
 
 
-_DB_MARKERS = ("[SQL:", "[parameters:", "(Background on this error", "\nDETAIL:", "\nCONTEXT:", "\nLINE ",
-               "\nHINT:")
-_DB_EXCEPTIONS = frozenset({"DBAPIError", "ProgrammingError", "IntegrityError", "OperationalError", "DataError",
-                            "InternalError", "NotSupportedError", "InterfaceError", "DatabaseError",
-                            "StatementError", "PendingRollbackError"})
+_DB_MARKERS = ("[SQL:", "[parameters:", "(Background on this error", "\nDETAIL:", "\nCONTEXT:", "\nLINE ", "\nHINT:")
+_DB_EXCEPTIONS = frozenset(
+    {
+        "DBAPIError",
+        "ProgrammingError",
+        "IntegrityError",
+        "OperationalError",
+        "DataError",
+        "InternalError",
+        "NotSupportedError",
+        "InterfaceError",
+        "DatabaseError",
+        "StatementError",
+        "PendingRollbackError",
+    }
+)
 _DRIVER_PREFIX = re.compile(r"^\((?:psycopg|psycopg2|sqlalchemy)[\w.]*\)\s*")
 
 
@@ -172,13 +205,24 @@ def job_model(row: dict[str, Any]) -> s.Job:
     if row["job_type"] == "simulation":
         links["simulation"] = f"/v1/simulations/{jid}"
     return s.Job(
-        id=jid, job_type=row["job_type"], status=row["status"], payload=row["payload"], priority=row["priority"],
-        attempts=row["attempts"], max_attempts=row["max_attempts"], progress=row["progress"] or {},
-        has_checkpoint=bool(row["has_checkpoint"]), result_ref=row["result_ref"],
+        id=jid,
+        job_type=row["job_type"],
+        status=row["status"],
+        payload=row["payload"],
+        priority=row["priority"],
+        attempts=row["attempts"],
+        max_attempts=row["max_attempts"],
+        progress=row["progress"] or {},
+        has_checkpoint=bool(row["has_checkpoint"]),
+        result_ref=row["result_ref"],
         last_error=public_error(row["last_error"]),
-        created_by=row["created_by"], created_at=row["created_at"], updated_at=row["updated_at"],
-        available_at=row["available_at"], finished_at=row["finished_at"],
-        cancellable=row["status"] in ("queued", "running"), links=links,
+        created_by=row["created_by"],
+        created_at=row["created_at"],
+        updated_at=row["updated_at"],
+        available_at=row["available_at"],
+        finished_at=row["finished_at"],
+        cancellable=row["status"] in ("queued", "running"),
+        links=links,
     )
 
 
@@ -198,18 +242,35 @@ def list_jobs(
     t = Timer()
     cur = decode_cursor(cursor, "tu")
     with read_conn(request) as conn:
-        rows = [dict(r) for r in conn.execute(
-            text(JOB_SQL + """ WHERE (CAST(:jt AS text) IS NULL OR job_type = :jt)
+        rows = [
+            dict(r)
+            for r in conn.execute(
+                text(
+                    JOB_SQL
+                    + """ WHERE (CAST(:jt AS text) IS NULL OR job_type = :jt)
                  AND (CAST(:st AS text) IS NULL OR status = :st)
                  AND (CAST(:c0 AS timestamptz) IS NULL
                       OR (created_at, id) < (CAST(:c0 AS timestamptz), CAST(:c1 AS uuid)))
-                 ORDER BY created_at DESC, id DESC LIMIT :lim"""),
-            {"jt": job_type, "st": status, "c0": cur[0] if cur else None, "c1": cur[1] if cur else None,
-             "lim": limit + 1},
-        ).mappings()]
+                 ORDER BY created_at DESC, id DESC LIMIT :lim"""
+                ),
+                {
+                    "jt": job_type,
+                    "st": status,
+                    "c0": cur[0] if cur else None,
+                    "c1": cur[1] if cur else None,
+                    "lim": limit + 1,
+                },
+            ).mappings()
+        ]
     rows, nxt = page(rows, limit, lambda r: (r["created_at"].isoformat(), r["id"]))
-    return s.JobListResponse(data=[job_model(r) for r in rows], context_mode="operations", origin="none",
-                             modality="metadata", cost=t.cost(len(rows)), next_cursor=nxt)
+    return s.JobListResponse(
+        data=[job_model(r) for r in rows],
+        context_mode="operations",
+        origin="none",
+        modality="metadata",
+        cost=t.cost(len(rows)),
+        next_cursor=nxt,
+    )
 
 
 @jobs_router.get("/jobs/{job_id}", response_model=s.Job, responses={404: {"model": s.Problem}})
@@ -224,15 +285,25 @@ def get_job(job_id: UUID, request: Request) -> s.Job:
 # Scope needed to cancel a job of each type: the scope that may submit (or operate) that type.
 # Unknown job types cannot be cancelled through the API.
 CANCEL_SCOPE: dict[str, str] = {
-    "simulation": "simulate", "replay": "simulate", "evaluation": "simulate", "population": "simulate",
+    "simulation": "simulate",
+    "replay": "simulate",
+    "evaluation": "simulate",
+    "population": "simulate",
     "backtest": "simulate",
-    "ingest": "ingest", "discovery": "ingest", "publish_beliefs": "ingest", "gaps": "ingest",
-    "health": "ingest", "gc": "ingest",
+    "ingest": "ingest",
+    "discovery": "ingest",
+    "publish_beliefs": "ingest",
+    "gaps": "ingest",
+    "health": "ingest",
+    "gc": "ingest",
 }
 
 
-@jobs_router.post("/jobs/{job_id}/cancel", response_model=s.JobCancelResult,
-                  responses={404: {"model": s.Problem}, 403: {"model": s.Problem}})
+@jobs_router.post(
+    "/jobs/{job_id}/cancel",
+    response_model=s.JobCancelResult,
+    responses={404: {"model": s.Problem}, 403: {"model": s.Problem}},
+)
 def cancel_job(job_id: UUID, request: Request, principal: Principal = Depends(authenticated)) -> s.JobCancelResult:
     """Cooperative cancellation; the partial audit trail is preserved.
 
@@ -245,11 +316,11 @@ def cancel_job(job_id: UUID, request: Request, principal: Principal = Depends(au
             raise NotFound("job not found", job_id=str(job_id))
         need = CANCEL_SCOPE.get(jt)
         if need is None:
-            raise ApiProblem(403, "forbidden", f"jobs of type '{jt}' cannot be cancelled through the API",
-                             job_type=jt)
+            raise ApiProblem(403, "forbidden", f"jobs of type '{jt}' cannot be cancelled through the API", job_type=jt)
         if need not in principal.scopes:
-            raise ApiProblem(403, "forbidden", f"scope '{need}' required to cancel a {jt} job",
-                             required_scope=need, job_type=jt)
+            raise ApiProblem(
+                403, "forbidden", f"scope '{need}' required to cancel a {jt} job", required_scope=need, job_type=jt
+            )
         st = conn.execute(text("SELECT ops.request_cancel(:j, :a)"), {"j": job_id, "a": principal.actor}).scalar_one()
     return s.JobCancelResult(job_id=job_id, status=st)
 
@@ -272,8 +343,10 @@ class RequestMetrics:
 @metrics_router.get("/metrics", response_class=PlainTextResponse, dependencies=[Depends(require_scope("read"))])
 def metrics(request: Request) -> PlainTextResponse:
     m: RequestMetrics = request.app.state.metrics
-    lines = ["# HELP reva_http_requests_total HTTP requests by route template and status",
-             "# TYPE reva_http_requests_total counter"]
+    lines = [
+        "# HELP reva_http_requests_total HTTP requests by route template and status",
+        "# TYPE reva_http_requests_total counter",
+    ]
     for (route, status), n in sorted(m.requests.items()):
         lines.append(f'reva_http_requests_total{{route="{route}",status="{status}"}} {n}')
     lines += ["# TYPE reva_http_request_duration_ms_sum counter"]
@@ -281,9 +354,12 @@ def metrics(request: Request) -> PlainTextResponse:
         lines.append(f'reva_http_request_duration_ms_sum{{route="{route}"}} {v:.3f}')
     with read_conn(request) as conn:
         rows = conn.execute(text("SELECT job_type, status, count(*) FROM ops.job GROUP BY 1, 2 ORDER BY 1, 2")).all()
-        oldest = conn.execute(text(
-            "SELECT COALESCE(EXTRACT(EPOCH FROM clock_timestamp() - min(created_at)), 0) FROM ops.job "
-            "WHERE status = 'queued'")).scalar_one()
+        oldest = conn.execute(
+            text(
+                "SELECT COALESCE(EXTRACT(EPOCH FROM clock_timestamp() - min(created_at)), 0) FROM ops.job "
+                "WHERE status = 'queued'"
+            )
+        ).scalar_one()
     lines += ["# TYPE reva_jobs gauge"]
     for jt, st, n in rows:
         lines.append(f'reva_jobs{{job_type="{jt}",status="{st}"}} {n}')

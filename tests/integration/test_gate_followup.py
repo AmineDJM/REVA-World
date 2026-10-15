@@ -55,8 +55,10 @@ def test_gate_followup_is_registered_and_scheduled(db: Any) -> None:
     sched = {k: (t, secs) for k, t, _p, secs in DEFAULT_SCHEDULES}
     assert sched["gate_followup:promotion"] == ("gate_followup", 300)
     with db.owner.connect() as c:
-        row = c.execute(text("SELECT job_type, cadence_spec FROM ops.schedule WHERE schedule_key = :k"),
-                        {"k": "gate_followup:promotion"}).one()
+        row = c.execute(
+            text("SELECT job_type, cadence_spec FROM ops.schedule WHERE schedule_key = :k"),
+            {"k": "gate_followup:promotion"},
+        ).one()
     assert row.job_type == "gate_followup" and row.cadence_spec["interval_seconds"] == 300
 
 
@@ -86,12 +88,16 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     io_, p, reports, m = await _t1_proposal(db)
     # shared session database: other tests may leave unspent gate passes; follow up only this proposal's
     real_pending = followup.pending_followups
-    monkeypatch.setattr(followup, "pending_followups", lambda engine, **k: [
-        c for c in real_pending(engine, **k) if c["proposal_id"] == p.proposal_id])
+    monkeypatch.setattr(
+        followup,
+        "pending_followups",
+        lambda engine, **k: [c for c in real_pending(engine, **k) if c["proposal_id"] == p.proposal_id],
+    )
 
     # 1. discovery's wait ends in gate_pending (no gate running): nothing to follow up yet
     pending = GateClient(db.worker, io_, wait_seconds=0.2, poll_seconds=0.05).decide(
-        p.proposal_id, reports, promotion_policy().ref())
+        p.proposal_id, reports, promotion_policy().ref()
+    )
     assert pending.outcome == "blocked" and pending.reasons[0].startswith(PENDING_REASON)
     out = followup.handle_gate_followup({}, _ctx(db))
     assert out["status"] == "ok" and not [r for r in out["results"] if r["proposal_id"] == str(p.proposal_id)]
@@ -108,8 +114,10 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     time.sleep(0.3)  # older than the (test) worker gate wait of 0.2 s
 
     promoted_events = "SELECT count(*) FROM ops.outbox WHERE event_type = 'autonomy.connector_promoted'"
-    followup_events = ("SELECT count(*) FROM ops.outbox WHERE event_type = 'autonomy.gate_followup' "
-                       "AND payload->>'gate_result_id' = :g")
+    followup_events = (
+        "SELECT count(*) FROM ops.outbox WHERE event_type = 'autonomy.gate_followup' "
+        "AND payload->>'gate_result_id' = :g"
+    )
     n_promoted = _count(db, promoted_events)
 
     # 3. kill switch: nothing is promoted or recorded; the candidate stays
@@ -119,8 +127,17 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
 
     # 4. fenced: a job context that lost its lease promotes and records nothing
     ok_ctx = _ctx(db)
-    stale = JobContext(job_id=ok_ctx.job_id, job_type="gate_followup", worker_id="test-worker", fencing_token=8,
-                       attempt=1, settings=ok_ctx.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
+    stale = JobContext(
+        job_id=ok_ctx.job_id,
+        job_type="gate_followup",
+        worker_id="test-worker",
+        fencing_token=8,
+        attempt=1,
+        settings=ok_ctx.settings,
+        worker_engine=db.worker,
+        sim_engine=None,
+        store=db.store,
+    )
     with pytest.raises(StaleLease):
         followup.handle_gate_followup({}, stale)
     assert _count(db, promoted_events) == n_promoted and _count(db, followup_events, g=str(d.decision_id)) == 0
@@ -143,9 +160,13 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     assert [r["status"] for r in item] == ["promoted"] and item[0]["version"] == m["version"], out
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == m["version"]
     with db.owner.connect() as c:
-        use = c.execute(text("SELECT u.approver, g.recorded_by FROM ops.approval_use u JOIN ops.gate_result g "
-                             "ON g.id = u.approval_id WHERE u.approval_id = :g AND u.kind = 'eligibility'"),
-                        {"g": d.decision_id}).one()
+        use = c.execute(
+            text(
+                "SELECT u.approver, g.recorded_by FROM ops.approval_use u JOIN ops.gate_result g "
+                "ON g.id = u.approval_id WHERE u.approval_id = :g AND u.kind = 'eligibility'"
+            ),
+            {"g": d.decision_id},
+        ).one()
     assert tuple(use) == ("gate-evaluator:promotion", "reva_gate")
     assert _count(db, promoted_events) == n_promoted + 1
     assert _count(db, followup_events, g=str(d.decision_id)) == 1
@@ -158,8 +179,14 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     rollback_promotion(db.owner, CONNECTOR, m["version"], CONCEPT, "human:maintainer", "gate followup drill")
     after = promoted_connectors(db.worker, db.store).get(CONNECTOR)
     if before is not None and (after is None or after.manifest["version"] != before.manifest["version"]):
-        reapprove_promotion(db.owner, CONNECTOR, before.manifest["version"], CONCEPT, "human:maintainer",
-                            "restore after gate followup drill")
+        reapprove_promotion(
+            db.owner,
+            CONNECTOR,
+            before.manifest["version"],
+            CONCEPT,
+            "human:maintainer",
+            "restore after gate followup drill",
+        )
         after = promoted_connectors(db.worker, db.store).get(CONNECTOR)
     assert (after.manifest["version"] if after else None) == (before.manifest["version"] if before else None)
 
@@ -169,11 +196,23 @@ def test_a_refused_followup_is_recorded_once(db: Any, monkeypatch: pytest.Monkey
     from reva.autonomy import followup
 
     gid, pid = uuid.uuid4(), uuid.uuid4()
-    monkeypatch.setattr(followup, "pending_followups",
-                        lambda engine, **k: [{"gate_result_id": gid, "proposal_id": pid, "recorded_at": None}])
+    monkeypatch.setattr(
+        followup,
+        "pending_followups",
+        lambda engine, **k: [{"gate_result_id": gid, "proposal_id": pid, "recorded_at": None}],
+    )
     out = followup.handle_gate_followup({}, _ctx(db))
     assert [r["status"] for r in _mine(out, gid)] == ["not_promotable"] and out["promoted"] == 0
     with db.owner.connect() as c:
-        rows = c.execute(text("SELECT payload FROM ops.outbox WHERE event_type = 'autonomy.gate_followup' "
-                              "AND payload->>'gate_result_id' = :g"), {"g": str(gid)}).scalars().all()
+        rows = (
+            c.execute(
+                text(
+                    "SELECT payload FROM ops.outbox WHERE event_type = 'autonomy.gate_followup' "
+                    "AND payload->>'gate_result_id' = :g"
+                ),
+                {"g": str(gid)},
+            )
+            .scalars()
+            .all()
+        )
     assert len(rows) == 1 and rows[0]["status"] == "not_promotable" and rows[0]["job_id"]

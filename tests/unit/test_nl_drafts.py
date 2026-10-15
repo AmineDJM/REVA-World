@@ -82,23 +82,37 @@ def _key(label: str) -> str:
 
 def draft(text: str, drafters: list[Any] | None = None, ledger: Any = None) -> Any:
     inp = DraftInput(text=text, baseline_release_id=BASELINE, knowledge_cutoff=CUTOFF, operation_key=_key(text))
-    return asyncio.run(draft_scenario(inp, drafters=drafters or [RecordedDrafter(FIXTURES)],
-                                      ledger=ledger or MemoryLedger(), budget=BUDGET))
+    return asyncio.run(
+        draft_scenario(
+            inp, drafters=drafters or [RecordedDrafter(FIXTURES)], ledger=ledger or MemoryLedger(), budget=BUDGET
+        )
+    )
 
 
 def synthetic_output(**over: Any) -> dict[str, Any]:
-    base = {"input_language": "en", "request_restatement": "x", "model_key": "economic.crude_exposure",
-            "title": "t", "countries": ["FRA"], "reference_year": 2023, "fidelity": None, "outputs": [],
-            "parameters": [{"path": "intervention.import_multiplier", "number": 1.2, "text": None, "quote": "20%"},
-                           {"path": "intervention.export_multiplier", "number": 1.0, "text": None,
-                            "quote": "unchanged"}],
-            "unsupported": [], "assumptions_added": []}
+    base = {
+        "input_language": "en",
+        "request_restatement": "x",
+        "model_key": "economic.crude_exposure",
+        "title": "t",
+        "countries": ["FRA"],
+        "reference_year": 2023,
+        "fidelity": None,
+        "outputs": [],
+        "parameters": [
+            {"path": "intervention.import_multiplier", "number": 1.2, "text": None, "quote": "20%"},
+            {"path": "intervention.export_multiplier", "number": 1.0, "text": None, "quote": "unchanged"},
+        ],
+        "unsupported": [],
+        "assumptions_added": [],
+    }
     base.update(over)
     return base
 
 
-def run_synthetic(output: dict[str, Any], text: str = "imports 20% dearer for France in 2023, exports unchanged"
-                  ) -> Any:
+def run_synthetic(
+    output: dict[str, Any], text: str = "imports 20% dearer for France in 2023, exports unchanged"
+) -> Any:
     return draft(text, [SyntheticDrafter(output)])
 
 
@@ -123,23 +137,27 @@ def test_english_request_drafts_and_flags_the_number_the_user_did_not_write() ->
     r = draft(TEXTS["openai_en_basic"])
     assert r.model.startswith("gpt-4.1") and r.provider == "openai" and r.prompt_version == PROMPT_VERSION
     assert r.status == "draft_ready" and r.language == "en"
-    assert r.restatement.startswith("Valid draft (not run)") and "nothing runs without your confirmation" in \
-        r.restatement
+    assert (
+        r.restatement.startswith("Valid draft (not run)") and "nothing runs without your confirmation" in r.restatement
+    )
     assert r.draft_spec["countries"] == ["FRA", "USA"] and r.draft_spec["fidelity"] == "L1"
     nums = {n["path"]: n for n in r.numbers_to_confirm}
     assert nums["intervention.import_multiplier"]["value"] == 1.2
     assert nums["intervention.import_multiplier"]["provenance"] == "converted_from_stated"  # "20%"
     # the user never wrote a number for exports: the LLM's neutral 1.0 is flagged for confirmation
     assert nums["intervention.export_multiplier"]["provenance"] == "not_in_text"
-    assert "number_not_in_text: intervention.export_multiplier was proposed by the LLM, not written by the user" \
+    assert (
+        "number_not_in_text: intervention.export_multiplier was proposed by the LLM, not written by the user"
         in r.warnings
+    )
     assert nums["reference_year"] == {"path": "reference_year", "value": 2023, "provenance": "stated"}
     assert r.usage["total_tokens"] > 0 and r.usage["requests"] == 1 and "recorded_llm_response" in r.warnings[0]
 
 
 def test_a_missing_required_number_is_asked_for_never_filled_in() -> None:
-    out = synthetic_output(parameters=[{"path": "intervention.import_multiplier", "number": 1.2, "text": None,
-                                        "quote": "20%"}])
+    out = synthetic_output(
+        parameters=[{"path": "intervention.import_multiplier", "number": 1.2, "text": None, "quote": "20%"}]
+    )
     r = run_synthetic(out)
     assert r.status == "needs_input" and r.draft_spec is None
     assert r.missing_fields == ["intervention.export_multiplier"]
@@ -156,9 +174,11 @@ def test_french_sensitivity_request_is_a_valid_draft_checked_by_the_same_validat
     assert "rien ne s'exécute sans votre confirmation" in r.restatement
     spec = r.draft_spec
     assert spec["fidelity"] == "L2" and spec["countries"] == ["FRA", "CHN"] and spec["reference_year"] == 2022
-    assert spec["assumptions"] == {"quantity_response": "elasticity_sensitivity", "no_general_equilibrium": True,
-                                   "elasticity_grid": [{"import_elasticity": -0.2, "export_elasticity": 0.1,
-                                                        "basis": "scenario_assumption"}]}
+    assert spec["assumptions"] == {
+        "quantity_response": "elasticity_sensitivity",
+        "no_general_equilibrium": True,
+        "elasticity_grid": [{"import_elasticity": -0.2, "export_elasticity": 0.1, "basis": "scenario_assumption"}],
+    }
     assert spec["baseline_release_id"] == BASELINE and spec["knowledge_cutoff"] == CUTOFF
     parsed = validate_scenario_spec(spec)
     assert r.draft_spec_sha256 == hashlib.sha256(parsed.canonical_bytes()).hexdigest()
@@ -185,8 +205,10 @@ def test_stale_recorded_capability_gap_never_runs() -> None:
     # unclassified and still produces no runnable draft (a stale recording can never start a run).
     r = draft(TEXTS["openai_en_retirement"])
     assert r.status == "nothing_draftable" and r.draft_spec is None and r.candidate_spec is None
-    assert r.unsupported and all(u["kind"] in ("capability_gap", "unclassified") or
-                                 u["capability_key"] == "nl.unclassified" for u in r.unsupported)
+    assert r.unsupported and all(
+        u["kind"] in ("capability_gap", "unclassified") or u["capability_key"] == "nl.unclassified"
+        for u in r.unsupported
+    )
 
 
 def test_hostile_multiplier_1000_is_rejected_by_the_validator_not_clamped() -> None:
@@ -268,8 +290,9 @@ def test_fallback_runs_only_after_a_retryable_failure_and_is_reported() -> None:
     primary = SyntheticDrafter(error=LlmProviderError("timeout", retryable=True, reason="transport"))
     r = draft(TEXTS["openai_fr_sensitivity"], [primary, RecordedDrafter(FIXTURES)])
     assert r.status == "draft_ready" and r.provider == "openai"
-    assert r.fallback_from == [{"provider": "synthetic", "model": "synthetic-adversarial", "reason": "transport",
-                                "retryable": True}]
+    assert r.fallback_from == [
+        {"provider": "synthetic", "model": "synthetic-adversarial", "reason": "transport", "retryable": True}
+    ]
     assert any(w.startswith("fallback_provider") for w in r.warnings)
 
 
@@ -322,8 +345,13 @@ def test_llm_http_client_allows_only_the_two_llm_hosts() -> None:
     with pytest.raises(UnsafeRequest):
         LlmHttpClient(allowed_hosts=("api.openai.com", "evil.example"))
     client = LlmHttpClient(resolver=lambda h: ["93.184.216.34"])
-    for bad in ("http://api.openai.com/v1/chat/completions", "https://evil.example/x",
-                "https://api.openai.com:8443/x", "https://user:pw@api.openai.com/x", "https://169.254.169.254/x"):
+    for bad in (
+        "http://api.openai.com/v1/chat/completions",
+        "https://evil.example/x",
+        "https://api.openai.com:8443/x",
+        "https://user:pw@api.openai.com/x",
+        "https://169.254.169.254/x",
+    ):
         with pytest.raises(UnsafeRequest):
             client.check_url(bad)
     asyncio.run(client.aclose())
@@ -340,16 +368,32 @@ def test_user_text_is_data_inside_one_json_field_and_never_in_the_system_prompt(
     assert user_envelope("a") == '{"user_text": "a"}'
 
 
-@pytest.mark.parametrize(("label", "over", "field"), [
-    ("unknown model", {"model_key": "economic.secret_model"}, "model_key"),
-    ("country outside allow-list", {"countries": ["FRA", "XXX"]}, "countries"),
-    ("macro output", {"outputs": ["gdp_loss"]}, "outputs"),
-    ("reserved fidelity", {"fidelity": "L3"}, "fidelity"),
-    ("choice outside enum", {"parameters": [{"path": "assumptions.quantity_response", "number": None,
-                                             "text": "general_equilibrium", "quote": ""}]}, "parameters"),
-])
-def test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected(label: str, over: dict[str, Any],
-                                                                               field: str) -> None:
+@pytest.mark.parametrize(
+    ("label", "over", "field"),
+    [
+        ("unknown model", {"model_key": "economic.secret_model"}, "model_key"),
+        ("country outside allow-list", {"countries": ["FRA", "XXX"]}, "countries"),
+        ("macro output", {"outputs": ["gdp_loss"]}, "outputs"),
+        ("reserved fidelity", {"fidelity": "L3"}, "fidelity"),
+        (
+            "choice outside enum",
+            {
+                "parameters": [
+                    {
+                        "path": "assumptions.quantity_response",
+                        "number": None,
+                        "text": "general_equilibrium",
+                        "quote": "",
+                    }
+                ]
+            },
+            "parameters",
+        ),
+    ],
+)
+def test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected(
+    label: str, over: dict[str, Any], field: str
+) -> None:
     r = run_synthetic(synthetic_output(**over))
     assert r.status == "draft_rejected" and r.draft_spec is None, label
     assert any(x["field"] == field for x in r.rejected_ids), label
@@ -359,13 +403,16 @@ def test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected(l
         assert "fidelity.L3" in {u["capability_key"] for u in r.unsupported}
 
 
-@pytest.mark.parametrize("bad", [
-    {"extra_field": 1},
-    {"parameters": [{"path": "intervention.bogus_field", "number": 1.2, "text": None, "quote": ""}]},
-    {"parameters": [{"path": "baseline_release_id", "number": None, "text": "x", "quote": ""}]},
-    {"countries": "FRA"},
-    {"input_language": "de"},
-])
+@pytest.mark.parametrize(
+    "bad",
+    [
+        {"extra_field": 1},
+        {"parameters": [{"path": "intervention.bogus_field", "number": 1.2, "text": None, "quote": ""}]},
+        {"parameters": [{"path": "baseline_release_id", "number": None, "text": "x", "quote": ""}]},
+        {"countries": "FRA"},
+        {"input_language": "de"},
+    ],
+)
 def test_synthetic_outputs_violating_the_output_schema_are_refused(bad: dict[str, Any]) -> None:
     with pytest.raises(LlmProviderError) as e:
         run_synthetic(synthetic_output(**bad))
@@ -373,8 +420,7 @@ def test_synthetic_outputs_violating_the_output_schema_are_refused(bad: dict[str
 
 
 def test_synthetic_output_cannot_set_server_fields_or_unknown_capability_keys() -> None:
-    r = run_synthetic(synthetic_output(unsupported=[{"text": "x", "capability_key": "admin.grant_all",
-                                                     "reason": "y"}]))
+    r = run_synthetic(synthetic_output(unsupported=[{"text": "x", "capability_key": "admin.grant_all", "reason": "y"}]))
     assert r.status == "draft_ready"
     assert r.draft_spec["baseline_release_id"] == BASELINE and r.draft_spec["seed"] == 0
     gap = r.unsupported[0]
@@ -404,8 +450,10 @@ def test_a_draft_never_runs_without_confirmation(monkeypatch: pytest.MonkeyPatch
     out = r.as_json()
     assert out["executed"] is False and out["confirmation_required"] is True
     assert "POST /v1/scenarios" in out["next_step"]
-    src = "".join((Path(__file__).resolve().parents[2] / "src/reva/nl" / f).read_text()
-                  for f in ("service.py", "catalog.py", "budget.py", "prompt.py", "providers.py"))
+    src = "".join(
+        (Path(__file__).resolve().parents[2] / "src/reva/nl" / f).read_text()
+        for f in ("service.py", "catalog.py", "budget.py", "prompt.py", "providers.py")
+    )
     for forbidden in ("sim.create_scenario", "ops.submit_job", "submit_job(", "handle_simulation", "run_scenario"):
         assert forbidden not in src
 
@@ -422,8 +470,15 @@ def test_text_is_bounded_and_cleaned() -> None:
 
 
 def test_keyword_guards_catch_unsupported_asks_the_llm_might_miss() -> None:
-    keys = lambda t, reg=(): {h.capability_key for h in keyword_gaps(t, language="fr", registered=reg,  # noqa: E731
-                                                                    multi_period_available=False)}
+    keys = lambda t, reg=(): {  # noqa: E731
+        h.capability_key
+        for h in keyword_gaps(
+            t,
+            language="fr",
+            registered=reg,
+            multi_period_available=False,
+        )
+    }
     assert keys("perte de PIB et chômage") == {"outputs.macroeconomic"}
     assert keys("relever l'âge de la retraite à 64 ans") == {"social.retirement_age"}
     assert keys("relever l'âge de la retraite", ("social.retirement_age",)) == set()  # registered model
@@ -466,17 +521,29 @@ def test_catalog_reads_registered_plugins_dynamically() -> None:
 
     schema = json.loads(json.dumps(scenario_schema()))
     n_before = len(list(model_branches(schema)))
-    branch = {"type": "object", "additionalProperties": False,
-              "required": ["schema_version", "model_key", "countries", "intervention", "outputs"],
-              "properties": {"schema_version": {"const": "2.0.0"}, "model_key": {"const": "social.retirement_age"},
-                             "countries": {"type": "array", "items": {"enum": ["FRA"]}},
-                             "intervention": {"type": "object", "required": ["kind", "legal_age"],
-                                              "properties": {"kind": {"const": "set_legal_retirement_age"},
-                                                             "legal_age": {"type": "number"}}},
-                             "outputs": {"type": "array", "items": {"enum": ["employed_55_69"]}}}}
+    branch = {
+        "type": "object",
+        "additionalProperties": False,
+        "required": ["schema_version", "model_key", "countries", "intervention", "outputs"],
+        "properties": {
+            "schema_version": {"const": "2.0.0"},
+            "model_key": {"const": "social.retirement_age"},
+            "countries": {"type": "array", "items": {"enum": ["FRA"]}},
+            "intervention": {
+                "type": "object",
+                "required": ["kind", "legal_age"],
+                "properties": {"kind": {"const": "set_legal_retirement_age"}, "legal_age": {"type": "number"}},
+            },
+            "outputs": {"type": "array", "items": {"enum": ["employed_55_69"]}},
+        },
+    }
     schema["$defs"]["social.retirement_age"] = branch
-    schema["allOf"].append({"if": {"properties": {"model_key": {"const": "social.retirement_age"}}},
-                            "then": {"$ref": "#/$defs/social.retirement_age"}})
+    schema["allOf"].append(
+        {
+            "if": {"properties": {"model_key": {"const": "social.retirement_age"}}},
+            "then": {"$ref": "#/$defs/social.retirement_age"},
+        }
+    )
 
     class Plugin:
         model_key = "social.retirement_age"
@@ -488,8 +555,9 @@ def test_catalog_reads_registered_plugins_dynamically() -> None:
     assert set(before.models) == {"economic.crude_exposure"}  # schema branches without a plugin are not draftable
     assert "social.retirement_age" not in before.models
     assert before.model_gap("social.retirement_age") in before.gap_keys
-    after = build_catalog(schema, plugins=("registered", {"economic.crude_exposure": object(),
-                                                          "social.retirement_age": Plugin()}))
+    after = build_catalog(
+        schema, plugins=("registered", {"economic.crude_exposure": object(), "social.retirement_age": Plugin()})
+    )
     m = after.models["social.retirement_age"]
     assert [p.path for p in m.parameters] == ["intervention.legal_age"] and m.experimental
     assert "model.social.retirement_age" not in after.gap_keys  # the catalogue entry (if any) is its own

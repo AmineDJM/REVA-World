@@ -84,8 +84,12 @@ class CompatibilityReport(BaseModel):
         """Raise unless compatible: blocked -> MissingInput, incompatible -> IncompatibleSemantics."""
         if self.verdict is Verdict.compatible:
             return
-        detail = {"purpose": self.purpose, "left": self.left, "right": self.right,
-                  "findings": [f.model_dump() for f in self.findings]}
+        detail = {
+            "purpose": self.purpose,
+            "left": self.left,
+            "right": self.right,
+            "findings": [f.model_dump() for f in self.findings],
+        }
         msg = f"{self.purpose} of {self.left} and {self.right}: " + "; ".join(self.reasons)
         if self.verdict is Verdict.blocked:
             raise MissingInput(msg, **detail)
@@ -146,8 +150,20 @@ def _as_side(x: SemanticSide | Concept) -> SemanticSide:
 # --------------------------------------------------------------------------- temporal support
 
 _POINT = re.compile(r"^point:(\d{2})-(\d{2})\s*(?:\((?P<q>[^)]*)\))?\s*$")
-_MONTHS = ("January", "February", "March", "April", "May", "June", "July", "August", "September",
-           "October", "November", "December")
+_MONTHS = (
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+)
 
 
 @dataclass(frozen=True)
@@ -180,16 +196,28 @@ def _temporal_finding(a: str, b: str) -> Finding | None:
     pa, pb = parse_temporal_support(a), parse_temporal_support(b)
     if pa.kind == pb.kind == "point" and pa.anchor == pb.anchor:
         # same date; differing qualifier text is still a declared difference in method
-        return Finding(aspect="temporal_support", code="temporal_support_qualifier_mismatch", severity="incompatible",
-                       message=f"temporal support differs: {pa.describe()} vs {pb.describe()}", left=a, right=b)
+        return Finding(
+            aspect="temporal_support",
+            code="temporal_support_qualifier_mismatch",
+            severity="incompatible",
+            message=f"temporal support differs: {pa.describe()} vs {pb.describe()}",
+            left=a,
+            right=b,
+        )
     if pa.kind == pb.kind == "point":
         code, what = "temporal_point_mismatch", "different reference points"
     elif {pa.kind, pb.kind} == {"point", "period"}:
         code, what = "temporal_point_vs_period", "point-in-time vs period statistic"
     else:
         code, what = "temporal_support_mismatch", "different temporal supports"
-    return Finding(aspect="temporal_support", code=code, severity="incompatible",
-                   message=f"{what}: {pa.describe()} vs {pb.describe()}", left=a, right=b)
+    return Finding(
+        aspect="temporal_support",
+        code=code,
+        severity="incompatible",
+        message=f"{what}: {pa.describe()} vs {pb.describe()}",
+        left=a,
+        right=b,
+    )
 
 
 # --------------------------------------------------------------------------- valuation
@@ -212,18 +240,42 @@ def _valuation_finding(a: str | None, b: str | None, where: str) -> Finding | No
     na, nb = normalise_valuation(a), normalise_valuation(b)
     if na == nb:
         if na is not None and na.startswith("undeclared:") and "not determinable" in na:
-            return Finding(aspect="valuation", code="valuation_undetermined", severity="blocker",
-                           message=f"{where} valuation is undetermined on both sides ({a})", left=a, right=b)
+            return Finding(
+                aspect="valuation",
+                code="valuation_undetermined",
+                severity="blocker",
+                message=f"{where} valuation is undetermined on both sides ({a})",
+                left=a,
+                right=b,
+            )
         return None
     if {na, nb} == {"CIF", "FOB"}:
-        return Finding(aspect="valuation", code="valuation_cif_vs_fob", severity="incompatible",
-                       message=f"{where} valuation CIF vs FOB: CIF includes insurance and freight to the importer's "
-                               "border, FOB does not; they are distinct measures", left=a, right=b)
+        return Finding(
+            aspect="valuation",
+            code="valuation_cif_vs_fob",
+            severity="incompatible",
+            message=f"{where} valuation CIF vs FOB: CIF includes insurance and freight to the importer's "
+            "border, FOB does not; they are distinct measures",
+            left=a,
+            right=b,
+        )
     if na is None or nb is None:
-        return Finding(aspect="valuation", code="valuation_missing", severity="blocker",
-                       message=f"{where} valuation declared on one side only ({a!r} vs {b!r})", left=a, right=b)
-    return Finding(aspect="valuation", code="valuation_mismatch", severity="incompatible",
-                   message=f"{where} valuation differs: {a!r} vs {b!r}", left=a, right=b)
+        return Finding(
+            aspect="valuation",
+            code="valuation_missing",
+            severity="blocker",
+            message=f"{where} valuation declared on one side only ({a!r} vs {b!r})",
+            left=a,
+            right=b,
+        )
+    return Finding(
+        aspect="valuation",
+        code="valuation_mismatch",
+        severity="incompatible",
+        message=f"{where} valuation differs: {a!r} vs {b!r}",
+        left=a,
+        right=b,
+    )
 
 
 # --------------------------------------------------------------------------- core checks
@@ -232,14 +284,25 @@ def _valuation_finding(a: str | None, b: str | None, where: str) -> Finding | No
 def _neq(aspect: str, code: str, a: Any, b: Any, what: str) -> Finding | None:
     if a == b:
         return None
-    return Finding(aspect=aspect, code=code, severity="incompatible", message=f"{what} differs: {a!r} vs {b!r}",
-                   left=None if a is None else str(a), right=None if b is None else str(b))
+    return Finding(
+        aspect=aspect,
+        code=code,
+        severity="incompatible",
+        message=f"{what} differs: {a!r} vs {b!r}",
+        left=None if a is None else str(a),
+        right=None if b is None else str(b),
+    )
 
 
 def _profile_findings(a: SemanticProfile, b: SemanticProfile, purpose: Purpose) -> list[Finding]:
     out: list[Finding | None] = [
-        _neq("population_universe", "population_universe_mismatch", a.population_universe, b.population_universe,
-             "statistical/population universe"),
+        _neq(
+            "population_universe",
+            "population_universe_mismatch",
+            a.population_universe,
+            b.population_universe,
+            "statistical/population universe",
+        ),
         _neq("denominator", "denominator_mismatch", a.denominator, b.denominator, "denominator"),
         _temporal_finding(a.temporal_support, b.temporal_support),
         _neq("spatial_support", "spatial_support_mismatch", a.spatial_support, b.spatial_support, "spatial support"),
@@ -249,21 +312,39 @@ def _profile_findings(a: SemanticProfile, b: SemanticProfile, purpose: Purpose) 
     ]
     if a.measurement_method != b.measurement_method:
         sev: Severity = "incompatible" if purpose == "identity" else "note"
-        out.append(Finding(aspect="measurement_method", code="measurement_method_mismatch", severity=sev,
-                           message=f"measurement method differs: {a.measurement_method!r} vs {b.measurement_method!r}",
-                           left=a.measurement_method, right=b.measurement_method))
+        out.append(
+            Finding(
+                aspect="measurement_method",
+                code="measurement_method_mismatch",
+                severity=sev,
+                message=f"measurement method differs: {a.measurement_method!r} vs {b.measurement_method!r}",
+                left=a.measurement_method,
+                right=b.measurement_method,
+            )
+        )
     if purpose == "aggregate":
         for p in (a, b):
             if p.scale_type not in ADDITIVE_SCALE_TYPES:
-                out.append(Finding(aspect="scale_type", code="non_additive_scale_type", severity="incompatible",
-                                   message=f"{p.scale_type.value} quantities cannot be summed"))
+                out.append(
+                    Finding(
+                        aspect="scale_type",
+                        code="non_additive_scale_type",
+                        severity="incompatible",
+                        message=f"{p.scale_type.value} quantities cannot be summed",
+                    )
+                )
                 break
         for p in (a, b):
             if not ADDITIVE_OPERATIONS.intersection(p.permitted_transformations):
-                out.append(Finding(
-                    aspect="permitted_operations", code="aggregation_not_permitted", severity="incompatible",
-                    message=f"concept permits only {list(p.permitted_transformations)}; no additive operation "
-                            f"({sorted(ADDITIVE_OPERATIONS)}) is approved"))
+                out.append(
+                    Finding(
+                        aspect="permitted_operations",
+                        code="aggregation_not_permitted",
+                        severity="incompatible",
+                        message=f"concept permits only {list(p.permitted_transformations)}; no additive operation "
+                        f"({sorted(ADDITIVE_OPERATIONS)}) is approved",
+                    )
+                )
                 break
     return [f for f in out if f is not None]
 
@@ -277,11 +358,23 @@ def _unit_findings(a: SemanticSide, b: SemanticSide) -> tuple[list[Finding], boo
         return out, False
     for side, u in ((a, ua), (b, ub)):
         if u is None:
-            out.append(Finding(aspect="unit", code="unit_missing", severity="blocker",
-                               message=f"{side.ref} has no unit_ref; a unit is never inferred"))
+            out.append(
+                Finding(
+                    aspect="unit",
+                    code="unit_missing",
+                    severity="blocker",
+                    message=f"{side.ref} has no unit_ref; a unit is never inferred",
+                )
+            )
         elif not is_known_unit(u):
-            out.append(Finding(aspect="unit", code="unit_unknown", severity="blocker",
-                               message=f"{side.ref} unit_ref {u!r} is not registered"))
+            out.append(
+                Finding(
+                    aspect="unit",
+                    code="unit_unknown",
+                    severity="blocker",
+                    message=f"{side.ref} unit_ref {u!r} is not registered",
+                )
+            )
     if out:
         return out, False
     ca, cb = canonical_unit_ref(ua), canonical_unit_ref(ub)
@@ -292,8 +385,16 @@ def _unit_findings(a: SemanticSide, b: SemanticSide) -> tuple[list[Finding], boo
             note = "convertible, but a conversion is a transform, not identity"
         except IncompatibleSemantics as e:
             note = e.message
-        out.append(Finding(aspect="unit", code="unit_mismatch", severity="incompatible",
-                           message=f"unit differs: {ca} vs {cb} ({note})", left=ca, right=cb))
+        out.append(
+            Finding(
+                aspect="unit",
+                code="unit_mismatch",
+                severity="incompatible",
+                message=f"unit differs: {ca} vs {cb} ({note})",
+                left=ca,
+                right=cb,
+            )
+        )
     return out, is_currency
 
 
@@ -304,11 +405,23 @@ def _currency_profile_findings(a: SemanticSide, b: SemanticSide) -> list[Finding
     for side, p in ((a, pa), (b, pb)):
         basis = side.basis
         if p.currency_basis is None and (basis is None or basis.currency is None):
-            out.append(Finding(aspect="currency_basis", code="currency_basis_missing", severity="blocker",
-                               message=f"{side.ref}: currency amount without declared currency"))
+            out.append(
+                Finding(
+                    aspect="currency_basis",
+                    code="currency_basis_missing",
+                    severity="blocker",
+                    message=f"{side.ref}: currency amount without declared currency",
+                )
+            )
         if p.price_basis is None and (basis is None or basis.price_basis is None):
-            out.append(Finding(aspect="price_basis", code="price_basis_missing", severity="blocker",
-                               message=f"{side.ref}: currency amount without nominal/real/PPP price basis"))
+            out.append(
+                Finding(
+                    aspect="price_basis",
+                    code="price_basis_missing",
+                    severity="blocker",
+                    message=f"{side.ref}: currency amount without nominal/real/PPP price basis",
+                )
+            )
     if not out:
         for f in (
             _neq("currency_basis", "currency_basis_mismatch", pa.currency_basis, pb.currency_basis, "currency"),
@@ -319,15 +432,22 @@ def _currency_profile_findings(a: SemanticSide, b: SemanticSide) -> list[Finding
     return out
 
 
-def basis_findings(a: MeasurementBasis | None, b: MeasurementBasis | None, *, currency: bool,
-                   left: str = "left", right: str = "right") -> list[Finding]:
+def basis_findings(
+    a: MeasurementBasis | None, b: MeasurementBasis | None, *, currency: bool, left: str = "left", right: str = "right"
+) -> list[Finding]:
     """Compare value-level measurement bases (currency, prices, FX, valuation, scale)."""
     out: list[Finding] = []
     if a is None or b is None:
         if currency:
             missing = [n for n, x in ((left, a), (right, b)) if x is None]
-            out.append(Finding(aspect="basis", code="currency_basis_missing", severity="blocker",
-                               message=f"currency amount without measurement basis: {', '.join(missing)}"))
+            out.append(
+                Finding(
+                    aspect="basis",
+                    code="currency_basis_missing",
+                    severity="blocker",
+                    message=f"currency amount without measurement basis: {', '.join(missing)}",
+                )
+            )
         return out
     checks = (
         ("currency", "currency_mismatch", "currency"),
@@ -343,11 +463,23 @@ def basis_findings(a: MeasurementBasis | None, b: MeasurementBasis | None, *, cu
     if currency:
         for name, x in ((left, a), (right, b)):
             if x.currency is None or x.price_basis is None:
-                out.append(Finding(aspect="basis", code="currency_basis_incomplete", severity="blocker",
-                                   message=f"{name}: currency amount lacks currency or price basis"))
+                out.append(
+                    Finding(
+                        aspect="basis",
+                        code="currency_basis_incomplete",
+                        severity="blocker",
+                        message=f"{name}: currency amount lacks currency or price basis",
+                    )
+                )
             elif x.price_basis in ("real", "ppp") and x.price_reference_year is None:
-                out.append(Finding(aspect="basis", code="price_reference_year_missing", severity="blocker",
-                                   message=f"{name}: {x.price_basis} amount without price reference year"))
+                out.append(
+                    Finding(
+                        aspect="basis",
+                        code="price_reference_year_missing",
+                        severity="blocker",
+                        message=f"{name}: {x.price_basis} amount without price reference year",
+                    )
+                )
     v = _valuation_finding(a.valuation, b.valuation, "value")
     if v is not None:
         out.append(v)
@@ -356,23 +488,40 @@ def basis_findings(a: MeasurementBasis | None, b: MeasurementBasis | None, *, cu
 
 def _support_findings(a: Support, b: Support, purpose: Purpose) -> list[Finding]:
     out: list[Finding | None] = [
-        _neq("support.aggregation", "support_aggregation_mismatch", a.aggregation, b.aggregation,
-             "support aggregation"),
-        _neq("support.population", "support_population_mismatch", a.population.universe, b.population.universe,
-             "support population universe"),
+        _neq(
+            "support.aggregation", "support_aggregation_mismatch", a.aggregation, b.aggregation, "support aggregation"
+        ),
+        _neq(
+            "support.population",
+            "support_population_mismatch",
+            a.population.universe,
+            b.population.universe,
+            "support population universe",
+        ),
         _neq("support.spatial", "spatial_scheme_mismatch", a.spatial.scheme, b.spatial.scheme, "spatial scheme"),
-        _neq("support.temporal", "calendar_mismatch", a.temporal.calendar.value, b.temporal.calendar.value,
-             "calendar"),
+        _neq("support.temporal", "calendar_mismatch", a.temporal.calendar.value, b.temporal.calendar.value, "calendar"),
     ]
     ta, tb = a.temporal, b.temporal
     if (ta.kind, ta.start, ta.end) != (tb.kind, tb.start, tb.end):
-        out.append(Finding(
-            aspect="support.temporal", code="temporal_extent_mismatch", severity="incompatible",
-            message=f"temporal extent differs: {ta.kind} {ta.start}..{ta.end} vs {tb.kind} {tb.start}..{tb.end}",
-            left=f"{ta.kind}:{ta.start}:{ta.end}", right=f"{tb.kind}:{tb.start}:{tb.end}"))
+        out.append(
+            Finding(
+                aspect="support.temporal",
+                code="temporal_extent_mismatch",
+                severity="incompatible",
+                message=f"temporal extent differs: {ta.kind} {ta.start}..{ta.end} vs {tb.kind} {tb.start}..{tb.end}",
+                left=f"{ta.kind}:{ta.start}:{ta.end}",
+                right=f"{tb.kind}:{tb.start}:{tb.end}",
+            )
+        )
     if ta.start_uncertainty or ta.end_uncertainty or tb.start_uncertainty or tb.end_uncertainty:
-        out.append(Finding(aspect="support.temporal", code="temporal_bounds_uncertain", severity="blocker",
-                           message="uncertain temporal bounds: equality of supports cannot be established"))
+        out.append(
+            Finding(
+                aspect="support.temporal",
+                code="temporal_bounds_uncertain",
+                severity="blocker",
+                message="uncertain temporal bounds: equality of supports cannot be established",
+            )
+        )
     if purpose == "identity":
         out.append(_neq("support.spatial", "spatial_unit_mismatch", a.spatial.key, b.spatial.key, "spatial unit"))
     return [f for f in out if f is not None]
@@ -382,42 +531,78 @@ def check_support_against_profile(profile: SemanticProfile, support: Support) ->
     """A support must instantiate its concept's declared support."""
     out: list[Finding] = []
     if support.aggregation != profile.aggregation:
-        out.append(Finding(aspect="support.aggregation", code="support_profile_aggregation_mismatch",
-                           severity="incompatible",
-                           message=f"support aggregation {support.aggregation} contradicts concept "
-                                   f"{profile.aggregation}"))
+        out.append(
+            Finding(
+                aspect="support.aggregation",
+                code="support_profile_aggregation_mismatch",
+                severity="incompatible",
+                message=f"support aggregation {support.aggregation} contradicts concept {profile.aggregation}",
+            )
+        )
     if profile.population_universe != "not_applicable" and support.population.universe != profile.population_universe:
-        out.append(Finding(aspect="support.population", code="support_profile_universe_mismatch",
-                           severity="incompatible",
-                           message=f"support universe {support.population.universe} contradicts concept "
-                                   f"{profile.population_universe}"))
+        out.append(
+            Finding(
+                aspect="support.population",
+                code="support_profile_universe_mismatch",
+                severity="incompatible",
+                message=f"support universe {support.population.universe} contradicts concept "
+                f"{profile.population_universe}",
+            )
+        )
     if support.spatial.scheme != profile.spatial_support:
-        out.append(Finding(aspect="support.spatial", code="support_profile_spatial_mismatch", severity="incompatible",
-                           message=f"support spatial scheme {support.spatial.scheme} contradicts concept "
-                                   f"{profile.spatial_support}"))
+        out.append(
+            Finding(
+                aspect="support.spatial",
+                code="support_profile_spatial_mismatch",
+                severity="incompatible",
+                message=f"support spatial scheme {support.spatial.scheme} contradicts concept "
+                f"{profile.spatial_support}",
+            )
+        )
     spec = parse_temporal_support(profile.temporal_support)
     t = support.temporal
     if spec.kind == "point":
         if t.kind != "instant" or t.start is None or t.start.strftime("%m-%d") != spec.anchor:
-            out.append(Finding(aspect="support.temporal", code="support_profile_temporal_mismatch",
-                               severity="incompatible",
-                               message=f"concept requires {spec.describe()}, support is {t.kind} starting {t.start}"))
+            out.append(
+                Finding(
+                    aspect="support.temporal",
+                    code="support_profile_temporal_mismatch",
+                    severity="incompatible",
+                    message=f"concept requires {spec.describe()}, support is {t.kind} starting {t.start}",
+                )
+            )
     elif spec.kind == "period" and t.kind != "interval":
-        out.append(Finding(aspect="support.temporal", code="support_profile_temporal_mismatch",
-                           severity="incompatible", message=f"concept requires a period ({spec.raw}), support is an "
-                                                            "instant"))
+        out.append(
+            Finding(
+                aspect="support.temporal",
+                code="support_profile_temporal_mismatch",
+                severity="incompatible",
+                message=f"concept requires a period ({spec.raw}), support is an instant",
+            )
+        )
     return out
 
 
-def check_compatibility(a: SemanticSide | Concept, b: SemanticSide | Concept,
-                        purpose: Purpose = "identity", *, require_support: bool = False) -> CompatibilityReport:
+def check_compatibility(
+    a: SemanticSide | Concept,
+    b: SemanticSide | Concept,
+    purpose: Purpose = "identity",
+    *,
+    require_support: bool = False,
+) -> CompatibilityReport:
     """Full semantic comparison of two operands for a stated purpose."""
     sa, sb = _as_side(a), _as_side(b)
     findings: list[Finding] = []
     if sa.profile is None or sb.profile is None:
         missing = [s.ref for s in (sa, sb) if s.profile is None]
-        findings.append(Finding(aspect="semantic_profile", code="semantic_profile_missing", severity="blocker",
-                                message=f"no semantic profile for {', '.join(missing)}"))
+        findings.append(
+            Finding(
+                aspect="semantic_profile",
+                code="semantic_profile_missing",
+                severity="blocker",
+                message=f"no semantic profile for {', '.join(missing)}",
+            )
+        )
         return _report(purpose, sa.ref, sb.ref, findings)
     findings.extend(_profile_findings(sa.profile, sb.profile, purpose))
     unit_f, is_currency = _unit_findings(sa, sb)
@@ -433,17 +618,36 @@ def check_compatibility(a: SemanticSide | Concept, b: SemanticSide | Concept,
             findings.extend(check_support_against_profile(s.profile, s.support))
     elif require_support:
         missing = [s.ref for s in (sa, sb) if s.support is None]
-        findings.append(Finding(aspect="support", code="support_missing", severity="blocker",
-                                message=f"support missing for {', '.join(missing)}"))
+        findings.append(
+            Finding(
+                aspect="support",
+                code="support_missing",
+                severity="blocker",
+                message=f"support missing for {', '.join(missing)}",
+            )
+        )
     ca, cb = sa.effective_classification, sb.effective_classification
     if ca != cb:
         if ca is None or cb is None:
-            findings.append(Finding(aspect="classification", code="classification_missing", severity="blocker",
-                                    message=f"classification revision declared on one side only ({ca!r} vs {cb!r})"))
+            findings.append(
+                Finding(
+                    aspect="classification",
+                    code="classification_missing",
+                    severity="blocker",
+                    message=f"classification revision declared on one side only ({ca!r} vs {cb!r})",
+                )
+            )
         else:
-            findings.append(Finding(aspect="classification", code="classification_revision_mismatch",
-                                    severity="incompatible",
-                                    message=f"classification/revision differs: {ca} vs {cb}", left=ca, right=cb))
+            findings.append(
+                Finding(
+                    aspect="classification",
+                    code="classification_revision_mismatch",
+                    severity="incompatible",
+                    message=f"classification/revision differs: {ca} vs {cb}",
+                    left=ca,
+                    right=cb,
+                )
+            )
     return _report(purpose, sa.ref, sb.ref, findings)
 
 
@@ -493,24 +697,47 @@ def can_combine_countries(items: Sequence[CountryValue]) -> CompatibilityReport:
     label = ",".join(i.entity_key for i in items)
     findings: list[Finding] = []
     if len(items) < 2:
-        findings.append(Finding(aspect="input", code="too_few_items", severity="blocker",
-                                message="combination needs at least two country values"))
+        findings.append(
+            Finding(
+                aspect="input",
+                code="too_few_items",
+                severity="blocker",
+                message="combination needs at least two country values",
+            )
+        )
         return _report("combine", label, "", findings)
     keys = [i.entity_key for i in items]
     if len(set(keys)) != len(keys):
-        findings.append(Finding(aspect="entity", code="duplicate_entity", severity="incompatible",
-                                message="the same country appears more than once"))
+        findings.append(
+            Finding(
+                aspect="entity",
+                code="duplicate_entity",
+                severity="incompatible",
+                message="the same country appears more than once",
+            )
+        )
     years = {i.entity_key: i.effective_reference_year for i in items}
     for k, y in years.items():
         if y is None:
-            findings.append(Finding(aspect="reference_year", code="reference_year_missing", severity="blocker",
-                                    message=f"{k}: reference year unknown"))
+            findings.append(
+                Finding(
+                    aspect="reference_year",
+                    code="reference_year_missing",
+                    severity="blocker",
+                    message=f"{k}: reference year unknown",
+                )
+            )
     known_years = {y for y in years.values() if y is not None}
     if len(known_years) > 1:
-        findings.append(Finding(
-            aspect="reference_year", code="reference_year_mismatch", severity="incompatible",
-            message="different reference years cannot be combined silently: "
-                    + ", ".join(f"{k}={y}" for k, y in sorted(years.items()))))
+        findings.append(
+            Finding(
+                aspect="reference_year",
+                code="reference_year_mismatch",
+                severity="incompatible",
+                message="different reference years cannot be combined silently: "
+                + ", ".join(f"{k}={y}" for k, y in sorted(years.items())),
+            )
+        )
     first = items[0]
     for other in items[1:]:
         rep = check_compatibility(first.side, other.side, "combine")
@@ -520,15 +747,28 @@ def can_combine_countries(items: Sequence[CountryValue]) -> CompatibilityReport:
             tagged = f.model_copy(update={"message": f"{first.entity_key} vs {other.entity_key}: {f.message}"})
             findings.append(tagged)
         if first.side.ref != other.side.ref:
-            findings.append(Finding(aspect="concept", code="concept_mismatch", severity="incompatible",
-                                    message=f"{first.entity_key} uses {first.side.ref}, {other.entity_key} uses "
-                                            f"{other.side.ref}", left=first.side.ref, right=other.side.ref))
+            findings.append(
+                Finding(
+                    aspect="concept",
+                    code="concept_mismatch",
+                    severity="incompatible",
+                    message=f"{first.entity_key} uses {first.side.ref}, {other.entity_key} uses {other.side.ref}",
+                    left=first.side.ref,
+                    right=other.side.ref,
+                )
+            )
     for i in items:
         u = i.side.effective_unit
         if u and is_known_unit(u) and unit_definition(u).kind is QuantityKind.currency_amount and i.side.basis is None:
-            findings.append(Finding(aspect="basis", code="currency_basis_missing", severity="blocker",
-                                    message=f"{i.entity_key}: currency amount without value basis (GDP basis "
-                                            "unknown: nominal/real/PPP, price year, exchange-rate transform)"))
+            findings.append(
+                Finding(
+                    aspect="basis",
+                    code="currency_basis_missing",
+                    severity="blocker",
+                    message=f"{i.entity_key}: currency amount without value basis (GDP basis "
+                    "unknown: nominal/real/PPP, price year, exchange-rate transform)",
+                )
+            )
     return _report("combine", label, "", _dedupe(findings))
 
 

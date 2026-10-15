@@ -59,8 +59,7 @@ HONESTY = {
         "availability are reported separately."
     ),
     RETROSPECTIVE: (
-        f"{RETROSPECTIVE_LABEL}: current revised historical data, temporally split; "
-        f"{RETROSPECTIVE_DISCLAIMER}."
+        f"{RETROSPECTIVE_LABEL}: current revised historical data, temporally split; {RETROSPECTIVE_DISCLAIMER}."
     ),
 }
 
@@ -158,18 +157,21 @@ def operational_as_known(
             filtered_out += 1
             continue
         eid = str(r["estimate_id"])
-        out = outputs.setdefault(eid, {
-            "estimate_id": eid,
-            "subject_id": str(r["subject_id"]),
-            "concept_id": r["concept_id"],
-            "support_id": str(r["support_id"]),
-            "temporal_extent": _plain(r["temporal_extent"]),
-            "modality": r["modality"],
-            "value": _plain(r["value"]),
-            "uncertainty": _plain(r["uncertainty"]),
-            "discrepancy_flags": _plain(r["discrepancy_flags"]),
-            "input_observation_ids": [],
-        })
+        out = outputs.setdefault(
+            eid,
+            {
+                "estimate_id": eid,
+                "subject_id": str(r["subject_id"]),
+                "concept_id": r["concept_id"],
+                "support_id": str(r["support_id"]),
+                "temporal_extent": _plain(r["temporal_extent"]),
+                "modality": r["modality"],
+                "value": _plain(r["value"]),
+                "uncertainty": _plain(r["uncertainty"]),
+                "discrepancy_flags": _plain(r["discrepancy_flags"]),
+                "input_observation_ids": [],
+            },
+        )
         if r["observation_id"] is not None:
             oid = str(r["observation_id"])
             out["input_observation_ids"].append(oid)
@@ -238,18 +240,20 @@ def available_then_reconstruction(
     inputs = []
     for s in selections:
         r = by_id[str(s.observation_id)]
-        inputs.append({
-            "observation_id": str(r["id"]),
-            "logical_key": r["logical_key"],
-            "revision_no": r["revision_no"],
-            "source_key": r["source_key"],
-            "recorded_at": _plain(r["recorded_at"]),
-            "retrieved_at": _plain(r["retrieved_at"]),
-            "source_published_at": _plain(r["source_published_at"]),
-            "availability_proof": _availability_proof(r, operational=False),
-            "eligibility_evaluated_at": _plain(r["eligibility_evaluated_at"]),
-            "post_cutoff_flags": [f for f in ("retracted_after_cutoff", "ineligible_after_cutoff") if r.get(f)],
-        })
+        inputs.append(
+            {
+                "observation_id": str(r["id"]),
+                "logical_key": r["logical_key"],
+                "revision_no": r["revision_no"],
+                "source_key": r["source_key"],
+                "recorded_at": _plain(r["recorded_at"]),
+                "retrieved_at": _plain(r["retrieved_at"]),
+                "source_published_at": _plain(r["source_published_at"]),
+                "availability_proof": _availability_proof(r, operational=False),
+                "eligibility_evaluated_at": _plain(r["eligibility_evaluated_at"]),
+                "post_cutoff_flags": [f for f in ("retracted_after_cutoff", "ineligible_after_cutoff") if r.get(f)],
+            }
+        )
     m["inputs"] = inputs
     m["outputs"] = [
         {
@@ -283,17 +287,23 @@ def available_then_reconstruction(
         "algorithm_design_date": _plain(method_recorded),
         "selection_policy": policy["policy_version"],
         "selection_method_and_ontology_as_of": now.isoformat(),
-        "design_date_note": ("the selection method and ontology are today's design; the design date is not the "
-                             "availability date and not the cutoff"),
+        "design_date_note": (
+            "the selection method and ontology are today's design; the design date is not the "
+            "availability date and not the cutoff"
+        ),
     }
     m["data_quality_decisions"] = {
         "retractions_as_of": cutoff.isoformat(),
         "eligibility_as_of": cutoff.isoformat(),
-        "eligibility_rule": ("decision in force at the cutoff; where REVA had none yet for a (connector version, "
-                             "concept), its first recorded decision (algorithm design) is used and dated"),
+        "eligibility_rule": (
+            "decision in force at the cutoff; where REVA had none yet for a (connector version, "
+            "concept), its first recorded decision (algorithm design) is used and dated"
+        ),
         "latest_eligibility_evaluated_at": _plain(max(elig_times)) if elig_times else None,
-        "post_cutoff_knowledge": ("later retractions and eligibility changes are flagged on inputs "
-                                  "(post_cutoff_flags), never used to exclude: excluding them would be hindsight"),
+        "post_cutoff_knowledge": (
+            "later retractions and eligibility changes are flagged on inputs "
+            "(post_cutoff_flags), never used to exclude: excluding them would be hindsight"
+        ),
     }
     m["availability"] = {
         "earliest_source_available_at": _plain(min(avail)) if avail else None,
@@ -377,10 +387,14 @@ def revised_data_retrospective(
 
     if min_train < 1 or not horizons or any(h < 1 for h in horizons):
         raise ValidationProblem("min_train must be >= 1 and horizons positive")
-    if isinstance(publication_lag_years, bool) or not isinstance(publication_lag_years, int) \
-            or not 0 <= publication_lag_years <= 10:
-        raise ValidationProblem("publication_lag_years must be an integer in [0, 10]",
-                                publication_lag_years=str(publication_lag_years))
+    if (
+        isinstance(publication_lag_years, bool)
+        or not isinstance(publication_lag_years, int)
+        or not 0 <= publication_lag_years <= 10
+    ):
+        raise ValidationProblem(
+            "publication_lag_years must be an integer in [0, 10]", publication_lag_years=str(publication_lag_years)
+        )
     lag = publication_lag_years
     now = _db_now(conn)
     snapshot = cutoff or now
@@ -399,8 +413,13 @@ def revised_data_retrospective(
         if v is None or y is None:
             excl["missing_or_non_decimal_value"] += 1
             continue
-        key = (str(r["subject_id"]), r["concept_id"], r["source_key"], r["aggregation"],
-               (r["temporal_extent"] or {}).get("kind"))
+        key = (
+            str(r["subject_id"]),
+            r["concept_id"],
+            r["source_key"],
+            r["aggregation"],
+            (r["temporal_extent"] or {}).get("kind"),
+        )
         if y in groups[key]:
             dup.add(key)
         groups[key][y] = {**r, "_v": v}
@@ -436,8 +455,9 @@ def revised_data_retrospective(
             scale = mase_scale([v for _, v in train], train_years)
             # What a strict guard would say at the fold's information date: revised values
             # recorded long after it are admitted only under this label.
-            origin_guard = LeakageGuard(datetime(origin_year, 12, 31, 23, 59, 59, tzinfo=UTC),
-                                        GuardMode.revised_data_retrospective)
+            origin_guard = LeakageGuard(
+                datetime(origin_year, 12, 31, 23, 59, 59, tzinfo=UTC), GuardMode.revised_data_retrospective
+            )
             for y in train_years:
                 origin_guard.check(CutoffRepository.observation_input(pts[y]))
             n_flag = len(origin_guard.flagged())
@@ -457,8 +477,11 @@ def revised_data_retrospective(
                         continue
                     point = float(fitted.predict([steps])[0].point)
                     ae = abs(point - actual)
-                    rec: dict[str, Any] = {"model": f"{mdl.key}@{mdl.version}", "point": point,
-                                           "abs_error_latest_revised": ae}
+                    rec: dict[str, Any] = {
+                        "model": f"{mdl.key}@{mdl.version}",
+                        "point": point,
+                        "abs_error_latest_revised": ae,
+                    }
                     acc = per_model[(key[1], rec["model"])]
                     sacc = per_series[(key[1], slabel, rec["model"])]
                     acc["ae_latest"].append(ae)
@@ -477,24 +500,30 @@ def revised_data_retrospective(
                         acc["ae_first"].append(rec["abs_error_first_release"])
                         sacc["ae_first"].append(rec["abs_error_first_release"])
                     preds.append(rec)
-                folds.append({
-                    "label": RETROSPECTIVE_LABEL,
-                    "series": {"subject_id": key[0], "concept_id": key[1], "source_key": key[2],
-                               "aggregation": key[3]},
-                    "origin_year": origin_year,
-                    "information_date": f"{origin_year}-12-31",
-                    "publication_lag_years": lag,
-                    "last_train_year": last_train,
-                    "target_year": target,
-                    "horizon": h,
-                    "steps_after_last_observation": steps,
-                    "train_years": [years[0], last_train],
-                    "mase_scale": scale.value,
-                    "actual_latest_revised": actual,
-                    "actual_first_release": first,
-                    "inputs_recorded_after_origin": n_flag,
-                    "predictions": preds,
-                })
+                folds.append(
+                    {
+                        "label": RETROSPECTIVE_LABEL,
+                        "series": {
+                            "subject_id": key[0],
+                            "concept_id": key[1],
+                            "source_key": key[2],
+                            "aggregation": key[3],
+                        },
+                        "origin_year": origin_year,
+                        "information_date": f"{origin_year}-12-31",
+                        "publication_lag_years": lag,
+                        "last_train_year": last_train,
+                        "target_year": target,
+                        "horizon": h,
+                        "steps_after_last_observation": steps,
+                        "train_years": [years[0], last_train],
+                        "mase_scale": scale.value,
+                        "actual_latest_revised": actual,
+                        "actual_first_release": first,
+                        "inputs_recorded_after_origin": n_flag,
+                        "predictions": preds,
+                    }
+                )
 
     def _mean(xs: list[float]) -> float | None:
         return sum(xs) / len(xs) if xs else None
@@ -506,7 +535,7 @@ def revised_data_retrospective(
             "n": len(acc_v["ae_latest"]),
             "mae_latest_revised": _mean(acc_v["ae_latest"]),
             "mae_pooling": "pooled across series of different scale (e.g. countries); see scores_by_series and "
-                           "mase_latest_revised",
+            "mase_latest_revised",
             "mase_latest_revised": _mean(acc_v["sae_latest"]),
             "n_mase": len(acc_v["sae_latest"]),
             "mape_latest_revised": _mean(acc_v["ape_latest"]),
@@ -533,12 +562,19 @@ def revised_data_retrospective(
     )
     m["mase_undefined_scale"] = [{"reason": k, "count": v} for k, v in sorted(undefined_scale.items())]
     m["outputs"] = folds
-    m["inputs"] = [{
-        "observation_id": str(r["id"]), "logical_key": r["logical_key"], "revision_no": r["revision_no"],
-        "recorded_at": _plain(r["recorded_at"]), "availability_proof": _availability_proof(r, operational=True),
-    } for r in scope.rows]
+    m["inputs"] = [
+        {
+            "observation_id": str(r["id"]),
+            "logical_key": r["logical_key"],
+            "revision_no": r["revision_no"],
+            "recorded_at": _plain(r["recorded_at"]),
+            "availability_proof": _availability_proof(r, operational=True),
+        }
+        for r in scope.rows
+    ]
     m["exclusions"] = [{"reason": k, "count": v} for k, v in sorted(excl.items())] + [
-        {"reason": f"model_ineligible:{k}", "count": v} for k, v in sorted(ineligible.items())]
+        {"reason": f"model_ineligible:{k}", "count": v} for k, v in sorted(ineligible.items())
+    ]
     m["design"] = {
         "split": "expanding-window rolling origins on annual reference years",
         "min_train": min_train,
@@ -577,9 +613,16 @@ def _parse_cutoff(v: Any) -> datetime:
     return dt
 
 
-def run_replay(conn: Connection, mode: str, cutoff: datetime, *, origin: str = "live",
-               concepts: Sequence[str] | None = None, store: Any = None,
-               options: dict[str, Any] | None = None) -> dict[str, Any]:
+def run_replay(
+    conn: Connection,
+    mode: str,
+    cutoff: datetime,
+    *,
+    origin: str = "live",
+    concepts: Sequence[str] | None = None,
+    store: Any = None,
+    options: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     """Dispatch to exactly the requested mode; an unknown mode is a capability gap."""
     options = options or {}
     if mode == OPERATIONAL:
@@ -588,8 +631,12 @@ def run_replay(conn: Connection, mode: str, cutoff: datetime, *, origin: str = "
         return available_then_reconstruction(conn, cutoff, origins=[origin], concepts=concepts)
     if mode == RETROSPECTIVE:
         return revised_data_retrospective(
-            conn, cutoff, origins=[origin], concepts=concepts,
-            min_train=int(options.get("min_train", 5)), horizons=tuple(options.get("horizons", (1,))),
+            conn,
+            cutoff,
+            origins=[origin],
+            concepts=concepts,
+            min_train=int(options.get("min_train", 5)),
+            horizons=tuple(options.get("horizons", (1,))),
             publication_lag_years=options.get("publication_lag_years", DEFAULT_PUBLICATION_LAG_YEARS),
         )
     raise CapabilityGap(f"unknown replay mode {mode!r}", supported=list(REPLAY_MODES))
@@ -616,23 +663,39 @@ def handle_replay(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     if concepts is not None and (not isinstance(concepts, list) or not all(isinstance(c, str) for c in concepts)):
         raise ValidationProblem("concepts must be a list of concept ids")
     with ctx.worker_engine.connect() as conn:
-        manifest = run_replay(conn, mode, cutoff, origin=origin, concepts=concepts, store=ctx.store,
-                              options=payload.get("options") or {})
+        manifest = run_replay(
+            conn, mode, cutoff, origin=origin, concepts=concepts, store=ctx.store, options=payload.get("options") or {}
+        )
     manifest["job_id"] = str(ctx.job_id)
     with ctx.worker_engine.begin() as conn:
         ctx.assert_lease(conn)
         sha = repo.store_json_artifact(conn, ctx.store, manifest, "evaluation", schema_version="replay-manifest/1")
-        act = repo.simple_activity("evaluation.replay", "evaluation", f"worker:{ctx.worker_id}",
-                                   {"mode": mode, "cutoff": cutoff.isoformat(), "origin": origin,
-                                    "concepts": concepts, "job_id": str(ctx.job_id)})
+        act = repo.simple_activity(
+            "evaluation.replay",
+            "evaluation",
+            f"worker:{ctx.worker_id}",
+            {
+                "mode": mode,
+                "cutoff": cutoff.isoformat(),
+                "origin": origin,
+                "concepts": concepts,
+                "job_id": str(ctx.job_id),
+            },
+        )
         pinned = []
         parent = None
         if mode == OPERATIONAL and manifest.get("release"):
             pinned = [(manifest["release"]["manifest_sha256"], {"role": "pinned_release_manifest"})]
             parent = UUID(manifest["release"]["context_id"])
         repo.record_activity(conn, act, inputs=pinned, outputs=[sha])
-        context_id = repo.create_context(conn, mode="evaluation", origin=origin, manifest_sha256=sha,
-                                         knowledge_cutoff=cutoff, parent_context_id=parent)
+        context_id = repo.create_context(
+            conn,
+            mode="evaluation",
+            origin=origin,
+            manifest_sha256=sha,
+            knowledge_cutoff=cutoff,
+            parent_context_id=parent,
+        )
         result = {
             "status": manifest["status"],
             "mode": mode,

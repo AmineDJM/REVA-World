@@ -31,8 +31,13 @@ PASSWORD = "adversarial review local password"
 
 # (method, route template) pairs reachable without credentials. Anything else must answer 401.
 PUBLIC = {
-    ("GET", "/health/live"), ("GET", "/health/ready"), ("POST", "/v1/session"),
-    ("GET", "/"), ("GET", "/{path:path}"), ("GET", "/openapi.json"), ("GET", "/docs"),
+    ("GET", "/health/live"),
+    ("GET", "/health/ready"),
+    ("POST", "/v1/session"),
+    ("GET", "/"),
+    ("GET", "/{path:path}"),
+    ("GET", "/openapi.json"),
+    ("GET", "/docs"),
     ("GET", "/docs/oauth2-redirect"),
 }
 PARAM_VALUES = {"kind": "observation", "model_ref": "naive_last_value@1.0.0", "entity_ref": "FRA"}
@@ -47,16 +52,26 @@ def clean_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
 
 
 def _local(**over: Any) -> Settings:
-    return Settings(_env_file=None, reva_env="test", reva_allowed_hosts="testserver",  # type: ignore[call-arg]
-                    reva_session_secret=SecretStr("x" * 48), **over)
+    return Settings(
+        _env_file=None,
+        reva_env="test",
+        reva_allowed_hosts="testserver",  # type: ignore[call-arg]
+        reva_session_secret=SecretStr("x" * 48),
+        **over,
+    )
 
 
 def _production(**over: Any) -> Settings:
     base: dict[str, Any] = {
-        "reva_env": "production", "reva_object_backend": "s3", "reva_s3_bucket": "b",
-        "reva_s3_access_key_id": "AKIAEXAMPLE", "reva_s3_secret_access_key": "s3-secret-value-xyz",
-        "reva_session_secret": "s" * 48, "reva_public_base_url": "https://reva.example.org",
-        "reva_db_sslmode": "verify-full", "reva_allowed_hosts": "testserver",
+        "reva_env": "production",
+        "reva_object_backend": "s3",
+        "reva_s3_bucket": "b",
+        "reva_s3_access_key_id": "AKIAEXAMPLE",
+        "reva_s3_secret_access_key": "s3-secret-value-xyz",
+        "reva_session_secret": "s" * 48,
+        "reva_public_base_url": "https://reva.example.org",
+        "reva_db_sslmode": "verify-full",
+        "reva_allowed_hosts": "testserver",
     }
     base.update(over)
     return Settings(_env_file=None, **base)  # type: ignore[call-arg]
@@ -65,6 +80,7 @@ def _production(**over: Any) -> Settings:
 def _concrete(path: str) -> str:
     def sub(m: re.Match[str]) -> str:
         return PARAM_VALUES.get(m.group(1), str(uuid.UUID(int=7)))
+
     return re.sub(r"\{([a-z_]+)(?::[a-z]+)?\}", sub, path)
 
 
@@ -103,15 +119,19 @@ def test_every_non_public_route_requires_authentication() -> None:
     routes = _routes(app)
     assert ("POST", "/v1/jobs/{job_id}/cancel") in routes and ("POST", "/v1/proposals/{proposal_id}/review") in routes
     forged = URLSafeTimedSerializer("attacker-key" * 4, salt="reva-session-v1").dumps(
-        {"u": "admin", "sid": "a" * 22, "csrf": "c" * 20})
+        {"u": "admin", "sid": "a" * 22, "csrf": "c" * 20}
+    )
     checked = 0
     with TestClient(app) as c:
         for method, path in routes:
             if (method, path) in PUBLIC:
                 continue
             url = _concrete(path)
-            for headers, cookies in (({}, {}), ({}, {"reva_session": forged}),
-                                     ({"Authorization": "Basic YWRtaW46eA=="}, {})):
+            for headers, cookies in (
+                ({}, {}),
+                ({}, {"reva_session": forged}),
+                ({"Authorization": "Basic YWRtaW46eA=="}, {}),
+            ):
                 c.cookies.clear()
                 for k, v in cookies.items():
                     c.cookies.set(k, v)
@@ -140,8 +160,13 @@ def test_api_routes_all_declare_an_auth_dependency() -> None:
         if not isinstance(r, APIRoute) or any((m, r.path) in PUBLIC for m in r.methods):
             continue
         names = calls(r.dependant)
-        assert names & {authenticated.__name__, "require_read", "require_simulate", "require_ingest",
-                        "require_review"}, r.path
+        assert names & {
+            authenticated.__name__,
+            "require_read",
+            "require_simulate",
+            "require_ingest",
+            "require_review",
+        }, r.path
         seen += 1
     assert seen >= 30
 
@@ -189,8 +214,9 @@ def test_oversized_bodies_are_refused_before_parsing() -> None:
         # An authenticated-only route refuses the body as well (before authentication is even attempted).
         r = c.post("/v1/scenarios", content=big, headers={"content-type": "application/json"})
         assert r.status_code == 413
-        r = c.post("/v1/session", content=b"{}", headers={"content-type": "application/json",
-                                                           "content-length": "nonsense"})
+        r = c.post(
+            "/v1/session", content=b"{}", headers={"content-type": "application/json", "content-length": "nonsense"}
+        )
         assert r.status_code in (400, 413)
 
 
@@ -217,8 +243,16 @@ def test_spa_path_tricks_never_500_or_escape(tmp_path: Path) -> None:
     (tmp_path / "secret.txt").write_text("TOP-SECRET")
     (ui / "link.txt").symlink_to(tmp_path / "secret.txt")
     with TestClient(create_app(_local(), static_dir=ui), raise_server_exceptions=False) as c:
-        for p in ("/%00", "/a%00b", "/assets/%00.js", "/..%2Fsecret.txt", "/%2e%2e/secret.txt", "/link.txt",
-                  "/..%5csecret.txt", "/" + "a" * 5000):
+        for p in (
+            "/%00",
+            "/a%00b",
+            "/assets/%00.js",
+            "/..%2Fsecret.txt",
+            "/%2e%2e/secret.txt",
+            "/link.txt",
+            "/..%5csecret.txt",
+            "/" + "a" * 5000,
+        ):
             r = c.get(p)
             assert r.status_code in (200, 404), (p, r.status_code)
             assert "TOP-SECRET" not in r.text, p
@@ -248,9 +282,13 @@ def test_internal_errors_carry_security_headers_and_no_internals() -> None:
 
 def _db_settings(db: Any, **over: Any) -> Settings:
     data = db.settings.model_dump()
-    data.update(reva_admin_password_hash=SecretStr(hash_password(PASSWORD)),
-                reva_session_secret=SecretStr("q" * 48), reva_allowed_hosts="testserver",
-                reva_cors_origins="", reva_env="test")
+    data.update(
+        reva_admin_password_hash=SecretStr(hash_password(PASSWORD)),
+        reva_session_secret=SecretStr("q" * 48),
+        reva_allowed_hosts="testserver",
+        reva_cors_origins="",
+        reva_env="test",
+    )
     data.update(over)
     return Settings.model_validate(data)
 
@@ -269,10 +307,13 @@ def _login(c: TestClient, **kw: Any) -> Any:
 def _token(db: Any, scopes: list[str], label: str, kind: str = "service") -> dict[str, str]:
     tok, sha = new_api_token()
     with db.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
-                       "VALUES (:h, :s, :l, :k)"), {"h": sha, "s": scopes, "l": label, "k": kind})
-        stored = c.execute(text("SELECT token_sha256 FROM ops.api_token WHERE token_sha256 = :h"),
-                           {"h": sha}).scalar_one()
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) VALUES (:h, :s, :l, :k)"),
+            {"h": sha, "s": scopes, "l": label, "k": kind},
+        )
+        stored = c.execute(
+            text("SELECT token_sha256 FROM ops.api_token WHERE token_sha256 = :h"), {"h": sha}
+        ).scalar_one()
     assert re.fullmatch(r"[0-9a-f]{64}", stored) and tok not in stored  # only the digest is at rest
     return {"Authorization": f"Bearer {tok}"}
 
@@ -285,8 +326,11 @@ def test_login_rate_limit_ignores_client_supplied_address_headers(db: Any, spoof
         codes = []
         for i in range(5):
             value = f"for=203.0.113.{i}" if spoof == "Forwarded" else f"203.0.113.{i}"
-            codes.append(c.post("/v1/session", json={"username": "admin", "password": f"bad-{i}"},
-                                headers={spoof: value}).status_code)
+            codes.append(
+                c.post(
+                    "/v1/session", json={"username": "admin", "password": f"bad-{i}"}, headers={spoof: value}
+                ).status_code
+            )
         assert codes == [401, 401, 401, 429, 429]
     app.state.engine.dispose()
 
@@ -301,11 +345,20 @@ def test_rate_limited_attempts_are_audited_once_per_window(db: Any) -> None:
     assert codes[0] == 401 and set(codes[1:]) == {429}
     tag = app.state.auth.username_tag(marker)
     with db.owner.connect() as conn:
-        n = conn.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'session.login_rate_limited' "
-                              "AND target->>'username_tag' = :u"), {"u": tag}).scalar_one()
-        leaked = conn.execute(text("SELECT count(*) FROM ops.audit WHERE action LIKE 'session.login_%' "
-                                   "AND (target::text LIKE :m OR details::text LIKE :m)"),
-                              {"m": f"%{marker}%"}).scalar_one()
+        n = conn.execute(
+            text(
+                "SELECT count(*) FROM ops.audit WHERE action = 'session.login_rate_limited' "
+                "AND target->>'username_tag' = :u"
+            ),
+            {"u": tag},
+        ).scalar_one()
+        leaked = conn.execute(
+            text(
+                "SELECT count(*) FROM ops.audit WHERE action LIKE 'session.login_%' "
+                "AND (target::text LIKE :m OR details::text LIKE :m)"
+            ),
+            {"m": f"%{marker}%"},
+        ).scalar_one()
     assert n == 1
     assert leaked == 0  # P8: the typed username is not stored verbatim
 
@@ -395,8 +448,11 @@ def test_service_token_with_human_label_cannot_review(db: Any, dbapp: Any) -> No
 def test_idempotency_keys_are_namespaced_per_principal(db: Any, dbapp: Any) -> None:
     tok_a = _token(db, ["read", "simulate"], f"svc-a-{uuid.uuid4().hex[:6]}")
     tok_b = _token(db, ["read", "simulate"], f"svc-b-{uuid.uuid4().hex[:6]}")
-    body = {"mode": "operational_as_known", "cutoff": (datetime.now(UTC) - timedelta(days=1)).isoformat(),
-            "concepts": ["demography.population.wdi_midyear_total"]}
+    body = {
+        "mode": "operational_as_known",
+        "cutoff": (datetime.now(UTC) - timedelta(days=1)).isoformat(),
+        "concepts": ["demography.population.wdi_midyear_total"],
+    }
     key = {"Idempotency-Key": f"shared-key-{uuid.uuid4().hex}"}
     ids: list[str] = []
     with TestClient(dbapp) as c:
@@ -418,8 +474,12 @@ def test_idempotency_keys_are_namespaced_per_principal(db: Any, dbapp: Any) -> N
             assert rs.status_code == 202 and rs.json()["job_id"] not in ids
             ids.append(rs.json()["job_id"])
             with db.owner.connect() as conn:
-                creators = dict(conn.execute(text("SELECT id::text, created_by FROM ops.job WHERE id = ANY(:i)"),
-                                             {"i": [uuid.UUID(i) for i in ids]}).all())
+                creators = dict(
+                    conn.execute(
+                        text("SELECT id::text, created_by FROM ops.job WHERE id = ANY(:i)"),
+                        {"i": [uuid.UUID(i) for i in ids]},
+                    ).all()
+                )
             assert creators[ids[2]] == "human:admin" and creators[ids[0]].startswith("token:svc-a-")
         finally:
             for jid in ids:  # never leave queued jobs for workers in the shared test database
@@ -446,8 +506,11 @@ def test_database_errors_do_not_leak_sql(dbapp: Any, db: Any) -> None:
     sim = _token(db, ["read", "simulate"], f"leak-{uuid.uuid4().hex[:6]}")
     with TestClient(dbapp) as c:
         # A 300-character key passes no client check of length 8..200: rejected by the API, not the DB.
-        r = c.post("/v1/replay", json={"mode": "operational_as_known", "cutoff": "2020-01-01T00:00:00Z"},
-                   headers={**sim, "Idempotency-Key": "k" * 300})
+        r = c.post(
+            "/v1/replay",
+            json={"mode": "operational_as_known", "cutoff": "2020-01-01T00:00:00Z"},
+            headers={**sim, "Idempotency-Key": "k" * 300},
+        )
         assert r.status_code == 400 and r.json()["code"] == "invalid_idempotency_key"
         for url in ("/v1/jobs?cursor=%00%00", "/v1/beliefs?as_of=not-a-time", f"/v1/provenance/artifact/{'z' * 64}"):
             r = c.get(url, headers=sim)

@@ -51,8 +51,9 @@ def _iso_z(t: datetime) -> str:
     return t.isoformat().replace("+00:00", "Z")
 
 
-def build_spec(release: dict[str, Any], countries: list[str], fidelity: str, scenario: str,
-               knowledge_cutoff: datetime) -> dict[str, Any]:
+def build_spec(
+    release: dict[str, Any], countries: list[str], fidelity: str, scenario: str, knowledge_cutoff: datetime
+) -> dict[str, Any]:
     """``knowledge_cutoff`` must come from the database clock (see :func:`db_cutoff`)."""
     if knowledge_cutoff.tzinfo is None:
         raise ValidationProblem("knowledge_cutoff must be timezone-aware")
@@ -69,7 +70,8 @@ def build_spec(release: dict[str, Any], countries: list[str], fidelity: str, sce
             "no_general_equilibrium": True,
             "elasticity_grid": [
                 {"import_elasticity": ei, "export_elasticity": ex, "basis": "scenario_assumption"}
-                for ei in (-0.5, -0.25, 0.0) for ex in (0.0, 0.25)
+                for ei in (-0.5, -0.25, 0.0)
+                for ex in (0.0, 0.25)
             ],
         }
     return spec
@@ -79,8 +81,11 @@ def db_cutoff(engine: Engine, release: dict[str, Any]) -> datetime:
     """Database clock in UTC (whole seconds, rounded *up*), never before the release cutoff."""
     with engine.connect() as conn:
         now: datetime = conn.execute(
-            text("SELECT date_trunc('second', clock_timestamp() AT TIME ZONE 'UTC' + interval '1 second') "
-                 "AT TIME ZONE 'UTC'")).scalar_one()
+            text(
+                "SELECT date_trunc('second', clock_timestamp() AT TIME ZONE 'UTC' + interval '1 second') "
+                "AT TIME ZONE 'UTC'"
+            )
+        ).scalar_one()
     now = now.astimezone(UTC)
     rc = release.get("knowledge_cutoff")
     if isinstance(rc, datetime) and rc.tzinfo is not None and rc.astimezone(UTC) > now:
@@ -91,17 +96,24 @@ def db_cutoff(engine: Engine, release: dict[str, Any]) -> datetime:
 
 def worker_running(engine: Engine, fresh_seconds: int = WORKER_FRESH_SECONDS) -> bool:
     with engine.connect() as conn:
-        return bool(conn.execute(
-            text("SELECT EXISTS (SELECT 1 FROM ops.worker_presence "
-                 "WHERE last_seen > clock_timestamp() - make_interval(secs => :s))"),
-            {"s": fresh_seconds},
-        ).scalar_one())
+        return bool(
+            conn.execute(
+                text(
+                    "SELECT EXISTS (SELECT 1 FROM ops.worker_presence "
+                    "WHERE last_seen > clock_timestamp() - make_interval(secs => :s))"
+                ),
+                {"s": fresh_seconds},
+            ).scalar_one()
+        )
 
 
 def _job_row(engine: Engine, job_id: Any) -> dict[str, Any]:
     with engine.connect() as conn:
-        return dict(conn.execute(text("SELECT status, result_ref, last_error FROM ops.job WHERE id=:j"),
-                                 {"j": job_id}).mappings().one())
+        return dict(
+            conn.execute(text("SELECT status, result_ref, last_error FROM ops.job WHERE id=:j"), {"j": job_id})
+            .mappings()
+            .one()
+        )
 
 
 def _wait(engine: Engine, job_id: Any, timeout: float, poll: float = 1.0) -> dict[str, Any]:
@@ -118,8 +130,17 @@ def _run_locally(job_id: Any, settings: Any) -> str:
     from reva.operations.worker import Worker
 
     worker_engine = get_engine("worker")
-    w = Worker(settings, worker_engine, get_store(), get_engine("sim"), worker_id="cli-demo",
-               concurrency=1, scheduler=False, invalidation=False, job_types=["simulation"])
+    w = Worker(
+        settings,
+        worker_engine,
+        get_store(),
+        get_engine("sim"),
+        worker_id="cli-demo",
+        concurrency=1,
+        scheduler=False,
+        invalidation=False,
+        job_types=["simulation"],
+    )
     job = queue.claim_job(worker_engine, UUID(str(job_id)), w.worker_id, w.lease_seconds)
     if job is None:
         return "not_claimed"  # a worker picked it up meanwhile
@@ -135,8 +156,15 @@ def _run_locally(job_id: Any, settings: Any) -> str:
             signal.signal(sig, h)
 
 
-def run_demo(*, scenario: str, countries: list[str], fidelity: str, origin: str = "live",
-             wait_seconds: float = 600.0, execute_locally: bool | None = None) -> dict[str, Any]:
+def run_demo(
+    *,
+    scenario: str,
+    countries: list[str],
+    fidelity: str,
+    origin: str = "live",
+    wait_seconds: float = 600.0,
+    execute_locally: bool | None = None,
+) -> dict[str, Any]:
     """Create and run the demo scenario.
 
     ``execute_locally``: ``None`` (default) runs the job here only when no worker is
@@ -180,9 +208,10 @@ def run_demo(*, scenario: str, countries: list[str], fidelity: str, origin: str 
     rows: list[Any] = []
     if run_id:
         with api.connect() as conn:
-            rows = list(conn.execute(
-                text(
-                    """SELECT e.label AS country, r.output_key, r.variant, r.value->>'value' AS value,
+            rows = list(
+                conn.execute(
+                    text(
+                        """SELECT e.label AS country, r.output_key, r.variant, r.value->>'value' AS value,
                               r.value->>'unit_ref' AS unit, r.uncertainty->>'kind' AS uncertainty_kind,
                               CASE WHEN r.value->>'kind' = 'sensitivity_range' THEN r.value->>'lower'
                                    ELSE r.uncertainty->>'lower' END AS lower,
@@ -192,14 +221,21 @@ def run_demo(*, scenario: str, countries: list[str], fidelity: str, origin: str 
                        FROM sim.result r
                        LEFT JOIN world.entity e ON e.id = r.subject_id
                        WHERE r.run_id = :r ORDER BY e.label, r.output_key, r.variant"""
-                ),
-                {"r": run_id},
-            ).mappings().all())
+                    ),
+                    {"r": run_id},
+                )
+                .mappings()
+                .all()
+            )
     return {
         "context": "SIMULATION — assumption-conditioned accounting stress test (not a forecast; not GDP loss)",
         "scenario_id": str(scenario_id),
-        "baseline_release": {"id": str(release["id"]), "sequence": release["sequence"],
-                             "knowledge_cutoff": release["knowledge_cutoff"], "origin": release["origin"]},
+        "baseline_release": {
+            "id": str(release["id"]),
+            "sequence": release["sequence"],
+            "knowledge_cutoff": release["knowledge_cutoff"],
+            "origin": release["origin"],
+        },
         "knowledge_cutoff": spec.as_json().get("knowledge_cutoff"),
         "execution": execution,
         "job": {"id": str(job_id), **row},

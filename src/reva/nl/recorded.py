@@ -51,40 +51,56 @@ def load_fixtures(directory: Path) -> list[dict[str, Any]]:
 class RecordedDrafter:
     """Replays fixtures by (text sha256, provider). Offline; never touches the network."""
 
-    def __init__(self, directory: Path | list[Path], *, provider: str = "openai",
-                 model: str | None = None) -> None:
+    def __init__(self, directory: Path | list[Path], *, provider: str = "openai", model: str | None = None) -> None:
         dirs = directory if isinstance(directory, list) else [directory]
         self.fixtures = [f for d in dirs for f in load_fixtures(d)]
         self.provider = provider
-        self.model = model or next((f["model_requested"] for f in self.fixtures if f["provider"] == provider),
-                                   "recorded")
+        self.model = model or next(
+            (f["model_requested"] for f in self.fixtures if f["provider"] == provider), "recorded"
+        )
         self.calls: list[str] = []
 
     def find(self, text_sha256: str) -> dict[str, Any] | None:
-        return next((f for f in self.fixtures
-                     if f["text_sha256"] == text_sha256 and f["provider"] == self.provider), None)
+        return next(
+            (f for f in self.fixtures if f["text_sha256"] == text_sha256 and f["provider"] == self.provider), None
+        )
 
     async def complete(self, request: LlmRequest) -> LlmResponse:
         self.calls.append(request.text_sha256)
         fx = self.find(request.text_sha256)
         if fx is None:
-            raise LlmProviderError("no recorded response for this text (offline replay)",
-                                   reason="fixture_missing", provider=self.provider)
+            raise LlmProviderError(
+                "no recorded response for this text (offline replay)", reason="fixture_missing", provider=self.provider
+            )
         if fx["prompt_version"] != request.prompt_version:
-            raise LlmProviderError(f"fixture {fx['_file']} was recorded with prompt {fx['prompt_version']}, "
-                                   f"not {request.prompt_version}: re-capture it", reason="fixture_stale")
+            raise LlmProviderError(
+                f"fixture {fx['_file']} was recorded with prompt {fx['prompt_version']}, "
+                f"not {request.prompt_version}: re-capture it",
+                reason="fixture_stale",
+            )
         status = int(fx.get("http_status", 200))
         if status != 200:
             from reva.adapters.http.safe_client import HttpResult
             from reva.nl.providers import _status_error
 
-            raise _status_error(self.provider, HttpResult(
-                url="recorded", final_url="recorded", status=status, headers={},
-                body=json.dumps(fx["response_body"]).encode(), retrieved_at=datetime.now(UTC),
-                elapsed_seconds=0.0, redirects=(), attempts=1))
+            raise _status_error(
+                self.provider,
+                HttpResult(
+                    url="recorded",
+                    final_url="recorded",
+                    status=status,
+                    headers={},
+                    body=json.dumps(fx["response_body"]).encode(),
+                    retrieved_at=datetime.now(UTC),
+                    elapsed_seconds=0.0,
+                    redirects=(),
+                    attempts=1,
+                ),
+            )
         parser = _parser(fx["provider"], fx["model_requested"])
-        return parser.parse(json.dumps(fx["response_body"]).encode(), latency_ms=float(fx.get("latency_ms", 0)),
-                            recorded=True)
+        return parser.parse(
+            json.dumps(fx["response_body"]).encode(), latency_ms=float(fx.get("latency_ms", 0)), recorded=True
+        )
 
 
 def redact_body(body: Any) -> Any:
@@ -95,16 +111,27 @@ def redact_body(body: Any) -> Any:
     return body
 
 
-async def capture(drafter: OpenAIDrafter | GeminiDrafter, request: LlmRequest, *, text: str, catalog_digest: str,
-                  prompt_sha256: str, out: Path, label: str) -> dict[str, Any]:
+async def capture(
+    drafter: OpenAIDrafter | GeminiDrafter,
+    request: LlmRequest,
+    *,
+    text: str,
+    catalog_digest: str,
+    prompt_sha256: str,
+    out: Path,
+    label: str,
+) -> dict[str, Any]:
     """One live call (maintainers only, outside CI); writes a redacted fixture and returns it."""
     from reva.nl.http import LlmHttpClient
 
     client = LlmHttpClient()
     t0 = time.perf_counter()
     try:
-        url = ("https://api.openai.com/v1/chat/completions" if drafter.provider == "openai" else
-               f"https://generativelanguage.googleapis.com/v1beta/models/{drafter.model}:generateContent")
+        url = (
+            "https://api.openai.com/v1/chat/completions"
+            if drafter.provider == "openai"
+            else f"https://generativelanguage.googleapis.com/v1beta/models/{drafter.model}:generateContent"
+        )
         result = await client.post_json(url, drafter.payload(request))
     finally:
         await client.aclose()

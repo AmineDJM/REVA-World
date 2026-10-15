@@ -23,8 +23,7 @@ FIXTURE_COUNTRIES = ("LI", "LU")
 
 
 def connector() -> ed.EurostatDemographyConnector:
-    return ed.EurostatDemographyConnector(countries=FIXTURE_COUNTRIES, since_year=2008,
-                                          window_years=ed.WINDOW_YEARS)
+    return ed.EurostatDemographyConnector(countries=FIXTURE_COUNTRIES, since_year=2008, window_years=ed.WINDOW_YEARS)
 
 
 def raws() -> dict[str, RawAcquisition]:
@@ -167,8 +166,7 @@ def test_unknown_flag_negative_count_and_drift_block(fixture_raws: dict[str, Raw
     def unit(d: dict[str, Any]) -> None:
         d["dimension"]["unit"]["category"]["index"] = {"THS": 0}
 
-    for mutate, code in ((unknown_flag, "unknown_status_flag"), (negative, "negative_count"),
-                         (unit, "unit_changed")):
+    for mutate, code in ((unknown_flag, "unknown_status_flag"), (negative, "negative_count"), (unit, "unit_changed")):
         [b] = list(c.parse(_override(raw, mutate)))
         q = c.validate(b)
         assert q.outcome == "blocked" and any(f.code == code for f in q.findings), code
@@ -182,8 +180,9 @@ def test_confidentiality_status_is_missing_suppressed_never_zero(fixture_raws: d
     def conf(d: dict[str, Any]) -> None:
         d["value"].pop("0", None)
         d["status"] = {**(d.get("status") or {}), "0": "|N"}
-        d["extension"]["status"] = {"label": {**((d["extension"].get("status") or {}).get("label") or {}),
-                                              "|N": "|not for publication"}}
+        d["extension"]["status"] = {
+            "label": {**((d["extension"].get("status") or {}).get("label") or {}), "|N": "|not for publication"}
+        }
 
     [b] = list(c.parse(_override(fixture_raws["demo_fasec:LU:2008"], conf)))
     assert c.validate(b).outcome == "pass"
@@ -206,4 +205,5 @@ def test_registry_entries_exist() -> None:
     assert {m["target"]["concept_id"] for m in maps} == {ed.DATASETS[k].concept_id for k in ed.OBSERVED}
     assert all(m["mapping_kind"] == "exact" for m in maps)
     assert budgets_policy().content["per_source_daily_requests"]["eurostat.demography"] >= len(
-        builtin_connectors()["eurostat.demography"].all_items())
+        builtin_connectors()["eurostat.demography"].all_items()
+    )

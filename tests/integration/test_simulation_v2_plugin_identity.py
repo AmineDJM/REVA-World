@@ -41,10 +41,12 @@ CAPTURE = os.environ.get("REVA_CAPTURE_SIM_GOLDEN")
 _UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$")
 SUBJECTS = {str(entity_id(i)): i for i in ("FRA", "CHN", "USA", "DZA")}
 MASK_KEYS = {"baseline_digest", "compute_seconds", "cache_hit_of"}
-GRID = [{"import_elasticity": -0.5, "export_elasticity": 0.0, "basis": "scenario_assumption"},
-        {"import_elasticity": 0.0, "export_elasticity": 0.0, "basis": "scenario_assumption"},
-        {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"},
-        {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"}]
+GRID = [
+    {"import_elasticity": -0.5, "export_elasticity": 0.0, "basis": "scenario_assumption"},
+    {"import_elasticity": 0.0, "export_elasticity": 0.0, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"},
+    {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"},
+]
 
 
 def mask(obj: Any) -> Any:
@@ -99,48 +101,88 @@ def run(db, scenario_id: UUID, fidelity: str) -> dict[str, Any]:
         token = conn.execute(
             text("""UPDATE ops.job SET status='running', worker_id='identity', lease_until=now()+interval '10 minutes',
                         fencing_token=nextval('ops.fencing_seq'), attempts=attempts+1
-                    WHERE id=:j RETURNING fencing_token"""), {"j": jid}).scalar_one()
+                    WHERE id=:j RETURNING fencing_token"""),
+            {"j": jid},
+        ).scalar_one()
 
     def heartbeat(_p: dict[str, Any] | None = None) -> str:
         with db.owner.connect() as c:
             return str(c.execute(text("SELECT status FROM ops.job WHERE id=:j"), {"j": jid}).scalar_one())
 
-    ctx = JobContext(job_id=jid, job_type="simulation", worker_id="identity", fencing_token=int(token), attempt=1,
-                     settings=db.settings, worker_engine=db.worker, sim_engine=db.sim, store=db.store,
-                     heartbeat=heartbeat)
+    ctx = JobContext(
+        job_id=jid,
+        job_type="simulation",
+        worker_id="identity",
+        fencing_token=int(token),
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=db.sim,
+        store=db.store,
+        heartbeat=heartbeat,
+    )
     return handle_simulation(payload, ctx)
 
 
 def snapshot(db, ref: dict[str, Any]) -> dict[str, Any]:
     with db.owner.connect() as c:
-        run_row = c.execute(text("SELECT seed_plan, execution_profile FROM sim.run WHERE id=:r"),
-                            {"r": ref["run_id"]}).mappings().one()
-        outcome = c.execute(text("SELECT status, output_digest, applicability, problems, cost FROM sim.run_outcome "
-                                 "WHERE run_id=:r"), {"r": ref["run_id"]}).mappings().one()
-        rows = c.execute(text("""SELECT output_key, subject_id::text AS subject_id, variant, value, uncertainty,
+        run_row = (
+            c.execute(text("SELECT seed_plan, execution_profile FROM sim.run WHERE id=:r"), {"r": ref["run_id"]})
+            .mappings()
+            .one()
+        )
+        outcome = (
+            c.execute(
+                text(
+                    "SELECT status, output_digest, applicability, problems, cost FROM sim.run_outcome WHERE run_id=:r"
+                ),
+                {"r": ref["run_id"]},
+            )
+            .mappings()
+            .one()
+        )
+        rows = (
+            c.execute(
+                text("""SELECT output_key, subject_id::text AS subject_id, variant, value, uncertainty,
                                         applicability FROM sim.result WHERE run_id=:r
-                                 ORDER BY output_key, subject_id, variant"""), {"r": ref["run_id"]}).mappings().all()
+                                 ORDER BY output_key, subject_id, variant"""),
+                {"r": ref["run_id"]},
+            )
+            .mappings()
+            .all()
+        )
     ep = dict(run_row["execution_profile"])
     for k in ("job_id", "attempt", "worker_id", "model_manifest_logical_sha256", "cache_key"):
         ep.pop(k, None)
-    return mask({
-        "status": ref["status"],
-        "output_digest": ref["output_digest"],
-        "problems": ref["problems"],
-        "outcome": {k: outcome[k] for k in ("status", "output_digest", "applicability", "problems")},
-        "cost": {k: v for k, v in outcome["cost"].items() if k != "compute_seconds"},
-        "seed_plan": run_row["seed_plan"],
-        "execution_profile": ep,
-        "rows": [dict(r) for r in rows],
-    })
+    return mask(
+        {
+            "status": ref["status"],
+            "output_digest": ref["output_digest"],
+            "problems": ref["problems"],
+            "outcome": {k: outcome[k] for k in ("status", "output_digest", "applicability", "problems")},
+            "cost": {k: v for k, v in outcome["cost"].items() if k != "compute_seconds"},
+            "seed_plan": run_row["seed_plan"],
+            "execution_profile": ep,
+            "rows": [dict(r) for r in rows],
+        }
+    )
 
 
 def scenarios(baseline: dict[str, Any]) -> dict[str, tuple[dict[str, Any], str]]:
     return {
         "l1_three": (make_spec(baseline), "L1"),
-        "l2_grid": (make_spec(baseline, fidelity="L2", assumptions={
-            "quantity_response": "elasticity_sensitivity", "elasticity_grid": GRID,
-            "no_general_equilibrium": True}), "L2"),
+        "l2_grid": (
+            make_spec(
+                baseline,
+                fidelity="L2",
+                assumptions={
+                    "quantity_response": "elasticity_sensitivity",
+                    "elasticity_grid": GRID,
+                    "no_general_equilibrium": True,
+                },
+            ),
+            "L2",
+        ),
         "all_four_missing_dza": (make_spec(baseline, countries=["FRA", "DZA", "CHN", "USA"]), "L1"),
         "l3_reserved": (make_spec(baseline), "L3"),
         "l0_miss": (make_spec(baseline, seed=99, title="Test: identity cache"), "L0"),
@@ -160,8 +202,9 @@ def test_crude_plugin_reproduces_v1_engine_on_fixture_release(db, baseline):
         got[name] = snapshot(db, ref)
         # the L0 cache key is the exact-spec identity, excluding only the fidelity (V1 formula)
         with db.owner.connect() as c:
-            ck = c.execute(text("SELECT execution_profile->>'cache_key' FROM sim.run WHERE id=:r"),
-                           {"r": ref["run_id"]}).scalar_one()
+            ck = c.execute(
+                text("SELECT execution_profile->>'cache_key' FROM sim.run WHERE id=:r"), {"r": ref["run_id"]}
+            ).scalar_one()
         stored = validate_scenario_spec({**spec, "fidelity": "L1" if fid in ("L0", "L3") else fid}).as_json()
         assert ck == logical_hash({k: v for k, v in stored.items() if k != "fidelity"}), name
     assert got["l0_hit"]["output_digest"] == got["l1_for_cache"]["output_digest"]

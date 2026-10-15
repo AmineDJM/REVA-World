@@ -1159,16 +1159,27 @@ def publication_staleness(
     for w in recorded or []:
         if isinstance(w, dict) and w.get("concept_id"):
             marks[str(w["concept_id"])] = {
-                "stale": True, "reason": w.get("reason") or SCHEMA_QUARANTINE, "pause_reason": w.get("pause_reason"),
-                "proposal_id": w.get("proposal_id"), "paused_since": w.get("paused_since"),
-                "withheld_in_release": True}
+                "stale": True,
+                "reason": w.get("reason") or SCHEMA_QUARANTINE,
+                "pause_reason": w.get("pause_reason"),
+                "proposal_id": w.get("proposal_id"),
+                "paused_since": w.get("paused_since"),
+                "withheld_in_release": True,
+            }
     for r in conn.execute(text(_PAUSE_MARKERS_SQL), {"p": PAUSE_MARKER_PREFIX + "%", "as_of": as_of}).mappings():
-        concept = str(r["node_key"])[len(PAUSE_MARKER_PREFIX):]
+        concept = str(r["node_key"])[len(PAUSE_MARKER_PREFIX) :]
         bound = dict(r["accumulated_error_bound"] or {})
-        mark = marks.setdefault(concept, {
-            "stale": True, "reason": bound.get("basis") or SCHEMA_QUARANTINE, "pause_reason": r["reason"],
-            "proposal_id": bound.get("proposal_id"), "paused_since": r["updated_at"].isoformat(),
-            "withheld_in_release": False})
+        mark = marks.setdefault(
+            concept,
+            {
+                "stale": True,
+                "reason": bound.get("basis") or SCHEMA_QUARANTINE,
+                "pause_reason": r["reason"],
+                "proposal_id": bound.get("proposal_id"),
+                "paused_since": r["updated_at"].isoformat(),
+                "withheld_in_release": False,
+            },
+        )
         mark["pause_active"] = True
     return marks
 
@@ -1178,13 +1189,19 @@ def last_release_with_concept(conn: Connection, release: dict[str, Any], concept
     estimates of ``concept_id`` (the last accepted release for a withheld concept)."""
     if release.get("sequence") is None:
         return None
-    row = conn.execute(text(_LAST_RELEASE_WITH_CONCEPT_SQL),
-                       {"o": release["origin"], "seq": release["sequence"], "c": concept_id}).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text(_LAST_RELEASE_WITH_CONCEPT_SQL), {"o": release["origin"], "seq": release["sequence"], "c": concept_id}
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 
-def _annotate(row: dict[str, Any], mark: dict[str, Any] | None, served_from: UUID | Any,
-              fallback: bool) -> dict[str, Any]:
+def _annotate(
+    row: dict[str, Any], mark: dict[str, Any] | None, served_from: UUID | Any, fallback: bool
+) -> dict[str, Any]:
     row["stale"] = mark is not None
     row["stale_reason"] = None if mark is None else mark["reason"]
     row["proposal_id"] = None if mark is None else mark.get("proposal_id")
@@ -1202,8 +1219,12 @@ class ReleaseEstimates:
     notes: tuple[str, ...]
 
     def as_dict(self) -> dict[str, Any]:
-        return {"release": self.release, "estimates": list(self.estimates), "stale_concepts": self.stale_concepts,
-                "notes": list(self.notes)}
+        return {
+            "release": self.release,
+            "estimates": list(self.estimates),
+            "stale_concepts": self.stale_concepts,
+            "notes": list(self.notes),
+        }
 
 
 def release_estimates(
@@ -1233,8 +1254,10 @@ def release_estimates(
     if rel is None or rel.get("sequence") is None:
         return ReleaseEstimates(None, (), {}, ("no published belief release is available for this query",))
     marks = publication_staleness(conn, rel, as_of=as_of)
-    out = [_annotate(r, marks.get(r["concept_id"]), rel["id"], False)
-           for r in release_rows(conn, rel["id"], subject_id=subject_id, concept_id=concept_id)]
+    out = [
+        _annotate(r, marks.get(r["concept_id"]), rel["id"], False)
+        for r in release_rows(conn, rel["id"], subject_id=subject_id, concept_id=concept_id)
+    ]
     for concept, mark in sorted(marks.items()):
         if not mark.get("withheld_in_release") or (concept_id is not None and concept != concept_id):
             continue
@@ -1243,15 +1266,20 @@ def release_estimates(
             notes.append(f"{concept}: withheld ({mark['reason']}) and no earlier release published it")
             continue
         have = {(r["subject_id"], r["support_id"]) for r in out if r["concept_id"] == concept}
-        rows = [r for r in release_rows(conn, prev["id"], subject_id=subject_id, concept_id=concept)
-                if (r["subject_id"], r["support_id"]) not in have]
+        rows = [
+            r
+            for r in release_rows(conn, prev["id"], subject_id=subject_id, concept_id=concept)
+            if (r["subject_id"], r["support_id"]) not in have
+        ]
         out.extend(_annotate(r, mark, prev["id"], True) for r in rows)
-        notes.append(f"{concept}: publication paused ({mark['reason']}); serving release sequence "
-                     f"{prev['sequence']} as stale")
+        notes.append(
+            f"{concept}: publication paused ({mark['reason']}); serving release sequence {prev['sequence']} as stale"
+        )
     for concept, mark in sorted(marks.items()):
         if not mark.get("withheld_in_release") and any(r["concept_id"] == concept for r in out):
-            notes.append(f"{concept}: publication paused since {mark['paused_since']} ({mark['reason']}); "
-                         "estimates are stale")
+            notes.append(
+                f"{concept}: publication paused since {mark['paused_since']} ({mark['reason']}); estimates are stale"
+            )
     return ReleaseEstimates(rel, tuple(out), marks, tuple(notes))
 
 
@@ -1423,9 +1451,14 @@ def compare_claims(
                     _annotate(est, mark, str(rel_id), fallback)
                 estimates.append(est)
         if mark is not None:
-            notes.append(f"publication of {concept_id} is paused ({mark['reason']}); accepted estimates are stale"
-                         + (" (served from the last release that published it)"
-                            if any(e.get("served_as") == "last_accepted_release" for e in estimates) else ""))
+            notes.append(
+                f"publication of {concept_id} is paused ({mark['reason']}); accepted estimates are stale"
+                + (
+                    " (served from the last release that published it)"
+                    if any(e.get("served_as") == "last_accepted_release" for e in estimates)
+                    else ""
+                )
+            )
         if not estimates:
             notes.append("the release holds no accepted estimate for this subject/concept/support")
         if any(e["modality"] == "selected_report" for e in estimates):

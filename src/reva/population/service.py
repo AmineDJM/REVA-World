@@ -27,9 +27,9 @@ from reva.population.recipe import SourceCell, build_recipe
 from reva.ports.storage import ArtifactStore
 
 CONCEPT = "demography.population.jan1_age_sex"
-FIVE_YEAR_BANDS: list[tuple[str, int, int | None]] = [
-    (f"Y{lo}-{lo + 4}", lo, lo + 4) for lo in range(0, 85, 5)
-] + [("Y_GE85", 85, None)]
+FIVE_YEAR_BANDS: list[tuple[str, int, int | None]] = [(f"Y{lo}-{lo + 4}", lo, lo + 4) for lo in range(0, 85, 5)] + [
+    ("Y_GE85", 85, None)
+]
 
 
 def _integral_count(value: Any, source_key: str) -> int:
@@ -76,24 +76,46 @@ def load_cells(engine: Engine, *, geo_entity: str, year: int, cutoff: datetime, 
         st = (r.get("source_flags") or {}).get("status") or ""
         raw_codes = st if isinstance(st, (list, tuple)) else list(str(st))
         flags = tuple(sorted({str(c).strip() for c in raw_codes if str(c).strip()}))
-        cells.append(SourceCell(age_code=str(res.get("age")), sex_code=str(res.get("sex")), count=count,
-                                flags=flags, source_key=r["logical_key"]))
+        cells.append(
+            SourceCell(
+                age_code=str(res.get("age")),
+                sex_code=str(res.get("sex")),
+                count=count,
+                flags=flags,
+                source_key=r["logical_key"],
+            )
+        )
     if not cells:
-        raise MissingInput(f"no eligible {CONCEPT} cells for {geo_entity} {year} at cutoff",
-                           input=CONCEPT, geography=geo_entity, year=year)
+        raise MissingInput(
+            f"no eligible {CONCEPT} cells for {geo_entity} {year} at cutoff",
+            input=CONCEPT,
+            geography=geo_entity,
+            year=year,
+        )
     return cells
 
 
 def build_population(
-    worker: Engine, store: ArtifactStore, *, geo_entity: str = "FRA", year: int = 2023, n_records: int = 100_000,
-    seed: int = 20260101, origin: str = "live", cutoff: datetime | None = None, actor: str = "worker:population",
+    worker: Engine,
+    store: ArtifactStore,
+    *,
+    geo_entity: str = "FRA",
+    year: int = 2023,
+    n_records: int = 100_000,
+    seed: int = 20260101,
+    origin: str = "live",
+    cutoff: datetime | None = None,
+    actor: str = "worker:population",
 ) -> dict[str, Any]:
     cutoff = cutoff or datetime.now(UTC)
     cells = load_cells(worker, geo_entity=geo_entity, year=year, cutoff=cutoff, origin=origin)
-    recipe = build_recipe(cells, geography=geo_entity, reference_date=date(year, 1, 1),
-                          source_ref={"concept": CONCEPT, "dataset": "eurostat demo_pjan",
-                                      "cutoff": cutoff.isoformat()},
-                          seed=seed)
+    recipe = build_recipe(
+        cells,
+        geography=geo_entity,
+        reference_date=date(year, 1, 1),
+        source_ref={"concept": CONCEPT, "dataset": "eurostat demo_pjan", "cutoff": cutoff.isoformat()},
+        seed=seed,
+    )
     table = materialise(recipe, n_records)
     diag = diagnose(table, recipe)
     pq_obj = store.put_bytes(to_parquet_bytes(table), "models", "application/vnd.apache.parquet")
@@ -117,25 +139,40 @@ def build_population(
         except (ValidationProblem, UnsupportedRefinement, IncompatibleSemantics) as e:
             compression["refine"] = {"status": "not_applicable", "reason": e.message}
         else:
-            refined_obj = store.put_bytes(to_parquet_bytes(refined.table), "models",
-                                          "application/vnd.apache.parquet")
+            refined_obj = store.put_bytes(to_parquet_bytes(refined.table), "models", "application/vnd.apache.parquet")
             steps.append(("refine", refined, refined_obj))
             compression["refine"] = {"status": "applied", "output_sha256": refined_obj.sha256}
     diag = {**diag, "compression": compression}
     with worker.begin() as conn:
-        act = repo.simple_activity("population.materialise", "model", actor,
-                                   {"geo": geo_entity, "year": year, "n_records": n_records, "seed": seed})
-        recipe_sha = repo.store_json_artifact(conn, store, recipe.to_dict(), "models",
-                                              schema_version="population-recipe/1",
-                                              privacy_class="synthetic_public_aggregate_derived")
+        act = repo.simple_activity(
+            "population.materialise",
+            "model",
+            actor,
+            {"geo": geo_entity, "year": year, "n_records": n_records, "seed": seed},
+        )
+        recipe_sha = repo.store_json_artifact(
+            conn,
+            store,
+            recipe.to_dict(),
+            "models",
+            schema_version="population-recipe/1",
+            privacy_class="synthetic_public_aggregate_derived",
+        )
         for obj, logical in [(pq_obj, table_logical_hash(table))] + [
-                (o, table_logical_hash(res.table)) for _op, res, o in steps]:
-            repo.register_artifact(conn, obj, schema_version="population-records/1",
-                                   rights={"licence": "derived from Eurostat (CC BY 4.0)"},
-                                   privacy_class="synthetic_public_aggregate_derived", logical_sha256=logical)
+            (o, table_logical_hash(res.table)) for _op, res, o in steps
+        ]:
+            repo.register_artifact(
+                conn,
+                obj,
+                schema_version="population-records/1",
+                rights={"licence": "derived from Eurostat (CC BY 4.0)"},
+                privacy_class="synthetic_public_aggregate_derived",
+                logical_sha256=logical,
+            )
         repo.record_activity(conn, act, outputs=[recipe_sha, pq_obj.sha256, *(o.sha256 for _op, _r, o in steps)])
-        ctx_id = repo.create_context(conn, mode="population", origin=origin, manifest_sha256=recipe_sha,
-                                     knowledge_cutoff=cutoff)
+        ctx_id = repo.create_context(
+            conn, mode="population", origin=origin, manifest_sha256=recipe_sha, knowledge_cutoff=cutoff
+        )
         pid = conn.execute(
             text(
                 """INSERT INTO model.population_dataset(context_id, recipe_sha256, materialisation_sha256,
@@ -143,9 +180,16 @@ def build_population(
                    VALUES (:c, :r, :m, CAST(:sa AS jsonb), :n, CAST(:d AS jsonb), CAST(:sp AS jsonb),
                            'synthetic_public_aggregate_derived', :a) RETURNING id"""
             ),
-            {"c": ctx_id, "r": recipe_sha, "m": pq_obj.sha256, "sa": json.dumps(["age", "sex"]), "n": table.num_rows,
-             "d": json.dumps(diag, default=str), "sp": json.dumps({"seed": seed, "allocator": "largest_remainder"}),
-             "a": act.id},
+            {
+                "c": ctx_id,
+                "r": recipe_sha,
+                "m": pq_obj.sha256,
+                "sa": json.dumps(["age", "sex"]),
+                "n": table.num_rows,
+                "d": json.dumps(diag, default=str),
+                "sp": json.dumps({"seed": seed, "allocator": "largest_remainder"}),
+                "a": act.id,
+            },
         ).scalar_one()
         for op, res, obj in steps:
             conn.execute(
@@ -154,19 +198,35 @@ def build_population(
                          certificate, output_sha256, provenance_activity_id)
                        VALUES (:p, :o, CAST(:t AS jsonb), CAST(:c AS jsonb), :s, :a)"""
                 ),
-                {"p": pid, "o": op, "t": json.dumps({"task": "age_band_reporting"}),
-                 "c": json.dumps(res.certificate.to_dict(), default=str), "s": obj.sha256, "a": act.id},
+                {
+                    "p": pid,
+                    "o": op,
+                    "t": json.dumps({"task": "age_band_reporting"}),
+                    "c": json.dumps(res.certificate.to_dict(), default=str),
+                    "s": obj.sha256,
+                    "a": act.id,
+                },
             )
-    return {"population_dataset_id": str(pid), "context_id": str(ctx_id), "records": table.num_rows,
-            "recipe_sha256": recipe_sha, "materialisation_sha256": pq_obj.sha256,
-            "ess": diag.get("effective_sample_size"), "leaf_cells": len(recipe.leaf_cells),
-            "totals_status": recipe.totals_status, "compression": compression}
+    return {
+        "population_dataset_id": str(pid),
+        "context_id": str(ctx_id),
+        "records": table.num_rows,
+        "recipe_sha256": recipe_sha,
+        "materialisation_sha256": pq_obj.sha256,
+        "ess": diag.get("effective_sample_size"),
+        "leaf_cells": len(recipe.leaf_cells),
+        "totals_status": recipe.totals_status,
+        "compression": compression,
+    }
 
 
 def handle_population(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
     return build_population(
-        ctx.worker_engine, ctx.store,
-        geo_entity=payload.get("geo", "FRA"), year=int(payload.get("year", 2023)),
-        n_records=int(payload.get("n_records", 100_000)), seed=int(payload.get("seed", 20260101)),
+        ctx.worker_engine,
+        ctx.store,
+        geo_entity=payload.get("geo", "FRA"),
+        year=int(payload.get("year", 2023)),
+        n_records=int(payload.get("n_records", 100_000)),
+        seed=int(payload.get("seed", 20260101)),
         origin=payload.get("origin", "live"),
     )

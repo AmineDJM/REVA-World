@@ -89,15 +89,36 @@ DIFF_SCHEMA = "reva-connector-semantic-diff/1"
 FINGERPRINT_SCHEMA = "reva-schema-fingerprint/1"
 PAUSE_PREFIX = "publication_pause:belief:"
 PERSISTENT_RUNS = 3
-SEMANTIC_FIELDS = ("subject_provider", "subject_key", "concept_id", "concept_version", "support", "value",
-                   "uncertainty", "relation")
+SEMANTIC_FIELDS = (
+    "subject_provider",
+    "subject_key",
+    "concept_id",
+    "concept_version",
+    "support",
+    "value",
+    "uncertainty",
+    "relation",
+)
 # R6-14: estimation, status and classification flags in ``source_flags`` of the built-in
 # connectors (Comtrade raw + normalised estimation keys, WDI ``obs_status``, Eurostat ``status``).
 # A repair that changes any of them on a historical vintage reinterprets history: blocker.
-SEMANTIC_FLAG_KEYS = frozenset({
-    "isReported", "isAggregate", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated",
-    "obs_status", "status", "classificationCode", "estimation_flag", "isOriginalClassification",
-    "provider_quantity_estimated", "provider_value_estimated", "legacy_estimation_code_unrecognised"})
+SEMANTIC_FLAG_KEYS = frozenset(
+    {
+        "isReported",
+        "isAggregate",
+        "legacyEstimationFlag",
+        "isQtyEstimated",
+        "isNetWgtEstimated",
+        "obs_status",
+        "status",
+        "classificationCode",
+        "estimation_flag",
+        "isOriginalClassification",
+        "provider_quantity_estimated",
+        "provider_value_estimated",
+        "legacy_estimation_code_unrecognised",
+    }
+)
 ACCEPTED_HISTORY_LIMIT = 500
 
 # --------------------------------------------------------------------------- classes
@@ -153,17 +174,50 @@ _CT_ROW = "$.data[]"
 SEMANTICS: dict[str, SchemaSemantics] = {
     "worldbank.wdi.indicators": SchemaSemantics(
         consumed=frozenset(
-            ["$[0]", "$[1]", "$[0].page", "$[0].pages", "$[0].per_page", "$[0].total", "$[0].lastupdated",
-             "$[0].message", "$[]", "$[].message"]
-            + [f"{_WB_ROW}.{k}" for k in (
-                # series rows
-                "countryiso3code", "date", "value", "obs_status", "decimal", "unit", "country", "country.id",
-                # country metadata rows
-                "id", "iso2Code", "name", "region", "region.value", "incomeLevel", "incomeLevel.value",
-                "capitalCity", "longitude", "latitude",
-                # indicator metadata rows
-                "sourceNote", "sourceOrganization", "source", "source.value")]
-            + [_WB_ROW]),
+            [
+                "$[0]",
+                "$[1]",
+                "$[0].page",
+                "$[0].pages",
+                "$[0].per_page",
+                "$[0].total",
+                "$[0].lastupdated",
+                "$[0].message",
+                "$[]",
+                "$[].message",
+            ]
+            + [
+                f"{_WB_ROW}.{k}"
+                for k in (
+                    # series rows
+                    "countryiso3code",
+                    "date",
+                    "value",
+                    "obs_status",
+                    "decimal",
+                    "unit",
+                    "country",
+                    "country.id",
+                    # country metadata rows
+                    "id",
+                    "iso2Code",
+                    "name",
+                    "region",
+                    "region.value",
+                    "incomeLevel",
+                    "incomeLevel.value",
+                    "capitalCity",
+                    "longitude",
+                    "latitude",
+                    # indicator metadata rows
+                    "sourceNote",
+                    "sourceOrganization",
+                    "source",
+                    "source.value",
+                )
+            ]
+            + [_WB_ROW]
+        ),
         units=(f"{_WB_ROW}.unit", f"{_WB_ROW}.decimal"),
         classifications=(f"{_WB_ROW}.indicator.id",),
         meanings=(f"{_WB_ROW}.indicator.value", f"{_WB_ROW}.sourceNote"),
@@ -173,15 +227,48 @@ SEMANTICS: dict[str, SchemaSemantics] = {
     "un.comtrade.public_exact": SchemaSemantics(
         consumed=frozenset(
             ["$.data", "$.error", "$.count", "$.elapsedTime", _CT_ROW]
-            + [f"{_CT_ROW}.{k}" for k in (
-                "period", "reporterCode", "flowCode", "partnerCode", "partner2Code", "cmdCode", "customsCode",
-                "motCode", "typeCode", "freqCode", "classificationCode", "isOriginalClassification", "isReported",
-                "isAggregate", "legacyEstimationFlag", "primaryValue", "cifvalue", "fobvalue", "netWgt",
-                "isNetWgtEstimated", "qtyUnitCode", "qty", "isQtyEstimated")]),
+            + [
+                f"{_CT_ROW}.{k}"
+                for k in (
+                    "period",
+                    "reporterCode",
+                    "flowCode",
+                    "partnerCode",
+                    "partner2Code",
+                    "cmdCode",
+                    "customsCode",
+                    "motCode",
+                    "typeCode",
+                    "freqCode",
+                    "classificationCode",
+                    "isOriginalClassification",
+                    "isReported",
+                    "isAggregate",
+                    "legacyEstimationFlag",
+                    "primaryValue",
+                    "cifvalue",
+                    "fobvalue",
+                    "netWgt",
+                    "isNetWgtEstimated",
+                    "qtyUnitCode",
+                    "qty",
+                    "isQtyEstimated",
+                )
+            ]
+        ),
         units=(f"{_CT_ROW}.qtyUnitCode", f"{_CT_ROW}.qtyUnitAbbr"),
-        classifications=tuple(f"{_CT_ROW}.{k}" for k in (
-            "classificationCode", "classificationSearchCode", "cmdCode", "typeCode", "freqCode", "customsCode",
-            "motCode")),
+        classifications=tuple(
+            f"{_CT_ROW}.{k}"
+            for k in (
+                "classificationCode",
+                "classificationSearchCode",
+                "cmdCode",
+                "typeCode",
+                "freqCode",
+                "customsCode",
+                "motCode",
+            )
+        ),
         meanings=(f"{_CT_ROW}.cmdDesc", f"{_CT_ROW}.flowDesc"),
         value_paths=(f"{_CT_ROW}.primaryValue", f"{_CT_ROW}.netWgt"),
         group_params=("scope",),
@@ -327,8 +414,9 @@ def semantic_schema_fingerprint(obj: Any, semantics: SchemaSemantics | None = No
     markers: dict[str, list[str]] = {}
     if semantics is not None:
         raw = _marker_values(obj, (*semantics.units, *semantics.classifications, *semantics.meanings))
-        markers = {p: [hashlib.sha256(v.encode()).hexdigest()[:16] if len(v) > 64 else v for v in vs]
-                   for p, vs in raw.items()}
+        markers = {
+            p: [hashlib.sha256(v.encode()).hexdigest()[:16] if len(v) > 64 else v for v in vs] for p, vs in raw.items()
+        }
     doc = {"schema": FINGERPRINT_SCHEMA, "paths": schema_profile(obj), "markers": markers}
     return hashlib.sha256(json.dumps(doc, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 
@@ -399,13 +487,21 @@ class MappingRevision:
     note: str = ""
 
     def as_json(self) -> dict[str, Any]:
-        return {"base_parser_version": self.base_parser_version,
-                "renames": [{"from": a, "to": b} for a, b in self.renames],
-                "scales": [{"path": s.path, "factor": s.factor, "when": (
-                    {"path": s.when_path, "equals": s.when_equals} if s.when_path else None),
-                    **({"normalize_to": s.normalize_to} if s.normalize_to is not None else {})}
-                    for s in self.scales],
-                "coercions": list(self.coercions), "note": self.note}
+        return {
+            "base_parser_version": self.base_parser_version,
+            "renames": [{"from": a, "to": b} for a, b in self.renames],
+            "scales": [
+                {
+                    "path": s.path,
+                    "factor": s.factor,
+                    "when": ({"path": s.when_path, "equals": s.when_equals} if s.when_path else None),
+                    **({"normalize_to": s.normalize_to} if s.normalize_to is not None else {}),
+                }
+                for s in self.scales
+            ],
+            "coercions": list(self.coercions),
+            "note": self.note,
+        }
 
     @property
     def version(self) -> str:
@@ -464,8 +560,11 @@ class MappedParser:
 
 def parser_identity(parser: Any) -> dict[str, Any]:
     if isinstance(parser, MappedParser):
-        return {"kind": "declarative_mapping", "mapping_version": parser.revision.version,
-                "mapping": parser.revision.as_json()}
+        return {
+            "kind": "declarative_mapping",
+            "mapping_version": parser.revision.version,
+            "mapping": parser.revision.as_json(),
+        }
     cls = type(parser)
     import inspect
 
@@ -542,11 +641,18 @@ def value_comparison(baseline: Mapping[str, str], new: Mapping[str, str]) -> dic
             st["factor_new_over_old"] = rescaled[c]
         concepts[c] = st
     factors = set(rescaled.values())
-    return {"shared_keys": len(shared), "identical": identical, "revised": len(revised),
-            "revised_examples": revised[:10], "per_concept": concepts, "rescaled_concepts": rescaled,
-            "uniform_power_of_ten": bool(rescaled),
-            "factor_new_over_old": next(iter(factors)) if len(factors) == 1 else None,
-            "baseline_only": len(b.keys() - n.keys()), "new_only": len(n.keys() - b.keys())}
+    return {
+        "shared_keys": len(shared),
+        "identical": identical,
+        "revised": len(revised),
+        "revised_examples": revised[:10],
+        "per_concept": concepts,
+        "rescaled_concepts": rescaled,
+        "uniform_power_of_ten": bool(rescaled),
+        "factor_new_over_old": next(iter(factors)) if len(factors) == 1 else None,
+        "baseline_only": len(b.keys() - n.keys()),
+        "new_only": len(n.keys() - b.keys()),
+    }
 
 
 # --------------------------------------------------------------------------- cases
@@ -658,32 +764,53 @@ def _structured_status(v: Any) -> int | None:
     return None
 
 
-def failure_history(conn: Connection, connector_name: str, *, version: str | None = None,
-                    origin: str | None = None, since: datetime | None = None,
-                    window: int = 20) -> tuple[RunSignals, ...]:
+def failure_history(
+    conn: Connection,
+    connector_name: str,
+    *,
+    version: str | None = None,
+    origin: str | None = None,
+    since: datetime | None = None,
+    window: int = 20,
+) -> tuple[RunSignals, ...]:
     """Run records (``reva.evidence.runner.record_health``) as per-item failure signals, oldest first."""
-    rows = conn.execute(text(
-        """SELECT h.recorded_at, h.metrics FROM ops.connector_health h
+    rows = (
+        conn.execute(
+            text(
+                """SELECT h.recorded_at, h.metrics FROM ops.connector_health h
              JOIN evidence.connector_version cv ON cv.id = h.connector_version_id
             WHERE cv.name = :n AND (CAST(:v AS text) IS NULL OR cv.version = :v)
               AND (CAST(:o AS text) IS NULL OR h.metrics->>'origin' = :o)
               AND (CAST(:t AS timestamptz) IS NULL OR h.recorded_at >= :t)
               AND COALESCE(h.metrics->>'kind', '') <> 'health_vector'
-            ORDER BY h.recorded_at DESC, h.id DESC LIMIT :w"""),
-        {"n": connector_name, "v": version, "o": origin, "t": since, "w": window}).mappings().all()
+            ORDER BY h.recorded_at DESC, h.id DESC LIMIT :w"""
+            ),
+            {"n": connector_name, "v": version, "o": origin, "t": since, "w": window},
+        )
+        .mappings()
+        .all()
+    )
     out = []
     for r in reversed(rows):
         m = dict(r["metrics"])
-        sigs = tuple(classify_error(str(e.get("item", "")), str(e.get("code", "")), str(e.get("error", "")),
-                                    _structured_status(e.get("status")))
-                     for e in m.get("errors") or [] if e.get("code"))
+        sigs = tuple(
+            classify_error(
+                str(e.get("item", "")),
+                str(e.get("code", "")),
+                str(e.get("error", "")),
+                _structured_status(e.get("status")),
+            )
+            for e in m.get("errors") or []
+            if e.get("code")
+        )
         ratio = m.get("request_success_ratio")
         out.append(RunSignals(r["recorded_at"], float(ratio) if ratio is not None else None, sigs))
     return tuple(out)
 
 
-def failure_streak(conn: Connection, connector_name: str, *, origin: str | None = None,
-                   window: int = 20) -> dict[str, Any] | None:
+def failure_streak(
+    conn: Connection, connector_name: str, *, origin: str | None = None, window: int = 20
+) -> dict[str, Any] | None:
     """The current streak of consecutive runs failing with authentication (401/403) or
     gone (404/410/DNS) signals, newest run last; ``None`` when the newest run has neither.
 
@@ -697,11 +824,17 @@ def failure_streak(conn: Connection, connector_name: str, *, origin: str | None 
         n = _consecutive(runs, pred, None)
         if n:
             streak = runs[-n:]
-            return {"kind": kind, "runs": n, "since": streak[0].recorded_at, "latest": streak[-1].recorded_at,
-                    "statuses": sorted({sig.status for r in streak for sig in r.signals
-                                        if pred(sig) and sig.status is not None}),
-                    "items": sorted({sig.item_key for sig in streak[-1].signals if pred(sig)}),
-                    "connector_wide": all(r.success_ratio is not None and r.success_ratio <= 0 for r in streak)}
+            return {
+                "kind": kind,
+                "runs": n,
+                "since": streak[0].recorded_at,
+                "latest": streak[-1].recorded_at,
+                "statuses": sorted(
+                    {sig.status for r in streak for sig in r.signals if pred(sig) and sig.status is not None}
+                ),
+                "items": sorted({sig.item_key for sig in streak[-1].signals if pred(sig)}),
+                "connector_wide": all(r.success_ratio is not None and r.success_ratio <= 0 for r in streak),
+            }
     return None
 
 
@@ -732,16 +865,30 @@ class FixtureReplayChecker:
     def __init__(self, io_: ArtifactIO) -> None:
         self.io = io_
 
-    def check(self, connector: Any, proposed: Any, bank: ArtifactRef, *, proposal_key: str,
-              history: Sequence[RawAcquisition] = (), new_raw: RawAcquisition | None = None,
-              baseline_new: Mapping[str, str] | None = None, history_truncated: bool = False) -> ValidationReport:
+    def check(
+        self,
+        connector: Any,
+        proposed: Any,
+        bank: ArtifactRef,
+        *,
+        proposal_key: str,
+        history: Sequence[RawAcquisition] = (),
+        new_raw: RawAcquisition | None = None,
+        baseline_new: Mapping[str, str] | None = None,
+        history_truncated: bool = False,
+    ) -> ValidationReport:
         plan = _plan_by_fingerprint(connector)
         findings: list[Finding] = []
         history_truncated = history_truncated or len(history) >= ACCEPTED_HISTORY_LIMIT
         if history_truncated:
-            findings.append(_finding("accepted_history_truncated", "warning",
-                                     "the accepted-history query hit its row cap: only the most recently "
-                                     "recorded accepted vintages were replayed, older history was not checked"))
+            findings.append(
+                _finding(
+                    "accepted_history_truncated",
+                    "warning",
+                    "the accepted-history query hit its row cap: only the most recently "
+                    "recorded accepted vintages were replayed, older history was not checked",
+                )
+            )
         vintages: list[dict[str, Any]] = []
         replayed = 0
         for e in bank_entries(self.io, bank):
@@ -749,14 +896,20 @@ class FixtureReplayChecker:
                 continue
             item = plan.get(e["request_fingerprint"])
             if item is None:
-                findings.append(_finding("fixture_not_replayable", "blocker",
-                                         f"stored fixture {e['url'][:160]} matches no planned request"))
+                findings.append(
+                    _finding(
+                        "fixture_not_replayable",
+                        "blocker",
+                        f"stored fixture {e['url'][:160]} matches no planned request",
+                    )
+                )
                 continue
             raw = _raw_from_entry(self.io, e, item)
             res = self._compare(connector, proposed, raw, strict=True)
             replayed += 1
-            vintages.append({"source": "fixture_bank", "url": redact_url(e["url"]), "body_sha256": e["body_sha256"],
-                             **res})
+            vintages.append(
+                {"source": "fixture_bank", "url": redact_url(e["url"]), "body_sha256": e["body_sha256"], **res}
+            )
         for raw in history:
             res = self._compare(connector, proposed, raw, strict=False)
             if res.get("skipped"):
@@ -766,22 +919,36 @@ class FixtureReplayChecker:
             vintages.append({"source": "accepted_acquisition", "item": raw.item.key, **res})
         changed = [v for v in vintages if v.get("semantic_changes")]
         for v in changed:
-            findings.append(_finding(
-                "historical_reinterpretation", "blocker",
-                f"{v.get('url') or v.get('item')}: {v['semantic_changes']} historical semantic outputs differ "
-                f"(e.g. {', '.join(v['examples'][:3])})"))
+            findings.append(
+                _finding(
+                    "historical_reinterpretation",
+                    "blocker",
+                    f"{v.get('url') or v.get('item')}: {v['semantic_changes']} historical semantic outputs differ "
+                    f"(e.g. {', '.join(v['examples'][:3])})",
+                )
+            )
         for v in vintages:
             if v.get("error"):
-                findings.append(_finding("historical_replay_failed", "blocker",
-                                         f"{v.get('url') or v.get('item')}: {v['error']}"))
+                findings.append(
+                    _finding("historical_replay_failed", "blocker", f"{v.get('url') or v.get('item')}: {v['error']}")
+                )
             elif v.get("semantic_flag_changes"):
-                findings.append(_finding("historical_flag_reinterpretation", "blocker",
-                                         f"{v.get('url') or v.get('item')}: {v['semantic_flag_changes']} "
-                                         "estimation/status/classification flag sets differ"))
+                findings.append(
+                    _finding(
+                        "historical_flag_reinterpretation",
+                        "blocker",
+                        f"{v.get('url') or v.get('item')}: {v['semantic_flag_changes']} "
+                        "estimation/status/classification flag sets differ",
+                    )
+                )
             elif v.get("flag_changes"):
-                findings.append(_finding("historical_flags_changed", "warning",
-                                         f"{v.get('url') or v.get('item')}: {v['flag_changes']} source-flag sets "
-                                         "differ (non-semantic)"))
+                findings.append(
+                    _finding(
+                        "historical_flags_changed",
+                        "warning",
+                        f"{v.get('url') or v.get('item')}: {v['flag_changes']} source-flag sets differ (non-semantic)",
+                    )
+                )
         if replayed == 0:
             findings.append(_finding("no_history", "blocker", "no stored vintage could be replayed"))
         new_summary: dict[str, Any] | None = None
@@ -796,28 +963,58 @@ class FixtureReplayChecker:
                 if baseline_new is not None:
                     new_summary["vs_same_request_vintage"] = value_comparison(baseline_new, sem)
                 for f in blockers:
-                    findings.append(_finding(f"new_payload_{f.code}", "blocker",
-                                             f"drifted payload still fails validation: {f.message}"))
+                    findings.append(
+                        _finding(
+                            f"new_payload_{f.code}", "blocker", f"drifted payload still fails validation: {f.message}"
+                        )
+                    )
             except RevaError as e:
                 new_summary = {"error": e.message}
-                findings.append(_finding("new_payload_unparseable", "blocker",
-                                         f"proposed parser cannot read the drifted payload: {e.message}"))
+                findings.append(
+                    _finding(
+                        "new_payload_unparseable",
+                        "blocker",
+                        f"proposed parser cannot read the drifted payload: {e.message}",
+                    )
+                )
             except (KeyError, IndexError, TypeError, ValueError, AttributeError, ArithmeticError) as e:
                 new_summary = {"error": type(e).__name__}
-                findings.append(_finding("new_payload_unparseable", "blocker",
-                                         f"proposed parser cannot read the drifted payload ({type(e).__name__})"))
-        history_blocked = any(f.code in ("historical_reinterpretation", "historical_flag_reinterpretation",
-                                         "historical_replay_failed",
-                                         "fixture_not_replayable", "no_history") for f in findings)
-        outcome = "blocked" if history_blocked else (
-            "fail" if any(f.severity == "blocker" for f in findings) else "pass")
-        evidence = {"schema": "reva-fixture-replay/1", "evaluator": self.evaluator, "proposal": proposal_key,
-                    "fixture_bank": bank.sha256, "parser": parser_identity(proposed),
-                    "baseline_parser_version": connector.describe().parser_version,
-                    "vintages_replayed": replayed, "vintages": vintages, "new_payload": new_summary,
-                    "accepted_history_truncated": history_truncated,
-                    "outcome": outcome, "rule": "every historical vintage must yield identical semantic outputs "
-                                                 "(concept, subject, support, value, uncertainty, relation)"}
+                findings.append(
+                    _finding(
+                        "new_payload_unparseable",
+                        "blocker",
+                        f"proposed parser cannot read the drifted payload ({type(e).__name__})",
+                    )
+                )
+        history_blocked = any(
+            f.code
+            in (
+                "historical_reinterpretation",
+                "historical_flag_reinterpretation",
+                "historical_replay_failed",
+                "fixture_not_replayable",
+                "no_history",
+            )
+            for f in findings
+        )
+        outcome = (
+            "blocked" if history_blocked else ("fail" if any(f.severity == "blocker" for f in findings) else "pass")
+        )
+        evidence = {
+            "schema": "reva-fixture-replay/1",
+            "evaluator": self.evaluator,
+            "proposal": proposal_key,
+            "fixture_bank": bank.sha256,
+            "parser": parser_identity(proposed),
+            "baseline_parser_version": connector.describe().parser_version,
+            "vintages_replayed": replayed,
+            "vintages": vintages,
+            "new_payload": new_summary,
+            "accepted_history_truncated": history_truncated,
+            "outcome": outcome,
+            "rule": "every historical vintage must yield identical semantic outputs "
+            "(concept, subject, support, value, uncertainty, relation)",
+        }
         evidence["findings"] = [{"code": f.code, "severity": f.severity, "message": f.message} for f in findings]
         ref = self.io.put_json(evidence, "evaluation")
         findings = [Finding(f.code, f.severity, f.message, (ref,)) for f in findings]
@@ -840,12 +1037,21 @@ class FixtureReplayChecker:
         if base[2] != prop[2]:
             changed.append("<expected_keys>")
         flag_changes = sum(1 for k in keys if base[1].get(k) != prop[1].get(k))
-        sem_flag_keys = [k for k in keys if base[1].get(k) != prop[1].get(k)
-                         and _semantic_flags(base[1].get(k)) != _semantic_flags(prop[1].get(k))]
+        sem_flag_keys = [
+            k
+            for k in keys
+            if base[1].get(k) != prop[1].get(k) and _semantic_flags(base[1].get(k)) != _semantic_flags(prop[1].get(k))
+        ]
         digest = hashlib.sha256(json.dumps(base[0], sort_keys=True).encode()).hexdigest()
-        return {"observations": len(base[0]), "semantic_digest": digest, "semantic_changes": len(changed),
-                "examples": changed[:10], "flag_changes": flag_changes,
-                "semantic_flag_changes": len(sem_flag_keys), "flag_examples": sem_flag_keys[:10]}
+        return {
+            "observations": len(base[0]),
+            "semantic_digest": digest,
+            "semantic_changes": len(changed),
+            "examples": changed[:10],
+            "flag_changes": flag_changes,
+            "semantic_flag_changes": len(sem_flag_keys),
+            "flag_examples": sem_flag_keys[:10],
+        }
 
 
 def _semantic_flags(flags_json: str | None) -> dict[str, Any]:
@@ -883,19 +1089,32 @@ def _plan_by_key(connector: Any) -> dict[str, FetchItem]:
 
 def _raw_from_entry(io_: ArtifactIO, e: Mapping[str, Any], item: FetchItem) -> RawAcquisition:
     body = io_.get_bytes(ArtifactRef(e["body_sha256"], "raw", e["media_type"]))
-    return RawAcquisition(item=item, body=body, media_type=e["media_type"],
-                          retrieved_at=datetime.fromisoformat(e["retrieved_at"]),
-                          response_metadata={"status": e["status"], "replay": "fixture_bank"},
-                          request_fingerprint=e["request_fingerprint"], origin="test_fixture")
+    return RawAcquisition(
+        item=item,
+        body=body,
+        media_type=e["media_type"],
+        retrieved_at=datetime.fromisoformat(e["retrieved_at"]),
+        response_metadata={"status": e["status"], "replay": "fixture_bank"},
+        request_fingerprint=e["request_fingerprint"],
+        origin="test_fixture",
+    )
 
 
 # --------------------------------------------------------------------------- advisor
 class ConnectorRepairAdvisor:
     """Classifies connector drift against the immutable fixture bank and files repair proposals."""
 
-    def __init__(self, engine: Engine, store: ArtifactStore, *, guard: AutonomyGuard | None = None,
-                 fixture_root: Path = FIXTURE_ROOT, persistent_runs: int = PERSISTENT_RUNS,
-                 author: str = AUTHOR, include_db_history: bool = True) -> None:
+    def __init__(
+        self,
+        engine: Engine,
+        store: ArtifactStore,
+        *,
+        guard: AutonomyGuard | None = None,
+        fixture_root: Path = FIXTURE_ROOT,
+        persistent_runs: int = PERSISTENT_RUNS,
+        author: str = AUTHOR,
+        include_db_history: bool = True,
+    ) -> None:
         if persistent_runs < 1:
             raise ValueError("persistent_runs must be >= 1")
         self.engine = engine
@@ -915,37 +1134,68 @@ class ConnectorRepairAdvisor:
             self._banks[connector_name] = bank_from_dir(self.io, connector_name, self.fixture_root)
         return self._banks[connector_name]
 
-    def case_from_response(self, connector: Any, url: str, body: bytes, *, status: int = 200,
-                           media_type: str = "application/json", observed_at: datetime | None = None,
-                           origin: str = "live") -> DriftCase:
+    def case_from_response(
+        self,
+        connector: Any,
+        url: str,
+        body: bytes,
+        *,
+        status: int = 200,
+        media_type: str = "application/json",
+        observed_at: datetime | None = None,
+        origin: str = "live",
+    ) -> DriftCase:
         item = _plan_by_fingerprint(connector).get(request_fingerprint("GET", url))
         if item is None:
             raise ValidationProblem("response URL matches no planned request of this connector")
-        return DriftCase(connector=connector.describe().name, observed_at=observed_at or datetime.now(UTC),
-                         origin=origin, item_key=item.key, body=body, media_type=media_type, status=status)
+        return DriftCase(
+            connector=connector.describe().name,
+            observed_at=observed_at or datetime.now(UTC),
+            origin=origin,
+            item_key=item.key,
+            body=body,
+            media_type=media_type,
+            status=status,
+        )
 
-    def find_case(self, connector: Any, *, version: str | None = None, origin: str | None = None,
-                  since: datetime | None = None, limit: int = 200) -> DriftCase | None:
+    def find_case(
+        self,
+        connector: Any,
+        *,
+        version: str | None = None,
+        origin: str | None = None,
+        since: datetime | None = None,
+        limit: int = 200,
+    ) -> DriftCase | None:
         """The newest open case: a persistent request-failure history, else the newest acquisition
         that was quarantined or whose semantic fingerprint differs from the fixture bank."""
         name = connector.describe().name
         with self.engine.connect() as conn:
             runs = failure_history(conn, name, version=version, origin=origin, since=since)
         if runs and any(_is_gone(s) or _is_auth(s) for s in runs[-1].signals):
-            return DriftCase(connector=name, observed_at=runs[-1].recorded_at, origin=origin or "live",
-                             status=None, failures=runs)
-        return self.find_drifted_acquisition(connector, version=version, origin=origin, since=since,
-                                             limit=limit)
+            return DriftCase(
+                connector=name, observed_at=runs[-1].recorded_at, origin=origin or "live", status=None, failures=runs
+            )
+        return self.find_drifted_acquisition(connector, version=version, origin=origin, since=since, limit=limit)
 
-    def find_drifted_acquisition(self, connector: Any, *, version: str | None = None, origin: str | None = None,
-                                 since: datetime | None = None, limit: int = 200) -> DriftCase | None:
+    def find_drifted_acquisition(
+        self,
+        connector: Any,
+        *,
+        version: str | None = None,
+        origin: str | None = None,
+        since: datetime | None = None,
+        limit: int = 200,
+    ) -> DriftCase | None:
         name = connector.describe().name
         sem = SEMANTICS.get(name)
         bank_by_fp = {e["request_fingerprint"]: e for e in bank_entries(self.io, self.bank(name))}
         plan = _plan_by_key(connector)
         with self.engine.connect() as conn:
-            rows = conn.execute(text(
-                """SELECT a.id, a.raw_sha256, a.retrieved_at, a.origin, a.response_metadata,
+            rows = (
+                conn.execute(
+                    text(
+                        """SELECT a.id, a.raw_sha256, a.retrieved_at, a.origin, a.response_metadata,
                           EXISTS (SELECT 1 FROM meta.artifact_location l WHERE l.artifact_sha256 = a.raw_sha256
                                   AND l.namespace = 'quarantine') AS quarantined,
                           (SELECT media_type FROM meta.artifact m WHERE m.sha256 = a.raw_sha256) AS media_type
@@ -953,8 +1203,13 @@ class ConnectorRepairAdvisor:
                     WHERE cv.name = :n AND (CAST(:v AS text) IS NULL OR cv.version = :v)
                       AND (CAST(:o AS text) IS NULL OR a.origin = :o)
                       AND (CAST(:t AS timestamptz) IS NULL OR a.recorded_at >= :t)
-                    ORDER BY a.recorded_at DESC, a.id DESC LIMIT :l"""),
-                {"n": name, "v": version, "o": origin, "t": since, "l": limit}).mappings().all()
+                    ORDER BY a.recorded_at DESC, a.id DESC LIMIT :l"""
+                    ),
+                    {"n": name, "v": version, "o": origin, "t": since, "l": limit},
+                )
+                .mappings()
+                .all()
+            )
         seen: set[str] = set()
         for r in rows:
             meta = dict(r["response_metadata"] or {})
@@ -970,32 +1225,53 @@ class ConnectorRepairAdvisor:
             if not drift and entry is not None:
                 old_body = self.io.get_bytes(ArtifactRef(entry["body_sha256"], "raw", entry["media_type"]))
                 try:
-                    drift = (semantic_schema_fingerprint(load_exact(body), sem)
-                             != semantic_schema_fingerprint(load_exact(old_body), sem))
+                    drift = semantic_schema_fingerprint(load_exact(body), sem) != semantic_schema_fingerprint(
+                        load_exact(old_body), sem
+                    )
                 except ValueError:
                     drift = True
                 if not drift and body != old_body:
                     drift = self._silently_rescaled(connector, plan[key], body, entry)
             if drift:
-                findings = tuple(f for q in meta.get("quality") or [] for f in q.get("findings") or []
-                                 if f.get("severity") == "blocker")
-                return DriftCase(connector=name, observed_at=r["retrieved_at"], origin=r["origin"], item_key=key,
-                                 body=body, media_type=ref.media_type, status=int(meta.get("status") or 200),
-                                 acquisition_id=str(r["id"]), raw_ref=ref, quarantined=bool(r["quarantined"]),
-                                 quarantine_findings=findings)
+                findings = tuple(
+                    f
+                    for q in meta.get("quality") or []
+                    for f in q.get("findings") or []
+                    if f.get("severity") == "blocker"
+                )
+                return DriftCase(
+                    connector=name,
+                    observed_at=r["retrieved_at"],
+                    origin=r["origin"],
+                    item_key=key,
+                    body=body,
+                    media_type=ref.media_type,
+                    status=int(meta.get("status") or 200),
+                    acquisition_id=str(r["id"]),
+                    raw_ref=ref,
+                    quarantined=bool(r["quarantined"]),
+                    quarantine_findings=findings,
+                )
         return None
 
     def _silently_rescaled(self, connector: Any, item: FetchItem, body: bytes, entry: Mapping[str, Any]) -> bool:
         """Same schema, but a concept's shared values all moved by one power of ten (§10.3 unit drift)."""
         try:
             old = semantic_outputs(list(connector.parse(_raw_from_entry(self.io, entry, item))))[0]
-            new_raw = RawAcquisition(item=item, body=body, media_type="application/json",
-                                     retrieved_at=datetime.now(UTC), response_metadata={},
-                                     request_fingerprint=entry["request_fingerprint"], origin="test_fixture")
+            new_raw = RawAcquisition(
+                item=item,
+                body=body,
+                media_type="application/json",
+                retrieved_at=datetime.now(UTC),
+                response_metadata={},
+                request_fingerprint=entry["request_fingerprint"],
+                origin="test_fixture",
+            )
             new = semantic_outputs(list(connector.parse(new_raw)))[0]
         except Exception as e:  # unparseable with the reviewed parser: that is drift too
-            log.info("repair: acquisition of %s does not parse with the reviewed parser (%s)", item.key,
-                     type(e).__name__)
+            log.info(
+                "repair: acquisition of %s does not parse with the reviewed parser (%s)", item.key, type(e).__name__
+            )
             return True
         return bool(value_comparison(old, new)["rescaled_concepts"])
 
@@ -1009,8 +1285,10 @@ class ConnectorRepairAdvisor:
         name = connector.describe().name
         plan = _plan_by_key(connector)
         with self.engine.connect() as conn:
-            rows = conn.execute(text(
-                """SELECT * FROM (
+            rows = (
+                conn.execute(
+                    text(
+                        """SELECT * FROM (
                      SELECT DISTINCT ON (a.raw_sha256) a.raw_sha256, a.retrieved_at, a.recorded_at, a.origin,
                             a.request_fingerprint, a.response_metadata->>'item_key' AS item_key, m.media_type
                        FROM evidence.acquisition a
@@ -1019,8 +1297,13 @@ class ConnectorRepairAdvisor:
                       WHERE cv.name = :n AND EXISTS (SELECT 1 FROM meta.artifact_location l
                             WHERE l.artifact_sha256 = a.raw_sha256 AND l.namespace = 'raw')
                       ORDER BY a.raw_sha256, a.recorded_at DESC) d
-                   ORDER BY d.recorded_at DESC, d.raw_sha256 LIMIT :l"""),
-                {"n": name, "l": limit + 1}).mappings().all()
+                   ORDER BY d.recorded_at DESC, d.raw_sha256 LIMIT :l"""
+                    ),
+                    {"n": name, "l": limit + 1},
+                )
+                .mappings()
+                .all()
+            )
         self.last_history_truncated = len(rows) > limit
         rows = rows[:limit]
         out = []
@@ -1033,9 +1316,17 @@ class ConnectorRepairAdvisor:
             except Exception as e:  # unreadable history is reported by its absence
                 log.warning("repair: accepted raw %s unreadable (%s)", r["raw_sha256"][:12], type(e).__name__)
                 continue
-            out.append(RawAcquisition(item=item, body=body, media_type=r["media_type"],
-                                      retrieved_at=r["retrieved_at"], response_metadata={"replay": "accepted"},
-                                      request_fingerprint=r["request_fingerprint"], origin=r["origin"]))
+            out.append(
+                RawAcquisition(
+                    item=item,
+                    body=body,
+                    media_type=r["media_type"],
+                    retrieved_at=r["retrieved_at"],
+                    response_metadata={"replay": "accepted"},
+                    request_fingerprint=r["request_fingerprint"],
+                    origin=r["origin"],
+                )
+            )
         return out
 
     # ------------------------------------------------------------------ assessment
@@ -1046,8 +1337,13 @@ class ConnectorRepairAdvisor:
         if case.connector != spec.name:
             raise ValidationProblem("case belongs to a different connector")
         bank = self.bank(spec.name)
-        base = {"connector": spec.name, "connector_version": spec.version, "parser_version": spec.parser_version,
-                "bank": bank, "case": case}
+        base = {
+            "connector": spec.name,
+            "connector_version": spec.version,
+            "parser_version": spec.parser_version,
+            "bank": bank,
+            "case": case,
+        }
         if case.failures or case.body is None:
             return self._assess_failures(connector, case, base)
         return self._assess_payload(connector, case, base)
@@ -1063,24 +1359,42 @@ class ConnectorRepairAdvisor:
         gone_items = sorted({s.item_key for s in latest.signals if _is_gone(s)})
         n_auth = _consecutive(runs, _is_auth, None)
         evidence: dict[str, Any] = {
-            "runs_considered": len(runs), "persistence_threshold": self.persistent_runs,
-            "latest_run": {"recorded_at": latest.recorded_at.isoformat(), "success_ratio": latest.success_ratio,
-                           "signals": [{"item": s.item_key, "status": s.status, "kind": s.kind,
-                                        "message": s.message[:200]} for s in latest.signals]}}
+            "runs_considered": len(runs),
+            "persistence_threshold": self.persistent_runs,
+            "latest_run": {
+                "recorded_at": latest.recorded_at.isoformat(),
+                "success_ratio": latest.success_ratio,
+                "signals": [
+                    {"item": s.item_key, "status": s.status, "kind": s.kind, "message": s.message[:200]}
+                    for s in latest.signals
+                ],
+            },
+        }
         changes: list[dict[str, Any]] = []
         if auth_items:
             evidence["consecutive_auth_failure_runs"] = n_auth
-            changes.append({"kind": AUTH, "items": auth_items,
-                            "statuses": sorted({s.status for s in latest.signals if _is_auth(s)})})
+            changes.append(
+                {
+                    "kind": AUTH,
+                    "items": auth_items,
+                    "statuses": sorted({s.status for s in latest.signals if _is_auth(s)}),
+                }
+            )
             cls = AUTH if n_auth >= self.persistent_runs else TRANSIENT
             item = None if (latest.success_ratio in (0, 0.0) or len(auth_items) > 1) else auth_items[0]
         elif gone_items:
             per_item = {i: _consecutive(runs, _is_gone, i) for i in gone_items}
             evidence["consecutive_gone_runs"] = per_item
             item = max(gone_items, key=lambda i: (per_item[i], i))
-            changes.append({"kind": ENDPOINT, "items": gone_items,
-                            "signals": sorted({s.kind if s.status is None else str(s.status)
-                                               for s in latest.signals if _is_gone(s)})})
+            changes.append(
+                {
+                    "kind": ENDPOINT,
+                    "items": gone_items,
+                    "signals": sorted(
+                        {s.kind if s.status is None else str(s.status) for s in latest.signals if _is_gone(s)}
+                    ),
+                }
+            )
             cls = ENDPOINT if per_item[item] >= self.persistent_runs else TRANSIENT
         else:
             cls, item = TRANSIENT, case.item_key
@@ -1088,10 +1402,21 @@ class ConnectorRepairAdvisor:
         evidence["persistent"] = cls != TRANSIENT
         concepts = self._affected_concepts(connector, item)
         action, tier = ACTIONS[cls]
-        return RepairAssessment(item_key=item, classification=cls, action=action, tier=tier,
-                                changes=tuple(changes), affected_concepts=concepts, semantic_diff=None,
-                                raw_ref=None, accepted_fingerprint=None, new_fingerprint=None,
-                                suggested_mapping=None, evidence=evidence, **base)
+        return RepairAssessment(
+            item_key=item,
+            classification=cls,
+            action=action,
+            tier=tier,
+            changes=tuple(changes),
+            affected_concepts=concepts,
+            semantic_diff=None,
+            raw_ref=None,
+            accepted_fingerprint=None,
+            new_fingerprint=None,
+            suggested_mapping=None,
+            evidence=evidence,
+            **base,
+        )
 
     def _assess_payload(self, connector: Any, case: DriftCase, base: dict[str, Any]) -> RepairAssessment:
         spec = connector.describe()
@@ -1099,12 +1424,19 @@ class ConnectorRepairAdvisor:
         plan = _plan_by_key(connector)
         item = plan.get(case.item_key or "")
         if item is None:
-            raise ValidationProblem("drift case names no planned request of this connector",
-                                    item=str(case.item_key)[:120])
+            raise ValidationProblem(
+                "drift case names no planned request of this connector", item=str(case.item_key)[:120]
+            )
         raw_ref = case.raw_ref or self.io.put_bytes(case.body or b"", "quarantine", case.media_type)
-        new_raw = RawAcquisition(item=item, body=case.body or b"", media_type=case.media_type,
-                                 retrieved_at=case.observed_at, response_metadata={"status": case.status},
-                                 request_fingerprint=request_fingerprint("GET", item.url), origin="test_fixture")
+        new_raw = RawAcquisition(
+            item=item,
+            body=case.body or b"",
+            media_type=case.media_type,
+            retrieved_at=case.observed_at,
+            response_metadata={"status": case.status},
+            request_fingerprint=request_fingerprint("GET", item.url),
+            origin="test_fixture",
+        )
         entries = bank_entries(self.io, base["bank"])
         by_fp = {e["request_fingerprint"]: e for e in entries}
         plan_fp = {request_fingerprint("GET", i.url): i for i in plan.values()}
@@ -1120,17 +1452,30 @@ class ConnectorRepairAdvisor:
             group_objs.append(obj)
             if e is same_entry:
                 same = obj
-        evidence: dict[str, Any] = {"group": list(group), "group_vintages": len(group_objs),
-                                    "same_request_vintage": same_entry["body_sha256"] if same_entry else None,
-                                    "quarantined": case.quarantined,
-                                    "quarantine_findings": [dict(f) for f in case.quarantine_findings]}
+        evidence: dict[str, Any] = {
+            "group": list(group),
+            "group_vintages": len(group_objs),
+            "same_request_vintage": same_entry["body_sha256"] if same_entry else None,
+            "quarantined": case.quarantined,
+            "quarantine_findings": [dict(f) for f in case.quarantine_findings],
+        }
         try:
             new_obj = load_exact(case.body or b"")
         except ValueError as e:
             evidence["decode_error"] = str(e)[:200]
-            return self._finish(connector, case, base, item.key, CONTENT,
-                                [{"kind": CONTENT, "detail": "response is not JSON"}], evidence, raw_ref,
-                                None, None, None)
+            return self._finish(
+                connector,
+                case,
+                base,
+                item.key,
+                CONTENT,
+                [{"kind": CONTENT, "detail": "response is not JSON"}],
+                evidence,
+                raw_ref,
+                None,
+                None,
+                None,
+            )
         changes = diff_payload(new_obj, group_objs, same, sem)
         # Parse with the reviewed parser (unchanged mapping) to measure semantic effects.
         baseline_sem: dict[str, str] | None = None
@@ -1142,8 +1487,7 @@ class ConnectorRepairAdvisor:
             batches = list(connector.parse(new_raw))
             new_sem = semantic_outputs(batches)[0]
             validator = type(connector)() if _default_constructible(connector) else connector
-            new_blockers = [f.code for b in batches for f in validator.validate(b).findings
-                            if f.severity == "blocker"]
+            new_blockers = [f.code for b in batches for f in validator.validate(b).findings if f.severity == "blocker"]
         except RevaError as e:
             new_blockers = [str(e.details.get("kind", e.code))]
         except (KeyError, IndexError, TypeError, ValueError, AttributeError, ArithmeticError) as e:
@@ -1153,10 +1497,16 @@ class ConnectorRepairAdvisor:
             cmp = value_comparison(baseline_sem, new_sem)
             evidence["values_vs_same_request_vintage"] = cmp
             if cmp["uniform_power_of_ten"]:
-                changes.append({"kind": SCALE, "paths": list(sem.value_paths) if sem else [],
-                                "factor_new_over_old": cmp["factor_new_over_old"],
-                                "rescaled_concepts": cmp["rescaled_concepts"], "consumed": True,
-                                "evidence": f"{cmp['revised']} of {cmp['shared_keys']} shared values rescaled"})
+                changes.append(
+                    {
+                        "kind": SCALE,
+                        "paths": list(sem.value_paths) if sem else [],
+                        "factor_new_over_old": cmp["factor_new_over_old"],
+                        "rescaled_concepts": cmp["rescaled_concepts"],
+                        "consumed": True,
+                        "evidence": f"{cmp['revised']} of {cmp['shared_keys']} shared values rescaled",
+                    }
+                )
         kinds = {c["kind"] for c in changes}
         additive_ok = False
         if kinds and kinds <= {"added_field", "populated_unused_field"}:
@@ -1165,11 +1515,11 @@ class ConnectorRepairAdvisor:
             additive_ok = strip["identical"] and not new_blockers and sem is not None
         cls = _primary_class(changes, sem, additive_ok, new_blockers)
         suggested = suggest_mapping(spec.parser_version, cls, changes, sem)
-        return self._finish(connector, case, base, item.key, cls, changes, evidence, raw_ref, same, new_obj,
-                            suggested)
+        return self._finish(connector, case, base, item.key, cls, changes, evidence, raw_ref, same, new_obj, suggested)
 
-    def _strip_check(self, connector: Any, new_raw: RawAcquisition, new_obj: Any,
-                     changes: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    def _strip_check(
+        self, connector: Any, new_raw: RawAcquisition, new_obj: Any, changes: Sequence[Mapping[str, Any]]
+    ) -> dict[str, Any]:
         """Remove added fields (null previously-null ones) and require identical outputs."""
         stripped = load_exact(dumps_exact(new_obj))  # exact deep copy
         for c in changes:
@@ -1184,32 +1534,70 @@ class ConnectorRepairAdvisor:
             b = semantic_outputs(list(connector.parse(new_raw.model_copy(update={"body": dumps_exact(stripped)}))))
         except Exception as e:  # the stripped payload must parse like the original
             return {"identical": False, "error": type(e).__name__}
-        return {"identical": a[0] == b[0] and a[2] == b[2], "flags_identical": a[1] == b[1],
-                "observations": len(a[0]), "paths": [c["path"] for c in changes]}
+        return {
+            "identical": a[0] == b[0] and a[2] == b[2],
+            "flags_identical": a[1] == b[1],
+            "observations": len(a[0]),
+            "paths": [c["path"] for c in changes],
+        }
 
-    def _finish(self, connector: Any, case: DriftCase, base: dict[str, Any], item_key: str, cls: str,
-                changes: list[dict[str, Any]], evidence: dict[str, Any], raw_ref: ArtifactRef,
-                same: Any, new_obj: Any, suggested: MappingRevision | None) -> RepairAssessment:
+    def _finish(
+        self,
+        connector: Any,
+        case: DriftCase,
+        base: dict[str, Any],
+        item_key: str,
+        cls: str,
+        changes: list[dict[str, Any]],
+        evidence: dict[str, Any],
+        raw_ref: ArtifactRef,
+        same: Any,
+        new_obj: Any,
+        suggested: MappingRevision | None,
+    ) -> RepairAssessment:
         sem = SEMANTICS.get(base["connector"])
         accepted_fp = semantic_schema_fingerprint(same, sem) if same is not None else None
         new_fp = semantic_schema_fingerprint(new_obj, sem) if new_obj is not None else None
         concepts = self._affected_concepts(connector, item_key)
         action, tier = ACTIONS[cls]
-        diff = {"schema": DIFF_SCHEMA, "connector": base["connector"], "connector_version": base["connector_version"],
-                "parser_version": base["parser_version"], "item_key": item_key, "classification": cls,
-                "action": action, "tier": tier, "fixture_bank": base["bank"].sha256, "drifted_raw": raw_ref.sha256,
-                "acquisition_id": case.acquisition_id, "observed_at": case.observed_at.isoformat(),
-                "fingerprints": {"accepted": accepted_fp, "new": new_fp, "schema": FINGERPRINT_SCHEMA},
-                "changes": changes, "affected_concepts": list(concepts), "evidence": evidence,
-                "suggested_mapping": suggested.as_json() if suggested else None,
-                "semantics_declared": sem is not None,
-                "rule": "§10.3: additive unused fields may auto-pass; rename/unit/meaning/classification changes "
-                        "require a new mapping version; history is replayed and must not change"}
+        diff = {
+            "schema": DIFF_SCHEMA,
+            "connector": base["connector"],
+            "connector_version": base["connector_version"],
+            "parser_version": base["parser_version"],
+            "item_key": item_key,
+            "classification": cls,
+            "action": action,
+            "tier": tier,
+            "fixture_bank": base["bank"].sha256,
+            "drifted_raw": raw_ref.sha256,
+            "acquisition_id": case.acquisition_id,
+            "observed_at": case.observed_at.isoformat(),
+            "fingerprints": {"accepted": accepted_fp, "new": new_fp, "schema": FINGERPRINT_SCHEMA},
+            "changes": changes,
+            "affected_concepts": list(concepts),
+            "evidence": evidence,
+            "suggested_mapping": suggested.as_json() if suggested else None,
+            "semantics_declared": sem is not None,
+            "rule": "§10.3: additive unused fields may auto-pass; rename/unit/meaning/classification changes "
+            "require a new mapping version; history is replayed and must not change",
+        }
         diff_ref = self.io.put_json(diff, "evaluation")
-        return RepairAssessment(item_key=item_key, classification=cls, action=action, tier=tier,
-                                changes=tuple(changes), affected_concepts=concepts, semantic_diff=diff_ref,
-                                raw_ref=raw_ref, accepted_fingerprint=accepted_fp, new_fingerprint=new_fp,
-                                suggested_mapping=suggested, evidence=evidence, **base)
+        return RepairAssessment(
+            item_key=item_key,
+            classification=cls,
+            action=action,
+            tier=tier,
+            changes=tuple(changes),
+            affected_concepts=concepts,
+            semantic_diff=diff_ref,
+            raw_ref=raw_ref,
+            accepted_fingerprint=accepted_fp,
+            new_fingerprint=new_fp,
+            suggested_mapping=suggested,
+            evidence=evidence,
+            **base,
+        )
 
     def _affected_concepts(self, connector: Any, item_key: str | None) -> tuple[str, ...]:
         """Concepts a request feeds, from replaying its stored vintage (dependents for metadata items)."""
@@ -1235,9 +1623,15 @@ class ConnectorRepairAdvisor:
         return tuple(sorted(concepts))
 
     # ------------------------------------------------------------------ proposals
-    def propose(self, connector: Any, assessment: RepairAssessment, *,
-                mapping: MappingRevision | None = None, parser: Any = None,
-                fence: Any = None) -> RepairProposal | None:
+    def propose(
+        self,
+        connector: Any,
+        assessment: RepairAssessment,
+        *,
+        mapping: MappingRevision | None = None,
+        parser: Any = None,
+        fence: Any = None,
+    ) -> RepairProposal | None:
         """Persist the repair proposal (ops.proposal + manifest), run independent checks, pause publication.
 
         Returns ``None`` for transient failures / no schema change. Gate results are
@@ -1251,8 +1645,9 @@ class ConnectorRepairAdvisor:
         if mapping is not None and parser is not None:
             raise ValidationProblem("give either a declarative mapping revision or a parser, not both")
         if (mapping is not None or parser is not None) and assessment.tier != 2:
-            raise ValidationProblem("a new mapping/parser only belongs to a T2 repair proposal",
-                                    classification=assessment.classification)
+            raise ValidationProblem(
+                "a new mapping/parser only belongs to a T2 repair proposal", classification=assessment.classification
+            )
         spec = connector.describe()
         mapping = mapping if parser is None else None
         if mapping is None and parser is None and assessment.tier == 2:
@@ -1267,10 +1662,18 @@ class ConnectorRepairAdvisor:
             history = self.accepted_history(connector) if self.include_db_history else []
             new_raw = self._new_raw(connector, assessment)
             baseline_new = self._baseline_same_request(connector, assessment)
-            reports.append(FixtureReplayChecker(self.io).check(
-                connector, proposed, assessment.bank, proposal_key=f"{spec.name}:{assessment.item_key}",
-                history=history, new_raw=new_raw, baseline_new=baseline_new,
-                history_truncated=self.last_history_truncated))
+            reports.append(
+                FixtureReplayChecker(self.io).check(
+                    connector,
+                    proposed,
+                    assessment.bank,
+                    proposal_key=f"{spec.name}:{assessment.item_key}",
+                    history=history,
+                    new_raw=new_raw,
+                    baseline_new=baseline_new,
+                    history_truncated=self.last_history_truncated,
+                )
+            )
         manifest = self._manifest(connector, assessment, proposed, reports)
         ref = self.io.put_json(manifest, "models")
         tier = int(assessment.tier)
@@ -1278,8 +1681,10 @@ class ConnectorRepairAdvisor:
         changed_paths: tuple[str, ...]
         caps: tuple[str, ...]
         if kind == "reenable_unchanged_mapping":
-            changed_paths = (f"connectors/{spec.name}/{spec.version}/accepted_schema/"
-                             f"{(assessment.new_fingerprint or 'none')[:16]}.json",)
+            changed_paths = (
+                f"connectors/{spec.name}/{spec.version}/accepted_schema/"
+                f"{(assessment.new_fingerprint or 'none')[:16]}.json",
+            )
             caps, scientific = ("concept_eligibility",), False
         elif kind in ("new_mapping_version", "review_content_anomaly"):
             ver = manifest["proposed_mapping_version"] or f"{spec.parser_version}+map.pending"
@@ -1292,30 +1697,55 @@ class ConnectorRepairAdvisor:
         else:  # credential provisioning
             changed_paths, caps, scientific = (), ("secret_access",), False
         proposal = PlatformChangeProposal(
-            proposal_id=stable_id("connector-repair", ref.sha256), author=self.author,
+            proposal_id=stable_id("connector-repair", ref.sha256),
+            author=self.author,
             permission_tier=tier,  # type: ignore[arg-type]
-            changed_paths=changed_paths, base_commit=base_commit(), patch_or_manifest=ref,
-            requested_capabilities=caps, scientific_change=scientific, migration_required=False,
-            expected_benefit=self._value(assessment), policy_version=promotion_policy().version)
+            changed_paths=changed_paths,
+            base_commit=base_commit(),
+            patch_or_manifest=ref,
+            requested_capabilities=caps,
+            scientific_change=scientific,
+            migration_required=False,
+            expected_benefit=self._value(assessment),
+            policy_version=promotion_policy().version,
+        )
         with self.engine.begin() as conn:
             for r in (assessment.semantic_diff, assessment.raw_ref):
                 if r is not None:
-                    self.io.register(conn, r, "connector-semantic-diff/1" if r is assessment.semantic_diff
-                                     else f"{spec.name}/{spec.parser_version}/raw")
+                    self.io.register(
+                        conn,
+                        r,
+                        "connector-semantic-diff/1"
+                        if r is assessment.semantic_diff
+                        else f"{spec.name}/{spec.parser_version}/raw",
+                    )
             for rep in reports:
                 self.io.register(conn, rep.evidence_manifest, "connector-repair-check/1")
         proposal_type = f"connector_repair:{kind}"
         record = ProposalStore(self.engine, self.io, self.guard).persist(
-            proposal, proposal_type=proposal_type,
-            scope={"connector": spec.name, "connector_version": spec.version, "item": assessment.item_key,
-                   "concepts": list(assessment.affected_concepts)},
-            risk={"tier": f"T{tier}", "classification": assessment.classification,
-                  "semantic_change": scientific, "history": "replay-checked" if proposed is not None else "n/a"},
+            proposal,
+            proposal_type=proposal_type,
+            scope={
+                "connector": spec.name,
+                "connector_version": spec.version,
+                "item": assessment.item_key,
+                "concepts": list(assessment.affected_concepts),
+            },
+            risk={
+                "tier": f"T{tier}",
+                "classification": assessment.classification,
+                "semantic_change": scientific,
+                "history": "replay-checked" if proposed is not None else "n/a",
+            },
             dependencies=[f"fixture_bank:{assessment.bank.sha256}"]
             + ([f"semantic_diff:{assessment.semantic_diff.sha256}"] if assessment.semantic_diff else [])
             + ([f"acquisition:{assessment.case.acquisition_id}"] if assessment.case.acquisition_id else []),
-            summary={"classification": assessment.classification, "action": kind,
-                     "reports": [{"evaluator": r.evaluator_version, "outcome": r.outcome} for r in reports]})
+            summary={
+                "classification": assessment.classification,
+                "action": kind,
+                "reports": [{"evaluator": r.evaluator_version, "outcome": r.outcome} for r in reports],
+            },
+        )
         pause = None
         if assessment.schema_failure:
             pause = self.pause_publication(assessment, proposal.proposal_id, fence=fence)
@@ -1327,16 +1757,23 @@ class ConnectorRepairAdvisor:
         if a.case.body is None or a.item_key is None:
             return None
         item = _plan_by_key(connector)[a.item_key]
-        return RawAcquisition(item=item, body=a.case.body, media_type=a.case.media_type,
-                              retrieved_at=a.case.observed_at, response_metadata={"status": a.case.status},
-                              request_fingerprint=request_fingerprint("GET", item.url), origin="test_fixture")
+        return RawAcquisition(
+            item=item,
+            body=a.case.body,
+            media_type=a.case.media_type,
+            retrieved_at=a.case.observed_at,
+            response_metadata={"status": a.case.status},
+            request_fingerprint=request_fingerprint("GET", item.url),
+            origin="test_fixture",
+        )
 
     def _baseline_same_request(self, connector: Any, a: RepairAssessment) -> dict[str, str] | None:
         if a.item_key is None:
             return None
         item = _plan_by_key(connector)[a.item_key]
         e = {x["request_fingerprint"]: x for x in bank_entries(self.io, a.bank)}.get(
-            request_fingerprint("GET", item.url))
+            request_fingerprint("GET", item.url)
+        )
         return semantic_outputs(list(connector.parse(_raw_from_entry(self.io, e, item))))[0] if e else None
 
     def _revalidation_report(self, connector: Any, a: RepairAssessment) -> ValidationReport:
@@ -1353,65 +1790,111 @@ class ConnectorRepairAdvisor:
                 q = [validator.validate(b) for b in batches]
                 for rep in q:
                     findings.extend(_finding(f.code, f.severity, f.message) for f in rep.findings)
-                detail = {"observations": sum(len(b.observations) for b in batches),
-                          "quality": [r.model_dump(mode="json") for r in q]}
+                detail = {
+                    "observations": sum(len(b.observations) for b in batches),
+                    "quality": [r.model_dump(mode="json") for r in q],
+                }
             except RevaError as e:
                 findings.append(_finding("parse_failed", "blocker", e.message))
             if not (a.evidence.get("unused_proof") or {}).get("identical"):
-                findings.append(_finding("added_fields_not_proven_unused", "blocker",
-                                         "removing the added fields changes semantic outputs"))
+                findings.append(
+                    _finding(
+                        "added_fields_not_proven_unused",
+                        "blocker",
+                        "removing the added fields changes semantic outputs",
+                    )
+                )
         replay = FixtureReplayChecker(self.io)._compare  # identity replay: bank must still parse
-        bank_ok = all(not replay(connector, connector, _raw_from_entry(self.io, e, it), strict=True).get("error")
-                      for e in bank_entries(self.io, a.bank)
-                      if (it := _plan_by_fingerprint(connector).get(e["request_fingerprint"])) is not None)
+        bank_ok = all(
+            not replay(connector, connector, _raw_from_entry(self.io, e, it), strict=True).get("error")
+            for e in bank_entries(self.io, a.bank)
+            if (it := _plan_by_fingerprint(connector).get(e["request_fingerprint"])) is not None
+        )
         if not bank_ok:
             findings.append(_finding("bank_replay_failed", "blocker", "stored fixtures no longer parse"))
         outcome = "fail" if any(f.severity == "blocker" for f in findings) else "pass"
-        ev = self.io.put_json({"schema": "reva-connector-revalidation/1", "evaluator": REVALIDATION_EVALUATOR,
-                               "connector": a.connector, "parser_version": a.parser_version, "item": a.item_key,
-                               "drifted_raw": a.raw_ref.sha256 if a.raw_ref else None,
-                               "fixture_bank": a.bank.sha256, "mapping": "unchanged", "outcome": outcome,
-                               "findings": [{"code": f.code, "severity": f.severity, "message": f.message}
-                                            for f in findings], "detail": detail}, "evaluation")
+        ev = self.io.put_json(
+            {
+                "schema": "reva-connector-revalidation/1",
+                "evaluator": REVALIDATION_EVALUATOR,
+                "connector": a.connector,
+                "parser_version": a.parser_version,
+                "item": a.item_key,
+                "drifted_raw": a.raw_ref.sha256 if a.raw_ref else None,
+                "fixture_bank": a.bank.sha256,
+                "mapping": "unchanged",
+                "outcome": outcome,
+                "findings": [{"code": f.code, "severity": f.severity, "message": f.message} for f in findings],
+                "detail": detail,
+            },
+            "evaluation",
+        )
         return report(outcome, findings, ev, REVALIDATION_EVALUATOR)
 
-    def _manifest(self, connector: Any, a: RepairAssessment, proposed: Any,
-                  reports: Sequence[ValidationReport]) -> dict[str, Any]:
+    def _manifest(
+        self, connector: Any, a: RepairAssessment, proposed: Any, reports: Sequence[ValidationReport]
+    ) -> dict[str, Any]:
         spec = connector.describe()
         m: dict[str, Any] = {
-            "schema": REPAIR_SCHEMA, "action": a.action, "classification": a.classification, "tier": a.tier,
-            "connector": {"name": spec.name, "version": spec.version, "template": spec.template,
-                          "code_digest": spec.code_digest, "parser_version": spec.parser_version},
-            "item_key": a.item_key, "affected_concepts": list(a.affected_concepts),
-            "fixture_bank": a.bank.sha256, "semantic_diff": a.semantic_diff.sha256 if a.semantic_diff else None,
-            "drifted_raw": a.raw_ref.sha256 if a.raw_ref else None, "acquisition_id": a.case.acquisition_id,
+            "schema": REPAIR_SCHEMA,
+            "action": a.action,
+            "classification": a.classification,
+            "tier": a.tier,
+            "connector": {
+                "name": spec.name,
+                "version": spec.version,
+                "template": spec.template,
+                "code_digest": spec.code_digest,
+                "parser_version": spec.parser_version,
+            },
+            "item_key": a.item_key,
+            "affected_concepts": list(a.affected_concepts),
+            "fixture_bank": a.bank.sha256,
+            "semantic_diff": a.semantic_diff.sha256 if a.semantic_diff else None,
+            "drifted_raw": a.raw_ref.sha256 if a.raw_ref else None,
+            "acquisition_id": a.case.acquisition_id,
             "fingerprints": {"accepted": a.accepted_fingerprint, "new": a.new_fingerprint},
             "changes": [dict(c) for c in a.changes],
-            "independent_checks": [{"evaluator": r.evaluator_version, "outcome": r.outcome,
-                                    "evidence": r.evidence_manifest.sha256} for r in reports],
-            "publication": {"paused_concepts": list(a.affected_concepts) if a.schema_failure else [],
-                            "resume": "only after a promote decision by a gate evaluator or a named human review"},
-            "proposed_mapping_version": None, "proposed_parser": None,
+            "independent_checks": [
+                {"evaluator": r.evaluator_version, "outcome": r.outcome, "evidence": r.evidence_manifest.sha256}
+                for r in reports
+            ],
+            "publication": {
+                "paused_concepts": list(a.affected_concepts) if a.schema_failure else [],
+                "resume": "only after a promote decision by a gate evaluator or a named human review",
+            },
+            "proposed_mapping_version": None,
+            "proposed_parser": None,
         }
         if a.action == "reenable_unchanged_mapping":
-            m["mapping"] = {"version": spec.parser_version, "change": "none",
-                            "accept_schema_fingerprint": a.new_fingerprint}
+            m["mapping"] = {
+                "version": spec.parser_version,
+                "change": "none",
+                "accept_schema_fingerprint": a.new_fingerprint,
+            }
         elif a.action in ("new_mapping_version", "review_content_anomaly"):
             if isinstance(proposed, MappedParser):
                 m["proposed_mapping_version"] = proposed.revision.version
             m["proposed_parser"] = parser_identity(proposed) if proposed is not None else None
-            m["mapping"] = {"base_version": spec.parser_version, "requires_new_version": True,
-                            "status": "proposed" if proposed is not None else
-                            "to be authored in review (no transform is inferable from the evidence)"}
+            m["mapping"] = {
+                "base_version": spec.parser_version,
+                "requires_new_version": True,
+                "status": "proposed"
+                if proposed is not None
+                else "to be authored in review (no transform is inferable from the evidence)",
+            }
         elif a.action == "documentation_discovery":
             m["task"] = self._documentation_task(spec, a)
         elif a.action == "credential_provisioning_required":
-            m["task"] = {"kind": "credential_provisioning", "secret_ref": spec.authentication_secret_ref,
-                         "statuses": sorted({s for c in a.changes for s in c.get("statuses", [])}),
-                         "bypass": "forbidden: no anonymous fallback, no alternative host, no credential reuse",
-                         "connector": "remains quarantined until a maintainer provisions a credential "
-                                      "(registry secret reference) and a new connector version is reviewed",
-                         "evidence": a.evidence}
+            m["task"] = {
+                "kind": "credential_provisioning",
+                "secret_ref": spec.authentication_secret_ref,
+                "statuses": sorted({s for c in a.changes for s in c.get("statuses", [])}),
+                "bypass": "forbidden: no anonymous fallback, no alternative host, no credential reuse",
+                "connector": "remains quarantined until a maintainer provisions a credential "
+                "(registry secret reference) and a new connector version is reviewed",
+                "evidence": a.evidence,
+            }
         return m
 
     def _documentation_task(self, spec: Any, a: RepairAssessment) -> dict[str, Any]:
@@ -1419,22 +1902,38 @@ class ConnectorRepairAdvisor:
 
         src = next((s for s in load_registry().sources if s.get("source_key") == spec.source_key), {})
         md = src.get("metadata") or {}
-        docs = sorted({str(v) for k, v in md.items() if k in ("api_docs", "documentation") and v}
-                      | ({str(src["provider_url"])} if src.get("provider_url") else set()))
-        return {"kind": "documentation_discovery", "source_key": spec.source_key,
-                "allowed_documentation": docs,
-                "failing_items": [c.get("items") for c in a.changes if c.get("kind") == ENDPOINT],
-                "method": "read the provider's registered documentation/catalogue only; a replacement endpoint "
-                          "becomes a new T2 connector-version proposal validated against the fixture bank",
-                "forbidden": ["random_url_guessing", "endpoint_enumeration", "hosts_outside_allowlist"],
-                "evidence": a.evidence}
+        docs = sorted(
+            {str(v) for k, v in md.items() if k in ("api_docs", "documentation") and v}
+            | ({str(src["provider_url"])} if src.get("provider_url") else set())
+        )
+        return {
+            "kind": "documentation_discovery",
+            "source_key": spec.source_key,
+            "allowed_documentation": docs,
+            "failing_items": [c.get("items") for c in a.changes if c.get("kind") == ENDPOINT],
+            "method": "read the provider's registered documentation/catalogue only; a replacement endpoint "
+            "becomes a new T2 connector-version proposal validated against the fixture bank",
+            "forbidden": ["random_url_guessing", "endpoint_enumeration", "hosts_outside_allowlist"],
+            "evidence": a.evidence,
+        }
 
     def _value(self, a: RepairAssessment) -> ValueEstimate:
-        ref = self.io.put_json({"reason": "a repair restores an existing feed; benefit is not quantified",
-                                "connector": a.connector, "classification": a.classification}, "evaluation")
-        return ValueEstimate("unsupported", None, None, {"status": "unquantified", "kind": "unknown",
-                                                         "description": "repair benefit not quantified"},
-                             ref, "autonomy.repair@1")
+        ref = self.io.put_json(
+            {
+                "reason": "a repair restores an existing feed; benefit is not quantified",
+                "connector": a.connector,
+                "classification": a.classification,
+            },
+            "evaluation",
+        )
+        return ValueEstimate(
+            "unsupported",
+            None,
+            None,
+            {"status": "unquantified", "kind": "unknown", "description": "repair benefit not quantified"},
+            ref,
+            "autonomy.repair@1",
+        )
 
     # ------------------------------------------------------------------ publication pause
     def pause_publication(self, a: RepairAssessment, proposal_id: UUID, *, fence: Any = None) -> PublicationPause:
@@ -1442,9 +1941,16 @@ class ConnectorRepairAdvisor:
             if fence is not None:
                 fence(conn)
             return pause_belief_publication(
-                conn, a.affected_concepts, connector=a.connector, classification=a.classification,
-                proposal_id=proposal_id, origin=a.case.origin, item_key=a.item_key,
-                acquisition_id=a.case.acquisition_id, actor=self.author)
+                conn,
+                a.affected_concepts,
+                connector=a.connector,
+                classification=a.classification,
+                proposal_id=proposal_id,
+                origin=a.case.origin,
+                item_key=a.item_key,
+                acquisition_id=a.case.acquisition_id,
+                actor=self.author,
+            )
 
 
 def _group_key(item: FetchItem, sem: SchemaSemantics | None) -> tuple[str, ...]:
@@ -1453,8 +1959,9 @@ def _group_key(item: FetchItem, sem: SchemaSemantics | None) -> tuple[str, ...]:
 
 
 # --------------------------------------------------------------------------- diff
-def diff_payload(new_obj: Any, group_objs: Sequence[Any], same: Any, sem: SchemaSemantics | None) -> list[
-        dict[str, Any]]:
+def diff_payload(
+    new_obj: Any, group_objs: Sequence[Any], same: Any, sem: SchemaSemantics | None
+) -> list[dict[str, Any]]:
     """Structural/semantic changes of ``new_obj`` versus the stored vintages of the same request kind."""
     consumed = sem.consumed if sem else frozenset()
     new_prof = schema_profile(new_obj)
@@ -1473,22 +1980,36 @@ def diff_payload(new_obj: Any, group_objs: Sequence[Any], same: Any, sem: Schema
         if with_parent and all(k in prof for prof in with_parent):
             required.add(k)
     changes: list[dict[str, Any]] = []
-    added = [p for p in new_prof if p not in union and not _under_any(p, [q for q in new_prof
-                                                                          if q not in union and q != p])]
-    removed = [p for p in sorted(required) if p not in new_prof and _parent(p) in new_prof
-               and not _under_any(p, [q for q in required if q not in new_prof and q != p])]
+    added = [
+        p for p in new_prof if p not in union and not _under_any(p, [q for q in new_prof if q not in union and q != p])
+    ]
+    removed = [
+        p
+        for p in sorted(required)
+        if p not in new_prof
+        and _parent(p) in new_prof
+        and not _under_any(p, [q for q in required if q not in new_prof and q != p])
+    ]
     same_prof = schema_profile(same) if same is not None else {}
     # renames: a removed path paired with an added sibling of compatible type and matching values
     renamed: set[str] = set()
     used_new: set[str] = set()
     for old in removed:
         old_types = set(union[old]) - {"null"}
-        cands = [a for a in added if a not in used_new and _parent(a) == _parent(old)
-                 and (not old_types or (set(new_prof[a]) - {"null"}) <= old_types)]
+        cands = [
+            a
+            for a in added
+            if a not in used_new
+            and _parent(a) == _parent(old)
+            and (not old_types or (set(new_prof[a]) - {"null"}) <= old_types)
+        ]
         if not cands:
             continue
-        old_vals = {_scalar_text(v) for v in values_at(same if same is not None else group_objs[0], old)
-                    if v is not None} if (same is not None or group_objs) else set()
+        old_vals = (
+            {_scalar_text(v) for v in values_at(same if same is not None else group_objs[0], old) if v is not None}
+            if (same is not None or group_objs)
+            else set()
+        )
         scored = []
         for c in cands:
             new_vals = {_scalar_text(v) for v in values_at(new_obj, c) if v is not None}
@@ -1499,22 +2020,41 @@ def diff_payload(new_obj: Any, group_objs: Sequence[Any], same: Any, sem: Schema
         if best_score >= 0.5 or (len(cands) == 1 and len(removed) == 1):
             renamed.add(old)
             used_new.add(best)
-            changes.append({"kind": RENAME, "path": old, "new_path": best, "consumed": old in consumed,
-                            "types": sorted(new_prof[best]),
-                            "confidence": "values_match" if best_score >= 0.5 else "structure_only",
-                            "value_overlap": round(best_score, 4)})
+            changes.append(
+                {
+                    "kind": RENAME,
+                    "path": old,
+                    "new_path": best,
+                    "consumed": old in consumed,
+                    "types": sorted(new_prof[best]),
+                    "confidence": "values_match" if best_score >= 0.5 else "structure_only",
+                    "value_overlap": round(best_score, 4),
+                }
+            )
     for p in added:
         if p in used_new:
             continue
-        changes.append({"kind": "added_field" if p not in consumed else STRUCTURE, "path": p,
-                        "types": new_prof[p], "consumed": p in consumed,
-                        **({"detail": "a path the reviewed parser reads appeared"} if p in consumed else {})})
+        changes.append(
+            {
+                "kind": "added_field" if p not in consumed else STRUCTURE,
+                "path": p,
+                "types": new_prof[p],
+                "consumed": p in consumed,
+                **({"detail": "a path the reviewed parser reads appeared"} if p in consumed else {}),
+            }
+        )
     for p in removed:
         if p in renamed:
             continue
-        changes.append({"kind": REMOVED if p in consumed else STRUCTURE, "path": p, "consumed": p in consumed,
-                        "old_types": sorted(union[p]),
-                        **({} if p in consumed else {"detail": "an unused field disappeared"})})
+        changes.append(
+            {
+                "kind": REMOVED if p in consumed else STRUCTURE,
+                "path": p,
+                "consumed": p in consumed,
+                "old_types": sorted(union[p]),
+                **({} if p in consumed else {"detail": "an unused field disappeared"}),
+            }
+        )
     for p, types in new_prof.items():
         if p not in union:
             continue
@@ -1523,14 +2063,35 @@ def diff_payload(new_obj: Any, group_objs: Sequence[Any], same: Any, sem: Schema
         if not new_nn or new_nn <= old_nn:
             continue
         if not old_nn:
-            changes.append({"kind": "populated_unused_field" if p not in consumed else TYPE_CHANGE, "path": p,
-                            "old_types": sorted(union[p]), "new_types": list(types), "consumed": p in consumed})
+            changes.append(
+                {
+                    "kind": "populated_unused_field" if p not in consumed else TYPE_CHANGE,
+                    "path": p,
+                    "old_types": sorted(union[p]),
+                    "new_types": list(types),
+                    "consumed": p in consumed,
+                }
+            )
         elif {"object", "array"} & (new_nn | old_nn) and p not in consumed:
-            changes.append({"kind": STRUCTURE, "path": p, "old_types": sorted(union[p]), "new_types": list(types),
-                            "consumed": False})
+            changes.append(
+                {
+                    "kind": STRUCTURE,
+                    "path": p,
+                    "old_types": sorted(union[p]),
+                    "new_types": list(types),
+                    "consumed": False,
+                }
+            )
         else:
-            changes.append({"kind": TYPE_CHANGE if p in consumed else STRUCTURE, "path": p,
-                            "old_types": sorted(union[p]), "new_types": list(types), "consumed": p in consumed})
+            changes.append(
+                {
+                    "kind": TYPE_CHANGE if p in consumed else STRUCTURE,
+                    "path": p,
+                    "old_types": sorted(union[p]),
+                    "new_types": list(types),
+                    "consumed": p in consumed,
+                }
+            )
     if sem is not None:
         for kind, paths in ((UNIT, sem.units), (CLASSIFICATION, sem.classifications), (MEANING, sem.meanings)):
             for p in paths:
@@ -1545,9 +2106,16 @@ def diff_payload(new_obj: Any, group_objs: Sequence[Any], same: Any, sem: Schema
                     basis = "request_kind_vocabulary"
                 if not base_vals or new_vals <= base_vals:
                     continue
-                changes.append({"kind": kind, "path": p, "old_values": _clip(sorted(base_vals)),
-                                "new_values": _clip(sorted(new_vals - base_vals)), "basis": basis,
-                                "consumed": p in consumed})
+                changes.append(
+                    {
+                        "kind": kind,
+                        "path": p,
+                        "old_values": _clip(sorted(base_vals)),
+                        "new_values": _clip(sorted(new_vals - base_vals)),
+                        "basis": basis,
+                        "consumed": p in consumed,
+                    }
+                )
     return changes
 
 
@@ -1560,8 +2128,9 @@ def _under_any(p: str, others: Sequence[str]) -> bool:
     return any(p != o and p.startswith(o) and p[len(o)] in ".[" for o in others if len(p) > len(o))
 
 
-def _primary_class(changes: Sequence[Mapping[str, Any]], sem: SchemaSemantics | None, additive_ok: bool,
-                   new_blockers: Sequence[str]) -> str:
+def _primary_class(
+    changes: Sequence[Mapping[str, Any]], sem: SchemaSemantics | None, additive_ok: bool, new_blockers: Sequence[str]
+) -> str:
     kinds = {c["kind"] for c in changes}
     for k in PAYLOAD_PRIORITY:
         if k in kinds:
@@ -1573,14 +2142,20 @@ def _primary_class(changes: Sequence[Mapping[str, Any]], sem: SchemaSemantics | 
     return NO_CHANGE
 
 
-def suggest_mapping(parser_version: str, cls: str, changes: Sequence[Mapping[str, Any]],
-                    sem: SchemaSemantics | None) -> MappingRevision | None:
+def suggest_mapping(
+    parser_version: str, cls: str, changes: Sequence[Mapping[str, Any]], sem: SchemaSemantics | None
+) -> MappingRevision | None:
     """Infer a declarative mapping revision only where the evidence determines it."""
     if cls not in (RENAME, TYPE_CHANGE, UNIT, SCALE):
         return None
     renames = tuple((c["new_path"], c["path"]) for c in changes if c["kind"] == RENAME)
-    coercions = tuple(c["path"] for c in changes if c["kind"] == TYPE_CHANGE and set(c.get("old_types", [])) - {
-        "null"} == {"number"} and "string" in c.get("new_types", []))
+    coercions = tuple(
+        c["path"]
+        for c in changes
+        if c["kind"] == TYPE_CHANGE
+        and set(c.get("old_types", [])) - {"null"} == {"number"}
+        and "string" in c.get("new_types", [])
+    )
     scales: tuple[ScaleRule, ...] = ()
     scale = next((c for c in changes if c["kind"] == SCALE), None)
     units = [c for c in changes if c["kind"] == UNIT]
@@ -1589,41 +2164,77 @@ def suggest_mapping(parser_version: str, cls: str, changes: Sequence[Mapping[str
         # (the condition) and the item has a single value field; otherwise review decides.
         # The matched marker is restored to the single accepted unit value (normalize_to);
         # with several accepted values the target unit is ambiguous and review decides.
-        if not (sem and len(sem.value_paths) == 1 and len(units) == 1 and len(units[0]["new_values"]) == 1
-                and len(units[0].get("old_values") or []) == 1 and scale["factor_new_over_old"]):
+        if not (
+            sem
+            and len(sem.value_paths) == 1
+            and len(units) == 1
+            and len(units[0]["new_values"]) == 1
+            and len(units[0].get("old_values") or []) == 1
+            and scale["factor_new_over_old"]
+        ):
             return None
         factor = Decimal(1) / Decimal(scale["factor_new_over_old"])
-        scales = (ScaleRule(sem.value_paths[0], format(factor.normalize(), "f"), units[0]["path"],
-                            units[0]["new_values"][0], units[0]["old_values"][0]),)
+        scales = (
+            ScaleRule(
+                sem.value_paths[0],
+                format(factor.normalize(), "f"),
+                units[0]["path"],
+                units[0]["new_values"][0],
+                units[0]["old_values"][0],
+            ),
+        )
     elif units:
         return None  # unit text changed without measurable rescaling: meaning must be reviewed
     if any(c["kind"] in (MEANING, CLASSIFICATION, REMOVED, STRUCTURE) for c in changes):
         return None
     if not (renames or coercions or scales):
         return None
-    return MappingRevision(parser_version, renames, scales, coercions,
-                           note=f"inferred from {cls} evidence; replay-checked before review")
+    return MappingRevision(
+        parser_version, renames, scales, coercions, note=f"inferred from {cls} evidence; replay-checked before review"
+    )
 
 
 # --------------------------------------------------------------------------- publication markers
 def last_accepted_release(conn: Connection, origin: str, concept_id: str | None = None) -> dict[str, Any] | None:
-    row = conn.execute(text(
-        """SELECT r.id, p.sequence, r.knowledge_cutoff, p.published_at FROM belief.release r
+    row = (
+        conn.execute(
+            text(
+                """SELECT r.id, p.sequence, r.knowledge_cutoff, p.published_at FROM belief.release r
              JOIN ops.publication p ON p.release_id = r.id
             WHERE r.origin = :o AND (CAST(:c AS text) IS NULL OR EXISTS (
                   SELECT 1 FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id
                    WHERE e.release_id = r.id AND cv.concept_id = :c))
-            ORDER BY p.sequence DESC LIMIT 1"""), {"o": origin, "c": concept_id}).mappings().one_or_none()
+            ORDER BY p.sequence DESC LIMIT 1"""
+            ),
+            {"o": origin, "c": concept_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if row is None:
         return None
-    return {"release_id": str(row["id"]), "sequence": int(row["sequence"]),
-            "knowledge_cutoff": row["knowledge_cutoff"].isoformat(), "published_at": row["published_at"].isoformat(),
-            "readable": True, "stale": True}
+    return {
+        "release_id": str(row["id"]),
+        "sequence": int(row["sequence"]),
+        "knowledge_cutoff": row["knowledge_cutoff"].isoformat(),
+        "published_at": row["published_at"].isoformat(),
+        "readable": True,
+        "stale": True,
+    }
 
 
-def pause_belief_publication(conn: Connection, concepts: Sequence[str], *, connector: str, classification: str,
-                             proposal_id: UUID, origin: str, item_key: str | None, acquisition_id: str | None,
-                             actor: str) -> PublicationPause:
+def pause_belief_publication(
+    conn: Connection,
+    concepts: Sequence[str],
+    *,
+    connector: str,
+    classification: str,
+    proposal_id: UUID,
+    origin: str,
+    item_key: str | None,
+    acquisition_id: str | None,
+    actor: str,
+) -> PublicationPause:
     """Mark concepts as paused (``publication_pause:belief:<concept>``) and announce the stale release.
 
     Takes the publication advisory lock first, so a pause either commits before a
@@ -1639,24 +2250,45 @@ def pause_belief_publication(conn: Connection, concepts: Sequence[str], *, conne
     for c in sorted(set(concepts)):
         key = f"{PAUSE_PREFIX}{c}"
         keys.append(key)
-        conn.execute(text(
-            """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
+        conn.execute(
+            text(
+                """INSERT INTO ops.dirty_node(node_key, since_sequence, accumulated_error_bound, reason)
                VALUES (:k, :s, CAST(:b AS jsonb), :r)
                ON CONFLICT (node_key) DO UPDATE SET reason = EXCLUDED.reason, updated_at = clock_timestamp(),
-                 accumulated_error_bound = EXCLUDED.accumulated_error_bound"""),
-            {"k": key, "s": seq, "r": reason,
-             "b": json.dumps({"kind": "unbounded", "basis": "source_schema_quarantine",
-                              "proposal_id": str(proposal_id)})})
+                 accumulated_error_bound = EXCLUDED.accumulated_error_bound"""
+            ),
+            {
+                "k": key,
+                "s": seq,
+                "r": reason,
+                "b": json.dumps(
+                    {"kind": "unbounded", "basis": "source_schema_quarantine", "proposal_id": str(proposal_id)}
+                ),
+            },
+        )
         releases[c] = last_accepted_release(conn, origin, c)
     last = last_accepted_release(conn, origin)
-    payload = {"connector": connector, "classification": classification, "item": item_key,
-               "proposal_id": str(proposal_id), "acquisition_id": acquisition_id, "origin": origin,
-               "concepts": sorted(set(concepts)), "node_keys": keys, "last_accepted_release": last,
-               "last_release_per_concept": releases,
-               "visibility": "last accepted release remains readable and must be shown as stale for these concepts"}
+    payload = {
+        "connector": connector,
+        "classification": classification,
+        "item": item_key,
+        "proposal_id": str(proposal_id),
+        "acquisition_id": acquisition_id,
+        "origin": origin,
+        "concepts": sorted(set(concepts)),
+        "node_keys": keys,
+        "last_accepted_release": last,
+        "last_release_per_concept": releases,
+        "visibility": "last accepted release remains readable and must be shown as stale for these concepts",
+    }
     repo.emit_outbox(conn, "connector.publication_paused", payload)
-    repo.audit(conn, actor, "connector.publication_paused", {"connector": connector, "concepts": payload["concepts"]},
-               {"classification": classification, "proposal_id": str(proposal_id)})
+    repo.audit(
+        conn,
+        actor,
+        "connector.publication_paused",
+        {"connector": connector, "concepts": payload["concepts"]},
+        {"classification": classification, "proposal_id": str(proposal_id)},
+    )
     return PublicationPause(tuple(keys), tuple(sorted(set(concepts))), reason, last)
 
 
@@ -1665,25 +2297,50 @@ PAUSE_WITHHOLD_REASON = "source_schema_quarantine"
 
 def active_publication_pauses(conn: Connection) -> list[dict[str, Any]]:
     """Active pause markers (readable by every runtime role: ops.dirty_node is granted to reva_api)."""
-    rows = conn.execute(text(
-        "SELECT node_key, reason, accumulated_error_bound, updated_at FROM ops.dirty_node "
-        "WHERE node_key LIKE :p ORDER BY node_key"), {"p": PAUSE_PREFIX + "%"}).mappings().all()
-    return [{"concept": r["node_key"][len(PAUSE_PREFIX):], "reason": r["reason"],
-             "basis": (r["accumulated_error_bound"] or {}).get("basis", PAUSE_WITHHOLD_REASON),
-             "proposal_id": (r["accumulated_error_bound"] or {}).get("proposal_id"),
-             "since": r["updated_at"].isoformat()} for r in rows]
+    rows = (
+        conn.execute(
+            text(
+                "SELECT node_key, reason, accumulated_error_bound, updated_at FROM ops.dirty_node "
+                "WHERE node_key LIKE :p ORDER BY node_key"
+            ),
+            {"p": PAUSE_PREFIX + "%"},
+        )
+        .mappings()
+        .all()
+    )
+    return [
+        {
+            "concept": r["node_key"][len(PAUSE_PREFIX) :],
+            "reason": r["reason"],
+            "basis": (r["accumulated_error_bound"] or {}).get("basis", PAUSE_WITHHOLD_REASON),
+            "proposal_id": (r["accumulated_error_bound"] or {}).get("proposal_id"),
+            "since": r["updated_at"].isoformat(),
+        }
+        for r in rows
+    ]
 
 
 def is_publication_paused(conn: Connection, concept_id: str) -> bool:
-    return conn.execute(text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"),
-                        {"k": PAUSE_PREFIX + concept_id}).scalar_one_or_none() is not None
+    return (
+        conn.execute(
+            text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"), {"k": PAUSE_PREFIX + concept_id}
+        ).scalar_one_or_none()
+        is not None
+    )
 
 
 RESUME_EXECUTOR = "worker:publication-resume"
 
 
-def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, reason: str,
-                              gate_result_id: UUID | None = None, review_id: UUID | None = None) -> bool:
+def resume_belief_publication(
+    engine: Engine,
+    concept_id: str,
+    *,
+    actor: str,
+    reason: str,
+    gate_result_id: UUID | None = None,
+    review_id: UUID | None = None,
+) -> bool:
     """Lift a pause. Only a gate evaluator (with its promote decision) or a named human may do so.
 
     A human resume is never asserted by the worker: it must cite the human's recorded
@@ -1695,9 +2352,14 @@ def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, re
     if not actor.startswith(("gate-evaluator:", "human:")):
         raise AutonomyBlocked("only a gate evaluator or a named human can resume belief publication")
     with engine.begin() as conn:
-        marker_row = conn.execute(text("SELECT accumulated_error_bound, updated_at FROM ops.dirty_node "
-                                       "WHERE node_key = :k FOR UPDATE"),
-                                  {"k": PAUSE_PREFIX + concept_id}).mappings().one_or_none()
+        marker_row = (
+            conn.execute(
+                text("SELECT accumulated_error_bound, updated_at FROM ops.dirty_node WHERE node_key = :k FOR UPDATE"),
+                {"k": PAUSE_PREFIX + concept_id},
+            )
+            .mappings()
+            .one_or_none()
+        )
         marker = marker_row["accumulated_error_bound"] if marker_row is not None else None
         pause_proposal = (marker or {}).get("proposal_id")
         evidence: dict[str, Any] = {"reason": reason[:500]}
@@ -1707,38 +2369,65 @@ def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, re
             # R6-08: the stored row is the authority (gate results are recorded by the separate
             # reva_gate login, not by this worker): a pass by this evaluator, for the repair
             # proposal that set this pause, recorded after the pause marker was (re)written.
-            g = conn.execute(text(
-                """SELECT g.decision, g.evaluator, g.proposal_id, g.recorded_at, p.proposal_type
+            g = (
+                conn.execute(
+                    text(
+                        """SELECT g.decision, g.evaluator, g.proposal_id, g.recorded_at, p.proposal_type
                      FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id
-                    WHERE g.id = :g"""), {"g": gate_result_id}).mappings().one_or_none()
+                    WHERE g.id = :g"""
+                    ),
+                    {"g": gate_result_id},
+                )
+                .mappings()
+                .one_or_none()
+            )
             if g is None or g["decision"] != "pass" or g["evaluator"] != actor:
                 raise AutonomyBlocked("gate result is not a promote decision by this evaluator")
-            if marker_row is None or pause_proposal is None or str(g["proposal_id"]) != str(pause_proposal) \
-                    or not str(g["proposal_type"]).startswith("connector_repair:") \
-                    or g["recorded_at"] <= marker_row["updated_at"]:
-                raise AutonomyBlocked("the gate pass is not for the repair proposal that paused publication "
-                                      "(or predates the pause)")
+            if (
+                marker_row is None
+                or pause_proposal is None
+                or str(g["proposal_id"]) != str(pause_proposal)
+                or not str(g["proposal_type"]).startswith("connector_repair:")
+                or g["recorded_at"] <= marker_row["updated_at"]
+            ):
+                raise AutonomyBlocked(
+                    "the gate pass is not for the repair proposal that paused publication (or predates the pause)"
+                )
             audit_actor = actor
             evidence.update({"gate_result_id": str(gate_result_id), "proposal_id": str(g["proposal_id"])})
         else:
             if review_id is None:
                 raise AutonomyBlocked("a human resume must cite the reviewer's recorded approval (review_id)")
-            rv = conn.execute(text("SELECT proposal_id, decision, reviewer FROM ops.proposal_review WHERE id = :r"),
-                              {"r": review_id}).mappings().one_or_none()
+            rv = (
+                conn.execute(
+                    text("SELECT proposal_id, decision, reviewer FROM ops.proposal_review WHERE id = :r"),
+                    {"r": review_id},
+                )
+                .mappings()
+                .one_or_none()
+            )
             if rv is None or rv["decision"] != "approve" or rv["reviewer"] != actor:
                 raise AutonomyBlocked("review is not an approval recorded by this reviewer")
             if marker is not None and str(rv["proposal_id"]) != str(pause_proposal):
                 raise AutonomyBlocked("the review approves a different proposal than the one that paused publication")
             audit_actor = RESUME_EXECUTOR
             evidence.update({"reviewer": actor, "review_id": str(review_id)})
-        n = conn.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"),
-                         {"k": PAUSE_PREFIX + concept_id}).rowcount
+        n = conn.execute(
+            text("DELETE FROM ops.dirty_node WHERE node_key = :k"), {"k": PAUSE_PREFIX + concept_id}
+        ).rowcount
         if n:
-            repo.emit_outbox(conn, "connector.publication_resumed",
-                             {"concept": concept_id, "actor": actor, "reason": reason[:500],
-                              "proposal_id": pause_proposal,
-                              "gate_result_id": str(gate_result_id) if gate_result_id else None,
-                              "review_id": str(review_id) if review_id else None})
+            repo.emit_outbox(
+                conn,
+                "connector.publication_resumed",
+                {
+                    "concept": concept_id,
+                    "actor": actor,
+                    "reason": reason[:500],
+                    "proposal_id": pause_proposal,
+                    "gate_result_id": str(gate_result_id) if gate_result_id else None,
+                    "review_id": str(review_id) if review_id else None,
+                },
+            )
             repo.audit(conn, audit_actor, "connector.publication_resumed", {"concept": concept_id}, evidence)
     return bool(n)
 
@@ -1764,45 +2453,98 @@ def handle_connector_repair(payload: dict[str, Any], ctx: Any) -> dict[str, Any]
         return {"status": "rejected", "reason": "unknown connector or origin", "known": sorted(connectors)}
     connector = connectors[name]
     if name not in SEMANTICS:
-        return {"status": "unsupported", "reason": f"no declared schema semantics for {name}; "
-                                                   "repairs for it need named review"}
+        return {
+            "status": "unsupported",
+            "reason": f"no declared schema semantics for {name}; repairs for it need named review",
+        }
     advisor = ConnectorRepairAdvisor(ctx.worker_engine, ctx.store, guard=guard)
     try:
         case = advisor.find_case(connector, origin=origin)
         if case is None:
             return {"status": "no_case", "connector": name}
         a = advisor.assess(connector, case)
-        fence = ctx.assert_lease if getattr(ctx, "job_id", None) is not None and hasattr(ctx, "assert_lease") \
-            else None
+        fence = ctx.assert_lease if getattr(ctx, "job_id", None) is not None and hasattr(ctx, "assert_lease") else None
         rp = advisor.propose(connector, a, fence=fence)
     except AutonomyBlocked as e:
         return {"status": "blocked", "reason": e.message}
-    out: dict[str, Any] = {"connector": name, "classification": a.classification, "action": a.action,
-                           "tier": a.tier, "item": a.item_key, "concepts": list(a.affected_concepts)}
+    out: dict[str, Any] = {
+        "connector": name,
+        "classification": a.classification,
+        "action": a.action,
+        "tier": a.tier,
+        "item": a.item_key,
+        "concepts": list(a.affected_concepts),
+    }
     if rp is None:
         return {**out, "status": "no_proposal"}
     # GATE (process separation): request + await the independent gate's recorded decision.
     gate = GateClient.from_settings(ctx.worker_engine, ArtifactIO(ctx.store), ctx.settings, guard=guard)
     d = gate.decide(rp.proposal, list(rp.reports), promotion_policy().ref())
-    out.update({"status": f"gate_{d.outcome}", "proposal_id": str(rp.proposal.proposal_id),
-                "gate_result_id": str(d.decision_id), "reasons": list(d.reasons),
-                "paused_concepts": list(rp.pause.concepts) if rp.pause else []})
+    out.update(
+        {
+            "status": f"gate_{d.outcome}",
+            "proposal_id": str(rp.proposal.proposal_id),
+            "gate_result_id": str(d.decision_id),
+            "reasons": list(d.reasons),
+            "paused_concepts": list(rp.pause.concepts) if rp.pause else [],
+        }
+    )
     if d.outcome == "promote" and a.action == "documentation_discovery":
         with ctx.worker_engine.begin() as conn:
-            repo.emit_outbox(conn, "autonomy.documentation_discovery_requested",
-                             {"connector": name, "proposal_id": str(rp.proposal.proposal_id),
-                              "gate_result_id": str(d.decision_id),
-                              "allowed_documentation": rp.extra.get("documentation_sources", [])})
+            repo.emit_outbox(
+                conn,
+                "autonomy.documentation_discovery_requested",
+                {
+                    "connector": name,
+                    "proposal_id": str(rp.proposal.proposal_id),
+                    "gate_result_id": str(d.decision_id),
+                    "allowed_documentation": rp.extra.get("documentation_sources", []),
+                },
+            )
     return out
 
 
 __all__ = [
-    "ADDITIVE", "AUTH", "CLASSIFICATION", "CONTENT", "ENDPOINT", "MEANING", "PAUSE_WITHHOLD_REASON", "REMOVED",
-    "RENAME", "RESUME_EXECUTOR", "SCALE", "STRUCTURE", "TRANSIENT", "TYPE_CHANGE", "UNIT", "AttemptSignal",
-    "ConnectorRepairAdvisor", "DriftCase", "FixtureReplayChecker", "MappedParser", "MappingRevision",
-    "PublicationPause", "RepairAssessment", "RepairProposal", "RunSignals", "ScaleRule", "SchemaSemantics",
-    "active_publication_pauses", "diff_payload", "dumps_exact", "failure_history", "failure_streak",
-    "handle_connector_repair", "is_publication_paused", "last_accepted_release", "load_exact",
-    "pause_belief_publication", "resume_belief_publication", "schema_profile", "semantic_schema_fingerprint",
-    "suggest_mapping", "value_comparison",
+    "ADDITIVE",
+    "AUTH",
+    "CLASSIFICATION",
+    "CONTENT",
+    "ENDPOINT",
+    "MEANING",
+    "PAUSE_WITHHOLD_REASON",
+    "REMOVED",
+    "RENAME",
+    "RESUME_EXECUTOR",
+    "SCALE",
+    "STRUCTURE",
+    "TRANSIENT",
+    "TYPE_CHANGE",
+    "UNIT",
+    "AttemptSignal",
+    "ConnectorRepairAdvisor",
+    "DriftCase",
+    "FixtureReplayChecker",
+    "MappedParser",
+    "MappingRevision",
+    "PublicationPause",
+    "RepairAssessment",
+    "RepairProposal",
+    "RunSignals",
+    "ScaleRule",
+    "SchemaSemantics",
+    "active_publication_pauses",
+    "diff_payload",
+    "dumps_exact",
+    "failure_history",
+    "failure_streak",
+    "handle_connector_repair",
+    "is_publication_paused",
+    "last_accepted_release",
+    "load_exact",
+    "pause_belief_publication",
+    "resume_belief_publication",
+    "schema_profile",
+    "semantic_schema_fingerprint",
+    "suggest_mapping",
+    "value_comparison",
 ]

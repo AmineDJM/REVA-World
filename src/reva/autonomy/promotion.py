@@ -68,12 +68,17 @@ def spec_manifest(io_: ArtifactIO, spec_sha256: str) -> dict[str, Any] | None:
 
 
 def versions_of(conn: Connection, name: str) -> list[dict[str, Any]]:
-    return [dict(r) for r in conn.execute(text(VERSIONS_SQL + " WHERE cv.name = :n ORDER BY cv.recorded_at, cv.id"),
-                                          {"n": name}).mappings()]
+    return [
+        dict(r)
+        for r in conn.execute(
+            text(VERSIONS_SQL + " WHERE cv.name = :n ORDER BY cv.recorded_at, cv.id"), {"n": name}
+        ).mappings()
+    ]
 
 
-def resolve_connector_version(conn: Connection, io_: ArtifactIO, manifest: Mapping[str, Any],
-                              code_digest: str) -> tuple[str, UUID | None]:
+def resolve_connector_version(
+    conn: Connection, io_: ArtifactIO, manifest: Mapping[str, Any], code_digest: str
+) -> tuple[str, UUID | None]:
     """(version, existing connector_version id or None) for this manifest content + template digest."""
     rows = versions_of(conn, str(manifest["name"]))
     key = content_key(manifest)
@@ -87,8 +92,9 @@ def resolve_connector_version(conn: Connection, io_: ArtifactIO, manifest: Mappi
     return f"{major}.{minor}.{patch + 1}", None
 
 
-def rolled_back_content(conn: Connection, io_: ArtifactIO, manifest: Mapping[str, Any],
-                        concept_version_id: Any) -> list[dict[str, Any]]:
+def rolled_back_content(
+    conn: Connection, io_: ArtifactIO, manifest: Mapping[str, Any], concept_version_id: Any
+) -> list[dict[str, Any]]:
     """Registered versions with this manifest's *content* that were rolled back (not superseded).
 
     Any hit means ``rolled_back_hold``: the content needs a named human re-approval
@@ -100,36 +106,55 @@ def rolled_back_content(conn: Connection, io_: ArtifactIO, manifest: Mapping[str
         m = spec_manifest(io_, r["spec_sha256"])
         if m is None or content_key(m) != key:
             continue
-        last = conn.execute(text(
-            """SELECT decision, applicability FROM evidence.eligibility
+        last = (
+            conn.execute(
+                text(
+                    """SELECT decision, applicability FROM evidence.eligibility
                WHERE connector_version_id = :cv AND concept_version_id = :c
-               ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
-            {"cv": r["id"], "c": concept_version_id}).mappings().one_or_none()
-        if last is not None and last["decision"] != "eligible" \
-                and "superseded_by" not in dict(last["applicability"] or {}):
+               ORDER BY recorded_at DESC, id DESC LIMIT 1"""
+                ),
+                {"cv": r["id"], "c": concept_version_id},
+            )
+            .mappings()
+            .one_or_none()
+        )
+        if (
+            last is not None
+            and last["decision"] != "eligible"
+            and "superseded_by" not in dict(last["applicability"] or {})
+        ):
             out.append({"connector_version_id": str(r["id"]), "version": r["version"], "decision": last["decision"]})
     return out
 
 
-def same_registered_content(io_: ArtifactIO, row: Mapping[str, Any], manifest: Mapping[str, Any],
-                            code_digest: str) -> bool:
+def same_registered_content(
+    io_: ArtifactIO, row: Mapping[str, Any], manifest: Mapping[str, Any], code_digest: str
+) -> bool:
     m = spec_manifest(io_, row["spec_sha256"])
     return m is not None and m == dict(manifest) and row["code_digest"] == code_digest
 
 
 def latest_decision(conn: Connection, connector_version_id: Any, concept_version_id: Any) -> str | None:
-    return conn.execute(text(
-        """SELECT decision FROM evidence.eligibility WHERE connector_version_id = :cv AND concept_version_id = :c
-           ORDER BY recorded_at DESC, id DESC LIMIT 1"""), {"cv": connector_version_id, "c": concept_version_id}
+    return conn.execute(
+        text(
+            """SELECT decision FROM evidence.eligibility WHERE connector_version_id = :cv AND concept_version_id = :c
+           ORDER BY recorded_at DESC, id DESC LIMIT 1"""
+        ),
+        {"cv": connector_version_id, "c": concept_version_id},
     ).scalar_one_or_none()
 
 
 def connector_states(conn: Connection, current_digest: str | None = None) -> list[dict[str, Any]]:
     """State of every registered template connector version (``active``/``template_changed``/``retired``)."""
     digest = current_digest or et.template_digest()
-    rows = conn.execute(text(VERSIONS_SQL + " WHERE cv.declared_capabilities->>'template' = :t "
-                                            "ORDER BY cv.recorded_at, cv.id"), {"t": TEMPLATE_CAPABILITY}
-                        ).mappings().all()
+    rows = (
+        conn.execute(
+            text(VERSIONS_SQL + " WHERE cv.declared_capabilities->>'template' = :t ORDER BY cv.recorded_at, cv.id"),
+            {"t": TEMPLATE_CAPABILITY},
+        )
+        .mappings()
+        .all()
+    )
     out = []
     for r in rows:
         if r["latest_decision"] != "eligible":
@@ -138,9 +163,18 @@ def connector_states(conn: Connection, current_digest: str | None = None) -> lis
             state = "template_changed"
         else:
             state = "active"
-        out.append({"connector_version_id": str(r["id"]), "name": r["name"], "version": r["version"],
-                     "source_key": r["source_key"], "spec_sha256": r["spec_sha256"],
-                     "code_digest": r["code_digest"], "latest_decision": r["latest_decision"], "state": state})
+        out.append(
+            {
+                "connector_version_id": str(r["id"]),
+                "name": r["name"],
+                "version": r["version"],
+                "source_key": r["source_key"],
+                "spec_sha256": r["spec_sha256"],
+                "code_digest": r["code_digest"],
+                "latest_decision": r["latest_decision"],
+                "state": state,
+            }
+        )
     return out
 
 
@@ -154,8 +188,9 @@ def active_specs(engine: Engine, current_digest: str | None = None) -> dict[str,
     out: dict[str, dict[str, Any]] = {}
     for s in states:
         if s["state"] == "template_changed":
-            log.warning("promoted connector %s@%s disabled: template_changed (re-validation required)",
-                        s["name"], s["version"])
+            log.warning(
+                "promoted connector %s@%s disabled: template_changed (re-validation required)", s["name"], s["version"]
+            )
         if s["state"] != "active":
             continue
         if s["name"] in builtins:

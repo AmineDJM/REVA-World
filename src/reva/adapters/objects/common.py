@@ -120,5 +120,6 @@ def confirm_object_locked(conn: Any, store: Any, namespace: str, sha256: str, by
     lock_object_xact(conn, sha256)
     head = store.head(namespace, sha256)
     if head is None or (byte_size is not None and head.byte_size != byte_size):
-        raise IntegrityFailure("object vanished before registration; re-put and retry",
-                               namespace=namespace, sha256=sha256, retryable=True)
+        raise IntegrityFailure(
+            "object vanished before registration; re-put and retry", namespace=namespace, sha256=sha256, retryable=True
+        )

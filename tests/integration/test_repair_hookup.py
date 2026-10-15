@@ -67,18 +67,26 @@ class StubHttp:
 
     origin = "test_fixture"
 
-    def __init__(self, connector: str, *, overrides: dict[str, bytes] | None = None, status_for: Any = None,
-                 message: str | None = None) -> None:
-        self.base = FixtureHttp(connector, overrides={request_fingerprint("GET", u): b
-                                                      for u, b in (overrides or {}).items()})
+    def __init__(
+        self,
+        connector: str,
+        *,
+        overrides: dict[str, bytes] | None = None,
+        status_for: Any = None,
+        message: str | None = None,
+    ) -> None:
+        self.base = FixtureHttp(
+            connector, overrides={request_fingerprint("GET", u): b for u, b in (overrides or {}).items()}
+        )
         self.status_for = status_for or (lambda url: None)
         self.message = message
 
     async def get(self, url: str, **kw: Any) -> Any:
         st = self.status_for(url)
         if st is not None:
-            raise SourceResponseError(self.message or f"HTTP {st} from {urlsplit(url).hostname}", retryable=False,
-                                      status=st, attempts=1)
+            raise SourceResponseError(
+                self.message or f"HTTP {st} from {urlsplit(url).hostname}", retryable=False, status=st, attempts=1
+            )
         return await self.base.get(url, **kw)
 
     async def aclose(self) -> None:
@@ -100,20 +108,33 @@ def _cleanup(db) -> Iterator[None]:
         c.execute(text("DELETE FROM ops.dirty_node WHERE node_key LIKE :p"), {"p": R.PAUSE_PREFIX + "%"})
         c.execute(text("DELETE FROM ops.schedule WHERE schedule_key LIKE 'test.repair_hookup.%'"))
         # Never leave repair jobs for a later worker test to claim.
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', finished_at = clock_timestamp() "
-                       "WHERE job_type = 'connector_repair' AND status = 'queued'"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', finished_at = clock_timestamp() "
+                "WHERE job_type = 'connector_repair' AND status = 'queued'"
+            )
+        )
     with db.api.begin() as c:
-        for pid in c.execute(text(
+        for pid in c.execute(
+            text(
                 "SELECT p.id FROM ops.proposal p WHERE p.author = :a AND NOT EXISTS "
-                "(SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"), {"a": R.AUTHOR}).scalars():
-            c.execute(text("SELECT ops.review_proposal(:p, 'reject', 'human:test-teardown', :m)"),
-                      {"p": pid, "m": "test proposal closed at module teardown"})
+                "(SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"
+            ),
+            {"a": R.AUTHOR},
+        ).scalars():
+            c.execute(
+                text("SELECT ops.review_proposal(:p, 'reject', 'human:test-teardown', :m)"),
+                {"p": pid, "m": "test proposal closed at module teardown"},
+            )
 
 
 def _job(db, key: str) -> dict[str, Any] | None:
     with db.owner.connect() as c:
-        row = c.execute(text("SELECT id, job_type, payload, status FROM ops.job WHERE idempotency_key = :k"),
-                        {"k": key}).mappings().one_or_none()
+        row = (
+            c.execute(text("SELECT id, job_type, payload, status FROM ops.job WHERE idempotency_key = :k"), {"k": key})
+            .mappings()
+            .one_or_none()
+        )
     return dict(row) if row else None
 
 
@@ -148,13 +169,17 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
 
     # Drift: the reviewed parser quarantines the renamed-field response.
     url = CASES["wb_renamed_field"]["url"]
-    rep = await run_connector(wb, StubHttp(WB, overrides={url: _unique_renamed_body()}), db.store, db.worker,
-                              persist_cursor=False)
+    rep = await run_connector(
+        wb, StubHttp(WB, overrides={url: _unique_renamed_body()}), db.store, db.worker, persist_cursor=False
+    )
     assert {o.item_key: o.status for o in rep.outcomes}["series:SP.POP.TOTL:p1"] == "quarantined"
     with db.owner.connect() as c:
-        acq = c.execute(text(
-            "SELECT payload->>'acquisition_id' FROM ops.outbox WHERE event_type = 'evidence.acquisition_quarantined' "
-            "ORDER BY id DESC LIMIT 1")).scalar_one()
+        acq = c.execute(
+            text(
+                "SELECT payload->>'acquisition_id' FROM ops.outbox WHERE event_type = 'evidence.acquisition_quarantined' "
+                "ORDER BY id DESC LIMIT 1"
+            )
+        ).scalar_one()
 
     # The operations dispatcher turns the outbox event into one idempotent repair job.
     report = invalidation.process_outbox(db.worker, environment="test")
@@ -174,8 +199,9 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
     proposal_id = out["proposal_id"]
     with db.owner.connect() as c:
         assert R.is_publication_paused(c, POP)
-        pause_started = c.execute(text("SELECT updated_at FROM ops.dirty_node WHERE node_key = :k"),
-                                  {"k": R.PAUSE_PREFIX + POP}).scalar_one()
+        pause_started = c.execute(
+            text("SELECT updated_at FROM ops.dirty_node WHERE node_key = :k"), {"k": R.PAUSE_PREFIX + POP}
+        ).scalar_one()
 
     # 2. Publication withholds POP (reason source_schema_quarantine) but publishes the rest.
     r1 = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test")
@@ -186,15 +212,24 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
     assert all(w["details"]["last_accepted_release"]["release_id"] for w in paused)
     assert m1["publication_pauses"][0]["concept_id"] == POP
     with db.owner.connect() as c:
-        pop_in_r1 = c.execute(text(
-            "SELECT count(*) FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id "
-            "WHERE e.release_id = :r AND cv.concept_id = :c"), {"r": r1.release_id, "c": POP}).scalar_one()
-        params = c.execute(text("SELECT a.parameters FROM belief.release r JOIN meta.activity a "
-                                "ON a.id = r.provenance_activity_id WHERE r.id = :r"),
-                           {"r": r1.release_id}).scalar_one()
+        pop_in_r1 = c.execute(
+            text(
+                "SELECT count(*) FROM belief.estimate e JOIN ontology.concept_version cv ON cv.id = e.concept_version_id "
+                "WHERE e.release_id = :r AND cv.concept_id = :c"
+            ),
+            {"r": r1.release_id, "c": POP},
+        ).scalar_one()
+        params = c.execute(
+            text(
+                "SELECT a.parameters FROM belief.release r JOIN meta.activity a "
+                "ON a.id = r.provenance_activity_id WHERE r.id = :r"
+            ),
+            {"r": r1.release_id},
+        ).scalar_one()
         # POP stays dirty for the next release, but does not count as publishable work while paused.
-        reason = c.execute(text("SELECT reason FROM ops.dirty_node WHERE node_key = :k"),
-                           {"k": f"belief:{POP}"}).scalar_one()
+        reason = c.execute(
+            text("SELECT reason FROM ops.dirty_node WHERE node_key = :k"), {"k": f"belief:{POP}"}
+        ).scalar_one()
         dirty_while_paused = dirty_belief_nodes(c)
     assert pop_in_r1 == 0 and r1.estimates > 0
     assert params["withheld_paused"][0]["proposal_id"] == proposal_id
@@ -208,12 +243,17 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
     with db.api.connect() as c:
         cur = wq.release_estimates(c, origin="test_fixture", concept_id=POP)
         other = wq.release_estimates(c, release_id=r1.release_id)
-        before_pause = wq.release_estimates(c, as_of=pause_started - timedelta(microseconds=1),
-                                            origin="test_fixture", concept_id=POP)
+        before_pause = wq.release_estimates(
+            c, as_of=pause_started - timedelta(microseconds=1), origin="test_fixture", concept_id=POP
+        )
     assert cur.release["id"] == r1.release_id
-    assert cur.estimates and all(e["stale"] and e["stale_reason"] == "source_schema_quarantine"
-                                 and e["proposal_id"] == proposal_id and e["served_as"] == "last_accepted_release"
-                                 for e in cur.estimates)
+    assert cur.estimates and all(
+        e["stale"]
+        and e["stale_reason"] == "source_schema_quarantine"
+        and e["proposal_id"] == proposal_id
+        and e["served_as"] == "last_accepted_release"
+        for e in cur.estimates
+    )
     assert {e["served_from_release_id"] for e in cur.estimates} == {r0.release_id}
     assert cur.stale_concepts[POP]["withheld_in_release"] is True
     assert any(not e["stale"] for e in other.estimates if e["concept_id"] != POP)
@@ -230,17 +270,20 @@ async def test_quarantine_to_repair_to_withheld_release_to_stale_read_to_resume(
 
     # Resume (named human) -> the outbox re-enqueues the publication -> POP published again.
     with db.api.begin() as c:  # the human decision is recorded through the API principal
-        review = c.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', 'mapping v2')"),
-                           {"p": proposal_id}).scalar_one()
-    assert R.resume_belief_publication(db.worker, POP, actor="human:maintainer", reason="mapping v2 reviewed",
-                                       review_id=review)
+        review = c.execute(
+            text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', 'mapping v2')"), {"p": proposal_id}
+        ).scalar_one()
+    assert R.resume_belief_publication(
+        db.worker, POP, actor="human:maintainer", reason="mapping v2 reviewed", review_id=review
+    )
     report = invalidation.process_outbox(db.worker, environment="test")
     assert report.publish_jobs, "a resumed concept must re-enqueue its publication"
     r2 = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test")
     with db.api.connect() as c:
         now = wq.release_estimates(c, release_id=r2.release_id, concept_id=POP)
-        dirty_after = c.execute(text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"),
-                                {"k": f"belief:{POP}"}).scalar_one_or_none()
+        dirty_after = c.execute(
+            text("SELECT 1 FROM ops.dirty_node WHERE node_key = :k"), {"k": f"belief:{POP}"}
+        ).scalar_one_or_none()
     assert now.estimates and not any(e["stale"] for e in now.estimates)
     assert {e["served_from_release_id"] for e in now.estimates} == {r2.release_id}
     assert dirty_after is None
@@ -253,9 +296,17 @@ def test_pause_waits_for_the_publication_lock(db) -> None:
         repo.take_publication_lock(holder)
         with db.worker.connect() as other, pytest.raises(DBAPIError):
             other.execute(text("SET lock_timeout = '300ms'"))
-            R.pause_belief_publication(other, [probe], connector=WB, classification=R.RENAME,
-                                       proposal_id=stable_id("lock-probe"), origin="test_fixture", item_key=None,
-                                       acquisition_id=None, actor=R.AUTHOR)
+            R.pause_belief_publication(
+                other,
+                [probe],
+                connector=WB,
+                classification=R.RENAME,
+                proposal_id=stable_id("lock-probe"),
+                origin="test_fixture",
+                item_key=None,
+                acquisition_id=None,
+                actor=R.AUTHOR,
+            )
     with db.owner.connect() as c:
         assert not R.is_publication_paused(c, probe)
 
@@ -282,10 +333,14 @@ async def test_persistent_auth_failure_disables_the_ingest_schedule(db) -> None:
     live_key = f"test.repair_hookup.ct_live.{uuid.uuid4().hex[:6]}"
     with db.owner.begin() as c:
         for k, mode in ((fixture_key, "fixture"), (live_key, "live")):
-            c.execute(text("INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at) "
-                           "VALUES (:k, 'ingest', CAST(:p AS jsonb), '{\"interval_seconds\": 86400}'::jsonb, "
-                           "clock_timestamp() + interval '30 days')"),
-                      {"k": k, "p": json.dumps({"connector": CT, "mode": mode})})
+            c.execute(
+                text(
+                    "INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at) "
+                    "VALUES (:k, 'ingest', CAST(:p AS jsonb), '{\"interval_seconds\": 86400}'::jsonb, "
+                    "clock_timestamp() + interval '30 days')"
+                ),
+                {"k": k, "p": json.dumps({"connector": CT, "mode": mode})},
+            )
     # Message without "HTTP nnn": only the structured status identifies the auth failure.
     http = StubHttp(CT, status_for=lambda u: 401, message="provider refused the request")
     for _ in range(R.PERSISTENT_RUNS):
@@ -297,16 +352,31 @@ async def test_persistent_auth_failure_disables_the_ingest_schedule(db) -> None:
     assert out["streak"]["runs"] >= R.PERSISTENT_RUNS and 401 in out["streak"]["statuses"]
     assert fixture_key in out["schedules_disabled"] and live_key not in out["schedules_disabled"]
     with db.owner.connect() as c:
-        enabled = dict(c.execute(text("SELECT schedule_key, enabled FROM ops.schedule WHERE schedule_key IN (:a, :b)"),
-                                 {"a": fixture_key, "b": live_key}).all())
-        audit = c.execute(text("SELECT actor, details FROM ops.audit WHERE action = 'schedule.disabled_auth_failure' "
-                               "AND target->>'schedule_key' = :k"), {"k": fixture_key}).mappings().all()
+        enabled = dict(
+            c.execute(
+                text("SELECT schedule_key, enabled FROM ops.schedule WHERE schedule_key IN (:a, :b)"),
+                {"a": fixture_key, "b": live_key},
+            ).all()
+        )
+        audit = (
+            c.execute(
+                text(
+                    "SELECT actor, details FROM ops.audit WHERE action = 'schedule.disabled_auth_failure' "
+                    "AND target->>'schedule_key' = :k"
+                ),
+                {"k": fixture_key},
+            )
+            .mappings()
+            .all()
+        )
     assert enabled == {fixture_key: False, live_key: True}
     assert len(audit) == 1 and audit[0]["actor"] == "worker:test-hookup"
     assert 401 in audit[0]["details"]["statuses"]
     # One repair job per streak (idempotent across repeated follow-ups); no second audit row.
-    job = _job(db, repair_idempotency_key(CT, trigger=f"failure_streak:{R.AUTH}:{out['streak']['since']}",
-                                          origin="test_fixture"))
+    job = _job(
+        db,
+        repair_idempotency_key(CT, trigger=f"failure_streak:{R.AUTH}:{out['streak']['since']}", origin="test_fixture"),
+    )
     assert job is not None and str(job["id"]) == out["repair_job_id"]
     again = after_run_failures(db.worker, CT, "test_fixture", actor="worker:test-hookup", environment="test")
     assert again["repair_job_id"] == out["repair_job_id"] and again["schedules_disabled"] == []
@@ -321,39 +391,60 @@ async def test_published_release_pins_its_relations_and_the_api_serves_them(db) 
     from reva.settings import Settings
 
     ct = ComtradeConnector()
-    rep = await run_connector(ct, FixtureHttp(CT), db.store, db.worker, persist_cursor=False,
-                              post_publish=post_publish_for(ct.describe().template))
+    rep = await run_connector(
+        ct,
+        FixtureHttp(CT),
+        db.store,
+        db.worker,
+        persist_cursor=False,
+        post_publish=post_publish_for(ct.describe().template),
+    )
     assert not rep.errors
     rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test")
     with db.owner.connect() as c:
-        n_rel, n_part, n_src_part = c.execute(text(
-            """SELECT count(DISTINCT r.id), count(p.*),
+        n_rel, n_part, n_src_part = c.execute(
+            text(
+                """SELECT count(DISTINCT r.id), count(p.*),
                       (SELECT count(*) FROM world.relation_participant sp
                         WHERE sp.relation_id IN (SELECT CAST(component->'derived_from'->>'relation_id' AS uuid)
                                                    FROM world.relation WHERE release_id = :r))
                  FROM world.relation r LEFT JOIN world.relation_participant p ON p.relation_id = r.id
-                WHERE r.release_id = :r"""), {"r": rel.release_id}).one()
-        expected = c.execute(text(
-            """SELECT count(*) FROM belief.estimate e JOIN belief.input i ON i.estimate_id = e.id
+                WHERE r.release_id = :r"""
+            ),
+            {"r": rel.release_id},
+        ).one()
+        expected = c.execute(
+            text(
+                """SELECT count(*) FROM belief.estimate e JOIN belief.input i ON i.estimate_id = e.id
                  JOIN world.relation r ON r.evidence_observation_id = i.observation_id
-                WHERE e.release_id = :r"""), {"r": rel.release_id}).scalar_one()
-        sample = c.execute(text("SELECT r.layer, r.component FROM world.relation r WHERE r.release_id = :r LIMIT 1"),
-                           {"r": rel.release_id}).one()
+                WHERE e.release_id = :r"""
+            ),
+            {"r": rel.release_id},
+        ).scalar_one()
+        sample = c.execute(
+            text("SELECT r.layer, r.component FROM world.relation r WHERE r.release_id = :r LIMIT 1"),
+            {"r": rel.release_id},
+        ).one()
     assert n_rel > 0 and n_rel == expected and n_part == n_src_part
     assert set(sample.component["derived_from"]) == {"relation_id", "evidence_observation_id", "estimate_id"}
     assert sample.component["flow_magnitude"]["value"]["kind"] in ("decimal", "missing")
 
     with db.api.connect() as c:
         es = wq.extract_subgraph(c, context=GraphContext.release(rel.release_id), max_edges=500)
-    assert es.edges and all(e.provenance.kind == "release" and e.provenance.release_id == rel.release_id
-                            for e in es.edges)
+    assert es.edges and all(
+        e.provenance.kind == "release" and e.provenance.release_id == rel.release_id for e in es.edges
+    )
     assert all(e.flow_magnitude["status"] == "selected" for e in es.edges)
 
     password = "correct horse battery staple"
     data = db.settings.model_dump()
-    data.update(reva_admin_password_hash=SecretStr(hash_password(password)),
-                reva_session_secret=SecretStr("s" * 48), reva_allowed_hosts="testserver,localhost",
-                reva_cors_origins="", reva_env="test")
+    data.update(
+        reva_admin_password_hash=SecretStr(hash_password(password)),
+        reva_session_secret=SecretStr("s" * 48),
+        reva_allowed_hosts="testserver,localhost",
+        reva_cors_origins="",
+        reva_env="test",
+    )
     app = create_app(Settings.model_validate(data))
     try:
         with TestClient(app) as client:

@@ -30,16 +30,21 @@ _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 def check_model_name(model: str) -> str:
     if not isinstance(model, str) or not _MODEL_RE.match(model):
-        raise LlmProviderError("invalid LLM model name (letters, digits, '.', '_', '-'; max 64)",
-                               reason="invalid_model_name")
+        raise LlmProviderError(
+            "invalid LLM model name (letters, digits, '.', '_', '-'; max 64)", reason="invalid_model_name"
+        )
     return model
 
 
 def _status_error(provider: str, result: HttpResult) -> LlmProviderError:
     status = result.status
-    reason = {401: "unauthorized", 402: "billing_exhausted", 403: "forbidden", 404: "model_not_found",
-              429: "rate_limited_or_quota"}.get(
-        status, "server_error" if status >= 500 else "bad_request")
+    reason = {
+        401: "unauthorized",
+        402: "billing_exhausted",
+        403: "forbidden",
+        404: "model_not_found",
+        429: "rate_limited_or_quota",
+    }.get(status, "server_error" if status >= 500 else "bad_request")
     # Provider error bodies are untrusted; keep only a short, typed message (never echoed prompts).
     message = ""
     try:
@@ -48,8 +53,14 @@ def _status_error(provider: str, result: HttpResult) -> LlmProviderError:
             message = str(err.get("message") or err.get("status") or "")[:200]
     except (ValueError, AttributeError):
         pass
-    return LlmProviderError(f"{provider} returned HTTP {status} ({reason})", retryable=status == 429 or status >= 500,
-                            provider=provider, http_status=status, reason=reason, provider_message=message)
+    return LlmProviderError(
+        f"{provider} returned HTTP {status} ({reason})",
+        retryable=status == 429 or status >= 500,
+        provider=provider,
+        http_status=status,
+        reason=reason,
+        provider_message=message,
+    )
 
 
 def _parse_json_object(provider: str, text: str) -> Any:
@@ -66,8 +77,14 @@ def _http_client(client: LlmHttpClient | None, **kw: Any) -> tuple[LlmHttpClient
 class OpenAIDrafter:
     provider = "openai"
 
-    def __init__(self, model: str = DEFAULT_OPENAI_MODEL, *, client: LlmHttpClient | None = None,
-                 proxy_mode: str | None = None, timeout_seconds: float = 60.0) -> None:
+    def __init__(
+        self,
+        model: str = DEFAULT_OPENAI_MODEL,
+        *,
+        client: LlmHttpClient | None = None,
+        proxy_mode: str | None = None,
+        timeout_seconds: float = 60.0,
+    ) -> None:
         self.model = check_model_name(model)
         self._client = client
         self._kw = {"proxy_mode": proxy_mode, "timeout_seconds": timeout_seconds}
@@ -75,14 +92,17 @@ class OpenAIDrafter:
     def payload(self, request: LlmRequest) -> dict[str, Any]:
         return {
             "model": self.model,
-            "messages": [{"role": "system", "content": request.system_prompt},
-                         {"role": "user", "content": request.user_content}],
+            "messages": [
+                {"role": "system", "content": request.system_prompt},
+                {"role": "user", "content": request.user_content},
+            ],
             "temperature": 0,
             "n": 1,
             "max_completion_tokens": request.max_output_tokens,
-            "response_format": {"type": "json_schema",
-                                "json_schema": {"name": request.schema_name, "strict": True,
-                                                "schema": request.output_schema}},
+            "response_format": {
+                "type": "json_schema",
+                "json_schema": {"name": request.schema_name, "strict": True, "schema": request.output_schema},
+            },
             "store": False,
         }
 
@@ -92,8 +112,9 @@ class OpenAIDrafter:
         try:
             result = await client.post_json(f"https://{OPENAI_HOST}/v1/chat/completions", self.payload(request))
         except (SourceResponseError, UnsafeRequest) as e:
-            raise LlmProviderError(f"openai request failed: {e.message}", retryable=True, provider=self.provider,
-                                   reason="transport") from e
+            raise LlmProviderError(
+                f"openai request failed: {e.message}", retryable=True, provider=self.provider, reason="transport"
+            ) from e
         finally:
             if owned:
                 await client.aclose()
@@ -108,33 +129,55 @@ class OpenAIDrafter:
             choice = doc["choices"][0]
             message = choice["message"]
             usage = doc.get("usage") or {}
-            u = LlmUsage(int(usage.get("prompt_tokens", 0)), int(usage.get("completion_tokens", 0)),
-                         int(usage.get("total_tokens", 0)))
+            u = LlmUsage(
+                int(usage.get("prompt_tokens", 0)),
+                int(usage.get("completion_tokens", 0)),
+                int(usage.get("total_tokens", 0)),
+            )
             refusal = message.get("refusal")
             finish = choice.get("finish_reason")
             content = message.get("content")
             model = str(doc.get("model") or self.model)
         except (KeyError, IndexError, TypeError, ValueError) as e:
-            raise LlmProviderError("openai response has an unexpected shape", provider=self.provider,
-                                   reason="unexpected_shape") from e
+            raise LlmProviderError(
+                "openai response has an unexpected shape", provider=self.provider, reason="unexpected_shape"
+            ) from e
         output = None
         if refusal is None:
             if finish == "length":
-                raise LlmProviderError("openai output truncated (max tokens reached)", provider=self.provider,
-                                       reason="truncated", usage=u.as_json())
+                raise LlmProviderError(
+                    "openai output truncated (max tokens reached)",
+                    provider=self.provider,
+                    reason="truncated",
+                    usage=u.as_json(),
+                )
             if not isinstance(content, str):
                 raise LlmProviderError("openai response has no content", provider=self.provider, reason="empty")
             output = _parse_json_object(self.provider, content)
-        return LlmResponse(provider=self.provider, model_requested=self.model, model=model, output=output, usage=u,
-                           latency_ms=round(latency_ms, 1), finish_reason=finish,
-                           refusal=str(refusal)[:500] if refusal else None, recorded=recorded)
+        return LlmResponse(
+            provider=self.provider,
+            model_requested=self.model,
+            model=model,
+            output=output,
+            usage=u,
+            latency_ms=round(latency_ms, 1),
+            finish_reason=finish,
+            refusal=str(refusal)[:500] if refusal else None,
+            recorded=recorded,
+        )
 
 
 class GeminiDrafter:
     provider = "gemini"
 
-    def __init__(self, model: str = DEFAULT_GEMINI_MODEL, *, client: LlmHttpClient | None = None,
-                 proxy_mode: str | None = None, timeout_seconds: float = 60.0) -> None:
+    def __init__(
+        self,
+        model: str = DEFAULT_GEMINI_MODEL,
+        *,
+        client: LlmHttpClient | None = None,
+        proxy_mode: str | None = None,
+        timeout_seconds: float = 60.0,
+    ) -> None:
         self.model = check_model_name(model)
         self._client = client
         self._kw = {"proxy_mode": proxy_mode, "timeout_seconds": timeout_seconds}
@@ -164,8 +207,9 @@ class GeminiDrafter:
         try:
             result = await client.post_json(url, self.payload(request))
         except (SourceResponseError, UnsafeRequest) as e:
-            raise LlmProviderError(f"gemini request failed: {e.message}", retryable=True, provider=self.provider,
-                                   reason="transport") from e
+            raise LlmProviderError(
+                f"gemini request failed: {e.message}", retryable=True, provider=self.provider, reason="transport"
+            ) from e
         finally:
             if owned:
                 await client.aclose()
@@ -186,23 +230,51 @@ class GeminiDrafter:
             cands = doc.get("candidates") or []
             if not cands:
                 block = feedback.get("blockReason")
-                return LlmResponse(provider=self.provider, model_requested=self.model, model=model, output=None,
-                                   usage=u, latency_ms=round(latency_ms, 1), finish_reason="blocked",
-                                   refusal=f"blocked: {block}" if block else "no candidate", recorded=recorded)
+                return LlmResponse(
+                    provider=self.provider,
+                    model_requested=self.model,
+                    model=model,
+                    output=None,
+                    usage=u,
+                    latency_ms=round(latency_ms, 1),
+                    finish_reason="blocked",
+                    refusal=f"blocked: {block}" if block else "no candidate",
+                    recorded=recorded,
+                )
             cand = cands[0]
             finish = cand.get("finishReason")
             parts = (cand.get("content") or {}).get("parts") or []
             text = "".join(str(p.get("text", "")) for p in parts if isinstance(p, dict) and not p.get("thought"))
         except (TypeError, ValueError, AttributeError) as e:
-            raise LlmProviderError("gemini response has an unexpected shape", provider=self.provider,
-                                   reason="unexpected_shape") from e
+            raise LlmProviderError(
+                "gemini response has an unexpected shape", provider=self.provider, reason="unexpected_shape"
+            ) from e
         if finish == "MAX_TOKENS":
-            raise LlmProviderError("gemini output truncated (max tokens reached)", provider=self.provider,
-                                   reason="truncated", usage=u.as_json())
+            raise LlmProviderError(
+                "gemini output truncated (max tokens reached)",
+                provider=self.provider,
+                reason="truncated",
+                usage=u.as_json(),
+            )
         if finish not in (None, "STOP"):
-            return LlmResponse(provider=self.provider, model_requested=self.model, model=model, output=None, usage=u,
-                               latency_ms=round(latency_ms, 1), finish_reason=str(finish),
-                               refusal=f"finish reason {finish}", recorded=recorded)
-        return LlmResponse(provider=self.provider, model_requested=self.model, model=model,
-                           output=_parse_json_object(self.provider, text), usage=u, latency_ms=round(latency_ms, 1),
-                           finish_reason=finish, recorded=recorded)
+            return LlmResponse(
+                provider=self.provider,
+                model_requested=self.model,
+                model=model,
+                output=None,
+                usage=u,
+                latency_ms=round(latency_ms, 1),
+                finish_reason=str(finish),
+                refusal=f"finish reason {finish}",
+                recorded=recorded,
+            )
+        return LlmResponse(
+            provider=self.provider,
+            model_requested=self.model,
+            model=model,
+            output=_parse_json_object(self.provider, text),
+            usage=u,
+            latency_ms=round(latency_ms, 1),
+            finish_reason=finish,
+            recorded=recorded,
+        )

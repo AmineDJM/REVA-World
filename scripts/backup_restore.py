@@ -1075,8 +1075,11 @@ def restore_roles(record: Mapping[str, Any]) -> list[str]:
 def database_grants(record: Mapping[str, Any]) -> list[tuple[str, str, bool]]:
     """Database-level grants to re-apply (not part of a non --create dump): exactly those recorded
     at backup time; for backups without a catalog section, CONNECT for the V1 runtime roles."""
-    rec = [(str(g[2]), str(g[3]), bool(g[4])) for g in _recorded_grants(record)
-           if len(g) >= 5 and g[0] == "database" and g[2] != "PUBLIC"]
+    rec = [
+        (str(g[2]), str(g[3]), bool(g[4]))
+        for g in _recorded_grants(record)
+        if len(g) >= 5 and g[0] == "database" and g[2] != "PUBLIC"
+    ]
     if rec or (record.get("logical_manifest") or {}).get("catalog"):
         return sorted(set(rec))
     return [(r, "CONNECT", False) for r in ("reva_api", "reva_worker", "reva_sim")]
@@ -1189,9 +1192,14 @@ def restore(
         for grantee, privilege, grantable in database_grants(record):
             if privilege not in {"CONNECT", "CREATE", "TEMPORARY"} or not REVA_ROLE_NAME.match(grantee):
                 raise BackupError(f"backup records an unexpected database grant: {privilege} to {grantee}")
-            conn.execute(sql.SQL("GRANT {} ON DATABASE {} TO {}{}").format(
-                sql.SQL(privilege), dbname, sql.Identifier(grantee),
-                sql.SQL(" WITH GRANT OPTION" if grantable else "")))
+            conn.execute(
+                sql.SQL("GRANT {} ON DATABASE {} TO {}{}").format(
+                    sql.SQL(privilege),
+                    dbname,
+                    sql.Identifier(grantee),
+                    sql.SQL(" WITH GRANT OPTION" if grantable else ""),
+                )
+            )
     finally:
         conn.close()
     bootstrap_report = None

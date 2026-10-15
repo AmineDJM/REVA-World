@@ -183,13 +183,23 @@ def test_mixed_basis_rejected(over):
 
 
 def test_from_value_dict_reads_kernel_values():
-    v = {"kind": "decimal", "value": "172426221223", "unit_ref": "unit.usd",
-         "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"}}
-    m = MonetaryInput.from_value_dict("M", v, reference_year=2023, aggregation="period_flow_total",
-                                      source_flags={"provider_derived_aggregate": True, "isReported": False})
+    v = {
+        "kind": "decimal",
+        "value": "172426221223",
+        "unit_ref": "unit.usd",
+        "basis": {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": "CIF"},
+    }
+    m = MonetaryInput.from_value_dict(
+        "M",
+        v,
+        reference_year=2023,
+        aggregation="period_flow_total",
+        source_flags={"provider_derived_aggregate": True, "isReported": False},
+    )
     assert m.value == D("172426221223") and m.valuation == "CIF"
-    miss = MonetaryInput.from_value_dict("X", {"kind": "missing", "reason": "unavailable"}, reference_year=2023,
-                                         aggregation="period_flow_total")
+    miss = MonetaryInput.from_value_dict(
+        "X", {"kind": "missing", "reason": "unavailable"}, reference_year=2023, aggregation="period_flow_total"
+    )
     assert miss.is_missing
     ex = explain(CountryInputs("USA", m, m, m))
     assert ex["source_flags"]["M"]["provider_derived_aggregate"] is True
@@ -215,8 +225,13 @@ def test_linearity_in_m_and_x_at_fixed_p(m1, m2, x1, x2, p_m, p_x, a):
             assert getattr(r12, k) == getattr(r1, k) + getattr(r2, k)  # exact
         # exposure involves one division rounded at 50 significant digits
         tol = D("1e-48") * (abs(r1.exposure_percent_baseline_gdp) + abs(r2.exposure_percent_baseline_gdp))
-        assert abs(r12.exposure_percent_baseline_gdp
-                   - (r1.exposure_percent_baseline_gdp + r2.exposure_percent_baseline_gdp)) <= tol
+        assert (
+            abs(
+                r12.exposure_percent_baseline_gdp
+                - (r1.exposure_percent_baseline_gdp + r2.exposure_percent_baseline_gdp)
+            )
+            <= tol
+        )
         # homogeneity: scaling M and X by a scales every value change exactly
         if a >= 0:
             ra = exposure_l1(D(a * m1), D(a * x1), G, p_m, p_x)

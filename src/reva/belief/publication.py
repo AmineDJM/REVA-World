@@ -115,7 +115,8 @@ def publish_release(
         elif cutoff > db_now:
             raise ValidationProblem(
                 "knowledge cutoff is in the future; pass cutoff=None to publish as of now",
-                cutoff=cutoff.isoformat(), now=db_now.isoformat(),
+                cutoff=cutoff.isoformat(),
+                now=db_now.isoformat(),
             )
         if fence is not None:
             fence(conn)  # stale lease holders cannot publish
@@ -127,7 +128,8 @@ def publish_release(
             if paused_withheld:
                 raise ValidationProblem(
                     "every eligible estimand belongs to a concept whose publication is paused; nothing to publish",
-                    paused_concepts=sorted({w.concept_id for w in paused_withheld}))
+                    paused_concepts=sorted({w.concept_id for w in paused_withheld}),
+                )
             raise ValidationProblem("no eligible observations at this cutoff; nothing to publish")
         paused_concepts = sorted({w.concept_id for w in paused_withheld})
         excluded_retracted = sorted(str(r["id"]) for r in rows if r.get("selection_status") == "retracted")
@@ -152,24 +154,37 @@ def publish_release(
         # rollback is harmless (GC).
         pq_obj = store.put_bytes(parquet_bytes, "belief", "application/vnd.apache.parquet")
 
-        act_params: dict[str, Any] = {"method": f"{METHOD_KEY}@{METHOD_VERSION}", "cutoff": cutoff.isoformat(),
-                                      "origin": origin.value, "policy": reg.policies["selection"]["policy_version"]}
+        act_params: dict[str, Any] = {
+            "method": f"{METHOD_KEY}@{METHOD_VERSION}",
+            "cutoff": cutoff.isoformat(),
+            "origin": origin.value,
+            "policy": reg.policies["selection"]["policy_version"],
+        }
         if paused_concepts:
             # Durable, role-readable record of what this release withheld (meta.activity is
             # readable by reva_api; the manifest artifact is not reachable from SQL).
             act_params["withheld_paused"] = [_pause_record(pauses[c]) for c in paused_concepts]
         act = repo.simple_activity("belief.publication", "belief", actor, act_params)
-        repo.register_artifact(conn, pq_obj, schema_version="belief-estimates/1",
-                               rights={"licence": "derived from source licences; see inputs"},
-                               logical_sha256=table_meta["logical_sha256"])
+        repo.register_artifact(
+            conn,
+            pq_obj,
+            schema_version="belief-estimates/1",
+            rights={"licence": "derived from source licences; see inputs"},
+            logical_sha256=table_meta["logical_sha256"],
+        )
         onto_sha = repo.store_json_artifact(conn, store, reg.manifest(), "belief", schema_version="ontology-manifest/1")
-        method = conn.execute(
-            text("SELECT id, spec_sha256 FROM model.version WHERE model_key=:k AND version=:v"),
-            {"k": METHOD_KEY, "v": METHOD_VERSION},
-        ).mappings().one()
-        model_manifest = {"schema": "reva-model-manifest/1",
-                          "models": [{"model_key": METHOD_KEY, "version": METHOD_VERSION,
-                                      "spec_sha256": method["spec_sha256"]}]}
+        method = (
+            conn.execute(
+                text("SELECT id, spec_sha256 FROM model.version WHERE model_key=:k AND version=:v"),
+                {"k": METHOD_KEY, "v": METHOD_VERSION},
+            )
+            .mappings()
+            .one()
+        )
+        model_manifest = {
+            "schema": "reva-model-manifest/1",
+            "models": [{"model_key": METHOD_KEY, "version": METHOD_VERSION, "spec_sha256": method["spec_sha256"]}],
+        }
         model_sha = repo.store_json_artifact(conn, store, model_manifest, "belief", schema_version="model-manifest/1")
         input_obs = sorted({str(s.observation_id) for s in selections})
         temporal = conn.execute(
@@ -202,16 +217,25 @@ def publish_release(
         # --- end V2 dataset inputs ---
         manifest_sha = repo.store_json_artifact(conn, store, manifest, "belief", schema_version="belief-release/1")
         repo.record_activity(conn, act, inputs=[], outputs=[pq_obj.sha256, onto_sha, model_sha, manifest_sha])
-        ctx = repo.create_context(conn, mode="belief", origin=origin.value, manifest_sha256=manifest_sha,
-                                  knowledge_cutoff=cutoff)
+        ctx = repo.create_context(
+            conn, mode="belief", origin=origin.value, manifest_sha256=manifest_sha, knowledge_cutoff=cutoff
+        )
         rid = conn.execute(
             text(
                 """INSERT INTO belief.release(context_id, origin, manifest_sha256, ontology_manifest_sha256,
                      model_manifest_sha256, knowledge_cutoff, method, provenance_activity_id)
                    VALUES (:c, :o, :m, :om, :mm, :cut, :meth, :a) RETURNING id"""
             ),
-            {"c": ctx, "o": origin.value, "m": manifest_sha, "om": onto_sha, "mm": model_sha, "cut": cutoff,
-             "meth": f"{METHOD_KEY}@{METHOD_VERSION}", "a": act.id},
+            {
+                "c": ctx,
+                "o": origin.value,
+                "m": manifest_sha,
+                "om": onto_sha,
+                "mm": model_sha,
+                "cut": cutoff,
+                "meth": f"{METHOD_KEY}@{METHOD_VERSION}",
+                "a": act.id,
+            },
         ).scalar_one()
         conn.execute(
             text("INSERT INTO belief.release_artifact(release_id, artifact_sha256, role) VALUES (:r, :s, 'estimates')"),
@@ -226,10 +250,18 @@ def publish_release(
                        VALUES (:r, :s, :c, :sp, :m, 'selected_report', CAST(:v AS jsonb), CAST(:u AS jsonb),
                                CAST(:alt AS jsonb), CAST(:df AS jsonb), :a) RETURNING id"""
                 ),
-                {"r": rid, "s": s.subject_id, "c": s.concept_version_id, "sp": s.support_id, "m": method["id"],
-                 "v": json.dumps(s.value), "u": json.dumps(s.uncertainty), "alt": json.dumps(s.alternatives,
-                                                                                             default=str),
-                 "df": json.dumps(s.discrepancy_flags), "a": act.id},
+                {
+                    "r": rid,
+                    "s": s.subject_id,
+                    "c": s.concept_version_id,
+                    "sp": s.support_id,
+                    "m": method["id"],
+                    "v": json.dumps(s.value),
+                    "u": json.dumps(s.uncertainty),
+                    "alt": json.dumps(s.alternatives, default=str),
+                    "df": json.dumps(s.discrepancy_flags),
+                    "a": act.id,
+                },
             ).scalar_one()
             conn.execute(
                 text("INSERT INTO belief.input(estimate_id, observation_id) VALUES (:e, :o)"),
@@ -241,8 +273,9 @@ def publish_release(
             text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a) RETURNING sequence"),
             {"r": rid, "a": act.id},
         ).scalar_one()
-        repo.emit_outbox(conn, "belief.release_published",
-                         {"release_id": str(rid), "sequence": seq, "cutoff": cutoff.isoformat()})
+        repo.emit_outbox(
+            conn, "belief.release_published", {"release_id": str(rid), "sequence": seq, "cutoff": cutoff.isoformat()}
+        )
         _clear_dirty_nodes(conn, origin.value, concepts, keep=paused_concepts)
         _keep_paused_dirty(conn, origin.value, paused_concepts)
     return ReleaseResult(UUID(str(rid)), ctx, int(seq), len(selections), manifest_sha, cutoff)
@@ -290,8 +323,9 @@ def pin_release_relations(conn: Connection, release_id: Any, activity_id: Any) -
     publication transaction before ``ops.publication`` is inserted (the release is
     sealed afterwards). Returns the number of pinned relations.
     """
-    n = conn.execute(text(PIN_RELATIONS_SQL), {"rid": release_id, "act": activity_id,
-                                               "method": f"{METHOD_KEY}@{METHOD_VERSION}"}).rowcount
+    n = conn.execute(
+        text(PIN_RELATIONS_SQL), {"rid": release_id, "act": activity_id, "method": f"{METHOD_KEY}@{METHOD_VERSION}"}
+    ).rowcount
     if n:
         conn.execute(text(PIN_PARTICIPANTS_SQL), {"rid": release_id})
     return int(n or 0)
@@ -307,12 +341,18 @@ def _active_pauses(conn: Connection) -> dict[str, dict[str, Any]]:
 def _pause_record(p: dict[str, Any]) -> dict[str, Any]:
     from reva.autonomy.repair import PAUSE_WITHHOLD_REASON
 
-    return {"concept_id": p["concept"], "reason": PAUSE_WITHHOLD_REASON, "pause_reason": p.get("reason"),
-            "proposal_id": p.get("proposal_id"), "paused_since": p.get("since")}
+    return {
+        "concept_id": p["concept"],
+        "reason": PAUSE_WITHHOLD_REASON,
+        "pause_reason": p.get("reason"),
+        "proposal_id": p.get("proposal_id"),
+        "paused_since": p.get("since"),
+    }
 
 
-def _withhold_paused(conn: Connection, selections: list[Selection], pauses: dict[str, dict[str, Any]],
-                     origin: str) -> tuple[list[Selection], list[Withheld]]:
+def _withhold_paused(
+    conn: Connection, selections: list[Selection], pauses: dict[str, dict[str, Any]], origin: str
+) -> tuple[list[Selection], list[Withheld]]:
     """Split selections into publishable ones and ``source_schema_quarantine`` withholdings."""
     if not pauses:
         return selections, []
@@ -328,12 +368,23 @@ def _withhold_paused(conn: Connection, selections: list[Selection], pauses: dict
             continue
         if s.concept_id not in last:
             last[s.concept_id] = last_accepted_release(conn, origin, s.concept_id)
-        withheld.append(Withheld(
-            subject_id=s.subject_id, concept_version_id=s.concept_version_id, concept_id=s.concept_id,
-            support_id=s.support_id, reason=PAUSE_WITHHOLD_REASON, discrepancy_flags=[], alternatives=[],
-            details={**_pause_record(p), "selected_observation_id": str(s.observation_id),
-                     "last_accepted_release": last[s.concept_id],
-                     "visibility": "the last accepted release stays readable and is served as stale"}))
+        withheld.append(
+            Withheld(
+                subject_id=s.subject_id,
+                concept_version_id=s.concept_version_id,
+                concept_id=s.concept_id,
+                support_id=s.support_id,
+                reason=PAUSE_WITHHOLD_REASON,
+                discrepancy_flags=[],
+                alternatives=[],
+                details={
+                    **_pause_record(p),
+                    "selected_observation_id": str(s.observation_id),
+                    "last_accepted_release": last[s.concept_id],
+                    "visibility": "the last accepted release stays readable and is served as stale",
+                },
+            )
+        )
     return keep, withheld
 
 
@@ -350,11 +401,13 @@ def _keep_paused_dirty(conn: Connection, origin: str, concepts: list[str]) -> No
                       reason = CASE WHEN d.reason = EXCLUDED.reason OR d.reason = 'upstream_changed' THEN d.reason
                                     WHEN d.reason LIKE 'upstream_changed:%' THEN 'upstream_changed:mixed'
                                     ELSE EXCLUDED.reason END"""),
-            {"k": f"belief:{c}", "s": seq, "r": f"upstream_changed:{origin}"})
+            {"k": f"belief:{c}", "s": seq, "r": f"upstream_changed:{origin}"},
+        )
 
 
-def _clear_dirty_nodes(conn: Connection, origin: str, concepts: list[str] | None,
-                       keep: list[str] | None = None) -> None:
+def _clear_dirty_nodes(
+    conn: Connection, origin: str, concepts: list[str] | None, keep: list[str] | None = None
+) -> None:
     """Clear belief dirty markers this release actually covers (R-06).
 
     Only nodes of the published concepts (all belief nodes for a full
@@ -366,11 +419,15 @@ def _clear_dirty_nodes(conn: Connection, origin: str, concepts: list[str] | None
     nodes = None if concepts is None else sorted({f"belief:{c}" for c in concepts})
     kept = sorted({f"belief:{c}" for c in keep or []})  # withheld (paused) concepts stay dirty
     other = "test_fixture" if origin == "live" else "live"
-    scope = ("node_key LIKE 'belief:%' AND (CAST(:n AS text[]) IS NULL OR node_key = ANY(CAST(:n AS text[]))) "
-             "AND NOT (node_key = ANY(CAST(:kept AS text[])))")
+    scope = (
+        "node_key LIKE 'belief:%' AND (CAST(:n AS text[]) IS NULL OR node_key = ANY(CAST(:n AS text[]))) "
+        "AND NOT (node_key = ANY(CAST(:kept AS text[])))"
+    )
     conn.execute(
-        text(f"DELETE FROM ops.dirty_node WHERE {scope} AND (reason = :mine "
-             "OR reason NOT LIKE 'upstream_changed%' OR reason = 'upstream_changed')"),
+        text(
+            f"DELETE FROM ops.dirty_node WHERE {scope} AND (reason = :mine "
+            "OR reason NOT LIKE 'upstream_changed%' OR reason = 'upstream_changed')"
+        ),
         {"n": nodes, "kept": kept, "mine": f"upstream_changed:{origin}"},
     )
     conn.execute(
@@ -386,15 +443,19 @@ def add_prior_estimate_input(conn: Connection, estimate_id: UUID, prior_estimate
     later than the consuming release's, and a live release may only cite live
     priors (a fixture or test estimate can never inform the live world).
     """
-    rows = conn.execute(
-        text(
-            """SELECT e.id, r.origin, r.knowledge_cutoff, p.sequence
+    rows = (
+        conn.execute(
+            text(
+                """SELECT e.id, r.origin, r.knowledge_cutoff, p.sequence
                FROM belief.estimate e JOIN belief.release r ON r.id = e.release_id
                LEFT JOIN ops.publication p ON p.release_id = r.id
                WHERE e.id = ANY(:ids)"""
-        ),
-        {"ids": [estimate_id, prior_estimate_id]},
-    ).mappings().all()
+            ),
+            {"ids": [estimate_id, prior_estimate_id]},
+        )
+        .mappings()
+        .all()
+    )
     by_id = {UUID(str(r["id"])): r for r in rows}
     if estimate_id not in by_id or prior_estimate_id not in by_id:
         raise ValidationProblem("unknown estimate")
@@ -404,8 +465,7 @@ def add_prior_estimate_input(conn: Connection, estimate_id: UUID, prior_estimate
     if prior["knowledge_cutoff"] > cur["knowledge_cutoff"]:
         raise ValidationProblem("prior estimate comes from a later knowledge cutoff")
     if cur["origin"] == "live" and prior["origin"] != "live":
-        raise ValidationProblem("a live release cannot cite a non-live prior estimate",
-                                prior_origin=prior["origin"])
+        raise ValidationProblem("a live release cannot cite a non-live prior estimate", prior_origin=prior["origin"])
     conn.execute(
         text("INSERT INTO belief.input(estimate_id, prior_estimate_id) VALUES (:e, :p)"),
         {"e": estimate_id, "p": prior_estimate_id},

@@ -40,8 +40,13 @@ def _apply_limits(argv: list[str]) -> dict[str, Any]:
     if "--limits" not in argv:
         return {"applied": False, "reason": "no limits given"}
     lim = json.loads(argv[argv.index("--limits") + 1])
-    pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
-             "fsize": resource.RLIMIT_FSIZE, "nproc": resource.RLIMIT_NPROC}
+    pairs = {
+        "cpu": resource.RLIMIT_CPU,
+        "as": resource.RLIMIT_AS,
+        "nofile": resource.RLIMIT_NOFILE,
+        "fsize": resource.RLIMIT_FSIZE,
+        "nproc": resource.RLIMIT_NPROC,
+    }
     for k, r in pairs.items():
         v = int(lim.get(k, 0))
         if v > 0:
@@ -121,8 +126,9 @@ def _probe_filesystem(req: dict[str, Any]) -> dict[str, Any]:
 
 def _block_network(allowlist: list[str]) -> None:
     def refuse(*a: Any, **k: Any) -> Any:
-        raise PermissionError(f"network is blocked in the trusted-template sandbox (allowlist {allowlist}, "
-                              "replay only)")
+        raise PermissionError(
+            f"network is blocked in the trusted-template sandbox (allowlist {allowlist}, replay only)"
+        )
 
     blocked_families = {_socket.AF_INET, _socket.AF_INET6, getattr(_socket, "AF_PACKET", -2), -1}
 
@@ -167,8 +173,17 @@ class _Replay:
         body = base64.b64decode(f["body_b64"])
         if kw.get("max_bytes") is not None and len(body) > int(kw["max_bytes"]):
             raise ValueError("input exceeds max_bytes")
-        return HttpResult(url, url, int(f["status"]), {"content-type": f["media_type"]}, body,
-                          datetime.fromisoformat(f["retrieved_at"]), 0.0, (), 1)
+        return HttpResult(
+            url,
+            url,
+            int(f["status"]),
+            {"content-type": f["media_type"]},
+            body,
+            datetime.fromisoformat(f["retrieved_at"]),
+            0.0,
+            (),
+            1,
+        )
 
 
 async def _run(req: dict[str, Any]) -> dict[str, Any]:
@@ -183,12 +198,16 @@ async def _run(req: dict[str, Any]) -> dict[str, Any]:
         raw = await conn.fetch(item, http)
         for b in conn.parse(raw):
             q = conn.validate(b)
-            results.append({
-                "item": b.item_key, "observations": len(b.observations),
-                "missing": sum(1 for o in b.observations if o.value.get("kind") == "missing"),
-                "cell_types": sorted({o.source_flags.get("cell_type") for o in b.observations}),
-                "structure_fingerprint": b.schema_fingerprint, "quality": q.model_dump(mode="json"),
-            })
+            results.append(
+                {
+                    "item": b.item_key,
+                    "observations": len(b.observations),
+                    "missing": sum(1 for o in b.observations if o.value.get("kind") == "missing"),
+                    "cell_types": sorted({o.source_flags.get("cell_type") for o in b.observations}),
+                    "structure_fingerprint": b.schema_fingerprint,
+                    "quality": q.model_dump(mode="json"),
+                }
+            )
     return {"plan_items": len(plan.items), "results": results}
 
 

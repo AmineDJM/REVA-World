@@ -38,8 +38,12 @@ CONCEPTS = {
     "X": "trade.hs2709.export_value.world_total",
     "G": "economics.gdp.nominal_current_usd",
 }
-OUTPUTS = ("import_value_change_usd", "export_value_change_usd", "net_external_cost_change_usd",
-           "exposure_percent_baseline_gdp")
+OUTPUTS = (
+    "import_value_change_usd",
+    "export_value_change_usd",
+    "net_external_cost_change_usd",
+    "exposure_percent_baseline_gdp",
+)
 
 
 @pytest.fixture(scope="module")
@@ -97,9 +101,18 @@ def claim_job(db, payload: dict[str, Any], worker: str = "test-worker") -> JobCo
         with db.owner.connect() as c:
             return str(c.execute(text("SELECT status FROM ops.job WHERE id=:j"), {"j": jid}).scalar_one())
 
-    return JobContext(job_id=jid, job_type="simulation", worker_id=worker, fencing_token=int(token), attempt=1,
-                      settings=db.settings, worker_engine=db.worker, sim_engine=db.sim, store=db.store,
-                      heartbeat=heartbeat)
+    return JobContext(
+        job_id=jid,
+        job_type="simulation",
+        worker_id=worker,
+        fencing_token=int(token),
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=db.sim,
+        store=db.store,
+        heartbeat=heartbeat,
+    )
 
 
 def run(db, scenario_id: UUID, fidelity: str | None = None) -> tuple[dict[str, Any], JobContext]:
@@ -117,17 +130,25 @@ def job_row(db, job_id: UUID) -> dict[str, Any]:
 
 def results(db, run_id: str) -> list[dict[str, Any]]:
     with db.owner.connect() as c:
-        return [dict(r) for r in c.execute(
-            text("""SELECT r.*, e.label FROM sim.result r JOIN world.entity e ON e.id = r.subject_id
-                    WHERE run_id = :r ORDER BY output_key, label, variant"""), {"r": run_id}).mappings()]
+        return [
+            dict(r)
+            for r in c.execute(
+                text("""SELECT r.*, e.label FROM sim.result r JOIN world.entity e ON e.id = r.subject_id
+                    WHERE run_id = :r ORDER BY output_key, label, variant"""),
+                {"r": run_id},
+            ).mappings()
+        ]
 
 
 def stored_inputs(db, baseline: dict[str, Any], iso3: str, year: int = 2023) -> dict[str, Decimal]:
     out = {}
     with db.owner.connect() as c:
         for n, concept in CONCEPTS.items():
-            [row] = [r for r in estimates(c, baseline["release_id"], subject_id=entity_id(iso3), concept_id=concept)
-                     if r["temporal_extent"].get("label") == str(year)]
+            [row] = [
+                r
+                for r in estimates(c, baseline["release_id"], subject_id=entity_id(iso3), concept_id=concept)
+                if r["temporal_extent"].get("label") == str(year)
+            ]
             out[n] = Decimal(row["value"]["value"])
     return out
 
@@ -157,8 +178,12 @@ def test_l1_exposure_matches_hand_computation(db, baseline):
             d_x = v["X"] * (Decimal("1.25") - 1)
             d_net = d_m - d_x
             exposure = 100 * d_net / v["G"]
-        expected = {"import_value_change_usd": d_m, "export_value_change_usd": d_x,
-                    "net_external_cost_change_usd": d_net, "exposure_percent_baseline_gdp": exposure}
+        expected = {
+            "import_value_change_usd": d_m,
+            "export_value_change_usd": d_x,
+            "net_external_cost_change_usd": d_net,
+            "exposure_percent_baseline_gdp": exposure,
+        }
         for k, want in expected.items():
             r = by[(label, k)]
             assert Decimal(r["value"]["value"]) == want, (iso3, k)
@@ -172,18 +197,43 @@ def test_l1_exposure_matches_hand_computation(db, baseline):
     # pinned provenance
     with db.owner.connect() as c:
         run_row = c.execute(text("SELECT * FROM sim.run WHERE id=:r"), {"r": ref["run_id"]}).mappings().one()
-        outcome = c.execute(text("SELECT * FROM sim.run_outcome WHERE run_id=:r"),
-                            {"r": ref["run_id"]}).mappings().one()
-        rel = c.execute(text("SELECT * FROM belief.release WHERE id=:r"),
-                        {"r": baseline["release_id"]}).mappings().one()
-        ns = c.execute(text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256=:s"),
-                       {"s": outcome["output_manifest_sha256"]}).scalars().all()
-        model_ns = c.execute(text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256=:s"),
-                             {"s": run_row["model_manifest_sha256"]}).scalars().all()
-        act = c.execute(text("SELECT origin, kind FROM meta.activity WHERE id=:a"),
-                        {"a": outcome["provenance_activity_id"]}).mappings().one()
-        act_inputs = c.execute(text("SELECT artifact_sha256 FROM meta.activity_input WHERE activity_id=:a"),
-                               {"a": outcome["provenance_activity_id"]}).scalars().all()
+        outcome = (
+            c.execute(text("SELECT * FROM sim.run_outcome WHERE run_id=:r"), {"r": ref["run_id"]}).mappings().one()
+        )
+        rel = (
+            c.execute(text("SELECT * FROM belief.release WHERE id=:r"), {"r": baseline["release_id"]}).mappings().one()
+        )
+        ns = (
+            c.execute(
+                text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256=:s"),
+                {"s": outcome["output_manifest_sha256"]},
+            )
+            .scalars()
+            .all()
+        )
+        model_ns = (
+            c.execute(
+                text("SELECT namespace FROM meta.artifact_location WHERE artifact_sha256=:s"),
+                {"s": run_row["model_manifest_sha256"]},
+            )
+            .scalars()
+            .all()
+        )
+        act = (
+            c.execute(
+                text("SELECT origin, kind FROM meta.activity WHERE id=:a"), {"a": outcome["provenance_activity_id"]}
+            )
+            .mappings()
+            .one()
+        )
+        act_inputs = (
+            c.execute(
+                text("SELECT artifact_sha256 FROM meta.activity_input WHERE activity_id=:a"),
+                {"a": outcome["provenance_activity_id"]},
+            )
+            .scalars()
+            .all()
+        )
     assert run_row["ontology_manifest_sha256"] == rel["ontology_manifest_sha256"]
     assert run_row["seed_plan"]["run_seed"] == 1729 and run_row["job_id"] == ctx.job_id
     assert run_row["execution_profile"]["fidelity"] == "L1"
@@ -196,9 +246,20 @@ def test_l1_exposure_matches_hand_computation(db, baseline):
     assert manifest["baseline"]["release_id"] == str(baseline["release_id"])
     assert "not a GDP loss" in manifest["applicability"]["explanation"]["not_claimed"]
     # recompute the output digest from the stored rows
-    digest = logical_hash(sorted(({"output_key": r["output_key"], "subject_id": str(r["subject_id"]),
-                                   "variant": r["variant"], "value": r["value"]} for r in rows),
-                                 key=lambda d: (d["output_key"], d["subject_id"], d["variant"])))
+    digest = logical_hash(
+        sorted(
+            (
+                {
+                    "output_key": r["output_key"],
+                    "subject_id": str(r["subject_id"]),
+                    "variant": r["variant"],
+                    "value": r["value"],
+                }
+                for r in rows
+            ),
+            key=lambda d: (d["output_key"], d["subject_id"], d["variant"]),
+        )
+    )
     assert digest == outcome["output_digest"]
 
     # idempotent: a second job for the same request reuses the immutable run
@@ -231,8 +292,9 @@ def test_all_four_countries_returns_missing_input_for_dza(db, baseline):
 
 
 def test_five_year_horizon_rejected(db, baseline):
-    bad = make_spec(baseline, horizon={"periods": 5, "unit": "annual_accounting_period"},
-                    title="Test: five-year horizon")
+    bad = make_spec(
+        baseline, horizon={"periods": 5, "unit": "annual_accounting_period"}, title="Test: five-year horizon"
+    )
     with pytest.raises(CapabilityGap):
         validate_scenario_spec(bad)
     # even if a malformed spec were stored, the engine re-validates and records unsupported
@@ -253,8 +315,7 @@ def test_l3_and_l4_rejected(db, baseline):
         assert ref["status"] == "unsupported" and ref["problems"][0]["code"] == "capability_gap"
         assert results(db, ref["run_id"]) == []
         with db.owner.connect() as c:
-            assert c.execute(text("SELECT fidelity FROM sim.run WHERE id=:r"),
-                             {"r": ref["run_id"]}).scalar_one() == fid
+            assert c.execute(text("SELECT fidelity FROM sim.run WHERE id=:r"), {"r": ref["run_id"]}).scalar_one() == fid
 
 
 def test_l0_cache_miss_then_hit_after_l1(db, baseline):
@@ -285,12 +346,24 @@ def test_l0_cache_miss_then_hit_after_l1(db, baseline):
 
 
 def test_l2_sensitivity_range(db, baseline):
-    grid = [{"import_elasticity": -0.5, "export_elasticity": 0.0, "basis": "scenario_assumption"},
-            {"import_elasticity": 0.0, "export_elasticity": 0.0, "basis": "scenario_assumption"},
-            {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"}]
-    sid = create_scenario(db, make_spec(baseline, fidelity="L2", title="Test: L2",
-                                        assumptions={"quantity_response": "elasticity_sensitivity",
-                                                     "elasticity_grid": grid, "no_general_equilibrium": True}))
+    grid = [
+        {"import_elasticity": -0.5, "export_elasticity": 0.0, "basis": "scenario_assumption"},
+        {"import_elasticity": 0.0, "export_elasticity": 0.0, "basis": "scenario_assumption"},
+        {"import_elasticity": -0.2, "export_elasticity": 0.3, "basis": "scenario_assumption"},
+    ]
+    sid = create_scenario(
+        db,
+        make_spec(
+            baseline,
+            fidelity="L2",
+            title="Test: L2",
+            assumptions={
+                "quantity_response": "elasticity_sensitivity",
+                "elasticity_grid": grid,
+                "no_general_equilibrium": True,
+            },
+        ),
+    )
     ref, _ = run(db, sid)
     assert ref["status"] == "succeeded", ref
     rows = results(db, ref["run_id"])
@@ -307,8 +380,9 @@ def test_l2_sensitivity_range(db, baseline):
             assert (u["lower"], u["upper"]) == (v["lower"], v["upper"])
             assert Decimal(u["lower"]) <= Decimal(u["upper"])
             same = [x for x in rows if x["label"] == r["label"] and x["output_key"] == r["output_key"]]
-            points = [Decimal(x["value"]["value"]) for x in same
-                      if x["variant"].startswith("L2:eM=") or x["variant"] == "L1"]
+            points = [
+                Decimal(x["value"]["value"]) for x in same if x["variant"].startswith("L2:eM=") or x["variant"] == "L1"
+            ]
             assert Decimal(u["lower"]) == min(points) and Decimal(u["upper"]) == max(points)
             l1 = next(Decimal(x["value"]["value"]) for x in same if x["variant"] == "L1")
             assert Decimal(u["lower"]) <= l1 <= Decimal(u["upper"])
@@ -317,14 +391,18 @@ def test_l2_sensitivity_range(db, baseline):
             # the L1 fixed-quantity row and every grid variant keep the unquantified status (R3-03)
             assert u["status"] == "unquantified" and u["kind"] == "unknown", r
             assert r["value"]["kind"] == "decimal"
-    by = {(r["label"], r["output_key"], r["variant"]): r["value"]["value"] for r in rows
-          if r["value"]["kind"] == "decimal"}
+    by = {
+        (r["label"], r["output_key"], r["variant"]): r["value"]["value"]
+        for r in rows
+        if r["value"]["kind"] == "decimal"
+    }
     for label in ("France", "China", "United States"):
         for k in OUTPUTS:
             assert by[(label, k, "L2:eM=0;eX=0")] == by[(label, k, "L1")]  # zero elasticity == L1 exactly
         # negative import elasticity with a price rise lowers the import value change
         assert Decimal(by[(label, "import_value_change_usd", "L2:eM=-0.5;eX=0")]) < Decimal(
-            by[(label, "import_value_change_usd", "L1")])
+            by[(label, "import_value_change_usd", "L1")]
+        )
 
 
 def test_stale_fencing_token_cannot_publish(db, baseline):
@@ -332,8 +410,7 @@ def test_stale_fencing_token_cannot_publish(db, baseline):
     payload = {"scenario_id": str(sid), "fidelity": "L1"}
     ctx = claim_job(db, payload)
     with db.owner.begin() as c:  # another worker re-claimed the job: the token moves on
-        c.execute(text("UPDATE ops.job SET fencing_token = nextval('ops.fencing_seq') WHERE id=:j"),
-                  {"j": ctx.job_id})
+        c.execute(text("UPDATE ops.job SET fencing_token = nextval('ops.fencing_seq') WHERE id=:j"), {"j": ctx.job_id})
     runs_before = count(db, "SELECT count(*) FROM sim.run")
     results_before = count(db, "SELECT count(*) FROM sim.result")
     with pytest.raises(StaleLease):
@@ -349,8 +426,10 @@ def test_cancellation_before_publication(db, baseline):
     payload = {"scenario_id": str(sid)}
     ctx = claim_job(db, payload)
     with db.api.begin() as c:
-        assert c.execute(text("SELECT ops.request_cancel(:j, 'human:test')"),
-                         {"j": ctx.job_id}).scalar_one() == "cancel_requested"
+        assert (
+            c.execute(text("SELECT ops.request_cancel(:j, 'human:test')"), {"j": ctx.job_id}).scalar_one()
+            == "cancel_requested"
+        )
     out = handle_simulation(payload, ctx)
     assert out["status"] == "cancelled"
     assert job_row(db, ctx.job_id)["status"] == "cancelled"

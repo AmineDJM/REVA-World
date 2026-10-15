@@ -86,8 +86,10 @@ MODEL_KEY = "economic.io_price"
 MODEL_VERSION = "1.0.0"
 REVIEW_STATUS = "maintainer_review_pending"
 LABEL = "first-round cost-push under full pass-through; not an inflation forecast"
-L2_LABEL = ("first-round cost-push under a stated pass-through share; sensitivity over the pass-through grid; "
-            "not an inflation forecast")
+L2_LABEL = (
+    "first-round cost-push under a stated pass-through share; sensitivity over the pass-through grid; "
+    "not an inflation forecast"
+)
 
 DATASET_INPUT = "io_table"
 DATASET_CONCEPT = "economics.io.figaro_ii_table"
@@ -100,14 +102,17 @@ PURCHASERS_READING_NOTE = (
     "purchasers'-price reading: the basket price change divided by the basket value including households' "
     "taxes less subsidies on products (FIGARO DOM x D21X31 x P3_S14), i.e. product taxes held fixed in money "
     "per unit; with purely ad valorem taxes the basic-price figure applies, so the two readings bracket the "
-    "tax treatment. Not a consumer price index.")
+    "tax treatment. Not a consumer price index."
+)
 REST_OF_WORLD_KEY = "FIGARO_ROW"
 
 #: Industries that may be shocked, with exactly what they contain (NACE Rev. 2 / CPA 2.1).
 SHOCKABLE_INDUSTRIES: dict[str, str] = {
-    "B": ("Mining and quarrying (NACE B05-B09): coal and lignite; crude petroleum and natural gas; metal ores; "
-          "other mining and quarrying (stone, sand, clay, chemical minerals, salt, peat); mining support service "
-          "activities. Broader than crude petroleum: a price change of B applies to all of these."),
+    "B": (
+        "Mining and quarrying (NACE B05-B09): coal and lignite; crude petroleum and natural gas; metal ores; "
+        "other mining and quarrying (stone, sand, clay, chemical minerals, salt, peat); mining support service "
+        "activities. Broader than crude petroleum: a price change of B applies to all of these."
+    ),
     "C19": "Manufacture of coke and refined petroleum products (NACE C19).",
     "D35": "Electricity, gas, steam and air conditioning supply (NACE D35; includes manufactured-gas distribution).",
 }
@@ -144,10 +149,56 @@ SENSITIVITY_STATEMENT = "assumption sensitivity, not a confidence interval"
 #: Must equal ``reva.adapters.connectors.io_tables.ECONOMIES`` (tested); the dataset manifest
 #: is checked against it at compile time.
 FIGARO_KEYS: tuple[str, ...] = (
-    "BEL", "BGR", "CZE", "DNK", "DEU", "EST", "IRL", "GRC", "ESP", "FRA", "HRV", "ITA", "CYP", "LVA", "LTU", "LUX",
-    "HUN", "MLT", "NLD", "AUT", "POL", "PRT", "ROU", "SVN", "SVK", "FIN", "SWE", "NOR", "CHE", "GBR", "MNE", "MKD",
-    "ALB", "SRB", "TUR", "RUS", "ZAF", "CAN", "USA", "MEX", "ARG", "BRA", "CHN", "JPN", "KOR", "IND", "IDN", "SAU",
-    "AUS", REST_OF_WORLD_KEY,
+    "BEL",
+    "BGR",
+    "CZE",
+    "DNK",
+    "DEU",
+    "EST",
+    "IRL",
+    "GRC",
+    "ESP",
+    "FRA",
+    "HRV",
+    "ITA",
+    "CYP",
+    "LVA",
+    "LTU",
+    "LUX",
+    "HUN",
+    "MLT",
+    "NLD",
+    "AUT",
+    "POL",
+    "PRT",
+    "ROU",
+    "SVN",
+    "SVK",
+    "FIN",
+    "SWE",
+    "NOR",
+    "CHE",
+    "GBR",
+    "MNE",
+    "MKD",
+    "ALB",
+    "SRB",
+    "TUR",
+    "RUS",
+    "ZAF",
+    "CAN",
+    "USA",
+    "MEX",
+    "ARG",
+    "BRA",
+    "CHN",
+    "JPN",
+    "KOR",
+    "IND",
+    "IDN",
+    "SAU",
+    "AUS",
+    REST_OF_WORLD_KEY,
 )
 
 #: Reviewed meanings for scenario drafting (``reva.nl.catalog`` shows them to the drafting LLM and the user).
@@ -156,13 +207,16 @@ DRAFTING_HINTS: dict[str, Any] = {
         "intervention.shocks[].origin": (
             "economy whose producers' output price of the industry changes (the location of the shock). Only an "
             "origin the user states: a world price change (e.g. of crude oil) is a shock in every producing economy, "
-            "never only in the reported country. FIGARO_ROW = FIGARO's rest of the world."),
+            "never only in the reported country. FIGARO_ROW = FIGARO's rest of the world."
+        ),
         "intervention.shocks[].industry": (
             "the whole table industry whose output price changes (see choice_meanings); never narrower than the "
-            "industry: B includes coal, metal ores and quarrying, not only crude oil and natural gas"),
+            "industry: B includes coal, metal ores and quarrying, not only crude oil and natural gas"
+        ),
         "intervention.shocks[].price_change_percent": "percent change of that industry's output price (+25 % = 25)",
         "assumptions.pass_through_grid[]": (
-            "L2 only: shares θ in (0, 1] of a cost increase passed on by the non-shocked industries (1 = full)"),
+            "L2 only: shares θ in (0, 1] of a cost increase passed on by the non-shocked industries (1 = full)"
+        ),
     },
     "choice_meanings": {"intervention.shocks[].industry": dict(SHOCKABLE_INDUSTRIES)},
 }
@@ -240,8 +294,10 @@ def parse_spec(spec: Mapping[str, Any]) -> IOSpec:
     """Model-specific checks (the JSON schema covers types; this covers meaning)."""
     horizon = dict(spec.get("horizon") or SUPPORTED_HORIZON)
     if horizon != SUPPORTED_HORIZON:
-        raise CapabilityGap("economic.io_price is single-period: horizon must be 1 annual_accounting_period",
-                            capability="horizon.multi_period")
+        raise CapabilityGap(
+            "economic.io_price is single-period: horizon must be 1 annual_accounting_period",
+            capability="horizon.multi_period",
+        )
     try:
         year = int(spec["reference_year"])
     except (KeyError, TypeError, ValueError) as e:
@@ -251,8 +307,11 @@ def parse_spec(spec: Mapping[str, Any]) -> IOSpec:
         raise ValidationProblem("countries must list at least one economy to report")
     unknown = [c for c in countries if c not in FIGARO_KEYS or c == REST_OF_WORLD_KEY]
     if unknown:
-        raise CapabilityGap(f"not separately covered by the FIGARO table (part of its rest of the world or not a "
-                            f"country): {unknown}", capability="economic.io_price.coverage", countries=unknown)
+        raise CapabilityGap(
+            f"not separately covered by the FIGARO table (part of its rest of the world or not a country): {unknown}",
+            capability="economic.io_price.coverage",
+            countries=unknown,
+        )
     if len(set(countries)) != len(countries):
         raise ValidationProblem("countries must be unique")
     inter = spec.get("intervention") or {}
@@ -265,30 +324,38 @@ def parse_spec(spec: Mapping[str, Any]) -> IOSpec:
     for i, s in enumerate(raw):
         origin, industry = str(s.get("origin")), str(s.get("industry"))
         if origin not in FIGARO_KEYS:
-            raise CapabilityGap(f"shock {i}: origin {origin!r} is not a FIGARO economy (use FIGARO_ROW for the rest "
-                                "of the world)", capability="economic.io_price.coverage")
+            raise CapabilityGap(
+                f"shock {i}: origin {origin!r} is not a FIGARO economy (use FIGARO_ROW for the rest of the world)",
+                capability="economic.io_price.coverage",
+            )
         if industry not in SHOCKABLE_INDUSTRIES:
-            raise CapabilityGap(f"shock {i}: industry {industry!r} cannot be shocked (allowed: "
-                                f"{sorted(SHOCKABLE_INDUSTRIES)})", capability="economic.io_price.shockable_industry")
+            raise CapabilityGap(
+                f"shock {i}: industry {industry!r} cannot be shocked (allowed: {sorted(SHOCKABLE_INDUSTRIES)})",
+                capability="economic.io_price.shockable_industry",
+            )
         pct = _dec(s.get("price_change_percent"), f"shocks[{i}].price_change_percent")
         if not PERCENT_MIN_EXCLUSIVE < pct <= PERCENT_MAX:
-            raise CapabilityGap(f"shock {i}: {pct}% is outside the registered envelope (-100, 200]",
-                                capability="economic.io_price.shock_envelope")
+            raise CapabilityGap(
+                f"shock {i}: {pct}% is outside the registered envelope (-100, 200]",
+                capability="economic.io_price.shock_envelope",
+            )
         shocks.append(Shock(origin, industry, pct))
     if len({(s.origin, s.industry) for s in shocks}) != len(shocks):
         raise ValidationProblem("each (origin, industry) may be shocked once")
     assumptions = spec.get("assumptions") or {}
     grid_raw = assumptions.get("pass_through_grid")
-    grid = tuple(_dec(t, "pass_through_grid[]") for t in grid_raw) if grid_raw is not None \
-        else DEFAULT_PASS_THROUGH_GRID
+    grid = (
+        tuple(_dec(t, "pass_through_grid[]") for t in grid_raw) if grid_raw is not None else DEFAULT_PASS_THROUGH_GRID
+    )
     if not grid or any(not Decimal(0) < t <= Decimal(1) for t in grid):
         raise ValidationProblem("pass_through_grid values must lie in (0, 1]")
     grid = tuple(sorted(set(grid)))
     outputs = tuple(spec.get("outputs") or OUTPUT_GROUPS)
     bad = [o for o in outputs if o not in OUTPUT_GROUPS]
     if bad:
-        raise CapabilityGap(f"unsupported outputs {bad} (supported: {list(OUTPUT_GROUPS)})",
-                            capability="outputs.macroeconomic")
+        raise CapabilityGap(
+            f"unsupported outputs {bad} (supported: {list(OUTPUT_GROUPS)})", capability="outputs.macroeconomic"
+        )
     return IOSpec(year, countries, tuple(shocks), grid, outputs)
 
 
@@ -364,14 +431,14 @@ def arrays_from_table(table: Any, coverage: Mapping[str, Any]) -> IOArrays:
     if np.isnan(val).any():
         raise IntegrityFailure("dataset contains missing values")
     row = rc.astype(np.int64) * n_i + rk
-    zm = (block == 0)
+    zm = block == 0
     if (rc[zm] < 0).any() or (rk[zm] < 0).any() or (cc[zm] < 0).any() or (ck[zm] < 0).any():
         raise IntegrityFailure("intermediate block has codes outside the manifest code lists")
     z = np.zeros((n, n), dtype=np.float64)
     z[row[zm], cc[zm].astype(np.int64) * n_i + ck[zm]] = val[zm]
     if int(zm.sum()) != n * n:
         raise IntegrityFailure(f"intermediate block has {int(zm.sum())} cells, expected {n * n}")
-    xm = (block == 3)
+    xm = block == 3
     x = np.full(n, np.nan)
     x[row[xm]] = val[xm]
     if np.isnan(x).any():
@@ -392,18 +459,28 @@ def arrays_from_table(table: Any, coverage: Mapping[str, Any]) -> IOArrays:
     z[:, ~pos] = 0.0
     a = z
     diagnostics = {
-        "industries": n, "zero_output_industries": int((~pos).sum()),
+        "industries": n,
+        "zero_output_industries": int((~pos).sum()),
         "negative_coefficients": int((a < 0).sum()),
         "max_column_sum": float(a.sum(axis=0).max()),
         "negative_household_cells": int((households < 0).sum()),
     }
-    return IOArrays(economies, keys, industries, a, x, households,
-                    reference_year=coverage.get("reference_year"),
-                    diagnostics=diagnostics, household_product_taxes=taxes)
+    return IOArrays(
+        economies,
+        keys,
+        industries,
+        a,
+        x,
+        households,
+        reference_year=coverage.get("reference_year"),
+        diagnostics=diagnostics,
+        household_product_taxes=taxes,
+    )
 
 
-def _household_product_taxes(table: Any, block: np.ndarray, cc: np.ndarray, ck: np.ndarray, val: np.ndarray,
-                             n_economies: int) -> np.ndarray | None:
+def _household_product_taxes(
+    table: Any, block: np.ndarray, cc: np.ndarray, ck: np.ndarray, val: np.ndarray, n_economies: int
+) -> np.ndarray | None:
     """Taxes less subsidies on products paid on each economy's household consumption (``DOM`` x ``D21X31``).
 
     Exactly one cell per consuming economy, or none at all (then ``None``: no purchasers'-price reading).
@@ -418,8 +495,9 @@ def _household_product_taxes(table: Any, block: np.ndarray, cc: np.ndarray, ck: 
     if len(sel) == 0:
         return None
     if len(sel) != n_economies or (cc[sel] < 0).any() or len(set(cc[sel].tolist())) != n_economies:
-        raise IntegrityFailure(f"households' taxes less subsidies on products: {len(sel)} cells, expected one per "
-                               f"economy ({n_economies})")
+        raise IntegrityFailure(
+            f"households' taxes less subsidies on products: {len(sel)} cells, expected one per economy ({n_economies})"
+        )
     out = np.zeros(n_economies, dtype=np.float64)
     out[cc[sel]] = val[sel]
     return out
@@ -457,8 +535,10 @@ def _shock_vector(arr: IOArrays, shocks: Sequence[Shock]) -> tuple[np.ndarray, n
     idx = np.array([arr.index(key_pos[s.origin], s.industry) for s in shocks], dtype=np.int64)
     if (arr.x[idx] <= 0).any():
         empty = [f"{s.origin}:{s.industry}" for s, i in zip(shocks, idx, strict=True) if arr.x[i] <= 0]
-        raise CapabilityGap(f"shocked industries have no output in the table: {empty}",
-                            capability="economic.io_price.shock_without_output")
+        raise CapabilityGap(
+            f"shocked industries have no output in the table: {empty}",
+            capability="economic.io_price.shock_without_output",
+        )
     pi = np.array([s.fraction for s in shocks], dtype=np.float64)
     return idx, pi, [s.origin for s in shocks]
 
@@ -490,8 +570,9 @@ def solve(arr: IOArrays, shocks: Sequence[Shock], theta: Decimal) -> Solution:
         rel = r / nb if nb > 0 else (0.0 if float(np.linalg.norm(sol[:, c])) == 0.0 else float("inf"))
         residuals[name] = rel
         if not rel < RESIDUAL_TOLERANCE:
-            raise IntegrityFailure(f"linear solve residual {rel:.3e} exceeds {RESIDUAL_TOLERANCE:g} ({name})",
-                                   residual=rel, column=name)
+            raise IntegrityFailure(
+                f"linear solve residual {rel:.3e} exceeds {RESIDUAL_TOLERANCE:g} ({name})", residual=rel, column=name
+            )
     del m
 
     def full(col: int, exo: np.ndarray) -> np.ndarray:
@@ -538,7 +619,7 @@ def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult | Non
     dp = np.where(pos, sol.dp, 0.0)
     own = np.zeros(arr.n, dtype=bool)
     k = len(arr.industries)
-    own[economy_pos * k:(economy_pos + 1) * k] = True
+    own[economy_pos * k : (economy_pos + 1) * k] = True
     dom = float(h[own] @ dp[own]) / w_tot
     imp = float(h[~own] @ dp[~own]) / w_tot
     total = dom + imp
@@ -553,8 +634,12 @@ def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult | Non
 
 # --------------------------------------------------------------------------- result rows
 def _value(d: Decimal, notes: str) -> dict[str, Any]:
-    return {"kind": "decimal", "value": dstr(d), "unit_ref": UNIT,
-            "basis": {"price_basis": "nominal", "valuation": "basic_prices", "scale_factor": "1", "notes": notes}}
+    return {
+        "kind": "decimal",
+        "value": dstr(d),
+        "unit_ref": UNIT,
+        "basis": {"price_basis": "nominal", "valuation": "basic_prices", "scale_factor": "1", "notes": notes},
+    }
 
 
 def _missing() -> dict[str, Any]:
@@ -570,14 +655,21 @@ def _unknown_uncertainty() -> dict[str, Any]:
 
 def _range_uncertainty(lo: Decimal, hi: Decimal, grid: Sequence[str]) -> dict[str, Any]:
     return UncertaintySpec(
-        status=UncertaintyStatus.quantified, kind=UncertaintyKind.sensitivity_range,
-        description=("Pass-through sensitivity range (" + SENSITIVITY_STATEMENT + "): min/max of this output over "
-                     "the labelled pass-through grid together with full pass-through θ = 1. Not a confidence, "
-                     "credible or prediction interval; no coverage level; says nothing about the table's own "
-                     "measurement uncertainty, which is unquantified."),
-        method_version=SENSITIVITY_METHOD, lower=dstr(lo), upper=dstr(hi),
-        conditioning=(*(f"pass_through={t}" for t in grid), "full_pass_through:pass_through=1 (the L1 value) is "
-                      "always included"),
+        status=UncertaintyStatus.quantified,
+        kind=UncertaintyKind.sensitivity_range,
+        description=(
+            "Pass-through sensitivity range (" + SENSITIVITY_STATEMENT + "): min/max of this output over "
+            "the labelled pass-through grid together with full pass-through θ = 1. Not a confidence, "
+            "credible or prediction interval; no coverage level; says nothing about the table's own "
+            "measurement uncertainty, which is unquantified."
+        ),
+        method_version=SENSITIVITY_METHOD,
+        lower=dstr(lo),
+        upper=dstr(hi),
+        conditioning=(
+            *(f"pass_through={t}" for t in grid),
+            "full_pass_through:pass_through=1 (the L1 value) is always included",
+        ),
     ).model_dump(mode="json")
 
 
@@ -614,41 +706,89 @@ def _rows_for(compiled: CompiledIO, fidelity: str) -> list[_Row]:
     same_sign = all(sh.percent > 0 for sh in s.shocks) or all(sh.percent < 0 for sh in s.shocks)
     shocked = {(sh.origin, sh.industry) for sh in s.shocks}
     key_pos = {k: i for i, k in enumerate(arr.keys)}
-    base_app = {"status": "applicable", "modality": "assumption_conditioned_scenario",
-                "model": f"{MODEL_KEY}@{MODEL_VERSION}", "label": LABEL, "reference_year": s.reference_year,
-                "dataset_id": compiled.dataset.get("dataset_id"), "not_claimed": NOT_CLAIMED}
+    base_app = {
+        "status": "applicable",
+        "modality": "assumption_conditioned_scenario",
+        "model": f"{MODEL_KEY}@{MODEL_VERSION}",
+        "label": LABEL,
+        "reference_year": s.reference_year,
+        "dataset_id": compiled.dataset.get("dataset_id"),
+        "not_claimed": NOT_CLAIMED,
+    }
     variants: list[tuple[str, Decimal]] = [("L1", Decimal(1))]
     if fidelity == "L2":
         variants += [(_variant(t), t) for t in s.pass_through_grid]
     rows: list[_Row] = []
 
-    def emit(key: str, country: str, values: dict[Decimal, float | None], extra: dict[str, Any], notes: str,
-             extra_by_theta: Mapping[Decimal, Mapping[str, Any]] | None = None) -> None:
+    def emit(
+        key: str,
+        country: str,
+        values: dict[Decimal, float | None],
+        extra: dict[str, Any],
+        notes: str,
+        extra_by_theta: Mapping[Decimal, Mapping[str, Any]] | None = None,
+    ) -> None:
         for name, t in variants:
             v = values[t]
-            app = {**base_app, "country": country, "variant": name, "pass_through": dstr(t), **extra,
-                   **((extra_by_theta or {}).get(t) or {})}
+            app = {
+                **base_app,
+                "country": country,
+                "variant": name,
+                "pass_through": dstr(t),
+                **extra,
+                **((extra_by_theta or {}).get(t) or {}),
+            }
             if name != "L1":
                 app["label"] = L2_LABEL
-            rows.append(_Row(key, country, name, _missing() if v is None else _value(to_result_decimal(v), notes),
-                             _unknown_uncertainty(), app))
+            rows.append(
+                _Row(
+                    key,
+                    country,
+                    name,
+                    _missing() if v is None else _value(to_result_decimal(v), notes),
+                    _unknown_uncertainty(),
+                    app,
+                )
+            )
         if fidelity == "L2" and all(values[t] is not None for t in values):
             pts = [to_result_decimal(values[t]) for t in values]  # type: ignore[arg-type]
             lo, hi = min(pts), max(pts)
             grid = s.grid_strings()
-            one_sided = ("one-sided by construction: every shock has the same sign and A ≥ 0, so the magnitude "
-                         "rises with θ and full pass-through (the L1 value) is the largest-magnitude end"
-                         if same_sign and arr.diagnostics.get("negative_coefficients") == 0 else
-                         "range over the evaluated points only; no monotonicity in θ is claimed (mixed-sign shocks)")
-            rows.append(_Row(key, country, SENSITIVITY_VARIANT,
-                             {"kind": "sensitivity_range", "lower": dstr(lo), "upper": dstr(hi), "unit_ref": UNIT,
-                              "basis": {"valuation": "basic_prices", "notes": notes},
-                              "evaluated_points": len(values), "includes_full_pass_through_point": True,
-                              "statement": SENSITIVITY_STATEMENT, "one_sidedness": one_sided},
-                             _range_uncertainty(lo, hi, grid),
-                             {**base_app, "label": L2_LABEL, "country": country, "variant": SENSITIVITY_VARIANT,
-                              "range_over": "pass-through grid ∪ {θ = 1}", "pass_through_grid": grid,
-                              "one_sidedness": one_sided, **extra}))
+            one_sided = (
+                "one-sided by construction: every shock has the same sign and A ≥ 0, so the magnitude "
+                "rises with θ and full pass-through (the L1 value) is the largest-magnitude end"
+                if same_sign and arr.diagnostics.get("negative_coefficients") == 0
+                else "range over the evaluated points only; no monotonicity in θ is claimed (mixed-sign shocks)"
+            )
+            rows.append(
+                _Row(
+                    key,
+                    country,
+                    SENSITIVITY_VARIANT,
+                    {
+                        "kind": "sensitivity_range",
+                        "lower": dstr(lo),
+                        "upper": dstr(hi),
+                        "unit_ref": UNIT,
+                        "basis": {"valuation": "basic_prices", "notes": notes},
+                        "evaluated_points": len(values),
+                        "includes_full_pass_through_point": True,
+                        "statement": SENSITIVITY_STATEMENT,
+                        "one_sidedness": one_sided,
+                    },
+                    _range_uncertainty(lo, hi, grid),
+                    {
+                        **base_app,
+                        "label": L2_LABEL,
+                        "country": country,
+                        "variant": SENSITIVITY_VARIANT,
+                        "range_over": "pass-through grid ∪ {θ = 1}",
+                        "pass_through_grid": grid,
+                        "one_sidedness": one_sided,
+                        **extra,
+                    },
+                )
+            )
 
     all_t = sorted(set(thetas))
     for country in s.countries:
@@ -665,35 +805,64 @@ def _rows_for(compiled: CompiledIO, fidelity: str) -> list[_Row]:
                     extra["exogenous"] = "price change set by the intervention (not passed through)"
                 if arr.x[k] <= 0:
                     extra["note"] = "industry has no output in the table; price change not applicable"
-                emit(INDUSTRY_PREFIX + ind, country, vals, extra,
-                     "output price change of this industry, percent of the baseline price")
+                emit(
+                    INDUSTRY_PREFIX + ind,
+                    country,
+                    vals,
+                    extra,
+                    "output price change of this industry, percent of the baseline price",
+                )
         if BASKET_KEY in s.outputs or "household_basket_contributions" in s.outputs:
             res = {t: basket(arr, sols[t], e) for t in all_t}
             b1 = res[Decimal(1)]
-            note = {} if b1 is not None else {
-                "note": "no household final consumption recorded for this economy; basket not applicable"}
+            note = (
+                {}
+                if b1 is not None
+                else {"note": "no household final consumption recorded for this economy; basket not applicable"}
+            )
             if BASKET_KEY in s.outputs:
                 taxes = None if b1 is None or b1.product_taxes_mio_eur is None else b1.product_taxes_mio_eur
-                readings = {t: {PURCHASERS_READING_KEY: None if r is None or r.purchasers_reading is None
-                                else dstr(to_result_decimal(100.0 * r.purchasers_reading))} for t, r in res.items()}
-                emit(BASKET_KEY, country, {t: None if r is None else 100.0 * r.total for t, r in res.items()},
-                     {"basket": "households' final consumption (P3_S14) at basic prices, domestic and imported",
-                      "valuation": "basic prices: trade and transport margins included, taxes less subsidies on "
-                                   "products excluded; not a consumer price index",
-                      "weight_total_mio_eur": None if b1 is None else f"{b1.weight_total_mio_eur:.3f}",
-                      "household_product_taxes_less_subsidies_mio_eur": None if taxes is None else f"{taxes:.3f}",
-                      "purchasers_price_reading_note": PURCHASERS_READING_NOTE, **note},
-                     "price change of the household basket at basic prices, percent", readings)
+                readings = {
+                    t: {
+                        PURCHASERS_READING_KEY: None
+                        if r is None or r.purchasers_reading is None
+                        else dstr(to_result_decimal(100.0 * r.purchasers_reading))
+                    }
+                    for t, r in res.items()
+                }
+                emit(
+                    BASKET_KEY,
+                    country,
+                    {t: None if r is None else 100.0 * r.total for t, r in res.items()},
+                    {
+                        "basket": "households' final consumption (P3_S14) at basic prices, domestic and imported",
+                        "valuation": "basic prices: trade and transport margins included, taxes less subsidies on "
+                        "products excluded; not a consumer price index",
+                        "weight_total_mio_eur": None if b1 is None else f"{b1.weight_total_mio_eur:.3f}",
+                        "household_product_taxes_less_subsidies_mio_eur": None if taxes is None else f"{taxes:.3f}",
+                        "purchasers_price_reading_note": PURCHASERS_READING_NOTE,
+                        **note,
+                    },
+                    "price change of the household basket at basic prices, percent",
+                    readings,
+                )
             if "household_basket_contributions" in s.outputs:
-                parts = {CONTRIBUTION_KEYS[0]: "domestic_products", CONTRIBUTION_KEYS[1]: "imported_products",
-                         CONTRIBUTION_KEYS[2]: "domestic_shocks", CONTRIBUTION_KEYS[3]: "foreign_shocks"}
+                parts = {
+                    CONTRIBUTION_KEYS[0]: "domestic_products",
+                    CONTRIBUTION_KEYS[1]: "imported_products",
+                    CONTRIBUTION_KEYS[2]: "domestic_shocks",
+                    CONTRIBUTION_KEYS[3]: "foreign_shocks",
+                }
                 for out_key, attr in parts.items():
-                    emit(out_key, country,
-                         {t: None if r is None else 100.0 * getattr(r, attr) for t, r in res.items()},
-                         {"decomposition": attr, **note},
-                         "contribution to the household basket price change, percent of the baseline basket "
-                         "value; domestic+imported products and domestic+foreign shocks each sum to the basket "
-                         "change before rounding")
+                    emit(
+                        out_key,
+                        country,
+                        {t: None if r is None else 100.0 * getattr(r, attr) for t, r in res.items()},
+                        {"decomposition": attr, **note},
+                        "contribution to the household basket price change, percent of the baseline basket "
+                        "value; domestic+imported products and domestic+foreign shocks each sum to the basket "
+                        "change before rounding",
+                    )
     for t, sol in sols.items():
         compiled.arrays.diagnostics.setdefault("max_relative_residual", {})[dstr(t)] = max(sol.residuals.values())
         compiled.arrays.diagnostics.setdefault("right_hand_sides", {})[dstr(t)] = len(sol.residuals)
@@ -712,8 +881,10 @@ class IOPriceModel:
     def validate(self, spec: dict[str, Any]) -> None:
         parse_spec(spec)
         if spec.get("missing_input_policy", "fail") != "fail":
-            raise CapabilityGap("economic.io_price supports missing_input_policy=fail only (one global table)",
-                                capability="scenario.skip_missing_countries")
+            raise CapabilityGap(
+                "economic.io_price supports missing_input_policy=fail only (one global table)",
+                capability="scenario.skip_missing_countries",
+            )
 
     def requirements(self, spec: dict[str, Any]) -> list[Any]:
         from reva.simulation.plugins import InputRequirement
@@ -731,37 +902,64 @@ class IOPriceModel:
         cov = manifest.get("coverage") or {}
         year = cov.get("reference_year")
         if year != s.reference_year:
-            return CompiledIO(s, empty, {}, dict(inputs.release), incompatible=[{
-                "code": "incompatible_semantics", "input": DATASET_INPUT,
-                "message": f"the pinned IO table is for {year}, the scenario asks for {s.reference_year}",
-                "table_year": year, "reference_year": s.reference_year}])
+            return CompiledIO(
+                s,
+                empty,
+                {},
+                dict(inputs.release),
+                incompatible=[
+                    {
+                        "code": "incompatible_semantics",
+                        "input": DATASET_INPUT,
+                        "message": f"the pinned IO table is for {year}, the scenario asks for {s.reference_year}",
+                        "table_year": year,
+                        "reference_year": s.reference_year,
+                    }
+                ],
+            )
         if not (cov.get("identity_report") or {}).get("passed"):
             raise IntegrityFailure("the pinned IO table has no passing identity report")
         arr = arrays_from_table(ds.table, cov)
         rho = spectral_radius_upper_bound(arr.A)
         arr.diagnostics["spectral_radius_upper_bound"] = rho
         if not rho < 1.0:
-            raise CapabilityGap(f"the table's Leontief system is not shown to be productive (ρ bound {rho:.6f})",
-                                capability="economic.io_price.productivity")
-        dataset = {"dataset_id": ds.dataset_id, "artifact_sha256": ds.artifact_sha256,
-                   "manifest_sha256": manifest.get("manifest_sha256"), "dataset_key": manifest.get("dataset_key"),
-                   "source": cov.get("source"), "reference_year": year}
+            raise CapabilityGap(
+                f"the table's Leontief system is not shown to be productive (ρ bound {rho:.6f})",
+                capability="economic.io_price.productivity",
+            )
+        dataset = {
+            "dataset_id": ds.dataset_id,
+            "artifact_sha256": ds.artifact_sha256,
+            "manifest_sha256": manifest.get("manifest_sha256"),
+            "dataset_key": manifest.get("dataset_key"),
+            "source": cov.get("source"),
+            "reference_year": year,
+        }
         return CompiledIO(s, arr, dataset, dict(inputs.release))
 
     def compute(self, compiled: CompiledIO, fidelity: str) -> list[Any]:
         from reva.simulation.plugins import ResultRow
 
         if fidelity not in self.fidelities:
-            raise CapabilityGap(f"economic.io_price computes L1 and L2, not {fidelity}",
-                                capability=f"fidelity.{fidelity}")
-        return [ResultRow(r.output_key, r.country, entity_id(r.country), r.variant, r.value, r.uncertainty,
-                          r.applicability) for r in _rows_for(compiled, fidelity)]
+            raise CapabilityGap(
+                f"economic.io_price computes L1 and L2, not {fidelity}", capability=f"fidelity.{fidelity}"
+            )
+        return [
+            ResultRow(r.output_key, r.country, entity_id(r.country), r.variant, r.value, r.uncertainty, r.applicability)
+            for r in _rows_for(compiled, fidelity)
+        ]
 
     def manifest(self) -> dict[str, Any]:
-        return {"implementation": "reva.models.economic.io_price", "implementation_digest": implementation_digest(),
-                "review_status": REVIEW_STATUS, "numerics": numerics_statement(), "label": LABEL,
-                "assumptions": list(ASSUMPTIONS), "not_claimed": NOT_CLAIMED,
-                "shockable_industries": SHOCKABLE_INDUSTRIES}
+        return {
+            "implementation": "reva.models.economic.io_price",
+            "implementation_digest": implementation_digest(),
+            "review_status": REVIEW_STATUS,
+            "numerics": numerics_statement(),
+            "label": LABEL,
+            "assumptions": list(ASSUMPTIONS),
+            "not_claimed": NOT_CLAIMED,
+            "shockable_industries": SHOCKABLE_INDUSTRIES,
+        }
 
     # -- optional hooks ------------------------------------------------------------------
     def spec_schema(self) -> dict[str, Any]:
@@ -771,13 +969,18 @@ class IOPriceModel:
         return explain(fidelity)
 
     def run_applicability(self, compiled: CompiledIO, fidelity: str) -> dict[str, Any]:
-        return {"explanation": explain(fidelity), "label": LABEL if fidelity != "L2" else L2_LABEL,
-                "intervention": [sh.as_json() for sh in compiled.spec.shocks],
-                "shocked_industry_contents": {sh.industry: SHOCKABLE_INDUSTRIES[sh.industry]
-                                              for sh in compiled.spec.shocks},
-                "pass_through_grid": compiled.spec.grid_strings() if fidelity == "L2" else ["1"],
-                "dataset": compiled.dataset, "diagnostics": compiled.arrays.diagnostics,
-                "countries": list(compiled.spec.countries)}
+        return {
+            "explanation": explain(fidelity),
+            "label": LABEL if fidelity != "L2" else L2_LABEL,
+            "intervention": [sh.as_json() for sh in compiled.spec.shocks],
+            "shocked_industry_contents": {
+                sh.industry: SHOCKABLE_INDUSTRIES[sh.industry] for sh in compiled.spec.shocks
+            },
+            "pass_through_grid": compiled.spec.grid_strings() if fidelity == "L2" else ["1"],
+            "dataset": compiled.dataset,
+            "diagnostics": compiled.arrays.diagnostics,
+            "countries": list(compiled.spec.countries),
+        }
 
     def seed_subjects(self, spec: dict[str, Any]) -> list[str]:
         return [str(c) for c in spec.get("countries", [])]
@@ -787,17 +990,22 @@ class IOPriceModel:
         return DRAFTING_HINTS
 
     def cost(self, spec: dict[str, Any]) -> dict[str, Any]:
-        return {"pass_through_points": len((spec.get("assumptions") or {}).get("pass_through_grid")
-                                           or DEFAULT_PASS_THROUGH_GRID)}
+        return {
+            "pass_through_points": len(
+                (spec.get("assumptions") or {}).get("pass_through_grid") or DEFAULT_PASS_THROUGH_GRID
+            )
+        }
 
     def implementation_files(self) -> tuple[Path, ...]:
         return (Path(__file__),)
 
 
 def numerics_statement() -> str:
-    return (f"float64 LU with partial pivoting (SciPy/LAPACK); relative residual < {RESIDUAL_TOLERANCE:g} checked "
-            f"per right-hand side; Collatz-Wielandt bound of ρ(|A|) < 1 checked; results rounded half-even to "
-            f"{RESULT_DECIMALS} decimals of a percent")
+    return (
+        f"float64 LU with partial pivoting (SciPy/LAPACK); relative residual < {RESIDUAL_TOLERANCE:g} checked "
+        f"per right-hand side; Collatz-Wielandt bound of ρ(|A|) < 1 checked; results rounded half-even to "
+        f"{RESULT_DECIMALS} decimals of a percent"
+    )
 
 
 def explain(fidelity: str = "L1") -> dict[str, Any]:
@@ -806,14 +1014,18 @@ def explain(fidelity: str = "L1") -> dict[str, Any]:
         "label": LABEL if fidelity != "L2" else L2_LABEL,
         "modality": "assumption_conditioned_scenario",
         "formula": "(I − θ A_EEᵀ) Δp_E = θ A_SEᵀ π_S; Δp_S = π_S; basket_d = Σ_k h_kd Δp_k / Σ_k h_kd",
-        "units": {"industry_price_change_percent:<industry>": "percent of the baseline output price",
-                  BASKET_KEY: "percent of the baseline household basket value (basic prices; taxes less "
-                              "subsidies on products excluded; each row also carries a purchasers'-price reading "
-                              "with product taxes fixed per unit)",
-                  "household_basket_contribution_*": "percent of the baseline basket value (sums to the basket)"},
+        "units": {
+            "industry_price_change_percent:<industry>": "percent of the baseline output price",
+            BASKET_KEY: "percent of the baseline household basket value (basic prices; taxes less "
+            "subsidies on products excluded; each row also carries a purchasers'-price reading "
+            "with product taxes fixed per unit)",
+            "household_basket_contribution_*": "percent of the baseline basket value (sums to the basket)",
+        },
         "assumptions": list(ASSUMPTIONS),
-        "uncertainty": ("Unquantified: FIGARO publishes no uncertainty. L2 publishes a separate pass-through "
-                        "sensitivity range row (min/max over the grid ∪ {θ = 1}); it has no probability level."),
+        "uncertainty": (
+            "Unquantified: FIGARO publishes no uncertainty. L2 publishes a separate pass-through "
+            "sensitivity range row (min/max over the grid ∪ {θ = 1}); it has no probability level."
+        ),
         "numerical": numerics_statement(),
         "shockable_industries": SHOCKABLE_INDUSTRIES,
         "not_claimed": NOT_CLAIMED,
@@ -824,27 +1036,47 @@ def explain(fidelity: str = "L1") -> dict[str, Any]:
 def spec_schema() -> dict[str, Any]:
     num = {"oneOf": [{"type": "number"}, {"type": "string", "pattern": r"^-?[0-9]+(\.[0-9]+)?$"}]}
     return {
-        "countries": {"type": "array", "minItems": 1, "maxItems": 49, "uniqueItems": True,
-                      "items": {"enum": [k for k in FIGARO_KEYS if k != REST_OF_WORLD_KEY]}},
+        "countries": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 49,
+            "uniqueItems": True,
+            "items": {"enum": [k for k in FIGARO_KEYS if k != REST_OF_WORLD_KEY]},
+        },
         "reference_year": {"type": "integer", "minimum": 2010, "maximum": 2100},
-        "horizon": {"type": "object", "additionalProperties": False,
-                    "properties": {"periods": {"const": 1}, "unit": {"const": "annual_accounting_period"}},
-                    "required": ["periods", "unit"]},
+        "horizon": {
+            "type": "object",
+            "additionalProperties": False,
+            "properties": {"periods": {"const": 1}, "unit": {"const": "annual_accounting_period"}},
+            "required": ["periods", "unit"],
+        },
         "missing_input_policy": {"const": "fail"},
         "intervention": {
-            "type": "object", "additionalProperties": False, "required": ["kind", "shocks"],
+            "type": "object",
+            "additionalProperties": False,
+            "required": ["kind", "shocks"],
             "properties": {
                 "kind": {"const": "set_exogenous_industry_price_change"},
-                "shocks": {"type": "array", "minItems": 1, "maxItems": MAX_SHOCKS, "items": {
-                    "type": "object", "additionalProperties": False,
-                    "required": ["origin", "industry", "price_change_percent"],
-                    "properties": {"origin": {"enum": list(FIGARO_KEYS)},
-                                   "industry": {"enum": sorted(SHOCKABLE_INDUSTRIES)},
-                                   "price_change_percent": num}}},
+                "shocks": {
+                    "type": "array",
+                    "minItems": 1,
+                    "maxItems": MAX_SHOCKS,
+                    "items": {
+                        "type": "object",
+                        "additionalProperties": False,
+                        "required": ["origin", "industry", "price_change_percent"],
+                        "properties": {
+                            "origin": {"enum": list(FIGARO_KEYS)},
+                            "industry": {"enum": sorted(SHOCKABLE_INDUSTRIES)},
+                            "price_change_percent": num,
+                        },
+                    },
+                },
             },
         },
         "assumptions": {
-            "type": "object", "additionalProperties": False,
+            "type": "object",
+            "additionalProperties": False,
             "properties": {"pass_through_grid": {"type": "array", "minItems": 1, "maxItems": 10, "items": num}},
         },
         "outputs": {"type": "array", "minItems": 1, "uniqueItems": True, "items": {"enum": list(OUTPUT_GROUPS)}},
@@ -868,18 +1100,22 @@ REGISTRY_ENTRY: dict[str, Any] = {
     "version": MODEL_VERSION,
     "kind": "scenario",
     "approval_status": "candidate",
-    "description": ("Multi-region Leontief cost-push price model on the Eurostat FIGARO inter-country table: "
-                    "exogenous output-price change of chosen industries, uniform pass-through share, fixed "
-                    "coefficients. " + LABEL + "."),
-    "input_ports": [{"name": DATASET_INPUT, "kind": "dataset", "concept": DATASET_CONCEPT,
-                     "subject": DATASET_SUBJECT}],
+    "description": (
+        "Multi-region Leontief cost-push price model on the Eurostat FIGARO inter-country table: "
+        "exogenous output-price change of chosen industries, uniform pass-through share, fixed "
+        "coefficients. " + LABEL + "."
+    ),
+    "input_ports": [{"name": DATASET_INPUT, "kind": "dataset", "concept": DATASET_CONCEPT, "subject": DATASET_SUBJECT}],
     "output_ports": [{"name": g, "unit": UNIT} for g in OUTPUT_GROUPS],
-    "applicability": {"horizon": SUPPORTED_HORIZON, "price_change_percent_envelope": {"min_exclusive": -100,
-                                                                                       "max": 200},
-                      "pass_through_envelope": {"min_exclusive": 0, "max": 1},
-                      "shockable_industries": sorted(SHOCKABLE_INDUSTRIES),
-                      "fidelity_supported": ["L0", "L1", "L2"], "fidelity_reserved": ["L3", "L4"],
-                      "unsupported_outputs": ["inflation_forecast", "consumer_price_index", "gdp_loss", "welfare"]},
+    "applicability": {
+        "horizon": SUPPORTED_HORIZON,
+        "price_change_percent_envelope": {"min_exclusive": -100, "max": 200},
+        "pass_through_envelope": {"min_exclusive": 0, "max": 1},
+        "shockable_industries": sorted(SHOCKABLE_INDUSTRIES),
+        "fidelity_supported": ["L0", "L1", "L2"],
+        "fidelity_reserved": ["L3", "L4"],
+        "unsupported_outputs": ["inflation_forecast", "consumer_price_index", "gdp_loss", "welfare"],
+    },
     "assumptions": list(ASSUMPTIONS),
     "review_status": REVIEW_STATUS,
 }

@@ -130,8 +130,13 @@ def error_document(code: str, message: str, *, retryable: bool, attempt: int, **
     from reva.operations.telemetry import redact_obj, redact_text, secret_values
 
     known = secret_values()
-    return {"code": code[:64], "message": redact_text(message, known)[:MAX_ERROR_MESSAGE],
-            "retryable": retryable, "attempt": attempt, **redact_obj(extra, known)}
+    return {
+        "code": code[:64],
+        "message": redact_text(message, known)[:MAX_ERROR_MESSAGE],
+        "retryable": retryable,
+        "attempt": attempt,
+        **redact_obj(extra, known),
+    }
 ```
 
 **P4 (SEC): `src/reva/api/app.py`.** Install the redacting JSON handler in the served process, and
@@ -190,8 +195,7 @@ In `_db`, change `log.exception("database error")` the same way:
 **P7 (lead): `src/reva/evidence/runner.py:65`.**
 
 ```python
-                raise SourceResponseError(f"no captured fixture for {redact_url(url)}", retryable=False,
-                                          kind="fixture_missing")
+raise SourceResponseError(f"no captured fixture for {redact_url(url)}", retryable=False, kind="fixture_missing")
 ```
 
 **P8 (SEC, recommendation, no test): `src/reva/api/auth.py` `login`.** For

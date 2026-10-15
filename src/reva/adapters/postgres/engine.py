@@ -18,9 +18,7 @@ EngineKind = Literal["api", "worker", "sim", "gate", "migration"]
 def make_engine(kind: EngineKind, settings: Settings | None = None) -> Engine:
     s = settings or get_settings()
     url = s.migration_url() if kind == "migration" else s.runtime_url(kind)  # type: ignore[arg-type]
-    timeout = s.reva_db_statement_timeout_ms if kind == "api" else max(
-        s.reva_db_statement_timeout_ms, 300_000
-    )
+    timeout = s.reva_db_statement_timeout_ms if kind == "api" else max(s.reva_db_statement_timeout_ms, 300_000)
     return create_engine(
         url,
         pool_size=s.reva_db_pool_size,

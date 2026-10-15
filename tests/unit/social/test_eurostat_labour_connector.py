@@ -79,8 +79,11 @@ def test_pension_expenditure_is_nominal_euro_millions() -> None:
     c = lab.EurostatLabourPensionsConnector()
     (batch,) = list(c.parse(RAWS["spr_exp_pens"]))
     v = next(o.value for o in batch.observations if o.value["kind"] == "decimal")
-    assert v["unit_ref"] == "unit.eur" and v["basis"] == {"scale_factor": "1000000", "currency": "EUR",
-                                                          "price_basis": "nominal"}
+    assert v["unit_ref"] == "unit.eur" and v["basis"] == {
+        "scale_factor": "1000000",
+        "currency": "EUR",
+        "price_basis": "nominal",
+    }
 
 
 def _doc(code: str) -> dict[str, Any]:
@@ -127,8 +130,11 @@ def test_empty_value_map_is_blocked_not_zero() -> None:
 
 def test_api_error_document_is_typed() -> None:
     with pytest.raises(SourceResponseError):
-        list(lab.EurostatLabourPensionsConnector().parse(
-            _with_body(RAWS["ilc_lvph01"], b'{"error": {"status": 400, "label": "bad"}}')))
+        list(
+            lab.EurostatLabourPensionsConnector().parse(
+                _with_body(RAWS["ilc_lvph01"], b'{"error": {"status": 400, "label": "bad"}}')
+            )
+        )
 
 
 def test_dataset_derivation_is_deterministic_and_per_country() -> None:

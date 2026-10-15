@@ -153,9 +153,14 @@ class Withheld:
     details: dict[str, Any] | None = None  # reason-specific context (e.g. the publication pause)
 
     def as_json(self) -> dict[str, Any]:
-        out: dict[str, Any] = {"subject_id": str(self.subject_id), "concept_id": self.concept_id,
-                               "support_id": str(self.support_id), "reason": self.reason,
-                               "discrepancy_flags": self.discrepancy_flags, "alternatives": self.alternatives}
+        out: dict[str, Any] = {
+            "subject_id": str(self.subject_id),
+            "concept_id": self.concept_id,
+            "support_id": str(self.support_id),
+            "reason": self.reason,
+            "discrepancy_flags": self.discrepancy_flags,
+            "alternatives": self.alternatives,
+        }
         if self.details is not None:
             out["details"] = self.details
         return out
@@ -230,8 +235,12 @@ def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]])
         if chosen.get("selection_status") == "superseded_revision_selected":
             sel.discrepancy_flags.append("superseded_revision_selected")
         for alt in ranked[1:]:
-            entry = {"observation_id": str(alt["id"]), "source_key": alt["source_key"], "value": alt["value"],
-                     **_independence(alt, chosen)}
+            entry = {
+                "observation_id": str(alt["id"]),
+                "source_key": alt["source_key"],
+                "value": alt["value"],
+                **_independence(alt, chosen),
+            }
             if alt.get("selection_status") == "superseded_revision_selected":
                 entry["selection_status"] = "superseded_revision_selected"
             sel.alternatives.append(entry)
@@ -241,25 +250,44 @@ def select_report(rows: list[dict[str, Any]], preferences: dict[str, list[str]])
         if len(same_source) > 1:
             sel.discrepancy_flags.append("multiple_lineages_same_source")
         incompatible = [
-            f"incompatible_lineages:{dim}" for dim in DISTINGUISHING_FLAGS
+            f"incompatible_lineages:{dim}"
+            for dim in DISTINGUISHING_FLAGS
             if len({str((c.get("source_flags") or {}).get(dim)) for c in ranked}) > 1
         ]
         if incompatible:
             # Different quantities under one estimand (R-05/R3-08): never pick one arbitrarily.
-            withheld.append(Withheld(
-                subject_id=subject, concept_version_id=concept, concept_id=concept_id, support_id=support,
-                reason="incompatible_lineages", discrepancy_flags=incompatible,
-                alternatives=[{"observation_id": str(c["id"]), "source_key": c["source_key"],
-                               "logical_key": c["logical_key"], "value": c["value"],
-                               **{d: (c.get("source_flags") or {}).get(d) for d in DISTINGUISHING_FLAGS}}
-                              for c in ranked],
-            ))
+            withheld.append(
+                Withheld(
+                    subject_id=subject,
+                    concept_version_id=concept,
+                    concept_id=concept_id,
+                    support_id=support,
+                    reason="incompatible_lineages",
+                    discrepancy_flags=incompatible,
+                    alternatives=[
+                        {
+                            "observation_id": str(c["id"]),
+                            "source_key": c["source_key"],
+                            "logical_key": c["logical_key"],
+                            "value": c["value"],
+                            **{d: (c.get("source_flags") or {}).get(d) for d in DISTINGUISHING_FLAGS},
+                        }
+                        for c in ranked
+                    ],
+                )
+            )
             continue
         for r in retracted:
             # The retracted lineage is excluded; its value is not carried forward.
-            sel.alternatives.append({"observation_id": str(r["id"]), "source_key": r["source_key"],
-                                     "logical_key": r["logical_key"], "selection_status": "retracted",
-                                     **_independence(r, chosen)})
+            sel.alternatives.append(
+                {
+                    "observation_id": str(r["id"]),
+                    "source_key": r["source_key"],
+                    "logical_key": r["logical_key"],
+                    "selection_status": "retracted",
+                    **_independence(r, chosen),
+                }
+            )
             sel.discrepancy_flags.append(f"retracted_lineage_excluded:{r['source_key']}")
         sel.discrepancy_flags = list(dict.fromkeys(sel.discrepancy_flags))
         out.append(sel)

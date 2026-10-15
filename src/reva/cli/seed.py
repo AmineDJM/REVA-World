@@ -112,8 +112,16 @@ def _ensure_alias(
                        :mv, :c, :a)
                ON CONFLICT (provider, external_key, mapping_version) DO NOTHING"""
         ),
-        {"e": eid, "p": provider, "k": key, "c": confidence, "a": act, "mv": mapping_version,
-         "vf": valid_from, "vt": valid_to},
+        {
+            "e": eid,
+            "p": provider,
+            "k": key,
+            "c": confidence,
+            "a": act,
+            "mv": mapping_version,
+            "vf": valid_from,
+            "vt": valid_to,
+        },
     )
 
 
@@ -132,8 +140,15 @@ def _seed_entities(conn: Connection, reg: Registry, act: UUID) -> int:
         eid = entity_id(e["key"])
         _ensure_entity(conn, eid, e["kind"], e["label"], e.get("referent_mode", "real"), act)
         for a in e["aliases"]:
-            _ensure_alias(conn, eid, a["provider"], str(a["key"]), "reviewed_exact", act,
-                          mapping_version=str(a.get("mapping_version", "1.0.0")))
+            _ensure_alias(
+                conn,
+                eid,
+                a["provider"],
+                str(a["key"]),
+                "reviewed_exact",
+                act,
+                mapping_version=str(a.get("mapping_version", "1.0.0")),
+            )
         n += 1
     # Provider-declared partner areas for bilateral trade relations (R-10): only a
     # reviewed comtrade_partner alias (countries.yaml) maps a partner code to a
@@ -157,10 +172,17 @@ def _seed_entities(conn: Connection, reg: Registry, act: UUID) -> int:
             "abstract" if is_area else "real",
             act,
         )
-        _ensure_alias(conn, eid, "comtrade_partner", code, "provider_declared", act,
-                      mapping_version=PARTNER_MAPPING_VERSION,
-                      valid_from=_catalogue_date(p.get("entryEffectiveDate")),
-                      valid_to=_catalogue_date(p.get("entryExpiredDate"), exclusive_end=True))
+        _ensure_alias(
+            conn,
+            eid,
+            "comtrade_partner",
+            code,
+            "provider_declared",
+            act,
+            mapping_version=PARTNER_MAPPING_VERSION,
+            valid_from=_catalogue_date(p.get("entryEffectiveDate")),
+            valid_to=_catalogue_date(p.get("entryExpiredDate"), exclusive_end=True),
+        )
     n += _seed_crosswalk_entities(conn, {e["key"] for e in reg.entities}, act)
     return n
 
@@ -182,10 +204,13 @@ def _seed_crosswalk_entities(conn: Connection, reviewed_keys: set[str], act: UUI
         eid = entity_id(e["key"])
         _ensure_entity(conn, eid, e["kind"], e["label"], "real", act)
         for a in e["aliases"]:
-            _ensure_alias(conn, eid, a["provider"], str(a["key"]), "provider_declared", act,
-                          mapping_version=ALIAS_MAPPING_VERSION)
+            _ensure_alias(
+                conn, eid, a["provider"], str(a["key"]), "provider_declared", act, mapping_version=ALIAS_MAPPING_VERSION
+            )
         n += 1
     return n
+
+
 # --- end V2 step 1 (ALLC) ---
 
 
@@ -232,7 +257,8 @@ def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any
         ):
             raise ImmutableRecordViolation(
                 f"connector {spec.name}@{spec.version} is registered with different content; bump the version",
-                connector=spec.name, version=spec.version,
+                connector=spec.name,
+                version=spec.version,
             )
         return UUID(str(existing["id"]))
     src = repo.source_by_key(conn, spec.source_key)
@@ -253,11 +279,16 @@ def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any
                     "v": spec.version,
                     "sha": sha,
                     "cd": spec.code_digest,
-                    "caps": json.dumps({"template": spec.template, "datasets": list(spec.dataset_ids),
-                                        "allowed_hosts": list(spec.allowed_hosts),
-                                        # GATE/R6-02: evidence.approve_eligibility binds a gate pass to the
-                                        # manifest digest the gate evaluated (declarative connectors only)
-                                        "manifest_sha256": (spec.field_mappings or {}).get("manifest_sha256")}),
+                    "caps": json.dumps(
+                        {
+                            "template": spec.template,
+                            "datasets": list(spec.dataset_ids),
+                            "allowed_hosts": list(spec.allowed_hosts),
+                            # GATE/R6-02: evidence.approve_eligibility binds a gate pass to the
+                            # manifest digest the gate evaluated (declarative connectors only)
+                            "manifest_sha256": (spec.field_mappings or {}).get("manifest_sha256"),
+                        }
+                    ),
                 },
             ).scalar_one()
         )
@@ -293,9 +324,19 @@ def record_mapping_and_eligibility(
                 """SELECT ontology.approve_mapping(:p, :g, :k, :v, CAST(:sr AS jsonb), :t, :mk, CAST(:ts AS jsonb),
                      CAST(:ap AS jsonb), :pv, :a)"""
             ),
-            {"p": approval[0], "g": approval[1], "k": m["mapping_key"], "v": m["version"],
-             "sr": json.dumps(m["source_ref"]), "t": target, "mk": m["mapping_kind"], "ts": json.dumps(transform),
-             "ap": json.dumps(m.get("applicability", {})), "pv": policy_version, "a": act},
+            {
+                "p": approval[0],
+                "g": approval[1],
+                "k": m["mapping_key"],
+                "v": m["version"],
+                "sr": json.dumps(m["source_ref"]),
+                "t": target,
+                "mk": m["mapping_kind"],
+                "ts": json.dumps(transform),
+                "ap": json.dumps(m.get("applicability", {})),
+                "pv": policy_version,
+                "a": act,
+            },
         )
     elif not exists:
         conn.execute(
@@ -326,13 +367,17 @@ def record_mapping_and_eligibility(
     applicability = {**m.get("applicability", {}), "subject_ids": subject_ids, "mapping_key": m["mapping_key"]}
     # Append a decision only when the latest seeded one differs (e.g. a mapping version
     # widened its applicability); decisions are append-only and the latest in scope wins.
-    latest = conn.execute(
-        text(
-            "SELECT decision, applicability FROM evidence.eligibility WHERE connector_version_id=:cv "
-            "AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"
-        ),
-        {"cv": cv["id"], "c": target},
-    ).mappings().one_or_none()
+    latest = (
+        conn.execute(
+            text(
+                "SELECT decision, applicability FROM evidence.eligibility WHERE connector_version_id=:cv "
+                "AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"
+            ),
+            {"cv": cv["id"], "c": target},
+        )
+        .mappings()
+        .one_or_none()
+    )
     if latest is not None and latest["decision"] == "eligible" and dict(latest["applicability"]) == applicability:
         return
     if latest is not None and latest["decision"] != "eligible":
@@ -438,29 +483,37 @@ def _crosswalk_sha256() -> str:  # V2 step 1 (ALLC)
 def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
     """Digest of everything ``seed`` writes (registry content, built-in connectors, schedules)."""
     partners = reg.root / "reference" / "comtrade_partnerAreas.json"
-    return logical_hash({
-        "schema": "reva-seed-fingerprint/1",
-        "ontology": reg.manifest(),
-        "entities": list(reg.entities),
-        "sources": list(reg.sources),
-        "mappings": list(reg.mappings),
-        "models": list(reg.models),
-        "partners_sha256": sha256_bytes(partners.read_bytes()),
-        "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
-        # identity only: a changed spec/code under the same version is refused by
-        # register_connector_version when the owner seeds, not hidden in the fingerprint
-        "connectors": sorted([s.name, s.version]
-                             for s in (c.describe() for c in builtin_connectors(contact_email).values())),
-        "schedules": [list(x) for x in DEFAULT_SCHEDULES],
-    })
+    return logical_hash(
+        {
+            "schema": "reva-seed-fingerprint/1",
+            "ontology": reg.manifest(),
+            "entities": list(reg.entities),
+            "sources": list(reg.sources),
+            "mappings": list(reg.mappings),
+            "models": list(reg.models),
+            "partners_sha256": sha256_bytes(partners.read_bytes()),
+            "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
+            # identity only: a changed spec/code under the same version is refused by
+            # register_connector_version when the owner seeds, not hidden in the fingerprint
+            "connectors": sorted(
+                [s.name, s.version] for s in (c.describe() for c in builtin_connectors(contact_email).values())
+            ),
+            "schedules": [list(x) for x in DEFAULT_SCHEDULES],
+        }
+    )
 
 
 def _already_seeded(conn: Connection, fingerprint: str) -> bool:
-    return conn.execute(
-        text("SELECT 1 FROM meta.activity WHERE kind = 'registry.seed' AND parameters->>'fingerprint' = :f "
-             "AND actor = :a LIMIT 1"),
-        {"f": fingerprint, "a": SEED_ACTOR},
-    ).scalar_one_or_none() is not None
+    return (
+        conn.execute(
+            text(
+                "SELECT 1 FROM meta.activity WHERE kind = 'registry.seed' AND parameters->>'fingerprint' = :f "
+                "AND actor = :a LIMIT 1"
+            ),
+            {"f": fingerprint, "a": SEED_ACTOR},
+        ).scalar_one_or_none()
+        is not None
+    )
 
 
 def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = None) -> dict[str, Any]:
@@ -476,8 +529,13 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
         login = conn.execute(text("SELECT session_user")).scalar_one()
         if login in RUNTIME_PRINCIPALS:
             if _already_seeded(conn, fingerprint):
-                return {"new_concepts": 0, "entities": len(reg.entities), "new_models": 0,
-                        "status": "already_seeded", "fingerprint": fingerprint}
+                return {
+                    "new_concepts": 0,
+                    "entities": len(reg.entities),
+                    "new_models": 0,
+                    "status": "already_seeded",
+                    "fingerprint": fingerprint,
+                }
             raise ConfigurationError(
                 f"registry seeding writes approved registry state and must run as the migration owner "
                 f"(`reva db bootstrap` / `reva seed`), not as {login}"
@@ -485,10 +543,16 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
     with engine.begin() as conn:
         take_evidence_write_lock(conn)  # writes eligibility decisions: evidence lock protocol (R-03)
         if _already_seeded(conn, fingerprint):
-            return {"new_concepts": 0, "entities": len(reg.entities), "new_models": 0,
-                    "status": "already_seeded", "fingerprint": fingerprint}
-        act = repo.simple_activity("registry.seed", "review", SEED_ACTOR,
-                                   {"registry": "mvp", "fingerprint": fingerprint})
+            return {
+                "new_concepts": 0,
+                "entities": len(reg.entities),
+                "new_models": 0,
+                "status": "already_seeded",
+                "fingerprint": fingerprint,
+            }
+        act = repo.simple_activity(
+            "registry.seed", "review", SEED_ACTOR, {"registry": "mvp", "fingerprint": fingerprint}
+        )
         repo.record_activity(conn, act)
         concepts = _seed_concepts(conn, reg, act.id)
         entities = _seed_entities(conn, reg, act.id)
@@ -497,5 +561,10 @@ def seed(engine: Engine, store: ArtifactStore, *, contact_email: str | None = No
             record_mapping_and_eligibility(conn, m, act.id)
         models = _seed_models(conn, store, reg, act.id)
         _seed_schedules(conn)
-    return {"new_concepts": concepts, "entities": entities, "new_models": models, "status": "seeded",
-            "fingerprint": fingerprint}
+    return {
+        "new_concepts": concepts,
+        "entities": entities,
+        "new_models": models,
+        "status": "seeded",
+        "fingerprint": fingerprint,
+    }

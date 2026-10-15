@@ -26,23 +26,25 @@ Back-test results: [`v2_pop_backtest.md`](v2_pop_backtest.md) (stored evaluation
 from reva.models.population import cohort as C
 
 data = C.CountryDemography.from_tables(
-    "FRA", population=pjan_table, deaths=magec_table, births=fasec_table,
-    europop_migration=None, europop_fertility=None)        # Arrow tables / Polars frames / row dicts
-assumptions = C.Assumptions(migration="average_residual",   # "zero" | "average_residual" | "europop2023_bsl"
-                            fertility="constant_base_period_rates",  # | "europop2023_bsl"
-                            base_period=(2019, 2023),        # calendar years of events, must end < jump_off
-                            migration_window=None,           # default: the base period
-                            migration_breaks="exclude",      # default; "include" keeps series-break years
-                            allow_single_year_migration=False)  # averaging < 2 residual years is refused
+    "FRA", population=pjan_table, deaths=magec_table, births=fasec_table, europop_migration=None, europop_fertility=None
+)  # Arrow tables / Polars frames / row dicts
+assumptions = C.Assumptions(
+    migration="average_residual",  # "zero" | "average_residual" | "europop2023_bsl"
+    fertility="constant_base_period_rates",  # | "europop2023_bsl"
+    base_period=(2019, 2023),  # calendar years of events, must end < jump_off
+    migration_window=None,  # default: the base period
+    migration_breaks="exclude",  # default; "include" keeps series-break years
+    allow_single_year_migration=False,
+)  # averaging < 2 residual years is refused
 proj = C.project(data, jump_off=2025, end_year=2041, assumptions=assumptions)
-proj.warnings                   # typed run warnings (stable "code"), see "Series breaks" below
-proj.migration_window           # years averaged and years excluded (with residuals and flags)
-proj.population[2030]["F"]      # tuple[Decimal] for ages 0..proj.omega (index omega = open group omega+)
-proj.total(2030, "M", 55, 70)   # persons aged 55..69 on 1 January 2030 (None = both sexes)
-proj.flows[2030]                # births / deaths / net_migration by sex during 2030
-C.output_values(proj)           # {(output_key, year): Decimal} unrounded
-proj.single_age_table()         # pyarrow table: iso3, year, sex, age, open_group, persons (exact text), variant
-proj.summary()                  # label, assumptions, TFR, e0, data notes, status flags, negative-cohort flags
+proj.warnings  # typed run warnings (stable "code"), see "Series breaks" below
+proj.migration_window  # years averaged and years excluded (with residuals and flags)
+proj.population[2030]["F"]  # tuple[Decimal] for ages 0..proj.omega (index omega = open group omega+)
+proj.total(2030, "M", 55, 70)  # persons aged 55..69 on 1 January 2030 (None = both sexes)
+proj.flows[2030]  # births / deaths / net_migration by sex during 2030
+C.output_values(proj)  # {(output_key, year): Decimal} unrounded
+proj.single_age_table()  # pyarrow table: iso3, year, sex, age, open_group, persons (exact text), variant
+proj.summary()  # label, assumptions, TFR, e0, data notes, status flags, negative-cohort flags
 ```
 
 * Inputs are the dataset-input tables of schema `reva-eurostat-demography-table/1` (one per

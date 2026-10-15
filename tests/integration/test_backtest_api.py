@@ -71,20 +71,38 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         owner, worker = make_engine("migration", settings), make_engine("worker", settings)
         seed(owner, store)
         demo = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008, window_years=ed.WINDOW_YEARS)
-        asyncio.run(run_connector(demo, FixtureHttp(ed.NAME), store, worker, persist_cursor=False,
-                                  post_publish=ed.post_publish_datasets))
-        asyncio.run(run_connector(lab.EurostatLabourPensionsConnector(), FixtureHttp(lab.CONNECTOR_NAME), store,
-                                  worker, persist_cursor=False, post_publish=lab.post_publish_datasets))
+        asyncio.run(
+            run_connector(
+                demo, FixtureHttp(ed.NAME), store, worker, persist_cursor=False, post_publish=ed.post_publish_datasets
+            )
+        )
+        asyncio.run(
+            run_connector(
+                lab.EurostatLabourPensionsConnector(),
+                FixtureHttp(lab.CONNECTOR_NAME),
+                store,
+                worker,
+                persist_cursor=False,
+                post_publish=lab.post_publish_datasets,
+            )
+        )
         wb = builtin_connectors()["worldbank.wdi.indicators"]
         asyncio.run(run_connector(wb, FixtureHttp(wb.describe().name), store, worker, persist_cursor=False))
         rel = publish_release(worker, store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
         tok, sha = new_api_token()
         with owner.begin() as c:
-            c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'bt-read')"),
-                      {"h": sha, "s": ["read"]})
-        api_settings = Settings.model_validate({
-            **settings.model_dump(), "reva_session_secret": SecretStr("s" * 48),
-            "reva_allowed_hosts": "testserver,localhost", "reva_cors_origins": ""})
+            c.execute(
+                text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'bt-read')"),
+                {"h": sha, "s": ["read"]},
+            )
+        api_settings = Settings.model_validate(
+            {
+                **settings.model_dump(),
+                "reva_session_secret": SecretStr("s" * 48),
+                "reva_allowed_hosts": "testserver,localhost",
+                "reva_cors_origins": "",
+            }
+        )
         app = create_app(api_settings)
         try:
             with TestClient(app) as client:
@@ -103,19 +121,34 @@ def q(engine: Engine, sql: str, **p: Any) -> list[dict[str, Any]]:
 def run_job(env: Env, payload: dict[str, Any]) -> dict[str, Any]:
     """Run the handler as the worker would: a leased ops.job row and a real JobContext."""
     with env.owner.begin() as conn:
-        jid = conn.execute(text("""INSERT INTO ops.job(job_type, payload, idempotency_key, created_by)
+        jid = conn.execute(
+            text("""INSERT INTO ops.job(job_type, payload, idempotency_key, created_by)
                                    VALUES ('backtest', CAST(:p AS jsonb), :k, 'worker:test') RETURNING id"""),
-                           {"p": json.dumps(payload), "k": f"bt-test-{utc_now().timestamp()}"}).scalar_one()
-        token = conn.execute(text("""UPDATE ops.job SET status='running', worker_id='t', attempts=attempts+1,
+            {"p": json.dumps(payload), "k": f"bt-test-{utc_now().timestamp()}"},
+        ).scalar_one()
+        token = conn.execute(
+            text("""UPDATE ops.job SET status='running', worker_id='t', attempts=attempts+1,
                                      lease_until=now()+interval '10 minutes', fencing_token=nextval('ops.fencing_seq')
-                                     WHERE id=:j RETURNING fencing_token"""), {"j": jid}).scalar_one()
+                                     WHERE id=:j RETURNING fencing_token"""),
+            {"j": jid},
+        ).scalar_one()
 
     def hb(_p: Any = None) -> str:
         with env.owner.connect() as c:
             return str(c.execute(text("SELECT status FROM ops.job WHERE id=:j"), {"j": jid}).scalar_one())
 
-    ctx = JobContext(job_id=jid, job_type="backtest", worker_id="t", fencing_token=int(token), attempt=1,
-                     settings=env.settings, worker_engine=env.worker, sim_engine=None, store=env.store, heartbeat=hb)
+    ctx = JobContext(
+        job_id=jid,
+        job_type="backtest",
+        worker_id="t",
+        fencing_token=int(token),
+        attempt=1,
+        settings=env.settings,
+        worker_engine=env.worker,
+        sim_engine=None,
+        store=env.store,
+        heartbeat=hb,
+    )
     return B.handle_backtest(payload, ctx)
 
 
@@ -155,21 +188,31 @@ def test_payload_is_validated() -> None:
 def test_population_backtest_job_stores_rows_from_pinned_datasets(env: Env, population: dict[str, Any]) -> None:
     assert population["status"] == "succeeded" and population["reused"] is False
     assert population["units"] == ["LIE", "LUX"]  # default: every country whose population table is pinned
-    rows = q(env.owner, """SELECT e.id, e.replay_mode, e.task_scope, e.evaluation_manifest_sha256, c.mode, c.origin,
+    rows = q(
+        env.owner,
+        """SELECT e.id, e.replay_mode, e.task_scope, e.evaluation_manifest_sha256, c.mode, c.origin,
                                   a.parameters
                            FROM model.evaluation e JOIN meta.context c ON c.id = e.context_id
                            JOIN meta.activity a ON a.id = e.provenance_activity_id
                            JOIN model.version v ON v.id = e.model_version_id
-                           WHERE v.model_key = 'demography.cohort_component'""")
+                           WHERE v.model_key = 'demography.cohort_component'""",
+    )
     assert len(rows) == 2 and {r["mode"] for r in rows} == {"evaluation"}
     assert {r["replay_mode"] for r in rows} == {"revised_data_retrospective"}
     assert {r["origin"] for r in rows} == {"test_fixture"}
     assert {r["parameters"]["release_id"] for r in rows} == {str(env.release_id)}
     [sha] = population["evaluation_manifest_sha256"]
     manifest = json.loads(env.store.get("evaluation", sha))
-    pinned = {r["artifact_sha256"] for r in q(env.owner, """SELECT d.artifact_sha256 FROM belief.release_dataset p
+    pinned = {
+        r["artifact_sha256"]
+        for r in q(
+            env.owner,
+            """SELECT d.artifact_sha256 FROM belief.release_dataset p
                                                            JOIN evidence.dataset d ON d.id = p.dataset_id
-                                                           WHERE p.release_id = :r""", r=env.release_id)}
+                                                           WHERE p.release_id = :r""",
+            r=env.release_id,
+        )
+    }
     used = {p["artifact_sha256"] for c in manifest["countries"].values() for p in c["inputs"].values()}
     assert used and used <= pinned  # only release-pinned datasets, by digest
     assert manifest["baseline_release"]["id"] == str(env.release_id)
@@ -178,8 +221,11 @@ def test_population_backtest_job_stores_rows_from_pinned_datasets(env: Env, popu
 def test_rerun_reuses_the_stored_backtest(env: Env, population: dict[str, Any]) -> None:
     again = run_job(env, {"model_key": "demography.cohort_component"})
     assert again["reused"] is True and sorted(again["evaluation_ids"]) == sorted(population["evaluation_ids"])
-    n = q(env.owner, """SELECT count(*) AS n FROM model.evaluation e JOIN model.version v ON v.id = e.model_version_id
-                        WHERE v.model_key = 'demography.cohort_component'""")[0]["n"]
+    n = q(
+        env.owner,
+        """SELECT count(*) AS n FROM model.evaluation e JOIN model.version v ON v.id = e.model_version_id
+                        WHERE v.model_key = 'demography.cohort_component'""",
+    )[0]["n"]
     assert n == 2
 
 
@@ -187,9 +233,12 @@ def test_retirement_backtest_job_matches_the_pure_function(env: Env, retirement:
     from reva.models.social import backtest as bt
 
     assert retirement["status"] == "succeeded" and retirement["units"] == ["FRA"]
-    [row] = q(env.owner, """SELECT e.task_scope, e.metrics, e.evaluation_manifest_sha256, e.replay_mode
+    [row] = q(
+        env.owner,
+        """SELECT e.task_scope, e.metrics, e.evaluation_manifest_sha256, e.replay_mode
                             FROM model.evaluation e JOIN model.version v ON v.id = e.model_version_id
-                            WHERE v.model_key = 'social.retirement_age'""")
+                            WHERE v.model_key = 'social.retirement_age'""",
+    )
     assert row["replay_mode"] == "revised_data_retrospective"
     assert row["task_scope"]["task"] == "retirement_backtest" and row["task_scope"]["base_year"] == bt.BASE_YEAR
     # independent recomputation from the captured provider bytes (no database)
@@ -199,8 +248,9 @@ def test_retirement_backtest_job_matches_the_pure_function(env: Env, retirement:
         c, http = lab.EurostatLabourPensionsConnector(), FixtureHttp(lab.CONNECTOR_NAME)
         return [await c.fetch(i, http) for i in c.plan(None, FetchBudget()).items]
 
-    derived = {r.item.params["table"]: lab.derive_dataset_tables(r.body, r.item.params["table"])
-               for r in asyncio.run(raws())}
+    derived = {
+        r.item.params["table"]: lab.derive_dataset_tables(r.body, r.item.params["table"]) for r in asyncio.run(raws())
+    }
     tables = {k: derived[k]["FRA"].to_pylist() for k in ("lfsa_ergan", "lfsa_argan")}
     pure = bt.run(tables["lfsa_ergan"], tables["lfsa_argan"])
     assert row["metrics"]["report_digest"] == pure["digest"]
@@ -218,8 +268,9 @@ def test_model_without_backtest_function_is_a_typed_gap(env: Env) -> None:
         run_job(env, {"model_key": "forecast.last_value"})
 
 
-def test_api_lists_backtests_with_metrics_design_sha_and_labels(env: Env, population: dict[str, Any],
-                                                                 retirement: dict[str, Any]) -> None:
+def test_api_lists_backtests_with_metrics_design_sha_and_labels(
+    env: Env, population: dict[str, Any], retirement: dict[str, Any]
+) -> None:
     r = get(env, "/v1/models/social.retirement_age/backtests")
     assert r.status_code == 200, r.text
     body = r.json()
@@ -238,8 +289,9 @@ def test_api_lists_backtests_with_metrics_design_sha_and_labels(env: Env, popula
 
     first = get(env, "/v1/models/demography.cohort_component/backtests", params={"limit": 1}).json()
     assert len(first["data"]) == 1 and first["next_cursor"]
-    second = get(env, "/v1/models/demography.cohort_component/backtests",
-                 params={"limit": 1, "cursor": first["next_cursor"]}).json()
+    second = get(
+        env, "/v1/models/demography.cohort_component/backtests", params={"limit": 1, "cursor": first["next_cursor"]}
+    ).json()
     assert {first["data"][0]["country"], second["data"][0]["country"]} == {"LIE", "LUX"}
     assert first["data"][0]["design"]["jump_off"] == 2013
 
@@ -271,22 +323,30 @@ def test_api_post_enqueues_a_backtest_job(env: Env) -> None:
 
     sim_tok, sha = new_api_token()
     with env.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'bt-sim')"),
-                  {"h": sha, "s": ["read", "simulate"]})
-    ro = env.client.post("/v1/models/demography.cohort_component/backtests",
-                         headers={"Authorization": f"Bearer {env.token}", "Idempotency-Key": "bt-api-post-ro01"},
-                         json={})
+        c.execute(
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'bt-sim')"),
+            {"h": sha, "s": ["read", "simulate"]},
+        )
+    ro = env.client.post(
+        "/v1/models/demography.cohort_component/backtests",
+        headers={"Authorization": f"Bearer {env.token}", "Idempotency-Key": "bt-api-post-ro01"},
+        json={},
+    )
     assert ro.status_code == 403  # read scope cannot submit
-    r = env.client.post("/v1/models/demography.cohort_component/backtests",
-                        headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0001"},
-                        json={"countries": ["lie", "LUX"]})
+    r = env.client.post(
+        "/v1/models/demography.cohort_component/backtests",
+        headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0001"},
+        json={"countries": ["lie", "LUX"]},
+    )
     assert r.status_code == 202, r.text
     job_id = r.json()["data"]["job_id"] if "data" in r.json() else r.json()["job_id"]
     rows = q(env.owner, "SELECT job_type, payload FROM ops.job WHERE id = :j", j=job_id)
     assert rows and rows[0]["job_type"] == "backtest"
     assert rows[0]["payload"]["model_key"] == "demography.cohort_component"
     assert rows[0]["payload"]["countries"] == ["LIE", "LUX"]
-    bad = env.client.post("/v1/models/demography.cohort_component/backtests",
-                          headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0002"},
-                          json={"unexpected": 1})
+    bad = env.client.post(
+        "/v1/models/demography.cohort_component/backtests",
+        headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0002"},
+        json={"unexpected": 1},
+    )
     assert bad.status_code == 422

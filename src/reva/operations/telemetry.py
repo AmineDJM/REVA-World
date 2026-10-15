@@ -368,8 +368,13 @@ class Gauge(_Metric):
 class Histogram(_Metric):
     kind = "histogram"
 
-    def __init__(self, name: str, help_text: str, labels: tuple[str, ...] = (),
-                 buckets: tuple[float, ...] = (0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60, 300, 1800)) -> None:
+    def __init__(
+        self,
+        name: str,
+        help_text: str,
+        labels: tuple[str, ...] = (),
+        buckets: tuple[float, ...] = (0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30, 60, 300, 1800),
+    ) -> None:
         super().__init__(name, help_text, labels)
         self.buckets = tuple(sorted(buckets))
         self._counts: dict[tuple[str, ...], list[int]] = {}
@@ -402,14 +407,43 @@ class Histogram(_Metric):
         return lines
 
 
-KNOWN_JOB_TYPES = frozenset({
-    "ingest", "publish_beliefs", "simulation", "replay", "discovery", "gaps", "health", "gc", "evaluation",
-    "population",
-})
-KNOWN_STATUSES = frozenset({
-    "queued", "running", "succeeded", "failed", "cancel_requested", "cancelled", "dead", "retry", "released",
-    "ok", "error", "published", "unchanged", "quarantined", "lost_lease", "2xx", "3xx", "4xx", "5xx",
-})
+KNOWN_JOB_TYPES = frozenset(
+    {
+        "ingest",
+        "publish_beliefs",
+        "simulation",
+        "replay",
+        "discovery",
+        "gaps",
+        "health",
+        "gc",
+        "evaluation",
+        "population",
+    }
+)
+KNOWN_STATUSES = frozenset(
+    {
+        "queued",
+        "running",
+        "succeeded",
+        "failed",
+        "cancel_requested",
+        "cancelled",
+        "dead",
+        "retry",
+        "released",
+        "ok",
+        "error",
+        "published",
+        "unchanged",
+        "quarantined",
+        "lost_lease",
+        "2xx",
+        "3xx",
+        "4xx",
+        "5xx",
+    }
+)
 
 
 def bound_label(name: str, value: str) -> str:
@@ -459,25 +493,34 @@ JOBS_CLAIMED = REGISTRY.counter("reva_jobs_claimed_total", "Jobs claimed by this
 JOBS_COMPLETED = REGISTRY.counter("reva_jobs_completed_total", "Jobs finished by status", ("job_type", "status"))
 JOBS_FAILED = REGISTRY.counter("reva_jobs_failed_total", "Job attempts that failed", ("job_type", "status"))
 LEASE_EXPIRIES = REGISTRY.counter("reva_job_lease_expiries_total", "Expired leases re-queued or dead-lettered")
-QUEUE_OLDEST_AGE = REGISTRY.gauge("reva_queue_oldest_age_seconds", "Age of the oldest available queued job",
-                                  ("job_type",))
+QUEUE_OLDEST_AGE = REGISTRY.gauge(
+    "reva_queue_oldest_age_seconds", "Age of the oldest available queued job", ("job_type",)
+)
 QUEUE_DEPTH = REGISTRY.gauge("reva_queue_depth", "Jobs per status", ("status",))
-QUEUE_ACK = REGISTRY.histogram("reva_queue_ack_seconds", "Claim to handler start latency", ("job_type",),
-                               buckets=(0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5))
+QUEUE_ACK = REGISTRY.histogram(
+    "reva_queue_ack_seconds",
+    "Claim to handler start latency",
+    ("job_type",),
+    buckets=(0.001, 0.005, 0.01, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5),
+)
 JOB_DURATION = REGISTRY.histogram("reva_job_duration_seconds", "Handler wall time", ("job_type", "status"))
-INGEST_REQUESTS = REGISTRY.counter("reva_ingestion_requests_total", "Connector items by outcome",
-                                   ("connector", "status"))
+INGEST_REQUESTS = REGISTRY.counter(
+    "reva_ingestion_requests_total", "Connector items by outcome", ("connector", "status")
+)
 INGEST_BYTES = REGISTRY.counter("reva_ingestion_bytes_total", "Raw bytes acquired", ("connector",))
 SIM_DURATION = REGISTRY.histogram("reva_simulation_duration_seconds", "Simulation job wall time", ("status",))
 SIM_RSS = REGISTRY.gauge("reva_simulation_max_rss_bytes", "Peak worker RSS observed after a simulation job")
 IDEMPOTENCY_CONFLICTS = REGISTRY.counter(
     "reva_idempotency_conflicts_total",
     "Internal enqueues whose idempotency key was held by a foreign job (created under a disambiguated key)",
-    ("job_type",))
-OUTBOX_EVENT_FAILURES = REGISTRY.counter("reva_outbox_event_failures_total",
-                                         "Outbox events whose processing failed (isolated, retried with backoff)")
-OUTBOX_FAILING_EVENTS = REGISTRY.gauge("reva_outbox_failing_events",
-                                       "Unprocessed outbox events with at least one recorded failure")
+    ("job_type",),
+)
+OUTBOX_EVENT_FAILURES = REGISTRY.counter(
+    "reva_outbox_event_failures_total", "Outbox events whose processing failed (isolated, retried with backoff)"
+)
+OUTBOX_FAILING_EVENTS = REGISTRY.gauge(
+    "reva_outbox_failing_events", "Unprocessed outbox events with at least one recorded failure"
+)
 
 
 def max_rss_bytes() -> int:

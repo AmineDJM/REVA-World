@@ -20,8 +20,11 @@ def test_json_logs_carry_correlation_and_redact_secrets(monkeypatch) -> None:
     try:
         log = logging.getLogger("reva.test.telemetry")
         with tm.log_context(job_id="job-123", release_id="rel-9", user_email="x@example.com"):
-            log.info("connecting with %s and pw sup3r-secret-pw key=AKIA-very-secret",
-                     "postgresql+psycopg://reva_worker:hunter22@db:5432/reva", extra={"run_id": "run-1"})
+            log.info(
+                "connecting with %s and pw sup3r-secret-pw key=AKIA-very-secret",
+                "postgresql+psycopg://reva_worker:hunter22@db:5432/reva",
+                extra={"run_id": "run-1"},
+            )
     finally:
         logging.getLogger().removeHandler(handler)
     rec = json.loads(stream.getvalue().strip().splitlines()[-1])
@@ -33,8 +36,14 @@ def test_json_logs_carry_correlation_and_redact_secrets(monkeypatch) -> None:
 
 
 def test_secret_env_names() -> None:
-    for name in ("REVA_API_DB_PASSWORD", "REVA_SESSION_SECRET", "REVA_COMTRADE_API_KEY", "DATABASE_URL",
-                 "REVA_MIGRATION_DATABASE_URL", "REVA_S3_ACCESS_KEY_ID"):
+    for name in (
+        "REVA_API_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+        "REVA_COMTRADE_API_KEY",
+        "DATABASE_URL",
+        "REVA_MIGRATION_DATABASE_URL",
+        "REVA_S3_ACCESS_KEY_ID",
+    ):
         assert tm.is_secret_env_name(name), name
     for name in ("REVA_ENV", "OMP_NUM_THREADS", "REVA_DB_HOST"):
         assert not tm.is_secret_env_name(name), name
@@ -49,8 +58,11 @@ def test_metrics_have_bounded_labels_and_render() -> None:
         c.inc(connector=f"conn.{i}", status="published")
     c.inc(connector="https://evil.example/?q=1", status="weird-status")
     text_ = reg.render()
-    connectors = {line.split('connector="')[1].split('"')[0] for line in text_.splitlines()
-                  if line.startswith("reva_test_requests_total{")}
+    connectors = {
+        line.split('connector="')[1].split('"')[0]
+        for line in text_.splitlines()
+        if line.startswith("reva_test_requests_total{")
+    }
     assert len(connectors) <= tm.MAX_LABEL_VALUES + 1 and "other" in connectors
     assert 'status="other"' in text_
     h = reg.histogram("reva_test_seconds", "t", ("job_type",), buckets=(0.1, 1))
@@ -64,7 +76,15 @@ def test_metrics_have_bounded_labels_and_render() -> None:
 
 def test_default_registry_exposes_required_series() -> None:
     out = tm.REGISTRY.render()
-    for name in ("reva_jobs_claimed_total", "reva_jobs_completed_total", "reva_jobs_failed_total",
-                 "reva_queue_oldest_age_seconds", "reva_job_lease_expiries_total", "reva_ingestion_requests_total",
-                 "reva_ingestion_bytes_total", "reva_simulation_duration_seconds", "reva_simulation_max_rss_bytes"):
+    for name in (
+        "reva_jobs_claimed_total",
+        "reva_jobs_completed_total",
+        "reva_jobs_failed_total",
+        "reva_queue_oldest_age_seconds",
+        "reva_job_lease_expiries_total",
+        "reva_ingestion_requests_total",
+        "reva_ingestion_bytes_total",
+        "reva_simulation_duration_seconds",
+        "reva_simulation_max_rss_bytes",
+    ):
         assert f"# TYPE {name} " in out

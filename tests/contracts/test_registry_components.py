@@ -26,8 +26,12 @@ FILES = sorted(COMPONENTS_DIR.glob("*.schema.json"))
 
 def test_required_components_exist() -> None:
     names = {p.name for p in FILES}
-    assert {"demographics.v1.schema.json", "economy.v1.schema.json", "trade_crude.v1.schema.json",
-            "display_geometry.v1.schema.json"} <= names
+    assert {
+        "demographics.v1.schema.json",
+        "economy.v1.schema.json",
+        "trade_crude.v1.schema.json",
+        "display_geometry.v1.schema.json",
+    } <= names
 
 
 @pytest.mark.parametrize("path", FILES, ids=lambda p: p.name)

@@ -4,6 +4,7 @@ Copy into src/reva/ports/autonomy.py, adapting imports to kernel DTOs.
 Protocols specify capabilities; the V1 implementations described in the
 implementation prompt must supply real behaviour and contract tests.
 """
+
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
@@ -72,8 +73,7 @@ class MappingProposal:
     source_metadata: ArtifactRef
     target_concept_version: str
     relation: Literal[
-        "exact", "narrower", "broader", "overlap",
-        "weighted_crosswalk", "approximate_transform", "incompatible"
+        "exact", "narrower", "broader", "overlap", "weighted_crosswalk", "approximate_transform", "incompatible"
     ]
     mapping_manifest: ArtifactRef
     review_required: bool
@@ -139,8 +139,7 @@ class EvaluationSpec:
     spec_id: UUID
     manifest: ArtifactRef
     mode: Literal[
-        "operational_as_known", "available_then_reconstruction",
-        "revised_data_retrospective", "analytic_verification"
+        "operational_as_known", "available_then_reconstruction", "revised_data_retrospective", "analytic_verification"
     ]
     context: ScopedContext
 
@@ -204,105 +203,87 @@ class GateDecision:
 
 
 class SourceDiscoverer(Protocol):
-    async def discover(
-        self, gap: KnowledgeGap, budget: ResourceBudget
-    ) -> Sequence[SourceCandidate]: ...
+    async def discover(self, gap: KnowledgeGap, budget: ResourceBudget) -> Sequence[SourceCandidate]: ...
 
 
 class OntologyMapper(Protocol):
-    def propose_mapping(
-        self, candidate: SourceCandidate, context: ScopedContext
-    ) -> MappingProposal: ...
+    def propose_mapping(self, candidate: SourceCandidate, context: ScopedContext) -> MappingProposal: ...
 
 
 class ConnectorGenerator(Protocol):
     def generate(
-        self, candidate: SourceCandidate, mapping: MappingProposal,
-        approved_template_ids: tuple[str, ...]
+        self, candidate: SourceCandidate, mapping: MappingProposal, approved_template_ids: tuple[str, ...]
     ) -> ConnectorProposal: ...
 
 
 class ConnectorValidator(Protocol):
     async def validate(
-        self, proposal: ConnectorProposal, fixtures: ArtifactRef,
-        budget: ResourceBudget
+        self, proposal: ConnectorProposal, fixtures: ArtifactRef, budget: ResourceBudget
     ) -> ValidationReport: ...
 
 
 class ConnectorHealthMonitor(Protocol):
     def assess(
-        self, connector_version_id: UUID, run_history: ArtifactRef,
-        expected_schedule: Mapping[str, JSON], now: datetime
+        self, connector_version_id: UUID, run_history: ArtifactRef, expected_schedule: Mapping[str, JSON], now: datetime
     ) -> HealthReport: ...
 
 
 class EvidenceExtractor(Protocol):
-    def extract(
-        self, document: ArtifactRef, context: ScopedContext
-    ) -> Sequence[EvidenceCandidate]: ...
+    def extract(self, document: ArtifactRef, context: ScopedContext) -> Sequence[EvidenceCandidate]: ...
 
 
 class DataQualityEvaluator(Protocol):
-    def evaluate(
-        self, observation_batch: ArtifactRef, data_contract: ArtifactRef
-    ) -> ValidationReport: ...
+    def evaluate(self, observation_batch: ArtifactRef, data_contract: ArtifactRef) -> ValidationReport: ...
 
 
 class ModelRegistry(Protocol):
-    def register(
-        self, descriptor: ModelDescriptor, approval: GateDecision
-    ) -> ModelDescriptor: ...
+    def register(self, descriptor: ModelDescriptor, approval: GateDecision) -> ModelDescriptor: ...
 
-    def eligible(
-        self, task: Mapping[str, JSON], context: ScopedContext
-    ) -> Sequence[ModelDescriptor]: ...
+    def eligible(self, task: Mapping[str, JSON], context: ScopedContext) -> Sequence[ModelDescriptor]: ...
 
 
 class ModelEvaluator(Protocol):
     def evaluate(
-        self, model: ModelDescriptor, predictions: ArtifactRef,
-        targets: ArtifactRef, specification: EvaluationSpec
+        self, model: ModelDescriptor, predictions: ArtifactRef, targets: ArtifactRef, specification: EvaluationSpec
     ) -> EvaluationReport: ...
 
 
 class BacktestRunner(Protocol):
     async def run(
-        self, model: ModelDescriptor, specification: EvaluationSpec,
-        budget: ResourceBudget
+        self, model: ModelDescriptor, specification: EvaluationSpec, budget: ResourceBudget
     ) -> EvaluationReport: ...
 
 
 class KnowledgeGapDetector(Protocol):
     def detect(
-        self, requirements: ArtifactRef, coverage_snapshot: ArtifactRef,
-        context: ScopedContext
+        self, requirements: ArtifactRef, coverage_snapshot: ArtifactRef, context: ScopedContext
     ) -> Sequence[KnowledgeGap]: ...
 
 
 class ValueOfInformationEstimator(Protocol):
     def estimate(
-        self, gap: KnowledgeGap, acquisition_plan: ArtifactRef,
-        decision_spec: ArtifactRef | None, budget: ResourceBudget
+        self,
+        gap: KnowledgeGap,
+        acquisition_plan: ArtifactRef,
+        decision_spec: ArtifactRef | None,
+        budget: ResourceBudget,
     ) -> ValueEstimate: ...
 
 
 class ModelChallenger(Protocol):
     def propose(
-        self, task: Mapping[str, JSON], incumbent: ModelDescriptor,
-        context: ScopedContext, budget: ResourceBudget
+        self, task: Mapping[str, JSON], incumbent: ModelDescriptor, context: ScopedContext, budget: ResourceBudget
     ) -> Sequence[PlatformChangeProposal]: ...
 
 
 class SandboxRunner(Protocol):
-    async def run(
-        self, proposal: PlatformChangeProposal, policy: SandboxPolicy
-    ) -> ValidationReport: ...
+    async def run(self, proposal: PlatformChangeProposal, policy: SandboxPolicy) -> ValidationReport: ...
 
 
 class PromotionGate(Protocol):
     def decide(
-        self, proposal: PlatformChangeProposal,
+        self,
+        proposal: PlatformChangeProposal,
         independent_reports: Sequence[ValidationReport],
-        signed_policy: ArtifactRef
+        signed_policy: ArtifactRef,
     ) -> GateDecision: ...
-

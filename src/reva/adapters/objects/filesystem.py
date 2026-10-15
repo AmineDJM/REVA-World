@@ -35,9 +35,7 @@ class FilesystemArtifactStore:
     def uri(self, namespace: str, sha256: str) -> str:
         return f"file://{self._path(namespace, sha256)}"
 
-    def put(
-        self, stream: BinaryIO, namespace: str, media_type: str, *, max_bytes: int | None = None
-    ) -> StoredObject:
+    def put(self, stream: BinaryIO, namespace: str, media_type: str, *, max_bytes: int | None = None) -> StoredObject:
         check_namespace(namespace)
         tmp, sha, size = spool_and_hash(stream, str(self.staging), max_bytes or self.default_max_bytes)
         try:

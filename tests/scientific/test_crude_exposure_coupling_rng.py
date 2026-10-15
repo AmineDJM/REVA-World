@@ -23,8 +23,13 @@ M = PortSpec("M", "trade.hs2709.import_value.world_total", "unit.usd", "nominal_
 
 def test_port_compatibility():
     check_compatible(M, M)
-    for change in ({"unit": "unit.kg"}, {"basis": "real_2015_usd"}, {"aggregation": "point_in_time_stock"},
-                   {"concept": "economics.gdp.nominal_current_usd"}, {"temporal_support": "calendar_month"}):
+    for change in (
+        {"unit": "unit.kg"},
+        {"basis": "real_2015_usd"},
+        {"aggregation": "point_in_time_stock"},
+        {"concept": "economics.gdp.nominal_current_usd"},
+        {"temporal_support": "calendar_month"},
+    ):
         other = PortSpec(**{**M.__dict__, **change})
         with pytest.raises(IncompatibleSemantics):
             check_compatible(M, other)

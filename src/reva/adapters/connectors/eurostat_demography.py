@@ -95,11 +95,37 @@ MAX_RESPONSE_BYTES = 20_000_000
 
 # Eurostat geo code -> ISO 3166 alpha-3 (Eurostat uses EL for Greece). EU-27 + EFTA.
 COUNTRIES: dict[str, str] = {
-    "AT": "AUT", "BE": "BEL", "BG": "BGR", "HR": "HRV", "CY": "CYP", "CZ": "CZE", "DK": "DNK", "EE": "EST",
-    "FI": "FIN", "FR": "FRA", "DE": "DEU", "EL": "GRC", "HU": "HUN", "IE": "IRL", "IT": "ITA", "LV": "LVA",
-    "LT": "LTU", "LU": "LUX", "MT": "MLT", "NL": "NLD", "PL": "POL", "PT": "PRT", "RO": "ROU", "SK": "SVK",
-    "SI": "SVN", "ES": "ESP", "SE": "SWE",
-    "IS": "ISL", "LI": "LIE", "NO": "NOR", "CH": "CHE",
+    "AT": "AUT",
+    "BE": "BEL",
+    "BG": "BGR",
+    "HR": "HRV",
+    "CY": "CYP",
+    "CZ": "CZE",
+    "DK": "DNK",
+    "EE": "EST",
+    "FI": "FIN",
+    "FR": "FRA",
+    "DE": "DEU",
+    "EL": "GRC",
+    "HU": "HUN",
+    "IE": "IRL",
+    "IT": "ITA",
+    "LV": "LVA",
+    "LT": "LTU",
+    "LU": "LUX",
+    "MT": "MLT",
+    "NL": "NLD",
+    "PL": "POL",
+    "PT": "PRT",
+    "RO": "ROU",
+    "SK": "SVK",
+    "SI": "SVN",
+    "ES": "ESP",
+    "SE": "SWE",
+    "IS": "ISL",
+    "LI": "LIE",
+    "NO": "NOR",
+    "CH": "CHE",
 }
 ISO3_TO_GEO = {v: k for k, v in COUNTRIES.items()}
 
@@ -123,35 +149,95 @@ class DatasetDef:
 
 DATASETS: dict[str, DatasetDef] = {
     "demo_pjan": DatasetDef(
-        "demo_pjan", "observed", ("freq", "unit", "age", "sex", "geo", "time"), "NR",
-        "demography.population.jan1_age_sex", "1.0.0", "point_in_time_stock", "point:01-01",
-        "usually_resident_population_eurostat", "unit.persons", True, ("T", "M", "F"),
-        "Population on 1 January by age and sex"),
+        "demo_pjan",
+        "observed",
+        ("freq", "unit", "age", "sex", "geo", "time"),
+        "NR",
+        "demography.population.jan1_age_sex",
+        "1.0.0",
+        "point_in_time_stock",
+        "point:01-01",
+        "usually_resident_population_eurostat",
+        "unit.persons",
+        True,
+        ("T", "M", "F"),
+        "Population on 1 January by age and sex",
+    ),
     "demo_magec": DatasetDef(
-        "demo_magec", "observed", ("freq", "unit", "sex", "age", "geo", "time"), "NR",
-        "demography.deaths.age_sex", "1.0.0", "period_flow_total", "calendar_year",
-        "usually_resident_population_eurostat", "unit.persons", True, ("T", "M", "F"),
-        "Deaths by age and sex"),
+        "demo_magec",
+        "observed",
+        ("freq", "unit", "sex", "age", "geo", "time"),
+        "NR",
+        "demography.deaths.age_sex",
+        "1.0.0",
+        "period_flow_total",
+        "calendar_year",
+        "usually_resident_population_eurostat",
+        "unit.persons",
+        True,
+        ("T", "M", "F"),
+        "Deaths by age and sex",
+    ),
     "demo_fasec": DatasetDef(
-        "demo_fasec", "observed", ("freq", "unit", "age", "sex", "geo", "time"), "NR",
-        "demography.live_births.mother_age_newborn_sex", "1.0.0", "period_flow_total", "calendar_year",
-        "usually_resident_population_eurostat", "unit.persons", True, ("T", "M", "F"),
-        "Live births by mother's age and newborn's sex"),
+        "demo_fasec",
+        "observed",
+        ("freq", "unit", "age", "sex", "geo", "time"),
+        "NR",
+        "demography.live_births.mother_age_newborn_sex",
+        "1.0.0",
+        "period_flow_total",
+        "calendar_year",
+        "usually_resident_population_eurostat",
+        "unit.persons",
+        True,
+        ("T", "M", "F"),
+        "Live births by mother's age and newborn's sex",
+    ),
     "proj_23nanmig": DatasetDef(
-        "proj_23nanmig", "europop", ("freq", "projection", "sex", "age", "unit", "geo", "time"), "PER",
-        "demography.assumption.europop2023.net_migration_age_sex", "1.0.0", "period_flow_total", "calendar_year",
-        "usually_resident_population_eurostat", "unit.persons", False, ("T", "M", "F"),
-        "Assumptions for net migration by age, sex and type of projection"),
+        "proj_23nanmig",
+        "europop",
+        ("freq", "projection", "sex", "age", "unit", "geo", "time"),
+        "PER",
+        "demography.assumption.europop2023.net_migration_age_sex",
+        "1.0.0",
+        "period_flow_total",
+        "calendar_year",
+        "usually_resident_population_eurostat",
+        "unit.persons",
+        False,
+        ("T", "M", "F"),
+        "Assumptions for net migration by age, sex and type of projection",
+    ),
     "proj_23naasfr": DatasetDef(
-        "proj_23naasfr", "europop", ("freq", "projection", "age", "unit", "geo", "time"), "NR",
-        "demography.assumption.europop2023.fertility_rate_age", "1.0.0", "period_rate", "calendar_year",
-        "usually_resident_population_eurostat", "unit.ratio", True, (),
-        "Assumptions for fertility rates by age and type of projection"),
+        "proj_23naasfr",
+        "europop",
+        ("freq", "projection", "age", "unit", "geo", "time"),
+        "NR",
+        "demography.assumption.europop2023.fertility_rate_age",
+        "1.0.0",
+        "period_rate",
+        "calendar_year",
+        "usually_resident_population_eurostat",
+        "unit.ratio",
+        True,
+        (),
+        "Assumptions for fertility rates by age and type of projection",
+    ),
     "proj_23np": DatasetDef(
-        "proj_23np", "europop", ("freq", "projection", "sex", "age", "unit", "geo", "time"), "PER",
-        "demography.projection.europop2023.population_age_sex", "1.0.0", "point_in_time_stock", "point:01-01",
-        "usually_resident_population_eurostat", "unit.persons", True, ("T", "M", "F"),
-        "Population on 1st January by age, sex and type of projection"),
+        "proj_23np",
+        "europop",
+        ("freq", "projection", "sex", "age", "unit", "geo", "time"),
+        "PER",
+        "demography.projection.europop2023.population_age_sex",
+        "1.0.0",
+        "point_in_time_stock",
+        "point:01-01",
+        "usually_resident_population_eurostat",
+        "unit.persons",
+        True,
+        ("T", "M", "F"),
+        "Population on 1st January by age, sex and type of projection",
+    ),
 }
 OBSERVED = tuple(k for k, d in DATASETS.items() if d.kind == "observed")
 EUROPOP = tuple(k for k, d in DATASETS.items() if d.kind == "europop")
@@ -191,6 +277,7 @@ def split_status(status: str) -> tuple[str, str]:
         return flag.strip(), conf.strip()
     return status.strip(), ""
 
+
 # Reviewed age-code grammar. Anything else blocks (its meaning is not reviewed).
 _AGE_SINGLE = re.compile(r"^Y(\d{1,3})$")
 _AGE_GROUP = re.compile(r"^Y(\d{1,3})-(\d{1,3})$")
@@ -199,10 +286,21 @@ _AGE_LT = re.compile(r"^Y_LT(\d{1,3})$")
 
 DATASET_SCHEMA_VERSION = "reva-eurostat-demography-table/1"
 DATASET_COLUMNS: tuple[tuple[str, str], ...] = (
-    ("dataset", "string"), ("geo", "string"), ("iso3", "string"), ("projection", "string"),
-    ("year", "int32"), ("sex", "string"), ("age", "string"), ("age_kind", "string"),
-    ("age_start", "int32"), ("age_end", "int32"), ("cell_type", "string"), ("value", "string"),
-    ("missing_reason", "string"), ("status", "string"), ("unit", "string"),
+    ("dataset", "string"),
+    ("geo", "string"),
+    ("iso3", "string"),
+    ("projection", "string"),
+    ("year", "int32"),
+    ("sex", "string"),
+    ("age", "string"),
+    ("age_kind", "string"),
+    ("age_start", "int32"),
+    ("age_end", "int32"),
+    ("cell_type", "string"),
+    ("value", "string"),
+    ("missing_reason", "string"),
+    ("status", "string"),
+    ("unit", "string"),
 )
 
 
@@ -229,8 +327,10 @@ def age_info(code: str, all_codes: Sequence[str] = ()) -> dict[str, Any]:
     if m := _AGE_GE.match(code):
         n = int(m.group(1))
         # a subtotal when a single age at or above n (or a higher open class) is also a category
-        sub = any((i := age_info(o))["kind"] in ("single", "open_upper") and o != code
-                  and (i["start"] or 0) >= n for o in all_codes)
+        sub = any(
+            (i := age_info(o))["kind"] in ("single", "open_upper") and o != code and (i["start"] or 0) >= n
+            for o in all_codes
+        )
         return {"kind": "open_upper", "start": n, "end": None, "cell_type": "subtotal" if sub else "leaf"}
     if m := _AGE_LT.match(code):
         n = int(m.group(1))
@@ -326,8 +426,11 @@ def structure_fingerprint(doc: Mapping[str, Any]) -> str:
     dims = doc.get("dimension") or {}
     shape = {
         "dimension_order": list(doc.get("id") or []),
-        "categories": {d: sorted(dims.get(d, {}).get("category", {}).get("index") or {})
-                       for d in (doc.get("id") or []) if d not in ("time", "geo")},
+        "categories": {
+            d: sorted(dims.get(d, {}).get("category", {}).get("index") or {})
+            for d in (doc.get("id") or [])
+            if d not in ("time", "geo")
+        },
         "top_level": schema_fingerprint({k: v for k, v in doc.items() if k not in ("value", "status")}),
     }
     return hashlib.sha256(json.dumps(shape, sort_keys=True).encode()).hexdigest()
@@ -340,8 +443,9 @@ def decode_cube(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
     except SourceResponseError:
         raise
     except _MALFORMED as e:
-        raise SourceResponseError(f"malformed JSON-stat document: {type(e).__name__}", retryable=False,
-                                  kind="schema_drift") from None
+        raise SourceResponseError(
+            f"malformed JSON-stat document: {type(e).__name__}", retryable=False, kind="schema_drift"
+        ) from None
 
 
 def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
@@ -352,8 +456,9 @@ def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
     if not isinstance(doc, dict):
         raise SourceResponseError("JSON-stat document is not an object", retryable=False, kind="schema_drift")
     if "error" in doc and "value" not in doc:
-        raise SourceResponseError(f"Eurostat API error: {str(plain(doc['error']))[:300]}", retryable=False,
-                                  kind="api_error")
+        raise SourceResponseError(
+            f"Eurostat API error: {str(plain(doc['error']))[:300]}", retryable=False, kind="api_error"
+        )
     if str(doc.get("version")) != "2.0" or doc.get("class") != "dataset":
         raise SourceResponseError("not a JSON-stat 2.0 dataset", retryable=False, kind="schema_drift")
     ids, sizes_raw = doc.get("id"), doc.get("size")
@@ -365,10 +470,13 @@ def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
     sizes = [int(str(s)) for s in sizes_raw]
     n = math.prod(sizes)
     if n > MAX_POSITIONS:
-        raise SourceResponseError(f"cube of {n} positions exceeds the connector bound", retryable=False,
-                                  kind="oversized_cube")
-    cats = {d: _positions(doc["dimension"][d].get("category", {}).get("index"), s, d)
-            for d, s in zip(ids, sizes, strict=True)}
+        raise SourceResponseError(
+            f"cube of {n} positions exceeds the connector bound", retryable=False, kind="oversized_cube"
+        )
+    cats = {
+        d: _positions(doc["dimension"][d].get("category", {}).get("index"), s, d)
+        for d, s in zip(ids, sizes, strict=True)
+    }
     labels = {d: dict(doc["dimension"][d].get("category", {}).get("label") or {}) for d in ids}
     values = _sparse(doc.get("value"), n, "value")
     status = _sparse(doc.get("status"), n, "status")
@@ -377,11 +485,18 @@ def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
     annotations = {
         str(a.get("type")): a.get("date") or a.get("title")
         for a in (ext.get("annotation") or [])
-        if isinstance(a, dict) and a.get("type") in (
-            "UPDATE_DATA", "UPDATE_STRUCTURE", "OBS_COUNT", "OBS_PERIOD_OVERALL_LATEST",
-            "OBS_PERIOD_OVERALL_OLDEST", "DISSEMINATION_TIMESTAMP_DATA")
+        if isinstance(a, dict)
+        and a.get("type")
+        in (
+            "UPDATE_DATA",
+            "UPDATE_STRUCTURE",
+            "OBS_COUNT",
+            "OBS_PERIOD_OVERALL_LATEST",
+            "OBS_PERIOD_OVERALL_OLDEST",
+            "DISSEMINATION_TIMESTAMP_DATA",
+        )
     }
-    strides = [math.prod(sizes[i + 1:]) for i in range(len(sizes))]
+    strides = [math.prod(sizes[i + 1 :]) for i in range(len(sizes))]
     cells: list[Cell] = []
     for pos in range(n):
         coord = {d: cats[d][(pos // strides[i]) % sizes[i]] for i, d in enumerate(ids)}
@@ -392,8 +507,21 @@ def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
                 raise SourceResponseError("non-finite value", retryable=False, kind="schema_drift")
         st = status.get(pos)
         cells.append(Cell(pos, coord, v, str(st) if st is not None else ""))
-    return Cube(dataset, ids, sizes, cats, labels, status_labels, "status" in doc, doc.get("updated"),
-                plain(annotations), ext.get("id"), len(values), structure_fingerprint(doc), tuple(cells))
+    return Cube(
+        dataset,
+        ids,
+        sizes,
+        cats,
+        labels,
+        status_labels,
+        "status" in doc,
+        doc.get("updated"),
+        plain(annotations),
+        ext.get("id"),
+        len(values),
+        structure_fingerprint(doc),
+        tuple(cells),
+    )
 
 
 def _dec_text(d: Decimal) -> str:
@@ -423,23 +551,25 @@ def dataset_rows(cube: Cube) -> dict[str, list[dict[str, Any]]]:
         if iso3 is None:
             continue  # validation blocks unexpected geos; never silently renamed
         info = infos[c.coord["age"]]
-        out.setdefault(iso3, []).append({
-            "dataset": cube.dataset,
-            "geo": geo,
-            "iso3": iso3,
-            "projection": c.coord.get("projection"),
-            "year": int(c.coord["time"]),
-            "sex": c.coord.get("sex", "T"),
-            "age": c.coord["age"],
-            "age_kind": info["kind"],
-            "age_start": info["start"],
-            "age_end": info["end"],
-            "cell_type": info["cell_type"],
-            "value": _dec_text(c.value) if c.value is not None else None,
-            "missing_reason": None if c.value is not None else _missing_reason(c.status),
-            "status": c.status,
-            "unit": c.coord.get("unit", ddef.unit),
-        })
+        out.setdefault(iso3, []).append(
+            {
+                "dataset": cube.dataset,
+                "geo": geo,
+                "iso3": iso3,
+                "projection": c.coord.get("projection"),
+                "year": int(c.coord["time"]),
+                "sex": c.coord.get("sex", "T"),
+                "age": c.coord["age"],
+                "age_kind": info["kind"],
+                "age_start": info["start"],
+                "age_end": info["end"],
+                "cell_type": info["cell_type"],
+                "value": _dec_text(c.value) if c.value is not None else None,
+                "missing_reason": None if c.value is not None else _missing_reason(c.status),
+                "status": c.status,
+                "unit": c.coord.get("unit", ddef.unit),
+            }
+        )
     return out
 
 
@@ -448,8 +578,18 @@ def rows_to_table(rows: Sequence[Mapping[str, Any]]) -> Any:
     import pyarrow as pa
 
     schema = pa.schema([(name, getattr(pa, typ)()) for name, typ in DATASET_COLUMNS])
-    ordered = sorted(rows, key=lambda r: (r["dataset"], r["iso3"], r["projection"] or "", r["year"], r["sex"],
-                                          r["age_start"] if r["age_start"] is not None else -1, r["age"]))
+    ordered = sorted(
+        rows,
+        key=lambda r: (
+            r["dataset"],
+            r["iso3"],
+            r["projection"] or "",
+            r["year"],
+            r["sex"],
+            r["age_start"] if r["age_start"] is not None else -1,
+            r["age"],
+        ),
+    )
     cols = {name: [r.get(name) for r in ordered] for name, _ in DATASET_COLUMNS}
     return pa.table(cols, schema=schema)
 
@@ -473,8 +613,9 @@ def merged_tables(dataset: str, raws: Sequence[RawAcquisition]) -> dict[str, Any
     for iso3, rws in sorted(per_iso3.items()):
         keys = [(r["projection"], r["year"], r["sex"], r["age"]) for r in rws]
         if len(keys) != len(set(keys)):
-            raise SourceResponseError(f"overlapping time windows for {dataset} {iso3}", retryable=False,
-                                      kind="schema_drift")
+            raise SourceResponseError(
+                f"overlapping time windows for {dataset} {iso3}", retryable=False, kind="schema_drift"
+            )
         out[iso3] = rows_to_table(rws)
     return out
 
@@ -488,8 +629,14 @@ def dataset_concept(dataset: str) -> str:
 class EurostatDemographyConnector:
     """Reviewed built-in connector for Eurostat demography and EUROPOP2023 assumptions."""
 
-    def __init__(self, countries: Sequence[str] | None = None, *, include_europop: bool = True,
-                 since_year: int = SINCE_YEAR, window_years: int | None = None) -> None:
+    def __init__(
+        self,
+        countries: Sequence[str] | None = None,
+        *,
+        include_europop: bool = True,
+        since_year: int = SINCE_YEAR,
+        window_years: int | None = None,
+    ) -> None:
         """``window_years=None``: one request per (dataset, country) for all years (the plain
         URL scheme); ``window_years=WINDOW_YEARS``: time-window requests (what the built-in
         instance in ``registry.builtin_connectors`` uses, see :data:`WINDOW_YEARS`)."""
@@ -518,9 +665,11 @@ class EurostatDemographyConnector:
             field_mappings={k: f"{d.concept_id}@{d.concept_version}" for k, d in DATASETS.items()},
             units={k: d.unit_ref for k, d in DATASETS.items()},
             geography=tuple(COUNTRIES[g] for g in self.geos),
-            time_semantics=("demo_pjan: 1 January point stock; demo_magec/demo_fasec: calendar-year flow totals "
-                            "(age in completed years); EUROPOP2023 BSL assumptions are projections, not "
-                            "observations (dataset inputs only)"),
+            time_semantics=(
+                "demo_pjan: 1 January point stock; demo_magec/demo_fasec: calendar-year flow totals "
+                "(age in completed years); EUROPOP2023 BSL assumptions are projections, not "
+                "observations (dataset inputs only)"
+            ),
             lineage_family="eurostat",
             cadence_seconds=7 * 86400,
             release_aware=True,
@@ -567,17 +716,34 @@ class EurostatDemographyConnector:
             for ds in OBSERVED:
                 for w in self.windows():
                     key = f"{ds}:{g}" if self.window_years is None else f"{ds}:{g}:{w[0]}"
-                    items.append(FetchItem(key=key, url=self.url_for(ds, [g], w),
-                                           expected_media_types=("application/json",), max_bytes=MAX_RESPONSE_BYTES,
-                                           params={"kind": "jsonstat", "dataset": ds, "geos": [g],
-                                                   "window": [w[0], w[1]], "since_year": self.since_year,
-                                                   "window_years": self.window_years}))
+                    items.append(
+                        FetchItem(
+                            key=key,
+                            url=self.url_for(ds, [g], w),
+                            expected_media_types=("application/json",),
+                            max_bytes=MAX_RESPONSE_BYTES,
+                            params={
+                                "kind": "jsonstat",
+                                "dataset": ds,
+                                "geos": [g],
+                                "window": [w[0], w[1]],
+                                "since_year": self.since_year,
+                                "window_years": self.window_years,
+                            },
+                        )
+                    )
         if self.include_europop:
             geos = [g for g in self.geos]
             for ds in EUROPOP:
-                items.append(FetchItem(key=f"{ds}:all", url=self.url_for(ds, geos),
-                                       expected_media_types=("application/json",), max_bytes=MAX_RESPONSE_BYTES,
-                                       params={"kind": "jsonstat", "dataset": ds, "geos": geos}))
+                items.append(
+                    FetchItem(
+                        key=f"{ds}:all",
+                        url=self.url_for(ds, geos),
+                        expected_media_types=("application/json",),
+                        max_bytes=MAX_RESPONSE_BYTES,
+                        params={"kind": "jsonstat", "dataset": ds, "geos": geos},
+                    )
+                )
         return items
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
@@ -605,8 +771,7 @@ class EurostatDemographyConnector:
         prior_done = set(getattr(self, "_prior_done", set()))  # set by plan() of this run
         done = sorted((prior_done | ok) & set(all_keys))
         complete = len(done) == len(all_keys)
-        return Cursor(state={"complete": complete, "done": [] if complete else done,
-                             "since_year": self.since_year})
+        return Cursor(state={"complete": complete, "done": [] if complete else done, "since_year": self.since_year})
 
     # -------------------------------------------------------------- parsing
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
@@ -671,8 +836,9 @@ class EurostatDemographyConnector:
         support = Support(
             temporal=temporal,
             spatial=SpatialRef(scheme="eurostat_geo_code", key=f"ESTAT:{geo}", authority="Eurostat"),
-            population=PopulationRef(universe=ddef.population_universe,
-                                     definition_source=f"Eurostat {ddef.code} metadata"),
+            population=PopulationRef(
+                universe=ddef.population_universe, definition_source=f"Eurostat {ddef.code} metadata"
+            ),
             aggregation=ddef.aggregation,  # type: ignore[arg-type]
             resolution=resolution,
         )
@@ -681,17 +847,27 @@ class EurostatDemographyConnector:
         if c.value is None:
             value: dict[str, Any] = {"kind": "missing", "reason": _missing_reason(c.status)}
         else:
-            value = {"kind": "decimal", "value": _dec_text(c.value), "unit_ref": ddef.unit_ref,
-                     "basis": {"scale_factor": "1"}}
+            value = {
+                "kind": "decimal",
+                "value": _dec_text(c.value),
+                "unit_ref": ddef.unit_ref,
+                "basis": {"scale_factor": "1"},
+            }
         sex_cell = "total" if c.coord["sex"] == "T" else "leaf"
         age_cell = info["cell_type"]
-        cell_type = "total" if (sex_cell == "total" and age_cell == "total") else (
-            "leaf" if (sex_cell == "leaf" and age_cell == "leaf") else "subtotal")
+        cell_type = (
+            "total"
+            if (sex_cell == "total" and age_cell == "total")
+            else ("leaf" if (sex_cell == "leaf" and age_cell == "leaf") else "subtotal")
+        )
         flags: dict[str, Any] = {
             "dataset": ddef.code,
             "status": c.status,
-            "status_labels": ({c.status: str(cube.status_labels[c.status])} if c.status in cube.status_labels
-                              else {ch: str(cube.status_labels.get(ch, "")) for ch in flag_chars}),
+            "status_labels": (
+                {c.status: str(cube.status_labels[c.status])}
+                if c.status in cube.status_labels
+                else {ch: str(cube.status_labels.get(ch, "")) for ch in flag_chars}
+            ),
             "confidentiality_status": conf,
             "cell_type": cell_type,
             "age_kind": info["kind"],
@@ -722,8 +898,11 @@ class EurostatDemographyConnector:
             value=value,
             uncertainty=UncertaintySpec.unknown("Eurostat publishes no uncertainty for this value"),
             source_flags=flags,
-            raw_selector={"jsonstat_position": c.position, "coordinates": c.coord,
-                          "labels": {d: str(cube.labels.get(d, {}).get(c.coord[d], "")) for d in c.coord}},
+            raw_selector={
+                "jsonstat_position": c.position,
+                "coordinates": c.coord,
+                "labels": {d: str(cube.labels.get(d, {}).get(c.coord[d], "")) for d in c.coord},
+            },
         )
 
     # -------------------------------------------------------------- validation
@@ -736,21 +915,44 @@ class EurostatDemographyConnector:
             return _report([Finding(code="unreviewed_dataset", severity="blocker", message=dataset)], 0, 0, ())
         order = list(md.get("dimension_order") or [])
         if order != list(ddef.dimension_order):
-            f.append(Finding(code="dimension_order_changed", severity="blocker",
-                             message=f"dimension order {order} differs from pinned {list(ddef.dimension_order)}"))
+            f.append(
+                Finding(
+                    code="dimension_order_changed",
+                    severity="blocker",
+                    message=f"dimension order {order} differs from pinned {list(ddef.dimension_order)}",
+                )
+            )
         cats: dict[str, list[str]] = md.get("categories") or {}
         if cats.get("unit") != [ddef.unit]:
-            f.append(Finding(code="unit_changed", severity="blocker",
-                             message=f"unit categories {cats.get('unit')} != pinned [{ddef.unit}]"))
+            f.append(
+                Finding(
+                    code="unit_changed",
+                    severity="blocker",
+                    message=f"unit categories {cats.get('unit')} != pinned [{ddef.unit}]",
+                )
+            )
         if cats.get("freq") != ["A"]:
             f.append(Finding(code="freq_changed", severity="blocker", message=f"freq {cats.get('freq')} != ['A']"))
         if ddef.kind == "europop" and cats.get("projection") != [EUROPOP_PROJECTION]:
-            f.append(Finding(code="projection_changed", severity="blocker",
-                             message=f"projection {cats.get('projection')} != [{EUROPOP_PROJECTION}]"))
-        if ddef.sexes and sorted(cats.get("sex") or []) != sorted(ddef.sexes) and not (
-                ddef.kind == "europop" and set(cats.get("sex") or []) <= set(ddef.sexes)):
-            f.append(Finding(code="sex_categories_changed", severity="blocker",
-                             message=f"sex categories {cats.get('sex')} != {list(ddef.sexes)}"))
+            f.append(
+                Finding(
+                    code="projection_changed",
+                    severity="blocker",
+                    message=f"projection {cats.get('projection')} != [{EUROPOP_PROJECTION}]",
+                )
+            )
+        if (
+            ddef.sexes
+            and sorted(cats.get("sex") or []) != sorted(ddef.sexes)
+            and not (ddef.kind == "europop" and set(cats.get("sex") or []) <= set(ddef.sexes))
+        ):
+            f.append(
+                Finding(
+                    code="sex_categories_changed",
+                    severity="blocker",
+                    message=f"sex categories {cats.get('sex')} != {list(ddef.sexes)}",
+                )
+            )
         geos = list(cats.get("geo") or [])
         requested = list(md.get("requested_geos") or [])
         extra = sorted(set(geos) - set(requested))
@@ -758,66 +960,134 @@ class EurostatDemographyConnector:
             f.append(Finding(code="unexpected_geo", severity="blocker", message=f"unrequested geos {extra}"))
         absent = sorted(set(requested) - set(geos))
         if absent:
-            f.append(Finding(code="geo_absent", severity="warning" if ddef.kind == "europop" else "blocker",
-                             message=f"requested geos absent from the response (typed gap): {absent}"))
+            f.append(
+                Finding(
+                    code="geo_absent",
+                    severity="warning" if ddef.kind == "europop" else "blocker",
+                    message=f"requested geos absent from the response (typed gap): {absent}",
+                )
+            )
         bad_ages = sorted(a for a, k in (md.get("age_kinds") or {}).items() if k == "unreviewed")
         if bad_ages:
-            f.append(Finding(code="unreviewed_age_category", severity="blocker",
-                             message=f"age categories with unreviewed meaning: {bad_ages[:10]}"))
+            f.append(
+                Finding(
+                    code="unreviewed_age_category",
+                    severity="blocker",
+                    message=f"age categories with unreviewed meaning: {bad_ages[:10]}",
+                )
+            )
         n = int(md.get("cube_positions", 0))
         if n == 0 or int(md.get("value_count", 0)) == 0:
-            f.append(Finding(code="empty_response", severity="blocker",
-                             message="empty cube: an empty response is never zero or complete"))
+            f.append(
+                Finding(
+                    code="empty_response",
+                    severity="blocker",
+                    message="empty cube: an empty response is never zero or complete",
+                )
+            )
         if ddef.kind == "observed" and len(batch.observations) != n:
-            f.append(Finding(code="size_mismatch", severity="blocker",
-                             message=f"{len(batch.observations)} cells parsed for a cube of {n}"))
+            f.append(
+                Finding(
+                    code="size_mismatch",
+                    severity="blocker",
+                    message=f"{len(batch.observations)} cells parsed for a cube of {n}",
+                )
+            )
         window = md.get("window")
         if ddef.kind == "observed" and window and md.get("years"):
             lo, hi = window
             outside = [y for y in md["years"] if y < lo or (hi is not None and y > hi)]
             if outside:
-                f.append(Finding(code="time_mismatch", severity="blocker",
-                                 message=f"periods {outside} outside the requested window {window}"))
+                f.append(
+                    Finding(
+                        code="time_mismatch",
+                        severity="blocker",
+                        message=f"periods {outside} outside the requested window {window}",
+                    )
+                )
         labels = md.get("status_labels") or {}
         for code in sorted(set(md.get("status_codes_seen") or [])):
             flag_part, conf = split_status(code)
             if conf and conf not in CONF_STATUS:
-                f.append(Finding(code="unknown_status_flag", severity="blocker",
-                                 message=f"confidentiality status {conf!r} is not in the reviewed vocabulary"))
+                f.append(
+                    Finding(
+                        code="unknown_status_flag",
+                        severity="blocker",
+                        message=f"confidentiality status {conf!r} is not in the reviewed vocabulary",
+                    )
+                )
             for ch in flag_part:
                 if ch not in EUROSTAT_FLAGS:
-                    f.append(Finding(code="unknown_status_flag", severity="blocker",
-                                     message=f"status flag {ch!r} is not in the reviewed vocabulary"))
+                    f.append(
+                        Finding(
+                            code="unknown_status_flag",
+                            severity="blocker",
+                            message=f"status flag {ch!r} is not in the reviewed vocabulary",
+                        )
+                    )
                 elif ch not in labels and code not in labels:  # labels may name the combined code ("bep")
-                    f.append(Finding(code="undeclared_status_flag", severity="blocker",
-                                     message=f"status flag {ch!r} used without a declared label"))
+                    f.append(
+                        Finding(
+                            code="undeclared_status_flag",
+                            severity="blocker",
+                            message=f"status flag {ch!r} used without a declared label",
+                        )
+                    )
         for ch, label in labels.items():
             if ch in EUROSTAT_FLAGS and str(label).strip().lower() != EUROSTAT_FLAGS[ch]:
-                f.append(Finding(code="status_label_changed", severity="warning",
-                                 message=f"flag {ch!r} label {label!r} differs from reviewed meaning"))
+                f.append(
+                    Finding(
+                        code="status_label_changed",
+                        severity="warning",
+                        message=f"flag {ch!r} label {label!r} differs from reviewed meaning",
+                    )
+                )
         if ddef.nonnegative and int(md.get("negative_values", 0)):
-            f.append(Finding(code="negative_count", severity="blocker",
-                             message=f"{md['negative_values']} negative values in a non-negative dataset"))
+            f.append(
+                Finding(
+                    code="negative_count",
+                    severity="blocker",
+                    message=f"{md['negative_values']} negative values in a non-negative dataset",
+                )
+            )
         keys = [o.logical_key for o in batch.observations]
         if len(keys) != len(set(keys)):
             f.append(Finding(code="duplicate_keys", severity="blocker", message="duplicate logical keys"))
         n_missing = sum(1 for o in batch.observations if o.value.get("kind") == "missing")
         if n_missing:
-            f.append(Finding(code="missing_values", severity="info",
-                             message=f"{n_missing} positions absent from the value map (kept Missing)"))
+            f.append(
+                Finding(
+                    code="missing_values",
+                    severity="info",
+                    message=f"{n_missing} positions absent from the value map (kept Missing)",
+                )
+            )
         add = md.get("additivity") or {}
         if add.get("mismatched_groups"):
-            f.append(Finding(code="additivity_mismatch", severity="warning",
-                             message=f"{add['mismatched_groups']} (geo, sex, year) groups whose age leaves do not "
-                                     f"sum to TOTAL (max abs diff {add.get('max_abs_diff')}); kept as published"))
-        return _report(f, n, len(keys), tuple(sorted(o.logical_key for o in batch.observations
-                                                      if o.value.get("kind") == "missing")))
+            f.append(
+                Finding(
+                    code="additivity_mismatch",
+                    severity="warning",
+                    message=f"{add['mismatched_groups']} (geo, sex, year) groups whose age leaves do not "
+                    f"sum to TOTAL (max abs diff {add.get('max_abs_diff')}); kept as published",
+                )
+            )
+        return _report(
+            f,
+            n,
+            len(keys),
+            tuple(sorted(o.logical_key for o in batch.observations if o.value.get("kind") == "missing")),
+        )
 
 
 def _report(findings: list[Finding], expected: int, received: int, missing: tuple[str, ...]) -> QualityReport:
-    return QualityReport(outcome="blocked" if any(x.severity == "blocker" for x in findings) else "pass",
-                         findings=tuple(findings), expected_count=expected,
-                         received_count=received, missing_keys=missing)
+    return QualityReport(
+        outcome="blocked" if any(x.severity == "blocker" for x in findings) else "pass",
+        findings=tuple(findings),
+        expected_count=expected,
+        received_count=received,
+        missing_keys=missing,
+    )
 
 
 def _group_key(c: Cell) -> tuple[str, ...]:
@@ -862,8 +1132,11 @@ def _additivity(cube: Cube, infos: Mapping[str, Mapping[str, Any]]) -> dict[str,
             leaves[k] = leaves.get(k, Decimal(0)) + c.value
     diffs = [abs(leaves.get(k, Decimal(0)) - t) for k, t in totals.items()]
     bad = [d for d in diffs if d != 0]
-    return {"checked_groups": len(totals), "mismatched_groups": len(bad),
-            "max_abs_diff": _dec_text(max(bad)) if bad else "0"}
+    return {
+        "checked_groups": len(totals),
+        "mismatched_groups": len(bad),
+        "max_abs_diff": _dec_text(max(bad)) if bad else "0",
+    }
 
 
 def dataset_key(dataset: str) -> str:
@@ -879,8 +1152,9 @@ def dataset_coverage(table: Any) -> dict[str, Any]:
         "years": [years[0], years[-1]] if years else [],
         "years_with_values": sorted({r["year"] for r in present}),
         "sexes": sorted({r["sex"] for r in rows}),
-        "special_age_categories": sorted({r["age"] for r in rows if r["age_kind"] in (
-            "open", "open_upper", "open_lower", "unknown")}),
+        "special_age_categories": sorted(
+            {r["age"] for r in rows if r["age_kind"] in ("open", "open_upper", "open_lower", "unknown")}
+        ),
         "status_flags": sorted({r["status"] for r in rows if r["status"]}),
         "missing_cells": len(rows) - len(present),
     }
@@ -894,13 +1168,25 @@ def _fingerprint(url: str) -> str:
 
 def _group_items(dataset: str, geos: Sequence[str], since_year: int, window_years: int | None) -> list[FetchItem]:
     """Every request whose bytes make up the dataset inputs of (dataset, geos)."""
-    conn_ = EurostatDemographyConnector(countries=list(geos), since_year=since_year, window_years=window_years,
-                                        include_europop=DATASETS[dataset].kind == "europop")
+    conn_ = EurostatDemographyConnector(
+        countries=list(geos),
+        since_year=since_year,
+        window_years=window_years,
+        include_europop=DATASETS[dataset].kind == "europop",
+    )
     return [i for i in conn_.all_items() if i.params["dataset"] == dataset and list(i.params["geos"]) == list(geos)]
 
 
-def assemble_datasets(conn: Any, store: Any, dataset: str, geos: Sequence[str], *, origin: str,
-                      since_year: int = SINCE_YEAR, window_years: int | None = WINDOW_YEARS) -> list[Any]:
+def assemble_datasets(
+    conn: Any,
+    store: Any,
+    dataset: str,
+    geos: Sequence[str],
+    *,
+    origin: str,
+    since_year: int = SINCE_YEAR,
+    window_years: int | None = WINDOW_YEARS,
+) -> list[Any]:
     """Register the dataset inputs of (dataset, geos) from the latest passing acquisition of every
     request that makes them up (all time windows). Returns the registered records, or ``[]`` while
     any part is missing or did not pass validation (an incomplete table is never registered)."""
@@ -913,41 +1199,73 @@ def assemble_datasets(conn: Any, store: Any, dataset: str, geos: Sequence[str], 
 
     items = _group_items(dataset, geos, since_year, window_years)
     fps = {_fingerprint(i.url): i for i in items}
-    rows = conn.execute(text(
-        """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.request_fingerprint, a.response_metadata
+    rows = (
+        conn.execute(
+            text(
+                """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.request_fingerprint, a.response_metadata
            FROM evidence.acquisition a JOIN evidence.connector_version v ON v.id = a.connector_version_id
            WHERE v.name = :n AND a.origin = :o AND a.request_fingerprint = ANY(:fps)
-           ORDER BY a.request_fingerprint, a.recorded_at DESC, a.id DESC"""),
-        {"n": NAME, "o": origin, "fps": list(fps)}).mappings().all()
+           ORDER BY a.request_fingerprint, a.recorded_at DESC, a.id DESC"""
+            ),
+            {"n": NAME, "o": origin, "fps": list(fps)},
+        )
+        .mappings()
+        .all()
+    )
     latest = {r["request_fingerprint"]: r for r in rows}
     if set(latest) != set(fps):
         return []  # not every window acquired yet
-    if any(q.get("outcome") != "pass" for r in latest.values()
-           for q in (dict(r["response_metadata"] or {}).get("quality") or [])):
+    if any(
+        q.get("outcome") != "pass"
+        for r in latest.values()
+        for q in (dict(r["response_metadata"] or {}).get("quality") or [])
+    ):
         return []  # a part is quarantined/blocked: no dataset from it
     raws = []
     for fp, item in sorted(fps.items(), key=lambda kv: kv[1].key):
         body = store.get("raw", latest[fp]["raw_sha256"])
         if sha256_bytes(body) != latest[fp]["raw_sha256"]:
-            raise SourceResponseError("archived raw bytes do not match their hash", retryable=False,
-                                      kind="integrity")
-        raws.append(RawAcquisition(item=item, body=body, media_type="application/json",
-                                   retrieved_at=datetime.now(UTC), response_metadata={}, request_fingerprint=fp,
-                                   origin=origin))  # type: ignore[arg-type]
+            raise SourceResponseError("archived raw bytes do not match their hash", retryable=False, kind="integrity")
+        raws.append(
+            RawAcquisition(
+                item=item,
+                body=body,
+                media_type="application/json",
+                retrieved_at=datetime.now(UTC),
+                response_metadata={},
+                request_fingerprint=fp,
+                origin=origin,
+            )
+        )  # type: ignore[arg-type]
     acq_ids = sorted(str(r["id"]) for r in latest.values())
     out = []
     for iso3, table in merged_tables(dataset, raws).items():
-        out.append(register_dataset(
-            conn, store, dataset_key=dataset_key(dataset), concept_id=DATASETS[dataset].concept_id,
-            subject_key=iso3, table=table, source_acquisition_ids=acq_ids, parser_version=PARSER_VERSION,
-            origin=origin, coverage=dataset_coverage(table), actor=f"connector:{NAME}",
-            rights={"licence": "CC-BY-4.0 (Eurostat reuse policy)", "attribution": "Source: Eurostat",
-                    "source_key": SOURCE_KEY}))
+        out.append(
+            register_dataset(
+                conn,
+                store,
+                dataset_key=dataset_key(dataset),
+                concept_id=DATASETS[dataset].concept_id,
+                subject_key=iso3,
+                table=table,
+                source_acquisition_ids=acq_ids,
+                parser_version=PARSER_VERSION,
+                origin=origin,
+                coverage=dataset_coverage(table),
+                actor=f"connector:{NAME}",
+                rights={
+                    "licence": "CC-BY-4.0 (Eurostat reuse policy)",
+                    "attribution": "Source: Eurostat",
+                    "source_key": SOURCE_KEY,
+                },
+            )
+        )
     return out
 
 
-def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch],
-                          summary: Any) -> None:
+def post_publish_datasets(
+    conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch], summary: Any
+) -> None:
     """Register the dataset inputs this acquisition completes (same transaction).
 
     Contract of ``reva.evidence.runner.post_publish_for`` hooks: runs inside the acquisition
@@ -960,16 +1278,24 @@ def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: S
     geos = list(raw.item.params.get("geos") or [])
     since = int(raw.item.params.get("since_year") or SINCE_YEAR)  # the window grid's anchor
     wy = raw.item.params.get("window_years")
-    assemble_datasets(conn, store, dataset, geos, origin=raw.origin, since_year=since,
-                      window_years=int(wy) if wy is not None else None)
+    assemble_datasets(
+        conn,
+        store,
+        dataset,
+        geos,
+        origin=raw.origin,
+        since_year=since,
+        window_years=int(wy) if wy is not None else None,
+    )
 
 
 # Optional hook read by runners that dispatch post-publish steps per connector.
 EurostatDemographyConnector.post_publish = staticmethod(post_publish_datasets)  # type: ignore[attr-defined]
 
 
-def backfill_datasets(conn: Any, store: Any, *, origin: str = "live",
-                      connector: EurostatDemographyConnector | None = None) -> list[Any]:
+def backfill_datasets(
+    conn: Any, store: Any, *, origin: str = "live", connector: EurostatDemographyConnector | None = None
+) -> list[Any]:
     """Assemble and register every complete dataset input from archived acquisitions.
 
     For runners that do not dispatch :func:`post_publish_datasets` (the worker ``ingest``
@@ -979,10 +1305,12 @@ def backfill_datasets(conn: Any, store: Any, *, origin: str = "live",
     out: list[Any] = []
     for ds in OBSERVED:
         for g in c.geos:
-            out += assemble_datasets(conn, store, ds, [g], origin=origin, since_year=c.since_year,
-                                     window_years=c.window_years)
+            out += assemble_datasets(
+                conn, store, ds, [g], origin=origin, since_year=c.since_year, window_years=c.window_years
+            )
     if c.include_europop:
         for ds in EUROPOP:
-            out += assemble_datasets(conn, store, ds, list(c.geos), origin=origin, since_year=c.since_year,
-                                     window_years=c.window_years)
+            out += assemble_datasets(
+                conn, store, ds, list(c.geos), origin=origin, since_year=c.since_year, window_years=c.window_years
+            )
     return out

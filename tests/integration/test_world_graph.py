@@ -83,8 +83,13 @@ def _publish_with_pinned_relations(db, monkeypatch, write: Any) -> UUID:
         return n
 
     monkeypatch.setattr(publication, "pin_release_relations", pin)
-    rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test",
-                          concepts=["trade.hs2709.import_value.world_total"])
+    rel = publish_release(
+        db.worker,
+        db.store,
+        origin=Origin.test_fixture,
+        environment="test",
+        concepts=["trade.hs2709.import_value.world_total"],
+    )
     monkeypatch.setattr(publication, "pin_release_relations", orig)
     return rel.release_id
 

@@ -89,15 +89,20 @@ def connector_health_vector(
 ) -> dict[str, Any] | None:
     """Compute the health vector; ``None`` if the connector is not registered."""
     with engine.connect() as conn:
-        cvs = conn.execute(
-            text("SELECT id FROM evidence.connector_version WHERE name = :n ORDER BY recorded_at DESC"),
-            {"n": connector_name},
-        ).scalars().all()
+        cvs = (
+            conn.execute(
+                text("SELECT id FROM evidence.connector_version WHERE name = :n ORDER BY recorded_at DESC"),
+                {"n": connector_name},
+            )
+            .scalars()
+            .all()
+        )
         if not cvs:
             return None
         now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
-        runs = [r for r in _runs(conn, list(cvs), window)
-                if origin is None or r["metrics"].get("origin") in (None, origin)]
+        runs = [
+            r for r in _runs(conn, list(cvs), window) if origin is None or r["metrics"].get("origin") in (None, origin)
+        ]
         acqs = _acquisitions(conn, list(cvs), origin, window)
         last_new = conn.execute(
             text(
@@ -131,9 +136,13 @@ def connector_health_vector(
         status = "unknown"
     elif state == "template_changed" or (latest is not None and latest["status"] == "quarantined"):
         status = "quarantined"
-    elif ((success_ratio is not None and success_ratio < MIN_SUCCESS)
-          or lag_cadences is None or lag_cadences > LATE_CADENCES or drift_items
-          or (completeness_latest is not None and completeness_latest < MIN_SUCCESS)):
+    elif (
+        (success_ratio is not None and success_ratio < MIN_SUCCESS)
+        or lag_cadences is None
+        or lag_cadences > LATE_CADENCES
+        or drift_items
+        or (completeness_latest is not None and completeness_latest < MIN_SUCCESS)
+    ):
         status = "degraded"
     else:
         status = "healthy"
@@ -154,8 +163,11 @@ def connector_health_vector(
             "late": lag_cadences is None or lag_cadences > LATE_CADENCES,
             "late_threshold_cadences": LATE_CADENCES,
         },
-        "schema_drift": {"drift": bool(drift_items), "items": drift_items[:20],
-                         "distinct_fingerprint_sets": len({f for fps in by_item.values() for f in fps})},
+        "schema_drift": {
+            "drift": bool(drift_items),
+            "items": drift_items[:20],
+            "distinct_fingerprint_sets": len({f for fps in by_item.values() for f in fps}),
+        },
         "completeness": {
             "latest_run_item_completeness": completeness_latest,
             "validated_acquisition_ratio": validated / len(acqs) if acqs else None,

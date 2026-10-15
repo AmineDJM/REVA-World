@@ -54,8 +54,13 @@ def backtest_grid(grid: lit.AssumptionGrid) -> tuple[tuple[lit.GridPoint, ...], 
     keep, out = [], []
     for p in grid.literature():
         if p.overlaps(COUNTRY, BASE_YEAR, TEST_YEARS[-1]):
-            out.append({"point_id": p.point_id, "reason": f"estimation sample overlaps the {COUNTRY} reform/period "
-                        f"being back-tested ({BASE_YEAR}-{TEST_YEARS[-1]}): leakage"})
+            out.append(
+                {
+                    "point_id": p.point_id,
+                    "reason": f"estimation sample overlaps the {COUNTRY} reform/period "
+                    f"being back-tested ({BASE_YEAR}-{TEST_YEARS[-1]}): leakage",
+                }
+            )
         else:
             keep.append(p)
     return tuple(keep), tuple(out)
@@ -76,19 +81,31 @@ def placebo(emp_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     trend the model does not represent (diagnostic only, never used to adjust predictions)."""
     out: dict[str, Any] = {}
     for s in SEXES:
-        base = next(Decimal(r["value"]) for r in emp_rows if r["year"] == BASE_YEAR and r["dim1"] == s
-                    and r["dim2"] == "Y55-59")
+        base = next(
+            Decimal(r["value"]) for r in emp_rows if r["year"] == BASE_YEAR and r["dim1"] == s and r["dim2"] == "Y55-59"
+        )
         per = []
         for t in TEST_YEARS:
             r = next(r for r in emp_rows if r["year"] == t and r["dim1"] == s and r["dim2"] == "Y55-59")
-            per.append({"year": t, "predicted": dstr(base), "observed": r["value"], "observed_flag": r["status"],
-                        "error_pp": dstr(base - Decimal(r["value"]))})
+            per.append(
+                {
+                    "year": t,
+                    "predicted": dstr(base),
+                    "observed": r["value"],
+                    "observed_flag": r["status"],
+                    "error_pp": dstr(base - Decimal(r["value"])),
+                }
+            )
         out[s] = per
     return out
 
 
-def predict(train_emp: Sequence[Mapping[str, Any]], train_act: Sequence[Mapping[str, Any]], table: rl.RuleTable,
-            points: Sequence[lit.GridPoint]) -> dict[str, dict[str, dict[int, Decimal]]]:
+def predict(
+    train_emp: Sequence[Mapping[str, Any]],
+    train_act: Sequence[Mapping[str, Any]],
+    table: rl.RuleTable,
+    points: Sequence[lit.GridPoint],
+) -> dict[str, dict[str, dict[int, Decimal]]]:
     """point_id -> sex -> year -> predicted employment rate (percent). Uses only ``year <= BASE_YEAR`` rows."""
     for rows in (train_emp, train_act):
         late = sorted({r["year"] for r in rows if r["year"] > BASE_YEAR})
@@ -113,17 +130,27 @@ def predict(train_emp: Sequence[Mapping[str, Any]], train_act: Sequence[Mapping[
     return out
 
 
-def run(emp_rows: Sequence[Mapping[str, Any]], act_rows: Sequence[Mapping[str, Any]],
-        grid: lit.AssumptionGrid | None = None, table: rl.RuleTable | None = None) -> dict[str, Any]:
+def run(
+    emp_rows: Sequence[Mapping[str, Any]],
+    act_rows: Sequence[Mapping[str, Any]],
+    grid: lit.AssumptionGrid | None = None,
+    table: rl.RuleTable | None = None,
+) -> dict[str, Any]:
     grid = grid or lit.load_grid()
     table = table or rl.load_rule_table(COUNTRY)
     points, excluded = backtest_grid(grid)
     if CENTRAL not in {p.point_id for p in points}:
         raise ValidationProblem(f"pre-registered central point {CENTRAL} is not in the back-test grid")
-    persistence = lit.GridPoint(point_id="benchmark_persistence", label="Persistence: 2010 rate carried forward",
-                                share_employed={s: Decimal(0) for s in SEXES},
-                                pension_drop={s: Decimal(0) for s in SEXES}, country=None, doi=None,
-                                citation="benchmark (no reform effect)", kind="reference")
+    persistence = lit.GridPoint(
+        point_id="benchmark_persistence",
+        label="Persistence: 2010 rate carried forward",
+        share_employed={s: Decimal(0) for s in SEXES},
+        pension_drop={s: Decimal(0) for s in SEXES},
+        country=None,
+        doi=None,
+        citation="benchmark (no reform effect)",
+        kind="reference",
+    )
     train_emp = [r for r in emp_rows if r["year"] <= BASE_YEAR]
     train_act = [r for r in act_rows if r["year"] <= BASE_YEAR]
     preds = predict(train_emp, train_act, table, [*points, persistence])
@@ -136,29 +163,51 @@ def run(emp_rows: Sequence[Mapping[str, Any]], act_rows: Sequence[Mapping[str, A
             for t in TEST_YEARS:
                 obs, flag = observed[s][t]
                 err = by_sex[s][t] - obs
-                per_year.append({"year": t, "predicted": dstr(CTX.quantize(by_sex[s][t], Decimal("0.01"))),
-                                 "observed": dstr(obs), "observed_flag": flag,
-                                 "error_pp": dstr(CTX.quantize(err, Decimal("0.01")))})
+                per_year.append(
+                    {
+                        "year": t,
+                        "predicted": dstr(CTX.quantize(by_sex[s][t], Decimal("0.01"))),
+                        "observed": dstr(obs),
+                        "observed_flag": flag,
+                        "error_pp": dstr(CTX.quantize(err, Decimal("0.01"))),
+                    }
+                )
             errs = [by_sex[s][t] - observed[s][t][0] for t in TEST_YEARS]
             n = Decimal(len(errs))
-            res[s] = {"per_year": per_year,
-                      "mean_error_pp": dstr(CTX.quantize(CTX.divide(sum(errs, Decimal(0)), n), Decimal("0.01"))),
-                      "mean_absolute_error_pp": dstr(CTX.quantize(CTX.divide(sum((abs(e) for e in errs), Decimal(0)),
-                                                                             n), Decimal("0.01")))}
+            res[s] = {
+                "per_year": per_year,
+                "mean_error_pp": dstr(CTX.quantize(CTX.divide(sum(errs, Decimal(0)), n), Decimal("0.01"))),
+                "mean_absolute_error_pp": dstr(
+                    CTX.quantize(CTX.divide(sum((abs(e) for e in errs), Decimal(0)), n), Decimal("0.01"))
+                ),
+            }
         results[pid] = res
-    base = {s: {"employment_rate_2010": dstr(_rate(train_emp, BASE_YEAR, s)[0]),
-                "activity_rate_2010": dstr(_rate(train_act, BASE_YEAR, s)[0])} for s in SEXES}
+    base = {
+        s: {
+            "employment_rate_2010": dstr(_rate(train_emp, BASE_YEAR, s)[0]),
+            "activity_rate_2010": dstr(_rate(train_act, BASE_YEAR, s)[0]),
+        }
+        for s in SEXES
+    }
     ages = range(GROUP[1], GROUP[2] + 1)
     scn = rl.TablePath(table, SCENARIO_PATH, "minimum_pension_age")
     report = {
         "protocol": PROTOCOL_VERSION,
-        "country": COUNTRY, "age_group": GROUP[0], "base_year": BASE_YEAR, "test_years": list(TEST_YEARS),
-        "scenario_path": SCENARIO_PATH, "reference_path": REFERENCE_PATH,
-        "rule_table_digest": table.digest(), "assumption_registry_digest": grid.source_digest,
-        "central_point": CENTRAL, "benchmark": "benchmark_persistence",
-        "grid_points": [p.as_dict() for p in points], "excluded_points": list(excluded),
-        "ineligible_share_60_64": {str(t): dstr(CTX.quantize(fr(rl.ineligible_share(scn, t, ages)), Decimal("0.0001")))
-                                   for t in TEST_YEARS},
+        "country": COUNTRY,
+        "age_group": GROUP[0],
+        "base_year": BASE_YEAR,
+        "test_years": list(TEST_YEARS),
+        "scenario_path": SCENARIO_PATH,
+        "reference_path": REFERENCE_PATH,
+        "rule_table_digest": table.digest(),
+        "assumption_registry_digest": grid.source_digest,
+        "central_point": CENTRAL,
+        "benchmark": "benchmark_persistence",
+        "grid_points": [p.as_dict() for p in points],
+        "excluded_points": list(excluded),
+        "ineligible_share_60_64": {
+            str(t): dstr(CTX.quantize(fr(rl.ineligible_share(scn, t, ages)), Decimal("0.0001"))) for t in TEST_YEARS
+        },
         "base_data": base,
         "results": results,
         "placebo_55_59": placebo(emp_rows),

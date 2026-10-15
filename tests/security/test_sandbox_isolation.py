@@ -52,11 +52,21 @@ def _value(io) -> ValueEstimate:
 
 
 def _code_proposal(io, marker: Path) -> PlatformChangeProposal:
-    patch = (f"open({str(marker)!r}, 'w').write('executed')\n"
-             "import os; os.environ['REVA_PWNED'] = '1'\n").encode()
+    patch = (f"open({str(marker)!r}, 'w').write('executed')\nimport os; os.environ['REVA_PWNED'] = '1'\n").encode()
     ref = io.put_bytes(patch, "models", "text/x-python")
-    return PlatformChangeProposal(uuid.uuid4(), "agent:codegen", 2, ("src/reva/autonomy/generated/evil_patch.py",),
-                                  base_commit(), ref, ("execute_code",), True, False, _value(io), "promotion-1.1.0")
+    return PlatformChangeProposal(
+        uuid.uuid4(),
+        "agent:codegen",
+        2,
+        ("src/reva/autonomy/generated/evil_patch.py",),
+        base_commit(),
+        ref,
+        ("execute_code",),
+        True,
+        False,
+        _value(io),
+        "promotion-1.1.0",
+    )
 
 
 def _manifest_proposal(io) -> tuple[PlatformChangeProposal, object]:
@@ -73,8 +83,17 @@ def _manifest_proposal(io) -> tuple[PlatformChangeProposal, object]:
 
     bank = bank_from_dir(io, CONNECTOR)
     ctx = make_context(io, "evidence", datetime.now(UTC), {"t": 1})
-    gap = KnowledgeGap(uuid.uuid4(), "R-POP-JAN-AGESEX", "demography.population.jan1_age_sex@1.0.0", ("FRA",),
-                       {"years": [2023]}, "unsupported", 1.0, "t", ctx)
+    gap = KnowledgeGap(
+        uuid.uuid4(),
+        "R-POP-JAN-AGESEX",
+        "demography.population.jan1_age_sex@1.0.0",
+        ("FRA",),
+        {"years": [2023]},
+        "unsupported",
+        1.0,
+        "t",
+        ctx,
+    )
     cands = run_sync(EurostatCatalogueDiscoverer(io, BankHttp(io, bank)).discover(gap, default_budget()))
     mapping = RegistryOntologyMapper(io).assess(cands[0], ctx)[0]
     cp = DeclarativeConnectorGenerator(io).generate(cands[0], mapping, ("eurostat_jsonstat",))
@@ -102,8 +121,13 @@ async def test_external_runner_posts_only_when_configured(io, tmp_path):
 
     def handler(request: httpx.Request) -> httpx.Response:
         seen.append(request)
-        return httpx.Response(200, json={"outcome": "fail", "findings": [
-            {"code": "tests_failed", "severity": "blocker", "message": "unit tests failed in VM"}]})
+        return httpx.Response(
+            200,
+            json={
+                "outcome": "fail",
+                "findings": [{"code": "tests_failed", "severity": "blocker", "message": "unit tests failed in VM"}],
+            },
+        )
 
     runner = HttpExternalRunner("https://runner.example.org/run", "tok", transport=httpx.MockTransport(handler))
     p = _code_proposal(io, tmp_path / "m")
@@ -122,10 +146,17 @@ async def test_external_runner_posts_only_when_configured(io, tmp_path):
 
 
 async def test_trusted_template_env_has_no_secrets_and_network_is_template_only(io, monkeypatch):
-    for k, v in {"REVA_WORKER_DB_PASSWORD": "pw", "REVA_API_DB_PASSWORD": "pw", "REVA_SESSION_SECRET": "s" * 40,
-                 "REVA_S3_SECRET_ACCESS_KEY": "k", "REVA_LLM_API_KEY": "k", "REVA_SANDBOX_TOKEN": "t",
-                 "DATABASE_URL": "postgresql://x:y@h/db", "REVA_MIGRATION_DATABASE_URL": "postgresql://o:p@h/db",
-                 "REVA_COMTRADE_API_KEY": "k"}.items():
+    for k, v in {
+        "REVA_WORKER_DB_PASSWORD": "pw",
+        "REVA_API_DB_PASSWORD": "pw",
+        "REVA_SESSION_SECRET": "s" * 40,
+        "REVA_S3_SECRET_ACCESS_KEY": "k",
+        "REVA_LLM_API_KEY": "k",
+        "REVA_SANDBOX_TOKEN": "t",
+        "DATABASE_URL": "postgresql://x:y@h/db",
+        "REVA_MIGRATION_DATABASE_URL": "postgresql://o:p@h/db",
+        "REVA_COMTRADE_API_KEY": "k",
+    }.items():
         monkeypatch.setenv(k, v)
     env = scrubbed_environment()
     assert not [k for k in env if SECRET_RE.search(k) or (k.startswith("REVA_") and k != "REVA_SANDBOX_ISOLATION")]
@@ -142,8 +173,9 @@ async def test_trusted_template_env_has_no_secrets_and_network_is_template_only(
     assert child["network_probe"].startswith("refused")
     assert child["results"][0]["observations"] == 309
     # widening the sandbox network beyond the template's hosts is refused
-    wide = SandboxPolicy("sandbox-1.0.0", "trusted_template", ("ec.europa.eu", "evil.example.com"), (), False,
-                         default_budget())
+    wide = SandboxPolicy(
+        "sandbox-1.0.0", "trusted_template", ("ec.europa.eu", "evil.example.com"), (), False, default_budget()
+    )
     assert (await TrustedTemplateSandbox(io, fixtures=bank).run(p, wide)).outcome == "blocked"
 
 
@@ -152,9 +184,19 @@ async def test_manifest_proposal_cannot_smuggle_code(io):
     change = io.get_json(p.patch_or_manifest)
     assert change["schema"] == CONNECTOR_CHANGE_SCHEMA
     change["manifest"]["template"] = "python_inline"
-    bad = PlatformChangeProposal(p.proposal_id, p.author, 1, p.changed_paths, p.base_commit,
-                                 io.put_json(change, "models"), p.requested_capabilities, True, False,
-                                 p.expected_benefit, p.policy_version)
+    bad = PlatformChangeProposal(
+        p.proposal_id,
+        p.author,
+        1,
+        p.changed_paths,
+        p.base_commit,
+        io.put_json(change, "models"),
+        p.requested_capabilities,
+        True,
+        False,
+        p.expected_benefit,
+        p.policy_version,
+    )
     rep = await TrustedTemplateSandbox(io, fixtures=bank).run(bad, trusted_template_policy(default_budget()))
     assert rep.outcome in ("fail", "blocked") and "manifest_invalid" in {f.code for f in rep.findings}
 
@@ -165,10 +207,16 @@ def test_worker_never_imports_proposed_code(io, tmp_path):
     assert not any(m.startswith("reva.autonomy.generated") or "evil_patch" in m for m in sys.modules)
     assert not marker.exists()
     # static guarantee: the autonomy package has no dynamic code loading/execution primitive
-    forbidden = re.compile(r"(?<![.\w])(exec|eval|compile)\(|import_module\(|__import__\("
-                           r"|runpy|spec_from_file_location")
-    offenders = [f"{p.name}:{i}" for p in AUTONOMY_SRC.glob("*.py")
-                 for i, line in enumerate(p.read_text().splitlines(), 1) if forbidden.search(line)]
+    forbidden = re.compile(
+        r"(?<![.\w])(exec|eval|compile)\(|import_module\(|__import__\("
+        r"|runpy|spec_from_file_location"
+    )
+    offenders = [
+        f"{p.name}:{i}"
+        for p in AUTONOMY_SRC.glob("*.py")
+        for i, line in enumerate(p.read_text().splitlines(), 1)
+        if forbidden.search(line)
+    ]
     assert offenders == []
     # the sandbox child only ever runs the reviewed template module
     child_src = (AUTONOMY_SRC / "sandbox_child.py").read_text()
@@ -225,9 +273,11 @@ def test_python_guard_blocks_socket_and_raw_socket(tmp_path):
         "    except PermissionError:\n"
         "        out.append('refused')\n"
         "asyncio.run(asyncio.sleep(0))  # the event loop's local socketpair still works\n"
-        "print(','.join(out))\n")
-    r = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, timeout=60, cwd=tmp_path,
-                       env=scrubbed_environment())
+        "print(','.join(out))\n"
+    )
+    r = subprocess.run(
+        [sys.executable, "-I", "-c", code], capture_output=True, timeout=60, cwd=tmp_path, env=scrubbed_environment()
+    )
     assert r.stdout.decode().strip() == "refused,refused,refused,refused", r.stderr.decode()[-500:]
 
 

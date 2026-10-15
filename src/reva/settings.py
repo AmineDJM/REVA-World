@@ -100,6 +100,7 @@ class Settings(BaseSettings):
     )
 
     reva_env: Literal["local", "test", "production"] = "local"
+
     def __init__(self, *args: Any, **kwargs: Any) -> None:
         # pydantic includes each error's ``input`` (for model-level checks: the whole
         # input mapping, raw secrets included) in ValidationError.errors(); re-raise

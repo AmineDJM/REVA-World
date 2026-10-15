@@ -126,8 +126,9 @@ def _stale(exc: BaseException) -> bool:
 
 
 def _raise_stale(job_id: UUID, token: int, exc: BaseException) -> None:
-    raise StaleLease(f"lease lost for job {job_id} (fencing token {token})", job_id=str(job_id),
-                     fencing_token=token) from exc
+    raise StaleLease(
+        f"lease lost for job {job_id} (fencing token {token})", job_id=str(job_id), fencing_token=token
+    ) from exc
 
 
 class KeyConflict(ValidationProblem):
@@ -162,8 +163,15 @@ def enqueue(
     return _enqueue(conn, job_type, payload, idempotency_key, priority, max_attempts, created_by).job_id
 
 
-def _enqueue(conn: Connection, job_type: str, payload: Mapping[str, Any], idempotency_key: str, priority: int,
-             max_attempts: int | None, created_by: str) -> EnqueueResult:
+def _enqueue(
+    conn: Connection,
+    job_type: str,
+    payload: Mapping[str, Any],
+    idempotency_key: str,
+    priority: int,
+    max_attempts: int | None,
+    created_by: str,
+) -> EnqueueResult:
     if not 8 <= len(idempotency_key) <= 200:
         raise ValidationProblem("idempotency key must be 8..200 characters")
     if idempotency_key.startswith(RESERVED_KEY_PREFIXES):
@@ -185,8 +193,7 @@ def _enqueue(conn: Connection, job_type: str, payload: Mapping[str, Any], idempo
         return EnqueueResult(UUID(str(jid)), True)
     row = conn.execute(
         text(
-            "SELECT id, job_type = :t AND payload = CAST(:p AS jsonb) AS same FROM ops.job "
-            "WHERE idempotency_key = :k"
+            "SELECT id, job_type = :t AND payload = CAST(:p AS jsonb) AS same FROM ops.job WHERE idempotency_key = :k"
         ),
         {"t": job_type, "p": p, "k": idempotency_key},
     ).one()
@@ -196,10 +203,14 @@ def _enqueue(conn: Connection, job_type: str, payload: Mapping[str, Any], idempo
 
 
 def conflicting_job(conn: Connection, idempotency_key: str) -> dict[str, Any] | None:
-    row = conn.execute(
-        text("SELECT id, job_type, created_by, status FROM ops.job WHERE idempotency_key = :k"),
-        {"k": idempotency_key},
-    ).mappings().one_or_none()
+    row = (
+        conn.execute(
+            text("SELECT id, job_type, created_by, status FROM ops.job WHERE idempotency_key = :k"),
+            {"k": idempotency_key},
+        )
+        .mappings()
+        .one_or_none()
+    )
     return dict(row) if row else None
 
 
@@ -237,12 +248,18 @@ def enqueue_resolving_conflict(
                 res = _enqueue(conn, job_type, payload, alt, priority, max_attempts, created_by)
         except KeyConflict:
             continue
-        conflict = {"idempotency_key": idempotency_key, "disambiguated_key": alt,
-                    "foreign_job_id": str(foreign.get("id")), "foreign_job_type": foreign.get("job_type"),
-                    "foreign_created_by": foreign.get("created_by"), "job_type": job_type}
+        conflict = {
+            "idempotency_key": idempotency_key,
+            "disambiguated_key": alt,
+            "foreign_job_id": str(foreign.get("id")),
+            "foreign_job_type": foreign.get("job_type"),
+            "foreign_created_by": foreign.get("created_by"),
+            "job_type": job_type,
+        }
         return EnqueueResult(res.job_id, res.created, conflict)
-    raise KeyConflict("idempotency key and all disambiguated keys are held by different requests",
-                      idempotency_key=idempotency_key)
+    raise KeyConflict(
+        "idempotency key and all disambiguated keys are held by different requests", idempotency_key=idempotency_key
+    )
 
 
 REQUEUE_EXPIRED_SQL = """
@@ -338,8 +355,13 @@ def claim(
         expired = requeue_expired(conn)
         row = conn.execute(
             text(CLAIM_SQL),
-            {"w": worker_id, "lease": lease_seconds, "types": list(job_types) if job_types else None,
-             "aging": aging_seconds, "max_wait": max_wait_seconds},
+            {
+                "w": worker_id,
+                "lease": lease_seconds,
+                "types": list(job_types) if job_types else None,
+                "aging": aging_seconds,
+                "max_wait": max_wait_seconds,
+            },
         ).one_or_none()
     if expired:
         from reva.operations.telemetry import LEASE_EXPIRIES
@@ -385,17 +407,24 @@ def _claimed(row: Any, worker_id: str, lease_seconds: int, expired: int) -> Clai
 def assert_lease(conn: Connection, job: ClaimedJob) -> None:
     try:
         with conn.begin_nested():
-            conn.execute(text("SELECT ops.assert_lease(:j, :w, :t)"),
-                         {"j": job.id, "w": job.worker_id, "t": job.fencing_token})
+            conn.execute(
+                text("SELECT ops.assert_lease(:j, :w, :t)"), {"j": job.id, "w": job.worker_id, "t": job.fencing_token}
+            )
     except DBAPIError as e:
         if _stale(e):
             _raise_stale(job.id, job.fencing_token, e)
         raise
 
 
-def heartbeat(engine: Engine, job: ClaimedJob, progress: Mapping[str, Any] | None = None,
-              lease_seconds: int | None = None, *, lock_timeout_ms: int | None = None,
-              statement_timeout_ms: int | None = None) -> str:
+def heartbeat(
+    engine: Engine,
+    job: ClaimedJob,
+    progress: Mapping[str, Any] | None = None,
+    lease_seconds: int | None = None,
+    *,
+    lock_timeout_ms: int | None = None,
+    statement_timeout_ms: int | None = None,
+) -> str:
     """Extend the lease; returns the current status (``running`` or ``cancel_requested``).
 
     With ``lock_timeout_ms``/``statement_timeout_ms`` the transaction gives up
@@ -408,13 +437,21 @@ def heartbeat(engine: Engine, job: ClaimedJob, progress: Mapping[str, Any] | Non
             if lock_timeout_ms is not None:
                 conn.execute(text("SELECT set_config('lock_timeout', :v, true)"), {"v": f"{int(lock_timeout_ms)}ms"})
             if statement_timeout_ms is not None:
-                conn.execute(text("SELECT set_config('statement_timeout', :v, true)"),
-                             {"v": f"{int(statement_timeout_ms)}ms"})
-            return str(conn.execute(
-                text("SELECT ops.heartbeat(:j, :w, :t, :s, CAST(:p AS jsonb))"),
-                {"j": job.id, "w": job.worker_id, "t": job.fencing_token,
-                 "s": lease_seconds or job.lease_seconds, "p": to_json(dict(progress)) if progress else None},
-            ).scalar_one())
+                conn.execute(
+                    text("SELECT set_config('statement_timeout', :v, true)"), {"v": f"{int(statement_timeout_ms)}ms"}
+                )
+            return str(
+                conn.execute(
+                    text("SELECT ops.heartbeat(:j, :w, :t, :s, CAST(:p AS jsonb))"),
+                    {
+                        "j": job.id,
+                        "w": job.worker_id,
+                        "t": job.fencing_token,
+                        "s": lease_seconds or job.lease_seconds,
+                        "p": to_json(dict(progress)) if progress else None,
+                    },
+                ).scalar_one()
+            )
     except DBAPIError as e:
         if _stale(e):
             _raise_stale(job.id, job.fencing_token, e)
@@ -426,8 +463,14 @@ def _complete(conn: Connection, job: ClaimedJob, status: str, result: Any, error
         with conn.begin_nested():
             conn.execute(
                 text("SELECT ops.complete_job(:j, :w, :t, :s, CAST(:r AS jsonb), CAST(:e AS jsonb))"),
-                {"j": job.id, "w": job.worker_id, "t": job.fencing_token, "s": status,
-                 "r": to_json(result), "e": to_json(error)},
+                {
+                    "j": job.id,
+                    "w": job.worker_id,
+                    "t": job.fencing_token,
+                    "s": status,
+                    "r": to_json(result),
+                    "e": to_json(error),
+                },
             )
     except DBAPIError as e:
         if _stale(e):
@@ -435,8 +478,7 @@ def _complete(conn: Connection, job: ClaimedJob, status: str, result: Any, error
         raise
 
 
-def complete(engine: Engine, job: ClaimedJob, result: Mapping[str, Any] | None,
-             conn: Connection | None = None) -> None:
+def complete(engine: Engine, job: ClaimedJob, result: Mapping[str, Any] | None, conn: Connection | None = None) -> None:
     """Mark succeeded (fenced). Pass ``conn`` to commit together with result references."""
     if conn is not None:
         _complete(conn, job, "succeeded", dict(result) if result is not None else None, None)
@@ -455,12 +497,18 @@ def finish_cancelled(engine: Engine, job: ClaimedJob, details: Mapping[str, Any]
 def error_document(code: str, message: str, *, retryable: bool, attempt: int, **extra: Any) -> dict[str, Any]:
     from reva.operations.telemetry import redact_obj, redact_text, secret_values
 
-    return {"code": code[:64], "message": redact_text(message, secret_values())[:MAX_ERROR_MESSAGE],
-            "retryable": retryable, "attempt": attempt, **redact_obj(dict(extra))}
+    return {
+        "code": code[:64],
+        "message": redact_text(message, secret_values())[:MAX_ERROR_MESSAGE],
+        "retryable": retryable,
+        "attempt": attempt,
+        **redact_obj(dict(extra)),
+    }
 
 
-def backoff_seconds(attempts: int, base: float = DEFAULT_BACKOFF_BASE_SECONDS,
-                    cap: float = DEFAULT_BACKOFF_CAP_SECONDS) -> float:
+def backoff_seconds(
+    attempts: int, base: float = DEFAULT_BACKOFF_BASE_SECONDS, cap: float = DEFAULT_BACKOFF_CAP_SECONDS
+) -> float:
     return float(min(cap, base * (2 ** max(0, attempts - 1))))
 
 
@@ -507,8 +555,9 @@ def fail(
         return "queued"
 
 
-def release(engine: Engine, job: ClaimedJob, checkpoint: Mapping[str, Any] | None = None,
-            reason: str = "worker_shutdown") -> str:
+def release(
+    engine: Engine, job: ClaimedJob, checkpoint: Mapping[str, Any] | None = None, reason: str = "worker_shutdown"
+) -> str:
     """Hand an interrupted job back (graceful shutdown); the attempt is not counted."""
     with engine.begin() as conn:
         assert_lease(conn, job)
@@ -523,8 +572,11 @@ def release(engine: Engine, job: ClaimedJob, checkpoint: Mapping[str, Any] | Non
                 "available_at = clock_timestamp(), last_error = CAST(:e AS jsonb), updated_at = clock_timestamp() "
                 "WHERE id = :j"
             ),
-            {"j": job.id, "c": to_json(dict(checkpoint)) if checkpoint else None,
-             "e": to_json({"code": "released", "reason": reason, "retryable": True})},
+            {
+                "j": job.id,
+                "c": to_json(dict(checkpoint)) if checkpoint else None,
+                "e": to_json({"code": "released", "reason": reason, "retryable": True}),
+            },
         )
         return "queued"
 

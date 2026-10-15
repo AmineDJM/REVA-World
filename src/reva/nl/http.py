@@ -44,18 +44,33 @@ LLM_MAX_REQUEST_BYTES = 131_072
 class LlmHttpClient(SafeHttpClient):
     """SafeHttpClient restricted to the LLM API hosts, with a single-shot JSON POST."""
 
-    def __init__(self, *, allowed_hosts: tuple[str, ...] = LLM_HOSTS, timeout_seconds: float = 60.0,
-                 max_bytes: int = LLM_MAX_RESPONSE_BYTES, **kw: Any) -> None:
+    def __init__(
+        self,
+        *,
+        allowed_hosts: tuple[str, ...] = LLM_HOSTS,
+        timeout_seconds: float = 60.0,
+        max_bytes: int = LLM_MAX_RESPONSE_BYTES,
+        **kw: Any,
+    ) -> None:
         unknown = {h.lower() for h in allowed_hosts} - set(LLM_HOSTS)
         if unknown:
             raise UnsafeRequest("LLM client hosts are fixed", hosts=sorted(unknown))
         limiter = kw.pop("rate_limiter", None) or RateLimiter(
-            default=HostPolicy(min_interval_seconds=0.0, max_concurrency=4, max_retry_after_seconds=0.0))
-        super().__init__(allowed_hosts=allowed_hosts, timeout_seconds=timeout_seconds, max_bytes=max_bytes,
-                         max_redirects=0, max_attempts=1, rate_limiter=limiter, **kw)
+            default=HostPolicy(min_interval_seconds=0.0, max_concurrency=4, max_retry_after_seconds=0.0)
+        )
+        super().__init__(
+            allowed_hosts=allowed_hosts,
+            timeout_seconds=timeout_seconds,
+            max_bytes=max_bytes,
+            max_redirects=0,
+            max_attempts=1,
+            rate_limiter=limiter,
+            **kw,
+        )
 
-    async def post_json(self, url: str, payload: Mapping[str, Any], *,
-                        headers: Mapping[str, str] | None = None) -> HttpResult:
+    async def post_json(
+        self, url: str, payload: Mapping[str, Any], *, headers: Mapping[str, str] | None = None
+    ) -> HttpResult:
         """One POST of ``payload`` as JSON; returns the (bounded) response whatever its status."""
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode()
         if len(body) > LLM_MAX_REQUEST_BYTES:
@@ -81,13 +96,19 @@ class LlmHttpClient(SafeHttpClient):
                     chunks.extend(decoder.feed(raw))
                 chunks.extend(decoder.finish())
                 return HttpResult(
-                    url=url, final_url=url, status=resp.status_code,
-                    headers={k.lower(): v for k, v in resp.headers.items()}, body=b"".join(chunks),
-                    retrieved_at=datetime.now(UTC), elapsed_seconds=time.monotonic() - start, redirects=(),
+                    url=url,
+                    final_url=url,
+                    status=resp.status_code,
+                    headers={k.lower(): v for k, v in resp.headers.items()},
+                    body=b"".join(chunks),
+                    retrieved_at=datetime.now(UTC),
+                    elapsed_seconds=time.monotonic() - start,
+                    redirects=(),
                     attempts=1,
                 )
         except (TimeoutError, httpx.TransportError) as e:
-            raise SourceResponseError(f"LLM transport failure: {type(e).__name__}", retryable=True,
-                                      provider_host=host) from e
+            raise SourceResponseError(
+                f"LLM transport failure: {type(e).__name__}", retryable=True, provider_host=host
+            ) from e
         finally:
             self.rate_limiter.release(host)

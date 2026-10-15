@@ -88,14 +88,25 @@ def _record_conflict(conn: Any, actor: str, schedule_key: str, slot: datetime, c
     from reva.operations.audit import record
     from reva.operations.telemetry import IDEMPOTENCY_CONFLICTS
 
-    log.error("schedule %s slot %s: idempotency key %s is held by foreign job %s (%s); created the job under %s",
-              schedule_key, slot.isoformat(), conflict["idempotency_key"], conflict["foreign_job_id"],
-              conflict["foreign_job_type"], conflict["disambiguated_key"])
+    log.error(
+        "schedule %s slot %s: idempotency key %s is held by foreign job %s (%s); created the job under %s",
+        schedule_key,
+        slot.isoformat(),
+        conflict["idempotency_key"],
+        conflict["foreign_job_id"],
+        conflict["foreign_job_type"],
+        conflict["disambiguated_key"],
+    )
     IDEMPOTENCY_CONFLICTS.inc(job_type=str(conflict.get("job_type")))
     try:
         with conn.begin_nested():
-            record(conn, actor, "schedule.slot_key_conflict",
-                   {"schedule_key": schedule_key, "slot": slot.isoformat()}, conflict)
+            record(
+                conn,
+                actor,
+                "schedule.slot_key_conflict",
+                {"schedule_key": schedule_key, "slot": slot.isoformat()},
+                conflict,
+            )
     except Exception as e:  # the audit row is best effort; the job itself must still be created
         log.warning("could not audit schedule key conflict: %s", type(e).__name__)
 
@@ -107,14 +118,18 @@ def tick(engine: Engine, *, limit: int = 50, actor: str = "scheduler") -> list[S
         conn.execute(text("SET LOCAL TIME ZONE 'UTC'"))
         now: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
         now = now.astimezone(UTC)
-        rows = conn.execute(
-            text(
-                "SELECT schedule_key, job_type, parameters, cadence_spec, next_due_at FROM ops.schedule "
-                "WHERE enabled AND next_due_at <= clock_timestamp() ORDER BY next_due_at "
-                "LIMIT :n FOR UPDATE SKIP LOCKED"
-            ),
-            {"n": limit},
-        ).mappings().all()
+        rows = (
+            conn.execute(
+                text(
+                    "SELECT schedule_key, job_type, parameters, cadence_spec, next_due_at FROM ops.schedule "
+                    "WHERE enabled AND next_due_at <= clock_timestamp() ORDER BY next_due_at "
+                    "LIMIT :n FOR UPDATE SKIP LOCKED"
+                ),
+                {"n": limit},
+            )
+            .mappings()
+            .all()
+        )
         for r in rows:
             interval = timedelta(seconds=max(MIN_INTERVAL_SECONDS, int(r["cadence_spec"]["interval_seconds"])))
             slot = due_slot(r["next_due_at"].astimezone(UTC), now, interval)
@@ -128,8 +143,13 @@ def tick(engine: Engine, *, limit: int = 50, actor: str = "scheduler") -> list[S
                         payload = schedule_payload(r["job_type"], dict(r["parameters"]))
                         key = slot_key(r["schedule_key"], slot)
                         res = queue.enqueue_resolving_conflict(
-                            conn, r["job_type"], payload, key, SCHEDULE_PRIORITY,
-                            created_by=f"{actor}:{r['schedule_key']}"[:200])
+                            conn,
+                            r["job_type"],
+                            payload,
+                            key,
+                            SCHEDULE_PRIORITY,
+                            created_by=f"{actor}:{r['schedule_key']}"[:200],
+                        )
                         conflict = res.conflict
                         if conflict is not None and res.created:
                             _record_conflict(conn, actor, r["schedule_key"], slot, conflict)
@@ -142,8 +162,13 @@ def tick(engine: Engine, *, limit: int = 50, actor: str = "scheduler") -> list[S
                         {"n": slot + interval, "s": slot, "k": r["schedule_key"]},
                     )
             except Exception as e:  # one broken schedule never blocks the others; retried next tick
-                log.error("schedule %s slot %s failed: %s: %s", r["schedule_key"], slot.isoformat(),
-                          type(e).__name__, getattr(e, "message", None) or str(e)[:300])
+                log.error(
+                    "schedule %s slot %s failed: %s: %s",
+                    r["schedule_key"],
+                    slot.isoformat(),
+                    type(e).__name__,
+                    getattr(e, "message", None) or str(e)[:300],
+                )
                 out.append(ScheduledJob(r["schedule_key"], slot, None, False, f"error: {type(e).__name__}"))
                 continue
             out.append(ScheduledJob(r["schedule_key"], slot, job_id, created, reason, conflict))
@@ -160,8 +185,9 @@ def next_due(engine: Engine) -> datetime | None:
         return due
 
 
-def disable_ingest_on_auth_failure(conn: Any, connector: str, origin: str, streak: dict[str, Any], *,
-                                   actor: str) -> list[str]:
+def disable_ingest_on_auth_failure(
+    conn: Any, connector: str, origin: str, streak: dict[str, Any], *, actor: str
+) -> list[str]:
     """Disable the enabled ingest schedules of ``connector`` whose mode matches ``origin``
     (``live`` <-> mode ``live``, ``test_fixture`` <-> mode ``fixture``) after a persistent,
     connector-wide authentication failure. One ``schedule.disabled_auth_failure`` audit row
@@ -171,19 +197,35 @@ def disable_ingest_on_auth_failure(conn: Any, connector: str, origin: str, strea
     from reva.operations.audit import record
 
     mode = "live" if origin == "live" else "fixture"
-    keys = list(conn.execute(
-        text(
-            "UPDATE ops.schedule SET enabled = false WHERE enabled AND job_type = 'ingest' "
-            "AND parameters->>'connector' = :c AND COALESCE(parameters->>'mode', 'live') = :m "
-            "RETURNING schedule_key"
-        ),
-        {"c": connector, "m": mode},
-    ).scalars())
+    keys = list(
+        conn.execute(
+            text(
+                "UPDATE ops.schedule SET enabled = false WHERE enabled AND job_type = 'ingest' "
+                "AND parameters->>'connector' = :c AND COALESCE(parameters->>'mode', 'live') = :m "
+                "RETURNING schedule_key"
+            ),
+            {"c": connector, "m": mode},
+        ).scalars()
+    )
     for key in sorted(keys):
-        log.error("schedule %s disabled: %d consecutive runs of %s failed authentication (%s)", key,
-                  streak.get("runs", 0), connector, streak.get("statuses"))
-        record(conn, actor, "schedule.disabled_auth_failure", {"schedule_key": key, "connector": connector},
-               {"origin": origin, "consecutive_auth_failure_runs": streak.get("runs"),
-                "statuses": streak.get("statuses"), "since": str(streak.get("since")),
-                "reenable": "maintainer action after credential provisioning (no bypass)"})
+        log.error(
+            "schedule %s disabled: %d consecutive runs of %s failed authentication (%s)",
+            key,
+            streak.get("runs", 0),
+            connector,
+            streak.get("statuses"),
+        )
+        record(
+            conn,
+            actor,
+            "schedule.disabled_auth_failure",
+            {"schedule_key": key, "connector": connector},
+            {
+                "origin": origin,
+                "consecutive_auth_failure_runs": streak.get("runs"),
+                "statuses": streak.get("statuses"),
+                "since": str(streak.get("since")),
+                "reenable": "maintainer action after credential provisioning (no bypass)",
+            },
+        )
     return sorted(keys)

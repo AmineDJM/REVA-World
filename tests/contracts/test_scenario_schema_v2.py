@@ -29,7 +29,8 @@ def errs(schema: dict[str, Any], doc: Any) -> list[str]:
 
 def test_exported_schema_is_generated_from_the_registered_plugins() -> None:
     assert SCHEMA_FILE.read_text() == render(build_schema()), (
-        "contracts/scenario.schema.json is stale: run `uv run python -m reva.simulation.scenario_schema`")
+        "contracts/scenario.schema.json is stale: run `uv run python -m reva.simulation.scenario_schema`"
+    )
     assert "economic.crude_exposure" in V2["$defs"]
 
 
@@ -48,10 +49,14 @@ def test_crude_branch_accepts_every_v1_spec() -> None:
 V1_VALID_VARIANTS = [
     lambda d: None,
     lambda d: d.update(countries=["FRA", "DZA", "CHN", "USA"]),
-    lambda d: d.update(fidelity="L2", assumptions={"quantity_response": "elasticity_sensitivity",
-                                                   "no_general_equilibrium": True, "elasticity_grid": [
-                                                       {"import_elasticity": -0.5, "export_elasticity": 0.25,
-                                                        "basis": "scenario_assumption"}]}),
+    lambda d: d.update(
+        fidelity="L2",
+        assumptions={
+            "quantity_response": "elasticity_sensitivity",
+            "no_general_equilibrium": True,
+            "elasticity_grid": [{"import_elasticity": -0.5, "export_elasticity": 0.25, "basis": "scenario_assumption"}],
+        },
+    ),
     lambda d: d.update(fidelity="L0", outputs=["exposure_percent_baseline_gdp"], reference_year=2020),
 ]
 
@@ -89,12 +94,21 @@ class _Multi:
     def spec_schema(self) -> dict[str, Any]:
         return {
             "schema_version": {"const": "2.0.0"},
-            "horizon": {"type": "object", "additionalProperties": False,
-                        "properties": {"periods": {"type": "integer", "minimum": 1, "maximum": 30},
-                                       "unit": {"const": "calendar_year"}}, "required": ["periods", "unit"]},
-            "intervention": {"type": "object", "additionalProperties": False,
-                             "properties": {"kind": {"const": "scale_series"}, "factor": {"type": "number"}},
-                             "required": ["kind", "factor"]},
+            "horizon": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "periods": {"type": "integer", "minimum": 1, "maximum": 30},
+                    "unit": {"const": "calendar_year"},
+                },
+                "required": ["periods", "unit"],
+            },
+            "intervention": {
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {"kind": {"const": "scale_series"}, "factor": {"type": "number"}},
+                "required": ["kind", "factor"],
+            },
             "assumptions": {"type": "object", "additionalProperties": False, "properties": {}},
             "outputs": {"type": "array", "minItems": 1, "items": {"enum": ["scaled"]}},
         }
@@ -117,10 +131,18 @@ class _Multi:
 
 
 def multi_spec(**over: Any) -> dict[str, Any]:
-    doc = {**copy.deepcopy(EXAMPLE), "schema_version": "2.0.0", "model_key": "test.multi_period",
-           "model_version": "0.1.0", "baseline_release_id": str(uuid.uuid4()), "countries": ["DEU", "FRA"],
-           "horizon": {"periods": 10, "unit": "calendar_year"}, "intervention": {"kind": "scale_series", "factor": 2},
-           "assumptions": {}, "outputs": ["scaled"]}
+    doc = {
+        **copy.deepcopy(EXAMPLE),
+        "schema_version": "2.0.0",
+        "model_key": "test.multi_period",
+        "model_version": "0.1.0",
+        "baseline_release_id": str(uuid.uuid4()),
+        "countries": ["DEU", "FRA"],
+        "horizon": {"periods": 10, "unit": "calendar_year"},
+        "intervention": {"kind": "scale_series", "factor": 2},
+        "assumptions": {},
+        "outputs": ["scaled"],
+    }
     doc.update(over)
     return doc
 

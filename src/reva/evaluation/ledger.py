@@ -160,8 +160,10 @@ def freeze_issue(
     for sid, obs in sorted(series.items()):
         m = meta.get(sid, {})
         report = check_applicability(
-            desc, ApplicabilityRequest(geography=m.get("iso3"), aggregation=m.get("aggregation"), train=list(obs),
-                                       horizons=hs),
+            desc,
+            ApplicabilityRequest(
+                geography=m.get("iso3"), aggregation=m.get("aggregation"), train=list(obs), horizons=hs
+            ),
         )
         if not report.applicable:
             refused.append({"series_id": sid, "reasons": list(report.reasons)})
@@ -171,39 +173,50 @@ def freeze_issue(
             refused.append({"series_id": sid, "reasons": [f"ineligible: {fitted.reason}"]})
             continue
         scale = mase_scale([to_float(v) for _, v in obs])
-        issued.append({
-            "series_id": sid,
-            "concept_id": m.get("concept_id"),
-            "iso3": m.get("iso3"),
-            "unit_ref": m.get("unit_ref"),
-            "origin_year": fitted.origin_year,
-            "n_train": len(obs),
-            "train_mase_scale": scale.value,
-            "scale_flag": scale.flag,
-            "forecasts": [
-                {"target_year": fc.target_year, "horizon": fc.horizon, "point": fc.point,
-                 "interval": list(fc.interval) if fc.interval else None, "interval_kind": fc.interval_kind,
-                 "level": fc.level, "uncertainty": fc.uncertainty.model_dump(mode="json", exclude_none=True)}
-                for fc in fitted.predict(hs, level=level)
-            ],
-        })
+        issued.append(
+            {
+                "series_id": sid,
+                "concept_id": m.get("concept_id"),
+                "iso3": m.get("iso3"),
+                "unit_ref": m.get("unit_ref"),
+                "origin_year": fitted.origin_year,
+                "n_train": len(obs),
+                "train_mase_scale": scale.value,
+                "scale_flag": scale.flag,
+                "forecasts": [
+                    {
+                        "target_year": fc.target_year,
+                        "horizon": fc.horizon,
+                        "point": fc.point,
+                        "interval": list(fc.interval) if fc.interval else None,
+                        "interval_kind": fc.interval_kind,
+                        "level": fc.level,
+                        "uncertainty": fc.uncertainty.model_dump(mode="json", exclude_none=True),
+                    }
+                    for fc in fitted.predict(hs, level=level)
+                ],
+            }
+        )
     if not issued:
-        raise CapabilityGap("no series is within the model's applicability envelope; nothing issued",
-                            refused=refused[:20])
-    issue: dict[str, Any] = finite_json({
-        "schema": ISSUE_SCHEMA,
-        "label": LEDGER_LABEL,
-        "replay_mode": REPLAY_MODE,
-        "issued_at": issued_at.isoformat(),
-        "model": model_ref(model),
-        "horizons": hs,
-        "level": level,
-        "data": dict(data_ref),
-        "series": issued,
-        "refused": refused,
-        "statement": "These forecasts were issued at issued_at from the pinned release and are scored only "
-        "against outcomes recorded later.",
-    })
+        raise CapabilityGap(
+            "no series is within the model's applicability envelope; nothing issued", refused=refused[:20]
+        )
+    issue: dict[str, Any] = finite_json(
+        {
+            "schema": ISSUE_SCHEMA,
+            "label": LEDGER_LABEL,
+            "replay_mode": REPLAY_MODE,
+            "issued_at": issued_at.isoformat(),
+            "model": model_ref(model),
+            "horizons": hs,
+            "level": level,
+            "data": dict(data_ref),
+            "series": issued,
+            "refused": refused,
+            "statement": "These forecasts were issued at issued_at from the pinned release and are scored only "
+            "against outcomes recorded later.",
+        }
+    )
     return issue
 
 
@@ -240,48 +253,62 @@ def score_issue(
                 pending.append(cell)
                 continue
             if out.recorded_at is not None and out.recorded_at <= issued_at:
-                not_prospective.append({**cell, "reason": "outcome recorded at or before issue time",
-                                        "recorded_at": out.recorded_at.isoformat()})
+                not_prospective.append(
+                    {
+                        **cell,
+                        "reason": "outcome recorded at or before issue time",
+                        "recorded_at": out.recorded_at.isoformat(),
+                    }
+                )
                 continue
             y = to_float(out.value)
             ae = absolute_error(float(fc["point"]), y)
             interval = tuple(fc["interval"]) if fc.get("interval") else None
-            scores.append({
-                **cell, "point": fc["point"], "outcome": y, "abs_error": ae,
-                "mase_scaled_error": ae / scale if scale else None,
-                "covered": interval_covers(interval, y) if interval else None,
-                "interval_width": interval_width(interval) if interval else None,
-                "outcome_release_id": out.release_id, "outcome_observation_id": out.observation_id,
-                "outcome_recorded_at": out.recorded_at.isoformat() if out.recorded_at else None,
-            })
+            scores.append(
+                {
+                    **cell,
+                    "point": fc["point"],
+                    "outcome": y,
+                    "abs_error": ae,
+                    "mase_scaled_error": ae / scale if scale else None,
+                    "covered": interval_covers(interval, y) if interval else None,
+                    "interval_width": interval_width(interval) if interval else None,
+                    "outcome_release_id": out.release_id,
+                    "outcome_observation_id": out.observation_id,
+                    "outcome_recorded_at": out.recorded_at.isoformat() if out.recorded_at else None,
+                }
+            )
     if not scores:
         raise MissingInput(
             "no outcome has been recorded yet for any issued target; refusing to score",
-            pending=len(pending), not_prospective=len(not_prospective),
+            pending=len(pending),
+            not_prospective=len(not_prospective),
         )
     scaled = [r["mase_scaled_error"] for r in scores if r["mase_scaled_error"] is not None]
     cov = [r["covered"] for r in scores if r["covered"] is not None]
-    scored: dict[str, Any] = finite_json({
-        "schema": SCORE_SCHEMA,
-        "label": LEDGER_LABEL,
-        "replay_mode": REPLAY_MODE,
-        "issue_manifest_sha256": issue_sha256,
-        "issued_at": issued_at.isoformat(),
-        "scored_at": scored_at.isoformat(),
-        "model": manifest["model"],
-        "scores": scores,
-        "pending": pending,
-        "not_prospective": not_prospective,
-        "summary": {
-            "n_scored": len(scores),
-            "n_pending": len(pending),
-            "n_not_prospective": len(not_prospective),
-            "mae": math.fsum(r["abs_error"] for r in scores) / len(scores),
-            "mase": math.fsum(scaled) / len(scaled) if scaled else None,
-            "coverage": sum(cov) / len(cov) if cov else None,
-            "n_intervals": len(cov),
-        },
-    })
+    scored: dict[str, Any] = finite_json(
+        {
+            "schema": SCORE_SCHEMA,
+            "label": LEDGER_LABEL,
+            "replay_mode": REPLAY_MODE,
+            "issue_manifest_sha256": issue_sha256,
+            "issued_at": issued_at.isoformat(),
+            "scored_at": scored_at.isoformat(),
+            "model": manifest["model"],
+            "scores": scores,
+            "pending": pending,
+            "not_prospective": not_prospective,
+            "summary": {
+                "n_scored": len(scores),
+                "n_pending": len(pending),
+                "n_not_prospective": len(not_prospective),
+                "mae": math.fsum(r["abs_error"] for r in scores) / len(scores),
+                "mase": math.fsum(scaled) / len(scaled) if scaled else None,
+                "coverage": sum(cov) / len(cov) if cov else None,
+                "n_intervals": len(cov),
+            },
+        }
+    )
     return scored
 
 
@@ -306,17 +333,29 @@ def _model_version_id(conn: Any, model: ForecastModel) -> str:
     return str(row)
 
 
-def _insert_eval(conn: Any, mv: str, ctx_id: UUID, sha: str, scope: Mapping[str, Any], metrics: Mapping[str, Any],
-                 act: UUID) -> UUID:
-    return UUID(str(conn.execute(
-        text(
-            """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
+def _insert_eval(
+    conn: Any, mv: str, ctx_id: UUID, sha: str, scope: Mapping[str, Any], metrics: Mapping[str, Any], act: UUID
+) -> UUID:
+    return UUID(
+        str(
+            conn.execute(
+                text(
+                    """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
                  task_scope, metrics, provenance_activity_id)
                VALUES (:m, :c, :s, :rm, CAST(:ts AS jsonb), CAST(:mt AS jsonb), :a) RETURNING id"""
-        ),
-        {"m": mv, "c": ctx_id, "s": sha, "rm": REPLAY_MODE, "ts": json.dumps(finite_json(dict(scope))),
-         "mt": json.dumps(finite_json(dict(metrics))), "a": act},
-    ).scalar_one()))
+                ),
+                {
+                    "m": mv,
+                    "c": ctx_id,
+                    "s": sha,
+                    "rm": REPLAY_MODE,
+                    "ts": json.dumps(finite_json(dict(scope))),
+                    "mt": json.dumps(finite_json(dict(metrics))),
+                    "a": act,
+                },
+            ).scalar_one()
+        )
+    )
 
 
 def issue_forecasts(
@@ -349,31 +388,68 @@ def issue_forecasts(
         panel = load_release_panel(conn, release, concepts=list(concepts), countries=list(countries), years=years)
         issued_at: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
         mv = _model_version_id(conn, model)
-    manifest = freeze_issue(panel.series, panel.meta, model, horizons, issued_at=issued_at,
-                            data_ref={**panel.source, "panel_digest": panel.digest(), "dropped": panel.dropped},
-                            level=level)
+    manifest = freeze_issue(
+        panel.series,
+        panel.meta,
+        model,
+        horizons,
+        issued_at=issued_at,
+        data_ref={**panel.source, "panel_digest": panel.digest(), "dropped": panel.dropped},
+        level=level,
+    )
     targets = tuple(sorted({f["target_year"] for s in manifest["series"] for f in s["forecasts"]}))
     n = sum(len(s["forecasts"]) for s in manifest["series"])
     with engine.begin() as conn:
         sha = repo.store_json_artifact(conn, store, manifest, "evaluation", schema_version="forecast-issue/1")
         if sha != manifest_sha256(manifest):
             raise IntegrityFailure("stored issue manifest hash differs from its canonical hash")
-        act = repo.simple_activity("evaluation.forecast_issue", "evaluation", actor,
-                                   {"model": model_ref(model), "horizons": list(horizons), "label": LEDGER_LABEL})
-        repo.record_activity(conn, act, inputs=[(release["manifest_sha256"], {"role": "issue_data_release"})],
-                             outputs=[sha])
-        ctx_id = repo.create_context(conn, mode="evaluation", origin=release["origin"], manifest_sha256=sha,
-                                     knowledge_cutoff=release["knowledge_cutoff"],
-                                     parent_context_id=UUID(str(release["context_id"])))
-        scope = {"kind": "prospective_forecast_ledger", "task": "annual_point_forecast.positive_series",
-                 "concepts": sorted(concepts), "countries": sorted(countries), "horizons": sorted(set(horizons))}
-        eid = _insert_eval(conn, mv, ctx_id, sha, scope, {
-            "kind": "prospective_issue", "status": "issued_unscored", "label": LEDGER_LABEL,
-            "issued_at": issued_at.isoformat(), "issue_manifest_sha256": sha, "n_forecasts": n,
-            "target_years": list(targets), "refused": len(manifest["refused"]),
-        }, act.id)
-        repo.emit_outbox(conn, "evaluation.forecast_issued",
-                         {"evaluation_id": str(eid), "manifest_sha256": sha, "model": model_ref(model)})
+        act = repo.simple_activity(
+            "evaluation.forecast_issue",
+            "evaluation",
+            actor,
+            {"model": model_ref(model), "horizons": list(horizons), "label": LEDGER_LABEL},
+        )
+        repo.record_activity(
+            conn, act, inputs=[(release["manifest_sha256"], {"role": "issue_data_release"})], outputs=[sha]
+        )
+        ctx_id = repo.create_context(
+            conn,
+            mode="evaluation",
+            origin=release["origin"],
+            manifest_sha256=sha,
+            knowledge_cutoff=release["knowledge_cutoff"],
+            parent_context_id=UUID(str(release["context_id"])),
+        )
+        scope = {
+            "kind": "prospective_forecast_ledger",
+            "task": "annual_point_forecast.positive_series",
+            "concepts": sorted(concepts),
+            "countries": sorted(countries),
+            "horizons": sorted(set(horizons)),
+        }
+        eid = _insert_eval(
+            conn,
+            mv,
+            ctx_id,
+            sha,
+            scope,
+            {
+                "kind": "prospective_issue",
+                "status": "issued_unscored",
+                "label": LEDGER_LABEL,
+                "issued_at": issued_at.isoformat(),
+                "issue_manifest_sha256": sha,
+                "n_forecasts": n,
+                "target_years": list(targets),
+                "refused": len(manifest["refused"]),
+            },
+            act.id,
+        )
+        repo.emit_outbox(
+            conn,
+            "evaluation.forecast_issued",
+            {"evaluation_id": str(eid), "manifest_sha256": sha, "model": model_ref(model)},
+        )
     return IssueResult(eid, ctx_id, sha, issued_at, n, targets)
 
 
@@ -406,8 +482,12 @@ def release_outcomes(
         k = (f"{iso3}:{r['concept_id']}", year)
         if k not in wanted or (r["value"] or {}).get("kind") != "decimal":
             continue
-        out[k] = Outcome(Decimal(str(r["value"]["value"])), r["recorded_at"], str(release["id"]),
-                         str(r["observation_id"]) if r["observation_id"] else None)
+        out[k] = Outcome(
+            Decimal(str(r["value"]["value"])),
+            r["recorded_at"],
+            str(release["id"]),
+            str(r["observation_id"]) if r["observation_id"] else None,
+        )
     return out
 
 
@@ -427,12 +507,16 @@ def score_issued_forecasts(
     from reva.belief.snapshots import release_as_of, release_by_id
 
     with engine.connect() as conn:
-        row = conn.execute(
-            text("""SELECT e.id, e.model_version_id, e.context_id, e.evaluation_manifest_sha256, e.metrics,
+        row = (
+            conn.execute(
+                text("""SELECT e.id, e.model_version_id, e.context_id, e.evaluation_manifest_sha256, e.metrics,
                            e.task_scope, c.origin, c.knowledge_cutoff
                     FROM model.evaluation e JOIN meta.context c ON c.id = e.context_id WHERE e.id = :i"""),
-            {"i": issue_evaluation_id},
-        ).mappings().one_or_none()
+                {"i": issue_evaluation_id},
+            )
+            .mappings()
+            .one_or_none()
+        )
         if row is None or (row["metrics"] or {}).get("kind") != "prospective_issue":
             raise ValidationProblem("not a prospective forecast issue", evaluation_id=str(issue_evaluation_id))
         sha = row["evaluation_manifest_sha256"]
@@ -445,24 +529,50 @@ def score_issued_forecasts(
         outcomes = release_outcomes(conn, release, manifest)
         scored_at: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
     result = score_issue(manifest, outcomes, scored_at=scored_at, issue_sha256=sha)
-    result["outcome_release"] = {"release_id": str(release["id"]), "manifest_sha256": release["manifest_sha256"],
-                                 "published_at": release["published_at"].isoformat()}
+    result["outcome_release"] = {
+        "release_id": str(release["id"]),
+        "manifest_sha256": release["manifest_sha256"],
+        "published_at": release["published_at"].isoformat(),
+    }
     with engine.begin() as conn:
         score_sha = repo.store_json_artifact(conn, store, result, "evaluation", schema_version="forecast-score/1")
-        act = repo.simple_activity("evaluation.forecast_score", "evaluation", actor,
-                                   {"issue_evaluation_id": str(issue_evaluation_id), "label": LEDGER_LABEL})
-        repo.record_activity(conn, act, inputs=[(sha, {"role": "frozen_issue"}),
-                                                (release["manifest_sha256"], {"role": "outcome_release"})],
-                             outputs=[score_sha])
-        ctx_id = repo.create_context(conn, mode="evaluation", origin=row["origin"], manifest_sha256=score_sha,
-                                     knowledge_cutoff=release["knowledge_cutoff"],
-                                     parent_context_id=UUID(str(row["context_id"])))
+        act = repo.simple_activity(
+            "evaluation.forecast_score",
+            "evaluation",
+            actor,
+            {"issue_evaluation_id": str(issue_evaluation_id), "label": LEDGER_LABEL},
+        )
+        repo.record_activity(
+            conn,
+            act,
+            inputs=[(sha, {"role": "frozen_issue"}), (release["manifest_sha256"], {"role": "outcome_release"})],
+            outputs=[score_sha],
+        )
+        ctx_id = repo.create_context(
+            conn,
+            mode="evaluation",
+            origin=row["origin"],
+            manifest_sha256=score_sha,
+            knowledge_cutoff=release["knowledge_cutoff"],
+            parent_context_id=UUID(str(row["context_id"])),
+        )
         scope = {**dict(row["task_scope"]), "issue_evaluation_id": str(issue_evaluation_id)}
         summary = result["summary"]
-        eid = _insert_eval(conn, str(row["model_version_id"]), ctx_id, score_sha, scope, {
-            "kind": "prospective_score", "label": LEDGER_LABEL, "issue_manifest_sha256": sha,
-            "scored_at": result["scored_at"], **summary,
-        }, act.id)
+        eid = _insert_eval(
+            conn,
+            str(row["model_version_id"]),
+            ctx_id,
+            score_sha,
+            scope,
+            {
+                "kind": "prospective_score",
+                "label": LEDGER_LABEL,
+                "issue_manifest_sha256": sha,
+                "scored_at": result["scored_at"],
+                **summary,
+            },
+            act.id,
+        )
     return ScoreResult(eid, ctx_id, score_sha, summary["n_scored"], summary["n_pending"])
 
 

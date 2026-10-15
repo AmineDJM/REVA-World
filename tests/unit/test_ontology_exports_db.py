@@ -14,16 +14,18 @@ pytestmark = pytest.mark.db
 def test_export_lineage_from_database(db) -> None:  # type: ignore[no-untyped-def]
     with db.worker.begin() as conn:
         raw = repo.store_json_artifact(conn, db.store, {"test": "ontology-export-raw"}, "raw", schema_version="t/1")
-        out = repo.store_json_artifact(conn, db.store, {"test": "ontology-export-norm"}, "normalised",
-                                       schema_version="t/1")
+        out = repo.store_json_artifact(
+            conn, db.store, {"test": "ontology-export-norm"}, "normalised", schema_version="t/1"
+        )
         a1 = repo.simple_activity("test.acquire", "source", "test:agent-k")
         repo.record_activity(conn, a1, outputs=[raw])
         a2 = repo.simple_activity("test.normalise", "normalisation", "test:agent-k")
         repo.record_activity(conn, a2, inputs=[(raw, {"json_pointer": "/test"})], outputs=[out])
     with db.api.connect() as conn:
         doc = export_artifact_lineage(conn, out)
-        n_rows = conn.execute(text("SELECT count(*) FROM meta.activity WHERE id IN (:a, :b)"),
-                              {"a": a1.id, "b": a2.id}).scalar_one()
+        n_rows = conn.execute(
+            text("SELECT count(*) FROM meta.activity WHERE id IN (:a, :b)"), {"a": a1.id, "b": a2.id}
+        ).scalar_one()
     assert n_rows == 2
     nodes = {n["@id"]: n for n in doc["@graph"]}
     assert {activity_iri(a1.id), activity_iri(a2.id), artifact_iri(raw), artifact_iri(out)} <= set(nodes)

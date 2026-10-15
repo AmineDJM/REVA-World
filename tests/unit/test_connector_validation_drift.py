@@ -139,11 +139,20 @@ async def test_wb_unit_change_with_rescaled_values_blocks() -> None:
         (lambda r: r.update(unit=None), "unit_drift"),
         (lambda r: r.update(value=str(r["value"])), "value_type_drift"),
         (lambda r: r.pop("value"), "value_type_drift"),
-        (lambda r: r.update(indicator={"id": "SP.POP.TOTL.FE.IN", "value": "Population, female"}),
-         "indicator_mismatch"),
+        (
+            lambda r: r.update(indicator={"id": "SP.POP.TOTL.FE.IN", "value": "Population, female"}),
+            "indicator_mismatch",
+        ),
     ],
-    ids=["decimal_changed", "decimal_absent", "unit_absent", "unit_null", "value_as_string", "value_absent",
-         "indicator_changed"],
+    ids=[
+        "decimal_changed",
+        "decimal_absent",
+        "unit_absent",
+        "unit_null",
+        "value_as_string",
+        "value_absent",
+        "indicator_changed",
+    ],
 )
 async def test_wb_marker_drift_blocks(edit: Callable[[dict[str, Any]], Any], code: str) -> None:
     def apply(obj: Any) -> None:
@@ -169,8 +178,10 @@ async def test_wb_null_value_is_missing_not_drift() -> None:
 
 
 def test_wb_reviewed_markers_cover_every_mapped_indicator() -> None:
-    mapped = {m["source_ref"]["indicator"] for m in yaml.safe_load(
-        (REGISTRY / "mappings" / "worldbank.yaml").read_text())["mappings"]}
+    mapped = {
+        m["source_ref"]["indicator"]
+        for m in yaml.safe_load((REGISTRY / "mappings" / "worldbank.yaml").read_text())["mappings"]
+    }
     assert mapped == set(INDICATORS)
     assert all(INDICATORS[i]["provider_unit"] == "" and INDICATORS[i]["provider_decimal"] == "0" for i in mapped)
 
@@ -214,8 +225,7 @@ async def test_ct_unreviewed_classification_blocks() -> None:
 
 def test_ct_reviewed_classifications_mirror_the_registry_mapping() -> None:
     maps = yaml.safe_load((REGISTRY / "mappings" / "comtrade.yaml").read_text())["mappings"]
-    declared = {tuple(m["applicability"]["classifications"]) for m in maps
-                if "classifications" in m["applicability"]}
+    declared = {tuple(m["applicability"]["classifications"]) for m in maps if "classifications" in m["applicability"]}
     assert declared == {CT.REVIEWED_CLASSIFICATIONS}
 
 

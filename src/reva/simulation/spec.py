@@ -53,8 +53,10 @@ def parse_knowledge_cutoff(value: object, *, now: datetime | None = None) -> dat
         raise ValidationProblem("knowledge_cutoff must be an RFC 3339 date-time string")
     m = _RFC3339.match(value)
     if m is None:
-        raise ValidationProblem("knowledge_cutoff is not an RFC 3339 date-time with an explicit offset",
-                                errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}])
+        raise ValidationProblem(
+            "knowledge_cutoff is not an RFC 3339 date-time with an explicit offset",
+            errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}],
+        )
     text = value[:-1] + "+00:00" if value[-1] in "Zz" else value
     frac = m.group(7)
     if frac and len(frac) > 7:  # fromisoformat accepts at most microseconds; truncate extra digits
@@ -62,15 +64,18 @@ def parse_knowledge_cutoff(value: object, *, now: datetime | None = None) -> dat
     try:
         parsed = datetime.fromisoformat(text.replace("t", "T", 1))
     except ValueError as e:
-        raise ValidationProblem("knowledge_cutoff is not a valid calendar date-time",
-                                errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}]) from e
+        raise ValidationProblem(
+            "knowledge_cutoff is not a valid calendar date-time",
+            errors=[{"path": "/knowledge_cutoff", "message": "invalid date-time"}],
+        ) from e
     if parsed.tzinfo is None or parsed.utcoffset() is None:
         raise ValidationProblem("knowledge_cutoff must carry an explicit UTC offset")
     utc = parsed.astimezone(UTC)
     current = now or datetime.now(UTC)
     if utc > current + CUTOFF_FUTURE_SKEW:
-        raise ValidationProblem("knowledge_cutoff lies in the future",
-                                errors=[{"path": "/knowledge_cutoff", "message": "future cutoff"}])
+        raise ValidationProblem(
+            "knowledge_cutoff lies in the future", errors=[{"path": "/knowledge_cutoff", "message": "future cutoff"}]
+        )
     return utc
 
 
@@ -203,8 +208,9 @@ def _schema_problem(errors: list[Any], version: str) -> ValidationProblem:
     )
 
 
-def _validate_generic(data: dict[str, Any], model: Any, *, allow_fixture_baseline: bool,
-                      now: datetime | None) -> GenericScenarioSpec:
+def _validate_generic(
+    data: dict[str, Any], model: Any, *, allow_fixture_baseline: bool, now: datetime | None
+) -> GenericScenarioSpec:
     errors = _schema_errors(data)
     if errors:
         raise _schema_problem(errors, "v2")
@@ -212,10 +218,15 @@ def _validate_generic(data: dict[str, Any], model: Any, *, allow_fixture_baselin
     if data["missing_input_policy"] not in policies:
         raise CapabilityGap(
             f"missing_input_policy {data['missing_input_policy']!r} is not supported by {model.model_key}",
-            capability=f"scenario.{data['missing_input_policy']}", supported=sorted(policies))
+            capability=f"scenario.{data['missing_input_policy']}",
+            supported=sorted(policies),
+        )
     if data["fidelity"] != "L0" and data["fidelity"] not in model.fidelities:
-        raise CapabilityGap(f"model {model.model_key} does not compute fidelity {data['fidelity']}",
-                            capability=f"fidelity.{data['fidelity']}", supported=sorted({"L0", *model.fidelities}))
+        raise CapabilityGap(
+            f"model {model.model_key} does not compute fidelity {data['fidelity']}",
+            capability=f"fidelity.{data['fidelity']}",
+            supported=sorted({"L0", *model.fidelities}),
+        )
     parse_knowledge_cutoff(data["knowledge_cutoff"], now=now)
     if data["baseline_release_id"] == FIXTURE_BASELINE and not allow_fixture_baseline:
         raise ValidationProblem(
@@ -265,15 +276,15 @@ def validate_scenario_spec(
         from reva.simulation import plugins
 
         _check_macro_outputs(data)
-        return _validate_generic(data, plugins.get(model_key), allow_fixture_baseline=allow_fixture_baseline,
-                                 now=now)
+        return _validate_generic(data, plugins.get(model_key), allow_fixture_baseline=allow_fixture_baseline, now=now)
     if isinstance(data, dict) and isinstance(data.get("horizon"), dict) and data["horizon"].get("periods") != 1:
         require("horizon.multi_period", requested_periods=data["horizon"].get("periods"))
     _check_macro_outputs(data)
     errors = _schema_errors(data)
     if errors:
-        raise _schema_problem(errors, "v1" if isinstance(data, dict) and data.get("schema_version") == "1.0.0"
-                              else "v2")
+        raise _schema_problem(
+            errors, "v1" if isinstance(data, dict) and data.get("schema_version") == "1.0.0" else "v2"
+        )
     spec = ScenarioSpec.model_validate(data)
     parse_knowledge_cutoff(spec.knowledge_cutoff, now=now)
     if spec.baseline_release_id == FIXTURE_BASELINE and not allow_fixture_baseline:

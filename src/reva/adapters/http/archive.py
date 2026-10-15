@@ -79,10 +79,18 @@ def read_zip_members(
             try:
                 with zf.open(info) as f:
                     content = f.read(info.file_size + 1)
-            except (zipfile.BadZipFile, zlib.error, EOFError, ValueError, NotImplementedError, RuntimeError,
-                    OSError) as e:
-                raise SourceResponseError(f"corrupt archive member {name!r}", retryable=False,
-                                          kind="corrupt_archive") from e
+            except (
+                zipfile.BadZipFile,
+                zlib.error,
+                EOFError,
+                ValueError,
+                NotImplementedError,
+                RuntimeError,
+                OSError,
+            ) as e:
+                raise SourceResponseError(
+                    f"corrupt archive member {name!r}", retryable=False, kind="corrupt_archive"
+                ) from e
             if len(content) != info.file_size:
                 raise UnsafeRequest(f"archive member size mismatch for {name}")
             out[base] = content

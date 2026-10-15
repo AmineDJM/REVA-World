@@ -155,24 +155,39 @@ Also revoke `EXECUTE ON ops.record_gate_result` from `reva_worker` (GATE's `reva
 **R6-08.** In `resume_belief_publication`, replace the gate-evaluator branch:
 
 ```python
-        marker_row = conn.execute(text("SELECT accumulated_error_bound, updated_at FROM ops.dirty_node "
-                                       "WHERE node_key = :k FOR UPDATE"), {"k": PAUSE_PREFIX + concept_id}
-                                  ).mappings().one_or_none()
-        marker = (marker_row or {}).get("accumulated_error_bound")
-        ...
-        if actor.startswith("gate-evaluator:"):
-            if gate_result_id is None:
-                raise AutonomyBlocked("a gate evaluator resumes publication only with its promote decision")
-            g = conn.execute(text(
+marker_row = (
+    conn.execute(
+        text("SELECT accumulated_error_bound, updated_at FROM ops.dirty_node WHERE node_key = :k FOR UPDATE"),
+        {"k": PAUSE_PREFIX + concept_id},
+    )
+    .mappings()
+    .one_or_none()
+)
+marker = (marker_row or {}).get("accumulated_error_bound")
+...
+if actor.startswith("gate-evaluator:"):
+    if gate_result_id is None:
+        raise AutonomyBlocked("a gate evaluator resumes publication only with its promote decision")
+    g = (
+        conn.execute(
+            text(
                 """SELECT g.decision, g.evaluator, g.proposal_id, g.recorded_at, p.proposal_type
-                   FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id WHERE g.id = :g"""),
-                {"g": gate_result_id}).mappings().one_or_none()
-            if g is None or g["decision"] != "pass" or g["evaluator"] != actor:
-                raise AutonomyBlocked("gate result is not a promote decision by this evaluator")
-            if marker_row is None or str(g["proposal_id"]) != str(pause_proposal) \
-                    or not str(g["proposal_type"]).startswith("connector_repair:") \
-                    or g["recorded_at"] < marker_row["updated_at"]:
-                raise AutonomyBlocked("the gate pass is not for the repair proposal that paused publication")
+           FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id WHERE g.id = :g"""
+            ),
+            {"g": gate_result_id},
+        )
+        .mappings()
+        .one_or_none()
+    )
+    if g is None or g["decision"] != "pass" or g["evaluator"] != actor:
+        raise AutonomyBlocked("gate result is not a promote decision by this evaluator")
+    if (
+        marker_row is None
+        or str(g["proposal_id"]) != str(pause_proposal)
+        or not str(g["proposal_type"]).startswith("connector_repair:")
+        or g["recorded_at"] < marker_row["updated_at"]
+    ):
+        raise AutonomyBlocked("the gate pass is not for the repair proposal that paused publication")
 ```
 
 **R6-14.** Estimation, status and classification flags must be semantic for the replay check.
@@ -201,9 +216,10 @@ In `check`, before the `historical_flags_changed` warning:
 After `history = self.accepted_history(connector)`:
 
 ```python
-            if len(history) >= 500:
-                findings.append(_finding("accepted_history_truncated", "warning",
-                                         "replayed the 500 most recent accepted vintages only"))
+if len(history) >= 500:
+    findings.append(
+        _finding("accepted_history_truncated", "warning", "replayed the 500 most recent accepted vintages only")
+    )
 ```
 
 Check the exact `source_flags` key names against `comtrade.py` and `worldbank.py`. The current Comtrade 1.2.0 normalises the estimation flags under its own keys.

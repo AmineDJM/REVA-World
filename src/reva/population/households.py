@@ -67,10 +67,13 @@ UNSUPPORTED_ASSOCIATIONS = (
 )
 
 COMPOSITION_LABELS = {
-    "A1_NCH": "one adult without resident children", "A1_CH": "one adult with resident children",
-    "CPL_NCH": "couple without resident children", "CPL_CH": "couple with resident children",
+    "A1_NCH": "one adult without resident children",
+    "A1_CH": "one adult with resident children",
+    "CPL_NCH": "couple without resident children",
+    "CPL_CH": "couple with resident children",
     "OTH_NCH": "other household type without resident children",
-    "OTH_CH": "other household type with resident children", "NRP": "no response (composition unknown)",
+    "OTH_CH": "other household type with resident children",
+    "NRP": "no response (composition unknown)",
 }
 
 
@@ -130,10 +133,18 @@ class HouseholdCell:
     status: str
 
     def to_dict(self) -> dict[str, Any]:
-        return {"cell_id": self.cell_id, "composition": self.composition,
-                "composition_label": COMPOSITION_LABELS[self.composition], "n_child": self.n_child,
-                "households": self.households, "size_lo": self.size_lo, "size_hi": self.size_hi,
-                "adults_lo": self.adults_lo, "adults_hi": self.adults_hi, "status": self.status}
+        return {
+            "cell_id": self.cell_id,
+            "composition": self.composition,
+            "composition_label": COMPOSITION_LABELS[self.composition],
+            "n_child": self.n_child,
+            "households": self.households,
+            "size_lo": self.size_lo,
+            "size_hi": self.size_hi,
+            "adults_lo": self.adults_lo,
+            "adults_hi": self.adults_hi,
+            "status": self.status,
+        }
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -163,13 +174,23 @@ class HouseholdRecipe:
 
     def to_dict(self) -> dict[str, Any]:
         lo, hi = self.persons_bounds()
-        return {"method_version": self.method_version, "geography": self.geography, "year": self.year,
-                "source_ref": dict(self.source_ref), "supported_attributes": list(SUPPORTED_ATTRIBUTES),
-                "cells": [c.to_dict() for c in self.cells], "structural_zeros": list(self.structural_zeros),
-                "observed_zero_cells": list(self.observed_zero_cells), "missing_cells": list(self.missing_cells),
-                "reported_total": self.reported_total, "total_households": self.total_households,
-                "totals_check": dict(self.totals_check), "accepted_inconsistency": self.accepted_inconsistency,
-                "persons_in_households_bounds": {"lower": lo, "upper": hi, "kind": "bounds"}, "seed": self.seed}
+        return {
+            "method_version": self.method_version,
+            "geography": self.geography,
+            "year": self.year,
+            "source_ref": dict(self.source_ref),
+            "supported_attributes": list(SUPPORTED_ATTRIBUTES),
+            "cells": [c.to_dict() for c in self.cells],
+            "structural_zeros": list(self.structural_zeros),
+            "observed_zero_cells": list(self.observed_zero_cells),
+            "missing_cells": list(self.missing_cells),
+            "reported_total": self.reported_total,
+            "total_households": self.total_households,
+            "totals_check": dict(self.totals_check),
+            "accepted_inconsistency": self.accepted_inconsistency,
+            "persons_in_households_bounds": {"lower": lo, "upper": hi, "kind": "bounds"},
+            "seed": self.seed,
+        }
 
     def digest(self) -> str:
         return logical_hash(self.to_dict())
@@ -182,9 +203,15 @@ def _households(value: str) -> int:
     return int(d)
 
 
-def build_household_recipe(rows: Sequence[Mapping[str, Any]], *, geography: str, year: int,
-                           source_ref: Mapping[str, Any], seed: int,
-                           inconsistency_explanation: str | None = None) -> HouseholdRecipe:
+def build_household_recipe(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    geography: str,
+    year: int,
+    source_ref: Mapping[str, Any],
+    seed: int,
+    inconsistency_explanation: str | None = None,
+) -> HouseholdRecipe:
     """Rows: the ``lfst_hhnhtych`` dataset-input table of one country (dim1 = phhcomp, dim2 = n_child)."""
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValidationProblem("seed must be a non-negative int")
@@ -213,12 +240,19 @@ def build_household_recipe(rows: Sequence[Mapping[str, Any]], *, geography: str,
                 if v is not None and Decimal(v) != 0:
                     raise InconsistentHouseholdSource(
                         f"{geography} {year}: {cid} is impossible by definition but the source reports {v} thousand",
-                        cell=cid, value=v)
+                        cell=cid,
+                        value=v,
+                    )
                 structural.append(cid)
                 continue
             if v is None:
-                missing.append({"cell_id": cid, "reason": (r or {}).get("missing_reason") or "absent_from_source",
-                                "status": (r or {}).get("status", "")})
+                missing.append(
+                    {
+                        "cell_id": cid,
+                        "reason": (r or {}).get("missing_reason") or "absent_from_source",
+                        "status": (r or {}).get("status", ""),
+                    }
+                )
                 continue
             assert r is not None
             lo, hi, alo, ahi = size_bounds(comp, k)
@@ -238,20 +272,35 @@ def build_household_recipe(rows: Sequence[Mapping[str, Any]], *, geography: str,
             status = "not_computable_missing_leaves"
         else:
             status = "inconsistent"
-        check = {"status": status, "reported": reported, "leaf_sum": leaf_sum, "difference": diff,
-                 "rounding_tolerance": tolerance,
-                 "unexplained_remainder_if_missing": (reported - leaf_sum) if missing else None}
+        check = {
+            "status": status,
+            "reported": reported,
+            "leaf_sum": leaf_sum,
+            "difference": diff,
+            "rounding_tolerance": tolerance,
+            "unexplained_remainder_if_missing": (reported - leaf_sum) if missing else None,
+        }
         if status == "inconsistent" and inconsistency_explanation is None:
             raise InconsistentHouseholdSource(
                 f"{geography} {year}: household leaves sum to {leaf_sum} but the source TOTAL is {reported} "
-                f"(tolerance {tolerance}); record an explanation to proceed", totals_check=check)
+                f"(tolerance {tolerance}); record an explanation to proceed",
+                totals_check=check,
+            )
     if not cells:
         raise ValidationProblem("no observed household leaf cells")
     return HouseholdRecipe(
-        geography=geography, year=year, source_ref=source_ref, cells=tuple(cells), structural_zeros=tuple(structural),
-        observed_zero_cells=tuple(c.cell_id for c in cells if c.households == 0), missing_cells=tuple(missing),
-        reported_total=reported, totals_check=check, seed=seed,
-        accepted_inconsistency=inconsistency_explanation if check.get("status") == "inconsistent" else None)
+        geography=geography,
+        year=year,
+        source_ref=source_ref,
+        cells=tuple(cells),
+        structural_zeros=tuple(structural),
+        observed_zero_cells=tuple(c.cell_id for c in cells if c.households == 0),
+        missing_cells=tuple(missing),
+        reported_total=reported,
+        totals_check=check,
+        seed=seed,
+        accepted_inconsistency=inconsistency_explanation if check.get("status") == "inconsistent" else None,
+    )
 
 
 # --------------------------------------------------------------------------- materialisation
@@ -265,8 +314,9 @@ def allocate_households(recipe: HouseholdRecipe, n_records: int) -> dict[str, in
     if not 1 <= n_records <= MAX_HOUSEHOLD_RECORDS:
         raise ValidationProblem(f"n_records must be in [1, {MAX_HOUSEHOLD_RECORDS}]")
     if n_records < len(nz):
-        raise HouseholdResolutionError(f"{n_records} records cannot represent {len(nz)} nonzero household cells",
-                                       required_min=len(nz))
+        raise HouseholdResolutionError(
+            f"{n_records} records cannot represent {len(nz)} nonzero household cells", required_min=len(nz)
+        )
     total = sum(c.households for c in nz)
     extra = n_records - len(nz)
     base = {c.cell_id: 1 + (extra * c.households) // total for c in nz}
@@ -277,19 +327,21 @@ def allocate_households(recipe: HouseholdRecipe, n_records: int) -> dict[str, in
     return base
 
 
-HOUSEHOLD_SCHEMA = pa.schema([
-    pa.field("household_id", pa.int64(), nullable=False),
-    pa.field("cell_id", pa.string(), nullable=False),
-    pa.field("composition", pa.string(), nullable=False),
-    pa.field("n_child", pa.string(), nullable=False),
-    pa.field("size_lo", pa.int16(), nullable=False),
-    pa.field("size_hi", pa.int16(), nullable=True),
-    pa.field("adults_lo", pa.int16(), nullable=False),
-    pa.field("adults_hi", pa.int16(), nullable=True),
-    pa.field("weight", pa.float64(), nullable=False),
-    pa.field("weight_num", pa.int64(), nullable=False),
-    pa.field("weight_den", pa.int64(), nullable=False),
-])
+HOUSEHOLD_SCHEMA = pa.schema(
+    [
+        pa.field("household_id", pa.int64(), nullable=False),
+        pa.field("cell_id", pa.string(), nullable=False),
+        pa.field("composition", pa.string(), nullable=False),
+        pa.field("n_child", pa.string(), nullable=False),
+        pa.field("size_lo", pa.int16(), nullable=False),
+        pa.field("size_hi", pa.int16(), nullable=True),
+        pa.field("adults_lo", pa.int16(), nullable=False),
+        pa.field("adults_hi", pa.int16(), nullable=True),
+        pa.field("weight", pa.float64(), nullable=False),
+        pa.field("weight_num", pa.int64(), nullable=False),
+        pa.field("weight_den", pa.int64(), nullable=False),
+    ]
+)
 
 
 def materialise_households(recipe: HouseholdRecipe, n_records: int) -> pa.Table:
@@ -321,8 +373,12 @@ def materialise_households(recipe: HouseholdRecipe, n_records: int) -> pa.Table:
 
 def exact_sums(table: pa.Table, key: str) -> dict[str, Fraction]:
     out: dict[str, Fraction] = {}
-    for k, n, d in zip(table.column(key).to_pylist(), table.column("weight_num").to_pylist(),
-                       table.column("weight_den").to_pylist(), strict=True):
+    for k, n, d in zip(
+        table.column(key).to_pylist(),
+        table.column("weight_num").to_pylist(),
+        table.column("weight_den").to_pylist(),
+        strict=True,
+    ):
         out[k] = out.get(k, Fraction(0)) + Fraction(n, d)
     return out
 
@@ -334,8 +390,11 @@ def _margin(targets: Mapping[str, Fraction], est: Mapping[str, Fraction]) -> dic
         e = abs(est.get(k, Fraction(0)) - targets.get(k, Fraction(0)))
         if e > max_abs:
             worst, max_abs = k, e
-    return {"n_categories": len(set(targets) | set(est)), "max_abs_error": fraction_str(max_abs),
-            "worst_category": worst}
+    return {
+        "n_categories": len(set(targets) | set(est)),
+        "max_abs_error": fraction_str(max_abs),
+        "worst_category": worst,
+    }
 
 
 def size_share_bounds(recipe: HouseholdRecipe) -> dict[str, tuple[Fraction, Fraction]]:
@@ -358,8 +417,9 @@ def size_share_bounds(recipe: HouseholdRecipe) -> dict[str, tuple[Fraction, Frac
     return out
 
 
-def held_out_silc(recipe: HouseholdRecipe, size_rows: Sequence[Mapping[str, Any]],
-                  avg_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+def held_out_silc(
+    recipe: HouseholdRecipe, size_rows: Sequence[Mapping[str, Any]], avg_rows: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
     """Score the LFS-implied size intervals against EU-SILC (held out: never used for synthesis)."""
     shares = {r["dim1"]: r for r in size_rows if r.get("year") == recipe.year}
     bounds = size_share_bounds(recipe)
@@ -368,8 +428,11 @@ def held_out_silc(recipe: HouseholdRecipe, size_rows: Sequence[Mapping[str, Any]
     for cls in SIZE_CLASSES:
         lo, hi = bounds[cls]
         r = shares.get(cls)
-        entry: dict[str, Any] = {"size_class": cls, "lfs_implied_share_lower": fraction_decimal_str(lo, 6),
-                                 "lfs_implied_share_upper": fraction_decimal_str(hi, 6)}
+        entry: dict[str, Any] = {
+            "size_class": cls,
+            "lfs_implied_share_lower": fraction_decimal_str(lo, 6),
+            "lfs_implied_share_upper": fraction_decimal_str(hi, 6),
+        }
         if r is None or r.get("value") is None:
             entry["silc_share"] = None
             entry["status"] = "not_scored_missing"
@@ -385,24 +448,37 @@ def held_out_silc(recipe: HouseholdRecipe, size_rows: Sequence[Mapping[str, Any]
         classes.append(entry)
     avg = next((r for r in avg_rows if r.get("year") == recipe.year and r.get("value") is not None), None)
     lo_p, hi_p = recipe.persons_bounds()
-    avg_entry: dict[str, Any] = {"lfs_implied_average_lower": fraction_decimal_str(
-        Fraction(lo_p, recipe.total_households), 6),
-        "lfs_implied_average_upper": None if hi_p is None else fraction_decimal_str(
-            Fraction(hi_p, recipe.total_households), 6)}
+    avg_entry: dict[str, Any] = {
+        "lfs_implied_average_lower": fraction_decimal_str(Fraction(lo_p, recipe.total_households), 6),
+        "lfs_implied_average_upper": None
+        if hi_p is None
+        else fraction_decimal_str(Fraction(hi_p, recipe.total_households), 6),
+    }
     if avg is not None:
         a = Fraction(Decimal(avg["value"]))
         avg_entry["silc_average"] = avg["value"]
-        avg_entry["status"] = "inside" if a >= Fraction(lo_p, recipe.total_households) and (
-            hi_p is None or a <= Fraction(hi_p, recipe.total_households)) else "outside"
-    return {"source": "EU-SILC ilc_lvph03 / ilc_lvph01 (different survey; held out)",
-            "size_classes": classes, "scored": n_scored, "inside": n_ok, "average_size": avg_entry,
-            "note": ("The LFS and SILC household universes and sampling differ; an 'outside' class is a "
-                     "discrepancy between sources, reported, never corrected.")}
+        avg_entry["status"] = (
+            "inside"
+            if a >= Fraction(lo_p, recipe.total_households)
+            and (hi_p is None or a <= Fraction(hi_p, recipe.total_households))
+            else "outside"
+        )
+    return {
+        "source": "EU-SILC ilc_lvph03 / ilc_lvph01 (different survey; held out)",
+        "size_classes": classes,
+        "scored": n_scored,
+        "inside": n_ok,
+        "average_size": avg_entry,
+        "note": (
+            "The LFS and SILC household universes and sampling differ; an 'outside' class is a "
+            "discrepancy between sources, reported, never corrected."
+        ),
+    }
 
 
-def diagnose_households(table: pa.Table, recipe: HouseholdRecipe,
-                        held_out: Mapping[str, Any] | None = None,
-                        person_total: int | None = None) -> dict[str, Any]:
+def diagnose_households(
+    table: pa.Table, recipe: HouseholdRecipe, held_out: Mapping[str, Any] | None = None, person_total: int | None = None
+) -> dict[str, Any]:
     n = table.num_rows
     if n == 0:
         raise ValueError("empty table")
@@ -436,21 +512,34 @@ def diagnose_households(table: pa.Table, recipe: HouseholdRecipe,
         "total_weight": fraction_str(sum(joint.values(), Fraction(0))),
         "recipe_total_households": recipe.total_households,
         "effective_sample_size": s1 * s1 / s2,
-        "weight_concentration": {"gini_record_weights": gini,
-                                 "top_1pct_record_weight_share": float(np.sum(ws[-top_k:]) / s1)},
-        "calibration_error": {"joint_composition_children": _margin(jt, joint), "composition_margin": _margin(ct, comp),
-                              "children_margin": _margin(kt, kids),
-                              "basis": "exact weight_num/weight_den sums vs recipe cell counts"},
-        "support_violations": {"records_in_structural_zero_cells": in_struct, "records_in_observed_zero_cells": in_zero,
-                               "records_outside_recipe_cells": outside,
-                               "ok": in_struct == 0 and in_zero == 0 and outside == 0},
+        "weight_concentration": {
+            "gini_record_weights": gini,
+            "top_1pct_record_weight_share": float(np.sum(ws[-top_k:]) / s1),
+        },
+        "calibration_error": {
+            "joint_composition_children": _margin(jt, joint),
+            "composition_margin": _margin(ct, comp),
+            "children_margin": _margin(kt, kids),
+            "basis": "exact weight_num/weight_den sums vs recipe cell counts",
+        },
+        "support_violations": {
+            "records_in_structural_zero_cells": in_struct,
+            "records_in_observed_zero_cells": in_zero,
+            "records_outside_recipe_cells": outside,
+            "ok": in_struct == 0 and in_zero == 0 and outside == 0,
+        },
         "structural_constraints": {
             "structural_zero_cells": list(recipe.structural_zeros),
-            "size_rule": "size and adult counts follow from category definitions (exact or lower bounds)"},
+            "size_rule": "size and adult counts follow from category definitions (exact or lower bounds)",
+        },
         "totals_check": dict(recipe.totals_check),
         "missing_cells": list(recipe.missing_cells),
-        "persons_in_households_bounds": {"lower": lo_p, "upper": hi_p, "kind": "bounds",
-                                         "note": "open intervals (3+ children, other, no response) are not imputed"},
+        "persons_in_households_bounds": {
+            "lower": lo_p,
+            "upper": hi_p,
+            "kind": "bounds",
+            "note": "open intervals (3+ children, other, no response) are not imputed",
+        },
         "supported_associations": ["household composition x number of resident children (joint, source cells)"],
         "unsupported_associations": [{"association": a, "status": "unsupported"} for a in UNSUPPORTED_ASSOCIATIONS],
     }
@@ -458,10 +547,14 @@ def diagnose_households(table: pa.Table, recipe: HouseholdRecipe,
         out["held_out"] = dict(held_out)
     if person_total is not None:
         out["person_population_check"] = {
-            "person_recipe_total": person_total, "persons_in_households_lower_bound": lo_p,
+            "person_recipe_total": person_total,
+            "persons_in_households_lower_bound": lo_p,
             "status": "consistent" if lo_p <= person_total else "inconsistent",
-            "note": ("persons in private households (lower bound) must not exceed the resident population; "
-                     "the two sources differ in universe (private households vs usually resident population)")}
+            "note": (
+                "persons in private households (lower bound) must not exceed the resident population; "
+                "the two sources differ in universe (private households vs usually resident population)"
+            ),
+        }
     return out
 
 
@@ -472,12 +565,27 @@ class HouseholdSynthesis:
     diagnostics: dict[str, Any] = field(default_factory=dict)
 
 
-def synthesise_households(rows: Sequence[Mapping[str, Any]], *, geography: str, year: int, seed: int, n_records: int,
-                          source_ref: Mapping[str, Any], size_rows: Sequence[Mapping[str, Any]] = (),
-                          avg_rows: Sequence[Mapping[str, Any]] = (), person_total: int | None = None,
-                          inconsistency_explanation: str | None = None) -> HouseholdSynthesis:
-    recipe = build_household_recipe(rows, geography=geography, year=year, source_ref=source_ref, seed=seed,
-                                    inconsistency_explanation=inconsistency_explanation)
+def synthesise_households(
+    rows: Sequence[Mapping[str, Any]],
+    *,
+    geography: str,
+    year: int,
+    seed: int,
+    n_records: int,
+    source_ref: Mapping[str, Any],
+    size_rows: Sequence[Mapping[str, Any]] = (),
+    avg_rows: Sequence[Mapping[str, Any]] = (),
+    person_total: int | None = None,
+    inconsistency_explanation: str | None = None,
+) -> HouseholdSynthesis:
+    recipe = build_household_recipe(
+        rows,
+        geography=geography,
+        year=year,
+        source_ref=source_ref,
+        seed=seed,
+        inconsistency_explanation=inconsistency_explanation,
+    )
     table = materialise_households(recipe, n_records)
     held = held_out_silc(recipe, size_rows, avg_rows) if size_rows else None
     return HouseholdSynthesis(recipe, table, diagnose_households(table, recipe, held, person_total))

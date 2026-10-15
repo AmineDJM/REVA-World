@@ -79,8 +79,17 @@ def fresh_db(tmp_path_factory: pytest.TempPathFactory, label: str) -> Iterator[C
             time.sleep(1)
     store = FilesystemArtifactStore(root, settings.reva_s3_prefix)
     pooled = settings.model_copy(update={"reva_db_pool_size": 4, "reva_db_max_overflow": 4})
-    d = ChaosDB(settings, name, url, root, make_engine("migration", settings), make_engine("api", pooled),
-                make_engine("worker", pooled), make_engine("sim", settings), store)
+    d = ChaosDB(
+        settings,
+        name,
+        url,
+        root,
+        make_engine("migration", settings),
+        make_engine("api", pooled),
+        make_engine("worker", pooled),
+        make_engine("sim", settings),
+        store,
+    )
     # As tests/conftest.py: bootstrap() seeds the registry as the migration owner (R5-01); re-running
     # it as the owner is an idempotent no-op. (Older bootstraps did not seed: seed as the worker.)
     seed(d.owner if "seed_registry" in inspect.signature(bootstrap).parameters else d.worker, store)
@@ -142,21 +151,23 @@ class WorkerProc:
 
 def worker_env(d: ChaosDB, chaos_dir: Path, **extra: str) -> dict[str, str]:
     env = dict(os.environ)
-    env.update({
-        "REVA_ENV": "test",
-        "REVA_DB_NAME": d.name,  # the throwaway database, never the dev DB
-        "REVA_OBJECT_ROOT": str(d.root),
-        # The worker strips this in test (warning); point it at the throwaway DB regardless.
-        "REVA_MIGRATION_DATABASE_URL": d.url,
-        "REVA_JOB_LEASE_SECONDS": str(LEASE_SECONDS),
-        "REVA_JOB_HEARTBEAT_SECONDS": str(HEARTBEAT_SECONDS),
-        "REVA_WORKER_DRAIN_SECONDS": str(DRAIN_SECONDS),
-        "REVA_SCHEDULER_TICK_SECONDS": "3600",
-        "REVA_WORKER_CONCURRENCY": "1",
-        "REVA_LOG_LEVEL": "INFO",
-        "PYTHONUNBUFFERED": "1",
-        "CHAOS_DIR": str(chaos_dir),
-    })
+    env.update(
+        {
+            "REVA_ENV": "test",
+            "REVA_DB_NAME": d.name,  # the throwaway database, never the dev DB
+            "REVA_OBJECT_ROOT": str(d.root),
+            # The worker strips this in test (warning); point it at the throwaway DB regardless.
+            "REVA_MIGRATION_DATABASE_URL": d.url,
+            "REVA_JOB_LEASE_SECONDS": str(LEASE_SECONDS),
+            "REVA_JOB_HEARTBEAT_SECONDS": str(HEARTBEAT_SECONDS),
+            "REVA_WORKER_DRAIN_SECONDS": str(DRAIN_SECONDS),
+            "REVA_SCHEDULER_TICK_SECONDS": "3600",
+            "REVA_WORKER_CONCURRENCY": "1",
+            "REVA_LOG_LEVEL": "INFO",
+            "PYTHONUNBUFFERED": "1",
+            "CHAOS_DIR": str(chaos_dir),
+        }
+    )
     env.update(extra)
     return env
 
@@ -175,8 +186,14 @@ def start_worker(d: ChaosDB, chaos_dir: Path, *, cli: bool = False, **extra: str
     cmd = reva_cli() if cli else [sys.executable, str(LAUNCHER)]
     log_path = chaos_dir / f"worker-{uuid.uuid4().hex[:6]}.log"
     fh = open(log_path, "wb")  # closed in WorkerProc.stop()
-    p = subprocess.Popen(cmd, cwd=REPO, env=worker_env(d, chaos_dir, **extra), stdout=fh,
-                         stderr=subprocess.STDOUT, start_new_session=True)
+    p = subprocess.Popen(
+        cmd,
+        cwd=REPO,
+        env=worker_env(d, chaos_dir, **extra),
+        stdout=fh,
+        stderr=subprocess.STDOUT,
+        start_new_session=True,
+    )
     return WorkerProc(p, log_path, time.monotonic(), _log=fh)
 
 
@@ -195,8 +212,13 @@ def events(chaos_dir: Path, event: str | None = None, **match: Any) -> list[dict
     return sorted(out, key=lambda e: e["t"])
 
 
-def wait_until(pred: Callable[[], Any], timeout: float, interval: float = 0.1, what: str = "condition",
-               procs: list[WorkerProc] | None = None) -> Any:
+def wait_until(
+    pred: Callable[[], Any],
+    timeout: float,
+    interval: float = 0.1,
+    what: str = "condition",
+    procs: list[WorkerProc] | None = None,
+) -> Any:
     deadline = time.monotonic() + timeout
     while True:
         v = pred()
@@ -221,8 +243,12 @@ def job(d: ChaosDB, jid: uuid.UUID) -> dict[str, Any]:
 
 def clear_queue(d: ChaosDB) -> None:
     with d.owner.begin() as c:
-        c.execute(text("UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL, "
-                       "finished_at = clock_timestamp() WHERE status IN ('queued','running','cancel_requested')"))
+        c.execute(
+            text(
+                "UPDATE ops.job SET status = 'cancelled', worker_id = NULL, lease_until = NULL, "
+                "finished_at = clock_timestamp() WHERE status IN ('queued','running','cancel_requested')"
+            )
+        )
         c.execute(text("UPDATE ops.schedule SET enabled = false"))
 
 
@@ -233,10 +259,14 @@ def db_now(d: ChaosDB) -> Any:
 
 def terminate_worker_backends(d: ChaosDB, where: str = "true") -> int:
     with d.owner.connect() as c:
-        n = c.execute(text(
-            "SELECT count(pg_terminate_backend(pid)) FROM pg_stat_activity "
-            "WHERE datname = :db AND usename IN ('reva_worker','reva_sim') "
-            "AND application_name LIKE 'reva-worker%' AND " + where), {"db": d.name}).scalar_one()
+        n = c.execute(
+            text(
+                "SELECT count(pg_terminate_backend(pid)) FROM pg_stat_activity "
+                "WHERE datname = :db AND usename IN ('reva_worker','reva_sim') "
+                "AND application_name LIKE 'reva-worker%' AND " + where
+            ),
+            {"db": d.name},
+        ).scalar_one()
         c.commit()
     return int(n)
 

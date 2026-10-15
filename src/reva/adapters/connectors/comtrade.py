@@ -96,10 +96,27 @@ PARSER_VERSION = "comtrade-parse-3"
 JUMP_RATIO = Decimal(100)
 VALUATION_UNDETERMINED = "primaryValue (basis not determinable from response)"
 EXCHANGE_RATE_TRANSFORM = "provider_reported_usd (UN Comtrade methodology)"
-FIXED_DIMS = {"typeCode": "C", "freqCode": "A", "cmdCode": "2709", "customsCode": "C00", "motCode": 0,
-              "partner2Code": 0}
-DIM_FIELDS = ("period", "reporterCode", "flowCode", "partnerCode", "partner2Code", "cmdCode", "customsCode",
-              "motCode", "typeCode", "freqCode", "classificationCode")
+FIXED_DIMS = {
+    "typeCode": "C",
+    "freqCode": "A",
+    "cmdCode": "2709",
+    "customsCode": "C00",
+    "motCode": 0,
+    "partner2Code": 0,
+}
+DIM_FIELDS = (
+    "period",
+    "reporterCode",
+    "flowCode",
+    "partnerCode",
+    "partner2Code",
+    "cmdCode",
+    "customsCode",
+    "motCode",
+    "typeCode",
+    "freqCode",
+    "classificationCode",
+)
 # Value fields the parser publishes or derives the valuation label from: each must be
 # present in every row (null allowed = provider Missing) and a JSON number when not null.
 VALUE_FIELDS = ("primaryValue", "cifvalue", "fobvalue", "netWgt")
@@ -108,8 +125,12 @@ VALUE_FIELDS = ("primaryValue", "cifvalue", "fobvalue", "netWgt")
 REVIEWED_CLASSIFICATIONS = ("H4", "H5", "H6")
 # UNSD legacy estimation codes: (quantity estimated, net weight estimated). None of them
 # marks the trade value as estimated.
-LEGACY_ESTIMATION_CODES: dict[int, tuple[bool, bool]] = {0: (False, False), 2: (True, False), 4: (False, True),
-                                                         6: (True, True)}
+LEGACY_ESTIMATION_CODES: dict[int, tuple[bool, bool]] = {
+    0: (False, False),
+    2: (True, False),
+    4: (False, True),
+    6: (True, True),
+}
 
 
 def _legacy_code(v: Any) -> int | None:
@@ -165,8 +186,10 @@ class ComtradeConnector:
             licence="UN Comtrade terms of use",
             allowed_hosts=("comtradeapi.un.org",),
             dataset_ids=("C/A/HS/2709",),
-            field_mappings={**{f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
-                            **{f"{k}:netWgt:total": v for k, v in WEIGHT_CONCEPT.items()}},
+            field_mappings={
+                **{f"{k[0]}:{k[1]}": v for k, v in FLOW_CONCEPT.items()},
+                **{f"{k}:netWgt:total": v for k, v in WEIGHT_CONCEPT.items()},
+            },
             units={"primaryValue": "unit.usd", "netWgt": "unit.kg"},
             geography=self.reporters,
             time_semantics="annual calendar-year flow totals",
@@ -180,10 +203,7 @@ class ComtradeConnector:
         )
 
     def _url(self, reporter: int, flow: str, years: Sequence[int], partner: int | None) -> str:
-        url = (
-            f"{BASE}?period={','.join(map(str, years))}&reporterCode={reporter}&cmdCode=2709"
-            f"&flowCode={flow}"
-        )
+        url = f"{BASE}?period={','.join(map(str, years))}&reporterCode={reporter}&cmdCode=2709&flowCode={flow}"
         if partner is not None:
             url += f"&partnerCode={partner}"
         return url + f"&partner2Code=0&customsCode=C00&motCode=0&maxRecords={MAX_RECORDS}"
@@ -209,8 +229,7 @@ class ComtradeConnector:
                             key=f"bilateral:{iso}:{flow}:{y}",
                             url=self._url(code, flow, (y,), None),
                             max_bytes=5_000_000,
-                            params={"scope": "bilateral", "iso": iso, "reporter": code, "flow": flow,
-                                    "years": [y]},
+                            params={"scope": "bilateral", "iso": iso, "reporter": code, "flow": flow, "years": [y]},
                             required=False,
                         )
                     )
@@ -262,8 +281,11 @@ class ComtradeConnector:
             item_key=raw.item.key,
             observations=tuple(obs),
             expected_keys=expected,
-            metadata={**meta, "rows": [self._dims(r) for r in rows][:MAX_RECORDS],
-                      "row_structure": _row_structure(rows)},
+            metadata={
+                **meta,
+                "rows": [self._dims(r) for r in rows][:MAX_RECORDS],
+                "row_structure": _row_structure(rows),
+            },
             schema_fingerprint=schema_fingerprint(rows[:5]),
         )
 
@@ -336,8 +358,13 @@ class ComtradeConnector:
         valuation, warning = self._valuation(flow, r)
         if warning:
             flags["valuation_warning"] = warning
-        return {"currency": "USD", "price_basis": "nominal", "scale_factor": "1", "valuation": valuation,
-                "exchange_rate_transform": EXCHANGE_RATE_TRANSFORM}
+        return {
+            "currency": "USD",
+            "price_basis": "nominal",
+            "scale_factor": "1",
+            "valuation": valuation,
+            "exchange_rate_transform": EXCHANGE_RATE_TRANSFORM,
+        }
 
     def _support(self, iso: str, year: int, partner: str) -> Support:
         return Support(
@@ -386,8 +413,12 @@ class ComtradeConnector:
                     value = {"kind": "missing", "reason": "unavailable"}
                     flags["weight_unusable"] = True
                 else:
-                    value = {"kind": "decimal", "value": dec_str(w), "unit_ref": "unit.kg",
-                             "basis": {"scale_factor": "1"}}
+                    value = {
+                        "kind": "decimal",
+                        "value": dec_str(w),
+                        "unit_ref": "unit.kg",
+                        "basis": {"scale_factor": "1"},
+                    }
         flags["flowCode"] = flow
         return ParsedObservation(
             subject_provider="comtrade_reporter",
@@ -399,8 +430,10 @@ class ComtradeConnector:
             value=value,
             uncertainty=UncertaintySpec.unknown("UN Comtrade publishes no uncertainty for this value"),
             source_flags=flags,
-            raw_selector={"match": {"period": str(year), "partnerCode": 0, "flowCode": flow},
-                          "field": "primaryValue" if what == "value" else "netWgt"},
+            raw_selector={
+                "match": {"period": str(year), "partnerCode": 0, "flowCode": flow},
+                "field": "primaryValue" if what == "value" else "netWgt",
+            },
         )
 
     def _bilateral(self, p: dict[str, Any], r: dict[str, Any]) -> ParsedObservation:
@@ -412,8 +445,12 @@ class ComtradeConnector:
         value: dict[str, Any] = (
             {"kind": "missing", "reason": "unavailable"}
             if v is None
-            else {"kind": "decimal", "value": dec_str(v), "unit_ref": "unit.usd",
-                  "basis": self._value_basis(flow, r, flags)}
+            else {
+                "kind": "decimal",
+                "value": dec_str(v),
+                "unit_ref": "unit.usd",
+                "basis": self._value_basis(flow, r, flags),
+            }
         )
         reporter_dir, partner_dir = ("in", "out") if flow == "M" else ("out", "in")
         return ParsedObservation(
@@ -426,20 +463,28 @@ class ComtradeConnector:
             value=value,
             uncertainty=UncertaintySpec.unknown("UN Comtrade publishes no uncertainty for this value"),
             source_flags=flags,
-            raw_selector={"match": {"period": str(year), "partnerCode": int(partner), "flowCode": flow},
-                          "field": "primaryValue"},
+            raw_selector={
+                "match": {"period": str(year), "partnerCode": int(partner), "flowCode": flow},
+                "field": "primaryValue",
+            },
             relation=RelationSpec(
                 predicate="predicate.trade_flow",
                 layer="trade.crude_petroleum",
                 participants=(
-                    {"role": "role.reporter", "provider": "comtrade_reporter", "key": str(REPORTERS[iso]),
-                     "direction": reporter_dir},
-                    {"role": "role.partner", "provider": "comtrade_partner", "key": partner,
-                     "direction": partner_dir},
+                    {
+                        "role": "role.reporter",
+                        "provider": "comtrade_reporter",
+                        "key": str(REPORTERS[iso]),
+                        "direction": reporter_dir,
+                    },
+                    {"role": "role.partner", "provider": "comtrade_partner", "key": partner, "direction": partner_dir},
                     {"role": "role.product", "provider": "hs_heading", "key": "2709", "direction": "undirected"},
                 ),
-                component={"flow": flow, "valuation": value.get("basis", {}).get("valuation"),
-                           "classification": r.get("classificationCode")},
+                component={
+                    "flow": flow,
+                    "valuation": value.get("basis", {}).get("valuation"),
+                    "classification": r.get("classificationCode"),
+                },
             ),
         )
 
@@ -450,11 +495,17 @@ class ComtradeConnector:
         count = meta.get("count")
         n = meta["returned_rows"]
         if count is None or int(count) != n:
-            findings.append(Finding(code="count_mismatch", severity="blocker",
-                                    message=f"count={count} but {n} rows returned"))
+            findings.append(
+                Finding(code="count_mismatch", severity="blocker", message=f"count={count} but {n} rows returned")
+            )
         if n >= MAX_RECORDS:
-            findings.append(Finding(code="possible_truncation", severity="blocker",
-                                    message="row count reached maxRecords; preview truncation cannot be excluded"))
+            findings.append(
+                Finding(
+                    code="possible_truncation",
+                    severity="blocker",
+                    message="row count reached maxRecords; preview truncation cannot be excluded",
+                )
+            )
         seen = set()
         for d in meta["rows"]:
             want = {**FIXED_DIMS, "reporterCode": req["reporter"], "flowCode": req["flow"]}
@@ -462,41 +513,78 @@ class ComtradeConnector:
                 want["partnerCode"] = 0
             for k, v in want.items():
                 if str(d.get(k)) != str(v):
-                    findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                            message=f"{k}={d.get(k)} differs from requested {v}"))
+                    findings.append(
+                        Finding(
+                            code="dimension_mismatch",
+                            severity="blocker",
+                            message=f"{k}={d.get(k)} differs from requested {v}",
+                        )
+                    )
             if int(str(d.get("period"))) not in [int(y) for y in req["years"]]:
-                findings.append(Finding(code="dimension_mismatch", severity="blocker",
-                                        message=f"unexpected period {d.get('period')}"))
+                findings.append(
+                    Finding(
+                        code="dimension_mismatch", severity="blocker", message=f"unexpected period {d.get('period')}"
+                    )
+                )
             key = (d.get("period"), d.get("partnerCode"), d.get("classificationCode"))
             dims_key = (d.get("period"), d.get("partnerCode"))
             if dims_key in seen:
-                findings.append(Finding(code="ambiguous_duplicate", severity="blocker",
-                                        message=f"duplicate rows for {key}"))
+                findings.append(
+                    Finding(code="ambiguous_duplicate", severity="blocker", message=f"duplicate rows for {key}")
+                )
             seen.add(dims_key)
         findings.extend(_structure_findings(meta))
-        missing = [o.logical_key for o in batch.observations if o.value.get("kind") == "missing"
-                   and o.logical_key.endswith("primaryValue")]
+        missing = [
+            o.logical_key
+            for o in batch.observations
+            if o.value.get("kind") == "missing" and o.logical_key.endswith("primaryValue")
+        ]
         if missing:
-            findings.append(Finding(code="missing_flow", severity="warning",
-                                    message=f"{len(missing)} requested flows returned no value (kept Missing)"))
+            findings.append(
+                Finding(
+                    code="missing_flow",
+                    severity="warning",
+                    message=f"{len(missing)} requested flows returned no value (kept Missing)",
+                )
+            )
         undetermined = [o for o in batch.observations if o.source_flags.get("valuation_warning")]
         if undetermined:
             codes = sorted({str(o.source_flags["valuation_warning"]) for o in undetermined})
-            findings.append(Finding(code="valuation_basis_undetermined", severity="warning",
-                                    message=f"{len(undetermined)} values carry an undeterminable valuation basis "
-                                            f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'"))
+            findings.append(
+                Finding(
+                    code="valuation_basis_undetermined",
+                    severity="warning",
+                    message=f"{len(undetermined)} values carry an undeterminable valuation basis "
+                    f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'",
+                )
+            )
         estimated = [o for o in batch.observations if o.source_flags.get("provider_quantity_estimated")]
         if estimated:
-            findings.append(Finding(code="provider_quantity_estimated", severity="info",
-                                    message=f"{len(estimated)} net weights are estimated by the provider "
-                                            "(isQtyEstimated/isNetWgtEstimated, legacyEstimationFlag 2/4/6); "
-                                            "trade values are as reported"))
-        unknown = sorted({str(o.source_flags.get("legacyEstimationFlag")) for o in batch.observations
-                          if o.source_flags.get("legacy_estimation_code_unrecognised")})
+            findings.append(
+                Finding(
+                    code="provider_quantity_estimated",
+                    severity="info",
+                    message=f"{len(estimated)} net weights are estimated by the provider "
+                    "(isQtyEstimated/isNetWgtEstimated, legacyEstimationFlag 2/4/6); "
+                    "trade values are as reported",
+                )
+            )
+        unknown = sorted(
+            {
+                str(o.source_flags.get("legacyEstimationFlag"))
+                for o in batch.observations
+                if o.source_flags.get("legacy_estimation_code_unrecognised")
+            }
+        )
         if unknown:
-            findings.append(Finding(code="estimation_code_unrecognised", severity="warning",
-                                    message=f"legacyEstimationFlag {', '.join(unknown)} is outside the UNSD codes "
-                                            "0/2/4/6; estimation status of these rows needs review"))
+            findings.append(
+                Finding(
+                    code="estimation_code_unrecognised",
+                    severity="warning",
+                    message=f"legacyEstimationFlag {', '.join(unknown)} is outside the UNSD codes "
+                    "0/2/4/6; estimation status of these rows needs review",
+                )
+            )
         findings.extend(self._jump_signals(batch))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
 
@@ -521,10 +609,14 @@ class ComtradeConnector:
                     continue
                 ratio = max(v, w) / min(v, w)
                 if ratio > JUMP_RATIO:
-                    out.append(Finding(
-                        code="implausible_jump", severity="warning",
-                        message=f"{o.logical_key}: {v} vs {w} in {adj} (x{ratio:.0f} > x{JUMP_RATIO}); "
-                                "review signal only, value kept as reported"))
+                    out.append(
+                        Finding(
+                            code="implausible_jump",
+                            severity="warning",
+                            message=f"{o.logical_key}: {v} vs {w} in {adj} (x{ratio:.0f} > x{JUMP_RATIO}); "
+                            "review signal only, value kept as reported",
+                        )
+                    )
         return out
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
@@ -562,8 +654,13 @@ def _structure_findings(meta: dict[str, Any]) -> list[Finding]:
     out: list[Finding] = []
     structure = meta.get("row_structure")
     if structure is None:
-        return [Finding(code="structure_unverifiable", severity="blocker",
-                        message="batch carries no row structure record; drift cannot be excluded")]
+        return [
+            Finding(
+                code="structure_unverifiable",
+                severity="blocker",
+                message="batch carries no row structure record; drift cannot be excluded",
+            )
+        ]
     absent: dict[str, int] = {}
     types: dict[str, set[str]] = {}
     for s in structure:
@@ -574,16 +671,36 @@ def _structure_findings(meta: dict[str, Any]) -> list[Finding]:
         for k, t in (s.get("value_types") or {}).items():
             types.setdefault(k, set()).add(t)
     for k, n in sorted(absent.items()):
-        out.append(Finding(code="field_absent", severity="blocker",
-                           message=f"{n} rows lack the consumed field '{k}' (renamed or removed?); a structurally "
-                                   "absent field is schema drift, not a provider Missing"))
+        out.append(
+            Finding(
+                code="field_absent",
+                severity="blocker",
+                message=f"{n} rows lack the consumed field '{k}' (renamed or removed?); a structurally "
+                "absent field is schema drift, not a provider Missing",
+            )
+        )
     for k, ts in sorted(types.items()):
-        out.append(Finding(code="value_type_drift", severity="blocker",
-                           message=f"'{k}' is {'/'.join(sorted(ts))}, expected a JSON number or null (never coerced)"))
-    unreviewed = sorted({str(d.get("classificationCode")) for d in meta.get("rows", ())
-                         if d.get("classificationCode") not in REVIEWED_CLASSIFICATIONS})
+        out.append(
+            Finding(
+                code="value_type_drift",
+                severity="blocker",
+                message=f"'{k}' is {'/'.join(sorted(ts))}, expected a JSON number or null (never coerced)",
+            )
+        )
+    unreviewed = sorted(
+        {
+            str(d.get("classificationCode"))
+            for d in meta.get("rows", ())
+            if d.get("classificationCode") not in REVIEWED_CLASSIFICATIONS
+        }
+    )
     if unreviewed:
-        out.append(Finding(code="classification_unreviewed", severity="blocker",
-                           message=f"classificationCode {', '.join(unreviewed)} is outside the reviewed mapping's "
-                                   f"applicability ({', '.join(REVIEWED_CLASSIFICATIONS)})"))
+        out.append(
+            Finding(
+                code="classification_unreviewed",
+                severity="blocker",
+                message=f"classificationCode {', '.join(unreviewed)} is outside the reviewed mapping's "
+                f"applicability ({', '.join(REVIEWED_CLASSIFICATIONS)})",
+            )
+        )
     return out

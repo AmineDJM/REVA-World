@@ -23,7 +23,8 @@ from reva.simulation import plugins
 from reva.simulation.plugins import ResolvedInputs
 
 _spec = importlib.util.spec_from_file_location(
-    "io_synthetic", Path(__file__).resolve().parents[1] / "fixtures" / "io_tables" / "synthetic.py")
+    "io_synthetic", Path(__file__).resolve().parents[1] / "fixtures" / "io_tables" / "synthetic.py"
+)
 assert _spec and _spec.loader
 syn = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(syn)
@@ -32,28 +33,46 @@ DIMS = it.TableDims(countries=syn.COUNTRIES, industries=syn.INDUSTRIES)
 
 @pytest.fixture(scope="module")
 def built() -> it.BuiltDataset:
-    items = [it.parse_sdmx_csv(syn.body(g), dataset=syn.DATASET, year=syn.YEAR, origins=g, dims=DIMS)
-             for g in syn.groups()]
+    items = [
+        it.parse_sdmx_csv(syn.body(g), dataset=syn.DATASET, year=syn.YEAR, origins=g, dims=DIMS) for g in syn.groups()
+    ]
     return it.build_dataset(items, dataset=syn.DATASET, year=syn.YEAR, origin="test_fixture", dims=DIMS)
 
 
 def spec(**over: Any) -> dict[str, Any]:
     doc: dict[str, Any] = {
-        "model_key": m.MODEL_KEY, "model_version": m.MODEL_VERSION, "reference_year": 2024,
-        "countries": ["FRA", "DEU"], "horizon": {"periods": 1, "unit": "annual_accounting_period"},
-        "intervention": {"kind": "set_exogenous_industry_price_change",
-                         "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "10"}]},
+        "model_key": m.MODEL_KEY,
+        "model_version": m.MODEL_VERSION,
+        "reference_year": 2024,
+        "countries": ["FRA", "DEU"],
+        "horizon": {"periods": 1, "unit": "annual_accounting_period"},
+        "intervention": {
+            "kind": "set_exogenous_industry_price_change",
+            "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "10"}],
+        },
         "assumptions": {"pass_through_grid": ["0.5", "0.75", "1"]},
-        "outputs": list(m.OUTPUT_GROUPS), "missing_input_policy": "fail", "fidelity": "L1"}
+        "outputs": list(m.OUTPUT_GROUPS),
+        "missing_input_policy": "fail",
+        "fidelity": "L1",
+    }
     doc.update(over)
     return doc
 
 
-def inputs(built: it.BuiltDataset, doc: dict[str, Any], *, coverage: dict[str, Any] | None = None,
-           missing: bool = False) -> ResolvedInputs:
+def inputs(
+    built: it.BuiltDataset, doc: dict[str, Any], *, coverage: dict[str, Any] | None = None, missing: bool = False
+) -> ResolvedInputs:
     reqs = m.MODEL.requirements(doc)
-    ds = None if missing else {(m.DATASET_INPUT, m.DATASET_SUBJECT): (
-        built.table(), {"dataset_id": "ds-1", "coverage": coverage or built.manifest})}
+    ds = (
+        None
+        if missing
+        else {
+            (m.DATASET_INPUT, m.DATASET_SUBJECT): (
+                built.table(),
+                {"dataset_id": "ds-1", "coverage": coverage or built.manifest},
+            )
+        }
+    )
     return ResolvedInputs.from_values(reqs, datasets=ds, release={"id": "rel-1"})
 
 
@@ -101,7 +120,8 @@ def test_household_basket_and_contributions_match_hand_computation(built: it.Bui
     assert val(dom) == q(100 * 50 * P_FR_C / 100) and val(imp) == q(100 * (30 * P_DE_C + 2) / 100)
     assert val(r[("household_basket_contribution_domestic_shocks_percent", "FRA", "L1")]) == 0
     assert val(r[("household_basket_contribution_foreign_shocks_percent", "FRA", "L1")]) == val(
-        r[(m.BASKET_KEY, "FRA", "L1")])
+        r[(m.BASKET_KEY, "FRA", "L1")]
+    )
     # DEU households buy nothing in the synthetic table: a typed not-applicable value, never 0 or a crash
     d = r[(m.BASKET_KEY, "DEU", "L1")]
     assert d.value == {"kind": "missing", "reason": "not_applicable"} and "no household" in d.applicability["note"]
@@ -127,8 +147,13 @@ def test_l2_pass_through_grid_and_one_sided_sensitivity_range(built: it.BuiltDat
 
 
 def test_zero_output_industry_is_not_applicable_never_zero(built: it.BuiltDataset) -> None:
-    doc = spec(countries=["FRA"], intervention={"kind": "set_exogenous_industry_price_change", "shocks": [
-        {"origin": "FIGARO_ROW", "industry": "B", "price_change_percent": "50"}]})
+    doc = spec(
+        countries=["FRA"],
+        intervention={
+            "kind": "set_exogenous_industry_price_change",
+            "shocks": [{"origin": "FIGARO_ROW", "industry": "B", "price_change_percent": "50"}],
+        },
+    )
     compiled = m.MODEL.compile(inputs(built, doc), doc)
     assert compiled.arrays.diagnostics["zero_output_industries"] == 1
     arr = compiled.arrays
@@ -140,8 +165,10 @@ def test_zero_output_industry_is_not_applicable_never_zero(built: it.BuiltDatase
 
 
 def test_linearity_and_decomposition_by_shock_origin(built: it.BuiltDataset) -> None:
-    both = [{"origin": "DEU", "industry": "B", "price_change_percent": "10"},
-            {"origin": "FRA", "industry": "B", "price_change_percent": "-20"}]
+    both = [
+        {"origin": "DEU", "industry": "B", "price_change_percent": "10"},
+        {"origin": "FRA", "industry": "B", "price_change_percent": "-20"},
+    ]
     doc = spec(intervention={"kind": "set_exogenous_industry_price_change", "shocks": both}, countries=["FRA"])
     compiled = m.MODEL.compile(inputs(built, doc), doc)
     sol = m.solve(compiled.arrays, compiled.spec.shocks, Decimal("0.75"))
@@ -178,12 +205,24 @@ def test_productivity_bound_and_rounding() -> None:
 def test_validation_envelopes_and_coverage() -> None:
     m.MODEL.validate(spec())
     gaps = [
-        spec(intervention={"kind": "set_exogenous_industry_price_change",
-                           "shocks": [{"origin": "DEU", "industry": "C24", "price_change_percent": "10"}]}),
-        spec(intervention={"kind": "set_exogenous_industry_price_change",
-                           "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "250"}]}),
-        spec(intervention={"kind": "set_exogenous_industry_price_change",
-                           "shocks": [{"origin": "DZA", "industry": "B", "price_change_percent": "10"}]}),
+        spec(
+            intervention={
+                "kind": "set_exogenous_industry_price_change",
+                "shocks": [{"origin": "DEU", "industry": "C24", "price_change_percent": "10"}],
+            }
+        ),
+        spec(
+            intervention={
+                "kind": "set_exogenous_industry_price_change",
+                "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "250"}],
+            }
+        ),
+        spec(
+            intervention={
+                "kind": "set_exogenous_industry_price_change",
+                "shocks": [{"origin": "DZA", "industry": "B", "price_change_percent": "10"}],
+            }
+        ),
         spec(countries=["DZA"]),
         spec(horizon={"periods": 5, "unit": "annual_accounting_period"}),
         spec(outputs=["inflation_forecast"]),
@@ -192,16 +231,31 @@ def test_validation_envelopes_and_coverage() -> None:
     for doc in gaps:
         with pytest.raises(CapabilityGap):
             m.MODEL.validate(doc)
-    for doc in (spec(assumptions={"pass_through_grid": [0]}), spec(assumptions={"pass_through_grid": [1.5]}),
-                spec(intervention={"kind": "other", "shocks": []}),
-                spec(intervention={"kind": "set_exogenous_industry_price_change", "shocks": [
+    for doc in (
+        spec(assumptions={"pass_through_grid": [0]}),
+        spec(assumptions={"pass_through_grid": [1.5]}),
+        spec(intervention={"kind": "other", "shocks": []}),
+        spec(
+            intervention={
+                "kind": "set_exogenous_industry_price_change",
+                "shocks": [
                     {"origin": "DEU", "industry": "B", "price_change_percent": "10"},
-                    {"origin": "DEU", "industry": "B", "price_change_percent": "5"}]})):
+                    {"origin": "DEU", "industry": "B", "price_change_percent": "5"},
+                ],
+            }
+        ),
+    ):
         with pytest.raises(ValidationProblem):
             m.MODEL.validate(doc)
     with pytest.raises(CapabilityGap):  # -100 % (a free good) is outside the envelope
-        m.parse_spec(spec(intervention={"kind": "set_exogenous_industry_price_change", "shocks": [
-            {"origin": "DEU", "industry": "B", "price_change_percent": "-100"}]}))
+        m.parse_spec(
+            spec(
+                intervention={
+                    "kind": "set_exogenous_industry_price_change",
+                    "shocks": [{"origin": "DEU", "industry": "B", "price_change_percent": "-100"}],
+                }
+            )
+        )
 
 
 def test_missing_dataset_and_year_mismatch_are_typed(built: it.BuiltDataset) -> None:
@@ -226,8 +280,15 @@ def test_plugin_registration_manifest_and_schema() -> None:
     [req] = m.MODEL.requirements(spec())
     assert (req.kind, req.concept, req.subject, req.years) == ("dataset", m.DATASET_CONCEPT, "WORLD", (2024,))
     sch = m.MODEL.spec_schema()
-    assert set(sch) <= {"intervention", "assumptions", "outputs", "countries", "reference_year", "horizon",
-                        "missing_input_policy"}
+    assert set(sch) <= {
+        "intervention",
+        "assumptions",
+        "outputs",
+        "countries",
+        "reference_year",
+        "horizon",
+        "missing_input_policy",
+    }
     assert "FIGARO_ROW" not in sch["countries"]["items"]["enum"]
     assert "B" in m.SHOCKABLE_INDUSTRIES and "broader than crude" in m.SHOCKABLE_INDUSTRIES["B"].lower()
     assert m.MODEL.fidelities == frozenset({"L1", "L2"})
@@ -237,8 +298,16 @@ def test_plugin_registration_manifest_and_schema() -> None:
 # ------------------------------------------------------------------ valuation (review M9)
 def _built_with_household_taxes(fr_taxes: str) -> it.BuiltDataset:
     over = {("DOM", "D21X31", "FR", "P3_S14"): fr_taxes}
-    items = [it.parse_sdmx_csv(syn.body(g, overrides=over if g == ("DOM",) else None), dataset=syn.DATASET,
-                               year=syn.YEAR, origins=g, dims=DIMS) for g in syn.groups()]
+    items = [
+        it.parse_sdmx_csv(
+            syn.body(g, overrides=over if g == ("DOM",) else None),
+            dataset=syn.DATASET,
+            year=syn.YEAR,
+            origins=g,
+            dims=DIMS,
+        )
+        for g in syn.groups()
+    ]
     return it.build_dataset(items, dataset=syn.DATASET, year=syn.YEAR, origin="test_fixture", dims=DIMS)
 
 

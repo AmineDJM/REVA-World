@@ -414,7 +414,8 @@ enforcement moves to the proxy (allowlist plus private-range deny) and make the 
 As a minimum interim check, before reading the body:
 ```python
 peer = resp.extensions["network_stream"].get_extra_info("server_addr")
-if peer and not address_is_public(peer[0]): raise UnsafeRequest("connected to non-public address")
+if peer and not address_is_public(peer[0]):
+    raise UnsafeRequest("connected to non-public address")
 ```
 
 ### R-13 — Decompression memory blow-up before the size limit (VERIFIED)
@@ -435,14 +436,20 @@ Fix: read raw bytes and decode incrementally with a bound.
 codings = [c.strip() for c in resp.headers.get("content-encoding", "identity").split(",") if c.strip()]
 if len(codings) > 1 or codings[0] not in ("identity", "gzip", "deflate"):
     raise UnsafeRequest(f"unsupported content-encoding {codings}")
-d = zlib.decompressobj(16 + zlib.MAX_WBITS if codings[0] == "gzip" else zlib.MAX_WBITS) if codings[0] != "identity" else None
+d = (
+    zlib.decompressobj(16 + zlib.MAX_WBITS if codings[0] == "gzip" else zlib.MAX_WBITS)
+    if codings[0] != "identity"
+    else None
+)
 async for raw in resp.aiter_raw():
     buf = raw if d is None else d.decompress(raw, limit - total + 1)
     while True:
         total += len(buf)
-        if total > limit: raise UnsafeRequest(...)
+        if total > limit:
+            raise UnsafeRequest(...)
         chunks.append(buf)
-        if d is None or not d.unconsumed_tail: break
+        if d is None or not d.unconsumed_tail:
+            break
         buf = d.decompress(d.unconsumed_tail, limit - total + 1)
 ```
 
@@ -520,17 +527,22 @@ Fix: send a SCRAM verifier, never the password, and sanitise errors.
 ```python
 def scram_verifier(pw: str, iterations: int = 4096) -> str:
     import base64, hashlib, hmac, os
+
     salt = os.urandom(16)
     salted = hashlib.pbkdf2_hmac("sha256", pw.encode(), salt, iterations)
     ck = hmac.new(salted, b"Client Key", "sha256").digest()
     sk = hmac.new(salted, b"Server Key", "sha256").digest()
     b64 = lambda b: base64.b64encode(b).decode()
     return f"SCRAM-SHA-256${iterations}:{b64(salt)}${b64(hashlib.sha256(ck).digest())}:{b64(sk)}"
+
+
 ...
 try:
     conn.execute(text(stmt_with_verifier))
 except Exception as e:
-    raise ConfigurationError(f"provisioning {login} failed: {type(e.orig if hasattr(e,'orig') else e).__name__}") from None
+    raise ConfigurationError(
+        f"provisioning {login} failed: {type(e.orig if hasattr(e, 'orig') else e).__name__}"
+    ) from None
 ```
 Also require a minimum password length (for example ≥ 24) before provisioning.
 

@@ -64,8 +64,11 @@ def seed_plan(run_seed: int, model_id: str, entity_ids: list[str], draws_per_ent
         "derivation": DERIVATION,
         "model_id": model_id,
         "streams": [
-            {"entity_id": e, "draws": draws_per_entity,
-             "first_stream_key": stream_key(run_seed, model_id, e, 0) if draws_per_entity else None}
+            {
+                "entity_id": e,
+                "draws": draws_per_entity,
+                "first_stream_key": stream_key(run_seed, model_id, e, 0) if draws_per_entity else None,
+            }
             for e in sorted(entity_ids)
         ],
         "random_draws_used": draws_per_entity * len(entity_ids),
