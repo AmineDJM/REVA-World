@@ -4,7 +4,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { getLocations } from '../../api/client';
 import { useApi } from '../../lib/useApi';
 import { warningsFr } from '../api/common';
-import { conceptLabel, getAtlasConcepts, getAtlasCoverage, getAtlasMap, type AtlasConcept, type AtlasMapResponse } from '../api/atlas';
+import { conceptLabel, getAtlasCatalog, getAtlasCoverage, getAtlasMap, type AtlasConcept, type AtlasMapResponse } from '../api/atlas';
 import { FixtureBadge, MissingCell, ProviderDeclaredBadge } from '../components/Honesty';
 import { V3Empty, V3Error, V3Loading } from '../components/States';
 import { buildScale, cellText, countryStates, iso3OfFeatureKey, legendRows, NO_SOURCE_REASON, OUTSIDE, ranking } from '../lib/choropleth';
@@ -22,7 +22,7 @@ export default function AtlasPage() {
   const navigate = useNavigate();
   const concept = params.get('concept');
   const yearParam = params.get('annee');
-  const concepts = useApi((s) => getAtlasConcepts({}, s), []);
+  const concepts = useApi(() => getAtlasCatalog(), []);
   const coverage = useApi((s) => getAtlasCoverage({ concept: concept! }, s), [concept], !!concept);
   const locations = useApi((s) => getLocations(undefined, s), []);
   const [filter, setFilter] = useState('');

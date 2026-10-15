@@ -1,0 +1,78 @@
+# REVA headline concepts: trade (agent ATLASOPS). See population.yaml for the rules.
+theme: trade
+concepts:
+  - id: reva.trade.current_account_gdp
+    labels: {fr: "Solde courant (% du PIB)", en: "Current account balance (% of GDP)"}
+    definition: "Balance of payments current account balance (BPM6), surplus positive, as a percentage of GDP."
+    unit: "% of GDP"
+    series:
+      - series: "imf.weo.BCA_NGDPD"
+        justification: "IMF WEO \"Current account balance, percent of GDP\" (BPM6). Projection years excluded."
+      - series: "wb.wdi_econ.BN.CAB.XOKA.GD.ZS"
+        justification: >-
+          WDI "Current account balance (% of GDP)": IMF balance of payments current account divided by WDI GDP —
+          the same quantity.
+        caveats: "The WDI divides by its own GDP in US dollars."
+    related_catalog_concepts: [imf.current_account_balance_gdp]
+
+  - id: reva.trade.goods_balance_usd
+    labels: {fr: "Solde commercial des biens (balance des paiements, dollars US)", en: "Trade balance in goods (balance of payments, US dollars)"}
+    definition: >-
+      Goods exports minus goods imports, both FOB, balance-of-payments basis (BPM6), current US dollars.
+      Surplus positive, deficit negative.
+    unit: US dollars
+    series:
+      - series: "imf.bop.G|entry=NETCD_T"
+        justification: "IMF Balance of Payments (BPM6) goods, net (credit minus debit), US dollars — this definition."
+      - series: "wb.wdi_econ.BN.GSR.MRCH.CD"
+        justification: "WDI \"Net trade in goods (BoP, current US$)\" from IMF BOP statistics — the same quantity."
+    derived:
+      formula: difference
+      alternatives:
+        - [{series: "imf.bop.G|entry=CD_T"}, {series: "imf.bop.G|entry=DB_T"}]
+        - [{series: "wb.wdi_econ.BX.GSR.MRCH.CD"}, {series: "wb.wdi_econ.BM.GSR.MRCH.CD"}]
+      justification: >-
+        Exact by definition (net = credit - debit), each pair from one source (IMF BOP goods credit and debit; or
+        WDI BoP goods exports and imports), same country and year. Used only when no net value is reported.
+    not_equivalent:
+      - series: "imf.imts.XG_FOB_USD|partner=G001 - imf.imts.MG_CIF_USD|partner=G001"
+        reason: >-
+          Customs merchandise trade with imports valued CIF: not the BOP goods balance (valuation and coverage
+          differ); see reva.trade.merchandise_balance_imts.
+    related_catalog_concepts: [imf.goods_balance_usd]
+
+  - id: reva.trade.goods_services_balance_usd
+    labels: {fr: "Solde des biens et services (balance des paiements, dollars US)", en: "Balance on goods and services (balance of payments, US dollars)"}
+    definition: "Exports minus imports of goods and services, balance-of-payments basis (BPM6), current US dollars."
+    unit: US dollars
+    series:
+      - series: "imf.bop.GS|entry=NETCD_T"
+        justification: "IMF BOP goods and services, net, US dollars — this definition."
+      - series: "wb.wdi_econ.BN.GSR.GNFS.CD"
+        justification: "WDI \"Net trade in goods and services (BoP, current US$)\" from IMF BOP — the same quantity."
+    derived:
+      formula: difference
+      alternatives:
+        - [{series: "imf.bop.GS|entry=CD_T"}, {series: "imf.bop.GS|entry=DB_T"}]
+      justification: "Exact by definition (credit - debit), same source (IMF BOP), same country and year."
+    not_equivalent:
+      - series: "wb NE.RSB.GNFS.CD"
+        reason: "National-accounts external balance on goods and services (not BOP basis)."
+    related_catalog_concepts: [imf.goods_services_balance_usd]
+
+  - id: reva.trade.merchandise_balance_imts
+    labels: {fr: "Solde du commerce de marchandises (douanes, exportations FAB - importations CAF)", en: "Merchandise trade balance (customs, exports FOB - imports CIF)"}
+    definition: >-
+      Merchandise exports to the world (FOB) minus merchandise imports from the world (CIF), IMF International
+      Trade in Goods (successor of DOTS), current US dollars. Not the BOP goods balance (imports include
+      insurance and freight).
+    unit: US dollars
+    derived:
+      formula: difference
+      alternatives:
+        - [{series: "imf.imts.XG_FOB_USD|partner=G001"}, {series: "imf.imts.MG_CIF_USD|partner=G001"}]
+      justification: >-
+        Exact difference of two series of the same source and table (IMTS exports and imports with the world),
+        same reporter and year. Covers economies without BOP data (e.g. CUB, PRK, GRL).
+    caveats: "IMTS includes IMF estimates for non-reporting economies (not always flagged per cell)."
+    related_catalog_concepts: [imf.goods_exports_world_usd, imf.goods_imports_world_usd]

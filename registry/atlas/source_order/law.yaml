@@ -1,0 +1,20 @@
+# REVA headline concepts: law and crime (agent ATLASOPS). See population.yaml for the rules.
+theme: law
+concepts:
+  - id: reva.law.homicide_rate
+    labels: {fr: "Taux d'homicides volontaires (pour 100 000 habitants)", en: "Intentional homicide rate (per 100,000 population)"}
+    definition: >-
+      Victims of intentional homicide (unlawful death inflicted on a person with the intent to cause death or
+      serious injury; UNODC ICCS definition) per 100,000 population.
+    unit: per 100,000 population
+    series:
+      - series: "un_sdg.sdg_headline.VC_IHR_PSRC|Reporting Type=G|Sex=BOTHSEX"
+        justification: "UN SDG indicator 16.1.1 (UNODC), both sexes: the reference UNODC series."
+      - series: "wb.wdi_econ.VC.IHR.PSRC.P5"
+        justification: "WDI \"Intentional homicides (per 100,000 people)\" republishes UNODC data."
+    not_equivalent:
+      - series: "who.gho homicide estimates"
+        reason: "WHO GHE modelled deaths from assault (ICD-10 X85-Y09): different source and model."
+      - series: "clio.infra.Homicide_rates-historical"
+        reason: "Historical reconstructions (Eisner and others): different sources and coverage."
+    related_catalog_concepts: [history.homicide_rate]

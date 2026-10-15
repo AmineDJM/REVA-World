@@ -1,0 +1,13 @@
+# REVA headline concepts: science and technology (agent ATLASOPS). See population.yaml for the rules.
+theme: science
+concepts:
+  - id: reva.science.internet_users
+    labels: {fr: "Utilisateurs d'Internet (% de la population)", en: "Individuals using the Internet (% of population)"}
+    definition: "Share of individuals who used the Internet from any location in the last three months (ITU)."
+    unit: "%"
+    series:
+      - series: "un_sdg.sdg_headline.IT_USE_ii99|Reporting Type=G|Sex=BOTHSEX"
+        justification: "UN SDG indicator 17.8.1 (ITU estimates), both sexes, global reporting: the ITU series."
+      - series: "wb.wdi_econ.IT.NET.USER.ZS"
+        justification: "WDI \"Individuals using the Internet (% of population)\" republishes the ITU series."
+    related_catalog_concepts: []

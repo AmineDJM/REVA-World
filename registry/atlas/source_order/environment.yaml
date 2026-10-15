@@ -1,0 +1,25 @@
+# REVA headline concepts: environment (agent ATLASOPS). See population.yaml for the rules.
+theme: environment
+concepts:
+  - id: reva.environment.co2_per_capita
+    labels: {fr: "Émissions de CO2 par habitant (territoriales, hors UTCATF)", en: "CO2 emissions per capita (territorial, excluding land use)"}
+    definition: >-
+      Territorial (production-based) emissions of carbon dioxide from fossil fuels and industry (combustion,
+      flaring, cement) excluding land-use change, divided by population (Global Carbon Budget).
+    unit: tonnes per person
+    series:
+      - series: "owid.co2.co2_per_capita"
+        justification: >-
+          OWID CO2 dataset "Annual CO2 emissions (per capita)": Global Carbon Budget territorial fossil+industry CO2,
+          excluding land-use change, per person — this definition (original producer cited per cell).
+      - series: "undp.hdr25.co2_prod"
+        justification: >-
+          UNDP HDR 2025 "Carbon dioxide emissions per capita (production)" (PHDI component): territorial CO2 from
+          fossil fuels, flaring and cement from the Global Carbon Project, per capita — the same quantity.
+        caveats: "HDR divides by UN WPP population; OWID by its own population series: small differences."
+    not_equivalent:
+      - series: "owid.co2.consumption_co2_per_capita"
+        reason: "Consumption-based (trade-adjusted) emissions: a different accounting."
+      - series: "wb EN.GHG.CO2.PC.CE.AR5 (EDGAR)"
+        reason: "EDGAR inventory with different sector coverage and methods."
+    related_catalog_concepts: [environment.co2_per_capita, environment.hdr_co2_prod]

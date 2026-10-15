@@ -1,0 +1,27 @@
+# REVA headline concepts: public finance (agent ATLASOPS). See population.yaml for the rules.
+theme: finance
+concepts:
+  - id: reva.finance.government_net_lending_gdp
+    labels: {fr: "Solde des administrations publiques (capacité/besoin de financement, % du PIB)", en: "General government net lending/borrowing (% of GDP)"}
+    definition: >-
+      General government (S13) net lending (+) / net borrowing (-): revenue minus total expenditure, as a
+      percentage of GDP (GFSM 2014). Surplus positive, deficit negative.
+    unit: "% of GDP"
+    series:
+      - series: "imf.gfs_soo.GNLB_T|sector=S13"
+        justification: >-
+          IMF GFS Statement of Operations, net lending/borrowing, general government (S13), % of GDP, as reported
+          by national authorities — this definition.
+      - series: "imf.weo.GGXCNL_NGDP"
+        justification: >-
+          IMF WEO "General government net lending/borrowing, percent of GDP" — the same GFSM concept, compiled by
+          IMF staff for every member. Projection years excluded.
+        caveats: >-
+          WEO country notes state that for some countries the data cover the central government only; such
+          deviations are not flagged per cell.
+    not_equivalent:
+      - series: "imf.gfs_soo.GNLB_T|sector=S1311 / wb GC.NLD.TOTL.GD.ZS"
+        reason: "Budgetary central government only (a narrower sector)."
+      - series: "imf.weo.GGXONLB_NGDP"
+        reason: "Primary balance (excludes interest): a different measure."
+    related_catalog_concepts: [imf.gfs_gg_net_lending_gdp, imf.gg_net_lending_gdp]

@@ -39,7 +39,7 @@ from reva.adapters.connectors.atlas_worldbank import (
 
 CATALOG_DOMAIN = "worldbank"
 CONCEPT_RE = re.compile(r"^[a-z0-9][a-z0-9_.-]{0,199}$")
-MAX_DEFINITION = 1000
+MAX_DEFINITION = 600
 
 #: Databases in best-available order (most recent release first; EdStats bulk is the 2018 release).
 DB_ORDER = ("wdi", "gender", "wgi", "hnp", "ids", "jobs", "doingbusiness", "edstats")
@@ -149,6 +149,14 @@ def theme_for(code: str, domain: str) -> str:
     return THEME_OF_DOMAIN.get(domain, "economy")
 
 
+#: One-line caveats per database (full text: DATABASES[..].note and docs/dev/v3_a_wb.md).
+DB_CAVEATS: Mapping[str, str] = {
+    "edstats": "EdStats bulk = 2018 release; years after 2018 are projections (flag period_after_vintage).",
+    "doingbusiness": "Doing Business discontinued 2021 (data irregularities); archive, not a current measure.",
+    "ids": "IDS: World totals (counterpart WLD); future years are projected debt service.",
+}
+
+
 def concept_id(code: str) -> str | None:
     cid = "wb." + code.lower()
     return cid if CONCEPT_RE.match(cid) else None
@@ -255,30 +263,26 @@ def build_catalog(
             definition = f"{name} (the World Bank metadata gives no definition for {code})."
         unit, unit_how = units[primary][code]
         licence = (meta.licence if meta and meta.licence else "") or UNSTATED_LICENCE
-        notes = [
-            f"Provider metadata: World Bank {DATABASES_BY_KEY[primary].title}, series {code}"
-            f" (bulk ZIP sha256 {raw_sha256s.get(primary, '?')[:16]}…).",
-            f"Licence: {licence}.",
-        ]
+        notes = [f"WB {primary} series {code} (ZIP {raw_sha256s.get(primary, '?')[:12]})."]
+        if not licence.upper().startswith("CC BY-4.0"):
+            notes.append(f"Licence: {licence}.")
         if meta and meta.source_note:
-            notes.append(f"Upstream source: {meta.source_note[:600]}")
-        if meta and meta.periodicity:
-            notes.append(f"Periodicity: {meta.periodicity}.")
+            notes.append(f"Upstream: {meta.source_note[:240]}")
         if unit_how != "provider_unit_of_measure":
-            notes.append(f"Unit taken from: {unit_how.replace('_', ' ')}.")
+            notes.append(f"Unit from {unit_how.replace('_', ' ')}.")
         if no_definition:
-            notes.append("Provider metadata has no definition text; the definition repeats the indicator name.")
+            notes.append("No provider definition text.")
         if truncated:
-            notes.append("Definition truncated; the full text is in the archived Series metadata.")
+            notes.append("Definition truncated (full text in the archived Series CSV).")
         if other:
-            notes.append("Not merged (" + "; ".join(other)[:800] + ").")
+            notes.append("Not merged (" + "; ".join(other)[:500] + ").")
         if fr_tag == "missing":
-            notes.append("No French label provided by the World Bank: labels.fr repeats the English text.")
+            notes.append("No World Bank French label: labels.fr = English text.")
         if fr_tag == "agent_a_wb":
-            notes.append("French label written by agent A-WB (not a World Bank translation).")
+            notes.append("French label by agent A-WB, not the World Bank.")
         for db in dbs:
-            if DATABASES_BY_KEY[db].note and db in same:
-                notes.append(f"{DATABASES_BY_KEY[db].title}: {DATABASES_BY_KEY[db].note}")
+            if db in DB_CAVEATS:
+                notes.append(DB_CAVEATS[db])
         tags = [
             f"reva_domain:{dom}",
             f"wb_topic:{_slug(topic.split(':')[0]) if topic else 'none'}",

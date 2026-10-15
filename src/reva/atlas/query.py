@@ -36,6 +36,8 @@ import tempfile
 import threading
 from collections import OrderedDict
 from collections.abc import Iterable, Sequence
+from dataclasses import dataclass
+from decimal import Context, Decimal, InvalidOperation
 from functools import lru_cache
 from pathlib import Path
 from typing import Any
@@ -44,7 +46,8 @@ import duckdb
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from reva.atlas.catalog import Catalog
+from reva.atlas.catalog import Catalog, Series
+from reva.atlas.source_order import HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.snapshot import AtlasSnapshot
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
@@ -533,6 +536,53 @@ class AtlasQuery:
             "concepts_without_data": sum(len(d["without_data"]) for d in domains.values()),
             "non_annual_cells": int(other[0]["n"]),
         }
+
+
+# --------------------------------------------------------------------------- headline concepts (ATLASOPS)
+#: A cell is a projection when its provider says so: WEO/ILO-style estimate_kind, a truthy
+#: ``projection`` flag (WPP/WHO booleans, ILO text) or the WDI's ``period_after_vintage``.
+PROJECTION_SQL = (
+    "(coalesce(json_extract_string(x.flags, '$.estimate_kind'), '') = 'projection' "
+    "OR coalesce(json_extract_string(x.flags, '$.projection'), 'false') NOT IN ('false', '') "
+    "OR coalesce(json_extract_string(x.flags, '$.period_after_vintage'), 'false') = 'true')"
+)
+DERIVED_PRECISION = 12  # significant digits of a derived ratio (an exact formula, rounded once)
+
+
+def _dec_text(d: Decimal) -> str:
+    """A finite Decimal as a strict decimal string (no exponent, no trailing zeros)."""
+    if d == d.to_integral_value():
+        return str(d.quantize(Decimal(1)))
+    t = format(d.normalize(), "f")
+    return t.rstrip("0").rstrip(".") if "." in t else t
+
+
+def _scaled(value: str, scale: Decimal) -> str:
+    return value if scale == 1 else _dec_text(Decimal(value) * scale)
+
+
+@dataclass(frozen=True)
+class _Spec:
+    """One concept (or derived operand) to resolve: ordered (series, scale, reported unit)."""
+
+    key: str
+    series: tuple[tuple[Series, Decimal, str | None, str | None], ...]  # (series, scale, unit, justification)
+    allow_projections: bool = False
+
+
+def _spec_of(c: HeadlineConcept) -> _Spec:
+    return _Spec(
+        c.id,
+        tuple((s.series, s.scale, s.reported_unit, s.justification) for s in c.series),
+        c.projections == "allow",
+    )
+
+
+def _operand_spec(o: Operand, reg: HeadlineRegistry) -> _Spec:
+    if o.concept is not None:
+        return _spec_of(reg.concepts[o.concept])
+    assert o.series is not None
+    return _Spec(f"series:{o.series.key}", ((o.series, o.scale, o.reported_unit, None),))
 
 
 def _series_table(series: list[tuple[Any, ...]]) -> tuple[pa.Table, list[str]]:

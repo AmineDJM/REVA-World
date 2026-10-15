@@ -63,7 +63,6 @@ nes", 530, 697, 711, 736 Sudan (...2011), 810, 849, 891.
 from __future__ import annotations
 
 import io
-import re
 from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
 from datetime import date
@@ -79,7 +78,6 @@ from reva.adapters.connectors.atlas_trade_common import (
     iter_csv_blocks,
     iter_member,
     parse_content_range,
-    scaled_int_expr,
     scaled_to_text_expr,
 )
 from reva.atlas.sources import AtlasSourceSpec
@@ -170,7 +168,9 @@ PAIR_SECTION_TABLES: dict[str, tuple[int, int]] = {
 }
 DATASETS: tuple[str, ...] = (DS_COUNTRY, DS_PAIR_TOTAL, *PAIR_SECTION_TABLES, DS_PAIR_HS2)
 
-_VALUE_RE = r"^[0-9]+(\.[0-9]{1,3})?$"
+_VALUE_RE = r"^[0-9]+(\.[0-9]+)?$"
+#: binary floating-point noise after the 3rd decimal, e.g. "34.471000000000004", "3.3729999999999998"
+_NOISE_RE = r"^(0{6,}[0-9]{1,3}|9{6,}[0-9]{1,3})$"
 _CODE_RE = r"^[0-9]{1,4}$"
 _PRODUCT_RE = r"^[0-9]{4}[0-9A-Z]{2}$"
 
@@ -215,6 +215,28 @@ def _check_block(df: pl.DataFrame, year: int, member: str) -> None:
         raise SourceResponseError("BACI product chapter outside the HS sections", chapters=sorted(unknown)[:10])
 
 
+def thousandths(v: pl.Series) -> list[pl.Series]:
+    """BACI value text -> exact Int64 thousandths ``v`` and a 0/1 ``r`` "rounded" marker.
+
+    BACI writes values with at most 3 decimals, except a few (~120 of ~11 M per year) printed with
+    binary floating-point noise (``34.471000000000004``, ``3.3729999999999998``): those, and only
+    those (6+ zeros or nines after the 3rd decimal), are rounded to the thousandth they denote and
+    counted (``r``). Any other value with more than 3 decimals is refused."""
+    parts = v.str.split_exact(".", 1)
+    whole = parts.struct.field("field_0")
+    frac = parts.struct.field("field_1").fill_null("")
+    tail = frac.str.slice(3)
+    long = tail.str.len_chars() > 0
+    bad = long & ~tail.str.contains(_NOISE_RE)
+    if bad.any():
+        raise SourceResponseError(
+            "BACI value with more than 3 decimals that is not float noise", examples=v.filter(bad).head(3).to_list()
+        )
+    base = whole.cast(pl.Int64) * 1000 + frac.str.slice(0, 3).str.pad_end(SCALE, "0").cast(pl.Int64)
+    up = (long & tail.str.starts_with("9")).cast(pl.Int64)
+    return [(base + up).alias("v"), long.cast(pl.Int64).alias("r")]
+
+
 def aggregate_year(blocks: Iterable[bytes], *, year: int, member: str, raw_sha256: str) -> YearAgg:
     """Aggregate the CSV blocks of one year member (consumes the iterator fully)."""
     schema = {c: pl.String for c in ("t", "i", "j", "k", "v", "q")}
@@ -229,14 +251,11 @@ def aggregate_year(blocks: Iterable[bytes], *, year: int, member: str, raw_sha25
             "i",
             "j",
             pl.col("k").str.slice(0, 2).alias("hs2"),
-            scaled_int_expr("v", SCALE).alias("v"),
+            *thousandths(df["v"]),
         ).with_columns(pl.col("hs2").replace_strict(CHAPTER_SECTION, return_dtype=pl.String).alias("section"))
-        sec_parts.append(df.group_by("i", "j", "section").agg(pl.col("v").sum(), pl.len().alias("n")))
-        hs2_parts.append(
-            df.filter(pl.col("hs2").is_in(list(HS2_CHAPTERS)))
-            .group_by("i", "j", "hs2")
-            .agg(pl.col("v").sum(), pl.len().alias("n"))
-        )
+        aggs = (pl.col("v").sum(), pl.len().alias("n"), pl.col("r").sum().alias("r"))
+        sec_parts.append(df.group_by("i", "j", "section").agg(*aggs))
+        hs2_parts.append(df.filter(pl.col("hs2").is_in(list(HS2_CHAPTERS))).group_by("i", "j", "hs2").agg(*aggs))
     if not rows:
         raise SourceResponseError("BACI year member has no rows", member=member, retryable=False)
 
@@ -244,11 +263,12 @@ def aggregate_year(blocks: Iterable[bytes], *, year: int, member: str, raw_sha25
         return (
             pl.concat(parts)
             .group_by(*keys)
-            .agg(pl.col("v").sum(), pl.col("n").sum().cast(pl.Int64))
+            .agg(pl.col("v").sum(), pl.col("n").sum().cast(pl.Int64), pl.col("r").sum().cast(pl.Int64))
             .sort(*keys)
         )
 
     by_section = merge(sec_parts, ("i", "j", "section"))
+    rounded = int(by_section["r"].sum())
     by_hs2 = merge(hs2_parts, ("i", "j", "hs2"))
     return YearAgg(
         year=year,
@@ -257,7 +277,7 @@ def aggregate_year(blocks: Iterable[bytes], *, year: int, member: str, raw_sha25
         by_section=by_section,
         by_hs2=by_hs2,
         rows=rows,
-        stats={"hs6_rows": rows, "pairs": by_section.select("i", "j").unique().height},
+        stats={"hs6_rows": rows, "pairs": by_section.select("i", "j").unique().height, "rounded_values": rounded},
     )
 
 
@@ -266,11 +286,6 @@ def _partner_map(codes: Iterable[str]) -> dict[str, str | None]:
     from reva.atlas.tables import country_iso3
 
     return {c: country_iso3(c, GEO_SCHEME) for c in codes}
-
-
-def _base_flags() -> str:
-    # literal JSON prefix (keys sorted after the variable part where relevant)
-    return f'"baci_release":"{RELEASE}","estimate":"cepii_reconciled","hs_revision":"{HS}","valuation":"FOB"'
 
 
 def _partner_flags(col: str, pmap: dict[str, str | None]) -> pl.Expr:
@@ -312,7 +327,8 @@ def _frame(df: pl.DataFrame, *, dataset: str, year: int) -> pl.DataFrame:
 
 
 def _sel(member: str, filt: list[tuple[str, pl.Expr | str]], n: pl.Expr | None) -> pl.Expr:
-    """Selector JSON ``{"aggregate":"sum(v)","filter":{...},"member":"...","rows":n}``."""
+    """Selector JSON ``{"aggregate":"sum(v)","filter":{...},"member":"...","rounded":r,"rows":n}``
+    (``rounded``: inputs rounded from float noise, see :func:`thousandths`)."""
     parts: list[pl.Expr] = [pl.lit('{"aggregate":"sum(v)","filter":{')]
     for idx, (k, v) in enumerate(filt):
         parts.append(pl.lit(("," if idx else "") + f'"{k}":"'))
@@ -320,7 +336,7 @@ def _sel(member: str, filt: list[tuple[str, pl.Expr | str]], n: pl.Expr | None) 
         parts.append(pl.lit('"'))
     parts.append(pl.lit(f'}},"member":"{member}"'))
     if n is not None:
-        parts += [pl.lit(',"rows":'), n.cast(pl.String)]
+        parts += [pl.lit(',"rounded":'), pl.col("r").cast(pl.String), pl.lit(',"rows":'), n.cast(pl.String)]
     parts.append(pl.lit("}"))
     return pl.concat_str(parts)
 
@@ -354,7 +370,7 @@ def pair_hs2_rows(agg: YearAgg, pmap: dict[str, str | None]) -> pl.DataFrame:
 
 
 def pair_total_rows(agg: YearAgg, pmap: dict[str, str | None]) -> pl.DataFrame:
-    tot = agg.by_section.group_by("i", "j").agg(pl.col("v").sum(), pl.col("n").sum()).sort("i", "j")
+    tot = agg.by_section.group_by("i", "j").agg(pl.col("v").sum(), pl.col("n").sum(), pl.col("r").sum()).sort("i", "j")
     x = tot.with_columns(
         pl.concat_str([pl.lit("X|partner="), pl.col("j"), pl.lit("|section=TOTAL")]).alias("indicator"),
         pl.col("i").alias("provider_geo"),
@@ -408,10 +424,11 @@ def pair_total_rows(agg: YearAgg, pmap: dict[str, str | None]) -> pl.DataFrame:
 
 def country_rows(agg: YearAgg) -> pl.DataFrame:
     s = agg.by_section
-    xs = s.group_by(pl.col("i").alias("c"), "section").agg(pl.col("v").sum(), pl.col("n").sum())
-    ms = s.group_by(pl.col("j").alias("c"), "section").agg(pl.col("v").sum(), pl.col("n").sum())
-    xt = xs.group_by("c").agg(pl.col("v").sum(), pl.col("n").sum()).with_columns(pl.lit("TOTAL").alias("section"))
-    mt = ms.group_by("c").agg(pl.col("v").sum(), pl.col("n").sum()).with_columns(pl.lit("TOTAL").alias("section"))
+    sums = (pl.col("v").sum(), pl.col("n").sum(), pl.col("r").sum())
+    xs = s.group_by(pl.col("i").alias("c"), "section").agg(*sums)
+    ms = s.group_by(pl.col("j").alias("c"), "section").agg(*sums)
+    xt = xs.group_by("c").agg(*sums).with_columns(pl.lit("TOTAL").alias("section"))
+    mt = ms.group_by("c").agg(*sums).with_columns(pl.lit("TOTAL").alias("section"))
     x = pl.concat([xs, xt.select(xs.columns)])
     m = pl.concat([ms, mt.select(ms.columns)])
     base = f'{{"baci_release":"{RELEASE}","estimate":"cepii_reconciled","hs_revision":"{HS}","valuation":"FOB"}}'
@@ -431,7 +448,7 @@ def country_rows(agg: YearAgg) -> pl.DataFrame:
             sel.alias("selector"),
         )
 
-    bal = x.join(m, on=["c", "section"], how="inner", suffix="_m").with_columns(
+    bal = x.join(m.drop("n", "r"), on=["c", "section"], how="inner", suffix="_m").with_columns(
         (pl.col("v") - pl.col("v_m")).alias("b")
     )
     b = bal.with_columns(
@@ -626,8 +643,6 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         )
     return {"fetched": fetched, "errors": errors, "tables": tables, "years": years_done, "ok": not errors}
 
-
-_ = re  # (kept for callers' regex helpers)
 
 __all__ = [
     "CHAPTER_SECTION",

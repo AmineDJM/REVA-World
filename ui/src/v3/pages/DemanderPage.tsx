@@ -179,14 +179,25 @@ export function Answer({ data }: { data: AskResponse }) {
   );
 }
 
+function labelOf(x: unknown): string {
+  if (!x || typeof x !== 'object') return typeof x === 'string' ? x : '';
+  const o = x as Record<string, unknown>;
+  const l = (o.labels ?? {}) as Record<string, string>;
+  return l.fr || l.en || String(o.qid ?? o.id ?? '');
+}
+
 function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
   const c = e.citation as Record<string, unknown>;
   const s = (k: string) => (typeof c[k] === 'string' || typeof c[k] === 'number' ? String(c[k]) : null);
+  const x = e as Record<string, unknown>;
   const source = s('source') ?? '';
-  const wd = isWikidataSource(source);
+  const rawUrl = s('url');
+  const url = rawUrl && /^https:\/\//.test(rawUrl) ? rawUrl : null;
+  const wd = isWikidataSource(source) || (!!url && /^https:\/\/www\.wikidata\.org\//.test(url));
   const stmt = s('statement_id');
   const rev = s('revision') ?? s('source_revision');
-  const url = s('url') ?? (wd ? (wikidataStatementUrl(stmt, s('subject')) ?? (typeof e.qid === 'string' ? wikidataItemUrl(e.qid) : null)) : null);
+  const href = url ?? (wd ? (wikidataStatementUrl(stmt, typeof x.qid === 'string' ? x.qid : null) ?? (typeof x.qid === 'string' ? wikidataItemUrl(x.qid) : null)) : null);
+  const community = wd || c.status === 'community_edited';
   const kindFr: Record<string, string> = {
     kg_statement: 'déclaration',
     atlas_cell: 'cellule atlas',
@@ -194,36 +205,51 @@ function EvidenceItem({ e, active }: { e: AskEvidence; active: boolean }) {
     link: 'lien dérivé',
     absence: 'absence constatée',
   };
+  let what = '';
+  if (e.kind === 'kg_statement') {
+    const when = [x.point_in_time, x.start && `depuis ${String(x.start)}`, x.end && `jusqu’en ${String(x.end)}`].filter(Boolean).join(', ');
+    what = `${labelOf(x.subject)} — ${labelOf(x.property)} — ${labelOf(x.object) || (typeof x.value === 'string' ? x.value : '')}${when ? ` (${when})` : ''}`;
+  } else if (e.kind === 'entity_identification') {
+    what = `${labelOf(x)} (${String(x.qid ?? '')})${x.query ? ` pour « ${String(x.query)} »` : ''}`;
+  } else if (e.kind === 'atlas_cell') {
+    const v = typeof x.value === 'string' ? x.value : typeof x.value_text === 'string' ? x.value_text : 'manquant';
+    what = `${String(x.concept_id ?? '')} · ${String(x.iso3 ?? '')} · ${String(x.period_start ?? '').slice(0, 4)} : ${v} ${String(x.unit ?? '')}`;
+  } else if (e.kind === 'absence') {
+    what = `rien trouvé (${String(x.what ?? '')}) · sources consultées : ${Array.isArray(x.sources_consulted) ? (x.sources_consulted as unknown[]).map(String).join(', ') : 'non précisées'}`;
+  } else if (e.kind === 'link') {
+    what = `lien ${String(x.link_kind ?? '')} ${String(x.a ?? '')} – ${String(x.b ?? '')}`;
+  }
   return (
     <li id={`ev-${e.id}`} className={`v3-ev${active ? ' active' : ''}`} data-testid="evidence-item">
-      <strong>{e.id}</strong> <span className="v3-chip">{kindFr[e.kind] ?? e.kind}</span>{' '}
-      {url && /^https:\/\//.test(url) ? (
-        <a href={url} target="_blank" rel="noreferrer noopener">
-          {wd ? 'Wikidata' : source} {stmt ?? (typeof e.qid === 'string' ? e.qid : '')}
-        </a>
-      ) : (
-        <span>
-          {source} {stmt ?? ''}
-        </span>
-      )}
-      {rev && wd && wikidataRevisionUrl(rev) && (
-        <>
-          {' '}
-          ·{' '}
-          <a href={wikidataRevisionUrl(rev)!} target="_blank" rel="noreferrer noopener">
-            révision {rev}
+      <strong>{e.id}</strong> <span className="v3-chip">{kindFr[e.kind] ?? e.kind}</span> {what && <span>{what}</span>}{' '}
+      <span className="v3-ev-src">
+        {href ? (
+          <a href={href} target="_blank" rel="noreferrer noopener">
+            {wd ? 'Wikidata' : source} {stmt ?? (typeof x.qid === 'string' ? x.qid : '')}
           </a>
-        </>
-      )}
-      {e.kind === 'atlas_cell' && (
-        <span className="muted">
-          {' '}
-          {s('dataset')} · {s('indicator')} · {String(e.iso3 ?? '')} {String(e.period_start ?? '')} · sha256 {(s('raw_sha256') ?? '').slice(0, 12)}…
-        </span>
-      )}
-      {e.kind === 'absence' && Array.isArray(e.sources_consulted) && <span className="muted"> sources consultées : {(e.sources_consulted as unknown[]).map(String).join(', ')}</span>}
-      {wd && <CommunityBadge />}
-      {e.origin === 'test_fixture' && <FixtureBadge />}
+        ) : (
+          <span>
+            {source} {stmt ?? ''}
+          </span>
+        )}
+        {rev && wd && wikidataRevisionUrl(rev) && (
+          <>
+            {' '}
+            ·{' '}
+            <a href={wikidataRevisionUrl(rev)!} target="_blank" rel="noreferrer noopener">
+              révision {rev}
+            </a>
+          </>
+        )}
+        {e.kind === 'atlas_cell' && (
+          <span className="muted">
+            {' '}
+            {s('dataset')} · {s('indicator')} · sha256 {(s('raw_sha256') ?? '').slice(0, 12)}… {s('selector') ?? ''}
+          </span>
+        )}
+      </span>
+      {community && <CommunityBadge />}
+      {x.origin === 'test_fixture' && <FixtureBadge />}
     </li>
   );
 }

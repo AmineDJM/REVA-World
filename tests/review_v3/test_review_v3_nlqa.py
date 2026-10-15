@@ -171,3 +171,15 @@ def test_rephrase_that_drops_the_projection_label_is_rejected() -> None:
     ev = {"E1": {"id": "E1", "value": "3.9", "flags": {"estimate_kind": "projection"}}}
     report, _ = check_faithful([s], {"sentences": [{"id": "S1", "text": dropped}]}, ev)
     assert not report.ok
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="ASK-5: nlqa.ports.AtlasCell.year is int(period_start[:4]); atlas periods are now astronomical ISO text "
+    "('-0043-01-01' = 44 BCE, reva.atlas.query.iso_date_sql), so a BCE cell gets year -4 (and compose prints "
+    "'-004' via period_start[:4])",
+)
+def test_bce_atlas_cell_year() -> None:
+    c = F.cell(*UNE_SRC, "ITA", 2000, "1", "%", F.RAW_ILO, UNE)
+    bce = type(c)(**{**c.__dict__, "period_start": "-0043-01-01", "period_end": "-0042-01-01"})
+    assert bce.year == -43

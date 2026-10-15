@@ -47,6 +47,23 @@ export async function v3post<S extends z.ZodType>(path: string, schema: S, body:
   return parseWith(schema, res.body, path);
 }
 
+/**
+ * Session memo for static reads (the atlas catalog, display geometry): one request per page
+ * load; a failure is not cached. The caller's AbortSignal is not passed to the shared request.
+ */
+export function memo<T>(fn: () => Promise<T>): () => Promise<T> {
+  let p: Promise<T> | null = null;
+  return () => {
+    if (!p) {
+      p = fn();
+      p.catch(() => {
+        p = null;
+      });
+    }
+    return p;
+  };
+}
+
 // ------------------------------------------------------------------ shared schemas
 
 export const ApiWarning = z.looseObject({ code: z.string(), message: z.string() });

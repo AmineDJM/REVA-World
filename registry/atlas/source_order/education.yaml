@@ -1,0 +1,16 @@
+# REVA headline concepts: education (agent ATLASOPS). See population.yaml for the rules.
+theme: education
+concepts:
+  - id: reva.education.literacy_rate_adult
+    labels: {fr: "Taux d'alphabétisation des adultes (15 ans et plus)", en: "Adult literacy rate (15+)"}
+    definition: >-
+      Percentage of the population aged 15 and over who can both read and write with understanding a short
+      simple statement on everyday life (UNESCO UIS).
+    unit: "%"
+    series:
+      - series: "uis.api.LR.AG15T99"
+        justification: "UNESCO UIS adult literacy rate, both sexes, 15+: the reference series."
+      - series: "wb.wdi_social.SE.ADT.LITR.ZS"
+        justification: "WDI \"Literacy rate, adult total (% of people ages 15 and above)\" republishes the UIS series."
+    caveats: "National literacy definitions differ (census self-declaration vs tests); many high-income countries report none."
+    related_catalog_concepts: [education.literacy_rate_adult]

@@ -296,7 +296,9 @@ _DISPUTE_RE = re.compile(r"\b(disput\w*|claim\w*|contested|occupied|annex\w*)\b"
 # --------------------------------------------------------------------------------------- numbers
 _NUM = r"\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d+(?:\.\d+)?"
 _SCALE = {"thousand": 3, "million": 6, "billion": 9, "trillion": 12}
-_YEAR = re.compile(r"\((?P<y1>(?:19|20)\d{2})(?:\s*[-–]\s*(?P<y2>(?:19|20)?\d{2}))?(?P<est>\s*est\.?)?\)")
+_YEAR = re.compile(
+    r"\((?:[A-Z][a-z]{2,8}\.? )?(?P<y1>(?:19|20)\d{2})(?:\s*[-–]\s*(?P<y2>(?:19|20)?\d{2}))?(?P<est>\s*est\.?)?\)"
+)
 _LABEL = re.compile(r"^[A-Za-z][A-Za-z ,'/()-]{0,60}:\s+")
 _MONEY = re.compile(rf"^(?P<s1>-)?\$(?P<s2>-)?(?P<num>{_NUM})(?:\s+(?P<scale>thousand|million|billion|trillion)\b)?")
 _PLAIN = re.compile(rf"^(?P<s1>-)?(?P<num>{_NUM})(?:\s*(?P<scale>thousand|million|billion|trillion)\b)?")
@@ -1008,7 +1010,9 @@ def split_top(text: str) -> list[str]:
     return [s for s in out if s]
 
 
-_TRAIL_YEAR = re.compile(r"\s*\((?:19|20)\d{2}(?:\s*[-–]\s*(?:19|20)?\d{2})?(?:\s*est\.?)?\)\s*$")
+_TRAIL_YEAR = re.compile(
+    r"\s*\((?:[A-Z][a-z]{2,8}\.? )?(?:19|20)\d{2}(?:\s*[-–]\s*(?:19|20)?\d{2})?(?:\s*est\.?)?\)\s*$"
+)
 _SHARE = re.compile(r"^(?P<name>[^%]+?)\s+(?P<num>\d{1,3}(?:\.\d+)?)%(?P<rest>(?:\s*\([^()]*\))*)\s*$")
 _BORDER = re.compile(rf"^(?P<name>[^\d]+?)\s+(?P<num>{_NUM})\s*km(?P<rest>(?:\s*\([^()]*\))*)\s*$")
 
@@ -1227,6 +1231,12 @@ def parse_texts(doc: Mapping[str, Any], region: str, gec: str, sha: str, rows: R
 def _numeric_leaves(doc: Mapping[str, Any], spec: Spec) -> list[tuple[tuple[str, ...], str, str | None]]:
     """(json path, raw text, sibling-year source key) for a spec; year-keyed fields expand per year."""
     node = _node(doc, spec.path)
+    path = spec.path
+    if node is None and len(path) > 2 and path[-1] in ("total", "total population"):
+        # older profile layout (e.g. Western Sahara, last changed 2021): the total is the field's own text
+        parent = _node(doc, path[:-1])
+        if isinstance(parent, dict) and isinstance(parent.get("text"), str):
+            return [(path[:-1], parent["text"], None)]
     if node is None:
         return []
     if spec.year_keyed and isinstance(node, dict):

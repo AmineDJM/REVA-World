@@ -200,6 +200,106 @@ def test_anchor_brazil_world_heritage_sites_match_unesco_list():
     assert len({r["site"] for r in designations}) >= 20
 
 
+# ----------------------------------------------------------------------------- entity anchors (wbgetentities)
+@pytest.fixture(scope="module")
+def ent():
+    """Anchor snapshots run through WDHARVEST's extractor with the real allow-list: what the seed specs keep."""
+    from datetime import datetime
+
+    from reva.adapters.connectors.wikidata import extract_entity, load_allowlist
+
+    if not ENTITY_FIXTURE.exists():
+        pytest.fail("anchor_entities.json missing: python tests/unit/test_kg_queries_culture.py capture-entities")
+    doc = json.loads(ENTITY_FIXTURE.read_text())
+    allow = load_allowlist()
+    out = {}
+    for qid, raw in doc["entities"].items():
+        out[qid] = extract_entity(raw, allow, raw_sha256=raw["raw_sha256"],
+                                  retrieved_at=datetime.fromisoformat(raw["retrieved_at"]))
+    return out
+
+
+def objs(e, pid: str) -> set[str]:
+    return {s.object_qid for s in e.statements if s.property == pid and s.object_qid}
+
+
+def strings(e, pid: str) -> set[str]:
+    return {str(s.value.get("value", s.value)) for s in e.statements if s.property == pid}
+
+
+def ancestors(ent, qid: str, pid: str = "P279") -> set[str]:
+    seen: set[str] = set()
+    todo = [qid]
+    while todo:
+        q = todo.pop()
+        for o in objs(ent[q], pid) if q in ent else ():
+            if o not in seen:
+                seen.add(o)
+                todo.append(o)
+    return seen
+
+
+def test_entity_anchor_language_codes(ent):
+    expected_639_3 = {PORTUGUESE: "por", SPANISH: "spa", ENGLISH: "eng", FRENCH: "fra", ARABIC: "ara",
+                      SWAHILI: "swa", LATIN: "lat"}
+    for qid, code in expected_639_3.items():
+        e = ent[qid]
+        assert e.statements, qid
+        assert any(code in v for v in strings(e, "P220")), (qid, strings(e, "P220"))
+        assert e.statements[0].statement_id and e.lastrevid  # statement ids + entity revision kept
+    assert any("pt" in v for v in strings(ent[PORTUGUESE], "P218"))
+
+
+def test_entity_anchor_speakers_are_dated(ent):
+    for qid in (PORTUGUESE, SPANISH, ENGLISH, ARABIC, SWAHILI):
+        speakers = [s for s in ent[qid].statements if s.property == "P1098"]
+        assert speakers, qid
+        # every kept speaker figure we rely on carries a date (point in time) or is flagged undated by absence
+        assert any(s.point_in_time for s in speakers), qid
+
+
+def test_entity_anchor_writing_systems(ent):
+    for qid in (PORTUGUESE, ARABIC, LATIN):
+        assert objs(ent[qid], "P282"), qid
+
+
+def test_entity_anchor_genealogy_chain(ent):
+    ROMANCE, INDO_EUROPEAN = "Q19814", "Q19860"
+    for lang in (PORTUGUESE, SPANISH, FRENCH):
+        anc = ancestors(ent, lang)
+        assert ROMANCE in anc and INDO_EUROPEAN in anc, (lang, sorted(anc))
+    assert INDO_EUROPEAN in ancestors(ent, ENGLISH)
+    assert INDO_EUROPEAN in ancestors(ent, LATIN)
+
+
+def test_entity_anchor_brazil_official_language(ent):
+    p37 = [s for s in ent[BRAZIL].statements if s.property == "P37"]
+    assert PORTUGUESE in {s.object_qid for s in p37}
+    assert all(s.statement_id and s.statement_id.upper().startswith("Q155$") for s in p37)
+    assert PORTUGUESE in objs(ent[PORTUGAL], "P37")
+
+
+def test_entity_anchor_colonial_path_statements_exist(ent):
+    """Brazil -> predecessor(s) -> part of / country -> ... -> Portuguese: each hop is a harvested statement.
+    The test checks that some predecessor chain reaches an entity whose official language is Portuguese
+    (no link is invented: every hop is a P1365/P155, P361/P17 or P37 claim in the snapshots)."""
+    preds = objs(ent[BRAZIL], "P1365") | objs(ent[BRAZIL], "P155")
+    assert preds
+    preds2 = {o for q in preds if q in ent for o in objs(ent[q], "P1365") | objs(ent[q], "P155")}
+    frontier = preds | preds2
+    parents = {o for q in frontier if q in ent for o in objs(ent[q], "P361") | objs(ent[q], "P17")}
+    speaking = {q for q in frontier | parents if q in ent and PORTUGUESE in objs(ent[q], "P37")}
+    assert speaking, (sorted(frontier), sorted(parents))
+
+
+def test_entity_anchor_religions(ent):
+    assert ISLAM in ent and ent[ISLAM].statements
+    assert ent[ISLAM].sitelinks_count >= 5
+    # Catholicism and the Catholic Church are distinct items; at least one carries a founder or a parent branch
+    cath = [ent[q] for q in (CATHOLICISM, CATHOLIC_CHURCH) if q in ent]
+    assert cath and any(objs(e, "P279") | objs(e, "P361") | objs(e, "P112") for e in cath)
+
+
 # ----------------------------------------------------------------------------- capture (live, manual)
 async def _capture(names: list[str]) -> None:  # pragma: no cover - live, run by hand
     from datetime import UTC, datetime

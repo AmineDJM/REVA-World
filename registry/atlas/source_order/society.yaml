@@ -1,0 +1,31 @@
+# REVA headline concepts: society and quality of life (agent ATLASOPS). See population.yaml for the rules.
+theme: society
+concepts:
+  - id: reva.society.hdi
+    labels: {fr: "Indice de développement humain (IDH)", en: "Human Development Index (HDI)"}
+    definition: "UNDP Human Development Index: geometric mean of health, education and income indices (0-1)."
+    unit: index (0-1)
+    series:
+      - series: "undp.hdr25.hdi"
+        justification: "UNDP HDR 2025 composite indices time series: the only producer of the HDI."
+    caveats: "No other source publishes the HDI; countries UNDP does not cover have no value."
+    related_catalog_concepts: [quality_of_life.hdi]
+
+  - id: reva.society.gini_income
+    labels: {fr: "Indice de Gini (enquêtes ménages, revenu ou consommation)", en: "Gini index (household surveys, income or consumption)"}
+    definition: >-
+      Gini index of the distribution of household per capita income or consumption expenditure from household
+      surveys (0 = perfect equality, 100 = perfect inequality), World Bank Poverty and Inequality Platform.
+    unit: "index (0-100)"
+    series:
+      - series: "wb.wdi_social.SI.POV.GINI"
+        justification: "WDI \"Gini index\" (PIP survey years, no interpolation): the reference survey-based series."
+    caveats: "Welfare measure (income vs consumption) differs by country; survey years only."
+    not_equivalent:
+      - series: "wid.wid_key.gptincj992|p0p100 / gdiincj992 / ghwealj992"
+        reason: "WID Gini of pre-tax national income / post-tax income / wealth per equal-split adult (0-1): different distributions."
+      - series: "undp.hdr25.ineq_inc"
+        reason: "Atkinson inequality in income (IHDI component), not a Gini."
+      - series: "clio.infra.income_inequality-historical"
+        reason: "Historical reconstructions (Gini points) with different sources and methods."
+    related_catalog_concepts: [quality_of_life.wid_gptincj992_p0p100, quality_of_life.ineq_inc]

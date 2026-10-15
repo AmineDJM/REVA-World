@@ -1,0 +1,28 @@
+# REVA headline concepts: health (agent ATLASOPS). See population.yaml for the rules.
+theme: health
+concepts:
+  - id: reva.health.life_expectancy
+    labels: {fr: "Espérance de vie à la naissance", en: "Life expectancy at birth"}
+    definition: >-
+      Period life expectancy at birth, both sexes: the average number of years a newborn would live under the
+      age-specific mortality rates of the year, as estimated by the UN World Population Prospects.
+    unit: years
+    series:
+      - series: "un_wpp.wpp2024_demo.LEx"
+        justification: "UN WPP 2024 \"Life expectancy at birth, both sexes\" (estimates 1950-2023): the reference series."
+      - series: "wb.wdi_social.SP.DYN.LE00.IN"
+        justification: >-
+          WDI "Life expectancy at birth, total (years)" is derived from the UN WPP (with national sources for a
+          few economies) — the same definition and model.
+      - series: "undp.hdr25.le"
+        justification: >-
+          UNDP HDR 2025 life expectancy (HDI component) is taken from UN WPP 2024 per the HDR25 codebook — the same
+          series republished.
+    not_equivalent:
+      - series: "who.gho.WHOSIS_000001|sex=SEX_BTSX"
+        reason: >-
+          WHO Global Health Estimates life tables: same definition but a different mortality model, so values
+          differ systematically (A-HEALTHEDU's catalog keeps it separate); kept as health.life_expectancy_birth.
+      - series: "clio.infra.Total_life_expectancy-historical / gapminder.fasttrack.lex"
+        reason: "Long-run historical compilations (cohort/period mixes, interpolations)."
+    related_catalog_concepts: [un.wpp.life_expectancy, health.life_expectancy_birth, quality_of_life.le]

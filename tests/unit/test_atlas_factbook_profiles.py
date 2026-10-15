@@ -138,6 +138,7 @@ def test_year_of_ranges_and_estimates():
     assert m.year_of("0.67% annual rate of change (2020-25 est.)") == ((date(2020, 1, 1), date(2026, 1, 1)), True)
     assert m.year_of("14,236 sq km (2020)") == ((date(2020, 1, 1), date(2021, 1, 1)), False)
     assert m.year_of("643,801 sq km") == (None, False)
+    assert m.year_of("652,271 (July 2020 est.)") == ((date(2020, 1, 1), date(2021, 1, 1)), True)
 
 
 def test_list_splitting_keeps_parentheses_thousands_and_inverted_names():
@@ -203,6 +204,8 @@ def test_texts_table_is_verbatim_and_flags_disputes(profiles):
     wf = json.loads(wi["flags"])
     assert wf["stale_profile"].startswith("the Factbook dropped Western Sahara") and wf["disputed_territory"]
     assert wi["period_start"] == date(2021, 1, 1) and wi["iso3"] == "ESH"
+    (wpop,) = _cell(run.frames[m.DS_FIGURES], "WI", "population.total")  # older layout: Population is a text
+    assert wpop["value"] == "652271" and wpop["period_start"] == date(2020, 1, 1)
     assert all(len(v) <= m.TEXT_LIMIT for v in t["value_text"].to_list())
     assert t.filter(pl.col("flags").str.contains('"mentions_dispute":true')).height > 0
 

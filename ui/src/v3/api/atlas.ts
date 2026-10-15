@@ -6,7 +6,7 @@
  * missing). The schema refuses a JSON number for `value`, so a filled zero can never sneak in.
  */
 import { z } from 'zod';
-import { ApiWarning, DecimalString, JsonRecord, v3get } from './common';
+import { ApiWarning, DecimalString, JsonRecord, memo, v3get } from './common';
 
 const enc = encodeURIComponent;
 const nullishString = z.string().nullish().transform((v) => v ?? null);
@@ -177,6 +177,9 @@ export type AtlasCoverageResponse = z.output<typeof AtlasCoverageResponse>;
 
 export const getAtlasConcepts = (q: { domain?: string; q?: string; limit?: number } = {}, s?: AbortSignal) =>
   v3get('/v1/atlas/concepts', AtlasConceptList, { limit: 5000, ...q }, s);
+
+/** The whole catalog, fetched once per page load (it changes only with a deployment). */
+export const getAtlasCatalog = memo(() => getAtlasConcepts());
 
 export const getAtlasDossier = (iso3: string, q: { domain?: string; series?: boolean } = {}, s?: AbortSignal) =>
   v3get(`/v1/atlas/countries/${enc(iso3.toUpperCase())}`, AtlasDossierResponse, { ...q }, s);

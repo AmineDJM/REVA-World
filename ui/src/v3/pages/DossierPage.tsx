@@ -2,7 +2,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import { getLocations } from '../../api/client';
 import { useApi, type ApiState } from '../../lib/useApi';
-import { conceptLabel, getAtlasConcepts, getAtlasDossier, type AtlasConcept, type AtlasDossierConcept, type AtlasDossierDomain } from '../api/atlas';
+import { conceptLabel, getAtlasCatalog, getAtlasDossier, type AtlasConcept, type AtlasDossierConcept, type AtlasDossierDomain } from '../api/atlas';
 import { getKgTimeline } from '../api/kg';
 import { getCountryLinks, LINK_STATUS_LABEL, LINK_TYPE_LABEL, linkNodeLabel, type CountryLink, type CountryLinksResponse } from '../api/links';
 import { CitationChip } from '../components/CitationChip';
@@ -22,7 +22,7 @@ export default function DossierPage() {
   const iso3 = raw.toUpperCase();
   const navigate = useNavigate();
   const dossier = useApi((s) => getAtlasDossier(iso3, { series: true }, s), [iso3]);
-  const concepts = useApi((s) => getAtlasConcepts({}, s), []);
+  const concepts = useApi(() => getAtlasCatalog(), []);
   const links = useApi((s) => getCountryLinks(iso3, {}, s), [iso3]);
   const locations = useApi((s) => getLocations(undefined, s), []);
   const [pick, setPick] = useState('');
