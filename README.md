@@ -1,30 +1,116 @@
 # REVA World
 
-REVA World V1 is a private, single-user MVP: a versioned register of official
-statistics (evidence with revisions and provenance), release-pinned belief
-estimates and one narrow scenario model. It is not a world model and makes no
-causal, welfare or forecast claims about the economy.
+REVA World is a private, single-user research platform: a versioned register of
+official statistics (evidence with revisions and provenance down to the raw
+bytes), immutable release-pinned belief estimates, and a small set of scenario
+models that run against a pinned release. It is not a world model and makes no
+causal, welfare or forecast claims about the economy. Unsupported questions get a
+typed `capability_gap` or `missing_input`, never a made-up number.
 
-What V1 runs:
+**Status (2026-10-15): not deployed.** Nothing runs in production yet (see
+"Blocked on credentials" below). The phase/gate ledger is
+[docs/implementation_status.md](docs/implementation_status.md).
+
+## What it does
+
+### V1 (MVP, phases P0–P7)
 
 * **Evidence**: World Bank WDI (population, nominal GDP), UN Comtrade public
-  preview (HS 2709 crude values, connector 1.1.0), Natural Earth 1:110m (display
-  geometry only), Crossref (DOI metadata only) and, via template-only autonomy,
-  Eurostat `demo_pjan` (France). Missing source values stay typed `Missing`, never
-  zero; e.g. Algeria has no Comtrade crude rows for 2020–2023.
+  preview (HS 2709 crude values), Natural Earth 1:110m (display geometry only),
+  Crossref (DOI metadata only) and, through the template-only autonomy path,
+  Eurostat `demo_pjan`. Missing source values stay typed `Missing`, never zero
+  (e.g. Algeria has no Comtrade crude rows for 2020–2023).
 * **Beliefs**: immutable releases selected by `source_select_v1`, with as-of
   reads of what REVA actually published.
 * **Scenario**: `economic.crude_exposure` 1.0.0, a one-year border-value
   accounting stress test (L0 cache, L1 fixed quantities, L2 labelled elasticity
-  sensitivity range with no probability level). L3/L4 and later phases P8–P12
-  are interface-only and refuse with structured capability gaps.
-* **Evaluation**: a revised-data retrospective forecast tournament (DM/HLN with
-  Holm, locked holdout) and three labelled replay modes.
+  sensitivity range with no probability level). L3/L4 and phases P8–P12 are
+  interface-only and refuse with structured capability gaps.
+* **Evaluation**: a revised-data retrospective forecast tournament and three
+  labelled replay modes.
+* **Governance**: approvals are enforced in the database; the promotion gate is a
+  separate process with its own login (`reva_gate`).
 
-Read before relying on any output: [limitations](docs/limitations.md),
-[methodology](docs/methodology.md), [scientific validation](docs/scientific_validation.md),
-[threat model](docs/threat_model.md), [API](docs/api.md),
-[operations](docs/operations.md), [deployment](docs/deployment.md).
+### V2 (2026-10-15; new models are experimental, maintainer review pending)
 
-Local development: `make help` lists the targets (`make up`, `make sync`,
-`make bootstrap`, `make seed`, `make test`).
+Every V2 model result is labelled "experimental model, not yet reviewed".
+
+| Capability | Label / limit | Details |
+|---|---|---|
+| Crude scenario for every country with data (`countries: ["ALL"]`, `skip_missing_countries`) | Countries without complete inputs are skipped with typed reasons, never zero-filled; in the live throwaway run 74–89 countries per reference year (2020–2024) had complete inputs | [docs/dev/v2_allc.md](docs/dev/v2_allc.md) |
+| Natural language → draft scenario (`POST /v1/scenario-drafts`, French/English) | The LLM only drafts; nothing runs until the user submits the spec. Disabled by default (`REVA_LLM_ENABLED=false`). OpenAI `gpt-4.1` verified live; the Gemini fallback was not (the provider answered 402) | [docs/dev/v2_nlc.md](docs/dev/v2_nlc.md) |
+| Cohort-component population projection `demography.cohort_component` (EU-27 + EFTA) | "Conditional projection under stated assumptions, not a forecast"; on the 2013 → 2023 back-test a constant-growth benchmark beats it on totals in most countries | [docs/dev/v2_pop.md](docs/dev/v2_pop.md), [back-test](docs/dev/v2_pop_backtest.md) |
+| Multi-region input-output price model `economic.io_price` (Eurostat FIGARO 2024, 49 countries) | "First-round cost-push under full pass-through; not an inflation forecast". The household basket is at basic prices, and a purchasers'-price reading is attached | [docs/dev/v2_io.md](docs/dev/v2_io.md) |
+| Retirement-age model `social.retirement_age` (FRA, DEU, ESP, NLD rule tables; ITA, BEL, SWE, POL refused) and household margins | Conditional projection to 2040. The France 2010-reform back-test fits, but two errors of opposite sign offset each other: the fit is not validation | [docs/dev/v2_pen.md](docs/dev/v2_pen.md), [back-test](docs/dev/v2_pen_backtest.md) |
+| Back-test API (`/v1/models/{key}/backtests`) | Revised-data retrospectives, shown whether good or bad | [docs/api.md](docs/api.md) |
+| UI V2: world map, scenario composer, multi-period run pages | E2E uses recorded LLM responses and fixture data (labelled TEST FIXTURE); the IO screens run on a synthetic table | [docs/dev/ui_v2.md](docs/dev/ui_v2.md) |
+
+An independent scientific review of the V2 models is in
+[docs/dev/review_science_v2.md](docs/dev/review_science_v2.md). Its findings and
+the fixes are tracked in the agents' reports.
+
+## Run it locally
+
+Requirements: Docker (PostGIS), [uv](https://docs.astral.sh/uv/) with Python
+3.12, Node 22 for the UI. `make help` lists every target.
+
+```sh
+make env          # .env from .env.example (local-only passwords)
+make up           # PostgreSQL 17 + PostGIS in docker compose
+make sync         # locked Python dependencies
+make bootstrap    # migrations + runtime role provisioning (same code as the Render pre-deploy)
+make seed         # registry: concepts, entities, sources, models, schedules
+make fixtures     # captured source fixtures (origin test_fixture), or: make ingest-live
+make api          # API + UI on http://localhost:8000
+make worker       # durable worker and scheduler
+make gate         # independent promotion gate (login reva_gate), next to the worker
+make ui-dev       # optional: Vite dev server proxying /v1 to the API
+```
+
+Without `make gate`, autonomous discovery reports `gate_pending` and promotes
+nothing. The worker's `gate_followup` schedule promotes a late pass once the gate
+has recorded it. See [docs/operations.md](docs/operations.md) ("Promotion gate").
+
+Checks:
+
+* `make check`: lint, mypy, registry/contract validation, Blueprint validation and
+  offline pytest. DB tests create a fresh database per session; the dev database is
+  never used.
+* `make ci`: also the UI checks and the e2e suite.
+* `make e2e` (= `uv run python scripts/e2e_stack.py --run`): a disposable stack
+  (fresh database, offline fixtures) and the Playwright suite.
+* V2 suites: `uv run python scripts/e2e_stack.py --recorded-drafter --v2-fixtures --run`.
+  This replays recorded LLM responses (no live LLM call) and ingests the V2 fixtures.
+* `make test-live`: live provider smoke tests (network).
+
+## Documentation
+
+* Read before relying on any output: [limitations](docs/limitations.md),
+  [methodology](docs/methodology.md) and
+  [scientific validation](docs/scientific_validation.md).
+* System: [architecture](docs/architecture.md), [API](docs/api.md) and
+  [data constitution](docs/data_constitution.md) (the 35 invariants).
+* Security and operations: [threat model](docs/threat_model.md),
+  [operations](docs/operations.md) and [deployment](docs/deployment.md).
+* Decisions: [ADRs](docs/adr/) and the [V2 roadmap](docs/roadmap/v2_design.md).
+* Status: [phase/gate ledger](docs/implementation_status.md); agents' and
+  reviewers' reports are in [docs/dev/](docs/dev/).
+
+## Blocked on credentials
+
+The following cannot be done from the repository. See
+[docs/deployment.md](docs/deployment.md).
+
+* **Render deployment**: a Render account/API key.
+* **Production object storage**: an S3-compatible private bucket with three
+  scoped key pairs (read-only for `reva-api`, prefix-scoped write for
+  `reva-worker`, a separate prefix-scoped pair for `reva-gate`). The S3 adapter
+  and the credential split were verified locally against a self-built MinIO,
+  not against a provider bucket.
+* **Measurements on the named Render plans**: available only after deployment.
+* **Live NL drafting in a deployment**: `REVA_LLM_ENABLED=true` and an egress
+  proxy that injects the OpenAI credential (REVA reads no API key). In
+  production, settings also require `REVA_LLM_MONTHLY_BUDGET_USD > 0` when the
+  LLM is enabled. The Gemini fallback needs a funded account.
+* **Optional**: `REVA_COMTRADE_API_KEY` and an external sandbox runner
+  (`REVA_SANDBOX_ENDPOINT`). Without the runner, generated code stays blocked.

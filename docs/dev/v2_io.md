@@ -81,7 +81,12 @@ unit-cost increase:
 
 L1 is θ = 1 (full pass-through). Zero-output industries get a typed `not_applicable` value (never 0).
 Household basket of economy d: Σ_k h_kd Δp_k / Σ_k h_kd with h = households' final consumption
-(`P3_S14`) of d bought from every industry k (domestic and imported), at basic prices. Decompositions
+(`P3_S14`) of d bought from every industry k (domestic and imported), at basic prices (trade and
+transport margins inside, taxes less subsidies on products outside). Each basket row's applicability
+also carries `household_product_taxes_less_subsidies_mio_eur` (T_d, FIGARO `DOM` x `D21X31` x `P3_S14`)
+and a labelled purchasers'-price reading `purchasers_price_reading_fixed_unit_taxes_percent`
+= basket_d x H_d / (H_d + T_d) (H_d = basic-price basket value), i.e. product taxes held fixed in money
+per unit, per pass-through point (absent when the table has no tax cell for d). Decompositions
 (exact before rounding): domestic vs imported **products**, and domestic vs foreign **shock origin**
 (one right-hand side per shocked origin economy, same LU factorisation).
 
@@ -122,18 +127,34 @@ in the unit tests and through the full DB/job path.
 `registry/assumptions/io_energy_passthrough_benchmarks.yaml`, maintainer review pending) use other data
 years, national rather than inter-country tables, product-by-product tables and other shock definitions,
 so they are order-of-magnitude plausibility checks only. REVA numbers (FIGARO 2024, θ = 1, shocks applied
-in every FIGARO economy so imported inputs move too; "basket" = household basket at basic prices,
-"producer" = output-weighted mean over the economy's 64 industries):
+in every FIGARO economy so imported inputs move too; "basic-price basket" = household basket at basic
+prices, i.e. without taxes less subsidies on products; "producer" = output-weighted mean over the
+economy's 64 industries). **EA12** = the twelve euro-area countries of the ECB benchmark (ECB OP 113):
+DEU, IRL, GRC, ESP, FRA, ITA, NLD, AUT, PRT, SVN, SVK, FIN (not BEL, not LUX); its basket is the
+**household-consumption-weighted pooled basket** Σ_{d∈EA12} Σ_k h_kd Δp_k / Σ_{d∈EA12} Σ_k h_kd, and its
+producer figure the output-weighted mean Σ x_k Δp_k / Σ x_k over the 12 x 64 industries (aggregation
+documented in `docs/methodology.md`; the scientific review's 0.937 used a different twelve-country list,
+`docs/dev/review_science_v2.md` L1):
 
 | Benchmark (published) | Published | REVA comparable run | REVA |
 |---|---|---|---|
-| ECB OP 113 (2010, IOT 2005): +10 % all energy products, consumer prices before taxes, euro area / France | 0.36 % / 0.34 % | B, C19, D35 +10 % (exogenous), basket, EA12 / FRA | 0.95 % / 0.93 % |
+| ECB OP 113 (2010, IOT 2005): +10 % all energy products, consumer prices before taxes, euro area / France | 0.36 % / 0.34 % | B, C19, D35 +10 % (exogenous), basic-price basket, EA12 / FRA | 0.95 % / 0.93 % |
+| same | | same run, purchasers'-price reading (product taxes fixed per unit), EA12 / FRA | 0.84 % / 0.82 % |
 | same, producer prices EA / FRA | 0.39 % / 0.30 % | same run, output-weighted producer prices EA12 / FRA | 0.93 % / 0.86 % |
-| same | | **B only** +10 %, basket EA12 / FRA | 0.36 % / 0.39 % |
-| CNB MPR Spring 2026 Box 2: +100 % oil and gas, Czech CPI, full pass-through (2024 scaled estimate) | 3.6 % | B and C19 +100 %, basket CZE / B only | 4.94 % / 3.82 % |
+| same | | **B only** +10 %, basic-price basket EA12 / FRA | 0.36 % / 0.39 % |
+| CNB MPR Spring 2026 Box 2: +100 % oil and gas, Czech CPI, full pass-through (2024 scaled estimate) | 3.6 % | B and C19 +100 %, basic-price basket CZE / B only | 4.94 % / 3.82 % |
 | Banque de France Eco Notepad 50 (2018): +EUR 10/bbl | 0.4 pp (0.15 indirect) | not compared: REVA holds no archived reference oil price to turn EUR/bbl into a percentage | — |
 
-Reading: the all-energy-like REVA run is about 2.6x the ECB 2005 result. Contributing reasons that are
+**Purchasers'-price reading.** The basic-price basket leaves out taxes less subsidies on products
+(VAT, excises): for French households 180 bn EUR, 13.2 % of the 1,364 bn EUR basic-price basket
+(`docs/dev/review_science_v2.md` M9). Holding those taxes fixed in money per unit, the same price change
+spread over the tax-inclusive basket gives France 0.93 % → **0.82 %** and EA12 0.95 % → **0.84 %**.
+Purely ad valorem taxes would leave the basic-price figure unchanged, so the two readings bracket the tax
+treatment; the 0.93 % is the upper side for a purchasers'-price reading. Neither reading is a CPI (no
+direct purchases abroad, fixed weights, no second-round effects).
+
+Reading: the all-energy-like REVA run is about 2.6x the ECB 2005 result at basic prices (about
+2.3-2.4x with the purchasers'-price reading; the ECB figure is itself "before taxes"). Contributing reasons that are
 visible in the data: (i) in FIGARO 2024 French households' basic-price purchases of C19 + D35 are 5.4 % of
 the basket (2.2 % + 3.3 %), so the direct effect alone is about 0.54 % against the ECB's 0.21 % for France
 (energy cost shares after the 2022-23 price surge are much higher than in 2005); (ii) setting B, C19 and
@@ -183,7 +204,12 @@ result rows; compute itself is about 2-4 s per θ.
    a primary-cost shock to the shocked industry: the intervention is "the price of B changes by π".
 6. Shockable set limited to B, C19, D35, each documented; B is never called "crude".
 7. θ applies to every non-shocked industry (uniform); the shocked industries keep the full π.
-8. Basket at basic prices (no product taxes, no purchases abroad); not a CPI.
+8. Basic-price basket (no taxes less subsidies on products, no purchases abroad); not a CPI. Each
+   basket row also carries a labelled purchasers'-price reading with product taxes held fixed per unit
+   (France 0.93 % → 0.82 %, EA12 pooled 0.95 % → 0.84 % for +10 % on B, C19, D35, θ = 1); ad valorem
+   taxes would keep the basic-price figure, so the two bracket the tax treatment. Added after the
+   scientific review V2 (M9); tested in `tests/unit/test_io_price.py`
+   (`test_basket_is_basic_prices_and_carries_a_purchasers_price_reading_with_fixed_unit_taxes`).
 9. Rest of the world may be a shock origin but is not reported (not a country, no world entity).
 10. Countries without household consumption → typed not-applicable basket rows, not a failed run.
 11. No external benchmark reproduced; comparisons in §4 are plausibility only.

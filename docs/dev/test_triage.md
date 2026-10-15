@@ -1,5 +1,47 @@
 # Test triage (agent T)
 
+## Round 7 (agent FIX2, 2026-10-15 02:15–02:55 UTC)
+
+Command: `uv run pytest -m "not live and not perf" -q -p no:cacheprovider -rfE` (GATE had renamed the
+security copy to `test_gate_separation_security.py`, so no `--ignore` was needed).
+
+| Run | Result |
+|---|---|
+| 02:26–02:46 | **2 failed, 2370 passed, 30 skipped, 21 deselected** (1211 s) |
+| reruns 02:48–02:55 of both failures + every Round 6 target (`tests/unit/social`, PEN pipeline, `test_start_env`, ALLC module, `tests/contracts` schema contract) | all pass (10 + 125 passed) |
+| ruff on touched files | clean |
+
+### Round 6 items
+- **PEN** (`tests/unit/social/test_retirement_age_model.py`, `test_labour_pensions_retirement_pipeline.py`): no
+  fixture work needed. The DE `demo_pjan` fixture exists (`tests/fixtures/social/eurostat.demography`, plain
+  `sinceTimePeriod=2000` URLs that `fixture_inputs.py` requests with `window_years=None`). Run C caught POP editing
+  `eurostat_demography.py` (mtime 02:01:43, inside run C 01:47–02:07). Both modules pass now, alone and in the
+  full run.
+- **ALLC** (`test_all_country_fixture_ingest_keeps_gaps_typed`): order-dependent. **The connector is correct.**
+  An offline probe shows that `un.comtrade.public_batch` emits the DZA 2023 M/X typed Missing
+  (`provider_returned_no_rows`). The row has the same semantic hash as the one `un.comtrade.public_exact` emits.
+  A lineage is (source, origin, logical key), and both connectors share the source `un.comtrade.public_preview`.
+  So when an earlier module has ingested the exact connector's fixtures (e.g. `test_autonomy_contracts.py`),
+  the batch row is "unchanged" and is not inserted again under the batch connector version. The test filtered
+  on `cv.name = 'un.comtrade.public_batch'`. Reproduced with
+  `pytest tests/integration/test_autonomy_contracts.py tests/integration/test_comtrade_worldbank_all_countries.py`.
+  Fix (test): read the lineage heads of the source, whichever connector wrote them
+  (`DISTINCT ON (logical_key) … ORDER BY revision_no DESC`). The test passes in both orders.
+- **POP** (`test_start_env::test_bootstrap_runtime_reports_schema_without_secrets`): the build is
+  deterministic. Spec sha and code digest of every built-in connector are identical across two calls in one
+  process and across `PYTHONHASHSEED` 1/2/3. `module_digest` hashes the module source *on disk*: `inspect`
+  re-reads the file when its mtime changes. The session DB was seeded at the start of run C. POP's edit at 02:01
+  changed the file, so the bootstrap subprocess near the end of the run computed a new digest. That is a
+  legitimate content change (pre-release, no bump needed), not a nondeterminism. Passes now.
+  Optional hardening (shared `adapters/connectors/base.py`, not edited): memoise `module_digest` per module,
+  so one long-lived process never reports two digests for the code it loaded.
+
+### Remaining failures (02:26 run), both transient from concurrent edits
+| Owner | Test | Root cause |
+|---|---|---|
+| governance migration author (0006 edited 02:30–02:47) | `test_backup_restore_roundtrip::test_backup_restore_round_trip…` | The restore's `verify-schema` found 6 function definitions that differ from the contract: `evidence.approve_eligibility`, `restore_eligibility`, `model.approve_version`, `ontology.approve_mapping`, `ops.consume_approval`, `ops.require_review_activity`. `0006_operations.py` changed while the run was going (latest mtime 02:47). Passes on rerun, schema-contract test included. Separately, the test env does not pass `REVA_GATE_DB_PASSWORD`, so restore warns `runtime role reva_gate not provisioned`. **BKP/GATE**: add it as `test_start_env` does. |
+| PEN / SFX1 (rules, retirement_age, backtest edited 02:35–02:47) | `test_retirement_backtest::test_backtest_is_reproducible_and_matches_the_committed_artifact` | `docs/dev/v2_pen_backtest.json` was stale while `rules.py`/`retirement_age.py` were being edited. It was regenerated at 02:37 and passes on rerun. |
+
 ## Round 6 (agent STAB, 2026-10-15 01:00–02:10 UTC)
 
 Command (as CI; `-n` is not available, pytest-xdist is not installed):

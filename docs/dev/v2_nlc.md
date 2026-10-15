@@ -2,8 +2,8 @@
 
 Status: implemented and tested offline; one live provider verified (OpenAI). The
 capability `nl.scenario_drafts` is `implemented` with `requires_config`
-(REVA_LLM_ENABLED, credential-injecting egress proxy, the two ledger functions
-requested for migration `0008_v2`, see "Requests to other owners").
+(REVA_LLM_ENABLED, credential-injecting egress proxy; the two ledger functions
+are now in migration `0008_v2` as `SQL_LLM_LEDGER`, see "Requests to other owners").
 
 ## What exists
 
@@ -99,7 +99,10 @@ Errors (RFC 9457): 400 `idempotency_key_required`, 403 scope, 409
     models without a catalogue entry + drafting keys (`geography.not_covered`,
     `nl.parameter_not_draftable`, `nl.input_value_override` (policy refusal),
     `nl.instruction_in_text` (policy refusal), `nl.out_of_scope`,
-    `nl.unclassified`). `model.<id>` from the LLM maps to the catalogue id `<id>`.
+    `nl.unclassified`, and for the cross-checks of decision 17
+    `geography.exclusion_not_supported`, `geography.region_not_resolved`,
+    `nl.shock_origin_not_stated`, `nl.age_level_not_shift`). `model.<id>` from the
+    LLM maps to the catalogue id `<id>`.
 12. **Dynamic allow-list.** Draftable = schema branches (`$defs` union) whose
     plugin is registered (`reva.simulation.plugins.load_all()`); countries = the
     branch enum, else the registered country entities (`countries.yaml` + the
@@ -136,6 +139,35 @@ Errors (RFC 9457): 400 `idempotency_key_required`, 403 scope, 409
     rows hold the text's sha256 and length, key hash, status, provider, model,
     prompt version/sha, usage, gap keys and the draft spec sha — never the text,
     the restatements or the title.
+17. **Server cross-checks between the text and the draft** (`src/reva/nl/crosschecks.py`,
+    called from `crosscheck()` in `src/reva/nl/service.py` after composition; answers
+    scientific review V2 findings H2, H3 and M6 in `docs/dev/review_science_v2.md`).
+    A valid spec can still describe a different scenario than the one asked, so the
+    server compares the user's text with the draft, independently of the LLM:
+    * *Geography (every model)*: an exclusion ("tous les pays sauf …", "all countries
+      except …") cannot be expressed by any scenario schema → always blocks; a named
+      region or country group with `countries ["ALL"]` blocks; with an explicit
+      country list it only warns (`geography_qualifier_unverified`); any LLM-reported
+      `geography.*` gap blocks.
+    * *`economic.io_price`*: every shock origin must be named in the text, as an
+      origin when the reported country is also the shocked one ("en France" is a
+      location, not an origin; demonyms and "from/en provenance de" count); a
+      world-wide price change blocks (it needs a shock in every FIGARO economy, more
+      than the 10 a draft holds); the chosen industry is compared with the words
+      used and warned (`B` broader than crude, `C19` is refined products not crude,
+      `D35` is electricity *and* gas supply).
+    * *`social.retirement_age`*: a stated age *level* ("passe à 65 ans") is never
+      accepted as a shift in months; with the target-age intervention the stated
+      level must equal the drafted target (else blocks).
+    A blocking finding turns `draft_ready`/`draft_invalid` into `needs_input`: the
+    `draft_spec` and its sha are withheld, the field goes to `missing_fields`, and the
+    server-written question (fr/en, quoting only the user's own words) is added to
+    `unsupported` with `source: server_guard`, `blocks_draft: true`; non-blocking
+    findings become `warnings`. The checks are **lexical** (French and English
+    patterns): a miss leaves the draft to the user's review of the server
+    restatement, a false hit only asks a question. Tests:
+    `tests/unit/test_nl_crosschecks.py` (each case also asserts the status the draft
+    would have had without the cross-checks, so it fails on the earlier code).
 
 ## Live-call evidence (2026-10-15, through the environment proxy)
 
@@ -156,9 +188,12 @@ Errors (RFC 9457): 400 `idempotency_key_required`, 403 scope, 409
 | openai_en_io_energy_shock | 200 | gpt-4.1-2025-04-14 | 3286 | 7608 / 221 / 7829 |
 | openai_fr_population | 200 | gpt-4.1-2025-04-14 | 1994 | 7593 / 187 / 7780 |
 | openai_fr_all_countries | 200 | gpt-4.1-2025-04-14 | 2971 | 9965 / 248 / 10213 |
+| openai_fr_all_countries_except_china (cross-check H2) | 200 | gpt-4.1-2025-04-14 | 3696 | 10808 / 318 / 11126 |
+| openai_fr_oil_price_io (cross-check H3) | 200 | gpt-4.1-2025-04-14 | 2408 | 10799 / 335 / 11134 |
+| openai_fr_retirement_level (cross-check M6) | 200 | gpt-4.1-2025-04-14 | 2776 | 10817 / 301 / 11118 |
 | gemini_en_basic (`gemini-3.8-flash`) | 402 | — (prepayment credits depleted) | 326 | — |
 
-Latency 1.4–3.3 s. The input grew from ~4.8 k to ~7.6 k and then ~10 k tokens as
+Latency 1.4–3.7 s. The input grew from ~4.8 k to ~7.6 k and then ~10–10.8 k tokens as
 the POP, IO and retirement plugins registered (their country lists and parameters
 entered the catalogue); the budget reservation bound grows with it. `pytest -m live tests/integration/test_nl_live.py` (one call):
 `gpt-4.1-2025-04-14`, 2351 ms, 7477 / 208 / 7685 tokens, status `needs_input`.
@@ -176,6 +211,14 @@ All live calls of this session were made by the maintainer capture helper and
 the live test, outside the persistent ledger (per-run caps, like the operator
 live-check scripts): 33 OpenAI requests and 5 Gemini requests (404/402),
 about 170 k tokens in total.
+The three cross-check fixtures (recorded 2026-10-15 02:39–02:40 UTC, after the
+scientific review V2) are 3 further OpenAI requests, 33,378 tokens, made the same way.
+What the model drafted in them (asserted in `tests/unit/test_nl_crosschecks.py`):
+"tous les pays sauf la Chine" → `countries ["ALL"]` plus an LLM geography gap;
+"hausse de 25 % du prix du pétrole … en France" → still `{FRA, C19, +25}` even
+with the industry contents in the catalogue; "l'âge de départ passe à 65 ans" →
+`retirement_age_target`, 780 months, no birth cohort. All three end as
+`needs_input` with no `draft_spec` (decision 17).
 
 ## Tests
 
@@ -196,6 +239,8 @@ about 170 k tokens in total.
   ledger charged and settled with the reported usage; 429 with no provider call;
   disabled LLM and missing ledger functions fail closed (503); injection text as data.
 * `tests/integration/test_nl_live.py` — `live` (deselected by default), one call.
+* `tests/unit/test_nl_crosschecks.py` — server cross-checks (decision 17), offline:
+  the three recorded H2/H3/M6 responses plus labelled synthetic outputs.
 
 Results at hand-off (2026-10-15): `tests/unit` 693 passed; `tests/security -k "nl or
 injection or api"` 161 passed (an earlier run had 2 failures in other agents'
@@ -212,6 +257,9 @@ clean on `src/reva/nl` and the route; `scripts/export_contracts.py --check` up t
    intact), then regenerate `migrations/schema_contract.json`. Until then the
    integration test installs the same SQL in its private database and the
    endpoint returns 503 for the API role.
+   **Done** (later): `migrations/versions/0008_v2.py` executes `SQL_LLM_LEDGER`, a
+   copy of `LEDGER_FUNCTIONS_SQL` (`tests/unit/test_nl_ledger_migration.py` checks
+   the two copies are identical).
 2. **Invariant 30 owner (`tests/invariants/test_invariant_30_budgets.py`)**: the
    static scan's `LIVE_CALLS` does not match `LlmHttpClient(`; add it, list
    `src/reva/nl/service.py` under `BUDGETED` with markers

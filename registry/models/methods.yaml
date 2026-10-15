@@ -156,6 +156,9 @@ models:
       - shocked industries' output prices change exactly by the stated percentage (exogenous prices)
       - every other industry passes on share theta of its unit-cost increase (L1 theta = 1)
       - household basket weights are P3_S14 purchases at basic prices (no product taxes, no purchases abroad)
+      - each basket row also carries a labelled purchasers'-price reading that holds taxes less subsidies on
+        products (FIGARO DOM x D21X31 x P3_S14) fixed in money per unit; ad valorem taxes would keep the
+        basic-price figure, so the two readings bracket the tax treatment; neither is a CPI
       - a shocked industry is a whole table industry (NACE B is broader than crude petroleum)
   - model_key: social.retirement_age
     version: "1.0.0"
@@ -199,7 +202,7 @@ models:
       unsupported_outputs: [gdp_loss, unemployment, wages, household_welfare, benefit_substitution, full_rate_age_effects]
     assumptions:
       - base-year LFS employment rates by sex and five-year group held constant
-      - pension-receipt drop of an affected cell = base-year share outside the labour force (upper-bound proxy, own-country data)
+      - pension-receipt drop of an affected cell = base-year share outside the labour force (proxy of unknown direction, own-country data; bounding variants rho 60-64 / 65-69 in L2)
       - employment response share from the literature registry (stated assumption with citation; L2 grid)
       - exceptions to the general eligibility age (long careers, disability, hardship) not represented
       - average pension constant in nominal euro of its year; pension recipients level scales with the 65+ population

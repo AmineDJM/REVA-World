@@ -267,16 +267,26 @@ def test_enqueue_backtest_names_the_release(env: Env) -> None:
 
 
 def test_api_post_enqueues_a_backtest_job(env: Env) -> None:
+    from reva.api.auth import new_api_token
+
+    sim_tok, sha = new_api_token()
+    with env.owner.begin() as c:
+        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:h, :s, 'bt-sim')"),
+                  {"h": sha, "s": ["read", "simulate"]})
+    ro = env.client.post("/v1/models/demography.cohort_component/backtests",
+                         headers={"Authorization": f"Bearer {env.token}", "Idempotency-Key": "bt-api-post-ro01"},
+                         json={})
+    assert ro.status_code == 403  # read scope cannot submit
     r = env.client.post("/v1/models/demography.cohort_component/backtests",
-                        headers={"Authorization": f"Bearer {env.token}", "Idempotency-Key": "bt-api-post-0001"},
-                        json={"countries": ["li", "LU"]})
+                        headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0001"},
+                        json={"countries": ["lie", "LUX"]})
     assert r.status_code == 202, r.text
     job_id = r.json()["data"]["job_id"] if "data" in r.json() else r.json()["job_id"]
     rows = q(env.owner, "SELECT job_type, payload FROM ops.job WHERE id = :j", j=job_id)
     assert rows and rows[0]["job_type"] == "backtest"
     assert rows[0]["payload"]["model_key"] == "demography.cohort_component"
-    assert rows[0]["payload"]["countries"] == ["LI", "LU"]
+    assert rows[0]["payload"]["countries"] == ["LIE", "LUX"]
     bad = env.client.post("/v1/models/demography.cohort_component/backtests",
-                          headers={"Authorization": f"Bearer {env.token}", "Idempotency-Key": "bt-api-post-0002"},
+                          headers={"Authorization": f"Bearer {sim_tok}", "Idempotency-Key": "bt-api-post-0002"},
                           json={"unexpected": 1})
     assert bad.status_code == 422

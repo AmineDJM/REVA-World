@@ -2,7 +2,10 @@
 
 **Draft ledger** for the completion protocol (implementation prompt §14) and the P7 release checklist
 (architecture §25.1). Drafted on 2026-10-15 from the working tree on top of commit `b0d2d49`, which has
-uncommitted UI and doc edits. Sections 9 and 10 (**actual test results** and **deployment**) are placeholders.
+uncommitted UI and doc edits. **Updated later on 2026-10-15 (agent DOCV2)**: V1 rows that changed since the
+draft (governance enforced in the database with a separate gate process, the budget ledger, S3 checked against
+MinIO, backup/restore proven end to end, chaos tests, redaction, bounded ingest locks, the recorded live demo)
+and a V2 ledger (§12). Sections 9 and 10 (**actual test results** and **deployment**) are placeholders.
 The lead fills them in after the final full run. Until then, no row here claims that a test *passed* in the
 final run. "Done" means the code exists **and** a test or recorded measurement for it exists.
 
@@ -23,7 +26,12 @@ Inputs: `docs/dev/spec_audit.md` (snapshot 2026-10-14 23:45, stale in places), `
 (round 3), `docs/dev/perf_report.md`, `docs/dev/live_checks.md`, `docs/dev/review_core.md`,
 `docs/dev/review_api_sim_ops.md`, `docs/dev/review_autonomy_deploy_ui.md`, `docs/dev/review_science.md`,
 `docs/dev/review_db_fixes.md`, `docs/dev/doc_accuracy.md`, `tests/invariants/coverage.yaml`. Each claim was
-re-checked against the code with grep. Where the result differs from a report, the row says so.
+re-checked against the code with grep. Where the result differs from a report, the row says so. Inputs of the
+update: `docs/dev/gate_separation.md`, `docs/dev/s3_check.md`, `docs/dev/backup_check.md`,
+`docs/dev/chaos_check.md`, `docs/dev/redaction_check.md`, `docs/dev/lock_bounds.md`, `docs/dev/v2_eng.md`,
+`docs/dev/v2_allc.md`, `docs/dev/v2_nlc.md`, `docs/dev/v2_pop.md`, `docs/dev/v2_pop_backtest.md`,
+`docs/dev/v2_io.md`, `docs/dev/v2_pen.md`, `docs/dev/v2_pen_backtest.md`, `docs/dev/ui_v2.md`,
+`docs/dev/review_science_v2.md`.
 
 Abbreviations in evidence cells: `RG` = `tests/security/test_roles_grants.py`, `DBH` =
 `tests/security/test_db_hardening.py`, `QR` = `tests/integration/test_queue_reliability.py`, `SIM` =
@@ -31,8 +39,11 @@ Abbreviations in evidence cells: `RG` = `tests/security/test_roles_grants.py`, `
 `tests/integration/test_api_endpoints.py`, `HC` = `tests/security/test_http_connectors.py`, `SSRF` =
 `tests/security/test_ssrf_http.py`, `REV` = `tests/integration/test_revisions.py`, `EUR` =
 `tests/integration/test_eurostat_discovery.py`, `EF` = `tests/integration/test_evidence_fixes.py`, `POP` =
-`tests/unit/population/`. "demo step n" refers to `scripts/demo_workflow.py` (§17.3 workflow). Its output is in
-`var/acceptance/demo_fixtures.json` (00:19, 13/13 pass) and `var/acceptance/demo_live.json` (23:56, 12/13; step 8 failed).
+`tests/unit/population/`, `GOV` = `tests/security/test_governance_r5.py`, `GS` =
+`tests/security/test_gate_separation_security.py`. "demo step n" refers to `scripts/demo_workflow.py`
+(§17.3 workflow). Its output is in `var/acceptance/demo_fixtures.json` (started 00:19, 13/13 pass) and
+`var/acceptance/demo_live.json` (started 2026-10-15 00:19:35 on `9ecd563` with a dirty worktree, 13/13 pass; the
+earlier 23:56 live run had step 8 failing).
 
 ---
 
