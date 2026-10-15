@@ -128,7 +128,8 @@ class PolicyPromotionGate:
         """The ``ops.proposal`` row + its digest-verified document; ``obj`` must equal it (R6-03)."""
         with self.engine.connect() as conn:
             row = conn.execute(text(
-                "SELECT proposal_type, manifest_sha256, permission_tier, author, summary FROM ops.proposal WHERE id = :i"),
+                "SELECT proposal_type, manifest_sha256, permission_tier, author, summary "
+                "FROM ops.proposal WHERE id = :i"),
                 {"i": proposal_id}).mappings().one_or_none()
         if row is None:
             raise ValidationProblem("gate evaluates only persisted proposals (ops.proposal)")

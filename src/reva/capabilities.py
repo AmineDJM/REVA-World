@@ -404,8 +404,12 @@ _BASE: tuple[Capability, ...] = (
             "uncertainty over unidentified joints",
             "held-out joints scored",
         ),
-        reason="no approved joint household microdata; V1 uses public age/sex aggregate cells only",
+        reason=("no approved joint person x household data: households cannot be linked to synthetic persons "
+                "(member ages/sexes), household-aware IPU and multiple completed populations are not implemented; "
+                "V2 provides household units from public composition x children cells only "
+                "(population.household_margins)"),
         interface="reva.extensions.population",
+        available_instead=("population.household_margins",),
     ),
     Capability(
         "population.privacy_accounting",
@@ -532,13 +536,26 @@ _BASE: tuple[Capability, ...] = (
     Capability(
         "demography.cohort_component",
         "Cohort-component population projection (conditional projection, not a forecast)",
-        "reserved",
+        "implemented",
         "V2",
         "reva.models.population.cohort_component",
         ("Eurostat demography inputs as pinned dataset inputs", "back-test 2013 -> 2023 by age and sex with "
          "published error metrics", "labelled conditional projection under stated assumptions"),
-        reason="V2 step 3a: the cohort-component plugin and its back-test are not in this build yet",
         interface="reva.simulation.plugins",
+        tests=("tests/integration/test_demography_cohort.py::test_ingest_publishes_observations_and_registers_dataset_inputs",
+               "tests/integration/test_demography_cohort.py::test_l1_projection_runs_through_the_job_path",
+               "tests/integration/test_demography_cohort.py::test_l2_sensitivity_grid_and_range_rows",
+               "tests/integration/test_demography_cohort.py::test_backtest_evaluation_is_stored_from_pinned_datasets",
+               "tests/unit/test_population_cohort.py::test_residual_migration_reconstructs_observed_population_exactly",
+               "tests/unit/test_population_cohort.py::test_no_information_after_jump_off",
+               "tests/property/test_population_cohort_properties.py::"
+               "test_population_balancing_equation_exact_and_negative_cohorts_flagged"),
+        docs=("docs/dev/v2_pop.md", "docs/dev/v2_pop_backtest.md"),
+        notes=("Experimental model (maintainer review pending). EU-27 + EFTA from Eurostat demo_pjan/demo_magec/"
+               "demo_fasec; constant base-period mortality (no improvement); migration and fertility as labelled "
+               "assumptions (zero, residual average, EUROPOP2023 baseline); L2 is an assumption grid without "
+               "probability levels. Back-test errors are published, including countries where it does worse "
+               "than a no-change benchmark."),
     ),
     Capability(
         "economic.io_price",
@@ -563,14 +580,53 @@ _BASE: tuple[Capability, ...] = (
     ),
     Capability(
         "social.retirement_age",
-        "Retirement-age module (France first)",
-        "reserved",
+        "Retirement-age module (France; Germany, Spain, Netherlands where sourced)",
+        "implemented",
         "V2",
         "reva.models.social.retirement_age",
-        ("reviewed legal-age rule table with citations", "literature parameters as cited assumptions with a "
-         "sensitivity grid", "2010-reform back-test 2010 -> 2019 reported, including when bad"),
-        reason="V2 step 4: the retirement-age plugin and its back-test are not in this build yet",
+        ("legal-age rule tables with per-row citations verified against archived legal text (transcribed by an "
+         "agent; maintainer review pending)", "literature parameters as cited assumptions with a "
+         "sensitivity grid (verified values only)", "2010-reform back-test 2012 -> 2019 reported, including "
+         "its weaknesses (placebo 55-59)"),
         interface="reva.simulation.plugins",
+        tests=("tests/unit/social/test_retirement_rules.py::test_every_row_is_cited_and_its_locator_is_in_the_archived_source",
+               "tests/unit/social/test_retirement_age_model.py::test_change_equals_difference_of_levels_and_signs",
+               "tests/unit/social/test_retirement_age_model.py::test_l2_grid_range_contains_every_point_and_no_response_reference",
+               "tests/unit/social/test_retirement_age_model.py::test_countries_without_rule_tables_are_capability_gaps",
+               "tests/unit/social/test_retirement_age_model.py::test_macro_outputs_are_capability_gaps",
+               "tests/unit/social/test_retirement_backtest.py::test_no_grid_estimate_overlaps_the_backtested_reform_or_period",
+               "tests/unit/social/test_retirement_backtest.py::test_backtest_is_reproducible_and_matches_the_committed_artifact",
+               "tests/integration/test_labour_pensions_retirement_pipeline.py::test_retirement_scenario_runs_through_the_job_path_with_pinned_datasets"),
+        docs=("docs/dev/v2_pen.md", "docs/dev/v2_pen_backtest.md"),
+        notes=("Experimental model (maintainer review pending); conditional projection under stated assumptions, "
+               "not a forecast. Outputs: employed persons 55-69, pension recipients, approximate pension "
+               "expenditure change, old-age dependency ratio (from demography.cohort_component). No GDP, "
+               "unemployment or welfare output. ITA, BEL, SWE, POL are refused (no sourced rule table); Spain is "
+               "refused by its own data (contribution-track heterogeneity). The back-test fits well partly by "
+               "offsetting errors; see docs/dev/v2_pen_backtest.md."),
+    ),
+    Capability(
+        "population.household_margins",
+        "Weighted representative households from public composition x children cells (no person linkage)",
+        "implemented",
+        "V2",
+        "reva.population.households",
+        (
+            "approved public joint household cells (Eurostat lfst_hhnhtych composition x number of children; "
+            "no microdata)",
+            "structural constraints exact (impossible cells refused, exact rational weights, no support violations)",
+            "unidentified joints kept as bounds (open household sizes never imputed)",
+            "held-out EU-SILC size distribution and average size scored; discrepancies reported, not corrected",
+        ),
+        tests=("tests/unit/social/test_households.py::test_france_recipe_cells_structural_zeros_and_totals",
+               "tests/unit/social/test_households.py::test_exact_weight_conservation_and_no_support_violations",
+               "tests/unit/social/test_households.py::test_structural_zero_with_a_reported_value_is_refused",
+               "tests/unit/social/test_households.py::test_missing_leaf_stays_missing_and_totals_gate_reports_remainder",
+               "tests/unit/social/test_households.py::test_held_out_silc_scoring_is_reported_including_misses",
+               "tests/unit/social/test_households.py::test_records_carry_no_person_attributes"),
+        docs=("docs/dev/v2_pen.md",),
+        notes=("V2 step 4 (agent PEN). Household units only: not linked to synthetic persons, no member age, sex or "
+               "other attribute. The full P10 capability population.households stays reserved."),
     ),
     Capability(
         "nl.scenario_drafts",

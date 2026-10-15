@@ -55,19 +55,10 @@ def _datasets(conn: Any, store: ArtifactStore, release_id: Any, iso3: str) -> di
     return out
 
 
-def evaluate_country(conn: Any, store: ArtifactStore, release_id: Any, iso3: str,
-                     comparison_jump_off: int, comparison_base: tuple[int, int]) -> dict[str, Any]:
-    ds = _datasets(conn, store, release_id, iso3)
-    missing = [n for n in ("population", "deaths", "births") if ds[n].is_missing]
-    prov = {n: d.provenance() for n, d in ds.items() if not d.is_missing}
-    if missing:
-        return {"country": iso3, "status": "missing_input", "missing": missing, "inputs": prov}
-    data = C.CountryDemography.from_tables(
-        iso3, population=ds["population"].table, deaths=ds["deaths"].table, births=ds["births"].table,
-        europop_migration=None if ds["europop_migration"].is_missing else ds["europop_migration"].table,
-        europop_fertility=None if ds["europop_fertility"].is_missing else ds["europop_fertility"].table,
-        europop_population=None if ds["europop_population"].is_missing else ds["europop_population"].table)
-    out: dict[str, Any] = {"country": iso3, "status": "evaluated", "inputs": prov, "backtests": {},
+def evaluate_data(data: C.CountryDemography, comparison_jump_off: int = 2025,
+                  comparison_base: tuple[int, int] = (2019, 2023)) -> dict[str, Any]:
+    """Pure: both back-test designs and the EUROPOP2023 plausibility comparison for one country."""
+    out: dict[str, Any] = {"country": data.iso3, "status": "evaluated", "backtests": {},
                            "europop2023_comparison": {}}
     for bt in (PRIMARY, LITERAL):
         try:
@@ -84,6 +75,21 @@ def evaluate_country(conn: Any, store: ArtifactStore, release_id: Any, iso3: str
         except (MissingInput, RevaError) as e:
             out["europop2023_comparison"][a.variant] = {"status": "unavailable", "problem": e.problem()}
     return out
+
+
+def evaluate_country(conn: Any, store: ArtifactStore, release_id: Any, iso3: str,
+                     comparison_jump_off: int, comparison_base: tuple[int, int]) -> dict[str, Any]:
+    ds = _datasets(conn, store, release_id, iso3)
+    missing = [n for n in ("population", "deaths", "births") if ds[n].is_missing]
+    prov = {n: d.provenance() for n, d in ds.items() if not d.is_missing}
+    if missing:
+        return {"country": iso3, "status": "missing_input", "missing": missing, "inputs": prov}
+    data = C.CountryDemography.from_tables(
+        iso3, population=ds["population"].table, deaths=ds["deaths"].table, births=ds["births"].table,
+        europop_migration=None if ds["europop_migration"].is_missing else ds["europop_migration"].table,
+        europop_fertility=None if ds["europop_fertility"].is_missing else ds["europop_fertility"].table,
+        europop_population=None if ds["europop_population"].is_missing else ds["europop_population"].table)
+    return {**evaluate_data(data, comparison_jump_off, comparison_base), "inputs": prov}
 
 
 def run_population_evaluation(engine: Engine, store: ArtifactStore, release_id: Any, countries: Sequence[str], *,

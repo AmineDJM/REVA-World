@@ -33,7 +33,7 @@ DS = {"population": "demo_pjan", "deaths": "demo_magec", "births": "demo_fasec",
 
 @cache
 def fixture_tables() -> dict[str, dict[str, Any]]:
-    c = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
+    c = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008, window_years=ed.WINDOW_YEARS)
     http = FixtureHttp(ed.NAME)
 
     async def go() -> dict[str, list[Any]]:

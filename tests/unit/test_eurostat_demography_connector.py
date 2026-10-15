@@ -23,7 +23,8 @@ FIXTURE_COUNTRIES = ("LI", "LU")
 
 
 def connector() -> ed.EurostatDemographyConnector:
-    return ed.EurostatDemographyConnector(countries=FIXTURE_COUNTRIES, since_year=2008)
+    return ed.EurostatDemographyConnector(countries=FIXTURE_COUNTRIES, since_year=2008,
+                                          window_years=ed.WINDOW_YEARS)
 
 
 def raws() -> dict[str, RawAcquisition]:
@@ -51,7 +52,7 @@ def test_name_does_not_collide_with_autonomy_templates_and_is_builtin() -> None:
 
 
 def test_plan_covers_every_country_and_dataset_and_resumes_from_cursor() -> None:
-    c = ed.EurostatDemographyConnector()
+    c = builtin_connectors()["eurostat.demography"]  # the windowed built-in instance
     items = c.all_items()
     assert len(items) == 31 * 3 * 3 + 3  # 3 time windows per observed table
     assert all(i.url.startswith(ed.DATA_BASE) for i in items)
@@ -205,4 +206,4 @@ def test_registry_entries_exist() -> None:
     assert {m["target"]["concept_id"] for m in maps} == {ed.DATASETS[k].concept_id for k in ed.OBSERVED}
     assert all(m["mapping_kind"] == "exact" for m in maps)
     assert budgets_policy().content["per_source_daily_requests"]["eurostat.demography"] >= len(
-        ed.EurostatDemographyConnector().all_items())
+        builtin_connectors()["eurostat.demography"].all_items())

@@ -307,6 +307,13 @@ function IoView({ st }: { st: SimulationStatus }) {
   }, [st.results]);
   const label = (iso: string) => (labels.get(iso) && labels.get(iso) !== iso ? `${labels.get(iso)} (${iso})` : iso);
   const isL2 = st.run?.fidelity === 'L2';
+  const oneSided = [
+    ...new Set(
+      baskets
+        .map((b) => (b.range ? (b.range.value as unknown as { one_sidedness?: unknown }).one_sidedness : null))
+        .filter((x): x is string => typeof x === 'string'),
+    ),
+  ];
   const shocks = Array.isArray((st.scenario?.spec?.intervention as Record<string, unknown> | undefined)?.shocks)
     ? ((st.scenario!.spec.intervention as Record<string, unknown>).shocks as Record<string, unknown>[])
     : [];
@@ -357,9 +364,6 @@ function IoView({ st }: { st: SimulationStatus }) {
                     {isL2 && (
                       <td>
                         {b.range ? <ValueView value={b.range.value} /> : <span className="muted">—</span>}
-                        {b.range && typeof (b.range.value as unknown as { one_sidedness?: unknown }).one_sidedness === 'string' && (
-                          <span className="field-hint"> {(b.range.value as unknown as { one_sidedness: string }).one_sidedness}</span>
-                        )}
                       </td>
                     )}
                     {(Object.keys(IO_CONTRIB) as (keyof typeof IO_CONTRIB)[]).map((k) => (
@@ -373,6 +377,11 @@ function IoView({ st }: { st: SimulationStatus }) {
         )}
       </section>
 
+      {oneSided.length > 0 && (
+        <p className="field-hint" data-testid="one-sidedness">
+          Sensitivity range: {oneSided.join(' / ')}
+        </p>
+      )}
       <section className="panel" aria-labelledby="hm-h">
         <h2 id="hm-h">Output-price change by country and industry</h2>
         {matrix.countries.length === 0 ? <p className="muted">No industry rows in this run.</p> : <IoHeatmap matrix={matrix} countryLabel={label} />}
@@ -542,7 +551,7 @@ export function RunBody({ id, env }: { id: string; env: Envelope<SimulationStatu
           </ul>
         )}
         {ex.assumptions && <JsonView value={ex.assumptions} />}
-        {ex.grid && (
+        {ex.grid && ex.grid.length > 0 && (
           <details>
             <summary>Sensitivity grid ({ex.grid.length} variants; scenario assumptions, no probability)</summary>
             <JsonView value={ex.grid} />

@@ -60,7 +60,7 @@ def test_live_ingest_projection_and_backtest(tmp_path: Path) -> None:
         engines = {k: make_engine(k, settings) for k in ("migration", "api", "worker", "sim")}
         try:
             seed(engines["migration"], store)
-            connector = ed.EurostatDemographyConnector(countries=geos)
+            connector = ed.EurostatDemographyConnector(countries=geos, window_years=ed.WINDOW_YEARS)
             spec_ = connector.describe()
             planned = len(connector.all_items())
             reservation = reserve_ingest(engines["worker"], job_id=uuid.uuid4(), attempt=1,

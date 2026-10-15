@@ -210,5 +210,23 @@ Check the exact `source_flags` key names against `comtrade.py` and `worldbank.py
 
 ## Test results
 
-- **Before the fixes**, the autonomy suites showed 6 failures: R6-01 (5 promotion tests) and the DZA gap test.
-- **After the fixes**, see the AFX report. The DB fixture was briefly broken by GATE's in-flight `reva_gate` role provisioning (SQLSTATE 42704) while this was written.
+**Before the fixes.** The autonomy suites had 6 failures:
+- R6-01 broke 5 promotion tests;
+- the DZA gap-detector test failed.
+
+**After the fixes** (final run, with GATE's `reva_gate` separation in the tree):
+
+| Suite | Result |
+|---|---|
+| `test_autonomy_gates.py`, `test_autonomy_contracts.py`, `test_autonomy_r6.py` | 76 passed |
+| `test_eurostat_discovery.py` | 27 passed |
+| Wider autonomy set: `test_sandbox_isolation.py`, `test_prompt_injection.py`, `test_redaction_r7.py`, `test_connector_repair.py`, `test_repair_hookup.py`, `test_budget_caps.py` | 182 passed. One test failed only because of GATE's grant change, and GATE adapted it. |
+
+**Scratch files** (`scratchpad/review6`, outputs in `scratchpad/after_test_r6_*.txt`). They were run against the fixed tree before GATE revoked the worker's `ops.record_gate_result`:
+- every attack in my area no longer reproduces;
+- the two exceptions are R6-08 and R6-14, which are HOOK's patches;
+- `test_r4_01_*` still correctly rejects.
+
+After GATE's change, the scratch DB tests fail earlier, with `permission denied for record_gate_result`, because they record gate results as the worker.
+
+**Full-suite run.** It showed failures in many areas that other agents were editing at the same time, such as GATE, NL, cohort and households. Every failure in my area passed on re-run once those concurrent edits settled. One of those edits was a `budgets.yaml` re-pin.

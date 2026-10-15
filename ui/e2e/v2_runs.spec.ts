@@ -30,12 +30,12 @@ function common(model: string, extra: Record<string, unknown>) {
 
 const COHORT = () =>
   common('demography.cohort_component', {
-    title: 'e2e cohort projection France',
-    countries: ['FRA'],
-    reference_year: 2023,
+    title: 'e2e cohort projection Luxembourg',
+    countries: ['LUX'],
+    reference_year: 2025,
     horizon: { periods: 5, unit: 'calendar_year' },
     intervention: { kind: 'baseline_projection' },
-    assumptions: { mortality: 'constant_base_period_rates', fertility: 'constant_base_period_rates', migration: 'average_residual', base_period: { first_year: 2018, last_year: 2022 } },
+    assumptions: { mortality: 'constant_base_period_rates', fertility: 'constant_base_period_rates', migration: 'average_residual', base_period: { first_year: 2019, last_year: 2023 } },
     outputs: ['population.total.all_ages', 'old_age_dependency_ratio_65plus_per_15_64', 'population_by_single_age'],
   });
 
@@ -109,6 +109,33 @@ test('cohort projection: pyramid by year with a slider, period bounds, labels', 
   await expect(page.getByTestId('pyramid-year')).not.toHaveText(first ?? '');
   await expect(page.getByTestId('period-chart').first()).toBeVisible();
   await expect(page.getByTestId('backtest-panel')).toBeVisible();
+});
+
+test('cohort projection L2: assumption-sensitivity ribbon per year, never a confidence band', async ({ page, context }) => {
+  test.setTimeout(300_000);
+  const spec = COHORT() as Record<string, any>;
+  spec.title = 'e2e cohort projection Luxembourg L2';
+  spec.fidelity = 'L2';
+  spec.outputs = ['population.total.all_ages', 'old_age_dependency_ratio_65plus_per_15_64'];
+  spec.assumptions = { ...spec.assumptions, sensitivity: { migration: ['zero', 'average_residual'], fertility: ['constant_base_period_rates'] } };
+  const r = await tryRun(page, context, spec);
+  test.skip(!r.id, `cohort projection L2 cannot run on this stack: ${r.reason}`);
+  const st = (await apiGet(page.request, `/v1/simulations/${r.id}`)).data;
+  const ranges = (st.results as any[]).filter((x) => x.variant === 'L2:sensitivity_range' && x.output_key === 'population.total.all_ages');
+  expect(ranges.length).toBeGreaterThan(0);
+  expect(ranges.every((x) => x.period_start && x.period_end)).toBe(true);
+  await page.goto(`/runs/${r.id}`);
+  await settle(page);
+  await expect(page.getByTestId('sensitivity-ribbon')).toBeVisible();
+  await expect(page.getByText(/ribbon = assumption sensitivity range \(not a confidence interval\)/)).toBeVisible();
+  await page.getByText(/^Table: Population, total, all ages/).click();
+  const table = page.getByTestId('series-table');
+  for (const x of ranges) {
+    const year = x.period_start.slice(0, 4);
+    const row = table.getByRole('row').filter({ has: page.getByRole('rowheader', { name: new RegExp(`^${year} `) }) });
+    await expect(row).toContainText(`[${x.period_start}, ${x.period_end})`);
+  }
+  await expect(table).not.toContainText('±');
 });
 
 test('retirement age: indicators, sensitivity ribbon and back-test panel', async ({ page, context }) => {

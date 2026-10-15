@@ -69,7 +69,7 @@ def env(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Env]:
         store = FilesystemArtifactStore(root, settings.reva_s3_prefix)
         engines = {k: make_engine(k, settings) for k in ("migration", "api", "worker", "sim")}
         seed(engines["migration"], store)
-        conn_ = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
+        conn_ = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008, window_years=ed.WINDOW_YEARS)
         report = asyncio.run(run_connector(conn_, FixtureHttp(ed.NAME), store, engines["worker"],
                                            persist_cursor=False, post_publish=ed.post_publish_datasets))
         # a release needs at least one selected estimate: the World Bank fixture provides them
@@ -148,7 +148,7 @@ def test_ingest_publishes_observations_and_registers_dataset_inputs(env: Env) ->
     observed = {ed.DATASETS[d].concept_id for d in ed.OBSERVED}
     europop = {ed.DATASETS[d].concept_id for d in ed.EUROPOP}
     assert got == {(c, s) for c in observed for s in ("LIE", "LUX")} | {(c, "LUX") for c in europop}
-    windows = len(ed.EurostatDemographyConnector(since_year=2008).windows())
+    windows = len(ed.EurostatDemographyConnector(since_year=2008, window_years=ed.WINDOW_YEARS).windows())
     for r in rows:  # an observed table is assembled from all its time-window acquisitions
         assert r["parser_version"] == ed.PARSER_VERSION
         assert len(r["source_acquisition_ids"]) == (windows if r["concept_id"] in observed else 1)

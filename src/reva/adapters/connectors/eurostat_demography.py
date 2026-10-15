@@ -489,7 +489,10 @@ class EurostatDemographyConnector:
     """Reviewed built-in connector for Eurostat demography and EUROPOP2023 assumptions."""
 
     def __init__(self, countries: Sequence[str] | None = None, *, include_europop: bool = True,
-                 since_year: int = SINCE_YEAR) -> None:
+                 since_year: int = SINCE_YEAR, window_years: int | None = None) -> None:
+        """``window_years=None``: one request per (dataset, country) for all years (the plain
+        URL scheme); ``window_years=WINDOW_YEARS``: time-window requests (what the built-in
+        instance in ``registry.builtin_connectors`` uses, see :data:`WINDOW_YEARS`)."""
         geos = list(countries) if countries is not None else list(COUNTRIES)
         unknown = [g for g in geos if g not in COUNTRIES]
         if unknown:
@@ -497,6 +500,9 @@ class EurostatDemographyConnector:
         self.geos = tuple(sorted(set(geos)))
         self.include_europop = include_europop
         self.since_year = int(since_year)
+        if window_years is not None and window_years < 1:
+            raise ValueError("window_years must be >= 1")
+        self.window_years = window_years
         self._prior_done: set[str] = set()
 
     def describe(self) -> ConnectorSpec:
@@ -530,9 +536,11 @@ class EurostatDemographyConnector:
         """Time windows of the observed tables (the last one is open-ended: "latest")."""
         out: list[tuple[int, int | None]] = []
         start = self.since_year
-        while start + WINDOW_YEARS <= OPEN_WINDOW_FROM:
-            out.append((start, start + WINDOW_YEARS - 1))
-            start += WINDOW_YEARS
+        if self.window_years is None:
+            return [(start, None)]
+        while start + self.window_years <= OPEN_WINDOW_FROM:
+            out.append((start, start + self.window_years - 1))
+            start += self.window_years
         out.append((start, None))
         return out
 
@@ -558,10 +566,12 @@ class EurostatDemographyConnector:
         for g in self.geos:
             for ds in OBSERVED:
                 for w in self.windows():
-                    items.append(FetchItem(key=f"{ds}:{g}:{w[0]}", url=self.url_for(ds, [g], w),
+                    key = f"{ds}:{g}" if self.window_years is None else f"{ds}:{g}:{w[0]}"
+                    items.append(FetchItem(key=key, url=self.url_for(ds, [g], w),
                                            expected_media_types=("application/json",), max_bytes=MAX_RESPONSE_BYTES,
                                            params={"kind": "jsonstat", "dataset": ds, "geos": [g],
-                                                   "window": [w[0], w[1]], "since_year": self.since_year}))
+                                                   "window": [w[0], w[1]], "since_year": self.since_year,
+                                                   "window_years": self.window_years}))
         if self.include_europop:
             geos = [g for g in self.geos]
             for ds in EUROPOP:
@@ -883,15 +893,15 @@ def _fingerprint(url: str) -> str:
     return request_fingerprint("GET", url, secret_params=("subscription-key",))
 
 
-def _group_items(dataset: str, geos: Sequence[str], since_year: int) -> list[FetchItem]:
+def _group_items(dataset: str, geos: Sequence[str], since_year: int, window_years: int | None) -> list[FetchItem]:
     """Every request whose bytes make up the dataset inputs of (dataset, geos)."""
-    conn_ = EurostatDemographyConnector(countries=list(geos), since_year=since_year,
+    conn_ = EurostatDemographyConnector(countries=list(geos), since_year=since_year, window_years=window_years,
                                         include_europop=DATASETS[dataset].kind == "europop")
     return [i for i in conn_.all_items() if i.params["dataset"] == dataset and list(i.params["geos"]) == list(geos)]
 
 
 def assemble_datasets(conn: Any, store: Any, dataset: str, geos: Sequence[str], *, origin: str,
-                      since_year: int = SINCE_YEAR) -> list[Any]:
+                      since_year: int = SINCE_YEAR, window_years: int | None = WINDOW_YEARS) -> list[Any]:
     """Register the dataset inputs of (dataset, geos) from the latest passing acquisition of every
     request that makes them up (all time windows). Returns the registered records, or ``[]`` while
     any part is missing or did not pass validation (an incomplete table is never registered)."""
@@ -902,7 +912,7 @@ def assemble_datasets(conn: Any, store: Any, dataset: str, geos: Sequence[str], 
     from reva.kernel.ids import sha256_bytes
     from reva.simulation.datasets import register_dataset
 
-    items = _group_items(dataset, geos, since_year)
+    items = _group_items(dataset, geos, since_year, window_years)
     fps = {_fingerprint(i.url): i for i in items}
     rows = conn.execute(text(
         """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.request_fingerprint, a.response_metadata
@@ -950,7 +960,9 @@ def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: S
     dataset = str(raw.item.params["dataset"])
     geos = list(raw.item.params.get("geos") or [])
     since = int(raw.item.params.get("since_year") or SINCE_YEAR)  # the window grid's anchor
-    assemble_datasets(conn, store, dataset, geos, origin=raw.origin, since_year=since)
+    wy = raw.item.params.get("window_years")
+    assemble_datasets(conn, store, dataset, geos, origin=raw.origin, since_year=since,
+                      window_years=int(wy) if wy is not None else None)
 
 
 # Optional hook read by runners that dispatch post-publish steps per connector.
@@ -964,12 +976,14 @@ def backfill_datasets(conn: Any, store: Any, *, origin: str = "live",
     For runners that do not dispatch :func:`post_publish_datasets` (the worker ``ingest``
     job dispatches post-publish steps by template only). Idempotent: ``register_dataset``
     returns the existing row for identical table bytes. Caller's transaction (worker role)."""
-    c = connector or EurostatDemographyConnector()
+    c = connector or EurostatDemographyConnector(window_years=WINDOW_YEARS)
     out: list[Any] = []
     for ds in OBSERVED:
         for g in c.geos:
-            out += assemble_datasets(conn, store, ds, [g], origin=origin, since_year=c.since_year)
+            out += assemble_datasets(conn, store, ds, [g], origin=origin, since_year=c.since_year,
+                                     window_years=c.window_years)
     if c.include_europop:
         for ds in EUROPOP:
-            out += assemble_datasets(conn, store, ds, list(c.geos), origin=origin, since_year=c.since_year)
+            out += assemble_datasets(conn, store, ds, list(c.geos), origin=origin, since_year=c.since_year,
+                                     window_years=c.window_years)
     return out

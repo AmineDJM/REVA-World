@@ -1328,6 +1328,7 @@ table.heatmap {
   border-collapse: separate;
   border-spacing: 1px;
   font-size: 0.72rem;
+  min-width: min(100%, 560px);
 }
 table.heatmap caption {
   text-align: left;
@@ -1358,7 +1359,6 @@ table.heatmap thead th {
   font-weight: 500;
 }
 .hm-cell {
-  width: 14px;
   min-width: 14px;
   height: 16px;
   background: #f0efec;
