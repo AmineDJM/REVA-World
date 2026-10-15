@@ -88,6 +88,7 @@ markers = [
   "live: performs real network requests to public providers",
   "perf: performance measurement",
   "e2e: end-to-end demonstration workflow (fresh database)",
+  "chaos: real-process fault injection (SIGKILL/SIGTERM/DB loss) against a throwaway database",
 ]
 addopts = "-m 'not live and not perf'"
 

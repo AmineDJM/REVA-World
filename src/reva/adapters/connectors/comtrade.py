@@ -13,6 +13,20 @@ flow-specific concepts ``trade.hs2709.{import,export}_net_weight.world_total``
 valuation label is inferred per flow (exports are FOB; a CIF label on an export
 is impossible); value bases record the exchange-rate transform.
 
+1.2.0 (parser comtrade-parse-3): estimation flags follow the UNSD coding of
+``legacyEstimationFlag`` (0 none, 2 quantity, 4 net weight, 6 both estimated;
+UNSD trade data processing method, 2019), which concerns quantity/weight, never
+the USD value. Value observations carry ``provider_value_estimated``, which is
+``null`` (undeterminable): no field of the public-preview response marks the
+value itself as estimated (``isReported=false`` holds for every world-total
+row and is kept raw). Net-weight observations carry
+``provider_quantity_estimated`` (``isQtyEstimated``/``isNetWgtEstimated`` or
+codes 2/4/6). The 1.1.0 flag ``provider_estimation_flagged`` (code != 0, read
+by consumers as an estimated value) is no longer emitted; readers treat it on
+old rows as quantity estimation. Raw provider flags are kept unchanged. Values,
+concepts and logical keys are unchanged (minor bump). Validation now also blocks
+structural drift (below).
+
 Structural drift blocks (the acquisition is quarantined; nothing is coerced):
 a row lacking a consumed field (e.g. ``primaryValue`` renamed) is a schema
 change, not a missing flow -- only a present ``null`` is a provider Missing;
@@ -77,8 +91,8 @@ WEIGHT_CONCEPT = {
     "M": "trade.hs2709.import_net_weight.world_total",
     "X": "trade.hs2709.export_net_weight.world_total",
 }
-CONNECTOR_VERSION = "1.1.0"
-PARSER_VERSION = "comtrade-parse-2"
+CONNECTOR_VERSION = "1.2.0"
+PARSER_VERSION = "comtrade-parse-3"
 JUMP_RATIO = Decimal(100)
 VALUATION_UNDETERMINED = "primaryValue (basis not determinable from response)"
 EXCHANGE_RATE_TRANSFORM = "provider_reported_usd (UN Comtrade methodology)"
@@ -92,6 +106,29 @@ VALUE_FIELDS = ("primaryValue", "cifvalue", "fobvalue", "netWgt")
 # HS editions for which the reviewed HS2709 mapping applies (registry/mappings/comtrade.yaml
 # applicability.classifications); an edition outside it (e.g. H7) is blocked until reviewed.
 REVIEWED_CLASSIFICATIONS = ("H4", "H5", "H6")
+# UNSD legacy estimation codes: (quantity estimated, net weight estimated). None of them
+# marks the trade value as estimated.
+LEGACY_ESTIMATION_CODES: dict[int, tuple[bool, bool]] = {0: (False, False), 2: (True, False), 4: (False, True),
+                                                         6: (True, True)}
+
+
+def _legacy_code(v: Any) -> int | None:
+    if v is None or isinstance(v, bool):
+        return None
+    try:
+        d = Decimal(str(v))
+    except ArithmeticError:
+        return None
+    return int(d) if d == d.to_integral_value() else None
+
+
+def _quantity_estimated(r: dict[str, Any]) -> tuple[bool, bool]:
+    """(quantity and/or net weight estimated by the provider, legacy code recognised)."""
+    raw = r.get("legacyEstimationFlag")
+    code = _legacy_code(raw)
+    known = LEGACY_ESTIMATION_CODES.get(code) if code is not None else None
+    est = r.get("isQtyEstimated") is True or r.get("isNetWgtEstimated") is True or bool(known and any(known))
+    return est, raw is None or known is not None
 
 
 def _nonzero(v: Any) -> bool:
@@ -249,12 +286,24 @@ class ComtradeConnector:
             "qtyUnitCode": plain(r.get("qtyUnitCode")),
             "qty": plain(r.get("qty")),
             "isQtyEstimated": r.get("isQtyEstimated"),
-            # 1.1.0: the former derived flag provider_derived_aggregate (isAggregate and not
-            # isReported) was true for every live HS2709 world-total row, i.e. uninformative.
-            # The raw isReported/isAggregate flags are kept above; the derived flag now marks
-            # only rows the provider itself flags as estimated (legacyEstimationFlag != 0).
-            "provider_estimation_flagged": _nonzero(r.get("legacyEstimationFlag")),
         }
+
+    def _value_flags(self, r: dict[str, Any]) -> dict[str, Any]:
+        flags = self._flags(r)
+        # No response field marks the USD value as estimated (legacyEstimationFlag codes
+        # quantity/weight only): undeterminable, never claimed either way.
+        flags["provider_value_estimated"] = None
+        if not _quantity_estimated(r)[1]:
+            flags["legacy_estimation_code_unrecognised"] = True
+        return flags
+
+    def _weight_flags(self, r: dict[str, Any]) -> dict[str, Any]:
+        flags = self._flags(r)
+        est, known = _quantity_estimated(r)
+        flags["provider_quantity_estimated"] = est
+        if not known:
+            flags["legacy_estimation_code_unrecognised"] = True
+        return flags
 
     @staticmethod
     def _valuation(flow: str, r: dict[str, Any]) -> tuple[str, str | None]:
@@ -315,9 +364,9 @@ class ComtradeConnector:
                 flags: dict[str, Any] = {"provider_returned_no_rows": True}
             elif r.get("primaryValue") is None:
                 value = {"kind": "missing", "reason": "unavailable"}
-                flags = self._flags(r)
+                flags = self._value_flags(r)
             else:
-                flags = self._flags(r)
+                flags = self._value_flags(r)
                 value = {
                     "kind": "decimal",
                     "value": dec_str(r["primaryValue"]),
@@ -330,7 +379,7 @@ class ComtradeConnector:
             if r is None:
                 value, flags = {"kind": "missing", "reason": "unavailable"}, {"provider_returned_no_rows": True}
             else:
-                flags = self._flags(r)
+                flags = self._weight_flags(r)
                 w = r.get("netWgt")
                 if w is None or Decimal(w) <= 0:
                     # null or zero weight alongside a positive value is unusable, never a measurement
@@ -359,7 +408,7 @@ class ComtradeConnector:
         year = int(str(r.get("period")))
         partner = str(plain(r.get("partnerCode")))
         v = r.get("primaryValue")
-        flags = {**self._flags(r), "flowCode": flow, "partnerCode": partner}
+        flags = {**self._value_flags(r), "flowCode": flow, "partnerCode": partner}
         value: dict[str, Any] = (
             {"kind": "missing", "reason": "unavailable"}
             if v is None
@@ -436,11 +485,18 @@ class ComtradeConnector:
             findings.append(Finding(code="valuation_basis_undetermined", severity="warning",
                                     message=f"{len(undetermined)} values carry an undeterminable valuation basis "
                                             f"({', '.join(codes)}); labelled '{VALUATION_UNDETERMINED}'"))
-        estimated = [o for o in batch.observations if o.source_flags.get("provider_estimation_flagged")]
+        estimated = [o for o in batch.observations if o.source_flags.get("provider_quantity_estimated")]
         if estimated:
-            findings.append(Finding(code="provider_estimation_flagged", severity="info",
-                                    message=f"{len(estimated)} values carry a provider estimation flag "
-                                            "(legacyEstimationFlag != 0)"))
+            findings.append(Finding(code="provider_quantity_estimated", severity="info",
+                                    message=f"{len(estimated)} net weights are estimated by the provider "
+                                            "(isQtyEstimated/isNetWgtEstimated, legacyEstimationFlag 2/4/6); "
+                                            "trade values are as reported"))
+        unknown = sorted({str(o.source_flags.get("legacyEstimationFlag")) for o in batch.observations
+                          if o.source_flags.get("legacy_estimation_code_unrecognised")})
+        if unknown:
+            findings.append(Finding(code="estimation_code_unrecognised", severity="warning",
+                                    message=f"legacyEstimationFlag {', '.join(unknown)} is outside the UNSD codes "
+                                            "0/2/4/6; estimation status of these rows needs review"))
         findings.extend(self._jump_signals(batch))
         return _report(findings, len(batch.expected_keys), len(batch.observations), ())
 

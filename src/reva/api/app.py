@@ -9,6 +9,7 @@ audit inserts.
 
 from __future__ import annotations
 
+import asyncio
 import json
 import logging
 import secrets
@@ -156,6 +157,11 @@ def create_app(
 
     @asynccontextmanager
     async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+        # Refuse to serve against a schema that differs from the committed contract (SchemaDriftError, a
+        # ConfigurationError): enforced in production, a logged warning under REVA_ENV=test.
+        from reva.adapters.postgres.schema_contract import assert_schema_contract
+
+        await asyncio.to_thread(assert_schema_contract, engine(), reva_env=settings.reva_env)
         yield
         engine.dispose()  # type: ignore[attr-defined]
 

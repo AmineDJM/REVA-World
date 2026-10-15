@@ -149,13 +149,14 @@ def test_api_routes_all_declare_an_auth_dependency() -> None:
 @pytest.mark.usefixtures("clean_env")
 def test_production_hides_docs_and_requires_auth_for_openapi() -> None:
     app = create_app(_production(), static_dir=Path("/nonexistent-ui"))
-    with TestClient(app) as c:
-        assert c.get("/docs").status_code == 404
-        r = c.get("/openapi.json")
-        assert r.status_code == 401 and "paths" not in r.text
-        h = c.get("/health/live").headers
-        assert h["strict-transport-security"].startswith("max-age=")
-        assert "frame-ancestors 'none'" in h["content-security-policy"] and h["x-frame-options"] == "DENY"
+    # No lifespan: production enforces the schema contract at startup and there is no database here.
+    c = TestClient(app)
+    assert c.get("/docs").status_code == 404
+    r = c.get("/openapi.json")
+    assert r.status_code == 401 and "paths" not in r.text
+    h = c.get("/health/live").headers
+    assert h["strict-transport-security"].startswith("max-age=")
+    assert "frame-ancestors 'none'" in h["content-security-policy"] and h["x-frame-options"] == "DENY"
     # The committed contract is still generated from the same app object.
     assert "/v1/session" in app.openapi()["paths"]
 

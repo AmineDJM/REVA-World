@@ -2,7 +2,10 @@
 # trade.hs2709.net_weight.world_total (two quantities collapsed into one
 # estimand, R-05); that concept stays registered (published versions are
 # immutable) but is no longer produced, mapped or selected.
-connector: {name: un.comtrade.public_exact, version: "1.1.0"}
+# Connector 1.2.0 (parser comtrade-parse-3): estimation flags follow the UNSD
+# legacyEstimationFlag coding (quantity/weight, never the value); values,
+# concepts and logical keys unchanged, so the mappings below are unchanged.
+connector: {name: un.comtrade.public_exact, version: "1.2.0"}
 mappings:
   - mapping_key: comtrade.2709.M.world
     source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: 0, field: primaryValue}
