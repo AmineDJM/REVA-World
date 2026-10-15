@@ -126,7 +126,7 @@ def verify_runtime(conn: Connection, *, expected_role: str = "reva_worker") -> d
         revision = "0007_security(marker)" if marker else None
     if revision is None or _revision_number(revision) < MIN_SCHEMA_REVISION:
         raise SchemaNotReady(f"schema revision {revision!r} is older than 0007_security")
-    roles = dict(conn.execute(
+    roles: dict[str, bool] = dict(conn.execute(
         text("SELECT rolname, rolcanlogin FROM pg_roles WHERE rolname IN ('reva_worker','reva_sim','reva_api')")
     ).all())
     missing = [r for r in ("reva_worker", "reva_sim") if not roles.get(r)]
@@ -439,6 +439,12 @@ class Worker:
         if job.job_type in SIM_ENGINE_JOB_TYPES and job.job_type == "simulation" and self.sim_engine is None:
             return failed(ConfigurationError("simulation credentials (reva_sim) are not configured"), 0.0,
                           "sim_engine_unavailable", False)
+        def ctx_heartbeat(p: dict[str, Any] | None = None) -> str:
+            return self._ctx_heartbeat(job.id, p)
+
+        def ctx_user_cancel() -> bool:
+            return self._ctx_user_cancel(job.id)
+
         ctx = JobContext(
             job_id=job.id,
             job_type=job.job_type,
@@ -449,10 +455,10 @@ class Worker:
             worker_engine=self.engine,
             sim_engine=self.sim_engine if job.job_type in SIM_ENGINE_JOB_TYPES else None,
             store=self.store,
-            heartbeat=lambda p=None: self._ctx_heartbeat(job.id, p),
+            heartbeat=ctx_heartbeat,
             checkpoint=job.checkpoint,
             shutdown_signal=self._shutdown.is_set,
-            cancel_probe=lambda: self._ctx_user_cancel(job.id),
+            cancel_probe=ctx_user_cancel,
         )
         ack = time.monotonic() - job.claimed_monotonic
         self.ack_latencies.append(ack)

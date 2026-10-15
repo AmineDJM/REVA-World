@@ -97,7 +97,22 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
         for name in names:
             c = conns[name]
             spec = c.describe()
+            reservation = None
+            fetch_budget = None
             if live:
+                # Invariant 30: direct CLI live runs are charged like ingest jobs.
+                import uuid
+
+                from reva.evidence.runner import load_cursor
+                from reva.operations.budgets import reserve_ingest
+                from reva.ports.connectors import FetchBudget
+
+                default = FetchBudget()
+                planned = len(c.plan(load_cursor(get_engine("worker"), spec.name), default).items)
+                reservation = reserve_ingest(get_engine("worker"), job_id=f"cli-{uuid.uuid4()}", attempt=1,
+                                             source_key=spec.source_key, planned_requests=planned)
+                fetch_budget = FetchBudget(max_requests=min(default.max_requests, reservation.max_requests),
+                                           max_bytes=min(default.max_bytes, reservation.max_bytes))
                 client = make_live_client(spec, settings)
                 http: Any = RecordingHttp(client, spec.name, spec.licence) if capture else client
                 if not capture:
@@ -105,12 +120,17 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
             else:
                 http = FixtureHttp(spec.name)
             try:
-                rep = await run_connector(c, http, get_store(), get_engine("worker"),
+                rep = await run_connector(c, http, get_store(), get_engine("worker"), budget=fetch_budget,
                                           post_publish=post_publish_for(spec.template), persist_cursor=live)
             finally:
                 if capture and live:
                     http.write_manifest()
                 await http.aclose()
+            if reservation is not None:
+                from reva.operations.budgets import settle
+
+                fetched = sum(1 for o in rep.outcomes if o.detail != "budget")
+                settle(get_engine("worker"), reservation, requests=fetched, nbytes=0)
             d = rep.as_dict()
             d.pop("quality", None)
             d["mode"] = "live" if live else "fixture"
@@ -287,11 +307,14 @@ def demo(
     scenario: str = typer.Option("crude-border-price-25"),
     countries: str = typer.Option("FRA,CHN,USA"),
     fidelity: str = typer.Option("L1"),
+    origin: str = typer.Option("live", help="baseline release origin: live | test_fixture"),
+    wait_seconds: float = typer.Option(600.0, help="max wait when a running worker executes the job"),
 ) -> None:
     """Create and run the crude border-price scenario against the latest published baseline."""
     from reva.cli.demo import run_demo
 
-    _out(run_demo(scenario=scenario, countries=countries.split(","), fidelity=fidelity))
+    _out(run_demo(scenario=scenario, countries=countries.split(","), fidelity=fidelity, origin=origin,
+                  wait_seconds=wait_seconds))
 
 
 def main() -> None:  # pragma: no cover

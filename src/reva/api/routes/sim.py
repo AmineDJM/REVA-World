@@ -427,12 +427,35 @@ def create_discovery(
     key: str = Depends(idempotency_key),
     principal: Principal = Depends(require_scope("ingest")),
 ) -> s.JobAccepted:
-    """Enqueue a bounded official-catalogue discovery job (template-only autonomy)."""
+    """Enqueue a bounded official-catalogue discovery job (template-only autonomy).
+
+    V1 supports the Eurostat catalogue for the registered requirements that have a discovery template
+    (``reva.autonomy.jobs.DISCOVERABLE_REQUIREMENTS``). The job payload is exactly
+    ``{"requirement_id", "mode"}``, the keys the handler reads; anything else is rejected here. A tier-1
+    connector change within the signed policy scope may be promoted automatically by the gate.
+    """
     settings = request.app.state.settings
     if settings.reva_autonomy_kill_switch or settings.reva_autonomy_mode == "disabled":
         raise CapabilityGap("autonomous discovery is disabled by configuration", capability="discovery")
+    if body.catalogue != "eurostat":
+        raise CapabilityGap(f"discovery in the {body.catalogue} catalogue is not supported in V1",
+                            capability=f"discovery.{body.catalogue}", supported=["eurostat"])
+    unsupported = sorted(k for k in ("query", "concept_id", "max_candidates") if getattr(body, k) is not None)
+    if unsupported:
+        raise CapabilityGap("free-text discovery parameters are not supported in V1; discovery targets a "
+                            "registered requirement (requirement_id)", unsupported=unsupported)
+    try:
+        from reva.autonomy.jobs import DISCOVERABLE_REQUIREMENTS
+    except ImportError:
+        raise CapabilityGap("the discovery service is not installed in this build", capability="discovery") from None
+    if body.requirement_id not in DISCOVERABLE_REQUIREMENTS:
+        raise CapabilityGap("requirement has no discovery template", requirement_id=body.requirement_id,
+                            supported=list(DISCOVERABLE_REQUIREMENTS))
+    if body.mode == "fixture" and settings.reva_env == "production":
+        raise ValidationProblem("fixture-mode discovery is not allowed in production")
+    payload = {"requirement_id": body.requirement_id, "mode": body.mode}
     with get_engine(request).begin() as conn:
-        jid = submit_job(conn, "discovery", body.model_dump(mode="json"), key, principal.actor)
+        jid = submit_job(conn, "discovery", payload, key, principal.actor)
         job = fetch_job(conn, jid)
     assert job is not None
     return _accepted(response, jid, "discovery", job["status"], f"/v1/jobs/{jid}")

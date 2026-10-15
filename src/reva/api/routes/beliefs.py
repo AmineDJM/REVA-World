@@ -26,6 +26,7 @@ from reva.api.deps import (
     support_summary,
     uncertainty_summary,
     units_of,
+    valid_window,
 )
 from reva.api.errors import ApiProblem, NotFound
 from reva.api.routes.world import resolve_entity
@@ -126,7 +127,7 @@ def beliefs_response(
     return s.BeliefListResponse(
         data=data, context_id=rel["context_id"], context_mode="belief", origin=rel["origin"],
         modality="selected_estimate", units=units_of(r["value"] for r in rows), baseline_release=release_ref(rel),
-        knowledge_cutoff=rel["knowledge_cutoff"],
+        knowledge_cutoff=rel["knowledge_cutoff"], valid_time=valid_window(r["temporal_extent"] for r in rows),
         model_versions=[s.ModelVersionRef(id=method["id"], model_key=method["model_key"], version=method["version"],
                                           approval_status=method["approval_status"])] if method else [],
         assumptions=assumptions, uncertainty=uncertainty_summary(r["uncertainty"] for r in rows),

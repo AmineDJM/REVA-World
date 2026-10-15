@@ -28,6 +28,7 @@ from reva.api.deps import (
     release_ref,
     require_aware,
     support_summary,
+    valid_window,
 )
 from reva.api.errors import NotFound
 from reva.belief.snapshots import release_as_of, release_by_id
@@ -268,6 +269,7 @@ def relations_response(conn: Connection, t: Timer, **kw: Any) -> s.RelationListR
         context_mode="belief" if rel else "evidence", origin=origin,  # type: ignore[arg-type]
         modality="selected_estimate" if rel else "reported_observation",
         baseline_release=release_ref(rel), knowledge_cutoff=rel["knowledge_cutoff"] if rel else kw.get("as_of"),
+        valid_time=valid_window(r.support.temporal for r in graph.relations),
         assumptions=["Relations are reported flows; existence is as reported by the source",
                      "Superseded and retracted observations are excluded as known at the as_of time"],
         warnings=warnings, cost=t.cost(len(graph.relations), truncated=graph.truncated),

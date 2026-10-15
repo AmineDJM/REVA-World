@@ -460,7 +460,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -573,6 +593,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -807,7 +828,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -920,6 +961,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -1042,7 +1084,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -1155,6 +1217,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -1498,7 +1561,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -1611,6 +1694,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -1949,7 +2033,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -2062,6 +2166,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -2156,7 +2261,7 @@
       },
       "DiscoveryCandidate": {
         "additionalProperties": false,
-        "description": "A source candidate surfaced by a completed discovery job, or a connector proposal.\n\nSearch ranking is lexical evidence only: it never grants semantic equivalence.\nNothing here is promoted; promotion needs passing gates and a human review.",
+        "description": "A source candidate surfaced by a completed discovery job, or a connector proposal.\n\nSearch ranking is lexical evidence only: it never grants semantic equivalence. Promotion needs passing\ngates: a tier-1 change within the signed policy scope is promoted automatically by the gate; tier-2/3\nchanges need a human review.",
         "properties": {
           "candidate_kind": {
             "enum": [
@@ -2491,7 +2596,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -2604,6 +2729,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -2625,9 +2751,11 @@
       },
       "DiscoveryRequest": {
         "additionalProperties": false,
+        "description": "Bounded discovery for one registered catalogue requirement (V1: Eurostat only).\n\nThe job searches the official catalogue for the requirement's concept/geography; it does not run\nfree-text queries. ``query``, ``concept_id`` and ``max_candidates`` are not supported in V1 and are\nrejected with a 422 ``capability_gap`` when supplied (they are never silently ignored).",
         "properties": {
           "catalogue": {
             "default": "eurostat",
+            "description": "Only 'eurostat' is supported in V1; others return 422 capability_gap",
             "enum": [
               "eurostat",
               "worldbank",
@@ -2646,25 +2774,54 @@
                 "type": "null"
               }
             ],
+            "description": "Not supported in V1 (422 when set)",
             "title": "Concept Id"
           },
           "max_candidates": {
-            "default": 10,
-            "maximum": 50.0,
-            "minimum": 1.0,
-            "title": "Max Candidates",
-            "type": "integer"
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Not supported in V1 (422 when set)",
+            "title": "Max Candidates"
+          },
+          "mode": {
+            "default": "live",
+            "description": "fixture replays captured catalogue responses (refused in production)",
+            "enum": [
+              "live",
+              "fixture"
+            ],
+            "title": "Mode",
+            "type": "string"
           },
           "query": {
-            "maxLength": 200,
-            "minLength": 2,
-            "title": "Query",
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Not supported in V1 (422 when set)",
+            "title": "Query"
+          },
+          "requirement_id": {
+            "default": "R-POP-JAN-AGESEX",
+            "description": "Requirement from the versioned catalogue with a discovery template",
+            "maxLength": 50,
+            "title": "Requirement Id",
             "type": "string"
           }
         },
-        "required": [
-          "query"
-        ],
         "title": "DiscoveryRequest",
         "type": "object"
       },
@@ -2910,7 +3067,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -3023,6 +3200,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -3149,7 +3327,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -3262,6 +3460,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -3557,7 +3756,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -3670,6 +3889,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -3929,7 +4149,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -4042,6 +4282,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -4247,7 +4488,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -4360,6 +4621,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -4676,7 +4938,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -4789,6 +5071,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -5367,7 +5650,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -5480,6 +5783,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -5602,7 +5906,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -5715,6 +6039,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -6072,7 +6397,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -6185,6 +6530,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -6311,7 +6657,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -6424,6 +6790,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -6913,7 +7280,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -7026,6 +7413,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -7173,7 +7561,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -7286,6 +7694,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -7612,7 +8021,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -7725,6 +8154,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -8034,7 +8464,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -8147,6 +8597,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -8482,7 +8933,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -8595,6 +9066,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -9305,7 +9777,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -9418,6 +9910,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -9540,7 +10033,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -9653,6 +10166,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -10213,7 +10727,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -10326,6 +10860,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -10514,7 +11049,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -10627,6 +11182,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -11266,7 +11822,27 @@
                 "type": "null"
               }
             ],
+            "description": "Latest information the result may reflect. Rule: pinned release -> its cutoff; explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. See knowledge_cutoff_basis.",
             "title": "Knowledge Cutoff"
+          },
+          "knowledge_cutoff_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "release_cutoff",
+                  "as_of",
+                  "scenario_cutoff",
+                  "evaluation_context",
+                  "read_time"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How knowledge_cutoff was determined; read_time = 'read as of' the database time the query was answered",
+            "title": "Knowledge Cutoff Basis"
           },
           "modality": {
             "enum": [
@@ -11379,6 +11955,7 @@
           "support",
           "baseline_release",
           "knowledge_cutoff",
+          "knowledge_cutoff_basis",
           "valid_time",
           "model_versions",
           "assumptions",
@@ -12127,7 +12704,7 @@
     },
     "/v1/discovery": {
       "post": {
-        "description": "Enqueue a bounded official-catalogue discovery job (template-only autonomy).",
+        "description": "Enqueue a bounded official-catalogue discovery job (template-only autonomy).\n\nV1 supports the Eurostat catalogue for the registered requirements that have a discovery template\n(``reva.autonomy.jobs.DISCOVERABLE_REQUIREMENTS``). The job payload is exactly\n``{\"requirement_id\", \"mode\"}``, the keys the handler reads; anything else is rejected here. A tier-1\nconnector change within the signed policy scope may be promoted automatically by the gate.",
         "operationId": "create_discovery_v1_discovery_post",
         "parameters": [
           {

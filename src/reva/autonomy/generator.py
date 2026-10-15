@@ -78,11 +78,11 @@ class DeclarativeConnectorGenerator:
         sp = concept.semantic_profile.model_dump(mode="json") if concept.semantic_profile else {}
         order: list[str] = list(inspection["dimension_order"])
         cats: dict[str, list[str]] = inspection["categories"]
-        sizes = dict(zip(order, inspection["size"], strict=True))
+        if len(order) != len(inspection["size"]):
+            raise ValidationProblem("inspection dimension order and size disagree")
         geo = list((meta.get("geography") or {}).get("eurostat_geo") or [])
         years = [int(y) for y in meta.get("years") or []]
         resolution = [d for d in order if d not in STRUCTURAL_DIMS]
-        key_dims = ["geo", *sorted(resolution, key=lambda d: (sizes.get(d, 0), d)), "time"]
         units = cats.get("unit") or []
         exact = mapping.relation == "exact" and not mapping.review_required
         source = next(s for s in self.registry.sources if s["source_key"] == "eurostat.dissemination")
@@ -118,7 +118,7 @@ class DeclarativeConnectorGenerator:
                 "total_categories": {d: [c for c in cats[d] if c in EUROSTAT_TOTAL_CODES] for d in resolution},
                 "special_categories": {d: {c: EUROSTAT_SPECIAL_CODES[c] for c in cats[d]
                                            if c in EUROSTAT_SPECIAL_CODES} for d in resolution},
-                "logical_key_template": "eurostat:{dataset}:" + ":".join(f"{{{d}}}" for d in key_dims),
+                "logical_key_template": "",  # derived below by the reviewed template code
                 "licence": str((source.get("rights") or {}).get("licence", "")),
                 "inspection_fingerprint": inspection.get("structure_fingerprint"),
                 "dataset_label": str(inspection.get("label", ""))[:200],

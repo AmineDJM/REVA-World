@@ -170,6 +170,11 @@ export interface paths {
         /**
          * Create Discovery
          * @description Enqueue a bounded official-catalogue discovery job (template-only autonomy).
+         *
+         *     V1 supports the Eurostat catalogue for the registered requirements that have a discovery template
+         *     (``reva.autonomy.jobs.DISCOVERABLE_REQUIREMENTS``). The job payload is exactly
+         *     ``{"requirement_id", "mode"}``, the keys the handler reads; anything else is rejected here. A tier-1
+         *     connector change within the signed policy scope may be promoted automatically by the gate.
          */
         post: operations["create_discovery_v1_discovery_post"];
         delete?: never;
@@ -1465,8 +1470,9 @@ export interface components {
          * DiscoveryCandidate
          * @description A source candidate surfaced by a completed discovery job, or a connector proposal.
          *
-         *     Search ranking is lexical evidence only: it never grants semantic equivalence.
-         *     Nothing here is promoted; promotion needs passing gates and a human review.
+         *     Search ranking is lexical evidence only: it never grants semantic equivalence. Promotion needs passing
+         *     gates: a tier-1 change within the signed policy scope is promoted automatically by the gate; tier-2/3
+         *     changes need a human review.
          */
         DiscoveryCandidate: {
             /**
@@ -1600,23 +1606,50 @@ export interface components {
             /** Warnings */
             warnings: components["schemas"]["ApiWarning"][];
         };
-        /** DiscoveryRequest */
+        /**
+         * DiscoveryRequest
+         * @description Bounded discovery for one registered catalogue requirement (V1: Eurostat only).
+         *
+         *     The job searches the official catalogue for the requirement's concept/geography; it does not run
+         *     free-text queries. ``query``, ``concept_id`` and ``max_candidates`` are not supported in V1 and are
+         *     rejected with a 422 ``capability_gap`` when supplied (they are never silently ignored).
+         */
         DiscoveryRequest: {
             /**
              * Catalogue
+             * @description Only 'eurostat' is supported in V1; others return 422 capability_gap
              * @default eurostat
              * @enum {string}
              */
             catalogue?: "eurostat" | "worldbank" | "comtrade";
-            /** Concept Id */
+            /**
+             * Concept Id
+             * @description Not supported in V1 (422 when set)
+             */
             concept_id?: string | null;
             /**
              * Max Candidates
-             * @default 10
+             * @description Not supported in V1 (422 when set)
              */
-            max_candidates?: number;
-            /** Query */
-            query: string;
+            max_candidates?: number | null;
+            /**
+             * Mode
+             * @description fixture replays captured catalogue responses (refused in production)
+             * @default live
+             * @enum {string}
+             */
+            mode?: "live" | "fixture";
+            /**
+             * Query
+             * @description Not supported in V1 (422 when set)
+             */
+            query?: string | null;
+            /**
+             * Requirement Id
+             * @description Requirement from the versioned catalogue with a discovery template
+             * @default R-POP-JAN-AGESEX
+             */
+            requirement_id?: string;
         };
         /**
          * EntityComponent

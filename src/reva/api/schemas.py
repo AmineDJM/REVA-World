@@ -24,7 +24,7 @@ from datetime import datetime
 from typing import Annotated, Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 # ---------------------------------------------------------------------------
 # Base classes
@@ -204,7 +204,15 @@ class Envelope(ApiModel):
     units: list[str] = Field(default_factory=list)
     support: dict[str, Any] | None = None
     baseline_release: BaselineReleaseRef | None = None
-    knowledge_cutoff: datetime | None = None
+    knowledge_cutoff: datetime | None = Field(
+        None, description="Latest information the result may reflect. Rule: pinned release -> its cutoff; "
+        "explicit as_of -> as_of; scenario -> the scenario's cutoff; evaluation -> the evaluation context's "
+        "cutoff; otherwise (evidence/registry/operations reads 'as of now') the database time the read began. "
+        "See knowledge_cutoff_basis.")
+    knowledge_cutoff_basis: Literal["release_cutoff", "as_of", "scenario_cutoff", "evaluation_context",
+                                    "read_time"] | None = Field(
+        None, description="How knowledge_cutoff was determined; read_time = 'read as of' the database time the "
+        "query was answered")
     valid_time: dict[str, Any] | None = Field(None, description="Valid-time window of the returned data")
     model_versions: list[ModelVersionRef] = Field(default_factory=list)
     assumptions: list[str] = Field(default_factory=list)
@@ -222,6 +230,27 @@ class Envelope(ApiModel):
     warnings: list[ApiWarning] = Field(default_factory=list)
     cost: CostReport | None = None
     next_cursor: str | None = Field(None, description="Opaque keyset cursor; null when no further page")
+
+    @model_validator(mode="after")
+    def _state_cutoff(self) -> Envelope:
+        """Every result states its knowledge cutoff (see the field description for the rule)."""
+        if self.knowledge_cutoff is None:
+            if self.context_mode in ("evidence", "registry", "operations", "evaluation", "population", "belief"):
+                from reva.api.deps import READ_TIME  # local import: deps imports this module
+
+                rt = READ_TIME.get()
+                if rt is not None:
+                    self.knowledge_cutoff = rt
+                    self.knowledge_cutoff_basis = "read_time"
+        elif self.knowledge_cutoff_basis is None:
+            if self.context_mode == "simulation":
+                self.knowledge_cutoff_basis = "scenario_cutoff"
+            elif (self.baseline_release is not None
+                  and self.baseline_release.knowledge_cutoff == self.knowledge_cutoff):
+                self.knowledge_cutoff_basis = "release_cutoff"
+            else:
+                self.knowledge_cutoff_basis = "as_of"
+        return self
 
 
 # ---------------------------------------------------------------------------
@@ -920,17 +949,30 @@ class ReplayRequest(ApiModel):
 
 
 class DiscoveryRequest(ApiModel):
-    catalogue: Literal["eurostat", "worldbank", "comtrade"] = "eurostat"
-    query: str = Field(min_length=2, max_length=200)
-    concept_id: str | None = Field(None, max_length=200)
-    max_candidates: int = Field(10, ge=1, le=50)
+    """Bounded discovery for one registered catalogue requirement (V1: Eurostat only).
+
+    The job searches the official catalogue for the requirement's concept/geography; it does not run
+    free-text queries. ``query``, ``concept_id`` and ``max_candidates`` are not supported in V1 and are
+    rejected with a 422 ``capability_gap`` when supplied (they are never silently ignored).
+    """
+
+    catalogue: Literal["eurostat", "worldbank", "comtrade"] = Field(
+        "eurostat", description="Only 'eurostat' is supported in V1; others return 422 capability_gap")
+    requirement_id: str = Field("R-POP-JAN-AGESEX", max_length=50,
+                                description="Requirement from the versioned catalogue with a discovery template")
+    mode: Literal["live", "fixture"] = Field(
+        "live", description="fixture replays captured catalogue responses (refused in production)")
+    query: str | None = Field(None, max_length=200, description="Not supported in V1 (422 when set)")
+    concept_id: str | None = Field(None, max_length=200, description="Not supported in V1 (422 when set)")
+    max_candidates: int | None = Field(None, ge=1, le=50, description="Not supported in V1 (422 when set)")
 
 
 class DiscoveryCandidate(ApiModel):
     """A source candidate surfaced by a completed discovery job, or a connector proposal.
 
-    Search ranking is lexical evidence only: it never grants semantic equivalence.
-    Nothing here is promoted; promotion needs passing gates and a human review.
+    Search ranking is lexical evidence only: it never grants semantic equivalence. Promotion needs passing
+    gates: a tier-1 change within the signed policy scope is promoted automatically by the gate; tier-2/3
+    changes need a human review.
     """
 
     candidate_kind: Literal["search_result", "connector_proposal"]

@@ -187,8 +187,21 @@ def list_models(
                WHERE (CAST(:k AS text) IS NULL OR mv.kind = :k)
                  AND (CAST(:a AS text) IS NULL OR mv.approval_status = :a)
                ORDER BY mv.model_key, mv.version"""), {"k": kind, "a": approval_status}).mappings()]
-    return s.ModelListResponse(data=[s.ModelVersionOut(**r) for r in rows], context_mode="registry", origin="none",
-                               modality="metadata", cost=t.cost(len(rows)))
+        # Origin of the data behind this view: the evaluation contexts of the listed models plus the latest
+        # published release they would be applied to (registry entries themselves have no origin).
+        origins = list(conn.execute(text(
+            """SELECT DISTINCT c.origin FROM model.evaluation ev JOIN meta.context c ON c.id = ev.context_id
+               WHERE ev.model_version_id = ANY(:ids)
+               UNION
+               SELECT origin FROM (SELECT r.origin FROM belief.release r JOIN ops.publication p ON p.release_id = r.id
+                                   ORDER BY p.sequence DESC LIMIT 1) latest"""),
+            {"ids": [r["id"] for r in rows]}).scalars())
+    org = origin_of(origins)
+    return s.ModelListResponse(data=[s.ModelVersionOut(**r) for r in rows], context_mode="registry",
+                               origin=org, modality="metadata", warnings=origin_warnings(org),  # type: ignore[arg-type]
+                               assumptions=["origin describes the evaluation data and the latest published release "
+                                            "these models apply to; registry entries themselves have no origin"],
+                               cost=t.cost(len(rows)))
 
 
 # Naive last-value baseline every challenger must beat (registry/models/methods.yaml).
@@ -203,6 +216,7 @@ REPLAY_MODE_LABELS = {
 
 EVALUATION_SQL = """
 SELECT ev.id, ev.model_version_id, mv.model_key, mv.version AS model_version, ev.context_id, c.origin,
+       c.knowledge_cutoff AS ctx_cutoff,
        ev.replay_mode, ev.task_scope, ev.metrics, ev.evaluation_manifest_sha256, ev.recorded_at,
        COALESCE((SELECT jsonb_agg(jsonb_build_object('decision', p.decision, 'policy_version',
                   p.policy_version, 'reviewer', p.reviewer, 'reasons', p.reasons,
@@ -289,12 +303,16 @@ def list_evaluations(
             code="naive_baseline_missing",
             message=f"{len(groups - naive_groups)} evaluation set(s) have no naive baseline row; their scores cannot "
                     "be compared to the naive forecast"))
+    cutoffs = [r.pop("ctx_cutoff") for r in all_rows]
+    known = [c for c in cutoffs if c is not None]
     data = [s.ModelEvaluation(**r, replay_mode_label=REPLAY_MODE_LABELS.get(r["replay_mode"], r["replay_mode"]))
             for r in all_rows]
     modes = sorted({r["replay_mode"] for r in all_rows})
     return s.ModelEvaluationListResponse(
         data=data, context_mode="evaluation", origin=org,  # type: ignore[arg-type]
         modality="evaluation", warnings=warnings, cost=t.cost(len(data)), next_cursor=nxt,
+        knowledge_cutoff=max(known) if known else None,
+        knowledge_cutoff_basis="evaluation_context" if known else None,
         historical_validation=s.Assessment(
             status="reported", detail={"replay_modes": modes,
                                        "labels": [REPLAY_MODE_LABELS.get(m, m) for m in modes]})
@@ -554,8 +572,9 @@ def review_proposal(
 DISCOVERY_JOB_SCAN = 50
 CANDIDATE_NOTE = s.ApiWarning(
     code="unreviewed_candidates",
-    message="Discovery candidates are lexical search results and proposals awaiting gates/human review; ranking "
-            "never grants semantic equivalence and nothing listed here is promoted.",
+    message="Discovery candidates are lexical search results and proposals. Ranking never grants semantic "
+            "equivalence. Promotion needs passing gates: tier-1 changes within the signed policy scope are "
+            "promoted automatically; tier-2/3 changes need a human review.",
 )
 
 

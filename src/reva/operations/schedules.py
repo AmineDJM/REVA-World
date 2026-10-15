@@ -155,4 +155,6 @@ def tick(engine: Engine, *, limit: int = 50, actor: str = "scheduler") -> list[S
 
 def next_due(engine: Engine) -> datetime | None:
     with engine.connect() as conn:
-        return conn.execute(text("SELECT min(next_due_at) FROM ops.schedule WHERE enabled")).scalar_one()
+        sql = text("SELECT min(next_due_at) FROM ops.schedule WHERE enabled")
+        due: datetime | None = conn.execute(sql).scalar_one()
+        return due

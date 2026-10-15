@@ -217,8 +217,13 @@ function ProposalCard({ p, onReviewed }: { p: Proposal; onReviewed: () => void }
   );
 }
 
+/** Requirements that have a V1 discovery template (reva.autonomy.jobs.DISCOVERABLE_REQUIREMENTS). */
+export const DISCOVERABLE_REQUIREMENTS: { id: string; label: string }[] = [
+  { id: 'R-POP-JAN-AGESEX', label: 'R-POP-JAN-AGESEX — population on 1 January by age and sex' },
+];
+
 function DiscoveryForm() {
-  const [req, setReq] = useState<DiscoveryRequest>({ catalogue: 'eurostat', query: 'population on 1 January by age and sex', max_candidates: 10 });
+  const [req, setReq] = useState<DiscoveryRequest>({ catalogue: 'eurostat', requirement_id: 'R-POP-JAN-AGESEX', mode: 'live' });
   const [jobId, setJobId] = useState<string | null>(null);
   const [error, setError] = useState<unknown>(null);
   const [busy, setBusy] = useState(false);
@@ -228,7 +233,7 @@ function DiscoveryForm() {
     setBusy(true);
     setError(null);
     try {
-      const r = await startDiscovery({ ...req, concept_id: req.concept_id || null }, newIdempotencyKey());
+      const r = await startDiscovery(req, newIdempotencyKey());
       setJobId(r.job_id);
     } catch (err) {
       setError(err);
@@ -243,27 +248,26 @@ function DiscoveryForm() {
         Official catalogue
         <select value={req.catalogue} onChange={(e) => setReq({ ...req, catalogue: e.target.value as DiscoveryRequest['catalogue'] })}>
           <option value="eurostat">Eurostat</option>
-          <option value="worldbank">World Bank</option>
-          <option value="comtrade">UN Comtrade</option>
         </select>
+        <span className="field-hint">V1 discovers in the Eurostat catalogue only.</span>
       </label>
       <label>
-        Query
-        <input type="text" minLength={2} maxLength={200} value={req.query} onChange={(e) => setReq({ ...req, query: e.target.value })} required />
+        Requirement
+        <select value={req.requirement_id} onChange={(e) => setReq({ ...req, requirement_id: e.target.value })}>
+          {DISCOVERABLE_REQUIREMENTS.map((r) => (
+            <option key={r.id} value={r.id}>
+              {r.label}
+            </option>
+          ))}
+        </select>
+        <span className="field-hint">Discovery searches for a registered requirement; free-text queries are not supported.</span>
       </label>
       <label>
-        Target concept (optional)
-        <input type="text" value={req.concept_id ?? ''} onChange={(e) => setReq({ ...req, concept_id: e.target.value })} />
-      </label>
-      <label>
-        Max candidates
-        <input
-          type="number"
-          min={1}
-          max={50}
-          value={req.max_candidates}
-          onChange={(e) => setReq({ ...req, max_candidates: Math.max(1, Math.min(50, Number(e.target.value) || 1)) })}
-        />
+        Mode
+        <select value={req.mode} onChange={(e) => setReq({ ...req, mode: e.target.value as DiscoveryRequest['mode'] })}>
+          <option value="live">Live (official catalogue)</option>
+          <option value="fixture">Fixture (captured responses; TEST FIXTURE)</option>
+        </select>
       </label>
       <div>
         <button type="submit" disabled={busy}>
@@ -329,8 +333,9 @@ export default function AcquisitionPage() {
       <section className="panel" aria-labelledby="disc-h">
         <h2 id="disc-h">Discovery</h2>
         <p className="muted">
-          Bounded search of an official catalogue. Candidates become reviewable proposals; nothing is promoted without gates and a
-          human review.
+          Bounded search of an official catalogue for a registered requirement. Candidates become proposals that must pass the
+          promotion gates: a tier-1 connector change within the signed policy scope is promoted automatically; tier-2 and tier-3
+          changes need a human review.
         </p>
         <DiscoveryForm />
       </section>

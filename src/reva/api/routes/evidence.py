@@ -26,6 +26,7 @@ from reva.api.deps import (
     support_summary,
     uncertainty_summary,
     units_of,
+    valid_window,
 )
 from reva.api.errors import ApiProblem, NotFound
 from reva.api.routes.world import resolve_entity
@@ -153,7 +154,8 @@ def list_observations(
         warnings.append(s.ApiWarning(code="retracted_records", message="Some records were retracted by the source"))
     return s.ObservationListResponse(
         data=data, context_mode="evidence", origin=org, modality="reported_observation",  # type: ignore[arg-type]
-        knowledge_cutoff=as_of, units=units_of(r["value"] for r in rows), assumptions=OBS_ASSUMPTIONS,
+        knowledge_cutoff=as_of, valid_time=valid_window(r["temporal_extent"] for r in rows),
+        units=units_of(r["value"] for r in rows), assumptions=OBS_ASSUMPTIONS,
         uncertainty=uncertainty_summary(r["uncertainty"] for r in rows),
         data_freshness=freshness((r["retrieved_at"] for r in rows), (r["recorded_at"] for r in rows)),
         provenance_links=[link("observation", r["id"]) for r in rows[:50]], warnings=warnings,

@@ -748,11 +748,15 @@ export interface ReplayRequest {
   horizon_years: number;
 }
 
+/** POST /v1/discovery. V1: catalogue 'eurostat' and a requirement with a discovery template; query/concept_id/
+ * max_candidates are not supported (422 capability_gap when set). */
 export interface DiscoveryRequest {
   catalogue: 'eurostat' | 'worldbank' | 'comtrade';
-  query: string;
-  concept_id?: string | null;
-  max_candidates: number;
+  requirement_id: string;
+  mode: 'live' | 'fixture';
+  query?: null;
+  concept_id?: null;
+  max_candidates?: null;
 }
 
 /** GET /v1/discovery/candidates: unreviewed search results and connector proposals (read-only). */

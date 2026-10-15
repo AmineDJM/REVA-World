@@ -860,7 +860,8 @@ ACCEPTANCE: list[tuple[str, str, list[dict[str, Any]]]] = [
         "Structural-zero and unknown-category handling",
         [
             T(
-                POPU + "test_population_recipe.py::test_observed_zero_is_structural_zero_not_missing",
+                POPU + "test_population_recipe.py::test_observed_zero_is_not_structural_zero_and_not_missing",
+                POPU + "test_population_partition.py::test_observed_zero_cells_are_not_structural_zeros",
                 POPU + "test_population_recipe.py::test_unknown_and_top_coded_retained_explicitly",
                 POPU + "test_population_materialise.py::test_every_nonzero_cell_represented_and_zero_cell_empty",
             )
@@ -1280,7 +1281,9 @@ class Evaluator:
         kind = ev["kind"]
         if kind == "pytest":
             nodes = [self.pytest_node(n) for n in ev["nodes"]]
-            return {"kind": kind, "status": aggregate([n["status"] for n in nodes]), "nodes": nodes}
+            sts = [n["status"] for n in nodes]
+            st = "not_run" if all(x == "not_run" for x in sts) else aggregate(sts)
+            return {"kind": kind, "status": st, "nodes": nodes}
         if kind == "group":
             g = self.groups_run.get(ev["group"])
             if g is None:

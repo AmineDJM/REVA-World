@@ -97,6 +97,17 @@ unmodified appendix Blueprint fails those checks with explicit messages.
 
 ## Known blocker to resolve before the first Render deploy
 
+**Worker startup in production (R4-02, verified 2026-10-15).** With `render.yaml`
+as written the worker does **not** start: `Settings` applies the rule
+"`REVA_PUBLIC_BASE_URL` must be https" to every production process, and the
+worker (correctly) has no public URL, so the default `http://localhost:8000`
+fails validation. The API side passes. Regression test:
+`tests/security/test_start_env.py::test_blueprint_as_written_starts_both_processes_in_production`
+materialises each service's environment from `render.yaml` and runs the real
+start-script preparation; it fails until the rule is limited to the API process
+(`reva_process_role in (None, "api")`, change requested in `reva/settings.py`).
+
+
 Managed PostgreSQL owners are `CREATEROLE` but not superusers. PostgreSQL 16+
 refuses `ALTER ROLE … NOSUPERUSER/NOCREATEDB/NOBYPASSRLS` from such a role (we
 reproduced this on PostgreSQL 17.5). `reva.cli.bootstrap.provision_roles` and the

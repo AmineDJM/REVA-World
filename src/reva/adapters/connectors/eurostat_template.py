@@ -85,6 +85,16 @@ _ALIAS_RE = re.compile(r"^[a-z0-9_]{1,40}$")
 _REF_RE = re.compile(r"^[a-z0-9_.]{1,80}$")
 _AGGREGATIONS = {"point_in_time_stock", "period_average_stock", "period_flow_total", "period_rate",
                  "category_cell"}
+# Logical keys use a strict placeholder language (never ``str.format``): ``{name}``
+# where name is ``dataset`` or a pinned dimension id; bounded template and output.
+_KEY_TEMPLATE_RE = re.compile(r"^eurostat:\{dataset\}(?::\{[a-z0-9_]{1,32}\}){1,12}$")
+_PLACEHOLDER_RE = re.compile(r"\{([a-z0-9_]{1,32})\}")
+MAX_KEY_TEMPLATE_CHARS = 256
+MAX_LOGICAL_KEY_CHARS = 512
+DEFAULT_KEY_TEMPLATE = "eurostat:{dataset}:{geo}:{time}"
+# Structural errors a malformed provider document can raise inside parsing; they
+# are converted to a typed, non-retryable ``schema_drift`` SourceResponseError.
+_MALFORMED = (ValueError, TypeError, AttributeError, KeyError, IndexError, RecursionError, ArithmeticError)
 
 
 @lru_cache(maxsize=1)
@@ -158,7 +168,50 @@ def validate_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
     flags = rp.get("status_vocabulary", list(EUROSTAT_FLAGS))
     if not set(flags) <= set(EUROSTAT_FLAGS):
         raise ValidationProblem("status vocabulary contains unreviewed flags")
+    check_logical_key_template(rp.get("logical_key_template", DEFAULT_KEY_TEMPLATE), order)
     return m
+
+
+def canonical_logical_key_template(manifest: Mapping[str, Any]) -> str:
+    """The logical-key template this reviewed code derives from a manifest's structure.
+
+    ``eurostat:{dataset}:{<subject dim>}:{<resolution dims by (category count, id)>}:{time}``.
+    Gates and generators compare/emit this; a manifest cannot choose another layout.
+    """
+    rp = manifest["request_parameters"]
+    pinned = rp["pinned_categories"]
+    res = sorted(rp["resolution_dimensions"], key=lambda d: (len(pinned.get(d) or []), d))
+    dims = [rp["subject"]["dimension"], *res, "time"]
+    return "eurostat:{dataset}:" + ":".join(f"{{{d}}}" for d in dims)
+
+
+def check_logical_key_template(template: Any, order: Sequence[str]) -> str:
+    if not isinstance(template, str) or len(template) > MAX_KEY_TEMPLATE_CHARS \
+            or not _KEY_TEMPLATE_RE.fullmatch(template):
+        raise ValidationProblem("logical_key_template must be 'eurostat:{dataset}:{dim}:...' with plain "
+                                "{dimension} placeholders only")
+    names = _PLACEHOLDER_RE.findall(template)
+    unknown = [n for n in names if n != "dataset" and n not in order]
+    if unknown:
+        raise ValidationProblem("logical_key_template names unknown dimensions", unknown=unknown)
+    if len(set(names)) != len(names) or "time" not in names:
+        raise ValidationProblem("logical_key_template placeholders must be unique and include {time}")
+    return template
+
+
+def render_logical_key(template: str, parts: Mapping[str, str]) -> str:
+    """Strict substitution of ``{name}`` placeholders (no attribute/index access, no format specs)."""
+    def sub(m: re.Match[str]) -> str:
+        v = parts.get(m.group(1))
+        if v is None:
+            raise SourceResponseError(f"logical key placeholder {m.group(1)!r} has no value", retryable=False,
+                                      kind="schema_drift")
+        return str(v)
+
+    out = _PLACEHOLDER_RE.sub(sub, template)
+    if len(out) > MAX_LOGICAL_KEY_CHARS:
+        raise SourceResponseError("logical key exceeds the template bound", retryable=False, kind="schema_drift")
+    return out
 
 
 def _positions(index: Any, size: int, dim: str) -> list[str]:
@@ -299,6 +352,15 @@ class EurostatJsonStatConnector:
 
     # ------------------------------------------------------------------ parse
     def _doc(self, raw: RawAcquisition) -> dict[str, Any]:
+        try:
+            return self._doc_unchecked(raw)
+        except SourceResponseError:
+            raise
+        except _MALFORMED as e:
+            raise SourceResponseError(f"malformed JSON-stat document: {type(e).__name__}", retryable=False,
+                                      kind="schema_drift") from None
+
+    def _doc_unchecked(self, raw: RawAcquisition) -> dict[str, Any]:
         require_json(HttpResult(raw.item.url, raw.item.url, 200, {"content-type": raw.media_type}, raw.body,
                                 raw.retrieved_at, 0.0, (), 1))
         doc = json_decimal(raw.body)
@@ -319,6 +381,16 @@ class EurostatJsonStatConnector:
 
     def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
         doc = self._doc(raw)
+        try:
+            batch = self._batch(raw, doc)
+        except SourceResponseError:
+            raise
+        except _MALFORMED as e:  # malformed provider data is a typed failure, never an untyped crash
+            raise SourceResponseError(f"malformed JSON-stat structure: {type(e).__name__}", retryable=False,
+                                      kind="schema_drift") from None
+        yield batch
+
+    def _batch(self, raw: RawAcquisition, doc: dict[str, Any]) -> ObservationBatch:
         ids: list[str] = [str(d) for d in doc["id"]]
         sizes = [int(str(s)) for s in doc["size"]]
         n = math.prod(sizes)
@@ -369,7 +441,7 @@ class EurostatJsonStatConnector:
             "pinned_dimension_order": self.order,
         }
         expected = tuple(o.logical_key for o in observations)
-        yield ObservationBatch(
+        return ObservationBatch(
             connector=self.manifest["name"],
             connector_version=self.manifest["version"],
             item_key=raw.item.key,
@@ -428,7 +500,7 @@ class EurostatJsonStatConnector:
         if v is None:
             flags["absent_in_value_map"] = True
         key_parts = {**coord, "dataset": self.dataset}
-        logical_key = str(self.rp.get("logical_key_template", "eurostat:{dataset}:{geo}:{time}")).format_map(key_parts)
+        logical_key = render_logical_key(str(self.rp.get("logical_key_template", DEFAULT_KEY_TEMPLATE)), key_parts)
         return ParsedObservation(
             subject_provider=self.rp["subject"]["alias_provider"],
             subject_key=geo,

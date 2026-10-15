@@ -12,7 +12,9 @@
 #   REVA_PG_BINDIR               directory holding pg_dump/pg_restore >= server major
 #   REVA_OBJECT_BACKEND/REVA_OBJECT_ROOT/REVA_S3_*   object store to inventory
 #
-# Output: DIR/reva-backup-<UTC>/ {reva.dump[.age], objects.jsonl, backup.json} (mode 0700/0600).
+# Output: DIR/reva-backup-<UTC>/ {reva.dump.age (or reva.dump when unencrypted locally), objects.jsonl,
+#         backup.json, SHA256SUMS} (mode 0700/0600). With encryption, pg_dump is streamed into
+#         age: no plaintext dump is ever written to disk.
 # Copy the directory to storage in a separate account (see docs/operations.md).
 # Secrets are read from the environment only and never printed.
 set -euo pipefail

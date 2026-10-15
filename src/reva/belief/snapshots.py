@@ -68,7 +68,7 @@ LEFT JOIN evidence.acquisition a ON a.id = o.acquisition_id
 WHERE e.release_id = :r
   AND (CAST(:subject AS uuid) IS NULL OR e.subject_id = :subject)
   AND (CAST(:concept AS text) IS NULL OR c.concept_id = :concept)
-ORDER BY c.concept_id, ent.label, s.temporal_extent->>'start'
+ORDER BY c.concept_id, ent.label, s.temporal_extent->>'start', e.id
 """
 
 

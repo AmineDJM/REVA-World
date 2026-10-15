@@ -39,10 +39,10 @@ def _setup() -> Any:
             log.info("OTEL_EXPORTER_OTLP_ENDPOINT is set but opentelemetry is not installed; tracing disabled")
             return None
         try:  # optional SDK + exporter: configure a provider once
-            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-            from opentelemetry.sdk.resources import Resource
-            from opentelemetry.sdk.trace import TracerProvider
-            from opentelemetry.sdk.trace.export import BatchSpanProcessor
+            from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter  # type: ignore[import-not-found,unused-ignore]
+            from opentelemetry.sdk.resources import Resource  # type: ignore[import-not-found,unused-ignore]
+            from opentelemetry.sdk.trace import TracerProvider  # type: ignore[import-not-found,unused-ignore]
+            from opentelemetry.sdk.trace.export import BatchSpanProcessor  # type: ignore[import-not-found,unused-ignore]
 
             provider = TracerProvider(resource=Resource.create(
                 {"service.name": os.environ.get("OTEL_SERVICE_NAME", "reva-worker")}))

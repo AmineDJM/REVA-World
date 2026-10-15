@@ -195,8 +195,9 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
                         conn.execute(text("SET LOCAL log_statement = 'none'"))
                     stmt = conn.execute(
                         text(
-                            "SELECT format('ALTER ROLE %I LOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE "
-                            "NOBYPASSRLS NOREPLICATION CONNECTION LIMIT %s PASSWORD %L', "
+                            # Only attributes a non-superuser CREATEROLE owner may set (PG16+);
+                            # the privileged attributes are verified afterwards instead.
+                            "SELECT format('ALTER ROLE %I LOGIN NOINHERIT CONNECTION LIMIT %s PASSWORD %L', "
                             "CAST(:r AS text), CAST(:l AS integer), CAST(:v AS text))"
                         ),
                         {"r": login, "l": limit, "v": verifier},
@@ -207,17 +208,47 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
                 break
             except ConfigurationError:
                 raise
-            except Exception as e:  # noqa: BLE001 - re-raised below without the statement text
+            except Exception as e:
                 failure = _sqlstate(e)
             finally:
                 verifier = ""
             if failure not in _RETRYABLE:
                 break
-            time.sleep(min(2.0, 0.05 * (2**attempt)) * (0.5 + random.random()))  # noqa: S311 - jitter only
+            time.sleep(min(2.0, 0.05 * (2**attempt)) * (0.5 + random.random()))
         if failure is not None:
             raise ConfigurationError(f"provisioning runtime role {login} failed (SQLSTATE {failure})") from None
         done.append(login)
+    verify_runtime_role_attributes(conn, list(ROLE_LOGIN.values()))
     return done
+
+
+FORBIDDEN_ROLE_ATTRIBUTES = ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls", "rolreplication")
+
+
+def verify_runtime_role_attributes(conn: Connection, logins: list[str]) -> None:
+    """Fail loudly unless every runtime role is a NOINHERIT login without privileged attributes."""
+    rows = conn.execute(
+        text("SELECT rolname, rolcanlogin, rolinherit, " + ", ".join(FORBIDDEN_ROLE_ATTRIBUTES)
+             + " FROM pg_roles WHERE rolname = ANY(:r)"),
+        {"r": logins},
+    ).mappings().all()
+    found = {r["rolname"]: r for r in rows}
+    problems = []
+    for login in logins:
+        r = found.get(login)
+        if r is None:
+            problems.append(f"{login}: missing")
+            continue
+        bad = [k.removeprefix("rol").upper() for k in FORBIDDEN_ROLE_ATTRIBUTES if r[k]]
+        if r["rolinherit"]:
+            bad.append("INHERIT")
+        if not r["rolcanlogin"]:
+            bad.append("NOLOGIN")
+        if bad:
+            problems.append(f"{login}: {', '.join(bad)}")
+    if problems:
+        raise ConfigurationError("runtime roles have unsafe attributes (a superuser must fix them): "
+                                 + "; ".join(problems))
 
 
 def verify_ownership(conn: Connection) -> None:

@@ -539,7 +539,15 @@ def backup(
         t0 = time.perf_counter()
         plain_sha, plain_bytes = stream_dump(
             tools,
-            ["--format=custom", "--compress=6", f"--snapshot={snapshot}", "--no-password"],
+            [
+                "--format=custom",
+                "--compress=6",
+                f"--snapshot={snapshot}",
+                "--no-password",
+                # PostGIS-owned reference data is recreated by CREATE EXTENSION; REVA adds no
+                # custom SRIDs (EPSG:4326 only). Restoring it would need the extension owner.
+                "--exclude-table-data=public.spatial_ref_sys",
+            ],
             url,
             dump_file,
             age_args,

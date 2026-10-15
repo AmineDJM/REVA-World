@@ -168,6 +168,9 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
     bdir = Path(out["path"])
     record = json.loads((bdir / "backup.json").read_text())
     assert record["dump"]["encrypted"] and not (bdir / "reva.dump").exists()
+    # No plaintext dump was ever written: the set is exactly ciphertext + metadata.
+    assert sorted(p.name for p in bdir.iterdir()) == ["SHA256SUMS", "backup.json", "objects.jsonl", "reva.dump.age"]
+    assert subprocess.run(["sha256sum", "-c", "--quiet", "SHA256SUMS"], cwd=bdir, check=False).returncode == 0
     assert record["objects"]["count"] > 0 and record["objects"]["missing"] == []
     assert record["objects"]["corrupt_objects"] == [] and record["objects"]["mismatched"] == []
     # The manifest recorded inside the dump snapshot equals the one computed independently.
@@ -182,15 +185,46 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
         c.execute(text(f'CREATE DATABASE "{target}"'))
     target_url = db.settings.migration_url().set(database=target)
     restored_engines: list[Engine] = []
+    probe_role = f"reva_restore_probe_{uuid.uuid4().hex[:6]}"
+    probe_db = f"{target}_ns"
     try:
         restore_env = {
             **base_env,
             "REVA_RESTORE_DATABASE_URL": target_url.render_as_string(hide_password=False),
             "REVA_BACKUP_AGE_IDENTITY": str(identity),
         }
+        # Tampered sets are refused before the target is touched.
+        for case in ("checksum", "authenticated"):
+            bad = tmp_path / f"tampered-{case}"
+            shutil.copytree(bdir, bad)
+            data = bytearray((bad / "reva.dump.age").read_bytes())
+            data[len(data) // 2] ^= 0x01
+            (bad / "reva.dump.age").write_bytes(bytes(data))
+            if case == "authenticated":  # attacker also rewrites every checksum, but has no age key
+                rec = json.loads((bad / "backup.json").read_text())
+                rec["dump"]["sha256"] = br._sha256_file(bad / "reva.dump.age")
+                (bad / "backup.json").write_text(json.dumps(rec))
+                br.write_checksums(bad, ["reva.dump.age", "objects.jsonl", "backup.json"])
+            proc = subprocess.run(
+                ["bash", str(SCRIPTS / "restore.sh"), str(bad)],
+                env=restore_env,
+                cwd=tmp_path,
+                capture_output=True,
+                text=True,
+                timeout=300,
+                check=False,
+            )
+            assert proc.returncode != 0
+            assert ("checksum verification failed" if case == "checksum" else "age") in proc.stderr
+            with create_engine(target_url).connect() as c:
+                n = c.execute(
+                    text("SELECT count(*) FROM pg_tables WHERE schemaname = ANY(:s)"), {"s": list(br.SCHEMAS)}
+                ).scalar_one()
+            assert n == 0, f"tampered archive ({case}) touched the target"
         res, restore_wall, restore_err = _run("restore.sh", [str(bdir), "--verify-objects"], restore_env, tmp_path)
         assert owner_pw not in json.dumps(res) + restore_err
         assert res["matches_backup"] and res["differences"] == []
+        assert res["timings"]["verify_seconds"] >= 0
         assert res["bootstrap"]["schema_version"] == manifest_before["schema_version"]
         assert res["objects"]["missing"] == [] and res["objects"]["locations"] > 0
 
@@ -236,6 +270,38 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
             ).scalar_one()
         assert owned == 0 and public_connect is False
 
+        # Restore as a NON-superuser that owns the empty target database (as on a
+        # managed service). PostGIS is pre-created by an administrator because it is
+        # not a trusted extension locally; bootstrap is skipped because altering the
+        # cluster-global runtime roles needs privileges this role does not have.
+        probe_pw = uuid.uuid4().hex
+        with admin.connect() as c:
+            c.execute(text(f"CREATE ROLE \"{probe_role}\" LOGIN NOSUPERUSER PASSWORD '{probe_pw}'"))
+            c.execute(text(f'CREATE DATABASE "{probe_db}" OWNER "{probe_role}"'))
+        with create_engine(db.settings.migration_url().set(database=probe_db)).begin() as c:
+            c.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))
+        probe_url = db.settings.migration_url().set(database=probe_db, username=probe_role, password=probe_pw)
+        ns_env = {**restore_env, "REVA_RESTORE_DATABASE_URL": probe_url.render_as_string(hide_password=False)}
+        res_ns, _, ns_err = _run("restore.sh", [str(bdir), "--skip-bootstrap"], ns_env, tmp_path)
+        assert res_ns["matches_backup"] and res_ns["restored_as_superuser"] is False
+        assert probe_pw not in json.dumps(res_ns) + ns_err
+        api_ns = make_engine("api", settings_r.model_copy(update={"reva_db_name": probe_db}))
+        restored_engines.append(api_ns)
+        assert _as_of_results(api_ns, times) == as_of_before
+        with create_engine(probe_url).connect() as c:
+            owners = (
+                c.execute(
+                    text(
+                        "SELECT DISTINCT r.rolname FROM pg_class cl JOIN pg_namespace n ON n.oid = cl.relnamespace "
+                        "JOIN pg_roles r ON r.oid = cl.relowner WHERE n.nspname = ANY(:s)"
+                    ),
+                    {"s": list(br.SCHEMAS)},
+                )
+                .scalars()
+                .all()
+            )
+        assert owners == [probe_role]
+
         timings = {
             "backup_wall_seconds": round(backup_wall, 3),
             "restore_wall_seconds": round(restore_wall, 3),
@@ -256,39 +322,36 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
             e.dispose()
         with admin.connect() as c:
             c.execute(text(f'DROP DATABASE IF EXISTS "{target}" WITH (FORCE)'))
+            c.execute(text(f'DROP DATABASE IF EXISTS "{probe_db}" WITH (FORCE)'))
+            c.execute(text(f'DROP ROLE IF EXISTS "{probe_role}"'))
         admin.dispose()
 
 
-def test_restore_refuses_non_empty_target_and_bad_checksum(db, tmp_path: Path) -> None:
+def test_restore_refuses_unverifiable_sets_and_non_empty_target(db, tmp_path: Path) -> None:
+    import hashlib
+
     bdir = tmp_path / "b"
     bdir.mkdir()
     (bdir / "reva.dump").write_bytes(b"not a dump")
-    (bdir / "backup.json").write_text(
-        json.dumps({"dump": {"file": "reva.dump", "sha256": "0" * 64, "encrypted": False}})
-    )
-    with pytest.raises(br.BackupError, match="checksum"):
-        br.restore(
-            bdir,
-            url_env="REVA_RESTORE_DATABASE_URL",
-            tools=br.PgTools(),
-            identity=None,
-            run_bootstrap=False,
-            verify_objects=False,
-        )
-    import hashlib
-
-    (bdir / "backup.json").write_text(
-        json.dumps(
-            {"dump": {"file": "reva.dump", "sha256": hashlib.sha256(b"not a dump").hexdigest(), "encrypted": False}}
-        )
-    )
+    good = hashlib.sha256(b"not a dump").hexdigest()
+    record = {
+        "dump": {"file": "reva.dump", "sha256": good, "plaintext_sha256": good, "encrypted": False},
+        "pg_dump_major": 17,
+    }
+    (bdir / "backup.json").write_text(json.dumps(record))
+    kwargs = {"tools": br.PgTools(), "identity": None, "run_bootstrap": False, "verify_objects": False}
+    with pytest.raises(br.BackupError, match="SHA256SUMS missing"):
+        br.restore(bdir, url_env="REVA_RESTORE_DATABASE_URL", **kwargs)
+    br.write_checksums(bdir, ["reva.dump", "backup.json"])
+    (bdir / "reva.dump").write_bytes(b"not a dumq")
+    with pytest.raises(br.BackupError, match="checksum verification failed"):
+        br.restore(bdir, url_env="REVA_RESTORE_DATABASE_URL", **kwargs)
+    (bdir / "reva.dump").write_bytes(b"not a dump")
     env_key = "REVA_TEST_RESTORE_TARGET_URL"
     os.environ[env_key] = db.settings.reva_migration_database_url.get_secret_value()  # populated test DB
     try:
         with pytest.raises(br.BackupError, match="not empty"):
-            br.restore(
-                bdir, url_env=env_key, tools=br.PgTools(), identity=None, run_bootstrap=False, verify_objects=False
-            )
+            br.restore(bdir, url_env=env_key, **kwargs)
     finally:
         del os.environ[env_key]
 

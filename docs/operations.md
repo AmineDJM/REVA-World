@@ -43,13 +43,28 @@ What it does (`scripts/backup_restore.py backup`):
    settings), the artifact sha256 list digest and the release list
    (id, manifest sha256, cutoff, publication sequence);
 3. runs `pg_dump --format=custom --snapshot=<id>`, i.e. the dump contains exactly
-   the manifested state; the password is passed as `PGPASSWORD`, never on argv;
+   the manifested state; the password is passed as `PGPASSWORD`, never on argv.
+   With encryption, pg_dump's stdout is **streamed straight into `age --encrypt`**
+   (`scripts/backup_restore.py:stream_dump`): the plaintext exists only in pipe
+   buffers and is never written to disk; its sha256 and size are computed in the
+   stream and recorded. `public.spatial_ref_sys` data is excluded (PostGIS
+   recreates it; REVA uses EPSG:4326 only and adds no custom SRIDs);
 4. inventories the object store (key, sha256 of the bytes, size) and checks every
    `meta.artifact_location` exists with matching address/size — any missing,
    mismatched or corrupt object fails the backup;
-5. encrypts the dump with `age` (plaintext deleted) and writes `backup.json`
-   (dump sha256, sizes, versions, timings, logical manifest) and `objects.jsonl`,
-   all with mode 0600 in a 0700 directory.
+5. writes `backup.json` (archive and plaintext sha256, sizes, versions, timings,
+   logical manifest), `objects.jsonl` and **`SHA256SUMS`** (`sha256sum -c`
+   format) over the archive, the inventory and `backup.json`, all mode 0600 in a
+   0700 directory.
+
+Integrity and authenticity: `age` encrypts with authenticated
+ChaCha20-Poly1305 chunks, so a modified ciphertext fails decryption even if an
+attacker rewrites every checksum (tested). `SHA256SUMS` detects accidental or
+naive modification without the key. For origin authenticity (who made the
+backup), sign the checksum file on the backup host with a key kept elsewhere,
+e.g. `minisign -S -s backup.key -m SHA256SUMS`, and verify before restoring with
+`minisign -V -p backup.pub -m SHA256SUMS`; this signing step is operational and
+not automated by the scripts.
 
 Ownership semantics: the dump keeps owners and ACLs; restore uses `--no-owner`
 so the restoring migration owner owns everything (what bootstrap verifies),
@@ -73,13 +88,26 @@ export REVA_BACKUP_AGE_IDENTITY=/secure/age.key
 scripts/restore.sh /secure/backups/reva-backup-<UTC> --verify-objects
 ```
 
-Steps: verify dump sha256 → decrypt → refuse a non-empty target → ensure the
-runtime roles exist (`NOLOGIN`) → `pg_restore --no-owner --no-comments
---single-transaction --exit-on-error` → re-apply database-level grants
-(`REVOKE ALL … FROM PUBLIC`, `GRANT CONNECT` to the three runtime roles) →
+Steps: verify `SHA256SUMS` (missing or mismatching → refuse) → verify the archive
+sha256 recorded in `backup.json` → **pass 1**: decrypt to nowhere, which
+authenticates the ciphertext and checks the plaintext sha256 (refuse on any
+failure; the target is not touched) → refuse a non-empty target → ensure the
+runtime roles exist (`NOLOGIN`) → **pass 2**: `age --decrypt` streamed directly
+into `pg_restore --no-owner --no-comments --single-transaction --exit-on-error`
+(no plaintext file; the plaintext digest is re-checked) → re-apply database-level
+grants (`REVOKE ALL … FROM PUBLIC`, `GRANT CONNECT` to the three runtime roles) →
 bootstrap (role passwords, ownership/deletion-role verification) → recompute the
 logical manifest and compare with the one in `backup.json` (any difference exits
 1) → optionally confirm every artifact location exists in the object store.
+
+Restore does not need a superuser: the restoring role only has to own the empty
+target database (`--no-owner` makes it the owner of every restored object), and
+PostGIS must be creatable by it or pre-created by an administrator. The test
+restores as a `NOSUPERUSER` database owner and checks identical manifests, as-of
+answers and object ownership; the result reports `restored_as_superuser`.
+Bootstrap after such a restore needs a role allowed to alter the runtime roles
+(see deployment.md, known blocker) — otherwise use `--skip-bootstrap` and let the
+next pre-deploy run it.
 
 Roles are cluster-global: the role passwords supplied to restore are applied to
 the cluster. Use the target environment's values (on Render: the API service's

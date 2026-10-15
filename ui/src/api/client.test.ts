@@ -53,7 +53,7 @@ describe('http client', () => {
     });
     await startSimulation({ scenario_id: 's', fidelity: 'L1' });
     await startReplay({ mode: 'operational_as_known', cutoff: '2026-01-01T00:00:00Z', horizon_years: 1 });
-    await startDiscovery({ catalogue: 'eurostat', query: 'population', max_candidates: 5 });
+    await startDiscovery({ catalogue: 'eurostat', requirement_id: 'R-POP-JAN-AGESEX', mode: 'fixture' });
     await createScenario({} as ScenarioSpec);
     await reviewProposal('p', 'reject', 'no');
     const keys = calls.map((c) => c.headers.get('Idempotency-Key'));

@@ -12,8 +12,9 @@
 #   REVA_BACKUP_AGE_IDENTITY     age identity file for encrypted dumps
 #   REVA_PG_CONTAINER / REVA_PG_BINDIR   as for backup.sh
 #
-# Steps: checksum -> decrypt -> refuse non-empty target -> ensure runtime roles ->
-# pg_restore --no-owner --single-transaction -> database-level grants -> bootstrap ->
+# Steps: SHA256SUMS + archive checksum -> authenticate/decrypt to nowhere (plaintext sha256) ->
+# refuse non-empty target -> ensure runtime roles -> age -d streamed into
+# pg_restore --no-owner --single-transaction (no plaintext file) -> database-level grants -> bootstrap ->
 # logical-manifest comparison with the manifest recorded at backup time (exit 1 on any difference).
 set -euo pipefail
 here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

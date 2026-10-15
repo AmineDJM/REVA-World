@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: read  # read-only token; no write scopes for scheduled runs
 
 concurrency:
   group: live-smoke
@@ -32,9 +32,8 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U reva_owner -d reva"
           --health-interval 5s --health-timeout 3s --health-retries 30
-    env:
-      REVA_HTTP_CONTACT_EMAIL: ${{ vars.REVA_HTTP_CONTACT_EMAIL }}
-      REVA_COMTRADE_API_KEY: ${{ secrets.REVA_COMTRADE_API_KEY }}
+    # No job-level env: the optional provider key is exposed only to the one step
+    # that performs live requests (not to checkout/setup/sync/schema steps).
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -49,6 +48,9 @@ jobs:
       - run: uv sync --frozen --all-extras
       - run: cp .env.example .env
       - name: Live provider tests
+        env:
+          REVA_HTTP_CONTACT_EMAIL: ${{ vars.REVA_HTTP_CONTACT_EMAIL }}
+          REVA_COMTRADE_API_KEY: ${{ secrets.REVA_COMTRADE_API_KEY }}
         run: uv run pytest -m live -q -o addopts="" --junitxml=var/junit-live.xml
       - name: Render schema drift (download the current official schema)
         run: uv run python scripts/validate_blueprint.py --live

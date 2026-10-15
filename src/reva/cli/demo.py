@@ -56,7 +56,7 @@ def build_spec(release: dict[str, Any], countries: list[str], fidelity: str, sce
     """``knowledge_cutoff`` must come from the database clock (see :func:`db_cutoff`)."""
     if knowledge_cutoff.tzinfo is None:
         raise ValidationProblem("knowledge_cutoff must be timezone-aware")
-    spec = json.loads((CONTRACTS / "scenario.example.json").read_text())
+    spec: dict[str, Any] = json.loads((CONTRACTS / "scenario.example.json").read_text())
     spec["title"] = f"{scenario}: +25% crude border-price stress ({', '.join(countries)})"
     spec["baseline_release_id"] = str(release["id"])
     spec["knowledge_cutoff"] = _iso_z(knowledge_cutoff)

@@ -500,3 +500,91 @@ def test_worker_schema_wait_against_database(db) -> None:
     state = start_worker.wait_for_schema(db.settings, 10)
     assert state["worker_ok"] and state["sim_ok"] and state["attempts"] == 1
     assert state["schema_version"] == state["expected_head"]
+
+
+# --- the Blueprint as written (R4-02) ---------------------------------------------------
+
+
+def _render_service_envs() -> dict[str, dict[str, str]]:
+    """Materialise each service's environment from render.yaml as Render would.
+
+    generateValue -> random 44-char value (Render: base64 of 256 bits);
+    fromDatabase -> plausible managed-DB values; fromService -> the referenced
+    service's materialised value; sync: false -> an operator-supplied value
+    (the API's S3 key is the read-only one, the worker's its own write key).
+    """
+    import base64
+    import secrets
+
+    import yaml
+
+    doc = yaml.safe_load((SCRIPTS.parent / "render.yaml").read_text())
+    common = {e["key"]: str(e["value"]) for g in doc["envVarGroups"] for e in g["envVars"]}
+    db = {
+        "connectionString": "postgresql://reva_owner:gen%2Fowner@dpg-x-a/reva",
+        "host": "dpg-x-a",
+        "port": "5432",
+        "database": "reva",
+    }
+    operator = {
+        "REVA_ADMIN_PASSWORD_HASH": "$argon2id$v=19$m=65536,t=3,p=4$c2FsdHNhbHQ$aGFzaGhhc2hoYXNo",
+        "REVA_S3_ENDPOINT_URL": "https://s3.eu-central-1.example.net",
+        "REVA_S3_REGION": "eu-central-1",
+        "REVA_S3_BUCKET": "reva-prod",
+        "REVA_HTTP_CONTACT_EMAIL": "ops@example.org",
+    }
+    services = {s["name"]: s for s in doc["services"]}
+    out: dict[str, dict[str, str]] = {}
+    platform = {
+        "reva-api": {
+            "RENDER_EXTERNAL_URL": "https://reva-api.onrender.com",
+            "RENDER_EXTERNAL_HOSTNAME": "reva-api.onrender.com",
+        }
+    }
+    for name in ("reva-api", "reva-worker"):  # API first: the worker references it
+        env = {"PATH": CONFIG["PATH"], "HOME": "/home/reva", "PORT": "10000", **platform.get(name, {})}
+        for item in services[name]["envVars"]:
+            if "fromGroup" in item:
+                env.update(common)
+            elif "value" in item:
+                env[item["key"]] = str(item["value"])
+            elif item.get("generateValue"):
+                env[item["key"]] = base64.b64encode(secrets.token_bytes(32)).decode()
+            elif "fromDatabase" in item:
+                env[item["key"]] = db[item["fromDatabase"]["property"]]
+            elif "fromService" in item:
+                ref = item["fromService"]
+                source = platform.get(ref["name"], {}) | out.get(ref["name"], {})
+                env[item["key"]] = source[ref["envVarKey"]]
+            elif item.get("sync") is False:
+                if item["key"] in ("REVA_S3_ACCESS_KEY_ID", "REVA_S3_SECRET_ACCESS_KEY"):
+                    env[item["key"]] = f"{name}-{item['key'].lower()}"
+                else:
+                    env[item["key"]] = operator[item["key"]]
+        out[name] = env
+    return out
+
+
+def test_blueprint_as_written_starts_both_processes_in_production() -> None:
+    envs = _render_service_envs()
+    api_env, worker_env = envs["reva-api"], envs["reva-worker"]
+    assert api_env["REVA_ENV"] == worker_env["REVA_ENV"] == "production"
+    assert "REVA_MIGRATION_DATABASE_URL" in api_env and "REVA_MIGRATION_DATABASE_URL" not in worker_env
+
+    _, api_child, api_summary = start_api.prepare(api_env)
+    assert api_summary["process_role"] == "api" and "REVA_MIGRATION_DATABASE_URL" not in api_child
+    assert api_child["REVA_S3_ACCESS_KEY_ID"] == "reva-api-reva_s3_access_key_id"
+
+    # The worker must start with exactly what render.yaml gives it (no public URL,
+    # no session secret, its own S3 credential).
+    _, worker_child, summary, settings = start_worker.prepare(worker_env)
+    assert summary["process_role"] == "worker" and settings.reva_env == "production"
+    assert worker_child["REVA_S3_ACCESS_KEY_ID"] == "reva-worker-reva_s3_access_key_id"
+    for key in (
+        "REVA_API_DB_PASSWORD",
+        "REVA_SESSION_SECRET",
+        "REVA_ADMIN_PASSWORD_HASH",
+        "REVA_MIGRATION_DATABASE_URL",
+    ):
+        assert key not in worker_child
+    assert worker_child["REVA_WORKER_DB_PASSWORD"] == api_env["REVA_WORKER_DB_PASSWORD"]

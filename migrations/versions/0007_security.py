@@ -20,22 +20,32 @@ SCIENTIFIC = ("meta", "ontology", "world", "evidence", "belief", "model", "sim")
 ALL_SCHEMAS = (*SCIENTIFIC, "ops")
 
 SQL_ROLES = r"""
+-- Works for a superuser and for a non-superuser CREATEROLE owner (managed
+-- PostgreSQL, PG16+ semantics): such an owner may not even *mention*
+-- SUPERUSER/CREATEDB/CREATEROLE/BYPASSRLS/REPLICATION in CREATE/ALTER ROLE, so
+-- roles are created with the (false) defaults and the attributes are verified.
 DO $$
-DECLARE r text;
+DECLARE r text; bad text;
 BEGIN
   FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
       BEGIN
-        EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
+        EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT', r);
       EXCEPTION WHEN duplicate_object OR unique_violation THEN
-        NULL;  -- created concurrently by another bootstrap; attributes are verified below
+        NULL;  -- created concurrently by another bootstrap; verified below
       END;
     END IF;
-    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r AND (rolinherit OR rolsuper OR rolcreatedb
-                  OR rolcreaterole OR rolbypassrls OR rolreplication)) THEN
-      -- Roles are cluster-global; only touch the catalog row when needed so parallel
-      -- bootstraps of other databases do not race on it ("tuple concurrently updated").
-      EXECUTE format('ALTER ROLE %I NOINHERIT NOSUPERUSER NOCREATEDB NOCREATEROLE NOBYPASSRLS NOREPLICATION', r);
+    -- Roles are cluster-global; only touch the catalog row when needed so parallel
+    -- bootstraps of other databases do not race on it ("tuple concurrently updated").
+    IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r AND rolinherit) THEN
+      EXECUTE format('ALTER ROLE %I NOINHERIT', r);
+    END IF;
+    SELECT string_agg(a, ', ') INTO bad FROM pg_roles p,
+      LATERAL (VALUES ('SUPERUSER', p.rolsuper), ('CREATEDB', p.rolcreatedb), ('CREATEROLE', p.rolcreaterole),
+                      ('BYPASSRLS', p.rolbypassrls), ('REPLICATION', p.rolreplication)) v(a, on_)
+     WHERE p.rolname = r AND v.on_;
+    IF bad IS NOT NULL THEN
+      RAISE EXCEPTION 'runtime role % holds forbidden attributes: % (a superuser must remove them)', r, bad;
     END IF;
   END LOOP;
 END $$;

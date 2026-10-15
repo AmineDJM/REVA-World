@@ -9,12 +9,13 @@ import re
 import time
 from collections.abc import Iterable, Iterator
 from contextlib import contextmanager
+from contextvars import ContextVar
 from datetime import datetime
 from typing import Any
 from uuid import UUID
 
 from fastapi import Header, Query, Request
-from sqlalchemy import Connection, Engine
+from sqlalchemy import Connection, Engine, text
 
 from reva.api import schemas as s
 from reva.api.errors import ApiProblem
@@ -28,11 +29,17 @@ def get_engine(request: Request) -> Engine:
     return request.app.state.engine()  # type: ignore[no-any-return]
 
 
+# Database time at which the current request's read transaction began (see ``read_conn``). Envelopes for
+# "as of now" reads state it as their knowledge cutoff (``knowledge_cutoff_basis = read_time``).
+READ_TIME: ContextVar[datetime | None] = ContextVar("reva_read_time", default=None)
+
+
 @contextmanager
 def read_conn(request: Request) -> Iterator[Connection]:
-    """Read-only transaction on the reva_api role."""
+    """Read-only transaction on the reva_api role; records the database read time (``READ_TIME``)."""
     with get_engine(request).connect() as conn:
         with conn.begin():
+            READ_TIME.set(conn.execute(text("SELECT clock_timestamp()")).scalar_one())
             yield conn
 
 
@@ -204,6 +211,20 @@ def support_summary(row: dict[str, Any], prefix: str = "") -> s.SupportSummary:
         aggregation=row[f"{prefix}aggregation"],
         period_label=period_label(temporal),
     )
+
+
+def valid_window(temporals: Iterable[dict[str, Any] | None]) -> dict[str, Any] | None:
+    """Valid-time window spanned by the returned records' temporal extents (None when none is known)."""
+    starts: list[str] = []
+    ends: list[str] = []
+    for te in temporals:
+        if not te or not te.get("start"):
+            continue
+        starts.append(str(te["start"]))
+        ends.append(str(te.get("end") or te["start"]))
+    if not starts:
+        return None
+    return {"start": min(starts), "end": max(ends)}
 
 
 def link(kind: str, ident: Any) -> s.ProvenanceLink:
