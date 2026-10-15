@@ -211,5 +211,5 @@ Files: `pages/ComposerPage.tsx`, `components/SpecEditor.tsx`, `lib/draft.ts`.
   - `src/components/{ContextBanner,ProvenanceDrawer}.tsx`
   - `src/pages/{CountryPage,SimulationPage,EvidencePage,AcquisitionPage}.tsx`
   - `src/styles.css`
-  - `e2e/{helpers,a11y_mobile,country}.spec.ts`
+  - `e2e/helpers.ts`, `e2e/a11y_mobile.spec.ts`, `e2e/country.spec.ts`
   - `src/lib/format.test.ts`, `src/pages/SimulationPage.test.tsx`
