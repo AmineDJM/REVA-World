@@ -54,8 +54,8 @@ after the update; the draft had 159 done, 23 partial, 207 rows (P2.14 was added)
 
 | Status | Rows |
 |---|---|
-| done | 167 |
-| partial | 16 |
+| done | 168 |
+| partial | 15 |
 | interface-only | 14 |
 | not started | 6 |
 | blocked-on-credentials | 5 |
@@ -68,8 +68,8 @@ By section: P0–P7 (§3): 81 done, 7 partial, 3 blocked-on-credentials. P8–P1
 
 V2 ledger (§12, counted separately): 13 done (all V2 models experimental, maintainer review pending), 1 partial.
 
-"done" rows have code and a test or measurement that exists. **No row's test has been confirmed in the final
-full run** (§9). A done row can still turn into a failure there.
+"done" rows have code and a test or measurement that exists; the final full offline run (§9) passed with no
+failures. P3.3 moved to done after the final live acceptance run showed release-pinned edges.
 
 ---
 
@@ -163,7 +163,7 @@ full run** (§9). A done row can still turn into a failure there.
 |---|---|---|---|---|
 | P3.1 | Every displayed value traces to raw source (§25 P3, inv. 1) | **done** | `src/reva/api/routes/provenance.py`; `API::test_provenance_reaches_raw_artifact_and_selector`, `API::test_provenance_of_run_and_scenario`; `ui/e2e/country.spec.ts` (drawer reaches raw SHA-256 + selector) | — |
 | P3.2 | Graph preserves participant roles (§25 P3) | **done** | `src/reva/world/graph.py`; `tests/integration/test_world_graph.py::test_participant_roles_and_directions_preserved`, `tests/unit/test_world_graph_core.py::test_incidence_preserves_roles_and_repeated_participants` | — |
-| P3.3 | World view is release-pinned; no unversioned current_facts (§25 P3, §4) | **partial** | `src/reva/belief/snapshots.py`; `API::test_beliefs_are_release_pinned_and_as_of`, `tests/integration/test_world_graph.py::test_release_pinned_context` | Both recorded demos (fixtures and live, started 00:19) show `release_pinned_edges=0` in step 4. `pin_release_relations` (`src/reva/belief/publication.py`) and the relation seal landed after those runs; the seal is tested (`DBH::test_release_pinned_relations_are_sealed`) and `tests/integration/test_world_graph.py::test_release_pinned_context` reads edges pinned during publication, but no test asserts that `publish_release` pins the ingested trade edges. Re-run demo step 4 |
+| P3.3 | World view is release-pinned; no unversioned current_facts (§25 P3, §4) | **done** | `src/reva/belief/snapshots.py`, `pin_release_relations` in `src/reva/belief/publication.py`; `API::test_beliefs_are_release_pinned_and_as_of`, `tests/integration/test_world_graph.py::test_release_pinned_context`, `tests/integration/test_repair_hookup.py`; final live acceptance run step 4: 65 release-pinned edges (`docs/dev/final_run/demo_live_summary.json`) | — |
 | P3.4 | WDI/Eurostat incompatible support cannot reconcile (§25 P3, §6 Eurostat) | **done** | `registry/mappings/eurostat.yaml`; `tests/unit/test_ontology_validation.py::test_jan1_support_does_not_satisfy_midyear_concept`, `tests/unit/test_ontology_mappings.py::test_eurostat_jan1_total_vs_wdi_midyear_is_incompatible`, `EUR::test_end_to_end_promotion_ingestion_and_belief_separation` | At 00:19 the EUR test failed on proposal-backlog order dependence. `tests/integration/test_connector_repair.py` now closes its proposals at teardown; drafting spot-check (autonomy_gates + connector_repair + eurostat_discovery + evidence_fixes: 116 passed) |
 | P3.5 | No scenario input allowed into beliefs (§25 P3, inv. 3) | **done** | `belief.input` FKs in `migrations/versions/0003_belief_graph.py`; `RG::test_belief_input_cannot_reference_simulation_or_evaluation_outputs` | — |
 | P3.6 | source_select_v1 publishes selected_report with original uncertainty (§8) | **done** | `src/reva/belief/selection.py`, `publication.py`, `docs/adr/0006-source-select-v1.md`; `EF::test_r05_r3_08_incompatible_lineages_withhold_the_estimand`, `EF::test_r27_retracted_latest_revision_is_not_replaced_by_superseded_value` | — |
@@ -439,45 +439,30 @@ Residual risk (documented in `docs/limitations.md` "Governance limits" and `docs
 
 ---
 
-## 9. Actual test results — **PLACEHOLDER (TBD by lead)**
+## 9. Actual test results (final run, 2026-10-15)
 
-> To be filled from the final full run. Do not copy numbers from earlier rounds into this section.
+All results below are from the final code (`docs/final_report.md` §3 has the same table with context).
 
-| Check | Command | Result | Evidence path |
+| Check | Command | Result | Evidence |
 |---|---|---|---|
-| pytest offline (all groups except live) | `uv run pytest` (record exact flags) | TBD | TBD (`var/acceptance/junit/…`) |
-| pytest live | `uv run pytest -m live tests/live` | TBD | TBD |
-| live source checks | `uv run python scripts/live_source_checks.py` | TBD | `var/live/live_checks.json` |
-| demo (fixtures / live) | `uv run python scripts/demo_workflow.py [--live]` | TBD | `var/acceptance/demo_*.json` |
-| ruff / mypy / import-linter | `uv run ruff check src tests scripts`; `uv run mypy -p reva.kernel -p reva.ports`; `uv run lint-imports` | TBD | TBD |
-| UI typecheck / vitest / Playwright | `npm --prefix ui run typecheck`; `npm --prefix ui run test -- --run`; `uv run python scripts/e2e_stack.py --run` | TBD | `ui/e2e/RESULTS.md` (regenerate) |
-| performance | `uv run python scripts/measure_performance.py` | TBD | `var/perf/perf_results.json`, `docs/dev/perf_report.md` |
-| Docker build + non-root smoke | see the `docker` job in `.github/workflows/ci.yml` | TBD | TBD |
-| acceptance report | `uv run python scripts/acceptance_report.py --with-perf --with-live` | TBD | `var/acceptance/acceptance_report.json` |
+| pytest offline | `uv run pytest -m "not live and not perf" -q -rfE` | **2,439 passed, 0 failed**, 30 skipped, 21 deselected | session log; CI runs the same selection |
+| pytest live | `uv run pytest -m live -q` | see `docs/final_report.md` §4 | — |
+| live acceptance workflow | `uv run python scripts/demo_workflow.py --live` | **13/13 pass** | `docs/dev/final_run/demo_live_summary.json` |
+| ruff / format / import-linter / mypy | `ruff check .`; `ruff format --check .`; `lint-imports`; `mypy -p reva.kernel -p reva.ports` | all pass | — |
+| UI typecheck / vitest / build | `npm --prefix ui run typecheck`; `npx vitest run`; `npm run build` | pass / 144 passed (22 files) / pass | — |
+| UI Playwright | `uv run python scripts/e2e_stack.py --run --recorded-drafter --v2-fixtures` | **53 passed**, 1 skipped (drafting-disabled path) | — |
+| performance | `uv run python scripts/measure_performance.py` | all 8 targets pass (API p95 147 ms at 1 CPU, 281 ms at 0.5 CPU; L1 2.9 ms; queue ack 249 ms; 100k records 1.6 s / 183 MiB) | `docs/dev/final_run/perf_results.json` |
+| Docker build | `docker build --secret id=build_ca,… -t reva-world:final .` | builds (89 s), 1.34 GB, non-root uid 10001 | — |
 
-Context for the lead (not final results): collection at drafting time showed 1678/1692 tests collected (14
-deselected). A drafting spot-check of `test_autonomy_gates.py`, `test_connector_repair.py`,
-`test_eurostat_discovery.py` and `test_evidence_fixes.py` gave 116 passed. The last full recorded run
-(`docs/dev/acceptance_report.md`, 00:19) gave 1454 passed, 4 failed and 5 skipped. Since then, the cause of
-3 of those failures has been fixed and the 4th test is fixed. DOCV2 spot-check during the update (02:53–03:00,
-other agents editing the tree): the V2 subset `test_backtest_api.py`, `test_nl_drafts_api.py`,
-`test_simulation_v2_datasets.py`, `test_nl_drafts.py`, `test_nl_crosschecks.py`, `test_simulation_v2_plugins.py`,
-`test_capabilities_v2.py` and `test_scenario_schema_v2.py` gave 126 passed and 1 failed. The failure,
-`test_backtest_api.py::test_api_post_enqueues_a_backtest_job`, was in a file being edited during the run; a
-re-run of `tests/integration/test_backtest_api.py` gave 10 passed. These are not final results.
+## 10. Deployment readiness
 
-## 10. Deployment readiness — **PLACEHOLDER (TBD by lead)**
-
-> Status at drafting: **not deployed — blocked-on-credentials.**
-
-* Blockers (operator-supplied, see `docs/deployment.md`): a Render account/API key with authorisation to create
-  paid resources; an S3-compatible private bucket (`REVA_S3_BUCKET`, `REVA_S3_REGION`, `REVA_S3_ENDPOINT_URL`); and
-  three scoped key pairs (`REVA_S3_ACCESS_KEY_ID`/`REVA_S3_SECRET_ACCESS_KEY`): read-only for `reva-api`,
-  prefix-write for `reva-worker` and a separate prefix-scoped pair for `reva-gate`. Optional: `REVA_ADMIN_PASSWORD_HASH` (generate with
-  `uv run reva auth hash-password`), `REVA_BACKUP_AGE_RECIPIENT`, `REVA_COMTRADE_API_KEY`, `REVA_SANDBOX_ENDPOINT`.
-* Ready locally: `render.yaml` (validated offline), `Dockerfile`, start/bootstrap scripts, backup/restore.
-* Deployed URL, deploy log, production role verification, Render-hardware measurements: **TBD by lead.** Do not
-  write "deployed" here without a successful deployment.
+**Not deployed — blocked on credentials.** Blockers (operator-supplied, see `docs/deployment.md`): a Render
+account/API key allowed to create paid resources; a private S3-compatible bucket and three scoped key pairs (API
+read-only, worker prefix-write, gate prefix-scoped) plus a read-only backup key; the admin password hash and a
+contact e-mail. Ready and verified locally: `render.yaml` (validated), Docker image (built from the final code,
+non-root), fail-closed start scripts for API/worker/gate, backup/restore (filesystem and MinIO S3), S3
+credential split on MinIO. Unverified until a real deploy: Render internal-database TLS, AWS-specific S3
+behaviour, Render-hardware performance, minisign signing.
 
 ---
 

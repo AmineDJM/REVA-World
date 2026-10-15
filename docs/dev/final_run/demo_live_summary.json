@@ -1,0 +1,113 @@
+{
+  "started_at": "2026-10-15T03:19:42.645690+00:00",
+  "finished_at": "2026-10-15T03:23:20.137768+00:00",
+  "mode": "live",
+  "origin": "live",
+  "git": {
+    "head": "f2865567893ef12402eeec0baa6a6c1a75ed5540",
+    "dirty_worktree": false
+  },
+  "summary": {
+    "pass": 13,
+    "fail": 0,
+    "blocked": 0
+  },
+  "overall": "pass",
+  "steps": [
+    {
+      "id": "1",
+      "title": "Fetch and archive real source responses",
+      "status": "pass"
+    },
+    {
+      "id": "2",
+      "title": "Show source flags, units, classifications and release uncertainty",
+      "status": "pass"
+    },
+    {
+      "id": "3",
+      "title": "Publish source-selected baseline beliefs",
+      "status": "pass"
+    },
+    {
+      "id": "4",
+      "title": "Explore trade hyperedges (product, reporter, counterpart, interval)",
+      "status": "pass"
+    },
+    {
+      "id": "5",
+      "title": "Apply a +25% border-price scenario (L1, FRA/CHN/USA) through the job path",
+      "status": "pass"
+    },
+    {
+      "id": "6",
+      "title": "Deterministic exposure plus labelled elasticity sensitivity range (L2)",
+      "status": "pass"
+    },
+    {
+      "id": "7",
+      "title": "Drill from a result to exact response fields and raw artifacts",
+      "status": "pass"
+    },
+    {
+      "id": "8",
+      "title": "Replay a two-vintage recorded sequence; later revisions excluded",
+      "status": "pass"
+    },
+    {
+      "id": "9",
+      "title": "Discover and validate the Eurostat connector; reject false equivalence",
+      "status": "pass"
+    },
+    {
+      "id": "10",
+      "title": "Materialise/calibrate/coarsen/refine the public demographic recipe",
+      "status": "pass"
+    },
+    {
+      "id": "11",
+      "title": "Naive-versus-state-space tournament on a labelled retrospective panel",
+      "status": "pass"
+    },
+    {
+      "id": "12",
+      "title": "Unresolved knowledge gaps and a reviewable connector change proposal",
+      "status": "pass"
+    },
+    {
+      "id": "N",
+      "title": "Negative demo: all four countries -> explicit Algerian data blocker",
+      "status": "pass"
+    }
+  ],
+  "exposure_L2": {
+    "FRA": {
+      "exposure_percent_L1": "0.25756760879252203773441363615596620341591545855751",
+      "sensitivity_range": [
+        "0.12131889858951678180006646294779048754547902009006",
+        "0.25756760879252203773441363615596620341591545855751"
+      ],
+      "kind": "sensitivity_range",
+      "range_row_variant": "L2:sensitivity_range"
+    },
+    "CHN": {
+      "exposure_percent_L1": "0.46085699286476945046091517470024753622140364013097",
+      "sensitivity_range": [
+        "0.21664647588479745806246579800173613969633972816126",
+        "0.46085699286476945046091517470024753622140364013097"
+      ],
+      "kind": "sensitivity_range",
+      "range_row_variant": "L2:sensitivity_range"
+    },
+    "USA": {
+      "exposure_percent_L1": "0.049678790138452354109270630580848933914680022668307",
+      "sensitivity_range": [
+        "-0.06234839454322513253652965724522554945372178681858",
+        "0.049678790138452354109270630580848933914680022668307"
+      ],
+      "kind": "sensitivity_range",
+      "range_row_variant": "L2:sensitivity_range"
+    }
+  },
+  "release_pinned_edges": 65
+}
