@@ -30,7 +30,7 @@ tested computation (no shapely/pyproj; :mod:`reva.adapters.connectors.atlas_geod
 Political view: Natural Earth's *default* Admin-0 layers are a de facto view (e.g. release 5.1.1 assigns
 Crimea to Russia, notes "Admin. by Russia; Claimed by Ukraine"). Every row says so in its flags
 (``ne_view``); the disputed-area rows name the claims. Features that are not crosswalk countries
-(Somaliland, N. Cyprus, Siachen Glacier, Bir Tawil, Taiwan, UN buffer zone, sovereign base areas, ...)
+(Somaliland, N. Cyprus, Siachen Glacier, Bir Tawil, UN buffer zone, sovereign base areas, ...)
 keep their Natural Earth code (``provider_geo``) with ``iso3 = null`` and are listed, never dropped or
 merged into a claimant. Borders with such features are kept as borders with that feature.
 

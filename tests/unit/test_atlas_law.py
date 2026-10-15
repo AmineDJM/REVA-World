@@ -226,8 +226,9 @@ def test_factbook_profiles():
         body, sha = _fixture("atlas.factbook", name)
         shas.append(sha)
         rows += atlas_factbook.parse_profile(body, gec, region, sha)
-    frame, unmapped = _frame(rows, "factbook", "legal_2026_01", shas, "fips")
-    assert {u["provider_geo"] for u in unmapped} == {"TW"}
+    frame, unmapped = _frame(rows, "factbook", "legal_2026_01", shas, "factbook_gec")  # A-FACTBOOK's GEC scheme
+    assert unmapped == []  # TW -> TWN since TWN joined the crosswalk
+    assert frame.filter(pl.col("provider_geo") == "TW")["iso3"].unique().to_list() == ["TWN"]
     fra = {r["indicator"]: r for r in frame.filter(pl.col("iso3") == "FRA").to_dicts()}
     assert fra["legal_system"]["value_text"].startswith("civil law")
     assert fra["suffrage.minimum_age"]["value"] == "18"
@@ -395,12 +396,14 @@ def test_sources_discovered_and_geo_schemes_load():
         "atlas.constitute",
         "atlas.ccp",
         "atlas.factbook",
+        "atlas.factbook_disputes",  # A-FACTBOOK's second Factbook source (same module)
         "atlas.ssa_ssptw",
     }
     for e in sources.values():
         assert e.spec.template == "atlas_bulk" and e.spec.code_digest.startswith("sha256:")
         assert e.spec.budget_key == e.spec.source_key
-    assert sources["atlas.factbook"].spec.planned_requests == len(atlas_factbook.items()) == 255
+    # atlas.factbook is now A-FACTBOOK's merged source (261 profiles incl. oceans/World; 3 tables)
+    assert sources["atlas.factbook"].spec.planned_requests == len(atlas_factbook.items()) == 261
     assert country_iso3("KSV", "wbl") == "XKX" and country_iso3("FRA", "wbl") == "FRA"
     assert country_iso3("Cote_d_Ivoire", "constitute") == "CIV"
     assert country_iso3("Germany_Prussia", "constitute") is None

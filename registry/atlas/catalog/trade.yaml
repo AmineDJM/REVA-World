@@ -1,0 +1,1888 @@
+# Trade concepts of the atlas (agent A-TRADE). Provider-declared definitions, not human-reviewed.
+# Tables: baci.* (src/reva/adapters/connectors/atlas_baci.py, CEPII BACI, Etalab 2.0), unctad.* (atlas_unctad.py,
+# UNCTADstat, CC BY 3.0 IGO), oecd.batis_services (atlas_trade_batis.py, OECD-WTO BaTIS). Rules: reconciled (BACI),
+# balanced (BaTIS) and reported (UNCTAD, IMF) statistics are separate concepts; *_balance concepts are REVA-derived
+# (exports - imports of the same source, file and year; flags.derived cites both inputs). Bilateral series
+# (partner in the indicator) are link-layer tables, not country concepts: see docs/dev/v3_a_trade.md.
+# Every series string is checked against the fixture tables by tests/unit/test_atlas_trade.py.
+domain: trade
+labels:
+  fr: Commerce international et investissement
+  en: International trade and investment
+maintainer: A-TRADE
+concepts:
+- id: trade.goods_exports.baci
+  labels:
+    fr: Exportations de biens (BACI, réconciliées)
+    en: Goods exports (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, all products, as reconciled by CEPII BACI (FOB, current
+    US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=TOTAL
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci
+  labels:
+    fr: Importations de biens (BACI, réconciliées)
+    en: Goods imports (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, all products, as reconciled by CEPII BACI (FOB, current
+    US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=TOTAL
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci
+  labels:
+    fr: Solde commercial des biens (BACI, dérivé)
+    en: Goods trade balance (BACI, derived)
+  definition: Exports minus imports of goods, all products, both from the same CEPII BACI year file (FOB, thousand current
+    US dollars). Positive = surplus (pays excédentaire), negative = deficit (pays déficitaire). Derived by REVA (flags.derived,
+    both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=TOTAL
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_i
+  labels:
+    fr: Exportations de biens — section SH I (Animaux vivants et produits du règne animal) (BACI, réconciliées)
+    en: Goods exports — HS section I (Live animals; animal products) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section I, chapters 01-05 (Live animals; animal products),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=I
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_i
+  labels:
+    fr: Importations de biens — section SH I (Animaux vivants et produits du règne animal) (BACI, réconciliées)
+    en: Goods imports — HS section I (Live animals; animal products) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section I, chapters 01-05 (Live animals; animal
+    products), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=I
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_i
+  labels:
+    fr: Solde commercial des biens — section SH I (Animaux vivants et produits du règne animal) (BACI, dérivé)
+    en: Goods trade balance — HS section I (Live animals; animal products) (BACI, derived)
+  definition: Exports minus imports of goods, HS section I, chapters 01-05 (Live animals; animal products), both from the
+    same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=I
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_ii
+  labels:
+    fr: Exportations de biens — section SH II (Produits du règne végétal) (BACI, réconciliées)
+    en: Goods exports — HS section II (Vegetable products) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section II, chapters 06-14 (Vegetable products),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=II
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_ii
+  labels:
+    fr: Importations de biens — section SH II (Produits du règne végétal) (BACI, réconciliées)
+    en: Goods imports — HS section II (Vegetable products) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section II, chapters 06-14 (Vegetable products),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=II
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_ii
+  labels:
+    fr: Solde commercial des biens — section SH II (Produits du règne végétal) (BACI, dérivé)
+    en: Goods trade balance — HS section II (Vegetable products) (BACI, derived)
+  definition: Exports minus imports of goods, HS section II, chapters 06-14 (Vegetable products), both from the same CEPII
+    BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit (pays déficitaire).
+    Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=II
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_iii
+  labels:
+    fr: Exportations de biens — section SH III (Graisses et huiles) (BACI, réconciliées)
+    en: Goods exports — HS section III (Animal or vegetable fats and oils) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section III, chapters 15-15 (Animal or vegetable
+    fats and oils), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=III
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_iii
+  labels:
+    fr: Importations de biens — section SH III (Graisses et huiles) (BACI, réconciliées)
+    en: Goods imports — HS section III (Animal or vegetable fats and oils) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section III, chapters 15-15 (Animal or vegetable
+    fats and oils), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=III
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_iii
+  labels:
+    fr: Solde commercial des biens — section SH III (Graisses et huiles) (BACI, dérivé)
+    en: Goods trade balance — HS section III (Animal or vegetable fats and oils) (BACI, derived)
+  definition: Exports minus imports of goods, HS section III, chapters 15-15 (Animal or vegetable fats and oils), both from
+    the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=III
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_iv
+  labels:
+    fr: Exportations de biens — section SH IV (Produits des industries alimentaires, boissons, tabacs) (BACI, réconciliées)
+    en: Goods exports — HS section IV (Prepared foodstuffs; beverages, spirits and vinegar; tobacco) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section IV, chapters 16-24 (Prepared foodstuffs;
+    beverages, spirits and vinegar; tobacco), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=IV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_iv
+  labels:
+    fr: Importations de biens — section SH IV (Produits des industries alimentaires, boissons, tabacs) (BACI, réconciliées)
+    en: Goods imports — HS section IV (Prepared foodstuffs; beverages, spirits and vinegar; tobacco) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section IV, chapters 16-24 (Prepared foodstuffs;
+    beverages, spirits and vinegar; tobacco), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=IV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_iv
+  labels:
+    fr: Solde commercial des biens — section SH IV (Produits des industries alimentaires, boissons, tabacs) (BACI, dérivé)
+    en: Goods trade balance — HS section IV (Prepared foodstuffs; beverages, spirits and vinegar; tobacco) (BACI, derived)
+  definition: Exports minus imports of goods, HS section IV, chapters 16-24 (Prepared foodstuffs; beverages, spirits and vinegar;
+    tobacco), both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire),
+    negative = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=IV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_v
+  labels:
+    fr: Exportations de biens — section SH V (Produits minéraux (dont combustibles)) (BACI, réconciliées)
+    en: Goods exports — HS section V (Mineral products) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section V, chapters 25-27 (Mineral products), as
+    reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=V
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_v
+  labels:
+    fr: Importations de biens — section SH V (Produits minéraux (dont combustibles)) (BACI, réconciliées)
+    en: Goods imports — HS section V (Mineral products) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section V, chapters 25-27 (Mineral products), as
+    reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=V
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_v
+  labels:
+    fr: Solde commercial des biens — section SH V (Produits minéraux (dont combustibles)) (BACI, dérivé)
+    en: Goods trade balance — HS section V (Mineral products) (BACI, derived)
+  definition: Exports minus imports of goods, HS section V, chapters 25-27 (Mineral products), both from the same CEPII BACI
+    year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit (pays déficitaire).
+    Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=V
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_vi
+  labels:
+    fr: Exportations de biens — section SH VI (Produits des industries chimiques) (BACI, réconciliées)
+    en: Goods exports — HS section VI (Products of the chemical or allied industries) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section VI, chapters 28-38 (Products of the chemical
+    or allied industries), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=VI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_vi
+  labels:
+    fr: Importations de biens — section SH VI (Produits des industries chimiques) (BACI, réconciliées)
+    en: Goods imports — HS section VI (Products of the chemical or allied industries) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section VI, chapters 28-38 (Products of the chemical
+    or allied industries), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=VI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_vi
+  labels:
+    fr: Solde commercial des biens — section SH VI (Produits des industries chimiques) (BACI, dérivé)
+    en: Goods trade balance — HS section VI (Products of the chemical or allied industries) (BACI, derived)
+  definition: Exports minus imports of goods, HS section VI, chapters 28-38 (Products of the chemical or allied industries),
+    both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=VI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_vii
+  labels:
+    fr: Exportations de biens — section SH VII (Matières plastiques et caoutchouc) (BACI, réconciliées)
+    en: Goods exports — HS section VII (Plastics and rubber) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section VII, chapters 39-40 (Plastics and rubber),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=VII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_vii
+  labels:
+    fr: Importations de biens — section SH VII (Matières plastiques et caoutchouc) (BACI, réconciliées)
+    en: Goods imports — HS section VII (Plastics and rubber) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section VII, chapters 39-40 (Plastics and rubber),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=VII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_vii
+  labels:
+    fr: Solde commercial des biens — section SH VII (Matières plastiques et caoutchouc) (BACI, dérivé)
+    en: Goods trade balance — HS section VII (Plastics and rubber) (BACI, derived)
+  definition: Exports minus imports of goods, HS section VII, chapters 39-40 (Plastics and rubber), both from the same CEPII
+    BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit (pays déficitaire).
+    Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=VII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_viii
+  labels:
+    fr: Exportations de biens — section SH VIII (Peaux, cuirs, pelleteries) (BACI, réconciliées)
+    en: Goods exports — HS section VIII (Raw hides and skins, leather, furskins) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section VIII, chapters 41-43 (Raw hides and skins,
+    leather, furskins), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=VIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_viii
+  labels:
+    fr: Importations de biens — section SH VIII (Peaux, cuirs, pelleteries) (BACI, réconciliées)
+    en: Goods imports — HS section VIII (Raw hides and skins, leather, furskins) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section VIII, chapters 41-43 (Raw hides and skins,
+    leather, furskins), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=VIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_viii
+  labels:
+    fr: Solde commercial des biens — section SH VIII (Peaux, cuirs, pelleteries) (BACI, dérivé)
+    en: Goods trade balance — HS section VIII (Raw hides and skins, leather, furskins) (BACI, derived)
+  definition: Exports minus imports of goods, HS section VIII, chapters 41-43 (Raw hides and skins, leather, furskins), both
+    from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=VIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_ix
+  labels:
+    fr: Exportations de biens — section SH IX (Bois, liège, vannerie) (BACI, réconciliées)
+    en: Goods exports — HS section IX (Wood, cork, straw and plaiting materials) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section IX, chapters 44-46 (Wood, cork, straw and
+    plaiting materials), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=IX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_ix
+  labels:
+    fr: Importations de biens — section SH IX (Bois, liège, vannerie) (BACI, réconciliées)
+    en: Goods imports — HS section IX (Wood, cork, straw and plaiting materials) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section IX, chapters 44-46 (Wood, cork, straw and
+    plaiting materials), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=IX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_ix
+  labels:
+    fr: Solde commercial des biens — section SH IX (Bois, liège, vannerie) (BACI, dérivé)
+    en: Goods trade balance — HS section IX (Wood, cork, straw and plaiting materials) (BACI, derived)
+  definition: Exports minus imports of goods, HS section IX, chapters 44-46 (Wood, cork, straw and plaiting materials), both
+    from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=IX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_x
+  labels:
+    fr: Exportations de biens — section SH X (Pâtes de bois, papier, carton) (BACI, réconciliées)
+    en: Goods exports — HS section X (Pulp of wood; paper and paperboard) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section X, chapters 47-49 (Pulp of wood; paper and
+    paperboard), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=X
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_x
+  labels:
+    fr: Importations de biens — section SH X (Pâtes de bois, papier, carton) (BACI, réconciliées)
+    en: Goods imports — HS section X (Pulp of wood; paper and paperboard) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section X, chapters 47-49 (Pulp of wood; paper
+    and paperboard), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=X
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_x
+  labels:
+    fr: Solde commercial des biens — section SH X (Pâtes de bois, papier, carton) (BACI, dérivé)
+    en: Goods trade balance — HS section X (Pulp of wood; paper and paperboard) (BACI, derived)
+  definition: Exports minus imports of goods, HS section X, chapters 47-49 (Pulp of wood; paper and paperboard), both from
+    the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=X
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xi
+  labels:
+    fr: Exportations de biens — section SH XI (Matières textiles et ouvrages) (BACI, réconciliées)
+    en: Goods exports — HS section XI (Textiles and textile articles) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XI, chapters 50-63 (Textiles and textile
+    articles), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xi
+  labels:
+    fr: Importations de biens — section SH XI (Matières textiles et ouvrages) (BACI, réconciliées)
+    en: Goods imports — HS section XI (Textiles and textile articles) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XI, chapters 50-63 (Textiles and textile
+    articles), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xi
+  labels:
+    fr: Solde commercial des biens — section SH XI (Matières textiles et ouvrages) (BACI, dérivé)
+    en: Goods trade balance — HS section XI (Textiles and textile articles) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XI, chapters 50-63 (Textiles and textile articles), both from the
+    same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xii
+  labels:
+    fr: Exportations de biens — section SH XII (Chaussures, coiffures, parapluies) (BACI, réconciliées)
+    en: Goods exports — HS section XII (Footwear, headgear, umbrellas) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XII, chapters 64-67 (Footwear, headgear,
+    umbrellas), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xii
+  labels:
+    fr: Importations de biens — section SH XII (Chaussures, coiffures, parapluies) (BACI, réconciliées)
+    en: Goods imports — HS section XII (Footwear, headgear, umbrellas) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XII, chapters 64-67 (Footwear, headgear,
+    umbrellas), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xii
+  labels:
+    fr: Solde commercial des biens — section SH XII (Chaussures, coiffures, parapluies) (BACI, dérivé)
+    en: Goods trade balance — HS section XII (Footwear, headgear, umbrellas) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XII, chapters 64-67 (Footwear, headgear, umbrellas), both from the
+    same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xiii
+  labels:
+    fr: Exportations de biens — section SH XIII (Ouvrages en pierre, céramique, verre) (BACI, réconciliées)
+    en: Goods exports — HS section XIII (Articles of stone, plaster, cement; ceramics; glass) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XIII, chapters 68-70 (Articles of stone,
+    plaster, cement; ceramics; glass), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xiii
+  labels:
+    fr: Importations de biens — section SH XIII (Ouvrages en pierre, céramique, verre) (BACI, réconciliées)
+    en: Goods imports — HS section XIII (Articles of stone, plaster, cement; ceramics; glass) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XIII, chapters 68-70 (Articles of stone,
+    plaster, cement; ceramics; glass), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xiii
+  labels:
+    fr: Solde commercial des biens — section SH XIII (Ouvrages en pierre, céramique, verre) (BACI, dérivé)
+    en: Goods trade balance — HS section XIII (Articles of stone, plaster, cement; ceramics; glass) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XIII, chapters 68-70 (Articles of stone, plaster, cement; ceramics;
+    glass), both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire),
+    negative = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xiv
+  labels:
+    fr: Exportations de biens — section SH XIV (Perles, pierres et métaux précieux, bijouterie) (BACI, réconciliées)
+    en: Goods exports — HS section XIV (Pearls, precious stones and metals; jewellery; coin) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XIV, chapters 71-71 (Pearls, precious stones
+    and metals; jewellery; coin), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XIV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xiv
+  labels:
+    fr: Importations de biens — section SH XIV (Perles, pierres et métaux précieux, bijouterie) (BACI, réconciliées)
+    en: Goods imports — HS section XIV (Pearls, precious stones and metals; jewellery; coin) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XIV, chapters 71-71 (Pearls, precious stones
+    and metals; jewellery; coin), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XIV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xiv
+  labels:
+    fr: Solde commercial des biens — section SH XIV (Perles, pierres et métaux précieux, bijouterie) (BACI, dérivé)
+    en: Goods trade balance — HS section XIV (Pearls, precious stones and metals; jewellery; coin) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XIV, chapters 71-71 (Pearls, precious stones and metals; jewellery;
+    coin), both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire),
+    negative = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XIV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xv
+  labels:
+    fr: Exportations de biens — section SH XV (Métaux communs et ouvrages) (BACI, réconciliées)
+    en: Goods exports — HS section XV (Base metals and articles of base metal) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XV, chapters 72-83 (Base metals and articles
+    of base metal), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xv
+  labels:
+    fr: Importations de biens — section SH XV (Métaux communs et ouvrages) (BACI, réconciliées)
+    en: Goods imports — HS section XV (Base metals and articles of base metal) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XV, chapters 72-83 (Base metals and articles
+    of base metal), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xv
+  labels:
+    fr: Solde commercial des biens — section SH XV (Métaux communs et ouvrages) (BACI, dérivé)
+    en: Goods trade balance — HS section XV (Base metals and articles of base metal) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XV, chapters 72-83 (Base metals and articles of base metal), both
+    from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XV
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xvi
+  labels:
+    fr: Exportations de biens — section SH XVI (Machines et appareils, matériel électrique) (BACI, réconciliées)
+    en: Goods exports — HS section XVI (Machinery and mechanical appliances; electrical equipment) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XVI, chapters 84-85 (Machinery and mechanical
+    appliances; electrical equipment), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XVI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xvi
+  labels:
+    fr: Importations de biens — section SH XVI (Machines et appareils, matériel électrique) (BACI, réconciliées)
+    en: Goods imports — HS section XVI (Machinery and mechanical appliances; electrical equipment) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XVI, chapters 84-85 (Machinery and mechanical
+    appliances; electrical equipment), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XVI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xvi
+  labels:
+    fr: Solde commercial des biens — section SH XVI (Machines et appareils, matériel électrique) (BACI, dérivé)
+    en: Goods trade balance — HS section XVI (Machinery and mechanical appliances; electrical equipment) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XVI, chapters 84-85 (Machinery and mechanical appliances; electrical
+    equipment), both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire),
+    negative = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XVI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xvii
+  labels:
+    fr: Exportations de biens — section SH XVII (Matériel de transport) (BACI, réconciliées)
+    en: Goods exports — HS section XVII (Vehicles, aircraft, vessels and transport equipment) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XVII, chapters 86-89 (Vehicles, aircraft,
+    vessels and transport equipment), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XVII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xvii
+  labels:
+    fr: Importations de biens — section SH XVII (Matériel de transport) (BACI, réconciliées)
+    en: Goods imports — HS section XVII (Vehicles, aircraft, vessels and transport equipment) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XVII, chapters 86-89 (Vehicles, aircraft,
+    vessels and transport equipment), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XVII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xvii
+  labels:
+    fr: Solde commercial des biens — section SH XVII (Matériel de transport) (BACI, dérivé)
+    en: Goods trade balance — HS section XVII (Vehicles, aircraft, vessels and transport equipment) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XVII, chapters 86-89 (Vehicles, aircraft, vessels and transport equipment),
+    both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XVII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xviii
+  labels:
+    fr: Exportations de biens — section SH XVIII (Instruments d'optique, de mesure, médicaux; horlogerie; musique) (BACI,
+      réconciliées)
+    en: Goods exports — HS section XVIII (Optical, medical, measuring instruments; clocks; musical instruments) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XVIII, chapters 90-92 (Optical, medical,
+    measuring instruments; clocks; musical instruments), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XVIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xviii
+  labels:
+    fr: Importations de biens — section SH XVIII (Instruments d'optique, de mesure, médicaux; horlogerie; musique) (BACI,
+      réconciliées)
+    en: Goods imports — HS section XVIII (Optical, medical, measuring instruments; clocks; musical instruments) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XVIII, chapters 90-92 (Optical, medical,
+    measuring instruments; clocks; musical instruments), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XVIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xviii
+  labels:
+    fr: Solde commercial des biens — section SH XVIII (Instruments d'optique, de mesure, médicaux; horlogerie; musique) (BACI,
+      dérivé)
+    en: Goods trade balance — HS section XVIII (Optical, medical, measuring instruments; clocks; musical instruments) (BACI,
+      derived)
+  definition: Exports minus imports of goods, HS section XVIII, chapters 90-92 (Optical, medical, measuring instruments; clocks;
+    musical instruments), both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays
+    excédentaire), negative = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XVIII
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xix
+  labels:
+    fr: Exportations de biens — section SH XIX (Armes et munitions) (BACI, réconciliées)
+    en: Goods exports — HS section XIX (Arms and ammunition) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XIX, chapters 93-93 (Arms and ammunition),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XIX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xix
+  labels:
+    fr: Importations de biens — section SH XIX (Armes et munitions) (BACI, réconciliées)
+    en: Goods imports — HS section XIX (Arms and ammunition) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XIX, chapters 93-93 (Arms and ammunition),
+    as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XIX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xix
+  labels:
+    fr: Solde commercial des biens — section SH XIX (Armes et munitions) (BACI, dérivé)
+    en: Goods trade balance — HS section XIX (Arms and ammunition) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XIX, chapters 93-93 (Arms and ammunition), both from the same CEPII
+    BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit (pays déficitaire).
+    Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XIX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xx
+  labels:
+    fr: Exportations de biens — section SH XX (Marchandises et produits divers) (BACI, réconciliées)
+    en: Goods exports — HS section XX (Miscellaneous manufactured articles) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XX, chapters 94-96 (Miscellaneous manufactured
+    articles), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xx
+  labels:
+    fr: Importations de biens — section SH XX (Marchandises et produits divers) (BACI, réconciliées)
+    en: Goods imports — HS section XX (Miscellaneous manufactured articles) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XX, chapters 94-96 (Miscellaneous manufactured
+    articles), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xx
+  labels:
+    fr: Solde commercial des biens — section SH XX (Marchandises et produits divers) (BACI, dérivé)
+    en: Goods trade balance — HS section XX (Miscellaneous manufactured articles) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XX, chapters 94-96 (Miscellaneous manufactured articles), both from
+    the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative = deficit
+    (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XX
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_xxi
+  labels:
+    fr: Exportations de biens — section SH XXI (Objets d'art, de collection ou d'antiquité) (BACI, réconciliées)
+    en: Goods exports — HS section XXI (Works of art, collectors' pieces and antiques) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, HS section XXI, chapters 97-97 (Works of art, collectors'
+    pieces and antiques), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=XXI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_xxi
+  labels:
+    fr: Importations de biens — section SH XXI (Objets d'art, de collection ou d'antiquité) (BACI, réconciliées)
+    en: Goods imports — HS section XXI (Works of art, collectors' pieces and antiques) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, HS section XXI, chapters 97-97 (Works of art, collectors'
+    pieces and antiques), as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=XXI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_xxi
+  labels:
+    fr: Solde commercial des biens — section SH XXI (Objets d'art, de collection ou d'antiquité) (BACI, dérivé)
+    en: Goods trade balance — HS section XXI (Works of art, collectors' pieces and antiques) (BACI, derived)
+  definition: Exports minus imports of goods, HS section XXI, chapters 97-97 (Works of art, collectors' pieces and antiques),
+    both from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=XXI
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.goods_exports.baci.section_ns
+  labels:
+    fr: Exportations de biens — marchandises non spécifiées (BACI, réconciliées)
+    en: Goods exports — commodities not specified (BACI 9999AA) (BACI, reconciled)
+  definition: Value of goods exported by the country to all partners, BACI legacy code 9999AA 'Commodities not specified according
+    to kind', as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.X|section=NS
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+  tags:
+  - bilateral_detail:baci.hs92_pair_section
+- id: trade.goods_imports.baci.section_ns
+  labels:
+    fr: Importations de biens — marchandises non spécifiées (BACI, réconciliées)
+    en: Goods imports — commodities not specified (BACI 9999AA) (BACI, reconciled)
+  definition: Value of goods imported by the country from all partners, BACI legacy code 9999AA 'Commodities not specified
+    according to kind', as reconciled by CEPII BACI (FOB, current US dollars, thousands).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.M|section=NS
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts.'
+- id: trade.goods_balance.baci.section_ns
+  labels:
+    fr: Solde commercial des biens — marchandises non spécifiées (BACI, dérivé)
+    en: Goods trade balance — commodities not specified (BACI 9999AA) (BACI, derived)
+  definition: Exports minus imports of goods, BACI legacy code 9999AA 'Commodities not specified according to kind', both
+    from the same CEPII BACI year file (FOB, thousand current US dollars). Positive = surplus (pays excédentaire), negative
+    = deficit (pays déficitaire). Derived by REVA (flags.derived, both inputs cited).
+  unit: thousand US dollars (current)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - baci.hs92_country.BAL|section=NS
+  provider_declared: true
+  notes: 'CEPII BACI HS92 V202601: reconciled estimates (CEPII harmonisation of exporter and importer declarations, CIF costs
+    removed: FOB), exact sums of HS6 flows; 13 selected years (1995, 2000, 2005, 2010, 2015, 2017-2024). Codes follow UN Comtrade
+    reporters: France includes Monaco, USA includes Puerto Rico and the US Virgin Islands, Switzerland includes Liechtenstein,
+    Norway includes Svalbard and Jan Mayen. Not the same statistic as IMF IMTS (reported, CIF imports) or BOP goods (BPM6)
+    -- separate concepts. Derived only when both exports and imports exist.'
+  tags:
+  - derived
+- id: trade.services_exports
+  labels:
+    fr: Exportations de services (UNCTAD)
+    en: Services exports (UNCTAD)
+  definition: Exports of services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat, compiled with the WTO from
+    balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=S
+  - unctad.goods_services.usd_millions|flow=02|series=2102
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports
+  labels:
+    fr: Importations de services (UNCTAD)
+    en: Services imports (UNCTAD)
+  definition: Imports of services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=S
+  - unctad.goods_services.usd_millions|flow=01|series=2102
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance
+  labels:
+    fr: Solde des échanges de services (UNCTAD, dérivé)
+    en: Services trade balance (UNCTAD, derived)
+  definition: Services exports minus services imports, same UNCTADstat file, economy and year; millions of current US dollars.
+    Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=S
+  - unctad.goods_services.usd_millions_balance|series=2102
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.sc
+  labels:
+    fr: Exportations de services — transports (UNCTAD)
+    en: Services exports — transport (UNCTAD)
+  definition: Exports of services, transport (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat, compiled with
+    the WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SC
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.sc
+  labels:
+    fr: Importations de services — transports (UNCTAD)
+    en: Services imports — transport (UNCTAD)
+  definition: Imports of services, transport (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SC
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.sc
+  labels:
+    fr: Solde des échanges de services — transports (UNCTAD, dérivé)
+    en: Services trade balance — transport (UNCTAD, derived)
+  definition: Services exports minus services imports, transport, same UNCTADstat file, economy and year; millions of current
+    US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SC
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.sd
+  labels:
+    fr: Exportations de services — voyages (UNCTAD)
+    en: Services exports — travel (UNCTAD)
+  definition: Exports of services, travel (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat, compiled with the
+    WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SD
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.sd
+  labels:
+    fr: Importations de services — voyages (UNCTAD)
+    en: Services imports — travel (UNCTAD)
+  definition: Imports of services, travel (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SD
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.sd
+  labels:
+    fr: Solde des échanges de services — voyages (UNCTAD, dérivé)
+    en: Services trade balance — travel (UNCTAD, derived)
+  definition: Services exports minus services imports, travel, same UNCTADstat file, economy and year; millions of current
+    US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SD
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.sg
+  labels:
+    fr: Exportations de services — services financiers (UNCTAD)
+    en: Services exports — financial services (UNCTAD)
+  definition: Exports of services, financial services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat, compiled
+    with the WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SG
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.sg
+  labels:
+    fr: Importations de services — services financiers (UNCTAD)
+    en: Services imports — financial services (UNCTAD)
+  definition: Imports of services, financial services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SG
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.sg
+  labels:
+    fr: Solde des échanges de services — services financiers (UNCTAD, dérivé)
+    en: Services trade balance — financial services (UNCTAD, derived)
+  definition: Services exports minus services imports, financial services, same UNCTADstat file, economy and year; millions
+    of current US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SG
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.sh
+  labels:
+    fr: Exportations de services — redevances de propriété intellectuelle (UNCTAD)
+    en: Services exports — charges for the use of intellectual property (UNCTAD)
+  definition: Exports of services, charges for the use of intellectual property (EBOPS 2010 / BPM6), current US dollars, millions
+    (UNCTADstat, compiled with the WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SH
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.sh
+  labels:
+    fr: Importations de services — redevances de propriété intellectuelle (UNCTAD)
+    en: Services imports — charges for the use of intellectual property (UNCTAD)
+  definition: Imports of services, charges for the use of intellectual property (EBOPS 2010 / BPM6), current US dollars, millions
+    (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SH
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.sh
+  labels:
+    fr: Solde des échanges de services — redevances de propriété intellectuelle (UNCTAD, dérivé)
+    en: Services trade balance — charges for the use of intellectual property (UNCTAD, derived)
+  definition: Services exports minus services imports, charges for the use of intellectual property, same UNCTADstat file,
+    economy and year; millions of current US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SH
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.si
+  labels:
+    fr: Exportations de services — télécommunications, informatique et information (UNCTAD)
+    en: Services exports — telecommunications, computer and information services (UNCTAD)
+  definition: Exports of services, telecommunications, computer and information services (EBOPS 2010 / BPM6), current US dollars,
+    millions (UNCTADstat, compiled with the WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SI
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.si
+  labels:
+    fr: Importations de services — télécommunications, informatique et information (UNCTAD)
+    en: Services imports — telecommunications, computer and information services (UNCTAD)
+  definition: Imports of services, telecommunications, computer and information services (EBOPS 2010 / BPM6), current US dollars,
+    millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SI
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.si
+  labels:
+    fr: Solde des échanges de services — télécommunications, informatique et information (UNCTAD, dérivé)
+    en: Services trade balance — telecommunications, computer and information services (UNCTAD, derived)
+  definition: Services exports minus services imports, telecommunications, computer and information services, same UNCTADstat
+    file, economy and year; millions of current US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs
+    cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SI
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.services_exports.sj
+  labels:
+    fr: Exportations de services — autres services aux entreprises (UNCTAD)
+    en: Services exports — other business services (UNCTAD)
+  definition: Exports of services, other business services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat,
+    compiled with the WTO from balance-of-payments statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=02|category=SJ
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_imports.sj
+  labels:
+    fr: Importations de services — autres services aux entreprises (UNCTAD)
+    en: Services imports — other business services (UNCTAD)
+  definition: Imports of services, other business services (EBOPS 2010 / BPM6), current US dollars, millions (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions|flow=01|category=SJ
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.services_balance.sj
+  labels:
+    fr: Solde des échanges de services — autres services aux entreprises (UNCTAD, dérivé)
+    en: Services trade balance — other business services (UNCTAD, derived)
+  definition: Services exports minus services imports, other business services, same UNCTADstat file, economy and year; millions
+    of current US dollars. Positive = surplus. Derived by REVA (flags.derived, both inputs cited).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: services
+  source_order:
+  - unctad.services_cat.usd_millions_balance|category=SJ
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.goods_bpm6_exports
+  labels:
+    fr: Exportations de biens (BPM6, UNCTAD)
+    en: Exports of goods (BPM6, UNCTAD)
+  definition: Exports of goods, balance-of-payments basis (BPM6), millions of current US dollars (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions|flow=02|series=3503
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.goods_bpm6_imports
+  labels:
+    fr: Importations de biens (BPM6, UNCTAD)
+    en: Imports of goods (BPM6, UNCTAD)
+  definition: Imports of goods, balance-of-payments basis (BPM6), millions of current US dollars (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions|flow=01|series=3503
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.goods_bpm6_balance
+  labels:
+    fr: Solde des échanges de biens (BPM6, UNCTAD, dérivé)
+    en: Trade balance in goods (BPM6, UNCTAD, derived)
+  definition: Exports minus imports of goods (BPM6), same UNCTADstat file, economy and year; millions of current US dollars.
+    Positive = surplus. Derived by REVA.
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions_balance|series=3503
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.goods_services_exports
+  labels:
+    fr: Exportations de biens et services (BPM6, UNCTAD)
+    en: Exports of goods and services (BPM6, UNCTAD)
+  definition: Exports of goods and services, balance-of-payments basis (BPM6), millions of current US dollars (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions|flow=02|series=2106
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.goods_services_imports
+  labels:
+    fr: Importations de biens et services (BPM6, UNCTAD)
+    en: Imports of goods and services (BPM6, UNCTAD)
+  definition: Imports of goods and services, balance-of-payments basis (BPM6), millions of current US dollars (UNCTADstat).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions|flow=01|series=2106
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+- id: trade.goods_services_balance
+  labels:
+    fr: Solde des échanges de biens et services (BPM6, UNCTAD, dérivé)
+    en: Trade balance in goods and services (BPM6, UNCTAD, derived)
+  definition: Exports minus imports of goods and services (BPM6), same UNCTADstat file, economy and year; millions of current
+    US dollars. Positive = surplus. Derived by REVA.
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: balance_of_payments
+  source_order:
+  - unctad.goods_services.usd_millions_balance|series=2106
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes.
+  tags:
+  - derived
+- id: trade.merchandise_exports.unctad
+  labels:
+    fr: Exportations de marchandises (UNCTAD)
+    en: Merchandise exports (UNCTAD)
+  definition: Merchandise exports, millions of current US dollars (UNCTADstat, international merchandise trade statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - unctad.merch_total.usd_millions|flow=02
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. Merchandise trade
+    from customs statistics (exports FOB, imports CIF for most economies); 1948 onward; not BPM6 goods.
+- id: trade.merchandise_imports.unctad
+  labels:
+    fr: Importations de marchandises (UNCTAD)
+    en: Merchandise imports (UNCTAD)
+  definition: Merchandise imports, millions of current US dollars (UNCTADstat, international merchandise trade statistics).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - unctad.merch_total.usd_millions|flow=01
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. Merchandise trade
+    from customs statistics (exports FOB, imports CIF for most economies); 1948 onward; not BPM6 goods.
+- id: trade.merchandise_balance.unctad
+  labels:
+    fr: Solde commercial des marchandises (UNCTAD, dérivé)
+    en: Merchandise trade balance (UNCTAD, derived)
+  definition: 'Merchandise exports minus merchandise imports, same UNCTADstat file, economy and year; millions of current
+    US dollars (exports mostly FOB, imports mostly CIF: the provider valuations, not adjusted). Positive = surplus. Derived
+    by REVA.'
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: goods
+  source_order:
+  - unctad.merch_total.usd_millions_balance
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. Merchandise trade
+    from customs statistics (exports FOB, imports CIF for most economies); 1948 onward; not BPM6 goods.
+  tags:
+  - derived
+- id: trade.fdi_inward_flow
+  labels:
+    fr: IDE entrants — flux (UNCTAD)
+    en: FDI inward flows (UNCTAD)
+  definition: Foreign direct investment, inward flows, millions of current US dollars (UNCTADstat, World Investment Report
+    data).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.usd_millions|flow=08|direction=1
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_inward_flow.pct_gdp
+  labels:
+    fr: IDE entrants — flux (% du PIB, UNCTAD)
+    en: FDI inward flows (% of GDP, UNCTAD)
+  definition: Foreign direct investment, inward flows, as a percentage of gross domestic product (UNCTADstat).
+  unit: '% of GDP'
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.pct_gdp|flow=08|direction=1
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_outward_flow
+  labels:
+    fr: IDE sortants — flux (UNCTAD)
+    en: FDI outward flows (UNCTAD)
+  definition: Foreign direct investment, outward flows, millions of current US dollars (UNCTADstat, World Investment Report
+    data).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.usd_millions|flow=08|direction=2
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_outward_flow.pct_gdp
+  labels:
+    fr: IDE sortants — flux (% du PIB, UNCTAD)
+    en: FDI outward flows (% of GDP, UNCTAD)
+  definition: Foreign direct investment, outward flows, as a percentage of gross domestic product (UNCTADstat).
+  unit: '% of GDP'
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.pct_gdp|flow=08|direction=2
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_inward_stock
+  labels:
+    fr: Stock d'IDE entrants (UNCTAD)
+    en: FDI inward stock (UNCTAD)
+  definition: Foreign direct investment, inward stock, millions of current US dollars (UNCTADstat, World Investment Report
+    data).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.usd_millions|flow=09|direction=1
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_inward_stock.pct_gdp
+  labels:
+    fr: Stock d'IDE entrants (% du PIB, UNCTAD)
+    en: FDI inward stock (% of GDP, UNCTAD)
+  definition: Foreign direct investment, inward stock, as a percentage of gross domestic product (UNCTADstat).
+  unit: '% of GDP'
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.pct_gdp|flow=09|direction=1
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_outward_stock
+  labels:
+    fr: Stock d'IDE sortants (UNCTAD)
+    en: FDI outward stock (UNCTAD)
+  definition: Foreign direct investment, outward stock, millions of current US dollars (UNCTADstat, World Investment Report
+    data).
+  unit: millions of US dollars (current prices)
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.usd_millions|flow=09|direction=2
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.fdi_outward_stock.pct_gdp
+  labels:
+    fr: Stock d'IDE sortants (% du PIB, UNCTAD)
+    en: FDI outward stock (% of GDP, UNCTAD)
+  definition: Foreign direct investment, outward stock, as a percentage of gross domestic product (UNCTADstat).
+  unit: '% of GDP'
+  domain: trade
+  subdomain: fdi
+  source_order:
+  - unctad.fdi.pct_gdp|flow=09|direction=2
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. FDI flows can be negative
+    (disinvestment); stocks UNCTAD flags 'Negative accumulation of flows' are absent (no value published).
+- id: trade.liner_shipping_connectivity
+  labels:
+    fr: Indice de connectivité du transport maritime de ligne (UNCTAD)
+    en: Liner shipping connectivity index (UNCTAD)
+  definition: 'UNCTAD liner shipping connectivity index (LSCI) of the economy, quarterly, average of Q1 2023 = 100: computed
+    by UNCTAD from liner fleet deployment data (MDS Transmodal).'
+  unit: index (average Q1 2023 = 100)
+  domain: trade
+  subdomain: maritime
+  source_order:
+  - unctad.lsci.index
+  provider_declared: true
+  notes: UNCTADstat bulk file (CC BY 3.0 IGO). Cells UNCTAD marks as missing ('Not publishable', 'Not applicable', 'No value
+    reported or collected') are absent, never zero; flags.footnote keeps 'Estimated'/'Break' footnotes. Quarterly periods.
+    The bilateral index (unctad.lsbci, country pairs) is a link-layer table, not a country concept.
+- id: trade.services_exports_world.batis
+  labels:
+    fr: Exportations de services vers le monde (BaTIS, équilibrées)
+    en: Services exports to the world (BaTIS, balanced)
+  definition: Total services exports of the economy to the world (partner W) in the OECD-WTO Balanced Trade in Services matrix,
+    balanced measure (ADJUSTMENT B), millions of current US dollars.
+  unit: millions of US dollars (current)
+  domain: trade
+  subdomain: services
+  source_order:
+  - oecd.batis_services.X|partner=W
+  provider_declared: true
+  notes: OECD-WTO estimates (balanced matrix; OBS_STATUS I on nearly every cell); BPM6 edition December2025; 2005-2024. Bilateral
+    detail (X|partner=..., derived BAL|partner=...) in the same table for the link layer. Not the same statistic as UNCTAD/IMF
+    reported services exports.

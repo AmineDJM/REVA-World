@@ -382,7 +382,7 @@ async def _ingest(
         geo_scheme="iso3",
         rights=RIGHTS,
         coverage_note=f"GeoNames countryInfo.txt: {len(rows)} countries/territories as declared by GeoNames "
-        "(undated; retrieval snapshot); historical codes SCG/ANT and Taiwan kept unmapped",
+        "(undated; retrieval snapshot); codes outside the crosswalk (historical SCG/ANT) kept unmapped",
     )
     kg: dict[str, Any] = {"loaded": False}
     if load_kg:

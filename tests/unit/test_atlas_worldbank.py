@@ -21,7 +21,7 @@ import yaml
 from reva.adapters.connectors import atlas_worldbank as wb
 from reva.adapters.connectors.atlas_worldbank_catalog import build_catalog, concept_id, reva_domain
 from reva.atlas.catalog import SCHEMA_PATH, load_catalog
-from reva.atlas.tables import validate_atlas_frame
+from reva.atlas.tables import country_iso3, validate_atlas_frame
 from reva.evidence.runner import _fixture_fingerprint
 from reva.kernel.errors import SourceResponseError
 
@@ -99,8 +99,15 @@ def test_wdi_is_split_by_topic_into_two_tables() -> None:
 def test_unmapped_codes_are_kept_and_iso3_fallback_is_flagged() -> None:
     p = parsed("wgi")
     f = frame(p)
-    assert p.geo.unmapped == {"ANT": "Netherlands Antilles", "TWN": "Taiwan, China"}
-    assert f.filter(pl.col("provider_geo") == "TWN")["iso3"].is_null().all()
+    # Taiwan has no WB economy code: unmapped while the crosswalk lacks TWN (1.0.0), mapped via ISO3 since 1.1.0.
+    twn = country_iso3("TWN", "iso3")
+    assert p.geo.unmapped == {"ANT": "Netherlands Antilles", **({} if twn else {"TWN": "Taiwan, China"})}
+    tw = f.filter(pl.col("provider_geo") == "TWN")
+    assert tw.height > 0
+    if twn:
+        assert (tw["iso3"] == "TWN").all() and tw["flags"].str.contains('"geo_via":"iso3"').all()
+    else:
+        assert tw["iso3"].is_null().all()
     aia = f.filter(pl.col("provider_geo") == "AIA")
     assert (aia["iso3"] == "AIA").all() and aia["flags"].str.contains('"geo_via":"iso3"').all()
     db = parsed("doingbusiness")
@@ -168,7 +175,9 @@ def test_pip_folds_dimensions_and_checks_line_independent_measures() -> None:
     inds = set(f["indicator"].unique())
     assert "headcount|povline=3.00|level=national|welfare=consumption" in inds
     assert any(i.startswith("gini|level=") for i in inds) and not any(i.startswith("gini|povline") for i in inds)
-    assert unmapped == [{"provider_geo": "TWN", "rows": f.filter(pl.col("provider_geo") == "TWN").height}]
+    tw_rows = f.filter(pl.col("provider_geo") == "TWN").height
+    assert tw_rows > 0
+    assert unmapped == ([] if country_iso3("TWN", "iso3") else [{"provider_geo": "TWN", "rows": tw_rows}])
     assert f["flags"].str.contains(wb.PIP_VERSION).all()
     assert (f["concept_id"] == f["indicator"].map_elements(wb.pip_concept_id, return_dtype=pl.String)).all()
     # A release whose distribution measures differ between poverty-line files is refused.

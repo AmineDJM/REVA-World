@@ -330,6 +330,52 @@
         "title": "Assessment",
         "type": "object"
       },
+      "AtlasAnsweredBy": {
+        "additionalProperties": true,
+        "properties": {
+          "dataset": {
+            "title": "Dataset",
+            "type": "string"
+          },
+          "indicator": {
+            "title": "Indicator",
+            "type": "string"
+          },
+          "justification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Justification"
+          },
+          "series": {
+            "title": "Series",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "source_rank": {
+            "title": "Source Rank",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "series",
+          "source",
+          "dataset",
+          "indicator",
+          "source_rank",
+          "justification"
+        ],
+        "title": "AtlasAnsweredBy",
+        "type": "object"
+      },
       "AtlasCell": {
         "additionalProperties": true,
         "properties": {
@@ -369,13 +415,12 @@
             "title": "Iso3"
           },
           "period_end": {
-            "description": "Exclusive end (half-open period)",
-            "format": "date",
+            "description": "Exclusive end (half-open period), same convention as period_start",
             "title": "Period End",
             "type": "string"
           },
           "period_start": {
-            "format": "date",
+            "description": "ISO 8601 date, proleptic Gregorian, astronomical years (year 0 = 1 BCE; -9999-01-01 = 10000 BCE)",
             "title": "Period Start",
             "type": "string"
           },
@@ -550,6 +595,18 @@
             "title": "Tags",
             "type": "array"
           },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "REVA theme (registry/atlas/themes.yaml)",
+            "title": "Theme"
+          },
           "unit": {
             "title": "Unit",
             "type": "string"
@@ -566,6 +623,7 @@
           "unit",
           "domain",
           "subdomain",
+          "theme",
           "value_kind",
           "source_order",
           "provider_declared",
@@ -603,6 +661,17 @@
             "title": "Domain",
             "type": "string"
           },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          },
           "year_max": {
             "anyOf": [
               {
@@ -629,6 +698,7 @@
         "required": [
           "concept_id",
           "domain",
+          "theme",
           "countries",
           "cells",
           "year_min",
@@ -663,9 +733,28 @@
             "title": "Domains",
             "type": "object"
           },
+          "themes": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "default": {},
+            "title": "Themes",
+            "type": "object"
+          },
           "total": {
             "title": "Total",
             "type": "integer"
+          },
+          "unthemed": {
+            "default": [],
+            "items": {
+              "type": "string"
+            },
+            "title": "Unthemed",
+            "type": "array"
           },
           "warnings": {
             "default": [],
@@ -680,10 +769,38 @@
           "data",
           "total",
           "domains",
+          "themes",
+          "unthemed",
           "catalog_errors",
           "warnings"
         ],
         "title": "AtlasConceptList",
+        "type": "object"
+      },
+      "AtlasConsulted": {
+        "additionalProperties": true,
+        "properties": {
+          "series": {
+            "description": "<source>.<dataset>.<indicator>, or 'derived: <expression>'",
+            "title": "Series",
+            "type": "string"
+          },
+          "source_rank": {
+            "title": "Source Rank",
+            "type": "integer"
+          },
+          "status": {
+            "description": "answered | also_reported | no_value | projection_only | unit_mismatch | series_not_in_snapshot",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "series",
+          "source_rank",
+          "status"
+        ],
+        "title": "AtlasConsulted",
         "type": "object"
       },
       "AtlasCountryCoverage": {
@@ -816,6 +933,17 @@
             "title": "Domains",
             "type": "array"
           },
+          "headline": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AtlasHeadlineDossier"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "REVA headline concepts: cross-source best value per year, naming who answered"
+          },
           "iso3": {
             "title": "Iso3",
             "type": "string"
@@ -839,6 +967,7 @@
         "required": [
           "iso3",
           "label",
+          "headline",
           "domains",
           "concepts_with_data",
           "concepts_without_data",
@@ -896,6 +1025,17 @@
             ],
             "title": "Subdomain"
           },
+          "theme": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Theme"
+          },
           "unit": {
             "title": "Unit",
             "type": "string"
@@ -918,6 +1058,7 @@
           "labels",
           "unit",
           "subdomain",
+          "theme",
           "latest",
           "years",
           "year_min",
@@ -1001,6 +1142,744 @@
           "warnings"
         ],
         "title": "AtlasDossierResponse",
+        "type": "object"
+      },
+      "AtlasHeadlineCell": {
+        "additionalProperties": true,
+        "properties": {
+          "answered_by": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AtlasAnsweredBy"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "consulted": {
+            "description": "Every listed series in order, with what it had for this cell",
+            "items": {
+              "$ref": "#/components/schemas/AtlasConsulted"
+            },
+            "title": "Consulted",
+            "type": "array"
+          },
+          "derived": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "formula, expression, precision and the two input cells",
+            "title": "Derived"
+          },
+          "flags": {
+            "additionalProperties": true,
+            "title": "Flags",
+            "type": "object"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          },
+          "method": {
+            "description": "reported (one listed series answered) or derived (exact formula of two inputs)",
+            "title": "Method",
+            "type": "string"
+          },
+          "period_end": {
+            "title": "Period End",
+            "type": "string"
+          },
+          "period_start": {
+            "title": "Period Start",
+            "type": "string"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AtlasProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "provider_geo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Provider Geo"
+          },
+          "reported": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "The value and unit exactly as the answering source reports",
+            "title": "Reported"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "description": "Exact decimal string in the concept unit (reported value x declared exact scale)",
+            "title": "Value",
+            "type": "string"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concept_id",
+          "iso3",
+          "year",
+          "value",
+          "unit",
+          "method",
+          "answered_by",
+          "reported",
+          "provider_geo",
+          "period_start",
+          "period_end",
+          "flags",
+          "provenance",
+          "consulted",
+          "derived"
+        ],
+        "title": "AtlasHeadlineCell",
+        "type": "object"
+      },
+      "AtlasHeadlineConcept": {
+        "additionalProperties": true,
+        "properties": {
+          "caveats": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caveats"
+          },
+          "definition": {
+            "title": "Definition",
+            "type": "string"
+          },
+          "derived": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Derived"
+          },
+          "file": {
+            "title": "File",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "not_equivalent": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Not Equivalent",
+            "type": "array"
+          },
+          "projections": {
+            "title": "Projections",
+            "type": "string"
+          },
+          "related_catalog_concepts": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related Catalog Concepts",
+            "type": "array"
+          },
+          "review_status": {
+            "title": "Review Status",
+            "type": "string"
+          },
+          "series": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Series",
+            "type": "array"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "theme",
+          "labels",
+          "definition",
+          "unit",
+          "projections",
+          "series",
+          "derived",
+          "caveats",
+          "not_equivalent",
+          "related_catalog_concepts",
+          "review_status",
+          "file"
+        ],
+        "title": "AtlasHeadlineConcept",
+        "type": "object"
+      },
+      "AtlasHeadlineConceptList": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineConcept"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "errors": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "themes": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Themes",
+            "type": "object"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "data",
+          "total",
+          "themes",
+          "errors",
+          "notes"
+        ],
+        "title": "AtlasHeadlineConceptList",
+        "type": "object"
+      },
+      "AtlasHeadlineCoverage": {
+        "additionalProperties": true,
+        "properties": {
+          "cells": {
+            "title": "Cells",
+            "type": "integer"
+          },
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "countries": {
+            "title": "Countries",
+            "type": "integer"
+          },
+          "countries_answered_by": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Countries Answered By",
+            "type": "object"
+          },
+          "countries_without_value": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Countries Without Value",
+            "type": "array"
+          },
+          "derived_cells": {
+            "title": "Derived Cells",
+            "type": "integer"
+          },
+          "latest_year_answered_by": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "Latest Year Answered By",
+            "type": "object"
+          },
+          "series_in_snapshot": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Series In Snapshot",
+            "type": "array"
+          },
+          "series_not_in_snapshot": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Series Not In Snapshot",
+            "type": "array"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          },
+          "year_max": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Max"
+          },
+          "year_min": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Min"
+          }
+        },
+        "required": [
+          "concept_id",
+          "theme",
+          "countries",
+          "cells",
+          "year_min",
+          "year_max",
+          "derived_cells",
+          "latest_year_answered_by",
+          "countries_answered_by",
+          "series_in_snapshot",
+          "series_not_in_snapshot",
+          "countries_without_value"
+        ],
+        "title": "AtlasHeadlineCoverage",
+        "type": "object"
+      },
+      "AtlasHeadlineCoverageResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "countries_total": {
+            "title": "Countries Total",
+            "type": "integer"
+          },
+          "data": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineCoverage"
+            },
+            "title": "Data",
+            "type": "array"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "countries_total",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasHeadlineCoverageResponse",
+        "type": "object"
+      },
+      "AtlasHeadlineDossier": {
+        "additionalProperties": true,
+        "properties": {
+          "concepts": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineDossierConcept"
+            },
+            "title": "Concepts",
+            "type": "array"
+          },
+          "without_data": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineMissing"
+            },
+            "title": "Without Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "concepts",
+          "without_data"
+        ],
+        "title": "AtlasHeadlineDossier",
+        "type": "object"
+      },
+      "AtlasHeadlineDossierConcept": {
+        "additionalProperties": true,
+        "properties": {
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Labels",
+            "type": "object"
+          },
+          "latest": {
+            "$ref": "#/components/schemas/AtlasHeadlineCell"
+          },
+          "series": {
+            "anyOf": [
+              {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Series"
+          },
+          "sources_used": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources Used",
+            "type": "array"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "year_max": {
+            "title": "Year Max",
+            "type": "integer"
+          },
+          "year_min": {
+            "title": "Year Min",
+            "type": "integer"
+          },
+          "years": {
+            "title": "Years",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concept_id",
+          "theme",
+          "labels",
+          "unit",
+          "latest",
+          "years",
+          "year_min",
+          "year_max",
+          "sources_used",
+          "series"
+        ],
+        "title": "AtlasHeadlineDossierConcept",
+        "type": "object"
+      },
+      "AtlasHeadlineMap": {
+        "additionalProperties": true,
+        "properties": {
+          "by_source": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "title": "By Source",
+            "type": "object"
+          },
+          "concept": {
+            "$ref": "#/components/schemas/AtlasHeadlineConcept"
+          },
+          "countries_with_value": {
+            "title": "Countries With Value",
+            "type": "integer"
+          },
+          "countries_without_value": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineMapMissing"
+            },
+            "title": "Countries Without Value",
+            "type": "array"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineCell"
+            },
+            "title": "Values",
+            "type": "array"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "concept",
+          "year",
+          "values",
+          "countries_with_value",
+          "countries_without_value",
+          "by_source"
+        ],
+        "title": "AtlasHeadlineMap",
+        "type": "object"
+      },
+      "AtlasHeadlineMapMissing": {
+        "additionalProperties": true,
+        "properties": {
+          "consulted": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasConsulted"
+            },
+            "title": "Consulted",
+            "type": "array"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          }
+        },
+        "required": [
+          "iso3",
+          "consulted"
+        ],
+        "title": "AtlasHeadlineMapMissing",
+        "type": "object"
+      },
+      "AtlasHeadlineMapResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AtlasHeadlineMap"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasHeadlineMapResponse",
+        "type": "object"
+      },
+      "AtlasHeadlineMissing": {
+        "additionalProperties": true,
+        "properties": {
+          "concept_id": {
+            "title": "Concept Id",
+            "type": "string"
+          },
+          "consulted": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasConsulted"
+            },
+            "title": "Consulted",
+            "type": "array"
+          },
+          "theme": {
+            "title": "Theme",
+            "type": "string"
+          }
+        },
+        "required": [
+          "concept_id",
+          "theme",
+          "consulted"
+        ],
+        "title": "AtlasHeadlineMissing",
+        "type": "object"
+      },
+      "AtlasHeadlineSeries": {
+        "additionalProperties": true,
+        "properties": {
+          "best": {
+            "items": {
+              "$ref": "#/components/schemas/AtlasHeadlineCell"
+            },
+            "title": "Best",
+            "type": "array"
+          },
+          "by_series": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "By Series",
+            "type": "array"
+          },
+          "concept": {
+            "$ref": "#/components/schemas/AtlasHeadlineConcept"
+          },
+          "derived_years": {
+            "title": "Derived Years",
+            "type": "integer"
+          },
+          "iso3": {
+            "title": "Iso3",
+            "type": "string"
+          },
+          "sources_without_data": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Sources Without Data",
+            "type": "array"
+          }
+        },
+        "required": [
+          "concept",
+          "iso3",
+          "best",
+          "by_series",
+          "derived_years",
+          "sources_without_data"
+        ],
+        "title": "AtlasHeadlineSeries",
+        "type": "object"
+      },
+      "AtlasHeadlineSeriesResponse": {
+        "additionalProperties": true,
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/AtlasHeadlineSeries"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Notes",
+            "type": "array"
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/AtlasSnapshotRef"
+          },
+          "warnings": {
+            "default": [],
+            "items": {
+              "$ref": "#/components/schemas/ApiWarning"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "data",
+          "snapshot",
+          "notes",
+          "warnings"
+        ],
+        "title": "AtlasHeadlineSeriesResponse",
         "type": "object"
       },
       "AtlasMap": {
@@ -17683,6 +18562,25 @@
               "title": "Offset",
               "type": "integer"
             }
+          },
+          {
+            "description": "REVA theme",
+            "in": "query",
+            "name": "theme",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REVA theme",
+              "title": "Theme"
+            }
           }
         ],
         "responses": {
@@ -17793,6 +18691,37 @@
               "description": "A recorded atlas snapshot (manifest sha256)",
               "title": "Snapshot"
             }
+          },
+          {
+            "description": "REVA theme",
+            "in": "query",
+            "name": "theme",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REVA theme",
+              "title": "Theme"
+            }
+          },
+          {
+            "description": "Include the REVA headline concepts (cross-source best value)",
+            "in": "query",
+            "name": "headline",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Include the REVA headline concepts (cross-source best value)",
+              "title": "Headline",
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -17901,6 +18830,25 @@
               "description": "A recorded atlas snapshot (manifest sha256)",
               "title": "Snapshot"
             }
+          },
+          {
+            "description": "REVA theme",
+            "in": "query",
+            "name": "theme",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REVA theme",
+              "title": "Theme"
+            }
           }
         ],
         "responses": {
@@ -17926,6 +18874,337 @@
           }
         },
         "summary": "Coverage",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/headline/concepts": {
+      "get": {
+        "description": "REVA headline concepts: the declared cross-source equivalences (series, justifications, exclusions).",
+        "operationId": "headline_concepts_v1_atlas_headline_concepts_get",
+        "parameters": [
+          {
+            "description": "REVA theme",
+            "in": "query",
+            "name": "theme",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REVA theme",
+              "title": "Theme"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasHeadlineConceptList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Headline Concepts",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/headline/coverage": {
+      "get": {
+        "description": "Per headline concept: countries with a value, who answered (latest year), missing countries.",
+        "operationId": "headline_coverage_v1_atlas_headline_coverage_get",
+        "parameters": [
+          {
+            "description": "REVA theme",
+            "in": "query",
+            "name": "theme",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[a-z][a-z0-9_]{0,39}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "REVA theme",
+              "title": "Theme"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasHeadlineCoverageResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Headline Coverage",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/headline/map": {
+      "get": {
+        "description": "Best value of a headline concept for every country in one year, with the answering source per\ncountry and, for countries without a value, every series consulted and what it had.",
+        "operationId": "headline_map_v1_atlas_headline_map_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concept",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Concept",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year",
+            "required": true,
+            "schema": {
+              "maximum": 3000,
+              "minimum": -10000,
+              "title": "Year",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasHeadlineMapResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Headline Map",
+        "tags": [
+          "atlas"
+        ]
+      }
+    },
+    "/v1/atlas/headline/series": {
+      "get": {
+        "description": "Best annual series of a headline concept for one country (source named per year).",
+        "operationId": "headline_series_v1_atlas_headline_series_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "concept",
+            "required": true,
+            "schema": {
+              "maxLength": 200,
+              "minLength": 1,
+              "title": "Concept",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "iso3",
+            "required": true,
+            "schema": {
+              "pattern": "^[A-Za-z]{3}$",
+              "title": "Iso3",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Snapshot origin (default: latest of any)",
+            "in": "query",
+            "name": "origin",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^(live|test_fixture)$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Snapshot origin (default: latest of any)",
+              "title": "Origin"
+            }
+          },
+          {
+            "description": "A recorded atlas snapshot (manifest sha256)",
+            "in": "query",
+            "name": "snapshot",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "pattern": "^[0-9a-f]{64}$",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "A recorded atlas snapshot (manifest sha256)",
+              "title": "Snapshot"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AtlasHeadlineSeriesResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Headline Series",
         "tags": [
           "atlas"
         ]

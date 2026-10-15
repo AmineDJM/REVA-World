@@ -45,16 +45,18 @@ cells are kept flagged ``inconsistent``. Only clean cells feed shares and KG sta
 from __future__ import annotations
 
 import hashlib
+import itertools
 import json
 import re
 from collections import Counter, defaultdict
-from collections.abc import Mapping, Sequence
+from collections.abc import Callable, Iterable, Iterator, Mapping, Sequence
 from dataclasses import dataclass
 from datetime import date, timedelta
 from typing import Any
 
 from reva.adapters.connectors.atlas_geopol_common import (
     COUNTRYCODE_VERSION,
+    AtlasRows,
     KgEntity,
     KgStatement,
     StateCodeCrosswalk,
@@ -289,7 +291,7 @@ def rollcalls(v: Votes) -> tuple[dict[int, RollCall], list[bool]]:
     return out, ok
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class VoteCell:
     """One (roll call, country) position after provider-defect handling.
 
@@ -366,13 +368,17 @@ def _period(d: date) -> tuple[date, date]:
 
 def vote_rows(
     cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha256: str, crosswalk: StateCodeCrosswalk
-) -> list[dict[str, Any]]:
+) -> AtlasRows:
     from reva.atlas.tables import json_obj
 
-    out = []
+    out = AtlasRows()
+    cache: dict[tuple[int | None, date], Any] = {}
     for cell in cells:
         rc = rcs[cell.rcid]
-        res = crosswalk.resolve("cow", cell.ccode, rc.date)
+        k = (cell.ccode, rc.date)
+        res = cache.get(k)
+        if res is None:
+            res = cache[k] = crosswalk.resolve("cow", cell.ccode, rc.date)
         flags: dict[str, Any] = {"rcid": rc.rcid, "code_resolution": res.reason, "provider_country": cell.country}
         if cell.status != "ok":
             flags["provider_status"] = cell.status
@@ -390,7 +396,7 @@ def vote_rows(
         if value_text is None:
             flags["missing"] = "unreliable"
         start, end = _period(rc.date)
-        out.append(
+        out.add(
             {
                 "source": ATLAS_SOURCE,
                 "dataset": "votes",
@@ -420,10 +426,10 @@ def _clean_text(t: str) -> str:
     return re.sub(r"\s{2,}", " ", _CONTROL.sub(" ", t)).strip() or "?"
 
 
-def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[str, Any]]:
+def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> AtlasRows:
     from reva.atlas.tables import MAX_TEXT, json_obj
 
-    out = []
+    out = AtlasRows()
     for r in sorted(rcs):
         rc = rcs[r]
         start, end = _period(rc.date)
@@ -440,7 +446,7 @@ def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[
             "provider_totals": rc.totals,
             "provider_inconsistent_rows": rc.inconsistent_rows,
         }
-        out.append(
+        out.add(
             {
                 "source": ATLAS_SOURCE,
                 "dataset": "rollcalls",
@@ -464,7 +470,7 @@ def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[
 
 def share_rows(
     cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha256: str, crosswalk: StateCodeCrosswalk
-) -> list[dict[str, Any]]:
+) -> AtlasRows:
     """Computed counts and yes-shares per (COW code, period, issue); see module docstring."""
     from reva.atlas.tables import json_obj, year_period
 
@@ -486,7 +492,7 @@ def share_rows(
                 acc[(cell.ccode, res.iso3, res.label if res.iso3 is None else None, res.qid, grain, p, issue)][
                     VOTE[cell.vote or 0]
                 ] += 1
-    out = []
+    out = AtlasRows()
     for (ccode, iso3, hist, qid, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
         if grain == "year":
             start, end = year_period(p)
@@ -520,7 +526,7 @@ def share_rows(
                 {"formula": "n_yes / (n_yes + n_no + n_abstain); absences excluded", "n_recorded": n_rec},
             )
         for meas, (val, unit, extra) in vals.items():
-            out.append(
+            out.add(
                 {
                     "source": ATLAS_SOURCE,
                     "dataset": "vote_shares",
@@ -547,18 +553,8 @@ def share_rows(
 # ----------------------------------------------------------------------------- KG
 
 
-def kg_records(
-    cells: Sequence[VoteCell],
-    rcs: Mapping[int, RollCall],
-    *,
-    raw_sha256: str,
-    resolver: StateEntityResolver,
-    issues_only: bool = False,
-) -> tuple[list[KgEntity], list[KgStatement]]:
-    """Roll-call entities + one vote statement per (state, roll call) with a yes/no/abstain position.
-
-    ``issues_only`` restricts vote statements to issue-coded roll calls (smaller KG); the atlas keeps all.
-    """
+def rollcall_kg(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> tuple[list[KgEntity], list[KgStatement]]:
+    """Roll-call entities with their symbol, issue codes and date."""
     ents: list[KgEntity] = []
     stmts: list[KgStatement] = []
     for r in sorted(rcs):
@@ -621,6 +617,21 @@ def kg_records(
                 selector=sel,
             )
         )
+    return ents, stmts
+
+
+def vote_statements(
+    cells: Iterable[VoteCell],
+    rcs: Mapping[int, RollCall],
+    *,
+    raw_sha256: str,
+    resolver: StateEntityResolver,
+    issues_only: bool = False,
+) -> Iterator[KgStatement]:
+    """One statement per (state, roll call) with a yes/no/abstain position (generator; ~930k for the full file).
+
+    ``issues_only`` restricts them to issue-coded roll calls (smaller KG); the atlas keeps every vote.
+    """
     for cell in cells:
         if not cell.usable or cell.vote not in (1, 2, 3) or cell.ccode is None:
             continue
@@ -632,7 +643,7 @@ def kg_records(
         q: dict[str, Any] = {"ccode": cell.ccode}
         if cell.status != "ok":
             q["provider_status"] = cell.status
-        stmts.append(
+        yield (
             KgStatement(
                 key=f"{rc.rcid}:cow{cell.ccode}",
                 subject=subj,
@@ -645,6 +656,19 @@ def kg_records(
                 selector={"file": VOTES_FILE_NAME, "object": FRAME, "row": cell.rows[0], "column": "vote"},
             )
         )
+
+
+def kg_records(
+    cells: Sequence[VoteCell],
+    rcs: Mapping[int, RollCall],
+    *,
+    raw_sha256: str,
+    resolver: StateEntityResolver,
+    issues_only: bool = False,
+) -> tuple[list[KgEntity], list[KgStatement]]:
+    """Materialised roll-call records + vote statements (small inputs and tests)."""
+    ents, stmts = rollcall_kg(rcs, raw_sha256=raw_sha256)
+    stmts += vote_statements(cells, rcs, raw_sha256=raw_sha256, resolver=resolver, issues_only=issues_only)
     return ents, stmts
 
 
@@ -711,48 +735,95 @@ def build(
 
 
 async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Memory-bounded pipeline (the full file is 1.28 M rows): each table is registered and released before the
+    next is built; KG vote statements are streamed to the loader in batches."""
+    import gc
+
     crosswalk, cc_sha = await fetch_countrycode(run)
     raws = {}
     for it in fetch_items():
         raws[it.key] = await run.get(
             it.url, key=f"{it.key}:{DATASET_VERSION}", media_types=it.expected_media_types, max_bytes=it.max_bytes
         )
-    out = build(
-        raws,
-        crosswalk=crosswalk,
-        qid_for_iso3=load_qid_for_iso3(),
-        countrycode_sha256=cc_sha,
-        strict=run.origin == "live",
-    )
-    for raw in raws.values():
-        run.archive(raw)
-    note = (
-        f"Voeten UNGA roll calls {out['date_range'][0]}..{out['date_range'][1]} ({out['n_rollcalls']} roll calls) "
-        f"from {DOI} v{DATASET_VERSION}"
-    )
-    res: dict[str, Any] = {"stats": out["stats"], "meta": out["meta"], "atlas": {}}
-    for ds, rows, extra in (
-        ("votes", out["votes"], "; not-a-member rows skipped; provider defects flagged"),
-        ("rollcalls", out["rollcalls"], "; provider_geo UNGA (not a country)"),
-        ("vote_shares", out["shares"], "; COMPUTED counts and yes-shares (see flags)"),
+    strict = run.origin == "live"
+    meta = check_version(raws["version"].body, raws["votes"].body)
+    sha = hashlib.sha256(raws["votes"].body).hexdigest()
+    v = parse_votes(raws["votes"].body, strict=strict)
+    rcs, ok = rollcalls(v)
+    for col in (
+        "descr",
+        "short",
+        "session",
+        "resid",
+        "amend",
+        "para",
+        "importantvote",
+        "yes",
+        "no",
+        "abstain",
+        *ISSUES,
     ):
+        v.cols.pop(col, None)  # roll-call level, kept in ``rcs``
+    cells, stats = vote_cells(v, ok)
+    n_rows = v.n
+    del v, ok
+    gc.collect()
+    for raw in raws.values():  # parsed and checked: archive
+        run.archive(raw)
+    dates = sorted(r.date for r in rcs.values())
+    note = (
+        f"Voeten UNGA roll calls {dates[0].isoformat()}..{dates[-1].isoformat()} ({len(rcs)} roll calls, "
+        f"{n_rows} provider rows) from {DOI} v{DATASET_VERSION}"
+    )
+    res: dict[str, Any] = {"stats": stats, "meta": meta, "atlas": {}}
+    builders: tuple[tuple[str, Callable[[], AtlasRows], str], ...] = (
+        (
+            "votes",
+            lambda: vote_rows(cells, rcs, raw_sha256=sha, crosswalk=crosswalk),
+            "; not-a-member rows skipped; provider defects flagged",
+        ),
+        ("rollcalls", lambda: rollcall_rows(rcs, raw_sha256=sha), "; provider_geo UNGA (not a country)"),
+        (
+            "vote_shares",
+            lambda: share_rows(cells, rcs, raw_sha256=sha, crosswalk=crosswalk),
+            "; COMPUTED counts and yes-shares (see flags)",
+        ),
+    )
+    for ds, make, extra in builders:
         if run.wants(ds):
-            r = run.register(
-                dataset=ds, frame=atlas_frame(rows), raw_sha256s=[out["sha"]], rights=RIGHTS, coverage_note=note + extra
-            )
+            frame = atlas_frame(make())
+            r = run.register(dataset=ds, frame=frame, raw_sha256s=[sha], rights=RIGHTS, coverage_note=note + extra)
+            del frame
+            gc.collect()
             res["atlas"][ds] = {k: r[k] for k in ("dataset_key", "row_count", "created")}
             res["atlas"][ds]["unmapped_provider_geo"] = r["unmapped_provider_geo"][:40]
-    res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
     if run.dataset is None and kg_available(run.engine):
-        res["kg"] = load_kg(
-            run.engine,
-            run.store,
-            out["entities"],
-            out["statements"],
+        resolver = StateEntityResolver(crosswalk, load_qid_for_iso3())
+        ents, sts = rollcall_kg(rcs, raw_sha256=sha)
+        common = dict(
             source_key=SOURCE_KEY,
             source_revision=f"dataverse-{DATASET_VERSION}",
-            raw_sha256s=[out["sha"], cc_sha],
             retrieved_at=raws["votes"].retrieved_at,
             origin=run.origin,
         )
+        votes_gen = vote_statements(cells, rcs, raw_sha256=sha, resolver=resolver)
+        first = load_kg(run.engine, run.store, ents, itertools.chain(sts, votes_gen), raw_sha256s=[sha], **common)
+        tail = load_kg(
+            run.engine,
+            run.store,
+            resolver.code_entities(),
+            code_correspondence(resolver, raw_sha256=cc_sha),
+            raw_sha256s=[cc_sha],
+            **common,
+        )
+        res["kg"] = {
+            k: (first.get(k, 0) + tail.get(k, 0)) if isinstance(first.get(k, 0), int) else first.get(k)
+            for k in set(first) | set(tail)
+            if k not in ("rejected", "rejected_sample")
+        }
+        res["kg"]["rejected"] = {
+            **first["rejected"],
+            **{k: first["rejected"].get(k, 0) + n for k, n in tail["rejected"].items()},
+        }
+        res["kg"]["rejected_sample"] = first["rejected_sample"] + tail["rejected_sample"]
     return res

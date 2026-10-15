@@ -160,7 +160,7 @@ def test_anchor_languages_are_seeded():
 def test_anchor_language_genealogy():
     anc = {q: {r["item"] for r in rows(load_anchor(f"language_ancestors_{q}"))} for q in ANCHOR_LANGUAGES}
     ROMANCE, INDO_EUROPEAN, SEMITIC, AFROASIATIC, BANTU, GERMANIC = (
-        "Q19814", "Q19860", "Q34049", "Q25288", "Q33146", "Q21200")
+        "Q19814", "Q19860", "Q34049", "Q25268", "Q33146", "Q21200")
     for lang in (PORTUGUESE, SPANISH, FRENCH):
         assert {ROMANCE, INDO_EUROPEAN} <= anc[lang], lang
     assert {GERMANIC, INDO_EUROPEAN} <= anc[ENGLISH]
@@ -348,13 +348,13 @@ async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
         todo = sorted(i for i in ids if i not in out)
         if not todo:
             return
-        res = await client.get_entities(todo, props=("claims", "labels", "sitelinks"), languages=("en", "fr"),
+        res = await client.get_entities(todo, props=("info", "claims", "labels", "sitelinks"), languages=("en", "fr"),
                                         meta={"agent": "KGCULT", "purpose": "anchor entities"})
         for qid, ent in res.entities.items():
             out[qid] = {
                 "id": ent["id"], "type": ent.get("type"), "lastrevid": ent.get("lastrevid"),
                 "modified": ent.get("modified"), "labels": ent.get("labels", {}),
-                "sitelinks_count": len(ent.get("sitelinks") or {}),
+                "sitelinks": ent.get("sitelinks") or {},
                 "claims": {k: v for k, v in (ent.get("claims") or {}).items() if k in ENTITY_KEEP},
                 "raw_sha256": res.raw_sha_by_id.get(qid), "retrieved_at": res.retrieved_at.isoformat(),
             }

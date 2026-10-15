@@ -58,5 +58,89 @@
     },
     "retrieved_at": "2026-10-15T22:07:00+00:00",
     "licence": "Public domain (US Government work); mirror CC0-1.0"
+  },
+  {
+    "request_fingerprint": "70c4f8bbcb17f8124feef45a1c541314032035cf18c8d30234d31d9509124bae",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/africa/wi.json",
+    "file": "africa_wi.json",
+    "sha256": "eec8065067daf6d027a9daa5da0c99879a254dc018505b44089296fe0405de62",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "c713e4a3ab29b4337602c6e84085836b849b41629c302042bfe2b495c2d1cfb4",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/east-n-southeast-asia/kn.json",
+    "file": "east-n-southeast-asia_kn.json",
+    "sha256": "d3f148b473cdfbe6db9fa8970346fc276689a4581118c6868a790de888a548ae",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "03bb2fd32abe669e19be7394830cfb94377ad456f407f5bba5e098836f9d47f8",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/europe/sv.json",
+    "file": "europe_sv.json",
+    "sha256": "925733dbe5d1c40c43e93ac147cedf123e12b8b0ff30d1626ae9e51636fc56f8",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "a96f20033271296b45230e6a7c67774d686e4484938560f6a60a0e1172bcabe7",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/europe/vt.json",
+    "file": "europe_vt.json",
+    "sha256": "aa4816a1cba08bd65da695f4b0ba8d68f50f08026a1572cc96232f40f9e10ef4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "dfde8688f1262144af14d8c6668af107af1e9f7648da59871e098444e6f8bef7",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/middle-east/we.json",
+    "file": "middle-east_we.json",
+    "sha256": "199c60edadf9e503dcbc5f12eb9c788496f5045de0d6adcf9e235d9666ea701e",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "60e9640b60d15b9c7b09e972d1e439848f6e31291d55a59e320db145bd3679cb",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/north-america/gl.json",
+    "file": "north-america_gl.json",
+    "sha256": "5cbba5737dd035b54be520cb1b965a723786218d00c540a9e5be9b0e980d4307",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
+  },
+  {
+    "request_fingerprint": "ae6e3743fcaa5ba3d381b5cc9959b5a32d202f6c37da5663e6776eef5fafbb94",
+    "url": "https://raw.githubusercontent.com/factbook/factbook.json/144d6977b2b01ac1cbd220de754c0a005616760b/world/xx.json",
+    "file": "world_xx.json",
+    "sha256": "a11d7d89264af212f65aa5985351cb355b3444ac1f2d9f7a4209923f9c741f65",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "blob bytes of the pinned mirror commit (identical to the raw.githubusercontent.com response archived in the live run)"
   }
 ]

@@ -23,3 +23,38 @@
   retrieved_at: '2026-10-15T00:59:20+00:00'
   licence: CC-BY-4.0 (World Bank API metadata)
   use: country crosswalk input (registry/entities/country_crosswalk.json)
+- file: iso-codes_4.20.1_iso_3166-1.json
+  url: https://salsa.debian.org/iso-codes-team/iso-codes/-/raw/v4.20.1/data/iso_3166-1.json
+  sha256: f01b812b57fba9f31ff621bf33e7c7570a01964dbeb5be2167e94decf538c89f
+  retrieved_at: '2026-10-15T23:12:13Z'
+  version: Debian iso-codes 4.20.1 (tag v4.20.1, commit 74623235ae99f6e835e1e465017ce4c544ae6b53, 2026-01-01)
+  licence: LGPL-2.1-or-later (Debian iso-codes)
+  use: ISO 3166-1 list (249 officially assigned codes, ISO English short names) for the country crosswalk
+- file: iso-codes_4.20.1_iso_3166-1_fr.po
+  url: https://salsa.debian.org/iso-codes-team/iso-codes/-/raw/v4.20.1/iso_3166-1/fr.po
+  sha256: adda8487a0bbf9103921d4dc5717f77e2b19217d65c6000ed33a64de00d358d7
+  retrieved_at: '2026-10-15T23:12:14Z'
+  version: Debian iso-codes 4.20.1 (tag v4.20.1)
+  licence: LGPL-2.1-or-later (Debian iso-codes)
+  use: French labels of crosswalk entities whose label comes from ISO 3166-1 (not M49 / World Bank)
+- file: unsd_m49_home.html.gz
+  url: https://unstats.un.org/unsd/methodology/m49/
+  sha256: 4d5cabcb10ad9ef184553b5e64c0a34ba8deeb20dab2e02cd0be3599b93bb01d
+  retrieved_at: '2026-10-15T23:11:35Z'
+  stored_as: gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes
+  licence: United Nations (UNSD M49 standard; reference metadata)
+  use: M49 FAQ note on Taiwan Province of China / China (CHN-TWN aggregation semantics in the crosswalk)
+- file: un_member_states.html.gz
+  url: https://www.un.org/en/about-us/member-states
+  sha256: 9f1d81ab68ed9947cc67e945e9753de6f072f05a239524aed48213fbf6df169e
+  retrieved_at: '2026-10-15T23:11:41Z'
+  stored_as: gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes
+  licence: United Nations (website terms of use; reference metadata)
+  use: UN Member States (193, with dates of admission) for the crosswalk un_membership field
+- file: un_non_member_states.html.gz
+  url: https://www.un.org/en/about-us/non-member-states
+  sha256: 516294ce51c3b99b6b08408f2b2c03604cd02299155ebe3b97566e72e1696cf4
+  retrieved_at: '2026-10-15T23:11:45Z'
+  stored_as: gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes
+  licence: United Nations (website terms of use; reference metadata)
+  use: UN non-member observer states for the crosswalk un_membership field

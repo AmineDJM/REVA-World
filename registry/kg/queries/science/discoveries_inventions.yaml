@@ -1,0 +1,22 @@
+id: science.discoveries_inventions
+domain: science
+owner: KGSCIECO
+description: >-
+  Discoveries and inventions: every item with a "discoverer or inventor" (P61) or a "time of discovery or
+  invention" (P575) statement and at least 15 sitelinks (the bound keeps notable discoveries/inventions,
+  e.g. penicillin, telephone, transistor, World Wide Web, and drops the ~1M bot-imported minor planets
+  whose only notability is their discoverer). Snapshots keep P61 (discoverer -> person hop), P575,
+  P495 country of origin, P138 named after (once allow-listed), P279/P361, P144 based on, P828/P1542
+  (asserted by Wikidata).
+purpose: seed_entities
+entity_kind: discovery
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { ?item wdt:P61 ?who . } UNION { ?item wdt:P575 ?when . }
+    ?item wikibase:sitelinks ?links .
+    FILTER(?links >= 15)
+    FILTER NOT EXISTS { ?item wdt:P31 wd:Q5 . }
+  }
+max_rows: 12000
+timeout_seconds: 55
+expand_hops: 1

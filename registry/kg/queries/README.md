@@ -10,6 +10,7 @@ Owner of the format and of the executor: **WDHARVEST** (`src/reva/kg/harvest.py`
 | `people/` | KGPEOPLE |
 | `culture/` | KGCULT |
 | `geopolitics/` | KGGEOPOL |
+| `society/` | A-LAW (legal ages: majority, consent, marriage, candidacy, retirement) |
 
 One YAML file = one spec. The machine-checkable contract is [`_schema.json`](_schema.json)
 (JSON Schema 2020-12); the harvester validates every spec against it before running anything.

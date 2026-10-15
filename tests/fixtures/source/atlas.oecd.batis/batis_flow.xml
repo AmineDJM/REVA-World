@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--NSI Web Service v10.11.8.0-->
+<message:Structure xmlns:message="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/message" xmlns:structure="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/structure" xmlns:common="http://www.sdmx.org/resources/sdmxml/schemas/v2_1/common">
+  <message:Header>
+    <message:ID>IDREF20847</message:ID>
+    <message:Test>false</message:Test>
+    <message:Prepared>2026-10-16T01:15:44.5759056+02:00</message:Prepared>
+    <message:Sender id="Unknown" />
+    <message:Receiver id="Unknown" />
+  </message:Header>
+  <message:Structures>
+    <structure:Dataflows>
+      <structure:Dataflow id="DSD_BATIS@DF_BATIS" agencyID="OECD.SDD.TPS" version="1.0" isFinal="true">
+        <common:Annotations>
+          <common:Annotation>
+            <common:AnnotationType>NonProductionDataflow</common:AnnotationType>
+            <common:AnnotationText xml:lang="en">true</common:AnnotationText>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>COUNTERPART_AREA</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_ROW</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>TIME_PERIOD,ADJUSTMENT</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_COLUMN</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>OBS_STATUS</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_FLAG</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>METHODOLOGY_TYPE</common:AnnotationTitle>
+            <common:AnnotationType>LAYOUT_NOTE</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>COUNTERPART_AREA=WXOECD,TYPE_PRODUCT=S,CURRENCY=USD,FREQ=A,DECIMALS=2,OBS_STATUS=A</common:AnnotationTitle>
+            <common:AnnotationType>NOT_DISPLAYED</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationTitle>REF_AREA=AUS,TYPE_PRODUCT=S,TRADE_FLOW=X,SERVICE=S,UNIT_MEASURE=USD_EXC,TIME_PERIOD_START=2020</common:AnnotationTitle>
+            <common:AnnotationType>DEFAULT</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation>
+            <common:AnnotationTitle>UNIT_MEASURE,UNIT_MULT</common:AnnotationTitle>
+            <common:AnnotationType>UNIT_MEASURE_CONCEPTS</common:AnnotationType>
+          </common:Annotation>
+          <common:Annotation id="@SDMX">
+            <common:AnnotationType>EXT_RESOURCE</common:AnnotationType>
+            <common:AnnotationText xml:lang="en">Bulk download - all data (478 MB)|https://webfs-sdd.oecd.org/files/.Stat/BATIS/OECD-WTO_BATIS_BPM6_December2025_bulk.zip</common:AnnotationText>
+            <common:AnnotationText xml:lang="fr">Téléchargement en masse - toutes les données  (478 Mo)|https://webfs-sdd.oecd.org/files/.Stat/BATIS/OECD-WTO_BATIS_BPM6_December2025_bulk.zip</common:AnnotationText>
+          </common:Annotation>
+        </common:Annotations>
+        <common:Name xml:lang="en">Balanced trade in services (BaTIS)</common:Name>
+        <common:Name xml:lang="fr">Echanges équilibrés de services (BaTIS)</common:Name>
+        <common:Description xml:lang="en">&lt;p&gt;The OECD-WTO Balanced Trade in Services (BaTIS) dataset is a complete, consistent, and balanced matrix of international trade in services statistics (ITSS). It contains annual bilateral data covering 202 reporters and partners, broken down by total services and 26 EBOPS 2010 (BPM6) categories from 2005 to 2024. BaTIS is the result of joint efforts by the OECD and WTO. Two main features enable BaTIS to stand out as the international benchmark for any analysis on international trade in services:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;&lt;b&gt;BaTIS is complete and consistent.&lt;/b&gt; At present, only around 65% of world trade in services is bilaterally specified, and the percentage is even lower for the individual service categories. The OECD-WTO methodology leverages all available official statistics and combines them with estimations and adjustments to provide users with a complete matrix covering virtually all economies in the world.&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;BaTIS is balanced.&lt;/b&gt; To resolve the asymmetries between reported and mirror flows, exports and imports are reconciled by calculating a symmetry-index weighted average between the two, following a similar approach to that developed for international merchandise trade statistics.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Batis provides three measures for each trade flow (under the ‘adjustment’ dimension):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;b&gt;Reported. &lt;/b&gt; Reflects the value officially reported by the country (where available), some values are rescaled to fit world totals.&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Adjusted and/or imputed.&lt;/b&gt; Reflects, in addition to the reported values, any adjustments made to ensure internal consistency as well as the estimations made by the OECD-WTO to fill in the gaps in the reported information.&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Balanced.&lt;/b&gt; Reflects the reconciled bilateral trade flow, where exports equal mirror imports.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Official information on bilateral trade flows was collected from OECD, Eurostat, national sources as well as UNSD. The WTO-UNCTAD trade in services dataset, based on a number of primary sources complemented with estimations, was the main source for data with partner world.&lt;/p&gt;
+&lt;p&gt;The BaTIS dataset can be used as a stand-alone input for economic analysis and policy-making. In addition, balanced trade in services data form an essential input to the OECD Trade in Value Added (TiVA) initiative, for which a balanced view of international trade is crucial. BaTIS is intended to be regularly updated and constantly improved as new data become available.&lt;/p&gt;
+&lt;p&gt;For more information on the methodology, please refer to the technical paper accompanying this dataset &lt;a href="https://doi.org/10.1787/c321a7a7-en"&gt;The OECD-WTO Balanced Trade in Services (BaTIS)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;For more information on balanced trade statistics, please go to the topic related OECD page &lt;a href="https://www.oecd.org/en/data/datasets/oecd-balanced-trade-statistics.html"&gt;Balanced trade statistics&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Users are encouraged to send their questions, or to signal any apparent errors, regarding this database to &lt;a href="mailto:STAT.Contact@oecd.org"&gt;STAT.Contact@oecd.org&lt;/a&gt;&lt;/p&gt;
+&lt;div&gt;&lt;a href="https://www.oecd.org/en/about/directorates/statistics-and-data-directorate.html"&gt;https://www.oecd.org/en/about/directorates/statistics-and-data-directorate.html&lt;/a&gt;&lt;/div&gt;</common:Description>
+        <common:Description xml:lang="fr">&lt;p&gt;La base de données Équilibrées sur le Commerce des Services (BaTIS) de l'OCDE et de l'OMC est une matrice complète, cohérente et équilibrée des statistiques du commerce international des services (ITSS). Elle contient des données bilatérales annuelles couvrant 202 pays déclarants et pays partenaires, ventilées selon le total des services ainsi que 26 catégories EBOPS 2010 (BPM6) de 2005 à 2024. BaTIS est le résultat des efforts conjoints de l'OCDE et de l'OMC. Deux caractéristiques principales permettent à BaTIS de s’imposer comme la référence internationale pour toute analyse sur le commerce international des services :&lt;/p&gt;&lt;ol&gt;
+  &lt;li&gt;&lt;b&gt;BaTIS est complet et cohérent.&lt;/b&gt; Actuellement, seulement 65 % environ du commerce mondial des services est spécifié de manière bilatérale, et le pourcentage est encore plus faible pour les différentes catégories de services. La méthodologie de l'OCDE-OMC exploite toutes les statistiques officielles disponibles et les combine avec des estimations et des ajustements pour fournir aux utilisateurs une matrice complète couvrant pratiquement toutes les économies du monde.&lt;/li&gt;  &lt;li&gt;&lt;b&gt;BaTIS est équilibré.&lt;/b&gt; Pour résoudre les asymétries entre les flux déclarés et les flux miroirs, les exportations et les importations sont conciliées en calculant une moyenne pondérée par l’indice de symétrie entre les deux, suivant une approche similaire à celle développée pour les statistiques du commerce international de marchandises.&lt;/li&gt;&lt;/ol&gt;
+&lt;p&gt;Batis fournit trois mesures pour chaque flux commercial (sous la dimension ‘ajustement’):&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;b&gt;Déclaré.&lt;/b&gt; Reflète la valeur officiellement déclarée par le pays (quand il est disponible), certaines valeurs sont recalibrées pour correspondre aux totaux mondiaux.&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Ajusté et/ou imputé.&lt;/b&gt; Reflète, en plus des valeurs déclarées, tous les ajustements effectués pour assurer la cohérence interne ainsi que les estimations réalisées par l'OCDE-OMC pour combler les lacunes dans les informations déclarées.&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;Équilibré.&lt;/b&gt; Reflète le flux commercial bilatéral reconcilié, où les exportations équivalent aux importations miroirs.&lt;/li&gt;&lt;/ul&gt;
+&lt;p&gt;Les informations officielles sur les flux commerciaux bilatéraux ont été collectées auprès de l'OCDE, d'Eurostat, de sources nationales ainsi que de l'UNSD. Le jeu de données sur le commerce des services OMC-CNUCED, basé sur un certain nombre de sources primaires complétées par des estimations, était la principale source de données avec le partenaire monde.&lt;/p&gt;&lt;p&gt;La base de données BaTIS peut être utilisée comme une entrée autonome pour l'analyse économique et l'élaboration de politiques. De plus, les données équilibrées sur le commerce des services constituent une entrée essentielle à l'initiative de l'OCDE sur le Commerce en Valeur Ajoutée (TiVA), pour laquelle une vision équilibrée du commerce international est cruciale. BaTIS est destiné à être régulièrement mis à jour et constamment amélioré à mesure que de nouvelles données deviennent disponibles.&lt;/p&gt;&lt;p&gt;Pour plus d'informations sur la méthodologie, veuillez-vous référer au document technique accompagnant cette base de données &lt;a href="https://doi.org/10.1787/c321a7a7-en"&gt;L'OCDE-OMC Commerce Équilibré des Services (BaTIS)&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Pour plus d'informations sur les statistiques du commerce équilibré, veuillez consulter la page de l'OCDE sur le sujet (uniquement disponible en anglais) &lt;a href="https://www.oecd.org/fr/data/datasets/oecd-balanced-trade-statistics.html"&gt;Statistiques du commerce équilibré&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Les utilisateurs sont encouragés à envoyer leurs questions, ou à signaler toute erreur apparente, concernant cette base de données à &lt;a href="mailto:STAT.Contact@oecd.org"&gt;STAT.Contact@oecd.org&lt;/a&gt;&lt;/p&gt;
+&lt;div&gt;&lt;a href="https://www.oecd.org/fr/about/directorates/statistics-and-data-directorate.html"&gt;https://www.oecd.org/fr/about/directorates/statistics-and-data-directorate.html&lt;/a&gt;&lt;/div&gt;</common:Description>
+        <structure:Structure>
+          <Ref id="DSD_BATIS" version="1.0" agencyID="OECD.SDD.TPS" package="datastructure" class="DataStructure" />
+        </structure:Structure>
+      </structure:Dataflow>
+    </structure:Dataflows>
+  </message:Structures>
+</message:Structure>

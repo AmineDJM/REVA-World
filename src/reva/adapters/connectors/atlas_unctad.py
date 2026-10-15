@@ -197,7 +197,9 @@ def parse_report(body: bytes, raw_sha: str, s: UnctadSet) -> tuple[pl.DataFrame,
     """One UNCTADstat bulk 7z -> atlas frame (not yet validated) and parse statistics."""
     name, content = read_7z_single(body, limit=MAX_CSV_BYTES)
     if name != s.csv_name:
-        raise SourceResponseError("UNCTAD bulk archive holds an unexpected file", file=name, expected=s.csv_name)
+        raise SourceResponseError(
+            "UNCTAD bulk archive holds an unexpected file", file=name, expected=s.csv_name, retryable=False
+        )
     df = common.read_csv_all_text(content, what=f"UNCTADstat {s.report}")
     need = [s.period, "Economy", *(c for c, _ in s.dims), *(m.column for m in s.measures)]
     if s.partner:
@@ -209,7 +211,9 @@ def parse_report(body: bytes, raw_sha: str, s: UnctadSet) -> tuple[pl.DataFrame,
     if s.period == "Year":
         bad = df.filter(~pl.col("Year").str.contains(r"^[12][0-9]{3}$"))
         if bad.height:
-            raise SourceResponseError("UNCTADstat: unexpected Year values", examples=bad["Year"].head(3).to_list())
+            raise SourceResponseError(
+                "UNCTADstat: unexpected Year values", examples=bad["Year"].head(3).to_list(), retryable=False
+            )
     else:
         qs = df["Quarter"].unique().to_list()
         qmap = {q: quarter_period(q) for q in qs}
@@ -236,7 +240,10 @@ def parse_report(body: bytes, raw_sha: str, s: UnctadSet) -> tuple[pl.DataFrame,
             both = sub.filter(pl.col(mcol).is_not_null())
             if both.height:
                 raise SourceResponseError(
-                    "UNCTADstat cell has a value and a missing-value reason", report=s.report, rows=both.height
+                    "UNCTADstat cell has a value and a missing-value reason",
+                    report=s.report,
+                    rows=both.height,
+                    retryable=False,
                 )
         vals = sub[m.column].unique().to_list()
         fix = {v: strict_decimal(v) for v in vals}
@@ -434,7 +441,12 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             )
         except Exception as e:
             errors.append(
-                {"stage": "register", "table": f"{SOURCE}.{s.dataset}", "error": type(e).__name__, "message": str(e)[:500]}
+                {
+                    "stage": "register",
+                    "table": f"{SOURCE}.{s.dataset}",
+                    "error": type(e).__name__,
+                    "message": str(e)[:500],
+                }
             )
             continue
         cov = out.get("coverage") or {}

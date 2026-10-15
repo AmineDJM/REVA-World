@@ -1,8 +1,8 @@
-"""CIA World Factbook profiles connector (agent A-FACTBOOK): offline, on recorded fixtures.
+"""CIA World Factbook connector (agent A-FACTBOOK; legal table by A-LAW): offline, on recorded fixtures.
 
-Fixtures ``tests/fixtures/source/atlas.factbook_profiles`` are the blob bytes of the pinned mirror
+Fixtures ``tests/fixtures/source/atlas.factbook`` are the blob bytes of the pinned mirror
 commit (identical to the raw.githubusercontent.com responses of the live run; the France file has
-the same sha256 as A-LAW's live capture) for FR, TW, KV, GL, WI, WE, VT, XX, KN, SV;
+the same sha256 as A-LAW's live capture) for FR, TW, KV, GL, WI, WE, VT, XX, KN, SV (plus A-LAW's US, SA);
 ``atlas.factbook_disputes`` holds FR, WI, TW at the 2024-04-18 commit.
 """
 
@@ -18,8 +18,9 @@ from typing import Any
 import polars as pl
 import pytest
 
-from reva.adapters.connectors import atlas_factbook_profiles as m
+from reva.adapters.connectors import atlas_factbook as m
 from reva.atlas.catalog import load_catalog
+from reva.atlas.ingest import AtlasRun
 from reva.atlas.sources import discover
 from reva.atlas.tables import country_iso3, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp
@@ -43,12 +44,7 @@ class _Run:
         return True
 
     async def get(self, url: str, **kw: Any) -> Any:
-        r = await self.http.get(url)
-
-        class Raw:
-            body = r.body
-
-        return Raw()
+        return await AtlasRun.offline(self.spec, self.http).get(url, **kw)
 
     def archive(self, raw: Any) -> str:
         return hashlib.sha256(raw.body).hexdigest()
@@ -59,7 +55,14 @@ class _Run:
         )
         self.frames[dataset] = f
         self.unmapped[dataset] = unm
-        return {"dataset_key": f"atlas.factbook.{dataset}", "row_count": f.height, "created": True}
+        return {
+            "dataset_key": f"atlas.factbook.{dataset}",
+            "artifact_sha256": "0" * 64,
+            "row_count": f.height,
+            "created": True,
+            "coverage": {},
+            "unmapped_provider_geo": unm,
+        }
 
 
 @pytest.fixture(scope="module")
@@ -75,7 +78,7 @@ def _cell(frame: pl.DataFrame, geo: str, indicator: str) -> list[dict[str, Any]]
 
 # ------------------------------------------------------------------------------------------ specs
 def test_two_atlas_sources_are_discovered_and_fit_the_budget():
-    found, errors = discover(["reva.adapters.connectors.atlas_factbook_profiles"])
+    found, errors = discover(["reva.adapters.connectors.atlas_factbook"])
     assert errors == []
     assert set(found) == {m.NAME_PROFILES, m.NAME_DISPUTES}
     prof, disp = (found[n].spec for n in (m.NAME_PROFILES, m.NAME_DISPUTES))
@@ -105,7 +108,8 @@ def test_geo_scheme_maps_gec_codes_and_keeps_partial_territories_unmapped():
     assert country_iso3("KV", m.GEO_SCHEME) == "XKX"
     assert country_iso3("WI", m.GEO_SCHEME) == "ESH"
     assert country_iso3("SF", m.GEO_SCHEME) == "ZAF" and country_iso3("ZA", m.GEO_SCHEME) == "ZMB"
-    for code in ("WE", "GZ", "SV", "JN", "UM", "TW", "EE", "XX", "PF", "PG"):
+    assert country_iso3("TW", m.GEO_SCHEME) == "TWN"
+    for code in ("WE", "GZ", "SV", "JN", "UM", "EE", "XX", "PF", "PG"):
         assert country_iso3(code, m.GEO_SCHEME) is None, code
 
 
@@ -161,7 +165,8 @@ def test_clean_text_removes_tags_keeps_wording():
 # ------------------------------------------------------------------------------- fixture ingests
 def test_figures_table_from_fixtures(profiles):
     run, out = profiles
-    assert out["failed"] == [] and out["files"] == len(FIX_GECS)
+    assert out["blocked"] == [] and out["files"] == len(FIX_GECS) and out["status"] == "ok"
+    assert [t["dataset_key"] for t in out["tables"]] == [f"atlas.factbook.{d}" for d in m.atlas_source()[0].datasets]
     f = run.frames[m.DS_FIGURES]
     (pop,) = _cell(f, "FR", "population.total")
     assert pop["value"] == "68512806" and pop["iso3"] == "FRA" and pop["period_start"] == date(2025, 1, 1)
@@ -184,13 +189,13 @@ def test_figures_table_from_fixtures(profiles):
     assert rc["value"] == "47" and rc["period_start"] == date(2021, 1, 1)
     # gap fillers: Taiwan (unmapped, kept), Greenland, Vatican, North Korea
     (tw,) = _cell(f, "TW", "population.total")
-    assert tw["iso3"] is None and json.loads(tw["flags"])["disputed_territory"].startswith("Taiwan")
+    assert tw["iso3"] == "TWN" and json.loads(tw["flags"])["disputed_territory"].startswith("Taiwan")
     assert _cell(f, "GL", "population.total")[0]["iso3"] == "GRL"
     assert _cell(f, "VT", "area.total")[0]["iso3"] == "VAT"
     assert _cell(f, "KN", "population.total")[0]["iso3"] == "PRK"
     (we,) = _cell(f, "WE", "population.total")
     assert we["iso3"] is None and json.loads(we["flags"])["partial_of_iso3"] == "PSE"
-    assert {u["provider_geo"] for u in run.unmapped[m.DS_FIGURES]} == {"TW", "WE", "XX", "SV"}
+    assert {u["provider_geo"] for u in run.unmapped[m.DS_FIGURES]} == {"WE", "XX", "SV"}
     assert f.filter(pl.col("value").is_not_null() & pl.col("value").str.contains(",")).height == 0
 
 
@@ -213,7 +218,7 @@ def test_texts_table_is_verbatim_and_flags_disputes(profiles):
 def test_disputes_table_from_fixtures():
     run = _Run(m.NAME_DISPUTES, {"gecs": ["fr", "wi", "tw"]})
     out = asyncio.run(m.atlas_ingest(run))
-    assert out["failed"] == [] and out["stats"] == {"dispute_rows": 3}
+    assert out["blocked"] == [] and out["stats"] == {"dispute_rows": 3}
     d = run.frames[m.DS_DISPUTES]
     (fr,) = _cell(d, "FR", "transnational_issues.disputes_international")
     assert "Madagascar claims the French territories" in fr["value_text"]
@@ -222,9 +227,10 @@ def test_disputes_table_from_fixtures():
 
 
 def test_missing_fixture_is_reported_not_silent():
-    run = _Run(m.NAME_PROFILES, {"gecs": "fr,us"})  # 'us' has no recorded fixture here
+    run = _Run(m.NAME_PROFILES, {"gecs": "fr,ca"})  # 'ca' has no recorded fixture
     out = asyncio.run(m.atlas_ingest(run))
-    assert out["files"] == 1 and [x["file"] for x in out["failed"]] == ["north-america/us.json"]
+    assert out["files"] == 1 and out["status"] == "partial"
+    assert [(b["item"], b["reason"]) for b in out["blocked"]] == [("north-america/ca", "fixture_missing")]
 
 
 def test_catalog_concepts_point_at_factbook_series():
@@ -235,3 +241,16 @@ def test_catalog_concepts_point_at_factbook_series():
     assert {"factbook.population.total", "factbook.text.climate", "factbook.text.disputes_international"} <= ids
     numeric = {f"factbook.{k}" for k in m.NUMERIC}
     assert numeric <= ids
+
+
+def test_legal_table_kept_for_law_catalog(profiles):
+    run, _ = profiles
+    lg = run.frames[m.DS_LEGAL]
+    (ls,) = _cell(lg, "FR", "legal_system")
+    assert ls["value_text"].startswith("civil law") and json.loads(ls["flags"])["transcription"] == "verbatim"
+    (age,) = _cell(lg, "FR", "suffrage.minimum_age")
+    assert age["value"] == "18" and "transcribed by agent A-LAW" in json.loads(age["flags"])["transcription"]
+    assert not _cell(lg, "WE", "suffrage.minimum_age") or _cell(lg, "WE", "legal_system")[0]["iso3"] is None
+    law = load_catalog().by_domain("law")
+    used = {x.indicator for c in law for x in c.source_order if (x.source, x.dataset) == ("factbook", m.DS_LEGAL)}
+    assert used and used <= set(lg["indicator"].unique())

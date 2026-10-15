@@ -1,6 +1,6 @@
 # CCKP (World Bank Climate Change Knowledge Portal) country keys (agent A-GEO).
 # CCKP all_countries responses key countries by ISO 3166-1 alpha-3, plus KSV (Kosovo, the World Bank's
-# legacy code) and TWN (Taiwan; not an entity of registry/entities/country_crosswalk.json, kept unmapped).
+# legacy code). Codes outside registry/entities/country_crosswalk.json are kept unmapped.
 scheme: cckp
 base: iso3
 aliases:

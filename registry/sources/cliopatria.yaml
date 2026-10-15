@@ -1,0 +1,31 @@
+# V3 (agent KGPOLITY): Cliopatria, the Seshat Global History Databank's polity-borders dataset
+# (worldwide polities 3400 BCE - 2024 CE, one GeoJSON file).
+# Connector: src/reva/adapters/connectors/atlas_cliopatria.py -> KG entities/statements (source_key
+# cliopatria.github) + the computed territorial overlay with Natural Earth 1:10m Admin-0 map units
+# (src/reva/kg/overlay.py). No atlas table (BCE periods are not representable in atlas periods).
+source_key: cliopatria.github
+title: Cliopatria - polity borders 3400 BCE - 2024 CE (Seshat Global History Databank)
+provider_url: https://github.com/Seshat-Global-History-Databank/cliopatria
+lineage_family: seshat_cliopatria
+rights:
+  licence: CC BY 4.0
+  licence_url: http://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Cliopatria (Seshat Global History Databank), release v0.2.1. Bennett, J. S. et al. (2025), "Cliopatria -
+    A geospatial database of world-wide political entities from 3400BCE to 2024CE", Scientific Data 12,
+    https://doi.org/10.1038/s41597-025-04516-9. Changes: polygons intersected with Natural Earth 1:10m
+    Admin-0 map units (public domain) to compute shares of modern countries' areas.
+metadata:
+  allowed_hosts: [raw.githubusercontent.com, naciscdn.org]
+  release: v0.2.1 (git 5f433377139a6eeaeacbdc894b70f8805b72c8b5; zip member cliopatria_polities_only_v021.geojson)
+  licence_check: LICENSE.md of the pinned tag is fetched every run; any other licence text blocks the run
+  zenodo: https://zenodo.org/records/13363121 (GitHub releases mirrored there)
+  provider_caveat: >-
+    "these maps reflect only one version of the territory held by past polities. Border uncertainties, as well
+    as differing opinions on the names, territorial changes, and durations of polities, are common challenges"
+    (Cliopatria README). Polygons are approximate; years are the provider's sampling steps.
+  natural_earth: >-
+    ne_10m_admin_0_map_units.zip (public domain, Natural Earth default de facto view) is fetched in the same run
+    and archived under this connector (same layer as A-GEO's naturalearth.admin0_10m, same entity rules)
+  authentication: none
+  cadence: monthly check; release-pinned (bump the tag and the connector version together)

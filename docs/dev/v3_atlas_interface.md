@@ -18,7 +18,7 @@ reported cell. Build a `polars.DataFrame` with exactly these columns (`reva.atla
 | `iso3` | str | yes | crosswalk entity key; fill with `geo_scheme=` or `country_iso3()`; null = unmapped (kept) |
 | `provider_geo` | str | no | the provider's own geography code, verbatim |
 | `entity_qid` | str | yes | Wikidata QID `Q…` when known |
-| `period_start` | date | no | half-open `[start, end)`: year 2020 = `2020-01-01`..`2021-01-01` (`year_period(2020)`) |
+| `period_start` | date | no | half-open `[start, end)`: year 2020 = `2020-01-01`..`2021-01-01` (`year_period(2020)`). **Astronomical years** (year 0 = 1 BCE, -9999 = 10000 BCE, as in the KG): build BCE periods with `frame_with_year_periods(rows, year_key=...)` / `year_period_exprs(col)` (Python `date` stops at year 1) |
 | `period_end` | date | no | exclusive end |
 | `value` | str | yes | **strict decimal string** as reported: `-12.5`, `3e-4`. No `1,000`, no `NaN`, never a filled zero |
 | `value_text` | str | yes | non-numeric reported value (category, `"Yes"`, legal text excerpt ≤ 4000 chars) |
@@ -189,3 +189,25 @@ async def atlas_ingest(run) -> dict:             # run: reva.atlas.ingest.AtlasR
   throwaway databases call `reva.atlas.sources.ensure_registered(owner_engine, store, spec)`; for the
   seeded deployment the lead adds `register_atlas_connector_versions(conn, store, act)` to the seed.
 * Tests: see `tests/integration/test_atlas_ingest.py` (fake live client via `http_factory=`).
+
+### 7.1 Additions (ATLASOPS, 2026-10-15)
+
+* `run.get(url, key=, media_types=, headers=, max_bytes=, params=)`: `params` stay on the acquisition's
+  item (bookkeeping, not sent). `run.get_range(url, key=, start=, end= | suffix=, if_range=)`: one HTTP
+  byte range, metered like `get`, only `206` accepted, fingerprint includes the range, metadata keeps
+  `content-range` (WID reads an 882 MB zip this way). Fixture mode serves byte ranges from a manifest
+  object `{"kind": "byte_range_archive", "url", "file", "sha256", "etag"}`
+  (`reva.atlas.ingest.ArchiveRangeFixtureHttp`).
+* Run options: `run.options` (CLI `--option KEY=VALUE`, job payload `"options"`), e.g. WID
+  `countries=FR,DE` for a country-subset run.
+* `AtlasRun.offline(spec, http)`: a fetch-only run for parser unit tests (no archive/register).
+* `run_atlas_ingest` refuses a source whose connector version is not registered, or is registered with a
+  different `code_digest` ("bump the version"): acquisitions always name the code that produced them. The
+  seed registers every discovered atlas source; a conflicting one is skipped and logged, never fatal.
+* CLI `reva atlas list | ingest <source> [--dataset] [--fixture] [--option] | snapshot [--warm]
+  [--skip-unchanged]`; job kinds `atlas_ingest` / `atlas_snapshot` (migration `0010_atlas_ops` adds them to
+  `ops.submit_job`), scheduled monthly / daily by the seed (`docs/dev/v3_atlasops.md`).
+* Themes: `registry/atlas/themes.yaml` maps every catalog concept to one REVA theme (optional per-concept
+  `theme:` field in the catalog schema overrides the rules). Cross-source equivalences ("REVA headline
+  concepts") live in `registry/atlas/source_order/<theme>.yaml` (`docs/dev/v3_atlasops.md`).
+

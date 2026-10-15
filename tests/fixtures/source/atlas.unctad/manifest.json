@@ -1,0 +1,80 @@
+[
+ {
+  "request_fingerprint": "6488a497a64eb5be95f0ecd3ae14961b723d8cd55f7ac779ca498e5532813203",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.TradeServCatTotal/US_TradeServCatTotal",
+  "file": "US_TradeServCatTotal.csv.7z",
+  "sha256": "3e325ae61c9e7523aed87906e99b55348bc8cc9119cf09a182dd064d15960aee",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "rebuilt excerpt: 8534 original lines (economies ['0000', '012', '156', '158', '250', '412', '728', '840'], years <=1950 or >=2019)"
+ },
+ {
+  "request_fingerprint": "e0e92e5b226c0ed833cd1631d3187d61378732bab4e09b057f8e65c4e6f8a945",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.GoodsAndServicesBpm6/US_GoodsAndServicesBpm6",
+  "file": "US_GoodsAndServicesBpm6.csv.7z",
+  "sha256": "585937707d41f84b784dd8665b84a4f7be2476bc4c6f3301d4eae61108b57843",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "rebuilt excerpt: 336 original lines (economies ['0000', '012', '156', '158', '250', '412', '728', '840'], years <=1950 or >=2019)"
+ },
+ {
+  "request_fingerprint": "8ac5e474ac9fa1fb06f8515bed9b36f0337b192b53a98418c68d499cfe72e318",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.TradeMerchTotal/US_TradeMerchTotal",
+  "file": "US_TradeMerchTotal.csv.7z",
+  "sha256": "250ca3ce1deb809a1b3752c5055977b96f74ba70f9f270d86ea665d89bca874b",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "rebuilt excerpt: 138 original lines (economies ['0000', '012', '156', '158', '250', '412', '728', '840'], years <=1950 or >=2019)"
+ },
+ {
+  "request_fingerprint": "e370de7ea5932bcacb74bd9e8b044901aca06446315fe94add05082a89a76ead",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.FdiFlowsStock/US_FdiFlowsStock",
+  "file": "US_FdiFlowsStock.csv.7z",
+  "sha256": "275be0ffbca767ee868dcfa0c24dd93d90947eb90d97ab3bcb588a54788e9778",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "rebuilt excerpt: 203 original lines (economies ['0000', '012', '156', '158', '250', '412', '728', '840'], years <=1950 or >=2019)"
+ },
+ {
+  "request_fingerprint": "cd77b64fa54c3a0bf7f69947724e42842f7277b417c94e52dd5e551c1db3cbf7",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.LSCI/US_LSCI",
+  "file": "US_LSCI.csv.7z",
+  "sha256": "435a64bdef78cdb89881bceac6c672bf49e97bf0305fa0f638a4c89614d5b2a3",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "whole real file"
+ },
+ {
+  "request_fingerprint": "9f90463c7fa2653ce978fe4a125048fbc4dffa4707bd28d100b76fa600624733",
+  "url": "https://unctadstat-api.unctad.org/bulkdownload/US.LSBCI/US_LSBCI",
+  "file": "US_LSBCI.csv.7z",
+  "sha256": "98eef0fc1d06dade4516d3828a997c5905025ed29e962d9ee90dd0165873dd3f",
+  "status": 200,
+  "headers": {
+   "content-type": "application/octet-stream"
+  },
+  "retrieved_at": "2026-10-15T22:59:00+00:00",
+  "licence": "CC BY 3.0 IGO",
+  "excerpt": "rebuilt excerpt: 200 original lines (economies ['0000', '012', '156', '158', '250', '412', '728', '840'], years <=1950 or >=2019)"
+ }
+]

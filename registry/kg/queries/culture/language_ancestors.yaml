@@ -2,21 +2,26 @@ id: culture.language_ancestors
 domain: culture
 owner: KGCULT
 description: >-
-  Closure of the subclass-of (P279) chain above every ISO 639-3 language: intermediate branches
-  (e.g. Western Ibero-Romance, Romance, Italic, Indo-European) that are not typed as language family
-  but are needed for an unbroken genealogy path language -> branch -> family.
+  Genealogical ancestors of every ISO 639-3 language: items reached by the subclass-of (P279) chain
+  that carry a Glottolog code (P1394), e.g. Portuguese -> Galician-Portuguese -> West Iberian ->
+  Iberian Romance -> ... -> Romance -> Italic -> Indo-European. Needed for an unbroken path
+  language -> branch -> family when branches are not typed as language family.
 purpose: seed_entities
 entity_kind: language_family
 sparql: |
   SELECT DISTINCT ?item WHERE {
     ?lang wdt:P220 ?iso .
     ?lang wdt:P279+ ?item .
+    ?item wdt:P1394 ?glottocode .
   }
 max_rows: 8000
 expand_hops: 0
 properties: [P31, P279, P361, P1394, P219, P220, P2341, P571]
 notes: >-
-  The top of the chain reaches abstract classes (language, natural language, modern language);
-  they are harvested like any other node and are recognisable by their P31/P279 classes. Paths must
-  not treat "subclass of language" as a genealogical link: KG consumers should stop at items that
-  carry a Glottocode (P1394) or are instances of language family (Q25295).
+  Without the Glottocode filter the P279 closure climbs into upper-ontology classes (language ->
+  information content entity -> BFO/DOLCE "continuant", "entity", ...: 139 items for the 7 anchor
+  languages, captured 2026-10-15) and into contested macro-family hypotheses without a Glottocode
+  (Eurasiatic, Italo-Celtic). Restricting seeds to Glottolog-coded nodes keeps the classification
+  Glottolog recognises; a P279 edge to an unseeded item stays a bare QID (no label), and KG path
+  consumers should treat only Glottocode-bearing nodes or language-family (Q25295) instances as
+  genealogical.

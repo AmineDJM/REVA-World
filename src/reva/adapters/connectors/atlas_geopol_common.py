@@ -521,12 +521,44 @@ def read_csv_member(
     return [r for r in csv.DictReader(io.StringIO(textdata)) if any((v or "").strip() for v in r.values())]
 
 
-def atlas_frame(rows: list[dict[str, Any]]) -> Any:
-    """polars DataFrame in the atlas schema from row dicts (missing nullable keys -> null)."""
+class AtlasRows:
+    """Column-wise accumulator of atlas rows: ``add(row_dict)`` keeps only the column values (no per-row
+    dict is retained), so million-row tables fit in memory. Iterating yields row dicts (tests, small data)."""
+
+    def __init__(self) -> None:
+        from reva.atlas.tables import ATLAS_COLUMNS
+
+        self.columns: tuple[str, ...] = ATLAS_COLUMNS
+        self.cols: dict[str, list[Any]] = {c: [] for c in ATLAS_COLUMNS}
+
+    def add(self, row: Mapping[str, Any]) -> None:
+        for c in self.columns:
+            self.cols[c].append(row.get(c))
+
+    def __len__(self) -> int:
+        return len(self.cols[self.columns[0]])
+
+    def __iter__(self) -> Any:
+        for i in range(len(self)):
+            yield {c: self.cols[c][i] for c in self.columns}
+
+    def frame(self) -> Any:
+        import polars as pl
+
+        from reva.atlas.tables import ATLAS_SCHEMA
+
+        return pl.DataFrame(self.cols, schema=ATLAS_SCHEMA)
+
+
+def atlas_frame(rows: Any) -> Any:
+    """polars DataFrame in the atlas schema from :class:`AtlasRows` or row dicts (missing nullable keys ->
+    null)."""
     import polars as pl
 
     from reva.atlas.tables import ATLAS_COLUMNS, ATLAS_SCHEMA
 
+    if isinstance(rows, AtlasRows):
+        return rows.frame()
     if not rows:
         return pl.DataFrame(schema=ATLAS_SCHEMA)
     cols = {c: [r.get(c) for r in rows] for c in ATLAS_COLUMNS}
@@ -834,29 +866,30 @@ def load_kg(
     engine: Any,
     store: Any,
     entities: Sequence[KgEntity],
-    statements: Sequence[KgStatement],
+    statements: Iterable[KgStatement],
     *,
     source_key: str,
     source_revision: str,
     raw_sha256s: Sequence[str],
     retrieved_at: Any,
     origin: str,
+    batch_size: int = 100_000,
 ) -> dict[str, Any]:
-    """Register the dataset predicates and load in bounded batches (entities first, then statements)."""
+    """Register the dataset predicates and load in bounded batches (entities first, then statements).
+    ``statements`` may be a generator: it is consumed and converted one batch at a time."""
     from collections import Counter as _C
+    from itertools import islice
 
     from reva.kg.model import MAX_ENTITIES_PER_BATCH, MAX_STATEMENTS_PER_BATCH, load_batch, register_properties
 
     register_properties(engine, kg_properties())
-    ents, sts = to_kg_model(entities, statements, source_key=source_key, source_revision=source_revision)
     totals: _C[str] = _C()
     rejected: _C[str] = _C()
-    batches: list[tuple[list[Any], list[Any]]] = [
-        (ents[i : i + MAX_ENTITIES_PER_BATCH], []) for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH)
-    ]
-    step = min(MAX_STATEMENTS_PER_BATCH, 100_000)
-    batches += [([], sts[i : i + step]) for i in range(0, len(sts), step)]
-    for be, bs in batches:
+    samples: list[tuple[str, str | None]] = []
+    n_batches = 0
+
+    def _load(be: list[Any], bs: list[Any]) -> None:
+        nonlocal n_batches
         used = sorted({s.raw_sha256 for s in bs if s.raw_sha256} or set(raw_sha256s))
         rep = load_batch(
             engine,
@@ -868,6 +901,7 @@ def load_kg(
             retrieved_at=retrieved_at,
             origin=origin,
         )
+        n_batches += 1
         for k in (
             "entities_inserted",
             "entities_unchanged",
@@ -879,4 +913,18 @@ def load_kg(
         ):
             totals[k] += getattr(rep, k)
         rejected.update(rep.rejected_counts)
-    return {**totals, "rejected": dict(rejected), "batches": len(batches)}
+        samples.extend((r.reason, r.key) for r in rep.rejected[:5])
+
+    ents, _ = to_kg_model(entities, (), source_key=source_key, source_revision=source_revision)
+    for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH):
+        _load(ents[i : i + MAX_ENTITIES_PER_BATCH], [])
+    it = iter(statements)
+    step = min(MAX_STATEMENTS_PER_BATCH, batch_size)
+    while True:
+        chunk = list(islice(it, step))
+        if not chunk:
+            break
+        _, sts = to_kg_model((), chunk, source_key=source_key, source_revision=source_revision)
+        del chunk
+        _load([], sts)
+    return {**totals, "rejected": dict(rejected), "rejected_sample": samples[:20], "batches": n_batches}

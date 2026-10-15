@@ -1,0 +1,23 @@
+# V3 (agent A-TRADE): CEPII BACI, reconciled bilateral trade by HS6 product.
+# Connector: src/reva/adapters/connectors/atlas_baci.py (byte ranges of one bulk zip; atlas tables baci.*).
+source_key: cepii.baci
+title: CEPII BACI international trade database at the product level (bulk zip per HS revision)
+provider_url: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
+lineage_family: un_comtrade
+rights:
+  licence: Etalab-2.0
+  licence_url: https://www.etalab.gouv.fr/licence-ouverte-open-licence/
+  terms_url: https://www.cepii.fr/CEPII/en/bdd_modele/bdd_modele_item.asp?id=37
+  attribution: "CEPII BACI (version 202601); Gaulier, G. and Zignago, S. (2010), BACI: International Trade Database at the Product-Level, CEPII Working Paper 2010-23"
+metadata:
+  allowed_hosts: [www.cepii.fr]
+  bulk_url: https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip
+  authentication: none
+  cadence: one release per year (January); V202601 released 2026-01-22
+  notes: >-
+    BACI is derived from UN Comtrade declarations (lineage un_comtrade): CEPII removes estimated CIF
+    costs from import declarations and weights exporter/importer declarations by estimated reporter
+    reliability, so each value is a CEPII estimate of the FOB flow. Not independent of UN Comtrade,
+    IMF IMTS (also Comtrade-based) or national customs data for the same flow. The server honours
+    HTTP byte ranges (Accept-Ranges: bytes, ETag); the connector reads the central directory and
+    the selected year members only (If-Range pinned to the ETag).

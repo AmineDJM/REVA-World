@@ -145,7 +145,11 @@ test('Atlas: choropleth, hatched gaps with reason (never zero), legend with sour
   await page.goto('/v3/atlas?concept=labour.unemployment_rate&annee=2020');
   await expect(page.locator('.v3-year-out')).toHaveText('2020');
   await page.getByRole('button', { name: /Lecture/ }).click();
-  await expect(page.locator('.v3-year-out')).toHaveText('2021', { timeout: 10_000 });
+  const shownYear = async () => Number(await page.locator('.v3-year-out').textContent());
+  await expect.poll(shownYear, { timeout: 10_000 }).toBeGreaterThan(2020);
+  // Play stops by itself at the last covered year.
+  await expect.poll(shownYear, { timeout: 15_000 }).toBe(2022);
+  await expect(page.getByRole('button', { name: /Lecture/ })).toBeVisible({ timeout: 5_000 });
 });
 
 test('Atlas map tooltip names the gap reason for a hatched country', async ({ page }) => {

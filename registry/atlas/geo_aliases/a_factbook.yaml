@@ -5,11 +5,12 @@
 # Deliberately NOT mapped (kept with iso3 = null, listed in each manifest):
 #   partial territories: WE West Bank and GZ Gaza Strip (parts of PSE), SV Svalbard and JN Jan Mayen (parts of SJM),
 #     UM US Pacific Island Wildlife Refuges, WQ Wake Island, BQ Navassa Island (parts of UMI);
-#   not crosswalk entities: TW Taiwan (TWN is not in country_crosswalk.json), AX Akrotiri, DX Dhekelia,
+#   not crosswalk entities: AX Akrotiri, DX Dhekelia,
 #     AT Ashmore and Cartier Islands, CR Coral Sea Islands, IP Clipperton Island, PF Paracel Islands,
 #     PG Spratly Islands;
 #   aggregates / non-countries: EE European Union, XX World, OO/XO/XQ/ZH/ZN oceans.
-# Unmapped at generation: AT, CR, UM, WQ, BQ, PF, PG, TW, AX, DX, EE, JN, SV, GZ, WE, IP, OO, XO, XQ, ZH, ZN, XX
+# TW Taiwan -> TWN since ATLASCORE added TWN to the crosswalk (2026-10-15).
+# Unmapped: AT, CR, UM, WQ, BQ, PF, PG, AX, DX, EE, JN, SV, GZ, WE, IP, OO, XO, XQ, ZH, ZN, XX
 # Scheme unsd_ama: UNSD AMA CountryID = UN M49 codes (base m49) plus Kosovo, which AMA lists as 412.
 schemes:
   factbook_gec:
@@ -141,6 +142,7 @@ schemes:
       - {code: "KZ", iso3: KAZ, source: "Factbook central-asia/kz.json (Kazakhstan); GEC = FIPS 10-4 KZ -> KAZ in GeoNames countryInfo (country_codes_extra.json scheme fips)"}
       - {code: "RS", iso3: RUS, source: "Factbook central-asia/rs.json (Russia); GEC = FIPS 10-4 RS -> RUS in GeoNames countryInfo (country_codes_extra.json scheme fips)"}
       - {code: "TI", iso3: TJK, source: "Factbook central-asia/ti.json (Tajikistan); GEC = FIPS 10-4 TI -> TJK in GeoNames countryInfo (country_codes_extra.json scheme fips)"}
+      - {code: "TW", iso3: TWN, source: "Factbook east-n-southeast-asia/tw.json (Taiwan); GEC = FIPS 10-4 TW -> TWN in GeoNames countryInfo (country_codes_extra.json scheme fips); TWN crosswalk entity added by ATLASCORE"}
       - {code: "TX", iso3: TKM, source: "Factbook central-asia/tx.json (Turkmenistan); GEC = FIPS 10-4 TX -> TKM in GeoNames countryInfo (country_codes_extra.json scheme fips)"}
       - {code: "UZ", iso3: UZB, source: "Factbook central-asia/uz.json (Uzbekistan); GEC = FIPS 10-4 UZ -> UZB in GeoNames countryInfo (country_codes_extra.json scheme fips)"}
       - {code: "BM", iso3: MMR, source: "Factbook east-n-southeast-asia/bm.json (Burma); GEC = FIPS 10-4 BM -> MMR in GeoNames countryInfo (country_codes_extra.json scheme fips)"}

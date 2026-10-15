@@ -372,7 +372,7 @@ def kg_records(
                     qual["side"] = side.split("=")[1]
                 stmts.append(
                     KgStatement(
-                        key=f"{cid}:{pred.split(':')[1]}:{obj}:{a}",
+                        key=f"{cid}:{pred.split(':')[1]}{(':' + side) if side else ''}:{obj}:{a}",
                         subject=subj,
                         property=pred,
                         object_qid=obj,

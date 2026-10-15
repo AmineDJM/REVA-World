@@ -14,7 +14,7 @@ import polars as pl
 import pytest
 from sqlalchemy import text
 
-from reva.adapters.connectors import atlas_factbook_profiles as fb
+from reva.adapters.connectors import atlas_factbook as fb
 from reva.adapters.connectors import atlas_unsd_ama as ama
 from reva.atlas.ingest import run_atlas_ingest
 from reva.atlas.sources import ensure_registered, get_source
@@ -41,7 +41,11 @@ def test_factbook_profiles_tables(registered):
     out = _run(db, fb.NAME_PROFILES, {"gecs": GECS})
     assert out["status"] == "completed" and out["archived_raw"] == 10
     keys = {r["dataset_key"]: r for r in out["registered"]}
-    assert set(keys) == {"atlas.factbook.figures_2026_01", "atlas.factbook.texts_2026_01"}
+    assert set(keys) == {
+        "atlas.factbook.legal_2026_01",
+        "atlas.factbook.figures_2026_01",
+        "atlas.factbook.texts_2026_01",
+    }
     assert all(r["created"] for r in out["registered"])
     with db.owner.connect() as c:
         ds = c.execute(
@@ -59,11 +63,9 @@ def test_factbook_profiles_tables(registered):
     f = read_atlas_table(db.store, sha)
     gl = f.filter((pl.col("iso3") == "GRL") & (pl.col("indicator") == "population.total")).to_dicts()
     assert gl and json.loads(gl[0]["flags"])["estimate"] is True
-    assert (
-        f.filter(pl.col("provider_geo") == "TW")["iso3"].null_count() == f.filter(pl.col("provider_geo") == "TW").height
-    )
+    assert f.filter(pl.col("provider_geo") == "TW")["iso3"].unique().to_list() == ["TWN"]
     again = _run(db, fb.NAME_PROFILES, {"gecs": GECS})
-    assert [r["created"] for r in again["registered"]] == [False, False]  # idempotent
+    assert [r["created"] for r in again["registered"]] == [False, False, False]  # idempotent
 
 
 def test_factbook_disputes_and_ama_tables(registered):

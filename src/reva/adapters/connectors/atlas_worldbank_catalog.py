@@ -228,9 +228,7 @@ def build_catalog(
             groups.setdefault(key, []).append(db)
         ids = [base] + [f"wb.{g[0]}.{code.lower()}" for g in list(groups.values())[1:]]
         for i, g in enumerate(groups.values()):
-            others = [
-                f"{ids[j]} ({DATABASES_BY_KEY[h[0]].title})" for j, h in enumerate(groups.values()) if j != i
-            ]
+            others = [f"{ids[j]} ({DATABASES_BY_KEY[h[0]].title})" for j, h in enumerate(groups.values()) if j != i]
             work.append((ids[i], code, g, others))
     for cid, code, dbs, other_ids in work:
         if not CONCEPT_RE.match(cid):

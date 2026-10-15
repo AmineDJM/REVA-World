@@ -18,7 +18,8 @@ selector. Consistency check (blocks the run): the 12 monthly precipitation total
 value within 1 mm (or 0.5 %) for every country present in both responses.
 
 Geography: CCKP keys are ISO 3166 alpha-3 plus ``KSV`` (Kosovo, World Bank legacy code; mapped to the
-crosswalk key ``XKX`` through ``registry/atlas/geo_aliases/a_geo.yaml``) and ``TWN`` (kept unmapped). CCKP
+crosswalk key ``XKX`` through ``registry/atlas/geo_aliases/a_geo.yaml``); any key outside the crosswalk is kept
+unmapped and listed in the manifest. CCKP
 has no aggregate for ATA, ESH, FLK, SGS and CHI.
 """
 
@@ -333,7 +334,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             geo_scheme=GEO_SCHEME,
             rights=RIGHTS,
             coverage_note=f"{PRODUCTS[ds]}: 1991-2020 climatology national aggregates; KSV->XKX alias; "
-            "TWN kept unmapped; no CCKP aggregate for ATA/ESH/FLK/SGS/CHI; null series omitted: "
+            "codes outside the crosswalk kept unmapped; no CCKP aggregate for ATA/ESH/FLK/SGS/CHI; null series omitted: "
             + (",".join(nulls[ds]) or "none"),
         )
     return {"connector": CONNECTOR_NAME, "raw_sha256s": shas, "tables": tables}

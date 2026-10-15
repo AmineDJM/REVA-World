@@ -136,7 +136,7 @@ SECTIONS: tuple[tuple[str, tuple[int, int], str], ...] = (
     ("XXI", (97, 97), "Works of art, collectors' pieces and antiques"),
 )
 NOT_SPECIFIED = "NS"  # BACI legacy non-WCO code 9999AA "Commodities not specified according to kind"
-SECTION_CODES: tuple[str, ...] = tuple(s for s, _, _ in SECTIONS) + (NOT_SPECIFIED,)
+SECTION_CODES: tuple[str, ...] = (*tuple(s for s, _, _ in SECTIONS), NOT_SPECIFIED)
 CHAPTER_SECTION: dict[str, str] = {
     f"{c:02d}": s for s, (lo, hi), _ in SECTIONS for c in range(lo, hi + 1) if c != 77
 } | {"99": NOT_SPECIFIED}
@@ -212,7 +212,9 @@ def _check_block(df: pl.DataFrame, year: int, member: str) -> None:
         )
     unknown = set(df["k"].str.slice(0, 2).unique().to_list()) - set(CHAPTER_SECTION)
     if unknown:
-        raise SourceResponseError("BACI product chapter outside the HS sections", chapters=sorted(unknown)[:10])
+        raise SourceResponseError(
+            "BACI product chapter outside the HS sections", chapters=sorted(unknown)[:10], retryable=False
+        )
 
 
 def thousandths(v: pl.Series) -> list[pl.Series]:
@@ -230,7 +232,9 @@ def thousandths(v: pl.Series) -> list[pl.Series]:
     bad = long & ~tail.str.contains(_NOISE_RE)
     if bad.any():
         raise SourceResponseError(
-            "BACI value with more than 3 decimals that is not float noise", examples=v.filter(bad).head(3).to_list()
+            "BACI value with more than 3 decimals that is not float noise",
+            examples=v.filter(bad).head(3).to_list(),
+            retryable=False,
         )
     base = whole.cast(pl.Int64) * 1000 + frac.str.slice(0, 3).str.pad_end(SCALE, "0").cast(pl.Int64)
     up = (long & tail.str.starts_with("9")).cast(pl.Int64)
@@ -393,7 +397,9 @@ def pair_total_rows(agg: YearAgg, pmap: dict[str, str | None]) -> pl.DataFrame:
         scaled_to_text_expr("b", SCALE).alias("value"),
         pl.concat_str(
             [
-                pl.lit(f'{{"baci_release":"{RELEASE}","derived":"exports_minus_imports","estimate":"cepii_reconciled",'),
+                pl.lit(
+                    f'{{"baci_release":"{RELEASE}","derived":"exports_minus_imports","estimate":"cepii_reconciled",'
+                ),
                 pl.lit('"hs_revision":"HS92","inputs":["X|partner='),
                 pl.col("j"),
                 pl.lit("|section=TOTAL of "),
@@ -436,8 +442,10 @@ def country_rows(agg: YearAgg) -> pl.DataFrame:
     def flow(df: pl.DataFrame, code: str, side: str) -> pl.DataFrame:
         filt = [(side, pl.col("c"))]
         sec = pl.when(pl.col("section") == "TOTAL").then(None).otherwise(pl.col("section"))
-        sel = pl.when(sec.is_null()).then(_sel(agg.member, filt, pl.col("n"))).otherwise(
-            _sel(agg.member, [*filt, ("section", pl.col("section"))], pl.col("n"))
+        sel = (
+            pl.when(sec.is_null())
+            .then(_sel(agg.member, filt, pl.col("n")))
+            .otherwise(_sel(agg.member, [*filt, ("section", pl.col("section"))], pl.col("n")))
         )
         return df.with_columns(
             pl.concat_str([pl.lit(f"{code}|section="), pl.col("section")]).alias("indicator"),
@@ -551,8 +559,13 @@ def _module() -> Any:
 
 async def _range(run: Any, m: ZipMember, *, key: str, etag: str) -> tuple[Any, int]:
     raw = await run.get_range(
-        URL, key=key, start=m.offset, end=m.end, if_range=etag, media_types=("application/x-zip-compressed",
-        "application/zip", "application/octet-stream"), params={"member": m.name}
+        URL,
+        key=key,
+        start=m.offset,
+        end=m.end,
+        if_range=etag,
+        media_types=("application/x-zip-compressed", "application/zip", "application/octet-stream"),
+        params={"member": m.name},
     )
     start, _end, _total = parse_content_range(raw.response_metadata["headers"].get("content-range", ""))
     return raw, start
@@ -604,7 +617,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         del raw
         aggs.append(agg)
         shas.append(sha)
-        fetched.append({"item": name, "bytes": members[name].end - members[name].offset + 1, "sha256": sha, **agg.stats})
+        fetched.append(
+            {"item": name, "bytes": members[name].end - members[name].offset + 1, "sha256": sha, **agg.stats}
+        )
     tables: list[dict[str, Any]] = []
     frames = build_frames(aggs, wanted)
     years_done = sorted(a.year for a in aggs)
@@ -626,8 +641,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
                 rights=dict(RIGHTS),
             )
         except Exception as e:
-            errors.append({"stage": "register", "table": f"{SOURCE}.{ds}", "error": type(e).__name__,
-                           "message": str(e)[:500]})
+            errors.append(
+                {"stage": "register", "table": f"{SOURCE}.{ds}", "error": type(e).__name__, "message": str(e)[:500]}
+            )
             continue
         cov = out.get("coverage") or {}
         tables.append(

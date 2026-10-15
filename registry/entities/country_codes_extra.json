@@ -251,6 +251,7 @@
     "TT": "TLS",
     "TU": "TUR",
     "TV": "TUV",
+    "TW": "TWN",
     "TX": "TKM",
     "TZ": "TZA",
     "UC": "CUW",
@@ -286,12 +287,6 @@
     "licence": "CC BY 4.0 (GeoNames)",
     "column": "fips",
     "skipped": [
-     {
-      "fips": "TW",
-      "geonames_iso3": "TWN",
-      "name": "Taiwan",
-      "reason": "iso3 not a crosswalk entity"
-     },
      {
       "fips": "YI",
       "geonames_iso3": "SCG",

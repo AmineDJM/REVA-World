@@ -30,6 +30,8 @@ async def _live(db: Any, module: Any) -> dict[str, Any]:
     from reva.operations.budgets import BudgetExhausted
 
     spec = module.atlas_source()
+    if isinstance(spec, list):  # atlas_factbook declares two sources; the first is atlas.factbook
+        spec = spec[0]
     ensure_registered(db.owner, db.store, spec)
     try:
         out = await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="live")

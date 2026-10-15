@@ -277,3 +277,15 @@ schemes:
       also_seen_in: [US.FdiFlowsStock, US.LSCI, US.LSBCI, US.GoodsAndServicesBpm6, US.TradeMerchTotal]
       retrieved_at: "2026-10-15T22:58:57Z"
       m49_reference: registry/entities/country_crosswalk.json (field m49)
+  # OECD-WTO BaTIS (src/reva/adapters/connectors/atlas_trade_batis.py): REF_AREA / COUNTERPART_AREA use
+  # ISO 3166-1 alpha-3 plus one non-ISO economy code. Kept unmapped: TWN (not a crosswalk entity) and the
+  # aggregates W "World", WXD "Rest of the world", WXOECD "Non-OECD economies", WXEU27_2020, OECD, EU27_2020.
+  batis:
+    base: iso3
+    aliases:
+      - {code: XKV, iso3: XKX, source: "OECD.SDD.TPS DSD_BATIS 1.0 codelist CL_AREA: <structure:Code id=\"XKV\"> <common:Name xml:lang=\"en\">Kosovo</common:Name>"}
+    source:
+      kind: provider_reference_list
+      url: "https://sdmx.oecd.org/public/rest/datastructure/OECD.SDD.TPS/DSD_BATIS/1.0?references=all"
+      sha256: "476694e2c33c558e1a35eda12dcb4043a204d03d772592cf461601b0db519054"
+      retrieved_at: "2026-10-15T23:01:00Z"

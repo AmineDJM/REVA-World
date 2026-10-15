@@ -418,21 +418,49 @@ class WikidataClient:
                             time.monotonic() - t0)
 
     # -- search (CirrusSearch, Wikibase API host) ---------------------------------------------------
-    async def search_items(self, query: str, *, limit: int = 50,
+    async def search_items(self, query: str, *, limit: int = 50, offset: int = 0,
                            meta: Mapping[str, Any] | None = None) -> tuple[list[str], str]:
         """Item ids matching a CirrusSearch query (e.g. ``haswbstatement:P298=FRA``) on www.wikidata.org.
 
         Uses the Wikibase API host (not WDQS). Returns (QIDs in result order, raw sha256)."""
+        hits, _total, sha = await self.search_page(query, limit=limit, offset=offset, meta=meta)
+        return hits, sha
+
+    async def search_page(self, query: str, *, limit: int = 500, offset: int = 0,
+                          meta: Mapping[str, Any] | None = None) -> tuple[list[str], int, str]:
+        """One page of a CirrusSearch query: (QIDs, total hits, raw sha256). CirrusSearch serves at most
+        10,000 results per query (offset + limit <= 10,000)."""
         params = {"action": "query", "list": "search", "srsearch": query, "srnamespace": "0",
-                  "srlimit": str(min(max(1, limit), 500)), "srprop": "", "format": "json", "maxlag": "5"}
+                  "srlimit": str(min(max(1, limit), 500)), "sroffset": str(max(0, offset)), "srprop": "",
+                  "srinfo": "totalhits", "format": "json", "maxlag": "5"}
         url = f"{WBAPI_URL}?{urlencode(params)}"
         result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
-                                          meta={"kind": "search", "query": query, **(meta or {})})
+                                          meta={"kind": "search", "query": query[:2000], "offset": offset,
+                                                **(meta or {})})
         doc = _json(result.body)
         if "error" in doc:
-            raise WikidataError(f"search error {doc['error'].get('code')}", api_code=doc["error"].get("code"))
-        hits = [h.get("title", "") for h in (doc.get("query") or {}).get("search") or []]
-        return [h for h in hits if h[:1] == "Q" and h[1:].isdigit()], sha
+            raise WikidataError(f"search error {doc['error'].get('code')}: {str(doc['error'].get('info'))[:200]}",
+                                api_code=doc["error"].get("code"))
+        q = doc.get("query") or {}
+        hits = [h.get("title", "") for h in q.get("search") or []]
+        total = int((q.get("searchinfo") or {}).get("totalhits") or 0)
+        return [h for h in hits if h[:1] == "Q" and h[1:].isdigit()], total, sha
+
+    async def search_all(self, query: str, *, meta: Mapping[str, Any] | None = None,
+                         max_results: int = 10_000) -> tuple[list[str], int, list[str]]:
+        """Every page of a search (up to CirrusSearch's 10,000-result window).
+        Returns (QIDs, total hits reported, raw sha256s); total > len(QIDs) means the window was exceeded."""
+        out: list[str] = []
+        shas: list[str] = []
+        offset, total = 0, 0
+        while offset < min(max_results, 10_000):
+            hits, total, sha = await self.search_page(query, limit=500, offset=offset, meta=meta)
+            shas.append(sha)
+            out.extend(hits)
+            offset += 500
+            if offset >= total or not hits:
+                break
+        return list(dict.fromkeys(out)), total, shas
 
     # -- wbgetentities -----------------------------------------------------------------------------
     @staticmethod

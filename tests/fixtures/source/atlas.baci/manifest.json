@@ -1,0 +1,12 @@
+{
+ "kind": "byte_range_archive",
+ "url": "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip",
+ "file": "baci_hs92_excerpt.zip",
+ "sha256": "7c0b4b3e3c790c3888375497621d0aa983b929aa1d26d40457b94054765913fa",
+ "etag": "\"fixture-2a6b593bd68bdc1:0\"",
+ "retrieved_at": "2026-10-15T23:06:00+00:00",
+ "licence": "Etalab Open Licence 2.0",
+ "live_archive_etag": "\"2a6b593bd68bdc1:0\"",
+ "live_archive_bytes": 2417732497,
+ "excerpt": "A small zip REBUILT for tests from real member text retrieved 2026-10-15 by byte ranges of BACI_HS92_V202601.zip: rows of BACI_HS92_Y2023/Y2024_V202601.csv whose exporter and importer are in {251,842,156,12,490,699} and whose HS6 code ends in '10' or is 9999AA, plus every row with more than 3 decimals (float noise) among them; a header-only Y2022 member; country_codes_V202601.csv and Readme.txt whole. Served by byte range (reva.atlas.ingest.ArchiveRangeFixtureHttp)."
+}

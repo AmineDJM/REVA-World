@@ -310,3 +310,23 @@ def test_atlas_ingest_registers_every_domain_from_fixtures() -> None:
     one = _FakeRun(dataset="rl")
     asyncio.run(atlas_fao.atlas_ingest(one))
     assert set(one.registered) == {"rl"} and len(one.archived) == 2
+
+
+def test_periods_after_the_faostat_release_are_marked_projection() -> None:
+    d = DOMAINS_BY_DATASET["oa"]
+    head = b"Area Code,Area Code (M49),Area,Item Code,Item,Element Code,Element,Year Code,Year,Unit,Value,Flag,Note\n"
+    rows = (
+        b'"4","\'012","Algeria","3010","Population - Est. & Proj.","551","Rural population","2025","2025","1000 No","1.5","X",""\n'
+        b'"4","\'012","Algeria","3010","Population - Est. & Proj.","551","Rural population","2030","2030","1000 No","1.2","X",""\n'
+        b'"4","\'012","Algeria","3010","Population - Est. & Proj.","561","Urban population","2030","2030","1000 No","9","F",""\n'
+    )
+    zipped = _zip({"Population_E_All_Data_(Normalized).csv": head + rows})
+    f, rep = parse_domain(d, zipped, "0" * 64, released=atlas_fao.release_date("2026-03-09T00:00:00"))
+    by = {(r["indicator"], r["period_start"].year): json.loads(r["flags"]) for r in f.iter_rows(named=True)}
+    assert "estimate_kind" not in by[("3010|551", 2025)] and "series_note" in by[("3010|551", 2025)]
+    assert by[("3010|551", 2030)]["estimate_kind"] == "projection"
+    assert by[("3010|561", 2030)]["estimate_kind"] == "forecast"  # FAO's own F flag is kept
+    assert rep.projection_cells == 2
+    f0, _ = parse_domain(d, zipped, "0" * 64)  # no release date known: nothing is marked
+    assert not f0["flags"].str.contains('"estimate_kind":"projection"').any()
+    assert atlas_fao.release_date(None) is None and atlas_fao.release_date("garbage") is None

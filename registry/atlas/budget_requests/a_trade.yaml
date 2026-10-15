@@ -1,0 +1,33 @@
+# Budget request from agent A-TRADE (trade interconnections: BACI, UNCTADstat, OECD-WTO BaTIS).
+# ATLASOPS/ATLASCORE merges into registry/policies/budgets.yaml. Bytes measured in the live run of
+# 2026-10-15 (docs/dev/v3_a_trade.md).
+agent: A-TRADE
+requests:
+  - source_key: cepii.baci
+    # Byte ranges of BACI_HS92_V202601.zip (2.42 GB): tail (64 KB) + country codes + Readme + 13 year
+    # members (45-99 MB each) = 16 requests, 1.14 GB per full run. BACI releases once a year (January):
+    # a full run is needed once a year; allow one retry of a few members.
+    daily_requests: 30
+    expected_bytes_per_day: 1250000000
+    reason: "BACI HS92 V202601: 13 selected year members by byte range (1.14 GB) + central directory"
+  - source_key: unctad.bulk
+    # 6 bulk 7z files: TradeServCatTotal 10.1 MB, LSBCI 3.5 MB, FdiFlowsStock 0.7 MB, TradeMerchTotal 0.6 MB,
+    # GoodsAndServicesBpm6 0.4 MB, LSCI 0.2 MB = 15.5 MB per run.
+    daily_requests: 15
+    expected_bytes_per_day: 35000000
+    reason: "UNCTADstat bulk files (services, goods&services BPM6, merchandise, FDI, LSCI, LSBCI): 6 requests per run"
+  - source_key: oecd.sdmx
+    # OECD-WTO BaTIS: dataflow (12 KB) + 20 yearly SDMX-CSV files (total services, exports, balanced;
+    # ~3.6 MB each) = 21 requests, ~72 MB per run; on top of A-ILO's 2 requests per run.
+    daily_requests: 50
+    expected_bytes_per_day: 80000000
+    reason: "OECD-WTO BaTIS bilateral services matrix (21 requests per run) + A-ILO earnings (2)"
+daily_totals_increase:
+  http_requests_total: "+95"
+  http_bytes_total: "+1_365_000_000"
+notes: >-
+  BACI is the only large item (1.14 GB per yearly refresh) and is archived content-addressed (raw
+  member ranges), well inside the 1.5 GB agent disk budget together with the Parquet tables. If the
+  global daily byte cap cannot absorb it, run BACI with --dataset over two days (each run fetches all
+  selected years, so prefer one run on a quiet day). WTO api.wto.org is not requested (subscription
+  key required); UNCTAD creative goods (335 MB) is not requested (disk budget).

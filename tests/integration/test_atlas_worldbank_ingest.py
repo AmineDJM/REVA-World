@@ -17,7 +17,7 @@ from reva.adapters.connectors import atlas_worldbank as wb
 from reva.adapters.connectors.atlas_worldbank_catalog import catalog_from_archive
 from reva.atlas.ingest import run_atlas_ingest
 from reva.atlas.sources import ensure_registered, get_source
-from reva.atlas.tables import read_atlas_table
+from reva.atlas.tables import country_iso3, read_atlas_table
 
 pytestmark = pytest.mark.db
 
@@ -50,11 +50,9 @@ def test_fixture_ingest_registers_every_table_and_is_idempotent(db) -> None:  # 
     assert n == len(s["acquisitions"])
     assert {r[0] for r in rows} == {f"atlas.wb.{d}" for d in EXPECTED}
     wgi = read_atlas_table(db.store, s["tables"]["wgi"]["artifact_sha256"])
-    assert wgi.filter(pl.col("provider_geo") == "TWN")["iso3"].is_null().all()
-    assert s["tables"]["wgi"]["unmapped_provider_geo"] == [
-        {"provider_geo": "ANT", "rows": wgi.filter(pl.col("provider_geo") == "ANT").height},
-        {"provider_geo": "TWN", "rows": wgi.filter(pl.col("provider_geo") == "TWN").height},
-    ]
+    unmapped = {u["provider_geo"] for u in s["tables"]["wgi"]["unmapped_provider_geo"]}
+    assert unmapped == ({"ANT"} if country_iso3("TWN", "iso3") else {"ANT", "TWN"})  # crosswalk 1.1.0 has TWN
+    assert wgi.filter(pl.col("provider_geo") == "ANT")["iso3"].is_null().all()
     wdi = read_atlas_table(db.store, s["tables"]["wdi_social"]["artifact_sha256"])
     assert not wdi["provider_geo"].is_in(["WLD", "HIC"]).any()
     # The catalog is rebuilt from the archived raw bytes (not from a local copy).

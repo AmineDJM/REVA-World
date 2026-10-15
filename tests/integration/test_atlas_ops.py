@@ -129,3 +129,19 @@ def test_cli_atlas_group_lists_sources() -> None:
     assert doc["sources"]["atlas.wid"]["budget_key"] == "wid.bulk"
     res = CliRunner().invoke(app, ["atlas", "--help"])
     assert all(c in res.output for c in ("ingest", "snapshot", "list"))
+
+
+def test_every_catalog_concept_has_a_theme() -> None:
+    from reva.atlas.catalog import load_catalog, load_themes
+
+    themes = load_themes()
+    assert {"economy", "population", "labour", "health", "education", "environment", "energy", "politics", "law",
+            "science", "culture", "history", "geography", "trade", "finance"} <= set(themes.labels)  # fmt: skip
+    cat = load_catalog()
+    assert cat.unthemed == [], cat.unthemed[:20]
+    assert cat.concepts["imf.goods_balance_usd"].theme == "trade"
+    assert cat.concepts["imf.gg_net_lending_gdp"].theme == "finance"
+    assert cat.concepts["imf.gdp_current_usd"].theme == "economy"
+    assert cat.concepts["un.wpp.population"].theme == "population"
+    assert cat.concepts["un.unsd.surface_area"].theme == "geography"
+    assert themes.theme_of("imf", "fiscal", "imf.x", own="society") == "society"  # a concept's own theme wins

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { configure, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -17,6 +17,9 @@ vi.mock('../components/NeuronGraph', () => ({
   ),
 }));
 vi.mock('../components/AtlasMap', () => ({ default: ({ label }: { label: string }) => <div role="img" aria-label={label} data-testid="atlas-map" /> }));
+
+// Lazy screens + chained requests: allow for a loaded CI machine.
+configure({ asyncUtilTimeout: 5000 });
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -46,11 +49,11 @@ describe('Neurones', () => {
   it('starts from an entity, shows its card with provenance and every statement with its citation', async () => {
     mockFetch(KG_ROUTES);
     at('/v3/neurones?qid=Q155');
-    const card = await screen.findByTestId('entity-card');
+    const card = await screen.findByTestId('entity-card', {}, { timeout: 5000 });
     expect(within(card).getByRole('heading', { name: /Brésil/ })).toBeInTheDocument();
     expect(within(card).getByRole('link', { name: 'Q155' })).toHaveAttribute('href', 'https://www.wikidata.org/wiki/Q155');
     expect(within(card).getByTestId('community-badge')).toHaveTextContent('communautaire, non vérifié');
-    await waitFor(() => expect(screen.getAllByTestId('citation').length).toBe(4));
+    await waitFor(() => expect(screen.getAllByTestId('citation').length).toBe(4), { timeout: 5000 });
     const first = screen.getAllByTestId('citation')[0]!;
     expect(within(first).getAllByRole('link')[0]).toHaveAttribute('href', expect.stringMatching(/^https:\/\/www\.wikidata\.org\/wiki\/Q\d+#Q\d+\$FIXTURE-/));
     expect(within(first).getByRole('link', { name: 'révision' })).toHaveAttribute('href', 'https://www.wikidata.org/w/index.php?oldid=2250000000');
@@ -61,10 +64,10 @@ describe('Neurones', () => {
   it('clicking a node selects and expands it', async () => {
     const { calls } = mockFetch(KG_ROUTES);
     at('/v3/neurones?qid=Q155');
-    await screen.findByTestId('entity-card');
-    await userEvent.click(await screen.findByRole('button', { name: 'tap-Q5146' }));
-    await waitFor(() => expect(calls.some((c) => c.url.startsWith('/v1/kg/entities/Q5146/neighbours'))).toBe(true));
-    expect(await screen.findByRole('heading', { name: /portugais/ })).toBeInTheDocument();
+    await screen.findByTestId('entity-card', {}, { timeout: 5000 });
+    await userEvent.click(await screen.findByRole('button', { name: 'tap-Q5146' }, { timeout: 5000 }));
+    await waitFor(() => expect(calls.some((c) => c.url.startsWith('/v1/kg/entities/Q5146/neighbours'))).toBe(true), { timeout: 5000 });
+    expect(await screen.findByRole('heading', { name: /portugais/ }, { timeout: 5000 })).toBeInTheDocument();
   });
 
   it('says "pas encore disponible" when the KG API is not deployed, and shows no graph', async () => {

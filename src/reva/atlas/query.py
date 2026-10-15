@@ -66,6 +66,8 @@ CREATE TABLE cells (sid INTEGER NOT NULL, iso3 VARCHAR, year INTEGER, has_value 
                     unit VARCHAR NOT NULL, flags VARCHAR NOT NULL, raw_sha256 VARCHAR NOT NULL,
                     selector VARCHAR NOT NULL, table_sha VARCHAR NOT NULL);
 """
+
+
 #: Full cell columns selected from ``cells x``.
 def iso_date_sql(col: str) -> str:
     """ISO 8601 text of a DATE in astronomical years (``-9999-01-01`` = 10000 BCE; DuckDB's own
@@ -375,9 +377,9 @@ class AtlasQuery:
         }
 
     # ------------------------------------------------------------------ coverage
-    def coverage(self, catalog: Catalog, domain: str | None = None) -> list[dict[str, Any]]:
-        concepts = [c.id for c in catalog.by_domain(domain)]
-        key = ("coverage", domain, tuple(sorted(catalog.files.items())), tuple(concepts))
+    def coverage(self, catalog: Catalog, domain: str | None = None, theme: str | None = None) -> list[dict[str, Any]]:
+        concepts = [c.id for c in catalog.by_domain(domain, theme)]
+        key = ("coverage", domain, theme, tuple(sorted(catalog.files.items())), tuple(concepts))
         if key in self._memo:
             return self._memo[key]  # type: ignore[no-any-return]
         series = self._concept_series(catalog, concepts)
@@ -385,6 +387,7 @@ class AtlasQuery:
             cid: {
                 "concept_id": cid,
                 "domain": catalog.concepts[cid].domain,
+                "theme": catalog.concepts[cid].theme,
                 "countries": 0,
                 "cells": 0,
                 "year_min": None,
@@ -467,10 +470,17 @@ class AtlasQuery:
 
     # ------------------------------------------------------------------ dossier
     def dossier(
-        self, catalog: Catalog, iso3: str, *, domain: str | None = None, include_series: bool = True
+        self,
+        catalog: Catalog,
+        iso3: str,
+        *,
+        domain: str | None = None,
+        include_series: bool = True,
+        theme: str | None = None,
     ) -> dict[str, Any]:
-        """Every concept (of every domain, or one): latest best-available cell + annual series."""
-        concepts = sorted(catalog.by_domain(domain), key=lambda c: (c.domain, c.subdomain or "", c.id))
+        """Every concept (of every domain, or one; optionally one theme): latest best-available cell
+        + annual series."""
+        concepts = sorted(catalog.by_domain(domain, theme), key=lambda c: (c.domain, c.subdomain or "", c.id))
         series = self._concept_series(catalog, [c.id for c in concepts])
         where = ["x.iso3 = ?", "x.year IS NOT NULL", "x.has_value"]
         latest: dict[str, dict[str, Any]] = {}
@@ -510,6 +520,7 @@ class AtlasQuery:
                 "labels": c.labels,
                 "unit": c.unit,
                 "subdomain": c.subdomain,
+                "theme": c.theme,
                 "latest": latest[c.id],
                 "years": len(pts),
                 "year_min": pts[0]["year"],
@@ -772,7 +783,9 @@ class AtlasQuery:
                     "years": len(ys),
                     "year_min": ys[0] if ys else None,
                     "year_max": ys[-1] if ys else None,
-                    "years_answered": sum(1 for x in cells if x["answered_by"] and x["answered_by"]["series"] == ser.key),
+                    "years_answered": sum(
+                        1 for x in cells if x["answered_by"] and x["answered_by"]["series"] == ser.key
+                    ),
                 }
             )
         return {
@@ -847,7 +860,9 @@ class AtlasQuery:
                     "latest_year_answered_by": _count(self._answer_key(x) for x in latest.values()),
                     "countries_answered_by": {k: len(v) for k, v in sorted(answered.items())},
                     "series_in_snapshot": [
-                        s.key for s in c.series if (s.series.source, s.series.dataset, s.series.indicator) in self.sid_of
+                        s.key
+                        for s in c.series
+                        if (s.series.source, s.series.dataset, s.series.indicator) in self.sid_of
                     ],
                     "series_not_in_snapshot": [
                         s.key

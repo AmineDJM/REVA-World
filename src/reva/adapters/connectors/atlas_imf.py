@@ -76,7 +76,7 @@ from reva.atlas.sources import AtlasSourceSpec
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.imf"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parsers
 PARSER_VERSION = "atlas_imf/1"
 SOURCE = "imf"
 SOURCE_KEY = "imf.sdmx"

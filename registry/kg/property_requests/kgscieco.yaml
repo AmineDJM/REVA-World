@@ -1,0 +1,230 @@
+# Property requests from KGSCIECO (science / economy / nature). WDHARVEST merges them into
+# registry/kg/properties.yaml (`python -m reva.kg.harvest merge-property-requests` checks every id and its
+# datatype against Wikidata and takes the en/fr labels from the property entity itself).
+# The KGSCIECO seed specs do not restrict `properties`, so once a property below is allow-listed its claims
+# are kept automatically on the next (re-)harvest of those specs and of core.countries -- no spec edit needed.
+# Ids and English labels were checked with the recorded label probe
+# tests/fixtures/kg/scieco/qid_labels.json (see docs/dev/v3_kgscieco.md).
+
+# ---------------------------------------------------------------- science / technology
+- property: P138
+  why: >-
+    named after (theory/law/unit/element/discovery -> person or place), e.g. polonium -> Poland,
+    curium -> Marie Curie, Doppler effect -> Christian Doppler, Halley's Comet -> Edmond Halley.
+  reva_predicate: named_after
+  inverse: eponym_of
+  kind: entity
+  group: science
+  label_en: named after
+  label_fr: nommé d'après
+- property: P1027
+  why: conferred by (award -> institution), e.g. Nobel Prize in Physics -> Royal Swedish Academy of Sciences.
+  reva_predicate: conferred_by
+  inverse: confers
+  kind: entity
+  group: science
+  label_en: conferred by
+  label_fr: décerné par
+- property: P1924
+  why: vaccine for (vaccine -> disease), e.g. rabies vaccine -> rabies.
+  reva_predicate: vaccine_for
+  inverse: prevented_by_vaccine
+  kind: entity
+  group: science
+  label_en: vaccine for
+  label_fr: vaccin contre
+- property: P178
+  why: developer (vaccine/technology/software -> organisation or person), e.g. a COVID-19 vaccine -> BioNTech.
+  reva_predicate: developer
+  inverse: developer_of
+  kind: entity
+  group: science
+  label_en: developer
+  label_fr: développeur
+- property: P176
+  why: manufacturer (vaccine/spacecraft/product -> company), e.g. Sputnik 1 -> OKB-1.
+  reva_predicate: manufacturer
+  inverse: manufacturer_of
+  kind: entity
+  group: science
+  label_en: manufacturer
+  label_fr: fabricant
+- property: P619
+  why: UTC date of spacecraft launch (space missions/satellites), dates the mission -> agency -> country chain.
+  reva_predicate: launch_date
+  inverse: null
+  kind: time
+  group: science
+  label_en: UTC date of spacecraft launch
+  label_fr: date de lancement
+- property: P448
+  why: launch site (spacecraft -> cosmodrome), e.g. Sputnik 1 -> Baikonur Cosmodrome -> Kazakhstan.
+  reva_predicate: launch_site
+  inverse: launch_site_of
+  kind: entity
+  group: science
+  label_en: launch site
+  label_fr: site de lancement
+- property: P1686
+  role: qualifier
+  why: for work (qualifier of award received P166), e.g. the work a Nobel Prize was awarded for.
+  label_en: for work
+  label_fr: pour l'œuvre
+
+# ---------------------------------------------------------------- economy
+- property: P1304
+  why: central bank (country -> central bank), e.g. Japan -> Bank of Japan; harvested with core.countries.
+  reva_predicate: central_bank
+  inverse: central_bank_of
+  kind: entity
+  group: economy
+  label_en: central bank
+  label_fr: banque centrale
+- property: P562
+  why: central bank/issuer (currency -> issuing bank), e.g. euro -> European Central Bank.
+  reva_predicate: issuer
+  inverse: issuer_of
+  kind: entity
+  group: economy
+  label_en: central bank/issuer
+  label_fr: banque centrale ou émetteur
+- property: P414
+  why: stock exchange (company -> exchange it is listed on), e.g. Toyota -> Tokyo Stock Exchange.
+  reva_predicate: listed_on
+  inverse: lists
+  kind: entity
+  group: economy
+  label_en: stock exchange
+  label_fr: place de cotation
+- property: P2541
+  why: >-
+    operating area (organisation -> territory it operates in), the colonial trading company -> territory hop,
+    e.g. Dutch East India Company -> Dutch East Indies / Indonesia; Hudson's Bay Company -> Rupert's Land.
+  reva_predicate: operating_area
+  inverse: operating_area_of
+  kind: entity
+  group: economy
+  label_en: operating area
+  label_fr: zone d'activité
+- property: P1056
+  why: product or material produced (company/country -> product), e.g. Saudi Aramco -> petroleum.
+  reva_predicate: produces
+  inverse: produced_by
+  kind: entity
+  group: economy
+  label_en: product or material produced or service provided
+  label_fr: produit ou matériau fabriqué ou service fourni
+
+# ---------------------------------------------------------------- nature
+- property: P610
+  why: highest point (country/region/range -> mountain), e.g. Nepal -> Mount Everest; harvested with core.countries.
+  reva_predicate: highest_point
+  inverse: highest_point_of
+  kind: entity
+  group: nature
+  label_en: highest point
+  label_fr: point culminant
+- property: P1589
+  why: lowest point (country -> place), e.g. Israel/Jordan -> Dead Sea.
+  reva_predicate: lowest_point
+  inverse: lowest_point_of
+  kind: entity
+  group: nature
+  label_en: lowest point
+  label_fr: point le plus bas
+- property: P2044
+  why: elevation above sea level (mountains, lakes, observatories, cities).
+  reva_predicate: elevation
+  inverse: null
+  kind: quantity
+  group: nature
+  label_en: elevation above sea level
+  label_fr: altitude
+- property: P4552
+  why: mountain range (mountain -> range), e.g. Mont Blanc -> Alps.
+  reva_predicate: in_mountain_range
+  inverse: mountain_range_of
+  kind: entity
+  group: nature
+  label_en: mountain range
+  label_fr: massif
+- property: P403
+  why: mouth of the watercourse (river -> sea/river/lake), e.g. Danube -> Black Sea.
+  reva_predicate: mouth
+  inverse: receives_watercourse
+  kind: entity
+  group: nature
+  label_en: mouth of the watercourse
+  label_fr: embouchure
+- property: P885
+  why: origin of the watercourse (river -> source lake/glacier/mountain), e.g. Nile (White Nile) -> Lake Victoria.
+  reva_predicate: watercourse_origin
+  inverse: origin_of_watercourse
+  kind: entity
+  group: nature
+  label_en: origin of the watercourse
+  label_fr: source
+- property: P974
+  why: tributary (river -> tributary river), e.g. Amazon -> Rio Negro.
+  reva_predicate: tributary
+  inverse: tributary_of
+  kind: entity
+  group: nature
+  label_en: tributary
+  label_fr: affluent
+- property: P4614
+  why: drainage basin (river/lake/place -> basin), e.g. Lake Victoria -> Nile basin.
+  reva_predicate: drainage_basin
+  inverse: drainage_basin_of
+  kind: entity
+  group: nature
+  label_en: drainage basin
+  label_fr: bassin versant
+- property: P205
+  why: basin country (lake/sea/river basin -> country bordering or containing it), e.g. Caspian Sea -> Iran.
+  reva_predicate: basin_country
+  inverse: country_in_basin_of
+  kind: entity
+  group: nature
+  label_en: basin country
+  label_fr: pays du bassin
+- property: P2043
+  why: length (rivers, straits, mountain ranges).
+  reva_predicate: length
+  inverse: null
+  kind: quantity
+  group: nature
+  label_en: length
+  label_fr: longueur
+- property: P2528
+  why: earthquake magnitude on the Richter magnitude scale (earthquakes).
+  reva_predicate: magnitude_richter
+  inverse: null
+  kind: quantity
+  group: nature
+  label_en: earthquake magnitude on the Richter magnitude scale
+  label_fr: magnitude sur l'échelle de Richter
+- property: P2527
+  why: earthquake magnitude on the moment magnitude scale (earthquakes; the usual modern measure).
+  reva_predicate: magnitude_moment
+  inverse: null
+  kind: quantity
+  group: nature
+  label_en: earthquake magnitude on the moment magnitude scale
+  label_fr: magnitude de moment
+- property: P1603
+  why: number of cases (epidemics/pandemics, often with point-in-time qualifiers).
+  reva_predicate: number_of_cases
+  inverse: null
+  kind: quantity
+  group: nature
+  label_en: number of cases
+  label_fr: nombre de cas
+- property: P814
+  why: IUCN protected areas category (national parks -> IUCN category II ...).
+  reva_predicate: iucn_category
+  inverse: iucn_category_of
+  kind: entity
+  group: nature
+  label_en: IUCN protected areas category
+  label_fr: catégorie UICN

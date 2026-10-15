@@ -1,0 +1,22 @@
+# V3 (agent A-TRADE): UNCTADstat (UNCTAD Data Hub) bulk files.
+# Connector: src/reva/adapters/connectors/atlas_unctad.py (one 7z CSV per report; atlas tables unctad.*).
+source_key: unctad.bulk
+title: UNCTADstat bulk download (UNCTAD Data Hub, one 7z CSV per report)
+provider_url: https://unctadstat.unctad.org/datacentre/
+lineage_family: unctad
+rights:
+  licence: CC-BY-3.0-IGO
+  licence_url: https://creativecommons.org/licenses/by/3.0/igo/
+  terms_url: https://unctadstat.unctad.org/EN/About.html
+  attribution: "United Nations Trade and Development (UNCTAD) Data Hub, https://unctadstat.unctad.org"
+metadata:
+  allowed_hosts: [unctadstat-api.unctad.org]
+  bulk_pattern: https://unctadstat-api.unctad.org/bulkdownload/<report id>/<file>
+  authentication: none ("Access to data is free and there is no registration required", UNCTADstat FAQ)
+  cadence: reports are revised several times a year; monthly re-download check
+  notes: >-
+    Services trade and the BPM6 goods/services series are compiled by UNCTAD with the WTO from IMF
+    BOP and national sources (not independent of IMF BOP); merchandise totals from national customs
+    data, UN Comtrade and IMF; FDI from national central banks / statistical offices; LSCI/LSBCI are
+    UNCTAD indices computed from MDS Transmodal liner fleet deployment data. HEAD requests answer 403
+    (Cloudflare); GET works. The datamart API needs a registered client and is not used.

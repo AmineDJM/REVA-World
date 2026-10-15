@@ -50,8 +50,8 @@ def test_atlas_rows_are_as_declared(rows: list[gn.CountryInfo]) -> None:
         geo_scheme="iso3",
     )
     assert frame.height == len(out)
-    # historical codes and Taiwan are kept, unmapped (never dropped)
-    assert {u["provider_geo"] for u in unmapped} >= {"ANT", "SCG", "TWN"}
+    # historical codes are kept, unmapped (never dropped)
+    assert {u["provider_geo"] for u in unmapped} >= {"ANT", "SCG"}
     fra_area = _cell(out, "FRA", "area_km2")
     assert fra_area["value"] == next(r for r in rows if r.iso3 == "FRA").cells["Area(in sq km)"]
     assert json.loads(fra_area["flags"])["period_basis"].startswith("retrieval snapshot")

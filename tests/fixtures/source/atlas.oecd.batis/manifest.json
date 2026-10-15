@@ -1,0 +1,38 @@
+[
+ {
+  "request_fingerprint": "5016bbf3c60f81bb2486ced6d8904845f43fc5f2f6a63d00cf595e5fdaa42347",
+  "url": "https://sdmx.oecd.org/public/rest/dataflow/OECD.SDD.TPS/DSD_BATIS@DF_BATIS/1.0",
+  "file": "batis_flow.xml",
+  "sha256": "07b714949bed1cb3a96d707951ab26f8f1d46f758f119e9a3b06a21d79816ec4",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.structure+xml; version=2.1; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-15T23:04:00+00:00",
+  "licence": "CC BY 4.0 (OECD default for content from 2024-07-01; dataset statement not verified)"
+ },
+ {
+  "request_fingerprint": "0f087764cdc58206f65346e826bec5261e7c48aea8c3b0b2f48e56065251a6ee",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_BATIS@DF_BATIS,1.0/FRA+USA+DZA+CHN+XKV+W..X.S.S.A.USD_EXC.B?startPeriod=2023&endPeriod=2023&format=csvfile",
+  "file": "batis_fx_2023.csv",
+  "sha256": "1da1481492bee299736b2210bdce4472ed9823bc1ed51d7e9c4005f9bdfd5899",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-15T23:18:40+00:00",
+  "licence": "CC BY 4.0 (OECD default for content from 2024-07-01; dataset statement not verified)"
+ },
+ {
+  "request_fingerprint": "c8a3304540d7e9e97f1e7fa54fedc5e43ae81201413c1f411fb0a1bfb8e302b4",
+  "url": "https://sdmx.oecd.org/public/rest/data/OECD.SDD.TPS,DSD_BATIS@DF_BATIS,1.0/FRA+USA+DZA+CHN+XKV+W..X.S.S.A.USD_EXC.B?startPeriod=2024&endPeriod=2024&format=csvfile",
+  "file": "batis_fx_2024.csv",
+  "sha256": "7a2aea0a97081c2507d93848c1c33fecd316f8acd522a1476a9fa4b8d8242989",
+  "status": 200,
+  "headers": {
+   "content-type": "application/vnd.sdmx.data+csv; charset=utf-8"
+  },
+  "retrieved_at": "2026-10-15T23:18:45+00:00",
+  "licence": "CC BY 4.0 (OECD default for content from 2024-07-01; dataset statement not verified)"
+ }
+]

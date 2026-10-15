@@ -61,6 +61,7 @@ import sys
 import zipfile
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
+from datetime import date
 from typing import Any
 
 import polars as pl
@@ -149,6 +150,7 @@ class Domain:
     max_bytes: int = 100_000_000
     third_party: str = ""  # original producer(s) of redistributed series (coverage note)
     unit_rules: tuple[tuple[str, str], ...] = ()  # (substring of the item/element name, unit) when Unit is empty
+    series_note: str = ""  # added to every cell's flags (e.g. estimates and projections not separated by FAO)
 
     @property
     def file(self) -> str:
@@ -232,6 +234,8 @@ DOMAINS: tuple[Domain, ...] = (
         "Population",
         "Annual population (FAO-distributed UN WPP)",
         third_party="UN DESA World Population Prospects (FAO redistribution; A-UN ingests WPP at the source)",
+        series_note="FAO item 'Population - Est. & Proj.': UN estimates and projections; FAO does not mark the "
+        "estimate/projection boundary per cell (only periods after the FAOSTAT release are marked projection)",
     ),
     Domain(
         "OEA",
@@ -313,6 +317,14 @@ def parse_listing(body: bytes) -> dict[str, dict[str, Any]]:
     return out
 
 
+def release_date(date_update: str | None) -> date | None:
+    """``DateUpdate`` of datasets_E.json (``2026-03-09T00:00:00``) as a date; None when absent/unparsable."""
+    try:
+        return date.fromisoformat(str(date_update)[:10]) if date_update else None
+    except ValueError:
+        return None
+
+
 # --------------------------------------------------------------------------- zip helpers
 def _decode(data: bytes) -> tuple[str, str]:
     try:
@@ -388,6 +400,7 @@ class DomainReport:
     dropped_missing_flag: dict[str, int] = field(default_factory=dict)
     dropped_empty_value: int = 0
     dropped_months_not_kept: int = 0
+    projection_cells: int = 0
     flags: dict[str, int] = field(default_factory=dict)
     indicators: dict[str, dict[str, str]] = field(default_factory=dict)
     areas: dict[str, dict[str, Any]] = field(default_factory=dict)
@@ -423,7 +436,7 @@ def _indicator_expr(df: pl.DataFrame) -> pl.Expr:
     return pl.concat_str(parts, separator="|")
 
 
-def _flags_json(flag: str, note: str, meanings: Mapping[str, str]) -> str:
+def _flags_json(flag: str, note: str, meanings: Mapping[str, str], *, after_release: bool, series_note: str) -> str:
     obj: dict[str, Any] = {}
     if flag:
         obj["flag"] = flag
@@ -433,8 +446,14 @@ def _flags_json(flag: str, note: str, meanings: Mapping[str, str]) -> str:
     else:
         obj["flag"] = ""
         obj["flag_meaning"] = "no flag in the file"
+    if after_release and obj.get("estimate_kind") != "forecast":
+        # a period that starts after the domain's FAOSTAT release date cannot be an observation
+        obj["estimate_kind"] = "projection"
+        obj["projection_rule"] = "period starts after the FAOSTAT DateUpdate of the domain"
     if note:
         obj["note"] = note[:MAX_NOTE]
+    if series_note:
+        obj["series_note"] = series_note
     return json.dumps(obj, sort_keys=True, separators=(",", ":"), ensure_ascii=False)
 
 
@@ -568,8 +587,13 @@ def fao_area_iso3(m49: str | None) -> str | None:
     return country_iso3(str(int(code)), GEO_SCHEME)
 
 
-def parse_domain(domain: Domain, body: bytes, raw_sha256: str) -> tuple[pl.DataFrame, DomainReport]:
-    """One FAOSTAT bulk zip -> (atlas frame, report). Raises :class:`FaoParseError` on any layout surprise."""
+def parse_domain(
+    domain: Domain, body: bytes, raw_sha256: str, released: date | None = None
+) -> tuple[pl.DataFrame, DomainReport]:
+    """One FAOSTAT bulk zip -> (atlas frame, report). Raises :class:`FaoParseError` on any layout surprise.
+
+    ``released`` = the domain's FAOSTAT ``DateUpdate``: cells whose period starts after it are marked
+    ``estimate_kind = "projection"`` (FAO's own ``F`` forecast flag is kept as ``forecast``)."""
     try:
         zf = zipfile.ZipFile(io.BytesIO(body))
     except zipfile.BadZipFile as e:
@@ -603,8 +627,14 @@ def parse_domain(domain: Domain, body: bytes, raw_sha256: str) -> tuple[pl.DataF
     geo_map = {code: fao_area_iso3(a["m49"]) for code, a in rep.areas.items()}
     for code, iso in geo_map.items():
         rep.areas[code]["iso3"] = iso
-    flag_keys = df.select("Flag", "_note").unique()
-    fmap = {f"{f}\x1f{n}": _flags_json(f, n, meanings) for f, n in flag_keys.iter_rows()}
+    after = pl.lit(False) if released is None else pl.col("_start") > pl.lit(released)
+    df = df.with_columns(after.alias("_after"))
+    rep.projection_cells = int(df["_after"].sum())
+    flag_keys = df.select("Flag", "_note", "_after").unique()
+    fmap = {
+        f"{f}\x1f{n}\x1f{int(a)}": _flags_json(f, n, meanings, after_release=a, series_note=domain.series_note)
+        for f, n, a in flag_keys.iter_rows()
+    }
     selector = pl.format('{{"file":"{}","row":{},"zip":"{}"}}', pl.lit(member), pl.col("line"), pl.lit(domain.file))
     out = df.select(
         pl.lit(SOURCE).alias("source"),
@@ -619,7 +649,11 @@ def parse_domain(domain: Domain, body: bytes, raw_sha256: str) -> tuple[pl.DataF
         pl.when(pl.col("_numeric")).then(pl.col("Value")).otherwise(None).alias("value"),
         pl.when(pl.col("_numeric")).then(None).otherwise(pl.col("Value").str.slice(0, 4000)).alias("value_text"),
         pl.col("_unit").str.slice(0, 100).alias("unit"),
-        (pl.col("Flag") + pl.lit("\x1f") + pl.col("_note")).replace_strict(fmap, return_dtype=pl.String).alias("flags"),
+        pl.concat_str(
+            [pl.col("Flag"), pl.col("_note"), pl.col("_after").cast(pl.Int8).cast(pl.String)], separator="\x1f"
+        )
+        .replace_strict(fmap, return_dtype=pl.String)
+        .alias("flags"),
         pl.lit(raw_sha256).alias("raw_sha256"),
         selector.alias("selector"),
     ).cast(dict(ATLAS_SCHEMA))  # type: ignore[arg-type]
@@ -643,7 +677,8 @@ def coverage_note(domain: Domain, rep: DomainReport, listing: Mapping[str, Any] 
         f"{'all' if domain.elements is None else sorted(domain.elements)}.",
         f"{rep.cells} cells from {rep.rows_in_scope} rows in scope; no cell for {sum(rep.dropped_missing_flag.values())}"
         f" rows flagged missing {rep.dropped_missing_flag} and {rep.dropped_empty_value} empty values.",
-        "Flags verbatim with FAO meaning in flags; E/I/F rows kept with flags.estimate_kind.",
+        "Flags verbatim with FAO meaning in flags; E/I/F rows kept with flags.estimate_kind;"
+        f" {rep.projection_cells} cells whose period starts after the FAOSTAT release are estimate_kind projection.",
     ]
     if domain.third_party:
         parts.append(f"Third-party series redistributed by FAO: {domain.third_party}.")
@@ -702,7 +737,7 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
             params={"domain": d.code, "date_update": li.get("date_update")},
         )
         sha = run.archive(raw)
-        frame, rep = parse_domain(d, raw.body, sha)
+        frame, rep = parse_domain(d, raw.body, sha, released=release_date(li.get("date_update")))
         etag = (raw.response_metadata.get("headers") or {}).get("etag")
         del raw
         reg = run.register(

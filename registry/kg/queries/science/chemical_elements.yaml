@@ -1,0 +1,13 @@
+id: science.chemical_elements
+domain: science
+owner: KGSCIECO
+description: >-
+  The chemical elements (instance of chemical element Q11344), small and fully connected: discoverer (P61),
+  time of discovery (P575), named after (P138 once allow-listed, e.g. polonium -> Poland, curium -> Marie
+  and Pierre Curie, einsteinium -> Albert Einstein), country of origin of the discovery when stated.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31 wd:Q11344 . }
+max_rows: 200
+expand_hops: 1

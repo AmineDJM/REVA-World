@@ -19,6 +19,8 @@ pytestmark = pytest.mark.db
 
 async def _fixture_run(db, module, **kw):
     spec = module.atlas_source()
+    if isinstance(spec, list):  # atlas_factbook declares two sources; the first is atlas.factbook
+        spec = spec[0]
     ensure_registered(db.owner, db.store, spec)
     return await run_atlas_ingest(db.settings, db.worker, db.store, spec.name, mode="fixture", **kw)
 
@@ -66,13 +68,15 @@ async def test_constitute_ccp_factbook_ssa(db):
     usa = ch.filter((pl.col("iso3") == "USA") & (pl.col("indicator") == "votemin"))
     assert set(usa["value"].drop_nulls()) <= {"18"}
 
-    # only 5 of the 255 profiles are recorded: the 250 others end as typed fixture_missing, nothing invented
+    # only 12 of the 261 profiles are recorded: the 249 others end as typed fixture_missing, nothing invented
+    # (atlas.factbook is A-FACTBOOK's merged source: legal_2026_01 + figures_2026_01 + texts_2026_01)
     out = await _fixture_run(db, atlas_factbook)
     rep = out["summary"]
     assert rep["status"] == "partial" and {b["reason"] for b in rep["blocked"]} == {"fixture_missing"}
-    assert len(rep["blocked"]) == 250
-    (t,) = rep["tables"]
-    assert t["countries"] == 4 and [u["provider_geo"] for u in t["unmapped_provider_geo"]] == ["TW"]
+    assert len(rep["blocked"]) == 249
+    t = next(x for x in rep["tables"] if x["dataset_key"] == "atlas.factbook.legal_2026_01")
+    assert t["countries"] >= 8  # FRA USA SAU XKX TWN GRL ESH VAT PRK ... (partial territories WE/SV unmapped)
+    assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} <= {"WE", "SV"}
 
     # SSPTW: fixtures hold the Europe index, guide and 5 country pages; every other request is a typed
     # fixture_missing entry (the other regions' index/guide and 40 Europe pages), never an invented value

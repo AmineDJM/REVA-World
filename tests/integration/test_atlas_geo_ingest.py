@@ -94,7 +94,7 @@ async def test_geonames_climate_hazards_ingest(registered) -> None:  # type: ign
     assert g["table"]["row_count"] > 3000 and g["kg"]["loaded"] and g["kg"]["statements"] > 0
     c = await cl.ingest(db.worker, db.store, FixtureHttp(cl.CONNECTOR_NAME))
     assert set(c["tables"]) == {cl.DS_CRU, cl.DS_ERA5}
-    assert [u["provider_geo"] for u in c["tables"][cl.DS_CRU]["unmapped_provider_geo"]] == ["TWN"]
+    assert {u["provider_geo"] for u in c["tables"][cl.DS_CRU]["unmapped_provider_geo"]} <= {"TWN"}
     h = await hz.ingest(db.worker, db.store, FixtureHttp(hz.CONNECTOR_NAME))
     assert h["workflow"]["name"] == "INFORM Risk 2026" and h["table"]["row_count"] >= 8 * hz.MIN_COUNTRIES
     with db.worker.connect() as conn:

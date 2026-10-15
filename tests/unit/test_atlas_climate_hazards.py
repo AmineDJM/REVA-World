@@ -11,7 +11,7 @@ import pytest
 
 from reva.adapters.connectors import atlas_climate as cl
 from reva.adapters.connectors import atlas_hazards as hz
-from reva.atlas.tables import ATLAS_SCHEMA, validate_atlas_frame
+from reva.atlas.tables import ATLAS_SCHEMA, known_country_keys, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import RawAcquisition
@@ -51,7 +51,8 @@ def test_cckp_rows_validate_and_map_kosovo(cckp_rows: dict[str, list[dict]]) -> 
             raw_sha256s=sorted({r["raw_sha256"] for r in rows}),
             geo_scheme="cckp",
         )
-        assert [u["provider_geo"] for u in unmapped] == ["TWN"]
+        # only codes outside the crosswalk stay unmapped (TWN until the crosswalk listed it)
+        assert {u["provider_geo"] for u in unmapped} <= {"TWN"} - set(known_country_keys())
         ksv = f.filter(pl.col("provider_geo") == "KSV")
         assert ksv.height > 0 and set(ksv["iso3"].to_list()) == {"XKX"}
         assert set(f["period_start"].to_list()) == {date(1991, 1, 1)} and set(f["period_end"].to_list()) == {

@@ -1,0 +1,75 @@
+# Dataset predicates of the polity layer (owner: KGPOLITY). Not Wikidata properties: they are registered in the
+# KG allow-list (kg.property / kg.property_version) by the Cliopatria connector itself through
+# reva.kg.model.register_properties, like atlas_cow registers cow:code_denotes. WDHARVEST's
+# registry/kg/properties.yaml (Wikidata only) is not touched.
+#
+# Honesty:
+# * cliopatria:* statements are what Cliopatria (Seshat, CC BY 4.0) reports, row by row.
+# * geo:covered_territory_of is DERIVED: a spatial overlay computed by REVA (src/reva/kg/overlay.py) of two sourced
+#   geometries (a Cliopatria polity polygon and a Natural Earth 1:10m Admin-0 country). Every statement carries
+#   qualifier derivation=computed_spatial_overlay, both raw artifacts and both geometry digests. Cliopatria's
+#   borders are approximate ("only one version of the territory held by past polities"); Natural Earth's default
+#   layer is a de facto view of today's borders. "Covered X % of the territory" is not a statement about
+#   sovereignty, legitimacy, control on the ground or any causal relation.
+
+version: 1
+owner: KGPOLITY
+predicates:
+  - pid: "geo:covered_territory_of"
+    value_kind: item
+    reva_predicate: covered_territory_of
+    label_en: "covered part of the present-day territory of (computed overlay)"
+    label_fr: "a couvert une partie du territoire actuel de (superposition calculée)"
+    inverse_name: territory_covered_by
+    inverse_label_en: "present-day territory partly covered by (computed overlay)"
+    inverse_label_fr: "territoire actuel couvert en partie par (superposition calculée)"
+    derived: true
+    description: >-
+      subject = a historical polity (Cliopatria entity), object = a present-day country (Wikidata QID when the
+      ISO3 -> QID mapping is available at load time, else the REVA node iso3:<KEY>, or naturalearth:<ADM0_A3> for a
+      Natural Earth unit outside the crosswalk). One statement per maximal run of consecutive Cliopatria rows of
+      the polity in which the polity polygon covers at least min_share of the country's area. start/end = first
+      FromYear / last ToYear of the run (astronomical years; BCE negative). Qualifiers: share_of_country_area
+      {max,min,first,last} (decimal strings, 0..1), overlap_km2_max, rows[] (row, years, share, overlap_km2,
+      Cliopatria geometry sha256), country_geometry_sha256, ne_raw_sha256, method, caveat.
+  - pid: "cliopatria:denotes"
+    value_kind: item
+    reva_predicate: cliopatria_denotes
+    label_en: "Cliopatria polity is described by Wikidata item"
+    label_fr: "l'entité politique Cliopatria est décrite par l'élément Wikidata"
+    inverse_name: described_cliopatria_polity
+    inverse_label_en: "Wikidata item describing the Cliopatria polity"
+    inverse_label_fr: "élément Wikidata décrivant l'entité politique Cliopatria"
+    derived: false
+    description: >-
+      The Wikidata id Cliopatria itself records on the polity's rows ("associated Wikidata id for the entity in
+      those years"), dated by the run of rows carrying it. Provider-declared mapping, never guessed by REVA.
+  - pid: "cliopatria:reported_area"
+    value_kind: quantity
+    reva_predicate: cliopatria_reported_area
+    label_en: "area of the polity polygon (Cliopatria)"
+    label_fr: "superficie du polygone de l'entité politique (Cliopatria)"
+    derived: false
+    description: >-
+      One statement per Cliopatria row: the row's Area field (km2, EPSG:6933 equal-area, as reported) valid from
+      FromYear to ToYear; qualifiers: row ordinal, Cliopatria geometry sha256, SeshatID, Wikipedia phrase.
+  - pid: "cliopatria:member_of"
+    value_kind: item
+    reva_predicate: cliopatria_member_of
+    label_en: "component of (Cliopatria relation)"
+    label_fr: "composante de (relation Cliopatria)"
+    inverse_name: cliopatria_has_component
+    inverse_label_en: "has component (Cliopatria relation)"
+    inverse_label_fr: "a pour composante (relation Cliopatria)"
+    derived: false
+    description: >-
+      From the MemberOf / Components fields: a polity is a component of a Cliopatria RELATION entity (alliance,
+      personal union, allegiance, empire grouping) during a run of rows.
+  - pid: "cliopatria:seshat_polity_id"
+    value_kind: external_id
+    reva_predicate: seshat_polity_id
+    label_en: "Seshat polity id (as recorded by Cliopatria)"
+    label_fr: "identifiant de polité Seshat (selon Cliopatria)"
+    derived: false
+    description: >-
+      The SeshatID Cliopatria records for some rows (seshat-db.com/core/polity/<id>), dated by the run of rows.

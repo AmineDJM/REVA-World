@@ -1,0 +1,17 @@
+# Budget request from agent KGPOLITY (polity borders + territorial overlay). ATLASCORE merges into
+# registry/policies/budgets.yaml. One full run = 3 requests: Cliopatria LICENSE.md (licence check, ~1 kB),
+# cliopatria.geojson.zip of the pinned release (46 MB, raw.githubusercontent.com) and Natural Earth
+# ne_10m_admin_0_map_units.zip (~9 MB, naciscdn.org; archived under this connector for the overlay's provenance).
+agent: KGPOLITY
+requests:
+  - source_key: cliopatria.github
+    daily_requests: 6
+    expected_bytes_per_day: 112000000
+    reason: "Cliopatria v0.2.1 (CC BY 4.0) + NE 1:10m map units: 3 requests (~56 MB) per run; 2 runs/day max (retry)"
+daily_totals_increase:
+  http_requests_total: "+6"
+  http_bytes_total: "+112_000_000"
+notes: >-
+  Seshat Global History Databank variables (seshat-db.com) are NOT requested: downloads require an account and
+  acceptance of the Seshat user agreement (Public Data CC BY-SA 4.0; the Equinox-2020 release is CC BY-NC-SA),
+  see docs/dev/v3_kgpolity.md.

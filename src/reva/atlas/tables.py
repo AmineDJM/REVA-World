@@ -288,6 +288,8 @@ def geo_index() -> GeoIndex:
             if v:
                 maps[scheme][_norm_code(v, scheme in _NUMERIC_SCHEMES)] = e["key"]
         maps["iso3"].setdefault(e["key"], e["key"])  # XKX / CHI: the crosswalk key itself
+        if e.get("iso_numeric"):  # XWALK: ISO 3166-1 numeric of an ISO entity M49 does not list (TWN 158)
+            maps["m49"].setdefault(_norm_code(e["iso_numeric"], True), e["key"])
     sources: dict[str, Any] = {"crosswalk": {"file": CROSSWALK_PATH.name, "content_sha256": doc.get("content_sha256")}}
     if EXTRA_CODES_PATH.exists():
         _load_extra(EXTRA_CODES_PATH, keys, maps, sources)
@@ -301,7 +303,8 @@ def country_iso3(provider_code: str | None, scheme: str) -> str | None:
     """The crosswalk entity key (ISO3; ``XKX``/``CHI`` for the two non-ISO entities) of a
     provider geography code, or ``None`` when it does not map (aggregates, regions, unknown).
 
-    Schemes: ``iso3``, ``iso2``, ``m49`` (also ISO numeric), ``wb``, ``comtrade`` from the
+    Schemes: ``iso3``, ``iso2``, ``m49`` (also ISO 3166-1 numeric, e.g. 158 -> ``TWN``, which
+    M49 itself does not list), ``wb``, ``comtrade`` from the
     crosswalk; ``eurostat``, ``fips``, ``imf``, ``ilo``, ``who``, ``owid``… from
     ``registry/entities/country_codes_extra.json`` and ``registry/atlas/geo_aliases/*.yaml``.
     Unknown scheme -> ``ValueError``.
