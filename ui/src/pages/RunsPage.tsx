@@ -32,7 +32,7 @@ export default function RunsPage() {
   return (
     <>
       <h1>Simulation runs</h1>
-      <ContextBanner meta={scenarios.data ?? jobs.data} simulation scope="All simulation runs (jobs) and their scenarios" />
+      <ContextBanner meta={scenarios.data ?? jobs.data} simulation scope="All simulation runs; each run is pinned to its own scenario cutoff (per row)" />
       <section className="panel" aria-labelledby="runs-h">
         <h2 id="runs-h">Runs</h2>
         {(jobs.status === 'loading' || scenarios.status === 'loading') && <Loading what="runs" />}
@@ -72,6 +72,7 @@ export default function RunsPage() {
                   <th scope="col">Model</th>
                   <th scope="col">Fidelity</th>
                   <th scope="col">Status</th>
+                  <th scope="col">Knowledge cutoff</th>
                   <th scope="col">Created</th>
                 </tr>
               </thead>
@@ -90,6 +91,10 @@ export default function RunsPage() {
                     </td>
                     <td>{String(r.job.payload?.fidelity ?? '—')}</td>
                     <td>{humanize(r.job.status)}</td>
+                    <td>
+                      {formatDateTime(r.scenario?.knowledge_cutoff)}
+                      {r.scenario?.origin === 'test_fixture' && <span className="fixture-inline"> · TEST FIXTURE</span>}
+                    </td>
                     <td>{formatDateTime(r.job.created_at)}</td>
                   </tr>
                 ))}

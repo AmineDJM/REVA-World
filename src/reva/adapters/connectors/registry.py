@@ -9,6 +9,7 @@ from reva.adapters.connectors.comtrade_batch import ComtradeBatchConnector
 from reva.adapters.connectors.crossref import CrossrefConnector
 from reva.adapters.connectors.eurostat_demography import EurostatDemographyConnector
 from reva.adapters.connectors.eurostat_labour import EurostatLabourPensionsConnector
+from reva.adapters.connectors.io_tables import FigaroConnector
 from reva.adapters.connectors.naturalearth import NaturalEarthConnector
 from reva.adapters.connectors.worldbank import WorldBankConnector
 from reva.adapters.connectors.worldbank_all import WorldBankAllConnector
@@ -27,5 +28,7 @@ def builtin_connectors(contact_email: str | None = None) -> dict[str, Any]:
         EurostatLabourPensionsConnector(),
         # V2 step 3a (agent POP): demo_pjan/demo_magec/demo_fasec + EUROPOP2023 assumption tables
         EurostatDemographyConnector(),
+        # V2 step 3b (agent IO): FIGARO inter-country input-output table (latest year)
+        FigaroConnector(),
     ]
     return {c.describe().name: c for c in conns}

@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -105,8 +105,12 @@ describe('ComposerPage', () => {
     expect(within(review).getByTestId('draft-invalid')).toHaveTextContent('reference_year is required');
     const confirm = within(review).getByRole('button', { name: /Confirm and run/ });
     expect(confirm).toBeDisabled();
-    await userEvent.type(within(review).getByLabelText('title'), '!');
+    // The user supplies the missing value; it stays a number and nothing else is filled in.
+    const input = within(review).getByLabelText('reference_year');
+    expect(input).toHaveValue('');
+    await userEvent.type(input, '2023');
     expect(confirm).toBeEnabled();
+    expect(within(review).getByTestId('confirm-json')).toHaveTextContent('"reference_year": 2023');
     expect(calls.some((c) => c.url === '/v1/scenarios')).toBe(false);
   });
 
@@ -120,8 +124,45 @@ describe('ComposerPage', () => {
     });
     renderPage();
     await draft();
-    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('llm_unavailable'));
+    const err = await screen.findByTestId('draft-error');
+    expect(err).toHaveTextContent('HTTP 503, llm_unavailable');
+    expect(err).toHaveTextContent('Nothing was sent to a language model');
     expect(screen.queryByTestId('draft-review')).toBeNull();
     expect(calls.some((c) => c.url === '/v1/scenarios')).toBe(false);
+  });
+
+  it('shows an exhausted daily budget (429) as a clear message, not a fallback', async () => {
+    mockFetch({
+      ...base,
+      'POST /v1/scenario-drafts': { status: 429, body: { title: 'budget exhausted', status: 429, code: 'budget_exhausted', detail: 'daily LLM requests used' } },
+    });
+    renderPage();
+    await draft();
+    const err = await screen.findByTestId('draft-error');
+    expect(err).toHaveAttribute('data-code', 'budget_exhausted');
+    expect(err).toHaveTextContent('daily drafting budget is used up');
+    expect(screen.queryByTestId('draft-review')).toBeNull();
+  });
+
+  it('flags an experimental model and highlights numbers not in the text', async () => {
+    mockFetch({
+      ...base,
+      'POST /v1/scenario-drafts': {
+        body: {
+          ...READY_RESPONSE,
+          draft_spec: { ...READY_RESPONSE.draft_spec, model_key: 'economic.io_price' },
+          warnings: ['experimental_model: economic.io_price is not yet reviewed (maintainer_review_pending)'],
+          numbers_to_confirm: [{ path: 'intervention.export_multiplier', value: 1, provenance: 'not_in_text', quote: null }],
+        },
+      },
+    });
+    renderPage();
+    await draft();
+    const review = await screen.findByTestId('draft-review');
+    expect(within(review).getByTestId('experimental-label')).toBeInTheDocument();
+    const row = within(within(review).getByTestId('numbers-to-confirm')).getByRole('row', { name: /export_multiplier/ });
+    expect(row).toHaveClass('number-unstated');
+    expect(row).toHaveTextContent('NOT in your text');
+    expect(within(review).getByText(/experimental_model: economic.io_price/)).toBeInTheDocument();
   });
 });

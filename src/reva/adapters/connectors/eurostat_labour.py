@@ -54,7 +54,7 @@ import re
 from collections.abc import Iterator, Mapping, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal
-from typing import Any
+from typing import Any, Literal
 from urllib.parse import urlencode
 
 from reva.adapters.connectors.base import json_decimal, module_digest, plain, schema_fingerprint, to_raw
@@ -89,8 +89,8 @@ MAX_POSITIONS = 200_000
 LICENCE = "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
 
 #: Reviewed Eurostat ``geo`` code -> ISO 3166 alpha-3 (Eurostat uses EL for Greece and
-#: UK for the United Kingdom; no such code is in the default set). Mirrors the
-#: ``eurostat_geo`` aliases the entity registry must hold for publication.
+#: UK for the United Kingdom; no such code is in the default set). Observations name their
+#: subject by ISO3 (``iso3166_alpha3`` aliases).
 EUROSTAT_GEO_TO_ISO3: dict[str, str] = {
     "FR": "FRA",
     "DE": "DEU",
@@ -412,7 +412,7 @@ def parse_cube(body: bytes, table: TableSpec) -> ParsedCube:
                 for d, s in zip(ids, sizes, strict=True)}
         values = _sparse(doc.get("value"), n, "value")
         status = _sparse(doc.get("status"), n, "status")
-        ext = doc.get("extension") if isinstance(doc.get("extension"), dict) else {}
+        ext: dict[str, Any] = doc["extension"] if isinstance(doc.get("extension"), dict) else {}
         labels = {str(k): str(v) for k, v in dict(((ext.get("status") or {}).get("label")) or {}).items()}
         strides = [math.prod(sizes[i + 1:]) for i in range(len(sizes))]
         cells: list[Cell] = []
@@ -569,7 +569,7 @@ class EurostatLabourPensionsConnector:
         t = self._table_of(raw)
         cube = parse_cube(raw.body, t)
         obs = tuple(self._observation(t, c, cube.status_labels) for c in cube.cells)
-        meta = {
+        meta: dict[str, Any] = {
             "kind": "jsonstat",
             "table": t.code,
             "dataset_updated": cube.updated,  # dataset-level; NOT a value publication time
@@ -619,8 +619,11 @@ class EurostatLabourPensionsConnector:
         if c.value is None:
             source_flags["absent_in_value_map"] = True
         return ParsedObservation(
-            subject_provider="eurostat_geo",
-            subject_key=c.geo,
+            # Subject: this module's reviewed Eurostat-geo -> ISO 3166 table, resolved through the
+            # iso3166_alpha3 aliases (same convention as eurostat.demography); deliberately not new
+            # eurostat_geo aliases, which feed the autonomy template's eligibility scope.
+            subject_provider="iso3166_alpha3",
+            subject_key=EUROSTAT_GEO_TO_ISO3[c.geo],
             concept_id=t.concept_id,
             concept_version=t.concept_version,
             support=support,
@@ -654,7 +657,7 @@ class EurostatLabourPensionsConnector:
         keys = [o.logical_key for o in batch.observations]
         if len(keys) != len(set(keys)):
             f.append(Finding(code="duplicate_keys", severity="blocker", message="duplicate logical keys"))
-        outcome = "blocked" if any(x.severity == "blocker" for x in f) else "pass"
+        outcome: Literal["pass", "blocked"] = "blocked" if any(x.severity == "blocker" for x in f) else "pass"
         return QualityReport(outcome=outcome, findings=tuple(f), expected_count=n, received_count=len(keys),
                              missing_keys=tuple(sorted(o.logical_key for o in batch.observations
                                                        if o.value.get("kind") == "missing")))
@@ -704,7 +707,7 @@ def derive_dataset_tables(body: bytes, table_code: str, geos: Sequence[str] = DE
     if blockers:
         raise SourceResponseError(f"{table_code}: cube fails drift checks: {blockers[0].message}", retryable=False,
                                   kind="schema_drift", findings=[b.model_dump() for b in blockers])
-    dims = list(t.resolution) + [None, None]
+    dims = [*t.resolution, None, None]
     out: dict[str, Any] = {}
     for geo in geos:
         rows = sorted((c for c in cube.cells if c.geo == geo),

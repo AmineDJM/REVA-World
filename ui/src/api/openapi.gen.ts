@@ -617,6 +617,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/v1/scenario-drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Scenario Draft
+         * @description Draft a ScenarioSpec from natural language. **Nothing is executed or stored.**
+         *
+         *     The draft is re-validated by the same validator as hand-written specs; numbers proposed for the
+         *     intervention are listed in ``numbers_to_confirm``. Run it only after review, by submitting
+         *     ``draft_spec`` to ``POST /v1/scenarios``.
+         */
+        post: operations["create_scenario_draft_v1_scenario_drafts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/v1/scenarios": {
         parameters: {
             query?: never;
@@ -1732,6 +1756,48 @@ export interface components {
              * @default R-POP-JAN-AGESEX
              */
             requirement_id?: string;
+        };
+        /** DraftAssumption */
+        DraftAssumption: {
+            /** Source */
+            source: string;
+            /** Text */
+            text: string;
+        };
+        /** DraftGap */
+        DraftGap: {
+            /** Capability Key */
+            capability_key: string;
+            /**
+             * Kind
+             * @description capability_gap | policy_refusal
+             */
+            kind: string;
+            /** Llm Capability Key Rejected */
+            llm_capability_key_rejected?: boolean | null;
+            /** Reason */
+            reason: string;
+            /**
+             * Source
+             * @description llm | server_guard | server | validator | provider
+             */
+            source: string;
+            /** Text */
+            text: string;
+        };
+        /** DraftNumber */
+        DraftNumber: {
+            /** Path */
+            path: string;
+            /**
+             * Provenance
+             * @description stated | converted_from_stated | not_in_text | server_default | schema_constant
+             */
+            provenance: string;
+            /** Quote */
+            quote?: string | null;
+            /** Value */
+            value: unknown;
         };
         /**
          * EntityComponent
@@ -4066,6 +4132,95 @@ export interface components {
             /** Spec Sha256 */
             spec_sha256: string;
         };
+        /** ScenarioDraftResponse */
+        ScenarioDraftResponse: {
+            /** Assumptions Added */
+            assumptions_added: components["schemas"]["DraftAssumption"][];
+            /**
+             * Candidate Spec
+             * @description Incomplete or invalid spec, for review only
+             */
+            candidate_spec: {
+                [key: string]: unknown;
+            } | null;
+            /** Catalog Digest */
+            catalog_digest: string;
+            /** Confirmation Required */
+            confirmation_required: boolean;
+            /**
+             * Draft Spec
+             * @description Valid ScenarioSpec (status draft_ready only); runs only when submitted to POST /v1/scenarios
+             */
+            draft_spec: {
+                [key: string]: unknown;
+            } | null;
+            /** Draft Spec Sha256 */
+            draft_spec_sha256: string | null;
+            /** Executed */
+            executed: boolean;
+            /** Fallback From */
+            fallback_from: {
+                [key: string]: unknown;
+            }[];
+            /** Language */
+            language: string;
+            /** Latency Ms */
+            latency_ms: number;
+            /**
+             * Llm Restatement
+             * @description The LLM's paraphrase of the request (untrusted, for comparison)
+             */
+            llm_restatement: string;
+            /** Missing Fields */
+            missing_fields: string[];
+            /** Model */
+            model: string;
+            /** Model Requested */
+            model_requested: string;
+            /** Next Step */
+            next_step: string;
+            /** Numbers To Confirm */
+            numbers_to_confirm: components["schemas"]["DraftNumber"][];
+            /**
+             * Parameters Set
+             * @description Every parameter the LLM set, with its quote
+             */
+            parameters_set: {
+                [key: string]: unknown;
+            }[];
+            /** Prompt Sha256 */
+            prompt_sha256: string;
+            /** Prompt Version */
+            prompt_version: string;
+            /** Provider */
+            provider: string;
+            /** Rejected Ids */
+            rejected_ids: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Restatement
+             * @description Server-generated restatement of the draft (input language)
+             */
+            restatement: string;
+            /**
+             * Status
+             * @description draft_ready | needs_input | draft_invalid | draft_rejected | nothing_draftable
+             */
+            status: string;
+            /** Unsupported */
+            unsupported: components["schemas"]["DraftGap"][];
+            /** Usage */
+            usage: {
+                [key: string]: unknown;
+            };
+            /** Validation */
+            validation: {
+                [key: string]: unknown;
+            };
+            /** Warnings */
+            warnings: string[];
+        };
         /** ScenarioListResponse */
         ScenarioListResponse: {
             applicability: components["schemas"]["Assessment"];
@@ -6093,6 +6248,86 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    create_scenario_draft_v1_scenario_drafts_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Required on POSTs that start work: 8-200 printable ASCII characters */
+                "Idempotency-Key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * Baseline Release Id
+                     * @description Published belief release the draft is pinned to (default: the latest published one)
+                     */
+                    baseline_release_id?: string | null;
+                    /**
+                     * Text
+                     * @description The request in plain French or English (at most 4096 UTF-8 bytes). Treated as data: it never changes the system's instructions.
+                     */
+                    text: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScenarioDraftResponse"];
+                };
+            };
+            /** @description Idempotency-Key reuse or no published release */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Body larger than 8 KiB or text larger than 4096 bytes */
+            413: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Invalid request */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Daily LLM budget exhausted (nothing was sent) */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description LLM provider failed; no draft */
+            502: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description LLM drafting disabled or budget ledger unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

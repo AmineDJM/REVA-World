@@ -73,10 +73,12 @@ def test_missing_leaf_stays_missing_and_totals_gate_reports_remainder() -> None:
 
 
 def test_inconsistent_total_is_blocked_unless_explained() -> None:
+    """Leaves above the reported total are inconsistent; leaves below it with missing leaves are only
+    'not computable' (the missing cells could hold the difference)."""
     rows = [dict(r) for r in _rows("FRA")]
     for r in rows:
         if r["year"] == YEAR and r["dim1"] == "TOTAL" and r["dim2"] == "TOTAL":
-            r["value"] = "40000"
+            r["value"] = "30000"  # leaves (32154 thousand) exceed it: missing leaves cannot explain that
     with pytest.raises(hh.InconsistentHouseholdSource):
         hh.build_household_recipe(rows, geography="FRA", year=YEAR, source_ref={}, seed=1)
     rec = hh.build_household_recipe(rows, geography="FRA", year=YEAR, source_ref={}, seed=1,

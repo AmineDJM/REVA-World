@@ -26,6 +26,7 @@ from __future__ import annotations
 
 import calendar
 import html
+import itertools
 import json
 import re
 from collections.abc import Iterable, Mapping, Sequence
@@ -313,7 +314,7 @@ def _check_disjoint(t: RuleTable) -> None:
         if len({r.basis for r in rows}) > 1:
             raise ValidationProblem(f"{t.country}: path/age kind {key} mixes birth-cohort and claim-year rows")
         ivs = sorted((_intervals(r), r.row_id) for r in rows)
-        for (a, ida), (b, idb) in zip(ivs, ivs[1:], strict=False):
+        for (a, ida), (b, idb) in itertools.pairwise(ivs):
             if b[0] <= a[1]:
                 raise ValidationProblem(f"{t.country}: rows {ida} and {idb} overlap in {key}")
 
@@ -391,7 +392,7 @@ class ShiftedPath:
         if not 1900 <= self.first_birth_year <= 2100:
             raise ValidationProblem("first_birth_year out of range")
 
-    def extra(self, birth_y: int) -> int:
+    def extra_months(self, birth_y: int) -> int:
         if birth_y < self.first_birth_year:
             return 0
         if self.phase_in_months_per_cohort == 0:
@@ -400,7 +401,7 @@ class ShiftedPath:
         return max(self.shift_months, -step) if self.shift_months < 0 else min(self.shift_months, step)
 
     def age_months(self, birth_y: int, birth_m: int, claim_year: int) -> int:
-        return self.base.age_months(birth_y, birth_m, claim_year) + self.extra(birth_y)
+        return self.base.age_months(birth_y, birth_m, claim_year) + self.extra_months(birth_y)
 
     def describe(self) -> dict[str, Any]:
         return {"kind": "shift_of_rule_table_path", "base": self.base.describe(), "shift_months": self.shift_months,

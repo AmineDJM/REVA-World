@@ -189,6 +189,7 @@ def build_household_recipe(rows: Sequence[Mapping[str, Any]], *, geography: str,
     if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
         raise ValidationProblem("seed must be a non-negative int")
     by: dict[tuple[str, str], Mapping[str, Any]] = {}
+    r: Mapping[str, Any] | None
     for r in rows:
         if r.get("year") != year:
             continue
@@ -219,6 +220,7 @@ def build_household_recipe(rows: Sequence[Mapping[str, Any]], *, geography: str,
                 missing.append({"cell_id": cid, "reason": (r or {}).get("missing_reason") or "absent_from_source",
                                 "status": (r or {}).get("status", "")})
                 continue
+            assert r is not None
             lo, hi, alo, ahi = size_bounds(comp, k)
             cells.append(HouseholdCell(cid, comp, k, _households(v), lo, hi, alo, ahi, str(r.get("status") or "")))
     tot_row = by.get(("TOTAL", "TOTAL"))

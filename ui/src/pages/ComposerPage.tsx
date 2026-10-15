@@ -5,6 +5,8 @@ import { ApiError } from '../api/problem';
 import type { BaselineReleaseRef, Fidelity } from '../api/types';
 import type { ScenarioDraft } from '../api/v2types';
 import { ContextBanner } from '../components/ContextBanner';
+import { ExperimentalLabel } from '../components/HonestyLabels';
+import { MODEL_KEYS } from '../api/v2types';
 import { SpecEditor } from '../components/SpecEditor';
 import { ErrorState, Loading, ProblemView } from '../components/StateViews';
 import { STATUS_TEXT, diffJson, normalizeDraft, pinToRelease, reviewSpec, setIn, type DiffEntry } from '../lib/draft';
@@ -93,6 +95,90 @@ function ProviderLine({ d }: { d: ScenarioDraft }) {
         </div>
       )}
     </dl>
+  );
+}
+
+const DRAFT_ERROR_TEXT: Record<string, string> = {
+  llm_unavailable: 'Drafting is unavailable on this server (disabled, not configured, or its budget ledger is missing). Nothing was sent to a language model.',
+  budget_exhausted: 'The daily drafting budget is used up. Nothing was sent to a language model; try again tomorrow or write the scenario by hand.',
+  llm_provider_error: 'The language-model provider failed and no draft was produced. No fallback guess is shown.',
+  payload_too_large: 'The description is too long (at most 4096 bytes).',
+  no_published_release: 'No published belief release exists; a draft must be pinned to one.',
+  idempotency_conflict: 'This request key was already used for a different text. Draft again.',
+};
+
+/** A drafting failure as a clear, typed message (never a silent fallback). */
+function DraftError({ error }: { error: unknown }) {
+  const api = error instanceof ApiError ? error : null;
+  const missing = api && (api.status === 404 || api.status === 405);
+  const text = api ? (DRAFT_ERROR_TEXT[api.code ?? ''] ?? null) : null;
+  return (
+    <div className="state state-error" role="alert" data-testid="draft-error" data-code={api?.code ?? ''}>
+      <p>
+        <strong>
+          {missing
+            ? 'Drafting is not available on this server'
+            : api
+              ? `Draft refused (HTTP ${api.status}${api.code ? `, ${api.code}` : ''})`
+              : 'Drafting failed'}
+        </strong>
+        {missing && <> (POST /v1/scenario-drafts returned HTTP {api!.status})</>}.{' '}
+        {text ?? api?.problem.detail ?? (error instanceof Error ? error.message : String(error))}
+      </p>
+      {api?.problem.detail && text && <p className="muted">{api.problem.detail}</p>}
+      <p>
+        You can write the scenario by hand on the <Link to="/simulation">Simulation</Link> screen.
+      </p>
+    </div>
+  );
+}
+
+/** "a.b[0].c" -> ["a", "b", 0, "c"] */
+export function splitPath(path: string): (string | number)[] {
+  const out: (string | number)[] = [];
+  for (const part of path.split('.')) {
+    const m = /^([^[\]]+)((?:\[\d+\])*)$/.exec(part);
+    if (!m) {
+      out.push(part);
+      continue;
+    }
+    out.push(m[1]!);
+    for (const idx of m[2]!.matchAll(/\[(\d+)\]/g)) out.push(Number(idx[1]));
+  }
+  return out;
+}
+
+function getIn(obj: unknown, parts: (string | number)[]): unknown {
+  let cur: unknown = obj;
+  for (const p of parts) {
+    if (cur === null || typeof cur !== 'object') return undefined;
+    cur = (cur as Record<string | number, unknown>)[p];
+  }
+  return cur;
+}
+
+/** An input for a field the draft is missing. Numbers stay numbers; nothing is pre-filled. */
+function MissingFieldInput({ path, spec, onSet }: { path: string; spec: Record<string, unknown>; onSet: (parts: (string | number)[], v: unknown) => void }) {
+  const parts = splitPath(path);
+  const current = getIn(spec, parts);
+  const [text, setText] = useState(current === undefined || current === null ? '' : String(current));
+  const id = `missing-${path.replace(/[^\w]/g, '_')}`;
+  return (
+    <div className="spec-field">
+      <label htmlFor={id}>{path}</label>
+      <input
+        id={id}
+        type="text"
+        value={text}
+        placeholder="required — not set"
+        onChange={(e) => {
+          const t = e.target.value;
+          setText(t);
+          const trimmed = t.trim();
+          onSet(parts, trimmed === '' ? undefined : /^-?\d+(\.\d+)?$/.test(trimmed) ? Number(trimmed) : trimmed);
+        }}
+      />
+    </div>
   );
 }
 
@@ -195,7 +281,6 @@ export default function ComposerPage() {
     }
   };
 
-  const endpointMissing = draftError instanceof ApiError && (draftError.status === 404 || draftError.status === 405);
 
   return (
     <>
@@ -261,17 +346,7 @@ export default function ComposerPage() {
           <span className="field-hint">Drafting does not create a scenario or start a run.</span>
         </p>
         {drafting && <Loading what="draft from the language model" />}
-        {!!draftError &&
-          (endpointMissing ? (
-            <div className="state state-error" role="alert" data-testid="draft-unavailable">
-              <p>
-                <strong>Drafting is not available on this server</strong> (POST /v1/scenario-drafts returned HTTP {(draftError as ApiError).status}). Use
-                the <Link to="/simulation">Simulation</Link> form to write a scenario by hand.
-              </p>
-            </div>
-          ) : (
-            <ProblemView error={draftError} />
-          ))}
+        {!!draftError && <DraftError error={draftError} />}
       </form>
 
       {draft && (
@@ -281,6 +356,11 @@ export default function ComposerPage() {
             <span className="llm-badge">LLM draft</span> {DRAFT_NOTICE}
           </p>
           <ProviderLine d={draft} />
+          {(() => {
+            const mk = typeof baseSpec?.model_key === 'string' ? baseSpec.model_key : null;
+            const flagged = draft.warnings.find((w) => w.startsWith('experimental_model'));
+            return flagged || (mk && mk !== MODEL_KEYS.crude) ? <ExperimentalLabel reviewStatus={flagged ? 'maintainer_review_pending' : null} /> : null;
+          })()}
 
           <p className={`draft-status status-${draft.status}`} data-testid="draft-status" data-status={draft.status}>
             <strong>{STATUS_TEXT[draft.status] ?? humanize(draft.status)}</strong>
@@ -320,9 +400,19 @@ export default function ComposerPage() {
           )}
 
           {draft.missing_fields.length > 0 && (
-            <p className="field-error" data-testid="missing-fields">
-              Missing before this can run: {draft.missing_fields.map((f) => <code key={f}>{f} </code>)}
-            </p>
+            <div data-testid="missing-fields">
+              <p className="field-error">
+                Missing before this can run: {draft.missing_fields.map((f) => <code key={f}>{f} </code>)}. Nothing is filled in for you; enter
+                each value below (the server validates it).
+              </p>
+              {edited && (
+                <div className="spec-grid">
+                  {draft.missing_fields.map((f) => (
+                    <MissingFieldInput key={f} path={f} spec={edited} onSet={(parts, v) => setEdited((cur) => setIn(cur, parts, v) as Record<string, unknown>)} />
+                  ))}
+                </div>
+              )}
+            </div>
           )}
 
           {draft.numbers_to_confirm.length > 0 && (

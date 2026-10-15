@@ -371,6 +371,13 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         INGEST_REQUESTS.inc(connector=spec.name, status=o.status)
     shas = sorted({o.raw_sha256 for o in report.outcomes if o.raw_sha256})
     origin = "test_fixture" if mode == "fixture" else "live"
+    dataset_info = None
+    if spec.name == "eurostat.figaro.iciot_ii" and report.cursor.get("complete") and report.cursor.get("year"):
+        # V2: a complete FIGARO year becomes a verified dataset input (identity checks; refuses otherwise)
+        from reva.adapters.connectors.io_tables import publish_io_dataset
+
+        dataset_info = publish_io_dataset(ctx.worker_engine, ctx.store, year=int(report.cursor["year"]),
+                                          origin=origin)
     publish_job = None
     nbytes = 0
     with ctx.worker_engine.begin() as conn:
@@ -378,7 +385,7 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
             nbytes = conn.execute(text("SELECT COALESCE(sum(byte_size), 0) FROM meta.artifact WHERE sha256 = ANY(:s)"),
                                   {"s": shas}).scalar_one()
             INGEST_BYTES.inc(float(nbytes), connector=spec.name)
-        if report.inserted > 0 and not (production and origin != "live"):
+        if (report.inserted > 0 or dataset_info) and not (production and origin != "live"):
             try:
                 with conn.begin_nested():
                     publish_job = enqueue_publish_beliefs(conn, origin, latest_observation_event(conn),
@@ -398,6 +405,7 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         "mode": mode,
         "origin": origin,
         "inserted": report.inserted,
+        "dataset": dataset_info,
         "unchanged": report.unchanged,
         "relations": report.relations,
         "outcomes": counts,

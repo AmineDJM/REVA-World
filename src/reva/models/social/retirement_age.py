@@ -278,9 +278,11 @@ def _rows(table: Any) -> list[dict[str, Any]]:
     return [dict(r) for r in table]
 
 
-def employment_rates(rows: Sequence[Mapping[str, Any]], year: int, name: str = "employment_rate") -> tuple[dict[tuple[str, str], Decimal],
-                                                                            dict[tuple[str, str], str],
-                                                                            list[dict[str, Any]]]:
+RateTable = dict[tuple[str, str], Decimal]
+
+
+def employment_rates(rows: Sequence[Mapping[str, Any]], year: int, name: str = "employment_rate"
+                     ) -> tuple[RateTable, dict[tuple[str, str], str], list[dict[str, Any]]]:
     rates: dict[tuple[str, str], Decimal] = {}
     flags: dict[tuple[str, str], str] = {}
     missing: list[dict[str, Any]] = []
@@ -437,8 +439,7 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
     central, points = grid_for(iso3, assumptions, fidelity)
     plan = CountryPlan(iso3, subject_id, iv, central, points, None)
     missing: list[dict[str, Any]] = []
-    for name in ("employment_rate", "activity_rate", "pension_beneficiaries", "pension_expenditure", "population", "deaths",
-                 "births"):
+    for name in CONCEPTS:
         if tables.get(name) is None:
             missing.append({"code": "missing_input", "country": iso3, "input": name, "concept": CONCEPTS[name],
                             "kind": "dataset", "reason": "unavailable"})
@@ -645,7 +646,9 @@ def applicability(plan: CountryPlan, compiled: Compiled, point: lit.GridPoint, v
 
 def rows_for_country(plan: CountryPlan, compiled: Compiled, fidelity: str, row_cls: Any) -> list[Any]:
     rows: list[Any] = []
-    pts = plan.points if fidelity == "L2" else (plan.central,)
+    assert plan.central is not None
+    central: lit.GridPoint = plan.central
+    pts: tuple[lit.GridPoint, ...] = plan.points if fidelity == "L2" else (central,)
     results: dict[str, dict[str, dict[int, Decimal]]] = {}
     for p in pts:
         assert p is not None
@@ -680,7 +683,7 @@ def rows_for_country(plan: CountryPlan, compiled: Compiled, fidelity: str, row_c
                            "unit_ref": unit, "basis": base["basis"], "evaluated_points": len(vs),
                            "statement": SENSITIVITY_STATEMENT},
                     uncertainty=range_uncertainty(lo, hi, unit, pts),
-                    applicability={**applicability(plan, compiled, plan.central, SENSITIVITY_VARIANT, output),
+                    applicability={**applicability(plan, compiled, central, SENSITIVITY_VARIANT, output),
                                    "grid_points": [p.point_id for p in pts]},
                     period=period))
     return rows
@@ -712,7 +715,7 @@ def implementation_files() -> tuple[Path, ...]:
 
 
 def data_files() -> tuple[Path, ...]:
-    files = sorted(rl.RULE_DIR.glob("*.yaml")) + [lit.ASSUMPTIONS_FILE]
+    files = [*sorted(rl.RULE_DIR.glob("*.yaml")), lit.ASSUMPTIONS_FILE]
     return tuple(f for f in files if f.exists())
 
 
@@ -792,7 +795,7 @@ class RetirementAgeModel:
     def requirements(self, spec: dict[str, Any]) -> list[Any]:
         from reva.simulation.plugins import InputRequirement
 
-        b, years = years_of(spec)
+        b, _years = years_of(spec)
         out = []
         for iso3 in spec.get("countries") or []:
             for name, concept in CONCEPTS.items():

@@ -20,7 +20,8 @@ Only ``s`` enters the model. The pension-receipt drop of a country is taken
 from that country's own data (base-year LFS inactivity, see the model), never
 from a foreign study; the study's ``rho`` is kept for documentation. Estimates
 are also tagged with the reform they were estimated on, so a back-test can
-exclude every estimate whose estimation sample overlaps the reform it tests. Entries without both numbers (e.g. effects on exit ages in years)
+exclude every estimate whose estimation sample overlaps the reform it tests.
+Entries without both numbers (e.g. effects on exit ages in years)
 are listed as ``excluded`` with the reason. A women-only estimate applied to men
 (or a single pooled estimate applied to both sexes) is flagged
 ``sex_transfer``. A reference point with no employment response (``s = 0``) is

@@ -49,6 +49,8 @@ export const HAVE_SESSION = HAVE_STACK && !!STORAGE_STATE && existsSync(STORAGE_
 export const FIXTURE_BASELINE_UUID = '00000000-0000-4000-8000-000000000001';
 
 export const SCREENS = ['/world', '/country/FRA', '/country/DZA', '/evidence', '/graph', '/simulation', '/models', '/acquisition'];
+/** V2 screens (UIR): checked for accessible names and 375 px layout; their context is checked in v2_*.spec.ts. */
+export const V2_SCREENS = ['/map', '/compose', '/runs'];
 
 /** Wait until no "Loading …" status remains on the page (bounded). */
 export async function settle(page: Page, timeout = 30_000) {

@@ -855,3 +855,50 @@ def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: S
 
 # Optional hook read by runners that dispatch post-publish steps per connector.
 EurostatDemographyConnector.post_publish = staticmethod(post_publish_datasets)  # type: ignore[attr-defined]
+
+
+def backfill_datasets(conn: Any, store: Any, *, origin: str = "live") -> list[dict[str, Any]]:
+    """Derive and register dataset inputs from this connector's archived acquisitions.
+
+    For runners that do not dispatch :func:`post_publish_datasets` (the worker ``ingest``
+    job dispatches post-publish steps by template only): the latest passing acquisition per
+    request is re-read from the object store (namespace ``raw``, hash-checked), re-parsed
+    and registered. Idempotent (``register_dataset`` returns the existing row for the same
+    table bytes). Caller's transaction (worker role)."""
+    from sqlalchemy import text
+
+    from reva.kernel.ids import sha256_bytes
+
+    rows = conn.execute(text(
+        """SELECT DISTINCT ON (a.request_fingerprint) a.id, a.raw_sha256, a.origin, a.retrieved_at,
+                  a.request_fingerprint, a.response_metadata
+           FROM evidence.acquisition a JOIN evidence.connector_version v ON v.id = a.connector_version_id
+           WHERE v.name = :n AND a.origin = :o
+           ORDER BY a.request_fingerprint, a.recorded_at DESC, a.id DESC"""), {"n": NAME, "o": origin}).mappings().all()
+    items = {i.key: i for i in EurostatDemographyConnector().all_items()}
+    out: list[dict[str, Any]] = []
+    for r in rows:
+        md = dict(r["response_metadata"] or {})
+        if any(q.get("outcome") != "pass" for q in md.get("quality") or []):
+            continue  # quarantined/blocked bytes never become dataset inputs
+        key = str(md.get("item_key") or "")
+        dataset = key.split(":", 1)[0]
+        if dataset not in DATASETS:
+            continue
+        body = store.get("raw", r["raw_sha256"])
+        if sha256_bytes(body) != r["raw_sha256"]:
+            raise SourceResponseError("archived raw bytes do not match their hash", retryable=False,
+                                      kind="integrity")
+        item = items.get(key) or FetchItem(key=key, url=DATA_BASE + dataset, max_bytes=MAX_RESPONSE_BYTES,
+                                           params={"kind": "jsonstat", "dataset": dataset})
+        raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=r["retrieved_at"],
+                             response_metadata={}, request_fingerprint=r["request_fingerprint"],
+                             origin=r["origin"])
+
+        class _Summary:
+            acquisition_id = r["id"]
+            raw_sha256 = r["raw_sha256"]
+
+        post_publish_datasets(conn, store, raw, (), _Summary())
+        out.append({"acquisition_id": str(r["id"]), "item_key": key})
+    return out

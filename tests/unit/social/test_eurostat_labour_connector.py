@@ -68,6 +68,7 @@ def test_values_kept_verbatim_in_provider_scale_with_flags() -> None:
     assert o.value == {"kind": "decimal", "value": "25.6", "unit_ref": "unit.percent", "basis": {"scale_factor": "1"}}
     assert o.source_flags["status"] == "b" and o.source_flags["status_labels"] == {"b": "break in time series"}
     assert o.support.resolution == {"sex": "M", "age": "Y60-64"}
+    assert (o.subject_provider, o.subject_key, o.support.spatial.key) == ("iso3166_alpha3", "FRA", "ESTAT:FR")
     (eg,) = list(c.parse(RAWS["lfsa_egan"]))
     assert all(x.value["basis"]["scale_factor"] == "1000" for x in eg.observations if x.value["kind"] == "decimal")
     totals = [x for x in batch.observations if x.support.resolution["sex"] == "T"]

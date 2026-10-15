@@ -7,7 +7,7 @@
  * Full-page screenshots (desktop + 375 px) are written to test-results/ for review.
  */
 import { expect, test, type Page } from '@playwright/test';
-import { BASE_URL, HAVE_SESSION, SCREENS, SKIP_REASON, STORAGE_STATE, settle } from './helpers';
+import { BASE_URL, HAVE_SESSION, SCREENS, SKIP_REASON, STORAGE_STATE, V2_SCREENS, settle } from './helpers';
 
 test.skip(!HAVE_SESSION, SKIP_REASON);
 test.use({ baseURL: BASE_URL, storageState: STORAGE_STATE });
@@ -96,7 +96,7 @@ async function overflow(page: Page): Promise<{ scrollWidth: number; clientWidth:
   });
 }
 
-for (const path of SCREENS) {
+for (const path of [...SCREENS, ...V2_SCREENS]) {
   test(`${path}: controls are named and the page fits 375 px without horizontal scroll`, async ({ page }, info) => {
     await page.setViewportSize({ width: 1280, height: 900 });
     await page.goto(path);
