@@ -128,6 +128,22 @@
             }
           },
           "additionalProperties": false
+        },
+        "start_precision": {
+          "type": "string",
+          "description": "Optional: variable bound to wikibase:timePrecision of P580 (select it through the full value node, e.g. ?statement pqv:P580/wikibase:timePrecision ?start_p, or psv:Pxxx/wikibase:timePrecision for the object). Without it the time is stored with precision_unknown (no time bounds asserted): the harvester never infers precision from a date's shape."
+        },
+        "end_precision": {
+          "type": "string",
+          "description": "Optional: variable bound to wikibase:timePrecision of P582 (select it through the full value node, e.g. ?statement pqv:P580/wikibase:timePrecision ?start_p, or psv:Pxxx/wikibase:timePrecision for the object). Without it the time is stored with precision_unknown (no time bounds asserted): the harvester never infers precision from a date's shape."
+        },
+        "point_in_time_precision": {
+          "type": "string",
+          "description": "Optional: variable bound to wikibase:timePrecision of P585 (select it through the full value node, e.g. ?statement pqv:P580/wikibase:timePrecision ?start_p, or psv:Pxxx/wikibase:timePrecision for the object). Without it the time is stored with precision_unknown (no time bounds asserted): the harvester never infers precision from a date's shape."
+        },
+        "object_precision": {
+          "type": "string",
+          "description": "Optional: variable bound to wikibase:timePrecision of the object (select it through the full value node, e.g. ?statement pqv:P580/wikibase:timePrecision ?start_p, or psv:Pxxx/wikibase:timePrecision for the object). Without it the time is stored with precision_unknown (no time bounds asserted): the harvester never infers precision from a date's shape."
         }
       }
     },

@@ -10,8 +10,7 @@ Two endpoints, both CC0:
 
 Policy compliance (https://meta.wikimedia.org/wiki/User-Agent_policy, WDQS usage policy, API etiquette):
 
-* descriptive ``User-Agent`` with contact (``REVA_CONTACT_EMAIL`` / ``REVA_HTTP_CONTACT_EMAIL`` when set, else
-  the project URL);
+* descriptive generic ``User-Agent`` with the project URL as contact (never a personal e-mail address);
 * **one request at a time machine-wide**: every request holds an exclusive ``fcntl`` lock on
   ``var/locks/wikidata.lock`` (all agents/processes on this machine share it) and the shared state file next
   to it enforces ≥ ``min_interval`` seconds between the end of one request and the start of the next and any
@@ -108,10 +107,9 @@ class RateLimited(WikidataError):
 
 
 # --------------------------------------------------------------------------- user agent
-def user_agent(contact: str | None = None) -> str:
-    contact = contact or os.environ.get("REVA_CONTACT_EMAIL") or os.environ.get("REVA_HTTP_CONTACT_EMAIL") or ""
-    who = f"mailto:{contact.strip()}" if contact.strip() else PROJECT_URL
-    return f"REVA-World/{VERSION} (research world knowledge graph; {who}) reva-kg-harvest/{VERSION}"
+def user_agent() -> str:
+    """Generic project User-Agent. Never a personal e-mail address or any personal data."""
+    return f"REVA-World/{VERSION} (research world knowledge graph; {PROJECT_URL}) reva-kg-harvest/{VERSION}"
 
 
 # --------------------------------------------------------------------------- machine-wide lock
@@ -335,7 +333,6 @@ class WikidataClient:
         *,
         archive: Archive | None = None,
         lock: MachineLock | None = None,
-        contact: str | None = None,
         max_retries: int = 12,
         sleep: Any = asyncio.sleep,
     ) -> None:
@@ -343,7 +340,7 @@ class WikidataClient:
         self.wbapi_http = wbapi_http or wdqs_http
         self.archive = archive or Archive(None)
         self.lock = lock or MachineLock()
-        self.ua = user_agent(contact)
+        self.ua = user_agent()
         self.max_retries = max_retries
         self._sleep = sleep
         self.stats = ClientStats()

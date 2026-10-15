@@ -14,6 +14,7 @@ indicator, raw sha256 and selector. The composer cites these, nothing else.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any, Protocol, runtime_checkable
@@ -213,9 +214,71 @@ class Concept:
     definition: str | None = None
     source_order: tuple[str, ...] = ()
     review_status: str = "provider_declared"
+    #: explicit catalog declaration (``rankable: false``); ``None`` = derived from the unit
+    rankable: bool | None = None
 
     def label(self, lang: str) -> str:
         return pick_label(self.labels, lang, self.id)
+
+    @property
+    def comparable_across_countries(self) -> bool:
+        """False when the catalog says ``rankable: false`` or the concept's unit is a currency (or unit)
+        named per country/cell ("local currency", "LCU", "national currency", "named per cell"): such
+        values are never ranked or listed against each other (no currency conversion in REVA)."""
+        if self.rankable is not None:
+            return self.rankable
+        return not per_country_unit(self.unit)
+
+
+#: Units whose meaning changes from one country (or cell) to the next: a different currency per country.
+_PER_COUNTRY_UNIT = re.compile(
+    r"\b(lcu|ncu|local currenc(y|ies)|national currenc(y|ies)|monnaie (locale|nationale)|named per cell|"
+    r"per cell|unit per country)\b",
+    re.IGNORECASE,
+)
+
+
+def per_country_unit(unit: str | None) -> bool:
+    """True for a unit text that names a currency per country/cell rather than one common unit."""
+    return bool(unit) and bool(_PER_COUNTRY_UNIT.search(str(unit)))
+
+
+_PROJECTION_KINDS = frozenset({"projection", "forecast", "projected"})
+_ESTIMATE_KINDS = frozenset({"estimated", "estimate", "imputed", "modelled", "modeled", "nowcast"})
+_ESTIMATE_TYPES = frozenset({"ilo_modelled", "ilo_estimate_in_national_series"})
+
+
+def _truthy(v: Any) -> bool:
+    if v is None or v is False:
+        return False
+    return str(v).strip().lower() not in ("", "false", "0", "no", "none")
+
+
+def is_projection(flags: Mapping[str, Any] | None) -> bool:
+    """A cell is a projection when its provider says so — the semantics of the atlas query layer's
+    ``PROJECTION_SQL`` (``estimate_kind = projection``, a truthy ``projection`` flag, the WDI's
+    ``period_after_vintage``) plus FAO's ``estimate_kind = forecast``."""
+    f = flags or {}
+    return (
+        str(f.get("estimate_kind") or "").strip().lower() in _PROJECTION_KINDS
+        or _truthy(f.get("projection"))
+        or str(f.get("period_after_vintage") or "").strip().lower() == "true"
+    )
+
+
+def estimate_status(flags: Mapping[str, Any] | None) -> str | None:
+    """``projection``, ``estimate`` (provider-estimated, imputed or modelled) or ``None`` (as reported)."""
+    f = flags or {}
+    if is_projection(f):
+        return "projection"
+    if str(f.get("estimate_kind") or "").strip().lower() in _ESTIMATE_KINDS:
+        return "estimate"
+    if str(f.get("estimate_type") or "").strip().lower() in _ESTIMATE_TYPES:
+        return "estimate"
+    return None
+
+
+_YEAR_RE = re.compile(r"^\s*([+-]?\d+)-")
 
 
 @dataclass(frozen=True)
@@ -242,10 +305,14 @@ class AtlasCell:
 
     @property
     def year(self) -> int | None:
-        try:
-            return int(str(self.period_start)[:4])
-        except ValueError:
-            return None
+        """Year of ``period_start`` (astronomical ISO text: ``-0043-01-01`` is year -43 = 44 BCE)."""
+        m = _YEAR_RE.match(str(self.period_start))
+        return int(m.group(1)) if m else None
+
+    @property
+    def end_year(self) -> int | None:
+        m = _YEAR_RE.match(str(self.period_end))
+        return int(m.group(1)) if m else None
 
 
 @dataclass(frozen=True)

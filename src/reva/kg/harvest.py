@@ -466,11 +466,10 @@ def kg_value(kind: str, value: Mapping[str, Any]) -> dict[str, Any]:
     if kind == "time":
         kt = _kg_time(value)
         if kt is None:
+            if value.get("time") and value.get("precision") is None:
+                return {"type": "time_unknown_precision", "time": value["time"]}
             return {"type": "other", "raw": dict(value)}
-        out: dict[str, Any] = {"type": "time", "time": kt.iso, "precision": kt.precision, "calendar": kt.calendar}
-        if value.get("precision_inferred"):
-            out["precision_inferred"] = True
-        return out
+        return {"type": "time", "time": kt.iso, "precision": kt.precision, "calendar": kt.calendar}
     if kind == "quantity":
         q = {"type": "quantity", "amount": value.get("amount"), "unit": value.get("unit")}
         if value.get("lower") is not None:
@@ -495,6 +494,8 @@ def to_kg_statement(s: WdStatement) -> Any:
         t = getattr(s, name)
         if t and t.get("snaktype"):  # unknown / no value: not a time, keep the fact in the qualifiers
             quals[pid] = [{"snaktype": t["snaktype"]}]
+        elif t and t.get("precision") is None:  # precision not selected: kept as data, no bounds asserted
+            quals[pid] = [{"time": t.get("time"), "precision": None, "precision_unknown": True}]
     refs = [{p: [_kg_qualifier_value(v) for v in vs] for p, vs in r.items()} for r in s.references]
     if s.selector.get("rank_selected") is False:
         quals["_rank_not_selected"] = True  # WDQS row without ?rank: 'normal' is a default, not a reading
@@ -607,6 +608,8 @@ class SpecReport:
     statements: int = 0
     statements_dropped_deprecated: int = 0
     rows_skipped: int = 0
+    statements_enriched: int = 0  # WDQS rows replaced by the snapshot claim (revision, refs, precision)
+    statements_unenriched: int = 0  # WDQS rows loaded as such (revision unknown, no references)
     requests: int = 0
     bytes: int = 0
     seconds: float = 0.0
@@ -710,6 +713,7 @@ class Harvester:
         subjects: dict[str, None] = dict.fromkeys(state.data.get("subjects", []) if state else [])
         objects: dict[str, None] = dict.fromkeys(state.data.get("objects", []) if state else [])
         rows_total = int(state.data.get("rows", 0)) if state else 0
+        snapshot_subjects: set[str] = set(state.data.get("snapshot_subjects", []) if state else [])
         for ch in chunks:
             if state is not None and ch.key in state.data["chunks"]:
                 rep.chunks_done += 1
@@ -741,9 +745,12 @@ class Harvester:
                     if s.object_qid:
                         objects.setdefault(s.object_qid)
                 if kept and not trying:
-                    self.sink.load(Batch(SOURCE_WDQS, [], kept, [res.raw_sha256], res.retrieved_at,
-                                         {"spec": spec.id, "chunk": ch.key, "query_sha256": res.query_sha256,
-                                          "harvester": HARVEST_VERSION}))
+                    kept, fetched = await self.enrich_from_snapshots(spec, kept, rep)
+                    snapshot_subjects.update(fetched)
+                    if kept:
+                        self.sink.load(Batch(SOURCE_WDQS, [], kept, [res.raw_sha256], res.retrieved_at,
+                                             {"spec": spec.id, "chunk": ch.key, "query_sha256": res.query_sha256,
+                                              "harvester": HARVEST_VERSION}))
                 rep.statements += len(kept)
             rep.chunks_done += 1
             if state is not None:
@@ -752,6 +759,7 @@ class Harvester:
                 state.data["seeds"] = list(seeds)
                 state.data["subjects"] = list(subjects)
                 state.data["objects"] = list(objects)
+                state.data["snapshot_subjects"] = sorted(snapshot_subjects)
                 state.save()
         if self.via == "api" and not trying and state is not None and not state.data["chunks"].get("api"):
             found, info = await self.api_seeds(spec)
@@ -779,8 +787,9 @@ class Harvester:
             for q in new_objects:
                 objects.setdefault(q)
         else:
-            known = self.sink.known_entities(list(subjects))
-            await self.fetch_entities(spec, [s for s in subjects if s not in known], state, rep, full=False,
+            todo = [s for s in subjects if s not in snapshot_subjects]
+            known = self.sink.known_entities(todo)
+            await self.fetch_entities(spec, [s for s in todo if s not in known], state, rep, full=False,
                                       kind=spec.get("entity_kind") or LABEL_KIND)
         if int(spec.get("expand_hops", 0)) >= 1 and self.expand:
             already = set(seeds) | set(subjects)
@@ -793,6 +802,45 @@ class Harvester:
         state.data["report"] = rep.as_dict()
         state.save()
         rep.status = "done"
+
+    # -- WDQS rows -> snapshot statements (revision, references, exact time precision) ----------------
+    async def enrich_from_snapshots(self, spec: Spec, stmts: list[WdStatement],
+                                    rep: SpecReport) -> tuple[list[WdStatement], set[str]]:
+        """Replace WDQS rows that carry a statement id by the same claim read from the subject's wbgetentities
+        snapshot (``lastrevid`` as revision, references, exact precision and calendar). The subject snapshot
+        replaces the label snapshot it would get anyway (same number of requests). Returns the WDQS rows that
+        could not be matched (no statement id, or the claim changed/vanished since the WDQS replica) and the
+        subjects fetched."""
+        need = sorted({s.subject for s in stmts if s.statement_id}, key=lambda q: int(q[1:]))
+        if not need:
+            return stmts, set()
+        by_id: dict[str, WdStatement] = {}
+        fetched: set[str] = set()
+        for i in range(0, len(need), self.entity_batch):
+            part = need[i:i + self.entity_batch]
+            res = await self.client.get_entities(part, props=ENTITY_PROPS, meta={"spec": spec.id, "mode": "enrich"})
+            ents: list[WdEntity] = []
+            for qid, raw in res.entities.items():
+                if not qid.startswith("Q"):
+                    continue
+                e = extract_entity(raw, self.allow, raw_sha256=res.raw_sha_by_id[qid], retrieved_at=res.retrieved_at,
+                                   kind_hint=spec.get("entity_kind") or LABEL_KIND)
+                ents.append(e)
+                fetched.add(qid)
+                for st in e.statements:
+                    if st.statement_id:
+                        by_id[st.statement_id.lower()] = st
+            wanted = {s.statement_id.lower() for s in stmts if s.statement_id and s.subject in set(part)}
+            matched = [by_id[k] for k in sorted(wanted) if k in by_id]
+            if ents:
+                self.sink.load(Batch(SOURCE_WBAPI, ents, matched, list(res.raw_sha256s), res.retrieved_at,
+                                     {"spec": spec.id, "mode": "enrich", "harvester": HARVEST_VERSION,
+                                      "allowlist_sha256": self.allow.sha256}))
+            rep.entities_labels += len(ents)
+            rep.statements_enriched += len(matched)
+        left = [s for s in stmts if not (s.statement_id and s.statement_id.lower() in by_id)]
+        rep.statements_unenriched += len(left)
+        return left, fetched
 
     # -- WDQS-free seeds (CirrusSearch) ---------------------------------------------------------------
     async def api_seeds(self, spec: Spec) -> tuple[list[str], dict[str, Any]]:
@@ -904,8 +952,11 @@ class Harvester:
                 out.append(None)
                 continue
             sid = statement_id_from_uri((_first_value(b, cols.get("statement")) or {}).get("value"))
-            temporal = {k: coarse_precision(time_value_from_binding(_first_value(b, cols.get(k))))
+            temporal = {k: with_precision(time_value_from_binding(_first_value(b, cols.get(k))),
+                                          _first_value(b, cols.get(f"{k}_precision")))
                         for k in ("start", "end", "point_in_time")}
+            if kind == "time":
+                value = with_precision(value, _first_value(b, cols.get("object_precision"))) or value
             quals: dict[str, list[Any]] = {}
             for qp, var in (cols.get("qualifiers") or {}).items():
                 vb = b.get(var)
@@ -930,17 +981,20 @@ class Harvester:
         return out, skipped
 
 
-def coarse_precision(t: dict[str, Any] | None) -> dict[str, Any] | None:
-    """WDQS xsd:dateTime carries no precision. Assign the *coarsest* precision consistent with the value
-    (``-01-01`` -> year 9, ``-01`` day -> month 10, else day 11) and flag it as inferred: a day-precise
-    1 January is reported as a year (information loss, never false precision)."""
-    if not t or t.get("snaktype") or not t.get("time") or t.get("precision") is not None:
+def with_precision(t: dict[str, Any] | None, binding: Mapping[str, str] | None) -> dict[str, Any] | None:
+    """Attach the Wikibase precision selected by the spec (``wikibase:timePrecision`` via ``psv:``/``pqv:``).
+
+    WDQS ``xsd:dateTime`` literals carry no precision and a date's shape says nothing about it (a century is
+    written ``-0400-01-01``). Without a selected precision the time is marked ``precision_unknown``: it is kept
+    as data but asserts no time bounds (never a guessed precision)."""
+    if not t or t.get("snaktype") or not t.get("time"):
         return t
-    m = re.match(r"^([+-]?\d+)-(\d\d)-(\d\d)", t["time"])
-    if not m:
-        return t
-    prec = 9 if (m.group(2), m.group(3)) == ("01", "01") else (10 if m.group(3) == "01" else 11)
-    return {**t, "precision": prec, "precision_inferred": True}
+    raw = (binding or {}).get("value")
+    if raw is not None and str(raw).lstrip("-").isdigit():
+        p = int(raw)
+        if 0 <= p <= 14:
+            return {**t, "precision": p, "precision_unknown": False}
+    return {**t, "precision": None, "precision_unknown": True}
 
 
 # --------------------------------------------------------------------------- run many
@@ -1023,8 +1077,7 @@ def ensure_database(db_name: str) -> Any:
     return settings
 
 
-def live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, proxy_mode: str | None = None,
-              contact: str | None = None) -> Any:
+def live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, proxy_mode: str | None = None) -> Any:
     """The raw SafeHttpClient for the two Wikidata hosts. Every ``src`` caller wraps it in the budget meter
     (:func:`budgeted_client`); only offline-fixture capture tools in ``tests`` use it directly.
 
@@ -1039,7 +1092,7 @@ def live_http(*, max_bytes: int = 52_428_800, timeout_seconds: float = 75.0, pro
                               max_retry_after_seconds=900.0) for h in ALLOWED_HOSTS}
     return SafeHttpClient(allowed_hosts=ALLOWED_HOSTS, timeout_seconds=timeout_seconds, max_bytes=max_bytes,
                           max_attempts=1, rate_limiter=RateLimiter(policies), proxy_mode=proxy_mode,  # type: ignore[arg-type]
-                          contact_email=contact)
+                          contact_email=None)  # the request carries the generic project User-Agent only
 
 
 @dataclass

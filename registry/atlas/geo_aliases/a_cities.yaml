@@ -1,0 +1,18 @@
+# Geography aliases of agent A-CITIES (GeoNames cities15000 / admin1CodesASCII / alternateNamesV2).
+# GeoNames identifies a place's country by its ISO 3166-1 alpha-2 "country code"; the crosswalk
+# (registry/entities/country_crosswalk.json) holds every ISO alpha-2 code. GeoNames uses one code outside
+# ISO 3166-1: XK for Kosovo (crosswalk key XKX). Nothing else is added; any other unknown code stays unmapped.
+scheme: geonames_cc
+base: iso2
+aliases:
+  - code: XK
+    iso3: XKX
+    source: >-
+      GeoNames countryInfo.txt (raw sha256 c55f638cfaafb4fe45a9aa15120a0f1f78e8a34a8e1847d7b9320cf740fbc9ab,
+      archived by A-GEO, retrieved 2026-10-15): header comment line 13 "The countrycode XK temporarily stands
+      for Kosvo" and data line 173 "XK<TAB>XKX<TAB>0<TAB>KV<TAB>Kosovo<TAB>Pristina ...". XKX is the World
+      Bank / crosswalk key of Kosovo.
+source:
+  kind: provider_data
+  url: https://download.geonames.org/export/dump/countryInfo.txt
+  retrieved_at: "2026-10-15T22:49:36Z"

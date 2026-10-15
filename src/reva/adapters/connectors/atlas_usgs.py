@@ -226,7 +226,7 @@ def parse_metadata(body: bytes) -> dict[str, Any]:
 
 def licence_ok(item: dict[str, Any], meta: dict[str, Any]) -> bool:
     blob = f"{item.get('rights') or ''} {meta.get('use_constraints') or ''}".lower()
-    return "cc0" in blob or "public domain" in blob
+    return any(k in blob for k in ("cc0", "creative commons zero", "public domain"))
 
 
 # --------------------------------------------------------------------------- csv helpers
