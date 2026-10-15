@@ -1294,6 +1294,216 @@ properties:
     label_en: "official website"
     label_fr: "site officiel"
     wikidata_datatype: url
+# merged property requests (wbgetentities labels|datatype 2026-10-15T22:38:23.145114+00:00 raw 20ba40b050ef)
+  - property: P945
+    reva_predicate: allegiance
+    inverse: "has_allegiance_of"
+    kind: entity
+    group: requested
+    expected_en: "allegiance"
+    label_en: "allegiance"
+    label_fr: "allégeance envers"
+    wikidata_datatype: wikibase-item
+    requested_by: KGHIST
+    why: "allegiance (person -> state/crown served), e.g. a navigator in the service of the Crown of Castile; a person -> polity hop for explorer/conquistador anchor chains when no employer/citizenship is stated."
+  - property: P137
+    reva_predicate: operator
+    inverse: "operator_of"
+    kind: entity
+    group: requested
+    expected_en: "operator"
+    label_en: "operator"
+    label_fr: "opérateur"
+    wikidata_datatype: wikibase-item
+    requested_by: KGHIST
+    why: "operator (expedition/voyage -> crown, state or company that ran it), e.g. voyages run by the Portuguese Crown or the Dutch East India Company; voyage -> polity hop."
+  - property: P2997
+    reva_predicate: age_of_majority
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "age of majority"
+    label_en: "age of majority"
+    label_fr: "âge de la majorité"
+    wikidata_datatype: quantity
+    requested_by: A_LAW
+    why: "age of majority of a country (legal ages for the atlas law domain)"
+  - property: P3000
+    reva_predicate: marriageable_age
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "marriageable age"
+    label_en: "marriageable age"
+    label_fr: "âge nubile"
+    wikidata_datatype: quantity
+    requested_by: A_LAW
+    why: "marriageable age (minimum age to marry by law; qualifier P518 for males/females)"
+  - property: P3001
+    reva_predicate: retirement_age
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "retirement age"
+    label_en: "retirement age"
+    label_fr: "âge de départ à la retraite"
+    wikidata_datatype: quantity
+    requested_by: A_LAW
+    why: "retirement age (Wikidata wording \"age at which most people normally retire\"; cross-check of WBL statutory ages)"
+  - property: P2999
+    reva_predicate: age_of_consent
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "age of consent"
+    label_en: "age of consent"
+    label_fr: "âge de consentement"
+    wikidata_datatype: quantity
+    requested_by: A_LAW
+    why: "age of consent"
+  - property: P2998
+    reva_predicate: age_of_candidacy
+    inverse: null
+    kind: quantity
+    group: requested
+    expected_en: "age of candidacy"
+    label_en: "age of candidacy"
+    label_fr: "âge de candidature"
+    wikidata_datatype: quantity
+    requested_by: A_LAW
+    why: "age of candidacy (minimum age for elected office)"
+  - property: P219
+    reva_predicate: iso_639_2
+    inverse: null
+    kind: external_id
+    group: requested
+    expected_en: "ISO 639-2 code"
+    label_en: "ISO 639-2 code"
+    label_fr: "code ISO 639-2"
+    wikidata_datatype: external-id
+    requested_by: KGCULT
+    why: "ISO 639-2 code of languages (bibliographic/terminologic codes used by libraries and older datasets)"
+  - property: P305
+    reva_predicate: ietf_language_tag
+    inverse: null
+    kind: external_id
+    group: requested
+    expected_en: "IETF language tag"
+    label_en: "IETF language tag"
+    label_fr: "code de langue IETF"
+    wikidata_datatype: external-id
+    requested_by: KGCULT
+    why: "IETF BCP 47 language tag (joins languages to locale-tagged sources)"
+  - property: P1394
+    reva_predicate: glottolog_code
+    inverse: null
+    kind: external_id
+    group: requested
+    expected_en: "Glottolog code"
+    label_en: "Glottolog code"
+    label_fr: "code Glottolog"
+    wikidata_datatype: external-id
+    requested_by: KGCULT
+    why: "Glottolog code (languoid genealogy anchor; join key to Glottolog CC-BY data)"
+  - property: P4913
+    reva_predicate: dialect_of
+    inverse: "has_dialect"
+    kind: entity
+    group: requested
+    expected_en: "dialect of"
+    label_en: "dialect of"
+    label_fr: "dialecte de"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "dialect of (language genealogy below the language level)"
+  - property: P1999
+    reva_predicate: unesco_language_status
+    inverse: "unesco_language_status_of"
+    kind: entity
+    group: requested
+    expected_en: "UNESCO language status"
+    label_en: "UNESCO language status"
+    label_fr: "statut UNESCO d'une langue"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "UNESCO language status (endangerment, Atlas of the World's Languages in Danger)"
+  - property: P3823
+    reva_predicate: ethnologue_language_status
+    inverse: "ethnologue_language_status_of"
+    kind: entity
+    group: requested
+    expected_en: "Ethnologue language status"
+    label_en: "Ethnologue language status"
+    label_fr: "statut de langue Ethnologue"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "Ethnologue language status (EGIDS level as stated on Wikidata)"
+  - property: P1018
+    reva_predicate: language_regulatory_body
+    inverse: "regulates_language"
+    kind: entity
+    group: requested
+    expected_en: "language regulatory body"
+    label_en: "language regulatory body"
+    label_fr: "institution de normalisation"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "language regulatory body (e.g. Académie française, Real Academia Española)"
+  - property: P506
+    reva_predicate: iso_15924_alpha4
+    inverse: null
+    kind: external_id
+    group: requested
+    expected_en: "ISO 15924 alpha-4"
+    label_en: "ISO 15924 alpha-4 code"
+    label_fr: "code alpha-4 ISO 15924"
+    wikidata_datatype: external-id
+    requested_by: KGCULT
+    why: "ISO 15924 alpha-4 code of writing systems"
+  - property: P144
+    reva_predicate: based_on
+    inverse: "basis_of"
+    kind: entity
+    group: requested
+    expected_en: "based on"
+    label_en: "based on"
+    label_fr: "basé sur"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "based on (writing-system derivation, e.g. Latin script based on Old Italic)"
+  - property: P498
+    reva_predicate: iso_4217_code
+    inverse: null
+    kind: external_id
+    group: requested
+    expected_en: "ISO 4217 code"
+    label_en: "ISO 4217 code"
+    label_fr: "code ISO 4217"
+    wikidata_datatype: external-id
+    requested_by: KGCULT
+    why: "ISO 4217 currency code (join key for currency entities and FX datasets)"
+  - property: P2012
+    reva_predicate: cuisine
+    inverse: "cuisine_of"
+    kind: entity
+    group: requested
+    expected_en: "cuisine"
+    label_en: "cuisine"
+    label_fr: "cuisine servie"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "cuisine (country -> national cuisine)"
+  - property: P2614
+    reva_predicate: world_heritage_criteria
+    inverse: "world_heritage_criterion_of"
+    kind: entity
+    group: requested
+    expected_en: "World Heritage criteria"
+    label_en: "World Heritage criteria"
+    label_fr: "critère du patrimoine mondial (2005)"
+    wikidata_datatype: wikibase-item
+    requested_by: KGCULT
+    why: "World Heritage criteria of a site (criteria (i)-(x))"
 # Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
 # temporal fields (with precision); the rest go to the qualifiers jsonb.
 qualifiers:
@@ -1323,6 +1533,9 @@ qualifiers:
   - {property: P7452, expected_en: "reason for preferred rank", label_en: "reason for preferred rank", label_fr: "raison du rang préféré"}
   - {property: P1352, expected_en: "ranking", label_en: "ranking", label_fr: "rang/classement"}
   - {property: P3680, expected_en: "statement supported by", label_en: "statement supported by", label_fr: "déclaration soutenue par"}
+  - {property: P1107, expected_en: "proportion", label_en: "proportion", label_fr: "proportion", requested_by: KGCULT}
+  - {property: P1098, expected_en: "number of speakers, writers, or signers", label_en: "number of speakers, writers, or signers", label_fr: "nombre de locuteurs, auteurs ou signeurs", requested_by: KGCULT}
+  - {property: P1114, expected_en: "quantity", label_en: "quantity", label_fr: "quantité", requested_by: KGCULT}
 # Reference properties kept (compactly) per statement reference.
 references:
   - {property: P248, expected_en: "stated in", label_en: "stated in", label_fr: "affirmé dans"}

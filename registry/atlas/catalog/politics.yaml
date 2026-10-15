@@ -702,15 +702,15 @@ concepts:
   labels:
     fr: Redevabilité (V-Dem)
     en: Accountability index (V-Dem)
-  definition: 'To what extent is the ideal of government accountability achieved? (vertical, diagonal, horizontal) NOTE: V-Dem
-    publishes this index on an unbounded interval scale (not 0-1); see the codebook. (v2x_accountability). V-Dem measurement-model
-    point estimate; country-year day-weighted mean.'
-  unit: V-Dem interval scale (unbounded)
+  definition: 'To what extent is the ideal of government accountability achieved? (vertical, diagonal, horizontal) The series
+    is V-Dem''s v2x_accountability_osp: the measurement-model estimate (published on an unbounded interval scale as v2x_accountability,
+    in the same table) mapped by V-Dem through the standard normal CDF to 0-1 (low to high).'
+  unit: index 0-1
   domain: politics
   subdomain: checks_and_balances
   value_kind: numeric
   source_order:
-  - vdem.indices.v2x_accountability
+  - vdem.indices.v2x_accountability_osp
   provider_declared: true
   notes: 'Source V-Dem v16 (CC BY-SA 4.0: attribute V-Dem; share derived tables alike).'
   tags:

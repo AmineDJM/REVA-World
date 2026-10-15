@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 import unicodedata
 from collections.abc import Iterable, Mapping, Sequence
@@ -75,6 +76,22 @@ def fold(text: str) -> str:
     t = unicodedata.normalize("NFKD", text)
     t = "".join(c for c in t if not unicodedata.combining(c))
     return re.sub(r"\s+", " ", t.casefold().replace("’", "'")).strip()
+
+
+_STOPWORDS = frozenset(
+    "les des une est sont quel quelle quels quelles comment pourquoi quand dans pour par sur avec entre plus "
+    "moins pays ont aux qui que quoi leur leurs son ses cette ces the and for with what which how why when "
+    "where who are was were has have had from into than most more less countries country does did per ans "
+    "years year annee annees".split()
+)
+
+
+def _content_words(text: str) -> list[str]:
+    return [w for w in re.findall(r"[a-z0-9]{3,}", fold(text)) if w not in _STOPWORDS and not w.isdigit()]
+
+
+def _stem(word: str) -> str:
+    return word[:5]
 
 
 def _labels(doc: Mapping[str, Any]) -> dict[str, str]:
@@ -224,15 +241,25 @@ class QaCatalog:
         return c.label if c else iso3
 
     def relevant_concepts(self, question: str, limit: int = MAX_PROMPT_CONCEPTS) -> list[Concept]:
-        """Concepts for the prompt: all when few, else the ``limit`` best lexical matches (deterministic)."""
+        """Concepts for the prompt: all when few, else the ``limit`` best lexical matches (deterministic).
+
+        Score = sum of the inverse document frequency of the question's content words found in the
+        concept's id/labels; a word matches on its first 5 letters (``densité``/``density``,
+        ``chômage``/``chomeur``) so French questions reach English-only labels too. Stop words are ignored.
+        This only chooses what the model *sees*; the model may still answer "not in the catalogue"."""
         items = list(self.concepts.values())
         if len(items) <= limit:
             return sorted(items, key=lambda c: c.id)
-        q = set(re.findall(r"[a-z0-9]{3,}", fold(question)))
+        docs = {c.id: {_stem(w) for w in _content_words(" ".join([c.id, *c.labels.values()]))} for c in items}
+        df: dict[str, int] = {}
+        for ws in docs.values():
+            for w in ws:
+                df[w] = df.get(w, 0) + 1
+        n = len(items)
+        q = {_stem(w) for w in _content_words(question)}
 
-        def score(c: Concept) -> tuple[int, str]:
-            words = set(re.findall(r"[a-z0-9]{3,}", fold(" ".join([c.id, *c.labels.values()]))))
-            return (-len(q & words), c.id)
+        def score(c: Concept) -> tuple[float, str]:
+            return (-sum(math.log(1 + n / df[w]) for w in q & docs[c.id]), c.id)
 
         return sorted(items, key=score)[:limit]
 

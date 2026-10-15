@@ -10,8 +10,9 @@ Assembly Ideal Points") dropped the raw votes and point to the UNGA-DM database
 (https://unvotes.unige.ch/) for them. Files of earlier versions stay downloadable by file id, so the
 connector pins version 33.0: it fetches the version's metadata (licence, file md5) and the RData file
 (the access URL redirects to the Dataverse S3 bucket) and checks the md5 Dataverse publishes.
-Coverage: roll calls 1946-12 .. 2023-12 (sessions 1-78), 6,551 roll calls, 1,283,746 country rows.
-Votes after 2023 are **not** in this file (gap documented in docs/dev/v3_kggeopol.md).
+Coverage: roll calls 1946-01-01 .. 2024-06-04 (sessions 1-78 incl. emergency special sessions), 6,551 roll
+calls, 1,283,746 country rows.
+Votes after 2024-06-04 are **not** in this file (gap documented in docs/dev/v3_kggeopol.md).
 
 Codebook (``Codebook-1.docx``, same version, archived too): vote 1 yes, 2 abstain, 3 no, 8 absent,
 9 not a member; ``ccode`` = Correlates-of-War code; issue codes (ME Palestinian conflict, NU nuclear
@@ -32,9 +33,13 @@ Outputs
 * KG: roll-call entities ``unga:rcid:<rcid>`` (date, symbol, short title, issue codes) and statements
   ``<state> unga:voted_yes|voted_no|voted_abstain unga:rcid:<rcid>`` at the vote date.
 
-Provider defect handled explicitly: in 56 roll calls of session 78 a few rows carry another roll
-call's description/symbol/date (misaligned rows). Such rows are kept in ``unga.votes`` flagged
-``provider_row_inconsistent`` and excluded from shares and KG statements.
+Provider defects handled explicitly (:func:`vote_cells`): (1) in 56 roll calls of 2023-24 a few rows
+carry another roll call's description/symbol/date (misaligned rows); (2) some (roll call, country)
+pairs have several rows -- COW 345 (Yugoslavia) 1999-2005 has three rows per roll call (the old seat
+"absent" twice plus FR Yugoslavia's vote), a few 2023 rows are duplicated, one 2023 row has no ccode.
+Identical duplicates collapse to one position (flagged ``duplicate_identical``); disagreeing rows give
+no position (``conflicting``, ``missing: unreliable``, all provider values listed); misaligned-only
+cells are kept flagged ``inconsistent``. Only clean cells feed shares and KG statements.
 """
 
 from __future__ import annotations
@@ -222,19 +227,33 @@ def rollcalls(v: Votes) -> tuple[dict[int, RollCall], list[bool]]:
     return out, ok
 
 
-# ----------------------------------------------------------------------------- atlas tables
+@dataclass(frozen=True)
+class VoteCell:
+    """One (roll call, country) position after provider-defect handling.
+
+    status: ``ok``; ``duplicate_identical`` (several provider rows, same position); ``conflicting``
+    (consistent rows disagree -> no position); ``inconsistent`` (only misaligned rows, see module doc).
+    Only ``ok`` / ``duplicate_identical`` cells feed shares and KG statements.
+    """
+
+    rcid: int
+    ccode: int | None
+    vote: int | None
+    rows: tuple[int, ...]  # 1-based provider rows
+    status: str
+    provider_values: tuple[int, ...]
+    country: str | None
+    countryname: str | None
+    row_unres: str | None = None
+
+    @property
+    def usable(self) -> bool:
+        return self.status in ("ok", "duplicate_identical") and self.vote in VOTE
 
 
-def _period(d: date) -> tuple[date, date]:
-    return d, d + timedelta(days=1)
-
-
-def vote_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
-              crosswalk: StateCodeCrosswalk) -> tuple[list[dict[str, Any]], dict[str, int]]:
-    from reva.atlas.tables import json_obj
-
+def vote_cells(v: Votes, ok: Sequence[bool]) -> tuple[list[VoteCell], dict[str, int]]:
     c = v.cols
-    out = []
+    groups: dict[tuple[int, int | None], list[int]] = defaultdict(list)
     stats: Counter[str] = Counter()
     for i in range(v.n):
         vote = c["vote"][i]
@@ -242,29 +261,68 @@ def vote_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_
             stats["not_member_rows_skipped"] += 1
             continue
         if vote not in VOTE:
-            stats["unknown_vote_code_rows"] += 1
+            stats["unknown_vote_code_rows_skipped"] += 1
             continue
-        rc = rcs[c["rcid"][i]]
-        d = c["date"][i] if ok[i] else rc.date
-        res = crosswalk.resolve("cow", c["ccode"][i], d)
-        flags: dict[str, Any] = {"rcid": rc.rcid, "code_resolution": res.reason, "provider_country": c["Country"][i]}
-        if not ok[i]:
+        groups[(c["rcid"][i], c["ccode"][i])].append(i)
+    cells = []
+    for (rcid, ccode), idx in groups.items():
+        good = [i for i in idx if ok[i]]
+        votes = {c["vote"][i] for i in good}
+        first = (good or idx)[0]
+        if good and len(votes) == 1:
+            status = "ok" if len(idx) == 1 else "duplicate_identical"
+            vote: int | None = c["vote"][good[0]]
+        elif good:
+            status, vote = "conflicting", None
+        else:
+            status = "inconsistent"
+            vote = c["vote"][idx[0]] if len({c["vote"][i] for i in idx}) == 1 else None
+        stats[f"cells_{status}"] += 1
+        cells.append(VoteCell(rcid, ccode, vote, tuple(i + 1 for i in idx), status,
+                              tuple(c["vote"][i] for i in idx), c["Country"][first], c["Countryname"][first],
+                              None if good else c["unres"][idx[0]]))
+    cells.sort(key=lambda x: (x.rcid, x.ccode if x.ccode is not None else -1))
+    return cells, dict(stats)
+
+
+# ----------------------------------------------------------------------------- atlas tables
+
+
+def _period(d: date) -> tuple[date, date]:
+    return d, d + timedelta(days=1)
+
+
+def vote_rows(cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha256: str,
+              crosswalk: StateCodeCrosswalk) -> list[dict[str, Any]]:
+    from reva.atlas.tables import json_obj
+
+    out = []
+    for cell in cells:
+        rc = rcs[cell.rcid]
+        res = crosswalk.resolve("cow", cell.ccode, rc.date)
+        flags: dict[str, Any] = {"rcid": rc.rcid, "code_resolution": res.reason, "provider_country": cell.country}
+        if cell.status != "ok":
+            flags["provider_status"] = cell.status
+            flags["provider_rows"] = list(cell.rows)
+            flags["provider_values"] = [VOTE.get(x, x) for x in cell.provider_values]
+        if cell.status == "inconsistent":
             flags["provider_row_inconsistent"] = ("row's description/symbol/date differ from the roll call's "
                                                  "majority metadata; excluded from shares and KG")
-            flags["row_unres"] = c["unres"][i]
-            stats["inconsistent_rows"] += 1
+            flags["row_unres"] = cell.row_unres
         if res.iso3 is None and res.label:
             flags["historical_state"] = res.label
+        value_text = VOTE[cell.vote] if cell.vote in VOTE and cell.status != "conflicting" else None
+        if value_text is None:
+            flags["missing"] = "unreliable"
         start, end = _period(rc.date)
         out.append({
             "source": ATLAS_SOURCE, "dataset": "votes", "indicator": f"vote|rcid={rc.rcid}", "concept_id": None,
-            "iso3": res.iso3, "provider_geo": f"cow:{c['ccode'][i]}", "entity_qid": None, "period_start": start,
-            "period_end": end, "value": None, "value_text": VOTE[vote], "unit": "vote position",
-            "flags": json_obj(flags), "raw_sha256": raw_sha256,
-            "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME, row=i + 1, column="vote"),
+            "iso3": res.iso3, "provider_geo": f"cow:{cell.ccode if cell.ccode is not None else 'NA'}",
+            "entity_qid": None, "period_start": start, "period_end": end, "value": None, "value_text": value_text,
+            "unit": "vote position", "flags": json_obj(flags), "raw_sha256": raw_sha256,
+            "selector": json_obj(file=VOTES_FILE_NAME, object=FRAME, row=cell.rows[0], column="vote"),
         })
-        stats[f"vote_{VOTE[vote]}"] += 1
-    return out, dict(stats)
+    return out
 
 
 def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[str, Any]]:
@@ -288,30 +346,28 @@ def rollcall_rows(rcs: Mapping[int, RollCall], *, raw_sha256: str) -> list[dict[
     return out
 
 
-def share_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
+def share_rows(cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha256: str,
                crosswalk: StateCodeCrosswalk) -> list[dict[str, Any]]:
     """Computed counts and yes-shares per (COW code, period, issue); see module docstring."""
     from reva.atlas.tables import json_obj, year_period
 
-    c = v.cols
     # votes are grouped by the state the code denotes *at the vote date* (e.g. COW 365 = USSR until
     # 1991-12-20, then RUS): one group never mixes two states.
     acc: dict[tuple[int, str | None, str | None, str, int, str], Counter[str]] = defaultdict(Counter)
     cache: dict[tuple[int, date], Any] = {}
-    for i in range(v.n):
-        vote = c["vote"][i]
-        if vote not in VOTE or not ok[i]:
+    for cell in cells:
+        if not cell.usable or cell.ccode is None:
             continue
-        rc = rcs[c["rcid"][i]]
-        k = (c["ccode"][i], rc.date)
+        rc = rcs[cell.rcid]
+        k = (cell.ccode, rc.date)
         res = cache.get(k)
         if res is None:
-            res = cache[k] = crosswalk.resolve("cow", c["ccode"][i], rc.date)
+            res = cache[k] = crosswalk.resolve("cow", cell.ccode, rc.date)
         y = rc.date.year
         for issue in (*rc.issues, "all"):
             for grain, p in (("year", y), ("decade", y // 10 * 10)):
-                acc[(c["ccode"][i], res.iso3, res.label if res.iso3 is None else None, grain, p, issue)][
-                    VOTE[vote]] += 1
+                acc[(cell.ccode, res.iso3, res.label if res.iso3 is None else None, grain, p, issue)][
+                    VOTE[cell.vote]] += 1  # type: ignore[index]
     out = []
     for (ccode, iso3, hist, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
         if grain == "year":
@@ -356,13 +412,12 @@ def share_rows(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw
 # ----------------------------------------------------------------------------- KG
 
 
-def kg_records(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw_sha256: str,
+def kg_records(cells: Sequence[VoteCell], rcs: Mapping[int, RollCall], *, raw_sha256: str,
                resolver: StateEntityResolver, issues_only: bool = False) -> tuple[list[KgEntity], list[KgStatement]]:
     """Roll-call entities + one vote statement per (state, roll call) with a yes/no/abstain position.
 
     ``issues_only`` restricts vote statements to issue-coded roll calls (smaller KG); the atlas keeps all.
     """
-    c = v.cols
     ents: list[KgEntity] = []
     stmts: list[KgStatement] = []
     for r in sorted(rcs):
@@ -389,20 +444,22 @@ def kg_records(v: Votes, rcs: Mapping[int, RollCall], ok: Sequence[bool], *, raw
                                  qualifiers={"session": rc.session, "amend": rc.amend, "para": rc.para,
                                              "importantvote": rc.important, "provider_totals": rc.totals},
                                  raw_sha256=raw_sha256, selector=sel))
-    for i in range(v.n):
-        vote = c["vote"][i]
-        if vote not in (1, 2, 3) or not ok[i]:
+    for cell in cells:
+        if not cell.usable or cell.vote not in (1, 2, 3) or cell.ccode is None:
             continue
-        rc = rcs[c["rcid"][i]]
+        rc = rcs[cell.rcid]
         if issues_only and not rc.issues:
             continue
-        subj = resolver.entity("cow", c["ccode"][i], rc.date, provider_label=c["Countryname"][i])
-        pos = VOTE[vote]
+        subj = resolver.entity("cow", cell.ccode, rc.date, provider_label=cell.countryname)
+        pos = VOTE[cell.vote]  # type: ignore[index]
+        q: dict[str, Any] = {"ccode": cell.ccode}
+        if cell.status != "ok":
+            q["provider_status"] = cell.status
         stmts.append(KgStatement(
-            key=f"{rc.rcid}:cow{c['ccode'][i]}", subject=subj, property=f"unga:voted_{pos}",
+            key=f"{rc.rcid}:cow{cell.ccode}", subject=subj, property=f"unga:voted_{pos}",
             object_qid=f"unga:rcid:{rc.rcid}", point_in_time=rc.date.isoformat(), pit_precision=11,
-            qualifiers={"ccode": c["ccode"][i]}, raw_sha256=raw_sha256,
-            selector={"file": VOTES_FILE_NAME, "object": FRAME, "row": i + 1, "column": "vote"}))
+            qualifiers=q, raw_sha256=raw_sha256,
+            selector={"file": VOTES_FILE_NAME, "object": FRAME, "row": cell.rows[0], "column": "vote"}))
     return ents, stmts
 
 
@@ -418,7 +475,7 @@ class UngaVotesConnector:
             provider="Harvard Dataverse (Voeten, Strezhnev & Bailey)", licence=RIGHTS["licence"],
             allowed_hosts=HOSTS, dataset_ids=(f"{DOI}@{DATASET_VERSION}#{VOTES_FILE_ID}",),
             field_mappings={"geo": "COW ccode", "time": "date of the roll call"}, units={"vote": "vote position"},
-            geography=("world",), time_semantics="date of each roll-call vote (1946-12 .. 2023-12)",
+            geography=("world",), time_semantics="date of each roll-call vote (1946-01 .. 2024-06)",
             lineage_family="unga_votes_voeten", cadence_seconds=90 * 86400,
             revision_strategy="pinned dataset version 33.0 and file id; md5 checked against Dataverse metadata",
             max_response_bytes=MAX_BYTES, max_pages=1, parser_version=PARSER_VERSION,
@@ -456,12 +513,13 @@ def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk, 
     sha = hashlib.sha256(raws["votes"].body).hexdigest()
     v = parse_votes(raws["votes"].body)
     rcs, ok = rollcalls(v)
-    votes, stats = vote_rows(v, rcs, ok, raw_sha256=sha, crosswalk=crosswalk)
+    cells, stats = vote_cells(v, ok)
+    votes = vote_rows(cells, rcs, raw_sha256=sha, crosswalk=crosswalk)
     resolver = StateEntityResolver(crosswalk, qid_for_iso3)
-    ents, stmts = kg_records(v, rcs, ok, raw_sha256=sha, resolver=resolver, issues_only=kg_issues_only)
+    ents, stmts = kg_records(cells, rcs, raw_sha256=sha, resolver=resolver, issues_only=kg_issues_only)
     return {
         "meta": meta, "sha": sha, "votes": votes, "rollcalls": rollcall_rows(rcs, raw_sha256=sha),
-        "shares": share_rows(v, rcs, ok, raw_sha256=sha, crosswalk=crosswalk), "stats": stats,
+        "shares": share_rows(cells, rcs, raw_sha256=sha, crosswalk=crosswalk), "stats": stats,
         "entities": ents + resolver.code_entities(), "statements": stmts, "n_rows": v.n, "n_rollcalls": len(rcs),
         "date_range": [min(r.date for r in rcs.values()).isoformat(), max(r.date for r in rcs.values()).isoformat()],
         "unresolved_state_codes": {k: sorted(x) for k, x in resolver.unresolved.items()},

@@ -331,10 +331,25 @@ class Series:
     unit: str
 
 
+#: Index scales that are not 0-1 (V-Dem v16 codebook ``scale``, checked against the observed range).
+UNBOUNDED_INDICES = frozenset({"v2x_accountability", "v2x_veracc", "v2x_diagacc", "v2x_horacc", "v2x_divparctrl"})
+INDEX_UNITS: dict[str, str] = {
+    "v2xdd_i_rf": "index 0-2",
+    "v2xdd_i_or": "index 0-2",
+    "v2xdd_i_pl": "index 0-2",
+    # codebook says "Interval, from low to high (0-1)" but v16 values reach 1.92: unit kept as the codebook
+    # words, the discrepancy is reported (docs/dev/v3_a_pol.md), nothing is rescaled.
+    "v2xdd_i_ci": "interval index (codebook: 0-1; v16 values up to 1.92)",
+    "v2xex_elecleg": "interval index (codebook: 'Interval')",
+}
+
+
 def _index_unit(var: str) -> str:
     if var in CATEGORICAL_INDICES:
         return "category code"
-    return "index 0-1"
+    if var in UNBOUNDED_INDICES:
+        return "V-Dem latent interval scale (unbounded)"
+    return INDEX_UNITS.get(var, "index 0-1")
 
 
 def plan_series(columns: Iterable[str], dataset: str) -> list[Series]:
@@ -349,13 +364,15 @@ def plan_series(columns: Iterable[str], dataset: str) -> list[Series]:
             for b in ("codelow", "codehigh"):
                 if f"{v}_{b}" in cols:
                     out.append(Series(f"{v}_{b}", v, b, _index_unit(v)))
+            if v in UNBOUNDED_INDICES and f"{v}_osp" in cols:
+                out.append(Series(f"{v}_osp", v, "osp", "index 0-1 (standard normal CDF of the latent scale)"))
     elif dataset in ("institutions", "liberties"):
         for v, kind in INSTITUTIONS if dataset == "institutions" else LIBERTIES:
             if v not in cols:
                 continue
             if kind == "C":
                 latent = v + "_osp" in cols
-                unit = "V-Dem measurement-model latent scale" if latent else "as coded (see codebook scale)"
+                unit = "V-Dem measurement-model latent scale" if latent else C_UNITS.get(v, "as coded (see codebook scale)")
                 out.append(Series(v, v, "point", unit))
                 for b in ("codelow", "codehigh"):
                     if f"{v}_{b}" in cols:
@@ -372,6 +389,9 @@ def plan_series(columns: Iterable[str], dataset: str) -> list[Series]:
         raise ValueError(f"unknown V-Dem dataset {dataset!r}")
     return out
 
+
+#: Units of C variables without an ordinal original scale (codebook "Percent").
+C_UNITS: dict[str, str] = {"v2svstterr": "%"}
 
 _PERCENT_VARS = {"v2eltrnout", "v2elvaptrn", "v2elsuffrage", "v2lgfemleg", "v2ellostsl", "v2ellovtlg", "v2elthresh",
                  "v2lgello", "v2lgelecup"}

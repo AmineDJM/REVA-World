@@ -152,3 +152,20 @@ def test_server_restatement_uses_catalog_labels() -> None:
 def test_in_question_is_accent_and_case_insensitive() -> None:
     assert in_question("senegal", Q) and in_question("SALAIRE MINIMUM", Q)
     assert not in_question("999 milliards", Q) and not in_question("", Q)
+
+
+def test_registry_catalog_prompt_stays_bounded() -> None:
+    """The real allow-lists (ATLASCORE catalog, crosswalk, KG properties) build, and the prompt shows at most
+    MAX_PROMPT_CONCEPTS concepts so a request stays under the LLM client's body cap."""
+    from reva.nl.http import LLM_MAX_REQUEST_BYTES
+    from reva.nlqa.catalog import MAX_PROMPT_CONCEPTS, build_catalog
+
+    cat = build_catalog()
+    assert len(cat.countries) >= 249 and "P37" in cat.properties
+    req = plan_request("Quel est le salaire minimum au Sénégal ?", cat, load_llm_budget())
+    view = cat.prompt_view("Quel est le salaire minimum au Sénégal ?")
+    assert view["concepts_shown"] <= MAX_PROMPT_CONCEPTS
+    assert len(req.system_prompt.encode()) + len(req.user_content.encode()) < LLM_MAX_REQUEST_BYTES // 2
+    wage = [c for c in cat.concepts if "minimum_wage" in c]
+    if wage:  # the labour catalog is loaded: its concepts rank first for this question
+        assert {c["id"] for c in view["concepts"][: len(wage)]} == set(wage)

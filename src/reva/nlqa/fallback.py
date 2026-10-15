@@ -94,6 +94,9 @@ def match_concept(question: str, catalog: QaCatalog) -> tuple[str | None, list[s
     return (winners[0], []) if len(winners) == 1 else (None, winners)
 
 
+MAX_TIED_CONCEPTS = 4
+
+
 def keyword_plan(question: str, catalog: QaCatalog) -> dict[str, Any]:
     q = fold(question)
     lang = detect_language(question)
@@ -131,6 +134,12 @@ def keyword_plan(question: str, catalog: QaCatalog) -> dict[str, Any]:
                 op(op="atlas_value", concept=concept, country=iso, year=years[0] if years else None)
         else:
             op(op="atlas_rank", concept=concept, year=years[0] if years else None, order="desc", limit=10)
+    elif ambiguous and len(ambiguous) <= MAX_TIED_CONCEPTS and countries and not _RANK_DESC.search(question):
+        # a few equally matching concepts for named countries: each is queried and named in the answer
+        for cid in ambiguous:
+            for iso in countries[:2]:
+                op(op="atlas_value", concept=cid, country=iso, year=years[0] if years else None)
+        ambiguous = []
     else:
         spans = []
         for m in _CAP_SPAN.finditer(question):
