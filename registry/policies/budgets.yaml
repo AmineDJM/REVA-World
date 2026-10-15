@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.3"
+policy_version: "budgets-1.3.4"
 daily:
-  http_requests_total: 10735
+  http_requests_total: 10981
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -25,6 +25,8 @@ per_source_daily_requests:
   constitute.service: 5
   # cow.data: requested by A-HISTECON (a_histecon.yaml)
   cow.data: 20
+  # cshapes.cran: requested by KGGEOPOL (kggeopol.yaml)
+  cshapes.cran: 8
   # factbook.json: requested by A-FACTBOOK (a_factbook.yaml), A-LAW (a_law.yaml)
   factbook.json: 900
   # fao.faostat: requested by A-FAO (a_fao.yaml)
@@ -33,6 +35,8 @@ per_source_daily_requests:
   gapminder.fasttrack: 20
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
   geonames.countryinfo: 2
+  # harvard.dataverse.unvotes: requested by KGGEOPOL (kggeopol.yaml)
+  harvard.dataverse.unvotes: 12
   # hyde.dans: requested by A-HISTECON (a_histecon.yaml)
   hyde.dans: 10
   # ilostat.rplumber: requested by A-ILO (a_ilo.yaml)
@@ -58,7 +62,9 @@ per_source_daily_requests:
   # owid.compilations: requested by A-QOL (a_qol.yaml)
   owid.compilations: 50
   # ssa.ssptw: requested by A-LAW (a_law.yaml)
-  ssa.ssptw: 10
+  ssa.ssptw: 220
+  # ucdp.downloads: requested by KGGEOPOL (kggeopol.yaml)
+  ucdp.downloads: 16
   # un.desa_ims: requested by A-UN (a_un.yaml)
   un.desa_ims: 5
   # un.sdg: requested by A-UN (a_un.yaml)

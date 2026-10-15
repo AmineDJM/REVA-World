@@ -101,3 +101,21 @@ def test_non_calendar_cells_are_not_reported_as_absent(tmp_path: Path, label: st
     # concept-level coverage must not be zero while its only source covers one country.
     assert "FIN" not in m["countries_without_value"], label
     assert cov["countries"] == cov["by_source"][0]["countries"] == 1, label
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="ATLAS-3: dossier series points (and the API's AtlasSeriesPoint) carry no unit; one concept's series can "
+    "switch currency (ILOSTAT AUT earnings: ATS 1969-1970, EUR 2000-) or source/unit across years, so the points "
+    "read as one homogeneous series",
+)
+def test_dossier_series_points_carry_their_unit(tmp_path: Path) -> None:
+    rows = [
+        {**_row("src", "ds", "IND", "AUT", date(1970, 1, 1), date(1971, 1, 1), "4590"), "unit": "ATS per month"},
+        {**_row("src", "ds", "IND", "AUT", date(2001, 1, 1), date(2002, 1, 1), "2254"), "unit": "EUR per month"},
+    ]
+    snap, store = _snapshot(tmp_path, rows, "atlas.src.ds")
+    cat = _catalog("t.c", Series("src", "ds", "IND"))
+    d = AtlasQuery(snap, store, tmp_path / "cache").dossier(cat, "AUT")
+    points = d["domains"][0]["concepts"][0]["series"]
+    assert [p.get("unit") for p in points] == ["ATS per month", "EUR per month"]

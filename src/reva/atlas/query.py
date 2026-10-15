@@ -47,8 +47,8 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from reva.atlas.catalog import Catalog, Series
-from reva.atlas.source_order import HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.snapshot import AtlasSnapshot
+from reva.atlas.source_order import HeadlineConcept, HeadlineRegistry, Operand
 from reva.atlas.tables import ATLAS_ARROW_SCHEMA, NAMESPACE, known_country_keys
 from reva.kernel.errors import IntegrityFailure, ValidationProblem
 from reva.ports.storage import ArtifactStore
@@ -537,6 +537,329 @@ class AtlasQuery:
             "non_annual_cells": int(other[0]["n"]),
         }
 
+    # ------------------------------------------------------------------ headline concepts (ATLASOPS)
+    def _resolve(
+        self, specs: Sequence[_Spec], *, iso3: str | None = None, year: int | None = None
+    ) -> dict[str, dict[tuple[str, int], dict[str, Any]]]:
+        """Per spec and (iso3, year): ranks with an eligible value, projection-only ranks, unit
+        mismatches, and the best (lowest-rank eligible) cell. One DuckDB pass for every spec."""
+        hs: list[tuple[int, int, int, str | None, bool]] = []
+        for i, sp in enumerate(specs):
+            for rank, (ser, _scale, unit, _j) in enumerate(sp.series):
+                sid = self.sid_of.get((ser.source, ser.dataset, ser.indicator))
+                if sid is not None:
+                    hs.append((i, rank, sid, unit, sp.allow_projections))
+        out: dict[str, dict[tuple[str, int], dict[str, Any]]] = {sp.key: {} for sp in specs}
+        if not hs:
+            return out
+        tbl = pa.table(
+            {
+                "ci": pa.array([h[0] for h in hs], pa.int32()),
+                "rank": pa.array([h[1] for h in hs], pa.int32()),
+                "sid": pa.array([h[2] for h in hs], pa.int32()),
+                "unit": pa.array([h[3] for h in hs], pa.string()),
+                "allow": pa.array([h[4] for h in hs], pa.bool_()),
+            }
+        )
+        where, params = ["x.iso3 IS NOT NULL", "x.year IS NOT NULL", "x.has_value"], []
+        if iso3 is not None:
+            where.append("x.iso3 = ?")
+            params.append(iso3)
+        if year is not None:
+            where.append("x.year = ?")
+            params.append(year)
+        sids = sorted({h[2] for h in hs})
+        sidf = "TRUE" if len(sids) > 64 else "x.sid IN (" + ",".join(str(x) for x in sids) + ")"
+        table = "cells" if iso3 is not None else "cells_s"
+        ok = "num AND NOT proj AND NOT bad_unit"
+        sql = f"""
+            WITH c AS (
+              SELECT h.ci, h.rank, x.iso3, x.year,
+                     ({PROJECTION_SQL} AND NOT h.allow) AS proj,
+                     (h.unit IS NOT NULL AND x.unit <> h.unit) AS bad_unit,
+                     (x.value IS NOT NULL) AS num,
+                     {{'sid': x.sid, 'value': x.value, 'value_text': x.value_text, 'unit': x.unit,
+                       'flags': x.flags, 'provider_geo': x.provider_geo, 'entity_qid': x.entity_qid,
+                       'period_start': {iso_date_sql("x.period_start")}, 'period_end': {iso_date_sql("x.period_end")},
+                       'raw_sha256': x.raw_sha256, 'selector': x.selector, 'table_sha': x.table_sha}} AS cell
+              FROM {table} x JOIN hs h ON x.sid = h.sid
+              WHERE {sidf} AND {" AND ".join(where)})
+            SELECT ci, iso3, year,
+                   list(rank ORDER BY rank) FILTER (WHERE {ok}) AS ok_ranks,
+                   list(rank ORDER BY rank) FILTER (WHERE proj) AS projected_ranks,
+                   list(rank ORDER BY rank) FILTER (WHERE bad_unit AND NOT proj) AS unit_ranks,
+                   arg_min(cell, rank) FILTER (WHERE {ok}) AS best,
+                   min(rank) FILTER (WHERE {ok}) AS best_rank
+            FROM c GROUP BY ci, iso3, year"""
+        for r in self._rows(sql, params, extra={"hs": tbl}):
+            out[specs[r.pop("ci")].key][(r["iso3"], int(r["year"]))] = r
+        return out
+
+    def _consulted(self, sp: _Spec, row: dict[str, Any] | None) -> list[dict[str, Any]]:
+        ok = set((row or {}).get("ok_ranks") or [])
+        proj = set((row or {}).get("projected_ranks") or [])
+        unit = set((row or {}).get("unit_ranks") or [])
+        best = (row or {}).get("best_rank")
+        out = []
+        for rank, (ser, _s, _u, _j) in enumerate(sp.series):
+            if (ser.source, ser.dataset, ser.indicator) not in self.sid_of:
+                st = "series_not_in_snapshot"
+            elif best is not None and rank == best:
+                st = "answered"
+            elif rank in ok:
+                st = "also_reported"
+            elif rank in proj:
+                st = "projection_only"
+            elif rank in unit:
+                st = "unit_mismatch"
+            else:
+                st = "no_value"
+            out.append({"series": ser.key, "source_rank": rank, "status": st})
+        return out
+
+    def _reported_cell(self, sp: _Spec, unit: str | None, key: tuple[str, int], row: dict[str, Any]) -> dict[str, Any]:
+        rank = int(row["best_rank"])
+        ser, scale, _u, just = sp.series[rank]
+        c = self._cell({**row["best"], "year": key[1]})
+        return {
+            "concept_id": sp.key,
+            "iso3": key[0],
+            "year": key[1],
+            "value": _scaled(c["value"], scale),
+            "unit": unit or c["unit"],
+            "method": "reported",
+            "answered_by": {
+                "series": ser.key,
+                "source": ser.source,
+                "dataset": ser.dataset,
+                "indicator": ser.indicator,
+                "source_rank": rank,
+                "justification": just,
+            },
+            "reported": {"value": c["value"], "unit": c["unit"], "scale": str(scale)},
+            "provider_geo": c["provider_geo"],
+            "period_start": c["period_start"],
+            "period_end": c["period_end"],
+            "flags": c["flags"],
+            "provenance": c["provenance"],
+            "consulted": self._consulted(sp, row),
+            "derived": None,
+        }
+
+    def _headline(
+        self, reg: HeadlineRegistry, concept_ids: Iterable[str], *, iso3: str | None = None, year: int | None = None
+    ) -> dict[str, dict[str, Any]]:
+        """Best-available headline cells (reported, else derived) per concept and (iso3, year)."""
+        concepts = [reg.concepts[c] for c in concept_ids]
+        specs: dict[str, _Spec] = {c.id: _spec_of(c) for c in concepts}
+        for c in concepts:
+            for a, b in c.derived.alternatives if c.derived else ():
+                for o in (a, b):
+                    sp = _operand_spec(o, reg)
+                    specs.setdefault(sp.key, sp)
+        res = self._resolve(list(specs.values()), iso3=iso3, year=year)
+        out: dict[str, dict[str, Any]] = {}
+        for c in concepts:
+            sp = specs[c.id]
+            rows = res[c.id]
+            cells = {k: self._reported_cell(sp, c.unit, k, r) for k, r in rows.items() if r["best_rank"] is not None}
+            if c.derived:
+                for i, (a, b) in enumerate(c.derived.alternatives):
+                    sa, sb = specs[_operand_spec(a, reg).key], specs[_operand_spec(b, reg).key]
+                    ra, rb = res[sa.key], res[sb.key]
+                    for k in sorted(set(ra) & set(rb)):
+                        if k in cells or ra[k]["best_rank"] is None or rb[k]["best_rank"] is None:
+                            continue
+                        d = self._derived_cell(reg, c, i, (a, sa), (b, sb), k, ra[k], rb[k], rows.get(k))
+                        if d is not None:
+                            cells[k] = d
+            out[c.id] = {"concept": c, "spec": sp, "cells": cells, "rows": rows}
+        return out
+
+    def _derived_cell(
+        self,
+        reg: HeadlineRegistry,
+        c: HeadlineConcept,
+        alt: int,
+        a: tuple[Operand, _Spec],
+        b: tuple[Operand, _Spec],
+        key: tuple[str, int],
+        ra: dict[str, Any],
+        rb: dict[str, Any],
+        own: dict[str, Any] | None,
+    ) -> dict[str, Any] | None:
+        assert c.derived is not None
+        unit_of = {o.concept: reg.concepts[o.concept].unit for o, _ in (a, b) if o.concept}
+        ca = self._reported_cell(a[1], unit_of.get(a[0].concept), key, ra)
+        cb = self._reported_cell(b[1], unit_of.get(b[0].concept), key, rb)
+        try:
+            va, vb = Decimal(ca["value"]), Decimal(cb["value"])
+        except InvalidOperation:  # pragma: no cover - registered values are strict decimals
+            return None
+        if c.derived.formula == "ratio":
+            if vb <= 0:
+                return None
+            v = Context(prec=DERIVED_PRECISION).divide(va, vb)
+            formula, precision = f"{a[0].label} / {b[0].label}", f"{DERIVED_PRECISION} significant digits"
+        else:
+            v, formula, precision = va - vb, f"{a[0].label} - {b[0].label}", "exact"
+        v = v * c.derived.scale
+        consulted = self._consulted(_spec_of(c), own)
+        consulted.append({"series": f"derived: {formula}", "source_rank": len(c.series), "status": "answered"})
+        return {
+            "concept_id": c.id,
+            "iso3": key[0],
+            "year": key[1],
+            "value": _dec_text(v),
+            "unit": c.unit,
+            "method": "derived",
+            "answered_by": None,
+            "reported": None,
+            "provider_geo": None,
+            "period_start": ca["period_start"],
+            "period_end": ca["period_end"],
+            "flags": {},
+            "provenance": None,
+            "consulted": consulted,
+            "derived": {
+                "formula": c.derived.formula,
+                "expression": formula,
+                "alternative": alt,
+                "precision": precision,
+                "justification": c.derived.justification,
+                "inputs": [ca, cb],
+            },
+        }
+
+    @staticmethod
+    def _answer_key(cell: dict[str, Any]) -> str:
+        return "derived" if cell["method"] == "derived" else cell["answered_by"]["series"]
+
+    def headline_map(self, reg: HeadlineRegistry, concept_id: str, year: int) -> dict[str, Any]:
+        _need_headline(reg, concept_id)
+        h = self._headline(reg, [concept_id], year=year)[concept_id]
+        cells = sorted(h["cells"].values(), key=lambda x: x["iso3"])
+        have = {x["iso3"] for x in cells}
+        without = [
+            {"iso3": k, "consulted": self._consulted(h["spec"], h["rows"].get((k, year)))}
+            for k in sorted(known_country_keys() - have)
+        ]
+        return {
+            "concept": reg.concepts[concept_id].as_dict(),
+            "year": year,
+            "values": cells,
+            "countries_with_value": len(have),
+            "countries_without_value": without,
+            "by_source": _count(self._answer_key(x) for x in cells),
+        }
+
+    def headline_series(self, reg: HeadlineRegistry, concept_id: str, iso3: str) -> dict[str, Any]:
+        _need_headline(reg, concept_id)
+        h = self._headline(reg, [concept_id], iso3=iso3)[concept_id]
+        cells = sorted(h["cells"].values(), key=lambda x: x["year"])
+        per: dict[int, list[int]] = {}
+        for (_, y), r in h["rows"].items():
+            for rank in r.get("ok_ranks") or []:
+                per.setdefault(int(rank), []).append(y)
+        by_series = []
+        for rank, (ser, _s, _u, _j) in enumerate(h["spec"].series):
+            ys = sorted(per.get(rank, []))
+            by_series.append(
+                {
+                    "series": ser.key,
+                    "source_rank": rank,
+                    "in_snapshot": (ser.source, ser.dataset, ser.indicator) in self.sid_of,
+                    "years": len(ys),
+                    "year_min": ys[0] if ys else None,
+                    "year_max": ys[-1] if ys else None,
+                    "years_answered": sum(1 for x in cells if x["answered_by"] and x["answered_by"]["series"] == ser.key),
+                }
+            )
+        return {
+            "concept": reg.concepts[concept_id].as_dict(),
+            "iso3": iso3,
+            "best": cells,
+            "by_series": by_series,
+            "derived_years": sum(1 for x in cells if x["method"] == "derived"),
+            "sources_without_data": [b["series"] for b in by_series if b["years"] == 0],
+        }
+
+    def headline_dossier(
+        self, reg: HeadlineRegistry, iso3: str, *, theme: str | None = None, include_series: bool = True
+    ) -> dict[str, Any]:
+        """Every headline concept for one country: latest best value (who answered, who was
+        consulted and had nothing) + the best annual series."""
+        concepts = sorted(reg.by_theme(theme), key=lambda c: (c.theme, c.id))
+        hs = self._headline(reg, [c.id for c in concepts], iso3=iso3) if concepts else {}
+        items, without = [], []
+        for c in concepts:
+            h = hs[c.id]
+            pts = sorted(h["cells"].values(), key=lambda x: x["year"])
+            if not pts:
+                without.append({"concept_id": c.id, "theme": c.theme, "consulted": self._consulted(h["spec"], None)})
+                continue
+            item: dict[str, Any] = {
+                "concept_id": c.id,
+                "theme": c.theme,
+                "labels": c.labels,
+                "unit": c.unit,
+                "latest": pts[-1],
+                "years": len(pts),
+                "year_min": pts[0]["year"],
+                "year_max": pts[-1]["year"],
+                "sources_used": sorted({self._answer_key(x) for x in pts}),
+            }
+            if include_series:
+                item["series"] = [
+                    {"year": x["year"], "value": x["value"], "method": x["method"], "series": self._answer_key(x)}
+                    for x in pts
+                ]
+            items.append(item)
+        return {"concepts": items, "without_data": without}
+
+    def headline_coverage(self, reg: HeadlineRegistry, theme: str | None = None) -> list[dict[str, Any]]:
+        concepts = sorted(reg.by_theme(theme), key=lambda c: (c.theme, c.id))
+        key = ("headline_coverage", theme, reg.fingerprint())
+        if key in self._memo:
+            return self._memo[key]  # type: ignore[no-any-return]
+        hs = self._headline(reg, [c.id for c in concepts]) if concepts else {}
+        out = []
+        known = known_country_keys()
+        for c in concepts:
+            cells = list(hs[c.id]["cells"].values())
+            latest: dict[str, dict[str, Any]] = {}
+            for x in cells:
+                if x["iso3"] not in latest or x["year"] > latest[x["iso3"]]["year"]:
+                    latest[x["iso3"]] = x
+            answered: dict[str, set[str]] = {}
+            for x in cells:
+                answered.setdefault(self._answer_key(x), set()).add(x["iso3"])
+            years = [x["year"] for x in cells]
+            out.append(
+                {
+                    "concept_id": c.id,
+                    "theme": c.theme,
+                    "countries": len(latest),
+                    "cells": len(cells),
+                    "year_min": min(years) if years else None,
+                    "year_max": max(years) if years else None,
+                    "derived_cells": sum(1 for x in cells if x["method"] == "derived"),
+                    "latest_year_answered_by": _count(self._answer_key(x) for x in latest.values()),
+                    "countries_answered_by": {k: len(v) for k, v in sorted(answered.items())},
+                    "series_in_snapshot": [
+                        s.key for s in c.series if (s.series.source, s.series.dataset, s.series.indicator) in self.sid_of
+                    ],
+                    "series_not_in_snapshot": [
+                        s.key
+                        for s in c.series
+                        if (s.series.source, s.series.dataset, s.series.indicator) not in self.sid_of
+                    ],
+                    "countries_without_value": sorted(known - set(latest)),
+                }
+            )
+        self._memo[key] = out
+        return out
+
 
 # --------------------------------------------------------------------------- headline concepts (ATLASOPS)
 #: A cell is a projection when its provider says so: WEO/ILO-style estimate_kind, a truthy
@@ -610,6 +933,18 @@ def _series_table(series: list[tuple[Any, ...]]) -> tuple[pa.Table, list[str]]:
 def _need(catalog: Catalog, concept_id: str) -> None:
     if concept_id not in catalog.concepts:
         raise ValidationProblem("unknown atlas concept", concept=concept_id[:200])
+
+
+def _need_headline(reg: HeadlineRegistry, concept_id: str) -> None:
+    if concept_id not in reg.concepts:
+        raise ValidationProblem("unknown headline concept", concept=concept_id[:200])
+
+
+def _count(keys: Iterable[str]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for k in keys:
+        out[k] = out.get(k, 0) + 1
+    return dict(sorted(out.items()))
 
 
 def _count_by(cells: list[dict[str, Any]], key: str) -> dict[str, int]:

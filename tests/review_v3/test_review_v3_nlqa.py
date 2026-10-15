@@ -183,3 +183,23 @@ def test_bce_atlas_cell_year() -> None:
     c = F.cell(*UNE_SRC, "ITA", 2000, "1", "%", F.RAW_ILO, UNE)
     bce = type(c)(**{**c.__dict__, "period_start": "-0043-01-01", "period_end": "-0042-01-01"})
     assert bce.year == -43
+
+
+@pytest.mark.xfail(
+    strict=True,
+    reason="ASK-1: op_atlas_series labels a whole series with its first point's unit; ILOSTAT's Austrian mean "
+    "earnings switch from ATS (1969-1970) to EUR (2000-) inside one series, so EUR values are printed as ATS",
+)
+def test_series_sentence_never_labels_mixed_currencies_with_one_unit() -> None:
+    ind = "EAR_INEE_NOC_NB|cur=LCU"
+    cells = [
+        F.cell("ilo", "ilostat_mw", ind, "AUT", 1970, "4590", "ATS per month", F.RAW_ILO, MW),
+        F.cell("ilo", "ilostat_mw", ind, "AUT", 2001, "2254", "EUR per month", F.RAW_ILO, MW),
+    ]
+    _, c = _run(
+        "Austria monthly wage series",
+        [{"id": "s1", "op": "atlas_series", "concept": MW, "country": "AUT"}],
+        cells,
+    )
+    text = " ".join(_facts(c))
+    assert "(ATS per month)" not in text, text
