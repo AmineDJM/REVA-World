@@ -1,9 +1,12 @@
-# V3 (agent A-LAW): CIA World Factbook country profiles as JSON (factbook/factbook.json, CC0 mirror of
-# the public-domain Factbook; the CIA discontinued the Factbook in February 2026). Fetched per country
-# file from raw.githubusercontent.com at a pinned commit. Atlas connector:
-# src/reva/adapters/connectors/atlas_factbook.py (legal system, suffrage, constitution text fields).
+# V3: CIA World Factbook country profiles as JSON (factbook/factbook.json, CC0 mirror of the public-domain
+# Factbook; the CIA ended the Factbook on 2026-02-04). Fetched per entity file from raw.githubusercontent.com
+# at pinned mirror commits. One connector module, owned by agent A-FACTBOOK (created by A-LAW for the legal
+# fields, merged 2026-10-15): src/reva/adapters/connectors/atlas_factbook.py
+#   atlas.factbook          -> atlas.factbook.legal_2026_01 (A-LAW's legal fields), figures_2026_01, texts_2026_01
+#   atlas.factbook_disputes -> atlas.factbook.disputes_2024_04 ("Disputes - international", last edition with it)
+# Coverage report: docs/dev/v3_a_factbook.md.
 source_key: factbook.json
-title: CIA World Factbook country profiles (factbook.json mirror, final editions)
+title: CIA World Factbook country profiles (factbook/factbook.json mirror, final editions)
 provider_url: https://github.com/factbook/factbook.json
 lineage_family: cia_world_factbook
 rights:
@@ -13,7 +16,12 @@ rights:
 metadata:
   allowed_hosts: [raw.githubusercontent.com]
   authentication: none
-  cadence: none (discontinued February 2026); pinned mirror commit
+  cadence: none (discontinued 2026-02-04, cia.gov story "Spotlighting The World Factbook as We Bid a Fond Farewell"); pinned mirror commits
+  commits:
+    profiles: 144d6977b2b01ac1cbd220de754c0a005616760b  # data identical to 783ed27, auto-update 2026-01-22 (last data update)
+    disputes: b1e7065ada45922848799b55393ced060cefdf92  # auto-update 2024-04-18, last edition with "Disputes - international"
+  entities: 261 (every state plus Taiwan, Kosovo, Western Sahara, dependencies, Antarctica, EU, World, 5 oceans)
   editorial_status: >-
-    Short descriptive texts written by the Factbook editors; not legal sources. The edition date of
-    each profile is not recorded in the mirror; REVA records the mirror commit.
+    US-government (CIA) compilation and estimates of various years, not official national statistics; texts are
+    the Factbook editors' wording (US view, e.g. on disputed territories). The mirror is a third-party copy: the
+    mirror commit and each file's last-change date are recorded; the CIA's own per-page dates are not in it.

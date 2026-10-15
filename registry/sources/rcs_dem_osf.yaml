@@ -1,0 +1,27 @@
+# V3 atlas (agent A-SOCIETY): Religious Characteristics of States - Demographics v2.0 (RCS-Dem 2.0), OSF.
+# Connector: src/reva/adapters/connectors/atlas_society_religion.py (atlas.rcs_dem -> atlas table rcs.dem2).
+source_key: rcs_dem.osf
+title: Religious Characteristics of States Dataset Project - Demographics v. 2.0 (RCS-Dem 2.0), countries only
+provider_url: https://doi.org/10.17605/OSF.IO/7SR4M
+lineage_family: rcs_dem
+rights:
+  licence: "No licence declared (OSF node_license null); ARDA usage agreement: attribution and responsible use"
+  licence_status: usage_agreement_attribution
+  terms_url: https://osf.io/download/6c3xq/
+  attribution: >-
+    The data were downloaded from the Association of Religion Data Archives (www.theARDA.com) and the Open Science
+    Framework (doi:10.17605/OSF.IO/7SR4M), and were collected by Davis Brown and Patrick James.
+metadata:
+  allowed_hosts: [api.osf.io, osf.io, files.osf.io, storage.googleapis.com]
+  open_licence: false
+  redistribution: >-
+    The usage agreement (archived with every run) asks for acknowledgement of ARDA and the principal investigators
+    and "responsible use"; it has no non-commercial or no-redistribution clause. Not an open licence: flagged for
+    maintainer review.
+  files:
+    - https://api.osf.io/v2/nodes/7sr4m/  # node record (title, node_license must stay null)
+    - https://api.osf.io/v2/nodes/7sr4m/files/osfstorage/?page%5Bsize%5D=100  # listing with sha256 per file
+    - https://osf.io/download/6c3xq/  # Usage Agreement.txt
+    - https://osf.io/download/asg25/  # COUNTRIES ONLY.XLSX (40 MB, sha256 438831b2...), redirects to Google Cloud Storage
+  authentication: none
+  cadence: irregular (v2.0 released 2019; quarterly check)

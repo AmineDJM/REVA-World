@@ -1,0 +1,389 @@
+# Provider geography schemes of the society & culture atlas tables (agent A-SOCIETY).
+# Every alias is either an exact crosswalk label match or a listed name match with its evidence. Units that do
+# not denote a crosswalk entity stay unmapped (kept, listed in each table's manifest coverage.unmapped_provider_geo).
+schemes:
+  # HIEF country names (HIEF_data.csv, Harvard Dataverse doi:10.7910/DVN/4JQRCL V2, MD5 8bdaacb5a44f691863f5ad78fd0bdf76).
+  # Not here on purpose: units whose referent changes over 1945-2013 are mapped by year window in
+  # src/reva/adapters/connectors/atlas_society_frac.py (HIEF_WINDOWS): Democratic Republic of Vietnam, German Federal Republic, Yemen Arab Republic, Serbia.
+  # Unmapped (historical states / not a crosswalk entity): Czechoslovakia, German Democratic Republic, Republic of Vietnam, USSR, Yemen PDR, Yugoslavia, Taiwan.
+  soc_hief:
+    aliases:
+      - {code: "Afghanistan", iso3: AFG, source: "HIEF name = crosswalk label"}
+      - {code: "Albania", iso3: ALB, source: "HIEF name = crosswalk label"}
+      - {code: "Algeria", iso3: DZA, source: "HIEF name = crosswalk label"}
+      - {code: "Angola", iso3: AGO, source: "HIEF name = crosswalk label"}
+      - {code: "Argentina", iso3: ARG, source: "HIEF name = crosswalk label"}
+      - {code: "Armenia", iso3: ARM, source: "HIEF name = crosswalk label"}
+      - {code: "Australia", iso3: AUS, source: "HIEF name = crosswalk label"}
+      - {code: "Austria", iso3: AUT, source: "HIEF name = crosswalk label"}
+      - {code: "Azerbaijan", iso3: AZE, source: "HIEF name = crosswalk label"}
+      - {code: "Bahrain", iso3: BHR, source: "HIEF name = crosswalk label"}
+      - {code: "Bangladesh", iso3: BGD, source: "HIEF name = crosswalk label"}
+      - {code: "Belarus", iso3: BLR, source: "HIEF name = crosswalk label"}
+      - {code: "Belgium", iso3: BEL, source: "HIEF name = crosswalk label"}
+      - {code: "Benin", iso3: BEN, source: "HIEF name = crosswalk label"}
+      - {code: "Bhutan", iso3: BTN, source: "HIEF name = crosswalk label"}
+      - {code: "Bolivia", iso3: BOL, source: "HIEF name; crosswalk label Bolivia (Plurinational State of)"}
+      - {code: "Bosnia-Herzegovina", iso3: BIH, source: "HIEF name; crosswalk label Bosnia and Herzegovina"}
+      - {code: "Botswana", iso3: BWA, source: "HIEF name = crosswalk label"}
+      - {code: "Brazil", iso3: BRA, source: "HIEF name = crosswalk label"}
+      - {code: "Bulgaria", iso3: BGR, source: "HIEF name = crosswalk label"}
+      - {code: "Burkina Faso", iso3: BFA, source: "HIEF name = crosswalk label"}
+      - {code: "Burundi", iso3: BDI, source: "HIEF name = crosswalk label"}
+      - {code: "Cambodia", iso3: KHM, source: "HIEF name = crosswalk label"}
+      - {code: "Canada", iso3: CAN, source: "HIEF name = crosswalk label"}
+      - {code: "Cape Verde", iso3: CPV, source: "HIEF name; crosswalk label Cabo Verde"}
+      - {code: "Central African Republic", iso3: CAF, source: "HIEF name = crosswalk label"}
+      - {code: "Chad", iso3: TCD, source: "HIEF name = crosswalk label"}
+      - {code: "Chile", iso3: CHL, source: "HIEF name = crosswalk label"}
+      - {code: "China", iso3: CHN, source: "HIEF name = crosswalk label"}
+      - {code: "Colombia", iso3: COL, source: "HIEF name = crosswalk label"}
+      - {code: "Comoros", iso3: COM, source: "HIEF name = crosswalk label"}
+      - {code: "Congo", iso3: COG, source: "HIEF name = crosswalk label"}
+      - {code: "Costa Rica", iso3: CRI, source: "HIEF name = crosswalk label"}
+      - {code: "Cote d'Ivoire", iso3: CIV, source: "HIEF name; crosswalk label Côte d’Ivoire"}
+      - {code: "Croatia", iso3: HRV, source: "HIEF name = crosswalk label"}
+      - {code: "Cuba", iso3: CUB, source: "HIEF name = crosswalk label"}
+      - {code: "Cyprus", iso3: CYP, source: "HIEF name = crosswalk label"}
+      - {code: "Czech Republic", iso3: CZE, source: "HIEF name; crosswalk label Czechia"}
+      - {code: "Democratic People's Republic of Korea", iso3: PRK, source: "HIEF name = crosswalk label"}
+      - {code: "Democratic Republic of Congo", iso3: COD, source: "HIEF name; crosswalk label Democratic Republic of the Congo"}
+      - {code: "Denmark", iso3: DNK, source: "HIEF name = crosswalk label"}
+      - {code: "Djibouti", iso3: DJI, source: "HIEF name = crosswalk label"}
+      - {code: "Dominican Republic", iso3: DOM, source: "HIEF name = crosswalk label"}
+      - {code: "East Timor", iso3: TLS, source: "HIEF name; crosswalk label Timor-Leste"}
+      - {code: "Ecuador", iso3: ECU, source: "HIEF name = crosswalk label"}
+      - {code: "Egypt", iso3: EGY, source: "HIEF name = crosswalk label"}
+      - {code: "El Salvador", iso3: SLV, source: "HIEF name = crosswalk label"}
+      - {code: "Eritrea", iso3: ERI, source: "HIEF name = crosswalk label"}
+      - {code: "Estonia", iso3: EST, source: "HIEF name = crosswalk label"}
+      - {code: "Ethiopia", iso3: ETH, source: "HIEF name = crosswalk label"}
+      - {code: "Fiji", iso3: FJI, source: "HIEF name = crosswalk label"}
+      - {code: "Finland", iso3: FIN, source: "HIEF name = crosswalk label"}
+      - {code: "Gabon", iso3: GAB, source: "HIEF name = crosswalk label"}
+      - {code: "Gambia", iso3: GMB, source: "HIEF name = crosswalk label"}
+      - {code: "Georgia", iso3: GEO, source: "HIEF name = crosswalk label"}
+      - {code: "Ghana", iso3: GHA, source: "HIEF name = crosswalk label"}
+      - {code: "Greece", iso3: GRC, source: "HIEF name = crosswalk label"}
+      - {code: "Guatemala", iso3: GTM, source: "HIEF name = crosswalk label"}
+      - {code: "Guinea", iso3: GIN, source: "HIEF name = crosswalk label"}
+      - {code: "Guinea-Bissau", iso3: GNB, source: "HIEF name = crosswalk label"}
+      - {code: "Guyana", iso3: GUY, source: "HIEF name = crosswalk label"}
+      - {code: "Haiti", iso3: HTI, source: "HIEF name = crosswalk label"}
+      - {code: "Honduras", iso3: HND, source: "HIEF name = crosswalk label"}
+      - {code: "Hungary", iso3: HUN, source: "HIEF name = crosswalk label"}
+      - {code: "Indonesia", iso3: IDN, source: "HIEF name = crosswalk label"}
+      - {code: "Iran", iso3: IRN, source: "HIEF name; crosswalk label Iran (Islamic Republic of)"}
+      - {code: "Iraq", iso3: IRQ, source: "HIEF name = crosswalk label"}
+      - {code: "Ireland", iso3: IRL, source: "HIEF name = crosswalk label"}
+      - {code: "Israel", iso3: ISR, source: "HIEF name = crosswalk label"}
+      - {code: "Italy", iso3: ITA, source: "HIEF name = crosswalk label"}
+      - {code: "Jamaica", iso3: JAM, source: "HIEF name = crosswalk label"}
+      - {code: "Japan", iso3: JPN, source: "HIEF name = crosswalk label"}
+      - {code: "Jordan", iso3: JOR, source: "HIEF name = crosswalk label"}
+      - {code: "Kazakhstan", iso3: KAZ, source: "HIEF name = crosswalk label"}
+      - {code: "Kenya", iso3: KEN, source: "HIEF name = crosswalk label"}
+      - {code: "Kuwait", iso3: KWT, source: "HIEF name = crosswalk label"}
+      - {code: "Kyrgyz Republic", iso3: KGZ, source: "HIEF name; crosswalk label Kyrgyzstan"}
+      - {code: "Laos", iso3: LAO, source: "HIEF name; crosswalk label Lao People's Democratic Republic"}
+      - {code: "Latvia", iso3: LVA, source: "HIEF name = crosswalk label"}
+      - {code: "Lebanon", iso3: LBN, source: "HIEF name = crosswalk label"}
+      - {code: "Lesotho", iso3: LSO, source: "HIEF name = crosswalk label"}
+      - {code: "Liberia", iso3: LBR, source: "HIEF name = crosswalk label"}
+      - {code: "Libya", iso3: LBY, source: "HIEF name = crosswalk label"}
+      - {code: "Lithuania", iso3: LTU, source: "HIEF name = crosswalk label"}
+      - {code: "Macedonia", iso3: MKD, source: "HIEF name; crosswalk label North Macedonia"}
+      - {code: "Madagascar", iso3: MDG, source: "HIEF name = crosswalk label"}
+      - {code: "Malawi", iso3: MWI, source: "HIEF name = crosswalk label"}
+      - {code: "Malaysia", iso3: MYS, source: "HIEF name = crosswalk label"}
+      - {code: "Mali", iso3: MLI, source: "HIEF name = crosswalk label"}
+      - {code: "Mauritania", iso3: MRT, source: "HIEF name = crosswalk label"}
+      - {code: "Mauritius", iso3: MUS, source: "HIEF name = crosswalk label"}
+      - {code: "Mexico", iso3: MEX, source: "HIEF name = crosswalk label"}
+      - {code: "Moldova", iso3: MDA, source: "HIEF name; crosswalk label Republic of Moldova"}
+      - {code: "Mongolia", iso3: MNG, source: "HIEF name = crosswalk label"}
+      - {code: "Morocco", iso3: MAR, source: "HIEF name = crosswalk label"}
+      - {code: "Myanmar", iso3: MMR, source: "HIEF name = crosswalk label"}
+      - {code: "Namibia", iso3: NAM, source: "HIEF name = crosswalk label"}
+      - {code: "Nepal", iso3: NPL, source: "HIEF name = crosswalk label"}
+      - {code: "Netherlands", iso3: NLD, source: "HIEF name; crosswalk label Netherlands (Kingdom of the)"}
+      - {code: "New Zealand", iso3: NZL, source: "HIEF name = crosswalk label"}
+      - {code: "Nicaragua", iso3: NIC, source: "HIEF name = crosswalk label"}
+      - {code: "Niger", iso3: NER, source: "HIEF name = crosswalk label"}
+      - {code: "Nigeria", iso3: NGA, source: "HIEF name = crosswalk label"}
+      - {code: "Norway", iso3: NOR, source: "HIEF name = crosswalk label"}
+      - {code: "Oman", iso3: OMN, source: "HIEF name = crosswalk label"}
+      - {code: "Pakistan", iso3: PAK, source: "HIEF name = crosswalk label"}
+      - {code: "Panama", iso3: PAN, source: "HIEF name = crosswalk label"}
+      - {code: "Paraguay", iso3: PRY, source: "HIEF name = crosswalk label"}
+      - {code: "Peru", iso3: PER, source: "HIEF name = crosswalk label"}
+      - {code: "Philippines", iso3: PHL, source: "HIEF name = crosswalk label"}
+      - {code: "Poland", iso3: POL, source: "HIEF name = crosswalk label"}
+      - {code: "Portugal", iso3: PRT, source: "HIEF name = crosswalk label"}
+      - {code: "Qatar", iso3: QAT, source: "HIEF name = crosswalk label"}
+      - {code: "Republic of Korea", iso3: KOR, source: "HIEF name = crosswalk label"}
+      - {code: "Romania", iso3: ROU, source: "HIEF name = crosswalk label"}
+      - {code: "Russia", iso3: RUS, source: "HIEF name; crosswalk label Russian Federation"}
+      - {code: "Rwanda", iso3: RWA, source: "HIEF name = crosswalk label"}
+      - {code: "Saudi Arabia", iso3: SAU, source: "HIEF name = crosswalk label"}
+      - {code: "Senegal", iso3: SEN, source: "HIEF name = crosswalk label"}
+      - {code: "Sierra Leone", iso3: SLE, source: "HIEF name = crosswalk label"}
+      - {code: "Singapore", iso3: SGP, source: "HIEF name = crosswalk label"}
+      - {code: "Slovakia", iso3: SVK, source: "HIEF name = crosswalk label"}
+      - {code: "Slovenia", iso3: SVN, source: "HIEF name = crosswalk label"}
+      - {code: "Solomon Islands", iso3: SLB, source: "HIEF name = crosswalk label"}
+      - {code: "Somalia", iso3: SOM, source: "HIEF name = crosswalk label"}
+      - {code: "South Africa", iso3: ZAF, source: "HIEF name = crosswalk label"}
+      - {code: "Spain", iso3: ESP, source: "HIEF name = crosswalk label"}
+      - {code: "Sri Lanka", iso3: LKA, source: "HIEF name = crosswalk label"}
+      - {code: "Sudan", iso3: SDN, source: "HIEF name = crosswalk label"}
+      - {code: "Swaziland", iso3: SWZ, source: "HIEF name; crosswalk label Eswatini"}
+      - {code: "Sweden", iso3: SWE, source: "HIEF name = crosswalk label"}
+      - {code: "Switzerland", iso3: CHE, source: "HIEF name = crosswalk label"}
+      - {code: "Syria", iso3: SYR, source: "HIEF name; crosswalk label Syrian Arab Republic"}
+      - {code: "Tajikistan", iso3: TJK, source: "HIEF name = crosswalk label"}
+      - {code: "Tanzania", iso3: TZA, source: "HIEF name; crosswalk label United Republic of Tanzania"}
+      - {code: "Thailand", iso3: THA, source: "HIEF name = crosswalk label"}
+      - {code: "Togo", iso3: TGO, source: "HIEF name = crosswalk label"}
+      - {code: "Trinidad and Tobago", iso3: TTO, source: "HIEF name = crosswalk label"}
+      - {code: "Tunisia", iso3: TUN, source: "HIEF name = crosswalk label"}
+      - {code: "Turkey", iso3: TUR, source: "HIEF name; crosswalk label Türkiye"}
+      - {code: "Turkmenistan", iso3: TKM, source: "HIEF name = crosswalk label"}
+      - {code: "Uganda", iso3: UGA, source: "HIEF name = crosswalk label"}
+      - {code: "Ukraine", iso3: UKR, source: "HIEF name = crosswalk label"}
+      - {code: "United Arab Emirates", iso3: ARE, source: "HIEF name = crosswalk label"}
+      - {code: "United Kingdom", iso3: GBR, source: "HIEF name; crosswalk label United Kingdom of Great Britain and Northern Ireland"}
+      - {code: "United States of America", iso3: USA, source: "HIEF name = crosswalk label"}
+      - {code: "Uruguay", iso3: URY, source: "HIEF name = crosswalk label"}
+      - {code: "Uzbekistan", iso3: UZB, source: "HIEF name = crosswalk label"}
+      - {code: "Venezuela", iso3: VEN, source: "HIEF name; crosswalk label Venezuela (Bolivarian Republic of)"}
+      - {code: "Zambia", iso3: ZMB, source: "HIEF name = crosswalk label"}
+      - {code: "Zimbabwe", iso3: ZWE, source: "HIEF name = crosswalk label"}
+    source: {kind: provider_data, url: "https://dataverse.harvard.edu/api/access/datafile/3476857?format=original", md5: 8bdaacb5a44f691863f5ad78fd0bdf76}
+
+  # CDPD country names (CDPD version 1 June 2024.xlsx, Harvard Dataverse doi:10.7910/DVN/LI3WYK, MD5 fd4d028b91ba3e6b10570b5c6e34ae29).
+  # CDPD covers 'currently existing independent states since 1800' and splits predecessor states into their own units.
+  # Unmapped (historical states / not a crosswalk entity): CZECHOSLOVAKIA, GERMANY EAST, GERMANY WEST, KOREA, TAIWAN, USSR, VIETNAM NORTH, VIETNAM SOUTH, YEMEN ARAB REPUBLIC, YEMEN PEOPLE REPUBLIC, YUGOSLAVIA.
+  soc_cdpd:
+    aliases:
+      - {code: "AFGHANISTAN", iso3: AFG, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ALBANIA", iso3: ALB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ALGERIA", iso3: DZA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ANDORRA", iso3: AND, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ANGOLA", iso3: AGO, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ANTIGUA", iso3: ATG, source: "CDPD name; crosswalk label Antigua and Barbuda"}
+      - {code: "ARGENTINA", iso3: ARG, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ARMENIA", iso3: ARM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "AUSTRALIA", iso3: AUS, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "AUSTRIA", iso3: AUT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "AZERBAIJAN", iso3: AZE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BAHAMAS", iso3: BHS, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BAHRAIN", iso3: BHR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BANGLADESH", iso3: BGD, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BARBADOS", iso3: BRB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BELARUS", iso3: BLR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BELGIUM", iso3: BEL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BELIZE", iso3: BLZ, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BENIN", iso3: BEN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BHUTAN", iso3: BTN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BOLIVIA", iso3: BOL, source: "CDPD name; crosswalk label Bolivia (Plurinational State of)"}
+      - {code: "BOSNIA", iso3: BIH, source: "CDPD name; crosswalk label Bosnia and Herzegovina"}
+      - {code: "BOTSWANA", iso3: BWA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BRAZIL", iso3: BRA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BRUNEI", iso3: BRN, source: "CDPD name; crosswalk label Brunei Darussalam"}
+      - {code: "BULGARIA", iso3: BGR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BURKINA FASO", iso3: BFA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "BURUNDI", iso3: BDI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CAMBODIA", iso3: KHM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CAMEROON", iso3: CMR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CANADA", iso3: CAN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CAPE VERDE IS.", iso3: CPV, source: "CDPD name; crosswalk label Cabo Verde"}
+      - {code: "CENTRAL AFR.R.", iso3: CAF, source: "CDPD name; crosswalk label Central African Republic"}
+      - {code: "CHAD", iso3: TCD, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CHILE", iso3: CHL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CHINA", iso3: CHN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "COLOMBIA", iso3: COL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "COMOROS", iso3: COM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "COSTA RICA", iso3: CRI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "COTE D'IVOIRE", iso3: CIV, source: "CDPD name; crosswalk label Côte d’Ivoire"}
+      - {code: "CROATIA", iso3: HRV, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CUBA", iso3: CUB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CYPRUS", iso3: CYP, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "CZECH REPUBLIC", iso3: CZE, source: "CDPD name; crosswalk label Czechia"}
+      - {code: "DEMOCRATIC REPUBLIC OF CONGO", iso3: COD, source: "CDPD name; crosswalk label Democratic Republic of the Congo"}
+      - {code: "DENMARK", iso3: DNK, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "DJIBOUTI", iso3: DJI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "DOMINICA", iso3: DMA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "DOMINICAN REP.", iso3: DOM, source: "CDPD name; crosswalk label Dominican Republic"}
+      - {code: "EAST TIMOR", iso3: TLS, source: "CDPD name; crosswalk label Timor-Leste"}
+      - {code: "ECUADOR", iso3: ECU, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "EGYPT", iso3: EGY, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "EL SALVADOR", iso3: SLV, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "EQUATORIAL G", iso3: GNQ, source: "CDPD name; crosswalk label Equatorial Guinea"}
+      - {code: "ERITREA", iso3: ERI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ESTONIA", iso3: EST, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ESWATINI", iso3: SWZ, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ETHIOPIA", iso3: ETH, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ETHIOPIA  (INCL. ERIT)", iso3: ETH, source: "CDPD name; crosswalk label Ethiopia; CDPD unit for Ethiopia 1952-1992 while it included Eritrea (CDPD unit ETHIOPIA covers 1855-1951 and 1993-2022); same sovereign state"}
+      - {code: "FIJI", iso3: FJI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "FINLAND", iso3: FIN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "FRANCE", iso3: FRA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GABON", iso3: GAB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GAMBIA", iso3: GMB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GEORGIA", iso3: GEO, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GERMANY", iso3: DEU, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GHANA", iso3: GHA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GREECE", iso3: GRC, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GRENADA", iso3: GRD, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GUATEMALA", iso3: GTM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GUINEA", iso3: GIN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "GUINEA-BISS", iso3: GNB, source: "CDPD name; crosswalk label Guinea-Bissau"}
+      - {code: "GUYANA", iso3: GUY, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "HAITI", iso3: HTI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "HONDURAS", iso3: HND, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "HUNGARY", iso3: HUN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ICELAND", iso3: ISL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "INDIA", iso3: IND, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "INDONESIA", iso3: IDN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "IRAN", iso3: IRN, source: "CDPD name; crosswalk label Iran (Islamic Republic of)"}
+      - {code: "IRAQ", iso3: IRQ, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "IRELAND", iso3: IRL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ISRAEL", iso3: ISR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ITALY", iso3: ITA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "JAMAICA", iso3: JAM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "JAPAN", iso3: JPN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "JORDAN", iso3: JOR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "KAZAKHSTAN", iso3: KAZ, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "KENYA", iso3: KEN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "KIRIBATI", iso3: KIR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "KOREA NORTH", iso3: PRK, source: "CDPD name; crosswalk label Democratic People's Republic of Korea"}
+      - {code: "KOREA SOUTH", iso3: KOR, source: "CDPD name; crosswalk label Republic of Korea"}
+      - {code: "KUWAIT", iso3: KWT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "KYRGYZTAN", iso3: KGZ, source: "CDPD name; crosswalk label Kyrgyzstan; provider spelling of Kyrgyzstan"}
+      - {code: "LAOS", iso3: LAO, source: "CDPD name; crosswalk label Lao People's Democratic Republic"}
+      - {code: "LATVIA", iso3: LVA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LEBANON", iso3: LBN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LESOTHO", iso3: LSO, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LIBERIA", iso3: LBR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LIBYA", iso3: LBY, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LIECHTENSTEIN", iso3: LIE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LITHUANIA", iso3: LTU, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "LUXEMBOURG", iso3: LUX, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MADAGASCAR", iso3: MDG, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MALAWI", iso3: MWI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MALAYSIA", iso3: MYS, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MALDIVES", iso3: MDV, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MALI", iso3: MLI, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MALTA", iso3: MLT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MARSHALL ISL", iso3: MHL, source: "CDPD name; crosswalk label Marshall Islands"}
+      - {code: "MAURITANIA", iso3: MRT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MAURITIUS", iso3: MUS, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MEXICO", iso3: MEX, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MICRONESIA", iso3: FSM, source: "CDPD name; crosswalk label Micronesia (Federated States of)"}
+      - {code: "MOLDOVA", iso3: MDA, source: "CDPD name; crosswalk label Republic of Moldova"}
+      - {code: "MONACO", iso3: MCO, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MONGOLIA", iso3: MNG, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MONTENEGRO", iso3: MNE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MOROCCO", iso3: MAR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MOZAMBIQUE", iso3: MOZ, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "MYANMAR", iso3: MMR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NAMIBIA", iso3: NAM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NAURU", iso3: NRU, source: "CDPD name; crosswalk label Naoero; crosswalk label Naoero"}
+      - {code: "NEPAL", iso3: NPL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NETHERLANDS", iso3: NLD, source: "CDPD name; crosswalk label Netherlands (Kingdom of the)"}
+      - {code: "NEW ZEALAND", iso3: NZL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NICARAGUA", iso3: NIC, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NIGER", iso3: NER, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NIGERIA", iso3: NGA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NORHT MACEDONIA", iso3: MKD, source: "CDPD name; crosswalk label North Macedonia; provider spelling of North Macedonia"}
+      - {code: "NORTH MACEDONIA", iso3: MKD, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "NORWAY", iso3: NOR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "OMAN", iso3: OMN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PAKISTAN", iso3: PAK, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PAKISTAN  (INCL. BANGLAD", iso3: PAK, source: "CDPD name; crosswalk label Pakistan; CDPD unit for Pakistan 1947-1971 while it included East Pakistan (Bangladesh); same sovereign state"}
+      - {code: "PALAU", iso3: PLW, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PANAMA", iso3: PAN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PAPUA N.GUINEA", iso3: PNG, source: "CDPD name; crosswalk label Papua New Guinea"}
+      - {code: "PARAGUAY", iso3: PRY, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PERU", iso3: PER, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PHILIPPINES", iso3: PHL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "POLAND", iso3: POL, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "PORTUGAL", iso3: PRT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "QATAR", iso3: QAT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "REPUBLIC OF CONGO", iso3: COG, source: "CDPD name; crosswalk label Congo"}
+      - {code: "ROMANIA", iso3: ROU, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "RUSSIA", iso3: RUS, source: "CDPD name; crosswalk label Russian Federation; CDPD unit RUSSIA covers 1800-1921 and 1992-2022 (USSR is a separate CDPD unit 1922-1991)"}
+      - {code: "RWANDA", iso3: RWA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SAMOA", iso3: WSM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SAN MARINO", iso3: SMR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SAO TOME", iso3: STP, source: "CDPD name; crosswalk label Sao Tome and Principe"}
+      - {code: "SAUDI ARABIA", iso3: SAU, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SENEGAL", iso3: SEN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SERBIA", iso3: SRB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SEYCHELLES", iso3: SYC, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SIERRA LEONE", iso3: SLE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SINGAPORE", iso3: SGP, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SLOVAK REPUBLIC", iso3: SVK, source: "CDPD name; crosswalk label Slovakia"}
+      - {code: "SLOVENIA", iso3: SVN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SOLOMON IS.", iso3: SLB, source: "CDPD name; crosswalk label Solomon Islands"}
+      - {code: "SOMALIA", iso3: SOM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SOUTH AFRICA", iso3: ZAF, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SOUTH SUDAN", iso3: SSD, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SPAIN", iso3: ESP, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SRI LANKA", iso3: LKA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ST.KITTS&NEVIS", iso3: KNA, source: "CDPD name; crosswalk label Saint Kitts and Nevis"}
+      - {code: "ST.LUCIA", iso3: LCA, source: "CDPD name; crosswalk label Saint Lucia"}
+      - {code: "ST.VINCENT&GRE", iso3: VCT, source: "CDPD name; crosswalk label Saint Vincent and the Grenadines"}
+      - {code: "SUDAN", iso3: SDN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SURINAME", iso3: SUR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SWEDEN", iso3: SWE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SWITZERLAND", iso3: CHE, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "SYRIA", iso3: SYR, source: "CDPD name; crosswalk label Syrian Arab Republic"}
+      - {code: "TAJIKISTAN", iso3: TJK, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TANZANIA", iso3: TZA, source: "CDPD name; crosswalk label United Republic of Tanzania"}
+      - {code: "THAILAND", iso3: THA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TOGO", iso3: TGO, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TONGA", iso3: TON, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TRINIDAD&TOBAGO", iso3: TTO, source: "CDPD name; crosswalk label Trinidad and Tobago"}
+      - {code: "TUNISIA", iso3: TUN, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TURKEY", iso3: TUR, source: "CDPD name; crosswalk label Türkiye"}
+      - {code: "TURKMENISTAN", iso3: TKM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "TUVALU", iso3: TUV, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "UGANDA", iso3: UGA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "UKRAINE", iso3: UKR, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "UNITED ARAB E.", iso3: ARE, source: "CDPD name; crosswalk label United Arab Emirates"}
+      - {code: "UNITED KINGDOM", iso3: GBR, source: "CDPD name; crosswalk label United Kingdom of Great Britain and Northern Ireland"}
+      - {code: "UNITED STATES OF AMERICA", iso3: USA, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "URUGUAY", iso3: URY, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "UZBEKISTAN", iso3: UZB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "VANUATU", iso3: VUT, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "VENEZUELA", iso3: VEN, source: "CDPD name; crosswalk label Venezuela (Bolivarian Republic of)"}
+      - {code: "VIETNAM", iso3: VNM, source: "CDPD name; crosswalk label Viet Nam; CDPD unit VIETNAM covers 1976-2022 (VIETNAM NORTH / SOUTH are separate units)"}
+      - {code: "YEMEN", iso3: YEM, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ZAMBIA", iso3: ZMB, source: "CDPD name = crosswalk label (case-insensitive)"}
+      - {code: "ZIMBABWE", iso3: ZWE, source: "CDPD name = crosswalk label (case-insensitive)"}
+    source: {kind: provider_data, url: "https://dataverse.harvard.edu/api/access/datafile/10251764", md5: fd4d028b91ba3e6b10570b5c6e34ae29}
+
+  # SSCP fractionalisation iso_num (ISO 3166 numeric, sscp_fractionalisation_extension.csv, doi:10.7910/DVN/EVCQXC,
+  # MD5 a905a3d5f9bff1705357b68717916219). Unmapped: 158 Taiwan, 896 "Vietnam, North", 530 and 891 (rows without a
+  # name; ISO numeric of the dissolved Netherlands Antilles and Serbia and Montenegro).
+  soc_sscp:
+    base: m49
+    aliases:
+      - {code: "689", iso3: XKX, source: "SSCP row '689,Kosovo,in_scope,347,KOS,...' (SSCP's own numeric code for Kosovo; README_project: SGS case list)"}
+      - {code: "830", iso3: CHI, source: "SSCP row '830,Channel Islands,opportunistic,...' (ISO 3166 numeric 830 = Channel Islands, crosswalk CHI)"}
+    source: {kind: provider_data, url: "https://dataverse.harvard.edu/api/access/datafile/14330927?format=original", md5: a905a3d5f9bff1705357b68717916219}
+
+  # Transparency International CPI ISO3 column (CPI2025_Results.xlsx). TWN (Taiwan) stays unmapped.
+  soc_ti:
+    base: iso3
+    aliases:
+      - {code: KSV, iso3: XKX, source: "CPI2025_Results.xlsx sheet 'CPI Historical': 'Kosovo' carries ISO3 'KSV' (non-ISO, World Bank code)"}
+    source: {kind: provider_data, url: "https://images.transparencycdn.org/images/CPI2025_Results.xlsx"}
+
+  # OECD SDMX REF_AREA of the SIGI / GID-DB 2023 dataflows. Aggregates W, A, E, F, S, OECD, EU, G7, G20 and TWN stay unmapped.
+  soc_oecd:
+    base: iso3
+    aliases:
+      - {code: XKV, iso3: XKX, source: "OECD SDMX DSD_SIGI@DF_SIGI_2023 csvfilewithlabels: REF_AREA 'XKV' labelled 'Kosovo'"}
+    source: {kind: provider_data, url: "https://sdmx.oecd.org/public/rest/data/OECD.DEV.NPG,DSD_SIGI@DF_SIGI_2023,1.0/all?format=csvfilewithlabels"}

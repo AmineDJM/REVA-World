@@ -225,6 +225,9 @@ RCS_CODE_VARS = {
     "MAJID": "ID code of religion of majority of population (50% plus one)",
     "SUPID": "ID code of religion of supermajority of population (66 2/3% or greater)",
 }
+#: RCS units without an ISO3 in the file that denote a crosswalk entity (evidence: RCS codebook Appendix A /
+#: the ABBREV field; COW state number 347 = Kosovo).
+RCS_ALIASES: dict[str, str] = {"347": "XKX"}
 RCS_REQUIRED = ("CCODE", "ABBREV", "YEAR", "ISO3", "INDEP", *RCS_CODE_VARS, *RCS_EXTRA)
 
 
@@ -318,7 +321,6 @@ def parse_rcs(body: bytes, *, raw_sha256: str, min_rows: int = RCS_MIN_ROWS) -> 
     pc_units = {v: "%" for v in pcs}
     var_units = {**pc_units, **RCS_EXTRA}
     cols = [(v, hdr[v], var_units[v]) for v in (*pcs, *RCS_EXTRA)]
-    file_sel = RCS_XLSX_NAME
     for rnum, cells in rows:
 
         def text(col: str, cells: dict[int, Any] = cells) -> str | None:
@@ -336,7 +338,7 @@ def parse_rcs(body: bytes, *, raw_sha256: str, min_rows: int = RCS_MIN_ROWS) -> 
         seen.add((ccode, year))
         rep["unit_years"] += 1
         abbrev, iso_txt, indep = text("ABBREV"), text("ISO3"), text("INDEP")
-        iso3 = crosswalk_key(iso_txt)
+        iso3 = crosswalk_key(iso_txt) or RCS_ALIASES.get(ccode)
         if iso3 is None:
             unmapped[ccode] = f"{abbrev}|iso3={iso_txt}"
         flags = canon({"rcs_abbrev": abbrev, "rcs_iso3": iso_txt, "independent_dec31": indep})
@@ -347,7 +349,7 @@ def parse_rcs(body: bytes, *, raw_sha256: str, min_rows: int = RCS_MIN_ROWS) -> 
                 rep["blank_cells"] += 1
                 continue
             v = num(c.text)
-            sel = canon(file=file_sel, sheet=RCS_SHEET, row=rnum, column=var)
+            sel = canon(sheet=RCS_SHEET, row=rnum, column=var)
             if v is None:
                 buf.add(
                     indicator=var, provider_geo=ccode, period=period, value=None, value_text=c.text[:4000],
@@ -374,7 +376,7 @@ def parse_rcs(body: bytes, *, raw_sha256: str, min_rows: int = RCS_MIN_ROWS) -> 
                 f = canon(json.loads(flags), undocumented_code=True)
             buf.add(
                 indicator=var, provider_geo=ccode, period=period, value=v, value_text=label, unit="code",
-                flags=f, raw_sha256=raw_sha256, selector=canon(file=file_sel, sheet=RCS_SHEET, row=rnum, column=var),
+                flags=f, raw_sha256=raw_sha256, selector=canon(sheet=RCS_SHEET, row=rnum, column=var),
                 iso3=iso3, concept_id=hints.get(var),
             )  # fmt: skip
     if rep["unit_years"] < min_rows:

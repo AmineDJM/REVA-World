@@ -1,11 +1,11 @@
 # CIA World Factbook concepts (agent A-FACTBOOK). Provider-declared, not human-reviewed.
 # Tables: atlas.factbook.figures_2026_01 / texts_2026_01 / disputes_2024_04, built by
-# src/reva/adapters/connectors/atlas_factbook_profiles.py (sources atlas.factbook_profiles, atlas.factbook_disputes).
+# src/reva/adapters/connectors/atlas_factbook.py (sources atlas.factbook, atlas.factbook_disputes).
 # Every numeric cell is a US-government estimate (flags.estimate = true) with the Factbook's own stated year as
 # period; never an official national statistic. Shares (language/religion/ethnic group/trade partner) and land
 # borders per neighbour are in figures_2026_01 as families of indicators ('language_share|name=<name>',
 # 'land_boundary|partner=<name>'), without catalog concepts (one series per name). Legal texts (legal system,
-# suffrage, constitution, citizenship) are A-LAW's concepts in law.yaml (atlas.factbook.legal_2026_01).
+# suffrage, constitution, citizenship) are A-LAW's concepts in law.yaml (atlas.factbook.legal_2026_01, same connector).
 domain: factbook
 labels:
   fr: CIA World Factbook (comblement des lacunes)

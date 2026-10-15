@@ -1,0 +1,21 @@
+# V3 atlas (agent A-SOCIETY): ParlGov stable release 2024, Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_society_gov.py (atlas.parlgov -> atlas table parlgov.elections).
+source_key: parlgov.dataverse
+title: ParlGov -- Parliaments and governments database (Döring & Manow), stable release 2024
+provider_url: https://doi.org/10.7910/DVN/2VZ5ZC
+lineage_family: parlgov
+rights:
+  licence: CC0-1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Döring, Holger and Philip Manow. 2024. Parliaments and governments database (ParlGov): Information on parties,
+    elections and cabinets in established democracies. Stable version 2024, Harvard Dataverse doi:10.7910/DVN/2VZ5ZC.
+  licence_evidence: Dataverse dataset record license.name = "CC0 1.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/2VZ5ZC
+    - https://dataverse.harvard.edu/api/access/datafile/10437092?format=original  # view_election.csv (MD5 ee737ba6...)
+  coverage: 37 EU/OECD democracies, national parliament and European Parliament elections since 1900
+  authentication: none
+  cadence: irregular (stable releases ~yearly)

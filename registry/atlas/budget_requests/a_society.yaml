@@ -1,0 +1,61 @@
+# Budget request from agent A-SOCIETY (society & culture atlas). ATLASCORE merges into registry/policies/budgets.yaml.
+# Every source is a bulk download (whole dataset per request). Format: docs/dev/v3_atlas_interface.md section 5.
+agent: A-SOCIETY
+requests:
+  - source_key: rcs_dem.osf
+    # api.osf.io node record + file listing (sha256), osf.io usage agreement (1 KB), RCS-Dem 2.0 XLSX (40 MB;
+    # osf.io -> files.osf.io -> storage.googleapis.com redirects). Not an open licence (ARDA usage agreement): flagged.
+    daily_requests: 12
+    expected_bytes_per_day: 85000000
+    reason: "RCS-Dem 2.0: 4 requests / ~40 MB per run; quarterly cadence, 2 runs/day headroom for a retry"
+  - source_key: hief.dataverse
+    # dataverse.harvard.edu record + HIEF_data.csv (0.2 MB; 303 redirect to dvn-cloud-iqss.s3.amazonaws.com). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 1000000
+    reason: "HIEF: 2 requests per run"
+  - source_key: sscp.dataverse
+    # record + sscp_fractionalisation_extension.csv (25 KB) + README_frac.txt (13 KB). CC BY 4.0.
+    daily_requests: 9
+    expected_bytes_per_day: 500000
+    reason: "SSCP fractionalisation: 3 requests per run"
+  - source_key: cdpd.dataverse
+    # record + CDPD version 1 June 2024.xlsx (0.9 MB). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 3000000
+    reason: "CDPD: 2 requests per run"
+  - source_key: parlgov.dataverse
+    # record + view_election.csv (1.1 MB). CC0.
+    daily_requests: 6
+    expected_bytes_per_day: 4000000
+    reason: "ParlGov 2024: 2 requests per run"
+  - source_key: ti.cpi
+    # www.transparency.org/en/cpi/2025 (licence statement, 0.3 MB) + CPI2025_Results.xlsx (3 MB; 307 -> files.transparencycdn.org).
+    daily_requests: 6
+    expected_bytes_per_day: 8000000
+    reason: "TI CPI: 2 requests per run; annual cadence"
+  # Shared keys (already in budgets.yaml): requested increase on top of the owners' use.
+  - source_key: cow.data
+    # A-SOCIETY atlas.wrp: WRP_national.csv (0.9 MB) + countrycode tarball (0.5 MB, cran.r-project.org) = 2 requests.
+    daily_requests: 26
+    expected_bytes_per_day: 33000000
+    reason: "A-HISTECON's 20/day + 6 for the World Religion Project (2 requests per run)"
+  - source_key: who.gho
+    # A-SOCIETY atlas.who_violence: indicator list (~3 MB) + VIOLENCE_HOMICIDERATE + VIOLENCE_HOMICIDENUM = 3 requests.
+    daily_requests: 129
+    expected_bytes_per_day: 365000000
+    reason: "A-HEALTHEDU's 120/day + 9 for the WHO homicide estimates (3 requests per run, ~12 MB)"
+  - source_key: oecd.sdmx
+    # A-SOCIETY atlas.oecd_sigi: DSD_SIGI@DF_SIGI_2023 (0.2 MB) + DSD_GID@DF_GID_2023 (4 MB) csvfilewithlabels = 2 requests.
+    daily_requests: 56
+    expected_bytes_per_day: 92000000
+    reason: "A-TRADE/A-ILO request (50/day) + 6 for OECD SIGI 2023 (2 requests per run)"
+daily_totals_increase:
+  http_requests_total: "+66"
+  http_bytes_total: "+130_000_000"
+notes: >-
+  Skipped for licence reasons (no request needed): Pew Research Center religious composition (terms forbid
+  republishing in principal part), World Religion Database (proprietary), UNODC dataUNODC (UN copyright, written
+  permission), World Prison Brief (no reuse terms, no bulk file), Amnesty (CC BY-NC-ND), ITU DataHub and UN Tourism
+  (copies in WDI / SDG ingested by A-WB / A-UN), International IDEA (non-commercial), Freedom House (non-commercial;
+  commercial use needs approval), RSF (reproduction and database extraction prohibited), CLEA (registration terms).
+  See docs/dev/v3_a_society.md.

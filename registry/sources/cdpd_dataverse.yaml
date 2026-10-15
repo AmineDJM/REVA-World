@@ -1,0 +1,21 @@
+# V3 atlas (agent A-SOCIETY): Comparative Death Penalty Database (CDPD) v1, Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_society_justice.py (atlas.cdpd -> atlas table cdpd.cdpd_v1).
+source_key: cdpd.dataverse
+title: Comparative Death Penalty Database (CDPD) -- Anckar & Denk
+provider_url: https://doi.org/10.7910/DVN/LI3WYK
+lineage_family: cdpd
+rights:
+  licence: CC0-1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Anckar, Carsten and Denk, Thomas. 2024. Introducing Comparative Death Penalty Database. European Political
+    Science, doi:10.1057/s41304-024-00491-8. Data: Harvard Dataverse doi:10.7910/DVN/LI3WYK.
+  licence_evidence: Dataverse dataset record license.name = "CC0 1.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/LI3WYK
+    - https://dataverse.harvard.edu/api/access/datafile/10251764  # CDPD version 1 June 2024.xlsx (MD5 fd4d028b...)
+  upstream_lineages: [amnesty_international_annual_reports, hood_hoyle_2015]
+  authentication: none
+  cadence: irregular ("the ambition is to update the database regularly")

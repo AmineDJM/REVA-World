@@ -1,0 +1,24 @@
+# V3 atlas (agent A-SOCIETY): Transparency International Corruption Perceptions Index (CPI).
+# Connector: src/reva/adapters/connectors/atlas_society_gov.py (atlas.ti_cpi -> atlas table ti.cpi).
+source_key: ti.cpi
+title: Transparency International -- Corruption Perceptions Index (results workbook, 2012-2025)
+provider_url: https://www.transparency.org/en/cpi/2025
+lineage_family: ti_cpi
+rights:
+  licence: CC-BY-ND-4.0
+  licence_url: https://creativecommons.org/licenses/by-nd/4.0/
+  licence_evidence: >-
+    https://www.transparency.org/en/cpi/2025 footer "Except where otherwise noted, this work is licensed under
+    CC BY-ND 4.0" (page archived with every run, read 2026-10-15)
+  attribution: Corruption Perceptions Index 2025 by Transparency International, licensed under CC BY-ND 4.0
+metadata:
+  allowed_hosts: [www.transparency.org, images.transparencycdn.org, files.transparencycdn.org]
+  no_derivatives: >-
+    Values are kept exactly as published (no rescaling, rounding, imputation or recomputation); the long-format
+    layout is a format change (CC BY-ND 4.0 s.2(a)(4)). The third-party source scores in the workbook are not
+    ingested (proprietary data of EIU, PRS, S&P Global, etc.).
+  files:
+    - https://www.transparency.org/en/cpi/2025
+    - https://images.transparencycdn.org/images/CPI2025_Results.xlsx  # 307 -> files.transparencycdn.org
+  authentication: none
+  cadence: annual (February)

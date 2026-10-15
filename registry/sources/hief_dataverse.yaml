@@ -1,0 +1,19 @@
+# V3 atlas (agent A-SOCIETY): Historical Index of Ethnic Fractionalization (HIEF), Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_society_frac.py (atlas.hief -> atlas table hief.hief).
+source_key: hief.dataverse
+title: Historical Index of Ethnic Fractionalization Dataset (HIEF) -- Lenka Drazanova
+provider_url: https://doi.org/10.7910/DVN/4JQRCL
+lineage_family: hief
+rights:
+  licence: CC0-1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: "Drazanova, Lenka (2019). Historical Index of Ethnic Fractionalization Dataset (HIEF). Harvard Dataverse, doi:10.7910/DVN/4JQRCL."
+  licence_evidence: Dataverse dataset record license.name = "CC0 1.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/4JQRCL
+    - https://dataverse.harvard.edu/api/access/datafile/3476857?format=original  # HIEF_data.csv (MD5 8bdaacb5a44f691863f5ad78fd0bdf76)
+  upstream_lineages: [cline_center_creg]
+  authentication: none
+  cadence: irregular (V2 2020)

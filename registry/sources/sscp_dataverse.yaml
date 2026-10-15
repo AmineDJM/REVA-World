@@ -1,0 +1,23 @@
+# V3 atlas (agent A-SOCIETY): Small State Coverage Project (SSCP) Fractionalisation v1.0, Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_society_frac.py (atlas.sscp_frac -> atlas table sscp.frac_v1).
+source_key: sscp.dataverse
+title: Small State Coverage Project (SSCP) -- Fractionalisation (extends Alesina et al. 2003)
+provider_url: https://doi.org/10.7910/DVN/EVCQXC
+lineage_family: sscp
+rights:
+  licence: CC-BY-4.0
+  licence_url: http://creativecommons.org/licenses/by/4.0
+  attribution: >-
+    Gordon, E. R. 2026. Small State Coverage Project (SSCP): Fractionalisation. v1.0. Harvard Dataverse,
+    doi:10.7910/DVN/EVCQXC. Base: Alesina, Devleeschauwer, Easterly, Kurlat & Wacziarg (2003), Fractionalization,
+    Journal of Economic Growth 8(2):155-194; religion: Brown & James (2019), RCS-Dem 2.0.
+  licence_evidence: Dataverse dataset record license.name = "CC BY 4.0" (API read 2026-10-15)
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/EVCQXC
+    - https://dataverse.harvard.edu/api/access/datafile/14330927?format=original  # sscp_fractionalisation_extension.csv
+    - https://dataverse.harvard.edu/api/access/datafile/14330926  # README_frac.txt (period rules)
+  upstream_lineages: [alesina_2003, cia_world_factbook, britannica_2014, minority_rights_wdm, rcs_dem]
+  authentication: none
+  cadence: irregular (v1.0 2026-10-13; extended over time)
