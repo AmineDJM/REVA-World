@@ -117,7 +117,8 @@ def _acquisition(spec: Any, request: str, keys: list[str], values: dict[str, str
     """One synthetic WDI-shaped acquisition (request fingerprint ``request``) with one observation per key,
     in the given key order."""
     vals = {k: (values if isinstance(values, str) else values[k]) for k in keys}
-    body = json.dumps({"lockfix": request, "rows": vals}, sort_keys=True).encode()
+    rows = [{"suffix": k, "value": v} for k, v in vals.items()]  # each raw_selector resolves to one row
+    body = json.dumps({"lockfix": request, "rows": rows}, sort_keys=True).encode()
     item = FetchItem(key=f"lockfix:{request}", url=f"https://api.worldbank.org/v2/lockfix/{request}",
                      max_bytes=50_000_000)
     raw = RawAcquisition(item=item, body=body, media_type="application/json", retrieved_at=datetime.now(UTC),
@@ -129,7 +130,7 @@ def _acquisition(spec: Any, request: str, keys: list[str], values: dict[str, str
             support=support, logical_key=k,
             value={"kind": "decimal", "value": vals[k], "unit_ref": "unit.persons", "basis": {"scale_factor": "1"}},
             uncertainty=UncertaintySpec.unknown("synthetic lock test value"),
-            source_flags={"lockfix": request}, raw_selector={"match": {"suffix": k}},
+            source_flags={"lockfix": tag}, raw_selector={"match": {"suffix": k}},
         )
         for k in keys
     )
@@ -185,7 +186,8 @@ def test_ten_thousand_observations_hold_a_bounded_number_of_locks(db: Any) -> No
         raise _Rollback
 
     with pytest.raises(_Rollback):
-        _publish(db, spec, raw, batches, post_publish=probe)
+        summary = _publish(db, spec, raw, batches, post_publish=probe)
+        pytest.fail(f"not published (quarantined?): {summary}")
     assert seen["inserted"] == n
     assert 0 < seen["lineage"] <= LINEAGE_LOCK_BUCKETS
     # every advisory lock of the transaction: the lineage buckets + evidence write lock + acquisition
@@ -285,7 +287,7 @@ def test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock(db: Any
 
     def writer(w: str) -> None:
         try:
-            raw, batches = _acquisition(spec, f"order-{run}-{w}", orders[w], w + "1", tag=run)
+            raw, batches = _acquisition(spec, f"order-{run}-{w}", orders[w], str("abcd".index(w) + 1), tag=run)
             barrier.wait(10)
             out[w] = _publish(db, spec, raw, batches)
         except Exception as e:  # deadlock_detected / lock timeout would land here
@@ -297,7 +299,7 @@ def test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock(db: Any
     for t in ts:
         t.join(120)
     assert not [k for k in out if k.endswith("_error")], out
-    assert all(out[w].inserted == len(orders[w]) for w in "abcd")
+    assert all(out[w].inserted == len(orders[w]) for w in "abcd"), out
     with db.worker.connect() as c:
         revs = c.execute(text(
             """SELECT logical_key, array_agg(revision_no ORDER BY revision_no) FROM evidence.observation
@@ -309,34 +311,52 @@ def test_overlapping_acquisitions_in_opposite_key_orders_do_not_deadlock(db: Any
 
 
 # --------------------------------------------------------------------------- other sources: no contention
-def test_large_acquisition_does_not_block_another_source(db: Any) -> None:
-    """Buckets are namespaced by (source, origin): while a 1,000-key acquisition of source A is open,
-    an acquisition of source B with the *same* logical keys commits without waiting."""
+def test_large_acquisition_does_not_block_another_source(db: Any, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Buckets are namespaced by (source, origin): while a 1,000-key acquisition of source A holds its
+    bucket locks, an acquisition of source B with the *same* logical keys commits without waiting.
+
+    A is paused right after taking its buckets (before it touches shared rows such as the support or
+    the ``belief:<concept>`` dirty node, which serialise same-concept ingests independently of these
+    locks; see docs/dev/lock_bounds.md)."""
+    import reva.evidence.ingest as ingest
+
     spec_a, spec_b = _spec(db, "ns-a"), _spec(db, "ns-b")
+    sid_a = _source_id(db, spec_a)
     run = uuid.uuid4().hex[:8]
     keys = [f"lockfix:{run}:k:{i:04d}" for i in range(1000)]
     inside, release = threading.Event(), threading.Event()
     result: dict[str, Any] = {}
+    original = ingest.lock_lineages
 
-    def hold(conn: Any, summary: Any) -> None:
-        inside.set()
-        assert release.wait(30)
+    def pausing_lock(conn: Any, source_id: Any, origin: str, logical_keys: Any) -> int:
+        n = original(conn, source_id, origin, logical_keys)
+        if source_id == sid_a and n > 1:
+            result["a_buckets"] = n
+            inside.set()
+            assert release.wait(30)
+        return n
+
+    monkeypatch.setattr(ingest, "lock_lineages", pausing_lock)
 
     def writer_a() -> None:
-        raw, batches = _acquisition(spec_a, f"ns-{run}-a", keys, "1", tag=run)
-        result["a"] = _publish(db, spec_a, raw, batches, post_publish=hold)
+        try:
+            raw, batches = _acquisition(spec_a, f"ns-{run}-a", keys, "1", tag=f"{run}-a")
+            result["a"] = _publish(db, spec_a, raw, batches)
+        except Exception as e:  # pragma: no cover - reported below
+            result["a_error"] = e
 
     t = threading.Thread(target=writer_a)
     t.start()
     try:
-        assert inside.wait(60), "writer A did not reach its publication transaction"
-        raw, batches = _acquisition(spec_b, f"ns-{run}-b", keys, "2", tag=run)
+        assert inside.wait(60), "writer A did not take its bucket locks"
+        raw, batches = _acquisition(spec_b, f"ns-{run}-b", keys, "2", tag=f"{run}-b")
         started = time.monotonic()
         summary_b = _publish(db, spec_b, raw, batches)
         assert summary_b.inserted == len(keys)
-        assert t.is_alive() and "a" not in result  # A was still open the whole time
+        assert t.is_alive() and "a" not in result  # A still held every one of its buckets
         assert time.monotonic() - started < 30
     finally:
         release.set()
         t.join(60)
-    assert result["a"].inserted == len(keys)
+    assert "a_error" not in result, result.get("a_error")
+    assert result["a"].inserted == len(keys) and result["a_buckets"] <= LINEAGE_LOCK_BUCKETS
