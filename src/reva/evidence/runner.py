@@ -13,7 +13,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal
 
 from sqlalchemy import Engine, text
 
@@ -27,7 +27,7 @@ from reva.adapters.http.safe_client import (
 from reva.evidence.ingest import publish_acquisition
 from reva.kernel.errors import RevaError, SourceResponseError
 from reva.kernel.ids import sha256_bytes
-from reva.ports.connectors import Cursor, FetchBudget, FetchOutcome, QualityReport
+from reva.ports.connectors import Cursor, FetchBudget, FetchOutcome, Finding, QualityReport
 from reva.ports.storage import ArtifactStore
 
 log = logging.getLogger("reva.runner")
@@ -248,8 +248,8 @@ async def run_connector(
                 reports: list[QualityReport] = [connector.validate(b) for b in batches]
             except SourceResponseError as e:
                 batches, reports = [], [
-                    QualityReport(outcome="quarantine", findings=({"code": e.details.get("kind", "parse_error"),
-                                                                   "severity": "blocker", "message": e.message},))
+                    QualityReport(outcome="quarantine", findings=(Finding(
+                        code=str(e.details.get("kind", "parse_error")), severity="blocker", message=e.message),))
                 ]
             except (KeyError, IndexError, TypeError, ValueError, AttributeError, ArithmeticError) as e:
                 # Row-level schema drift (a missing/renamed field, an unexpected type) in
@@ -257,9 +257,9 @@ async def run_connector(
                 log.warning("connector %s item %s: row-level schema drift: %s", spec.name, item.key,
                             type(e).__name__)
                 batches, reports = [], [
-                    QualityReport(outcome="quarantine", findings=(
-                        {"code": "row_schema_drift", "severity": "blocker",
-                         "message": f"parser failed on a row ({type(e).__name__}: {str(e)[:200]})"},))
+                    QualityReport(outcome="quarantine", findings=(Finding(
+                        code="row_schema_drift", severity="blocker",
+                        message=f"parser failed on a row ({type(e).__name__}: {str(e)[:200]})"),))
                 ]
             for b in batches:
                 queue.extend(b.follow_up)
@@ -275,8 +275,9 @@ async def run_connector(
             report.inserted += summary.inserted
             report.unchanged += summary.unchanged
             report.relations += summary.relations
-            status = "quarantined" if summary.namespace == "quarantine" else (
-                "published" if (summary.inserted or not summary.duplicate_acquisition) else "unchanged")
+            status: Literal["published", "unchanged", "quarantined", "failed"] = (
+                "quarantined" if summary.namespace == "quarantine" else (
+                    "published" if (summary.inserted or not summary.duplicate_acquisition) else "unchanged"))
             report.outcomes.append(FetchOutcome(item_key=item.key, status=status, raw_sha256=summary.raw_sha256))
         except RevaError as e:
             log.warning("connector %s item %s failed: %s", spec.name, item.key, e.message)

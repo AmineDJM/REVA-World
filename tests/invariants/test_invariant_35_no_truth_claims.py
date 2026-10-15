@@ -27,8 +27,9 @@ NEGATION = re.compile(r"\b(not|no|never|cannot|can't|nothing|neither|nor|without
 
 def _user_facing_files() -> list[Path]:
     files = [REPO / "README.md", *sorted((REPO / "docs").glob("*.md"))]
-    files += sorted(p for p in (REPO / "ui" / "src").rglob("*") if p.suffix in (".ts", ".tsx")
-                    and "test" not in p.parts)
+    files += sorted(
+        p for p in (REPO / "ui" / "src").rglob("*") if p.suffix in (".ts", ".tsx") and "test" not in p.parts
+    )
     files += sorted(p for p in (REPO / "src" / "reva").rglob("*.py") if "__pycache__" not in p.parts)
     return [f for f in files if f.exists()]
 

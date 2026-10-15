@@ -1,16 +1,24 @@
 """Child process of the trusted-template sandbox. Reviewed code only.
 
-Reads one JSON request on stdin: a declarative manifest for the approved
-``eurostat_jsonstat`` template and captured fixture bodies (read-only inputs).
-Network is blocked: every socket connect and name resolution is refused (V1
-replays captured bytes; the allowlist is reported, never widened). The process
-runs with a scrubbed environment and OS resource limits set by the parent. It
-never imports code named by a proposal: the only executed connector code is the
-reviewed template module.
+First action: apply the OS resource limits given as ``--limits`` (no
+``preexec_fn`` in the parent). Then read one JSON request on stdin: a
+declarative manifest for the approved ``eurostat_jsonstat`` template and
+captured fixture bodies (read-only inputs).
+
+Before installing the Python-level network guard the child *probes* real
+reachability with the raw ``_socket`` module (a listener the parent opened on
+127.0.0.1, and a public IP). ``network_mode`` is ``blocked_verified`` only if
+both attempts fail (e.g. under a network namespace); otherwise it is
+``python_guard_only``, which is not a security boundary. The guard then refuses
+connect/sendto/name resolution on both ``socket`` and ``_socket`` (V1 replays
+captured bytes; the allowlist is reported, never widened). It never imports
+code named by a proposal: the only executed connector code is the reviewed
+template module.
 """
 
 from __future__ import annotations
 
+import _socket
 import asyncio
 import base64
 import json
@@ -22,15 +30,88 @@ from typing import Any
 from urllib.parse import urlsplit
 
 
+PUBLIC_PROBE = ("1.1.1.1", 443)
+_RAW_SOCKET = _socket.socket
+
+
+def _apply_limits(argv: list[str]) -> dict[str, Any]:
+    """Lower this process's own rlimits before doing anything else."""
+    import resource
+
+    if "--limits" not in argv:
+        return {"applied": False, "reason": "no limits given"}
+    lim = json.loads(argv[argv.index("--limits") + 1])
+    pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
+             "fsize": resource.RLIMIT_FSIZE}
+    for k, r in pairs.items():
+        v = int(lim.get(k, 0))
+        if v > 0:
+            resource.setrlimit(r, (v, v))
+    return {"applied": True, **{k: resource.getrlimit(r) for k, r in pairs.items()}}
+
+
+def _raw_connect(addr: tuple[str, int], timeout: float = 0.5) -> str:
+    s = _RAW_SOCKET(_socket.AF_INET, _socket.SOCK_STREAM)
+    try:
+        s.settimeout(timeout)
+        s.connect(addr)
+        return "connected"
+    except OSError as e:
+        return f"failed: {type(e).__name__}: {getattr(e, 'errno', '')}"
+    finally:
+        s.close()
+
+
+def _probe_isolation(req: dict[str, Any]) -> dict[str, Any]:
+    """Measured (not nominal) isolation facts, gathered before the Python guard is installed."""
+    port = req.get("probe_port")
+    loop = _raw_connect(("127.0.0.1", int(port))) if port else "not_probed"
+    public = _raw_connect(PUBLIC_PROBE)
+    verified = loop.startswith("failed") and public.startswith("failed")
+    try:
+        with open(f"/proc/{os.getppid()}/environ", "rb") as f:
+            environ_readable = len(f.read(1)) >= 0
+    except OSError:
+        environ_readable = False
+    same_uid = os.getuid() == req.get("parent_uid")
+    if req.get("namespaces"):
+        process = "user+pid+net namespaces (unshare); parent /proc not visible"
+    elif same_uid:
+        process = "none (same uid)"
+    else:
+        process = "different uid"
+    return {
+        "network_probe_raw": {"loopback_listener": loop, "public_ip": public},
+        "network_mode": "blocked_verified" if verified else "python_guard_only",
+        "parent_environ_readable": environ_readable,
+        "process_isolation": process,
+    }
+
+
 def _block_network(allowlist: list[str]) -> None:
     def refuse(*a: Any, **k: Any) -> Any:
         raise PermissionError(f"network is blocked in the trusted-template sandbox (allowlist {allowlist}, "
                               "replay only)")
 
-    socket.socket.connect = refuse  # type: ignore[method-assign]
-    socket.socket.connect_ex = refuse  # type: ignore[method-assign]
+    blocked_families = {_socket.AF_INET, _socket.AF_INET6, getattr(_socket, "AF_PACKET", -2), -1}
+
+    class _RefusingSocket(_RAW_SOCKET):  # type: ignore[misc, valid-type]
+        # socket.socket.__init__ calls ``_socket.socket.__init__`` through the module
+        # attribute, so this also guards sockets created via the ``socket`` module.
+        # Wrapping an existing fd (socketpair, used by asyncio's self-pipe) and
+        # process-local AF_UNIX sockets stay possible.
+        def __init__(self, family: int = -1, type: int = -1, proto: int = -1, fileno: Any = None) -> None:
+            if fileno is None and family in blocked_families:
+                refuse()
+            _RAW_SOCKET.__init__(self, family, type, proto, fileno)
+
+    for name in ("connect", "connect_ex", "sendto", "sendmsg", "bind"):
+        setattr(socket.socket, name, refuse)
     socket.create_connection = refuse  # type: ignore[assignment]
     socket.getaddrinfo = refuse  # type: ignore[assignment]
+    _socket.socket = _RefusingSocket  # type: ignore[misc]
+    _socket.getaddrinfo = refuse  # type: ignore[attr-defined]
+    # socketpair (AF_UNIX, process-local) stays available: asyncio's self-pipe needs it.
 
 
 class _Replay:
@@ -81,14 +162,18 @@ async def _run(req: dict[str, Any]) -> dict[str, Any]:
 
 
 def main() -> int:
+    rlimits = _apply_limits(sys.argv)
     req = json.loads(sys.stdin.read())
+    isolation = _probe_isolation(req)
     _block_network(list(req["network_hosts"]))
     out: dict[str, Any] = {
         "environment_keys": sorted(os.environ),
         "network_allowlist": list(req["network_hosts"]),
-        "network_mode": "blocked_by_default_replay_only",
+        "network_guard": "python socket+_socket patched (replay only)",
+        **isolation,
         "cwd_writable": os.access(os.getcwd(), os.W_OK),
         "modules_from_proposal": [],
+        "rlimits": rlimits,
     }
     probe = req.get("network_probe")
     if probe:  # self-test: prove that outbound connections are refused
@@ -103,13 +188,6 @@ def main() -> int:
     except Exception as e:
         out["ok"] = False
         out["error"] = f"{type(e).__name__}: {str(e)[:500]}"
-    try:
-        import resource
-
-        out["rlimits"] = {"cpu": resource.getrlimit(resource.RLIMIT_CPU),
-                          "as": resource.getrlimit(resource.RLIMIT_AS)}
-    except Exception:
-        out["rlimits"] = None
     sys.stdout.write(json.dumps(out, default=str))
     return 0
 

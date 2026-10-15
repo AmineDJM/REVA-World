@@ -27,11 +27,19 @@ M = [105, 101, 99, 4, 100, 102, 97, 94, 90, 88, 250, 5]
 
 
 def _recipe():
-    cells = [SourceCell(a, s, c, (), f"synthetic.{s}.{a}") for s, counts in (("F", F), ("M", M))
-             for a, c in zip(AGES, counts, strict=True)]
+    cells = [
+        SourceCell(a, s, c, (), f"synthetic.{s}.{a}")
+        for s, counts in (("F", F), ("M", M))
+        for a, c in zip(AGES, counts, strict=True)
+    ]
     cells += [SourceCell("TOTAL", s, sum(v), (), f"synthetic.{s}.TOTAL") for s, v in (("F", F), ("M", M))]
-    return build_recipe(cells, geography="XX-synthetic", reference_date=date(2024, 1, 1),
-                        source_ref={"dataset": "synthetic", "fixture": "invariant-26"}, seed=11)
+    return build_recipe(
+        cells,
+        geography="XX-synthetic",
+        reference_date=date(2024, 1, 1),
+        source_ref={"dataset": "synthetic", "fixture": "invariant-26"},
+        seed=11,
+    )
 
 
 def _assert_task_relevant(cert, operation: str) -> None:
@@ -60,8 +68,11 @@ def test_lossy_refinement_reports_its_error_instead_of_hiding_it() -> None:
     coarse = coarsen(materialise(recipe, 300), standard_age_bands(5, 10, 9)).table
     nums = coarse.column("weight_num").to_pylist()
     nums[coarse.column("cell_id").to_pylist().index("F|Y_LT5")] *= 3
-    adjusted = coarse.set_column(coarse.schema.get_field_index("weight_num"), "weight_num",
-                                 pa.array(nums, type=coarse.schema.field("weight_num").type))
+    adjusted = coarse.set_column(
+        coarse.schema.get_field_index("weight_num"),
+        "weight_num",
+        pa.array(nums, type=coarse.schema.field("weight_num").type),
+    )
     res = refine(adjusted, recipe, "age")
     _assert_task_relevant(res.certificate, "refine")
     assert Fraction(res.certificate.measured_error) > 0

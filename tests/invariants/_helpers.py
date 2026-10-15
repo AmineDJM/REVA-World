@@ -44,9 +44,18 @@ def claim_simulation_job(db, payload: dict[str, Any], worker: str = "invariant-w
         with db.owner.connect() as c:
             return str(c.execute(text("SELECT status FROM ops.job WHERE id=:j"), {"j": jid}).scalar_one())
 
-    return JobContext(job_id=jid, job_type="simulation", worker_id=worker, fencing_token=int(token), attempt=1,
-                      settings=db.settings, worker_engine=db.worker, sim_engine=db.sim, store=db.store,
-                      heartbeat=heartbeat)
+    return JobContext(
+        job_id=jid,
+        job_type="simulation",
+        worker_id=worker,
+        fencing_token=int(token),
+        attempt=1,
+        settings=db.settings,
+        worker_engine=db.worker,
+        sim_engine=db.sim,
+        store=db.store,
+        heartbeat=heartbeat,
+    )
 
 
 def scenario_spec(release: dict[str, Any], **over: Any) -> dict[str, Any]:

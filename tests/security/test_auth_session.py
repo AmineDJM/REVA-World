@@ -37,12 +37,15 @@ def client(db: Any) -> Iterator[TestClient]:
     app.state.engine.dispose()
 
 
-def _token(db: Any, scopes: list[str], label: str = "test-token", revoked: bool = False) -> str:
+def _token(db: Any, scopes: list[str], label: str = "test-token", revoked: bool = False,
+           principal_kind: str | None = None) -> str:
+    """Tokens labelled human:* are issued as human principals unless stated otherwise."""
     tok, sha = new_api_token()
+    pk = principal_kind or ("human" if label.startswith("human:") else "service")
     with db.owner.begin() as c:
-        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label, revoked_at) "
-                       "VALUES (:h, :s, :l, CASE WHEN :r THEN clock_timestamp() END)"),
-                  {"h": sha, "s": scopes, "l": label, "r": revoked})
+        c.execute(text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind, revoked_at) "
+                       "VALUES (:h, :s, :l, :pk, CASE WHEN :r THEN clock_timestamp() END)"),
+                  {"h": sha, "s": scopes, "l": label, "pk": pk, "r": revoked})
     return tok
 
 

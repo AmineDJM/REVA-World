@@ -34,11 +34,18 @@ def test_no_code_path_emits_an_identified_causal_modality() -> None:
         rel = path.relative_to(SRC).as_posix()
         tree = ast.parse(path.read_text(), filename=str(path))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Attribute) and node.attr == Modality.identified_causal_estimate.name \
-                    and not (rel == "kernel/context.py"):
+            if (
+                isinstance(node, ast.Attribute)
+                and node.attr == Modality.identified_causal_estimate.name
+                and not (rel == "kernel/context.py")
+            ):
                 offenders.append(f"{rel}:{node.lineno} uses Modality.{node.attr}")
-            if isinstance(node, ast.Constant) and isinstance(node.value, str) and node.value in CAUSAL_LITERALS \
-                    and rel not in DEFINITIONS:
+            if (
+                isinstance(node, ast.Constant)
+                and isinstance(node.value, str)
+                and node.value in CAUSAL_LITERALS
+                and rel not in DEFINITIONS
+            ):
                 offenders.append(f"{rel}:{node.lineno} literal {node.value!r}")
     assert not offenders, "causal modality emitted outside the vocabulary definitions:\n" + "\n".join(offenders)
 
@@ -56,8 +63,12 @@ def test_hypothesis_card_cannot_carry_a_causal_coefficient() -> None:
 
     card = yaml.safe_load(sorted(Path(CARD_DIR).glob("*.yaml"))[0].read_text())["card"]
     validate_card(card)  # positive control: the curated card itself is valid
-    card = {**card, "evidence_kind": "hypothesis", "coefficient": "0.5",
-            "source_spans": [{**card["source_spans"][0], "artifact": "table"}]}
+    card = {
+        **card,
+        "evidence_kind": "hypothesis",
+        "coefficient": "0.5",
+        "source_spans": [{**card["source_spans"][0], "artifact": "table"}],
+    }
     with pytest.raises(ValidationProblem, match="hypothesis cannot carry a causal coefficient"):
         validate_card(card)
 
@@ -65,9 +76,16 @@ def test_hypothesis_card_cannot_carry_a_causal_coefficient() -> None:
 @pytest.mark.db
 def test_belief_estimates_cannot_be_causal(db) -> None:
     with db.owner.connect() as c:
-        defs = c.execute(text(
-            """SELECT pg_get_constraintdef(oid) FROM pg_constraint
-               WHERE conrelid = 'belief.estimate'::regclass AND contype = 'c'""")).scalars().all()
+        defs = (
+            c.execute(
+                text(
+                    """SELECT pg_get_constraintdef(oid) FROM pg_constraint
+               WHERE conrelid = 'belief.estimate'::regclass AND contype = 'c'"""
+                )
+            )
+            .scalars()
+            .all()
+        )
     modality = [d for d in defs if "modality" in d]
     assert modality, defs
     assert all("causal" not in d for d in modality), modality

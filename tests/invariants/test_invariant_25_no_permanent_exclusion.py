@@ -38,21 +38,39 @@ def test_every_default_country_is_a_target_of_every_crude_exposure_requirement()
 
 def _snapshot(dza_status: str) -> dict:
     concept = "trade.hs2709.import_value.world_total"
-    cells = [{"concept_id": concept, "geo": geo, "year": y, "status": "value", "missing_reasons": [],
-              "latest_recorded_at": (NOW - timedelta(days=5)).isoformat()}
-             for geo in ("FRA", "CHN", "USA") for y in range(2020, 2025)]
-    cells += [{"concept_id": concept, "geo": "DZA", "year": y, "status": dza_status,
-               "missing_reasons": ["unavailable"] if dza_status == "missing" else [],
-               "latest_recorded_at": None if dza_status == "missing" else (NOW - timedelta(days=5)).isoformat()}
-              for y in range(2020, 2025)]
-    return {"schema": "reva-coverage-snapshot/1", "eligible": {concept: ["FRA", "DZA", "CHN", "USA"]},
-            "cells": cells}
+    cells = [
+        {
+            "concept_id": concept,
+            "geo": geo,
+            "year": y,
+            "status": "value",
+            "missing_reasons": [],
+            "latest_recorded_at": (NOW - timedelta(days=5)).isoformat(),
+        }
+        for geo in ("FRA", "CHN", "USA")
+        for y in range(2020, 2025)
+    ]
+    cells += [
+        {
+            "concept_id": concept,
+            "geo": "DZA",
+            "year": y,
+            "status": dza_status,
+            "missing_reasons": ["unavailable"] if dza_status == "missing" else [],
+            "latest_recorded_at": None if dza_status == "missing" else (NOW - timedelta(days=5)).isoformat(),
+        }
+        for y in range(2020, 2025)
+    ]
+    return {"schema": "reva-coverage-snapshot/1", "eligible": {concept: ["FRA", "DZA", "CHN", "USA"]}, "cells": cells}
 
 
 def _dza_crude_gaps(snapshot: dict, cutoff: datetime) -> list[dict]:
     reqs = load_registry().requirements
-    return [g for g in classify(reqs, snapshot, cutoff)
-            if g["geo"] == "DZA" and g["requirement_id"] == "R-CRUDE-M" and g["status"] != "covered"]
+    return [
+        g
+        for g in classify(reqs, snapshot, cutoff)
+        if g["geo"] == "DZA" and g["requirement_id"] == "R-CRUDE-M" and g["status"] != "covered"
+    ]
 
 
 def test_a_missing_country_stays_a_gap_on_every_detection_run() -> None:

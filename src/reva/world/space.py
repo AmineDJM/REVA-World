@@ -76,6 +76,7 @@ def publish_display_geometries(
 
 
 def latest_geometry_dataset(conn: Any) -> str | None:
-    return conn.execute(
+    sha = conn.execute(
         text("SELECT dataset_sha256 FROM world.display_geometry ORDER BY recorded_at DESC LIMIT 1")
     ).scalar_one_or_none()
+    return None if sha is None else str(sha)

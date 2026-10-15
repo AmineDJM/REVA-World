@@ -7,6 +7,7 @@ API never fabricates outputs.
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import UTC, datetime
 from functools import lru_cache
@@ -134,21 +135,25 @@ def create_scenario(
                 "information into the scenario)", baseline_cutoff=rel["knowledge_cutoff"].isoformat())
         if cutoff > datetime.now(UTC):
             raise ValidationProblem("scenario knowledge_cutoff is in the future")
-        existed = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_digest = :d"),
-                               {"d": parsed.digest()}).scalar_one_or_none()
+        # Scenario identity is the sha256 of the canonical spec bytes (computed the same way by
+        # sim.create_scenario); spec_digest is advisory metadata only.
+        canonical = parsed.canonical_bytes()
+        spec_sha = hashlib.sha256(canonical).hexdigest()
+        existed = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_sha256 = :h"),
+                               {"h": spec_sha}).scalar_one_or_none()
         try:
             with conn.begin_nested():
                 sid = conn.execute(
                     text("SELECT sim.create_scenario(CAST(:spec AS jsonb), :canonical_bytes, :digest, :actor)"),
-                    {"spec": json.dumps(parsed.as_json()), "canonical_bytes": parsed.canonical_bytes(),
+                    {"spec": json.dumps(parsed.as_json()), "canonical_bytes": canonical,
                      "digest": parsed.digest(), "actor": principal.actor},
                 ).scalar_one()
         except IntegrityError as e:
-            # A concurrent identical request committed first (UNIQUE spec_digest): return that scenario.
+            # A concurrent identical request committed first (UNIQUE spec_sha256): return that scenario.
             if getattr(getattr(e, "orig", None), "sqlstate", None) != "23505":
                 raise
-            existed = sid = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_digest = :d"),
-                                         {"d": parsed.digest()}).scalar_one_or_none()
+            existed = sid = conn.execute(text("SELECT id FROM sim.scenario WHERE spec_sha256 = :h"),
+                                         {"h": spec_sha}).scalar_one_or_none()
             if sid is None:
                 raise
         row = fetch_scenario(conn, sid)

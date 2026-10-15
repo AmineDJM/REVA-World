@@ -145,6 +145,7 @@ class Settings(BaseSettings):
     #: Outbound HTTP egress: "direct" (DNS-pinned, default in production) or "env"
     #: (HTTPS_PROXY from the environment; the proxy then enforces SSRF policy).
     reva_http_proxy_mode: Literal["direct", "env"] | None = None
+    reva_login_rate_limit_per_minute: int = Field(5, ge=1, le=1000)
     reva_cache_max_bytes: int = 536_870_912
     reva_comtrade_api_key: SecretStr | None = None
 

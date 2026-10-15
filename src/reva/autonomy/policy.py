@@ -31,7 +31,7 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 # Maintainer-pinned SHA-256 of policy file bytes. Changing a policy requires a
 # reviewed change to these pins (T3); the agent has no write path to either.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
-    "promotion.yaml": "46b757ea892cb571ec9503cc5be001cc97c3f589be31f6e3e75c6ea3faa6037a",
+    "promotion.yaml": "442e406aedfa9802c20cf46ff5847b4a7bae6c81cc8fb751e0c8169618f4fad9",
     "budgets.yaml": "048ec5bef503f29e771828d8394601572e59c133d10905a8a283cedf4bdbd08a",
 }
 

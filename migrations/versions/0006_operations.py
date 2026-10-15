@@ -182,8 +182,11 @@ CREATE TABLE ops.api_token (
   token_sha256 text NOT NULL UNIQUE,
   scopes text[] NOT NULL,
   label text NOT NULL,
+  -- A token counts as a human reviewer only when explicitly issued to a human.
+  principal_kind text NOT NULL DEFAULT 'service' CHECK (principal_kind IN ('human','service')),
   created_at timestamptz NOT NULL DEFAULT clock_timestamp(),
-  revoked_at timestamptz
+  revoked_at timestamptz,
+  CHECK (principal_kind = 'service' OR label LIKE 'human:%')
 );
 -- (R2-09) Server-side revocation of API sessions (logout / admin revoke).
 -- Mutable operational table: rows may be pruned after expires_at.

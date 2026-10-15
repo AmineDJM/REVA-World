@@ -32,7 +32,7 @@ def _parsed(name: str) -> list[Any]:
         for item in conn.plan(None, FetchBudget(max_requests=1000)).items:
             try:
                 raw = await conn.fetch(item, http)
-            except Exception as e:  # noqa: BLE001 - only items with a captured fixture are replayed
+            except Exception as e:
                 if getattr(e, "details", {}).get("kind") == "fixture_missing":
                     continue
                 raise
@@ -64,11 +64,19 @@ def test_kernel_refuses_exact_label_without_a_definition() -> None:
 @pytest.mark.db
 def test_published_source_estimates_keep_unquantified_status(db, fixture_release) -> None:
     with db.owner.connect() as c:
-        rows = c.execute(text(
-            """SELECT e.modality, e.uncertainty->>'status' AS status, count(*) AS n
+        rows = (
+            c.execute(
+                text(
+                    """SELECT e.modality, e.uncertainty->>'status' AS status, count(*) AS n
                FROM belief.estimate e JOIN belief.input i ON i.estimate_id = e.id
                WHERE e.release_id = :r AND i.observation_id IS NOT NULL
-               GROUP BY 1, 2"""), {"r": fixture_release["release_id"]}).mappings().all()
+               GROUP BY 1, 2"""
+                ),
+                {"r": fixture_release["release_id"]},
+            )
+            .mappings()
+            .all()
+        )
     assert rows, "the fixture release published no source-backed estimates"
     for r in rows:
         assert r["modality"] == "selected_report", dict(r)

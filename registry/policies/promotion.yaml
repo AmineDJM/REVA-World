@@ -1,6 +1,15 @@
 # Versioned promotion policy. The autonomy agent cannot edit this file's
-# effective content: gates verify its pinned digest (see policies/digests.yaml).
-policy_version: "promotion-1.0.0"
+# effective content: gates verify its SHA-256 against the maintainer pin in
+# src/reva/autonomy/policy.py (PINNED_POLICY_DIGESTS); a change here is T3.
+#
+# promotion-1.1.0 (deliberate change, re-pinned):
+# * approved_templates.<id>.template_sha256 pins the reviewed template code digest
+#   (replaces the former path reference); any template edit disables T1
+#   auto-promotion until a maintainer re-pins it (R4-11);
+# * approved_templates.<id>.source_key names the registered source every
+#   manifest of that template must use (R4-01);
+# * model_promotion: explicit paired/subgroup/holdout test settings.
+policy_version: "promotion-1.1.0"
 tiers:
   T0: {description: "read, discover, generate proposals", auto: true}
   T1: {description: "new series via approved template, approved semantics/rights, known hosts", auto_within_scope: true}
@@ -8,7 +17,8 @@ tiers:
   T3: {description: "kernel, security, licences, sensitive data, causal claims, destructive migrations, paid resources", requires: [maintainer_approval]}
 approved_templates:
   eurostat_jsonstat:
-    template_digest_ref: src/reva/adapters/connectors/eurostat_template.py
+    template_sha256: "sha256:44b2b256fed303a85807bfb4b17795cd4fae3bf61dc04d3004ac5ca9b43194e1"
+    source_key: eurostat.dissemination
     allowed_hosts: [ec.europa.eu]
 approved_exact_mappings:
   - template: eurostat_jsonstat
@@ -18,7 +28,11 @@ approved_exact_mappings:
     rights: verified
 model_promotion:
   min_origin_series_pairs: 30
-  bootstrap: {method: moving_block, block_length: 3, replicates: 1000, level: 0.95}
+  bootstrap: {method: moving_block, block_length: 3, replicates: 1000, level: 0.95}  # descriptive interval only
+  paired_test: {method: dm_hln_holm, alpha: 0.025, min_origins_per_horizon: 8}
+  subgroup_test: {alpha: 0.05, min_origins: 5}
+  holdout_non_inferiority: {margin: 0.0, alpha: 0.025, require_statistical: false}
+  locked_holdout: {years: 2, max_accesses_per_model_version: 1}
   primary_loss: mase
   max_subgroup_degradation: 0.10
   keep_naive_baseline: true

@@ -31,9 +31,21 @@ from ._helpers import claim_simulation_job, create_scenario, scenario_spec
 
 REPO = Path(__file__).resolve().parents[2]
 
-NETWORK_MODULES = ("httpx", "httpcore", "requests", "urllib3", "aiohttp", "boto3", "botocore",
-                   "reva.adapters.http", "reva.adapters.connectors", "reva.evidence.runner",
-                   "reva.evidence.ingest", "reva.autonomy", "reva.api")
+NETWORK_MODULES = (
+    "httpx",
+    "httpcore",
+    "requests",
+    "urllib3",
+    "aiohttp",
+    "boto3",
+    "botocore",
+    "reva.adapters.http",
+    "reva.adapters.connectors",
+    "reva.evidence.runner",
+    "reva.evidence.ingest",
+    "reva.autonomy",
+    "reva.api",
+)
 MODEL_EXECUTION = ("reva.models", "reva.simulation", "reva.evaluation", "reva.compression", "reva.extensions")
 
 
@@ -64,10 +76,14 @@ def test_model_execution_cannot_reach_the_network_through_imports(graph, package
     assert not chains, f"{package} transitively imports network/ingest code:\n" + "\n".join(map(" -> ".join, chains))
 
 
-@pytest.mark.xfail(strict=False, reason=(
-    "owner: lead (src/reva/population/service.py). handle_population imports reva.cli.seed.entity_id, and "
-    "reva.cli.seed imports the connector registry -> SafeHttpClient -> httpx. No fetch happens, but the import "
-    "boundary is open; fix: move entity_id() to a pure module (e.g. reva.kernel.ids) and import it from there."))
+@pytest.mark.xfail(
+    strict=False,
+    reason=(
+        "owner: lead (src/reva/population/service.py). handle_population imports reva.cli.seed.entity_id, and "
+        "reva.cli.seed imports the connector registry -> SafeHttpClient -> httpx. No fetch happens, but the import "
+        "boundary is open; fix: move entity_id() to a pure module (e.g. reva.kernel.ids) and import it from there."
+    ),
+)
 def test_population_job_cannot_reach_the_network_through_imports(graph) -> None:
     chains = _violations(graph, "reva.population")
     assert not chains, "reva.population transitively imports network code:\n" + "\n".join(map(" -> ".join, chains))
@@ -75,8 +91,9 @@ def test_population_job_cannot_reach_the_network_through_imports(graph) -> None:
 
 def test_import_linter_contracts_encode_the_boundary_and_are_kept() -> None:
     cfg = tomllib.loads((REPO / "pyproject.toml").read_text())["tool"]["importlinter"]
-    forbidden = {tuple(c["source_modules"]): set(c["forbidden_modules"]) for c in cfg["contracts"]
-                 if c["type"] == "forbidden"}
+    forbidden = {
+        tuple(c["source_modules"]): set(c["forbidden_modules"]) for c in cfg["contracts"] if c["type"] == "forbidden"
+    }
     assert {"httpx", "reva.adapters"} <= forbidden[("reva.models",)]
     assert {"httpx", "reva.adapters.connectors"} <= forbidden[("reva.simulation",)]
 
@@ -84,8 +101,15 @@ def test_import_linter_contracts_encode_the_boundary_and_are_kept() -> None:
     if not exe.exists():
         pytest.skip("lint-imports is not installed in this environment (dev dependency group)")
     env = {**os.environ, "PYTHONPATH": str(REPO / "src")}
-    proc = subprocess.run([str(exe), "--config", str(REPO / "pyproject.toml"), "--no-cache"], cwd=REPO, env=env,
-                          capture_output=True, text=True, timeout=300, check=False)
+    proc = subprocess.run(
+        [str(exe), "--config", str(REPO / "pyproject.toml"), "--no-cache"],
+        cwd=REPO,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=300,
+        check=False,
+    )
     assert proc.returncode == 0, proc.stdout[-4000:] + proc.stderr[-2000:]
     assert "numerical models have no HTTP, DB or adapters KEPT" in proc.stdout
     assert "simulation does not write evidence or beliefs KEPT" in proc.stdout
@@ -117,9 +141,11 @@ def test_simulation_succeeds_with_all_network_paths_disabled(db, fixture_release
 
     over: dict[str, Any] = {"title": f"Invariant 11: offline {fidelity}", "fidelity": fidelity}
     if fidelity == "L2":
-        over["assumptions"] = {"quantity_response": "elasticity_sensitivity", "no_general_equilibrium": True,
-                               "elasticity_grid": [{"import_elasticity": -0.3, "export_elasticity": 0.2,
-                                                    "basis": "scenario_assumption"}]}
+        over["assumptions"] = {
+            "quantity_response": "elasticity_sensitivity",
+            "no_general_equilibrium": True,
+            "elasticity_grid": [{"import_elasticity": -0.3, "export_elasticity": 0.2, "basis": "scenario_assumption"}],
+        }
     sid = create_scenario(db, scenario_spec(fixture_release, **over))
     payload = {"scenario_id": str(sid), "fidelity": fidelity}
     ctx = claim_simulation_job(db, payload)
@@ -130,6 +156,7 @@ def test_simulation_succeeds_with_all_network_paths_disabled(db, fixture_release
         def _refuse(*a: Any, **k: Any) -> Any:
             calls.append(name)
             raise NetworkUsed(f"model execution attempted network access via {name}")
+
         return _refuse
 
     real_getaddrinfo = socket.getaddrinfo
@@ -150,7 +177,6 @@ def test_simulation_succeeds_with_all_network_paths_disabled(db, fixture_release
     assert ref["status"] == "succeeded", ref
     with db.owner.connect() as c:
         n = c.execute(text("SELECT count(*) FROM sim.result WHERE run_id = :r"), {"r": ref["run_id"]}).scalar_one()
-        inputs = c.execute(text("SELECT baseline_release_id FROM sim.scenario WHERE id = :s"),
-                           {"s": sid}).scalar_one()
+        inputs = c.execute(text("SELECT baseline_release_id FROM sim.scenario WHERE id = :s"), {"s": sid}).scalar_one()
     assert n > 0
     assert str(inputs) == str(fixture_release["release_id"])  # inputs come from the pinned release only

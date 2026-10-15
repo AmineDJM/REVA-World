@@ -203,6 +203,7 @@ def hash_password(password: str = typer.Option(..., prompt=True, hide_input=True
 def create_token(
     label: str = typer.Option(..., help="e.g. human:alice or service:ci"),
     scopes: str = typer.Option("read", help="comma list of read,simulate,ingest,review"),
+    human: bool = typer.Option(False, "--human", help="token issued to a named human (required for reviews)"),
 ) -> None:
     """Create a hashed, scoped API token (admin operation; uses the migration owner). Printed once."""
     from sqlalchemy import text
@@ -215,12 +216,16 @@ def create_token(
     if not sc or set(sc) - allowed:
         typer.echo(f"scopes must be a subset of {sorted(allowed)}", err=True)
         raise typer.Exit(2)
+    if human and not label.startswith("human:"):
+        typer.echo("--human tokens need a label of the form human:<name>", err=True)
+        raise typer.Exit(2)
     token, sha = new_api_token()
     eng = make_engine("migration")
     with eng.begin() as c:
         tid = c.execute(
-            text("INSERT INTO ops.api_token(token_sha256, scopes, label) VALUES (:s, :sc, :l) RETURNING id"),
-            {"s": sha, "sc": sc, "l": label},
+            text("INSERT INTO ops.api_token(token_sha256, scopes, label, principal_kind) "
+                 "VALUES (:s, :sc, :l, :pk) RETURNING id"),
+            {"s": sha, "sc": sc, "l": label, "pk": "human" if human else "service"},
         ).scalar_one()
         c.execute(
             text("INSERT INTO ops.audit(actor, action, target, details) VALUES ('admin:cli', 'token.create', "

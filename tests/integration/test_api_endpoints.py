@@ -371,6 +371,9 @@ def test_replay_and_discovery(env: Env) -> None:
                                                "mode": "fixture"},
                         headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"})
     assert d.status_code == 202, d.text
+    problem(env.client.post("/v1/discovery", json={"catalogue": "worldbank"},
+                            headers={"Idempotency-Key": f"disc-{uuid.uuid4()}"}), 422, "capability_gap")
+    env.client.post(f"/v1/jobs/{d.json()['job_id']}/cancel")
 
 
 def test_coverage_and_gaps(env: Env) -> None:

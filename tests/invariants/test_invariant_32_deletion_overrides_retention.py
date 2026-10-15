@@ -23,8 +23,13 @@ pytestmark = pytest.mark.db
 
 def _insert_artifact(conn) -> str:
     sha = uuid.uuid4().hex * 2
-    conn.execute(text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, "
-                      "rights) VALUES (:s, 'text/plain', 1, 'inv32', 'public_aggregate', '{}')"), {"s": sha})
+    conn.execute(
+        text(
+            "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, privacy_class, "
+            "rights) VALUES (:s, 'text/plain', 1, 'inv32', 'public_aggregate', '{}')"
+        ),
+        {"s": sha},
+    )
     return sha
 
 
@@ -32,16 +37,21 @@ def test_restricted_privacy_classes_cannot_be_stored_in_v1(db) -> None:
     for cls in ("restricted_microdata", "sensitive_restricted"):
         with db.owner.connect() as conn, conn.begin() as tx:
             with pytest.raises(DBAPIError, match="artifact_v1_public_only"):
-                conn.execute(text("INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, "
-                                  "privacy_class, rights) VALUES (:s, 'text/csv', 1, 'inv32', :p, '{}')"),
-                             {"s": uuid.uuid4().hex * 2, "p": cls})
+                conn.execute(
+                    text(
+                        "INSERT INTO meta.artifact(sha256, media_type, byte_size, schema_version, "
+                        "privacy_class, rights) VALUES (:s, 'text/csv', 1, 'inv32', :p, '{}')"
+                    ),
+                    {"s": uuid.uuid4().hex * 2, "p": cls},
+                )
             tx.rollback()
 
 
 def test_reviewed_deletion_ticket_can_delete_an_immutable_record(db) -> None:
     with db.owner.connect() as conn:
-        member = conn.execute(text(
-            "SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'MEMBER')")).scalar_one()
+        member = conn.execute(
+            text("SELECT pg_has_role(session_user, 'reva_restricted_deletion', 'MEMBER')")
+        ).scalar_one()
     if not member:
         pytest.skip("migration owner is not a member of reva_restricted_deletion in this cluster")
     with db.owner.connect() as conn:

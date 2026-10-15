@@ -34,4 +34,3 @@ def fixture_release(db) -> dict[str, Any]:
     asyncio.run(ingest())
     rel = publish_release(db.worker, db.store, cutoff=utc_now(), origin=Origin.test_fixture, environment="test")
     return {"release_id": rel.release_id, "cutoff": rel.knowledge_cutoff}
-

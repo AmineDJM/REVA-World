@@ -29,7 +29,6 @@ from reva.evidence.runner import run_connector
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import Cursor, FetchBudget, FetchItem, FetchOutcome, FetchPlan, RawAcquisition
 
-
 PLANNED = 6
 
 
@@ -52,8 +51,12 @@ class OverPlanningConnector:
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         full = self.inner.plan(cursor, FetchBudget(max_requests=1000))
         # independent items (no depends_on), so only the budget can stop a fetch
-        items = tuple(it.model_copy(update={"key": f"probe-{i}", "params": {
-            k: v for k, v in it.params.items() if k != "depends_on"}}) for i, it in enumerate(full.items * 2))
+        items = tuple(
+            it.model_copy(
+                update={"key": f"probe-{i}", "params": {k: v for k, v in it.params.items() if k != "depends_on"}}
+            )
+            for i, it in enumerate(full.items * 2)
+        )
         assert len(items) >= PLANNED
         return full.model_copy(update={"items": items[:PLANNED]})
 
@@ -82,8 +85,11 @@ class NoHttp:
 @pytest.mark.parametrize("max_requests", [0, 1, 3])
 def test_runner_never_exceeds_the_request_budget(db, max_requests: int) -> None:
     conn = OverPlanningConnector()
-    report = asyncio.run(run_connector(conn, NoHttp(), db.store, db.worker,
-                                       budget=FetchBudget(max_requests=max_requests), persist_cursor=False))
+    report = asyncio.run(
+        run_connector(
+            conn, NoHttp(), db.store, db.worker, budget=FetchBudget(max_requests=max_requests), persist_cursor=False
+        )
+    )
     assert len(conn.fetched) == max_requests, conn.fetched
     over = [o for o in report.outcomes if o.detail == "budget"]
     assert len(over) == PLANNED - max_requests

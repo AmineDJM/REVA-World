@@ -248,8 +248,8 @@ class ComtradeConnector:
         pv, cif, fob = r.get("primaryValue"), r.get("cifvalue"), r.get("fobvalue")
         # A 0 cifvalue/fobvalue (seen for CHN/USA 2020-21) is kept as a flag only: it never
         # "matches" primaryValue, not even when primaryValue is itself 0.
-        eq_cif = _nonzero(pv) and _nonzero(cif) and Decimal(pv) == Decimal(cif)
-        eq_fob = _nonzero(pv) and _nonzero(fob) and Decimal(pv) == Decimal(fob)
+        eq_cif = _nonzero(pv) and _nonzero(cif) and Decimal(str(pv)) == Decimal(str(cif))
+        eq_fob = _nonzero(pv) and _nonzero(fob) and Decimal(str(pv)) == Decimal(str(fob))
         if flow == "M":
             if eq_cif and not eq_fob:
                 return "CIF", None

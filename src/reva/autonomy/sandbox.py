@@ -1,15 +1,30 @@
 """SandboxRunner V1.
 
 ``trusted_template`` isolation executes a *declarative manifest* through the
-reviewed template code in a child process with
+reviewed template code in a child process. **It is not a security boundary**
+(architecture §18.3): it is defence in depth around code that is already
+reviewed. What it does, and what the evidence records about it (only what the
+child verified by probing, never a nominal claim):
 
-* a scrubbed environment (no REVA_* secrets, no database URLs, no tokens),
-* read-only inputs (captured fixture bytes on stdin; an empty, read-only cwd),
-* network blocked by default (the allowlist is limited to the template's hosts
-  and V1 replays captured bytes only),
-* OS limits on CPU seconds, address space, open files and wall time.
+* scrubbed, allowlisted environment (no REVA_* secrets, database URLs or tokens),
+  a fresh private temporary HOME/TMPDIR and dead proxy variables;
+* read-only inputs (captured fixture bytes on stdin; an empty, read-only cwd);
+  no inherited file descriptors (``close_fds``);
+* network: the child patches ``socket`` **and** ``_socket``; when the host allows
+  unprivileged namespaces it also runs under ``unshare --user --net --pid
+  --mount-proc`` (no network interfaces, its own PID namespace, so the worker's
+  ``/proc/<pid>/environ`` is not visible). The child probes, *before* patching,
+  with the raw ``_socket`` module: a connection to a listener the parent opened on
+  127.0.0.1 and to a public IP. ``network_mode`` is ``blocked_verified`` only when
+  both fail; otherwise ``python_guard_only`` (not a boundary). The child also
+  records whether the parent's environment is readable and whether it runs as
+  the same UID (``process_isolation``);
+* OS limits (CPU seconds, address space, open files, file size) applied by the
+  child itself as its first action (``--limits`` argument) plus ``prlimit`` from
+  the parent; no ``preexec_fn`` (unsafe in the multi-threaded worker, R4-15);
+* wall-time limit enforced by the parent.
 
-A Python subprocess is **not** a security boundary for hostile code, so any
+Because a Python subprocess is not a security boundary for hostile code, any
 proposal that contains code (``.py``/script paths or ``execute_code``) is never
 run here: it goes to an ``ExternalRunner`` (dedicated disposable VM/microVM
 service at ``REVA_SANDBOX_ENDPOINT``) or stays unexecuted with a ``blocked``
@@ -19,8 +34,12 @@ report. The production worker never imports proposed code.
 from __future__ import annotations
 
 import base64
+import contextlib
+import functools
 import json
 import os
+import resource
+import socket
 import subprocess
 import sys
 import tempfile
@@ -44,13 +63,41 @@ EVALUATOR_EXTERNAL = "sandbox:external_disposable_vm@1"
 SAFE_ENV_KEYS = ("LANG", "LC_ALL", "TZ")
 
 
+DEAD_PROXY = "http://127.0.0.1:9"  # discard port: any proxy-aware client fails fast
+# Child runs as an unprivileged user (no capabilities) inside new user/net/pid
+# namespaces with its own /proc; fallback maps root (capabilities only inside the
+# namespace) when ``--map-user`` is unsupported by the host's util-linux.
+_NS = ("--net", "--pid", "--fork", "--mount-proc", "--kill-child")
+UNSHARE_VARIANTS = (("--user", "--map-user=65534", "--map-group=65534", *_NS), ("--user", "--map-root-user", *_NS))
+
+
 def scrubbed_environment(source: Mapping[str, str] | None = None) -> dict[str, str]:
     """Minimal allowlisted environment: nothing secret survives (default deny)."""
     src = dict(os.environ if source is None else source)
     env = {k: src[k] for k in SAFE_ENV_KEYS if k in src}
     env.update({"PATH": "/usr/bin:/bin", "PYTHONDONTWRITEBYTECODE": "1", "PYTHONHASHSEED": "0",
-                "REVA_SANDBOX_ISOLATION": "trusted_template", "HOME": "/nonexistent"})
+                "REVA_SANDBOX_ISOLATION": "trusted_template", "HOME": "/nonexistent",
+                "HTTP_PROXY": DEAD_PROXY, "HTTPS_PROXY": DEAD_PROXY, "ALL_PROXY": DEAD_PROXY,
+                "http_proxy": DEAD_PROXY, "https_proxy": DEAD_PROXY, "all_proxy": DEAD_PROXY, "NO_PROXY": ""})
     return env
+
+
+@functools.lru_cache(maxsize=1)
+def namespace_isolation() -> tuple[str, ...] | None:
+    """``unshare`` command prefix for user+net+pid namespaces, or None where the host forbids them."""
+    for exe in ("/usr/bin/unshare", "/bin/unshare"):
+        if not os.path.exists(exe):
+            continue
+        for args in UNSHARE_VARIANTS:
+            try:
+                r = subprocess.run([exe, *args, "--", "/bin/true"], capture_output=True, timeout=5,
+                                   env={"PATH": "/usr/bin:/bin"}, check=False)
+            except (OSError, subprocess.SubprocessError):
+                return None
+            if r.returncode == 0:
+                return (exe, *args, "--")
+        return None
+    return None
 
 
 def _f(code: str, severity: str, message: str) -> Finding:
@@ -121,6 +168,7 @@ class TrustedTemplateSandbox:
 
         def finish(outcome: str, evaluator: str, usage: dict[str, Any] | None = None) -> ValidationReport:
             evidence["outcome"] = outcome
+            evidence["evaluator"] = evaluator
             evidence["findings"] = [{"code": x.code, "severity": x.severity, "message": x.message} for x in findings]
             u = {**(usage or {}), "wall_seconds": round(time.monotonic() - started, 3)}
             evidence["resource_usage"] = u
@@ -146,7 +194,8 @@ class TrustedTemplateSandbox:
             if change.get("schema") != CONNECTOR_CHANGE_SCHEMA:
                 raise ValueError("not a declarative connector change")
             manifest = validate_manifest(change["manifest"])
-        except (RevaError, ValueError, KeyError) as e:
+            evidence["manifest"] = (change.get("manifest_ref") or {}).get("sha256")
+        except (RevaError, ValueError, KeyError, TypeError, AttributeError) as e:
             findings.append(_f("manifest_invalid", "blocker", str(getattr(e, "message", e))))
             return finish("fail", EVALUATOR_TEMPLATE)
         if manifest["template"] != TEMPLATE_ID:
@@ -156,7 +205,11 @@ class TrustedTemplateSandbox:
             findings.append(_f("manifest_hosts_outside_policy", "blocker",
                                f"manifest hosts {manifest['allowed_hosts']} not in sandbox allowlist"))
             return finish("fail", EVALUATOR_TEMPLATE)
-        inputs = self._inputs(manifest, policy)
+        try:
+            inputs = self._inputs(manifest, policy)
+        except RevaError as e:
+            findings.append(_f("manifest_invalid", "blocker", e.message))
+            return finish("fail", EVALUATOR_TEMPLATE)
         if inputs is None:
             findings.append(_f("no_read_only_inputs", "blocker", "no captured fixture bank for the planned requests"))
             return finish("blocked", EVALUATOR_TEMPLATE)
@@ -174,6 +227,13 @@ class TrustedTemplateSandbox:
         leaked = [k for k in out.get("environment_keys", []) if _secretish(k)]
         if leaked:
             findings.append(_f("secret_in_environment", "blocker", f"secret-like env keys present: {leaked}"))
+        if out.get("network_mode") != "blocked_verified":
+            findings.append(_f("network_not_os_isolated", "warning",
+                               "outbound network was not verified blocked at OS level: python guard only "
+                               "(trusted-template isolation is not a security boundary)"))
+        if out.get("parent_environ_readable"):
+            findings.append(_f("parent_environment_readable", "warning",
+                               "the child could read the worker's /proc/<pid>/environ (same UID, no PID namespace)"))
         for r in out.get("results", []):
             for x in r["quality"]["findings"]:
                 findings.append(_f(x["code"], x["severity"], x["message"]))
@@ -228,42 +288,59 @@ class TrustedTemplateSandbox:
 
     @staticmethod
     def _spawn(request: dict[str, Any], policy: SandboxPolicy) -> tuple[dict[str, Any], dict[str, Any]]:
-        cpu = max(1, int(policy.budget.max_cpu_seconds))
-        mem = int(policy.budget.max_memory_bytes)
-
-        def limits() -> None:  # runs in the child before exec
-            import resource
-
-            resource.setrlimit(resource.RLIMIT_CPU, (cpu, cpu))
-            if mem > 0:
-                resource.setrlimit(resource.RLIMIT_AS, (mem, mem))
-            resource.setrlimit(resource.RLIMIT_NOFILE, (64, 64))
-            resource.setrlimit(resource.RLIMIT_FSIZE, (1_048_576, 1_048_576))
-
+        limits = {"cpu": max(1, int(policy.budget.max_cpu_seconds)), "as": int(policy.budget.max_memory_bytes),
+                  "nofile": 64, "fsize": 1_048_576}
+        unshare = namespace_isolation()
+        child = [sys.executable, "-I", "-m", "reva.autonomy.sandbox_child", "--limits", json.dumps(limits)]
+        cmd = [*unshare, *child] if unshare else child
         started = time.monotonic()
-        with tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd:
+        # A listener the child must NOT be able to reach (probe of OS-level network isolation).
+        listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        listener.bind(("127.0.0.1", 0))
+        listener.listen(8)
+        req = {**request, "probe_port": listener.getsockname()[1], "parent_uid": os.getuid(),
+               "namespaces": bool(unshare)}
+        with tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd, \
+                tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home:
             os.chmod(cwd, 0o500)  # read-only working directory
+            env = {**scrubbed_environment(), "HOME": home, "TMPDIR": home}
             try:
-                proc = subprocess.run(
-                    [sys.executable, "-I", "-m", "reva.autonomy.sandbox_child"],
-                    input=json.dumps(request).encode(), capture_output=True, env=scrubbed_environment(),
-                    cwd=cwd, timeout=max(1, int(policy.budget.max_wall_seconds)), preexec_fn=limits,
-                    check=False,
-                )
-            except subprocess.TimeoutExpired:
-                return {"ok": False, "timeout": True}, {"wall_seconds": round(time.monotonic() - started, 3)}
+                proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                        env=env, cwd=cwd, close_fds=True, start_new_session=True)
+                _prlimit(proc.pid, limits)  # belt and braces; the child applies them itself first
+                try:
+                    stdout, stderr = proc.communicate(json.dumps(req).encode(),
+                                                      timeout=max(1, int(policy.budget.max_wall_seconds)))
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.communicate()
+                    return {"ok": False, "timeout": True}, {"wall_seconds": round(time.monotonic() - started, 3)}
             finally:
                 os.chmod(cwd, 0o700)
+                listener.close()
         usage = {"wall_seconds": round(time.monotonic() - started, 3), "exit_code": proc.returncode,
-                 "stdout_bytes": len(proc.stdout), "requests": 0}
+                 "stdout_bytes": len(stdout), "requests": 0}
         try:
-            out = json.loads(proc.stdout or b"{}")
+            out = json.loads(stdout or b"{}")
         except ValueError:
             out = {"ok": False, "error": "unparseable child output"}
+        if not isinstance(out, dict):
+            out = {"ok": False, "error": "child output is not an object"}
         if proc.returncode != 0:
             out.setdefault("ok", False)
-            out.setdefault("error", proc.stderr.decode(errors="replace")[-500:])
+            out.setdefault("error", stderr.decode(errors="replace")[-500:])
+        out["launcher"] = " ".join(unshare[1:-1]) if unshare else "plain_subprocess"
         return out, usage
+
+
+def _prlimit(pid: int, limits: Mapping[str, int]) -> None:
+    pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
+             "fsize": resource.RLIMIT_FSIZE}
+    for k, r in pairs.items():
+        v = int(limits.get(k, 0))
+        if v > 0:
+            with contextlib.suppress(OSError, ValueError):  # e.g. the child already lowered its hard limit
+                resource.prlimit(pid, r, (v, v))
 
 
 def _secretish(key: str) -> bool:

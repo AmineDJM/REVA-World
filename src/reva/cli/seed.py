@@ -252,15 +252,20 @@ def record_mapping_and_eligibility(
         return
     subjects = m.get("applicability", {}).get("subjects", [])
     subject_ids = [str(entity_id(s)) for s in subjects]
-    have = conn.execute(
+    applicability = {**m.get("applicability", {}), "subject_ids": subject_ids, "mapping_key": m["mapping_key"]}
+    # Append a decision only when the latest seeded one differs (e.g. a mapping version
+    # widened its applicability); decisions are append-only and the latest in scope wins.
+    latest = conn.execute(
         text(
-            "SELECT 1 FROM evidence.eligibility WHERE connector_version_id=:cv AND concept_version_id=:c "
-            "AND decision='eligible' AND policy_version=:p"
+            "SELECT decision, applicability FROM evidence.eligibility WHERE connector_version_id=:cv "
+            "AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"
         ),
-        {"cv": cv["id"], "c": target, "p": policy_version},
-    ).scalar_one_or_none()
-    if have:
+        {"cv": cv["id"], "c": target},
+    ).mappings().one_or_none()
+    if latest is not None and latest["decision"] == "eligible" and dict(latest["applicability"]) == applicability:
         return
+    if latest is not None and latest["decision"] != "eligible":
+        return  # a later review retired/quarantined it: seeding never overrides a review decision
     conn.execute(
         text(
             """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
@@ -270,8 +275,7 @@ def record_mapping_and_eligibility(
         {
             "cv": cv["id"],
             "c": target,
-            "ap": json.dumps({**m.get("applicability", {}), "subject_ids": subject_ids,
-                              "mapping_key": m["mapping_key"]}),
+            "ap": json.dumps(applicability),
             "p": policy_version,
             "a": act,
         },
@@ -314,7 +318,7 @@ def _seed_models(conn: Connection, store: ArtifactStore, reg: Registry, act: UUI
     return n
 
 
-DEFAULT_SCHEDULES = (
+DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     ("ingest:worldbank.wdi.indicators", "ingest", {"connector": "worldbank.wdi.indicators"}, 30 * 86400),
     ("ingest:un.comtrade.public_exact", "ingest", {"connector": "un.comtrade.public_exact"}, 30 * 86400),
     ("ingest:naturalearth.admin0_110m", "ingest", {"connector": "naturalearth.admin0_110m"}, 7 * 86400),

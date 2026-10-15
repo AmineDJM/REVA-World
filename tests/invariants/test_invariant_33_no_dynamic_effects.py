@@ -60,8 +60,12 @@ def test_unknown_outputs_and_time_units_are_refused() -> None:
 
 
 def test_model_outputs_are_accounting_changes_only_and_say_what_is_not_claimed() -> None:
-    assert set(ce.OUTPUT_KEYS) == {"import_value_change_usd", "export_value_change_usd",
-                                   "net_external_cost_change_usd", "exposure_percent_baseline_gdp"}
+    assert set(ce.OUTPUT_KEYS) == {
+        "import_value_change_usd",
+        "export_value_change_usd",
+        "net_external_cost_change_usd",
+        "exposure_percent_baseline_gdp",
+    }
     for word in ("GDP loss", "welfare", "inflation", "unemployment", "general-equilibrium"):
         assert word in ce.NOT_CLAIMED
     with pytest.raises(CapabilityGap):

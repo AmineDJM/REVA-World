@@ -35,8 +35,11 @@ def _is_stub(fn) -> bool:
         return True
     if len(stmts) == 1 and isinstance(stmts[0], ast.Return):
         v = stmts[0].value
-        return v is None or isinstance(v, ast.Constant) or (
-            isinstance(v, ast.Dict) and all(isinstance(x, ast.Constant) for x in v.values))
+        return (
+            v is None
+            or isinstance(v, ast.Constant)
+            or (isinstance(v, ast.Dict) and all(isinstance(x, ast.Constant) for x in v.values))
+        )
     return False
 
 
@@ -50,7 +53,7 @@ def test_every_registered_job_type_resolves_to_a_real_handler(job_type: str) -> 
 
 
 def test_stub_detector_positive_control() -> None:
-    def stub(payload, ctx):  # noqa: ARG001
+    def stub(payload, ctx):
         return {"status": "succeeded"}
 
     assert _is_stub(stub)

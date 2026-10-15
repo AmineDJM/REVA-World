@@ -13,12 +13,17 @@ import ast
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-RUNTIME = [*sorted((REPO / "src" / "reva").rglob("*.py")),
-           *(REPO / "scripts" / n for n in ("start_api.py", "start_worker.py", "_runtime_env.py",
-                                            "bootstrap_runtime.py"))]
+RUNTIME = [
+    *sorted((REPO / "src" / "reva").rglob("*.py")),
+    *(REPO / "scripts" / n for n in ("start_api.py", "start_worker.py", "_runtime_env.py", "bootstrap_runtime.py")),
+]
 HOST_CPU_CALLS = {"cpu_count", "process_cpu_count", "sched_getaffinity"}
-POOLS = {"ThreadPoolExecutor": "max_workers", "ProcessPoolExecutor": "max_workers", "Pool": "processes",
-         "ThreadPool": "processes"}
+POOLS = {
+    "ThreadPoolExecutor": "max_workers",
+    "ProcessPoolExecutor": "max_workers",
+    "Pool": "processes",
+    "ThreadPool": "processes",
+}
 
 
 def _callee(node: ast.Call) -> str | None:
@@ -60,8 +65,9 @@ def test_runtime_code_never_sizes_concurrency_from_the_host_cpu_count() -> None:
 
 def test_scan_detects_a_planted_violation(tmp_path, monkeypatch) -> None:
     bad = tmp_path / "bad.py"
-    bad.write_text("import os\nfrom concurrent.futures import ThreadPoolExecutor\n"
-                   "n = os.cpu_count()\nex = ThreadPoolExecutor()\n")
+    bad.write_text(
+        "import os\nfrom concurrent.futures import ThreadPoolExecutor\nn = os.cpu_count()\nex = ThreadPoolExecutor()\n"
+    )
     monkeypatch.setattr(f"{__name__}.RUNTIME", [bad])
     monkeypatch.setattr(f"{__name__}.REPO", tmp_path)
     found = _scan()

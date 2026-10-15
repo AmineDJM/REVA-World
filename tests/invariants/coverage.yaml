@@ -1,0 +1,735 @@
+# Coverage map of the 35 non-negotiable invariants (architecture §24.1).
+#
+# For every invariant: where it is enforced (file + symbol: DB constraint/trigger/
+# function, code, import-linter contract, policy, document) and the pytest node
+# ids that fail if it is broken. Validated by tests/invariants/test_coverage_map.py
+# (35 entries, every node id collected by pytest, every enforcement file exists
+# and contains its symbol). The human-readable table is docs/data_constitution.md.
+#
+# status:
+#   proven             the cited tests fail if the invariant is broken on every V1 path
+#   partially_proven   tested for some paths; `gaps` says what is not, `owner` who closes it
+#   unproven           no test proves it; `owner` and `reason` required
+#   not_applicable_v1  V1 has no path where it can be violated; `reason` required
+# Parametrized tests are cited without their parameter suffix. A test marked
+# xfail is cited under `xfail` (never under `tests`) and keeps the status partial.
+schema: reva-invariant-coverage/1
+spec: "architecture §24.1 Non-negotiable invariants"
+constitution: docs/data_constitution.md
+invariants:
+  - id: 1
+    text: No published numerical result without complete provenance or an explicit missing-provenance blocker.
+    status: proven
+    reason: >-
+      Estimates cannot be published without a provenance activity reaching verified raw bytes; the provenance
+      API walks every result to raw artifacts and selectors. UI drill-through is covered separately by ui/e2e (agent F).
+    enforcement:
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "ops.check_publication", kind: db_function}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "publication_verified", kind: db_trigger}
+      - {file: migrations/versions/0001_kernel.py, symbol: "meta.artifact_is_verified", kind: db_function}
+      - {file: migrations/versions/0002_evidence.py, symbol: "evidence.check_acquisition_artifact", kind: db_function}
+      - {file: src/reva/evidence/ingest.py, symbol: "publish_acquisition", kind: code}
+      - {file: src/reva/api/routes/provenance.py, symbol: "router", kind: code}
+    tests:
+      - tests/security/test_roles_grants.py::test_publication_rejects_estimates_without_provenance
+      - tests/security/test_roles_grants.py::test_publication_rejects_unverified_artifacts
+      - tests/security/test_roles_grants.py::test_acquisition_requires_verified_raw_bytes
+      - tests/security/test_roles_grants.py::test_observation_must_agree_with_its_acquisition
+      - tests/security/test_roles_grants.py::test_provenance_cycles_rejected
+      - tests/security/test_db_hardening.py::test_sim_cannot_attach_provenance_to_source_activities
+      - tests/integration/test_api_endpoints.py::test_provenance_reaches_raw_artifact_and_selector
+      - tests/integration/test_api_endpoints.py::test_provenance_of_run_and_scenario
+      - tests/integration/test_api_contract.py::test_provenance_kinds_cover_emitted_links
+      - tests/unit/test_ontology_exports.py::test_prov_export_rejects_dangling_refs_cycles_and_naive_times
+
+  - id: 2
+    text: No overwriting a scientific observation, model version, scenario definition or belief release.
+    status: proven
+    enforcement:
+      - {file: migrations/versions/0001_kernel.py, symbol: "meta.reject_mutation", kind: db_trigger_function}
+      - {file: src/reva/adapters/postgres/ddl.py, symbol: "immutable_record", kind: db_trigger}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "release_sealed", kind: db_trigger}
+      - {file: migrations/versions/0002_evidence.py, symbol: "evidence.check_revision", kind: db_function}
+      - {file: src/reva/adapters/objects/filesystem.py, symbol: "put", kind: code}
+      - {file: src/reva/models/registry.py, symbol: "assert_immutable_update", kind: code}
+    tests:
+      - tests/security/test_roles_grants.py::test_runtime_roles_cannot_update_delete_truncate_history
+      - tests/security/test_roles_grants.py::test_owner_cannot_mutate_immutable_records_either
+      - tests/security/test_roles_grants.py::test_where_clause_is_not_the_boundary
+      - tests/security/test_roles_grants.py::test_create_scenario_does_not_alias_different_specs
+      - tests/security/test_db_hardening.py::test_published_release_is_sealed
+      - tests/integration/test_revisions.py::test_supersedes_chain_constraints_are_enforced_by_the_database
+      - tests/integration/test_revisions.py::test_aba_creates_three_revisions_identical_polls_create_none
+      - tests/integration/test_evidence_fixes.py::test_r28_parser_version_change_reprocesses_same_bytes
+      - tests/unit/test_storage_fs.py::test_never_overwrites_different_content
+      - tests/integration/test_storage_s3.py::test_conditional_write_never_overwrites_on_race
+      - tests/unit/test_model_registry.py::test_versions_are_immutable_and_promotion_moves_pointers
+      - tests/integration/test_backup_restore.py::test_backup_restore_reconstructs_manifests_and_as_of
+
+  - id: 3
+    text: No scenario/evaluation result accepted as real-world evidence.
+    status: proven
+    enforcement:
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "belief.check_input", kind: db_function}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "input_exactly_one", kind: db_constraint}
+      - {file: migrations/versions/0007_security.py, symbol: "activity_sim_insert", kind: rls_policy}
+      - {file: pyproject.toml, symbol: "simulation does not write evidence or beliefs", kind: import_contract}
+    tests:
+      - tests/security/test_roles_grants.py::test_sim_cannot_insert_evidence_or_beliefs
+      - tests/security/test_roles_grants.py::test_belief_input_cannot_reference_simulation_or_evaluation_outputs
+      - tests/security/test_roles_grants.py::test_sim_cannot_record_source_or_belief_activities
+      - tests/security/test_roles_grants.py::test_sim_cannot_create_belief_context_but_can_create_simulation_context
+      - tests/security/test_roles_grants.py::test_worker_cannot_write_simulation_outputs
+      - tests/security/test_db_hardening.py::test_sim_cannot_attach_provenance_to_source_activities
+      - tests/integration/test_simulation_engine.py::test_sim_role_cannot_write_evidence_or_beliefs
+      - tests/integration/test_eurostat_discovery.py::test_end_to_end_promotion_ingestion_and_belief_separation
+      - tests/performance/test_perf_simulation.py::test_benchmark_fixture_is_labelled_synthetic_and_never_a_source
+
+  - id: 4
+    text: No source report labelled as certain reality.
+    status: proven
+    enforcement:
+      - {file: src/reva/kernel/uncertainty.py, symbol: "UncertaintySpec", kind: code}
+      - {file: src/reva/adapters/connectors/worldbank.py, symbol: "UncertaintySpec.unknown", kind: code}
+      - {file: src/reva/adapters/connectors/comtrade.py, symbol: "UncertaintySpec.unknown", kind: code}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "selected_report", kind: db_constraint}
+    tests:
+      - tests/invariants/test_invariant_04_source_reports.py::test_parsed_source_reports_are_never_certain
+      - tests/invariants/test_invariant_04_source_reports.py::test_kernel_refuses_exact_label_without_a_definition
+      - tests/invariants/test_invariant_04_source_reports.py::test_published_source_estimates_keep_unquantified_status
+      - tests/unit/test_kernel_values.py::test_exact_by_definition_requires_definition_kind
+      - tests/unit/test_kernel_values.py::test_unknown_uncertainty_is_valid_and_not_zero_width
+      - tests/integration/test_evidence_fixes.py::test_comtrade_estimation_flag_replaces_uninformative_derived_flag
+      - tests/integration/test_world_graph.py::test_claim_vs_accepted_estimate
+
+  - id: 5
+    text: No missing value converted to zero.
+    status: proven
+    enforcement:
+      - {file: src/reva/kernel/values.py, symbol: "Missing", kind: code}
+      - {file: src/reva/kernel/values.py, symbol: "require_number", kind: code}
+      - {file: migrations/versions/0002_evidence.py, symbol: "value->>'kind' <> 'missing'", kind: db_constraint}
+      - {file: src/reva/models/economic/crude_exposure.py, symbol: "MissingInput", kind: code}
+    tests:
+      - tests/unit/test_kernel_values.py::test_missing_can_never_be_used_as_a_number
+      - tests/unit/test_kernel_values.py::test_require_number_rejects_non_value_inputs_instead_of_defaulting
+      - tests/security/test_roles_grants.py::test_missing_value_cannot_carry_a_number
+      - tests/security/test_http_connectors.py::test_comtrade_missing_flow_stays_missing_never_zero
+      - tests/security/test_http_connectors.py::test_wb_null_values_stay_missing
+      - tests/scientific/test_crude_exposure.py::test_missing_input_raises_never_zero
+      - tests/unit/population/test_population_recipe.py::test_leaf_absent_from_source_is_missing
+      - tests/unit/test_world_graph_core.py::test_missing_is_never_zero
+      - tests/unit/test_extensions_physical.py::test_missing_cells_are_never_zero_filled
+      - tests/contracts/test_observation_export.py::test_comtrade_dza_missing_is_exported_as_typed_missing
+      - tests/integration/test_api_endpoints.py::test_dza_crude_import_belief_is_typed_missing
+
+  - id: 6
+    text: No unit/currency/basis change without a versioned transform.
+    status: proven
+    enforcement:
+      - {file: src/reva/ontology/units.py, symbol: "apply_currency_transform", kind: code}
+      - {file: src/reva/ontology/units.py, symbol: "UNIT_REGISTRY_VERSION", kind: code}
+      - {file: src/reva/ontology/units.py, symbol: "mass_to_volume", kind: code}
+    tests:
+      - tests/unit/test_ontology_units.py::test_currency_never_converts_through_pint
+      - tests/unit/test_ontology_units.py::test_currency_transform_carries_basis_and_requires_period_factor
+      - tests/unit/test_ontology_units.py::test_currency_transform_rejects_incomplete_or_mismatched_basis
+      - tests/unit/test_ontology_units.py::test_kg_to_barrel_refused_without_density_and_convention
+      - tests/unit/test_ontology_units.py::test_no_unit_inference_from_field_names_exists
+      - tests/unit/test_ontology_units.py::test_observation_unit_must_match_concept_and_missing_values_pass
+      - tests/unit/test_ontology_mappings.py::test_crosswalk_requires_classification_revision_and_approval
+      - tests/scientific/test_crude_exposure.py::test_mixed_basis_rejected
+
+  - id: 7
+    text: No aggregation across incompatible support, classification or statistical universe.
+    status: proven
+    enforcement:
+      - {file: src/reva/ontology/validation.py, symbol: "can_aggregate", kind: code}
+      - {file: src/reva/ontology/validation.py, symbol: "can_combine_countries", kind: code}
+      - {file: src/reva/world/queries.py, symbol: "aggregate_flow_items", kind: code}
+      - {file: src/reva/belief/selection.py, symbol: "DISTINGUISHING_FLAGS", kind: code}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "input_admissible", kind: db_trigger}
+    tests:
+      - tests/unit/test_ontology_validation.py::test_world_total_and_bilateral_cannot_be_summed
+      - tests/unit/test_ontology_validation.py::test_cif_and_fob_values_cannot_be_aggregated
+      - tests/unit/test_ontology_validation.py::test_classification_revision_mismatch_and_missing
+      - tests/unit/test_ontology_validation.py::test_countries_with_different_reference_years_cannot_be_combined
+      - tests/unit/test_ontology_validation.py::test_jan1_support_does_not_satisfy_midyear_concept
+      - tests/unit/test_ontology_mappings.py::test_eurostat_jan1_total_vs_wdi_midyear_is_incompatible
+      - tests/integration/test_eurostat_discovery.py::test_wdi_midyear_equivalence_is_incompatible
+      - tests/integration/test_world_graph.py::test_aggregation_refuses_world_total_plus_bilateral
+      - tests/unit/test_world_graph_core.py::test_incompatible_semantics_are_refused
+      - tests/scientific/test_crude_exposure.py::test_mixed_reference_years_rejected
+      - tests/scientific/test_crude_exposure.py::test_mixed_basis_rejected
+      - tests/integration/test_evidence_fixes.py::test_r05_r3_08_incompatible_lineages_withhold_the_estimand
+      - tests/security/test_db_hardening.py::test_input_trigger_enforces_the_support_year_scope
+      - tests/unit/test_model_registry.py::test_annual_flow_cannot_feed_monthly_port_without_approved_disaggregation
+
+  - id: 8
+    text: No observed correlation labelled causal without an admissible causal claim.
+    status: proven
+    reason: >-
+      V1 has no causal model: no code path emits the identified_causal modality (AST scan), belief estimates
+      cannot carry it (DB CHECK), temporal sequence is never causation, a causal claim is tier T3 (human review)
+      and hypothesis cards cannot carry coefficients.
+    enforcement:
+      - {file: src/reva/kernel/context.py, symbol: "identified_causal_estimate", kind: code}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "modality IN ('selected_report','estimated_state','forecast')", kind: db_constraint}
+      - {file: src/reva/world/events.py, symbol: "SEQUENCE_NOTE", kind: code}
+      - {file: src/reva/autonomy/policy.py, symbol: "T3_CAPABILITIES", kind: policy}
+      - {file: src/reva/evidence/cards.py, symbol: "_no_fabrication", kind: code}
+    tests:
+      - tests/invariants/test_invariant_08_no_causal_labels.py::test_no_code_path_emits_an_identified_causal_modality
+      - tests/invariants/test_invariant_08_no_causal_labels.py::test_causal_claim_capability_requires_human_review_tier
+      - tests/invariants/test_invariant_08_no_causal_labels.py::test_hypothesis_card_cannot_carry_a_causal_coefficient
+      - tests/invariants/test_invariant_08_no_causal_labels.py::test_belief_estimates_cannot_be_causal
+      - tests/unit/test_world_graph_core.py::test_sequence_relations_never_claim_causation
+      - tests/integration/test_world_graph.py::test_history_separates_sequence_from_causal_hypotheses
+      - tests/security/test_prompt_injection.py::test_injected_paper_text_yields_only_a_candidate
+
+  - id: 9
+    text: No loss of uncertainty/dependence metadata without an explicit approximation record.
+    status: partially_proven
+    reason: >-
+      Proven at the selection, publication and export boundaries (verbatim copy, DB equality, export refuses
+      what the contract cannot express) and for compression (certificates).
+    gaps: >-
+      No generic approximation-record type exists; propagation of dependence_group through forecast and
+      simulation outputs is not tested end to end (inputs are unquantified in V1, so nothing is lost today).
+    owner: "lead (belief/evidence) with agent B (forecasting) and agent C (simulation)"
+    enforcement:
+      - {file: src/reva/belief/selection.py, symbol: "select_report", kind: code}
+      - {file: src/reva/kernel/uncertainty.py, symbol: "dependence_group", kind: code}
+      - {file: src/reva/evidence/export.py, symbol: "uncertainty", kind: code}
+      - {file: src/reva/compression/certificates.py, symbol: "CompressionCertificate", kind: code}
+    tests:
+      - tests/invariants/test_invariant_09_13_selection.py::test_selection_copies_uncertainty_and_dependence_metadata_verbatim
+      - tests/invariants/test_invariant_09_13_selection.py::test_published_estimate_uncertainty_equals_its_observation
+      - tests/scientific/test_uncertainty_types.py::test_specs_are_immutable
+      - tests/contracts/test_observation_export_properties.py::test_uncertainty_the_contract_cannot_express_is_refused
+      - tests/contracts/test_observation_export_properties.py::test_invalid_stored_uncertainty_is_refused
+      - tests/unit/test_ontology_mappings.py::test_crosswalk_preserves_unmapped_mass_as_residual
+
+  - id: 10
+    text: No synthetic/private-person identity linkage in V1.
+    status: proven
+    enforcement:
+      - {file: src/reva/population/recipe.py, symbol: "check_attributes", kind: code}
+      - {file: registry/policies/privacy.yaml, symbol: "privacy", kind: policy}
+      - {file: migrations/versions/0001_kernel.py, symbol: "artifact_v1_public_only", kind: db_constraint}
+    tests:
+      - tests/unit/population/test_population_recipe.py::test_forbidden_attributes_rejected
+      - tests/unit/population/test_population_recipe.py::test_any_other_attribute_rejected
+      - tests/security/test_roles_grants.py::test_restricted_privacy_classes_rejected
+      - tests/contracts/test_registry_components.py::test_component_privacy_is_v1_admissible_and_no_gender_field
+      - tests/unit/test_extensions_interfaces.py::test_household_synthesis_refuses_and_validates_sources
+
+  - id: 11
+    text: No model execution fetching live inputs.
+    status: partially_proven
+    reason: >-
+      models, simulation, evaluation, compression and extensions cannot transitively import any HTTP library,
+      connector, HTTP adapter or ingest module (grimp), the import-linter contracts are kept, JobContext carries no
+      HTTP client, and real L1/L2 simulation jobs succeed with every network path disabled.
+    gaps: >-
+      reva.population.service (population job handler) imports reva.cli.seed.entity_id, which pulls the connector
+      registry, SafeHttpClient and httpx into its import closure (no fetch happens). Test is xfail until fixed.
+    owner: "lead (src/reva/population/service.py; move entity_id to a pure module such as reva.kernel.ids)"
+    enforcement:
+      - {file: pyproject.toml, symbol: "numerical models have no HTTP, DB or adapters", kind: import_contract}
+      - {file: pyproject.toml, symbol: "simulation does not write evidence or beliefs", kind: import_contract}
+      - {file: scripts/verify_imports.py, symbol: "lint-imports", kind: ci}
+      - {file: src/reva/operations/context.py, symbol: "JobContext", kind: code}
+      - {file: src/reva/simulation/compile.py, symbol: "load_release", kind: code}
+    tests:
+      - tests/invariants/test_invariant_11_no_live_inputs.py::test_model_execution_cannot_reach_the_network_through_imports
+      - tests/invariants/test_invariant_11_no_live_inputs.py::test_import_linter_contracts_encode_the_boundary_and_are_kept
+      - tests/invariants/test_invariant_11_no_live_inputs.py::test_handler_contract_carries_no_http_client
+      - tests/invariants/test_invariant_11_no_live_inputs.py::test_simulation_succeeds_with_all_network_paths_disabled
+      - tests/scientific/test_crude_exposure_coupling_rng.py::test_unbound_or_double_owned_inputs_rejected
+    xfail:
+      - tests/invariants/test_invariant_11_no_live_inputs.py::test_population_job_cannot_reach_the_network_through_imports
+
+  - id: 12
+    text: No replay using unavailable revisions or later fitted preprocessing.
+    status: proven
+    enforcement:
+      - {file: src/reva/evaluation/leakage.py, symbol: "LeakageGuard", kind: code}
+      - {file: src/reva/evaluation/cutoff.py, symbol: "CutoffRepository", kind: code}
+      - {file: src/reva/evaluation/replay.py, symbol: "_verify_release_manifest", kind: code}
+      - {file: migrations/versions/0001_kernel.py, symbol: "meta.force_recorded_at", kind: db_trigger_function}
+      - {file: src/reva/belief/selection.py, symbol: "eligible_latest", kind: code}
+    tests:
+      - tests/replay/test_leakage_cases.py::test_six_leakage_cases_blocked_in_strict_mode
+      - tests/replay/test_leakage_cases.py::test_strict_never_downgrades
+      - tests/replay/test_leakage_cases.py::test_scaler_and_model_rules_need_proof_and_never_guess
+      - tests/replay/test_leakage_cases.py::test_available_then_excludes_records_without_availability_proof
+      - tests/replay/test_leakage_cases.py::test_revised_data_retrospective_is_labelled_everywhere
+      - tests/replay/test_replay_job.py::test_operational_replay_job_writes_evaluation_context_and_manifest
+      - tests/integration/test_revisions.py::test_two_revisions_yield_different_as_of_answers
+      - tests/integration/test_revisions.py::test_missing_source_publication_time_is_never_the_reference_date
+      - tests/unit/forecasting/test_forecast_no_lookahead.py::test_cutoff_scoped_series_blocks_future_access
+      - tests/unit/forecasting/test_forecast_no_lookahead.py::test_tournament_records_unchanged_by_future_panel_data
+      - tests/unit/forecasting/test_forecast_metrics.py::test_mase_scale_uses_training_window_only
+      - tests/security/test_roles_grants.py::test_belief_input_rejects_observation_recorded_after_cutoff
+      - tests/security/test_db_hardening.py::test_runtime_roles_cannot_backdate_recorded_at
+      - tests/security/test_db_hardening.py::test_every_recorded_at_table_has_the_server_trigger
+      - tests/integration/test_evidence_fixes.py::test_r03_future_cutoff_rejected_and_none_means_db_now
+      - tests/integration/test_evidence_fixes.py::test_r20_release_as_of_never_returns_release_with_later_cutoff
+      - tests/integration/test_evidence_fixes.py::test_r27_prior_estimate_input_respects_origin_and_cutoff
+      - tests/security/test_http_storage_fixes.py::test_invalid_or_future_knowledge_cutoff_rejected
+
+  - id: 13
+    text: No source-family duplicates counted as independent evidence.
+    status: partially_proven
+    reason: >-
+      V1 never pools or vote-counts: selection chooses one lineage by preference, agreeing duplicates (same
+      lineage family) neither change the value nor narrow/upgrade its uncertainty, stay visible as alternatives
+      and are flagged; each estimate names exactly one observation. Evaluator independence is enforced for gates.
+    gaps: >-
+      evidence.source.lineage_family and evidence.effect.dependency_family are recorded but no code consumes them
+      (there is no pooling/meta-analysis in V1); a family-aware independence rule must be added and tested before
+      any multi-source combination or evidence-weighting is introduced.
+    owner: "lead (belief/evidence) when pooling or evidence weighting is implemented"
+    enforcement:
+      - {file: src/reva/belief/selection.py, symbol: "select_report", kind: code}
+      - {file: src/reva/belief/selection.py, symbol: "multiple_lineages_same_source", kind: code}
+      - {file: registry/sources/comtrade.yaml, symbol: "lineage_family", kind: registry}
+      - {file: migrations/versions/0006_operations.py, symbol: "ops.check_gate_evaluator", kind: db_function}
+    tests:
+      - tests/invariants/test_invariant_09_13_selection.py::test_same_family_duplicates_do_not_narrow_or_upgrade_the_selected_value
+      - tests/invariants/test_invariant_09_13_selection.py::test_selection_output_has_no_independence_count_or_pooled_value
+      - tests/invariants/test_invariant_09_13_selection.py::test_every_source_estimate_names_exactly_one_selected_observation
+      - tests/integration/test_autonomy_gates.py::test_gate_ignores_reports_from_the_proposer
+      - tests/integration/test_autonomy_gates.py::test_t1_without_independent_reports_is_not_promoted
+
+  - id: 14
+    text: No arbitrary code from documents/agents executed in production.
+    status: proven
+    enforcement:
+      - {file: src/reva/autonomy/sandbox.py, symbol: "TrustedTemplateSandbox", kind: code}
+      - {file: src/reva/capabilities.py, symbol: "_sandbox_configured", kind: code}
+      - {file: src/reva/autonomy/policy.py, symbol: "contains_code", kind: policy}
+      - {file: src/reva/adapters/connectors/eurostat_template.py, symbol: "EurostatJsonStatConnector", kind: code}
+    tests:
+      - tests/security/test_sandbox_isolation.py::test_generated_code_is_blocked_without_external_runner
+      - tests/security/test_sandbox_isolation.py::test_manifest_proposal_cannot_smuggle_code
+      - tests/security/test_sandbox_isolation.py::test_worker_never_imports_proposed_code
+      - tests/security/test_sandbox_isolation.py::test_trusted_template_env_has_no_secrets_and_network_is_template_only
+      - tests/security/test_prompt_injection.py::test_injected_catalogue_and_metadata_change_nothing
+      - tests/security/test_prompt_injection.py::test_injected_paper_text_yields_only_a_candidate
+      - tests/unit/test_capabilities.py::test_sandbox_blocked_unless_configured
+      - tests/integration/test_eurostat_discovery.py::test_generator_refuses_unapproved_template
+      - tests/security/test_sql_injection.py::test_hostile_job_type_is_rejected_not_executed
+
+  - id: 15
+    text: No model self-promotion or editing its own policy gates.
+    status: proven
+    enforcement:
+      - {file: src/reva/autonomy/gate.py, symbol: "PolicyPromotionGate", kind: code}
+      - {file: src/reva/autonomy/policy.py, symbol: "load_pinned", kind: policy}
+      - {file: migrations/versions/0006_operations.py, symbol: "gate_independent", kind: db_trigger}
+      - {file: migrations/versions/0004_models_sim.py, symbol: "model.check_promotion", kind: db_function}
+      - {file: registry/policies/promotion.yaml, symbol: "policy_version", kind: policy}
+    tests:
+      - tests/integration/test_autonomy_gates.py::test_proposer_cannot_write_its_own_gate_result
+      - tests/integration/test_autonomy_gates.py::test_gate_ignores_reports_from_the_proposer
+      - tests/integration/test_autonomy_gates.py::test_policy_change_makes_gate_refuse
+      - tests/integration/test_autonomy_gates.py::test_repository_policy_matches_pin
+      - tests/integration/test_autonomy_gates.py::test_declared_tier_cannot_be_lowered_for_manifest
+      - tests/security/test_db_hardening.py::test_direct_gate_result_forgeries_rejected
+      - tests/security/test_db_hardening.py::test_model_promotion_requires_matching_replay_evaluation_and_named_reviewer
+      - tests/security/test_db_hardening.py::test_worker_cannot_mint_api_tokens_or_record_human_reviews
+      - tests/integration/test_evaluation_service.py::test_insufficient_evidence_keeps_incumbent
+      - tests/integration/test_evaluation_service.py::test_locked_holdout_reuse_is_blocked
+      - tests/integration/test_autonomy_contracts.py::test_model_registry_requires_approval_and_is_immutable
+
+  - id: 16
+    text: No kernel/ontology semantic mutation without version and migration.
+    status: proven
+    enforcement:
+      - {file: src/reva/ontology/components.py, symbol: "check_version_bump", kind: code}
+      - {file: src/reva/ontology/components.py, symbol: "verify_published", kind: code}
+      - {file: src/reva/adapters/postgres/ddl.py, symbol: "immutable_record", kind: db_trigger}
+      - {file: src/reva/kernel/ids.py, symbol: "CANONICAL_HASH_VERSION", kind: code}
+      - {file: scripts/validate_contracts.py, symbol: "def main", kind: ci}
+    tests:
+      - tests/unit/test_ontology_components.py::test_published_versions_are_immutable
+      - tests/unit/test_ontology_components.py::test_verify_published_detects_in_place_edit
+      - tests/unit/test_ontology_components.py::test_meaning_change_is_major_and_title_is_patch
+      - tests/unit/test_ontology_components.py::test_unit_change_is_major
+      - tests/contracts/test_registry_components.py::test_published_versions_match_pinned_digests
+      - tests/contracts/test_json_schemas.py::test_ontology_manifest_is_deterministic
+      - tests/security/test_roles_grants.py::test_owner_cannot_mutate_immutable_records_either
+      - tests/security/test_http_storage_fixes.py::test_canonical_version_bumped
+      - tests/unit/test_ids_canonical.py::test_logical_hash_is_versioned_and_hex
+
+  - id: 17
+    text: No silent truncation of a connector response, query or graph.
+    status: proven
+    enforcement:
+      - {file: src/reva/adapters/connectors/worldbank.py, symbol: "pagination_truncated", kind: code}
+      - {file: src/reva/adapters/connectors/comtrade.py, symbol: "possible_truncation", kind: code}
+      - {file: src/reva/adapters/http/safe_client.py, symbol: "_BoundedDecoder", kind: code}
+      - {file: src/reva/world/graph.py, symbol: "MAX_EDGES", kind: code}
+      - {file: src/reva/api/routes/world.py, symbol: "truncated", kind: code}
+    tests:
+      - tests/security/test_http_connectors.py::test_wb_pagination_truncation_blocks
+      - tests/security/test_http_connectors.py::test_comtrade_max_records_truncation_blocks
+      - tests/security/test_http_connectors.py::test_comtrade_count_mismatch_blocks
+      - tests/security/test_http_connectors.py::test_runner_quarantines_truncated_page_and_html
+      - tests/security/test_ssrf_http.py::test_oversized_streamed_body_rejected_early
+      - tests/security/test_http_storage_fixes.py::test_multi_member_gzip_and_truncation
+      - tests/unit/test_storage_fs.py::test_truncated_object_detected
+      - tests/integration/test_api_endpoints.py::test_relations_bounded_with_truncation_flag
+      - tests/integration/test_world_graph.py::test_path_search_bounds_and_truncated_flag
+      - tests/integration/test_world_graph.py::test_neighbourhood_interval_layer_and_truncation
+      - tests/unit/test_world_graph_core.py::test_networkx_cap_raises_capability_gap_before_import
+
+  - id: 18
+    text: No partial multi-object publication visible as a complete release.
+    status: proven
+    enforcement:
+      - {file: src/reva/belief/publication.py, symbol: "publish_release", kind: code}
+      - {file: src/reva/evidence/ingest.py, symbol: "publish_acquisition", kind: code}
+      - {file: migrations/versions/0003_belief_graph.py, symbol: "ops.check_publication", kind: db_function}
+      - {file: src/reva/operations/gc.py, symbol: "handle_gc", kind: code}
+    tests:
+      - tests/integration/test_storage_publication.py::test_crash_after_upload_before_commit_is_invisible_then_retry_publishes_once
+      - tests/integration/test_storage_publication.py::test_failure_inside_transaction_rolls_back_everything
+      - tests/integration/test_storage_publication.py::test_failure_mid_upload_leaves_no_object_and_no_rows
+      - tests/integration/test_storage_publication.py::test_unresolvable_subject_aborts_whole_acquisition
+      - tests/security/test_roles_grants.py::test_release_readers_ignore_unpublished_releases
+      - tests/security/test_roles_grants.py::test_release_by_id_does_not_serve_unpublished_releases
+      - tests/security/test_db_hardening.py::test_publication_requires_a_transaction_scoped_lock
+      - tests/integration/test_evidence_fixes.py::test_r14_post_publish_failure_rolls_back_and_is_retried
+      - tests/integration/test_evidence_fixes.py::test_r06_partial_publication_clears_only_published_concepts_of_its_origin
+      - tests/integration/test_queue_reliability.py::test_kill_after_object_upload_then_retry_yields_one_acquisition
+      - tests/security/test_http_storage_fixes.py::test_gc_skips_object_whose_lock_a_publisher_holds
+
+  - id: 19
+    text: No queue lease holder commits after losing its fencing token.
+    status: proven
+    enforcement:
+      - {file: migrations/versions/0006_operations.py, symbol: "ops.assert_lease", kind: db_function}
+      - {file: migrations/versions/0006_operations.py, symbol: "ops.complete_job", kind: db_function}
+      - {file: src/reva/operations/context.py, symbol: "complete_in", kind: code}
+    tests:
+      - tests/integration/test_queue_reliability.py::test_expired_lease_reclaimed_with_higher_token_and_stale_holder_cannot_commit
+      - tests/integration/test_simulation_engine.py::test_stale_fencing_token_cannot_publish
+      - tests/replay/test_replay_job.py::test_stale_lease_cannot_publish_a_replay
+      - tests/security/test_db_hardening.py::test_heartbeat_in_range_reaches_the_lease_check
+
+  - id: 20
+    text: No model applies outside its declared support without a qualified research-mode result.
+    status: proven
+    enforcement:
+      - {file: src/reva/models/applicability.py, symbol: "check_applicability", kind: code}
+      - {file: src/reva/models/applicability.py, symbol: "capability_status", kind: code}
+      - {file: src/reva/simulation/spec.py, symbol: "validate_scenario_spec", kind: code}
+      - {file: src/reva/models/economic/crude_exposure.py, symbol: "IMPORT_ELASTICITY_ENVELOPE", kind: code}
+    tests:
+      - tests/unit/test_model_registry.py::test_out_of_envelope_requests_are_refused_with_reasons
+      - tests/unit/test_model_registry.py::test_capability_levels_l3_l4_reserved
+      - tests/scientific/test_crude_exposure.py::test_envelopes_and_horizon
+      - tests/integration/test_simulation_engine.py::test_five_year_horizon_rejected
+      - tests/integration/test_simulation_engine.py::test_l3_and_l4_rejected
+      - tests/unit/test_capabilities.py::test_v1_fidelity_envelope
+      - tests/unit/forecasting/test_forecast_models.py::test_local_level_ineligible_below_six_points
+      - tests/unit/forecasting/test_forecast_models.py::test_log_models_refuse_non_positive_values_without_clipping
+      - tests/integration/test_autonomy_contracts.py::test_backtest_runner_adapts_tournament_and_blocks_unsupported_modes
+
+  - id: 21
+    text: No probabilities fabricated for unquantified assumptions.
+    status: proven
+    enforcement:
+      - {file: src/reva/kernel/uncertainty.py, symbol: "sensitivity_range", kind: code}
+      - {file: src/reva/simulation/engine.py, symbol: "_range_uncertainty", kind: code}
+      - {file: src/reva/simulation/engine.py, symbol: "_unknown_uncertainty", kind: code}
+      - {file: src/reva/autonomy/voi.py, symbol: "estimate", kind: code}
+    tests:
+      - tests/scientific/test_crude_exposure.py::test_sensitivity_range_not_probabilistic
+      - tests/scientific/test_uncertainty_types.py::test_sensitivity_range_cannot_carry_a_level
+      - tests/scientific/test_uncertainty_types.py::test_bounds_are_non_probabilistic_and_levelless
+      - tests/scientific/test_crude_exposure_sensitivity_row.py::test_l1_row_keeps_unquantified_uncertainty_in_l2_run
+      - tests/scientific/test_crude_exposure_sensitivity_row.py::test_range_row_is_separate_levelless_assumption_sensitivity
+      - tests/integration/test_simulation_engine.py::test_l2_sensitivity_range
+      - tests/unit/forecasting/test_forecast_models.py::test_last_value_point_is_last_train_value_and_unquantified
+      - tests/unit/forecasting/test_forecast_models.py::test_log_drift_interval_unquantified_below_two_degrees_of_freedom
+      - tests/scientific/test_voi_analytic.py::test_estimate_value_without_decision_spec_is_unitless_proxy
+
+  - id: 22
+    text: No confidence/credible/prediction/sensitivity intervals conflated.
+    status: proven
+    enforcement:
+      - {file: src/reva/kernel/uncertainty.py, symbol: "UncertaintyKind", kind: code}
+      - {file: src/reva/models/metrics.py, symbol: "_require_prediction_interval", kind: code}
+      - {file: contracts/observation.schema.json, symbol: "sensitivity_range", kind: contract}
+    tests:
+      - tests/scientific/test_uncertainty_types.py::test_kinds_are_distinct_values_and_not_interchangeable
+      - tests/scientific/test_uncertainty_types.py::test_only_prediction_intervals_have_coverage
+      - tests/scientific/test_uncertainty_types.py::test_interval_kinds_require_a_level
+      - tests/unit/test_kernel_values.py::test_interval_kinds_are_distinct_types
+      - tests/unit/forecasting/test_forecast_metrics.py::test_coverage_aggregation_rejects_non_prediction_intervals
+      - tests/unit/forecasting/test_forecast_metrics.py::test_coverage_of_specs_rejects_sensitivity_range
+      - tests/contracts/test_observation_export_properties.py::test_probability_kind_is_refused_explicitly
+
+  - id: 23
+    text: No source-specific country code assumed to be a universal country ID.
+    status: proven
+    enforcement:
+      - {file: src/reva/kernel/ids.py, symbol: "external_id", kind: code}
+      - {file: registry/entities/countries.yaml, symbol: "comtrade_partner", kind: registry}
+      - {file: src/reva/world/identities.py, symbol: "provider", kind: code}
+    tests:
+      - tests/unit/test_ids_canonical.py::test_external_id_depends_on_provider_key_and_epoch
+      - tests/unit/test_ids_canonical.py::test_registry_entity_ids_are_label_independent
+      - tests/unit/test_ids_canonical.py::test_external_id_takes_no_display_name
+      - tests/integration/test_world_graph.py::test_alias_resolution_is_provider_scoped
+      - tests/integration/test_world_graph.py::test_alias_ambiguity_is_explicit
+      - tests/integration/test_evidence_fixes.py::test_r10_partner_codes_get_distinct_entities
+      - tests/live/test_live_sources.py::test_comtrade_reporter_codes_match_provider_catalogue
+
+  - id: 24
+    text: No numerical instability or failed conservation check hidden by rounding.
+    status: proven
+    enforcement:
+      - {file: src/reva/models/economic/crude_exposure.py, symbol: "PRECISION", kind: code}
+      - {file: src/reva/compression/certificates.py, symbol: "ConservationCheck", kind: code}
+      - {file: src/reva/population/calibration.py, symbol: "rake", kind: code}
+      - {file: src/reva/kernel/values.py, symbol: "decimal_str", kind: code}
+    tests:
+      - tests/scientific/test_crude_exposure.py::test_zero_elasticity_l2_equals_l1_exactly
+      - tests/scientific/test_crude_exposure.py::test_l2_matches_definition_and_is_correctly_rounded
+      - tests/scientific/test_crude_exposure.py::test_hand_computed_l1_exact
+      - tests/property/test_population_properties.py::test_exact_conservation_for_random_counts
+      - tests/property/test_population_properties.py::test_leaf_sums_equal_reported_total_for_mixed_sources
+      - tests/unit/population/test_population_diagnostics_calibration.py::test_ipf_reports_non_convergence_for_jointly_incompatible_support
+      - tests/unit/population/test_population_compression.py::test_refine_after_reweighting_conserves_coarse_totals_but_reports_error
+      - tests/unit/test_kernel_values.py::test_non_finite_floats_rejected
+      - tests/unit/test_extensions_interfaces.py::test_imbalance_detected_with_residual
+      - tests/unit/test_extensions_physical.py::test_partition_conserves_total_with_unaligned_edges_and_antimeridian
+      - tests/integration/test_evidence_fixes.py::test_r3_08_decimal_values_compare_numerically
+
+  - id: 25
+    text: No default country/geography permanently excluded from possible refinement.
+    status: proven
+    enforcement:
+      - {file: registry/requirements/mvp.yaml, symbol: "geography: [FRA, DZA, CHN, USA]", kind: registry}
+      - {file: src/reva/autonomy/gaps.py, symbol: "classify", kind: code}
+      - {file: src/reva/autonomy/gaps.py, symbol: "CatalogueGapDetector", kind: code}
+    tests:
+      - tests/invariants/test_invariant_25_no_permanent_exclusion.py::test_every_default_country_is_a_target_of_every_crude_exposure_requirement
+      - tests/invariants/test_invariant_25_no_permanent_exclusion.py::test_a_missing_country_stays_a_gap_on_every_detection_run
+      - tests/invariants/test_invariant_25_no_permanent_exclusion.py::test_the_gap_closes_only_when_data_arrives
+      - tests/integration/test_autonomy_contracts.py::test_gap_detector_against_database_finds_dza_crude_missing
+      - tests/integration/test_autonomy_contracts.py::test_gap_classification_rules
+      - tests/integration/test_simulation_engine.py::test_all_four_countries_returns_missing_input_for_dza
+      - tests/integration/test_api_endpoints.py::test_coverage_and_gaps
+      - tests/e2e/test_demo_workflow.py::test_negative_demo_reports_the_algerian_blocker
+
+  - id: 26
+    text: No household/network coarsening without task-relevant diagnostics.
+    status: proven
+    reason: >-
+      V1 has no household synthesis (typed reserved capability) and network projections are flagged derived; the
+      only coarsening (age band x recorded sex) always carries a task-scoped compression certificate with
+      subgroup/tail errors and exact conservation, persisted by the population job.
+    enforcement:
+      - {file: src/reva/compression/certificates.py, symbol: "CompressionCertificate", kind: code}
+      - {file: src/reva/compression/stratified.py, symbol: "coarsen", kind: code}
+      - {file: src/reva/population/service.py, symbol: "model.compression_certificate", kind: code}
+      - {file: src/reva/extensions/population.py, symbol: "synthesize_households", kind: code}
+      - {file: src/reva/world/graph.py, symbol: "DERIVED_PROJECTION_WARNING", kind: code}
+    tests:
+      - tests/invariants/test_invariant_26_coarsening_diagnostics.py::test_every_coarsening_carries_a_task_scoped_certificate
+      - tests/invariants/test_invariant_26_coarsening_diagnostics.py::test_lossy_refinement_reports_its_error_instead_of_hiding_it
+      - tests/invariants/test_invariant_26_coarsening_diagnostics.py::test_household_coarsening_is_a_typed_reserved_capability
+      - tests/invariants/test_invariant_26_coarsening_diagnostics.py::test_population_job_persists_the_certificate_with_each_step
+      - tests/unit/population/test_population_compression.py::test_coarsen_conserves_exactly
+      - tests/unit/population/test_population_compression.py::test_refine_after_reweighting_conserves_coarse_totals_but_reports_error
+      - tests/unit/test_extensions_interfaces.py::test_household_synthesis_refuses_and_validates_sources
+      - tests/unit/test_world_graph_core.py::test_clique_projection_is_flagged_derived
+
+  - id: 27
+    text: No calibration performance claim without disclosed denominator/holdout.
+    status: proven
+    enforcement:
+      - {file: src/reva/models/tournament.py, symbol: "run_tournament", kind: code}
+      - {file: src/reva/evaluation/tournament_service.py, symbol: "HOLDOUT_LOCK", kind: code}
+      - {file: src/reva/evaluation/tournament_service.py, symbol: "HONESTY_STATEMENT", kind: code}
+      - {file: registry/policies/promotion.yaml, symbol: "policy_version", kind: policy}
+    tests:
+      - tests/unit/forecasting/test_forecast_tournament.py::test_short_panel_keeps_incumbent_insufficient_evaluation
+      - tests/unit/forecasting/test_forecast_tournament.py::test_holdout_non_inferiority_margin_and_test
+      - tests/integration/test_evaluation_service.py::test_full_panel_stores_evaluations_promotions_and_label
+      - tests/integration/test_evaluation_service.py::test_locked_holdout_reuse_is_blocked
+      - tests/integration/test_api_endpoints.py::test_evaluation_job_and_scorecard_labels
+      - tests/replay/test_replay_job.py::test_retrospective_job_result_carries_label_and_disclaimer
+      - tests/unit/test_model_registry.py::test_paired_metrics_use_common_cases_where_unpaired_ranking_flips
+
+  - id: 28
+    text: No global knowledge percentage without a versioned finite catalogue.
+    status: proven
+    enforcement:
+      - {file: registry/requirements/mvp.yaml, symbol: "catalogue_version", kind: registry}
+      - {file: src/reva/api/routes/catalog.py, symbol: "get_coverage", kind: code}
+      - {file: src/reva/autonomy/gaps.py, symbol: "coverage_report", kind: code}
+    tests:
+      - tests/integration/test_api_endpoints.py::test_coverage_and_gaps
+      - tests/integration/test_autonomy_contracts.py::test_handle_gaps_writes_report_and_outbox
+      - tests/invariants/test_invariant_35_no_truth_claims.py::test_evaluation_and_coverage_statements_disclaim_reality
+      - tests/live/test_live_sources.py::test_full_live_run_release_and_coverage
+
+  - id: 29
+    text: No uncontrolled concurrency based on host os.cpu_count().
+    status: proven
+    enforcement:
+      - {file: src/reva/settings.py, symbol: "threads_budget", kind: code}
+      - {file: src/reva/settings.py, symbol: "reva_worker_concurrency", kind: code}
+      - {file: scripts/_runtime_env.py, symbol: "thread_budget", kind: code}
+      - {file: src/reva/operations/worker.py, symbol: "never os.cpu_count()", kind: code}
+    tests:
+      - tests/invariants/test_invariant_29_no_cpu_count.py::test_runtime_code_never_sizes_concurrency_from_the_host_cpu_count
+      - tests/invariants/test_invariant_29_no_cpu_count.py::test_scan_detects_a_planted_violation
+      - tests/invariants/test_invariant_29_no_cpu_count.py::test_worker_concurrency_is_an_explicit_bounded_setting
+      - tests/unit/test_settings.py::test_threads_budget_ignores_cpu_count
+      - tests/unit/test_settings.py::test_threads_budget_respects_cgroup_quota
+      - tests/security/test_start_env.py::test_thread_budget_is_explicit_and_capped_by_cgroup
+      - tests/integration/test_queue_reliability.py::test_thread_budget_ignores_cpu_count
+
+  - id: 30
+    text: No external egress, LLM or scientific computation beyond the configured budget.
+    status: partially_proven
+    reason: >-
+      Per-run request budgets stop the connector runner, autonomy discovery is budgeted, the LLM is disabled
+      with a zero budget, external runner budgets must be bounded and CPU threads are explicitly budgeted.
+    gaps: >-
+      The daily totals in registry/policies/budgets.yaml (daily.http_requests_total, daily.http_bytes_total,
+      per_source_daily_requests) have no persistent ledger and are not enforced across scheduled live ingest
+      runs; per_source_daily_requests keys (e.g. worldbank.wdi) do not match connector names
+      (worldbank.wdi.indicators). No test proves a daily cap.
+    owner: "agent D (scheduler/ops: src/reva/operations/schedules.py, jobs.py) with lead (evidence/runner.py)"
+    enforcement:
+      - {file: src/reva/evidence/runner.py, symbol: "request budget exhausted", kind: code}
+      - {file: src/reva/autonomy/discovery.py, symbol: "budget.max_requests", kind: code}
+      - {file: registry/policies/budgets.yaml, symbol: "monthly_usd", kind: policy}
+      - {file: src/reva/settings.py, symbol: "reva_llm_monthly_budget_usd", kind: code}
+      - {file: src/reva/extensions/runner.py, symbol: "unbounded is not allowed", kind: code}
+    tests:
+      - tests/invariants/test_invariant_30_budgets.py::test_runner_never_exceeds_the_request_budget
+      - tests/invariants/test_invariant_30_budgets.py::test_llm_is_disabled_with_a_zero_budget_by_default
+      - tests/invariants/test_invariant_30_budgets.py::test_external_runner_budget_must_be_bounded
+      - tests/integration/test_autonomy_gates.py::test_budgets_policy_is_used
+      - tests/integration/test_autonomy_gates.py::test_llm_disabled_is_blocked_and_candidate_only
+      - tests/integration/test_autonomy_gates.py::test_proposal_backlog_is_bounded
+      - tests/integration/test_autonomy_gates.py::test_kill_switch_blocks_everything
+      - tests/unit/test_extensions_interfaces.py::test_runner_budget_must_be_bounded
+      - tests/security/test_ssrf_http.py::test_per_request_limit_cannot_raise_the_client_limit
+
+  - id: 31
+    text: No secrets in code, fixtures, logs, artifacts or generated prompts.
+    status: proven
+    enforcement:
+      - {file: src/reva/operations/telemetry.py, symbol: "RedactionFilter", kind: code}
+      - {file: src/reva/adapters/http/safe_client.py, symbol: "redact_url", kind: code}
+      - {file: src/reva/settings.py, symbol: "redact_env", kind: code}
+      - {file: scripts/_runtime_env.py, symbol: "build_child_env", kind: code}
+      - {file: src/reva/autonomy/sandbox.py, symbol: "scrubbed_environment", kind: code}
+    tests:
+      - tests/security/test_secrets_logs.py::test_no_hard_credentials_anywhere_in_repository
+      - tests/security/test_secrets_logs.py::test_captured_fixture_bodies_contain_no_credentials
+      - tests/security/test_secrets_logs.py::test_captured_fixture_manifests_contain_no_secrets
+      - tests/security/test_secrets_logs.py::test_raw_acquisition_metadata_excludes_secret_query_values
+      - tests/security/test_secrets_logs.py::test_http_client_logs_do_not_contain_secret_query_values
+      - tests/security/test_secrets_logs.py::test_env_file_is_not_tracked_and_is_ignored
+      - tests/security/test_start_env.py::test_worker_child_env_has_no_api_or_owner_secrets
+      - tests/security/test_start_env.py::test_start_api_fails_closed_without_printing_secrets
+      - tests/integration/test_queue_telemetry.py::test_json_logs_carry_correlation_and_redact_secrets
+      - tests/security/test_http_storage_fixes.py::test_redaction_covers_common_secret_names_and_url_credentials
+      - tests/security/test_http_storage_fixes.py::test_response_metadata_redacts_secret_query_values
+      - tests/security/test_sandbox_isolation.py::test_trusted_template_env_has_no_secrets_and_network_is_template_only
+      - tests/unit/test_extensions_interfaces.py::test_run_request_refuses_secrets_and_unaddressed_inputs
+      - tests/integration/test_api_endpoints.py::test_r2_13_job_errors_never_expose_sql
+      - tests/security/test_auth_session.py::test_validation_errors_never_echo_password
+
+  - id: 32
+    text: No claim of legal retention overriding required deletion of restricted data.
+    status: partially_proven
+    reason: >-
+      V1 cannot store restricted data (artifact_v1_public_only) and the append-only trigger has a reviewed
+      deletion path (reva_restricted_deletion + ticket) that deletes immutable rows while runtime roles can never
+      use it.
+    gaps: >-
+      No end-to-end restricted-data deletion workflow exists (object-store bytes, backups, derived artifacts),
+      because V1 stores none; it must be built and tested before any restricted class is admitted.
+    owner: "lead (migrations/kernel) with agent I (backup/restore, docs/operations.md)"
+    enforcement:
+      - {file: migrations/versions/0001_kernel.py, symbol: "reva_restricted_deletion", kind: db_role}
+      - {file: migrations/versions/0001_kernel.py, symbol: "reva.reviewed_deletion_ticket", kind: db_trigger_function}
+      - {file: migrations/versions/0001_kernel.py, symbol: "artifact_v1_public_only", kind: db_constraint}
+    tests:
+      - tests/invariants/test_invariant_32_deletion_overrides_retention.py::test_restricted_privacy_classes_cannot_be_stored_in_v1
+      - tests/invariants/test_invariant_32_deletion_overrides_retention.py::test_reviewed_deletion_ticket_can_delete_an_immutable_record
+      - tests/security/test_roles_grants.py::test_deletion_ticket_does_not_help_runtime_roles
+      - tests/security/test_roles_grants.py::test_restricted_privacy_classes_rejected
+
+  - id: 33
+    text: No dynamic economic effect inferred solely from the MVP accounting identity.
+    status: proven
+    enforcement:
+      - {file: src/reva/simulation/spec.py, symbol: "horizon.multi_period", kind: code}
+      - {file: src/reva/simulation/spec.py, symbol: "outputs.macroeconomic", kind: code}
+      - {file: src/reva/models/economic/crude_exposure.py, symbol: "check_horizon", kind: code}
+      - {file: src/reva/models/economic/crude_exposure.py, symbol: "NOT_CLAIMED", kind: code}
+      - {file: contracts/scenario.schema.json, symbol: "no_general_equilibrium", kind: contract}
+    tests:
+      - tests/invariants/test_invariant_33_no_dynamic_effects.py::test_multi_period_dynamics_are_a_typed_capability_gap
+      - tests/invariants/test_invariant_33_no_dynamic_effects.py::test_macroeconomic_outputs_are_refused
+      - tests/invariants/test_invariant_33_no_dynamic_effects.py::test_general_equilibrium_cannot_be_switched_on
+      - tests/invariants/test_invariant_33_no_dynamic_effects.py::test_unknown_outputs_and_time_units_are_refused
+      - tests/invariants/test_invariant_33_no_dynamic_effects.py::test_model_outputs_are_accounting_changes_only_and_say_what_is_not_claimed
+      - tests/integration/test_simulation_engine.py::test_five_year_horizon_rejected
+      - tests/scientific/test_crude_exposure.py::test_envelopes_and_horizon
+      - tests/contracts/test_json_schemas.py::test_scenario_schema_rejects_invalid_variants
+
+  - id: 34
+    text: No production success status from a stub or unavailable capability.
+    status: proven
+    enforcement:
+      - {file: src/reva/operations/jobs.py, symbol: "resolve_handler", kind: code}
+      - {file: src/reva/operations/jobs.py, symbol: "HandlerUnavailable", kind: code}
+      - {file: src/reva/operations/worker.py, symbol: "handler_unavailable", kind: code}
+      - {file: src/reva/capabilities.py, symbol: "require", kind: code}
+    tests:
+      - tests/invariants/test_invariant_34_no_stub_success.py::test_every_registered_job_type_resolves_to_a_real_handler
+      - tests/invariants/test_invariant_34_no_stub_success.py::test_unknown_or_missing_handler_is_a_non_retryable_typed_failure
+      - tests/invariants/test_invariant_34_no_stub_success.py::test_every_unavailable_capability_raises_a_typed_gap
+      - tests/invariants/test_invariant_34_no_stub_success.py::test_no_runtime_module_raises_not_implemented_as_a_placeholder
+      - tests/integration/test_queue_reliability.py::test_missing_handler_is_a_typed_failure_never_success
+      - tests/unit/test_capabilities.py::test_require_raises_structured_gap
+      - tests/unit/test_capabilities.py::test_not_available_typed_result
+      - tests/unit/test_capabilities.py::test_implemented_entries_point_to_existing_modules
+      - tests/replay/test_replay_job.py::test_unknown_mode_is_a_capability_gap_and_writes_nothing
+      - tests/unit/test_extensions_interfaces.py::test_optimise_refuses_with_structured_gap
+      - tests/e2e/test_demo_workflow.py::test_all_non_blocked_steps_pass
+
+  - id: 35
+    text: No claim that tests prove causal truth or completeness of reality.
+    status: partially_proven
+    reason: >-
+      The disclaimer is stated in docs/limitations.md and evaluation/coverage statements disclaim reality; a lexical
+      scan of README, docs, UI source and runtime messages finds no affirmative overclaim.
+    gaps: >-
+      A claim about the world cannot be proven by software tests; the wording scan is lexical and cannot judge
+      meaning. UI copy is scanned from ui/src only (not rendered pages).
+    owner: "agent I (docs) and agent F (UI wording); reviewed per change against this checklist"
+    enforcement:
+      - {file: docs/limitations.md, symbol: "Tests do not prove truth", kind: doc}
+      - {file: src/reva/evaluation/tournament_service.py, symbol: "HONESTY_STATEMENT", kind: code}
+      - {file: registry/requirements/mvp.yaml, symbol: "never as a percentage of reality", kind: registry}
+    tests:
+      - tests/invariants/test_invariant_35_no_truth_claims.py::test_limitations_state_that_tests_do_not_prove_truth
+      - tests/invariants/test_invariant_35_no_truth_claims.py::test_overclaim_detector_positive_control
+      - tests/invariants/test_invariant_35_no_truth_claims.py::test_no_user_facing_text_claims_tests_prove_truth_or_completeness
+      - tests/invariants/test_invariant_35_no_truth_claims.py::test_evaluation_and_coverage_statements_disclaim_reality

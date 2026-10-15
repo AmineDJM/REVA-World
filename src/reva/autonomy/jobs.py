@@ -4,8 +4,15 @@
 
     KnowledgeGapDetector → ValueOfInformationEstimator (proxy) → SourceDiscoverer
     → OntologyMapper → ConnectorGenerator → ConnectorValidator → SandboxRunner
-    → PromotionGate → (T1 within scope) register connector version + scoped
-    eligibility, keeping the previous state for rollback.
+    → PromotionGate → (T1 within the signed policy scope) register a
+    content-versioned connector + scoped eligibility automatically (no human
+    review), keeping the previous version for rollback. T2/T3 need named review.
+
+The kill switch is re-read before every step and inside the promotion
+transaction. Live runs reserve their requests/bytes in ``ops.budget_ledger``
+(``budgets.yaml``) before the first request. A connector version that was
+rolled back is never silently re-enabled (``rolled_back_hold``); ``promoted`` is
+reported only when a new eligibility decision was actually recorded.
 
 The false equivalence demo_pjan ≡ WDI midyear population is recorded as its own
 proposal, rejected by the gate, with the explicit incompatible mapping record.
@@ -26,12 +33,12 @@ from uuid import UUID
 
 from sqlalchemy import Engine, text
 
-from reva.adapters.connectors.eurostat_template import (
-    TEMPLATE_HOSTS,
-    EurostatJsonStatConnector,
-    template_digest,
-)
+from reva.adapters.connectors import eurostat_template as et
+from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, EurostatJsonStatConnector
 from reva.adapters.postgres import repositories as repo
+from reva.autonomy import binding
+from reva.autonomy import promotion as prom
+from reva.autonomy.budget import BudgetExhausted, reserve_discovery, settle_discovery
 from reva.autonomy.common import (
     ArtifactIO,
     AutonomyBlocked,
@@ -49,13 +56,14 @@ from reva.autonomy.gaps import CatalogueGapDetector, build_coverage_snapshot, co
 from reva.autonomy.gate import CONNECTOR_CHANGE_SCHEMA, PolicyPromotionGate
 from reva.autonomy.generator import DeclarativeConnectorGenerator
 from reva.autonomy.mapping import RegistryOntologyMapper
-from reva.autonomy.policy import AutonomyGuard, PinnedPolicy, promotion_policy
+from reva.autonomy.policy import AutonomyGuard, PinnedPolicy, live_kill_reason, promotion_policy
 from reva.autonomy.proposals import ProposalStore, base_commit
 from reva.autonomy.sandbox import TrustedTemplateSandbox, external_runner_from_settings, trusted_template_policy
 from reva.autonomy.validator import JsonStatConnectorValidator
 from reva.autonomy.voi import GapValueEstimator
 from reva.cli.seed import record_mapping_and_eligibility, register_connector_version
-from reva.kernel.errors import RevaError
+from reva.cli.seed import entity_id
+from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied, RevaError
 from reva.ontology.registry import load_registry
 from reva.ports.autonomy import (
     ArtifactRef,
@@ -71,6 +79,8 @@ log = logging.getLogger("reva.autonomy")
 AUTHOR = "agent:autonomy-discovery"
 FIXTURE_CONNECTORS = {"R-POP-JAN-AGESEX": "eurostat.demo_pjan.fr"}
 DISCOVERABLE_REQUIREMENTS = tuple(FIXTURE_CONNECTORS)
+DISCOVERY_SOURCE = "eurostat.dissemination"
+PAYLOAD_KEYS = {"requirement_id", "mode"}
 
 
 def _guard(ctx: Any) -> AutonomyGuard:
@@ -98,27 +108,61 @@ def handle_discovery(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     reason = guard.blocked_reason()
     if reason:
         return {"status": "blocked", "reason": reason}
+    unknown = sorted(str(k)[:40] for k in payload if k not in PAYLOAD_KEYS)
+    if unknown:
+        return {"status": "rejected", "reason": "unsupported payload keys", "unsupported": unknown}
     requirement = str(payload.get("requirement_id", "R-POP-JAN-AGESEX"))
     mode = str(payload.get("mode", "live"))
     if requirement not in DISCOVERABLE_REQUIREMENTS or mode not in ("live", "fixture"):
         return {"status": "rejected", "reason": "unsupported requirement or mode",
                 "supported": list(DISCOVERABLE_REQUIREMENTS)}
+    reservation = None
+    if mode == "live":
+        try:
+            reservation = reserve_discovery(ctx.worker_engine, DISCOVERY_SOURCE,
+                                            job_key=f"{getattr(ctx, 'job_id', None)}:{getattr(ctx, 'attempt', 0)}"
+                                            if getattr(ctx, "job_id", None) else None)
+        except BudgetExhausted as e:
+            return {"status": "blocked", "reason": e.message, "code": e.code}
     try:
-        return run_sync(discovery_flow(ctx, requirement, mode, guard))
+        return run_sync(discovery_flow(ctx, requirement, mode, guard, reservation=reservation))
     except AutonomyBlocked as e:
         return {"status": "blocked", "reason": e.message}
+    except RevaError as e:  # typed failure report (malformed provider data, schema drift, ...)
+        if e.details.get("retryable"):
+            raise
+        return {"status": "failed", "reason": e.message[:500], "code": e.code,
+                "kind": str(e.details.get("kind", ""))[:60]}
 
 
-async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyGuard) -> dict[str, Any]:
+async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyGuard,
+                         reservation: Any = None) -> dict[str, Any]:
+    http_box: dict[str, Any] = {}
+    try:
+        return await _discovery_flow(ctx, requirement, mode, guard, reservation, http_box)
+    finally:
+        if reservation is not None:  # record what was actually consumed (reservation counts until then)
+            h = http_box.get("http")
+            settle_discovery(ctx.worker_engine, reservation, requests=int(getattr(h, "requests", 0) or 0),
+                             nbytes=int(getattr(h, "bytes", 0) or 0))
+
+
+async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyGuard, reservation: Any,
+                          http_box: dict[str, Any]) -> dict[str, Any]:
     io_ = ArtifactIO(ctx.store)
     reg = load_registry()
     policy = promotion_policy()
     engine: Engine = ctx.worker_engine
     cutoff = now_utc()
     origins = ["test_fixture"] if mode == "fixture" else ["live"]
-    budget = default_budget(max_requests=min(5, guard.source_request_limit("eurostat.dissemination") or 5))
+    if reservation is not None:
+        budget = default_budget(max_requests=reservation.max_requests, max_bytes=reservation.max_bytes)
+    else:  # fixture replay: no network requests, not charged
+        budget = default_budget()
     summary: dict[str, Any] = {"status": "started", "requirement_id": requirement, "mode": mode,
-                               "policy": {"version": policy.version, "sha256": policy.sha256}}
+                               "policy": {"version": policy.version, "sha256": policy.sha256},
+                               "budget": reservation.as_dict() if reservation is not None
+                               else {"charged": False, "reason": "fixture replay makes no requests"}}
     # 1. gap
     with engine.connect() as conn:
         snapshot = build_coverage_snapshot(conn, cutoff, origins, reg)
@@ -137,7 +181,9 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
     voi = GapValueEstimator(io_).estimate(gap, plan_ref, None, budget)
     summary["value_estimate"] = {"kind": voi.kind, "value": voi.value, "unit": voi.unit}
     # 2. discovery
+    guard.check("discover")
     http, bank = _http(mode, io_, requirement, ctx.settings)
+    http_box["http"] = http
     discoverer = EurostatCatalogueDiscoverer(io_, http, registry=reg, guard=guard)
     candidates = await discoverer.discover(gap, budget)
     summary["search"] = discoverer.last_search
@@ -155,12 +201,26 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
     primary = mappings[0]
     summary["mappings"] = [{"target": m.target_concept_version, "relation": m.relation,
                             "review_required": m.review_required} for m in mappings]
-    # 4. manifest
-    generator = DeclarativeConnectorGenerator(io_, registry=reg, policy=policy)
+    # 4. manifest (content-derived version: same content keeps its version, changed content bumps it)
+    guard.check("generate")
+
+    def version_for(m: dict[str, Any]) -> str:
+        with engine.connect() as conn:
+            return prom.resolve_connector_version(conn, io_, m, et.template_digest())[0]
+
+    generator = DeclarativeConnectorGenerator(io_, registry=reg, policy=policy, version_resolver=version_for)
     cp = generator.generate(cand, primary, tuple((policy.content.get("approved_templates") or {}).keys()))
     manifest = io_.get_json(cp.manifest)
     summary["connector"] = {"name": manifest["name"], "version": manifest["version"],
                             "manifest_sha256": cp.manifest.sha256}
+    hold = _existing_state(engine, manifest, primary)
+    if hold is not None:  # rolled back or already promoted: never re-enable or re-announce silently
+        summary["connector"]["state"] = hold
+        summary["status"] = hold
+        summary["note"] = ("this exact connector version was rolled back; re-enabling it needs a named human "
+                           "review" if hold == "rolled_back_hold" else
+                           "this exact connector version is already eligible; nothing to promote")
+        return summary
     # 5. validation (captured replay or bounded live sample)
     live_factory = None
     if mode == "live":
@@ -168,7 +228,8 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
             return http.client
         bank = bank or io_.put_json({"schema": "reva-fixture-bank/1", "connector": manifest["name"],
                                      "entries": []}, "raw")
-    validator = JsonStatConnectorValidator(io_, live_client_factory=live_factory, guard=guard)
+    guard.check("validate")
+    validator = JsonStatConnectorValidator(io_, live_client_factory=live_factory, guard=guard, registry=reg)
     v_report = await validator.validate(cp, bank, budget)
     if mode == "live":
         ev = io_.get_json(v_report.evidence_manifest)
@@ -182,7 +243,8 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
                       scope={"concept": primary.target_concept_version, "dataset": cand.dataset_id,
                              "geo": manifest["request_parameters"]["filters"].get("geo"),
                              "eligibility_scope": manifest["eligibility_scope"]},
-                      risk={"tier": "T1", "hosts": manifest["allowed_hosts"], "code": "none (declarative)"},
+                      risk={"tier": "T1", "hosts": manifest["allowed_hosts"], "code": "none (declarative)",
+              "promotion": "automatic if the gate finds it within the signed policy scope"},
                       dependencies=[f"gap:{gap.gap_id}", f"candidate:{cand.metadata.sha256}",
                                     f"mapping:{primary.mapping_manifest.sha256}", f"template:{cp.template_digest}"])
     sandbox = TrustedTemplateSandbox(io_, fixtures=bank, external_runner=external_runner_from_settings(ctx.settings),
@@ -202,10 +264,11 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
         d = reject_equivalence(engine, io_, proposals, gate, policy, m, cand.dataset_id)
         summary["rejected_equivalences"].append({"target": m.target_concept_version, "outcome": d.outcome,
                                                  "proposal_id": str(d.proposal_id)})
-    # 9. promotion within scope
+    # 9. promotion within scope (automatic for T1 inside the signed policy scope; no human review)
     if decision.outcome == "promote":
-        summary["promotion"] = promote_connector(engine, io_, ctx, manifest, primary, decision, policy)
-        summary["status"] = "promoted"
+        result = promote_connector(engine, io_, ctx, manifest, primary, decision, policy, guard=guard)
+        summary["promotion"] = result
+        summary["status"] = result["status"]
     else:
         summary["status"] = f"gate_{decision.outcome}"
     return summary

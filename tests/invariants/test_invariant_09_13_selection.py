@@ -29,16 +29,33 @@ CONCEPT = "trade.hs2709.import_value.world_total"
 
 
 def _row(source_key: str, family: str, logical_key: str, value: str, uncertainty: dict[str, Any]) -> dict[str, Any]:
-    return {"id": uuid4(), "subject_id": SUBJECT, "concept_version_id": CONCEPT_VERSION, "support_id": SUPPORT,
-            "concept_id": CONCEPT, "source_key": source_key, "lineage_family": family, "origin": "test_fixture",
-            "logical_key": logical_key, "value": {"kind": "decimal", "value": value, "unit_ref": "unit.usd"},
-            "uncertainty": uncertainty, "source_flags": {"flowCode": "M", "partnerCode": "0"},
-            "selection_status": "current", "revision_no": 1}
+    return {
+        "id": uuid4(),
+        "subject_id": SUBJECT,
+        "concept_version_id": CONCEPT_VERSION,
+        "support_id": SUPPORT,
+        "concept_id": CONCEPT,
+        "source_key": source_key,
+        "lineage_family": family,
+        "origin": "test_fixture",
+        "logical_key": logical_key,
+        "value": {"kind": "decimal", "value": value, "unit_ref": "unit.usd"},
+        "uncertainty": uncertainty,
+        "source_flags": {"flowCode": "M", "partnerCode": "0"},
+        "selection_status": "current",
+        "revision_no": 1,
+    }
 
 
 RICH_UNCERTAINTY = UncertaintySpec(
-    status="quantified", kind="bounds", description="provider-stated bounds", method_version="provider-1",
-    lower="90", upper="110", dependence_group="un_comtrade:2023:HS2709", conditioning=("reporter-declared",),
+    status="quantified",
+    kind="bounds",
+    description="provider-stated bounds",
+    method_version="provider-1",
+    lower="90",
+    upper="110",
+    dependence_group="un_comtrade:2023:HS2709",
+    conditioning=("reporter-declared",),
 ).model_dump(mode="json")
 
 
@@ -84,11 +101,19 @@ def test_selection_output_has_no_independence_count_or_pooled_value() -> None:
 @pytest.mark.db
 def test_published_estimate_uncertainty_equals_its_observation(db, fixture_release) -> None:
     with db.owner.connect() as c:
-        rows = c.execute(text(
-            """SELECT e.id, e.uncertainty AS est_u, o.uncertainty AS obs_u, e.value AS est_v, o.value AS obs_v
+        rows = (
+            c.execute(
+                text(
+                    """SELECT e.id, e.uncertainty AS est_u, o.uncertainty AS obs_u, e.value AS est_v, o.value AS obs_v
                FROM belief.estimate e JOIN belief.input i ON i.estimate_id = e.id
                JOIN evidence.observation o ON o.id = i.observation_id
-               WHERE e.release_id = :r"""), {"r": fixture_release["release_id"]}).mappings().all()
+               WHERE e.release_id = :r"""
+                ),
+                {"r": fixture_release["release_id"]},
+            )
+            .mappings()
+            .all()
+        )
     assert rows
     lost = [r["id"] for r in rows if r["est_u"] != r["obs_u"]]
     assert not lost, f"{len(lost)} estimates changed their observation's uncertainty, e.g. {lost[:3]}"
@@ -100,10 +125,17 @@ def test_published_estimate_uncertainty_equals_its_observation(db, fixture_relea
 def test_every_source_estimate_names_exactly_one_selected_observation(db, fixture_release) -> None:
     """Selection never combines several observations into one value (no pooled duplicates)."""
     with db.owner.connect() as c:
-        multi = c.execute(text(
-            """SELECT e.id, count(i.observation_id) AS n FROM belief.estimate e
+        multi = (
+            c.execute(
+                text(
+                    """SELECT e.id, count(i.observation_id) AS n FROM belief.estimate e
                JOIN belief.input i ON i.estimate_id = e.id
                WHERE e.release_id = :r AND i.observation_id IS NOT NULL
-               GROUP BY e.id HAVING count(i.observation_id) > 1"""),
-            {"r": fixture_release["release_id"]}).mappings().all()
+               GROUP BY e.id HAVING count(i.observation_id) > 1"""
+                ),
+                {"r": fixture_release["release_id"]},
+            )
+            .mappings()
+            .all()
+        )
     assert not multi, [UUID(str(m["id"])) for m in multi[:3]]

@@ -604,6 +604,7 @@ class RepairProposal:
     reports: tuple[ValidationReport, ...]
     pause: PublicationPause | None = None
     extra: Mapping[str, Any] = field(default_factory=dict)
+    proposal_record: ArtifactRef | None = None  # ProposalStore manifest (ops.proposal.manifest_sha256)
 
 
 # --------------------------------------------------------------------------- failure signals
@@ -880,11 +881,14 @@ class ConnectorRepairAdvisor:
             entry = bank_by_fp.get(request_fingerprint("GET", plan[key].url))
             drift = bool(r["quarantined"])
             if not drift and entry is not None:
+                old_body = self.io.get_bytes(ArtifactRef(entry["body_sha256"], "raw", entry["media_type"]))
                 try:
-                    old = load_exact(self.io.get_bytes(ArtifactRef(entry["body_sha256"], "raw", entry["media_type"])))
-                    drift = semantic_schema_fingerprint(load_exact(body), sem) != semantic_schema_fingerprint(old, sem)
+                    drift = (semantic_schema_fingerprint(load_exact(body), sem)
+                             != semantic_schema_fingerprint(load_exact(old_body), sem))
                 except ValueError:
                     drift = True
+                if not drift and body != old_body:
+                    drift = self._silently_rescaled(connector, plan[key], body, entry)
             if drift:
                 findings = tuple(f for q in meta.get("quality") or [] for f in q.get("findings") or []
                                  if f.get("severity") == "blocker")
@@ -893,6 +897,20 @@ class ConnectorRepairAdvisor:
                                  acquisition_id=str(r["id"]), raw_ref=ref, quarantined=bool(r["quarantined"]),
                                  quarantine_findings=findings)
         return None
+
+    def _silently_rescaled(self, connector: Any, item: FetchItem, body: bytes, entry: Mapping[str, Any]) -> bool:
+        """Same schema, but a concept's shared values all moved by one power of ten (§10.3 unit drift)."""
+        try:
+            old = semantic_outputs(list(connector.parse(_raw_from_entry(self.io, entry, item))))[0]
+            new_raw = RawAcquisition(item=item, body=body, media_type="application/json",
+                                     retrieved_at=datetime.now(UTC), response_metadata={},
+                                     request_fingerprint=entry["request_fingerprint"], origin="test_fixture")
+            new = semantic_outputs(list(connector.parse(new_raw)))[0]
+        except Exception as e:  # unparseable with the reviewed parser: that is drift too
+            log.info("repair: acquisition of %s does not parse with the reviewed parser (%s)", item.key,
+                     type(e).__name__)
+            return True
+        return bool(value_comparison(old, new)["rescaled_concepts"])
 
     def accepted_history(self, connector: Any, *, limit: int = 500) -> list[RawAcquisition]:
         """Accepted (non-quarantined) raw acquisitions of this connector, for replay."""
@@ -1189,7 +1207,7 @@ class ConnectorRepairAdvisor:
             for rep in reports:
                 self.io.register(conn, rep.evidence_manifest, "connector-repair-check/1")
         proposal_type = f"connector_repair:{kind}"
-        ProposalStore(self.engine, self.io, self.guard).persist(
+        record = ProposalStore(self.engine, self.io, self.guard).persist(
             proposal, proposal_type=proposal_type,
             scope={"connector": spec.name, "connector_version": spec.version, "item": assessment.item_key,
                    "concepts": list(assessment.affected_concepts)},
@@ -1205,7 +1223,7 @@ class ConnectorRepairAdvisor:
             pause = self.pause_publication(assessment, proposal.proposal_id, fence=fence)
         if kind == "documentation_discovery":
             extra["documentation_sources"] = manifest["task"]["allowed_documentation"]
-        return RepairProposal(assessment, proposal, proposal_type, ref, tuple(reports), pause, extra)
+        return RepairProposal(assessment, proposal, proposal_type, ref, tuple(reports), pause, extra, record)
 
     def _new_raw(self, connector: Any, a: RepairAssessment) -> RawAcquisition | None:
         if a.case.body is None or a.item_key is None:

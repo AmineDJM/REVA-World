@@ -1,0 +1,203 @@
+[
+  {
+    "case": "wb_added_field",
+    "connector": "worldbank.wdi.indicators",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json&date=2000:2024&per_page=1000&page=1",
+    "status": 200,
+    "derivation": {
+      "op": "add_field",
+      "records": "$[1][]",
+      "field": "footnote",
+      "value": ""
+    },
+    "expected": "additive_unused_fields",
+    "source_fixture": {
+      "file": "worldbank.wdi.indicators/5ea35fdcb633a332.json",
+      "sha256": "b8c35c012e255e3f72d6bf0a080cbbf290abd831cdba1837c819859d07b3f2a9"
+    },
+    "file": "wb_added_field.json",
+    "sha256": "b1c8b61c3ef8ed9abdb43e0188cc331e05342c4f06efe788e4ac976ea4c427ca",
+    "synthetic": true
+  },
+  {
+    "case": "wb_renamed_field",
+    "connector": "worldbank.wdi.indicators",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json&date=2000:2024&per_page=1000&page=1",
+    "status": 200,
+    "derivation": {
+      "op": "rename",
+      "records": "$[1][]",
+      "from": "countryiso3code",
+      "to": "countryIso3Code"
+    },
+    "expected": "field_rename",
+    "source_fixture": {
+      "file": "worldbank.wdi.indicators/5ea35fdcb633a332.json",
+      "sha256": "b8c35c012e255e3f72d6bf0a080cbbf290abd831cdba1837c819859d07b3f2a9"
+    },
+    "file": "wb_renamed_field.json",
+    "sha256": "3b8c78bd205976f3308378b0166db8c08413b32f0d40ad602c5fa207fc8979e9",
+    "synthetic": true
+  },
+  {
+    "case": "wb_unit_text_and_scale",
+    "connector": "worldbank.wdi.indicators",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json&date=2000:2024&per_page=1000&page=1",
+    "status": 200,
+    "derivation": {
+      "op": "unit_scale",
+      "records": "$[1][]",
+      "unit_field": "unit",
+      "unit": "thousands",
+      "value_fields": [
+        "value"
+      ],
+      "divide_by": "1000"
+    },
+    "expected": "unit_change",
+    "source_fixture": {
+      "file": "worldbank.wdi.indicators/5ea35fdcb633a332.json",
+      "sha256": "b8c35c012e255e3f72d6bf0a080cbbf290abd831cdba1837c819859d07b3f2a9"
+    },
+    "file": "wb_unit_text_and_scale.json",
+    "sha256": "45f271adfd33b6c035628bfee7b7871edaf27fe5764ebc620f06f111b46f5621",
+    "synthetic": true
+  },
+  {
+    "case": "ct_added_field",
+    "connector": "un.comtrade.public_exact",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "status": 200,
+    "derivation": {
+      "op": "add_field",
+      "records": "$.data[]",
+      "field": "isLegacyFlagged",
+      "value": false
+    },
+    "expected": "additive_unused_fields",
+    "source_fixture": {
+      "file": "un.comtrade.public_exact/b4a4ba0308215cff.json",
+      "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01"
+    },
+    "file": "ct_added_field.json",
+    "sha256": "755ad611f257efc03db3c93528ed65990cc539c376ed9006c892cde8346f41f4",
+    "synthetic": true
+  },
+  {
+    "case": "ct_renamed_field",
+    "connector": "un.comtrade.public_exact",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "status": 200,
+    "derivation": {
+      "op": "rename",
+      "records": "$.data[]",
+      "from": "primaryValue",
+      "to": "primaryValueUsd"
+    },
+    "expected": "field_rename",
+    "source_fixture": {
+      "file": "un.comtrade.public_exact/b4a4ba0308215cff.json",
+      "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01"
+    },
+    "file": "ct_renamed_field.json",
+    "sha256": "7e4a3b8fbbddce704205c5b20056debe2deddc8f61bae7e7f1f84e538c952aa8",
+    "synthetic": true
+  },
+  {
+    "case": "ct_silent_scale",
+    "connector": "un.comtrade.public_exact",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "status": 200,
+    "derivation": {
+      "op": "unit_scale",
+      "records": "$.data[]",
+      "unit_field": null,
+      "unit": null,
+      "value_fields": [
+        "primaryValue",
+        "cifvalue",
+        "fobvalue"
+      ],
+      "divide_by": "1000"
+    },
+    "expected": "scale_change",
+    "source_fixture": {
+      "file": "un.comtrade.public_exact/b4a4ba0308215cff.json",
+      "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01"
+    },
+    "file": "ct_silent_scale.json",
+    "sha256": "b9da1562bc01712c74d21536248d5126616529213eae16c92ed776149eb87054",
+    "synthetic": true
+  },
+  {
+    "case": "ct_value_type_change",
+    "connector": "un.comtrade.public_exact",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "status": 200,
+    "derivation": {
+      "op": "stringify",
+      "records": "$.data[]",
+      "field": "primaryValue"
+    },
+    "expected": "value_type_change",
+    "source_fixture": {
+      "file": "un.comtrade.public_exact/b4a4ba0308215cff.json",
+      "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01"
+    },
+    "file": "ct_value_type_change.json",
+    "sha256": "c622efd9121879ab68f73d50f301b49511e5e516b10d1caa7ff2ddad12e48234",
+    "synthetic": true
+  },
+  {
+    "case": "ct_classification_change",
+    "connector": "un.comtrade.public_exact",
+    "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+    "status": 200,
+    "derivation": {
+      "op": "set_value",
+      "records": "$.data[]",
+      "field": "classificationCode",
+      "value": "H7"
+    },
+    "expected": "classification_change",
+    "source_fixture": {
+      "file": "un.comtrade.public_exact/b4a4ba0308215cff.json",
+      "sha256": "a739e968225c887782e2b0cfe5cbb4c28073f9a93659502a16e458514fb55c01"
+    },
+    "file": "ct_classification_change.json",
+    "sha256": "8d57d7abb0e31e8881ab4d3d9cd8edc8dc9d8e07abb44fff82869770fe642b05",
+    "synthetic": true
+  },
+  {
+    "case": "wb_endpoint_404",
+    "connector": "worldbank.wdi.indicators",
+    "url": "https://api.worldbank.org/v2/country/FRA;DZA;CHN;USA/indicator/SP.POP.TOTL?format=json&date=2000:2024&per_page=1000&page=1",
+    "status": 404,
+    "derivation": {
+      "op": "status_only",
+      "note": "series endpoint answers 404 on every scheduled run"
+    },
+    "expected": "endpoint_disappeared",
+    "source_fixture": {
+      "file": "worldbank.wdi.indicators/5ea35fdcb633a332.json",
+      "sha256": "b8c35c012e255e3f72d6bf0a080cbbf290abd831cdba1837c819859d07b3f2a9"
+    },
+    "file": null,
+    "sha256": null,
+    "synthetic": true
+  },
+  {
+    "case": "ct_auth_401",
+    "connector": "un.comtrade.public_exact",
+    "url": "*",
+    "status": 401,
+    "derivation": {
+      "op": "status_only",
+      "note": "public preview starts requiring a subscription key (all requests)"
+    },
+    "expected": "authentication_changed",
+    "file": null,
+    "sha256": null,
+    "synthetic": true
+  }
+]

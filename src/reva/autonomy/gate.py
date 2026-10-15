@@ -3,14 +3,27 @@
 * The gate verifies the policy bytes against the digest it was configured with
   (pinned by maintainers). A changed policy file makes the gate refuse
   (``blocked``): the agent cannot edit its own gates.
-* The tier is *derived* from what the proposal touches; a proposer cannot lower
-  it by declaring T0. T0 promotes automatically; T1 promotes only inside the
-  signed policy scope (approved template at its reviewed digest, approved exact
-  mapping, verified rights, known hosts, passing independent validator and
-  sandbox reports); T2/T3 always go to named review.
-* Reports authored by the proposer are ignored. Gate results are written to
-  ``ops.gate_result`` with evaluator ``gate-evaluator:<name>``; the database
-  refuses an evaluator equal to the proposal author.
+* The tier is *derived* from what the proposal touches (paths normalised first);
+  a proposer cannot lower it by declaring T0. T0 promotes automatically; T1
+  promotes automatically **only** inside the signed policy scope; T2/T3 always go
+  to named review (``needs_review``).
+* T1 scope is re-derived independently of the manifest (``binding.py``): the
+  template code digest must equal the digest pinned in the policy; semantics must
+  equal the registry concept profile of the approved exact mapping; source key and
+  lineage family must be the approved template's registered source; the name,
+  subject, logical-key layout (recomputed by template code), resolution
+  dimensions and totals must be what reviewed code derives; the name may not
+  collide with a built-in connector or a connector registered under another
+  source/template.
+* Reports are content-addressed: the gate re-reads each report's evidence
+  artifact (digest-verified), uses the *stored* outcome/evaluator/findings, and
+  ignores a report whose object disagrees with its stored evidence, or whose
+  evaluator is the proposer or a gate. The validator's data contract is
+  recomputed from the registry and must match the one the validator used.
+* Honest limit (V1): the gate runs inside the worker that ran discovery, with the
+  same credentials; independence is enforced by re-derivation and by DB checks
+  (``ops.record_gate_result``: evaluator ``gate-evaluator:<name>`` that is not the
+  proposal author, verified evidence artifact), not by process separation.
 """
 
 from __future__ import annotations
@@ -22,7 +35,9 @@ from typing import Any
 
 from sqlalchemy import Connection, Engine, text
 
-from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, template_digest, validate_manifest
+from reva.adapters.connectors import eurostat_template as et
+from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, validate_manifest
+from reva.autonomy import binding
 from reva.autonomy.common import ArtifactIO, AutonomyBlocked, ref_from, report_json
 from reva.autonomy.policy import (
     PINNED_POLICY_DIGESTS,
@@ -36,15 +51,16 @@ from reva.kernel.errors import PolicyDenied, RevaError, ValidationProblem
 from reva.ports.autonomy import ArtifactRef, GateDecision, PlatformChangeProposal, ValidationReport
 
 GATE_PREFIX = "gate-evaluator:"
-DB_DECISION = {"promote": "pass", "reject": "fail", "needs_review": "blocked", "blocked": "blocked"}
+DB_DECISION = {"promote": "pass", "reject": "fail", "needs_review": "needs_review", "blocked": "blocked"}
 CONNECTOR_CHANGE_SCHEMA = "reva-connector-change/1"
 
 
 def record_gate_result(conn: Connection, proposal_id: uuid.UUID, gate_name: str, policy_version: str,
                        decision: str, evidence_sha256: str, evaluator: str) -> uuid.UUID:
+    """Checked DB path (``ops.record_gate_result``, SECURITY DEFINER): evaluator must be
+    ``gate-evaluator:<gate name>`` and not the author; evidence must be a verified artifact."""
     return uuid.UUID(str(conn.execute(
-        text("""INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision, evidence_sha256,
-                     evaluator) VALUES (:p, :g, :v, :d, :e, :ev) RETURNING id"""),
+        text("SELECT ops.record_gate_result(:p, :g, :v, :d, :e, :ev)"),
         {"p": proposal_id, "g": gate_name, "v": policy_version, "d": decision, "e": evidence_sha256,
          "ev": evaluator},
     ).scalar_one()))
@@ -91,12 +107,9 @@ class PolicyPromotionGate:
         if proposal.policy_version != policy.version:
             reasons.append(f"proposal targets policy {proposal.policy_version}, gate runs {policy.version}")
             return self._record(proposal, "reject", reasons, list(independent_reports), policy, trace)
-        reports = []
-        for r in independent_reports:
-            if proposal.author in r.evaluator_version or r.evaluator_version.startswith(GATE_PREFIX):
-                reasons.append(f"ignored report {r.report_id} from a non-independent evaluator")
-                continue
-            reports.append(r)
+        reports, verify_reasons, verified = self._verified_reports(proposal, independent_reports)
+        reasons += verify_reasons
+        trace["reports_verified"] = verified
         if any(r.outcome == "blocked" for r in reports):
             reasons += [f"{r.evaluator_version}: {f.message}" for r in reports if r.outcome == "blocked"
                         for f in r.findings if f.severity == "blocker"]
@@ -121,9 +134,55 @@ class PolicyPromotionGate:
         reasons += ["T1 out of signed policy scope", *scope_reasons]
         return self._record(proposal, "reject", reasons, reports, policy, trace)
 
+    # ------------------------------------------------------------------ report verification
+    def _verified_reports(self, proposal: PlatformChangeProposal, reports: Sequence[ValidationReport]
+                          ) -> tuple[list[ValidationReport], list[str], list[dict[str, Any]]]:
+        """Keep only reports whose object matches their stored, digest-verified evidence."""
+        kept: list[ValidationReport] = []
+        reasons: list[str] = []
+        trace: list[dict[str, Any]] = []
+        for r in reports:
+            entry: dict[str, Any] = {"report_id": str(r.report_id), "evidence_sha256": r.evidence_manifest.sha256}
+            trace.append(entry)
+            if proposal.author in r.evaluator_version or r.evaluator_version.startswith(GATE_PREFIX):
+                reasons.append(f"ignored report {r.report_id} from a non-independent evaluator")
+                entry["verdict"] = "non_independent"
+                continue
+            try:
+                ev = self.io.get_json(r.evidence_manifest)  # re-hashed against its digest
+            except Exception as e:
+                reasons.append(f"ignored report {r.report_id}: evidence unreadable ({type(e).__name__})")
+                entry["verdict"] = "unreadable"
+                continue
+            if not isinstance(ev, dict):
+                reasons.append(f"ignored report {r.report_id}: evidence is not a report document")
+                entry["verdict"] = "malformed"
+                continue
+            stored_evaluator = str(ev.get("evaluator") or "")
+            stored_blockers = sorted(str(f.get("code")) for f in ev.get("findings") or []
+                                     if isinstance(f, dict) and f.get("severity") == "blocker")
+            obj_blockers = sorted(f.code for f in r.findings if f.severity == "blocker")
+            mismatch = [k for k, ok in (("outcome", ev.get("outcome") == r.outcome),
+                                        ("evaluator", stored_evaluator == r.evaluator_version),
+                                        ("blockers", stored_blockers == obj_blockers)) if not ok]
+            if mismatch:
+                reasons.append(f"ignored report {r.report_id}: report object disagrees with its stored evidence "
+                               f"({', '.join(mismatch)})")
+                entry["verdict"] = "mismatch"
+                continue
+            if proposal.author in stored_evaluator or stored_evaluator.startswith(GATE_PREFIX):
+                reasons.append(f"ignored report {r.report_id}: evidence authored by a non-independent evaluator")
+                entry["verdict"] = "non_independent"
+                continue
+            entry.update(verdict="verified", outcome=ev.get("outcome"), evaluator=stored_evaluator)
+            kept.append(r)
+        return kept, reasons, trace
+
     # ------------------------------------------------------------------ T1 scope
     def _t1_scope(self, proposal: PlatformChangeProposal, reports: Sequence[ValidationReport],
                   policy: PinnedPolicy) -> tuple[bool, list[str], dict[str, Any]]:
+        from reva.ontology.registry import load_registry
+
         problems: list[str] = []
         try:
             change = self.io.get_json(proposal.patch_or_manifest)
@@ -142,26 +201,35 @@ class PolicyPromotionGate:
         except Exception:
             problems.append("manifest reference is unreadable")
         template = manifest["template"]
-        tpl = (policy.content.get("approved_templates") or {}).get(template)
+        tpl = binding.template_entry(policy, template)
+        current_digest = et.template_digest()
+        pinned_digest = binding.approved_template_digest(policy, template)
         if tpl is None:
             problems.append(f"template {template} not approved by policy")
         else:
             hosts = set(manifest["allowed_hosts"])
             if not hosts <= set(tpl.get("allowed_hosts") or []) or not hosts <= set(TEMPLATE_HOSTS):
                 problems.append(f"hosts {sorted(hosts)} outside approved template hosts")
-        if change.get("template_digest") != template_digest():
-            problems.append("template code differs from the reviewed template digest")
+            if pinned_digest is None or current_digest != pinned_digest:
+                problems.append("template code digest differs from the digest pinned in the signed policy "
+                                "(template = reviewed code; a maintainer must re-pin it)")
+        if change.get("template_digest") != current_digest:
+            problems.append("proposal was generated against a different template revision")
+        registry = load_registry()
+        problems += binding.binding_problems(manifest, registry, policy)
+        with self.engine.connect() as conn:
+            problems += binding.name_conflicts(conn, manifest["name"], str(manifest["source_key"]), template)
         mapping = change.get("mapping") or {}
         sem = manifest["request_parameters"]["semantics"]
         target = {"concept_id": sem["concept_id"], "version": sem["concept_version"]}
         if mapping.get("relation") != "exact" or mapping.get("review_required"):
             problems.append(f"mapping relation {mapping.get('relation')!r} is not an approved exact mapping")
+        if (mapping.get("target") or {}) != target:
+            problems.append("mapping target differs from the manifest concept")
         rp = manifest["request_parameters"]
-        geo = set(rp["filters"].get(rp["subject"]["dimension"], []))
-        entry = next((m for m in policy.content.get("approved_exact_mappings") or []
-                      if m.get("template") == template and m.get("dataset") == manifest["dataset"]
-                      and m.get("target", {}).get("concept_id") == target["concept_id"]
-                      and str(m.get("target", {}).get("version")) == target["version"]), None)
+        geo = set(rp["filters"].get("geo", []))
+        entry = binding.approved_entry(policy, template, manifest["dataset"], target["concept_id"],
+                                       target["version"])
         if entry is None:
             problems.append("no approved exact mapping for this template/dataset/concept")
         else:
@@ -169,22 +237,32 @@ class PolicyPromotionGate:
                 problems.append(f"geography {sorted(geo)} outside approved scope {entry.get('scope')}")
             if entry.get("rights") != "verified" or (change.get("candidate") or {}).get("rights_status") != "verified":
                 problems.append("rights are not verified")
-        concept_key = f"{target['concept_id']}@{target['version']}"
-        if any(not s.startswith(concept_key + ":") for s in manifest["eligibility_scope"]):
-            problems.append("eligibility scope names concepts outside the approved mapping")
         manifest_sha = (change.get("manifest_ref") or {}).get("sha256")
+        expected_contract: str | None = None
+        try:
+            from reva.autonomy.quality import contract_for
+
+            expected_contract = self.io.put_json(contract_for(manifest, registry), "models").sha256
+        except RevaError as e:
+            problems.append(f"no registry-derived data contract: {e.message}")
         kinds = set()
         for r in reports:
             if r.outcome != "pass":
                 continue
             kind = r.evaluator_version.split(":", 1)[0]
-            try:
-                ev = self.io.get_json(r.evidence_manifest)
-            except Exception:
-                problems.append(f"{kind} report evidence is unreadable")
-                continue
-            covers = (ev.get("manifest") == manifest_sha if kind == "connector-validator"
-                      else ev.get("proposal_id") == str(proposal.proposal_id) if kind == "sandbox" else False)
+            ev = self.io.get_json(r.evidence_manifest)  # already verified in _verified_reports
+            if kind == "connector-validator":
+                covers = ev.get("manifest") == manifest_sha
+                if covers and ev.get("data_contract") != expected_contract:
+                    problems.append("validator did not use the registry-derived data contract")
+                    covers = False
+                if covers and ev.get("template_digest") != current_digest:
+                    problems.append("validator ran a different template revision")
+                    covers = False
+            elif kind == "sandbox":
+                covers = ev.get("proposal_id") == str(proposal.proposal_id) and ev.get("manifest") == manifest_sha
+            else:
+                covers = False
             if covers:
                 kinds.add(kind)
             elif kind in ("connector-validator", "sandbox"):
@@ -192,8 +270,11 @@ class PolicyPromotionGate:
         for needed in ("connector-validator", "sandbox"):
             if needed not in kinds:
                 problems.append(f"missing passing independent {needed} report")
-        scope = {"template": template, "dataset": manifest["dataset"], "target": target, "geo": sorted(geo),
-                 "hosts": manifest["allowed_hosts"], "approved_entry": entry}
+        scope = {"template": template, "template_digest": current_digest, "pinned_template_digest": pinned_digest,
+                 "dataset": manifest["dataset"], "target": target, "geo": sorted(geo),
+                 "hosts": manifest["allowed_hosts"], "approved_entry": entry, "connector": manifest["name"],
+                 "version": manifest["version"], "source_key": manifest["source_key"],
+                 "data_contract_sha256": expected_contract}
         return not problems, problems, scope
 
     # ------------------------------------------------------------------ recording
