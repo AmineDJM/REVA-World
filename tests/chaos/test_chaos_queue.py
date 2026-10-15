@@ -295,8 +295,6 @@ def test_backend_terminated_mid_heartbeat_worker_reconnects_and_keeps_lease(
     assert w.alive()
 
 
-@pytest.mark.xfail(strict=True, reason="CHAOS-1: a worker that cannot reach the DB keeps running the handler "
-                                       "past its lease (no local lease-deadline); see docs/dev/chaos_check.md")
 def test_sustained_db_outage_handler_stops_by_lease_expiry_then_worker_reconnects(
         cdb: ChaosDB, tmp_path: Path, procs: list[WorkerProc]) -> None:
     clear_queue(cdb)

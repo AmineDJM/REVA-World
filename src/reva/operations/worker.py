@@ -70,6 +70,9 @@ DEFAULT_DRAIN_SECONDS = 100.0
 HEARTBEAT_MIN_INTERVAL = 1.0  # rate limit for handler-initiated status checks
 HEARTBEAT_LOCK_TIMEOUT_MS = 2000
 HEARTBEAT_STATEMENT_TIMEOUT_MS = 2000
+# CHAOS-1: presume the lease lost once this fraction of it has elapsed without a successful
+# heartbeat, i.e. stop the handler before the DB-clock lease can have expired.
+LEASE_SAFETY_FRACTION = 0.1
 
 
 class SchemaNotReady(RevaError):
@@ -204,6 +207,15 @@ class _Active:
     status: str = "running"
     lost: bool = False
     last_hb: float = field(default_factory=time.monotonic)
+    # Monotonic time at which the last *successful* lease extension was sent (the claim, then
+    # each heartbeat): the DB-clock lease cannot expire before lease_basis + lease_seconds.
+    lease_basis: float | None = None
+    # Monotonic time of the last heartbeat attempt, successful or not (rate limit, CHAOS-2).
+    last_attempt: float = 0.0
+
+    def __post_init__(self) -> None:
+        if self.lease_basis is None:
+            self.lease_basis = getattr(self.job, "claimed_monotonic", None) or time.monotonic()
 
 
 @dataclass
@@ -324,6 +336,8 @@ class Worker:
                     pass  # recorded on the state; the handler learns it at its next check
 
     def _beat(self, st: _Active, progress: dict[str, Any] | None) -> str:
+        sent = time.monotonic()
+        st.last_attempt = sent
         try:
             status = queue.heartbeat(self.heartbeat_engine, st.job, progress, self.lease_seconds,
                                      lock_timeout_ms=HEARTBEAT_LOCK_TIMEOUT_MS,
@@ -337,10 +351,29 @@ class Worker:
                 log.info("heartbeat for job %s busy (row locked); retrying next beat", st.job.id)
             else:
                 log.warning("heartbeat failed for job %s: %s", st.job.id, type(e).__name__)
+            if self._lease_presumed_lost(st):
+                raise StaleLease(f"lease presumed lost for job {st.job.id}: no successful heartbeat "
+                                 f"within the {self.lease_seconds}s lease") from e
             return st.status
         st.status = status
         st.last_hb = time.monotonic()
+        st.lease_basis = sent
         return status
+
+    def _lease_presumed_lost(self, st: _Active) -> bool:
+        """Local, conservative lease deadline (CHAOS-1): a worker that cannot reach the
+        database must stop working before its DB-clock lease can have expired, because another
+        worker may already have reclaimed the job. The basis is the *send* time of the last
+        successful extension, earlier than the DB's ``lease_until`` basis."""
+        if st.lost:
+            return True
+        basis = st.lease_basis if st.lease_basis is not None else st.last_hb
+        elapsed = time.monotonic() - basis
+        if elapsed >= self.lease_seconds * (1 - LEASE_SAFETY_FRACTION):
+            st.lost = True
+            log.error("lease for job %s presumed lost: no successful heartbeat for %.1fs (lease %ss)",
+                      st.job.id, elapsed, self.lease_seconds, extra={"job_id": str(st.job.id)})
+        return st.lost
 
     def _active_state(self, job_id: UUID) -> _Active:
         with self._lock:
@@ -351,14 +384,20 @@ class Worker:
             raise StaleLease(f"lease lost for job {job_id}")
         return st
 
+    def _check_local_lease(self, st: _Active) -> None:
+        if self._lease_presumed_lost(st):
+            raise StaleLease(f"lease presumed lost for job {st.job.id}")
+
     def _ctx_heartbeat(self, job_id: UUID, progress: dict[str, Any] | None = None) -> str:
         """Handler heartbeat. Returns ``cancel_requested`` as the generic stop signal for a
         user cancel *or* a worker shutdown (backwards compatible); handlers distinguish the
         two with ``ctx.shutdown_requested()`` / ``ctx.cancel_requested()``."""
         st = self._active_state(job_id)
         status = st.status
-        if progress is not None or time.monotonic() - st.last_hb >= HEARTBEAT_MIN_INTERVAL:
+        if progress is not None or time.monotonic() - max(st.last_hb, st.last_attempt) >= HEARTBEAT_MIN_INTERVAL:
             status = self._beat(st, progress)  # keeps the lease and the true DB status current
+        else:
+            self._check_local_lease(st)  # rate-limited: still stop once the local deadline passed
         if self._shutdown.is_set():
             return "cancel_requested"
         return status
@@ -366,8 +405,10 @@ class Worker:
     def _ctx_user_cancel(self, job_id: UUID) -> bool:
         """True only if the job row's DB status is ``cancel_requested`` (never for a shutdown)."""
         st = self._active_state(job_id)
-        if time.monotonic() - st.last_hb >= 0.2:
+        if time.monotonic() - max(st.last_hb, st.last_attempt) >= 0.2:
             self._beat(st, None)
+        else:
+            self._check_local_lease(st)
         return st.status == "cancel_requested"
 
     def shutdown_requested(self) -> bool:

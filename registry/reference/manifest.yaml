@@ -1,6 +1,25 @@
 - file: comtrade_partnerAreas.json
   url: https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json
   sha256: 2da5667693b5a7f8b203028964a431cdb46356d3a377c7369bb9736c59f03733
-  retrieved_at: "2026-10-14T22:29:00Z"
+  retrieved_at: '2026-10-15T00:59:20+00:00'
   licence: UN Comtrade terms of use (reference metadata)
   use: provider-declared partner-area identities for bilateral trade relations
+- file: unsd_m49_overview.html.gz
+  url: https://unstats.un.org/unsd/methodology/m49/overview/
+  sha256: b9048114f6e7f2abda83bf03d4263c9d7cd1bd7230e3d0461025ee7839a7a1fb
+  retrieved_at: '2026-10-15T00:59:16+00:00'
+  stored_as: gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes
+  licence: United Nations (UNSD M49 standard; reference metadata)
+  use: country crosswalk input (registry/entities/country_crosswalk.json)
+- file: comtrade_Reporters.json
+  url: https://comtradeapi.un.org/files/v1/app/reference/Reporters.json
+  sha256: f2a1d78949089831c1fc7714e009996887db724a8d5a43379cdc37be9449f74b
+  retrieved_at: '2026-10-15T00:59:18+00:00'
+  licence: UN Comtrade terms of use (reference metadata)
+  use: country crosswalk input (registry/entities/country_crosswalk.json)
+- file: worldbank_country.json
+  url: https://api.worldbank.org/v2/country?format=json&per_page=400
+  sha256: c9acf3932785191a649cbc04c3056af4cf64a236e5c3b49d49be25ddb0440bce
+  retrieved_at: '2026-10-15T00:59:20+00:00'
+  licence: CC-BY-4.0 (World Bank API metadata)
+  use: country crosswalk input (registry/entities/country_crosswalk.json)

@@ -105,13 +105,17 @@ def install_error_handlers(app: FastAPI) -> None:
                                                       "a request parameter has an invalid value"))
         if sqlstate == "57014":
             return problem_response(request, _problem(503, "statement_timeout", "query exceeded the time budget"))
-        log.exception("database error")
+        log.exception("database error", extra={"request_id": getattr(request.state, "request_id", None)})
         return problem_response(request, _problem(500, "database_error", "database error"))
 
     @app.exception_handler(Exception)
     async def _unhandled(request: Request, exc: Exception) -> JSONResponse:
-        log.exception("unhandled error")
+        rid = getattr(request.state, "request_id", None)
+        log.exception("unhandled error", extra={"request_id": rid})
         response = problem_response(request, _problem(500, "internal_error", "internal error"))
+        if rid:
+            # Outside the header middleware: correlate the 500 with the logs here.
+            response.headers["X-Request-ID"] = rid
         # This handler runs in the outermost (server error) middleware, outside the header middleware:
         # apply the same security headers here so 500 pages are not the one response without them.
         apply = getattr(request.app.state, "apply_security_headers", None)

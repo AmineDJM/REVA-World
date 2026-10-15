@@ -106,3 +106,80 @@ Backend gaps (need owner action, not edited here):
   - `ui/e2e/a11y_mobile.spec.ts` (new)
   - `ui/e2e/country.spec.ts`
   - `ui/e2e/simulation.spec.ts`
+
+## Round 2 (2026-10-15, 00:40–01:00 UTC)
+
+Only `ui/**` was edited, and this section was appended. Nothing was committed by this agent; the lead's commits `6bb5389..447ded2` picked up the in-progress `ui/` files from the shared tree. The dev database `reva` was not touched.
+
+### Results
+
+| Command (in `ui/`) | Result |
+|---|---|
+| `npm run typecheck` | pass, 0 errors |
+| `npx vitest run` | **12 files, 87 tests, all pass** (was 10 files, 59 tests) |
+| `npm run build -- --outDir <scratch>/ui-build --emptyOutDir` | pass. `src/reva/api/static` was not written |
+| `uv run python scripts/e2e_stack.py --stack-file <scratch>/stack.json --static-dir <scratch>/ui-build` | ready in 19 s on the throwaway DB `reva_e2e_41c1a53c2d`. SIGINT then logged `dropped database reva_e2e_41c1a53c2d` |
+| `REVA_E2E_STACK_FILE=… PLAYWRIGHT_BROWSERS_PATH=/opt/pw-browsers npx playwright test` | **36/36 pass** (42 s). The first run was 35/36; the failure is explained below |
+
+The stack logged `WARNING reva.schema_contract: schema drift` (fingerprint `d6c11ab7e68d5906 != cc82852a11d2fa67`, both `0007_security`). This comes from migrations changed elsewhere and is for the MIGR owner. The stack still served normally.
+
+### Fixes
+
+1. **Invalid browser locale (charts).** New module `ui/src/lib/locale.ts`:
+   - `sanitizeLocale()` strips `@…` and `.charset`, turns `_` into `-`, and drops extension or private-use subtags (`-u-…`, `-x-…`). It then canonicalises with `Intl.getCanonicalLocales` inside try/catch, requires a supported locale, and otherwise falls back to `en-US`.
+   - `appLocale()` computes the locale once. `numberFormat()` and `formatNumber()` are cached formatters, and `separators()` gives the locale's group and decimal characters.
+   - `installLocaleGuard()` runs in `main.tsx` and again before uPlot's lazy import. When `Intl` rejects the browser tag, it shadows `navigator.language` and `navigator.languages` with the sanitised locale, because uPlot runs `new Intl.NumberFormat(navigator.language)` when its module loads.
+   - Every number formatter now goes through the app locale. That covers `formatDecimalString` (locale separators, still no float conversion), `compactMagnitude`, `valueToText`, `ValueView` floats, `ModelsPage` metrics and the chart axis `compact()`.
+   - No hard-coded `'en-US'` or `toLocaleString` calls remain.
+   - Dates stay ISO-8601 UTC on purpose, so cutoffs are unambiguous.
+2. **Display precision.**
+   - `displayDecimal(value, unitRef)` and `DISPLAY_FRACTION_DIGITS` show US$ to the cent and `% of baseline GDP` / `%` to 4 decimals, rounding half-up on the decimal string. Other units keep up to 6 decimals.
+   - `ValueView` puts the exact served string in `title` and `data-exact`. When rounding dropped digits, an **"exact"** toggle button (`aria-expanded`) shows `= 57082396439.600717`.
+   - Simulation L1 cells now read, for example, `7,882,716,561.38 US$ (7.88 billion US$)`.
+   - Baseline inputs and L2 ranges use the same rule.
+   - CSV and JSON exports are unchanged: they still carry the raw strings, and a test asserts this.
+3. **Contradictory "Origin: no records".**
+   - `ContextBanner` takes a `dataOrigin` prop. When the envelope origin is `none`, the banner shows the combined origin of the records actually displayed, with the note "(of the records shown on this page)", and the TEST FIXTURE label follows it.
+   - `CountryPage` gathers these origins from each panel's envelope and from the origins of the observations behind the shown rows (`combineOrigins`).
+   - If no records are shown, the banner reads "no records (none shown here; baseline release is a test fixture)".
+   - **Backend note:** in this stack `GET /v1/entities/{id}` already returns `origin: test_fixture`, so the API fix appears to have landed. The UI derivation is now only a fallback. The e2e test checks `data-origin-derived` against what the API returns.
+4. **Uncertainty glyph legend.** New `ui/src/components/UncertaintyGlyph.tsx`:
+   - `glyphKindFor(uncertainty, value)` is driven by the API status and kind. Solid line means exact by definition. Dotted line means unquantified, not-applicable or unreported, so these are never drawn as exact. Ribbon means sensitivity range. Hatched box means missing. There are also distinct glyphs for probabilistic intervals, bounds and mixed status.
+   - `UncertaintyLegend` always lists the four core glyphs and marks the ones the listed rows use as "(shown here)".
+   - The same SVG glyph appears in the uncertainty badges and panels, in `MissingValue` (aria-hidden, so the text stays "missing (reason)"), in sensitivity-range values and in the simulation missing-inputs table.
+   - The legend is shown above every country panel table, the simulation comparison table, and the Evidence source-comparison and observations tables. The observations table also gained an Uncertainty column.
+   - Hatching is now used only for missing values: the sensitivity bar was changed from hatched to a ribbon.
+5. **Comtrade 1.2.0 flags (coordinator item).** `sourceFlagNotes(flags, { concept })`:
+   - It reports "provider estimate" only when `provider_value_estimated === true`; `null` means undeterminable and gets no note.
+   - `provider_quantity_estimated` is shown only on quantity or net-weight concepts (`isQuantityConcept`).
+   - The legacy `provider_estimation_flagged` is shown as "legacy flag (meaning: quantity/net weight estimated)", never as a value estimate. An old API note that read the legacy flag as a value estimate is suppressed.
+   - `legacy_estimation_code_unrecognised` is surfaced.
+   - On the real stack, DZA 2024 (`legacyEstimationFlag 6`) now reads "not directly reported (isReported=false)" and is not called an estimate.
+6. **Stale e2e assertion.** The API now serves the simulation `valid_time` (`[2023-01-01…, 2024-01-01…)`), which made the first-run failure on `'2023 (scenario reference year'`. The assertion now accepts the served interval or the UI fallback label. This closes the round-1 backend gap on `valid_time`.
+
+### Tests added or changed
+
+- `src/lib/locale.test.ts` (new):
+  - sanitisation of `en-US@posix`, `en_US.UTF-8`, `fr_FR.UTF-8@euro`, `de-DE-u-nu-arab`, and fallbacks for `C`, `POSIX`, `''` and junk;
+  - formatting with an `en-US@posix` browser tag;
+  - uPlot imports after the guard;
+  - a valid `de-DE` locale is left untouched and uses its own separators.
+- `src/lib/format.test.ts`:
+  - `displayDecimal` for cents, percent of GDP to 4 decimals, the carry, and integers left unrounded;
+  - the Comtrade 1.2.0 `sourceFlagNotes` rules.
+- `src/components/ValueView.test.tsx`: the rounded display, the compact magnitude, the hover title, the exact toggle, and range ends.
+- `src/lib/scenario.test.ts`: CSV and JSON keep `57082396439.600717` and `1.987654321987` exactly.
+- `src/components/UncertaintyGlyph.test.tsx` (new): kind mapping, the legend's content and present-marking, the same glyphs on badges, missing values and ranges, and unique pattern ids.
+- `src/components/ContextBanner.test.tsx`: derived and mixed origin, the explained "no records", and `combineOrigins`.
+- `src/pages/SimulationPage.test.tsx` and `MissingValue.test.tsx`: updated for the new flags and precision.
+- e2e:
+  - `country.spec.ts`:
+    - the DZA flag test now uses `provider_value_estimated`;
+    - a new test checks the banner origin and the legend;
+    - a new test forces `navigator.language = 'en-US@posix'` with an init script and asserts that the chart canvases render, that "Chart unavailable" never appears and that no RangeError is thrown.
+  - `simulation.spec.ts`: L1 cents and compact display, the exact toggle equals the API string, and the legend is shown.
+
+### Remaining
+
+- Simulation `exposure_percent_baseline_gdp` values come back with about 50 decimal digits, for example `0.46085699286476945046091517470024753622140364013097`. The UI rounds them for display. The backend (SIMFIX/C) may want to quantise the stored result.
+- The schema-drift warning above is for the MIGR owner.

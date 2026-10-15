@@ -33,6 +33,7 @@ from reva.api.auth import CSRF_HEADER, AuthService, require_scope
 from reva.api.errors import ApiProblem, NotFound, install_error_handlers, problem_response
 from reva.api.routes import beliefs, catalog, evidence, provenance, sim, system, world
 from reva.kernel.errors import ConfigurationError
+from reva.operations.telemetry import configure_logging, log_context
 from reva.settings import Settings, get_settings
 
 log = logging.getLogger("reva.api.access")
@@ -222,7 +223,8 @@ def create_app(
             rid = secrets.token_hex(8)
         request.state.request_id = rid
         t0 = time.perf_counter()
-        response = await call_next(request)
+        with log_context(request_id=rid):  # correlates every log line emitted while serving the request
+            response = await call_next(request)
         ms = (time.perf_counter() - t0) * 1000
         route = getattr(request.scope.get("route"), "path", "unmatched")
         app.state.metrics.observe(route, response.status_code, ms)
@@ -283,7 +285,16 @@ def create_app(
 
 
 def _module_app() -> Any:
-    return create_app()
+    """The served app (``uvicorn reva.api.app:app``): install the redacting JSON log handler first.
+
+    Without it, uvicorn's "Exception in ASGI application" tracebacks and ``log.exception`` output fall
+    through to Python's last-resort handler unredacted (bound parameters, Authorization values).
+    ``configure_logging`` also adopts the uvicorn loggers. ``create_app()`` alone (tests, embedding)
+    leaves logging configuration to the caller.
+    """
+    settings = get_settings()
+    configure_logging(settings.reva_log_level)
+    return create_app(settings)
 
 
 app = _module_app()
