@@ -291,28 +291,80 @@ def _model_manifest(io, key):
                         "applicability": {"concepts": "*"}}, "models")
 
 
+def _model_proposal(db, io, spec_sha: str) -> ports.PlatformChangeProposal:
+    from reva.autonomy.policy import promotion_policy
+    from reva.autonomy.proposals import ProposalStore, base_commit
+
+    change = io.put_json({"schema": "reva-model-registration/1", "model_spec_sha256": spec_sha}, "models")
+    p = ports.PlatformChangeProposal(uuid.uuid4(), "agent:model-challenger", 2, (), base_commit(), change,
+                                     ("new_model",), True, False,
+                                     ports.ValueEstimate("unsupported", None, None, {}, change, "t"),
+                                     promotion_policy().version)
+    ProposalStore(db.worker, io).persist(p, proposal_type="model_registration", scope={}, risk={})
+    return p
+
+
+def _review(db, proposal_id, decision="approve", reviewer="human:maintainer"):
+    with db.api.begin() as conn:  # reviews are written only through ops.review_proposal (reva_api)
+        return conn.execute(text("SELECT ops.review_proposal(:p, :d, :r, 'test')"),
+                            {"p": proposal_id, "d": decision, "r": reviewer}).scalar_one()
+
+
 def test_model_registry_requires_approval_and_is_immutable(db, io):
+    from reva.autonomy.gate import PolicyPromotionGate
     from reva.autonomy.models import PostgresModelRegistry
+    from reva.autonomy.policy import promotion_policy
     from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied
 
     reg = PostgresModelRegistry(db.worker, io)
     key = f"forecast.test_{uuid.uuid4().hex[:8]}"
-    desc = ports.ModelDescriptor(uuid.uuid4(), key, "9.0.0", _model_manifest(io, key), {"concepts": "*"})
-    review = ports.GateDecision(uuid.uuid4(), "needs_review", uuid.uuid4(), "promotion-1.0.0", (), (),
-                                "gate-evaluator:promotion", None)
+    man = _model_manifest(io, key)
+    desc = ports.ModelDescriptor(uuid.uuid4(), key, "9.0.0", man, {"concepts": "*"})
+    p = _model_proposal(db, io, man.sha256)
+    review = PolicyPromotionGate(db.worker, io).decide(p, [], promotion_policy().ref())
+    assert review.outcome == "needs_review"  # new_model is T2
     with pytest.raises(PolicyDenied):
         reg.register(desc, review)
-    approved = ports.GateDecision(uuid.uuid4(), "promote", uuid.uuid4(), "promotion-1.0.0", (), ("named review",),
-                                  "human:maintainer", None)
+    # (R4-05) fabricated decisions are refused: no recorded approval behind them
+    for who in ("human:maintainer", "human:nobody", "gate-evaluator:promotion"):
+        fake = ports.GateDecision(uuid.uuid4(), "promote", p.proposal_id, "made-up", (), ("trust me",), who, None)
+        with pytest.raises(PolicyDenied):
+            reg.register(desc, fake)
     with pytest.raises(PolicyDenied):
         reg.register(desc, ports.GateDecision(uuid.uuid4(), "promote", uuid.uuid4(), "p", (), (), "agent:x", None))
+    # a recorded human approval of a proposal that names this spec is accepted
+    rid = _review(db, p.proposal_id)
+    approved = ports.GateDecision(rid, "promote", p.proposal_id, promotion_policy().version, (),
+                                  ("named review",), "human:maintainer", None)
+    with pytest.raises(PolicyDenied):  # right reviewer recorded, but another person claims it
+        reg.register(desc, ports.GateDecision(rid, "promote", p.proposal_id, "x", (), (), "human:other", None))
     got = reg.register(desc, approved)
     assert reg.register(desc, approved).model_version_id == got.model_version_id  # idempotent
-    other = ports.ModelDescriptor(uuid.uuid4(), key, "9.0.0",
-                                  io.put_json({"different": True, "kind": "forecast", "input_ports": [],
-                                               "output_ports": [], "assumptions": []}, "models"), {})
+    # an approval for a proposal naming another spec does not cover this one
+    other_key = f"forecast.test_{uuid.uuid4().hex[:8]}"
+    other_desc = ports.ModelDescriptor(uuid.uuid4(), other_key, "9.0.0", _model_manifest(io, other_key), {})
+    with pytest.raises(PolicyDenied):
+        reg.register(other_desc, approved)
+    # a T0 gate pass is never a model approval
+    from reva.autonomy.proposals import ProposalStore, base_commit
+
+    t0 = ports.PlatformChangeProposal(uuid.uuid4(), "agent:test", 0, (), base_commit(),
+                                      io.put_json({"model_spec_sha256": man.sha256}, "models"), ("report",), False,
+                                      False, ports.ValueEstimate("unsupported", None, None, {}, man, "t"),
+                                      promotion_policy().version)
+    ProposalStore(db.worker, io).persist(t0, proposal_type="t", scope={}, risk={})
+    t0_pass = PolicyPromotionGate(db.worker, io).decide(t0, [], promotion_policy().ref())
+    assert t0_pass.outcome == "promote"
+    key2 = f"forecast.test_{uuid.uuid4().hex[:8]}"
+    with pytest.raises(PolicyDenied):
+        reg.register(ports.ModelDescriptor(uuid.uuid4(), key2, "9.0.0", man, {}), t0_pass)
+    different = io.put_json({"different": True, "kind": "forecast", "input_ports": [], "output_ports": [],
+                             "assumptions": []}, "models")
+    p2 = _model_proposal(db, io, different.sha256)
+    rid2 = _review(db, p2.proposal_id)
     with pytest.raises(ImmutableRecordViolation):
-        reg.register(other, approved)
+        reg.register(ports.ModelDescriptor(uuid.uuid4(), key, "9.0.0", different, {}),
+                     ports.GateDecision(rid2, "promote", p2.proposal_id, "x", (), (), "human:maintainer", None))
     eligible = reg.eligible({"kind": "forecast"}, _ctx(io, cutoff=datetime.now(UTC) + timedelta(seconds=5)))
     assert key in {d.model_key for d in eligible} and "forecast.last_value" in {d.model_key for d in eligible}
     past = reg.eligible({"kind": "forecast"}, _ctx(io, cutoff=datetime(2000, 1, 1, tzinfo=UTC)))
@@ -322,7 +374,9 @@ def test_model_registry_requires_approval_and_is_immutable(db, io):
 def test_model_evaluator_proper_metrics(io):
     from reva.autonomy.models import TournamentModelEvaluator
 
-    targets = io.put_json({"series": {"a": [[2000, 10], [2001, 12], [2002, 14], [2003, 16]]}}, "evaluation")
+    # >= 3 consecutive training years are needed for a defined MASE scale (here 4: 1998-2001, scale 2)
+    targets = io.put_json({"series": {"a": [[1998, 6], [1999, 8], [2000, 10], [2001, 12], [2002, 14], [2003, 16]]}},
+                          "evaluation")
     preds = io.put_json({"records": [
         {"series_id": "a", "origin": 2001, "horizon": 1, "target_year": 2002, "point": 12,
          "interval": [11, 15], "interval_kind": "prediction_interval"},
@@ -335,7 +389,10 @@ def test_model_evaluator_proper_metrics(io):
     r = TournamentModelEvaluator(io).evaluate(model, preds, targets, spec)
     m = r.metrics["overall"]
     assert m["mae"] == pytest.approx(3.0) and m["mase"] == pytest.approx(1.5) and m["coverage"] == 1.0
-    assert set(r.metrics["subgroups"]["horizon"]) == {"1", "2"}
+    assert set(r.metrics["subgroups"]["horizon"]) == {"1", "2"} and m["n_undefined_scale"] == 0
+    short = io.put_json({"series": {"a": [[2000, 10], [2001, 12], [2002, 14], [2003, 16]]}}, "evaluation")
+    m2 = TournamentModelEvaluator(io).evaluate(model, preds, short, spec).metrics["overall"]
+    assert m2["mase"] is None and m2["n_undefined_scale"] == 2 and m2["mae"] == pytest.approx(3.0)
     leaky = io.put_json({"records": [{"series_id": "a", "origin": 2003, "horizon": 1, "target_year": 2003,
                                       "point": 1}]}, "evaluation")
     r2 = TournamentModelEvaluator(io).evaluate(model, leaky, targets, spec)

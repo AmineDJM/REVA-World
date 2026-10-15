@@ -134,6 +134,11 @@ class Step:
     blocked_reason: str | None = None
     duration_s: float = 0.0
     interfaces: list[str] = field(default_factory=list)
+    unmet: str | None = None
+
+    def require(self) -> None:
+        if self.unmet:
+            raise Blocked(self.unmet)
 
     def check(self, name: str, ok: bool, detail: Any = None) -> bool:
         self.checks.append(
@@ -198,8 +203,8 @@ class Recorder:
             # display check of that step failed; otherwise this step is blocked, never faked
             bad = [d for d in needs if not (self.steps.get(d) and self.steps[d].evidence.get("_ready"))]
             if bad:
-                raise Blocked(f"depends on step(s) {', '.join(bad)} which did not produce the required inputs")
-            yield st
+                st.unmet = f"depends on step(s) {', '.join(bad)} which did not produce the required inputs"
+            yield st  # the body starts with st.require(), which raises Blocked for unmet dependencies
             if not st.checks:
                 st.status = "fail"
                 st.error = "step recorded no checks"
@@ -461,6 +466,7 @@ def step1_fetch(env: Env, rec: Recorder) -> None:
     from reva.evidence.runner import FixtureHttp, make_live_client, post_publish_for, run_connector
 
     with rec.step("1") as st:
+        st.require()
         st.interfaces.append("library:evidence.runner.run_connector")
         connectors = builtin_connectors(env.settings.reva_http_contact_email)
         per: dict[str, Any] = {}
@@ -585,6 +591,7 @@ def _observation(env: Env, iso3: str, concept: str, year: int) -> dict[str, Any]
 
 def step2_flags(env: Env, rec: Recorder) -> None:
     with rec.step("2", needs=("1",)) as st:
+        st.require()
         st.interfaces.append("sql:evidence.observation")
         m = _observation(env, "FRA", M_CONCEPT, 2023)
         x = _observation(env, "FRA", X_CONCEPT, 2023)
@@ -643,6 +650,7 @@ def step3_publish(env: Env, rec: Recorder) -> None:
     from reva.kernel.context import Origin
 
     with rec.step("3", needs=("1",)) as st:
+        st.require()
         st.interfaces.append("library:belief.publication.publish_release")
         cutoff = env.now()
         rel = publish_release(
@@ -711,6 +719,7 @@ def step4_hyperedges(env: Env, rec: Recorder) -> None:
     from reva.world import queries
 
     with rec.step("4", needs=("3",)) as st:
+        st.require()
         st.interfaces.append("library:world.queries.neighbourhood")
         rel = env.state["release"]
         y23 = (datetime(2023, 1, 1, tzinfo=UTC), datetime(2024, 1, 1, tzinfo=UTC))
@@ -855,6 +864,7 @@ def hand_computed(env: Env, iso3: str) -> dict[str, Decimal]:
 
 def step5_l1(env: Env, rec: Recorder) -> None:
     with rec.step("5", needs=("3",)) as st:
+        st.require()
         st.interfaces += ["sql:sim.create_scenario(reva_api)", "sql:ops.submit_job(reva_api)", "worker:simulation"]
         counts_before = {
             t: count(env, f"SELECT count(*) FROM {t}")
@@ -929,6 +939,7 @@ def step5_l1(env: Env, rec: Recorder) -> None:
 
 def step6_l2(env: Env, rec: Recorder) -> None:
     with rec.step("6", needs=("5",)) as st:
+        st.require()
         st.interfaces += ["sql:sim.create_scenario(reva_api)", "sql:ops.submit_job(reva_api)", "worker:simulation"]
         grid = [
             {"import_elasticity": ei, "export_elasticity": ex, "basis": "scenario_assumption"}
@@ -1049,6 +1060,7 @@ def _find_record(doc: Any, match: dict[str, Any]) -> list[dict[str, Any]]:
 
 def step7_provenance(env: Env, rec: Recorder) -> None:
     with rec.step("7", needs=("5",)) as st:
+        st.require()
         st.interfaces.append("sql:belief.input->evidence.observation->evidence.acquisition")
         res = next(
             r
@@ -1153,6 +1165,7 @@ def step8_replay(env: Env, rec: Recorder) -> None:
     from reva.kernel.context import Origin
 
     with rec.step("8", needs=("1",)) as st:
+        st.require()
         st.interfaces += ["library:tests/fixtures/vintages/vintage_loader", "library:evaluation.replay"]
         vl = _vintage_loader()
         name, key = "pop_fra_1990_1991_two_vintages", "wb:SP.POP.TOTL:FRA:1991"
@@ -1262,6 +1275,7 @@ def step9_eurostat(env: Env, rec: Recorder) -> None:
     from reva.evidence.runner import FixtureHttp, make_live_client, run_connector
 
     with rec.step("9") as st:
+        st.require()
         st.interfaces += ["sql:ops.submit_job(reva_api)", "worker:discovery", "library:autonomy.jobs"]
         mode = "fixture" if env.mode == "fixtures" else "live"
         job_id = submit_job(env, "discovery", {"requirement_id": "R-POP-JAN-AGESEX", "mode": mode})
@@ -1270,6 +1284,8 @@ def step9_eurostat(env: Env, rec: Recorder) -> None:
         st.evidence.update(
             job_id=job_id,
             job_status=job["status"],
+            job_last_error=job["last_error"],
+            worker_outcome=job["worker_outcome"],
             discovery={
                 k: out.get(k)
                 for k in (
@@ -1384,11 +1400,12 @@ def step10_population(env: Env, rec: Recorder) -> None:
     from reva.population.service import CONCEPT, FIVE_YEAR_BANDS, load_cells
 
     with rec.step("10", needs=("9",)) as st:
+        st.require()
         st.interfaces += ["sql:ops.submit_job(reva_api)", "worker:population", "library:population/compression"]
         job_id = submit_job(env, "population", {"geo": "FRA", "year": 2023, "n_records": 100_000, "origin": env.origin})
         job = run_job(env, job_id, "population")
         out = job["result_ref"] or {}
-        st.evidence.update(job_id=job_id, job_status=job["status"], result=out)
+        st.evidence.update(job_id=job_id, job_status=job["status"], job_last_error=job["last_error"], result=out)
         st.check(
             "population job (materialise + diagnostics + coarsen + refine) succeeded",
             job["status"] == "succeeded",
@@ -1498,6 +1515,7 @@ def step11_tournament(env: Env, rec: Recorder) -> None:
     from reva.evaluation.tournament_service import LABEL, REPLAY_MODE
 
     with rec.step("11", needs=("3",)) as st:
+        st.require()
         st.interfaces += ["sql:ops.submit_job(reva_api)", "worker:evaluation", "library:evaluation.tournament_service"]
         rel = env.state["release"]
         job_id = submit_job(
@@ -1510,6 +1528,7 @@ def step11_tournament(env: Env, rec: Recorder) -> None:
         st.evidence.update(
             job_id=job_id,
             job_status=job["status"],
+            job_last_error=job["last_error"],
             result={
                 k: out.get(k)
                 for k in (
@@ -1549,6 +1568,7 @@ def step11_tournament(env: Env, rec: Recorder) -> None:
 # --------------------------------------------------------------------------- step 12
 def step12_gaps(env: Env, rec: Recorder) -> None:
     with rec.step("12", needs=("3",)) as st:
+        st.require()
         st.interfaces += ["worker:gaps", "library:autonomy.jobs.handle_gaps"]
         job_id = enqueue_internal(env, "gaps", {"origin": env.origin})
         job = run_job(env, job_id, "gaps")
@@ -1651,6 +1671,7 @@ def step12_gaps(env: Env, rec: Recorder) -> None:
 # --------------------------------------------------------------------------- negative demo
 def step_negative(env: Env, rec: Recorder) -> None:
     with rec.step("N", needs=("3",)) as st:
+        st.require()
         st.interfaces += [
             "sql:sim.create_scenario(reva_api)",
             "sql:ops.submit_job(reva_api)",

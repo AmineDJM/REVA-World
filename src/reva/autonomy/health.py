@@ -11,7 +11,12 @@ Dimensions (architecture §10.3):
 * ``completeness`` — received vs expected keys;
 * ``revision_anomalies`` — revisions per run vs a robust baseline;
 * ``provenance`` — share of runs with a raw artifact hash;
-* ``latency`` — p50/p95 seconds.
+* ``latency`` — p50/p95 seconds;
+* ``connector_state`` — for promoted template connectors: ``active``,
+  ``retired`` or ``template_changed`` (the reviewed template code changed since
+  promotion, so the version is no longer loaded for ingestion). Pass it in
+  ``expected_schedule["connector_state"]`` (see ``connector_state``);
+  ``template_changed`` makes the summary state ``quarantined``.
 
 The summary ``state`` is operational only.
 """
@@ -91,7 +96,11 @@ def health_vector(runs: list[Mapping[str, Any]], schedule: Mapping[str, Any], no
     lat = [float(r["latency_seconds"]) for r in recent if r.get("latency_seconds") is not None]
     dims["latency"] = {"p50": _pct(lat, 0.5), "p95": _pct(lat, 0.95)}
     latest = recent[-1] if recent else None
-    if not recent:
+    cstate = schedule.get("connector_state")
+    dims["connector_state"] = {"state": cstate or "not_applicable"}
+    if cstate == "template_changed":
+        state = "quarantined"
+    elif not recent:
         state = "unknown"
     elif dims["semantic_drift"]["drift"] or (latest and latest.get("outcome") == "quarantined"):
         state = "quarantined"
@@ -147,3 +156,11 @@ def run_history_from_db(conn: Connection, connector_version_id: UUID, limit: int
             "raw_sha256": a["raw_sha256"] if a else None,
         })
     return {"schema": "reva-run-history/1", "connector_version_id": str(connector_version_id), "runs": runs}
+
+
+def connector_state(conn: Connection, connector_version_id: UUID) -> str | None:
+    """``active`` / ``template_changed`` / ``retired`` for a promoted template connector, else None."""
+    from reva.autonomy.promotion import connector_states
+
+    return next((x["state"] for x in connector_states(conn) if x["connector_version_id"] == str(connector_version_id)),
+                None)

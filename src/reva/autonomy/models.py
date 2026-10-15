@@ -2,7 +2,12 @@
 
 * ``PostgresModelRegistry`` wraps the immutable ``model.version`` table (append
   only; an existing key/version with different content is refused). Registration
-  requires a ``promote`` decision from a gate evaluator or a named human.
+  requires a ``promote`` decision that is *recorded*: a passing
+  ``ops.gate_result`` row of a ``gate-evaluator:*`` for that proposal, or an
+  ``approve`` ``ops.proposal_review`` by that named human (latest review of the
+  proposal) — and the proposal must request ``new_model`` (T2, so in practice a
+  named human approval) and its change document must name this model spec
+  (``model_spec_sha256``). Hand-built ``GateDecision`` objects are refused (R4-05).
 * ``TournamentModelEvaluator`` computes proper metrics (MAE, MASE with a
   training-window scale, prediction-interval coverage) overall and by subgroup
   (series, horizon), with resource counts, using agent B's ``reva.models.metrics``.
@@ -66,6 +71,7 @@ class PostgresModelRegistry:
             if k not in spec:
                 raise PolicyDenied(f"model manifest lacks {k}")
         with self.engine.begin() as conn:
+            self._verify_approval(conn, descriptor, approval)
             row = conn.execute(text("SELECT id, spec_sha256 FROM model.version WHERE model_key=:k AND version=:v"),
                                {"k": descriptor.model_key, "v": descriptor.version}).mappings().one_or_none()
             if row is not None:
@@ -92,6 +98,40 @@ class PostgresModelRegistry:
                  "as": json.dumps(spec["assumptions"]), "a": act.id}).scalar_one()
         return ModelDescriptor(uuid.UUID(str(mid)), descriptor.model_key, descriptor.version, descriptor.manifest,
                                descriptor.applicability)
+
+    def _verify_approval(self, conn: Any, descriptor: ModelDescriptor, approval: GateDecision) -> None:
+        """Bind the decision to a recorded DB approval of a proposal that names this model spec."""
+        who = approval.reviewer_identity
+        if who.startswith("gate-evaluator:"):
+            row = conn.execute(text("SELECT proposal_id, decision, evaluator FROM ops.gate_result WHERE id = :i"),
+                               {"i": approval.decision_id}).mappings().one_or_none()
+            if row is None or row["decision"] != "pass" or row["evaluator"] != who \
+                    or str(row["proposal_id"]) != str(approval.proposal_id):
+                raise PolicyDenied("no recorded passing gate result matches this decision",
+                                   decision_id=str(approval.decision_id))
+        else:
+            row = conn.execute(text(
+                """SELECT decision, reviewer FROM ops.proposal_review WHERE proposal_id = :p
+                   ORDER BY recorded_at DESC, id DESC LIMIT 1"""), {"p": approval.proposal_id}
+            ).mappings().one_or_none()
+            if row is None or row["decision"] != "approve" or row["reviewer"] != who:
+                raise PolicyDenied("no recorded human approval (ops.proposal_review) matches this decision",
+                                   proposal_id=str(approval.proposal_id), reviewer=who)
+        sha = conn.execute(text("SELECT manifest_sha256 FROM ops.proposal WHERE id = :p"),
+                           {"p": approval.proposal_id}).scalar_one_or_none()
+        if sha is None:
+            raise PolicyDenied("approval does not refer to a persisted proposal")
+        try:
+            doc = self.io.get_json(ArtifactRef(sha, "models", "application/json"))
+            change = self.io.get_json(ArtifactRef(**doc["proposal"]["patch_or_manifest"]))
+        except Exception:
+            raise PolicyDenied("the approved proposal's change document is unreadable") from None
+        if "new_model" not in (doc["proposal"].get("requested_capabilities") or []):
+            raise PolicyDenied("the approved proposal is not a model proposal (capability new_model, tier >= T2)")
+        named = change.get("model_spec_sha256") if isinstance(change, dict) else None
+        if named != descriptor.manifest.sha256:
+            raise PolicyDenied("the approved proposal does not name this model spec (model_spec_sha256)",
+                               expected=descriptor.manifest.sha256)
 
     def eligible(self, task: Mapping[str, JSON], context: ScopedContext) -> list[ModelDescriptor]:
         with self.engine.connect() as conn:
@@ -160,8 +200,10 @@ class TournamentModelEvaluator:
             if y is None:
                 missing_target += 1
                 continue
-            train = [v for yr, v in sorted(s.items()) if yr <= int(p["origin"])]
-            scale = mase_scale(train) if len(train) >= 1 else None
+            train = [(yr, v) for yr, v in sorted(s.items()) if yr <= int(p["origin"])]
+            # MASE scale needs >= MIN_SCALE_POINTS consecutive training years; otherwise it is
+            # undefined (counted in n_undefined_scale), never a made-up value.
+            scale = mase_scale([v for _, v in train], [yr for yr, _ in train]) if train else None
             err = absolute_error(float(p["point"]), y)
             scored.append({"series_id": p["series_id"], "horizon": int(p["horizon"]), "target": y, "abs_error": err,
                            "scaled": (err / scale.value) if scale is not None and scale.value else None,

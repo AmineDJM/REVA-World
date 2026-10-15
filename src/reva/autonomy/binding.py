@@ -31,6 +31,7 @@ TOTAL_CODES = ("TOTAL", "T")
 SUBJECT = {"dimension": "geo", "alias_provider": "eurostat_geo"}
 MIN_CADENCE_SECONDS = 86_400
 MAX_RESPONSE_BYTES = 5_000_000
+CONNECTOR_PREFIX = "eurostat."  # namespace of template connectors; never a built-in name
 SEMANTIC_FIELDS = ("unit_ref", "aggregation", "population_universe", "temporal_support", "spatial_scheme")
 
 
@@ -49,7 +50,7 @@ def expected_semantics(concept: Any) -> dict[str, str]:
 
 
 def connector_name(dataset: str, geo: list[str]) -> str:
-    return f"eurostat.{dataset}.{'-'.join(g.lower() for g in geo)}"
+    return f"{CONNECTOR_PREFIX}{dataset}.{'-'.join(g.lower() for g in geo)}"
 
 
 def template_entry(policy: PinnedPolicy, template: str) -> Mapping[str, Any] | None:

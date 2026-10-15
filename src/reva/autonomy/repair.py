@@ -626,16 +626,18 @@ def classify_error(item: str, code: str, message: str, status: int | None = None
 
 
 def failure_history(conn: Connection, connector_name: str, *, version: str | None = None,
-                    origin: str | None = None, window: int = 20) -> tuple[RunSignals, ...]:
+                    origin: str | None = None, since: datetime | None = None,
+                    window: int = 20) -> tuple[RunSignals, ...]:
     """Run records (``reva.evidence.runner.record_health``) as per-item failure signals, oldest first."""
     rows = conn.execute(text(
         """SELECT h.recorded_at, h.metrics FROM ops.connector_health h
              JOIN evidence.connector_version cv ON cv.id = h.connector_version_id
             WHERE cv.name = :n AND (CAST(:v AS text) IS NULL OR cv.version = :v)
               AND (CAST(:o AS text) IS NULL OR h.metrics->>'origin' = :o)
+              AND (CAST(:t AS timestamptz) IS NULL OR h.recorded_at >= :t)
               AND COALESCE(h.metrics->>'kind', '') <> 'health_vector'
             ORDER BY h.recorded_at DESC, h.id DESC LIMIT :w"""),
-        {"n": connector_name, "v": version, "o": origin, "w": window}).mappings().all()
+        {"n": connector_name, "v": version, "o": origin, "t": since, "w": window}).mappings().all()
     out = []
     for r in reversed(rows):
         m = dict(r["metrics"])
@@ -840,19 +842,20 @@ class ConnectorRepairAdvisor:
                          origin=origin, item_key=item.key, body=body, media_type=media_type, status=status)
 
     def find_case(self, connector: Any, *, version: str | None = None, origin: str | None = None,
-                  limit: int = 200) -> DriftCase | None:
+                  since: datetime | None = None, limit: int = 200) -> DriftCase | None:
         """The newest open case: a persistent request-failure history, else the newest acquisition
         that was quarantined or whose semantic fingerprint differs from the fixture bank."""
         name = connector.describe().name
         with self.engine.connect() as conn:
-            runs = failure_history(conn, name, version=version, origin=origin)
+            runs = failure_history(conn, name, version=version, origin=origin, since=since)
         if runs and any(_is_gone(s) or _is_auth(s) for s in runs[-1].signals):
             return DriftCase(connector=name, observed_at=runs[-1].recorded_at, origin=origin or "live",
                              status=None, failures=runs)
-        return self.find_drifted_acquisition(connector, version=version, origin=origin, limit=limit)
+        return self.find_drifted_acquisition(connector, version=version, origin=origin, since=since,
+                                             limit=limit)
 
     def find_drifted_acquisition(self, connector: Any, *, version: str | None = None, origin: str | None = None,
-                                 limit: int = 200) -> DriftCase | None:
+                                 since: datetime | None = None, limit: int = 200) -> DriftCase | None:
         name = connector.describe().name
         sem = SEMANTICS.get(name)
         bank_by_fp = {e["request_fingerprint"]: e for e in bank_entries(self.io, self.bank(name))}
@@ -866,8 +869,9 @@ class ConnectorRepairAdvisor:
                      FROM evidence.acquisition a JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
                     WHERE cv.name = :n AND (CAST(:v AS text) IS NULL OR cv.version = :v)
                       AND (CAST(:o AS text) IS NULL OR a.origin = :o)
+                      AND (CAST(:t AS timestamptz) IS NULL OR a.recorded_at >= :t)
                     ORDER BY a.recorded_at DESC, a.id DESC LIMIT :l"""),
-                {"n": name, "v": version, "o": origin, "l": limit}).mappings().all()
+                {"n": name, "v": version, "o": origin, "t": since, "l": limit}).mappings().all()
         seen: set[str] = set()
         for r in rows:
             meta = dict(r["response_metadata"] or {})

@@ -29,7 +29,6 @@ from datetime import datetime
 from typing import Any
 from urllib.parse import urlsplit
 
-
 PUBLIC_PROBE = ("1.1.1.1", 443)
 _RAW_SOCKET = _socket.socket
 
@@ -66,7 +65,8 @@ def _probe_isolation(req: dict[str, Any]) -> dict[str, Any]:
     """Measured (not nominal) isolation facts, gathered before the Python guard is installed."""
     port = req.get("probe_port")
     loop = _raw_connect(("127.0.0.1", int(port))) if port else "not_probed"
-    public = _raw_connect(PUBLIC_PROBE)
+    pp = req.get("public_probe") or PUBLIC_PROBE
+    public = _raw_connect((str(pp[0]), int(pp[1])))
     verified = loop.startswith("failed") and public.startswith("failed")
     try:
         with open(f"/proc/{os.getppid()}/environ", "rb") as f:
@@ -95,7 +95,7 @@ def _block_network(allowlist: list[str]) -> None:
 
     blocked_families = {_socket.AF_INET, _socket.AF_INET6, getattr(_socket, "AF_PACKET", -2), -1}
 
-    class _RefusingSocket(_RAW_SOCKET):  # type: ignore[misc, valid-type]
+    class _RefusingSocket(_RAW_SOCKET):
         # socket.socket.__init__ calls ``_socket.socket.__init__`` through the module
         # attribute, so this also guards sockets created via the ``socket`` module.
         # Wrapping an existing fd (socketpair, used by asyncio's self-pipe) and
@@ -107,10 +107,10 @@ def _block_network(allowlist: list[str]) -> None:
 
     for name in ("connect", "connect_ex", "sendto", "sendmsg", "bind"):
         setattr(socket.socket, name, refuse)
-    socket.create_connection = refuse  # type: ignore[assignment]
-    socket.getaddrinfo = refuse  # type: ignore[assignment]
+    socket.create_connection = refuse
+    socket.getaddrinfo = refuse
     _socket.socket = _RefusingSocket  # type: ignore[misc]
-    _socket.getaddrinfo = refuse  # type: ignore[attr-defined]
+    _socket.getaddrinfo = refuse
     # socketpair (AF_UNIX, process-local) stays available: asyncio's self-pipe needs it.
 
 

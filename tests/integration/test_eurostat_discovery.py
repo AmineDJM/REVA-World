@@ -50,6 +50,14 @@ def _gap(io, **over) -> KnowledgeGap:
     return KnowledgeGap(**base)
 
 
+@pytest.fixture(autouse=True)
+def _offline_sandbox_probe(monkeypatch):
+    """Sandbox isolation probes target a closed local port in tests (no outbound packets)."""
+    from reva.autonomy import sandbox as _sb
+
+    monkeypatch.setattr(_sb, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))
+
+
 @pytest.fixture()
 def io(tmp_path: Path) -> ArtifactIO:
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
@@ -213,7 +221,7 @@ async def test_end_to_end_promotion_ingestion_and_belief_separation(db, tmp_path
             {"cv": cv["id"]}).mappings().all()
         assert len(elig) == 1 and elig[0]["decision"] == "eligible"
         assert elig[0]["applicability"]["subjects"] == ["FRA"]
-        assert elig[0]["policy_version"] == "promotion-1.0.0"
+        assert elig[0]["policy_version"] == "promotion-1.1.0"
         wdi_elig = conn.execute(text(
             """SELECT count(*) FROM evidence.eligibility e JOIN ontology.concept_version c
                ON c.id = e.concept_version_id WHERE e.connector_version_id = :cv
@@ -293,7 +301,7 @@ async def test_rollback_retires_eligibility(db, tmp_path):
     from reva.cli.seed import entity_id
 
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
-    assert out["status"] in ("promoted", "no_gap"), out
+    assert out["status"] in ("promoted", "no_gap", "already_promoted"), out
     with pytest.raises(Exception):
         rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
                            "agent:autonomy-discovery", "test")
@@ -307,6 +315,205 @@ async def test_rollback_retires_eligibility(db, tmp_path):
         ok = conn.execute(text("SELECT evidence.is_eligible(:cv, :c, :s, clock_timestamp())"),
                           {"cv": cv, "c": c, "s": entity_id("FRA")}).scalar_one()
     assert ok is False
+
+
+# --------------------------------------------------------------------------- R4-09 / R4-14 (offline)
+@pytest.mark.parametrize("template", ["k:{geo.__class__.__mro__}:{time}", "eurostat:{dataset}:{time:>200000}",
+                                      "eurostat:{dataset}:{geo}:{nope}:{time}", "eurostat:{dataset}:{geo}",
+                                      "eurostat:{dataset}:{geo[0]}:{time}"])
+async def test_r4_09_logical_key_template_is_strict(io, template):
+    from reva.adapters.connectors.eurostat_template import validate_manifest
+    from reva.kernel.errors import ValidationProblem
+
+    *_, cp = await _pipeline(io)
+    m = io.get_json(cp.manifest)
+    m["request_parameters"]["logical_key_template"] = template
+    with pytest.raises(ValidationProblem):
+        validate_manifest(m)
+
+
+def test_r4_09_render_is_plain_substitution():
+    from reva.adapters.connectors.eurostat_template import render_logical_key
+    from reva.kernel.errors import SourceResponseError
+
+    assert render_logical_key("eurostat:{dataset}:{geo}:{time}",
+                              {"dataset": "d", "geo": "{time}", "time": "2023"}) == "eurostat:d:{time}:2023"
+    with pytest.raises(SourceResponseError):
+        render_logical_key("eurostat:{dataset}:{geo}", {"dataset": "d", "geo": "x" * 600})
+
+
+async def test_r4_09_generated_key_layout_is_template_derived(io):
+    from reva.adapters.connectors.eurostat_template import canonical_logical_key_template
+
+    *_, cp = await _pipeline(io)
+    m = io.get_json(cp.manifest)
+    assert m["request_parameters"]["logical_key_template"] == canonical_logical_key_template(m) == \
+        "eurostat:{dataset}:{geo}:{sex}:{age}:{time}"
+
+
+def _bad_index(doc):
+    idx = doc["dimension"]["age"]["category"]["index"]
+    idx[next(iter(idx))] = "zero"
+
+
+def _dimension_not_object(doc):
+    doc["dimension"]["age"] = ["not", "an", "object"]
+
+
+def _size_not_int(doc):
+    doc["size"] = [1, 1, "x", 3, 1, 1]
+
+
+@pytest.mark.parametrize("mutation", [_bad_index, _dimension_not_object, _size_not_int])
+async def test_r4_14_malformed_provider_data_is_a_typed_failure(io, mutation):
+    from reva.kernel.errors import SourceResponseError
+
+    _, _, _c, _m, cp = await _pipeline(io)
+    bad_bank = bank_from_dir(io, CONNECTOR, overrides=_mutated(mutation))
+    rep = await JsonStatConnectorValidator(io).validate(cp, bad_bank, default_budget())
+    assert rep.outcome == "fail" and "schema_drift" in {f.code for f in rep.findings}
+    conn = EurostatJsonStatConnector(io.get_json(cp.manifest))
+    from reva.ports.connectors import FetchBudget
+
+    item = conn.plan(None, FetchBudget()).items[0]
+    raw = await conn.fetch(item, BankHttp(io, bad_bank))
+    with pytest.raises(SourceResponseError) as ei:
+        list(conn.parse(raw))
+    assert ei.value.details.get("kind") == "schema_drift"
+
+
+async def test_r4_14_malformed_inspection_is_recorded_not_raised(io):
+    bank = bank_from_dir(io, CONNECTOR, overrides=_mutated(_dimension_not_object))
+    gap = _gap(io)
+    disc = EurostatCatalogueDiscoverer(io, BankHttp(io, bank))
+    cands = await disc.discover(gap, default_budget())
+    assert cands and disc.last_search["inspections"][0]["ok"] is False
+    assert "malformed" in disc.last_search["inspections"][0]["error"]
+
+
+# --------------------------------------------------------------------------- R4-03 / R4-04 (promotion state)
+CONCEPT = "demography.population.jan1_age_sex@1.0.0"
+
+
+def _version_rows(db):
+    with db.owner.connect() as conn:
+        return conn.execute(text("SELECT version FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at"),
+                            {"n": CONNECTOR}).scalars().all()
+
+
+def _count(db, sql):
+    with db.owner.connect() as conn:
+        return conn.execute(text(sql)).scalar_one()
+
+
+async def test_r4_04_rediscovery_after_rollback_holds(db, tmp_path):
+    """After a rollback, discovery reports rolled_back_hold: no proposal, gate pass, event or eligibility."""
+    from reva.autonomy.jobs import handle_discovery, promoted_connectors, reapprove_promotion, rollback_promotion
+
+    out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
+    if out["status"] != "rolled_back_hold":  # make the precondition explicit (shared session DB)
+        rollback_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill")
+    events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
+    passes = ("SELECT count(*) FROM ops.gate_result g JOIN ops.proposal p ON p.id=g.proposal_id "
+              "WHERE p.proposal_type='connector_promotion' AND g.decision='pass'")
+    elig = "SELECT count(*) FROM evidence.eligibility"
+    before = (_count(db, events), _count(db, passes), _count(db, elig))
+    out2 = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
+    assert out2["status"] == "rolled_back_hold", out2
+    assert "gate" not in out2 and (_count(db, events), _count(db, passes), _count(db, elig)) == before
+    assert CONNECTOR not in promoted_connectors(db.worker, db.store)  # retired versions are not loaded
+    with pytest.raises(Exception):
+        reapprove_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "agent:autonomy-discovery", "no")
+    reapprove_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill over")
+    assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == "1.0.0"
+
+
+async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_previous(db, tmp_path):
+    from reva.adapters.connectors.eurostat_template import template_digest
+    from reva.autonomy.common import ArtifactIO
+    from reva.autonomy.gate import PolicyPromotionGate
+    from reva.autonomy.jobs import connector_change_proposal, promote_connector, promoted_connectors, rollback_promotion
+    from reva.autonomy.policy import promotion_policy
+    from reva.autonomy.promotion import resolve_connector_version
+    from reva.autonomy.proposals import ProposalStore
+    from reva.autonomy.sandbox import TrustedTemplateSandbox, trusted_template_policy
+    from reva.kernel.errors import ImmutableRecordViolation
+    from reva.ports.autonomy import MappingProposal, ValueEstimate
+
+    io_ = ArtifactIO(db.store)
+    active = promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"]
+    bank, _d, _c, mappings, cp = await _pipeline(io_)
+    m = io_.get_json(cp.manifest)
+    with db.worker.connect() as conn:
+        same_v, same_id = resolve_connector_version(conn, io_, m, template_digest())
+    assert same_v == "1.0.0" and same_id is not None  # identical content keeps its version
+    m["request_parameters"]["dataset_label"] = f"relabelled {uuid.uuid4().hex[:8]}"
+    with db.worker.connect() as conn:
+        new_v, new_id = resolve_connector_version(conn, io_, m, template_digest())
+        assert resolve_connector_version(conn, io_, m, "sha256:" + "f" * 64)[1] is None  # template change too
+    assert new_id is None and new_v not in _version_rows(db)
+
+    async def gate_pass(manifest):
+        cp2 = type(cp)(cp.proposal_id, cp.candidate, cp.template_id, cp.template_digest,
+                       io_.put_json(manifest, "models"), cp.mapping)
+        v = await JsonStatConnectorValidator(io_).validate(cp2, bank, default_budget())
+        val = ValueEstimate("unsupported", None, None, {}, io_.put_json({"t": 1}, "evaluation"), "t")
+        p = connector_change_proposal(io_, cp2, manifest, mappings[0], val, promotion_policy())
+        ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion", scope={}, risk={})
+        s = await TrustedTemplateSandbox(io_, fixtures=bank).run(p, trusted_template_policy(default_budget()))
+        d = PolicyPromotionGate(db.worker, io_).decide(p, [v, s], promotion_policy().ref())
+        assert d.outcome == "promote", d.reasons
+        return d
+
+    mp = MappingProposal(uuid.uuid4(), cp.candidate.metadata, CONCEPT, "exact", mappings[0].mapping_manifest, False)
+    # same (name, version) with different content is refused, never silently mapped to the old row
+    stale = dict(m, version="1.0.0")
+    with pytest.raises(ImmutableRecordViolation):
+        promote_connector(db.worker, io_, _job_ctx(db, tmp_path), stale, mp, await gate_pass(stale),
+                          promotion_policy())
+    m["version"] = new_v
+    out = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), m, mp, await gate_pass(m), promotion_policy())
+    assert out["status"] == "promoted" and out["version"] == new_v and out["superseded"] == [active]
+    assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == new_v
+    rollback_promotion(db.worker, CONNECTOR, new_v, CONCEPT, "human:maintainer", "drill")
+    assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == active  # restored
+    events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
+    n = _count(db, events)
+    again = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), m, mp, await gate_pass(m),
+                              promotion_policy())
+    assert again["status"] == "rolled_back_hold" and _count(db, events) == n
+
+
+async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, tmp_path, monkeypatch):
+    import reva.adapters.connectors.eurostat_template as et
+    from reva.autonomy.gaps import build_coverage_snapshot, classify
+    from reva.autonomy.jobs import (
+        handle_discovery,
+        promoted_connector_availability,
+        promoted_connector_states,
+        promoted_connectors,
+    )
+    from reva.ontology.registry import load_registry
+
+    assert CONNECTOR in promoted_connectors(db.worker, db.store)
+    monkeypatch.setattr(et, "template_digest", lambda: "sha256:" + "f" * 64)  # a reviewed template revision
+    assert CONNECTOR not in promoted_connectors(db.worker, db.store)
+    states = {x["state"] for x in promoted_connector_states(db.worker) if x["name"] == CONNECTOR}
+    assert "template_changed" in states and "active" not in states
+    with db.worker.connect() as conn:
+        snap = build_coverage_snapshot(conn, datetime.now(UTC), ["test_fixture"], load_registry())
+    assert "FRA" in snap["template_changed"]["demography.population.jan1_age_sex"]
+    rows = [r for r in classify(load_registry().requirements, snap, datetime.now(UTC))
+            if r["requirement_id"] == "R-POP-JAN-AGESEX"]
+    assert rows and all(r["status"] == "unsupported" and "template_changed" in r["detail"] for r in rows)
+    avail = promoted_connector_availability(db.worker, CONNECTOR)
+    assert avail is not None and avail["status"] == "not_promoted" and avail["state"] == "template_changed"
+    versions = len(_version_rows(db))
+    out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
+    # the template is reviewed code pinned in the policy: no auto-promotion until a maintainer re-pins it
+    assert out["status"] == "gate_reject", out
+    assert any("pinned in the signed policy" in r for r in out["gate"]["reasons"])
+    assert len(_version_rows(db)) == versions
 
 
 @pytest.mark.live

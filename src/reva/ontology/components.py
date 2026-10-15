@@ -46,6 +46,9 @@ PUBLISHED_COMPONENT_DIGESTS: Mapping[str, str] = {
     "display_geometry@1.0.0": "e5e67661bf2dd912bfeb701aa001c93a84b7ed70d2a8ccb278813e3b5148873b",
     "economy@1.0.0": "be5896ab0a9a810c4bd62e1921071dfe3e3ecb6c3202106cc6157938ae2bbebe",
     "trade_crude@1.0.0": "028c9431dd51ad617088d2123f27b69ffa5e960ad226a5e4d073d1073f41d081",
+    # 2.0.0: flow-specific net-weight concepts (Comtrade connector 1.1.0) replace the collapsed
+    # trade.hs2709.net_weight.world_total; a removed concept is a major change, so not 1.1.0.
+    "trade_crude@2.0.0": "0998072b978e4dd7ea6ccb321b901bdf09faa2f93c4c122ca6735068613a2af8",
 }
 
 # Entity kinds referenced by component manifests that are not yet registered
@@ -71,6 +74,14 @@ def version_key(m: ComponentManifest) -> str:
 
 def manifest_digest(m: ComponentManifest) -> str:
     return logical_hash(m.model_dump(mode="json"))
+
+
+def latest_manifest(manifests: Mapping[str, ComponentManifest], name: str) -> ComponentManifest:
+    """Highest published version of component ``name`` (new instances use it; snapshots keep theirs)."""
+    candidates = [m for m in manifests.values() if m.name == name]
+    if not candidates:
+        raise ValidationProblem(f"no component named {name!r}")
+    return max(candidates, key=lambda m: parse_semver(m.version))
 
 
 # --------------------------------------------------------------------------- loading

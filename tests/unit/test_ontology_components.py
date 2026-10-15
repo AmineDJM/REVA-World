@@ -15,6 +15,7 @@ from reva.ontology.components import (
     check_version_bump,
     classify_change,
     component_key,
+    latest_manifest,
     load_component_manifests,
     validate_component_instance,
     verify_published,
@@ -23,7 +24,8 @@ from reva.ontology.components import (
 MANIFESTS = load_component_manifests()
 DEMO = MANIFESTS["demographics@1.0.0"]
 ECON = MANIFESTS["economy@1.0.0"]
-TRADE = MANIFESTS["trade_crude@1.0.0"]
+TRADE_V1 = MANIFESTS["trade_crude@1.0.0"]
+TRADE = latest_manifest(MANIFESTS, "trade_crude")
 GEOM = MANIFESTS["display_geometry@1.0.0"]
 
 
@@ -37,7 +39,14 @@ def _evolve(m: ComponentManifest, version: str, mutate: Any = None, **update: An
 
 def test_component_keys() -> None:
     assert {component_key(m) for m in MANIFESTS.values()} == {
-        "demographics.v1", "economy.v1", "trade_crude.v1", "display_geometry.v1"}
+        "demographics.v1", "economy.v1", "trade_crude.v1", "trade_crude.v2", "display_geometry.v1"}
+
+
+def test_latest_manifest_picks_the_highest_version() -> None:
+    assert TRADE.version == "2.0.0"
+    assert latest_manifest(MANIFESTS, "economy") is ECON
+    with pytest.raises(ValidationProblem):
+        latest_manifest(MANIFESTS, "no_such_component")
 
 
 # --------------------------------------------------------------------------- instances
@@ -159,8 +168,24 @@ def test_meaning_change_is_major_and_title_is_patch() -> None:
     assert classify_change(ECON, _evolve(ECON, "1.0.0")).level is ChangeLevel.none
 
 
+def test_trade_crude_instance_of_v1_still_validates_under_latest() -> None:
+    inst = {"reference_year": 2023, "classification": {"system": "HS", "revision": "H6", "product_code": "2709"},
+            "imports_border_value": _border("CIF"), "exports_border_value": _border("FOB"),
+            "imports_net_weight": {"kind": "decimal", "value": "5", "unit_ref": "unit.kg"},
+            "exports_net_weight": {"kind": "missing", "reason": "unavailable"}}
+    assert validate_component_instance(TRADE_V1, inst).ok
+    assert validate_component_instance(TRADE, inst).ok
+
+
+def test_trade_crude_concept_split_needs_a_major_version() -> None:
+    assert check_version_bump(TRADE_V1, TRADE).level is ChangeLevel.major
+    as_minor = _evolve(TRADE, "1.1.0")
+    with pytest.raises(ValidationProblem, match="minor bump"):
+        check_version_bump(TRADE_V1, as_minor)
+
+
 def test_removed_field_and_privacy_change_are_major() -> None:
-    assert classify_change(TRADE, _evolve(TRADE, "2.0.0", lambda s: s["properties"].pop("exports_net_weight"))
+    assert classify_change(TRADE, _evolve(TRADE, "3.0.0", lambda s: s["properties"].pop("exports_net_weight"))
                            ).level is ChangeLevel.major
     assert classify_change(ECON, _evolve(ECON, "2.0.0", privacy_class="synthetic_public_aggregate_derived")
                            ).level is ChangeLevel.major

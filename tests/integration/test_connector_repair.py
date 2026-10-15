@@ -24,12 +24,10 @@ from sqlalchemy import text
 from reva.adapters.connectors.comtrade import ComtradeConnector
 from reva.adapters.connectors.worldbank import WorldBankConnector
 from reva.adapters.http.safe_client import request_fingerprint
-from reva.adapters.postgres import repositories as repo
 from reva.autonomy import repair as R
 from reva.autonomy.common import ArtifactIO, AutonomyBlocked, stable_id
 from reva.autonomy.gate import PolicyPromotionGate
 from reva.autonomy.policy import promotion_policy
-from reva.cli.seed import register_connector_version
 from reva.evidence.runner import FixtureHttp, run_connector
 from reva.kernel.errors import SourceResponseError
 from reva.operations.jobs import dirty_belief_nodes
@@ -78,6 +76,14 @@ def _clear_pause_markers(db) -> Iterator[None]:
     yield
     with db.owner.begin() as c:  # leave the shared session database without repair markers
         c.execute(text("DELETE FROM ops.dirty_node WHERE node_key LIKE :p"), {"p": R.PAUSE_PREFIX + "%"})
+    # Close this module's proposals through the human-review function so they do not occupy
+    # the bounded open-proposal backlog of later modules in the same session database.
+    with db.api.begin() as c:
+        for pid in c.execute(text(
+                "SELECT p.id FROM ops.proposal p WHERE p.author = :a AND NOT EXISTS "
+                "(SELECT 1 FROM ops.proposal_review r WHERE r.proposal_id = p.id)"), {"a": R.AUTHOR}).scalars():
+            c.execute(text("SELECT ops.review_proposal(:p, 'reject', 'human:test-teardown', :m)"),
+                      {"p": pid, "m": "test proposal closed at module teardown"})
 
 
 def _gate_rows(db, proposal_id) -> list[dict[str, Any]]:
@@ -104,21 +110,10 @@ def _paused(db, concept: str) -> bool:
         return R.is_publication_paused(c, concept)
 
 
-def _isolated(base: type, version: str) -> Any:
-    """The reviewed connector under a test-only version, so health/acquisition history is isolated."""
-
-    class Isolated(base):  # type: ignore[misc,valid-type]
-        def describe(self):  # type: ignore[no-untyped-def]
-            return super().describe().model_copy(update={"version": version})
-
-    return Isolated()
-
-
-def _register(db, connector: Any) -> None:
-    with db.worker.begin() as c:
-        act = repo.simple_activity("test.connector_registration", "review", "human:test-maintainer", {})
-        repo.record_activity(c, act)
-        register_connector_version(c, db.store, connector.describe(), act.id)
+def _db_now(db) -> datetime:
+    """Cases are scoped to this test's time window: the shared session database keeps other history."""
+    with db.owner.connect() as c:
+        return c.execute(text("SELECT clock_timestamp()")).scalar_one()
 
 
 class StubHttp:
@@ -322,15 +317,15 @@ def test_replay_accepts_identity_and_rejects_unparseable_fixes(io, advisor) -> N
 
 # --------------------------------------------------------------------------- through the real ingest path
 async def test_quarantined_acquisition_is_found_and_repaired(db, io, gate) -> None:
-    wb = _isolated(WorldBankConnector, "1.0.0+repair-quarantine")
-    _register(db, wb)
+    wb = WorldBankConnector()
+    since = _db_now(db)
     c = CASES["wb_renamed_field"]
     rep = await run_connector(wb, StubHttp(c["connector"], overrides={c["url"]: _body("wb_renamed_field")}),
                               db.store, db.worker, persist_cursor=False)
     by_item = {o.item_key: o.status for o in rep.outcomes}
     assert by_item["series:SP.POP.TOTL:p1"] == "quarantined"
     adv = R.ConnectorRepairAdvisor(db.worker, db.store)
-    case = adv.find_case(wb, version="1.0.0+repair-quarantine", origin="test_fixture")
+    case = adv.find_case(wb, origin="test_fixture", since=since)
     assert case is not None and case.quarantined and case.acquisition_id and case.raw_ref.namespace == "quarantine"
     assert case.item_key == "series:SP.POP.TOTL:p1"
     assert {f["code"] for f in case.quarantine_findings} >= {"unexpected_subject"}
@@ -356,14 +351,14 @@ async def test_quarantined_acquisition_is_found_and_repaired(db, io, gate) -> No
 
 
 async def test_persistent_404_triggers_documentation_discovery_not_url_guessing(db, io, gate) -> None:
-    wb = _isolated(WorldBankConnector, "1.0.0+repair-404")
-    _register(db, wb)
+    wb = WorldBankConnector()
+    since = _db_now(db)
     url = CASES["wb_endpoint_404"]["url"]
     http = StubHttp("worldbank.wdi.indicators", status_for=lambda u: 404 if u == url else None)
     adv = R.ConnectorRepairAdvisor(db.worker, db.store)
     for run in range(1, 4):
         await run_connector(wb, http, db.store, db.worker, persist_cursor=False)
-        case = adv.find_case(wb, version="1.0.0+repair-404", origin="test_fixture")
+        case = adv.find_case(wb, origin="test_fixture", since=since)
         assert case is not None and case.failures
         a = adv.assess(wb, case)
         if run < 3:
@@ -385,14 +380,14 @@ async def test_persistent_404_triggers_documentation_discovery_not_url_guessing(
 
 
 async def test_auth_change_requires_credential_provisioning(db, io, gate) -> None:
-    ct = _isolated(ComtradeConnector, "1.1.0+repair-401")
-    _register(db, ct)
+    ct = ComtradeConnector()
+    since = _db_now(db)
     http = StubHttp("un.comtrade.public_exact", status_for=lambda u: 401)
     adv = R.ConnectorRepairAdvisor(db.worker, db.store)
     for _ in range(3):
         rep = await run_connector(ct, http, db.store, db.worker, persist_cursor=False)
         assert all(o.status == "failed" for o in rep.outcomes)
-    case = adv.find_case(ct, version="1.1.0+repair-401", origin="test_fixture")
+    case = adv.find_case(ct, origin="test_fixture", since=since)
     assert case is not None
     a = adv.assess(ct, case)
     assert (a.classification, a.tier, a.item_key) == (R.AUTH, 3, None)  # connector-wide

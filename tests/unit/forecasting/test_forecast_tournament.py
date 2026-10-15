@@ -56,7 +56,7 @@ def test_long_geometric_panel_promotes_log_drift():
     kw = dict(replay_mode="revised_data_retrospective", seed=20261014, policy=load_policy())
     res = run_tournament(panel, [LastValue(), LogDrift(), LocalLevelLog()], **kw)
     assert res.replay_mode == "revised_data_retrospective"
-    assert res.policy["policy_version"] == "promotion-1.0.0"
+    assert res.policy["policy_version"] == "promotion-1.1.0"
     d = res.decisions["forecast.log_drift"]
     assert d.decision == "promote", d.reasons
     assert d.n_pairs >= 30
@@ -193,7 +193,7 @@ def test_holm_step_down():
 
 def test_policy_defaults_and_validation():
     pol = resolve_policy(load_policy())
-    assert pol["policy_version"] == "promotion-1.0.0"
+    assert pol["policy_version"] == "promotion-1.1.0"
     assert pol["paired_test"] == {"method": "dm_hln_holm", "alpha": 0.025, "min_origins_per_horizon": 8}
     assert pol["subgroup_test"] == {"alpha": 0.05, "min_origins": 5}
     assert pol["holdout_non_inferiority"]["margin"] == 0.0

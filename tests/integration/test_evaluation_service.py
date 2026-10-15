@@ -121,7 +121,7 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
         assert p["reviewer"] == "gate-evaluator:tournament"
         assert p["decision"] in ("promote", "keep_incumbent", "reject")
         assert p["reasons"][0] == LABEL and len(p["reasons"]) >= 2
-        assert p["policy_version"] == "promotion-1.0.0"
+        assert p["policy_version"] == "promotion-1.1.0"
         assert p["task_scope"]["task_key"] == res["task_key"]
 
     m = manifest_of(db, res["manifest_sha256"])
@@ -133,7 +133,7 @@ def test_full_panel_stores_evaluations_promotions_and_label(db, wdi_release):
     assert m["label"] == LABEL and m["replay_mode"] == REPLAY_MODE
     assert {"DZA:" + POP, "DZA:" + GDP, "FRA:" + POP, "CHN:" + GDP, "USA:" + GDP} <= set(m["inputs"]["series"])
     assert m["inputs"]["source"]["release_id"] == str(wdi_release.release_id)
-    assert m["seed"] == 20261014 and m["policy"]["policy_version"] == "promotion-1.0.0"
+    assert m["seed"] == 20261014 and m["policy"]["policy_version"] == "promotion-1.1.0"
     assert m["policy"]["min_origin_series_pairs"] == 30
     assert m["naive_baseline"].startswith("forecast.last_value@")
     rdf = m["researcher_degrees_of_freedom"]

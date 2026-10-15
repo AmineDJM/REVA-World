@@ -128,8 +128,9 @@ class PolicyPromotionGate:
         ok, scope_reasons, scope = self._t1_scope(proposal, reports, policy)
         trace["t1_scope"] = scope
         if ok:
-            reasons.append("T1 within signed policy scope: approved template, exact mapping, verified rights, "
-                           "known hosts, independent validation and sandbox passed")
+            reasons.append("T1 within signed policy scope: promoted automatically without human review "
+                           "(pinned template digest, registry-bound semantics and source, approved exact mapping, "
+                           "verified rights, known hosts, verified validator and sandbox reports)")
             return self._record(proposal, "promote", reasons, reports, policy, trace)
         reasons += ["T1 out of signed policy scope", *scope_reasons]
         return self._record(proposal, "reject", reasons, reports, policy, trace)

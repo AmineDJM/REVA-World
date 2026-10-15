@@ -161,8 +161,8 @@ class EurostatCatalogueDiscoverer:
         toc_ref = self.io.put_bytes(res.body, "raw", "text/plain")
         try:
             entries = parse_toc(res.body)
-        except MALFORMED as e:
-            raise SourceResponseError(f"malformed Eurostat catalogue: {type(e).__name__}", retryable=False,
+        except MALFORMED as exc:
+            raise SourceResponseError(f"malformed Eurostat catalogue: {type(exc).__name__}", retryable=False,
                                       kind="schema_drift") from None
         scored = []
         for e in entries:

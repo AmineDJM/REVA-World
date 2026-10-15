@@ -63,6 +63,7 @@ EVALUATOR_EXTERNAL = "sandbox:external_disposable_vm@1"
 SAFE_ENV_KEYS = ("LANG", "LC_ALL", "TZ")
 
 
+PUBLIC_PROBE_ADDR = ("1.1.1.1", 443)  # a public IP the child must not reach (probe only, 0.5 s timeout)
 DEAD_PROXY = "http://127.0.0.1:9"  # discard port: any proxy-aware client fails fast
 # Child runs as an unprivileged user (no capabilities) inside new user/net/pid
 # namespaces with its own /proc; fallback maps root (capabilities only inside the
@@ -299,6 +300,7 @@ class TrustedTemplateSandbox:
         listener.bind(("127.0.0.1", 0))
         listener.listen(8)
         req = {**request, "probe_port": listener.getsockname()[1], "parent_uid": os.getuid(),
+               "public_probe": list(PUBLIC_PROBE_ADDR),
                "namespaces": bool(unshare)}
         with tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd, \
                 tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home:

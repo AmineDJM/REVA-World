@@ -61,8 +61,8 @@ from reva.autonomy.proposals import ProposalStore, base_commit
 from reva.autonomy.sandbox import TrustedTemplateSandbox, external_runner_from_settings, trusted_template_policy
 from reva.autonomy.validator import JsonStatConnectorValidator
 from reva.autonomy.voi import GapValueEstimator
-from reva.cli.seed import record_mapping_and_eligibility, register_connector_version
-from reva.cli.seed import entity_id
+from reva.cli.seed import entity_id, record_mapping_and_eligibility, register_connector_version
+from reva.evidence.locks import take_evidence_write_lock
 from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied, RevaError
 from reva.ontology.registry import load_registry
 from reva.ports.autonomy import (
@@ -161,6 +161,8 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
         budget = default_budget()
     summary: dict[str, Any] = {"status": "started", "requirement_id": requirement, "mode": mode,
                                "policy": {"version": policy.version, "sha256": policy.sha256},
+                               "promotion_rule": "T1 within the signed policy scope is promoted automatically "
+                                                 "(no human review); T2/T3 changes need named review",
                                "budget": reservation.as_dict() if reservation is not None
                                else {"charged": False, "reason": "fixture replay makes no requests"}}
     # 1. gap
@@ -244,7 +246,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
                              "geo": manifest["request_parameters"]["filters"].get("geo"),
                              "eligibility_scope": manifest["eligibility_scope"]},
                       risk={"tier": "T1", "hosts": manifest["allowed_hosts"], "code": "none (declarative)",
-              "promotion": "automatic if the gate finds it within the signed policy scope"},
+                            "promotion": "automatic if the gate finds it within the signed policy scope"},
                       dependencies=[f"gap:{gap.gap_id}", f"candidate:{cand.metadata.sha256}",
                                     f"mapping:{primary.mapping_manifest.sha256}", f"template:{cp.template_digest}"])
     sandbox = TrustedTemplateSandbox(io_, fixtures=bank, external_runner=external_runner_from_settings(ctx.settings),
@@ -317,10 +319,16 @@ def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore
     findings = [Finding(code="incompatible_semantics", severity="blocker",
                         message="; ".join(mm.get("profile_differences") or ["incompatible"]),
                         evidence=(mapping.mapping_manifest,))]
-    mapper_report = report("fail", findings, mapping.mapping_manifest, "ontology-mapper:registry-profile@1")
+    mapper_evaluator = "ontology-mapper:registry-profile@1"
+    assessment = io_.put_json({"schema": "reva-mapping-assessment/1", "evaluator": mapper_evaluator,
+                               "outcome": "fail", "mapping_manifest": mapping.mapping_manifest.sha256,
+                               "findings": [{"code": f.code, "severity": f.severity, "message": f.message}
+                                            for f in findings]}, "evaluation")
+    mapper_report = report("fail", findings, assessment, mapper_evaluator)
     decision = gate.decide(p, [mapper_report], policy.ref())
     reg_mapping = mm.get("registry_mapping")
     with engine.begin() as conn:
+        take_evidence_write_lock(conn)
         act = repo.simple_activity("autonomy.mapping_assessment", "review", gate.evaluator,
                                    {"mapping": mm.get("mapping_key"), "relation": mapping.relation,
                                     "gate_result": str(decision.decision_id)})
@@ -345,24 +353,80 @@ def _no_value(io_: ArtifactIO) -> ValueEstimate:
                                                      "description": "not applicable"}, ref, "autonomy.jobs@1")
 
 
+def _existing_state(engine: Engine, manifest: dict[str, Any], mapping: MappingProposal) -> str | None:
+    """'rolled_back_hold' / 'already_promoted' when this exact (name, version) already has a decision."""
+    concept_id, version = mapping.target_concept_version.split("@", 1)
+    with engine.connect() as conn:
+        row = repo.connector_version_row(conn, manifest["name"], manifest["version"])
+        if row is None:
+            return None
+        try:
+            c = repo.concept_version_id(conn, concept_id, version)
+        except Exception:
+            return None
+        latest = prom.latest_decision(conn, row["id"], c)
+    if latest is None:
+        return None
+    return "already_promoted" if latest == "eligible" else "rolled_back_hold"
+
+
+def _verify_gate_row(conn: Any, decision: GateDecision) -> None:
+    """The decision must be a recorded pass of a gate evaluator for this very proposal."""
+    row = conn.execute(text(
+        "SELECT proposal_id, decision, evaluator FROM ops.gate_result WHERE id = :i"),
+        {"i": decision.decision_id}).mappings().one_or_none()
+    if (row is None or str(row["proposal_id"]) != str(decision.proposal_id) or row["decision"] != "pass"
+            or row["evaluator"] != decision.reviewer_identity):
+        raise PolicyDenied("promotion requires a recorded passing gate result for this proposal",
+                           gate_result_id=str(decision.decision_id))
+
+
 def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[str, Any],
-                      mapping: MappingProposal, decision: GateDecision, policy: PinnedPolicy) -> dict[str, Any]:
-    """Register connector version + scoped eligibility atomically; keep prior state for rollback."""
+                      mapping: MappingProposal, decision: GateDecision, policy: PinnedPolicy,
+                      guard: AutonomyGuard | None = None) -> dict[str, Any]:
+    """Register a content-versioned connector + scoped eligibility atomically; keep prior state for rollback.
+
+    Returns ``{"status": "promoted" | "already_promoted" | "rolled_back_hold", ...}``. Events and audit
+    rows are written only when a new eligibility decision is recorded.
+    """
+    reason = guard.blocked_reason() if guard is not None else live_kill_reason()
+    if reason:
+        raise AutonomyBlocked(reason, action="promote_connector")
     if decision.outcome != "promote" or not decision.reviewer_identity.startswith("gate-evaluator:"):
         raise AutonomyBlocked("promotion requires a promote decision from a gate evaluator")
+    problems = binding.binding_problems(manifest, load_registry(), policy)
+    if problems:  # defence in depth: the same derivation the gate used
+        raise PolicyDenied("manifest is outside the signed policy scope", problems=problems[:10])
     connector = EurostatJsonStatConnector(manifest)
     spec = connector.describe()
     mm = io_.get_json(mapping.mapping_manifest)
     concept_id, version = mapping.target_concept_version.split("@", 1)
     subjects = sorted((mm.get("scope") or {}).get("subjects") or [])
     with engine.begin() as conn:
+        take_evidence_write_lock(conn)  # R-03: eligibility decisions are evidence a release selects from
         if getattr(ctx, "job_id", None) is not None and hasattr(ctx, "assert_lease"):
             ctx.assert_lease(conn)  # fenced: a worker that lost its lease cannot promote
+        reason = guard.blocked_reason() if guard is not None else live_kill_reason()
+        if reason:  # re-read inside the promotion transaction
+            raise AutonomyBlocked(reason, action="promote_connector")
+        _verify_gate_row(conn, decision)
+        conflicts = binding.name_conflicts(conn, spec.name, spec.source_key, et.TEMPLATE_ID)
+        if conflicts:
+            raise PolicyDenied("connector name is registered under another source/template", conflicts=conflicts)
         concept_uuid = repo.concept_version_id(conn, concept_id, version)
+        existing = repo.connector_version_row(conn, spec.name, spec.version)
+        if existing is not None:
+            if not prom.same_registered_content(io_, existing, manifest, spec.code_digest):
+                raise ImmutableRecordViolation(
+                    f"connector {spec.name}@{spec.version} is registered with different content; "
+                    "a changed manifest or template needs a new version", connector=spec.name, version=spec.version)
+            latest = prom.latest_decision(conn, existing["id"], concept_uuid)
+            if latest is not None:
+                return {"status": "already_promoted" if latest == "eligible" else "rolled_back_hold",
+                        "connector_version_id": str(existing["id"]), "latest_decision": latest}
+        others = [r for r in prom.versions_of(conn, spec.name) if r["version"] != spec.version]
         previous = {
-            "connector_versions": [dict(r) for r in conn.execute(text(
-                "SELECT id::text, name, version, spec_sha256, code_digest FROM evidence.connector_version "
-                "WHERE name = :n ORDER BY recorded_at"), {"n": spec.name}).mappings()],
+            "connector_versions": [{k: str(v) for k, v in r.items()} for r in others],
             "eligibility": [dict(r) for r in conn.execute(text(
                 """SELECT DISTINCT ON (e.connector_version_id) e.id::text, e.connector_version_id::text,
                           e.decision, e.applicability, e.policy_version, e.recorded_at::text
@@ -373,43 +437,78 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
         act = repo.simple_activity("autonomy.connector_promotion", "review", decision.reviewer_identity,
                                    {"connector": spec.name, "version": spec.version,
                                     "gate_result": str(decision.decision_id), "policy_version": policy.version,
-                                    "template_digest": template_digest()})
+                                    "template_digest": spec.code_digest})
         repo.record_activity(conn, act)
         cv_id = register_connector_version(conn, io_.store, spec, act.id)
+        superseded = [r for r in others if prom.latest_decision(conn, r["id"], concept_uuid) == "eligible"]
         rollback = {"schema": "reva-promotion-rollback/1", "connector": spec.name, "version": spec.version,
                     "connector_version_id": str(cv_id), "concept": mapping.target_concept_version,
                     "previous": previous, "gate_result_id": str(decision.decision_id),
-                    "rollback": "append eligibility decision 'retired' for this connector version; "
-                                "previous connector versions remain registered and selectable"}
+                    "superseded": [{"connector_version_id": str(r["id"]), "version": r["version"]}
+                                   for r in superseded],
+                    "rollback": "rollback_promotion(): append 'retired' for this version and re-append "
+                                "'eligible' for the version it superseded (if still runnable)"}
         rb_ref = io_.put_json(rollback, "models")
         io_.register(conn, rb_ref, "promotion-rollback/1")
+        # The mapping record (idempotent); the eligibility decision is written below so that the
+        # *latest* decision is what counts (a retired version is never silently re-enabled).
         record_mapping_and_eligibility(conn, {
             "mapping_key": mm["mapping_key"], "version": mm["version"],
             "source_ref": {"provider": "eurostat", "dataset": manifest["dataset"],
                            "template": manifest["template"], "dimensions": manifest["request_parameters"]
                            ["resolution_dimensions"]},
             "target": {"concept_id": concept_id, "version": version}, "mapping_kind": "exact",
-            "applicability": {"subjects": subjects, "years": manifest["request_parameters"]["time"],
-                              "geo": manifest["request_parameters"]["filters"].get("geo"),
-                              "gate_result_id": str(decision.decision_id), "rollback_sha256": rb_ref.sha256},
-            "eligibility": "eligible", "connector": {"name": spec.name, "version": spec.version},
+            "applicability": {"subjects": subjects}, "eligibility": "none",
         }, act.id, policy_version=policy.version)
+        applicability = {"subjects": subjects, "subject_ids": [str(entity_id(x)) for x in subjects],
+                         "years": manifest["request_parameters"]["time"],
+                         "geo": manifest["request_parameters"]["filters"].get("geo"),
+                         "mapping_key": mm["mapping_key"], "gate_result_id": str(decision.decision_id),
+                         "rollback_sha256": rb_ref.sha256}
+        _append_eligibility(conn, cv_id, concept_uuid, applicability, "eligible", policy.version, act.id)
+        for r in superseded:
+            prev_app = conn.execute(text(
+                """SELECT applicability FROM evidence.eligibility WHERE connector_version_id = :cv
+                   AND concept_version_id = :c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
+                {"cv": r["id"], "c": concept_uuid}).scalar_one()
+            _append_eligibility(conn, r["id"], concept_uuid,
+                                {**dict(prev_app), "superseded_by": {"connector_version_id": str(cv_id),
+                                                                     "version": spec.version}},
+                                "retired", policy.version, act.id)
         repo.emit_outbox(conn, "autonomy.connector_promoted",
                          {"connector": spec.name, "version": spec.version, "connector_version_id": str(cv_id),
                           "concept": mapping.target_concept_version, "subjects": subjects,
-                          "gate_result_id": str(decision.decision_id), "rollback_sha256": rb_ref.sha256})
+                          "gate_result_id": str(decision.decision_id), "rollback_sha256": rb_ref.sha256,
+                          "superseded": [r["version"] for r in superseded]})
         repo.audit(conn, decision.reviewer_identity, "autonomy.connector_promoted",
                    {"connector": spec.name, "version": spec.version}, {"rollback_sha256": rb_ref.sha256})
-    return {"connector_version_id": str(cv_id), "rollback_sha256": rb_ref.sha256, "subjects": subjects}
+    return {"status": "promoted", "connector_version_id": str(cv_id), "version": spec.version,
+            "rollback_sha256": rb_ref.sha256, "subjects": subjects,
+            "superseded": [r["version"] for r in superseded]}
+
+
+def _append_eligibility(conn: Any, cv: Any, concept: Any, applicability: dict[str, Any], decision: str,
+                        policy_version: str, activity: Any) -> UUID:
+    return UUID(str(conn.execute(text(
+        """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
+             policy_version, review_activity_id)
+           VALUES (:cv, :c, CAST(:ap AS jsonb), :d, :p, :a) RETURNING id"""),
+        {"cv": cv, "c": concept, "ap": json.dumps(applicability), "d": decision, "p": policy_version,
+         "a": activity}).scalar_one()))
 
 
 def rollback_promotion(engine: Engine, connector_name: str, version: str, concept: str, actor: str,
                        reason: str) -> UUID:
-    """Append a 'retired' eligibility decision (latest decision wins); history stays immutable."""
+    """Append 'retired' for this version (latest decision wins) and restore the version it superseded.
+
+    History stays immutable. Re-running discovery afterwards reports ``rolled_back_hold`` for the retired
+    content instead of re-enabling it.
+    """
     if not actor.startswith(("gate-evaluator:", "human:")):
         raise AutonomyBlocked("rollback must be performed by a gate evaluator or a named human")
     concept_id, cversion = concept.split("@", 1)
     with engine.begin() as conn:
+        take_evidence_write_lock(conn)
         cv = repo.connector_version_row(conn, connector_name, version)
         if cv is None:
             raise RevaError(f"connector {connector_name}@{version} not registered")
@@ -420,36 +519,121 @@ def rollback_promotion(engine: Engine, connector_name: str, version: str, concep
             {"cv": cv["id"], "c": c}).mappings().one()
         act = repo.simple_activity("autonomy.rollback", "review", actor, {"reason": reason[:500]})
         repo.record_activity(conn, act)
-        rid = conn.execute(text(
-            """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
-                 policy_version, review_activity_id)
-               VALUES (:cv, :c, CAST(:ap AS jsonb), 'retired', :p, :a) RETURNING id"""),
-            {"cv": cv["id"], "c": c, "ap": json.dumps(dict(prev["applicability"])),
-             "p": prev["policy_version"], "a": act.id}).scalar_one()
+        rid = _append_eligibility(conn, cv["id"], c, dict(prev["applicability"]), "retired",
+                                  prev["policy_version"], act.id)
+        restored = _restore_superseded(conn, cv, c, act.id)
         repo.emit_outbox(conn, "autonomy.connector_rolled_back", {"connector": connector_name, "version": version,
-                                                                   "concept": concept})
-    return UUID(str(rid))
+                                                                   "concept": concept, "restored": restored})
+        repo.audit(conn, actor, "autonomy.connector_rolled_back", {"connector": connector_name, "version": version},
+                   {"restored": restored, "reason": reason[:500]})
+    return rid
+
+
+def reapprove_promotion(engine: Engine, connector_name: str, version: str, concept: str, actor: str,
+                        reason: str) -> UUID:
+    """Named-human re-approval of a rolled-back connector version (append-only; latest decision wins).
+
+    Rediscovery never re-enables a retired version by itself (``rolled_back_hold``); this is the
+    explicit human path. The version must still run under the current reviewed template.
+    """
+    if not actor.startswith("human:"):
+        raise AutonomyBlocked("re-enabling a rolled-back connector needs a named human reviewer")
+    concept_id, cversion = concept.split("@", 1)
+    with engine.begin() as conn:
+        take_evidence_write_lock(conn)
+        cv = repo.connector_version_row(conn, connector_name, version)
+        if cv is None:
+            raise RevaError(f"connector {connector_name}@{version} not registered")
+        if cv["code_digest"] != et.template_digest():
+            raise PolicyDenied("connector version was built for another template revision (template_changed); "
+                               "it needs re-validation as a new version")
+        c = repo.concept_version_id(conn, concept_id, cversion)
+        prev = conn.execute(text(
+            """SELECT decision, applicability, policy_version FROM evidence.eligibility WHERE connector_version_id=:cv
+               AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
+            {"cv": cv["id"], "c": c}).mappings().one()
+        if prev["decision"] == "eligible":
+            raise RevaError(f"connector {connector_name}@{version} is already eligible")
+        act = repo.simple_activity("autonomy.reapproval", "review", actor, {"reason": reason[:500]})
+        repo.record_activity(conn, act)
+        app = {k: v for k, v in dict(prev["applicability"]).items() if k != "superseded_by"}
+        rid = _append_eligibility(conn, cv["id"], c, {**app, "reapproved_by": actor}, "eligible",
+                                  prev["policy_version"], act.id)
+        repo.emit_outbox(conn, "autonomy.connector_reapproved", {"connector": connector_name, "version": version,
+                                                                  "concept": concept, "reviewer": actor})
+        repo.audit(conn, actor, "autonomy.connector_reapproved", {"connector": connector_name, "version": version},
+                   {"reason": reason[:500]})
+    return rid
+
+
+def _restore_superseded(conn: Any, cv: dict[str, Any], concept: Any, activity: Any) -> str | None:
+    """Re-append 'eligible' for the version that ``cv`` superseded, if it is still runnable."""
+    for r in reversed(prom.versions_of(conn, cv["name"])):
+        if str(r["id"]) == str(cv["id"]) or r["recorded_at"] > cv["recorded_at"]:
+            continue
+        last = conn.execute(text(
+            """SELECT decision, applicability, policy_version FROM evidence.eligibility
+               WHERE connector_version_id = :cv AND concept_version_id = :c
+               ORDER BY recorded_at DESC, id DESC LIMIT 1"""), {"cv": r["id"], "c": concept}).mappings().one_or_none()
+        if last is None:
+            continue
+        sup = (last["applicability"] or {}).get("superseded_by") or {}
+        if last["decision"] != "retired" or sup.get("connector_version_id") != str(cv["id"]):
+            return None  # the previous version was retired for its own reasons: do not resurrect it
+        if r["code_digest"] != et.template_digest():
+            return None  # cannot run under the current template: stays retired (template_changed)
+        app = {k: v for k, v in dict(last["applicability"]).items() if k != "superseded_by"}
+        _append_eligibility(conn, r["id"], concept, {**app, "restored_by_rollback_of": str(cv["id"])},
+                            "eligible", last["policy_version"], activity)
+        return str(r["version"])
+    return None
 
 
 def promoted_connectors(engine: Engine, store: Any) -> dict[str, EurostatJsonStatConnector]:
-    """Rebuild eligible declarative connectors from their registered spec artifacts.
+    """Rebuild *active* declarative connectors from their registered spec artifacts.
 
-    A spec whose code digest differs from the current reviewed template is skipped
-    (the template changed: re-validation/promotion is required).
+    Only versions whose latest eligibility decision is ``eligible`` and whose code digest is the current
+    reviewed template are loaded (newest per name); ``template_changed`` versions are surfaced by the gap
+    report and health instead. Built-in connector names are never shadowed. Under the autonomy kill switch
+    no autonomy-promoted connector is loaded.
     """
+    if live_kill_reason():
+        log.warning("autonomy kill switch: promoted connectors are not loaded")
+        return {}
     io_ = ArtifactIO(store)
     out: dict[str, EurostatJsonStatConnector] = {}
-    with engine.connect() as conn:
-        rows = conn.execute(text(
-            "SELECT name, version, spec_sha256, code_digest FROM evidence.connector_version "
-            "WHERE declared_capabilities->>'template' = 'eurostat_jsonstat' ORDER BY recorded_at")).mappings().all()
-    for r in rows:
-        if r["code_digest"] != template_digest():
-            log.warning("skipping %s@%s: template digest changed", r["name"], r["version"])
-            continue
+    for name, r in prom.active_specs(engine).items():
         spec = io_.get_json(ArtifactRef(r["spec_sha256"], "models", "application/json"))
-        out[r["name"]] = EurostatJsonStatConnector(spec["field_mappings"]["manifest"])
+        out[name] = EurostatJsonStatConnector(spec["field_mappings"]["manifest"])
     return out
+
+
+def promoted_connector_availability(engine: Engine, name: str) -> dict[str, Any] | None:
+    """Typed ``not_promoted`` result for a template connector name that is not loaded, else None.
+
+    Used by the ingest handler for scheduled template connectors (``eurostat.*``) before/after promotion.
+    """
+    if not name.startswith(f"{binding.CONNECTOR_PREFIX}"):
+        return None
+    if live_kill_reason():
+        return {"status": "not_promoted", "connector": name, "state": "autonomy_disabled",
+                "reason": "autonomy kill switch: promoted connectors are not run"}
+    with engine.connect() as conn:
+        rows = [x for x in prom.connector_states(conn) if x["name"] == name]
+    states = sorted({x["state"] for x in rows})
+    state = "not_registered" if not rows else ("template_changed" if "template_changed" in states else states[-1])
+    reasons = {"not_registered": "no connector version has been promoted for this name yet",
+               "template_changed": "the reviewed template changed since promotion; re-validation is required",
+               "retired": "the promoted connector version was rolled back"}
+    return {"status": "not_promoted", "connector": name, "state": state,
+            "reason": reasons.get(state, f"connector state {state}"),
+            "versions": [{"version": x["version"], "state": x["state"]} for x in rows]}
+
+
+def promoted_connector_states(engine: Engine) -> list[dict[str, Any]]:
+    """State of every promoted connector version: active / template_changed / retired."""
+    with engine.connect() as conn:
+        return prom.connector_states(conn)
 
 
 def handle_gaps(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:

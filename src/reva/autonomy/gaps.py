@@ -5,7 +5,10 @@ weight) and each geography:
 
 * ``unsupported`` — no connector version is *eligible* for the concept and
   subject (e.g. France 1 January age × sex population until the Eurostat
-  connector is promoted);
+  connector is promoted). A promoted template connector whose code digest no
+  longer matches the reviewed template is not support any more: its cells are
+  ``unsupported`` with the detail ``template_changed`` (so discovery re-proposes
+  a new connector version);
 * ``missing`` — eligible sources exist but no value for some years (absent, or
   stored as typed Missing, e.g. Algeria crude imports/exports 2020–2024 from the
   Comtrade preview);
@@ -53,11 +56,15 @@ WHERE l.rn = 1 AND c.concept_id = ANY(:concepts)
 
 ELIGIBILITY_SQL = """
 SELECT DISTINCT ON (e.connector_version_id, e.concept_version_id)
-       c.concept_id, e.decision, e.applicability
+       c.concept_id, e.decision, e.applicability, cv.name, cv.version, cv.code_digest,
+       cv.declared_capabilities->>'template' AS template
 FROM evidence.eligibility e JOIN ontology.concept_version c ON c.id = e.concept_version_id
+JOIN evidence.connector_version cv ON cv.id = e.connector_version_id
 WHERE e.recorded_at <= :cutoff
 ORDER BY e.connector_version_id, e.concept_version_id, e.recorded_at DESC, e.id DESC
 """
+TEMPLATE_CHANGED_DETAIL = ("promoted connector disabled: template_changed (the reviewed template code changed "
+                           "since promotion; re-validation and a new connector version are required)")
 
 
 def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequence[str],
@@ -67,12 +74,23 @@ def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequenc
     concepts = sorted({r["concept"] for r in reqs})
     geos = sorted({g for r in reqs for g in r["geography"]})
     by_entity = {str(entity_id(g)): g for g in geos}
+    from reva.adapters.connectors import eurostat_template as et
+
+    current_template = et.template_digest()
     eligible: dict[str, set[str]] = defaultdict(set)
+    template_changed: dict[str, set[str]] = defaultdict(set)
+    changed_connectors: list[dict[str, Any]] = []
     for row in conn.execute(text(ELIGIBILITY_SQL), {"cutoff": cutoff}).mappings():
         if row["decision"] != "eligible":
             continue
         subjects = (row["applicability"] or {}).get("subject_ids")
         targets = geos if subjects is None else [by_entity[s] for s in subjects if s in by_entity]
+        if row["template"] == et.TEMPLATE_ID and row["code_digest"] != current_template:
+            # Not loaded for ingestion any more (jobs.promoted_connectors): not support, but a visible gap.
+            template_changed[row["concept_id"]].update(targets)
+            changed_connectors.append({"connector": row["name"], "version": row["version"],
+                                       "concept_id": row["concept_id"], "state": "template_changed"})
+            continue
         eligible[row["concept_id"]].update(targets)
     cells: dict[tuple[str, str, int], dict[str, Any]] = {}
     for row in conn.execute(text(LATEST_SQL), {"cutoff": cutoff, "origins": list(origins),
@@ -101,7 +119,11 @@ def build_coverage_snapshot(conn: Connection, cutoff: datetime, origins: Sequenc
                           else None})
     return {"schema": "reva-coverage-snapshot/1", "as_of": cutoff.isoformat(), "origins": list(origins),
             "catalogue_version": reg.requirements.get("catalogue_version"),
-            "eligible": {k: sorted(v) for k, v in sorted(eligible.items())}, "cells": out_cells}
+            "eligible": {k: sorted(v) for k, v in sorted(eligible.items())},
+            "template_changed": {k: sorted(v - eligible.get(k, set())) for k, v in sorted(template_changed.items())
+                                 if v - eligible.get(k, set())},
+            "template_changed_connectors": sorted(changed_connectors, key=lambda d: (d["connector"], d["version"])),
+            "cells": out_cells}
 
 
 def _runs(years: Iterable[int]) -> list[list[int]]:
@@ -119,6 +141,7 @@ def classify(requirements: dict[str, Any], snapshot: dict[str, Any], cutoff: dat
     """Per (requirement, geography, year) status: covered / unsupported / missing / stale."""
     cells = {(c["concept_id"], c["geo"], int(c["year"])): c for c in snapshot["cells"]}
     eligible = {k: set(v) for k, v in snapshot["eligible"].items()}
+    changed = {k: set(v) for k, v in (snapshot.get("template_changed") or {}).items()}
     out = []
     for r in requirements["requirements"]:
         y0, y1 = int(r["period"][0]), int(r["period"][1])
@@ -126,7 +149,9 @@ def classify(requirements: dict[str, Any], snapshot: dict[str, Any], cutoff: dat
             for y in range(y0, y1 + 1):
                 cell = cells.get((r["concept"], g, y))
                 if g not in eligible.get(r["concept"], set()):
-                    status, detail = "unsupported", "no eligible connector version for concept and subject"
+                    status = "unsupported"
+                    detail = (TEMPLATE_CHANGED_DETAIL if g in changed.get(r["concept"], set())
+                              else "no eligible connector version for concept and subject")
                 elif cell is None or cell["status"] != "value":
                     status = "missing"
                     detail = ("source returned no value (typed Missing: "

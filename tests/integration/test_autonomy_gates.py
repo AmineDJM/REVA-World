@@ -30,6 +30,14 @@ pytestmark = pytest.mark.db
 CONNECTOR = "eurostat.demo_pjan.fr"
 
 
+@pytest.fixture(autouse=True)
+def _offline_sandbox_probe(monkeypatch):
+    """Sandbox isolation probes target a closed local port in tests (no outbound packets)."""
+    from reva.autonomy import sandbox as _sb
+
+    monkeypatch.setattr(_sb, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))
+
+
 @pytest.fixture()
 def io(db) -> ArtifactIO:
     return ArtifactIO(db.store)
@@ -128,7 +136,7 @@ def test_t2_t3_need_review(db, io, paths, caps, expected_tier):
     assert d.outcome in ("needs_review", "blocked")
     assert d.outcome == "needs_review", d.reasons
     ev = io.get_json(d.signed_receipt)
-    assert ev["tier"]["effective_tier"] == expected_tier and ev["db_decision"] == "blocked"
+    assert ev["tier"]["effective_tier"] == expected_tier and ev["db_decision"] == "needs_review"
 
 
 def test_t0_is_automatic(db, io):
@@ -198,7 +206,13 @@ async def test_policy_change_makes_gate_refuse(db, io, tmp_path):
 
 
 def test_repository_policy_matches_pin():
-    assert promotion_policy().version == "promotion-1.0.0"
+    pol = promotion_policy()
+    assert pol.version == "promotion-1.1.0"
+    from reva.adapters.connectors.eurostat_template import template_digest
+    from reva.autonomy.binding import approved_template_digest
+
+    # the reviewed template code is pinned in the (digest-pinned) policy (R4-11)
+    assert approved_template_digest(pol, "eurostat_jsonstat") == template_digest()
 
 
 # --------------------------------------------------------------------------- kill switch / budgets
@@ -292,3 +306,179 @@ def test_structured_importer_validates_spans(db, io):
     out = StructuredCardImporter(io).run(doc, ctx)
     assert len(out.candidates) == 1 and out.candidates[0].status == "candidate"
     assert len(out.rejected) == 2
+
+
+# --------------------------------------------------------------------------- R4 hardening (no promotion state)
+def _r4_tamper(m):
+    """The reviewer's malicious manifest (R4-01): approved dataset/concept/geo, lying semantics and identity."""
+    sem = m["request_parameters"]["semantics"]
+    sem["temporal_support"] = "point:07-01"            # midyear instead of 1 January
+    sem["population_universe"] = "de_facto_population"  # different universe
+    sem["unit_ref"] = "unit.thousand_persons"           # different unit/scale
+    m["source_key"] = "worldbank.wdi"                   # registered under another source
+    m["lineage_family"] = "worldbank"                   # source-family independence bypass
+    m["name"] = "worldbank.wdi.indicators"              # squats a built-in connector name
+    m["version"] = "9.9.9"
+    m["cadence"]["minimum_interval_seconds"] = 60
+
+
+async def test_r4_01_malicious_manifest_is_rejected(db, io):
+    p, v, s = await _t1(io, db, mutate_manifest=_r4_tamper)
+    blockers = {f.code for f in v.findings if f.severity == "blocker"}
+    # the validator's contract comes from the registry, so lying semantics fail validation
+    assert v.outcome == "fail" and {"temporal_support_mismatch", "unit_mismatch", "support_mismatch"} <= blockers
+    d = _gate(db, io).decide(p, [v, s], promotion_policy().ref())
+    assert d.outcome == "reject"
+    # even with a forged 'pass' for the same evidence, the gate re-derives scope from policy + registry
+    from reva.autonomy.common import report
+
+    forged = report("pass", [], v.evidence_manifest, v.evaluator_version)
+    d2 = _gate(db, io).decide(p, [forged, s], promotion_policy().ref())
+    assert d2.outcome == "reject", d2.reasons
+    text_ = " | ".join(d2.reasons)
+    assert "disagrees with its stored evidence" in text_
+    for needle in ("semantics.temporal_support", "semantics.population_universe", "semantics.unit_ref",
+                   "source_key 'worldbank.wdi'", "lineage_family", "collides with a built-in connector",
+                   "is not the derived name", "cadence"):
+        assert needle in text_, needle
+
+
+async def test_r4_01_scope_is_rederived_even_with_genuine_pass_reports(db, io):
+    """Fields the validator cannot see (name, source, lineage) are still bound by the gate."""
+    def rename(m):
+        m["name"] = "eurostat.demo_pjan.fr-shadow"
+        m["lineage_family"] = "worldbank_wdi"
+
+    p, v, s = await _t1(io, db, mutate_manifest=rename)
+    assert v.outcome == "pass" and s.outcome == "pass", (v.findings, s.findings)
+    d = _gate(db, io).decide(p, [v, s], promotion_policy().ref())
+    assert d.outcome == "reject"
+    assert any("derived name" in r for r in d.reasons) and any("lineage_family" in r for r in d.reasons)
+    ev = io.get_json(d.signed_receipt)
+    assert all(x["verdict"] == "verified" for x in ev["tier"]["reports_verified"])
+
+
+async def test_r4_01_validator_contract_must_be_registry_derived(db, io):
+    """A validator report whose data contract was built from the manifest is not accepted."""
+    from reva.autonomy.common import report
+
+    p, v, s = await _t1(io, db)
+    ev = io.get_json(v.evidence_manifest)
+    ev["data_contract"] = io.put_json({"schema": "reva-data-contract/1", "from": "manifest"}, "models").sha256
+    fake = report("pass", list(v.findings), io.put_json(ev, "evaluation"), v.evaluator_version)
+    d = _gate(db, io).decide(p, [fake, s], promotion_policy().ref())
+    assert d.outcome == "reject" and any("registry-derived data contract" in r for r in d.reasons)
+
+
+async def test_r4_11_template_digest_is_pinned_in_policy(db, io, tmp_path):
+    import hashlib
+
+    from reva.ports.autonomy import ArtifactRef
+
+    p, v, s = await _t1(io, db)
+    copy = tmp_path / "promotion.yaml"
+    text0 = (POLICY_DIR / "promotion.yaml").read_text()
+    import re as _re
+
+    copy.write_text(_re.sub(r'template_sha256: "[^"]*"', 'template_sha256: "sha256:' + "0" * 64 + '"', text0))
+    sha = hashlib.sha256(copy.read_bytes()).hexdigest()
+    d = PolicyPromotionGate(db.worker, io, policy_path=copy, pinned_sha256=sha).decide(
+        p, [v, s], ArtifactRef(sha, "policy", "application/yaml"))
+    assert d.outcome == "reject" and any("pinned in the signed policy" in r for r in d.reasons)
+
+
+@pytest.mark.parametrize("path,tier", [
+    ("./src/reva/kernel/values.py", 3), ("registry/./policies/promotion.yaml", 3), ("SRC/Reva/Kernel/x.py", 3),
+    ("src/reva/adapters/connectors/eurostat_template.py", 3), ("../outside.txt", 3), ("/etc/passwd", 3),
+    ("a\\b.json", 3), ("connectors/eurostat.demo_pjan.fr/1.0.1/manifest.json", 1),
+])
+def test_r4_11_paths_are_normalised_before_tiering(path, tier):
+    from reva.autonomy.policy import derive_tier
+
+    assert derive_tier((path,), ("propose",), False, False)[0] == tier
+
+
+async def test_r4_01_promote_connector_refuses_fabricated_decision(db, io):
+    from reva.autonomy.common import ref_from
+    from reva.autonomy.jobs import promote_connector
+    from reva.ports.autonomy import GateDecision, MappingProposal
+
+    p, _v, _s = await _t1(io, db)
+    change = io.get_json(p.patch_or_manifest)
+    mp = MappingProposal(uuid.uuid4(), ref_from(change["candidate"]["metadata"]),
+                         "demography.population.jan1_age_sex@1.0.0", "exact",
+                         ref_from(change["mapping"]["mapping_manifest"]), False)
+    fake = GateDecision(uuid.uuid4(), "promote", p.proposal_id, promotion_policy().version, (), ("trust me",),
+                        "gate-evaluator:promotion", None)
+    with db.owner.connect() as conn:
+        before = conn.execute(text("SELECT count(*) FROM evidence.connector_version")).scalar_one()
+    with pytest.raises(PolicyDenied):
+        promote_connector(db.worker, io, _ctx(db), change["manifest"], mp, fake, promotion_policy())
+    bad = dict(change["manifest"], name="worldbank.wdi.indicators")
+    with pytest.raises(PolicyDenied):
+        promote_connector(db.worker, io, _ctx(db), bad, mp, fake, promotion_policy())
+    with db.owner.connect() as conn:
+        assert conn.execute(text("SELECT count(*) FROM evidence.connector_version")).scalar_one() == before
+
+
+def test_r4_13_kill_switch_is_read_fresh(db, monkeypatch, tmp_path):
+    from reva.autonomy.jobs import promoted_connectors
+
+    guard = AutonomyGuard.from_settings(db.settings)
+    assert guard.blocked_reason() is None
+    monkeypatch.setenv("REVA_AUTONOMY_KILL_SWITCH", "true")  # flipped after the guard was built
+    assert "KILL_SWITCH" in (guard.blocked_reason() or "")
+    with pytest.raises(AutonomyBlocked):
+        guard.check("promote")
+    assert promoted_connectors(db.worker, db.store) == {}  # autonomy-promoted connectors stop running too
+    monkeypatch.delenv("REVA_AUTONOMY_KILL_SWITCH")
+    kill = tmp_path / "autonomy.kill"
+    monkeypatch.setenv("REVA_AUTONOMY_KILL_FILE", str(kill))
+    assert guard.blocked_reason() is None
+    kill.write_text("stop")
+    assert "kill file" in (guard.blocked_reason() or "")
+
+
+def _budget_policy(**per_source):
+    from reva.autonomy.policy import budgets_policy
+
+    base = budgets_policy()
+    content = {**base.content, "per_source_daily_requests": {**base.content["per_source_daily_requests"],
+                                                             **per_source}}
+    return type(base)(base.path, base.sha256, content)
+
+
+def test_r4_08_discovery_budget_zero_means_zero_and_daily_limit_holds(db):
+    from reva.autonomy.budget import BudgetExhausted, reserve_discovery, settle_discovery
+
+    src = f"test.autonomy.{uuid.uuid4().hex[:8]}"
+    with pytest.raises(BudgetExhausted):
+        reserve_discovery(db.worker, src, policy=_budget_policy(**{src: 0}))  # 0 means no request
+    with pytest.raises(BudgetExhausted):
+        reserve_discovery(db.worker, src + ".unlisted", policy=_budget_policy())  # no limit: fail closed
+    pol = _budget_policy(**{src: 7})
+    r1 = reserve_discovery(db.worker, src, policy=pol)
+    assert r1.max_requests == 5
+    settle_discovery(db.worker, r1, requests=4, nbytes=10)
+    r2 = reserve_discovery(db.worker, src, policy=pol)
+    assert r2.max_requests == 3  # 7 per day - 4 consumed
+    with pytest.raises(BudgetExhausted):  # unsettled reservation keeps counting (fail closed)
+        reserve_discovery(db.worker, src, policy=pol)
+    with db.owner.connect() as conn:
+        rows = conn.execute(text("SELECT account_key, consumed FROM ops.budget_ledger WHERE account_key LIKE :a"),
+                            {"a": f"autonomy:discovery:{src}:%"}).all()
+    assert {r[0] for r in rows} == {f"autonomy:discovery:{src}:requests", f"autonomy:discovery:{src}:bytes"}
+
+
+def test_r4_08_live_discovery_refused_when_budget_used_up(db):
+    with db.owner.begin() as conn:
+        conn.execute(text("INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved, consumed) "
+                          "VALUES ('autonomy:discovery:eurostat.dissemination:requests', :o, 'requests', 0, 1000)"),
+                     {"o": f"test-exhaust-{uuid.uuid4()}"})
+    out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "live"}, _ctx(db))
+    assert out["status"] == "blocked" and out["code"] == "budget_exhausted", out
+
+
+def test_discovery_rejects_unknown_payload_keys(db):
+    out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture", "query": "gdp"}, _ctx(db))
+    assert out["status"] == "rejected" and out["unsupported"] == ["query"]

@@ -9,9 +9,8 @@ pinned promotion policy's template entry, never from fetched metadata.
 
 from __future__ import annotations
 
-from typing import Any
-
 from collections.abc import Callable
+from typing import Any
 
 from reva.adapters.connectors.eurostat_template import (
     EUROSTAT_FLAGS,

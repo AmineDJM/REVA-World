@@ -680,7 +680,7 @@ async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
     ctx = JobContext(job_id=jid, job_type="discovery", worker_id="fx2-worker", fencing_token=7, attempt=1,
                      settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)
-    assert out["status"] in ("promoted", "no_gap"), out
+    assert out["status"] in ("promoted", "no_gap", "already_promoted"), out
     name = "eurostat.demo_pjan.fr"
     _ensure_reapproved(db, name)  # an earlier module may have rolled the promotion back (shared session DB)
     connector = promoted_connectors(db.worker, db.store)[name]

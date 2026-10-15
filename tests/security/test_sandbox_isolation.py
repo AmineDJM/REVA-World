@@ -32,6 +32,14 @@ SECRET_RE = re.compile(r"(PASSWORD|SECRET|TOKEN|API_KEY|ACCESS_KEY|DATABASE|_URL
 AUTONOMY_SRC = Path(__file__).parents[2] / "src" / "reva" / "autonomy"
 
 
+@pytest.fixture(autouse=True)
+def _offline_sandbox_probe(monkeypatch):
+    """Sandbox isolation probes target a closed local port in tests (no outbound packets)."""
+    from reva.autonomy import sandbox as _sb
+
+    monkeypatch.setattr(_sb, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))
+
+
 @pytest.fixture()
 def io(tmp_path) -> ArtifactIO:
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
@@ -48,7 +56,7 @@ def _code_proposal(io, marker: Path) -> PlatformChangeProposal:
              "import os; os.environ['REVA_PWNED'] = '1'\n").encode()
     ref = io.put_bytes(patch, "models", "text/x-python")
     return PlatformChangeProposal(uuid.uuid4(), "agent:codegen", 2, ("src/reva/autonomy/generated/evil_patch.py",),
-                                  base_commit(), ref, ("execute_code",), True, False, _value(io), "promotion-1.0.0")
+                                  base_commit(), ref, ("execute_code",), True, False, _value(io), "promotion-1.1.0")
 
 
 def _manifest_proposal(io) -> tuple[PlatformChangeProposal, object]:
@@ -165,3 +173,66 @@ def test_worker_never_imports_proposed_code(io, tmp_path):
     # the sandbox child only ever runs the reviewed template module
     child_src = (AUTONOMY_SRC / "sandbox_child.py").read_text()
     assert "eurostat_template import EurostatJsonStatConnector" in child_src
+
+
+# --------------------------------------------------------------------------- R4-10 / R4-15
+async def test_isolation_evidence_is_measured_not_nominal(io, monkeypatch):
+    """network_mode is 'blocked_verified' only if raw-_socket probes failed inside the child."""
+    from reva.autonomy import sandbox as sb_mod
+
+    monkeypatch.setenv("R4_PARENT_SECRET", "x")
+    monkeypatch.setattr(sb_mod, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))  # tests stay offline
+    p, bank = _manifest_proposal(io)
+    rep = await TrustedTemplateSandbox(io, fixtures=bank).run(p, trusted_template_policy(default_budget()))
+    assert rep.outcome == "pass", [(f.code, f.message) for f in rep.findings]
+    child = io.get_json(rep.evidence_manifest)["child"]
+    probes = child["network_probe_raw"]
+    verified = probes["loopback_listener"].startswith("failed") and probes["public_ip"].startswith("failed")
+    assert child["network_mode"] == ("blocked_verified" if verified else "python_guard_only")
+    assert child["rlimits"]["applied"] is True and child["rlimits"]["nofile"] == [64, 64]
+    assert child["cwd_writable"] is False
+    if sb_mod.namespace_isolation() is not None:  # available in this container (unprivileged userns)
+        assert child["network_mode"] == "blocked_verified" and child["parent_environ_readable"] is False
+        assert child["process_isolation"].startswith("user+pid+net namespaces")
+
+    # Without namespaces the same run must say so honestly (python guard only, same uid).
+    monkeypatch.setattr(sb_mod, "namespace_isolation", lambda: None)
+    rep2 = await TrustedTemplateSandbox(io, fixtures=bank).run(p, trusted_template_policy(default_budget()))
+    child2 = io.get_json(rep2.evidence_manifest)["child"]
+    assert child2["launcher"] == "plain_subprocess"
+    assert child2["network_probe_raw"]["loopback_listener"] == "connected"  # same netns as the worker
+    assert child2["network_mode"] == "python_guard_only"
+    assert child2["process_isolation"] == "none (same uid)"
+    codes = {f.code: f.severity for f in rep2.findings}
+    assert codes.get("network_not_os_isolated") == "warning"
+    assert rep2.outcome == "pass"  # trusted template only: honest warning, not a boundary claim
+
+
+def test_python_guard_blocks_socket_and_raw_socket(tmp_path):
+    import subprocess
+
+    code = (
+        "from reva.autonomy.sandbox_child import _block_network\n"
+        "_block_network(['ec.europa.eu'])\n"
+        "import socket, _socket, asyncio\n"
+        "out = []\n"
+        "for f in (lambda: socket.create_connection(('127.0.0.1', 9)),\n"
+        "          lambda: socket.socket(socket.AF_INET, socket.SOCK_STREAM),\n"
+        "          lambda: _socket.socket(_socket.AF_INET, _socket.SOCK_STREAM),\n"
+        "          lambda: _socket.socket(_socket.AF_INET6, _socket.SOCK_DGRAM)):\n"
+        "    try:\n"
+        "        f(); out.append('allowed')\n"
+        "    except PermissionError:\n"
+        "        out.append('refused')\n"
+        "asyncio.run(asyncio.sleep(0))  # the event loop's local socketpair still works\n"
+        "print(','.join(out))\n")
+    r = subprocess.run([sys.executable, "-I", "-c", code], capture_output=True, timeout=60, cwd=tmp_path,
+                       env=scrubbed_environment())
+    assert r.stdout.decode().strip() == "refused,refused,refused,refused", r.stderr.decode()[-500:]
+
+
+def test_no_preexec_fn_and_dead_proxies():
+    src = (AUTONOMY_SRC / "sandbox.py").read_text()
+    assert "preexec_fn" not in src.replace("no ``preexec_fn``", "").replace("No ``preexec_fn``", "")
+    env = scrubbed_environment({"HTTPS_PROXY": "http://real-proxy:3128", "HOME": "/root"})
+    assert env["HTTPS_PROXY"] == env["HTTP_PROXY"] == "http://127.0.0.1:9" and env["HOME"] == "/nonexistent"

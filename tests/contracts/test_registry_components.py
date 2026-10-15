@@ -7,12 +7,14 @@ import json
 import pytest
 from jsonschema import Draft202012Validator
 
+from reva.adapters.connectors.comtrade import FLOW_CONCEPT, WEIGHT_CONCEPT
 from reva.ontology.components import (
     COMPONENT_METADATA_KEY,
     COMPONENTS_DIR,
     PUBLISHED_COMPONENT_DIGESTS,
     REQUESTED_REGISTRY_CONCEPTS,
     SCHEMA_DIALECT,
+    latest_manifest,
     load_component_manifests,
     manifest_digest,
     verify_published,
@@ -76,3 +78,10 @@ def test_component_privacy_is_v1_admissible_and_no_gender_field() -> None:
         assert not {n for n in names if "gender" in n}, m.name
     demo = load_component_manifests()["demographics@1.0.0"]
     assert {"age", "recorded_sex"} <= set(demo.json_schema["required"])
+
+
+def test_latest_trade_crude_lists_the_world_total_concepts_comtrade_emits() -> None:
+    """The current trade_crude component binds exactly the world-total concepts the connector produces."""
+    latest = latest_manifest(load_component_manifests(), "trade_crude")
+    emitted = {c for (_flow, scope), c in FLOW_CONCEPT.items() if scope == "total"} | set(WEIGHT_CONCEPT.values())
+    assert {c.split("@")[0] for c in latest.concepts} == emitted

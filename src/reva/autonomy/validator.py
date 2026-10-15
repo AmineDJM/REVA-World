@@ -104,7 +104,7 @@ class JsonStatConnectorValidator:
             findings.append(_f("budget_exhausted", "blocker", "budget allows no sample request"))
             return finish("blocked", {"requests": 0, "bytes": 0})
         used_bytes = 0
-        batches = []
+        batches: list[Any] = []
         for item in plan.items:
             remaining = budget.max_bytes - used_bytes
             if remaining <= 0:

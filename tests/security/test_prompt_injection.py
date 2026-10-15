@@ -33,6 +33,14 @@ SAMPLE_URL = ("https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/da
               "?format=JSON&lang=EN&geo=FR&time=2023")
 
 
+@pytest.fixture(autouse=True)
+def _offline_sandbox_probe(monkeypatch):
+    """Sandbox isolation probes target a closed local port in tests (no outbound packets)."""
+    from reva.autonomy import sandbox as _sb
+
+    monkeypatch.setattr(_sb, "PUBLIC_PROBE_ADDR", ("127.0.0.1", 1))
+
+
 def _captured(url: str) -> bytes:
     d = FIXTURE_ROOT / CONNECTOR
     e = next(x for x in json.loads((d / "manifest.json").read_text()) if x["url"] == url)
