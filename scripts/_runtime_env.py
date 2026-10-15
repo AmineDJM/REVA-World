@@ -126,6 +126,9 @@ EXTRA_REVA_CONFIG = frozenset(
         "REVA_GIT_COMMIT",
         "REVA_IMAGE_DIGEST",
         "REVA_WORKER_STARTUP_DEADLINE_SECONDS",
+        # Runtime autonomy kill switch: a file path re-read on every autonomy guard check
+        # (reva.autonomy.policy.live_kill_reason); `touch` it to stop autonomy without a redeploy (R6-10).
+        "REVA_AUTONOMY_KILL_FILE",
     }
 )
 THREAD_VARS = (

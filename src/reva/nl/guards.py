@@ -97,7 +97,8 @@ RULES: tuple[GuardRule, ...] = (
               "Les dynamiques pluriannuelles ne sont pas calculées par un modèle à une seule période"),
     GuardRule("nl.input_value_override",
               _rx(r"\b(value|valeur|data|donn[ée]es?|figure|chiffre)s?\b\s*(=|:|of|de|à|a|to|is|est|égale?)?\s*"
-                  r"[-+−]?\d"),
+                  r"([-+−]?0(?![.,]?\d)|z[ée]ro\b|nulle?\b|missing\b|manquante?s?\b)"
+                  r"|\b(treat|traite[rz]?|consid[èe]re[rz]?)\b.{0,30}\b(missing|manquant\w*)\b.{0,20}\b(as|comme)\b"),
               "Data values come only from the pinned baseline release; they cannot be set in a scenario",
               "Les valeurs des données viennent uniquement de la publication de référence ; elles ne peuvent pas "
               "être fixées dans un scénario"),

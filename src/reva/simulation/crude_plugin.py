@@ -369,7 +369,7 @@ class CrudeExposureModel:
 
     # -- optional hooks ------------------------------------------------------------------
     def spec_schema(self) -> dict[str, Any]:
-        from reva.simulation.spec import crude_branch_schema
+        from reva.simulation.scenario_schema import crude_branch_schema
 
         return crude_branch_schema()
 

@@ -1,4 +1,9 @@
-"""ScenarioSpec v1: JSON Schema validation followed by mandatory scope checks.
+"""ScenarioSpec: JSON Schema validation followed by mandatory scope checks.
+
+Version 2.0.0 is a discriminated union on ``model_key`` built from the registered
+model plugins (:mod:`reva.simulation.scenario_schema`); crude-exposure specs with
+``schema_version`` 1.0.0 (the V1 appendix) validate exactly as before and produce
+the same canonical bytes, digests and L0 cache keys.
 
 Contract bounds are implementation/applicability limits, not empirical claims
 about plausible economics. The example's fixture baseline UUID is not a real
@@ -69,9 +74,30 @@ def parse_knowledge_cutoff(value: object, *, now: datetime | None = None) -> dat
     return utc
 
 
-@lru_cache(maxsize=1)
+CRUDE_MODEL_KEY = "economic.crude_exposure"
+
+
+@lru_cache(maxsize=8)
+def _union_schema(_keys: tuple[str, ...]) -> dict[str, Any]:
+    from reva.simulation.plugins import REGISTRY
+    from reva.simulation.scenario_schema import build_schema
+
+    return build_schema(dict(REGISTRY))
+
+
 def scenario_schema() -> dict[str, Any]:
-    return json.loads((CONTRACTS / "scenario.schema.json").read_text())
+    """The v2.0.0 union over the registered plugins (``contracts/scenario.schema.json``
+    is its exported copy; the contract test keeps them equal)."""
+    from reva.simulation.plugins import REGISTRY, load_all
+
+    load_all()
+    return _union_schema(tuple(sorted(REGISTRY)))
+
+
+@lru_cache(maxsize=1)
+def scenario_schema_v1() -> dict[str, Any]:
+    """The frozen V1 appendix (crude model only)."""
+    return json.loads((CONTRACTS / "scenario.v1.schema.json").read_text())
 
 
 class ElasticityPoint(BaseModel):
@@ -103,8 +129,10 @@ class Horizon(BaseModel):
 
 
 class ScenarioSpec(BaseModel):
+    """The crude-exposure spec (V1 shape; ``schema_version`` 1.0.0 or 2.0.0, same fields)."""
+
     model_config = ConfigDict(frozen=True, extra="forbid")
-    schema_version: Literal["1.0.0"]
+    schema_version: Literal["1.0.0", "2.0.0"]
     title: str
     baseline_release_id: str
     knowledge_cutoff: str
@@ -131,10 +159,95 @@ class ScenarioSpec(BaseModel):
         return logical_hash(self.as_json())
 
 
+class GenericScenarioSpec:
+    """A validated spec of a non-crude model: the common fields as attributes, the
+    model-specific parts as plain JSON (validated by the schema branch and the
+    plugin's ``validate``). Same identity methods as :class:`ScenarioSpec`."""
+
+    __slots__ = ("_data",)
+
+    def __init__(self, data: dict[str, Any]) -> None:
+        object.__setattr__(self, "_data", json.loads(json.dumps(data, allow_nan=False)))
+
+    def __setattr__(self, name: str, value: Any) -> None:
+        raise AttributeError("GenericScenarioSpec is immutable")
+
+    def __getattr__(self, name: str) -> Any:
+        try:
+            return self._data[name]
+        except KeyError as e:
+            raise AttributeError(name) from e
+
+    def as_json(self) -> dict[str, Any]:
+        return json.loads(json.dumps(self._data))
+
+    def canonical_bytes(self) -> bytes:
+        return json.dumps(self._data, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
+
+    def digest(self) -> str:
+        return logical_hash(self._data)
+
+
+def _schema_errors(data: Any) -> list[Any]:
+    validator = jsonschema.Draft202012Validator(scenario_schema(), format_checker=jsonschema.FormatChecker())
+    return sorted(validator.iter_errors(data), key=lambda e: list(e.path))
+
+
+def _schema_problem(errors: list[Any], version: str) -> ValidationProblem:
+    return ValidationProblem(
+        f"scenario does not satisfy ScenarioSpec {version}",
+        errors=[{"path": "/" + "/".join(map(str, e.path)), "message": e.message} for e in errors[:20]],
+    )
+
+
+def _validate_generic(data: dict[str, Any], model: Any, *, allow_fixture_baseline: bool,
+                      now: datetime | None) -> GenericScenarioSpec:
+    errors = _schema_errors(data)
+    if errors:
+        raise _schema_problem(errors, "v2")
+    policies = getattr(model, "missing_input_policies", frozenset({"fail"}))
+    if data["missing_input_policy"] not in policies:
+        raise CapabilityGap(
+            f"missing_input_policy {data['missing_input_policy']!r} is not supported by {model.model_key}",
+            capability=f"scenario.{data['missing_input_policy']}", supported=sorted(policies))
+    if data["fidelity"] != "L0" and data["fidelity"] not in model.fidelities:
+        raise CapabilityGap(f"model {model.model_key} does not compute fidelity {data['fidelity']}",
+                            capability=f"fidelity.{data['fidelity']}", supported=sorted({"L0", *model.fidelities}))
+    parse_knowledge_cutoff(data["knowledge_cutoff"], now=now)
+    if data["baseline_release_id"] == FIXTURE_BASELINE and not allow_fixture_baseline:
+        raise ValidationProblem(
+            "baseline_release_id is the illustrative fixture UUID; resolve a real published baseline release"
+        )
+    model.validate(data)
+    return GenericScenarioSpec(data)
+
+
+MACRO_OUTPUTS = frozenset({"gdp_loss", "unemployment", "consumer_inflation", "household_welfare"})
+
+
+def _check_macro_outputs(data: Any) -> None:
+    """Honesty rule: no macro outputs unless a listed model computes them (none does)."""
+    outputs = data.get("outputs", []) if isinstance(data, dict) else []
+    unsupported = MACRO_OUTPUTS & {o for o in outputs if isinstance(o, str)} if isinstance(outputs, list) else set()
+    if unsupported:
+        from reva.capabilities import require
+
+        require("outputs.macroeconomic", requested=sorted(unsupported))
+        raise CapabilityGap(
+            f"outputs {sorted(unsupported)} are not produced by an accounting exposure model",
+            capability="outputs.macroeconomic",
+        )
+
+
 def validate_scenario_spec(
     data: dict[str, Any], *, allow_fixture_baseline: bool = False, now: datetime | None = None
-) -> ScenarioSpec:
+) -> ScenarioSpec | GenericScenarioSpec:
     """JSON Schema validation, then scope checks (still required after schema).
+
+    Crude-exposure specs (``model_key`` absent or ``economic.crude_exposure``) take
+    the V1 path unchanged and return a :class:`ScenarioSpec`; other models validate
+    against their union branch and the plugin's ``validate`` and return a
+    :class:`GenericScenarioSpec`. An unknown ``model_key`` is a ``CapabilityGap``.
 
     ``knowledge_cutoff`` is parsed explicitly (``parse_knowledge_cutoff``): the
     schema's ``format: date-time`` is only enforced by jsonschema when the
@@ -144,24 +257,20 @@ def validate_scenario_spec(
 
     if isinstance(data, dict) and data.get("fidelity") in RESERVED_FIDELITY:
         require(f"fidelity.{data['fidelity']}")  # raises a structured CapabilityGap
+    model_key = data.get("model_key", CRUDE_MODEL_KEY) if isinstance(data, dict) else CRUDE_MODEL_KEY
+    if isinstance(model_key, str) and model_key != CRUDE_MODEL_KEY:
+        from reva.simulation import plugins
+
+        _check_macro_outputs(data)
+        return _validate_generic(data, plugins.get(model_key), allow_fixture_baseline=allow_fixture_baseline,
+                                 now=now)
     if isinstance(data, dict) and isinstance(data.get("horizon"), dict) and data["horizon"].get("periods") != 1:
         require("horizon.multi_period", requested_periods=data["horizon"].get("periods"))
-    unsupported = {"gdp_loss", "unemployment", "consumer_inflation", "household_welfare"} & set(
-        data.get("outputs", []) if isinstance(data, dict) else []
-    )
-    if unsupported:
-        require("outputs.macroeconomic", requested=sorted(unsupported))
-        raise CapabilityGap(
-            f"outputs {sorted(unsupported)} are not produced by an accounting exposure model",
-            capability="outputs.macroeconomic",
-        )
-    validator = jsonschema.Draft202012Validator(scenario_schema(), format_checker=jsonschema.FormatChecker())
-    errors = sorted(validator.iter_errors(data), key=lambda e: list(e.path))
+    _check_macro_outputs(data)
+    errors = _schema_errors(data)
     if errors:
-        raise ValidationProblem(
-            "scenario does not satisfy ScenarioSpec v1",
-            errors=[{"path": "/" + "/".join(map(str, e.path)), "message": e.message} for e in errors[:20]],
-        )
+        raise _schema_problem(errors, "v1" if isinstance(data, dict) and data.get("schema_version") == "1.0.0"
+                              else "v2")
     spec = ScenarioSpec.model_validate(data)
     parse_knowledge_cutoff(spec.knowledge_cutoff, now=now)
     if spec.baseline_release_id == FIXTURE_BASELINE and not allow_fixture_baseline:

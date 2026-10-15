@@ -27,7 +27,7 @@ from typing import Any
 
 from sqlalchemy import Engine
 
-from reva.operations.budgets import BudgetExhausted, consume, load_budget, reserve_egress
+from reva.operations.budgets import BudgetExhausted, MeteredHttp, Reservation, consume, load_budget, reserve_egress
 
 DEFAULT_MAX_REQUESTS_PER_JOB = 5
 
@@ -60,4 +60,39 @@ def settle_discovery(engine: Engine, r: DiscoveryReservation, *, requests: int, 
     consume(engine, r.bytes_operation_id, nbytes)
 
 
-__all__ = ["BudgetExhausted", "DiscoveryReservation", "reserve_discovery", "settle_discovery"]
+class DiscoveryMeteredHttp(MeteredHttp):
+    """One shared meter for a whole live discovery run (R6-09).
+
+    The catalogue search, the inspection *and* the validator's live sample all go
+    through this one client, so every provider GET is counted once and settled, and
+    the run as a whole is hard-capped at its reservation (no in-run top-up): it can
+    never make more requests or read more bytes than the ledger reserved.
+    """
+
+    def __init__(self, inner: Any, engine: Engine, r: DiscoveryReservation) -> None:
+        res = Reservation(r.source_key, r.requests_operation_id, r.bytes_operation_id, r.max_requests,
+                          r.max_requests, r.max_bytes, "budgets")
+        super().__init__(inner, engine, res, request_chunk=1)
+        self.reserved_bytes = r.max_bytes
+        self.hard_requests = r.max_requests
+        self.hard_bytes = r.max_bytes
+
+    async def get(self, url: str, **kw: Any) -> Any:
+        if self.requests >= self.hard_requests:
+            raise self._refuse("requests")
+        remaining = self.hard_bytes - self.bytes
+        if remaining <= 0:
+            raise self._refuse("bytes")
+        cap = int(kw.get("max_bytes") or remaining)
+        return await super().get(url, **{**kw, "max_bytes": min(cap, remaining)})
+
+
+def metered_discovery(http: Any, engine: Engine, reservation: DiscoveryReservation | None) -> Any:
+    """Wrap a live discovery client in the shared meter; fixture replays are returned unchanged."""
+    if reservation is None or getattr(http, "origin", "live") == "test_fixture":
+        return http
+    return DiscoveryMeteredHttp(http, engine, reservation)
+
+
+__all__ = ["BudgetExhausted", "DiscoveryMeteredHttp", "DiscoveryReservation", "metered_discovery",
+           "reserve_discovery", "settle_discovery"]

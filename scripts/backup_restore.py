@@ -961,7 +961,8 @@ def backup(
         if objects:
             settings = _settings()
             t0 = time.perf_counter()
-            inventory = object_inventory(settings)
+            # the objects archive re-hashes every object it writes; don't download each one twice
+            inventory = object_inventory(settings, verify_content=not include_objects)
             locations = check_locations(conn, inventory, settings)
             timings["object_inventory_seconds"] = round(time.perf_counter() - t0, 3)
     finally:

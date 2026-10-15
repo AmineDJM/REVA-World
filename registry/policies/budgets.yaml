@@ -1,4 +1,4 @@
-policy_version: "budgets-1.0.0"
+policy_version: "budgets-1.1.0"
 daily:
   http_requests_total: 2000
   http_bytes_total: 524288000
@@ -9,7 +9,15 @@ per_source_daily_requests:
   eurostat.dissemination: 100
   naturalearth.admin0_110m: 10
 llm:
+  # Autonomy LLM evidence extraction stays disabled (zero budget).
   monthly_usd: 0
+  # Natural-language scenario drafts (V2 step 2, src/reva/nl): POST /v1/scenario-drafts.
+  # Ledger accounts llm:scenario_drafts:{requests,tokens}; a request reserves an upper bound of its
+  # tokens (bytes sent + 64 + max_output_tokens) and settles the provider-reported total.
+  scenario_drafts:
+    daily_requests: 200
+    daily_tokens: 2000000
+    max_output_tokens: 1500
 autonomy:
   max_open_proposals: 20
   recursive_agents: false

@@ -28,10 +28,13 @@ describe('sourceFlagNotes', () => {
     expect(sourceFlagNotes({ provider_value_estimated: true, isReported: false }, { concept: VALUE })).toEqual([
       'provider estimate (value marked estimated by the provider)',
     ]);
-    // Comtrade 1.2.0 value rows: null = undeterminable, never claimed either way.
+    // Comtrade 1.2.0 value rows: null = undeterminable, shown as such and never as "not estimated".
     expect(sourceFlagNotes({ provider_value_estimated: null, legacyEstimationFlag: '6', isReported: false }, { concept: VALUE })).toEqual([
+      'estimation status undeterminable from provider flags',
       'not directly reported (isReported=false)',
     ]);
+    // An absent key says nothing.
+    expect(sourceFlagNotes({ isReported: true }, { concept: VALUE })).toEqual([]);
     expect(sourceFlagNotes({ provider_value_estimated: false, legacyEstimationFlag: '6' }, { concept: VALUE })).toEqual([]);
   });
 
@@ -53,10 +56,12 @@ describe('sourceFlagNotes', () => {
 
   it('surfaces not-reported, no-rows and unrecognised-code flags', () => {
     expect(sourceFlagNotes({ isReported: false, legacyEstimationFlag: '0', provider_value_estimated: null })).toEqual([
+      'estimation status undeterminable from provider flags',
       'not directly reported (isReported=false)',
     ]);
     expect(sourceFlagNotes({ provider_returned_no_rows: true, flowCode: 'M' })).toEqual(['provider returned no rows for this key']);
     expect(sourceFlagNotes({ legacy_estimation_code_unrecognised: true, legacyEstimationFlag: '9', provider_value_estimated: null })).toEqual([
+      'estimation status undeterminable from provider flags',
       'unrecognised provider estimation code (legacyEstimationFlag 9)',
     ]);
   });

@@ -32,10 +32,9 @@ R6 additions:
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 from typing import Any
-
-import re
 
 from sqlalchemy import Connection, text
 
@@ -326,8 +325,9 @@ def binding_problems(manifest: Mapping[str, Any], registry: Registry, policy: Pi
         problems.append(f"eligibility_scope {manifest.get('eligibility_scope')} != registry-derived {exp_scope}")
     if mapping_manifest is not None:
         subjects = sorted((mapping_manifest.get("scope") or {}).get("subjects") or [])
-        if subjects != iso3_for_geo(registry, geo) or not subjects:
-            problems.append(f"mapping subjects {subjects} differ from the registry-derived {iso3_for_geo(registry, geo)}")
+        derived = iso3_for_geo(registry, geo)
+        if subjects != derived or not subjects:
+            problems.append(f"mapping subjects {subjects} differ from the registry-derived {derived}")
     problems += scope_problems(manifest, registry, policy,
                                approved_entry(policy, str(template), str(manifest.get("dataset")), concept_id, version))
     return problems

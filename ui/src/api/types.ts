@@ -457,6 +457,9 @@ export interface TimeseriesPoint {
   /** Later revisions retracted at/before as_of that were skipped (latest non-retracted revision shown). */
   retracted_revisions_skipped?: number;
   revisions?: RevisionEntry[] | null;
+  /** Provider/connector flags of the observation (bounded; full record at /v1/observations). */
+  source_flags?: Record<string, unknown> | null;
+  source_flags_truncated?: boolean;
 }
 
 export interface Timeseries {
@@ -486,6 +489,17 @@ export interface BeliefEstimate {
   observation_revision_no?: number | null;
   retrieved_at?: string | null;
   method: ModelVersionRef;
+  /** Provider/connector flags of the selected observation (bounded; full record at /v1/observations). */
+  source_flags?: Record<string, unknown> | null;
+  /** True when source_flags was cut to its size bound. */
+  source_flags_truncated?: boolean;
+  /** Publication of this concept is paused: the value is the last accepted one, not fresh. */
+  stale?: boolean;
+  stale_reason?: string | null;
+  /** Repair proposal whose review lifts the pause. */
+  proposal_id?: string | null;
+  /** Release this row was read from (differs from the baseline release when served stale from an earlier one). */
+  served_from_release_id?: string | null;
 }
 
 export interface ReleaseConceptCount {

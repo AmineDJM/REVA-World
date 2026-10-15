@@ -1,0 +1,62 @@
+# Exact mappings of the eurostat.labour_pensions connector (V2, agent PEN). The connector
+# fetches each table once for all listed countries; eligibility covers the subjects whose
+# Eurostat geo code has a reviewed eurostat_geo alias in registry/entities/countries.yaml.
+# Years use the explicit {from, to} scope form.
+connector: {name: eurostat.labour_pensions, version: "1.0.0"}
+mappings:
+  - mapping_key: eurostat.lfsa_ergan
+    source_ref: {provider: eurostat, dataset: lfsa_ergan}
+    target: {concept_id: labour.employment_rate.lfs_age_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2000, to: 2025}}
+    eligibility: eligible
+  - mapping_key: eurostat.lfsa_argan
+    source_ref: {provider: eurostat, dataset: lfsa_argan}
+    target: {concept_id: labour.activity_rate.lfs_age_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2000, to: 2025}}
+    eligibility: eligible
+  - mapping_key: eurostat.lfsa_egan
+    source_ref: {provider: eurostat, dataset: lfsa_egan}
+    target: {concept_id: labour.employed_persons.lfs_age_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2000, to: 2025}}
+    eligibility: eligible
+  - mapping_key: eurostat.spr_pns_ben
+    source_ref: {provider: eurostat, dataset: spr_pns_ben}
+    target: {concept_id: social.pension_beneficiaries.esspros_old_age, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2006, to: 2024}}
+    eligibility: eligible
+  - mapping_key: eurostat.spr_exp_pens
+    source_ref: {provider: eurostat, dataset: spr_exp_pens}
+    target: {concept_id: social.pension_expenditure.esspros, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2000, to: 2024}}
+    eligibility: eligible
+  - mapping_key: eurostat.lfst_hhnhtych
+    source_ref: {provider: eurostat, dataset: lfst_hhnhtych}
+    target: {concept_id: households.private_households.lfs_composition, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2006, to: 2025}}
+    eligibility: eligible
+  - mapping_key: eurostat.ilc_lvph03
+    source_ref: {provider: eurostat, dataset: ilc_lvph03}
+    target: {concept_id: households.size_distribution.silc, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2005, to: 2025}}
+    eligibility: eligible
+  - mapping_key: eurostat.ilc_lvph01
+    source_ref: {provider: eurostat, dataset: ilc_lvph01}
+    target: {concept_id: households.average_size.silc, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability: {subjects: [FRA, DEU, ITA, ESP, NLD, BEL, SWE, POL], years: {from: 2005, to: 2025}}
+    eligibility: eligible

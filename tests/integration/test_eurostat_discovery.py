@@ -447,7 +447,7 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     from reva.autonomy.promotion import resolve_connector_version
     from reva.autonomy.proposals import ProposalStore
     from reva.autonomy.sandbox import TrustedTemplateSandbox, trusted_template_policy
-    from reva.kernel.errors import ImmutableRecordViolation
+    from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied
     from reva.ports.autonomy import MappingProposal, ValueEstimate
 
     io_ = ArtifactIO(db.store)
@@ -457,7 +457,8 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     with db.worker.connect() as conn:
         same_v, same_id = resolve_connector_version(conn, io_, m, template_digest())
     assert same_v == "1.0.0" and same_id is not None  # identical content keeps its version
-    m["request_parameters"]["dataset_label"] = f"relabelled {uuid.uuid4().hex[:8]}"
+    # (R6-12) provider labels are no longer free manifest fields: change a bound-but-free value instead
+    m["cadence"] = {**m["cadence"], "minimum_interval_seconds": 8 * 86400 + int(uuid.uuid4().hex[:4], 16)}
     with db.worker.connect() as conn:
         new_v, new_id = resolve_connector_version(conn, io_, m, template_digest())
         assert resolve_connector_version(conn, io_, m, "sha256:" + "f" * 64)[1] is None  # template change too
@@ -473,26 +474,27 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
         ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion",
                                               scope=connector_promotion_scope(io_, manifest, mp), risk={})
         s = await TrustedTemplateSandbox(io_, fixtures=bank).run(p, trusted_template_policy(default_budget()))
-        d = PolicyPromotionGate(db.worker, io_).decide(p, [v, s], promotion_policy().ref())
-        assert d.outcome == "promote", d.reasons
-        return d
+        return PolicyPromotionGate(db.worker, io_).decide(p, [v, s], promotion_policy().ref())
 
     mp = MappingProposal(uuid.uuid4(), cp.candidate.metadata, CONCEPT, "exact", mappings[0].mapping_manifest, False)
-    # same (name, version) with different content is refused, never silently mapped to the old row
+    # same (name, version) with different content is refused, never silently mapped to the old row:
+    # (R6-05) the gate requires the content-derived version, so the stale version never passes
     stale = dict(m, version="1.0.0")
-    with pytest.raises(ImmutableRecordViolation):
-        promote_connector(db.worker, io_, _job_ctx(db, tmp_path), stale, mp, await gate_pass(stale),
-                          promotion_policy())
+    d_stale = await gate_pass(stale)
+    assert d_stale.outcome == "reject" and any("content-derived version" in r for r in d_stale.reasons)
+    with pytest.raises((ImmutableRecordViolation, PolicyDenied)):
+        promote_connector(db.worker, io_, _job_ctx(db, tmp_path), d_stale, promotion_policy())
     m["version"] = new_v
-    out = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), m, mp, await gate_pass(m), promotion_policy())
+    d_new = await gate_pass(m)
+    assert d_new.outcome == "promote", d_new.reasons
+    out = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), d_new, promotion_policy())
     assert out["status"] == "promoted" and out["version"] == new_v and out["superseded"] == [active]
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == new_v
     rollback_promotion(db.owner, CONNECTOR, new_v, CONCEPT, "human:maintainer", "drill")
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == active  # restored
     events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
     n = _count(db, events)
-    again = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), m, mp, await gate_pass(m),
-                              promotion_policy())
+    again = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), await gate_pass(m), promotion_policy())
     assert again["status"] == "rolled_back_hold" and _count(db, events) == n
 
 

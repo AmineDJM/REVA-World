@@ -13,6 +13,14 @@
 * **Rollback (R4-04).** Retiring a version that superseded an earlier one
   re-appends ``eligible`` for that earlier version (if it is still runnable), so
   the previous connector is restored; history stays append-only.
+* **Rollback hold on content (R6-05).** The hold is keyed on the manifest *content*
+  (everything but ``version``), across every version and template digest: if any
+  registered version with the same content was rolled back (latest decision
+  ``retired`` that is not a supersession), the content stays held until a named
+  human re-approves it. Neither a proposer-chosen version nor a later template
+  re-pin can re-enable rolled-back content.
+* **Canonical versions (R6-05).** Only ``MAJOR.MINOR.PATCH`` without leading zeros
+  or suffixes; anything else is not a version (``"1.0.0\n"`` is refused).
 """
 
 from __future__ import annotations
@@ -45,11 +53,10 @@ def content_key(manifest: Mapping[str, Any]) -> str:
 
 
 def _semver(v: str) -> tuple[int, int, int]:
-    try:
-        a, b, c = (int(x) for x in str(v).split("."))
-        return a, b, c
-    except ValueError:
+    m = et.SEMVER_RE.fullmatch(str(v))
+    if m is None:
         return (0, 0, 0)
+    return int(m.group(1)), int(m.group(2)), int(m.group(3))
 
 
 def spec_manifest(io_: ArtifactIO, spec_sha256: str) -> dict[str, Any] | None:
@@ -78,6 +85,30 @@ def resolve_connector_version(conn: Connection, io_: ArtifactIO, manifest: Mappi
         return "1.0.0", None
     major, minor, patch = max(_semver(r["version"]) for r in rows)
     return f"{major}.{minor}.{patch + 1}", None
+
+
+def rolled_back_content(conn: Connection, io_: ArtifactIO, manifest: Mapping[str, Any],
+                        concept_version_id: Any) -> list[dict[str, Any]]:
+    """Registered versions with this manifest's *content* that were rolled back (not superseded).
+
+    Any hit means ``rolled_back_hold``: the content needs a named human re-approval
+    (``jobs.reapprove_promotion``), whatever version or template digest a new proposal carries.
+    """
+    key = content_key(manifest)
+    out = []
+    for r in versions_of(conn, str(manifest["name"])):
+        m = spec_manifest(io_, r["spec_sha256"])
+        if m is None or content_key(m) != key:
+            continue
+        last = conn.execute(text(
+            """SELECT decision, applicability FROM evidence.eligibility
+               WHERE connector_version_id = :cv AND concept_version_id = :c
+               ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
+            {"cv": r["id"], "c": concept_version_id}).mappings().one_or_none()
+        if last is not None and last["decision"] != "eligible" \
+                and "superseded_by" not in dict(last["applicability"] or {}):
+            out.append({"connector_version_id": str(r["id"]), "version": r["version"], "decision": last["decision"]})
+    return out
 
 
 def same_registered_content(io_: ArtifactIO, row: Mapping[str, Any], manifest: Mapping[str, Any],

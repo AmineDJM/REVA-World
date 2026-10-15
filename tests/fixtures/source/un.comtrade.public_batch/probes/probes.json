@@ -1,0 +1,66 @@
+{
+ "probed_at": "2026-10-15 between 00:52 and 00:55 UTC (agent ALLC)",
+ "purpose": "does the Comtrade public preview accept multi-reporter / multi-flow / multi-period requests?",
+ "probes": [
+  {
+   "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=251,156,842,12&cmdCode=2709&flowCode=M,X&partnerCode=0&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500",
+   "status": 200,
+   "sha256": "6971d0a97eacf1c0ce4fe7a27d094c7925b91d3848a30752753826e243f47549",
+   "result": {
+    "count": 6,
+    "error": "",
+    "rows": 6,
+    "reporters": 3
+   },
+   "file": "multi_reporter_multi_flow_2023.json",
+   "finding": "multi-reporter and multi-flow accepted; DZA (12) absent = no rows, as in single-reporter requests"
+  },
+  {
+   "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=<219 active non-group reporter codes>&cmdCode=2709&flowCode=M,X&partnerCode=0&...&maxRecords=500",
+   "status": 200,
+   "sha256": "64ab7b2172f6afba0507fe159e2cf55d0430b3191c1f916b5cc4f754fc80861c",
+   "result": {
+    "count": 223,
+    "error": "",
+    "rows": 223,
+    "reporters": 137
+   },
+   "finding": "a 219-code list is accepted (847-character parameter); 223 rows, no duplicate reporter/flow"
+  },
+  {
+   "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&cmdCode=2709&flowCode=M,X&partnerCode=0&...&maxRecords=500 (no reporterCode)",
+   "status": 200,
+   "sha256": "3307dec778050a038c3f2b24848c06eb6acf6cf5b5362a1be718b9d8d79cbe64",
+   "result": {
+    "count": 224,
+    "error": "",
+    "rows": 224,
+    "reporters": 138
+   },
+   "finding": "omitting reporterCode returns all reporters incl. 490 'Other Asia, nes'; not used (explicit crosswalk list instead)"
+  },
+  {
+   "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2022,2023&reporterCode=251&cmdCode=2709&flowCode=M&partnerCode=0&...&maxRecords=500",
+   "status": 400,
+   "sha256": "8246513f757818dbc955dcba91bc4f67b65bf8459dc549703c868ea0805e2b4d",
+   "result": {
+    "error": "Maximum number of periods for preview is 1",
+    "details": null
+   },
+   "file": "multi_period_refused.json",
+   "finding": "documented preview limit: one period per request"
+  },
+  {
+   "url": "https://comtradeapi.un.org/public/v1/preview/C/A/HS?period=2023&reporterCode=156,842,251,699,392,410,276,380,724,528,757,826&cmdCode=2709&flowCode=M,X&partner2Code=0&customsCode=C00&motCode=0&maxRecords=500 (bilateral)",
+   "status": 200,
+   "sha256": "160660d49eca3d2abd773e8834ba5cb03392ecef2ecf8941c26a8fca2fc2687c",
+   "result": {
+    "count": 500,
+    "error": "",
+    "rows": 500,
+    "reporters": 11
+   },
+   "finding": "bilateral for 12 large importers hits maxRecords=500 (truncated: USA absent); bilateral batches must stay small and split on truncation"
+  }
+ ]
+}

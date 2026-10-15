@@ -37,9 +37,17 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   adds explicit model_promotion test settings. Any later edit of
 #   src/reva/adapters/connectors/eurostat_template.py changes the template digest
 #   and disables T1 auto-promotion until a maintainer re-pins both digests.
+# * promotion.yaml re-pinned (2026-10-15, R6 fixes, label stays promotion-1.1.0):
+#   template_sha256 covers the template's whole reva import closure + connector schema
+#   (R6-07); rights_ref pinned per template (R6-12); approved_exact_mappings entries pin
+#   the provider structure (dimension order, unit code, category vocabularies, totals) (R6-04).
+# * budgets.yaml -> budgets-1.1.0 (2026-10-15, V2 step 2, agent NLC): adds the bounded
+#   llm.scenario_drafts budget (daily requests/tokens, max output tokens) for natural-language
+#   scenario drafts (src/reva/nl); llm.monthly_usd for autonomy extraction stays 0. Egress
+#   limits unchanged.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
-    "promotion.yaml": "442e406aedfa9802c20cf46ff5847b4a7bae6c81cc8fb751e0c8169618f4fad9",
-    "budgets.yaml": "048ec5bef503f29e771828d8394601572e59c133d10905a8a283cedf4bdbd08a",
+    "promotion.yaml": "46d1d7c33f7e459532cd2703243f58eb80f8643184ffdebbc419f4a2d71bcff4",
+    "budgets.yaml": "7fb08b528ca7cf6f47b0e3ca99988bec95c057c05cb760ebf64c4bf736422efc",
 }
 
 
@@ -201,7 +209,13 @@ T3_PATH_PREFIXES = ("src/reva/kernel", "src/reva/adapters/http", "src/reva/adapt
                     # (R4-11) the reviewed template that T1 auto-promotion trusts, and the code
                     # its digest/behaviour depends on, are reviewed code: changing them is T3.
                     "src/reva/adapters/connectors/eurostat_template.py",
-                    "src/reva/adapters/connectors/base.py", "src/reva/operations/budgets.py")
+                    "src/reva/adapters/connectors/base.py", "src/reva/operations/budgets.py",
+                    # (R6-16) registry data and ontology code that T1 binding treats as ground truth
+                    # (concept semantic profiles, eurostat_geo aliases feeding eligibility scopes).
+                    "registry/concepts", "registry/entities", "registry/requirements",
+                    "src/reva/ontology", "src/reva/ports")
+# (R6-16) mapping records change what source data means: never below named review (T2).
+T2_PATH_PREFIXES = ("registry/mappings",)
 T3_CAPABILITIES = {"paid_resources", "sensitive_data", "licence_change", "causal_claim", "destructive_migration",
                    "secret_access", "network_any", "edit_policy", "edit_allowlist", "edit_gate"}
 T2_CAPABILITIES = {"execute_code", "new_model", "ontology_mapping", "new_parser", "legal_rule", "run_backtest"}
@@ -257,6 +271,9 @@ def derive_tier(changed_paths: tuple[str, ...], capabilities: tuple[str, ...], s
     if tier < 3 and (contains_code(changed_paths, capabilities) or caps & T2_CAPABILITIES):
         tier = 2
         reasons.append("code, model, parser or ontology change")
+    if tier < 2 and any((normalise_path(p) or "").startswith(T2_PATH_PREFIXES) for p in changed_paths):
+        tier = 2
+        reasons.append("mapping record change")
     if tier < 2 and scientific_change and not (caps <= T1_CAPABILITIES | T0_CAPABILITIES):
         tier = 2
         reasons.append("scientific change outside approved template scope")

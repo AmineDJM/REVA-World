@@ -208,3 +208,24 @@ make ui-dev     # terminal 3 (Vite dev server; `make ui` = npm ci + typecheck + 
 make image smoke
 make ci         # offline CI equivalent (see `make help` for e2e, live-check, format-check)
 ```
+
+
+## Object storage (S3) — verified against MinIO
+
+Verified against a real MinIO server with these exact policies (commands, policy JSON and results in
+[docs/dev/s3_check.md](dev/s3_check.md)); not yet verified on AWS itself (403-vs-404 on prefix-limited
+listing, 409 conflicts, versioning/object lock, throttling).
+
+* API key: `s3:GetObject` on `<bucket>/reva/{raw,normalised,belief,models,scenarios,evaluation}/*` and
+  `s3:ListBucket` on `<bucket>` conditioned on `StringLike s3:prefix reva/*`.
+* Worker key: `s3:GetObject,PutObject,DeleteObject` on `<bucket>/reva/*` (keep the trailing slash:
+  `reva*` would also match `revax/`) plus the same conditioned `ListBucket`.
+* Backup key: a dedicated read-only key (`s3:GetObject` on `reva/*` plus conditioned `ListBucket`) — the
+  API key cannot read `quarantine/`, which backups include. Restore needs `PutObject`.
+* A blank `REVA_S3_ENDPOINT_URL`/`REVA_S3_REGION` is treated as unset (AWS default endpoint); an
+  `http://` endpoint is refused in production. TLS verification is on; for a private CA set
+  `AWS_CA_BUNDLE` (it replaces the default trust store). `REVA_S3_ADDRESSING_STYLE` is
+  `auto` (default; path-style for custom endpoints), `path` or `virtual`.
+* Uploads are a single PUT: one object is limited to 5 GiB.
+* `/health/ready` reports an `object_store` check; it is informational and does not make the API
+  not-ready.

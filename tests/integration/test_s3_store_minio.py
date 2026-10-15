@@ -316,8 +316,6 @@ def test_contract_corruption_detected_on_streaming_open(backend: Backend) -> Non
     st = backend.store
     obj = st.put_bytes(os.urandom(3 * 1024 * 1024), "raw", "application/octet-stream")
     backend.corrupt("raw", obj.sha256, os.urandom(3 * 1024 * 1024))
-    if backend.name == "filesystem":
-        pytest.xfail("FilesystemArtifactStore.open() streams without verifying (reported in docs/dev/s3_check.md)")
     with pytest.raises(IntegrityFailure):
         for _ in st.open("raw", obj.sha256):
             pass

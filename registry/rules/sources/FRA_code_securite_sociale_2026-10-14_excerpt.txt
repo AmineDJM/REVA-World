@@ -1,0 +1,58 @@
+Excerpt of: Code de la sécurité sociale, consolidated edition 2026-10-14, codes.droit.org
+URL: https://codes.droit.org/PDF/Code%20de%20la%20s%C3%A9curit%C3%A9%20sociale.pdf
+Full document sha256: b02b15a9c3de630bd58bf9c29f7539036663691c88a8057c3d16aa06b40fba5e (36971954 bytes), retrieved 2026-10-15T00:56:46Z
+Extraction: pdftotext -layout (poppler), lines copied verbatim; the full PDF (37 MB) is not committed, only this excerpt.
+Note: codes.droit.org states it is generated from the Legifrance and Judilibre APIs (LEGI open data); Legifrance itself refused automated retrieval (HTTP 403 bot challenge) on 2026-10-15.
+
+=== lines 12012-12030 ===
+L. 161-17-2                 LOI n°2023-270 du 14 avril 2023 - art. 10 (V) - Conseil Constit. 2022-845 DC 2023-849 DC                       Legif.   Plan   Jp.Judi.    Jp.Admin.      Juricaf
+
+
+        L'âge d'ouverture du droit à une pension de retraite mentionné au premier alinéa de l'article L. 351-1 du présent
+        code, au 1° du I de l'article L. 24 et au 1° de l'article L. 25 du code des pensions civiles et militaires de retraite
+        est fixé à soixante-quatre ans pour les assurés nés à compter du 1 er janvier 1969.
+        Cet âge est fixé à :
+        1° Soixante-deux ans et trois mois, pour les assurés nés entre le 1er septembre 1961 et le 31 décembre 1961 ;
+        2° Soixante-deux ans et six mois, pour les assurés nés en 1962 ;
+        3° Soixante-deux ans et neuf mois, pour les assurés nés entre le 1er janvier 1963 et le 31 mars 1965 ;
+        4° Soixante-trois ans, pour les assurés nés entre le 1er avril et le 31 décembre 1965 ;
+        5° Soixante-trois ans et trois mois, pour les assurés nés en 1966 ;
+        6° Soixante-trois ans et six mois, pour les assurés nés en 1967 ;
+        7° Soixante-trois ans et neuf mois, pour les assurés nés en 1968.
+        Pour les assurés nés avant le 1er septembre 1961, il est celui applicable en application du présent article dans
+        sa rédaction antérieure à la loi n° 2025-1403 du 30 décembre 2025 de financement de la sécurité sociale pour
+        2026.
+
+
+
+=== lines 31713-31718 ===
+L. 351-8                       LOI n°2023-270 du 14 avril 2023 - art. 10 (V) - Conseil Constit. 2022-845 DC 2023-849 DC                              Legif.   Plan     Jp.Judi.    Jp.Admin.      Juricaf
+
+
+        Bénéficient du taux plein même s'ils ne justifient pas de la durée requise d'assurance ou de périodes équivalentes
+        dans le régime général et un ou plusieurs autres régimes obligatoires :
+        1° Les assurés qui atteignent l'âge prévu au premier alinéa de l'article L. 161-17-2 augmenté de trois années ;
+
+=== lines 114386-114407 ===
+D. 161-2-1-9                                   Décret n°2023-436 du 3 juin 2023 - art. 1                                                                                Legif.   Plan   Jp.Judi.    Jp.Admin.      Juricaf
+
+
+         L'âge prévu au second alinéa de l'article L. 161-17-2 est fixé à :
+         1° Soixante ans pour les assurés nés avant le 1er juillet 1951 ;
+         2° Soixante ans et quatre mois pour les assurés nés entre le 1er juillet 1951 et le 31 décembre 1951 inclus ;
+         3° Soixante ans et neuf mois pour les assurés nés en 1952 ;
+         4° Soixante et un ans et deux mois pour les assurés nés en 1953 ;
+         5° Soixante et un ans et sept mois pour les assurés nés en 1954 ;
+         6° Soixante-deux ans pour les assurés nés entre le 1er janvier 1955 et le 31 août 1961 inclus ;
+         7° Soixante-deux ans et trois mois pour les assurés nés entre le 1er septembre 1961 et le 31 décembre 1961
+         inclus ;
+         8° Soixante-deux ans et six mois pour les assurés nés en 1962 ;
+         9° Soixante-deux ans et neuf mois pour les assurés nés en 1963 ;
+         10° Soixante-trois ans pour les assurés nés en 1964 ;
+         11° Soixante-trois ans et trois mois pour les assurés nés en 1965 ;
+         12° Soixante-trois ans et six mois pour les assurés nés en 1966 ;
+         13° Soixante-trois ans et neuf mois pour les assurés nés en 1967 ;
+         14° Soixante-quatre ans pour les assurés nés à compter du 1er janvier 1968.
+             service-public.fr
+              > À partir de quel âge un salarié peut-il partir en retraite ? : Code de la sécurité sociale : articles D161-2-1-9 à D161-2-4-4
+              > Retraite du salarié handicapé : Articles D161-2-4-1 à D161-2-4-3 : retraite pour handicap

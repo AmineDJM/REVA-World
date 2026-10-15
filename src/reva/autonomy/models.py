@@ -5,9 +5,10 @@
   requires a ``promote`` decision that is *recorded*: a passing
   ``ops.gate_result`` row of a ``gate-evaluator:*`` for that proposal, or an
   ``approve`` ``ops.proposal_review`` by that named human (latest review of the
-  proposal) — and the proposal must request ``new_model`` (T2, so in practice a
-  named human approval) and its change document must name this model spec
-  (``model_spec_sha256``). Hand-built ``GateDecision`` objects are refused (R4-05).
+  proposal) — and the proposal must request ``new_model`` (T2) and its change
+  document must name this model spec (``model_spec_sha256``). Hand-built
+  ``GateDecision`` objects are refused (R4-05), and since R6-03 a gate pass is never
+  accepted at all: registration needs the named human approval.
 * ``TournamentModelEvaluator`` computes proper metrics (MAE, MASE with a
   training-window scale, prediction-interval coverage) overall and by subgroup
   (series, horizon), with resource counts, using agent B's ``reva.models.metrics``.
@@ -66,6 +67,11 @@ class PostgresModelRegistry:
             raise PolicyDenied(f"model registration needs a promote decision, got {approval.outcome}")
         if not approval.reviewer_identity.startswith(("gate-evaluator:", "human:")):
             raise PolicyDenied("approval must come from a gate evaluator or a named human reviewer")
+        if approval.reviewer_identity.startswith("gate-evaluator:"):
+            # (R6-03 / R4-05) a new model is T2: only an approving named human review registers it. A gate
+            # pass (automatic, recorded by the worker) is never a model approval, whatever its tier claims.
+            raise PolicyDenied("model registration is T2 and needs an approving named human review; "
+                               "a gate pass is not a model approval")
         spec = self.io.get_json(descriptor.manifest)
         for k in ("kind", "input_ports", "output_ports", "assumptions"):
             if k not in spec:

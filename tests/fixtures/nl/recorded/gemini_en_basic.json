@@ -1,0 +1,21 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "gemini_en_basic",
+ "recorded_at": "2026-10-15T01:08:08+00:00",
+ "provider": "gemini",
+ "model_requested": "gemini-3.8-flash",
+ "http_status": 402,
+ "latency_ms": 335.2,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
+ "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "text": "What happens to France and the USA if crude oil import prices rise by 20% in 2023?",
+ "text_sha256": "27f5d567e48e9f3b3f4fe432d37eb0dc12e917656376bdc524a7dc087b72a71f",
+ "response_body": {
+  "error": {
+   "code": 402,
+   "message": "Your prepayment credits are depleted. Please go to AI Studio at https://ai.studio/projects to manage your project and billing. Learn more at https://ai.google.dev/gemini-api/docs/billing#prepay. ",
+   "status": "RESOURCE_EXHAUSTED"
+  }
+ }
+}

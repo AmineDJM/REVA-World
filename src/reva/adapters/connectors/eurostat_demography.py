@@ -168,6 +168,22 @@ EUROSTAT_FLAGS: dict[str, str] = {
     "z": "not applicable",
 }
 MISSING_REASON_BY_FLAG = {"c": "suppressed", "z": "not_applicable"}
+# Eurostat now appends the SDMX confidentiality status after a ``|`` (e.g. ``|N`` = no
+# observation flag, "not for publication"; seen live 2026-10-15 for demo_fasec DE/LT 2024).
+# Reviewed CONF_STATUS codes; any other code after ``|`` blocks.
+CONF_STATUS: dict[str, str] = {
+    "N": "not for publication",
+    "C": "confidential statistical information",
+    "D": "secondary confidentiality",
+}
+
+
+def split_status(status: str) -> tuple[str, str]:
+    """``"bep"`` -> (``"bep"``, ``""``); ``"|N"`` -> (``""``, ``"N"``); ``"p|N"`` -> (``"p"``, ``"N"``)."""
+    if "|" in status:
+        flag, conf = status.split("|", 1)
+        return flag.strip(), conf.strip()
+    return status.strip(), ""
 
 # Reviewed age-code grammar. Anything else blocks (its meaning is not reviewed).
 _AGE_SINGLE = re.compile(r"^Y(\d{1,3})$")
@@ -205,7 +221,11 @@ def age_info(code: str, all_codes: Sequence[str] = ()) -> dict[str, Any]:
         a = int(m.group(1))
         return {"kind": "single", "start": a, "end": a + 1, "cell_type": "leaf"}
     if m := _AGE_GE.match(code):
-        return {"kind": "open_upper", "start": int(m.group(1)), "end": None, "cell_type": "leaf"}
+        n = int(m.group(1))
+        # a subtotal when a single age at or above n (or a higher open class) is also a category
+        sub = any((i := age_info(o))["kind"] in ("single", "open_upper") and o != code
+                  and (i["start"] or 0) >= n for o in all_codes)
+        return {"kind": "open_upper", "start": n, "end": None, "cell_type": "subtotal" if sub else "leaf"}
     if m := _AGE_LT.match(code):
         n = int(m.group(1))
         singles = {f"Y{a}" for a in range(1, n)} | {"Y_LT1"}
@@ -378,8 +398,10 @@ def _dec_text(d: Decimal) -> str:
 
 
 def _missing_reason(status: str) -> str:
-    flags = [c for c in status if c.strip()]
-    return next((MISSING_REASON_BY_FLAG[c] for c in flags if c in MISSING_REASON_BY_FLAG), "unavailable")
+    flag, conf = split_status(status)
+    if conf in CONF_STATUS:
+        return "suppressed"
+    return next((MISSING_REASON_BY_FLAG[c] for c in flag if c in MISSING_REASON_BY_FLAG), "unavailable")
 
 
 # --------------------------------------------------------------------------- dataset tables
@@ -604,7 +626,8 @@ class EurostatDemographyConnector:
             aggregation=ddef.aggregation,  # type: ignore[arg-type]
             resolution=resolution,
         )
-        flag_chars = [ch for ch in c.status if ch.strip()]
+        flag_part, conf = split_status(c.status)
+        flag_chars = [ch for ch in flag_part if ch.strip()]
         if c.value is None:
             value: dict[str, Any] = {"kind": "missing", "reason": _missing_reason(c.status)}
         else:
@@ -617,10 +640,13 @@ class EurostatDemographyConnector:
         flags: dict[str, Any] = {
             "dataset": ddef.code,
             "status": c.status,
-            "status_labels": {ch: str(cube.status_labels.get(ch, "")) for ch in flag_chars},
+            "status_labels": ({c.status: str(cube.status_labels[c.status])} if c.status in cube.status_labels
+                              else {ch: str(cube.status_labels.get(ch, "")) for ch in flag_chars}),
+            "confidentiality_status": conf,
             "cell_type": cell_type,
             "age_kind": info["kind"],
             "categories": {d: c.coord[d] for d in ddef.dimension_order if d != "time"},
+            "eurostat_geo": geo,
             "unit_code": c.coord.get("unit", ""),
             "freq": c.coord.get("freq", ""),
         }
@@ -634,8 +660,11 @@ class EurostatDemographyConnector:
         if c.value is None:
             flags["absent_in_value_map"] = True
         return ParsedObservation(
-            subject_provider="eurostat_geo",
-            subject_key=geo,
+            # Subject: this module's reviewed Eurostat-geo -> ISO 3166 table (EL -> GRC), resolved
+            # through the iso3166_alpha3 aliases. Deliberately NOT a new eurostat_geo alias: those
+            # feed the autonomy template's T1 eligibility scope, which this connector must not widen.
+            subject_provider="iso3166_alpha3",
+            subject_key=COUNTRIES[geo],
             concept_id=ddef.concept_id,
             concept_version=ddef.concept_version,
             support=support,
@@ -698,11 +727,15 @@ class EurostatDemographyConnector:
                              message=f"series starts in {min(md['years'])}"))
         labels = md.get("status_labels") or {}
         for code in sorted(set(md.get("status_codes_seen") or [])):
-            for ch in code:
+            flag_part, conf = split_status(code)
+            if conf and conf not in CONF_STATUS:
+                f.append(Finding(code="unknown_status_flag", severity="blocker",
+                                 message=f"confidentiality status {conf!r} is not in the reviewed vocabulary"))
+            for ch in flag_part:
                 if ch not in EUROSTAT_FLAGS:
                     f.append(Finding(code="unknown_status_flag", severity="blocker",
                                      message=f"status flag {ch!r} is not in the reviewed vocabulary"))
-                elif ch not in labels:
+                elif ch not in labels and code not in labels:  # labels may name the combined code ("bep")
                     f.append(Finding(code="undeclared_status_flag", severity="blocker",
                                      message=f"status flag {ch!r} used without a declared label"))
         for ch, label in labels.items():

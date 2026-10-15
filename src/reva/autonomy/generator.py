@@ -20,7 +20,16 @@ from reva.adapters.connectors.eurostat_template import (
     template_digest,
     validate_manifest,
 )
-from reva.autonomy.binding import connector_name, expected_semantics, registered_source, template_entry
+from reva.autonomy.binding import (
+    SPECIAL_CODES,
+    TEMPLATE_LANG,
+    canonical_geo,
+    connector_name,
+    expected_semantics,
+    expected_special_categories,
+    registered_source,
+    template_entry,
+)
 from reva.autonomy.common import ArtifactIO, stable_id
 from reva.autonomy.mapping import STRUCTURAL_DIMS, TEMPLATE_FOR_PROVIDER
 from reva.autonomy.policy import PinnedPolicy, promotion_policy
@@ -29,7 +38,7 @@ from reva.ontology.registry import Registry, load_registry
 from reva.ports.autonomy import ConnectorProposal, MappingProposal, SourceCandidate
 
 EUROSTAT_TOTAL_CODES = ("TOTAL", "T")
-EUROSTAT_SPECIAL_CODES = {"UNK": "unknown", "Y_OPEN": "open_ended_top", "NAP": "not_applicable"}
+EUROSTAT_SPECIAL_CODES = SPECIAL_CODES  # template constant (binding.SPECIAL_CODES)
 DEFAULT_CADENCE_SECONDS = 7 * 86400  # weekly metadata/update check
 
 
@@ -90,7 +99,7 @@ class DeclarativeConnectorGenerator:
         cats: dict[str, list[str]] = inspection["categories"]
         if len(order) != len(inspection["size"]):
             raise ValidationProblem("inspection dimension order and size disagree")
-        geo = list((meta.get("geography") or {}).get("eurostat_geo") or [])
+        geo = canonical_geo(list((meta.get("geography") or {}).get("eurostat_geo") or []))
         years = [int(y) for y in meta.get("years") or []]
         resolution = [d for d in order if d not in STRUCTURAL_DIMS]
         units = cats.get("unit") or []
@@ -100,8 +109,9 @@ class DeclarativeConnectorGenerator:
         source = registered_source(self.registry, source_key)
         if source is None:
             raise PolicyDenied("approved template names no registered source in the pinned policy")
+        tpl = template_entry(self.policy, TEMPLATE_ID) or {}
         manifest = self._manifest(candidate, inspection, mm, hosts, concept_id, version, sem, order, cats, geo,
-                                  years, resolution, units, exact, source)
+                                  years, resolution, units, exact, source, str(tpl.get("rights_ref") or ""))
         manifest["request_parameters"]["logical_key_template"] = canonical_logical_key_template(manifest)
         return manifest
 
@@ -109,7 +119,10 @@ class DeclarativeConnectorGenerator:
     def _manifest(candidate: SourceCandidate, inspection: dict[str, Any], mm: dict[str, Any], hosts: list[str],
                   concept_id: str, version: str, sem: dict[str, str], order: list[str],
                   cats: dict[str, list[str]], geo: list[str], years: list[int], resolution: list[str],
-                  units: list[str], exact: bool, source: dict[str, Any]) -> dict[str, Any]:
+                  units: list[str], exact: bool, source: dict[str, Any], rights_ref: str) -> dict[str, Any]:
+        # (R6-12) no free fields: provider labels (dataset title, status labels) are not copied into
+        # the manifest; licence/rights come from the registered source and the pinned policy.
+        pinned = {d: list(cats[d]) for d in order if d != "time"}
         name = connector_name(candidate.dataset_id, geo)
         return {
             "schema_version": "1.0.0",
@@ -122,25 +135,22 @@ class DeclarativeConnectorGenerator:
             "request_parameters": {
                 "filters": {"geo": geo},
                 "time": years,
-                "lang": "EN",
+                "lang": TEMPLATE_LANG,
                 "dimension_order": order,
-                "pinned_categories": {d: list(cats[d]) for d in order if d != "time"},
+                "pinned_categories": pinned,
                 "status_vocabulary": sorted(EUROSTAT_FLAGS),
-                "observed_status_labels": dict(inspection.get("status_labels") or {}),
                 "semantics": {**sem, "concept_id": concept_id, "concept_version": version,
                               "unit_category": units[0] if len(units) == 1 else ""},
                 "subject": {"dimension": "geo", "alias_provider": "eurostat_geo"},
                 "resolution_dimensions": resolution,
                 "total_categories": {d: [c for c in cats[d] if c in EUROSTAT_TOTAL_CODES] for d in resolution},
-                "special_categories": {d: {c: EUROSTAT_SPECIAL_CODES[c] for c in cats[d]
-                                           if c in EUROSTAT_SPECIAL_CODES} for d in resolution},
+                "special_categories": expected_special_categories(pinned, resolution),
                 "logical_key_template": "",  # derived by the reviewed template code (build_manifest)
                 "licence": str((source.get("rights") or {}).get("licence", "")),
                 "inspection_fingerprint": inspection.get("structure_fingerprint"),
-                "dataset_label": str(inspection.get("label", ""))[:200],
             },
             "mapping_version": f"{mm['mapping_key']}@{mm['version']}",
-            "rights_ref": "registry/sources/eurostat.yaml#rights",
+            "rights_ref": rights_ref,
             "lineage_family": str(source.get("lineage_family") or ""),
             "max_response_bytes": min(5_000_000, max(1_000_000, 20 * int(inspection.get("bytes") or 0))),
             "max_pages": 1,

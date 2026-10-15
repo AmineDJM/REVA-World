@@ -61,9 +61,9 @@ NL_GAP_KEYS: Mapping[str, tuple[str, str]] = {
 #: Short, reviewed hints for parameters whose schema carries no description (keyed by model_key, path).
 PARAMETER_HINTS: Mapping[tuple[str, str], str] = {
     ("economic.crude_exposure", "intervention.import_multiplier"):
-        "ratio applied to the crude-oil import border price (1.2 = +20 %, 0.8 = -20 %)",
+        "ratio applied to the crude-oil import border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
     ("economic.crude_exposure", "intervention.export_multiplier"):
-        "ratio applied to the crude-oil export border price (1.2 = +20 %, 0.8 = -20 %)",
+        "ratio applied to the crude-oil export border price (1.2 = +20 %, 0.8 = -20 %; neutral value 1.0 = unchanged)",
     ("economic.crude_exposure", "assumptions.elasticity_grid[].import_elasticity"):
         "import quantity elasticity for the L2 sensitivity grid (a stated scenario assumption)",
     ("economic.crude_exposure", "assumptions.elasticity_grid[].export_elasticity"):
@@ -120,7 +120,8 @@ class DraftableModel:
             "model_key": self.model_key,
             "description": self.description,
             "countries": list(self.countries),
-            "reference_years": list(self.reference_years) if self.reference_years else None,
+            "reference_years": (f"any year from {self.reference_years[0]} to {self.reference_years[1]} inclusive"
+                                if self.reference_years else None),
             "fidelities": {f: _fidelity_title(f) for f in self.fidelities},
             "outputs": [{"id": o, "unit": self.output_units.get(o, "")} for o in self.outputs],
             "parameters": [p.prompt_view() for p in self.parameters],
@@ -211,21 +212,23 @@ def _const(node: Any) -> tuple[bool, Any]:
 def model_branches(schema: Mapping[str, Any]) -> Iterator[dict[str, Any]]:
     """Each model's merged schema branch (single schema, oneOf/anyOf union, or if/then on model_key)."""
     root = _resolve(dict(schema), schema)
-    is_const, _ = _const((root.get("properties") or {}).get("model_key"))
-    if is_const:
-        yield root
-        return
+    found = False
     for key in ("oneOf", "anyOf"):
         for br in root.get(key) or []:
             merged = _merge(root, br)
             if _const((merged.get("properties") or {}).get("model_key"))[0]:
+                found = True
                 yield merged
     for clause in root.get("allOf") or []:
         cond = ((clause.get("if") or {}).get("properties") or {}).get("model_key")
         if _const(cond)[0] and isinstance(clause.get("then"), dict):
-            merged = _merge(root, clause["then"])
+            base = {k: v for k, v in root.items() if k != "allOf"}
+            merged = _merge(base, clause["then"])
             merged["properties"]["model_key"] = {"const": _const(cond)[1]}
+            found = True
             yield merged
+    if not found and _const((root.get("properties") or {}).get("model_key"))[0]:
+        yield root
 
 
 def _leaves(node: Mapping[str, Any], prefix: str) -> Iterator[tuple[str, dict[str, Any]]]:
@@ -256,6 +259,21 @@ def _param(model_key: str, path: str, node: Mapping[str, Any]) -> ParamSpec:
     return ParamSpec(path, "text", (), hint)
 
 
+def _latest(node: Any) -> str | None:
+    """A constant, or the highest dotted version of an enum (new drafts use the current version)."""
+    values = [v for v in _enum(node) if isinstance(v, str)]
+    if not values:
+        return None
+
+    def key(v: str) -> tuple[int, ...]:
+        try:
+            return tuple(int(x) for x in v.split("."))
+        except ValueError:
+            return (-1,)
+
+    return max(values, key=key)
+
+
 def _enum(node: Any) -> tuple[Any, ...]:
     if not isinstance(node, dict):
         return ()
@@ -280,7 +298,7 @@ def _model_registry_entries() -> dict[str, dict[str, Any]]:
 def registered_plugins() -> tuple[str, dict[str, Any]]:
     """(state, {model_key: plugin}) from ``reva.simulation.plugins`` if that module exists."""
     try:
-        from reva.simulation import plugins  # type: ignore[attr-defined]
+        from reva.simulation import plugins
     except ImportError as e:
         if getattr(e, "name", "") in ("reva.simulation.plugins",):
             return "absent", {}
@@ -292,7 +310,7 @@ def registered_plugins() -> tuple[str, dict[str, Any]]:
         if callable(load_all):
             load_all()
         reg = getattr(plugins, "REGISTRY", None)
-    except Exception as e:  # noqa: BLE001 - a broken plugin must not take drafting down silently
+    except Exception as e:  # a broken plugin must not take drafting down silently
         log.warning("simulation plugin registry failed to load (%s); drafting uses the schema alone",
                     type(e).__name__)
         return "unavailable", {}
@@ -304,7 +322,7 @@ def registered_plugins() -> tuple[str, dict[str, Any]]:
 def _plugin_manifest(plugin: Any) -> dict[str, Any]:
     try:
         m = plugin.manifest() if hasattr(plugin, "manifest") else {}
-    except Exception:  # noqa: BLE001 - manifest is descriptive only
+    except Exception:  # manifest is descriptive only
         return {}
     return m if isinstance(m, dict) else {}
 
@@ -345,8 +363,8 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
         applicability = reg_entry.get("applicability") or {}
         models[key] = DraftableModel(
             model_key=key,
-            model_version=_const(props.get("model_version"))[1],
-            schema_version=_const(props.get("schema_version"))[1],
+            model_version=_latest(props.get("model_version")),
+            schema_version=_latest(props.get("schema_version")),
             description=" ".join(str(manifest.get("description") or reg_entry.get("description") or key).split()),
             review_status=str(manifest.get("review_status") or reg_entry.get("approval_status") or "unknown"),
             countries=tuple(str(c) for c in _enum(props.get("countries"))),

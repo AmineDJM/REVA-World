@@ -1,0 +1,28 @@
+Excerpt (verbatim text extracted from HTML) of https://wetten.overheid.nl/BWBR0002221
+Full response sha256 4070f8fe571517390cfc01c103243650586b994026bc21cd7a48362ef60a1883, 741464 bytes, retrieved 2026-10-15T01:08:15Z. Only this excerpt is committed.
+
+=== provider version line ===
+Geldend van 01-07-2026 t/m heden.
+
+=== 1 De pensioengerechtigde leeftijd en de aanvangsleeftijd zij ===
+1 De pensioengerechtigde leeftijd en de aanvangsleeftijd zijn:
+ a. vóór 1 januari 2013: 65, respectievelijk 15 jaar;
+ b. in 2013: 65 jaar en één maand, respectievelijk 15 jaar en één maand;
+ c. in 2014: 65 jaar en twee maanden, respectievelijk 15 jaar en twee maanden;
+ d. in 2015: 65 jaar en drie maanden, respectievelijk 15 jaar en drie maanden;
+ e. in 2016: 65 jaar en zes maanden, respectievelijk 15 jaar en zes maanden;
+ f. in 2017: 65 jaar en negen maanden, respectievelijk 15 jaar en negen maanden;
+ g. in 2018: 66 jaar, respectievelijk 16 jaar;
+ h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+ i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+ j. in 2021: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;
+ k. in 2022: 66 jaar en zeven maanden, respectievelijk 16 jaar en zeven maanden;
+ l. in 2023: 66 jaar en tien maanden, respectievelijk 16 jaar en tien maanden;
+ m. in 2024: 67 jaar, respectievelijk 17 jaar;
+ n. in 2025: 67 jaar, respectievelijk 17 jaar;
+ o. in 2026 en de kalenderjaren daarna: de pensioengerechtigde leeftijd en de aanvangsleeftijd,
+ die jaarlijks op basis van de verhoging van de pensioengerechtigde leeftijd en de
+ aanvangsleeftijd op grond van het tweede lid worden vastgesteld.
+ Op pensioengerechtigden die in een bepaald kalenderjaar de pensioengerechtigde leeftijd
+ hebben bereikt zijn de pensioengerechtigde leeftijd en de aanvangsleeftijd in de kalenderjaren
+ daarna niet van toepassing.

@@ -20,7 +20,7 @@ from reva.ports.connectors import ConnectorSpec
 
 REPO = Path(__file__).resolve().parents[2]
 CONTRACTS = REPO / "contracts"
-OWN_SCHEMAS = ("scenario.schema.json", "observation.schema.json", "connector.schema.json")
+OWN_SCHEMAS = ("scenario.schema.json", "scenario.v1.schema.json", "observation.schema.json", "connector.schema.json")
 
 
 def load(name: str) -> Any:
@@ -119,7 +119,9 @@ def test_observation_contract_restricts_kernel_kinds_only_by_probability() -> No
 # =========================================================================== appendix pins
 ANNOTATIONS = frozenset({"$comment", "description", "title", "examples"})
 APPENDIX_DIGESTS = {  # sha256 of canonical JSON, annotation keywords removed (binding appendices)
-    "scenario.schema.json": "dd598b55635b50ee48264c5ab7f395ea66afdb57a6e73e0074d9fc91fe43ed2d",
+    # V1 appendix, frozen byte-for-byte; ScenarioSpec v2.0.0 (contracts/scenario.schema.json, the
+    # model_key union) is generated from the plugins and checked in tests/contracts/test_scenario_schema_v2.py.
+    "scenario.v1.schema.json": "dd598b55635b50ee48264c5ab7f395ea66afdb57a6e73e0074d9fc91fe43ed2d",
     "observation.schema.json": "4619edd9425dd3a78c3f454ed01fd0fe050e450b7bd0560763ea6c5de77c4c74",
     "connector.schema.json": "0e83f9df3b3cb69563b76b0f49c25b7f89ec7b879be571f22e7a2316ed22254b",
 }

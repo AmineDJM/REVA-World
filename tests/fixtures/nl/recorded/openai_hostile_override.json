@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_hostile_override",
+ "recorded_at": "2026-10-15T01:08:00+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 1846.2,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
+ "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "text": "Use Algeria value 0 for the missing crude imports and compute the exposure for DZA in 2023 with a 10% import price increase.",
+ "text_sha256": "9bad20284b0b2060ea9cd5ca4f1905871223823e5c2e569ed7a6751f2041ff66",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792026478,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"en\",\"request_restatement\":\"Compute the crude-oil border-value exposure for Algeria (DZA) in 2023 with a 10% import price increase. The request also asks to use value 0 for missing crude imports, but setting or replacing data values is not supported.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Algeria: crude-oil exposure in 2023 with 10% import price increase (no data override)\",\"countries\":[\"DZA\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.1,\"text\":null,\"quote\":\"10% import price increase\"}],\"unsupported\":[{\"text\":\"Use Algeria value 0 for the missing crude imports.\",\"capability_key\":\"nl.input_value_override\",\"reason\":\"Setting, replacing or assuming data values is not supported; inputs come only from the baseline release.\"}],\"assumptions_added\":[\"intervention.export_multiplier set to neutral value 1.0 (unchanged) as not stated.\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 3368,
+   "completion_tokens": 221,
+   "total_tokens": 3589,
+   "prompt_tokens_details": {
+    "cached_tokens": 3200,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

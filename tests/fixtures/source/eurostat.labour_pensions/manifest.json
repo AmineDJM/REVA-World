@@ -1,0 +1,98 @@
+[
+  {
+    "request_fingerprint": "e0c93fa5b4aedef43d50a09ed363a825f3fcd5d874e5ddd7ff6d2821349bd7ad",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvph01?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&freq=A&unit=AVG&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "e0c93fa5b4aedef4.json",
+    "sha256": "35c6ec0ab0246f54319c0e2ca0358373a0eaf1d047ebc1994bd3ee7d1a2f0d2c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:05:00.112071+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "5567e81ba596bcfe38174b4a3fe80b039b2409ba1017011d29d3da3b661ca9bf",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/ilc_lvph03?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&freq=A&n_person=1&n_person=2&n_person=3&n_person=4&n_person=5&n_person=GE6&unit=PC&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "5567e81ba596bcfe.json",
+    "sha256": "4fa6f8c0c694e5777f4db428e2e734a55234aa77e77796961ee5cc9a28d4bb67",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:59.247090+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "c2d519f50c3cfd692d9d2f41a0e4085af573af4a7da3bab370acbe732b9f532c",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_argan?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&age=Y55-59&age=Y60-64&age=Y65-69&citizen=TOTAL&freq=A&sex=F&sex=M&sex=T&unit=PC&time=2000&time=2001&time=2002&time=2003&time=2004&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "c2d519f50c3cfd69.json",
+    "sha256": "d61296ecf95b6a3ed377fdfb89b385f74bb89e9a806a2625612e9ecf3b2d5e28",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:53.270350+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "3bb4d57ad7e65852d4d2079435385603d515ce187aa5d358597b0214212a3de1",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_egan?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&age=Y55-59&age=Y60-64&age=Y65-69&citizen=TOTAL&freq=A&sex=F&sex=M&sex=T&unit=THS_PER&time=2000&time=2001&time=2002&time=2003&time=2004&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "3bb4d57ad7e65852.json",
+    "sha256": "2f325e0c35902edb4416088a7b2cdd4080e2733a1dd6bfbdacc2648197bcf8f4",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:54.630744+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "e06721f0b9d1bd359c0fdb87af53da665526bb64da93e45b4414e3b1e8632999",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfsa_ergan?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&age=Y55-59&age=Y60-64&age=Y65-69&citizen=TOTAL&freq=A&sex=F&sex=M&sex=T&unit=PC&time=2000&time=2001&time=2002&time=2003&time=2004&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "e06721f0b9d1bd35.json",
+    "sha256": "cf1faa214c3375d42ad8c77f1527072e0e4eb661ea60e29154f57d11d4ccd190",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:52.240745+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "30a080d257aa6a4f6482defbf18aa5ab0db96bdfa997442c80304f746090600e",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/lfst_hhnhtych?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&agechild=TOTAL&freq=A&n_child=TOTAL&n_child=0&n_child=1&n_child=2&n_child=GE3&phhcomp=TOTAL&phhcomp=A1&phhcomp=A1_NCH&phhcomp=A1_CH&phhcomp=CPL&phhcomp=CPL_NCH&phhcomp=CPL_CH&phhcomp=OTH&phhcomp=OTH_NCH&phhcomp=OTH_CH&phhcomp=NRP&unit=THS_HH&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024&time=2025",
+    "file": "30a080d257aa6a4f.json",
+    "sha256": "be1458a48f19cc69ab47a2775ae51665768d51c88592abd87e1d01f202ad4082",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:57.928571+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "5ea5c1d82af587f600b721551aa271ca9f84a0c2ec11913fd35251d4b59601c1",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_exp_pens?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&freq=A&spdepb=TOTAL&spdepb=OLD&spdepb=AOLD&spdepb=PART&spdepm=TOTAL&unit=MIO_EUR&time=2000&time=2001&time=2002&time=2003&time=2004&time=2005&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024",
+    "file": "5ea5c1d82af587f6.json",
+    "sha256": "c017f15d5f458996a8d3620f57f11b400ddfa1599ee4713ae6c041b774d1b2f8",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:56.838846+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  },
+  {
+    "request_fingerprint": "b3039c825c214905f81f48ecdba581c41097c4521683808c2d5db206e9226a13",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/spr_pns_ben?format=JSON&lang=EN&geo=FR&geo=DE&geo=IT&geo=ES&geo=NL&geo=BE&geo=SE&geo=PL&freq=A&sex=F&sex=M&sex=T&spdepb=OLD_TOT&spdepm=TOTAL&spscheme=TOTAL&unit=PER&time=2006&time=2007&time=2008&time=2009&time=2010&time=2011&time=2012&time=2013&time=2014&time=2015&time=2016&time=2017&time=2018&time=2019&time=2020&time=2021&time=2022&time=2023&time=2024",
+    "file": "b3039c825c214905.json",
+    "sha256": "c046cc28050d98b778be40ba9f9e4c2388840cc1579de60b282567c30c1e5e85",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:04:55.548550+00:00",
+    "licence": "Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)"
+  }
+]

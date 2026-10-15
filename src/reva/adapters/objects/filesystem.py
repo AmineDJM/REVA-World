@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import os
 from collections.abc import Iterator
@@ -88,10 +89,16 @@ class FilesystemArtifactStore:
         return data
 
     def open(self, namespace: str, sha256: str) -> Iterator[bytes]:
+        """Stream the object; raises IntegrityFailure after the last chunk if the bytes don't hash to
+        their address (callers must not commit anything derived before the iterator is exhausted)."""
         p = self._path(namespace, sha256)
+        h = hashlib.sha256()
         with open(p, "rb") as f:
             while chunk := f.read(CHUNK):
+                h.update(chunk)
                 yield chunk
+        if h.hexdigest() != sha256:
+            raise IntegrityFailure("stored object bytes do not match their address", sha256=sha256)
 
     def range_read(self, namespace: str, sha256: str, start: int, length: int) -> bytes:
         if start < 0 or length < 0:

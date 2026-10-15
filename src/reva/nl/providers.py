@@ -24,7 +24,7 @@ from reva.nl.http import GEMINI_HOST, OPENAI_HOST, LlmHttpClient
 from reva.nl.ports import LlmProviderError, LlmRequest, LlmResponse, LlmUsage
 
 DEFAULT_OPENAI_MODEL = "gpt-4.1"
-DEFAULT_GEMINI_MODEL = "gemini-2.5-flash"
+DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
 _MODEL_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,63}$")
 
 
@@ -37,7 +37,8 @@ def check_model_name(model: str) -> str:
 
 def _status_error(provider: str, result: HttpResult) -> LlmProviderError:
     status = result.status
-    reason = {401: "unauthorized", 403: "forbidden", 404: "model_not_found", 429: "rate_limited_or_quota"}.get(
+    reason = {401: "unauthorized", 402: "billing_exhausted", 403: "forbidden", 404: "model_not_found",
+              429: "rate_limited_or_quota"}.get(
         status, "server_error" if status >= 500 else "bad_request")
     # Provider error bodies are untrusted; keep only a short, typed message (never echoed prompts).
     message = ""
@@ -148,6 +149,8 @@ class GeminiDrafter:
         }
         if self.model.startswith("gemini-2.5-flash"):
             generation["thinkingConfig"] = {"thinkingBudget": 0}
+        elif self.model.startswith("gemini-3"):
+            generation["thinkingConfig"] = {"thinkingLevel": "minimal"}  # drafting needs no reasoning trace
         return {
             "systemInstruction": {"parts": [{"text": request.system_prompt}]},
             "contents": [{"role": "user", "parts": [{"text": request.user_content}]}],

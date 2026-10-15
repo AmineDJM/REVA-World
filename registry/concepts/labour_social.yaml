@@ -1,0 +1,167 @@
+# Labour-market, pension and household concepts (V2 steps 4-5, agent PEN).
+# Source tables are fetched by the reviewed connector eurostat.labour_pensions.
+# Published versions are immutable: changing meaning requires a new version.
+concepts:
+  - concept_id: labour.employment_rate.lfs_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Employment rate by sex and age group (Eurostat LFS, lfsa_ergan)"}
+    definition: >-
+      Eurostat lfsa_ergan: employed persons as a percentage of the population of the same sex and
+      five-year age group, annual average of the EU Labour Force Survey (ILO definition of
+      employment: at least one hour of paid work in the reference week, or temporarily absent).
+      Population of private households only. Citizenship = TOTAL. A sample-survey estimate; Eurostat
+      publishes no sampling error in this table. Status flags (b break in series, d definition
+      differs, u low reliability) are kept with every value.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: persons_living_in_private_households_lfs
+      denominator: population of the same sex and age group in private households
+      temporal_support: annual_average
+      spatial_support: eurostat_geo_code
+      aggregation: period_rate
+      scale_type: rate
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_lfs
+  - concept_id: labour.activity_rate.lfs_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Activity (labour force participation) rate by sex and age group (Eurostat LFS, lfsa_argan)"}
+    definition: >-
+      Eurostat lfsa_argan: labour force (employed plus unemployed, ILO definitions) as a percentage of
+      the population of the same sex and five-year age group, annual average of the EU LFS, private
+      households, citizenship = TOTAL. Sample-survey estimate without published sampling error.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: persons_living_in_private_households_lfs
+      denominator: population of the same sex and age group in private households
+      temporal_support: annual_average
+      spatial_support: eurostat_geo_code
+      aggregation: period_rate
+      scale_type: rate
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_lfs
+  - concept_id: labour.employed_persons.lfs_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Employed persons by sex and age group (Eurostat LFS, lfsa_egan, thousands)"}
+    definition: >-
+      Eurostat lfsa_egan: number of employed persons (ILO definition), annual average, private
+      households, citizenship = TOTAL. Published in thousands; the value is stored verbatim with
+      scale_factor 1000 and never rescaled at ingest.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: persons_living_in_private_households_lfs
+      temporal_support: annual_average
+      spatial_support: eurostat_geo_code
+      aggregation: period_average_stock
+      scale_type: stock
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_lfs
+  - concept_id: social.pension_beneficiaries.esspros_old_age
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Old-age pension beneficiaries (ESSPROS, spr_pns_ben, OLD_TOT)"}
+    definition: >-
+      Eurostat spr_pns_ben, type of pension OLD_TOT (old-age, anticipated old-age and partial
+      pensions), all schemes, means-tested and non means-tested. ESSPROS pension-beneficiaries
+      module: persons receiving at least one such pension, counted once. The reference date is
+      country-specific (end of year or annual average) per the ESSPROS metadata; schemes may include
+      beneficiaries resident abroad. No age dimension is published.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: esspros_pension_beneficiaries
+      temporal_support: "calendar_year (country-specific reference date)"
+      spatial_support: eurostat_geo_code
+      aggregation: period_average_stock
+      scale_type: stock
+      unit_ref: unit.persons
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: administrative_esspros
+  - concept_id: social.pension_expenditure.esspros
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Expenditure on pensions by type (ESSPROS, spr_exp_pens, million EUR)"}
+    definition: >-
+      Eurostat spr_exp_pens: expenditure on pensions by type of pension (TOTAL, old age OLD,
+      anticipated old age AOLD, partial PART), means-testing TOTAL, million euro at current prices,
+      calendar-year flow. TOTAL also includes disability, survivors' and early-retirement benefits.
+      Values are stored verbatim in millions (scale_factor 1000000).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: esspros_social_protection_schemes
+      temporal_support: annual_total
+      spatial_support: eurostat_geo_code
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.eur
+      currency_basis: EUR
+      price_basis: nominal
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: administrative_esspros
+  - concept_id: households.private_households.lfs_composition
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Private households by composition and number of children (Eurostat LFS, lfst_hhnhtych)"}
+    definition: >-
+      Eurostat lfst_hhnhtych: number of private households (thousands) by household composition
+      (one adult, couple, other type; each with/without resident children; NRP no response) and
+      number of resident children (0, 1, 2, 3+), age of youngest child = TOTAL. Annual LFS
+      estimate. Values stored verbatim in thousands (scale_factor 1000).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: private_households_lfs
+      temporal_support: annual_average
+      spatial_support: eurostat_geo_code
+      aggregation: period_average_stock
+      scale_type: stock
+      unit_ref: unit.households
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_lfs
+  - concept_id: households.size_distribution.silc
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Distribution of private households by number of persons (EU-SILC, ilc_lvph03)"}
+    definition: >-
+      Eurostat ilc_lvph03: percentage of private households with 1, 2, 3, 4, 5 and 6 or more
+      persons (EU-SILC). A survey estimate; the categories partition households, the top
+      category is open (6+).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: private_households_silc
+      denominator: all private households
+      temporal_support: annual_survey_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_rate
+      scale_type: ratio
+      unit_ref: unit.percent
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_silc
+  - concept_id: households.average_size.silc
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Average household size (EU-SILC, ilc_lvph01)"}
+    definition: >-
+      Eurostat ilc_lvph01: average number of persons per private household (EU-SILC).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: private_households_silc
+      denominator: private households
+      temporal_support: annual_survey_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_rate
+      scale_type: ratio
+      unit_ref: unit.persons_per_household
+      permitted_transformations: [identity]
+      missingness: [unavailable, suppressed, not_applicable]
+      measurement_method: sample_survey_eu_silc

@@ -117,7 +117,7 @@ async def test_t1_out_of_scope_is_rejected(db, io):
 async def test_t1_with_foreign_reports_is_rejected(db, io):
     p, v, s = await _t1(io, db)
     other = _proposal(io, tier=1, caps=("register_connector_version",), manifest=io.get_json(p.patch_or_manifest))
-    _persist(db, io, other)
+    ProposalStore(db.worker, io).persist(other, proposal_type="connector_promotion", scope={}, risk={})
     d = _gate(db, io).decide(other, [v, s], promotion_policy().ref())  # s covers p, not `other`
     assert d.outcome == "reject" and any("does not cover" in r for r in d.reasons)
 
@@ -399,24 +399,20 @@ def test_r4_11_paths_are_normalised_before_tiering(path, tier):
 
 
 async def test_r4_01_promote_connector_refuses_fabricated_decision(db, io):
-    from reva.autonomy.common import ref_from
     from reva.autonomy.jobs import promote_connector
-    from reva.ports.autonomy import GateDecision, MappingProposal
+    from reva.ports.autonomy import GateDecision
 
     p, _v, _s = await _t1(io, db)
     change = io.get_json(p.patch_or_manifest)
-    mp = MappingProposal(uuid.uuid4(), ref_from(change["candidate"]["metadata"]),
-                         "demography.population.jan1_age_sex@1.0.0", "exact",
-                         ref_from(change["mapping"]["mapping_manifest"]), False)
     fake = GateDecision(uuid.uuid4(), "promote", p.proposal_id, promotion_policy().version, (), ("trust me",),
                         "gate-evaluator:promotion", None)
     with db.owner.connect() as conn:
         before = conn.execute(text("SELECT count(*) FROM evidence.connector_version")).scalar_one()
     with pytest.raises(PolicyDenied):
-        promote_connector(db.worker, io, _ctx(db), change["manifest"], mp, fake, promotion_policy())
+        promote_connector(db.worker, io, _ctx(db), fake, promotion_policy())
     bad = dict(change["manifest"], name="worldbank.wdi.indicators")
     with pytest.raises(PolicyDenied):
-        promote_connector(db.worker, io, _ctx(db), bad, mp, fake, promotion_policy())
+        promote_connector(db.worker, io, _ctx(db), fake, promotion_policy(), expected_manifest=bad)
     with db.owner.connect() as conn:
         assert conn.execute(text("SELECT count(*) FROM evidence.connector_version")).scalar_one() == before
 

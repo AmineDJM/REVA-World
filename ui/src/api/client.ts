@@ -34,6 +34,7 @@ import type {
   ReplayRequest,
   ReviewDecision,
   ReviewRecorded,
+  Scenario,
   ScenarioCreated,
   ScenarioSpec,
   SessionInfo,
@@ -42,6 +43,7 @@ import type {
   SourceOut,
   Timeseries,
 } from './types';
+import type { ScenarioDraftRequest } from './v2types';
 
 export { ApiError } from './problem';
 export type { ProblemDetails } from './problem';
@@ -100,7 +102,7 @@ export async function startEvaluation(body: EvaluationRequest = {}, idempotencyK
 
 // ------------------------------------------------------------------ simulation (work-starting POSTs carry Idempotency-Key)
 
-export async function createScenario(spec: ScenarioSpec, idempotencyKey: string | true = true) {
+export async function createScenario(spec: ScenarioSpec | Record<string, unknown>, idempotencyKey: string | true = true) {
   return (await request<ScenarioCreated>('POST', `${V1}/scenarios`, { body: spec, idempotencyKey })).body;
 }
 
@@ -110,6 +112,18 @@ export async function startSimulation(body: SimulationRequest, idempotencyKey: s
 
 export const getSimulation = (id: string, s?: AbortSignal) =>
   get<Envelope<SimulationStatus>>(`/simulations/${enc(id)}`, undefined, s);
+
+export const getScenarios = (q?: Query, s?: AbortSignal) => get<Envelope<Scenario[]>>('/scenarios', q, s);
+export const getScenario = (id: string, s?: AbortSignal) => get<Envelope<Scenario>>(`/scenarios/${enc(id)}`, undefined, s);
+
+/**
+ * V2: ask the server to draft a scenario from free text (POST /v1/scenario-drafts). The
+ * response is a draft only; nothing runs until the user confirms through createScenario.
+ * Not idempotent work (no job): a fresh key is still sent so a retried click is safe.
+ */
+export async function createScenarioDraft(body: ScenarioDraftRequest, signal?: AbortSignal) {
+  return (await request<unknown>('POST', `${V1}/scenario-drafts`, { body, idempotencyKey: true, signal })).body;
+}
 
 export async function startReplay(body: ReplayRequest, idempotencyKey: string | true = true) {
   return (await request<JobAccepted>('POST', `${V1}/replay`, { body, idempotencyKey })).body;

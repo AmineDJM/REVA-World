@@ -863,14 +863,48 @@ export interface components {
             /** Observation Revision No */
             observation_revision_no: number | null;
             /**
+             * Proposal Id
+             * @description Repair proposal whose review lifts the pause
+             */
+            proposal_id: string | null;
+            /**
              * Release Id
              * Format: uuid
              */
             release_id: string;
             /** Retrieved At */
             retrieved_at: string | null;
+            /**
+             * Served From Release Id
+             * @description Release this row was read from. Differs from the envelope's baseline release when the pinned release withheld the concept and the last earlier release that published it is served (stale)
+             */
+            served_from_release_id: string | null;
+            /**
+             * Source Flags
+             * @description Provider/connector flags as stored on the selected observation (e.g. Comtrade isReported, legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about 4 KiB; never a raw payload. The full record is at /v1/observations. Null when the estimate has no selected observation.
+             */
+            source_flags: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Source Flags Truncated
+             * @description True when source_flags was cut to its size bound (see /v1/observations)
+             * @default false
+             */
+            source_flags_truncated: boolean;
             /** Source Key */
             source_key: string | null;
+            /**
+             * Stale
+             * @description Publication of this concept is paused (e.g. a source schema quarantine awaiting a reviewed repair): the value is the last accepted one, not fresh
+             * @default false
+             */
+            stale: boolean;
+            /**
+             * Stale Reason
+             * @description Why the concept is stale, e.g. source_schema_quarantine
+             */
+            stale_reason: string | null;
             subject: components["schemas"]["EntityRef"];
             support: components["schemas"]["SupportSummary"];
             uncertainty: components["schemas"]["Uncertainty"];
@@ -4666,6 +4700,19 @@ export interface components {
              * @description Full lineage visible at as_of (revisions=all only)
              */
             revisions: components["schemas"]["RevisionEntry"][] | null;
+            /**
+             * Source Flags
+             * @description Provider/connector flags as stored on the selected observation (e.g. Comtrade isReported, legacyEstimationFlag, isQtyEstimated, isNetWgtEstimated, provider_value_estimated -- null means undeterminable, never 'not estimated' -- and provider_quantity_estimated; WDI obs_status). Bounded: at most 40 keys, scalar values or one level of nested scalars, strings capped at 200 characters, about 4 KiB; never a raw payload. The full record is at /v1/observations.
+             */
+            source_flags: {
+                [key: string]: unknown;
+            } | null;
+            /**
+             * Source Flags Truncated
+             * @description True when source_flags was cut to its size bound (see /v1/observations)
+             * @default false
+             */
+            source_flags_truncated: boolean;
             /** Source Key */
             source_key: string;
             /** Source Published At */

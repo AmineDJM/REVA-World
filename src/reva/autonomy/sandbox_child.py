@@ -41,7 +41,7 @@ def _apply_limits(argv: list[str]) -> dict[str, Any]:
         return {"applied": False, "reason": "no limits given"}
     lim = json.loads(argv[argv.index("--limits") + 1])
     pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
-             "fsize": resource.RLIMIT_FSIZE}
+             "fsize": resource.RLIMIT_FSIZE, "nproc": resource.RLIMIT_NPROC}
     for k, r in pairs.items():
         v = int(lim.get(k, 0))
         if v > 0:
@@ -81,11 +81,42 @@ def _probe_isolation(req: dict[str, Any]) -> dict[str, Any]:
     else:
         process = "different uid"
     return {
+        "filesystem": _probe_filesystem(req),
         "network_probe_raw": {"loopback_listener": loop, "public_ip": public},
         "network_mode": "blocked_verified" if verified else "python_guard_only",
         "parent_environ_readable": environ_readable,
         "process_isolation": process,
     }
+
+
+def _probe_filesystem(req: dict[str, Any]) -> dict[str, Any]:
+    """Measured filesystem reach (R6-13): can the child write outside its private directory?"""
+    out: dict[str, Any] = {"mount_isolation": "none (shared host root filesystem)", "shared_host_filesystem": True}
+    target = req.get("outside_probe_dir")
+    if target:
+        path = os.path.join(str(target), "planted-by-sandbox-child")
+        try:
+            with open(path, "x") as f:
+                f.write("x")
+            os.unlink(path)
+            out["outside_private_dir_writable"] = True
+        except OSError as e:
+            out["outside_private_dir_writable"] = False
+            out["outside_probe_error"] = type(e).__name__
+    else:
+        out["outside_private_dir_writable"] = None
+    try:
+        import resource
+
+        pid = os.fork()
+        if pid == 0:
+            os._exit(0)
+        os.waitpid(pid, 0)
+        out["fork"] = "permitted"
+        out["nproc_limit"] = list(resource.getrlimit(resource.RLIMIT_NPROC))
+    except OSError as e:
+        out["fork"] = f"refused: {type(e).__name__}"
+    return out
 
 
 def _block_network(allowlist: list[str]) -> None:

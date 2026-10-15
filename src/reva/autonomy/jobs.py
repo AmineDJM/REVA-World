@@ -21,10 +21,23 @@ proposal, rejected by the gate, with the explicit incompatible mapping record.
 
 Payload fields are validated against fixed vocabularies; nothing in a payload
 or in fetched content can choose hosts, fixture paths, policies or tiers.
+
+R6 fixes:
+
+* eligibility ``years`` use the scope format the database accepts (``{"in": [...]}``)
+  both in the approval and in the proposal scope (R6-01);
+* a database error that is not a ``RevaError`` ends the job with a typed,
+  non-retryable ``failed`` result instead of a retry loop that re-fetches live data;
+* ``promote_connector`` takes only the gate decision: manifest and mapping are loaded
+  from the stored proposal that the recorded gate pass evaluated, bound by digest (R6-02);
+* the rollback hold is keyed on content, not on ``(name, version)`` (R6-05);
+* the validator's live sample goes through the same metered client as discovery (R6-09);
+* ``mode=fixture`` is refused when ``REVA_ENV=production`` (R6-15).
 """
 
 from __future__ import annotations
 
+import contextlib
 import json
 import logging
 from datetime import datetime
@@ -32,19 +45,21 @@ from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Engine, text
+from sqlalchemy.exc import SQLAlchemyError
 
 from reva.adapters.connectors import eurostat_template as et
 from reva.adapters.connectors.eurostat_template import TEMPLATE_HOSTS, EurostatJsonStatConnector
 from reva.adapters.postgres import repositories as repo
 from reva.autonomy import binding
 from reva.autonomy import promotion as prom
-from reva.autonomy.budget import BudgetExhausted, reserve_discovery, settle_discovery
+from reva.autonomy.budget import BudgetExhausted, metered_discovery, reserve_discovery, settle_discovery
 from reva.autonomy.common import (
     ArtifactIO,
     AutonomyBlocked,
     default_budget,
     make_context,
     now_utc,
+    ref_from,
     ref_json,
     report,
     run_sync,
@@ -57,7 +72,7 @@ from reva.autonomy.gate import CONNECTOR_CHANGE_SCHEMA, PolicyPromotionGate
 from reva.autonomy.generator import DeclarativeConnectorGenerator
 from reva.autonomy.mapping import RegistryOntologyMapper
 from reva.autonomy.policy import AutonomyGuard, PinnedPolicy, live_kill_reason, promotion_policy
-from reva.autonomy.proposals import ProposalStore, base_commit
+from reva.autonomy.proposals import ProposalStore, base_commit, proposal_from
 from reva.autonomy.sandbox import TrustedTemplateSandbox, external_runner_from_settings, trusted_template_policy
 from reva.autonomy.validator import JsonStatConnectorValidator
 from reva.autonomy.voi import GapValueEstimator
@@ -116,6 +131,9 @@ def handle_discovery(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
     if requirement not in DISCOVERABLE_REQUIREMENTS or mode not in ("live", "fixture"):
         return {"status": "rejected", "reason": "unsupported requirement or mode",
                 "supported": list(DISCOVERABLE_REQUIREMENTS)}
+    if mode == "fixture" and str(getattr(ctx.settings, "reva_env", "")) == "production":
+        # (R6-15) captured-fixture promotion would create eligibility that live ingestion uses
+        return {"status": "rejected", "reason": "mode=fixture is refused in production", "code": "fixture_mode"}
     reservation = None
     if mode == "live":
         try:
@@ -133,6 +151,16 @@ def handle_discovery(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             raise
         return {"status": "failed", "reason": e.message[:500], "code": e.code,
                 "kind": str(e.details.get("kind", ""))[:60]}
+    except SQLAlchemyError as e:
+        # (R6-01) a database refusal (trigger, governance function, constraint) is not transient: a
+        # retry would only re-fetch live data and leave another unconsumed gate pass. Typed and final;
+        # the message carries the exception type and SQLSTATE only (no bound parameters).
+        orig = getattr(e, "orig", None)
+        log.error("discovery: database refused a step: %s", type(orig or e).__name__)
+        return {"status": "failed", "code": "database_refused", "retryable": False,
+                "kind": type(orig or e).__name__[:60],
+                "reason": f"database refused the discovery step: {type(orig or e).__name__}",
+                "sqlstate": str(getattr(orig, "sqlstate", "") or "")[:10]}
 
 
 async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyGuard,
@@ -141,8 +169,11 @@ async def discovery_flow(ctx: Any, requirement: str, mode: str, guard: AutonomyG
     try:
         return await _discovery_flow(ctx, requirement, mode, guard, reservation, http_box)
     finally:
+        h = http_box.get("http")
+        if h is not None and mode == "live":
+            with contextlib.suppress(Exception):
+                await h.aclose()
         if reservation is not None:  # record what was actually consumed (reservation counts until then)
-            h = http_box.get("http")
             settle_discovery(ctx.worker_engine, reservation, requests=int(getattr(h, "requests", 0) or 0),
                              nbytes=int(getattr(h, "bytes", 0) or 0))
 
@@ -185,6 +216,8 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     # 2. discovery
     guard.check("discover")
     http, bank = _http(mode, io_, requirement, ctx.settings)
+    # (R6-09) one metered client for the whole run: catalogue, inspection and the validator sample
+    http = metered_discovery(http, engine, reservation)
     http_box["http"] = http
     discoverer = EurostatCatalogueDiscoverer(io_, http, registry=reg, guard=guard)
     candidates = await discoverer.discover(gap, budget)
@@ -215,7 +248,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     manifest = io_.get_json(cp.manifest)
     summary["connector"] = {"name": manifest["name"], "version": manifest["version"],
                             "manifest_sha256": cp.manifest.sha256}
-    hold = _existing_state(engine, manifest, primary)
+    hold = _existing_state(engine, io_, manifest, primary)
     if hold is not None:  # rolled back or already promoted: never re-enable or re-announce silently
         summary["connector"]["state"] = hold
         summary["status"] = hold
@@ -227,7 +260,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     live_factory = None
     if mode == "live":
         def live_factory(hosts: tuple[str, ...]) -> Any:
-            return http.client
+            return http  # the same metered client (R6-09): the sample is charged and capped too
         bank = bank or io_.put_json({"schema": "reva-fixture-bank/1", "connector": manifest["name"],
                                      "entries": []}, "raw")
     guard.check("validate")
@@ -253,7 +286,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     summary["sandbox"] = {"outcome": s_report.outcome, "findings": [f.code for f in s_report.findings]}
     # 7. gate
     gate = PolicyPromotionGate(engine, io_, guard=guard)
-    decision = gate.decide(proposal, [v_report, s_report], policy.ref())
+    decision = gate.decide(proposal.proposal_id, [v_report, s_report], policy.ref())
     summary["gate"] = {"proposal_id": str(proposal.proposal_id), "outcome": decision.outcome,
                        "reasons": list(decision.reasons), "gate_result_id": str(decision.decision_id)}
     # 8. explicit rejection of tempting false equivalences
@@ -266,7 +299,7 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
                                                  "proposal_id": str(d.proposal_id)})
     # 9. promotion within scope (automatic for T1 inside the signed policy scope; no human review)
     if decision.outcome == "promote":
-        result = promote_connector(engine, io_, ctx, manifest, primary, decision, policy, guard=guard)
+        result = promote_connector(engine, io_, ctx, decision, policy, guard=guard, expected_manifest=manifest)
         summary["promotion"] = result
         summary["status"] = result["status"]
     else:
@@ -287,6 +320,7 @@ def connector_promotion_scope(io_: ArtifactIO, manifest: dict[str, Any], mapping
     return {"concept": mapping.target_concept_version, "dataset": dataset or manifest["dataset"],
             "geo": manifest["request_parameters"]["filters"].get("geo"),
             "eligibility_scope": manifest["eligibility_scope"], "mapping_key": mm["mapping_key"],
+            "manifest_sha256": et.manifest_digest(manifest),
             "subject_ids": [str(entity_id(x)) for x in subjects], "years": eligibility_years(manifest)}
 
 
@@ -344,7 +378,7 @@ def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore
                                "findings": [{"code": f.code, "severity": f.severity, "message": f.message}
                                             for f in findings]}, "evaluation")
     mapper_report = report("fail", findings, assessment, mapper_evaluator)
-    decision = gate.decide(p, [mapper_report], policy.ref())
+    decision = gate.decide(p.proposal_id, [mapper_report], policy.ref())
     reg_mapping = mm.get("registry_mapping")
     with engine.begin() as conn:
         take_evidence_write_lock(conn)
@@ -372,16 +406,20 @@ def _no_value(io_: ArtifactIO) -> ValueEstimate:
                                                      "description": "not applicable"}, ref, "autonomy.jobs@1")
 
 
-def _existing_state(engine: Engine, manifest: dict[str, Any], mapping: MappingProposal) -> str | None:
-    """'rolled_back_hold' / 'already_promoted' when this exact (name, version) already has a decision."""
+def _existing_state(engine: Engine, io_: ArtifactIO, manifest: dict[str, Any],
+                    mapping: MappingProposal) -> str | None:
+    """'rolled_back_hold' when this *content* was rolled back under any version or template digest
+    (R6-05); 'already_promoted' when this exact (name, version) is eligible; else None."""
     concept_id, version = mapping.target_concept_version.split("@", 1)
     with engine.connect() as conn:
-        row = repo.connector_version_row(conn, manifest["name"], manifest["version"])
-        if row is None:
-            return None
         try:
             c = repo.concept_version_id(conn, concept_id, version)
         except Exception:
+            return None
+        if prom.rolled_back_content(conn, io_, manifest, c):
+            return "rolled_back_hold"
+        row = repo.connector_version_row(conn, manifest["name"], manifest["version"])
+        if row is None:
             return None
         latest = prom.latest_decision(conn, row["id"], c)
     if latest is None:
@@ -389,21 +427,64 @@ def _existing_state(engine: Engine, manifest: dict[str, Any], mapping: MappingPr
     return "already_promoted" if latest == "eligible" else "rolled_back_hold"
 
 
-def _verify_gate_row(conn: Any, decision: GateDecision) -> None:
-    """The decision must be a recorded pass of a gate evaluator for this very proposal."""
+def _verify_gate_row(conn: Any, decision: GateDecision) -> dict[str, Any]:
+    """The decision must be a recorded pass of a gate evaluator for this very connector_promotion proposal."""
     row = conn.execute(text(
-        "SELECT proposal_id, decision, evaluator FROM ops.gate_result WHERE id = :i"),
+        """SELECT g.proposal_id, g.decision, g.evaluator, g.evidence_sha256, g.policy_version,
+                  p.proposal_type, p.manifest_sha256
+           FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id WHERE g.id = :i"""),
         {"i": decision.decision_id}).mappings().one_or_none()
     if (row is None or str(row["proposal_id"]) != str(decision.proposal_id) or row["decision"] != "pass"
-            or row["evaluator"] != decision.reviewer_identity):
-        raise PolicyDenied("promotion requires a recorded passing gate result for this proposal",
-                           gate_result_id=str(decision.decision_id))
+            or row["evaluator"] != decision.reviewer_identity
+            or not str(row["evaluator"]).startswith("gate-evaluator:")
+            or row["proposal_type"] != "connector_promotion"):
+        raise PolicyDenied("promotion requires a recorded passing gate result for this connector_promotion "
+                           "proposal", gate_result_id=str(decision.decision_id))
+    return dict(row)
 
 
-def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[str, Any],
-                      mapping: MappingProposal, decision: GateDecision, policy: PinnedPolicy,
-                      guard: AutonomyGuard | None = None) -> dict[str, Any]:
+def load_promotion(io_: ArtifactIO, gate_row: dict[str, Any], decision: GateDecision) -> dict[str, Any]:
+    """Manifest + mapping of the *stored* proposal that the recorded gate pass evaluated (R6-02).
+
+    Nothing comes from the caller: the gate result names the proposal; ``ops.proposal`` names its
+    (immutable, digest-verified) document; the document names the change, whose manifest and mapping
+    digests must equal the ones the gate recorded in its evidence for this pass.
+    """
+    ev = io_.get_json(ArtifactRef(str(gate_row["evidence_sha256"]), "evaluation", "application/json"))
+    scope = ((ev.get("tier") or {}).get("t1_scope") or {}) if isinstance(ev, dict) else {}
+    doc = io_.get_json(ArtifactRef(str(gate_row["manifest_sha256"]), "models", "application/json"))
+    proposal = proposal_from(doc["proposal"])
+    change = io_.get_json(proposal.patch_or_manifest)
+    manifest = et.validate_manifest((change or {}).get("manifest") or {})
+    manifest_ref = ref_from(change["manifest_ref"])
+    mapping_ref = ref_from((change.get("mapping") or {})["mapping_manifest"])
+    problems = []
+    if ev.get("outcome") != "promote" or ev.get("proposal_id") != str(decision.proposal_id) \
+            or ev.get("evaluator") != gate_row["evaluator"]:
+        problems.append("gate evidence is not this promote decision")
+    if ev.get("proposal_sha256") != gate_row["manifest_sha256"] or scope.get("proposal_sha256") != \
+            gate_row["manifest_sha256"]:
+        problems.append("gate evidence evaluated another proposal document")
+    if proposal.proposal_id != decision.proposal_id or doc.get("proposal_type") != "connector_promotion":
+        problems.append("stored proposal document does not match the gate result")
+    if scope.get("manifest_sha256") != manifest_ref.sha256 or io_.get_json(manifest_ref) != manifest:
+        problems.append("manifest differs from the one the gate evaluated")
+    if scope.get("mapping_manifest_sha256") != mapping_ref.sha256:
+        problems.append("mapping differs from the one the gate evaluated")
+    if problems:
+        raise PolicyDenied("the gate pass is not bound to this stored proposal", problems=problems)
+    return {"manifest": manifest, "mapping_manifest": io_.get_json(mapping_ref), "mapping_ref": mapping_ref,
+            "scope": scope, "proposal": proposal}
+
+
+def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, decision: GateDecision, policy: PinnedPolicy,
+                      guard: AutonomyGuard | None = None, *,
+                      expected_manifest: dict[str, Any] | None = None) -> dict[str, Any]:
     """Register a content-versioned connector + scoped eligibility atomically; keep prior state for rollback.
+
+    (R6-02) Takes only the gate decision: manifest and mapping are loaded from the stored proposal the
+    recorded gate pass evaluated (``load_promotion``). ``expected_manifest`` lets a caller assert what it
+    believes is being promoted; a mismatch is refused, it is never used as the source.
 
     Returns ``{"status": "promoted" | "already_promoted" | "rolled_back_hold", ...}``. Events and audit
     rows are written only when a new eligibility decision is recorded.
@@ -413,13 +494,23 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
         raise AutonomyBlocked(reason, action="promote_connector")
     if decision.outcome != "promote" or not decision.reviewer_identity.startswith("gate-evaluator:"):
         raise AutonomyBlocked("promotion requires a promote decision from a gate evaluator")
-    problems = binding.binding_problems(manifest, load_registry(), policy)
+    with engine.connect() as conn:
+        gate_row = _verify_gate_row(conn, decision)
+    if gate_row["policy_version"] != policy.version:
+        raise PolicyDenied("the gate pass ran another policy version", gate=gate_row["policy_version"])
+    loaded = load_promotion(io_, gate_row, decision)
+    manifest, mm = loaded["manifest"], loaded["mapping_manifest"]
+    if expected_manifest is not None and dict(expected_manifest) != manifest:
+        raise PolicyDenied("the manifest offered for promotion is not the one the gate evaluated")
+    registry = load_registry()
+    problems = binding.binding_problems(manifest, registry, policy, mapping_manifest=mm)
     if problems:  # defence in depth: the same derivation the gate used
         raise PolicyDenied("manifest is outside the signed policy scope", problems=problems[:10])
     connector = EurostatJsonStatConnector(manifest)
     spec = connector.describe()
-    mm = io_.get_json(mapping.mapping_manifest)
-    concept_id, version = mapping.target_concept_version.split("@", 1)
+    sem = manifest["request_parameters"]["semantics"]
+    concept_id, version = str(sem["concept_id"]), str(sem["concept_version"])
+    concept_ref = f"{concept_id}@{version}"
     subjects = sorted((mm.get("scope") or {}).get("subjects") or [])
     with engine.begin() as conn:
         take_evidence_write_lock(conn)  # R-03: eligibility decisions are evidence a release selects from
@@ -432,6 +523,13 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
         conflicts = binding.name_conflicts(conn, spec.name, spec.source_key, et.TEMPLATE_ID)
         if conflicts:
             raise PolicyDenied("connector name is registered under another source/template", conflicts=conflicts)
+        concept_uuid = repo.concept_version_id(conn, concept_id, version)
+        held = prom.rolled_back_content(conn, io_, manifest, concept_uuid)
+        if held:  # (R6-05) rolled-back content stays held whatever its version or template digest
+            return {"status": "rolled_back_hold", "rolled_back": held}
+        expected_version, _ = prom.resolve_connector_version(conn, io_, manifest, spec.code_digest)
+        if expected_version != spec.version:
+            raise PolicyDenied(f"version {spec.version} is not the content-derived version {expected_version}")
         concept_uuid = repo.concept_version_id(conn, concept_id, version)
         existing = repo.connector_version_row(conn, spec.name, spec.version)
         if existing is not None:
@@ -461,7 +559,7 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
         cv_id = register_connector_version(conn, io_.store, spec, act.id)
         superseded = [r for r in others if prom.latest_decision(conn, r["id"], concept_uuid) == "eligible"]
         rollback = {"schema": "reva-promotion-rollback/1", "connector": spec.name, "version": spec.version,
-                    "connector_version_id": str(cv_id), "concept": mapping.target_concept_version,
+                    "connector_version_id": str(cv_id), "concept": concept_ref,
                     "previous": previous, "gate_result_id": str(decision.decision_id),
                     "superseded": [{"connector_version_id": str(r["id"]), "version": r["version"]}
                                    for r in superseded],
@@ -501,7 +599,7 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
                                 "retired", policy.version, act.id)
         repo.emit_outbox(conn, "autonomy.connector_promoted",
                          {"connector": spec.name, "version": spec.version, "connector_version_id": str(cv_id),
-                          "concept": mapping.target_concept_version, "subjects": subjects,
+                          "concept": concept_ref, "subjects": subjects,
                           "gate_result_id": str(decision.decision_id), "rollback_sha256": rb_ref.sha256,
                           "superseded": [r["version"] for r in superseded]})
         repo.audit(conn, decision.reviewer_identity, "autonomy.connector_promoted",

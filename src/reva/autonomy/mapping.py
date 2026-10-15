@@ -16,6 +16,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from reva.autonomy.binding import MAPPING_VERSION, inspection_structure_problems, mapping_key
 from reva.autonomy.common import ArtifactIO, stable_id
 from reva.autonomy.policy import PinnedPolicy, promotion_policy
 from reva.ontology.registry import Registry, load_registry
@@ -95,7 +96,7 @@ class RegistryOntologyMapper:
         manifest = {
             "schema": "reva-mapping-proposal/1",
             "mapping_key": mapping_key,
-            "version": "1.0.0",
+            "version": MAPPING_VERSION,
             "source_ref": {"provider": candidate.provider, "dataset": candidate.dataset_id,
                            "template": TEMPLATE_FOR_PROVIDER.get(candidate.provider),
                            "candidate_metadata_sha256": candidate.metadata.sha256},
@@ -130,13 +131,15 @@ class RegistryOntologyMapper:
         inspection = meta.get("inspection")
         problems = self._structure_findings(inspection)
         approved = self._approved_exact(candidate, concept, geo)
+        if approved:  # (R6-04) provider structure must be the one the maintainers pinned
+            problems += inspection_structure_problems(inspection, approved)
         resolution = [d for d in (inspection or {}).get("dimension_order", []) if d not in STRUCTURAL_DIMS]
         out: list[MappingProposal] = []
         if approved and not problems and candidate.rights_status == "verified" \
                 and approved.get("rights") == "verified":
             source_profile = _profile(concept)
             out.append(self._proposal(
-                candidate, f"{candidate.provider}.{candidate.dataset_id}.{concept.concept_id.split('.')[-1]}",
+                candidate, mapping_key(candidate.dataset_id, concept.concept_id),
                 concept, "exact", False,
                 {"basis": "approved_exact_mapping", "approved_entry": approved,
                  "scope": {"geo": geo, "subjects": iso3}, "resolution_dimensions": resolution,

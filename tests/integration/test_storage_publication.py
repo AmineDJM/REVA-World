@@ -249,7 +249,7 @@ def test_unresolvable_subject_aborts_whole_acquisition(pdb: Any) -> None:
     spec = conn.describe()
     sha = sha256_bytes(raw.body)
     b = batches[0]
-    bad_obs = b.observations[-1].model_copy(update={"subject_key": "XKX", "logical_key": "wb:test:XKX:2000"})
+    bad_obs = b.observations[-1].model_copy(update={"subject_key": "ZZZ", "logical_key": "wb:test:ZZZ:2000"})
     bad = b.model_copy(update={"observations": (*b.observations, bad_obs)})
     with pytest.raises(ValidationProblem, match="no reviewed alias"):
         publish_acquisition(pdb.worker, pdb.store, spec, raw, [bad], reports)

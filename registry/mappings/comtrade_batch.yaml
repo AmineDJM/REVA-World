@@ -1,0 +1,85 @@
+# V2 step 1 (agent ALLC): the reviewed HS2709 mappings of comtrade.yaml (same source
+# fields, same concepts, same exact semantics) for connector un.comtrade.public_batch,
+# whose subject scope is every Comtrade reporter mapped in
+# registry/entities/country_crosswalk.json (219 entities; crosswalk content_sha256
+# 64c28c37fae5616a...). The subject list is generated from the crosswalk and
+# tests/unit/test_country_crosswalk.py checks they agree. Widened scope, unchanged
+# semantics; review status: pending maintainer review of the crosswalk (the agent cannot
+# record a human review). Classification scope H4-H6 as in comtrade.yaml: rows reported
+# under H0-H3 are stored but ineligible (listed as gaps, never filled).
+connector: {name: un.comtrade.public_batch, version: "1.0.0"}
+mappings:
+  - mapping_key: comtrade.batch.2709.M.world
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: 0, field: primaryValue}
+    target: {concept_id: trade.hs2709.import_value.world_total, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: &ct_subjects [ABW, AFG, AGO, AIA, ALB, AND, ARE, ARG, ARM, ATG, AUS, AUT, AZE, BDI, BEL, BEN, BES, BFA, BGD, BGR, BHR, BHS,
+        BIH, BLM, BLR, BLZ, BMU, BOL, BRA, BRB, BRN, BTN, BWA, CAF, CAN, CHE, CHL, CHN, CIV, CMR, COD, COG,
+        COK, COL, COM, CPV, CRI, CUB, CUW, CYM, CYP, CZE, DEU, DJI, DMA, DNK, DOM, DZA, ECU, EGY, ERI, ESP,
+        EST, ETH, FIN, FJI, FRA, FRO, FSM, GAB, GBR, GEO, GHA, GIB, GIN, GMB, GNB, GNQ, GRC, GRD, GRL, GTM,
+        GUY, HKG, HND, HRV, HTI, HUN, IDN, IND, IRL, IRN, IRQ, ISL, ISR, ITA, JAM, JOR, JPN, KAZ, KEN, KGZ,
+        KHM, KIR, KNA, KOR, KWT, LAO, LBN, LBR, LBY, LCA, LKA, LSO, LTU, LUX, LVA, MAC, MAR, MDA, MDG, MDV,
+        MEX, MHL, MKD, MLI, MLT, MMR, MNE, MNG, MNP, MOZ, MRT, MSR, MTQ, MUS, MWI, MYS, NAM, NCL, NER, NGA,
+        NIC, NIU, NLD, NOR, NPL, NRU, NZL, OMN, PAK, PAN, PER, PHL, PLW, PNG, POL, PRK, PRT, PRY, PSE, PYF,
+        QAT, ROU, RUS, RWA, SAU, SDN, SEN, SGP, SHN, SLB, SLE, SLV, SMR, SOM, SPM, SRB, SSD, STP, SUR, SVK,
+        SVN, SWE, SWZ, SXM, SYC, SYR, TCA, TCD, TGO, THA, TJK, TKL, TKM, TLS, TON, TTO, TUN, TUR, TUV, TZA,
+        UGA, UKR, URY, USA, UZB, VAT, VCT, VEN, VGB, VNM, VUT, WLF, WSM, YEM, ZAF, ZMB, ZWE]
+      years: {from: 2019, to: 2024}
+      classifications: [H4, H5, H6]
+      admit_unclassified_missing: true
+    eligibility: eligible
+  - mapping_key: comtrade.batch.2709.X.world
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: 0, field: primaryValue}
+    target: {concept_id: trade.hs2709.export_value.world_total, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: *ct_subjects
+      years: {from: 2019, to: 2024}
+      classifications: [H4, H5, H6]
+      admit_unclassified_missing: true
+    eligibility: eligible
+  - mapping_key: comtrade.batch.2709.M.bilateral
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: "*", field: primaryValue}
+    target: {concept_id: trade.hs2709.import_value.bilateral, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: *ct_subjects
+      years: {in: [2023]}
+      classifications: [H4, H5, H6]
+    eligibility: eligible
+  - mapping_key: comtrade.batch.2709.X.bilateral
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: "*", field: primaryValue}
+    target: {concept_id: trade.hs2709.export_value.bilateral, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: *ct_subjects
+      years: {in: [2023]}
+      classifications: [H4, H5, H6]
+    eligibility: eligible
+  - mapping_key: comtrade.batch.2709.M.netWgt.world
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: M, partnerCode: 0, field: netWgt}
+    target: {concept_id: trade.hs2709.import_net_weight.world_total, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: *ct_subjects
+      years: {from: 2019, to: 2024}
+      classifications: [H4, H5, H6]
+      admit_unclassified_missing: true
+    eligibility: eligible
+  - mapping_key: comtrade.batch.2709.X.netWgt.world
+    source_ref: {provider: comtrade, cmdCode: "2709", flowCode: X, partnerCode: 0, field: netWgt}
+    target: {concept_id: trade.hs2709.export_net_weight.world_total, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: *ct_subjects
+      years: {from: 2019, to: 2024}
+      classifications: [H4, H5, H6]
+      admit_unclassified_missing: true
+    eligibility: eligible

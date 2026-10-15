@@ -36,7 +36,8 @@ This page is an orientation only.
   60 s (default 5, allowed 1–1000, invalid values fail at startup; never
   disabled), plus a global window of `max(60, 12 × limit)` attempts. Excess
   attempts get 429 `rate_limited` with `retry_after`; attempts, failures and
-  rate-limit events are audited. The limiter is in memory (one API process).
+  rate-limit events are audited (the typed username is never stored: rows hold
+  `username_matched_admin` and a keyed `username_tag`). The limiter is in memory (one API process).
 * Errors are RFC 9457 problem details with a stable `code`. Unsupported requests
   (e.g. a five-year horizon, L3/L4 fidelity) return **422 `capability_gap`**;
   missing scenario inputs return **422 `missing_input`**; never a fabricated

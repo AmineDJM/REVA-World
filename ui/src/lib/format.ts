@@ -217,16 +217,34 @@ export function formatDate(iso: string | null | undefined): string {
   return d.toISOString().slice(0, 10);
 }
 
+const VALID_TIME_BASIS: Record<string, string> = {
+  scenario_reference_year: 'scenario reference year',
+};
+
+/** Date part of an ISO instant when it is midnight UTC, else the full UTC instant. */
+function instantLabel(v: string): string {
+  const m = /^(\d{4}-\d{2}-\d{2})(?:T00:00(?::00(?:\.0+)?)?(?:Z|\+00:00))?$/.exec(v.trim());
+  return m ? m[1]! : formatDateTime(v);
+}
+
+/**
+ * Valid / reference time. Accepts a TimeExtent ({label} or {start,end}), the envelope window
+ * {start, end, bounds: "[)", basis, reference_year}, or a plain string. A half-open window is
+ * printed with its bounds, e.g. "2023 (scenario reference year) · [2023-01-01, 2024-01-01)".
+ */
 export function validTimeLabel(vt: TimeExtent | Record<string, unknown> | string | null | undefined): string {
   if (!vt) return 'not stated';
   if (typeof vt === 'string') return vt;
   if (vt.label) return String(vt.label);
-  const start = vt.start ? String(vt.start) : '';
-  const end = vt.end ? String(vt.end) : '';
-  if (start && end) return `[${start}, ${end})`;
-  if (start) return `from ${start}`;
-  if (end) return `until ${end}`;
-  return 'not stated';
+  const start = vt.start ? instantLabel(String(vt.start)) : '';
+  const end = vt.end ? instantLabel(String(vt.end)) : '';
+  const bounds = typeof vt.bounds === 'string' && vt.bounds.length === 2 ? vt.bounds : '[)';
+  const interval = start && end ? `${bounds[0]}${start}, ${end}${bounds[1]}` : start ? `from ${start}` : end ? `until ${end}` : '';
+  const basis = typeof vt.basis === 'string' ? (VALID_TIME_BASIS[vt.basis] ?? vt.basis.replace(/_/g, ' ')) : '';
+  const year = typeof vt.reference_year === 'number' || typeof vt.reference_year === 'string' ? String(vt.reference_year) : '';
+  const head = year ? `${year}${basis ? ` (${basis})` : ''}` : basis;
+  if (head && interval) return `${head} · ${interval}`;
+  return head || interval || 'not stated';
 }
 
 /** Short opaque id for display; the full id stays in title/aria. */
@@ -288,6 +306,9 @@ export function isQuantityConcept(concept: string | null | undefined): boolean {
   return !!concept && /(net_weight|quantity|\bqty\b|\.weight)/i.test(concept);
 }
 
+/** provider_value_estimated === null: the provider flags cannot tell whether the value is estimated. */
+export const UNDETERMINABLE_NOTE = 'estimation status undeterminable from provider flags';
+
 const LEGACY_FLAG_NOTE = 'legacy flag (meaning: quantity/net weight estimated)';
 
 /**
@@ -296,7 +317,7 @@ const LEGACY_FLAG_NOTE = 'legacy flag (meaning: quantity/net weight estimated)';
  * as anything.
  *
  * Comtrade estimation (connector 1.2.0): only `provider_value_estimated === true` labels a value
- * as a provider estimate (`null` means undeterminable and says nothing). `provider_quantity_estimated`
+ * as a provider estimate; `null` means undeterminable and is shown as such (never as "not estimated"). `provider_quantity_estimated`
  * concerns quantity / net weight and is shown only on quantity/weight concepts. The 1.1.0 key
  * `provider_estimation_flagged` (legacyEstimationFlag != 0) codes estimated quantity/net weight,
  * never the USD value: on old rows it is shown as a legacy flag with that meaning, never as a
@@ -318,6 +339,9 @@ export function sourceFlagNotes(flags: Record<string, unknown> | null | undefine
   }
   if (flags.provider_returned_no_rows === true) out.push('provider returned no rows for this key');
   if (valueEstimated && !out.some((n) => /estimat/i.test(n))) out.push('provider estimate (value marked estimated by the provider)');
+  if ('provider_value_estimated' in flags && flags.provider_value_estimated === null) {
+    out.push(UNDETERMINABLE_NOTE);
+  }
   if (isQuantityConcept(concept) && flags.provider_quantity_estimated === true) {
     out.push(`provider estimate of quantity/net weight${lefText ? ` (${lefText})` : ''}`);
   }
@@ -325,7 +349,7 @@ export function sourceFlagNotes(flags: Record<string, unknown> | null | undefine
     out.push(`${LEGACY_FLAG_NOTE}${lefText ? `, ${lefText}` : ''}`);
   }
   if (flags.legacy_estimation_code_unrecognised === true) out.push(`unrecognised provider estimation code${lefText ? ` (${lefText})` : ''}`);
-  if (flags.isReported === false && !valueEstimated && !out.some((n) => /reported/i.test(n))) {
+  if (flags.isReported === false && !valueEstimated && !out.some((n) => /directly reported|isReported/i.test(n))) {
     out.push('not directly reported (isReported=false)');
   }
   if (typeof flags.obs_status === 'string' && flags.obs_status.trim()) out.push(`provider status: ${flags.obs_status.trim()}`);

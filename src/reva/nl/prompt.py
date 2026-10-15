@@ -54,13 +54,18 @@ set, replace or assume a data value (for example "use value 0 for a country") is
 it with capability_key "nl.input_value_override".
 8. countries: ISO 3166-1 alpha-3 codes. Map country names to their code. If the code is not in the chosen \
 model's country list, still write that code (the server reports it); never substitute another country.
-9. reference_year: only a year the user states, else null. fidelity: only if the user names one or asks for \
+9. reference_year: only a year the user states, else null. Never change a stated year; if it is outside the \
+model's range, still write it (the server reports it). fidelity: only if the user names one or asks for \
 a sensitivity analysis (then the model's sensitivity fidelity), else null.
 10. outputs: only outputs of the chosen model the user asks for; an empty list means all of its outputs. An \
 output the model does not compute is an unsupported item, never a substitute output.
-11. parameters: one entry per parameter path you set (use [0], [1], ... for list items, e.g. \
-"assumptions.elasticity_grid[0].import_elasticity"); number for numeric values, text for choices, the other \
-one null.
+11. parameters: one entry per parameter you set. path is exactly one catalogue parameter path (a leaf such \
+as "intervention.import_multiplier", never an object such as "intervention"); for list items replace [] by \
+[0], [1], ... (e.g. "assumptions.elasticity_grid[0].import_elasticity"). number holds numeric values, text \
+holds choices; the other one is null. Example: "imports 20 % more expensive" on a ratio multiplier gives \
+{"path": "intervention.import_multiplier", "number": 1.2, "text": null, "quote": "20 % more expensive"}. \
+A parameter the user does not mention may be set only to the neutral value its meaning states (for example \
+a multiplier of 1.0 = unchanged); record that choice in assumptions_added. Otherwise leave it out.
 12. request_restatement: one or two neutral sentences restating what the user asked, including the \
 unsupported parts, in the user's language (French if the text is French, otherwise English). \
 input_language: "fr", "en" or "other". title: a short neutral title (at most 120 characters) in the \
@@ -71,9 +76,35 @@ CATALOGUE (trusted, from the server registry):
 """
 
 
-def output_schema() -> dict[str, Any]:
-    """Structural JSON Schema of the LLM output (strict-mode compatible, provider-neutral)."""
+MAX_LIST_ROWS = 10
+
+
+def parameter_paths(catalog: DraftCatalog | None) -> list[str]:
+    """Every settable parameter path of the catalogue, list items indexed [0]..[9]."""
+    if catalog is None:
+        return []
+    paths: set[str] = set()
+    for m in catalog.models.values():
+        for p in m.parameters:
+            if "[]" in p.path:
+                paths.update(p.path.replace("[]", f"[{i}]", 1) for i in range(MAX_LIST_ROWS))
+            else:
+                paths.add(p.path)
+    return sorted(paths)
+
+
+def output_schema(catalog: DraftCatalog | None = None) -> dict[str, Any]:
+    """JSON Schema of the LLM output (strict-mode compatible, provider-neutral).
+
+    Only parameter *paths* are an enum (the live model otherwise wrote object paths such as
+    "intervention" with prose): a path carries no user meaning, so constraining it cannot make the
+    model substitute something the user did not ask. Model keys, countries, outputs and capability
+    keys stay free strings and are checked against the allow-list server-side, so an unknown ask is
+    reported instead of being forced onto an allowed identifier. No numeric limits either.
+    """
     s = {"type": "string"}
+    paths = parameter_paths(catalog)
+    path_schema: dict[str, Any] = {"type": "string", "enum": paths} if paths else s
     return {
         "type": "object",
         "additionalProperties": False,
@@ -90,7 +121,7 @@ def output_schema() -> dict[str, Any]:
             "outputs": {"type": "array", "items": s},
             "parameters": {"type": "array", "items": {
                 "type": "object", "additionalProperties": False, "required": ["path", "number", "text", "quote"],
-                "properties": {"path": s, "number": {"type": ["number", "null"]}, "text": {"type": ["string", "null"]},
+                "properties": {"path": path_schema, "number": {"type": ["number", "null"]}, "text": {"type": ["string", "null"]},
                                "quote": s}}},
             "unsupported": {"type": "array", "items": {
                 "type": "object", "additionalProperties": False, "required": ["text", "capability_key", "reason"],
@@ -113,5 +144,5 @@ def prompt_digest(catalog: DraftCatalog) -> str:
     """sha256 of the exact system prompt and output schema sent for this catalogue."""
     h = hashlib.sha256()
     h.update(system_prompt(catalog).encode())
-    h.update(json.dumps(output_schema(), sort_keys=True).encode())
+    h.update(json.dumps(output_schema(catalog), sort_keys=True).encode())
     return h.hexdigest()

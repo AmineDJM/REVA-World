@@ -19,10 +19,19 @@ child verified by probing, never a nominal claim):
   both fail; otherwise ``python_guard_only`` (not a boundary). The child also
   records whether the parent's environment is readable and whether it runs as
   the same UID (``process_isolation``);
-* OS limits (CPU seconds, address space, open files, file size) applied by the
-  child itself as its first action (``--limits`` argument) plus ``prlimit`` from
-  the parent; no ``preexec_fn`` (unsafe in the multi-threaded worker, R4-15);
-* wall-time limit enforced by the parent.
+* OS limits (CPU seconds, address space, open files, file size, and since R6-13
+  ``RLIMIT_NPROC`` = 1, i.e. no fork/thread creation for an unprivileged child)
+  applied by the child itself as its first action (``--limits`` argument) plus
+  ``prlimit`` from the parent; no ``preexec_fn`` (unsafe in the multi-threaded
+  worker, R4-15);
+* a private, freshly created 0700 HOME/TMPDIR as the only intended writable place;
+* filesystem reach is *measured* (R6-13): the child probes whether it can write
+  outside its private directory and whether it shares the host filesystem
+  (there is no mount isolation of the root filesystem); the evidence states it
+  and a ``filesystem_shared`` warning is recorded;
+* wall-time limit enforced by the parent;
+* the child's stderr/stdout and an external runner's response are redacted
+  (``reva.operations.telemetry``) before they become evaluation evidence (P6).
 
 Because a Python subprocess is not a security boundary for hostile code, any
 proposal that contains code (``.py``/script paths or ``execute_code``) is never
@@ -232,6 +241,12 @@ class TrustedTemplateSandbox:
             findings.append(_f("network_not_os_isolated", "warning",
                                "outbound network was not verified blocked at OS level: python guard only "
                                "(trusted-template isolation is not a security boundary)"))
+        fs = out.get("filesystem") or {}
+        if fs.get("outside_private_dir_writable") or fs.get("shared_host_filesystem", True):
+            findings.append(_f("filesystem_shared", "warning",
+                               "the child shares the worker's filesystem (no mount isolation of the root "
+                               f"filesystem; write outside its private dir: {fs.get('outside_private_dir_writable')})"
+                               "; trusted-template isolation is not a security boundary"))
         if out.get("parent_environ_readable"):
             findings.append(_f("parent_environment_readable", "warning",
                                "the child could read the worker's /proc/<pid>/environ (same UID, no PID namespace)"))
@@ -259,7 +274,9 @@ class TrustedTemplateSandbox:
                               "max_memory_bytes": policy.budget.max_memory_bytes,
                               "max_wall_seconds": policy.budget.max_wall_seconds},
                    "network": "blocked_by_default", "secrets": "none"}
-        resp = dict(await self.external_runner.run(request))
+        from reva.operations.telemetry import redact_obj
+
+        resp = redact_obj(dict(await self.external_runner.run(request)))
         evidence["external_response"] = resp
         outcome = resp.get("outcome") if resp.get("outcome") in ("pass", "fail", "blocked") else "blocked"
         for x in resp.get("findings") or []:
@@ -290,7 +307,7 @@ class TrustedTemplateSandbox:
     @staticmethod
     def _spawn(request: dict[str, Any], policy: SandboxPolicy) -> tuple[dict[str, Any], dict[str, Any]]:
         limits = {"cpu": max(1, int(policy.budget.max_cpu_seconds)), "as": int(policy.budget.max_memory_bytes),
-                  "nofile": 64, "fsize": 1_048_576}
+                  "nofile": 64, "fsize": 1_048_576, "nproc": 1}
         unshare = namespace_isolation()
         child = [sys.executable, "-I", "-m", "reva.autonomy.sandbox_child", "--limits", json.dumps(limits)]
         cmd = [*unshare, *child] if unshare else child
@@ -303,8 +320,10 @@ class TrustedTemplateSandbox:
                "public_probe": list(PUBLIC_PROBE_ADDR),
                "namespaces": bool(unshare)}
         with tempfile.TemporaryDirectory(prefix="reva-sandbox-") as cwd, \
-                tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home:
+                tempfile.TemporaryDirectory(prefix="reva-sandbox-home-") as home, \
+                tempfile.TemporaryDirectory(prefix="reva-sandbox-outside-") as outside:
             os.chmod(cwd, 0o500)  # read-only working directory
+            req["outside_probe_dir"] = outside  # a worker-owned 0700 dir the child must not be able to write
             env = {**scrubbed_environment(), "HOME": home, "TMPDIR": home}
             try:
                 proc = subprocess.Popen(cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
@@ -332,12 +351,17 @@ class TrustedTemplateSandbox:
             out.setdefault("ok", False)
             out.setdefault("error", stderr.decode(errors="replace")[-500:])
         out["launcher"] = " ".join(unshare[1:-1]) if unshare else "plain_subprocess"
-        return out, usage
+        # (P6) child output becomes evaluation evidence: never store a secret it may have printed
+        from reva.operations.telemetry import redact_obj
+
+        return redact_obj(out), usage
 
 
 def _prlimit(pid: int, limits: Mapping[str, int]) -> None:
     pairs = {"cpu": resource.RLIMIT_CPU, "as": resource.RLIMIT_AS, "nofile": resource.RLIMIT_NOFILE,
              "fsize": resource.RLIMIT_FSIZE}
+    # RLIMIT_NPROC is set by the child itself only: applied from here it could hit the ``unshare``
+    # launcher before it forks the child (the limit counts every process of the host uid).
     for k, r in pairs.items():
         v = int(limits.get(k, 0))
         if v > 0:

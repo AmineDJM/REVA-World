@@ -393,6 +393,10 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     ("ingest:crossref.works.doi", "ingest", {"connector": "crossref.works.doi"}, 7 * 86400),
     # Promoted by the autonomy gate (agent G); the ingest handler is a no-op until promotion.
     ("ingest:eurostat.demo_pjan.fr", "ingest", {"connector": "eurostat.demo_pjan.fr"}, 7 * 86400),
+    # V2 step 1 (ALLC): every crosswalk country. Comtrade rotates over reporter batches,
+    # one bounded slice per daily run (cursor offset), within the per-source daily budget.
+    ("ingest:worldbank.wdi.all_economies", "ingest", {"connector": "worldbank.wdi.all_economies"}, 30 * 86400),
+    ("ingest:un.comtrade.public_batch", "ingest", {"connector": "un.comtrade.public_batch"}, 86400),
     ("health:connectors", "health", {}, 86400),
     ("gaps:mvp", "gaps", {}, 86400),
     ("gc:orphans", "gc", {}, 86400),
@@ -432,7 +436,9 @@ def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
         "models": list(reg.models),
         "partners_sha256": sha256_bytes(partners.read_bytes()),
         "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
-        "connectors": sorted([s.name, s.version, s.code_digest]
+        # identity only: a changed spec/code under the same version is refused by
+        # register_connector_version when the owner seeds, not hidden in the fingerprint
+        "connectors": sorted([s.name, s.version]
                              for s in (c.describe() for c in builtin_connectors(contact_email).values())),
         "schedules": [list(x) for x in DEFAULT_SCHEDULES],
     })

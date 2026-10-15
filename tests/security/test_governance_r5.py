@@ -15,20 +15,18 @@ from uuid import UUID
 import pytest
 from sqlalchemy import Connection, create_engine, text
 from sqlalchemy.exc import DBAPIError
+from test_db_hardening import PROMOTION_SQL, activity, build_world, evaluation, new_artifact, tx
 
 from reva.kernel.errors import ConfigurationError
-from test_db_hardening import (  # noqa: F401  (w is a fixture)
-    PROMOTION_SQL,
-    activity,
-    evaluation,
-    new_artifact,
-    tx,
-    w,
-)
 
 pytestmark = pytest.mark.db
 
 DENIED = "governance|permission denied"
+
+
+@pytest.fixture(scope="module")
+def w(db: Any) -> dict[str, Any]:
+    return build_world(db)
 
 
 def refused(c: Connection, sql: str, params: dict[str, Any] | None = None, match: str = DENIED) -> None:

@@ -72,7 +72,15 @@ def ready(request: Request) -> Any:
         raise
     except Exception as e:
         checks.append(s.HealthCheck(name="database", ok=False, detail=type(e).__name__))
-    ok = bool(checks) and all(c.ok for c in checks)
+    # Object store: reported, never fatal (a wrong bucket/key shows here instead of at first use).
+    try:
+        from reva.adapters.objects.factory import get_store, probe_store
+
+        p = probe_store(get_store())
+        checks.append(s.HealthCheck(name="object_store", ok=p["status"] == "ok", detail=p.get("error")))
+    except Exception as e:
+        checks.append(s.HealthCheck(name="object_store", ok=False, detail=type(e).__name__))
+    ok = bool(checks) and all(c.ok for c in checks if c.name != "object_store")
     body = s.HealthReady(status="ready" if ok else "not_ready", checks=checks)
     return JSONResponse(body.model_dump(mode="json"), status_code=200 if ok else 503)
 
