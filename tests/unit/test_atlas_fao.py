@@ -165,7 +165,8 @@ def test_values_are_verbatim_and_periods_follow_faostat_years() -> None:
     f, _, _ = _parsed("fbs")
     c = _cell(f, iso3="FRA", indicator="2901|664", period_start=date(2020, 1, 1))
     assert c["unit"] == "kcal/cap/d" and c["period_end"] == date(2021, 1, 1)
-    assert "." not in c["value"] or c["value"].endswith("0") or c["value"][-1].isdigit()
+    assert c["value"] == "3485.450000"  # verbatim, never rescaled or re-rounded
+    assert json.loads(c["flags"]) == {"estimate_kind": "estimated", "flag": "E", "flag_meaning": "Estimated value"}
     fs, _, _ = _parsed("fs")
     multi = fs.filter((pl.col("period_end") - pl.col("period_start")).dt.total_days() > 366)
     assert multi.height > 0  # "2000-2002" 3-year averages -> [2000, 2003)
@@ -285,12 +286,17 @@ class _FakeRun:
 
     def register(self, *, dataset: str, frame: pl.DataFrame, raw_sha256s: list[str], **kw: Any) -> dict[str, Any]:
         assert set(raw_sha256s) <= set(self.archived)
-        f, unmapped = validate_atlas_frame(
+        f, _unmapped = validate_atlas_frame(
             frame, source="fao", dataset=dataset, raw_sha256s=raw_sha256s, geo_scheme=kw.get("geo_scheme")
         )
         assert kw["rights"]["licence"] == "CC-BY-4.0" and kw["coverage_note"].startswith("FAOSTAT")
         self.registered[dataset] = (f, kw)
-        return {"dataset_key": f"atlas.fao.{dataset}", "row_count": f.height, "coverage": {"countries": 0}, "created": True}
+        return {
+            "dataset_key": f"atlas.fao.{dataset}",
+            "row_count": f.height,
+            "coverage": {"countries": 0},
+            "created": True,
+        }
 
 
 def test_atlas_ingest_registers_every_domain_from_fixtures() -> None:

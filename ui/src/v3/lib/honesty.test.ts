@@ -63,7 +63,7 @@ describe('a path is not a cause', () => {
   it('ordinary hops say "relié via « propriété »" with no causal wording', () => {
     const v = fromLinks(links);
     const p0 = v.paths[0]!;
-    expect(p0.hops.map((h) => h.sentence)).toEqual([connectedSentence('participant à'), connectedSentence('signataire'), connectedSentence('ancienne colonie de')]);
+    expect(p0.hops.map((h) => h.sentence)).toEqual([connectedSentence('participant à'), connectedSentence('signataire'), connectedSentence('ancienne puissance coloniale de')]);
     for (const h of p0.hops) {
       expect(h.causal).toBeNull();
       expect(h.sentence).not.toMatch(CAUSAL_WORDS);
@@ -181,5 +181,16 @@ describe('French decimals', () => {
     expect(frDecimal('-0.0004', 3)).toBe('0');
     expect(frDecimal('1999.9996', 3)).toBe('2 000');
     expect(frDecimal('0', 2)).toBe('0');
+  });
+});
+
+describe('legend classes', () => {
+  it('few distinct values give one class each, labelled by the reported values', async () => {
+    const { legendRows } = await import('./choropleth');
+    const cells = AtlasMapResponse.parse(F.mapResponse(2022)).data.values;
+    const scale = buildScale(cells)!;
+    const rows = legendRows(scale, '%');
+    expect(rows).toHaveLength(5);
+    expect(rows.map((r) => r.label)).toEqual(['3,1', '3,6', '7,5', '10,8', '29,8']);
   });
 });

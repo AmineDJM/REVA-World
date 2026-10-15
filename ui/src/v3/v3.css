@@ -784,6 +784,22 @@
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  table-layout: fixed;
+}
+.v3-cells thead th:nth-child(1) {
+  width: 30%;
+}
+.v3-cells thead th:nth-child(2) {
+  width: 17%;
+}
+.v3-cells thead th:nth-child(3) {
+  width: 15%;
+}
+.v3-cells thead th:nth-child(5) {
+  width: 136px;
+}
+.v3-domain-empty h2 {
+  color: var(--muted);
 }
 .v3-cells th,
 .v3-cells td {

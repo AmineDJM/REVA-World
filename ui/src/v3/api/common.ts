@@ -68,6 +68,24 @@ export function envelopeOf<D extends z.ZodType>(data: D) {
 /** Strict decimal string as the atlas serves it ("-12.5", "3e-4"); never a JSON number. */
 export const DecimalString = z.string().regex(/^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/, 'valeur décimale attendue sous forme de chaîne');
 
+/** Server warnings in French; the ones the screen already states (path ≠ cause) are dropped. */
+const WARNING_FR: Record<string, string | null> = {
+  path_not_causal: null,
+  community_edited: 'Les déclarations Wikidata sont des contributions communautaires, non vérifiées par REVA.',
+  fixture_data: 'Données de test (test_fixture), pas des données publiées.',
+  truncated: 'Recherche ou liste bornée par le serveur : d’autres résultats peuvent exister.',
+  display_only: 'Géométrie d’affichage seulement.',
+};
+
+export function warningsFr(ws: { code: string; message: string }[]): string[] {
+  const out: string[] = [];
+  for (const w of ws) {
+    const t = w.code in WARNING_FR ? WARNING_FR[w.code] : w.message;
+    if (t && !out.includes(t)) out.push(t);
+  }
+  return out;
+}
+
 export const JsonRecord = z.record(z.string(), z.unknown());
 
 // ------------------------------------------------------------------ error classification

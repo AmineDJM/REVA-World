@@ -133,6 +133,22 @@ PIP_LABELS: Mapping[str, tuple[str, str]] = {
 }  # fmt: skip
 
 
+#: REVA domain -> atlas theme (registry/atlas/themes.yaml), set as each concept's ``theme``.
+THEME_OF_DOMAIN: Mapping[str, str] = {
+    "economy": "economy", "population": "population", "labour": "labour", "health": "health",
+    "education": "education", "environment": "environment", "energy": "energy", "governance": "politics",
+    "science": "science", "geography": "geography", "trade": "trade", "finance": "finance",
+    "gender": "society", "poverty": "society", "social_protection": "society", "business": "economy",
+    "agriculture": "economy", "infrastructure": "economy",
+}  # fmt: skip
+
+
+def theme_for(code: str, domain: str) -> str:
+    if code.startswith("IT."):  # communications (themes.yaml alias communications -> science)
+        return "science"
+    return THEME_OF_DOMAIN.get(domain, "economy")
+
+
 def concept_id(code: str) -> str | None:
     cid = "wb." + code.lower()
     return cid if CONCEPT_RE.match(cid) else None
@@ -279,6 +295,7 @@ def build_catalog(
                 "unit": unit[:100],
                 "domain": CATALOG_DOMAIN,
                 "subdomain": dom,
+                "theme": theme_for(code, dom),
                 "value_kind": "numeric",
                 "source_order": source_order,
                 "provider_declared": True,
@@ -311,6 +328,7 @@ def build_catalog(
                 "unit": PIP_UNITS.get(measure, "unspecified"),
                 "domain": CATALOG_DOMAIN,
                 "subdomain": "poverty",
+                "theme": "society",
                 "value_kind": "numeric",
                 "source_order": [f"{SOURCE}.pip.{ind}"],
                 "provider_declared": True,

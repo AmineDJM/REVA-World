@@ -74,6 +74,13 @@ async def test_constitute_ccp_factbook_ssa(db):
     (t,) = rep["tables"]
     assert t["countries"] == 4 and [u["provider_geo"] for u in t["unmapped_provider_geo"]] == ["TW"]
 
+    # SSPTW: fixtures hold the Europe index, guide and 5 country pages; every other request is a typed
+    # fixture_missing entry (the other regions' index/guide and 40 Europe pages), never an invented value
     out = await _fixture_run(db, atlas_ssa_ssptw)
-    assert out["summary"]["status"] == "blocked" and out["summary"]["blocked"][0]["http_status"] == 403
-    assert out["registered"] == [] and out["archived_raw"] == 0
+    rep = out["summary"]
+    assert rep["status"] == "partial" and {b["reason"] for b in rep["blocked"]} == {"fixture_missing"}
+    (t,) = rep["tables"]
+    assert t["dataset_key"] == "atlas.ssa.ssptw_2018_2019" and t["countries"] == 5 and t["unmapped_provider_geo"] == []
+    frame = read_atlas_table(db.store, t["artifact_sha256"])
+    che = frame.filter((pl.col("iso3") == "CHE") & pl.col("indicator").str.starts_with("old_age.pension_age."))
+    assert sorted(che["value"].to_list()) == ["64", "65"]

@@ -50,7 +50,7 @@ function sourceLabel(source: string): string {
   return isWikidataSource(source) ? 'Wikidata (contribution communautaire, non vérifiée)' : source;
 }
 
-function linkDates(t: LinkTemporal): { text: string; undated: boolean } {
+export function linkDates(t: LinkTemporal): { text: string; undated: boolean } {
   if (t.kind === 'undated') return { text: 'non daté dans la source', undated: true };
   if (t.kind === 'snapshot') return { text: t.year !== null && t.year !== undefined ? formatYear(t.year) : '', undated: false };
   if (t.kind === 'point') return { text: formatYear(yearOfPartial(t.point)), undated: false };
@@ -94,8 +94,11 @@ export function fromLinks(d: LinksPathData): PathsView {
       cost: p.cost ?? null,
       nodes: p.nodes.map(L),
       hops: p.hops.map((h) => {
+        // The server's hop text carries the label in the traversal direction (inverse labels for
+        // backward hops, e.g. "ancienne puissance coloniale de"); the type tables are fallbacks.
+        const typeLabel = h.kind === 'link' ? LINK_TYPE_LABEL[h.type] : PID_LABEL_FR[h.type];
         const relation =
-          (h.kind === 'link' ? LINK_TYPE_LABEL[h.type] : null) ?? relationFromText(h.text.fr) ?? PID_LABEL_FR[h.type] ?? relationFromText(h.text.en) ?? h.type;
+          relationFromText(h.text.fr) ?? (typeLabel ? (h.forward ? typeLabel : `${typeLabel} (sens inverse)`) : null) ?? relationFromText(h.text.en) ?? h.type;
         const citations = h.evidence.map(citeLinkEvidence);
         const stmtEvidence = h.evidence.find((e) => e.kind === 'kg_statement');
         const isCausal = h.causal === true && h.kind === 'statement' && !!stmtEvidence;

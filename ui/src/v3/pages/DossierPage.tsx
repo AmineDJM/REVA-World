@@ -11,10 +11,10 @@ import { Sparkline } from '../components/Sparkline';
 import { V3Error, V3Loading } from '../components/States';
 import { citeAtlasCell, citeLinkEvidence } from '../lib/citations';
 import { iso3OfFeatureKey } from '../lib/choropleth';
-import { domainLabel, domainRank } from '../lib/domains';
+import { DOMAIN_ORDER, domainLabel, domainRank } from '../lib/domains';
 import { cellText } from '../lib/choropleth';
 import { flagLines } from '../lib/format';
-import { formatYear, yearOfPartial } from '../lib/time';
+import { linkDates } from '../lib/paths';
 import { buildTimeline } from '../lib/timeline';
 
 export default function DossierPage() {
@@ -103,13 +103,26 @@ export default function DossierPage() {
             {dossier.data.snapshot.snapshot_sha256.slice(0, 12)}… arrêté au {dossier.data.snapshot.knowledge_cutoff.slice(0, 10)}{' '}
             {dossier.data.snapshot.origin === 'test_fixture' && <FixtureBadge />} <ProviderDeclaredBadge />
           </p>
-          {dossier.data.notes.map((n) => (
-            <p key={n} className="field-hint">
-              {n}
-            </p>
-          ))}
+          <p className="field-hint">
+            Chaque cellule est ce qu’une source rapporte ; la « meilleure disponible » suit l’ordre de sources déclaré du concept, sans mélange, imputation
+            ni zéro de remplissage.
+            {dossier.data.notes.length > 0 && (
+              <details>
+                <summary>Notes du serveur</summary>
+                {dossier.data.notes.map((n) => (
+                  <p key={n}>{n}</p>
+                ))}
+              </details>
+            )}
+          </p>
           {domains.map((d) => (
             <DomainSection key={d.domain} d={d} conceptById={conceptById} />
+          ))}
+          {DOMAIN_ORDER.filter((o) => !domains.some((d) => d.domain === o.id || (o.aliases ?? []).includes(d.domain))).map((o) => (
+            <section key={o.id} id={`dom-${o.id}`} className="v3-domain v3-domain-empty" aria-labelledby={`h-${o.id}`}>
+              <h2 id={`h-${o.id}`}>{o.label}</h2>
+              <p className="muted">Aucune variable de ce domaine n’est encore au catalogue de l’atlas : rien à afficher (ce n’est pas une valeur nulle).</p>
+            </section>
           ))}
         </>
       )}
@@ -223,7 +236,7 @@ function KgHistory({ links }: { links: ApiState<CountryLinksResponse> }) {
       {model && (
         <>
           <p>
-            {model.items.length} éléments datés{model.undated.length ? `, ${model.undated.length} non datés` : ''}.{' '}
+            {model.items.length} élément(s) daté(s){model.undated.length ? `, ${model.undated.length} non daté(s)` : ''}.{' '}
             <Link to={`/v3/frise?qid=${encodeURIComponent(qid!)}`}>Ouvrir la frise complète</Link> ·{' '}
             <Link to={`/v3/neurones?qid=${encodeURIComponent(qid!)}`}>Explorer en neurones</Link>
           </p>
@@ -266,14 +279,7 @@ function CountryLinks({ links, iso3 }: { links: ApiState<CountryLinksResponse>; 
                   const self = links.data.data.qid;
                   const other = l.subject === self ? l.object : l.subject;
                   const t = l.temporal;
-                  const dates =
-                    t.kind === 'undated'
-                      ? 'non daté dans la source'
-                      : t.kind === 'snapshot'
-                        ? String(t.year)
-                        : t.kind === 'point'
-                          ? formatYear(yearOfPartial(t.point))
-                          : `${t.start ? formatYear(yearOfPartial(t.start)) : '?'} – ${t.end ? formatYear(yearOfPartial(t.end)) : ''}`;
+                  const dates = linkDates(t).text;
                   return (
                     <li key={`${other}-${i}`}>
                       <Link to={`/v3/chemin?from=${encodeURIComponent(self)}&to=${encodeURIComponent(other)}`}>{linkNodeLabel(links.data.data.labels, other)}</Link>{' '}

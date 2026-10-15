@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import { getLocations } from '../../api/client';
 import { useApi } from '../../lib/useApi';
+import { warningsFr } from '../api/common';
 import { conceptLabel, getAtlasConcepts, getAtlasCoverage, getAtlasMap, type AtlasConcept, type AtlasMapResponse } from '../api/atlas';
 import { FixtureBadge, MissingCell, ProviderDeclaredBadge } from '../components/Honesty';
 import { V3Empty, V3Error, V3Loading } from '../components/States';
@@ -263,8 +264,8 @@ function Legend({ data, scaleRows }: { data: AtlasMapResponse; scaleRows: { colo
       </p>
       {data.warnings.length > 0 && (
         <ul className="v3-warnings">
-          {data.warnings.map((w) => (
-            <li key={w.code}>{w.message}</li>
+          {warningsFr(data.warnings).map((w) => (
+            <li key={w}>{w}</li>
           ))}
         </ul>
       )}

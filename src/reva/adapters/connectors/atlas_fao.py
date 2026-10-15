@@ -57,7 +57,6 @@ import hashlib
 import inspect
 import io
 import json
-import re
 import sys
 import zipfile
 from collections.abc import Iterator, Mapping
@@ -404,12 +403,11 @@ def _col(df: pl.DataFrame, *names: str) -> str | None:
     return None
 
 
-def _indicator_expr(df: pl.DataFrame) -> tuple[pl.Expr, dict[str, str | None]]:
+def _indicator_expr(df: pl.DataFrame) -> pl.Expr:
     item = _col(df, "Item Code")
     ind = _col(df, "Indicator Code")
     elem = _col(df, "Element Code")
     parts: list[pl.Expr] = []
-    roles: dict[str, str | None] = {"item": item, "indicator": ind, "element": elem}
     if item is not None:
         parts.append(pl.col(item))
     if ind is not None:
@@ -422,7 +420,7 @@ def _indicator_expr(df: pl.DataFrame) -> tuple[pl.Expr, dict[str, str | None]]:
         parts.append(pl.lit("sex=") + pl.col("Sex Code"))
     if "Source Code" in df.columns:
         parts.append(pl.lit("src=") + pl.col("Source Code"))
-    return pl.concat_str(parts, separator="|"), roles
+    return pl.concat_str(parts, separator="|")
 
 
 def _flags_json(flag: str, note: str, meanings: Mapping[str, str]) -> str:
@@ -490,14 +488,15 @@ def _parse_block(
     bad_year = df.filter(~pl.col("Year").str.contains(YEAR_RE))
     if bad_year.height:
         raise FaoParseError(f"{domain.code}: line {bad_year['line'][0]}: unexpected Year {bad_year['Year'][0]!r}")
-    ind_expr, roles = _indicator_expr(df)
-    df = df.with_columns(ind_expr.alias("_indicator"))
+    df = df.with_columns(_indicator_expr(df).alias("_indicator"))
     # indicator labels (report / catalog)
     name_cols = [c for c in ("Item", "Indicator", "Element", "Sex", "Source", "Unit") if c in df.columns]
     for row in df.select(["_indicator", *name_cols]).unique(subset=["_indicator"]).iter_rows(named=True):
         rep.indicators.setdefault(row["_indicator"], {k.lower(): (row[k] or "") for k in name_cols})
     for code, m49, name, y in (
-        df.group_by(["Area Code", "Area Code (M49)", "Area"] if "Area" in df.columns else ["Area Code", "Area Code (M49)"])
+        df.group_by(
+            ["Area Code", "Area Code (M49)", "Area"] if "Area" in df.columns else ["Area Code", "Area Code (M49)"]
+        )
         .agg(pl.col("Year").min().alias("y0"), pl.col("Year").max().alias("y1"))
         .with_columns(pl.concat_list("y0", "y1").alias("y"))
         .select(
@@ -516,7 +515,9 @@ def _parse_block(
     y0 = pl.col("Year").str.slice(0, 4).cast(pl.Int32)
     y1 = pl.when(pl.col("Year").str.len_chars() == 9).then(pl.col("Year").str.slice(5, 4).cast(pl.Int32)).otherwise(y0)
     if "Months Code" in df.columns:
-        month = pl.when(pl.col("Months Code") == "7021").then(None).otherwise(pl.col("Months Code").cast(pl.Int32) - 7000)
+        month = (
+            pl.when(pl.col("Months Code") == "7021").then(None).otherwise(pl.col("Months Code").cast(pl.Int32) - 7000)
+        )
         start = pl.when(month.is_null()).then(pl.date(y0, 1, 1)).otherwise(pl.date(y0, month, 1))
         end = (
             pl.when(month.is_null())
@@ -604,9 +605,7 @@ def parse_domain(domain: Domain, body: bytes, raw_sha256: str) -> tuple[pl.DataF
         rep.areas[code]["iso3"] = iso
     flag_keys = df.select("Flag", "_note").unique()
     fmap = {f"{f}\x1f{n}": _flags_json(f, n, meanings) for f, n in flag_keys.iter_rows()}
-    selector = pl.format(
-        '{{"file":"{}","row":{},"zip":"{}"}}', pl.lit(member), pl.col("line"), pl.lit(domain.file)
-    )
+    selector = pl.format('{{"file":"{}","row":{},"zip":"{}"}}', pl.lit(member), pl.col("line"), pl.lit(domain.file))
     out = df.select(
         pl.lit(SOURCE).alias("source"),
         pl.lit(domain.dataset).alias("dataset"),
@@ -620,9 +619,7 @@ def parse_domain(domain: Domain, body: bytes, raw_sha256: str) -> tuple[pl.DataF
         pl.when(pl.col("_numeric")).then(pl.col("Value")).otherwise(None).alias("value"),
         pl.when(pl.col("_numeric")).then(None).otherwise(pl.col("Value").str.slice(0, 4000)).alias("value_text"),
         pl.col("_unit").str.slice(0, 100).alias("unit"),
-        (pl.col("Flag") + pl.lit("\x1f") + pl.col("_note"))
-        .replace_strict(fmap, return_dtype=pl.String)
-        .alias("flags"),
+        (pl.col("Flag") + pl.lit("\x1f") + pl.col("_note")).replace_strict(fmap, return_dtype=pl.String).alias("flags"),
         pl.lit(raw_sha256).alias("raw_sha256"),
         selector.alias("selector"),
     ).cast(dict(ATLAS_SCHEMA))  # type: ignore[arg-type]

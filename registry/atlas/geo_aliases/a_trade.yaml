@@ -1,0 +1,279 @@
+# Geo schemes of the trade atlas connectors (agent A-TRADE). Targets are crosswalk entity keys.
+# Every alias is quoted from the provider's own code list (archived with each ingest); codes not listed
+# stay unmapped and are listed in each atlas table manifest -- never guessed.
+schemes:
+  # CEPII BACI (src/reva/adapters/connectors/atlas_baci.py). BACI country codes are UN Comtrade reporter
+  # codes (crosswalk field comtrade_reporter: 251 France, 842 USA, 699 India, 757 Switzerland, 579 Norway).
+  # The aliases are ten territories whose BACI code (= their M49 code) is not a Comtrade reporter code in the
+  # crosswalk; BACI's own country_codes file gives their ISO3. Kept unmapped (historical, combined or residual
+  # areas): 58 "Belgium-Luxembourg (...1998)", 200 "Czechoslovakia (...1992)", 278 "Dem. Rep. of Germany
+  # (...1990)", 280 "Fed. Rep. of Germany (...1990)", 490 "Other Asia, nes" (BACI iso3 S19), 530 "Netherlands
+  # Antilles (...2010)", 697 "Europe EFTA, nes", 711 "Southern African Customs Union (...1999)", 736 "Sudan
+  # (...2011)", 810 "USSR (...1990)", 849 "US Misc. Pacific Isds", 891 "Serbia and Montenegro (...2005)".
+  baci:
+    base: comtrade
+    aliases:
+      - {code: "16", iso3: ASM, source: "BACI country_codes_V202601.csv row '16,American Samoa,AS,ASM'"}
+      - {code: "86", iso3: IOT, source: "BACI country_codes_V202601.csv row '86,Br. Indian Ocean Terr.,IO,IOT'"}
+      - {code: "162", iso3: CXR, source: "BACI country_codes_V202601.csv row '162,Christmas Isds,CX,CXR'"}
+      - {code: "166", iso3: CCK, source: "BACI country_codes_V202601.csv row '166,Cocos Isds,CC,CCK'"}
+      - {code: "175", iso3: MYT, source: "BACI country_codes_V202601.csv row '175,Mayotte (Overseas France),YT,MYT'"}
+      - {code: "238", iso3: FLK, source: "BACI country_codes_V202601.csv row '238,Falkland Isds (Malvinas),FK,FLK'"}
+      - {code: "260", iso3: ATF, source: "BACI country_codes_V202601.csv row '260,Fr. South Antarctic Terr.,TF,ATF'"}
+      - {code: "316", iso3: GUM, source: "BACI country_codes_V202601.csv row '316,Guam,GU,GUM'"}
+      - {code: "574", iso3: NFK, source: "BACI country_codes_V202601.csv row '574,Norfolk Isds,NF,NFK'"}
+      - {code: "612", iso3: PCN, source: "BACI country_codes_V202601.csv row '612,Pitcairn,PN,PCN'"}
+    source:
+      kind: provider_reference_list
+      url: "https://www.cepii.fr/DATA_DOWNLOAD/baci/data/BACI_HS92_V202601.zip"
+      member: country_codes_V202601.csv
+      member_sha256: "c6892f28bea23d689b29b074d299cea7f5196c708b03026fbe419fa4ecb4e820"
+      retrieved_at: "2026-10-15T22:57:00Z"
+  # UNCTADstat bulk files (src/reva/adapters/connectors/atlas_unctad.py): column "Economy" (and "Partner")
+  # holds UN M49 codes zero-padded to 3 digits for economies and 4-digit codes for UNCTAD groups (0000
+  # World, 1400 Developing economies, ...). Every 3-digit code below was observed in the 2026-10-15 bulk
+  # files with the label quoted; the target is the crosswalk entity of that M49 code, except 412 "Kosovo"
+  # (not an M49 code; crosswalk XKX). Kept unmapped: 158 "China, Taiwan Province of" (not a crosswalk
+  # entity), historical areas 200, 230, 278, 280, 530, 590, 720, 736, 810, 886, 890, 891, 960
+  # "Indonesia (...2002)", and all 4-digit groups.
+  unctad:
+    base: null
+    aliases:
+      - {code: "004", iso3: AFG, source: "UNCTADstat Economy 004 \"Afghanistan\""}
+      - {code: "008", iso3: ALB, source: "UNCTADstat Economy 008 \"Albania\""}
+      - {code: "012", iso3: DZA, source: "UNCTADstat Economy 012 \"Algeria\""}
+      - {code: "016", iso3: ASM, source: "UNCTADstat Economy 016 \"American Samoa\""}
+      - {code: "020", iso3: AND, source: "UNCTADstat Economy 020 \"Andorra\""}
+      - {code: "024", iso3: AGO, source: "UNCTADstat Economy 024 \"Angola\""}
+      - {code: "028", iso3: ATG, source: "UNCTADstat Economy 028 \"Antigua and Barbuda\""}
+      - {code: "031", iso3: AZE, source: "UNCTADstat Economy 031 \"Azerbaijan\""}
+      - {code: "032", iso3: ARG, source: "UNCTADstat Economy 032 \"Argentina\""}
+      - {code: "036", iso3: AUS, source: "UNCTADstat Economy 036 \"Australia\""}
+      - {code: "040", iso3: AUT, source: "UNCTADstat Economy 040 \"Austria\""}
+      - {code: "044", iso3: BHS, source: "UNCTADstat Economy 044 \"Bahamas\""}
+      - {code: "048", iso3: BHR, source: "UNCTADstat Economy 048 \"Bahrain\""}
+      - {code: "050", iso3: BGD, source: "UNCTADstat Economy 050 \"Bangladesh\""}
+      - {code: "051", iso3: ARM, source: "UNCTADstat Economy 051 \"Armenia\""}
+      - {code: "052", iso3: BRB, source: "UNCTADstat Economy 052 \"Barbados\""}
+      - {code: "056", iso3: BEL, source: "UNCTADstat Economy 056 \"Belgium\""}
+      - {code: "060", iso3: BMU, source: "UNCTADstat Economy 060 \"Bermuda\""}
+      - {code: "064", iso3: BTN, source: "UNCTADstat Economy 064 \"Bhutan\""}
+      - {code: "068", iso3: BOL, source: "UNCTADstat Economy 068 \"Bolivia (Plurinational State of)\""}
+      - {code: "070", iso3: BIH, source: "UNCTADstat Economy 070 \"Bosnia and Herzegovina\""}
+      - {code: "072", iso3: BWA, source: "UNCTADstat Economy 072 \"Botswana\""}
+      - {code: "076", iso3: BRA, source: "UNCTADstat Economy 076 \"Brazil\""}
+      - {code: "084", iso3: BLZ, source: "UNCTADstat Economy 084 \"Belize\""}
+      - {code: "090", iso3: SLB, source: "UNCTADstat Economy 090 \"Solomon Islands\""}
+      - {code: "092", iso3: VGB, source: "UNCTADstat Economy 092 \"British Virgin Islands\""}
+      - {code: "096", iso3: BRN, source: "UNCTADstat Economy 096 \"Brunei Darussalam\""}
+      - {code: "100", iso3: BGR, source: "UNCTADstat Economy 100 \"Bulgaria\""}
+      - {code: "104", iso3: MMR, source: "UNCTADstat Economy 104 \"Myanmar\""}
+      - {code: "108", iso3: BDI, source: "UNCTADstat Economy 108 \"Burundi\""}
+      - {code: "112", iso3: BLR, source: "UNCTADstat Economy 112 \"Belarus\""}
+      - {code: "116", iso3: KHM, source: "UNCTADstat Economy 116 \"Cambodia\""}
+      - {code: "120", iso3: CMR, source: "UNCTADstat Economy 120 \"Cameroon\""}
+      - {code: "124", iso3: CAN, source: "UNCTADstat Economy 124 \"Canada\""}
+      - {code: "132", iso3: CPV, source: "UNCTADstat Economy 132 \"Cabo Verde\""}
+      - {code: "136", iso3: CYM, source: "UNCTADstat Economy 136 \"Cayman Islands\""}
+      - {code: "140", iso3: CAF, source: "UNCTADstat Economy 140 \"Central African Republic\""}
+      - {code: "144", iso3: LKA, source: "UNCTADstat Economy 144 \"Sri Lanka\""}
+      - {code: "148", iso3: TCD, source: "UNCTADstat Economy 148 \"Chad\""}
+      - {code: "152", iso3: CHL, source: "UNCTADstat Economy 152 \"Chile\""}
+      - {code: "156", iso3: CHN, source: "UNCTADstat Economy 156 \"China\""}
+      - {code: "162", iso3: CXR, source: "UNCTADstat Economy 162 \"Christmas Island\""}
+      - {code: "166", iso3: CCK, source: "UNCTADstat Economy 166 \"Cocos (Keeling) Islands\""}
+      - {code: "170", iso3: COL, source: "UNCTADstat Economy 170 \"Colombia\""}
+      - {code: "174", iso3: COM, source: "UNCTADstat Economy 174 \"Comoros\""}
+      - {code: "175", iso3: MYT, source: "UNCTADstat Economy 175 \"Mayotte\""}
+      - {code: "178", iso3: COG, source: "UNCTADstat Economy 178 \"Congo\""}
+      - {code: "180", iso3: COD, source: "UNCTADstat Economy 180 \"Dem. Rep. of the Congo\""}
+      - {code: "184", iso3: COK, source: "UNCTADstat Economy 184 \"Cook Islands\""}
+      - {code: "188", iso3: CRI, source: "UNCTADstat Economy 188 \"Costa Rica\""}
+      - {code: "191", iso3: HRV, source: "UNCTADstat Economy 191 \"Croatia\""}
+      - {code: "192", iso3: CUB, source: "UNCTADstat Economy 192 \"Cuba\""}
+      - {code: "196", iso3: CYP, source: "UNCTADstat Economy 196 \"Cyprus\""}
+      - {code: "203", iso3: CZE, source: "UNCTADstat Economy 203 \"Czechia\""}
+      - {code: "204", iso3: BEN, source: "UNCTADstat Economy 204 \"Benin\""}
+      - {code: "208", iso3: DNK, source: "UNCTADstat Economy 208 \"Denmark\""}
+      - {code: "212", iso3: DMA, source: "UNCTADstat Economy 212 \"Dominica\""}
+      - {code: "214", iso3: DOM, source: "UNCTADstat Economy 214 \"Dominican Republic\""}
+      - {code: "218", iso3: ECU, source: "UNCTADstat Economy 218 \"Ecuador\""}
+      - {code: "222", iso3: SLV, source: "UNCTADstat Economy 222 \"El Salvador\""}
+      - {code: "226", iso3: GNQ, source: "UNCTADstat Economy 226 \"Equatorial Guinea\""}
+      - {code: "231", iso3: ETH, source: "UNCTADstat Economy 231 \"Ethiopia\""}
+      - {code: "232", iso3: ERI, source: "UNCTADstat Economy 232 \"Eritrea\""}
+      - {code: "233", iso3: EST, source: "UNCTADstat Economy 233 \"Estonia\""}
+      - {code: "234", iso3: FRO, source: "UNCTADstat Economy 234 \"Faroe Islands\""}
+      - {code: "238", iso3: FLK, source: "UNCTADstat Economy 238 \"Falkland Islands (Malvinas)\""}
+      - {code: "242", iso3: FJI, source: "UNCTADstat Economy 242 \"Fiji\""}
+      - {code: "246", iso3: FIN, source: "UNCTADstat Economy 246 \"Finland\""}
+      - {code: "250", iso3: FRA, source: "UNCTADstat Economy 250 \"France\""}
+      - {code: "254", iso3: GUF, source: "UNCTADstat Economy 254 \"French Guiana\""}
+      - {code: "258", iso3: PYF, source: "UNCTADstat Economy 258 \"French Polynesia\""}
+      - {code: "262", iso3: DJI, source: "UNCTADstat Economy 262 \"Djibouti\""}
+      - {code: "266", iso3: GAB, source: "UNCTADstat Economy 266 \"Gabon\""}
+      - {code: "268", iso3: GEO, source: "UNCTADstat Economy 268 \"Georgia\""}
+      - {code: "270", iso3: GMB, source: "UNCTADstat Economy 270 \"Gambia\""}
+      - {code: "275", iso3: PSE, source: "UNCTADstat Economy 275 \"State of Palestine\""}
+      - {code: "276", iso3: DEU, source: "UNCTADstat Economy 276 \"Germany\""}
+      - {code: "288", iso3: GHA, source: "UNCTADstat Economy 288 \"Ghana\""}
+      - {code: "292", iso3: GIB, source: "UNCTADstat Economy 292 \"Gibraltar\""}
+      - {code: "296", iso3: KIR, source: "UNCTADstat Economy 296 \"Kiribati\""}
+      - {code: "300", iso3: GRC, source: "UNCTADstat Economy 300 \"Greece\""}
+      - {code: "304", iso3: GRL, source: "UNCTADstat Economy 304 \"Greenland\""}
+      - {code: "308", iso3: GRD, source: "UNCTADstat Economy 308 \"Grenada\""}
+      - {code: "312", iso3: GLP, source: "UNCTADstat Economy 312 \"Guadeloupe\""}
+      - {code: "316", iso3: GUM, source: "UNCTADstat Economy 316 \"Guam\""}
+      - {code: "320", iso3: GTM, source: "UNCTADstat Economy 320 \"Guatemala\""}
+      - {code: "324", iso3: GIN, source: "UNCTADstat Economy 324 \"Guinea\""}
+      - {code: "328", iso3: GUY, source: "UNCTADstat Economy 328 \"Guyana\""}
+      - {code: "332", iso3: HTI, source: "UNCTADstat Economy 332 \"Haiti\""}
+      - {code: "340", iso3: HND, source: "UNCTADstat Economy 340 \"Honduras\""}
+      - {code: "344", iso3: HKG, source: "UNCTADstat Economy 344 \"China, Hong Kong SAR\""}
+      - {code: "348", iso3: HUN, source: "UNCTADstat Economy 348 \"Hungary\""}
+      - {code: "352", iso3: ISL, source: "UNCTADstat Economy 352 \"Iceland\""}
+      - {code: "356", iso3: IND, source: "UNCTADstat Economy 356 \"India\""}
+      - {code: "360", iso3: IDN, source: "UNCTADstat Economy 360 \"Indonesia\""}
+      - {code: "364", iso3: IRN, source: "UNCTADstat Economy 364 \"Iran (Islamic Republic of)\""}
+      - {code: "368", iso3: IRQ, source: "UNCTADstat Economy 368 \"Iraq\""}
+      - {code: "372", iso3: IRL, source: "UNCTADstat Economy 372 \"Ireland\""}
+      - {code: "376", iso3: ISR, source: "UNCTADstat Economy 376 \"Israel\""}
+      - {code: "380", iso3: ITA, source: "UNCTADstat Economy 380 \"Italy\""}
+      - {code: "384", iso3: CIV, source: "UNCTADstat Economy 384 \"Cote d'Ivoire\""}
+      - {code: "388", iso3: JAM, source: "UNCTADstat Economy 388 \"Jamaica\""}
+      - {code: "392", iso3: JPN, source: "UNCTADstat Economy 392 \"Japan\""}
+      - {code: "398", iso3: KAZ, source: "UNCTADstat Economy 398 \"Kazakhstan\""}
+      - {code: "400", iso3: JOR, source: "UNCTADstat Economy 400 \"Jordan\""}
+      - {code: "404", iso3: KEN, source: "UNCTADstat Economy 404 \"Kenya\""}
+      - {code: "408", iso3: PRK, source: "UNCTADstat Economy 408 \"Dem. People's Rep. of Korea\""}
+      - {code: "410", iso3: KOR, source: "UNCTADstat Economy 410 \"Republic of Korea\""}
+      - {code: "412", iso3: XKX, source: "UNCTADstat Economy 412 \"Kosovo\""}
+      - {code: "414", iso3: KWT, source: "UNCTADstat Economy 414 \"Kuwait\""}
+      - {code: "417", iso3: KGZ, source: "UNCTADstat Economy 417 \"Kyrgyzstan\""}
+      - {code: "418", iso3: LAO, source: "UNCTADstat Economy 418 \"Lao People's Dem. Rep.\""}
+      - {code: "422", iso3: LBN, source: "UNCTADstat Economy 422 \"Lebanon\""}
+      - {code: "426", iso3: LSO, source: "UNCTADstat Economy 426 \"Lesotho\""}
+      - {code: "428", iso3: LVA, source: "UNCTADstat Economy 428 \"Latvia\""}
+      - {code: "430", iso3: LBR, source: "UNCTADstat Economy 430 \"Liberia\""}
+      - {code: "434", iso3: LBY, source: "UNCTADstat Economy 434 \"Libya\""}
+      - {code: "440", iso3: LTU, source: "UNCTADstat Economy 440 \"Lithuania\""}
+      - {code: "442", iso3: LUX, source: "UNCTADstat Economy 442 \"Luxembourg\""}
+      - {code: "446", iso3: MAC, source: "UNCTADstat Economy 446 \"China, Macao SAR\""}
+      - {code: "450", iso3: MDG, source: "UNCTADstat Economy 450 \"Madagascar\""}
+      - {code: "454", iso3: MWI, source: "UNCTADstat Economy 454 \"Malawi\""}
+      - {code: "458", iso3: MYS, source: "UNCTADstat Economy 458 \"Malaysia\""}
+      - {code: "462", iso3: MDV, source: "UNCTADstat Economy 462 \"Maldives\""}
+      - {code: "466", iso3: MLI, source: "UNCTADstat Economy 466 \"Mali\""}
+      - {code: "470", iso3: MLT, source: "UNCTADstat Economy 470 \"Malta\""}
+      - {code: "474", iso3: MTQ, source: "UNCTADstat Economy 474 \"Martinique\""}
+      - {code: "478", iso3: MRT, source: "UNCTADstat Economy 478 \"Mauritania\""}
+      - {code: "480", iso3: MUS, source: "UNCTADstat Economy 480 \"Mauritius\""}
+      - {code: "484", iso3: MEX, source: "UNCTADstat Economy 484 \"Mexico\""}
+      - {code: "496", iso3: MNG, source: "UNCTADstat Economy 496 \"Mongolia\""}
+      - {code: "498", iso3: MDA, source: "UNCTADstat Economy 498 \"Republic of Moldova\""}
+      - {code: "499", iso3: MNE, source: "UNCTADstat Economy 499 \"Montenegro\""}
+      - {code: "500", iso3: MSR, source: "UNCTADstat Economy 500 \"Montserrat\""}
+      - {code: "504", iso3: MAR, source: "UNCTADstat Economy 504 \"Morocco\""}
+      - {code: "508", iso3: MOZ, source: "UNCTADstat Economy 508 \"Mozambique\""}
+      - {code: "512", iso3: OMN, source: "UNCTADstat Economy 512 \"Oman\""}
+      - {code: "516", iso3: NAM, source: "UNCTADstat Economy 516 \"Namibia\""}
+      - {code: "520", iso3: NRU, source: "UNCTADstat Economy 520 \"Nauru\""}
+      - {code: "524", iso3: NPL, source: "UNCTADstat Economy 524 \"Nepal\""}
+      - {code: "528", iso3: NLD, source: "UNCTADstat Economy 528 \"Netherlands (Kingdom of the)\""}
+      - {code: "531", iso3: CUW, source: "UNCTADstat Economy 531 \"Curacao\""}
+      - {code: "533", iso3: ABW, source: "UNCTADstat Economy 533 \"Aruba\""}
+      - {code: "534", iso3: SXM, source: "UNCTADstat Economy 534 \"Sint Maarten (Dutch part)\""}
+      - {code: "535", iso3: BES, source: "UNCTADstat Economy 535 \"Bonaire, Sint Eustatius and Saba\""}
+      - {code: "540", iso3: NCL, source: "UNCTADstat Economy 540 \"New Caledonia\""}
+      - {code: "548", iso3: VUT, source: "UNCTADstat Economy 548 \"Vanuatu\""}
+      - {code: "554", iso3: NZL, source: "UNCTADstat Economy 554 \"New Zealand\""}
+      - {code: "558", iso3: NIC, source: "UNCTADstat Economy 558 \"Nicaragua\""}
+      - {code: "562", iso3: NER, source: "UNCTADstat Economy 562 \"Niger\""}
+      - {code: "566", iso3: NGA, source: "UNCTADstat Economy 566 \"Nigeria\""}
+      - {code: "570", iso3: NIU, source: "UNCTADstat Economy 570 \"Niue\""}
+      - {code: "574", iso3: NFK, source: "UNCTADstat Economy 574 \"Norfolk Island\""}
+      - {code: "578", iso3: NOR, source: "UNCTADstat Economy 578 \"Norway\""}
+      - {code: "580", iso3: MNP, source: "UNCTADstat Economy 580 \"Northern Mariana Islands\""}
+      - {code: "583", iso3: FSM, source: "UNCTADstat Economy 583 \"Micronesia (Federated States of)\""}
+      - {code: "584", iso3: MHL, source: "UNCTADstat Economy 584 \"Marshall Islands\""}
+      - {code: "585", iso3: PLW, source: "UNCTADstat Economy 585 \"Palau\""}
+      - {code: "586", iso3: PAK, source: "UNCTADstat Economy 586 \"Pakistan\""}
+      - {code: "591", iso3: PAN, source: "UNCTADstat Economy 591 \"Panama\""}
+      - {code: "598", iso3: PNG, source: "UNCTADstat Economy 598 \"Papua New Guinea\""}
+      - {code: "600", iso3: PRY, source: "UNCTADstat Economy 600 \"Paraguay\""}
+      - {code: "604", iso3: PER, source: "UNCTADstat Economy 604 \"Peru\""}
+      - {code: "608", iso3: PHL, source: "UNCTADstat Economy 608 \"Philippines\""}
+      - {code: "616", iso3: POL, source: "UNCTADstat Economy 616 \"Poland\""}
+      - {code: "620", iso3: PRT, source: "UNCTADstat Economy 620 \"Portugal\""}
+      - {code: "624", iso3: GNB, source: "UNCTADstat Economy 624 \"Guinea-Bissau\""}
+      - {code: "626", iso3: TLS, source: "UNCTADstat Economy 626 \"Timor-Leste\""}
+      - {code: "630", iso3: PRI, source: "UNCTADstat Economy 630 \"Puerto Rico\""}
+      - {code: "634", iso3: QAT, source: "UNCTADstat Economy 634 \"Qatar\""}
+      - {code: "638", iso3: REU, source: "UNCTADstat Economy 638 \"Reunion\""}
+      - {code: "642", iso3: ROU, source: "UNCTADstat Economy 642 \"Romania\""}
+      - {code: "643", iso3: RUS, source: "UNCTADstat Economy 643 \"Russian Federation\""}
+      - {code: "646", iso3: RWA, source: "UNCTADstat Economy 646 \"Rwanda\""}
+      - {code: "654", iso3: SHN, source: "UNCTADstat Economy 654 \"Saint Helena\""}
+      - {code: "659", iso3: KNA, source: "UNCTADstat Economy 659 \"Saint Kitts and Nevis\""}
+      - {code: "660", iso3: AIA, source: "UNCTADstat Economy 660 \"Anguilla\""}
+      - {code: "662", iso3: LCA, source: "UNCTADstat Economy 662 \"Saint Lucia\""}
+      - {code: "666", iso3: SPM, source: "UNCTADstat Economy 666 \"Saint Pierre and Miquelon\""}
+      - {code: "670", iso3: VCT, source: "UNCTADstat Economy 670 \"Saint Vincent and the Grenadines\""}
+      - {code: "678", iso3: STP, source: "UNCTADstat Economy 678 \"Sao Tome and Principe\""}
+      - {code: "682", iso3: SAU, source: "UNCTADstat Economy 682 \"Saudi Arabia\""}
+      - {code: "686", iso3: SEN, source: "UNCTADstat Economy 686 \"Senegal\""}
+      - {code: "688", iso3: SRB, source: "UNCTADstat Economy 688 \"Serbia\""}
+      - {code: "690", iso3: SYC, source: "UNCTADstat Economy 690 \"Seychelles\""}
+      - {code: "694", iso3: SLE, source: "UNCTADstat Economy 694 \"Sierra Leone\""}
+      - {code: "702", iso3: SGP, source: "UNCTADstat Economy 702 \"Singapore\""}
+      - {code: "703", iso3: SVK, source: "UNCTADstat Economy 703 \"Slovakia\""}
+      - {code: "704", iso3: VNM, source: "UNCTADstat Economy 704 \"Viet Nam\""}
+      - {code: "705", iso3: SVN, source: "UNCTADstat Economy 705 \"Slovenia\""}
+      - {code: "706", iso3: SOM, source: "UNCTADstat Economy 706 \"Somalia\""}
+      - {code: "710", iso3: ZAF, source: "UNCTADstat Economy 710 \"South Africa\""}
+      - {code: "716", iso3: ZWE, source: "UNCTADstat Economy 716 \"Zimbabwe\""}
+      - {code: "724", iso3: ESP, source: "UNCTADstat Economy 724 \"Spain\""}
+      - {code: "728", iso3: SSD, source: "UNCTADstat Economy 728 \"South Sudan\""}
+      - {code: "729", iso3: SDN, source: "UNCTADstat Economy 729 \"Sudan\""}
+      - {code: "740", iso3: SUR, source: "UNCTADstat Economy 740 \"Suriname\""}
+      - {code: "748", iso3: SWZ, source: "UNCTADstat Economy 748 \"Eswatini\""}
+      - {code: "752", iso3: SWE, source: "UNCTADstat Economy 752 \"Sweden\""}
+      - {code: "756", iso3: CHE, source: "UNCTADstat Economy 756 \"Switzerland\""}
+      - {code: "760", iso3: SYR, source: "UNCTADstat Economy 760 \"Syrian Arab Republic\""}
+      - {code: "762", iso3: TJK, source: "UNCTADstat Economy 762 \"Tajikistan\""}
+      - {code: "764", iso3: THA, source: "UNCTADstat Economy 764 \"Thailand\""}
+      - {code: "768", iso3: TGO, source: "UNCTADstat Economy 768 \"Togo\""}
+      - {code: "772", iso3: TKL, source: "UNCTADstat Economy 772 \"Tokelau\""}
+      - {code: "776", iso3: TON, source: "UNCTADstat Economy 776 \"Tonga\""}
+      - {code: "780", iso3: TTO, source: "UNCTADstat Economy 780 \"Trinidad and Tobago\""}
+      - {code: "784", iso3: ARE, source: "UNCTADstat Economy 784 \"United Arab Emirates\""}
+      - {code: "788", iso3: TUN, source: "UNCTADstat Economy 788 \"Tunisia\""}
+      - {code: "792", iso3: TUR, source: "UNCTADstat Economy 792 \"Turkiye\""}
+      - {code: "795", iso3: TKM, source: "UNCTADstat Economy 795 \"Turkmenistan\""}
+      - {code: "796", iso3: TCA, source: "UNCTADstat Economy 796 \"Turks and Caicos Islands\""}
+      - {code: "798", iso3: TUV, source: "UNCTADstat Economy 798 \"Tuvalu\""}
+      - {code: "800", iso3: UGA, source: "UNCTADstat Economy 800 \"Uganda\""}
+      - {code: "804", iso3: UKR, source: "UNCTADstat Economy 804 \"Ukraine\""}
+      - {code: "807", iso3: MKD, source: "UNCTADstat Economy 807 \"North Macedonia\""}
+      - {code: "818", iso3: EGY, source: "UNCTADstat Economy 818 \"Egypt\""}
+      - {code: "826", iso3: GBR, source: "UNCTADstat Economy 826 \"United Kingdom\""}
+      - {code: "831", iso3: GGY, source: "UNCTADstat Economy 831 \"Guernsey\""}
+      - {code: "832", iso3: JEY, source: "UNCTADstat Economy 832 \"Jersey\""}
+      - {code: "834", iso3: TZA, source: "UNCTADstat Economy 834 \"United Republic of Tanzania\""}
+      - {code: "840", iso3: USA, source: "UNCTADstat Economy 840 \"United States\""}
+      - {code: "850", iso3: VIR, source: "UNCTADstat Economy 850 \"United States Virgin Islands\""}
+      - {code: "854", iso3: BFA, source: "UNCTADstat Economy 854 \"Burkina Faso\""}
+      - {code: "858", iso3: URY, source: "UNCTADstat Economy 858 \"Uruguay\""}
+      - {code: "860", iso3: UZB, source: "UNCTADstat Economy 860 \"Uzbekistan\""}
+      - {code: "862", iso3: VEN, source: "UNCTADstat Economy 862 \"Venezuela (Bolivarian Rep. of)\""}
+      - {code: "876", iso3: WLF, source: "UNCTADstat Economy 876 \"Wallis and Futuna Islands\""}
+      - {code: "882", iso3: WSM, source: "UNCTADstat Economy 882 \"Samoa\""}
+      - {code: "887", iso3: YEM, source: "UNCTADstat Economy 887 \"Yemen\""}
+      - {code: "894", iso3: ZMB, source: "UNCTADstat Economy 894 \"Zambia\""}
+    source:
+      kind: provider_data
+      url: "https://unctadstat-api.unctad.org/bulkdownload/US.TradeServCatTotal/US_TradeServCatTotal"
+      sha256: "fe1218e8d614f88270a17e08da99251d98edd2f57248ee666d8ba917692aa4ee"
+      also_seen_in: [US.FdiFlowsStock, US.LSCI, US.LSBCI, US.GoodsAndServicesBpm6, US.TradeMerchTotal]
+      retrieved_at: "2026-10-15T22:58:57Z"
+      m49_reference: registry/entities/country_crosswalk.json (field m49)

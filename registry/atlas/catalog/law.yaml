@@ -24,7 +24,7 @@ concepts:
     source_order: ["wbl.wbl2026.Pen_Law_PensAgeEq_FullM"]
     provider_declared: true
     notes: >-
-      Replaces SSA SSPTW retirement ages, which could not be read (www.ssa.gov HTTP 403 to this deployment).
+      The SSA SSPTW 2018-2019 ages (law.ssptw.pension_age.men) are an older, differently defined series.
       Some economies report fractional ages or a single age of a phased reform as of the reference date.
     tags: [retirement, pension, statutory_age, legal_basis]
   - id: law.retirement_age.full_benefits.women
@@ -85,6 +85,92 @@ concepts:
     source_order: ["wbl.wbl2026.Pen_Law_MandAgeEq_Women"]
     provider_declared: true
     tags: [retirement, legal_basis]
+  - id: law.ssptw.pension_age.men
+    labels: {fr: "Âge de la pension de vieillesse, premier régime listé (hommes, SSPTW)", en: "Old-age pension age, first listed program (men, SSPTW)"}
+    definition: >-
+      Age (whole years) in the main rule of the first old-age program listed under Qualifying Conditions of the SSA
+      "Social Security Programs Throughout the World" 2018-2019 country page (Europe/Asia 2018, Africa/Americas 2019;
+      laws in force in the edition's as-of month). Derived by an agent rule (only "Age N (men) or age M (women)",
+      "Age N with ... (men) or age M with ... (women)" or a single "Age N" with no sex distinction); flagged
+      transcription + source paragraph. Ages stated with months are concept law.ssptw.pension_age_months.men.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["ssa.ssptw_2018_2019.old_age.pension_age.men"]
+    provider_declared: true
+    notes: Not the same definition as WBL's "full benefits" age (law.retirement_age.full_benefits.men); shown side by side, never blended.
+    tags: [retirement, pension, statutory_age, derived, history]
+  - id: law.ssptw.pension_age.women
+    labels: {fr: "Âge de la pension de vieillesse, premier régime listé (femmes, SSPTW)", en: "Old-age pension age, first listed program (women, SSPTW)"}
+    definition: Same rule as law.ssptw.pension_age.men, for women.
+    unit: years
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["ssa.ssptw_2018_2019.old_age.pension_age.women"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, derived, history]
+  - id: law.ssptw.pension_age_months.men
+    labels: {fr: "Âge de la pension de vieillesse en mois (hommes, SSPTW)", en: "Old-age pension age in months (men, SSPTW)"}
+    definition: Pension age stated as "N and M months" in the SSPTW 2018-2019 page, as exact months (N*12+M); agent rule, flagged.
+    unit: months
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["ssa.ssptw_2018_2019.old_age.pension_age_months.men"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, derived]
+  - id: law.ssptw.pension_age_months.women
+    labels: {fr: "Âge de la pension de vieillesse en mois (femmes, SSPTW)", en: "Old-age pension age in months (women, SSPTW)"}
+    definition: Same as law.ssptw.pension_age_months.men, for women.
+    unit: months
+    domain: law
+    subdomain: pensions
+    value_kind: numeric
+    source_order: ["ssa.ssptw_2018_2019.old_age.pension_age_months.women"]
+    provider_declared: true
+    tags: [retirement, pension, statutory_age, derived]
+  - id: law.ssptw.old_age_qualifying_conditions
+    labels: {fr: "Conditions d'ouverture de la pension de vieillesse (SSPTW, texte)", en: "Old-age pension qualifying conditions (SSPTW, text)"}
+    definition: First paragraph of "Qualifying Conditions" in the old-age part of the SSPTW 2018-2019 country page, verbatim.
+    unit: text
+    domain: law
+    subdomain: pensions
+    value_kind: text
+    source_order: ["ssa.ssptw_2018_2019.old_age.qualifying_conditions.first"]
+    provider_declared: true
+    tags: [retirement, pension]
+  - id: law.ssptw.old_age_contributions.insured_person
+    labels: {fr: "Cotisations vieillesse de l'assuré (SSPTW, texte)", en: "Old-age contributions of the insured person (SSPTW, text)"}
+    definition: '"Source of Funds - Insured person" block of the SSPTW 2018-2019 old-age part (contribution rates), verbatim.'
+    unit: text
+    domain: law
+    subdomain: pensions
+    value_kind: text
+    source_order: ["ssa.ssptw_2018_2019.old_age.contributions.insured_person"]
+    provider_declared: true
+    tags: [pension, contributions]
+  - id: law.ssptw.old_age_contributions.employer
+    labels: {fr: "Cotisations vieillesse de l'employeur (SSPTW, texte)", en: "Old-age contributions of the employer (SSPTW, text)"}
+    definition: '"Source of Funds - Employer" block of the SSPTW 2018-2019 old-age part, verbatim.'
+    unit: text
+    domain: law
+    subdomain: pensions
+    value_kind: text
+    source_order: ["ssa.ssptw_2018_2019.old_age.contributions.employer"]
+    provider_declared: true
+    tags: [pension, contributions]
+  - id: law.ssptw.old_age_program_type
+    labels: {fr: "Type de régime vieillesse (SSPTW)", en: "Old-age program type (SSPTW)"}
+    definition: '"Type of program" of the SSPTW 2018-2019 old-age part (e.g. "Social insurance and social assistance system."), verbatim.'
+    unit: text
+    domain: law
+    subdomain: pensions
+    value_kind: text
+    source_order: ["ssa.ssptw_2018_2019.old_age.type_of_program"]
+    provider_declared: true
+    tags: [pension]
   - id: law.retirement_age_equal_full_benefits
     labels: {fr: "Âge de retraite à taux plein identique pour femmes et hommes", en: "Same age for women and men to retire with full pension benefits"}
     definition: >-

@@ -20,7 +20,9 @@ Views (catalog concepts from :mod:`reva.atlas.catalog`):
 * **map**: best values of one concept for one year, all countries.
 
 "Year" means a calendar-year cell (``period_start`` = Jan 1, ``period_end`` = Jan 1 of the next
-year). Sub-annual or multi-year cells appear in per-source views only.
+year), in astronomical year numbering (year 0 = 1 BCE, -9999 = 10000 BCE; same as the KG). Periods
+are returned as ISO 8601 text (``-9999-01-01``). Sub-annual or multi-year cells appear in per-source
+views only.
 """
 
 from __future__ import annotations
@@ -62,8 +64,19 @@ CREATE TABLE cells (sid INTEGER NOT NULL, iso3 VARCHAR, year INTEGER, has_value 
                     selector VARCHAR NOT NULL, table_sha VARCHAR NOT NULL);
 """
 #: Full cell columns selected from ``cells x``.
+def iso_date_sql(col: str) -> str:
+    """ISO 8601 text of a DATE in astronomical years (``-9999-01-01`` = 10000 BCE; DuckDB's own
+    VARCHAR form is ``10000-01-01 (BC)`` and Python dates stop at year 1)."""
+    return (
+        f"((CASE WHEN year({col}) < 0 THEN '-' ELSE '' END) || lpad(CAST(abs(year({col})) AS VARCHAR), 4, '0') "
+        f"|| '-' || lpad(CAST(month({col}) AS VARCHAR), 2, '0') || '-' || lpad(CAST(day({col}) AS VARCHAR), 2, '0'))"
+    )
+
+
+#: Full cell columns selected from ``cells x`` (periods as astronomical ISO text: BCE-safe).
 CELL_SELECT = (
-    "x.sid, x.iso3, x.year, x.concept_hint, x.provider_geo, x.entity_qid, x.period_start, x.period_end, x.value, "
+    "x.sid, x.iso3, x.year, x.concept_hint, x.provider_geo, x.entity_qid, "
+    f"{iso_date_sql('x.period_start')} AS period_start, {iso_date_sql('x.period_end')} AS period_end, x.value, "
     "x.value_text, x.unit, x.flags, x.raw_sha256, x.selector, x.table_sha"
 )
 
@@ -258,8 +271,8 @@ class AtlasQuery:
             "series": key,
             "provider_geo": r["provider_geo"],
             "entity_qid": r["entity_qid"],
-            "period_start": r["period_start"].isoformat(),
-            "period_end": r["period_end"].isoformat(),
+            "period_start": r["period_start"],  # ISO text, astronomical years (BCE-safe)
+            "period_end": r["period_end"],
             "flags": _json(r["flags"]),
             "provenance": {
                 "raw_sha256": r["raw_sha256"],

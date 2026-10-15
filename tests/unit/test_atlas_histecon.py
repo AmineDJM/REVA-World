@@ -296,9 +296,15 @@ async def test_hyde_tail_parse_and_bce_exclusion() -> None:
     f, unmapped = _valid(b)
     assert {u["provider_geo"] for u in unmapped} == {"158", "891", "world"}
     fra = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "popc"))
-    assert fra["period_start"].min() == date(100, 1, 1)  # BCE steps and year 0 are not representable
-    assert b.report["excluded_bce_or_year0_cells"] > 0 and b.report["bce_steps"][0] == -10000
-    fl = json.loads(fra["flags"][0])
+    # BCE steps are loaded with astronomical years (year 0 = 1 BCE), like the KG (ATLASOPS)
+    years = fra["period_start"].dt.year()
+    assert years.min() == -10000 and 0 in years.to_list() and 100 in years.to_list()
+    assert (fra["period_end"].dt.year() == years + 1).all()
+    assert b.report["bce_or_year0_cells"] > 0 and b.report["bce_steps"][0] == -10000
+    bce = fra.filter(pl.col("period_start").dt.year() < 1)
+    assert all("year_numbering" in json.loads(x) for x in bce["flags"].to_list())
+    assert "year_numbering" not in json.loads(fra.filter(pl.col("period_start").dt.year() == 100)["flags"][0])
+    fl = json.loads(fra["flags"][-1])
     assert fl["hyde_modelled"] is True and fl["licence"] == "CC BY 3.0" and "inhabitants" in fl["unit_note"]
     assert set(f["indicator"].unique().to_list()) == {v[0] for v in atlas_hyde.SUMMARIES.values()}
     twn = f.filter(pl.col("provider_geo") == "158")

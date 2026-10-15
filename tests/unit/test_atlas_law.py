@@ -23,7 +23,6 @@ from reva.adapters.connectors import (
 from reva.adapters.http.safe_client import HttpResult
 from reva.atlas.catalog import load_catalog
 from reva.atlas.tables import country_iso3, validate_atlas_frame
-from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError, UnsafeRequest
 
 FIX = Path(__file__).resolve().parents[1] / "fixtures" / "source"
@@ -279,11 +278,78 @@ class _Run:
         raise AssertionError("nothing must be archived")
 
 
-async def test_ssa_probe_is_typed_blocked():
-    rep = await atlas_ssa_ssptw.atlas_ingest(_Run(FixtureHttp(atlas_ssa_ssptw.CONNECTOR_NAME)))
-    assert rep["tables"] == [] and rep["raw"] == [] and rep["status"] == "blocked"
-    (b,) = rep["blocked"]
-    assert b["reason"] == "http_403" and b["http_status"] == 403
+def _ssa_page(name):
+    body, sha = _fixture("atlas.ssa_ssptw", f"europe_{name}.html")
+    guide, _ = _fixture("atlas.ssa_ssptw", "europe_guide.html")
+    period, quote = atlas_ssa_ssptw.as_of_month(guide, "europe")
+    return atlas_ssa_ssptw.parse_country_page(body, "europe", name, sha, period, quote), sha
+
+
+def test_ssptw_index_guide_and_pages():
+    idx, _ = _fixture("atlas.ssa_ssptw", "europe_index.html")
+    slugs = atlas_ssa_ssptw.index_pages(idx, "europe")
+    assert len(slugs) == 45 and "france" in slugs and "guide" not in slugs
+    guide, _ = _fixture("atlas.ssa_ssptw", "europe_guide.html")
+    period, quote = atlas_ssa_ssptw.as_of_month(guide, "europe")
+    assert period == (date(2018, 1, 1), date(2018, 2, 1)) and "in force in January 2018" in quote
+    rows, sha = [], []
+    for name in ("france", "germany", "switzerland", "slovakia", "poland"):
+        r, h = _ssa_page(name)
+        rows += r
+        sha.append(h)
+    frame, unmapped = _frame(rows, "ssa", "ssptw_2018_2019", sha, "ssptw")
+    assert unmapped == []
+    by = {(r["iso3"], r["indicator"]): r for r in frame.to_dicts()}
+    # France: rule is stated as "legal minimum retirement age is 62 ... full pension is 67" -> text only
+    assert ("FRA", "old_age.pension_age.men") not in by
+    q = by[("FRA", "old_age.qualifying_conditions.first")]
+    assert "legal minimum retirement age is 62" in q["value_text"] and q["period_start"] == date(2018, 1, 1)
+    sel = json.loads(q["selector"])
+    assert sel["file"] == "2018-2019/europe/france.html" and sel["section"].endswith("Qualifying Conditions")
+    assert "6.9%" in by[("FRA", "old_age.contributions.insured_person")]["value_text"]
+    assert by[("FRA", "old_age.first_law")]["value_text"].startswith("1910")
+    # Switzerland: "Age 65 (men) or age 64 (women)"
+    assert by[("CHE", "old_age.pension_age.men")]["value"] == "65"
+    assert by[("CHE", "old_age.pension_age.women")]["value"] == "64"
+    f = _flags(by[("CHE", "old_age.pension_age.women")])
+    assert (
+        f["rule"] == "age_men_or_women"
+        and "review pending" in f["transcription"]
+        and "Age 65 (men)" in f["source_text"]
+    )
+    # Germany: "Age 65 and 7 months" -> exact months, not a rounded decimal year
+    assert by[("DEU", "old_age.pension_age_months.men")]["value"] == str(65 * 12 + 7)
+    assert ("DEU", "old_age.pension_age.men") not in by
+    # Poland: "Age 65 with at least 25 years of coverage (men) or age 60 with ... (women)"
+    assert (by[("POL", "old_age.pension_age.men")]["value"], by[("POL", "old_age.pension_age.women")]["value"]) == (
+        "65",
+        "60",
+    )
+    # Slovakia: "Age 62 and 139 days" -> nothing derived
+    assert not any(k[0] == "SVK" and "pension_age" in k[1] for k in by)
+
+
+@pytest.mark.parametrize(
+    ("text", "expected"),
+    [
+        ("Old-age pension: Age 60 (men) or age 55 (women and veterans) with 15 years.", ((60, 0), (55, 0))),
+        ("Old-age pension: Age 60 (women) or age 65 (men).", ((65, 0), (60, 0))),
+        (
+            "Old-age pension: Age 64 and one month (men, rising) or age 61 and two months (women, rising).",
+            ((64, 1), (61, 2)),
+        ),
+        ("Old-age pension: Age 67 (age 60 for some categories of seamen) with residence.", ((67, 0), (67, 0))),
+        ("Old-age pension: Age 61 (gradually rising to age 65 by 2034) with 20 years.", ((61, 0), (61, 0))),
+        ("Old-age pension: Age 56 (blue-collar workers), age 58 (white-collar workers).", None),
+        ("Old-age pension: Age 65 (men), age 60 (women), age 62 (civil servants).", None),
+        ("Old-age pension: Age 65 (gradually rising) or age 60 (women insured before 1975).", None),
+        ("Old-age pension: The retirement age is flexible, from age 60 to age 65.", None),
+        ("Old-age pension: Age 62 and 139 days with 15 years.", None),
+    ],
+)
+def test_pension_age_rules_are_conservative(text, expected):
+    got = atlas_ssa_ssptw.pension_ages(text)
+    assert (None if got is None else (got["men"], got["women"])) == expected
 
 
 async def test_fetch_maps_refusals_to_blocked():
@@ -369,5 +435,7 @@ def test_law_catalog_series_exist_in_parsed_tables(panel):
     produced |= {
         ("factbook", "legal_2026_01", r["indicator"]) for r in atlas_factbook.parse_profile(b, "fr", "europe", s)
     }
+    for name in ("germany", "switzerland", "france"):
+        produced |= {("ssa", "ssptw_2018_2019", r["indicator"]) for r in _ssa_page(name)[0]}
     missing = [(c.id, x.key) for c in law for x in c.source_order if (x.source, x.dataset, x.indicator) not in produced]
     assert missing == []

@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { Link, useSearchParams } from 'react-router';
-import { classifyV3Error } from '../api/common';
+import { classifyV3Error, warningsFr } from '../api/common';
 import { getKgEntity, getKgPath, entityLabel } from '../api/kg';
 import { getLinksPath } from '../api/links';
 import { CitationChip } from '../components/CitationChip';
@@ -56,12 +56,12 @@ export default function CheminPage() {
     const viaKg = () =>
       getKgPath({ from, to, max_hops: hops, max_paths: k, ...(year !== null ? { valid_from: String(year), valid_to: String(year) } : {}) }, ctrl.signal).then((r) => ({
         view: fromKg(r.data),
-        warnings: r.warnings.map((w) => w.message),
+        warnings: warningsFr(r.warnings),
       }));
     const viaLinks = () =>
       getLinksPath({ from, to, k, max_hops: hops, ...(year !== null ? { as_of: year } : {}) }, ctrl.signal).then((r) => ({
         view: fromLinks(r.data),
-        warnings: r.warnings.map((w) => w.message),
+        warnings: warningsFr(r.warnings),
       }));
     const run = async () => {
       if (engine === 'kg') return { ...(await viaKg()), fellBack: false };

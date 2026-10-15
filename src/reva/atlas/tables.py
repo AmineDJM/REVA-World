@@ -24,7 +24,12 @@ Columns (``ATLAS_SCHEMA``, nullable ones marked ?):
 * ``provider_geo`` — the provider's own geography code, verbatim.
 * ``entity_qid``? — Wikidata QID (``Q…``) when the provider geography is a KG entity.
 * ``period_start``, ``period_end`` — half-open UTC date interval ``[start, end)``
-  (calendar year 2020 = ``2020-01-01``..``2021-01-01``; see :func:`year_period`).
+  (calendar year 2020 = ``2020-01-01``..``2021-01-01``; see :func:`year_period`). Dates are
+  proleptic Gregorian with **astronomical year numbering** (year 0 = 1 BCE, -9999 = 10000 BCE),
+  the same convention as the knowledge graph (``reva.kg.model.KgTime``): Arrow ``date32``,
+  Parquet, Polars and DuckDB all store such dates natively. Python ``datetime.date`` cannot
+  (years 1-9999 only), so build BCE periods with :func:`frame_with_year_periods` /
+  :func:`year_period_exprs` and never convert them to Python dates (use :func:`period_text`).
 * ``value``? — the reported number as a **strict decimal string** (``-12.5``, ``3e-4``; no
   thousands separators, no NaN/inf, never a filled-in zero).
 * ``value_text``? — a reported non-numeric value (a category, a legal text excerpt, ``"Yes"``).
@@ -118,8 +123,37 @@ MISSING_REASONS = (
 
 # --------------------------------------------------------------------------- small helpers
 def year_period(year: int) -> tuple[date, date]:
-    """Calendar year ``year`` as a half-open ``[start, end)`` interval."""
+    """Calendar year ``year`` (1..9998) as a half-open ``[start, end)`` interval of Python dates.
+
+    For any astronomical year (including 0 and negative = BCE) use :func:`year_period_exprs` or
+    :func:`frame_with_year_periods`."""
+    if year < 1:
+        raise ValueError(f"year {year} < 1 has no Python date: use frame_with_year_periods / year_period_exprs")
     return date(year, 1, 1), date(year + 1, 1, 1)
+
+
+def year_period_exprs(year: pl.Expr | str) -> tuple[pl.Expr, pl.Expr]:
+    """Polars expressions ``(period_start, period_end)`` for an astronomical calendar year column
+    (year 0 = 1 BCE, negative = BCE); valid for any year Polars/Arrow can store."""
+    y = (pl.col(year) if isinstance(year, str) else year).cast(pl.Int32)
+    return pl.date(y, 1, 1).alias("period_start"), pl.date(y + 1, 1, 1).alias("period_end")
+
+
+def frame_with_year_periods(rows: Sequence[Mapping[str, Any]], *, year_key: str = "year") -> pl.DataFrame:
+    """An :data:`ATLAS_SCHEMA` frame from row dicts whose period is the calendar year ``row[year_key]``
+    (astronomical integer, BCE allowed); the rows' own period_start/period_end are ignored."""
+    cols = {c: [r.get(c) for r in rows] for c in ATLAS_SCHEMA.names() if c not in ("period_start", "period_end")}
+    base = pl.DataFrame(
+        {**cols, "_year": [int(r[year_key]) for r in rows]},
+        schema={**{c: ATLAS_SCHEMA[c] for c in cols}, "_year": pl.Int32},
+    )
+    start, end = year_period_exprs("_year")
+    return base.with_columns(start, end).select(ATLAS_SCHEMA.names())
+
+
+def period_text(expr: pl.Expr | str) -> pl.Expr:
+    """ISO 8601 text of a date column, astronomical years (``-9999-01-01`` = 10000 BCE)."""
+    return (pl.col(expr) if isinstance(expr, str) else expr).cast(pl.String)
 
 
 def missing_flags(reason: str, **extra: Any) -> str:
@@ -285,10 +319,9 @@ def _fail(msg: str, **ctx: Any) -> None:
 
 
 def _bad_examples(frame: pl.DataFrame, mask: pl.Expr, cols: Sequence[str], n: int = 5) -> list[dict[str, Any]]:
-    return [
-        {k: (str(v) if v is not None else None) for k, v in r.items()}
-        for r in frame.filter(mask).select(cols).head(n).to_dicts()
-    ]
+    sel = frame.filter(mask).select(cols).head(n)
+    sel = sel.with_columns([period_text(c) for c in cols if sel.schema[c] == pl.Date])  # BCE-safe
+    return [{k: (str(v) if v is not None else None) for k, v in r.items()} for r in sel.to_dicts()]
 
 
 def _json_objects(values: Sequence[str | None], column: str) -> dict[str, dict[str, Any]]:
@@ -462,8 +495,8 @@ def coverage_summary(
         pl.col("indicator").n_unique().alias("indicators"),
         pl.col("iso3").drop_nulls().n_unique().alias("countries"),
         pl.col("provider_geo").n_unique().alias("provider_geos"),
-        pl.col("period_start").min().alias("period_min"),
-        pl.col("period_end").max().alias("period_max"),
+        period_text(pl.col("period_start").min()).alias("period_min"),
+        period_text(pl.col("period_end").max()).alias("period_max"),
         pl.col("value").is_not_null().sum().alias("numeric_cells"),
         (pl.col("value").is_null() & pl.col("value_text").is_not_null()).sum().alias("text_cells"),
         (pl.col("value").is_null() & pl.col("value_text").is_null()).sum().alias("missing_cells"),

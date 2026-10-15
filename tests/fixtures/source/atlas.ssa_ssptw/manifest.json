@@ -1,14 +1,86 @@
 [
   {
-    "request_fingerprint": "258157c9ffb2df3d86ccb37d5467b516c3e70cf53d87ac0ae1e50cb6b7f1c2f8",
-    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/",
-    "file": "index_403.html",
-    "sha256": "4e1eec1696a27e5f60faf668aa7c9745899ac16bebe1b392eb67f4ba34437890",
-    "status": 403,
+    "request_fingerprint": "1f1f44c0de9604d0653dae63550b81656763e4904572fd24488a52772362eff8",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/france.html",
+    "file": "europe_france.html",
+    "sha256": "8abd07807d3532ed58e495294a5c5873c5a81d1500e46151a28f90f3741e5b49",
+    "status": 200,
     "headers": {
-      "content-type": "text/html"
+      "content-type": "text/html; charset=UTF-8"
     },
-    "retrieved_at": "2026-10-15T22:07:00+00:00",
-    "licence": "US Government work"
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "689889a7e21fb9eac39d79497f9bab4384aa375047626b3e19360801eeb3db26",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/germany.html",
+    "file": "europe_germany.html",
+    "sha256": "16054a29fa4fd5aff4516c1bf8ebcafa30d567bc7515302f5d816aeddb291880",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "2a814cb8edfb48652683c1076b4184a7260ed571190008ccca9877fb473ecd1d",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/guide.html",
+    "file": "europe_guide.html",
+    "sha256": "71bb7402a8527c07f5d060e27a5c10927eff9e92a969de2ba84a14290e7ecb96",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "b927dfbdcec0fd1e13556ac8d2f0a58a5a67338427d7ce6d61650b5bd504e35b",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/index.html",
+    "file": "europe_index.html",
+    "sha256": "4e5d71b5d9b036a044515c18864920629c7720c2d1c9e98bb211619620fcbfad",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "c4e5933aaa6fc1fef4e4797aabeea944b66b8f2c0813d64ef4be05871c47223d",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/poland.html",
+    "file": "europe_poland.html",
+    "sha256": "a70d0b9cb5f264b64a49a66cbae020a1d300ca894e8e813d7707575857422303",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "a4bc1367076c4cd278fdde38cc6842ea0884a7456728186b27dfeb8198fa3710",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/slovakia.html",
+    "file": "europe_slovakia.html",
+    "sha256": "83c7e869c3b7c69e83ef5cdff167b2a5d849a526faa861744c35db8e224d5970",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
+  },
+  {
+    "request_fingerprint": "9cf2fa2f44ffc37053db568fcbd4314c5ba8fb45d6c92a53134224f00da29450",
+    "url": "https://www.ssa.gov/policy/docs/progdesc/ssptw/2018-2019/europe/switzerland.html",
+    "file": "europe_switzerland.html",
+    "sha256": "9cc28ffdf98c8a2300fa3ef5e3f149cde3d28d222a6005cca3888da559227a9b",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "retrieved_at": "2026-10-15T23:20:00+00:00",
+    "licence": "US Government work (SSA), public domain in the US; prepared with the ISSA"
   }
 ]

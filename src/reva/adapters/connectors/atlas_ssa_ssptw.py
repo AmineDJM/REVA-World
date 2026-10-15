@@ -245,6 +245,8 @@ def pension_ages(paragraph: str) -> dict[str, Any] | None:
     if re.search(r"\b(men|women|male|female)\b", main, flags=re.I):
         return None
     rest = main[m.end() :].lstrip()
+    if re.match(r"and \d", rest):
+        return None  # "Age 62 and 139 days": a unit other than months is never truncated to whole years
     if rest.startswith("(") and not _OK_PAREN.match(rest):
         return None  # categorical / occupational alternative ages
     if re.search(r"(?:,|\bor) age \d{2} \(", main):

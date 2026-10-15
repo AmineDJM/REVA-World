@@ -33,6 +33,8 @@ export interface NumericScale {
   colors: string[];
   min: number;
   max: number;
+  /** Reported values, ascending (legend ranges show actual reported ends). */
+  values: number[];
 }
 
 export interface CategoricalScale {
@@ -45,10 +47,13 @@ export type Scale = NumericScale | CategoricalScale;
 export function quantileBreaks(values: number[], classes = SEQ.length): number[] {
   const v = [...values].sort((a, b) => a - b);
   if (v.length === 0) return [];
+  const distinct = [...new Set(v)];
+  // Few distinct values: one class per value (no empty or duplicated classes).
+  if (distinct.length <= classes) return distinct.slice(0, -1);
   const out: number[] = [];
   for (let i = 1; i < classes; i++) {
     const q = v[Math.min(v.length - 1, Math.floor((i * v.length) / classes))]!;
-    if (out.length === 0 || q > out[out.length - 1]!) out.push(q);
+    if ((out.length === 0 || q > out[out.length - 1]!) && q < distinct[distinct.length - 1]!) out.push(q);
   }
   return out;
 }
@@ -58,7 +63,8 @@ export function buildScale(cells: AtlasCell[]): Scale | null {
   if (nums.length > 0) {
     const breaks = quantileBreaks(nums);
     const colors = SEQ.slice(SEQ.length - (breaks.length + 1));
-    return { kind: 'numeric', breaks, colors, min: Math.min(...nums), max: Math.max(...nums) };
+    const values = [...nums].sort((a, b) => a - b);
+    return { kind: 'numeric', breaks, colors, min: values[0]!, max: values[values.length - 1]!, values };
   }
   const counts = new Map<string, number>();
   for (const c of cells) if (c.value_text) counts.set(c.value_text, (counts.get(c.value_text) ?? 0) + 1);
@@ -135,7 +141,11 @@ export function legendRows(scale: Scale | null, unit: string): { color: string; 
   for (let i = 0; i <= b.length; i++) {
     const lo = i === 0 ? scale.min : b[i - 1]!;
     const hi = i === b.length ? scale.max : b[i]!;
-    rows.push({ color: scale.colors[i]!, label: `${i === 0 ? '' : '> '}${f(lo)} – ${f(hi)}` });
+    // Class i holds values in (b[i-1], b[i]]; show the values actually reported at its ends.
+    const inClass = scale.values.filter((x) => (i === 0 || x > lo) && x <= hi);
+    const a = inClass.length ? inClass[0]! : lo;
+    const z = inClass.length ? inClass[inClass.length - 1]! : hi;
+    rows.push({ color: scale.colors[i]!, label: a === z ? f(a) : `${f(a)} – ${f(z)}` });
   }
   return rows;
 }

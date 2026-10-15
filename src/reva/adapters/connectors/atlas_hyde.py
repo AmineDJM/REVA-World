@@ -25,9 +25,13 @@ What is parsed
 Baseline scenario, one indicator per summary file (``SUMMARIES``): one row per country code (ISO 3166
 numeric, the HYDE ``iso_cr`` grid codes) and HYDE time step. Codes whose row is zero in every year of every
 file are placeholders (the files list codes 1-894) and are not emitted; a zero for a real country is kept as
-reported. The ``Total`` row is kept as provider_geo ``world``. **BCE time steps and year 0 cannot be
-represented** in the atlas period columns (dates from year 1 CE): they are not loaded and are counted in the
-report (10000 BCE - 0 CE: 11 steps). HYDE values are model estimates (allocation of historical population
+reported. The ``Total`` row is kept as provider_geo ``world``. **BCE time steps** (10000 BCE .. 0, 11
+steps) are loaded since parser ``atlas_hyde/2``: atlas periods use astronomical year numbering
+(``reva.atlas.tables``; year 0 = 1 BCE, -9999 = 10000 BCE, as in the KG). HYDE's header gives its time
+steps as numbers on one arithmetic scale (-10000, -9000, ..., -1000, 0, 100, ...; 1000-year steps across
+0), i.e. an astronomical scale: the number is used as the astronomical year and each pre-CE row says so in
+``flags.year_numbering`` (HYDE's documents label -10000 "10000 BC"; the one-year difference to historical
+numbering is far below the 1000-year time step). HYDE values are model estimates (allocation of historical population
 and land-use estimates to a 5' grid, summed per country); every row says so (``hyde_modelled``).
 """
 
@@ -46,21 +50,24 @@ from reva.adapters.connectors.atlas_history_common import (
     canon,
     code_digest,
     decimal_text,
-    frame,
     historical_qid,
     ingest_with_run,
     sha256_hex,
     source_spec,
-    year_period,
 )
 from reva.adapters.connectors.atlas_inflate64 import InflateError, inflate
 from reva.adapters.connectors.base import to_raw
+from reva.atlas.tables import frame_with_year_periods
 from reva.kernel.errors import SourceResponseError
 from reva.ports.connectors import FetchItem, RawAcquisition
 
 NAME = "atlas.hyde.hyde321"
-VERSION = "1.0.0"
-PARSER_VERSION = "atlas_hyde/1"
+VERSION = "1.1.0"  # 1.1.0 (ATLASOPS): BCE time steps loaded (astronomical years)
+PARSER_VERSION = "atlas_hyde/2"
+YEAR_NUMBERING = (
+    "HYDE numeric time step used as the astronomical year (year 0 = 1 BCE, -10000 = 10001 BCE); HYDE labels "
+    "-10000 '10000 BC': the one-year difference to historical numbering is below the 1000-year time step"
+)
 SOURCE_KEY = "hyde.dans"
 ATLAS_SOURCE = "hyde"
 ATLAS_DATASET = "hyde321"
@@ -263,7 +270,7 @@ def atlas_rows(
             if code != "Total" and not all(_is_zero(v) for v in vals):
                 live_codes.add(code)
     out: list[dict[str, Any]] = []
-    excluded_bce = 0
+    bce = 0
     bad: list[dict[str, Any]] = []
     for member, (years, rows) in parsed.items():
         ind, unit, note = SUMMARIES[member]
@@ -274,9 +281,6 @@ def atlas_rows(
             iso3 = None if code == "Total" else country_iso3(code, "m49")
             q = None if iso3 or code == "Total" else historical_qid("hyde", code)
             for k, (y, v) in enumerate(zip(years, vals, strict=True)):
-                if y < 1:
-                    excluded_bce += 1
-                    continue
                 d = decimal_text(v)
                 if d is None:
                     bad.append({"member": member, "region": code, "year": y, "text": v[:20]})
@@ -293,9 +297,11 @@ def atlas_rows(
                     flags["unit_note"] = UNIT_NOTE
                 if code == "Total":
                     flags["aggregate"] = "world (HYDE Total row)"
+                if y < 1:
+                    bce += 1
+                    flags["year_numbering"] = YEAR_NUMBERING
                 if q is not None:
                     flags["entity_mapping"] = {"qid": q["qid"], "review": q.get("review_status", "agent_mapped")}
-                start, end = year_period(y)
                 out.append(
                     {
                         "source": ATLAS_SOURCE,
@@ -305,8 +311,7 @@ def atlas_rows(
                         "iso3": iso3,
                         "provider_geo": geo,
                         "entity_qid": q["qid"] if q else None,
-                        "period_start": start,
-                        "period_end": end,
+                        "year": y,  # astronomical; periods built by frame_with_year_periods
                         "value": d,
                         "value_text": None,
                         "unit": unit,
@@ -319,7 +324,7 @@ def atlas_rows(
     report = {
         "members": sorted(members),
         "countries": len(live_codes),
-        "excluded_bce_or_year0_cells": excluded_bce,
+        "bce_or_year0_cells": bce,
         "bce_steps": [y for y in years0 if y < 1],
         "bad_cells": bad[:20],
         "unmapped_codes": sorted(c for c in live_codes if country_iso3(c, "m49") is None),
@@ -389,15 +394,15 @@ class HydeConnector:
         report["record"] = rec
         note = (
             f"HYDE 3.2.1 baseline country summaries ({len(SUMMARIES)} variables) from {BASELINE} "
-            f"(DANS {DOI}, Range request on the archive tail); CE time steps 100-2017; BCE steps not loaded; "
-            "modelled estimates."
+            f"(DANS {DOI}, Range request on the archive tail); time steps -10000..2017 (astronomical years; "
+            "pre-CE rows flagged year_numbering); modelled estimates."
         )
         used = [sha, sha256_hex(by["hyde.record"].body), sha256_hex(readme)]
         return [
             AtlasBuild(
                 ATLAS_SOURCE,
                 ATLAS_DATASET,
-                frame(rows),
+                frame_with_year_periods(rows, year_key="year"),
                 used,
                 PARSER_VERSION,
                 note,
