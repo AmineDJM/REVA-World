@@ -651,9 +651,6 @@ BEGIN
 END;
 $$;
 
--- (R5-11 hygiene, review note) functions created by later migrations are not
--- executable by PUBLIC unless granted explicitly.
-ALTER DEFAULT PRIVILEGES REVOKE EXECUTE ON FUNCTIONS FROM PUBLIC;
 """
 
 

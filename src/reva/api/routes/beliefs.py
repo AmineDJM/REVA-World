@@ -32,6 +32,7 @@ from reva.api.deps import (
 from reva.api.errors import ApiProblem, NotFound
 from reva.api.routes.world import resolve_entity
 from reva.belief.snapshots import release_as_of, release_by_id
+from reva.world import queries as wq
 
 router = APIRouter(prefix="/v1", tags=["beliefs"], dependencies=[Depends(require_scope("read"))])
 
@@ -84,14 +85,27 @@ WHERE e.release_id = :r
   AND (CAST(:subjects AS uuid[]) IS NULL OR e.subject_id = ANY(:subjects))
   AND (CAST(:concepts AS text[]) IS NULL OR c.concept_id = ANY(:concepts))
   AND (CAST(:y AS integer) IS NULL OR EXTRACT(YEAR FROM lower(sp.valid_range)) = :y)
-  AND (CAST(:c0 AS text) IS NULL OR (c.concept_id, e.subject_id::text, COALESCE(sp.temporal_extent->>'start', ''), e.id)
-       > (CAST(:c0 AS text), CAST(:c1 AS text), CAST(:c2 AS text), CAST(:c3 AS uuid)))
-ORDER BY c.concept_id, e.subject_id::text, COALESCE(sp.temporal_extent->>'start', ''), e.id
+  AND (CAST(:c0 AS text) IS NULL
+       OR (c.concept_id COLLATE "C", e.subject_id::text COLLATE "C",
+           COALESCE(sp.temporal_extent->>'start', '') COLLATE "C", e.id)
+          > (CAST(:c0 AS text) COLLATE "C", CAST(:c1 AS text) COLLATE "C", CAST(:c2 AS text) COLLATE "C",
+             CAST(:c3 AS uuid)))
+ORDER BY c.concept_id COLLATE "C", e.subject_id::text COLLATE "C",
+         COALESCE(sp.temporal_extent->>'start', '') COLLATE "C", e.id
 LIMIT :lim
 """
 
 
-def estimate_model(r: dict[str, Any]) -> s.BeliefEstimate:
+def _uuid_or_none(v: Any) -> UUID | None:
+    if v is None or isinstance(v, UUID):
+        return v
+    try:
+        return UUID(str(v))
+    except ValueError:
+        return None
+
+
+def estimate_model(r: dict[str, Any], mark: dict[str, Any] | None = None) -> s.BeliefEstimate:
     flags, flags_cut = bounded_source_flags(r.get("source_flags"))
     return s.BeliefEstimate(
         id=r["id"], release_id=r["release_id"],
@@ -101,6 +115,9 @@ def estimate_model(r: dict[str, Any]) -> s.BeliefEstimate:
         discrepancy_flags=r["discrepancy_flags"], source_key=r["source_key"], observation_id=r["observation_id"],
         observation_revision_no=r["revision_no"], retrieved_at=r["retrieved_at"],
         source_flags=flags, source_flags_truncated=flags_cut,
+        stale=mark is not None, stale_reason=None if mark is None else mark.get("reason"),
+        proposal_id=None if mark is None else _uuid_or_none(mark.get("proposal_id")),
+        served_from_release_id=r.get("served_from_release_id", r["release_id"]),
         method=s.ModelVersionRef(id=r["method_id"], model_key=r["model_key"], version=r["method_version"],
                                  approval_status=r["approval_status"]),
     )
@@ -112,15 +129,50 @@ def beliefs_response(
 ) -> s.BeliefListResponse:
     rel = resolve_release(conn, release_id, as_of, origin)
     cur = decode_cursor(cursor, "sssu")
-    rows = [dict(r) for r in conn.execute(text(ESTIMATE_SQL), {
-        "r": rel["id"], "subjects": subjects or None, "concepts": concepts or None, "y": year,
-        "c0": cur[0] if cur else None, "c1": cur[1] if cur else None, "c2": cur[2] if cur else None,
-        "c3": cur[3] if cur else None, "lim": limit + 1}).mappings()]
-    rows, nxt = page(rows, limit, lambda r: (r["concept_id"], str(r["subject_id"]), r["sort_start"], r["id"]))
+
+    def fetch(release_id: Any, concept_filter: list[str] | None) -> list[dict[str, Any]]:
+        return [dict(r, served_from_release_id=release_id) for r in conn.execute(text(ESTIMATE_SQL), {
+            "r": release_id, "subjects": subjects or None, "concepts": concept_filter or None, "y": year,
+            "c0": cur[0] if cur else None, "c1": cur[1] if cur else None, "c2": cur[2] if cur else None,
+            "c3": cur[3] if cur else None, "lim": limit + 1}).mappings()]
+
+    def key(r: dict[str, Any]) -> tuple[Any, ...]:
+        # Byte order (COLLATE "C" in ESTIMATE_SQL) so the merged order equals the SQL keyset order.
+        return (r["concept_id"], str(r["subject_id"]), r["sort_start"], r["id"])
+
+    rows = fetch(rel["id"], concepts)
+    # Publication pauses (connector repair): a concept the release withheld is served from the last earlier
+    # release that published it, marked stale; an active pause marks the pinned values stale. Every source
+    # query uses the same keyset cursor and order, so merging them keeps pagination exact.
+    marks = wq.publication_staleness(conn, rel, as_of=as_of)
+    served_from: dict[str, dict[str, Any]] = {}
+    for concept, mark in sorted(marks.items()):
+        if not mark.get("withheld_in_release") or (concepts and concept not in concepts):
+            continue
+        prev = wq.last_release_with_concept(conn, rel, concept)
+        if prev is None:
+            continue
+        served_from[concept] = prev
+        have = {(r["subject_id"], r["support_id"]) for r in rows if r["concept_id"] == concept}
+        rows += [r for r in fetch(prev["id"], [concept]) if (r["subject_id"], r["support_id"]) not in have]
+    if served_from:
+        rows.sort(key=key)
+    rows, nxt = page(rows, limit, key)
     method = conn.execute(text("SELECT id, model_key, version, approval_status, assumptions FROM model.version "
                                "WHERE model_key || '@' || version = :m"), {"m": rel["method"]}).mappings().one_or_none()
-    data = [estimate_model(r) for r in rows]
+    data = [estimate_model(r, marks.get(r["concept_id"])) for r in rows]
     warnings = origin_warnings(rel["origin"])
+    if marks:
+        parts = []
+        for concept, mark in sorted(marks.items()):
+            how = (f"withheld from this release; serving release #{served_from[concept]['sequence']} as stale"
+                   if concept in served_from else
+                   "withheld from this release; no earlier release published it" if mark.get("withheld_in_release")
+                   else f"paused since {mark.get('paused_since')}; values are stale")
+            parts.append(f"{concept} ({mark.get('reason')}): {how}")
+        warnings.append(s.ApiWarning(
+            code="publication_paused",
+            message="Belief publication is paused pending a reviewed connector repair: " + "; ".join(parts)[:1500]))
     n_missing = sum(1 for d in data if d.value.kind == "missing")
     if n_missing:
         warnings.append(s.ApiWarning(code="missing_values",
@@ -143,7 +195,8 @@ def beliefs_response(
         else s.Assessment(status="not_assessed", reason="no alternative eligible source in this page"),
         historical_validation=s.Assessment(status="not_applicable",
                                            reason="selected source reports are not forecasts"),
-        provenance_links=[link("release", rel["id"])] + [link("estimate", d.id) for d in data[:50]],
+        provenance_links=[link("release", rel["id"])] + [link("release", p["id"]) for p in served_from.values()]
+        + [link("estimate", d.id) for d in data[:50]],
         warnings=warnings, cost=t.cost(len(rows)), next_cursor=nxt,
     )
 

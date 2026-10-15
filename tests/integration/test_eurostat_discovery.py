@@ -305,7 +305,9 @@ async def test_rollback_retires_eligibility(db, tmp_path):
     with pytest.raises(Exception):
         rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
                            "agent:autonomy-discovery", "test")
-    rollback_promotion(db.worker, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
+    # a named human acts through the admin path; the database refuses human attribution from the
+    # worker login (R5-01)
+    rollback_promotion(db.owner, CONNECTOR, "1.0.0", "demography.population.jan1_age_sex@1.0.0",
                        "human:maintainer", "rollback drill")
     with db.owner.connect() as conn:
         cv = conn.execute(text("SELECT id FROM evidence.connector_version WHERE name=:n"),
@@ -412,7 +414,7 @@ async def test_r4_04_rediscovery_after_rollback_holds(db, tmp_path):
 
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, _job_ctx(db, tmp_path))
     if out["status"] != "rolled_back_hold":  # make the precondition explicit (shared session DB)
-        rollback_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill")
+        rollback_promotion(db.owner, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill")
     events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
     passes = ("SELECT count(*) FROM ops.gate_result g JOIN ops.proposal p ON p.id=g.proposal_id "
               "WHERE p.proposal_type='connector_promotion' AND g.decision='pass'")
@@ -424,7 +426,9 @@ async def test_r4_04_rediscovery_after_rollback_holds(db, tmp_path):
     assert CONNECTOR not in promoted_connectors(db.worker, db.store)  # retired versions are not loaded
     with pytest.raises(Exception):
         reapprove_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "agent:autonomy-discovery", "no")
-    reapprove_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill over")
+    with pytest.raises(Exception, match="governance"):  # (R5-01) worker credentials cannot claim a human
+        reapprove_promotion(db.worker, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "forged")
+    reapprove_promotion(db.owner, CONNECTOR, "1.0.0", CONCEPT, "human:maintainer", "drill over")
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == "1.0.0"
 
 
@@ -432,7 +436,13 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     from reva.adapters.connectors.eurostat_template import template_digest
     from reva.autonomy.common import ArtifactIO
     from reva.autonomy.gate import PolicyPromotionGate
-    from reva.autonomy.jobs import connector_change_proposal, promote_connector, promoted_connectors, rollback_promotion
+    from reva.autonomy.jobs import (
+        connector_change_proposal,
+        connector_promotion_scope,
+        promote_connector,
+        promoted_connectors,
+        rollback_promotion,
+    )
     from reva.autonomy.policy import promotion_policy
     from reva.autonomy.promotion import resolve_connector_version
     from reva.autonomy.proposals import ProposalStore
@@ -459,7 +469,9 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
         v = await JsonStatConnectorValidator(io_).validate(cp2, bank, default_budget())
         val = ValueEstimate("unsupported", None, None, {}, io_.put_json({"t": 1}, "evaluation"), "t")
         p = connector_change_proposal(io_, cp2, manifest, mappings[0], val, promotion_policy())
-        ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion", scope={}, risk={})
+        # (R5-01) the recorded scope is what the database binds the gate pass to
+        ProposalStore(db.worker, io_).persist(p, proposal_type="connector_promotion",
+                                              scope=connector_promotion_scope(io_, manifest, mp), risk={})
         s = await TrustedTemplateSandbox(io_, fixtures=bank).run(p, trusted_template_policy(default_budget()))
         d = PolicyPromotionGate(db.worker, io_).decide(p, [v, s], promotion_policy().ref())
         assert d.outcome == "promote", d.reasons
@@ -475,7 +487,7 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     out = promote_connector(db.worker, io_, _job_ctx(db, tmp_path), m, mp, await gate_pass(m), promotion_policy())
     assert out["status"] == "promoted" and out["version"] == new_v and out["superseded"] == [active]
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == new_v
-    rollback_promotion(db.worker, CONNECTOR, new_v, CONCEPT, "human:maintainer", "drill")
+    rollback_promotion(db.owner, CONNECTOR, new_v, CONCEPT, "human:maintainer", "drill")
     assert promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == active  # restored
     events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
     n = _count(db, events)

@@ -174,7 +174,7 @@ def start_worker(d: ChaosDB, chaos_dir: Path, *, cli: bool = False, **extra: str
     chaos_dir.mkdir(parents=True, exist_ok=True)
     cmd = reva_cli() if cli else [sys.executable, str(LAUNCHER)]
     log_path = chaos_dir / f"worker-{uuid.uuid4().hex[:6]}.log"
-    fh = open(log_path, "wb")  # noqa: SIM115 - closed in stop()
+    fh = open(log_path, "wb")  # closed in WorkerProc.stop()
     p = subprocess.Popen(cmd, cwd=REPO, env=worker_env(d, chaos_dir, **extra), stdout=fh,
                          stderr=subprocess.STDOUT, start_new_session=True)
     return WorkerProc(p, log_path, time.monotonic(), _log=fh)

@@ -287,7 +287,12 @@ def connector_promotion_scope(io_: ArtifactIO, manifest: dict[str, Any], mapping
     return {"concept": mapping.target_concept_version, "dataset": dataset or manifest["dataset"],
             "geo": manifest["request_parameters"]["filters"].get("geo"),
             "eligibility_scope": manifest["eligibility_scope"], "mapping_key": mm["mapping_key"],
-            "subject_ids": [str(entity_id(x)) for x in subjects], "years": manifest["request_parameters"]["time"]}
+            "subject_ids": [str(entity_id(x)) for x in subjects], "years": eligibility_years(manifest)}
+
+
+def eligibility_years(manifest: dict[str, Any]) -> dict[str, list[int]]:
+    """The manifest's requested years in the explicit eligibility form ``{"in": [y, ...]}`` (R5-11)."""
+    return {"in": sorted({int(str(y)) for y in manifest["request_parameters"]["time"]})}
 
 
 def connector_change_proposal(io_: ArtifactIO, cp: ConnectorProposal, manifest: dict[str, Any],
@@ -475,7 +480,7 @@ def promote_connector(engine: Engine, io_: ArtifactIO, ctx: Any, manifest: dict[
             "applicability": {"subjects": subjects}, "eligibility": "none",
         }, act.id, policy_version=policy.version, approval=(decision.proposal_id, decision.decision_id))
         applicability = {"subjects": subjects, "subject_ids": [str(entity_id(x)) for x in subjects],
-                         "years": manifest["request_parameters"]["time"],
+                         "years": eligibility_years(manifest),
                          "geo": manifest["request_parameters"]["filters"].get("geo"),
                          "mapping_key": mm["mapping_key"], "gate_result_id": str(decision.decision_id),
                          "rollback_sha256": rb_ref.sha256}

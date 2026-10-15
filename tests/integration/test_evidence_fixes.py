@@ -214,7 +214,7 @@ def _isolated_spec(db: Any) -> Any:
     """A test-only source + connector version (eligible for POP, never in a preference policy), so
     live-origin test rows never appear under a real source of the shared session database."""
     spec = WB.model_copy(update={"name": "fx2.test.connector", "source_key": TEST_SOURCE})
-    with db.worker.begin() as c:
+    with db.owner.begin() as c:  # registry setup (approved eligibility): migration owner, as seeding (R5-01)
         act = repo.simple_activity("registry.seed", "review", "maintainer:fx2-test", {})
         repo.record_activity(c, act)
         if repo.source_by_key(c, TEST_SOURCE) is None:
@@ -549,7 +549,7 @@ def test_r27_retracted_latest_revision_is_not_replaced_by_superseded_value(db: A
     _ingest(db, tag, {"a": "200", "b": "500"}, body_salt="v2")
     rev1, rev2 = _obs(db, f"fx2:{tag}:a")
     assert (rev1["v"], rev2["v"], rev2["revision_no"]) == ("100", "200", 2)
-    with db.worker.begin() as c:
+    with db.owner.begin() as c:  # a human-attributed retraction: admin path, never worker credentials (R5-01)
         retract_observation(c, rev2["id"], "provider withdrew the value", actor="human:fx2-test")
     with db.worker.connect() as c:
         rows = eligible_latest(c, _now(db.worker), ["test_fixture"], [POP], include_retracted=True)
@@ -577,7 +577,7 @@ def test_r27_ineligible_latest_revision_falls_back_with_flag(db: Any) -> None:
     tag = f"r27b-{uuid.uuid4().hex[:8]}"
     _ingest(db, tag, {"a": "100"})
     spec2 = WB.model_copy(update={"version": f"0.0.0-fx2-{tag}", "parser_version": "fx2-parse"})
-    with db.worker.begin() as c:
+    with db.owner.begin() as c:  # maintainer-attributed registry setup: migration owner (R5-01)
         act = repo.simple_activity("registry.seed", "review", "maintainer:fx2-test", {})
         repo.record_activity(c, act)
         register_connector_version(c, db.store, spec2, act.id)  # no eligibility decision: ineligible

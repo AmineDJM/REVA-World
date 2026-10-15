@@ -27,6 +27,7 @@ def make_engine(kind: EngineKind, settings: Settings | None = None) -> Engine:
         max_overflow=s.reva_db_max_overflow,
         pool_pre_ping=True,
         pool_recycle=1800,
+        hide_parameters=True,  # bound values (token hashes, passwords) never reach error text
         connect_args={
             "options": f"-c statement_timeout={timeout} -c lock_timeout=5000",
             "application_name": f"reva-{kind}",

@@ -1107,3 +1107,65 @@ def test_r7_entity_origin_is_derived_from_its_data(env: Env) -> None:
         assert not c.execute(text("SELECT count(*) FROM evidence.acquisition WHERE origin = 'live'")).scalar_one()
     for iso3 in ("DZA", "CHN", "USA"):
         assert env.client.get(f"/v1/entities/{iso3}").json()["origin"] == "test_fixture"
+
+
+def test_r7_paused_concept_is_served_stale_from_last_accepted_release(env: Env) -> None:
+    """Connector-repair pause (HOOK): the withheld concept comes from the last release that published it,
+    marked stale with the repair proposal; other concepts stay fresh; pagination over the merge is exact.
+    Runs last in the module and restores a fresh full release afterwards."""
+    from reva.autonomy import repair as R
+    from reva.autonomy.common import stable_id
+
+    proposal = stable_id(f"api-r7-pause-{uuid.uuid4()}")
+    t_before = datetime.now(UTC)
+    with env.worker.begin() as c:
+        R.pause_belief_publication(c, [POP], connector=WB, classification=R.RENAME, proposal_id=proposal,
+                                   origin="test_fixture", item_key=None, acquisition_id=None, actor=R.AUTHOR)
+    try:
+        r3 = publish_release(env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
+                             environment="test")
+        b = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP}).json()
+        assert b["baseline_release"]["id"] == str(r3.release_id)
+        assert b["data"] and all(
+            d["stale"] and d["stale_reason"] == "source_schema_quarantine" and d["proposal_id"] == str(proposal)
+            and d["served_from_release_id"] == str(env.r2.release_id) for d in b["data"])
+        w = next(x for x in b["warnings"] if x["code"] == "publication_paused")
+        assert POP in w["message"] and "stale" in w["message"]
+        assert any(lk["kind"] == "release" and lk["id"] == str(env.r2.release_id) for lk in b["provenance_links"])
+
+        # All concepts for FRA: only POP is stale; the merged page sequence is exact (no gaps, no repeats).
+        full = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "limit": 1000}).json()["data"]
+        assert {d["concept_id"] for d in full if d["stale"]} == {POP}
+        assert all(d["served_from_release_id"] == str(r3.release_id) for d in full if not d["stale"])
+        seen: list[str] = []
+        cursor = None
+        while True:
+            params: dict[str, Any] = {"subject_id": "FRA", "limit": 7}
+            if cursor:
+                params["cursor"] = cursor
+            pg = env.client.get("/v1/beliefs", params=params).json()
+            seen += [d["id"] for d in pg["data"]]
+            cursor = pg["next_cursor"]
+            if not cursor:
+                break
+        assert seen == [d["id"] for d in full] and len(set(seen)) == len(seen)
+
+        # Pinned earlier release under an active pause: its own POP values, marked stale.
+        pinned = env.client.get("/v1/beliefs", params={"release_id": str(env.r2.release_id), "subject_id": "FRA",
+                                                        "concept": POP}).json()
+        assert pinned["data"] and all(d["stale"] and d["served_from_release_id"] == str(env.r2.release_id)
+                                      for d in pinned["data"])
+        # As known before the pause: nothing is stale.
+        before = env.client.get("/v1/beliefs", params={"as_of": iso(t_before), "subject_id": "FRA",
+                                                       "concept": POP}).json()
+        assert before["baseline_release"]["id"] == str(env.r2.release_id)
+        assert not any(d["stale"] for d in before["data"])
+        assert not any(x["code"] == "publication_paused" for x in before["warnings"])
+    finally:
+        with env.owner.begin() as c:
+            c.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"), {"k": R.PAUSE_PREFIX + POP})
+        publish_release(env.worker, env.store, cutoff=datetime.now(UTC), origin=Origin.test_fixture,
+                        environment="test")
+    after = env.client.get("/v1/beliefs", params={"subject_id": "FRA", "concept": POP}).json()
+    assert after["data"] and not any(d["stale"] for d in after["data"])
+    assert not any(x["code"] == "publication_paused" for x in after["warnings"])

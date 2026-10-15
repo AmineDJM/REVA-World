@@ -623,6 +623,13 @@ class BeliefEstimate(ApiModel):
     source_flags: dict[str, Any] | None = Field(
         None, description=SOURCE_FLAGS_DOC + " Null when the estimate has no selected observation.")
     source_flags_truncated: bool = Field(False, description=SOURCE_FLAGS_TRUNCATED_DOC)
+    stale: bool = Field(False, description="Publication of this concept is paused (e.g. a source schema "
+                        "quarantine awaiting a reviewed repair): the value is the last accepted one, not fresh")
+    stale_reason: str | None = Field(None, description="Why the concept is stale, e.g. source_schema_quarantine")
+    proposal_id: UUID | None = Field(None, description="Repair proposal whose review lifts the pause")
+    served_from_release_id: UUID | None = Field(
+        None, description="Release this row was read from. Differs from the envelope's baseline release when the "
+        "pinned release withheld the concept and the last earlier release that published it is served (stale)")
     method: ModelVersionRef
 
 

@@ -325,7 +325,8 @@ def test_sustained_db_outage_handler_stops_by_lease_expiry_then_worker_reconnect
     assert r["status"] == "succeeded" and r["fencing_token"] > token
     # Safety: without a lease the old attempt must stop working (lease = last good beat + LEASE_SECONDS).
     late = [e for e in events(tmp_path / "w", "step", token=token) if e["t"] > outage + LEASE_SECONDS + 2]
-    assert not late, f"{len(late)} steps of the expired attempt ran after its lease; last at +{late[-1]['t'] - outage:.1f}s"
+    assert not late, (f"{len(late)} steps of the expired attempt ran after its lease; "
+                      f"last at +{late[-1]['t'] - outage:.1f}s")
 
 
 # =========================================================================== 4. cancellation

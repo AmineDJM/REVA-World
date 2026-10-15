@@ -447,14 +447,16 @@ def complete(engine: Engine, job: ClaimedJob, result: Mapping[str, Any] | None,
 
 def finish_cancelled(engine: Engine, job: ClaimedJob, details: Mapping[str, Any] | None = None) -> None:
     with engine.begin() as c:
-        _complete(c, job, "cancelled", None, {"code": "cancelled", **(details or {})})
+        from reva.operations.telemetry import redact_obj
+
+        _complete(c, job, "cancelled", None, {"code": "cancelled", **redact_obj(dict(details or {}))})
 
 
 def error_document(code: str, message: str, *, retryable: bool, attempt: int, **extra: Any) -> dict[str, Any]:
-    from reva.operations.telemetry import redact_text, secret_values
+    from reva.operations.telemetry import redact_obj, redact_text, secret_values
 
     return {"code": code[:64], "message": redact_text(message, secret_values())[:MAX_ERROR_MESSAGE],
-            "retryable": retryable, "attempt": attempt, **extra}
+            "retryable": retryable, "attempt": attempt, **redact_obj(dict(extra))}
 
 
 def backoff_seconds(attempts: int, base: float = DEFAULT_BACKOFF_BASE_SECONDS,

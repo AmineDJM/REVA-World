@@ -62,7 +62,8 @@ class FixtureHttp:
         else:
             e = self.entries.get(fp)
             if e is None:
-                raise SourceResponseError(f"no captured fixture for {url}", retryable=False, kind="fixture_missing")
+                raise SourceResponseError(f"no captured fixture for {redact_url(url)}", retryable=False,
+                                          kind="fixture_missing")
             body = (self.dir / e["file"]).read_bytes()
             if sha256_bytes(body) != e["sha256"]:
                 raise SourceResponseError("fixture bytes do not match manifest hash", retryable=False)

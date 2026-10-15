@@ -348,7 +348,6 @@ def test_real_db_errors_are_scrubbed_in_job_errors_and_logs(db: Any, json_log: i
     assert_absent(json_log.getvalue(), sha, tok)
 
 
-@pytest.mark.xfail(strict=True, reason="engine.py: make_engine lacks hide_parameters=True (patch P1)")
 def test_runtime_engines_hide_bound_parameters(db: Any) -> None:
     for eng in (db.api, db.worker, db.sim):
         assert eng.hide_parameters, eng.url.username
@@ -460,12 +459,13 @@ def test_worker_db_failure_last_error_and_api_view_hold_no_parameters(
 
     row = _run_failing_job(fresh, monkeypatch, handler)
     assert row["last_error"]["exception"] == "ProgrammingError"
-    assert "[parameters: ***]" in row["last_error"]["message"]  # the stored text still says what failed
+    msg = row["last_error"]["message"]
+    # parameters are either never rendered (hide_parameters=True) or masked by redaction
+    assert "[SQL parameters hidden" in msg or "[parameters: ***]" in msg
     assert_absent(json.dumps(row["last_error"], default=str) + json.dumps(public_error(row["last_error"]))
                   + json_log.getvalue() + _sweep(fresh.owner), sha)
 
 
-@pytest.mark.xfail(strict=True, reason="queue.error_document stores exception details unredacted (patch P3)")
 def test_worker_failure_details_are_redacted(fresh: Fresh, monkeypatch: pytest.MonkeyPatch) -> None:
     from reva.api.routes.system import public_error
 
@@ -706,7 +706,6 @@ async def test_fixture_ingest_logs_no_raw_bodies(fresh: Fresh, json_log: io.Stri
         assert snippet not in out
 
 
-@pytest.mark.xfail(strict=True, reason="evidence/runner.py FixtureHttp echoes the raw URL in its error (patch P7)")
 async def test_fixture_http_missing_fixture_error_has_no_key() -> None:
     from reva.evidence.runner import FixtureHttp
 
