@@ -19,6 +19,11 @@ daily_totals_increase:
   # The current total (2,000 requests, 500 MB per day for every source together) cannot hold a KG harvest.
   http_requests_total: "+5500"
   http_bytes_total: "+2_000_000_000"   # ~2 GB/day worst case; archived raw for the whole seed run is < 0.5 GB
+key_names: >-
+  Kept as wikidata.wdqs (SPARQL; the lead's "wikidata.sparql") and wikidata.wbapi (Wikibase action API:
+  wbgetentities and enwiki-sitelink lookups; the lead's "wikidata.wbgetentities" / "wikidata.wbsearchentities"
+  -- wbsearchentities is not used by WDHARVEST). Both keys are already merged in budgets.yaml and registered in
+  registry/sources/wikidata_{wdqs,wbapi}.yaml; renaming would only churn the ledger accounts.
 notes: >-
   Budgets are enforced through reva.operations.budgets (reserve_ingest + MeteredHttp per source key);
   without these keys in the pinned policy every live harvest run is refused (fail closed).

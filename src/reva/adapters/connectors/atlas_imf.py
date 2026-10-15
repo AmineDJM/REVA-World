@@ -48,8 +48,12 @@ Honesty rules implemented here:
   (kept, listed). IMTS partners are folded into the indicator (``XG_FOB_USD|partner=DEU``) and mapped
   into ``flags.partner_iso3`` (null when unmapped; the IMF code is always kept).
 
-Nothing here writes to a database except :func:`archive_raw` / :func:`ingest`, which use the evidence
-ingest service and :func:`reva.atlas.tables.register_atlas_table`.
+Atlas source platform (``docs/dev/v3_atlas_interface.md`` section 7): :func:`atlas_source` declares
+the source; :func:`atlas_ingest` runs inside :func:`reva.atlas.ingest.run_atlas_ingest`, which meters
+every request against the ``imf.sdmx`` budget. This module never builds an HTTP client: it fetches
+with ``run.get``, archives raw bytes with ``run.archive`` and registers tables with ``run.register``.
+
+    uv run reva atlas ingest atlas.imf [--dataset weo] [--fixture]
 """
 
 from __future__ import annotations
@@ -63,13 +67,13 @@ import xml.etree.ElementTree as ET
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
-from typing import Any, get_args
+from typing import Any
 from urllib.parse import urlencode
 
 import polars as pl
 
-from reva.adapters.http.safe_client import request_fingerprint
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.atlas.sources import AtlasSourceSpec
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.imf"
 CONNECTOR_VERSION = "1.0.0"
@@ -80,8 +84,6 @@ HOST = "api.imf.org"
 BASE = f"https://{HOST}/external/sdmx/2.1"
 ACCEPT = "application/vnd.sdmx.structurespecificdata+xml;version=2.1"
 GEO_SCHEME = "imf"
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"  # only to validate the other spec fields (see atlas_spec)
 MAX_RESPONSE_BYTES = 50 * 1024 * 1024
 LICENCE = (
     "IMF Copyright and Usage terms (https://www.imf.org/external/terms.htm); provider LICENSE attribute: "
@@ -256,29 +258,32 @@ def imts_queries(
     return out
 
 
-# --------------------------------------------------------------------------- spec / archive
-def template_supported() -> bool:
-    return ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
+# --------------------------------------------------------------------------- atlas source
+#: Fixture subset (tests/fixtures/source/atlas.imf: responses captured live on 2026-10-15).
+FIXTURE_COUNTRIES = ("FRA", "DZA", "IND", "EGY", "KOS", "WBG", "USA", "BRA", "G001", "TWN")
+FIXTURE_START_YEAR = 2018
+FIXTURE_IMTS_YEARS = (2022, 2023)
+FIXTURE_IMTS_REPORTERS = ("FRA", "DZA")
+#: One full run: 6 flows + the IMTS codelist + ceil(~209 reporters / 12) IMTS chunks (29 measured live).
+PLANNED_REQUESTS = 30
 
 
 def code_digest() -> str:
     return "sha256:" + hashlib.sha256(inspect.getsource(inspect.getmodule(code_digest)).encode()).hexdigest()  # type: ignore[arg-type]
 
 
-def describe() -> ConnectorSpec:
-    """Connector spec with ``template = "atlas_bulk"``.
-
-    ``ConnectorSpec.template`` is a closed ``Literal`` without an atlas value (requested change for
-    the lead: add ``"atlas_bulk"``); until then every other field is validated with a placeholder
-    template that is replaced afterwards (same approach as the other atlas agents)."""
-    fields: dict[str, Any] = {
-        "name": CONNECTOR_NAME,
-        "version": CONNECTOR_VERSION,
-        "source_key": SOURCE_KEY,
-        "provider": "International Monetary Fund",
-        "licence": LICENCE,
-        "allowed_hosts": (HOST,),
-        "dataset_ids": (
+def atlas_source() -> AtlasSourceSpec:
+    """The ``atlas.imf`` source (budget key ``imf.sdmx``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=SOURCE,
+        provider="International Monetary Fund",
+        licence=LICENCE,
+        allowed_hosts=(HOST,),
+        datasets=DATASETS,
+        dataset_ids=(
             "IMF.RES:WEO",
             "IMF.STA:BOP",
             "IMF.STA:GFS_SOO",
@@ -287,80 +292,41 @@ def describe() -> ConnectorSpec:
             "IMF.STA:IL",
             "IMF.STA:IMTS",
         ),
-        "field_mappings": {"atlas_datasets": list(DATASETS), "geo_scheme": GEO_SCHEME},
-        "units": {
-            "weo": "per indicator (see WEO_INDICATORS)",
-            "bop": "US dollars",
-            "gfs_soo": "% of GDP",
-            "er": "national currency per US dollar",
-            "mfs_ir": "% per annum",
-            "il": "US dollars",
-            "imts": "US dollars",
+        cadence_seconds=30 * 86400,
+        planned_requests=PLANNED_REQUESTS,
+        max_response_bytes=MAX_RESPONSE_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=code_digest(),
+        field_mappings={
+            "geo_scheme": GEO_SCHEME,
+            "units": {
+                "weo": "per indicator (see WEO_INDICATORS)",
+                "bop": "US dollars",
+                "gfs_soo": "% of GDP",
+                "er": "national currency per US dollar",
+                "mfs_ir": "% per annum",
+                "il": "US dollars",
+                "imts": "US dollars",
+            },
+            "time_semantics": "annual periods as labelled by the IMF (WEO maps fiscal years to calendar labels)",
         },
-        "geography": ("all IMF economies and aggregates",),
-        "time_semantics": "annual periods as labelled by the IMF (WEO maps fiscal years to calendar labels)",
-        "lineage_family": "imf",
-        "cadence_seconds": 30 * 86400,
-        "release_aware": True,
-        "revision_strategy": "a new vintage/revision is a new version of the atlas table (latest at cutoff)",
-        "max_response_bytes": MAX_RESPONSE_BYTES,
-        "max_pages": 1,
-        "parser_version": PARSER_VERSION,
-        "code_digest": code_digest(),
-    }
-    if template_supported():
-        return ConnectorSpec(template=ATLAS_TEMPLATE, **fields)  # type: ignore[arg-type]
-    checked = ConnectorSpec(template=_VALID_PLACEHOLDER, **fields)  # type: ignore[arg-type]
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
-
-
-class ImfAtlasConnector:
-    """Registry adapter: ``builtin_connectors`` keys connectors by ``describe().name``."""
-
-    def describe(self) -> ConnectorSpec:
-        return describe()
-
-
-async def fetch(item: FetchItem, http: Any) -> RawAcquisition:
-    """GET one item (SafeHttpClient live, FixtureHttp offline)."""
-    accept = ACCEPT if item.params.get("kind") == "sdmx_data" else "application/vnd.sdmx.structure+xml;version=2.1"
-    r = await http.get(item.url, headers={"Accept": accept}, max_bytes=item.max_bytes)
-    return RawAcquisition(
-        item=item,
-        body=r.body,
-        media_type=r.media_type or "application/xml",
-        retrieved_at=r.retrieved_at,
-        response_metadata=r.response_metadata(),
-        request_fingerprint=request_fingerprint("GET", item.url),
-        origin=getattr(http, "origin", "live"),
+        notes="A new WEO vintage/revision is a new version of the atlas table (latest at cutoff).",
     )
 
 
-def archive_raw(
-    engine: Any, store: Any, spec: ConnectorSpec, raw: RawAcquisition, *, actor: str = "worker:atlas_imf"
-) -> str:
-    """Archive raw bytes as an ``evidence.acquisition`` (no observations); return the sha256."""
-    from reva.evidence.ingest import publish_acquisition
-
-    summary = publish_acquisition(engine, store, spec, raw, [], [], actor=actor)
-    if summary.namespace == "quarantine":  # pragma: no cover - no blocking report exists here
-        raise RuntimeError("raw acquisition was quarantined")
-    return summary.raw_sha256
-
-
-def register_connector(engine: Any, store: Any, spec: ConnectorSpec | None = None) -> Any:
-    """Register the connector version (tests / throwaway databases; owner engine).
-
-    In a seeded deployment the seed registers built-in connectors (``registry.py``, lead-owned);
-    ``registry/sources/imf.yaml`` must be seeded first."""
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
-
-    spec = spec or describe()
-    with engine.begin() as conn:
-        act = repo.simple_activity("registry.seed", "review", "system:a_imf", {"connector": spec.name})
-        repo.record_activity(conn, act)
-        return register_connector_version(conn, store, spec, act.id)
+async def fetch(item: FetchItem, run: Any) -> RawAcquisition:
+    """GET one item through the atlas run (metered live client or fixture client)."""
+    accept = ACCEPT if item.params.get("kind") == "sdmx_data" else "application/vnd.sdmx.structure+xml;version=2.1"
+    raw: RawAcquisition = await run.get(
+        item.url,
+        key=item.key,
+        media_types=item.expected_media_types or ("application/xml",),
+        headers={"Accept": accept},
+        max_bytes=item.max_bytes,
+        params=item.params,
+    )
+    return raw
 
 
 # --------------------------------------------------------------------------- SDMX parsing
@@ -1028,17 +994,28 @@ class IngestResult:
         return sum(int(r["bytes"]) for r in self.raws)
 
 
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "tables": self.tables,
+            "stats": self.stats,
+            "failures": self.failures,
+            "requests": self.requests,
+            "raw_bytes": self.bytes,
+        }
+
+
 def _rights() -> dict[str, Any]:
-    return {"licence": LICENCE, "attribution": "International Monetary Fund", "review": "pending_maintainer_review"}
+    return {
+        "licence": LICENCE,
+        "attribution": "International Monetary Fund",
+        "review": "pending_maintainer_review",
+        "source_key": SOURCE_KEY,
+    }
 
 
 async def ingest(
-    engine: Any,
-    store: Any,
-    http: Any,
+    run: Any,
     *,
-    origin: str,
-    datasets: Sequence[str] = DATASETS,
     countries: Sequence[str] | None = None,
     start_year: int | None = None,
     imts_start_year: int = IMTS_START_YEAR,
@@ -1046,26 +1023,27 @@ async def ingest(
     imts_reporters_override: Sequence[str] | None = None,
     log: Callable[[str], None] = lambda _m: None,
 ) -> IngestResult:
-    """Fetch, archive (raw first), parse and register every requested IMF atlas table.
+    """Fetch, archive (raw first), parse and register every IMF atlas table the run wants.
 
-    A failed request is recorded in ``failures`` and its table is not registered (no partial
-    IMTS table: every reporter chunk must succeed)."""
-    from reva.atlas.tables import register_atlas_table
+    ``run`` is a :class:`reva.atlas.ingest.AtlasRun` (``run.wants`` honours ``--dataset``). A
+    failed provider request is recorded in ``failures`` and its table is not registered (no
+    partial IMTS table: every reporter chunk must succeed). A budget refusal or a cancellation is
+    never swallowed: it ends the run (``run_atlas_ingest`` reports ``budget_exhausted``)."""
+    from reva.kernel.errors import PolicyDenied
+    from reva.operations.budgets import BudgetExhausted
 
-    spec = describe()
     res = IngestResult()
-    unknown = sorted(set(datasets) - set(DATASETS))
-    if unknown:
-        raise ValueError(f"unknown IMF datasets {unknown}")
 
     async def get(item: FetchItem) -> tuple[RawAcquisition, str] | None:
         try:
-            raw = await fetch(item, http)
+            raw = await fetch(item, run)
+        except (BudgetExhausted, PolicyDenied):
+            raise
         except Exception as e:  # typed SourceResponseError / UnsafeRequest; recorded, table skipped
             res.failures.append({"item": item.key, "url": item.url, "error": f"{type(e).__name__}: {e}"[:500]})
             log(f"FAILED {item.key}: {e}")
             return None
-        sha = archive_raw(engine, store, spec, raw)
+        sha = run.archive(raw)
         res.raws.append(
             {
                 "item": item.key,
@@ -1079,19 +1057,13 @@ async def ingest(
         return raw, sha
 
     def register(dataset: str, frame: pl.DataFrame, shas: list[str], st: ParseStats, note: str) -> None:
-        summary = register_atlas_table(
-            engine,
-            store,
-            source=SOURCE,
+        summary = run.register(
             dataset=dataset,
             frame=frame,
             raw_sha256s=shas,
-            parser_version=PARSER_VERSION,
-            origin=origin,
             coverage_note=note[:4000],
             geo_scheme=GEO_SCHEME,
             rights=_rights(),
-            actor="worker:atlas_imf",
         )
         res.tables[dataset] = {k: v for k, v in summary.items() if k != "coverage"} | {
             "coverage": {k: v for k, v in summary["coverage"].items() if k != "unmapped_provider_geo"}
@@ -1100,7 +1072,7 @@ async def ingest(
         log(f"registered imf.{dataset}: {summary['row_count']} rows, created={summary['created']}")
 
     for q in flow_queries(countries, start_year):
-        if q.dataset not in datasets:
+        if not run.wants(q.dataset):
             continue
         got = await get(q.fetch_item())
         if got is None:
@@ -1116,7 +1088,7 @@ async def ingest(
             note = note.format(vintage=st.notes["vintage"]["vintage_label"])
         register(q.dataset, frame, [sha], st, note)
 
-    if "imts" in datasets:
+    if run.wants("imts"):
         got = await get(imts_codelist_item())
         if got is not None:
             names = parse_codelist(got[0].body)
@@ -1155,17 +1127,35 @@ async def ingest(
     return res
 
 
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas platform entry point (``reva atlas ingest atlas.imf``).
+
+    Live: every IMF economy and aggregate. Fixture mode replays the captured subset
+    (:data:`FIXTURE_COUNTRIES`, years from :data:`FIXTURE_START_YEAR`, two IMTS reporters)."""
+    if run.origin == "test_fixture":
+        res = await ingest(
+            run,
+            countries=FIXTURE_COUNTRIES,
+            start_year=FIXTURE_START_YEAR,
+            imts_start_year=FIXTURE_IMTS_YEARS[0],
+            imts_end_year=FIXTURE_IMTS_YEARS[1],
+            imts_reporters_override=FIXTURE_IMTS_REPORTERS,
+        )
+    else:
+        res = await ingest(run)
+    return res.as_dict()
+
+
 __all__ = [
     "CONNECTOR_NAME",
     "DATASETS",
     "GEO_SCHEME",
     "PARSER_VERSION",
     "SOURCE",
-    "ImfAtlasConnector",
     "SdmxError",
-    "archive_raw",
+    "atlas_ingest",
+    "atlas_source",
     "decimal_text",
-    "describe",
     "fetch",
     "flow_queries",
     "imts_queries",
@@ -1174,6 +1164,5 @@ __all__ = [
     "parse_codelist",
     "parse_sdmx",
     "parse_weo",
-    "register_connector",
     "weo_boundary",
 ]

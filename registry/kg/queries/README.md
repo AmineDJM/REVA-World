@@ -116,9 +116,15 @@ expand_hops: 1
   with `row_bound_exceeded` (nothing is silently truncated). Set a realistic bound.
 * No `SERVICE wikibase:label` — labels come from `wbgetentities` (multilingual, versioned).
 * All Wikidata traffic goes through `reva.adapters.connectors.wikidata` which holds a **machine-wide lock**
-  (`var/locks/wikidata.lock`): one request at a time across all agents, ≥ 1 s between requests,
-  Retry-After honoured, back-off on 429/503. Never call WDQS with curl/httpx directly.
-* Every raw response is archived content-addressed and metered against the `wikidata.*` budget.
+  (`var/locks/wikidata.lock`): one request at a time across all agents, ≥ 2 s between requests,
+  Retry-After honoured per endpoint (a WDQS cool-down does not block the API and is waited *without* holding
+  the lock), back-off on 429/503/maxlag. Never call WDQS with curl/httpx directly.
+* Every live request is metered by the budget ledger (`wikidata.wdqs`, `wikidata.wbapi`; reserve → meter →
+  settle in the throwaway harvest database `reva_kg_wdharvest`, never `reva`). A refused budget exits with
+  status 3 (`budget_exhausted`), never a partial success.
+* Every raw response is archived content-addressed (gzip, `var/kg/objects`, index `var/kg/archive_index.jsonl`).
+* WDQS throttles our shared egress hard (429 with Retry-After of 15 min observed on 2026-10-15): test with
+  `try` sparingly, avoid queries near the 60 s limit, and prefer `split` to one huge query.
 
 ## Trying a spec (small, LIMITed)
 
@@ -127,8 +133,14 @@ uv run python -m reva.kg.harvest validate registry/kg/queries            # schem
 uv run python -m reva.kg.harvest try registry/kg/queries/history/empires.yaml --limit 10   # 1 request, prints rows
 ```
 
-`try` runs the first chunk only with `LIMIT <limit>` (≤ 50), through the locked client, and writes nothing to
-the database. Full runs (`run`) are done by WDHARVEST.
+`try` runs the first chunk only with `LIMIT <limit>` (≤ 50), through the locked, budget-metered client, and
+writes nothing to the KG (only a ledger row in the throwaway harvest database). Full runs (`run`) are done by
+WDHARVEST:
+
+```bash
+uv run python -m reva.kg.harvest run registry/kg/queries/core --planned-wdqs 20 --planned-wbapi 400
+uv run python -m reva.kg.harvest status          # per-spec resume state (var/kg/harvest_state/)
+```
 
 ## Requesting properties
 
