@@ -129,11 +129,9 @@ WITH base AS (
          EXISTS (SELECT 1 FROM evidence.observation_retraction r
                  WHERE r.observation_id = o.id AND r.recorded_at > CAST(:cutoff AS timestamptz))
            AS retracted_after_cutoff,
-         NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id,
-                                  CAST(:now AS timestamptz)) AS ineligible_now,
+         NOT evidence.observation_is_eligible(o.id, CAST(:now AS timestamptz)) AS ineligible_now,
          CASE
-           WHEN NOT evidence.is_eligible(o.connector_version_id, o.concept_version_id, o.subject_id,
-                                         o.eligibility_evaluated_at) THEN 'ineligible'
+           WHEN NOT evidence.observation_is_eligible(o.id, o.eligibility_evaluated_at) THEN 'ineligible'
            WHEN EXISTS (SELECT 1 FROM evidence.observation_retraction r
                         WHERE r.observation_id = o.id AND r.recorded_at <= CAST(:cutoff AS timestamptz))
              THEN 'retracted'

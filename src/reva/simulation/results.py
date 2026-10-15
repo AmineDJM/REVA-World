@@ -13,9 +13,11 @@ from uuid import UUID
 
 from sqlalchemy import Connection, text
 
+from reva.adapters.objects.common import lock_object_xact
 from reva.adapters.postgres import repositories as repo
 from reva.belief.snapshots import release_by_id
-from reva.kernel.errors import ValidationProblem
+from reva.kernel.errors import IntegrityFailure, ValidationProblem
+from reva.kernel.ids import canonical_bytes
 from reva.ports.storage import ArtifactStore
 from reva.simulation.engine import RunPlan
 
@@ -26,6 +28,32 @@ def _j(obj: Any) -> str:
     import json
 
     return json.dumps(obj, sort_keys=True, default=str, allow_nan=False)
+
+
+def store_sim_json_artifact(conn: Connection, store: ArtifactStore, payload: Any) -> str:
+    """Store a simulation manifest and register it through ``sim.register_artifact``.
+
+    The simulation role has no INSERT on ``meta.artifact`` (review R5-05): the
+    database computes sha256 and size from the bytes and derives the schema
+    label from the document's ``schema`` field, so nothing is caller-chosen.
+    The location row is then written under the R-18 policy (``scenarios``
+    namespace, artifact created in this transaction or already sim-located).
+    """
+    data = canonical_bytes(payload)
+    obj = store.put_bytes(data, "scenarios", "application/json")
+    lock_object_xact(conn, obj.sha256)  # shared with orphan GC (see repositories.register_artifact)
+    sha = conn.execute(text("SELECT sim.register_artifact(:b)"), {"b": data}).scalar_one()
+    if sha != obj.sha256 or obj.byte_size != len(data):
+        raise IntegrityFailure("stored simulation artifact does not match the registered bytes",
+                               sha256=obj.sha256, registered_sha256=sha)
+    conn.execute(
+        text("""INSERT INTO meta.artifact_location(artifact_sha256, storage_uri, namespace,
+                                                   verified_byte_size, checksum_verified_at)
+                VALUES (:sha, :uri, :ns, :size, clock_timestamp())
+                ON CONFLICT (artifact_sha256, storage_uri) DO NOTHING"""),
+        {"sha": obj.sha256, "uri": obj.storage_uri, "ns": obj.namespace, "size": obj.byte_size},
+    )
+    return sha
 
 
 def existing_run(conn: Connection, idempotency_key: str) -> dict[str, Any] | None:
@@ -70,7 +98,7 @@ def publish_run(
     if release is None:
         raise ValidationProblem("pinned baseline release not found")
     onto_sha = release["ontology_manifest_sha256"]
-    model_sha = repo.store_json_artifact(conn, store, manifest, "scenarios", schema_version="model-manifest/1")
+    model_sha = store_sim_json_artifact(conn, store, manifest)  # labelled model-manifest/1 in-DB
     run_id = UUID(str(conn.execute(
         text("""INSERT INTO sim.run(scenario_id, fidelity, model_manifest_sha256, ontology_manifest_sha256,
                                     idempotency_key, seed_plan, execution_profile, job_id)
@@ -112,8 +140,7 @@ def publish_run(
         "results": results_json,
         "provenance_activity_id": str(activity.id),
     }
-    manifest_sha = repo.store_json_artifact(conn, store, result_manifest, "scenarios",
-                                            schema_version="simulation-result/1")
+    manifest_sha = store_sim_json_artifact(conn, store, result_manifest)  # simulation-result/1
     repo.record_activity(
         conn, activity,
         inputs=[
