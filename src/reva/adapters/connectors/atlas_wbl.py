@@ -46,6 +46,7 @@ from __future__ import annotations
 
 import json
 import re
+import sys
 from collections.abc import Iterator, Mapping, Sequence
 from datetime import date
 from typing import Any
@@ -53,7 +54,7 @@ from typing import Any
 from reva.adapters.connectors import atlas_law_common as common
 from reva.adapters.connectors.atlas_xlsx import Workbook, col_letters
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.atlas.sources import AtlasSourceSpec
 
 SOURCE_KEY = "worldbank.wbl"
 ATLAS_SOURCE = "wbl"
@@ -154,46 +155,29 @@ def _err(msg: str) -> WblParseError:
     return WblParseError(msg, retryable=False, kind="schema_drift")
 
 
-# ----------------------------------------------------------------------------- connector
+# ----------------------------------------------------------------------------- source
 
 
-class WblConnector:
-    """Fetch plan + parsers. ``describe()`` is the spec registered for archiving the raw files."""
-
-    def describe(self) -> ConnectorSpec:
-        return common.law_spec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            source_key=SOURCE_KEY,
-            provider="World Bank Women, Business and the Law",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=tuple(i["dataset"] for i in ITEMS.values()),
-            field_mappings={"tables": {k: f"{ATLAS_SOURCE}.{v['dataset']}" for k, v in ITEMS.items()}},
-            units={"scores": "score (0-100)", "ages": "years", "leave": "days"},
-            geography=("ALL_WBL_ECONOMIES",),
-            time_semantics="report year Y = law as of 1 October Y-1 (as-of day)",
-            lineage_family="worldbank_wbl",
-            cadence_seconds=365 * 86400,
-            revision_strategy="new file per report edition; panel recalculated with revisions each edition",
-            max_response_bytes=20_000_000,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=common.code_digest(inspect_module()),
-        )
-
-    def items(self, keys: Sequence[str] | None = None) -> tuple[FetchItem, ...]:
-        return tuple(
-            FetchItem(key=k, url=v["url"], expected_media_types=XLSX_MEDIA, max_bytes=v["max_bytes"])
-            for k, v in ITEMS.items()
-            if keys is None or k in keys
-        )
-
-
-def inspect_module() -> Any:
-    import sys
-
-    return sys.modules[__name__]
+def atlas_source() -> AtlasSourceSpec:
+    """The ATLASCORE source spec (connector ``atlas.wbl``; budget key ``worldbank.wbl``)."""
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="World Bank Women, Business and the Law",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=tuple(v["dataset"] for v in ITEMS.values()),
+        dataset_ids=tuple(v["file"] for v in ITEMS.values()),
+        cadence_seconds=365 * 86400,
+        planned_requests=len(ITEMS),
+        max_response_bytes=20_000_000,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=common.code_digest(sys.modules[__name__]),
+        field_mappings={"time_semantics": "report year Y = law as of 1 October Y-1 (as-of day)"},
+    )
 
 
 # ----------------------------------------------------------------------------- helpers
@@ -630,107 +614,48 @@ def parse_wbl2026(body: bytes, raw_sha256: str) -> tuple[list[dict[str, Any]], d
     return rows, notes
 
 
-# ----------------------------------------------------------------------------- run
+# ----------------------------------------------------------------------------- ingest
+
+NOTES = {
+    "panel": "WBL 1.0 panel, report years 1971-2024, 190 economies; legal basis per question in flags",
+    "wbl2026": "WBL 2026 (2.0) legal/supportive/enforcement data, 190 economies; pillar sheets not read (#REF!)",
+    "wbl1_2026": "WBL 1.0 values for report year 2026 (comparison file), panel layout and indicators",
+}
 
 
-async def run(
-    engine: Any,
-    store: Any,
-    http: Any,
-    *,
-    origin: str,
-    keys: Sequence[str] | None = None,
-    actor: str = "worker:atlas_wbl",
-) -> common.IngestReport:
-    """Fetch, archive and register the WBL atlas tables. A failed download is a typed ``Blocked``
-    entry; the tables of the other downloads are still registered."""
-    from reva.atlas.tables import register_atlas_table
-
-    conn = WblConnector()
-    spec = conn.describe()
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Fetch, archive and register the WBL atlas tables (``run`` = ``reva.atlas.ingest.AtlasRun``).
+    A failed download is a typed ``Blocked`` entry; the other downloads are still registered. The
+    WBL 1.0 2026 file is checked against the panel's header layout when the panel is in the run."""
     report = common.IngestReport(CONNECTOR_NAME)
-    raws: dict[str, tuple[RawAcquisition, str]] = {}
-    for item in conn.items(keys):
-        got = await common.fetch_raw(http, item, SOURCE_KEY)
+    wanted = [k for k, v in ITEMS.items() if run.wants(v["dataset"])]
+    if "wbl1_2026" in wanted and "panel" not in wanted:
+        wanted.insert(0, "panel")  # needed for the header check only (not registered)
+    raws: dict[str, tuple[Any, str]] = {}
+    for key in wanted:
+        item = ITEMS[key]
+        got = await common.fetch(run, item["url"], key=key, source_key=SOURCE_KEY, media_types=XLSX_MEDIA,
+                                 max_bytes=item["max_bytes"])  # fmt: skip
         if isinstance(got, common.Blocked):
             report.blocked.append(got)
             continue
-        sha = common.archive_raw(engine, store, spec, got, actor=actor)
-        raws[item.key] = (got, sha)
-        report.raw.append({"item": item.key, "raw_sha256": sha, "bytes": len(got.body), "url": item.url})
-    panel_hdrs: list[str] | None = None
-    if "panel" in raws:
-        raw, sha = raws["panel"]
-        panel_hdrs = panel_headers(raw.body)
-        rows = parse_panel(raw.body, sha)
-        report.tables.append(
-            _register(
-                register_atlas_table,
-                engine,
-                store,
-                "panel",
-                rows,
-                sha,
-                origin,
-                "WBL 1.0 panel, report years 1971-2024, 190 economies; legal basis per question in flags",
-            )
-        )
-    if "wbl2026" in raws:
-        raw, sha = raws["wbl2026"]
-        rows, notes = parse_wbl2026(raw.body, sha)
-        report.tables.append(
-            _register(
-                register_atlas_table,
-                engine,
-                store,
-                "wbl2026",
-                rows,
-                sha,
-                origin,
-                f"WBL 2026 (2.0) legal/supportive/enforcement data, 190 economies; notes: {notes}",
-            )
-        )
-    if "wbl1_2026" in raws:
-        raw, sha = raws["wbl1_2026"]
-        rows = parse_wbl1_2026(raw.body, sha, expected_headers=panel_hdrs)
-        report.tables.append(
-            _register(
-                register_atlas_table,
-                engine,
-                store,
-                "wbl1_2026",
-                rows,
-                sha,
-                origin,
-                "WBL 1.0 values for report year 2026 (comparison file), panel layout and indicators",
-            )
-        )
-    return report
-
-
-def _register(
-    fn: Any, engine: Any, store: Any, key: str, rows: list[dict[str, Any]], sha: str, origin: str, note: str
-) -> dict[str, Any]:
-    summary = fn(
-        engine,
-        store,
-        source=ATLAS_SOURCE,
-        dataset=ITEMS[key]["dataset"],
-        frame=common.atlas_frame(rows),
-        raw_sha256s=[sha],
-        parser_version=PARSER_VERSION,
-        origin=origin,
-        coverage_note=note[:3900],
-        geo_scheme="wbl",
-        rights=RIGHTS,
-    )
-    return {
-        k: summary[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")
-    } | {
-        "countries": summary["coverage"]["countries"],
-        "period_min": summary["coverage"]["period_min"],
-        "period_max": summary["coverage"]["period_max"],
-    }
+        sha = run.archive(got)
+        raws[key] = (got, sha)
+        report.raw.append({"item": key, "raw_sha256": sha, "bytes": len(got.body), "url": item["url"]})
+    panel_hdrs = panel_headers(raws["panel"][0].body) if "panel" in raws else None
+    for key, (raw, sha) in raws.items():
+        if not run.wants(ITEMS[key]["dataset"]):
+            continue
+        if key == "panel":
+            rows = parse_panel(raw.body, sha)
+        elif key == "wbl2026":
+            rows, _notes = parse_wbl2026(raw.body, sha)
+        else:
+            rows = parse_wbl1_2026(raw.body, sha, expected_headers=panel_hdrs)
+        out = run.register(dataset=ITEMS[key]["dataset"], frame=common.atlas_frame(rows), raw_sha256s=[sha],
+                           coverage_note=NOTES[key], geo_scheme="wbl", rights=RIGHTS)  # fmt: skip
+        report.tables.append(common.table_summary(out))
+    return report.as_dict()
 
 
 __all__ = [
@@ -738,11 +663,11 @@ __all__ = [
     "CONNECTOR_NAME",
     "ITEMS",
     "WBL1_HEADER_ALIASES",
-    "WblConnector",
+    "atlas_ingest",
+    "atlas_source",
     "as_of_period",
     "panel_headers",
     "parse_panel",
     "parse_wbl1_2026",
     "parse_wbl2026",
-    "run",
 ]

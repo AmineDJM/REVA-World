@@ -93,8 +93,10 @@ P144, P498, P2012, P2614 (main) and P1107, P1098, P1114 (qualifiers). Until WDHA
   criteria in the export (flag `criteria_not_reported`; never inferred). Brazil: 26 properties
   (16 cultural, 9 natural, 1 mixed; 1 transboundary with Argentina).
 * **Tests.** `tests/unit/test_atlas_unesco_whc.py` (captured live fixture
-  `tests/fixtures/source/atlas.unesco_whc/`), `tests/integration/test_atlas_unesco_whc_ingest.py`
-  (throwaway DB: archive raw → `register_atlas_table`, idempotent re-run).
+  `tests/fixtures/source/atlas.unesco_whc/`, recorded 2026-10-15 22:08 UTC through SafeHttpClient),
+  `tests/integration/test_atlas_unesco_whc_ingest.py` (throwaway DB through
+  `reva.atlas.ingest.run_atlas_ingest(mode="fixture")`: archive raw → `register_atlas_table`,
+  idempotent re-run; a `live`-marked budgeted run that skips until `unesco.whc` has a budget).
 
 ### Not provided (no sourced, openly licensed series)
 
@@ -111,10 +113,10 @@ captured through the locked `WikidataClient`).
 
 ## 4. Requests to other agents / lead
 
-* **Lead:** add `"atlas_bulk"` to `ConnectorSpec.template` (`src/reva/ports/connectors.py`), then
-  list `UnescoWhcConnector` in `reva.adapters.connectors.registry.builtin_connectors`. Until then
-  the spec is built with a validated placeholder and the template set afterwards (same approach as
-  A-SCI), and tests register the connector version themselves.
+* **Lead:** none for the connector: it follows the atlas source protocol (`atlas_source()` +
+  `atlas_ingest(run)`, discovered by module name; run with
+  `uv run python -m reva.atlas.ingest atlas.unesco_whc [--fixture]`). The seeded deployment needs
+  the lead's `register_atlas_connector_versions` seed step (already planned by ATLASCORE).
 * **ATLASCORE:** merge `registry/atlas/budget_requests/kgcult.yaml` (`unesco.whc`). Until merged,
   `tests/invariants/test_invariant_30_budgets.py::test_budget_keys_are_registered_sources_and_cover_every_connector`
   sees `unesco.whc` in `registry/sources/` without a budget key.

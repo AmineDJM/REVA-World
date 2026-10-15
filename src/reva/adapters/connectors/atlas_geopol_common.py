@@ -43,32 +43,111 @@ def _p(systems: Iterable[str], code: int, start: date, end: date, iso3: str | No
 
 
 _BOTH = ("gw", "cow")
-_p(_BOTH, 365, date(1922, 12, 30), date(1991, 12, 20), None, "Soviet Union (USSR)",
-   "GW/COW use 365 for Russia throughout ('Russia (Soviet Union)'); the USSR period is not the ISO entity RUS")
-_p(("gw",), 260, date(1949, 9, 21), date(1990, 10, 2), None, "German Federal Republic (West Germany)",
-   "GW 260 = FRG until unification, then unified Germany (DEU)")
-_p(("cow",), 260, _OPEN, date(1990, 10, 2), None, "German Federal Republic (West Germany)",
-   "COW 260 = FRG 1955-1990; unified Germany is COW 255 from 1990-10-03")
-_p(("cow",), 260, date(1990, 10, 3), _FUTURE, None, "German Federal Republic (COW 260 after unification)",
-   "COW codes unified Germany 255; a 260 row after 1990-10-02 is not mapped (would duplicate DEU)")
-_p(_BOTH, 265, _OPEN, _FUTURE, None, "German Democratic Republic (East Germany)", "no current ISO entity (ISO 3166-3 DDDE)")
-_p(_BOTH, 255, _OPEN, date(1945, 5, 8), None, "Germany (Prussia / German Reich)", "pre-1945 German state (GW: 'Germany (Prussia)')")
-_p(_BOTH, 345, _OPEN, date(2006, 6, 4), None, "Yugoslavia / Serbia and Montenegro",
-   "Yugoslavia (SFRY, FRY) and Serbia and Montenegro until Montenegro's independence (2006-06-03/05)")
-_p(("cow",), 345, date(2006, 6, 5), _FUTURE, "SRB", "Serbia",
-   "COW continues code 345 for Serbia after 2006-06-05 (GW uses 340)")
+_p(
+    _BOTH,
+    365,
+    date(1922, 12, 30),
+    date(1991, 12, 20),
+    None,
+    "Soviet Union (USSR)",
+    "GW/COW use 365 for Russia throughout ('Russia (Soviet Union)'); the USSR period is not the ISO entity RUS",
+)
+_p(
+    ("gw",),
+    260,
+    date(1949, 9, 21),
+    date(1990, 10, 2),
+    None,
+    "German Federal Republic (West Germany)",
+    "GW 260 = FRG until unification, then unified Germany (DEU)",
+)
+_p(
+    ("cow",),
+    260,
+    _OPEN,
+    date(1990, 10, 2),
+    None,
+    "German Federal Republic (West Germany)",
+    "COW 260 = FRG 1955-1990; unified Germany is COW 255 from 1990-10-03",
+)
+_p(
+    ("cow",),
+    260,
+    date(1990, 10, 3),
+    _FUTURE,
+    None,
+    "German Federal Republic (COW 260 after unification)",
+    "COW codes unified Germany 255; a 260 row after 1990-10-02 is not mapped (would duplicate DEU)",
+)
+_p(
+    _BOTH,
+    265,
+    _OPEN,
+    _FUTURE,
+    None,
+    "German Democratic Republic (East Germany)",
+    "no current ISO entity (ISO 3166-3 DDDE)",
+)
+_p(
+    _BOTH,
+    255,
+    _OPEN,
+    date(1945, 5, 8),
+    None,
+    "Germany (Prussia / German Reich)",
+    "pre-1945 German state (GW: 'Germany (Prussia)')",
+)
+_p(
+    _BOTH,
+    345,
+    _OPEN,
+    date(2006, 6, 4),
+    None,
+    "Yugoslavia / Serbia and Montenegro",
+    "Yugoslavia (SFRY, FRY) and Serbia and Montenegro until Montenegro's independence (2006-06-03/05)",
+)
+_p(
+    ("cow",),
+    345,
+    date(2006, 6, 5),
+    _FUTURE,
+    "SRB",
+    "Serbia",
+    "COW continues code 345 for Serbia after 2006-06-05 (GW uses 340)",
+)
 _p(_BOTH, 315, _OPEN, _FUTURE, None, "Czechoslovakia", "no current ISO entity (ISO 3166-3 CSHH); Czechia is 316")
 _p(_BOTH, 678, _OPEN, date(1990, 5, 21), None, "Yemen Arab Republic (North Yemen)", "before unification 1990-05-22")
-_p(("gw",), 678, date(1990, 5, 22), _FUTURE, "YEM", "Yemen",
-   "GW continues code 678 for unified Yemen (COW uses 679)")
-_p(_BOTH, 680, _OPEN, _FUTURE, None, "People's Democratic Republic of Yemen (South Yemen)", "merged into Yemen 1990-05-22")
-_p(_BOTH, 816, _OPEN, date(1976, 7, 1), None, "Democratic Republic of Vietnam (North Vietnam)",
-   "before reunification 1976-07-02")
+_p(("gw",), 678, date(1990, 5, 22), _FUTURE, "YEM", "Yemen", "GW continues code 678 for unified Yemen (COW uses 679)")
+_p(
+    _BOTH,
+    680,
+    _OPEN,
+    _FUTURE,
+    None,
+    "People's Democratic Republic of Yemen (South Yemen)",
+    "merged into Yemen 1990-05-22",
+)
+_p(
+    _BOTH,
+    816,
+    _OPEN,
+    date(1976, 7, 1),
+    None,
+    "Democratic Republic of Vietnam (North Vietnam)",
+    "before reunification 1976-07-02",
+)
 _p(_BOTH, 816, date(1976, 7, 2), _FUTURE, "VNM", "Vietnam", "GW/COW 816 = unified Vietnam from 1976-07-02")
 _p(_BOTH, 817, _OPEN, _FUTURE, None, "Republic of Vietnam (South Vietnam)", "no current ISO entity")
 _p(_BOTH, 511, _OPEN, _FUTURE, None, "Zanzibar", "independent 1963-12-19 to 1964-04-26; no current ISO entity")
-_p(_BOTH, 347, date(2008, 2, 17), _FUTURE, "XKX", "Kosovo",
-   "crosswalk entity XKX is the World Bank code for Kosovo (not ISO 3166)")
+_p(
+    _BOTH,
+    347,
+    date(2008, 2, 17),
+    _FUTURE,
+    "XKX",
+    "Kosovo",
+    "crosswalk entity XKX is the World Bank code for Kosovo (not ISO 3166)",
+)
 
 # UCDP uses GW codes but keeps 345 ("Serbia (Yugoslavia)") for Serbia after 2006 instead of GW 340
 # (UCDP Country-Year Dataset 26.1 rows 2006-2025 for country_id 345).
@@ -81,13 +160,27 @@ _p(("gw",), 397, _OPEN, _FUTURE, None, "South Ossetia", "GW microstates list; no
 #: sha256 5a220717ca4fa27b69c4ef0670f9897438999ef5a08ee5e18dda84574e04b629): countrycode's panel has no GW
 #: number for them. Code -> (GW name as listed, ISO3). NB GW 970-973 differ from COW (COW 970 = Nauru).
 GW_MICROSTATES: dict[int, tuple[str, str]] = {
-    54: ("Dominica", "DMA"), 55: ("Grenada", "GRD"), 56: ("Saint Lucia", "LCA"),
-    57: ("Saint Vincent and the Grenadines", "VCT"), 58: ("Antigua & Barbuda", "ATG"),
-    60: ("Saint Kitts and Nevis", "KNA"), 221: ("Monaco", "MCO"), 223: ("Liechtenstein", "LIE"),
-    331: ("San Marino", "SMR"), 232: ("Andorra", "AND"), 403: ("Sao Tome and Principe", "STP"),
-    591: ("Seychelles", "SYC"), 935: ("Vanuatu", "VUT"), 970: ("Kiribati", "KIR"), 971: ("Nauru", "NRU"),
-    972: ("Tonga", "TON"), 973: ("Tuvalu", "TUV"), 983: ("Marshall Islands", "MHL"), 986: ("Palau", "PLW"),
-    987: ("Federated States of Micronesia", "FSM"), 990: ("Samoa/Western Samoa", "WSM"),
+    54: ("Dominica", "DMA"),
+    55: ("Grenada", "GRD"),
+    56: ("Saint Lucia", "LCA"),
+    57: ("Saint Vincent and the Grenadines", "VCT"),
+    58: ("Antigua & Barbuda", "ATG"),
+    60: ("Saint Kitts and Nevis", "KNA"),
+    221: ("Monaco", "MCO"),
+    223: ("Liechtenstein", "LIE"),
+    331: ("San Marino", "SMR"),
+    232: ("Andorra", "AND"),
+    403: ("Sao Tome and Principe", "STP"),
+    591: ("Seychelles", "SYC"),
+    935: ("Vanuatu", "VUT"),
+    970: ("Kiribati", "KIR"),
+    971: ("Nauru", "NRU"),
+    972: ("Tonga", "TON"),
+    973: ("Tuvalu", "TUV"),
+    983: ("Marshall Islands", "MHL"),
+    986: ("Palau", "PLW"),
+    987: ("Federated States of Micronesia", "FSM"),
+    990: ("Samoa/Western Samoa", "WSM"),
 }
 for _code, (_name, _iso) in GW_MICROSTATES.items():
     _p(("gw",), _code, _OPEN, _FUTURE, _iso, _name, "Gleditsch-Ward microstates list")
@@ -105,8 +198,9 @@ class CodeResolution:
 class StateCodeCrosswalk:
     """GW/COW code + date -> crosswalk entity key (see module docstring)."""
 
-    def __init__(self, panel_rows: Iterable[Mapping[str, Any]], *, source_sha256: str,
-                 known_keys: frozenset[str] | None = None) -> None:
+    def __init__(
+        self, panel_rows: Iterable[Mapping[str, Any]], *, source_sha256: str, known_keys: frozenset[str] | None = None
+    ) -> None:
         self.source_sha256 = source_sha256
         self.known_keys = known_keys
         self._by: dict[tuple[str, int], dict[int, tuple[str | None, str | None]]] = {}
@@ -236,7 +330,7 @@ def int_or_none(v: Any) -> int | None:
 
 
 def iso_date_or_none(v: Any) -> date | None:
-    s = (str(v).strip() if v is not None else "")
+    s = str(v).strip() if v is not None else ""
     if not s or s.upper() == "NA":
         return None
     return date.fromisoformat(s[:10])
@@ -275,9 +369,12 @@ class StateEntityResolver:
 
     def code_entities(self) -> list[KgEntity]:
         return [
-            KgEntity(qid=eid, kind="state_code",
-                     labels={"en": f"{lab} ({eid.split(':')[0].upper()} {eid.split(':')[1]})"},
-                     descriptions={"en": "state as coded by a Gleditsch-Ward / Correlates-of-War state code"})
+            KgEntity(
+                qid=eid,
+                kind="state_code",
+                labels={"en": f"{lab} ({eid.split(':')[0].upper()} {eid.split(':')[1]})"},
+                descriptions={"en": "state as coded by a Gleditsch-Ward / Correlates-of-War state code"},
+            )
             for eid, lab in sorted(self.code_labels.items())
         ]
 
@@ -307,7 +404,7 @@ COUNTRYCODE_RIGHTS: dict[str, str] = {
     "licence": "GPL-3 (R package countrycode 1.9.0, Arel-Bundock, Enevoldsen & Yetman); code lists are facts",
     "licence_url": "https://cran.r-project.org/package=countrycode",
     "attribution": "Arel-Bundock, Enevoldsen & Yetman (2018), countrycode: An R package to convert country "
-                   "names and country codes. JOSS 3(28), 848",
+    "names and country codes. JOSS 3(28), 848",
 }
 
 
@@ -322,15 +419,17 @@ def extract_tar_member(body: bytes, member: str, *, max_bytes: int = 20_000_000)
         with tarfile.open(fileobj=io.BytesIO(body), mode="r:gz") as tf:
             info = tf.getmember(member)
             if not info.isreg() or info.size > max_bytes:
-                raise SourceResponseError(f"tar member {member} is not a bounded regular file", retryable=False,
-                                          kind="schema_drift")
+                raise SourceResponseError(
+                    f"tar member {member} is not a bounded regular file", retryable=False, kind="schema_drift"
+                )
             f = tf.extractfile(info)
             if f is None:
                 raise SourceResponseError(f"tar member {member} unreadable", retryable=False, kind="schema_drift")
             return f.read()
     except (KeyError, tarfile.TarError, EOFError, OSError) as e:
-        raise SourceResponseError(f"tar member {member} missing or archive corrupt", retryable=False,
-                                  kind="schema_drift") from e
+        raise SourceResponseError(
+            f"tar member {member} missing or archive corrupt", retryable=False, kind="schema_drift"
+        ) from e
 
 
 def crosswalk_from_countrycode_tarball(body: bytes, known_keys: frozenset[str] | None = None) -> StateCodeCrosswalk:
@@ -341,8 +440,9 @@ def crosswalk_from_countrycode_tarball(body: bytes, known_keys: frozenset[str] |
     return cw
 
 
-def read_csv_member(body: bytes, member_suffix: str, *, max_total: int = 64 * 1024 * 1024,
-                    encoding: str = "utf-8-sig") -> list[dict[str, str]]:
+def read_csv_member(
+    body: bytes, member_suffix: str, *, max_total: int = 64 * 1024 * 1024, encoding: str = "utf-8-sig"
+) -> list[dict[str, str]]:
     """Rows of the single CSV member ending with ``member_suffix`` of a zip (bounded; declared encoding,
     strict decoding)."""
     import csv
@@ -353,8 +453,9 @@ def read_csv_member(body: bytes, member_suffix: str, *, max_total: int = 64 * 10
 
     members = read_zip_members(body, (member_suffix.lower(),), max_total=max_total)
     if len(members) != 1:
-        raise SourceResponseError(f"expected one {member_suffix} member, found {sorted(members)}", retryable=False,
-                                  kind="schema_drift")
+        raise SourceResponseError(
+            f"expected one {member_suffix} member, found {sorted(members)}", retryable=False, kind="schema_drift"
+        )
     (data,) = members.values()
     try:
         textdata = data.decode(encoding)
@@ -423,12 +524,14 @@ async def fetch_countrycode(run: Any) -> tuple[StateCodeCrosswalk, str]:
 
     media = ("application/x-gzip", "application/gzip", "application/octet-stream", "application/x-tar")
     try:
-        raw = await run.get(COUNTRYCODE_URL, key=f"countrycode:{COUNTRYCODE_VERSION}", media_types=media,
-                            max_bytes=5_000_000)
+        raw = await run.get(
+            COUNTRYCODE_URL, key=f"countrycode:{COUNTRYCODE_VERSION}", media_types=media, max_bytes=5_000_000
+        )
     except SourceResponseError:
         # CRAN moves superseded releases to Archive/: same bytes, pinned version
-        raw = await run.get(COUNTRYCODE_ARCHIVE_URL, key=f"countrycode:{COUNTRYCODE_VERSION}", media_types=media,
-                            max_bytes=5_000_000)
+        raw = await run.get(
+            COUNTRYCODE_ARCHIVE_URL, key=f"countrycode:{COUNTRYCODE_VERSION}", media_types=media, max_bytes=5_000_000
+        )
     cw = crosswalk_from_countrycode_tarball(raw.body, crosswalk_keys())
     sha = run.archive(raw)
     return cw, sha
@@ -447,68 +550,189 @@ def code_correspondence(resolver: StateEntityResolver, *, raw_sha256: str) -> li
                 runs.setdefault(r.iso3, []).append(y)
         for iso3, ys in runs.items():
             for a, b in merge_years(ys):
-                out.append(KgStatement(
-                    key=f"{eid}:iso3:{iso3}:{a}", subject=eid, property="geopol:corresponds_to_iso3",
-                    value={"type": "string", "value": iso3}, start=f"{a}-01-01", start_precision=9,
-                    end=f"{b}-12-31", end_precision=9,
-                    qualifiers={"method": "countrycode codelist_panel + STATE_CODE_POLICY (atlas_geopol_common)",
-                                "years_observed": [y for y in ys if a <= y <= b]},
-                    raw_sha256=raw_sha256, selector={"file": COUNTRYCODE_MEMBER}))
+                out.append(
+                    KgStatement(
+                        key=f"{eid}:iso3:{iso3}:{a}",
+                        subject=eid,
+                        property="geopol:corresponds_to_iso3",
+                        value={"type": "string", "value": iso3},
+                        start=f"{a}-01-01",
+                        start_precision=9,
+                        end=f"{b}-12-31",
+                        end_precision=9,
+                        qualifiers={
+                            "method": "countrycode codelist_panel + STATE_CODE_POLICY (atlas_geopol_common)",
+                            "years_observed": [y for y in ys if a <= y <= b],
+                        },
+                        raw_sha256=raw_sha256,
+                        selector={"file": COUNTRYCODE_MEMBER},
+                    )
+                )
     return out
 
 
 #: Dataset predicates used by the geopolitics connectors: pid -> (value kind, reva predicate, en label,
 #: fr label, inverse name, inverse en label).
 GEOPOL_PROPERTIES: dict[str, tuple[str, str, str, str, str | None, str | None]] = {
-    "ucdp:primary_party": ("item", "ucdp_primary_party", "has primary party (UCDP)", "a pour partie principale (UCDP)",
-                           "ucdp_primary_party_in", "primary party in (UCDP)"),
-    "ucdp:secondary_party": ("item", "ucdp_secondary_party", "has secondary party with troops (UCDP)",
-                             "a pour partie secondaire (UCDP)", "ucdp_secondary_party_in",
-                             "secondary party in (UCDP)"),
-    "ucdp:location": ("item", "ucdp_location", "located in (UCDP conflict location)", "localisation (UCDP)",
-                      "ucdp_location_of", "location of conflict (UCDP)"),
-    "ucdp:nonstate_side": ("item", "ucdp_nonstate_side", "has non-state side (UCDP)", "a pour partie non étatique (UCDP)",
-                           "ucdp_nonstate_side_in", "non-state side in (UCDP)"),
-    "ucdp:incompatibility": ("string", "ucdp_incompatibility", "incompatibility (UCDP)", "incompatibilité (UCDP)",
-                             None, None),
-    "ucdp:conflict_type": ("string", "ucdp_conflict_type", "conflict type (UCDP)", "type de conflit (UCDP)", None, None),
-    "ucdp:territory_name": ("string", "ucdp_territory_name", "contested territory (UCDP)", "territoire contesté (UCDP)",
-                            None, None),
+    "ucdp:primary_party": (
+        "item",
+        "ucdp_primary_party",
+        "has primary party (UCDP)",
+        "a pour partie principale (UCDP)",
+        "ucdp_primary_party_in",
+        "primary party in (UCDP)",
+    ),
+    "ucdp:secondary_party": (
+        "item",
+        "ucdp_secondary_party",
+        "has secondary party with troops (UCDP)",
+        "a pour partie secondaire (UCDP)",
+        "ucdp_secondary_party_in",
+        "secondary party in (UCDP)",
+    ),
+    "ucdp:location": (
+        "item",
+        "ucdp_location",
+        "located in (UCDP conflict location)",
+        "localisation (UCDP)",
+        "ucdp_location_of",
+        "location of conflict (UCDP)",
+    ),
+    "ucdp:nonstate_side": (
+        "item",
+        "ucdp_nonstate_side",
+        "has non-state side (UCDP)",
+        "a pour partie non étatique (UCDP)",
+        "ucdp_nonstate_side_in",
+        "non-state side in (UCDP)",
+    ),
+    "ucdp:incompatibility": (
+        "string",
+        "ucdp_incompatibility",
+        "incompatibility (UCDP)",
+        "incompatibilité (UCDP)",
+        None,
+        None,
+    ),
+    "ucdp:conflict_type": (
+        "string",
+        "ucdp_conflict_type",
+        "conflict type (UCDP)",
+        "type de conflit (UCDP)",
+        None,
+        None,
+    ),
+    "ucdp:territory_name": (
+        "string",
+        "ucdp_territory_name",
+        "contested territory (UCDP)",
+        "territoire contesté (UCDP)",
+        None,
+        None,
+    ),
     "ucdp:start_date": ("time", "ucdp_start_date", "start date (UCDP)", "date de début (UCDP)", None, None),
     "ucdp:episode_end": ("time", "ucdp_episode_end", "episode end date (UCDP)", "fin d'épisode (UCDP)", None, None),
-    "ucdp:intensity_level": ("quantity", "ucdp_intensity_level", "intensity level (UCDP)", "niveau d'intensité (UCDP)",
-                             None, None),
-    "ucdp:battle_related_deaths": ("quantity", "ucdp_battle_related_deaths", "battle-related deaths (UCDP)",
-                                   "morts liées aux combats (UCDP)", None, None),
-    "unga:voted_yes": ("item", "unga_voted_yes", "voted yes on (UNGA roll call)", "a voté oui (AGNU)",
-                       "unga_yes_vote_by", "yes vote by"),
-    "unga:voted_no": ("item", "unga_voted_no", "voted no on (UNGA roll call)", "a voté non (AGNU)",
-                      "unga_no_vote_by", "no vote by"),
-    "unga:voted_abstain": ("item", "unga_voted_abstain", "abstained on (UNGA roll call)", "s'est abstenu (AGNU)",
-                           "unga_abstention_by", "abstention by"),
-    "unga:resolution_symbol": ("string", "unga_resolution_symbol", "resolution symbol (UNGA)",
-                               "cote de la résolution (AGNU)", None, None),
-    "unga:issue_code": ("string", "unga_issue_code", "issue code (Voeten UNGA data)", "code thématique (Voeten)",
-                        None, None),
+    "ucdp:intensity_level": (
+        "quantity",
+        "ucdp_intensity_level",
+        "intensity level (UCDP)",
+        "niveau d'intensité (UCDP)",
+        None,
+        None,
+    ),
+    "ucdp:battle_related_deaths": (
+        "quantity",
+        "ucdp_battle_related_deaths",
+        "battle-related deaths (UCDP)",
+        "morts liées aux combats (UCDP)",
+        None,
+        None,
+    ),
+    "unga:voted_yes": (
+        "item",
+        "unga_voted_yes",
+        "voted yes on (UNGA roll call)",
+        "a voté oui (AGNU)",
+        "unga_yes_vote_by",
+        "yes vote by",
+    ),
+    "unga:voted_no": (
+        "item",
+        "unga_voted_no",
+        "voted no on (UNGA roll call)",
+        "a voté non (AGNU)",
+        "unga_no_vote_by",
+        "no vote by",
+    ),
+    "unga:voted_abstain": (
+        "item",
+        "unga_voted_abstain",
+        "abstained on (UNGA roll call)",
+        "s'est abstenu (AGNU)",
+        "unga_abstention_by",
+        "abstention by",
+    ),
+    "unga:resolution_symbol": (
+        "string",
+        "unga_resolution_symbol",
+        "resolution symbol (UNGA)",
+        "cote de la résolution (AGNU)",
+        None,
+        None,
+    ),
+    "unga:issue_code": (
+        "string",
+        "unga_issue_code",
+        "issue code (Voeten UNGA data)",
+        "code thématique (Voeten)",
+        None,
+        None,
+    ),
     "unga:vote_date": ("time", "unga_vote_date", "date of vote (UNGA)", "date du vote (AGNU)", None, None),
-    "cshapes:polity_period": ("other", "cshapes_polity_period", "polity period with fixed borders (CShapes 2.0)",
-                              "période à frontières fixes (CShapes 2.0)", None, None),
-    "cshapes:ruled_by": ("item", "cshapes_ruled_by", "dependency ruled by (CShapes 2.0)", "dépendance de (CShapes 2.0)",
-                         "cshapes_rules", "rules dependency (CShapes 2.0)"),
-    "cshapes:shares_border_with": ("item", "cshapes_shares_border_with", "shares a border with (CShapes 2.0 topology)",
-                                   "partage une frontière avec (CShapes 2.0)", "cshapes_shares_border_with",
-                                   "shares a border with (CShapes 2.0 topology)"),
-    "geopol:corresponds_to_iso3": ("string", "corresponds_to_iso3", "state code corresponds to crosswalk entity",
-                                   "code d'État correspondant à l'entité", None, None),
+    "cshapes:polity_period": (
+        "other",
+        "cshapes_polity_period",
+        "polity period with fixed borders (CShapes 2.0)",
+        "période à frontières fixes (CShapes 2.0)",
+        None,
+        None,
+    ),
+    "cshapes:ruled_by": (
+        "item",
+        "cshapes_ruled_by",
+        "dependency ruled by (CShapes 2.0)",
+        "dépendance de (CShapes 2.0)",
+        "cshapes_rules",
+        "rules dependency (CShapes 2.0)",
+    ),
+    "cshapes:shares_border_with": (
+        "item",
+        "cshapes_shares_border_with",
+        "shares a border with (CShapes 2.0 topology)",
+        "partage une frontière avec (CShapes 2.0)",
+        "cshapes_shares_border_with",
+        "shares a border with (CShapes 2.0 topology)",
+    ),
+    "geopol:corresponds_to_iso3": (
+        "string",
+        "corresponds_to_iso3",
+        "state code corresponds to crosswalk entity",
+        "code d'État correspondant à l'entité",
+        None,
+        None,
+    ),
 }
 
 
 def kg_properties() -> list[Any]:
     from reva.kg.model import KgProperty
 
-    return [KgProperty(pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv,
-                       inverse_label_en=ile)
-            for p, (k, rp, le, lf, inv, ile) in GEOPOL_PROPERTIES.items()]
+    return [
+        KgProperty(
+            pid=p, value_kind=k, reva_predicate=rp, label_en=le, label_fr=lf, inverse_name=inv, inverse_label_en=ile
+        )
+        for p, (k, rp, le, lf, inv, ile) in GEOPOL_PROPERTIES.items()
+    ]
 
 
 def _kg_time(t: str | None, precision: int | None) -> Any:
@@ -517,26 +741,46 @@ def _kg_time(t: str | None, precision: int | None) -> Any:
     return None if t is None else KgTime(t, int(precision or 11))
 
 
-def to_kg_model(entities: Iterable[KgEntity], statements: Iterable[KgStatement], *, source_key: str,
-                source_revision: str) -> tuple[list[Any], list[Any]]:
+def to_kg_model(
+    entities: Iterable[KgEntity], statements: Iterable[KgStatement], *, source_key: str, source_revision: str
+) -> tuple[list[Any], list[Any]]:
     """Neutral records -> ``reva.kg.model`` records. The statement key becomes the source statement id; the
     raw selector is kept as the statement's own reference (``{"raw_sha256", "selector"}``)."""
     from reva.kg.model import KgEntity as MEntity
     from reva.kg.model import KgStatement as MStatement
 
-    ents = [MEntity(qid=e.qid, kind=e.kind, labels=dict(e.labels), descriptions=dict(e.descriptions),
-                    source_revision=source_revision) for e in entities]
+    ents = [
+        MEntity(
+            qid=e.qid,
+            kind=e.kind,
+            labels=dict(e.labels),
+            descriptions=dict(e.descriptions),
+            source_revision=source_revision,
+        )
+        for e in entities
+    ]
     sts = []
     for s in statements:
         value = s.value
         if value is not None and value.get("type") == "time":
             value = {"type": "time", "time": value["time"], "precision": value["precision"]}
-        sts.append(MStatement(
-            subject_qid=s.subject, property_pid=s.property, object_qid=s.object_qid, value=value,
-            start=_kg_time(s.start, s.start_precision), end=_kg_time(s.end, s.end_precision),
-            point_in_time=_kg_time(s.point_in_time, s.pit_precision), qualifiers=dict(s.qualifiers),
-            references=({"raw_sha256": s.raw_sha256, "selector": dict(s.selector)},),
-            source_key=source_key, source_revision=source_revision, statement_id=s.key, raw_sha256=s.raw_sha256))
+        sts.append(
+            MStatement(
+                subject_qid=s.subject,
+                property_pid=s.property,
+                object_qid=s.object_qid,
+                value=value,
+                start=_kg_time(s.start, s.start_precision),
+                end=_kg_time(s.end, s.end_precision),
+                point_in_time=_kg_time(s.point_in_time, s.pit_precision),
+                qualifiers=dict(s.qualifiers),
+                references=({"raw_sha256": s.raw_sha256, "selector": dict(s.selector)},),
+                source_key=source_key,
+                source_revision=source_revision,
+                statement_id=s.key,
+                raw_sha256=s.raw_sha256,
+            )
+        )
     return ents, sts
 
 
@@ -547,9 +791,18 @@ def kg_available(engine: Any) -> bool:
         return conn.execute(text("SELECT to_regclass('kg.statement') IS NOT NULL")).scalar_one()
 
 
-def load_kg(engine: Any, store: Any, entities: Sequence[KgEntity], statements: Sequence[KgStatement], *,
-            source_key: str, source_revision: str, raw_sha256s: Sequence[str], retrieved_at: Any,
-            origin: str) -> dict[str, Any]:
+def load_kg(
+    engine: Any,
+    store: Any,
+    entities: Sequence[KgEntity],
+    statements: Sequence[KgStatement],
+    *,
+    source_key: str,
+    source_revision: str,
+    raw_sha256s: Sequence[str],
+    retrieved_at: Any,
+    origin: str,
+) -> dict[str, Any]:
     """Register the dataset predicates and load in bounded batches (entities first, then statements)."""
     from collections import Counter as _C
 
@@ -559,15 +812,30 @@ def load_kg(engine: Any, store: Any, entities: Sequence[KgEntity], statements: S
     ents, sts = to_kg_model(entities, statements, source_key=source_key, source_revision=source_revision)
     totals: _C[str] = _C()
     rejected: _C[str] = _C()
-    batches = [(ents[i:i + MAX_ENTITIES_PER_BATCH], []) for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH)]
+    batches = [(ents[i : i + MAX_ENTITIES_PER_BATCH], []) for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH)]
     step = min(MAX_STATEMENTS_PER_BATCH, 100_000)
-    batches += [([], sts[i:i + step]) for i in range(0, len(sts), step)]
+    batches += [([], sts[i : i + step]) for i in range(0, len(sts), step)]
     for be, bs in batches:
         used = sorted({s.raw_sha256 for s in bs if s.raw_sha256} or set(raw_sha256s))
-        rep = load_batch(engine, store, entities=be, statements=bs, source_key=source_key, raw_sha256s=used,
-                         retrieved_at=retrieved_at, origin=origin)
-        for k in ("entities_inserted", "entities_unchanged", "statements_inserted", "statements_unchanged",
-                  "statements_new_revision", "statements_conflicting", "statements_stale"):
+        rep = load_batch(
+            engine,
+            store,
+            entities=be,
+            statements=bs,
+            source_key=source_key,
+            raw_sha256s=used,
+            retrieved_at=retrieved_at,
+            origin=origin,
+        )
+        for k in (
+            "entities_inserted",
+            "entities_unchanged",
+            "statements_inserted",
+            "statements_unchanged",
+            "statements_new_revision",
+            "statements_conflicting",
+            "statements_stale",
+        ):
             totals[k] += getattr(rep, k)
         rejected.update(rep.rejected_counts)
     return {**totals, "rejected": dict(rejected), "batches": len(batches)}

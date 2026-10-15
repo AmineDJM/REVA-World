@@ -42,26 +42,17 @@ What a cell is
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 from urllib.parse import quote
 
-from reva.adapters.connectors.atlas_healthedu_common import AtlasConnectorSpec, canon, fit_flags
-from reva.adapters.connectors.base import dec_str, json_decimal, module_digest, schema_fingerprint, to_raw
+from reva.adapters.connectors.atlas_healthedu_common import canon, fetch_archive_register, fit_flags
+from reva.adapters.connectors.base import dec_str, json_decimal, module_digest
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError, ValidationProblem
-from reva.ports.connectors import (
-    Cursor,
-    FetchBudget,
-    FetchItem,
-    FetchOutcome,
-    FetchPlan,
-    Finding,
-    ObservationBatch,
-    QualityReport,
-    RawAcquisition,
-)
+from reva.ports.connectors import FetchItem
 
 CONNECTOR_NAME = "atlas.unesco_uis"
 CONNECTOR_VERSION = "1.0.0"
@@ -71,7 +62,7 @@ HOST = "api.uis.unesco.org"
 BASE = f"https://{HOST}/api/public"
 VERSION_URL = f"{BASE}/versions/default"
 RECORD_CAP = 100_000  # API limit per query (documented); a response at the cap may be truncated
-MAX_ITEM_BYTES = 52_428_800
+MAX_ITEM_BYTES = 104_857_600  # batches were 3-20 MB on 2026-10-15
 
 RIGHTS: dict[str, str] = {
     "licence": "CC BY-SA 4.0",
@@ -187,53 +178,11 @@ class UisConnector:
     def indicators(self) -> tuple[str, ...]:
         return tuple(c for b in self.batches for c in b)
 
-    def expected_item_keys(self) -> list[str]:
-        return ["uis.version"] + [f"uis.data:{n}" for n in range(1, len(self.batches) + 1)]
+    # ------------------------------------------------------------------ run protocol (atlas_healthedu_common)
+    def items(self) -> tuple[FetchItem, ...]:
+        return (FetchItem(key="uis.version", url=VERSION_URL, max_bytes=100_000, params={"kind": "version"}),)
 
-    # ------------------------------------------------------------------ connector protocol
-    def describe(self) -> AtlasConnectorSpec:
-        return AtlasConnectorSpec(
-            name=CONNECTOR_NAME,
-            version=CONNECTOR_VERSION,
-            template="atlas_uis_data_api",
-            source_key=SOURCE_KEY,
-            provider="UNESCO Institute for Statistics",
-            licence=RIGHTS["licence"],
-            allowed_hosts=(HOST,),
-            dataset_ids=self.indicators,
-            field_mappings={
-                "value": "value",
-                "flags": ["qualifier", "magnitude", "footnotes"],
-                "batches": [list(b) for b in self.batches],
-            },
-            units={c: INDICATORS_BY_CODE[c].unit for c in self.indicators},
-            geography=self.countries or ("ALL_NATIONAL_GEOUNITS",),
-            time_semantics="reference year as published by UIS; half-open [Y-01-01, Y+1-01-01)",
-            lineage_family="unesco_uis",
-            cadence_seconds=30 * 86400,
-            release_aware=True,
-            revision_strategy="every data query pinned to the current UIS data version; new version = new table",
-            max_response_bytes=MAX_ITEM_BYTES,
-            max_pages=1,
-            parser_version=PARSER_VERSION,
-            code_digest=module_digest(UisConnector),
-        )
-
-    def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
-        item = FetchItem(key="uis.version", url=VERSION_URL, max_bytes=100_000, params={"kind": "version"})
-        return FetchPlan(
-            connector=CONNECTOR_NAME,
-            items=(item,)[: budget.max_requests],
-            pagination="none; data queries are planned as follow-ups pinned to the version returned",
-            availability_expectation="UIS data releases (February and September); version publicationDate",
-            budget_exhausted=budget.max_requests < 1 + len(self.batches),
-        )
-
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        result = await http.get(item.url, max_bytes=item.max_bytes)
-        return to_raw(item, result, getattr(http, "origin", "live"))
-
-    def follow_ups(self, version: str) -> tuple[FetchItem, ...]:
+    def data_items(self, version: str) -> tuple[FetchItem, ...]:
         return tuple(
             FetchItem(
                 key=f"uis.data:{n}",
@@ -250,63 +199,22 @@ class UisConnector:
             for n, codes in enumerate(self.batches, start=1)
         )
 
-    def parse(self, raw: RawAcquisition) -> Iterator[ObservationBatch]:
-        kind = raw.item.params.get("kind")
-        if kind == "version":
-            v = parse_version(raw.body)
-            yield ObservationBatch(
-                connector=CONNECTOR_NAME,
-                connector_version=CONNECTOR_VERSION,
-                item_key=raw.item.key,
-                observations=(),
-                metadata={"kind": kind, **v},
-                schema_fingerprint=schema_fingerprint(sorted(v)),
-                follow_up=self.follow_ups(v["version"]),
-            )
-            return
-        codes = tuple(raw.item.params["indicators"])
-        records, meta = parse_data(raw.body, codes)
-        yield ObservationBatch(
-            connector=CONNECTOR_NAME,
-            connector_version=CONNECTOR_VERSION,
-            item_key=raw.item.key,
-            observations=(),
-            metadata={
-                "kind": kind,
-                "records": len(records),
-                "indicators_with_records": meta["indicators_with_records"],
-                "hints": meta["hints"],
-                "version": raw.item.params.get("version"),
-            },
-            schema_fingerprint=schema_fingerprint(list(RECORD_FIELDS)),
-        )
+    def follow_ups(self, item: FetchItem, body: bytes) -> tuple[FetchItem, ...]:
+        """The data queries, pinned to the version the version item returned."""
+        if item.params.get("kind") != "version":
+            return ()
+        return self.data_items(parse_version(body)["version"])
 
-    def validate(self, batch: ObservationBatch) -> QualityReport:
-        m = batch.metadata
-        if m.get("kind") == "data":
-            if not m.get("records"):
-                return QualityReport(
-                    outcome="quarantine",
-                    findings=(
-                        Finding(code="empty_batch", severity="blocker", message="the UIS query returned no records"),
-                    ),
-                )
-            if int(m["records"]) >= RECORD_CAP:
-                return QualityReport(
-                    outcome="quarantine",
-                    findings=(
-                        Finding(
-                            code="record_cap",
-                            severity="blocker",
-                            message=f"{m['records']} records: at the API's 100k cap, the response may be truncated",
-                        ),
-                    ),
-                )
-        return QualityReport(outcome="pass", received_count=int(m.get("records") or 1))
-
-    def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
-        done = all(o.status in ("published", "unchanged") for o in outcomes) and not plan.budget_exhausted
-        return Cursor(state={"complete": done})
+    def check(self, item: FetchItem, body: bytes) -> dict[str, Any]:
+        """Structural check of one archived response (drift / empty / at the record cap -> ``UisParseError``)."""
+        if item.params.get("kind") == "version":
+            return parse_version(body)
+        records, meta = parse_data(body, tuple(item.params["indicators"]))
+        if not records:
+            raise _err(f"batch {item.params.get('batch')}: the UIS query returned no records")
+        if len(records) >= RECORD_CAP:
+            raise _err(f"{len(records)} records: at the API's 100k cap, the response may be truncated")
+        return {"records": len(records), "hints": meta["hints"]}
 
     # ------------------------------------------------------------------ atlas table
     def atlas_frame(self, bodies: Mapping[str, bytes], raws: Mapping[str, str]) -> tuple[Any, str, dict[str, Any]]:
@@ -462,6 +370,49 @@ def _frame(rows: Sequence[Mapping[str, Any]]) -> Any:
     return pl.DataFrame(list(rows), schema=ATLAS_SCHEMA)
 
 
+#: Fixture mode (``--fixture`` / tests) replays the captured subset in tests/fixtures/source/atlas.unesco_uis.
+FIXTURE_BATCHES = (("LR.AG15T99", "LR.AG15T99.F"), ("XGDP.FSGOV", "EXPGDP.TOT", "CR.MOD.1"))
+FIXTURE_COUNTRIES = ("DZA", "FRA", "IND", "NGA", "TUR")
+
+
+def atlas_source() -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=UisConnector.ATLAS_SOURCE,
+        provider="UNESCO Institute for Statistics",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=(UisConnector.ATLAS_DATASET,),
+        dataset_ids=tuple(i.code for i in INDICATORS),
+        cadence_seconds=30 * 86400,
+        planned_requests=1 + len(BATCHES),
+        max_response_bytes=MAX_ITEM_BYTES,
+        min_interval_seconds=1.0,
+        parser_version=PARSER_VERSION,
+        code_digest=module_digest(UisConnector),
+        field_mappings={
+            "value": "value",
+            "flags": ["qualifier", "magnitude", "footnotes"],
+            "batches": [[i.code for i in b] for b in BATCHES],
+            "units": {i.code: i.unit for i in INDICATORS},
+        },
+        notes="Data queries pinned to the current UIS data version; a partial run registers nothing.",
+    )
+
+
+def connector_for(run: Any) -> UisConnector:
+    if run.origin == "test_fixture":
+        return UisConnector(FIXTURE_BATCHES, FIXTURE_COUNTRIES)
+    return UisConnector()
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """ATLASCORE entry point (``uv run python -m reva.atlas.ingest atlas.unesco_uis``)."""
+    return await fetch_archive_register(run, connector_for(run), dataset=UisConnector.ATLAS_DATASET)
+
+
 #: UIS indicator -> catalog concept (registry/atlas/catalog/education.yaml; a test keeps them in sync).
 CONCEPT_HINTS: dict[str, str] = {}
 
@@ -492,7 +443,9 @@ __all__ = [
     "RIGHTS",
     "SOURCE_KEY",
     "UisConnector",
+    "atlas_ingest",
     "atlas_rows",
+    "atlas_source",
     "data_url",
     "parse_data",
     "parse_version",

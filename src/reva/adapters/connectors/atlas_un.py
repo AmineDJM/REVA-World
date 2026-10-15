@@ -43,8 +43,11 @@ Honesty rules applied here
   real figures are JSON integers. Only integers are stored; string cells are counted and omitted.
 
 Every cell keeps the sha256 of the archived raw artifact and a selector into it. Parsing is a
-pure function of the archived bytes; :func:`run` archives (``publish_acquisition`` with zero
-observation batches), parses and registers (``register_atlas_table``).
+pure function of the archived bytes. The module follows the ATLASCORE atlas-source protocol
+(``reva.atlas.sources`` / ``reva.atlas.ingest``): :func:`atlas_source` declares the five sources and
+:func:`atlas_ingest` fetches only through ``run.get`` (budget-metered live client or fixture
+client), archives with ``run.archive`` and registers with ``run.register``. Live run:
+``uv run python -m reva.atlas.ingest atlas.un_wpp [--dataset wpp2024_demo]``.
 """
 
 from __future__ import annotations

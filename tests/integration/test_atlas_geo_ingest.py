@@ -92,3 +92,22 @@ async def test_geonames_climate_hazards_ingest(registered) -> None:  # type: ign
     with db.worker.connect() as conn:
         keys = {r[0] for r in conn.execute(text("SELECT dataset_key FROM evidence.dataset WHERE dataset_key LIKE 'atlas.%'"))}
     assert {"atlas.geonames.countryinfo", f"atlas.cckp.{cl.DS_CRU}", f"atlas.inform.{hz.ATLAS_DATASET}"} <= keys
+
+
+@pytest.mark.parametrize("source", [gn.CONNECTOR_NAME, cl.CONNECTOR_NAME, hz.CONNECTOR_NAME])
+async def test_single_entry_point_fixture_mode(registered, source) -> None:  # type: ignore[no-untyped-def]
+    """The lead's single atlas ingest entry point replays the captured responses (origin test_fixture)."""
+    from reva.atlas.ingest import run_atlas_ingest
+
+    out = await run_atlas_ingest(registered.settings, registered.worker, registered.store, source, mode="fixture")
+    assert out["status"] == "completed" and out["archived_raw"] >= 1 and out["registered"]
+
+
+@pytest.mark.live
+async def test_live_geonames_through_entry_point(registered) -> None:  # type: ignore[no-untyped-def]
+    """One small live request through the budget-metered entry point (deselected by default)."""
+    from reva.atlas.ingest import run_atlas_ingest
+
+    out = await run_atlas_ingest(registered.settings, registered.worker, registered.store, gn.CONNECTOR_NAME,
+                                 mode="live")
+    assert out["status"] == "completed" and out["registered"][0]["row_count"] > 3000

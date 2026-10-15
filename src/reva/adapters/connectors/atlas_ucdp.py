@@ -89,9 +89,9 @@ RIGHTS: dict[str, str] = {
     "licence": "CC BY 4.0",
     "licence_url": "https://creativecommons.org/licenses/by/4.0/",
     "attribution": "Uppsala Conflict Data Program (UCDP), Department of Peace and Conflict Research, Uppsala "
-                   "University, datasets version 26.1 (ucdp.uu.se/downloads)",
+    "University, datasets version 26.1 (ucdp.uu.se/downloads)",
     "citations": "Gleditsch et al. 2002 (JPR 39(5)); Davies et al. 2025 (JPR) for ACD/BRD; Sundberg & Melander "
-                 "2013 (JPR 50(4)) for GED/OrganizedViolenceCY",
+    "2013 (JPR 50(4)) for GED/OrganizedViolenceCY",
 }
 
 INCOMPATIBILITY = {"1": "territory", "2": "government", "3": "government_and_territory"}
@@ -103,17 +103,24 @@ _PREC = {"1": 11, "2": 10, "3": 10, "4": 9, "5": 9, "6": 9, "7": 9}
 #: orgvio_cy columns kept as atlas indicators (unit) -- fatality estimates and dyad counts.
 CY_INDICATORS: dict[str, str] = {
     **{f"sb_total_deaths_{k}": "deaths" for k in ("best", "low", "high")},
-    "sb_deaths_parties": "deaths", "sb_deaths_civilians": "deaths", "sb_deaths_unknown": "deaths",
+    "sb_deaths_parties": "deaths",
+    "sb_deaths_civilians": "deaths",
+    "sb_deaths_unknown": "deaths",
     **{f"sb_intrastate_deaths_{k}": "deaths" for k in ("best", "low", "high")},
     **{f"sb_interstate_deaths_{k}": "deaths" for k in ("best", "low", "high")},
     **{f"ns_total_deaths_{k}": "deaths" for k in ("best", "low", "high")},
     **{f"os_total_deaths_{k}": "deaths" for k in ("best", "low", "high")},
-    "os_govt_killings_best": "deaths", "os_nsgroup_killings_best": "deaths",
+    "os_govt_killings_best": "deaths",
+    "os_nsgroup_killings_best": "deaths",
     **{f"cumulative_total_deaths_in_orgvio_{k}": "deaths" for k in ("best", "low", "high")},
-    "sb_dyad_count": "count", "ns_dyad_count": "count", "os_dyad_count": "count",
+    "sb_dyad_count": "count",
+    "ns_dyad_count": "count",
+    "os_dyad_count": "count",
 }
-CY_ZERO_NOTE = ("UCDP codes 0 when GED records no fatalities for the country-year; fatalities of dyads "
-                "below the 25-deaths inclusion threshold are not counted (codebook 26.1 section 2)")
+CY_ZERO_NOTE = (
+    "UCDP codes 0 when GED records no fatalities for the country-year; fatalities of dyads "
+    "below the 25-deaths inclusion threshold are not counted (codebook 26.1 section 2)"
+)
 
 
 class UcdpParseError(SourceResponseError):
@@ -122,8 +129,12 @@ class UcdpParseError(SourceResponseError):
 
 def fetch_items() -> tuple[FetchItem, ...]:
     return tuple(
-        FetchItem(key=k, url=BASE + path, max_bytes=MAX_BYTES,
-                  expected_media_types=("application/zip", "application/octet-stream", "application/x-zip-compressed"))
+        FetchItem(
+            key=k,
+            url=BASE + path,
+            max_bytes=MAX_BYTES,
+            expected_media_types=("application/zip", "application/octet-stream", "application/x-zip-compressed"),
+        )
         for k, (path, _m, _n) in FILES.items()
     )
 
@@ -132,12 +143,14 @@ def parse_file(key: str, body: bytes) -> list[dict[str, str]]:
     _path, member, min_rows = FILES[key]
     rows = read_csv_member(body, member, encoding=ENCODINGS.get(key, "utf-8-sig"))
     if len(rows) < min_rows:
-        raise UcdpParseError(f"UCDP {key}: {len(rows)} rows < expected {min_rows} (truncated?)", retryable=False,
-                             kind="incomplete")
+        raise UcdpParseError(
+            f"UCDP {key}: {len(rows)} rows < expected {min_rows} (truncated?)", retryable=False, kind="incomplete"
+        )
     versions = {r.get("version") or r.get("Version") for r in rows}
     if versions != {UCDP_VERSION}:
-        raise UcdpParseError(f"UCDP {key}: unexpected version column {sorted(map(str, versions))}", retryable=False,
-                             kind="schema_drift")
+        raise UcdpParseError(
+            f"UCDP {key}: unexpected version column {sorted(map(str, versions))}", retryable=False, kind="schema_drift"
+        )
     return rows
 
 
@@ -157,8 +170,13 @@ def _mid(year: int) -> date:
 # ----------------------------------------------------------------------------- atlas: orgvio_cy
 
 
-def orgvio_atlas_rows(rows: Sequence[Mapping[str, str]], *, raw_sha256: str, crosswalk: StateCodeCrosswalk,
-                      file: str = FILES["orgvio_cy"][1]) -> list[dict[str, Any]]:
+def orgvio_atlas_rows(
+    rows: Sequence[Mapping[str, str]],
+    *,
+    raw_sha256: str,
+    crosswalk: StateCodeCrosswalk,
+    file: str = FILES["orgvio_cy"][1],
+) -> list[dict[str, Any]]:
     from reva.atlas.tables import json_obj, year_period
 
     out: list[dict[str, Any]] = []
@@ -175,19 +193,34 @@ def orgvio_atlas_rows(rows: Sequence[Mapping[str, str]], *, raw_sha256: str, cro
                 continue  # not reported: omitted (never a filled zero)
             if int_or_none(v) is None or str(int_or_none(v)) != v:
                 raise UcdpParseError(f"orgvio_cy row {i + 2} {col}: non-integer {v!r}", retryable=False)
-            flags: dict[str, Any] = {"provider_country": r["country"], "ucdp_version": UCDP_VERSION,
-                                     "code_resolution": res.reason}
+            flags: dict[str, Any] = {
+                "provider_country": r["country"],
+                "ucdp_version": UCDP_VERSION,
+                "code_resolution": res.reason,
+            }
             if v == "0" and unit == "deaths":
                 flags["zero_semantics"] = CY_ZERO_NOTE
             if res.iso3 is None and res.label:
                 flags["historical_state"] = res.label
-            out.append({
-                "source": ATLAS_SOURCE, "dataset": "orgvio_cy", "indicator": col, "concept_id": None,
-                "iso3": res.iso3, "provider_geo": f"gw:{gw}", "entity_qid": None,
-                "period_start": start, "period_end": end, "value": v, "value_text": None, "unit": unit,
-                "flags": json_obj(flags), "raw_sha256": raw_sha256,
-                "selector": json_obj(file=file, row=i + 2, column=col),
-            })
+            out.append(
+                {
+                    "source": ATLAS_SOURCE,
+                    "dataset": "orgvio_cy",
+                    "indicator": col,
+                    "concept_id": None,
+                    "iso3": res.iso3,
+                    "provider_geo": f"gw:{gw}",
+                    "entity_qid": None,
+                    "period_start": start,
+                    "period_end": end,
+                    "value": v,
+                    "value_text": None,
+                    "unit": unit,
+                    "flags": json_obj(flags),
+                    "raw_sha256": raw_sha256,
+                    "selector": json_obj(file=file, row=i + 2, column=col),
+                }
+            )
     return out
 
 
@@ -198,12 +231,13 @@ ACD_CY_INDICATORS = {
     "acd_wars_located": "conflicts at war intensity (>= 1000 battle-related deaths in the year) located in the country",
     "acd_conflicts_primary_party": "active conflicts in which the country's government is a primary party (gwno_a/gwno_b)",
     "acd_conflicts_secondary_party": "active conflicts in which the country's government is a secondary (supporting) "
-                                     "party with troops (gwno_a_2nd/gwno_b_2nd)",
+    "party with troops (gwno_a_2nd/gwno_b_2nd)",
 }
 
 
-def acd_country_year_rows(rows: Sequence[Mapping[str, str]], *, raw_sha256: str, crosswalk: StateCodeCrosswalk,
-                          file: str = FILES["acd"][1]) -> list[dict[str, Any]]:
+def acd_country_year_rows(
+    rows: Sequence[Mapping[str, str]], *, raw_sha256: str, crosswalk: StateCodeCrosswalk, file: str = FILES["acd"][1]
+) -> list[dict[str, Any]]:
     """Counts of distinct conflicts per (GW code, year) and role, computed from the ACD rows.
 
     Only country-years with at least one conflict are emitted (the ACD lists conflicts, not countries;
@@ -234,18 +268,31 @@ def acd_country_year_rows(rows: Sequence[Mapping[str, str]], *, raw_sha256: str,
         flags: dict[str, Any] = {
             "computed_from": f"UCDP/PRIO Armed Conflict Dataset {UCDP_VERSION}",
             "method": "count of distinct conflict_id among conflict-year rows; " + ACD_CY_INDICATORS[ind],
-            "conflict_ids": sorted(cids, key=int), "code_resolution": res.reason,
+            "conflict_ids": sorted(cids, key=int),
+            "code_resolution": res.reason,
         }
         if res.iso3 is None and res.label:
             flags["historical_state"] = res.label
         rows_ = lines[(ind, gw, year)]
-        out.append({
-            "source": ATLAS_SOURCE, "dataset": "acd_cy", "indicator": ind, "concept_id": None, "iso3": res.iso3,
-            "provider_geo": f"gw:{gw}", "entity_qid": None, "period_start": start, "period_end": end,
-            "value": str(len(cids)), "value_text": None, "unit": "count", "flags": json_obj(flags),
-            "raw_sha256": raw_sha256,
-            "selector": json_obj(file=file, rows=rows_[:50], rows_total=len(rows_), year=year),
-        })
+        out.append(
+            {
+                "source": ATLAS_SOURCE,
+                "dataset": "acd_cy",
+                "indicator": ind,
+                "concept_id": None,
+                "iso3": res.iso3,
+                "provider_geo": f"gw:{gw}",
+                "entity_qid": None,
+                "period_start": start,
+                "period_end": end,
+                "value": str(len(cids)),
+                "value_text": None,
+                "unit": "count",
+                "flags": json_obj(flags),
+                "raw_sha256": raw_sha256,
+                "selector": json_obj(file=file, rows=rows_[:50], rows_total=len(rows_), year=year),
+            }
+        )
     return out
 
 
@@ -259,9 +306,14 @@ def _conflict_label(rows: Sequence[Mapping[str, str]]) -> str:
     return f"{r['location']}: {what} (UCDP conflict {r['conflict_id']})"
 
 
-def kg_records(acd: Sequence[Mapping[str, str]], brd: Sequence[Mapping[str, str]],
-               actors: Sequence[Mapping[str, str]], *, shas: Mapping[str, str],
-               resolver: StateEntityResolver) -> tuple[list[KgEntity], list[KgStatement]]:
+def kg_records(
+    acd: Sequence[Mapping[str, str]],
+    brd: Sequence[Mapping[str, str]],
+    actors: Sequence[Mapping[str, str]],
+    *,
+    shas: Mapping[str, str],
+    resolver: StateEntityResolver,
+) -> tuple[list[KgEntity], list[KgStatement]]:
     """Entities and statements for every ACD conflict (1946-2025) and BRD conflict-year (1989-2025).
 
     Relations that hold in several years become one statement per run of consecutive years
@@ -280,17 +332,28 @@ def kg_records(acd: Sequence[Mapping[str, str]], brd: Sequence[Mapping[str, str]
         rows = [r for _, r in items]
         subj = f"ucdp:conflict:{cid}"
         years_all = [int(r["year"]) for r in rows]
-        ents.append(KgEntity(qid=subj, kind="armed_conflict", labels={"en": _conflict_label(rows)},
-                             descriptions={"en": f"UCDP/PRIO armed conflict {cid}, active years "
-                                                 f"{min(years_all)}-{max(years_all)} (UCDP {UCDP_VERSION})"}))
+        ents.append(
+            KgEntity(
+                qid=subj,
+                kind="armed_conflict",
+                labels={"en": _conflict_label(rows)},
+                descriptions={
+                    "en": f"UCDP/PRIO armed conflict {cid}, active years "
+                    f"{min(years_all)}-{max(years_all)} (UCDP {UCDP_VERSION})"
+                },
+            )
+        )
         # role relations, grouped by resolved entity
         rel: dict[tuple[str, str], list[tuple[int, int]]] = defaultdict(list)  # (pred, obj) -> [(year, line)]
         for line, r in items:
             y = int(r["year"])
-            for pred, field, side in (("ucdp:primary_party", "gwno_a", "a"), ("ucdp:primary_party", "gwno_b", "b"),
-                                      ("ucdp:secondary_party", "gwno_a_2nd", "a"),
-                                      ("ucdp:secondary_party", "gwno_b_2nd", "b"),
-                                      ("ucdp:location", "gwno_loc", "")):
+            for pred, field, side in (
+                ("ucdp:primary_party", "gwno_a", "a"),
+                ("ucdp:primary_party", "gwno_b", "b"),
+                ("ucdp:secondary_party", "gwno_a_2nd", "a"),
+                ("ucdp:secondary_party", "gwno_b_2nd", "b"),
+                ("ucdp:location", "gwno_loc", ""),
+            ):
                 for gw in _codes(r[field]):
                     obj = resolver.entity("ucdp", gw, _mid(y))
                     rel[(pred + (f"|side={side}" if side else ""), obj)].append((y, line))
@@ -306,72 +369,143 @@ def kg_records(acd: Sequence[Mapping[str, str]], brd: Sequence[Mapping[str, str]
                 qual: dict[str, Any] = {"years": run}
                 if side:
                     qual["side"] = side.split("=")[1]
-                stmts.append(KgStatement(
-                    key=f"{cid}:{pred.split(':')[1]}:{obj}:{a}", subject=subj, property=pred, object_qid=obj,
-                    start=f"{a}-01-01", start_precision=9, end=f"{b}-12-31", end_precision=9, qualifiers=qual,
-                    raw_sha256=acd_sha,
-                    selector={"file": acd_file, "rows": [ln for y, ln in yl if a <= y <= b][:50]}))
+                stmts.append(
+                    KgStatement(
+                        key=f"{cid}:{pred.split(':')[1]}:{obj}:{a}",
+                        subject=subj,
+                        property=pred,
+                        object_qid=obj,
+                        start=f"{a}-01-01",
+                        start_precision=9,
+                        end=f"{b}-12-31",
+                        end_precision=9,
+                        qualifiers=qual,
+                        raw_sha256=acd_sha,
+                        selector={"file": acd_file, "rows": [ln for y, ln in yl if a <= y <= b][:50]},
+                    )
+                )
         last_line, last = items[-1]
         first_line, first = items[0]
-        for pred, val in (("ucdp:incompatibility", INCOMPATIBILITY.get(last["incompatibility"])),
-                          ("ucdp:conflict_type", CONFLICT_TYPE.get(last["type_of_conflict"])),
-                          ("ucdp:territory_name", last["territory_name"] or None)):
+        for pred, val in (
+            ("ucdp:incompatibility", INCOMPATIBILITY.get(last["incompatibility"])),
+            ("ucdp:conflict_type", CONFLICT_TYPE.get(last["type_of_conflict"])),
+            ("ucdp:territory_name", last["territory_name"] or None),
+        ):
             if val:
-                stmts.append(KgStatement(key=f"{cid}:{pred.split(':')[1]}", subject=subj, property=pred,
-                                         value={"type": "string", "value": val},
-                                         qualifiers={"as_of_year": int(last["year"])}, raw_sha256=acd_sha,
-                                         selector={"file": acd_file, "row": last_line}))
+                stmts.append(
+                    KgStatement(
+                        key=f"{cid}:{pred.split(':')[1]}",
+                        subject=subj,
+                        property=pred,
+                        value={"type": "string", "value": val},
+                        qualifiers={"as_of_year": int(last["year"])},
+                        raw_sha256=acd_sha,
+                        selector={"file": acd_file, "row": last_line},
+                    )
+                )
         types = sorted({CONFLICT_TYPE.get(r["type_of_conflict"], "") for r in rows} - {""})
         if len(types) > 1:  # e.g. intrastate -> internationalized: keep the history
             for t in types:
                 yrs = [int(r["year"]) for r in rows if CONFLICT_TYPE.get(r["type_of_conflict"]) == t]
-                stmts.append(KgStatement(key=f"{cid}:conflict_type_in:{t}", subject=subj,
-                                         property="ucdp:conflict_type", value={"type": "string", "value": t},
-                                         start=f"{min(yrs)}-01-01", start_precision=9, end=f"{max(yrs)}-12-31",
-                                         end_precision=9, qualifiers={"years": sorted(yrs)}, raw_sha256=acd_sha,
-                                         selector={"file": acd_file, "conflict_id": cid}))
+                stmts.append(
+                    KgStatement(
+                        key=f"{cid}:conflict_type_in:{t}",
+                        subject=subj,
+                        property="ucdp:conflict_type",
+                        value={"type": "string", "value": t},
+                        start=f"{min(yrs)}-01-01",
+                        start_precision=9,
+                        end=f"{max(yrs)}-12-31",
+                        end_precision=9,
+                        qualifiers={"years": sorted(yrs)},
+                        raw_sha256=acd_sha,
+                        selector={"file": acd_file, "conflict_id": cid},
+                    )
+                )
         sd = iso_date_or_none(first["start_date"])
         if sd:
-            stmts.append(KgStatement(key=f"{cid}:start_date", subject=subj, property="ucdp:start_date",
-                                     value={"type": "time", "time": sd.isoformat(),
-                                            "precision": _PREC.get(first["start_prec"], 9)},
-                                     qualifiers={"ucdp_start_prec": first["start_prec"],
-                                                 "definition": "date of the first battle-related death"},
-                                     raw_sha256=acd_sha, selector={"file": acd_file, "row": first_line,
-                                                                   "column": "start_date"}))
+            stmts.append(
+                KgStatement(
+                    key=f"{cid}:start_date",
+                    subject=subj,
+                    property="ucdp:start_date",
+                    value={"type": "time", "time": sd.isoformat(), "precision": _PREC.get(first["start_prec"], 9)},
+                    qualifiers={
+                        "ucdp_start_prec": first["start_prec"],
+                        "definition": "date of the first battle-related death",
+                    },
+                    raw_sha256=acd_sha,
+                    selector={"file": acd_file, "row": first_line, "column": "start_date"},
+                )
+            )
         for line, r in items:
             y = int(r["year"])
-            stmts.append(KgStatement(
-                key=f"{cid}:intensity:{y}", subject=subj, property="ucdp:intensity_level",
-                value={"type": "quantity", "amount": r["intensity_level"], "unit": "1"},
-                point_in_time=f"{y}-01-01", pit_precision=9,
-                qualifiers={"scale": "1 = 25-999 battle-related deaths in the year; 2 = at least 1000"},
-                raw_sha256=acd_sha, selector={"file": acd_file, "row": line, "column": "intensity_level"}))
+            stmts.append(
+                KgStatement(
+                    key=f"{cid}:intensity:{y}",
+                    subject=subj,
+                    property="ucdp:intensity_level",
+                    value={"type": "quantity", "amount": r["intensity_level"], "unit": "1"},
+                    point_in_time=f"{y}-01-01",
+                    pit_precision=9,
+                    qualifiers={"scale": "1 = 25-999 battle-related deaths in the year; 2 = at least 1000"},
+                    raw_sha256=acd_sha,
+                    selector={"file": acd_file, "row": line, "column": "intensity_level"},
+                )
+            )
             if r["ep_end"] == "1" and iso_date_or_none(r["ep_end_date"]):
-                stmts.append(KgStatement(
-                    key=f"{cid}:episode_end:{y}", subject=subj, property="ucdp:episode_end",
-                    value={"type": "time", "time": r["ep_end_date"][:10],
-                           "precision": _PREC.get(r["ep_end_prec"] or "1", 11)},
-                    qualifiers={"definition": "last date of the episode (no 25 battle-related deaths in the "
-                                              "following year)", "ucdp_ep_end_prec": r["ep_end_prec"]},
-                    raw_sha256=acd_sha, selector={"file": acd_file, "row": line, "column": "ep_end_date"}))
+                stmts.append(
+                    KgStatement(
+                        key=f"{cid}:episode_end:{y}",
+                        subject=subj,
+                        property="ucdp:episode_end",
+                        value={
+                            "type": "time",
+                            "time": r["ep_end_date"][:10],
+                            "precision": _PREC.get(r["ep_end_prec"] or "1", 11),
+                        },
+                        qualifiers={
+                            "definition": "last date of the episode (no 25 battle-related deaths in the "
+                            "following year)",
+                            "ucdp_ep_end_prec": r["ep_end_prec"],
+                        },
+                        raw_sha256=acd_sha,
+                        selector={"file": acd_file, "row": line, "column": "ep_end_date"},
+                    )
+                )
     brd_file, brd_sha = FILES["brd_conf"][1], shas["brd_conf"]
     for i, r in enumerate(brd):
         cid, y = r["conflict_id"], int(r["year"])
         q = {k: r[k] for k in ("bd_low", "bd_high") if (r.get(k) or "").strip()}
-        stmts.append(KgStatement(
-            key=f"{cid}:battle_deaths:{y}", subject=f"ucdp:conflict:{cid}", property="ucdp:battle_related_deaths",
-            value={"type": "quantity", "amount": r["bd_best"], "unit": "deaths",
-                   **({"lowerBound": q["bd_low"]} if "bd_low" in q else {}),
-                   **({"upperBound": q["bd_high"]} if "bd_high" in q else {})},
-            point_in_time=f"{y}-01-01", pit_precision=9,
-            qualifiers={"estimate": "best", "battle_location": r.get("battle_location") or None},
-            raw_sha256=brd_sha, selector={"file": brd_file, "row": i + 2, "column": "bd_best"}))
+        stmts.append(
+            KgStatement(
+                key=f"{cid}:battle_deaths:{y}",
+                subject=f"ucdp:conflict:{cid}",
+                property="ucdp:battle_related_deaths",
+                value={
+                    "type": "quantity",
+                    "amount": r["bd_best"],
+                    "unit": "deaths",
+                    **({"lowerBound": q["bd_low"]} if "bd_low" in q else {}),
+                    **({"upperBound": q["bd_high"]} if "bd_high" in q else {}),
+                },
+                point_in_time=f"{y}-01-01",
+                pit_precision=9,
+                qualifiers={"estimate": "best", "battle_location": r.get("battle_location") or None},
+                raw_sha256=brd_sha,
+                selector={"file": brd_file, "row": i + 2, "column": "bd_best"},
+            )
+        )
     for aid in sorted(used_actors, key=int):
         name = actor_name.get(aid)
-        ents.append(KgEntity(qid=f"ucdp:actor:{aid}", kind="armed_group",
-                             labels={"en": name or f"UCDP actor {aid}"},
-                             descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {UCDP_VERSION})"}))
+        ents.append(
+            KgEntity(
+                qid=f"ucdp:actor:{aid}",
+                kind="armed_group",
+                labels={"en": name or f"UCDP actor {aid}"},
+                descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {UCDP_VERSION})"},
+            )
+        )
     return ents, stmts
 
 
@@ -382,21 +516,37 @@ def atlas_source() -> Any:
     from reva.atlas.sources import AtlasSourceSpec
 
     return AtlasSourceSpec(
-        name=CONNECTOR_NAME, version=CONNECTOR_VERSION, source_key=SOURCE_KEY, atlas_source=ATLAS_SOURCE,
-        provider="Uppsala Conflict Data Program (Uppsala University)", licence=RIGHTS["licence"],
-        allowed_hosts=(HOST, "cran.r-project.org"), datasets=("orgvio_cy", "acd_cy"),
-        dataset_ids=tuple(f"ucdp-{k}-{UCDP_VERSION}" for k in FILES) + (f"countrycode-{COUNTRYCODE_VERSION}",),
-        cadence_seconds=30 * 86400, planned_requests=8, max_response_bytes=MAX_BYTES, min_interval_seconds=1.0,
+        name=CONNECTOR_NAME,
+        version=CONNECTOR_VERSION,
+        source_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="Uppsala Conflict Data Program (Uppsala University)",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST, "cran.r-project.org"),
+        datasets=("orgvio_cy", "acd_cy"),
+        dataset_ids=(*tuple(f"ucdp-{k}-{UCDP_VERSION}" for k in FILES), f"countrycode-{COUNTRYCODE_VERSION}"),
+        cadence_seconds=30 * 86400,
+        planned_requests=8,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=1.0,
         parser_version=PARSER_VERSION,
-        field_mappings={"geo": "Gleditsch-Ward codes (UCDP variant: 345 kept for Serbia after 2006)",
-                        "time": "calendar year", "kg": "ucdp:conflict:<id>, ucdp:actor:<id>"},
+        field_mappings={
+            "geo": "Gleditsch-Ward codes (UCDP variant: 345 kept for Serbia after 2006)",
+            "time": "calendar year",
+            "kg": "ucdp:conflict:<id>, ucdp:actor:<id>",
+        },
         notes="UCDP API needs a token since 2025; the official CSV downloads are used. Also fetches the "
-              "countrycode R package (CRAN) for GW/COW -> ISO3.",
+        "countrycode R package (CRAN) for GW/COW -> ISO3.",
     )
 
 
-def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk, qid_for_iso3: Mapping[str, str],
-          countrycode_sha256: str | None = None) -> dict[str, Any]:
+def build(
+    raws: Mapping[str, RawAcquisition],
+    *,
+    crosswalk: StateCodeCrosswalk,
+    qid_for_iso3: Mapping[str, str],
+    countrycode_sha256: str | None = None,
+) -> dict[str, Any]:
     """Parse raw bytes into the two atlas frames and the KG records (no I/O)."""
     import hashlib
 
@@ -409,9 +559,15 @@ def build(raws: Mapping[str, RawAcquisition], *, crosswalk: StateCodeCrosswalk, 
     ents = ents + resolver.code_entities()
     if countrycode_sha256:
         stmts = stmts + code_correspondence(resolver, raw_sha256=countrycode_sha256)
-    return {"shas": shas, "orgvio_cy": cy, "acd_cy": acd_cy, "entities": ents, "statements": stmts,
-            "row_counts": {k: len(v) for k, v in parsed.items()},
-            "unresolved_state_codes": {k: sorted(v) for k, v in resolver.unresolved.items()}}
+    return {
+        "shas": shas,
+        "orgvio_cy": cy,
+        "acd_cy": acd_cy,
+        "entities": ents,
+        "statements": stmts,
+        "row_counts": {k: len(v) for k, v in parsed.items()},
+        "unresolved_state_codes": {k: sorted(v) for k, v in resolver.unresolved.items()},
+    }
 
 
 def unmapped_geo(rows: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
@@ -429,8 +585,9 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     crosswalk, cc_sha = await fetch_countrycode(run)
     raws = {}
     for it in fetch_items():
-        raws[it.key] = await run.get(it.url, key=f"{it.key}:{UCDP_VERSION}", media_types=it.expected_media_types,
-                                     max_bytes=it.max_bytes)
+        raws[it.key] = await run.get(
+            it.url, key=f"{it.key}:{UCDP_VERSION}", media_types=it.expected_media_types, max_bytes=it.max_bytes
+        )
     out = build(raws, crosswalk=crosswalk, qid_for_iso3=load_qid_for_iso3(), countrycode_sha256=cc_sha)
     for raw in raws.values():  # parsed first: nothing archived on schema drift
         run.archive(raw)
@@ -438,21 +595,38 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     res: dict[str, Any] = {"row_counts": out["row_counts"], "atlas": {}}
     if run.wants("orgvio_cy"):
         r = run.register(
-            dataset="orgvio_cy", frame=atlas_frame(out["orgvio_cy"]), raw_sha256s=[shas["orgvio_cy"]], rights=RIGHTS,
+            dataset="orgvio_cy",
+            frame=atlas_frame(out["orgvio_cy"]),
+            raw_sha256s=[shas["orgvio_cy"]],
+            rights=RIGHTS,
             coverage_note=f"UCDP Country-Year Dataset on Organized Violence within Country Borders {UCDP_VERSION}, "
-                          "1989-2025, all GW states; indicators = UCDP columns verbatim; zeros are UCDP-coded")
+            "1989-2025, all GW states; indicators = UCDP columns verbatim; zeros are UCDP-coded",
+        )
         res["atlas"]["orgvio_cy"] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
     if run.wants("acd_cy"):
         r = run.register(
-            dataset="acd_cy", frame=atlas_frame(out["acd_cy"]), raw_sha256s=[shas["acd"]], rights=RIGHTS,
+            dataset="acd_cy",
+            frame=atlas_frame(out["acd_cy"]),
+            raw_sha256s=[shas["acd"]],
+            rights=RIGHTS,
             coverage_note=f"COMPUTED from UCDP/PRIO ACD {UCDP_VERSION} (1946-2025): distinct active conflicts per "
-                          "country-year by role; only country-years with >= 1 conflict are listed")
+            "country-year by role; only country-years with >= 1 conflict are listed",
+        )
         res["atlas"]["acd_cy"] = {k: r[k] for k in ("dataset_key", "row_count", "created", "unmapped_provider_geo")}
     res["kg_counts"] = {"entities": len(out["entities"]), "statements": len(out["statements"])}
     if run.dataset is None and kg_available(run.engine):
-        res["kg"] = load_kg(run.engine, run.store, out["entities"], out["statements"], source_key=KG_SOURCE_KEY,
-                            source_revision=f"ucdp-{UCDP_VERSION}", raw_sha256s=sorted(set(shas.values()) | {cc_sha}),
-                            retrieved_at=max(r.retrieved_at for r in raws.values()), origin=run.origin)
-    res["unresolved_state_codes"] = {k: v[:3] + (["..."] if len(v) > 3 else []) for k, v in
-                                     out["unresolved_state_codes"].items()}
+        res["kg"] = load_kg(
+            run.engine,
+            run.store,
+            out["entities"],
+            out["statements"],
+            source_key=KG_SOURCE_KEY,
+            source_revision=f"ucdp-{UCDP_VERSION}",
+            raw_sha256s=sorted(set(shas.values()) | {cc_sha}),
+            retrieved_at=max(r.retrieved_at for r in raws.values()),
+            origin=run.origin,
+        )
+    res["unresolved_state_codes"] = {
+        k: v[:3] + (["..."] if len(v) > 3 else []) for k, v in out["unresolved_state_codes"].items()
+    }
     return res

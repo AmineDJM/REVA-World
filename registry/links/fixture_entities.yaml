@@ -13,7 +13,7 @@ groups:
       - {qid: Q66626376, label: Governor of the Indies}
       - {qid: Q77380502, label: Viceroy of the Indies}
       - {qid: Q174306, label: Republic of Genoa}
-      - {qid: Q66555529, label: Spanish colonization of Hispaniola}
+      - {qid: Q66555529, label: Spanish Colonization of Hispaniola}
       - {qid: Q180897, label: Treaty of Tordesillas}
       - {qid: Q3930651, label: Demarcation line of Alexander VI}
       - {qid: Q1134342, label: Inter caetera}
@@ -42,7 +42,7 @@ groups:
       - {qid: Q1011, label: Cape Verde}
       - {qid: Q1007, label: Guinea-Bissau}
       - {qid: Q1039, label: São Tomé and Príncipe}
-      - {qid: Q574, label: East Timor}
+      - {qid: Q574, label: Timor-Leste}
   - name: us_decolonisation_1950s_60s
     description: >-
       The United States and European decolonisation in the 1950s–60s: Eisenhower, the Suez Crisis (1956),
@@ -79,5 +79,24 @@ groups:
       - {qid: Q131569, label: treaty}
       - {qid: Q5, label: human}
       - {qid: Q34770, label: language}
-      - {qid: Q19860, label: Indo-European languages}
-      - {qid: Q19814, label: Romance languages}
+      - {qid: Q19860, label: Indo-European}
+      - {qid: Q19814, label: Romance}
+  - name: wave2_bridges
+    description: >-
+      Entities found in the claims of the first capture (Brazil P1365, Colonial Brazil P361/P1366, Spanish
+      Empire P1365, Suez Crisis P361, Eisenhower P607, decolonization P1269) and three searched items.
+    entities:
+      - {qid: Q217196, label: Crown of Castile}
+      - {qid: Q204920, label: Crown of Aragon}
+      - {qid: Q377350, label: Iberian Union}
+      - {qid: Q903779, label: "United Kingdom of Portugal, Brazil and the Algarves"}
+      - {qid: Q217230, label: Empire of Brazil}
+      - {qid: Q1790360, label: colonial empire}
+      - {qid: Q8683, label: Cold War}
+      - {qid: Q8669, label: Arab–Israeli conflict}
+      - {qid: Q7167, label: colonialism}
+      - {qid: Q1330251, label: United Nations General Assembly resolution}
+      - {qid: Q1146918, label: decolonisation of Africa}
+      - {qid: Q387647, label: Year of Africa}
+      - {qid: Q835539, label: Eisenhower Doctrine}
+      - {qid: Q208191, label: Asian–African Conference}

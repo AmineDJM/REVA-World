@@ -12,6 +12,8 @@
 # * degree_penalty: extra cost per doubling of a node's degree above `threshold` distinct neighbours:
 #   penalty = per_doubling * max(0, log2(degree) - log2(threshold)); intermediate nodes only.
 #
+# QIDs checked against Wikidata labels (wbgetentities) on 2026-10-15.
+#
 # Penalties change which paths rank first; they never hide that a path exists through a blocked hub when
 # the caller asks for it (`include_blocked_hubs=true`).
 
@@ -48,8 +50,8 @@ penalised:
   - {qid: Q7809, label: UNESCO, penalty: 5.0}
   - {qid: Q7817, label: World Health Organization, penalty: 5.0}
   - {qid: Q7825, label: World Trade Organization, penalty: 4.0}
-  - {qid: Q7164, label: International Monetary Fund, penalty: 5.0}
-  - {qid: Q7159, label: World Bank, penalty: 5.0}
+  - {qid: Q7804, label: International Monetary Fund, penalty: 5.0}
+  - {qid: Q7164, label: World Bank, penalty: 5.0}
   - {qid: Q8475, label: Interpol, penalty: 5.0}
   - {qid: Q17495, label: Universal Postal Union, penalty: 5.0}
   - {qid: Q15180, label: Soviet Union, penalty: 0.5, note: "large polity; small penalty only"}
@@ -58,7 +60,7 @@ penalised:
   - {qid: Q48, label: Asia, penalty: 3.0}
   - {qid: Q18, label: South America, penalty: 3.0}
   - {qid: Q49, label: North America, penalty: 3.0}
-  - {qid: Q538, label: Oceania, penalty: 3.0}
+  - {qid: Q538, label: Insular Oceania, penalty: 3.0}
   - {qid: Q1321, label: Spanish, penalty: 1.0}
   - {qid: Q150, label: French, penalty: 1.0}
   - {qid: Q13955, label: Arabic, penalty: 1.0}

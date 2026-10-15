@@ -26,10 +26,18 @@ from reva.kernel.ids import sha256_bytes
 
 
 def _fetch(connector: str, items):
-    http = FixtureHttp(connector)
+    """Fetch fixture items through the platform's AtlasRun.get (the same path as a live run)."""
+    from reva.atlas.ingest import AtlasRun
+
+    run = AtlasRun(spec=U.CONNECTORS[connector].spec(), http=FixtureHttp(connector), engine=None,  # type: ignore[arg-type]
+                   store=None, settings=None, origin="test_fixture")  # type: ignore[arg-type]
 
     async def go():
-        return {it.key: (await U.fetch(it, http)).model_copy(update={"raw_sha256": None}) for it in items}
+        return {
+            it.key: await run.get(it.url, key=it.key, media_types=it.expected_media_types, max_bytes=it.max_bytes,
+                                  params=it.params)
+            for it in items
+        }
 
     return asyncio.run(go())
 
@@ -401,12 +409,21 @@ def test_syb_area_cp1252_and_respelled_numbers():
 
 
 # --------------------------------------------------------------------------- specs / catalog
-def test_connector_specs_validate():
-    for c in U.CONNECTORS.values():
-        spec = c.describe()
+def test_atlas_sources_are_discovered():
+    from reva.atlas.sources import discover
+
+    sources, errors = discover(["reva.adapters.connectors.atlas_un"])
+    assert errors == []
+    assert set(sources) == set(U.CONNECTORS)
+    for name, entry in sources.items():
+        spec, c = entry.spec, U.CONNECTORS[name]
         assert spec.template == "atlas_bulk" and spec.parser_version == U.PARSER_VERSION
         assert spec.source_key in {"un.wpp", "un.desa_ims", "un.sdg", "unhcr.population", "unsd.syb"}
         assert all(i.url.startswith("https://" + c.hosts[0] + "/") for i in c.plan())
+        assert all(i.max_bytes <= spec.max_response_bytes for i in c.plan())
+    # a dataset filter only fetches what it needs
+    only_demo = U.WPP_CONNECTOR.plan(lambda d: d == "wpp2024_demo")
+    assert [i.key for i in only_demo] == ["wpp:demo"]
 
 
 def test_catalog_un_loads_and_names_produced_series():

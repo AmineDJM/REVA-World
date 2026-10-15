@@ -51,7 +51,7 @@ What a cell is
 from __future__ import annotations
 
 import json
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
@@ -547,13 +547,13 @@ _load_hints()
 
 __all__ = [
     "CONNECTOR_NAME",
-    "atlas_ingest",
-    "atlas_source",
     "INDICATORS",
     "RIGHTS",
     "SOURCE_KEY",
     "WhoGhoConnector",
+    "atlas_ingest",
     "atlas_rows",
+    "atlas_source",
     "data_url",
     "fold_indicator",
     "parse_data",

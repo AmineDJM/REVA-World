@@ -350,6 +350,7 @@ def atlas_source() -> AtlasSourceSpec:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=SOURCE,
         provider="International Labour Organization (ILOSTAT)",
         licence=f"{RIGHTS['licence']} ({RIGHTS['terms_url']}); attribution: {RIGHTS['attribution']}",
