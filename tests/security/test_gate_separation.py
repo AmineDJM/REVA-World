@@ -23,6 +23,7 @@ import pytest
 from sqlalchemy import Connection, create_engine, text
 from sqlalchemy.exc import DBAPIError
 from test_db_hardening import activity, build_world, tx
+from test_governance_r5 import GATE_DATASET, GATE_MANIFEST, gate_connector_versions
 
 from reva.kernel.errors import ConfigurationError
 
@@ -30,6 +31,8 @@ pytestmark = pytest.mark.db
 
 DENIED = "permission denied"
 RECORD = "SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion')"
+RECORD_SCOPED = ("SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion', "
+                 "CAST(:sc AS jsonb))")
 APPROVE_ELIG = "SELECT evidence.approve_eligibility(:p, :g, :cv, :c, CAST(:ap AS jsonb), :pv, :a)"
 
 
@@ -37,7 +40,9 @@ APPROVE_ELIG = "SELECT evidence.approve_eligibility(:p, :g, :cv, :c, CAST(:ap AS
 def w(db: Any) -> dict[str, Any]:
     if db.gate is None:
         pytest.skip("REVA_GATE_DB_PASSWORD not configured")
-    return build_world(db)
+    world = build_world(db)
+    world["gate_cvs"] = gate_connector_versions(db)
+    return world
 
 
 def refused(c: Connection, sql: str, params: dict[str, Any] | None = None, match: str = DENIED) -> None:
@@ -57,7 +62,7 @@ def scope(c: Connection, w: dict[str, Any]) -> dict[str, Any]:
     ref = c.execute(text("SELECT concept_id || '@' || version FROM ontology.concept_version WHERE id = :c"),
                     {"c": w["obs"]["concept_version_id"]}).scalar_one()
     return {"concept": ref, "subject_ids": [str(w["obs"]["subject_id"])], "years": {"from": 2020, "to": 2023},
-            "mapping_key": "gate.map"}
+            "mapping_key": "gate.map", "dataset": GATE_DATASET, "manifest_sha256": GATE_MANIFEST}
 
 
 # --------------------------------------------------------------------------- who records gate results
@@ -73,7 +78,7 @@ def test_worker_api_and_sim_cannot_record_gate_results(w: dict[str, Any]) -> Non
             refused(c, direct, params)
     with db.worker.connect() as c:  # the worker still sees decisions (it promotes on them)
         assert c.execute(text("SELECT has_function_privilege('ops.record_gate_result(uuid,text,text,text,text,"
-                              "text)', 'EXECUTE')")).scalar_one() is False
+                              "text,jsonb)', 'EXECUTE')")).scalar_one() is False
         c.execute(text("SELECT count(*) FROM ops.gate_result")).scalar_one()
 
 
@@ -103,12 +108,14 @@ def test_owner_cannot_insert_gate_results(w: dict[str, Any]) -> None:
 
 # --------------------------------------------------------------------------- approvals need reva_gate
 def _forged_gate_row(c: Connection, pid: UUID, sha: str, recorded_by: str) -> UUID:
-    """A gate_result row as an attacker with trigger bypass (or a pre-GATE database) would leave it."""
+    """A gate_result row as an attacker with trigger bypass (or a pre-GATE database) would leave it,
+    complete with a plausible scope (the proposal's own)."""
     c.execute(text("SET LOCAL session_replication_role = replica"))
     gid = c.execute(text(
         "INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision, evidence_sha256, evaluator, "
-        "recorded_by) VALUES (:p, 'promotion', 'promotion-1', 'pass', :s, 'gate-evaluator:promotion', :r) "
-        "RETURNING id"), {"p": pid, "s": sha, "r": recorded_by}).scalar_one()
+        "recorded_by, scope) SELECT :p, 'promotion', 'promotion-1', 'pass', :s, 'gate-evaluator:promotion', :r, "
+        "summary->'scope' FROM ops.proposal WHERE id = :p RETURNING id"),
+        {"p": pid, "s": sha, "r": recorded_by}).scalar_one()
     c.execute(text("SET LOCAL session_replication_role = origin"))
     return UUID(str(gid))
 
@@ -124,13 +131,14 @@ def test_approval_functions_refuse_gate_results_not_recorded_by_the_gate(w: dict
         pytest.skip("forging a gate row needs a superuser (trigger bypass)")
     subj = [str(o["subject_id"])]
     with tx(db.owner) as c:
-        pid = proposal(w, scope(c, w))
+        sc = scope(c, w)
+    pid = proposal(w, sc)
     for forger in ("reva_worker", "reva_owner"):
         with tx(db.owner) as c:
             gid = _forged_gate_row(c, pid, w["verified"], forger)
             act = activity(c, "review", "gate-evaluator:promotion")
             app = {"subject_ids": subj, "years": {"from": 2020, "to": 2023}, "gate_result_id": str(gid)}
-            params = {"p": pid, "g": gid, "cv": o["connector_version_id"], "c": o["concept_version_id"],
+            params = {"p": pid, "g": gid, "cv": w["gate_cvs"][0], "c": o["concept_version_id"],
                       "ap": json.dumps(app), "pv": "promotion-1", "a": act}
             refused(c, APPROVE_ELIG, params, match="not recorded by the independent gate")
             refused(c, "SELECT ontology.approve_mapping(:p, :g, 'gate.map', '1', '{}'::jsonb, :c, 'exact', "
@@ -139,11 +147,12 @@ def test_approval_functions_refuse_gate_results_not_recorded_by_the_gate(w: dict
                     match="not recorded by the independent gate")
     # positive control: the same call with a reva_gate pass approves
     with db.gate.begin() as c:
-        g = c.execute(text(RECORD), {"p": pid, "v": "promotion-1", "d": "pass", "s": w["verified"]}).scalar_one()
+        g = c.execute(text(RECORD_SCOPED), {"p": pid, "v": "promotion-1", "d": "pass", "s": w["verified"],
+                                            "sc": json.dumps(sc)}).scalar_one()
     with tx(db.worker) as c:
         act = activity(c, "review", "gate-evaluator:promotion")
         app = {"subject_ids": subj, "years": {"from": 2020, "to": 2023}, "gate_result_id": str(g)}
-        eid = c.execute(text(APPROVE_ELIG), {"p": pid, "g": g, "cv": o["connector_version_id"],
+        eid = c.execute(text(APPROVE_ELIG), {"p": pid, "g": g, "cv": w["gate_cvs"][0],
                                              "c": o["concept_version_id"], "ap": json.dumps(app),
                                              "pv": "promotion-1", "a": act}).scalar_one()
         assert eid is not None
@@ -159,7 +168,8 @@ def test_model_approval_refuses_a_forged_gate_pass(w: dict[str, Any]) -> None:
         act = activity(c, "review", "worker:model-registry")
         refused(c, "SELECT model.approve_version(:p, :g, 'gate.m', '1', 'forecast', :s, 'x', '[]'::jsonb, "
                    "'[]'::jsonb, '{}'::jsonb, '[]'::jsonb, :a)",
-                {"p": pid, "g": gid, "s": w["verified"], "a": act}, match="not recorded by the independent gate")
+                {"p": pid, "g": gid, "s": w["verified"], "a": act},
+                match="need an approving human review|not recorded by the independent gate")
 
 
 def _restore_world(c: Connection, w: dict[str, Any], prev_recorded_by: str | None) -> tuple[UUID, UUID, UUID]:
@@ -382,3 +392,87 @@ def test_blueprint_has_an_independent_gate_service() -> None:
         "type": "web", "name": "reva-api", "envVarKey": "REVA_GATE_DB_PASSWORD"}})
     problems = " | ".join(vb.reva_checks(doc))
     assert "reva-gate must not receive" in problems and "reva-worker must not receive REVA_GATE_DB_PASSWORD" in problems
+
+
+# --------------------------------------------------------------------------- R6-02 / R6-03 (approval binding)
+def _gate_pass(w: dict[str, Any], pid: UUID, sc: dict[str, Any] | None) -> UUID:
+    with w["db"].gate.begin() as c:
+        return UUID(str(c.execute(text(RECORD_SCOPED), {"p": pid, "v": "promotion-1", "d": "pass",
+                                                        "s": w["verified"],
+                                                        "sc": json.dumps(sc) if sc is not None else None})
+                        .scalar_one()))
+
+
+def _approve(c: Connection, w: dict[str, Any], pid: UUID, g: UUID, cv: UUID, subjects: list[str]) -> Any:
+    act = activity(c, "review", "gate-evaluator:promotion")
+    app = {"subject_ids": subjects, "years": {"from": 2020, "to": 2023}, "gate_result_id": str(g)}
+    return {"p": pid, "g": g, "cv": cv, "c": w["obs"]["concept_version_id"], "ap": json.dumps(app),
+            "pv": "promotion-1", "a": act}
+
+
+def test_r6_02_gate_pass_is_bound_to_the_gate_derived_scope_and_manifest(w: dict[str, Any]) -> None:
+    db, o = w["db"], w["obs"]
+    subj = [str(o["subject_id"])]
+    with db.owner.connect() as c:
+        sc = scope(c, w)
+    cv = w["gate_cvs"][1]
+    # a pass without a gate-derived scope approves nothing
+    pid = proposal(w, sc)
+    g = _gate_pass(w, pid, None)
+    with tx(db.worker) as c:
+        refused(c, APPROVE_ELIG, _approve(c, w, pid, g, cv, subj), match="no gate-derived scope")
+    # the gate's scope wins over the proposer's summary: the proposer claimed a wider subject set
+    other = str(uuid.uuid4())
+    pid = proposal(w, {**sc, "subject_ids": [*subj, other]})
+    g = _gate_pass(w, pid, sc)
+    with tx(db.worker) as c:
+        refused(c, APPROVE_ELIG, _approve(c, w, pid, g, cv, [other]), match="does not cover subject_ids")
+    # the connector version must be the manifest and dataset the gate evaluated
+    with db.owner.connect() as c:
+        wdi = o["connector_version_id"]  # a built-in connector: no template manifest digest
+    for bad_scope, connector, match in (
+        (sc, wdi, "not the manifest the proposal scope names"),
+        ({**sc, "manifest_sha256": "sha256:" + "7" * 64}, cv, "not the manifest the proposal scope names"),
+        ({**sc, "dataset": "other.ds"}, cv, "serves another dataset"),
+    ):
+        pid = proposal(w, sc)
+        g = _gate_pass(w, pid, bad_scope)
+        with tx(db.worker) as c:
+            refused(c, APPROVE_ELIG, _approve(c, w, pid, g, connector, subj), match=match)
+    # positive control
+    pid = proposal(w, sc)
+    g = _gate_pass(w, pid, sc)
+    with tx(db.worker) as c:
+        assert c.execute(text(APPROVE_ELIG), _approve(c, w, pid, g, cv, subj)).scalar_one() is not None
+
+
+def test_r6_03_t2_proposals_need_a_human_review_not_a_gate_pass(w: dict[str, Any]) -> None:
+    db = w["db"]
+    model_sql = ("SELECT model.approve_version(:p, :g, :k, '1', 'forecast', :s, 'x', '[]'::jsonb, '[]'::jsonb, "
+                 "'{}'::jsonb, '[]'::jsonb, :a)")
+    pid = proposal(w, {}, ptype="model_registration")
+    g = _gate_pass(w, pid, {})
+    with tx(db.worker) as c:
+        act = activity(c, "review", "worker:model-registry")
+        refused(c, model_sql, {"p": pid, "g": g, "k": f"r6.{uuid.uuid4().hex[:6]}", "s": w["verified"], "a": act},
+                match="need an approving human review")
+    # a T2 connector_promotion (declared tier 2) is not approvable by a gate pass either
+    with db.owner.connect() as c:
+        sc = scope(c, w)
+    with db.worker.begin() as c:
+        pid2 = UUID(str(c.execute(text(
+            "INSERT INTO ops.proposal(proposal_type, manifest_sha256, permission_tier, author, summary) "
+            "VALUES ('connector_promotion', :s, 2, 'agent:discovery', CAST(:sum AS jsonb)) RETURNING id"),
+            {"s": w["verified"], "sum": json.dumps({"scope": sc})}).scalar_one()))
+    g2 = _gate_pass(w, pid2, sc)
+    with tx(db.worker) as c:
+        refused(c, APPROVE_ELIG, _approve(c, w, pid2, g2, w["gate_cvs"][1], [str(w["obs"]["subject_id"])]),
+                match="need an approving human review")
+    # positive control: the human review recorded through the API approves the model
+    with db.api.begin() as c:
+        rid = c.execute(text("SELECT ops.review_proposal(:p, 'approve', 'human:maintainer', 'ok')"),
+                        {"p": pid}).scalar_one()
+    with tx(db.worker) as c:
+        act = activity(c, "review", "worker:model-registry")
+        assert c.execute(text(model_sql), {"p": pid, "g": rid, "k": f"r6.{uuid.uuid4().hex[:6]}",
+                                           "s": w["verified"], "a": act}).scalar_one() is not None

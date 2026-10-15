@@ -91,6 +91,14 @@ PAUSE_PREFIX = "publication_pause:belief:"
 PERSISTENT_RUNS = 3
 SEMANTIC_FIELDS = ("subject_provider", "subject_key", "concept_id", "concept_version", "support", "value",
                    "uncertainty", "relation")
+# R6-14: estimation, status and classification flags in ``source_flags`` of the built-in
+# connectors (Comtrade raw + normalised estimation keys, WDI ``obs_status``, Eurostat ``status``).
+# A repair that changes any of them on a historical vintage reinterprets history: blocker.
+SEMANTIC_FLAG_KEYS = frozenset({
+    "isReported", "isAggregate", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated",
+    "obs_status", "status", "classificationCode", "estimation_flag", "isOriginalClassification",
+    "provider_quantity_estimated", "provider_value_estimated", "legacy_estimation_code_unrecognised"})
+ACCEPTED_HISTORY_LIMIT = 500
 
 # --------------------------------------------------------------------------- classes
 ADDITIVE = "additive_unused_fields"
@@ -726,9 +734,14 @@ class FixtureReplayChecker:
 
     def check(self, connector: Any, proposed: Any, bank: ArtifactRef, *, proposal_key: str,
               history: Sequence[RawAcquisition] = (), new_raw: RawAcquisition | None = None,
-              baseline_new: Mapping[str, str] | None = None) -> ValidationReport:
+              baseline_new: Mapping[str, str] | None = None, history_truncated: bool = False) -> ValidationReport:
         plan = _plan_by_fingerprint(connector)
         findings: list[Finding] = []
+        history_truncated = history_truncated or len(history) >= ACCEPTED_HISTORY_LIMIT
+        if history_truncated:
+            findings.append(_finding("accepted_history_truncated", "warning",
+                                     "the accepted-history query hit its row cap: only the most recently "
+                                     "recorded accepted vintages were replayed, older history was not checked"))
         vintages: list[dict[str, Any]] = []
         replayed = 0
         for e in bank_entries(self.io, bank):
@@ -761,6 +774,10 @@ class FixtureReplayChecker:
             if v.get("error"):
                 findings.append(_finding("historical_replay_failed", "blocker",
                                          f"{v.get('url') or v.get('item')}: {v['error']}"))
+            elif v.get("semantic_flag_changes"):
+                findings.append(_finding("historical_flag_reinterpretation", "blocker",
+                                         f"{v.get('url') or v.get('item')}: {v['semantic_flag_changes']} "
+                                         "estimation/status/classification flag sets differ"))
             elif v.get("flag_changes"):
                 findings.append(_finding("historical_flags_changed", "warning",
                                          f"{v.get('url') or v.get('item')}: {v['flag_changes']} source-flag sets "
@@ -789,7 +806,8 @@ class FixtureReplayChecker:
                 new_summary = {"error": type(e).__name__}
                 findings.append(_finding("new_payload_unparseable", "blocker",
                                          f"proposed parser cannot read the drifted payload ({type(e).__name__})"))
-        history_blocked = any(f.code in ("historical_reinterpretation", "historical_replay_failed",
+        history_blocked = any(f.code in ("historical_reinterpretation", "historical_flag_reinterpretation",
+                                         "historical_replay_failed",
                                          "fixture_not_replayable", "no_history") for f in findings)
         outcome = "blocked" if history_blocked else (
             "fail" if any(f.severity == "blocker" for f in findings) else "pass")
@@ -797,6 +815,7 @@ class FixtureReplayChecker:
                     "fixture_bank": bank.sha256, "parser": parser_identity(proposed),
                     "baseline_parser_version": connector.describe().parser_version,
                     "vintages_replayed": replayed, "vintages": vintages, "new_payload": new_summary,
+                    "accepted_history_truncated": history_truncated,
                     "outcome": outcome, "rule": "every historical vintage must yield identical semantic outputs "
                                                  "(concept, subject, support, value, uncertainty, relation)"}
         evidence["findings"] = [{"code": f.code, "severity": f.severity, "message": f.message} for f in findings]
@@ -821,9 +840,23 @@ class FixtureReplayChecker:
         if base[2] != prop[2]:
             changed.append("<expected_keys>")
         flag_changes = sum(1 for k in keys if base[1].get(k) != prop[1].get(k))
+        sem_flag_keys = [k for k in keys if base[1].get(k) != prop[1].get(k)
+                         and _semantic_flags(base[1].get(k)) != _semantic_flags(prop[1].get(k))]
         digest = hashlib.sha256(json.dumps(base[0], sort_keys=True).encode()).hexdigest()
         return {"observations": len(base[0]), "semantic_digest": digest, "semantic_changes": len(changed),
-                "examples": changed[:10], "flag_changes": flag_changes}
+                "examples": changed[:10], "flag_changes": flag_changes,
+                "semantic_flag_changes": len(sem_flag_keys), "flag_examples": sem_flag_keys[:10]}
+
+
+def _semantic_flags(flags_json: str | None) -> dict[str, Any]:
+    """The reviewed semantic subset of one observation's ``source_flags`` (absent key -> missing)."""
+    try:
+        d = json.loads(flags_json) if flags_json else {}
+    except ValueError:
+        return {"<unparseable>": flags_json}
+    if not isinstance(d, dict):
+        return {"<non_object>": d}
+    return {f: d[f] for f in SEMANTIC_FLAG_KEYS if f in d}
 
 
 def _default_constructible(connector: Any) -> bool:
@@ -873,6 +906,7 @@ class ConnectorRepairAdvisor:
         self.persistent_runs = persistent_runs
         self.author = author
         self.include_db_history = include_db_history
+        self.last_history_truncated = False
         self._banks: dict[str, ArtifactRef] = {}
 
     # ------------------------------------------------------------------ inputs
@@ -965,21 +999,30 @@ class ConnectorRepairAdvisor:
             return True
         return bool(value_comparison(old, new)["rescaled_concepts"])
 
-    def accepted_history(self, connector: Any, *, limit: int = 500) -> list[RawAcquisition]:
-        """Accepted (non-quarantined) raw acquisitions of this connector, for replay."""
+    def accepted_history(self, connector: Any, *, limit: int = ACCEPTED_HISTORY_LIMIT) -> list[RawAcquisition]:
+        """Accepted (non-quarantined) raw acquisitions of this connector, for replay.
+
+        At most ``limit`` distinct raw vintages, the most recently recorded first. When more
+        exist, ``self.last_history_truncated`` is set and the replay report carries an
+        ``accepted_history_truncated`` warning (R6-14).
+        """
         name = connector.describe().name
         plan = _plan_by_key(connector)
         with self.engine.connect() as conn:
             rows = conn.execute(text(
-                """SELECT DISTINCT ON (a.raw_sha256) a.raw_sha256, a.retrieved_at, a.origin, a.request_fingerprint,
-                          a.response_metadata->>'item_key' AS item_key, m.media_type
-                     FROM evidence.acquisition a
-                     JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
-                     JOIN meta.artifact m ON m.sha256 = a.raw_sha256
-                    WHERE cv.name = :n AND EXISTS (SELECT 1 FROM meta.artifact_location l
-                          WHERE l.artifact_sha256 = a.raw_sha256 AND l.namespace = 'raw')
-                    ORDER BY a.raw_sha256, a.recorded_at DESC LIMIT :l"""),
-                {"n": name, "l": limit}).mappings().all()
+                """SELECT * FROM (
+                     SELECT DISTINCT ON (a.raw_sha256) a.raw_sha256, a.retrieved_at, a.recorded_at, a.origin,
+                            a.request_fingerprint, a.response_metadata->>'item_key' AS item_key, m.media_type
+                       FROM evidence.acquisition a
+                       JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
+                       JOIN meta.artifact m ON m.sha256 = a.raw_sha256
+                      WHERE cv.name = :n AND EXISTS (SELECT 1 FROM meta.artifact_location l
+                            WHERE l.artifact_sha256 = a.raw_sha256 AND l.namespace = 'raw')
+                      ORDER BY a.raw_sha256, a.recorded_at DESC) d
+                   ORDER BY d.recorded_at DESC, d.raw_sha256 LIMIT :l"""),
+                {"n": name, "l": limit + 1}).mappings().all()
+        self.last_history_truncated = len(rows) > limit
+        rows = rows[:limit]
         out = []
         for r in rows:
             item = plan.get(r["item_key"] or "")
@@ -1220,12 +1263,14 @@ class ConnectorRepairAdvisor:
         if assessment.classification == ADDITIVE:
             reports.append(self._revalidation_report(connector, assessment))
         if proposed is not None:
+            self.last_history_truncated = False
             history = self.accepted_history(connector) if self.include_db_history else []
             new_raw = self._new_raw(connector, assessment)
             baseline_new = self._baseline_same_request(connector, assessment)
             reports.append(FixtureReplayChecker(self.io).check(
                 connector, proposed, assessment.bank, proposal_key=f"{spec.name}:{assessment.item_key}",
-                history=history, new_raw=new_raw, baseline_new=baseline_new))
+                history=history, new_raw=new_raw, baseline_new=baseline_new,
+                history_truncated=self.last_history_truncated))
         manifest = self._manifest(connector, assessment, proposed, reports)
         ref = self.io.put_json(manifest, "models")
         tier = int(assessment.tier)
@@ -1650,19 +1695,31 @@ def resume_belief_publication(engine: Engine, concept_id: str, *, actor: str, re
     if not actor.startswith(("gate-evaluator:", "human:")):
         raise AutonomyBlocked("only a gate evaluator or a named human can resume belief publication")
     with engine.begin() as conn:
-        marker = conn.execute(text("SELECT accumulated_error_bound FROM ops.dirty_node WHERE node_key = :k FOR UPDATE"),
-                              {"k": PAUSE_PREFIX + concept_id}).scalar_one_or_none()
+        marker_row = conn.execute(text("SELECT accumulated_error_bound, updated_at FROM ops.dirty_node "
+                                       "WHERE node_key = :k FOR UPDATE"),
+                                  {"k": PAUSE_PREFIX + concept_id}).mappings().one_or_none()
+        marker = marker_row["accumulated_error_bound"] if marker_row is not None else None
         pause_proposal = (marker or {}).get("proposal_id")
         evidence: dict[str, Any] = {"reason": reason[:500]}
         if actor.startswith("gate-evaluator:"):
             if gate_result_id is None:
                 raise AutonomyBlocked("a gate evaluator resumes publication only with its promote decision")
-            ok = conn.execute(text("SELECT decision = 'pass' AND evaluator = :a FROM ops.gate_result WHERE id = :g"),
-                              {"g": gate_result_id, "a": actor}).scalar_one_or_none()
-            if not ok:
+            # R6-08: the stored row is the authority (gate results are recorded by the separate
+            # reva_gate login, not by this worker): a pass by this evaluator, for the repair
+            # proposal that set this pause, recorded after the pause marker was (re)written.
+            g = conn.execute(text(
+                """SELECT g.decision, g.evaluator, g.proposal_id, g.recorded_at, p.proposal_type
+                     FROM ops.gate_result g JOIN ops.proposal p ON p.id = g.proposal_id
+                    WHERE g.id = :g"""), {"g": gate_result_id}).mappings().one_or_none()
+            if g is None or g["decision"] != "pass" or g["evaluator"] != actor:
                 raise AutonomyBlocked("gate result is not a promote decision by this evaluator")
+            if marker_row is None or pause_proposal is None or str(g["proposal_id"]) != str(pause_proposal) \
+                    or not str(g["proposal_type"]).startswith("connector_repair:") \
+                    or g["recorded_at"] <= marker_row["updated_at"]:
+                raise AutonomyBlocked("the gate pass is not for the repair proposal that paused publication "
+                                      "(or predates the pause)")
             audit_actor = actor
-            evidence["gate_result_id"] = str(gate_result_id)
+            evidence.update({"gate_result_id": str(gate_result_id), "proposal_id": str(g["proposal_id"])})
         else:
             if review_id is None:
                 raise AutonomyBlocked("a human resume must cite the reviewer's recorded approval (review_id)")

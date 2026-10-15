@@ -159,8 +159,9 @@ def _run_ingest(names: list[str], live: bool, capture: bool) -> list[dict[str, A
             else:
                 http = FixtureHttp(spec.name)
             try:
+                hook = getattr(c, "post_publish", None) or post_publish_for(spec.template)  # dataset inputs
                 rep = await run_connector(c, http, get_store(), get_engine("worker"), budget=fetch_budget,
-                                          post_publish=post_publish_for(spec.template), persist_cursor=live)
+                                          post_publish=hook, persist_cursor=live)
             finally:
                 if capture and live:
                     http.write_manifest()

@@ -274,7 +274,7 @@ def to_vector(cells: Mapping[str, Cell] | None, omega: int) -> list[Decimal] | N
     top = [singles[a] for a in range(omega, s)]
     top.append(next(c.value for c in cells.values()
                     if c.kind in ("open", "open_upper") and c.cell_type == "leaf" and c.value is not None))
-    vec.append(xsum(top))  # type: ignore[arg-type]
+    vec.append(xsum(top))
     return vec
 
 

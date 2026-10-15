@@ -179,13 +179,14 @@ def test_gdp_loss_and_unemployment_become_typed_gaps_never_another_output() -> N
     assert any(w.startswith("number_not_in_text: intervention.import_multiplier") for w in r.warnings)
 
 
-def test_retirement_age_before_the_model_exists_is_a_capability_gap() -> None:
+def test_stale_recorded_capability_gap_never_runs() -> None:
+    # Recorded before social.retirement_age was registered: the LLM then declared it unsupported. Now that
+    # the model exists, that gap no longer names a reserved capability; the server keeps the item as
+    # unclassified and still produces no runnable draft (a stale recording can never start a run).
     r = draft(TEXTS["openai_en_retirement"])
     assert r.status == "nothing_draftable" and r.draft_spec is None and r.candidate_spec is None
-    # the LLM wrote "model.social.retirement_age"; it maps to the capability catalogue's id
-    assert {u["capability_key"] for u in r.unsupported} == {"social.retirement_age"}
-    assert not any(u.get("llm_capability_key_rejected") for u in r.unsupported)
-    assert all(u["kind"] == "capability_gap" for u in r.unsupported)
+    assert r.unsupported and all(u["kind"] in ("capability_gap", "unclassified") or
+                                 u["capability_key"] == "nl.unclassified" for u in r.unsupported)
 
 
 def test_hostile_multiplier_1000_is_rejected_by_the_validator_not_clamped() -> None:

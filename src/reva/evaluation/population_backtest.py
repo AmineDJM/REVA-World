@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import json
 from collections.abc import Sequence
+from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 
@@ -35,12 +36,21 @@ from reva.simulation.plugins import InputRequirement
 SCHEMA = "reva-population-backtest/1"
 REPLAY_MODE = "revised_data_retrospective"
 EUROPOP_POPULATION = "demography.projection.europop2023.population_age_sex"
-PRIMARY = {"name": "primary_leak_free", "jump_off": 2013, "base_period": (2008, 2012), "target_year": 2023,
-           "note": ("jump-off population 1 January 2013; mortality, fertility and migration from the calendar "
-                    "years 2008-2012 (events before the jump-off only)")}
-LITERAL = {"name": "brief_2009_2013_rates", "jump_off": 2014, "base_period": (2009, 2013), "target_year": 2023,
-           "note": ("rates from 2009-2013 as in the brief; this needs 2013 events and the 1 January 2014 "
-                    "population, so the jump-off is 1 January 2014 (9 projected years)")}
+@dataclass(frozen=True)
+class Design:
+    name: str
+    jump_off: int
+    base_period: tuple[int, int]
+    target_year: int
+    note: str
+
+
+PRIMARY = Design("primary_leak_free", 2013, (2008, 2012), 2023,
+                 "jump-off population 1 January 2013; mortality, fertility and migration from the calendar years "
+                 "2008-2012 (events before the jump-off only)")
+LITERAL = Design("brief_2009_2013_rates", 2014, (2009, 2013), 2023,
+                 "rates from 2009-2013 as in the brief; this needs 2013 events and the 1 January 2014 population, so "
+                 "the jump-off is 1 January 2014 (9 projected years)")
 STATEMENT = ("Out-of-sample back-test on the current (revised) Eurostat vintage; no parameter was tuned on the "
              "test period. Errors describe this method on past data only; they are not a probability statement "
              "about future projections. The EUROPOP2023 comparison is a plausibility check, not validation.")
@@ -62,10 +72,10 @@ def evaluate_data(data: C.CountryDemography, comparison_jump_off: int = 2025,
                            "europop2023_comparison": {}}
     for bt in (PRIMARY, LITERAL):
         try:
-            out["backtests"][bt["name"]] = {"design": bt["note"], **C.backtest(
-                data, jump_off=bt["jump_off"], target_year=bt["target_year"], base_period=bt["base_period"])}
+            out["backtests"][bt.name] = {"design": bt.note, **C.backtest(
+                data, jump_off=bt.jump_off, target_year=bt.target_year, base_period=bt.base_period)}
         except (MissingInput, RevaError) as e:
-            out["backtests"][bt["name"]] = {"status": "not_evaluated", "problem": e.problem()}
+            out["backtests"][bt.name] = {"status": "not_evaluated", "problem": e.problem()}
     for mig, fert in (("europop2023_bsl", "europop2023_bsl"), ("average_residual", "constant_base_period_rates"),
                       ("zero", "constant_base_period_rates")):
         a = C.Assumptions(migration=mig, fertility=fert, base_period=comparison_base)
@@ -107,7 +117,7 @@ def run_population_evaluation(engine: Engine, store: ArtifactStore, release_id: 
             "label": C.LABEL, "replay_mode": REPLAY_MODE, "statement": STATEMENT,
             "baseline_release": {"id": str(rel["id"]), "manifest_sha256": rel["manifest_sha256"],
                                  "knowledge_cutoff": rel["knowledge_cutoff"].isoformat(), "origin": rel["origin"]},
-            "designs": {"primary": PRIMARY["note"], "literal": LITERAL["note"],
+            "designs": {"primary": PRIMARY.note, "literal": LITERAL.note,
                         "europop2023_comparison": f"jump-off {comparison_jump_off}, base {comparison_base}"},
             "countries": results,
         }
@@ -131,19 +141,19 @@ def run_population_evaluation(engine: Engine, store: ArtifactStore, release_id: 
                           {"k": C.MODEL_KEY, "v": C.MODEL_VERSION}).scalar_one()
         ids = {}
         for iso3, r in results.items():
-            primary = (r.get("backtests") or {}).get(PRIMARY["name"]) or {}
+            primary = (r.get("backtests") or {}).get(PRIMARY.name) or {}
             metrics = {"label": C.LABEL, "statement": STATEMENT, "status": r["status"],
                        "primary": {k: primary.get(k) for k in ("variants", "naive_no_change_total_ape",
                                                                "open_age", "test_period_status_flags")},
-                       "literal": ((r.get("backtests") or {}).get(LITERAL["name"]) or {}).get("variants")}
+                       "literal": ((r.get("backtests") or {}).get(LITERAL.name) or {}).get("variants")}
             ids[iso3] = str(conn.execute(text(
                 """INSERT INTO model.evaluation(model_version_id, context_id, evaluation_manifest_sha256, replay_mode,
                      task_scope, metrics, provenance_activity_id)
                    VALUES (:m, :c, :s, :rm, CAST(:ts AS jsonb), CAST(:mt AS jsonb), :a) RETURNING id"""),
                 {"m": mv, "c": ctx_id, "s": sha, "rm": REPLAY_MODE,
                  "ts": json.dumps({"task": "population_backtest", "country": iso3,
-                                   "jump_off": PRIMARY["jump_off"], "target_year": PRIMARY["target_year"],
-                                   "base_period": list(PRIMARY["base_period"])}),
+                                   "jump_off": PRIMARY.jump_off, "target_year": PRIMARY.target_year,
+                                   "base_period": list(PRIMARY.base_period)}),
                  "mt": json.dumps(metrics, default=str), "a": act.id}).scalar_one())
     return {"evaluation_manifest_sha256": sha, "context_id": str(ctx_id), "evaluation_ids": ids,
             "manifest": manifest}

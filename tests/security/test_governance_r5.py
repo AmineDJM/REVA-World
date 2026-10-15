@@ -24,9 +24,29 @@ pytestmark = pytest.mark.db
 DENIED = "governance|permission denied"
 
 
+GATE_DATASET = "gate.ds"
+GATE_MANIFEST = "sha256:" + "6" * 64
+
+
+def gate_connector_versions(db: Any, n: int = 2) -> list[UUID]:
+    """Connector versions that declare the manifest/dataset the test scopes name (R6-02 binding)."""
+    caps = json.dumps({"template": "gate.test", "datasets": [GATE_DATASET], "manifest_sha256": GATE_MANIFEST})
+    with db.worker.begin() as c:
+        src = c.execute(text("SELECT source_id FROM evidence.connector_version LIMIT 1")).scalar_one()
+        sha = c.execute(text("SELECT artifact_sha256 FROM meta.artifact_location WHERE namespace = 'raw' "
+                             "LIMIT 1")).scalar_one()
+        return [UUID(str(c.execute(text(
+            "INSERT INTO evidence.connector_version(source_id, name, version, spec_sha256, code_digest, "
+            "declared_capabilities) VALUES (:s, :n, '1.0.0', :sha, 'sha256:x', CAST(:caps AS jsonb)) RETURNING id"),
+            {"s": src, "n": f"gate.test.{uuid.uuid4().hex[:10]}", "sha": sha, "caps": caps}).scalar_one()))
+            for _ in range(n)]
+
+
 @pytest.fixture(scope="module")
 def w(db: Any) -> dict[str, Any]:
-    return build_world(db)
+    world = build_world(db)
+    world["gate_cvs"] = gate_connector_versions(db)
+    return world
 
 
 def refused(c: Connection, sql: str, params: dict[str, Any] | None = None, match: str = DENIED) -> None:
@@ -56,13 +76,19 @@ def promotion_proposal(c: Connection, w: dict[str, Any], scope: dict[str, Any],
         ).scalar_one()))
 
 
-def gate(c: Connection, w: dict[str, Any], pid: UUID, decision: str = "pass", policy: str = "promotion-1") -> UUID:
-    """A gate result recorded (committed) by the independent gate login reva_gate (GATE)."""
+def gate(c: Connection, w: dict[str, Any], pid: UUID, decision: str = "pass", policy: str = "promotion-1",
+         scope: dict[str, Any] | None = None) -> UUID:
+    """A gate result recorded (committed) by the independent gate login reva_gate (GATE). Its derived
+    scope (R6-02) defaults to the proposal's recorded scope, as the gate derives it for a sound proposal."""
     _ = c
     with w["db"].gate.begin() as gc:
+        if scope is None:
+            scope = gc.execute(text("SELECT summary->'scope' FROM ops.proposal WHERE id = :p"),
+                               {"p": pid}).scalar_one()
         return UUID(str(gc.execute(
-            text("SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion')"),
-            {"p": pid, "v": policy, "d": decision, "s": w["verified"]},
+            text("SELECT ops.record_gate_result(:p, 'promotion', :v, :d, :s, 'gate-evaluator:promotion', "
+                 "CAST(:sc AS jsonb))"),
+            {"p": pid, "v": policy, "d": decision, "s": w["verified"], "sc": json.dumps(scope)},
         ).scalar_one()))
 
 
@@ -149,7 +175,8 @@ def test_recorded_by_is_the_login_and_cannot_be_supplied(w: dict[str, Any]) -> N
 
 def _scope(c: Connection, w: dict[str, Any], subjects: list[str], **extra: Any) -> dict[str, Any]:
     return {"concept": concept_ref(c, w["obs"]["concept_version_id"]), "subject_ids": subjects,
-            "years": {"from": 2020, "to": 2023}, "mapping_key": "r5.map", **extra}
+            "years": {"from": 2020, "to": 2023}, "mapping_key": "r5.map", "dataset": GATE_DATASET,
+            "manifest_sha256": GATE_MANIFEST, **extra}
 
 
 APPROVE_ELIG = ("SELECT evidence.approve_eligibility(:p, :g, :cv, :c, CAST(:ap AS jsonb), :pv, :a)")
@@ -159,7 +186,7 @@ def test_eligibility_approval_requires_a_bound_passing_gate(w: dict[str, Any]) -
     db, o = w["db"], w["obs"]
     subj = [str(o["subject_id"])]
     with tx(db.worker) as c:
-        cv, other = o["connector_version_id"], other_connector_version(c, w)
+        cv, other = w["gate_cvs"]  # (R6-02) both declare the manifest/dataset the scope names
         pid = promotion_proposal(c, w, _scope(c, w, subj))
         g = gate(c, w, pid)
         act = activity(c, "review", "gate-evaluator:promotion")

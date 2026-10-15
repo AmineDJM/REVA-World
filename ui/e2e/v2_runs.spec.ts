@@ -53,13 +53,14 @@ const IO = () =>
 
 const RETIREMENT = () =>
   common('social.retirement_age', {
-    title: 'e2e retirement age France',
+    title: 'e2e retirement age France: 2023 reform as amended vs 2010 law',
+    fidelity: 'L2',
     countries: ['FRA'],
-    reference_year: 2023,
-    horizon: { periods: 10, unit: 'calendar_year' },
-    intervention: { kind: 'set_legal_retirement_age' },
-    assumptions: {},
-    outputs: [],
+    reference_year: 2024,
+    horizon: { periods: 16, unit: 'calendar_year' },
+    intervention: { kind: 'retirement_age_rule_path', scenario_path: 'law_in_force_2026', reference_path: 'law_2010_as_amended_2011' },
+    assumptions: { observed_path: 'law_in_force_2026' },
+    outputs: ['employed_persons_55_69', 'employment_change_55_69', 'pension_recipients', 'pension_recipients_change', 'pension_expenditure_change_approx_eur', 'old_age_dependency_ratio'],
   });
 
 /** Create and run; returns the job id, or a reason string when the stack cannot run this model. */
@@ -142,10 +143,18 @@ test('retirement age: indicators, sensitivity ribbon and back-test panel', async
   test.setTimeout(300_000);
   const r = await tryRun(page, context, RETIREMENT());
   test.skip(!r.id, `retirement-age model cannot run on this stack: ${r.reason}`);
+  const st = (await apiGet(page.request, `/v1/simulations/${r.id}`)).data;
   await page.goto(`/runs/${r.id}`);
   await settle(page);
   await expect(page.getByTestId('projection-label')).toBeVisible();
   await expect(page.getByTestId('experimental-label')).toBeVisible();
+  for (const key of ['employed_persons_55_69', 'pension_recipients', 'old_age_dependency_ratio', 'pension_expenditure_change_approx_eur']) {
+    if (!(st.results as any[]).some((x) => x.output_key === key)) continue;
+    await expect(page.locator(`figure[data-output-key="${key}"]`)).toBeVisible();
+  }
+  await expect(page.locator('figure[data-output-key="pension_expenditure_change_approx_eur"]').getByText('approximate', { exact: true })).toBeVisible();
+  if ((st.results as any[]).some((x) => x.variant === 'L2:sensitivity_range')) await expect(page.getByTestId('sensitivity-ribbon').first()).toBeVisible();
+  // Back-test: shown next to the model, from the run when attached, else pointed to.
   await expect(page.getByTestId('backtest-panel')).toBeVisible();
 });
 

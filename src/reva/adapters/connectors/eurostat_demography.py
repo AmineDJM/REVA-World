@@ -372,7 +372,7 @@ def _decode(body: bytes, media_type: str, url: str, dataset: str) -> Cube:
     labels = {d: dict(doc["dimension"][d].get("category", {}).get("label") or {}) for d in ids}
     values = _sparse(doc.get("value"), n, "value")
     status = _sparse(doc.get("status"), n, "status")
-    ext = doc.get("extension") if isinstance(doc.get("extension"), dict) else {}
+    ext: dict[str, Any] = doc["extension"] if isinstance(doc.get("extension"), dict) else {}
     status_labels = dict(((ext.get("status") or {}).get("label")) or {})
     annotations = {
         str(a.get("type")): a.get("date") or a.get("title")
@@ -758,8 +758,7 @@ class EurostatDemographyConnector:
             f.append(Finding(code="unexpected_geo", severity="blocker", message=f"unrequested geos {extra}"))
         absent = sorted(set(requested) - set(geos))
         if absent:
-            sev = "warning" if ddef.kind == "europop" else "blocker"
-            f.append(Finding(code="geo_absent", severity=sev,
+            f.append(Finding(code="geo_absent", severity="warning" if ddef.kind == "europop" else "blocker",
                              message=f"requested geos absent from the response (typed gap): {absent}"))
         bad_ages = sorted(a for a, k in (md.get("age_kinds") or {}).items() if k == "unreviewed")
         if bad_ages:
@@ -816,8 +815,8 @@ class EurostatDemographyConnector:
 
 
 def _report(findings: list[Finding], expected: int, received: int, missing: tuple[str, ...]) -> QualityReport:
-    outcome = "blocked" if any(x.severity == "blocker" for x in findings) else "pass"
-    return QualityReport(outcome=outcome, findings=tuple(findings), expected_count=expected,
+    return QualityReport(outcome="blocked" if any(x.severity == "blocker" for x in findings) else "pass",
+                         findings=tuple(findings), expected_count=expected,
                          received_count=received, missing_keys=missing)
 
 

@@ -254,7 +254,10 @@ def register_connector_version(conn: Connection, store: ArtifactStore, spec: Any
                     "sha": sha,
                     "cd": spec.code_digest,
                     "caps": json.dumps({"template": spec.template, "datasets": list(spec.dataset_ids),
-                                        "allowed_hosts": list(spec.allowed_hosts)}),
+                                        "allowed_hosts": list(spec.allowed_hosts),
+                                        # GATE/R6-02: evidence.approve_eligibility binds a gate pass to the
+                                        # manifest digest the gate evaluated (declarative connectors only)
+                                        "manifest_sha256": (spec.field_mappings or {}).get("manifest_sha256")}),
                 },
             ).scalar_one()
         )
@@ -397,6 +400,10 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     # one bounded slice per daily run (cursor offset), within the per-source daily budget.
     ("ingest:worldbank.wdi.all_economies", "ingest", {"connector": "worldbank.wdi.all_economies"}, 30 * 86400),
     ("ingest:un.comtrade.public_batch", "ingest", {"connector": "un.comtrade.public_batch"}, 86400),
+    # V2 steps 3-5: Eurostat demography, labour/pensions and FIGARO IO tables (monthly)
+    ("ingest:eurostat.demography", "ingest", {"connector": "eurostat.demography"}, 30 * 86400),
+    ("ingest:eurostat.labour_pensions", "ingest", {"connector": "eurostat.labour_pensions"}, 30 * 86400),
+    ("ingest:eurostat.figaro.iciot_ii", "ingest", {"connector": "eurostat.figaro.iciot_ii"}, 30 * 86400),
     ("health:connectors", "health", {}, 86400),
     ("gaps:mvp", "gaps", {}, 86400),
     ("gc:orphans", "gc", {}, 86400),

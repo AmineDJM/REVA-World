@@ -25,9 +25,9 @@ import {
   isApproximate,
   isMultiPeriod,
   modelKeyOf,
-  multiOutputLabel,
   pyramidFor,
   pyramidYears,
+  seriesLabel,
   type Series,
 } from '../lib/runviews';
 import { useSimulation } from '../lib/useSimulation';
@@ -59,11 +59,11 @@ function SeriesTable({ s }: { s: Series }) {
   const unit = unitLabel(s.unitRef);
   return (
     <details>
-      <summary>Table: {multiOutputLabel(s.outputKey)} ({years.length} periods)</summary>
+      <summary>Table: {seriesLabel(s)} ({years.length} periods)</summary>
       <div className="table-wrap">
         <table className="data-table" data-testid="series-table">
           <caption>
-            {multiOutputLabel(s.outputKey)} — {s.country}
+            {seriesLabel(s)} — {s.country}
             {unit ? ` (${unit})` : ''}; periods are half-open [start, end)
           </caption>
           <thead>
@@ -116,7 +116,7 @@ function SeriesBlock({ s }: { s: Series }) {
   return (
     <figure className="series-block" data-output-key={s.outputKey}>
       <figcaption>
-        <strong>{multiOutputLabel(s.outputKey)}</strong> <span className="muted">— {s.country}</span>
+        <strong>{seriesLabel(s)}</strong> <span className="muted">— {s.country}</span>
         {approx && <span className="badge badge-approx">approximate</span>}
         {s.range.length > 0 && (
           <span className="field-hint">
@@ -130,7 +130,7 @@ function SeriesBlock({ s }: { s: Series }) {
         l1={s.l1}
         range={s.range}
         unitRef={s.unitRef}
-        label={`${multiOutputLabel(s.outputKey)} for ${s.country}, ${s.l1[0]?.year ?? ''}–${s.l1[s.l1.length - 1]?.year ?? ''}${s.range.length ? ', with assumption sensitivity ribbon' : ''}. Table follows.`}
+        label={`${seriesLabel(s)} for ${s.country}, ${s.l1[0]?.year ?? ''}–${s.l1[s.l1.length - 1]?.year ?? ''}${s.range.length ? ', with assumption sensitivity ribbon' : ''}. Table follows.`}
       />
       {oneSided && <p className="field-hint">Range: {oneSided}</p>}
       <SeriesTable s={s} />
@@ -245,7 +245,7 @@ function CohortView({ st }: { st: SimulationStatus }) {
               <select value={shown?.outputKey ?? ''} onChange={(e) => setOutKey(e.target.value)}>
                 {series.map((s) => (
                   <option key={s.outputKey} value={s.outputKey}>
-                    {multiOutputLabel(s.outputKey)}
+                    {seriesLabel(s)}
                   </option>
                 ))}
               </select>

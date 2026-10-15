@@ -140,7 +140,8 @@ def _grants() -> str:
         "evidence.eligibility TO reva_gate;"
     )
     s.append("GRANT SELECT, INSERT ON meta.artifact, meta.artifact_location TO reva_gate;")
-    s.append("GRANT EXECUTE ON FUNCTION ops.record_gate_result(uuid,text,text,text,text,text) TO reva_gate;")
+    # ops.record_gate_result (re-created with the gate-derived scope, R6-02) is granted to
+    # reva_gate alone in SQL_GOVERNANCE.
 
     # --- reva_sim: read pinned inputs; write only sim/evaluation outputs.
     for sch in SCIENTIFIC:
@@ -411,6 +412,11 @@ BEGIN
   END IF;
   SELECT * INTO g FROM ops.gate_result WHERE id = p_approval;
   IF g.id IS NOT NULL THEN
+    -- (R6-03) T2+ changes (models, mapping equivalences) need a named human review.
+    IF p.proposal_type IN ('model_registration','mapping_equivalence') OR p.permission_tier >= 2 THEN
+      RAISE EXCEPTION 'approval: % proposals need an approving human review, not a gate pass', p.proposal_type
+        USING ERRCODE = 'insufficient_privilege';
+    END IF;
     IF g.proposal_id <> p_proposal OR g.decision <> 'pass' OR g.evaluator NOT LIKE 'gate-evaluator:%' THEN
       RAISE EXCEPTION 'approval: gate result % is not a passing gate result for proposal %', p_approval, p_proposal;
     END IF;
@@ -471,7 +477,7 @@ CREATE FUNCTION evidence.approve_eligibility(p_proposal uuid, p_approval uuid, p
                                              p_concept uuid, p_applicability jsonb, p_policy_version text,
                                              p_review_activity uuid) RETURNS uuid
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
-DECLARE scope jsonb; cref text; who text; eid uuid;
+DECLARE scope jsonb; gscope jsonb; is_gate boolean; caps jsonb; cref text; who text; eid uuid;
 BEGIN
   IF p_applicability IS NULL OR jsonb_typeof(p_applicability) <> 'object'
      OR octet_length(p_applicability::text) > 65536 THEN
@@ -487,7 +493,18 @@ BEGIN
   IF p_applicability ? 'gate_result_id' AND p_applicability->>'gate_result_id' IS DISTINCT FROM p_approval::text THEN
     RAISE EXCEPTION 'applicability cites another gate result';
   END IF;
-  SELECT summary->'scope' INTO scope FROM ops.proposal WHERE id = p_proposal;
+  -- (R6-02) A gate pass is bound to the scope the gate itself derived (ops.gate_result.scope,
+  -- recorded by reva_gate), not to what the proposer wrote; a human review to the reviewed
+  -- proposal's recorded scope.
+  SELECT g.scope, true INTO gscope, is_gate FROM ops.gate_result g WHERE g.id = p_approval;
+  IF is_gate THEN
+    IF gscope IS NULL OR jsonb_typeof(gscope) <> 'object' THEN
+      RAISE EXCEPTION 'approval: gate result % carries no gate-derived scope', p_approval;
+    END IF;
+    scope := gscope;
+  ELSE
+    SELECT summary->'scope' INTO scope FROM ops.proposal WHERE id = p_proposal;
+  END IF;
   SELECT concept_id || '@' || version INTO cref FROM ontology.concept_version WHERE id = p_concept;
   IF cref IS NULL OR scope->>'concept' IS DISTINCT FROM cref THEN
     RAISE EXCEPTION 'proposal scope does not cover concept %', COALESCE(cref, p_concept::text);
@@ -498,6 +515,15 @@ BEGIN
   END IF;
   IF (scope->'years') IS DISTINCT FROM (p_applicability->'years') THEN
     RAISE EXCEPTION 'proposal scope years % differ from %', scope->'years', p_applicability->'years';
+  END IF;
+  -- (R6-02) the connector version must be the manifest (and dataset) the scope names.
+  SELECT declared_capabilities INTO caps FROM evidence.connector_version WHERE id = p_connector_version;
+  IF scope->>'manifest_sha256' IS NULL OR caps->>'manifest_sha256' IS DISTINCT FROM scope->>'manifest_sha256' THEN
+    RAISE EXCEPTION 'approval: connector version % is not the manifest the proposal scope names', p_connector_version;
+  END IF;
+  IF NOT COALESCE(caps->'datasets' = jsonb_build_array(scope->>'dataset'), false) THEN
+    RAISE EXCEPTION 'approval: connector version % serves another dataset than %', p_connector_version,
+      scope->>'dataset';
   END IF;
   who := ops.consume_approval(p_proposal, p_approval, ARRAY['connector_promotion'], p_policy_version,
                               'eligibility', jsonb_build_object('connector_version_id', p_connector_version,
@@ -573,7 +599,7 @@ CREATE FUNCTION ontology.approve_mapping(p_proposal uuid, p_approval uuid, p_map
                                          p_transform_spec jsonb, p_applicability jsonb, p_policy_version text,
                                          p_review_activity uuid) RETURNS uuid
 LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
-DECLARE scope jsonb; cref text; who text; mid uuid;
+DECLARE scope jsonb; gscope jsonb; is_gate boolean; cref text; who text; mid uuid;
 BEGIN
   IF p_mapping_key IS NULL OR p_version IS NULL OR length(p_mapping_key) > 300 OR length(p_version) > 100 THEN
     RAISE EXCEPTION 'invalid mapping key or version';
@@ -582,7 +608,16 @@ BEGIN
      + octet_length(COALESCE(p_applicability, 'null')::text) > 65536 THEN
     RAISE EXCEPTION 'mapping documents larger than 64 KiB';
   END IF;
-  SELECT summary->'scope' INTO scope FROM ops.proposal WHERE id = p_proposal;
+  -- (R6-02) gate pass: the gate-derived scope; human review: the reviewed proposal's scope.
+  SELECT g.scope, true INTO gscope, is_gate FROM ops.gate_result g WHERE g.id = p_approval;
+  IF is_gate THEN
+    IF gscope IS NULL OR jsonb_typeof(gscope) <> 'object' THEN
+      RAISE EXCEPTION 'approval: gate result % carries no gate-derived scope', p_approval;
+    END IF;
+    scope := gscope;
+  ELSE
+    SELECT summary->'scope' INTO scope FROM ops.proposal WHERE id = p_proposal;
+  END IF;
   SELECT concept_id || '@' || version INTO cref FROM ontology.concept_version WHERE id = p_target;
   IF cref IS NULL OR scope->>'concept' IS DISTINCT FROM cref THEN
     RAISE EXCEPTION 'proposal scope does not cover concept %', COALESCE(cref, p_target::text);
@@ -670,13 +705,55 @@ GRANT EXECUTE ON FUNCTION evidence.approve_eligibility(uuid,uuid,uuid,uuid,jsonb
 -- reva_registry: exactly what the approval functions read and write.
 GRANT USAGE ON SCHEMA meta, ontology, evidence, model, ops TO reva_registry;
 GRANT SELECT ON ops.proposal, ops.proposal_review, ops.gate_result, ops.approval_use, meta.activity,
-  ontology.concept_version, ontology.mapping, evidence.eligibility, model.version TO reva_registry;
+  ontology.concept_version, ontology.mapping, evidence.eligibility, evidence.connector_version, model.version
+  TO reva_registry;
 GRANT INSERT ON ops.approval_use, ops.audit, evidence.eligibility, ontology.mapping, model.version
   TO reva_registry;
 GRANT EXECUTE ON FUNCTION meta.artifact_is_verified(text), meta.inserted_in_current_xact(xid)
   TO reva_registry;
 CREATE POLICY activity_registry_read ON meta.activity FOR SELECT TO reva_registry USING (true);
 GRANT SELECT ON ops.approval_use TO reva_api, reva_worker;
+
+-- (GATE, R6-02) ops.record_gate_result is re-created with the scope the gate derived
+-- (concept, dataset, subject_ids, years, manifest digest, mapping key); the approval
+-- functions bind a gate pass to it. Executable by reva_gate alone.
+ALTER TABLE ops.gate_result ADD COLUMN scope jsonb
+  CHECK (scope IS NULL OR (jsonb_typeof(scope) = 'object' AND octet_length(scope::text) <= 65536));
+DROP FUNCTION ops.record_gate_result(uuid,text,text,text,text,text);
+CREATE FUNCTION ops.record_gate_result(p_proposal uuid, p_gate_name text, p_policy_version text,
+                                       p_decision text, p_evidence_sha256 text, p_evaluator text,
+                                       p_scope jsonb DEFAULT NULL)
+RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = pg_catalog, pg_temp AS $$
+DECLARE gid uuid;
+BEGIN
+  IF p_gate_name IS NULL OR p_gate_name !~ '^[A-Za-z0-9_.-]{1,100}$' THEN
+    RAISE EXCEPTION 'invalid gate name';
+  END IF;
+  IF p_decision IS NULL OR p_decision NOT IN ('pass','fail','blocked','needs_review') THEN
+    RAISE EXCEPTION 'invalid gate decision %', p_decision;
+  END IF;
+  IF p_evaluator IS DISTINCT FROM 'gate-evaluator:' || p_gate_name THEN
+    RAISE EXCEPTION 'evaluator must be gate-evaluator:<gate name>';
+  END IF;
+  IF p_policy_version IS NULL OR btrim(p_policy_version) = '' OR length(p_policy_version) > 200 THEN
+    RAISE EXCEPTION 'invalid policy version';
+  END IF;
+  IF p_evidence_sha256 IS NULL OR NOT meta.artifact_is_verified(p_evidence_sha256) THEN
+    RAISE EXCEPTION 'gate evidence % is not a verified artifact', p_evidence_sha256;
+  END IF;
+  IF p_scope IS NOT NULL AND (jsonb_typeof(p_scope) <> 'object' OR octet_length(p_scope::text) > 65536) THEN
+    RAISE EXCEPTION 'gate scope must be a JSON object of at most 64 KiB';
+  END IF;
+  INSERT INTO ops.gate_result(proposal_id, gate_name, policy_version, decision, evidence_sha256, evaluator, scope)
+  VALUES (p_proposal, p_gate_name, p_policy_version, p_decision, p_evidence_sha256, p_evaluator, p_scope)
+  RETURNING id INTO gid;
+  INSERT INTO ops.audit(actor, action, target, details)
+  VALUES (p_evaluator, 'gate.result', jsonb_build_object('proposal_id', p_proposal, 'gate_result_id', gid),
+          jsonb_build_object('decision', p_decision, 'policy_version', p_policy_version));
+  RETURN gid;
+END $$;
+REVOKE ALL ON FUNCTION ops.record_gate_result(uuid,text,text,text,text,text,jsonb) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION ops.record_gate_result(uuid,text,text,text,text,text,jsonb) TO reva_gate;
 
 -- (GATE) The worker asks the independent gate for a decision: one row per
 -- request, naming the persisted proposal and the validator/sandbox report

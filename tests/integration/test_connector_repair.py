@@ -11,6 +11,7 @@ from __future__ import annotations
 import hashlib
 import importlib.util
 import json
+import uuid
 from collections.abc import Iterator
 from datetime import UTC, datetime
 from pathlib import Path
@@ -28,9 +29,11 @@ from reva.autonomy import repair as R
 from reva.autonomy.common import ArtifactIO, AutonomyBlocked
 from reva.autonomy.gate import PolicyPromotionGate
 from reva.autonomy.policy import promotion_policy
+from reva.autonomy.proposals import ProposalStore, base_commit
 from reva.evidence.runner import FixtureHttp, run_connector
 from reva.kernel.errors import SourceResponseError
 from reva.operations.jobs import dirty_belief_nodes
+from reva.ports.autonomy import PlatformChangeProposal, ValueEstimate
 
 pytestmark = pytest.mark.db
 
@@ -316,6 +319,77 @@ def test_replay_accepts_identity_and_rejects_unparseable_fixes(io, advisor) -> N
     assert any(f.code.startswith("new_payload_") for f in still_broken.findings)
 
 
+CT = "un.comtrade.public_exact"
+_CT_FLAG_RENAMES = {  # each renames a reviewed estimation/status/classification field away (R6-14)
+    "isReported": "$.data[].isReported",
+    "isAggregate": "$.data[].isAggregate",
+    "legacyEstimationFlag": "$.data[].legacyEstimationFlag",
+    "isQtyEstimated": "$.data[].isQtyEstimated",
+    "isNetWgtEstimated": "$.data[].isNetWgtEstimated",
+}
+
+
+@pytest.mark.parametrize("flag", sorted(_CT_FLAG_RENAMES))
+def test_replay_blocks_a_mapping_that_reinterprets_historical_estimation_flags(io, advisor, flag) -> None:
+    """R6-14: dropping isReported/legacyEstimationFlag/... from every stored vintage is a blocker."""
+    ct = ComtradeConnector()
+    path = _CT_FLAG_RENAMES[flag]
+    rev = R.MappingRevision(ct.describe().parser_version, renames=((path, path + "Legacy"),))
+    rep = R.FixtureReplayChecker(io).check(ct, R.MappedParser(ct, rev), advisor.bank(CT), proposal_key="r6-14")
+    codes = {(f.code, f.severity) for f in rep.findings}
+    assert rep.outcome == "blocked", codes
+    assert ("historical_flag_reinterpretation", "blocker") in codes
+    ev = io.get_json(rep.evidence_manifest)
+    assert sum(v.get("semantic_flag_changes", 0) for v in ev["vintages"]) > 0
+    assert ev["accepted_history_truncated"] is False
+
+
+def test_replay_only_warns_on_flags_outside_the_semantic_set(io, advisor) -> None:
+    ct = ComtradeConnector()
+    rev = R.MappingRevision(ct.describe().parser_version, renames=(("$.data[].qty", "$.data[].qtyLegacy"),))
+    rep = R.FixtureReplayChecker(io).check(ct, R.MappedParser(ct, rev), advisor.bank(CT), proposal_key="r6-14-qty")
+    assert rep.outcome == "pass"
+    assert {(f.code, f.severity) for f in rep.findings} == {("historical_flags_changed", "warning")}
+
+
+def test_semantic_flag_subset_covers_status_and_classification_flags() -> None:
+    assert {"isReported", "isAggregate", "legacyEstimationFlag", "isQtyEstimated", "isNetWgtEstimated",
+            "obs_status", "status", "classificationCode"} <= R.SEMANTIC_FLAG_KEYS
+    for key in ("obs_status", "status", "classificationCode"):
+        a = json.dumps({key: "E", "provider_country_id": "FR"})
+        assert R._semantic_flags(a) != R._semantic_flags(json.dumps({key: "", "provider_country_id": "FR"}))
+        assert R._semantic_flags(a) != R._semantic_flags(json.dumps({"provider_country_id": "FR"}))
+        assert R._semantic_flags(a) == R._semantic_flags(json.dumps({key: "E", "provider_country_id": "XX"}))
+
+
+def test_replay_reports_truncated_accepted_history(io, advisor) -> None:
+    wb = WorldBankConnector()
+    rep = R.FixtureReplayChecker(io).check(wb, wb, advisor.bank("worldbank.wdi.indicators"),
+                                           proposal_key="r6-14-cap", history_truncated=True)
+    assert rep.outcome == "pass"
+    assert ("accepted_history_truncated", "warning") in {(f.code, f.severity) for f in rep.findings}
+    assert io.get_json(rep.evidence_manifest)["accepted_history_truncated"] is True
+
+
+async def test_accepted_history_cap_is_detected_and_reported(db, io, monkeypatch) -> None:
+    """R6-14: the accepted-history query's row cap is reported, not silently applied."""
+    wb = WorldBankConnector()
+    await run_connector(wb, StubHttp("worldbank.wdi.indicators"), db.store, db.worker, persist_cursor=False)
+    adv = R.ConnectorRepairAdvisor(db.worker, db.store)
+    everything = adv.accepted_history(wb, limit=100_000)
+    assert len(everything) >= 3 and adv.last_history_truncated is False
+    capped = adv.accepted_history(wb, limit=2)
+    assert len(capped) <= 2 and adv.last_history_truncated is True
+    # Through propose(): a capped history surfaces as a warning finding on the replay report.
+    monkeypatch.setattr(R.ConnectorRepairAdvisor.accepted_history, "__kwdefaults__", {"limit": 2})
+    c = CASES["wb_renamed_field"]
+    a = adv.assess(wb, adv.case_from_response(wb, c["url"], _body("wb_renamed_field")))
+    rp = adv.propose(wb, a)
+    assert rp is not None
+    (rep,) = rp.reports
+    assert any(f.code == "accepted_history_truncated" and f.severity == "warning" for f in rep.findings)
+
+
 # --------------------------------------------------------------------------- through the real ingest path
 async def test_quarantined_acquisition_is_found_and_repaired(db, io, gate) -> None:
     wb = WorldBankConnector()
@@ -438,6 +512,71 @@ def test_only_gate_promotion_or_named_human_resumes_publication(db, advisor) -> 
                                   "AND target->>'concept' = :c ORDER BY recorded_at DESC LIMIT 1"),
                              {"c": probe}).mappings().one()
     assert audit["actor"] == R.RESUME_EXECUTOR and audit["details"]["reviewer"] == "human:maintainer"
+
+
+def _t0_repair_proposal(db, io, proposal_type: str) -> PlatformChangeProposal:
+    """A persisted read-only (T0, ``report``) proposal: the gate passes it automatically."""
+    p = PlatformChangeProposal(
+        uuid.uuid4(), R.AUTHOR, 0, (), base_commit(), io.put_json({"schema": "r6-08", "n": str(uuid.uuid4())},
+                                                                    "models"),
+        ("report",), False, False,
+        ValueEstimate("unsupported", None, None, {"status": "unquantified"},
+                      io.put_json({"t": str(uuid.uuid4())}, "evaluation"), "r6-08"),
+        promotion_policy().version)
+    ProposalStore(db.worker, io).persist(p, proposal_type=proposal_type, scope={}, risk={})
+    return p
+
+
+def _pause(db, concept: str, proposal_id: uuid.UUID) -> None:
+    with db.worker.begin() as conn:
+        R.pause_belief_publication(conn, [concept], connector="worldbank.wdi.indicators", classification=R.UNIT,
+                                   proposal_id=proposal_id, origin="test_fixture", item_key=None,
+                                   acquisition_id=None, actor=R.AUTHOR)
+
+
+def test_gate_resume_requires_a_later_pass_for_the_pausing_repair_proposal(db, io, gate) -> None:
+    """R6-08: an unrelated, earlier or non-repair gate pass never lifts a repair pause."""
+    probe = "test.repair.r6_08_probe"
+    policy = promotion_policy().ref()
+    # 1. A pass recorded *before* the pause, for the very proposal that then sets it.
+    repair = _t0_repair_proposal(db, io, "connector_repair:new_mapping_version")
+    early = gate.decide(repair, [], policy)
+    assert early.outcome == "promote"
+    _pause(db, probe, repair.proposal_id)
+    # 2. An unrelated proposal's automatic T0 pass after the pause (the R6-08 attack).
+    unrelated = _t0_repair_proposal(db, io, "r6_unrelated_report")
+    other = gate.decide(unrelated, [], policy)
+    assert other.outcome == "promote"
+    # 3. Another connector_repair proposal's later pass.
+    sibling = _t0_repair_proposal(db, io, "connector_repair:documentation_discovery")
+    sibling_pass = gate.decide(sibling, [], policy)
+    assert sibling_pass.outcome == "promote"
+    for d in (early, other, sibling_pass):
+        with pytest.raises(AutonomyBlocked, match="not for the repair proposal"):
+            R.resume_belief_publication(db.worker, probe, actor=d.reviewer_identity, reason="r6-08",
+                                        gate_result_id=d.decision_id)
+        assert _paused(db, probe)
+    # 4. The pausing proposal's type must be connector_repair:* even when ids match.
+    probe2 = "test.repair.r6_08_probe_nonrepair"
+    plain = _t0_repair_proposal(db, io, "r6_unrelated_report")
+    _pause(db, probe2, plain.proposal_id)
+    plain_pass = gate.decide(plain, [], policy)
+    with pytest.raises(AutonomyBlocked, match="not for the repair proposal"):
+        R.resume_belief_publication(db.worker, probe2, actor=plain_pass.reviewer_identity, reason="r6-08",
+                                    gate_result_id=plain_pass.decision_id)
+    assert _paused(db, probe2)
+    with db.owner.begin() as c:
+        c.execute(text("DELETE FROM ops.dirty_node WHERE node_key = :k"), {"k": R.PAUSE_PREFIX + probe2})
+    # 5. A pass recorded by the gate login after the pause, for the pausing repair proposal, resumes.
+    late = gate.decide(repair, [], policy)
+    assert late.outcome == "promote"
+    with db.owner.connect() as c:
+        row = c.execute(text("SELECT evaluator, proposal_id FROM ops.gate_result WHERE id = :g"),
+                        {"g": late.decision_id}).mappings().one()
+    assert row["evaluator"] == late.reviewer_identity and row["proposal_id"] == repair.proposal_id
+    assert R.resume_belief_publication(db.worker, probe, actor=late.reviewer_identity, reason="r6-08 repaired",
+                                       gate_result_id=late.decision_id)
+    assert not _paused(db, probe)
 
 
 def test_job_handler_refuses_when_blocked_or_unknown(db) -> None:

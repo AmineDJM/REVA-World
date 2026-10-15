@@ -356,7 +356,9 @@ def handle_ingest(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any]:
         try:
             return await run_connector(traced_connector(connector), http, ctx.store, ctx.worker_engine,
                                        budget=fetch_budget, persist_cursor=(mode == "live"),
-                                       post_publish=post_publish_for(spec.template), fence=ctx.assert_lease)
+                                       post_publish=getattr(connector, "post_publish", None)
+                                       or post_publish_for(spec.template),
+                                       fence=ctx.assert_lease)
         finally:
             await http.aclose()
 

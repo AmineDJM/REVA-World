@@ -77,6 +77,8 @@ export interface RangePoint {
 export interface Series {
   country: string;
   outputKey: string;
+  /** The model's own label for the output (applicability.output_label), when served. */
+  label: string | null;
   unitRef: string | null;
   l1: SeriesPoint[];
   range: RangePoint[];
@@ -95,9 +97,10 @@ export function buildSeries(results: SimResult[], filter?: (outputKey: string) =
     const k = `${country}|${r.output_key}`;
     let s = by.get(k);
     if (!s) {
-      s = { country, outputKey: r.output_key, unitRef: null, l1: [], range: [], variants: [] };
+      s = { country, outputKey: r.output_key, label: null, unitRef: null, l1: [], range: [], variants: [] };
       by.set(k, s);
     }
+    if (!s.label && typeof r.applicability?.output_label === 'string') s.label = r.applicability.output_label;
     if (r.variant === 'L1') {
       const v = r.value;
       if (v.kind === 'decimal') {
@@ -371,7 +374,8 @@ const OUTPUT_LABELS: [RegExp, (m: RegExpExecArray) => string][] = [
   [/^population\.(total|female|male)\.age_(\d+)_plus$/, (m) => `Population, ${m[1]}, ages ${m[2]}+ (1 January)`],
   [/^old_age_dependency_ratio_(\d+)plus_per_(\d+)_(\d+)$/, (m) => `Old-age dependency ratio, persons ${m[1]}+ per 100 aged ${m[2]}–${m[3]}`],
   [/^(births|deaths|net_migration)\.(total|female|male)$/, (m) => `${m[1] === 'net_migration' ? 'Net migration (incl. statistical adjustment)' : m[1]!.charAt(0).toUpperCase() + m[1]!.slice(1)}, ${m[2]}, during the year`],
-  [/^employ\w*55_69\w*$/, () => 'Employed persons aged 55–69'],
+  [/^employed_persons_55_69$/, () => 'Employed persons aged 55–69'],
+  [/^employment_change_55_69$/, () => 'Employed persons aged 55–69: scenario minus reference'],
   [/^pension_recipients\w*$/, () => 'Pension recipients'],
   [/^pension_expenditure\w*$/, () => 'Pension expenditure change (approximate: average pension × recipients)'],
   [/^household_basket_price_change_percent$/, () => 'Household basket price change, % (basic prices)'],
@@ -385,8 +389,13 @@ export function multiOutputLabel(key: string): string {
   return key.replace(/[._]/g, ' ');
 }
 
+/** Display label: the model's own output label when served, else a readable form of the key. */
+export function seriesLabel(series: Series): string {
+  return series.label ?? multiOutputLabel(series.outputKey);
+}
+
 /** True for an output that the model itself marks approximate (or whose key says so). */
 export function isApproximate(series: Series): boolean {
-  if (/expenditure/.test(series.outputKey)) return true;
+  if (/expenditure|approx/.test(series.outputKey)) return true;
   return series.l1.some((p) => /approximat/i.test(JSON.stringify(p.result.applicability ?? {})));
 }

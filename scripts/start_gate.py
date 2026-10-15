@@ -48,7 +48,7 @@ OWNER_KEYS = ("REVA_MIGRATION_DATABASE_URL", "DATABASE_URL")
 FOREIGN_SECRETS = ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_API_DB_PASSWORD",
                    "REVA_SESSION_SECRET", "REVA_ADMIN_PASSWORD_HASH")
 DEFAULT_DEADLINE_SECONDS = 300
-REQUIRED_FUNCTION = "ops.record_gate_result(uuid,text,text,text,text,text)"
+REQUIRED_FUNCTION = "ops.record_gate_result(uuid,text,text,text,text,text,jsonb)"
 
 
 def build_command(environ: Mapping[str, str]) -> list[str]:

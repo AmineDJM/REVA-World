@@ -19,6 +19,18 @@ concepts:
     labels: {en: Persons}
     definition: Count of persons.
     owner: reva-maintainers
+  - concept_id: unit.households
+    version: "1.0.0"
+    kind: unit
+    labels: {en: Households}
+    definition: Count of private households.
+    owner: reva-maintainers
+  - concept_id: unit.persons_per_household
+    version: "1.0.0"
+    kind: unit
+    labels: {en: Persons per household}
+    definition: Average number of persons per private household (ratio of persons to households).
+    owner: reva-maintainers
   - concept_id: unit.kg
     version: "1.0.0"
     kind: unit

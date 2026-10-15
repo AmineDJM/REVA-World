@@ -96,13 +96,15 @@ class StoredProposal:
 
 
 def record_gate_result(conn: Connection, proposal_id: uuid.UUID, gate_name: str, policy_version: str,
-                       decision: str, evidence_sha256: str, evaluator: str) -> uuid.UUID:
-    """Checked DB path (``ops.record_gate_result``, SECURITY DEFINER): evaluator must be
-    ``gate-evaluator:<gate name>`` and not the author; evidence must be a verified artifact."""
+                       decision: str, evidence_sha256: str, evaluator: str,
+                       scope: dict[str, Any] | None = None) -> uuid.UUID:
+    """Checked DB path (``ops.record_gate_result``, SECURITY DEFINER, executable by ``reva_gate`` only):
+    evaluator must be ``gate-evaluator:<gate name>`` and not the author; evidence must be a verified
+    artifact. (GATE/R6-02) ``scope`` is the scope the gate derived; the approval functions bind a pass to it."""
     return uuid.UUID(str(conn.execute(
-        text("SELECT ops.record_gate_result(:p, :g, :v, :d, :e, :ev)"),
+        text("SELECT ops.record_gate_result(:p, :g, :v, :d, :e, :ev, CAST(:sc AS jsonb))"),
         {"p": proposal_id, "g": gate_name, "v": policy_version, "d": decision, "e": evidence_sha256,
-         "ev": evaluator},
+         "ev": evaluator, "sc": json.dumps(scope) if scope is not None else None},
     ).scalar_one()))
 
 
@@ -461,8 +463,10 @@ class PolicyPromotionGate:
             if sha is None or str(sha) != stored.document_sha256:
                 raise ValidationProblem("gate evaluates only persisted proposals (ops.proposal)")
             self.io.register(conn, ref, "gate-decision/1")
+            # GATE/R6-02: a pass carries the scope this gate derived (t1_scope.db_scope)
+            db_scope = (trace.get("t1_scope") or {}).get("db_scope") if outcome == "promote" else None
             gid = record_gate_result(conn, proposal.proposal_id, self.name, version, DB_DECISION[outcome],
-                                     ref.sha256, self.evaluator)
+                                     ref.sha256, self.evaluator, scope=db_scope)
         return GateDecision(
             decision_id=gid, outcome=outcome,  # type: ignore[arg-type]
             proposal_id=proposal.proposal_id, policy_version=version,

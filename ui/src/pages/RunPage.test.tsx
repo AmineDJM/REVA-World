@@ -92,8 +92,13 @@ describe('RunPage: cohort-component projection', () => {
 describe('RunPage: retirement age (generic multi-period)', () => {
   it('shows each indicator, marks expenditure approximate and shows bad back-test errors as served', () => {
     const results = [2020, 2021].flatMap((y) => [
-      r('employed_55_69', String(5000000 + y), { year: y, flow: true }),
-      r('pension_expenditure_change_eur', '1200000000', { year: y, flow: true, unit: 'unit.eur' }),
+      r('employed_persons_55_69', String(5000000 + y), { year: y, flow: true }),
+      r('pension_expenditure_change_approx_eur', '1200000000', {
+        year: y,
+        flow: true,
+        unit: 'unit.eur',
+        app: { output_label: 'Approximate pension expenditure change = average old-age pension x change in recipients' },
+      }),
     ]);
     const e = env('social.retirement_age', results, {
       outcome: {
@@ -107,9 +112,11 @@ describe('RunPage: retirement age (generic multi-period)', () => {
     renderBody(e);
     expect(screen.getByTestId('projection-label')).toBeInTheDocument();
     expect(screen.getByTestId('experimental-label')).toBeInTheDocument();
-    expect(document.querySelector('figure[data-output-key="employed_55_69"]')).toHaveTextContent('Employed persons aged 55–69');
-    const exp = document.querySelector('figure[data-output-key="pension_expenditure_change_eur"]') as HTMLElement;
+    expect(document.querySelector('figure[data-output-key="employed_persons_55_69"]')).toHaveTextContent('Employed persons aged 55–69');
+    const exp = document.querySelector('figure[data-output-key="pension_expenditure_change_approx_eur"]') as HTMLElement;
     expect(within(exp).getByText('approximate')).toBeInTheDocument();
+    // The model's own output label is used when served.
+    expect(exp).toHaveTextContent('Approximate pension expenditure change = average old-age pension x change in recipients');
     const bt = screen.getByTestId('backtest-panel');
     expect(within(bt).getByRole('row', { name: /2019/ })).toHaveTextContent('9.0');
     expect(within(bt).getByRole('columnheader', { name: 'error, percentage points' })).toBeInTheDocument();

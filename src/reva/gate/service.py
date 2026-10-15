@@ -250,7 +250,7 @@ def check_gate_login(engine: Engine) -> dict[str, Any]:
     with engine.connect() as conn:
         row = conn.execute(text(
             """SELECT session_user::text AS login,
-                      has_function_privilege('ops.record_gate_result(uuid,text,text,text,text,text)', 'EXECUTE')
+                      has_function_privilege('ops.record_gate_result(uuid,text,text,text,text,text,jsonb)', 'EXECUTE')
                         AS can_record,
                       has_table_privilege('ops.gate_request', 'SELECT') AS can_read_requests,
                       (SELECT version_num FROM public.alembic_version LIMIT 1) AS schema_version"""

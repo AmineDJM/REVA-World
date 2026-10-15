@@ -5,7 +5,8 @@ Same throwaway database, fixtures, API and worker as ``scripts/e2e_stack.py``; t
 differences are that ``POST /v1/scenario-drafts`` replays the recorded provider responses in
 ``tests/fixtures/nl/recorded`` (``reva.nl.recorded.RecordedDrafter``), exactly as the API
 integration tests do, and that V2 dataset inputs are added offline (``--no-v2-fixtures`` to skip):
-the recorded Eurostat labour/pensions and demography (LI, LU) fixtures and the SYNTHETIC 3x2 FIGARO-format table of
+the recorded Eurostat labour/pensions and demography (LI, LU; FR without EUROPOP) fixtures and the SYNTHETIC
+3x2 FIGARO-format table of
 tests/integration/test_io_price_pipeline.py (so economic.io_price runs end to end; its results are
 test_fixture data, not FIGARO figures). No live LLM and no live provider is ever called (CI and tests never call an LLM). Without
 this wrapper the stack runs with LLM drafting disabled and the composer e2e tests check the
@@ -180,7 +181,11 @@ def _with_synthetic_io(stack_module):  # type: ignore[no-untyped-def]
                 demo = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
                 drep = asyncio.run(run_connector(demo, FixtureHttp(ed.NAME), store, worker, persist_cursor=False,
                                                  post_publish=ed.post_publish_datasets))
-                state["demography"] = {"inserted": drep.inserted, "errors": drep.errors}
+                # France (no EUROPOP), recorded for the retirement-age pipeline test (tests/fixtures/social).
+                fr = ed.EurostatDemographyConnector(countries=("FR",), include_europop=False)
+                frep = asyncio.run(run_connector(fr, FixtureHttp(ed.NAME, root=ROOT / "tests" / "fixtures" / "social"), store,
+                                                 worker, persist_cursor=False, post_publish=ed.post_publish_datasets))
+                state["demography"] = {"inserted": drep.inserted + frep.inserted, "errors": drep.errors + frep.errors}
             except Exception as e:  # noqa: BLE001 - optional fixture; the cohort e2e test then skips with a reason
                 state["demography"] = {"error": repr(e)}
             # The stack computed its cutoff before this hook ran: the release must see the datasets.

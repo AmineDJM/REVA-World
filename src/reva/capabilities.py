@@ -641,7 +641,7 @@ _BASE: tuple[Capability, ...] = (
                          "ops.reserve_llm_budget / ops.settle_llm_budget (requested for migration 0008_v2)"),
         tests=("tests/unit/test_nl_drafts.py::test_french_sensitivity_request_is_a_valid_draft_checked_by_the_same_validator",
                "tests/unit/test_nl_drafts.py::test_gdp_loss_and_unemployment_become_typed_gaps_never_another_output",
-               "tests/unit/test_nl_drafts.py::test_retirement_age_before_the_model_exists_is_a_capability_gap",
+               "tests/unit/test_nl_drafts.py::test_stale_recorded_capability_gap_never_runs",
                "tests/unit/test_nl_drafts.py::test_hostile_multiplier_1000_is_rejected_by_the_validator_not_clamped",
                "tests/unit/test_nl_drafts.py::test_synthetic_outputs_referencing_ids_outside_the_allow_list_are_rejected",
                "tests/unit/test_nl_drafts.py::test_over_budget_refuses_before_any_provider_call",
