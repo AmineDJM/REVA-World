@@ -1,0 +1,23 @@
+Age du taux plein et âge d’ouverture du droit à la retraite
+Ce tableau exprime, en fonction de la date de naissance de l’adhérent (1ere colonne à gauche), l’âge à atteindre pour pouvoir bénéficier de la retraite de
+base à taux plein (2e colonne), suivi du nombre de trimestres que vous devez avoir cotisés (3e colonne). La dernière valeur présente l’âge d’ouverture du
+droit à la retraite (pour carrière longues, travailleurs handicapés, etc.).
+
+ Année de naissance                           Âge pour le taux plein             Nombre de trimestres pour le taux plein         Âge d’ouverture du droit
+ 1948 et avant                          65 ans                                   160 trimestres                                60 ans
+ 1949                                   65 ans                                   161 trimestres                                60 ans
+ 1950                                   65 ans                                   162 trimestres                                60 ans
+ 1951 (01/07)                           65 ans + 4 mois                          163 trimestres                                60 ans + 4 mois
+ 1952                                   65 ans + 9 mois                          164 trimestres                                60 ans + 9 mois
+ 1953                                   66 ans + 2 mois                          165 trimestres                                61 ans + 2 mois
+ 1954                                   66 ans +7 mois                           165 trimestres                                61 ans + 7 mois
+ 1955                                   67 ans                                   166 trimestres                                62 ans
+ 1956                                   67 ans                                   166 trimestres                                62 ans
+ 1957                                   67 ans                                   166 trimestres                                62 ans
+ 1958-1959-1960                         67 ans                                   167 trimestres                                62 ans
+ 1961-1962-1963                         67 ans                                   168 trimestres                                62 ans
+ 1964-1965-1966                         67 ans                                   169 trimestres                                62 ans
+ 1967-1968-1969                         67 ans                                   170 trimestres                                62 ans
+ 1970-1971-1972                         67 ans                                   171 trimestres                                62 ans
+ 1973 et après                          67 ans                                   172 trimestres                                62 ans
+

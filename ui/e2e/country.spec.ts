@@ -21,6 +21,10 @@ test('DZA crude imports are shown as missing with a reason, never as 0', async (
   const missing = (beliefs.data as any[]).filter((e) => e.value.kind === 'missing');
   expect(missing.length, 'fixture release holds missing DZA crude-import estimates').toBeGreaterThan(0);
 
+  const observationCalls: string[] = [];
+  page.on('request', (r) => {
+    if (new URL(r.url()).pathname === '/v1/observations') observationCalls.push(r.url());
+  });
   await page.goto('/country/DZA');
   await expect(page.getByRole('heading', { level: 1 })).toContainText('DZA');
   const crude = panel(page, 'Crude petroleum imports (HS 2709)');
@@ -53,21 +57,26 @@ test('DZA crude imports are shown as missing with a reason, never as 0', async (
   // Provider flags (Comtrade 1.2.0): a value is called a provider estimate only when
   // provider_value_estimated === true. legacyEstimationFlag codes quantity/net weight, never the
   // USD value, so the 2024 row (legacyEstimationFlag 6, isReported=false) must not be called an estimate.
-  const obs = await apiGet(page.request, `/v1/observations?subject_id=DZA&concept=${CRUDE_M}&limit=1000`);
-  const reported = (obs.data as any[]).filter((o) => o.value.kind !== 'missing' && !o.superseded_by_id);
+  // The flags now travel on the estimates themselves (APIX): no extra /v1/observations call per panel.
+  const reported = (beliefs.data as any[]).filter((e) => e.value.kind !== 'missing');
   expect(reported.length, 'DZA has at least one reported crude-import value').toBeGreaterThan(0);
-  for (const o of reported) {
-    const period = String(o.support.period_label ?? o.support.temporal?.label);
+  for (const e of reported) {
+    const period = String(e.support.period_label ?? e.support.temporal?.label);
     const row = crude.getByRole('row').filter({ has: page.getByRole('rowheader', { name: period, exact: true }) });
     if (!(await row.count())) continue;
-    const f = o.source_flags ?? {};
+    const f = e.source_flags ?? {};
     if (f.provider_value_estimated === true) {
       await expect(row.getByTestId('source-flag'), `${period} carries the provider value-estimate flag`).toContainText('provider estimate');
     } else {
       await expect(row, `${period}: legacyEstimationFlag ${f.legacyEstimationFlag} is not a value estimate`).not.toContainText('provider estimate');
       if (f.isReported === false) await expect(row.getByTestId('source-flag')).toContainText('not directly reported (isReported=false)');
+      if ('provider_value_estimated' in f && f.provider_value_estimated === null) {
+        await expect(row.getByTestId('source-flag')).toContainText('undeterminable');
+      }
     }
+    if (e.source_flags_truncated) await expect(row.getByTestId('flags-truncated')).toBeVisible();
   }
+  expect(observationCalls, 'country panels read flags from /v1/beliefs, not /v1/observations').toEqual([]);
 });
 
 test('country banner derives the data origin from the records shown (never "no records" next to TEST FIXTURE)', async ({ page }) => {

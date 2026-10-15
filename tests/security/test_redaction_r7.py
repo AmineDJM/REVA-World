@@ -661,7 +661,6 @@ def test_sandbox_child_environment_contains_no_secret(monkeypatch: pytest.Monkey
     assert_absent(r.stdout, *planted.values(), planted["HTTPS_PROXY"].split(":")[2].split("@")[0])
 
 
-@pytest.mark.xfail(strict=True, reason="autonomy/sandbox.py stores child stderr in evidence unscrubbed (patch P6)")
 def test_sandbox_child_stderr_is_scrubbed_before_it_becomes_evidence(monkeypatch: pytest.MonkeyPatch) -> None:
     from reva.autonomy import sandbox
     from reva.ports.autonomy import SandboxPolicy

@@ -1,4 +1,5 @@
-import { useState, type FormEvent } from 'react';
+import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useSearchParams } from 'react-router';
 import { getConnectors, getProposals, newIdempotencyKey, reviewProposal, startDiscovery } from '../api/client';
 import type { ConnectorOut, DiscoveryRequest, Proposal, ReviewDecision } from '../api/types';
 import { ContextBanner } from '../components/ContextBanner';
@@ -9,7 +10,7 @@ import { JsonView } from '../components/JsonView';
 import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading, ProblemView } from '../components/StateViews';
 import { formatDateTime, humanize, isRecord, shortId } from '../lib/format';
-import { useApi } from '../lib/useApi';
+import { prefersReducedMotion, useApi } from '../lib/useApi';
 
 /** Collect nested values whose key looks like a semantic diff. */
 export function findDiffs(obj: unknown, path = ''): { path: string; value: unknown }[] {
@@ -146,11 +147,22 @@ function ReviewForm({ proposal, onDone }: { proposal: Proposal; onDone: () => vo
   );
 }
 
-function ProposalCard({ p, onReviewed }: { p: Proposal; onReviewed: () => void }) {
+function ProposalCard({ p, onReviewed, focused = false }: { p: Proposal; onReviewed: () => void; focused?: boolean }) {
   const summary = p.summary ?? {};
   const title = typeof summary.title === 'string' ? summary.title : typeof summary.description === 'string' ? summary.description : p.proposal_type;
+  const ref = useRef<HTMLElement>(null);
+  useEffect(() => {
+    if (focused) ref.current?.scrollIntoView({ block: 'start', behavior: prefersReducedMotion() ? 'auto' : 'smooth' });
+  }, [focused]);
   return (
-    <article className="panel" aria-label={`Proposal ${shortId(p.id)}`}>
+    <article
+      ref={ref}
+      id={`proposal-${p.id}`}
+      className={`panel${focused ? ' proposal-focused' : ''}`}
+      aria-label={`Proposal ${shortId(p.id)}`}
+      aria-current={focused ? 'true' : undefined}
+      tabIndex={focused ? -1 : undefined}
+    >
       <h3>
         {humanize(p.proposal_type)}: {title}
       </h3>
@@ -293,6 +305,8 @@ function DiscoveryForm() {
 export default function AcquisitionPage() {
   const connectors = useApi((s) => getConnectors(undefined, s), []);
   const proposals = useApi((s) => getProposals({ limit: 50 }, s), []);
+  const [search] = useSearchParams();
+  const focusProposal = search.get('proposal');
 
   return (
     <>
@@ -354,7 +368,13 @@ export default function AcquisitionPage() {
         {proposals.status === 'loading' && <Loading what="proposals" />}
         {proposals.status === 'error' && <ErrorState error={proposals.error} what="Proposals" onRetry={proposals.reload} />}
         {proposals.data && proposals.data.data.length === 0 && <Empty what="proposals" />}
-        {proposals.data?.data.map((p) => <ProposalCard key={p.id} p={p} onReviewed={proposals.reload} />)}
+        {focusProposal && proposals.data && !proposals.data.data.some((p) => p.id === focusProposal) && (
+          <p className="bound-flag" role="status">
+            Proposal <span className="mono">{shortId(focusProposal)}</span> (linked from a stale value) is not among the {proposals.data.data.length} proposals
+            listed here.
+          </p>
+        )}
+        {proposals.data?.data.map((p) => <ProposalCard key={p.id} p={p} onReviewed={proposals.reload} focused={p.id === focusProposal} />)}
         {proposals.data?.next_cursor && <p className="bound-flag">More proposals exist than shown (50).</p>}
       </section>
     </>

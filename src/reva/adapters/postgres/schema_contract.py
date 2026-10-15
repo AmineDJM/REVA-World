@@ -58,7 +58,7 @@ MIGRATION_SOURCES = (REPO_ROOT / "migrations" / "versions", Path(__file__).resol
 CONTRACT_FORMAT = 1
 APP_SCHEMAS = ("meta", "ontology", "world", "evidence", "belief", "model", "sim", "ops", "public")
 RUNTIME_ROLES = ("reva_api", "reva_worker", "reva_sim")
-APP_ROLES = (*RUNTIME_ROLES, "reva_restricted_deletion")
+APP_ROLES = (*RUNTIME_ROLES, "reva_restricted_deletion", "reva_registry")
 REGENERATE_HINT = "uv run python scripts/update_schema_contract.py"
 #: ``REVA_SCHEMA_CONTRACT``: enforce (refuse to start), warn (log only) or off.
 MODE_ENV = "REVA_SCHEMA_CONTRACT"

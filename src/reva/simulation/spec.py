@@ -17,10 +17,10 @@ import re
 from datetime import UTC, datetime, timedelta
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import jsonschema
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 
 from reva.kernel.errors import CapabilityGap, ValidationProblem
 from reva.kernel.ids import logical_hash
@@ -138,13 +138,16 @@ class ScenarioSpec(BaseModel):
     knowledge_cutoff: str
     model_key: Literal["economic.crude_exposure"]
     model_version: Literal["1.0.0"]
-    countries: tuple[Literal["FRA", "DZA", "CHN", "USA"], ...]
+    # V2 step 1 (ALLC): registry country keys (ISO 3166 alpha-3, or a World Bank economy code
+    # for CHI/XKX) or exactly ["ALL"]; the JSON Schema keeps 1.0.0 specs on the V1 four
+    # countries and the "fail" policy. "ALL" is resolved at compile against the pinned release.
+    countries: tuple[Annotated[str, StringConstraints(pattern=r"^[A-Z]{3}$")], ...]
     reference_year: int
     horizon: Horizon
     intervention: Intervention
     assumptions: Assumptions
     fidelity: Literal["L0", "L1", "L2"]
-    missing_input_policy: Literal["fail"]
+    missing_input_policy: Literal["fail", "skip_missing_countries"]
     outputs: tuple[str, ...]
     seed: int
 

@@ -1,0 +1,18 @@
+Excerpt (verbatim text extracted from HTML) of https://www.riksdagen.se/sv/dokument-och-lagar/dokument/svensk-forfattningssamling/socialforsakringsbalk-2010110_sfs-2010-110/
+Full response sha256 2e831d7b86409a8e0c2ddb98e02085b292731943a90772db3ef56d5d8e24881f, 3745121 bytes, retrieved 2026-10-15T01:08:58Z. Only this excerpt is committed.
+
+=== provider version line ===
+Ändrad: 
+
+=== 10 a § Vissa förmåner ===
+10 a § Vissa förmåner och beräkningar som anges i denna balk ska knytas till en särskild ålder (riktålder för pension) som beräknas för varje år enligt bestämmelserna i 10 b §.
+Lag (2019:649).
+10 b § Riktålder för pension räknas fram genom att det till bastalet 65 läggs 2/3 av differensen mellan
+ - den vid 65 års ålder återstående medellivslängden för befolkningen i Sverige under femårsperioden närmast före det år riktåldern beräknas, och 
+ - motsvarande värde för jämförelseåret 1994.
+Den framräknade riktåldern för pension ska avrundas till närmaste helår. Lag (2019:649).
+10 c § Den beräknade riktåldern för pension ska gälla för det sjätte året efter beräkningsåret.
+När en gällande riktålder för pension ändras ska en åldersgräns som är knuten till den riktåldern som gällde före ändringen fortsätta att gälla för en försäkrad som före ändringen har uppnått en sådan åldersgräns. Lag (2019:649).
+
+=== 3 § Inkomstgrundad ålderspension lämnas tidigast ===
+3 § Inkomstgrundad ålderspension lämnas tidigast från och med tre år före den månad då den försäkrade uppnår riktåldern för pension.

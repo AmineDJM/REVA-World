@@ -956,7 +956,7 @@ def test_bootstrap_with_non_superuser_createrole_owner(w: dict[str, Any]) -> Non
             c.execute(text(f'CREATE DATABASE "{dbname}" OWNER "{owner}"'))
             # the runtime roles already exist cluster-wide (created by another owner): on a fresh managed
             # cluster the CREATEROLE owner creates them and so holds ADMIN on them; simulate that.
-            c.execute(text(f'GRANT reva_api, reva_worker, reva_sim TO "{owner}" WITH ADMIN OPTION'))
+            c.execute(text(f'GRANT reva_api, reva_worker, reva_sim, reva_registry TO "{owner}" WITH ADMIN OPTION'))
         su = create_engine(db.settings.migration_url().set(database=dbname), isolation_level="AUTOCOMMIT")
         with su.connect() as c:  # PostGIS is provisioned by the platform, not by the owner
             c.execute(text("CREATE EXTENSION IF NOT EXISTS postgis"))

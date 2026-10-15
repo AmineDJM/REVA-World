@@ -482,7 +482,9 @@ async def test_r4_03_changed_content_gets_new_version_and_rollback_restores_prev
     stale = dict(m, version="1.0.0")
     d_stale = await gate_pass(stale)
     assert d_stale.outcome == "reject" and any("content-derived version" in r for r in d_stale.reasons)
-    with pytest.raises((ImmutableRecordViolation, PolicyDenied)):
+    from reva.autonomy.common import AutonomyBlocked
+
+    with pytest.raises((ImmutableRecordViolation, PolicyDenied, AutonomyBlocked)):
         promote_connector(db.worker, io_, _job_ctx(db, tmp_path), d_stale, promotion_policy())
     m["version"] = new_v
     d_new = await gate_pass(m)

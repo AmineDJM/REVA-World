@@ -77,6 +77,7 @@ BASE = "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1"
 UNIT = "MIO_EUR"
 LICENCE = "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
 DATASET_SCHEMA = "reva.io_table.figaro_ii/1"
+DATASET_CONCEPT = "economics.io.figaro_ii_table"
 #: Absolute tolerance of the row-total = column-total identity, in million EUR: one unit
 #: in the last published decimal (EUR 1,000). The 2026 edition balances exactly (0.000).
 IDENTITY_ABS_TOLERANCE_MIO_EUR = Decimal("0.001")
@@ -466,7 +467,7 @@ class FigaroConnector:
             licence=LICENCE,
             allowed_hosts=HOSTS,
             dataset_ids=tuple(d for d, _, _ in DATASETS),
-            field_mappings={"OBS_VALUE": "dataset:economics.io.figaro_ii_table"},
+            field_mappings={"OBS_VALUE": f"dataset:{DATASET_CONCEPT}"},
             units={"OBS_VALUE": "million EUR, current prices, basic prices"},
             geography=tuple(ECONOMIES.values()),
             time_semantics="calendar-year flow totals for one reference year; current prices",
@@ -567,15 +568,15 @@ def _index_frame(name: str, codes: Sequence[str]) -> Any:
                         schema={name: pl.Utf8, f"{name}_ord": pl.Int32})
 
 
-def assemble(frames: Sequence[Any], dims: TableDims = FIGARO_DIMS) -> Any:
-    """Concatenate parsed item frames into the long table with a ``block`` column.
+def to_long(frame: Any, dims: TableDims = FIGARO_DIMS) -> Any:
+    """One parsed item as rows of the long table, ordered by the pinned code lists.
 
     Blocks: ``Z`` industry -> industry, ``F`` industry -> final demand, ``V`` primary-input
-    rows (``row_country = DOM``). Rows are ordered by the pinned code lists.
+    rows (``row_country = DOM``); ``X`` (gross output) is appended by :func:`build_dataset`.
     """
     import polars as pl
 
-    df = pl.concat(frames, how="vertical").sort("c_orig", "ind_ava", "c_dest", "ind_use")  # enum = pinned order
+    df = frame.sort("c_orig", "ind_ava", "c_dest", "ind_use")  # enum order = pinned order
     block = (pl.when(pl.col("c_orig") == DOM).then(pl.lit("V"))
              .when(pl.col("ind_use").cast(pl.Utf8).is_in(list(dims.final_demand))).then(pl.lit("F"))
              .otherwise(pl.lit("Z")).cast(_block_enum()))
@@ -585,46 +586,69 @@ def assemble(frames: Sequence[Any], dims: TableDims = FIGARO_DIMS) -> Any:
                      pl.col("value"))
 
 
-def verify_identities(long: Any, *, dims: TableDims = FIGARO_DIMS,
+def _partials(long: Any, dims: TableDims) -> dict[str, Any]:
+    """Additive per-item aggregates for the identity checks (exact decimal sums)."""
+    import polars as pl
+
+    s = [pl.col(c).cast(pl.Utf8) for c in ("row_country", "row_code", "col_country", "col_code")]
+    return {
+        "x_row": long.filter(pl.col("block") != "V").group_by("row_country", "row_code").agg(
+            pl.col("value").sum().alias("x_row")).with_columns(s[:2]),
+        "z_col": long.filter(pl.col("block") == "Z").group_by("col_country", "col_code").agg(
+            pl.col("value").sum().alias("z_col")).with_columns(s[2:]),
+        "v_col": long.filter(pl.col("block") == "V", pl.col("col_code").cast(pl.Utf8).is_in(list(dims.industries)),
+                             pl.col("row_code").cast(pl.Utf8).is_in(list(COLUMN_TOTAL_PRIMARY_INPUTS))).group_by(
+            "col_country", "col_code").agg(pl.col("value").sum().alias("v_col")).with_columns(s[2:]),
+        "op_nonzero": long.filter(pl.col("block") == "V", pl.col("row_code").cast(pl.Utf8).is_in(["OP_RES", "OP_NRES"]),
+                                  pl.col("col_code").cast(pl.Utf8).is_in(list(dims.industries)),
+                                  pl.col("value") != 0).height,
+        "va_fd_nonzero": long.filter(
+            pl.col("block") == "V", pl.col("row_code").cast(pl.Utf8).is_in(list(FINAL_DEMAND_ZERO_PRIMARY_INPUTS)),
+            pl.col("col_code").cast(pl.Utf8).is_in(list(dims.final_demand)), pl.col("value") != 0).height,
+        "rows": long.height,
+        "nulls": int(long["value"].null_count()),
+        "z_sum": long.filter(pl.col("block") == "Z").select(pl.col("value").sum()).item(),
+        "f_sum": long.filter(pl.col("block") == "F").select(pl.col("value").sum()).item(),
+    }
+
+
+def verify_identities(parts: Sequence[Mapping[str, Any]], *, dims: TableDims = FIGARO_DIMS,
                       tolerance: Decimal = IDENTITY_ABS_TOLERANCE_MIO_EUR) -> tuple[dict[str, Any], Any]:
     """Completeness and accounting identities in exact decimal arithmetic.
 
-    For every economy c and industry i (N = 3200):
+    For every economy c and industry i (FIGARO: N = 50 x 64 = 3200):
 
     * row total      x_row(c,i) = Σ intermediate use by every (c',j) + Σ final demand by every (c',f);
     * column total   x_col(c,i) = Σ intermediate inputs from every (c',j) + D1 + B2A3G + D29X39 + D21X31;
     * identity       |x_row − x_col| <= tolerance (million EUR) and x_row >= 0;
     * structural zeros: OP_RES/OP_NRES are 0 in every industry column; D1, B2A3G, D29X39 are 0 in
       every final-demand column;
-    * completeness: the long table has exactly the dense number of distinct cells.
+    * completeness: exactly the dense number of cells, no empty value (each item was also checked
+      for duplicate keys and its own dense count when parsed).
 
-    Returns ``(report, gross_output_frame)``; ``report["passed"]`` is False on any failure.
+    ``parts`` are the per-item aggregates of :func:`_partials`. Returns ``(report, gross_output)``;
+    ``report["passed"]`` is False on any failure.
     """
     import polars as pl
 
     n_cells = dims.dense_cells()
     n_ind = len(dims.countries) * len(dims.industries)
-    checks: list[dict[str, Any]] = []
-    distinct = long.select("row_country", "row_code", "col_country", "col_code").unique().height
-    checks.append({"check": "dense_completeness", "expected_cells": n_cells, "rows": long.height,
-                   "distinct_cells": distinct, "passed": long.height == n_cells == distinct,
-                   "null_values": int(long["value"].null_count())})
-    if long["value"].null_count():
-        checks[-1]["passed"] = False
-    inter = long.filter(pl.col("block") != "V")
-    str_keys = [pl.col(c).cast(pl.Utf8) for c in ("row_country", "row_code", "col_country", "col_code")]
-    x_row = inter.group_by("row_country", "row_code").agg(pl.col("value").sum().alias("x_row")).with_columns(
-        str_keys[:2])
-    z_col = long.filter(pl.col("block") == "Z").group_by("col_country", "col_code").agg(
-        pl.col("value").sum().alias("z_col")).with_columns(str_keys[2:])
-    va = long.filter(pl.col("block") == "V", pl.col("col_code").is_in(list(dims.industries)),
-                     pl.col("row_code").is_in(list(COLUMN_TOTAL_PRIMARY_INPUTS))).group_by(
-        "col_country", "col_code").agg(pl.col("value").sum().alias("v_col")).with_columns(str_keys[2:])
-    tot = (x_row.rename({"row_country": "country", "row_code": "industry"})
-           .join(z_col.rename({"col_country": "country", "col_code": "industry"}), on=["country", "industry"],
-                 how="full", coalesce=True)
-           .join(va.rename({"col_country": "country", "col_code": "industry"}), on=["country", "industry"],
-                 how="full", coalesce=True))
+    rows = sum(int(p["rows"]) for p in parts)
+    nulls = sum(int(p["nulls"]) for p in parts)
+    checks: list[dict[str, Any]] = [{"check": "dense_completeness", "expected_cells": n_cells, "rows": rows,
+                                     "null_values": nulls, "passed": rows == n_cells and nulls == 0}]
+
+    def total(key: str, by: list[str]) -> Any:
+        frames = [p[key] for p in parts if p[key].height]
+        if not frames:
+            return pl.DataFrame(schema={by[0]: pl.Utf8, by[1]: pl.Utf8, key: pl.Decimal(38, 3)})
+        return pl.concat(frames).group_by(*by).agg(pl.col(key).sum())
+
+    x_row = total("x_row", ["row_country", "row_code"]).rename({"row_country": "country", "row_code": "industry"})
+    z_col = total("z_col", ["col_country", "col_code"]).rename({"col_country": "country", "col_code": "industry"})
+    v_col = total("v_col", ["col_country", "col_code"]).rename({"col_country": "country", "col_code": "industry"})
+    tot = (x_row.join(z_col, on=["country", "industry"], how="full", coalesce=True)
+           .join(v_col, on=["country", "industry"], how="full", coalesce=True))
     tot = tot.with_columns((pl.col("z_col") + pl.col("v_col")).alias("x_col"))
     tot = tot.with_columns((pl.col("x_row") - pl.col("x_col")).alias("diff"))
     tol = pl.lit(tolerance).cast(pl.Decimal(18, 3))
@@ -633,77 +657,93 @@ def verify_identities(long: Any, *, dims: TableDims = FIGARO_DIMS,
     neg = tot.filter(pl.col("x_row") < 0)
     zero = tot.filter(pl.col("x_row") == 0)
     checks.append({
-        "check": "row_total_equals_column_total", "industries": tot.height,
-        "expected_industries": n_ind,
+        "check": "row_total_equals_column_total", "industries": tot.height, "expected_industries": n_ind,
         "tolerance_mio_eur": str(tolerance), "max_abs_diff_mio_eur": str(max_abs) if max_abs is not None else None,
         "violations": bad.height,
-        "examples": [{"country": r[0], "industry": r[1], "diff": str(r[2])}
+        "examples": [{"country": r[0], "industry": r[1], "diff": None if r[2] is None else str(r[2])}
                      for r in bad.select("country", "industry", "diff").head(10).iter_rows()],
         "passed": bad.height == 0 and tot.height == n_ind})
     checks.append({"check": "gross_output_non_negative", "negative": neg.height,
                    "zero_output_industries": zero.height, "passed": neg.height == 0})
-    op_ind = long.filter(pl.col("block") == "V", pl.col("row_code").is_in(["OP_RES", "OP_NRES"]),
-                         pl.col("col_code").is_in(list(dims.industries)), pl.col("value") != 0).height
-    va_fd = long.filter(pl.col("block") == "V", pl.col("row_code").is_in(list(FINAL_DEMAND_ZERO_PRIMARY_INPUTS)),
-                        pl.col("col_code").is_in(list(dims.final_demand)), pl.col("value") != 0).height
-    checks.append({"check": "structural_zeros", "op_rows_nonzero_in_industry_columns": op_ind,
-                   "value_added_nonzero_in_final_demand_columns": va_fd, "passed": op_ind == 0 and va_fd == 0})
+    op = sum(int(p["op_nonzero"]) for p in parts)
+    vafd = sum(int(p["va_fd_nonzero"]) for p in parts)
+    checks.append({"check": "structural_zeros", "op_rows_nonzero_in_industry_columns": op,
+                   "value_added_nonzero_in_final_demand_columns": vafd, "passed": op == 0 and vafd == 0})
     totals = {
         "gross_output_mio_eur": str(tot.select(pl.col("x_row").sum()).item()),
-        "intermediate_mio_eur": str(long.filter(pl.col("block") == "Z").select(pl.col("value").sum()).item()),
-        "final_demand_mio_eur": str(long.filter(pl.col("block") == "F").select(pl.col("value").sum()).item()),
+        "intermediate_mio_eur": str(sum((p["z_sum"] for p in parts if p["z_sum"] is not None), Decimal(0))),
+        "final_demand_mio_eur": str(sum((p["f_sum"] for p in parts if p["f_sum"] is not None), Decimal(0))),
     }
     report = {"schema": "reva.io_identity_report/1", "checks": checks, "totals": totals,
-              "arithmetic": "exact decimal (published 3-decimal million-EUR values, int128 sums)",
+              "arithmetic": "exact decimal (published 3-decimal million-EUR values, 128-bit integer sums)",
               "passed": all(c["passed"] for c in checks)}
-    gross = tot.select("country", "industry", pl.col("x_row").alias("value"))
-    return report, gross
+    return report, tot.select("country", "industry", pl.col("x_row").alias("value"))
 
 
 def build_dataset(parsed: Sequence[ParsedItem], *, dataset: str, year: int,
                   acquisitions: Sequence[Mapping[str, Any]] = (), origin: str = "live",
                   dims: TableDims = FIGARO_DIMS) -> BuiltDataset:
-    """Assemble, verify and serialise one year. Refuses (``IdentityCheckFailed``) on any failure.
+    """Verify and serialise one year item by item (bounded memory). Refuses on any failure.
 
+    Items are written to Parquet in pinned origin order while additive aggregates are
+    collected; the identity checks then run on the aggregates. On a failure the buffer is
+    discarded and :class:`IdentityCheckFailed` is raised, so nothing can be registered.
     ``acquisitions`` lists ``{"acquisition_id", "raw_sha256", "item_key"}`` of the archived raw
     bytes the items were parsed from (provenance in the manifest).
     """
+    import hashlib
+
     import polars as pl
     import pyarrow.parquet as pq
 
     blockers = [f.model_dump() | {"item": p.metadata.get("origins")} for p in parsed for f in p.findings
                 if f.severity == "blocker"]
-    covered = sorted(o for p in parsed for o in p.metadata.get("origins", []))
-    if blockers or covered != sorted(dims.origins):
-        missing = sorted(set(dims.origins) - set(covered))
+    covered = [o for p in parsed for o in p.metadata.get("origins", [])]
+    if blockers or sorted(covered) != sorted(dims.origins):
         raise IdentityCheckFailed(
-            "FIGARO table is incomplete or failed item checks; nothing is published",
-            blockers=blockers[:20], missing_origins=missing,
+            "input-output table is incomplete or failed item checks; nothing is published",
+            blockers=blockers[:20], missing_origins=sorted(set(dims.origins) - set(covered)),
             duplicate_origins=sorted({o for o in covered if covered.count(o) > 1}))
-    long = assemble([p.frame for p in parsed], dims)
-    report, gross = verify_identities(long, dims=dims)
-    report.update({"dataset": dataset, "year": year})
-    if not report["passed"]:
-        raise IdentityCheckFailed("FIGARO accounting identities do not hold; the table is not published",
-                                  report=report)
-    x_rows = gross.join(_index_frame("country", dims.countries), on="country").join(
-        _index_frame("industry", dims.industries), on="industry").sort("country_ord", "industry_ord").select(
-        pl.lit("X").cast(long.schema["block"]).alias("block"),
-        pl.col("country").cast(long.schema["row_country"]).alias("row_country"),
-        pl.col("industry").cast(long.schema["row_code"]).alias("row_code"),
-        pl.col("country").cast(long.schema["col_country"]).alias("col_country"),
-        pl.lit(GROSS_OUTPUT).cast(long.schema["col_code"]).alias("col_code"), pl.col("value"))
-    table = pl.concat([long, x_rows], how="vertical").to_arrow()
+    order = {o: i for i, o in enumerate(dims.origins)}
+    items = sorted(parsed, key=lambda p: order[p.metadata["origins"][0]])
     buf = io.BytesIO()
-    pq.write_table(table, buf, compression="zstd", compression_level=6, use_dictionary=True,
-                   write_statistics=False, row_group_size=1_048_576)
+    writer: Any = None
+    parts: list[dict[str, Any]] = []
+    schema: Any = None
+    try:
+        for p in items:
+            long = to_long(p.frame, dims)
+            parts.append(_partials(long, dims))
+            table = long.to_arrow()
+            if writer is None:
+                schema = long.schema
+                writer = pq.ParquetWriter(buf, table.schema, compression="zstd", compression_level=6,
+                                          use_dictionary=True, write_statistics=False)
+            writer.write_table(table, row_group_size=1_048_576)
+            del long, table
+        report, gross = verify_identities(parts, dims=dims)
+        report.update({"dataset": dataset, "year": year})
+        if not report["passed"]:
+            raise IdentityCheckFailed("input-output accounting identities do not hold; the table is not published",
+                                      report=report)
+        x_rows = gross.join(_index_frame("country", dims.countries), on="country").join(
+            _index_frame("industry", dims.industries), on="industry").sort("country_ord", "industry_ord").select(
+            pl.lit("X").cast(schema["block"]).alias("block"),
+            pl.col("country").cast(schema["row_country"]).alias("row_country"),
+            pl.col("industry").cast(schema["row_code"]).alias("row_code"),
+            pl.col("country").cast(schema["col_country"]).alias("col_country"),
+            pl.lit(GROSS_OUTPUT).cast(schema["col_code"]).alias("col_code"),
+            pl.col("value").cast(schema["value"]))
+        writer.write_table(x_rows.to_arrow())
+        n_rows = sum(int(p["rows"]) for p in parts) + x_rows.height
+    finally:
+        if writer is not None:
+            writer.close()
     data = buf.getvalue()
-    import hashlib
-
     manifest = {
         "schema": DATASET_SCHEMA,
         "dataset_id": f"figaro.iciot_ii.{year}",
-        "concept": "economics.io.figaro_ii_table",
+        "concept": DATASET_CONCEPT,
         "source": {"provider": "Eurostat", "programme": "FIGARO", "dataset": dataset, "edition_note":
                    "2026 edition (released July 2026) covers 2010-2024", "licence": LICENCE,
                    "source_key": SOURCE_KEY, "connector": f"{NAME}@{VERSION}"},
@@ -717,17 +757,17 @@ def build_dataset(parsed: Sequence[ParsedItem], *, dataset: str, year: int,
             "block": "Z intermediate (industry->industry), F final demand (industry->category), "
                      "V primary inputs (row_country=DOM), X gross output (derived: row total, verified equal to "
                      "column total)",
-            "row_country": "FIGARO supplying economy (c_orig) or DOM", "row_code": "ind_ava",
-            "col_country": "FIGARO using economy (c_dest)", "col_code": "ind_use or GROSS_OUTPUT"},
+            "row_country": "supplying economy (c_orig) or DOM", "row_code": "ind_ava",
+            "col_country": "using economy (c_dest)", "col_code": "ind_use or GROSS_OUTPUT"},
         "code_lists": {"economies": list(dims.countries), "industries": list(dims.industries),
                        "final_demand": list(dims.final_demand), "primary_inputs": list(dims.primary_inputs)},
         "economy_iso3": {c: ECONOMIES.get(c) for c in dims.countries},
-        "row_count": table.num_rows,
+        "row_count": n_rows,
         "parquet_sha256": "sha256:" + hashlib.sha256(data).hexdigest(),
         "byte_size": len(data),
         "identity_report": report,
     }
-    return BuiltDataset(parquet=data, manifest=manifest, identity_report=report, row_count=table.num_rows)
+    return BuiltDataset(parquet=data, manifest=manifest, identity_report=report, row_count=n_rows)
 
 
 def gzip_csv(rows: Iterable[Sequence[Any]]) -> bytes:

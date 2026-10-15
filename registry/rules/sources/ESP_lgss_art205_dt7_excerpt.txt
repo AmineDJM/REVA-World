@@ -1,5 +1,5 @@
 Excerpt (verbatim text extracted from HTML) of https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724
-Full response sha256 e91283118e8f49199d8cc8d6ecaf5c481a3da42a85393be31376cfc94135529f, 2609784 bytes, retrieved 2026-10-15T01:08:30Z. Only this excerpt is committed.
+Full response sha256 e91283118e8f49199d8cc8d6ecaf5c481a3da42a85393be31376cfc94135529f, 2609784 bytes, retrieved 2026-10-15T01:08:49Z. Only this excerpt is committed.
 
 === provider version line ===
 Texto consolidado: «Última actualización, publicada el 03/10/2026»

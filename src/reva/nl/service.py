@@ -28,6 +28,7 @@ ledger rows and, in the API, one audit row without the text):
 
 from __future__ import annotations
 
+import asyncio
 import copy
 import hashlib
 import re
@@ -152,19 +153,21 @@ async def call_providers(request: LlmRequest, drafters: Sequence[ScenarioDrafter
     last: LlmProviderError | None = None
     for attempt, drafter in enumerate(drafters):
         op = f"nl_draft:{operation_key}:{attempt}"
-        ledger.reserve(op, requests=1, tokens=tokens)  # BudgetExhausted propagates: never a fallback
+        # BudgetExhausted propagates: never a fallback, nothing sent
+        await asyncio.to_thread(ledger.reserve, op, requests=1, tokens=tokens)
         try:
             response = await drafter.complete(request)
         except LlmProviderError as e:
             used = (e.details.get("usage") or {}).get("total_tokens")
-            ledger.settle(op, requests=1, tokens=int(used) if used else tokens)  # unknown usage stays charged
+            # unknown usage stays charged at the reserved upper bound (fail closed)
+            await asyncio.to_thread(ledger.settle, op, requests=1, tokens=int(used) if used else tokens)
             failures.append({"provider": drafter.provider, "model": drafter.model,
                              "reason": e.details.get("reason"), "retryable": e.retryable})
             last = e
             if not e.retryable:
                 raise
             continue
-        ledger.settle(op, requests=1, tokens=response.usage.total_tokens or tokens)
+        await asyncio.to_thread(ledger.settle, op, requests=1, tokens=response.usage.total_tokens or tokens)
         return response, failures
     assert last is not None
     raise LlmProviderError("every configured LLM provider failed; no draft was produced", retryable=True,
@@ -539,17 +542,24 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
             cap = e.details.get("capability")
             if isinstance(cap, str) and cap in catalog.gap_keys and cap not in present:
                 unsupported.append(_gap(catalog, cap, cap, e.message, "validator"))
+    def _is_missing(e: Mapping[str, Any]) -> bool:
+        where = str(e.get("path") or "").strip("/").replace("/", ".")
+        return "required property" in str(e.get("message", "")) or any(
+            where == m or where.startswith(m + ".") for m in missing)
+
+    details = [e for e in errors if "path" in e]
+    only_missing = bool(details) and all(_is_missing(e) for e in details)
     if rejected:
         status = "draft_rejected"
-    elif missing:
-        status = "needs_input"
-    elif not valid:
-        status = "draft_invalid"
-    else:
+    elif valid:
         status = "draft_ready"
+    elif missing and only_missing:
+        status = "needs_input"
+    else:
+        status = "draft_invalid"
     result = DraftResult(
         status=status, draft_spec=spec if status == "draft_ready" else None,
-        candidate_spec=None if status == "draft_ready" else candidate,
+        candidate_spec=None if status in ("draft_ready", "draft_rejected") else candidate,
         validation={"valid": status == "draft_ready", "errors": errors,
                     "validator": "reva.simulation.spec.validate_scenario_spec"},
         restatement="", unsupported=unsupported, rejected_ids=rejected, missing_fields=missing,

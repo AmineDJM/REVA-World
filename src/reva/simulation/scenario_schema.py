@@ -65,8 +65,10 @@ def crude_branch_schema() -> dict[str, Any]:
     """The crude model's fragments: V1 appendix semantics (plus schema_version 2.0.0)."""
     return {
         "schema_version": {"enum": ["1.0.0", "2.0.0"]},
-        "countries": {"type": "array", "items": {"enum": ["FRA", "DZA", "CHN", "USA"]}, "minItems": 1,
-                      "maxItems": 4, "uniqueItems": True},
+        # V2 step 1 (ALLC): registry country keys or exactly ["ALL"] (resolved at compile);
+        # schema_version 1.0.0 keeps the V1 four countries and the "fail" policy (allOf below).
+        "countries": {"type": "array", "items": {"type": "string", "pattern": "^[A-Z]{3}$"}, "minItems": 1,
+                      "maxItems": 300, "uniqueItems": True},
         "reference_year": {"type": "integer", "minimum": 2020, "maximum": 2024},
         "horizon": {"type": "object", "additionalProperties": False,
                     "properties": {"periods": {"const": 1}, "unit": {"const": "annual_accounting_period"}},
@@ -98,11 +100,16 @@ def crude_branch_schema() -> dict[str, Any]:
             "required": ["quantity_response", "elasticity_grid", "no_general_equilibrium"],
         },
         "fidelity": {"enum": ["L0", "L1", "L2"]},
-        "missing_input_policy": {"const": "fail"},
+        "missing_input_policy": {"enum": ["fail", "skip_missing_countries"]},
         "outputs": {"type": "array", "minItems": 1, "uniqueItems": True,
                     "items": {"enum": ["import_value_change_usd", "export_value_change_usd",
                                        "net_external_cost_change_usd", "exposure_percent_baseline_gdp"]}},
         "allOf": [
+            {"if": {"properties": {"schema_version": {"const": "1.0.0"}}},
+             "then": {"properties": {"countries": {"items": {"enum": ["FRA", "DZA", "CHN", "USA"]}, "maxItems": 4},
+                                     "missing_input_policy": {"const": "fail"}}}},
+            {"if": {"properties": {"countries": {"contains": {"const": "ALL"}}}},
+             "then": {"properties": {"countries": {"maxItems": 1}}}},
             {"if": {"properties": {"fidelity": {"const": "L1"}}},
              "then": {"properties": {"assumptions": {"properties": {"quantity_response": {"const": "fixed"},
                                                                     "elasticity_grid": {"maxItems": 0}}}}}},

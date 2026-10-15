@@ -1040,7 +1040,7 @@ ROLE_SQL = """
 DO $$
 DECLARE r text;
 BEGIN
-  FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim'] LOOP
+  FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim','reva_registry'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
       EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT', r);
     END IF;
@@ -1166,7 +1166,7 @@ def restore(
         os.environ["REVA_MIGRATION_DATABASE_URL"] = url.render_as_string(hide_password=False)
         os.environ["REVA_DB_NAME"] = str(url.database)
         t0 = time.perf_counter()
-        bootstrap_report = bootstrap(load_settings())
+        bootstrap_report = bootstrap(load_settings(), seed_registry=False)  # restore reproduces, never re-seeds
         timings["bootstrap_seconds"] = round(time.perf_counter() - t0, 3)
     conn = connect(url, autocommit=True)
     try:

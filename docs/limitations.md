@@ -98,19 +98,16 @@ catalogue in `src/reva/capabilities.py` describes them as
 
 ## Governance limits (residual risk)
 
-* **The worker role can forge governance approvals.** `reva_worker` holds INSERT
-  on the `evidence`, `ontology` and `model` schemas (migration `0007`), and no
-  trigger restricts who may insert `evidence.eligibility` (`decision='eligible'`),
-  `ontology.mapping` (`approval='approved'`) or `model.version`
-  (`approval_status='approved'`) rows; the `review_activity_id` they cite is also
-  worker-insertable. `reva seed` runs with the worker credentials and writes these
-  rows, and the autonomy promotion path writes eligibility and model versions as
-  the worker. The application checks gates and reviews before writing, but the
-  database does not: a compromised or buggy worker could self-approve a mapping,
-  make a connector version eligible (which `source_select_v1` would then publish)
-  or register an approved model version. Gate results and model promotions are
-  guarded by insert triggers, but `model.evaluation` rows, which a promotion must
-  cite, are also worker-insertable. See [threat_model.md](threat_model.md).
+* **Governance approvals are enforced in the database, but the gate is not independent.** Since
+  migration `0007` every governance row records the writing login (`recorded_by = session_user`);
+  human-attributed actors are accepted only from the API login, the migration owner or the approval
+  functions; approved states (`eligible`, `approved` mappings and model versions, `reviewed` claims)
+  are written only by the owner or by `reva_registry`-owned functions that require a passing gate
+  result or a human review recorded through the API, bound to the proposal's recorded scope and used
+  once (`ops.approval_use`). Seeding runs as the owner during bootstrap. Residual risk: the V1 gate
+  still runs inside the worker, so the worker can record a passing gate result for its own proposal;
+  `model.evaluation` rows and worker artifacts (`meta.artifact`) are still worker-writable. The real
+  fix is a separate gate login and process. See [threat_model.md](threat_model.md).
 * The autonomy gate runs in the same worker process with the same credentials as
   discovery; independence is enforced by re-derivation and DB checks on gate
   results, not by process separation.

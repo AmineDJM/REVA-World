@@ -156,10 +156,16 @@ export function ContextBanner({ meta, simulation = false, referenceTime, scope, 
           </div>
         )}
       </dl>
+      {meta?.warnings?.some((w) => w.code === 'publication_paused') && (
+        <p className="paused-flag" data-testid="publication-paused">
+          <strong>PUBLICATION PAUSED</strong> — some values below are stale (the last accepted ones) until a reviewed connector repair lifts
+          the pause. Stale rows are badged.
+        </p>
+      )}
       {meta?.warnings && meta.warnings.length > 0 && (
         <ul className="context-warnings" aria-label="Warnings">
           {meta.warnings.map((w, i) => (
-            <li key={`${w.code}-${i}`}>
+            <li key={`${w.code}-${i}`} className={w.code === 'publication_paused' ? 'warning-paused' : undefined}>
               <strong>{w.code.replace(/_/g, ' ')}:</strong> {w.message}
             </li>
           ))}

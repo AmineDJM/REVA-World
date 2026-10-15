@@ -78,15 +78,11 @@
         "countries": {
           "type": "array",
           "items": {
-            "enum": [
-              "FRA",
-              "DZA",
-              "CHN",
-              "USA"
-            ]
+            "type": "string",
+            "pattern": "^[A-Z]{3}$"
           },
           "minItems": 1,
-          "maxItems": 4,
+          "maxItems": 300,
           "uniqueItems": true
         },
         "reference_year": {
@@ -194,7 +190,10 @@
           ]
         },
         "missing_input_policy": {
-          "const": "fail"
+          "enum": [
+            "fail",
+            "skip_missing_countries"
+          ]
         },
         "outputs": {
           "type": "array",
@@ -233,6 +232,51 @@
         "seed"
       ],
       "allOf": [
+        {
+          "if": {
+            "properties": {
+              "schema_version": {
+                "const": "1.0.0"
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "countries": {
+                "items": {
+                  "enum": [
+                    "FRA",
+                    "DZA",
+                    "CHN",
+                    "USA"
+                  ]
+                },
+                "maxItems": 4
+              },
+              "missing_input_policy": {
+                "const": "fail"
+              }
+            }
+          }
+        },
+        {
+          "if": {
+            "properties": {
+              "countries": {
+                "contains": {
+                  "const": "ALL"
+                }
+              }
+            }
+          },
+          "then": {
+            "properties": {
+              "countries": {
+                "maxItems": 1
+              }
+            }
+          }
+        },
         {
           "if": {
             "properties": {

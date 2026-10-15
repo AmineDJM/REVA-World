@@ -171,11 +171,11 @@ service (commands and raw output: `docs/dev/docker_check.md`):
   which raises `ValueError: Invalid endpoint` (verified in the image). For AWS, set
   the regional endpoint explicitly (e.g. `https://s3.eu-central-1.amazonaws.com`)
   rather than leaving the prompt blank.
-* **Registry seed.** Bootstrap currently provisions schema and roles only; the
-  registry (concepts, entities, sources, schedules) is seeded by a separate step.
-  Check `reva/cli/bootstrap.py` for whether seeding has moved into the pre-deploy;
-  otherwise run `reva seed --profile mvp` once from a Render shell before the first
-  ingestion.
+* **Registry seed.** The pre-deploy bootstrap seeds the registry (concepts,
+  entities, sources, models, schedules) as the database owner; re-running it is a
+  no-op (`already_seeded`). `reva seed` also runs with the owner credentials; with a
+  runtime role it only confirms the seed. A connector code change without a
+  version bump makes seeding fail with `ImmutableRecordViolation` (intended).
 
 ## Image
 

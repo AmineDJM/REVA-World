@@ -319,7 +319,9 @@ def test_sustained_db_outage_handler_stops_by_lease_expiry_then_worker_reconnect
     wait_until(lambda: terminal(cdb, jid), 40, what="job recovers after the outage", procs=[w])
     r = job(cdb, jid)
     assert w.alive()
-    assert seen_since(cdb, w, restored)  # reconnected
+    # reconnected: presence is refreshed by the heartbeat thread once per beat, which can lag a
+    # short resumed attempt that finishes within the first second after the re-grant
+    wait_until(lambda: seen_since(cdb, w, restored), 8, what="presence updated after reconnect", procs=[w])
     assert r["status"] == "succeeded" and r["fencing_token"] > token
     # Safety: without a lease the old attempt must stop working (lease = last good beat + LEASE_SECONDS).
     late = [e for e in events(tmp_path / "w", "step", token=token) if e["t"] > outage + LEASE_SECONDS + 2]
