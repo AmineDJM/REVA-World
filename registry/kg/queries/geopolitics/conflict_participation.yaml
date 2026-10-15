@@ -1,0 +1,25 @@
+id: geopolitics.conflict_participation
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  States' participation in conflicts as recorded on the state: "participated in conflict" (P607) statements of
+  countries / sovereign states / historical countries / empires, with start/end. Complements history.wars
+  (conflict-side P710 participants) and the UCDP conflict statements (ucdp:primary_party, 1946-2025).
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?state ?statement ?conflict ?rank ?start ?end WHERE {
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q48349 }
+    ?state wdt:P31 ?cls .
+    {{qid_filter}}
+    ?state p:P607 ?statement .
+    ?statement ps:P607 ?conflict ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: state, property: P607, object: conflict, statement: statement, rank: rank, start: start,
+          end: end}
+split: {by: qid_prefix, variable: state}
+max_rows: 30000
+expand_hops: 1

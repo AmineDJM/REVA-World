@@ -1,0 +1,14 @@
+id: geopolitics.military_alliances
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Military alliances of all periods: instances of military alliance (Q1127126, checked 2026-10-15) or of its
+  subclasses (NATO, Warsaw Pact, Triple Entente, Axis, SEATO, CENTO, ANZUS, ...). Snapshots keep members
+  (P527 has part, with dates), inception/dissolution, participants (P710), replaces/replaced by. State-side
+  memberships come from geopolitics.state_memberships.
+purpose: seed_entities
+entity_kind: international_organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q1127126 . }
+max_rows: 5000
+expand_hops: 1

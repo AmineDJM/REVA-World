@@ -1,0 +1,139 @@
+# Geopolitics (agent KGGEOPOL). Provider-declared concepts (not human-reviewed). Atlas tables:
+# ucdp.orgvio_cy (UCDP Country-Year Organized Violence 26.1, values verbatim), ucdp.acd_cy (COMPUTED counts
+# from the UCDP/PRIO Armed Conflict Dataset 26.1), unga.votes / unga.rollcalls / unga.vote_shares (Voeten UNGA
+# votes, Dataverse v33.0; shares COMPUTED from the votes), cshapes.polities_gw / polities_cow (CShapes 2.0).
+# Licences: UCDP CC BY 4.0; Voeten CC0; CShapes CC BY-NC-SA 4.0 (non-commercial). See docs/dev/v3_kggeopol.md.
+domain: geopolitics
+labels: {fr: "Géopolitique (conflits, votes à l'ONU, frontières historiques)", en: "Geopolitics (conflicts, UN votes, historical borders)"}
+maintainer: KGGEOPOL
+concepts:
+  - id: geopolitics.conflict_deaths_state_based
+    labels: {fr: "Morts dans les conflits armés étatiques (sur le territoire, estimation centrale UCDP)", en: "Deaths in state-based armed conflict within the country (UCDP best estimate)"}
+    definition: >-
+      UCDP best estimate of fatalities in state-based armed conflict (government vs government or vs an organised
+      armed group) located within the country's borders in the calendar year, aggregated by UCDP from its
+      georeferenced events (GED) -- column sb_total_deaths_best of the UCDP Country-Year Dataset on Organized
+      Violence within Country Borders 26.1. 1989-2025. UCDP codes 0 when GED records no fatalities; deaths of
+      dyads below the 25-death inclusion threshold are not counted.
+    unit: deaths
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.orgvio_cy.sb_total_deaths_best]
+    provider_declared: true
+    notes: "Low/high estimates: ucdp.orgvio_cy.sb_total_deaths_low / _high. Location-based, not by nationality of the dead."
+  - id: geopolitics.conflict_deaths_all_organised_violence
+    labels: {fr: "Morts dues à la violence organisée (étatique, non étatique, unilatérale ; UCDP)", en: "Deaths from organised violence (state-based, non-state, one-sided; UCDP)"}
+    definition: >-
+      UCDP best estimate of all fatalities in organised violence within the country's borders in the year: the sum
+      of state-based, non-state and one-sided violence (cumulative_total_deaths_in_orgvio_best of the UCDP
+      Country-Year Dataset on Organized Violence 26.1; "cumulative" = across the three types, not over time).
+    unit: deaths
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.orgvio_cy.cumulative_total_deaths_in_orgvio_best]
+    provider_declared: true
+  - id: geopolitics.one_sided_violence_deaths
+    labels: {fr: "Victimes de la violence unilatérale contre les civils (UCDP)", en: "Deaths from one-sided violence against civilians (UCDP)"}
+    definition: "UCDP best estimate of civilians killed in one-sided violence by governments or organised groups within the country (os_total_deaths_best, Country-Year Dataset 26.1), 1989-2025."
+    unit: deaths
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.orgvio_cy.os_total_deaths_best]
+    provider_declared: true
+  - id: geopolitics.active_conflicts_located
+    labels: {fr: "Conflits armés actifs localisés dans le pays (calculé, UCDP/PRIO)", en: "Active armed conflicts located in the country (computed, UCDP/PRIO)"}
+    definition: >-
+      COMPUTED by REVA from the UCDP/PRIO Armed Conflict Dataset 26.1: number of distinct state-based armed conflicts
+      (>= 25 battle-related deaths in the year) whose location (gwno_loc) includes the country, per calendar year,
+      1946-2025. Only country-years with at least one conflict are listed (no reported zero).
+    unit: count
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.acd_cy.acd_conflicts_located]
+    provider_declared: true
+  - id: geopolitics.conflicts_as_primary_party
+    labels: {fr: "Conflits armés où le gouvernement est partie principale (calculé, UCDP/PRIO)", en: "Armed conflicts with the government as a primary party (computed, UCDP/PRIO)"}
+    definition: "COMPUTED from UCDP/PRIO ACD 26.1: distinct active conflicts per year in which the country's government is a primary party (gwno_a / gwno_b), wherever fought; includes extrasystemic (colonial) wars. 1946-2025."
+    unit: count
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.acd_cy.acd_conflicts_primary_party]
+    provider_declared: true
+  - id: geopolitics.conflicts_as_secondary_party
+    labels: {fr: "Conflits armés où le gouvernement soutient une partie avec des troupes (calculé, UCDP/PRIO)", en: "Armed conflicts with the government as a secondary party with troops (computed, UCDP/PRIO)"}
+    definition: "COMPUTED from UCDP/PRIO ACD 26.1: distinct active conflicts per year in which the country's government is a secondary warring party sending troops (gwno_a_2nd / gwno_b_2nd). 1946-2025."
+    unit: count
+    domain: geopolitics
+    subdomain: conflict
+    value_kind: numeric
+    source_order: [ucdp.acd_cy.acd_conflicts_secondary_party]
+    provider_declared: true
+  - id: geopolitics.unga_share_yes_colonialism
+    labels: {fr: "Part des votes « oui » sur les résolutions de l'AGNU codées « colonialisme » (calculé)", en: "Share of yes votes on UNGA roll calls coded 'colonialism' (computed)"}
+    definition: >-
+      COMPUTED by REVA from the Voeten UN General Assembly voting data (Dataverse doi:10.7910/DVN/LEJUQZ v33.0):
+      yes / (yes + no + abstain) over the country's recorded votes on roll calls carrying issue code CO
+      (colonialism) in the calendar year; absences and "not a member" excluded; provider rows with defects
+      excluded. Issue codes are Voeten's keyword-based coding ("rudimentary visual check, may not be 100%
+      accurate"). Roll calls include paragraph and amendment votes where the file has them.
+    unit: ratio
+    domain: geopolitics
+    subdomain: un_votes
+    value_kind: numeric
+    source_order: ["unga.vote_shares.share_yes|issue=co|grain=year"]
+    provider_declared: true
+    notes: "Decade grain: unga.vote_shares.share_yes|issue=co|grain=decade; counts n_yes/n_no/n_abstain/n_absent alongside. 1946-2024."
+  - id: geopolitics.unga_share_yes_human_rights
+    labels: {fr: "Part des votes « oui » sur les résolutions de l'AGNU codées « droits de l'homme » (calculé)", en: "Share of yes votes on UNGA roll calls coded 'human rights' (computed)"}
+    definition: "COMPUTED from the Voeten UNGA votes v33.0 as for colonialism, issue code HR (human rights)."
+    unit: ratio
+    domain: geopolitics
+    subdomain: un_votes
+    value_kind: numeric
+    source_order: ["unga.vote_shares.share_yes|issue=hr|grain=year"]
+    provider_declared: true
+  - id: geopolitics.unga_share_yes_all
+    labels: {fr: "Part des votes « oui » sur l'ensemble des votes nominaux de l'AGNU (calculé)", en: "Share of yes votes on all UNGA roll calls (computed)"}
+    definition: "COMPUTED from the Voeten UNGA votes v33.0: yes / (yes + no + abstain) over all recorded roll-call votes of the country in the calendar year."
+    unit: ratio
+    domain: geopolitics
+    subdomain: un_votes
+    value_kind: numeric
+    source_order: ["unga.vote_shares.share_yes|issue=all|grain=year"]
+    provider_declared: true
+  - id: geopolitics.unga_recorded_votes
+    labels: {fr: "Nombre de votes nominaux enregistrés à l'AGNU (oui/non/abstention)", en: "Number of recorded UNGA roll-call votes (yes/no/abstain)"}
+    definition: "COMPUTED count of the country's yes votes in UNGA roll calls in the calendar year (Voeten v33.0); companion counts n_no, n_abstain, n_absent in the same table."
+    unit: count
+    domain: geopolitics
+    subdomain: un_votes
+    value_kind: numeric
+    source_order: ["unga.vote_shares.n_yes|issue=all|grain=year"]
+    provider_declared: true
+  - id: geopolitics.polity_status
+    labels: {fr: "Statut politique du territoire (indépendant, colonie, protectorat, mandat, occupé ; CShapes)", en: "Political status of the territory (independent, colony, protectorate, mandate, occupied; CShapes)"}
+    definition: >-
+      Political status of the territory coded by the GW code in CShapes 2.0 for each period of unchanged borders
+      and attributes, 1886-2019 (de jure changes, CShapes coding rules). Dependency periods carry the ruling state
+      in cshapes.polities_gw.owner.
+    unit: category
+    domain: geopolitics
+    subdomain: borders
+    value_kind: text
+    source_order: [cshapes.polities_gw.status, cshapes.polities_cow.status]
+    provider_declared: true
+    notes: "CC BY-NC-SA 4.0 (non-commercial). For dependencies iso3 is the state the territory later became; borders may differ."
+  - id: geopolitics.ruling_state
+    labels: {fr: "État souverain de la dépendance (CShapes)", en: "Sovereign of the dependency (CShapes)"}
+    definition: "For a colony / protectorate / mandate / occupied / leased territory period in CShapes 2.0: the GW (or COW) code of the ruling state; flags give its crosswalk entity."
+    unit: category
+    domain: geopolitics
+    subdomain: borders
+    value_kind: text
+    source_order: [cshapes.polities_gw.owner, cshapes.polities_cow.owner]
+    provider_declared: true

@@ -1,0 +1,30 @@
+id: geopolitics.state_memberships
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Memberships of states in international organisations with their dates: "member of" (P463) statements whose
+  subject is a country / sovereign state / historical country / empire and whose object is one of the
+  organisations seeded by geopolitics.international_organisations, with start (P580) / end (P582), subject
+  role (P2868, e.g. founding member, observer, associate member) and end cause (P1534, e.g. withdrawal,
+  suspension, expulsion). Statement ids are kept so a membership can be traced to Wikidata.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?state ?statement ?org ?rank ?start ?end ?role ?endcause WHERE {
+    VALUES ?org { {{values}} }
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q48349 }
+    ?state p:P463 ?statement .
+    ?statement ps:P463 ?org ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?state wdt:P31 ?cls .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P2868 ?role }
+    OPTIONAL { ?statement pq:P1534 ?endcause }
+  }
+columns: {subject: state, property: P463, object: org, statement: statement, rank: rank, start: start, end: end,
+          qualifiers: {P2868: role, P1534: endcause}}
+split: {by: values, source: "spec:geopolitics.international_organisations", chunk_size: 100}
+depends_on: [geopolitics.international_organisations]
+max_rows: 80000
+expand_hops: 0

@@ -202,18 +202,32 @@ def get_source(name: str) -> AtlasSourceEntry:
 def register_atlas_connector_versions(conn: Any, store: Any, activity_id: Any) -> list[str]:
     """Register every atlas source's connector version (seed, migration-owner connection).
 
-    Requested seed hook (``reva.cli.seed``, after ``builtin_connectors``): a source whose
-    ``source_key`` is not registered is skipped and returned, never fatal.
+    Seed hook (``reva.cli.seed``, after ``builtin_connectors``): a source whose ``source_key`` is
+    not registered is skipped and returned, never fatal. A source already registered under the same
+    version with *different* spec/code is also skipped and returned (logged): the existing version
+    row stays the truth, and ``run_atlas_ingest`` refuses that source until its version is bumped —
+    one atlas module being edited never blocks seeding the rest.
     """
+    import logging
+
     from reva.adapters.postgres import repositories as repo
     from reva.cli.seed import register_connector_version
+    from reva.kernel.errors import ImmutableRecordViolation
 
     skipped = []
     for entry in atlas_sources().values():
         if repo.source_by_key(conn, entry.spec.source_key) is None:
             skipped.append(entry.spec.name)
             continue
-        register_connector_version(conn, store, entry.spec, activity_id)
+        try:
+            register_connector_version(conn, store, entry.spec, activity_id)
+        except ImmutableRecordViolation:  # raised before anything is written
+            logging.getLogger("reva.atlas").warning(
+                "atlas connector %s@%s is registered with different content; bump its version",
+                entry.spec.name,
+                entry.spec.version,
+            )
+            skipped.append(entry.spec.name)
     return skipped
 
 

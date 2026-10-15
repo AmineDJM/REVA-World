@@ -99,17 +99,23 @@ def fetch_items(which: str) -> tuple[FetchItem, ...]:
         return (
             FetchItem(key="lied.record", url=_record_url(LIED_DOI), max_bytes=2_000_000),
             FetchItem(
-                key="lied.file", url=f"https://{DATAVERSE}/api/access/datafile/{LIED_FILE_ID}", max_bytes=10_000_000,
-                expected_media_types=("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                      "application/octet-stream"),
+                key="lied.file",
+                url=f"https://{DATAVERSE}/api/access/datafile/{LIED_FILE_ID}",
+                max_bytes=10_000_000,
+                expected_media_types=(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    "application/octet-stream",
+                ),
             ),
         )
     if which == "bmr":
         return (
             FetchItem(key="bmr.record", url=_record_url(BMR_DOI), max_bytes=2_000_000),
             FetchItem(
-                key="bmr.file", url=f"https://{DATAVERSE}/api/access/datafile/{BMR_FILE_ID}?format=original",
-                max_bytes=5_000_000, expected_media_types=("text/csv", "application/octet-stream"),
+                key="bmr.file",
+                url=f"https://{DATAVERSE}/api/access/datafile/{BMR_FILE_ID}?format=original",
+                max_bytes=5_000_000,
+                expected_media_types=("text/csv", "application/octet-stream"),
             ),
         )
     raise ValueError(which)
@@ -141,8 +147,11 @@ def _spec(which: str) -> Any:
         version=CONNECTOR_VERSION,
         source_key="lied.dataverse" if lied else "bmr.dataverse",
         atlas_source=which,
-        provider=("Skaaning, Gerring & Bartusevicius (Harvard Dataverse)" if lied
-                  else "Boix, Miller & Rosato (Harvard Dataverse)"),
+        provider=(
+            "Skaaning, Gerring & Bartusevicius (Harvard Dataverse)"
+            if lied
+            else "Boix, Miller & Rosato (Harvard Dataverse)"
+        ),
         licence="CC0-1.0",
         allowed_hosts=(DATAVERSE, S3_HOST),
         datasets=(which,),
@@ -196,53 +205,117 @@ def check_record(body: bytes, *, file_id: int, filename: str, payload: bytes) ->
 # ----------------------------------------------------------------------------- labels
 _PRESENT = {"0": "Absent", "1": "Present"}
 LIED_INDICATORS: tuple[str, ...] = (
-    "lexical_index", "lexical_index_plus", "male_suffrage", "female_suffrage", "executive_elections",
-    "legislative_elections", "multi-party_legislative_elections", "competitive_elections",
-    "political_liberties", "democratic_transition", "transition_type", "democratic_breakdown",
-    "breakdown_type", "turnover_period", "turnover_event", "two_turnover_period", "sovereign",
+    "lexical_index",
+    "lexical_index_plus",
+    "male_suffrage",
+    "female_suffrage",
+    "executive_elections",
+    "legislative_elections",
+    "multi-party_legislative_elections",
+    "competitive_elections",
+    "political_liberties",
+    "democratic_transition",
+    "transition_type",
+    "democratic_breakdown",
+    "breakdown_type",
+    "turnover_period",
+    "turnover_event",
+    "two_turnover_period",
+    "sovereign",
 )
 #: Labels quoted/abridged from "Description of the LIED 6.8 dataset" (Dataverse file 11068562).
 LIED_LABELS: dict[str, dict[str, str]] = {
     "lexical_index": {
-        "0": "Non-electoral autocracy", "1": "One-party autocracy", "2": "Multiparty autocracy without elected executive",
-        "3": "Multiparty autocracy", "4": "Exclusive democracy", "5": "Male democracy", "6": "Electoral democracy"},
+        "0": "Non-electoral autocracy",
+        "1": "One-party autocracy",
+        "2": "Multiparty autocracy without elected executive",
+        "3": "Multiparty autocracy",
+        "4": "Exclusive democracy",
+        "5": "Male democracy",
+        "6": "Electoral democracy",
+    },
     "lexical_index_plus": {
-        "0": "Non-electoral autocracy", "1": "One-party autocracy", "2": "Multiparty autocracy without elected executive",
-        "3": "Multiparty autocracy", "4": "Exclusive democracy", "5": "Male democracy", "6": "Electoral democracy",
-        "7": "Polyarchy"},
-    "transition_type": {"0": "No democratic transition", "1": "Conversion (incumbent-led)",
-                        "2": "Cooperative (pact)", "3": "Collapse (opposition-led)", "4": "Foreign supervision",
-                        "5": "Foreign liberalization"},
-    "breakdown_type": {"0": "No democratic breakdown", "1": "Implicit regression induced by incumbents",
-                       "2": "Military coup", "3": "Foreign occupation", "4": "Self-coup",
-                       "5": "Coup or civil conflict headed by opposition", "6": "Coup headed by monarch"},
+        "0": "Non-electoral autocracy",
+        "1": "One-party autocracy",
+        "2": "Multiparty autocracy without elected executive",
+        "3": "Multiparty autocracy",
+        "4": "Exclusive democracy",
+        "5": "Male democracy",
+        "6": "Electoral democracy",
+        "7": "Polyarchy",
+    },
+    "transition_type": {
+        "0": "No democratic transition",
+        "1": "Conversion (incumbent-led)",
+        "2": "Cooperative (pact)",
+        "3": "Collapse (opposition-led)",
+        "4": "Foreign supervision",
+        "5": "Foreign liberalization",
+    },
+    "breakdown_type": {
+        "0": "No democratic breakdown",
+        "1": "Implicit regression induced by incumbents",
+        "2": "Military coup",
+        "3": "Foreign occupation",
+        "4": "Self-coup",
+        "5": "Coup or civil conflict headed by opposition",
+        "6": "Coup headed by monarch",
+    },
     "sovereign": {"0": "Not sovereign (colonised or occupied)", "1": "Sovereign"},
-    **{k: _PRESENT for k in ("male_suffrage", "female_suffrage", "executive_elections", "legislative_elections",
-                              "multi-party_legislative_elections", "competitive_elections", "political_liberties",
-                              "democratic_transition", "democratic_breakdown", "turnover_period", "turnover_event",
-                              "two_turnover_period")},
+    **{
+        k: _PRESENT
+        for k in (
+            "male_suffrage",
+            "female_suffrage",
+            "executive_elections",
+            "legislative_elections",
+            "multi-party_legislative_elections",
+            "competitive_elections",
+            "political_liberties",
+            "democratic_transition",
+            "democratic_breakdown",
+            "turnover_period",
+            "turnover_event",
+            "two_turnover_period",
+        )
+    },
 }
 #: Indices whose codes must all be documented (an unknown level means the scale changed): fail closed.
 LIED_STRICT = frozenset({"lexical_index", "lexical_index_plus"})
 UNDOCUMENTED_NOTE = "code not defined in the LIED description (1=present, 0=absent); reported value kept, no label"
-LIED_UNITS: dict[str, str] = {"lexical_index": "ordinal 0-6", "lexical_index_plus": "ordinal 0-7",
-                              "transition_type": "category code", "breakdown_type": "category code"}
+LIED_UNITS: dict[str, str] = {
+    "lexical_index": "ordinal 0-6",
+    "lexical_index_plus": "ordinal 0-7",
+    "transition_type": "category code",
+    "breakdown_type": "category code",
+}
 
 BMR_INDICATORS: tuple[str, ...] = (
-    "democracy", "democracy_trans", "democracy_breakdowns", "democracy_duration", "democracy_omitteddata",
+    "democracy",
+    "democracy_trans",
+    "democracy_breakdowns",
+    "democracy_duration",
+    "democracy_omitteddata",
     "democracy_femalesuffrage",
 )
 #: Labels from the BMR v4.0 codebook (Dataverse file 5707009).
 BMR_LABELS: dict[str, dict[str, str]] = {
     "democracy": {"0": "Not a democracy", "1": "Democracy"},
     "democracy_omitteddata": {"0": "Not a democracy", "1": "Democracy"},
-    "democracy_femalesuffrage": {"0": "Not a democracy (female suffrage required)",
-                                 "1": "Democracy (female suffrage required)"},
+    "democracy_femalesuffrage": {
+        "0": "Not a democracy (female suffrage required)",
+        "1": "Democracy (female suffrage required)",
+    },
     "democracy_trans": {"-1": "Democratic breakdown", "0": "No change", "1": "Transition to democracy"},
 }
-BMR_UNITS: dict[str, str] = {"democracy": "0/1", "democracy_omitteddata": "0/1", "democracy_femalesuffrage": "0/1",
-                             "democracy_trans": "category code", "democracy_breakdowns": "count",
-                             "democracy_duration": "years"}
+BMR_UNITS: dict[str, str] = {
+    "democracy": "0/1",
+    "democracy_omitteddata": "0/1",
+    "democracy_femalesuffrage": "0/1",
+    "democracy_trans": "category code",
+    "democracy_breakdowns": "count",
+    "democracy_duration": "years",
+}
 BMR_OMITTED_NOTE = (
     "NA in democracy_omitteddata: country occupied during an international war or in state collapse during a "
     "civil war (BMR v4.0 codebook)"
@@ -340,9 +413,14 @@ def lied_geo(r: Mapping[str, Any]) -> str:
     return f"{name}|cow={cow}" if cow is not None else name
 
 
-def lied_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mapping[str, str] | None = None) -> pl.DataFrame:
-    """LIED rows -> atlas frame (``iso3`` filled later by ``geo_scheme="lied"``)."""
-    qids = dict(qids or {})
+def lied_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Any = None) -> pl.DataFrame:
+    """LIED rows -> atlas frame (``iso3`` filled later by ``geo_scheme="lied"``).
+
+    ``qids``: a :class:`reva.adapters.connectors.atlas_vdem.QidIndex`; a row's ``entity_qid`` is the QID of
+    its V-Dem unit (LIED's own ``vdem`` id) in that year, else the unit-level QID of a LIED key outside V-Dem.
+    """
+    from reva.adapters.connectors.atlas_vdem import qid_at
+
     out: list[dict[str, Any]] = []
     for r in rows:
         year = _int_text(r.get("year"), "LIED year")
@@ -350,10 +428,19 @@ def lied_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mapp
             raise _err(f"LIED row {r['_row']} has no year")
         y = int(year)
         geo = lied_geo(r)
-        flags = _canon({
-            "lied_version": LIED_VERSION, "reference_date": f"{y}-12-31",
-            "cow": _int_text(r.get("cow"), "cow"), "vdem_id": _int_text(r.get("vdem"), "vdem"),
-        })
+        qid = None
+        if qids is not None:
+            vid = _int_text(r.get("vdem"), "vdem")
+            tid = qids.text_id_by_vdem_id.get(vid) if vid else None
+            qid = qid_at(qids.periods, tid, y) if tid else qids.other.get(("lied_countryn", geo))
+        flags = _canon(
+            {
+                "lied_version": LIED_VERSION,
+                "reference_date": f"{y}-12-31",
+                "cow": _int_text(r.get("cow"), "cow"),
+                "vdem_id": _int_text(r.get("vdem"), "vdem"),
+            }
+        )
         for ind in LIED_INDICATORS:
             v = _int_text(r.get(ind), f"LIED {ind} row {r['_row']}")
             if v is None:
@@ -366,19 +453,31 @@ def lied_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mapp
                     raise _err(f"LIED {ind}: code {v} has no label (row {r['_row']})")
                 # Reported as is (e.g. Botswana 1961-1965 legislative_elections = 2 in v6.9): kept, unlabelled, flagged.
                 cell_flags = _canon({**json.loads(flags), "undocumented_code": UNDOCUMENTED_NOTE})
-            out.append({
-                "source": "lied", "dataset": "lied", "indicator": ind, "concept_id": None, "iso3": None,
-                "provider_geo": geo, "entity_qid": qids.get(geo), "period_start": date(y, 1, 1),
-                "period_end": date(y + 1, 1, 1), "value": v, "value_text": label,
-                "unit": LIED_UNITS.get(ind, "0/1"), "flags": cell_flags, "raw_sha256": raw_sha256,
-                "selector": _canon({"file": LIED_FILENAME, "sheet": "Sheet1", "row": r["_row"], "column": ind}),
-            })
+            out.append(
+                {
+                    "source": "lied",
+                    "dataset": "lied",
+                    "indicator": ind,
+                    "concept_id": None,
+                    "iso3": None,
+                    "provider_geo": geo,
+                    "entity_qid": qid,
+                    "period_start": date(y, 1, 1),
+                    "period_end": date(y + 1, 1, 1),
+                    "value": v,
+                    "value_text": label,
+                    "unit": LIED_UNITS.get(ind, "0/1"),
+                    "flags": cell_flags,
+                    "raw_sha256": raw_sha256,
+                    "selector": _canon({"file": LIED_FILENAME, "sheet": "Sheet1", "row": r["_row"], "column": ind}),
+                }
+            )
     return _frame(out)
 
 
-def bmr_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mapping[str, str] | None = None) -> pl.DataFrame:
-    """BMR rows -> atlas frame (``iso3`` filled later by ``geo_scheme="bmr"``)."""
-    qids = dict(qids or {})
+def bmr_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Any = None) -> pl.DataFrame:
+    """BMR rows -> atlas frame (``iso3`` filled later by ``geo_scheme="bmr"``); ``entity_qid`` for listed
+    non-crosswalk ccodes (``QidIndex.other``)."""
     out: list[dict[str, Any]] = []
     for r in rows:
         y = int(_int_text(r.get("year"), "BMR year") or 0)
@@ -401,34 +500,36 @@ def bmr_frame(rows: Sequence[Mapping[str, Any]], *, raw_sha256: str, qids: Mappi
                 label = labels.get(v) if labels else None
                 if labels and label is None:
                     raise _err(f"BMR {ind}: code {v} has no label (row {r['_row']})")
-            out.append({
-                "source": "bmr", "dataset": "bmr", "indicator": ind, "concept_id": None, "iso3": None,
-                "provider_geo": geo, "entity_qid": qids.get(geo), "period_start": date(y, 1, 1),
-                "period_end": date(y + 1, 1, 1), "value": v, "value_text": label,
-                "unit": BMR_UNITS[ind], "flags": _canon(cell_flags), "raw_sha256": raw_sha256,
-                "selector": _canon({"file": BMR_FILENAME, "row": r["_row"], "column": ind}),
-            })
+            out.append(
+                {
+                    "source": "bmr",
+                    "dataset": "bmr",
+                    "indicator": ind,
+                    "concept_id": None,
+                    "iso3": None,
+                    "provider_geo": geo,
+                    "entity_qid": qids.other.get(("bmr_ccode", geo)) if qids is not None else None,
+                    "period_start": date(y, 1, 1),
+                    "period_end": date(y + 1, 1, 1),
+                    "value": v,
+                    "value_text": label,
+                    "unit": BMR_UNITS[ind],
+                    "flags": _canon(cell_flags),
+                    "raw_sha256": raw_sha256,
+                    "selector": _canon({"file": BMR_FILENAME, "row": r["_row"], "column": ind}),
+                }
+            )
     return _frame(out)
 
 
 # ----------------------------------------------------------------------------- QIDs
-def unit_qids(dataset: str) -> dict[str, str]:
-    """provider_geo -> QID for LIED/BMR units listed in ``registry/entities/vdem_qids.json``."""
-    from reva.adapters.connectors.atlas_vdem import QIDS_PATH
-
-    if not QIDS_PATH.exists():
-        return {}
-    doc = json.loads(QIDS_PATH.read_text())
-    key = {"lied": "lied_countryn", "bmr": "bmr_ccode"}[dataset]
-    out: dict[str, str] = {}
-    for u in doc.get("units", []) + doc.get("other_units", []):
-        for code in u.get(key) or []:
-            if u.get("qid"):
-                out[str(code)] = u["qid"]
-    return out
-
-
 # ----------------------------------------------------------------------------- ingest
+def _qids() -> Any:
+    from reva.adapters.connectors.atlas_vdem import qid_index
+
+    return qid_index()
+
+
 async def atlas_ingest(run: Any) -> dict[str, Any]:
     """LIED or BMR (by ``run.spec.name``): record + file through ``run``, checks, archive, register."""
     which = "lied" if run.spec.name == LIED_CONNECTOR else "bmr"
@@ -437,41 +538,61 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
         for it in fetch_items(which)
     }
     file_id, filename = (LIED_FILE_ID, LIED_FILENAME) if which == "lied" else (BMR_FILE_ID, BMR_FILENAME)
-    meta = check_record(raws[f"{which}.record"].body, file_id=file_id, filename=filename,
-                        payload=raws[f"{which}.file"].body)
+    meta = check_record(
+        raws[f"{which}.record"].body, file_id=file_id, filename=filename, payload=raws[f"{which}.file"].body
+    )
     shas = {k: run.archive(r) for k, r in raws.items()}
     # Fixture runs replay documented subsets; the partial-file guard applies to live bytes.
     live = run.origin == "live"
     if which == "lied":
         rows = parse_lied(raws["lied.file"].body, min_rows=LIED_MIN_ROWS if live else 1)
-        frame = lied_frame(rows, raw_sha256=shas["lied.file"], qids=unit_qids("lied"))
+        frame = lied_frame(rows, raw_sha256=shas["lied.file"], qids=_qids())
         undocumented = frame.filter(frame["flags"].str.contains("undocumented_code"))
-        extra = {"undocumented_code_cells": [
-            {"provider_geo": g, "indicator": i, "year": d.year, "value": v}
-            for g, i, d, v in undocumented.select("provider_geo", "indicator", "period_start", "value").iter_rows()]}
-        note = (f"LIED v{LIED_VERSION} ({LIED_FILENAME}), 1789-2025, status on 31 December; units keyed "
-                "'<countryn>|vdem=<id>'; historical polities and colonies without a crosswalk entity kept unmapped. CC0.")
+        extra = {
+            "undocumented_code_cells": [
+                {"provider_geo": g, "indicator": i, "year": d.year, "value": v}
+                for g, i, d, v in undocumented.select("provider_geo", "indicator", "period_start", "value").iter_rows()
+            ]
+        }
+        note = (
+            f"LIED v{LIED_VERSION} ({LIED_FILENAME}), 1789-2025, status on 31 December; units keyed "
+            "'<countryn>|vdem=<id>'; historical polities and colonies without a crosswalk entity kept unmapped. CC0."
+        )
         rights = RIGHTS_LIED
     else:
         extra = {}
         rows = parse_bmr(raws["bmr.file"].body, min_rows=BMR_MIN_ROWS if live else 1)
-        frame = bmr_frame(rows, raw_sha256=shas["bmr.file"], qids=unit_qids("bmr"))
-        note = (f"BMR v{BMR_VERSION} ({BMR_FILENAME}), 1800-2020, sovereign states keyed by COW code; West Germany, "
-                "USSR, Yugoslavia, Czechoslovakia and historical states kept unmapped. CC0.")
+        frame = bmr_frame(rows, raw_sha256=shas["bmr.file"], qids=_qids())
+        note = (
+            f"BMR v{BMR_VERSION} ({BMR_FILENAME}), 1800-2020, sovereign states keyed by COW code; West Germany, "
+            "USSR, Yugoslavia, Czechoslovakia and historical states kept unmapped. CC0."
+        )
         rights = RIGHTS_BMR
-    reg = run.register(dataset=which, frame=frame, raw_sha256s=[shas[f"{which}.file"]], geo_scheme=which,
-                       coverage_note=note, rights={**rights, "record": meta, "record_raw_sha256": shas[f"{which}.record"]})
-    return {"record": meta, "rows_parsed": len(rows), **extra,
-            "table": {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")}}
+    reg = run.register(
+        dataset=which,
+        frame=frame,
+        raw_sha256s=[shas[f"{which}.file"]],
+        geo_scheme=which,
+        coverage_note=note,
+        rights={**rights, "record": meta, "record_raw_sha256": shas[f"{which}.record"]},
+    )
+    return {
+        "record": meta,
+        "rows_parsed": len(rows),
+        **extra,
+        "table": {
+            k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")
+        },
+    }
 
 
 __all__ = [
     "BMR_INDICATORS",
     "LIED_INDICATORS",
-    "bmr_frame",
-    "check_record",
     "atlas_ingest",
     "atlas_source",
+    "bmr_frame",
+    "check_record",
     "fetch",
     "fetch_all",
     "fetch_items",

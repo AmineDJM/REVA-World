@@ -20,6 +20,8 @@ app.add_typer(db_app, name="db")
 app.add_typer(fixtures_app, name="fixtures")
 app.add_typer(auth_app, name="auth")
 app.add_typer(beliefs_app, name="beliefs")
+atlas_app = typer.Typer(no_args_is_help=True, help="V3 atlas: budget-metered source runs, snapshots, listing")
+app.add_typer(atlas_app, name="atlas")
 
 
 def _out(obj: Any) -> None:
@@ -445,6 +447,81 @@ def demo(
             fidelity=fidelity,
             origin=origin,
             wait_seconds=wait_seconds,
+        )
+    )
+
+
+# --------------------------------------------------------------------------- atlas (V3, ATLASOPS)
+@atlas_app.command("list")
+def atlas_list() -> None:
+    """Every discovered atlas source (spec, budget key, datasets) and modules that failed to import."""
+    from reva.atlas.ingest import list_sources
+
+    _out(list_sources())
+
+
+@atlas_app.command("ingest")
+def atlas_ingest_cmd(
+    source: str = typer.Argument(..., help="atlas source name, e.g. atlas.imf (see `reva atlas list`)"),
+    dataset: str | None = typer.Option(None, help="only this atlas dataset of the source"),
+    fixture: bool = typer.Option(False, "--fixture", help="replay recorded fixtures (test_fixture origin)"),
+    option: list[str] = typer.Option([], "--option", help="source run option KEY=VALUE (e.g. countries=FR,DE)"),
+) -> None:
+    """Run one atlas source through the single metered entry point (worker credentials).
+
+    Live runs reserve the source's planned requests on its budget key before the first request,
+    meter every request and settle the actual usage (reva.atlas.ingest.run_atlas_ingest)."""
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.atlas.ingest import parse_options, run_atlas_ingest
+    from reva.operations.budgets import BudgetExhausted
+    from reva.settings import get_settings
+
+    settings = get_settings()
+    try:
+        out = asyncio.run(
+            run_atlas_ingest(
+                settings,
+                make_engine("worker", settings),
+                get_store(),
+                source,
+                dataset=dataset,
+                mode="fixture" if fixture else "live",
+                options=parse_options(option),
+            )
+        )
+    except BudgetExhausted as e:
+        _out(e.problem())
+        raise typer.Exit(2) from e
+    _out(out)
+    if out.get("status") != "completed":
+        raise typer.Exit(3)
+
+
+@atlas_app.command("snapshot")
+def atlas_snapshot_cmd(
+    origin: str = typer.Option("live", help="live or test_fixture"),
+    warm: bool = typer.Option(False, "--warm", help="also build the local DuckDB query file now"),
+    skip_unchanged: bool = typer.Option(False, "--skip-unchanged", help="reuse the latest snapshot if unchanged"),
+) -> None:
+    """Record an atlas snapshot (worker credentials): pins the latest version of every atlas table."""
+    from reva.adapters.objects.factory import get_store
+    from reva.adapters.postgres.engine import make_engine
+    from reva.atlas.snapshot import take_snapshot
+    from reva.settings import get_settings
+
+    if origin not in ("live", "test_fixture"):
+        typer.echo("--origin must be live or test_fixture", err=True)
+        raise typer.Exit(2)
+    settings = get_settings()
+    _out(
+        take_snapshot(
+            settings,
+            make_engine("worker", settings),
+            get_store(),
+            origin=origin,
+            warm=warm,
+            skip_unchanged=skip_unchanged,
         )
     )
 

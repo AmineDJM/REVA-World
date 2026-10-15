@@ -1,6 +1,7 @@
 # V3 atlas — health and education (agent A-HEALTHEDU)
 
-Status: connectors, catalogs, fixtures and offline tests done; live ingest: see section 5.
+Status: done. Two atlas sources (`atlas.who_gho`, `atlas.unesco_uis`) on ATLASCORE's atlas source platform,
+catalogs, real fixtures, offline tests and one live ingest into a throwaway database (section 5).
 
 ## 1. Sources researched (2026-10-15)
 
@@ -12,25 +13,33 @@ Status: connectors, catalogs, fixtures and offline tests done; live ingest: see 
 
 ## 2. What was built
 
-* `src/reva/adapters/connectors/atlas_who.py` — `WhoGhoConnector` (48 curated GHO indicators,
-  atlas table `who.gho`), `src/reva/adapters/connectors/atlas_uis.py` — `UisConnector` (36 UIS
-  indicators in 5 batches, atlas table `uis.api`), shared `atlas_healthedu_common.py`
-  (`run_and_register`, `AtlasConnectorSpec`, `fit_flags`, `register_connector`).
-* Flow: `run_connector` archives every raw response as an `evidence.acquisition` (zero observation
-  batches; drift → quarantine); **only if every item is archived un-quarantined** the archived bytes are
-  read back from the artifact store, parsed into the ATLASCORE long schema and registered with
-  `register_atlas_table`. A partial run registers nothing (a table version missing indicators would
-  otherwise replace the complete one in the atlas snapshot); the result is `status: blocked` with the
-  failed items.
-* Catalogs: `registry/atlas/catalog/health.yaml` (56 concepts), `education.yaml` (36 concepts incl.
-  `rd.*` research & development). All `provider_declared: true`.
-* Sources: `registry/sources/who_gho.yaml`, `unesco_uis.yaml`. Budget request:
-  `registry/atlas/budget_requests/a_healthedu.yaml` (`who.gho` 120/day, `unesco.uis` 30/day).
+* `src/reva/adapters/connectors/atlas_who.py` — atlas source `atlas.who_gho` (budget/source key `who.gho`,
+  atlas table `who.gho`): 48 curated GHO indicators, one request each + the indicator list (49 requests).
+* `src/reva/adapters/connectors/atlas_uis.py` — atlas source `atlas.unesco_uis` (`unesco.uis`, atlas table
+  `uis.api`): 36 UIS indicators in 5 batched queries + the version request (6 requests).
+* Both declare `atlas_source() -> AtlasSourceSpec` and `async atlas_ingest(run)` (docs/dev/v3_atlas_interface.md
+  §7): no HTTP client is built in the modules; requests go through `run.get` (budget-metered live client or
+  `FixtureHttp`), raw bytes through `run.archive`, tables through `run.register`. Run:
+  `uv run python -m reva.atlas.ingest atlas.who_gho` / `atlas.unesco_uis` (`--fixture` replays the captured
+  subsets). **Note:** that CLI writes to the database of the current settings; use a throwaway database.
+* Shared `atlas_healthedu_common.py` (`fetch_archive_register`, `fit_flags`): every response is archived as
+  soon as it is fetched; each archived body is read back from the store and checked structurally; **only if
+  every item passed** are the archived bytes parsed and the table registered. A partial or drifted run
+  registers nothing (a table version missing indicators would replace the complete one in the snapshot) and
+  raises a typed `ValidationProblem` listing the failed items (raw bytes stay archived).
+* UIS queries are pinned to the data version returned by `/versions/default` (follow-up items), so all
+  batches come from one release.
+* Catalogs: `registry/atlas/catalog/health.yaml` (56 concepts), `education.yaml` (36 concepts incl. `rd.*`
+  research & development). All `provider_declared: true`.
+* Sources: `registry/sources/who_gho.yaml`, `unesco_uis.yaml`. Budget request
+  `registry/atlas/budget_requests/a_healthedu.yaml` — merged by ATLASCORE (budgets-1.3.2: `who.gho` 120/day,
+  `unesco.uis` 30/day).
 * Fixtures (real captures, 2026-10-15): `tests/fixtures/source/atlas.who_gho/` (6 indicators ×
   DZA/FRA/HKG/IND/NGA, 1.3 MB incl. the 415 KB indicator list), `tests/fixtures/source/atlas.unesco_uis/`
-  (5 indicators × DZA/FRA/IND/NGA/TUR, 170 KB).
-* Tests: `tests/unit/test_atlas_healthedu.py` (18, offline), `tests/integration/test_atlas_healthedu_db.py`
-  (3, fixture DB), `tests/live/test_atlas_healthedu_live.py` (1, `-m live`, throwaway DB).
+  (5 indicators × DZA/FRA/IND/NGA/TUR, 170 KB). Subsets = `FIXTURE_*` constants of each module.
+* Tests: `tests/unit/test_atlas_healthedu.py` (17, offline), `tests/integration/test_atlas_healthedu_db.py`
+  (3, fixture DB via `run_atlas_ingest(mode="fixture")`, idempotence, drift blocks registration),
+  `tests/live/test_atlas_healthedu_live.py` (1, `-m live`, throwaway DB via the `db` fixture).
 
 ## 3. Units, dimensions and estimate types (honesty choices)
 
@@ -73,10 +82,79 @@ Status: connectors, catalogs, fixtures and offline tests done; live ingest: see 
   they share the lineage (not independent evidence). Not listed: WB life expectancy (UN WPP, different
   model), WB physicians (per 1,000, different unit), WB primary completion (different definition).
 
-## 4. Coverage (live ingest)
+## 4. Coverage (live ingest 2026-10-15)
 
-_Filled from the live run below._
+Crosswalk: 250 entities (`registry/entities/country_crosswalk.json`; Taiwan is not in it — WHO and UIS do not
+publish Taiwan either).
+
+| table | rows | indicator series (folded) | countries | years | numeric / text cells | unmapped |
+|---|---|---|---|---|---|---|
+| `who.gho` | 606,051 | 193 (48 GHO codes) | 230 | 1931–2030 | 605,881 / 170 | none |
+| `uis.api` | 118,837 | 36 | 225 | 1970–2025 | 118,837 / 0 | `XDN` "Sudan (pre-secession)", 7 rows (kept, not mapped to SDN) |
+
+Per concept (countries with ≥ 1 value; in brackets: with a value in the last 5 available years):
+
+* **WHO GHE series** (life expectancy, HALE, adult mortality, NCD 30–70, NCD rate, causes-of-death shares,
+  suicide): 185 countries (185), 2000–2021/2023. **Child mortality** (UN IGME): 200, back to 1931 for some.
+  **MMR** (MMEIG): 195, 1985–2023; country-reported MMR: 169 cells, 1987–2009, all text.
+* Health expenditure (GHED), UHC index, immunisation (WUENIC): 195 (195). Workforce (NHWA): 191–194
+  (169–183). Hospital beds: 193 (147). Skilled birth attendance: 193 (148).
+* Obesity (adults/children): 199; hypertension: 194 (1990–2019 only); alcohol: 207; tobacco: 167
+  (2000–2030, years after the last survey are WHO projections); stunting: 162; TB: 197; HIV 15–49: 145
+  (UNAIDS publishes no estimate for many low-prevalence/high-income countries); malaria: 110 (endemic
+  countries only — absence is not "malaria-free").
+* Environment: PM2.5: 227; water/sanitation (JMP): 226; air-pollution deaths: 181–185 (2021 only); WASH
+  deaths: 183 (2019 only); road deaths: 195–197 (2021 only).
+* Education: GER primary 221 (195), out-of-school rates 203–217, net enrolment 218, expenditure % GDP 206
+  (183), mean years of schooling 207 (130), school life expectancy 205, tertiary GER 206 (151);
+  completion rates (surveys) 159–167, modelled 164–165 (all recent); literacy 179–182 (102–106);
+  minimum proficiency (lower secondary) 94–103.
+* R&D: GERD % GDP 156 (110), researchers per million FTE 146 (102), female researchers 153 (102).
+
+## Gaps and where else to look
+
+| gap | why | alternative (owner / status) |
+|---|---|---|
+| 20 crosswalk entities in no WHO series and 25 in no UIS series: uninhabited/dependent territories (ATA, BVT, HMD, SGS, UMI, IOT, ATF, CXR, CCK, NFK, PCN, SJM, ALA, BLM, MAF, GGY, JEY, CHI, ESH, VAT; UIS also BES, IMN, MNP, MYT, XKX) | not WHO/UNESCO reporting units | none needed for most; Kosovo (XKX): World Bank WDI (A-WB), Eurostat enlargement data |
+| WHO GHE (life expectancy, HALE, causes of death) missing 11 member states with < 90,000 inhabitants (AND, COK, DMA, KNA, MCO, MHL, NIU, NRU, PLW, SMR, TUV) and territories (HKG, MAC, GRL, FRO, French overseas departments GLP/GUF/MTQ/REU, …) | GHE excludes small populations | **UN WPP 2024** (A-UN; all 237 areas; different model → its own concept, never blended); national/Eurostat life tables for overseas departments (FRA DOM via INSEE), HKG/MAC Census & Statistics Departments |
+| Literacy absent for most high-income countries (AUS, CAN, DEU, FRA, GBR, JPN, USA, Nordics…) | not collected by UIS (universal schooling assumed) | OECD PIAAC adult skills (different construct: proficiency levels, not literacy) — not ingested; never imputed as 100 % |
+| R&D (GERD, researchers) missing for ~70 countries, mostly small/low-income | no R&D survey | OECD MSTI (OECD + Chinese Taipei, Argentina, China, Romania, Russia, Singapore, South Africa); RICYT (Latin America); Eurostat `rd_e_gerdtot` |
+| Learning outcomes (minimum proficiency) for ≤ 103 countries | assessment participation | PISA/TIMSS/PIRLS microdata (OECD/IEA; licence-restricted micro, open aggregates) — not ingested |
+| HIV prevalence absent for 80 entities incl. CHN, RUS, USA, JPN | UNAIDS does not publish 15–49 prevalence for them | UNAIDS AIDSinfo (same lineage, more indicators); national surveillance |
+| Taiwan (not in crosswalk) | not a WHO/UNESCO member | Taiwan MOHW / Ministry of Education statistics; OECD MSTI for R&D — needs a crosswalk decision (ALLC) first |
+| IHME GBD (cause-specific burden for all locations incl. subnational) | licence: non-commercial agreement + login | owner decision (section 1) |
+| Historical Sudan (XDN, UIS) | historical unit | KG historical states (KGHIST); kept unmapped in the table |
 
 ## 5. Live ingest
 
-_Pending._
+`uv run pytest -m live tests/live/test_atlas_healthedu_live.py` (2026-10-15 22:51–23:01 UTC), throwaway test
+database (created and dropped by the `db` fixture; the dev database `reva` was never touched), through
+`run_atlas_ingest(mode="live")` → `reserve_ingest` → metered SafeHttpClient → `settle_metered`:
+
+| source | requests (reserved/used/refused) | raw archived | Parquet | registered |
+|---|---|---|---|---|
+| `atlas.unesco_uis` | 6 / 6 / 0 | 34.6 MB | 1.6 MB | `atlas.uis.api`, 118,837 rows, UIS version 20260507-91260335 ("February 2026 Data Release") |
+| `atlas.who_gho` | 49 / 49 / 0 | 259.8 MB | 16.3 MB | `atlas.who.gho`, 606,051 rows |
+
+Per full run ≈ 295 MB raw + 18 MB Parquet (budget ≤ 1.5 GB: one archived vintage of each fits five times;
+WHO raw is the cost driver — consider keeping only the latest WHO vintage). Duration ≈ 10 min (WHO 49
+sequential requests at ≥ 1 s spacing; parsing 606k rows ≈ 20 s). The scratch object store of the run was
+deleted afterwards.
+
+An earlier attempt (before ATLASCORE re-pinned `budgets.yaml` after merging the request) was refused by the
+budget gate (`policy budgets.yaml changed … gates refuse until a maintainer re-pins it`): fail-closed as
+designed; nothing was registered.
+
+## 6. Requests to other owners
+
+* **lead (seed)**: call `reva.atlas.sources.register_atlas_connector_versions` in `reva.cli.seed` (as
+  documented by ATLASCORE) so `atlas.who_gho@1.0.0` and `atlas.unesco_uis@1.0.0` are registered in the
+  deployment; and schedule `atlas_ingest` jobs: `atlas.who_gho` monthly, `atlas.unesco_uis` monthly (UIS
+  releases twice a year; an unchanged version re-registers nothing).
+* **ATLASCORE**: none outstanding (budget keys merged and pinned).
+* **A-WB**: catalog fallbacks reference `wb.wdi_social.<code>` for 23 WDI series that are WHO/UIS
+  redistributions (SH.*, SP.DYN.IMRT.IN, SE.*); if WDI's split puts any of them elsewhere, the key must follow.
+* **A-SCI**: R&D concepts live in `education.yaml` as `rd.gerd_gdp`, `rd.researchers_per_million`,
+  `rd.female_researchers_share` (tag `science`) — reference them rather than duplicating.
+* **A-UN / A-QOL**: life expectancy from UN WPP / UNDP HDI and mean years of schooling from UNDP are
+  different series; give them their own concepts (do not add them to the WHO/UIS concepts' source_order).

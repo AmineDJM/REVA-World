@@ -533,23 +533,6 @@ def atlas_frame(rows: list[dict[str, Any]]) -> Any:
     return pl.DataFrame(cols, schema=ATLAS_SCHEMA)
 
 
-#: ``ConnectorSpec.template`` used by the V3 atlas connectors (see atlas_unesco_whc): validated with a
-#: placeholder while the Literal lacks ``atlas_bulk``.
-TEMPLATE = "atlas_bulk"
-_PLACEHOLDER_TEMPLATE = "naturalearth_asset"
-
-
-def make_spec(**fields: Any) -> Any:
-    from typing import get_args
-
-    from reva.ports.connectors import ConnectorSpec
-
-    if TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation):
-        return ConnectorSpec(template=TEMPLATE, **fields)
-    checked = ConnectorSpec(template=_PLACEHOLDER_TEMPLATE, **fields)
-    return checked.model_copy(update={"template": TEMPLATE})
-
-
 # --------------------------------------------------------------------------------------
 # Run-level helpers (atlas source platform, docs/dev/v3_atlas_interface.md section 7)
 # --------------------------------------------------------------------------------------
@@ -844,7 +827,7 @@ def kg_available(engine: Any) -> bool:
     from sqlalchemy import text
 
     with engine.connect() as conn:
-        return conn.execute(text("SELECT to_regclass('kg.statement') IS NOT NULL")).scalar_one()
+        return bool(conn.execute(text("SELECT to_regclass('kg.statement') IS NOT NULL")).scalar_one())
 
 
 def load_kg(
@@ -868,7 +851,9 @@ def load_kg(
     ents, sts = to_kg_model(entities, statements, source_key=source_key, source_revision=source_revision)
     totals: _C[str] = _C()
     rejected: _C[str] = _C()
-    batches = [(ents[i : i + MAX_ENTITIES_PER_BATCH], []) for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH)]
+    batches: list[tuple[list[Any], list[Any]]] = [
+        (ents[i : i + MAX_ENTITIES_PER_BATCH], []) for i in range(0, len(ents), MAX_ENTITIES_PER_BATCH)
+    ]
     step = min(MAX_STATEMENTS_PER_BATCH, 100_000)
     batches += [([], sts[i : i + step]) for i in range(0, len(sts), step)]
     for be, bs in batches:

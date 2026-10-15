@@ -1,0 +1,35 @@
+id: geopolitics.international_organisations
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  International organisations, alliances and intergovernmental forums that states belong to: every item that
+  at least three states / countries / historical countries / empires list as "member of" (P463), plus every
+  direct instance of international organization (Q484652), intergovernmental organization (Q245065),
+  military alliance (Q1127126) or supranational union (Q1335818). Covers the UN, League of
+  Nations, NATO, Warsaw Pact, EEC/EU, OAU/AU, ASEAN, Arab League, OPEC, Commonwealth, Non-Aligned Movement,
+  G7/G20, BRICS, OAS, Mercosur, ... without a hand-written list (class QIDs checked with wbgetentities
+  2026-10-15). Snapshots keep inception/dissolution (P571/P576), replaces/replaced by (P1365/P1366, e.g.
+  OAU -> AU, EEC -> EU), headquarters (P159), founders (P112), parts (P527).
+purpose: seed_entities
+entity_kind: international_organisation
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      SELECT ?item WHERE {
+        VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q48349 }
+        ?state wdt:P31 ?cls .
+        ?state wdt:P463 ?item .
+      } GROUP BY ?item HAVING (COUNT(DISTINCT ?state) >= 3)
+    }
+    UNION
+    {
+      VALUES ?root { wd:Q484652 wd:Q245065 wd:Q1127126 wd:Q1335818 }
+      ?item wdt:P31 ?root .
+    }
+  }
+max_rows: 40000
+expand_hops: 1
+notes: >-
+  Direct instances of the four classes plus every organisation with >= 3 state members; organisations typed
+  only with a deeper subclass and fewer than 3 members recorded on states are not seeded (keeps the query
+  under the 60 s WDQS limit without a key-range split).

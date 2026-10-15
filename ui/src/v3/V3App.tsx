@@ -29,7 +29,7 @@ export default function V3App() {
             const active = pathname.startsWith(base);
             return (
               <li key={s.to}>
-                <NavLink to={s.to} className={active ? 'active' : undefined} aria-current={active ? 'page' : undefined}>
+                <NavLink to={s.to} className={() => (active ? 'active' : '')} aria-current={active ? 'page' : undefined}>
                   {s.short}
                 </NavLink>
               </li>

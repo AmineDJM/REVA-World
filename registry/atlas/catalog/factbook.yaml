@@ -1,0 +1,2304 @@
+# CIA World Factbook concepts (agent A-FACTBOOK). Provider-declared, not human-reviewed.
+# Tables: atlas.factbook.figures_2026_01 / texts_2026_01 / disputes_2024_04, built by
+# src/reva/adapters/connectors/atlas_factbook_profiles.py (sources atlas.factbook_profiles, atlas.factbook_disputes).
+# Every numeric cell is a US-government estimate (flags.estimate = true) with the Factbook's own stated year as
+# period; never an official national statistic. Shares (language/religion/ethnic group/trade partner) and land
+# borders per neighbour are in figures_2026_01 as families of indicators ('language_share|name=<name>',
+# 'land_boundary|partner=<name>'), without catalog concepts (one series per name). Legal texts (legal system,
+# suffrage, constitution, citizenship) are A-LAW's concepts in law.yaml (atlas.factbook.legal_2026_01).
+domain: factbook
+labels:
+  fr: CIA World Factbook (comblement des lacunes)
+  en: CIA World Factbook (gap filler)
+maintainer: A-FACTBOOK
+concepts:
+- id: factbook.area.total
+  labels:
+    fr: Superficie totale
+    en: Area, total
+  definition: CIA World Factbook field 'Geography > Area > total' (Area, total), read from the leading number of the field
+    text.
+  unit: km2
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.area.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.area.land
+  labels:
+    fr: Superficie terrestre
+    en: Area, land
+  definition: CIA World Factbook field 'Geography > Area > land' (Area, land), read from the leading number of the field text.
+  unit: km2
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.area.land
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.area.water
+  labels:
+    fr: Superficie en eau
+    en: Area, water
+  definition: CIA World Factbook field 'Geography > Area > water' (Area, water), read from the leading number of the field
+    text.
+  unit: km2
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.area.water
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_boundaries.total
+  labels:
+    fr: Frontières terrestres, longueur totale
+    en: Land boundaries, total length
+  definition: CIA World Factbook field 'Geography > Land boundaries > total' (Land boundaries, total length), read from the
+    leading number of the field text.
+  unit: km
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_boundaries.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.coastline
+  labels:
+    fr: Longueur du littoral
+    en: Coastline length
+  definition: CIA World Factbook field 'Geography > Coastline' (Coastline length), read from the leading number of the field
+    text.
+  unit: km
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.coastline
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.elevation.highest
+  labels:
+    fr: Point culminant (altitude)
+    en: Highest point (elevation)
+  definition: CIA World Factbook field 'Geography > Elevation > highest point' (Highest point (elevation)), read from the
+    leading number of the field text.
+  unit: m
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.elevation.highest
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.elevation.lowest
+  labels:
+    fr: Point le plus bas (altitude)
+    en: Lowest point (elevation)
+  definition: CIA World Factbook field 'Geography > Elevation > lowest point' (Lowest point (elevation)), read from the leading
+    number of the field text.
+  unit: m
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.elevation.lowest
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.elevation.mean
+  labels:
+    fr: Altitude moyenne
+    en: Mean elevation
+  definition: CIA World Factbook field 'Geography > Elevation > mean elevation' (Mean elevation), read from the leading number
+    of the field text.
+  unit: m
+  domain: factbook
+  subdomain: geography
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.elevation.mean
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.agricultural
+  labels:
+    fr: Terres agricoles (part du territoire)
+    en: Agricultural land (share of land area)
+  definition: CIA World Factbook field 'Geography > Land use > agricultural land' (Agricultural land (share of land area)),
+    read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.agricultural
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.arable
+  labels:
+    fr: Terres arables (part du territoire)
+    en: Arable land (share of land area)
+  definition: 'CIA World Factbook field ''Geography > Land use > agricultural land: arable land'' (Arable land (share of land
+    area)), read from the leading number of the field text.'
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.arable
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.permanent_crops
+  labels:
+    fr: Cultures permanentes (part du territoire)
+    en: Permanent crops (share of land area)
+  definition: 'CIA World Factbook field ''Geography > Land use > agricultural land: permanent crops'' (Permanent crops (share
+    of land area)), read from the leading number of the field text.'
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.permanent_crops
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.permanent_pasture
+  labels:
+    fr: Pâturages permanents (part du territoire)
+    en: Permanent pasture (share of land area)
+  definition: 'CIA World Factbook field ''Geography > Land use > agricultural land: permanent pasture'' (Permanent pasture
+    (share of land area)), read from the leading number of the field text.'
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.permanent_pasture
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.forest
+  labels:
+    fr: Forêts (part du territoire)
+    en: Forest (share of land area)
+  definition: CIA World Factbook field 'Geography > Land use > forest' (Forest (share of land area)), read from the leading
+    number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.forest
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.land_use.other
+  labels:
+    fr: Autres terres (part du territoire)
+    en: Other land (share of land area)
+  definition: CIA World Factbook field 'Geography > Land use > other' (Other land (share of land area)), read from the leading
+    number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.land_use.other
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.irrigated_land
+  labels:
+    fr: Terres irriguées
+    en: Irrigated land
+  definition: CIA World Factbook field 'Geography > Irrigated land' (Irrigated land), read from the leading number of the
+    field text.
+  unit: km2
+  domain: factbook
+  subdomain: land_use
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.irrigated_land
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.population.total
+  labels:
+    fr: Population totale
+    en: Population, total
+  definition: CIA World Factbook field 'People and Society > Population > total' (Population, total), read from the leading
+    number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.population.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.population.male
+  labels:
+    fr: Population masculine
+    en: Population, male
+  definition: CIA World Factbook field 'People and Society > Population > male' (Population, male), read from the leading
+    number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.population.male
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.population.female
+  labels:
+    fr: Population féminine
+    en: Population, female
+  definition: CIA World Factbook field 'People and Society > Population > female' (Population, female), read from the leading
+    number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.population.female
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.age_structure.0_14
+  labels:
+    fr: Population de 0 à 14 ans (part)
+    en: Population aged 0-14 (share)
+  definition: CIA World Factbook field 'People and Society > Age structure > 0-14 years' (Population aged 0-14 (share)), read
+    from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.age_structure.0_14
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.age_structure.15_64
+  labels:
+    fr: Population de 15 à 64 ans (part)
+    en: Population aged 15-64 (share)
+  definition: CIA World Factbook field 'People and Society > Age structure > 15-64 years' (Population aged 15-64 (share)),
+    read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.age_structure.15_64
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.age_structure.65_plus
+  labels:
+    fr: Population de 65 ans et plus (part)
+    en: Population aged 65 and over (share)
+  definition: CIA World Factbook field 'People and Society > Age structure > 65 years and over' (Population aged 65 and over
+    (share)), read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.age_structure.65_plus
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.dependency_ratio.total
+  labels:
+    fr: Taux de dépendance total
+    en: Total dependency ratio
+  definition: CIA World Factbook field 'People and Society > Dependency ratios > total dependency ratio' (Total dependency
+    ratio), read from the leading number of the field text.
+  unit: ratio
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.dependency_ratio.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.dependency_ratio.youth
+  labels:
+    fr: Taux de dépendance des jeunes
+    en: Youth dependency ratio
+  definition: CIA World Factbook field 'People and Society > Dependency ratios > youth dependency ratio' (Youth dependency
+    ratio), read from the leading number of the field text.
+  unit: ratio
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.dependency_ratio.youth
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.dependency_ratio.elderly
+  labels:
+    fr: Taux de dépendance des personnes âgées
+    en: Elderly dependency ratio
+  definition: CIA World Factbook field 'People and Society > Dependency ratios > elderly dependency ratio' (Elderly dependency
+    ratio), read from the leading number of the field text.
+  unit: ratio
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.dependency_ratio.elderly
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.median_age.total
+  labels:
+    fr: Âge médian
+    en: Median age
+  definition: CIA World Factbook field 'People and Society > Median age > total' (Median age), read from the leading number
+    of the field text.
+  unit: years
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.median_age.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.median_age.male
+  labels:
+    fr: Âge médian, hommes
+    en: Median age, male
+  definition: CIA World Factbook field 'People and Society > Median age > male' (Median age, male), read from the leading
+    number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.median_age.male
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.median_age.female
+  labels:
+    fr: Âge médian, femmes
+    en: Median age, female
+  definition: CIA World Factbook field 'People and Society > Median age > female' (Median age, female), read from the leading
+    number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.median_age.female
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.population_growth_rate
+  labels:
+    fr: Taux de croissance démographique
+    en: Population growth rate
+  definition: CIA World Factbook field 'People and Society > Population growth rate' (Population growth rate), read from the
+    leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.population_growth_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.birth_rate
+  labels:
+    fr: Taux de natalité
+    en: Birth rate
+  definition: CIA World Factbook field 'People and Society > Birth rate' (Birth rate), read from the leading number of the
+    field text.
+  unit: births per 1,000 population
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.birth_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.death_rate
+  labels:
+    fr: Taux de mortalité
+    en: Death rate
+  definition: CIA World Factbook field 'People and Society > Death rate' (Death rate), read from the leading number of the
+    field text.
+  unit: deaths per 1,000 population
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.death_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.net_migration_rate
+  labels:
+    fr: Taux de migration nette
+    en: Net migration rate
+  definition: CIA World Factbook field 'People and Society > Net migration rate' (Net migration rate), read from the leading
+    number of the field text.
+  unit: migrants per 1,000 population
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.net_migration_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.urban_population
+  labels:
+    fr: Population urbaine (part)
+    en: Urban population (share)
+  definition: CIA World Factbook field 'People and Society > Urbanization > urban population' (Urban population (share)),
+    read from the leading number of the field text.
+  unit: '% of total population'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.urban_population
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.urbanization_rate
+  labels:
+    fr: Taux d'urbanisation (variation annuelle)
+    en: Rate of urbanization
+  definition: CIA World Factbook field 'People and Society > Urbanization > rate of urbanization' (Rate of urbanization),
+    read from the leading number of the field text.
+  unit: '% annual rate of change'
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.urbanization_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.sex_ratio.total
+  labels:
+    fr: Rapport de masculinité, population totale
+    en: Sex ratio, total population
+  definition: CIA World Factbook field 'People and Society > Sex ratio > total population' (Sex ratio, total population),
+    read from the leading number of the field text.
+  unit: males per female
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.sex_ratio.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.sex_ratio.at_birth
+  labels:
+    fr: Rapport de masculinité à la naissance
+    en: Sex ratio at birth
+  definition: CIA World Factbook field 'People and Society > Sex ratio > at birth' (Sex ratio at birth), read from the leading
+    number of the field text.
+  unit: males per female
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.sex_ratio.at_birth
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.maternal_mortality_ratio
+  labels:
+    fr: Taux de mortalité maternelle
+    en: Maternal mortality ratio
+  definition: CIA World Factbook field 'People and Society > Maternal mortality ratio' (Maternal mortality ratio), read from
+    the leading number of the field text.
+  unit: deaths per 100,000 live births
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.maternal_mortality_ratio
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.infant_mortality.total
+  labels:
+    fr: Taux de mortalité infantile
+    en: Infant mortality rate
+  definition: CIA World Factbook field 'People and Society > Infant mortality rate > total' (Infant mortality rate), read
+    from the leading number of the field text.
+  unit: deaths per 1,000 live births
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.infant_mortality.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.life_expectancy.total
+  labels:
+    fr: Espérance de vie à la naissance
+    en: Life expectancy at birth
+  definition: CIA World Factbook field 'People and Society > Life expectancy at birth > total population' (Life expectancy
+    at birth), read from the leading number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.life_expectancy.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.life_expectancy.male
+  labels:
+    fr: Espérance de vie à la naissance, hommes
+    en: Life expectancy at birth, male
+  definition: CIA World Factbook field 'People and Society > Life expectancy at birth > male' (Life expectancy at birth, male),
+    read from the leading number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.life_expectancy.male
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.life_expectancy.female
+  labels:
+    fr: Espérance de vie à la naissance, femmes
+    en: Life expectancy at birth, female
+  definition: CIA World Factbook field 'People and Society > Life expectancy at birth > female' (Life expectancy at birth,
+    female), read from the leading number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.life_expectancy.female
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.total_fertility_rate
+  labels:
+    fr: Indice synthétique de fécondité
+    en: Total fertility rate
+  definition: CIA World Factbook field 'People and Society > Total fertility rate' (Total fertility rate), read from the leading
+    number of the field text.
+  unit: children born per woman
+  domain: factbook
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.total_fertility_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.literacy.total
+  labels:
+    fr: Taux d'alphabétisation, population totale
+    en: Literacy rate, total population
+  definition: CIA World Factbook field 'People and Society > Literacy > total population' (Literacy rate, total population),
+    read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: education
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.literacy.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.literacy.male
+  labels:
+    fr: Taux d'alphabétisation, hommes
+    en: Literacy rate, male
+  definition: CIA World Factbook field 'People and Society > Literacy > male' (Literacy rate, male), read from the leading
+    number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: education
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.literacy.male
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.literacy.female
+  labels:
+    fr: Taux d'alphabétisation, femmes
+    en: Literacy rate, female
+  definition: CIA World Factbook field 'People and Society > Literacy > female' (Literacy rate, female), read from the leading
+    number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: education
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.literacy.female
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.physician_density
+  labels:
+    fr: Densité de médecins
+    en: Physician density
+  definition: CIA World Factbook field 'People and Society > Physician density' (Physician density), read from the leading
+    number of the field text.
+  unit: physicians per 1,000 population
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.physician_density
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.hospital_bed_density
+  labels:
+    fr: Densité de lits d'hôpital
+    en: Hospital bed density
+  definition: CIA World Factbook field 'People and Society > Hospital bed density' (Hospital bed density), read from the leading
+    number of the field text.
+  unit: beds per 1,000 population
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.hospital_bed_density
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.obesity_adult
+  labels:
+    fr: Obésité, prévalence chez les adultes
+    en: Obesity, adult prevalence
+  definition: CIA World Factbook field 'People and Society > Obesity - adult prevalence rate' (Obesity, adult prevalence),
+    read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.obesity_adult
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.health_expenditure_gdp
+  labels:
+    fr: Dépenses de santé (% du PIB)
+    en: Health expenditure (% of GDP)
+  definition: CIA World Factbook field 'People and Society > Health expenditure > Health expenditure (as % of GDP)' (Health
+    expenditure (% of GDP)), read from the leading number of the field text.
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.health_expenditure_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.education_expenditure_gdp
+  labels:
+    fr: Dépenses d'éducation (% du PIB)
+    en: Education expenditure (% of GDP)
+  definition: CIA World Factbook field 'People and Society > Education expenditure > Education expenditure (% GDP)' (Education
+    expenditure (% of GDP)), read from the leading number of the field text.
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: education
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.education_expenditure_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.school_life_expectancy.total
+  labels:
+    fr: Espérance de vie scolaire (primaire au supérieur)
+    en: School life expectancy (primary to tertiary)
+  definition: CIA World Factbook field 'People and Society > School life expectancy (primary to tertiary education) > total'
+    (School life expectancy (primary to tertiary)), read from the leading number of the field text.
+  unit: years
+  domain: factbook
+  subdomain: education
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.school_life_expectancy.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.drinking_water_improved.total
+  labels:
+    fr: Accès à une source d'eau potable améliorée (part de la population)
+    en: Improved drinking water source (share of population)
+  definition: 'CIA World Factbook field ''People and Society > Drinking water source > improved: total'' (Improved drinking
+    water source (share of population)), read from the leading number of the field text.'
+  unit: '% of population'
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.drinking_water_improved.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.sanitation_improved.total
+  labels:
+    fr: Accès à un assainissement amélioré (part de la population)
+    en: Improved sanitation facility access (share of population)
+  definition: 'CIA World Factbook field ''People and Society > Sanitation facility access > improved: total'' (Improved sanitation
+    facility access (share of population)), read from the leading number of the field text.'
+  unit: '% of population'
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.sanitation_improved.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.tobacco_use.total
+  labels:
+    fr: Consommation de tabac (part des adultes)
+    en: Tobacco use (share of adults)
+  definition: CIA World Factbook field 'People and Society > Tobacco use > total' (Tobacco use (share of adults)), read from
+    the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: health
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.tobacco_use.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp.real_ppp
+  labels:
+    fr: PIB réel (parité de pouvoir d'achat)
+    en: Real GDP (purchasing power parity)
+  definition: CIA World Factbook field 'Economy > Real GDP (purchasing power parity)' (Real GDP (purchasing power parity)),
+    read from the leading number of the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp.real_ppp
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp.real_growth
+  labels:
+    fr: Taux de croissance du PIB réel
+    en: Real GDP growth rate
+  definition: CIA World Factbook field 'Economy > Real GDP growth rate' (Real GDP growth rate), read from the leading number
+    of the field text (one value per year stated in the field).
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp.real_growth
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp.real_per_capita_ppp
+  labels:
+    fr: PIB réel par habitant (PPA)
+    en: Real GDP per capita (PPP)
+  definition: CIA World Factbook field 'Economy > Real GDP per capita' (Real GDP per capita (PPP)), read from the leading
+    number of the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp.real_per_capita_ppp
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp.official_exchange_rate
+  labels:
+    fr: PIB (au taux de change officiel)
+    en: GDP (official exchange rate)
+  definition: CIA World Factbook field 'Economy > GDP (official exchange rate)' (GDP (official exchange rate)), read from
+    the leading number of the field text.
+  unit: US$
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp.official_exchange_rate
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.inflation
+  labels:
+    fr: Taux d'inflation (prix à la consommation)
+    en: Inflation rate (consumer prices)
+  definition: CIA World Factbook field 'Economy > Inflation rate (consumer prices)' (Inflation rate (consumer prices)), read
+    from the leading number of the field text (one value per year stated in the field).
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.inflation
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_sector.agriculture
+  labels:
+    fr: 'Composition du PIB : agriculture'
+    en: 'GDP composition: agriculture'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by sector of origin > agriculture'' (GDP composition:
+    agriculture), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_sector.agriculture
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_sector.industry
+  labels:
+    fr: 'Composition du PIB : industrie'
+    en: 'GDP composition: industry'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by sector of origin > industry'' (GDP composition:
+    industry), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_sector.industry
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_sector.services
+  labels:
+    fr: 'Composition du PIB : services'
+    en: 'GDP composition: services'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by sector of origin > services'' (GDP composition:
+    services), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_sector.services
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_end_use.household_consumption
+  labels:
+    fr: 'PIB par emploi final : consommation des ménages'
+    en: 'GDP by end use: household consumption'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by end use > household consumption'' (GDP by end use:
+    household consumption), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_end_use.household_consumption
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_end_use.government_consumption
+  labels:
+    fr: 'PIB par emploi final : consommation publique'
+    en: 'GDP by end use: government consumption'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by end use > government consumption'' (GDP by end use:
+    government consumption), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_end_use.government_consumption
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_end_use.fixed_investment
+  labels:
+    fr: 'PIB par emploi final : investissement en capital fixe'
+    en: 'GDP by end use: investment in fixed capital'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by end use > investment in fixed capital'' (GDP by
+    end use: investment in fixed capital), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_end_use.fixed_investment
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_end_use.exports
+  labels:
+    fr: 'PIB par emploi final : exportations de biens et services'
+    en: 'GDP by end use: exports of goods and services'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by end use > exports of goods and services'' (GDP by
+    end use: exports of goods and services), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_end_use.exports
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gdp_end_use.imports
+  labels:
+    fr: 'PIB par emploi final : importations de biens et services'
+    en: 'GDP by end use: imports of goods and services'
+  definition: 'CIA World Factbook field ''Economy > GDP - composition, by end use > imports of goods and services'' (GDP by
+    end use: imports of goods and services), read from the leading number of the field text.'
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gdp_end_use.imports
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.industrial_production_growth
+  labels:
+    fr: Taux de croissance de la production industrielle
+    en: Industrial production growth rate
+  definition: CIA World Factbook field 'Economy > Industrial production growth rate' (Industrial production growth rate),
+    read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.industrial_production_growth
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.labor_force
+  labels:
+    fr: Population active
+    en: Labor force
+  definition: CIA World Factbook field 'Economy > Labor force' (Labor force), read from the leading number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: labour
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.labor_force
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.unemployment_rate
+  labels:
+    fr: Taux de chômage
+    en: Unemployment rate
+  definition: CIA World Factbook field 'Economy > Unemployment rate' (Unemployment rate), read from the leading number of
+    the field text (one value per year stated in the field).
+  unit: '%'
+  domain: factbook
+  subdomain: labour
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.unemployment_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.youth_unemployment.total
+  labels:
+    fr: Taux de chômage des jeunes (15-24 ans)
+    en: Youth unemployment rate (ages 15-24)
+  definition: CIA World Factbook field 'Economy > Youth unemployment rate (ages 15-24) > total' (Youth unemployment rate (ages
+    15-24)), read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: labour
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.youth_unemployment.total
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.poverty_line_population
+  labels:
+    fr: Population sous le seuil de pauvreté
+    en: Population below poverty line
+  definition: CIA World Factbook field 'Economy > Population below poverty line' (Population below poverty line), read from
+    the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.poverty_line_population
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.gini
+  labels:
+    fr: Indice de Gini du revenu des ménages
+    en: Gini index of family income
+  definition: CIA World Factbook field 'Economy > Gini Index coefficient - distribution of family income' (Gini index of family
+    income), read from the leading number of the field text (one value per year stated in the field).
+  unit: Gini index (0-100)
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.gini
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.income_share.lowest_10
+  labels:
+    fr: Part du revenu des 10 % les plus pauvres
+    en: Income share of the lowest 10%
+  definition: CIA World Factbook field 'Economy > Household income or consumption by percentage share > lowest 10%' (Income
+    share of the lowest 10%), read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.income_share.lowest_10
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.income_share.highest_10
+  labels:
+    fr: Part du revenu des 10 % les plus riches
+    en: Income share of the highest 10%
+  definition: CIA World Factbook field 'Economy > Household income or consumption by percentage share > highest 10%' (Income
+    share of the highest 10%), read from the leading number of the field text.
+  unit: '%'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.income_share.highest_10
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.remittances_gdp
+  labels:
+    fr: Transferts de fonds des migrants (% du PIB)
+    en: Remittances (% of GDP)
+  definition: CIA World Factbook field 'Economy > Remittances' (Remittances (% of GDP)), read from the leading number of the
+    field text (one value per year stated in the field).
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.remittances_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.budget.revenues
+  labels:
+    fr: Recettes budgétaires publiques
+    en: Government budget revenues
+  definition: CIA World Factbook field 'Economy > Budget > revenues' (Government budget revenues), read from the leading number
+    of the field text.
+  unit: US$
+  domain: factbook
+  subdomain: public_finance
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.budget.revenues
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.budget.expenditures
+  labels:
+    fr: Dépenses budgétaires publiques
+    en: Government budget expenditures
+  definition: CIA World Factbook field 'Economy > Budget > expenditures' (Government budget expenditures), read from the leading
+    number of the field text.
+  unit: US$
+  domain: factbook
+  subdomain: public_finance
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.budget.expenditures
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.public_debt_gdp
+  labels:
+    fr: Dette publique (% du PIB)
+    en: Public debt (% of GDP)
+  definition: CIA World Factbook field 'Economy > Public debt' (Public debt (% of GDP)), read from the leading number of the
+    field text (one value per year stated in the field).
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: public_finance
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.public_debt_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.taxes_revenues_gdp
+  labels:
+    fr: Impôts et autres recettes (% du PIB)
+    en: Taxes and other revenues (% of GDP)
+  definition: CIA World Factbook field 'Economy > Taxes and other revenues' (Taxes and other revenues (% of GDP)), read from
+    the leading number of the field text.
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: public_finance
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.taxes_revenues_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.current_account_balance
+  labels:
+    fr: Solde du compte courant
+    en: Current account balance
+  definition: CIA World Factbook field 'Economy > Current account balance' (Current account balance), read from the leading
+    number of the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.current_account_balance
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.exports
+  labels:
+    fr: Exportations de biens et services
+    en: Exports of goods and services
+  definition: CIA World Factbook field 'Economy > Exports' (Exports of goods and services), read from the leading number of
+    the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.exports
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.imports
+  labels:
+    fr: Importations de biens et services
+    en: Imports of goods and services
+  definition: CIA World Factbook field 'Economy > Imports' (Imports of goods and services), read from the leading number of
+    the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.imports
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.reserves
+  labels:
+    fr: Réserves de change et d'or
+    en: Reserves of foreign exchange and gold
+  definition: CIA World Factbook field 'Economy > Reserves of foreign exchange and gold' (Reserves of foreign exchange and
+    gold), read from the leading number of the field text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.reserves
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.external_debt
+  labels:
+    fr: Dette extérieure
+    en: External debt
+  definition: CIA World Factbook field 'Economy > Debt - external' (External debt), read from the leading number of the field
+    text (one value per year stated in the field).
+  unit: US$
+  domain: factbook
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.external_debt
+  provider_declared: true
+  notes: 'CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04).
+    US-government estimates (flags.estimate = true) with the Factbook''s own reference year as period; not official national
+    statistics. Gap filler for territories that other sources skip. Money: US dollars as stated (Real GDP figures are in constant
+    dollars of the base year given in flags.provider_note).'
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.exchange_rate
+  labels:
+    fr: Taux de change (monnaie nationale par dollar US)
+    en: Exchange rate (national currency per US dollar)
+  definition: CIA World Factbook field 'Economy > Exchange rates' (Exchange rate (national currency per US dollar)), read
+    from the leading number of the field text (one value per year stated in the field).
+  unit: national currency per US dollar
+  domain: factbook
+  subdomain: economy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.exchange_rate
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.electricity_access
+  labels:
+    fr: Accès à l'électricité (part de la population)
+    en: Electricity access (share of population)
+  definition: CIA World Factbook field 'Energy > Electricity access > electrification - total population' (Electricity access
+    (share of population)), read from the leading number of the field text.
+  unit: '% of population'
+  domain: factbook
+  subdomain: energy
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.electricity_access
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.internet_users
+  labels:
+    fr: Utilisateurs d'Internet (part de la population)
+    en: Internet users (share of population)
+  definition: CIA World Factbook field 'Communications > Internet users > percent of population' (Internet users (share of
+    population)), read from the leading number of the field text.
+  unit: '% of population'
+  domain: factbook
+  subdomain: communications
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.internet_users
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.mobile_subscriptions_per_100
+  labels:
+    fr: Abonnements mobiles pour 100 habitants
+    en: Mobile cellular subscriptions per 100 inhabitants
+  definition: CIA World Factbook field 'Communications > Telephones - mobile cellular > subscriptions per 100 inhabitants'
+    (Mobile cellular subscriptions per 100 inhabitants), read from the leading number of the field text.
+  unit: per 100 inhabitants
+  domain: factbook
+  subdomain: communications
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.mobile_subscriptions_per_100
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.co2_emissions
+  labels:
+    fr: Émissions de dioxyde de carbone, total
+    en: Carbon dioxide emissions, total
+  definition: CIA World Factbook field 'Environment > Carbon dioxide emissions > total emissions' (Carbon dioxide emissions,
+    total), read from the leading number of the field text.
+  unit: metric tonnes of CO2
+  domain: factbook
+  subdomain: environment
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.co2_emissions
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.military_expenditure_gdp
+  labels:
+    fr: Dépenses militaires (% du PIB)
+    en: Military expenditures (% of GDP)
+  definition: CIA World Factbook field 'Military and Security > Military expenditures' (Military expenditures (% of GDP)),
+    read from the leading number of the field text (one value per year stated in the field).
+  unit: '% of GDP'
+  domain: factbook
+  subdomain: military
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.military_expenditure_gdp
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.refugees
+  labels:
+    fr: Réfugiés accueillis
+    en: Refugees hosted
+  definition: CIA World Factbook field 'Transnational Issues > Refugees and internally displaced persons > refugees' (Refugees
+    hosted), read from the leading number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: transnational
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.refugees
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.idps
+  labels:
+    fr: Personnes déplacées internes
+    en: Internally displaced persons
+  definition: CIA World Factbook field 'Transnational Issues > Refugees and internally displaced persons > IDPs' (Internally
+    displaced persons), read from the leading number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: transnational
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.idps
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.stateless_persons
+  labels:
+    fr: Personnes apatrides
+    en: Stateless persons
+  definition: CIA World Factbook field 'Transnational Issues > Refugees and internally displaced persons > stateless persons'
+    (Stateless persons), read from the leading number of the field text.
+  unit: persons
+  domain: factbook
+  subdomain: transnational
+  value_kind: numeric
+  source_order:
+  - factbook.figures_2026_01.stateless_persons
+  provider_declared: true
+  notes: CIA World Factbook final edition (mirror commit 783ed27, 2026-01-22; the CIA ended the Factbook on 2026-02-04). US-government
+    estimates (flags.estimate = true) with the Factbook's own reference year as period; not official national statistics.
+    Gap filler for territories that other sources skip.
+  tags:
+  - gap_filler
+  - estimate
+- id: factbook.text.background
+  labels:
+    fr: Contexte (aperçu historique)
+    en: Background (historical overview)
+  definition: CIA World Factbook field 'Introduction > Background', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: history
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.introduction.background
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.location
+  labels:
+    fr: Situation géographique
+    en: Location
+  definition: CIA World Factbook field 'Geography > Location', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.location
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.climate
+  labels:
+    fr: Climat
+    en: Climate
+  definition: CIA World Factbook field 'Geography > Climate', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.climate
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.terrain
+  labels:
+    fr: Relief
+    en: Terrain
+  definition: CIA World Factbook field 'Geography > Terrain', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.terrain
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.natural_resources
+  labels:
+    fr: Ressources naturelles
+    en: Natural resources
+  definition: CIA World Factbook field 'Geography > Natural resources', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.natural_resources
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.natural_hazards
+  labels:
+    fr: Risques naturels
+    en: Natural hazards
+  definition: CIA World Factbook field 'Geography > Natural hazards', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.natural_hazards
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.border_countries
+  labels:
+    fr: Pays frontaliers (avec longueurs)
+    en: Border countries (with lengths)
+  definition: CIA World Factbook field 'Geography > Land boundaries > border countries', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: geography
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.geography.land_boundaries.border_countries
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.environmental_issues
+  labels:
+    fr: Problèmes environnementaux
+    en: Environmental issues
+  definition: CIA World Factbook field 'Environment > Environmental issues', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: environment
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.environment.environmental_issues
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.languages
+  labels:
+    fr: Langues (avec parts lorsqu'indiquées)
+    en: Languages (with shares when stated)
+  definition: CIA World Factbook field 'People and Society > Languages > Languages', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: culture
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.people_and_society.languages.languages
+  - factbook.texts_2026_01.people_and_society.languages
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.religions
+  labels:
+    fr: Religions (avec parts lorsqu'indiquées)
+    en: Religions (with shares when stated)
+  definition: CIA World Factbook field 'People and Society > Religions', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: culture
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.people_and_society.religions
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.ethnic_groups
+  labels:
+    fr: Groupes ethniques
+    en: Ethnic groups
+  definition: CIA World Factbook field 'People and Society > Ethnic groups', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: culture
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.people_and_society.ethnic_groups
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.country_name_long
+  labels:
+    fr: Nom du pays, forme longue conventionnelle
+    en: Country name, conventional long form
+  definition: CIA World Factbook field 'Government > Country name > conventional long form', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.country_name.conventional_long_form
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.government_type
+  labels:
+    fr: Type de gouvernement
+    en: Government type
+  definition: CIA World Factbook field 'Government > Government type', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.government_type
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.capital
+  labels:
+    fr: Capitale
+    en: Capital
+  definition: CIA World Factbook field 'Government > Capital > name', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.capital.name
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.dependency_status
+  labels:
+    fr: Statut de dépendance
+    en: Dependency status
+  definition: CIA World Factbook field 'Government > Dependency status', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.dependency_status
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.independence
+  labels:
+    fr: Indépendance
+    en: Independence
+  definition: CIA World Factbook field 'Government > Independence', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: history
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.independence
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.national_holiday
+  labels:
+    fr: Fête nationale
+    en: National holiday
+  definition: CIA World Factbook field 'Government > National holiday', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: culture
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.national_holiday
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.chief_of_state
+  labels:
+    fr: Chef de l'État
+    en: Chief of state
+  definition: CIA World Factbook field 'Government > Executive branch > chief of state', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.executive_branch.chief_of_state
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.head_of_government
+  labels:
+    fr: Chef du gouvernement
+    en: Head of government
+  definition: CIA World Factbook field 'Government > Executive branch > head of government', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.executive_branch.head_of_government
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.executive_election_process
+  labels:
+    fr: Mode d'élection/de nomination de l'exécutif
+    en: Executive election/appointment process
+  definition: CIA World Factbook field 'Government > Executive branch > election/appointment process', verbatim (HTML tags
+    removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.executive_branch.election_appointment_process
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.legislature_name
+  labels:
+    fr: Nom du parlement
+    en: Legislature name
+  definition: CIA World Factbook field 'Government > Legislative branch > legislature name', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.legislative_branch.legislature_name
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.legislative_structure
+  labels:
+    fr: Structure législative (monocamérale/bicamérale)
+    en: Legislative structure (unicameral/bicameral)
+  definition: CIA World Factbook field 'Government > Legislative branch > legislative structure', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.legislative_branch.legislative_structure
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.international_organizations
+  labels:
+    fr: Participation aux organisations internationales
+    en: International organization participation
+  definition: CIA World Factbook field 'Government > International organization participation', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: government
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.government.international_organization_participation
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.currency
+  labels:
+    fr: Monnaie (telle qu'indiquée dans le champ des taux de change)
+    en: Currency (as quoted in the exchange-rate field)
+  definition: CIA World Factbook field 'Economy > Exchange rates > Currency', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: economy
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.economy.exchange_rates.currency
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.exports_partners
+  labels:
+    fr: Partenaires à l'exportation (avec parts)
+    en: Export partners (with shares)
+  definition: CIA World Factbook field 'Economy > Exports - partners', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: trade
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.economy.exports_partners
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.imports_partners
+  labels:
+    fr: Partenaires à l'importation (avec parts)
+    en: Import partners (with shares)
+  definition: CIA World Factbook field 'Economy > Imports - partners', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: trade
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.economy.imports_partners
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.exports_commodities
+  labels:
+    fr: Produits exportés
+    en: Export commodities
+  definition: CIA World Factbook field 'Economy > Exports - commodities', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: trade
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.economy.exports_commodities
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.military_forces
+  labels:
+    fr: Forces armées et de sécurité
+    en: Military and security forces
+  definition: CIA World Factbook field 'Military and Security > Military and security forces', verbatim (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: military
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.military_and_security.military_and_security_forces
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.refugees_text
+  labels:
+    fr: Réfugiés (texte)
+    en: Refugees (text)
+  definition: CIA World Factbook field 'Transnational Issues > Refugees and internally displaced persons > refugees', verbatim
+    (HTML tags removed).
+  unit: text
+  domain: factbook
+  subdomain: transnational
+  value_kind: text
+  source_order:
+  - factbook.texts_2026_01.transnational_issues.refugees_and_internally_displaced_persons.refugees
+  provider_declared: true
+  notes: Verbatim Factbook wording (US-government view). Disputed entities carry flags.disputed_territory; texts mentioning
+    disputes/claims carry flags.mentions_dispute.
+  tags:
+  - gap_filler
+  - text
+- id: factbook.text.disputes_international
+  labels:
+    fr: Différends internationaux
+    en: International disputes
+  definition: CIA World Factbook field 'Transnational Issues > Disputes - international', verbatim, from the last edition
+    carrying it (mirror commit b1e7065, 2024-04-18; the CIA removed the field on 2024-04-25).
+  unit: text
+  domain: factbook
+  subdomain: geopolitics
+  value_kind: text
+  source_order:
+  - factbook.disputes_2024_04.transnational_issues.disputes_international
+  provider_declared: true
+  notes: 'Disputed-territory wording kept verbatim (flags.disputed_wording_verbatim = true): it is the US government''s description,
+    not a neutral or legal finding.'
+  tags:
+  - gap_filler
+  - text
+  - disputes

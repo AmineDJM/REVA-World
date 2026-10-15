@@ -1,0 +1,112 @@
+# Water (agent A-FAO). Provider-declared concepts, not human-reviewed. SDG 6.4.1 / 6.4.2 from the FAOSTAT SDG
+# domain (atlas table fao.sdgb, CC BY 4.0). Total renewable water resources / withdrawals per sector: AQUASTAT
+# (CC BY-NC-SA 4.0 per the FAO data catalog, not ingested); World Bank WDI ER.H2O.* series (sourced from
+# AQUASTAT) are the open route (A-WB).
+domain: water
+labels:
+  fr: Eau
+  en: Water
+maintainer: A-FAO
+concepts:
+- id: water.stress.total
+  labels:
+    fr: 'Niveau de stress hydrique : total (ODD 6.4.2)'
+    en: 'Level of water stress: total (SDG 6.4.2)'
+  definition: 'FAO SDG indicator 6.4.2 (ER_H2O_STRESS_TOT): freshwater withdrawal as a proportion of available freshwater
+    resources (total).'
+  unit: '%'
+  domain: water
+  subdomain: stress
+  source_order:
+  - fao.sdgb.24027-_T|6121
+  - wb.wdi_social.ER.H2O.FWST.ZS
+  provider_declared: true
+  notes: AQUASTAT-based (FAO custodian), taken from the FAOSTAT SDG domain (CC BY 4.0); the AQUASTAT dissemination dataset
+    itself is listed as CC BY-NC-SA 4.0 and is not ingested. World Bank WDI fallback (series sourced from FAO) when A-WB's
+    table is present.
+- id: water.use_efficiency.total
+  labels:
+    fr: 'Efficacité de l''utilisation de l''eau : total (ODD 6.4.1)'
+    en: 'Water use efficiency: total (SDG 6.4.1)'
+  definition: 'FAO SDG indicator 6.4.1 (ER_H2O_WUEYST_*), total: value added per volume of water withdrawn.'
+  unit: US dollars per cubic metre
+  domain: water
+  subdomain: efficiency
+  source_order:
+  - fao.sdgb.24028-_T|6178
+  provider_declared: true
+- id: water.stress.agriculture
+  labels:
+    fr: 'Niveau de stress hydrique : agriculture (ODD 6.4.2)'
+    en: 'Level of water stress: agriculture (SDG 6.4.2)'
+  definition: 'FAO SDG indicator 6.4.2 (ER_H2O_STRESS_AGR): freshwater withdrawal as a proportion of available freshwater
+    resources (agriculture).'
+  unit: '%'
+  domain: water
+  subdomain: stress
+  source_order:
+  - fao.sdgb.24027-A|6121
+  provider_declared: true
+  notes: AQUASTAT-based (FAO custodian), taken from the FAOSTAT SDG domain (CC BY 4.0); the AQUASTAT dissemination dataset
+    itself is listed as CC BY-NC-SA 4.0 and is not ingested.
+- id: water.use_efficiency.agriculture
+  labels:
+    fr: 'Efficacité de l''utilisation de l''eau : agriculture (ODD 6.4.1)'
+    en: 'Water use efficiency: agriculture (SDG 6.4.1)'
+  definition: 'FAO SDG indicator 6.4.1 (ER_H2O_WUEYST_*), agriculture: value added per volume of water withdrawn.'
+  unit: US dollars per cubic metre
+  domain: water
+  subdomain: efficiency
+  source_order:
+  - fao.sdgb.24028-A|6178
+  provider_declared: true
+- id: water.stress.industry
+  labels:
+    fr: 'Niveau de stress hydrique : industrie (ODD 6.4.2)'
+    en: 'Level of water stress: industries (SDG 6.4.2)'
+  definition: 'FAO SDG indicator 6.4.2 (ER_H2O_STRESS_IND): freshwater withdrawal as a proportion of available freshwater
+    resources (industries).'
+  unit: '%'
+  domain: water
+  subdomain: stress
+  source_order:
+  - fao.sdgb.24027-I|6121
+  provider_declared: true
+  notes: AQUASTAT-based (FAO custodian), taken from the FAOSTAT SDG domain (CC BY 4.0); the AQUASTAT dissemination dataset
+    itself is listed as CC BY-NC-SA 4.0 and is not ingested.
+- id: water.use_efficiency.industry
+  labels:
+    fr: 'Efficacité de l''utilisation de l''eau : industrie (ODD 6.4.1)'
+    en: 'Water use efficiency: industries (SDG 6.4.1)'
+  definition: 'FAO SDG indicator 6.4.1 (ER_H2O_WUEYST_*), industries: value added per volume of water withdrawn.'
+  unit: US dollars per cubic metre
+  domain: water
+  subdomain: efficiency
+  source_order:
+  - fao.sdgb.24028-I|6178
+  provider_declared: true
+- id: water.stress.services
+  labels:
+    fr: 'Niveau de stress hydrique : services (ODD 6.4.2)'
+    en: 'Level of water stress: services (SDG 6.4.2)'
+  definition: 'FAO SDG indicator 6.4.2 (ER_H2O_STRESS_SER): freshwater withdrawal as a proportion of available freshwater
+    resources (services).'
+  unit: '%'
+  domain: water
+  subdomain: stress
+  source_order:
+  - fao.sdgb.24027-S|6121
+  provider_declared: true
+  notes: AQUASTAT-based (FAO custodian), taken from the FAOSTAT SDG domain (CC BY 4.0); the AQUASTAT dissemination dataset
+    itself is listed as CC BY-NC-SA 4.0 and is not ingested.
+- id: water.use_efficiency.services
+  labels:
+    fr: 'Efficacité de l''utilisation de l''eau : services (ODD 6.4.1)'
+    en: 'Water use efficiency: services (SDG 6.4.1)'
+  definition: 'FAO SDG indicator 6.4.1 (ER_H2O_WUEYST_*), services: value added per volume of water withdrawn.'
+  unit: US dollars per cubic metre
+  domain: water
+  subdomain: efficiency
+  source_order:
+  - fao.sdgb.24028-S|6178
+  provider_declared: true

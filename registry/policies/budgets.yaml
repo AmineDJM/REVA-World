@@ -1,6 +1,6 @@
-policy_version: "budgets-1.3.2"
+policy_version: "budgets-1.3.3"
 daily:
-  http_requests_total: 10030
+  http_requests_total: 10735
   http_bytes_total: 3221225472
 per_source_daily_requests:
   worldbank.wdi: 200
@@ -25,8 +25,10 @@ per_source_daily_requests:
   constitute.service: 5
   # cow.data: requested by A-HISTECON (a_histecon.yaml)
   cow.data: 20
-  # factbook.json: requested by A-LAW (a_law.yaml)
-  factbook.json: 300
+  # factbook.json: requested by A-FACTBOOK (a_factbook.yaml), A-LAW (a_law.yaml)
+  factbook.json: 900
+  # fao.faostat: requested by A-FAO (a_fao.yaml)
+  fao.faostat: 45
   # gapminder.fasttrack: requested by A-HISTECON (a_histecon.yaml)
   gapminder.fasttrack: 20
   # geonames.countryinfo: requested by A-GEO (a_geo.yaml)
@@ -71,6 +73,8 @@ per_source_daily_requests:
   unesco.whc: 4
   # unhcr.population: requested by A-UN (a_un.yaml)
   unhcr.population: 150
+  # unsd.ama: requested by A-FACTBOOK (a_factbook.yaml)
+  unsd.ama: 20
   # unsd.syb: requested by A-UN (a_un.yaml)
   unsd.syb: 5
   # vdem.vdemdata: requested by A-POL (a_pol.yaml)
@@ -89,6 +93,8 @@ per_source_daily_requests:
   wipo.gii: 3
   # wipo.ipstats_bulk: requested by A-SCI (a_sci.yaml)
   wipo.ipstats_bulk: 5
+  # worldbank.atlas: requested by A-WB (a_wb.yaml)
+  worldbank.atlas: 40
   # worldbank.cckp: requested by A-GEO (a_geo.yaml)
   worldbank.cckp: 6
   # worldbank.wbl: requested by A-LAW (a_law.yaml)

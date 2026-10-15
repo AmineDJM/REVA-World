@@ -54,9 +54,12 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   source, <= 5000/day; pre-V3 limits never lowered); daily totals = 1.2.0 base + merged keys
 #   (requests) + declared bytes/day, capped at 20000 requests / 3 GiB. LLM budgets unchanged.
 #   Each later merge bumps the patch version and re-pins here.
+# * budgets.yaml -> budgets-1.3.3 (2026-10-15, V3, agent ATLASOPS, successor of ATLASCORE for
+#   atlas integration): merge of the pending requests for newly registered sources
+#   (factbook.json, fao.faostat, unsd.ama, worldbank.atlas); same caps, totals capped at 3 GiB.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
     "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
-    "budgets.yaml": "337a3d407402111a2f899847cbaaa708c4afcea93eeec3fe436adfddc4cacce3",
+    "budgets.yaml": "a5206154482df00d9098689202717b87b3e77a5115c030f198f387edfc02dbca",
 }
 
 

@@ -1,0 +1,23 @@
+id: geopolitics.territory_claims
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Territorial claims as explicit statements: every "territory claimed by" (P1336) statement whose claimant is a
+  country / sovereign state / historical country, with start/end (a claim may have been renounced) -- e.g.
+  Kashmir, Western Sahara, Falklands, Antarctic claims, Kuril Islands.
+purpose: statements
+entity_kind: place
+sparql: |
+  SELECT ?territory ?statement ?claimant ?rank ?start ?end WHERE {
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 }
+    ?territory p:P1336 ?statement .
+    ?statement ps:P1336 ?claimant ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?claimant wdt:P31 ?cls .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: territory, property: P1336, object: claimant, statement: statement, rank: rank, start: start,
+          end: end}
+max_rows: 10000
+expand_hops: 1

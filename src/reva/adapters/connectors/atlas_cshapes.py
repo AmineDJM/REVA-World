@@ -122,7 +122,7 @@ def _decode_arcs(topo: Mapping[str, Any]) -> list[list[list[float]]]:
     arcs = topo["arcs"]
     tr = topo.get("transform")
     if not tr:
-        return arcs
+        return list(arcs)
     (sx, sy), (tx, ty) = tr["scale"], tr["translate"]
     out = []
     for arc in arcs:
@@ -225,17 +225,17 @@ def adjacency(polities: Sequence[Polity]) -> list[tuple[int, int, date, date, li
     for ps in by_arc.values():
         for i in range(len(ps)):
             for j in range(i + 1, len(ps)):
-                a, b = ps[i], ps[j]
-                if a.code == b.code:
+                pa, pb = ps[i], ps[j]
+                if pa.code == pb.code:
                     continue
-                key = (min(a.fid, b.fid), max(a.fid, b.fid))
+                key = (min(pa.fid, pb.fid), max(pa.fid, pb.fid))
                 if key in seen:
                     continue
                 seen.add(key)
-                lo, hi = max(a.start, b.start), min(a.end, b.end)
+                lo, hi = max(pa.start, pb.start), min(pa.end, pb.end)
                 if lo > hi:
                     continue
-                x, y = (a, b) if a.code < b.code else (b, a)
+                x, y = (pa, pb) if pa.code < pb.code else (pb, pa)
                 pair_iv[(x.code, y.code)].append((lo, hi, x.fid, y.fid))
     out = []
     for (ca, cb), ivs in sorted(pair_iv.items()):
@@ -275,7 +275,7 @@ def polity_rows(polities: Sequence[Polity], *, raw_sha256: str, crosswalk: State
             )
         if res.iso3 is None and res.label:
             base["historical_state"] = res.label
-        cells = [("status", p.status, {})]
+        cells: list[tuple[str, str, dict[str, Any]]] = [("status", p.status, {})]
         if p.owner is not None and p.status != "independent":
             own = crosswalk.resolve(system, p.owner, p.start)
             cells.append(("owner", f"{system}:{p.owner}", {"owner_iso3": own.iso3, "owner_label": own.label}))
@@ -307,7 +307,7 @@ def polity_rows(polities: Sequence[Polity], *, raw_sha256: str, crosswalk: State
 
 
 def polygon_table(polities: Sequence[Polity], *, raw_sha256: str) -> Any:
-    import pyarrow as pa
+    import pyarrow as pa  # type: ignore[import-untyped]
 
     cols: dict[str, list[Any]] = defaultdict(list)
     for p in polities:
@@ -470,6 +470,7 @@ def atlas_source() -> Any:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="ETH Zürich ICR (CShapes 2.0, via the authors' CRAN package)",
         licence=RIGHTS["licence"],

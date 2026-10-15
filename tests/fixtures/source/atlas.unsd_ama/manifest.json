@@ -1,0 +1,50 @@
+[
+  {
+    "request_fingerprint": "61513b3d683d1957ecb2d07cedb60714bc837ad1af9ea855aeda4fc5b37d4a14",
+    "url": "https://unstats.un.org/unsd/amaapi/api/file",
+    "file": "file_list.json",
+    "sha256": "9996d8e36f2551f92e1a700219fb66d993eae3df81641cf081346fd011fd7132",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json; charset=utf-8"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "recorded"
+  },
+  {
+    "request_fingerprint": "87a48162293d655ca5f74dd7783301ba977e74ae2f9bdd6bf5221f0a84c6a9c5",
+    "url": "https://unstats.un.org/unsd/amaapi/api/file/2",
+    "file": "file_2.xlsx",
+    "sha256": "cff2f28bddf007d8de7404b1b2244cc2676d56b0541bb2982f713abe7ae9453c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.ms-excel"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "derived: recorded AMA file 2 trimmed to the rows of CountryID ['250', '408', '412', '660', '810', '835'] (all other workbook parts unchanged)"
+  },
+  {
+    "request_fingerprint": "744e996b59ee184892653653ff03dabdfc78a9eba99c68389c8fdfeae697915e",
+    "url": "https://unstats.un.org/unsd/amaapi/api/file/9",
+    "file": "file_9.xlsx",
+    "sha256": "faa93c9f1b6e4d809baa0b242d12638cd41252bca8370e608d325aab0df933ca",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.ms-excel"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "derived: recorded AMA file 9 trimmed to the rows of CountryID ['250', '408', '412', '660', '810', '835'] (all other workbook parts unchanged)"
+  },
+  {
+    "request_fingerprint": "f9cb017ed36afe415a817970a0143a7df7fe7ad95a70147a3732e1bb9e98e134",
+    "url": "https://unstats.un.org/unsd/amaapi/api/file/30",
+    "file": "file_30.xlsx",
+    "sha256": "0a531e871e0eea65e3c3d489aec4d6787b377a68ff58ebdef88a6f78c5e27b86",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.ms-excel"
+    },
+    "retrieved_at": "2026-10-15T23:10:00+00:00",
+    "note": "derived: recorded AMA file 30 trimmed to the rows of CountryID ['250', '408', '412', '660', '810', '835'] (all other workbook parts unchanged)"
+  }
+]

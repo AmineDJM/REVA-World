@@ -75,7 +75,8 @@ RANKS = {
     "http://wikiba.se/ontology#NormalRank": "normal",
     "http://wikiba.se/ontology#DeprecatedRank": "deprecated",
 }
-LABEL_KIND = "unclassified"  # kind of entities known only through a label snapshot (no claims fetched)
+LABEL_KIND = "unclassified"
+WDQS_AS_OF_QUERY = "SELECT ?t WHERE { <http://www.wikidata.org> schema:dateModified ?t }"  # kind of entities known only through a label snapshot (no claims fetched)
 
 
 class SpecError(RevaError):
@@ -497,14 +498,22 @@ def to_kg_statement(s: WdStatement) -> Any:
     refs = [{p: [_kg_qualifier_value(v) for v in vs] for p, vs in r.items()} for r in s.references]
     if s.selector.get("rank_selected") is False:
         quals["_rank_not_selected"] = True  # WDQS row without ?rank: 'normal' is a default, not a reading
+    revision = str(s.source_revision) if s.source_revision is not None else None
+    if s.source_key == SOURCE_WDQS:
+        # WDQS results carry no entity revision. The revision is recorded as explicitly unknown, with the
+        # query service's own data timestamp (schema:dateModified of <http://www.wikidata.org>, when probed)
+        # and the retrieval time; the version label is the retrieval time.
+        quals["_revision"] = {"wikidata_revision": "unknown", "reason": "WDQS rows carry no entity revision",
+                              "wdqs_data_as_of": s.selector.get("wdqs_data_as_of"),
+                              "retrieved_at": s.retrieved_at.isoformat()}
+        revision = f"wdqs@{s.retrieved_at.strftime('%Y-%m-%dT%H:%M:%SZ')}"
     return KgStatement(
         subject_qid=s.subject, property_pid=s.property,
         object_qid=s.object_qid if s.value_kind == "entity" else None,
         value=None if s.value_kind == "entity" else kg_value(s.value_kind, s.value),
         start=_kg_time(s.start), end=_kg_time(s.end), point_in_time=_kg_time(s.point_in_time),
         qualifiers=quals, rank=s.rank, references=refs, source_key=s.source_key,
-        source_revision=str(s.source_revision) if s.source_revision is not None else None,
-        statement_id=s.statement_id, raw_sha256=s.raw_sha256,
+        source_revision=revision, statement_id=s.statement_id, raw_sha256=s.raw_sha256,
     )
 
 
@@ -624,6 +633,21 @@ class Harvester:
         self.state_dir = state_dir
         self.entity_batch = entity_batch
         self.qids_for_source = qids_for_source
+        self.wdqs_as_of: str | None = None
+        self._as_of_probed = False
+
+    async def probe_wdqs_as_of(self) -> str | None:
+        """Once per harvester: the WDQS replica's data timestamp (its update lag is not otherwise visible)."""
+        if self._as_of_probed:
+            return self.wdqs_as_of
+        self._as_of_probed = True
+        try:
+            res = await self.client.sparql(WDQS_AS_OF_QUERY, meta={"purpose": "wdqs_data_as_of"})
+            vals = res.column("t")
+            self.wdqs_as_of = vals[0] if vals else None
+        except WikidataError as e:
+            log.warning("WDQS data timestamp probe failed: %s", e.message)
+        return self.wdqs_as_of
 
     # -- one spec ---------------------------------------------------------------------------------
     async def run_spec(self, spec: Spec, *, force: bool = False, try_limit: int | None = None) -> SpecReport:
@@ -667,6 +691,8 @@ class Harvester:
         if trying:
             chunks = chunks[:1]
         rep.chunks_total = len(chunks)
+        if spec.data["purpose"] == "statements" and not trying:
+            await self.probe_wdqs_as_of()
         max_rows = int(spec.data["max_rows"])
         cols = spec.columns
         purpose = spec.data["purpose"]
@@ -774,6 +800,9 @@ class Harvester:
                         objects.setdefault(s.object_qid)
             if res.missing:
                 rep.failures.append({"code": "missing_entities", "ids": list(res.missing)[:50]})
+            norev = [e.qid for e in ents if e.lastrevid is None]
+            if norev:
+                rep.failures.append({"code": "missing_revision", "ids": norev[:50]})
             if ents:
                 self.sink.load(Batch(SOURCE_WBAPI, ents, stmts, list(res.raw_sha256s), res.retrieved_at,
                                      {"spec": spec.id, "mode": mode, "redirects": res.redirects,
@@ -836,7 +865,8 @@ class Harvester:
                 source_key=SOURCE_WDQS, source_revision=None, raw_sha256=res.raw_sha256,
                 retrieved_at=res.retrieved_at,
                 selector={"spec": spec.id, "query_sha256": res.query_sha256,
-                          "rank_selected": bool(cols.get("rank")), "statement_id": sid},
+                          "rank_selected": bool(cols.get("rank")), "statement_id": sid,
+                          "wdqs_data_as_of": self.wdqs_as_of},
             ))
         return out, skipped
 
@@ -910,6 +940,16 @@ def ensure_database(db_name: str) -> Any:
                 c.execute(text(f'CREATE DATABASE "{db_name}"'))
     finally:
         admin.dispose()
+    if exists:
+        probe = create_engine(settings.migration_url())
+        try:
+            with probe.connect() as c:
+                ready = c.execute(text("SELECT to_regclass('kg.load') IS NOT NULL AND "
+                                       "to_regclass('ops.budget_ledger') IS NOT NULL")).scalar()
+        finally:
+            probe.dispose()
+        if ready:  # already migrated and seeded: no re-bootstrap per command
+            return settings
     from reva.adapters.objects.filesystem import FilesystemArtifactStore
     from reva.adapters.postgres.engine import make_engine
     from reva.cli.bootstrap import bootstrap
@@ -1152,6 +1192,107 @@ async def map_countries(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS
     return stats
 
 
+async def map_countries_search(client: WikidataClient, *, out_path: Path = COUNTRY_QIDS,
+                               manual_titles: Mapping[str, str] | None = None) -> dict[str, Any]:
+    """Map every crosswalk entity to a QID through the Wikibase API only (no WDQS).
+
+    Method ``P298_search``: CirrusSearch ``haswbstatement:P298=<alpha-3> -haswbstatement:P576`` (items holding
+    the ISO 3166-1 alpha-3 code that have no dissolution date). One hit -> mapped. Several hits -> their claims
+    are read with wbgetentities: candidates whose P298 statement for that code has an end time (P582) or is
+    deprecated are dropped; if one remains it is mapped, otherwise the code is left unmapped with its
+    candidates. Codes outside ISO 3166 (CHI, XKX) use ``enwiki_sitelink`` with the stated title.
+    The search index lags edits by minutes; every mapped item is re-checked for the P298 code when its full
+    snapshot is fetched (core.countries).
+    """
+    cw = json.loads(CROSSWALK.read_text())
+    ents = {e["key"]: e for e in cw["entities"]}
+    countries: dict[str, Any] = {}
+    ambiguous: dict[str, list[str]] = {}
+    unmapped: list[str] = []
+    raws: list[str] = []
+    for code in sorted(ents):
+        if not ents[code].get("iso3"):
+            unmapped.append(code)
+            continue
+        hits, sha = await client.search_items(f"haswbstatement:P298={code} -haswbstatement:P576", limit=10,
+                                              meta={"purpose": "country_qids", "code": code})
+        raws.append(sha)
+        if len(hits) == 1:
+            countries[code] = {"qid": hits[0], "method": "P298_search", "crosswalk_label": ents[code]["label"],
+                               "raw_sha256": sha}
+        elif hits:
+            ambiguous[code] = hits
+        else:
+            unmapped.append(code)
+    if ambiguous:
+        allq = sorted({q for v in ambiguous.values() for q in v}, key=lambda q: int(q[1:]))
+        res = await client.get_entities(allq, props=("info", "claims"), languages=("en",),
+                                        meta={"purpose": "country_qids_disambiguation"})
+        raws.extend(res.raw_sha256s)
+        for code, cands in ambiguous.items():
+            keep = []
+            for q in cands:
+                claims = (res.entities.get(q) or {}).get("claims") or {}
+                for c in claims.get("P298", []):
+                    v = ((c.get("mainsnak") or {}).get("datavalue") or {}).get("value")
+                    if v == code and c.get("rank") != "deprecated" and not (c.get("qualifiers") or {}).get("P582"):
+                        keep.append(q)
+                        break
+            if len(keep) == 1:
+                countries[code] = {"qid": keep[0], "method": "P298_search", "crosswalk_label": ents[code]["label"],
+                                   "note": "several items hold the code; the others' P298 statement has an end time "
+                                           "or is deprecated", "other_candidates": [q for q in cands if q != keep[0]]}
+            else:
+                unmapped.append(code)
+                countries.setdefault("_ambiguous", {})[code] = cands
+    amb = countries.pop("_ambiguous", {})
+    for code, title in (manual_titles or {}).items():
+        if code not in unmapped:
+            continue
+        url = WBAPI_SITELINK.format(title=title.replace(" ", "_"))
+        result, sha = await client._request(client.wbapi_http, url, endpoint="wbapi", accept="application/json",
+                                            meta={"kind": "wbgetentities_sitelink", "title": title})
+        raws.append(sha)
+        found = [q for q, e in (json.loads(result.body).get("entities") or {}).items()
+                 if q.startswith("Q") and "missing" not in e]
+        if len(found) == 1:
+            countries[code] = {"qid": found[0], "method": "enwiki_sitelink", "enwiki_title": title,
+                               "crosswalk_label": ents[code]["label"], "raw_sha256": sha}
+            unmapped.remove(code)
+    lab = await client.get_entities([v["qid"] for v in countries.values()], props=("info", "labels"),
+                                    languages=("en", "fr"), meta={"purpose": "country_qids_labels"})
+    raws.extend(lab.raw_sha256s)
+    for v in countries.values():
+        e = lab.entities.get(lab.redirects.get(v["qid"], v["qid"])) or {}
+        v["qid"] = lab.redirects.get(v["qid"], v["qid"])
+        v["label_en"] = (e.get("labels") or {}).get("en", {}).get("value")
+        v["label_fr"] = (e.get("labels") or {}).get("fr", {}).get("value")
+        v["lastrevid"] = e.get("lastrevid")
+    dup: dict[str, list[str]] = {}
+    for code, v in countries.items():
+        dup.setdefault(v["qid"], []).append(code)
+    doc_out: dict[str, Any] = {
+        "schema": "reva-country-qids/1",
+        "review_status": "machine_derived_pending_maintainer_review",
+        "built_by": f"reva.kg.harvest map-countries ({HARVEST_VERSION}, agent WDHARVEST)",
+        "note": "Extends registry/entities/country_crosswalk.json (unchanged): crosswalk key -> Wikidata QID.",
+        "method": (map_countries_search.__doc__ or "").strip(),
+        "sources": {"endpoint": "www.wikidata.org API (CirrusSearch + wbgetentities), CC0",
+                    "retrieved_at": lab.retrieved_at.isoformat(), "raw_sha256": raws},
+        "crosswalk_sha256": hashlib.sha256(CROSSWALK.read_bytes()).hexdigest(),
+        "stats": {"crosswalk_entities": len(ents), "mapped": len(countries), "unmapped": len(unmapped),
+                  "by_method": {m: sum(1 for v in countries.values() if v["method"] == m)
+                                for m in sorted({v["method"] for v in countries.values()})},
+                  "distinct_qids": len(dup), "shared_qids": {q: c for q, c in dup.items() if len(c) > 1}},
+        "countries": dict(sorted(countries.items())),
+        "unmapped": sorted(unmapped),
+        "ambiguous": amb,
+    }
+    out_path.write_text(json.dumps(doc_out, indent=1, ensure_ascii=False) + "\n")
+    stats: dict[str, Any] = doc_out["stats"]
+    return stats
+
+
 WBAPI_SITELINK = ("https://www.wikidata.org/w/api.php?action=wbgetentities&sites=enwiki&titles={title}"
                   "&props=info&format=json&maxlag=5")
 MANUAL_TITLES = {"CHI": "Channel Islands", "XKX": "Kosovo"}
@@ -1284,7 +1425,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     st = sub.add_parser("status", help="harvest state per spec")
     st.add_argument("paths", nargs="*", type=Path)
     sub.add_parser("merge-property-requests", help="merge registry/kg/property_requests into the allow-list")
-    sub.add_parser("map-countries", help="write registry/entities/country_qids.json (crosswalk -> QID)")
+    mc = sub.add_parser("map-countries", help="write registry/entities/country_qids.json (crosswalk -> QID)")
+    mc.add_argument("--via-wdqs", action="store_true", help="one SPARQL query instead of per-code API searches")
     r = sub.add_parser("run", help="run specs into a throwaway database (never 'reva'), budget-metered")
     r.add_argument("paths", nargs="*", type=Path)
     r.add_argument("--db", default=DEFAULT_DB)
@@ -1359,8 +1501,11 @@ def main(argv: Sequence[str] | None = None) -> int:
         return 0 if all(r["status"] in ("done", "skipped") for r in spec_reports) else 1
     if args.cmd == "map-countries":
         async def mapc() -> int:
-            async with budgeted_client(purpose="mapcountries", planned_wdqs=1, planned_wbapi=10) as sess:
-                _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
+            async with budgeted_client(purpose="mapcountries", planned_wdqs=0, planned_wbapi=270) as sess:
+                if args.via_wdqs:
+                    _print(await map_countries(sess.client, manual_titles=MANUAL_TITLES))
+                else:
+                    _print(await map_countries_search(sess.client, manual_titles=MANUAL_TITLES))
             _print({"budget": sess.usage.get("budget")})
             return 0
 

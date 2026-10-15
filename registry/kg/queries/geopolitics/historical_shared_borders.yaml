@@ -1,0 +1,22 @@
+id: geopolitics.historical_shared_borders
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  "Shares border with" (P47) statements of historical countries and empires, with start/end qualifiers.
+purpose: statements
+entity_kind: historical_state
+sparql: |
+  SELECT ?state ?statement ?other ?rank ?start ?end WHERE {
+    VALUES ?cls { wd:Q3024240 wd:Q48349 }
+    ?state wdt:P31 ?cls .
+    {{qid_filter}}
+    ?state p:P47 ?statement .
+    ?statement ps:P47 ?other ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: state, property: P47, object: other, statement: statement, rank: rank, start: start, end: end}
+split: {by: qid_prefix, variable: state}
+max_rows: 40000
+expand_hops: 1

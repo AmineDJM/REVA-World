@@ -93,11 +93,13 @@ def _column(v: Any) -> bytes:
 def data_frame(columns: Mapping[str, Any], nrows: int) -> bytes:
     """``columns``: name -> ("str"|"real"|"int", values) or :class:`Alt`."""
     body = _i(19 | (1 << 8) | (1 << 9)) + _i(len(columns)) + b"".join(_column(v) for v in columns.values())
-    attrs = _pairlist([
-        ("names", _strsxp(list(columns))),
-        ("class", _strsxp(["data.frame"])),
-        ("row.names", _intsxp([None, -nrows])),
-    ])
+    attrs = _pairlist(
+        [
+            ("names", _strsxp(list(columns))),
+            ("class", _strsxp(["data.frame"])),
+            ("row.names", _intsxp([None, -nrows])),
+        ]
+    )
     return body + attrs
 
 

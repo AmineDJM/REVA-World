@@ -1,0 +1,25 @@
+id: geopolitics.shared_borders
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  "Shares border with" (P47) statements of the 250 crosswalk countries, keeping start/end qualifiers (border
+  changes) and "applies to part" (P518, e.g. an exclave). Objects get a label snapshot so neighbouring
+  sub-national units can be told apart from countries. Complemented by the dated land-border adjacency
+  computed from CShapes 2.0 (cshapes:shares_border_with, 1886-2019).
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?other ?rank ?start ?end ?part WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P47 ?statement .
+    ?statement ps:P47 ?other ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P518 ?part }
+  }
+columns: {subject: country, property: P47, object: other, statement: statement, rank: rank, start: start, end: end,
+          qualifiers: {P518: part}}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 15000
+expand_hops: 1

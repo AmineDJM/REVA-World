@@ -30,9 +30,15 @@ ROOT = Path(__file__).resolve().parents[1] / "fixtures" / "source"
 
 def _raw(name: str, url: str, key: str = "k") -> RawAcquisition:
     r = asyncio.run(FixtureHttp(name).get(url))
-    return RawAcquisition(item=FetchItem(key=key, url=url, max_bytes=10**8), body=r.body, media_type="x",
-                          retrieved_at=r.retrieved_at, response_metadata={}, request_fingerprint="x",
-                          origin="test_fixture")
+    return RawAcquisition(
+        item=FetchItem(key=key, url=url, max_bytes=10**8),
+        body=r.body,
+        media_type="x",
+        retrieved_at=r.retrieved_at,
+        response_metadata={},
+        request_fingerprint="x",
+        origin="test_fixture",
+    )
 
 
 @pytest.fixture(scope="module")
@@ -80,17 +86,26 @@ def test_resolver_uses_qids_and_code_entities(crosswalk: G.StateCodeCrosswalk) -
 @pytest.fixture(scope="module")
 def ucdp(crosswalk: G.StateCodeCrosswalk) -> dict[str, Any]:
     raws = {it.key: _raw("atlas.ucdp", it.url, it.key) for it in U.fetch_items()}
-    return U.build(raws, crosswalk=crosswalk, qid_for_iso3={"FRA": "Q142", "IND": "Q668", "PAK": "Q843"},
-                   countrycode_sha256="c" * 64, strict=False)
+    return U.build(
+        raws,
+        crosswalk=crosswalk,
+        qid_for_iso3={"FRA": "Q142", "IND": "Q668", "PAK": "Q843"},
+        countrycode_sha256="c" * 64,
+        strict=False,
+    )
 
 
 def test_ucdp_orgvio_cy_values_verbatim(ucdp: dict[str, Any]) -> None:
     rows = ucdp["orgvio_cy"]
-    f, unmapped = validate_atlas_frame(G.atlas_frame(rows), source="ucdp", dataset="orgvio_cy",
-                                       raw_sha256s=[ucdp["shas"]["orgvio_cy"]])
+    f, unmapped = validate_atlas_frame(
+        G.atlas_frame(rows), source="ucdp", dataset="orgvio_cy", raw_sha256s=[ucdp["shas"]["orgvio_cy"]]
+    )
     assert f.height == len(rows) > 100
-    afg89 = [r for r in rows if r["iso3"] == "AFG" and r["period_start"] == date(1989, 1, 1)
-             and r["indicator"] == "sb_total_deaths_best"]
+    afg89 = [
+        r
+        for r in rows
+        if r["iso3"] == "AFG" and r["period_start"] == date(1989, 1, 1) and r["indicator"] == "sb_total_deaths_best"
+    ]
     assert [r["value"] for r in afg89] == ["5174"]  # CSV row: Afghanistan 1989 sb_total_deaths_best
     ussr = [r for r in rows if r["provider_geo"] == "gw:365" and r["period_start"].year == 1989]
     assert ussr and all(r["iso3"] is None and r["entity_qid"] == "Q15180" for r in ussr)
@@ -104,8 +119,13 @@ def test_ucdp_orgvio_cy_values_verbatim(ucdp: dict[str, Any]) -> None:
 def test_ucdp_acd_counts_are_labelled_computed(ucdp: dict[str, Any]) -> None:
     rows = ucdp["acd_cy"]
     validate_atlas_frame(G.atlas_frame(rows), source="ucdp", dataset="acd_cy", raw_sha256s=[ucdp["shas"]["acd"]])
-    fra = [r for r in rows if r["iso3"] == "FRA" and r["indicator"] == "acd_conflicts_primary_party"
-           and r["period_start"] == date(1956, 1, 1)]
+    fra = [
+        r
+        for r in rows
+        if r["iso3"] == "FRA"
+        and r["indicator"] == "acd_conflicts_primary_party"
+        and r["period_start"] == date(1956, 1, 1)
+    ]
     assert len(fra) == 1
     flags = json.loads(fra[0]["flags"])
     assert "computed_from" in flags and set(flags["conflict_ids"]) >= {"244", "246"}
@@ -125,7 +145,7 @@ def test_ucdp_kg_records(ucdp: dict[str, Any]) -> None:
     assert ent["ucdp:actor:403"].labels["en"] == "FLN"
     # every statement points at its raw file and row(s)
     assert all(s.raw_sha256 in ucdp["shas"].values() or s.raw_sha256 == "c" * 64 for s in sts)
-    ents, msts = G.to_kg_model(ucdp["entities"], sts, source_key=U.KG_SOURCE_KEY, source_revision="ucdp-26.1")
+    _ents, msts = G.to_kg_model(ucdp["entities"], sts, source_key=U.KG_SOURCE_KEY, source_revision="ucdp-26.1")
     assert len(msts) == len(sts) and all(m.statement_id for m in msts)
     assert set(by) <= set(G.GEOPOL_PROPERTIES)
 
@@ -143,8 +163,13 @@ def test_ucdp_truncation_guard() -> None:
 @pytest.fixture(scope="module")
 def unga(crosswalk: G.StateCodeCrosswalk) -> dict[str, Any]:
     raws = {it.key: _raw("atlas.unga_votes", it.url, it.key) for it in V.fetch_items()}
-    return V.build(raws, crosswalk=crosswalk, qid_for_iso3={"USA": "Q30", "FRA": "Q142", "GBR": "Q145"},
-                   countrycode_sha256="c" * 64, strict=False)
+    return V.build(
+        raws,
+        crosswalk=crosswalk,
+        qid_for_iso3={"USA": "Q30", "FRA": "Q142", "GBR": "Q145"},
+        countrycode_sha256="c" * 64,
+        strict=False,
+    )
 
 
 def test_unga_tables_validate(unga: dict[str, Any]) -> None:
@@ -170,13 +195,26 @@ def test_unga_provider_defects_are_flagged_not_counted(unga: dict[str, Any]) -> 
 
 def test_unga_shares_recomputed_from_votes(unga: dict[str, Any]) -> None:
     """share_yes equals yes/(yes+no+abstain) over the clean vote cells of the same country/issue/decade."""
-    co_rcids = {json.loads(r["flags"])["rcid"] for r in unga["rollcalls"] if "co" in json.loads(r["flags"])["issue_codes"]}
-    votes = [r for r in unga["votes"] if r["iso3"] == "USA" and r["period_start"].year // 10 == 196
-             and json.loads(r["flags"])["rcid"] in co_rcids and r["value_text"] in ("yes", "no", "abstain")]
+    co_rcids = {
+        json.loads(r["flags"])["rcid"] for r in unga["rollcalls"] if "co" in json.loads(r["flags"])["issue_codes"]
+    }
+    votes = [
+        r
+        for r in unga["votes"]
+        if r["iso3"] == "USA"
+        and r["period_start"].year // 10 == 196
+        and json.loads(r["flags"])["rcid"] in co_rcids
+        and r["value_text"] in ("yes", "no", "abstain")
+    ]
     assert votes
     n_yes = sum(r["value_text"] == "yes" for r in votes)
-    share = [r for r in unga["shares"] if r["iso3"] == "USA" and r["indicator"] == "share_yes|issue=co|grain=decade"
-             and r["period_start"] == date(1960, 1, 1)]
+    share = [
+        r
+        for r in unga["shares"]
+        if r["iso3"] == "USA"
+        and r["indicator"] == "share_yes|issue=co|grain=decade"
+        and r["period_start"] == date(1960, 1, 1)
+    ]
     assert len(share) == 1
     assert abs(float(share[0]["value"]) - n_yes / len(votes)) < 1e-6
     flags = json.loads(share[0]["flags"])
@@ -210,8 +248,7 @@ def test_unga_licence_and_checksum_drift() -> None:
 @pytest.fixture(scope="module")
 def cshapes(crosswalk: G.StateCodeCrosswalk) -> dict[str, Any]:
     body = _raw("atlas.cshapes", CS.PACKAGE_URL).body
-    return CS.build(body, crosswalk=crosswalk, qid_for_iso3={"FRA": "Q142"}, countrycode_sha256="c" * 64,
-                    strict=False)
+    return CS.build(body, crosswalk=crosswalk, qid_for_iso3={"FRA": "Q142"}, countrycode_sha256="c" * 64, strict=False)
 
 
 def test_cshapes_atlas_and_polygons(cshapes: dict[str, Any]) -> None:
@@ -232,8 +269,9 @@ def test_cshapes_kg_colonial_rule_and_borders(cshapes: dict[str, Any]) -> None:
     ruled = [s for s in sts if s.subject == "cshapes:gw:615" and s.property == "cshapes:ruled_by"]
     assert ruled and {s.object_qid for s in ruled} == {"Q142"}
     assert max(s.end for s in ruled) < "1963"  # Algeria independent in 1962
-    borders = {(s.subject, s.object_qid) for s in sts if s.property == "cshapes:shares_border_with"
-               and s.end >= "2019-12-31"}
+    borders = {
+        (s.subject, s.object_qid) for s in sts if s.property == "cshapes:shares_border_with" and s.end >= "2019-12-31"
+    }
     assert ("cshapes:gw:211", "cshapes:gw:220") in borders  # Belgium - France
     assert ("cshapes:gw:220", "cshapes:gw:230") in borders  # France - Spain
     assert ("cshapes:gw:220", "cshapes:gw:615") not in borders  # no land border across the Mediterranean
@@ -241,15 +279,32 @@ def test_cshapes_kg_colonial_rule_and_borders(cshapes: dict[str, Any]) -> None:
 
 def test_cshapes_adjacency_merges_consecutive_periods() -> None:
     def pol(code: int, fid: int, s: str, e: str, arcs: set[int]) -> CS.Polity:
-        return CS.Polity("gw", code, fid, str(code), date.fromisoformat(s), date.fromisoformat(e), "independent",
-                         None, None, None, None, 1, frozenset(arcs), {}, fid)
+        return CS.Polity(
+            "gw",
+            code,
+            fid,
+            str(code),
+            date.fromisoformat(s),
+            date.fromisoformat(e),
+            "independent",
+            None,
+            None,
+            None,
+            None,
+            1,
+            frozenset(arcs),
+            {},
+            fid,
+        )
 
-    ps = [pol(1, 1, "1900-01-01", "1949-12-31", {1}), pol(1, 2, "1950-01-01", "2000-12-31", {1}),
-          pol(2, 3, "1900-01-01", "2000-12-31", {1}), pol(3, 4, "1990-01-01", "2000-12-31", {9})]
-    adj = CS.adjacency(ps)
-    assert [(a, b, lo.isoformat(), hi.isoformat()) for a, b, lo, hi, _f in adj] == [
-        (1, 2, "1900-01-01", "2000-12-31")
+    ps = [
+        pol(1, 1, "1900-01-01", "1949-12-31", {1}),
+        pol(1, 2, "1950-01-01", "2000-12-31", {1}),
+        pol(2, 3, "1900-01-01", "2000-12-31", {1}),
+        pol(3, 4, "1990-01-01", "2000-12-31", {9}),
     ]
+    adj = CS.adjacency(ps)
+    assert [(a, b, lo.isoformat(), hi.isoformat()) for a, b, lo, hi, _f in adj] == [(1, 2, "1900-01-01", "2000-12-31")]
 
 
 def test_fixture_manifests_are_hash_pinned() -> None:

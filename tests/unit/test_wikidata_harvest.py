@@ -6,6 +6,7 @@ manifest.json). Synthetic responses are used for protocol edge cases (429, maxla
 
 from __future__ import annotations
 
+import hashlib
 import json
 from datetime import UTC, datetime
 from pathlib import Path
@@ -177,8 +178,8 @@ async def test_429_retry_after_is_honoured_and_archived(tmp_path: Path) -> None:
 
     store = FilesystemArtifactStore(tmp_path / "objects")
     assert gzip.decompress(store.get("raw", res.raw_sha256)) == body  # deterministic gzip of the provider bytes
-    assert index[1]["body_sha256"] == __import__("hashlib").sha256(body).hexdigest()
-    q = [e for e in index if e["kind"] == "sparql_query"][0]
+    assert index[1]["body_sha256"] == hashlib.sha256(body).hexdigest()
+    q = next(e for e in index if e["kind"] == "sparql_query")
     assert gzip.decompress(store.get("raw", q["sha256"])).decode().startswith("SELECT ?item")
 
 
@@ -207,7 +208,7 @@ async def test_maxlag_is_backed_off_and_entities_parsed(tmp_path: Path) -> None:
     assert c.stats.throttled == 1 and res.requests == 1
     url = http.calls[-1][0]
     assert "ids=Q404|Q17167" in url and "languages=fr|en|es|pt|ar|zh|ru|de" in url and "maxlag=5" in url
-    assert "props=claims|labels|descriptions|aliases|sitelinks" in url
+    assert "props=info|claims|labels|descriptions|aliases|sitelinks" in url  # info -> lastrevid
 
 
 async def test_entities_are_requested_50_per_call(tmp_path: Path) -> None:
@@ -280,8 +281,11 @@ def test_recorded_fixture_extracts() -> None:
             e = wd.extract_entity(raw, allow, raw_sha256=m["sha256"], retrieved_at=NOW)
             assert e.labels.get("en")
             assert all(s.property in allow and s.rank in ("preferred", "normal") for s in e.statements)
+            assert e.lastrevid and e.statements  # props=info -> every snapshot has its revision
             for s in e.statements:
-                hv.to_kg_statement(s)  # converts without error
+                assert s.source_revision == e.lastrevid
+                kg = hv.to_kg_statement(s)
+                assert kg.source_revision == str(e.lastrevid) and kg.statement_id
 
 
 # --------------------------------------------------------------------------- specs
@@ -361,7 +365,7 @@ def _router(rows: int, entities_seen: list[list[str]]) -> Any:
         for i in ids:
             e = entity_json()
             e["id"] = i
-            if "props=claims" not in url:
+            if "|claims|" not in url:
                 e.pop("claims")
             ents[i] = e
         return 200, json.dumps({"entities": ents}).encode(), {}
@@ -427,6 +431,9 @@ async def test_statement_rows(tmp_path: Path) -> None:
                        "precision_inferred": True}
     kg = hv.to_kg_statement(s)
     assert kg.start.iso.startswith("+1789-04-30") and kg.start.precision == 11 and kg.object_qid == "Q30461"
+    # WDQS gives no entity revision: explicitly unknown, versioned by retrieval time
+    assert kg.source_revision == "wdqs@2026-10-15T12:00:00Z"
+    assert kg.qualifiers["_revision"]["wikidata_revision"] == "unknown"
     rep = await h.run_spec(spec)
     assert rep.status == "done" and rep.statements == 1 and rep.entities_labels == 1
 

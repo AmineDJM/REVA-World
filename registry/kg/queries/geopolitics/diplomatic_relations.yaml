@@ -1,0 +1,22 @@
+id: geopolitics.diplomatic_relations
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Diplomatic relations (P530) of the 250 crosswalk countries, with start/end qualifiers when Wikidata has them
+  (most P530 statements are undated: an undated statement says "has diplomatic relations" without a period).
+  Objects get a label snapshot.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?other ?rank ?start ?end WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P530 ?statement .
+    ?statement ps:P530 ?other ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: country, property: P530, object: other, statement: statement, rank: rank, start: start, end: end}
+split: {by: values, source: countries, chunk_size: 25}
+max_rows: 60000
+expand_hops: 1

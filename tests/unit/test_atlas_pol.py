@@ -92,8 +92,11 @@ def vdem_frames(vdem_raws):
     data = vdem.read_vdem(vdem_raws["vdemdata.vdem"].body)
     return data, {
         ds: validate_atlas_frame(
-            vdem.build_frame(data, ds, raw_sha256=SHA, release="16.0", qids={"BVR": "Q154195"}),
-            source="vdem", dataset=ds, raw_sha256s=[SHA], geo_scheme="vdem",
+            vdem.build_frame(data, ds, raw_sha256=SHA, release="16.0", qids=vdem.vdem_qids()),
+            source="vdem",
+            dataset=ds,
+            raw_sha256s=[SHA],
+            geo_scheme="vdem",
         )
         for ds in vdem.DATASETS
     }
@@ -120,8 +123,9 @@ def test_vdem_values_flags_and_geo(vdem_frames):
     ind, _ = frames["indices"]
 
     def cell(geo, var, year):
-        f = ind.filter((pl.col("provider_geo") == geo) & (pl.col("indicator") == var)
-                       & (pl.col("period_start").dt.year() == year))
+        f = ind.filter(
+            (pl.col("provider_geo") == geo) & (pl.col("indicator") == var) & (pl.col("period_start").dt.year() == year)
+        )
         return f.to_dicts()
 
     fr = cell("FRA", "v2x_polyarchy", 2024)
@@ -133,22 +137,29 @@ def test_vdem_values_flags_and_geo(vdem_frames):
     de = cell("DEU", "v2x_polyarchy", 1800)[0]
     assert de["iso3"] == "DEU" and "Prussia" in json.loads(de["flags"])["vdem_histname"]
     assert cell("PSE", "v2x_polyarchy", 2024)[0]["iso3"] is None  # West Bank only: not the State of Palestine
+    assert de["entity_qid"] == "Q27306"  # V-Dem histname "Kingdom of Prussia" -> Wikidata Kingdom of Prussia
+    assert cell("DEU", "v2x_polyarchy", 2024)[0]["entity_qid"] is None  # crosswalk country: linked via iso3
     bvr = cell("BVR", "v2x_polyarchy", 1800)[0]
-    assert bvr["iso3"] is None and bvr["entity_qid"] == "Q154195"
+    assert bvr["iso3"] is None and bvr["entity_qid"] is None  # 1800 = Electorate of Bavaria: not mapped
+    assert cell("PSE", "v2x_polyarchy", 2024)[0]["entity_qid"] == "Q36678"  # West Bank
     assert cell("TWN", "v2x_polyarchy", 2024)[0]["iso3"] is None
     assert cell("USA", "v2x_regime", 1800) == []  # RoW starts 1900: no invented cell
     acc = cell("FRA", "v2x_accountability", 2024)[0]
-    assert acc["unit"].startswith("V-Dem latent") and cell("FRA", "v2x_accountability_osp", 2024)[0]["unit"].startswith("index 0-1")
+    assert acc["unit"].startswith("V-Dem latent") and cell("FRA", "v2x_accountability_osp", 2024)[0]["unit"].startswith(
+        "index 0-1"
+    )
 
 
 def test_vdem_institutions_text_and_categories(vdem_frames):
     _, frames = vdem_frames
     inst, unmapped = frames["institutions"]
-    hos = inst.filter((pl.col("iso3") == "USA") & (pl.col("indicator") == "v2exnamhos")
-                      & (pl.col("period_start").dt.year() == 1789))
+    hos = inst.filter(
+        (pl.col("iso3") == "USA") & (pl.col("indicator") == "v2exnamhos") & (pl.col("period_start").dt.year() == 1789)
+    )
     assert hos["value_text"].to_list() == ["George Washington"] and hos["value"].to_list() == [None]
-    bicam = inst.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2lgbicam")
-                        & (pl.col("period_start").dt.year() == 2024))
+    bicam = inst.filter(
+        (pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2lgbicam") & (pl.col("period_start").dt.year() == 2024)
+    )
     assert bicam.select("value", "value_text").row(0) == ("2", "2 or more chambers")
     assert {u["provider_geo"] for u in unmapped} == {"PSE", "BVR", "TWN"}
     lib, _ = frames["liberties"]
@@ -173,16 +184,18 @@ def regime_raws():
 
 
 def test_dataverse_record_checks(regime_raws):
-    meta = reg.check_record(regime_raws["lied.record"].body, file_id=reg.LIED_FILE_ID, filename="x",
-                            payload=regime_raws["lied.file"].body)
+    meta = reg.check_record(
+        regime_raws["lied.record"].body, file_id=reg.LIED_FILE_ID, filename="x", payload=regime_raws["lied.file"].body
+    )
     assert meta["licence"] == "CC0 1.0"
     with pytest.raises(SourceResponseError, match="does not match"):
         reg.check_record(regime_raws["lied.record"].body, file_id=reg.LIED_FILE_ID, filename="x", payload=b"other")
     doc = json.loads(regime_raws["bmr.record"].body)
     doc["data"]["latestVersion"]["license"]["name"] = "CC BY-NC 4.0"
     with pytest.raises(SourceResponseError, match="licence"):
-        reg.check_record(json.dumps(doc).encode(), file_id=reg.BMR_FILE_ID, filename="x",
-                         payload=regime_raws["bmr.file"].body)
+        reg.check_record(
+            json.dumps(doc).encode(), file_id=reg.BMR_FILE_ID, filename="x", payload=regime_raws["bmr.file"].body
+        )
 
 
 def test_lied_frame_geo_and_labels(regime_raws):
@@ -192,16 +205,28 @@ def test_lied_frame_geo_and_labels(regime_raws):
     table = wb.table(next(iter(wb.sheets)))
     header = table[0]
     rows = [dict(zip(header, r, strict=False), _row=i) for i, r in enumerate(table[1:], start=2)]
-    f, unmapped = validate_atlas_frame(reg.lied_frame(rows, raw_sha256=SHA), source="lied", dataset="lied",
-                                       raw_sha256s=[SHA], geo_scheme="lied")
+    f, unmapped = validate_atlas_frame(
+        reg.lied_frame(rows, raw_sha256=SHA, qids=vdem.qid_index()),
+        source="lied",
+        dataset="lied",
+        raw_sha256s=[SHA],
+        geo_scheme="lied",
+    )
     geo = dict(zip(f["provider_geo"], f["iso3"], strict=True))
     assert geo["Prussia|vdem=77"] == "DEU" and geo["Germany, West|vdem=77"] == "DEU"
     assert geo["Vietnam|vdem=34"] == "VNM" and geo["Vietnam, North|vdem=34"] == "VNM"
     assert geo["Brunei|vdem=151"] == "BRN"
+    q = dict(zip(zip(f["provider_geo"], f["period_start"].dt.year()), f["entity_qid"], strict=True))
+    assert q[("Prussia|vdem=77", 1800)] == "Q27306" and q[("Bavaria|vdem=350", 1850)] == "Q154195"
+    assert q[("Vietnam, North|vdem=34", 1960)] == "Q172640"
     assert {"Vietnam|vdem=35", "Bavaria|vdem=350", "Taiwan|vdem=48", "Palestine/West Bank|vdem=128"} <= {
-        u["provider_geo"] for u in unmapped}
-    fr = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "lexical_index")
-                  & (pl.col("period_start").dt.year() == 2024))
+        u["provider_geo"] for u in unmapped
+    }
+    fr = f.filter(
+        (pl.col("iso3") == "FRA")
+        & (pl.col("indicator") == "lexical_index")
+        & (pl.col("period_start").dt.year() == 2024)
+    )
     assert fr.select("value", "value_text").row(0) == ("6", "Electoral democracy")
     assert json.loads(fr["flags"][0])["reference_date"] == "2024-12-31"
     # no DEU year twice (Prussia / Germany / West Germany are consecutive lineages)
@@ -219,8 +244,13 @@ def test_partial_files_are_refused(regime_raws):
 def test_atlas_sources_are_declared():
     from reva.atlas.sources import discover
 
-    found, errors = discover(["reva.adapters.connectors.atlas_vdem", "reva.adapters.connectors.atlas_regimes",
-                              "reva.adapters.connectors.atlas_ipu"])
+    found, errors = discover(
+        [
+            "reva.adapters.connectors.atlas_vdem",
+            "reva.adapters.connectors.atlas_regimes",
+            "reva.adapters.connectors.atlas_ipu",
+        ]
+    )
     assert errors == []
     assert set(found) == {"atlas.vdem", "atlas.lied", "atlas.bmr", "atlas.ipu"}
     assert found["atlas.vdem"].spec.datasets == vdem.DATASETS
@@ -235,13 +265,23 @@ def test_bmr_frame(regime_raws):
     import io
 
     rows = [dict(r, _row=i) for i, r in enumerate(csv.DictReader(io.StringIO(text)), start=2)]
-    f, unmapped = validate_atlas_frame(reg.bmr_frame(rows, raw_sha256=SHA), source="bmr", dataset="bmr",
-                                       raw_sha256s=[SHA], geo_scheme="bmr")
+    f, unmapped = validate_atlas_frame(
+        reg.bmr_frame(rows, raw_sha256=SHA, qids=vdem.qid_index()),
+        source="bmr",
+        dataset="bmr",
+        raw_sha256s=[SHA],
+        geo_scheme="bmr",
+    )
     geo = dict(zip(f["provider_geo"], f["iso3"], strict=True))
     assert geo["2"] == "USA" and geo["255"] == "DEU" and geo["490"] == "COD" and geo["365"] == "RUS"
     assert {u["provider_geo"] for u in unmapped} == {"260", "364", "713"}  # West Germany, USSR, Taiwan
-    fr = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "democracy")
-                  & (pl.col("period_start").dt.year().is_in([1870, 1871])))
+    q = dict(zip(f["provider_geo"], f["entity_qid"], strict=True))
+    assert (q["260"], q["364"], q["713"], q["2"]) == ("Q713750", "Q15180", "Q865", None)
+    fr = f.filter(
+        (pl.col("iso3") == "FRA")
+        & (pl.col("indicator") == "democracy")
+        & (pl.col("period_start").dt.year().is_in([1870, 1871]))
+    )
     assert fr.sort("period_start")["value"].to_list() == ["0", "1"]  # v4.0: France democratises in 1871
     omitted = f.filter((pl.col("indicator") == "democracy_omitteddata") & pl.col("value").is_null())
     assert omitted.height > 0
@@ -271,10 +311,12 @@ def test_ipu_parline_frame(ipu_data):
     raws, d = ipu_data
     retrieved = ipu.date_accessed(raws["ipu.chambers"].body)
     shas = {k: SHA for k in ("chambers", "parliaments", "countries")}
-    frame, skipped = ipu.parline_frame(d["chambers"], d["parliaments"], d["countries"], raw=shas, retrieved=retrieved)
+    frame, _skipped = ipu.parline_frame(d["chambers"], d["parliaments"], d["countries"], raw=shas, retrieved=retrieved)
     f, unmapped = validate_atlas_frame(frame, source="ipu", dataset="parline", raw_sha256s=[SHA], geo_scheme="iso2")
     assert unmapped == [] and set(f["iso3"].unique()) == {"FRA", "NAM"}  # "NA" is Namibia, never null
-    ye = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "current_women_percent|chamber=lower|at=year_end"))
+    ye = f.filter(
+        (pl.col("iso3") == "FRA") & (pl.col("indicator") == "current_women_percent|chamber=lower|at=year_end")
+    )
     y2024 = ye.filter(pl.col("period_start").dt.year() == 2024).to_dicts()[0]
     assert y2024["value"] == "36.173913043478265"
     flags = json.loads(y2024["flags"])
@@ -294,9 +336,16 @@ def test_ipu_elections_frame(ipu_data):
     frame, _ = ipu.elections_frame(d["elections"], raw_sha256=SHA, retrieved=retrieved)
     f, unmapped = validate_atlas_frame(frame, source="ipu", dataset="elections", raw_sha256s=[SHA], geo_scheme="iso2")
     assert unmapped == []
-    t = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "turnout|chamber=lower")
-                 & (pl.col("period_start").dt.year() == 2024)).to_dicts()[0]
-    assert t["value"] == "66.7120334091984" and str(t["period_start"]) == "2024-06-30" and str(t["period_end"]) == "2024-07-08"
+    t = f.filter(
+        (pl.col("iso3") == "FRA")
+        & (pl.col("indicator") == "turnout|chamber=lower")
+        & (pl.col("period_start").dt.year() == 2024)
+    ).to_dicts()[0]
+    assert (
+        t["value"] == "66.7120334091984"
+        and str(t["period_start"]) == "2024-06-30"
+        and str(t["period_end"]) == "2024-07-08"
+    )
     dates = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "election_date|chamber=lower"))
     assert "2024-06-30/2024-07-07" in dates["value_text"].to_list()
 
@@ -310,8 +359,13 @@ def test_politics_catalog_series_exist(vdem_frames, ipu_data):
     planned = {(ds, s.column) for ds in vdem.DATASETS for s in vdem.plan_series(data.all_columns, ds)}
     raws, d = ipu_data
     retrieved = ipu.date_accessed(raws["ipu.chambers"].body)
-    pf, _ = ipu.parline_frame(d["chambers"], d["parliaments"], d["countries"],
-                              raw={k: SHA for k in ("chambers", "parliaments", "countries")}, retrieved=retrieved)
+    pf, _ = ipu.parline_frame(
+        d["chambers"],
+        d["parliaments"],
+        d["countries"],
+        raw={k: SHA for k in ("chambers", "parliaments", "countries")},
+        retrieved=retrieved,
+    )
     ef, _ = ipu.elections_frame(d["elections"], raw_sha256=SHA, retrieved=retrieved)
     ipu_ind = {("parline", i) for i in pf["indicator"].unique()} | {("elections", i) for i in ef["indicator"].unique()}
     for c in concepts:
@@ -343,7 +397,15 @@ def test_qid_crosswalk_shape():
         pytest.skip("registry/entities/vdem_qids.json not built")
     doc = json.loads(path.read_text())
     assert doc["review_status"].startswith("agent_mapped")
+    used = set()
     for u in doc["units"]:
         assert u["qid"] is None or (u["qid"].startswith("Q") and u["qid"][1:].isdigit())
         assert u["method"]
+        for p in u["periods"]:
+            assert p["from"] <= p["to"]
+            if p["qid"]:
+                assert p["method"]
+                used.add(p["qid"])
+    used |= {o["qid"] for o in doc["other_units"] if o["qid"]} | {u["qid"] for u in doc["units"] if u["qid"]}
+    assert used <= set(doc["evidence"])  # every QID carries its verification evidence
     assert len(doc["units"]) >= 202

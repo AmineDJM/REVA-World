@@ -35,8 +35,18 @@ RETRIEVED = "2026-10-15T22:08:36+00:00"
 
 VDEM_UNITS = ("FRA", "DEU", "PSE", "BVR", "TWN", "USA")
 VDEM_YEARS = (1789, 1800, 1871, 1900, 1945, 1990, 2024, 2025)
-LIED_KEYS = ("France", "Prussia", "Germany", "Germany, West", "Vietnam", "Vietnam, North", "Bavaria", "Taiwan",
-             "Palestine/West Bank", "Brunei")
+LIED_KEYS = (
+    "France",
+    "Prussia",
+    "Germany",
+    "Germany, West",
+    "Vietnam",
+    "Vietnam, North",
+    "Bavaria",
+    "Taiwan",
+    "Palestine/West Bank",
+    "Brunei",
+)
 BMR_CCODES = ("2", "220", "255", "260", "364", "365", "490", "713")
 IPU_PARLIAMENTS = ("FR", "NA")  # FR: bicameral, history since 1945; NA (Namibia): the code "NA" must not become null
 
@@ -55,8 +65,10 @@ def xlsx(rows: list[list[str | None]]) -> bytes:
             s = chr(65 + r) + s
         return s
 
-    sheet = ['<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
-             '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>']
+    sheet = [
+        '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>',
+        '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetData>',
+    ]
     for r, row in enumerate(rows, start=1):
         cells = []
         for c, v in enumerate(row):
@@ -174,11 +186,20 @@ def write(connector: str, entries: list[dict[str, Any]]) -> None:
         fp = _fixture_fingerprint(e["url"])
         fname = fp[:16] + e["ext"]
         (d / fname).write_bytes(e["body"])
-        manifest.append({
-            "request_fingerprint": fp, "url": e["url"], "file": fname, "sha256": _sha(e["body"]), "status": 200,
-            "headers": {"content-type": e["ctype"]}, "retrieved_at": RETRIEVED, "licence": e["licence"],
-            "derived_from_sha256": e.get("orig"), "note": e.get("note", "live bytes, unchanged"),
-        })
+        manifest.append(
+            {
+                "request_fingerprint": fp,
+                "url": e["url"],
+                "file": fname,
+                "sha256": _sha(e["body"]),
+                "status": 200,
+                "headers": {"content-type": e["ctype"]},
+                "retrieved_at": RETRIEVED,
+                "licence": e["licence"],
+                "derived_from_sha256": e.get("orig"),
+                "note": e.get("note", "live bytes, unchanged"),
+            }
+        )
     (d / "manifest.json").write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n")
 
 
@@ -189,41 +210,97 @@ def main(raw_dir: str) -> None:
     vd = (r / "vdem" / "vdem.RData").read_bytes()
     items = {i.key: i.url for i in atlas_vdem.fetch_items()}
     sub = derive_vdem(vd)
-    write("atlas.vdem", [
-        {"url": items["vdemdata.description"], "body": (r / "vdem" / "DESCRIPTION").read_bytes(), "ext": ".txt",
-         "ctype": "text/plain; charset=utf-8", "licence": "GPL-3 (package metadata)"},
-        {"url": items["vdemdata.codebook"], "body": (r / "vdem" / "codebook.RData").read_bytes(), "ext": ".RData",
-         "ctype": "application/octet-stream", "licence": "CC-BY-SA-4.0"},
-        {"url": items["vdemdata.vdem"], "body": sub, "ext": ".RData", "ctype": "application/octet-stream",
-         "licence": "CC-BY-SA-4.0", "orig": _sha(vd),
-         "note": f"subset of vdem.RData v16: units {VDEM_UNITS} x years {VDEM_YEARS}, every column the connector reads; values bit-identical"},
-    ])
+    write(
+        "atlas.vdem",
+        [
+            {
+                "url": items["vdemdata.description"],
+                "body": (r / "vdem" / "DESCRIPTION").read_bytes(),
+                "ext": ".txt",
+                "ctype": "text/plain; charset=utf-8",
+                "licence": "GPL-3 (package metadata)",
+            },
+            {
+                "url": items["vdemdata.codebook"],
+                "body": (r / "vdem" / "codebook.RData").read_bytes(),
+                "ext": ".RData",
+                "ctype": "application/octet-stream",
+                "licence": "CC-BY-SA-4.0",
+            },
+            {
+                "url": items["vdemdata.vdem"],
+                "body": sub,
+                "ext": ".RData",
+                "ctype": "application/octet-stream",
+                "licence": "CC-BY-SA-4.0",
+                "orig": _sha(vd),
+                "note": f"subset of vdem.RData v16: units {VDEM_UNITS} x years {VDEM_YEARS}, every column the connector reads; values bit-identical",
+            },
+        ],
+    )
     items = {i.key: i.url for w in ("lied", "bmr") for i in atlas_regimes.fetch_items(w)}
     lied = (r / "dv" / "LIED_6.9.xlsx").read_bytes()
     bmr = (r / "dv" / "democracy-v4.0.csv").read_bytes()
     lsub, bsub = derive_lied(lied), derive_bmr(bmr)
-    write("atlas.lied", [
-        {"url": items["lied.record"], "body": derive_record((r / "dv" / "lied_record.json").read_bytes(),
-                                                            atlas_regimes.LIED_FILE_ID, lsub),
-         "ext": ".json", "ctype": "application/json", "licence": "CC0-1.0", "note": "real record; file MD5 replaced by the subset's"},
-        {"url": items["lied.file"], "body": lsub, "ext": ".xlsx",
-         "ctype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "licence": "CC0-1.0",
-         "orig": _sha(lied), "note": f"subset of LIED_6.9.xlsx: header + rows of {LIED_KEYS}; exact cell text"},
-    ])
-    write("atlas.bmr", [
-        {"url": items["bmr.record"], "body": derive_record((r / "dv" / "bmr_record.json").read_bytes(),
-                                                           atlas_regimes.BMR_FILE_ID, bsub),
-         "ext": ".json", "ctype": "application/json", "licence": "CC0-1.0", "note": "real record; file MD5 replaced by the subset's"},
-        {"url": items["bmr.file"], "body": bsub, "ext": ".csv", "ctype": "text/csv", "licence": "CC0-1.0",
-         "orig": _sha(bmr), "note": f"subset of democracy-v4.0.csv: header + rows of ccodes {BMR_CCODES}; lines unchanged"},
-    ])
+    write(
+        "atlas.lied",
+        [
+            {
+                "url": items["lied.record"],
+                "body": derive_record((r / "dv" / "lied_record.json").read_bytes(), atlas_regimes.LIED_FILE_ID, lsub),
+                "ext": ".json",
+                "ctype": "application/json",
+                "licence": "CC0-1.0",
+                "note": "real record; file MD5 replaced by the subset's",
+            },
+            {
+                "url": items["lied.file"],
+                "body": lsub,
+                "ext": ".xlsx",
+                "ctype": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "licence": "CC0-1.0",
+                "orig": _sha(lied),
+                "note": f"subset of LIED_6.9.xlsx: header + rows of {LIED_KEYS}; exact cell text",
+            },
+        ],
+    )
+    write(
+        "atlas.bmr",
+        [
+            {
+                "url": items["bmr.record"],
+                "body": derive_record((r / "dv" / "bmr_record.json").read_bytes(), atlas_regimes.BMR_FILE_ID, bsub),
+                "ext": ".json",
+                "ctype": "application/json",
+                "licence": "CC0-1.0",
+                "note": "real record; file MD5 replaced by the subset's",
+            },
+            {
+                "url": items["bmr.file"],
+                "body": bsub,
+                "ext": ".csv",
+                "ctype": "text/csv",
+                "licence": "CC0-1.0",
+                "orig": _sha(bmr),
+                "note": f"subset of democracy-v4.0.csv: header + rows of ccodes {BMR_CCODES}; lines unchanged",
+            },
+        ],
+    )
     entries = []
     for it in atlas_ipu.fetch_items():
         name = it.key.split(".", 1)[1]
         body = (r.parent / "web" / f"all_{name}.json").read_bytes()
-        entries.append({"url": it.url, "body": derive_ipu(body, name), "ext": ".json", "ctype": "application/json",
-                        "licence": "CC-BY-NC-SA-4.0", "orig": _sha(body),
-                        "note": f"subset of the live response: parliaments {IPU_PARLIAMENTS}; meta.total adjusted"})
+        entries.append(
+            {
+                "url": it.url,
+                "body": derive_ipu(body, name),
+                "ext": ".json",
+                "ctype": "application/json",
+                "licence": "CC-BY-NC-SA-4.0",
+                "orig": _sha(body),
+                "note": f"subset of the live response: parliaments {IPU_PARLIAMENTS}; meta.total adjusted",
+            }
+        )
     write("atlas.ipu", entries)
 
 

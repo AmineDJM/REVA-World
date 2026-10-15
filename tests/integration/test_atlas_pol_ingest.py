@@ -25,8 +25,10 @@ async def _run(db, name: str, dataset: str | None = None) -> dict:
 def _rights(db, key: str) -> dict:
     with db.owner.connect() as c:
         r = c.execute(
-            text("SELECT a.rights FROM evidence.dataset d JOIN meta.artifact a ON a.sha256 = d.artifact_sha256 "
-                 "WHERE d.dataset_key = :k ORDER BY d.recorded_at DESC LIMIT 1"),
+            text(
+                "SELECT a.rights FROM evidence.dataset d JOIN meta.artifact a ON a.sha256 = d.artifact_sha256 "
+                "WHERE d.dataset_key = :k ORDER BY d.recorded_at DESC LIMIT 1"
+            ),
             {"k": key},
         ).scalar_one()
     return r if isinstance(r, dict) else json.loads(r)
@@ -41,8 +43,9 @@ async def test_vdem_ingest_registers_three_tables(db):
         assert t["dataset_key"] == f"atlas.vdem.{ds}" and t["created"] is True
         assert {u["provider_geo"] for u in t["unmapped_provider_geo"]} == {"PSE", "BVR", "TWN"}
     frame = read_atlas_table(db.store, s["tables"]["indices"]["artifact_sha256"])
-    fr = frame.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2x_libdem")
-                      & (pl.col("period_start").dt.year() == 2025))
+    fr = frame.filter(
+        (pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2x_libdem") & (pl.col("period_start").dt.year() == 2025)
+    )
     assert fr.height == 1 and 0 < float(fr["value"][0]) < 1
     assert _rights(db, "atlas.vdem.indices")["licence"] == "CC-BY-SA-4.0"
     again = await _run(db, "atlas.vdem", dataset="indices")

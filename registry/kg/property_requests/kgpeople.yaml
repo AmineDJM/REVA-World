@@ -1,0 +1,19 @@
+# Property requests from KGPEOPLE (registry/kg/queries/people/**). WDHARVEST merges them into
+# registry/kg/properties.yaml. Entries with `role: qualifier` belong in the `qualifiers:` list.
+# (P945 allegiance, also useful for people, is already requested by KGHIST.)
+- property: P241
+  why: >-
+    military branch (person -> army/navy/air force of a state); links military leaders and conquerors to the
+    polity whose forces they served, when no position or citizenship statement does.
+  reva_predicate: military_branch
+  inverse: has_member_of_branch
+  kind: entity
+  label_en: military branch
+  label_fr: composante militaire
+- property: P1686
+  role: qualifier
+  why: >-
+    "for work" qualifier on award received (P166), e.g. the work a Nobel Prize was awarded for; keeps the
+    person -> award -> work link explicit.
+  label_en: for work
+  label_fr: pour l'œuvre

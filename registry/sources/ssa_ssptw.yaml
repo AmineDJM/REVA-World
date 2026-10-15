@@ -1,9 +1,9 @@
 # V3 (agent A-LAW): US Social Security Administration, "Social Security Programs Throughout the World"
-# (SSPTW, with the ISSA). Connector src/reva/adapters/connectors/atlas_ssa_ssptw.py. Status 2026-10-15:
-# www.ssa.gov answers HTTP 403 (Akamai "Access Denied") to this deployment's egress for every path,
-# so the connector reports a typed blocked outcome and extracts nothing.
+# (SSPTW, with the ISSA). Connector src/reva/adapters/connectors/atlas_ssa_ssptw.py: the final (2018-2019)
+# regional editions are archived on ssa.gov as one HTML page per country. Access note 2026-10-15: curl
+# probes got HTTP 403 (Akamai), the REVA SafeHttpClient (httpx via the environment proxy) gets 200.
 source_key: ssa.ssptw
-title: SSA Social Security Programs Throughout the World (regional editions)
+title: SSA Social Security Programs Throughout the World (regional editions, final 2018-2019, archived)
 provider_url: https://www.ssa.gov/policy/docs/progdesc/ssptw/
 lineage_family: ssa_issa_ssptw
 rights:
@@ -13,5 +13,5 @@ rights:
 metadata:
   allowed_hosts: [www.ssa.gov]
   authentication: none
-  cadence: biennial regional editions (Europe, Asia and the Pacific, Africa, the Americas)
-  access_status: blocked_http_403_2026-10-15
+  cadence: none (series archived after the 2018-2019 editions: Europe and Asia 2018, Africa and the Americas 2019)
+  access_note: curl HTTP 403 (Akamai); SafeHttpClient via proxy HTTP 200 (2026-10-15)

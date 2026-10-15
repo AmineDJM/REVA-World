@@ -66,6 +66,11 @@ HANDLERS: dict[str, str] = {
     # --- BTAPI: stored back-tests of V2 models from release-pinned datasets (worker credentials)
     "backtest": "reva.evaluation.backtests:handle_backtest",
     # --- end BTAPI
+    # --- ATLASOPS (V3): one atlas source, budget-metered (reserve/meter/settle inside run_atlas_ingest)
+    "atlas_ingest": "reva.atlas.ingest:handle_atlas_ingest",
+    # --- ATLASOPS: record (or reuse when unchanged) an atlas snapshot of the registered atlas tables
+    "atlas_snapshot": "reva.atlas.snapshot:handle_atlas_snapshot",
+    # --- end ATLASOPS
 }
 
 # Job types that receive the separate reva_sim engine (numerical/simulation

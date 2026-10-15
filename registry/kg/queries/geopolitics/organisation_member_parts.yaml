@@ -1,0 +1,25 @@
+id: geopolitics.organisation_member_parts
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Memberships recorded on the organisation side: "has part(s)" (P527) statements of the seeded organisations
+  whose object is a country / sovereign state / historical country, with start/end dates (several
+  organisations, e.g. G7/G20/BRICS, list members this way rather than on the member's item).
+purpose: statements
+entity_kind: international_organisation
+sparql: |
+  SELECT ?org ?statement ?state ?rank ?start ?end WHERE {
+    VALUES ?org { {{values}} }
+    VALUES ?cls { wd:Q6256 wd:Q3624078 wd:Q3024240 wd:Q48349 }
+    ?org p:P527 ?statement .
+    ?statement ps:P527 ?state ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?state wdt:P31 ?cls .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: org, property: P527, object: state, statement: statement, rank: rank, start: start, end: end}
+split: {by: values, source: "spec:geopolitics.international_organisations", chunk_size: 100}
+depends_on: [geopolitics.international_organisations]
+max_rows: 20000
+expand_hops: 0

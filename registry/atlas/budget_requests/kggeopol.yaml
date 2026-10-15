@@ -1,0 +1,27 @@
+# Budget request from agent KGGEOPOL (UCDP, UNGA votes, CShapes). ATLASCORE merges into
+# registry/policies/budgets.yaml. Every source is a bulk download (whole dataset per request); each run also
+# fetches the countrycode 1.9.0 tarball from CRAN (0.54 MB) for GW/COW -> ISO3. A full refresh of all three
+# sources is 13 requests / ~15 MB. Wikidata traffic of registry/kg/queries/geopolitics/** is executed by
+# WDHARVEST under its own wikidata.* budget (11 specs; ~40-60 WDQS requests + label snapshots per pass).
+agent: KGGEOPOL
+requests:
+  - source_key: ucdp.downloads
+    # ucdp.uu.se/downloads: ACD, BRD (conflict), OrganizedViolenceCY, Actor CSV zips (40-170 KB each)
+    # + cran.r-project.org countrycode tarball. CC BY 4.0. planned_requests 8 (5 used + retries).
+    daily_requests: 16
+    expected_bytes_per_day: 3000000
+    reason: "UCDP 26.1: 4 zips + countrycode per run (5 requests, ~0.9 MB)"
+  - source_key: harvard.dataverse.unvotes
+    # dataverse.harvard.edu: version record (11 KB), UNVotes-1.RData (8.7 MB, redirect to
+    # dvn-cloud-iqss.s3.amazonaws.com), Codebook-1.docx (26 KB) + countrycode. CC0.
+    daily_requests: 12
+    expected_bytes_per_day: 20000000
+    reason: "Voeten UNGA votes v33.0: 3 files + countrycode per run (4 requests, ~9.3 MB)"
+  - source_key: cshapes.cran
+    # cran.r-project.org: cshapes_2.0.tar.gz (4.2 MB) + countrycode. CC BY-NC-SA 4.0 (non-commercial).
+    daily_requests: 8
+    expected_bytes_per_day: 10000000
+    reason: "CShapes 2.0 via the authors' CRAN package: 2 requests per run (~4.7 MB)"
+daily_totals_increase:
+  http_requests_total: "+36"
+  http_bytes_total: "+33_000_000"

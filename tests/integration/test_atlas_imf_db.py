@@ -77,7 +77,9 @@ def test_registered_weo_table_reads_back_with_projection_flags(db, first):
 
 
 def test_one_dataset_run_fetches_only_that_dataset(db, first):
-    out = asyncio.run(run_atlas_ingest(db.settings, db.worker, db.store, m.CONNECTOR_NAME, dataset="er", mode="fixture"))
+    out = asyncio.run(
+        run_atlas_ingest(db.settings, db.worker, db.store, m.CONNECTOR_NAME, dataset="er", mode="fixture")
+    )
     assert out["archived_raw"] == 1 and set(out["summary"]["tables"]) == {"er"}
     assert out["summary"]["tables"]["er"]["created"] is False
 

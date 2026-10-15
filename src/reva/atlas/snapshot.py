@@ -60,6 +60,7 @@ class AtlasSnapshot:
     cutoff: datetime
     tables: tuple[dict[str, Any], ...]
     activity_id: str | None = None
+    reused: bool = False  # create_atlas_snapshot(skip_unchanged=True) returned the previous snapshot
 
     def ref(self) -> dict[str, Any]:
         return {
@@ -83,10 +84,23 @@ def atlas_tables_as_of(conn: Connection, *, cutoff: datetime, origin: str) -> li
     ]
 
 
+def _pins(tables: Any) -> list[tuple[str, str]]:
+    return sorted((str(t["dataset_key"]), str(t["artifact_sha256"])) for t in tables)
+
+
 def create_atlas_snapshot(
-    engine: Engine, store: ArtifactStore, *, origin: str, actor: str = "worker:atlas"
+    engine: Engine,
+    store: ArtifactStore,
+    *,
+    origin: str,
+    actor: str = "worker:atlas",
+    skip_unchanged: bool = False,
 ) -> AtlasSnapshot:
-    """Record a snapshot of every atlas table at the current database time (worker engine)."""
+    """Record a snapshot of every atlas table at the current database time (worker engine).
+
+    ``skip_unchanged`` (scheduled daily snapshots): when the latest recorded snapshot of this
+    origin pins exactly the same table artifacts, nothing is recorded and that snapshot is
+    returned (``AtlasSnapshot.reused``)."""
     from reva.adapters.postgres import repositories as repo
     from reva.evidence.locks import take_evidence_snapshot_lock
 
@@ -96,6 +110,19 @@ def create_atlas_snapshot(
         take_evidence_snapshot_lock(conn)  # waits for in-flight dataset registrations
         cutoff: datetime = conn.execute(text("SELECT clock_timestamp()")).scalar_one()
         tables = atlas_tables_as_of(conn, cutoff=cutoff, origin=origin)
+        if skip_unchanged:
+            ref = latest_snapshot_ref(conn, origin)
+            if ref is not None:
+                prev = _load_manifest(store, ref["sha"])
+                if prev.get("origin") == origin and _pins(prev["tables"]) == _pins(tables):
+                    return AtlasSnapshot(
+                        ref["sha"],
+                        origin,
+                        datetime.fromisoformat(prev["knowledge_cutoff"]),
+                        tuple(prev["tables"]),
+                        ref["activity_id"],
+                        reused=True,
+                    )
         manifest = {
             "schema": SNAPSHOT_SCHEMA,
             "origin": origin,
@@ -176,6 +203,43 @@ def resolve_snapshot(
     )
 
 
+def take_snapshot(
+    settings: Any,
+    engine: Engine,
+    store: ArtifactStore,
+    *,
+    origin: str = "live",
+    warm: bool = False,
+    skip_unchanged: bool = False,
+) -> dict[str, Any]:
+    """Record (or reuse) a snapshot; ``warm`` also builds the local DuckDB query file."""
+    snap = create_atlas_snapshot(engine, store, origin=origin, skip_unchanged=skip_unchanged)
+    out: dict[str, Any] = {**snap.ref(), "reused": snap.reused, "activity_id": snap.activity_id}
+    if warm:
+        from reva.atlas.query import build_snapshot_db
+
+        out["query_file"] = str(build_snapshot_db(snap, store))
+    return out
+
+
+def handle_atlas_snapshot(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
+    """Worker job handler (job kind ``atlas_snapshot``; payload ``{"origin", "warm", "skip_unchanged"}``).
+
+    Scheduled daily after the atlas ingests; with ``skip_unchanged`` (default for jobs) a day
+    without new table versions records nothing."""
+    origin = str(payload.get("origin", "live"))
+    if origin not in ("live", "test_fixture"):
+        raise ValidationProblem("atlas snapshot origin must be live or test_fixture", origin=origin[:32])
+    return take_snapshot(
+        ctx.settings,
+        ctx.worker_engine,
+        ctx.store,
+        origin=origin,
+        warm=bool(payload.get("warm", False)),
+        skip_unchanged=bool(payload.get("skip_unchanged", True)),
+    )
+
+
 def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator entry point
     import argparse
 
@@ -186,14 +250,18 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator 
     ap = argparse.ArgumentParser(description="Record an atlas snapshot (worker credentials).")
     ap.add_argument("--origin", choices=("live", "test_fixture"), default="live")
     ap.add_argument("--warm", action="store_true", help="also build the local DuckDB query file now")
+    ap.add_argument("--skip-unchanged", action="store_true", help="reuse the latest snapshot if no table changed")
     args = ap.parse_args(argv)
     settings = get_settings()
-    snap = create_atlas_snapshot(make_engine("worker", settings), get_store(), origin=args.origin)
-    print(json.dumps(snap.ref(), indent=1))
-    if args.warm:
-        from reva.atlas.query import build_snapshot_db
-
-        print(f"query file: {build_snapshot_db(snap, get_store())}")
+    out = take_snapshot(
+        settings,
+        make_engine("worker", settings),
+        get_store(),
+        origin=args.origin,
+        warm=args.warm,
+        skip_unchanged=args.skip_unchanged,
+    )
+    print(json.dumps(out, indent=1, default=str))
 
 
 if __name__ == "__main__":  # pragma: no cover

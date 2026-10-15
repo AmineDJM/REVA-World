@@ -1,0 +1,1218 @@
+# Food and agriculture (agent A-FAO). Provider-declared concepts, not human-reviewed.
+# Source: FAOSTAT bulk downloads (FAO, CC BY 4.0), atlas tables fao.<domain> registered by
+# src/reva/adapters/connectors/atlas_fao.py. Indicators are '<FAOSTAT item code>|<element code>' (plus
+# '|sex=<code>|src=<code>' where FAOSTAT has those dimensions). wb.wdi_social.* fallbacks name World Bank WDI
+# series that cite FAO as their source (A-WB tables). Multi-year (3-year average) and monthly FAOSTAT cells
+# stay in the per-source tables only (the best-available view uses calendar-year cells).
+domain: food_agriculture
+labels:
+  fr: Alimentation et agriculture
+  en: Food and agriculture
+maintainer: A-FAO
+concepts:
+- id: food_agriculture.food_supply_kcal
+  labels:
+    fr: Disponibilité alimentaire (kcal/personne/jour)
+    en: Food supply (kcal/capita/day)
+  definition: 'FAOSTAT Food Balances, Grand Total (2901), element Food supply (kcal/capita/day) (664): dietary energy available
+    for human consumption per person per day.'
+  unit: kcal per capita per day
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2901|664
+  - fao.fbsh.2901|664
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.protein_supply
+  labels:
+    fr: Disponibilité en protéines (g/personne/jour)
+    en: Protein supply (g/capita/day)
+  definition: FAOSTAT Food Balances, Grand Total (2901), Protein supply quantity (g/capita/day) (674).
+  unit: grams per capita per day
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2901|674
+  - fao.fbsh.2901|674
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.fat_supply
+  labels:
+    fr: Disponibilité en lipides (g/personne/jour)
+    en: Fat supply (g/capita/day)
+  definition: FAOSTAT Food Balances, Grand Total (2901), Fat supply quantity (g/capita/day) (684).
+  unit: grams per capita per day
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2901|684
+  - fao.fbsh.2901|684
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_kcal_animal
+  labels:
+    fr: Disponibilité alimentaire d'origine animale (kcal/personne/jour)
+    en: Food supply from animal products (kcal/capita/day)
+  definition: FAOSTAT Food Balances, Animal Products (2941), Food supply (kcal/capita/day) (664).
+  unit: kcal per capita per day
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2941|664
+  - fao.fbsh.2941|664
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.cereals
+  labels:
+    fr: 'Disponibilité alimentaire : céréales (hors bière) (kg/personne/an)'
+    en: 'Food supply quantity: cereals (excluding beer) (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2905, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2905|645
+  - fao.fbsh.2905|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.meat
+  labels:
+    fr: 'Disponibilité alimentaire : viande (kg/personne/an)'
+    en: 'Food supply quantity: meat (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2943, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2943|645
+  - fao.fbsh.2943|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.milk
+  labels:
+    fr: 'Disponibilité alimentaire : lait (hors beurre) (kg/personne/an)'
+    en: 'Food supply quantity: milk (excluding butter) (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2848, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2848|645
+  - fao.fbsh.2848|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.fish_seafood
+  labels:
+    fr: 'Disponibilité alimentaire : poissons et fruits de mer (kg/personne/an)'
+    en: 'Food supply quantity: fish and seafood (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2960, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2960|645
+  - fao.fbsh.2960|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.vegetables
+  labels:
+    fr: 'Disponibilité alimentaire : légumes (kg/personne/an)'
+    en: 'Food supply quantity: vegetables (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2918, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2918|645
+  - fao.fbsh.2918|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.food_supply_qty.fruits
+  labels:
+    fr: 'Disponibilité alimentaire : fruits (hors vin) (kg/personne/an)'
+    en: 'Food supply quantity: fruits (excluding wine) (kg/capita/year)'
+  definition: FAOSTAT Food Balances, item group 2919, Food supply quantity (kg/capita/yr) (645).
+  unit: kilograms per capita per year
+  domain: food_agriculture
+  subdomain: diet
+  source_order:
+  - fao.fbs.2919|645
+  - fao.fbsh.2919|645
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell.'
+- id: food_agriculture.fish_seafood_production
+  labels:
+    fr: Production de poissons et fruits de mer (bilans alimentaires)
+    en: Fish and seafood production (food balances)
+  definition: 'FAOSTAT Food Balances, Fish, Seafood (2960), Production (5511): capture and aquaculture production of aquatic
+    animals in live-weight-based commodity equivalents, as used in the food balances.'
+  unit: thousand tonnes
+  domain: food_agriculture
+  subdomain: fisheries
+  source_order:
+  - fao.fbs.2960|5511
+  - fao.fbsh.2960|5511
+  provider_declared: true
+  notes: 'FAOSTAT Food Balances: FBS (2010-, new methodology) first, then FBSH (1961-2013, old methodology); FBS wins the
+    overlapping years 2010-2013. FAO warns that the two series are not strictly comparable (methodology break around 2010):
+    read long series with that break in mind. FBS rows are estimated (E) or imputed (I) by FAO: flags.estimate_kind on every
+    cell. FAO FishStat (per-species capture/aquaculture) is the primary fisheries database; FBS aggregates it for the food
+    balance.'
+- id: food_agriculture.dietary_energy_supply_pou
+  labels:
+    fr: Apport énergétique alimentaire (estimation de la sous-alimentation)
+    en: Dietary energy supply used to estimate undernourishment
+  definition: 'FAOSTAT Suite of Food Security Indicators, item 220001 (annual value): dietary energy supply (kcal/cap/day)
+    used in the estimation of the prevalence of undernourishment.'
+  unit: kcal per capita per day
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.fs.220001|6128
+  provider_declared: true
+  notes: Annual value; FAO also publishes 3-year averages (item 22000, multi-year periods in the fao.fs table).
+- id: food_agriculture.food_supply_variability
+  labels:
+    fr: Variabilité de la disponibilité alimentaire par habitant
+    en: Per capita food supply variability
+  definition: 'FAOSTAT Suite of Food Security Indicators, item 21031: per capita food supply variability (kcal/cap/day).'
+  unit: kcal per capita per day
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.fs.21031|6128
+  provider_declared: true
+- id: food_agriculture.undernourishment_prevalence
+  labels:
+    fr: Prévalence de la sous-alimentation (ODD 2.1.1)
+    en: Prevalence of undernourishment (SDG 2.1.1)
+  definition: 'FAO SDG indicator 2.1.1 (SN_ITK_DEFC): percentage of the population whose habitual food consumption is insufficient
+    to provide the dietary energy levels required to maintain a normal active and healthy life.'
+  unit: '%'
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.sdgb.24000|6121
+  - wb.wdi_social.SN.ITK.DEFC.ZS
+  provider_declared: true
+  notes: FAO estimates (flag E); each value is a 3-year average reported for its central year (FAO note per cell). Values
+    below the reporting threshold are text ('<2.5') in value_text, never a number. World Bank WDI fallback (series sourced
+    from FAO) when A-WB's table is present.
+- id: food_agriculture.undernourished_people
+  labels:
+    fr: Nombre de personnes sous-alimentées (ODD 2.1.1)
+    en: Number of undernourished people (SDG 2.1.1)
+  definition: 'FAO SDG indicator 2.1.1 (SN_ITK_DEFCN): number of undernourished people.'
+  unit: million persons
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.sdgb.24001|6132
+  provider_declared: true
+  notes: 3-year average reported for its central year; '<0.1'/'<0.5' thresholds as text.
+- id: food_agriculture.food_insecurity_moderate_severe
+  labels:
+    fr: Prévalence de l'insécurité alimentaire modérée ou grave (FIES, ODD 2.1.2)
+    en: Prevalence of moderate or severe food insecurity (FIES, SDG 2.1.2)
+  definition: 'FAO SDG indicator 2.1.2 (AG_PRD_FIESMS), total population, both sexes, all ages: Food Insecurity Experience
+    Scale.'
+  unit: '%'
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.sdgb.24002-TTT|6121
+  - wb.wdi_social.SN.ITK.MSFI.ZS
+  provider_declared: true
+  notes: 3-year averages reported for the central year; confidence bounds in elements 61211/61212 of the same item. World
+    Bank WDI fallback (series sourced from FAO) when A-WB's table is present.
+- id: food_agriculture.food_insecurity_severe
+  labels:
+    fr: Prévalence de l'insécurité alimentaire grave (FIES, ODD 2.1.2)
+    en: Prevalence of severe food insecurity (FIES, SDG 2.1.2)
+  definition: FAO SDG indicator 2.1.2 (AG_PRD_FIESS), total population, both sexes, all ages.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: food_security
+  source_order:
+  - fao.sdgb.24003-TTT|6121
+  - wb.wdi_social.SN.ITK.SVFI.ZS
+  provider_declared: true
+  notes: 3-year averages reported for the central year. World Bank WDI fallback (series sourced from FAO) when A-WB's table
+    is present.
+- id: food_agriculture.agriculture_orientation_index
+  labels:
+    fr: Indice d'orientation agricole des dépenses publiques (ODD 2.a.1)
+    en: Agriculture orientation index for government expenditures (SDG 2.a.1)
+  definition: 'FAO SDG indicator 2.a.1: agriculture share of government expenditure divided by the agriculture share of GDP.'
+  unit: index (ratio)
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.sdgb.24022|6125
+  provider_declared: true
+- id: food_agriculture.agriculture_share_government_expenditure
+  labels:
+    fr: Part de l'agriculture dans les dépenses publiques (ODD 2.a.1)
+    en: Agriculture share of government expenditure (SDG 2.a.1)
+  definition: 'FAO SDG indicator 2.a.1 component: agriculture, forestry and fishing share of total government expenditure.'
+  unit: '%'
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.sdgb.24020|6121
+  provider_declared: true
+- id: food_agriculture.production.cereals
+  labels:
+    fr: 'Production : céréales'
+    en: 'Production: cereals (primary)'
+  definition: FAOSTAT Production (QCL), item 1717, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1717|5510
+  - wb.wdi_social.AG.PRD.CREL.MT
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent. World Bank WDI fallback (series sourced from FAO) when A-WB''s table is present.'
+- id: food_agriculture.production.wheat
+  labels:
+    fr: 'Production : blé'
+    en: 'Production: wheat'
+  definition: FAOSTAT Production (QCL), item 15, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.15|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.rice
+  labels:
+    fr: 'Production : riz (paddy)'
+    en: 'Production: rice (paddy)'
+  definition: FAOSTAT Production (QCL), item 27, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.27|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.maize
+  labels:
+    fr: 'Production : maïs'
+    en: 'Production: maize (corn)'
+  definition: FAOSTAT Production (QCL), item 56, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.56|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.roots_tubers
+  labels:
+    fr: 'Production : racines et tubercules'
+    en: 'Production: roots and tubers'
+  definition: FAOSTAT Production (QCL), item 1720, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1720|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.pulses
+  labels:
+    fr: 'Production : légumineuses'
+    en: 'Production: pulses'
+  definition: FAOSTAT Production (QCL), item 1726, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1726|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.vegetables
+  labels:
+    fr: 'Production : légumes'
+    en: 'Production: vegetables (primary)'
+  definition: FAOSTAT Production (QCL), item 1735, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1735|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.fruit
+  labels:
+    fr: 'Production : fruits'
+    en: 'Production: fruit (primary)'
+  definition: FAOSTAT Production (QCL), item 1738, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1738|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.sugar_crops
+  labels:
+    fr: 'Production : plantes sucrières'
+    en: 'Production: sugar crops (primary)'
+  definition: FAOSTAT Production (QCL), item 1723, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1723|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.meat
+  labels:
+    fr: 'Production : viande (total)'
+    en: 'Production: meat (total)'
+  definition: FAOSTAT Production (QCL), item 1765, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1765|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.milk
+  labels:
+    fr: 'Production : lait (total)'
+    en: 'Production: milk (total)'
+  definition: FAOSTAT Production (QCL), item 1780, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1780|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.eggs
+  labels:
+    fr: 'Production : œufs'
+    en: 'Production: eggs (primary)'
+  definition: FAOSTAT Production (QCL), item 1783, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1783|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.soya_beans
+  labels:
+    fr: 'Production : soja'
+    en: 'Production: soya beans'
+  definition: FAOSTAT Production (QCL), item 236, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.236|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.coffee
+  labels:
+    fr: 'Production : café vert'
+    en: 'Production: coffee, green'
+  definition: FAOSTAT Production (QCL), item 656, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.656|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.production.cocoa
+  labels:
+    fr: 'Production : fèves de cacao'
+    en: 'Production: cocoa beans'
+  definition: FAOSTAT Production (QCL), item 661, element Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.661|5510
+  provider_declared: true
+  notes: 'FAO item aggregates are FAO''s own totals (not REVA sums). Flags: A official, E estimated, I imputed, X external;
+    missing (M) rows are absent.'
+- id: food_agriculture.cereal_yield
+  labels:
+    fr: Rendement céréalier
+    en: Cereal yield
+  definition: FAOSTAT Production (QCL), Cereals, primary (1717), Yield (5412).
+  unit: kg per hectare
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1717|5412
+  - wb.wdi_social.AG.YLD.CREL.KG
+  provider_declared: true
+  notes: World Bank WDI fallback (series sourced from FAO) when A-WB's table is present.
+- id: food_agriculture.cereal_area_harvested
+  labels:
+    fr: Superficie récoltée en céréales
+    en: Cereal area harvested
+  definition: FAOSTAT Production (QCL), Cereals, primary (1717), Area harvested (5312).
+  unit: hectares
+  domain: food_agriculture
+  subdomain: production
+  source_order:
+  - fao.qcl.1717|5312
+  - wb.wdi_social.AG.LND.CREL.HA
+  provider_declared: true
+  notes: World Bank WDI fallback (series sourced from FAO) when A-WB's table is present.
+- id: food_agriculture.livestock.cattle
+  labels:
+    fr: 'Cheptel : bovins'
+    en: 'Livestock: cattle'
+  definition: FAOSTAT Production (QCL), item 866, Stocks (5111).
+  unit: head
+  domain: food_agriculture
+  subdomain: livestock
+  source_order:
+  - fao.qcl.866|5111
+  provider_declared: true
+- id: food_agriculture.livestock.sheep
+  labels:
+    fr: 'Cheptel : ovins'
+    en: 'Livestock: sheep'
+  definition: FAOSTAT Production (QCL), item 976, Stocks (5111).
+  unit: head
+  domain: food_agriculture
+  subdomain: livestock
+  source_order:
+  - fao.qcl.976|5111
+  provider_declared: true
+- id: food_agriculture.livestock.goats
+  labels:
+    fr: 'Cheptel : caprins'
+    en: 'Livestock: goats'
+  definition: FAOSTAT Production (QCL), item 1016, Stocks (5111).
+  unit: head
+  domain: food_agriculture
+  subdomain: livestock
+  source_order:
+  - fao.qcl.1016|5111
+  provider_declared: true
+- id: food_agriculture.livestock.pigs
+  labels:
+    fr: 'Cheptel : porcins'
+    en: 'Livestock: pigs'
+  definition: FAOSTAT Production (QCL), item 1034, Stocks (5111).
+  unit: head
+  domain: food_agriculture
+  subdomain: livestock
+  source_order:
+  - fao.qcl.1034|5111
+  provider_declared: true
+- id: food_agriculture.livestock.chickens
+  labels:
+    fr: 'Cheptel : poulets'
+    en: 'Livestock: chickens'
+  definition: FAOSTAT Production (QCL), item 1057, Stocks (5112).
+  unit: thousand head
+  domain: food_agriculture
+  subdomain: livestock
+  source_order:
+  - fao.qcl.1057|5112
+  provider_declared: true
+- id: food_agriculture.gross_production_value
+  labels:
+    fr: Valeur brute de la production agricole (I$ constants 2014-2016)
+    en: Gross agricultural production value (constant 2014-2016 international $)
+  definition: FAOSTAT Value of Agricultural Production (QV), Agriculture (2051), Gross Production Value (constant 2014-2016
+    thousand I$) (152).
+  unit: thousand international dollars (constant 2014-2016)
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.qv.2051|152
+  provider_declared: true
+- id: food_agriculture.gross_production_value_usd
+  labels:
+    fr: Valeur brute de la production agricole (US$ courants)
+    en: Gross agricultural production value (current US$)
+  definition: FAOSTAT QV, Agriculture (2051), Gross Production Value (current thousand US$) (57).
+  unit: thousand US dollars (current)
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.qv.2051|57
+  provider_declared: true
+- id: food_agriculture.producer_price.wheat
+  labels:
+    fr: 'Prix à la production : blé (US$/tonne)'
+    en: 'Producer price: wheat (US$/tonne)'
+  definition: FAOSTAT Producer Prices (PP), item 15, Producer Price (USD/tonne) (5532), annual value (months code 7021).
+  unit: US dollars per tonne
+  domain: food_agriculture
+  subdomain: prices
+  source_order:
+  - fao.pp.15|5532
+  provider_declared: true
+  notes: Annual values only (monthly producer prices are not ingested).
+- id: food_agriculture.producer_price.rice
+  labels:
+    fr: 'Prix à la production : riz paddy (US$/tonne)'
+    en: 'Producer price: rice (paddy) (US$/tonne)'
+  definition: FAOSTAT Producer Prices (PP), item 27, Producer Price (USD/tonne) (5532), annual value (months code 7021).
+  unit: US dollars per tonne
+  domain: food_agriculture
+  subdomain: prices
+  source_order:
+  - fao.pp.27|5532
+  provider_declared: true
+  notes: Annual values only (monthly producer prices are not ingested).
+- id: food_agriculture.producer_price.maize
+  labels:
+    fr: 'Prix à la production : maïs (US$/tonne)'
+    en: 'Producer price: maize (US$/tonne)'
+  definition: FAOSTAT Producer Prices (PP), item 56, Producer Price (USD/tonne) (5532), annual value (months code 7021).
+  unit: US dollars per tonne
+  domain: food_agriculture
+  subdomain: prices
+  source_order:
+  - fao.pp.56|5532
+  provider_declared: true
+  notes: Annual values only (monthly producer prices are not ingested).
+- id: food_agriculture.agri_exports_value
+  labels:
+    fr: Exportations agricoles (valeur)
+    en: Agricultural exports (value)
+  definition: 'FAOSTAT Trade (TCL), Crops and livestock products (1882), Export value (5922): FAO''s agricultural trade total.'
+  unit: thousand US dollars
+  domain: food_agriculture
+  subdomain: trade
+  source_order:
+  - fao.tcl.1882|5922
+  provider_declared: true
+- id: food_agriculture.agri_imports_value
+  labels:
+    fr: Importations agricoles (valeur)
+    en: Agricultural imports (value)
+  definition: FAOSTAT Trade (TCL), Crops and livestock products (1882), Import value (5622).
+  unit: thousand US dollars
+  domain: food_agriculture
+  subdomain: trade
+  source_order:
+  - fao.tcl.1882|5622
+  provider_declared: true
+- id: food_agriculture.food_exports_value
+  labels:
+    fr: Exportations alimentaires hors poisson (valeur)
+    en: Food exports excluding fish (value)
+  definition: FAOSTAT Trade (TCL), Food Excluding Fish (1982), Export value (5922).
+  unit: thousand US dollars
+  domain: food_agriculture
+  subdomain: trade
+  source_order:
+  - fao.tcl.1982|5922
+  provider_declared: true
+- id: food_agriculture.food_imports_value
+  labels:
+    fr: Importations alimentaires hors poisson (valeur)
+    en: Food imports excluding fish (value)
+  definition: FAOSTAT Trade (TCL), Food Excluding Fish (1982), Import value (5622).
+  unit: thousand US dollars
+  domain: food_agriculture
+  subdomain: trade
+  source_order:
+  - fao.tcl.1982|5622
+  provider_declared: true
+- id: food_agriculture.agri_exports_share_gdp
+  labels:
+    fr: Part des exportations agricoles dans le PIB
+    en: Share of agricultural exports in GDP
+  definition: FAOSTAT Trade indicators (TCLI), Crops and livestock products (1882), indicator 503.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: trade
+  source_order:
+  - fao.tcli.1882|503
+  provider_declared: true
+- id: food_agriculture.land.country_area
+  labels:
+    fr: Superficie du pays
+    en: Country area
+  definition: FAOSTAT Land Use (RL), item 6600, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6600|5110
+  provider_declared: true
+- id: food_agriculture.land.land_area
+  labels:
+    fr: Superficie des terres
+    en: Land area
+  definition: FAOSTAT Land Use (RL), item 6601, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6601|5110
+  provider_declared: true
+- id: food_agriculture.land.agricultural_land
+  labels:
+    fr: Terres agricoles
+    en: Agricultural land
+  definition: FAOSTAT Land Use (RL), item 6610, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6610|5110
+  provider_declared: true
+- id: food_agriculture.land.agricultural_land_share
+  labels:
+    fr: Terres agricoles (% des terres)
+    en: Agricultural land (% of land area)
+  definition: FAOSTAT Land Use (RL), item 6610, element 7209.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6610|7209
+  - wb.wdi_social.AG.LND.AGRI.ZS
+  provider_declared: true
+  notes: Forest figures come from FAO's Global Forest Resources Assessment (FRA). World Bank WDI fallback (series sourced
+    from FAO) when A-WB's table is present.
+- id: food_agriculture.land.cropland
+  labels:
+    fr: Terres cultivées
+    en: Cropland
+  definition: FAOSTAT Land Use (RL), item 6620, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6620|5110
+  provider_declared: true
+- id: food_agriculture.land.cropland_share
+  labels:
+    fr: Terres cultivées (% des terres)
+    en: Cropland (% of land area)
+  definition: FAOSTAT Land Use (RL), item 6620, element 7209.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6620|7209
+  provider_declared: true
+- id: food_agriculture.land.cropland_per_capita
+  labels:
+    fr: Terres cultivées par habitant
+    en: Cropland per capita
+  definition: FAOSTAT Land Use (RL), item 6620, element 7277.
+  unit: hectares per capita
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6620|7277
+  provider_declared: true
+- id: food_agriculture.land.arable_land
+  labels:
+    fr: Terres arables
+    en: Arable land
+  definition: FAOSTAT Land Use (RL), item 6621, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6621|5110
+  provider_declared: true
+- id: food_agriculture.land.permanent_crops
+  labels:
+    fr: Cultures permanentes
+    en: Permanent crops
+  definition: FAOSTAT Land Use (RL), item 6650, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6650|5110
+  provider_declared: true
+- id: food_agriculture.land.permanent_meadows_pastures
+  labels:
+    fr: Prairies et pâturages permanents
+    en: Permanent meadows and pastures
+  definition: FAOSTAT Land Use (RL), item 6655, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6655|5110
+  provider_declared: true
+- id: food_agriculture.land.forest_land
+  labels:
+    fr: Forêts (superficie)
+    en: Forest land (area)
+  definition: FAOSTAT Land Use (RL), item 6646, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6646|5110
+  - fao.sdgb.24033|6176
+  provider_declared: true
+  notes: 'Forest figures come from FAO''s Global Forest Resources Assessment (FRA). '
+- id: food_agriculture.land.forest_share
+  labels:
+    fr: Forêts (% des terres)
+    en: Forest land (% of land area)
+  definition: FAOSTAT Land Use (RL), item 6646, element 7209.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6646|7209
+  - fao.sdgb.24034|6121
+  - wb.wdi_social.AG.LND.FRST.ZS
+  provider_declared: true
+  notes: Forest figures come from FAO's Global Forest Resources Assessment (FRA). World Bank WDI fallback (series sourced
+    from FAO) when A-WB's table is present.
+- id: food_agriculture.land.primary_forest
+  labels:
+    fr: Forêts primaires
+    en: Primary forest
+  definition: FAOSTAT Land Use (RL), item 6714, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6714|5110
+  provider_declared: true
+  notes: 'Forest figures come from FAO''s Global Forest Resources Assessment (FRA). '
+- id: food_agriculture.land.planted_forest
+  labels:
+    fr: Forêts plantées
+    en: Planted forest
+  definition: FAOSTAT Land Use (RL), item 6716, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6716|5110
+  provider_declared: true
+  notes: 'Forest figures come from FAO''s Global Forest Resources Assessment (FRA). '
+- id: food_agriculture.land.irrigation_equipped
+  labels:
+    fr: Terres équipées pour l'irrigation
+    en: Land area equipped for irrigation
+  definition: FAOSTAT Land Use (RL), item 6690, element 5110.
+  unit: thousand hectares
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6690|5110
+  provider_declared: true
+- id: food_agriculture.land.irrigation_equipped_share
+  labels:
+    fr: Terres équipées pour l'irrigation (% des terres cultivées)
+    en: Land equipped for irrigation (% of cropland)
+  definition: FAOSTAT Land Use (RL), item 6690, element 7252.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6690|7252
+  provider_declared: true
+- id: food_agriculture.land.irrigated_share_agri
+  labels:
+    fr: Superficie agricole effectivement irriguée (% des terres agricoles)
+    en: Agriculture area actually irrigated (% of agricultural land)
+  definition: FAOSTAT Land Use (RL), item 6611, element 7208.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6611|7208
+  - wb.wdi_social.AG.LND.IRIG.AG.ZS
+  provider_declared: true
+  notes: Forest figures come from FAO's Global Forest Resources Assessment (FRA). World Bank WDI fallback (series sourced
+    from FAO) when A-WB's table is present.
+- id: food_agriculture.land.organic_share_agri
+  labels:
+    fr: Agriculture biologique (% des terres agricoles)
+    en: Organic agriculture (% of agricultural land)
+  definition: FAOSTAT Land Use (RL), item 6671, element 7208.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.rl.6671|7208
+  provider_declared: true
+- id: food_agriculture.land.forest_change_rate
+  labels:
+    fr: Taux annuel de variation de la superficie forestière (ODD 15.2.1)
+    en: Annual forest area change rate (SDG 15.2.1)
+  definition: FAO SDG indicator 15.2.1 (AG_LND_FRSTCHG).
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.sdgb.24037|6121
+  provider_declared: true
+- id: food_agriculture.land.forest_protected_share
+  labels:
+    fr: Forêts dans des aires protégées (ODD 15.2.1)
+    en: Forest area within legally established protected areas (SDG 15.2.1)
+  definition: FAO SDG indicator 15.2.1 (AG_LND_FRSTPRCT).
+  unit: '%'
+  domain: food_agriculture
+  subdomain: land
+  source_order:
+  - fao.sdgb.24040|6121
+  provider_declared: true
+- id: food_agriculture.fertilizer_use_per_ha.nitrogen
+  labels:
+    fr: 'Engrais : azote (N) par hectare de terres cultivées'
+    en: 'Fertilizer use: nitrogen (N) per hectare of cropland'
+  definition: FAOSTAT Fertilizers by Nutrient (RFN), item 3102, Use per area of cropland (5159).
+  unit: kg per hectare
+  domain: food_agriculture
+  subdomain: inputs
+  source_order:
+  - fao.rfn.3102|5159
+  provider_declared: true
+- id: food_agriculture.fertilizer_use_per_ha.phosphate
+  labels:
+    fr: 'Engrais : phosphate (P2O5) par hectare de terres cultivées'
+    en: 'Fertilizer use: phosphate (P2O5) per hectare of cropland'
+  definition: FAOSTAT Fertilizers by Nutrient (RFN), item 3103, Use per area of cropland (5159).
+  unit: kg per hectare
+  domain: food_agriculture
+  subdomain: inputs
+  source_order:
+  - fao.rfn.3103|5159
+  provider_declared: true
+- id: food_agriculture.fertilizer_use_per_ha.potash
+  labels:
+    fr: 'Engrais : potasse (K2O) par hectare de terres cultivées'
+    en: 'Fertilizer use: potash (K2O) per hectare of cropland'
+  definition: FAOSTAT Fertilizers by Nutrient (RFN), item 3104, Use per area of cropland (5159).
+  unit: kg per hectare
+  domain: food_agriculture
+  subdomain: inputs
+  source_order:
+  - fao.rfn.3104|5159
+  provider_declared: true
+- id: food_agriculture.pesticide_use_per_ha
+  labels:
+    fr: Pesticides par hectare de terres cultivées
+    en: Pesticide use per hectare of cropland
+  definition: FAOSTAT Pesticides Use (RP), Pesticides (total) (1357), Use per area of cropland (5159).
+  unit: kg per hectare
+  domain: food_agriculture
+  subdomain: inputs
+  source_order:
+  - fao.rp.1357|5159
+  provider_declared: true
+- id: food_agriculture.emissions_co2eq.agrifood_systems
+  labels:
+    fr: 'Émissions de GES : systèmes agroalimentaires (FAO tier 1, CO2eq AR5)'
+    en: 'GHG emissions: agrifood systems (FAO tier 1, CO2eq AR5)'
+  definition: FAOSTAT Emissions totals (GT), item 6518, Emissions (CO2eq) (AR5) (723113), source FAO TIER 1 (3050).
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.6518|723113|src=3050
+  provider_declared: true
+  notes: FAO tier-1 estimates; projections flagged F (estimate_kind forecast) are kept but labelled. UNFCCC-reported inventories
+    are the separate series src=3051 (concept emissions_co2eq.ipcc_agriculture_unfccc).
+- id: food_agriculture.emissions_co2eq.farm_gate
+  labels:
+    fr: 'Émissions de GES : à la ferme (FAO tier 1, CO2eq AR5)'
+    en: 'GHG emissions: farm gate (FAO tier 1, CO2eq AR5)'
+  definition: FAOSTAT Emissions totals (GT), item 6996, Emissions (CO2eq) (AR5) (723113), source FAO TIER 1 (3050).
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.6996|723113|src=3050
+  provider_declared: true
+  notes: FAO tier-1 estimates; projections flagged F (estimate_kind forecast) are kept but labelled. UNFCCC-reported inventories
+    are the separate series src=3051 (concept emissions_co2eq.ipcc_agriculture_unfccc).
+- id: food_agriculture.emissions_co2eq.land_use_change
+  labels:
+    fr: 'Émissions de GES : changement d''affectation des terres (FAO tier 1, CO2eq AR5)'
+    en: 'GHG emissions: land-use change (FAO tier 1, CO2eq AR5)'
+  definition: FAOSTAT Emissions totals (GT), item 6516, Emissions (CO2eq) (AR5) (723113), source FAO TIER 1 (3050).
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.6516|723113|src=3050
+  provider_declared: true
+  notes: FAO tier-1 estimates; projections flagged F (estimate_kind forecast) are kept but labelled. UNFCCC-reported inventories
+    are the separate series src=3051 (concept emissions_co2eq.ipcc_agriculture_unfccc).
+- id: food_agriculture.emissions_co2eq.pre_post_production
+  labels:
+    fr: 'Émissions de GES : pré- et post-production (FAO tier 1, CO2eq AR5)'
+    en: 'GHG emissions: pre- and post-production (FAO tier 1, CO2eq AR5)'
+  definition: FAOSTAT Emissions totals (GT), item 6517, Emissions (CO2eq) (AR5) (723113), source FAO TIER 1 (3050).
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.6517|723113|src=3050
+  provider_declared: true
+  notes: FAO tier-1 estimates; projections flagged F (estimate_kind forecast) are kept but labelled. UNFCCC-reported inventories
+    are the separate series src=3051 (concept emissions_co2eq.ipcc_agriculture_unfccc).
+- id: food_agriculture.emissions_co2eq.ipcc_agriculture
+  labels:
+    fr: 'Émissions de GES : agriculture (GIEC) (FAO tier 1, CO2eq AR5)'
+    en: 'GHG emissions: IPCC agriculture (FAO tier 1, CO2eq AR5)'
+  definition: FAOSTAT Emissions totals (GT), item 1711, Emissions (CO2eq) (AR5) (723113), source FAO TIER 1 (3050).
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.1711|723113|src=3050
+  provider_declared: true
+  notes: FAO tier-1 estimates; projections flagged F (estimate_kind forecast) are kept but labelled. UNFCCC-reported inventories
+    are the separate series src=3051 (concept emissions_co2eq.ipcc_agriculture_unfccc).
+- id: food_agriculture.emissions_co2eq.ipcc_agriculture_unfccc
+  labels:
+    fr: 'Émissions de GES : agriculture (inventaires CCNUCC, CO2eq AR5)'
+    en: 'GHG emissions: IPCC agriculture (UNFCCC inventories, CO2eq AR5)'
+  definition: 'FAOSTAT Emissions totals (GT), IPCC Agriculture (1711), Emissions (CO2eq) (AR5), source UNFCCC (3051): national
+    inventories as reported to the UNFCCC, redistributed by FAO.'
+  unit: kilotonnes CO2 equivalent (AR5)
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.1711|723113|src=3051
+  provider_declared: true
+- id: food_agriculture.emissions_ch4.agrifood_systems
+  labels:
+    fr: Émissions de méthane des systèmes agroalimentaires
+    en: Methane emissions from agrifood systems
+  definition: FAOSTAT GT, Agrifood systems (6518), Emissions (CH4) (7225), FAO TIER 1.
+  unit: kilotonnes CH4
+  domain: food_agriculture
+  subdomain: emissions
+  source_order:
+  - fao.gt.6518|7225|src=3050
+  provider_declared: true
+- id: food_agriculture.forestry_production.roundwood
+  labels:
+    fr: 'Production forestière : bois rond'
+    en: 'Forestry production: roundwood'
+  definition: FAOSTAT Forestry Production and Trade (FO), item 1861, Production (5516).
+  unit: cubic metres
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1861|5516
+  provider_declared: true
+- id: food_agriculture.forestry_production.wood_fuel
+  labels:
+    fr: 'Production forestière : bois de chauffage'
+    en: 'Forestry production: wood fuel'
+  definition: FAOSTAT Forestry Production and Trade (FO), item 1864, Production (5516).
+  unit: cubic metres
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1864|5516
+  provider_declared: true
+- id: food_agriculture.forestry_production.industrial_roundwood
+  labels:
+    fr: 'Production forestière : bois rond industriel'
+    en: 'Forestry production: industrial roundwood'
+  definition: FAOSTAT Forestry Production and Trade (FO), item 1865, Production (5516).
+  unit: cubic metres
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1865|5516
+  provider_declared: true
+- id: food_agriculture.forestry_production.sawnwood
+  labels:
+    fr: 'Production forestière : sciages'
+    en: 'Forestry production: sawnwood'
+  definition: FAOSTAT Forestry Production and Trade (FO), item 1872, Production (5516).
+  unit: cubic metres
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1872|5516
+  provider_declared: true
+- id: food_agriculture.forestry_production.paper
+  labels:
+    fr: 'Production forestière : papiers et cartons'
+    en: 'Forestry production: paper and paperboard'
+  definition: FAOSTAT Forestry Production and Trade (FO), item 1876, Production (5510).
+  unit: tonnes
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1876|5510
+  provider_declared: true
+- id: food_agriculture.forest_products_exports
+  labels:
+    fr: Exportations de produits forestiers primaires (valeur)
+    en: Exports of primary wood and paper products (value)
+  definition: FAOSTAT FO, Primary wood and paper products (1877), Export value (5922).
+  unit: thousand US dollars
+  domain: food_agriculture
+  subdomain: forestry
+  source_order:
+  - fao.fo.1877|5922
+  provider_declared: true
+- id: food_agriculture.agri_value_added_share_gdp
+  labels:
+    fr: Valeur ajoutée agricole, forestière et halieutique (% du PIB)
+    en: Agriculture, forestry and fishing value added (% of GDP)
+  definition: FAOSTAT Macro Indicators (MK), Value Added (Agriculture, Forestry and Fishing) (22016), Share of GDP US$ (6103);
+    UNSD national accounts redistributed by FAO (flag X).
+  unit: '%'
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.mk.22016|6103
+  provider_declared: true
+  notes: UNSD national accounts (AMA) via FAO. The World Bank series NV.AGR.TOTL.ZS uses World Bank national accounts (a different
+    compilation) and is not listed as a fallback.
+- id: food_agriculture.agri_value_added_usd
+  labels:
+    fr: Valeur ajoutée agricole, forestière et halieutique (US$ courants)
+    en: Agriculture, forestry and fishing value added (current US$)
+  definition: FAOSTAT MK, Value Added (Agriculture, Forestry and Fishing) (22016), Value US$ (6110).
+  unit: million US dollars
+  domain: food_agriculture
+  subdomain: economy
+  source_order:
+  - fao.mk.22016|6110
+  provider_declared: true
+- id: food_agriculture.agri_value_added_per_worker
+  labels:
+    fr: Valeur ajoutée agricole par travailleur
+    en: Agriculture value added per worker
+  definition: FAOSTAT Employment Indicators (OEA), indicator 21085, constant 2015 US$ (ILO modelled employment; FAOSTAT value
+    added).
+  unit: US dollars (constant 2015) per worker
+  domain: food_agriculture
+  subdomain: employment
+  source_order:
+  - fao.oea.21085|6228|sex=1|src=3047
+  provider_declared: true
+- id: food_agriculture.employment_agriculture_share
+  labels:
+    fr: Emploi dans l'agriculture (% de l'emploi total), estimations modélisées OIT (via FAO)
+    en: Employment in agriculture (% of total employment), ILO modelled estimates (via FAO)
+  definition: 'FAOSTAT Employment Indicators (OEA), indicator 21156, both sexes, source ILO modelled estimates (3043): ILO
+    data redistributed by FAO.'
+  unit: '%'
+  domain: food_agriculture
+  subdomain: employment
+  source_order:
+  - fao.oea.21156|6121|sex=1|src=3043
+  - wb.wdi_social.SL.AGR.EMPL.ZS
+  provider_declared: true
+  notes: ILO modelled estimates as distributed by FAO (vintage of FAOSTAT's June 2026 update); A-ILO ingests ILOSTAT directly
+    (labour.employment.agriculture.ilo_modelled, thousands). The World Bank series is the same ILO model (possibly another
+    vintage).
+- id: food_agriculture.employment_agrifood_systems
+  labels:
+    fr: Emploi dans les systèmes agroalimentaires (milliers)
+    en: Employment in agrifood systems (thousands)
+  definition: FAOSTAT OEA, Total employment in agrifood systems (21160), both sexes, FAO Model (3044).
+  unit: thousand persons
+  domain: food_agriculture
+  subdomain: employment
+  source_order:
+  - fao.oea.21160|6199|sex=1|src=3044
+  provider_declared: true
+  notes: FAO model estimates (flag E).
+- id: food_agriculture.rural_population_fao
+  labels:
+    fr: Population rurale (FAOSTAT, d'après ONU WPP/WUP)
+    en: Rural population (FAOSTAT, from UN population estimates)
+  definition: 'FAOSTAT Annual population (OA), Population - Est. & Proj. (3010), Rural population (551): UN DESA estimates
+    redistributed by FAO (flag X).'
+  unit: thousand persons
+  domain: food_agriculture
+  subdomain: rural
+  source_order:
+  - fao.oa.3010|551
+  provider_declared: true
+  notes: FAO-labelled copy of UN DESA figures; A-UN ingests UN population data at the source. Years after the UN estimates
+    are projections.
+- id: food_agriculture.fish_stocks_sustainable_share
+  labels:
+    fr: Stocks de poissons dans des limites biologiquement viables (ODD 14.4.1)
+    en: Fish stocks within biologically sustainable levels (SDG 14.4.1)
+  definition: FAO SDG indicator 14.4.1 (ER_H2O_FWTL), national values where published.
+  unit: '%'
+  domain: food_agriculture
+  subdomain: fisheries
+  source_order:
+  - fao.sdgb.24029|6121
+  provider_declared: true
+- id: food_agriculture.sustainable_fisheries_share_gdp
+  labels:
+    fr: Pêche durable en % du PIB (ODD 14.7.1)
+    en: Sustainable fisheries as a proportion of GDP (SDG 14.7.1)
+  definition: FAO SDG indicator 14.7.1 (EN_SCP_FSHGDP).
+  unit: '%'
+  domain: food_agriculture
+  subdomain: fisheries
+  source_order:
+  - fao.sdgb.24031|6121
+  provider_declared: true

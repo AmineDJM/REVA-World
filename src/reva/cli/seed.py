@@ -460,7 +460,40 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     # --- GATE2: late gate decisions (discovery reported gate_pending) are promoted from the stored proposal
     ("gate_followup:promotion", "gate_followup", {}, 300),
     # --- end GATE2
+    # --- ATLASOPS (V3): monthly atlas source runs through the single metered entry point
+    # (reva.atlas.ingest: reserve the spec's planned requests on its budget key, meter, settle), first
+    # slots staggered over a week (ATLAS_FIRST_SLOT_HOURS) so no day carries more than one large run;
+    # then a daily snapshot that is reused (nothing recorded) when no atlas table changed.
+    ("atlas_ingest:atlas.imf", "atlas_ingest", {"source": "atlas.imf"}, 30 * 86400),
+    ("atlas_ingest:atlas.undp_hdr", "atlas_ingest", {"source": "atlas.undp_hdr"}, 30 * 86400),
+    ("atlas_ingest:atlas.whr", "atlas_ingest", {"source": "atlas.whr"}, 30 * 86400),
+    ("atlas_ingest:atlas.owid", "atlas_ingest", {"source": "atlas.owid"}, 30 * 86400),
+    ("atlas_ingest:atlas.wid", "atlas_ingest", {"source": "atlas.wid"}, 30 * 86400),
+    ("atlas_ingest:atlas.who_gho", "atlas_ingest", {"source": "atlas.who_gho"}, 30 * 86400),
+    ("atlas_ingest:atlas.unesco_uis", "atlas_ingest", {"source": "atlas.unesco_uis"}, 30 * 86400),
+    ("atlas_ingest:atlas.ilostat", "atlas_ingest", {"source": "atlas.ilostat"}, 30 * 86400),
+    ("atlas_ingest:atlas.un_wpp", "atlas_ingest", {"source": "atlas.un_wpp"}, 30 * 86400),
+    ("atlas_ingest:atlas.un_sdg", "atlas_ingest", {"source": "atlas.un_sdg"}, 30 * 86400),
+    ("atlas_snapshot:live", "atlas_snapshot", {"origin": "live", "warm": True, "skip_unchanged": True}, 86400),
+    # --- end ATLASOPS
 )
+
+#: ATLASOPS: hours from seeding to a schedule's first slot (default 1 h). Atlas runs are spread over
+#: a week so heavy downloads (WID ~660 MB, IMF ~170 MB, OWID ~25 MB) never share a day's byte budget;
+#: the daily snapshot follows the day's runs.
+ATLAS_FIRST_SLOT_HOURS: dict[str, int] = {
+    "atlas_ingest:atlas.imf": 2,
+    "atlas_ingest:atlas.undp_hdr": 26,
+    "atlas_ingest:atlas.whr": 27,
+    "atlas_ingest:atlas.ilostat": 28,
+    "atlas_ingest:atlas.owid": 50,
+    "atlas_ingest:atlas.un_wpp": 51,
+    "atlas_ingest:atlas.wid": 74,
+    "atlas_ingest:atlas.who_gho": 98,
+    "atlas_ingest:atlas.unesco_uis": 99,
+    "atlas_ingest:atlas.un_sdg": 122,
+    "atlas_snapshot:live": 8,
+}
 
 
 def _seed_schedules(conn: Connection) -> None:
@@ -468,10 +501,17 @@ def _seed_schedules(conn: Connection) -> None:
         conn.execute(
             text(
                 """INSERT INTO ops.schedule(schedule_key, job_type, parameters, cadence_spec, next_due_at, enabled)
-                   VALUES (:k, :t, CAST(:p AS jsonb), CAST(:c AS jsonb), clock_timestamp() + interval '1 hour', true)
+                   VALUES (:k, :t, CAST(:p AS jsonb), CAST(:c AS jsonb),
+                           clock_timestamp() + make_interval(hours => :h), true)
                    ON CONFLICT (schedule_key) DO NOTHING"""
             ),
-            {"k": key, "t": jt, "p": json.dumps(params), "c": json.dumps({"interval_seconds": secs})},
+            {
+                "k": key,
+                "t": jt,
+                "p": json.dumps(params),
+                "c": json.dumps({"interval_seconds": secs}),
+                "h": ATLAS_FIRST_SLOT_HOURS.get(key, 1),
+            },
         )
 
 
@@ -503,8 +543,17 @@ def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
                 [s.name, s.version] for s in (c.describe() for c in builtin_connectors(contact_email).values())
             ),
             "schedules": [list(x) for x in DEFAULT_SCHEDULES],
+            # ATLASOPS: atlas connector versions are registered by the seed too; a new atlas source (or
+            # version) changes the fingerprint so the owner's next seed registers it
+            "atlas_sources": _atlas_source_ids(),
         }
     )
+
+
+def _atlas_source_ids() -> list[list[str]]:
+    from reva.atlas.sources import atlas_sources
+
+    return sorted([e.spec.name, e.spec.version] for e in atlas_sources().values())
 
 
 def _already_seeded(conn: Connection, fingerprint: str) -> bool:

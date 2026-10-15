@@ -181,7 +181,9 @@ def parse_response(body: bytes, name: str) -> list[dict[str, Any]]:
     meta = doc.get("meta") or {}
     lic = ((meta.get("licence") or {}).get("en")) or ""
     if LICENCE_MARK not in lic:
-        raise _err(f"{name}: declared licence changed ({lic[:120]!r}); not publishing under assumed rights", kind="licence")
+        raise _err(
+            f"{name}: declared licence changed ({lic[:120]!r}); not publishing under assumed rights", kind="licence"
+        )
     total = meta.get("total")
     if total is None or int(total) != len(doc["data"]):
         raise _err(f"{name}: received {len(doc['data'])} of {total} records (truncated page)", kind="incomplete")
@@ -255,8 +257,19 @@ class _Rows:
         self.skipped: Counter[str] = Counter()
         self._keys: set[tuple[str, str, date, date]] = set()
 
-    def add(self, *, indicator: str, geo: str, start: date, end: date, value: str | None, value_text: str | None,
-            unit: str, flags: Mapping[str, Any], selector: Mapping[str, Any]) -> None:
+    def add(
+        self,
+        *,
+        indicator: str,
+        geo: str,
+        start: date,
+        end: date,
+        value: str | None,
+        value_text: str | None,
+        unit: str,
+        flags: Mapping[str, Any],
+        selector: Mapping[str, Any],
+    ) -> None:
         if start >= end:
             self.skipped["empty_or_inverted_interval"] += 1
             return
@@ -265,12 +278,25 @@ class _Rows:
             self.skipped["duplicate_cell_overlapping_intervals"] += 1
             return
         self._keys.add(key)
-        self.rows.append({
-            "source": SOURCE, "dataset": self.dataset, "indicator": indicator, "concept_id": None, "iso3": None,
-            "provider_geo": geo, "entity_qid": None, "period_start": start, "period_end": end, "value": value,
-            "value_text": value_text, "unit": unit, "flags": _canon(flags), "raw_sha256": self.raw,
-            "selector": _canon(selector),
-        })
+        self.rows.append(
+            {
+                "source": SOURCE,
+                "dataset": self.dataset,
+                "indicator": indicator,
+                "concept_id": None,
+                "iso3": None,
+                "provider_geo": geo,
+                "entity_qid": None,
+                "period_start": start,
+                "period_end": end,
+                "value": value,
+                "value_text": value_text,
+                "unit": unit,
+                "flags": _canon(flags),
+                "raw_sha256": self.raw,
+                "selector": _canon(selector),
+            }
+        )
 
     def frame(self) -> pl.DataFrame:
         from reva.atlas.tables import ATLAS_SCHEMA
@@ -278,8 +304,18 @@ class _Rows:
         return pl.DataFrame({c: [r[c] for r in self.rows] for c in ATLAS_SCHEMA.names()}, schema=ATLAS_SCHEMA)
 
 
-def _dated(rows: _Rows, *, entries: Any, field: str, kind: str, unit: str, geo: str, indicator: str,
-           selector: dict[str, Any], base_flags: Mapping[str, Any]) -> None:
+def _dated(
+    rows: _Rows,
+    *,
+    entries: Any,
+    field: str,
+    kind: str,
+    unit: str,
+    geo: str,
+    indicator: str,
+    selector: dict[str, Any],
+    base_flags: Mapping[str, Any],
+) -> None:
     """Interval cells + year-end readings of one dated field; undated values as of retrieval."""
     if entries is None:
         return
@@ -303,8 +339,17 @@ def _dated(rows: _Rows, *, entries: Any, field: str, kind: str, unit: str, geo: 
         start = _iso_day(e.get("date_from"))
         stop = _iso_day(e.get("date_to"))
         if start is None:  # undated: the provider's current value, as of retrieval
-            rows.add(indicator=indicator, geo=geo, start=rows.retrieved, end=rows.retrieved + timedelta(days=1),
-                     value=val, value_text=txt, unit=unit, flags={**flags, "as_of_retrieval": True}, selector=sel)
+            rows.add(
+                indicator=indicator,
+                geo=geo,
+                start=rows.retrieved,
+                end=rows.retrieved + timedelta(days=1),
+                value=val,
+                value_text=txt,
+                unit=unit,
+                flags={**flags, "as_of_retrieval": True},
+                selector=sel,
+            )
             continue
         if start > rows.retrieved:
             rows.skipped["future_dated"] += 1
@@ -316,16 +361,36 @@ def _dated(rows: _Rows, *, entries: Any, field: str, kind: str, unit: str, geo: 
             continue
         seen.add((start, end))
         iflags = {**flags, **({"open_ended": True, "valid_as_of": rows.retrieved.isoformat()} if open_ended else {})}
-        rows.add(indicator=indicator, geo=geo, start=start, end=end, value=val, value_text=txt, unit=unit,
-                 flags=iflags, selector=sel)
+        rows.add(
+            indicator=indicator,
+            geo=geo,
+            start=start,
+            end=end,
+            value=val,
+            value_text=txt,
+            unit=unit,
+            flags=iflags,
+            selector=sel,
+        )
         last = end - timedelta(days=1)  # inclusive last day covered by the provider's interval
         for y in range(start.year, last.year + 1):
             dec31 = date(y, 12, 31)
             if start <= dec31 <= last and dec31 <= rows.retrieved:
-                rows.add(indicator=f"{indicator}|at=year_end", geo=geo, start=date(y, 1, 1), end=date(y + 1, 1, 1),
-                         value=val, value_text=txt, unit=unit, selector=sel,
-                         flags={**flags, "selection": f"value valid on {dec31.isoformat()}",
-                                "provider_interval": f"{start.isoformat()}/{'' if open_ended else stop.isoformat()}"})  # type: ignore[union-attr]
+                rows.add(
+                    indicator=f"{indicator}|at=year_end",
+                    geo=geo,
+                    start=date(y, 1, 1),
+                    end=date(y + 1, 1, 1),
+                    value=val,
+                    value_text=txt,
+                    unit=unit,
+                    selector=sel,
+                    flags={
+                        **flags,
+                        "selection": f"value valid on {dec31.isoformat()}",
+                        "provider_interval": f"{start.isoformat()}/{'' if open_ended else stop.isoformat()}",
+                    },
+                )  # type: ignore[union-attr]
 
 
 def _chamber_kind(chamber_id: str) -> tuple[str, str]:
@@ -336,8 +401,14 @@ def _chamber_kind(chamber_id: str) -> tuple[str, str]:
     return geo, kind
 
 
-def parline_frame(chambers: Sequence[Mapping[str, Any]], parliaments: Sequence[Mapping[str, Any]],
-                  countries: Sequence[Mapping[str, Any]], *, raw: Mapping[str, str], retrieved: date) -> tuple[pl.DataFrame, dict[str, int]]:
+def parline_frame(
+    chambers: Sequence[Mapping[str, Any]],
+    parliaments: Sequence[Mapping[str, Any]],
+    countries: Sequence[Mapping[str, Any]],
+    *,
+    raw: Mapping[str, str],
+    retrieved: date,
+) -> tuple[pl.DataFrame, dict[str, int]]:
     """``ipu.parline`` frame from the three parsed responses. ``raw``: endpoint -> raw sha256."""
     out: list[dict[str, Any]] = []
     skipped: Counter[str] = Counter()
@@ -349,25 +420,59 @@ def parline_frame(chambers: Sequence[Mapping[str, Any]], parliaments: Sequence[M
         if (a.get("is_abolished_chamber") or {}).get("value"):
             base["abolished_chamber"] = True
         for f, (k, unit) in CHAMBER_DATED.items():
-            _dated(rc, entries=a.get(f), field=f, kind=k, unit=unit, geo=geo, indicator=f"{f}|chamber={kind}",
-                   selector={"file": "chambers.json", "id": c["id"]}, base_flags=base)
+            _dated(
+                rc,
+                entries=a.get(f),
+                field=f,
+                kind=k,
+                unit=unit,
+                geo=geo,
+                indicator=f"{f}|chamber={kind}",
+                selector={"file": "chambers.json", "id": c["id"]},
+                base_flags=base,
+            )
         for f, (k, unit) in CHAMBER_STATIC.items():
-            _dated(rc, entries=a.get(f), field=f, kind=k, unit=unit, geo=geo, indicator=f"{f}|chamber={kind}",
-                   selector={"file": "chambers.json", "id": c["id"]}, base_flags=base)
+            _dated(
+                rc,
+                entries=a.get(f),
+                field=f,
+                kind=k,
+                unit=unit,
+                geo=geo,
+                indicator=f"{f}|chamber={kind}",
+                selector={"file": "chambers.json", "id": c["id"]},
+                base_flags=base,
+            )
     rp = _Rows("parline", raw["parliaments"], retrieved)
     for p in parliaments:
         a = p.get("attributes") or {}
         for f, (k, unit) in PARLIAMENT_DATED.items():
-            _dated(rp, entries=a.get(f), field=f, kind=k, unit=unit, geo=p["id"], indicator=f,
-                   selector={"file": "parliaments.json", "id": p["id"]}, base_flags={})
+            _dated(
+                rp,
+                entries=a.get(f),
+                field=f,
+                kind=k,
+                unit=unit,
+                geo=p["id"],
+                indicator=f,
+                selector={"file": "parliaments.json", "id": p["id"]},
+                base_flags={},
+            )
         fw = a.get("first_woman_in_parliament_year") or {}
         if isinstance(fw, dict) and fw.get("value"):
             y = str(fw["value"])[:4]
             if y.isdigit():
-                rp.add(indicator="first_woman_in_parliament_year", geo=p["id"], start=retrieved,
-                       end=retrieved + timedelta(days=1), value=str(int(y)), value_text=None, unit="year",
-                       flags={"as_of_retrieval": True},
-                       selector={"file": "parliaments.json", "id": p["id"], "field": "first_woman_in_parliament_year"})
+                rp.add(
+                    indicator="first_woman_in_parliament_year",
+                    geo=p["id"],
+                    start=retrieved,
+                    end=retrieved + timedelta(days=1),
+                    value=str(int(y)),
+                    value_text=None,
+                    unit="year",
+                    flags={"as_of_retrieval": True},
+                    selector={"file": "parliaments.json", "id": p["id"], "field": "first_woman_in_parliament_year"},
+                )
         for k, s in enumerate((a.get("suffrage") or {}).get("value") or []):
             scope = ((s.get("national_or_local") or {}).get("term")) or "unspecified"
             restr = ((s.get("restricted_or_unrestricted") or {}).get("term")) or "unspecified"
@@ -375,17 +480,35 @@ def parline_frame(chambers: Sequence[Mapping[str, Any]], parliaments: Sequence[M
             if not y.isdigit():
                 skipped["suffrage_without_year"] += 1
                 continue
-            rp.add(indicator=f"suffrage_right_to_vote_year|scope={scope}|restriction={restr}", geo=p["id"],
-                   start=retrieved, end=retrieved + timedelta(days=1), value=str(int(y)), value_text=None, unit="year",
-                   flags={"as_of_retrieval": True, **({"detail": str(s["detail_of_restrictions"])[:500]}
-                                                      if s.get("detail_of_restrictions") else {})},
-                   selector={"file": "parliaments.json", "id": p["id"], "field": "suffrage", "index": k})
+            rp.add(
+                indicator=f"suffrage_right_to_vote_year|scope={scope}|restriction={restr}",
+                geo=p["id"],
+                start=retrieved,
+                end=retrieved + timedelta(days=1),
+                value=str(int(y)),
+                value_text=None,
+                unit="year",
+                flags={
+                    "as_of_retrieval": True,
+                    **({"detail": str(s["detail_of_restrictions"])[:500]} if s.get("detail_of_restrictions") else {}),
+                },
+                selector={"file": "parliaments.json", "id": p["id"], "field": "suffrage", "index": k},
+            )
     rk = _Rows("parline", raw["countries"], retrieved)
     for c in countries:
         a = c.get("attributes") or {}
         for f, (k, unit) in COUNTRY_DATED.items():
-            _dated(rk, entries=a.get(f), field=f, kind=k, unit=unit, geo=c["id"], indicator=f,
-                   selector={"file": "countries.json", "id": c["id"]}, base_flags={})
+            _dated(
+                rk,
+                entries=a.get(f),
+                field=f,
+                kind=k,
+                unit=unit,
+                geo=c["id"],
+                indicator=f,
+                selector={"file": "countries.json", "id": c["id"]},
+                base_flags={},
+            )
     for r in (rc, rp, rk):
         out.extend(r.rows)
         skipped.update(r.skipped)
@@ -414,7 +537,9 @@ def _dedupe_suffrage(rows: list[dict[str, Any]], skipped: Counter[str]) -> list[
     return [r for i, r in enumerate(rows) if i not in drop]
 
 
-def elections_frame(elections: Sequence[Mapping[str, Any]], *, raw_sha256: str, retrieved: date) -> tuple[pl.DataFrame, dict[str, int]]:
+def elections_frame(
+    elections: Sequence[Mapping[str, Any]], *, raw_sha256: str, retrieved: date
+) -> tuple[pl.DataFrame, dict[str, int]]:
     """``ipu.elections`` frame (exact election date ranges + unique-in-year calendar cells)."""
     rows = _Rows("elections", raw_sha256, retrieved)
     per_year: dict[tuple[str, str, int], list[tuple[Mapping[str, Any], date, date]]] = defaultdict(list)
@@ -443,12 +568,29 @@ def elections_frame(elections: Sequence[Mapping[str, Any]], *, raw_sha256: str, 
         unique = len(per_year[(geo, kind, start.year)]) == 1
         label = start.isoformat() if stop == start else f"{start.isoformat()}/{stop.isoformat()}"
         sel = {"file": "elections.json", "id": e["id"], "field": "election_date"}
-        rows.add(indicator=f"election_date|chamber={kind}", geo=geo, start=start, end=end, value=None,
-                 value_text=label, unit="date", flags=base, selector=sel)
+        rows.add(
+            indicator=f"election_date|chamber={kind}",
+            geo=geo,
+            start=start,
+            end=end,
+            value=None,
+            value_text=label,
+            unit="date",
+            flags=base,
+            selector=sel,
+        )
         if unique:
-            rows.add(indicator=f"election_date|chamber={kind}|at=year", geo=geo, start=date(start.year, 1, 1),
-                     end=date(start.year + 1, 1, 1), value=None, value_text=label, unit="date",
-                     flags={**base, "selection": "the only election of this chamber in the year"}, selector=sel)
+            rows.add(
+                indicator=f"election_date|chamber={kind}|at=year",
+                geo=geo,
+                start=date(start.year, 1, 1),
+                end=date(start.year + 1, 1, 1),
+                value=None,
+                value_text=label,
+                unit="date",
+                flags={**base, "selection": "the only election of this chamber in the year"},
+                selector=sel,
+            )
         for f, (k, unit) in ELECTION_FIELDS.items():
             ent = a.get(f)
             if not isinstance(ent, dict):
@@ -461,13 +603,33 @@ def elections_frame(elections: Sequence[Mapping[str, Any]], *, raw_sha256: str, 
                     continue
                 flags.update({"missing": MISSING_MAP.get(reason, "provider_missing_code"), "provider_flag": reason})
             sel = {"file": "elections.json", "id": e["id"], "field": f}
-            rows.add(indicator=f"{f}|chamber={kind}", geo=geo, start=start, end=end, value=val, value_text=txt,
-                     unit=unit, flags=flags, selector=sel)
+            rows.add(
+                indicator=f"{f}|chamber={kind}",
+                geo=geo,
+                start=start,
+                end=end,
+                value=val,
+                value_text=txt,
+                unit=unit,
+                flags=flags,
+                selector=sel,
+            )
             if unique:
-                rows.add(indicator=f"{f}|chamber={kind}|at=year", geo=geo, start=date(start.year, 1, 1),
-                         end=date(start.year + 1, 1, 1), value=val, value_text=txt, unit=unit, selector=sel,
-                         flags={**flags, "selection": "the only election of this chamber in the year",
-                                "election_dates": label})
+                rows.add(
+                    indicator=f"{f}|chamber={kind}|at=year",
+                    geo=geo,
+                    start=date(start.year, 1, 1),
+                    end=date(start.year + 1, 1, 1),
+                    value=val,
+                    value_text=txt,
+                    unit=unit,
+                    selector=sel,
+                    flags={
+                        **flags,
+                        "selection": "the only election of this chamber in the year",
+                        "election_dates": label,
+                    },
+                )
     return rows.frame(), dict(rows.skipped)
 
 
@@ -481,20 +643,29 @@ async def atlas_ingest(run: Any) -> dict[str, Any]:
     out: dict[str, Any] = {"retrieved": retrieved.isoformat(), "tables": {}}
     jobs = []
     if run.wants("parline"):
-        pf, pskip = parline_frame(data["chambers"], data["parliaments"], data["countries"], raw=shas, retrieved=retrieved)
+        pf, pskip = parline_frame(
+            data["chambers"], data["parliaments"], data["countries"], raw=shas, retrieved=retrieved
+        )
         jobs.append(("parline", pf, [shas["chambers"], shas["parliaments"], shas["countries"]], pskip))
     if run.wants("elections"):
         ef, eskip = elections_frame(data["elections"], raw_sha256=shas["elections"], retrieved=retrieved)
         jobs.append(("elections", ef, [shas["elections"]], eskip))
     for ds, frame, rawlist, skip in jobs:
         reg = run.register(
-            dataset=ds, frame=frame, raw_sha256s=rawlist, geo_scheme="iso2", rights=RIGHTS,
-            coverage_note=(f"IPU Parline API retrieved {retrieved.isoformat()}; provider validity intervals kept, "
-                           f"year-end readings selected (|at=year_end); not loaded: {json.dumps(skip, sort_keys=True)}. "
-                           "Licence CC BY-NC-SA 4.0 (NON-COMMERCIAL)."),
+            dataset=ds,
+            frame=frame,
+            raw_sha256s=rawlist,
+            geo_scheme="iso2",
+            rights=RIGHTS,
+            coverage_note=(
+                f"IPU Parline API retrieved {retrieved.isoformat()}; provider validity intervals kept, "
+                f"year-end readings selected (|at=year_end); not loaded: {json.dumps(skip, sort_keys=True)}. "
+                "Licence CC BY-NC-SA 4.0 (NON-COMMERCIAL)."
+            ),
         )
-        out["tables"][ds] = {k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created",
-                                                 "unmapped_provider_geo")}
+        out["tables"][ds] = {
+            k: reg[k] for k in ("dataset_key", "artifact_sha256", "row_count", "created", "unmapped_provider_geo")
+        }
         out["tables"][ds]["not_loaded"] = skip
     return out
 

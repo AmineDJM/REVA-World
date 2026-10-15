@@ -497,14 +497,14 @@ def kg_records(
                 selector={"file": brd_file, "row": i + 2, "column": "bd_best"},
             )
         )
-    for aid in sorted(used_actors, key=int):
-        name = actor_name.get(aid)
+    for actor in sorted(used_actors, key=int):
+        name = actor_name.get(actor)
         ents.append(
             KgEntity(
-                qid=f"ucdp:actor:{aid}",
+                qid=f"ucdp:actor:{actor}",
                 kind="armed_group",
-                labels={"en": (name or "").strip() or f"UCDP actor {aid}"},
-                descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {UCDP_VERSION})"},
+                labels={"en": (name or "").strip() or f"UCDP actor {actor}"},
+                descriptions={"en": f"UCDP actor {actor} (UCDP Actor Dataset {UCDP_VERSION})"},
             )
         )
     return ents, stmts
@@ -520,6 +520,7 @@ def atlas_source() -> Any:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="Uppsala Conflict Data Program (Uppsala University)",
         licence=RIGHTS["licence"],

@@ -1,0 +1,302 @@
+# UNSD AMA concepts (agent A-FACTBOOK). Provider-declared, not human-reviewed. Table atlas.unsd.ama built by
+# src/reva/adapters/connectors/atlas_unsd_ama.py (source atlas.unsd_ama). All 73 AMA series are in the table
+# (indicator '<series>|<AMA item>'); the concepts below are the headline ones.
+domain: unsd_ama
+labels:
+  fr: ONU - Agrégats principaux des comptes nationaux (AMA)
+  en: UN - National Accounts Main Aggregates (AMA)
+maintainer: A-FACTBOOK
+concepts:
+- id: unsd_ama.gdp_current_usd
+  labels:
+    fr: PIB, dollars US courants (UNSD AMA)
+    en: GDP, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|Gross Domestic Product (GDP)' (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|Gross Domestic Product (GDP)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gdp_constant2020_usd
+  labels:
+    fr: PIB, dollars US constants de 2020 (UNSD AMA)
+    en: GDP, constant 2020 US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_constant2020_usd|Gross Domestic Product (GDP)' (bulk download of the AMA database).
+  unit: constant 2020 US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_constant2020_usd|Gross Domestic Product (GDP)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gdp_pc_current_usd
+  labels:
+    fr: PIB par habitant, dollars US courants (UNSD AMA)
+    en: GDP per capita, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_pc_current_usd' (bulk download of the AMA database).
+  unit: current US$ per person
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_pc_current_usd
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gdp_pc_constant2020_usd
+  labels:
+    fr: PIB par habitant, dollars US constants de 2020 (UNSD AMA)
+    en: GDP per capita, constant 2020 US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_pc_constant2020_usd' (bulk download of the AMA database).
+  unit: constant 2020 US$ per person
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_pc_constant2020_usd
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gdp_growth
+  labels:
+    fr: Taux de croissance du PIB, prix constants de 2020 (UNSD AMA)
+    en: GDP growth rate, constant 2020 prices (UNSD AMA)
+  definition: UNSD AMA series 'growth_constant2020|Gross Domestic Product (GDP)' (bulk download of the AMA database).
+  unit: '% annual growth (constant 2020 prices)'
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.growth_constant2020|Gross Domestic Product (GDP)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gni_current_usd
+  labels:
+    fr: RNB, dollars US courants (UNSD AMA)
+    en: GNI, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gni_current_usd' (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gni_current_usd
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gni_pc_current_usd
+  labels:
+    fr: RNB par habitant, dollars US courants (UNSD AMA)
+    en: GNI per capita, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gni_pc_current_usd' (bulk download of the AMA database).
+  unit: current US$ per person
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gni_pc_current_usd
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.exports_current_usd
+  labels:
+    fr: Exportations de biens et services, dollars US courants (UNSD AMA)
+    en: Exports of goods and services, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|Exports of goods and services' (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|Exports of goods and services
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.imports_current_usd
+  labels:
+    fr: Importations de biens et services, dollars US courants (UNSD AMA)
+    en: Imports of goods and services, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|Imports of goods and services' (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: trade
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|Imports of goods and services
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.household_consumption_current_usd
+  labels:
+    fr: Dépenses de consommation des ménages, dollars US courants (UNSD AMA)
+    en: Household consumption expenditure, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|Household consumption expenditure (including Non-profit institutions serving
+    households)' (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|Household consumption expenditure (including Non-profit institutions serving households)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.government_consumption_current_usd
+  labels:
+    fr: Consommation finale des administrations publiques, dollars US courants (UNSD AMA)
+    en: General government final consumption, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|General government final consumption expenditure' (bulk download of the AMA
+    database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|General government final consumption expenditure
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.gfcf_current_usd
+  labels:
+    fr: Formation brute de capital fixe, dollars US courants (UNSD AMA)
+    en: Gross fixed capital formation, current US dollars (UNSD AMA)
+  definition: UNSD AMA series 'gdp_current_usd|Gross fixed capital formation (including Acquisitions less disposals of valuables)'
+    (bulk download of the AMA database).
+  unit: current US$
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.gdp_current_usd|Gross fixed capital formation (including Acquisitions less disposals of valuables)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.share_agriculture
+  labels:
+    fr: Valeur ajoutée agricole, part (UNSD AMA)
+    en: Agriculture value added, share (UNSD AMA)
+  definition: UNSD AMA series 'share_current|Agriculture, hunting, forestry, fishing (ISIC A-B)' (bulk download of the AMA
+    database).
+  unit: '% (share of GDP / value added, current prices)'
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.share_current|Agriculture, hunting, forestry, fishing (ISIC A-B)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.share_manufacturing
+  labels:
+    fr: Valeur ajoutée manufacturière, part (UNSD AMA)
+    en: Manufacturing value added, share (UNSD AMA)
+  definition: UNSD AMA series 'share_current|Manufacturing (ISIC D)' (bulk download of the AMA database).
+  unit: '% (share of GDP / value added, current prices)'
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.share_current|Manufacturing (ISIC D)
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.population
+  labels:
+    fr: Population (UNSD AMA)
+    en: Population (UNSD AMA)
+  definition: UNSD AMA series 'xr_pop|Population' (bulk download of the AMA database).
+  unit: persons
+  domain: unsd_ama
+  subdomain: population
+  value_kind: numeric
+  source_order:
+  - unsd.ama.xr_pop|Population
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.exchange_rate_ama
+  labels:
+    fr: Taux de change AMA (monnaie nationale par dollar US)
+    en: AMA exchange rate (national currency per US dollar)
+  definition: UNSD AMA series 'xr_pop|AMA exchange rate' (bulk download of the AMA database).
+  unit: national currency per US dollar
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.xr_pop|AMA exchange rate
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler
+- id: unsd_ama.exchange_rate_imf
+  labels:
+    fr: Taux de change fondé sur le FMI (monnaie nationale par dollar US, UNSD AMA)
+    en: IMF-based exchange rate (national currency per US dollar, UNSD AMA)
+  definition: UNSD AMA series 'xr_pop|IMF based exchange rate' (bulk download of the AMA database).
+  unit: national currency per US dollar
+  domain: unsd_ama
+  subdomain: national_accounts
+  value_kind: numeric
+  source_order:
+  - unsd.ama.xr_pop|IMF based exchange rate
+  provider_declared: true
+  notes: UNSD National Accounts - Analysis of Main Aggregates (AMA), 220 countries/areas 1970-latest incl. territories and
+    former states. Official data reported to UNSD with gaps filled by UNSD estimates (not marked per cell); footnotes in flags.footnotes.
+    Universal fallback where WB/IMF lack a country.
+  tags:
+  - gap_filler

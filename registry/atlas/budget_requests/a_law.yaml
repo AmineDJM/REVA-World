@@ -24,6 +24,9 @@ requests:
     expected_bytes_per_day: 20000000
     reason: "one ~60 kB JSON per Factbook entity (262 files at a pinned commit of factbook/factbook.json); one run total (source discontinued)"
   - source_key: ssa.ssptw
-    daily_requests: 10
-    expected_bytes_per_day: 50000000
-    reason: "access probe only (www.ssa.gov answers 403 to this deployment); regional PDFs (~5-15 MB each) if access is restored"
+    daily_requests: 220
+    expected_bytes_per_day: 20000000
+    reason: >-
+      SSPTW 2018-2019 (archived, final editions) HTML: 4 region indexes + 4 reading guides (as-of dates)
+      + 184 country pages (~75 kB each) = 192 requests per full run; one run (source no longer updated).
+      Updated 2026-10-15: www.ssa.gov answers 200 to the platform client (proxy egress); it refused curl.

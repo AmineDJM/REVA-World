@@ -41,7 +41,17 @@ from reva.adapters.postgres import queue
 
 log = logging.getLogger("reva.scheduler")
 
-SCHEDULE_JOB_TYPES = frozenset({"ingest", "health", "gaps", "gc", "gate_followup"})  # GATE2: gate_followup
+SCHEDULE_JOB_TYPES = frozenset(
+    {
+        "ingest",
+        "health",
+        "gaps",
+        "gc",
+        "gate_followup",  # GATE2
+        "atlas_ingest",  # ATLASOPS (V3): budget-metered atlas source runs
+        "atlas_snapshot",  # ATLASOPS (V3): daily atlas snapshot (reused when no table changed)
+    }
+)
 SCHEDULE_PRIORITY = -5
 MIN_INTERVAL_SECONDS = 60
 
@@ -58,7 +68,7 @@ class ScheduledJob:
 
 def schedule_payload(job_type: str, parameters: dict[str, Any]) -> dict[str, Any]:
     payload = dict(parameters)
-    if job_type == "ingest":
+    if job_type in ("ingest", "atlas_ingest"):
         payload.setdefault("mode", "live")
     return payload
 

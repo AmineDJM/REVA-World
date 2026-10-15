@@ -1,0 +1,23 @@
+id: geopolitics.historical_diplomatic_relations
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Diplomatic relations (P530) recorded on historical countries and empires (Soviet Union, Yugoslavia, Ottoman
+  Empire, ...), with start/end qualifiers when present.
+purpose: statements
+entity_kind: historical_state
+sparql: |
+  SELECT ?state ?statement ?other ?rank ?start ?end WHERE {
+    VALUES ?cls { wd:Q3024240 wd:Q48349 }
+    ?state wdt:P31 ?cls .
+    {{qid_filter}}
+    ?state p:P530 ?statement .
+    ?statement ps:P530 ?other ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: state, property: P530, object: other, statement: statement, rank: rank, start: start, end: end}
+split: {by: qid_prefix, variable: state}
+max_rows: 30000
+expand_hops: 1

@@ -200,7 +200,6 @@ class _Reader:
         flags = self.int()
         t = flags & 0xFF
         has_attr = bool(flags & (1 << 9))
-        has_tag = bool(flags & (1 << 10))
 
         if t == NILVALUE_SXP:
             return None
@@ -266,9 +265,11 @@ class _Reader:
             value = None
         elif t == RAWSXP:
             n = self.length()
-            value = None if skip else self.read(n)
             if skip:
-                pass
+                self.skip(n)
+                value = None
+            else:
+                value = self.read(n)
         elif t == STRSXP:
             value = self.string_vector(skip)
         elif t in (VECSXP, EXPRSXP):
@@ -277,7 +278,6 @@ class _Reader:
         else:
             raise RDataError(f"unsupported R object type {t}")
         attrs = _pairlist_dict(self.item(depth + 1)) if has_attr else {}
-        del has_tag
         return RObject(t, value, attrs)
 
     def pairlist(self, flags: int, depth: int, skip: bool) -> RObject:

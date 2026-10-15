@@ -1,0 +1,13 @@
+id: geopolitics.disputed_territories
+domain: geopolitics
+owner: KGGEOPOL
+description: >-
+  Disputed territories: instances of disputed territory (Q15239622, checked 2026-10-15) or of its subclasses.
+  Snapshots keep the claimants (P1336 territory claimed by), country (P17), location (P276/P131), part of
+  (P361), start/end and inception/dissolution, so a dispute links to the states involved.
+purpose: seed_entities
+entity_kind: place
+sparql: |
+  SELECT DISTINCT ?item WHERE { ?item wdt:P31/wdt:P279* wd:Q15239622 . }
+max_rows: 3000
+expand_hops: 1

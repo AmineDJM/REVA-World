@@ -5,7 +5,7 @@ Two endpoints, both CC0:
 * **WDQS** SPARQL — ``https://query.wikidata.org/sparql`` (GET, ``format=json``), for selecting items and
   explicit statement rows. Queries are killed by WDQS at 60 s; long queries are split by the harvester.
 * **Wikibase API** ``wbgetentities`` — ``https://www.wikidata.org/w/api.php`` (≤ 50 ids per call,
-  ``props=claims|labels|descriptions|aliases|sitelinks``, languages fr|en|es|pt|ar|zh|ru|de, ``maxlag=5``),
+  ``props=info|claims|labels|descriptions|aliases|sitelinks``, languages fr|en|es|pt|ar|zh|ru|de, ``maxlag=5``),
   for versioned entity snapshots (``lastrevid``) and statements with ids, ranks, qualifiers and references.
 
 Policy compliance (https://meta.wikimedia.org/wiki/User-Agent_policy, WDQS usage policy, API etiquette):
@@ -64,8 +64,9 @@ ALLOWED_HOSTS: tuple[str, ...] = ("query.wikidata.org", "www.wikidata.org")
 SOURCE_WDQS = "wikidata.wdqs"
 SOURCE_WBAPI = "wikidata.wbapi"
 LANGUAGES: tuple[str, ...] = ("fr", "en", "es", "pt", "ar", "zh", "ru", "de")
-ENTITY_PROPS = ("claims", "labels", "descriptions", "aliases", "sitelinks")
-LABEL_PROPS = ("labels", "descriptions", "aliases", "sitelinks")
+# ``info`` carries ``lastrevid``/``modified``: without it wbgetentities returns no revision id.
+ENTITY_PROPS = ("info", "claims", "labels", "descriptions", "aliases", "sitelinks")
+LABEL_PROPS = ("info", "labels", "descriptions", "aliases", "sitelinks")
 MAX_IDS_PER_CALL = 50
 MAX_GET_URL = 7500  # WDQS/varnish accept longer GETs, but chunks this large mean the spec should split
 ENTITY_PREFIX = "http://www.wikidata.org/entity/"
@@ -416,6 +417,23 @@ class WikidataClient:
         return SparqlResult(variables, bindings, query_sha, sha, len(result.body), result.retrieved_at,
                             time.monotonic() - t0)
 
+    # -- search (CirrusSearch, Wikibase API host) ---------------------------------------------------
+    async def search_items(self, query: str, *, limit: int = 50,
+                           meta: Mapping[str, Any] | None = None) -> tuple[list[str], str]:
+        """Item ids matching a CirrusSearch query (e.g. ``haswbstatement:P298=FRA``) on www.wikidata.org.
+
+        Uses the Wikibase API host (not WDQS). Returns (QIDs in result order, raw sha256)."""
+        params = {"action": "query", "list": "search", "srsearch": query, "srnamespace": "0",
+                  "srlimit": str(min(max(1, limit), 500)), "srprop": "", "format": "json", "maxlag": "5"}
+        url = f"{WBAPI_URL}?{urlencode(params)}"
+        result, sha = await self._request(self.wbapi_http, url, endpoint="wbapi", accept="application/json",
+                                          meta={"kind": "search", "query": query, **(meta or {})})
+        doc = _json(result.body)
+        if "error" in doc:
+            raise WikidataError(f"search error {doc['error'].get('code')}", api_code=doc["error"].get("code"))
+        hits = [h.get("title", "") for h in (doc.get("query") or {}).get("search") or []]
+        return [h for h in hits if h[:1] == "Q" and h[1:].isdigit()], sha
+
     # -- wbgetentities -----------------------------------------------------------------------------
     @staticmethod
     def entities_url(ids: Sequence[str], props: Sequence[str] = ENTITY_PROPS,
@@ -512,17 +530,22 @@ def _is_maxlag(body: bytes) -> bool:
         return False
 
 
+RETRY_AFTER_MARGIN_S = 30.0
+
+
 def _retry_after_seconds(value: str | None) -> float | None:
     if not value:
         return None
     value = value.strip()
+    # WDQS answers 429 with Retry-After up to ~1000 s; honour it in full (cap 3600 s) plus a safety
+    # margin, otherwise the shared lock releases the next request early and the ban is renewed.
     if value.isdigit():
-        return min(900.0, float(value))
+        return min(3600.0, float(value)) + RETRY_AFTER_MARGIN_S
     try:
         dt = email.utils.parsedate_to_datetime(value)
     except (TypeError, ValueError):
         return None
-    return max(0.0, min(900.0, (dt - datetime.now(UTC)).total_seconds()))
+    return max(0.0, min(3600.0, (dt - datetime.now(UTC)).total_seconds())) + RETRY_AFTER_MARGIN_S
 
 
 # --------------------------------------------------------------------------- property allow-list

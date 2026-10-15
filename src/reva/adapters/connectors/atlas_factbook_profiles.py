@@ -147,9 +147,7 @@ _LAST_CHANGED: dict[str, str] = {
     "su tk tl tp tx uc up vc vi vt xo xq zh",
     "2026-05-17": "aj am gg",  # only moved between region folders (content of the 2026-01-22 update)
 }
-FILE_LAST_CHANGED: dict[str, date] = {
-    g: date.fromisoformat(d) for d, gs in _LAST_CHANGED.items() for g in gs.split()
-}
+FILE_LAST_CHANGED: dict[str, date] = {g: date.fromisoformat(d) for d, gs in _LAST_CHANGED.items() for g in gs.split()}
 DEFAULT_LAST_CHANGED = date(2026, 1, 22)
 #: the moved files carry 2026-01-22 data: their as-published day is the data commit's day.
 _MOVED_ONLY = {"aj", "am", "gg"}
@@ -217,38 +215,48 @@ def _digest() -> str:
     return "sha256:" + hashlib.sha256(inspect.getsource(sys.modules[__name__]).encode()).hexdigest()
 
 
+def _spec(
+    name: str, datasets: tuple[str, ...], commit: str, planned: int, mappings: dict[str, Any], notes: str
+) -> AtlasSourceSpec:
+    return AtlasSourceSpec(
+        name=name,
+        version=VERSION,
+        source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
+        atlas_source=ATLAS_SOURCE,
+        provider="CIA World Factbook (final edition; factbook/factbook.json CC0 mirror)",
+        licence=RIGHTS["licence"],
+        allowed_hosts=(HOST,),
+        datasets=datasets,
+        dataset_ids=(f"{REPO}@{commit}",),
+        cadence_seconds=365 * 86400,
+        planned_requests=planned,
+        max_response_bytes=MAX_BYTES,
+        min_interval_seconds=0.5,
+        parser_version=PARSER_VERSION,
+        code_digest=_digest(),
+        field_mappings=mappings,
+        notes=notes,
+    )
+
+
 def atlas_source() -> list[AtlasSourceSpec]:
-    common = {
-        "version": VERSION,
-        "source_key": SOURCE_KEY,
-        "atlas_source": ATLAS_SOURCE,
-        "provider": "CIA World Factbook (final edition; factbook/factbook.json CC0 mirror)",
-        "licence": RIGHTS["licence"],
-        "allowed_hosts": (HOST,),
-        "cadence_seconds": 365 * 86400,
-        "max_response_bytes": MAX_BYTES,
-        "min_interval_seconds": 0.5,
-        "parser_version": PARSER_VERSION,
-        "code_digest": _digest(),
-    }
     return [
-        AtlasSourceSpec(
-            name=NAME_PROFILES,
-            datasets=(DS_FIGURES, DS_TEXTS),
-            dataset_ids=(f"{REPO}@{COMMIT}",),
-            planned_requests=sum(len(v.split()) for v in PATHS.values()),
-            field_mappings={"commit": COMMIT, "data_commit": DATA_COMMIT, "numeric": sorted(NUMERIC)},
-            notes="One JSON per Factbook entity at the pinned mirror commit; source discontinued.",
-            **common,
+        _spec(
+            NAME_PROFILES,
+            (DS_FIGURES, DS_TEXTS),
+            COMMIT,
+            sum(len(v.split()) for v in PATHS.values()),
+            {"commit": COMMIT, "data_commit": DATA_COMMIT, "numeric": sorted(NUMERIC)},
+            "One JSON per Factbook entity at the pinned mirror commit; source discontinued.",
         ),
-        AtlasSourceSpec(
-            name=NAME_DISPUTES,
-            datasets=(DS_DISPUTES,),
-            dataset_ids=(f"{REPO}@{DISPUTES_COMMIT}",),
-            planned_requests=sum(len(v.split()) for v in DISPUTES_PATHS.values()),
-            field_mappings={"commit": DISPUTES_COMMIT, "field": ["Transnational Issues", "Disputes - international"]},
-            notes="Last mirror edition carrying 'Disputes - international' (removed by the CIA on 2024-04-25).",
-            **common,
+        _spec(
+            NAME_DISPUTES,
+            (DS_DISPUTES,),
+            DISPUTES_COMMIT,
+            sum(len(v.split()) for v in DISPUTES_PATHS.values()),
+            {"commit": DISPUTES_COMMIT, "field": ["Transnational Issues", "Disputes - international"]},
+            "Last mirror edition carrying 'Disputes - international' (removed by the CIA on 2024-04-25).",
         ),
     ]
 
@@ -334,7 +342,7 @@ def year_of(text: str) -> tuple[tuple[date, date] | None, bool]:
 class Spec:
     """One curated numeric Factbook field."""
 
-    __slots__ = ("indicator", "path", "kind", "unit", "suffix", "year_keyed")
+    __slots__ = ("indicator", "kind", "path", "suffix", "unit", "year_keyed")
 
     def __init__(
         self,
@@ -451,7 +459,13 @@ _SPECS: list[Spec] = [
         "years",
         r"years",
     ),
-    Spec("drinking_water_improved.total", (_P, "Drinking water source", "improved: total"), "plain", "% of population", _PCT),
+    Spec(
+        "drinking_water_improved.total",
+        (_P, "Drinking water source", "improved: total"),
+        "plain",
+        "% of population",
+        _PCT,
+    ),
     Spec(
         "sanitation_improved.total",
         (_P, "Sanitation facility access", "improved: total"),
@@ -466,7 +480,13 @@ _SPECS: list[Spec] = [
     Spec("gdp.real_per_capita_ppp", (_E, "Real GDP per capita"), "money", "US$", year_keyed=True),
     Spec("gdp.official_exchange_rate", (_E, "GDP (official exchange rate)"), "money", "US$"),
     Spec("inflation", (_E, "Inflation rate (consumer prices)"), "plain", "%", _PCT, year_keyed=True),
-    Spec("gdp_sector.agriculture", (_E, "GDP - composition, by sector of origin", "agriculture"), "plain", "% of GDP", _PCT),
+    Spec(
+        "gdp_sector.agriculture",
+        (_E, "GDP - composition, by sector of origin", "agriculture"),
+        "plain",
+        "% of GDP",
+        _PCT,
+    ),
     Spec("gdp_sector.industry", (_E, "GDP - composition, by sector of origin", "industry"), "plain", "% of GDP", _PCT),
     Spec("gdp_sector.services", (_E, "GDP - composition, by sector of origin", "services"), "plain", "% of GDP", _PCT),
     Spec(
@@ -490,8 +510,20 @@ _SPECS: list[Spec] = [
         "% of GDP",
         _PCT,
     ),
-    Spec("gdp_end_use.exports", (_E, "GDP - composition, by end use", "exports of goods and services"), "plain", "% of GDP", _PCT),
-    Spec("gdp_end_use.imports", (_E, "GDP - composition, by end use", "imports of goods and services"), "plain", "% of GDP", _PCT),
+    Spec(
+        "gdp_end_use.exports",
+        (_E, "GDP - composition, by end use", "exports of goods and services"),
+        "plain",
+        "% of GDP",
+        _PCT,
+    ),
+    Spec(
+        "gdp_end_use.imports",
+        (_E, "GDP - composition, by end use", "imports of goods and services"),
+        "plain",
+        "% of GDP",
+        _PCT,
+    ),
     Spec("industrial_production_growth", (_E, "Industrial production growth rate"), "plain", "%", _PCT),
     Spec("labor_force", (_E, "Labor force"), "plain", "persons", r"(?!%|\d)"),
     Spec("unemployment_rate", (_E, "Unemployment rate"), "plain", "%", _PCT, year_keyed=True),
@@ -505,8 +537,20 @@ _SPECS: list[Spec] = [
         r"(?!%)",
         year_keyed=True,
     ),
-    Spec("income_share.lowest_10", (_E, "Household income or consumption by percentage share", "lowest 10%"), "plain", "%", _PCT),
-    Spec("income_share.highest_10", (_E, "Household income or consumption by percentage share", "highest 10%"), "plain", "%", _PCT),
+    Spec(
+        "income_share.lowest_10",
+        (_E, "Household income or consumption by percentage share", "lowest 10%"),
+        "plain",
+        "%",
+        _PCT,
+    ),
+    Spec(
+        "income_share.highest_10",
+        (_E, "Household income or consumption by percentage share", "highest 10%"),
+        "plain",
+        "%",
+        _PCT,
+    ),
     Spec("remittances_gdp", (_E, "Remittances"), "plain", "% of GDP", _PCT, year_keyed=True),
     Spec("budget.revenues", (_E, "Budget", "revenues"), "money", "US$"),
     Spec("budget.expenditures", (_E, "Budget", "expenditures"), "money", "US$"),
@@ -517,7 +561,9 @@ _SPECS: list[Spec] = [
     Spec("imports", (_E, "Imports"), "money", "US$", year_keyed=True),
     Spec("reserves", (_E, "Reserves of foreign exchange and gold"), "money", "US$", year_keyed=True),
     Spec("external_debt", (_E, "Debt - external"), "money", "US$", year_keyed=True),
-    Spec("exchange_rate", (_E, "Exchange rates"), "plain", "national currency per US dollar", r"(?!%)", year_keyed=True),
+    Spec(
+        "exchange_rate", (_E, "Exchange rates"), "plain", "national currency per US dollar", r"(?!%)", year_keyed=True
+    ),
     # energy, communications, environment
     Spec(
         "electricity_access",
@@ -599,7 +645,6 @@ PARTNER_ALIASES: dict[str, str] = {
     "west bank": "we",
     "gaza strip": "gz",
     "holy see (vatican city)": "vt",
-    "congo, republic of the": "cf",
     "bahamas, the": "bf",
     "gambia, the": "ga",
     "micronesia, federated states of": "fm",
@@ -684,7 +729,9 @@ _INVERTED = re.compile(r", (?:The|Republic of the|Democratic Republic of the|Fed
 
 def split_top(text: str) -> list[str]:
     """Split on commas/semicolons outside parentheses/brackets (not thousands separators)."""
-    out, depth, cur = [], 0, []
+    out: list[str] = []
+    cur: list[str] = []
+    depth = 0
     for i, ch in enumerate(text):
         if ch in "([":
             depth += 1
@@ -882,7 +929,11 @@ def _leaves(node: Any, path: tuple[str, ...]) -> Iterable[tuple[tuple[str, ...],
 def parse_texts(doc: Mapping[str, Any], region: str, gec: str, sha: str, rows: Rows, stats: dict[str, int]) -> None:
     geo = gec.upper()
     file = f"{region}/{gec}.json"
-    base = {"edition": EDITION, "provider_nature": NATURE, "transcription": "verbatim (HTML tags removed)"}
+    base: dict[str, Any] = {
+        "edition": EDITION,
+        "provider_nature": NATURE,
+        "transcription": "verbatim (HTML tags removed)",
+    }
     base |= entity_flags(gec)
     period = as_published(gec)
     for path, raw in _leaves(doc, ()):
@@ -891,7 +942,7 @@ def parse_texts(doc: Mapping[str, Any], region: str, gec: str, sha: str, rows: R
         text = clean_text(raw)
         if not text:
             continue
-        flags = dict(base)
+        flags: dict[str, Any] = dict(base)
         if len(text) > TEXT_LIMIT:
             flags["value_text_truncated"] = True
             flags["full_length"] = len(text)
@@ -920,7 +971,7 @@ def _numeric_leaves(doc: Mapping[str, Any], spec: Spec) -> list[tuple[tuple[str,
     if node is None:
         return []
     if spec.year_keyed and isinstance(node, dict):
-        out = []
+        out: list[tuple[tuple[str, ...], str, str | None]] = []
         field = spec.path[-1]
         pat = re.compile(r"^" + re.escape(field) + r" ((?:19|20)\d{2})$", re.I)
         for k, v in node.items():
@@ -947,7 +998,7 @@ def _sibling_year(doc: Mapping[str, Any], spec: Spec) -> tuple[tuple[date, date]
             if p:
                 found.setdefault(p, (est, k))
     if len(found) == 1:
-        (p, (est, k)), = found.items()
+        ((p, (est, k)),) = found.items()
         return p, est, k
     return None, False, None
 
@@ -963,7 +1014,7 @@ def parse_figures(
 ) -> None:
     geo = gec.upper()
     file = f"{region}/{gec}.json"
-    base = {"edition": EDITION, "provider_nature": NATURE, "estimate": True} | entity_flags(gec)
+    base: dict[str, Any] = {"edition": EDITION, "provider_nature": NATURE, "estimate": True} | entity_flags(gec)
     pub = as_published(gec)
     for spec in _SPECS:
         node = _node(doc, spec.path)
@@ -1007,10 +1058,10 @@ def parse_figures(
     # shares
     for prefix, candidates in SHARES.items():
         for path in candidates:
-            raw = _text(_node(doc, path))
-            if raw is None:
+            share_raw = _text(_node(doc, path))
+            if share_raw is None:
                 continue
-            text = clean_text(raw)
+            text = clean_text(share_raw)
             items, skipped, period, est = parse_shares(text)
             stats[f"share_segments_skipped:{prefix}"] = stats.get(f"share_segments_skipped:{prefix}", 0) + skipped
             for seg, name, value, qual in items:
@@ -1040,9 +1091,9 @@ def parse_figures(
                 ):
                     stats["share_rows"] = stats.get("share_rows", 0) + 1
             break
-    raw = _text(_node(doc, (_G, "Land boundaries", "border countries")))
-    if raw:
-        text = clean_text(raw)
+    border_raw = _text(_node(doc, (_G, "Land boundaries", "border countries")))
+    if border_raw:
+        text = clean_text(border_raw)
         items, skipped = parse_borders(text)
         stats["border_segments_skipped"] = stats.get("border_segments_skipped", 0) + skipped
         for seg, name, value, qual in items:
@@ -1207,10 +1258,20 @@ async def ingest_disputes(run: Any, gecs: Iterable[str] | None = None) -> dict[s
     return out
 
 
+def _gecs_option(run: Any) -> list[str] | None:
+    """Run option ``gecs`` (list or comma-separated GEC codes) restricts the entities fetched."""
+    v = (getattr(run, "options", None) or {}).get("gecs")
+    if v is None:
+        return None
+    items = v.split(",") if isinstance(v, str) else list(v)
+    return [g.strip().lower() for g in items if g.strip()]
+
+
 async def atlas_ingest(run: Any) -> dict[str, Any]:
+    gecs = _gecs_option(run)
     if run.spec.name == NAME_DISPUTES:
-        return await ingest_disputes(run)
-    return await ingest_profiles(run)
+        return await ingest_disputes(run, gecs)
+    return await ingest_profiles(run, gecs)
 
 
 __all__ = [

@@ -13,6 +13,7 @@ import pytest
 from reva.adapters.connectors import atlas_undp, atlas_whr, atlas_wid
 from reva.adapters.connectors.atlas_qol_common import fetch_all
 from reva.adapters.http.safe_client import SafeHttpClient
+from reva.atlas.ingest import AtlasRun
 from reva.atlas.tables import validate_atlas_frame
 
 pytestmark = pytest.mark.live
@@ -22,8 +23,8 @@ async def _validated(connector: Any) -> dict[str, Any]:
     spec = connector.describe()
     async with SafeHttpClient(
         allowed_hosts=spec.allowed_hosts, timeout_seconds=120, max_bytes=spec.max_response_bytes, proxy_mode="env"
-    ) as http:
-        raws = await fetch_all(connector, http)
+    ) as client:
+        raws = await fetch_all(connector, AtlasRun.offline(spec, client, origin="live"))  # fetch only, no archive
     out = {}
     for b in connector.build(raws):
         f, unmapped = validate_atlas_frame(

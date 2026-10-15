@@ -318,11 +318,11 @@ def vote_cells(v: Votes, ok: Sequence[bool]) -> tuple[list[VoteCell], dict[str, 
     groups: dict[tuple[int, int | None], list[int]] = defaultdict(list)
     stats: Counter[str] = Counter()
     for i in range(v.n):
-        vote = c["vote"][i]
-        if vote == NOT_MEMBER:
+        code = c["vote"][i]
+        if code == NOT_MEMBER:
             stats["not_member_rows_skipped"] += 1
             continue
-        if vote not in VOTE:
+        if code not in VOTE:
             stats["unknown_vote_code_rows_skipped"] += 1
             continue
         groups[(c["rcid"][i], c["ccode"][i])].append(i)
@@ -484,8 +484,8 @@ def share_rows(
         for issue in (*rc.issues, "all"):
             for grain, p in (("year", y), ("decade", y // 10 * 10)):
                 acc[(cell.ccode, res.iso3, res.label if res.iso3 is None else None, res.qid, grain, p, issue)][
-                    VOTE[cell.vote]
-                ] += 1  # type: ignore[index]
+                    VOTE[cell.vote or 0]
+                ] += 1
     out = []
     for (ccode, iso3, hist, qid, grain, p, issue), cnt in sorted(acc.items(), key=lambda kv: tuple(map(str, kv[0]))):
         if grain == "year":
@@ -628,7 +628,7 @@ def kg_records(
         if issues_only and not rc.issues:
             continue
         subj = resolver.entity("cow", cell.ccode, rc.date, provider_label=cell.countryname)
-        pos = VOTE[cell.vote]  # type: ignore[index]
+        pos = VOTE[cell.vote or 0]
         q: dict[str, Any] = {"ccode": cell.ccode}
         if cell.status != "ok":
             q["provider_status"] = cell.status
@@ -658,6 +658,7 @@ def atlas_source() -> Any:
         name=CONNECTOR_NAME,
         version=CONNECTOR_VERSION,
         source_key=SOURCE_KEY,
+        budget_key=SOURCE_KEY,
         atlas_source=ATLAS_SOURCE,
         provider="Harvard Dataverse (Voeten, Strezhnev & Bailey, UNGA voting data)",
         licence=RIGHTS["licence"],

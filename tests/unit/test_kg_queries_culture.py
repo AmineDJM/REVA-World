@@ -230,8 +230,74 @@ async def _capture(names: list[str]) -> None:  # pragma: no cover - live, run by
         await http.aclose()
 
 
+ENTITY_FIXTURE = FIXTURES / "anchor_entities.json"
+ENTITY_KEEP = ("P31", "P279", "P361", "P17", "P220", "P218", "P219", "P1394", "P1098", "P282", "P37", "P2936",
+               "P140", "P38", "P112", "P571", "P576", "P1365", "P155", "P1366", "P156")
+
+
+async def _capture_entities() -> None:  # pragma: no cover - live, run by hand
+    """wbgetentities snapshots (claims trimmed to ENTITY_KEEP) of the anchors, the P279 ancestors of the
+    anchor languages and religions, and Brazil's predecessors and what they are part of."""
+    from reva.adapters.connectors.wikidata import WikidataClient, make_live_http
+
+    http = make_live_http(proxy_mode="env")
+    client = WikidataClient(http)
+    out: dict[str, Any] = {}
+
+    async def fetch(ids: set[str]) -> None:
+        todo = sorted(i for i in ids if i not in out)
+        if not todo:
+            return
+        res = await client.get_entities(todo, props=("claims", "labels", "sitelinks"), languages=("en", "fr"),
+                                        meta={"agent": "KGCULT", "purpose": "anchor entities"})
+        for qid, ent in res.entities.items():
+            out[qid] = {
+                "id": ent["id"], "type": ent.get("type"), "lastrevid": ent.get("lastrevid"),
+                "modified": ent.get("modified"), "labels": ent.get("labels", {}),
+                "sitelinks_count": len(ent.get("sitelinks") or {}),
+                "claims": {k: v for k, v in (ent.get("claims") or {}).items() if k in ENTITY_KEEP},
+                "raw_sha256": res.raw_sha_by_id.get(qid), "retrieved_at": res.retrieved_at.isoformat(),
+            }
+
+    def objects(qid: str, pid: str) -> set[str]:
+        got = set()
+        for c in out.get(qid, {}).get("claims", {}).get(pid, []):
+            if c.get("rank") == "deprecated":
+                continue
+            v = (c.get("mainsnak", {}).get("datavalue") or {}).get("value")
+            if isinstance(v, dict) and v.get("id"):
+                got.add(v["id"])
+        return got
+
+    try:
+        await fetch({*ANCHOR_LANGUAGES, BRAZIL, PORTUGAL, CATHOLICISM, CATHOLIC_CHURCH, ISLAM})
+        frontier = set(ANCHOR_LANGUAGES) | {CATHOLICISM, CATHOLIC_CHURCH, ISLAM}
+        for _ in range(12):  # P279 closure, bounded depth
+            nxt = {o for q in frontier for o in objects(q, "P279")} - set(out)
+            if not nxt:
+                break
+            await fetch(nxt)
+            frontier = nxt
+        preds = objects(BRAZIL, "P1365") | objects(BRAZIL, "P155")
+        await fetch(preds)
+        preds2 = {o for q in preds for o in objects(q, "P1365") | objects(q, "P155")}
+        await fetch(preds2)
+        await fetch({o for q in preds | preds2 for o in objects(q, "P361") | objects(q, "P17")})
+    finally:
+        await http.aclose()
+    FIXTURES.mkdir(parents=True, exist_ok=True)
+    ENTITY_FIXTURE.write_text(json.dumps({
+        "source": "Wikidata wbgetentities (CC0) via reva.adapters.connectors.wikidata.WikidataClient; claims trimmed "
+                  "to ENTITY_KEEP, raw response sha256 per entity",
+        "entities": dict(sorted(out.items(), key=lambda kv: int(kv[0][1:]))),
+    }, indent=1, ensure_ascii=False, sort_keys=True))
+    print("entities", len(out), file=sys.stderr)
+
+
 if __name__ == "__main__":  # pragma: no cover
     import asyncio
 
     if len(sys.argv) >= 2 and sys.argv[1] == "capture":
         asyncio.run(_capture(sys.argv[2:] or list(ANCHORS)))
+    elif len(sys.argv) >= 2 and sys.argv[1] == "capture-entities":
+        asyncio.run(_capture_entities())
