@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "reva-atlas-source-order/1",
+  "title": "REVA headline concepts with a cross-source fallback order (registry/atlas/source_order/<theme>.yaml)",
+  "description": "A REVA headline concept lists, in best-available order, provider series that define the same quantity the same way (each with a written justification); the query layer picks per country and calendar year the first series that reports it and names it, listing every series consulted and which had no value. Series with a different definition are not listed (they may be recorded under not_equivalent with the reason). An optional derived step computes the concept from two sourced inputs with an exact formula, same country and same year only, when no listed series reports the cell.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["theme", "concepts"],
+  "properties": {
+    "theme": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,39}$"},
+    "maintainer": {"type": "string", "maxLength": 100},
+    "concepts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/concept"}}
+  },
+  "$defs": {
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fr", "en"],
+      "properties": {
+        "fr": {"type": "string", "minLength": 1, "maxLength": 300},
+        "en": {"type": "string", "minLength": 1, "maxLength": 300}
+      }
+    },
+    "series_key": {"type": "string", "pattern": "^[a-z0-9][a-z0-9_-]{0,23}\\.[a-z0-9][a-z0-9_-]{0,38}\\.[^\\x00-\\x1f\\x7f]{1,200}$"},
+    "decimal": {"type": "string", "pattern": "^(0|[1-9][0-9]*)(\\.[0-9]+)?([eE][-+]?[0-9]{1,3})?$"},
+    "series": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["series", "justification"],
+      "properties": {
+        "series": {"$ref": "#/$defs/series_key"},
+        "reported_unit": {"type": "string", "minLength": 1, "maxLength": 100, "description": "The cell unit this entry accepts (cells with another unit are skipped and reported). Required when scale is not 1."},
+        "scale": {"$ref": "#/$defs/decimal", "description": "Exact decimal factor from the reported unit to the concept unit (e.g. 1000 for thousands -> persons)."},
+        "justification": {"type": "string", "minLength": 20, "maxLength": 2000},
+        "caveats": {"type": "string", "maxLength": 2000}
+      }
+    },
+    "operand": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "concept": {"type": "string", "pattern": "^reva\\.[a-z0-9_.]{1,150}$", "description": "Another headline concept (its reported best value, never its derived one)"},
+        "series": {"$ref": "#/$defs/series_key"},
+        "reported_unit": {"type": "string", "minLength": 1, "maxLength": 100},
+        "scale": {"$ref": "#/$defs/decimal"}
+      },
+      "oneOf": [{"required": ["concept"]}, {"required": ["series"]}]
+    },
+    "derived": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["formula", "alternatives", "justification"],
+      "properties": {
+        "formula": {"enum": ["ratio", "difference"], "description": "ratio = a / b (b > 0); difference = a - b"},
+        "scale": {"$ref": "#/$defs/decimal", "description": "Exact factor applied to the result (default 1)"},
+        "alternatives": {
+          "type": "array", "minItems": 1, "maxItems": 10,
+          "items": {"type": "array", "minItems": 2, "maxItems": 2, "items": {"$ref": "#/$defs/operand"}},
+          "description": "Operand pairs [a, b] tried in order; both from the same country and calendar year"
+        },
+        "justification": {"type": "string", "minLength": 20, "maxLength": 2000}
+      }
+    },
+    "not_equivalent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["series", "reason"],
+      "properties": {
+        "series": {"type": "string", "minLength": 3, "maxLength": 260},
+        "reason": {"type": "string", "minLength": 10, "maxLength": 2000}
+      }
+    },
+    "concept": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "labels", "definition", "unit"],
+      "properties": {
+        "id": {"type": "string", "pattern": "^reva\\.[a-z0-9_.]{1,150}$"},
+        "labels": {"$ref": "#/$defs/labels"},
+        "definition": {"type": "string", "minLength": 10, "maxLength": 4000},
+        "unit": {"type": "string", "minLength": 1, "maxLength": 100},
+        "projections": {"enum": ["exclude", "allow"], "description": "exclude (default): cells flagged as projections never answer"},
+        "series": {"type": "array", "maxItems": 20, "items": {"$ref": "#/$defs/series"}},
+        "derived": {"$ref": "#/$defs/derived"},
+        "caveats": {"type": "string", "maxLength": 4000},
+        "not_equivalent": {"type": "array", "maxItems": 30, "items": {"$ref": "#/$defs/not_equivalent"}},
+        "related_catalog_concepts": {"type": "array", "maxItems": 30, "items": {"type": "string", "maxLength": 200}}
+      },
+      "anyOf": [{"required": ["series"]}, {"required": ["derived"]}]
+    }
+  }
+}

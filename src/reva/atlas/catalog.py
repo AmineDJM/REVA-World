@@ -28,6 +28,7 @@ from reva.ontology.registry import REGISTRY_ROOT
 
 CATALOG_DIR = REGISTRY_ROOT / "atlas" / "catalog"
 SCHEMA_PATH = CATALOG_DIR / "_schema.json"
+THEMES_PATH = REGISTRY_ROOT / "atlas" / "themes.yaml"
 
 
 @dataclass(frozen=True)
@@ -64,6 +65,7 @@ class Concept:
     tags: tuple[str, ...] = ()
     file: str = ""
     provider_declared: bool = True
+    theme: str | None = None
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -73,6 +75,7 @@ class Concept:
             "unit": self.unit,
             "domain": self.domain,
             "subdomain": self.subdomain,
+            "theme": self.theme,
             "value_kind": self.value_kind,
             "source_order": [s.key for s in self.source_order],
             "provider_declared": self.provider_declared,
@@ -89,15 +92,29 @@ class Catalog:
     domains: dict[str, dict[str, Any]] = field(default_factory=dict)
     errors: list[dict[str, str]] = field(default_factory=list)
     files: dict[str, str] = field(default_factory=dict)  # file name -> sha256 of bytes
+    themes: dict[str, dict[str, str]] = field(default_factory=dict)  # theme id -> labels
+    unthemed: list[str] = field(default_factory=list)  # concepts no theme rule/default covers (reported)
 
-    def by_domain(self, domain: str | None = None) -> list[Concept]:
-        return [c for c in self.concepts.values() if domain is None or c.domain == domain]
+    def by_domain(self, domain: str | None = None, theme: str | None = None) -> list[Concept]:
+        return [
+            c
+            for c in self.concepts.values()
+            if (domain is None or c.domain == domain) and (theme is None or c.theme == theme)
+        ]
 
-    def search(self, q: str | None = None, domain: str | None = None, subdomain: str | None = None) -> list[Concept]:
+    def search(
+        self,
+        q: str | None = None,
+        domain: str | None = None,
+        subdomain: str | None = None,
+        theme: str | None = None,
+    ) -> list[Concept]:
         needle = (q or "").strip().lower()
         out = []
         for c in self.concepts.values():
             if domain and c.domain != domain:
+                continue
+            if theme and c.theme != theme:
                 continue
             if subdomain and c.subdomain != subdomain:
                 continue
@@ -142,11 +159,61 @@ def _validate_doc(doc: Any, name: str) -> list[str]:
     return out
 
 
-def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True) -> Catalog:
+@dataclass(frozen=True)
+class Themes:
+    """``registry/atlas/themes.yaml``: theme labels, ordered rules and per-domain defaults."""
+
+    labels: dict[str, dict[str, str]]
+    rules: tuple[dict[str, str], ...]
+    domain_defaults: dict[str, str]
+    subdomain_themed_domains: frozenset[str] = frozenset()
+    subdomain_aliases: dict[str, str] = field(default_factory=dict)
+
+    def theme_of(self, domain: str, subdomain: str | None, concept_id: str, own: str | None = None) -> str | None:
+        if own:
+            return own
+        for r in self.rules:
+            if r.get("domain") not in (None, domain):
+                continue
+            if "subdomain" in r and r["subdomain"] != subdomain:
+                continue
+            if "id_prefix" in r and not concept_id.startswith(r["id_prefix"]):
+                continue
+            return r["theme"]
+        if domain in self.subdomain_themed_domains and subdomain:
+            if subdomain in self.labels:
+                return subdomain
+            if subdomain in self.subdomain_aliases:
+                return self.subdomain_aliases[subdomain]
+        return self.domain_defaults.get(domain)
+
+
+def load_themes(path: Path = THEMES_PATH) -> Themes:
+    """Load and check the theme registry (every rule/default names a declared theme)."""
+    doc = yaml.safe_load(path.read_text()) or {}
+    labels = {str(k): dict(v) for k, v in (doc.get("themes") or {}).items()}
+    rules = tuple(dict(r) for r in (doc.get("rules") or ()))
+    defaults = {str(k): str(v) for k, v in (doc.get("domain_defaults") or {}).items()}
+    aliases = {str(k): str(v) for k, v in (doc.get("subdomain_aliases") or {}).items()}
+    bad = sorted(
+        {r.get("theme", "") for r in rules if r.get("theme") not in labels}
+        | {v for v in defaults.values() if v not in labels}
+        | {v for v in aliases.values() if v not in labels}
+    )
+    if bad or any(set(r) - {"domain", "subdomain", "id_prefix", "theme"} for r in rules):
+        raise ValidationProblem("atlas themes.yaml invalid", unknown_themes=bad)
+    for k, lab in labels.items():
+        if not re.match(r"^[a-z][a-z0-9_]{0,39}$", k) or not lab.get("fr") or not lab.get("en"):
+            raise ValidationProblem("atlas theme needs an id and fr/en labels", theme=k)
+    return Themes(labels, rules, defaults, frozenset(doc.get("subdomain_themed_domains") or ()), aliases)
+
+
+def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True, themes_path: Path = THEMES_PATH) -> Catalog:
     """Load and validate every ``<domain>.yaml``. ``strict`` raises on the first problem."""
     import hashlib
 
-    cat = Catalog()
+    themes = load_themes(themes_path)
+    cat = Catalog(themes=dict(themes.labels))
     files = sorted(p for p in directory.glob("*.y*ml") if not p.name.startswith("_"))
     for p in files:
         data = p.read_bytes()
@@ -168,6 +235,10 @@ def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True) -> Catal
         cat.files[p.name] = hashlib.sha256(data).hexdigest()
         cat.domains[doc["domain"]] = {"labels": doc.get("labels"), "file": p.name, "concepts": len(doc["concepts"])}
         for c in doc["concepts"]:
+            theme = themes.theme_of(c["domain"], c.get("subdomain"), c["id"], c.get("theme"))
+            if theme not in themes.labels:  # reported, never fatal: a new domain must not break loading
+                cat.unthemed.append(c["id"])
+                theme = None
             cat.concepts[c["id"]] = Concept(
                 id=c["id"],
                 labels=dict(c["labels"]),
@@ -180,6 +251,7 @@ def load_catalog(directory: Path = CATALOG_DIR, *, strict: bool = True) -> Catal
                 value_kind=c.get("value_kind", "numeric"),
                 tags=tuple(c.get("tags") or ()),
                 file=p.name,
+                theme=theme,
             )
     return cat
 
@@ -191,7 +263,7 @@ def cached_catalog(directory: Path = CATALOG_DIR) -> Catalog:
     """Non-strict catalog, reloaded when any catalog file changes (mtime/size fingerprint)."""
     fp = tuple(
         (p.name, p.stat().st_mtime_ns, p.stat().st_size)
-        for p in sorted(directory.glob("*.y*ml"))
+        for p in [*sorted(directory.glob("*.y*ml")), THEMES_PATH]
         if not p.name.startswith("_")
     )
     key = str(directory)

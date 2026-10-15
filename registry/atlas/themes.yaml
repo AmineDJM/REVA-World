@@ -1,0 +1,110 @@
+# REVA atlas themes (agent ATLASOPS). Every catalog concept (registry/atlas/catalog/<domain>.yaml) and
+# every REVA headline concept (registry/atlas/source_order/<theme>.yaml) belongs to exactly one theme.
+#
+# A catalog file's `domain` says which agent/provider family filed the concept (e.g. `imf`, `un`); the
+# theme says what the concept is about. Resolution order for a catalog concept:
+#   1. its own optional `theme:` field (catalog schema),
+#   2. the first matching rule below (domain + optional subdomain / id prefix),
+#   3. for domains listed in `subdomain_themed_domains`: the subdomain itself when it is a theme id,
+#      else `subdomain_aliases[subdomain]`,
+#   4. the domain default below.
+# A concept that resolves to no theme is reported (reva.atlas.catalog.Catalog.errors; a test fails).
+# `society` is the 16th theme: quality of life, well-being, human development, poverty, inequality and
+# gender (none of the 15 requested themes fits them without distorting it).
+themes:
+  economy: {fr: "Économie", en: "Economy"}
+  population: {fr: "Population", en: "Population"}
+  labour: {fr: "Travail", en: "Labour"}
+  health: {fr: "Santé", en: "Health"}
+  education: {fr: "Éducation", en: "Education"}
+  environment: {fr: "Environnement", en: "Environment"}
+  energy: {fr: "Énergie", en: "Energy"}
+  politics: {fr: "Politique", en: "Politics"}
+  law: {fr: "Droit", en: "Law"}
+  science: {fr: "Science et technologie", en: "Science and technology"}
+  culture: {fr: "Culture", en: "Culture"}
+  history: {fr: "Histoire", en: "History"}
+  geography: {fr: "Géographie", en: "Geography"}
+  trade: {fr: "Commerce extérieur", en: "Trade"}
+  finance: {fr: "Finances publiques et monnaie", en: "Public finance and money"}
+  society: {fr: "Société et qualité de vie", en: "Society and quality of life"}
+
+# first match wins (before the domain defaults)
+rules:
+  # IMF (A-IMF filed everything under domain `imf`)
+  - {domain: imf, subdomain: national_accounts, theme: economy}
+  - {domain: imf, subdomain: prices, theme: economy}
+  - {domain: imf, subdomain: labour, theme: labour}
+  - {domain: imf, subdomain: population, theme: population}
+  - {domain: imf, subdomain: external, theme: trade}
+  - {domain: imf, subdomain: trade, theme: trade}
+  - {domain: imf, subdomain: fiscal, theme: finance}
+  - {domain: imf, subdomain: fiscal_gfs, theme: finance}
+  - {domain: imf, subdomain: monetary, theme: finance}
+  # UN (A-UN filed everything under domain `un`)
+  - {domain: un, subdomain: area, theme: geography}
+  - {domain: un, subdomain: mortality, theme: health}
+  # quality of life (A-QOL)
+  - {domain: quality_of_life, subdomain: planetary, theme: environment}
+  # education: R&D indicators are science
+  - {domain: education, subdomain: research_development, theme: science}
+  - {domain: geography, subdomain: hazards, theme: environment}
+  - {domain: geography, subdomain: climate, theme: environment}
+  - {domain: geography, subdomain: population, theme: population}
+
+# multi-topic catalogs whose subdomains name what a concept is about
+subdomain_themed_domains: [factbook, food_agriculture, unsd_ama, water]
+subdomain_aliases:
+  public_finance: finance
+  national_accounts: economy
+  government: politics
+  geopolitics: politics
+  factbook: geography
+  food_agriculture: economy
+  unsd_ama: economy
+  water: environment
+  military: politics
+  transnational: politics
+  communications: science
+  land_use: environment
+  land: environment
+  emissions: environment
+  forestry: environment
+  stress: environment
+  efficiency: environment
+  production: economy
+  livestock: economy
+  inputs: economy
+  fisheries: economy
+  prices: economy
+  diet: health
+  food_security: society
+  employment: labour
+  rural: population
+
+domain_defaults:
+  culture: culture
+  education: education
+  energy: energy
+  environment: environment
+  geography: geography
+  health: health
+  history: history
+  imf: economy
+  labour: labour
+  law: law
+  politics: politics
+  quality_of_life: society
+  science: science
+  un: population
+  # domains of atlas agents still running (catalog files may appear later)
+  economy: economy
+  population: population
+  trade: trade
+  finance: finance
+  society: society
+  geopolitics: politics
+  factbook: geography
+  food_agriculture: economy
+  unsd_ama: economy
+  water: environment

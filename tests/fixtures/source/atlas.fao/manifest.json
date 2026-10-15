@@ -1,0 +1,301 @@
+[
+ {
+  "request_fingerprint": "bfb862960fbea387c65daf2213512405c24ca689a160e5b4e20c11b956ca0f6f",
+  "url": "https://bulks-faostat.fao.org/production/datasets_E.json",
+  "file": "bfb862960fbea387.json",
+  "sha256": "f294cc8002c70eeb411697c1522324fd7bfe020a7cb4ba86d70f217c3d63fbf1",
+  "status": 200,
+  "headers": {
+   "content-type": "application/json"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "f294cc8002c70eeb411697c1522324fd7bfe020a7cb4ba86d70f217c3d63fbf1",
+  "excerpt": "whole file"
+ },
+ {
+  "request_fingerprint": "47fae6a8c807943ad352179d67621268319550630277b64b2dc0a1389b8c8bbd",
+  "url": "https://bulks-faostat.fao.org/production/FoodBalanceSheets_E_All_Data_(Normalized).zip",
+  "file": "47fae6a8c807943a.zip",
+  "sha256": "54f97d655e40059e2e3f61b94532f9b4c720d93732b995aa3d6ea02b135fe36f",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "26200855ed5da3d0805e34219124e241d0e0bc6959d0995ebc77a10dd84cbaf1",
+  "live_bytes": 54840802,
+  "excerpt": "1937 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "032765cf4f685cb4c3c3f37d9668affa00473495b9b687411b506a0d3645758d",
+  "url": "https://bulks-faostat.fao.org/production/FoodBalanceSheetsHistoric_E_All_Data_(Normalized).zip",
+  "file": "032765cf4f685cb4.zip",
+  "sha256": "e831275b96411df96f99c1eb9685364e1c0a0013a509fa5db660766820489870",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "925bac969ea3904eca1a33f0b3d7ea4416bbac79d14db50b0db43cd2a77a3adb",
+  "live_bytes": 72467143,
+  "excerpt": "2643 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "96f1c7a7bde17ab2ecf82785a3f841a0892999b9349133b17ff4ba4fa7f86f25",
+  "url": "https://bulks-faostat.fao.org/production/Food_Security_Data_E_All_Data_(Normalized).zip",
+  "file": "96f1c7a7bde17ab2.zip",
+  "sha256": "26d33d2fc512c42eeb0d9d8baf5bc60a17833dc8766bfc6dade4ac0314f4fd63",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "1ccced40d8e228693c6fcc5d172de9bcaa3a1c6a1581ebde345d71c1dfa9b692",
+  "live_bytes": 2214673,
+  "excerpt": "895 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "79f9d81b21d5fbd44a91bf6069462554dd1709c6d1d088c58c489087bb73b95f",
+  "url": "https://bulks-faostat.fao.org/production/Production_Crops_Livestock_E_All_Data_(Normalized).zip",
+  "file": "79f9d81b21d5fbd4.zip",
+  "sha256": "ccb0cfa7c2977dd31c1ca919ba0acad7cb5d3bc1c0db803c795303d634e9612f",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "c5835418c18f9322e7decbd6800f93a216eaae3cdfa31acb08f0518c0c6d6853",
+  "live_bytes": 33921825,
+  "excerpt": "3691 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "0c7de68387d39e74a6dd5913d7e01453b7964221313095873dea75f0b0ec1cbb",
+  "url": "https://bulks-faostat.fao.org/production/Value_of_Production_E_All_Data_(Normalized).zip",
+  "file": "0c7de68387d39e74.zip",
+  "sha256": "cd0b3637c80828eea024e89347c098e22469da7b825a55be14283daf1e2f7950",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "14e7b718f1be0dd70e3493aeccb04d2ff2ddc1a39e17a062867f1182a807c422",
+  "live_bytes": 30326566,
+  "excerpt": "737 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "62d06830145fa7e9a1f6b72ee64cc60cef4d658b5e5960ab570e4f76c5c1d6ac",
+  "url": "https://bulks-faostat.fao.org/production/Prices_E_All_Data_(Normalized).zip",
+  "file": "62d06830145fa7e9.zip",
+  "sha256": "9cd25d1afb179cba88c039d4d6f491b8f4edca9a48a051ad07f6c4208d93d22d",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "327f70a2230032d3966d6e9583ec5caf0e9416aa9fd91b444e02f6b8665c984d",
+  "live_bytes": 11684078,
+  "excerpt": "1052 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "fd22af64e6a3f44790a6845d2a8adb136f5a8239fcc18d0e4250c46d66c0c316",
+  "url": "https://bulks-faostat.fao.org/production/ConsumerPriceIndices_E_All_Data_(Normalized).zip",
+  "file": "fd22af64e6a3f447.zip",
+  "sha256": "36473d0f316d019768cd1a901ede61ae473fa1718db9a473ec92b32cbff9eb74",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "acb1ef08e7eabc4f8ff1ed630a5426d6c014b094fb766ce4aca2563ae91ab0f6",
+  "live_bytes": 2525615,
+  "excerpt": "128 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "fc41505a8b9d24675df90b190681a28682e477c004ca82c0fdff5b5d826d3bff",
+  "url": "https://bulks-faostat.fao.org/production/Trade_CropsLivestock_E_All_Data_(Normalized).zip",
+  "file": "fc41505a8b9d2467.zip",
+  "sha256": "91d73b69fce44250974fcf160bcf126c4956870a47bf67e203c61caa3d773b7d",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "effb07f6ee6c1f086e2dd4c11742d2ba9495552fb11c11ea64aa7edbd7a32380",
+  "live_bytes": 273514210,
+  "excerpt": "1416 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "9ff76304f21ed4a44db6c7c2d4495961c56b2b5e485b9612507c80b7050c1cc8",
+  "url": "https://bulks-faostat.fao.org/production/Trade_CropsLivestockIndicators_E_All_Data_(Normalized).zip",
+  "file": "9ff76304f21ed4a4.zip",
+  "sha256": "2aa3d9300f61fb22c2dc1fb21f48c0c71677c8c965753f85d52b87c2d1767bf1",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "0ef0d28b07cca5ebe1597dc2f6b914cc2ae064340a9cf373c56c084beb5e0f19",
+  "live_bytes": 853915,
+  "excerpt": "640 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "9d60d4da4be8b0c64604cb9104ecdcab195d981c057a877d68c3884d958750f3",
+  "url": "https://bulks-faostat.fao.org/production/Inputs_LandUse_E_All_Data_(Normalized).zip",
+  "file": "9d60d4da4be8b0c6.zip",
+  "sha256": "53e1081bd9fe715bbd9916fb752538d3874370e31ac1668082504cc749fd3d14",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "39b739fbfb694971207a2efa572c41e8de2386fc5cb33caaf2a188e9c9a6ca3f",
+  "live_bytes": 2970716,
+  "excerpt": "979 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "37b124e2ac647427a83fc290f5c2f3ba5c94d0fd01ce40e458cd1ff1fb34b67d",
+  "url": "https://bulks-faostat.fao.org/production/Emissions_Totals_E_All_Data_(Normalized).zip",
+  "file": "37b124e2ac647427.zip",
+  "sha256": "24ea2b8aa852c79ef2677ddade5b1b3532172d328382981bd95cf57c0d4fe802",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "d2c47e116553711f7c2fd6b62437db511038fd9bd9ec77815fa69ff7a18a89a9",
+  "live_bytes": 20501708,
+  "excerpt": "2769 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "147124f4694b20bbb3da021c5ee2c843202b2decaa4af9fe82aba99c43a8204a",
+  "url": "https://bulks-faostat.fao.org/production/Forestry_E_All_Data_(Normalized).zip",
+  "file": "147124f4694b20bb.zip",
+  "sha256": "acfb3ab1c9d693abb00371e8077a58d507106b9832718c20960caa29d9336663",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "c2f7fc99651f620b6c0a16ff07f6c1d80c153fa01d5a3422413d9c89e0d61444",
+  "live_bytes": 18122620,
+  "excerpt": "708 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "e938c8f32849450ff70826718f978132dd7b05aa0f1dfd1aec587be55ca331b6",
+  "url": "https://bulks-faostat.fao.org/production/Inputs_FertilizersNutrient_E_All_Data_(Normalized).zip",
+  "file": "e938c8f32849450f.zip",
+  "sha256": "7ef7cfbf85680a05894754856ed7a711163161f69869a9915c959ea537c25af9",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "6cf684dd5366d96fd8554b626dd3a60d57f8ac5c8a7775394334d52ec3a498ae",
+  "live_bytes": 2030532,
+  "excerpt": "206 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "6f6062bb5bcbe6a734a84959b45021cad87bb2af9a70a911a0f8b166e3cd7a5c",
+  "url": "https://bulks-faostat.fao.org/production/Inputs_Pesticides_Use_E_All_Data_(Normalized).zip",
+  "file": "6f6062bb5bcbe6a7.zip",
+  "sha256": "ef7e8e3abe592e63a9fe12e85c8c80d3ef7257010fd65e265b0fe87e95be883d",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "c59b42cc28b52213b63bfc92333e0ac95b158517929c67af1508395c1ec9c1c8",
+  "live_bytes": 760053,
+  "excerpt": "353 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "5f57ab55bc573d69b67810ff00d092b9b08c9327e65e67e57a77b2104b1a0ae3",
+  "url": "https://bulks-faostat.fao.org/production/Population_E_All_Data_(Normalized).zip",
+  "file": "5f57ab55bc573d69.zip",
+  "sha256": "73a07b3d2ae2ea1957544b9b99919e095ddd7b8ff575ef543695494697e62128",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "e2781a554d4efb36f17999d031acc99f0a7d8bb25a1b4d55cc5d403ccfb6b694",
+  "live_bytes": 1581544,
+  "excerpt": "72 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "19f54a7d62f2d0970abc050c47dacd6c956da96a5418d802b7f11662568f0736",
+  "url": "https://bulks-faostat.fao.org/production/Employment_Indicators_Agriculture_E_All_Data_(Normalized).zip",
+  "file": "19f54a7d62f2d097.zip",
+  "sha256": "0b6738cb824a928841ddf5ab8dcb58f0ae60412674ad3961f745319d8d56fefb",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "6853b41f9f965f4a605ed57b42e39a8a9617344161b2e14aedb1bfd7f6cb90fc",
+  "live_bytes": 2369575,
+  "excerpt": "524 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "ea2bd1629420b18e3a31f07c21d58ddb9deab3124027ffb3781d3693d9c01a9a",
+  "url": "https://bulks-faostat.fao.org/production/Employment_Indicators_Rural_E_All_Data_(Normalized).zip",
+  "file": "ea2bd1629420b18e.zip",
+  "sha256": "8acb4a81fbae5c5d94481455d525e14b304f27bf55e6b842079c394ca52077d2",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "de9d1963713379fbad4e8dfa9bdd164ee5bd8a8a9c580fe370dd205c87524039",
+  "live_bytes": 1039031,
+  "excerpt": "188 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "9f2259ea6494ea3116885fda79bfa2d2a239dacf03a1cb9c600bce47ee160349",
+  "url": "https://bulks-faostat.fao.org/production/Macro-Statistics_Key_Indicators_E_All_Data_(Normalized).zip",
+  "file": "9f2259ea6494ea31.zip",
+  "sha256": "0c2cfc3042be20b04e09fe6a5550477f5f06fe95ed32cf52a23f8c2103e179c8",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "3dd1583866ac3ca164a077de4469fa8478877971bbc8f52dd0d7b79f8d8ec262",
+  "live_bytes": 7266430,
+  "excerpt": "254 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ },
+ {
+  "request_fingerprint": "cedefe19b35afd00fd09948b82ded35b0f803d798422186f493b3f4bc1eb06ad",
+  "url": "https://bulks-faostat.fao.org/production/SDG_BulkDownloads_E_All_Data_(Normalized).zip",
+  "file": "cedefe19b35afd00.zip",
+  "sha256": "118df0f50341f01def79ae8f0b4b55dc4465de31e932f6ac51741f668618514a",
+  "status": 200,
+  "headers": {
+   "content-type": "application/x-zip-compressed"
+  },
+  "retrieved_at": "2026-10-15T23:00:00+00:00",
+  "licence": "CC BY 4.0 (FAO Statistical Database terms of use)",
+  "live_sha256": "ef0358f2cc8cb786f811f5347818284b6e186b1ce4330f788c7e6d7142fb751e",
+  "live_bytes": 4721843,
+  "excerpt": "1518 data rows of the live file (areas ['206', '214', '228', '238', '259', '276', '351', '4', '41', '5000', '62', '68'], a few years, plus out-of-scope, missing-flag and text-value rows); code-list members verbatim"
+ }
+]
