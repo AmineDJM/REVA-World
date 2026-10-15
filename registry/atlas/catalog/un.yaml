@@ -1534,3 +1534,621 @@ concepts:
     against World Bank AG.SRF.TOTL.K2.
   tags:
   - syb68
+- id: un.sdg.poverty_international_line
+  labels:
+    fr: Pauvreté (seuil international)
+    en: Poverty (international line)
+  definition: Proportion of population below international poverty line (%) (UN SDG Global Database series SI_POV_DAY1).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SI_POV_DAY1|Age=ALLAGE|Location=ALLAREA|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.poverty_national_line
+  labels:
+    fr: Pauvreté (seuil national)
+    en: Poverty (national line)
+  definition: Proportion of population living below the national poverty line (%) (UN SDG Global Database series SI_POV_NAHC).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SI_POV_NAHC|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.social_protection_coverage
+  labels:
+    fr: Couverture de la protection sociale
+    en: Social protection coverage
+  definition: '[ILO] Proportion of population covered by at least one social protection benefit, by sex (%) (UN SDG Global
+    Database series SI_COV_BENFTS).'
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SI_COV_BENFTS|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.undernourishment
+  labels:
+    fr: Prévalence de la sous-alimentation
+    en: Prevalence of undernourishment
+  definition: Prevalence of undernourishment (%) (UN SDG Global Database series SN_ITK_DEFC).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SN_ITK_DEFC|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.stunting
+  labels:
+    fr: Retard de croissance des enfants
+    en: Child stunting
+  definition: Proportion of children moderately or severely stunted (%) (UN SDG Global Database series SH_STA_STNT).
+  unit: PER_POP_U5
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_STNT|Age=<5Y|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.wasting
+  labels:
+    fr: Émaciation des enfants
+    en: Child wasting
+  definition: Proportion of children moderately or severely wasted (%) (UN SDG Global Database series SH_STA_WAST).
+  unit: PER_POP_U5
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_WAST|Age=<5Y|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.maternal_mortality_ratio
+  labels:
+    fr: Taux de mortalité maternelle
+    en: Maternal mortality ratio
+  definition: Maternal mortality ratio (UN SDG Global Database series SH_STA_MORT).
+  unit: PER_100000_LIVE_BIRTHS
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_MORT|Reporting Type=G|Sex=FEMALE
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.skilled_birth_attendance
+  labels:
+    fr: Accouchements assistés par du personnel qualifié
+    en: Births attended by skilled personnel
+  definition: Proportion of births attended by skilled health personnel (%) (UN SDG Global Database series SH_STA_BRTC).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_BRTC|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.under5_mortality
+  labels:
+    fr: Mortalité des moins de 5 ans (ODD)
+    en: Under-five mortality (SDG)
+  definition: Under-five mortality rate, by sex (deaths per 1,000 live births) (UN SDG Global Database series SH_DYN_MORT).
+  unit: PER_1000_LIVE_BIRTHS
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_DYN_MORT|Age=<5Y|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.infant_mortality
+  labels:
+    fr: Mortalité infantile (ODD)
+    en: Infant mortality (SDG)
+  definition: Infant mortality rate (deaths per 1,000 live births) (UN SDG Global Database series SH_DYN_IMRT).
+  unit: PER_1000_LIVE_BIRTHS
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_DYN_IMRT|Age=<1Y|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.neonatal_mortality
+  labels:
+    fr: Mortalité néonatale
+    en: Neonatal mortality
+  definition: Neonatal mortality rate (deaths per 1,000 live births) (UN SDG Global Database series SH_DYN_NMRT).
+  unit: PER_1000_LIVE_BIRTHS
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_DYN_NMRT|Age=<1M|Location=ALLAREA|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.hiv_incidence
+  labels:
+    fr: Incidence du VIH
+    en: HIV incidence
+  definition: Number of new HIV infections per 1,000 uninfected population, by sex and age (per 1,000 uninfected population)
+    (UN SDG Global Database series SH_HIV_INCD).
+  unit: PER_1000_UNINFECTED_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_HIV_INCD|Age=ALLAGE|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.tuberculosis_incidence
+  labels:
+    fr: Incidence de la tuberculose
+    en: Tuberculosis incidence
+  definition: Tuberculosis incidence (per 100,000 population) (UN SDG Global Database series SH_TBS_INCD).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_TBS_INCD|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.ncd_mortality
+  labels:
+    fr: Mortalité due aux maladies non transmissibles
+    en: NCD mortality
+  definition: Mortality rate attributed to cardiovascular disease, cancer, diabetes or chronic respiratory disease (probability)
+    (UN SDG Global Database series SH_DTH_NCOM).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_DTH_NCOM|Age=30-69|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.suicide_rate
+  labels:
+    fr: Taux de suicide
+    en: Suicide mortality rate
+  definition: Suicide mortality rate, by sex (deaths per 100,000 population) (UN SDG Global Database series SH_STA_SCIDE).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_SCIDE|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.road_traffic_deaths
+  labels:
+    fr: Mortalité routière
+    en: Road traffic death rate
+  definition: Death rate due to road traffic injuries, by sex (per 100,000 population) (UN SDG Global Database series SH_STA_TRAF).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_TRAF|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.air_pollution_mortality
+  labels:
+    fr: Mortalité due à la pollution de l'air
+    en: Air pollution mortality
+  definition: Age-standardized mortality rate attributed to household and ambient air pollution (deaths per 100,000 population)
+    (UN SDG Global Database series SH_STA_ASAIRP).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_STA_ASAIRP|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.dtp3_coverage
+  labels:
+    fr: Couverture vaccinale DTC3
+    en: DTP3 immunisation coverage
+  definition: Proportion of the target population who received 3 doses of diphtheria-tetanus-pertussis (DTP3) vaccine (%)
+    (UN SDG Global Database series SH_ACS_DTP3).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_ACS_DTP3|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.uhc_service_coverage
+  labels:
+    fr: Indice de couverture sanitaire universelle
+    en: UHC service coverage index
+  definition: Universal health coverage (UHC) service coverage index, 2025 methodology (UN SDG Global Database series SH_ACS_UNHC_25).
+  unit: INDEX
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_ACS_UNHC_25|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.pre_primary_participation
+  labels:
+    fr: Participation à l'éducation préprimaire
+    en: Pre-primary participation rate
+  definition: Participation rate in organized learning (one year before the official primary entry age), by sex (%) (UN SDG
+    Global Database series SE_PRE_PARTN).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SE_PRE_PARTN|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.women_in_parliament
+  labels:
+    fr: Femmes au parlement
+    en: Women in national parliaments
+  definition: Proportion of seats held by women in national parliaments (% of total number of seats) (UN SDG Global Database
+    series SG_GEN_PARL).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SG_GEN_PARL|Reporting Type=G|Sex=FEMALE
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.child_marriage_18
+  labels:
+    fr: Mariage avant 18 ans
+    en: Child marriage before 18
+  definition: Proportion of women aged 20-24 years who were married or in a union before age 18 (%) (UN SDG Global Database
+    series SP_DYN_MRBF18).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SP_DYN_MRBF18|Age=20-24|Reporting Type=G|Sex=FEMALE
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.safe_drinking_water
+  labels:
+    fr: Eau potable gérée en toute sécurité
+    en: Safely managed drinking water
+  definition: Proportion of population using safely managed drinking water services, by urban/rural (%) (UN SDG Global Database
+    series SH_H2O_SAFE).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_H2O_SAFE|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.safe_sanitation
+  labels:
+    fr: Assainissement géré en toute sécurité
+    en: Safely managed sanitation
+  definition: Proportion of population using safely managed sanitation services, by urban/rural (%) (UN SDG Global Database
+    series SH_SAN_SAFE).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SH_SAN_SAFE|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.electricity_access
+  labels:
+    fr: Accès à l'électricité
+    en: Access to electricity
+  definition: Proportion of population with access to electricity, by urban/rural (%) (UN SDG Global Database series EG_ACS_ELEC).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EG_ACS_ELEC|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.clean_cooking
+  labels:
+    fr: Combustibles et technologies propres
+    en: Clean fuels and technologies
+  definition: Proportion of population with primary reliance on clean fuels and technology (%) (UN SDG Global Database series
+    EG_EGY_CLEAN).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EG_EGY_CLEAN|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.renewable_energy_share
+  labels:
+    fr: Part des énergies renouvelables
+    en: Renewable energy share
+  definition: Renewable energy share in the total final energy consumption (%) (UN SDG Global Database series EG_FEC_RNEW).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EG_FEC_RNEW|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.gdp_per_capita_growth
+  labels:
+    fr: Croissance du PIB réel par habitant
+    en: Real GDP per capita growth
+  definition: Annual growth rate of real GDP per capita (%) (UN SDG Global Database series NY_GDP_PCAP).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.NY_GDP_PCAP|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.youth_neet
+  labels:
+    fr: Jeunes NEET
+    en: Youth not in education, employment or training
+  definition: Proportion of youth not in education, employment or training, by sex and age - 13th ICLS (%) (UN SDG Global
+    Database series SL_TLF_NEET).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SL_TLF_NEET|Age=15-24|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.rd_expenditure
+  labels:
+    fr: Dépenses de R-D
+    en: R&D expenditure
+  definition: Research and development expenditure as a proportion of GDP (%) (UN SDG Global Database series GB_XPD_RSDV).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.GB_XPD_RSDV|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.co2_fuel_combustion
+  labels:
+    fr: Émissions de CO2 (combustion)
+    en: CO2 emissions from fuel combustion
+  definition: Carbon dioxide emissions from fuel combustion (millions of tonnes) (UN SDG Global Database series EN_ATM_CO2).
+  unit: TONNES_M
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EN_ATM_CO2|Activity=TOTAL|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.pm25_exposure
+  labels:
+    fr: Particules fines PM2,5
+    en: Fine particulate matter (PM2.5)
+  definition: Annual mean levels of fine particulate matter (population-weighted), by location (micrograms per cubic meter)
+    (UN SDG Global Database series EN_ATM_PM25).
+  unit: mgr/m^3
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EN_ATM_PM25|Location=ALLAREA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.urban_slum_population
+  labels:
+    fr: Population urbaine en bidonvilles
+    en: Urban population living in slums
+  definition: Proportion of urban population living in slums (%) (UN SDG Global Database series EN_LND_SLUM).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.EN_LND_SLUM|Location=URBAN|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.forest_area_share
+  labels:
+    fr: Surface forestière
+    en: Forest area share
+  definition: Forest area as a proportion of total land area (%) (UN SDG Global Database series AG_LND_FRST).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.AG_LND_FRST|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.marine_kba_protected
+  labels:
+    fr: Zones clés marines protégées
+    en: Protected marine key biodiversity areas
+  definition: Average proportion of Marine Key Biodiversity Areas (KBAs) covered by protected areas (%) (UN SDG Global Database
+    series ER_MRN_MPA).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.ER_MRN_MPA|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.homicide_rate
+  labels:
+    fr: Taux d'homicides
+    en: Intentional homicide rate
+  definition: Number of victims of intentional homicide per 100,000 population, by sex (victims per 100,000 population) (UN
+    SDG Global Database series VC_IHR_PSRC).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.VC_IHR_PSRC|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.conflict_deaths_rate
+  labels:
+    fr: Morts liées aux conflits
+    en: Conflict-related deaths
+  definition: Number of total conflict-related deaths per 100,000 population (Per 100,000 population) (UN SDG Global Database
+    series VC_DTH_TOTR).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.VC_DTH_TOTR|Age=ALLAGE|Cause of death=_T|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.internet_users
+  labels:
+    fr: Utilisateurs d'Internet
+    en: Internet users
+  definition: Proportion of individuals using the Internet (%) (UN SDG Global Database series IT_USE_ii99).
+  unit: PERCENT
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.IT_USE_ii99|Reporting Type=G|Sex=BOTHSEX
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.fixed_broadband
+  labels:
+    fr: Abonnements haut débit fixe
+    en: Fixed broadband subscriptions
+  definition: Fixed broadband subscriptions per 100 inhabitants, by speed (per 100 inhabitants) (UN SDG Global Database series
+    IT_NET_BBND).
+  unit: PER_100_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.IT_NET_BBND|Reporting Type=G|Type of speed=ANYS
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
+- id: un.sdg.refugees_by_origin_rate
+  labels:
+    fr: Réfugiés par pays d'origine (pour 100 000)
+    en: Refugees by country of origin (per 100,000)
+  definition: Number of refugees per 100,000 population, by country of origin (per 100,000 population) (UN SDG Global Database
+    series SM_POP_REFG_OR).
+  unit: PER_100000_POP
+  domain: un
+  subdomain: sdg
+  source_order:
+  - un_sdg.sdg_headline.SM_POP_REFG_OR|Reporting Type=G
+  provider_declared: true
+  notes: Headline (total) cells of the series; Reporting Type G = global (custodian) data, N = national data as reported to
+    the custodian. Custodian agency in flags.provider_source; not independent of the custodian's own atlas table.
+  tags:
+  - sdg
