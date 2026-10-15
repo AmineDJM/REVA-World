@@ -137,8 +137,8 @@ export default function CheminPage() {
         <label>
           Moteur
           <select value={draft.engine} onChange={(e) => setDraft((d) => ({ ...d, engine: e.target.value as Engine }))}>
-            <option value="links">liens typés (k plus courts chemins)</option>
-            <option value="kg">graphe brut (déclarations)</option>
+            <option value="links">liens typés</option>
+            <option value="kg">graphe brut</option>
           </select>
         </label>
         <button type="submit" className="primary">

@@ -85,6 +85,22 @@ const STYLE: cytoscape.StylesheetJson = [
   { selector: 'edge.dim', style: { opacity: 0.06, 'text-opacity': 0 } },
 ];
 
+/** Fit `eles` in the viewport without zooming in past 1.25 (a few nodes must not fill the screen). */
+function fitCapped(cy: cytoscape.Core, eles: cytoscape.Collection, duration: number) {
+  if (eles.empty()) return;
+  const bb = eles.boundingBox({});
+  const w = cy.width();
+  const h = cy.height();
+  const pad = 50;
+  const z = Math.max(cy.minZoom(), Math.min(1.25, (w - 2 * pad) / Math.max(bb.w, 1), (h - 2 * pad) / Math.max(bb.h, 1)));
+  const pan = { x: w / 2 - z * (bb.x1 + bb.w / 2), y: h / 2 - z * (bb.y1 + bb.h / 2) };
+  if (duration > 0) cy.animate({ zoom: z, pan }, { duration });
+  else {
+    cy.zoom(z);
+    cy.pan(pan);
+  }
+}
+
 function nodeData(m: GraphModel, id: string, root: string | null) {
   const n = m.nodes.get(id)!;
   const ks = kindStyle(n.kind);
@@ -188,7 +204,8 @@ export default function NeuronGraph({ model, visibility, root, selected, burst, 
         parent.animate({ style: { 'underlay-opacity': 0.9, 'underlay-padding': 22 } }, { duration: 260 }).animate({ style: { 'underlay-opacity': 0.25, 'underlay-padding': 10 } }, { duration: 1100 });
       }
       if (cy.nodes().length <= 3 + fresh.length && fresh.length > 0) {
-        cy.animate({ fit: { eles: cy.elements(), padding: 40 } }, { duration: reduced ? 0 : 500 });
+        // Fit once the nodes have reached their positions.
+        setTimeout(() => cyRef.current && fitCapped(cyRef.current, cyRef.current.elements(), reduced ? 0 : 400), reduced ? 0 : 680);
       }
     }
   }, [model, root, burst]);
@@ -226,8 +243,8 @@ export default function NeuronGraph({ model, visibility, root, selected, burst, 
       animate: !reduced && cy.nodes().length < 600,
       animationDuration: 900,
       randomize: false,
-      fit: true,
-      padding: 40,
+      fit: false,
+      stop: () => cyRef.current && fitCapped(cyRef.current, cyRef.current.elements(), reduced ? 0 : 300),
       nodeRepulsion: () => 9000,
       idealEdgeLength: () => 110,
       numIter: cy.nodes().length > 800 ? 400 : 1000,
@@ -239,7 +256,7 @@ export default function NeuronGraph({ model, visibility, root, selected, burst, 
     if (!cy || fitSeq === lastFit.current) return;
     lastFit.current = fitSeq;
     const target = selected ? cy.$id(selected).closedNeighborhood() : cy.elements();
-    cy.animate({ fit: { eles: target.nonempty() ? target : cy.elements(), padding: 50 } }, { duration: prefersReducedMotion() ? 0 : 450 });
+    fitCapped(cy, target.nonempty() ? target : cy.elements(), prefersReducedMotion() ? 0 : 450);
   }, [fitSeq, selected]);
 
   return <div ref={el} className="v3-neuron-canvas" style={{ height }} role="img" aria-label={label} data-testid="neuron-canvas" />;

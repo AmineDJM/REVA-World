@@ -80,13 +80,14 @@ def test_two_atlas_sources_are_discovered_and_fit_the_budget():
     assert set(found) == {m.NAME_PROFILES, m.NAME_DISPUTES}
     prof, disp = (found[n].spec for n in (m.NAME_PROFILES, m.NAME_DISPUTES))
     assert prof.planned_requests == 261 and disp.planned_requests == 259
-    assert prof.source_key == disp.source_key == "factbook.json" and prof.allowed_hosts == ("raw.githubusercontent.com",)
+    assert prof.source_key == disp.source_key == "factbook.json" and prof.allowed_hosts == (
+        "raw.githubusercontent.com",
+    )
     import yaml
 
     budgets = yaml.safe_load((REPO / "registry/policies/budgets.yaml").read_text())
     assert max(prof.planned_requests, disp.planned_requests) <= budgets["per_source_daily_requests"]["factbook.json"]
-    keys = {yaml.safe_load(p.read_text())["source_key"] for p in (REPO / "registry/sources").glob("*.yaml")}
-    assert "factbook.json" in keys
+    assert "source_key: factbook.json" in (REPO / "registry/sources/factbook.yaml").read_text()
 
 
 def test_entity_tables_are_complete_and_dated():

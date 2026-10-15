@@ -40,13 +40,18 @@ export function EntityPicker({
   const listId = useId();
   const inputId = useId();
   const lastValue = useRef(value?.qid);
+  const lastLabel = useRef(value?.label ?? '');
 
   useEffect(() => {
-    if (value?.qid !== lastValue.current) {
+    const label = value?.label ?? '';
+    // New entity, or a better label resolved for the same entity while the user is not typing.
+    if (value?.qid !== lastValue.current || (label !== lastLabel.current && text === lastLabel.current)) {
       lastValue.current = value?.qid;
-      setText(value?.label ?? '');
+      setText(label);
     }
-  }, [value]);
+    lastLabel.current = label;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value?.qid, value?.label]);
 
   useEffect(() => {
     const q = text.trim();
@@ -96,6 +101,7 @@ export function EntityPicker({
   const choose = (e: PickedEntity | undefined) => {
     if (!e) return;
     lastValue.current = e.qid;
+    lastLabel.current = e.label;
     setText(e.label);
     setOpen(false);
     onChange(e);

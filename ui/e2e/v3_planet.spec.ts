@@ -121,8 +121,8 @@ test('Frise: SVG timeline with zoom from centuries to years and cited items', as
   await expect(svg).toBeVisible();
   const controls = page.getByRole('toolbar', { name: 'Zoom de la frise' });
   const before = await controls.locator('.muted').first().textContent();
-  await controls.getByRole('button', { name: 'Zoomer' }).click();
-  await controls.getByRole('button', { name: 'Zoomer' }).click();
+  await controls.getByRole('button', { name: 'Zoomer', exact: true }).click();
+  await controls.getByRole('button', { name: 'Zoomer', exact: true }).click();
   await expect(controls.locator('.muted').first()).not.toHaveText(before ?? '');
   await page.getByRole('heading', { name: /Éléments datés/ }).scrollIntoViewIfNeeded();
   await expect(page.locator('.v3-tl-row').first()).toBeVisible();

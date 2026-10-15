@@ -13,5 +13,5 @@ rights:
 metadata:
   allowed_hosts: [www.ssa.gov]
   authentication: none
-  cadence: none (series archived after the 2018-2019 editions: Europe and Asia 2018, Africa and the Americas 2019)
-  access_note: curl HTTP 403 (Akamai); SafeHttpClient via proxy HTTP 200 (2026-10-15)
+  cadence: "none (series archived after the 2018-2019 editions: Europe and Asia 2018, Africa and the Americas 2019)"
+  access_note: "curl HTTP 403 (Akamai); SafeHttpClient via proxy HTTP 200 (2026-10-15)"

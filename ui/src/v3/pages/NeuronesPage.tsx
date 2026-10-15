@@ -84,7 +84,12 @@ export default function NeuronesPage() {
         const r = await getKgNeighbours(qid, { limit: 80, cursor: more ? (node?.nextCursor ?? undefined) : undefined });
         if (gen !== generation.current) return;
         const res = mergeNeighbours(modelRef.current, { qid, label: node?.label && node.label !== qid ? node.label : r.data.label }, r.data.edges, r.next_cursor ?? null);
-        commit(res.graph);
+        let g = res.graph;
+        for (const id of res.addedNodes) {
+          const known = kindCache.current.get(id);
+          if (known) g = setNodeKind(g, id, known.kind ?? null, entityLabel(known, undefined) || undefined);
+        }
+        commit(g);
         burstSeq.current += 1;
         setBurst({ seq: burstSeq.current, parent: qid, nodes: res.addedNodes.filter((n) => n !== qid) });
         setLoads((l) => {
@@ -287,7 +292,7 @@ export default function NeuronesPage() {
                 load={selLoad}
                 onExpand={(more) => void expand(selected, more)}
                 onSelect={(id) => {
-                  setSelected(id);
+                  onTapNode(id);
                   setFitSeq((s) => s + 1);
                 }}
               />

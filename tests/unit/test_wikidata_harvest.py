@@ -183,6 +183,22 @@ async def test_429_retry_after_is_honoured_and_archived(tmp_path: Path) -> None:
     assert gzip.decompress(store.get("raw", q["sha256"])).decode().startswith("SELECT ?item")
 
 
+async def test_long_retry_after_is_honoured_in_full_with_margin(tmp_path: Path) -> None:
+    """WDQS answers 429 with Retry-After=1000: the shared cool-down must cover all of it (+ margin), never a
+    capped value that releases the next request early and renews the ban."""
+    assert wd._retry_after_seconds("1000") >= 1030
+    body = sparql_body(["item"], [{"item": uri("Q1")}])
+    http = ScriptedHttp({"wdqs": [(429, b"Too Many Requests", {"retry-after": "1000"}), (200, body, {})]})
+    clock = FakeClock()
+    c = client_for(http, tmp_path, clock)
+    t0 = clock.t
+    await c.sparql("SELECT ?item WHERE { ?item wdt:P31 wd:Q5 }")
+    state = json.loads((tmp_path / "locks" / "wikidata.state.json").read_text())
+    assert sum(clock.sleeps) >= 1030 and clock.t - t0 >= 1030
+    assert all(s <= 60.0 for s in clock.sleeps)  # waited in steps, lock released between them
+    assert "cooldown_until:wbapi" not in state  # the API is not throttled by a WDQS cool-down
+
+
 async def test_wdqs_timeout_is_typed_and_not_retried(tmp_path: Path) -> None:
     http = ScriptedHttp({"wdqs": [(500, b"java.util.concurrent.TimeoutException\n\tat ...", {})]})
     c = client_for(http, tmp_path)
