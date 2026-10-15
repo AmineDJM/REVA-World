@@ -27,6 +27,8 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
   `var/locks/wikidata.lock`; the shared state `var/locks/wikidata.state.json` enforces ≥ 2 s between the end
   of one request and the start of the next (any process, any agent) — 2 s, not 1 s, because the API answered
   `429 You are making too many requests` at ~1 req/s aggregate on 2026-10-15.
+* **Recovery pacing**: for 10 min after any 429/503 on an endpoint, requests to it are spaced ≥ 10 s apart
+  machine-wide, so processes queued behind a cool-down do not burst at its expiry and re-trigger it.
 * **Retry-After honoured in full**, per endpoint (`cooldown_until:wdqs`, `cooldown_until:wbapi`), plus a 30 s
   margin, cap 3,600 s. Long cool-downs are waited *without* holding the lock (60 s steps), so a WDQS ban does
   not block API traffic. 429/503 without Retry-After: exponential back-off from 5 s.
@@ -51,6 +53,21 @@ client is the project's `SafeHttpClient` (HTTPS only, SSRF guards, size caps).
 2. Retry-After was capped at 900 s while WDQS sent 1,000 s, so requests were released ~100 s early and the ban
    kept renewing (diagnosed by KGPEOPLE; patched by the lead: cap 3,600 s + 30 s margin; regression test
    `test_long_retry_after_is_honoured_in_full_with_margin`).
+
+### Alternative endpoints
+
+* **CirrusSearch on the API host** (`haswbstatement:`) is used when WDQS is throttled: `map-countries`
+  (default) and `run --via api` for seed specs carrying an `api_search` block (subclass closure by BFS over
+  P279, OR groups packed under the 300-character query limit, 10,000-result window per query reported as
+  `search_window_exceeded`). Semantics differ slightly from SPARQL `wdt:` (all non-deprecated statements are
+  indexed, index lag of minutes) — documented in `_schema.json`; snapshots are then fetched with wbgetentities
+  as usual, so loaded statements keep revision ids.
+* **QLever** (`https://qlever.cs.uni-freiburg.de/api/wikidata`, University of Freiburg) was considered at the
+  lead's request and **not adopted**: neither the QLever README (github.com/ad-freiburg/qlever) nor qlever.dev
+  publishes terms of use, a usage policy, rate limits or a contact for bulk use (checked 2026-10-15). Sending
+  harvest traffic to a research group's service without a stated policy is not conservative. The client
+  design supports it (per-endpoint cool-downs, one request at a time, archive, metering under a new source key
+  with the dump date as provenance) once the operators confirm acceptable use.
 
 ## Raw archive and provenance
 

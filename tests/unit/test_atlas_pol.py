@@ -142,7 +142,7 @@ def test_vdem_values_flags_and_geo(vdem_frames):
     bvr = cell("BVR", "v2x_polyarchy", 1800)[0]
     assert bvr["iso3"] is None and bvr["entity_qid"] is None  # 1800 = Electorate of Bavaria: not mapped
     assert cell("PSE", "v2x_polyarchy", 2024)[0]["entity_qid"] == "Q36678"  # West Bank
-    assert cell("TWN", "v2x_polyarchy", 2024)[0]["iso3"] is None
+    assert cell("TWN", "v2x_polyarchy", 2024)[0]["iso3"] == "TWN"  # crosswalk 1.1.0 (ISO 3166-1)
     assert cell("USA", "v2x_regime", 1800) == []  # RoW starts 1900: no invented cell
     acc = cell("FRA", "v2x_accountability", 2024)[0]
     assert acc["unit"].startswith("V-Dem latent") and cell("FRA", "v2x_accountability_osp", 2024)[0]["unit"].startswith(
@@ -161,7 +161,7 @@ def test_vdem_institutions_text_and_categories(vdem_frames):
         (pl.col("iso3") == "FRA") & (pl.col("indicator") == "v2lgbicam") & (pl.col("period_start").dt.year() == 2024)
     )
     assert bicam.select("value", "value_text").row(0) == ("2", "2 or more chambers")
-    assert {u["provider_geo"] for u in unmapped} == {"PSE", "BVR", "TWN"}
+    assert {u["provider_geo"] for u in unmapped} == {"PSE", "BVR"}
     lib, _ = frames["liberties"]
     assert lib.filter(pl.col("indicator") == "v2cltort_osp").height > 0
 

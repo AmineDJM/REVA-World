@@ -99,7 +99,8 @@ async def test_maddison_fixture_parses_with_provider_notes() -> None:
     assert "Total Economy Database" in g22["mpd_general_note"]
     # historical / non-crosswalk codes kept, never dropped, with agent-mapped QIDs
     geos = {u["provider_geo"] for u in unmapped}
-    assert {"SUN", "CSK", "TWN", "world"} <= geos
+    assert {"SUN", "CSK", "world"} <= geos and "TWN" not in geos  # TWN: crosswalk entity since 1.1.0
+    assert set(f.filter(pl.col("provider_geo") == "TWN")["iso3"].to_list()) == {"TWN"}
     sun = f.filter(pl.col("provider_geo") == "SUN")
     assert sun["iso3"].null_count() == sun.height and set(sun["entity_qid"].to_list()) == {"Q15180"}
     # empty cells are omitted, never zero-filled
@@ -188,9 +189,9 @@ async def test_gapminder_excludes_projections_and_flags_segments() -> None:
         )["flags"][0]
     )
     assert fra1800["composite_reconstruction"] is True and "Clio Infra" in fra1800["segment"]
-    assert unmapped == [{"provider_geo": "twn", "rows": unmapped[0]["rows"]}]
+    assert unmapped == []  # "twn" maps to TWN since crosswalk 1.1.0 (ISO 3166-1)
     twn = f.filter(pl.col("provider_geo") == "twn")
-    assert set(twn["entity_qid"].to_list()) == {"Q865"}
+    assert set(twn["iso3"].to_list()) == {"TWN"}
 
 
 def test_gapminder_name_alias_requires_exact_provider_name() -> None:
@@ -294,7 +295,7 @@ async def test_hyde_tail_parse_and_bce_exclusion() -> None:
 
     (b,), _ = await _builds(atlas_hyde.HydeConnector(tail_bytes=10_000_000), atlas_hyde.NAME)
     f, unmapped = _valid(b)
-    assert {u["provider_geo"] for u in unmapped} == {"158", "891", "world"}
+    assert {u["provider_geo"] for u in unmapped} == {"891", "world"}  # 158 -> TWN (ISO numeric)
     fra = f.filter((pl.col("iso3") == "FRA") & (pl.col("indicator") == "popc"))
     # BCE steps are loaded with astronomical years (year 0 = 1 BCE), like the KG (ATLASOPS)
     years = fra["period_start"].dt.year()
@@ -308,7 +309,7 @@ async def test_hyde_tail_parse_and_bce_exclusion() -> None:
     assert fl["hyde_modelled"] is True and fl["licence"] == "CC BY 3.0" and "inhabitants" in fl["unit_note"]
     assert set(f["indicator"].unique().to_list()) == {v[0] for v in atlas_hyde.SUMMARIES.values()}
     twn = f.filter(pl.col("provider_geo") == "158")
-    assert set(twn["entity_qid"].to_list()) == {"Q865"}
+    assert set(twn["iso3"].to_list()) == {"TWN"}  # ISO 3166-1 numeric 158 (crosswalk 1.1.0)
 
 
 def test_hyde_readme_licence_clause_required() -> None:

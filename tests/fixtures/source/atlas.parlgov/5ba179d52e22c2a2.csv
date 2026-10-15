@@ -1,0 +1,36 @@
+country_name_short,country_name,election_type,election_date,vote_share,seats,seats_total,party_name_short,party_name,party_name_english,left_right,country_id,election_id,previous_parliament_election_id,previous_cabinet_id,party_id
+DEU,Germany,parliament,2021-09-26,25.74,206,736,SPD,Sozialdemokratische Partei Deutschlands,Social Democratic Party of Germany,3.6451,54,1096,1016,1528,558
+DEU,Germany,parliament,2021-09-26,18.9,152,736,CDU,Christlich Demokratische Union,Christian Democratic Union,6.2503,54,1096,1016,1528,808
+DEU,Germany,parliament,2021-09-26,14.75,118,736,B90/Gru,Bündnis 90 / Die Grünen,Alliance 90 / Greens,2.9308,54,1096,1016,1528,772
+DEU,Germany,parliament,2021-09-26,11.46,92,736,FDP,Freie Demokratische Partei,Free Democratic Party,5.9233,54,1096,1016,1528,543
+DEU,Germany,parliament,2021-09-26,10.34,83,736,AfD,Alternative für Deutschland,Alternative for Germany,8.7,54,1096,1016,1528,2253
+DEU,Germany,parliament,2021-09-26,5.17,45,736,CSU,Christlich Soziale Union,Christian Social Union,7.2871,54,1096,1016,1528,1180
+DEU,Germany,parliament,2021-09-26,4.89,39,736,PDS|Li,PDS | Die Linke,PDS | The Left,1.2152,54,1096,1016,1528,791
+DEU,Germany,parliament,2021-09-26,0.12,1,736,SSW,Südschleswigscher Wählerverband,South Schleswig Voter League,,54,1096,1016,1528,2850
+DEU,Germany,parliament,2021-09-26,2.43,0,736,FW,Freie Wähler,Free Voters,7.4,54,1096,1016,1528,41
+DEU,Germany,parliament,2021-09-26,0.99,0,736,PARTEI,Die PARTEI,The PARTY,,54,1096,1016,1528,2649
+DEU,Germany,parliament,2021-09-26,1.36,0,736,dieBasis,Basisdemokratische Partei Deutschland,Grassroots Democratic Party of Germany,,54,1096,1016,1528,2821
+DEU,Germany,parliament,2021-09-26,1.45,0,736,Tier,Tierschutzpartei,Animal Protection Party,,54,1096,1016,1528,301
+FRA,France,ep,2019-05-26,23.34,22,74,FN,Rassemblement National ,National Rally,9.6854,43,1054,1014,1509,270
+FRA,France,ep,2019-05-26,22.42,21,74,REM|R,La République En Marche! | Renaissance,The Republic Onwards! | Renaissance,6.0,43,1054,1014,1509,2643
+FRA,France,ep,2019-05-26,13.48,12,74,V,Les Verts,Greens,3.155,43,1054,1014,1509,873
+FRA,France,ep,2019-05-26,8.48,8,74,UMP|LR,Union pour un mouvement populaire | Les Républicains,Union for a Popular Movement | The Republicans,7.4997,43,1054,1014,1509,658
+FRA,France,ep,2019-05-26,6.31,6,74,FI,La France Insoumise,Unbowed France,1.3,43,1054,1014,1509,2644
+FRA,France,ep,2019-05-26,6.19,5,74,PS,Parti socialiste,Socialist Party,3.2493,43,1054,1014,1509,1539
+FRA,France,ep,2019-05-26,3.51,0,74,DLR|DLF,Debout la république | Debout la France,Republic Arise | France Arise,7.4,43,1054,1014,1509,2399
+FRA,France,ep,2019-05-26,3.27,0,74,Gs,"Génération.s, le mouvement","Generation.s, the movement",3.3,43,1054,1014,1509,2732
+FRA,France,ep,2019-05-26,2.5,0,74,UDI,Union des démocrates et indépendants,Union of Democrats and Independents,7.4,43,1054,1014,1509,2273
+FRA,France,ep,2019-05-26,2.49,0,74,PCF,Parti communiste française,French Communist Party,1.3741,43,1054,1014,1509,686
+FRA,France,ep,2019-05-26,2.16,0,74,PA,Parti animaliste,Animalist Party,,43,1054,1014,1509,2733
+FRA,France,ep,2019-05-26,1.82,0,74,d-eco,divers ecologistes,other ecologists,2.5,43,1054,1014,1509,2249
+FRA,France,ep,2019-05-26,1.17,0,74,UPR,Union Populaire Républicaine,Popular Republican Union,7.4,43,1054,1014,1509,2734
+GBR,United Kingdom,parliament,1945-07-05,48.0,393,640,Lab,Labour Party,Labour,4.3562,44,609,911,1520,1556
+GBR,United Kingdom,parliament,1945-07-05,36.2,197,640,Con,Conservatives,Conservatives,7.4261,44,609,911,1520,773
+GBR,United Kingdom,parliament,1945-07-05,,19,640,etc,others,others,,44,609,911,1520,453
+GBR,United Kingdom,parliament,1945-07-05,9.0,12,640,Lib,Liberals,Liberals,4.2875,44,609,911,1520,659
+GBR,United Kingdom,parliament,1945-07-05,2.9,11,640,NLP,National Liberal Party,National Liberal Party,6.0,44,609,911,1520,1017
+GBR,United Kingdom,parliament,1945-07-05,0.2,3,640,ILP,Independent Labour Party,Independent Labour Party,1.3,44,609,911,1520,1205
+GBR,United Kingdom,parliament,1945-07-05,0.4,2,640,CPGB,Communist Party of Great Britain,Communist Party of Great Britain,1.3,44,609,911,1520,1276
+GBR,United Kingdom,parliament,1945-07-05,0.4,2,640,N,Nationalist Party,Nationalist Party,3.3,44,609,911,1520,332
+GBR,United Kingdom,parliament,1945-07-05,0.5,1,640,one-seat,one seat,one seat,,44,609,911,1520,2296
+GBR,United Kingdom,parliament,1945-07-05,0.1,0,640,SNP,Scottish National Party – Pàrtaidh Nàiseanta na h-Alba,Scottish National Party,3.5871,44,609,911,1520,1284

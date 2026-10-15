@@ -531,3 +531,21 @@ async def test_map_countries_from_p298_claims(tmp_path: Path, monkeypatch: pytes
     assert doc["countries"]["SRB"]["qid"] == "Q403"  # the dissolved holder is excluded
     assert doc["countries"]["TWN"]["not_in_crosswalk"] is True
     assert stats["mapped_crosswalk"] == 2 and doc["unmapped"] == []
+
+
+async def test_requests_are_spaced_out_while_recovering_from_a_429(tmp_path: Path) -> None:
+    clock = FakeClock()
+    lock = wd.MachineLock(tmp_path, min_interval=2.0, clock=clock, sleep=clock.sleep)
+    async with lock.slot("wbapi") as s:
+        s.cooldown(40)
+    clock.sleeps.clear()
+    async with lock.slot("wbapi"):  # waits the cool-down
+        pass
+    clock.sleeps.clear()
+    async with lock.slot("wbapi"):  # recovery: >= 10 s since the last API request, not 2 s
+        pass
+    assert sum(clock.sleeps) >= wd.RECOVERY_INTERVAL - 1e-6
+    clock.sleeps.clear()
+    async with lock.slot("wdqs"):  # other endpoint: normal pacing only
+        pass
+    assert sum(clock.sleeps) <= 2.0 + 1e-6

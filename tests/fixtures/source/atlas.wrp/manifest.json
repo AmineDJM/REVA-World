@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "04f7aa7472880afdd33c13ecde39156c27736cb5f1de188f1ef3a26702c526b6",
+    "url": "https://correlatesofwar.org/wp-content/uploads/WRP_national.csv",
+    "file": "04f7aa7472880afd.csv",
+    "sha256": "6df8ffe3be3a07d6a8ad5c0e920c2b22d70c5dd5afface6ed330f77d8ce67643",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "COW terms (cite; no charging)",
+    "derived_from_sha256": "ba1f3b73fdccbee9f3591d20326d14d86169eb6c40d4b196cf78b6c1678eba60",
+    "note": "subset of WRP_national.csv: state-years [('2', '2010'), ('220', '2010'), ('255', '1995'), ('260', '1980'), ('365', '1980'), ('365', '1995'), ('713', '2010'), ('750', '2010')]"
+  },
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "COW terms (cite; no charging)",
+    "derived_from_sha256": null,
+    "note": "real countrycode 1.9.0 tarball (CRAN, GPL-3), the COW code panel"
+  }
+]

@@ -1,0 +1,44 @@
+[
+  {
+    "request_fingerprint": "7e80846f5b3a6c0a54d8eb483622d4efd802bf499b479087496aff74d57ca528",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/EVCQXC",
+    "file": "7e80846f5b3a6c0a.json",
+    "sha256": "f5245a72a6816fbf4e82677b69c06241628a8aea4bf4d3b2532aff6bb9d35cb0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from_sha256": "a6d8fcf86834f1bc8b83f2b5c134cdacd11372d95ffffb8d76996298b1e0cb6c",
+    "note": "real Dataverse record; MD5 of the data file replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "e67ffebd0929e8a555edb00b6ac818b24963bae5631fc59e41950c542fdb5dc1",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/14330927?format=original",
+    "file": "e67ffebd0929e8a5.csv",
+    "sha256": "ba7789698c6996d5aa3167741c912519fa44003313383dbd0554afcb0b50b2b3",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from_sha256": "13718be677d1e6866b37550b4d38c2148f6e0d9cdfcb7b0540c96fa6c09e278b",
+    "note": "subset of sscp_fractionalisation_extension.csv (iso_num ['4', '16', '158', '250', '275', '336', '530', '689', '728', '830', '834'])"
+  },
+  {
+    "request_fingerprint": "92622e414c2e33f75b4311fffcf232dedf8e4357149f1d5b5696670f57f32f7b",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/14330926",
+    "file": "92622e414c2e33f7.txt",
+    "sha256": "d6db885afe27d960c5f2cba979ee0333edab7e9abed3e6c2ea17950b46e06bbd",
+    "status": 200,
+    "headers": {
+      "content-type": "text/plain"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC-BY-4.0",
+    "derived_from_sha256": null,
+    "note": "real README_frac.txt"
+  }
+]

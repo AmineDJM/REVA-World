@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "6e0bec89df058d5b6c2c7e0eac3a104e9ce3c5af53be236f205c60e7eab496e0",
+    "url": "https://www.transparency.org/en/cpi/2025",
+    "file": "6e0bec89df058d5b.html",
+    "sha256": "3210813d6a89e00757db5d0ce105f8928ea375dce6e713ed06e17009521ad58a",
+    "status": 200,
+    "headers": {
+      "content-type": "text/html"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC-BY-ND-4.0",
+    "derived_from_sha256": "3e402d7fec8d5642e104960a5ec48e0f494b75b5f1e99aa897ce4ca67b86a97e",
+    "note": "the CPI 2025 page reduced to its legal footer line (verbatim)"
+  },
+  {
+    "request_fingerprint": "3ec6258688d7c58ee4cbd094a839e2e280631eff65d6276bb8a975aa8640ab36",
+    "url": "https://images.transparencycdn.org/images/CPI2025_Results.xlsx",
+    "file": "3ec6258688d7c58e.xlsx",
+    "sha256": "0207162456858d934911a782ccee203456cbf6dcd85dd0565fe15e8b2a8aed9f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC-BY-ND-4.0",
+    "derived_from_sha256": "543a2ad438c4ba9a70367ee10a44a2565de7fae6bcd8a8db0c23d0b993e46e31",
+    "note": "subset of CPI2025_Results.xlsx (strict OOXML kept): sheets CPI2025 and CPI Historical, header rows 1-4 + ['DNK', 'FRA', 'KSV', 'SOM', 'TWN']; exact cell text"
+  }
+]

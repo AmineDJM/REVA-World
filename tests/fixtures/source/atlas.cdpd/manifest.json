@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "7c11fc94645d696840e5c4e2b800575ce0fa703b85f28a844f641c1e38e82163",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/LI3WYK",
+    "file": "7c11fc94645d6968.json",
+    "sha256": "b7ef44bebec685e3b927d024031f4c908653f55b3157165ead1959882c4bb757",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "a97fd4a081f1a811a4750a4aa14c22139ec9a225f839d114164515e09e0b33e0",
+    "note": "real Dataverse record; MD5 of the xlsx replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "c9878f294bae7611f2b3e80db334aa69fdff55705ae30b363ce1c6204ac65dcf",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10251764",
+    "file": "c9878f294bae7611.xlsx",
+    "sha256": "27aad28da7a37f2db2cc3e20f54d82bc694d7d63f37bae78c6e5d20c6e30a347",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "9a193e6be4dc0b788957f5601e240ddc7d61f966445146a52e188878d86a804a",
+    "note": "subset of CDPD version 1 June 2024.xlsx: [('ETHIOPIA  (INCL. ERIT)', '1960'), ('FRANCE', '1980'), ('FRANCE', '1981'), ('FRANCE', '1982'), ('GERMANY WEST', '1949'), ('KYRGYZTAN', '2022'), ('RUSSIA', '2000'), ('TAIWAN', '2022'), ('UNITED STATES OF AMERICA', '2022'), ('USSR', '1950')]; exact cell text"
+  }
+]

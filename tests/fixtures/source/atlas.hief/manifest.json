@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "7d5e6f8df3ffb9c04c62715a0ffbb4f975b5109fc6369d2f6ef2eb209eaa9680",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/4JQRCL",
+    "file": "7d5e6f8df3ffb9c0.json",
+    "sha256": "da485c2fa61fc61d2e8bff49e4a40ef051306c8f130682d8b9379bbd8e2371c2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "2749d965d562e6b126fb63a667e49104cb18191cdce62432e363d39e44d2eb45",
+    "note": "real Dataverse record; MD5 of HIEF_data.tab replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "be712939017567b17d0667b0b9f807bde708077ec530e2b63cac34329d28e3ac",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/3476857?format=original",
+    "file": "be712939017567b1.csv",
+    "sha256": "36ffc604473020377dcaf4f103ff35f10fe765be6b39a01ba28cf864888cfcb4",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "273f31955e24154f63b8e831008558d8531dfc3775e72067f0782fcc949e77fe",
+    "note": "subset of HIEF_data.csv (France, both Germanies 1989-1991, Serbia 2006-2007, Taiwan/Iran/USSR)"
+  }
+]

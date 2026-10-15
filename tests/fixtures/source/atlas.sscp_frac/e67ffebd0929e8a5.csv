@@ -1,0 +1,12 @@
+iso_num,country,scope_status,gw_num,gw_alpha,cow_num,cow_alpha,ethnic_frac,ethnic_source,language_frac,language_source,religion_frac,religion_source
+4,Afghanistan,in_scope,700,AFG,700,AFG,0.769344585,alesina_2003,0.6141462,alesina_2003,0.2716839,alesina_2003
+16,American Samoa,opportunistic,NA,NA,NA,NA,0.205661,cia,0.1732544,alesina_2003,0.6395266,alesina_2003
+158,Taiwan,in_scope,713,TAW,713,TAW,0.2744,alesina_2003,0.5027927,alesina_2003,0.6844943,alesina_2003
+250,France,in_scope,220,FRN,220,FRN,0.103216841,alesina_2003,0.1220981,alesina_2003,0.4028581,alesina_2003
+275,West Bank and Gaza,opportunistic,NA,NA,NA,NA,NA,NA,NA,NA,0.3235325285822682,rcs_dem_2.0
+336,Holy See,opportunistic,NA,NA,NA,NA,NA,NA,NA,NA,0,rcs_dem_2.0
+530,NA,opportunistic,NA,NA,NA,NA,NA,NA,0.2507729,alesina_2003,0.3866214,alesina_2003
+689,Kosovo,in_scope,347,KOS,347,KOS,0.1361619999999999,cia,0.10622700000000009,cia,0.06299128241356833,rcs_dem_2.0
+728,South Sudan,in_scope,626,SSD,626,SSD,0.8175,cia,NA,NA,0.6138551264296365,rcs_dem_2.0
+830,Channel Islands,opportunistic,NA,NA,NA,NA,NA,NA,NA,NA,0.553323574447797,rcs_dem_2.0
+834,Tanzania,in_scope,510,TAZ,510,TAZ,0.735296,alesina_2003,0.8982636,alesina_2003,0.6334385,alesina_2003

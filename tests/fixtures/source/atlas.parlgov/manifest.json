@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "18d8e0e02e8f49978888cf1df3f815d1a5515f834642e40d8e4c2804048f2484",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/2VZ5ZC",
+    "file": "18d8e0e02e8f4997.json",
+    "sha256": "28f081b199b04e8ec7764a504df11875f509f95f5a99198e88db1c5f04912f0a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "e5b6565ff7f1c01624d10b1a352c6ce1a625025f8322ccbf5ce399d114a6aeeb",
+    "note": "real Dataverse record; MD5 of view_election replaced by the subset's"
+  },
+  {
+    "request_fingerprint": "5ba179d52e22c2a29ac0ea8ffe9b30bbc33016cf337cf6c0a4a13533d03ce9f0",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10437092?format=original",
+    "file": "5ba179d52e22c2a2.csv",
+    "sha256": "2caa49f4c0432838633395e193c3823c9816a3223b30c36e4406ceae5741b3d2",
+    "status": 200,
+    "headers": {
+      "content-type": "text/csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC0-1.0",
+    "derived_from_sha256": "a421fb7060f57f8203af6ccd0dce8d79dfee953db8702837f4c5390ef6b23fb6",
+    "note": "subset of view_election.csv: DEU 2021 Bundestag, FRA 2019 EP, GBR 1945 general election"
+  }
+]

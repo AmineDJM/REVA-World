@@ -1,0 +1,30 @@
+[
+  {
+    "request_fingerprint": "eaea5b5175cb54ca62ca971d3446e6b7c2ea5bed946210f4dc616021f5d9f044",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.DEV.NPG,DSD_SIGI@DF_SIGI_2023,1.0/all?format=csvfilewithlabels",
+    "file": "eaea5b5175cb54ca.csv",
+    "sha256": "8ddc7a88dfb95edf4ad10d1d2d3643de7e1d050a3eff4371d7e27f1f39da138b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "OECD terms (CC BY 4.0 default)",
+    "derived_from_sha256": "3135324b88960f9b9eea2c8255c7e27ba7bdd2d6256d746727e68f1296f0aa5d",
+    "note": "subset of the sigi csvfilewithlabels response: REF_AREA ['AFG', 'FRA', 'NGA', 'TWN', 'W', 'XKV']"
+  },
+  {
+    "request_fingerprint": "d0bba04b6d88c8b3f0e08487d428ae2abee8d89aa23cc7ad1b66e23a46b48c83",
+    "url": "https://sdmx.oecd.org/public/rest/data/OECD.DEV.NPG,DSD_GID@DF_GID_2023,1.0/all?format=csvfilewithlabels",
+    "file": "d0bba04b6d88c8b3.csv",
+    "sha256": "f0469f9b58eba3a269128ff500c5dd7836224426234e409cd1289cf40cc0788b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "OECD terms (CC BY 4.0 default)",
+    "derived_from_sha256": "be146a371758d81d435bad8694c7c460e51dbe37cff7876a941ddb7dc92eb0bf",
+    "note": "subset of the gid csvfilewithlabels response: REF_AREA ['AFG', 'FRA', 'NGA', 'TWN', 'W', 'XKV'] (LAW rows + DF_CM_PCT_1)"
+  }
+]

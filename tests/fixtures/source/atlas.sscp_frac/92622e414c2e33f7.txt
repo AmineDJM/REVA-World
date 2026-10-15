@@ -1,0 +1,257 @@
+================================================================================
+SSCP CODEBOOK: FRACTIONALISATION
+================================================================================
+
+Part of the Small State Coverage Project (SSCP). See the project-level README
+for shared conventions (universe of cases, identifier scheme, missing-data
+codes). This file documents what is specific to this extension.
+
+
+Files:			sscp_fractionalisation.csv
+Version:		v1.0
+Base dataset extended:	Alesina, A., Devleeschauwer, A., Easterly, W., Kurlat,
+    S., & Wacziarg, R. (2003). "Fractionalization." Journal of Economic
+    Growth, 8(2), 155-194. (Also circulated as NBER Working Paper No. 9411.)
+DOI:			10.7910/DVN/EVCQXC
+
+
+--------------------------------------------------------------------------------
+1. WHAT THIS EXTENSION ADDS
+--------------------------------------------------------------------------------
+
+This extensions covers an additional 38 polities for ethnic fractionalisation, 18 for linguistic fractionalisation, and 25 for religious fractionalisation. Adds ethnic, language, and religious fractionalisation values for mostly small polities not covered by Alesina et al.'s original index:
+  - Ethnic and language: from CIA World Factbook group-share data, plus a
+    supplementary source for polities the Factbook itself has no ethnic
+    breakdown for (see section 4).
+  - Religion: from RCS-Dem 2.0 (2015 cross-section).
+ 
+
+--------------------------------------------------------------------------------
+2. STATE COVERAGE
+--------------------------------------------------------------------------------
+
+2a. Polities newly added by this SSCP extension
+
+
+	Field order: State | iso_num | ethnic | language | religion
+ 
+American Samoa | 16 | NEW | COVERED | COVERED
+Anguilla | 660 | NEW | - | NEW
+Aruba | 533 | NEW | COVERED | COVERED
+Bermuda | 60 | NEW | - | COVERED
+British Virgin Islands | 92 | NEW | - | NEW
+Cayman Islands | 136 | NEW | NEW | NEW
+Channel Islands | 830 | - | - | NEW
+Christmas Island | 162 | NEW | NEW | -
+Cocos (Keeling) Islands | 166 | - | NEW | -
+Cook Islands | 184 | NEW | NEW | NEW
+Curacao | 531 | NEW | NEW | NEW
+Falkland Islands | 238 | NEW | NEW | NEW
+Faroe Islands | 234 | NEW | NEW | COVERED
+French Polynesia | 258 | NEW | COVERED | COVERED
+Gibraltar | 292 | NEW | - | NEW
+Greenland | 304 | NEW | COVERED | COVERED
+Guam | 316 | NEW | COVERED | COVERED
+Guernsey | 831 | NEW | - | -
+Holy See | 336 | - | - | NEW
+Isle of Man | 833 | NEW | NEW | COVERED
+Jersey | 832 | NEW | NEW | COVERED
+Kosovo | 689 | NEW | NEW | NEW
+Macau | 446 | NEW | COVERED | COVERED
+Maldives | 462 | NEW | - | NEW
+Montenegro | 499 | NEW | NEW | NEW
+Montserrat | 500 | NEW | - | NEW
+New Caledonia | 540 | NEW | COVERED | COVERED
+Niue | 570 | NEW | NEW | NEW
+Norfolk Island | 574 | NEW | NEW | -
+Northern Mariana Islands | 580 | NEW | COVERED | COVERED
+Puerto Rico | 630 | NEW | COVERED | COVERED
+Rwanda | 646 | COVERED | NEW | COVERED
+Sao Tome and Principe | 678 | NEW | COVERED | COVERED
+Serbia | 688 | COVERED | NEW | NEW
+Sint Maarten | 534 | NEW | NEW | NEW
+South Sudan | 728 | NEW | - | NEW
+St. Helena, Ascension and Tristan da Cunha | 654 | NEW | - | NEW
+St. Pierre and Miquelon | 666 | - | - | NEW
+Svalbard and Jan Mayen | 744 | NEW | - | -
+Timor-Leste | 626 | NEW | COVERED | COVERED
+Tokelau | 772 | NEW | NEW | NEW
+Turks and Caicos | 796 | NEW | - | NEW
+Vietnam, North | 896 | - | - | NEW
+Virgin Islands (U.S.) | 850 | NEW | COVERED | COVERED
+Wallis and Futuna | 876 | - | NEW | NEW
+West Bank and Gaza | 275 | - | - | NEW
+Western Sahara | 732 | - | - | NEW
+Yemen | 887 | NEW | COVERED | COVERED
+
+
+2b. In-scope polities not covered for one or more variables
+
+	Field order: State | Missing | Reason
+
+Anguilla | language | No value in any source
+Austria-Hungary | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Bermuda | language | No value in any source
+British Virgin Islands | language | No value in any source
+Cabo Verde | language | No value in any source
+Cuba | language | No value in any source
+Czechoslovakia | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Dominica | language | No value in any source
+El Salvador | language | No value in any source
+Germany, East | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Gibraltar | language | No value in any source
+Gran Columbia | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Grenada | language | No value in any source
+Haiti | language | No value in any source
+Korea | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Maldives | language | No value in any source
+Orange Free State | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+San Marino | language | No value in any source
+South Sudan | language | No value in any source
+St. Kitts and Nevis | language | No value in any source
+Tibet | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Transvaal | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Turks and Caicos | language | No value in any source
+United Provinces of Central America | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Vietnam, South | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Yemen, South | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+Zanzibar | ethnic, language, religion | Polity no longer exists; sources are present-day cross-sections
+
+
+
+
+--------------------------------------------------------------------------------
+3. VARIABLES
+--------------------------------------------------------------------------------
+
+In sscp_fractionalisation.csv:
+ 
+ Field order: Variable name | Type | Description | Coding/units
+ 
+iso_num          | numeric | see project README | -
+country          | string  | polity name | -
+scope_status     | string  | Whether the polity is in the SSCP universe | "in_scope" if the polity is in universe_of_cases.csv, otherwise "opportunistic" (no year dimension, so assessed per polity)
+gw_num           | numeric | Gleditsch & Ward state number | From universe_of_cases.csv; NA if none
+gw_alpha         | string  | Gleditsch & Ward state abbreviation | From universe_of_cases.csv; NA if none
+cow_num          | numeric | Correlates of War state number | From universe_of_cases.csv; NA if none
+cow_alpha        | string  | Correlates of War state abbreviation | From universe_of_cases.csv; NA if none
+ethnic_frac      | numeric | Ethnic fractionalisation: probability two randomly selected individuals from the population belong to different ethnic groups | 0-1; 1 - sum(group share^2)
+ethnic_source    | string  | Where ethnic_frac came from | "alesina_2003", "cia", "eb", or "wdm"
+language_frac    | numeric | Language fractionalisation, same construction as ethnic_frac applied to linguistic groups | 0-1; 1 - sum(group share^2)
+language_source  | string  | Where language_frac came from | "alesina_2003" or "cia"
+religion_frac    | numeric | Religious fractionalisation, same Herfindahl construction applied to broad religious-group shares | 0-1; 1 - sum(group share^2), floored at 0
+religion_source  | string  | Where religion_frac came from | "alesina_2003" or "rcs_dem_2.0"
+
+
+--------------------------------------------------------------------------------
+4. CONSTRUCTION METHOD
+--------------------------------------------------------------------------------
+
+4a. Ethnic and language
+ 
+For each added state, ethnic and language group shares were taken from the
+CIA World Factbook's "Ethnic Groups" and "Languages" entries. For states
+without any Factbook ethnic breakdown, group shares were instead taken from
+sources recorded per-row in ethnic_other.csv's `source` field:
+ 
+  - `eb`  : Encyclopaedia Britannica, Britannica Book of the Year 2014
+            (Chicago: Encyclopædia Britannica, Inc., 2014), "Nations of the
+            World" statistical tables. Britannica's own tables cite whatever
+            census/estimate year was current for each country at time of
+            publication, which is why the `date` field varies row to row
+            even though all `eb` rows come from the same 2014 edition.
+  - `wdm` : World Directory of Minorities and Indigenous Peoples, Minority
+            Rights Group International (minorityrights.org).
+  - `cia` : current CIA World Factbook.
+ 
+
+4b. Religion
+ 
+Religious group shares were taken from Brown, D., & James, P. (2019, February). 
+Religious characteristics of states dataset project – demographics v. 2.0 (rcs-dem 2.0), 
+countries only. https://doi.org/10.17605/OSF.IO/7SR4M (2015 cross-section),
+using the broad religion categories (Christian, Jewish, Muslim, Zroastrian,
+Baha'i, Jain, Sikh, Hindu, Buddhist, East Asian complex, new religious
+movements, indigenous, other) plus an "unknown" (UNKPC) category.
+ 
+The East Asian complex category (EACPC) is backfilled where RCS-Dem records
+it as missing or zero, using the sum of Shinto (SHNPC), Confucian (CNFPC),
+Taoist (TAOPC), and Chinese folk (CHFPC) shares.
+ 
+UNKPC (unknown affiliation) is included in the denominator when computing
+each group's share of the population, but is not treated as a religious
+group in its own rightl, i.e. it drags total_percent (and therefore every
+group's share) down, but never appears as a term in the sum-of-squares.
+Where reported affiliations sum to under 100% (mostly countries with large
+unaffiliated or folk-religion populations underrepresented in RCS-Dem, n=16
+in the 2015 cross-section), this has the effect of normalising shares to
+sum to 1 rather than leaving fractionalisation understated.
+
+
+
+4c. Common to both
+ 
+All variables use the same Herfindahl-based fractionalisation formula,
+following Alesina et al. (2003):
+ 
+    frac = 1 - sum(share_i^2)
+ 
+where share_i is group i's share of the population, summed over all
+reported groups for that state - the probability that two individuals
+drawn at random from the population belong to different groups.
+ 
+--------------------------------------------------------------------------------
+5. KNOWN LIMITATIONS / CAVEATS
+--------------------------------------------------------------------------------
+
+
+Ethnic / language:
+- Reported group shares do not always sum to 100% in the underlying sources
+  (Factbook entries in particular often omit small/unclassified residual
+  categories). States with total reported shares well below 100% will have
+  understated fractionalisation values. 
+- All values are a single cross-sectional snapshot rather than a time series.
+ 
+Religion:
+- religion_frac is a 2015 cross-section (RCS-Dem 2.0).
+- Countries with total_flag != "ok" (total_percent outside 95-105% before
+  normalisation) in religious_frac.csv (n=16) rely on the UNKPC-inclusive
+  normalisation described in section 4b.
+- The EACPC backfill (section 4b) is a judgment call about how to treat
+  missing/zero East Asian complex data.
+ 
+ 
+
+--------------------------------------------------------------------------------
+6. MISSING DATA
+--------------------------------------------------------------------------------
+
+Follows the SSCP-wide missing data convention (NA). No deviations.
+
+
+--------------------------------------------------------------------------------
+7. CITATION FOR THIS FILE
+--------------------------------------------------------------------------------
+
+Gordon, E. R. 2026. "Small State Coverage Project (SSCP): Fractionalisation."
+  v1.0. Harvard Dataverse. https://doi.org/10.7910/DVN/EVCQXC.
+
+Please also cite the base dataset (and, for religion_frac, RCS-Dem 2.0):
+
+Alesina, A., Devleeschauwer, A., Easterly, W., Kurlat,
+    S., & Wacziarg, R. (2003). "Fractionalization." Journal of Economic
+    Growth, 8(2), 155-194. (Also circulated as NBER Working Paper No. 9411.)
+Brown, D., & James, P. (2019). Religious characteristics of states dataset
+      project – demographics v. 2.0 (RCS-Dem 2.0), countries only.
+      https://doi.org/10.17605/OSF.IO/7SR4M
+
+
+--------------------------------------------------------------------------------
+8. CHANGELOG (THIS FILE ONLY)
+--------------------------------------------------------------------------------
+
+    Field order: Version | Date | Change
+
+[v1] | [2026-10-13] | Initial release
+
+================================================================================

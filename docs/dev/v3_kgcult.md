@@ -9,27 +9,30 @@ UNESCO World Heritage atlas connector implemented and tested (fixture + throwawa
 |---|---|---|---|
 | `culture.languages` | seed | every item with a non-deprecated ISO 639-3 code (P220); claims: codes (P218/P219/P220/P305/P1394), genealogy (P31/P279/P361/P4913), speakers (P1098 with point-in-time, applies-to-part, role, method), writing system (P282), status (P1999/P3823), regulator, indigenous to | 12 000 |
 | `culture.language_families` | seed | instances of language family (Q25295) | 15 000 |
-| `culture.language_ancestors` | seed | closure of P279 above every ISO 639-3 language (intermediate branches not typed as families) | 8 000 |
+| `culture.language_ancestors` | seed | P279 ancestors of every ISO 639-3 language **that carry a Glottocode (P1394)** (branches not typed as families) | 8 000 |
 | `culture.writing_systems` | seed | objects of P282 of ISO languages + instances of writing system (Q8192); ISO 15924, based on (P144) | 4 000 |
 | `culture.country_official_languages` | statements | P37 of the 250 crosswalk countries, start/end/point-in-time, applies-to-part (P518) | 3 000 |
-| `culture.country_languages_used` | statements | P2936 of the 250 countries, speakers (P1098) / proportion (P1107) qualifiers | 15 000 |
-| `culture.historical_state_languages` | statements | P37 + P2936 of historical countries, empires, colonies, protectorates, dependent territories (P31/P279*) | 30 000 |
+| `culture.country_languages_used` | statements | P2936 of the 250 countries, speakers (P1098) / proportion (P1107) qualifiers (Brazil alone: 222) | 40 000 |
+| `culture.historical_state_languages` | statements | P37 + P2936 of historical countries, empires, colonies, protectorates, dependent territories (P31/P279*, FILTER EXISTS: no duplicate rows) | 20 000 |
 | `culture.country_religions` | statements | P140 of the 250 countries with proportion/dates | 3 000 |
 | `culture.religions` | seed | religions (Q9174) and denominations (Q13414953) with ≥ 5 sitelinks + every P140 object of a country; founders (P112), branches (P279/P361), inception | 8 000 |
 | `culture.religion_ancestors` | seed | P279 closure above `culture.religions` (depends_on) | 6 000 |
 | `culture.country_currencies` | statements | P38 of the 250 countries with start/end | 3 000 |
-| `culture.historical_state_currencies` | statements | P38 of historical states/empires/colonies with dates | 15 000 |
+| `culture.historical_state_currencies` | statements | P38 of historical states/empires/colonies/protectorates/dependencies with dates | 8 000 |
 | `culture.currencies` | seed | items with ISO 4217 (P498) + every P38 object of a country; succession (P1365/P1366/P155/P156) | 3 000 |
 | `culture.world_heritage_sites` | seed | items with a WH Site ID (P757); P1435 with start/end, criteria (P2614), country, location | 6 000 |
 | `culture.world_heritage_designations` | statements | P1435 = World Heritage Site (Q9259) with start (inscription) / end (removal) | 6 000 |
 | `culture.cultural_movements` | seed | cultural/art/literary movements (Q2198855/Q968159/Q3326717) with ≥ 3 sitelinks; periods, origin, influences | 8 000 |
-| `culture.movement_members` | statements | P135 of humans with ≥ 20 sitelinks (split by QID prefix) | 60 000 |
+| `culture.movement_members` | statements | P135 of humans with ≥ 20 sitelinks (split by QID prefix) | 40 000 |
 | `culture.country_cuisines` | statements | P2012 (cuisine) of the 250 countries | 1 000 |
 
-Entity budget: seeded entities ≤ 70 000 (sum of seed bounds, overlapping); statement specs with
-open subject sets add at most the distinct subjects of `historical_state_*`, `movement_members` and
-`world_heritage_designations` (rows ≠ entities; most objects are entities seeded above). Target
-≤ 150 000 entities — see §4 for measured counts.
+Entity budget, **bounded by construction**: seeded entities ≤ 70 000 (sum of seed `max_rows`,
+overlapping) + subjects of the statement specs whose subjects are not the 250 countries
+(`historical_state_*`, `movement_members`, `world_heritage_designations`) ≤ 74 000 rows ⇒ ≤ 144 000
+entities ≤ 150 000 target (`test_entity_budget`). A spec that would exceed its bound fails with
+`row_bound_exceeded` (never truncated). Full-size COUNT queries were not run: WDQS throttled this
+machine's shared IP for most of the session (HTTP 429, Retry-After up to 900 s), so bounds are
+upper estimates checked only by the anchors and by WDHARVEST's runs.
 
 Design choices (honesty):
 
@@ -44,11 +47,15 @@ Design choices (honesty):
   religion with P1107 proportion, often absent). Absence is not evidence; the spec notes say so.
 * **Sitelink thresholds** (religions ≥ 5, movements ≥ 3, movement members ≥ 20) are coverage
   bounds, not judgements of importance; stated in each spec's description.
-* **Language genealogy.** Wikidata's P279 chain mixes genealogical branches with abstract classes
-  ("modern language", "natural language"). `language_ancestors` notes that path consumers must stop
-  at items carrying a Glottocode (P1394) or typed as language family (Q25295). Glottolog (CC BY 4.0,
-  `glottolog_languoid.csv.zip` on cdstar.eva.mpg.de) is the fallback if the anchor chains prove
-  broken; not implemented because the anchors (§3) resolve through Wikidata.
+* **Language genealogy.** Wikidata's P279 chain mixes genealogical branches with ontology classes:
+  the unfiltered closure of the 7 anchor languages reached 139 items, climbing from "language" into
+  BFO/DOLCE upper-ontology classes ("continuant", "entity") and contested macro-families without a
+  Glottocode (Eurasiatic, Italo-Celtic). `language_ancestors` therefore seeds only ancestors with a
+  Glottocode (P1394) — Glottolog's classification as mirrored on Wikidata. The anchor chains are
+  complete with Wikidata alone (e.g. Portuguese → Galician–Portuguese → West Iberian → Iberian
+  Romance → Gallo-Iberian(?)/Italo-Western → Romance → Latino-Faliscan → Italic → Indo-European;
+  Swahili → Sabaki → … → Bantu → … → Niger–Congo; Arabic → Semitic → Afroasiatic), so a Glottolog
+  connector (CC BY 4.0, `glottolog_languoid.csv.zip`) was not needed; it remains the fallback.
 
 ### Colonial diffusion paths (no invented links)
 

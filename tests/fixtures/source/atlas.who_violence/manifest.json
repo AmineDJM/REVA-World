@@ -1,0 +1,44 @@
+[
+  {
+    "request_fingerprint": "242769544b25a6d5ec1be7008343fefcad8bc695296c1c449ab2b163e8944a4a",
+    "url": "https://ghoapi.azureedge.net/api/Indicator",
+    "file": "242769544b25a6d5.json",
+    "sha256": "91ca035c8b6203322fee452469eedcf16cdf1efdc3950cdc09c1c70feaa1716f",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "derived_from_sha256": "3a7dc572409e5eed7d85607987b9c6e35a0aaf7a232e15c6bd12a1dd30b1be0b",
+    "note": "subset of the GHO indicator list (3 entries, verbatim)"
+  },
+  {
+    "request_fingerprint": "05c8d1b30637d842d66134d334aac8c39bfbe2d0d08a296645b054d96b51e43f",
+    "url": "https://ghoapi.azureedge.net/api/VIOLENCE_HOMICIDERATE?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'JPN'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'ZAF')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "05c8d1b30637d842.json",
+    "sha256": "adad93de414017e27ec85f8642cde4a67a71b2fcf399a7e3ac6888779e72bc28",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "derived_from_sha256": null,
+    "note": "real response (gho.data:VIOLENCE_HOMICIDERATE, 5 countries)"
+  },
+  {
+    "request_fingerprint": "b23fcdf7d42b1dea5a4d821bdbdea719b57190fd2c3896a0aca3f7fe989ede9d",
+    "url": "https://ghoapi.azureedge.net/api/VIOLENCE_HOMICIDENUM?$filter=SpatialDimType%20eq%20'COUNTRY'%20and%20(SpatialDim%20eq%20'BRA'%20or%20SpatialDim%20eq%20'FRA'%20or%20SpatialDim%20eq%20'JPN'%20or%20SpatialDim%20eq%20'NGA'%20or%20SpatialDim%20eq%20'ZAF')&$select=Id,IndicatorCode,SpatialDimType,SpatialDim,TimeDimType,TimeDim,Dim1Type,Dim1,Dim2Type,Dim2,Dim3Type,Dim3,DataSourceDimType,DataSourceDim,Value,NumericValue,Low,High,Comments,Date",
+    "file": "b23fcdf7d42b1dea.json",
+    "sha256": "1bc97490204c4afad7205f0801ee98c428ad9baf5fa8349171809d20a45b7322",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T23:30:00+00:00",
+    "licence": "CC BY 4.0 (WHO additional terms)",
+    "derived_from_sha256": null,
+    "note": "real response (gho.data:VIOLENCE_HOMICIDENUM, 5 countries)"
+  }
+]

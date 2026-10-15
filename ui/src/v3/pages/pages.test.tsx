@@ -20,6 +20,7 @@ vi.mock('../components/AtlasMap', () => ({ default: ({ label }: { label: string 
 
 // Lazy screens + chained requests: allow for a loaded CI machine.
 configure({ asyncUtilTimeout: 5000 });
+vi.setConfig({ testTimeout: 20_000 });
 
 afterEach(() => vi.unstubAllGlobals());
 

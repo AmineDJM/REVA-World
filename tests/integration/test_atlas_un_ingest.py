@@ -37,7 +37,7 @@ async def test_wpp_tables_registered_and_idempotent(db):
     demo = rep["tables"]["wpp2024_demo"]
     assert demo["dataset_key"] == "atlas.un_wpp.wpp2024_demo" and demo["created"] is True
     unmapped = {u["provider_geo"] for u in demo["unmapped_provider_geo"]}
-    assert {"158", "900", "1834"} <= unmapped and "412" not in unmapped
+    assert {"900", "1834"} <= unmapped and not {"412", "158"} & unmapped  # Kosovo alias; TWN via crosswalk
     frame = read_atlas_table(db.store, demo["artifact_sha256"])
     xkx = frame.filter((pl.col("iso3") == "XKX") & (pl.col("indicator") == "TPopulation1July"))
     assert xkx.height == 74  # 1950-2023 estimates

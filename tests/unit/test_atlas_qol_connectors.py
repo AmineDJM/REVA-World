@@ -270,7 +270,9 @@ async def test_wid_reads_only_needed_members_by_range() -> None:
     assert all("If-Range" in r for r in http.requests[1:])
     fetched = set(f["provider_geo"].unique().to_list())
     assert fetched == {"FR", "KS", "DZ"} and unmapped == []
-    assert b.report["countries_fetched"] == 3  # TW (not a crosswalk entity) and XK (alias excluded) never fetched
+    # XK (alias excluded) is never fetched; TW maps to TWN since crosswalk 1.1.0 (ISO 3166-1): it is
+    # fetched, and the fixture excerpt holds none of the selected series for it (no row, no zero).
+    assert b.report["countries_fetched"] == 4 and b.report["countries_without_selected_series"] == ["TW"]
     assert set(f["indicator"].unique().to_list()) <= {f"{v}|{p}" for v, p in atlas_wid.SERIES}
     assert f.filter(pl.col("provider_geo") == "KS")["iso3"].unique().to_list() == ["XKX"]
     top10 = f.filter(

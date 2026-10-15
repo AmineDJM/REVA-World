@@ -2,8 +2,10 @@
 # UNSD Statistical Yearbook). UN products identify areas by their M49 location code; the crosswalk
 # (registry/entities/country_crosswalk.json) holds the M49 code of every ISO 3166 entity. Two UN
 # location codes name crosswalk entities that have no M49 code there (the two non-ISO World Bank
-# entities); each alias quotes the provider row that establishes it. Nothing else is added: e.g.
-# "China, Taiwan Province of China" (158) is not a crosswalk entity and stays unmapped (kept).
+# entities); each alias quotes the provider row that establishes it. Nothing else is added.
+# Code 158 ("China, Taiwan Province of China" in WPP/IMS, "Other non-specified areas" in the UNSD
+# Statistical Yearbook) maps to TWN through the crosswalk itself (ISO 3166-1 numeric 158; UNSD M49 page:
+# "for strictly statistical purposes, the numerical code 158 can be used to represent this area"), not here.
 scheme: un_m49x
 base: m49
 aliases:

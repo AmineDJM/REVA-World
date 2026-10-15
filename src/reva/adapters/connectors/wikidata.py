@@ -75,6 +75,10 @@ VERSION = "0.3"
 #: Seconds between the end of one Wikidata request and the start of the next, machine-wide. 2 s (not 1 s):
 #: on 2026-10-15 the API answered 429 "You are making too many requests" at ~1 req/s aggregate.
 DEFAULT_MIN_INTERVAL = 2.0
+#: After a 429/503 on an endpoint, for RECOVERY_WINDOW seconds past the cool-down, requests to that endpoint are
+#: spaced RECOVERY_INTERVAL seconds apart machine-wide (queued processes must not burst at cool-down expiry).
+RECOVERY_WINDOW = 600.0
+RECOVERY_INTERVAL = 10.0
 PROJECT_URL = "https://github.com/AmineDJM/REVA-World"
 TEMPORAL_QUALIFIERS = {"P580": "start", "P582": "end", "P585": "point_in_time"}
 SITELINKS_KEPT = ("enwiki", "frwiki", "eswiki", "ptwiki", "arwiki", "zhwiki", "ruwiki", "dewiki")
@@ -174,7 +178,14 @@ class MachineLock:
                     self.waited_seconds += step
                     await self._sleep(step)
                     continue
-                wait = max(state.get("last_end", 0.0) + self.min_interval, state.get(ckey, 0.0)) - now
+                interval = self.min_interval
+                if state.get(f"recovering_until:{endpoint}", 0.0) > now:
+                    # after a 429/503 the endpoint is approached slowly (no burst of queued requests)
+                    interval = max(interval, RECOVERY_INTERVAL)
+                    wait_ep = state.get(f"last_end:{endpoint}", 0.0) + interval - now
+                else:
+                    wait_ep = 0.0
+                wait = max(state.get("last_end", 0.0) + self.min_interval, state.get(ckey, 0.0), now + wait_ep) - now
                 if wait > 0:  # pacing: at most min_interval, under the lock
                     self.waited_seconds += wait
                     await self._sleep(wait)
@@ -186,11 +197,15 @@ class MachineLock:
                 finally:
                     end = self._clock()
                     state = self._read_state()
-                    new = {k: v for k, v in state.items() if k.startswith("cooldown_until:") and v > end}
+                    new = {k: v for k, v in state.items()
+                           if (k.startswith(("cooldown_until:", "recovering_until:")) and v > end)
+                           or k.startswith("last_end:")}
                     new["last_end"] = end
+                    new[f"last_end:{endpoint}"] = end
                     new["pid"] = float(os.getpid())
                     if self._cooldown:
                         new[ckey] = max(new.get(ckey, 0.0), end + self._cooldown)
+                        new[f"recovering_until:{endpoint}"] = new[ckey] + RECOVERY_WINDOW
                     self._write_state(new)
             finally:
                 fcntl.flock(fd, fcntl.LOCK_UN)
