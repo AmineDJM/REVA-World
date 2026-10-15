@@ -1,0 +1,20 @@
+id: culture.religion_ancestors
+domain: culture
+owner: KGCULT
+description: >-
+  Closure of subclass-of (P279) above the religions and denominations of culture.religions
+  (e.g. Sunni Islam -> Islam -> Abrahamic religions), so branch paths are unbroken.
+purpose: seed_entities
+entity_kind: religion
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?rel { {{values}} }
+    ?rel wdt:P279+ ?item .
+  }
+split: {by: values, source: "spec:culture.religions", chunk_size: 200}
+depends_on: [culture.religions]
+max_rows: 6000
+expand_hops: 0
+properties: [P31, P279, P361, P112, P571, P576, P140]
+notes: >-
+  Different chunks return overlapping ancestors; max_rows counts all rows, hence the generous bound.

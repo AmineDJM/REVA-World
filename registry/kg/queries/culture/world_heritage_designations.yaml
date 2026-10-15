@@ -1,0 +1,23 @@
+id: culture.world_heritage_designations
+domain: culture
+owner: KGCULT
+description: >-
+  Heritage designation (P1435) = World Heritage Site (Q9259) statements with start time (inscription)
+  and end time (removal from the list, e.g. Dresden Elbe Valley 2009), plus the site's country (P17)
+  so site -> country paths exist even when the site item was not seeded.
+purpose: statements
+entity_kind: heritage_site
+sparql: |
+  SELECT ?site ?statement ?designation ?rank ?start ?end ?pit WHERE {
+    BIND(wd:Q9259 AS ?designation)
+    ?site p:P1435 ?statement .
+    ?statement ps:P1435 ?designation ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: site, property: P1435, object: designation, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+max_rows: 6000
+expand_hops: 0

@@ -1,0 +1,27 @@
+id: culture.religions
+domain: culture
+owner: KGCULT
+description: >-
+  Religions and their branches: direct instances of religion (Q9174) or religious denomination
+  (Q13414953) with at least 5 sitelinks, plus every object of a religion (P140) statement on a
+  crosswalk country. Snapshots keep branch genealogy (subclass of / part of), founders (P112),
+  inception/dissolution, headquarters and parent organisation.
+purpose: seed_entities
+entity_kind: religion
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    {
+      VALUES ?class { wd:Q9174 wd:Q13414953 }
+      ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+      FILTER(?links >= 5)
+    }
+    UNION
+    { VALUES ?country { {{values}} } ?country wdt:P140 ?item . }
+  }
+split: {by: values, source: countries, chunk_size: 250}
+max_rows: 8000
+expand_hops: 1
+properties: [P31, P279, P361, P112, P571, P576, P159, P749, P140, P17, P495, P737, P1365, P1366, P155, P156]
+notes: >-
+  expand_hops 1 gives label snapshots of founders (P112) and parent branches; their full claims come
+  from KGPEOPLE / this spec's ancestor closure (culture.religion_ancestors).

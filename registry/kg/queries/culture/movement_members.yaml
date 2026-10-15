@@ -1,0 +1,25 @@
+id: culture.movement_members
+domain: culture
+owner: KGCULT
+description: >-
+  Movement (P135) statements of humans with at least 20 sitelinks (well-documented people), linking
+  people to the cultural/artistic/political movements they are listed in, with start/end when given.
+  The sitelink threshold keeps the spec bounded; it is a coverage choice, not a judgement of importance.
+purpose: statements
+entity_kind: person
+sparql: |
+  SELECT ?person ?statement ?movement ?rank ?start ?end WHERE {
+    ?person p:P135 ?statement .
+    ?statement ps:P135 ?movement ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?person wdt:P31 wd:Q5 ; wikibase:sitelinks ?links .
+    FILTER(?links >= 20)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    {{qid_filter}}
+  }
+columns: {subject: person, property: P135, object: movement, statement: statement, rank: rank,
+          start: start, end: end}
+split: {by: qid_prefix, variable: person}
+max_rows: 60000
+expand_hops: 1

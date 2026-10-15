@@ -1,0 +1,18 @@
+id: culture.cultural_movements
+domain: culture
+owner: KGCULT
+description: >-
+  Cultural, art and literary movements (direct instances of Q2198855, Q968159, Q3326717) with at
+  least 3 sitelinks, with periods (inception/dissolution, start/end), country of origin, parent
+  movement and influences.
+purpose: seed_entities
+entity_kind: movement
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?class { wd:Q2198855 wd:Q968159 wd:Q3326717 }
+    ?item wdt:P31 ?class ; wikibase:sitelinks ?links .
+    FILTER(?links >= 3)
+  }
+max_rows: 8000
+expand_hops: 1
+properties: [P31, P279, P361, P571, P576, P580, P582, P2348, P495, P17, P737, P135, P1365, P1366, P155, P156]

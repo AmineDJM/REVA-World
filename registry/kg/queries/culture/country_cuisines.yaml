@@ -1,0 +1,19 @@
+id: culture.country_cuisines
+domain: culture
+owner: KGCULT
+description: >-
+  Cuisine (P2012) statements of the 250 crosswalk countries (country -> national cuisine item).
+  Structured, sitelinked data only; dishes and recipes are out of scope.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?cuisine ?rank WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P2012 ?statement .
+    ?statement ps:P2012 ?cuisine ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+columns: {subject: country, property: P2012, object: cuisine, statement: statement, rank: rank}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 1000
+expand_hops: 1

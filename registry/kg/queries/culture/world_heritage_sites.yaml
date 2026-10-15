@@ -1,0 +1,20 @@
+id: culture.world_heritage_sites
+domain: culture
+owner: KGCULT
+description: >-
+  Every item carrying a UNESCO World Heritage Site ID (P757): inscribed properties and many of their
+  components. Snapshots keep the heritage designation (P1435) with its start/end qualifiers
+  (inscription / removal), the WH criteria (P2614), country, location and coordinates. The official
+  list itself (inscription year, criteria, danger status) comes from the UNESCO WHC dataset
+  (connector atlas_unesco_whc) and is joined on P757 = id_no.
+purpose: seed_entities
+entity_kind: heritage_site
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item p:P757 ?st .
+    ?st wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+max_rows: 6000
+expand_hops: 1
+properties: [P31, P757, P1435, P2614, P17, P131, P625, P361, P527, P571, P1448]
