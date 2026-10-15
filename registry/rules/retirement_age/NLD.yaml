@@ -1,0 +1,242 @@
+schema: reva-retirement-age-rules/1
+version: 1.0.0
+review_status: maintainer_review_pending
+transcription: transcribed from law text by an agent; maintainer review pending
+country: NLD
+notes: Official consolidated text from wetten.overheid.nl (Algemene Ouderdomswet, art. 7a, 'Geldend van 01-07-2026').
+  The AOW age is fixed per calendar year in the law up to 2025; for 2026 onwards it is set yearly by regulation
+  using the life-expectancy formula of art. 7a(2). Those regulation values are NOT archived, so the in-force path
+  has no row after 2025 (coverage gap, never extrapolated).
+model_lever:
+  age_kind: state_pension_age
+  rationale: The AOW pensioengerechtigde leeftijd is the only age at which the state old-age pension starts (no
+    early claim).
+sources:
+- source_id: nl_aow_7a
+  title: Algemene Ouderdomswet art. 7a (wetten.overheid.nl)
+  url: https://wetten.overheid.nl/BWBR0002221
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:51Z'
+  response_sha256: 4070f8fe571517390cfc01c103243650586b994026bc21cd7a48362ef60a1883
+  archived_file: NLD_aow_art7a_excerpt.txt
+  note: 741 KB HTML not committed; verbatim text excerpt of art. 7a(1) committed.
+paths:
+- path_id: pre_2013_counterfactual
+  label: 'Counterfactual: AOW age 65 in every year'
+  status: counterfactual
+  description: Art. 7a(1)(a) (65 before 2013) extended to every year.
+- path_id: law_in_force
+  label: 'AOW art. 7a(1)(a)-(n): 65 -> 67 by calendar year 2013-2024 (2025 = 67)'
+  status: in_force
+  description: Years from 2026 are set by regulation and not covered.
+rows:
+- row_id: NLD.spa.7a.a
+  paths:
+  - pre_2013_counterfactual
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: null
+  year_to: 2012
+  citation: &id001
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder a
+    locator: 'a. vóór 1 januari 2013: 65, respectievelijk 15 jaar;'
+- row_id: NLD.spa.cf.ge2013
+  paths:
+  - pre_2013_counterfactual
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2013
+  year_to: null
+  derivation: counterfactual_extension
+  note: Counterfactual - 65 extended to every year from 2013.
+  citation: *id001
+- row_id: NLD.spa.7a.b
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 1
+  year_from: 2013
+  year_to: 2013
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder b
+    locator: 'b. in 2013: 65 jaar en één maand, respectievelijk 15 jaar en één maand;'
+- row_id: NLD.spa.7a.c
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 2
+  year_from: 2014
+  year_to: 2014
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder c
+    locator: 'c. in 2014: 65 jaar en twee maanden, respectievelijk 15 jaar en twee maanden;'
+- row_id: NLD.spa.7a.d
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 3
+  year_from: 2015
+  year_to: 2015
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder d
+    locator: 'd. in 2015: 65 jaar en drie maanden, respectievelijk 15 jaar en drie maanden;'
+- row_id: NLD.spa.7a.e
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 6
+  year_from: 2016
+  year_to: 2016
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder e
+    locator: 'e. in 2016: 65 jaar en zes maanden, respectievelijk 15 jaar en zes maanden;'
+- row_id: NLD.spa.7a.f
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 9
+  year_from: 2017
+  year_to: 2017
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder f
+    locator: 'f. in 2017: 65 jaar en negen maanden, respectievelijk 15 jaar en negen maanden;'
+- row_id: NLD.spa.7a.g
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 0
+  year_from: 2018
+  year_to: 2018
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder g
+    locator: 'g. in 2018: 66 jaar, respectievelijk 16 jaar;'
+- row_id: NLD.spa.7a.h
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 4
+  year_from: 2019
+  year_to: 2019
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder h
+    locator: 'h. in 2019: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;'
+- row_id: NLD.spa.7a.i
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 4
+  year_from: 2020
+  year_to: 2020
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder i
+    locator: 'i. in 2020: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;'
+- row_id: NLD.spa.7a.j
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 4
+  year_from: 2021
+  year_to: 2021
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder j
+    locator: 'j. in 2021: 66 jaar en vier maanden, respectievelijk 16 jaar en vier maanden;'
+- row_id: NLD.spa.7a.k
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 7
+  year_from: 2022
+  year_to: 2022
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder k
+    locator: 'k. in 2022: 66 jaar en zeven maanden, respectievelijk 16 jaar en zeven maanden;'
+- row_id: NLD.spa.7a.l
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 10
+  year_from: 2023
+  year_to: 2023
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder l
+    locator: 'l. in 2023: 66 jaar en tien maanden, respectievelijk 16 jaar en tien maanden;'
+- row_id: NLD.spa.7a.m
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 67
+    months: 0
+  year_from: 2024
+  year_to: 2024
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder m
+    locator: 'm. in 2024: 67 jaar, respectievelijk 17 jaar;'
+- row_id: NLD.spa.7a.n
+  paths:
+  - law_in_force
+  age_kind: state_pension_age
+  basis: claim_year
+  age:
+    years: 67
+    months: 0
+  year_from: 2025
+  year_to: 2025
+  citation:
+    source_id: nl_aow_7a
+    legal_reference: AOW art. 7a lid 1 onder n
+    locator: 'n. in 2025: 67 jaar, respectievelijk 17 jaar;'

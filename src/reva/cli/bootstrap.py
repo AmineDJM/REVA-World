@@ -33,7 +33,7 @@ from sqlalchemy import Connection, text
 
 from reva.adapters.postgres.engine import make_engine
 from reva.kernel.errors import ConfigurationError
-from reva.settings import ROLE_LOGIN, Settings, load_settings
+from reva.settings import OPTIONAL_OUTSIDE_PRODUCTION, ROLE_LOGIN, Settings, load_settings
 
 log = logging.getLogger("reva.bootstrap")
 MIGRATION_LOCK_KEY = 7262001
@@ -177,8 +177,17 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
         conn.execute(text("SELECT rolsuper FROM pg_roles WHERE rolname = current_user")).scalar_one_or_none()
     )
     limit = role_connection_limit(settings)
+    skipped: list[str] = []
     for role, login in ROLE_LOGIN.items():
         pw = settings.role_password(role)  # type: ignore[arg-type]
+        if (pw is None or not pw.get_secret_value()) and role in OPTIONAL_OUTSIDE_PRODUCTION \
+                and getattr(settings, "reva_env", "local") != "production":
+            # (GATE) Outside production the independent gate login may be left unprovisioned:
+            # nothing can then record gate results, so nothing is auto-promoted (fail closed).
+            # The role is left as it is (roles are cluster-global; other databases may use it).
+            log.warning("runtime role %s not provisioned (no password configured)", login)
+            skipped.append(login)
+            continue
         if pw is None:
             raise ConfigurationError(f"generated password for {login} is missing")
         failure: str | None = None
@@ -218,15 +227,21 @@ def provision_roles(conn: Connection, settings: Settings) -> list[str]:
         if failure is not None:
             raise ConfigurationError(f"provisioning runtime role {login} failed (SQLSTATE {failure})") from None
         done.append(login)
-    verify_runtime_role_attributes(conn, list(ROLE_LOGIN.values()))
+    verify_runtime_role_attributes(conn, done)
+    if skipped:
+        verify_runtime_role_attributes(conn, skipped, require_login=False)
     return done
 
 
 FORBIDDEN_ROLE_ATTRIBUTES = ("rolsuper", "rolcreatedb", "rolcreaterole", "rolbypassrls", "rolreplication")
 
 
-def verify_runtime_role_attributes(conn: Connection, logins: list[str]) -> None:
-    """Fail loudly unless every runtime role is a NOINHERIT login without privileged attributes."""
+def verify_runtime_role_attributes(conn: Connection, logins: list[str], *, require_login: bool = True) -> None:
+    """Fail loudly unless every runtime role is a NOINHERIT login without privileged attributes.
+
+    ``require_login=False`` is used for an optional role that was not provisioned (no password):
+    it must still exist and hold no privileged attribute, but may be NOLOGIN.
+    """
     rows = conn.execute(
         text("SELECT rolname, rolcanlogin, rolinherit, " + ", ".join(FORBIDDEN_ROLE_ATTRIBUTES)
              + " FROM pg_roles WHERE rolname = ANY(:r)"),
@@ -242,7 +257,7 @@ def verify_runtime_role_attributes(conn: Connection, logins: list[str]) -> None:
         bad = [k.removeprefix("rol").upper() for k in FORBIDDEN_ROLE_ATTRIBUTES if r[k]]
         if r["rolinherit"]:
             bad.append("INHERIT")
-        if not r["rolcanlogin"]:
+        if require_login and not r["rolcanlogin"]:
             bad.append("NOLOGIN")
         if bad:
             problems.append(f"{login}: {', '.join(bad)}")
@@ -344,7 +359,7 @@ def bootstrap(settings: Settings | None = None, *, allow_older_server: bool = Fa
             conn.commit()
             report["roles"] = provision_roles(conn, s)
             # Readiness checks read the schema version; nothing else in public is granted.
-            conn.execute(text("GRANT SELECT ON public.alembic_version TO reva_api, reva_worker, reva_sim"))
+            conn.execute(text("GRANT SELECT ON public.alembic_version TO reva_api, reva_worker, reva_sim, reva_gate"))
             verify_ownership(conn)
             conn.commit()
             from reva.adapters.postgres.schema_contract import assert_schema_contract

@@ -1,0 +1,532 @@
+schema: reva-retirement-age-rules/1
+version: 1.0.0
+review_status: maintainer_review_pending
+transcription: transcribed from law text by an agent; maintainer review pending
+country: ESP
+notes: Official consolidated text (BOE, Real Decreto Legislativo 8/2015, Ley General de la Seguridad Social, 'Última
+  actualización, publicada el 03/10/2026'). The ordinary retirement age depends on the calendar year of retirement
+  AND on the contribution record (two tracks); the phase-in started in 2013 (Ley 27/2011). No row is given for years
+  before 2013 in the in-force path (coverage starts 2013).
+model_lever:
+  age_kind: normal_pension_age
+  track: short_contribution
+  rationale: Ordinary retirement age for persons with fewer contribution years than the DT 7ª threshold. Persons
+    above the threshold keep 65; REVA has no data on the share of each track, so applying the short-track age to
+    the whole population overstates the affected population; results are labelled qualified.
+sources:
+- source_id: es_lgss_boe
+  title: Ley General de la Seguridad Social (RDL 8/2015), art. 205 and disposición transitoria 7ª, BOE consolidated
+    text
+  url: https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:49Z'
+  response_sha256: e91283118e8f49199d8cc8d6ecaf5c481a3da42a85393be31376cfc94135529f
+  archived_file: ESP_lgss_art205_dt7_excerpt.txt
+  note: 2.6 MB HTML not committed; verbatim text excerpt of art. 205 and DT 7ª committed.
+paths:
+- path_id: pre_2013_counterfactual
+  label: 'Counterfactual: ordinary age 65 in every year (no Ley 27/2011 phase-in)'
+  status: counterfactual
+  description: The 65-year age that DT 7ª keeps for the long-contribution track, applied to every year and both
+    tracks.
+- path_id: law_in_force
+  label: LGSS art. 205.1.a and DT 7ª phase-in (2013-2027)
+  status: in_force
+  description: Short-contribution track 65 + 1 month (2013) -> 67 (2027 onwards); long-contribution track 65.
+rows:
+- row_id: ESP.npa.cf.short_contribution
+  paths:
+  - pre_2013_counterfactual
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: null
+  year_to: null
+  track: short_contribution
+  derivation: counterfactual_extension
+  note: Counterfactual - 65 for every year (the pre-phase-in age that DT 7ª keeps for long contribution records).
+  citation: &id001
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, 2013 row, long-contribution track (extended as counterfactual)
+    locator: 2013 35 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.cf.long_contribution
+  paths:
+  - pre_2013_counterfactual
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: null
+  year_to: null
+  track: long_contribution
+  derivation: counterfactual_extension
+  note: Counterfactual - 65 for every year (the pre-phase-in age that DT 7ª keeps for long contribution records).
+  citation: *id001
+- row_id: ESP.npa.dt7.2013.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 1
+  year_from: 2013
+  year_to: 2013
+  track: short_contribution
+  condition: contribution record below 35 años y 3 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2013, contribution record below the threshold
+    locator: Menos de 35 años y 3 meses. 65 años y 1 mes.
+- row_id: ESP.npa.dt7.2013.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2013
+  year_to: 2013
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2013, contribution record at or above the threshold
+    locator: 2013 35 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2014.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 2
+  year_from: 2014
+  year_to: 2014
+  track: short_contribution
+  condition: contribution record below 35 años y 6 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2014, contribution record below the threshold
+    locator: Menos de 35 años y 6 meses. 65 años y 2 meses.
+- row_id: ESP.npa.dt7.2014.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2014
+  year_to: 2014
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2014, contribution record at or above the threshold
+    locator: 2014 35 años y 6 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2015.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 3
+  year_from: 2015
+  year_to: 2015
+  track: short_contribution
+  condition: contribution record below 35 años y 9 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2015, contribution record below the threshold
+    locator: Menos de 35 años y 9 meses. 65 años y 3 meses.
+- row_id: ESP.npa.dt7.2015.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2015
+  year_to: 2015
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2015, contribution record at or above the threshold
+    locator: 2015 35 años y 9 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2016.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 4
+  year_from: 2016
+  year_to: 2016
+  track: short_contribution
+  condition: contribution record below 36 años
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2016, contribution record below the threshold
+    locator: Menos de 36 años. 65 años y 4 meses.
+- row_id: ESP.npa.dt7.2016.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2016
+  year_to: 2016
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2016, contribution record at or above the threshold
+    locator: 2016 36 o más años. 65 años.
+- row_id: ESP.npa.dt7.2017.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 5
+  year_from: 2017
+  year_to: 2017
+  track: short_contribution
+  condition: contribution record below 36 años y 3 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2017, contribution record below the threshold
+    locator: Menos de 36 años y 3 meses. 65 años y 5 meses.
+- row_id: ESP.npa.dt7.2017.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2017
+  year_to: 2017
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2017, contribution record at or above the threshold
+    locator: 2017 36 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2018.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 6
+  year_from: 2018
+  year_to: 2018
+  track: short_contribution
+  condition: contribution record below 36 años y 6 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2018, contribution record below the threshold
+    locator: Menos de 36 años y 6 meses. 65 años y 6 meses.
+- row_id: ESP.npa.dt7.2018.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2018
+  year_to: 2018
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2018, contribution record at or above the threshold
+    locator: 2018 36 años y 6 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2019.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 8
+  year_from: 2019
+  year_to: 2019
+  track: short_contribution
+  condition: contribution record below 36 años y 9 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2019, contribution record below the threshold
+    locator: Menos de 36 años y 9 meses. 65 años y 8 meses.
+- row_id: ESP.npa.dt7.2019.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2019
+  year_to: 2019
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2019, contribution record at or above the threshold
+    locator: 2019 36 años y 9 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2020.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 10
+  year_from: 2020
+  year_to: 2020
+  track: short_contribution
+  condition: contribution record below 37 años
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2020, contribution record below the threshold
+    locator: Menos de 37 años. 65 años y 10 meses.
+- row_id: ESP.npa.dt7.2020.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2020
+  year_to: 2020
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2020, contribution record at or above the threshold
+    locator: 2020 37 o más años. 65 años.
+- row_id: ESP.npa.dt7.2021.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 0
+  year_from: 2021
+  year_to: 2021
+  track: short_contribution
+  condition: contribution record below 37 años y 3 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2021, contribution record below the threshold
+    locator: Menos de 37 años y 3 meses. 66 años.
+- row_id: ESP.npa.dt7.2021.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2021
+  year_to: 2021
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2021, contribution record at or above the threshold
+    locator: 2021 37 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2022.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 2
+  year_from: 2022
+  year_to: 2022
+  track: short_contribution
+  condition: contribution record below 37 años y 6 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2022, contribution record below the threshold
+    locator: Menos de 37 años y 6 meses. 66 años y 2 meses.
+- row_id: ESP.npa.dt7.2022.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2022
+  year_to: 2022
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2022, contribution record at or above the threshold
+    locator: 2022 37 años y 6 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2023.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 4
+  year_from: 2023
+  year_to: 2023
+  track: short_contribution
+  condition: contribution record below 37 años y 9 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2023, contribution record below the threshold
+    locator: Menos de 37 años y 9 meses. 66 años y 4 meses.
+- row_id: ESP.npa.dt7.2023.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2023
+  year_to: 2023
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2023, contribution record at or above the threshold
+    locator: 2023 37 años y 9 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2024.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 6
+  year_from: 2024
+  year_to: 2024
+  track: short_contribution
+  condition: contribution record below 38 años
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2024, contribution record below the threshold
+    locator: Menos de 38 años. 66 años y 6 meses.
+- row_id: ESP.npa.dt7.2024.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2024
+  year_to: 2024
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2024, contribution record at or above the threshold
+    locator: 2024 38 o más años. 65 años.
+- row_id: ESP.npa.dt7.2025.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 8
+  year_from: 2025
+  year_to: 2025
+  track: short_contribution
+  condition: contribution record below 38 años y 3 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2025, contribution record below the threshold
+    locator: Menos de 38 años y 3 meses. 66 años y 8 meses.
+- row_id: ESP.npa.dt7.2025.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2025
+  year_to: 2025
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2025, contribution record at or above the threshold
+    locator: 2025 38 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.dt7.2026.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 66
+    months: 10
+  year_from: 2026
+  year_to: 2026
+  track: short_contribution
+  condition: contribution record below 38 años y 3 meses
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2026, contribution record below the threshold
+    locator: Menos de 38 años y 3 meses. 66 años y 10 meses.
+- row_id: ESP.npa.dt7.2026.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2026
+  year_to: 2026
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 2026, contribution record at or above the threshold
+    locator: 2026 38 años y 3 meses o más. 65 años.
+- row_id: ESP.npa.dt7.ge2027.short
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 67
+    months: 0
+  year_from: 2027
+  year_to: null
+  track: short_contribution
+  condition: contribution record below 38 years 6 months
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS DT 7ª, row 'A partir del año 2027'; art. 205.1.a
+    locator: A partir del año 2027 38 años y 6 meses o más. 65 años. Menos de 38 años y 6 meses. 67 años.
+- row_id: ESP.npa.dt7.ge2027.long
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: claim_year
+  age:
+    years: 65
+    months: 0
+  year_from: 2027
+  year_to: null
+  track: long_contribution
+  citation:
+    source_id: es_lgss_boe
+    legal_reference: LGSS art. 205.1.a and DT 7ª (from 2027)
+    locator: sesenta y cinco años cuando se acrediten treinta y ocho años y seis meses de cotización

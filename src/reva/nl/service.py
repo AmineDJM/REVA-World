@@ -43,6 +43,7 @@ from reva.kernel.errors import CapabilityGap, ValidationProblem
 from reva.nl.budget import LlmBudget, LlmLedger, token_upper_bound
 from reva.nl.catalog import (
     EXPLICIT_FIELDS,
+    _const,
     SERVER_FIELDS,
     DraftableModel,
     DraftCatalog,
@@ -96,6 +97,7 @@ class DraftResult:
     text_sha256: str = ""
     text_length: int = 0
     draft_spec_sha256: str | None = None  # sha256 of the canonical bytes POST /v1/scenarios will store
+    parameters_set: list[dict[str, Any]] = field(default_factory=list)  # every parameter the LLM set
 
     def as_json(self) -> dict[str, Any]:
         return {
@@ -114,6 +116,7 @@ class DraftResult:
             "missing_fields": self.missing_fields,
             "assumptions_added": self.assumptions_added,
             "numbers_to_confirm": self.numbers_to_confirm,
+            "parameters_set": self.parameters_set,
             "provider": self.provider,
             "model": self.model,
             "model_requested": self.model_requested,
@@ -195,8 +198,9 @@ def _check_output(output: Any, catalog: DraftCatalog) -> dict[str, Any]:
 
 
 def _gap(catalog: DraftCatalog, key: str, text: str, reason: str, source: str) -> dict[str, Any]:
-    known = key in catalog.gap_keys
-    g = catalog.gap_keys.get(key if known else "nl.unclassified")
+    norm = catalog.normalize_gap(key)
+    known = norm is not None
+    g = catalog.gap_keys.get(norm if norm is not None else "nl.unclassified")
     assert g is not None
     item: dict[str, Any] = {"text": _s(text, 500), "capability_key": g.key, "kind": g.kind, "reason": _s(reason, 500),
             "source": source}
@@ -235,17 +239,20 @@ def _fill_defaults(node: Mapping[str, Any], value: Any) -> Any:
     """Fill schema constants and empty arrays for absent required members (never a guessed number)."""
     if not isinstance(node, Mapping):
         return value
-    if "const" in node:
-        return node["const"] if value is None else value
+    if _const(node)[0]:
+        return _const(node)[1] if value is None else value
     if node.get("type") == "object" or "properties" in node:
         out = dict(value) if isinstance(value, dict) else {}
         props = node.get("properties") or {}
-        for name in node.get("required") or props.keys():
+        for name in props:
             sub = props.get(name) or {}
             if name in out:
                 out[name] = _fill_defaults(sub, out[name])
-            elif "const" in sub:
-                out[name] = sub["const"]
+                continue
+            if name not in (node.get("required") or []):
+                continue  # optional members stay absent (the model's own default applies)
+            if _const(sub)[0]:
+                out[name] = _const(sub)[1]
             elif sub.get("type") == "object" or "properties" in sub:
                 out[name] = _fill_defaults(sub, {})
             elif sub.get("type") == "array":
@@ -271,6 +278,8 @@ def _missing_leaves(node: Mapping[str, Any], value: Any, prefix: str) -> list[st
             out.append(f"{prefix}.{name}")
         elif isinstance(sub, dict) and (sub.get("type") == "object" or "properties" in sub):
             out.extend(_missing_leaves(sub, value[name], f"{prefix}.{name}"))
+        elif isinstance(sub, dict) and value[name] == [] and int(sub.get("minItems") or 0) > 0:
+            out.append(f"{prefix}.{name}")
     return out
 
 
@@ -320,7 +329,8 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     """Turn an (untrusted) LLM output into a checked draft. Pure apart from the registries."""
     from reva.simulation.spec import validate_scenario_spec
 
-    base: dict[str, Any] = dict(provider=response.provider, model=response.model, model_requested=response.model_requested,
+    base: dict[str, Any] = dict(provider=response.provider, model=response.model,
+                                model_requested=response.model_requested,
                 prompt_version=PROMPT_VERSION, prompt_sha256=prompt_digest(catalog),
                 catalog_digest=catalog.digest(), usage={**response.usage.as_json(), "requests": 1},
                 latency_ms=response.latency_ms, text_sha256=text_digest(text), text_length=len(text))
@@ -343,14 +353,16 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     present = {u["capability_key"] for u in unsupported}
     for hit in keyword_gaps(text, language=lang, registered=registered,
                             multi_period_available=catalog.horizon_multi_period):
-        if hit.capability_key not in present:
-            unsupported.append(_gap(catalog, hit.capability_key, hit.text, hit.reason, "server_guard"))
-            present.add(hit.capability_key)
+        gk = catalog.normalize_gap(hit.capability_key)
+        if gk is not None and gk not in present:
+            unsupported.append(_gap(catalog, gk, hit.text, hit.reason, "server_guard"))
+            present.add(gk)
     assumptions = [{"text": _s(a, 500), "source": "llm"} for a in out["assumptions_added"]]
     rejected: list[dict[str, Any]] = []
     missing: list[str] = []
     key = _s(out["model_key"], 100).strip()
-    common: dict[str, Any] = dict(llm_restatement=_s(out["request_restatement"], 2000), language=lang, warnings=warnings,
+    common: dict[str, Any] = dict(llm_restatement=_s(out["request_restatement"], 2000), language=lang,
+                                  warnings=warnings,
                   assumptions_added=assumptions, **base)
     if not key:
         if not unsupported:
@@ -363,7 +375,7 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     model = catalog.models.get(key)
     if model is None:
         rejected.append({"field": "model_key", "value": key[:100]})
-        gap_key = f"model.{key}" if f"model.{key}" in catalog.gap_keys else "nl.unclassified"
+        gap_key = catalog.model_gap(key) or "nl.unclassified"
         if gap_key not in present:
             unsupported.append(_gap(catalog, gap_key, key, "model is not registered for drafting", "server"))
         return DraftResult(status="draft_rejected", draft_spec=None, candidate_spec=None,
@@ -421,11 +433,8 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     # reference year
     year = out["reference_year"]
     year_source = "llm"
-    if year is None and model.reference_years:
-        year = model.reference_years[1]
-        year_source = "server_default"
-        assumptions.append({"text": f"reference_year {year}: not stated; the latest year the model accepts",
-                            "source": "server"})
+    if year is None and "reference_year" in (model.branch.get("required") or []):
+        missing.append("reference_year")  # asked for, never defaulted
     # parameters
     param_meta: dict[str, dict[str, Any]] = {}
     for p in out["parameters"]:
@@ -483,8 +492,8 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
     for name in model.branch.get("required") or []:
         sub = branch_props.get(name) or {}
         if name not in spec:
-            if "const" in sub:
-                spec[name] = sub["const"]
+            if _const(sub)[0]:
+                spec[name] = _const(sub)[1]
             elif isinstance(sub.get("enum"), list) and name == "missing_input_policy":
                 spec[name] = "fail" if "fail" in sub["enum"] else sub["enum"][0]
                 assumptions.append({"text": f"missing_input_policy {spec[name]}", "source": "server"})
@@ -563,7 +572,10 @@ def interpret(response: LlmResponse, text: str, inp: DraftInput, catalog: DraftC
         validation={"valid": status == "draft_ready", "errors": errors,
                     "validator": "reva.simulation.spec.validate_scenario_spec"},
         restatement="", unsupported=unsupported, rejected_ids=rejected, missing_fields=missing,
-        numbers_to_confirm=confirm, draft_spec_sha256=canonical_sha if status == "draft_ready" else None, **common)
+        numbers_to_confirm=confirm, draft_spec_sha256=canonical_sha if status == "draft_ready" else None,
+        parameters_set=[{"path": p, "value": spec_value(spec if valid else candidate, p),
+                         "quote": param_meta.get(p, {}).get("quote", "")} for p in sorted(param_meta)],
+        **common)
     result.restatement = restate(result, model)
     return result
 
@@ -614,9 +626,9 @@ def restate(r: DraftResult, model: DraftableModel) -> str:
         return _restate_rejected(lang, r.rejected_ids, r.unsupported)
     spec = r.draft_spec or r.candidate_spec or {}
     countries = ", ".join(spec.get("countries") or []) or ("(aucun pays)" if lang == "fr" else "(no country)")
-    nums = "; ".join(f"{n['path']} = {n['value']}" for n in r.numbers_to_confirm
-                     if n["provenance"] != "schema_constant" and n["path"] != "reference_year")
-    outputs = ", ".join(spec.get("outputs") or [])
+    nums = "; ".join(f"{p['path']} = {p['value']}" for p in r.parameters_set)
+    outs = list(spec.get("outputs") or [])
+    outputs = ", ".join(outs[:6]) + (f" (+{len(outs) - 6})" if len(outs) > 6 else "")
     if lang == "fr":
         head = {"draft_ready": "Brouillon valide (non exécuté)", "needs_input": "Brouillon incomplet",
                 "draft_invalid": "Brouillon non valide"}[r.status]

@@ -100,6 +100,7 @@ class ScenarioDraftResponse(BaseModel):
     missing_fields: list[str]
     assumptions_added: list[DraftAssumption]
     numbers_to_confirm: list[DraftNumber]
+    parameters_set: list[dict[str, Any]] = Field(description="Every parameter the LLM set, with its quote")
     provider: str
     model: str
     model_requested: str

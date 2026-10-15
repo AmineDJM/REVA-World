@@ -25,6 +25,7 @@ from __future__ import annotations
 
 import copy
 import logging
+import re
 from collections.abc import Iterator, Mapping
 from dataclasses import dataclass, field
 from functools import lru_cache
@@ -152,22 +153,40 @@ class DraftCatalog:
     def digest(self) -> str:
         return logical_hash(self.prompt_view())
 
+    def model_gap(self, model_key: str) -> str | None:
+        """The gap key for an unregistered model: the capability id if catalogued, else ``model.<key>``."""
+        for k in (model_key, f"model.{model_key}"):
+            if k in self.gap_keys:
+                return k
+        return None
+
+    def normalize_gap(self, key: str) -> str | None:
+        """A gap key from the LLM, accepting ``model.<id>`` for the catalogued ``<id>`` and vice versa."""
+        if key in self.gap_keys:
+            return key
+        if key.startswith("model."):
+            return key[6:] if key[6:] in self.gap_keys else None
+        return f"model.{key}" if f"model.{key}" in self.gap_keys else None
+
     def countries(self) -> frozenset[str]:
         return frozenset(c for m in self.models.values() for c in m.countries)
 
 
 # --------------------------------------------------------------------------- schema walking
 def _generic_path(path: str) -> str:
-    import re
-
     return re.sub(r"\[\d+\]", "[]", path)
 
 
-def _fidelity_title(f: str) -> str:
-    from reva.capabilities import get
+#: Model-neutral meaning of the fidelity levels (the capability titles are crude-model specific).
+FIDELITY_MEANING: Mapping[str, str] = {
+    "L0": "exact cache lookup of an identical, already computed specification",
+    "L1": "deterministic computation under the stated assumptions",
+    "L2": "labelled sensitivity range over a stated assumption grid (no probabilities)",
+}
 
-    cap = get(f"fidelity.{f}")
-    return cap.title if cap is not None else f
+
+def _fidelity_title(f: str) -> str:
+    return FIDELITY_MEANING.get(f, f)
 
 
 def _resolve(node: Any, root: Mapping[str, Any]) -> Any:
@@ -187,7 +206,8 @@ def _resolve(node: Any, root: Mapping[str, Any]) -> Any:
 
 def _merge(base: Mapping[str, Any], branch: Mapping[str, Any]) -> dict[str, Any]:
     out = {k: copy.deepcopy(v) for k, v in base.items() if k not in ("oneOf", "anyOf", "$defs", "definitions")}
-    props = dict(out.get("properties") or {})
+    # root placeholders ({}: "defined by the model branch") are not properties of a model
+    props = {k: v for k, v in (out.get("properties") or {}).items() if v != {}}
     props.update(branch.get("properties") or {})
     out["properties"] = props
     out["required"] = sorted(set(out.get("required") or []) | set(branch.get("required") or []))
@@ -232,7 +252,7 @@ def model_branches(schema: Mapping[str, Any]) -> Iterator[dict[str, Any]]:
 
 
 def _leaves(node: Mapping[str, Any], prefix: str) -> Iterator[tuple[str, dict[str, Any]]]:
-    if _const(node)[0]:
+    if _const(node)[0] or not node:
         return
     t = node.get("type")
     if t == "object" or "properties" in node:
@@ -254,6 +274,9 @@ def _param(model_key: str, path: str, node: Mapping[str, Any]) -> ParamSpec:
     if isinstance(node.get("enum"), list):
         return ParamSpec(path, "choice", tuple(node["enum"]), hint)
     t = node.get("type")
+    alternatives = [a.get("type") for a in (node.get("oneOf") or node.get("anyOf") or []) if isinstance(a, dict)]
+    if t is None and alternatives:  # e.g. a number or a decimal string: the draft always sends a JSON number
+        t = next((k for k in ("number", "integer", "boolean") if k in alternatives), None)
     if t in ("number", "integer", "boolean"):
         return ParamSpec(path, t, (), hint)
     return ParamSpec(path, "text", (), hint)
@@ -283,6 +306,42 @@ def _enum(node: Any) -> tuple[Any, ...]:
         return tuple(node["enum"])
     items = node.get("items")
     return _enum(items) if isinstance(items, dict) else ()
+
+
+def registered_countries() -> tuple[str, ...]:
+    """ISO3 keys of the registered country entities (reviewed ``countries.yaml`` + the verified crosswalk)."""
+    from reva.ontology.registry import REGISTRY_ROOT, load_yaml
+
+    keys: set[str] = set()
+    try:
+        for e in load_yaml(REGISTRY_ROOT / "entities" / "countries.yaml").get("entities") or []:
+            if isinstance(e, dict) and e.get("kind") == "entity.country" and re.fullmatch(r"[A-Z]{3}",
+                                                                                        str(e.get("key"))):
+                keys.add(str(e["key"]))
+    except (OSError, AttributeError):
+        pass
+    try:
+        from reva.adapters.connectors.country_crosswalk import load_crosswalk
+
+        for e in load_crosswalk().get("entities") or []:
+            if e.get("kind") == "entity.country" and re.fullmatch(r"[A-Z]{3}", str(e.get("key"))):
+                keys.add(str(e["key"]))
+    except Exception as e:  # an unverifiable crosswalk adds nothing (fail closed to the reviewed list)
+        log.warning("country crosswalk not used for drafting: %s", type(e).__name__)
+    return tuple(sorted(keys))
+
+
+def _countries(node: Any, plugin: Any) -> tuple[str, ...]:
+    """A model's country allow-list: the schema enum, else registered entities matching the item pattern."""
+    listed = tuple(str(c) for c in _enum(node))
+    if listed:
+        return listed
+    items = node.get("items") if isinstance(node, dict) else None
+    pattern = items.get("pattern") if isinstance(items, dict) else None
+    out = [c for c in registered_countries() if pattern is None or re.search(str(pattern), c)]
+    if getattr(plugin, "supports_all_countries", False):
+        out.append("ALL")
+    return tuple(out)
 
 
 def _model_registry_entries() -> dict[str, dict[str, Any]]:
@@ -327,6 +386,16 @@ def _plugin_manifest(plugin: Any) -> dict[str, Any]:
     return m if isinstance(m, dict) else {}
 
 
+def _description(key: str, manifest: Mapping[str, Any], reg_entry: Mapping[str, Any]) -> str:
+    """Registry/plugin text describing what the model computes (label and stated assumptions)."""
+    parts = [str(manifest.get("description") or reg_entry.get("description") or manifest.get("label") or key)]
+    if not (manifest.get("description") or reg_entry.get("description")):
+        assumptions = manifest.get("assumptions") or reg_entry.get("assumptions") or []
+        if isinstance(assumptions, list) and assumptions:
+            parts.append("Assumptions: " + "; ".join(str(a) for a in assumptions[:4]))
+    return " ".join(" ".join(parts).split())[:1200]
+
+
 def build_catalog(schema: Mapping[str, Any] | None = None, *,
                   plugins: tuple[str, Mapping[str, Any]] | None = None) -> DraftCatalog:
     """Build the allow-list from the scenario schema, the plugin registry and the capability catalogue."""
@@ -365,9 +434,9 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
             model_key=key,
             model_version=_latest(props.get("model_version")),
             schema_version=_latest(props.get("schema_version")),
-            description=" ".join(str(manifest.get("description") or reg_entry.get("description") or key).split()),
+            description=_description(key, manifest, reg_entry),
             review_status=str(manifest.get("review_status") or reg_entry.get("approval_status") or "unknown"),
-            countries=tuple(str(c) for c in _enum(props.get("countries"))),
+            countries=_countries(props.get("countries"), registry.get(key)),
             reference_years=ref_years,
             fidelities=tuple(str(f) for f in _enum(props.get("fidelity"))),
             outputs=tuple(str(o) for o in _enum(props.get("outputs"))),
@@ -381,21 +450,25 @@ def build_catalog(schema: Mapping[str, Any] | None = None, *,
         if not cap.available and not cap.verification_only:
             gaps[cap.capability_id] = GapKey(cap.capability_id, "capability_gap", cap.title)
     for key, title in PLANNED_MODELS.items():
-        if key not in models:
+        if key not in models and key not in gaps:  # the capability catalogue's own id wins when it exists
             gaps[f"model.{key}"] = GapKey(f"model.{key}", "capability_gap", f"{title}: not registered yet")
     for key, (kind, title) in NL_GAP_KEYS.items():
         gaps[key] = GapKey(key, kind, title)
     return DraftCatalog(models=models, gap_keys=gaps, plugin_registry=state, horizon_multi_period=multi_period)
 
 
-@lru_cache(maxsize=1)
-def _cached(schema_digest: str, plugin_keys: tuple[str, ...], state: str) -> DraftCatalog:
+@lru_cache(maxsize=2)
+def _cached(schema_digest: str, plugin_keys: tuple[str, ...], state: str, entity_stamp: tuple[int, ...]
+            ) -> DraftCatalog:
     return build_catalog()
 
 
 def current_catalog() -> DraftCatalog:
-    """The catalogue for this request (rebuilt when the schema or the registered plugins change)."""
+    """The catalogue for this request (rebuilt when the schema, the plugins or the entity files change)."""
+    from reva.ontology.registry import REGISTRY_ROOT
     from reva.simulation.spec import scenario_schema
 
     state, registry = registered_plugins()
-    return _cached(logical_hash(scenario_schema()), tuple(sorted(registry)), state)
+    stamp = tuple(p.stat().st_mtime_ns if p.exists() else 0 for p in
+                  (REGISTRY_ROOT / "entities" / "countries.yaml", REGISTRY_ROOT / "entities" / "country_crosswalk.json"))
+    return _cached(logical_hash(scenario_schema()), tuple(sorted(registry)), state, stamp)

@@ -20,6 +20,7 @@ from __future__ import annotations
 import hashlib
 import inspect
 from collections.abc import Iterator, Sequence
+
 from reva.adapters.connectors import worldbank as base
 from reva.adapters.connectors.worldbank import BASE, INDICATORS, WorldBankConnector
 from reva.ports.connectors import (

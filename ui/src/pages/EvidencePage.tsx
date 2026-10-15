@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
 import { getEvidence, getEvidenceItem, getObservations } from '../api/client';
 import { COUNTRY_CODES, type EvidenceItem, type Observation } from '../api/types';
@@ -255,8 +256,12 @@ function ObservationDrilldown({ obs, lineage }: { obs: Observation; lineage: Obs
 export default function EvidencePage() {
   const evidence = useApi((s) => getEvidence({ limit: 200 }, s), []);
   const [selected, setSelected] = useState<string | null>(null);
-  const [country, setCountry] = useState<string>('FRA');
-  const [concept, setConcept] = useState<string>(PROFILE_PANELS[2]!.concept);
+  // ?concept= and ?country= preselect the filter (links from the command palette).
+  const [search] = useSearchParams();
+  const conceptParam = search.get('concept');
+  const countryParam = search.get('country');
+  const [country, setCountry] = useState<string>(countryParam && /^[A-Z]{3}$/.test(countryParam) ? countryParam : 'FRA');
+  const [concept, setConcept] = useState<string>(conceptParam || PROFILE_PANELS[2]!.concept);
   const [year, setYear] = useState<string>('2023');
   const [obsId, setObsId] = useState<string | null>(null);
   const [asOf, setAsOf] = useState('');
@@ -299,7 +304,7 @@ export default function EvidencePage() {
           <label>
             Country
             <select value={country} onChange={(e) => setCountry(e.target.value)}>
-              {COUNTRY_CODES.map((c) => (
+              {[...COUNTRY_CODES, ...(country && !(COUNTRY_CODES as readonly string[]).includes(country) ? [country] : [])].map((c) => (
                 <option key={c}>{c}</option>
               ))}
             </select>
@@ -312,6 +317,7 @@ export default function EvidencePage() {
                   {p.title}
                 </option>
               ))}
+              {!PROFILE_PANELS.some((p) => p.concept === concept) && <option value={concept}>{concept}</option>}
             </select>
           </label>
           <label>

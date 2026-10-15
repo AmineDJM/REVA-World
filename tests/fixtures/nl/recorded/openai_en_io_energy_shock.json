@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_en_io_energy_shock",
+ "recorded_at": "2026-10-15T01:17:19+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 3286.0,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "40171f22d659782c41e9ff1da9477f824c97daabf66b98fa02ef6e7fc5081ee5",
+ "catalog_digest": "b9ff54f4cc51cfcfe157fa0f9effcf5eaa0456a5edeb888cd33c783433e1ff2a",
+ "text": "What happens to consumer prices in France and Germany if the price of crude petroleum and natural gas from Norway rises by 30% (reference year 2021)?",
+ "text_sha256": "5f8bffd180fd540570256afb494085e996023e10b68fa1341dcb30af49256159",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792027036,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"en\",\"request_restatement\":\"The user asks for the effect on consumer prices in France and Germany if the price of crude petroleum and natural gas from Norway increases by 30% in the reference year 2021.\",\"model_key\":\"economic.io_price\",\"title\":\"Effect on consumer prices in France and Germany from a 30% price rise in Norwegian crude petroleum and natural gas (2021)\",\"countries\":[\"FRA\",\"DEU\"],\"reference_year\":2021,\"fidelity\":null,\"outputs\":[\"household_basket_price_change_percent\"],\"parameters\":[{\"path\":\"intervention.shocks[0].origin\",\"number\":null,\"text\":\"NOR\",\"quote\":\"from Norway\"},{\"path\":\"intervention.shocks[0].industry\",\"number\":null,\"text\":\"B\",\"quote\":\"crude petroleum and natural gas\"},{\"path\":\"intervention.shocks[0].price_change_percent\",\"number\":30,\"text\":null,\"quote\":\"30%\"}],\"unsupported\":[],\"assumptions_added\":[\"No pass-through grid specified; full pass-through (neutral value) assumed.\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 7608,
+   "completion_tokens": 221,
+   "total_tokens": 7829,
+   "prompt_tokens_details": {
+    "cached_tokens": 0,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

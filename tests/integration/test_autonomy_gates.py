@@ -71,7 +71,10 @@ async def _t1(io, db, mutate_manifest=None):
                       io.put_json(manifest, "models"), cp.mapping)
     v = await JsonStatConnectorValidator(io).validate(cp, bank, default_budget())
     p = connector_change_proposal(io, cp, manifest, mapping, _value(io), promotion_policy())
-    ProposalStore(db.worker, io).persist(p, proposal_type="connector_promotion", scope={}, risk={})
+    from reva.autonomy.jobs import connector_promotion_scope
+
+    ProposalStore(db.worker, io).persist(p, proposal_type="connector_promotion",
+                                         scope=connector_promotion_scope(io, manifest, mapping), risk={})
     s = await TrustedTemplateSandbox(io, fixtures=bank).run(p, trusted_template_policy(default_budget()))
     return p, v, s
 

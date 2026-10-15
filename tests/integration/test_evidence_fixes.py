@@ -152,6 +152,26 @@ def _estimate_for_support(db: Any, release_id: Any, tag: str) -> list[dict[str, 
             {"r": release_id, "t": tag}).mappings()]
 
 
+# --------------------------------------------------------------------------- kernel value validation
+def test_non_kernel_values_quarantine_the_acquisition(db: Any) -> None:
+    """publish_acquisition validates every value with the kernel parser: a decimal without its basis
+    (or any non-kernel value) quarantines the item; nothing is stored as an observation."""
+    tag = f"kv-{uuid.uuid4().hex[:8]}"
+    raw, batches, reports = _synthetic(tag, {"a": "100", "b": "987654321"})
+    bad = batches[0].observations[1].model_copy(
+        update={"value": {"kind": "decimal", "value": "987654321", "unit_ref": "unit.persons"}})  # no basis
+    batches = [batches[0].model_copy(update={"observations": (batches[0].observations[0], bad)})]
+    summary = publish_acquisition(db.worker, db.store, WB, raw, batches, reports)
+    assert summary.namespace == "quarantine" and summary.inserted == 0
+    assert _obs(db, f"fx2:{tag}:a") == [] and _obs(db, f"fx2:{tag}:b") == []
+    with db.worker.connect() as c:
+        quality = c.execute(text("SELECT response_metadata->'quality' FROM evidence.acquisition WHERE id = :i"),
+                            {"i": summary.acquisition_id}).scalar_one()
+    (finding,) = [f for q in quality for f in q["findings"] if f["code"] == "invalid_kernel_value"]
+    assert finding["severity"] == "blocker" and f"fx2:{tag}:b" in finding["message"]
+    assert "987654321" not in finding["message"]  # the value itself is not echoed
+
+
 # --------------------------------------------------------------------------- R-03
 def test_r03_release_waits_for_inflight_ingest(db: Any) -> None:
     tag = f"r03-{uuid.uuid4().hex[:8]}"
@@ -386,7 +406,8 @@ def test_r23_valuation_is_flow_aware(flow: str, pv: str, cif: str | None, fob: s
 def test_comtrade_estimation_flag_replaces_uninformative_derived_flag() -> None:
     ct = ComtradeConnector(reporters=("CHN",), total_years=(2023,), bilateral_years=())
     body = copy.deepcopy(_ct_body(156, "M", 2023))
-    body["data"][0].update({"isReported": False, "isAggregate": True, "legacyEstimationFlag": 0})
+    body["data"][0].update({"isReported": False, "isAggregate": True, "legacyEstimationFlag": 0,
+                            "isQtyEstimated": False, "isNetWgtEstimated": False})
     batches, report = _ct_parse(ct, "total:CHN:M:2023", body)
     v = next(o for o in batches[0].observations if o.logical_key.endswith("primaryValue"))
     w = next(o for o in batches[0].observations if o.logical_key.endswith("netWgt"))
@@ -648,29 +669,19 @@ def test_r28_parser_version_change_reprocesses_same_bytes(db: Any) -> None:
 
 # --------------------------------------------------------------------------- population from Eurostat
 def _ensure_reapproved(db: Any, name: str) -> None:
-    """If the promotion was retired (rollback drill elsewhere in the session), append a named-human
-    re-approval with the original applicability (append-only; latest decision wins)."""
-    from reva.evidence.locks import take_evidence_write_lock
+    """If the promotion was rolled back elsewhere in the session (shared session DB), re-enable it through
+    the sanctioned named-human path (``reapprove_promotion`` on the migration-owner engine, R5-01), for the
+    newest retired version under the current template: the one ``promoted_connectors`` would then load."""
+    from reva.autonomy import promotion as prom
+    from reva.autonomy.jobs import promoted_connectors, reapprove_promotion
 
-    with db.owner.begin() as c:  # a named-human re-approval: admin path, not worker credentials (R5-01)
-        take_evidence_write_lock(c)
-        cv = c.execute(text("SELECT id FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at DESC "
-                            "LIMIT 1"), {"n": name}).scalar_one()
-        concept = repo.concept_version_id(c, "demography.population.jan1_age_sex", "1.0.0")
-        latest = c.execute(text(
-            """SELECT decision, applicability, policy_version FROM evidence.eligibility
-               WHERE connector_version_id=:cv AND concept_version_id=:c ORDER BY recorded_at DESC, id DESC LIMIT 1"""),
-            {"cv": cv, "c": concept}).mappings().one()
-        if latest["decision"] == "eligible":
-            return
-        act = repo.simple_activity("evidence.eligibility_review", "review", "human:fx2-test", {"connector": name})
-        repo.record_activity(c, act)
-        c.execute(text(
-            """INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
-                 policy_version, review_activity_id)
-               VALUES (:cv, :c, CAST(:ap AS jsonb), 'eligible', :p, :a)"""),
-            {"cv": cv, "c": concept, "ap": json.dumps(dict(latest["applicability"])),
-             "p": latest["policy_version"], "a": act.id})
+    if name in promoted_connectors(db.worker, db.store):
+        return
+    with db.worker.connect() as c:
+        retired = [s for s in prom.connector_states(c) if s["name"] == name and s["state"] == "retired"]
+    assert retired, f"{name}: neither active nor retired under the current template"
+    reapprove_promotion(db.owner, name, retired[-1]["version"], "demography.population.jan1_age_sex@1.0.0",
+                        "human:fx2-test", "re-enable after a rollback drill in another test module")
 
 
 async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
@@ -688,7 +699,8 @@ async def test_population_from_promoted_eurostat_connector(db: Any) -> None:
     ctx = JobContext(job_id=jid, job_type="discovery", worker_id="fx2-worker", fencing_token=7, attempt=1,
                      settings=db.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
     out = handle_discovery({"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}, ctx)
-    assert out["status"] in ("promoted", "no_gap", "already_promoted"), out
+    # rolled_back_hold: an earlier module's rollback drill retired this content; re-approved below
+    assert out["status"] in ("promoted", "no_gap", "already_promoted", "rolled_back_hold"), out
     name = "eurostat.demo_pjan.fr"
     _ensure_reapproved(db, name)  # an earlier module may have rolled the promotion back (shared session DB)
     connector = promoted_connectors(db.worker, db.store)[name]

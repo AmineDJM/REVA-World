@@ -1,0 +1,26 @@
+[
+  {
+    "request_fingerprint": "0294a4478cd1263554c391453aa9b8e8070abb37c90bd1d0121f8914cad31182",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/contentconstraint/ESTAT/NAIO_10_FCP_II4",
+    "file": "0294a4478cd12635.json",
+    "sha256": "b4395ecd63e46cfefcf6b5b5a2264384ef4354719f980a1daac3671568d2d1cc",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.structure+xml;version=2.1"
+    },
+    "retrieved_at": "2026-10-15T01:17:53.808622+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "19f590dd91bea77317a4ee2e3825351f10d0f59f3eb48d12e1a874a469955adf",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/sdmx/2.1/data/NAIO_10_FCP_II4/A.....DOM?startPeriod=2024&endPeriod=2024&format=SDMX-CSV&compressed=true",
+    "file": "19f590dd91bea773.json",
+    "sha256": "b63a8d9917b6ce4a20da3f9526f8ff2f4113f7ceb6a7c7f0d4c890adf07ba173",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.sdmx.data+csv;version=1.0.0"
+    },
+    "retrieved_at": "2026-10-15T01:17:58.643111+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  }
+]

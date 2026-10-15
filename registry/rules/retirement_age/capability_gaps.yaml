@@ -1,0 +1,19 @@
+schema: reva-retirement-age-gaps/1
+note: Countries of the phase-2 list without a sourced rule table; the model refuses them with capability_gap.
+gaps:
+- country: ITA
+  reason: Normattiva (official consolidated text) did not return the D.L. 201/2011 art. 24 text to automated retrieval
+    on 2026-10-15, and the life-expectancy adjustments are set by later decrees that were not archived; no rule
+    table was transcribed.
+- country: BEL
+  reason: The Belgian Justel/eJustice consolidated text of the law of 10 August 2015 (pension age 65 -> 66 in 2025
+    -> 67 in 2030) could not be retrieved automatically on 2026-10-15 (JavaScript/redirect page); no archived source,
+    no rule table.
+- country: SWE
+  reason: Socialförsäkringsbalken 56 kap. 3 § (archived) sets the earliest income-pension age at three years before
+    the riktålder, whose yearly values (10 a-10 d §§) are fixed outside the archived law text; the riktålder values
+    and the 2020-2025 transitional ages were not archived, so no rule table was transcribed.
+  archived_file: SWE_sfb_56kap3_excerpt.txt
+- country: POL
+  reason: ISAP (Sejm legal information system) refused automated retrieval (HTTP 403) of the Act on pensions from
+    the Social Insurance Fund on 2026-10-15; no archived source, no rule table.

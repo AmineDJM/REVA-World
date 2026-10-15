@@ -2894,6 +2894,104 @@
         "title": "DiscoveryRequest",
         "type": "object"
       },
+      "DraftAssumption": {
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "source"
+        ],
+        "title": "DraftAssumption",
+        "type": "object"
+      },
+      "DraftGap": {
+        "properties": {
+          "capability_key": {
+            "title": "Capability Key",
+            "type": "string"
+          },
+          "kind": {
+            "description": "capability_gap | policy_refusal",
+            "title": "Kind",
+            "type": "string"
+          },
+          "llm_capability_key_rejected": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Llm Capability Key Rejected"
+          },
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "source": {
+            "description": "llm | server_guard | server | validator | provider",
+            "title": "Source",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text",
+          "capability_key",
+          "kind",
+          "reason",
+          "source"
+        ],
+        "title": "DraftGap",
+        "type": "object"
+      },
+      "DraftNumber": {
+        "properties": {
+          "path": {
+            "title": "Path",
+            "type": "string"
+          },
+          "provenance": {
+            "description": "stated | converted_from_stated | not_in_text | server_default | schema_constant",
+            "title": "Provenance",
+            "type": "string"
+          },
+          "quote": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quote"
+          },
+          "value": {
+            "title": "Value"
+          }
+        },
+        "required": [
+          "path",
+          "value",
+          "provenance"
+        ],
+        "title": "DraftNumber",
+        "type": "object"
+      },
       "EntityComponent": {
         "additionalProperties": false,
         "description": "A data facet available for the entity (a concept with source records or\npinned estimates, display geometry, or relation layer).",
@@ -9739,6 +9837,197 @@
         "title": "ScenarioCreated",
         "type": "object"
       },
+      "ScenarioDraftResponse": {
+        "properties": {
+          "assumptions_added": {
+            "items": {
+              "$ref": "#/components/schemas/DraftAssumption"
+            },
+            "title": "Assumptions Added",
+            "type": "array"
+          },
+          "candidate_spec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Incomplete or invalid spec, for review only",
+            "title": "Candidate Spec"
+          },
+          "catalog_digest": {
+            "title": "Catalog Digest",
+            "type": "string"
+          },
+          "confirmation_required": {
+            "title": "Confirmation Required",
+            "type": "boolean"
+          },
+          "draft_spec": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Valid ScenarioSpec (status draft_ready only); runs only when submitted to POST /v1/scenarios",
+            "title": "Draft Spec"
+          },
+          "draft_spec_sha256": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Draft Spec Sha256"
+          },
+          "executed": {
+            "title": "Executed",
+            "type": "boolean"
+          },
+          "fallback_from": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Fallback From",
+            "type": "array"
+          },
+          "language": {
+            "title": "Language",
+            "type": "string"
+          },
+          "latency_ms": {
+            "title": "Latency Ms",
+            "type": "number"
+          },
+          "llm_restatement": {
+            "description": "The LLM's paraphrase of the request (untrusted, for comparison)",
+            "title": "Llm Restatement",
+            "type": "string"
+          },
+          "missing_fields": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Fields",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "model_requested": {
+            "title": "Model Requested",
+            "type": "string"
+          },
+          "next_step": {
+            "title": "Next Step",
+            "type": "string"
+          },
+          "numbers_to_confirm": {
+            "items": {
+              "$ref": "#/components/schemas/DraftNumber"
+            },
+            "title": "Numbers To Confirm",
+            "type": "array"
+          },
+          "prompt_sha256": {
+            "title": "Prompt Sha256",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "rejected_ids": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Rejected Ids",
+            "type": "array"
+          },
+          "restatement": {
+            "description": "Server-generated restatement of the draft (input language)",
+            "title": "Restatement",
+            "type": "string"
+          },
+          "status": {
+            "description": "draft_ready | needs_input | draft_invalid | draft_rejected | nothing_draftable",
+            "title": "Status",
+            "type": "string"
+          },
+          "unsupported": {
+            "items": {
+              "$ref": "#/components/schemas/DraftGap"
+            },
+            "title": "Unsupported",
+            "type": "array"
+          },
+          "usage": {
+            "additionalProperties": true,
+            "title": "Usage",
+            "type": "object"
+          },
+          "validation": {
+            "additionalProperties": true,
+            "title": "Validation",
+            "type": "object"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Warnings",
+            "type": "array"
+          }
+        },
+        "required": [
+          "status",
+          "confirmation_required",
+          "executed",
+          "draft_spec",
+          "draft_spec_sha256",
+          "candidate_spec",
+          "validation",
+          "restatement",
+          "language",
+          "llm_restatement",
+          "unsupported",
+          "rejected_ids",
+          "missing_fields",
+          "assumptions_added",
+          "numbers_to_confirm",
+          "provider",
+          "model",
+          "model_requested",
+          "prompt_version",
+          "prompt_sha256",
+          "catalog_digest",
+          "usage",
+          "latency_ms",
+          "fallback_from",
+          "warnings",
+          "next_step"
+        ],
+        "title": "ScenarioDraftResponse",
+        "type": "object"
+      },
       "ScenarioListResponse": {
         "additionalProperties": false,
         "properties": {
@@ -14923,6 +15212,101 @@
         "summary": "Create Replay",
         "tags": [
           "simulation"
+        ]
+      }
+    },
+    "/v1/scenario-drafts": {
+      "post": {
+        "description": "Draft a ScenarioSpec from natural language. **Nothing is executed or stored.**\n\nThe draft is re-validated by the same validator as hand-written specs; numbers proposed for the\nintervention are listed in ``numbers_to_confirm``. Run it only after review, by submitting\n``draft_spec`` to ``POST /v1/scenarios``.",
+        "operationId": "create_scenario_draft_v1_scenario_drafts_post",
+        "parameters": [
+          {
+            "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Required on POSTs that start work: 8-200 printable ASCII characters",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "baseline_release_id": {
+                    "anyOf": [
+                      {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ],
+                    "description": "Published belief release the draft is pinned to (default: the latest published one)",
+                    "title": "Baseline Release Id"
+                  },
+                  "text": {
+                    "description": "The request in plain French or English (at most 4096 UTF-8 bytes). Treated as data: it never changes the system's instructions.",
+                    "title": "Text",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "text"
+                ],
+                "title": "ScenarioDraftRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioDraftResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "409": {
+            "description": "Idempotency-Key reuse or no published release"
+          },
+          "413": {
+            "description": "Body larger than 8 KiB or text larger than 4096 bytes"
+          },
+          "422": {
+            "description": "Invalid request"
+          },
+          "429": {
+            "description": "Daily LLM budget exhausted (nothing was sent)"
+          },
+          "502": {
+            "description": "LLM provider failed; no draft"
+          },
+          "503": {
+            "description": "LLM drafting disabled or budget ledger unavailable"
+          }
+        },
+        "summary": "Create Scenario Draft",
+        "tags": [
+          "scenario-drafts"
         ]
       }
     },

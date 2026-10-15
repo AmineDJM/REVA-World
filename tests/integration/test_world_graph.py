@@ -70,6 +70,25 @@ def _concept(conn: Connection, cid: str, kind: str, act: UUID, profile: dict[str
     )
 
 
+def _publish_with_pinned_relations(db, monkeypatch, write: Any) -> UUID:
+    """Publish a *new* release whose extra release-pinned relations are written inside the publication
+    transaction, before ``ops.publication`` seals it (R5-07: a published release accepts no new rows)."""
+    from reva.belief import publication
+
+    orig = publication.pin_release_relations
+
+    def pin(conn: Connection, release_id: Any, activity_id: Any) -> int:
+        n = orig(conn, release_id, activity_id)
+        write(conn, release_id)
+        return n
+
+    monkeypatch.setattr(publication, "pin_release_relations", pin)
+    rel = publish_release(db.worker, db.store, origin=Origin.test_fixture, environment="test",
+                          concepts=["trade.hs2709.import_value.world_total"])
+    monkeypatch.setattr(publication, "pin_release_relations", orig)
+    return rel.release_id
+
+
 @pytest.fixture(scope="module")
 def world(db) -> World:
     c = builtin_connectors()["un.comtrade.public_exact"]
@@ -338,9 +357,11 @@ def test_path_search_time_limit_is_reported(db, world, monkeypatch) -> None:
 # ---------------------------------------------------------------------------
 
 
-def test_release_pinned_context(db, world) -> None:
+def test_release_pinned_context(db, world, monkeypatch) -> None:
     layer = f"test.wg.{world.tag}.release_pinned"
-    with db.worker.begin() as conn:
+    made: list[UUID] = []
+
+    def write(conn: Connection, release_id: Any) -> None:
         sup = conn.execute(
             text("SELECT support_id FROM world.relation WHERE layer = :l LIMIT 1"), {"l": LAYER}
         ).scalar_one()
@@ -354,7 +375,7 @@ def test_release_pinned_context(db, world) -> None:
                 "p": repo.concept_version_id(conn, "predicate.trade_flow"),
                 "l": layer,
                 "s": sup,
-                "r": world.release_id,
+                "r": release_id,
                 "a": world.activity_id,
             },
         ).scalar_one()
@@ -366,14 +387,18 @@ def test_release_pinned_context(db, world) -> None:
                           direction) VALUES (:r, :o, :role, :e, :d)"""),
                 {"r": rid, "o": i, "role": repo.concept_version_id(conn, role), "e": ent, "d": d},
             )
+        made.append(rid)
+
+    release_id = _publish_with_pinned_relations(db, monkeypatch, write)
+    (rid,) = made
     with db.api.connect() as conn:
-        pinned = queries.neighbourhood(conn, FRA, context=GraphContext.release(world.release_id), layers=[layer])
+        pinned = queries.neighbourhood(conn, FRA, context=GraphContext.release(release_id), layers=[layer])
         as_evidence = queries.neighbourhood(conn, FRA, context=_ev(), layers=[layer])
         missing = queries.neighbourhood(conn, FRA, context=GraphContext.release(uuid4()), layers=[layer])
         ctx = queries.release_context_as_of(conn, None, "test_fixture")
     assert [e.id for e in pinned.edges] == [rid]
     e = pinned.edges[0]
-    assert e.provenance.kind == "release" and e.provenance.release_id == world.release_id
+    assert e.provenance.kind == "release" and e.provenance.release_id == release_id
     assert e.flow_magnitude["status"] == "selected" and e.tie_strength["status"] == "not_assessed"
     assert as_evidence.edges == ()
     assert missing.edges == () and "does not exist" in missing.notes[0]
@@ -527,7 +552,7 @@ def test_occurrences_with_uncertain_time(db, world) -> None:
     assert early.items == ()
 
 
-def test_history_separates_sequence_from_causal_hypotheses(db, world) -> None:
+def test_history_separates_sequence_from_causal_hypotheses(db, world, monkeypatch) -> None:
     occ = world.occ
     ids = list(occ.values())
     with db.api.connect() as conn:
@@ -542,7 +567,9 @@ def test_history_separates_sequence_from_causal_hypotheses(db, world) -> None:
     assert view.causal_hypotheses == ()  # A preceded C, but nothing asserts that A caused C
     assert any("no causal hypothesis" in n for n in view.notes)
 
-    with db.worker.begin() as conn:  # a separate, explicit causal assertion
+    made: list[UUID] = []
+
+    def write(conn: Connection, release_id: Any) -> None:  # a separate, explicit causal assertion
         sup = conn.execute(
             text("SELECT support_id FROM world.occurrence WHERE entity_id = :e"), {"e": occ["C"]}
         ).scalar_one()
@@ -555,7 +582,7 @@ def test_history_separates_sequence_from_causal_hypotheses(db, world) -> None:
                 "p": repo.concept_version_id(conn, world.causal_predicate),
                 "l": f"test.wg.{world.tag}.causal",
                 "s": sup,
-                "r": world.release_id,
+                "r": release_id,
                 "a": world.activity_id,
             },
         ).scalar_one()
@@ -571,6 +598,10 @@ def test_history_separates_sequence_from_causal_hypotheses(db, world) -> None:
                     "d": "out" if i == 0 else "in",
                 },
             )
+        made.append(rid)
+
+    _publish_with_pinned_relations(db, monkeypatch, write)
+    (rid,) = made
     with db.api.connect() as conn:
         after = events.history_view(conn, occurrence_ids=ids)
         parts, truncated = events.occurrence_participants(conn, occ["A"])

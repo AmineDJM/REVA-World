@@ -40,7 +40,8 @@ DEMO = ROOT / "var/acceptance/demo_live.json"
 
 
 def _value(v: str) -> dict[str, Any]:
-    return {"kind": "decimal", "value": v, "unit_ref": "unit.usd", "basis": {"currency": "USD", "price_basis": "nominal"}}
+    return {"kind": "decimal", "value": v, "unit_ref": "unit.usd",
+            "basis": {"currency": "USD", "price_basis": "nominal"}}
 
 
 def resolved(spec: dict[str, Any], inputs: dict[str, dict[str, str]]) -> ResolvedInputs:
@@ -190,7 +191,8 @@ def test_resolved_inputs_are_typed_read_only_and_never_zero_fill() -> None:
             InputRequirement("pop", "d.pop", "FRA", (2023,), "dataset")]
     table = pa.table({"row": ["A", "B"], "value": [1.5, 2.5]})
     ri = ResolvedInputs.from_values(
-        reqs, scalars={("M", "FRA", 2023): _value("10"), ("M", "FRA", 2022): {"kind": "missing", "reason": "suppressed"}},
+        reqs, scalars={("M", "FRA", 2023): _value("10"),
+                       ("M", "FRA", 2022): {"kind": "missing", "reason": "suppressed"}},
         datasets={("io", "EU27"): (table, {"dataset_id": "d1", "artifact_sha256": "ab" * 32, "row_count": 2})})
     assert isinstance(ri.scalars, MappingProxyType) and isinstance(ri.datasets, MappingProxyType)
     with pytest.raises(TypeError):

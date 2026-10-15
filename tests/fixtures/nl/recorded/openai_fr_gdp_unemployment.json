@@ -1,27 +1,27 @@
 {
  "fixture_kind": "recorded_live_response",
  "label": "openai_fr_gdp_unemployment",
- "recorded_at": "2026-10-15T01:07:54+00:00",
+ "recorded_at": "2026-10-15T01:13:11+00:00",
  "provider": "openai",
  "model_requested": "gpt-4.1",
  "http_status": 200,
- "latency_ms": 2181.3,
+ "latency_ms": 2092.4,
  "prompt_version": "nl-draft-1.0.0",
- "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
- "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "prompt_sha256": "f9662e32a386927e0b1c4a155157e5ed2f48fc6265132ae895475a56e4cda44a",
+ "catalog_digest": "fb2b0a6be4af83cb8c1af58236da6b9e07ac1bb8d6295e00c5eddae061e75744",
  "text": "Quelle serait la perte de PIB et la hausse du chômage en France en 2023 si le prix du pétrole importé doublait ?",
  "text_sha256": "f6b1464f16cd4f82ef7f6fc6d4fee30d721ad9ea7cd9698797846144ad571840",
  "response_body": {
   "id": "redacted",
   "object": "chat.completion",
-  "created": 1792026473,
+  "created": 1792026790,
   "model": "gpt-4.1-2025-04-14",
   "choices": [
    {
     "index": 0,
     "message": {
      "role": "assistant",
-     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Vous demandez la perte de PIB et la hausse du chômage en France en 2023 si le prix du pétrole importé doublait. Le modèle disponible ne calcule pas la perte de PIB ni la hausse du chômage, mais peut estimer l'exposition de la France à un doublement du prix du pétrole importé.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Exposition de la France à un doublement du prix du pétrole importé en 2023\",\"countries\":[\"FRA\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":2.0,\"text\":null,\"quote\":\"doublait\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.0,\"text\":null,\"quote\":\"neutral value (unchanged)\"}],\"unsupported\":[{\"text\":\"perte de PIB\",\"capability_key\":\"outputs.macroeconomic\",\"reason\":\"Le modèle ne calcule pas la perte de PIB.\"},{\"text\":\"hausse du chômage\",\"capability_key\":\"outputs.macroeconomic\",\"reason\":\"Le modèle ne calcule pas la hausse du chômage.\"}],\"assumptions_added\":[\"Le multiplicateur d'exportation est laissé à 1.0 (valeur neutre) car aucune modification n'a été mentionnée.\"]}",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"L'utilisateur demande la perte de PIB et la hausse du chômage en France en 2023 si le prix du pétrole importé doublait. Le modèle disponible ne calcule pas la perte de PIB ni la hausse du chômage, mais peut estimer l'exposition de la France à un doublement du prix du pétrole importé en 2023.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Exposition de la France à un doublement du prix du pétrole importé en 2023\",\"countries\":[\"FRA\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":2.0,\"text\":null,\"quote\":\"doublait\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.0,\"text\":null,\"quote\":\"neutral value (unchanged, not stated)\"}],\"unsupported\":[{\"text\":\"perte de PIB\",\"capability_key\":\"outputs.macroeconomic\",\"reason\":\"Le modèle ne calcule pas la perte de PIB.\"},{\"text\":\"hausse du chômage\",\"capability_key\":\"outputs.macroeconomic\",\"reason\":\"Le modèle ne calcule pas la hausse du chômage.\"}],\"assumptions_added\":[\"Le multiplicateur d'exportation de pétrole est laissé à 1.0 (valeur neutre) car l'utilisateur ne l'a pas précisé.\",\"Les autres paramètres sont laissés à leur valeur neutre par défaut.\"]}",
      "refusal": null,
      "annotations": []
     },
@@ -30,11 +30,11 @@
    }
   ],
   "usage": {
-   "prompt_tokens": 3365,
-   "completion_tokens": 280,
-   "total_tokens": 3645,
+   "prompt_tokens": 4827,
+   "completion_tokens": 304,
+   "total_tokens": 5131,
    "prompt_tokens_details": {
-    "cached_tokens": 3200,
+    "cached_tokens": 3968,
     "audio_tokens": 0
    },
    "completion_tokens_details": {

@@ -34,6 +34,7 @@ from reva.evidence.locks import take_evidence_write_lock
 from reva.evidence.revisions import LineageHead, decide_revision, semantic_hash
 from reva.kernel.errors import ValidationProblem
 from reva.kernel.ids import canonical_bytes
+from reva.kernel.values import parse_value
 from reva.ports.connectors import (
     ConnectorSpec,
     Finding,
@@ -149,6 +150,32 @@ def selector_report(raw: RawAcquisition, batches: Sequence[ObservationBatch]) ->
         code="selector_unresolved", severity="blocker",
         message=f"{len(bad)} observation selectors do not resolve to exactly one payload element "
                 f"(e.g. {', '.join(bad[:5])})"),))
+
+
+def value_report(batches: Sequence[ObservationBatch]) -> QualityReport | None:
+    """Every stored value must be a kernel value (``reva.kernel.values.parse_value``): a parser that
+    emits anything else (a decimal without its basis, an unknown kind, a non-finite number) quarantines
+    the item instead of storing a value no reader can interpret. Returns a blocking report or None.
+
+    The finding names logical keys and error locations only, never the offending values."""
+    bad: list[str] = []
+    first: str | None = None
+    for b in batches:
+        for o in b.observations:
+            try:
+                parse_value(dict(o.value))
+            except (ValueError, TypeError) as e:  # pydantic ValidationError is a ValueError
+                bad.append(o.logical_key)
+                if first is None:
+                    errs = e.errors(include_input=False) if hasattr(e, "errors") else []
+                    first = (f"{'.'.join(map(str, errs[0].get('loc', ())))}: {errs[0].get('type', '')}"
+                             if errs else type(e).__name__)
+    if not bad:
+        return None
+    return QualityReport(outcome="quarantine", findings=(Finding(
+        code="invalid_kernel_value", severity="blocker",
+        message=f"{len(bad)} observation values are not valid kernel values (first: {first}; "
+                f"e.g. {', '.join(bad[:5])})"),))
 
 
 def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: bool) -> StoredObject:
@@ -317,6 +344,9 @@ def publish_acquisition(
     sel = selector_report(raw, batches)
     if sel is not None:
         reports = [*reports, sel]
+    vals = value_report(batches)
+    if vals is not None:
+        reports = [*reports, vals]
     quarantined = any(r.blocking for r in reports)
     obj = write_raw_object(store, raw, quarantined)  # 1-2: bytes first, verified
     if fault_after_object_write:  # used by fault-injection tests

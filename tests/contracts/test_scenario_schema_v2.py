@@ -33,33 +33,34 @@ def test_exported_schema_is_generated_from_the_registered_plugins() -> None:
     assert "economic.crude_exposure" in V2["$defs"]
 
 
-def test_crude_branch_is_the_v1_appendix_plus_schema_version_2() -> None:
-    branch = copy.deepcopy(V2["$defs"]["economic.crude_exposure"])
-    assert branch["properties"]["schema_version"] == {"enum": ["1.0.0", "2.0.0"]}
-    branch["properties"]["schema_version"] = {"const": "1.0.0"}
-    assert branch == {k: v for k, v in V1.items() if k not in ("$schema", "title")}
+def test_crude_branch_accepts_every_v1_spec() -> None:
+    """The crude branch may only widen V1 (e.g. V2 step 1: more countries, an explicit skip policy);
+    it never narrows it: every V1-valid spec stays valid. Keywords V1 constrains and the branch
+    does not widen keep V1's exact value."""
+    branch = V2["$defs"]["economic.crude_exposure"]
+    assert "1.0.0" in branch["properties"]["schema_version"]["enum"]
+    assert set(branch["properties"]) == set(V1["properties"]) and branch["required"] == V1["required"]
+    widened = {"schema_version", "countries", "missing_input_policy"}
+    for k in set(V1["properties"]) - widened:
+        assert branch["properties"][k] == V1["properties"][k], k
 
 
-V1_MUTATIONS = [
-    lambda d: d.update(unexpected="x"),
-    lambda d: d.pop("baseline_release_id"),
-    lambda d: d.update(countries=["FRA", "GBR"]),
-    lambda d: d["intervention"].update(import_multiplier=-1),
-    lambda d: d.update(missing_input_policy="zero_fill"),
-    lambda d: d.update(fidelity="L2"),  # L2 needs an elasticity grid
-    lambda d: d["horizon"].update(periods=5),
-    lambda d: d.update(model_version="2.0.0"),
-    lambda d: d.update(outputs=["gdp_loss"]),
-    lambda d: d.update(schema_version="3.0.0"),
+V1_VALID_VARIANTS = [
+    lambda d: None,
+    lambda d: d.update(countries=["FRA", "DZA", "CHN", "USA"]),
+    lambda d: d.update(fidelity="L2", assumptions={"quantity_response": "elasticity_sensitivity",
+                                                   "no_general_equilibrium": True, "elasticity_grid": [
+                                                       {"import_elasticity": -0.5, "export_elasticity": 0.25,
+                                                        "basis": "scenario_assumption"}]}),
+    lambda d: d.update(fidelity="L0", outputs=["exposure_percent_baseline_gdp"], reference_year=2020),
 ]
 
 
-@pytest.mark.parametrize("mutate", V1_MUTATIONS)
-def test_v1_and_v2_agree_on_crude_specs(mutate: Any) -> None:
+@pytest.mark.parametrize("variant", V1_VALID_VARIANTS)
+def test_v1_valid_specs_validate_under_v2(variant: Any) -> None:
     doc = copy.deepcopy(EXAMPLE)
+    variant(doc)
     assert errs(V1, doc) == [] and errs(V2, doc) == []
-    mutate(doc)
-    assert errs(V1, doc) != [] and errs(V2, doc) != []
 
 
 def test_v1_spec_identity_is_unchanged_and_2_0_0_is_accepted() -> None:

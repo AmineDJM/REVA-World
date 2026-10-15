@@ -1,0 +1,434 @@
+schema: reva-retirement-age-rules/1
+country: FRA
+version: "1.0.0"
+review_status: maintainer_review_pending
+transcription: "transcribed from law text by an agent; maintainer review pending"
+notes: >-
+  Légifrance refused automated retrieval (HTTP 403 bot challenge, 2026-10-15), so the official
+  text was read from the codes.droit.org consolidated edition of the Code de la sécurité sociale
+  (generated from the Légifrance LEGI open data; edition 2026-10-14) and cross-checked against the
+  official information page service-public.fr F14043 (DILA, "Vérifié le 14 août 2026"). Full-rate
+  ages for the 1951-1955 transition cohorts are not in the consolidated code any more (abrogated
+  wording is excluded from positive law); they are taken from a statutory pension fund's table
+  (IRCEC, 2022), a secondary source, and marked secondary_table. Exceptions (carrières longues,
+  disability, hardship) are NOT represented: the rows are the general statutory ages.
+model_lever:
+  age_kind: minimum_pension_age
+  rationale: >-
+    The general minimum age at which an old-age pension can be claimed (âge d'ouverture du droit,
+    CSS art. L161-17-2). This is the age whose increase Rabaté & Rochut evaluate for the 2010 reform.
+sources:
+  - source_id: fr_css_codes_droit_2026_10_14
+    title: Code de la sécurité sociale, consolidated edition 2026-10-14 (codes.droit.org, from Légifrance LEGI open data)
+    url: https://codes.droit.org/PDF/Code%20de%20la%20s%C3%A9curit%C3%A9%20sociale.pdf
+    kind: secondary_consolidated_mirror
+    retrieved_at: "2026-10-15T00:56:46Z"
+    response_sha256: b02b15a9c3de630bd58bf9c29f7539036663691c88a8057c3d16aa06b40fba5e
+    archived_file: FRA_code_securite_sociale_2026-10-14_excerpt.txt
+    note: 37 MB PDF not committed; verbatim pdftotext excerpt of L161-17-2, L351-8 and D161-2-1-9 committed.
+  - source_id: fr_service_public_f14043
+    title: "service-public.fr F14043: À partir de quel âge un salarié peut-il partir en retraite ? (DILA)"
+    url: https://www.service-public.fr/particuliers/vosdroits/F14043
+    kind: official_information_page
+    retrieved_at: "2026-10-15T01:05:40Z"
+    response_sha256: 3d67874dc39c3bfc5e470e2848d6c85c474267e1231189e59d3dc8eb97b2b3e2
+    archived_file: FRA_service_public_F14043.html
+  - source_id: fr_ircec_2022
+    title: "IRCEC: Age du taux plein et âge d'ouverture du droit à la retraite (table, August 2022)"
+    url: https://www.ircec.fr/wp-content/uploads/2022/08/tableauagetauxpleinouverturedroits.pdf
+    kind: secondary_statutory_fund_table
+    retrieved_at: "2026-10-15T01:05:42Z"
+    response_sha256: 9362bd28c76f45746590799e439b065134727183076d31093613cf0fe75671c4
+    archived_file: FRA_ircec_tableau_age_taux_plein_2022.pdf
+    note: Text extraction committed as FRA_ircec_tableau_age_taux_plein_2022.pdftotext.txt (pdftotext 24.02.0 -layout).
+paths:
+  - path_id: pre_2010_counterfactual
+    label: "Counterfactual: minimum age 60 and full-rate age 65 kept for all cohorts (no Loi n° 2010-1330)"
+    status: counterfactual
+    description: >-
+      The rule applicable to cohorts born before 1 July 1951 extended to every later cohort. Used as
+      the no-reform reference of the 2010 back-test.
+  - path_id: law_2010_as_amended_2011
+    label: "Loi n° 2010-1330 (9 Nov 2010), accelerated by Loi n° 2011-1906 (LFSS 2012), without the 2023 reform"
+    status: enacted_superseded
+    description: >-
+      Minimum age 60 -> 62 by cohort 1951 (2nd half) - 1955 in steps of 4-5 months as applied after the
+      LFSS 2012 acceleration (décret n° 2011-2034); 62 for every later cohort; full-rate age 65 -> 67.
+      Counterfactual for cohorts born from 1 September 1961 (the 2023 reform applies to them).
+  - path_id: law_2023_as_enacted
+    label: "Loi n° 2023-270 (14 Apr 2023) art. 10 and décret n° 2023-436 (3 Jun 2023), as enacted"
+    status: enacted_superseded
+    description: Minimum age 62 -> 64 by 3 months per cohort, cohorts born from 1 September 1961 to 1968.
+  - path_id: law_in_force_2026
+    label: "Law in force: L161-17-2 as amended by Loi n° 2025-1403 (LFSS 2026), suspension of the 2023 increase"
+    status: in_force
+    description: >-
+      Cohorts born 1 January 1963 - 31 March 1965 keep 62 years 9 months; the 3-month steps resume for
+      later cohorts, reaching 64 for cohorts born from 1 January 1969. Cross-checked with service-public.fr
+      F14043 (verified 14 August 2026).
+rows:
+  # ------------------------------------------------------------- minimum pension age
+  - row_id: FRA.mpa.d161-2-1-9.1
+    paths: [pre_2010_counterfactual, law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: null
+    born_to: "1951-06-30"
+    age: {years: 60, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 1° (version décret n° 2023-436 du 3 juin 2023)"
+      locator: "1° Soixante ans pour les assurés nés avant le 1er juillet 1951 ;"
+  - row_id: FRA.mpa.pre2010.cf
+    paths: [pre_2010_counterfactual]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1951-07-01"
+    born_to: null
+    age: {years: 60, months: 0}
+    derivation: counterfactual_extension
+    note: Counterfactual - the 60-year rule of art. D161-2-1-9 1° extended to all later cohorts (no 2010 reform).
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 1° (extended as counterfactual)"
+      locator: "1° Soixante ans pour les assurés nés avant le 1er juillet 1951 ;"
+  - row_id: FRA.mpa.d161-2-1-9.2
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1951-07-01"
+    born_to: "1951-12-31"
+    age: {years: 60, months: 4}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 2° (Loi n° 2010-1330 art. 18; décret n° 2011-2034)"
+      locator: "2° Soixante ans et quatre mois pour les assurés nés entre le 1er juillet 1951 et le 31 décembre 1951 inclus ;"
+  - row_id: FRA.mpa.d161-2-1-9.3
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1952-01-01"
+    born_to: "1952-12-31"
+    age: {years: 60, months: 9}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 3°"
+      locator: "3° Soixante ans et neuf mois pour les assurés nés en 1952 ;"
+  - row_id: FRA.mpa.d161-2-1-9.4
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1953-01-01"
+    born_to: "1953-12-31"
+    age: {years: 61, months: 2}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 4°"
+      locator: "4° Soixante et un ans et deux mois pour les assurés nés en 1953 ;"
+  - row_id: FRA.mpa.d161-2-1-9.5
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1954-01-01"
+    born_to: "1954-12-31"
+    age: {years: 61, months: 7}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 5°"
+      locator: "5° Soixante et un ans et sept mois pour les assurés nés en 1954 ;"
+  - row_id: FRA.mpa.d161-2-1-9.6
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1955-01-01"
+    born_to: "1961-08-31"
+    age: {years: 62, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 6°"
+      locator: "6° Soixante-deux ans pour les assurés nés entre le 1er janvier 1955 et le 31 août 1961 inclus ;"
+  - row_id: FRA.mpa.law2010.after_1961_08
+    paths: [law_2010_as_amended_2011]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1961-09-01"
+    born_to: null
+    age: {years: 62, months: 0}
+    derivation: secondary_table
+    note: >-
+      Pre-2023 law (62 for every cohort from 1955) as tabulated in 2022 by IRCEC; counterfactual for
+      cohorts born from 1 September 1961, to whom the 2023 reform applies.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2 in its version before Loi n° 2023-270 (as tabulated by IRCEC, 2022)"
+      locator: "1973 et après 67 ans 172 trimestres 62 ans"
+  # law 2023 as enacted (décret n° 2023-436)
+  - row_id: FRA.mpa.d161-2-1-9.7
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1961-09-01"
+    born_to: "1961-12-31"
+    age: {years: 62, months: 3}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 7° (décret n° 2023-436; Loi n° 2023-270 art. 10)"
+      locator: "7° Soixante-deux ans et trois mois pour les assurés nés entre le 1er septembre 1961 et le 31 décembre 1961 inclus ;"
+  - row_id: FRA.mpa.d161-2-1-9.8
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1962-01-01"
+    born_to: "1962-12-31"
+    age: {years: 62, months: 6}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 8°"
+      locator: "8° Soixante-deux ans et six mois pour les assurés nés en 1962 ;"
+  - row_id: FRA.mpa.d161-2-1-9.9
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1963-01-01"
+    born_to: "1963-12-31"
+    age: {years: 62, months: 9}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 9°"
+      locator: "9° Soixante-deux ans et neuf mois pour les assurés nés en 1963 ;"
+  - row_id: FRA.mpa.d161-2-1-9.10
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1964-01-01"
+    born_to: "1964-12-31"
+    age: {years: 63, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 10°"
+      locator: "10° Soixante-trois ans pour les assurés nés en 1964 ;"
+  - row_id: FRA.mpa.d161-2-1-9.11
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1965-01-01"
+    born_to: "1965-12-31"
+    age: {years: 63, months: 3}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 11°"
+      locator: "11° Soixante-trois ans et trois mois pour les assurés nés en 1965 ;"
+  - row_id: FRA.mpa.d161-2-1-9.12
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1966-01-01"
+    born_to: "1966-12-31"
+    age: {years: 63, months: 6}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 12°"
+      locator: "12° Soixante-trois ans et six mois pour les assurés nés en 1966 ;"
+  - row_id: FRA.mpa.d161-2-1-9.13
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1967-01-01"
+    born_to: "1967-12-31"
+    age: {years: 63, months: 9}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 13°"
+      locator: "13° Soixante-trois ans et neuf mois pour les assurés nés en 1967 ;"
+  - row_id: FRA.mpa.d161-2-1-9.14
+    paths: [law_2023_as_enacted]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1968-01-01"
+    born_to: null
+    age: {years: 64, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. D161-2-1-9, 14°"
+      locator: "14° Soixante-quatre ans pour les assurés nés à compter du 1er janvier 1968."
+  # law in force (L161-17-2 as amended by Loi n° 2025-1403, LFSS 2026)
+  - row_id: FRA.mpa.l161-17-2.1
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1961-09-01"
+    born_to: "1961-12-31"
+    age: {years: 62, months: 3}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 2nd paragraph, 1° (as amended by Loi n° 2025-1403)"
+      locator: "1° Soixante-deux ans et trois mois, pour les assurés nés entre le 1er septembre 1961 et le 31 décembre 1961 ;"
+  - row_id: FRA.mpa.l161-17-2.2
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1962-01-01"
+    born_to: "1962-12-31"
+    age: {years: 62, months: 6}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 2°"
+      locator: "2° Soixante-deux ans et six mois, pour les assurés nés en 1962 ;"
+  - row_id: FRA.mpa.l161-17-2.3
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1963-01-01"
+    born_to: "1965-03-31"
+    age: {years: 62, months: 9}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 3° (cross-checked: service-public.fr F14043)"
+      locator: "3° Soixante-deux ans et neuf mois, pour les assurés nés entre le 1er janvier 1963 et le 31 mars 1965 ;"
+  - row_id: FRA.mpa.l161-17-2.4
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1965-04-01"
+    born_to: "1965-12-31"
+    age: {years: 63, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 4°"
+      locator: "4° Soixante-trois ans, pour les assurés nés entre le 1er avril et le 31 décembre 1965 ;"
+  - row_id: FRA.mpa.l161-17-2.5
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1966-01-01"
+    born_to: "1966-12-31"
+    age: {years: 63, months: 3}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 5°"
+      locator: "5° Soixante-trois ans et trois mois, pour les assurés nés en 1966 ;"
+  - row_id: FRA.mpa.l161-17-2.6
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1967-01-01"
+    born_to: "1967-12-31"
+    age: {years: 63, months: 6}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 6°"
+      locator: "6° Soixante-trois ans et six mois, pour les assurés nés en 1967 ;"
+  - row_id: FRA.mpa.l161-17-2.7
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1968-01-01"
+    born_to: "1968-12-31"
+    age: {years: 63, months: 9}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 7°"
+      locator: "7° Soixante-trois ans et neuf mois, pour les assurés nés en 1968."
+  - row_id: FRA.mpa.l161-17-2.first
+    paths: [law_in_force_2026]
+    age_kind: minimum_pension_age
+    basis: birth_cohort
+    born_from: "1969-01-01"
+    born_to: null
+    age: {years: 64, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: "Code de la sécurité sociale, art. L161-17-2, 1st paragraph (Loi n° 2023-270 art. 10, as amended by Loi n° 2025-1403)"
+      locator: "est fixé à soixante-quatre ans pour les assurés nés à compter du 1 er janvier 1969."
+  # ------------------------------------------------------------- full-rate age (recorded, not used by the model)
+  - row_id: FRA.frage.pre2010
+    paths: [pre_2010_counterfactual]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: null
+    born_to: null
+    age: {years: 65, months: 0}
+    derivation: counterfactual_extension
+    note: Counterfactual - the 65-year full-rate age of cohorts up to 1950 extended to every cohort.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age before Loi n° 2010-1330 (CSS art. L351-8 1°, former version), as tabulated by IRCEC"
+      locator: "1950 65 ans 162 trimestres 60 ans"
+  - row_id: FRA.frage.le_1951_06
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: null
+    born_to: "1951-06-30"
+    age: {years: 65, months: 0}
+    derivation: secondary_table
+    note: IRCEC lists 65 for cohorts up to 1950 and 65 + 4 months from 1 July 1951; cohorts born January-June 1951 are assigned 65 consistently with D161-2-1-9 1°.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age (CSS art. L351-8 1°), as tabulated by IRCEC"
+      locator: "1950 65 ans 162 trimestres 60 ans"
+  - row_id: FRA.frage.1951_h2
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: "1951-07-01"
+    born_to: "1951-12-31"
+    age: {years: 65, months: 4}
+    derivation: secondary_table
+    note: Transition row of Loi n° 2010-1330 (accelerated by LFSS 2012) taken from the IRCEC table.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age (CSS art. L351-8 1°), as tabulated by IRCEC"
+      locator: "1951 (01/07) 65 ans + 4 mois 163 trimestres 60 ans + 4 mois"
+  - row_id: FRA.frage.1952
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: "1952-01-01"
+    born_to: "1952-12-31"
+    age: {years: 65, months: 9}
+    derivation: secondary_table
+    note: Transition row taken from the IRCEC table.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age (CSS art. L351-8 1°), as tabulated by IRCEC"
+      locator: "1952 65 ans + 9 mois 164 trimestres 60 ans + 9 mois"
+  - row_id: FRA.frage.1953
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: "1953-01-01"
+    born_to: "1953-12-31"
+    age: {years: 66, months: 2}
+    derivation: secondary_table
+    note: Transition row taken from the IRCEC table.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age (CSS art. L351-8 1°), as tabulated by IRCEC"
+      locator: "1953 66 ans + 2 mois 165 trimestres 61 ans + 2 mois"
+  - row_id: FRA.frage.1954
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: "1954-01-01"
+    born_to: "1954-12-31"
+    age: {years: 66, months: 7}
+    derivation: secondary_table
+    note: Transition row taken from the IRCEC table.
+    citation:
+      source_id: fr_ircec_2022
+      legal_reference: "Full-rate age (CSS art. L351-8 1°), as tabulated by IRCEC"
+      locator: "1954 66 ans +7 mois 165 trimestres 61 ans + 7 mois"
+  - row_id: FRA.frage.ge_1955
+    paths: [law_2010_as_amended_2011, law_2023_as_enacted, law_in_force_2026]
+    age_kind: full_rate_age
+    basis: birth_cohort
+    born_from: "1955-01-01"
+    born_to: null
+    age: {years: 67, months: 0}
+    citation:
+      source_id: fr_css_codes_droit_2026_10_14
+      legal_reference: >-
+        CSS art. L351-8 1° (Loi n° 2023-270 art. 10): the age of L161-17-2 first paragraph (64) plus three
+        years = 67; IRCEC (2022) shows 67 for cohorts 1955 onwards under the pre-2023 law as well
+      locator: "1° Les assurés qui atteignent l'âge prévu au premier alinéa de l'article L. 161-17-2 augmenté de trois années ;"

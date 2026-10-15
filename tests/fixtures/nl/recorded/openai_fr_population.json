@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_fr_population",
+ "recorded_at": "2026-10-15T01:17:21+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 1993.5,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "40171f22d659782c41e9ff1da9477f824c97daabf66b98fa02ef6e7fc5081ee5",
+ "catalog_digest": "b9ff54f4cc51cfcfe157fa0f9effcf5eaa0456a5edeb888cd33c783433e1ff2a",
+ "text": "Projette la population de la France sur 15 ans avec une fécondité constante.",
+ "text_sha256": "12b8fcddee9ffbc452af64df25e972b5ea93ad46f3d3d6b7ddaadf625cda7f1b",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792027039,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Projeter la population de la France sur 15 ans en supposant une fécondité constante. Aucun autre paramètre n'a été précisé.\",\"model_key\":\"demography.cohort_component\",\"title\":\"Projection de la population française sur 15 ans avec fécondité constante\",\"countries\":[\"FRA\"],\"reference_year\":null,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"assumptions.fertility\",\"number\":null,\"text\":\"constant_base_period_rates\",\"quote\":\"fécondité constante\"},{\"path\":\"horizon.periods\",\"number\":15,\"text\":null,\"quote\":\"15 ans\"}],\"unsupported\":[],\"assumptions_added\":[\"Aucune année de référence n'a été précisée, la valeur par défaut sera utilisée.\",\"Les autres paramètres (migration, mortalité, etc.) sont laissés à leur valeur neutre par défaut.\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 7593,
+   "completion_tokens": 187,
+   "total_tokens": 7780,
+   "prompt_tokens_details": {
+    "cached_tokens": 0,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

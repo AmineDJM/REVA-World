@@ -62,8 +62,24 @@ reality. Source-family dependence is recorded but not modelled in V1.
 ## 2. Crude-oil border-value exposure: `economic.crude_exposure` 1.0.0
 
 Implementation: `src/reva/models/economic/crude_exposure.py` (pure; `decimal`,
-50-digit context), engine `src/reva/simulation/engine.py`. Scenario contract:
-`contracts/scenario.schema.json`.
+50-digit context), run as simulation plugin #1 (`src/reva/simulation/crude_plugin.py`)
+by the model-agnostic engine `src/reva/simulation/engine.py`. Scenario contract:
+`contracts/scenario.schema.json` (ScenarioSpec 2.0.0, a union on `model_key`; the
+V1 appendix `contracts/scenario.v1.schema.json` specs keep validating). Moving the
+model behind the plugin interface changed no output: result rows, output digests
+and L0 cache keys are bit-identical to the V1 engine (golden tests, including the
+recorded live demo).
+
+**Simulation platform (V2).** Every model is a plugin (`reva.simulation.plugins`)
+that declares its inputs; the platform resolves them only from the scenario's
+pinned baseline release — scalars as selected estimates of exactly the requested
+calendar year (a typed `Missing` stays missing), large tables as *dataset inputs*
+the release pinned by sha256 at publication (re-hashed on read; unpinned is a
+`missing_input`, never zero). Unless a model reports missing inputs itself, the
+platform refuses the run before computing. Multi-period models publish one row per
+half-open period `[start, end)`. Models seeded as `candidate` with review status
+`maintainer_review_pending` run only labelled "experimental model, not yet
+reviewed". Details: `docs/dev/v2_eng.md`.
 
 This is an **assumption-conditioned border-value accounting stress test for one
 annual accounting period**. It is not a forecast and not a GDP loss.

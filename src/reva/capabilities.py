@@ -37,7 +37,7 @@ CATALOGUE_VERSION = "1.0.0"
 CATALOGUE_SCHEMA = "reva.capability_catalogue/1"
 
 Status = Literal["implemented", "reserved", "blocked"]
-PHASES: tuple[str, ...] = (*(f"P{i}" for i in range(13)), "unscheduled")
+PHASES: tuple[str, ...] = (*(f"P{i}" for i in range(13)), "V2", "unscheduled")
 
 SANDBOX_ENDPOINT_ENV = "REVA_SANDBOX_ENDPOINT"
 
@@ -61,6 +61,12 @@ class Capability:
     verification_only: bool = False
     notes: str | None = None
     available_instead: tuple[str, ...] = field(default=())
+    tests: tuple[str, ...] = field(default=())
+    """Acceptance tests that hold an implemented capability there, as ``path::test_name``
+    (repository-relative). ``implemented`` without a cited, existing test is refused by
+    tests/unit/test_capabilities_v2.py (V2 honesty rule 5)."""
+    docs: tuple[str, ...] = field(default=())
+    """Repository-relative documentation entries (required for implemented V2 entries)."""
 
     def __post_init__(self) -> None:
         if self.status not in ("implemented", "reserved", "blocked"):
@@ -91,6 +97,8 @@ class Capability:
             "verification_only": self.verification_only,
             "notes": self.notes,
             "available_instead": list(self.available_instead),
+            "tests": list(self.tests),
+            "docs": list(self.docs),
         }
 
 
@@ -126,6 +134,24 @@ class CapabilityNotAvailable:
 
 
 _ROADMAP = "architecture §25 phase table"
+
+#: Tests holding the V1 implemented entries (path::test_name); V2 entries cite theirs inline.
+_V1_TESTS: dict[str, tuple[str, ...]] = {
+    "fidelity.L0": ("tests/integration/test_simulation_engine.py::test_l0_cache_miss_then_hit_after_l1",),
+    "fidelity.L1": ("tests/integration/test_simulation_engine.py::test_l1_exposure_matches_hand_computation",
+                    "tests/unit/test_simulation_v2_plugins.py::test_crude_plugin_is_bit_identical_to_v1_engine"),
+    "fidelity.L2": ("tests/integration/test_simulation_engine.py::test_l2_sensitivity_range",),
+    "coupling.acyclic": ("tests/scientific/test_crude_exposure_coupling_rng.py::"
+                         "test_acyclic_graph_schedules_and_cycle_rejected",),
+    "forecasting.baselines": ("tests/unit/forecasting/test_forecast_models.py::test_models_satisfy_protocol",),
+    "verification.analytic_field_aggregation": (
+        "tests/unit/test_extensions_physical.py::test_linear_in_latitude_matches_closed_form_spherical_integral",),
+    "verification.double_entry_balance": ("tests/unit/test_extensions_interfaces.py::test_balanced_ledger_passes",
+                                          "tests/unit/test_extensions_interfaces.py::"
+                                          "test_imbalance_detected_with_residual"),
+    "verification.external_model_lifecycle": (
+        "tests/unit/test_extensions_physical.py::test_lifecycle_conformance_passes_for_conforming_model",),
+}
 
 _BASE: tuple[Capability, ...] = (
     # ------------------------------------------------------------------ P4/P5: V1 executable envelope
@@ -469,6 +495,104 @@ _BASE: tuple[Capability, ...] = (
         ("concepts, sources, model/measurement contract, tests and a benefiting task per domain",),
         reason="no planetary domain beyond the crude-exposure vertical slice has entered production",
     ),
+    # ------------------------------------------------------------------ V2 roadmap (docs/roadmap/v2_design.md)
+    # Model agents flip an entry to implemented only together with ``tests=`` (passing,
+    # cited as path::test_name) and ``docs=`` entries; tests/unit/test_capabilities_v2.py
+    # enforces both.
+    Capability(
+        "simulation.platform.dataset_inputs",
+        "Release-pinned dataset inputs for simulation models",
+        "implemented",
+        "V2",
+        "reva.simulation.datasets",
+        ("datasets derive from archived acquisitions with the release origin", "a release pins datasets "
+         "eligible at its cutoff, sealed with the release", "simulations read only pinned, re-hashed tables; "
+         "unpinned is a typed missing input"),
+        tests=("tests/integration/test_simulation_v2_datasets.py::test_release_pins_dataset_by_digest_and_seals_it",
+               "tests/integration/test_simulation_v2_datasets.py::test_dataset_registration_requires_archived_sources",
+               "tests/integration/test_simulation_v2_datasets.py::test_unpinned_dataset_is_missing_input_never_zero",
+               "tests/integration/test_simulation_v2_datasets.py::test_dataset_recorded_after_cutoff_is_not_pinned"),
+        docs=("docs/dev/v2_eng.md",),
+        notes="Platform capability only: no model consumes dataset inputs until its own entry is implemented.",
+    ),
+    Capability(
+        "simulation.platform.period_results",
+        "Half-open multi-period simulation result rows",
+        "implemented",
+        "V2",
+        "reva.simulation.plugins",
+        ("period both null or both set with start < end", "L0 reuse and output digests cover periods",
+         "single-period digests unchanged"),
+        tests=("tests/integration/test_simulation_v2_datasets.py::test_multi_period_dataset_model_runs_through_the_job_path",
+               "tests/integration/test_simulation_v2_datasets.py::test_result_period_constraints",
+               "tests/unit/test_simulation_v2_plugins.py::test_result_row_period_is_half_open_and_extends_digest_only_when_set"),
+        docs=("docs/dev/v2_eng.md",),
+        notes="Platform capability only: the crude model stays single-period (horizon.multi_period is reserved).",
+    ),
+    Capability(
+        "demography.cohort_component",
+        "Cohort-component population projection (conditional projection, not a forecast)",
+        "reserved",
+        "V2",
+        "reva.models.population.cohort_component",
+        ("Eurostat demography inputs as pinned dataset inputs", "back-test 2013 -> 2023 by age and sex with "
+         "published error metrics", "labelled conditional projection under stated assumptions"),
+        reason="V2 step 3a: the cohort-component plugin and its back-test are not in this build yet",
+        interface="reva.simulation.plugins",
+    ),
+    Capability(
+        "economic.io_price",
+        "Multi-region input-output cost-push price model",
+        "reserved",
+        "V2",
+        "reva.models.economic.io_price",
+        ("FIGARO/ICIO tables as pinned dataset inputs with accounting identities verified",
+         "Leontief price solution checked against a hand-computed small system",
+         "labelled first-round cost-push, full pass-through"),
+        reason="V2 step 3b: the IO price plugin and its data are not in this build yet",
+        interface="reva.simulation.plugins",
+    ),
+    Capability(
+        "social.retirement_age",
+        "Retirement-age module (France first)",
+        "reserved",
+        "V2",
+        "reva.models.social.retirement_age",
+        ("reviewed legal-age rule table with citations", "literature parameters as cited assumptions with a "
+         "sensitivity grid", "2010-reform back-test 2010 -> 2019 reported, including when bad"),
+        reason="V2 step 4: the retirement-age plugin and its back-test are not in this build yet",
+        interface="reva.simulation.plugins",
+    ),
+    Capability(
+        "nl.scenario_drafts",
+        "Natural-language scenario drafts (LLM drafts only; user confirms)",
+        "reserved",
+        "V2",
+        "reva.nl",
+        ("draft validated by the same schema and compiler", "unsupported asks become capability_gap items",
+         "recorded-response tests; prompt-injection hardening; bounded LLM budget"),
+        reason="V2 step 2: the drafting service is not in this build yet",
+    ),
+    Capability(
+        "scenario.all_countries",
+        "Crude border-price scenario for every country with data",
+        "reserved",
+        "V2",
+        "reva.simulation.crude_plugin",
+        ("M49/ISO3 crosswalk from archived provider lists; aggregates and composite reporters never mapped "
+         "silently", "per-country typed gaps"),
+        reason="V2 step 1: the crude scenario is limited to FRA, DZA, CHN and USA in this build",
+        available_instead=("fidelity.L1", "fidelity.L2"),
+    ),
+    Capability(
+        "scenario.skip_missing_countries",
+        "Explicit missing-input policy that runs complete countries and reports skipped ones",
+        "reserved",
+        "V2",
+        "reva.simulation.crude_plugin",
+        ("skipped countries listed with typed missing inputs", "never zero-filled"),
+        reason="V2 step 1: only missing_input_policy=fail is implemented",
+    ),
     # ------------------------------------------------------------------ later
     Capability(
         "query.ask_reva",
@@ -503,6 +627,8 @@ def catalogue(settings: Any | None = None) -> tuple[Capability, ...]:
     """
     out: list[Capability] = []
     for cap in _BASE:
+        if cap.capability_id in _V1_TESTS and not cap.tests:
+            cap = replace(cap, tests=_V1_TESTS[cap.capability_id])
         if cap.capability_id == "autonomy.external_sandbox_runner" and _sandbox_configured(settings):
             cap = replace(
                 cap,

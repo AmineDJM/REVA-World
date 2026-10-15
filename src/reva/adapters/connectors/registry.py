@@ -7,6 +7,7 @@ from typing import Any
 from reva.adapters.connectors.comtrade import ComtradeConnector
 from reva.adapters.connectors.comtrade_batch import ComtradeBatchConnector
 from reva.adapters.connectors.crossref import CrossrefConnector
+from reva.adapters.connectors.eurostat_demography import EurostatDemographyConnector
 from reva.adapters.connectors.eurostat_labour import EurostatLabourPensionsConnector
 from reva.adapters.connectors.naturalearth import NaturalEarthConnector
 from reva.adapters.connectors.worldbank import WorldBankConnector
@@ -24,5 +25,7 @@ def builtin_connectors(contact_email: str | None = None) -> dict[str, Any]:
         ComtradeBatchConnector(),
         # V2 steps 4-5 (agent PEN): LFS rates, ESSPROS pensions, household margins
         EurostatLabourPensionsConnector(),
+        # V2 step 3a (agent POP): demo_pjan/demo_magec/demo_fasec + EUROPOP2023 assumption tables
+        EurostatDemographyConnector(),
     ]
     return {c.describe().name: c for c in conns}

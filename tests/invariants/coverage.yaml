@@ -440,8 +440,8 @@ invariants:
     status: proven
     enforcement:
       - {file: src/reva/kernel/uncertainty.py, symbol: "sensitivity_range", kind: code}
-      - {file: src/reva/simulation/engine.py, symbol: "_range_uncertainty", kind: code}
-      - {file: src/reva/simulation/engine.py, symbol: "_unknown_uncertainty", kind: code}
+      - {file: src/reva/simulation/crude_plugin.py, symbol: "_range_uncertainty", kind: code}
+      - {file: src/reva/simulation/crude_plugin.py, symbol: "_unknown_uncertainty", kind: code}
       - {file: src/reva/autonomy/voi.py, symbol: "estimate", kind: code}
     tests:
       - tests/scientific/test_crude_exposure.py::test_sensitivity_range_not_probabilistic

@@ -1,27 +1,27 @@
 {
  "fixture_kind": "recorded_live_response",
  "label": "openai_en_retirement",
- "recorded_at": "2026-10-15T01:07:56+00:00",
+ "recorded_at": "2026-10-15T01:13:13+00:00",
  "provider": "openai",
  "model_requested": "gpt-4.1",
  "http_status": 200,
- "latency_ms": 1477.5,
+ "latency_ms": 1582.7,
  "prompt_version": "nl-draft-1.0.0",
- "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
- "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "prompt_sha256": "f9662e32a386927e0b1c4a155157e5ed2f48fc6265132ae895475a56e4cda44a",
+ "catalog_digest": "fb2b0a6be4af83cb8c1af58236da6b9e07ac1bb8d6295e00c5eddae061e75744",
  "text": "Raise the legal retirement age in France to 66 and show the effect on employment of people aged 60 to 69.",
  "text_sha256": "6b8285e83efe64a102da35fa3263c2e8512f66707de2e6b0ce3e083a91c1cd4f",
  "response_body": {
   "id": "redacted",
   "object": "chat.completion",
-  "created": 1792026475,
+  "created": 1792026792,
   "model": "gpt-4.1-2025-04-14",
   "choices": [
    {
     "index": 0,
     "message": {
      "role": "assistant",
-     "content": "{\"input_language\":\"en\",\"request_restatement\":\"Raise the legal retirement age in France to 66 and show the effect on employment of people aged 60 to 69. This request cannot be drafted because there is no registered model for retirement age or employment effects by age group.\",\"model_key\":\"\",\"title\":\"Raise retirement age in France to 66 and show employment effect for ages 60-69\",\"countries\":[\"FRA\"],\"reference_year\":null,\"fidelity\":null,\"outputs\":[],\"parameters\":[],\"unsupported\":[{\"text\":\"Raise the legal retirement age in France to 66 and show the effect on employment of people aged 60 to 69.\",\"capability_key\":\"model.social.retirement_age\",\"reason\":\"No registered model for retirement-age policy or employment by age group.\"}],\"assumptions_added\":[]}",
+     "content": "{\"input_language\":\"en\",\"request_restatement\":\"The user requests a scenario raising the legal retirement age in France to 66 and wants to see the effect on employment of people aged 60 to 69. This effect cannot be computed because there is no registered retirement-age or employment model.\",\"model_key\":\"\",\"title\":\"Raise retirement age in France to 66 and effect on employment (ages 60–69)\",\"countries\":[\"FRA\"],\"reference_year\":null,\"fidelity\":null,\"outputs\":[],\"parameters\":[],\"unsupported\":[{\"text\":\"Show the effect on employment of people aged 60 to 69 in France after raising the legal retirement age to 66.\",\"capability_key\":\"model.social.retirement_age\",\"reason\":\"There is no registered model for retirement age or employment effects.\"}],\"assumptions_added\":[]}",
      "refusal": null,
      "annotations": []
     },
@@ -30,11 +30,11 @@
    }
   ],
   "usage": {
-   "prompt_tokens": 3363,
-   "completion_tokens": 165,
-   "total_tokens": 3528,
+   "prompt_tokens": 4825,
+   "completion_tokens": 167,
+   "total_tokens": 4992,
    "prompt_tokens_details": {
-    "cached_tokens": 3200,
+    "cached_tokens": 4608,
     "audio_tokens": 0
    },
    "completion_tokens_details": {

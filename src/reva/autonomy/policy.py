@@ -45,9 +45,12 @@ POLICY_DIR = REGISTRY_ROOT / "policies"
 #   llm.scenario_drafts budget (daily requests/tokens, max output tokens) for natural-language
 #   scenario drafts (src/reva/nl); llm.monthly_usd for autonomy extraction stays 0. Egress
 #   limits unchanged.
+# * budgets.yaml -> budgets-1.2.0 (2026-10-15, V2 step 3a, agent POP): adds the per-source
+#   daily request limit for the built-in connector eurostat.demography (120; a full run is
+#   96 requests). No other limit changed.
 PINNED_POLICY_DIGESTS: dict[str, str] = {
-    "promotion.yaml": "46d1d7c33f7e459532cd2703243f58eb80f8643184ffdebbc419f4a2d71bcff4",
-    "budgets.yaml": "7fb08b528ca7cf6f47b0e3ca99988bec95c057c05cb760ebf64c4bf736422efc",
+    "promotion.yaml": "115a9ab5aed0c29e136fbd8efa9d519e5db5db6eaa241719b9a0b9d7384194aa",
+    "budgets.yaml": "68d98472e830a4bbbefe1525d7d01f71664d655514e1445827b355ef16d55349",
 }
 
 

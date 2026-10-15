@@ -813,3 +813,146 @@ progress {
 .l1-position {
   display: block;
 }
+
+/* ============================================================= V2 (UIR) */
+:root {
+  --gap-ink: #6b4e16;
+  --arc: #8a5a00;
+  --mirror: #5b3f8c;
+  --mirror-bg: #f1ecfa;
+  --llm: #6b3fa0;
+  --llm-bg: #f5f0fb;
+  --projection: #0b5e6b;
+  --projection-bg: #e6f4f6;
+  --experimental: #8a4b00;
+  --experimental-bg: #fff1dc;
+}
+
+/* stale / served-from badges and the publication-paused flag (APIX) */
+.badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 1px 6px;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+  margin-right: 4px;
+  white-space: nowrap;
+}
+.badge-stale {
+  color: #8a4b00;
+  background: #fff4e0;
+}
+.badge-served {
+  color: #374151;
+  background: #f3f4f6;
+}
+.paused-flag {
+  margin: 6px 0;
+  padding: 4px 8px;
+  border: 1px solid #8a4b00;
+  border-left-width: 4px;
+  background: #fff4e0;
+  color: #5c3200;
+}
+.context-warnings li.warning-paused {
+  color: #5c3200;
+}
+.proposal-focused {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* world exposure map */
+.exposure-map-wrap {
+  position: relative;
+}
+.map-tip {
+  position: absolute;
+  z-index: 5;
+  pointer-events: none;
+  transform: translate(-50%, calc(-100% - 12px));
+  max-width: min(360px, 80vw);
+  white-space: normal;
+  background: #111827;
+  color: #f9fafb;
+  font-size: 0.8rem;
+  padding: 6px 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.map-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  align-items: flex-end;
+  margin-bottom: 8px;
+}
+.map-controls select {
+  max-width: 100%;
+}
+.map-controls > label {
+  min-width: 0;
+  max-width: 100%;
+}
+fieldset.seg {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin: 0;
+}
+fieldset.seg label {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+.map-legend {
+  margin-top: 6px;
+}
+.legend-title {
+  margin: 6px 0 0;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+.legend-scale {
+  gap: 2px 10px;
+}
+.swatch-hatch {
+  border: 1px solid var(--gap-ink);
+  background: repeating-linear-gradient(135deg, #fbf7ee 0 3px, var(--gap-ink) 3px 4px);
+}
+.swatch-arc {
+  border: none;
+  height: 3px;
+  width: 18px;
+  background: var(--arc);
+  border-radius: 2px;
+}
+ul.reasons {
+  margin: 2px 0 0;
+  padding-left: 16px;
+  font-size: 0.85rem;
+  color: var(--missing);
+}
+
+/* mirror statistics */
+.mirror-panel {
+  border-color: var(--mirror);
+  border-style: dashed;
+}
+.mirror-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 3px;
+  color: var(--mirror);
+  background: var(--mirror-bg);
+  border: 1px solid var(--mirror);
+}
+.mirror-badge-inline {
+  margin-left: 6px;
+}
+.mirror-note {
+  font-size: 0.9rem;
+}

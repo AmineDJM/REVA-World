@@ -27,7 +27,7 @@ SQL_ROLES = r"""
 DO $$
 DECLARE r text; bad text;
 BEGIN
-  FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim'] LOOP
+  FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim','reva_gate'] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
       BEGIN
         EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT', r);
@@ -59,7 +59,7 @@ def _grants() -> str:
         "DO $$ BEGIN EXECUTE format('" + db_revoke.replace("{db}", "%I") + "', current_database()); END $$;"
     )
     s.append(
-        "DO $$ BEGIN EXECUTE format('GRANT CONNECT ON DATABASE %I TO reva_api, reva_worker, reva_sim',"
+        "DO $$ BEGIN EXECUTE format('GRANT CONNECT ON DATABASE %I TO reva_api, reva_worker, reva_sim, reva_gate',"
         " current_database()); END $$;"
     )
     for sch in ALL_SCHEMAS:
@@ -106,7 +106,12 @@ def _grants() -> str:
     # (identity format) and by meta.enforce_governance (who may attribute to a
     # human; R5-01, see SQL_GOVERNANCE). Approved/eligible/reviewed registry
     # states are written only by the reva_registry approval functions.
-    s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation FROM reva_worker;")
+    # (GATE) Gate results are recorded only by the independent gate login
+    # reva_gate (separate process): the worker has neither a direct INSERT on
+    # ops.gate_result nor EXECUTE on ops.record_gate_result; it files an
+    # ops.gate_request and waits for the gate's decision.
+    s.append("REVOKE INSERT ON ops.api_token, ops.proposal_review, ops.session_revocation, ops.gate_result "
+             "FROM reva_worker;")
     s.append(
         "GRANT UPDATE ON ops.job, ops.schedule, ops.dirty_node, ops.outbox, ops.connector_cursor, "
         "ops.gc_candidate, ops.budget_ledger, ops.worker_presence TO reva_worker;"
@@ -121,9 +126,21 @@ def _grants() -> str:
         "GRANT EXECUTE ON FUNCTION ops.assert_lease(uuid,text,bigint), "
         "ops.heartbeat(uuid,text,bigint,integer,jsonb), "
         "ops.complete_job(uuid,text,bigint,text,jsonb,jsonb), "
-        "ops.record_gate_result(uuid,text,text,text,text,text), "
         "model.record_promotion(uuid,jsonb,text,uuid,text,text,jsonb) TO reva_worker;"
     )
+
+    # --- reva_gate: the independent promotion gate (separate process and login).
+    # It reads the persisted proposal, the connector registry rows the T1 binding
+    # needs and the artifacts it verifies; it writes only its own decision
+    # evidence (meta.artifact + an 'evaluation' location, see SQL_GOVERNANCE)
+    # and gate results through ops.record_gate_result. Nothing else.
+    s.append("GRANT USAGE ON SCHEMA meta, evidence, ops TO reva_gate;")
+    s.append(
+        "GRANT SELECT ON ops.proposal, ops.gate_result, evidence.connector_version, evidence.source, "
+        "evidence.eligibility TO reva_gate;"
+    )
+    s.append("GRANT SELECT, INSERT ON meta.artifact, meta.artifact_location TO reva_gate;")
+    s.append("GRANT EXECUTE ON FUNCTION ops.record_gate_result(uuid,text,text,text,text,text) TO reva_gate;")
 
     # --- reva_sim: read pinned inputs; write only sim/evaluation outputs.
     for sch in SCIENTIFIC:
@@ -190,6 +207,10 @@ CREATE POLICY location_sim_insert ON meta.artifact_location FOR INSERT TO reva_s
                       AND l.namespace IN ('scenarios','evaluation'))));
 CREATE POLICY location_worker_insert ON meta.artifact_location FOR INSERT TO reva_worker
   WITH CHECK (namespace <> 'scenarios');
+-- (GATE) The gate registers only its own decision evidence ('evaluation').
+CREATE POLICY location_gate_read ON meta.artifact_location FOR SELECT TO reva_gate USING (true);
+CREATE POLICY location_gate_insert ON meta.artifact_location FOR INSERT TO reva_gate
+  WITH CHECK (namespace = 'evaluation');
 
 -- (R-18) Provenance edges: the simulation role may attach inputs/outputs only
 -- to simulation/evaluation activities (never to source, normalisation, belief,
@@ -228,7 +249,7 @@ RECORDED_BY_TABLES = (
 )
 GOVERNED_TABLES = (
     "meta.activity", "ontology.mapping", "evidence.eligibility", "evidence.claim", "model.version",
-    "model.promotion", "ops.audit", "ops.proposal",
+    "model.promotion", "ops.audit", "ops.proposal", "ops.gate_result",
 )
 
 SQL_GOVERNANCE = r"""
@@ -249,6 +270,10 @@ SQL_GOVERNANCE = r"""
 --     approval approves one thing (ops.approval_use).
 --   * Everything else the worker may still write is fail-safe (quarantine,
 --     retired, candidate, rejected, retracted) or attributable (recorded_by).
+--   * (GATE) Gate results are written only by the independent gate login
+--     reva_gate (a separate process with its own credentials), and the
+--     approval functions accept only gate results recorded by reva_gate. The
+--     worker asks for a decision through ops.gate_request.
 -- ---------------------------------------------------------------------------
 DO $$
 BEGIN
@@ -292,7 +317,7 @@ CREATE FUNCTION meta.role_is_owner(r name) RETURNS boolean LANGUAGE sql STABLE
 $$;
 CREATE FUNCTION meta.session_principal() RETURNS text LANGUAGE sql STABLE
   SET search_path = pg_catalog, pg_temp AS $$
-  SELECT CASE WHEN session_user::text IN ('reva_api','reva_worker','reva_sim') THEN session_user::text
+  SELECT CASE WHEN session_user::text IN ('reva_api','reva_worker','reva_sim','reva_gate') THEN session_user::text
               WHEN meta.role_is_owner(session_user) THEN 'owner'
               ELSE 'other' END
 $$;
@@ -342,6 +367,11 @@ BEGIN
       END IF;
     WHEN 'evidence.claim' THEN
       IF NOT approve_ok AND NEW.status = 'reviewed' THEN bad := 'a reviewed claim'; END IF;
+    WHEN 'ops.gate_result' THEN
+      -- (GATE) only the independent gate process records gate results.
+      IF who <> 'reva_gate' THEN
+        bad := 'a gate result (only the independent gate login reva_gate records gate results)';
+      END IF;
     ELSE
       NULL;
   END CASE;
@@ -383,6 +413,11 @@ BEGIN
   IF g.id IS NOT NULL THEN
     IF g.proposal_id <> p_proposal OR g.decision <> 'pass' OR g.evaluator NOT LIKE 'gate-evaluator:%' THEN
       RAISE EXCEPTION 'approval: gate result % is not a passing gate result for proposal %', p_approval, p_proposal;
+    END IF;
+    -- (GATE) only a decision of the independent gate process counts.
+    IF g.recorded_by IS DISTINCT FROM 'reva_gate' THEN
+      RAISE EXCEPTION 'approval: gate result % was not recorded by the independent gate (reva_gate)', p_approval
+        USING ERRCODE = 'insufficient_privilege';
     END IF;
     IF p_policy IS NOT NULL AND g.policy_version IS DISTINCT FROM p_policy THEN
       RAISE EXCEPTION 'approval: gate result % ran policy %, not %', p_approval, g.policy_version, p_policy;
@@ -505,6 +540,22 @@ BEGIN
   IF prev.id IS NULL THEN
     RAISE EXCEPTION 'restore: connector version % was never approved', p_connector_version;
   END IF;
+  -- (GATE) Only re-enable a version whose approval was independent: the owner
+  -- (reviewed seed, admin CLI) wrote it, or an approval was consumed for exactly
+  -- this target that is a reva_gate pass or an API-recorded human review.
+  IF NOT meta.role_is_owner(prev.recorded_by::name) AND NOT EXISTS (
+       SELECT 1 FROM ops.approval_use u
+        WHERE u.kind = 'eligibility'
+          AND u.target = jsonb_build_object('connector_version_id', p_connector_version,
+                                            'concept_version_id', p_concept)
+          AND (EXISTS (SELECT 1 FROM ops.gate_result g WHERE g.id = u.approval_id AND g.decision = 'pass'
+                         AND g.recorded_by = 'reva_gate')
+               OR EXISTS (SELECT 1 FROM ops.proposal_review r WHERE r.id = u.approval_id
+                            AND r.decision = 'approve'
+                            AND (r.recorded_by = 'reva_api' OR meta.role_is_owner(r.recorded_by::name))))) THEN
+    RAISE EXCEPTION 'restore: connector version % has no independent approval (reva_gate pass, API review or owner)',
+      p_connector_version USING ERRCODE = 'insufficient_privilege';
+  END IF;
   PERFORM ops.require_review_activity(p_review_activity, NULL);
   SELECT a.actor INTO actor FROM meta.activity a WHERE a.id = p_review_activity;
   INSERT INTO evidence.eligibility(connector_version_id, concept_version_id, applicability, decision,
@@ -610,7 +661,7 @@ REVOKE ALL ON FUNCTION meta.role_is_owner(name), meta.session_principal(), meta.
   model.approve_version(uuid,uuid,text,text,text,text,text,jsonb,jsonb,jsonb,jsonb,uuid) FROM PUBLIC;
 -- Helpers called from trigger bodies run as the inserting role.
 GRANT EXECUTE ON FUNCTION meta.role_is_owner(name), meta.session_principal(), meta.is_human_identity(text)
-  TO reva_api, reva_worker, reva_sim, reva_registry;
+  TO reva_api, reva_worker, reva_sim, reva_gate, reva_registry;
 GRANT EXECUTE ON FUNCTION evidence.approve_eligibility(uuid,uuid,uuid,uuid,jsonb,text,uuid),
   evidence.restore_eligibility(uuid,uuid,uuid,uuid),
   ontology.approve_mapping(uuid,uuid,text,text,jsonb,uuid,text,jsonb,jsonb,text,uuid),
@@ -626,6 +677,44 @@ GRANT EXECUTE ON FUNCTION meta.artifact_is_verified(text), meta.inserted_in_curr
   TO reva_registry;
 CREATE POLICY activity_registry_read ON meta.activity FOR SELECT TO reva_registry USING (true);
 GRANT SELECT ON ops.approval_use TO reva_api, reva_worker;
+
+-- (GATE) The worker asks the independent gate for a decision: one row per
+-- request, naming the persisted proposal and the validator/sandbox report
+-- objects (whose stored evidence the gate re-reads and, for T1, recomputes).
+-- The gate (reva_gate) polls for requests without a later decision of its own;
+-- it never trusts the request for anything but which proposal to evaluate and
+-- where the reports' evidence lives.
+CREATE TABLE ops.gate_request (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  proposal_id uuid NOT NULL REFERENCES ops.proposal,
+  gate_name text NOT NULL DEFAULT 'promotion' CHECK (gate_name ~ '^[A-Za-z0-9_.-]{1,100}$'),
+  reports jsonb NOT NULL DEFAULT '[]'::jsonb
+    CHECK (jsonb_typeof(reports) = 'array' AND jsonb_array_length(reports) <= 16
+           AND octet_length(reports::text) <= 262144),
+  policy_sha256 text CHECK (policy_sha256 IS NULL OR policy_sha256 ~ '^[0-9a-f]{64}$'),
+  recorded_by text NOT NULL DEFAULT session_user,
+  recorded_at timestamptz NOT NULL DEFAULT clock_timestamp()
+);
+CREATE INDEX gate_request_pending ON ops.gate_request (recorded_at, id);
+CREATE INDEX gate_result_proposal ON ops.gate_result (proposal_id, recorded_at);
+CREATE TRIGGER a01_recorded_by BEFORE INSERT ON ops.gate_request
+  FOR EACH ROW EXECUTE FUNCTION meta.force_recorded_by();
+GRANT SELECT, INSERT ON ops.gate_request TO reva_worker;
+GRANT SELECT ON ops.gate_request TO reva_api, reva_gate;
+
+-- (GATE) meta.artifact has no row security; the gate login may register only
+-- its own decision evidence there.
+CREATE FUNCTION meta.restrict_gate_artifact() RETURNS trigger LANGUAGE plpgsql
+  SET search_path = pg_catalog, pg_temp AS $$
+BEGIN
+  IF NEW.schema_version IS DISTINCT FROM 'gate-decision/1' OR NEW.media_type IS DISTINCT FROM 'application/json' THEN
+    RAISE EXCEPTION 'the gate login may register only gate-decision/1 evidence (got %)', NEW.schema_version
+      USING ERRCODE = 'insufficient_privilege';
+  END IF;
+  RETURN NEW;
+END $$;
+CREATE TRIGGER a02_gate_artifact BEFORE INSERT ON meta.artifact
+  FOR EACH ROW WHEN (session_user = 'reva_gate') EXECUTE FUNCTION meta.restrict_gate_artifact();
 
 -- (R5-06) The worker prunes only *expired* session revocations; deleting a
 -- live one would un-revoke a stolen session.
@@ -698,7 +787,7 @@ def upgrade() -> None:
     # (R5-01, R5-06, R5-10) governance, approval functions, revocation pruning.
     op.execute(SQL_GOVERNANCE)
     op.execute(_governance_triggers())
-    op.execute(immutable("ops.approval_use"))
+    op.execute(immutable("ops.approval_use", "ops.gate_request"))
     # (R-08) recorded_at is server time on every table that has it.
     op.execute(server_recorded_at(*ALL_SCHEMAS))
     op.execute(SQL_RESTRICTED_DELETION)

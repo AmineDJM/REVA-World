@@ -1,0 +1,418 @@
+# Plausibility benchmarks for the IO cost-push price model (economic.io_price@1.0.0, agent IO).
+# These are published first-round estimates of how an oil/energy price increase feeds into producer
+# and consumer prices. They are BENCHMARKS for sanity checks of model output, not calibration targets
+# and not reviewed evidence. Validated by registry/assumptions/schema.json and
+# tests/unit/test_assumptions_registry.py. Texts are not archived; only their SHA-256 at access.
+schema_version: "1.0.0"
+registry_key: io_energy_passthrough_benchmarks
+title: Published input-output estimates of energy/oil price pass-through to prices
+description: >-
+  First-round (direct + indirect, no second-round wage/margin effects) price effects of an energy or
+  oil price increase computed with input-output tables, plus one macro-model cross-check that is
+  flagged as not IO-based. Shock definitions differ (all energy products vs. oil and gas vs. EUR per
+  barrel of oil); compare like with like and read each entry's policy_change and notes.
+curation:
+  curated_by: "agent LIT (automated extraction; REVA V2 roadmap)"
+  curated_at: "2026-10-15T01:20:00Z"
+  review_status: maintainer_review_pending
+  statement: >-
+    No human has reviewed these extractions. Each number was read in the text whose digest is
+    recorded. Derived elasticities are REVA computations (value / shock size) shown for comparison
+    only; they assume linearity, which a Leontief price model satisfies but the sources' other
+    channels may not.
+quote_normalisation: >-
+  Unicode NFC normalisation, then:
+  Quotes are verbatim after whitespace collapsing, re-joining words split across lines or columns of
+  a two-column layout, and joining table cells of one printed row with single spaces.
+
+entries:
+  - id: ecb_op113_2010_io_energy
+    citation: >-
+      Task Force of the Monetary Policy Committee of the European System of Central Banks (2010).
+      Energy markets and the euro area macroeconomy. ECB Occasional Paper No. 113, June 2010,
+      Section 3.3.1 'An analysis based on input-output tables' and Annex 2.7.
+    doi: null
+    url: "https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf"
+    accessed_at: "2026-10-15T01:06:51Z"
+    verification_status: verified_from_text
+    metadata_check: null
+    country: EA12
+    period: "Input-output tables for 2005 (12 euro area countries)"
+    design: "Static Leontief cost-push calculation on Eurostat symmetric IO tables (59 NACE branches); fixed technical coefficients, no substitution, constant wages and margins, no monetary policy response"
+    method_family: input_output
+    policy_change: "10% increase in energy prices: coal/lignite/peat (NACE 10), crude petroleum and natural gas (NACE 11), coke/refined petroleum/nuclear fuels (NACE 23), electricity/gas/steam/hot water (NACE 40), applied to imported and domestically produced energy inputs"
+    population: "Producer prices by country and branch; consumer prices before taxes via household consumption weights; euro area = weighted average of DE, IE, GR, ES, FR, IT, NL, AT, PT, SI, SK, FI"
+    text_sources:
+      - id: ecb_op113_pdf
+        kind: institutional_publication
+        title: "ECB Occasional Paper No. 113 (June 2010), PDF"
+        doi: null
+        url: "https://www.ecb.europa.eu/pub/pdf/scpops/ecbocp113.pdf"
+        accessed_at: "2026-10-15T01:06:51Z"
+        sha256: d38a4290e31a1d37d2f75ddbc868806009702d507e2c59a998ad6ab324e7fe52
+        bytes: 2836963
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "ECB publication; reproduction permitted with source acknowledgement per ECB terms; not archived to keep the registry small."
+    values:
+      - name: consumer_prices_total_ea
+        value: 0.36
+        unit: percent
+        as_printed: "0.36"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total (direct + indirect) increase in consumer prices before taxes for a 10% energy price increase"
+        population: "Euro area (12-country weighted average), IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 12 'Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)', row 'Total', column 'euro area' (pdf p.77, printed p.76); text: 'a 10% increase in energy prices would feed into a 0.36% increase in consumer prices'"
+        quote: "Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36"
+        notes: "Direct 0.22, indirect 0.14 (same table)."
+      - name: consumer_prices_total_fra
+        value: 0.34
+        unit: percent
+        as_printed: "0.34"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total (direct + indirect) increase in consumer prices before taxes for a 10% energy price increase"
+        population: "France, IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 12, row 'Total', column 'FR' (5th country column: DE IE GR ES FR ...) (pdf p.77)"
+        quote: "Total 0.37 0.44 0.36 0.32 0.34 0.39 0.35 0.42 0.40 0.61 0.63 0.34 0.36"
+        notes: "France: direct 0.21, indirect 0.12 (rounded components)."
+      - name: consumer_prices_direct_ea
+        value: 0.22
+        unit: percent
+        as_printed: "0.22"
+        standard_error: null
+        confidence_interval: null
+        definition: "Direct contribution (households' own energy consumption) to consumer prices for a 10% energy price increase"
+        population: "Euro area, IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 12, row 'Direct', column 'euro area' (pdf p.77)"
+        quote: "Direct 0.25 0.30 0.20 0.16 0.21 0.22 0.22 0.27 0.22 0.45 0.38 0.14 0.22"
+      - name: consumer_prices_indirect_ea
+        value: 0.14
+        unit: percent
+        as_printed: "0.14"
+        standard_error: null
+        confidence_interval: null
+        definition: "Indirect contribution (energy embodied in other consumed products) for a 10% energy price increase"
+        population: "Euro area, IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 12, row 'Indirect', column 'euro area' (pdf p.77)"
+        quote: "Indirect 0.12 0.14 0.17 0.16 0.12 0.17 0.13 0.14 0.19 0.17 0.25 0.20 0.14"
+      - name: producer_prices_total_ea
+        value: 0.39
+        unit: percent
+        as_printed: "0.39"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total increase in producer prices (all branches) for a 10% energy price increase"
+        population: "Euro area, IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 10 'Impact of a 10% increase in energy prices on producer prices: direct and indirect impact (2005)', row 'Total', column 'euro area' (pdf p.75, printed p.74)"
+        quote: "Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39"
+      - name: producer_prices_total_fra
+        value: 0.30
+        unit: percent
+        as_printed: "0.30"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total increase in producer prices (all branches) for a 10% energy price increase"
+        population: "France, IOT 2005"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 10, row 'Total', column 'FR' (pdf p.75)"
+        quote: "Total 0.33 0.25 0.47 0.44 0.30 0.40 0.79 0.42 0.52 0.36 0.78 0.43 0.39"
+      - name: shock_size
+        value: 10
+        unit: percent
+        as_printed: "10%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Size of the energy price shock in the experiment"
+        population: "All energy inputs listed in policy_change"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_op113_pdf
+        locator: "Table 12 title (pdf p.77)"
+        quote: "Table 12 Impact of a 10% increase in energy prices on consumer prices overall, direct and indirect impact (2005)"
+    derived:
+      - name: consumer_price_elasticity_ea
+        op: ratio
+        numerator: consumer_prices_total_ea
+        denominator: shock_size
+        sign: 1
+        value: 0.036
+        unit: "percent consumer prices per percent energy price"
+        rounding: 3
+        meaning: "First-round consumer-price elasticity to an all-energy price shock, euro area 2005"
+      - name: consumer_price_elasticity_fra
+        op: ratio
+        numerator: consumer_prices_total_fra
+        denominator: shock_size
+        sign: 1
+        value: 0.034
+        unit: "percent consumer prices per percent energy price"
+        rounding: 3
+        meaning: "First-round consumer-price elasticity to an all-energy price shock, France 2005"
+      - name: producer_price_elasticity_ea
+        op: ratio
+        numerator: producer_prices_total_ea
+        denominator: shock_size
+        sign: 1
+        value: 0.039
+        unit: "percent producer prices per percent energy price"
+        rounding: 3
+        meaning: "First-round producer-price elasticity to an all-energy price shock, euro area 2005"
+    not_verified: "No DOI found in Crossref for ECB Occasional Paper 113; bibliographic data taken from the PDF itself."
+    notes: >-
+      The shock raises ALL energy products by 10%, including electricity and gas, so it is an
+      upper-side benchmark for a crude-only shock in a model that does not force refined products
+      and electricity to move with crude. The authors state the static assumptions 'suggest that the
+      results will tend to overestimate the effects' while ignoring indirect effects on non-energy
+      imports biases them down (Annex 2.7, pdf p.119-120). Energy branch itself: +4.88% for a 10% shock
+      (Table 11). Data year 2005; energy cost shares have changed since.
+
+  - id: cnb_mpr_spring2026_box2_cze
+    citation: >-
+      Czech National Bank (2026). The sensitivity of consumer prices to energy shocks: An
+      input-output analysis. Monetary Policy Report, Spring 2026, Box 2.
+    doi: null
+    url: "https://www.cnb.cz/en/monetary-policy/monetary-policy-reports/boxes-and-articles/The-sensitivity-of-consumer-prices-to-energy-shocks-An-input-output-analysis"
+    accessed_at: "2026-10-15T01:06:48Z"
+    verification_status: verified_from_text
+    metadata_check: null
+    country: CZE
+    period: "Symmetric IO tables up to 2022; 2024 value estimated from the direct oil-and-gas share"
+    design: "Leontief input-output model on CZSO symmetric product-by-product tables; energy intensity of products weighted by household consumption shares; full cost pass-through"
+    method_family: input_output
+    policy_change: "100% increase in oil and natural gas prices"
+    population: "Czech consumer prices"
+    text_sources:
+      - id: cnb_box_html
+        kind: institutional_publication
+        title: "CNB web page of Monetary Policy Report Spring 2026, Box 2"
+        doi: null
+        url: "https://www.cnb.cz/en/monetary-policy/monetary-policy-reports/boxes-and-articles/The-sensitivity-of-consumer-prices-to-energy-shocks-An-input-output-analysis"
+        accessed_at: "2026-10-15T01:06:48Z"
+        sha256: df58a83f9742366d980ae1b3e0c66d7f58085223b060c98e9f0870c0d404ce2a
+        bytes: 62643
+        media_type: "text/html"
+        archived: false
+        licence_note: "CNB web publication; dynamic HTML page (digest may change on refetch); not archived."
+    values:
+      - name: consumer_prices_total_2024
+        value: 3.6
+        unit: percent
+        as_printed: "3.6%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Increase in consumer prices for a 100% oil and natural gas price shock, full cost pass-through, 2024 estimate"
+        population: "Czech Republic"
+        verification: verified_from_text
+        evidence: primary
+        text_source: cnb_box_html
+        locator: "Box text, paragraph after Chart 1"
+        quote: "According to an estimate for 2024, a 100% shock to oil and natural gas prices would result in a 3.6% increase in consumer prices, assuming full cost pass-through."
+      - name: shock_size
+        value: 100
+        unit: percent
+        as_printed: "100%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Size of the oil and gas price shock"
+        population: "Oil and natural gas"
+        verification: verified_from_text
+        evidence: primary
+        text_source: cnb_box_html
+        locator: "Box text, paragraph after Chart 1"
+        quote: "According to an estimate for 2024, a 100% shock to oil and natural gas prices would result in a 3.6% increase in consumer prices, assuming full cost pass-through."
+      - name: direct_oil_gas_share_of_output_2024
+        value: 0.9
+        unit: percent
+        as_printed: "0.9%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Direct share of intermediate oil and natural gas consumption in total output, 2024"
+        population: "Czech Republic"
+        verification: verified_from_text
+        evidence: primary
+        text_source: cnb_box_html
+        locator: "Footnote [3]"
+        quote: "It is calculated from the direct share of intermediate oil and natural gas consumption in total output, which is also available for 2024 (0.9%)."
+    derived:
+      - name: consumer_price_elasticity
+        op: ratio
+        numerator: consumer_prices_total_2024
+        denominator: shock_size
+        sign: 1
+        value: 0.036
+        unit: "percent consumer prices per percent oil and gas price"
+        rounding: 3
+        meaning: "First-round consumer-price elasticity to an oil-and-gas shock, Czech Republic 2024 estimate"
+    notes: >-
+      Footnote [3]: the 2024 figure is not a full IO computation but scaled from the direct share,
+      because 'this direct effect consistently accounts for roughly 25% of the total impact' in
+      years with symmetric tables. The box calls the sensitivity downward-trending except in 2022.
+      Shock covers oil AND gas, not crude alone. A single country (Czechia), not France.
+
+  - id: bdf_eco_notepad_50_2018_fra
+    citation: >-
+      Kalantzis, Y. and Ouvrard, J.-F. (2018). The impact of oil prices on inflation in France and
+      the euro area. Banque de France, Eco Notepad (Bloc-notes Éco) post n°50, 28 February 2018.
+    doi: null
+    url: "https://www.banque-france.fr/en/publications-and-statistics/publications/impact-oil-prices-inflation-france-and-euro-area"
+    accessed_at: "2026-10-15T01:07:50Z"
+    verification_status: verified_from_text
+    metadata_check: null
+    country: FRA
+    period: "Net oil imports 2016; national-accounts IO tables"
+    design: "Hybrid: direct effect via the HICP energy component from econometric estimates; indirect effect from the oil content of consumption computed with national-accounts input-output tables (imported goods assumed to share the domestic production structure); no second-round effects"
+    method_family: input_output_hybrid
+    policy_change: "EUR 10 increase in the price of a barrel of oil (Brent)"
+    population: "HICP, France and euro area"
+    text_sources:
+      - id: bdf_eco_notepad_html
+        kind: institutional_publication
+        title: "Banque de France Eco Notepad post n°50 (English web page)"
+        doi: null
+        url: "https://www.banque-france.fr/en/publications-and-statistics/publications/impact-oil-prices-inflation-france-and-euro-area"
+        accessed_at: "2026-10-15T01:07:50Z"
+        sha256: 1141e2bf66e48fccc4094a1643678cc18068944d6a8f2b59681a121a16b309a3
+        bytes: 302864
+        media_type: "text/html"
+        archived: false
+        licence_note: "Banque de France web publication; dynamic HTML page (digest may change on refetch); not archived."
+    values:
+      - name: hicp_total_fra
+        value: 0.4
+        unit: percentage_points
+        as_printed: "0.4"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total direct + indirect impact on the HICP of a EUR 10 per barrel oil price rise, excluding second-round effects"
+        population: "France"
+        verification: verified_from_text
+        evidence: primary
+        text_source: bdf_eco_notepad_html
+        locator: "Section 'Assessing the indirect impact of oil prices on inflation', paragraph before Table 1"
+        quote: "In France, the total impact is also 0.4 percentage point, of which 0.25 is direct and 0.15 is indirect."
+      - name: hicp_indirect_fra
+        value: 0.15
+        unit: percentage_points
+        as_printed: "0.15"
+        standard_error: null
+        confidence_interval: null
+        definition: "Indirect (IO-based) impact on the HICP of a EUR 10 per barrel oil price rise"
+        population: "France"
+        verification: verified_from_text
+        evidence: primary
+        text_source: bdf_eco_notepad_html
+        locator: "Same paragraph; also Table 'impact on the HICP of a EUR 10 shock on the price of a barrel of oil (in percentage points)'"
+        quote: "In France, the total impact is also 0.4 percentage point, of which 0.25 is direct and 0.15 is indirect."
+      - name: hicp_total_ea
+        value: 0.4
+        unit: percentage_points
+        as_printed: "0.4"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total direct + indirect impact on the HICP of a EUR 10 per barrel oil price rise, excluding second-round effects"
+        population: "Euro area"
+        verification: verified_from_text
+        evidence: primary
+        text_source: bdf_eco_notepad_html
+        locator: "Same paragraph"
+        quote: "a EUR 10 rise in the price of a barrel of oil therefore results in a total impact of 0.4 percentage point on the HICP in the euro area, of which 0.3 percentage point is direct and 0.1% is indirect."
+      - name: oil_content_of_consumption_fra
+        value: 73
+        unit: percent
+        as_printed: "73%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Total oil content of consumption as a share of the oil bill (IO-based)"
+        population: "France"
+        verification: verified_from_text
+        evidence: primary
+        text_source: bdf_eco_notepad_html
+        locator: "Same section"
+        quote: "we calculate that the total oil content of consumption is 65% of the oil bill in the euro area and 73% in France."
+    derived: []
+    not_verified: "The shock is in EUR per barrel; the note does not pair the estimate with a reference oil price, so no percentage elasticity is derived here."
+    notes: >-
+      France-specific benchmark. Only the indirect part is IO-based; the direct part is econometric
+      and reflects volume-based excise taxes (TICPE) that damp final energy price changes. To compare
+      with a +X% crude shock, the IO agent must state the reference EUR/barrel price it uses.
+
+  - id: ecb_mb_dec2014_box3_ea
+    citation: >-
+      European Central Bank (2014). Indirect effects of oil price developments on euro area
+      inflation. Monthly Bulletin, December 2014, Box 3 (citing a 2010 Eurosystem staff
+      study, Monthly Bulletin August 2010).
+    doi: null
+    url: "https://www.ecb.europa.eu/pub/pdf/other/mb201412_focus03.en.pdf"
+    accessed_at: "2026-10-15T01:06:49Z"
+    verification_status: verified_from_text
+    metadata_check: null
+    country: EA
+    period: "Oil price levels of USD 60–80 per barrel (2010 study)"
+    design: "Eurosystem macroeconomic models (combined with IO tables and an SVAR for indirect/second-round effects in the 2010 study)"
+    method_family: macro_models
+    policy_change: "10% change in oil prices"
+    population: "Euro area HICP"
+    text_sources:
+      - id: ecb_mb201412_box3_pdf
+        kind: institutional_publication
+        title: "ECB Monthly Bulletin December 2014, Box 3 (PDF extract)"
+        doi: null
+        url: "https://www.ecb.europa.eu/pub/pdf/other/mb201412_focus03.en.pdf"
+        accessed_at: "2026-10-15T01:06:49Z"
+        sha256: 32b6cd7aac0dd2569860dd6d94ad86b093689988448c5e2520c98cd6c8c60f18
+        bytes: 1750916
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "ECB publication; reproduction permitted with source acknowledgement per ECB terms; not archived."
+    values:
+      - name: hicp_direct_energy_component
+        value: 0.4
+        unit: percentage_points
+        as_printed: "0.4"
+        standard_error: null
+        confidence_interval: null
+        definition: "Impact on HICP inflation via direct effects on the energy component of a 10% oil price change"
+        population: "Euro area"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_mb201412_box3_pdf
+        locator: "Box 3, main text (pdf p.2, printed p.55)"
+        quote: "More specifically, a 10% change in oil prices was estimated to give rise to a 0.4 percentage point impact via direct effects on the energy component – most of which would happen relatively quickly – and an approximate 0.2 percentage point impact via other HICP components over a period of up to three years."
+      - name: hicp_other_components
+        value: 0.2
+        unit: percentage_points
+        as_printed: "0.2"
+        standard_error: null
+        confidence_interval: null
+        definition: "Approximate impact via other (non-energy) HICP components over up to three years"
+        population: "Euro area"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ecb_mb201412_box3_pdf
+        locator: "Box 3, main text (pdf p.2, printed p.55)"
+        quote: "More specifically, a 10% change in oil prices was estimated to give rise to a 0.4 percentage point impact via direct effects on the energy component – most of which would happen relatively quickly – and an approximate 0.2 percentage point impact via other HICP components over a period of up to three years."
+    derived: []
+    notes: >-
+      NOT an input-output result: a macro-model cross-check that includes behaviour (and possibly
+      some second-round effects) and excise-tax damping. Do not compare it directly with a
+      full-pass-through Leontief output; it is listed to show the order of magnitude seen by
+      model-based estimates (about 0.6 pp of HICP for +10% oil).

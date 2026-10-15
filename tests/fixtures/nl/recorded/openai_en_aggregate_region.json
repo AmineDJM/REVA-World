@@ -1,0 +1,50 @@
+{
+ "fixture_kind": "recorded_live_response",
+ "label": "openai_en_aggregate_region",
+ "recorded_at": "2026-10-15T01:13:19+00:00",
+ "provider": "openai",
+ "model_requested": "gpt-4.1",
+ "http_status": 200,
+ "latency_ms": 2559.7,
+ "prompt_version": "nl-draft-1.0.0",
+ "prompt_sha256": "f9662e32a386927e0b1c4a155157e5ed2f48fc6265132ae895475a56e4cda44a",
+ "catalog_digest": "fb2b0a6be4af83cb8c1af58236da6b9e07ac1bb8d6295e00c5eddae061e75744",
+ "text": "The euro area and France: oil import prices up 30% in 2023, exports unchanged.",
+ "text_sha256": "d23beccc8c3271f9cec8729b43da9052c7a53aa2ebef67ab4612816024f7cc9d",
+ "response_body": {
+  "id": "redacted",
+  "object": "chat.completion",
+  "created": 1792026797,
+  "model": "gpt-4.1-2025-04-14",
+  "choices": [
+   {
+    "index": 0,
+    "message": {
+     "role": "assistant",
+     "content": "{\"input_language\":\"en\",\"request_restatement\":\"The user requests a scenario for the euro area and France in which oil import prices increase by 30% in 2023, while export prices remain unchanged. Outputs for both regions are requested.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Euro area and France: oil import prices +30% in 2023, exports unchanged\",\"countries\":[\"FRA\",\"EMU\"],\"reference_year\":2023,\"fidelity\":null,\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.3,\"text\":null,\"quote\":\"up 30%\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.0,\"text\":null,\"quote\":\"unchanged\"}],\"unsupported\":[{\"text\":\"The euro area (EMU) is not listed as a supported country in the model catalogue.\",\"capability_key\":\"geography.not_covered\",\"reason\":\"The selected model does not include the euro area as a supported country code.\"}],\"assumptions_added\":[\"intervention.export_multiplier set to 1.0 (neutral value) for 'exports unchanged'\",\"outputs left empty to request all model outputs\",\"missing_input_policy not specified by user, left at model default\",\"fidelity not specified by user, left as model default\"]}",
+     "refusal": null,
+     "annotations": []
+    },
+    "logprobs": null,
+    "finish_reason": "stop"
+   }
+  ],
+  "usage": {
+   "prompt_tokens": 4821,
+   "completion_tokens": 263,
+   "total_tokens": 5084,
+   "prompt_tokens_details": {
+    "cached_tokens": 4608,
+    "audio_tokens": 0
+   },
+   "completion_tokens_details": {
+    "reasoning_tokens": 0,
+    "audio_tokens": 0,
+    "accepted_prediction_tokens": 0,
+    "rejected_prediction_tokens": 0
+   }
+  },
+  "service_tier": "default",
+  "system_fingerprint": "fp_8c02795173"
+ }
+}

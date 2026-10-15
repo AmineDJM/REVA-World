@@ -90,6 +90,7 @@ class StoredProposal:
     proposal_type: str
     row_tier: int
     document_sha256: str
+    summary: dict[str, Any]
 
 
 def record_gate_result(conn: Connection, proposal_id: uuid.UUID, gate_name: str, policy_version: str,
@@ -125,7 +126,7 @@ class PolicyPromotionGate:
         """The ``ops.proposal`` row + its digest-verified document; ``obj`` must equal it (R6-03)."""
         with self.engine.connect() as conn:
             row = conn.execute(text(
-                "SELECT proposal_type, manifest_sha256, permission_tier, author FROM ops.proposal WHERE id = :i"),
+                "SELECT proposal_type, manifest_sha256, permission_tier, author, summary FROM ops.proposal WHERE id = :i"),
                 {"i": proposal_id}).mappings().one_or_none()
         if row is None:
             raise ValidationProblem("gate evaluates only persisted proposals (ops.proposal)")
@@ -142,7 +143,7 @@ class PolicyPromotionGate:
             raise PolicyDenied("the proposal object differs from the persisted proposal; the gate evaluates "
                                "only the stored proposal", proposal_id=str(proposal_id))
         return StoredProposal(stored, str(row["proposal_type"]), int(row["permission_tier"]),
-                              str(row["manifest_sha256"]))
+                              str(row["manifest_sha256"]), dict(row["summary"] or {}))
 
     # ------------------------------------------------------------------ protocol
     def decide(self, proposal: PlatformChangeProposal | uuid.UUID, independent_reports: Sequence[ValidationReport],
@@ -270,8 +271,8 @@ class PolicyPromotionGate:
         proposal = stored.proposal
         problems: list[str] = []
         if stored.proposal_type != "connector_promotion":
-            return False, [f"T1 auto-promotion only covers connector_promotion proposals, not "
-                           f"{stored.proposal_type!r}"], {}
+            return False, [f"T1 auto-promotion only covers declarative connector manifests (connector_promotion "
+                           f"proposals), not {stored.proposal_type!r}"], {}
         try:
             change = self.io.get_json(proposal.patch_or_manifest)
         except Exception as e:
@@ -370,6 +371,19 @@ class PolicyPromotionGate:
         if not problems:  # (R6-06) recompute both reports from the stored proposal; never trust outcomes
             recomputed = self._recompute(proposal, change, manifest_sha, mapping_ref, bank_sha, problems)
         subjects = binding.iso3_for_geo(registry, geo)
+        # (R6-02) the database binds the approval to ops.proposal.summary.scope, which the proposer wrote:
+        # it must be exactly the scope derived here (concept, dataset, subjects, years, manifest digest).
+        from reva.cli.seed import entity_id
+
+        derived_db_scope = {"concept": f"{target['concept_id']}@{target['version']}", "dataset": manifest["dataset"],
+                            "subject_ids": [str(entity_id(x)) for x in subjects],
+                            "years": {"in": sorted({int(y) for y in rp["time"]})},
+                            "manifest_sha256": et.manifest_digest(manifest),
+                            "mapping_key": mm.get("mapping_key")}
+        recorded = dict(stored.summary.get("scope") or {})
+        off = sorted(k for k, v in derived_db_scope.items() if recorded.get(k) != v)
+        if off:
+            problems.append(f"recorded proposal scope differs from the derived scope in {off}")
         scope = {"template": template, "template_digest": current_digest, "pinned_template_digest": pinned_digest,
                  "dataset": manifest["dataset"], "target": target, "geo": geo,
                  "hosts": manifest["allowed_hosts"], "approved_entry": entry, "connector": manifest["name"],
@@ -378,7 +392,7 @@ class PolicyPromotionGate:
                  "proposal_sha256": stored.document_sha256, "manifest_sha256": manifest_sha,
                  "mapping_manifest_sha256": mapping_ref.sha256, "mapping_key": mm.get("mapping_key"),
                  "subjects": subjects, "years": {"in": sorted(int(y) for y in rp["time"])},
-                 "fixture_bank_sha256": bank_sha, "recomputed": recomputed}
+                 "fixture_bank_sha256": bank_sha, "recomputed": recomputed, "db_scope": derived_db_scope}
         return not problems, problems, scope
 
     def _recompute(self, proposal: PlatformChangeProposal, change: dict[str, Any], manifest_sha: str | None,

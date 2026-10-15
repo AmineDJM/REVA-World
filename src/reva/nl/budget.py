@@ -84,6 +84,7 @@ class LlmLedger(Protocol):
     def settle(self, operation_id: str, *, requests: int, tokens: int) -> None: ...
 
 
+# No ':name' sequences after a quote: the SQL must survive sqlalchemy.text()/op.execute() bind parsing.
 LEDGER_FUNCTIONS_SQL = r"""
 CREATE FUNCTION ops.reserve_llm_budget(p_operation_id text, p_requests integer, p_tokens bigint,
                                        p_daily_requests integer, p_daily_tokens bigint)
@@ -103,7 +104,7 @@ BEGIN
   END IF;
   PERFORM pg_advisory_xact_lock(hashtextextended('reva:budget:llm', 0));
   IF EXISTS (SELECT 1 FROM ops.budget_ledger
-              WHERE operation_id IN (p_operation_id || ':requests', p_operation_id || ':tokens')) THEN
+              WHERE operation_id IN (p_operation_id || ':' || 'requests', p_operation_id || ':' || 'tokens')) THEN
     RETURN jsonb_build_object('granted', false, 'reason', 'operation_exists');
   END IF;
   day_start := date_trunc('day', clock_timestamp() AT TIME ZONE 'UTC') AT TIME ZONE 'UTC';
@@ -122,8 +123,8 @@ BEGIN
                               'used_tokens', used_t);
   END IF;
   INSERT INTO ops.budget_ledger(account_key, operation_id, unit, reserved) VALUES
-    ('llm:scenario_drafts:requests', p_operation_id || ':requests', 'requests', p_requests),
-    ('llm:scenario_drafts:tokens', p_operation_id || ':tokens', 'tokens', p_tokens);
+    ('llm:scenario_drafts:requests', p_operation_id || ':' || 'requests', 'requests', p_requests),
+    ('llm:scenario_drafts:tokens', p_operation_id || ':' || 'tokens', 'tokens', p_tokens);
   RETURN jsonb_build_object('granted', true, 'used_requests', used_r, 'used_tokens', used_t);
 END $$;
 
@@ -140,7 +141,7 @@ BEGIN
   END IF;
   UPDATE ops.budget_ledger
      SET consumed = CASE unit WHEN 'requests' THEN p_requests ELSE p_tokens END
-   WHERE operation_id IN (p_operation_id || ':requests', p_operation_id || ':tokens')
+   WHERE operation_id IN (p_operation_id || ':' || 'requests', p_operation_id || ':' || 'tokens')
      AND account_key IN ('llm:scenario_drafts:requests', 'llm:scenario_drafts:tokens')
      AND consumed IS NULL;
   GET DIAGNOSTICS n = ROW_COUNT;

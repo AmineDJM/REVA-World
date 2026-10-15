@@ -47,6 +47,14 @@ _year_of_calendar_support = calendar_year_of  # V1 name
 def resolve_subject(conn: Connection, iso3: str) -> tuple[UUID, str]:
     sid = resolve_alias(conn, "iso3166_alpha3", iso3)
     if sid is not None:
+        # V2 step 1 (ALLC): crosswalk aliases are provider_declared, not reviewed; say which.
+        from sqlalchemy import text
+
+        kind = conn.execute(text(
+            "SELECT confidence_kind FROM world.alias WHERE provider = 'iso3166_alpha3' AND external_key = :k "
+            "AND entity_id = :e ORDER BY recorded_at DESC LIMIT 1"), {"k": iso3, "e": sid}).scalar_one_or_none()
+        if kind == "provider_declared":
+            return sid, "provider_declared_alias:iso3166_alpha3"
         return sid, "reviewed_alias:iso3166_alpha3"
     return external_id("reva.entity", iso3), "deterministic_entity_id"
 
@@ -127,10 +135,108 @@ def compile_run(conn: Connection, spec_json: dict[str, Any], store: ArtifactStor
             f"(registered: {model.model_version})", capability=f"model.{spec_json['model_key']}")
     model.validate(spec_json)
     release = load_release(conn, UUID(spec_json["baseline_release_id"]), spec_json["knowledge_cutoff"])
+    selection = None
+    if is_all_countries(spec_json.get("countries")):  # V2 step 1 (ALLC)
+        selection = resolve_all_countries(conn, model, release, spec_json)
+        spec_json = {**spec_json, "countries": selection["resolved"]}
     inputs = resolve_inputs(conn, release, model.requirements(spec_json), store)
-    return model, model.compile(inputs, spec_json), inputs
+    compiled = model.compile(inputs, spec_json)
+    if selection is not None:
+        compiled.country_selection = selection
+    return model, compiled, inputs
+
+
+# --- V2 step 1 (agent ALLC): countries ["ALL"] -------------------------------------------
+ALL_COUNTRIES = "ALL"
+ALL_RULE = ("every entity.country subject of the pinned release holding a selected_report estimate (a value or "
+            "a typed Missing) of at least one concept the model requires, for a required year; keyed by its "
+            "ISO 3166 alpha-3 alias, or by its World Bank code when it has none (CHI, XKX)")
+
+
+def is_all_countries(countries: Any) -> bool:
+    return isinstance(countries, list | tuple) and len(countries) == 1 and countries[0] == ALL_COUNTRIES
+
+
+def resolve_all_countries(conn: Connection, model: Any, release: dict[str, Any],
+                          spec_json: dict[str, Any]) -> dict[str, Any]:
+    """Resolve countries ["ALL"] against the pinned release (deterministic, read only).
+
+    Only models declaring ``supports_all_countries`` accept it. The required concepts
+    and years come from the model's own ``requirements`` (probed with subject "ALL").
+    A country lacking some inputs is still selected: the missing-input policy then
+    refuses the run (``fail``) or lists it as skipped (``skip_missing_countries``).
+    """
+    from sqlalchemy import text
+
+    if not getattr(model, "supports_all_countries", False):
+        raise CapabilityGap(f"model {model.model_key} does not accept countries [\"ALL\"]",
+                            capability="scenario.all_countries", model=model.model_key)
+    probe = model.requirements(spec_json)
+    concepts = sorted({r.concept for r in probe if r.kind == "scalar"})
+    years = sorted({y for r in probe if r.kind == "scalar" for y in r.years})
+    rows = conn.execute(text(
+        """SELECT DISTINCT e.subject_id FROM belief.estimate e
+           JOIN ontology.concept_version c ON c.id = e.concept_version_id
+           JOIN world.entity ent ON ent.id = e.subject_id
+           JOIN ontology.concept_version k ON k.id = ent.kind_concept_id AND k.concept_id = 'entity.country'
+           WHERE e.release_id = :r AND e.modality = 'selected_report' AND c.concept_id = ANY(:c)
+             AND world.support_ref_year(e.support_id) = ANY(:y)"""),
+        {"r": release["id"], "c": concepts, "y": years}).scalars().all()
+    ids = sorted({UUID(str(i)) for i in rows}, key=str)
+    keys = conn.execute(text(
+        """SELECT DISTINCT ON (entity_id) entity_id, external_key FROM world.alias
+           WHERE entity_id = ANY(:ids) AND provider IN ('iso3166_alpha3', 'worldbank')
+             AND external_key ~ '^[A-Z]{3}$'
+           ORDER BY entity_id, (provider = 'iso3166_alpha3') DESC, recorded_at DESC"""),
+        {"ids": ids}).all()
+    resolved: dict[str, UUID] = {}
+    for eid, key in keys:
+        if resolve_subject(conn, key)[0] == UUID(str(eid)):  # the key must resolve back to this entity
+            resolved[key] = UUID(str(eid))
+    unkeyed = sorted(str(i) for i in set(ids) - set(resolved.values()))
+    if not resolved:
+        raise ValidationProblem("countries [\"ALL\"] resolved to no country: the pinned release holds no estimate "
+                                "of the required concepts for the reference year", concepts=concepts, years=years)
+    return {"requested": [ALL_COUNTRIES], "rule": ALL_RULE, "concepts": concepts, "years": years,
+            "resolved": sorted(resolved), "resolved_count": len(resolved), "unkeyed_subject_ids": unkeyed}
+# --- end V2 step 1 (ALLC) -------------------------------------------------------------------
 
 
 def compile_scenario(conn: Connection, spec: Any, store: ArtifactStore | None = None) -> Any:
     """V1 entry point: the compiled plan of a validated spec (any registered model)."""
     return compile_run(conn, spec.as_json(), store)[1]
+
+
+def preflight_missing(conn: Connection, spec_json: dict[str, Any]) -> list[dict[str, Any]]:
+    """Missing inputs of a stored spec against its pinned release, without loading datasets.
+
+    For the API's submit-time check (``missing_input`` 422 before a job is queued):
+    scalars are resolved exactly as the engine resolves them; a dataset counts as
+    present when the release pins one for (concept, subject) — its bytes are verified
+    by the engine at run time. Same problem shape as ``ResolvedInputs.missing_problems``.
+    """
+    from sqlalchemy import text
+
+    from reva.simulation.datasets import dataset_schema_present
+
+    model = plugins.get(spec_json["model_key"])
+    release_id = UUID(str(spec_json["baseline_release_id"]))
+    if is_all_countries(spec_json.get("countries")):
+        sel = resolve_all_countries(conn, model, {"id": release_id}, spec_json)
+        spec_json = {**spec_json, "countries": sel["resolved"]}
+    reqs = model.requirements(spec_json)
+    scalar_reqs = [r for r in reqs if r.kind == "scalar"]
+    inputs = resolve_inputs(conn, {"id": release_id}, scalar_reqs)
+    problems = inputs.missing_problems()
+    has_datasets = dataset_schema_present(conn)
+    for r in reqs:
+        if r.kind != "dataset":
+            continue
+        pinned = has_datasets and conn.execute(
+            text("""SELECT 1 FROM belief.release_dataset WHERE release_id = :r AND concept_id = :c
+                    AND subject_key = :s"""), {"r": release_id, "c": r.concept, "s": r.subject},
+        ).first() is not None
+        if not pinned:
+            problems.append({"code": "missing_input", "country": r.subject, "input": r.name, "concept": r.concept,
+                             "kind": "dataset", "years": list(r.years), "reason": "unavailable"})
+    return problems

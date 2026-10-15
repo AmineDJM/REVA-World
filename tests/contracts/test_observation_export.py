@@ -60,10 +60,15 @@ VALIDATOR = Draft202012Validator(SCHEMA, format_checker=strict_format_checker())
 
 @pytest.fixture(scope="module")
 def ingested(db: Any) -> list[dict[str, Any]]:
+    # Scoped to the acquisitions of these captured fixture bodies (by raw digest): other modules write
+    # their own (synthetic, revised) observations under the same sources in the shared session DB.
+    raw_shas: set[str] = set()
     for name in CONNECTORS:
         c = builtin_connectors()[name]
         rep = asyncio.run(run_connector(c, FixtureHttp(name), db.store, db.worker, persist_cursor=False))
         assert all(o.status in ("published", "unchanged") for o in rep.outcomes), rep.as_dict()
+        raw_shas |= {o.raw_sha256 for o in rep.outcomes if o.raw_sha256}
+    assert raw_shas
     with db.api.connect() as c:
         rows = (
             c.execute(
@@ -73,10 +78,11 @@ def ingested(db: Any) -> list[dict[str, Any]]:
                          FROM evidence.observation o
                          JOIN evidence.acquisition a ON a.id = o.acquisition_id
                          JOIN evidence.source s ON s.id = o.source_id
-                        WHERE s.source_key = ANY(:keys)
+                        WHERE s.source_key = ANY(:keys) AND a.raw_sha256 = ANY(:raws)
+                          AND a.origin = 'test_fixture'
                         ORDER BY o.logical_key, o.revision_no, o.id"""
                 ),
-                {"keys": list(SOURCES)},
+                {"keys": list(SOURCES), "raws": sorted(raw_shas)},
             )
             .mappings()
             .all()

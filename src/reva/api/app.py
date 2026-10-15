@@ -212,6 +212,7 @@ def create_app(
               world.router, evidence.router, beliefs.router, provenance.router, catalog.router, sim.router,
               sim.query_router):
         app.include_router(r)
+    app.include_router(__import__("reva.api.routes.nl", fromlist=["router"]).router)  # V2 NL drafts (agent NLC)
 
     # Added before the header middleware so that it runs inside it: its 413 responses get headers/metrics.
     app.add_middleware(BodySizeLimit, max_bytes=max_body_bytes)

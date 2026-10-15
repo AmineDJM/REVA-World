@@ -223,7 +223,8 @@ def validate_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
         raise ValidationProblem("dimension_order must be a non-empty list of dimension ids")
     if len(set(order)) != len(order) or "time" not in order:
         raise ValidationProblem("dimension_order must be unique and contain 'time'")
-    for dim, codes in {**rp["filters"], **rp["pinned_categories"]}.items():
+    # both maps are checked (a merged dict would let the pinned list hide an unchecked filter list)
+    for dim, codes in [*rp["filters"].items(), *rp["pinned_categories"].items()]:
         if dim not in order or not isinstance(codes, list) or not codes:
             raise ValidationProblem(f"filter/pin on unknown or empty dimension {dim!r}")
         if not all(isinstance(c, str) and _CODE_RE.fullmatch(c) for c in codes):

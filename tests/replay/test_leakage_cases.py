@@ -75,7 +75,7 @@ async def test_six_leakage_cases_blocked_in_strict_mode(db):
     # (1) a revised historical value: vintage 1 known at the cutoff, the revision arrives later
     name = "pop_fra_1975_1976_leakage"
     await vl.ingest_vintage(db.worker, db.store, name, "v1")
-    with db.worker.begin() as conn:  # identity/ontology recorded before the cutoff
+    with db.owner.begin() as conn:  # reviewed identity/ontology (maintainer-attributed: owner, R5-01)
         act = _activity(conn, "test.alias")
         provider = f"test.boundaries.{uuid.uuid4().hex[:8]}"
         conn.execute(text(
@@ -85,7 +85,7 @@ async def test_six_leakage_cases_blocked_in_strict_mode(db):
     cutoff = _now(db.worker)
 
     await vl.ingest_vintage(db.worker, db.store, name, "v2")
-    with db.worker.begin() as conn:
+    with db.owner.begin() as conn:  # maintainer-attributed registry records: owner (R5-01)
         act = _activity(conn, "test.future_records")
         # (2) renamed country boundary: new alias version and a new ontology mapping recorded after cutoff
         new_alias = conn.execute(text(

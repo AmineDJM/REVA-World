@@ -121,7 +121,8 @@ def output_schema(catalog: DraftCatalog | None = None) -> dict[str, Any]:
             "outputs": {"type": "array", "items": s},
             "parameters": {"type": "array", "items": {
                 "type": "object", "additionalProperties": False, "required": ["path", "number", "text", "quote"],
-                "properties": {"path": path_schema, "number": {"type": ["number", "null"]}, "text": {"type": ["string", "null"]},
+                "properties": {"path": path_schema, "number": {"type": ["number", "null"]},
+                               "text": {"type": ["string", "null"]},
                                "quote": s}}},
             "unsupported": {"type": "array", "items": {
                 "type": "object", "additionalProperties": False, "required": ["text", "capability_key", "reason"],

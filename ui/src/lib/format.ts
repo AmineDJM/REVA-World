@@ -93,6 +93,8 @@ export const DISPLAY_FRACTION_DIGITS: Record<string, { digits: number; pad: bool
   'unit.usd': { digits: 2, pad: true },
   'unit.percent': { digits: 4, pad: false },
   'unit.percent_of_baseline_gdp': { digits: 4, pad: false },
+  // Person counts from a projection carry a model quantum (1e-9 persons); whole persons are shown.
+  'unit.persons': { digits: 0, pad: false },
 };
 
 export interface DisplayDecimal {

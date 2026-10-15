@@ -85,3 +85,42 @@ models:
     output_ports: [{name: weighted_records}]
     applicability: {attributes: [age, sex], max_records: 100000}
     assumptions: [no attributes beyond age and recorded sex; no household structure]
+  - model_key: demography.cohort_component
+    version: "1.0.0"
+    kind: scenario
+    # V2 experimental model (agent POP): runs only because its plugin manifest declares
+    # review_status maintainer_review_pending; labelled "experimental model, not yet reviewed".
+    approval_status: candidate
+    description: >-
+      Annual cohort-component population projection by single age (0 to an open group, at most
+      100+) and recorded sex: constant base-period mortality (m_x -> q_x with a_x = 1/2 and
+      Coale-Demeny a_0), births = age-specific fertility rates x female exposure, sex ratio at
+      birth from data, net migration by a labelled assumption (zero, average residual estimate, or
+      EUROPOP2023 baseline). A conditional projection under stated assumptions, not a forecast.
+    input_ports:
+      - {name: population, kind: dataset, concept: demography.population.jan1_age_sex}
+      - {name: deaths, kind: dataset, concept: demography.deaths.age_sex}
+      - {name: births, kind: dataset, concept: demography.live_births.mother_age_newborn_sex}
+      - {name: europop_migration, kind: dataset, concept: demography.assumption.europop2023.net_migration_age_sex, optional: true}
+      - {name: europop_fertility, kind: dataset, concept: demography.assumption.europop2023.fertility_rate_age, optional: true}
+    output_ports:
+      - {name: population_by_sex_and_broad_age_group, unit: unit.persons, temporal: "point:01-01"}
+      - {name: births_deaths_net_migration, unit: unit.persons, temporal: calendar_year}
+      - {name: old_age_dependency_ratio_65plus_per_15_64, unit: unit.percent}
+      - {name: old_age_dependency_ratio_67plus_per_20_66, unit: unit.percent}
+      - {name: population_by_single_age, unit: unit.persons, optional: true}
+    applicability:
+      countries: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, IRL, ISL, ITA, LIE, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+      horizon: {max_periods: 50, unit: calendar_year}
+      open_age: {max: 100, min: 85}
+      base_period_must_end_before_jump_off: true
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [forecast, probability_levels, mortality_improvement, economic_effects]
+    assumptions:
+      - mortality held at base-period rates (no improvement)
+      - migrants added at the end of the year (not exposed to mortality in the arrival year)
+      - residual net migration includes statistical adjustment (census revisions, unknown-age events)
+      - births with unknown mother's age projected as a separate rate per woman aged 15-49
+      - open age groups and unknown ages never spread over single ages
+      - sensitivity grid at L2 is assumption sensitivity with no probability interpretation

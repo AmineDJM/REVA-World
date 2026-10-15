@@ -813,20 +813,45 @@ def _additivity(cube: Cube, infos: Mapping[str, Mapping[str, Any]]) -> dict[str,
             "max_abs_diff": _dec_text(max(bad)) if bad else "0"}
 
 
+def dataset_key(dataset: str) -> str:
+    return f"eurostat.demography.{dataset}"
+
+
+def dataset_coverage(table: Any) -> dict[str, Any]:
+    """Coverage summary recorded with a dataset (years, sexes, open age categories, flags)."""
+    rows = table.to_pylist()
+    years = sorted({r["year"] for r in rows})
+    present = [r for r in rows if r["value"] is not None]
+    return {
+        "years": [years[0], years[-1]] if years else [],
+        "years_with_values": sorted({r["year"] for r in present}),
+        "sexes": sorted({r["sex"] for r in rows}),
+        "special_age_categories": sorted({r["age"] for r in rows if r["age_kind"] in (
+            "open", "open_upper", "open_lower", "unknown")}),
+        "status_flags": sorted({r["status"] for r in rows if r["status"]}),
+        "missing_cells": len(rows) - len(present),
+    }
+
+
 def post_publish_datasets(conn: Any, store: Any, raw: RawAcquisition, batches: Sequence[ObservationBatch],
                           summary: Any) -> None:
     """Register the dataset inputs derived from this acquisition's raw bytes (same transaction).
 
-    Delegates to the platform's dataset registry; when it is not available the step is
-    a no-op (the observations are still published and datasets can be re-derived from
-    the archived raw bytes at any time, since :func:`dataset_tables` is a pure function
-    of them)."""
-    try:
-        from reva.datasets import register_dataset  # type: ignore[import-not-found]
-    except ImportError:  # pragma: no cover - platform without dataset inputs
-        return
+    Contract of ``reva.evidence.runner.post_publish_for`` hooks: runs inside the acquisition
+    publication transaction, only for newly published (not quarantined) raw bytes, and
+    must not commit. :func:`dataset_tables` is a pure function of the archived bytes, so
+    a dataset can always be re-derived from the acquisition it names."""
+    from reva.simulation.datasets import register_dataset
+
     dataset = str(raw.item.params["dataset"])
     for iso3, table in dataset_tables(raw).items():
-        register_dataset(conn, store, table=table, concept=dataset_concept(dataset), subject=iso3,
-                         acquisition_ids=[str(summary.acquisition_id)], parser_version=PARSER_VERSION,
-                         schema_version=DATASET_SCHEMA_VERSION, raw_sha256=summary.raw_sha256)
+        register_dataset(conn, store, dataset_key=dataset_key(dataset), concept_id=DATASETS[dataset].concept_id,
+                         subject_key=iso3, table=table, source_acquisition_ids=[summary.acquisition_id],
+                         parser_version=PARSER_VERSION, origin=raw.origin, coverage=dataset_coverage(table),
+                         actor=f"connector:{NAME}",
+                         rights={"licence": "CC-BY-4.0 (Eurostat reuse policy)", "attribution": "Source: Eurostat",
+                                 "source_key": SOURCE_KEY})
+
+
+# Optional hook read by runners that dispatch post-publish steps per connector.
+EurostatDemographyConnector.post_publish = staticmethod(post_publish_datasets)  # type: ignore[attr-defined]

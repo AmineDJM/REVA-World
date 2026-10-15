@@ -1,0 +1,108 @@
+# Demography concepts of V2 step 3a (agent POP): vital statistics and EUROPOP2023
+# assumption tables used by demography.cohort_component@1.0.0. The 1 January population
+# concept (demography.population.jan1_age_sex) is in demography.yaml.
+# Published versions are immutable: changing meaning requires a new version.
+concepts:
+  - concept_id: demography.deaths.age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Deaths by age (completed years) and recorded sex, calendar year (Eurostat demo_magec)"}
+    definition: >-
+      Eurostat demo_magec: number of deaths of usually resident persons during the calendar year,
+      by age at death in completed years (age at last birthday) and sex as recorded. The open-ended
+      top age class (Y_OPEN) and unknown age (UNK) are distinct categories and are never spread over
+      single ages. Recent years may be provisional (status flag 'p'); flags are kept with every value.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      temporal_support: calendar_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, suppressed, not_collected]
+      measurement_method: civil_registration_vital_statistics
+  - concept_id: demography.live_births.mother_age_newborn_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Live births by mother's age (completed years) and newborn's sex, calendar year (Eurostat demo_fasec)"}
+    definition: >-
+      Eurostat demo_fasec: live births during the calendar year to usually resident mothers, by the
+      mother's age in completed years (Eurostat's default concept for fertility indicators; single
+      ages 15-49 plus the classes 10-14 and 50+, and UNK for age not stated) and the newborn's sex.
+      Five-year mother's-age classes overlapping the single ages are subtotals. Open/unknown classes
+      are never spread over single ages. Series start in 2007 for most countries.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      temporal_support: calendar_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, suppressed, not_collected]
+      measurement_method: civil_registration_vital_statistics
+  - concept_id: demography.assumption.europop2023.net_migration_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "EUROPOP2023 baseline net-migration assumption by age and sex (Eurostat proj_23nanmig)"}
+    definition: >-
+      Eurostat EUROPOP2023 projection assumption (projection type BSL, baseline): net migration
+      (immigration minus emigration, may be negative) by single age (Y_LT1 .. Y99, Y_GE100) and sex
+      for each projection year 2022-2100. A projection assumption published by Eurostat, NOT an
+      observation of migration: it enters models only as a labelled scenario assumption. REVA
+      assumes the age refers to the end of the year (stated in the model documentation).
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      temporal_support: calendar_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, not_applicable]
+      measurement_method: projection_assumption_eurostat_europop2023
+  - concept_id: demography.assumption.europop2023.fertility_rate_age
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "EUROPOP2023 baseline age-specific fertility-rate assumption (Eurostat proj_23naasfr)"}
+    definition: >-
+      Eurostat EUROPOP2023 projection assumption (projection type BSL): age-specific fertility rates
+      (live births per woman of the age, per year) by mother's age (Y_LT15, Y15 .. Y49, Y_GE50) for
+      each projection year; TOTAL is the total fertility rate. A projection assumption, NOT an
+      observation.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      denominator: women of the same age (Eurostat projection methodology)
+      temporal_support: calendar_year
+      spatial_support: eurostat_geo_code
+      aggregation: period_rate
+      scale_type: rate
+      unit_ref: unit.ratio
+      permitted_transformations: [identity]
+      missingness: [unavailable, not_applicable]
+      measurement_method: projection_assumption_eurostat_europop2023
+  - concept_id: demography.projection.europop2023.population_age_sex
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "EUROPOP2023 baseline projected population on 1 January by age and sex (Eurostat proj_23np)"}
+    definition: >-
+      Eurostat EUROPOP2023 projected population on 1 January (projection type BSL) by single age
+      (Y_LT1 .. Y99, Y_GE100, plus age-group subtotals) and sex. Another institution's conditional
+      projection, NOT an observation; REVA uses it only as a plausibility comparison for its own
+      projections, never as validation evidence or as a belief.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: usually_resident_population_eurostat
+      temporal_support: "point:01-01"
+      spatial_support: eurostat_geo_code
+      aggregation: point_in_time_stock
+      scale_type: stock
+      unit_ref: unit.persons
+      permitted_transformations: [identity, sum_disjoint_leaf_cells]
+      missingness: [unavailable, not_applicable]
+      measurement_method: projection_eurostat_europop2023

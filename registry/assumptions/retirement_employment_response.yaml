@@ -1,0 +1,1001 @@
+# Literature parameters: employment response to raising the minimum / statutory pension age.
+# Consumed by PEN (social.retirement_age@1.0.0) as a STATED SCENARIO ASSUMPTION with a sensitivity
+# grid (docs/dev/v2_literature.md), never as a reviewed evidence claim. Validated by
+# registry/assumptions/schema.json and tests/unit/test_assumptions_registry.py.
+#
+# Fetched texts are NOT archived in the repository (licensing unclear for most); only the SHA-256 of
+# the exact bytes received is recorded. Some publisher/repository pages are dynamic, so a later fetch
+# may legitimately produce different bytes.
+schema_version: "1.0.0"
+registry_key: retirement_employment_response
+title: Employment response to an increase in the pension eligibility age
+description: >-
+  Quasi-experimental estimates of how raising the early/normal/statutory pension age changed
+  employment (and pension receipt) of the affected ages. The quantity most transferable across
+  countries is derived per entry: the share of people kept out of pension receipt (or retirement)
+  by the reform who are employed instead (employment effect / drop in pension receipt). Absolute
+  percentage-point effects depend strongly on pre-reform employment and bunching at the threshold
+  and should not be transferred directly.
+curation:
+  curated_by: "agent LIT (automated extraction; REVA V2 roadmap)"
+  curated_at: "2026-10-15T01:20:00Z"
+  review_status: maintainer_review_pending
+  statement: >-
+    No human has reviewed these extractions. Each number below was read in the text whose digest is
+    recorded; values marked evidence=secondary_compilation were read in a later paper that reports
+    the cited study's number with a primary locator, not in the cited study itself.
+quote_normalisation: >-
+  Unicode NFC normalisation, then:
+  Quotes are verbatim after whitespace collapsing, re-joining words split across lines, expanding
+  typographic ligatures dropped by text extraction (e.g. 'eect' -> 'effect') and joining table
+  cells of one printed row with single spaces or ' | '. Minus signs are kept as printed (U+2212
+  or U+2013 where the source used them).
+
+entries:
+  # ------------------------------------------------------------------ Austria, ERA
+  - id: staubli_zweimuller_2013_aut
+    citation: >-
+      Staubli, S. and Zweimüller, J. (2013). Does raising the early retirement age increase
+      employment of older workers? Journal of Public Economics 108, 17–32.
+    doi: "10.1016/j.jpubeco.2013.09.003"
+    url: "https://doi.org/10.1016/j.jpubeco.2013.09.003"
+    accessed_at: "2026-10-15T01:03:36Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1016/j.jpubeco.2013.09.003"
+      accessed_at: "2026-10-15T01:01:48Z"
+      sha256: 8805b221866a9281d91456d26b812678ec48d0cd117fb6c3f6b3ba5cb57b2283
+      bytes: 10665
+      abstract_in_record: false
+    country: AUT
+    period: "1997–2010 (treatment period); placebo 1987–2000"
+    design: "Difference-in-differences across birth cohorts (OLS, linear probability), administrative social-security data"
+    method_family: quasi_experimental
+    policy_change: "Early retirement age (ERA) raised from 60 to 62 for men and from 55 to 58.25 for women (2000 and 2004 reforms)"
+    population: "Men aged 57–64 and women aged 52–59 (specification 2); effect = being below the cohort-specific new ERA"
+    text_sources:
+      - id: pmc3851570_xml
+        kind: author_accepted_manuscript
+        title: "NIHPA author manuscript PMC3851570 (NIHMS526007) of the same article"
+        doi: "10.1016/j.jpubeco.2013.09.003"
+        url: "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pmc&id=3851570&retmode=xml"
+        accessed_at: "2026-10-15T01:03:36Z"
+        sha256: 01c8272f83fc549eb73424b894bdef093d922655e5c3385b831d7d85765844e9
+        bytes: 183086
+        media_type: "text/xml"
+        archived: false
+        licence_note: "PMC author manuscript; 'available for text mining' and fair use per the PMC record; not redistributed."
+    values:
+      - name: employment_effect_men
+        value: 9.75
+        unit: percentage_points
+        as_printed: "9.75"
+        standard_error: 0.30
+        standard_error_as_printed: "(0.30)"
+        confidence_interval: null
+        definition: "Change in the probability of being employed when below the (raised) ERA, men, with controls"
+        population: "Men aged 57–64, 1997–2010"
+        verification: verified_from_text
+        evidence: primary
+        text_source: pmc3851570_xml
+        locator: "Table 3 'Main effects', Panel B 'Employment', column (2); also the abstract"
+        quote: "B. Employment I(age<ERA) | 12.09*** (0.45) | 9.75*** (0.30) | 7.50*** (0.47) | −0.17 (0.17) | 18.91*** (0.50) | 11.00*** (0.34) | 9.26*** (0.38) | −0.03 (0.12)"
+        notes: "Abstract: 'We find that raising the ERA increased employment by 9.75 percentage points among affected men and by 11 percentage points among affected women.' Pre-policy employment mean (men 60–61, 2000): 8.76."
+      - name: employment_effect_women
+        value: 11.00
+        unit: percentage_points
+        as_printed: "11.00"
+        standard_error: 0.34
+        standard_error_as_printed: "(0.34)"
+        confidence_interval: null
+        definition: "Change in the probability of being employed when below the (raised) ERA, women, with controls"
+        population: "Women aged 52–59, 1997–2010"
+        verification: verified_from_text
+        evidence: primary
+        text_source: pmc3851570_xml
+        locator: "Table 3 'Main effects', Panel B 'Employment', column (6)"
+        quote: "B. Employment I(age<ERA) | 12.09*** (0.45) | 9.75*** (0.30) | 7.50*** (0.47) | −0.17 (0.17) | 18.91*** (0.50) | 11.00*** (0.34) | 9.26*** (0.38) | −0.03 (0.12)"
+        notes: "Pre-policy employment mean (women 55–58.2, 2000): 27.56."
+      - name: pension_receipt_effect_men
+        value: -24.85
+        unit: percentage_points
+        as_printed: "−24.85"
+        standard_error: 0.46
+        standard_error_as_printed: "(0.46)"
+        confidence_interval: null
+        definition: "Change in the probability of claiming retirement benefits when below the (raised) ERA, men"
+        population: "Men aged 57–64, 1997–2010"
+        verification: verified_from_text
+        evidence: primary
+        text_source: pmc3851570_xml
+        locator: "Table 3, Panel A 'Retirement benefits', column (2)"
+        quote: "A. Retirement benefits I(age<ERA) | −26.34*** (0.61) | −24.85*** (0.46) | −21.12*** (0.93) | 1.03*** (0.22) | −34.45*** (1.04) | −24.63*** (0.94) | −22.06***(1.13) | 0.19 (0.28)"
+      - name: pension_receipt_effect_women
+        value: -24.63
+        unit: percentage_points
+        as_printed: "−24.63"
+        standard_error: 0.94
+        standard_error_as_printed: "(0.94)"
+        confidence_interval: null
+        definition: "Change in the probability of claiming retirement benefits when below the (raised) ERA, women"
+        population: "Women aged 52–59, 1997–2010"
+        verification: verified_from_text
+        evidence: primary
+        text_source: pmc3851570_xml
+        locator: "Table 3, Panel A 'Retirement benefits', column (6)"
+        quote: "A. Retirement benefits I(age<ERA) | −26.34*** (0.61) | −24.85*** (0.46) | −21.12*** (0.93) | 1.03*** (0.22) | −34.45*** (1.04) | −24.63*** (0.94) | −22.06***(1.13) | 0.19 (0.28)"
+    derived:
+      - name: employment_share_of_pension_drop_men
+        op: ratio
+        numerator: employment_effect_men
+        denominator: pension_receipt_effect_men
+        sign: -1
+        value: 0.392
+        unit: share
+        rounding: 3
+        meaning: "Share of men kept out of pension receipt by the ERA increase who are employed instead"
+      - name: employment_share_of_pension_drop_women
+        op: ratio
+        numerator: employment_effect_women
+        denominator: pension_receipt_effect_women
+        sign: -1
+        value: 0.447
+        unit: share
+        rounding: 3
+        meaning: "Share of women kept out of pension receipt by the ERA increase who are employed instead"
+    notes: >-
+      Unemployment rose by 12.51 pp (men) and 11.77 pp (women) in the same table (Panel C, columns 2
+      and 6): a large share of the delayed pensioners moved to unemployment insurance. Specification
+      (1) without controls gives 12.09 pp for men; the text states 'roughly 45% of men who delay
+      claiming continue to work' for that specification.
+
+  # ------------------------------------------------------------------ Austria, ERA (job-exit age)
+  - id: manoli_weber_2016_aut
+    citation: >-
+      Manoli, D. S. and Weber, A. (2016). The Effects of the Early Retirement Age on Retirement
+      Decisions. NBER Working Paper 22561.
+    doi: "10.3386/w22561"
+    url: "https://www.nber.org/papers/w22561"
+    accessed_at: "2026-10-15T01:02:14Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.3386/w22561"
+      accessed_at: "2026-10-15T01:01:49Z"
+      sha256: a730d90a00b3667bd7789682fb8a690a6903d52cb8dad4c439278823a1f8e23f
+      bytes: 1530
+      abstract_in_record: false
+    country: AUT
+    period: "Birth cohorts around the 2000 and 2004 Austrian pension reform kinks"
+    design: "Fuzzy regression kink design, administrative social-security data"
+    method_family: quasi_experimental
+    policy_change: "ERA increases of the 2000 and 2004 Austrian reforms (phased by birth quarter)"
+    population: "Individuals with short contribution years (directly affected) and full sample, by sex"
+    text_sources:
+      - id: nber_w22561_pdf
+        kind: working_paper_version
+        title: "NBER Working Paper 22561 (August 2016)"
+        doi: "10.3386/w22561"
+        url: "https://www.nber.org/system/files/working_papers/w22561/w22561.pdf"
+        accessed_at: "2026-10-15T01:02:14Z"
+        sha256: 75a7d5dc9ff72277577e19417012e32f12035c15d3db2f448b89ecad24d8e8ac
+        bytes: 1036455
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "All rights reserved by the authors; short quotation permitted with credit; not redistributed."
+    values:
+      - name: exit_age_per_era_year_women_short
+        value: 0.390
+        unit: years_per_year
+        as_printed: "0.390"
+        standard_error: 0.062
+        standard_error_as_printed: "(0.062)"
+        confidence_interval: null
+        definition: "Increase in average job-exit age per 1-year increase in the ERA (2000 reform kink)"
+        population: "Women with short contribution years"
+        verification: verified_from_text
+        evidence: primary
+        text_source: nber_w22561_pdf
+        locator: "Table 3 'Fuzzy Regression Kink Estimates, Maximum Symmetric Bandwith', panel A, row 'Exit Age', column 'Short Contribution Years – Women' (pdf p.32, printed p.30)"
+        quote: "Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030)"
+      - name: exit_age_per_era_year_men_short
+        value: 0.358
+        unit: years_per_year
+        as_printed: "0.358"
+        standard_error: 0.047
+        standard_error_as_printed: "(0.047)"
+        confidence_interval: null
+        definition: "Increase in average job-exit age per 1-year increase in the ERA (2000 reform kink)"
+        population: "Men with short contribution years"
+        verification: verified_from_text
+        evidence: primary
+        text_source: nber_w22561_pdf
+        locator: "Table 3, panel A, row 'Exit Age', column 'Short Contribution Years – Men' (pdf p.32)"
+        quote: "Exit Age 0.390 0.358 0.391 0.320 (0.062) (0.047) (0.050) (0.030)"
+      - name: claim_age_per_era_year_women_short
+        value: 0.540
+        unit: years_per_year
+        as_printed: "0.540"
+        standard_error: 0.059
+        standard_error_as_printed: "(0.059)"
+        confidence_interval: null
+        definition: "Increase in average pension-claiming age per 1-year increase in the ERA (2000 reform kink)"
+        population: "Women with short contribution years"
+        verification: verified_from_text
+        evidence: primary
+        text_source: nber_w22561_pdf
+        locator: "Table 3, panel A, row 'Claim Age', column 'Short Contribution Years – Women' (pdf p.32)"
+        quote: "Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031)"
+      - name: claim_age_per_era_year_men_short
+        value: 0.539
+        unit: years_per_year
+        as_printed: "0.539"
+        standard_error: 0.049
+        standard_error_as_printed: "(0.049)"
+        confidence_interval: null
+        definition: "Increase in average pension-claiming age per 1-year increase in the ERA (2000 reform kink)"
+        population: "Men with short contribution years"
+        verification: verified_from_text
+        evidence: primary
+        text_source: nber_w22561_pdf
+        locator: "Table 3, panel A, row 'Claim Age', column 'Short Contribution Years – Men' (pdf p.32)"
+        quote: "Claim Age 0.540 0.539 0.496 0.464 (0.059) (0.049) (0.048) (0.031)"
+    derived:
+      - name: exit_delay_share_of_claim_delay_women
+        op: ratio
+        numerator: exit_age_per_era_year_women_short
+        denominator: claim_age_per_era_year_women_short
+        sign: 1
+        value: 0.722
+        unit: share
+        rounding: 3
+        meaning: "Job-exit delay as a share of pension-claim delay (years-based analogue of the employment share)"
+      - name: exit_delay_share_of_claim_delay_men
+        op: ratio
+        numerator: exit_age_per_era_year_men_short
+        denominator: claim_age_per_era_year_men_short
+        sign: 1
+        value: 0.664
+        unit: share
+        rounding: 3
+        meaning: "Job-exit delay as a share of pension-claim delay (years-based analogue of the employment share)"
+    notes: >-
+      Abstract (pdf p.2): 'a 1.0-year increase in the ERA leads to a 0.4-year increase in the average
+      job exiting age and a 0.5-year increase in the average pension claiming age.' This is a
+      years-based measure (average exit age), not a percentage-point employment rate; it is used in
+      the grid only as a cross-check. Working-paper numbers; a published version was not checked.
+
+  # ------------------------------------------------------------------ UK women SPA (working paper)
+  - id: cribb_emmerson_tetlow_2014_gbr_wp
+    citation: >-
+      Cribb, J., Emmerson, C. and Tetlow, G. (2014). Labour supply effects of increasing the female
+      state pension age in the UK from age 60 to 62. IFS Working Paper W14/19.
+    doi: "10.1920/wp.ifs.2014.1419"
+    url: "https://doi.org/10.1920/wp.ifs.2014.1419"
+    accessed_at: "2026-10-15T01:05:41Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1920/wp.ifs.2014.1419"
+      accessed_at: "2026-10-15T01:05:22Z"
+      sha256: af4c2162cca41d5818ad5732fc23c67d1c5ec17c9163daafa150ec614970bfef
+      bytes: 1800
+      abstract_in_record: false
+    country: GBR
+    period: "April 2010 – March 2014 (data 2009Q2–2014Q1)"
+    design: "Difference-in-differences across birth cohorts (probit preferred; OLS reported), Labour Force Survey"
+    method_family: quasi_experimental
+    policy_change: "Female state pension age (also the earliest age of state pension receipt) raised from 60 to 62"
+    population: "Women aged 60–61 born 1949–50 to 1952–53"
+    text_sources:
+      - id: ifs_wp201419_pdf
+        kind: working_paper_version
+        title: "IFS Working Paper W14/19 (July 2014)"
+        doi: "10.1920/wp.ifs.2014.1419"
+        url: "https://ifs.org.uk/sites/default/files/output_url_files/wp201419.pdf"
+        accessed_at: "2026-10-15T01:05:41Z"
+        sha256: 4d4213f4d3cf6a92f7aa948fafc1df785930e6f8c1e87cbfeae37c3c94cf6cbc
+        bytes: 761835
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IFS working paper, copyright IFS/authors; not redistributed."
+    values:
+      - name: employment_effect_women_60_61
+        value: 5.9
+        unit: percentage_points
+        as_printed: "5.9"
+        standard_error: 1.5
+        standard_error_as_printed: "[0.015]"
+        confidence_interval: null
+        definition: "Change in the probability of women aged 60–61 being in work due to being below the raised SPA (probit marginal effect)"
+        population: "Women aged 60–61, UK, April 2010 – March 2014"
+        verification: verified_from_text
+        evidence: primary
+        text_source: ifs_wp201419_pdf
+        locator: "Abstract (pdf p.3); standard error from Table 3.1, bottom panel 'Probit', row '(1) Estimate across all periods' (pdf p.9): '+0.059*** [0.015]'"
+        quote: "we find that women’s employment rates at ages 60 to 61 were increased by 5.9 percentage points as a result of the state pension age increasing from age 60 to age 62 between April 2010 and March 2014."
+        notes: "OLS gives +0.061*** [0.015]. No pension-receipt effect is reported in this working paper, so no employment share is derived here (see the published version entry)."
+    related_entries: [cribb_emmerson_tetlow_2016_gbr]
+    notes: "Working-paper predecessor of the Labour Economics (2016) article; numbers differ slightly from the published version."
+
+  # ------------------------------------------------------------------ UK women SPA (published, via compilation)
+  - id: cribb_emmerson_tetlow_2016_gbr
+    citation: >-
+      Cribb, J., Emmerson, C. and Tetlow, G. (2016). Signals matter? Large retirement responses to
+      limited financial incentives. Labour Economics 42, 203–212.
+    doi: "10.1016/j.labeco.2016.09.005"
+    url: "https://doi.org/10.1016/j.labeco.2016.09.005"
+    accessed_at: "2026-10-15T01:03:02Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1016/j.labeco.2016.09.005"
+      accessed_at: "2026-10-15T01:01:48Z"
+      sha256: 0fd0b8d4d316ea3213386571e14816207defdf5ebf7bfc311659d8448aa0d698
+      bytes: 14661
+      abstract_in_record: false
+    country: GBR
+    period: "2010 onwards (female SPA increase)"
+    design: "Difference-in-differences (per the compilation table)"
+    method_family: quasi_experimental
+    policy_change: "Female state pension age 60 → 62 (compilation labels it 'ERA 60 → 62')"
+    population: "UK women at the old threshold age"
+    text_sources:
+      - id: iza_dp14150_pdf
+        kind: secondary_compilation
+        title: "Atav, Jongen and Rabaté (2021), Increasing the Effective Retirement Age: Key Factors and Interaction Effects, IZA DP No. 14150, Appendix Table B.1"
+        doi: "10.2139/ssrn.3798903"
+        url: "https://docs.iza.org/dp14150.pdf"
+        accessed_at: "2026-10-15T01:03:02Z"
+        sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+        bytes: 646046
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed."
+    values:
+      - name: employment_effect_women
+        value: 6.3
+        unit: percentage_points
+        as_printed: "+6.3"
+        standard_error: null
+        confidence_interval: null
+        definition: "Employment-rate effect near the raised threshold (as tabulated by the compilation)"
+        population: "UK women, female SPA 60 → 62"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Cribb et al. (2016)', columns 'Employm. rate pp' and 'Retirem. rate pp'; Table C.1 (pdf p.45) gives the primary locators: employment 'Table 4', retirement 'Table 5, \"Retired\"'"
+        quote: "Cribb et al. (2016) UK ♀: ERA 60 → 62 DID +6.3 –11.5 55 0.25 14"
+      - name: retirement_effect_women
+        value: -11.5
+        unit: percentage_points
+        as_printed: "–11.5"
+        standard_error: null
+        confidence_interval: null
+        definition: "Change in the share retired near the raised threshold (as tabulated by the compilation)"
+        population: "UK women, female SPA 60 → 62"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Cribb et al. (2016)', column 'Retirem. rate pp'"
+        quote: "Cribb et al. (2016) UK ♀: ERA 60 → 62 DID +6.3 –11.5 55 0.25 14"
+    derived:
+      - name: employment_share_of_retirement_drop_women
+        op: ratio
+        numerator: employment_effect_women
+        denominator: retirement_effect_women
+        sign: -1
+        value: 0.548
+        unit: share
+        rounding: 3
+        meaning: "Share of women kept out of retirement who are employed instead (compilation values)"
+    not_verified: "The published article was not read: ScienceDirect returned HTTP 403 and the Elsevier API rate-limited (429) although Crossref lists a CC-BY 4.0 licence. Numbers come from the compilation only; standard errors not verified."
+    related_entries: [cribb_emmerson_tetlow_2014_gbr_wp]
+    notes: "Denominator is the change in self-reported 'retired' status, not pension receipt."
+
+  # ------------------------------------------------------------------ Germany women ERA (working paper)
+  - id: geyer_welteke_2017_deu_wp
+    citation: >-
+      Geyer, J. and Welteke, C. (2017). Closing Routes to Retirement: How Do People Respond?
+      IZA Discussion Paper No. 10681.
+    doi: "10.2139/ssrn.2949117"
+    url: "https://docs.iza.org/dp10681.pdf"
+    accessed_at: "2026-10-15T01:04:34Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.2139/ssrn.2949117"
+      accessed_at: "2026-10-15T01:08:11Z"
+      sha256: 52e8cb3aa931520449226717ae2a3198c8186db3a204991fd544baef1073bd91
+      bytes: 2725
+      abstract_in_record: true
+    country: DEU
+    period: "Cohorts born around the 1951/1952 cutoff, observed at ages 60–61"
+    design: "Regression discontinuity in month of birth, administrative pension-insurance data (VSKT 2014)"
+    method_family: quasi_experimental
+    policy_change: "Abolition of the early-retirement 'pension for women' for women born after 1951, effectively raising their ERA by three years (60 → 63)"
+    population: "Women aged 60–61 who met the eligibility criteria of the abolished pension for women (N = 3,771)"
+    text_sources:
+      - id: iza_dp10681_pdf
+        kind: working_paper_version
+        title: "IZA DP No. 10681 (March 2017)"
+        doi: "10.2139/ssrn.2949117"
+        url: "https://docs.iza.org/dp10681.pdf"
+        accessed_at: "2026-10-15T01:04:34Z"
+        sha256: 0eccd2ee017cb74f3ac9927bcf1ab1ec1828e4580d8b7a9fadb94eba2cd71ec6
+        bytes: 1469886
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed."
+        differs_from_cited_version: "The JHR (2021) version reports +13.5 pp per the compilation (see geyer_welteke_2021_deu)."
+    values:
+      - name: employment_effect_women_60_61
+        value: 0.144
+        unit: proportion
+        as_printed: "0.144"
+        standard_error: 0.0271
+        standard_error_as_printed: "(0.0271)"
+        confidence_interval: null
+        definition: "Change in the employment rate (proportion; 0.144 = 14.4 percentage points) of women aged 60–61 due to the ERA increase"
+        population: "Eligible women aged 60–61"
+        verification: verified_from_text
+        evidence: primary
+        text_source: iza_dp10681_pdf
+        locator: "Table 1 'Linear regression results, age 60-61', row 'Di', column (1) Employment (pdf p.18); text p.17: 'average positive effect of 14.4 percentage points'"
+        quote: "Di 0.144*** 0.052*** -0.004 0.052*** -0.249*** (0.0271) (0.0111) (0.0232) (0.0123) (0.0270)"
+        notes: "Pre-treatment employment mean 0.538."
+      - name: pension_receipt_effect_women_60_61
+        value: -0.249
+        unit: proportion
+        as_printed: "-0.249"
+        standard_error: 0.0270
+        standard_error_as_printed: "(0.0270)"
+        confidence_interval: null
+        definition: "Change in the share receiving a pension (proportion)"
+        population: "Eligible women aged 60–61"
+        verification: verified_from_text
+        evidence: primary
+        text_source: iza_dp10681_pdf
+        locator: "Table 1, row 'Di', column (5) Pension (pdf p.18)"
+        quote: "Di 0.144*** 0.052*** -0.004 0.052*** -0.249*** (0.0271) (0.0111) (0.0232) (0.0123) (0.0270)"
+      - name: share_continue_working_printed
+        value: 58
+        unit: percent
+        as_printed: "58%"
+        standard_error: null
+        confidence_interval: null
+        definition: "Authors' statement of the share of women who would have retired but continue to work"
+        population: "Eligible women aged 60–61"
+        verification: verified_from_text
+        evidence: primary
+        text_source: iza_dp10681_pdf
+        locator: "Section 6.1 'Baseline results' (pdf p.17)"
+        quote: "About 58% of those women, who would have retired if they had the option, continue to work due to the reform."
+    derived:
+      - name: employment_share_of_pension_drop_women
+        op: ratio
+        numerator: employment_effect_women_60_61
+        denominator: pension_receipt_effect_women_60_61
+        sign: -1
+        value: 0.578
+        unit: share
+        rounding: 3
+        meaning: "Share of women kept out of pension receipt who are employed instead"
+        printed_as: "About 58%"
+    related_entries: [geyer_welteke_2021_deu]
+    notes: "Unemployment and inactivity each +5.2 pp (Table 1, columns 2 and 4); no effect on disability pensions."
+
+  # ------------------------------------------------------------------ Germany women ERA (published, via compilation)
+  - id: geyer_welteke_2021_deu
+    citation: >-
+      Geyer, J. and Welteke, C. (2021). Closing Routes to Retirement for Women: How Do They Respond?
+      Journal of Human Resources 56(1), 311–341.
+    doi: "10.3368/jhr.56.1.0717-8947r2"
+    url: "https://doi.org/10.3368/jhr.56.1.0717-8947r2"
+    accessed_at: "2026-10-15T01:03:02Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.3368/jhr.56.1.0717-8947r2"
+      accessed_at: "2026-10-15T01:01:48Z"
+      sha256: 83030c30188de3dba6bf5a05efbd9c6a27b254a545c49f525dbfb94d82886448
+      bytes: 2126
+      abstract_in_record: false
+    country: DEU
+    period: "Cohorts born around 1951/1952"
+    design: "Regression discontinuity (per the compilation table)"
+    method_family: quasi_experimental
+    policy_change: "Women's ERA 60 → 63 (abolition of the pension for women)"
+    population: "German women affected by the abolition"
+    text_sources:
+      - id: iza_dp14150_pdf
+        kind: secondary_compilation
+        title: "Atav, Jongen and Rabaté (2021), IZA DP No. 14150, Appendix Table B.1"
+        doi: "10.2139/ssrn.3798903"
+        url: "https://docs.iza.org/dp14150.pdf"
+        accessed_at: "2026-10-15T01:03:02Z"
+        sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+        bytes: 646046
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed."
+    values:
+      - name: employment_effect_women
+        value: 13.5
+        unit: percentage_points
+        as_printed: "+13.5"
+        standard_error: null
+        confidence_interval: null
+        definition: "Employment-rate effect near the raised ERA (as tabulated by the compilation)"
+        population: "German women, ERA 60 → 63"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Geyer & Welteke (2019)'; Table C.1 (pdf p.45) gives primary locators Table 1 column (1) and column (5)"
+        quote: "Geyer & Welteke (2019) GER ♀: ERA 60 → 63 RDD +13.5 –27.6 62 0.19 12"
+      - name: pension_receipt_effect_women
+        value: -27.6
+        unit: percentage_points
+        as_printed: "–27.6"
+        standard_error: null
+        confidence_interval: null
+        definition: "Change in retirement (pension) rate near the raised ERA (as tabulated by the compilation)"
+        population: "German women, ERA 60 → 63"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Geyer & Welteke (2019)', column 'Retirem. rate pp'"
+        quote: "Geyer & Welteke (2019) GER ♀: ERA 60 → 63 RDD +13.5 –27.6 62 0.19 12"
+    derived:
+      - name: employment_share_of_pension_drop_women
+        op: ratio
+        numerator: employment_effect_women
+        denominator: pension_receipt_effect_women
+        sign: -1
+        value: 0.489
+        unit: share
+        rounding: 3
+        meaning: "Share of women kept out of pension receipt who are employed instead (compilation values)"
+    not_verified: "The JHR article itself was not accessible (no open-access copy found); numbers from the compilation only, standard errors not verified."
+    related_entries: [geyer_welteke_2017_deu_wp]
+    notes: "Compilation cites the online-first (2019) version."
+
+  # ------------------------------------------------------------------ Netherlands SRA
+  - id: atav_jongen_rabate_2021_nld_wp
+    citation: >-
+      Atav, T., Jongen, E. and Rabaté, S. (2021). Increasing the Effective Retirement Age: Key Factors
+      and Interaction Effects. IZA Discussion Paper No. 14150. Working-paper version of Rabaté, Jongen
+      and Atav (2024), American Economic Journal: Economic Policy 16(1), 259–291.
+    doi: "10.2139/ssrn.3798903"
+    url: "https://docs.iza.org/dp14150.pdf"
+    accessed_at: "2026-10-15T01:03:02Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.2139/ssrn.3798903"
+      accessed_at: "2026-10-15T01:08:11Z"
+      sha256: 179af54dd4506cdd14cf057003df6849c10e2a4933e027338b0b3d445d85ed1f
+      bytes: 2194
+      abstract_in_record: true
+    country: NLD
+    period: "2007–2019 (SRA increases from 2013)"
+    design: "Regression discontinuity in date of birth, administrative data on the universe of the Dutch population"
+    method_family: quasi_experimental
+    policy_change: "Statutory retirement age (AOW) raised from 65 to 66 years and 4 months between 2013 and 2019; main estimate at cutoff 4 (SRA 65y6m → 65y9m)"
+    population: "Individuals born just before vs. after July 1951, outcome at age 65 years and 6 months"
+    text_sources:
+      - id: iza_dp14150_pdf
+        kind: working_paper_version
+        title: "IZA DP No. 14150 (February 2021)"
+        doi: "10.2139/ssrn.3798903"
+        url: "https://docs.iza.org/dp14150.pdf"
+        accessed_at: "2026-10-15T01:03:02Z"
+        sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+        bytes: 646046
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed."
+        differs_from_cited_version: "The AEJ:EP (2024) published version was not read; its numbers may differ."
+    values:
+      - name: employment_effect
+        value: 18.943
+        unit: percentage_points
+        as_printed: "18.943"
+        standard_error: 0.446
+        standard_error_as_printed: "(0.446)"
+        confidence_interval: null
+        definition: "RD effect of the SRA increase on the probability of employment at age 65y6m"
+        population: "Dutch individuals at cutoff 4 (born around July 1951)"
+        verification: verified_from_text
+        evidence: primary
+        text_source: iza_dp14150_pdf
+        locator: "Table 4 'Effect of the SRA reform (all workstates, cutoff 4)', row 'Treatment effect', column Employment (pdf p.18, printed p.15)"
+        quote: "Treatment effect 18.943 −58.945 3.962 12.679 16.403 4.098 2.873 (0.446) (0.459) (0.162) (0.279) (0.303) (0.164) (0.156)"
+      - name: retirement_effect
+        value: -58.945
+        unit: percentage_points
+        as_printed: "−58.945"
+        standard_error: 0.459
+        standard_error_as_printed: "(0.459)"
+        confidence_interval: null
+        definition: "RD effect on the probability of being retired (main income source: pension)"
+        population: "Dutch individuals at cutoff 4"
+        verification: verified_from_text
+        evidence: primary
+        text_source: iza_dp14150_pdf
+        locator: "Table 4, row 'Treatment effect', column Retirement (pdf p.18)"
+        quote: "Treatment effect 18.943 −58.945 3.962 12.679 16.403 4.098 2.873 (0.446) (0.459) (0.162) (0.279) (0.303) (0.164) (0.156)"
+    derived:
+      - name: employment_share_of_retirement_drop
+        op: ratio
+        numerator: employment_effect
+        denominator: retirement_effect
+        sign: -1
+        value: 0.321
+        unit: share
+        rounding: 3
+        meaning: "Share of people kept out of retirement who are employed instead"
+        printed_as: "The employment rate increases by 19 percentage points (32% of the decrease in retirement)."
+    related_entries: [rabate_jongen_atav_2024_nld]
+    notes: >-
+      Disability +12.679 pp, no income +16.403 pp (same table). The authors' Table B.1 shows the
+      employment effect rising with pre-reform bunching at the threshold; the Dutch effect at the
+      earlier, more generous cutoffs is only +4.5 pp.
+
+  - id: rabate_jongen_atav_2024_nld
+    citation: >-
+      Rabaté, S., Jongen, E. and Atav, T. (2024). Increasing the Retirement Age: Policy Effects and
+      Underlying Mechanisms. American Economic Journal: Economic Policy 16(1), 259–291.
+    doi: "10.1257/pol.20210101"
+    url: "https://doi.org/10.1257/pol.20210101"
+    accessed_at: "2026-10-15T01:01:49Z"
+    verification_status: metadata_only
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1257/pol.20210101"
+      accessed_at: "2026-10-15T01:01:49Z"
+      sha256: b94a3f87bf21b2ffb3143ec1f1a7b2b0f3004ca1e73704027d718b4aca938e2b
+      bytes: 8222
+      abstract_in_record: true
+    country: NLD
+    period: "SRA increases from 2013"
+    design: "Regression discontinuity design, administrative data (Crossref abstract)"
+    method_family: quasi_experimental
+    policy_change: "Increase in the Dutch statutory retirement age"
+    population: "Universe of the Dutch population near the SRA"
+    text_sources: []
+    values: []
+    derived: []
+    not_verified: "number not verified: the Crossref abstract states 'clear and large employment effects' without a number; the Leiden repository copy fetched (sha256 669c16d84665eb841535f95326e1fd8f8128218ae6b4f119414ea65207084974) contained only figures as extractable text. Use the IZA DP 14150 entry for numbers."
+    related_entries: [atav_jongen_rabate_2021_nld_wp]
+    notes: "Published version of atav_jongen_rabate_2021_nld_wp."
+
+  # ------------------------------------------------------------------ France 2010 reform
+  - id: rabate_rochut_2020_fra
+    citation: >-
+      Rabaté, S. and Rochut, J. (2020). Employment and substitution effects of raising the statutory
+      retirement age in France. Journal of Pension Economics and Finance 19(3), 293–308
+      (online 2019).
+    doi: "10.1017/s1474747218000392"
+    url: "https://doi.org/10.1017/s1474747218000392"
+    accessed_at: "2026-10-15T01:03:02Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1017/s1474747218000392"
+      accessed_at: "2026-10-15T01:01:47Z"
+      sha256: e67103cf144d6885a05b55e83c346651c2d9009c27583fa08f43620b298a5f29
+      bytes: 7483
+      abstract_in_record: true
+    country: FRA
+    period: "Generations around the first step of the 2010 reform (statutory eligibility age 60 → 61)"
+    design: "Difference-in-differences across succeeding generations, social-security administrative data (Crossref abstract)"
+    method_family: quasi_experimental
+    policy_change: "2010 French pension reform: statutory (minimum) eligibility age raised from 60 to 61 for the first affected cohorts (60 → 62 when fully phased)"
+    population: "French workers of the first generations affected, at age 60"
+    text_sources:
+      - id: iza_dp14150_pdf
+        kind: secondary_compilation
+        title: "Atav, Jongen and Rabaté (2021), IZA DP No. 14150, Appendix Table B.1"
+        doi: "10.2139/ssrn.3798903"
+        url: "https://docs.iza.org/dp14150.pdf"
+        accessed_at: "2026-10-15T01:03:02Z"
+        sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+        bytes: 646046
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed. One compilation author (S. Rabaté) is also an author of the cited study."
+    values:
+      - name: employment_effect
+        value: 20.9
+        unit: percentage_points
+        as_printed: "+20.9"
+        standard_error: null
+        confidence_interval: null
+        definition: "Employment-rate effect at the old eligibility age (as tabulated by the compilation)"
+        population: "France, statutory age 60 → 61"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Rabaté & Rochut (2019)'; Table C.1 (pdf p.45) gives primary locators: Table 5, column 'Employment' and column 'Retirement'. The same number appears in the introduction (pdf p.4): 'ranging from 6.3 percentage points in Cribb et al. (2016) to 20.9 percentage points in Rabaté & Rochut (2019)'"
+        quote: "Rabaté & Rochut (2019) FRA NRA 60 → 61 DID +20.9 –47.8 45 0.50 23"
+      - name: retirement_effect
+        value: -47.8
+        unit: percentage_points
+        as_printed: "–47.8"
+        standard_error: null
+        confidence_interval: null
+        definition: "Change in the retirement rate at the old eligibility age (as tabulated by the compilation)"
+        population: "France, statutory age 60 → 61"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Rabaté & Rochut (2019)', column 'Retirem. rate pp'"
+        quote: "Rabaté & Rochut (2019) FRA NRA 60 → 61 DID +20.9 –47.8 45 0.50 23"
+    derived:
+      - name: employment_share_of_retirement_drop
+        op: ratio
+        numerator: employment_effect
+        denominator: retirement_effect
+        sign: -1
+        value: 0.437
+        unit: share
+        rounding: 3
+        meaning: "Share of people kept out of retirement by the 2010 reform's first step who are employed instead (compilation values)"
+    not_verified: >-
+      The primary text was not readable: Cambridge full text is paywalled (Unpaywall: not open
+      access) and the HAL working-paper copy (halshs-01622346, PSE WP 2017-46) is behind a bot
+      challenge. The Crossref abstract (verified) says only 'despite a sizable effect on the
+      employment rate, the reform also strongly increased unemployment and disability rates'.
+      Standard errors not verified.
+    notes: >-
+      Most directly relevant study for France, but it is estimated on the 2010 reform that PEN uses
+      as its back-test: using it to set the back-test parameter would leak the test period (see
+      docs/dev/v2_literature.md).
+
+  # ------------------------------------------------------------------ Italy NRA
+  - id: ardito_2021_ita
+    citation: >-
+      Ardito, C. (2021). The unequal impact of raising the retirement age: Employment response and
+      program substitution. IZA Journal of Labor Economics 10(1), article 20210003.
+    doi: "10.2478/izajole-2021-0003"
+    url: "https://doi.org/10.2478/izajole-2021-0003"
+    accessed_at: "2026-10-15T01:02:17Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.2478/izajole-2021-0003"
+      accessed_at: "2026-10-15T01:01:50Z"
+      sha256: 43558bf635c8919d2d6e7c9dd6c5cd366878349fbc81bbc5633847ba0c348eda
+      bytes: 19879
+      abstract_in_record: true
+    country: ITA
+    period: "Control cohorts born 1931–1933, treated cohorts born 1934–1936, observed at ages 60–64"
+    design: "Difference-in-differences (standard and de Chaisemartin–D'Haultfoeuille staggered estimator), administrative registers, wild-cluster bootstrap"
+    method_family: quasi_experimental
+    policy_change: "1992 reform raising the normal retirement age from 60 to 65 for private-sector male employees"
+    population: "Male private-sector employees aged 60–64"
+    text_sources:
+      - id: sciendo_izajole_2021_0003_pdf
+        kind: published_version
+        title: "Published article PDF (Sciendo)"
+        doi: "10.2478/izajole-2021-0003"
+        url: "https://www.sciendo.com/pdf/10.2478/izajole-2021-0003"
+        accessed_at: "2026-10-15T01:02:17Z"
+        sha256: 2aee07d5fe0ad99770e9d0e8388542f1d4c56df7ac1ae22790275aa35e91f3c8
+        bytes: 1828237
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "CC BY 4.0 per Crossref licence metadata; text not archived to keep the registry small."
+    values:
+      - name: employment_effect_men
+        value: 0.087
+        unit: proportion
+        as_printed: "0.087"
+        standard_error: null
+        confidence_interval: null
+        definition: "DD effect of being below the raised NRA on employment (proportion; 0.087 = 8.7 pp), standard DD estimator"
+        population: "Male private-sector employees aged 60–64, treated cohorts 1934–1936"
+        verification: verified_from_text
+        evidence: primary
+        text_source: sciendo_izajole_2021_0003_pdf
+        locator: "Table 4 'Effect of raising the NRA on different labor market outcomes', Panel A, row 'Age<NRA', column Employment (pdf p.17)"
+        quote: "Age<NRA −0.440*** 0.087*** 0.134*** 0.042*** 0.016"
+        notes: "Panel A reports p-values, not standard errors. Panel B (staggered DD estimator): 0.090 with WB SE 0.008."
+      - name: pension_claim_effect_men
+        value: -0.440
+        unit: proportion
+        as_printed: "−0.440"
+        standard_error: null
+        confidence_interval: null
+        definition: "DD effect on drawing a pension (proportion)"
+        population: "Male private-sector employees aged 60–64, treated cohorts 1934–1936"
+        verification: verified_from_text
+        evidence: primary
+        text_source: sciendo_izajole_2021_0003_pdf
+        locator: "Table 4, Panel A, row 'Age<NRA', column 'Pension benefit' (pdf p.17)"
+        quote: "Age<NRA −0.440*** 0.087*** 0.134*** 0.042*** 0.016"
+      - name: employment_effect_staggered_men
+        value: 0.090
+        unit: proportion
+        as_printed: "0.090"
+        standard_error: 0.008
+        standard_error_as_printed: "0.008"
+        confidence_interval: null
+        definition: "Employment effect with the de Chaisemartin–D'Haultfoeuille (2020b) DD estimator"
+        population: "Male private-sector employees aged 60–64"
+        verification: verified_from_text
+        evidence: primary
+        text_source: sciendo_izajole_2021_0003_pdf
+        locator: "Table 4, Panel B, rows 'Age<NRA' and 'WB SE', column Employment (pdf p.17)"
+        quote: "Age<NRA −0.552*** 0.090*** 0.130*** 0.025*** 0.003 WB SE 0.016 0.008 0.005 0.002 0.005"
+      - name: pension_claim_effect_staggered_men
+        value: -0.552
+        unit: proportion
+        as_printed: "−0.552"
+        standard_error: 0.016
+        standard_error_as_printed: "0.016"
+        confidence_interval: null
+        definition: "Pension-claim effect with the de Chaisemartin–D'Haultfoeuille (2020b) DD estimator"
+        population: "Male private-sector employees aged 60–64"
+        verification: verified_from_text
+        evidence: primary
+        text_source: sciendo_izajole_2021_0003_pdf
+        locator: "Table 4, Panel B, rows 'Age<NRA' and 'WB SE', column 'Pension benefit' (pdf p.17)"
+        quote: "Age<NRA −0.552*** 0.090*** 0.130*** 0.025*** 0.003 WB SE 0.016 0.008 0.005 0.002 0.005"
+    derived:
+      - name: employment_share_of_pension_drop_men
+        op: ratio
+        numerator: employment_effect_men
+        denominator: pension_claim_effect_men
+        sign: -1
+        value: 0.198
+        unit: share
+        rounding: 3
+        meaning: "Share of men kept out of pension receipt who are employed instead (standard DD)"
+      - name: employment_share_of_pension_drop_staggered_men
+        op: ratio
+        numerator: employment_effect_staggered_men
+        denominator: pension_claim_effect_staggered_men
+        sign: -1
+        value: 0.163
+        unit: share
+        rounding: 3
+        meaning: "Same share with the staggered-DD estimates"
+    notes: "Inactivity (+0.134) rose more than employment; disability take-up +0.042 (Panel A)."
+
+  # ------------------------------------------------------------------ Australia women
+  - id: atalay_barrett_2015_aus
+    citation: >-
+      Atalay, K. and Barrett, G. F. (2015). The Impact of Age Pension Eligibility Age on Retirement
+      and Program Dependence: Evidence from an Australian Experiment. Review of Economics and
+      Statistics 97(1), 71–87.
+    doi: "10.1162/rest_a_00443"
+    url: "https://doi.org/10.1162/rest_a_00443"
+    accessed_at: "2026-10-15T01:03:02Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1162/rest_a_00443"
+      accessed_at: "2026-10-15T01:01:49Z"
+      sha256: b594a981a488088c067be27fa1ec50ad6db635306f9bbcf16e0b162664b07278
+      bytes: 3228
+      abstract_in_record: false
+    country: AUS
+    period: "Phased increase of the women's Age Pension age"
+    design: "Difference-in-differences (per the compilation table)"
+    method_family: quasi_experimental
+    policy_change: "Women's Age Pension eligibility age 60 → 65"
+    population: "Australian women"
+    text_sources:
+      - id: iza_dp14150_pdf
+        kind: secondary_compilation
+        title: "Atav, Jongen and Rabaté (2021), IZA DP No. 14150, Appendix Table B.1"
+        doi: "10.2139/ssrn.3798903"
+        url: "https://docs.iza.org/dp14150.pdf"
+        accessed_at: "2026-10-15T01:03:02Z"
+        sha256: 4bbb8c9042e53a3cea1a66576e51125ac8561103ee0b3dbc789a394885b4a51e
+        bytes: 646046
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "IZA discussion paper, copyright authors; not redistributed."
+    values:
+      - name: employment_effect_women
+        value: 7.7
+        unit: percentage_points
+        as_printed: "+7.7"
+        standard_error: null
+        confidence_interval: null
+        definition: "Employment-rate effect (as tabulated by the compilation); no retirement-rate effect tabulated"
+        population: "Australian women, Age Pension age 60 → 65"
+        verification: verified_from_text
+        evidence: secondary_compilation
+        text_source: iza_dp14150_pdf
+        locator: "IZA DP 14150 Appendix Table B.1 (pdf p.38), row 'Atalay & Barrett (2015)'; Table C.1 gives the primary locator 'Table 3, column Full Sample'"
+        quote: "Atalay & Barrett (2015) AUS ♀: NRA 60 → 65 DID +7.7 × 30–50 × ×"
+    derived: []
+    not_verified: "The REStat article was not accessible (no open-access copy found). No pension/retirement effect is tabulated, so no employment share can be derived; standard error not verified."
+    notes: "Usable only as an absolute-pp cross-check, not in the share grid."
+
+  # ------------------------------------------------------------------ USA NRA
+  - id: mastrobuoni_2009_usa
+    citation: >-
+      Mastrobuoni, G. (2009). Labor supply effects of the recent social security benefit cuts:
+      Empirical estimates using cohort discontinuities. Journal of Public Economics 93(11–12),
+      1224–1233.
+    doi: "10.1016/j.jpubeco.2009.07.009"
+    url: "https://doi.org/10.1016/j.jpubeco.2009.07.009"
+    accessed_at: "2026-10-15T01:05:45Z"
+    verification_status: verified_from_text
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1016/j.jpubeco.2009.07.009"
+      accessed_at: "2026-10-15T01:01:49Z"
+      sha256: ed30d1819f8ab87cbc0d4e811c47daefb87ae173815174b36d404940ffa65dfa
+      bytes: 10464
+      abstract_in_record: false
+    country: USA
+    period: "Cohorts born 1938 and after, reaching retirement age from 2000"
+    design: "Cohort discontinuities in the Normal Retirement Age schedule"
+    method_family: quasi_experimental
+    policy_change: "US Normal Retirement Age raised by two months per birth year for cohorts born 1938 and after"
+    population: "Affected US cohorts"
+    text_sources:
+      - id: carlo_alberto_notebook_33_pdf
+        kind: working_paper_version
+        title: "Carlo Alberto Notebooks No. 33 (version November 2006)"
+        doi: null
+        url: "https://www.carloalberto.org/wp-content/uploads/2018/11/no.33.pdf"
+        accessed_at: "2026-10-15T01:05:45Z"
+        sha256: de899c84f813711d6b63d6016e3cd00b48699d71f02c0e7a1f5ebbbe9f2d4519
+        bytes: 307334
+        media_type: "application/pdf"
+        archived: false
+        licence_note: "Copyright author (2006); not redistributed."
+        differs_from_cited_version: "Earlier working-paper version; the 2009 journal version was not read."
+    values:
+      - name: retirement_age_response_per_nra_year
+        value: 0.5
+        unit: years_per_year
+        as_printed: "about half"
+        standard_error: null
+        confidence_interval: null
+        definition: "Increase in the mean retirement age of affected cohorts relative to the increase in the NRA (verbal, approximate)"
+        population: "US cohorts born 1938 and after"
+        verification: verified_from_text
+        evidence: primary
+        text_source: carlo_alberto_notebook_33_pdf
+        locator: "Abstract (pdf p.3)"
+        quote: "The evidence strongly suggests that the mean retirement age of the affected cohorts has increased by about half as much as the increase in the NRA."
+        notes: "Verbal approximation, recorded as 0.5; no standard error. Cross-check only (years-based, US benefit-cut reform rather than an eligibility-age change)."
+    derived: []
+    notes: "The NRA change is a benefit cut at a given claiming age, not a change of the minimum eligibility age."
+
+  # ------------------------------------------------------------------ Germany, metadata only
+  - id: geyer_haan_hammerschmid_peters_2020_deu
+    citation: >-
+      Geyer, J., Haan, P., Hammerschmid, A. and Peters, M. (2020). Labor Market and Distributional
+      Effects of an Increase in the Retirement Age. Labour Economics 65, 101817.
+    doi: "10.1016/j.labeco.2020.101817"
+    url: "https://doi.org/10.1016/j.labeco.2020.101817"
+    accessed_at: "2026-10-15T01:01:50Z"
+    verification_status: metadata_only
+    metadata_check:
+      source: crossref
+      url: "https://api.crossref.org/works/10.1016/j.labeco.2020.101817"
+      accessed_at: "2026-10-15T01:01:50Z"
+      sha256: 9b662a3c7dc8cfcb1b60d94f5dec506146f93cd2d166a25f5efff844bcee8751
+      bytes: 13993
+      abstract_in_record: false
+    country: DEU
+    period: "not verified"
+    design: "not verified"
+    method_family: quasi_experimental
+    policy_change: "not verified (title: increase in the retirement age, Germany)"
+    population: "not verified"
+    text_sources: []
+    values: []
+    derived: []
+    not_verified: "number not verified: no open-access copy (Unpaywall: not OA); Crossref record has no abstract."
+    notes: "Recorded so a reviewer can complete it; not used in the grid."

@@ -1,27 +1,27 @@
 {
  "fixture_kind": "recorded_live_response",
  "label": "openai_fr_sensitivity",
- "recorded_at": "2026-10-15T01:07:52+00:00",
+ "recorded_at": "2026-10-15T01:13:09+00:00",
  "provider": "openai",
  "model_requested": "gpt-4.1",
  "http_status": 200,
- "latency_ms": 2393.8,
+ "latency_ms": 2192.0,
  "prompt_version": "nl-draft-1.0.0",
- "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
- "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "prompt_sha256": "f9662e32a386927e0b1c4a155157e5ed2f48fc6265132ae895475a56e4cda44a",
+ "catalog_digest": "fb2b0a6be4af83cb8c1af58236da6b9e07ac1bb8d6295e00c5eddae061e75744",
  "text": "Que se passe-t-il pour la France et la Chine si le prix du pétrole brut importé et exporté augmente de 25 % en 2022, avec une analyse de sensibilité aux élasticités -0,2 pour les importations et 0,1 pour les exportations ?",
  "text_sha256": "27727e1559289859cc7122287dbf2fc44e6f61c6f65fb399f04d560b2a7fbcc7",
  "response_body": {
   "id": "redacted",
   "object": "chat.completion",
-  "created": 1792026470,
+  "created": 1792026787,
   "model": "gpt-4.1-2025-04-14",
   "choices": [
    {
     "index": 0,
     "message": {
      "role": "assistant",
-     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Pour la France et la Chine, simuler une hausse de 25 % du prix du pétrole brut importé et exporté en 2022, avec une analyse de sensibilité utilisant une élasticité de -0,2 pour les importations et 0,1 pour les exportations.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"Effet d'une hausse de 25 % des prix du pétrole brut importé et exporté en 2022 pour la France et la Chine, avec analyse de sensibilité aux élasticités\",\"countries\":[\"FRA\",\"CHN\"],\"reference_year\":2022,\"fidelity\":\"L2\",\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.25,\"text\":null,\"quote\":\"25 %\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.25,\"text\":null,\"quote\":\"25 %\"},{\"path\":\"assumptions.quantity_response\",\"number\":null,\"text\":\"elasticity_sensitivity\",\"quote\":\"analyse de sensibilité aux élasticités\"},{\"path\":\"assumptions.elasticity_grid[0].import_elasticity\",\"number\":-0.2,\"text\":null,\"quote\":\"-0,2\"},{\"path\":\"assumptions.elasticity_grid[0].export_elasticity\",\"number\":0.1,\"text\":null,\"quote\":\"0,1\"}],\"unsupported\":[],\"assumptions_added\":[\"Aucune autre élasticité n'a été ajoutée à la grille de sensibilité.\",\"Aucune autre année de référence n'a été considérée.\",\"Tous les autres paramètres sont laissés à leur valeur neutre.\"]}",
+     "content": "{\"input_language\":\"fr\",\"request_restatement\":\"Pour la France et la Chine, simuler une hausse de 25 % du prix du pétrole brut importé et exporté en 2022, avec une analyse de sensibilité utilisant une élasticité de -0,2 pour les importations et 0,1 pour les exportations.\",\"model_key\":\"economic.crude_exposure\",\"title\":\"France et Chine : hausse de 25 % des prix du pétrole brut importé et exporté en 2022, sensibilité élasticités\",\"countries\":[\"FRA\",\"CHN\"],\"reference_year\":2022,\"fidelity\":\"L2\",\"outputs\":[],\"parameters\":[{\"path\":\"intervention.import_multiplier\",\"number\":1.25,\"text\":null,\"quote\":\"25 %\"},{\"path\":\"intervention.export_multiplier\",\"number\":1.25,\"text\":null,\"quote\":\"25 %\"},{\"path\":\"assumptions.quantity_response\",\"number\":null,\"text\":\"elasticity_sensitivity\",\"quote\":\"analyse de sensibilité aux élasticités\"},{\"path\":\"assumptions.elasticity_grid[0].import_elasticity\",\"number\":-0.2,\"text\":null,\"quote\":\"-0,2\"},{\"path\":\"assumptions.elasticity_grid[0].export_elasticity\",\"number\":0.1,\"text\":null,\"quote\":\"0,1\"}],\"unsupported\":[],\"assumptions_added\":[\"missing_input_policy fixé à fail (valeur neutre)\"]}",
      "refusal": null,
      "annotations": []
     },
@@ -30,11 +30,11 @@
    }
   ],
   "usage": {
-   "prompt_tokens": 3398,
-   "completion_tokens": 342,
-   "total_tokens": 3740,
+   "prompt_tokens": 4860,
+   "completion_tokens": 301,
+   "total_tokens": 5161,
    "prompt_tokens_details": {
-    "cached_tokens": 3200,
+    "cached_tokens": 4608,
     "audio_tokens": 0
    },
    "completion_tokens_details": {

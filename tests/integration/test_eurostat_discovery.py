@@ -532,6 +532,38 @@ async def test_r4_03_template_change_is_surfaced_not_silently_promoted(db, tmp_p
     assert len(_version_rows(db)) == versions
 
 
+async def test_r6_05_rollback_hold_is_keyed_on_content(db, tmp_path, monkeypatch):
+    """(R6-05) Rolled-back content stays held: neither a proposer-chosen version nor a later template
+    re-pin re-enables it (review scratch test_b_rollback_hold_bypasses). Restores state at the end."""
+    from reva.adapters.connectors import eurostat_template as et
+    from reva.autonomy import binding, generator, jobs, validator
+    from reva.autonomy import promotion as prom
+
+    payload = {"requirement_id": "R-POP-JAN-AGESEX", "mode": "fixture"}
+    active = jobs.promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"]
+    jobs.rollback_promotion(db.owner, CONNECTOR, active, CONCEPT, "human:maintainer", "r6 drill")
+    events = "SELECT count(*) FROM ops.outbox WHERE event_type='autonomy.connector_promoted'"
+    n = _count(db, events)
+    try:
+        with monkeypatch.context() as m:  # (i) a proposer that chooses another version for the same content
+            m.setattr(prom, "resolve_connector_version", lambda conn, io_, man, cd: ("9.9.9", None))
+            out = jobs.handle_discovery(payload, _job_ctx(db, tmp_path))
+        assert out["status"] == "rolled_back_hold", out
+        new = "sha256:" + "ab" * 32
+        with monkeypatch.context() as m:  # (ii) a later maintainer re-pin of the template (unrelated edit)
+            m.setattr(et, "template_digest", lambda: new)
+            m.setattr(validator, "template_digest", lambda: new)
+            m.setattr(generator, "template_digest", lambda: new)
+            m.setattr(binding, "approved_template_digest", lambda policy, t: new)
+            out = jobs.handle_discovery(payload, _job_ctx(db, tmp_path))
+        assert out["status"] == "rolled_back_hold", out
+        assert _count(db, events) == n
+        assert CONNECTOR not in jobs.promoted_connectors(db.worker, db.store)
+    finally:
+        jobs.reapprove_promotion(db.owner, CONNECTOR, active, CONCEPT, "human:maintainer", "r6 drill over")
+    assert jobs.promoted_connectors(db.worker, db.store)[CONNECTOR].manifest["version"] == active
+
+
 @pytest.mark.live
 async def test_live_catalogue_and_sample_still_conform(io):
     """Bounded live check (2 discovery requests + 1 sample): run with ``-m live``."""

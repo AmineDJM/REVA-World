@@ -125,7 +125,8 @@ def _register_model_version(owner: Engine, store: FilesystemArtifactStore) -> No
         sha = repo.store_json_artifact(conn, store, spec, "models", schema_version="model-spec/1")
         conn.execute(text("""INSERT INTO model.version(model_key, version, kind, spec_sha256, code_digest, input_ports,
                                output_ports, applicability, assumptions, approval_status, provenance_activity_id)
-                             VALUES (:k, '0.1.0', 'scenario', :sha, 'test', '[]', '[]', '{}', '[]', 'candidate', :a)"""),
+                             VALUES (:k, '0.1.0', 'scenario', :sha, 'test', '[]', '[]', '{}', '[]',
+                                     'candidate', :a)"""),
                      {"k": MODEL_KEY, "sha": sha, "a": act.id})
 
 
@@ -239,7 +240,7 @@ def test_release_pins_dataset_by_digest_and_seals_it(env: Env) -> None:
     # sealed: nothing can be pinned into a published release, and pins are immutable
     with pytest.raises(DBAPIError, match="sealed"), env.worker.begin() as c:
         c.execute(text("""INSERT INTO belief.release_dataset(release_id, dataset_id, concept_id, subject_key,
-                          artifact_sha256) SELECT :r, id, concept_id, 'X' || subject_key, artifact_sha256
+                          artifact_sha256) SELECT :r, id, concept_id, subject_key, artifact_sha256
                           FROM evidence.dataset LIMIT 1"""), {"r": env.release_id})
     with pytest.raises(DBAPIError, match="Immutable"), env.owner.begin() as c:
         c.execute(text("UPDATE evidence.dataset SET row_count = 0"))

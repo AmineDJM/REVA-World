@@ -33,7 +33,7 @@ const STATE_TEXT: Record<CountryRunStatus['state'], string> = {
 };
 
 function fmtPct(v: string): string {
-  const d = displayDecimal(v, '%');
+  const d = displayDecimal(v, 'unit.percent');
   return `${v.trim().startsWith('-') ? '' : '+'}${d.text} %`;
 }
 

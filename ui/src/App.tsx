@@ -4,6 +4,7 @@ import { getSession, logout } from './api/client';
 import { onUnauthorized } from './api/http';
 import { ApiError } from './api/problem';
 import type { SessionInfo } from './api/types';
+import { CommandPalette } from './components/CommandPalette';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ProvenanceProvider } from './components/ProvenanceDrawer';
 import { ErrorState, Loading } from './components/StateViews';
@@ -16,13 +17,20 @@ const GraphPage = lazy(() => import('./pages/GraphPage'));
 const SimulationPage = lazy(() => import('./pages/SimulationPage'));
 const ModelsPage = lazy(() => import('./pages/ModelsPage'));
 const AcquisitionPage = lazy(() => import('./pages/AcquisitionPage'));
+const MapPage = lazy(() => import('./pages/MapPage'));
+const ComposerPage = lazy(() => import('./pages/ComposerPage'));
+const RunsPage = lazy(() => import('./pages/RunsPage'));
+const RunPage = lazy(() => import('./pages/RunPage'));
 
 const NAV = [
   { to: '/world', label: 'World' },
+  { to: '/map', label: 'Map' },
   { to: '/country/FRA', label: 'Country' },
   { to: '/evidence', label: 'Evidence' },
   { to: '/graph', label: 'Graph' },
+  { to: '/compose', label: 'Compose' },
   { to: '/simulation', label: 'Simulation' },
+  { to: '/runs', label: 'Runs' },
   { to: '/models', label: 'Models' },
   { to: '/acquisition', label: 'Acquisition' },
 ];
@@ -97,6 +105,7 @@ export function App() {
             ))}
           </ul>
         </nav>
+        <CommandPalette screens={NAV} />
         <div className="session">
           <span>
             Signed in as <strong>{state.session.username}</strong>
@@ -119,6 +128,10 @@ export function App() {
             <Route path="/simulation" element={<SimulationPage />} />
             <Route path="/models" element={<ModelsPage />} />
             <Route path="/acquisition" element={<AcquisitionPage />} />
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/compose" element={<ComposerPage />} />
+            <Route path="/runs" element={<RunsPage />} />
+            <Route path="/runs/:id" element={<RunPage />} />
             <Route path="/login" element={<Navigate to="/world" replace />} />
             <Route path="*" element={<p>Unknown screen. Choose a screen from the navigation.</p>} />
           </Routes>

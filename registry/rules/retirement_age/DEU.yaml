@@ -1,0 +1,352 @@
+schema: reva-retirement-age-rules/1
+version: 1.0.0
+review_status: maintainer_review_pending
+transcription: transcribed from law text by an agent; maintainer review pending
+country: DEU
+notes: Official consolidated text from gesetze-im-internet.de (Bundesministerium der Justiz; the site labels its
+  table of contents 'nichtamtlich'). Regelaltersgrenze (normal pension age, general old-age pension with the 5-year
+  qualifying period) 65 -> 67 by cohort 1947-1964 (RV-Altersgrenzenanpassungsgesetz 2007, now SGB VI § 235 and §
+  35). Exceptions (Altersteilzeit agreed before 2007, Bergbau Anpassungsgeld; long-insured early claim from 63 with
+  35 years, § 36/§ 236; 45-year and disability pensions) are NOT represented in the lever path.
+model_lever:
+  age_kind: normal_pension_age
+  rationale: The Regelaltersgrenze is the earliest age at which a person with only the general 5-year qualifying
+    period can claim an old-age pension. Persons with 35+ insurance years can claim from 63 with deductions (§ 36/§
+    236), an age the 2007 reform did not raise for most cohorts; the model's affected population therefore overstates
+    the population actually constrained, and the result is labelled qualified.
+sources:
+- source_id: de_sgb6_35
+  title: SGB VI § 35 Regelaltersrente (gesetze-im-internet.de)
+  url: https://www.gesetze-im-internet.de/sgb_6/__35.html
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:45Z'
+  response_sha256: a052a5b5df1022621ea30ee4037a49df4aa1e5866b958f2d7bceb5222102b76b
+  archived_file: DEU_sgb6_par35.html
+- source_id: de_sgb6_36
+  title: SGB VI § 36 Altersrente für langjährig Versicherte
+  url: https://www.gesetze-im-internet.de/sgb_6/__36.html
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:46Z'
+  response_sha256: 1d78719ef0b844f51cfd8bb56650ff3db69a6b4578dbd6f4361ac7e25b7357b9
+  archived_file: DEU_sgb6_par36.html
+- source_id: de_sgb6_235
+  title: SGB VI § 235 Regelaltersrente (transitional schedule)
+  url: https://www.gesetze-im-internet.de/sgb_6/__235.html
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:48Z'
+  response_sha256: 7e28241d059e66b768e49e975d76c7eff5f653e651c7377d2fc1ea904434837d
+  archived_file: DEU_sgb6_par235.html
+- source_id: de_sgb6_236
+  title: SGB VI § 236 Altersrente für langjährig Versicherte (transitional schedule)
+  url: https://www.gesetze-im-internet.de/sgb_6/__236.html
+  kind: official_consolidated_text
+  retrieved_at: '2026-10-15T01:08:49Z'
+  response_sha256: d6d9c116ccc45c58f22c7c23a415469a69828ef03648ddbbd6b28c3e094e8a9f
+  archived_file: DEU_sgb6_par236.html
+paths:
+- path_id: pre_2007_counterfactual
+  label: 'Counterfactual: Regelaltersgrenze 65 for all cohorts (no RV-Altersgrenzenanpassungsgesetz 2007)'
+  status: counterfactual
+  description: § 235(2) first sentence (65 for cohorts born before 1947) extended to every cohort.
+- path_id: law_in_force
+  label: SGB VI § 235(2) schedule and § 35 (67 from cohort 1964)
+  status: in_force
+  description: Regelaltersgrenze 65 -> 67 by cohort 1947-1964.
+rows:
+- row_id: DEU.npa.235.pre1947
+  paths:
+  - pre_2007_counterfactual
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 0
+  born_from: null
+  born_to: '1946-12-31'
+  citation: &id001
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 1
+    locator: (2) Versicherte, die vor dem 1. Januar 1947 geboren sind, erreichen die Regelaltersgrenze mit Vollendung
+      des 65. Lebensjahres.
+- row_id: DEU.npa.cf.ge1947
+  paths:
+  - pre_2007_counterfactual
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 0
+  born_from: '1947-01-01'
+  born_to: null
+  derivation: counterfactual_extension
+  note: Counterfactual - 65 extended to cohorts born from 1947 (no 2007 reform).
+  citation: *id001
+- row_id: DEU.npa.235.1947
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 1
+  born_from: '1947-01-01'
+  born_to: '1947-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1947 (Anhebung um 1 Monate)
+    locator: 1947 1 65 1 1948
+- row_id: DEU.npa.235.1948
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 2
+  born_from: '1948-01-01'
+  born_to: '1948-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1948 (Anhebung um 2 Monate)
+    locator: 1948 2 65 2 1949
+- row_id: DEU.npa.235.1949
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 3
+  born_from: '1949-01-01'
+  born_to: '1949-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1949 (Anhebung um 3 Monate)
+    locator: 1949 3 65 3 1950
+- row_id: DEU.npa.235.1950
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 4
+  born_from: '1950-01-01'
+  born_to: '1950-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1950 (Anhebung um 4 Monate)
+    locator: 1950 4 65 4 1951
+- row_id: DEU.npa.235.1951
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 5
+  born_from: '1951-01-01'
+  born_to: '1951-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1951 (Anhebung um 5 Monate)
+    locator: 1951 5 65 5 1952
+- row_id: DEU.npa.235.1952
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 6
+  born_from: '1952-01-01'
+  born_to: '1952-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1952 (Anhebung um 6 Monate)
+    locator: 1952 6 65 6 1953
+- row_id: DEU.npa.235.1953
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 7
+  born_from: '1953-01-01'
+  born_to: '1953-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1953 (Anhebung um 7 Monate)
+    locator: 1953 7 65 7 1954
+- row_id: DEU.npa.235.1954
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 8
+  born_from: '1954-01-01'
+  born_to: '1954-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1954 (Anhebung um 8 Monate)
+    locator: 1954 8 65 8 1955
+- row_id: DEU.npa.235.1955
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 9
+  born_from: '1955-01-01'
+  born_to: '1955-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1955 (Anhebung um 9 Monate)
+    locator: 1955 9 65 9 1956
+- row_id: DEU.npa.235.1956
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 10
+  born_from: '1956-01-01'
+  born_to: '1956-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1956 (Anhebung um 10 Monate)
+    locator: 1956 10 65 10 1957
+- row_id: DEU.npa.235.1957
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 65
+    months: 11
+  born_from: '1957-01-01'
+  born_to: '1957-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1957 (Anhebung um 11 Monate)
+    locator: 1957 11 65 11 1958
+- row_id: DEU.npa.235.1958
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 0
+  born_from: '1958-01-01'
+  born_to: '1958-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1958 (Anhebung um 12 Monate)
+    locator: 1958 12 66 0 1959
+- row_id: DEU.npa.235.1959
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 2
+  born_from: '1959-01-01'
+  born_to: '1959-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1959 (Anhebung um 14 Monate)
+    locator: 1959 14 66 2 1960
+- row_id: DEU.npa.235.1960
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 4
+  born_from: '1960-01-01'
+  born_to: '1960-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1960 (Anhebung um 16 Monate)
+    locator: 1960 16 66 4 1961
+- row_id: DEU.npa.235.1961
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 6
+  born_from: '1961-01-01'
+  born_to: '1961-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1961 (Anhebung um 18 Monate)
+    locator: 1961 18 66 6 1962
+- row_id: DEU.npa.235.1962
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 8
+  born_from: '1962-01-01'
+  born_to: '1962-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1962 (Anhebung um 20 Monate)
+    locator: 1962 20 66 8 1963
+- row_id: DEU.npa.235.1963
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 66
+    months: 10
+  born_from: '1963-01-01'
+  born_to: '1963-12-31'
+  citation:
+    source_id: de_sgb6_235
+    legal_reference: SGB VI § 235 Abs. 2 Satz 2, table row Geburtsjahr 1963 (Anhebung um 22 Monate)
+    locator: 1963 22 66 10.
+- row_id: DEU.npa.35.ge1964
+  paths:
+  - law_in_force
+  age_kind: normal_pension_age
+  basis: birth_cohort
+  age:
+    years: 67
+    months: 0
+  born_from: '1964-01-01'
+  born_to: null
+  citation:
+    source_id: de_sgb6_35
+    legal_reference: SGB VI § 35 Satz 2 (applies to cohorts born from 1 January 1964; § 235 Abs. 1 covers earlier
+      cohorts)
+    locator: Die Regelaltersgrenze wird mit Vollendung des 67. Lebensjahres erreicht.
+- row_id: DEU.early.36.ge1964
+  paths:
+  - law_in_force
+  age_kind: early_pension_age_long_insured
+  basis: birth_cohort
+  age:
+    years: 63
+    months: 0
+  born_from: '1964-01-01'
+  born_to: null
+  condition: Wartezeit von 35 Jahren; pension reduced for early claim
+  citation:
+    source_id: de_sgb6_36
+    legal_reference: SGB VI § 36 Satz 2 (35 years of insurance; with deductions)
+    locator: Die vorzeitige Inanspruchnahme dieser Altersrente ist nach Vollendung des 63. Lebensjahres möglich.

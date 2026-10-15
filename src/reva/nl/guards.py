@@ -59,6 +59,7 @@ class GuardRule:
     reason_en: str
     reason_fr: str
     provided_by: tuple[str, ...] = ()  # registered model keys that make this rule moot
+    # capability_key of a planned-model rule is the model key; the service maps it to the catalogue's gap id
 
 
 def _rx(p: str) -> re.Pattern[str]:
@@ -81,11 +82,11 @@ RULES: tuple[GuardRule, ...] = (
     GuardRule("outputs.macroeconomic", _rx(r"\b(welfare|bien-[êe]tre|pouvoir d'achat|purchasing power)\b"),
               "Household welfare or purchasing power is not computed by any registered model",
               "Le bien-être ou le pouvoir d'achat des ménages n'est calculé par aucun modèle enregistré"),
-    GuardRule("model.social.retirement_age",
+    GuardRule("social.retirement_age",
               _rx(r"\b(retraite|retirement|pension\w*|[âa]ge l[ée]gal|retire)\b"),
               "No retirement-age model is registered", "Aucun modèle d'âge de départ à la retraite n'est enregistré",
               provided_by=("social.retirement_age",)),
-    GuardRule("model.demography.cohort_component",
+    GuardRule("demography.cohort_component",
               _rx(r"\b(projection (de la |d[ue] )?population|population projection|vieillissement|ageing|aging"
                   r"|fertilit\w*|f[ée]condit[ée]|mortalit\w*|cohort\w*)"),
               "No population projection model is registered", "Aucun modèle de projection démographique n'est "

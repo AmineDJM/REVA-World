@@ -5,7 +5,7 @@
  * consumer goes through a normaliser in src/lib/* that tolerates their absence:
  * nothing missing is ever replaced by a made-up value.
  */
-import type { EnvelopeMeta, SimResult } from './types';
+import type { SimResult } from './types';
 
 // ---------------------------------------------------------------- natural-language drafts (NLC)
 
@@ -16,57 +16,69 @@ export interface ScenarioDraftRequest {
   baseline_release_id?: string;
 }
 
-/** One part of the request the drafting LLM (or the server's guard) could not express. */
+/** One part of the request that the draft does not express (typed capability gap / refusal). */
 export interface DraftUnsupportedItem {
   text?: string | null;
   capability_key?: string | null;
-  /** capability_gap | policy_refusal (catalogue kinds). */
+  /** capability_gap | policy_refusal */
   kind?: string | null;
   reason?: string | null;
-  /** Who flagged it: the LLM, or the server-side guard re-checking the draft. */
+  /** llm | server_guard | server | validator | provider */
   source?: string | null;
+  /** The LLM proposed a capability key outside the allow-list (replaced by the server). */
+  llm_capability_key_rejected?: boolean | null;
 }
 
-export interface DraftParameter {
+/** A number the draft proposes, with where it came from. */
+export interface DraftNumber {
   path: string;
-  number?: number | null;
-  text?: string | null;
-  /** The words of the user's text this value was taken from. */
+  value: unknown;
+  /** stated | converted_from_stated | not_in_text | server_default | schema_constant */
+  provenance?: string | null;
   quote?: string | null;
 }
 
-export interface LlmUsageOut {
-  input_tokens?: number | null;
-  output_tokens?: number | null;
-  total_tokens?: number | null;
+export interface DraftAssumption {
+  text: string;
+  source?: string | null;
 }
 
+export type DraftStatus = 'draft_ready' | 'needs_input' | 'draft_invalid' | 'draft_rejected' | 'nothing_draftable' | string;
+
+/** Normalised view of the POST /v1/scenario-drafts response (src/reva/api/routes/nl.py ScenarioDraftResponse). */
 export interface ScenarioDraft {
-  draft_id?: string | null;
-  /** The draft ScenarioSpec (null when nothing in the text is draftable). */
-  spec: Record<string, unknown> | null;
-  /** Server-side validation of `spec` by the same schema/compiler as hand-written specs. */
-  valid?: boolean | null;
-  validation_problems?: unknown[];
+  status: DraftStatus;
+  confirmation_required: boolean;
+  /** Always false: drafting never executes anything. */
+  executed: boolean;
+  /** Valid ScenarioSpec (status draft_ready only). */
+  draft_spec: Record<string, unknown> | null;
+  draft_spec_sha256: string | null;
+  /** Incomplete or invalid spec, for review only. */
+  candidate_spec: Record<string, unknown> | null;
+  validation: Record<string, unknown>;
+  /** Server-generated restatement of the draft, in the input language. */
   restatement: string;
-  title?: string | null;
-  input_language?: string | null;
+  language: string | null;
+  /** The LLM's own paraphrase (untrusted, shown for comparison). */
+  llm_restatement: string | null;
   unsupported: DraftUnsupportedItem[];
-  assumptions_added: string[];
-  parameters: DraftParameter[];
-  provider?: string | null;
-  model?: string | null;
-  model_requested?: string | null;
-  prompt_version?: string | null;
-  prompt_sha256?: string | null;
-  usage?: LlmUsageOut | null;
-  /** True when replayed from a recorded response (tests/CI): never a live LLM call. */
-  recorded?: boolean | null;
-  latency_ms?: number | null;
-  text_sha256?: string | null;
+  rejected_ids: Record<string, unknown>[];
+  missing_fields: string[];
+  assumptions_added: DraftAssumption[];
+  numbers_to_confirm: DraftNumber[];
+  provider: string | null;
+  model: string | null;
+  model_requested: string | null;
+  prompt_version: string | null;
+  prompt_sha256: string | null;
+  catalog_digest: string | null;
+  usage: Record<string, unknown> | null;
+  latency_ms: number | null;
+  fallback_from: Record<string, unknown>[];
+  warnings: string[];
+  next_step: string | null;
 }
-
-export type ScenarioDraftEnvelope = Partial<EnvelopeMeta> & { data: ScenarioDraft };
 
 // ---------------------------------------------------------------- multi-period results (ENG)
 

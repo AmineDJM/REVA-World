@@ -7,11 +7,16 @@ connector path (``FixtureHttp``) and published as a ``test_fixture`` release.
 from __future__ import annotations
 
 import asyncio
+import importlib.util
 import json
+import sys
 import time
 import uuid
+from collections.abc import Iterator
 from datetime import timedelta
 from decimal import Decimal
+from pathlib import Path
+from typing import Any
 
 import pytest
 from sqlalchemy import text
@@ -27,6 +32,27 @@ from reva.kernel.ids import canonical_bytes
 from reva.operations.context import JobContext
 
 pytestmark = pytest.mark.db
+
+
+def _isolated_helper() -> Any:
+    name = "reva_h2_isolated_db"
+    if name not in sys.modules:
+        path = Path(__file__).resolve().parents[1] / "fixtures" / "adversarial" / "isolated_db.py"
+        spec = importlib.util.spec_from_file_location(name, path)
+        assert spec and spec.loader
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        spec.loader.exec_module(mod)
+    return sys.modules[name]
+
+
+@pytest.fixture(scope="module")
+def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Any]:
+    """A private database for this module (overrides the session ``db``): ``wdi_release`` publishes
+    every ``test_fixture`` POP/GDP row, so synthetic supports and revised values written by other modules
+    into the shared session DB would otherwise enter the panel and change forecast counts."""
+    with _isolated_helper().isolated_db(tmp_path_factory) as d:
+        yield d
 
 
 @pytest.fixture(scope="module")

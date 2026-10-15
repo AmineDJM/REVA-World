@@ -1,14 +1,14 @@
 {
  "fixture_kind": "recorded_live_response",
  "label": "gemini_en_basic",
- "recorded_at": "2026-10-15T01:08:08+00:00",
+ "recorded_at": "2026-10-15T01:13:23+00:00",
  "provider": "gemini",
  "model_requested": "gemini-3.8-flash",
  "http_status": 402,
- "latency_ms": 335.2,
+ "latency_ms": 326.3,
  "prompt_version": "nl-draft-1.0.0",
- "prompt_sha256": "67557b00ce21eecf612616c0680d612864a630ca2a87b9899cd05677f07dd3cf",
- "catalog_digest": "10afe532efb4bf24ec45f0f7975a2fedc5b178792a054feba075ef75240638c2",
+ "prompt_sha256": "f9662e32a386927e0b1c4a155157e5ed2f48fc6265132ae895475a56e4cda44a",
+ "catalog_digest": "fb2b0a6be4af83cb8c1af58236da6b9e07ac1bb8d6295e00c5eddae061e75744",
  "text": "What happens to France and the USA if crude oil import prices rise by 20% in 2023?",
  "text_sha256": "27f5d567e48e9f3b3f4fe432d37eb0dc12e917656376bdc524a7dc087b72a71f",
  "response_body": {

@@ -1,4 +1,4 @@
-policy_version: "budgets-1.1.0"
+policy_version: "budgets-1.2.0"
 daily:
   http_requests_total: 2000
   http_bytes_total: 524288000
@@ -7,6 +7,9 @@ per_source_daily_requests:
   un.comtrade.public_preview: 100
   crossref.works: 50
   eurostat.dissemination: 100
+  # 1.2.0 (V2 step 3a, agent POP): built-in connector eurostat.demography; one full run is
+  # 31 countries x 3 tables + 3 EUROPOP2023 tables = 96 requests (resumable via its cursor).
+  eurostat.demography: 120
   naturalearth.admin0_110m: 10
 llm:
   # Autonomy LLM evidence extraction stays disabled (zero budget).

@@ -264,9 +264,9 @@ def dataset_for_year(year: int) -> str:
     raise ValidationProblem(f"FIGARO has no industry-by-industry table for {year} (2010 onwards)", year=year)
 
 
-def origin_groups(per_request: int = ORIGINS_PER_REQUEST) -> list[tuple[str, ...]]:
+def origin_groups(per_request: int = ORIGINS_PER_REQUEST, dims: TableDims | None = None) -> list[tuple[str, ...]]:
     """Request groups: pairs of supplying economies, then the ``DOM`` primary-input rows alone."""
-    eco = list(COUNTRY_CODES)
+    eco = list((dims or FIGARO_DIMS).countries)
     groups = [tuple(eco[i:i + per_request]) for i in range(0, len(eco), per_request)]
     return [*groups, (DOM,)]
 
@@ -423,11 +423,13 @@ def parse_constraint(body: bytes) -> dict[str, list[str]]:
     return out
 
 
-def constraint_findings(dims: Mapping[str, list[str]], year: int | None) -> tuple[list[Finding], int | None]:
+def constraint_findings(dims: Mapping[str, list[str]], year: int | None,
+                        table: TableDims | None = None) -> tuple[list[Finding], int | None]:
     """Compare the published code lists with the pinned ones; returns findings and the target year."""
     findings: list[Finding] = []
-    pinned = {"freq": {"A"}, "unit": {UNIT}, "c_orig": set(ORIGIN_CODES), "c_dest": set(COUNTRY_CODES),
-              "ind_use": set(USE_CODES), "ind_ava": set(AVA_CODES)}
+    t = table or FIGARO_DIMS
+    pinned = {"freq": {"A"}, "unit": {UNIT}, "c_orig": set(t.origins), "c_dest": set(t.countries),
+              "ind_use": set(t.uses), "ind_ava": set(t.avas)}
     for dim, want in pinned.items():
         got = set(dims.get(dim, []))
         if got != want:
@@ -450,12 +452,13 @@ class FigaroConnector:
     """Reviewed built-in connector for the FIGARO industry-by-industry table of one year."""
 
     def __init__(self, year: int | None = None, *, dataset: str = "NAIO_10_FCP_II4",
-                 per_request: int = ORIGINS_PER_REQUEST) -> None:
+                 per_request: int = ORIGINS_PER_REQUEST, dims: TableDims = FIGARO_DIMS) -> None:
         if year is not None:
             dataset = dataset_for_year(year)
         self.year = year
         self.dataset = dataset
         self.per_request = per_request
+        self.dims = dims  # FIGARO's pinned code lists (a smaller table only in tests)
 
     def describe(self) -> ConnectorSpec:
         return ConnectorSpec(
@@ -490,17 +493,18 @@ class FigaroConnector:
                       max_bytes=MAX_DATA_RESPONSE_BYTES,
                       params={"kind": "data", "dataset": dataset, "year": year, "origins": list(g),
                               "depends_on": dep})
-            for g in origin_groups(self.per_request)
+            for g in origin_groups(self.per_request, self.dims)
         )
 
     def plan(self, cursor: Cursor | None, budget: FetchBudget) -> FetchPlan:
         items = (FetchItem(key=f"constraint:{self.dataset}", url=constraint_url(self.dataset),
-                           expected_media_types=("application/xml",), max_bytes=MAX_CONSTRAINT_BYTES,
+                           expected_media_types=("application/vnd.sdmx.structure+xml", "application/xml"),
+                           max_bytes=MAX_CONSTRAINT_BYTES,
                            params={"kind": "constraint", "dataset": self.dataset, "year": self.year}),)
         return FetchPlan(connector=NAME, items=items,
                          pagination="data requests planned after the content constraint (one per origin group)",
                          availability_expectation="annual edition, usually July; year T-2",
-                         budget_exhausted=budget.max_requests < 1 + len(origin_groups(self.per_request)))
+                         budget_exhausted=budget.max_requests < 1 + len(origin_groups(self.per_request, self.dims)))
 
     async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
         result = await http.get(item.url, max_bytes=item.max_bytes)
@@ -513,7 +517,7 @@ class FigaroConnector:
         kind = raw.item.params.get("kind")
         if kind == "constraint":
             dims = parse_constraint(raw.body)
-            findings, target = constraint_findings(dims, self.year)
+            findings, target = constraint_findings(dims, self.year, self.dims)
             follow = () if target is None or any(f.severity == "blocker" for f in findings) else \
                 self._data_items(target, dataset_for_year(target))
             yield ObservationBatch(
@@ -526,7 +530,8 @@ class FigaroConnector:
         if kind != "data":
             raise SourceResponseError(f"unknown FIGARO item kind {kind!r}", retryable=False)
         p = raw.item.params
-        parsed = parse_sdmx_csv(raw.body, dataset=p["dataset"], year=int(p["year"]), origins=p["origins"])
+        parsed = parse_sdmx_csv(raw.body, dataset=p["dataset"], year=int(p["year"]), origins=p["origins"],
+                                dims=self.dims)
         yield ObservationBatch(connector=NAME, connector_version=VERSION, item_key=raw.item.key, observations=(),
                                metadata={"kind": kind, **parsed.metadata,
                                          "findings": [f.model_dump() for f in parsed.findings]})
@@ -540,7 +545,7 @@ class FigaroConnector:
 
     def next_cursor(self, plan: FetchPlan, outcomes: Sequence[FetchOutcome]) -> Cursor:
         data = [o for o in outcomes if o.item_key.startswith("data:")]
-        ok = bool(data) and len(data) == len(origin_groups(self.per_request)) and all(
+        ok = bool(data) and len(data) == len(origin_groups(self.per_request, self.dims)) and all(
             o.status in ("published", "unchanged") for o in outcomes)
         return Cursor(state={"complete": ok, "dataset": self.dataset, "year": self.year,
                              "raw_sha256": {o.item_key: o.raw_sha256 for o in data}})
@@ -549,10 +554,23 @@ class FigaroConnector:
 # --------------------------------------------------------------------------- dataset build (pure)
 @dataclass(frozen=True)
 class BuiltDataset:
+    """A verified table. ``manifest`` becomes the registered dataset's ``coverage`` block.
+
+    ``parquet`` is this build's serialisation (bounded memory); the registered artifact is
+    re-serialised by :func:`reva.simulation.datasets.register_dataset`, so its sha256 is the
+    registry's, not ``build_sha256``.
+    """
+
     parquet: bytes
     manifest: dict[str, Any]
     identity_report: dict[str, Any]
     row_count: int
+    build_sha256: str = ""
+
+    def table(self) -> Any:
+        import pyarrow.parquet as pq
+
+        return pq.read_table(io.BytesIO(self.parquet))
 
 
 def _block_enum() -> Any:
@@ -763,11 +781,10 @@ def build_dataset(parsed: Sequence[ParsedItem], *, dataset: str, year: int,
                        "final_demand": list(dims.final_demand), "primary_inputs": list(dims.primary_inputs)},
         "economy_iso3": {c: ECONOMIES.get(c) for c in dims.countries},
         "row_count": n_rows,
-        "parquet_sha256": "sha256:" + hashlib.sha256(data).hexdigest(),
-        "byte_size": len(data),
         "identity_report": report,
     }
-    return BuiltDataset(parquet=data, manifest=manifest, identity_report=report, row_count=n_rows)
+    return BuiltDataset(parquet=data, manifest=manifest, identity_report=report, row_count=n_rows,
+                        build_sha256="sha256:" + hashlib.sha256(data).hexdigest())
 
 
 def gzip_csv(rows: Iterable[Sequence[Any]]) -> bytes:
@@ -777,3 +794,71 @@ def gzip_csv(rows: Iterable[Sequence[Any]]) -> bytes:
     for r in rows:
         out.write(",".join("" if v is None else str(v) for v in r) + "\n")
     return gzip.compress(out.getvalue().encode(), mtime=0)
+
+
+# --------------------------------------------------------------------------- dataset publication (DB)
+DATASET_SUBJECT = "WORLD"
+
+
+def dataset_key(year: int) -> str:
+    return f"figaro.iciot_ii.{year}"
+
+
+def latest_data_acquisitions(conn: Any, year: int, origin: str = "live") -> list[dict[str, Any]]:
+    """Latest passing acquisition per data item of ``year`` (quarantined bytes never used)."""
+    from sqlalchemy import text
+
+    rows = conn.execute(text(
+        """SELECT DISTINCT ON (a.response_metadata->>'item_key')
+                  a.id::text AS acquisition_id, a.raw_sha256, a.response_metadata->>'item_key' AS item_key,
+                  a.response_metadata->'quality' AS quality, a.recorded_at
+           FROM evidence.acquisition a JOIN evidence.connector_version cv ON cv.id = a.connector_version_id
+           WHERE cv.name = :n AND a.origin = :o AND a.response_metadata->>'item_key' LIKE :pat
+           ORDER BY a.response_metadata->>'item_key', a.recorded_at DESC, a.id DESC"""),
+        {"n": NAME, "o": origin, "pat": f"data:%:{year}:%"}).mappings().all()
+    out = []
+    for r in rows:
+        quality = r["quality"] or []
+        if any(q.get("outcome") != "pass" for q in quality):
+            continue
+        out.append({"acquisition_id": r["acquisition_id"], "raw_sha256": r["raw_sha256"],
+                    "item_key": r["item_key"]})
+    return out
+
+
+def publish_io_dataset(engine: Any, store: Any, *, year: int, origin: str = "live",
+                       actor: str = "worker:io_tables", dims: TableDims = FIGARO_DIMS) -> dict[str, Any]:
+    """Parse the archived raw bytes of one year, verify, and register the dataset input.
+
+    Refuses (``IdentityCheckFailed``, nothing registered) when an item is missing, failed
+    its checks, or an accounting identity does not hold. Returns the registration summary
+    with the identity report.
+    """
+    import hashlib
+
+    from reva.simulation.datasets import register_dataset
+
+    dataset = dataset_for_year(year)
+    with engine.connect() as conn:
+        acqs = latest_data_acquisitions(conn, year, origin)
+    parsed: list[ParsedItem] = []
+    for a in acqs:
+        body = store.get("raw", a["raw_sha256"])
+        if hashlib.sha256(body).hexdigest() != a["raw_sha256"]:
+            raise IdentityCheckFailed("archived raw bytes do not match their sha256", **a)
+        origins = a["item_key"].rsplit(":", 1)[1].split("+")
+        parsed.append(parse_sdmx_csv(body, dataset=dataset, year=year, origins=origins, dims=dims))
+        del body
+    built = build_dataset(parsed, dataset=dataset, year=year, acquisitions=acqs, origin=origin, dims=dims)
+    del parsed
+    table = built.table()
+    with engine.begin() as conn:
+        rec = register_dataset(conn, store, dataset_key=dataset_key(year), concept_id=DATASET_CONCEPT,
+                               subject_key=DATASET_SUBJECT, table=table,
+                               source_acquisition_ids=[a["acquisition_id"] for a in acqs],
+                               parser_version=PARSER_VERSION, origin=origin, coverage=built.manifest, actor=actor,
+                               rights={"licence": LICENCE, "attribution": "Source: Eurostat (FIGARO)",
+                                       "source_key": SOURCE_KEY})
+    return {"dataset_id": str(rec.id), "dataset_key": rec.dataset_key, "artifact_sha256": rec.artifact_sha256,
+            "manifest_sha256": rec.manifest_sha256, "row_count": rec.row_count, "created": rec.created,
+            "identity_report": built.identity_report, "acquisitions": len(acqs)}

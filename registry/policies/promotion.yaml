@@ -26,7 +26,7 @@ tiers:
   T3: {description: "kernel, security, licences, sensitive data, causal claims, destructive migrations, paid resources", requires: [maintainer_approval]}
 approved_templates:
   eurostat_jsonstat:
-    template_sha256: "sha256:cca2625ebabfd9bd2a9a29564012f428a15ec5d823394d0acfb550d0c6aa3db7"
+    template_sha256: "sha256:4467985201296671882d9ca57fd7d414617537a63a423d0f61c8e20da9ec3443"
     source_key: eurostat.dissemination
     rights_ref: "registry/sources/eurostat.yaml#rights"
     allowed_hosts: [ec.europa.eu]

@@ -129,8 +129,10 @@ class CompiledScenario:
     def skipped(self) -> list[dict[str, Any]]:
         if not self.skipping():
             return []
+        # ``inputs``: per input the release estimate id (None = no estimate in the release) and value
+        # (None = typed Missing or absent), so a reader can tell "absent" from "provider Missing".
         return [{"country": c.iso3, "subject_id": str(c.subject_id), "subject_resolution": c.subject_resolution,
-                 "status": c.status, "reasons": list(c.problems)}
+                 "status": c.status, "reasons": list(c.problems), "inputs": c.input_refs()}
                 for c in sorted(self.countries, key=lambda c: c.iso3) if c.status != "ready"]
 
     @property

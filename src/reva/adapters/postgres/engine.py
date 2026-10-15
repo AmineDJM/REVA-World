@@ -12,7 +12,7 @@ from reva.settings import Role, Settings, get_settings
 _lock = threading.Lock()
 _engines: dict[str, Engine] = {}
 
-EngineKind = Literal["api", "worker", "sim", "migration"]
+EngineKind = Literal["api", "worker", "sim", "gate", "migration"]
 
 
 def make_engine(kind: EngineKind, settings: Settings | None = None) -> Engine:

@@ -21,10 +21,13 @@ Production validation has two layers:
   worker      REVA_WORKER_DB_PASSWORD, REVA_SIM_DB_PASSWORD,
               no REVA_MIGRATION_DATABASE_URL
   sim         REVA_SIM_DB_PASSWORD, no REVA_MIGRATION_DATABASE_URL
-  bootstrap   REVA_MIGRATION_DATABASE_URL and all three runtime role passwords
+  gate        REVA_GATE_DB_PASSWORD, no REVA_MIGRATION_DATABASE_URL
+  bootstrap   REVA_MIGRATION_DATABASE_URL and all four runtime role passwords
   ========== ==============================================================
 
-  Outside production only the runtime role password(s) are required.
+  Outside production only the runtime role password(s) are required; there
+  bootstrap may also run without REVA_GATE_DB_PASSWORD (the independent gate
+  login is then not provisioned, so nothing can be auto-promoted: fail closed).
 """
 
 from __future__ import annotations
@@ -47,6 +50,7 @@ SECRET_ENV_KEYS = frozenset(
         "REVA_API_DB_PASSWORD",
         "REVA_WORKER_DB_PASSWORD",
         "REVA_SIM_DB_PASSWORD",
+        "REVA_GATE_DB_PASSWORD",
         "REVA_S3_ACCESS_KEY_ID",
         "REVA_S3_SECRET_ACCESS_KEY",
         "REVA_SESSION_SECRET",
@@ -81,9 +85,13 @@ _URL_USERINFO = re.compile(r"(?P<scheme>[a-zA-Z][a-zA-Z0-9+.\-]*://)(?P<user>[^:
 ARGON2ID_HASH = re.compile(r"^\$argon2id\$v=\d+\$m=\d+,t=\d+,p=\d+\$[A-Za-z0-9+/]+={0,2}\$[A-Za-z0-9+/]+={0,2}$")
 SSL_MODES_PRODUCTION = ("require", "verify-ca", "verify-full")
 
-Role = Literal["api", "worker", "sim"]
-ProcessRole = Literal["api", "worker", "sim", "bootstrap"]
-ROLE_LOGIN = {"api": "reva_api", "worker": "reva_worker", "sim": "reva_sim"}
+Role = Literal["api", "worker", "sim", "gate"]
+ProcessRole = Literal["api", "worker", "sim", "gate", "bootstrap"]
+#: Runtime logins. ``gate`` is the independent promotion-gate process (reva_gate): the only
+#: login that may record gate results (ops.record_gate_result); see docs/dev/gate_separation.md.
+ROLE_LOGIN = {"api": "reva_api", "worker": "reva_worker", "sim": "reva_sim", "gate": "reva_gate"}
+#: Runtime roles bootstrap may skip outside production when their password is absent.
+OPTIONAL_OUTSIDE_PRODUCTION: tuple[Role, ...] = ("gate",)
 
 
 class Settings(BaseSettings):
@@ -120,6 +128,7 @@ class Settings(BaseSettings):
     reva_api_db_password: SecretStr | None = None
     reva_worker_db_password: SecretStr | None = None
     reva_sim_db_password: SecretStr | None = None
+    reva_gate_db_password: SecretStr | None = None
     reva_db_pool_size: int = Field(2, ge=1, le=20)
     reva_db_max_overflow: int = Field(0, ge=0, le=20)
     reva_db_statement_timeout_ms: int = Field(10000, ge=100)
@@ -166,6 +175,11 @@ class Settings(BaseSettings):
     reva_llm_api_key: SecretStr | None = None
 
     reva_autonomy_mode: Literal["template_only", "disabled"] = "template_only"
+    #: How long a worker autonomy step waits for the independent gate process to record its
+    #: decision (seconds); on timeout the step reports ``gate_pending`` and promotes nothing.
+    reva_gate_wait_seconds: float = Field(120.0, gt=0, le=3600)
+    #: Poll interval of the gate process for new gate requests (seconds).
+    reva_gate_poll_seconds: float = Field(2.0, gt=0, le=300)
     reva_autonomy_kill_switch: bool = False
     reva_sandbox_endpoint: str | None = None
     reva_sandbox_token: SecretStr | None = None
@@ -241,18 +255,21 @@ class Settings(BaseSettings):
             "api": ("api",),
             "worker": ("worker", "sim"),
             "sim": ("sim",),
-            "bootstrap": ("api", "worker", "sim"),
+            "gate": ("gate",),
+            "bootstrap": ("api", "worker", "sim", "gate"),
         }
         if role not in needed:
             raise ValueError(f"unknown process role {role!r}")
         for r in needed[role]:
+            if role == "bootstrap" and r in OPTIONAL_OUTSIDE_PRODUCTION and self.reva_env != "production":
+                continue
             if self.role_password(r) is None or not self.role_password(r).get_secret_value():  # type: ignore[union-attr]
                 problems.append(f"REVA_{r.upper()}_DB_PASSWORD")
         if role == "bootstrap" and self.reva_migration_database_url is None:
             problems.append("REVA_MIGRATION_DATABASE_URL")
         if self.reva_env != "production":
             return problems
-        if role in ("api", "worker", "sim") and self.reva_migration_database_url is not None:
+        if role in ("api", "worker", "sim", "gate") and self.reva_migration_database_url is not None:
             problems.append("REVA_MIGRATION_DATABASE_URL must not be present in a runtime process")
         if role == "api":
             if not self.reva_session_secret or len(self.reva_session_secret.get_secret_value()) < 32:
@@ -284,6 +301,7 @@ class Settings(BaseSettings):
             "api": self.reva_api_db_password,
             "worker": self.reva_worker_db_password,
             "sim": self.reva_sim_db_password,
+            "gate": self.reva_gate_db_password,
         }[role]
 
     def runtime_url(self, role: Role) -> URL:

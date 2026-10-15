@@ -1,0 +1,31 @@
+# V2 step 3a (agent POP): reviewed built-in connector eurostat.demography (demo_pjan,
+# demo_magec, demo_fasec observations and EUROPOP2023 proj_23* assumption tables).
+# Same provider and lineage family as eurostat.dissemination: values from the two
+# sources (e.g. demo_pjan for France via the autonomy template connector) are the same
+# upstream statistics and are never independent evidence of each other (invariant 13).
+source_key: eurostat.demography
+title: Eurostat dissemination API (JSON-stat 2.0) - demography and EUROPOP2023 projections
+provider_url: https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/
+lineage_family: eurostat
+rights:
+  licence: Eurostat copyright/licence policy (reuse authorised with acknowledgement, CC BY 4.0)
+  licence_url: https://ec.europa.eu/eurostat/about-us/policies/copyright
+  attribution: "Source: Eurostat"
+metadata:
+  api_docs: https://ec.europa.eu/eurostat/web/user-guides/data-browser/api-data-access/api-detailed-guidelines/api-statistics
+  datasets:
+    demo_pjan: https://ec.europa.eu/eurostat/cache/metadata/en/demo_pop_esms.htm
+    demo_magec: https://ec.europa.eu/eurostat/cache/metadata/en/demo_mor_esms.htm
+    demo_fasec: https://ec.europa.eu/eurostat/cache/metadata/en/demo_fer_esms.htm
+    proj_23nanmig: https://ec.europa.eu/eurostat/cache/metadata/en/proj_esms.htm
+    proj_23naasfr: https://ec.europa.eu/eurostat/cache/metadata/en/proj_esms.htm
+    proj_23np: https://ec.europa.eu/eurostat/cache/metadata/en/proj_esms.htm
+  age_definition: >-
+    demo_magec and demo_fasec: age in completed years (age at last birthday), the concept
+    Eurostat uses for its mortality and fertility indicators (demo_mor / demo_fer metadata).
+    demo_pjan: age in completed years on 1 January. Y_OPEN = open-ended class starting after
+    the last single age the country reports (85+, 90+, 95+, 99+ or 100+); UNK = age not stated.
+  projections_note: >-
+    EUROPOP2023 (proj_23*) values are Eurostat projection assumptions/outputs, not observations;
+    they enter REVA only as labelled assumption dataset inputs, never as observations or beliefs.
+  cadence: weekly metadata/update check

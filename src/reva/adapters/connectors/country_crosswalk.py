@@ -41,11 +41,16 @@ Entities defined in ``registry/entities/countries.yaml`` (human-reviewed) keep
 their reviewed aliases; the crosswalk records them with ``reviewed_entry: true``
 and the seed does not add crosswalk aliases for them.
 
-CLI (maintainer tool, the only network path is ``fetch`` through SafeHttpClient)::
+CLI (offline; this module makes no network request)::
 
-    python -m reva.adapters.connectors.country_crosswalk fetch   # refresh raw archives
-    python -m reva.adapters.connectors.country_crosswalk build   # rebuild the JSON
+    python -m reva.adapters.connectors.country_crosswalk build   # rebuild the JSON from the archives
     python -m reva.adapters.connectors.country_crosswalk verify  # digests + rebuild equality
+
+Refreshing the raw archives is a maintainer step outside ``src/reva`` (every live
+provider path inside it must be budgeted, invariant 30): download the four
+``SOURCES`` URLs, store them under ``registry/reference/`` (the M49 page as
+``gzip.compress(raw, mtime=0)``), update the sha256/retrieved_at entries of
+``registry/reference/manifest.yaml``, then ``build`` and review the diff.
 """
 
 from __future__ import annotations
@@ -94,7 +99,6 @@ SOURCES: tuple[SourceFile, ...] = (
     SourceFile("worldbank_countries", "worldbank_country.json",
                "https://api.worldbank.org/v2/country?format=json&per_page=400"),
 )
-ALLOWED_HOSTS = ("unstats.un.org", "comtradeapi.un.org", "api.worldbank.org")
 
 
 class CrosswalkError(ValueError):
@@ -440,62 +444,9 @@ def seed_entities(doc: dict[str, Any] | None = None) -> list[dict[str, Any]]:
 
 
 # --------------------------------------------------------------------------- CLI
-async def _fetch_all() -> dict[str, tuple[bytes, str]]:
-    from reva.adapters.http.rate_limit import HostPolicy, RateLimiter
-    from reva.adapters.http.safe_client import SafeHttpClient
-    from reva.settings import get_settings
-
-    settings = get_settings()
-    client = SafeHttpClient(
-        allowed_hosts=ALLOWED_HOSTS, timeout_seconds=60, max_bytes=8_000_000,
-        contact_email=settings.reva_http_contact_email, proxy_mode=settings.reva_http_proxy_mode,
-        rate_limiter=RateLimiter({h: HostPolicy(min_interval_seconds=3.0, max_concurrency=1) for h in ALLOWED_HOSTS}),
-    )
-    out = {}
-    try:
-        for s in SOURCES:
-            r = await client.get(s.url)
-            out[s.name] = (r.body, r.retrieved_at.astimezone(UTC).isoformat(timespec="seconds"))
-    finally:
-        await client.aclose()
-    return out
-
-
-def _write_archives(fetched: dict[str, tuple[bytes, str]]) -> None:
-    manifest_path = REFERENCE_DIR / "manifest.yaml"
-    manifest = yaml.safe_load(manifest_path.read_text(encoding="utf-8")) or []
-    by_file = {m["file"]: m for m in manifest}
-    for s in SOURCES:
-        body, retrieved = fetched[s.name]
-        data = gzip.compress(body, mtime=0) if s.gzip else body
-        (REFERENCE_DIR / s.file).write_bytes(data)
-        entry = by_file.get(s.file) or {"file": s.file}
-        if entry.get("sha256") != _sha256(body):  # same bytes: keep the first retrieval time
-            entry.update({"url": s.url, "sha256": _sha256(body), "retrieved_at": retrieved})
-        if s.gzip:
-            entry["stored_as"] = "gzip (mtime 0) of the raw response bytes; sha256 is of the raw bytes"
-        entry.setdefault("licence", {
-            "unsd_m49": "United Nations (UNSD M49 standard; reference metadata)",
-            "comtrade_reporters": "UN Comtrade terms of use (reference metadata)",
-            "comtrade_partners": "UN Comtrade terms of use (reference metadata)",
-            "worldbank_countries": "CC-BY-4.0 (World Bank API metadata)",
-        }[s.name])
-        entry.setdefault("use", "country crosswalk input (registry/entities/country_crosswalk.json)")
-        if s.file not in by_file:
-            manifest.append(entry)
-            by_file[s.file] = entry
-    manifest_path.write_text(yaml.safe_dump(manifest, sort_keys=False, allow_unicode=True), encoding="utf-8")
-
-
 def main(argv: list[str] | None = None) -> int:
-    import asyncio
-
     args = list(sys.argv[1:] if argv is None else argv)
     cmd = args[0] if args else "verify"
-    if cmd == "fetch":
-        _write_archives(asyncio.run(_fetch_all()))
-        print("archived", ", ".join(s.file for s in SOURCES))
-        return 0
     if cmd == "build":
         doc = build_from_archive()
         CROSSWALK_PATH.write_text(dumps(doc), encoding="utf-8")
@@ -509,7 +460,7 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(f"ok {datetime.now(UTC).date().isoformat()} content_sha256={doc['content_sha256']}")
         return 0
-    print(f"unknown command {cmd!r}; use fetch | build | verify", file=sys.stderr)
+    print(f"unknown command {cmd!r}; use build | verify", file=sys.stderr)
     return 2
 
 

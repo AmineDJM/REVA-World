@@ -133,4 +133,4 @@ async def capture(drafter: OpenAIDrafter | GeminiDrafter, request: LlmRequest, *
     return fixture
 
 
-__all__ = ["RecordedDrafter", "capture", "load_fixtures", "redact_body", "LlmUsage"]
+__all__ = ["LlmUsage", "RecordedDrafter", "capture", "load_fixtures", "redact_body"]

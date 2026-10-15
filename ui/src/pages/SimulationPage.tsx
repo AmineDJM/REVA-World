@@ -206,7 +206,7 @@ interface MissingInputRow {
 }
 
 /** A missing_input rejection listed as data gaps (never zero), above the raw problem details. */
-function MissingInputs({ error }: { error: unknown }) {
+export function MissingInputs({ error }: { error: unknown }) {
   if (!(error instanceof ApiError) || error.code !== 'missing_input') return null;
   const details = error.problem.details;
   const raw = isRecord(details) && Array.isArray(details.missing) ? details.missing : Array.isArray(error.problem.missing) ? error.problem.missing : [];
@@ -455,7 +455,8 @@ export default function SimulationPage() {
 
   const beliefs = useApi((s) => getBeliefs({ limit: 1 }, s), []);
   const releases = useApi((s) => getBeliefReleases({ limit: 20 }, s), []);
-  const [chosenRelease, setChosenRelease] = useState<string>('');
+  // ?release= preselects a release (links from the command palette).
+  const [chosenRelease, setChosenRelease] = useState<string>(params.get('release') ?? '');
   const [form, setForm] = useState<ScenarioForm>(DEFAULT_FORM);
   const [touched, setTouched] = useState(false);
   const [submitError, setSubmitError] = useState<unknown>(null);

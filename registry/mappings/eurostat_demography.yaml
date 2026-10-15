@@ -1,0 +1,39 @@
+# Exact mappings of the reviewed connector eurostat.demography (V2 step 3a, agent POP).
+# Subjects: the connector's reviewed Eurostat-geo -> ISO 3166 alpha-3 table (EL -> GRC),
+# resolved through iso3166_alpha3 aliases (no eurostat_geo aliases are added, so the
+# autonomy template's T1 scope is not widened).
+#
+# Eligibility: the observations are eligible evidence, but registry/policies/selection.yaml
+# lists no preference for this source, so source_select_v1 does not select them into
+# beliefs (about 6e5 single-age cells for 31 countries). The cohort model reads the same
+# values as dataset inputs pinned by digest in the belief release. EUROPOP2023 tables are
+# projection assumptions: they have no observation mapping (dataset inputs only).
+connector: {name: eurostat.demography, version: "1.0.0"}
+mappings:
+  - mapping_key: eurostat.demography.demo_pjan
+    source_ref: {provider: eurostat, dataset: demo_pjan, dimensions: {freq: A, unit: NR}}
+    target: {concept_id: demography.population.jan1_age_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, IRL, ISL, ITA, LIE, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+      years: {from: 2000, to: 2025}
+    eligibility: eligible
+  - mapping_key: eurostat.demography.demo_magec
+    source_ref: {provider: eurostat, dataset: demo_magec, dimensions: {freq: A, unit: NR}}
+    target: {concept_id: demography.deaths.age_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, IRL, ISL, ITA, LIE, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+      years: {from: 2000, to: 2024}
+    eligibility: eligible
+  - mapping_key: eurostat.demography.demo_fasec
+    source_ref: {provider: eurostat, dataset: demo_fasec, dimensions: {freq: A, unit: NR}}
+    target: {concept_id: demography.live_births.mother_age_newborn_sex, version: "1.0.0"}
+    mapping_kind: exact
+    version: "1.0.0"
+    applicability:
+      subjects: [AUT, BEL, BGR, CHE, CYP, CZE, DEU, DNK, ESP, EST, FIN, FRA, GRC, HRV, HUN, IRL, ISL, ITA, LIE, LTU, LUX, LVA, MLT, NLD, NOR, POL, PRT, ROU, SVK, SVN, SWE]
+      years: {from: 2007, to: 2024}
+    eligibility: eligible
