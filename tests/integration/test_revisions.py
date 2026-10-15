@@ -154,7 +154,7 @@ async def test_replayed_raw_with_new_parser_is_distinguished_from_original_vinta
     assert orig.inserted == 2
     y0, y1 = vl.series(name)["years"]
     replay_conn = vl.ReplayParserWorldBank(countries=("FRA",), years=(y0, y1))
-    vl.register_connector_variant(db.worker, db.store, replay_conn)
+    vl.register_connector_variant(db.owner, db.store, replay_conn)  # reviewed registry change: owner (R5-01)
     archived = db.store.get("raw", orig.raw_sha256)  # the original vintage bytes, as archived
     rep, _raw1 = await vl.ingest_vintage(db.worker, db.store, name, "v1", connector=replay_conn,
                                         replay_of=str(orig.acquisition_id), retrieved_at=raw0.retrieved_at,

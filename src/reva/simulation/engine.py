@@ -1,112 +1,93 @@
-"""Simulation engine: fidelity dispatch, deterministic execution and output digests.
+"""Simulation engine: model dispatch, fidelity dispatch, deterministic execution, digests.
 
-L0  exact-spec cache lookup: the same full specification (excluding only the
-    requested fidelity), same pinned baseline and same model manifest reuse a prior
-    succeeded L1/L2 outcome; otherwise the run is a ``cache_miss`` — never a
-    computed answer.
-L1  deterministic fixed-quantity crude border-value exposure.
-L2  labelled elasticity sensitivity over the declared grid. Each grid point is its
-    own result variant. The per-country/output min/max over grid ∪ {ε=(0,0)} is
-    published as a SEPARATE row (variant ``L2:sensitivity_range``) whose value is
-    the range object (kind ``sensitivity_range``) and whose uncertainty is a
-    ``sensitivity_range`` without a coverage level: assumption sensitivity, not a
-    confidence interval. The fixed-quantity ``L1`` row keeps its own unquantified
-    uncertainty (R3-03 / kernel rule R3-19); the range always contains it.
-L3/L4 reserved: CapabilityGap.
+The engine is model-agnostic: the scenario spec's ``model_key`` selects a plugin
+from :mod:`reva.simulation.plugins` (crude exposure = plugin #1,
+:mod:`reva.simulation.crude_plugin`).
 
-The engine only reads (pinned release, prior runs). Persistence lives in
-``reva.simulation.results``.
+L0  exact-spec cache lookup (platform, any model): the same full specification
+    (excluding only the requested fidelity), same pinned baseline and same model
+    manifest reuse a prior succeeded L1/L2 outcome; otherwise the run is a
+    ``cache_miss`` — never a computed answer.
+L1/L2  computed by the plugin, if it declares the fidelity.
+L3/L4  reserved: CapabilityGap.
+
+The engine only reads (pinned release, pinned datasets, prior runs). Persistence
+lives in ``reva.simulation.results``.
 """
 
 from __future__ import annotations
 
-import hashlib
 import time
 from dataclasses import dataclass, field
-from decimal import Decimal
-from functools import lru_cache
-from pathlib import Path
 from typing import Any
 from uuid import UUID
 
 from sqlalchemy import Connection, text
 
-from reva.kernel.errors import CapabilityGap, RevaError
+from reva.kernel.errors import CapabilityGap, MissingInput, RevaError
 from reva.kernel.ids import logical_hash
-from reva.kernel.uncertainty import UncertaintyKind, UncertaintySpec, UncertaintyStatus
 from reva.models.economic import crude_exposure as ce
-from reva.simulation import rng
-from reva.simulation.compile import CompiledScenario, compile_scenario
-from reva.simulation.spec import RESERVED_FIDELITY, ScenarioSpec
+from reva.ports.storage import ArtifactStore
+from reva.simulation import plugins, rng
+from reva.simulation.compile import CompiledScenario, compile_run
+from reva.simulation.crude_plugin import (  # noqa: F401  (V1 names, re-exported)
+    FIXED_POINT_CONDITION,
+    SENSITIVITY_METHOD,
+    SENSITIVITY_STATEMENT,
+    SENSITIVITY_VARIANT,
+    compute,
+    implementation_digest,
+)
+from reva.simulation.plugins import ResultRow
+from reva.simulation.spec import RESERVED_FIDELITY
 
 ENGINE_VERSION = "reva.simulation.engine@1.0.0"
-SENSITIVITY_METHOD = "reva.simulation.l2_elasticity_grid_minmax@1.1.0"
-SENSITIVITY_VARIANT = "L2:sensitivity_range"
-SENSITIVITY_STATEMENT = "assumption sensitivity, not a confidence interval"
-FIXED_POINT_CONDITION = ("fixed_quantity_point:import_elasticity=0;export_elasticity=0 (the L1 value) is always "
-                         "included in the range, whether or not it is listed in the grid")
-_IMPL_FILES = (
-    Path(ce.__file__),
-    Path(__file__),
-    Path(__file__).with_name("compile.py"),
-    Path(__file__).with_name("coupling.py"),
-)
+DEFAULT_MODEL_KEY = ce.MODEL_KEY
+#: Approval states the engine runs. ``candidate`` runs only for a plugin whose manifest
+#: declares ``review_status: maintainer_review_pending`` (V2 experimental models) and is
+#: labelled as such on the model manifest and every run.
+EXPERIMENTAL_REVIEW_STATUS = "maintainer_review_pending"
+EXPERIMENTAL_LABEL = "experimental model, not yet reviewed"
+
+__all__ = ["ENGINE_VERSION", "ResultRow", "RunPlan", "cache_key", "compute", "model_manifest", "output_digest",
+           "plan_run"]
 
 
-@lru_cache(maxsize=1)
-def implementation_digest() -> str:
-    """Hash of the model + engine sources: any change invalidates the L0 cache."""
-    h = hashlib.sha256()
-    for p in _IMPL_FILES:
-        h.update(p.name.encode())
-        h.update(p.read_bytes())
-    return f"sha256:{h.hexdigest()}"
+def model_manifest(conn: Connection, model_key: str | None = None, model_version: str | None = None
+                   ) -> dict[str, Any]:
+    """Deterministic model manifest for the scenario's model (default: the crude model).
 
-
-def model_manifest(conn: Connection) -> dict[str, Any]:
-    """Deterministic model manifest for economic.crude_exposure@1.0.0."""
+    The registry row (``model.version``) must exist and be approved — or be a
+    ``candidate`` whose plugin declares itself experimental (review pending), in which
+    case the manifest says so. The plugin's own manifest (implementation digest,
+    precision, review status) is merged into the model entry.
+    """
+    key = model_key or DEFAULT_MODEL_KEY
+    plugin = plugins.get(key)
+    version = model_version or plugin.model_version
+    if version != plugin.model_version:
+        raise CapabilityGap(f"model {key}@{version} is not available (registered plugin: {plugin.model_version})",
+                            capability=f"model.{key}")
     row = conn.execute(
         text("SELECT spec_sha256, approval_status, applicability FROM model.version WHERE model_key=:k AND version=:v"),
-        {"k": ce.MODEL_KEY, "v": ce.MODEL_VERSION},
+        {"k": key, "v": version},
     ).mappings().one_or_none()
     if row is None:
-        raise CapabilityGap(f"model {ce.MODEL_KEY}@{ce.MODEL_VERSION} is not registered",
-                            capability="model.registry")
-    if row["approval_status"] != "approved":
-        raise CapabilityGap(f"model {ce.MODEL_KEY}@{ce.MODEL_VERSION} is not approved",
-                            capability="model.approval")
-    return {
-        "schema": "reva-model-manifest/1",
-        "models": [{
-            "model_key": ce.MODEL_KEY,
-            "version": ce.MODEL_VERSION,
-            "spec_sha256": row["spec_sha256"],
-            "implementation": "reva.models.economic.crude_exposure",
-            "implementation_digest": implementation_digest(),
-            "decimal_precision": ce.PRECISION,
-        }],
-        "engine": ENGINE_VERSION,
-    }
+        raise CapabilityGap(f"model {key}@{version} is not registered", capability="model.registry")
+    own = dict(plugin.manifest())
+    experimental = (row["approval_status"] == "candidate"
+                    and own.get("review_status") == EXPERIMENTAL_REVIEW_STATUS)
+    if row["approval_status"] != "approved" and not experimental:
+        raise CapabilityGap(f"model {key}@{version} is not approved", capability="model.approval")
+    entry: dict[str, Any] = {"model_key": key, "version": version, "spec_sha256": row["spec_sha256"], **own}
+    if experimental:
+        entry.update(approval_status="candidate", experimental=True, label=EXPERIMENTAL_LABEL)
+    return {"schema": "reva-model-manifest/1", "models": [entry], "engine": ENGINE_VERSION}
 
 
 def cache_key(spec_json: dict[str, Any]) -> str:
     """Exact specification identity, excluding only the requested fidelity level."""
     return logical_hash({k: v for k, v in spec_json.items() if k != "fidelity"})
-
-
-@dataclass
-class ResultRow:
-    output_key: str
-    iso3: str
-    subject_id: UUID
-    variant: str
-    value: dict[str, Any]
-    uncertainty: dict[str, Any]
-    applicability: dict[str, Any]
-
-    def digest_view(self) -> dict[str, Any]:
-        return {"output_key": self.output_key, "subject_id": str(self.subject_id), "variant": self.variant,
-                "value": self.value}
 
 
 @dataclass
@@ -124,10 +105,11 @@ class RunPlan:
     cache_key: str | None = None
     cache_hit_of: UUID | None = None
     output_digest: str | None = None
-    compiled: CompiledScenario | None = None
+    compiled: CompiledScenario | Any | None = None
     release: dict[str, Any] | None = None
     seed_plan: dict[str, Any] = field(default_factory=dict)
     cost: dict[str, Any] = field(default_factory=dict)
+    input_provenance: dict[str, Any] | None = None
 
     @property
     def outcome_status(self) -> str:
@@ -136,146 +118,51 @@ class RunPlan:
 
 
 def output_digest(rows: list[ResultRow]) -> str:
+    """Logical hash of the sorted digest views (single-period views are the V1 views)."""
     return logical_hash(sorted((r.digest_view() for r in rows),
-                               key=lambda d: (d["output_key"], d["subject_id"], d["variant"])))
+                               key=lambda d: (d["output_key"], d["subject_id"], d["variant"],
+                                              d.get("period", []))))
 
 
-def _value(output_key: str, d: Decimal) -> dict[str, Any]:
-    unit = ce.OUTPUT_UNITS[output_key]
-    if unit == ce.USD:
-        basis = {"currency": "USD", "price_basis": "nominal", "scale_factor": "1",
-                 "notes": "change in border value over one annual accounting period"}
-    else:
-        basis = {"scale_factor": "1", "notes": "percent of same-year baseline nominal GDP (current USD)"}
-    return {"kind": "decimal", "value": ce.dstr(d), "unit_ref": unit, "basis": basis}
+def _plugin_or_none(model_key: Any) -> plugins.SimulationModel | None:
+    try:
+        return plugins.get(str(model_key))
+    except CapabilityGap:
+        return None
 
 
-def _unknown_uncertainty() -> dict[str, Any]:
-    return UncertaintySpec.unknown(
-        "Unquantified: inputs carry no published uncertainty and no error model is introduced; the value is "
-        "conditional on the stated scenario assumptions"
-    ).model_dump(mode="json")
+def _explanation(model: plugins.SimulationModel | None, fidelity: str, model_key: Any) -> dict[str, Any]:
+    hook = plugins.optional_hook(model, "explanation") if model is not None else None
+    if hook is not None:
+        return dict(hook(fidelity))
+    return {"model": f"{model_key}", "fidelity": fidelity}
 
 
-def _grid_conditioning(grid: list[dict[str, Any]]) -> tuple[str, ...]:
-    return (*(f"import_elasticity={g['import_elasticity']};export_elasticity={g['export_elasticity']}"
-              f";basis={g['basis']}" for g in grid), FIXED_POINT_CONDITION)
+def _seed_subjects(model: plugins.SimulationModel | None, spec_json: dict[str, Any]) -> list[str]:
+    hook = plugins.optional_hook(model, "seed_subjects") if model is not None else None
+    if hook is not None:
+        try:
+            return [str(s) for s in hook(spec_json)]
+        except RevaError:
+            pass
+    return [str(c) for c in spec_json.get("countries", [])]
 
 
-def _range_uncertainty(lo: Decimal, hi: Decimal, grid: list[dict[str, Any]]) -> dict[str, Any]:
-    """Uncertainty of the separate range row: assumption sensitivity only (kernel rule R3-19)."""
-    spec = UncertaintySpec(
-        status=UncertaintyStatus.quantified,
-        kind=UncertaintyKind.sensitivity_range,
-        description=(f"Elasticity sensitivity range ({SENSITIVITY_STATEMENT}): min/max of this output over the "
-                     "labelled scenario-assumption grid together with the fixed-quantity point ε=(0,0). Not a "
-                     "confidence, credible or prediction interval; no coverage level. It says nothing about the "
-                     "measurement uncertainty of the inputs, which is unquantified."),
-        method_version=SENSITIVITY_METHOD,
-        lower=ce.dstr(lo),
-        upper=ce.dstr(hi),
-        conditioning=_grid_conditioning(grid),
-    )
-    return spec.model_dump(mode="json")
-
-
-def _range_value(output_key: str, lo: Decimal, hi: Decimal, points: int) -> dict[str, Any]:
-    """The range object itself (value kind ``sensitivity_range``)."""
-    base = _value(output_key, lo)
-    return {
-        "kind": "sensitivity_range",
-        "lower": ce.dstr(lo),
-        "upper": ce.dstr(hi),
-        "unit_ref": base["unit_ref"],
-        "basis": base["basis"],
-        "evaluated_points": points,
-        "includes_fixed_quantity_point": True,
-        "statement": SENSITIVITY_STATEMENT,
-    }
-
-
-def _applicability(spec: ScenarioSpec, country: Any, variant: str, assumptions: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "status": "applicable",
-        "modality": "assumption_conditioned_scenario",
-        "model": f"{ce.MODEL_KEY}@{ce.MODEL_VERSION}",
-        "country": country.iso3,
-        "reference_year": spec.reference_year,
-        "horizon": spec.horizon.model_dump(mode="json"),
-        "variant": variant,
-        "variant_assumptions": assumptions,
-        "inputs": country.input_refs(),
-        "source_flags": ce.explain(country.inputs)["source_flags"],
-        "not_claimed": ce.NOT_CLAIMED,
-    }
-
-
-def compute(compiled: CompiledScenario, fidelity: str) -> list[ResultRow]:
-    """Deterministic L1 or L2 evaluation over ready countries (sorted, scheduling-independent)."""
-    spec = compiled.spec
-    ch = compiled.change
-    grid = [g.model_dump(mode="json") for g in spec.assumptions.elasticity_grid]
-    rows: list[ResultRow] = []
-    wanted = list(spec.outputs)
-    for c in sorted(compiled.countries, key=lambda c: c.iso3):
-        if c.status != "ready" or c.values is None:
-            continue
-        m, x, g = c.values
-        l1 = ce.exposure_l1(m, x, g, ch.import_multiplier, ch.export_multiplier)
-        if fidelity == "L1":
-            for k in wanted:
-                rows.append(ResultRow(k, c.iso3, c.subject_id, "L1", _value(k, getattr(l1, k)),
-                                      _unknown_uncertainty(),
-                                      _applicability(spec, c, "L1", {"quantity_response": "fixed"})))
-            continue
-        variants = [
-            ce.exposure_l2(m, x, g, ch.import_multiplier, ch.export_multiplier,
-                           Decimal(repr(p["import_elasticity"])), Decimal(repr(p["export_elasticity"])))
-            for p in grid
-        ]
-        # ε=(0,0) reproduces L1 bit-for-bit; it is always part of the range so the range contains L1.
-        fixed_point = ce.exposure_l2(m, x, g, ch.import_multiplier, ch.export_multiplier, Decimal(0), Decimal(0))
-        evaluated = {r.variant for r in variants} | {fixed_point.variant}
-        for k in wanted:
-            lo, hi = ce.sensitivity_range([fixed_point, *variants], k)
-            # The fixed-quantity row keeps its own (unquantified) uncertainty: R3-03.
-            rows.append(ResultRow(k, c.iso3, c.subject_id, "L1", _value(k, getattr(l1, k)),
-                                  _unknown_uncertainty(),
-                                  _applicability(spec, c, "L1", {"quantity_response": "fixed"})))
-            rows.append(ResultRow(k, c.iso3, c.subject_id, SENSITIVITY_VARIANT,
-                                  _range_value(k, lo, hi, len(evaluated)),
-                                  _range_uncertainty(lo, hi, grid),
-                                  _applicability(spec, c, SENSITIVITY_VARIANT, {
-                                      "quantity_response": "elasticity_sensitivity",
-                                      "range_over": "elasticity grid ∪ {(0,0)} (fixed-quantity L1 point)",
-                                      "elasticity_grid": grid,
-                                      "statement": SENSITIVITY_STATEMENT})))
-            for p, r in zip(grid, variants, strict=True):
-                if r.variant in {row.variant for row in rows if row.output_key == k and row.iso3 == c.iso3}:
-                    continue  # duplicate grid points are evaluated once
-                rows.append(ResultRow(k, c.iso3, c.subject_id, r.variant, _value(k, getattr(r, k)),
-                                      _unknown_uncertainty(),
-                                      _applicability(spec, c, r.variant, {"quantity_response": "elasticity",
-                                                                          **p})))
-    return rows
-
-
-def _base_plan(scenario: dict[str, Any], fidelity: str) -> RunPlan:
-    spec_json = dict(scenario["spec"])
-    return RunPlan(scenario_id=UUID(str(scenario["id"])), fidelity=fidelity, spec_json=spec_json,
-                   spec_digest=str(scenario["spec_digest"]), status="unsupported",
-                   cache_key=cache_key(spec_json))
-
-
-def plan_run(conn: Connection, scenario: dict[str, Any], fidelity: str, manifest: dict[str, Any]) -> RunPlan:
+def plan_run(conn: Connection, scenario: dict[str, Any], fidelity: str, manifest: dict[str, Any],
+             store: ArtifactStore | None = None) -> RunPlan:
     """Validate, compile and execute (or look up) a run. Never raises for request problems:
     they are recorded on the plan as unsupported / missing_input outcomes."""
     from reva.simulation.spec import validate_scenario_spec
 
     t0 = time.perf_counter()
-    plan = _base_plan(scenario, fidelity)
-    plan.seed_plan = rng.seed_plan(int(plan.spec_json.get("seed", 0)), f"{ce.MODEL_KEY}@{ce.MODEL_VERSION}",
-                                   [str(c) for c in plan.spec_json.get("countries", [])], 0)
+    spec_json = dict(scenario["spec"])
+    plan = RunPlan(scenario_id=UUID(str(scenario["id"])), fidelity=fidelity, spec_json=spec_json,
+                   spec_digest=str(scenario["spec_digest"]), status="unsupported", cache_key=cache_key(spec_json))
+    model_key = spec_json.get("model_key", DEFAULT_MODEL_KEY)
+    model = _plugin_or_none(model_key)
+    model_id = (f"{model.model_key}@{model.model_version}" if model is not None
+                else f"{model_key}@{spec_json.get('model_version')}")
+    plan.seed_plan = rng.seed_plan(int(spec_json.get("seed", 0)), model_id, _seed_subjects(model, spec_json), 0)
     try:
         if fidelity in RESERVED_FIDELITY:
             raise CapabilityGap(
@@ -285,47 +172,78 @@ def plan_run(conn: Connection, scenario: dict[str, Any], fidelity: str, manifest
             )
         if fidelity not in ("L0", "L1", "L2"):
             raise CapabilityGap(f"unknown fidelity {fidelity!r}", capability="fidelity")
-        spec = validate_scenario_spec({**plan.spec_json, "fidelity": fidelity})
+        spec = validate_scenario_spec({**spec_json, "fidelity": fidelity})
+        if model is None:
+            model = plugins.get(str(model_key))  # raises the structured CapabilityGap
         if fidelity == "L0":
-            _lookup(conn, plan, manifest)
+            _lookup(conn, plan, manifest, model)
         else:
-            compiled = compile_scenario(conn, spec)
+            if fidelity not in model.fidelities:
+                raise CapabilityGap(f"model {model_id} does not compute fidelity {fidelity}",
+                                    capability=f"fidelity.{fidelity}", model=model_id,
+                                    supported=sorted({"L0", *model.fidelities}))
+            _, compiled, inputs = compile_run(conn, spec.as_json(), store)
             plan.compiled = compiled
-            plan.release = compiled.release
-            plan.applicability = {
-                "explanation": ce.explain(None, fidelity=fidelity),
-                "intervention": compiled.change.as_json(),
-                "countries": {c.iso3: {"status": c.status, "problems": c.problems} for c in compiled.countries},
-                "schedule": compiled.schedule,
-                "baseline_inputs": compiled.baseline_inputs(),
-                "baseline_digest": compiled.baseline_digest(),
-            }
-            if compiled.missing:
-                plan.status = "missing_input"
-                plan.problems = compiled.missing + compiled.incompatible
-            elif compiled.incompatible:
-                plan.status = "unsupported"
-                plan.problems = compiled.incompatible
+            plan.release = dict(inputs.release)
+            plan.input_provenance = inputs.provenance() if inputs.datasets else None
+            hook = plugins.optional_hook(model, "run_applicability")
+            plan.applicability = dict(hook(compiled, fidelity)) if hook else {
+                "explanation": _explanation(model, fidelity, model_key)}
+            plan.applicability.setdefault("explanation", _explanation(model, fidelity, model_key))
+            if plan.input_provenance is not None:
+                plan.applicability["input_provenance"] = plan.input_provenance
+            if manifest.get("models") and manifest["models"][0].get("experimental"):
+                plan.applicability["model_label"] = EXPERIMENTAL_LABEL
+            own_missing = getattr(compiled, "missing", None)
+            if own_missing is None:
+                # The plugin does not report missing inputs itself: the platform refuses
+                # before compute whenever any declared input is missing.
+                missing = inputs.missing_problems()
+                incompatible: list[dict[str, Any]] = []
             else:
-                plan.results = compute(compiled, fidelity)
+                missing = list(own_missing)
+                incompatible = list(getattr(compiled, "incompatible", []) or [])
+            if missing:
+                plan.status = "missing_input"
+                plan.problems = missing + incompatible
+            elif incompatible:
+                plan.status = "unsupported"
+                plan.problems = incompatible
+            else:
+                plan.results = model.compute(compiled, fidelity)
                 plan.status = "succeeded"
                 plan.output_digest = output_digest(plan.results)
+    except MissingInput as e:
+        plan.status = "missing_input"
+        plan.problems = [{"code": "missing_input", **m} for m in e.details.get("missing", [])] or [e.problem()]
+        plan.results, plan.cache_hit_of, plan.output_digest = [], None, None
+        plan.applicability.setdefault("explanation", _explanation(model, fidelity, model_key))
     except RevaError as e:
         plan.status = "unsupported"
         plan.problems = [e.problem()]
         plan.results, plan.cache_hit_of, plan.output_digest = [], None, None
-        plan.applicability.setdefault("explanation", ce.explain(None, fidelity=fidelity))
+        plan.applicability.setdefault("explanation", _explanation(model, fidelity, model_key))
+    cost_hook = plugins.optional_hook(model, "cost") if model is not None else None
     plan.cost = {
         "compute_seconds": round(time.perf_counter() - t0, 6),
-        "countries": len(plan.spec_json.get("countries", [])),
-        "grid_points": len(plan.spec_json.get("assumptions", {}).get("elasticity_grid", [])),
+        "countries": len(spec_json.get("countries", [])),
+        **(dict(cost_hook(spec_json)) if cost_hook else {}),
         "result_rows": len(plan.results),
         "random_draws": 0,
     }
     return plan
 
 
-def _lookup(conn: Connection, plan: RunPlan, manifest: dict[str, Any]) -> None:
+def _period(row: dict[str, Any]) -> tuple[Any, Any] | None:
+    from datetime import date
+
+    s, e = row.get("period_start"), row.get("period_end")
+    if s is None and e is None:
+        return None
+    return (date.fromisoformat(str(s)), date.fromisoformat(str(e)))
+
+
+def _lookup(conn: Connection, plan: RunPlan, manifest: dict[str, Any], model: plugins.SimulationModel) -> None:
     """L0: reuse a prior succeeded computed outcome for the exact same specification."""
     mm = logical_hash(manifest)
     row = conn.execute(
@@ -340,7 +258,7 @@ def _lookup(conn: Connection, plan: RunPlan, manifest: dict[str, Any]) -> None:
         ),
         {"k": plan.cache_key, "mm": mm, "b": plan.spec_json["baseline_release_id"]},
     ).mappings().one_or_none()
-    plan.applicability = {"explanation": ce.explain(None, fidelity="L0"),
+    plan.applicability = {"explanation": _explanation(model, "L0", model.model_key),
                           "l0": "exact-specification cache lookup; no computation"}
     if row is None:
         plan.status = "cache_miss"
@@ -349,16 +267,20 @@ def _lookup(conn: Connection, plan: RunPlan, manifest: dict[str, Any]) -> None:
                                     "manifest; L0 does not compute an answer (request L1 or L2)"}]
         return
     prior = UUID(str(row["id"]))
+    # to_jsonb(r) reads the V2 period columns when present (migration 0008) and yields
+    # NULL on a pre-0008 schema, so the lookup works on both.
     res = conn.execute(
         text("""SELECT r.output_key, r.subject_id, r.variant, r.value, r.uncertainty, r.applicability,
+                       to_jsonb(r)->>'period_start' AS period_start, to_jsonb(r)->>'period_end' AS period_end,
                        e.label FROM sim.result r LEFT JOIN world.entity e ON e.id = r.subject_id
-                WHERE r.run_id = :r ORDER BY r.output_key, r.subject_id, r.variant"""),
+                WHERE r.run_id = :r ORDER BY r.output_key, r.subject_id, r.variant,
+                      to_jsonb(r)->>'period_start'"""),
         {"r": prior},
     ).mappings().all()
     plan.results = [
         ResultRow(r["output_key"], str(r["applicability"].get("country", r["label"])), UUID(str(r["subject_id"])),
                   r["variant"], dict(r["value"]), dict(r["uncertainty"]),
-                  {**dict(r["applicability"]), "cache_hit_of": str(prior)})
+                  {**dict(r["applicability"]), "cache_hit_of": str(prior)}, _period(dict(r)))
         for r in res
     ]
     plan.cache_hit_of = prior

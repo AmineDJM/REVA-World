@@ -31,6 +31,7 @@ import io
 import json
 import logging
 import os
+import random
 import shutil
 import subprocess
 import sys
@@ -436,8 +437,11 @@ def test_store_put_racing_rogue_writer_never_reports_success_over_foreign_bytes(
     """A rogue conditional writer and REVA writers race for one key: whoever lands first
     wins, nothing is overwritten, and a REVA put succeeds only if the true bytes landed."""
     st = S3ArtifactStore(admin, bucket, f"t-{uuid.uuid4().hex[:8]}/", spool_dir=str(tmp_path))
-    for _ in range(8):
-        data = os.urandom(256 * 1024)
+    rng = random.Random(20261015)
+    winners = {"reva": 0, "rogue": 0}
+    for _ in range(40):
+        data = os.urandom(64 * 1024)
+        jitter = [rng.uniform(0, 0.03) for _ in range(4)]  # rogue start delays: both sides get to win
         key = object_key(st.prefix, "raw", sha(data))
         barrier = threading.Barrier(8)
 
@@ -451,6 +455,7 @@ def test_store_put_racing_rogue_writer_never_reports_success_over_foreign_bytes(
 
         def rogue(i: int) -> str:
             barrier.wait()
+            time.sleep(jitter[i])
             try:
                 admin.put_object(
                     Bucket=bucket, Key=key, Body=b"rogue %d" % i, Metadata={"reva-sha256": sha(data)}, IfNoneMatch="*"
@@ -465,10 +470,13 @@ def test_store_put_racing_rogue_writer_never_reports_success_over_foreign_bytes(
         final = bytes(admin.get_object(Bucket=bucket, Key=key)["Body"].read())
         reva_out, rogue_out = out[:4], out[4:]
         if final == data:
+            winners["reva"] += 1
             assert reva_out == ["stored"] * 4 and "rogue_ok" not in rogue_out, out
         else:
+            winners["rogue"] += 1
             assert final.startswith(b"rogue ") and rogue_out.count("rogue_ok") == 1, out
             assert reva_out == ["integrity"] * 4, out
+    assert winners["reva"] and winners["rogue"], winners  # both interleavings were exercised
 
 
 # =========================================================================== settings

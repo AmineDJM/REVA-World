@@ -652,7 +652,7 @@ def _ensure_reapproved(db: Any, name: str) -> None:
     re-approval with the original applicability (append-only; latest decision wins)."""
     from reva.evidence.locks import take_evidence_write_lock
 
-    with db.worker.begin() as c:
+    with db.owner.begin() as c:  # a named-human re-approval: admin path, not worker credentials (R5-01)
         take_evidence_write_lock(c)
         cv = c.execute(text("SELECT id FROM evidence.connector_version WHERE name=:n ORDER BY recorded_at DESC "
                             "LIMIT 1"), {"n": name}).scalar_one()

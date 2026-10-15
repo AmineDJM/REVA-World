@@ -22,10 +22,13 @@ Semantics preserved from the provider:
 
 from __future__ import annotations
 
+import ast
 import hashlib
+import importlib.util
 import json
 import math
 import re
+import sys
 from collections.abc import Iterator, Mapping, Sequence
 from datetime import date
 from decimal import Decimal
@@ -34,7 +37,7 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlencode
 
-from reva.adapters.connectors.base import json_decimal, module_digest, plain, schema_fingerprint, to_raw
+from reva.adapters.connectors.base import json_decimal, plain, schema_fingerprint, to_raw
 from reva.adapters.http.safe_client import HttpResult, require_json
 from reva.kernel.errors import SourceResponseError, ValidationProblem
 from reva.kernel.support import PopulationRef, SpatialRef, Support
@@ -78,11 +81,17 @@ EUROSTAT_FLAGS: dict[str, str] = {
 }
 MISSING_REASON_BY_FLAG = {"c": "suppressed", "z": "not_applicable"}
 
-_DATASET_RE = re.compile(r"^[a-z0-9_]{2,64}$")
-_CODE_RE = re.compile(r"^[A-Za-z0-9_\-]{1,40}$")
-_DIM_RE = re.compile(r"^[a-z0-9_]{1,32}$")
-_ALIAS_RE = re.compile(r"^[a-z0-9_]{1,40}$")
-_REF_RE = re.compile(r"^[a-z0-9_.]{1,80}$")
+# Identifiers are checked with ``fullmatch`` (R6-11): Python's ``$`` also matches
+# before a trailing newline, so ``re.match(r"...$")`` would accept ``"FR\n"``.
+_DATASET_RE = re.compile(r"[a-z0-9_]{2,64}")
+_CODE_RE = re.compile(r"[A-Za-z0-9_\-]{1,40}")
+_DIM_RE = re.compile(r"[a-z0-9_]{1,32}")
+_ALIAS_RE = re.compile(r"[a-z0-9_]{1,40}")
+_REF_RE = re.compile(r"[a-z0-9_.]{1,80}")
+_NAME_RE = re.compile(r"[a-z][a-z0-9_.-]{1,127}")
+# Canonical semantic version (R6-05): no leading zeros, no suffix, no whitespace.
+SEMVER_RE = re.compile(r"(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})\.(0|[1-9][0-9]{0,8})")
+_TEMPORAL_RE = re.compile(r"point:(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])")
 _AGGREGATIONS = {"point_in_time_stock", "period_average_stock", "period_flow_total", "period_rate",
                  "category_cell"}
 # Logical keys use a strict placeholder language (never ``str.format``): ``{name}``
@@ -102,9 +111,80 @@ def connector_schema() -> dict[str, Any]:
     return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
 
+# (R6-07) The template's behaviour depends on every reva module it imports (directly or
+# transitively: base.json_decimal, safe_client.require_json, kernel support/time/uncertainty,
+# ...) and on the connector schema. The pinned digest covers the bytes of that whole import
+# closure, enumerated deterministically from the import statements of the loaded files.
+TEMPLATE_MODULE = __name__
+DIGEST_DATA_FILES: tuple[Path, ...] = (SCHEMA_PATH,)
+
+
+def _reva_imports(source: bytes) -> list[str]:
+    """``reva.*`` modules named by any import statement (module level or lazy) of ``source``."""
+    out: list[str] = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.ImportFrom) and node.module and node.level == 0:
+            out += [node.module, *(f"{node.module}.{a.name}" for a in node.names)]
+        elif isinstance(node, ast.Import):
+            out += [a.name for a in node.names]
+    return [n for n in out if n == "reva" or n.startswith("reva.")]
+
+
+def _module_file(name: str) -> str | None:
+    mod = sys.modules.get(name)
+    origin = getattr(mod, "__file__", None) if mod is not None else None
+    if origin is None:
+        try:
+            spec = importlib.util.find_spec(name)
+        except (ImportError, AttributeError, ValueError):  # e.g. ``pkg.module.function``
+            return None
+        origin = spec.origin if spec is not None else None
+    return origin if origin and origin.endswith(".py") else None
+
+
+@lru_cache(maxsize=1)
+def template_closure() -> tuple[tuple[str, str], ...]:
+    """Sorted ``(module or data file, sha256 of its bytes)`` for the template's reviewed closure."""
+    seen: dict[str, str] = {}
+    todo = [TEMPLATE_MODULE]
+    while todo:
+        name = todo.pop()
+        if name in seen:
+            continue
+        path = _module_file(name)
+        if path is None:
+            continue
+        data = Path(path).read_bytes()
+        seen[name] = hashlib.sha256(data).hexdigest()
+        todo.extend(_reva_imports(data))
+    for f in DIGEST_DATA_FILES:
+        seen[f"file:{f.name}"] = hashlib.sha256(f.read_bytes()).hexdigest()
+    return tuple(sorted(seen.items()))
+
+
+def _rebound_imports() -> list[str]:
+    """Names this module imported from reva modules that no longer are those modules' objects."""
+    out = []
+    for node in ast.parse(Path(__file__).read_bytes()).body:
+        if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("reva.") and node.level == 0:
+            src = sys.modules.get(node.module)
+            for a in node.names:
+                local = a.asname or a.name
+                if src is None or globals().get(local) is not getattr(src, a.name, None):
+                    out.append(f"{node.module}.{a.name}")
+    return sorted(out)
+
+
 def template_digest() -> str:
-    """Digest of this reviewed template module (what promotion policy approves)."""
-    return module_digest(EurostatJsonStatConnector)
+    """Digest of the reviewed template *and its whole reva import closure* (what the policy pins).
+
+    ``sha256`` over the sorted ``module:sha256(file bytes)`` lines of the closure plus the
+    connector schema. If a name the template imported was re-bound at runtime (monkey
+    patching), the digest includes that fact and can no longer equal the pin.
+    """
+    lines = [f"{k}:{v}" for k, v in template_closure()]
+    lines += [f"rebound:{n}" for n in _rebound_imports()]
+    return "sha256:" + hashlib.sha256("\n".join(lines).encode()).hexdigest()
 
 
 def manifest_digest(manifest: Mapping[str, Any]) -> str:
@@ -127,22 +207,26 @@ def validate_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
     if not set(m["allowed_hosts"]) <= set(TEMPLATE_HOSTS):
         raise ValidationProblem("manifest hosts exceed the template's fixed hosts",
                                 hosts=sorted(set(m["allowed_hosts"]) - set(TEMPLATE_HOSTS)))
-    if not _DATASET_RE.match(m["dataset"]):
+    if not isinstance(m["dataset"], str) or not _DATASET_RE.fullmatch(m["dataset"]):
         raise ValidationProblem("invalid Eurostat dataset code")
+    if not isinstance(m["name"], str) or not _NAME_RE.fullmatch(m["name"]):
+        raise ValidationProblem("invalid connector name")
+    if not isinstance(m["version"], str) or not SEMVER_RE.fullmatch(m["version"]):
+        raise ValidationProblem("connector version must be a canonical MAJOR.MINOR.PATCH string")
     rp = m["request_parameters"]
     for key in ("filters", "time", "dimension_order", "pinned_categories", "semantics", "subject",
                 "resolution_dimensions", "total_categories"):
         if key not in rp:
             raise ValidationProblem(f"request_parameters.{key} is required by {TEMPLATE_ID}")
     order = rp["dimension_order"]
-    if not (isinstance(order, list) and order and all(isinstance(d, str) and _DIM_RE.match(d) for d in order)):
+    if not (isinstance(order, list) and order and all(isinstance(d, str) and _DIM_RE.fullmatch(d) for d in order)):
         raise ValidationProblem("dimension_order must be a non-empty list of dimension ids")
     if len(set(order)) != len(order) or "time" not in order:
         raise ValidationProblem("dimension_order must be unique and contain 'time'")
     for dim, codes in {**rp["filters"], **rp["pinned_categories"]}.items():
         if dim not in order or not isinstance(codes, list) or not codes:
             raise ValidationProblem(f"filter/pin on unknown or empty dimension {dim!r}")
-        if not all(isinstance(c, str) and _CODE_RE.match(c) for c in codes):
+        if not all(isinstance(c, str) and _CODE_RE.fullmatch(c) for c in codes):
             raise ValidationProblem(f"invalid category code in {dim!r}")
     years = rp["time"]
     if not (isinstance(years, list) and 1 <= len(years) <= 30
@@ -158,12 +242,12 @@ def validate_manifest(manifest: Mapping[str, Any]) -> dict[str, Any]:
             raise ValidationProblem(f"semantics.{key} is required")
     if sem["aggregation"] not in _AGGREGATIONS:
         raise ValidationProblem("unsupported aggregation")
-    if not re.match(r"^point:(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])$", sem["temporal_support"]):
+    if not _TEMPORAL_RE.fullmatch(sem["temporal_support"]):
         raise ValidationProblem("template supports point:MM-DD temporal support only")
-    if not _REF_RE.match(sem["concept_id"]) or not _REF_RE.match(sem["unit_ref"]):
+    if not _REF_RE.fullmatch(sem["concept_id"]) or not _REF_RE.fullmatch(sem["unit_ref"]):
         raise ValidationProblem("invalid concept/unit reference")
     subj = rp["subject"]
-    if subj.get("dimension") not in order or not _ALIAS_RE.match(str(subj.get("alias_provider", ""))):
+    if subj.get("dimension") not in order or not _ALIAS_RE.fullmatch(str(subj.get("alias_provider", ""))):
         raise ValidationProblem("subject must name a cube dimension and an alias provider")
     flags = rp.get("status_vocabulary", list(EUROSTAT_FLAGS))
     if not set(flags) <= set(EUROSTAT_FLAGS):

@@ -259,6 +259,19 @@
             ],
             "title": "Observation Revision No"
           },
+          "proposal_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Repair proposal whose review lifts the pause",
+            "title": "Proposal Id"
+          },
           "release_id": {
             "format": "uuid",
             "title": "Release Id",
@@ -275,6 +288,19 @@
               }
             ],
             "title": "Retrieved At"
+          },
+          "served_from_release_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Release this row was read from. Differs from the envelope's baseline release when the pinned release withheld the concept and the last earlier release that published it is served (stale)",
+            "title": "Served From Release Id"
           },
           "source_flags": {
             "anyOf": [
@@ -305,6 +331,24 @@
               }
             ],
             "title": "Source Key"
+          },
+          "stale": {
+            "default": false,
+            "description": "Publication of this concept is paused (e.g. a source schema quarantine awaiting a reviewed repair): the value is the last accepted one, not fresh",
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "stale_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Why the concept is stale, e.g. source_schema_quarantine",
+            "title": "Stale Reason"
           },
           "subject": {
             "$ref": "#/components/schemas/EntityRef"
@@ -369,6 +413,10 @@
           "retrieved_at",
           "source_flags",
           "source_flags_truncated",
+          "stale",
+          "stale_reason",
+          "proposal_id",
+          "served_from_release_id",
           "method"
         ],
         "title": "BeliefEstimate",

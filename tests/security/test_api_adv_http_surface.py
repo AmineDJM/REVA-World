@@ -299,10 +299,15 @@ def test_rate_limited_attempts_are_audited_once_per_window(db: Any) -> None:
         codes = [c.post("/v1/session", json={"username": marker, "password": "x"}).status_code for _ in range(25)]
     app.state.engine.dispose()
     assert codes[0] == 401 and set(codes[1:]) == {429}
+    tag = app.state.auth.username_tag(marker)
     with db.owner.connect() as conn:
         n = conn.execute(text("SELECT count(*) FROM ops.audit WHERE action = 'session.login_rate_limited' "
-                              "AND target->>'username' = :u"), {"u": marker}).scalar_one()
+                              "AND target->>'username_tag' = :u"), {"u": tag}).scalar_one()
+        leaked = conn.execute(text("SELECT count(*) FROM ops.audit WHERE action LIKE 'session.login_%' "
+                                   "AND (target::text LIKE :m OR details::text LIKE :m)"),
+                              {"m": f"%{marker}%"}).scalar_one()
     assert n == 1
+    assert leaked == 0  # P8: the typed username is not stored verbatim
 
 
 @pytest.mark.db

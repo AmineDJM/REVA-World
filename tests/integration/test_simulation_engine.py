@@ -381,8 +381,8 @@ def test_run_reuse_key_includes_model_manifest(db, baseline, monkeypatch):
     assert again["run_id"] == first["run_id"] and again.get("idempotent_replay") is True
     real = sim_jobs.model_manifest
 
-    def changed(conn):
-        m = real(conn)
+    def changed(conn, *args):
+        m = real(conn, *args)
         m["models"][0] = {**m["models"][0], "implementation_digest": "sha256:" + "0" * 64}
         return m
 

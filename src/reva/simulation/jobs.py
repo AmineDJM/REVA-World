@@ -1,8 +1,10 @@
 """Simulation job handler: ``handle_simulation(payload, ctx)``.
 
 payload: ``{"scenario_id": uuid, "fidelity": "L0"|"L1"|"L2"}`` (optional
-``idempotency_key``). Reads and writes go through the reva_sim role only; the sim
-role cannot write evidence or beliefs (database grants, not a WHERE clause).
+``idempotency_key``). The scenario spec's ``model_key`` selects the model plugin
+(:mod:`reva.simulation.plugins`); the model manifest is that model's. Reads and
+writes go through the reva_sim role only; the sim role cannot write evidence or
+beliefs (database grants, not a WHERE clause).
 
 Request problems (missing inputs, unsupported fidelity/horizon, cache miss) are
 recorded as immutable run outcomes and the job completes with that outcome as a
@@ -27,13 +29,15 @@ from uuid import UUID
 from sqlalchemy import Connection, text
 from sqlalchemy.exc import DBAPIError
 
-from reva.kernel.errors import ConfigurationError, StaleLease, ValidationProblem
+from reva.kernel.errors import CapabilityGap, ConfigurationError, StaleLease, ValidationProblem
 from reva.kernel.ids import logical_hash
 from reva.operations.context import JobCancelled, JobContext
+from reva.simulation import plugins
 from reva.simulation import results as res
 from reva.simulation.engine import ENGINE_VERSION, RunPlan, model_manifest, plan_run
 
 ALL_FIDELITY = ("L0", "L1", "L2", "L3", "L4")
+DEFAULT_SCHEDULING = "deterministic: countries sorted by ISO3; acyclic one-way coupling"
 
 
 def load_scenario(conn: Connection, scenario_id: UUID) -> dict[str, Any]:
@@ -50,6 +54,14 @@ def load_scenario(conn: Connection, scenario_id: UUID) -> dict[str, Any]:
 def default_idempotency_key(spec_digest: str, fidelity: str, baseline_release_id: Any,
                             model_manifest_digest: str) -> str:
     return f"sim:{spec_digest}:{fidelity}:{baseline_release_id}:{model_manifest_digest}"
+
+
+def _scheduling(model_key: Any) -> str:
+    """Execution-order statement of the model (plugin attribute ``scheduling``)."""
+    try:
+        return str(getattr(plugins.get(str(model_key)), "scheduling", DEFAULT_SCHEDULING))
+    except CapabilityGap:
+        return DEFAULT_SCHEDULING
 
 
 def _is_stale(e: DBAPIError) -> bool:
@@ -82,8 +94,8 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
         fidelity = str(payload.get("fidelity") or scenario["spec"].get("fidelity"))
         if fidelity not in ALL_FIDELITY:
             raise ValidationProblem(f"unknown fidelity {fidelity!r}")
-        manifest = model_manifest(conn)
-        plan: RunPlan = plan_run(conn, scenario, fidelity, manifest)
+        manifest = model_manifest(conn, scenario["spec"].get("model_key"), scenario["spec"].get("model_version"))
+        plan: RunPlan = plan_run(conn, scenario, fidelity, manifest, store=ctx.store)
         conn.rollback()
 
     mm_digest = logical_hash(manifest)
@@ -100,8 +112,8 @@ def handle_simulation(payload: dict[str, Any], ctx: JobContext) -> dict[str, Any
         "fidelity": fidelity,
         "cache_key": plan.cache_key,
         "model_manifest_logical_sha256": mm_digest,
-        "scheduling": "deterministic: countries sorted by ISO3; acyclic one-way coupling",
-        "decimal_precision": manifest["models"][0]["decimal_precision"],
+        "scheduling": _scheduling(scenario["spec"].get("model_key")),
+        "decimal_precision": manifest["models"][0].get("decimal_precision"),
         "job_id": str(ctx.job_id),
         "attempt": ctx.attempt,
         "worker_id": ctx.worker_id,

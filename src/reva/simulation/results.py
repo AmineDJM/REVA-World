@@ -56,6 +56,17 @@ def store_sim_json_artifact(conn: Connection, store: ArtifactStore, payload: Any
     return sha
 
 
+def _dataset_inputs(plan: RunPlan) -> list[tuple[str, dict[str, Any]]]:
+    """Pinned dataset artifacts read by the run (provenance inputs of the run activity)."""
+    prov = plan.input_provenance or {}
+    seen: dict[str, dict[str, Any]] = {}
+    for d in prov.get("datasets", []):
+        if d.get("artifact_sha256") and d["artifact_sha256"] not in seen:
+            seen[d["artifact_sha256"]] = {"role": "dataset_input", "dataset_id": d.get("dataset_id"),
+                                          "input": d.get("name"), "subject": d.get("subject")}
+    return sorted(seen.items())
+
+
 def existing_run(conn: Connection, idempotency_key: str) -> dict[str, Any] | None:
     row = conn.execute(
         text("""SELECT r.id AS run_id, r.scenario_id, r.fidelity, o.status, o.output_digest,
@@ -115,8 +126,11 @@ def publish_run(
     )
     results_json = [
         {"output_key": r.output_key, "country": r.iso3, "subject_id": str(r.subject_id), "variant": r.variant,
-         "value": r.value, "uncertainty": r.uncertainty}
-        for r in sorted(plan.results, key=lambda r: (r.output_key, r.iso3, r.variant))
+         "value": r.value, "uncertainty": r.uncertainty,
+         **({} if r.period is None else {"period": {"start": r.period[0].isoformat(),
+                                                    "end": r.period[1].isoformat(), "bounds": "[)"}})}
+        for r in sorted(plan.results, key=lambda r: (r.output_key, r.iso3, r.variant,
+                                                     "" if r.period is None else r.period[0].isoformat()))
     ]
     result_manifest = {
         "schema": RESULT_SCHEMA,
@@ -148,18 +162,32 @@ def publish_run(
             (scenario["spec_sha256"], {"role": "scenario_spec", "scenario_id": str(plan.scenario_id)}),
             (model_sha, {"role": "model_manifest"}),
             (onto_sha, {"role": "ontology_manifest"}),
+            *_dataset_inputs(plan),
         ],
         outputs=[manifest_sha],
     )
     for r in plan.results:
-        conn.execute(
-            text("""INSERT INTO sim.result(run_id, output_key, subject_id, variant, value, uncertainty,
-                                           applicability, artifact_sha256, provenance_activity_id)
-                    VALUES (:run, :k, :s, :v, CAST(:val AS jsonb), CAST(:u AS jsonb), CAST(:ap AS jsonb),
-                            :sha, :a)"""),
-            {"run": run_id, "k": r.output_key, "s": r.subject_id, "v": r.variant, "val": _j(r.value),
-             "u": _j(r.uncertainty), "ap": _j(r.applicability), "sha": manifest_sha, "a": activity.id},
-        )
+        params = {"run": run_id, "k": r.output_key, "s": r.subject_id, "v": r.variant, "val": _j(r.value),
+                  "u": _j(r.uncertainty), "ap": _j(r.applicability), "sha": manifest_sha, "a": activity.id}
+        if r.period is None:
+            # Single-period rows use the V1 statement (period columns stay NULL), so this
+            # path also works on a database without migration 0008.
+            conn.execute(
+                text("""INSERT INTO sim.result(run_id, output_key, subject_id, variant, value, uncertainty,
+                                               applicability, artifact_sha256, provenance_activity_id)
+                        VALUES (:run, :k, :s, :v, CAST(:val AS jsonb), CAST(:u AS jsonb), CAST(:ap AS jsonb),
+                                :sha, :a)"""),
+                params,
+            )
+        else:
+            conn.execute(
+                text("""INSERT INTO sim.result(run_id, output_key, subject_id, variant, value, uncertainty,
+                                               applicability, artifact_sha256, provenance_activity_id,
+                                               period_start, period_end)
+                        VALUES (:run, :k, :s, :v, CAST(:val AS jsonb), CAST(:u AS jsonb), CAST(:ap AS jsonb),
+                                :sha, :a, :ps, :pe)"""),
+                {**params, "ps": r.period[0], "pe": r.period[1]},
+            )
     conn.execute(
         text("""INSERT INTO sim.run_outcome(run_id, status, output_manifest_sha256, output_digest, applicability,
                                             problems, cost, cache_hit_of, provenance_activity_id)

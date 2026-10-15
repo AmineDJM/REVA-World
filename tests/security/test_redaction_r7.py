@@ -586,7 +586,6 @@ def test_api_unhandled_error_is_generic_with_request_id(api: Any, json_log: io.S
     assert_absent(json_log.getvalue(), ADMIN_PASSWORD)
 
 
-@pytest.mark.xfail(strict=True, reason="api/errors.py: the 500 fallback response lacks X-Request-ID (patch P5)")
 def test_api_unhandled_error_response_carries_request_id_header(api: Any) -> None:
     _, client = api
     r = client.get("/v1/_r7_boom", headers={"X-Request-ID": "r7-boom-2"})
@@ -634,7 +633,6 @@ def test_api_process_logs_are_redacted_once_logging_is_configured(tmp_path: Path
     assert_absent(r.stdout + r.stderr, sha)
 
 
-@pytest.mark.xfail(strict=True, reason="reva.api.app never installs the redacting log handler (patch P4)")
 def test_api_process_as_shipped_redacts_error_logs(tmp_path: Path) -> None:
     sha = canary("sha")
     r = _api_process(tmp_path, "as-shipped", sha)

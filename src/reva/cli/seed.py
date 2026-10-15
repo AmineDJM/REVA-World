@@ -161,7 +161,32 @@ def _seed_entities(conn: Connection, reg: Registry, act: UUID) -> int:
                       mapping_version=PARTNER_MAPPING_VERSION,
                       valid_from=_catalogue_date(p.get("entryEffectiveDate")),
                       valid_to=_catalogue_date(p.get("entryExpiredDate"), exclusive_end=True))
+    n += _seed_crosswalk_entities(conn, {e["key"] for e in reg.entities}, act)
     return n
+
+
+# --- V2 step 1 (agent ALLC): data-driven country entities from the provider crosswalk ---
+# registry/entities/country_crosswalk.json is built mechanically from the providers' own
+# reference lists (UNSD M49, Comtrade Reporters/partnerAreas, World Bank countries; raw
+# bytes archived in registry/reference/, digests verified on load). Its aliases are seeded
+# as 'provider_declared' (not human-reviewed); entities in countries.yaml keep their
+# reviewed aliases and get nothing from the crosswalk. Composite/"nes"/historical provider
+# codes are listed unmapped in the crosswalk and never seeded as country aliases.
+def _seed_crosswalk_entities(conn: Connection, reviewed_keys: set[str], act: UUID) -> int:
+    from reva.adapters.connectors.country_crosswalk import ALIAS_MAPPING_VERSION, seed_entities
+
+    n = 0
+    for e in seed_entities():
+        if e["key"] in reviewed_keys:
+            continue
+        eid = entity_id(e["key"])
+        _ensure_entity(conn, eid, e["kind"], e["label"], "real", act)
+        for a in e["aliases"]:
+            _ensure_alias(conn, eid, a["provider"], str(a["key"]), "provider_declared", act,
+                          mapping_version=ALIAS_MAPPING_VERSION)
+        n += 1
+    return n
+# --- end V2 step 1 (ALLC) ---
 
 
 def _seed_sources(conn: Connection, store: ArtifactStore, reg: Registry, act: UUID, contact: str | None) -> None:
@@ -389,6 +414,12 @@ def _seed_schedules(conn: Connection) -> None:
 RUNTIME_PRINCIPALS = ("reva_api", "reva_worker", "reva_sim")
 
 
+def _crosswalk_sha256() -> str:  # V2 step 1 (ALLC)
+    from reva.adapters.connectors.country_crosswalk import crosswalk_sha256
+
+    return crosswalk_sha256()
+
+
 def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
     """Digest of everything ``seed`` writes (registry content, built-in connectors, schedules)."""
     partners = reg.root / "reference" / "comtrade_partnerAreas.json"
@@ -400,6 +431,7 @@ def seed_fingerprint(reg: Registry, contact_email: str | None = None) -> str:
         "mappings": list(reg.mappings),
         "models": list(reg.models),
         "partners_sha256": sha256_bytes(partners.read_bytes()),
+        "crosswalk_sha256": _crosswalk_sha256(),  # V2 step 1 (ALLC)
         "connectors": sorted([s.name, s.version, s.code_digest]
                              for s in (c.describe() for c in builtin_connectors(contact_email).values())),
         "schedules": [list(x) for x in DEFAULT_SCHEDULES],

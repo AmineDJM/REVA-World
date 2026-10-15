@@ -87,11 +87,19 @@ def test_wrong_password_is_401_and_audited(db: Any, client: TestClient) -> None:
     assert "nope" not in r.text
     r2 = client.post("/v1/session", json={"username": "admin", "password": "wrong password"})
     assert r2.status_code == 401
+    tag = client.app.state.auth.username_tag(marker)  # type: ignore[attr-defined]
     with db.owner.connect() as c:
-        rows = c.execute(text("SELECT actor, details FROM ops.audit WHERE action = 'session.login_failed' "
-                              "AND target->>'username' = :u"), {"u": marker}).mappings().all()
+        rows = c.execute(text("SELECT actor, target, details FROM ops.audit WHERE action = 'session.login_failed' "
+                              "AND target->>'username_tag' = :u"), {"u": tag}).mappings().all()
+        admin_rows = c.execute(text(
+            "SELECT target FROM ops.audit WHERE action = 'session.login_failed' AND target->>'username_tag' = :u"),
+            {"u": client.app.state.auth.username_tag("admin")}).scalars().all()  # type: ignore[attr-defined]
     assert len(rows) == 1 and rows[0]["actor"] == "anonymous"
     assert "nope" not in str(rows[0]["details"])
+    # P8: the typed username is never stored (a password typed there would persist in immutable audit).
+    assert rows[0]["target"] == {"username_matched_admin": False, "username_tag": tag}
+    assert marker not in str(rows[0]["target"]) and marker not in str(rows[0]["details"])
+    assert admin_rows and all(r["username_matched_admin"] is True for r in admin_rows)
 
 
 def test_login_sets_httponly_session_and_csrf_cookie(db: Any, client: TestClient) -> None:
