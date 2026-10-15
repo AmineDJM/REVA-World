@@ -9,6 +9,15 @@
 # * approved_templates.<id>.source_key names the registered source every
 #   manifest of that template must use (R4-01);
 # * model_promotion: explicit paired/subgroup/holdout test settings.
+#
+# R6 re-pin (2026-10-15, same policy_version label; the pinned SHA-256 is the identity):
+# * template_sha256 now covers the template's whole reva import closure plus
+#   contracts/connector.schema.json (R6-07): any edit there disables T1 until re-pinned;
+# * approved_templates.<id>.rights_ref pins the rights reference (R6-12);
+# * approved_exact_mappings.<entry>.structure pins the provider structure that T1 may
+#   auto-promote: dimension order, provider unit code(s), fixed categories, category
+#   vocabularies and total codes (R6-04). Anything else (unit THS, an extra dimension
+#   such as citizen, overlapping age aggregates) is out of T1 scope.
 policy_version: "promotion-1.1.0"
 tiers:
   T0: {description: "read, discover, generate proposals", auto: true}
@@ -17,8 +26,9 @@ tiers:
   T3: {description: "kernel, security, licences, sensitive data, causal claims, destructive migrations, paid resources", requires: [maintainer_approval]}
 approved_templates:
   eurostat_jsonstat:
-    template_sha256: "sha256:44b2b256fed303a85807bfb4b17795cd4fae3bf61dc04d3004ac5ca9b43194e1"
+    template_sha256: "sha256:06843889dc4841ffdbd768e6ad750b0e12fdf2309465a04df2eb11c3aabf5561"
     source_key: eurostat.dissemination
+    rights_ref: "registry/sources/eurostat.yaml#rights"
     allowed_hosts: [ec.europa.eu]
 approved_exact_mappings:
   - template: eurostat_jsonstat
@@ -26,6 +36,12 @@ approved_exact_mappings:
     target: {concept_id: demography.population.jan1_age_sex, version: "1.0.0"}
     scope: {geo: [FR]}
     rights: verified
+    structure:
+      dimension_order: [freq, unit, age, sex, geo, time]
+      provider_unit_codes: [NR]
+      fixed_categories: {freq: [A]}
+      category_patterns: {age: "^(TOTAL|Y_LT1|Y[1-9][0-9]?|Y_OPEN|UNK)$", sex: "^(T|M|F)$"}
+      total_codes: {age: [TOTAL], sex: [T]}
 model_promotion:
   min_origin_series_pairs: 30
   bootstrap: {method: moving_block, block_length: 3, replicates: 1000, level: 0.95}  # descriptive interval only
