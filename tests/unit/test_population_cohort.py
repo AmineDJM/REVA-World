@@ -279,3 +279,23 @@ def test_single_age_output_is_opt_in() -> None:
     total = sum(Decimal(r.value["value"]) for r in single if r.period[0].year == 2026)
     agg = next(r for r in rows if r.output_key == "population.total.all_ages" and r.period[0].year == 2026)
     assert abs(total - Decimal(agg.value["value"])) <= Decimal("0.5")
+
+
+def test_incomplete_birth_years_are_left_out_and_labelled_never_filled() -> None:
+    """Like Germany (2022 births by mother's age unpublished, 2024 births by sex '|N'): such years are
+    excluded from the fertility / sex-ratio estimation and listed explicitly; nothing is imputed."""
+    lu = country("LUX")
+    births = {k: dict(v) for k, v in lu.births.items()}
+    for code, cell in births[(2021, "T")].items():  # mother's-age class missing in 2021
+        if code == "Y30":
+            births[(2021, "T")][code] = C.Cell(None, cell.kind, cell.start, cell.end, cell.cell_type, "")
+    tot = births[(2022, "M")]["TOTAL"]  # births by newborn sex missing in 2022
+    births[(2022, "M")]["TOTAL"] = C.Cell(None, tot.kind, tot.start, tot.end, tot.cell_type, "|N")
+    gap = C.CountryDemography(lu.iso3, lu.population, lu.deaths, births)
+    rates = C.base_rates(gap, 2019, 2023, migration_window=(2019, 2021))
+    used = rates.years_used()
+    assert used["fertility"] == [2019, 2020, 2022, 2023] and used["sex_ratio_at_birth"] == [2019, 2020, 2021, 2023]
+    assert used["excluded_never_filled"] == {"fertility": [2021], "sex_ratio_at_birth": [2022]}
+    assert any("never imputed" in n for n in rates.notes)
+    full = C.base_rates(lu, 2019, 2023)
+    assert full.years_used()["excluded_never_filled"] == {}

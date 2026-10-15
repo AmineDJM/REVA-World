@@ -484,6 +484,7 @@ class CohortComponentModel:
                         s: C.dstr(C._CTX.quantize(r.life_tables[s].e0, Decimal("0.01"))) for s in C.SEXES},
                     "male_share_at_birth": C.dstr(C._CTX.quantize(r.male_share_at_birth, Decimal("0.0001"))),
                     "data_notes": list(r.notes),
+                    "base_period_years_used": r.years_used(),
                     "input_status_flags": r.input_status_flags,
                     "unavailable_variants": c.unavailable_variants,
                 })

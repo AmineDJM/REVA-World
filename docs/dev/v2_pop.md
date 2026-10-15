@@ -165,7 +165,11 @@ always clearly named), `{births|deaths|net_migration}.{total|female|male}`, and 
 | SVN (SI) | 2000–2025 | 2000–2024 | 2007–2024 | 100 | b | yes |
 | SWE (SE) | 2000–2025 | 2000–2024 | 2007–2024 | 100 | – | yes |
 
-`|N` = not for publication (DEU births 2024 totals, LTU 2022–2024 mother's-age classes). Germany's
+`|N` = not for publication (DEU births 2024 totals by sex, LTU 2022–2024 mother's-age classes).
+Every run and back-test reports `base_period_years_used` per component (mortality, fertility, sex
+ratio at birth) and `excluded_never_filled` (e.g. DEU with base period 2019–2023: fertility from
+2019–2021 and 2023, 2022 excluded). A year without births by newborn sex cannot enter the
+migration-residual window (typed `missing_input`), e.g. DEU 2024 until Eurostat publishes it. Germany's
 2022 births by mother's age are not published by single age; Lithuania's 10–14 and 50+ classes are
 missing for 2022–2024: those years are left out of fertility-rate estimation (reported in
 `data_notes`), never imputed. Liechtenstein has no EUROPOP2023 projection. Unknown-age population and
@@ -196,19 +200,45 @@ deaths (`UNK`) are excluded (absorbed by the migration residual) and reported pe
 
 ## Live run
 
-Filled in below from the live end-to-end run (`tests/integration/test_demography_live.py`).
+`REVA_POP_LIVE_COUNTRIES=FR,DE,IT,ES,PL uv run pytest -m live tests/integration/test_demography_live.py`
+(2026-10-15, 9 min 11 s, passed), in a throwaway database bootstrapped like a deployment:
+
+1. Live ingest of `eurostat.demography` for FRA, DEU, ITA, ESP, POL (+ the three EUROPOP2023 tables):
+   48 requests reserved and metered through the budget ledger (`budgets-1.2.0`, 48 consumed,
+   2 334 036 bytes, 0 refused), 48 acquisitions published, 91 215 observations, dataset inputs
+   registered by the post-publish hook (observed tables assembled from their three time windows).
+2. Belief release `9f793a8b…` (live origin) pins the dataset inputs by digest.
+3. Scenario (L2, jump-off 1 January 2025, horizon 25 years, base period 2019–2023, grid migration
+   {zero, average residual, EUROPOP2023} × fertility {constant, EUROPOP2023}) created through
+   `sim.create_scenario` and run through the worker job path `handle_simulation`: status `succeeded`,
+   output digest `59c9c8df…86f5`, run outcome labelled "experimental model, not yet reviewed".
+4. `run_population_evaluation` stored the back-test evaluation (manifest `1878cd06…744b`,
+   `model.evaluation` rows, `revised_data_retrospective`); its numbers for these five countries are
+   **identical** to `v2_pop_backtest_evaluation.json` (checked field by field).
+
+Selected outputs (conditional projections under stated assumptions, not forecasts; mortality
+constant at 2019–2023 rates, which include COVID-19 excess mortality):
+
+| Country | total 2025 (observed jump-off) | total 2050 L1 (avg. residual mig., constant fertility) | 2050 L2 range over the grid | 65+/15-64 2025 | 65+/15-64 2050 L1 | 2050 L2 range |
+|---|---|---|---|---|---|---|
+| DEU | 83577140 | 82017671 | 70561807–82794754 | 35.891 | 39.1731 | 38.9829–48.3689 |
+| ESP | 49128297 | 54919175 | 41913161–55721268 | 31.2174 | 47.4222 | 47.1602–63.4552 |
+| FRA | 68882600 | 71583998 | 65938992–71834774 | 35.523 | 42.4375 | 42.3282–45.3077 |
+| ITA | 58943464 | 50612773 | 47240151–55246876 | 39.0425 | 60.3901 | 55.0062–65.2008 |
+| POL | 36497495 | 25773187 | 25773187–30430194 | 32.7056 | 50.8282 | 44.0641–50.8282 |
+
+The L2 range is assumption sensitivity, not a confidence interval (no probability level).
 
 ## Requested changes in files owned by others (not edited)
 
-* `src/reva/evidence/runner.py` `post_publish_for` and its callers (`operations/jobs.py`
-  `handle_ingest`, CLI): honour a connector-provided hook, e.g.
-  `hook = getattr(connector, "post_publish", None); return hook if callable(hook) else <template dispatch>`
-  (the connector exposes `EurostatDemographyConnector.post_publish`). Until then the worker ingest job
-  publishes the observations but registers no dataset inputs; call
-  `eurostat_demography.backfill_datasets(conn, store, origin="live")` after ingest.
-* `src/reva/cli/seed.py` `DEFAULT_SCHEDULES`: add
-  `("ingest:eurostat.demography", "ingest", {"connector": "eurostat.demography"}, 86400)` (a full
-  cycle is 282 requests = 3 daily runs of 100; per-source budget 300/day).
+* Done by others since: the worker ingest handler and the CLI now call
+  `getattr(connector, "post_publish", None) or post_publish_for(spec.template)`; this connector exposes
+  `EurostatDemographyConnector.post_publish` (= `post_publish_datasets`), so scheduled and CLI ingests
+  register dataset inputs. `backfill_datasets(conn, store, origin=)` remains for archived acquisitions.
+* `src/reva/cli/seed.py` now schedules `ingest:eurostat.demography` every 30 days. A full cycle is 282
+  requests and the ingest job plans at most 100 per run (`FetchBudget()` default), so one cycle takes
+  three scheduled runs (the cursor resumes); a daily schedule (budget 300/day) would complete a cycle
+  in three days. Datasets of a country are registered as soon as all its windows are in.
 * `src/reva/evidence/ingest.py` (lead): one advisory lock per observation exhausts PostgreSQL's
   default lock table for large tables (seen live: another agent's test held 7 588 advisory locks in
   one transaction while my 8 000-cell acquisition failed with `out of shared memory`). Either lock

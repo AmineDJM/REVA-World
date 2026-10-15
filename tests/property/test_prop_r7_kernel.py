@@ -460,7 +460,7 @@ def test_bound_lies_within_its_uncertain_bound(x: date, e: date, l_: date, end_s
 @example(date(2020, 1, 1), 365, 0, False)
 def test_interval_whose_end_precedes_every_admissible_start_is_rejected(s: date, gap: int, width: int,
                                                                         end_side: bool) -> None:
-    assume(s - timedelta(days=gap + width) > date(1, 1, 1))
+    assume(s.toordinal() - (gap + width) > 1)  # ordinal arithmetic: date subtraction below year 1 overflows
     before = UncertainBound(earliest=s - timedelta(days=gap + width), latest=s - timedelta(days=gap))
     if end_side:  # every admissible end is before the start
         kw = {"start": s, "end_uncertainty": before}

@@ -414,6 +414,15 @@ class BaseRates:
     residual_migration: dict[int, dict[str, list[Decimal]]]  # year t (flow t -> t+1) -> sex -> age 0..omega
     notes: tuple[str, ...]
     input_status_flags: dict[str, dict[str, list[str]]]
+    fertility_years: tuple[int, ...] = ()  # base-period years whose births-by-mother's-age table was complete
+    sex_ratio_years: tuple[int, ...] = ()  # base-period years with births by newborn sex
+    excluded_years: dict[str, list[int]] = field(default_factory=dict)  # component -> years left out (never filled)
+
+    def years_used(self) -> dict[str, Any]:
+        """Which base-period years fed each component (explicit label; gaps are never filled)."""
+        return {"base_period": list(self.years), "mortality": list(self.years),
+                "fertility": list(self.fertility_years), "sex_ratio_at_birth": list(self.sex_ratio_years),
+                "excluded_never_filled": dict(self.excluded_years)}
 
     @property
     def tfr(self) -> Decimal:
@@ -586,8 +595,11 @@ def base_rates(data: CountryDemography, first_year: int, last_year: int, *,
         "demo_magec": _status_flags(data.deaths, years),
         "demo_fasec": _status_flags(data.births, years),
     }
+    excluded = {k: [y for y in years if y not in used] for k, used in (("fertility", fert_years),
+                                                                        ("sex_ratio_at_birth", sex_years))}
     return BaseRates(data.iso3, omega, years, lts, fert, div(unk_b, unk_e) if unk_e > 0 else ZERO, male_share,
-                     residual, tuple(notes), flags)
+                     residual, tuple(notes), flags, tuple(fert_years), tuple(sex_years),
+                     {k: v for k, v in excluded.items() if v})
 
 
 # --------------------------------------------------------------------------- assumptions
@@ -714,6 +726,7 @@ class Projection:
                                                                           Decimal("0.01"))) for s in SEXES},
             "male_share_at_birth": dstr(_CTX.quantize(self.rates.male_share_at_birth, Decimal("0.0001"))),
             "data_notes": list(self.rates.notes), "input_status_flags": self.rates.input_status_flags,
+            "base_period_years_used": self.rates.years_used(),
             "flags": list(self.flags),
         }
 
@@ -902,6 +915,7 @@ def backtest(data: CountryDemography, *, jump_off: int, target_year: int, base_p
         "country": data.iso3, "jump_off": jump_off, "target_year": target_year,
         "base_period": list(base_period), "open_age": omega, "variants": {},
         "data_notes": list(rates.notes), "input_status_flags": rates.input_status_flags,
+        "base_period_years_used": rates.years_used(),
         "target_status_flags": _status_flags(data.population, [target_year]),
         # reported, never used: breaks/estimates in the test period explain part of the error
         "test_period_status_flags": _status_flags(data.population, range(jump_off + 1, target_year + 1)),

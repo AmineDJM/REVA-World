@@ -84,9 +84,7 @@ def _with_llm_ledger(stack_module):  # type: ignore[no-untyped-def]
 #: V2 recorded provider fixtures (tests/fixtures/source/<name>) also ingested offline, when the connector
 #: is registered: all-country WDI/Comtrade (ALLC), Eurostat demography (POP), FIGARO IO tables (IO) and
 #: labour/pensions (PEN). Their datasets are then pinned by the stack's test_fixture release.
-V2_FIXTURE_CONNECTORS = (
-    "eurostat.labour_pensions",
-)
+V2_FIXTURE_CONNECTORS: tuple[str, ...] = ()  # labour/pensions is ingested with its dataset hook below
 # Not ingested with their default (full) plans: their recorded fixtures were captured for restricted
 # plans, so most requests have no captured response (worldbank.wdi.all_economies,
 # un.comtrade.public_batch, eurostat.demography, eurostat.figaro.iciot_ii). FIGARO is replaced by the
@@ -178,7 +176,11 @@ def _with_synthetic_io(stack_module):  # type: ignore[no-untyped-def]
             try:
                 from reva.adapters.connectors import eurostat_demography as ed
 
-                demo = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008)
+                import inspect
+
+                windowed = "window_years" in inspect.signature(ed.EurostatDemographyConnector).parameters
+                win = {"window_years": ed.WINDOW_YEARS} if windowed and hasattr(ed, "WINDOW_YEARS") else {}
+                demo = ed.EurostatDemographyConnector(countries=("LI", "LU"), since_year=2008, **win)
                 drep = asyncio.run(run_connector(demo, FixtureHttp(ed.NAME), store, worker, persist_cursor=False,
                                                  post_publish=ed.post_publish_datasets))
                 # France (no EUROPOP), recorded for the retirement-age pipeline test (tests/fixtures/social).
@@ -188,10 +190,23 @@ def _with_synthetic_io(stack_module):  # type: ignore[no-untyped-def]
                 state["demography"] = {"inserted": drep.inserted + frep.inserted, "errors": drep.errors + frep.errors}
             except Exception as e:  # noqa: BLE001 - optional fixture; the cohort e2e test then skips with a reason
                 state["demography"] = {"error": repr(e)}
+            # Recorded Eurostat labour/pensions fixtures with their dataset inputs (the plain stack ingest
+            # runs the default post-publish hook, which registers observations but not these datasets).
+            try:
+                from reva.adapters.connectors import eurostat_labour as lab
+
+                lrep = asyncio.run(run_connector(lab.EurostatLabourPensionsConnector(), FixtureHttp(lab.CONNECTOR_NAME), store,
+                                                 worker, persist_cursor=False, post_publish=lab.post_publish_datasets))
+                state["labour"] = {"inserted": lrep.inserted, "errors": lrep.errors}
+            except Exception as e:  # noqa: BLE001 - optional fixture; the retirement e2e test then skips with a reason
+                state["labour"] = {"error": repr(e)}
             # The stack computed its cutoff before this hook ran: the release must see the datasets.
             from datetime import UTC, datetime
 
             kwargs["cutoff"] = datetime.now(UTC)
+            summary = {k: (v if k != "io_dataset" else {"keys": sorted(v)[:10]} if isinstance(v, dict) else v)
+                       for k, v in state.items() if k != "settings"}
+            print(json.dumps({"e2e_v2_inputs": summary}, default=str)[:4000], file=sys.stderr, flush=True)
         return original_publish(worker, store, **kwargs)
 
     stack_module.Stack.prepare_data = prepare_data

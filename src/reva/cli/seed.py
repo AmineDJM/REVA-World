@@ -401,7 +401,7 @@ DEFAULT_SCHEDULES: tuple[tuple[str, str, dict[str, Any], int], ...] = (
     ("ingest:worldbank.wdi.all_economies", "ingest", {"connector": "worldbank.wdi.all_economies"}, 30 * 86400),
     ("ingest:un.comtrade.public_batch", "ingest", {"connector": "un.comtrade.public_batch"}, 86400),
     # V2 steps 3-5: Eurostat demography, labour/pensions and FIGARO IO tables (monthly)
-    ("ingest:eurostat.demography", "ingest", {"connector": "eurostat.demography"}, 30 * 86400),
+    ("ingest:eurostat.demography", "ingest", {"connector": "eurostat.demography"}, 86400),  # 282-request cycle in ~3 days
     ("ingest:eurostat.labour_pensions", "ingest", {"connector": "eurostat.labour_pensions"}, 30 * 86400),
     ("ingest:eurostat.figaro.iciot_ii", "ingest", {"connector": "eurostat.figaro.iciot_ii"}, 30 * 86400),
     ("health:connectors", "health", {}, 86400),

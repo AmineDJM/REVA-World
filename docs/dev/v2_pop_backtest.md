@@ -5,7 +5,7 @@ describe how this *method* would have done on past data. They are not a probabil
 about any future projection, and they are shown whether good or bad (V2 honesty rule 3).
 
 * Stored evaluation artifact: [`v2_pop_backtest_evaluation.json`](v2_pop_backtest_evaluation.json)
-  (schema `reva-population-backtest/1`, sha256 `4a57a5e2…3ad08703` of the file; it lists the sha256 and
+  (schema `reva-population-backtest/1`, sha256 `a7588934…b4350905` of the file; it lists the sha256 and
   URL of every archived Eurostat response it was computed from and the model implementation digest).
   In a database the same manifest is stored content-addressed (namespace `evaluation`) with one
   `model.evaluation` row per country (`replay_mode = revised_data_retrospective`) by

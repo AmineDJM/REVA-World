@@ -43,6 +43,26 @@ process with the worker's database login. Because `ops.record_gate_result` was e
 - `ops.gate_request(recorded_at, id)`.
 - `ops.gate_result(proposal_id, recorded_at)`.
 
+### AFX's R6-02 and R6-03 database patches (applied by GATE in the 0007 governance section)
+
+**R6-02: the gate pass is bound to what the gate evaluated**
+- `ops.record_gate_result` is re-created with a seventh argument, `p_scope jsonb DEFAULT NULL`. It is stored in the new column `ops.gate_result.scope` (a JSON object of at most 64 KiB) and is still executable by `reva_gate` only.
+- `PolicyPromotionGate._record` passes `t1_scope.db_scope` for a `promote` decision: concept, dataset, subject_ids, years, manifest digest and mapping key.
+- For a gate pass, `evidence.approve_eligibility` and `ontology.approve_mapping` use the gate-derived scope, not the proposer's `ops.proposal.summary.scope`. A pass without a scope approves nothing. A human review still uses the reviewed proposal's scope.
+- `approve_eligibility` also requires two things of the connector version:
+  - `declared_capabilities.manifest_sha256` must equal the scope's `manifest_sha256`. `cli/seed.register_connector_version` now records it from `spec.field_mappings.manifest_sha256`.
+  - `declared_capabilities.datasets` must equal `[scope.dataset]`.
+- `reva_registry` gains `SELECT` on `evidence.connector_version`.
+
+**R6-03: T2+ changes need a named human review**
+`ops.consume_approval` refuses a gate pass for `model_registration` or `mapping_equivalence` proposals, and for any proposal with `permission_tier >= 2`. Such proposals need an approving human review recorded through the API.
+
+**Regression tests** are in `tests/security/test_gate_separation.py`:
+- `test_r6_02_gate_pass_is_bound_to_the_gate_derived_scope_and_manifest`;
+- `test_r6_03_t2_proposals_need_a_human_review_not_a_gate_pass`.
+
+**Schema contract.** `migrations/schema_contract.json` was regenerated at 02:08 with `scripts/update_schema_contract.py`, on a throwaway database. No migration had been edited for more than 35 minutes, and the 0007 and 0008 edits were committed. The regeneration also picked up ENG's `ops.reserve_llm_budget`/`ops.settle_llm_budget` from 0008. `--check` reports that the contract is up to date.
+
 ### Process (`src/reva/gate/`, new package)
 
 **Worker side: `reva.gate.client.GateClient`**
@@ -159,11 +179,6 @@ A second test covers the service failing closed: the kill switch records nothing
 
 ## Follow-ups for other owners
 
-- `migrations/schema_contract.json` already contains the GATE objects (it was regenerated at 01:20, after the
-  0007 edit). `scripts/update_schema_contract.py --check` reports only ENG's `0008_v2` functions
-  `ops.reserve_llm_budget` and `ops.settle_llm_budget` as stale. GATE did not regenerate it, because ENG edited
-  `0008_v2.py` at 01:29 and may still be working on it. ENG or MIGR should run
-  `uv run python scripts/update_schema_contract.py` when 0008 is final.
 - `docs/deployment.md` and `docs/operations.md` (DKR/DOC2) should document:
   - the `reva-gate` service and its S3 key pair (prefix-scoped as above);
   - running `reva gate` locally next to `reva worker`;
