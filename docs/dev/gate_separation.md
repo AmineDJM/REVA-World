@@ -133,7 +133,7 @@ It gains the `gate` component. The worker allowlist never includes the gate pass
 
 ## Tests
 
-**`tests/security/test_gate_separation_security.py`** (new, 14 tests). It covers:
+**`tests/security/test_gate_separation_security.py`** (new, 16 tests). It covers:
 - worker, API and simulation logins cannot record gate results, either through the function or directly;
 - the gate login can, and its rows carry `recorded_by = 'reva_gate'`; the identity checks still fire;
 - the owner is refused;

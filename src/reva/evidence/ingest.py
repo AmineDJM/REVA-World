@@ -183,36 +183,71 @@ def write_raw_object(store: ArtifactStore, raw: RawAcquisition, quarantined: boo
     return store.put_bytes(raw.body, ns, raw.media_type or "application/octet-stream")
 
 
-# Lineage write locks are striped: one transaction-scoped advisory lock per *bucket* of lineages
-# (two-int key space, class LINEAGE_LOCK_CLASS), taken for the whole acquisition up front in
-# ascending order. A lock per logical key put one entry per observation in PostgreSQL's
-# cluster-wide lock table (max_locks_per_transaction x max_connections), so one large acquisition
-# (thousands of age/sex cells) could exhaust it ("out of shared memory") for every database on the
-# server. Ascending acquisition keeps concurrent ingests deadlock-free; a bucket collision only
-# serialises two writers of unrelated lineages.
+# Lineage write locks are striped (docs/dev/lock_bounds.md). Why they exist: a revision number is
+# assigned by reading the lineage head and inserting head + 1, so two concurrent writers of one
+# lineage (source, origin, logical key) must be serialised, or the second computes the same
+# revision and fails the unique key instead of superseding the first.
+# A lock per logical key put one entry per observation in PostgreSQL's *cluster-wide* lock table
+# (max_locks_per_transaction x (max_connections + max_prepared_transactions) slots), so one large
+# acquisition (thousands of age/sex cells) could exhaust it ("out of shared memory") for every
+# database on the server. Instead each lineage maps to one of LINEAGE_LOCK_BUCKETS buckets of its
+# (source, origin), and the acquisition takes its distinct bucket locks once, up front, in one
+# statement, in ascending key order: at most LINEAGE_LOCK_BUCKETS lock-table entries per
+# acquisition (an acquisition has one source and one origin), deadlock-free between ingests. A
+# bucket collision only serialises two writers of the same (source, origin); other sources never
+# contend (barring a 2^-31 hash collision, which also only serialises).
+# Key space: the two-int form pg_advisory_xact_lock(LINEAGE_LOCK_CLASS, id), i.e. pg_locks
+# (classid, objid, objsubid) = (7262050, id, 2). Every other REVA advisory lock uses the bigint form
+# (objsubid 1: 7262001/7262002/7262011/7262020/7262021/7262031 and the hashtextextended keys), which
+# PostgreSQL never confuses with a two-int key. The ids are also always negative (objid >= 2^31 in
+# pg_locks), so even a probe filtering pg_locks on objid alone cannot match a small fixed key.
 LINEAGE_LOCK_CLASS = 7262050
 LINEAGE_LOCK_BUCKETS = 256
+# A same-source writer may now wait for a whole acquisition rather than only for a shared key, so
+# the bucket wait gets more than the engines' default lock_timeout (5 s) while staying below the
+# default job lease (120 s; the publication transaction holds the job row through ops.assert_lease).
+LINEAGE_LOCK_WAIT = "60s"
+_LOCK_BUCKETS_SQL = "SELECT count(pg_advisory_xact_lock(:c, k)) FROM unnest(CAST(:ids AS integer[])) AS k"
 
 
 def lineage_bucket(source_id: UUID, origin: str, logical_key: str) -> int:
-    """Stable lock bucket of a lineage (source, origin, logical key)."""
+    """Stable lock bucket (0..LINEAGE_LOCK_BUCKETS-1) of a lineage (source, origin, logical key)."""
     digest = hashlib.sha256(f"{source_id}|{origin}|{logical_key}".encode()).digest()
     return int.from_bytes(digest[:4], "big") % LINEAGE_LOCK_BUCKETS
 
 
+def lineage_lock_id(source_id: UUID, origin: str, logical_key: str) -> int:
+    """Second key (signed int4, always negative) of the lineage's bucket lock, namespaced by
+    (source, origin) so lineages of unrelated sources never share a bucket."""
+    bucket = lineage_bucket(source_id, origin, logical_key)
+    digest = hashlib.sha256(f"reva.lineage-bucket|{source_id}|{origin}|{bucket}".encode()).digest()
+    return (int.from_bytes(digest[:4], "big") | 0x80000000) - (1 << 32)
+
+
 def lock_lineages(conn: Connection, source_id: UUID, origin: str, logical_keys: Iterator[str] | Sequence[str]) -> int:
-    """Serialise writers of these lineages for the rest of the transaction (ascending buckets)."""
-    buckets = sorted({lineage_bucket(source_id, origin, k) for k in logical_keys})
-    for b in buckets:
-        conn.execute(text("SELECT pg_advisory_xact_lock(:c, :b)"), {"c": LINEAGE_LOCK_CLASS, "b": b})
-    return len(buckets)
+    """Serialise writers of these lineages for the rest of the transaction.
+
+    One statement takes the distinct bucket locks in ascending order (``unnest`` of a sorted array
+    yields its elements in array order) with ``lock_timeout = LINEAGE_LOCK_WAIT``; the caller's
+    lock_timeout is restored afterwards (if the wait fails the transaction is aborted anyway).
+    Re-taking held buckets is re-entrant and adds no lock-table entry. Returns the bucket count."""
+    ids = sorted({lineage_lock_id(source_id, origin, k) for k in logical_keys})
+    if not ids:
+        return 0
+    prev = conn.execute(text("SELECT current_setting('lock_timeout')")).scalar_one()
+    conn.execute(text("SELECT set_config('lock_timeout', :t, true)"), {"t": LINEAGE_LOCK_WAIT})
+    conn.execute(text(_LOCK_BUCKETS_SQL), {"c": LINEAGE_LOCK_CLASS, "ids": ids})
+    conn.execute(text("SELECT set_config('lock_timeout', :t, true)"), {"t": prev})
+    return len(ids)
 
 
 def _lineage_head(conn: Connection, source_id: UUID, origin: str, logical_key: str) -> LineageHead | None:
     # A lineage is (source, origin, logical key): a live ingest never dedups against, or
     # supersedes, a fixture-origin head (R-04). The caller holds the lineage's lock
-    # (``lock_lineages``) for the duration of the transaction; re-taking it is re-entrant.
-    lock_lineages(conn, source_id, origin, [logical_key])
+    # (``lock_lineages``) for the duration of the transaction; re-taking it here (one statement,
+    # re-entrant: no wait and no new lock-table entry) keeps this helper safe on its own.
+    conn.execute(text("SELECT pg_advisory_xact_lock(:c, :k)"),
+                 {"c": LINEAGE_LOCK_CLASS, "k": lineage_lock_id(source_id, origin, logical_key)})
     row = conn.execute(
         text(
             "SELECT id, revision_no, semantic_hash FROM evidence.observation "

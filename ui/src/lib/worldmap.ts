@@ -176,6 +176,8 @@ export interface FlowRow {
   value: string | null;
   missingReason: string | null;
   origin: string | null;
+  /** Where the value comes from: the run's pinned release, or evidence as of its cutoff (fallback). */
+  valueSource: 'release' | 'evidence_as_of' | 'evidence';
 }
 
 function toFlow(rel: Relation): FlowRow | null {
@@ -199,7 +201,35 @@ function toFlow(rel: Relation): FlowRow | null {
     value: v && v.kind === 'decimal' ? v.value : null,
     missingReason: v && v.kind === 'missing' ? String(v.reason) : v ? null : 'not_reported',
     origin: rel.origin ?? null,
+    valueSource: (rel as Relation & { value_source?: FlowRow['valueSource'] }).value_source ?? (rel.release_id ? 'release' : 'evidence'),
   };
+}
+
+function flowKey(rel: Relation): string | null {
+  const rep = participant(rel, 'role.reporter');
+  const par = participant(rel, 'role.partner');
+  if (!rep || !par) return null;
+  return `${rep.entity_id}|${par.entity_id}|${String(rel.component?.flow ?? '')}|${rel.support?.period_label ?? ''}`;
+}
+
+/**
+ * Release-pinned relations, with a value taken from evidence as known at the scenario cutoff
+ * only where the release relation carries none ("not recorded" in the release). The fallback is
+ * marked on the row (value_source) so the screen can say so.
+ */
+export function mergeReleaseRelations(release: Relation[], evidenceAsOf: Relation[] | null | undefined): Relation[] {
+  const byKey = new Map<string, Relation>();
+  for (const r of evidenceAsOf ?? []) {
+    const k = flowKey(r);
+    if (k) byKey.set(k, r);
+  }
+  return release.map((r) => {
+    if (r.value) return { ...r, value_source: 'release' } as Relation;
+    const k = flowKey(r);
+    const ev = k ? byKey.get(k) : undefined;
+    if (ev?.value) return { ...r, value: ev.value, evidence_observation_id: ev.evidence_observation_id, value_source: 'evidence_as_of' } as Relation;
+    return { ...r, value_source: 'release' } as Relation;
+  });
 }
 
 export interface PartnerFlows {

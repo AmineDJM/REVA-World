@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Relation, SimResult, SimulationStatus } from '../api/types';
-import { anchorsByEntity, arcWidth, exposureRows, featureAnchor, greatCircle, mirrorFlows, problemText, reportedPartnerFlows, runCountryStatuses } from './worldmap';
+import { anchorsByEntity, arcWidth, exposureRows, featureAnchor, greatCircle, mergeReleaseRelations, mirrorFlows, problemText, reportedPartnerFlows, runCountryStatuses } from './worldmap';
 
 function rel(id: string, reporter: [string, string], partner: [string, string, string], flow: 'M' | 'X', value: string | null, partnerCode = '999', period = '2023'): Relation {
   return {
@@ -142,5 +142,21 @@ describe('geometry', () => {
     expect(arcWidth('100', 100)).toBe(4);
     expect(arcWidth('25', 100)).toBe(3);
     expect(arcWidth(null, 100)).toBe(1);
+  });
+});
+
+describe('mergeReleaseRelations', () => {
+  it('keeps release values and fills only unrecorded ones from evidence as of the cutoff, marked', () => {
+    const pinned = [
+      { ...rel('r1', FRA, DZA, 'M', '3042655857.775', '12'), release_id: 'rel' },
+      { ...rel('r2', FRA, ['kaz', 'Kazakhstan', 'entity.country'], 'M', null, '398'), value: null, release_id: 'rel' },
+      { ...rel('r3', FRA, ['nga', 'Nigeria', 'entity.country'], 'M', null, '566'), value: null, release_id: 'rel' },
+    ];
+    const evidence = [rel('e2', FRA, ['kaz', 'Kazakhstan', 'entity.country'], 'M', '3603711989.944', '398'), rel('e1', FRA, DZA, 'M', '1', '12')];
+    const flows = reportedPartnerFlows(mergeReleaseRelations(pinned, evidence), 'fra', 'M').countries;
+    const by = Object.fromEntries(flows.map((f) => [f.partnerLabel, f]));
+    expect(by.Algeria).toMatchObject({ value: '3042655857.775', valueSource: 'release' });
+    expect(by.Kazakhstan).toMatchObject({ value: '3603711989.944', valueSource: 'evidence_as_of' });
+    expect(by.Nigeria).toMatchObject({ value: null, missingReason: 'not_reported', valueSource: 'release' });
   });
 });

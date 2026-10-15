@@ -203,11 +203,17 @@ class Builder:
         k = self.add("release", ident, f"belief release #{r['sequence']}", sequence=r["sequence"],
                      published_at=r["published_at"], knowledge_cutoff=r["knowledge_cutoff"], origin=r["origin"],
                      method=r["method"])
+        pinned = self.all("SELECT artifact_sha256, role FROM belief.release_artifact WHERE release_id = :i",
+                          i=ident)
+        # Dataset artifacts (V2 dataset inputs) are summarised on the release node, not expanded one by one:
+        # they can number in the hundreds and are not inputs of any single estimate.
+        dataset_pins = [x for x in pinned if str(x["role"]).startswith("dataset")]
+        if dataset_pins and k is not None:
+            self.nodes[k].attributes["dataset_artifacts_pinned"] = len(dataset_pins)
         for sha, role in [(r["manifest_sha256"], "release_manifest"),
                           (r["ontology_manifest_sha256"], "ontology_manifest"),
                           (r["model_manifest_sha256"], "model_manifest")] + [
-            (x["artifact_sha256"], x["role"]) for x in self.all(
-                "SELECT artifact_sha256, role FROM belief.release_artifact WHERE release_id = :i", i=ident)]:
+            (x["artifact_sha256"], x["role"]) for x in pinned if not str(x["role"]).startswith("dataset")]:
             self.edge(k, self._artifact(sha, depth + 1), "pins", role=role)
         self.edge(k, self._context(str(r["context_id"]), depth + 1), "in_context")
         self.edge(k, self._activity(str(r["provenance_activity_id"]), depth + 1), "published_by")
@@ -229,8 +235,8 @@ class Builder:
             return None
         k = self.add("estimate", ident, f"{e['concept_id']} ({e['modality']})", modality=e["modality"],
                      value=e["value"], concept_id=e["concept_id"], uncertainty=e["uncertainty"])
-        self.edge(k, self._release(str(e["release_id"]), depth + 1), "in_release")
-        self.edge(k, self._model_version(str(e["method_version_id"]), depth + 1), "method")
+        # The estimate's own inputs first (observation -> acquisition -> raw bytes), so the node budget is
+        # spent on its lineage before the release's other pins.
         for inp in self.all("SELECT observation_id, prior_estimate_id, claim_id FROM belief.input "
                             "WHERE estimate_id = :i ORDER BY id LIMIT 50", i=ident):
             if inp["observation_id"]:
@@ -241,6 +247,8 @@ class Builder:
             elif inp["claim_id"]:
                 ck = self.add("claim", inp["claim_id"], "reviewed scientific claim")
                 self.edge(k, ck, "informed_by")
+        self.edge(k, self._model_version(str(e["method_version_id"]), depth + 1), "method")
+        self.edge(k, self._release(str(e["release_id"]), depth + 1), "in_release")
         return k
 
     def _scenario(self, ident: str, depth: int) -> str | None:

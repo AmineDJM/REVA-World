@@ -18,6 +18,7 @@ import {
   arcWidth,
   exposureRows,
   greatCircle,
+  mergeReleaseRelations,
   reportedPartnerFlows,
   runCountryStatuses,
   type CountryRunStatus,
@@ -104,14 +105,41 @@ export default function MapPage() {
   const refYear = typeof st?.scenario?.spec?.reference_year === 'number' ? (st.scenario.spec.reference_year as number) : null;
   const cutoff = st?.scenario?.knowledge_cutoff ?? null;
 
-  const relations = useApi(
+  // Release-consistent view: relations pinned to the run's baseline release; where the release
+  // carries no flow value, evidence as known at the scenario cutoff fills it (marked per row).
+  const releaseId = st?.scenario?.baseline_release?.id ?? null;
+  const relRelease = useApi(
+    (s) => getRelations({ entity_id: focusId!, layer: 'trade.crude_petroleum', period: refYear ?? undefined, release_id: releaseId!, max_edges: 500 }, s),
+    [focusId, refYear, releaseId],
+    !!focusId && !!releaseId,
+  );
+  const needsFallback = !!relRelease.data && relRelease.data.data.relations.some((r) => !r.value);
+  const relEvidence = useApi(
     (s) => getRelations({ entity_id: focusId!, layer: 'trade.crude_petroleum', period: refYear ?? undefined, as_of: cutoff ?? undefined, max_edges: 500 }, s),
     [focusId, refYear, cutoff],
-    !!focusId && !!st,
+    !!focusId && !!st && (needsFallback || !releaseId),
+  );
+  const relations = {
+    status: relRelease.status === 'error' ? relRelease.status : releaseId ? relRelease.status : relEvidence.status,
+    error: relRelease.error ?? relEvidence.error,
+    reload: () => {
+      relRelease.reload();
+      relEvidence.reload();
+    },
+    data: releaseId ? relRelease.data : relEvidence.data,
+  };
+  const mergedRelations = useMemo(
+    () =>
+      releaseId
+        ? relRelease.data
+          ? mergeReleaseRelations(relRelease.data.data.relations, relEvidence.data?.data.relations)
+          : null
+        : (relEvidence.data?.data.relations ?? null),
+    [releaseId, relRelease.data, relEvidence.data],
   );
   const partners = useMemo(
-    () => (relations.data && focusId ? reportedPartnerFlows(relations.data.data.relations, focusId, flow) : null),
-    [relations.data, focusId, flow],
+    () => (mergedRelations && focusId ? reportedPartnerFlows(mergedRelations, focusId, flow) : null),
+    [mergedRelations, focusId, flow],
   );
 
   const features = locations.data?.data.features ?? [];
@@ -355,7 +383,8 @@ export default function MapPage() {
               {flow === 'M' ? 'Reported origins' : 'Reported destinations'} for {focusLabel ?? '—'}
             </h2>
             <p className="field-hint">
-              Bilateral flows {focusLabel ?? 'the country'} itself reports for {refYear ?? 'the reference year'}, as known at the scenario cutoff. They
+              Bilateral flows {focusLabel ?? 'the country'} itself reports for {refYear ?? 'the reference year'}, from the run's pinned baseline
+              release (evidence as of the scenario cutoff where the release records no value; marked per row). They
               are context: the crude model uses World totals, not these rows. "World" is never drawn as an arc; composite partner areas are listed,
               not mapped.
             </p>
@@ -443,6 +472,7 @@ function PartnerTable({ rows, arcs, unmapped }: { rows: FlowRow[]; arcs: MapArc[
                   </span>
                 )}
                 {p.valuation && <span className="basis"> · {p.valuation}</span>}
+                {p.valueSource === 'evidence_as_of' && <span className="field-hint"> · evidence as of cutoff (not in the release)</span>}
               </td>
               <td>{arcs.some((a) => a.id === p.relationId) ? 'arc' : <span className="muted">listed only</span>}</td>
             </tr>
