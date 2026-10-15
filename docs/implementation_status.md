@@ -61,7 +61,7 @@ after the update; the draft had 159 done, 23 partial, 207 rows (P2.14 was added)
 | blocked-on-credentials | 5 |
 | **total** | **208** |
 
-By section: P0–P7 (§3): 81 done, 7 partial, 3 blocked-on-credentials. P8–P12 (§4): 14 interface-only and
+By section: P0–P7 (§3): 82 done, 6 partial, 3 blocked-on-credentials. P8–P12 (§4): 14 interface-only and
 6 not started (none done). §13 acceptance (§5): 34 done, 1 blocked-on-credentials. MVP gates/demo (§6): 7 done,
 1 partial. First actions + CI (§7): 15 done, 3 partial, 1 blocked-on-credentials. Invariants (§8.1): 30 done,
 5 partial.
