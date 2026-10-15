@@ -14,33 +14,31 @@ import pytest
 from sqlalchemy import text
 
 from reva.adapters.connectors import atlas_imf as m
+from reva.atlas.ingest import run_atlas_ingest
+from reva.atlas.sources import ensure_registered
 from reva.atlas.tables import read_atlas_table
-from reva.evidence.runner import FixtureHttp
 
 pytestmark = pytest.mark.db
 
-FIX_COUNTRIES = ("FRA", "DZA", "IND", "EGY", "KOS", "WBG", "USA", "BRA", "G001", "TWN")
+
+class _Res:
+    """The module summary of one platform run (``run_atlas_ingest(..., mode="fixture")``)."""
+
+    def __init__(self, out: dict) -> None:
+        assert out["status"] == "completed" and out["mode"] == "fixture" and out["budget"] is None
+        self.out = out
+        self.tables = out["summary"]["tables"]
+        self.failures = out["summary"]["failures"]
+        self.requests = out["summary"]["requests"]
 
 
-def _run(db):
-    return asyncio.run(
-        m.ingest(
-            db.worker,
-            db.store,
-            FixtureHttp(m.CONNECTOR_NAME),
-            origin="test_fixture",
-            countries=FIX_COUNTRIES,
-            start_year=2018,
-            imts_start_year=2022,
-            imts_end_year=2023,
-            imts_reporters_override=("FRA", "DZA"),
-        )
-    )
+def _run(db) -> _Res:
+    return _Res(asyncio.run(run_atlas_ingest(db.settings, db.worker, db.store, m.CONNECTOR_NAME, mode="fixture")))
 
 
 @pytest.fixture(scope="module")
 def first(db):
-    m.register_connector(db.owner, db.store)
+    ensure_registered(db.owner, db.store, m.atlas_source())
     return _run(db)
 
 
@@ -48,7 +46,8 @@ def test_every_imf_table_registered_from_archived_raw(db, first):
     assert first.failures == []
     assert set(first.tables) == set(m.DATASETS)
     assert all(t["created"] for t in first.tables.values())
-    assert first.requests == 8
+    assert first.requests == 8 and first.out["archived_raw"] == 8
+    assert {r["dataset_key"] for r in first.out["registered"]} == {f"atlas.imf.{d}" for d in m.DATASETS}
     with db.owner.connect() as c:
         rows = c.execute(
             text("""SELECT dataset_key, origin, row_count, cardinality(source_acquisition_ids) AS n
@@ -75,6 +74,12 @@ def test_registered_weo_table_reads_back_with_projection_flags(db, first):
     assert flags[2026]["estimate_kind"] == "projection" and "estimate_kind" not in flags[2025]
     assert t["coverage"]["unmapped_provider_geo_count"] == 2  # G001, TWN kept
     assert "WEO October 2026" in t["coverage"]["coverage_note"]
+
+
+def test_one_dataset_run_fetches_only_that_dataset(db, first):
+    out = asyncio.run(run_atlas_ingest(db.settings, db.worker, db.store, m.CONNECTOR_NAME, dataset="er", mode="fixture"))
+    assert out["archived_raw"] == 1 and set(out["summary"]["tables"]) == {"er"}
+    assert out["summary"]["tables"]["er"]["created"] is False
 
 
 def test_reingest_is_idempotent(db, first):

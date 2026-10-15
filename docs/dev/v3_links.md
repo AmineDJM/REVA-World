@@ -85,8 +85,10 @@ cannot map to a QID keep the node `iso3:<CODE>` (`basis.qid_unmapped`), never dr
   (`networkx.shortest_simple_paths`) on the pruned subgraph. `max_hops` ≤ 6, `k` ≤ 10, expansion budget
   200 000 edges, at most 400 Yen candidates; hitting a bound sets `truncated`.
 * **Costs / hub damping** (`registry/links/hubs.yaml`): edge cost = the kind's `path_cost`; entering an
-  intermediate node adds its declared penalty (UN 6, UNESCO/WHO/IMF/World Bank 5, continents 3...) plus
-  `per_doubling × (log2 degree − log2 64)` for nodes above 64 distinct neighbours. *Blocked* hubs (Earth,
+  intermediate node adds its declared penalty (UN 6, UNESCO/WHO/IMF/World Bank 5, continents 3...; QIDs checked against Wikidata labels) plus
+  `per_doubling × (log2 degree − log2 64)` for nodes above 64 distinct neighbours. A derived link carries
+  the penalties of its `via` nodes (a co-membership *via* the UN is damped like the two hops through the UN),
+  and a derived link via a blocked hub is refused like the hub itself. *Blocked* hubs (Earth,
   human, country, sovereign state, state, city, colony, empire, treaty, war, language, Indo-European,
   English...) are never intermediate nodes unless `include_blocked_hubs=true`; excluded properties (P31,
   P21, P106, P101, P30 continent, P2348, P122, P166) are traversed only when named in `kinds`.
@@ -107,7 +109,45 @@ cannot map to a QID keep the node `iso3:<CODE>` (`basis.qid_unmapped`), never dr
 codes. Each statement keeps its Wikidata GUID, entity revision id and the raw response sha256; the file is
 `origin: test_fixture` (`tests/unit/links/fixtures/wikidata_links_fixture.json`).
 
-FIXTURE_RESULTS_PLACEHOLDER
+Captured on 2026-10-15 in two waves (4 `wbgetentities` batches of ≤ 20 ids; wave 2 added entities found in
+wave-1 claims plus three searched QIDs): **76 entities, 544 statements** (P530 87, P31 66, P571 50, P17 40,
+P463 29, P37 18, P47 18, P527 16, P2936 16, P1365 12, P1891 3...). All seed QIDs were checked against the
+captured English labels (test-enforced). Entity revision ids were read separately with `props=info`
+because the client's default `props` omit it (see cross-owner request 8); every entity's `modified` time
+precedes the claims retrieval, so the recorded revisions are the ones captured.
+
+What the real statements give (tests `tests/unit/links/test_links_fixture.py`):
+
+* derived from the fixture: 13 `border_wikidata`, 44 `diplomatic_relation`, 81 `shared_official_language`,
+  72 `shared_language_used`, 135 `co_member` (16 candidate pairs refused: disjoint membership periods),
+  3 `co_signatory` (Tordesillas), 7 `conflict_co_participant`, 4 `colony_of`, 15 `successor_of`,
+  6 `former_colony_of` — every one evidenced by statement GUIDs;
+* `Brazil —former colony of→ Portuguese Empire (via Colonial Brazil, 1500–1822)`: Brazil P1365 Colonial
+  Brazil; Colonial Brazil P31 colony; Colonial Brazil P361 Portuguese Empire [1500, 1822];
+* **Columbus chain** (waypoints Columbus → Tordesillas → Brazil → Portuguese, ≤ 3 hops per segment):
+  1. Christophe Colomb — personnalité importante → Isabelle la Catholique (non daté dans la source)
+  2. Isabelle la Catholique — signataire de → traité de Tordesillas (1494-07-02)
+  3. traité de Tordesillas — pays → royaume de Portugal (non daté dans la source)
+  4. royaume de Portugal — langue officielle commune (via portugais) → Brésil (non daté dans la source)
+  5. Brésil — langue officielle → portugais (non daté dans la source)
+
+  each followed by its citation, e.g. `[wikidata:Q180897$577800bc-… rev … [fixture]]`. Without waypoints the
+  cheapest Columbus → Brazil connection is shorter and duller: Wikidata says Columbus spoke Portuguese
+  (P1412) and Portuguese has country (P17) Brazil. Tordesillas → Brazil also goes "Treaty of Tordesillas —
+  significant event of → Portuguese Empire — country of → Brazil (1500–1815)".
+* **US / decolonisation 1950s–60s** (waypoints US → Eisenhower → Suez Crisis → UK):
+  "United States — head of government → Dwight D. Eisenhower (1953-01-20–1961-01-20) | Eisenhower —
+  conflict → Cold War | Cold War — has part → Suez Crisis | Suez Crisis — participant → United Kingdom".
+  That is a chain of connections, **not** a US stance: Wikidata's Suez Crisis lists Israel, the UK, France
+  and Egypt as participants (no sides, not the US); UNGA Resolution 1514 (Q2629473) has only its class
+  (P31) in Wikidata, so the engine answers `no_traversable_statements`; the US is not connected to
+  "decolonization" (Q230533) within 6 hops. The US stance (e.g. its abstention on 1514) is **not
+  established** by the loaded sources and is not asserted anywhere.
+* Hub damping on real data: without it, "US and UK both members of the United Nations" (derived co_member
+  via UN, cost 1.2) would be the top US–UK connection; with the UN penalty (6) the first path is the
+  sourced diplomatic relation.
+* Time filter: as of 1956 the US — Eisenhower (P6, 1953–1961) — Cold War path exists; as of 1965 it does
+  not.
 
 ## 6. Recommended API shape
 
@@ -115,12 +155,18 @@ Implemented in `src/reva/api/routes/links.py` (read scope, standard envelope, pr
 `application/problem+json`):
 
 * `GET /v1/links/path?from=Q7322&to=Q5146&k=3&max_hops=4&as_of=1960|from_year&to_year&kind=P37&kind=link:former_colony_of&exclude_kind=…&include_undated=true&include_blocked_hubs=false`
-  — `from`/`to` accept a QID or an ISO3 code (resolved through P298). `data`: `query`, `found`, `reason`
-  (`no_path_within_max_hops`), `truncated`, `explored_nodes`, `paths[]` (`nodes`, `cost`, `hop_count`,
+  `&via=Q180897&via=BRA` (≤ 4 waypoints: one path forced through them, each segment searched on its own)
+  — `from`/`to`/`via` accept a QID or an ISO3 code (resolved through P298). `data`: `query`, `found`, `reason`
+  (`no_path_within_max_hops`, `no_traversable_statements`, `no_path_segment:<a>-><b>`), `truncated`, `explored_nodes`, `paths[]` (`nodes`, `cost`, `hop_count`,
   `text.fr[]`, `text.en[]`, `hops[]` with `from`, `to`, `kind` statement|link, `type` (property or link
   type), `forward`, `causal`, `temporal`, `via`, `weight`/`unit`, `evidence[]` (+`cite`), `sources`,
   `alternatives`, `text.fr`, `text.en`), `labels` (fr/en per node), `disclaimer`. Warnings:
   `path_not_causal` (always first), `community_edited`, `fixture_data`, `truncated`.
+Integration test (`tests/integration/test_links_db.py`, throwaway database from `tests/conftest.py`):
+the fixture is loaded with KGCORE's `load_batch` (source key `wikidata.links_fixture`, origin
+`test_fixture`, the fixture file archived as the raw artifact), then `/v1/links/path` (incl. waypoints),
+`/v1/links/BRA` and the service functions read it back from `kg.statement_current`.
+
 * `GET /v1/links/{iso3|qid}?link_type=…&year=1960` — every derived link touching the country (KG
   neighbourhood: borders, diplomacy, languages + genealogy, currency, head of state, memberships,
   treaties, conflicts, succession chains up to 4 steps), each with evidence; `link_types` gives every
@@ -170,5 +216,8 @@ letting it delegate to the LINKS engine.
 6. **KGCORE** (`src/reva/api/routes/kg.py`): optionally add `semantics=links` to `/v1/kg/path`
    delegating to `reva.links.service.path_between(conn, from, to, ...)` (typed hops, hub damping, k
    shortest weighted paths, fr/en explanations) — or keep both and let the UI call `/v1/links/path`.
-7. **Lead**: `contracts/openapi.json` must be re-exported (`scripts/export_contracts.py`) after the
+8. **WDHARVEST** (`src/reva/adapters/connectors/wikidata.py`): `ENTITY_PROPS` lacks `info`, so
+   `wbgetentities` returns no `lastrevid` and `extract_entity` stores `source_revision = None` on every
+   statement (seen in this capture). Add `"info"` to `ENTITY_PROPS` (one word; `LABEL_PROPS` too).
+9. **Lead**: `contracts/openapi.json` must be re-exported (`scripts/export_contracts.py`) after the
    `/v1/links` router registration (one line in `src/reva/api/app.py`).

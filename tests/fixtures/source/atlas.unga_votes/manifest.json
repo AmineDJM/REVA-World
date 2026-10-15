@@ -1,0 +1,54 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "ac202df3ad1a59f7a6c5857e17af3df71dbac71f5ea83a4ed6e00ce2145a38ba",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10295576",
+    "file": "ac202df3ad1a59f7.RData",
+    "sha256": "a9110c40dcc07ee9af71b327374a89667a84c2a25d4cd548e07489f436ad728d",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-rlang-transport"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "slice of UNVotes-1.RData (196 of 1283746 rows, 18 roll calls), rewritten as RDX3/XDR with the same columns and values"
+  },
+  {
+    "request_fingerprint": "73a57ebea9688eaa2caa65e20dcaebbb31383a423473b80b279ec2ffe14969a1",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/10295577",
+    "file": "73a57ebea9688eaa.docx",
+    "sha256": "fd57aa2263439410d360c54ce3e03a89b02787404564664fad952ab44997fca0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "unchanged"
+  },
+  {
+    "request_fingerprint": "8a2496f676b44ba955dfbd1f2ad8e933dd4902972d8789b8ea2473412187748b",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/33.0?persistentId=doi:10.7910/DVN/LEJUQZ",
+    "file": "8a2496f676b44ba9.json",
+    "sha256": "a3c833b358a06bfe8ba6c4df286b2d6d35913189cb85e1237a17621d194a64d0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC0 1.0",
+    "note": "Dataverse v33.0 version record, trimmed to the 2 used files; votes md5/size replaced by the slice's"
+  }
+]

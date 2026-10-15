@@ -37,11 +37,12 @@ from typing import Any
 from reva.adapters.connectors import atlas_qol_common as common
 from reva.adapters.connectors.atlas_qol_common import AtlasBuild, NameIndex, canon, decimal_text
 from reva.adapters.connectors.atlas_xlsx import Workbook
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.whr"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
 PARSER_VERSION = "atlas_whr/1"
 SOURCE_KEY = "whr.figure21"
 SOURCE = "whr"
@@ -167,27 +168,29 @@ def parse(body: bytes, raw_sha: str, names: NameIndex | None = None) -> tuple[li
 
 
 class WhrConnector:
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
+    def describe(self) -> AtlasSourceSpec:
+        return AtlasSourceSpec(
             name=CONNECTOR_NAME,
             version=CONNECTOR_VERSION,
             source_key=SOURCE_KEY,
+            atlas_source=SOURCE,
             provider="World Happiness Report (Wellbeing Research Centre, Oxford; Gallup; UN SDSN)",
             licence=LICENCE,
             allowed_hosts=(HOST,),
+            datasets=(DATASET,),
             dataset_ids=("WHR26_Data_Figure_2.1",),
-            field_mappings={"atlas_tables": [f"{SOURCE}.{DATASET}"]},
-            units={v[0]: v[1] for v in COLUMNS.values()},
-            geography=("all",),
-            time_semantics="three-year survey window ending in Year: [Year-2, Year+1)",
-            lineage_family="gallup_world_poll",
             cadence_seconds=30 * common.DAY,
-            release_aware=True,
-            revision_strategy="annual report (March); a new file name per edition",
+            planned_requests=1,
             max_response_bytes=5_000_000,
-            max_pages=1,
+            min_interval_seconds=1.0,
             parser_version=PARSER_VERSION,
             code_digest=common.code_digest(sys.modules[__name__]),
+            field_mappings={
+                "atlas_tables": [f"{SOURCE}.{DATASET}"],
+                "units": {v[0]: v[1] for v in COLUMNS.values()},
+                "time_semantics": "three-year survey window ending in Year: [Year-2, Year+1)",
+            },
+            notes="Annual report (March); a new file name per edition.",
         )
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
@@ -206,8 +209,8 @@ class WhrConnector:
     def follow_up(self, raw: RawAcquisition) -> tuple[FetchItem, ...]:
         return ()
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        return await common.fetch_plain(item, http)
+    async def fetch(self, item: FetchItem, run: Any) -> RawAcquisition:
+        return await common.fetch_plain(item, run)
 
     def build(self, raws: Sequence[RawAcquisition]) -> list[AtlasBuild]:
         raw = next((r for r in raws if r.item.key == "figure21"), None)
@@ -241,4 +244,20 @@ class WhrConnector:
         ]
 
 
-__all__ = ["CONNECTOR_NAME", "NAME_ALIASES", "WhrConnector", "parse"]
+def atlas_source() -> AtlasSourceSpec:
+    return WhrConnector().describe()
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas platform entry point (``reva atlas ingest {CONNECTOR_NAME}``)."""
+    return await common.run_connector(run, WhrConnector())
+
+
+__all__ = [
+    "CONNECTOR_NAME",
+    "NAME_ALIASES",
+    "WhrConnector",
+    "atlas_ingest",
+    "atlas_source",
+    "parse",
+]

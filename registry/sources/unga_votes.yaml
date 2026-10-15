@@ -1,0 +1,27 @@
+# V3 (agent KGGEOPOL): UN General Assembly roll-call votes (Voeten, Strezhnev & Bailey), Harvard Dataverse.
+# Connector: src/reva/adapters/connectors/atlas_unga_votes.py -> atlas tables unga.votes, unga.rollcalls,
+# unga.vote_shares (computed) + KG statements (source_key harvard.dataverse.unvotes).
+source_key: harvard.dataverse.unvotes
+title: United Nations General Assembly Voting Data (Voeten et al.), dataset version 33.0, UNVotes-1.RData
+provider_url: https://doi.org/10.7910/DVN/LEJUQZ
+lineage_family: unga_votes_voeten
+rights:
+  licence: CC0 1.0
+  licence_url: http://creativecommons.org/publicdomain/zero/1.0
+  attribution: >-
+    Voeten, Erik; Strezhnev, Anton; Bailey, Michael, "United Nations General Assembly Voting Data",
+    Harvard Dataverse, doi:10.7910/DVN/LEJUQZ (version 33.0). Bailey, Strezhnev & Voeten (2017), JCR 61(2).
+  licence_evidence: Dataverse version metadata (license.name "CC0 1.0"), checked by the connector on every run.
+metadata:
+  allowed_hosts: [dataverse.harvard.edu, dvn-cloud-iqss.s3.amazonaws.com, cran.r-project.org]
+  files:
+    - https://dataverse.harvard.edu/api/datasets/:persistentId/versions/33.0?persistentId=doi:10.7910/DVN/LEJUQZ
+    - https://dataverse.harvard.edu/api/access/datafile/10295576   # UNVotes-1.RData (redirects to S3)
+    - https://dataverse.harvard.edu/api/access/datafile/10295577   # Codebook-1.docx
+  access_note: >-
+    Versions 34-39 of the dataset (now "United Nations General Assembly Ideal Points") no longer contain the
+    raw votes; version 33.0 is the latest with UNVotes; its files stay downloadable by id. Coverage
+    1946-01-01 .. 2024-06-04. Later votes: UNGA-DM database (unvotes.unige.ch) or the UN Digital Library
+    voting data -- not ingested (see docs/dev/v3_kggeopol.md).
+  authentication: none
+  cadence: pinned version; re-check quarterly for a new raw-votes release

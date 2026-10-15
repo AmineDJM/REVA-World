@@ -1,0 +1,30 @@
+# V3 (agent KGGEOPOL): CShapes 2.0 historical state borders 1886-2019 (ETH Zurich ICR).
+# Connector: src/reva/adapters/connectors/atlas_cshapes.py -> atlas tables cshapes.polities_gw,
+# cshapes.polities_cow, dataset geo.cshapes.polygons + KG statements (source_key cshapes.cran).
+source_key: cshapes.cran
+title: CShapes 2.0 (GW and COW codings, independent states and dependencies), authors' CRAN package cshapes 2.0
+provider_url: https://icr.ethz.ch/data/cshapes/
+lineage_family: cshapes
+rights:
+  licence: CC BY-NC-SA 4.0
+  licence_url: http://creativecommons.org/licenses/by-nc-sa/4.0/
+  attribution: >-
+    Schvitz, Rüegger, Girardin, Cederman, Weidmann & Gleditsch (2022), "Mapping the International System,
+    1886-2017: The CShapes 2.0 Dataset", Journal of Conflict Resolution 66(1): 144-161.
+  licence_evidence: >-
+    icr.ethz.ch/data/cshapes/ (read 2026-10-15): "CShapes by Schvitz, Rüegger, Girardin, Cederman, Weidmann,
+    Gleditsch is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License."
+  non_commercial: true
+  share_alike: derived tables (simplified polygons, adjacency, KG statements) under CC BY-NC-SA 4.0
+  package_code_licence: GPL (>= 2) (R code of the cshapes package; the data keep the CC BY-NC-SA licence)
+metadata:
+  allowed_hosts: [cran.r-project.org]
+  files:
+    - https://cran.r-project.org/src/contrib/cshapes_2.0.tar.gz
+  access_note: >-
+    The CRAN package (same authors) ships the full dataset incl. dependencies and owners as simplified TopoJSON;
+    the ICR site's shapefile covers GW independent states only and its host resets proxy connections
+    intermittently.
+  authentication: none
+  cadence: static release (2.0, 2021); semi-annual check
+  review_flag: non-commercial licence -- exclude from any commercial deployment

@@ -17,19 +17,20 @@ import pytest
 
 from reva.adapters.connectors import atlas_imf as m
 from reva.atlas.catalog import load_catalog
+from reva.atlas.ingest import AtlasRun
 from reva.atlas.tables import country_iso3, validate_atlas_frame
 from reva.evidence.runner import FixtureHttp
 from reva.kernel.errors import SourceResponseError
 
-FIX_COUNTRIES = ("FRA", "DZA", "IND", "EGY", "KOS", "WBG", "USA", "BRA", "G001", "TWN")
-FIX_START = 2018
+FIX_COUNTRIES = m.FIXTURE_COUNTRIES
+FIX_START = m.FIXTURE_START_YEAR
 SHA = "a" * 64
 CATALOG = Path(__file__).resolve().parents[2] / "registry" / "atlas" / "catalog"
 
 
 @pytest.fixture(scope="module")
 def raws() -> dict[str, bytes]:
-    http = FixtureHttp(m.CONNECTOR_NAME)
+    http = AtlasRun.offline(m.atlas_source(), FixtureHttp(m.CONNECTOR_NAME))
 
     async def go() -> dict[str, bytes]:
         out = {q.dataset: (await m.fetch(q.fetch_item(), http)).body for q in m.flow_queries(FIX_COUNTRIES, FIX_START)}
@@ -302,11 +303,17 @@ def test_catalog_matches_tables(raws):
             assert f"imf.{ds}.{ind}" in {s.key for s in imf[cid].source_order}
 
 
-def test_spec_is_an_atlas_bulk_spec():
-    spec = m.describe()
+def test_spec_is_an_atlas_source_spec():
+    from reva.atlas.sources import atlas_sources
+
+    spec = m.atlas_source()
     assert spec.template == "atlas_bulk" and spec.allowed_hosts == ("api.imf.org",)
-    assert spec.source_key == "imf.sdmx" and spec.parser_version == m.PARSER_VERSION
-    assert spec.code_digest.startswith("sha256:")
+    assert spec.source_key == "imf.sdmx" and spec.budget_key == "imf.sdmx" and spec.parser_version == m.PARSER_VERSION
+    assert spec.code_digest.startswith("sha256:") and spec.datasets == m.DATASETS
+    assert atlas_sources()[m.CONNECTOR_NAME].module == m.__name__  # discovered by the atlas platform
+    src = Path(m.__file__).read_text()
+    for forbidden in ("SafeHttpClient(", "make_live_client(", "httpx.", "model_copy(", "ConnectorSpec"):
+        assert forbidden not in src
 
 
 def test_fixture_manifest_is_complete_and_offline():
@@ -315,6 +322,6 @@ def test_fixture_manifest_is_complete_and_offline():
     )
     assert {e["item"] for e in man} == {"weo", "bop", "gfs_soo", "er", "mfs_ir", "il", "imts:codelist", "imts:DZA-FRA"}
     assert all(e["url"].startswith("https://api.imf.org/") for e in man)
-    http = FixtureHttp(m.CONNECTOR_NAME)
+    run = AtlasRun.offline(m.atlas_source(), FixtureHttp(m.CONNECTOR_NAME))
     with pytest.raises(SourceResponseError):  # an unrecorded request never reaches the network
-        asyncio.run(m.fetch(m.flow_queries(("ZZZ",))[0].fetch_item(), http))
+        asyncio.run(m.fetch(m.flow_queries(("ZZZ",))[0].fetch_item(), run))

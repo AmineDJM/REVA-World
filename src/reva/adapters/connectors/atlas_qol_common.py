@@ -1,20 +1,17 @@
 """Shared plumbing of the quality-of-life / environment / energy atlas connectors (V3, agent A-QOL).
 
-Used by :mod:`atlas_undp`, :mod:`atlas_whr`, :mod:`atlas_owid` and :mod:`atlas_wid`.
+Used by :mod:`atlas_undp`, :mod:`atlas_whr`, :mod:`atlas_owid` and :mod:`atlas_wid`, which are atlas
+sources of the atlas platform (``docs/dev/v3_atlas_interface.md`` section 7): each declares
+``atlas_source()`` (an :class:`~reva.atlas.sources.AtlasSourceSpec`) and ``async atlas_ingest(run)``,
+which calls :func:`run_connector`. Nothing here builds an HTTP client: every request goes through the
+run (``run.get`` / ``run.get_range``: the budget-metered live client or the fixture client).
 
-* :func:`atlas_spec` — a :class:`~reva.ports.connectors.ConnectorSpec` with template ``atlas_bulk``.
-  ``ConnectorSpec.template`` is a closed ``Literal`` without an atlas value yet (requested change for
-  the lead: add ``"atlas_bulk"`` to it in ``src/reva/ports/connectors.py``). Every other field is
-  validated normally; the template is set afterwards.
 * :class:`AtlasBuild` — one atlas table to register (frame + the raw artifacts it was parsed from).
-* :func:`ingest` — fetch every planned item, archive each raw response as an ``evidence.acquisition``
-  (zero observation batches), parse, and register the atlas tables through
-  :func:`reva.atlas.tables.register_atlas_table`. Nothing is registered when a parse fails.
+* :func:`run_connector` — fetch every planned item through the run, archive each raw response as an
+  ``evidence.acquisition`` as soon as it arrives (``run.archive``), parse, and register the atlas
+  tables (``run.register``). Nothing is registered when a parse fails.
 * :class:`NameIndex` — provider country *names* -> crosswalk keys, by exact (normalised) match on the
   crosswalk's own labels plus explicit, per-provider aliases. Unmatched names stay unmapped (kept).
-
-Nothing here makes a network request by itself; the ``http`` object passed to :func:`ingest`
-(``SafeHttpClient`` live, ``FixtureHttp`` in tests) does.
 """
 
 from __future__ import annotations
@@ -24,31 +21,17 @@ import inspect
 import json
 import re
 import unicodedata
-from collections.abc import Callable, Iterable, Mapping, Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from functools import lru_cache
-from typing import Any, Protocol, get_args
+from typing import Any, Protocol
 
 import polars as pl
 
-from reva.adapters.connectors.base import to_raw
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.atlas.sources import AtlasSourceSpec
+from reva.ports.connectors import FetchItem, RawAcquisition
 
-ATLAS_TEMPLATE = "atlas_bulk"
-_VALID_PLACEHOLDER = "naturalearth_asset"  # only to validate the other fields; replaced before use
 DAY = 86_400
-
-
-def template_supported() -> bool:
-    return ATLAS_TEMPLATE in get_args(ConnectorSpec.model_fields["template"].annotation)
-
-
-def atlas_spec(**fields: Any) -> ConnectorSpec:
-    """A connector spec with ``template = "atlas_bulk"`` (every other field validated)."""
-    if template_supported():
-        return ConnectorSpec(template=ATLAS_TEMPLATE, **fields)  # type: ignore[arg-type]
-    checked = ConnectorSpec(template=_VALID_PLACEHOLDER, **fields)  # type: ignore[arg-type]
-    return checked.model_copy(update={"template": ATLAS_TEMPLATE})
 
 
 def code_digest(*modules: Any) -> str:
@@ -115,25 +98,36 @@ class AtlasBuild:
 
 
 class AtlasConnector(Protocol):
-    def describe(self) -> ConnectorSpec: ...
+    def describe(self) -> AtlasSourceSpec: ...
 
     def fetch_items(self) -> tuple[FetchItem, ...]: ...
 
     def follow_up(self, raw: RawAcquisition) -> tuple[FetchItem, ...]: ...
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition: ...
+    async def fetch(self, item: FetchItem, run: Any) -> RawAcquisition: ...
 
     def build(self, raws: Sequence[RawAcquisition]) -> list[AtlasBuild]: ...
 
 
-async def fetch_plain(item: FetchItem, http: Any, origin: str | None = None) -> RawAcquisition:
-    """GET ``item.url`` through the given client and wrap it as a raw acquisition."""
-    r = await http.get(item.url, max_bytes=item.max_bytes)
-    return to_raw(item, r, str(origin or getattr(http, "origin", "live")))
+async def fetch_plain(item: FetchItem, run: Any) -> RawAcquisition:
+    """GET ``item.url`` through the atlas run (``params`` stay on the acquisition's item)."""
+    raw: RawAcquisition = await run.get(
+        item.url,
+        key=item.key,
+        media_types=item.expected_media_types or ("application/octet-stream",),
+        max_bytes=item.max_bytes,
+        params=item.params,
+    )
+    return raw
 
 
-async def fetch_all(connector: AtlasConnector, http: Any, *, max_requests: int = 500) -> list[RawAcquisition]:
-    """Fetch every planned item and every follow-up item (breadth-first, bounded)."""
+async def fetch_all(
+    connector: AtlasConnector, run: Any, *, max_requests: int = 1000, on_raw: Any = None
+) -> list[RawAcquisition]:
+    """Fetch every planned item and every follow-up item (breadth-first, bounded).
+
+    ``on_raw(raw)`` runs as soon as each response arrives (the platform archives it there, so the
+    raw bytes of a run cut short by its budget are kept)."""
     queue = list(connector.fetch_items())
     seen: set[str] = set()
     raws: list[RawAcquisition] = []
@@ -144,94 +138,62 @@ async def fetch_all(connector: AtlasConnector, http: Any, *, max_requests: int =
         seen.add(item.key)
         if len(seen) > max_requests:
             raise RuntimeError(f"{connector.describe().name}: more than {max_requests} requests planned")
-        raw = await connector.fetch(item, http)
+        raw = await connector.fetch(item, run)
+        if on_raw is not None:
+            on_raw(raw)
         raws.append(raw)
         queue.extend(connector.follow_up(raw))
     return raws
 
 
-def archive_raw(engine: Any, store: Any, spec: ConnectorSpec, raw: RawAcquisition, *, actor: str) -> str:
-    """Archive the raw bytes as an acquisition of ``spec`` (no observations); return its sha256."""
-    from reva.evidence.ingest import publish_acquisition
+async def run_connector(run: Any, connector: AtlasConnector) -> dict[str, Any]:
+    """Atlas platform run: fetch (metered) -> archive each raw response -> parse -> register.
 
-    summary = publish_acquisition(engine, store, spec, raw, [], [], actor=actor)
-    if summary.namespace == "quarantine":  # pragma: no cover - no blocking report is ever produced here
-        raise RuntimeError("raw acquisition was quarantined")
-    if summary.raw_sha256 != sha256_hex(raw.body):  # pragma: no cover - store integrity
-        raise RuntimeError("archived raw sha256 differs from the body hash")
-    return summary.raw_sha256
+    Parsing happens before any table is registered, so a parse failure registers nothing (the raw
+    bytes already archived stay archived: they are what the provider served). Builds of datasets
+    the run does not want (``--dataset``) are not registered."""
+    spec = connector.describe()
+    if spec.name != run.spec.name:
+        raise ValueError(f"connector {spec.name} run as {run.spec.name}")
+    shas: dict[str, str] = {}
 
+    def archive(raw: RawAcquisition) -> None:
+        sha = run.archive(raw)
+        if sha != sha256_hex(raw.body):  # pragma: no cover - store integrity
+            raise RuntimeError("archived raw sha256 differs from the body hash")
+        shas[raw.item.key] = sha
 
-def register_connector(owner_engine: Any, store: Any, spec: ConnectorSpec, actor: str = "system:a_qol") -> Any:
-    """Register ``spec`` as a connector version (tests / throwaway databases).
-
-    The seed registers the built-in connectors (``reva.adapters.connectors.registry``, lead-owned);
-    until the A-QOL connectors are listed there, tests and the throwaway live ingest register them
-    with the seed's own function (migration owner). The ``registry/sources/*.yaml`` entry is seeded.
-    """
-    from reva.adapters.postgres import repositories as repo
-    from reva.cli.seed import register_connector_version
-
-    with owner_engine.begin() as conn:
-        act = repo.simple_activity("registry.seed", "review", actor, {"connector": spec.name})
-        repo.record_activity(conn, act)
-        return register_connector_version(conn, store, spec, act.id)
-
-
-def register_builds(engine: Any, store: Any, builds: Iterable[AtlasBuild], *, origin: str) -> list[dict[str, Any]]:
-    from reva.atlas.tables import register_atlas_table
-
-    out = []
+    raws = await fetch_all(connector, run, max_requests=max(1000, spec.planned_requests * 2), on_raw=archive)
+    builds = connector.build(raws)
+    tables = []
     for b in builds:
-        out.append(
-            register_atlas_table(
-                engine,
-                store,
-                source=b.source,
+        if b.source != spec.atlas_source:
+            raise ValueError(f"build {b.source}.{b.dataset} is not of source {spec.atlas_source}")
+        if not run.wants(b.dataset):
+            continue
+        tables.append(
+            run.register(
                 dataset=b.dataset,
                 frame=b.frame,
                 raw_sha256s=b.raw_sha256s,
-                parser_version=b.parser_version,
-                origin=origin,
                 coverage_note=b.coverage_note[:4000],
                 geo_scheme=b.geo_scheme,
-                rights=b.rights,
-                actor="worker:atlas_a_qol",
+                rights={**b.rights, "source_key": spec.source_key},
             )
         )
-    return out
-
-
-async def ingest(
-    engine: Any,
-    store: Any,
-    connector: AtlasConnector,
-    http: Any,
-    *,
-    origin: str | None = None,
-    on_raw: Callable[[RawAcquisition], None] | None = None,
-) -> dict[str, Any]:
-    """Fetch -> archive every raw response -> parse -> register the atlas tables (worker engine).
-
-    Parsing happens before any table is registered, so a parse failure registers nothing (the raw
-    bytes already archived stay archived: they are what the provider served).
-    """
-    spec = connector.describe()
-    org = str(origin or getattr(http, "origin", "live"))
-    raws = await fetch_all(connector, http)
-    for raw in raws:
-        archive_raw(engine, store, spec, raw, actor="worker:atlas_a_qol")
-        if on_raw is not None:
-            on_raw(raw)
-    builds = connector.build(raws)
-    tables = register_builds(engine, store, builds, origin=org)
     return {
         "connector": spec.name,
         "requests": len(raws),
         "raw_bytes": sum(len(r.body) for r in raws),
-        "tables": tables,
+        "tables": [{k: v for k, v in t.items() if k != "coverage"} | {"coverage": _light(t)} for t in tables],
         "reports": {f"{b.source}.{b.dataset}": b.report for b in builds},
     }
+
+
+def _light(t: Mapping[str, Any]) -> dict[str, Any]:
+    cov = dict(t.get("coverage") or {})
+    cov.pop("unmapped_provider_geo", None)
+    return cov
 
 
 # --------------------------------------------------------------------------- country names
@@ -298,23 +260,17 @@ class NameIndex:
 
 
 __all__ = [
-    "ATLAS_TEMPLATE",
     "DAY",
     "AtlasBuild",
     "AtlasConnector",
     "NameIndex",
-    "archive_raw",
-    "atlas_spec",
     "canon",
     "code_digest",
     "decimal_text",
     "fetch_all",
     "fetch_plain",
     "frame",
-    "ingest",
     "norm_name",
-    "register_builds",
-    "register_connector",
+    "run_connector",
     "sha256_hex",
-    "template_supported",
 ]

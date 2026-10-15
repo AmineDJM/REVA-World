@@ -37,7 +37,6 @@ or re-labelled as observed.
 
 from __future__ import annotations
 
-import hashlib
 import io
 import re
 import struct
@@ -51,11 +50,12 @@ import polars as pl
 
 from reva.adapters.connectors import atlas_qol_common as common
 from reva.adapters.connectors.atlas_qol_common import AtlasBuild, canon
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.wid"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
 PARSER_VERSION = "atlas_wid/1"
 SOURCE_KEY = "wid.bulk"
 SOURCE = "wid"
@@ -64,6 +64,8 @@ HOST = "wid.world"
 ARCHIVE = "wid_all_data.zip"
 URL = f"https://{HOST}/bulk_download/{ARCHIVE}"
 TAIL_BYTES = 131_072
+#: One full run: tail + WID_countries.csv + data and metadata members of ~232 mappable codes.
+PLANNED_REQUESTS = 470
 MEMBER_SLACK = 1024  # local extra field allowance beyond the central-directory sizes
 MAX_MEMBER_UNCOMPRESSED = 400_000_000
 GEO_SCHEME = "wid"
@@ -300,27 +302,26 @@ class WidConnector:
         self._members: dict[str, Member] = {}
         self._etag: str | None = None
 
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
+    def describe(self) -> AtlasSourceSpec:
+        return AtlasSourceSpec(
             name=CONNECTOR_NAME,
             version=CONNECTOR_VERSION,
             source_key=SOURCE_KEY,
+            atlas_source=SOURCE,
             provider="World Inequality Database (WID.world)",
             licence=LICENCE,
             allowed_hosts=(HOST,),
+            datasets=(DATASET,),
             dataset_ids=(ARCHIVE,),
-            field_mappings={"atlas_tables": [f"{SOURCE}.{DATASET}"], "series": [f"{v}|{p}" for v, p in SERIES]},
-            units={},
-            geography=self.countries or ("all",),
-            time_semantics="calendar years",
-            lineage_family="wid",
             cadence_seconds=30 * common.DAY,
-            release_aware=True,
-            revision_strategy="archive ETag; a new archive = new raw members = new atlas table version",
+            planned_requests=PLANNED_REQUESTS,
             max_response_bytes=20_000_000,
-            max_pages=1,
+            min_interval_seconds=1.0,
             parser_version=PARSER_VERSION,
             code_digest=common.code_digest(sys.modules[__name__]),
+            field_mappings={"atlas_tables": [f"{SOURCE}.{DATASET}"], "series": [f"{v}|{p}" for v, p in SERIES]},
+            notes="Byte ranges of one archive (If-Range pinned to the tail's ETag); a new archive = a new table "
+            "version. Run option countries=FR,DE,... limits a run to a country subset.",
         )
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
@@ -380,25 +381,23 @@ class WidConnector:
             mapped = [c for c in mapped if c in self.countries]
         return mapped
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        from reva.adapters.http.safe_client import redact_url
-
-        headers = {"Range": f"bytes={item.params['range']}"}
-        if item.params.get("if_range"):
-            headers["If-Range"] = item.params["if_range"]
-        r = await http.get(item.url, headers=headers, max_bytes=item.max_bytes, accept_status=(206,))
-        meta = r.response_metadata()
-        meta["headers"] = {**meta.get("headers", {}), "content-range": r.headers.get("content-range", "")}
-        fp = hashlib.sha256(f"GET {redact_url(item.url)} Range: bytes={item.params['range']}".encode()).hexdigest()
-        return RawAcquisition(
-            item=item,
-            body=r.body,
-            media_type=r.media_type or "application/octet-stream",
-            retrieved_at=r.retrieved_at,
-            response_metadata=meta,
-            request_fingerprint=fp,
-            origin=getattr(http, "origin", "live"),
+    async def fetch(self, item: FetchItem, run: Any) -> RawAcquisition:
+        """One byte range through the run (metered; ``If-Range`` pins the archive version)."""
+        rng = str(item.params["range"])
+        kw: dict[str, Any] = (
+            {"suffix": int(rng[1:])}
+            if rng.startswith("-")
+            else dict(zip(("start", "end"), map(int, rng.split("-")), strict=False))
         )
+        raw: RawAcquisition = await run.get_range(
+            item.url,
+            key=item.key,
+            if_range=item.params.get("if_range"),
+            media_types=item.expected_media_types,
+            params=item.params,
+            **kw,
+        )
+        return raw
 
     def build(self, raws: Sequence[RawAcquisition]) -> list[AtlasBuild]:
         tail = next((r for r in raws if r.item.key == "tail"), None)
@@ -474,11 +473,31 @@ class WidConnector:
         ]
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return WidConnector().describe()
+
+
+def _run_countries(run: Any) -> list[str] | None:
+    """Run option ``countries`` (WID alpha-2 codes, comma-separated or a list): a subset run."""
+    v = (getattr(run, "options", None) or {}).get("countries")
+    if not v:
+        return None
+    codes = [c.strip().upper() for c in (v.split(",") if isinstance(v, str) else v) if c and c.strip()]
+    return codes or None
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas platform entry point (``reva atlas ingest {CONNECTOR_NAME}``)."""
+    return await common.run_connector(run, WidConnector(countries=_run_countries(run)))
+
+
 __all__ = [
     "CONNECTOR_NAME",
     "SERIES",
     "Member",
     "WidConnector",
+    "atlas_ingest",
+    "atlas_source",
     "inflate_member",
     "member_range",
     "parse_central_directory",

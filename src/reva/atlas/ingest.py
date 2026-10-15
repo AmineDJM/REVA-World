@@ -53,6 +53,7 @@ class AtlasRun:
     origin: str  # "live" | "test_fixture"
     dataset: str | None = None  # restrict the run to one atlas dataset (None: all)
     actor: str = ACTOR
+    options: dict[str, Any] = field(default_factory=dict)  # source-specific run options (validated, small)
     is_cancelled: Callable[[], bool] = lambda: False
     archived: list[str] = field(default_factory=list)
     registered: list[dict[str, Any]] = field(default_factory=list)
@@ -63,7 +64,7 @@ class AtlasRun:
         return self.dataset is None or self.dataset == dataset
 
     @classmethod
-    def offline(cls, spec: AtlasSourceSpec, http: Any) -> AtlasRun:
+    def offline(cls, spec: AtlasSourceSpec, http: Any, origin: str | None = None) -> AtlasRun:
         """A run that can only fetch (parser tests): no engine/store, so ``archive``/``register`` fail."""
         return cls(
             spec=spec,
@@ -71,15 +72,23 @@ class AtlasRun:
             engine=None,  # type: ignore[arg-type]
             store=None,  # type: ignore[arg-type]
             settings=None,
-            origin=str(getattr(http, "origin", "test_fixture")),
+            origin=origin or str(getattr(http, "origin", "test_fixture")),
         )
 
     def _cap(self, max_bytes: int | None) -> int:
         return min(max_bytes or self.spec.max_response_bytes, self.spec.max_response_bytes)
 
     def _raw(
-        self, r: Any, *, url: str, key: str, media_types: tuple[str, ...], cap: int, params: dict[str, Any] | None,
-        fingerprint: str, extra_headers: dict[str, str] | None = None,
+        self,
+        r: Any,
+        *,
+        url: str,
+        key: str,
+        media_types: tuple[str, ...],
+        cap: int,
+        params: dict[str, Any] | None,
+        fingerprint: str,
+        extra_headers: dict[str, str] | None = None,
     ) -> Any:
         from reva.ports.connectors import FetchItem, RawAcquisition
 
@@ -328,8 +337,14 @@ async def run_atlas_ingest(
     attempt: int = 1,
     http_factory: Callable[[AtlasSourceSpec, Any], Any] | None = None,
     is_cancelled: Callable[[], bool] = lambda: False,
+    options: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Run one atlas source (see module doc). ``http_factory`` replaces the live client (tests)."""
+    """Run one atlas source (see module doc). ``http_factory`` replaces the live client (tests).
+
+    ``options`` are source-specific run options (e.g. WID ``countries``), JSON scalars or lists
+    of strings, recorded in the result. The source's connector version must be registered with
+    the code it runs (``code_digest``): changed code under the same version is refused before any
+    request, so archived acquisitions always name the code that produced them."""
     from reva.operations.budgets import BudgetExhausted, load_budget, metered, reserve_ingest, settle_metered
 
     entry = get_source(source)
@@ -340,6 +355,8 @@ async def run_atlas_ingest(
         raise ValidationProblem("atlas ingest mode must be live or fixture", mode=str(mode)[:32])
     if mode == "fixture" and getattr(settings, "reva_env", "") == "production":
         raise PolicyDenied("fixture ingestion is not allowed in production")
+    opts = _check_options(options)
+    _check_registered(engine, spec)
     import importlib
 
     module = importlib.import_module(entry.module)
@@ -369,6 +386,7 @@ async def run_atlas_ingest(
         origin="test_fixture" if mode == "fixture" else "live",
         dataset=dataset,
         is_cancelled=is_cancelled,
+        options=opts,
     )
     status, error, summary = "completed", None, None
     try:
@@ -386,6 +404,7 @@ async def run_atlas_ingest(
         "budget_key": spec.budget_key,
         "mode": mode,
         "dataset": dataset,
+        "options": opts,
         "status": status,
         "error": error,
         "started_at": started.isoformat(),
@@ -394,6 +413,39 @@ async def run_atlas_ingest(
         "summary": summary,
         "budget": usage,
     }
+
+
+def _check_options(options: dict[str, Any] | None) -> dict[str, Any]:
+    out: dict[str, Any] = {}
+    for k, v in (options or {}).items():
+        if not isinstance(k, str) or not k.isidentifier() or len(k) > 40:
+            raise ValidationProblem("invalid atlas run option name", option=str(k)[:40])
+        ok = isinstance(v, (str, int, float, bool)) or (
+            isinstance(v, list) and len(v) <= 1000 and all(isinstance(x, str) and len(x) <= 64 for x in v)
+        )
+        if not ok or (isinstance(v, str) and len(v) > 4000):
+            raise ValidationProblem("atlas run option values are scalars or short string lists", option=k)
+        out[k] = v
+    return out
+
+
+def _check_registered(engine: Engine, spec: AtlasSourceSpec) -> None:
+    from reva.adapters.postgres import repositories as repo
+
+    with engine.connect() as conn:
+        row = repo.connector_version_row(conn, spec.name, spec.version)
+    if row is None:
+        raise ValidationProblem(
+            f"atlas connector {spec.name}@{spec.version} is not registered (seed or ensure_registered)",
+            connector=spec.name,
+            version=spec.version,
+        )
+    if (row.get("code_digest") or "") != (spec.code_digest or ""):
+        raise ValidationProblem(
+            f"atlas connector {spec.name}@{spec.version} is registered with different code; bump the version",
+            connector=spec.name,
+            version=spec.version,
+        )
 
 
 def handle_atlas_ingest(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
@@ -409,8 +461,20 @@ def handle_atlas_ingest(payload: dict[str, Any], ctx: Any) -> dict[str, Any]:
             job_id=ctx.job_id,
             attempt=ctx.attempt,
             is_cancelled=ctx.cancel_requested,
+            options=payload.get("options") or None,
         )
     )
+
+
+def parse_options(items: list[str] | None) -> dict[str, Any]:
+    """``["countries=FR,DE", "x=1"]`` -> ``{"countries": "FR,DE", "x": "1"}`` (CLI ``--option``)."""
+    out: dict[str, Any] = {}
+    for it in items or []:
+        k, sep, v = it.partition("=")
+        if not sep or not k.strip():
+            raise ValidationProblem("run option must be KEY=VALUE", option=it[:80])
+        out[k.strip()] = v.strip()
+    return out
 
 
 def list_sources() -> dict[str, Any]:
@@ -438,6 +502,7 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator 
     ap.add_argument("--dataset")
     ap.add_argument("--fixture", action="store_true", help="replay recorded fixtures (test_fixture origin)")
     ap.add_argument("--list", action="store_true")
+    ap.add_argument("--option", action="append", default=[], metavar="KEY=VALUE", help="source run option")
     args = ap.parse_args(argv)
     if args.list or not args.source:
         print(json.dumps(list_sources(), indent=1, default=str))
@@ -452,6 +517,7 @@ def main(argv: list[str] | None = None) -> None:  # pragma: no cover - operator 
                 args.source,
                 dataset=args.dataset,
                 mode="fixture" if args.fixture else "live",
+                options=parse_options(args.option),
             )
         )
     except BudgetExhausted as e:

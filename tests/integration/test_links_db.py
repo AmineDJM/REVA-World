@@ -80,7 +80,12 @@ def test_path_columbus_to_portuguese_from_db(kg) -> None:  # type: ignore[no-unt
     assert hop_sources == {SRC}
     assert all(e.origin == "test_fixture" for p in res.paths for h in p.hops for e in h.edge.evidence)
     assert res.paths[0].nodes[0] == "Q7322" and res.paths[0].nodes[-1] == "Q5146"
-    assert "Q155" in {n for p in res.paths for n in p.nodes}  # through Brazil
+    # the same chain as the offline test, forced through Tordesillas and Brazil, read from kg.statement_current
+    chain = service.path_between(kg, "Q7322", "Q5146", via=["Q180897", "BRA"], origin="test_fixture", max_hops=3)
+    (path,) = chain.paths
+    assert "Q180897" in path.nodes and "Q155" in path.nodes
+    assert path.text["fr"][1].startswith("Isabelle la Catholique — signataire de → traité de Tordesillas (1494-07-02)")
+    assert all("[wikidata.links_fixture:" in t for t in path.text["en"])
 
 
 def test_country_links_from_db(kg) -> None:  # type: ignore[no-untyped-def]

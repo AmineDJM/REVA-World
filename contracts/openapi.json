@@ -20204,6 +20204,28 @@
             }
           },
           {
+            "description": "Waypoints (QID or ISO3): one path forced through them, in order",
+            "in": "query",
+            "name": "via",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "maxItems": 4,
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Waypoints (QID or ISO3): one path forced through them, in order",
+              "title": "Via"
+            }
+          },
+          {
             "description": "Number of paths (k shortest simple paths)",
             "in": "query",
             "name": "k",

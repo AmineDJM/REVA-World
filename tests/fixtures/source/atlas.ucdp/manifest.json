@@ -1,0 +1,67 @@
+[
+  {
+    "request_fingerprint": "b9eef8431dd6ce91332e4c3d72337b48cd197fb07148d7eb992874261b488888",
+    "url": "https://cran.r-project.org/src/contrib/countrycode_1.9.0.tar.gz",
+    "file": "b9eef8431dd6ce91.tar.gz",
+    "sha256": "464dac3ea4eadab18afa167729abc2d905d60f6a5c543af6fa1f804f9522ef41",
+    "status": 200,
+    "headers": {
+      "content-type": "application/x-gzip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of countrycode_1.9.0.tar.gz (CRAN): only data/codelist_panel.rda, byte-identical member; real tarball sha256 d560b1c2011e19ebf21f7576ba0be9f5bad573082eda1f555f9153b0ba5ae7da"
+  },
+  {
+    "request_fingerprint": "ca1a47ab7785eaf3c52e7a2d2596c633852c393f479125632e709816b2ba4543",
+    "url": "https://ucdp.uu.se/downloads/actor/ucdp-actor-261-csv.zip",
+    "file": "ca1a47ab7785eaf3.zip",
+    "sha256": "8d514c73e5256654fb82e9c32031670d614ed81427c263e458a135d308329d62",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-actor-261-csv.zip (UCDP 26.1), selected rows, original header and row text"
+  },
+  {
+    "request_fingerprint": "17097c93bdcea84ee72933295c6fdd014577115d399748748db8cb72c86c2868",
+    "url": "https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-csv.zip",
+    "file": "17097c93bdcea84e.zip",
+    "sha256": "2ca91b508502608096439f4cccb92aafe3660614fd605a275f6d5c1d43a07837",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-brd-conf-261-csv.zip (UCDP 26.1), selected rows, original header and row text"
+  },
+  {
+    "request_fingerprint": "a80aa1b46e5c73537234a8e3e3a76a3e00af3ba532eba7ae3b61c7c49f079c93",
+    "url": "https://ucdp.uu.se/downloads/organizedviolencecy/organizedviolencecy-261-csv.zip",
+    "file": "a80aa1b46e5c7353.zip",
+    "sha256": "8506384511a7e7067bb37f9048107648deeea466a324dbd24fd7414b8371ecdb",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of organizedviolencecy-261-csv.zip (UCDP 26.1), selected rows, original header and row text"
+  },
+  {
+    "request_fingerprint": "74c3c9d7b9c678fe55041dce1e5c3904d75156c7fbc3a3a4f2a71d8e30f981ed",
+    "url": "https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip",
+    "file": "74c3c9d7b9c678fe.zip",
+    "sha256": "87155470431e03a2be0bf169e98f0c4e3f417bedc9e9026093bf09d183a9a257",
+    "status": 200,
+    "headers": {
+      "content-type": "application/zip"
+    },
+    "retrieved_at": "2026-10-15T22:05:00+00:00",
+    "licence": "CC BY 4.0",
+    "note": "slice of ucdp-prio-acd-261-csv.zip (UCDP 26.1), selected rows, original header and row text"
+  }
+]

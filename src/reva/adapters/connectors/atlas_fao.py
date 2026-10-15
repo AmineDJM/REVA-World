@@ -127,7 +127,12 @@ QV_ITEMS = _codes(2051, 2041, 2044, 2054, 2057, 1717, 1720, 1723, 1730, 1735, 17
 GT_ELEMENTS = _codes(723113, 7225, 7230, 7273)  # CO2eq (AR5), CH4, N2O, CO2
 FO_ITEMS = _codes(1861, 1862, 1863, 1864, 1865, 1868, 1872, 1873, 1875, 1876, 1630, 1877)
 MK_ELEMENTS = _codes(6110, 6103, 6184, 6119, 6185, 6182, 6224)
-TCL_ITEMS = _codes(1882)  # "Crops and livestock products" (FAO agricultural trade total)
+#: TCL: the agricultural trade total ("Crops and livestock products" 1882), "Food Excluding Fish" (1982),
+#: FAO trade groups and a few headline commodities (wheat, rice, maize, soya beans, coffee, cocoa, palm oil).
+TCL_ITEMS = _codes(
+    1882, 1982, 1888, 1944, 1885, 1886, 1889, 1890, 1892, 1895, 1896, 1898, 1899, 1900, 1901, 1844, 1847,
+    15, 27, 56, 236, 656, 661, 257,
+)  # fmt: skip
 TCL_ELEMENTS = _codes(5622, 5922)  # import value, export value (1000 USD)
 
 
@@ -144,7 +149,7 @@ class Domain:
     monthly: bool = False  # keep monthly rows (Months Code 7001..7012) as month periods
     max_bytes: int = 100_000_000
     third_party: str = ""  # original producer(s) of redistributed series (coverage note)
-    unit_rules: tuple[tuple[str, str], ...] = ()  # (substring of the item name, unit) when Unit is empty
+    unit_rules: tuple[tuple[str, str], ...] = ()  # (substring of the item/element name, unit) when Unit is empty
 
     @property
     def file(self) -> str:
@@ -189,6 +194,7 @@ DOMAINS: tuple[Domain, ...] = (
         "Producer Prices (annual values)",
         QCL_ITEMS,
         _codes(5530, 5532, 5539),
+        unit_rules=(("Producer Price Index (2014-2016 = 100)", "index (2014-2016 = 100)"),),
     ),
     Domain(
         "CP",
@@ -526,10 +532,10 @@ def _parse_block(
     # units
     unit = pl.col("Unit").fill_null("").str.strip_chars() if "Unit" in df.columns else pl.lit("")
     fallback: pl.Expr = pl.lit(UNIT_NOT_STATED)
-    name_col = _col(df, "Item", "Indicator")
+    name_cols = [c for c in ("Item", "Indicator", "Element") if c in df.columns]
     for sub, u in reversed(domain.unit_rules):
-        if name_col is not None:
-            fallback = pl.when(pl.col(name_col).str.contains(sub, literal=True)).then(pl.lit(u)).otherwise(fallback)
+        for c in name_cols:
+            fallback = pl.when(pl.col(c).str.contains(sub, literal=True)).then(pl.lit(u)).otherwise(fallback)
     df = df.with_columns(
         pl.when(unit == "").then(fallback).otherwise(unit).alias("_unit"),
         start.alias("_start"),

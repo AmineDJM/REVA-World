@@ -57,11 +57,12 @@ import polars as pl
 
 from reva.adapters.connectors import atlas_qol_common as common
 from reva.adapters.connectors.atlas_qol_common import AtlasBuild, canon
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.owid"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
 PARSER_VERSION = "atlas_owid/1"
 SOURCE_KEY = "owid.compilations"
 SOURCE = "owid"
@@ -293,30 +294,29 @@ class OwidConnector:
     def __init__(self, charts: dict[str, tuple[str, str]] | None = None) -> None:
         self.charts = dict(GRAPHER_CHARTS if charts is None else charts)
 
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
+    def describe(self) -> AtlasSourceSpec:
+        return AtlasSourceSpec(
             name=CONNECTOR_NAME,
             version=CONNECTOR_VERSION,
             source_key=SOURCE_KEY,
+            atlas_source=SOURCE,
             provider="Our World in Data (compiler; original producers cited per series)",
             licence=LICENCE,
             allowed_hosts=(GH_HOST, GRAPHER_HOST, API_HOST),
+            datasets=tuple(d.dataset for d in GITHUB_DATASETS) + tuple(v[0] for v in GRAPHER_CHARTS.values()),
             dataset_ids=tuple(d.repo for d in GITHUB_DATASETS) + tuple(f"grapher:{s}" for s in self.charts),
-            field_mappings={
-                "atlas_tables": [f"{SOURCE}.{d.dataset}" for d in GITHUB_DATASETS]
-                + [f"{SOURCE}.{v[0]}" for v in self.charts.values()]
-            },
-            units={},
-            geography=("all",),
-            time_semantics="calendar years",
-            lineage_family="owid_compilation",
             cadence_seconds=7 * common.DAY,
-            release_aware=False,
-            revision_strategy="OWID republishes continuously; each changed file = a new atlas table version",
+            planned_requests=24,
             max_response_bytes=52_428_800,
-            max_pages=1,
+            min_interval_seconds=1.0,
             parser_version=PARSER_VERSION,
             code_digest=common.code_digest(sys.modules[__name__]),
+            field_mappings={
+                "atlas_tables": [f"{SOURCE}.{d.dataset}" for d in GITHUB_DATASETS]
+                + [f"{SOURCE}.{v[0]}" for v in self.charts.values()],
+                "time_semantics": "calendar years",
+            },
+            notes="OWID republishes continuously; each changed file = a new atlas table version.",
         )
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
@@ -370,8 +370,8 @@ class OwidConnector:
             )
         return tuple(out)
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        return await common.fetch_plain(item, http)
+    async def fetch(self, item: FetchItem, run: Any) -> RawAcquisition:
+        return await common.fetch_plain(item, run)
 
     def build(self, raws: Sequence[RawAcquisition]) -> list[AtlasBuild]:
         by = {r.item.key: r for r in raws}
@@ -445,11 +445,22 @@ class OwidConnector:
         return builds
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return OwidConnector().describe()
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas platform entry point (``reva atlas ingest {CONNECTOR_NAME}``)."""
+    return await common.run_connector(run, OwidConnector())
+
+
 __all__ = [
     "CONNECTOR_NAME",
     "GITHUB_DATASETS",
     "GRAPHER_CHARTS",
     "OwidConnector",
+    "atlas_ingest",
+    "atlas_source",
     "parse_codebook",
     "parse_github",
     "parse_grapher",

@@ -1,20 +1,21 @@
 # V3 — A-SCI: science & technology atlas (OpenAlex, Nobel, WIPO) — coverage report
 
-Agent A-SCI, 2026-10-15. Status: connectors, catalog, fixtures and offline tests done; one live ingest
-into a throwaway database (`reva_asci_live_1015b`, dropped afterwards) for Nobel, WIPO bulk and GII;
-OpenAlex: see §1 (provider metering).
+Agent A-SCI, 2026-10-15. Status: four atlas sources declared through ATLASCORE's protocol
+(`atlas_source()` / `atlas_ingest(run)`, discovered by `reva.atlas.sources`; fetch only via `run.get`,
+budget-metered live); catalog, fixtures and offline tests done; one live run through
+`reva.atlas.ingest.run_atlas_ingest` into a throwaway database (`reva_asci_live_1016`, dropped
+afterwards) for Nobel, WIPO bulk and GII; OpenAlex: see §2.1.
 
 | file | role |
 |---|---|
-| `src/reva/adapters/connectors/atlas_openalex.py` | OpenAlex `group_by=authorships.countries` aggregates -> `openalex.works_country_year`, `openalex.works_country_domain` (+ optional `works_country_field`) |
-| `src/reva/adapters/connectors/atlas_nobel.py` | Nobel API v2.1 laureates -> `nobel.laureates` counts + KG statements (P166 award received, P19 place of birth) |
-| `src/reva/adapters/connectors/atlas_wipo.py` | WIPO IP Statistics bulk ZIPs -> 6 tables; Global Innovation Index 2025 -> `wipo.gii_2025` (stdlib xlsx reader, DTD/entity refusal, zip-bomb cap) |
-| `src/reva/adapters/connectors/atlas_sci_common.py` | spec builder (`template="atlas_bulk"`, see requests), raw archiving, frame builder |
-| `src/reva/adapters/connectors/atlas_sci_ingest.py` | `ingest_nobel / ingest_gii / ingest_wipo / ingest_openalex` (archive raw -> parse -> `register_atlas_table`; Nobel also `kg.model.load_batch`). No live client is created in `src/reva` (invariant 30). |
+| `src/reva/adapters/connectors/atlas_openalex.py` | source `atlas.openalex` (`openalex.api`): `group_by=authorships.countries` aggregates -> `openalex.works_country_year`, `openalex.works_country_domain` (+ optional `works_country_field`) |
+| `src/reva/adapters/connectors/atlas_nobel.py` | source `atlas.nobel` (`nobelprize.api`): laureates -> `nobel.laureates` counts + KG statements (P166 award received, P19 place of birth) via `reva.kg.model.load_batch` |
+| `src/reva/adapters/connectors/atlas_wipo.py` | sources `atlas.wipo_ipstats` (`wipo.ipstats_bulk`, 6 tables) and `atlas.wipo_gii` (`wipo.gii`, `wipo.gii_2025`); stdlib xlsx reader (DTD/entity refusal, zip-bomb cap) |
+| `src/reva/adapters/connectors/atlas_sci_common.py` | helpers (canonical JSON, frame builder, code digest) |
 | `registry/atlas/catalog/science.yaml` | 123 provider-declared concepts (domain `science`) |
 | `registry/sources/{openalex,nobelprize,wipo_ipstats,wipo_gii}.yaml` | source entries (rights, hosts, editorial status) |
 | `registry/atlas/budget_requests/a_sci.yaml` | budget request (openalex.api 400/day, nobelprize.api 5, wipo.ipstats_bulk 5, wipo.gii 3) |
-| `tests/unit/test_atlas_sci.py` (22 tests), `tests/integration/test_atlas_sci_ingest.py` (4 db tests) | offline |
+| `tests/unit/test_atlas_sci.py` (22 tests), `tests/integration/test_atlas_sci_ingest.py` (4 db tests, through `run_atlas_ingest`) | offline |
 | `tests/fixtures/source/atlas.{nobel,wipo_ipstats,wipo_gii,openalex}/` | real captures or labelled excerpts of real captures (manifest `note`, `excerpt_of_sha256`) |
 
 ## 1. Sources researched
@@ -43,7 +44,10 @@ OpenAlex: see §1 (provider metering).
 | `wipo.design_appl_class` | 202,802 | 3,997 | 186 | 2000–2022 | `**`, `AN`, `EU`, `YU` |
 | `wipo.design_reg_class` | 202,591 | 3,881 | 187 | 2000–2022 | `**`, `AN`, `EU` |
 
-Disk: raw + Parquet for all of the above = 63 MB (budget 1.5 GB).
+Disk: raw + Parquet for all of the above = 63 MB (budget 1.5 GB). Ledger usage of the live run:
+nobelprize.api 1 request / 3.9 MB, wipo.gii 1 / 0.9 MB, wipo.ipstats_bulk 3 / 22.8 MB (reserved =
+consumed, 0 refused). Fixture mode (`--fixture`) replays excerpts: Nobel then accepts the 18-record
+excerpt (threshold 1 instead of 1,000), OpenAlex runs only the recorded 2020 queries.
 
 KG (Nobel): 2,007 statements loaded (1,036 `award_received` with `point_in_time` = award year,
 motivation, portion, status, affiliations-at-award in qualifiers; 971 `place_of_birth` to the city QID
@@ -94,26 +98,19 @@ _Filled in after the live attempt at the OpenAlex budget reset (see the end of t
 
 ## 5. Requests for owners of shared files
 
-1. **lead / ports** (`src/reva/ports/connectors.py`): add `"atlas_bulk"` to `ConnectorSpec.template`'s
-   `Literal` (A-SCI, A-GEO, KGCULT… currently validate with a placeholder and set it afterwards —
-   `atlas_sci_common.template_supported()` switches to full validation automatically).
-2. **lead** (`src/reva/adapters/connectors/registry.py`): register the four connectors so `seed`
-   records their versions (tests register them via `atlas_sci_common.register_connector`):
-   `from reva.adapters.connectors.atlas_nobel import NobelAtlasConnector`,
-   `from reva.adapters.connectors.atlas_openalex import OpenAlexAtlasConnector`,
-   `from reva.adapters.connectors.atlas_wipo import WipoGiiConnector, WipoIpStatsConnector`, and add
-   `NobelAtlasConnector(), OpenAlexAtlasConnector(mailto=contact_email), WipoIpStatsConnector(), WipoGiiConnector()`
-   to `conns`.
-3. **ATLASCORE**: merge `registry/atlas/budget_requests/a_sci.yaml`; the four new source keys make
-   `tests/invariants/test_invariant_30_budgets.py::test_budget_keys_are_registered_sources...` fail until
-   then (same for the other atlas agents' sources). The ingest functions take an `http` object so the job
-   path can pass `MeteredHttp`.
-4. **Owner**: an OpenAlex API key (free; `POST https://api.openalex.org/api-keys` with the owner's email,
-   confirmed by clicking the emailed link) set as `OPENALEX_API_KEY` would remove the shared-IP limit.
+1. **lead** (seed): add ATLASCORE's `register_atlas_connector_versions(conn, store, act)` to the seed so
+   the four A-SCI connector versions are registered in the deployment (tests use `ensure_registered`).
+2. **WDHARVEST / KGPEOPLE**: entity snapshots for the 1,028 laureate QIDs and the 6 prize QIDs (§2).
+3. **Owner**: an OpenAlex API key (free; requested by `POST https://api.openalex.org/api-keys` with the
+   owner's email and confirmed via the emailed link — not done on the owner's behalf), exported as
+   `OPENALEX_API_KEY`, removes the shared-IP daily limit.
+4. Budgets: `registry/atlas/budget_requests/a_sci.yaml` was merged by ATLASCORE (budgets-1.3.2).
 
-## 6. Reproducing the live run
+## 6. Running
 
-The one-off live runner is kept outside `src/reva` (invariant 30). It creates `reva_<name>` (refuses
-`reva`), bootstraps and seeds it like the test fixture (`REVA_ENV=test` so the schema-contract check
-warns about in-flight migration 0009 instead of failing), registers the connectors as the migration
-owner, then ingests as `reva_worker` with a plain `SafeHttpClient` through the proxy.
+`uv run python -m reva.atlas.ingest atlas.nobel | atlas.wipo_gii | atlas.wipo_ipstats [--dataset D] |
+atlas.openalex [--dataset works_country_year]` (worker credentials of the configured database;
+`--fixture` replays the recorded fixtures). The throwaway live run used `run_atlas_ingest` with a
+`Settings` copy pointing at `reva_asci_live_1016` (created, bootstrapped and seeded like the test
+fixture, `REVA_ENV=test` so the schema-contract check only warns about the in-flight 0009 migration),
+`ensure_registered` as the migration owner, then the budget-metered live path as `reva_worker`.

@@ -1,0 +1,17 @@
+# Budget request from agent A-FAO (FAOSTAT bulk downloads, https://bulks-faostat.fao.org/production/).
+# ATLASCORE merges into registry/policies/budgets.yaml. Connector: atlas.fao
+# (src/reva/adapters/connectors/atlas_fao.py), planned_requests = 21 per full run.
+agent: A-FAO
+requests:
+  - source_key: fao.faostat
+    # One full run = 1 listing (datasets_E.json, 0.1 MB) + 19 domain zips: TCL 274 MB, FBSH 72 MB, FBS 55 MB,
+    # QCL 34 MB, QV 30 MB, GT 21 MB, FO 18 MB, PP 12 MB, MK 7 MB, SDGB 5 MB, RL 3 MB, CP/OEA/FS 2-3 MB each,
+    # RFN 2 MB, OA 1.6 MB, OER 1 MB, TCLI 0.9 MB, RP 0.7 MB = ~545 MB (measured on 2026-10-15). FAOSTAT
+    # domains update independently a few times a year; a weekly run (or --dataset <domain> after a
+    # DateUpdate change) is plenty. Allow one full retry of the smaller domains per day.
+    daily_requests: 45
+    expected_bytes_per_day: 600000000
+    reason: "one full bulk run (20 requests, ~545 MB, largest single file TCL 274 MB) plus retries; no key"
+daily_totals_increase:
+  http_requests_total: "+45"
+  http_bytes_total: "+600_000_000"

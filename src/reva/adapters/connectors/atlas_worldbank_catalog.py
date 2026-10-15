@@ -186,10 +186,30 @@ def build_catalog(
     concepts: list[dict[str, Any]] = []
     stats: dict[str, Any] = {"by_domain": {}, "fr": {"provider": 0, "agent_a_wb": 0, "missing": 0}, "skipped": []}
     codes = sorted({c for db in units for c in units[db] if db != "pip"})
+    work: list[tuple[str, str, list[str], list[str]]] = []  # (concept id, code, databases, not-merged notes)
     for code in codes:
-        cid = concept_id(code)
-        dbs = [db for db in DB_ORDER if code in units.get(db, {})]
-        if cid is None or not dbs:
+        base = concept_id(code)
+        all_dbs = [db for db in DB_ORDER if code in units.get(db, {})]
+        if base is None or not all_dbs:
+            stats["skipped"].append(code)
+            continue
+        # Group the databases carrying the code by indicator name: same name = same concept; a database
+        # using the code under another name gets its own concept wb.<db>.<code> (never merged).
+        groups: dict[str, list[str]] = {}
+        for db in all_dbs:
+            m = series.get(db, {}).get(code)
+            key = _norm(m.name) if m is not None and m.name else ""
+            if key == "" and groups:
+                key = next(iter(groups))  # no metadata row: follows the primary database
+            groups.setdefault(key, []).append(db)
+        ids = [base] + [f"wb.{g[0]}.{code.lower()}" for g in list(groups.values())[1:]]
+        for i, g in enumerate(groups.values()):
+            others = [
+                f"{ids[j]} ({DATABASES_BY_KEY[h[0]].title})" for j, h in enumerate(groups.values()) if j != i
+            ]
+            work.append((ids[i], code, g, others))
+    for cid, code, dbs, other_ids in work:
+        if not CONCEPT_RE.match(cid):
             stats["skipped"].append(code)
             continue
         primary = dbs[0]
@@ -197,13 +217,8 @@ def build_catalog(
             (series[d][code] for d in dbs if code in series.get(d, {})), None
         )
         name = meta.name if meta and meta.name else code
-        same, other = [], []
-        for db in dbs:
-            m = series.get(db, {}).get(code)
-            if db == primary or (m is not None and _norm(m.name) == _norm(name)) or m is None:
-                same.append(db)
-            else:
-                other.append(f"{DATABASES_BY_KEY[db].title} names it '{m.name}'")
+        same = dbs
+        other = [f"same code under another name: {', '.join(other_ids)}"] if other_ids else []
         source_order = [f"{SOURCE}.{datasets[db][code]}.{_indicator(db, code)}" for db in same]
         # French label: World Bank translation (any database carrying the code), else agent, else missing.
         fr, fr_tag = None, "missing"
@@ -240,7 +255,7 @@ def build_catalog(
         if truncated:
             notes.append("Definition truncated; the full text is in the archived Series metadata.")
         if other:
-            notes.append("Not merged (different indicator name): " + "; ".join(other)[:800] + ".")
+            notes.append("Not merged (" + "; ".join(other)[:800] + ").")
         if fr_tag == "missing":
             notes.append("No French label provided by the World Bank: labels.fr repeats the English text.")
         if fr_tag == "agent_a_wb":
@@ -307,6 +322,10 @@ def build_catalog(
                 "tags": ["reva_domain:poverty", "wb_db:pip", "fr_label:agent_a_wb"],
             }
         )
+    seen: set[str] = set()
+    dups = sorted({c["id"] for c in concepts if c["id"] in seen or seen.add(c["id"])})  # type: ignore[func-returns-value]
+    if dups:
+        raise ValueError(f"duplicate World Bank concept ids: {dups[:10]}")
     doc = {
         "domain": CATALOG_DOMAIN,
         "labels": {"fr": "Banque mondiale (toutes bases)", "en": "World Bank (all databases)"},

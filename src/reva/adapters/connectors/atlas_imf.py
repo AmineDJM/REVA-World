@@ -993,7 +993,6 @@ class IngestResult:
     def bytes(self) -> int:
         return sum(int(r["bytes"]) for r in self.raws)
 
-
     def as_dict(self) -> dict[str, Any]:
         return {
             "tables": self.tables,

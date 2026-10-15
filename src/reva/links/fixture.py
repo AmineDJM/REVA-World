@@ -132,6 +132,7 @@ async def capture(
     import hashlib
 
     from reva.adapters.connectors.wikidata import (
+        ENTITY_PROPS,
         Archive,
         WikidataClient,
         extract_entity,
@@ -165,7 +166,7 @@ async def capture(
                 cached.parent.mkdir(parents=True, exist_ok=True)
                 cached.write_text(json.dumps(part), encoding="utf-8")
         else:
-            r = await client.get_entities(chunk, batch_size=batch_size)
+            r = await client.get_entities(chunk, props=(*ENTITY_PROPS, "info"), batch_size=batch_size)
             requests += r.requests
             part = {
                 "entities": r.entities,

@@ -13,6 +13,7 @@ import pytest
 
 from reva.adapters.connectors import atlas_imf as m
 from reva.adapters.http.safe_client import SafeHttpClient
+from reva.atlas.ingest import AtlasRun
 from reva.ports.connectors import FetchItem
 
 pytestmark = pytest.mark.live
@@ -23,7 +24,8 @@ def _item(dataset: str, agency: str, flow: str, key: str) -> FetchItem:
 
 
 async def test_live_weo_vintage_projections_bop_and_codelist() -> None:
-    async with SafeHttpClient(allowed_hosts=[m.HOST], timeout_seconds=120, proxy_mode="env") as http:
+    async with SafeHttpClient(allowed_hosts=[m.HOST], timeout_seconds=120, proxy_mode="env") as client:
+        http = AtlasRun.offline(m.atlas_source(), client, origin="live")  # fetch-only run (no archive)
         weo = await m.fetch(_item("weo", "IMF.RES", "WEO", "FRA.NGDP_RPCH+BCA_NGDPD.A"), http)
         bop = await m.fetch(_item("bop", "IMF.STA", "BOP", "FRA.NETCD_T.G.USD.A"), http)
         cl = await m.fetch(m.imts_codelist_item(), http)

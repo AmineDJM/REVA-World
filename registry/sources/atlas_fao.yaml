@@ -1,0 +1,32 @@
+# V3 atlas (agent A-FAO): FAOSTAT bulk downloads (one normalized zip per domain). Connector
+# src/reva/adapters/connectors/atlas_fao.py (atlas tables fao.fbs, fao.fbsh, fao.fs, fao.qcl, fao.qv, fao.pp,
+# fao.cp, fao.tcl, fao.tcli, fao.rl, fao.gt, fao.fo, fao.rfn, fao.rp, fao.oa, fao.oea, fao.oer, fao.mk, fao.sdgb).
+source_key: fao.faostat
+title: FAOSTAT (FAO) — food balances, food security, production, prices, trade totals, land use, emissions, forestry, rural employment, SDG indicators
+provider_url: https://www.fao.org/faostat/en/#data
+lineage_family: fao_faostat
+rights:
+  licence: "CC BY 4.0 (FAO Statistical Database terms of use)"
+  licence_url: https://www.fao.org/contact-us/terms/db-terms-of-use/en
+  attribution: "FAO. <year of last update>. FAOSTAT: <domain>. Accessed <date>. https://www.fao.org/faostat/en/#data. Licence: CC-BY-4.0."
+  terms_quote: >-
+    Unless specified otherwise in their metadata or webpage, all datasets disseminated through FAO corporate
+    statistical databases (see examples in Annex 1) are licensed under the Creative Commons Attribution-4.0
+    International licence (CC BY 4.0)
+  third_party: >-
+    Some FAOSTAT domains redistribute other producers' series (UN WPP population, ILO employment, WHO/UNICEF
+    nutrition and WASH series in the food-security suite, UNSD national accounts, UNFCCC inventories); FAO flags
+    them X ("value from external organization") and each atlas table names them in its coverage note.
+metadata:
+  allowed_hosts: [bulks-faostat.fao.org]
+  bulk_listing: https://bulks-faostat.fao.org/production/datasets_E.json
+  bulk_file_pattern: "https://bulks-faostat.fao.org/production/<stem>_E_All_Data_(Normalized).zip"
+  authentication: none (the FAOSTAT REST API now requires a token and is not used)
+  domains: [FBS, FBSH, FS, QCL, QV, PP, CP, TCL, TCLI, RL, GT, FO, RFN, RP, OA, OEA, OER, MK, SDGB]
+  cadence: "domains update independently (DateUpdate per domain in datasets_E.json); weekly check"
+  editorial_status: >-
+    Official statistics compiled by FAO from national questionnaires plus FAO estimates and imputations
+    (flags E, I) and external-organization values (X); flags are kept verbatim per cell.
+  not_used: >-
+    AQUASTAT direct (FAO data catalog lists it as CC BY-NC-SA 4.0; SDG 6.4.1/6.4.2 come from FAOSTAT SDGB),
+    Trade Indices / detailed trade matrix (bulk size), FishStat (per-species only).

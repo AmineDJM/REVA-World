@@ -1,0 +1,32 @@
+# V3 (agent KGGEOPOL): Uppsala Conflict Data Program datasets, version 26.1, official CSV downloads.
+# Connector: src/reva/adapters/connectors/atlas_ucdp.py -> atlas tables ucdp.orgvio_cy, ucdp.acd_cy
+# + KG statements (source_key ucdp.downloads).
+source_key: ucdp.downloads
+title: UCDP datasets 26.1 (UCDP/PRIO Armed Conflict, Battle-Related Deaths, Country-Year Organized Violence, Actors)
+provider_url: https://ucdp.uu.se/downloads/
+lineage_family: ucdp
+rights:
+  licence: CC BY 4.0
+  licence_url: https://creativecommons.org/licenses/by/4.0/
+  attribution: >-
+    Uppsala Conflict Data Program (UCDP), Department of Peace and Conflict Research, Uppsala University,
+    datasets version 26.1. Gleditsch et al. (2002), Journal of Peace Research 39(5); Sundberg & Melander (2013),
+    Journal of Peace Research 50(4).
+  licence_evidence: >-
+    ucdp.uu.se/downloads (read 2026-10-15): "All datasets are free of charge and licensed under CC BY 4.0 -
+    you are free to use and redistribute them provided you cite the relevant publications listed with each dataset."
+metadata:
+  allowed_hosts: [ucdp.uu.se, cran.r-project.org]
+  files:
+    - https://ucdp.uu.se/downloads/ucdpprio/ucdp-prio-acd-261-csv.zip
+    - https://ucdp.uu.se/downloads/brd/ucdp-brd-conf-261-csv.zip
+    - https://ucdp.uu.se/downloads/organizedviolencecy/organizedviolencecy-261-csv.zip
+    - https://ucdp.uu.se/downloads/actor/ucdp-actor-261-csv.zip
+  access_note: >-
+    The UCDP API (ucdpapi.pcr.uu.se) answers HTTP 401 "API token required (x-ucdp-access-token)" since 2025;
+    the downloads need no token and are used instead.
+  code_crosswalk: >-
+    Gleditsch-Ward codes (UCDP keeps 345 for Serbia after 2006) -> crosswalk entities through
+    StateCodeCrosswalk (countrycode 1.9.0 codelist_panel, CRAN, archived with every run).
+  authentication: none
+  cadence: annual release (spring); candidate monthly GED not used

@@ -47,11 +47,12 @@ from typing import Any
 from reva.adapters.connectors import atlas_qol_common as common
 from reva.adapters.connectors.atlas_qol_common import AtlasBuild, NameIndex, canon, decimal_text
 from reva.adapters.connectors.atlas_xlsx import Workbook
+from reva.atlas.sources import AtlasSourceSpec
 from reva.kernel.errors import SourceResponseError
-from reva.ports.connectors import ConnectorSpec, FetchItem, RawAcquisition
+from reva.ports.connectors import FetchItem, RawAcquisition
 
 CONNECTOR_NAME = "atlas.undp_hdr"
-CONNECTOR_VERSION = "1.0.0"
+CONNECTOR_VERSION = "1.1.0"  # 1.1.0: atlas source platform (metered run.get), same parser
 PARSER_VERSION = "atlas_undp/1"
 SOURCE_KEY = "undp.hdr"
 SOURCE = "undp"
@@ -437,27 +438,29 @@ MPI_NAME_ALIASES: dict[str, str | None] = {}
 
 # --------------------------------------------------------------------------- connector
 class UndpHdrConnector:
-    def describe(self) -> ConnectorSpec:
-        return common.atlas_spec(
+    def describe(self) -> AtlasSourceSpec:
+        return AtlasSourceSpec(
             name=CONNECTOR_NAME,
             version=CONNECTOR_VERSION,
             source_key=SOURCE_KEY,
+            atlas_source=SOURCE,
             provider="UNDP Human Development Report Office",
             licence=LICENCE,
             allowed_hosts=(HOST,),
+            datasets=("hdr25", "gmpi2026"),
             dataset_ids=("hdr25_composite", "hdr25_metadata", "gmpi2026_tables_1_2"),
-            field_mappings={"atlas_tables": ["undp.hdr25", "undp.gmpi2026"]},
-            units=dict(UNITS),
-            geography=("all",),
-            time_semantics="calendar years (composite); survey years (MPI)",
-            lineage_family="undp_hdro",
             cadence_seconds=30 * common.DAY,
-            release_aware=True,
-            revision_strategy="new HDR edition = new files; same content re-registers as a no-op",
+            planned_requests=3,
             max_response_bytes=20_000_000,
-            max_pages=1,
+            min_interval_seconds=1.0,
             parser_version=PARSER_VERSION,
             code_digest=common.code_digest(sys.modules[__name__]),
+            field_mappings={
+                "atlas_tables": ["undp.hdr25", "undp.gmpi2026"],
+                "units": dict(UNITS),
+                "time_semantics": "calendar years (composite); survey years (MPI)",
+            },
+            notes="New HDR edition = new files; same content re-registers as a no-op.",
         )
 
     def fetch_items(self) -> tuple[FetchItem, ...]:
@@ -472,8 +475,8 @@ class UndpHdrConnector:
     def follow_up(self, raw: RawAcquisition) -> tuple[FetchItem, ...]:
         return ()
 
-    async def fetch(self, item: FetchItem, http: Any) -> RawAcquisition:
-        return await common.fetch_plain(item, http)
+    async def fetch(self, item: FetchItem, run: Any) -> RawAcquisition:
+        return await common.fetch_plain(item, run)
 
     def build(self, raws: Sequence[RawAcquisition]) -> list[AtlasBuild]:
         by = {r.item.key: r for r in raws}
@@ -527,9 +530,20 @@ class UndpHdrConnector:
         return builds
 
 
+def atlas_source() -> AtlasSourceSpec:
+    return UndpHdrConnector().describe()
+
+
+async def atlas_ingest(run: Any) -> dict[str, Any]:
+    """Atlas platform entry point (``reva atlas ingest {CONNECTOR_NAME}``)."""
+    return await common.run_connector(run, UndpHdrConnector())
+
+
 __all__ = [
     "CONNECTOR_NAME",
     "UndpHdrConnector",
+    "atlas_ingest",
+    "atlas_source",
     "parse_codebook",
     "parse_composite",
     "parse_mpi",

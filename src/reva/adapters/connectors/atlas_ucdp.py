@@ -503,7 +503,7 @@ def kg_records(
             KgEntity(
                 qid=f"ucdp:actor:{aid}",
                 kind="armed_group",
-                labels={"en": name or f"UCDP actor {aid}"},
+                labels={"en": (name or "").strip() or f"UCDP actor {aid}"},
                 descriptions={"en": f"UCDP actor {aid} (UCDP Actor Dataset {UCDP_VERSION})"},
             )
         )

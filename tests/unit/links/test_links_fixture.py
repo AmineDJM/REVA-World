@@ -18,7 +18,14 @@ from reva.links.paths import PathQuery, build_graph, find_chain, find_paths
 COLUMBUS, TORDESILLAS, BRAZIL, PORTUGUESE, PORTUGAL = "Q7322", "Q180897", "Q155", "Q5146", "Q45"
 COLONIAL_BRAZIL, PORTUGUESE_EMPIRE, ISABELLA, KINGDOM_PT = "Q2088324", "Q200464", "Q45859", "Q45670"
 USA, EISENHOWER, SUEZ, UK, COLD_WAR, RES_1514, DECOLONIZATION, UN = (
-    "Q30", "Q9916", "Q49101", "Q145", "Q8683", "Q2629473", "Q230533", "Q1065"
+    "Q30",
+    "Q9916",
+    "Q49101",
+    "Q145",
+    "Q8683",
+    "Q2629473",
+    "Q230533",
+    "Q1065",
 )
 
 
@@ -74,7 +81,9 @@ def test_colonial_derivation_brazil(derived) -> None:
 
 
 def test_shared_language_and_co_membership(derived) -> None:
-    sol = {(lk.subject, lk.object) for lk in derived.by_type["shared_official_language"].links if lk.via == (PORTUGUESE,)}
+    sol = {
+        (lk.subject, lk.object) for lk in derived.by_type["shared_official_language"].links if lk.via == (PORTUGUESE,)
+    }
     assert (BRAZIL, PORTUGAL) in sol or (PORTUGAL, BRAZIL) in sol
     # co-membership derived only from overlapping dated memberships; disjoint ones counted, not linked
     co = derived.by_type["co_member"]
@@ -163,13 +172,14 @@ def test_resolution_1514_and_us_stance_not_established(graph, fx) -> None:
 
 
 def test_hub_damping_on_real_graph(graph) -> None:
-    # without damping, "both members of the United Nations" would be the cheapest US–UK connection
-    res = find_paths(graph, PathQuery(USA, UK, k=5))
-    vias = [h.edge.link.via for p in res.paths for h in p.hops if h.edge.link is not None]
+    # "both members of the United Nations" (a derived co_member link via the UN, cost 1.2) would be the
+    # cheapest US–UK connection without damping; the UN's declared penalty pushes it behind specific links
+    res = find_paths(graph, PathQuery(USA, UK, k=3))
     first = res.paths[0]
     assert all(UN not in (h.edge.link.via if h.edge.link else ()) for h in first.hops)
-    assert all(UN not in p.nodes[1:-1] for p in res.paths[:1])
-    assert vias is not None
+    assert UN not in first.nodes
+    undamped = graph.edge_cost(next(e for e in graph.adj[USA] if e.link is not None and e.link.via == (UN,)))
+    assert undamped >= 1.2 + 6.0  # path_cost of co_member + the UN penalty from registry/links/hubs.yaml
 
 
 def test_no_causal_wording_anywhere_in_fixture_paths(graph) -> None:

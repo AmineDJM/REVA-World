@@ -1,0 +1,391 @@
+{
+ "status": "OK",
+ "data": {
+  "id": 422897,
+  "datasetId": 61211,
+  "datasetPersistentId": "doi:10.7910/DVN/LEJUQZ",
+  "datasetType": "dataset",
+  "storageIdentifier": "s3://10.7910/DVN/LEJUQZ",
+  "versionNumber": 33,
+  "internalVersionNumber": 11,
+  "versionMinorNumber": 0,
+  "versionState": "RELEASED",
+  "latestVersionPublishingState": "RELEASED",
+  "deaccessionLink": "",
+  "distributionDate": "2013-02",
+  "productionDate": "2015-08",
+  "lastUpdateTime": "2024-06-24T16:52:12Z",
+  "releaseTime": "2024-06-24T16:52:12Z",
+  "createTime": "2024-06-24T12:28:18Z",
+  "alternativePersistentId": "hdl:1902.1/12379",
+  "publicationDate": "2009-03-02",
+  "citationDate": "2009-03-02",
+  "effectiveDatasetFileCountLimit": 1000,
+  "datasetFileUploadsAvailable": 900,
+  "license": {
+   "name": "CC0 1.0",
+   "uri": "http://creativecommons.org/publicdomain/zero/1.0",
+   "iconUri": "https://licensebuttons.net/p/zero/1.0/88x31.png",
+   "rightsIdentifier": "CC0-1.0",
+   "rightsIdentifierScheme": "SPDX",
+   "schemeUri": "https://spdx.org/licenses/",
+   "languageCode": "en"
+  },
+  "fileAccessRequest": false,
+  "metadataBlocks": {
+   "citation": {
+    "displayName": "Citation Metadata",
+    "name": "citation",
+    "fields": [
+     {
+      "typeName": "title",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "United Nations General Assembly Voting Data"
+     },
+     {
+      "typeName": "author",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Voeten, Erik"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Georgetown University"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Strezhnev, Anton"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Harvard University"
+        }
+       },
+       {
+        "authorName": {
+         "typeName": "authorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Bailey, Michael"
+        },
+        "authorAffiliation": {
+         "typeName": "authorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Georgetown University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "datasetContact",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "datasetContactName": {
+         "typeName": "datasetContactName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Erik Voeten"
+        },
+        "datasetContactAffiliation": {
+         "typeName": "datasetContactAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Georgetown University"
+        },
+        "datasetContactEmail": {
+         "typeName": "datasetContactEmail",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "ev42@georgetown.edu"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "dsDescription",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "dsDescriptionValue": {
+         "typeName": "dsDescriptionValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "This is a dataset of roll-call votes in the UN General Assembly sessions 1-78 (1946-2023.  (sessions 1-77).  Note that most votes take place in the Fall but some votes also occur in the spring of the following year. In recent years more votes have taken place in the spring. Ideal point estimates are based on sessions rather than calendar years. Note that for the more recent years, failed votes and votes on amendments and paragraphs have not yet been added. Moreover, \"important votes\" are also not yet coded for these years. Fall. Note the codebook as there are some issues with dates and other features of the raw data, which are pieced together from numerous sources. Note that there is an ongoing effort to collect the full data for all votes on resolution related matters that I will link to once it is publicly available. \n\n The dataset includes issue codes and descriptions. It also contains ideal point estimates derived from these votes as described in Bailey, Michael A., Anton Strezhnev, and Erik Voeten. \"Estimating dynamic state preferences from United Nations voting data.\" Journal of Conflict Resolution 61.2 (2017): 430-456. Code to estimate ideal points and issue ideal points are available at: https://github.com/evoeten/United-Nations-General-Assembly-Votes-and-Ideal-Points. The ideal point estimates are based on sessions, not years. There are also dyadic agreement scores, See the Bailey, Strezhnev, Voeten article for why these should not be used in most instances."
+        },
+        "dsDescriptionDate": {
+         "typeName": "dsDescriptionDate",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2024-06-24"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "subject",
+      "multiple": true,
+      "typeClass": "controlledVocabulary",
+      "value": [
+       "Law",
+       "Social Sciences"
+      ]
+     },
+     {
+      "typeName": "keyword",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "United Nations"
+        },
+        "keywordVocabulary": {
+         "typeName": "keywordVocabulary",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "UN"
+        }
+       },
+       {
+        "keywordValue": {
+         "typeName": "keywordValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "roll-calls"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "topicClassification",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "topicClassValue": {
+         "typeName": "topicClassValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "International Relations"
+        }
+       },
+       {
+        "topicClassValue": {
+         "typeName": "topicClassValue",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Political Science"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "publication",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "publicationCitation": {
+         "typeName": "publicationCitation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "When using the raw UN data, please cite:\nErik Voeten \"Data and Analyses of Voting in the UN General Assembly\"   Routledge Handbook of International Organization, edited by Bob Reinalda (published May 27, 2013). Available at SSRN: http://ssrn.com/abstract=2111149\n\nWhen using the ideal point data, please cite:\nBailey, Michael A., Anton Strezhnev, and Erik Voeten. 2017. Estimating dynamic state preferences from united nations voting data. Journal of Conflict Resolution 61 (2): 430-56."
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "producer",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "producerName": {
+         "typeName": "producerName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Erik Voeten"
+        },
+        "producerURL": {
+         "typeName": "producerURL",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "https://blogs.commons.georgetown.edu/erikvoeten/"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "productionDate",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2015-08"
+     },
+     {
+      "typeName": "distributor",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "distributorName": {
+         "typeName": "distributorName",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Erik Voeten"
+        },
+        "distributorAffiliation": {
+         "typeName": "distributorAffiliation",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "Georgetown University"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "distributionDate",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2013-02"
+     },
+     {
+      "typeName": "dateOfDeposit",
+      "multiple": false,
+      "typeClass": "primitive",
+      "value": "2012-06"
+     },
+     {
+      "typeName": "timePeriodCovered",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "timePeriodCoveredStart": {
+         "typeName": "timePeriodCoveredStart",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "1946"
+        },
+        "timePeriodCoveredEnd": {
+         "typeName": "timePeriodCoveredEnd",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "2019"
+        }
+       }
+      ]
+     },
+     {
+      "typeName": "kindOfData",
+      "multiple": true,
+      "typeClass": "primitive",
+      "value": [
+       "roll-call data"
+      ]
+     }
+    ]
+   },
+   "geospatial": {
+    "displayName": "Geospatial Metadata",
+    "name": "geospatial",
+    "fields": [
+     {
+      "typeName": "geographicCoverage",
+      "multiple": true,
+      "typeClass": "compound",
+      "value": [
+       {
+        "otherGeographicCoverage": {
+         "typeName": "otherGeographicCoverage",
+         "multiple": false,
+         "typeClass": "primitive",
+         "value": "World"
+        }
+       }
+      ]
+     }
+    ]
+   }
+  },
+  "files": [
+   {
+    "description": "Codebook",
+    "label": "Codebook-1.docx",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 422897,
+    "dataFile": {
+     "id": 10295577,
+     "persistentId": "",
+     "filename": "Codebook-1.docx",
+     "contentType": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+     "friendlyType": "MS Word",
+     "filesize": 26420,
+     "description": "Codebook",
+     "storageIdentifier": "s3://dvn-cloud:1904a3e6eff-317fbd4e7444",
+     "rootDataFileId": 10295577,
+     "md5": "5bbaa05e37850b0f29f5839e306e459e",
+     "checksum": {
+      "type": "MD5",
+      "value": "5bbaa05e37850b0f29f5839e306e459e"
+     },
+     "tabularData": false,
+     "creationDate": "2024-06-24",
+     "publicationDate": "2024-06-24",
+     "lastUpdateTime": "2024-06-24T16:52:12Z",
+     "fileAccessRequest": false
+    }
+   },
+   {
+    "description": "Raw UN votes sessions 1-78. Note that for the last few years, this only includes final votes on resolutions that passed.",
+    "label": "UNVotes-1.RData",
+    "restricted": false,
+    "version": 1,
+    "datasetVersionId": 422897,
+    "dataFile": {
+     "id": 10295576,
+     "persistentId": "",
+     "filename": "UNVotes-1.RData",
+     "contentType": "application/x-rlang-transport",
+     "friendlyType": "R Data",
+     "filesize": 3722,
+     "description": "Raw UN votes sessions 1-78. Note that for the last few years, this only includes final votes on resolutions that passed.",
+     "storageIdentifier": "s3://dvn-cloud:1904a3a6b3d-97cf34cbaf40",
+     "rootDataFileId": -1,
+     "md5": "c1b1fb9fc9c057eb17193ce34d63c878",
+     "checksum": {
+      "type": "MD5",
+      "value": "c1b1fb9fc9c057eb17193ce34d63c878"
+     },
+     "tabularData": false,
+     "creationDate": "2024-06-24",
+     "publicationDate": "2024-06-24",
+     "lastUpdateTime": "2024-06-24T16:52:12Z",
+     "fileAccessRequest": false
+    }
+   }
+  ]
+ }
+}
