@@ -11,6 +11,9 @@ the pinned policy bytes.
 from __future__ import annotations
 
 import hashlib
+import os
+import posixpath
+import re
 from collections.abc import Mapping
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -105,13 +108,20 @@ class AutonomyGuard:
         )
 
     def blocked_reason(self) -> str | None:
+        """Checked before every autonomy action.
+
+        Combines the settings snapshot taken at construction with a *fresh* read of
+        the live switches (``live_kill_reason``) on every call, so flipping the
+        switch stops in-flight discovery before its next step and before promotion
+        (review R4-13). The live read can only tighten, never loosen, the snapshot.
+        """
         if self.kill_switch:
             return "REVA_AUTONOMY_KILL_SWITCH is on: all autonomy actions are blocked"
         if self.mode == "disabled":
             return "REVA_AUTONOMY_MODE=disabled: all autonomy actions are blocked"
         if self.mode != "template_only":
             return f"unknown autonomy mode {self.mode!r}: blocked"
-        return None
+        return live_kill_reason()
 
     def check(self, action: str) -> None:
         reason = self.blocked_reason()
@@ -140,6 +150,32 @@ class AutonomyGuard:
         return int(self.per_source_daily_requests.get(source_key, 0))
 
 
+_TRUE = {"1", "true", "yes", "on"}
+
+
+def live_kill_reason(env: Mapping[str, str] | None = None) -> str | None:
+    """Fresh (uncached) read of the kill switch, re-evaluated on every guard check.
+
+    * ``REVA_AUTONOMY_KILL_SWITCH`` / ``REVA_AUTONOMY_MODE`` from the process
+      environment as it is *now* (not the settings snapshot taken at start-up);
+    * ``REVA_AUTONOMY_KILL_FILE``: if set and the file exists, autonomy is blocked.
+      Operators can stop a running worker's autonomy with ``touch <file>`` (no
+      redeploy); removing the file re-enables it.
+    """
+    e = os.environ if env is None else env
+    if str(e.get("REVA_AUTONOMY_KILL_SWITCH", "")).strip().lower() in _TRUE:
+        return "REVA_AUTONOMY_KILL_SWITCH is on: all autonomy actions are blocked"
+    mode = str(e.get("REVA_AUTONOMY_MODE", "") or "").strip()
+    if mode == "disabled":
+        return "REVA_AUTONOMY_MODE=disabled: all autonomy actions are blocked"
+    if mode and mode != "template_only":
+        return f"unknown autonomy mode {mode!r}: blocked"
+    kill_file = str(e.get("REVA_AUTONOMY_KILL_FILE", "") or "")
+    if kill_file and os.path.lexists(kill_file):
+        return "autonomy kill file is present: all autonomy actions are blocked"
+    return None
+
+
 def open_proposal_count(conn: Connection) -> int:
     """Proposals without a final gate decision (pass/fail) and without a human review."""
     return int(conn.execute(text(
@@ -153,8 +189,12 @@ def open_proposal_count(conn: Connection) -> int:
 # --------------------------------------------------------------------------- tiers
 T3_PATH_PREFIXES = ("src/reva/kernel", "src/reva/adapters/http", "src/reva/adapters/postgres",
                     "src/reva/autonomy", "migrations", "registry/policies", "src/reva/settings.py",
-                    "src/reva/api/security", "contracts/", ".github", "Dockerfile", "pyproject.toml",
-                    "uv.lock", "registry/sources")
+                    "src/reva/api/security", "contracts/", ".github", "dockerfile", "pyproject.toml",
+                    "uv.lock", "registry/sources",
+                    # (R4-11) the reviewed template that T1 auto-promotion trusts, and the code
+                    # its digest/behaviour depends on, are reviewed code: changing them is T3.
+                    "src/reva/adapters/connectors/eurostat_template.py",
+                    "src/reva/adapters/connectors/base.py", "src/reva/operations/budgets.py")
 T3_CAPABILITIES = {"paid_resources", "sensitive_data", "licence_change", "causal_claim", "destructive_migration",
                    "secret_access", "network_any", "edit_policy", "edit_allowlist", "edit_gate"}
 T2_CAPABILITIES = {"execute_code", "new_model", "ontology_mapping", "new_parser", "legal_rule", "run_backtest"}
@@ -163,8 +203,28 @@ T0_CAPABILITIES = {"read", "discover", "report", "propose"}
 CODE_SUFFIXES = (".py", ".pyx", ".so", ".sh", ".js", ".ts", ".sql", ".toml", ".cfg", ".ini", ".lock")
 
 
+_DRIVE_RE = re.compile(r"^[A-Za-z]:")
+
+
+def normalise_path(path: str) -> str | None:
+    """Repository-relative POSIX path, case-folded, for tier derivation.
+
+    Returns None for anything that cannot be normalised safely (absolute paths,
+    backslashes, drive letters, NUL, or ``..`` escaping the repository): such
+    paths are treated as protected (T3).
+    """
+    if not isinstance(path, str) or not path or "\\" in path or "\x00" in path or path.startswith("/") \
+            or _DRIVE_RE.match(path):
+        return None
+    n = posixpath.normpath(path)
+    if n in (".", "..") or n.startswith("../"):
+        return None
+    return n.lower()
+
+
 def contains_code(changed_paths: tuple[str, ...], capabilities: tuple[str, ...]) -> bool:
-    return "execute_code" in capabilities or any(p.lower().endswith(CODE_SUFFIXES) for p in changed_paths)
+    return "execute_code" in capabilities or any(
+        (normalise_path(p) or p.lower()).endswith(CODE_SUFFIXES) for p in changed_paths)
 
 
 def derive_tier(changed_paths: tuple[str, ...], capabilities: tuple[str, ...], scientific_change: bool,
@@ -177,9 +237,13 @@ def derive_tier(changed_paths: tuple[str, ...], capabilities: tuple[str, ...], s
         tier = 3
         reasons.append("schema migration required")
     for p in changed_paths:
-        if p.startswith(T3_PATH_PREFIXES):
+        n = normalise_path(p)
+        if n is None:
             tier = 3
-            reasons.append(f"protected path {p}")
+            reasons.append(f"unnormalisable path {p[:200]!r} treated as protected")
+        elif n.startswith(T3_PATH_PREFIXES):
+            tier = 3
+            reasons.append(f"protected path {n}")
     if caps & T3_CAPABILITIES:
         tier = 3
         reasons.append(f"T3 capabilities {sorted(caps & T3_CAPABILITIES)}")
