@@ -30,7 +30,17 @@ estimate register with one narrow scenario model — not a world model.
 
 ## Coverage limits and known data gaps
 
-* Countries: France, Algeria, China, United States profiles.
+* Countries: the four V1 profiles (France, Algeria, China, United States) use reviewed aliases; every
+  other country uses provider-declared aliases from the archived Comtrade/World Bank/UNSD lists
+  (`registry/entities/country_crosswalk.json`). The crude scenario can run for `ALL` countries with
+  `missing_input_policy: skip_missing_countries`: for 2023, 85 countries have complete inputs and 144
+  are skipped with typed reasons (coverage in [dev/v2_allc.md](dev/v2_allc.md)). Composite provider
+  codes (490 "Other Asia, nes", 899, EU 97, historical entities) are never mapped to a country.
+  Reporters whose customs territory is wider than the country (France incl. Monaco, USA incl.
+  territories, Switzerland incl. Liechtenstein, Norway incl. Svalbard/Jan Mayen) are flagged.
+  HS editions H0–H3 are stored but not eligible for the crude concepts until a human reviews that
+  mapping (this excludes, e.g., Iraq's 2023 exports reported under H2). A country reporting one flow
+  but not the other is skipped, never zero-filled.
 * **Algeria (DZA) crude trade is a missing input, never zero.** Comtrade's public
   preview returned **zero rows** for DZA HS 2709 world-total imports and exports
   for **2020–2023**; these cells are stored as typed `Missing(unavailable)` with

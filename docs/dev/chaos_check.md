@@ -56,6 +56,12 @@ updated `tests/conftest.py`, also passed: 10 passed and 1 xfailed.
 
 ### CHAOS-1: a worker cut off from the DB keeps running the handler past its lease (medium)
 
+**Status (round 6, agent STAB): fixed** in `src/reva/operations/worker.py` as proposed below (local lease
+deadline at 90 % of the lease from the send time of the last successful extension; the check also runs on
+rate-limited handler safe points). The strict xfail was removed; the test now waits for the presence update
+after the re-grant instead of asserting it immediately (a 5-step resumed attempt can finish before the
+next 1 s presence beat). `tests/chaos` passed 11/11, then the queue module 9/9 twice.
+
 **What.** `Worker._beat` treats every non-`StaleLease` heartbeat error as "retry next beat". It
 returns the last known status (`running`) and never updates `last_hb`. Nothing compares local time
 with the lease, so during a database outage:
@@ -159,6 +165,8 @@ and the 10 % margin covers that round trip. After landing, remove the `xfail` ma
 it will report XPASS as a failure until the marker is removed.
 
 ### CHAOS-2: failed heartbeats are retried at every handler safe point (low)
+
+**Status (round 6): fixed** with the `last_attempt` rate limit (both `_ctx_heartbeat` and `_ctx_user_cancel`).
 
 **What.** The 1 s handler heartbeat rate limit (`HEARTBEAT_MIN_INTERVAL`) is keyed on `last_hb`,
 which a failed beat never updates. During an outage, every `ctx.is_cancelled()` therefore opens a

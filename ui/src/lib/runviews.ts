@@ -370,7 +370,7 @@ const OUTPUT_LABELS: [RegExp, (m: RegExpExecArray) => string][] = [
   [/^population\.(total|female|male)\.age_(\d+)_(\d+)$/, (m) => `Population, ${m[1]}, ages ${m[2]}–${m[3]} (1 January)`],
   [/^population\.(total|female|male)\.age_(\d+)_plus$/, (m) => `Population, ${m[1]}, ages ${m[2]}+ (1 January)`],
   [/^old_age_dependency_ratio_(\d+)plus_per_(\d+)_(\d+)$/, (m) => `Old-age dependency ratio, persons ${m[1]}+ per 100 aged ${m[2]}–${m[3]}`],
-  [/^(births|deaths|net_migration)\.(total|female|male)$/, (m) => `${m[1] === 'net_migration' ? 'Net migration (incl. statistical adjustment)' : m[1][0]!.toUpperCase() + m[1].slice(1)}, ${m[2]}, during the year`],
+  [/^(births|deaths|net_migration)\.(total|female|male)$/, (m) => `${m[1] === 'net_migration' ? 'Net migration (incl. statistical adjustment)' : m[1]!.charAt(0).toUpperCase() + m[1]!.slice(1)}, ${m[2]}, during the year`],
   [/^employ\w*55_69\w*$/, () => 'Employed persons aged 55–69'],
   [/^pension_recipients\w*$/, () => 'Pension recipients'],
   [/^pension_expenditure\w*$/, () => 'Pension expenditure change (approximate: average pension × recipients)'],

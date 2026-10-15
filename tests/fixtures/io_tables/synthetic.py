@@ -70,14 +70,14 @@ def cells() -> dict[tuple[str, str, str, str], Decimal]:
 
 
 def body(origins: tuple[str, ...], overrides: dict[tuple[str, str, str, str], str] | None = None,
-         drop: set[tuple[str, str, str, str]] | None = None) -> bytes:
+         drop: set[tuple[str, str, str, str]] | None = None, year: int = YEAR) -> bytes:
     """gzip SDMX-CSV response for the given supplying economies (or ("DOM",))."""
     rows = [HEADER]
     for k, v in sorted(cells().items()):
         if k[0] not in origins or (drop and k in drop):
             continue
         val = (overrides or {}).get(k, f"{v:.3f}")
-        rows.append(f"ESTAT:{DATASET}(1.0),20/07/26 11:00:00,A,{k[3]},{k[1]},{k[2]},MIO_EUR,{k[0]},{YEAR},{val},,")
+        rows.append(f"ESTAT:{DATASET}(1.0),20/07/26 11:00:00,A,{k[3]},{k[1]},{k[2]},MIO_EUR,{k[0]},{year},{val},,")
     return gzip.compress(("\n".join(rows) + "\n").encode(), mtime=0)
 
 

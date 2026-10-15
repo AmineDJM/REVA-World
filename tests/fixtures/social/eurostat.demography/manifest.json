@@ -1,0 +1,146 @@
+[
+  {
+    "request_fingerprint": "f7ec051991753ff5679ab9148832a5c26b09316988f4eb0756ea8d93fb2b37f0",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fasec?format=JSON&lang=EN&geo=DE&sinceTimePeriod=2000",
+    "file": "f7ec051991753ff5.json",
+    "sha256": "4291764c84be9ef393b00ee6d5dc3d08a036916d25d463b3e9992a8cb3823b55",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:14.114786+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "684a0c928e354a9c583ee4bffa48a0ab8d46cec4e921ec6c0aa2d4f634433b11",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fasec?format=JSON&lang=EN&geo=ES&sinceTimePeriod=2000",
+    "file": "684a0c928e354a9c.json",
+    "sha256": "0fbc7a0184491a9f384bab57a98ea270e0f2586c86206ac59c5350d6e3346820",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:17.085187+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "6da267f7bb5605646cdbe5e8134491d348c6f65baab95f56518ad9ae00ec53b3",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fasec?format=JSON&lang=EN&geo=FR&sinceTimePeriod=2000",
+    "file": "6da267f7bb560564.json",
+    "sha256": "7c9322ae025cf35e095acb4c69d76fdd9069495555d244825dfff2cff2abe51b",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:20.206241+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "4dfef75cff4e63a471d68d03c5bfba22f2de095a29e25aa372e3a0d6d63a3ef8",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_fasec?format=JSON&lang=EN&geo=NL&sinceTimePeriod=2000",
+    "file": "4dfef75cff4e63a4.json",
+    "sha256": "fdd620155dc20de413911fe8d404d951341600ef1e18346908799e2d7753a43c",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:23.200887+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "5479e18a125cb8b0f564674a540de5406e4aa4c6c80729f939c080c809b98626",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_magec?format=JSON&lang=EN&geo=DE&sinceTimePeriod=2000",
+    "file": "5479e18a125cb8b0.json",
+    "sha256": "d3165101755b28fee7a7d9108d3ece51247950f70c2ad6c840137a572015a9b0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:13.186550+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "a88d45e27983eda7b54dcd45d5115ead5acbe0928b633860e6f021076551c36e",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_magec?format=JSON&lang=EN&geo=ES&sinceTimePeriod=2000",
+    "file": "a88d45e27983eda7.json",
+    "sha256": "e7e1ac3a19a2792d8c500795ed05ec787da00f08651dff96e235536a1c9beef5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:16.106522+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "54aab9a12e81ccf448f7eb93611538ce91a1fb973af375ceb7fdd67042a56e7d",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_magec?format=JSON&lang=EN&geo=FR&sinceTimePeriod=2000",
+    "file": "54aab9a12e81ccf4.json",
+    "sha256": "daad9ff372a0f5f783e43db0ecb2ed73f6e81ad3d26533bc407b9ee86c20e3c2",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:19.115698+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "cec52be4763e4583a46a4e808ee9484754a2228354ea197db02062bd30ec0858",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_magec?format=JSON&lang=EN&geo=NL&sinceTimePeriod=2000",
+    "file": "cec52be4763e4583.json",
+    "sha256": "ada66717ccdc9dd127cbd70d3187ac4a54ed6332cc6a104d72807a2fceff3fa5",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:22.272195+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "8a9e33734ef6e322039acce9305191e051d2d27b1f748103bed38cc1f95a08b5",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=DE&sinceTimePeriod=2000",
+    "file": "8a9e33734ef6e322.json",
+    "sha256": "27a9bf0bdd212ae178f572b993a08d41c176abc9990fae57d4de5cf1f2c28563",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:12.898635+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "5ccd4c9b8cee4b943beaf26147426f05d224abade3fa97d3aad28fb46a5b098a",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=ES&sinceTimePeriod=2000",
+    "file": "5ccd4c9b8cee4b94.json",
+    "sha256": "0153ce9f8f1362d98bc60007e08e4c8e7c22d8fb63cf5a02b26b191beb2cb410",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:15.191036+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "3b096e9f5134d7bf5df50a63ed618a89ec5bcd686ec739be6acf1b6cbd405139",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=FR&sinceTimePeriod=2000",
+    "file": "3b096e9f5134d7bf.json",
+    "sha256": "412d32aef9f7fa2d30f112d965ad2231eafb96034c7494c6a08f24449a7f9cc0",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:18.178075+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  },
+  {
+    "request_fingerprint": "140a26c96baafc66d750d1dec674007f951792e897b136cc1baf6c6563837249",
+    "url": "https://ec.europa.eu/eurostat/api/dissemination/statistics/1.0/data/demo_pjan?format=JSON&lang=EN&geo=NL&sinceTimePeriod=2000",
+    "file": "140a26c96baafc66.json",
+    "sha256": "8911a722b7d141d51916f9b08b19f01f0d5140218c1b7b564a37f5ee0eb05a6a",
+    "status": 200,
+    "headers": {
+      "content-type": "application/json"
+    },
+    "retrieved_at": "2026-10-15T01:20:21.348017+00:00",
+    "licence": "CC-BY-4.0 (Eurostat reuse policy, acknowledgement required)"
+  }
+]

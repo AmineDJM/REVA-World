@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import asyncio
 import importlib
+import importlib.util
 import json
 import os
 import shutil
@@ -20,6 +21,7 @@ import subprocess
 import sys
 import time
 import uuid
+from collections.abc import Iterator
 from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any
@@ -41,6 +43,27 @@ ROOT = Path(__file__).resolve().parents[2]
 SCRIPTS = ROOT / "scripts"
 sys.path.insert(0, str(SCRIPTS))
 br = importlib.import_module("backup_restore")
+
+
+def _isolated_helper() -> Any:
+    name = "reva_h2_isolated_db"
+    if name not in sys.modules:
+        path = ROOT / "tests" / "fixtures" / "adversarial" / "isolated_db.py"
+        spec = importlib.util.spec_from_file_location(name, path)
+        assert spec and spec.loader
+        mod = importlib.util.module_from_spec(spec)
+        sys.modules[name] = mod
+        spec.loader.exec_module(mod)
+    return sys.modules[name]
+
+
+@pytest.fixture(scope="module")
+def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[Any]:
+    """A private source database for this module (overrides the session ``db``). The whole-database
+    logical manifest is compared before/after; any concurrent write by another module (or a leaked
+    background thread) into the shared session database would otherwise change it mid-test."""
+    with _isolated_helper().isolated_db(tmp_path_factory) as d:
+        yield d
 
 
 def _pg_tools_env() -> dict[str, str]:
@@ -157,6 +180,8 @@ def test_backup_restore_reconstructs_manifests_and_as_of(db, tmp_path: Path, rec
         "REVA_API_DB_PASSWORD": s.reva_api_db_password.get_secret_value(),
         "REVA_WORKER_DB_PASSWORD": s.reva_worker_db_password.get_secret_value(),
         "REVA_SIM_DB_PASSWORD": s.reva_sim_db_password.get_secret_value(),
+        **({"REVA_GATE_DB_PASSWORD": s.reva_gate_db_password.get_secret_value()}
+           if getattr(s, "reva_gate_db_password", None) is not None else {}),
         **tools_env,
     }
     backup_env = {**base_env, "REVA_MIGRATION_DATABASE_URL": source_url, "REVA_DB_NAME": db.name}

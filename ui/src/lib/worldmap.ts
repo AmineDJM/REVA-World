@@ -134,7 +134,7 @@ export function exposureRows(results: SimResult[], output = EXPOSURE_OUTPUT, var
 
 // ------------------------------------------------------------------ bilateral flows
 
-export type PartnerClass = 'country' | 'world' | 'composite';
+export type PartnerClass = 'country' | 'world' | 'composite' | 'self';
 
 function participant(rel: Relation, role: string) {
   return rel.participants.find((p) => p.role === role) ?? null;
@@ -204,16 +204,19 @@ export interface PartnerFlows {
   composites: FlowRow[];
   /** Rows whose partner is "World" (should not exist as relations; never drawn). */
   world: FlowRow[];
+  /** Partner = the reporter itself (re-imports / re-exports of own goods): listed, never an arc. */
+  self: FlowRow[];
 }
 
 /** Flows the selected country reports (it is the reporter), for one flow direction. */
 export function reportedPartnerFlows(relations: Relation[], entityId: string, flow: string): PartnerFlows {
-  const out: PartnerFlows = { countries: [], composites: [], world: [] };
+  const out: PartnerFlows = { countries: [], composites: [], world: [], self: [] };
   for (const rel of relations) {
     if (rel.predicate !== 'predicate.trade_flow') continue;
     const f = toFlow(rel);
     if (!f || f.reporterId !== entityId || f.flow !== flow) continue;
     if (f.partnerClass === 'world') out.world.push(f);
+    else if (f.partnerId === f.reporterId) out.self.push({ ...f, partnerClass: 'self' });
     else if (f.partnerClass === 'composite') out.composites.push(f);
     else out.countries.push(f);
   }

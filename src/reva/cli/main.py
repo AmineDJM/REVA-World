@@ -317,6 +317,22 @@ def worker() -> None:
     main()
 
 
+@app.command("gate")
+def gate(
+    once: bool = typer.Option(False, "--once", help="evaluate the pending gate requests once and exit"),
+    poll_seconds: float | None = typer.Option(None, help="poll interval (default REVA_GATE_POLL_SECONDS)"),
+) -> None:
+    """Run the independent promotion gate process (login reva_gate; records gate decisions)."""
+    from reva.gate.service import main
+
+    argv = ["--once"] if once else []
+    if poll_seconds is not None:
+        argv += ["--poll-seconds", str(poll_seconds)]
+    code = main(argv)
+    if code:
+        raise typer.Exit(code)
+
+
 @app.command("verify")
 def verify(profile: str = typer.Option("local")) -> None:
     """Check configuration, DB schema/roles, registry and object store (no source calls)."""

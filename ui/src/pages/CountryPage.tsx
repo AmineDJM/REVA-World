@@ -17,6 +17,7 @@ import { DataTable } from '../components/DataTable';
 import { DefinitionPopover } from '../components/DefinitionPopover';
 import { EnvelopeDetails } from '../components/EnvelopeDetails';
 import { MapView } from '../components/MapView';
+import { MirrorPanel } from '../components/MirrorPanel';
 import { ProvenanceButton } from '../components/ProvenanceDrawer';
 import { Empty, ErrorState, Loading } from '../components/StateViews';
 import { TimeSeriesChart, type SeriesPoint } from '../components/TimeSeriesChart';
@@ -446,6 +447,8 @@ export default function CountryPage() {
           />
         </section>
       )}
+
+      {ent && <MirrorPanel entity={iso3} entityId={ent.id} countryLabel={ent.label} />}
 
       {PROFILE_PANELS.map((p) => (
         <ConceptPanel

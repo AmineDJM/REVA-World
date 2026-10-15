@@ -34,10 +34,12 @@
 * (R6-02) The gate evidence records the digests it evaluated (proposal document,
   manifest, mapping manifest, derived eligibility scope); promotion re-loads exactly
   those from storage and the database binds the approval to them.
-* Honest limit (V1): the gate runs inside the worker that ran discovery, with the
-  same credentials; independence is enforced by re-derivation, recomputation and by
-  DB checks (``ops.record_gate_result``: evaluator ``gate-evaluator:<name>`` that is
-  not the proposal author, verified evidence artifact), not by process separation.
+* (GATE, process separation) This class runs in the separate gate process
+  (``reva.gate.service``, login ``reva_gate``); the worker only files an
+  ``ops.gate_request`` and waits (``reva.gate.client.GateClient``). Only ``reva_gate``
+  may execute ``ops.record_gate_result``, and the approval functions accept only gate
+  results recorded by it. Constructed with the worker's engine, ``_record`` fails with
+  a permission error. See ``docs/dev/gate_separation.md``.
 """
 
 from __future__ import annotations

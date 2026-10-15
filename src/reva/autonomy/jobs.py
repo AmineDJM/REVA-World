@@ -78,6 +78,7 @@ from reva.autonomy.validator import JsonStatConnectorValidator
 from reva.autonomy.voi import GapValueEstimator
 from reva.cli.seed import entity_id, record_mapping_and_eligibility, register_connector_version
 from reva.evidence.locks import take_evidence_write_lock
+from reva.gate.client import PENDING_REASON, GateClient  # GATE: decisions come from the reva_gate process
 from reva.kernel.errors import ImmutableRecordViolation, PolicyDenied, RevaError
 from reva.ontology.registry import load_registry
 from reva.ports.autonomy import (
@@ -285,8 +286,11 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
     s_report = await sandbox.run(proposal, trusted_template_policy(budget))
     summary["sandbox"] = {"outcome": s_report.outcome, "findings": [f.code for f in s_report.findings]}
     # 7. gate
-    gate = PolicyPromotionGate(engine, io_, guard=guard)
+    # --- GATE (process separation): the worker files a gate request and waits for the decision the
+    # independent gate process records with its own login (reva_gate); it cannot record one itself.
+    gate = GateClient.from_settings(engine, io_, ctx.settings, guard=guard)
     decision = gate.decide(proposal.proposal_id, [v_report, s_report], policy.ref())
+    # --- end GATE
     summary["gate"] = {"proposal_id": str(proposal.proposal_id), "outcome": decision.outcome,
                        "reasons": list(decision.reasons), "gate_result_id": str(decision.decision_id)}
     # 8. explicit rejection of tempting false equivalences
@@ -304,6 +308,8 @@ async def _discovery_flow(ctx: Any, requirement: str, mode: str, guard: Autonomy
         summary["status"] = result["status"]
     else:
         summary["status"] = f"gate_{decision.outcome}"
+        if decision.reasons and decision.reasons[0].startswith(PENDING_REASON):  # GATE
+            summary["status"] = PENDING_REASON
     return summary
 
 
@@ -352,7 +358,8 @@ def connector_change_proposal(io_: ArtifactIO, cp: ConnectorProposal, manifest: 
     )
 
 
-def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore, gate: PolicyPromotionGate,
+def reject_equivalence(engine: Engine, io_: ArtifactIO, proposals: ProposalStore,
+                       gate: GateClient | PolicyPromotionGate,
                        policy: PinnedPolicy, mapping: MappingProposal, dataset: str) -> GateDecision:
     """Record 'dataset ≡ target' as a proposal that the gate rejects, plus the incompatible mapping record."""
     mm = io_.get_json(mapping.mapping_manifest)

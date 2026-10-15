@@ -451,13 +451,17 @@ class BasketResult:
     weight_total_mio_eur: float
 
 
-def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult:
-    """Household basket price change (fraction) of one economy and its decompositions."""
+def basket(arr: IOArrays, sol: Solution, economy_pos: int) -> BasketResult | None:
+    """Household basket price change (fraction) of one economy and its decompositions.
+
+    ``None`` when the table records no (positive) household consumption for the economy:
+    the basket is then not applicable (published as a typed missing value, never zero).
+    """
     h = arr.households[:, economy_pos]
     pos = arr.x > 0
     w_tot = float(h[pos].sum())
     if not w_tot > 0:
-        raise IntegrityFailure(f"economy {arr.keys[economy_pos]} has no household consumption in the table")
+        return None
     dp = np.where(pos, sol.dp, 0.0)
     own = np.zeros(arr.n, dtype=bool)
     k = len(arr.industries)
@@ -589,17 +593,21 @@ def _rows_for(compiled: CompiledIO, fidelity: str) -> list[_Row]:
                      "output price change of this industry, percent of the baseline price")
         if BASKET_KEY in s.outputs or "household_basket_contributions" in s.outputs:
             res = {t: basket(arr, sols[t], e) for t in all_t}
+            b1 = res[Decimal(1)]
+            note = {} if b1 is not None else {
+                "note": "no household final consumption recorded for this economy; basket not applicable"}
             if BASKET_KEY in s.outputs:
-                emit(BASKET_KEY, country, {t: 100.0 * r.total for t, r in res.items()},
+                emit(BASKET_KEY, country, {t: None if r is None else 100.0 * r.total for t, r in res.items()},
                      {"basket": "households' final consumption (P3_S14) at basic prices, domestic and imported",
-                      "weight_total_mio_eur": f"{res[Decimal(1)].weight_total_mio_eur:.3f}"},
+                      "weight_total_mio_eur": None if b1 is None else f"{b1.weight_total_mio_eur:.3f}", **note},
                      "price change of the household basket at basic prices, percent")
             if "household_basket_contributions" in s.outputs:
                 parts = {CONTRIBUTION_KEYS[0]: "domestic_products", CONTRIBUTION_KEYS[1]: "imported_products",
                          CONTRIBUTION_KEYS[2]: "domestic_shocks", CONTRIBUTION_KEYS[3]: "foreign_shocks"}
                 for out_key, attr in parts.items():
-                    emit(out_key, country, {t: 100.0 * getattr(r, attr) for t, r in res.items()},
-                         {"decomposition": attr},
+                    emit(out_key, country,
+                         {t: None if r is None else 100.0 * getattr(r, attr) for t, r in res.items()},
+                         {"decomposition": attr, **note},
                          "contribution to the household basket price change, percent of the baseline basket "
                          "value; domestic+imported products and domestic+foreign shocks each sum to the basket "
                          "change before rounding")

@@ -9942,6 +9942,15 @@
             "title": "Numbers To Confirm",
             "type": "array"
           },
+          "parameters_set": {
+            "description": "Every parameter the LLM set, with its quote",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "title": "Parameters Set",
+            "type": "array"
+          },
           "prompt_sha256": {
             "title": "Prompt Sha256",
             "type": "string"
@@ -10013,6 +10022,7 @@
           "missing_fields",
           "assumptions_added",
           "numbers_to_confirm",
+          "parameters_set",
           "provider",
           "model",
           "model_requested",

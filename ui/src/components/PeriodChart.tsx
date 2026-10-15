@@ -104,7 +104,7 @@ export function PeriodChart({ l1, range = [], label, unitRef, height = 220 }: Pe
   const yTicks = niceTicks(geo.lo, geo.hi);
   const step = Math.max(1, Math.ceil(years.length / Math.max(2, Math.floor(geo.iw / 56))));
   const xTicks = years.filter((_, i) => i % step === 0);
-  const activeYear = active !== null ? years[active] : null;
+  const activeYear: number | null = active !== null ? (years[active] ?? null) : null;
   const ap = activeYear !== null ? l1.find((p) => p.year === activeYear) : undefined;
   const ar = activeYear !== null ? range.find((r) => r.year === activeYear) : undefined;
   const showMarkers = l1.length <= 30;

@@ -15,14 +15,18 @@ What it computes (annual periods ``reference_year+1 .. reference_year+periods``,
   ``N`` the population at completed age ``a`` during year ``t`` (mean of the 1 January
   populations of ``t`` and ``t+1`` from the ``demography.cohort_component`` projection of
   agent POP).
-* **Response (cited assumption grid).** Per grid point ``g`` (literature registry of agent
-  LIT, verified numbers only): pension recipients change ``-rho_g(s) * A`` and employment
-  change ``s_g(s) * rho_g(s) * A``, where ``rho`` is the study's drop in pension receipt
-  for a fully affected cell and ``s`` the share of that drop employed instead.
+* **Pension-receipt drop (own-country data).** ``rho(g, s) = 1 - activity_rate(g, s) / 100``
+  of the base year (LFS ``lfsa_argan``): the share of the age group outside the labour
+  force, a stated *upper-bound proxy* for the share of an affected cell that would
+  otherwise draw a pension (it also counts inactive persons who are not pensioners).
+  It is never taken from a foreign study. Pension recipients change ``-rho * A``.
+* **Employment response (cited assumption grid).** Per grid point (literature registry of
+  agent LIT, ``verified_from_text`` values only): ``s`` = share of the persons kept out of
+  pension receipt who are employed instead. Employment change ``s * rho * A``.
 * **Levels.** Employment rates of each five-year group are held at their base-year LFS
   values (``lfsa_ergan``) and shifted by the response to eligibility relative to the
   regime under which the base year was observed (``observed_path``):
-  ``e_P(a, s, t) = e_obs(g(a), s) + s_g rho_g (I_P(a, t) - I_obs(a, b))``. Employed persons
+  ``e_P(a, s, t) = e_obs(g(a), s) + s * rho(g, s) * (I_P(a, t) - I_obs(a, b))``. Employed persons
   = ``sum N * e``. Pension recipients (level) = base-year ESSPROS old-age beneficiaries
   scaled by the 65+ population (constant beneficiaries-per-65+ ratio, stated assumption)
   plus the modelled change relative to the observed regime.
@@ -74,6 +78,7 @@ SENSITIVITY_METHOD = "reva.models.social.retirement_age.l2_literature_grid_minma
 
 CONCEPTS = {
     "employment_rate": "labour.employment_rate.lfs_age_sex",
+    "activity_rate": "labour.activity_rate.lfs_age_sex",
     "pension_beneficiaries": "social.pension_beneficiaries.esspros_old_age",
     "pension_expenditure": "social.pension_expenditure.esspros",
     "population": "demography.population.jan1_age_sex",
@@ -253,6 +258,7 @@ class CountryData:
     base_year: int
     employment_rate: dict[tuple[str, str], Decimal]  # (sex, group) -> percent
     employment_flags: dict[tuple[str, str], str]
+    activity_rate: dict[tuple[str, str], Decimal] = field(default_factory=dict)
     beneficiaries: Decimal | None = None
     beneficiaries_year: int | None = None
     avg_pension_eur: Decimal | None = None
@@ -272,7 +278,7 @@ def _rows(table: Any) -> list[dict[str, Any]]:
     return [dict(r) for r in table]
 
 
-def employment_rates(rows: Sequence[Mapping[str, Any]], year: int) -> tuple[dict[tuple[str, str], Decimal],
+def employment_rates(rows: Sequence[Mapping[str, Any]], year: int, name: str = "employment_rate") -> tuple[dict[tuple[str, str], Decimal],
                                                                             dict[tuple[str, str], str],
                                                                             list[dict[str, Any]]]:
     rates: dict[tuple[str, str], Decimal] = {}
@@ -283,7 +289,7 @@ def employment_rates(rows: Sequence[Mapping[str, Any]], year: int) -> tuple[dict
         for g, _lo, _hi in AGE_GROUPS:
             r = have.get((s, g))
             if r is None or r.get("value") is None:
-                missing.append({"input": "employment_rate", "sex": s, "age_group": g, "year": year,
+                missing.append({"input": name, "sex": s, "age_group": g, "year": year,
                                 "reason": (r or {}).get("missing_reason") or "unavailable"})
                 continue
             rates[(s, g)] = D(r["value"])
@@ -395,7 +401,7 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
     central, points = grid_for(iso3, assumptions, fidelity)
     plan = CountryPlan(iso3, subject_id, iv, central, points, None)
     missing: list[dict[str, Any]] = []
-    for name in ("employment_rate", "pension_beneficiaries", "pension_expenditure", "population", "deaths",
+    for name in ("employment_rate", "activity_rate", "pension_beneficiaries", "pension_expenditure", "population", "deaths",
                  "births"):
         if tables.get(name) is None:
             missing.append({"code": "missing_input", "country": iso3, "input": name, "concept": CONCEPTS[name],
@@ -404,9 +410,14 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
         plan.status, plan.problems = "missing_input", missing
         return plan
     rates, flags, miss = employment_rates(_rows(tables["employment_rate"]), b)
-    for m in miss:
-        plan.problems.append({"code": "missing_input", "country": iso3, "concept": CONCEPTS["employment_rate"],
+    act, _aflags, amiss = employment_rates(_rows(tables["activity_rate"]), b, "activity_rate")
+    for m in [*miss, *amiss]:
+        plan.problems.append({"code": "missing_input", "country": iso3, "concept": CONCEPTS[m["input"]],
                               "reference_year": b, **m})
+    for key, e in rates.items():
+        if key in act and e > act[key]:
+            plan.problems.append({"code": "inconsistent_input", "country": iso3, "detail":
+                                  f"employment rate {e} exceeds activity rate {act[key]} for {key} in {b}"})
     basis = latest_pension_basis(_rows(tables["pension_beneficiaries"]), _rows(tables["pension_expenditure"]), b)
     if not basis:
         plan.problems.append({"code": "missing_input", "country": iso3, "input": "pension_beneficiaries",
@@ -421,10 +432,10 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
                                   "concept": CONCEPTS["population"], **m})
         pop, dep, summary = {}, {}, {}
     if plan.problems:
-        plan.status = "missing_input"
+        plan.status = "missing_input" if any(p["code"] == "missing_input" for p in plan.problems) else "incompatible"
         return plan
     plan.data = CountryData(
-        iso3=iso3, base_year=b, employment_rate=rates, employment_flags=flags,
+        iso3=iso3, base_year=b, employment_rate=rates, employment_flags=flags, activity_rate=act,
         beneficiaries=basis["beneficiaries"], beneficiaries_year=basis["year"],
         avg_pension_eur=basis["avg_pension_eur"], avg_pension_year=basis["year"],
         avg_pension_basis={"year": basis["year"], "expenditure_eur": dstr(basis["expenditure_eur"]),
@@ -437,6 +448,11 @@ def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tabl
 
 
 # --------------------------------------------------------------------------- computation
+def pension_drop(d: CountryData, sex: str, group: str) -> Decimal:
+    """Own-country upper-bound proxy: share of the group outside the labour force in the base year."""
+    return Decimal(1) - CTX.divide(d.activity_rate[(sex, group)], Decimal(100))
+
+
 def n_mid(pop: Mapping[int, Mapping[str, Sequence[Decimal]]], t: int, s: str, a: int) -> Decimal:
     return CTX.divide(CTX.add(pop[t][s][a], pop[t + 1][s][a]), Decimal(2))
 
@@ -465,11 +481,11 @@ def compute_point(plan: CountryPlan, point: lit.GridPoint, years: Sequence[int])
         grp_num: dict[tuple[str, str], Decimal] = {}
         grp_den: dict[tuple[str, str], Decimal] = {}
         for s in SEXES:
-            k = point.employment_effect(s)
-            rho = point.pension_drop[s]
             for a in AGES:
                 n = n_mid(d.population, t, s, a)
                 g = group_of(a)
+                rho = pension_drop(d, s, g)
+                k = point.share_employed[s] * rho
                 base = CTX.divide(d.employment_rate[(s, g)], Decimal(100))
                 i_obs = fr(sh["observed"][(b, a)])
                 i_s, i_r = fr(sh["scenario"][(t, a)]), fr(sh["reference"][(t, a)])
@@ -668,3 +684,137 @@ def manifest_dict() -> dict[str, Any]:
 
 def digest_of(obj: Any) -> str:
     return logical_hash(obj)
+
+
+# --------------------------------------------------------------------------- plugin
+def spec_schema() -> dict[str, Any]:
+    point_ids = {"type": "string", "pattern": "^[a-z0-9_]{3,80}$"}
+    return {
+        "reference_year": {"type": "integer", "minimum": MIN_REFERENCE_YEAR, "maximum": MAX_END_YEAR - 1},
+        "horizon": {"type": "object", "additionalProperties": False,
+                    "properties": {"periods": {"type": "integer", "minimum": 1, "maximum": MAX_END_YEAR -
+                                               MIN_REFERENCE_YEAR},
+                                   "unit": {"const": "calendar_year"}},
+                    "required": ["periods", "unit"]},
+        "fidelity": {"enum": ["L0", "L1", "L2"]},
+        "intervention": {"oneOf": [
+            {"type": "object", "additionalProperties": False,
+             "properties": {"kind": {"const": "retirement_age_rule_path"},
+                            "scenario_path": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"},
+                            "reference_path": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"}},
+             "required": ["kind", "scenario_path", "reference_path"]},
+            {"type": "object", "additionalProperties": False,
+             "properties": {"kind": {"const": "retirement_age_shift"},
+                            "reference_path": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"},
+                            "shift_months": {"type": "integer", "minimum": -60, "maximum": 60},
+                            "first_birth_year": {"type": "integer", "minimum": 1900, "maximum": 2100},
+                            "phase_in_months_per_cohort": {"type": "integer", "minimum": 0, "maximum": 24}},
+             "required": ["kind", "reference_path", "shift_months", "first_birth_year"]}]},
+        "assumptions": {"type": "object", "additionalProperties": False, "properties": {
+            "observed_path": {"type": "string", "pattern": "^[a-z0-9_]{1,80}$"},
+            "employment_response": {"type": "object", "additionalProperties": False, "properties": {
+                "central": point_ids, "grid": {"type": "array", "items": point_ids, "maxItems": 50,
+                                               "uniqueItems": True}}},
+            "population": {"type": "object", "additionalProperties": False, "properties": {
+                "migration": {"enum": ["zero", "average_residual", "europop2023_bsl"]},
+                "fertility": {"enum": ["constant_base_period_rates", "europop2023_bsl"]},
+                "base_period_years": {"type": "integer", "minimum": 1, "maximum": 10}}}}},
+        "outputs": {"type": "array", "minItems": 1, "uniqueItems": True, "items": {"enum": sorted(OUTPUTS)}},
+    }
+
+
+class RetirementAgeModel:
+    """Plugin ``social.retirement_age@1.0.0`` (experimental, review pending)."""
+
+    model_key = MODEL_KEY
+    model_version = MODEL_VERSION
+    fidelities = frozenset({"L1", "L2"})
+
+    def validate(self, spec: dict[str, Any]) -> None:
+        validate_spec(spec)
+
+    def requirements(self, spec: dict[str, Any]) -> list[Any]:
+        from reva.simulation.plugins import InputRequirement
+
+        b, years = years_of(spec)
+        out = []
+        for iso3 in spec.get("countries") or []:
+            for name, concept in CONCEPTS.items():
+                yrs = (b,) if name in ("employment_rate", "activity_rate") else \
+                    tuple(range(b - 9, b + 2)) if name in ("population", "deaths", "births") else tuple(
+                        range(b - 9, b + 1))
+                out.append(InputRequirement(name, concept, iso3, yrs, "dataset"))
+        return out
+
+    def compile(self, inputs: Any, spec: dict[str, Any]) -> Compiled:
+        b, years = years_of(spec)
+        plans = []
+        for iso3 in spec.get("countries") or []:
+            tables = {}
+            for name in CONCEPTS:
+                ds = inputs.dataset(name, iso3)
+                tables[name] = None if ds.is_missing else ds.table
+            plans.append(build_country_plan(iso3, inputs.subject(iso3).entity_id, spec, tables))
+        outputs = tuple(spec.get("outputs") or DEFAULT_OUTPUTS)
+        return Compiled(dict(spec), b, years, outputs, plans, str(spec.get("missing_input_policy", "fail")),
+                        dict(inputs.release))
+
+    def compute(self, compiled: Compiled, fidelity: str) -> list[Any]:
+        from reva.simulation.plugins import ResultRow
+
+        if fidelity not in self.fidelities:
+            raise CapabilityGap(f"{MODEL_KEY} computes L1 and L2 only", capability=f"fidelity.{fidelity}")
+        rows: list[Any] = []
+        for plan in compiled.countries:
+            if plan.status == "ready":
+                rows.extend(rows_for_country(plan, compiled, fidelity, ResultRow))
+        return sorted(rows, key=lambda r: r.sort_key())
+
+    def manifest(self) -> dict[str, Any]:
+        return manifest_dict()
+
+    def spec_schema(self) -> dict[str, Any]:
+        return spec_schema()
+
+    def explanation(self, fidelity: str) -> dict[str, Any]:
+        return explain(fidelity)
+
+    def run_applicability(self, compiled: Compiled, fidelity: str) -> dict[str, Any]:
+        countries = {}
+        for c in compiled.countries:
+            entry: dict[str, Any] = {"status": c.status, "problems": c.problems}
+            if c.intervention is not None:
+                entry["intervention"] = c.intervention.as_json()
+            if c.central is not None:
+                entry["central_grid_point"] = c.central.point_id
+                entry["grid_points"] = [p.point_id for p in c.points]
+            if c.data is not None:
+                entry["base_year"] = c.data.base_year
+                entry["employment_rate_flags"] = {f"{k[0]}.{k[1]}": v for k, v in c.data.employment_flags.items()}
+                entry["average_pension"] = c.data.avg_pension_basis
+                entry["population_projection"] = c.data.population_summary
+            countries[c.iso3] = entry
+        out = {"explanation": explain(fidelity), "countries": countries, "years": list(compiled.years),
+               "label": LABEL, "model_label": EXPERIMENTAL_LABEL}
+        if compiled.policy == "skip_missing_countries":
+            out["missing_input_policy"] = "skip_missing_countries"
+            out["skipped_countries"] = compiled.skipped
+        return out
+
+    def cost(self, spec: dict[str, Any]) -> dict[str, Any]:
+        return {"periods": int((spec.get("horizon") or {}).get("periods", 0)), "ages": len(AGES)}
+
+    def implementation_files(self) -> tuple[Path, ...]:
+        return implementation_files()
+
+
+MODEL = RetirementAgeModel()
+
+
+def _register() -> None:
+    from reva.simulation import plugins
+
+    plugins.register(MODEL)
+
+
+_register()

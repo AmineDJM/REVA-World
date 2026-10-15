@@ -1694,7 +1694,7 @@ def handle_connector_repair(payload: dict[str, Any], ctx: Any) -> dict[str, Any]
     promotion gate decide. Nothing in the payload can choose hosts, fixtures, tiers or policies.
     """
     from reva.adapters.connectors.registry import builtin_connectors
-    from reva.autonomy.gate import PolicyPromotionGate
+    from reva.gate.client import GateClient  # GATE: decisions come from the reva_gate process
 
     guard = AutonomyGuard.from_settings(ctx.settings)
     reason = guard.blocked_reason()
@@ -1724,7 +1724,8 @@ def handle_connector_repair(payload: dict[str, Any], ctx: Any) -> dict[str, Any]
                            "tier": a.tier, "item": a.item_key, "concepts": list(a.affected_concepts)}
     if rp is None:
         return {**out, "status": "no_proposal"}
-    gate = PolicyPromotionGate(ctx.worker_engine, ArtifactIO(ctx.store), guard=guard)
+    # GATE (process separation): request + await the independent gate's recorded decision.
+    gate = GateClient.from_settings(ctx.worker_engine, ArtifactIO(ctx.store), ctx.settings, guard=guard)
     d = gate.decide(rp.proposal, list(rp.reports), promotion_policy().ref())
     out.update({"status": f"gate_{d.outcome}", "proposal_id": str(rp.proposal.proposal_id),
                 "gate_result_id": str(d.decision_id), "reasons": list(d.reasons),

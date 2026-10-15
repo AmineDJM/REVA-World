@@ -1,4 +1,4 @@
-"""Shared helpers for the process entrypoints (bootstrap/start_api/start_worker).
+"""Shared helpers for the process entrypoints (bootstrap/start_api/start_worker/start_gate).
 
 These scripts run as ``python scripts/<name>.py`` both from the Docker image
 (package installed editable into /opt/venv, sources at /app/src) and from a
@@ -23,7 +23,7 @@ from typing import Any, Literal
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SRC = REPO_ROOT / "src"
 
-Component = Literal["api", "worker"]
+Component = Literal["api", "worker", "gate"]
 
 # Exit codes (sysexits.h): configuration error / temporary failure.
 EX_CONFIG = 78
@@ -70,6 +70,16 @@ COMPONENT_SECRETS: dict[Component, frozenset[str]] = {
             "REVA_COMTRADE_API_KEY",
             "REVA_SANDBOX_TOKEN",
             "REVA_LLM_API_KEY",  # forwarded only when REVA_LLM_ENABLED is true
+        }
+    ),
+    # The independent promotion gate: its own DB login and its own object-store
+    # credential (read the autonomy prefixes, write evaluation/models/normalised);
+    # no worker/sim/API password, no provider keys (it makes no outbound requests).
+    "gate": frozenset(
+        {
+            "REVA_GATE_DB_PASSWORD",
+            "REVA_S3_ACCESS_KEY_ID",
+            "REVA_S3_SECRET_ACCESS_KEY",
         }
     ),
 }
@@ -126,6 +136,7 @@ EXTRA_REVA_CONFIG = frozenset(
         "REVA_GIT_COMMIT",
         "REVA_IMAGE_DIGEST",
         "REVA_WORKER_STARTUP_DEADLINE_SECONDS",
+        "REVA_GATE_STARTUP_DEADLINE_SECONDS",
         # Runtime autonomy kill switch: a file path re-read on every autonomy guard check
         # (reva.autonomy.policy.live_kill_reason); `touch` it to stop autonomy without a redeploy (R6-10).
         "REVA_AUTONOMY_KILL_FILE",

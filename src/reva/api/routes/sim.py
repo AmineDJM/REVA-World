@@ -43,6 +43,7 @@ from reva.api.routes.world import relations_response
 from reva.belief.snapshots import release_by_id
 from reva.kernel.errors import CapabilityGap, MissingInput, ValidationProblem
 from reva.ontology.registry import REGISTRY_ROOT, load_yaml
+from reva.simulation.compile import preflight_missing
 from reva.simulation.spec import RESERVED_FIDELITY, SUPPORTED_FIDELITY, validate_scenario_spec
 
 router = APIRouter(prefix="/v1", tags=["simulation"], dependencies=[Depends(require_scope("read"))])
@@ -307,7 +308,9 @@ def create_simulation(
             raise ValidationProblem(
                 f"fidelity {body.fidelity} does not match the scenario's declared fidelity {spec.get('fidelity')}; "
                 "create a scenario for that fidelity (L0 is always allowed)")
-        missing = _preflight_inputs(conn, spec)
+        # skip_missing_countries / ALL: the worker computes complete countries and lists the skipped ones
+        skip_ok = spec.get("missing_input_policy") == "skip_missing_countries" or spec.get("countries") == ["ALL"]
+        missing = [] if skip_ok else preflight_missing(conn, spec)  # per-plugin (scalars and datasets)
         if missing:
             raise MissingInput(
                 "required inputs are missing from the pinned baseline release; the run is rejected rather than "

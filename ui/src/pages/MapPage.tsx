@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router';
 import { getEntity, getJobs, getLocations, getRelations, getScenarios, getSimulation } from '../api/client';
 import type { Job, Scenario } from '../api/types';
@@ -354,39 +354,7 @@ export default function MapPage() {
               </p>
             )}
             {partners && partners.countries.length > 0 && (
-              <div className="table-wrap">
-                <table className="data-table" data-testid="partner-table">
-                  <caption>
-                    {partners.countries.length} partner countr{partners.countries.length === 1 ? 'y' : 'ies'}; {arcs.length} drawn as arcs
-                    {unmappedPartners.length > 0 && ` (${unmappedPartners.length} without reviewed display geometry, listed only)`}
-                  </caption>
-                  <thead>
-                    <tr>
-                      <th scope="col">Partner</th>
-                      <th scope="col">Value</th>
-                      <th scope="col">On map</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {partners.countries.map((p) => (
-                      <tr key={p.relationId}>
-                        <th scope="row">{p.partnerLabel}</th>
-                        <td>
-                          {p.value === null ? (
-                            <MissingValue reason={p.missingReason ?? 'unavailable'} />
-                          ) : (
-                            <span className="num" data-exact={p.value} title={`exact: ${p.value} US$`}>
-                              {displayDecimal(p.value, 'unit.usd').text} US$
-                            </span>
-                          )}
-                          {p.valuation && <span className="basis"> · {p.valuation}</span>}
-                        </td>
-                        <td>{arcs.some((a) => a.id === p.relationId) ? 'arc' : <span className="muted">listed only</span>}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <PartnerTable rows={partners.countries} arcs={arcs} unmapped={unmappedPartners.length} />
             )}
             {partners && partners.composites.length > 0 && (
               <div data-testid="composite-partners">
@@ -400,6 +368,12 @@ export default function MapPage() {
                   ))}
                 </ul>
               </div>
+            )}
+            {partners && partners.self.length > 0 && (
+              <p className="muted" data-testid="self-partner">
+                {focusLabel} also reports {flow === 'M' ? 'imports from' : 'exports to'} itself (re-{flow === 'M' ? 'imports' : 'exports'}):{' '}
+                {partners.self.map((p) => (p.value === null ? 'missing' : `${displayDecimal(p.value, 'unit.usd').text} US$`)).join(', ')}. Listed, not drawn.
+              </p>
             )}
             {partners && partners.world.length > 0 && (
               <p className="muted">{partners.world.length} partner-World row(s) excluded from arcs (a World total is not a partner).</p>
@@ -418,6 +392,54 @@ export default function MapPage() {
         </details>
       )}
     </>
+  );
+}
+
+const PARTNER_PREVIEW = 12;
+
+function PartnerTable({ rows, arcs, unmapped }: { rows: FlowRow[]; arcs: MapArc[]; unmapped: number }) {
+  const [all, setAll] = useState(false);
+  const shown = all ? rows : rows.slice(0, PARTNER_PREVIEW);
+  return (
+    <div className="table-wrap">
+      <table className="data-table" data-testid="partner-table">
+        <caption>
+          {rows.length} partner countr{rows.length === 1 ? 'y' : 'ies'}; {arcs.length} drawn as arcs
+          {unmapped > 0 && ` (${unmapped} without reviewed display geometry, listed only)`}
+          {!all && rows.length > PARTNER_PREVIEW && `; largest ${PARTNER_PREVIEW} shown`}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">Partner</th>
+            <th scope="col">Value</th>
+            <th scope="col">On map</th>
+          </tr>
+        </thead>
+        <tbody>
+          {shown.map((p) => (
+            <tr key={p.relationId}>
+              <th scope="row">{p.partnerLabel}</th>
+              <td>
+                {p.value === null ? (
+                  <MissingValue reason={p.missingReason ?? 'unavailable'} />
+                ) : (
+                  <span className="num" data-exact={p.value} title={`exact: ${p.value} US$`}>
+                    {displayDecimal(p.value, 'unit.usd').text} US$
+                  </span>
+                )}
+                {p.valuation && <span className="basis"> · {p.valuation}</span>}
+              </td>
+              <td>{arcs.some((a) => a.id === p.relationId) ? 'arc' : <span className="muted">listed only</span>}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      {rows.length > PARTNER_PREVIEW && (
+        <button type="button" onClick={() => setAll((a) => !a)} aria-expanded={all}>
+          {all ? `Show the largest ${PARTNER_PREVIEW}` : `Show all ${rows.length} partners`}
+        </button>
+      )}
+    </div>
   );
 }
 

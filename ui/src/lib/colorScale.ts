@@ -60,7 +60,7 @@ function legendLabel(step: number, neg: boolean, scale: DivergingScale): string 
   const lo = step === 1 ? null : scale.breaks[step - 2]!;
   const hi = step <= scale.breaks.length ? scale.breaks[step - 1]! : null;
   if (hi === null) return `${s}${lo} ${scale.unit} or beyond`;
-  if (lo === null) return `${s}0 to ${s}${hi} ${scale.unit} (not 0)`;
+  if (lo === null) return `above 0 to ${s}${hi} ${scale.unit}`.replace('above 0 to −', 'below 0 to −');
   return `${s}${lo} to ${s}${hi} ${scale.unit}`;
 }
 

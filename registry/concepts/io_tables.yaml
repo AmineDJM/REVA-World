@@ -1,0 +1,32 @@
+# Inter-country input-output table concepts (V2 step 3b, agent IO).
+# Fetched by the reviewed connector eurostat.figaro.iciot_ii (src/reva/adapters/connectors/io_tables.py)
+# and stored as a dataset input (Parquet), never as scalar observations.
+# Published versions are immutable: changing meaning requires a new version.
+concepts:
+  - concept_id: economics.io.figaro_ii_table
+    version: "1.0.0"
+    kind: quantity
+    labels: {en: "Inter-country input-output table, industry by industry (Eurostat FIGARO)"}
+    definition: >-
+      Eurostat FIGARO EU inter-country input-output table at basic prices, industry by industry
+      (datasets NAIO_10_FCP_II1..II4), one reference year, current prices, million EUR: 50 economies
+      (EU27, NO, CH, UK, ME, MK, AL, RS, TR, RU, ZA, CA, US, MX, AR, BR, CN, JP, KR, IN, ID, SA, AU and
+      a rest-of-the-world region) x 64 NACE Rev. 2 industries. Blocks: intermediate use (Z), final
+      demand by category and using economy (F), primary inputs and product taxes (V, row DOM) and
+      gross output (X, derived as the row total and verified equal to the column total). Confidential
+      cells are replaced by Eurostat with adjusted values before dissemination (controlled tabular
+      adjustment); no uncertainty is published.
+    owner: reva-maintainers
+    semantic_profile:
+      population_universe: resident_producers_and_final_users_of_figaro_economies
+      temporal_support: annual_total
+      spatial_support: figaro_economy_pair
+      aggregation: period_flow_total
+      scale_type: flow
+      unit_ref: unit.eur  # values are published in millions of EUR (scale factor 1e6)
+      currency_basis: EUR
+      price_basis: nominal_current
+      valuation: basic_prices
+      permitted_transformations: [identity]
+      missingness: [unavailable]
+      measurement_method: compiled_inter_country_supply_use_and_input_output_tables

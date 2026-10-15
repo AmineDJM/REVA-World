@@ -115,6 +115,10 @@ services:
         generateValue: true
       - key: REVA_SIM_DB_PASSWORD
         generateValue: true
+      # The independent promotion gate's login (reva_gate); generated here because the
+      # pre-deploy bootstrap provisions it. Only reva-gate receives it.
+      - key: REVA_GATE_DB_PASSWORD
+        generateValue: true
       - key: REVA_SESSION_SECRET
         generateValue: true
       - key: REVA_ADMIN_PASSWORD_HASH
@@ -205,3 +209,60 @@ services:
           type: web
           name: reva-api
           envVarKey: REVA_HTTP_CONTACT_EMAIL
+
+  # Independent promotion gate (process separation): its own login (reva_gate), the only
+  # one allowed to record gate results; consumes ops.gate_request rows filed by the worker.
+  # No owner URL, no worker/sim/API password, no session secret, no provider keys.
+  - type: worker
+    name: reva-gate
+    runtime: docker
+    plan: 0.5c-512mb
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    dockerCommand: python scripts/start_gate.py
+    autoDeployTrigger: checksPass
+    numInstances: 1
+    maxShutdownDelaySeconds: 60
+    envVars:
+      - fromGroup: reva-common
+      - key: REVA_PROCESS_ROLE
+        value: gate
+      - key: REVA_DB_HOST
+        fromDatabase:
+          name: reva-db
+          property: host
+      - key: REVA_DB_PORT
+        fromDatabase:
+          name: reva-db
+          property: port
+      - key: REVA_DB_NAME
+        fromDatabase:
+          name: reva-db
+          property: database
+      - key: REVA_GATE_DB_PASSWORD
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_GATE_DB_PASSWORD
+      - key: REVA_S3_ENDPOINT_URL
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_ENDPOINT_URL
+      - key: REVA_S3_REGION
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_REGION
+      - key: REVA_S3_BUCKET
+        fromService:
+          type: web
+          name: reva-api
+          envVarKey: REVA_S3_BUCKET
+      # Distinct gate credentials: read the autonomy prefixes, write evaluation/, models/
+      # and normalised/ only; no bucket-admin or delete rights.
+      - key: REVA_S3_ACCESS_KEY_ID
+        sync: false
+      - key: REVA_S3_SECRET_ACCESS_KEY
+        sync: false

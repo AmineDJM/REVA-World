@@ -16,9 +16,11 @@ entry the module takes, per recorded sex where the entry is sex-specific:
   proportion): the share of an affected cohort-age cell that would otherwise
   receive a pension.
 
-The model's employment change for a fully affected cell is ``s * rho`` (the
-study's own percentage-point employment effect) and its pension-recipient change
-is ``-rho``. Entries without both numbers (e.g. effects on exit ages in years)
+Only ``s`` enters the model. The pension-receipt drop of a country is taken
+from that country's own data (base-year LFS inactivity, see the model), never
+from a foreign study; the study's ``rho`` is kept for documentation. Estimates
+are also tagged with the reform they were estimated on, so a back-test can
+exclude every estimate whose estimation sample overlaps the reform it tests. Entries without both numbers (e.g. effects on exit ages in years)
 are listed as ``excluded`` with the reason. A women-only estimate applied to men
 (or a single pooled estimate applied to both sexes) is flagged
 ``sex_transfer``. A reference point with no employment response (``s = 0``) is
@@ -27,6 +29,7 @@ added, labelled as a reference, not literature.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from decimal import Decimal
@@ -43,6 +46,7 @@ ASSUMPTIONS_FILE = Path(__file__).resolve().parents[4] / "registry" / "assumptio
     "retirement_employment_response.yaml"
 VERIFIED = "verified_from_text"
 NO_RESPONSE_ID = "reference_no_employment_response"
+_YEAR_RE = re.compile(r"\b(19[5-9]\d|20[0-4]\d)\b")
 SEXES = ("F", "M")
 
 
@@ -60,9 +64,17 @@ class GridPoint:
     sex_transfer: str | None = None
     provenance: Mapping[str, Any] = field(default_factory=dict)
 
-    def employment_effect(self, sex: str) -> Decimal:
-        """Percentage-point-equivalent employment effect (proportion) for a fully affected cell."""
+    def study_employment_effect(self, sex: str) -> Decimal:
+        """The study's own employment effect for a fully affected cell (s * rho of the study; documentation)."""
         return self.share_employed[sex] * self.pension_drop[sex]
+
+    def overlaps(self, country: str, first_year: int, last_year: int) -> bool:
+        """True when the estimate may come from the same country's reforms in or before the window
+        (conservative: any own-country estimate whose period text mentions a year <= last_year)."""
+        if self.country != country:
+            return False
+        years = [int(y) for y in _YEAR_RE.findall(" ".join(str(v) for v in self.provenance.values()))]
+        return not years or min(years) <= last_year
 
     def as_dict(self) -> dict[str, Any]:
         return {
@@ -70,7 +82,8 @@ class GridPoint:
             "doi": self.doi, "citation": self.citation,
             "share_employed": {k: str(v) for k, v in self.share_employed.items()},
             "pension_drop": {k: str(v) for k, v in self.pension_drop.items()},
-            "employment_effect_full_cell": {k: str(self.employment_effect(k)) for k in SEXES},
+            "study_employment_effect_full_cell": {k: str(self.study_employment_effect(k)) for k in SEXES},
+            "pension_drop_used_by_model": "own-country data (not this study's value)",
             "evidence": list(self.evidence), "sex_transfer": self.sex_transfer,
             "provenance": dict(self.provenance),
             "status": "stated scenario assumption with citation (not a reviewed evidence claim)",
@@ -176,6 +189,7 @@ def build_grid(doc: Mapping[str, Any]) -> AssumptionGrid:
             country=e.get("country"), doi=e.get("doi"), citation=str(e.get("citation")), kind="literature",
             evidence=tuple(sorted(evidence)), sex_transfer=transfer,
             provenance={"policy_change": e.get("policy_change"), "population": e.get("population"),
+                        "period": e.get("period"),
                         "design": e.get("design"), "text_sources": [t.get("id") for t in e.get("text_sources") or []],
                         "derived": [d.get("name") for d in derived]}))
     if not points:

@@ -14,6 +14,10 @@ REVA-specific checks (security/operational invariants of the Blueprint):
   * reva-worker runs ``python scripts/start_worker.py`` and receives neither
     REVA_MIGRATION_DATABASE_URL nor DATABASE_URL nor the API role password,
     session secret or admin hash;
+  * reva-gate (independent promotion gate) runs ``python scripts/start_gate.py``
+    with REVA_PROCESS_ROLE=gate, references reva-api's generated
+    REVA_GATE_DB_PASSWORD, has its own S3 credential (sync: false) and receives no
+    owner URL and no worker/sim/API secret; the worker never receives the gate's;
   * the migration-owner URL comes only from the database connectionString;
   * the common group selects s3 storage and production mode; one instance each.
 
@@ -82,6 +86,40 @@ def _env_keys(service: dict[str, Any]) -> dict[str, dict[str, Any]]:
     return {e["key"]: e for e in service.get("envVars", []) if "key" in e}
 
 
+GATE_FORBIDDEN = API_FORBIDDEN_ON_WORKER | {"REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD",
+                                          "REVA_COMTRADE_API_KEY", "REVA_LLM_API_KEY"}
+
+
+def gate_checks(services: dict[str, Any], wkeys: dict[str, dict[str, Any]]) -> list[str]:
+    problems: list[str] = []
+    gate = services.get("reva-gate")
+    if gate is None:
+        return ["service reva-gate (independent promotion gate) is required"]
+    if gate.get("type") != "worker" or gate.get("dockerCommand") != "python scripts/start_gate.py":
+        problems.append("reva-gate must be type worker running `python scripts/start_gate.py`")
+    if "preDeployCommand" in gate:
+        problems.append("reva-gate must not run a preDeployCommand")
+    if gate.get("runtime") != "docker" or gate.get("dockerfilePath") != "./Dockerfile":
+        problems.append("reva-gate must build ./Dockerfile with runtime docker")
+    if gate.get("numInstances", 1) != 1:
+        problems.append("reva-gate must run exactly one instance in V1")
+    gkeys = _env_keys(gate)
+    leaked = sorted(GATE_FORBIDDEN & set(gkeys))
+    if leaked:
+        problems.append(f"reva-gate must not receive {leaked}")
+    if gkeys.get("REVA_PROCESS_ROLE", {}).get("value") != "gate":
+        problems.append("reva-gate must set REVA_PROCESS_ROLE=gate")
+    ref = gkeys.get("REVA_GATE_DB_PASSWORD", {}).get("fromService", {})
+    if ref.get("name") != "reva-api" or ref.get("envVarKey") != "REVA_GATE_DB_PASSWORD":
+        problems.append("reva-gate REVA_GATE_DB_PASSWORD must reference reva-api's generated value")
+    for key in ("REVA_S3_ACCESS_KEY_ID", "REVA_S3_SECRET_ACCESS_KEY"):
+        if gkeys.get(key, {}).get("sync") is not False:
+            problems.append(f"reva-gate {key} must be its own dashboard-supplied secret (sync: false)")
+    if "REVA_GATE_DB_PASSWORD" in wkeys:
+        problems.append("reva-worker must not receive REVA_GATE_DB_PASSWORD (it may not record gate results)")
+    return problems
+
+
 def reva_checks(doc: dict[str, Any]) -> list[str]:
     problems: list[str] = []
     services = {s.get("name"): s for s in doc.get("services", [])}
@@ -113,7 +151,8 @@ def reva_checks(doc: dict[str, Any]) -> list[str]:
     mig = akeys.get("REVA_MIGRATION_DATABASE_URL")
     if not mig or mig.get("fromDatabase", {}).get("property") != "connectionString":
         problems.append("REVA_MIGRATION_DATABASE_URL must come from the database connectionString")
-    for key in ("REVA_API_DB_PASSWORD", "REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_SESSION_SECRET"):
+    for key in ("REVA_API_DB_PASSWORD", "REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD", "REVA_GATE_DB_PASSWORD",
+                "REVA_SESSION_SECRET"):
         if not akeys.get(key, {}).get("generateValue"):
             problems.append(f"{key} must be generated on reva-api (generateValue: true)")
     for key in ("REVA_WORKER_DB_PASSWORD", "REVA_SIM_DB_PASSWORD"):
@@ -147,6 +186,7 @@ def reva_checks(doc: dict[str, Any]) -> list[str]:
     for env_keys, role in ((akeys, "api"), (wkeys, "worker")):
         if env_keys.get("REVA_PROCESS_ROLE", {}).get("value") != role:
             problems.append(f"reva-{role} must set REVA_PROCESS_ROLE={role}")
+    problems += gate_checks(services, wkeys)
     for db in doc.get("databases", []):
         if str(db.get("postgresMajorVersion")) != "17":
             problems.append("database must be PostgreSQL 17")

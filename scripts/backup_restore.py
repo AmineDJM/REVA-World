@@ -34,7 +34,8 @@ Ownership semantics: the dump records owners and ACLs; restore uses --no-owner,
 so the restoring migration owner owns every object (exactly what bootstrap's
 verify_ownership requires) while grants to reva_api/reva_worker/reva_sim are
 restored. Database-level grants are not part of a non --create dump and are
-re-applied explicitly (mirrors migration 0007).
+re-applied explicitly from the grants recorded in the backup's catalog manifest
+(so roles added by later migrations, e.g. reva_gate, are covered).
 """
 
 from __future__ import annotations
@@ -43,6 +44,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -1040,7 +1042,7 @@ ROLE_SQL = """
 DO $$
 DECLARE r text;
 BEGIN
-  FOREACH r IN ARRAY ARRAY['reva_api','reva_worker','reva_sim','reva_registry'] LOOP
+  FOREACH r IN ARRAY ARRAY[{roles}]::text[] LOOP
     IF NOT EXISTS (SELECT 1 FROM pg_roles WHERE rolname = r) THEN
       EXECUTE format('CREATE ROLE %I NOLOGIN NOINHERIT', r);
     END IF;
@@ -1050,6 +1052,34 @@ BEGIN
   END IF;
 END $$;
 """
+BASE_ROLES = ("reva_api", "reva_worker", "reva_sim", "reva_registry")
+REVA_ROLE_NAME = re.compile(r"^reva_[a-z][a-z0-9_]{0,50}$")
+
+
+def _recorded_grants(record: Mapping[str, Any]) -> list[list[Any]]:
+    return list(((record.get("logical_manifest") or {}).get("catalog") or {}).get("grants") or [])
+
+
+def restore_roles(record: Mapping[str, Any]) -> list[str]:
+    """Roles that must exist before pg_restore re-applies the recorded ACLs: the base runtime/group
+    roles, every runtime login role this code knows (``reva.settings.ROLE_LOGIN``) and every
+    ``reva_*`` grantee recorded in the backup's catalog (e.g. a role added by a later migration).
+    Missing ones are created NOLOGIN (bootstrap provisions logins and passwords)."""
+    from reva.settings import ROLE_LOGIN
+
+    roles = set(BASE_ROLES) | set(ROLE_LOGIN.values())
+    roles |= {g[2] for g in _recorded_grants(record) if len(g) >= 3 and isinstance(g[2], str)}
+    return sorted(r for r in roles if REVA_ROLE_NAME.match(r))
+
+
+def database_grants(record: Mapping[str, Any]) -> list[tuple[str, str, bool]]:
+    """Database-level grants to re-apply (not part of a non --create dump): exactly those recorded
+    at backup time; for backups without a catalog section, CONNECT for the V1 runtime roles."""
+    rec = [(str(g[2]), str(g[3]), bool(g[4])) for g in _recorded_grants(record)
+           if len(g) >= 5 and g[0] == "database" and g[2] != "PUBLIC"]
+    if rec or (record.get("logical_manifest") or {}).get("catalog"):
+        return sorted(set(rec))
+    return [(r, "CONNECT", False) for r in ("reva_api", "reva_worker", "reva_sim")]
 
 
 def _target_is_empty(conn: psycopg.Connection[Any]) -> bool:
@@ -1130,7 +1160,8 @@ def restore(
                     "(or pass --force --confirm-database <name> to drop its REVA schemas first)"
                 )
             dropped = _drop_reva_objects(conn)
-        conn.execute(ROLE_SQL)
+        # role names are validated against REVA_ROLE_NAME (no quotes possible) before rendering
+        conn.execute(ROLE_SQL.replace("{roles}", ", ".join(f"'{r}'" for r in restore_roles(record))))
         restore_major = tools.major_version("pg_restore", url)
         if restore_major < record["pg_dump_major"]:
             raise BackupError("pg_restore is older than the pg_dump that produced the archive")
@@ -1155,7 +1186,12 @@ def restore(
             raise BackupError("archive changed between verification and restore; drop the target and retry")
         dbname = sql.Identifier(url.database)
         conn.execute(sql.SQL("REVOKE ALL ON DATABASE {} FROM PUBLIC").format(dbname))
-        conn.execute(sql.SQL("GRANT CONNECT ON DATABASE {} TO reva_api, reva_worker, reva_sim").format(dbname))
+        for grantee, privilege, grantable in database_grants(record):
+            if privilege not in {"CONNECT", "CREATE", "TEMPORARY"} or not REVA_ROLE_NAME.match(grantee):
+                raise BackupError(f"backup records an unexpected database grant: {privilege} to {grantee}")
+            conn.execute(sql.SQL("GRANT {} ON DATABASE {} TO {}{}").format(
+                sql.SQL(privilege), dbname, sql.Identifier(grantee),
+                sql.SQL(" WITH GRANT OPTION" if grantable else "")))
     finally:
         conn.close()
     bootstrap_report = None

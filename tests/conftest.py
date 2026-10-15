@@ -45,6 +45,8 @@ class DB:
     worker: Engine
     sim: Engine
     store: FilesystemArtifactStore
+    #: The independent promotion gate's login (reva_gate): the only one that may record gate results.
+    gate: Engine | None = None
 
 
 def _base_settings(**over: object) -> Settings:
@@ -95,17 +97,34 @@ def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[DB]:
         worker=make_engine("worker", settings),
         sim=make_engine("sim", settings),
         store=store,
+        gate=make_engine("gate", settings) if settings.reva_gate_db_password is not None else None,
     )
     # bootstrap() seeds the reviewed registry as the migration owner (R5-01: runtime roles may not
     # write approved registry state); re-running it as the owner is an idempotent no-op.
     seed(d.owner, store)
     yield d
-    for e in (d.owner, d.api, d.worker, d.sim):
-        e.dispose()
+    for e in (d.owner, d.api, d.worker, d.sim, d.gate):
+        if e is not None:
+            e.dispose()
     if not os.environ.get("REVA_KEEP_TEST_DB"):
         with admin.connect() as c:
             c.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
     admin.dispose()
+
+
+@pytest.fixture()
+def gate_service(db: DB) -> Iterator[object]:
+    """The independent gate process (reva_gate login) running in a background thread, so worker
+    autonomy steps that file gate requests receive a decision (``reva.gate.service.GateService``)."""
+    if db.gate is None:
+        pytest.skip("REVA_GATE_DB_PASSWORD not configured (see .env.example)")
+    from reva.gate.service import GateService
+
+    engine = make_engine("gate", db.settings)  # own pool: tests may use db.gate concurrently
+    svc = GateService(engine, db.store, db.settings, poll_seconds=0.05)
+    with svc.background():
+        yield svc
+    engine.dispose()
 
 
 @pytest.fixture()

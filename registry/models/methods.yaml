@@ -124,3 +124,36 @@ models:
       - births with unknown mother's age projected as a separate rate per woman aged 15-49
       - open age groups and unknown ages never spread over single ages
       - sensitivity grid at L2 is assumption sensitivity with no probability interpretation
+  - model_key: economic.io_price
+    version: "1.0.0"
+    kind: scenario
+    approval_status: candidate
+    review_status: maintainer_review_pending
+    description: >-
+      Multi-region Leontief cost-push price model on the Eurostat FIGARO inter-country
+      industry-by-industry table (dataset input economics.io.figaro_ii_table, subject WORLD).
+      Exogenous output-price change of chosen industries (B, C19, D35) in chosen economies;
+      every other industry passes on share theta of its unit-cost increase:
+      (I - theta A_EE') dp_E = theta A_SE' pi_S. Household basket = P3_S14-weighted average at
+      basic prices. First-round cost-push under full pass-through; not an inflation forecast.
+    input_ports:
+      - {name: io_table, kind: dataset, concept: economics.io.figaro_ii_table, subject: WORLD}
+    output_ports:
+      - {name: industry_price_change_percent, unit: unit.percent}
+      - {name: household_basket_price_change_percent, unit: unit.percent}
+      - {name: household_basket_contributions, unit: unit.percent}
+    applicability:
+      horizon: {periods: 1, unit: annual_accounting_period}
+      price_change_percent_envelope: {min_exclusive: -100, max: 200}
+      pass_through_envelope: {min_exclusive: 0, max: 1}
+      shockable_industries: [B, C19, D35]
+      fidelity_supported: [L0, L1, L2]
+      fidelity_reserved: [L3, L4]
+      unsupported_outputs: [inflation_forecast, consumer_price_index, gdp_loss, welfare]
+    assumptions:
+      - fixed technical coefficients of the reference-year table (no substitution)
+      - no demand, quantity, wage, exchange-rate or monetary response; one annual period; nominal basic prices
+      - shocked industries' output prices change exactly by the stated percentage (exogenous prices)
+      - every other industry passes on share theta of its unit-cost increase (L1 theta = 1)
+      - household basket weights are P3_S14 purchases at basic prices (no product taxes, no purchases abroad)
+      - a shocked industry is a whole table industry (NACE B is broader than crude petroleum)
