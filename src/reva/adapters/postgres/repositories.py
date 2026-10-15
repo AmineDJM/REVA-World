@@ -219,7 +219,8 @@ def concept_version_id(conn: Connection, concept_id: str, version: str | None = 
 
 def concept_profile(conn: Connection, concept_uuid: UUID) -> dict[str, Any]:
     row = conn.execute(
-        text("SELECT concept_id, version, kind, semantic_profile, definition FROM ontology.concept_version WHERE id=:i"),
+        text("SELECT concept_id, version, kind, semantic_profile, definition "
+             "FROM ontology.concept_version WHERE id=:i"),
         {"i": concept_uuid},
     ).mappings().one()
     return dict(row)

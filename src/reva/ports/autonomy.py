@@ -6,12 +6,13 @@ implementation prompt must supply real behaviour and contract tests.
 """
 from __future__ import annotations
 
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Literal, Mapping, Protocol, Sequence, TypeAlias
+from typing import Literal, Protocol, TypeAlias
 from uuid import UUID
 
-JSON: TypeAlias = (
+JSON: TypeAlias = (  # noqa: UP040 - normative port text kept verbatim
     dict[str, "JSON"] | list["JSON"] | str | int | float | bool | None
 )
 

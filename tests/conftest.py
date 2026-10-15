@@ -55,7 +55,7 @@ def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[DB]:
     try:
         with admin.connect() as c:
             c.execute(text("SELECT 1"))
-    except Exception:  # noqa: BLE001
+    except Exception:
         pytest.skip("PostgreSQL not reachable")
     name = f"reva_test_{uuid.uuid4().hex[:10]}"
     with admin.connect() as c:
@@ -72,7 +72,7 @@ def db(tmp_path_factory: pytest.TempPathFactory) -> Iterator[DB]:
         try:
             bootstrap(settings)
             break
-        except Exception:  # noqa: BLE001
+        except Exception:
             if attempt == 2:
                 raise
     store = FilesystemArtifactStore(root, settings.reva_s3_prefix)

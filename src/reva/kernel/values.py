@@ -18,7 +18,6 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, field_validator
 
 from reva.kernel.errors import MissingInput
 
-
 _DECIMAL_RE = re.compile(r"-?(0|[1-9][0-9]*)(\.[0-9]+)?")
 
 
