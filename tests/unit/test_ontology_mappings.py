@@ -50,7 +50,7 @@ def test_exact_mapping_is_identity_only_within_applicability() -> None:
     assert m.usable_as_identity
     assert m.require_identity(subject="FRA", year=2010).concept_id == "demography.population.wdi_midyear_total"
     with pytest.raises(IncompatibleSemantics, match="does not apply"):
-        m.require_identity(subject="FRA", year=1999)
+        m.require_identity(subject="FRA", year=1959)
     with pytest.raises(IncompatibleSemantics, match="does not apply"):
         m.require_identity(subject="DEU", year=2010)
     cm = find_mapping(MAPPINGS, "comtrade.2709.M.world")
