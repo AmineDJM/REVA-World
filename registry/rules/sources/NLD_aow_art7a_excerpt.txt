@@ -1,5 +1,5 @@
 Excerpt (verbatim text extracted from HTML) of https://wetten.overheid.nl/BWBR0002221
-Full response sha256 4070f8fe571517390cfc01c103243650586b994026bc21cd7a48362ef60a1883, 741464 bytes, retrieved 2026-10-15T01:08:15Z. Only this excerpt is committed.
+Full response sha256 4070f8fe571517390cfc01c103243650586b994026bc21cd7a48362ef60a1883, 741464 bytes, retrieved 2026-10-15T01:08:32Z. Only this excerpt is committed.
 
 === provider version line ===
 Geldend van 01-07-2026 t/m heden.

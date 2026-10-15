@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-import { getBeliefs, getCoverage, getEntity, getGaps, getLocations, getObservations, getOntology, getTimeseries } from '../api/client';
+import { getBeliefRelease, getBeliefs, getCoverage, getEntity, getGaps, getLocations, getOntology, getTimeseries } from '../api/client';
 import { ApiError } from '../api/problem';
 import {
   COUNTRY_CODES,
@@ -53,9 +53,45 @@ interface Row {
   observationId: string | null;
   /** Provider source-flag notes (e.g. provider estimate, not directly reported). */
   flags: string[];
+  /** source_flags was cut to its size bound (the full record is at /v1/observations). */
+  flagsTruncated: boolean;
+  /** Record origin (timeseries points carry it; belief rows inherit the release origin). */
+  origin: string | null;
+  /** Belief rows: publication of the concept is paused; the value is the last accepted one. */
+  stale: boolean;
+  staleReason: string | null;
+  proposalId: string | null;
+  /** Belief rows: release the row was read from, when it differs from the baseline release. */
+  servedFromReleaseId: string | null;
 }
 
-const rowColumns: ColumnDef<Row, unknown>[] = [
+/** Stale / served-from-earlier-release badges for one belief row. */
+function StaleNotes({ row, releaseSeq }: { row: Row; releaseSeq: (id: string) => number | null | undefined }) {
+  if (!row.stale && !row.servedFromReleaseId) return null;
+  const seq = row.servedFromReleaseId ? releaseSeq(row.servedFromReleaseId) : null;
+  return (
+    <span className="stale-notes" data-testid="stale-notes">
+      {row.stale && (
+        <span className="badge badge-stale" title="Publication of this concept is paused; this is the last accepted value, not a fresh one">
+          stale{row.staleReason ? `: ${humanize(row.staleReason)}` : ''}
+        </span>
+      )}
+      {row.servedFromReleaseId && (
+        <span className="badge badge-served" data-served-from={row.servedFromReleaseId}>
+          served from release {seq !== null && seq !== undefined ? `#${seq}` : <span className="mono">{row.servedFromReleaseId.slice(0, 8)}…</span>}
+        </span>
+      )}
+      {row.proposalId && (
+        <>
+          {' '}
+          <Link to={`/acquisition?proposal=${encodeURIComponent(row.proposalId)}#proposal-${row.proposalId}`}>repair proposal</Link>
+        </>
+      )}
+    </span>
+  );
+}
+
+const rowColumns = (releaseSeq: (id: string) => number | null | undefined): ColumnDef<Row, unknown>[] => [
   { header: 'Period', accessorKey: 'period' },
   { header: 'Value', id: 'value', cell: (c) => <ValueView value={c.row.original.value} showBasis /> },
   { header: 'Uncertainty', id: 'unc', cell: (c) => <UncertaintyPanel uncertainty={c.row.original.uncertainty} compact /> },
@@ -72,6 +108,13 @@ const rowColumns: ColumnDef<Row, unknown>[] = [
             · {c.row.original.flags.join('; ')}
           </span>
         )}
+        {c.row.original.flagsTruncated && (
+          <span className="field-hint" data-testid="flags-truncated">
+            {' '}
+            · provider flags truncated to their size bound; the full record is on the observation (Trace)
+          </span>
+        )}{' '}
+        <StaleNotes row={c.row.original} releaseSeq={releaseSeq} />
       </>
     ),
   },
@@ -82,7 +125,7 @@ const rowColumns: ColumnDef<Row, unknown>[] = [
   },
 ];
 
-function beliefRows(data: BeliefEstimate[]): Row[] {
+function beliefRows(data: BeliefEstimate[], baselineReleaseId: string | null, concept: string, origin: string | null): Row[] {
   return data.map((e) => {
     const flags = [...e.discrepancy_flags];
     if (e.alternatives.length) flags.push(`${e.alternatives.length} alternative(s) retained`);
@@ -97,12 +140,18 @@ function beliefRows(data: BeliefEstimate[]): Row[] {
       provKind: 'estimate',
       provId: e.id,
       observationId: e.observation_id ?? null,
-      flags: [],
+      flags: sourceFlagNotes(e.source_flags, { concept }),
+      flagsTruncated: !!e.source_flags_truncated,
+      origin,
+      stale: !!e.stale,
+      staleReason: e.stale_reason ?? null,
+      proposalId: e.proposal_id ?? null,
+      servedFromReleaseId: e.served_from_release_id && e.served_from_release_id !== baselineReleaseId ? e.served_from_release_id : null,
     };
   });
 }
 
-function evidenceRows(points: TimeseriesPoint[]): Row[] {
+function evidenceRows(points: TimeseriesPoint[], concept: string): Row[] {
   return points.map((p) => ({
     key: p.observation_id,
     period: p.period_label ?? p.valid_start ?? '—',
@@ -114,7 +163,13 @@ function evidenceRows(points: TimeseriesPoint[]): Row[] {
     provKind: 'observation',
     provId: p.observation_id,
     observationId: p.observation_id,
-    flags: [],
+    flags: sourceFlagNotes(p.source_flags, { concept }),
+    flagsTruncated: !!p.source_flags_truncated,
+    origin: p.origin ?? null,
+    stale: false,
+    staleReason: null,
+    proposalId: null,
+    servedFromReleaseId: null,
   }));
 }
 
@@ -131,24 +186,47 @@ function ConceptPanel({ iso3, concept, title, definition, onOrigins }: ConceptPa
   const [mode, setMode] = useState<'belief' | 'evidence'>('belief');
   const beliefs = useApi((s) => getBeliefs({ subject_id: iso3, concept, limit: 1000 }, s), [iso3, concept], mode === 'belief');
   const series = useApi((s) => getTimeseries({ subject_id: iso3, concept }, s), [iso3, concept], mode === 'evidence');
-  // Provider source flags (estimation / not-reported markers) live on the observations.
-  const observations = useApi((s) => getObservations({ subject_id: iso3, concept, limit: 1000 }, s), [iso3, concept]);
   const state = mode === 'belief' ? beliefs : series;
-  const rows = useMemo(() => {
-    const base = mode === 'belief' ? (beliefs.data ? beliefRows(beliefs.data.data) : []) : series.data ? evidenceRows(series.data.data.points) : [];
-    const flagsById = new Map<string, string[]>();
-    for (const o of observations.data?.data ?? []) flagsById.set(o.id, sourceFlagNotes(o.source_flags, { concept }));
-    return base.map((r) => (r.observationId && flagsById.get(r.observationId)?.length ? { ...r, flags: flagsById.get(r.observationId)! } : r));
-  }, [mode, beliefs.data, series.data, observations.data]);
+  // Provider source flags now travel on the estimate / point itself (no extra /v1/observations call).
+  const rows = useMemo(
+    () =>
+      mode === 'belief'
+        ? beliefs.data
+          ? beliefRows(beliefs.data.data, beliefs.data.baseline_release?.id ?? null, concept, beliefs.data.origin ?? null)
+          : []
+        : series.data
+          ? evidenceRows(series.data.data.points, concept)
+          : [],
+    [mode, beliefs.data, series.data, concept],
+  );
   const sorted = useMemo(() => [...rows].sort((a, b) => (a.year ?? 0) - (b.year ?? 0)), [rows]);
-  // Origins of the records actually shown: the panel envelope and the observations behind the rows.
+  // Sequences of earlier releases that served stale rows ("served from release #N").
+  const servedIds = useMemo(() => [...new Set(rows.map((r) => r.servedFromReleaseId).filter((x): x is string => !!x))].sort(), [rows]);
+  const served = useApi(
+    async (s) => {
+      const out: Record<string, number | null> = {};
+      await Promise.all(
+        servedIds.map(async (id) => {
+          try {
+            out[id] = (await getBeliefRelease(id, s)).data.sequence ?? null;
+          } catch {
+            out[id] = null;
+          }
+        }),
+      );
+      return out;
+    },
+    [servedIds.join(',')],
+    servedIds.length > 0,
+  );
+  const columns = useMemo(() => rowColumns((id) => served.data?.[id]), [served.data]);
+  // Origins of the records actually shown: the panel envelope and the rows' own origins.
   const shownOrigins = useMemo(() => {
     const o: string[] = [];
     if (state.data?.origin && state.data.origin !== 'none') o.push(state.data.origin);
-    const shownObs = new Set(rows.map((r) => r.observationId).filter(Boolean));
-    for (const ob of observations.data?.data ?? []) if (shownObs.has(ob.id) && ob.origin) o.push(ob.origin);
+    for (const r of rows) if (r.origin && r.origin !== 'none') o.push(r.origin);
     return [...new Set(o)].sort();
-  }, [state.data, rows, observations.data]);
+  }, [state.data, rows]);
   const originKey = shownOrigins.join(',');
   useEffect(() => {
     onOrigins?.(concept, originKey ? originKey.split(',') : []);
@@ -197,7 +275,8 @@ function ConceptPanel({ iso3, concept, title, definition, onOrigins }: ConceptPa
           {latest && (
             <p className="headline">
               Latest ({latest.period}): <ValueView value={latest.value} compact showBasis />
-              {latest.flags.length > 0 && <span className="source-flag"> · {latest.flags.join('; ')}</span>}
+              {latest.flags.length > 0 && <span className="source-flag"> · {latest.flags.join('; ')}</span>}{' '}
+              <StaleNotes row={latest} releaseSeq={(id) => served.data?.[id]} />
             </p>
           )}
           {missingPeriods.length > 0 && (
@@ -205,7 +284,7 @@ function ConceptPanel({ iso3, concept, title, definition, onOrigins }: ConceptPa
           )}
           <TimeSeriesChart points={chartPoints} label={`${title} by year for ${iso3}; table follows`} yLabel={unitLabel(unit) || 'value'} />
           <UncertaintyLegend present={glyphs} />
-          <DataTable caption={`${title} — ${iso3} (${mode === 'belief' ? 'selected estimates' : 'latest source revisions'})`} columns={rowColumns} rows={sorted} rowKey={(r) => r.key} />
+          <DataTable caption={`${title} — ${iso3} (${mode === 'belief' ? 'selected estimates' : 'latest source revisions'})`} columns={columns} rows={sorted} rowKey={(r) => r.key} />
           <EnvelopeDetails meta={state.data} />
         </>
       )}

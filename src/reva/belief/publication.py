@@ -193,6 +193,13 @@ def publish_release(
         }
         if paused_concepts:
             manifest["publication_pauses"] = [_pause_record(pauses[c]) for c in paused_concepts]
+        # --- V2 dataset inputs (reva.simulation.datasets, owner ENG): pinned by digest ---
+        from reva.simulation.datasets import publication_hook
+
+        dataset_inputs, pin_datasets = publication_hook(conn, cutoff=cutoff, origin=origin)
+        if dataset_inputs:  # releases without datasets keep the V1 manifest unchanged
+            manifest["dataset_inputs"] = dataset_inputs
+        # --- end V2 dataset inputs ---
         manifest_sha = repo.store_json_artifact(conn, store, manifest, "belief", schema_version="belief-release/1")
         repo.record_activity(conn, act, inputs=[], outputs=[pq_obj.sha256, onto_sha, model_sha, manifest_sha])
         ctx = repo.create_context(conn, mode="belief", origin=origin.value, manifest_sha256=manifest_sha,
@@ -228,6 +235,7 @@ def publish_release(
                 text("INSERT INTO belief.input(estimate_id, observation_id) VALUES (:e, :o)"),
                 {"e": eid, "o": s.observation_id},
             )
+        pin_datasets(rid)  # V2 dataset inputs (owner ENG): sealed with the release, like estimates
         pin_release_relations(conn, rid, act.id)  # before the publication row seals the release
         seq = conn.execute(
             text("INSERT INTO ops.publication(release_id, activity_id) VALUES (:r, :a) RETURNING sequence"),

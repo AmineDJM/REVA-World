@@ -214,8 +214,14 @@ def eligible_datasets(conn: Connection, cutoff: datetime, origin: Any) -> list[d
     """Per (concept, subject): the latest dataset recorded at or before ``cutoff`` with
     the release's origin. Call inside the publication transaction (after the evidence
     snapshot lock), so the set is consistent with the release's evidence snapshot."""
+    if not dataset_schema_present(conn):
+        return []  # database not yet at migration 0008: no dataset inputs exist
     rows = conn.execute(text(ELIGIBLE_SQL), {"o": _origin(origin), "cut": cutoff}).mappings().all()
     return [dict(r) for r in rows]
+
+
+def dataset_schema_present(conn: Connection) -> bool:
+    return bool(conn.execute(text("SELECT to_regclass('evidence.dataset') IS NOT NULL")).scalar_one())
 
 
 def manifest_entries(datasets: Iterable[Mapping[str, Any]]) -> list[dict[str, Any]]:
