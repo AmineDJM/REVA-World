@@ -23,7 +23,8 @@
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
     "react-router": "^7.18.4",
-    "uplot": "^1.6.32"
+    "uplot": "^1.6.32",
+    "zod": "4.6.5"
   },
   "devDependencies": {
     "@playwright/test": "1.56.1",
