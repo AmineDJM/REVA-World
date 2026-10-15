@@ -1,0 +1,670 @@
+"""``social.retirement_age@1.0.0`` - pension eligibility-age changes, employment and pension recipients.
+
+Experimental (``review_status: maintainer_review_pending``). A *conditional projection
+under stated assumptions*, not a forecast. Pure: no database, network or clock; the
+platform resolves the dataset inputs pinned by the scenario's baseline release.
+
+What it computes (annual periods ``reference_year+1 .. reference_year+periods``, at most
+2040; ages 55-69 by recorded sex; Decimal, precision 50)
+------------------------------------------------------------------------------------
+* **Eligibility.** For each calendar year ``t``, completed age ``a`` and rule path ``P`` the
+  exact share ``I_P(a, t)`` of person-time below the path's eligibility age
+  (:mod:`reva.models.social.rules`: births uniform within month cohorts, exact age uniform
+  within the completed year; rows transcribed from archived legal text).
+* **Affected population.** ``A(a, s, t) = N(a, s, t) * (I_scn(a, t) - I_ref(a, t))`` with
+  ``N`` the population at completed age ``a`` during year ``t`` (mean of the 1 January
+  populations of ``t`` and ``t+1`` from the ``demography.cohort_component`` projection of
+  agent POP).
+* **Response (cited assumption grid).** Per grid point ``g`` (literature registry of agent
+  LIT, verified numbers only): pension recipients change ``-rho_g(s) * A`` and employment
+  change ``s_g(s) * rho_g(s) * A``, where ``rho`` is the study's drop in pension receipt
+  for a fully affected cell and ``s`` the share of that drop employed instead.
+* **Levels.** Employment rates of each five-year group are held at their base-year LFS
+  values (``lfsa_ergan``) and shifted by the response to eligibility relative to the
+  regime under which the base year was observed (``observed_path``):
+  ``e_P(a, s, t) = e_obs(g(a), s) + s_g rho_g (I_P(a, t) - I_obs(a, b))``. Employed persons
+  = ``sum N * e``. Pension recipients (level) = base-year ESSPROS old-age beneficiaries
+  scaled by the 65+ population (constant beneficiaries-per-65+ ratio, stated assumption)
+  plus the modelled change relative to the observed regime.
+* **Expenditure (approximate).** ``avg_pension * delta_recipients`` with ``avg_pension`` =
+  ESSPROS old-age pension expenditure (OLD + AOLD + PART) / old-age beneficiaries (OLD_TOT)
+  of the latest year where both exist, nominal euro of that year, no indexation: labelled
+  approximate.
+* **Old-age dependency ratio** (persons 65+ per 100 aged 15-64, 1 January) from the POP
+  projection; the eligibility age does not change it.
+
+Not modelled / not claimed: GDP, unemployment, wages, welfare, taxes, substitution into
+unemployment/disability benefits as outputs, behavioural responses at the full-rate age,
+exceptions to the general eligibility age (long careers, disability, hardship), any
+interaction with the pension amount. L2 is a sensitivity grid over the cited response
+assumptions (no probabilities).
+"""
+
+from __future__ import annotations
+
+from collections.abc import Mapping, Sequence
+from dataclasses import dataclass, field
+from datetime import date
+from decimal import ROUND_HALF_EVEN, Context, Decimal
+from fractions import Fraction
+from pathlib import Path
+from typing import Any
+
+from reva.kernel.errors import CapabilityGap, MissingInput, ValidationProblem
+from reva.kernel.ids import logical_hash
+from reva.kernel.uncertainty import UncertaintyKind, UncertaintySpec, UncertaintyStatus
+from reva.models.social import assumptions as lit
+from reva.models.social import rules as rl
+
+MODEL_KEY = "social.retirement_age"
+MODEL_VERSION = "1.0.0"
+REVIEW_STATUS = "maintainer_review_pending"
+LABEL = "conditional projection under stated assumptions, not a forecast"
+EXPERIMENTAL_LABEL = "experimental model, not yet reviewed"
+MAX_END_YEAR = 2040
+MIN_REFERENCE_YEAR = 2000
+AGES = tuple(range(55, 70))
+AGE_GROUPS: tuple[tuple[str, int, int], ...] = (("Y55-59", 55, 59), ("Y60-64", 60, 64), ("Y65-69", 65, 69))
+SEXES = ("F", "M")
+PRECISION = 50
+CTX = Context(prec=PRECISION, rounding=ROUND_HALF_EVEN)
+SENSITIVITY_VARIANT = "L2:sensitivity_range"
+SENSITIVITY_STATEMENT = "assumption sensitivity over cited literature values, not a confidence interval"
+SENSITIVITY_METHOD = "reva.models.social.retirement_age.l2_literature_grid_minmax@1.0.0"
+
+CONCEPTS = {
+    "employment_rate": "labour.employment_rate.lfs_age_sex",
+    "pension_beneficiaries": "social.pension_beneficiaries.esspros_old_age",
+    "pension_expenditure": "social.pension_expenditure.esspros",
+    "population": "demography.population.jan1_age_sex",
+    "deaths": "demography.deaths.age_sex",
+    "births": "demography.live_births.mother_age_newborn_sex",
+}
+
+OUTPUTS: dict[str, dict[str, str]] = {
+    "employed_persons_55_69": {"unit": "unit.persons", "kind": "level", "label":
+                               "Employed persons aged 55-69 under the scenario rule path"},
+    "employed_persons_55_69_reference": {"unit": "unit.persons", "kind": "level", "label":
+                                         "Employed persons aged 55-69 under the reference rule path"},
+    "employment_change_55_69": {"unit": "unit.persons", "kind": "change", "label":
+                                "Employed persons aged 55-69: scenario minus reference"},
+    "pension_recipients": {"unit": "unit.persons", "kind": "level", "label":
+                           "Old-age pension recipients under the scenario rule path (base-year ESSPROS level "
+                           "scaled with the 65+ population, plus the modelled change)"},
+    "pension_recipients_change": {"unit": "unit.persons", "kind": "change", "label":
+                                  "Old-age pension recipients: scenario minus reference"},
+    "pension_expenditure_change_approx_eur": {"unit": "unit.eur", "kind": "change", "label":
+                                              "Approximate pension expenditure change = average old-age pension "
+                                              "x change in recipients (nominal euro of the average's year, "
+                                              "not indexed)"},
+    "old_age_dependency_ratio": {"unit": "unit.ratio", "kind": "level", "label":
+                                 "Persons 65+ per 100 persons aged 15-64 on 1 January (POP projection)"},
+}
+for _sex in SEXES:
+    for _g, _lo, _hi in AGE_GROUPS:
+        OUTPUTS[f"employment_rate.{_sex}.{_g}"] = {
+            "unit": "unit.percent", "kind": "level",
+            "label": f"Employment rate (percent), recorded sex {_sex}, ages {_lo}-{_hi}, scenario rule path"}
+DEFAULT_OUTPUTS = ("employed_persons_55_69", "employment_change_55_69", "pension_recipients",
+                   "pension_recipients_change", "pension_expenditure_change_approx_eur", "old_age_dependency_ratio")
+
+NOT_CLAIMED = ("GDP or output effects", "unemployment, disability or other benefit substitution as outputs",
+               "wages, taxes, contributions or household welfare", "effects of full-rate / normal-age changes",
+               "exceptions to the general eligibility age (long careers, disability, hardship)",
+               "a forecast of what will happen")
+
+
+def D(x: Any) -> Decimal:
+    return x if isinstance(x, Decimal) else Decimal(str(x))
+
+
+def fr(x: Fraction) -> Decimal:
+    return CTX.divide(Decimal(x.numerator), Decimal(x.denominator))
+
+
+def dstr(d: Decimal) -> str:
+    s = format(d, "f")
+    if "." in s:
+        s = s.rstrip("0").rstrip(".")
+    return "0" if s in ("-0", "") else s
+
+
+def group_of(age: int) -> str:
+    for g, lo, hi in AGE_GROUPS:
+        if lo <= age <= hi:
+            return g
+    raise ValueError(age)
+
+
+# --------------------------------------------------------------------------- spec handling
+@dataclass(frozen=True)
+class Intervention:
+    kind: str
+    scenario: Any  # rl.AgePath
+    reference: rl.TablePath
+    observed: rl.AgePath
+
+    def as_json(self) -> dict[str, Any]:
+        return {"kind": self.kind, "scenario_path": self.scenario.describe(),
+                "reference_path": self.reference.describe(), "observed_regime_path": self.observed.describe()}
+
+
+def _lever(table: rl.RuleTable) -> tuple[str, str]:
+    lever = dict(table.model_lever)
+    if not lever:
+        raise CapabilityGap(f"{table.country}: the rule table declares no model lever", capability=MODEL_KEY,
+                            country=table.country)
+    return str(lever["age_kind"]), str(lever.get("track", "general"))
+
+
+def compile_intervention(iso3: str, intervention: Mapping[str, Any], assumptions: Mapping[str, Any]) -> Intervention:
+    table = rl.load_rule_table(iso3)
+    age_kind, track = _lever(table)
+    kind = intervention.get("kind")
+    ref_id = intervention.get("reference_path")
+    if not isinstance(ref_id, str):
+        raise ValidationProblem("intervention.reference_path is required")
+    reference = rl.TablePath(table, ref_id, age_kind, track)
+    if kind == "retirement_age_rule_path":
+        scn_id = intervention.get("scenario_path")
+        if not isinstance(scn_id, str):
+            raise ValidationProblem("intervention.scenario_path is required")
+        if scn_id == ref_id:
+            raise ValidationProblem("scenario_path and reference_path must differ")
+        scenario: Any = rl.TablePath(table, scn_id, age_kind, track)
+    elif kind == "retirement_age_shift":
+        scenario = rl.ShiftedPath(reference, int(intervention["shift_months"]), int(intervention["first_birth_year"]),
+                                  int(intervention.get("phase_in_months_per_cohort", 0)))
+    else:
+        raise CapabilityGap(f"intervention kind {kind!r} is unsupported", capability=f"intervention.{kind}",
+                            supported=["retirement_age_rule_path", "retirement_age_shift"])
+    obs_id = assumptions.get("observed_path", ref_id)
+    observed = rl.TablePath(table, str(obs_id), age_kind, track)
+    return Intervention(str(kind), scenario, reference, observed)
+
+
+def years_of(spec: Mapping[str, Any]) -> tuple[int, tuple[int, ...]]:
+    b = spec.get("reference_year")
+    h = spec.get("horizon") or {}
+    if not isinstance(b, int) or isinstance(b, bool):
+        raise ValidationProblem("reference_year (the base year of the employment rates) must be an integer")
+    if h.get("unit") != "calendar_year" or not isinstance(h.get("periods"), int):
+        raise ValidationProblem("horizon must be {periods: n, unit: calendar_year}")
+    n = int(h["periods"])
+    if not MIN_REFERENCE_YEAR <= b < MAX_END_YEAR:
+        raise ValidationProblem(f"reference_year must be in [{MIN_REFERENCE_YEAR}, {MAX_END_YEAR - 1}]")
+    if n < 1 or b + n > MAX_END_YEAR:
+        raise ValidationProblem(f"horizon must end by {MAX_END_YEAR}: reference_year + periods <= {MAX_END_YEAR}")
+    return b, tuple(range(b + 1, b + n + 1))
+
+
+def grid_for(iso3: str, assumptions: Mapping[str, Any], fidelity: str) -> tuple[lit.GridPoint, tuple[lit.GridPoint,
+                                                                                                     ...]]:
+    grid = lit.load_grid()
+    resp = dict(assumptions.get("employment_response") or {})
+    central_id = resp.get("central")
+    if central_id is None:
+        central = grid.default_central(iso3)
+        if central is None:
+            raise ValidationProblem(
+                f"{iso3}: no single verified own-country estimate; assumptions.employment_response.central must "
+                "name a literature grid point", available=[p.point_id for p in grid.literature()])
+    else:
+        central = grid.point(str(central_id))
+    points = lit.select_points(grid, resp.get("grid"))
+    if fidelity == "L2":
+        pts = [central, *[p for p in points if p.point_id != central.point_id]]
+        pts.append(lit.no_response_point(central))
+        return central, tuple(pts)
+    return central, (central,)
+
+
+def validate_spec(spec: Mapping[str, Any]) -> None:
+    countries = spec.get("countries") or []
+    if not countries:
+        raise ValidationProblem("countries must list at least one ISO3 code")
+    b, years = years_of(spec)
+    outputs = spec.get("outputs") or list(DEFAULT_OUTPUTS)
+    unknown = [o for o in outputs if o not in OUTPUTS]
+    if unknown:
+        raise CapabilityGap(f"outputs {unknown} are not computed by {MODEL_KEY}", capability="outputs",
+                            supported=sorted(OUTPUTS))
+    fidelity = spec.get("fidelity", "L1")
+    for iso3 in countries:
+        iv = compile_intervention(iso3, spec.get("intervention") or {}, spec.get("assumptions") or {})
+        grid_for(iso3, spec.get("assumptions") or {}, fidelity if fidelity in ("L1", "L2") else "L1")
+        gaps = []
+        for p in (iv.scenario, iv.reference):
+            gaps += rl.coverage_problems(p, years, AGES)
+        gaps += rl.coverage_problems(iv.observed, (b,), AGES)
+        if gaps:
+            raise rl.RuleCoverageGap(
+                f"{iso3}: the rule paths do not cover every (year, age) cell of the request "
+                f"({len(gaps)} cells, e.g. {gaps[0]})", capability="social.retirement_age", country=iso3,
+                cells=gaps[:20])
+
+
+# --------------------------------------------------------------------------- inputs
+@dataclass
+class CountryData:
+    """Base-year data of one country (all values exact decimals)."""
+
+    iso3: str
+    base_year: int
+    employment_rate: dict[tuple[str, str], Decimal]  # (sex, group) -> percent
+    employment_flags: dict[tuple[str, str], str]
+    beneficiaries: Decimal | None = None
+    beneficiaries_year: int | None = None
+    avg_pension_eur: Decimal | None = None
+    avg_pension_year: int | None = None
+    avg_pension_basis: dict[str, Any] = field(default_factory=dict)
+    population: dict[int, dict[str, tuple[Decimal, ...]]] = field(default_factory=dict)  # Jan 1
+    dependency: dict[int, Decimal] = field(default_factory=dict)
+    population_summary: dict[str, Any] = field(default_factory=dict)
+    provenance: dict[str, Any] = field(default_factory=dict)
+
+
+def _rows(table: Any) -> list[dict[str, Any]]:
+    if table is None:
+        return []
+    if hasattr(table, "to_pylist"):
+        return list(table.to_pylist())
+    return [dict(r) for r in table]
+
+
+def employment_rates(rows: Sequence[Mapping[str, Any]], year: int) -> tuple[dict[tuple[str, str], Decimal],
+                                                                            dict[tuple[str, str], str],
+                                                                            list[dict[str, Any]]]:
+    rates: dict[tuple[str, str], Decimal] = {}
+    flags: dict[tuple[str, str], str] = {}
+    missing: list[dict[str, Any]] = []
+    have = {(r["dim1"], r["dim2"]): r for r in rows if r.get("year") == year and r.get("dim1_name") == "sex"}
+    for s in SEXES:
+        for g, _lo, _hi in AGE_GROUPS:
+            r = have.get((s, g))
+            if r is None or r.get("value") is None:
+                missing.append({"input": "employment_rate", "sex": s, "age_group": g, "year": year,
+                                "reason": (r or {}).get("missing_reason") or "unavailable"})
+                continue
+            rates[(s, g)] = D(r["value"])
+            flags[(s, g)] = str(r.get("status") or "")
+    return rates, flags, missing
+
+
+def latest_pension_basis(ben_rows: Sequence[Mapping[str, Any]], exp_rows: Sequence[Mapping[str, Any]],
+                         max_year: int) -> dict[str, Any]:
+    """Latest year <= max_year with old-age beneficiaries (T) and OLD, AOLD and PART expenditure all present."""
+    ben = {r["year"]: r for r in ben_rows if r.get("dim1") == "T" and r.get("value") is not None}
+    exp: dict[int, dict[str, Mapping[str, Any]]] = {}
+    for r in exp_rows:
+        if r.get("dim1") in ("OLD", "AOLD", "PART") and r.get("value") is not None:
+            exp.setdefault(r["year"], {})[r["dim1"]] = r
+    for y in sorted(ben, reverse=True):
+        if y > max_year:
+            continue
+        e = exp.get(y, {})
+        if set(e) == {"OLD", "AOLD", "PART"}:
+            total = sum((D(e[k]["value"]) * D(e[k]["scale_factor"]) for k in ("OLD", "AOLD", "PART")), Decimal(0))
+            persons = D(ben[y]["value"]) * D(ben[y]["scale_factor"])
+            return {"year": y, "beneficiaries": persons, "expenditure_eur": total,
+                    "avg_pension_eur": CTX.divide(total, persons),
+                    "flags": {"beneficiaries": ben[y].get("status"), **{k: e[k].get("status") for k in e}}}
+    return {}
+
+
+def population_inputs(iso3: str, base_year: int, end_year: int, tables: Mapping[str, Any],
+                      assumptions: Mapping[str, Any]) -> tuple[dict[int, dict[str, tuple[Decimal, ...]]],
+                                                               dict[int, Decimal], dict[str, Any]]:
+    """Jan-1 populations base_year+1 .. end_year+1 and dependency ratios via POP's ``project``."""
+    from reva.models.population import cohort
+
+    pa = dict(assumptions.get("population") or {})
+    n_base = int(pa.get("base_period_years", 5))
+    if not 1 <= n_base <= 10:
+        raise ValidationProblem("assumptions.population.base_period_years must be in [1, 10]")
+    jump = base_year + 1
+    data = cohort.CountryDemography.from_tables(iso3, population=tables["population"], deaths=tables["deaths"],
+                                                births=tables["births"])
+    ass = cohort.Assumptions(migration=str(pa.get("migration", "average_residual")),
+                             fertility=str(pa.get("fertility", "constant_base_period_rates")),
+                             base_period=(jump - n_base, jump - 1))
+    proj = cohort.project(data, jump_off=jump, end_year=end_year + 1, assumptions=ass)
+    values = cohort.output_values(proj)
+    dep = {y: values[("old_age_dependency_ratio_65plus_per_15_64", y)] for y in sorted(proj.population)}
+    return dict(proj.population), dep, proj.summary()
+
+
+# --------------------------------------------------------------------------- compiled plan
+@dataclass
+class CountryPlan:
+    iso3: str
+    subject_id: Any
+    intervention: Intervention | None
+    central: lit.GridPoint | None
+    points: tuple[lit.GridPoint, ...]
+    data: CountryData | None
+    status: str = "ready"
+    problems: list[dict[str, Any]] = field(default_factory=list)
+    shares: dict[str, dict[tuple[int, int], Fraction]] = field(default_factory=dict)  # path -> (year, age) -> I
+
+
+@dataclass
+class Compiled:
+    spec: dict[str, Any]
+    base_year: int
+    years: tuple[int, ...]
+    outputs: tuple[str, ...]
+    countries: list[CountryPlan]
+    policy: str
+    release: Mapping[str, Any] = field(default_factory=dict)
+
+    @property
+    def missing(self) -> list[dict[str, Any]]:
+        probs = [p for c in self.countries for p in c.problems if p.get("code") == "missing_input"]
+        if self.policy == "skip_missing_countries" and any(c.status == "ready" for c in self.countries):
+            return []
+        return probs
+
+    @property
+    def incompatible(self) -> list[dict[str, Any]]:
+        return [p for c in self.countries for p in c.problems if p.get("code") != "missing_input"]
+
+    @property
+    def skipped(self) -> list[str]:
+        return [c.iso3 for c in self.countries if c.status != "ready"]
+
+
+def eligibility_shares(iv: Intervention, base_year: int, years: Sequence[int]) -> dict[str, dict[tuple[int, int],
+                                                                                             Fraction]]:
+    out: dict[str, dict[tuple[int, int], Fraction]] = {"scenario": {}, "reference": {}, "observed": {}}
+    for y in years:
+        for a in AGES:
+            out["scenario"][(y, a)] = rl.ineligible_share_single_age(iv.scenario, y, a)
+            out["reference"][(y, a)] = rl.ineligible_share_single_age(iv.reference, y, a)
+    for a in AGES:
+        out["observed"][(base_year, a)] = rl.ineligible_share_single_age(iv.observed, base_year, a)
+    return out
+
+
+def build_country_plan(iso3: str, subject_id: Any, spec: Mapping[str, Any], tables: Mapping[str, Any]) -> CountryPlan:
+    """Pure: ``tables`` maps input names to Arrow tables (or None when the release pins nothing)."""
+    b, years = years_of(spec)
+    fidelity = str(spec.get("fidelity", "L1"))
+    assumptions = dict(spec.get("assumptions") or {})
+    iv = compile_intervention(iso3, spec.get("intervention") or {}, assumptions)
+    central, points = grid_for(iso3, assumptions, fidelity)
+    plan = CountryPlan(iso3, subject_id, iv, central, points, None)
+    missing: list[dict[str, Any]] = []
+    for name in ("employment_rate", "pension_beneficiaries", "pension_expenditure", "population", "deaths",
+                 "births"):
+        if tables.get(name) is None:
+            missing.append({"code": "missing_input", "country": iso3, "input": name, "concept": CONCEPTS[name],
+                            "kind": "dataset", "reason": "unavailable"})
+    if missing:
+        plan.status, plan.problems = "missing_input", missing
+        return plan
+    rates, flags, miss = employment_rates(_rows(tables["employment_rate"]), b)
+    for m in miss:
+        plan.problems.append({"code": "missing_input", "country": iso3, "concept": CONCEPTS["employment_rate"],
+                              "reference_year": b, **m})
+    basis = latest_pension_basis(_rows(tables["pension_beneficiaries"]), _rows(tables["pension_expenditure"]), b)
+    if not basis:
+        plan.problems.append({"code": "missing_input", "country": iso3, "input": "pension_beneficiaries",
+                              "concept": CONCEPTS["pension_beneficiaries"], "reference_year": b,
+                              "reason": "no year <= reference_year with old-age beneficiaries and OLD/AOLD/PART "
+                                        "expenditure all present"})
+    try:
+        pop, dep, summary = population_inputs(iso3, b, years[-1], tables, assumptions)
+    except MissingInput as e:
+        for m in e.details.get("missing", []) or [{"detail": e.message}]:
+            plan.problems.append({"code": "missing_input", "country": iso3, "input": "population_projection",
+                                  "concept": CONCEPTS["population"], **m})
+        pop, dep, summary = {}, {}, {}
+    if plan.problems:
+        plan.status = "missing_input"
+        return plan
+    plan.data = CountryData(
+        iso3=iso3, base_year=b, employment_rate=rates, employment_flags=flags,
+        beneficiaries=basis["beneficiaries"], beneficiaries_year=basis["year"],
+        avg_pension_eur=basis["avg_pension_eur"], avg_pension_year=basis["year"],
+        avg_pension_basis={"year": basis["year"], "expenditure_eur": dstr(basis["expenditure_eur"]),
+                           "beneficiaries": dstr(basis["beneficiaries"]), "flags": basis["flags"],
+                           "definition": "ESSPROS spr_exp_pens (OLD + AOLD + PART, MIO_EUR) / spr_pns_ben (OLD_TOT, "
+                                         "T, persons); nominal euro of that year"},
+        population=pop, dependency=dep, population_summary=summary)
+    plan.shares = eligibility_shares(iv, b, years)
+    return plan
+
+
+# --------------------------------------------------------------------------- computation
+def n_mid(pop: Mapping[int, Mapping[str, Sequence[Decimal]]], t: int, s: str, a: int) -> Decimal:
+    return CTX.divide(CTX.add(pop[t][s][a], pop[t + 1][s][a]), Decimal(2))
+
+
+@dataclass(frozen=True)
+class YearValues:
+    year: int
+    values: dict[str, Decimal]
+
+
+def compute_point(plan: CountryPlan, point: lit.GridPoint, years: Sequence[int]) -> tuple[dict[str, dict[int, Decimal]],
+                                                                                           list[dict[str, Any]]]:
+    """All outputs for one grid point. Returns (output -> year -> value, level problems)."""
+    d = plan.data
+    assert d is not None
+    sh = plan.shares
+    b = d.base_year
+    out: dict[str, dict[int, Decimal]] = {k: {} for k in OUTPUTS}
+    problems: list[dict[str, Any]] = []
+    p65_base = None
+    if d.beneficiaries_year in d.population:
+        p65_base = sum((v for s in SEXES for v in d.population[d.beneficiaries_year][s][65:]), Decimal(0))
+    for t in years:
+        emp_s = emp_r = d_rec_scn_obs = Decimal(0)
+        d_emp = d_rec = Decimal(0)
+        grp_num: dict[tuple[str, str], Decimal] = {}
+        grp_den: dict[tuple[str, str], Decimal] = {}
+        for s in SEXES:
+            k = point.employment_effect(s)
+            rho = point.pension_drop[s]
+            for a in AGES:
+                n = n_mid(d.population, t, s, a)
+                g = group_of(a)
+                base = CTX.divide(d.employment_rate[(s, g)], Decimal(100))
+                i_obs = fr(sh["observed"][(b, a)])
+                i_s, i_r = fr(sh["scenario"][(t, a)]), fr(sh["reference"][(t, a)])
+                e_s = base + k * (i_s - i_obs)
+                e_r = base + k * (i_r - i_obs)
+                for label, e in (("scenario", e_s), ("reference", e_r)):
+                    if not Decimal(0) <= e <= Decimal(1):
+                        problems.append({"code": "employment_rate_out_of_bounds", "country": d.iso3, "year": t,
+                                         "age": a, "sex": s, "path": label, "rate": dstr(e),
+                                         "grid_point": point.point_id})
+                emp_s += n * e_s
+                emp_r += n * e_r
+                d_emp += k * n * (i_s - i_r)
+                d_rec -= rho * n * (i_s - i_r)
+                d_rec_scn_obs -= rho * n * (i_s - i_obs)
+                grp_num[(s, g)] = grp_num.get((s, g), Decimal(0)) + n * e_s
+                grp_den[(s, g)] = grp_den.get((s, g), Decimal(0)) + n
+        out["employed_persons_55_69"][t] = emp_s
+        out["employed_persons_55_69_reference"][t] = emp_r
+        out["employment_change_55_69"][t] = d_emp
+        out["pension_recipients_change"][t] = d_rec
+        out["pension_expenditure_change_approx_eur"][t] = CTX.multiply(d.avg_pension_eur or Decimal(0), d_rec)
+        if p65_base is not None and d.beneficiaries is not None:
+            p65_t = sum((n_mid(d.population, t, s, a) for s in SEXES for a in range(65, len(d.population[t][s]))),
+                        Decimal(0))
+            out["pension_recipients"][t] = CTX.multiply(d.beneficiaries, CTX.divide(p65_t, p65_base)) + d_rec_scn_obs
+        out["old_age_dependency_ratio"][t] = d.dependency[t]
+        for (s, g), num in grp_num.items():
+            out[f"employment_rate.{s}.{g}"][t] = CTX.multiply(Decimal(100), CTX.divide(num, grp_den[(s, g)]))
+    if p65_base is None:
+        problems.append({"code": "pension_level_not_computable", "country": d.iso3,
+                         "detail": f"no population on 1 January {d.beneficiaries_year} in the projection inputs"})
+    return out, problems
+
+
+# --------------------------------------------------------------------------- result rows
+QUANTA = {"unit.persons": Decimal("0.001"), "unit.eur": Decimal("0.01"), "unit.ratio": Decimal("0.000001"),
+          "unit.percent": Decimal("0.000001")}
+
+
+def present(d: Decimal, unit: str) -> str:
+    return dstr(CTX.quantize(d, QUANTA[unit]))
+
+
+def value_dict(output: str, d: Decimal, plan: CountryPlan) -> dict[str, Any]:
+    unit = OUTPUTS[output]["unit"]
+    basis: dict[str, Any] = {"scale_factor": "1", "notes": OUTPUTS[output]["label"]}
+    if unit == "unit.eur":
+        assert plan.data is not None
+        basis.update(currency="EUR", price_basis="nominal", price_reference_year=plan.data.avg_pension_year,
+                     notes=OUTPUTS[output]["label"] + " (approximate)")
+    return {"kind": "decimal", "value": present(d, unit), "unit_ref": unit, "basis": basis}
+
+
+def unknown_uncertainty() -> dict[str, Any]:
+    return UncertaintySpec.unknown(
+        "Unquantified: LFS/ESSPROS inputs carry no published uncertainty, the population is a conditional projection "
+        "and the response is a cited assumption; the value is conditional on the stated assumptions").model_dump(
+        mode="json")
+
+
+def range_uncertainty(lo: Decimal, hi: Decimal, unit: str, points: Sequence[lit.GridPoint]) -> dict[str, Any]:
+    return UncertaintySpec(
+        status=UncertaintyStatus.quantified,
+        kind=UncertaintyKind.sensitivity_range,
+        description=(f"Literature sensitivity range ({SENSITIVITY_STATEMENT}): min/max of this output over the "
+                     "cited employment-response grid (and the no-response reference point). No coverage level."),
+        method_version=SENSITIVITY_METHOD,
+        lower=present(lo, unit),
+        upper=present(hi, unit),
+        conditioning=tuple(f"grid_point={p.point_id}" for p in points),
+    ).model_dump(mode="json")
+
+
+def applicability(plan: CountryPlan, compiled: Compiled, point: lit.GridPoint, variant: str,
+                  output: str) -> dict[str, Any]:
+    assert plan.intervention is not None and plan.data is not None
+    caveats = [str(dict(plan.intervention.reference.table.model_lever).get("rationale", ""))]
+    lever_status = "qualified" if plan.iso3 != "FRA" else "applicable"
+    if point.country and point.country != plan.iso3:
+        caveats.append(f"response estimate transferred from {point.country} ({point.point_id})")
+    if point.sex_transfer:
+        caveats.append(point.sex_transfer)
+    return {
+        "status": lever_status,
+        "modality": "assumption_conditioned_scenario",
+        "label": LABEL,
+        "model": f"{MODEL_KEY}@{MODEL_VERSION}",
+        "model_label": EXPERIMENTAL_LABEL,
+        "review_status": REVIEW_STATUS,
+        "country": plan.iso3,
+        "variant": variant,
+        "output": output,
+        "output_label": OUTPUTS[output]["label"],
+        "grid_point": point.as_dict(),
+        "base_year": plan.data.base_year,
+        "caveats": [c for c in caveats if c],
+        "not_claimed": list(NOT_CLAIMED),
+    }
+
+
+def rows_for_country(plan: CountryPlan, compiled: Compiled, fidelity: str, row_cls: Any) -> list[Any]:
+    rows: list[Any] = []
+    pts = plan.points if fidelity == "L2" else (plan.central,)
+    results: dict[str, dict[str, dict[int, Decimal]]] = {}
+    for p in pts:
+        assert p is not None
+        vals, problems = compute_point(plan, p, compiled.years)
+        bad = [x for x in problems if x["code"] == "employment_rate_out_of_bounds"]
+        if bad:
+            raise ValidationProblem(f"{plan.iso3}: an employment rate leaves [0, 100] under grid point "
+                                    f"{p.point_id}; the response assumption is incompatible with the base data",
+                                    problems=bad[:10])
+        results[p.point_id] = vals
+    for output in compiled.outputs:
+        for t in compiled.years:
+            period = (date(t, 1, 1), date(t + 1, 1, 1)) if output != "old_age_dependency_ratio" else \
+                (date(t, 1, 1), date(t, 1, 2))
+            series = [(p, results[p.point_id][output].get(t)) for p in pts]
+            if any(v is None for _p, v in series):
+                continue
+            for p, v in series:
+                assert v is not None
+                variant = "L1" if fidelity == "L1" else f"L2:{p.point_id}"
+                rows.append(row_cls(output_key=output, iso3=plan.iso3, subject_id=plan.subject_id, variant=variant,
+                                    value=value_dict(output, v, plan), uncertainty=unknown_uncertainty(),
+                                    applicability=applicability(plan, compiled, p, variant, output), period=period))
+            if fidelity == "L2":
+                vs = [v for _p, v in series if v is not None]
+                lo, hi = min(vs), max(vs)
+                unit = OUTPUTS[output]["unit"]
+                base = value_dict(output, lo, plan)
+                rows.append(row_cls(
+                    output_key=output, iso3=plan.iso3, subject_id=plan.subject_id, variant=SENSITIVITY_VARIANT,
+                    value={"kind": "sensitivity_range", "lower": present(lo, unit), "upper": present(hi, unit),
+                           "unit_ref": unit, "basis": base["basis"], "evaluated_points": len(vs),
+                           "statement": SENSITIVITY_STATEMENT},
+                    uncertainty=range_uncertainty(lo, hi, unit, pts),
+                    applicability={**applicability(plan, compiled, plan.central, SENSITIVITY_VARIANT, output),
+                                   "grid_points": [p.point_id for p in pts]},
+                    period=period))
+    return rows
+
+
+def explain(fidelity: str | None = None) -> dict[str, Any]:
+    return {
+        "model": f"{MODEL_KEY}@{MODEL_VERSION}",
+        "label": LABEL,
+        "model_label": EXPERIMENTAL_LABEL,
+        "review_status": REVIEW_STATUS,
+        "fidelity": fidelity,
+        "method": ("legal eligibility age by cohort/claim year (rule tables) -> share of person-time below it per "
+                   "age and year -> cited response: pension receipt drop rho and employment share s; population from "
+                   "the cohort-component projection; base-year LFS employment rates held constant"),
+        "fidelities": {"L1": "central cited grid point (own-country estimate or the one named in the spec)",
+                       "L2": "every verified literature grid point plus a no-response reference; separate "
+                             "sensitivity_range rows (min/max), not a confidence interval"},
+        "outputs": {k: v["label"] for k, v in OUTPUTS.items()},
+        "not_claimed": list(NOT_CLAIMED),
+        "numeric": f"decimal.Decimal precision {PRECISION}, ROUND_HALF_EVEN; eligibility shares exact fractions; "
+                   "values rounded only for presentation",
+    }
+
+
+def implementation_files() -> tuple[Path, ...]:
+    here = Path(__file__)
+    return (here, here.with_name("rules.py"), here.with_name("assumptions.py"))
+
+
+def data_files() -> tuple[Path, ...]:
+    files = sorted(rl.RULE_DIR.glob("*.yaml")) + [lit.ASSUMPTIONS_FILE]
+    return tuple(f for f in files if f.exists())
+
+
+def manifest_dict() -> dict[str, Any]:
+    from reva.simulation.plugins import source_digest
+
+    return {
+        "implementation": "reva.models.social.retirement_age",
+        "implementation_digest": source_digest(*implementation_files(), *data_files()),
+        "review_status": REVIEW_STATUS,
+        "label": EXPERIMENTAL_LABEL,
+        "decimal_precision": PRECISION,
+        "rule_tables": {c: rl.load_rule_table(c).digest() for c in rl.available_countries()},
+        "assumption_registry_digest": lit.load_grid().source_digest,
+        "assumptions": [
+            "base-year LFS employment rates by sex and five-year group held constant",
+            "employment and pension-receipt responses are cited literature values (stated assumptions)",
+            "population from the cohort-component conditional projection (agent POP)",
+            "pension recipients level scales with the 65+ population (constant ratio)",
+            "average pension constant in nominal euro of its year (no indexation)",
+        ],
+        "max_end_year": MAX_END_YEAR,
+    }
+
+
+def digest_of(obj: Any) -> str:
+    return logical_hash(obj)

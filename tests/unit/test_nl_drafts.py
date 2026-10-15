@@ -221,14 +221,34 @@ def test_role_override_and_prompt_leak_attempt_drafts_nothing() -> None:
     assert "SECURITY RULES" not in json.dumps(r.as_json())  # nothing of the system prompt leaks
 
 
-def test_multi_year_ask_is_a_gap_and_the_year_default_is_flagged() -> None:
+def test_multi_year_ask_is_a_gap_and_an_unstated_year_is_asked_for() -> None:
     r = draft(TEXTS["openai_en_multiyear"])
     assert "horizon.multi_period" in {u["capability_key"] for u in r.unsupported}
-    spec = r.draft_spec
-    assert r.status == "draft_ready" and spec["horizon"] == {"periods": 1, "unit": "annual_accounting_period"}
-    year = next(n for n in r.numbers_to_confirm if n["path"] == "reference_year")
-    assert year["provenance"] == "server_default" and year["value"] == 2024
-    assert any(a["source"] == "server" and "reference_year" in a["text"] for a in r.assumptions_added)
+    assert r.status == "needs_input" and r.missing_fields == ["reference_year"]  # never defaulted
+    assert r.candidate_spec["horizon"] == {"periods": 1, "unit": "annual_accounting_period"}
+    assert "reference year (not stated)" in r.restatement and "Missing information: reference_year" in r.restatement
+
+
+def test_newly_registered_io_model_is_drafted_and_labelled_experimental() -> None:
+    if "economic.io_price" not in current_catalog().models:
+        pytest.skip("economic.io_price is not registered in this build")
+    r = draft(TEXTS["openai_en_io_energy_shock"])
+    assert r.status == "draft_ready", (r.validation, r.missing_fields)
+    assert r.draft_spec["model_key"] == "economic.io_price"
+    assert r.draft_spec["intervention"]["shocks"] == [{"origin": "NOR", "industry": "B", "price_change_percent": 30}]
+    assert any(w.startswith("experimental_model: economic.io_price") for w in r.warnings)
+    # "consumer prices": the first-round cost-push output is drafted, inflation itself stays a typed gap
+    assert "outputs.macroeconomic" in {u["capability_key"] for u in r.unsupported}
+
+
+def test_population_projection_asks_for_unstated_assumptions() -> None:
+    if "demography.cohort_component" not in current_catalog().models:
+        pytest.skip("demography.cohort_component is not registered in this build")
+    r = draft(TEXTS["openai_fr_population"])
+    assert r.status == "needs_input" and r.language == "fr" and r.draft_spec is None
+    assert "reference_year" in r.missing_fields and "assumptions.migration" in r.missing_fields
+    assert r.candidate_spec["horizon"]["periods"] == 15
+    assert r.restatement.startswith("Brouillon incomplet")
 
 
 # --------------------------------------------------------------------------- providers, fallback, budget

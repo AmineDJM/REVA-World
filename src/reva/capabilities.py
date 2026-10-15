@@ -576,22 +576,40 @@ _BASE: tuple[Capability, ...] = (
     Capability(
         "scenario.all_countries",
         "Crude border-price scenario for every country with data",
-        "reserved",
+        "implemented",
         "V2",
         "reva.simulation.crude_plugin",
         ("M49/ISO3 crosswalk from archived provider lists; aggregates and composite reporters never mapped "
          "silently", "per-country typed gaps"),
-        reason="V2 step 1: the crude scenario is limited to FRA, DZA, CHN and USA in this build",
-        available_instead=("fidelity.L1", "fidelity.L2"),
+        tests=("tests/unit/test_country_crosswalk.py::test_composite_and_special_codes_are_flagged_and_never_mapped",
+               "tests/unit/test_country_crosswalk.py::test_committed_crosswalk_is_a_rebuild_of_the_archived_provider_lists",
+               "tests/unit/test_comtrade_worldbank_all_connectors.py::"
+               "test_rotation_covers_the_sweep_within_the_daily_budget",
+               "tests/integration/test_comtrade_worldbank_all_countries.py::"
+               "test_all_country_fixture_ingest_keeps_gaps_typed",
+               "tests/integration/test_scenario_all_countries.py::"
+               "test_all_countries_with_skip_policy_runs_complete_countries_and_lists_the_rest",
+               "tests/integration/test_scenario_all_countries.py::"
+               "test_all_countries_with_fail_policy_refuses_listing_every_missing_input"),
+        docs=("docs/dev/v2_allc.md",),
+        notes="Engine/job path. POST /v1/simulations still pre-checks inputs as policy 'fail' and refuses "
+              "countries [\"ALL\"] with a typed missing_input until the API preflight change requested in "
+              "docs/dev/v2_allc.md lands. Crosswalk aliases are provider_declared (pending maintainer review).",
     ),
     Capability(
         "scenario.skip_missing_countries",
         "Explicit missing-input policy that runs complete countries and reports skipped ones",
-        "reserved",
+        "implemented",
         "V2",
         "reva.simulation.crude_plugin",
         ("skipped countries listed with typed missing inputs", "never zero-filled"),
-        reason="V2 step 1: only missing_input_policy=fail is implemented",
+        tests=("tests/integration/test_scenario_all_countries.py::"
+               "test_explicit_list_with_skip_policy_and_all_missing_is_refused",
+               "tests/integration/test_scenario_all_countries.py::"
+               "test_skip_policy_gives_the_same_numbers_as_fail_for_complete_countries",
+               "tests/integration/test_scenario_all_countries.py::test_v1_specs_keep_the_v1_contract"),
+        docs=("docs/dev/v2_allc.md",),
+        notes="Engine/job path; the API preflight change is requested in docs/dev/v2_allc.md.",
     ),
     # ------------------------------------------------------------------ later
     Capability(

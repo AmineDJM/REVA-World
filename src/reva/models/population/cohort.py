@@ -780,11 +780,13 @@ def project(data: CountryDemography, *, jump_off: int, end_year: int, assumption
             if lhs != rhs:
                 raise AssertionError(f"conservation violated {data.iso3} {t} {s}: {lhs} != {rhs}")
             for x, v in enumerate(nxt[s]):
-                if v < 0:
+                if v < 0:  # kept (clipping would break the balancing equation) and flagged
+                    origin = [x - 1] if 0 < x < omega else ([omega - 1, omega] if x == omega else [])
+                    inherited = any(p[s][o] < 0 for o in origin) or (x == 0 and births[s] < 0)
+                    cause = ("negative net migration larger than the surviving cohort" if mig[s][x] < 0 else
+                             "inherited from a negative cohort" if inherited else "unexplained")
                     flags.append({"code": "negative_cohort", "year": t + 1, "sex": s, "age": x,
-                                  "persons": dstr(v), "net_migration": dstr(mig[s][x]),
-                                  "cause": "negative net migration larger than the surviving cohort"
-                                  if mig[s][x] < 0 else "unexplained"})
+                                  "persons": dstr(v), "net_migration": dstr(mig[s][x]), "cause": cause})
         pop[t + 1] = {s: tuple(nxt[s]) for s in SEXES}
         flows[t] = StepFlows(t, births, deaths, netmig, {s: tuple(mig[s]) for s in SEXES})
     return Projection(data.iso3, jump_off, end_year, omega, assumptions, pop, flows, rates, tuple(flags))

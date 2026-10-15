@@ -632,22 +632,24 @@ def restate(r: DraftResult, model: DraftableModel) -> str:
     if lang == "fr":
         head = {"draft_ready": "Brouillon valide (non exécuté)", "needs_input": "Brouillon incomplet",
                 "draft_invalid": "Brouillon non valide"}[r.status]
+        year = spec.get("reference_year") or "(non précisée)"
         text = (f"{head} : modèle {model.model_key}, pays {countries}, année de référence "
-                f"{spec.get('reference_year')}, fidélité {spec.get('fidelity')}"
+                f"{year}, fidélité {spec.get('fidelity')}"
                 + (f" ; paramètres : {nums}" if nums else "") + f" ; sorties : {outputs}.")
         if r.missing_fields:
             text += f" Informations manquantes : {', '.join(r.missing_fields)}."
-        if r.validation.get("errors"):
+        if r.validation.get("errors") and r.status == "draft_invalid":
             text += " Refusé par le validateur : " + "; ".join(e["message"] for e in r.validation["errors"][:5]) + "."
         text += _gaps_text(lang, r.unsupported)
         return text + " Vérifiez chaque valeur ; rien ne s'exécute sans votre confirmation."
     head = {"draft_ready": "Valid draft (not run)", "needs_input": "Incomplete draft",
             "draft_invalid": "Invalid draft"}[r.status]
-    text = (f"{head}: model {model.model_key}, countries {countries}, reference year {spec.get('reference_year')}, "
+    year = spec.get("reference_year") or "(not stated)"
+    text = (f"{head}: model {model.model_key}, countries {countries}, reference year {year}, "
             f"fidelity {spec.get('fidelity')}" + (f"; parameters: {nums}" if nums else "") + f"; outputs: {outputs}.")
     if r.missing_fields:
         text += f" Missing information: {', '.join(r.missing_fields)}."
-    if r.validation.get("errors"):
+    if r.validation.get("errors") and r.status == "draft_invalid":
         text += " Rejected by the validator: " + "; ".join(e["message"] for e in r.validation["errors"][:5]) + "."
     text += _gaps_text(lang, r.unsupported)
     return text + " Check every value; nothing runs without your confirmation."
