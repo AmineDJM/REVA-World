@@ -83,12 +83,12 @@ def _with_llm_ledger(stack_module):  # type: ignore[no-untyped-def]
 #: is registered: all-country WDI/Comtrade (ALLC), Eurostat demography (POP), FIGARO IO tables (IO) and
 #: labour/pensions (PEN). Their datasets are then pinned by the stack's test_fixture release.
 V2_FIXTURE_CONNECTORS = (
-    "worldbank.wdi.all_economies",
-    "un.comtrade.public_batch",
-    "eurostat.demography",
-    "eurostat.figaro.iciot_ii",
     "eurostat.labour_pensions",
 )
+# Not ingested with their default (full) plans: their recorded fixtures were captured for restricted
+# plans, so most requests have no captured response (worldbank.wdi.all_economies,
+# un.comtrade.public_batch, eurostat.demography, eurostat.figaro.iciot_ii). FIGARO is replaced by the
+# synthetic table below.
 
 
 def _with_v2_fixtures(stack_module):  # type: ignore[no-untyped-def]
@@ -99,6 +99,84 @@ def _with_v2_fixtures(stack_module):  # type: ignore[no-untyped-def]
     stack_module.FIXTURE_CONNECTORS = tuple(stack_module.FIXTURE_CONNECTORS) + extra
 
 
+def _load_synthetic_io():  # type: ignore[no-untyped-def]
+    spec = importlib.util.spec_from_file_location("io_synthetic", ROOT / "tests" / "fixtures" / "io_tables" / "synthetic.py")
+    assert spec and spec.loader
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+def _with_synthetic_io(stack_module):  # type: ignore[no-untyped-def]
+    """Ingest the SYNTHETIC 3-economy x 2-industry FIGARO-format table used by
+    tests/integration/test_io_price_pipeline.py (tests/fixtures/io_tables/synthetic.py) through the
+    real connector (FixtureHttp), identity checks and dataset registration, just before the stack
+    publishes its test_fixture release, so economic.io_price can run end to end. The recorded
+    FIGARO source fixture holds one data item only and cannot form a complete table."""
+    import asyncio
+    import json
+    import tempfile
+
+    import reva.belief.publication as pub
+
+    original_prepare = stack_module.Stack.prepare_data
+    original_publish = pub.publish_release
+    state: dict = {}
+
+    def prepare_data(self, settings):  # type: ignore[no-untyped-def]
+        state["settings"] = settings
+        out = original_prepare(self, settings)
+        out["io_dataset"] = state.get("io_dataset")
+        return out
+
+    def publish_release(worker, store, **kwargs):  # type: ignore[no-untyped-def]
+        settings = state.get("settings")
+        if settings is not None and "io_dataset" not in state:
+            from reva.adapters.connectors import io_tables as it
+            from reva.adapters.postgres import repositories as repo
+            from reva.adapters.postgres.engine import make_engine
+            from reva.cli.seed import register_connector_version
+            from reva.evidence.runner import FixtureHttp, _fixture_fingerprint, run_connector
+            from reva.kernel.ids import sha256_bytes
+
+            syn = _load_synthetic_io()
+            dims = it.TableDims(countries=syn.COUNTRIES, industries=syn.INDUSTRIES)
+            root = Path(tempfile.mkdtemp(prefix="reva-e2e-io-"))
+            d = root / it.NAME
+            d.mkdir(parents=True)
+            conn = it.FigaroConnector(dims=dims)
+            bodies = {it.constraint_url("NAIO_10_FCP_II4"): syn.constraint_xml()}
+            for item in conn._data_items(syn.YEAR, "NAIO_10_FCP_II4"):
+                bodies[item.url] = syn.body(tuple(item.params["origins"]), year=syn.YEAR)
+            entries = []
+            for url, body in bodies.items():
+                fp = _fixture_fingerprint(url)
+                (d / f"{fp[:16]}.bin").write_bytes(body)
+                entries.append({"request_fingerprint": fp, "url": url, "file": f"{fp[:16]}.bin",
+                                "sha256": sha256_bytes(body), "status": 200,
+                                "headers": {"content-type": "application/vnd.sdmx.data+csv"},
+                                "retrieved_at": "2026-10-15T00:00:00+00:00", "licence": it.LICENCE})
+            (d / "manifest.json").write_text(json.dumps(entries))
+            owner = make_engine("migration", settings)
+            try:
+                with owner.begin() as c:
+                    act = repo.simple_activity("registry.seed", "review", "maintainer:registry-seed", {"e2e": it.NAME})
+                    repo.record_activity(c, act)
+                    register_connector_version(c, store, it.FigaroConnector(dims=dims).describe(), act.id)
+            finally:
+                owner.dispose()
+            rep = asyncio.run(run_connector(it.FigaroConnector(syn.YEAR, dims=dims), FixtureHttp(it.NAME, root=root),
+                                            store, worker, persist_cursor=False))
+            if rep.errors:
+                state["io_dataset"] = {"errors": rep.errors}
+            else:
+                state["io_dataset"] = it.publish_io_dataset(worker, store, year=syn.YEAR, origin="test_fixture", dims=dims)
+        return original_publish(worker, store, **kwargs)
+
+    stack_module.Stack.prepare_data = prepare_data
+    pub.publish_release = publish_release
+
+
 if __name__ == "__main__":
     mod = _load_stack_module()
     _with_llm_ledger(mod)
@@ -106,5 +184,6 @@ if __name__ == "__main__":
         sys.argv.remove("--no-v2-fixtures")
     else:
         _with_v2_fixtures(mod)
+        _with_synthetic_io(mod)
     sys.argv[0] = str(ROOT / "scripts" / "e2e_stack.py")
     sys.exit(mod.main())
