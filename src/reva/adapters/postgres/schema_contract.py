@@ -54,7 +54,7 @@ log = logging.getLogger("reva.schema_contract")
 
 REPO_ROOT = Path(__file__).resolve().parents[4]
 CONTRACT_PATH = REPO_ROOT / "migrations" / "schema_contract.json"
-MIGRATION_SOURCES = (REPO_ROOT / "migrations" / "versions", REPO_ROOT / "src" / "reva" / "adapters" / "postgres" / "ddl.py")
+MIGRATION_SOURCES = (REPO_ROOT / "migrations" / "versions", Path(__file__).resolve().with_name("ddl.py"))
 CONTRACT_FORMAT = 1
 APP_SCHEMAS = ("meta", "ontology", "world", "evidence", "belief", "model", "sim", "ops", "public")
 RUNTIME_ROLES = ("reva_api", "reva_worker", "reva_sim")

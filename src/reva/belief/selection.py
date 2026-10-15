@@ -54,6 +54,11 @@ class Selection:
 # The concept filter is applied to the selected row, not before revision
 # selection, so a lineage re-mapped to a new concept is not resurrected under the
 # old one.
+# Eligibility is evidence.observation_is_eligible, the same function the
+# belief.input trigger applies (R5-03): subject, support reference year
+# (world.support_ref_year; unknown never satisfies a years scope) and
+# classification. A row that is out of scope is therefore not selected (its
+# lineage falls back or is skipped) instead of aborting the whole release.
 ELIGIBLE_SQL = """
 WITH visible AS (
   SELECT o.id, o.source_id, o.origin, o.logical_key, o.revision_no, o.connector_version_id,
@@ -67,13 +72,10 @@ annotated AS (
   SELECT v.*, s.source_key, s.lineage_family, c.concept_id,
          EXISTS (SELECT 1 FROM evidence.observation_retraction r
                  WHERE r.observation_id = v.id AND r.recorded_at <= :cutoff) AS retracted,
-         evidence.is_eligible(v.connector_version_id, v.concept_version_id, v.subject_id, :cutoff,
-                              CAST(EXTRACT(year FROM lower(sp.valid_range) AT TIME ZONE 'UTC') AS integer))
-           AS eligible
+         evidence.observation_is_eligible(v.id, :cutoff) AS eligible
   FROM visible v
   JOIN evidence.source s ON s.id = v.source_id
   JOIN ontology.concept_version c ON c.id = v.concept_version_id
-  JOIN world.support sp ON sp.id = v.support_id
 ),
 heads AS (
   SELECT source_id, origin, logical_key, revision_no AS head_revision_no, retracted AS head_retracted, id AS head_id
