@@ -25,6 +25,14 @@ export function isFixtureOrigin(meta: BannerMeta): boolean {
 export const SIMULATION_BANNER_TEXT =
   'SIMULATION — assumption-conditioned scenario. Values are hypothetical; they are not observations or forecasts.';
 
+const CUTOFF_BASIS_LABEL: Record<string, string> = {
+  release_cutoff: 'release cutoff',
+  as_of: 'as of',
+  scenario_cutoff: 'scenario cutoff',
+  evaluation_context: 'evaluation cutoff',
+  read_time: 'read as of',
+};
+
 /**
  * Shown on every screen: modality + context + valid/reference time + knowledge
  * cutoff. Simulation contexts get a persistent red banner; fixture-origin data
@@ -80,7 +88,12 @@ export function ContextBanner({ meta, simulation = false, referenceTime, scope }
         </div>
         <div>
           <dt>Knowledge cutoff</dt>
-          <dd>{cutoff ? formatDateTime(cutoff) : 'not stated'}</dd>
+          <dd>
+            {cutoff ? formatDateTime(cutoff) : 'not stated'}
+            {cutoff && meta?.knowledge_cutoff && meta.knowledge_cutoff_basis && (
+              <span className="muted"> ({CUTOFF_BASIS_LABEL[meta.knowledge_cutoff_basis] ?? meta.knowledge_cutoff_basis})</span>
+            )}
+          </dd>
         </div>
         {release && (
           <div>

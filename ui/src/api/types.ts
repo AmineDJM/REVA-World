@@ -184,6 +184,8 @@ export interface EnvelopeMeta {
   support?: Record<string, unknown> | null;
   baseline_release?: BaselineReleaseRef | null;
   knowledge_cutoff?: string | null;
+  /** How knowledge_cutoff was set: read_time = 'read as of' the database time the query was answered. */
+  knowledge_cutoff_basis?: 'release_cutoff' | 'as_of' | 'scenario_cutoff' | 'evaluation_context' | 'read_time' | null;
   valid_time?: Record<string, unknown> | null;
   model_versions?: ModelVersionRef[];
   assumptions?: string[];
