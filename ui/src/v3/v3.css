@@ -100,7 +100,7 @@
   border-radius: 999px;
   margin-left: 4px;
   vertical-align: middle;
-  white-space: nowrap;
+  max-width: 100%;
 }
 .v3-badge-community {
   background: var(--v3-community-bg);

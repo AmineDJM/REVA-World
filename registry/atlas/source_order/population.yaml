@@ -1,0 +1,68 @@
+# REVA headline concepts: population (agent ATLASOPS). Schema: _schema.json; loader: reva.atlas.source_order.
+# Each listed series defines the same quantity as the concept; the first one that reports a (country,
+# calendar year) answers, and the answer names it and lists every series consulted. Not blended, not imputed.
+theme: population
+concepts:
+  - id: reva.population.total
+    labels: {fr: "Population totale (au 1er juillet)", en: "Total population (1 July)"}
+    definition: >-
+      De facto mid-year population: all residents regardless of legal status or citizenship, as of 1 July
+      of the year (UN WPP definition, also used by the World Bank WDI series).
+    unit: persons
+    series:
+      - series: "un_wpp.wpp2024_demo.TPopulation1July"
+        reported_unit: thousands
+        scale: "1000"
+        justification: >-
+          UN World Population Prospects 2024 estimates (1950-2023), "Total population, as of 1 July" — the
+          reference de facto mid-year series. Published in thousands; multiplied by 1000 exactly (the stored
+          value keeps WPP's decimals). Projection years are a separate indicator (|proj=medium), never used here.
+      - series: "wb.wdi_social.SP.POP.TOTL"
+        justification: >-
+          World Bank WDI "Population, total": "midyear estimates ... based on the de facto definition of
+          population, which counts all residents regardless of legal status or citizenship" (WDI series
+          metadata). Same definition; the WDI takes WPP for most economies and national statistics for some.
+        caveats: "For economies where the WDI uses national sources the value can differ from WPP."
+    caveats: >-
+      WPP and WDI agree in definition; values may differ where WDI uses a national census-based series.
+      Fallback order is WPP then WDI, per country and year.
+    not_equivalent:
+      - series: "imf.weo.LP"
+        reason: >-
+          WEO population follows national definitions (resident or de facto, census-based or registry)
+          compiled by IMF desks, and WEO years after the latest actual are projections. Kept as its own
+          catalog concept (imf.population).
+      - series: "geonames.countryinfo.population"
+        reason: "A snapshot without a stated reference year: cannot be placed in a calendar year."
+      - series: "gapminder.fasttrack.pop / hyde.hyde321.popc / maddison.mpd2023.pop"
+        reason: >-
+          Long-run historical compilations (back-casts, interpolations, different territorial bases);
+          kept as history concepts.
+    related_catalog_concepts: [un.wpp.population, imf.population, history.population_persons]
+
+  - id: reva.population.density
+    labels: {fr: "Densité de population", en: "Population density"}
+    definition: "Mid-year population divided by land area (square kilometres of land, excluding inland water)."
+    unit: persons per km2 of land area
+    series:
+      - series: "wb.wdi_social.EN.POP.DNST"
+        justification: >-
+          WDI "Population density (people per sq. km of land area)": "midyear population divided by land area
+          in square kilometers" (WDI metadata) — exactly this definition.
+    derived:
+      formula: ratio
+      alternatives:
+        - [{concept: reva.population.total}, {concept: reva.geography.land_area}]
+      justification: >-
+        Exact by definition: the headline mid-year population (de facto) divided by the headline land area
+        of the same country and the same calendar year; both inputs are cited with their own sources.
+        Used only when the WDI does not report the cell.
+    caveats: >-
+      A derived value may combine a WPP population with an FAO land area (WDI's own density uses the WDI
+      population); both are cited.
+    not_equivalent:
+      - series: "un_wpp.wpp2024_demo.PopDensity"
+        reason: >-
+          The WPP file does not state whether its denominator is land or total surface area; kept as its own
+          concept (un.wpp.population_density) until the definition is confirmed.
+    related_catalog_concepts: [un.wpp.population_density]

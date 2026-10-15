@@ -1,0 +1,38 @@
+# REVA headline concepts: geography (agent ATLASOPS). See population.yaml for the rules.
+theme: geography
+concepts:
+  - id: reva.geography.land_area
+    labels: {fr: "Superficie terrestre", en: "Land area"}
+    definition: >-
+      Total area excluding inland water bodies (major rivers and lakes) and, in most cases, national claims
+      to continental shelf and exclusive economic zones (FAO definition used by the World Bank).
+    unit: km2
+    series:
+      - series: "wb.wdi_social.AG.LND.TOTL.K2"
+        justification: >-
+          WDI "Land area (sq. km)" from FAO: "a country's total area, excluding area under inland water
+          bodies, national claims to continental shelf, and exclusive economic zones" — this definition.
+    not_equivalent:
+      - series: "naturalearth.admin0_10m.area_km2"
+        reason: "Computed from 1:10m polygons (includes lakes not cut out by the map); a geometric estimate, not land area."
+      - series: "geonames.countryinfo.area_km2"
+        reason: "Total area as declared by GeoNames, no reference year and not net of inland water."
+    related_catalog_concepts: [geography.area_ne10m_computed, geography.area_geonames_declared]
+
+  - id: reva.geography.surface_area
+    labels: {fr: "Superficie totale", en: "Surface area"}
+    definition: "Total area of the country including areas under inland bodies of water and some coastal waterways."
+    unit: km2
+    series:
+      - series: "wb.wdi_social.AG.SRF.TOTL.K2"
+        justification: >-
+          WDI "Surface area (sq. km)" from FAO: "a country's total area, including areas under inland bodies
+          of water and some coastal waterways" — this definition.
+    not_equivalent:
+      - series: "unsd.syb68_t02.Surface area (thousand km2)"
+        reason: >-
+          Same definition (UN Demographic Yearbook total area) but published in whole thousand km2, with 0 for
+          areas under 500 km2: scaling it to km2 would present a rounding as a measurement.
+      - series: "geonames.countryinfo.area_km2"
+        reason: "No reference year; provenance of the declared figure not stated."
+    related_catalog_concepts: [un.unsd.surface_area]

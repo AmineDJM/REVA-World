@@ -1,4 +1,4 @@
-# Agent A-LAW: provider geography schemes for WBL (KSV), Constitute (country_id) and CCP (COW code|name).
+# Agent A-LAW: provider geography schemes for WBL (KSV), SSPTW (page slug), Constitute (country_id) and CCP (COW code|name).
 # Built by scratch script from the archived provider lists; reviewed entry by entry by the agent.
 note: Agent A-LAW provider geography schemes. Every alias names its evidence; manual entries are agent decisions pending maintainer review. Unmapped provider geographies (historical states, Taiwan) are
   deliberately absent and stay unmapped (kept, listed) in the atlas tables.
@@ -12,6 +12,567 @@ schemes:
     source:
       kind: provider_data
       url: https://wbl.worldbank.org/en/data/download-data
+  ssptw:
+    base: null
+    aliases:
+    - code: albania
+      iso3: ALB
+      source: 'exact normalised name match: SSPTW europe page "albania" titled "Albania" = crosswalk label "Albania"'
+    - code: algeria
+      iso3: DZA
+      source: 'exact normalised name match: SSPTW africa page "algeria" titled "Algeria" = crosswalk label "Algeria"'
+    - code: andorra
+      iso3: AND
+      source: 'exact normalised name match: SSPTW europe page "andorra" titled "Andorra" = crosswalk label "Andorra"'
+    - code: angola
+      iso3: AGO
+      source: 'exact normalised name match: SSPTW africa page "angola" titled "Angola" = crosswalk label "Angola"'
+    - code: antigua-barbuda
+      iso3: ATG
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "antigua-barbuda" titled "Antigua and Barbuda"; crosswalk label "Antigua and Barbuda"'
+    - code: argentina
+      iso3: ARG
+      source: 'exact normalised name match: SSPTW americas page "argentina" titled "Argentina" = crosswalk label "Argentina"'
+    - code: armenia
+      iso3: ARM
+      source: 'exact normalised name match: SSPTW asia page "armenia" titled "Armenia" = crosswalk label "Armenia"'
+    - code: aruba
+      iso3: ABW
+      source: 'exact normalised name match: SSPTW americas page "aruba" titled "Aruba" = crosswalk label "Aruba"'
+    - code: australia
+      iso3: AUS
+      source: 'exact normalised name match: SSPTW asia page "australia" titled "Australia" = crosswalk label "Australia"'
+    - code: austria
+      iso3: AUT
+      source: 'exact normalised name match: SSPTW europe page "austria" titled "Austria" = crosswalk label "Austria"'
+    - code: azerbaijan
+      iso3: AZE
+      source: 'exact normalised name match: SSPTW asia page "azerbaijan" titled "Azerbaijan" = crosswalk label "Azerbaijan"'
+    - code: bahamas
+      iso3: BHS
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "bahamas" titled "Bahamas"; crosswalk label "Bahamas"'
+    - code: bahrain
+      iso3: BHR
+      source: 'exact normalised name match: SSPTW asia page "bahrain" titled "Bahrain" = crosswalk label "Bahrain"'
+    - code: bangladesh
+      iso3: BGD
+      source: 'exact normalised name match: SSPTW asia page "bangladesh" titled "Bangladesh" = crosswalk label "Bangladesh"'
+    - code: barbados
+      iso3: BRB
+      source: 'exact normalised name match: SSPTW americas page "barbados" titled "Barbados" = crosswalk label "Barbados"'
+    - code: belarus
+      iso3: BLR
+      source: 'exact normalised name match: SSPTW europe page "belarus" titled "Belarus" = crosswalk label "Belarus"'
+    - code: belgium
+      iso3: BEL
+      source: 'exact normalised name match: SSPTW europe page "belgium" titled "Belgium" = crosswalk label "Belgium"'
+    - code: belize
+      iso3: BLZ
+      source: 'exact normalised name match: SSPTW americas page "belize" titled "Belize" = crosswalk label "Belize"'
+    - code: benin
+      iso3: BEN
+      source: 'exact normalised name match: SSPTW africa page "benin" titled "Benin" = crosswalk label "Benin"'
+    - code: bermuda
+      iso3: BMU
+      source: 'exact normalised name match: SSPTW americas page "bermuda" titled "Bermuda" = crosswalk label "Bermuda"'
+    - code: bhutan
+      iso3: BTN
+      source: 'exact normalised name match: SSPTW asia page "bhutan" titled "Bhutan" = crosswalk label "Bhutan"'
+    - code: bolivia
+      iso3: BOL
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "bolivia" titled "Bolivia"; crosswalk label "Bolivia (Plurinational State of)"'
+    - code: botswana
+      iso3: BWA
+      source: 'exact normalised name match: SSPTW africa page "botswana" titled "Botswana" = crosswalk label "Botswana"'
+    - code: brazil
+      iso3: BRA
+      source: 'exact normalised name match: SSPTW americas page "brazil" titled "Brazil" = crosswalk label "Brazil"'
+    - code: brunei
+      iso3: BRN
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "brunei" titled "Brunei"; crosswalk label "Brunei Darussalam"'
+    - code: bulgaria
+      iso3: BGR
+      source: 'exact normalised name match: SSPTW europe page "bulgaria" titled "Bulgaria" = crosswalk label "Bulgaria"'
+    - code: burkina-faso
+      iso3: BFA
+      source: 'exact normalised name match: SSPTW africa page "burkina-faso" titled "Burkina Faso" = crosswalk label "Burkina Faso"'
+    - code: burma
+      iso3: MMR
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "burma" titled "Burma (Myanmar)"; crosswalk label "Myanmar"'
+    - code: burundi
+      iso3: BDI
+      source: 'exact normalised name match: SSPTW africa page "burundi" titled "Burundi" = crosswalk label "Burundi"'
+    - code: bvi
+      iso3: VGB
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "bvi" titled "British Virgin Islands"; crosswalk label "British Virgin Islands"'
+    - code: cabo-verde
+      iso3: CPV
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "cabo-verde" titled "Cabo Verde"; crosswalk label "Cabo Verde"'
+    - code: cambodia
+      iso3: KHM
+      source: 'exact normalised name match: SSPTW asia page "cambodia" titled "Cambodia" = crosswalk label "Cambodia"'
+    - code: cameroon
+      iso3: CMR
+      source: 'exact normalised name match: SSPTW africa page "cameroon" titled "Cameroon" = crosswalk label "Cameroon"'
+    - code: canada
+      iso3: CAN
+      source: 'exact normalised name match: SSPTW americas page "canada" titled "Canada" = crosswalk label "Canada"'
+    - code: central-african-republic
+      iso3: CAF
+      source: 'exact normalised name match: SSPTW africa page "central-african-republic" titled "Central African Republic" = crosswalk label "Central African Republic"'
+    - code: chad
+      iso3: TCD
+      source: 'exact normalised name match: SSPTW africa page "chad" titled "Chad" = crosswalk label "Chad"'
+    - code: chile
+      iso3: CHL
+      source: 'exact normalised name match: SSPTW americas page "chile" titled "Chile" = crosswalk label "Chile"'
+    - code: china
+      iso3: CHN
+      source: 'exact normalised name match: SSPTW asia page "china" titled "China" = crosswalk label "China"'
+    - code: colombia
+      iso3: COL
+      source: 'exact normalised name match: SSPTW americas page "colombia" titled "Colombia" = crosswalk label "Colombia"'
+    - code: congo-democratic-republic-of-the
+      iso3: COD
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "congo-democratic-republic-of-the" titled "Congo, Democratic Republic of the"; crosswalk label "Democratic Republic of the
+        Congo"'
+    - code: congo-republic-of-the
+      iso3: COG
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "congo-republic-of-the" titled "Congo, Republic of the"; crosswalk label "Congo"'
+    - code: costa-rica
+      iso3: CRI
+      source: 'exact normalised name match: SSPTW americas page "costa-rica" titled "Costa Rica" = crosswalk label "Costa Rica"'
+    - code: cote-divoire
+      iso3: CIV
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "cote-divoire" titled "Côte d’Ivoire"; crosswalk label "Côte d’Ivoire"'
+    - code: croatia
+      iso3: HRV
+      source: 'exact normalised name match: SSPTW europe page "croatia" titled "Croatia" = crosswalk label "Croatia"'
+    - code: cuba
+      iso3: CUB
+      source: 'exact normalised name match: SSPTW americas page "cuba" titled "Cuba" = crosswalk label "Cuba"'
+    - code: cyprus
+      iso3: CYP
+      source: 'exact normalised name match: SSPTW europe page "cyprus" titled "Cyprus" = crosswalk label "Cyprus"'
+    - code: czech-republic
+      iso3: CZE
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "czech-republic" titled "Czech Republic"; crosswalk label "Czechia"'
+    - code: denmark
+      iso3: DNK
+      source: 'exact normalised name match: SSPTW europe page "denmark" titled "Denmark" = crosswalk label "Denmark"'
+    - code: djibouti
+      iso3: DJI
+      source: 'exact normalised name match: SSPTW africa page "djibouti" titled "Djibouti" = crosswalk label "Djibouti"'
+    - code: dominica
+      iso3: DMA
+      source: 'exact normalised name match: SSPTW americas page "dominica" titled "Dominica" = crosswalk label "Dominica"'
+    - code: dominican-republic
+      iso3: DOM
+      source: 'exact normalised name match: SSPTW americas page "dominican-republic" titled "Dominican Republic" = crosswalk label "Dominican Republic"'
+    - code: ecuador
+      iso3: ECU
+      source: 'exact normalised name match: SSPTW americas page "ecuador" titled "Ecuador" = crosswalk label "Ecuador"'
+    - code: egypt
+      iso3: EGY
+      source: 'exact normalised name match: SSPTW africa page "egypt" titled "Egypt" = crosswalk label "Egypt"'
+    - code: el-salvador
+      iso3: SLV
+      source: 'exact normalised name match: SSPTW americas page "el-salvador" titled "El Salvador" = crosswalk label "El Salvador"'
+    - code: equatorial-guinea
+      iso3: GNQ
+      source: 'exact normalised name match: SSPTW africa page "equatorial-guinea" titled "Equatorial Guinea" = crosswalk label "Equatorial Guinea"'
+    - code: estonia
+      iso3: EST
+      source: 'exact normalised name match: SSPTW europe page "estonia" titled "Estonia" = crosswalk label "Estonia"'
+    - code: eswatini-swaziland
+      iso3: SWZ
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "eswatini-swaziland" titled "Eswatini (Swaziland)"; crosswalk label "Eswatini"'
+    - code: ethiopia
+      iso3: ETH
+      source: 'exact normalised name match: SSPTW africa page "ethiopia" titled "Ethiopia" = crosswalk label "Ethiopia"'
+    - code: fiji
+      iso3: FJI
+      source: 'exact normalised name match: SSPTW asia page "fiji" titled "Fiji" = crosswalk label "Fiji"'
+    - code: finland
+      iso3: FIN
+      source: 'exact normalised name match: SSPTW europe page "finland" titled "Finland" = crosswalk label "Finland"'
+    - code: france
+      iso3: FRA
+      source: 'exact normalised name match: SSPTW europe page "france" titled "France" = crosswalk label "France"'
+    - code: gabon
+      iso3: GAB
+      source: 'exact normalised name match: SSPTW africa page "gabon" titled "Gabon" = crosswalk label "Gabon"'
+    - code: gambia
+      iso3: GMB
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "gambia" titled "Gambia"; crosswalk label "Gambia"'
+    - code: georgia
+      iso3: GEO
+      source: 'exact normalised name match: SSPTW asia page "georgia" titled "Georgia" = crosswalk label "Georgia"'
+    - code: germany
+      iso3: DEU
+      source: 'exact normalised name match: SSPTW europe page "germany" titled "Germany" = crosswalk label "Germany"'
+    - code: ghana
+      iso3: GHA
+      source: 'exact normalised name match: SSPTW africa page "ghana" titled "Ghana" = crosswalk label "Ghana"'
+    - code: greece
+      iso3: GRC
+      source: 'exact normalised name match: SSPTW europe page "greece" titled "Greece" = crosswalk label "Greece"'
+    - code: grenada
+      iso3: GRD
+      source: 'exact normalised name match: SSPTW americas page "grenada" titled "Grenada" = crosswalk label "Grenada"'
+    - code: guatemala
+      iso3: GTM
+      source: 'exact normalised name match: SSPTW americas page "guatemala" titled "Guatemala" = crosswalk label "Guatemala"'
+    - code: guernsey
+      iso3: GGY
+      source: 'exact normalised name match: SSPTW europe page "guernsey" titled "Guernsey" = crosswalk label "Guernsey"'
+    - code: guinea
+      iso3: GIN
+      source: 'exact normalised name match: SSPTW africa page "guinea" titled "Guinea" = crosswalk label "Guinea"'
+    - code: guinea-bissau
+      iso3: GNB
+      source: 'exact normalised name match: SSPTW africa page "guinea-bissau" titled "Guinea-Bissau" = crosswalk label "Guinea-Bissau"'
+    - code: guyana
+      iso3: GUY
+      source: 'exact normalised name match: SSPTW americas page "guyana" titled "Guyana" = crosswalk label "Guyana"'
+    - code: haiti
+      iso3: HTI
+      source: 'exact normalised name match: SSPTW americas page "haiti" titled "Haiti" = crosswalk label "Haiti"'
+    - code: honduras
+      iso3: HND
+      source: 'exact normalised name match: SSPTW americas page "honduras" titled "Honduras" = crosswalk label "Honduras"'
+    - code: hong-kong
+      iso3: HKG
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "hong-kong" titled "Hong Kong (China)"; crosswalk label "China, Hong Kong Special Administrative Region"'
+    - code: hungary
+      iso3: HUN
+      source: 'exact normalised name match: SSPTW europe page "hungary" titled "Hungary" = crosswalk label "Hungary"'
+    - code: iceland
+      iso3: ISL
+      source: 'exact normalised name match: SSPTW europe page "iceland" titled "Iceland" = crosswalk label "Iceland"'
+    - code: india
+      iso3: IND
+      source: 'exact normalised name match: SSPTW asia page "india" titled "India" = crosswalk label "India"'
+    - code: indonesia
+      iso3: IDN
+      source: 'exact normalised name match: SSPTW asia page "indonesia" titled "Indonesia" = crosswalk label "Indonesia"'
+    - code: iran
+      iso3: IRN
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "iran" titled "Iran"; crosswalk label "Iran (Islamic Republic of)"'
+    - code: ireland
+      iso3: IRL
+      source: 'exact normalised name match: SSPTW europe page "ireland" titled "Ireland" = crosswalk label "Ireland"'
+    - code: isle-of-man
+      iso3: IMN
+      source: 'exact normalised name match: SSPTW europe page "isle-of-man" titled "Isle of Man" = crosswalk label "Isle of Man"'
+    - code: israel
+      iso3: ISR
+      source: 'exact normalised name match: SSPTW asia page "israel" titled "Israel" = crosswalk label "Israel"'
+    - code: italy
+      iso3: ITA
+      source: 'exact normalised name match: SSPTW europe page "italy" titled "Italy" = crosswalk label "Italy"'
+    - code: jamaica
+      iso3: JAM
+      source: 'exact normalised name match: SSPTW americas page "jamaica" titled "Jamaica" = crosswalk label "Jamaica"'
+    - code: japan
+      iso3: JPN
+      source: 'exact normalised name match: SSPTW asia page "japan" titled "Japan" = crosswalk label "Japan"'
+    - code: jersey
+      iso3: JEY
+      source: 'exact normalised name match: SSPTW europe page "jersey" titled "Jersey" = crosswalk label "Jersey"'
+    - code: jordan
+      iso3: JOR
+      source: 'exact normalised name match: SSPTW asia page "jordan" titled "Jordan" = crosswalk label "Jordan"'
+    - code: kazakhstan
+      iso3: KAZ
+      source: 'exact normalised name match: SSPTW asia page "kazakhstan" titled "Kazakhstan" = crosswalk label "Kazakhstan"'
+    - code: kenya
+      iso3: KEN
+      source: 'exact normalised name match: SSPTW africa page "kenya" titled "Kenya" = crosswalk label "Kenya"'
+    - code: kiribati
+      iso3: KIR
+      source: 'exact normalised name match: SSPTW asia page "kiribati" titled "Kiribati" = crosswalk label "Kiribati"'
+    - code: kuwait
+      iso3: KWT
+      source: 'exact normalised name match: SSPTW asia page "kuwait" titled "Kuwait" = crosswalk label "Kuwait"'
+    - code: kyrgyzstan
+      iso3: KGZ
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "kyrgyzstan" titled "Kyrgyzstan"; crosswalk label "Kyrgyzstan"'
+    - code: laos
+      iso3: LAO
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "laos" titled "Laos"; crosswalk label "Lao People''s Democratic Republic"'
+    - code: latvia
+      iso3: LVA
+      source: 'exact normalised name match: SSPTW europe page "latvia" titled "Latvia" = crosswalk label "Latvia"'
+    - code: lebanon
+      iso3: LBN
+      source: 'exact normalised name match: SSPTW asia page "lebanon" titled "Lebanon" = crosswalk label "Lebanon"'
+    - code: lesotho
+      iso3: LSO
+      source: 'exact normalised name match: SSPTW africa page "lesotho" titled "Lesotho" = crosswalk label "Lesotho"'
+    - code: liberia
+      iso3: LBR
+      source: 'exact normalised name match: SSPTW africa page "liberia" titled "Liberia" = crosswalk label "Liberia"'
+    - code: libya
+      iso3: LBY
+      source: 'exact normalised name match: SSPTW africa page "libya" titled "Libya" = crosswalk label "Libya"'
+    - code: liechtenstein
+      iso3: LIE
+      source: 'exact normalised name match: SSPTW europe page "liechtenstein" titled "Liechtenstein" = crosswalk label "Liechtenstein"'
+    - code: lithuania
+      iso3: LTU
+      source: 'exact normalised name match: SSPTW europe page "lithuania" titled "Lithuania" = crosswalk label "Lithuania"'
+    - code: luxembourg
+      iso3: LUX
+      source: 'exact normalised name match: SSPTW europe page "luxembourg" titled "Luxembourg" = crosswalk label "Luxembourg"'
+    - code: madagascar
+      iso3: MDG
+      source: 'exact normalised name match: SSPTW africa page "madagascar" titled "Madagascar" = crosswalk label "Madagascar"'
+    - code: malawi
+      iso3: MWI
+      source: 'exact normalised name match: SSPTW africa page "malawi" titled "Malawi" = crosswalk label "Malawi"'
+    - code: malaysia
+      iso3: MYS
+      source: 'exact normalised name match: SSPTW asia page "malaysia" titled "Malaysia" = crosswalk label "Malaysia"'
+    - code: mali
+      iso3: MLI
+      source: 'exact normalised name match: SSPTW africa page "mali" titled "Mali" = crosswalk label "Mali"'
+    - code: malta
+      iso3: MLT
+      source: 'exact normalised name match: SSPTW europe page "malta" titled "Malta" = crosswalk label "Malta"'
+    - code: marshall-islands
+      iso3: MHL
+      source: 'exact normalised name match: SSPTW asia page "marshall-islands" titled "Marshall Islands" = crosswalk label "Marshall Islands"'
+    - code: mauritania
+      iso3: MRT
+      source: 'exact normalised name match: SSPTW africa page "mauritania" titled "Mauritania" = crosswalk label "Mauritania"'
+    - code: mauritius
+      iso3: MUS
+      source: 'exact normalised name match: SSPTW africa page "mauritius" titled "Mauritius" = crosswalk label "Mauritius"'
+    - code: mexico
+      iso3: MEX
+      source: 'exact normalised name match: SSPTW americas page "mexico" titled "Mexico" = crosswalk label "Mexico"'
+    - code: micronesia
+      iso3: FSM
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "micronesia" titled "Micronesia"; crosswalk label "Micronesia (Federated States of)"'
+    - code: moldova
+      iso3: MDA
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "moldova" titled "Moldova"; crosswalk label "Republic of Moldova"'
+    - code: monaco
+      iso3: MCO
+      source: 'exact normalised name match: SSPTW europe page "monaco" titled "Monaco" = crosswalk label "Monaco"'
+    - code: morocco
+      iso3: MAR
+      source: 'exact normalised name match: SSPTW africa page "morocco" titled "Morocco" = crosswalk label "Morocco"'
+    - code: mozambique
+      iso3: MOZ
+      source: 'exact normalised name match: SSPTW africa page "mozambique" titled "Mozambique" = crosswalk label "Mozambique"'
+    - code: namibia
+      iso3: NAM
+      source: 'exact normalised name match: SSPTW africa page "namibia" titled "Namibia" = crosswalk label "Namibia"'
+    - code: nepal
+      iso3: NPL
+      source: 'exact normalised name match: SSPTW asia page "nepal" titled "Nepal" = crosswalk label "Nepal"'
+    - code: netherlands
+      iso3: NLD
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "netherlands" titled "Netherlands"; crosswalk label "Netherlands (Kingdom of the)"'
+    - code: new-zealand
+      iso3: NZL
+      source: 'exact normalised name match: SSPTW asia page "new-zealand" titled "New Zealand" = crosswalk label "New Zealand"'
+    - code: nicaragua
+      iso3: NIC
+      source: 'exact normalised name match: SSPTW americas page "nicaragua" titled "Nicaragua" = crosswalk label "Nicaragua"'
+    - code: niger
+      iso3: NER
+      source: 'exact normalised name match: SSPTW africa page "niger" titled "Niger" = crosswalk label "Niger"'
+    - code: nigeria
+      iso3: NGA
+      source: 'exact normalised name match: SSPTW africa page "nigeria" titled "Nigeria" = crosswalk label "Nigeria"'
+    - code: norway
+      iso3: NOR
+      source: 'exact normalised name match: SSPTW europe page "norway" titled "Norway" = crosswalk label "Norway"'
+    - code: oman
+      iso3: OMN
+      source: 'exact normalised name match: SSPTW asia page "oman" titled "Oman" = crosswalk label "Oman"'
+    - code: pakistan
+      iso3: PAK
+      source: 'exact normalised name match: SSPTW asia page "pakistan" titled "Pakistan" = crosswalk label "Pakistan"'
+    - code: palau
+      iso3: PLW
+      source: 'exact normalised name match: SSPTW asia page "palau" titled "Palau" = crosswalk label "Palau"'
+    - code: panama
+      iso3: PAN
+      source: 'exact normalised name match: SSPTW americas page "panama" titled "Panama" = crosswalk label "Panama"'
+    - code: papua-new-guinea
+      iso3: PNG
+      source: 'exact normalised name match: SSPTW asia page "papua-new-guinea" titled "Papua New Guinea" = crosswalk label "Papua New Guinea"'
+    - code: paraguay
+      iso3: PRY
+      source: 'exact normalised name match: SSPTW americas page "paraguay" titled "Paraguay" = crosswalk label "Paraguay"'
+    - code: peru
+      iso3: PER
+      source: 'exact normalised name match: SSPTW americas page "peru" titled "Peru" = crosswalk label "Peru"'
+    - code: philippines
+      iso3: PHL
+      source: 'exact normalised name match: SSPTW asia page "philippines" titled "Philippines" = crosswalk label "Philippines"'
+    - code: poland
+      iso3: POL
+      source: 'exact normalised name match: SSPTW europe page "poland" titled "Poland" = crosswalk label "Poland"'
+    - code: portugal
+      iso3: PRT
+      source: 'exact normalised name match: SSPTW europe page "portugal" titled "Portugal" = crosswalk label "Portugal"'
+    - code: qatar
+      iso3: QAT
+      source: 'exact normalised name match: SSPTW asia page "qatar" titled "Qatar" = crosswalk label "Qatar"'
+    - code: romania
+      iso3: ROU
+      source: 'exact normalised name match: SSPTW europe page "romania" titled "Romania" = crosswalk label "Romania"'
+    - code: russia
+      iso3: RUS
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "russia" titled "Russia"; crosswalk label "Russian Federation"'
+    - code: rwanda
+      iso3: RWA
+      source: 'exact normalised name match: SSPTW africa page "rwanda" titled "Rwanda" = crosswalk label "Rwanda"'
+    - code: saint-kitts
+      iso3: KNA
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "saint-kitts" titled "Saint Kitts and Nevis"; crosswalk label "Saint Kitts and Nevis"'
+    - code: saint-lucia
+      iso3: LCA
+      source: 'exact normalised name match: SSPTW americas page "saint-lucia" titled "Saint Lucia" = crosswalk label "Saint Lucia"'
+    - code: saint-vincent
+      iso3: VCT
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "saint-vincent" titled "Saint Vincent and the Grenadines"; crosswalk label "Saint Vincent and the Grenadines"'
+    - code: samoa
+      iso3: WSM
+      source: 'exact normalised name match: SSPTW asia page "samoa" titled "Samoa" = crosswalk label "Samoa"'
+    - code: san-marino
+      iso3: SMR
+      source: 'exact normalised name match: SSPTW europe page "san-marino" titled "San Marino" = crosswalk label "San Marino"'
+    - code: sao-tome-and-principe
+      iso3: STP
+      source: 'exact normalised name match: SSPTW africa page "sao-tome-and-principe" titled "São Tomé and Príncipe" = crosswalk label "Sao Tome and Principe"'
+    - code: saudi-arabia
+      iso3: SAU
+      source: 'exact normalised name match: SSPTW asia page "saudi-arabia" titled "Saudi Arabia" = crosswalk label "Saudi Arabia"'
+    - code: senegal
+      iso3: SEN
+      source: 'exact normalised name match: SSPTW africa page "senegal" titled "Senegal" = crosswalk label "Senegal"'
+    - code: serbia
+      iso3: SRB
+      source: 'exact normalised name match: SSPTW europe page "serbia" titled "Serbia" = crosswalk label "Serbia"'
+    - code: seychelles
+      iso3: SYC
+      source: 'exact normalised name match: SSPTW africa page "seychelles" titled "Seychelles" = crosswalk label "Seychelles"'
+    - code: sierra-leone
+      iso3: SLE
+      source: 'exact normalised name match: SSPTW africa page "sierra-leone" titled "Sierra Leone" = crosswalk label "Sierra Leone"'
+    - code: singapore
+      iso3: SGP
+      source: 'exact normalised name match: SSPTW asia page "singapore" titled "Singapore" = crosswalk label "Singapore"'
+    - code: slovakia
+      iso3: SVK
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "slovakia" titled "Slovakia"; crosswalk label "Slovakia"'
+    - code: slovenia
+      iso3: SVN
+      source: 'exact normalised name match: SSPTW europe page "slovenia" titled "Slovenia" = crosswalk label "Slovenia"'
+    - code: solomon-islands
+      iso3: SLB
+      source: 'exact normalised name match: SSPTW asia page "solomon-islands" titled "Solomon Islands" = crosswalk label "Solomon Islands"'
+    - code: south-africa
+      iso3: ZAF
+      source: 'exact normalised name match: SSPTW africa page "south-africa" titled "South Africa" = crosswalk label "South Africa"'
+    - code: south-korea
+      iso3: KOR
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "south-korea" titled "South Korea"; crosswalk label "Republic of Korea"'
+    - code: spain
+      iso3: ESP
+      source: 'exact normalised name match: SSPTW europe page "spain" titled "Spain" = crosswalk label "Spain"'
+    - code: sri-lanka
+      iso3: LKA
+      source: 'exact normalised name match: SSPTW asia page "sri-lanka" titled "Sri Lanka" = crosswalk label "Sri Lanka"'
+    - code: sudan
+      iso3: SDN
+      source: 'exact normalised name match: SSPTW africa page "sudan" titled "Sudan" = crosswalk label "Sudan"'
+    - code: suriname
+      iso3: SUR
+      source: 'exact normalised name match: SSPTW americas page "suriname" titled "Suriname" = crosswalk label "Suriname"'
+    - code: sweden
+      iso3: SWE
+      source: 'exact normalised name match: SSPTW europe page "sweden" titled "Sweden" = crosswalk label "Sweden"'
+    - code: switzerland
+      iso3: CHE
+      source: 'exact normalised name match: SSPTW europe page "switzerland" titled "Switzerland" = crosswalk label "Switzerland"'
+    - code: syria
+      iso3: SYR
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "syria" titled "Syria"; crosswalk label "Syrian Arab Republic"'
+    - code: tajikistan
+      iso3: TJK
+      source: 'exact normalised name match: SSPTW asia page "tajikistan" titled "Tajikistan" = crosswalk label "Tajikistan"'
+    - code: tanzania
+      iso3: TZA
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW africa page "tanzania" titled "Tanzania"; crosswalk label "United Republic of Tanzania"'
+    - code: thailand
+      iso3: THA
+      source: 'exact normalised name match: SSPTW asia page "thailand" titled "Thailand" = crosswalk label "Thailand"'
+    - code: togo
+      iso3: TGO
+      source: 'exact normalised name match: SSPTW africa page "togo" titled "Togo" = crosswalk label "Togo"'
+    - code: trinidad-tobago
+      iso3: TTO
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "trinidad-tobago" titled "Trinidad and Tobago"; crosswalk label "Trinidad and Tobago"'
+    - code: tunisia
+      iso3: TUN
+      source: 'exact normalised name match: SSPTW africa page "tunisia" titled "Tunisia" = crosswalk label "Tunisia"'
+    - code: turkey
+      iso3: TUR
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "turkey" titled "Turkey"; crosswalk label "Türkiye"'
+    - code: turkmenistan
+      iso3: TKM
+      source: 'exact normalised name match: SSPTW asia page "turkmenistan" titled "Turkmenistan" = crosswalk label "Turkmenistan"'
+    - code: uganda
+      iso3: UGA
+      source: 'exact normalised name match: SSPTW africa page "uganda" titled "Uganda" = crosswalk label "Uganda"'
+    - code: ukraine
+      iso3: UKR
+      source: 'exact normalised name match: SSPTW europe page "ukraine" titled "Ukraine" = crosswalk label "Ukraine"'
+    - code: united-kingdom
+      iso3: GBR
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW europe page "united-kingdom" titled "United Kingdom"; crosswalk label "United Kingdom of Great Britain and Northern Ireland"'
+    - code: united-states
+      iso3: USA
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "united-states" titled "United States of America"; crosswalk label "United States of America"'
+    - code: uruguay
+      iso3: URY
+      source: 'exact normalised name match: SSPTW americas page "uruguay" titled "Uruguay" = crosswalk label "Uruguay"'
+    - code: uzbekistan
+      iso3: UZB
+      source: 'exact normalised name match: SSPTW asia page "uzbekistan" titled "Uzbekistan" = crosswalk label "Uzbekistan"'
+    - code: vanuatu
+      iso3: VUT
+      source: 'exact normalised name match: SSPTW asia page "vanuatu" titled "Vanuatu" = crosswalk label "Vanuatu"'
+    - code: venezuela
+      iso3: VEN
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW americas page "venezuela" titled "Venezuela"; crosswalk label "Venezuela (Bolivarian Republic of)"'
+    - code: vietnam
+      iso3: VNM
+      source: 'manual (agent A-LAW, maintainer review pending): SSPTW asia page "vietnam" titled "Vietnam"; crosswalk label "Viet Nam"'
+    - code: yemen
+      iso3: YEM
+      source: 'exact normalised name match: SSPTW asia page "yemen" titled "Yemen" = crosswalk label "Yemen"'
+    - code: zambia
+      iso3: ZMB
+      source: 'exact normalised name match: SSPTW africa page "zambia" titled "Zambia" = crosswalk label "Zambia"'
+    - code: zimbabwe
+      iso3: ZWE
+      source: 'exact normalised name match: SSPTW africa page "zimbabwe" titled "Zimbabwe" = crosswalk label "Zimbabwe"'
+    unmapped:
+    - code: taiwan
+      reason: Taiwan is not an entity of the ALLC crosswalk
+    code_format: SSPTW 2018-2019 country page slug (/policy/docs/progdesc/ssptw/2018-2019/<region>/<slug>.html)
+    source:
+      kind: provider_data
+      url: https://www.ssa.gov/policy/docs/progdesc/ssptw/
+      retrieved_at: '2026-10-15'
   constitute:
     base: null
     aliases:

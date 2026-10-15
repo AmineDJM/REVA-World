@@ -98,7 +98,8 @@ test('Neurones: graph canvas, entity card with provenance, statements with Wikid
   await expect(page.getByTestId('entity-card').getByRole('heading', { name: /portugais/ })).toBeVisible();
 
   // "As of" 1900: UN membership (1945) is not in force.
-  await page.getByLabel('filtrer par année').check();
+  await page.getByLabel('filtrer par année').click();
+  await expect(page.getByLabel('filtrer par année')).toBeChecked();
   await page.getByRole('slider', { name: 'Année' }).fill('1900');
   await expect(page.locator('.v3-stage-stats')).toContainText('en vigueur en 1900');
 });
