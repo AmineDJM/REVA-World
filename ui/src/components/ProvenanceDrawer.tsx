@@ -77,7 +77,8 @@ function NodeDetails({ node, selectors }: { node: ProvenanceNode; selectors: { r
   const attrs = isRecord(node.attributes) ? node.attributes : {};
   const sha = pickAttr(attrs, SHA_KEYS) ?? (node.kind === 'artifact' ? nodeIdent(node) : undefined);
   const selector = pickAttr(attrs, SELECTOR_KEYS);
-  const rest = Object.entries(attrs).filter(([k]) => !SHA_KEYS.includes(k) && !SELECTOR_KEYS.includes(k));
+  const pinned = typeof attrs.dataset_artifacts_pinned === 'number' ? attrs.dataset_artifacts_pinned : null;
+  const rest = Object.entries(attrs).filter(([k]) => !SHA_KEYS.includes(k) && !SELECTOR_KEYS.includes(k) && k !== 'dataset_artifacts_pinned');
   return (
     <dl className="kv compact">
       {sha !== undefined && (
@@ -98,6 +99,14 @@ function NodeDetails({ node, selectors }: { node: ProvenanceNode; selectors: { r
           <dd className="mono break">{typeof sel.selector === 'string' ? sel.selector : JSON.stringify(sel.selector)}</dd>
         </div>
       ))}
+      {pinned !== null && (
+        <div className="kv-row" data-testid="dataset-artifacts-pinned">
+          <dt>Dataset inputs pinned</dt>
+          <dd>
+            {pinned} dataset artifact{pinned === 1 ? '' : 's'} (pinned by this release for model runs; not inputs of this value, not expanded here)
+          </dd>
+        </div>
+      )}
       {rest.map(([k, v]) => (
         <div className="kv-row" key={k}>
           <dt>{humanize(k)}</dt>
