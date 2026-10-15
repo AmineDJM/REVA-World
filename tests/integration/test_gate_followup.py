@@ -8,6 +8,7 @@ by the kill switch. Offline: captured Eurostat fixtures.
 
 from __future__ import annotations
 
+import time
 import uuid
 from typing import Any
 
@@ -104,6 +105,7 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     assert not _mine(followup.handle_gate_followup({}, _ctx(db)), d.decision_id)
     monkeypatch.setattr(followup, "GRACE_SECONDS", 0.0)
     assert [c for c in real_pending(db.worker) if c["gate_result_id"] == d.decision_id]
+    time.sleep(0.3)  # older than the (test) worker gate wait of 0.2 s
 
     promoted_events = "SELECT count(*) FROM ops.outbox WHERE event_type = 'autonomy.connector_promoted'"
     followup_events = ("SELECT count(*) FROM ops.outbox WHERE event_type = 'autonomy.gate_followup' "
@@ -120,8 +122,7 @@ async def test_late_gate_decision_is_promoted_by_the_followup(db: Any, monkeypat
     stale = JobContext(job_id=ok_ctx.job_id, job_type="gate_followup", worker_id="test-worker", fencing_token=8,
                        attempt=1, settings=ok_ctx.settings, worker_engine=db.worker, sim_engine=None, store=db.store)
     with pytest.raises(StaleLease):
-        print(real_pending(db.worker), followup.pending_followups(db.worker, min_age_seconds=0.2), p.proposal_id, followup.GRACE_SECONDS)
-        print(followup.handle_gate_followup({}, stale))
+        followup.handle_gate_followup({}, stale)
     assert _count(db, promoted_events) == n_promoted and _count(db, followup_events, g=str(d.decision_id)) == 0
 
     # 5. a transient database error is retried on the next run, not recorded as final
