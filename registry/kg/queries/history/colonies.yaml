@@ -1,0 +1,21 @@
+id: history.colonies
+domain: history
+owner: KGHIST
+description: >-
+  Colonies and other dependent territories: instances of colony (Q133156), protectorate (Q164142) or
+  dependent territory (Q161243), or of a subclass of one of them (crown colony, proprietary colony,
+  League of Nations mandate, ...). Wikidata has no "colony of" property: the colonial power is carried by
+  P17 (country) and P361 (part of, e.g. "Portuguese Empire"), often with P580/P582 qualifiers, plus
+  P1365/P1366 (replaces / replaced by) towards the post-colonial state. All of these are kept in the
+  snapshot (allow-listed claims with qualifiers).
+purpose: seed_entities
+entity_kind: colony
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    VALUES ?root { wd:Q133156 wd:Q164142 wd:Q161243 }
+    ?item wdt:P31/wdt:P279* ?root .
+    {{qid_filter}}
+  }
+split: {by: qid_prefix}
+max_rows: 20000
+expand_hops: 1

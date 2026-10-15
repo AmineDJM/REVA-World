@@ -1,0 +1,15 @@
+id: culture.language_families
+domain: culture
+owner: KGCULT
+description: >-
+  Every item that is an instance of language family (Q25295), including Glottolog-derived
+  subfamilies, so the subclass-of (P279) / part-of (P361) genealogy of languages has its nodes.
+purpose: seed_entities
+entity_kind: language_family
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31 wd:Q25295 .
+  }
+max_rows: 15000
+expand_hops: 0
+properties: [P31, P279, P361, P1394, P219, P220, P2341, P571]

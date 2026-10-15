@@ -1,0 +1,26 @@
+id: culture.historical_state_languages
+domain: culture
+owner: KGCULT
+description: >-
+  Official language (P37) and language used (P2936) of historical countries (Q3024240), empires
+  (Q48349) and colonies (Q133156) - directly typed or typed by a subclass - with dates. Provides the
+  empire/colony -> language hop of colonial-diffusion paths (e.g. Portuguese Empire -> Portuguese).
+  The colony -> empire and country -> predecessor hops come from KGHIST specs.
+purpose: statements
+entity_kind: historical_state
+sparql: |
+  SELECT ?state ?statement ?prop ?language ?rank ?start ?end ?pit WHERE {
+    VALUES ?class { wd:Q3024240 wd:Q48349 wd:Q133156 }
+    VALUES (?p ?ps ?prop) { (p:P37 ps:P37 wd:P37) (p:P2936 ps:P2936 wd:P2936) }
+    ?state ?p ?statement .
+    ?statement ?ps ?language ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?state wdt:P31/wdt:P279* ?class .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+  }
+columns: {subject: state, property_var: prop, object: language, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit}
+max_rows: 30000
+expand_hops: 1

@@ -1,0 +1,22 @@
+id: culture.historical_state_currencies
+domain: culture
+owner: KGCULT
+description: >-
+  Currency (P38) of historical countries, empires and colonies (typed directly or via a subclass),
+  with dates, so currency succession across regime changes is reachable.
+purpose: statements
+entity_kind: historical_state
+sparql: |
+  SELECT ?state ?statement ?currency ?rank ?start ?end WHERE {
+    VALUES ?class { wd:Q3024240 wd:Q48349 wd:Q133156 }
+    ?state p:P38 ?statement .
+    ?statement ps:P38 ?currency ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    ?state wdt:P31/wdt:P279* ?class .
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: state, property: P38, object: currency, statement: statement, rank: rank,
+          start: start, end: end}
+max_rows: 15000
+expand_hops: 1

@@ -1,0 +1,1191 @@
+# KG property allow-list (owner: WDHARVEST). Only claims whose main property is listed here are loaded
+# into kg.statement; qualifiers and references are reduced to the lists further down.
+#
+# Columns:
+#   property        Wikidata property id
+#   reva_predicate  REVA predicate name (snake_case, subject -> object direction)
+#   inverse         name of the reverse direction for graph traversal (object -> subject); null when the
+#                   object is a literal (no reverse edge)
+#   kind            entity | time | quantity | monolingualtext | external_id | url | coordinate | string
+#   group           thematic group (display / filtering only)
+#   label_en/fr     the property's own Wikidata labels (fetched from the property entity with wbgetentities,
+#                   see labels_source below); expected_en is the label WDHARVEST checked the id against
+#   symmetric       true when the relation is symmetric (shares border with, diplomatic relation, ...)
+#
+# Honesty: Wikidata is community-edited (CC0); statements are 'community_edited', never 'verified'.
+# Causal wording (P828/P1542/P1478/P1479/P1536/P1537) is shown only as "asserted by Wikidata".
+# Deprecated-rank claims are dropped at extraction; preferred/normal rank is kept per statement.
+# To request a property: registry/kg/property_requests/<agent>.yaml (see registry/kg/queries/README.md).
+
+version: 1
+labels_source: null
+properties:
+  - property: P31
+    reva_predicate: instance_of
+    inverse: "has_instance"
+    kind: entity
+    group: classification
+    expected_en: "instance of"
+    label_en: null
+    label_fr: null
+  - property: P279
+    reva_predicate: subclass_of
+    inverse: "has_subclass"
+    kind: entity
+    group: classification
+    expected_en: "subclass of"
+    label_en: null
+    label_fr: null
+  - property: P361
+    reva_predicate: part_of
+    inverse: "has_part"
+    kind: entity
+    group: structure
+    expected_en: "part of"
+    label_en: null
+    label_fr: null
+  - property: P527
+    reva_predicate: has_part
+    inverse: "part_of"
+    kind: entity
+    group: structure
+    expected_en: "has part(s)"
+    label_en: null
+    label_fr: null
+  - property: P1269
+    reva_predicate: facet_of
+    inverse: "has_facet"
+    kind: entity
+    group: classification
+    expected_en: "facet of"
+    label_en: null
+    label_fr: null
+  - property: P2184
+    reva_predicate: history_of_topic
+    inverse: "history_topic_of"
+    kind: entity
+    group: classification
+    expected_en: "history of topic"
+    label_en: null
+    label_fr: null
+  - property: P921
+    reva_predicate: main_subject
+    inverse: "subject_of"
+    kind: entity
+    group: classification
+    expected_en: "main subject"
+    label_en: null
+    label_fr: null
+  - property: P17
+    reva_predicate: country
+    inverse: "country_of"
+    kind: entity
+    group: geography
+    expected_en: "country"
+    label_en: null
+    label_fr: null
+  - property: P30
+    reva_predicate: continent
+    inverse: "continent_of"
+    kind: entity
+    group: geography
+    expected_en: "continent"
+    label_en: null
+    label_fr: null
+  - property: P36
+    reva_predicate: capital
+    inverse: "capital_of"
+    kind: entity
+    group: geography
+    expected_en: "capital"
+    label_en: null
+    label_fr: null
+  - property: P1376
+    reva_predicate: capital_of
+    inverse: "has_capital"
+    kind: entity
+    group: geography
+    expected_en: "capital of"
+    label_en: null
+    label_fr: null
+  - property: P131
+    reva_predicate: located_in_admin
+    inverse: "contains_admin_located"
+    kind: entity
+    group: geography
+    expected_en: "located in the administrative territorial entity"
+    label_en: null
+    label_fr: null
+  - property: P150
+    reva_predicate: contains_admin
+    inverse: "admin_contained_in"
+    kind: entity
+    group: geography
+    expected_en: "contains the administrative territorial entity"
+    label_en: null
+    label_fr: null
+  - property: P47
+    reva_predicate: shares_border_with
+    inverse: "shares_border_with"
+    kind: entity
+    group: geography
+    expected_en: "shares border with"
+    label_en: null
+    label_fr: null
+    symmetric: true
+  - property: P706
+    reva_predicate: located_in_terrain
+    inverse: "terrain_contains"
+    kind: entity
+    group: geography
+    expected_en: "located in/on physical feature"
+    label_en: null
+    label_fr: null
+  - property: P206
+    reva_predicate: located_next_to_water
+    inverse: "water_body_next_to"
+    kind: entity
+    group: geography
+    expected_en: "located in or next to body of water"
+    label_en: null
+    label_fr: null
+  - property: P276
+    reva_predicate: location
+    inverse: "location_of"
+    kind: entity
+    group: geography
+    expected_en: "location"
+    label_en: null
+    label_fr: null
+  - property: P3842
+    reva_predicate: located_in_present_day
+    inverse: "present_day_contains"
+    kind: entity
+    group: geography
+    expected_en: "located in present-day administrative territorial entity"
+    label_en: null
+    label_fr: null
+  - property: P1382
+    reva_predicate: partially_coincident_with
+    inverse: "partially_coincident_with"
+    kind: entity
+    group: geography
+    expected_en: "partially coincident with"
+    label_en: null
+    label_fr: null
+    symmetric: true
+  - property: P625
+    reva_predicate: coordinate_location
+    inverse: null
+    kind: coordinate
+    group: geography
+    expected_en: "coordinate location"
+    label_en: null
+    label_fr: null
+  - property: P2046
+    reva_predicate: area
+    inverse: null
+    kind: quantity
+    group: geography
+    expected_en: "area"
+    label_en: null
+    label_fr: null
+  - property: P1082
+    reva_predicate: population
+    inverse: null
+    kind: quantity
+    group: demography
+    expected_en: "population"
+    label_en: null
+    label_fr: null
+  - property: P1549
+    reva_predicate: demonym
+    inverse: null
+    kind: monolingualtext
+    group: demography
+    expected_en: "demonym"
+    label_en: null
+    label_fr: null
+  - property: P1448
+    reva_predicate: official_name
+    inverse: null
+    kind: monolingualtext
+    group: naming
+    expected_en: "official name"
+    label_en: null
+    label_fr: null
+  - property: P1813
+    reva_predicate: short_name
+    inverse: null
+    kind: monolingualtext
+    group: naming
+    expected_en: "short name"
+    label_en: null
+    label_fr: null
+  - property: P1705
+    reva_predicate: native_label
+    inverse: null
+    kind: monolingualtext
+    group: naming
+    expected_en: "native label"
+    label_en: null
+    label_fr: null
+  - property: P571
+    reva_predicate: inception
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "inception"
+    label_en: null
+    label_fr: null
+  - property: P576
+    reva_predicate: dissolved
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "dissolved, abolished or demolished date"
+    label_en: null
+    label_fr: null
+  - property: P580
+    reva_predicate: start_time
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "start time"
+    label_en: null
+    label_fr: null
+  - property: P582
+    reva_predicate: end_time
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "end time"
+    label_en: null
+    label_fr: null
+  - property: P585
+    reva_predicate: point_in_time
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "point in time"
+    label_en: null
+    label_fr: null
+  - property: P577
+    reva_predicate: publication_date
+    inverse: null
+    kind: time
+    group: time
+    expected_en: "publication date"
+    label_en: null
+    label_fr: null
+  - property: P2348
+    reva_predicate: time_period
+    inverse: "period_of"
+    kind: entity
+    group: time
+    expected_en: "time period"
+    label_en: null
+    label_fr: null
+  - property: P1365
+    reva_predicate: replaces
+    inverse: "replaced_by"
+    kind: entity
+    group: succession
+    expected_en: "replaces"
+    label_en: null
+    label_fr: null
+  - property: P1366
+    reva_predicate: replaced_by
+    inverse: "replaces"
+    kind: entity
+    group: succession
+    expected_en: "replaced by"
+    label_en: null
+    label_fr: null
+  - property: P155
+    reva_predicate: follows
+    inverse: "followed_by"
+    kind: entity
+    group: succession
+    expected_en: "follows"
+    label_en: null
+    label_fr: null
+  - property: P156
+    reva_predicate: followed_by
+    inverse: "follows"
+    kind: entity
+    group: succession
+    expected_en: "followed by"
+    label_en: null
+    label_fr: null
+  - property: P35
+    reva_predicate: head_of_state
+    inverse: "head_of_state_of"
+    kind: entity
+    group: politics
+    expected_en: "head of state"
+    label_en: null
+    label_fr: null
+  - property: P6
+    reva_predicate: head_of_government
+    inverse: "head_of_government_of"
+    kind: entity
+    group: politics
+    expected_en: "head of government"
+    label_en: null
+    label_fr: null
+  - property: P1906
+    reva_predicate: office_held_by_head_of_state
+    inverse: "head_of_state_office_of"
+    kind: entity
+    group: politics
+    expected_en: "office held by head of state"
+    label_en: null
+    label_fr: null
+  - property: P1313
+    reva_predicate: office_held_by_head_of_government
+    inverse: "head_of_government_office_of"
+    kind: entity
+    group: politics
+    expected_en: "office held by head of government"
+    label_en: null
+    label_fr: null
+  - property: P39
+    reva_predicate: position_held
+    inverse: "position_held_by"
+    kind: entity
+    group: politics
+    expected_en: "position held"
+    label_en: null
+    label_fr: null
+  - property: P194
+    reva_predicate: legislative_body
+    inverse: "legislative_body_of"
+    kind: entity
+    group: politics
+    expected_en: "legislative body"
+    label_en: null
+    label_fr: null
+  - property: P208
+    reva_predicate: executive_body
+    inverse: "executive_body_of"
+    kind: entity
+    group: politics
+    expected_en: "executive body"
+    label_en: null
+    label_fr: null
+  - property: P209
+    reva_predicate: highest_judicial_authority
+    inverse: "highest_judicial_authority_of"
+    kind: entity
+    group: politics
+    expected_en: "highest judicial authority"
+    label_en: null
+    label_fr: null
+  - property: P122
+    reva_predicate: basic_form_of_government
+    inverse: "form_of_government_of"
+    kind: entity
+    group: politics
+    expected_en: "basic form of government"
+    label_en: null
+    label_fr: null
+  - property: P1142
+    reva_predicate: political_ideology
+    inverse: "ideology_of"
+    kind: entity
+    group: politics
+    expected_en: "political ideology"
+    label_en: null
+    label_fr: null
+  - property: P102
+    reva_predicate: member_of_political_party
+    inverse: "party_member"
+    kind: entity
+    group: politics
+    expected_en: "member of political party"
+    label_en: null
+    label_fr: null
+  - property: P1001
+    reva_predicate: applies_to_jurisdiction
+    inverse: "jurisdiction_of"
+    kind: entity
+    group: politics
+    expected_en: "applies to jurisdiction"
+    label_en: null
+    label_fr: null
+  - property: P1336
+    reva_predicate: territory_claimed_by
+    inverse: "claims_territory"
+    kind: entity
+    group: politics
+    expected_en: "territory claimed by"
+    label_en: null
+    label_fr: null
+  - property: P38
+    reva_predicate: currency
+    inverse: "currency_of"
+    kind: entity
+    group: economy
+    expected_en: "currency"
+    label_en: null
+    label_fr: null
+  - property: P37
+    reva_predicate: official_language
+    inverse: "official_language_of"
+    kind: entity
+    group: language
+    expected_en: "official language"
+    label_en: null
+    label_fr: null
+  - property: P2936
+    reva_predicate: language_used
+    inverse: "language_used_in"
+    kind: entity
+    group: language
+    expected_en: "language used"
+    label_en: null
+    label_fr: null
+  - property: P103
+    reva_predicate: native_language
+    inverse: "native_language_of"
+    kind: entity
+    group: language
+    expected_en: "native language"
+    label_en: null
+    label_fr: null
+  - property: P1412
+    reva_predicate: languages_spoken
+    inverse: "spoken_by"
+    kind: entity
+    group: language
+    expected_en: "languages spoken, written or signed"
+    label_en: null
+    label_fr: null
+  - property: P407
+    reva_predicate: language_of_work
+    inverse: "language_of"
+    kind: entity
+    group: language
+    expected_en: "language of work or name"
+    label_en: null
+    label_fr: null
+  - property: P2341
+    reva_predicate: indigenous_to
+    inverse: "has_indigenous"
+    kind: entity
+    group: language
+    expected_en: "indigenous to"
+    label_en: null
+    label_fr: null
+  - property: P282
+    reva_predicate: writing_system
+    inverse: "writing_system_of"
+    kind: entity
+    group: language
+    expected_en: "writing system"
+    label_en: null
+    label_fr: null
+  - property: P1098
+    reva_predicate: number_of_speakers
+    inverse: null
+    kind: quantity
+    group: language
+    expected_en: "number of speakers, writers, or signers"
+    label_en: null
+    label_fr: null
+  - property: P220
+    reva_predicate: iso_639_3
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "ISO 639-3 code"
+    label_en: null
+    label_fr: null
+  - property: P218
+    reva_predicate: iso_639_1
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "ISO 639-1 code"
+    label_en: null
+    label_fr: null
+  - property: P140
+    reva_predicate: religion
+    inverse: "religion_of"
+    kind: entity
+    group: religion
+    expected_en: "religion or worldview"
+    label_en: null
+    label_fr: null
+  - property: P3075
+    reva_predicate: official_religion
+    inverse: "official_religion_of"
+    kind: entity
+    group: religion
+    expected_en: "official religion"
+    label_en: null
+    label_fr: null
+  - property: P172
+    reva_predicate: ethnic_group
+    inverse: "ethnic_group_of"
+    kind: entity
+    group: society
+    expected_en: "ethnic group"
+    label_en: null
+    label_fr: null
+  - property: P463
+    reva_predicate: member_of
+    inverse: "has_member"
+    kind: entity
+    group: organisations
+    expected_en: "member of"
+    label_en: null
+    label_fr: null
+  - property: P530
+    reva_predicate: diplomatic_relation
+    inverse: "diplomatic_relation"
+    kind: entity
+    group: geopolitics
+    expected_en: "diplomatic relation"
+    label_en: null
+    label_fr: null
+    symmetric: true
+  - property: P607
+    reva_predicate: conflict
+    inverse: "conflict_of"
+    kind: entity
+    group: conflict
+    expected_en: "conflict"
+    label_en: null
+    label_fr: null
+  - property: P710
+    reva_predicate: participant
+    inverse: "participant_in"
+    kind: entity
+    group: events
+    expected_en: "participant"
+    label_en: null
+    label_fr: null
+  - property: P1344
+    reva_predicate: participant_in
+    inverse: "participant"
+    kind: entity
+    group: events
+    expected_en: "participant in"
+    label_en: null
+    label_fr: null
+  - property: P793
+    reva_predicate: significant_event
+    inverse: "significant_event_of"
+    kind: entity
+    group: events
+    expected_en: "significant event"
+    label_en: null
+    label_fr: null
+  - property: P828
+    reva_predicate: has_cause
+    inverse: "cause_of"
+    kind: entity
+    group: causality
+    expected_en: "has cause"
+    label_en: null
+    label_fr: null
+  - property: P1542
+    reva_predicate: has_effect
+    inverse: "effect_of"
+    kind: entity
+    group: causality
+    expected_en: "has effect"
+    label_en: null
+    label_fr: null
+  - property: P1478
+    reva_predicate: has_immediate_cause
+    inverse: "immediate_cause_of"
+    kind: entity
+    group: causality
+    expected_en: "has immediate cause"
+    label_en: null
+    label_fr: null
+  - property: P1536
+    reva_predicate: immediate_cause_of
+    inverse: "has_immediate_cause"
+    kind: entity
+    group: causality
+    expected_en: "immediate cause of"
+    label_en: null
+    label_fr: null
+  - property: P1479
+    reva_predicate: has_contributing_factor
+    inverse: "contributing_factor_of"
+    kind: entity
+    group: causality
+    expected_en: "has contributing factor"
+    label_en: null
+    label_fr: null
+  - property: P1537
+    reva_predicate: contributing_factor_of
+    inverse: "has_contributing_factor"
+    kind: entity
+    group: causality
+    expected_en: "contributing factor of"
+    label_en: null
+    label_fr: null
+  - property: P1891
+    reva_predicate: signatory
+    inverse: "signatory_of"
+    kind: entity
+    group: treaties
+    expected_en: "signatory"
+    label_en: null
+    label_fr: null
+  - property: P790
+    reva_predicate: approved_by
+    inverse: "approved"
+    kind: entity
+    group: treaties
+    expected_en: "approved by"
+    label_en: null
+    label_fr: null
+  - property: P3005
+    reva_predicate: valid_in_place
+    inverse: "place_of_validity"
+    kind: entity
+    group: treaties
+    expected_en: "valid in place"
+    label_en: null
+    label_fr: null
+  - property: P1120
+    reva_predicate: number_of_deaths
+    inverse: null
+    kind: quantity
+    group: events
+    expected_en: "number of deaths"
+    label_en: null
+    label_fr: null
+  - property: P1132
+    reva_predicate: number_of_participants
+    inverse: null
+    kind: quantity
+    group: events
+    expected_en: "number of participants"
+    label_en: null
+    label_fr: null
+  - property: P1346
+    reva_predicate: winner
+    inverse: "won"
+    kind: entity
+    group: events
+    expected_en: "winner"
+    label_en: null
+    label_fr: null
+  - property: P3342
+    reva_predicate: significant_person
+    inverse: "significant_person_for"
+    kind: entity
+    group: events
+    expected_en: "significant person"
+    label_en: null
+    label_fr: null
+  - property: P664
+    reva_predicate: organizer
+    inverse: "organizer_of"
+    kind: entity
+    group: events
+    expected_en: "organizer"
+    label_en: null
+    label_fr: null
+  - property: P1427
+    reva_predicate: start_point
+    inverse: "start_point_of"
+    kind: entity
+    group: voyages
+    expected_en: "start point"
+    label_en: null
+    label_fr: null
+  - property: P1444
+    reva_predicate: destination_point
+    inverse: "destination_of"
+    kind: entity
+    group: voyages
+    expected_en: "destination point"
+    label_en: null
+    label_fr: null
+  - property: P1029
+    reva_predicate: crew_member
+    inverse: "crew_member_of"
+    kind: entity
+    group: voyages
+    expected_en: "crew member(s)"
+    label_en: null
+    label_fr: null
+  - property: P61
+    reva_predicate: discoverer_or_inventor
+    inverse: "discovered_or_invented"
+    kind: entity
+    group: science
+    expected_en: "discoverer or inventor"
+    label_en: null
+    label_fr: null
+  - property: P575
+    reva_predicate: time_of_discovery
+    inverse: null
+    kind: time
+    group: science
+    expected_en: "time of discovery or invention"
+    label_en: null
+    label_fr: null
+  - property: P27
+    reva_predicate: citizenship
+    inverse: "citizen"
+    kind: entity
+    group: people
+    expected_en: "country of citizenship"
+    label_en: null
+    label_fr: null
+  - property: P19
+    reva_predicate: place_of_birth
+    inverse: "birthplace_of"
+    kind: entity
+    group: people
+    expected_en: "place of birth"
+    label_en: null
+    label_fr: null
+  - property: P20
+    reva_predicate: place_of_death
+    inverse: "deathplace_of"
+    kind: entity
+    group: people
+    expected_en: "place of death"
+    label_en: null
+    label_fr: null
+  - property: P569
+    reva_predicate: date_of_birth
+    inverse: null
+    kind: time
+    group: people
+    expected_en: "date of birth"
+    label_en: null
+    label_fr: null
+  - property: P570
+    reva_predicate: date_of_death
+    inverse: null
+    kind: time
+    group: people
+    expected_en: "date of death"
+    label_en: null
+    label_fr: null
+  - property: P21
+    reva_predicate: sex_or_gender
+    inverse: null
+    kind: entity
+    group: people
+    expected_en: "sex or gender"
+    label_en: null
+    label_fr: null
+  - property: P106
+    reva_predicate: occupation
+    inverse: "occupation_of"
+    kind: entity
+    group: people
+    expected_en: "occupation"
+    label_en: null
+    label_fr: null
+  - property: P101
+    reva_predicate: field_of_work
+    inverse: "field_of_work_of"
+    kind: entity
+    group: people
+    expected_en: "field of work"
+    label_en: null
+    label_fr: null
+  - property: P166
+    reva_predicate: award_received
+    inverse: "awarded_to"
+    kind: entity
+    group: people
+    expected_en: "award received"
+    label_en: null
+    label_fr: null
+  - property: P69
+    reva_predicate: educated_at
+    inverse: "alumnus"
+    kind: entity
+    group: people
+    expected_en: "educated at"
+    label_en: null
+    label_fr: null
+  - property: P108
+    reva_predicate: employer
+    inverse: "employee"
+    kind: entity
+    group: people
+    expected_en: "employer"
+    label_en: null
+    label_fr: null
+  - property: P22
+    reva_predicate: father
+    inverse: "child_of_father"
+    kind: entity
+    group: family
+    expected_en: "father"
+    label_en: null
+    label_fr: null
+  - property: P25
+    reva_predicate: mother
+    inverse: "child_of_mother"
+    kind: entity
+    group: family
+    expected_en: "mother"
+    label_en: null
+    label_fr: null
+  - property: P26
+    reva_predicate: spouse
+    inverse: "spouse"
+    kind: entity
+    group: family
+    expected_en: "spouse"
+    label_en: null
+    label_fr: null
+    symmetric: true
+  - property: P40
+    reva_predicate: child
+    inverse: "parent"
+    kind: entity
+    group: family
+    expected_en: "child"
+    label_en: null
+    label_fr: null
+  - property: P3373
+    reva_predicate: sibling
+    inverse: "sibling"
+    kind: entity
+    group: family
+    expected_en: "sibling"
+    label_en: null
+    label_fr: null
+    symmetric: true
+  - property: P53
+    reva_predicate: family
+    inverse: "family_member"
+    kind: entity
+    group: family
+    expected_en: "family"
+    label_en: null
+    label_fr: null
+  - property: P97
+    reva_predicate: noble_title
+    inverse: "noble_title_holder"
+    kind: entity
+    group: people
+    expected_en: "noble title"
+    label_en: null
+    label_fr: null
+  - property: P551
+    reva_predicate: residence
+    inverse: "residence_of"
+    kind: entity
+    group: people
+    expected_en: "residence"
+    label_en: null
+    label_fr: null
+  - property: P937
+    reva_predicate: work_location
+    inverse: "work_location_of"
+    kind: entity
+    group: people
+    expected_en: "work location"
+    label_en: null
+    label_fr: null
+  - property: P135
+    reva_predicate: movement
+    inverse: "movement_member"
+    kind: entity
+    group: culture
+    expected_en: "movement"
+    label_en: null
+    label_fr: null
+  - property: P737
+    reva_predicate: influenced_by
+    inverse: "influenced"
+    kind: entity
+    group: culture
+    expected_en: "influenced by"
+    label_en: null
+    label_fr: null
+  - property: P800
+    reva_predicate: notable_work
+    inverse: "notable_work_of"
+    kind: entity
+    group: culture
+    expected_en: "notable work"
+    label_en: null
+    label_fr: null
+  - property: P50
+    reva_predicate: author
+    inverse: "author_of"
+    kind: entity
+    group: culture
+    expected_en: "author"
+    label_en: null
+    label_fr: null
+  - property: P170
+    reva_predicate: creator
+    inverse: "creator_of"
+    kind: entity
+    group: culture
+    expected_en: "creator"
+    label_en: null
+    label_fr: null
+  - property: P495
+    reva_predicate: country_of_origin
+    inverse: "origin_country_of"
+    kind: entity
+    group: culture
+    expected_en: "country of origin"
+    label_en: null
+    label_fr: null
+  - property: P2596
+    reva_predicate: culture
+    inverse: "culture_of"
+    kind: entity
+    group: culture
+    expected_en: "culture"
+    label_en: null
+    label_fr: null
+  - property: P1435
+    reva_predicate: heritage_designation
+    inverse: "heritage_designation_of"
+    kind: entity
+    group: culture
+    expected_en: "heritage designation"
+    label_en: null
+    label_fr: null
+  - property: P1066
+    reva_predicate: student_of
+    inverse: "teacher_of"
+    kind: entity
+    group: science
+    expected_en: "student of"
+    label_en: null
+    label_fr: null
+  - property: P802
+    reva_predicate: student
+    inverse: "student_of"
+    kind: entity
+    group: science
+    expected_en: "student"
+    label_en: null
+    label_fr: null
+  - property: P184
+    reva_predicate: doctoral_advisor
+    inverse: "doctoral_student_of"
+    kind: entity
+    group: science
+    expected_en: "doctoral advisor"
+    label_en: null
+    label_fr: null
+  - property: P2578
+    reva_predicate: studies
+    inverse: "studied_by"
+    kind: entity
+    group: science
+    expected_en: "studies"
+    label_en: null
+    label_fr: null
+  - property: P2579
+    reva_predicate: studied_by
+    inverse: "studies"
+    kind: entity
+    group: science
+    expected_en: "studied by"
+    label_en: null
+    label_fr: null
+  - property: P112
+    reva_predicate: founded_by
+    inverse: "founder_of"
+    kind: entity
+    group: organisations
+    expected_en: "founded by"
+    label_en: null
+    label_fr: null
+  - property: P127
+    reva_predicate: owned_by
+    inverse: "owner_of"
+    kind: entity
+    group: organisations
+    expected_en: "owned by"
+    label_en: null
+    label_fr: null
+  - property: P1830
+    reva_predicate: owner_of
+    inverse: "owned_by"
+    kind: entity
+    group: organisations
+    expected_en: "owner of"
+    label_en: null
+    label_fr: null
+  - property: P749
+    reva_predicate: parent_organization
+    inverse: "subsidiary_of_org"
+    kind: entity
+    group: organisations
+    expected_en: "parent organization"
+    label_en: null
+    label_fr: null
+  - property: P355
+    reva_predicate: has_subsidiary
+    inverse: "parent_organization_of"
+    kind: entity
+    group: organisations
+    expected_en: "has subsidiary"
+    label_en: null
+    label_fr: null
+  - property: P488
+    reva_predicate: chairperson
+    inverse: "chairperson_of"
+    kind: entity
+    group: organisations
+    expected_en: "chairperson"
+    label_en: null
+    label_fr: null
+  - property: P1037
+    reva_predicate: director_manager
+    inverse: "directs"
+    kind: entity
+    group: organisations
+    expected_en: "director / manager"
+    label_en: null
+    label_fr: null
+  - property: P159
+    reva_predicate: headquarters_location
+    inverse: "headquarters_of"
+    kind: entity
+    group: organisations
+    expected_en: "headquarters location"
+    label_en: null
+    label_fr: null
+  - property: P740
+    reva_predicate: location_of_formation
+    inverse: "formation_location_of"
+    kind: entity
+    group: organisations
+    expected_en: "location of formation"
+    label_en: null
+    label_fr: null
+  - property: P452
+    reva_predicate: industry
+    inverse: "industry_of"
+    kind: entity
+    group: organisations
+    expected_en: "industry"
+    label_en: null
+    label_fr: null
+  - property: P2124
+    reva_predicate: member_count
+    inverse: null
+    kind: quantity
+    group: organisations
+    expected_en: "member count"
+    label_en: null
+    label_fr: null
+  - property: P1128
+    reva_predicate: employees
+    inverse: null
+    kind: quantity
+    group: organisations
+    expected_en: "employees"
+    label_en: null
+    label_fr: null
+  - property: P297
+    reva_predicate: iso_3166_1_alpha2
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "ISO 3166-1 alpha-2 code"
+    label_en: null
+    label_fr: null
+  - property: P298
+    reva_predicate: iso_3166_1_alpha3
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "ISO 3166-1 alpha-3 code"
+    label_en: null
+    label_fr: null
+  - property: P299
+    reva_predicate: iso_3166_1_numeric
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "ISO 3166-1 numeric code"
+    label_en: null
+    label_fr: null
+  - property: P1566
+    reva_predicate: geonames_id
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "GeoNames ID"
+    label_en: null
+    label_fr: null
+  - property: P402
+    reva_predicate: osm_relation_id
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "OpenStreetMap relation ID"
+    label_en: null
+    label_fr: null
+  - property: P757
+    reva_predicate: world_heritage_site_id
+    inverse: null
+    kind: external_id
+    group: identifier
+    expected_en: "World Heritage Site ID"
+    label_en: null
+    label_fr: null
+  - property: P856
+    reva_predicate: official_website
+    inverse: null
+    kind: url
+    group: identifier
+    expected_en: "official website"
+    label_en: null
+    label_fr: null
+# Qualifiers kept on statements (others are dropped). P580/P582/P585 become the statement's
+# temporal fields (with precision); the rest go to the qualifiers jsonb.
+qualifiers:
+  - {property: P580, expected_en: "start time", label_en: null, label_fr: null}
+  - {property: P582, expected_en: "end time", label_en: null, label_fr: null}
+  - {property: P585, expected_en: "point in time", label_en: null, label_fr: null}
+  - {property: P1319, expected_en: "earliest date", label_en: null, label_fr: null}
+  - {property: P1326, expected_en: "latest date", label_en: null, label_fr: null}
+  - {property: P642, expected_en: "of", label_en: null, label_fr: null}
+  - {property: P1534, expected_en: "end cause", label_en: null, label_fr: null}
+  - {property: P459, expected_en: "determination method", label_en: null, label_fr: null}
+  - {property: P1480, expected_en: "sourcing circumstances", label_en: null, label_fr: null}
+  - {property: P1310, expected_en: "statement disputed by", label_en: null, label_fr: null}
+  - {property: P5102, expected_en: "nature of statement", label_en: null, label_fr: null}
+  - {property: P3831, expected_en: "object has role", label_en: null, label_fr: null}
+  - {property: P2868, expected_en: "subject has role", label_en: null, label_fr: null}
+  - {property: P1545, expected_en: "series ordinal", label_en: null, label_fr: null}
+  - {property: P518, expected_en: "applies to part", label_en: null, label_fr: null}
+  - {property: P155, expected_en: "follows", label_en: null, label_fr: null}
+  - {property: P156, expected_en: "followed by", label_en: null, label_fr: null}
+  - {property: P1365, expected_en: "replaces", label_en: null, label_fr: null}
+  - {property: P1366, expected_en: "replaced by", label_en: null, label_fr: null}
+  - {property: P768, expected_en: "electoral district", label_en: null, label_fr: null}
+  - {property: P2715, expected_en: "elected in", label_en: null, label_fr: null}
+  - {property: P805, expected_en: "statement is subject of", label_en: null, label_fr: null}
+  - {property: P17, expected_en: "country", label_en: null, label_fr: null}
+  - {property: P276, expected_en: "location", label_en: null, label_fr: null}
+  - {property: P7452, expected_en: "reason for preferred rank", label_en: null, label_fr: null}
+  - {property: P1352, expected_en: "ranking", label_en: null, label_fr: null}
+  - {property: P3680, expected_en: "statement supported by", label_en: null, label_fr: null}
+# Reference properties kept (compactly) per statement reference.
+references:
+  - {property: P248, expected_en: "stated in", label_en: null, label_fr: null}
+  - {property: P854, expected_en: "reference URL", label_en: null, label_fr: null}
+  - {property: P813, expected_en: "retrieved", label_en: null, label_fr: null}
+  - {property: P143, expected_en: "imported from Wikimedia project", label_en: null, label_fr: null}

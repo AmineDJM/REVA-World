@@ -1,0 +1,25 @@
+id: culture.languages
+domain: culture
+owner: KGCULT
+description: >-
+  Every language item carrying a non-deprecated ISO 639-3 code (P220): the individual languages,
+  macrolanguages and collective codes of ISO 639-3. Snapshots keep codes (ISO 639-1/2/3, IETF,
+  Glottocode), genealogy (subclass of / part of / dialect of), number of speakers with their
+  point-in-time qualifiers, writing systems and endangerment status.
+purpose: seed_entities
+entity_kind: language
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item p:P220 ?st .
+    ?st wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+  }
+max_rows: 12000
+expand_hops: 1
+properties: [P31, P279, P361, P4913, P218, P219, P220, P305, P1394, P1098, P282, P2341, P17,
+             P1999, P3823, P1018, P571, P576, P1365, P1366, P155, P156]
+notes: >-
+  ISO 639-3 has about 7,900 codes; Wikidata also tags some retired and collective codes, hence the
+  12,000 bound. Speakers (P1098) are kept with every qualifier the harvester keeps (point in time
+  P585, applies to part P518, object has role P3831 L1/L2, determination method P459) and with their
+  references: figures are what the cited source says for that date, never a current estimate.

@@ -1,0 +1,22 @@
+id: culture.language_ancestors
+domain: culture
+owner: KGCULT
+description: >-
+  Closure of the subclass-of (P279) chain above every ISO 639-3 language: intermediate branches
+  (e.g. Western Ibero-Romance, Romance, Italic, Indo-European) that are not typed as language family
+  but are needed for an unbroken genealogy path language -> branch -> family.
+purpose: seed_entities
+entity_kind: language_family
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?lang wdt:P220 ?iso .
+    ?lang wdt:P279+ ?item .
+  }
+max_rows: 8000
+expand_hops: 0
+properties: [P31, P279, P361, P1394, P219, P220, P2341, P571]
+notes: >-
+  The top of the chain reaches abstract classes (language, natural language, modern language);
+  they are harvested like any other node and are recognisable by their P31/P279 classes. Paths must
+  not treat "subclass of language" as a genealogical link: KG consumers should stop at items that
+  carry a Glottocode (P1394) or are instances of language family (Q25295).

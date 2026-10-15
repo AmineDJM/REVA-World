@@ -1,0 +1,22 @@
+id: culture.country_currencies
+domain: culture
+owner: KGCULT
+description: >-
+  Currency (P38) statements of the 250 crosswalk countries over time (start/end qualifiers), e.g.
+  Brazil: real, cruzeiro, cruzado...
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?currency ?rank ?start ?end WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P38 ?statement .
+    ?statement ps:P38 ?currency ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+columns: {subject: country, property: P38, object: currency, statement: statement, rank: rank,
+          start: start, end: end}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 3000
+expand_hops: 1

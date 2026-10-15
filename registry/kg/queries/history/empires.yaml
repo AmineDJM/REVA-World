@@ -1,0 +1,15 @@
+id: history.empires
+domain: history
+owner: KGHIST
+description: >-
+  Empires: every item that is an instance of empire (Q48349) or of a subclass of it (colonial empire
+  Q1790360, maritime empire, ...). Snapshots keep inception/dissolution (P571/P576), succession
+  (P1365/P1366/P155/P156), parts (P361/P527/P150), capital, official language, significant events.
+purpose: seed_entities
+entity_kind: empire
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    ?item wdt:P31/wdt:P279* wd:Q48349 .
+  }
+max_rows: 3000
+expand_hops: 1

@@ -1,0 +1,25 @@
+id: culture.country_languages_used
+domain: culture
+owner: KGCULT
+description: >-
+  Language used (P2936) statements of the 250 crosswalk countries, with point in time, start/end,
+  number of speakers / proportion qualifiers where present.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?language ?rank ?start ?end ?pit ?quantity ?proportion WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P2936 ?statement .
+    ?statement ps:P2936 ?language ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+    OPTIONAL { ?statement pq:P1098 ?quantity }
+    OPTIONAL { ?statement pq:P1107 ?proportion }
+  }
+columns: {subject: country, property: P2936, object: language, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit, qualifiers: {P1098: quantity, P1107: proportion}}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 15000
+expand_hops: 1

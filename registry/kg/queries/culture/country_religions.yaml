@@ -1,0 +1,28 @@
+id: culture.country_religions
+domain: culture
+owner: KGCULT
+description: >-
+  Religion or worldview (P140) statements of the 250 crosswalk countries (state religion or a
+  religion reported with a proportion), with start/end, point in time and proportion (P1107).
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?religion ?rank ?start ?end ?pit ?proportion WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P140 ?statement .
+    ?statement ps:P140 ?religion ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+    OPTIONAL { ?statement pq:P1107 ?proportion }
+  }
+columns: {subject: country, property: P140, object: religion, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit, qualifiers: {P1107: proportion}}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 3000
+expand_hops: 1
+notes: >-
+  Wikidata uses P140 on countries inconsistently (sometimes state religion, sometimes majority
+  religion with a proportion, often absent). Consumers must read the qualifiers; absence of a P140
+  statement is not evidence of no religion.

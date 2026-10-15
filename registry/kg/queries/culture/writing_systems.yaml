@@ -1,0 +1,17 @@
+id: culture.writing_systems
+domain: culture
+owner: KGCULT
+description: >-
+  Writing systems used by ISO 639-3 languages (objects of P282) plus every direct instance of writing
+  system (Q8192), with their own genealogy (P279/P361), ISO 15924 code and inception.
+purpose: seed_entities
+entity_kind: other
+sparql: |
+  SELECT DISTINCT ?item WHERE {
+    { ?lang wdt:P220 ?iso ; wdt:P282 ?item . }
+    UNION
+    { ?item wdt:P31 wd:Q8192 . }
+  }
+max_rows: 4000
+expand_hops: 0
+properties: [P31, P279, P361, P506, P571, P282, P144]

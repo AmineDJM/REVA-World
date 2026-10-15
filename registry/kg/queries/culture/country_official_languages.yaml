@@ -1,0 +1,28 @@
+id: culture.country_official_languages
+domain: culture
+owner: KGCULT
+description: >-
+  Official language (P37) statements of the 250 crosswalk countries, with start/end time, point in
+  time, applies-to-part (regional officiality) and statement ids. First hop of paths such as
+  Brazil -> official language -> Portuguese.
+purpose: statements
+entity_kind: country
+sparql: |
+  SELECT ?country ?statement ?language ?rank ?start ?end ?pit ?part WHERE {
+    VALUES ?country { {{values}} }
+    ?country p:P37 ?statement .
+    ?statement ps:P37 ?language ; wikibase:rank ?rank .
+    FILTER(?rank != wikibase:DeprecatedRank)
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+    OPTIONAL { ?statement pq:P585 ?pit }
+    OPTIONAL { ?statement pq:P518 ?part }
+  }
+columns: {subject: country, property: P37, object: language, statement: statement, rank: rank,
+          start: start, end: end, point_in_time: pit, qualifiers: {P518: part}}
+split: {by: values, source: countries, chunk_size: 50}
+max_rows: 3000
+expand_hops: 1
+notes: >-
+  A statement with several P518 values yields one row per value; the harvester de-duplicates on the
+  statement id and keeps every qualifier value.
